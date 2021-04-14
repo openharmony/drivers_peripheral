@@ -59,7 +59,7 @@ static int OnWifiEventListener(struct HdfDevEventlistener *listener,
  * @tc.type: FUNC
  * @tc.require: AR000F869F, AR000F8QNL
  */
-HWTEST_F(WifiClientTest, WifiClientInitAndDeinit001, TestSize.Level0)
+HWTEST_F(WifiClientTest, WifiClientInitAndDeinit001, TestSize.Level1)
 {
     int ret;
 
@@ -74,7 +74,7 @@ HWTEST_F(WifiClientTest, WifiClientInitAndDeinit001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869F, AR000F8QNL
  */
-HWTEST_F(WifiClientTest, WifiClientInitAndDeinit002, TestSize.Level0)
+HWTEST_F(WifiClientTest, WifiClientInitAndDeinit002, TestSize.Level1)
 {
     int ret;
 
@@ -93,7 +93,7 @@ HWTEST_F(WifiClientTest, WifiClientInitAndDeinit002, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869F, AR000F8QNL
  */
-HWTEST_F(WifiClientTest, WifiClientInitAndDeinit003, TestSize.Level0)
+HWTEST_F(WifiClientTest, WifiClientInitAndDeinit003, TestSize.Level1)
 {
     int ret;
 
@@ -110,7 +110,7 @@ HWTEST_F(WifiClientTest, WifiClientInitAndDeinit003, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869F, AR000F8QNL
  */
-HWTEST_F(WifiClientTest, WifiRegisterListener001, TestSize.Level0)
+HWTEST_F(WifiClientTest, WifiRegisterListener001, TestSize.Level1)
 {
     int ret;
 
@@ -129,7 +129,7 @@ HWTEST_F(WifiClientTest, WifiRegisterListener001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869F, AR000F8QNL
  */
-HWTEST_F(WifiClientTest, WifiRegisterListener002, TestSize.Level0)
+HWTEST_F(WifiClientTest, WifiRegisterListener002, TestSize.Level1)
 {
     int ret;
 
@@ -153,7 +153,7 @@ HWTEST_F(WifiClientTest, WifiRegisterListener002, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869F
  */
-HWTEST_F(WifiClientTest, WifiRegisterListener003, TestSize.Level0)
+HWTEST_F(WifiClientTest, WifiRegisterListener003, TestSize.Level1)
 {
     int ret;
 
@@ -178,7 +178,7 @@ HWTEST_F(WifiClientTest, WifiRegisterListener003, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869F
  */
-HWTEST_F(WifiClientTest, WifiRegisterListener004, TestSize.Level0)
+HWTEST_F(WifiClientTest, WifiRegisterListener004, TestSize.Level1)
 {
     int ret;
 
@@ -201,7 +201,7 @@ HWTEST_F(WifiClientTest, WifiRegisterListener004, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869F
  */
-HWTEST_F(WifiClientTest, WifiRegisterListener005, TestSize.Level0)
+HWTEST_F(WifiClientTest, WifiRegisterListener005, TestSize.Level1)
 {
     int ret;
 
@@ -219,7 +219,7 @@ HWTEST_F(WifiClientTest, WifiRegisterListener005, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869F
  */
-HWTEST_F(WifiClientTest, WifiRegisterListener006, TestSize.Level0)
+HWTEST_F(WifiClientTest, WifiRegisterListener006, TestSize.Level1)
 {
     int ret;
 
@@ -244,7 +244,7 @@ HWTEST_F(WifiClientTest, WifiRegisterListener006, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869F
  */
-HWTEST_F(WifiClientTest, WifiRegisterListener007, TestSize.Level0)
+HWTEST_F(WifiClientTest, WifiRegisterListener007, TestSize.Level1)
 {
     int ret;
 
