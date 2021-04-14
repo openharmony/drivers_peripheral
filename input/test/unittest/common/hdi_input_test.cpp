@@ -84,7 +84,7 @@ void ReportEventPkgCallback(const EventPackage **pkgs, uint32_t count)
   * @tc.type: FUNC
   * @tc.require: AR000F867R, AR000F8QNL
   */
-HWTEST_F(HdiInputTest, OpenInputDev001, TestSize.Level0)
+HWTEST_F(HdiInputTest, OpenInputDev001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] OpenInputDev001 enter", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -102,7 +102,7 @@ HWTEST_F(HdiInputTest, OpenInputDev001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867R
   */
-HWTEST_F(HdiInputTest, OpenInputDevice002, TestSize.Level0)
+HWTEST_F(HdiInputTest, OpenInputDevice002, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] OpenInputDev002 enter", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -121,7 +121,7 @@ HWTEST_F(HdiInputTest, OpenInputDevice002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867T, AR000F8QNL
   */
-HWTEST_F(HdiInputTest, CloseInputDevice001, TestSize.Level0)
+HWTEST_F(HdiInputTest, CloseInputDevice001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] CloseInputDev001 enter", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -139,7 +139,7 @@ HWTEST_F(HdiInputTest, CloseInputDevice001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867T
   */
-HWTEST_F(HdiInputTest, CloseInputDevice002, TestSize.Level0)
+HWTEST_F(HdiInputTest, CloseInputDevice002, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] CloseInputDev002 enter", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -158,7 +158,7 @@ HWTEST_F(HdiInputTest, CloseInputDevice002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867S
   */
-HWTEST_F(HdiInputTest, GetInputDevice001, TestSize.Level0)
+HWTEST_F(HdiInputTest, GetInputDevice001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] GetInputDevice001 enter", __func__);
     DeviceInfo *dev = NULL;
@@ -191,7 +191,7 @@ HWTEST_F(HdiInputTest, GetInputDevice001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F8680
   */
-HWTEST_F(HdiInputTest, GetInputDeviceList001, TestSize.Level0)
+HWTEST_F(HdiInputTest, GetInputDeviceList001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] GetInputDeviceList001 enter", __func__);
     int32_t ret;
@@ -224,7 +224,7 @@ HWTEST_F(HdiInputTest, GetInputDeviceList001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F8681, AR000F8QNL
   */
-HWTEST_F(HdiInputTest, GetDeviceType001, TestSize.Level0)
+HWTEST_F(HdiInputTest, GetDeviceType001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] GetDeviceType001 enter", __func__);
     int32_t ret;
@@ -246,7 +246,7 @@ HWTEST_F(HdiInputTest, GetDeviceType001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F8682
   */
-HWTEST_F(HdiInputTest, GetChipInfo001, TestSize.Level0)
+HWTEST_F(HdiInputTest, GetChipInfo001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] GetChipInfo001 enter", __func__);
     int32_t ret;
@@ -268,7 +268,7 @@ HWTEST_F(HdiInputTest, GetChipInfo001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F8683
   */
-HWTEST_F(HdiInputTest, GetInputDevice002, TestSize.Level0)
+HWTEST_F(HdiInputTest, GetInputDevice002, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] GetInputDevice002 enter", __func__);
     int32_t ret;
@@ -297,7 +297,7 @@ HWTEST_F(HdiInputTest, GetInputDevice002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F8684, AR000F8QNL
   */
-HWTEST_F(HdiInputTest, RegisterCallback001, TestSize.Level0)
+HWTEST_F(HdiInputTest, RegisterCallback001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] RegisterCallbac001 enter", __func__);
     int32_t ret;
@@ -319,7 +319,7 @@ HWTEST_F(HdiInputTest, RegisterCallback001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867T
   */
-HWTEST_F(HdiInputTest, SetPowerStatus001, TestSize.Level0)
+HWTEST_F(HdiInputTest, SetPowerStatus001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] SetPowerStatus001 enter", __func__);
     int32_t ret;
@@ -340,7 +340,7 @@ HWTEST_F(HdiInputTest, SetPowerStatus001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867T
   */
-HWTEST_F(HdiInputTest, SetPowerStatus002, TestSize.Level0)
+HWTEST_F(HdiInputTest, SetPowerStatus002, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] SetPowerStatus002 enter", __func__);
     int32_t ret;
@@ -362,7 +362,7 @@ HWTEST_F(HdiInputTest, SetPowerStatus002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867S
   */
-HWTEST_F(HdiInputTest, GetPowerStatus001, TestSize.Level0)
+HWTEST_F(HdiInputTest, GetPowerStatus001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] GetPowerStatus001 enter", __func__);
     int32_t ret;
@@ -384,7 +384,7 @@ HWTEST_F(HdiInputTest, GetPowerStatus001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867S
   */
-HWTEST_F(HdiInputTest, GetPowerStatus002, TestSize.Level0)
+HWTEST_F(HdiInputTest, GetPowerStatus002, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] GetPowerStatus002 enter", __func__);
     int32_t ret;
@@ -406,7 +406,7 @@ HWTEST_F(HdiInputTest, GetPowerStatus002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867T
   */
-HWTEST_F(HdiInputTest, GetVendorName001, TestSize.Level0)
+HWTEST_F(HdiInputTest, GetVendorName001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] GetVendorName001 enter", __func__);
     int32_t ret;
@@ -428,7 +428,7 @@ HWTEST_F(HdiInputTest, GetVendorName001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867T
   */
-HWTEST_F(HdiInputTest, GetVendorName002, TestSize.Level0)
+HWTEST_F(HdiInputTest, GetVendorName002, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] GetVendorName002 enter", __func__);
     int32_t ret;
@@ -450,7 +450,7 @@ HWTEST_F(HdiInputTest, GetVendorName002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867S
   */
-HWTEST_F(HdiInputTest, GetChipName001, TestSize.Level0)
+HWTEST_F(HdiInputTest, GetChipName001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] GetChipName001 enter", __func__);
     int32_t ret;
@@ -472,7 +472,7 @@ HWTEST_F(HdiInputTest, GetChipName001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867S
   */
-HWTEST_F(HdiInputTest, GetChipName002, TestSize.Level0)
+HWTEST_F(HdiInputTest, GetChipName002, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] GetChipName002 enter", __func__);
     int32_t ret;
@@ -494,7 +494,7 @@ HWTEST_F(HdiInputTest, GetChipName002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867S
   */
-HWTEST_F(HdiInputTest, SetGestureMode001, TestSize.Level0)
+HWTEST_F(HdiInputTest, SetGestureMode001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] SetGestureMode001 enter", __func__);
     int32_t ret;
@@ -515,7 +515,7 @@ HWTEST_F(HdiInputTest, SetGestureMode001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867S
   */
-HWTEST_F(HdiInputTest, SetGestureMode002, TestSize.Level0)
+HWTEST_F(HdiInputTest, SetGestureMode002, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] SetGestureMode001 enter", __func__);
     int32_t ret;
@@ -537,7 +537,7 @@ HWTEST_F(HdiInputTest, SetGestureMode002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867R
   */
-HWTEST_F(HdiInputTest, RunCapacitanceTest001, TestSize.Level0)
+HWTEST_F(HdiInputTest, RunCapacitanceTest001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] RunCapacitanceTest001 enter", __func__);
     int32_t ret;
@@ -559,7 +559,7 @@ HWTEST_F(HdiInputTest, RunCapacitanceTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F867R
   */
-HWTEST_F(HdiInputTest, RunExtraCommand001, TestSize.Level0)
+HWTEST_F(HdiInputTest, RunExtraCommand001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] RunExtraCommand001 enter", __func__);
     int32_t ret;
@@ -582,7 +582,7 @@ HWTEST_F(HdiInputTest, RunExtraCommand001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F8682, AR000F8QNL
   */
-HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level0)
+HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] RegisterCallbackAndReportData001 enter", __func__);
     int32_t ret;
@@ -608,7 +608,7 @@ HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F867Q
   */
-HWTEST_F(HdiInputTest, UnregisterReportCallback001, TestSize.Level0)
+HWTEST_F(HdiInputTest, UnregisterReportCallback001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] UnregisterReportCallback001 enter", __func__);
     int32_t ret;

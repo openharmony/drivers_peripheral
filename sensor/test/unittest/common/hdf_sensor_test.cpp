@@ -95,7 +95,7 @@ void HdfSensorTest::TearDown()
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869N, AR000F8QNL
   */
-HWTEST_F(HdfSensorTest, GetSensorInstance001, TestSize.Level0)
+HWTEST_F(HdfSensorTest, GetSensorInstance001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_sensorDev);
 }
@@ -106,7 +106,7 @@ HWTEST_F(HdfSensorTest, GetSensorInstance001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869N
   */
-HWTEST_F(HdfSensorTest, GetSensorInstance002, TestSize.Level0)
+HWTEST_F(HdfSensorTest, GetSensorInstance002, TestSize.Level1)
 {
     const struct SensorInterface *sensorDev = NewSensorInterfaceInstance();
 
@@ -119,7 +119,7 @@ HWTEST_F(HdfSensorTest, GetSensorInstance002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869O, AR000F8QNL
   */
-HWTEST_F(HdfSensorTest, RemoveSensorInstance001, TestSize.Level0)
+HWTEST_F(HdfSensorTest, RemoveSensorInstance001, TestSize.Level1)
 {
     int ret = FreeSensorInterfaceInstance();
     ASSERT_EQ(0, ret);
@@ -138,7 +138,7 @@ HWTEST_F(HdfSensorTest, RemoveSensorInstance001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869P, AR000F8QNL
   */
-HWTEST_F(HdfSensorTest, RegisterSensorDataCb001, TestSize.Level0)
+HWTEST_F(HdfSensorTest, RegisterSensorDataCb001, TestSize.Level1)
 {
     int ret = g_sensorDev->Register(nullptr);
     EXPECT_EQ(SENSOR_NULL_PTR, ret);
@@ -150,7 +150,7 @@ HWTEST_F(HdfSensorTest, RegisterSensorDataCb001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869P
   */
-HWTEST_F(HdfSensorTest, RegisterSensorDataCb002, TestSize.Level0)
+HWTEST_F(HdfSensorTest, RegisterSensorDataCb002, TestSize.Level1)
 {
     int ret = g_sensorDev->Register(SensorTestDataCallback);
     EXPECT_EQ(0, ret);
@@ -162,7 +162,7 @@ HWTEST_F(HdfSensorTest, RegisterSensorDataCb002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869Q
   */
-HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level0)
+HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
 {
     int32_t count = 0;
     struct SensorInformation *sensorInfo = nullptr;
@@ -183,7 +183,7 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869Q
   */
-HWTEST_F(HdfSensorTest, GetSensorList002, TestSize.Level0)
+HWTEST_F(HdfSensorTest, GetSensorList002, TestSize.Level1)
 {
     struct SensorInformation *sensorInfo = nullptr;
     struct SensorInformation *info = nullptr;
@@ -227,7 +227,7 @@ HWTEST_F(HdfSensorTest, GetSensorList002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869R, AR000F8QNL
   */
-HWTEST_F(HdfSensorTest, EnableSensor001, TestSize.Level0)
+HWTEST_F(HdfSensorTest, EnableSensor001, TestSize.Level1)
 {
     int ret = g_sensorDev->Enable(g_noExistSensorId);
     EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
@@ -239,7 +239,7 @@ HWTEST_F(HdfSensorTest, EnableSensor001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869R
   */
-HWTEST_F(HdfSensorTest, EnableSensor002, TestSize.Level0)
+HWTEST_F(HdfSensorTest, EnableSensor002, TestSize.Level1)
 {
     int ret = g_sensorDev->Enable(SENSOR_ID);
     g_sensorDataFlag = 0;
@@ -253,7 +253,7 @@ HWTEST_F(HdfSensorTest, EnableSensor002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869T
   */
-HWTEST_F(HdfSensorTest, SetSensorBatch001, TestSize.Level0)
+HWTEST_F(HdfSensorTest, SetSensorBatch001, TestSize.Level1)
 {
     int ret = g_sensorDev->SetBatch(SENSOR_ID, SENSOR_INTERVAL, SENSOR_POLL_TIME);
     EXPECT_EQ(0, ret);
@@ -267,7 +267,7 @@ HWTEST_F(HdfSensorTest, SetSensorBatch001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M
   */
-HWTEST_F(HdfSensorTest, CheckSensorData001, TestSize.Level0)
+HWTEST_F(HdfSensorTest, CheckSensorData001, TestSize.Level1)
 {
     EXPECT_EQ(1, g_sensorDataFlag);
 }
@@ -278,7 +278,7 @@ HWTEST_F(HdfSensorTest, CheckSensorData001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869S
   */
-HWTEST_F(HdfSensorTest, DisableSensor001, TestSize.Level0)
+HWTEST_F(HdfSensorTest, DisableSensor001, TestSize.Level1)
 {
     int ret = g_sensorDev->Disable(g_noExistSensorId);
     EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
@@ -290,7 +290,7 @@ HWTEST_F(HdfSensorTest, DisableSensor001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869S
   */
-HWTEST_F(HdfSensorTest, DisableSensor002, TestSize.Level0)
+HWTEST_F(HdfSensorTest, DisableSensor002, TestSize.Level1)
 {
     int ret = g_sensorDev->Disable(SENSOR_ID);
     g_sensorDataFlag = 0;
@@ -304,7 +304,7 @@ HWTEST_F(HdfSensorTest, DisableSensor002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869U, AR000F8QNL
   */
-HWTEST_F(HdfSensorTest, SetSensorMode001, TestSize.Level0)
+HWTEST_F(HdfSensorTest, SetSensorMode001, TestSize.Level1)
 {
     int ret = g_sensorDev->SetMode(SENSOR_ID, 0);
     EXPECT_EQ(SENSOR_FAILURE, ret);
@@ -317,7 +317,7 @@ HWTEST_F(HdfSensorTest, SetSensorMode001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869U
   */
-HWTEST_F(HdfSensorTest, SetSensorMode002, TestSize.Level0)
+HWTEST_F(HdfSensorTest, SetSensorMode002, TestSize.Level1)
 {
     int ret = g_sensorDev->SetMode(SENSOR_ID, 1);
     EXPECT_EQ(0, ret);
@@ -329,7 +329,7 @@ HWTEST_F(HdfSensorTest, SetSensorMode002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869U
   */
-HWTEST_F(HdfSensorTest, SetSensorOption001, TestSize.Level0)
+HWTEST_F(HdfSensorTest, SetSensorOption001, TestSize.Level1)
 {
     int ret = g_sensorDev->SetOption(SENSOR_ID, 1);
     EXPECT_EQ(0, ret);
@@ -342,7 +342,7 @@ HWTEST_F(HdfSensorTest, SetSensorOption001, TestSize.Level0)
   * @tc.require: SR000F869M, AR000F869U
   */
 
-HWTEST_F(HdfSensorTest, UnregisterSensorDataCb001, TestSize.Level0)
+HWTEST_F(HdfSensorTest, UnregisterSensorDataCb001, TestSize.Level1)
 {
     int ret = g_sensorDev->Unregister();
     EXPECT_EQ(0, ret);
@@ -354,7 +354,7 @@ HWTEST_F(HdfSensorTest, UnregisterSensorDataCb001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F869M
   */
-HWTEST_F(HdfSensorTest, RegisterSensorDataCb003, TestSize.Level0)
+HWTEST_F(HdfSensorTest, RegisterSensorDataCb003, TestSize.Level1)
 {
     int ret = g_sensorDev->Register(SensorTestDataCallback);
     EXPECT_EQ(0, ret);

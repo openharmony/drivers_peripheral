@@ -60,7 +60,7 @@ void HdiDisplayTest::TearDownTestCase()
   * @tc.type: FUNC
   * @tc.require: AR000F868K
   */
-HWTEST_F(HdiDisplayTest, InitDisplayTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, InitDisplayTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -79,7 +79,7 @@ HWTEST_F(HdiDisplayTest, InitDisplayTest001, TestSize.Level0)
   * @tc.require: AR000F868O
   */
 
-HWTEST_F(HdiDisplayTest, GetDisplayInfoTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, GetDisplayInfoTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -97,7 +97,7 @@ HWTEST_F(HdiDisplayTest, GetDisplayInfoTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F868K, AR000F868O
   */
-HWTEST_F(HdiDisplayTest, OpenLayerTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, OpenLayerTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -115,7 +115,7 @@ HWTEST_F(HdiDisplayTest, OpenLayerTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F868L
   */
-HWTEST_F(HdiDisplayTest, SetLayerVisibleTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, SetLayerVisibleTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -133,7 +133,7 @@ HWTEST_F(HdiDisplayTest, SetLayerVisibleTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F868L
   */
-HWTEST_F(HdiDisplayTest, SetLayerDirtyRegionTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, SetLayerDirtyRegionTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -151,7 +151,7 @@ HWTEST_F(HdiDisplayTest, SetLayerDirtyRegionTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F868N
   */
-HWTEST_F(HdiDisplayTest, GetLayerBufferTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, GetLayerBufferTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -169,7 +169,7 @@ HWTEST_F(HdiDisplayTest, GetLayerBufferTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F868M
   */
-HWTEST_F(HdiDisplayTest, FlushCrossLineTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, FlushCrossLineTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -189,7 +189,7 @@ HWTEST_F(HdiDisplayTest, FlushCrossLineTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F868N
   */
-HWTEST_F(HdiDisplayTest, InitGfxTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, InitGfxTest001, TestSize.Level1)
 {
     int32_t ret;
     ret = InitGfxTest();
@@ -206,7 +206,7 @@ HWTEST_F(HdiDisplayTest, InitGfxTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F868M
   */
-HWTEST_F(HdiDisplayTest, BlitTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, BlitTest001, TestSize.Level1)
 {
     int32_t ret;
     ret = BlitTest();
@@ -223,7 +223,7 @@ HWTEST_F(HdiDisplayTest, BlitTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F868M
   */
-HWTEST_F(HdiDisplayTest, FlushPictureTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, FlushPictureTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -243,7 +243,7 @@ HWTEST_F(HdiDisplayTest, FlushPictureTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F868L
   */
-HWTEST_F(HdiDisplayTest, FillRectTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, FillRectTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -261,7 +261,7 @@ HWTEST_F(HdiDisplayTest, FillRectTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F868N
   */
-HWTEST_F(HdiDisplayTest, FlushRectTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, FlushRectTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -281,7 +281,7 @@ HWTEST_F(HdiDisplayTest, FlushRectTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F868K
   */
-HWTEST_F(HdiDisplayTest, DeinitGfxTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, DeinitGfxTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -299,7 +299,7 @@ HWTEST_F(HdiDisplayTest, DeinitGfxTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F868K
   */
-HWTEST_F(HdiDisplayTest, CloseLayerTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, CloseLayerTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -317,7 +317,7 @@ HWTEST_F(HdiDisplayTest, CloseLayerTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F868J, AR000F868O
   */
-HWTEST_F(HdiDisplayTest, DeinitDisplayTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, DeinitDisplayTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -335,7 +335,7 @@ HWTEST_F(HdiDisplayTest, DeinitDisplayTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F868J, AR000F868L
   */
-HWTEST_F(HdiDisplayTest, AllocMemTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, AllocMemTest001, TestSize.Level1)
 {
     int32_t ret;
     ret = AllocMemTest1();
@@ -352,7 +352,7 @@ HWTEST_F(HdiDisplayTest, AllocMemTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F868J, AR000F868L
   */
-HWTEST_F(HdiDisplayTest, MmapCacheTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, MmapCacheTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -370,7 +370,7 @@ HWTEST_F(HdiDisplayTest, MmapCacheTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F868J, AR000F868N
   */
-HWTEST_F(HdiDisplayTest, FlushMCacheTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, FlushMCacheTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -388,7 +388,7 @@ HWTEST_F(HdiDisplayTest, FlushMCacheTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F868J, AR000F868N
   */
-HWTEST_F(HdiDisplayTest, FreeMemTest001, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, FreeMemTest001, TestSize.Level1)
 {
     int32_t ret;
 
@@ -406,7 +406,7 @@ HWTEST_F(HdiDisplayTest, FreeMemTest001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F868J, AR000F868N
   */
-HWTEST_F(HdiDisplayTest, AllocMemTest002, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, AllocMemTest002, TestSize.Level1)
 {
     int32_t ret;
 
@@ -424,7 +424,7 @@ HWTEST_F(HdiDisplayTest, AllocMemTest002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F868J, AR000F868L
   */
-HWTEST_F(HdiDisplayTest, MmapCacheTest002, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, MmapCacheTest002, TestSize.Level1)
 {
     int32_t ret;
 
@@ -442,7 +442,7 @@ HWTEST_F(HdiDisplayTest, MmapCacheTest002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F868J, AR000F868N
   */
-HWTEST_F(HdiDisplayTest, FlushMCacheTest002, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, FlushMCacheTest002, TestSize.Level1)
 {
     int32_t ret;
 
@@ -460,7 +460,7 @@ HWTEST_F(HdiDisplayTest, FlushMCacheTest002, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: SR000F868J, AR000F868N
   */
-HWTEST_F(HdiDisplayTest, FreeMemTest002, TestSize.Level0)
+HWTEST_F(HdiDisplayTest, FreeMemTest002, TestSize.Level1)
 {
     int32_t ret;
 
