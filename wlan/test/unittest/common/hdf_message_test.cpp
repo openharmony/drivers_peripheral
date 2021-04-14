@@ -50,7 +50,7 @@ void WiFiMessageTest::TearDown() const {}
  * @tc.type: FUNC
  * @tc.require: AR000F86AL
  */
-HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_QUEUE001, TestSize.Level0)
+HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_QUEUE001, TestSize.Level1)
 {
     struct HdfTestMsg msg = { TEST_WIFI_TYPE, WIFI_MESSAGE_QUEUE_001, -1 };
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -62,7 +62,7 @@ HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_QUEUE001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F86AL
  */
-HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_QUEUE002, TestSize.Level0)
+HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_QUEUE002, TestSize.Level1)
 {
     struct HdfTestMsg msg = { TEST_WIFI_TYPE, WIFI_MESSAGE_QUEUE_002, -1 };
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -74,7 +74,7 @@ HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_QUEUE002, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F86AL
  */
-HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_QUEUE003, TestSize.Level0)
+HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_QUEUE003, TestSize.Level1)
 {
     struct HdfTestMsg msg = { TEST_WIFI_TYPE, WIFI_MESSAGE_QUEUE_003, -1 };
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -86,7 +86,7 @@ HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_QUEUE003, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F86AL
  */
-HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_SINGLE_NODE001, TestSize.Level0)
+HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_SINGLE_NODE001, TestSize.Level1)
 {
     struct HdfTestMsg msg = { TEST_WIFI_TYPE, WIFI_MESSAGE_SINGLE_NODE_001, -1 };
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -98,7 +98,7 @@ HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_SINGLE_NODE001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F86AL
  */
-HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_SINGLE_NODE002, TestSize.Level0)
+HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_SINGLE_NODE002, TestSize.Level1)
 {
     struct HdfTestMsg msg = { TEST_WIFI_TYPE, WIFI_MESSAGE_SINGLE_NODE_002, -1 };
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -110,7 +110,7 @@ HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_SINGLE_NODE002, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F86AL
  */
-HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_SINGLE_NODE003, TestSize.Level0)
+HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_SINGLE_NODE003, TestSize.Level1)
 {
     struct HdfTestMsg msg = { TEST_WIFI_TYPE, WIFI_MESSAGE_SINGLE_NODE_003, -1 };
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -122,7 +122,7 @@ HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_SINGLE_NODE003, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F86AL
  */
-HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_SINGLE_NODE004, TestSize.Level0)
+HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_SINGLE_NODE004, TestSize.Level1)
 {
     struct HdfTestMsg msg = { TEST_WIFI_TYPE, WIFI_MESSAGE_SINGLE_NODE_004, -1 };
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -134,7 +134,7 @@ HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_SINGLE_NODE004, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F86AL
  */
-HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_SINGLE_NODE005, TestSize.Level0)
+HWTEST_F(WiFiMessageTest, WIFI_MESSAGE_SINGLE_NODE005, TestSize.Level1)
 {
     struct HdfTestMsg msg = { TEST_WIFI_TYPE, WIFI_MESSAGE_SINGLE_NODE_005, -1 };
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));

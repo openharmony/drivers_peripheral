@@ -116,7 +116,7 @@ static int32_t HalResetCallbackEvent(int32_t event, struct HdfSBuf *sbuf)
  * @tc.type: FUNC
  * @tc.require: AR000F869J
  */
-HWTEST_F(HdfWlanPerformanceTest, WifiHalGetSupportFeature001, TestSize.Level0)
+HWTEST_F(HdfWlanPerformanceTest, WifiHalGetSupportFeature001, TestSize.Level1)
 {
     int ret;
     uint8_t supportTest[PROTOCOL_80211_IFTYPE_NUM] = {0};
@@ -144,7 +144,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetSupportFeature001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869J
  */
-HWTEST_F(HdfWlanPerformanceTest, WifiHalGetSupportCombo001, TestSize.Level0)
+HWTEST_F(HdfWlanPerformanceTest, WifiHalGetSupportCombo001, TestSize.Level1)
 {
     int ret;
     uint8_t support[PROTOCOL_80211_IFTYPE_NUM + 1] = {0};
@@ -176,7 +176,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetSupportCombo001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
-HWTEST_F(HdfWlanPerformanceTest, WifiHalGetDeviceMacAddress001, TestSize.Level0)
+HWTEST_F(HdfWlanPerformanceTest, WifiHalGetDeviceMacAddress001, TestSize.Level1)
 {
     int ret;
     struct IWiFiAp *apFeature = nullptr;
@@ -210,7 +210,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetDeviceMacAddress001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869E
  */
-HWTEST_F(HdfWlanPerformanceTest, WifiHalGetDeviceMacAddress002, TestSize.Level0)
+HWTEST_F(HdfWlanPerformanceTest, WifiHalGetDeviceMacAddress002, TestSize.Level1)
 {
     int ret;
     struct IWiFiSta *staFeature = nullptr;
@@ -244,7 +244,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetDeviceMacAddress002, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
-HWTEST_F(HdfWlanPerformanceTest, WifiHaGetValidFreqsWithBand001, TestSize.Level0)
+HWTEST_F(HdfWlanPerformanceTest, WifiHaGetValidFreqsWithBand001, TestSize.Level1)
 {
     int ret;
     struct IWiFiAp *apFeature = nullptr;
@@ -279,7 +279,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHaGetValidFreqsWithBand001, TestSize.Level0
  * @tc.type: FUNC
  * @tc.require: AR000F869K
  */
-HWTEST_F(HdfWlanPerformanceTest, WifiHalGetAsscociatedStas001, TestSize.Level0)
+HWTEST_F(HdfWlanPerformanceTest, WifiHalGetAsscociatedStas001, TestSize.Level1)
 {
     int ret;
     struct IWiFiAp *apFeature = nullptr;
@@ -312,7 +312,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetAsscociatedStas001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869K
  */
-HWTEST_F(HdfWlanPerformanceTest, WifiHalSetScanningMacAddress001, TestSize.Level0)
+HWTEST_F(HdfWlanPerformanceTest, WifiHalSetScanningMacAddress001, TestSize.Level1)
 {
     int ret;
     struct IWiFiSta *staFeature = nullptr;
@@ -344,7 +344,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalSetScanningMacAddress001, TestSize.Level
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
-HWTEST_F(HdfWlanPerformanceTest, WifiHalGetChipId001, TestSize.Level0)
+HWTEST_F(HdfWlanPerformanceTest, WifiHalGetChipId001, TestSize.Level1)
 {
     int ret;
     struct IWiFiSta *staFeature = nullptr;
@@ -377,7 +377,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetChipId001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
-HWTEST_F(HdfWlanPerformanceTest, WifiHalGetIfNamesByChipId001, TestSize.Level0)
+HWTEST_F(HdfWlanPerformanceTest, WifiHalGetIfNamesByChipId001, TestSize.Level1)
 {
     int ret;
     struct IWiFiSta *staFeature = nullptr;
@@ -421,7 +421,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetIfNamesByChipId001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
-HWTEST_F(HdfWlanPerformanceTest, WifiHalResetDriver001, TestSize.Level0)
+HWTEST_F(HdfWlanPerformanceTest, WifiHalResetDriver001, TestSize.Level1)
 {
     int ret;
     struct IWiFiSta *staFeature = nullptr;
