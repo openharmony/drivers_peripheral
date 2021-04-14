@@ -55,7 +55,7 @@ void WiFiModuleTest::TearDown() const {}
   * @tc.type: FUNC
   * @tc.require: SR000F869D
   */
-HWTEST_F(WiFiModuleTest, WiFiModuleCreate001, TestSize.Level0)
+HWTEST_F(WiFiModuleTest, WiFiModuleCreate001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_WIFI_TYPE, WIFI_MODULE_CREATE_MODULE, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -67,7 +67,7 @@ HWTEST_F(WiFiModuleTest, WiFiModuleCreate001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F869K
   */
-HWTEST_F(WiFiModuleTest, WiFiModuleAddFeature001, TestSize.Level0)
+HWTEST_F(WiFiModuleTest, WiFiModuleAddFeature001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_WIFI_TYPE, WIFI_MODULE_ADD_FEATURE, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -79,7 +79,7 @@ HWTEST_F(WiFiModuleTest, WiFiModuleAddFeature001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F869K
   */
-HWTEST_F(WiFiModuleTest, WiFiModuleDeteleFeature001, TestSize.Level0)
+HWTEST_F(WiFiModuleTest, WiFiModuleDeteleFeature001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_WIFI_TYPE, WIFI_MODULE_DELETE_FEATURE, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -91,7 +91,7 @@ HWTEST_F(WiFiModuleTest, WiFiModuleDeteleFeature001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F869K
   */
-HWTEST_F(WiFiModuleTest, WiFiModuleDelete001, TestSize.Level0)
+HWTEST_F(WiFiModuleTest, WiFiModuleDelete001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_WIFI_TYPE, WIFI_MODULE_DELETE_MODULE, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));

@@ -55,7 +55,7 @@ void WiFiNetBuffTest::TearDown() const {}
   * @tc.type: FUNC
   * @tc.require: AR000F869I
   */
-HWTEST_F(WiFiNetBuffTest, WiFiNetBuff001, TestSize.Level0)
+HWTEST_F(WiFiNetBuffTest, WiFiNetBuff001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_WIFI_TYPE, WIFI_NET_BUF_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -67,7 +67,7 @@ HWTEST_F(WiFiNetBuffTest, WiFiNetBuff001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F869I
   */
-HWTEST_F(WiFiNetBuffTest, WiFiNetBuffQueue001, TestSize.Level0)
+HWTEST_F(WiFiNetBuffTest, WiFiNetBuffQueue001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_WIFI_TYPE, WIFI_NET_BUF_QUEUE_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));

@@ -90,7 +90,7 @@ void HdfSensorPerformanceTest::TearDown()
   * @tc.type: FUNC
   * @tc.require: AR000F869N
   */
-HWTEST_F(HdfSensorPerformanceTest, SensorHdiRegister001, TestSize.Level0)
+HWTEST_F(HdfSensorPerformanceTest, SensorHdiRegister001, TestSize.Level1)
 {
     int timeUsed = 0;
     struct timespec tv1 = (struct timespec){0};
@@ -111,7 +111,7 @@ HWTEST_F(HdfSensorPerformanceTest, SensorHdiRegister001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F869O
   */
-HWTEST_F(HdfSensorPerformanceTest, SensorHdiGetAllSensors001, TestSize.Level0)
+HWTEST_F(HdfSensorPerformanceTest, SensorHdiGetAllSensors001, TestSize.Level1)
 {
     int32_t count = 0;
     struct SensorInformation *sensorInfo = nullptr;
@@ -134,7 +134,7 @@ HWTEST_F(HdfSensorPerformanceTest, SensorHdiGetAllSensors001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F869P
   */
-HWTEST_F(HdfSensorPerformanceTest, SensorHdiEnable001, TestSize.Level0)
+HWTEST_F(HdfSensorPerformanceTest, SensorHdiEnable001, TestSize.Level1)
 {
     int timeUsed = 0;
     struct timespec tv1 = (struct timespec){0};
@@ -155,7 +155,7 @@ HWTEST_F(HdfSensorPerformanceTest, SensorHdiEnable001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F869Q
   */
-HWTEST_F(HdfSensorPerformanceTest, SensorHdiSetBatch001, TestSize.Level0)
+HWTEST_F(HdfSensorPerformanceTest, SensorHdiSetBatch001, TestSize.Level1)
 {
     int timeUsed = 0;
     struct timespec tv1 = (struct timespec){0};
@@ -179,7 +179,7 @@ HWTEST_F(HdfSensorPerformanceTest, SensorHdiSetBatch001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F869U
   */
-HWTEST_F(HdfSensorPerformanceTest, SensorHdiDisable001, TestSize.Level0)
+HWTEST_F(HdfSensorPerformanceTest, SensorHdiDisable001, TestSize.Level1)
 {
     int timeUsed = 0;
     struct timespec tv1 = (struct timespec){0};
@@ -200,7 +200,7 @@ HWTEST_F(HdfSensorPerformanceTest, SensorHdiDisable001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F869R
   */
-HWTEST_F(HdfSensorPerformanceTest, SensorHdiSetMode001, TestSize.Level0)
+HWTEST_F(HdfSensorPerformanceTest, SensorHdiSetMode001, TestSize.Level1)
 {
     int timeUsed = 0;
     struct timespec tv1 = (struct timespec){0};
@@ -221,7 +221,7 @@ HWTEST_F(HdfSensorPerformanceTest, SensorHdiSetMode001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F869S
   */
-HWTEST_F(HdfSensorPerformanceTest, SensorHdiSetOption001, TestSize.Level0)
+HWTEST_F(HdfSensorPerformanceTest, SensorHdiSetOption001, TestSize.Level1)
 {
     int timeUsed = 0;
     struct timespec tv1 = (struct timespec){0};
@@ -242,7 +242,7 @@ HWTEST_F(HdfSensorPerformanceTest, SensorHdiSetOption001, TestSize.Level0)
   * @tc.type: FUNC
   * @tc.require: AR000F869T
   */
-HWTEST_F(HdfSensorPerformanceTest, SensorHdiUnregister001, TestSize.Level0)
+HWTEST_F(HdfSensorPerformanceTest, SensorHdiUnregister001, TestSize.Level1)
 {
     int timeUsed = 0;
     struct timespec tv1 = (struct timespec){0};

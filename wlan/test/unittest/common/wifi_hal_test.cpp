@@ -81,7 +81,7 @@ void WifiHalTest::TearDown()
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
-HWTEST_F(WifiHalTest, WifiHalCreateAndDestroyFeature001, TestSize.Level0)
+HWTEST_F(WifiHalTest, WifiHalCreateAndDestroyFeature001, TestSize.Level1)
 {
     int ret;
     struct IWiFiAp *apFeature = nullptr;
@@ -102,7 +102,7 @@ HWTEST_F(WifiHalTest, WifiHalCreateAndDestroyFeature001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869E
  */
-HWTEST_F(WifiHalTest, WifiHalCreateAndDestroyFeature002, TestSize.Level0)
+HWTEST_F(WifiHalTest, WifiHalCreateAndDestroyFeature002, TestSize.Level1)
 {
     int ret;
     struct IWiFiSta *staFeature = nullptr;
@@ -123,7 +123,7 @@ HWTEST_F(WifiHalTest, WifiHalCreateAndDestroyFeature002, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
-HWTEST_F(WifiHalTest, WifiHalGetFeatureByIfName001, TestSize.Level0)
+HWTEST_F(WifiHalTest, WifiHalGetFeatureByIfName001, TestSize.Level1)
 {
     int ret;
     struct IWiFiAp *apFeature = nullptr;
@@ -159,7 +159,7 @@ static int32_t HalCallbackEvent(int32_t event, struct HdfSBuf *sbuf)
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
-HWTEST_F(WifiHalTest, WifiHalRegisterEventCallback001, TestSize.Level0)
+HWTEST_F(WifiHalTest, WifiHalRegisterEventCallback001, TestSize.Level1)
 {
     int ret;
 
@@ -173,7 +173,7 @@ HWTEST_F(WifiHalTest, WifiHalRegisterEventCallback001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
-HWTEST_F(WifiHalTest, WifiHalUnRegisterEventCallback001, TestSize.Level0)
+HWTEST_F(WifiHalTest, WifiHalUnRegisterEventCallback001, TestSize.Level1)
 {
     int ret;
 
@@ -187,7 +187,7 @@ HWTEST_F(WifiHalTest, WifiHalUnRegisterEventCallback001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
-HWTEST_F(WifiHalTest, WifiHalGetNetworkIfaceName001, TestSize.Level0)
+HWTEST_F(WifiHalTest, WifiHalGetNetworkIfaceName001, TestSize.Level1)
 {
     int ret;
     struct IWiFiAp *apFeature = nullptr;
@@ -210,7 +210,7 @@ HWTEST_F(WifiHalTest, WifiHalGetNetworkIfaceName001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
-HWTEST_F(WifiHalTest, WifiHalGetGetFeatureType001, TestSize.Level0)
+HWTEST_F(WifiHalTest, WifiHalGetGetFeatureType001, TestSize.Level1)
 {
     int ret;
     struct IWiFiAp *apFeature = nullptr;
@@ -232,7 +232,7 @@ HWTEST_F(WifiHalTest, WifiHalGetGetFeatureType001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
-HWTEST_F(WifiHalTest, WifiHalSetMacAddress001, TestSize.Level0)
+HWTEST_F(WifiHalTest, WifiHalSetMacAddress001, TestSize.Level1)
 {
     int ret;
     struct IWiFiAp *apFeature = nullptr;
@@ -259,7 +259,7 @@ HWTEST_F(WifiHalTest, WifiHalSetMacAddress001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869E
  */
-HWTEST_F(WifiHalTest, WifiHalSetMacAddress002, TestSize.Level0)
+HWTEST_F(WifiHalTest, WifiHalSetMacAddress002, TestSize.Level1)
 {
     int ret;
     struct IWiFiSta *staFeature = nullptr;
@@ -286,7 +286,7 @@ HWTEST_F(WifiHalTest, WifiHalSetMacAddress002, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
-HWTEST_F(WifiHalTest, WifiHalSetTxPower001, TestSize.Level0)
+HWTEST_F(WifiHalTest, WifiHalSetTxPower001, TestSize.Level1)
 {
     int ret;
     struct IWiFiAp *apFeature = nullptr;
@@ -309,7 +309,7 @@ HWTEST_F(WifiHalTest, WifiHalSetTxPower001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000F869K
  */
-HWTEST_F(WifiHalTest, WifiHalSetCountryCode001, TestSize.Level0)
+HWTEST_F(WifiHalTest, WifiHalSetCountryCode001, TestSize.Level1)
 {
     int ret;
     struct IWiFiAp *apFeature = nullptr;
