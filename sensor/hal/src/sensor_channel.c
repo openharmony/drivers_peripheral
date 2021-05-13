@@ -27,24 +27,25 @@
 #define ACCEL_ACCURACY    (HDI_SENSOR_GRAVITY / HDI_SENSOR_ACCEL_LSB / HDI_SENSOR_UNITS)
 
 static struct SensorCovertCoff g_sensorCovertCoff[] = {
-    {SENSOR_TYPE_NONE, 0, DATA_X, {ACCEL_ACCURACY}},
-    {SENSOR_TYPE_ACCELEROMETER, SENSOR_TYPE_MAX, DATA_XYZ, {ACCEL_ACCURACY, ACCEL_ACCURACY, ACCEL_ACCURACY}},
+    { SENSOR_TYPE_NONE, 0, DATA_X, { ACCEL_ACCURACY } },
+    { SENSOR_TYPE_ACCELEROMETER, SENSOR_TYPE_MAX, DATA_XYZ, { ACCEL_ACCURACY, ACCEL_ACCURACY, ACCEL_ACCURACY } },
 };
 
 void SetSensorIdBySensorType(enum SensorTypeTag type, int32_t sensorId)
 {
-    int32_t sensorTypeId = type;
+    uint32_t count = sizeof(g_sensorCovertCoff) / sizeof(g_sensorCovertCoff[0]);
 
-    for (uint32_t i = 0; i < sizeof(g_sensorCovertCoff) / sizeof(g_sensorCovertCoff[0]); ++i) {
-        if (g_sensorCovertCoff[i].sensorTypeId == sensorTypeId) {
+    for (uint32_t i = 0; i < count; ++i) {
+        if (g_sensorCovertCoff[i].sensorTypeId == (int32_t)type) {
             g_sensorCovertCoff[i].sensorId = sensorId;
+            break;
         }
     }
 }
 
 static void ConvertSensorData(struct SensorEvents *event)
 {
-    uint32_t DataLen;
+    uint32_t dataLen;
     int32_t axis;
     int32_t *data = NULL;
     float *value = NULL;
@@ -53,10 +54,10 @@ static void ConvertSensorData(struct SensorEvents *event)
     value = (float *)event->data;
 
     for (uint32_t i = 0; i < sizeof(g_sensorCovertCoff) / sizeof(g_sensorCovertCoff[0]); ++i) {
-        if ((g_sensorCovertCoff[i].sensorId == event->sensorId) && (g_sensorCovertCoff[i].Dim != 0)) {
-            DataLen = event->dataLen;
-            for (uint32_t j = 0; j < DataLen / sizeof(int32_t); ++j) {
-                axis = j % g_sensorCovertCoff[i].Dim;
+        if ((g_sensorCovertCoff[i].sensorId == event->sensorId) && (g_sensorCovertCoff[i].dim != 0)) {
+            dataLen = event->dataLen / sizeof(int32_t);
+            for (uint32_t j = 0; j < dataLen; ++j) {
+                axis = j % g_sensorCovertCoff[i].dim;
                 value[j] = (float)(data[j] * g_sensorCovertCoff[i].coff[axis]);
             }
         }
@@ -77,14 +78,16 @@ static int OnSensorEventReceived(struct HdfDevEventlistener *listener,
 
     (void)OsalMutexLock(&manager->eventMutex);
     if (!HdfSbufReadBuffer(data, (const void **)&event, &len) || event == NULL) {
-        HDF_LOGE("read sensor event fail!");
+        HDF_LOGE("%s: Read sensor event fail!", __func__);
         (void)OsalMutexUnlock(&manager->eventMutex);
         return SENSOR_FAILURE;
     }
 
     uint8_t *buf = NULL;
     if (!HdfSbufReadBuffer(data, (const void **)&buf, &len) || buf == NULL) {
-        HDF_LOGE("read sensor data fail!");
+        (void)OsalMutexUnlock(&manager->eventMutex);
+        HDF_LOGE("%s: Read sensor data fail!", __func__);
+        return SENSOR_FAILURE;
     } else {
         event->data = buf;
         event->dataLen = len;
@@ -112,14 +115,19 @@ static int32_t AddSensorDevServiceGroup(void)
     struct SensorManagerNode *pos = NULL;
     struct SensorDevManager *manager = GetSensorDevManager();
 
-    manager->serviceGroup = HdfIoServiceGroupObtain();
-    CHECK_NULL_PTR_RETURN_VALUE(manager->serviceGroup, SENSOR_NULL_PTR);
     (void)OsalMutexLock(&manager->mutex);
+    manager->serviceGroup = HdfIoServiceGroupObtain();
+    if (manager->serviceGroup == NULL) {
+        (void)OsalMutexUnlock(&manager->mutex);
+        return SENSOR_FAILURE;
+    }
+
     DLIST_FOR_EACH_ENTRY(pos, &manager->managerHead, struct SensorManagerNode, node) {
         if ((pos->ioService != NULL) &&
             (HdfIoServiceGroupAddService(manager->serviceGroup, pos->ioService) != SENSOR_SUCCESS)) {
-            HDF_LOGE("add service to group failed");
+            HdfIoServiceGroupRecycle(manager->serviceGroup);
             (void)OsalMutexUnlock(&manager->mutex);
+            HDF_LOGE("%s: Add service to group failed", __func__);
             return SENSOR_INVALID_SERVICE;
         }
     }
@@ -127,8 +135,9 @@ static int32_t AddSensorDevServiceGroup(void)
 
     int32_t ret = HdfIoServiceGroupRegisterListener(manager->serviceGroup, &g_listener);
     if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%s: Register listener to group failed", __func__);
         HdfIoServiceGroupRecycle(manager->serviceGroup);
-        return SENSOR_INVALID_SERVICE;
+        return ret;
     }
 
     return SENSOR_SUCCESS;
@@ -136,10 +145,10 @@ static int32_t AddSensorDevServiceGroup(void)
 
 int32_t Register(RecordDataCallback cb)
 {
-    struct SensorDevManager *manager = GetSensorDevManager();
+    struct SensorDevManager *manager = NULL;
 
     CHECK_NULL_PTR_RETURN_VALUE(cb, SENSOR_NULL_PTR);
-
+    manager = GetSensorDevManager();
     (void)OsalMutexLock(&manager->mutex);
     manager->recordDataCb = cb;
     (void)OsalMutexUnlock(&manager->mutex);
@@ -154,18 +163,16 @@ int32_t Unregister(void)
 
     int32_t ret = HdfIoServiceGroupUnregisterListener(manager->serviceGroup, &g_listener);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("sensor unregister listener failed");
-        return SENSOR_FAILURE;
+        HDF_LOGE("%s: Sensor unregister listener failed", __func__);
+        return ret;
     }
 
     (void)OsalMutexLock(&manager->mutex);
     manager->hasSensorListener = false;
     HdfIoServiceGroupRecycle(manager->serviceGroup);
     manager->serviceGroup = NULL;
-
-    if (manager->recordDataCb != NULL) {
         manager->recordDataCb = NULL;
-    }
+
     (void)OsalMutexUnlock(&manager->mutex);
 
     return SENSOR_SUCCESS;

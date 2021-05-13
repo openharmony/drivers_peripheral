@@ -48,11 +48,12 @@ static int32_t GetSensorServiceList(void)
     CHECK_NULL_PTR_RETURN_VALUE(data, SENSOR_NULL_PTR);
     int32_t ret = HdfGetServiceNameByDeviceClass(DEVICE_CLASS_SENSOR, data);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("sensor manager get service class failed");
+        HDF_LOGE("%s :sensor manager get service class failed", __func__);
         HdfSBufRecycle(data);
         return SENSOR_INVALID_SERVICE;
     }
 
+    (void)OsalMutexLock(&manager->mutex);
     while (true) {
         svcName = HdfSbufReadString(data);
         if (svcName == NULL) {
@@ -61,13 +62,13 @@ static int32_t GetSensorServiceList(void)
 
         managerNode = (struct SensorManagerNode*)OsalMemCalloc(sizeof(*managerNode));
         if (managerNode == NULL) {
-            continue;
+            break;
         }
 
         managerNode->sensorCount = 0;
         managerNode->ioService = HdfIoServiceBind(svcName);
         if (managerNode->ioService == NULL) {
-            HDF_LOGE("sensor manager get manager service name[%s] failed", svcName);
+            HDF_LOGE("%s: Sensor manager get manager service name[%s] failed", __func__, svcName);
             OsalMemFree(managerNode);
             managerNode = NULL;
             continue;
@@ -75,19 +76,20 @@ static int32_t GetSensorServiceList(void)
 
         DListInsertTail(&managerNode->node, &manager->managerHead);
     }
+    (void)OsalMutexUnlock(&manager->mutex);
 
     HdfSBufRecycle(data);
     data = NULL;
 
     if (DListIsEmpty(&manager->managerHead)) {
-        HDF_LOGE("sensor get sensor service failed");
+        HDF_LOGE("%s: Sensor get service failed", __func__);
         return SENSOR_INVALID_SERVICE;
     }
 
     return SENSOR_SUCCESS;
 }
 
-static int32_t ReleaseSensorServiceList()
+static void ReleaseSensorServiceList()
 {
     struct SensorManagerNode *pos = NULL;
     struct SensorManagerNode *tmp = NULL;
@@ -116,8 +118,6 @@ static int32_t ReleaseSensorServiceList()
         HdfIoServiceGroupRecycle(manager->serviceGroup);
     }
     (void)OsalMutexUnlock(&manager->mutex);
-
-    return SENSOR_SUCCESS;
 }
 
 static int32_t InitSensorManager(void)
@@ -131,7 +131,7 @@ static int32_t InitSensorManager(void)
 
     int32_t ret = GetSensorServiceList();
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("sensor get service failed");
+        HDF_LOGE("%s: Sensor get service failed", __func__);
         ReleaseSensorServiceList();
         OsalMutexDestroy(&manager->mutex);
         OsalMutexDestroy(&manager->eventMutex);
@@ -154,17 +154,16 @@ const struct SensorInterface *NewSensorInterfaceInstance(void)
     GetSensorDeviceMethods(&sensorDevInstance);
 
     if (InitSensorManager() != SENSOR_SUCCESS) {
-        HDF_LOGE("sensor init manager failed");
+        HDF_LOGE("%s: Sensor init manager failed", __func__);
         return NULL;
     }
     manager->initState = true;
-    HDF_LOGE(" get sensor device instance success");
+    HDF_LOGE("%s: Get sensor device instance success", __func__);
     return &sensorDevInstance;
 }
 
 int32_t FreeSensorInterfaceInstance(void)
 {
-    int32_t ret;
     struct SensorDevManager *manager = GetSensorDevManager();
 
     if (!manager->initState) {
@@ -172,12 +171,7 @@ int32_t FreeSensorInterfaceInstance(void)
     }
 
     ReleaseAllSensorInfo();
-
-    ret = ReleaseSensorServiceList();
-    if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("sensor release service failed");
-        return SENSOR_INVALID_SERVICE;
-    }
+    ReleaseSensorServiceList();
 
     OsalMutexDestroy(&manager->mutex);
     OsalMutexDestroy(&manager->eventMutex);
