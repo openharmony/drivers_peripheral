@@ -24,10 +24,10 @@
 
 enum SensorMethodIoCmd {
     SENSOR_IO_GET_INFO_LIST = 0xFFFF,
-    SENSOR_IO_ENABLE = 1,
-    SENSOR_IO_DISABLE = 2,
-    SENSOR_IO_SET_BATCH = 3,
-    SENSOR_IO_SET_MODE = 4,
+    SENSOR_IO_ENABLE     = 1,
+    SENSOR_IO_DISABLE    = 2,
+    SENSOR_IO_SET_BATCH  = 3,
+    SENSOR_IO_SET_MODE   = 4,
     SENSOR_IO_SET_OPTION = 5,
     SENSOR_IO_END,
 };
@@ -38,13 +38,12 @@ struct SensorBasicInformation {
     char vendorName[SENSOR_NAME_MAX_LEN]; /* Sensor vendor */
     char firmwareVersion[SENSOR_VERSION_MAX_LEN]; /* Sensor firmware version */
     char hardwareVersion[SENSOR_VERSION_MAX_LEN]; /* Sensor hardware version */
-    int32_t sensorTypeId; /* Sensor type ID (described in {@link SensorTypeTag}) */
-    int32_t sensorId;     /* Sensor ID, defined by the sensor driver developer */
+    int32_t sensorTypeId;   /* Sensor type ID (described in {@link SensorTypeTag}) */
+    int32_t sensorId;       /* Sensor ID, defined by the sensor driver developer */
     int32_t maxRange;       /* Maximum measurement range of the sensor */
-    int32_t accuracy;      /* Sensor accuracy */
+    int32_t accuracy;       /* Sensor accuracy */
     int32_t power;          /* Sensor power */
 };
-
 
 void GetSensorDeviceMethods(struct SensorInterface *device);
 void ReleaseAllSensorInfo(void);

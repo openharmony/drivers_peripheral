@@ -35,7 +35,7 @@ enum SensorDataDimension {
 struct SensorCovertCoff {
     int32_t sensorTypeId;
     int32_t sensorId;
-    enum SensorDataDimension Dim;
+    enum SensorDataDimension dim;
     float coff[DATA_MAX_DATA_SIZE];
 };
 
