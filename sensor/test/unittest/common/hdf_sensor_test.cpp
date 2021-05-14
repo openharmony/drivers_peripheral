@@ -69,7 +69,7 @@ void HdfSensorTest::SetUpTestCase()
 {
     g_sensorDev = NewSensorInterfaceInstance();
     if (g_sensorDev == nullptr) {
-        printf("test sensorHdi get Module instace failed\n\r");
+        printf("test sensorHdi get Module instance failed\n\r");
     }
 }
 
@@ -127,7 +127,7 @@ HWTEST_F(HdfSensorTest, RemoveSensorInstance001, TestSize.Level1)
     EXPECT_EQ(0, ret);
     g_sensorDev = NewSensorInterfaceInstance();
     if (g_sensorDev == nullptr) {
-        printf("test sensorHdi get Module instace failed\n\r");
+        printf("test sensorHdi get Module instance failed\n\r");
         ASSERT_EQ(0, ret);
     }
 }
@@ -197,7 +197,7 @@ HWTEST_F(HdfSensorTest, GetSensorList002, TestSize.Level1)
         EXPECT_NE(nullptr, sensorInfo);
         return;
     }
-    printf("get sensor list num[%d] size[%d]\n\r", count, sizeof(*sensorInfo));
+    printf("get sensor list num[%d] size[%u]\n\r", count, sizeof(*sensorInfo));
     info = sensorInfo;
     testSensorInfo = sensorInfo;
     accelSensorInfo = sensorInfo;
@@ -214,7 +214,7 @@ HWTEST_F(HdfSensorTest, GetSensorList002, TestSize.Level1)
 
     if (testSensorInfo->sensorTypeId == 0) {
         EXPECT_STREQ("sensor_test", testSensorInfo->sensorName);
-        EXPECT_STREQ("huawei", testSensorInfo->vendorName);
+        EXPECT_STREQ("default", testSensorInfo->vendorName);
     }
     if (accelSensorInfo->sensorTypeId == 1) {
         EXPECT_STREQ("accelerometer", accelSensorInfo->sensorName);
@@ -337,7 +337,7 @@ HWTEST_F(HdfSensorTest, SetSensorOption001, TestSize.Level1)
 
 /**
   * @tc.name: UnregisterDataCb001
-  * @tc.desc: Deregisters the callback for reporting sensor data.
+  * @tc.desc: Unregister the callback for reporting sensor data.
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869U
   */
@@ -361,4 +361,3 @@ HWTEST_F(HdfSensorTest, RegisterSensorDataCb003, TestSize.Level1)
     ret = g_sensorDev->Unregister();
     EXPECT_EQ(0, ret);
 }
-
