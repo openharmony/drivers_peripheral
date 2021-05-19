@@ -32,17 +32,23 @@ public:
     virtual ~WiFiMessageTest() {};
     static void SetUpTestCase();
     static void TearDownTestCase();
-    void SetUp() const;
-    void TearDown() const;
+    void SetUp();
+    void TearDown();
 };
 
-void WiFiMessageTest::SetUpTestCase() {}
+void WiFiMessageTest::SetUpTestCase()
+{
+    HdfTestOpenService();
+}
 
-void WiFiMessageTest::TearDownTestCase() {}
+void WiFiMessageTest::TearDownTestCase()
+{
+    HdfTestCloseService();
+}
 
-void WiFiMessageTest::SetUp() const {}
+void WiFiMessageTest::SetUp() {}
 
-void WiFiMessageTest::TearDown() const {}
+void WiFiMessageTest::TearDown() {}
 
 /**
  * @tc.name: WIFI_MESSAGE_QUEUE001

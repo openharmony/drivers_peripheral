@@ -35,4 +35,4 @@ void HalMutexUnlock();
 #endif
 #endif
 
-#endif
+#endif /* WIFI_HAL_UTIL_H */

@@ -29,17 +29,17 @@ class WifiClientTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    void SetUp() const;
-    void TearDown() const;
+    void SetUp();
+    void TearDown();
 };
 
 void WifiClientTest::SetUpTestCase() {}
 
 void WifiClientTest::TearDownTestCase() {}
 
-void WifiClientTest::SetUp() const {}
+void WifiClientTest::SetUp() {}
 
-void WifiClientTest::TearDown() const {}
+void WifiClientTest::TearDown() {}
 
 static int OnWifiEventListener(struct HdfDevEventlistener *listener,
     struct HdfIoService *service, uint32_t id, struct HdfSBuf *data)
@@ -55,7 +55,7 @@ static int OnWifiEventListener(struct HdfDevEventlistener *listener,
 
 /**
  * @tc.name: WifiClientInitAndDeinit001
- * @tc.desc: In normal cases, the WLAN client is initialized and deinitialized once.
+ * @tc.desc: Initialize and uninitialize the WLAN client only once.
  * @tc.type: FUNC
  * @tc.require: AR000F869F, AR000F8QNL
  */
@@ -70,7 +70,7 @@ HWTEST_F(WifiClientTest, WifiClientInitAndDeinit001, TestSize.Level1)
 
 /**
  * @tc.name: WifiClientInitAndDeinit002
- * @tc.desc: In normal cases, the WLAN client is initialized and deinitialized for multiple times.
+ * @tc.desc: Initialize and uninitialize the WLAN client for multiple times.
  * @tc.type: FUNC
  * @tc.require: AR000F869F, AR000F8QNL
  */
@@ -106,7 +106,7 @@ HWTEST_F(WifiClientTest, WifiClientInitAndDeinit003, TestSize.Level1)
 
 /**
  * @tc.name: WifiRegisterListener001
- * @tc.desc: Single registration and unregistration of the listener in normal cases.
+ * @tc.desc: Register the listener for single registration and unregistration.
  * @tc.type: FUNC
  * @tc.require: AR000F869F, AR000F8QNL
  */
@@ -125,7 +125,7 @@ HWTEST_F(WifiClientTest, WifiRegisterListener001, TestSize.Level1)
 
 /**
  * @tc.name: WifiRegisterListener002
- * @tc.desc: Multiple registrations and unregistrations of the listener in normal cases.
+ * @tc.desc: Register the listener for repeated registration and unregistration.
  * @tc.type: FUNC
  * @tc.require: AR000F869F, AR000F8QNL
  */
@@ -149,7 +149,7 @@ HWTEST_F(WifiClientTest, WifiRegisterListener002, TestSize.Level1)
 
 /**
  * @tc.name: WifiRegisterListener003
- * @tc.desc: In normal cases, multiple listeners are registered and deregistered.
+ * @tc.desc: Register multiple listeners for registration and unregistration.
  * @tc.type: FUNC
  * @tc.require: AR000F869F
  */
@@ -174,7 +174,7 @@ HWTEST_F(WifiClientTest, WifiRegisterListener003, TestSize.Level1)
 
 /**
  * @tc.name: WifiRegisterListener004
- * @tc.desc: Repeatedly registering a listener.
+ * @tc.desc: Repeatedly register a listener.
  * @tc.type: FUNC
  * @tc.require: AR000F869F
  */
@@ -197,7 +197,7 @@ HWTEST_F(WifiClientTest, WifiRegisterListener004, TestSize.Level1)
 
 /**
  * @tc.name: WifiRegisterListener005
- * @tc.desc: Registration and unregistration of interception in abnormal cases.
+ * @tc.desc: In abnormal condition, register the listener and no deregistration operation.
  * @tc.type: FUNC
  * @tc.require: AR000F869F
  */
@@ -215,7 +215,7 @@ HWTEST_F(WifiClientTest, WifiRegisterListener005, TestSize.Level1)
 
 /**
  * @tc.name: WifiRegisterListener006
- * @tc.desc: Deinitialization when the listener is not completely unregistered.
+ * @tc.desc: Uninitialize a listener when the listener is not completely unregistered.
  * @tc.type: FUNC
  * @tc.require: AR000F869F
  */
@@ -240,7 +240,7 @@ HWTEST_F(WifiClientTest, WifiRegisterListener006, TestSize.Level1)
 
 /**
  * @tc.name: WifiRegisterListener007
- * @tc.desc: Canceling a listener when no listener is registered.
+ * @tc.desc: Cancel a listener when no listener is registered.
  * @tc.type: FUNC
  * @tc.require: AR000F869F
  */

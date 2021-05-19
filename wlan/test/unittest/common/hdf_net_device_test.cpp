@@ -31,8 +31,8 @@ class WiFiNetDeviceTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    void SetUp() const;
-    void TearDown() const;
+    void SetUp();
+    void TearDown();
 };
 
 void WiFiNetDeviceTest::SetUpTestCase()
@@ -49,9 +49,9 @@ void WiFiNetDeviceTest::TearDownTestCase()
     HdfTestCloseService();
 }
 
-void WiFiNetDeviceTest::SetUp() const {}
+void WiFiNetDeviceTest::SetUp() {}
 
-void WiFiNetDeviceTest::TearDown() const {}
+void WiFiNetDeviceTest::TearDown() {}
 
 /**
   * @tc.name: WiFiNetDeviceInit001

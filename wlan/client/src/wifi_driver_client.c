@@ -34,7 +34,7 @@ int32_t WifiMsgServiceInit(void)
         g_wifiService = HdfIoServiceBind(DRIVER_SERVICE_NAME);
     }
     if (g_wifiService == NULL) {
-        HDF_LOGE("%s: fail to get remote service!", __func__);
+        HDF_LOGE("%s: fail to get remote service!, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -43,10 +43,11 @@ int32_t WifiMsgServiceInit(void)
 int32_t WifiMsgRegisterEventListener(struct HdfDevEventlistener *listener)
 {
     if (g_wifiService == NULL || listener == NULL) {
+        HDF_LOGE("%s: params or g_wifiService is NULL, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
     if (HdfDeviceRegisterEventListener(g_wifiService, listener) != HDF_SUCCESS) {
-        HDF_LOGE("%s: fail to register event listener", __func__);
+        HDF_LOGE("%s: fail to register event listener, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -54,21 +55,23 @@ int32_t WifiMsgRegisterEventListener(struct HdfDevEventlistener *listener)
 
 void WifiMsgUnregisterEventListener(struct HdfDevEventlistener *listener)
 {
-    if (listener == NULL) {
+    if (g_wifiService == NULL || listener == NULL) {
+        HDF_LOGE("%s: params or g_wifiService is NULL, line: %d", __FUNCTION__, __LINE__);
         return;
     }
     if (HdfDeviceUnregisterEventListener(g_wifiService, listener)) {
-        HDF_LOGE("fail to  unregister listener");
+        HDF_LOGE("%s: fail to unregister listener, line: %d", __FUNCTION__, __LINE__);
     }
 }
 
 void WifiMsgServiceDeinit(void)
 {
     if (g_wifiService == NULL) {
+        HDF_LOGE("%s: g_wifiService is NULL, line: %d", __FUNCTION__, __LINE__);
         return;
     }
     if (HdfIoserviceGetListenerCount(g_wifiService) != 0) {
-        HDF_LOGE("the current EventListener is not empty. cancel the listener registration first.");
+        HDF_LOGE("%s: EventListener is not empty. cancel listener registration, line: %d", __FUNCTION__, __LINE__);
         return;
     }
     HdfIoServiceRecycle(g_wifiService);
@@ -78,15 +81,15 @@ void WifiMsgServiceDeinit(void)
 int32_t WifiCmdBlockSyncSend(const uint32_t cmd, struct HdfSBuf *reqData, struct HdfSBuf *respData)
 {
     if (reqData == NULL) {
-        HDF_LOGE("%s params is NULL", __func__);
+        HDF_LOGE("%s: params is NULL, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
     if (g_wifiService == NULL || g_wifiService->dispatcher == NULL || g_wifiService->dispatcher->Dispatch == NULL) {
-        HDF_LOGE("%s:bad remote service found!", __func__);
+        HDF_LOGE("%s: bad remote service found, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
     int32_t ret = g_wifiService->dispatcher->Dispatch(&g_wifiService->object, cmd, reqData, respData);
-    HDF_LOGI("%s: cmd=%d, ret=%d", __func__, cmd, ret);
+    HDF_LOGI("%s: cmd=%u, ret=%d, line: %d", __FUNCTION__, cmd, ret, __LINE__);
     return ret;
 }
 

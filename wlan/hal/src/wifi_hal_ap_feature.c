@@ -29,7 +29,7 @@ extern "C" {
 static int32_t GetAsscociatedStasInner(const struct IWiFiAp *apFeature,
     struct StaInfo *staInfo, uint32_t size, uint32_t *num)
 {
-    if (apFeature == NULL || staInfo == NULL || size <= 0 || num == NULL) {
+    if (apFeature == NULL || staInfo == NULL || size == 0 || num == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }

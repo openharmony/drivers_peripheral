@@ -34,5 +34,4 @@ enum WifiClientType {
 #endif
 #endif
 
-
-#endif /* end of wifi_common_cmd.h */
+#endif /* _WIFI_COMMON_CMD_H_ */

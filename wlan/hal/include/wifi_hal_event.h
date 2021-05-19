@@ -44,4 +44,4 @@ int32_t WifiHalEventRecv(struct HdfDevEventlistener *listener,
 #endif
 #endif
 
-#endif
+#endif /* WIFI_HAL_EVENT_H */

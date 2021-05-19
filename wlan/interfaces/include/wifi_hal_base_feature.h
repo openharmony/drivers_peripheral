@@ -160,7 +160,7 @@ struct IWiFiBaseFeature {
      * @param band Indicates the frequency band, either 2.4 GHz or 5 GHz.
      * @param freqs Indicates the pointer to the supported frequencies.
      * @param count Indicates the number of elements in the frequency array.
-     * @param num Indicates the pointer to the number of supported frequencies.
+     * @param num Indicates the number of supported frequencies.
      *
      * @return Returns <b>0</b> if the supported frequencies are obtained; returns a negative value otherwise.
      *

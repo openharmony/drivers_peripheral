@@ -112,7 +112,7 @@ static int32_t HalResetCallbackEvent(int32_t event, struct HdfSBuf *sbuf)
 
 /**
  * @tc.name: WifiHalGetSupportFeature001
- * @tc.desc: Wifi hal get support feature function test
+ * @tc.desc: Get supported features
  * @tc.type: FUNC
  * @tc.require: AR000F869J
  */
@@ -140,7 +140,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetSupportFeature001, TestSize.Level1)
 
 /**
  * @tc.name: WifiHalGetSupportCombo001
- * @tc.desc: Wifi hal get support combo function test
+ * @tc.desc: Get supported combo
  * @tc.type: FUNC
  * @tc.require: AR000F869J
  */
@@ -172,7 +172,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetSupportCombo001, TestSize.Level1)
 
 /**
  * @tc.name: WifiHalGetDeviceMacAddress001
- * @tc.desc: Wifi hal get device Mac address function test
+ * @tc.desc: Get device Mac address for ap mode
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
@@ -206,7 +206,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetDeviceMacAddress001, TestSize.Level1)
 
 /**
  * @tc.name: WifiHalGetDeviceMacAddress002
- * @tc.desc: Wifi hal get device Mac address function test
+ * @tc.desc: Get device Mac address for sta mode
  * @tc.type: FUNC
  * @tc.require: AR000F869E
  */
@@ -240,7 +240,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetDeviceMacAddress002, TestSize.Level1)
 
 /**
  * @tc.name: WifiHaGetValidFreqsWithBand001
- * @tc.desc: Wifi hal get available freqs with band function test
+ * @tc.desc: Get available frequencies
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
@@ -274,8 +274,8 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHaGetValidFreqsWithBand001, TestSize.Level1
 }
 
 /**
- * @tc.name: WifiHalGetAsscociatedStas001
- * @tc.desc: Wifi hal get asscociated sta info function test
+ * @tc.name: WifiHalGetAssociatedStas001
+ * @tc.desc: Get asscociated STA info
  * @tc.type: FUNC
  * @tc.require: AR000F869K
  */
@@ -308,7 +308,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetAsscociatedStas001, TestSize.Level1)
 
 /**
  * @tc.name: WifiHalSetScanningMacAddress001
- * @tc.desc: Wifi hal set scanning Mac address function test
+ * @tc.desc: Set Mac address scanning
  * @tc.type: FUNC
  * @tc.require: AR000F869K
  */
@@ -340,7 +340,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalSetScanningMacAddress001, TestSize.Level
 
 /**
  * @tc.name: WifiHalGetChipId001
- * @tc.desc: Wifi hal obtain the chip ID function test
+ * @tc.desc: Obtain the chip ID
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
@@ -373,7 +373,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetChipId001, TestSize.Level1)
 
 /**
  * @tc.name: WifiHalGetIfNamesByChipId001
- * @tc.desc: Wifi hal obtain all ifNames and the number of the current chip function test
+ * @tc.desc: Obtain all ifNames and the number of the current chip
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
@@ -417,7 +417,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetIfNamesByChipId001, TestSize.Level1)
 
 /**
  * @tc.name: WifiHalResetDriver001
- * @tc.desc: Wifi hal Reset the wifi Driver function test
+ * @tc.desc: Reset the WiFi driver
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */

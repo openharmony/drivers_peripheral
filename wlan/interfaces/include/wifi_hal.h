@@ -171,7 +171,7 @@ struct IWiFi {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*unRegisterEventCallback)(void);
+    int32_t (*unregisterEventCallback)(void);
 
     /**
      * @brief Destroys a specified {@link IWiFiBaseFeature} object.

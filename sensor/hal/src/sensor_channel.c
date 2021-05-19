@@ -171,7 +171,7 @@ int32_t Unregister(void)
     manager->hasSensorListener = false;
     HdfIoServiceGroupRecycle(manager->serviceGroup);
     manager->serviceGroup = NULL;
-        manager->recordDataCb = NULL;
+    manager->recordDataCb = NULL;
 
     (void)OsalMutexUnlock(&manager->mutex);
 

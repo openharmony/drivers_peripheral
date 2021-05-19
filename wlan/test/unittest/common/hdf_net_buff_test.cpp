@@ -31,8 +31,8 @@ class WiFiNetBuffTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    void SetUp() const;
-    void TearDown() const;
+    void SetUp();
+    void TearDown();
 };
 
 void WiFiNetBuffTest::SetUpTestCase()
@@ -45,9 +45,9 @@ void WiFiNetBuffTest::TearDownTestCase()
     HdfTestCloseService();
 }
 
-void WiFiNetBuffTest::SetUp() const {}
+void WiFiNetBuffTest::SetUp() {}
 
-void WiFiNetBuffTest::TearDown() const {}
+void WiFiNetBuffTest::TearDown() {}
 
 /**
   * @tc.name: WiFiNetBuff001
