@@ -31,8 +31,8 @@ class WiFiFlowControlTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    void SetUp() const;
-    void TearDown() const;
+    void SetUp();
+    void TearDown();
 };
 
 void WiFiFlowControlTest::SetUpTestCase()
@@ -44,14 +44,14 @@ void WiFiFlowControlTest::SetUpTestCase()
 
 void WiFiFlowControlTest::TearDownTestCase()
 {
-    HdfTestOpenService();
     struct HdfTestMsg msg = {TEST_WIFI_TYPE, WIFI_FLOW_CONTROL_DEINIT, -1};
     HdfTestSendMsgToService(&msg);
+    HdfTestCloseService();
 }
 
-void WiFiFlowControlTest::SetUp() const {}
+void WiFiFlowControlTest::SetUp() {}
 
-void WiFiFlowControlTest::TearDown() const {}
+void WiFiFlowControlTest::TearDown() {}
 
 /**
  * @tc.name: WiFiFlowControlGetQueueID001

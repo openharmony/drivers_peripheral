@@ -31,8 +31,8 @@ class WiFiModuleTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    void SetUp() const;
-    void TearDown() const;
+    void SetUp();
+    void TearDown();
 };
 
 void WiFiModuleTest::SetUpTestCase()
@@ -45,9 +45,9 @@ void WiFiModuleTest::TearDownTestCase()
     HdfTestCloseService();
 }
 
-void WiFiModuleTest::SetUp() const {}
+void WiFiModuleTest::SetUp() {}
 
-void WiFiModuleTest::TearDown() const {}
+void WiFiModuleTest::TearDown() {}
 
 /**
   * @tc.name: WiFiModuleCreate001
@@ -74,12 +74,12 @@ HWTEST_F(WiFiModuleTest, WiFiModuleAddFeature001, TestSize.Level1)
 }
 
 /**
-  * @tc.name: WiFiModuleDeteleFeature001
+  * @tc.name: WiFiModuleDeleteFeature001
   * @tc.desc: wifi module delete feature function test
   * @tc.type: FUNC
   * @tc.require: AR000F869K
   */
-HWTEST_F(WiFiModuleTest, WiFiModuleDeteleFeature001, TestSize.Level1)
+HWTEST_F(WiFiModuleTest, WiFiModuleDeleteFeature001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_WIFI_TYPE, WIFI_MODULE_DELETE_FEATURE, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "wifi_hal.h"
 #include <stdbool.h>
+#include "wifi_hal.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "hdf_sbuf.h"
@@ -25,15 +25,15 @@
 #include "wifi_hal_event.h"
 #include "wifi_hal_util.h"
 
-#define MAX_AUTH_NUM 1000
-
 #ifdef __cplusplus
 #if __cplusplus
 extern "C" {
 #endif
 #endif
 
-static struct HdfDevEventlistener g_wifiHalEventListener;
+#define MAX_AUTH_NUM 1000
+
+static struct HdfDevEventlistener g_wifiHalEventListener = {0};
 static bool g_wifiIsStarted = false;
 
 static int32_t StartInner(struct IWiFi *iwifi)
@@ -60,10 +60,9 @@ static int32_t StartInner(struct IWiFi *iwifi)
         WifiMsgServiceDeinit();
         return ret;
     }
-
     ret = HalCmdGetAvailableNetwork();
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: HalCmdGetIfName failed, line: %d, error no: %d", __FUNCTION__, __LINE__, ret);
+        HDF_LOGE("%s: HalCmdGetAvailableNetwork failed, line: %d, error no: %d", __FUNCTION__, __LINE__, ret);
         WifiMsgUnregisterEventListener(&g_wifiHalEventListener);
         WifiMsgServiceDeinit();
         return ret;
@@ -91,7 +90,7 @@ static int32_t StopInner(struct IWiFi *iwifi)
 
 static int32_t GetSupportFeatureInner(uint8_t *supType, uint32_t size)
 {
-    if (supType == NULL || size < (PROTOCOL_80211_IFTYPE_NUM + 1)) {
+    if (supType == NULL || size <= PROTOCOL_80211_IFTYPE_NUM) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -141,19 +140,19 @@ static int32_t InitFeatureByType(int32_t type, struct IWiFiBaseFeature **ifeatur
     return ret;
 }
 
-static int32_t FindValidNetwork(int32_t type, struct IWiFiBaseFeature **fe)
+static int32_t FindValidNetwork(int32_t type, struct IWiFiBaseFeature **feature)
 {
     struct DListHead *networkHead = GetNetworkHead();
     struct IWiFiList *networkNode = NULL;
 
     DLIST_FOR_EACH_ENTRY(networkNode, networkHead, struct IWiFiList, entry) {
         if (networkNode->ifeature == NULL && networkNode->supportMode[type] == 1) {
-            if (memcpy_s((*fe)->ifName, IFNAME_MAX_LEN, networkNode->ifName, strlen(networkNode->ifName)) != EOK) {
+            if (memcpy_s((*feature)->ifName, IFNAME_MAX_LEN, networkNode->ifName, strlen(networkNode->ifName)) != EOK) {
                 HDF_LOGE("%s: memcpy_s failed, line: %d", __FUNCTION__, __LINE__);
                 return HDF_FAILURE;
             }
-            (*fe)->type = type;
-            networkNode->ifeature = *fe;
+            (*feature)->type = type;
+            networkNode->ifeature = *feature;
             return HDF_SUCCESS;
         }
     }
@@ -165,19 +164,24 @@ static int32_t CreateFeatureInner(int32_t type, struct IWiFiBaseFeature **ifeatu
 {
     int32_t ret;
 
+    if (ifeature == NULL) {
+        HDF_LOGE("%s: ifeature is null, line: %d", __FUNCTION__, __LINE__);
+        return HDF_FAILURE;
+    }
     ret = InitFeatureByType(type, ifeature);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: init feature failed, line: %d, error no: %d", __FUNCTION__, __LINE__, ret);
-        *ifeature = NULL;
         return ret;
     }
 
     ret = FindValidNetwork(type, ifeature);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: create feature failed, line: %d, error no: %d", __FUNCTION__, __LINE__, ret);
-        free(*ifeature);
-        *ifeature = NULL;
-        return HDF_FAILURE;
+        if (*ifeature != NULL) {
+            free(*ifeature);
+            *ifeature = NULL;
+        }
+        return ret;
     }
     return HDF_SUCCESS;
 }
@@ -192,7 +196,7 @@ static int32_t GetFeatureByIfNameInner(const char *ifName, struct IWiFiBaseFeatu
         return HDF_ERR_INVALID_PARAM;
     }
     DLIST_FOR_EACH_ENTRY(networkNode, networkHead, struct IWiFiList, entry) {
-        if (!strcmp(networkNode->ifName, ifName)) {
+        if (strcmp(networkNode->ifName, ifName) == HDF_SUCCESS) {
             *ifeature = networkNode->ifeature;
             return HDF_SUCCESS;
         }
@@ -212,7 +216,7 @@ static int32_t DestroyFeatureInner(struct IWiFiBaseFeature *ifeature)
     }
 
     DLIST_FOR_EACH_ENTRY(networkNode, networkHead, struct IWiFiList, entry) {
-        if (!strcmp(networkNode->ifName, ifeature->ifName)) {
+        if (strcmp(networkNode->ifName, ifeature->ifName) == HDF_SUCCESS) {
             free(ifeature);
             ifeature = NULL;
             networkNode->ifeature = NULL;
@@ -230,22 +234,28 @@ static int32_t RegisterEventCallbackInner(CallbackFunc cbFunc)
         return HDF_ERR_INVALID_PARAM;
     }
     struct CallbackEvent *callbackFunc = GetCallbackFunc();
-    if (callbackFunc->cbFunc) {
-        HDF_LOGE("%s: callback function has been registered, line: %d", __FUNCTION__, __LINE__);
+    if (callbackFunc != NULL) {
+        if (callbackFunc->cbFunc != NULL) {
+            HDF_LOGE("%s: callback function has been registered, line: %d", __FUNCTION__, __LINE__);
+            return HDF_FAILURE;
+        }
+        callbackFunc->cbFunc = cbFunc;
+    } else {
         return HDF_FAILURE;
     }
-    callbackFunc->cbFunc = cbFunc;
     return HDF_SUCCESS;
 }
 
-static int32_t UnRegisterEventCallbackInner(void)
+static int32_t UnregisterEventCallbackInner(void)
 {
     struct CallbackEvent *callbackFunc = GetCallbackFunc();
-    callbackFunc->cbFunc = NULL;
+    if (callbackFunc != NULL) {
+        callbackFunc->cbFunc = NULL;
+    }
     return HDF_SUCCESS;
 }
 
-static int32_t ResetDriverInner(const uint8_t chipId)
+static int32_t ResetDriverInner(uint8_t chipId)
 {
     return HalCmdSetResetDriver(chipId);
 }
@@ -281,6 +291,7 @@ static int32_t GetSupportCombo(uint64_t *combo, uint32_t size)
     HalMutexUnlock();
     return ret;
 }
+
 static int32_t CreateFeature(int32_t type, struct IWiFiBaseFeature **ifeature)
 {
     HalMutexLock();
@@ -313,18 +324,17 @@ static int32_t RegisterEventCallback(CallbackFunc cbFunc)
     return ret;
 }
 
-static int32_t UnRegisterEventCallback(void)
+static int32_t UnregisterEventCallback(void)
 {
     HalMutexLock();
-    int32_t ret = UnRegisterEventCallbackInner();
+    int32_t ret = UnregisterEventCallbackInner();
     HalMutexUnlock();
     return ret;
 }
 
 static int32_t ResetDriver(const uint8_t chipId)
 {
-    /* Add permission, distinguish liteos kernel from Linux kernel */
-    if (getuid() > MAX_AUTH_NUM) {
+    if (getuid() >= MAX_AUTH_NUM) {
         HDF_LOGE("%s: don't have authorized access, line: %d", __FUNCTION__, __LINE__);
         return ERR_UNAUTH_ACCESS;
     }
@@ -339,6 +349,7 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
 {
     static bool isInited = false;
     static struct IWiFi singleWifiInstance;
+
     if (!isInited) {
         if (HalMutexInit() != HDF_SUCCESS) {
             HDF_LOGE("%s: HalMutexInit failed, line: %d\n", __FUNCTION__, __LINE__);
@@ -353,7 +364,7 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
         singleWifiInstance.getFeatureByIfName = GetFeatureByIfName;
         singleWifiInstance.destroyFeature = DestroyFeature;
         singleWifiInstance.registerEventCallback = RegisterEventCallback;
-        singleWifiInstance.unRegisterEventCallback = UnRegisterEventCallback;
+        singleWifiInstance.unregisterEventCallback = UnregisterEventCallback;
         singleWifiInstance.resetDriver = ResetDriver;
         InitIWiFiList();
         isInited = true;
@@ -371,6 +382,7 @@ int32_t WifiDestruct(struct IWiFi **wifiInstance)
     *wifiInstance = NULL;
     if (HalMutexDestroy() != HDF_SUCCESS) {
         HDF_LOGE("%s: HalMutexDestroy failed, line: %d", __FUNCTION__, __LINE__);
+        return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }

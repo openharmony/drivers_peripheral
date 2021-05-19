@@ -27,7 +27,7 @@ extern "C" {
 #endif
 #endif
 
-static struct DListHead g_networkHead;
+static struct DListHead g_networkHead = {0};
 
 struct DListHead *GetNetworkHead(void)
 {
@@ -97,6 +97,7 @@ int32_t HalCmdGetAvailableNetwork(void)
     }
     ret = WifiCmdBlockSyncSend(WIFI_HAL_CMD_GET_NETWORK_INFO, data, reply);
     if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: WifiCmdBlockSyncSend failed, line: %d", __FUNCTION__, __LINE__);
         HdfSBufRecycle(data);
         HdfSBufRecycle(reply);
         return ret;
@@ -137,6 +138,7 @@ int32_t HalCmdGetSupportType(uint8_t *supType)
     GetSupportTypeByList(supType);
     ret = WifiCmdBlockSyncSend(WIFI_HAL_CMD_IS_SUPPORT_COMBO, data, reply);
     if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: WifiCmdBlockSyncSend failed, line: %d", __FUNCTION__, __LINE__);
         HdfSBufRecycle(data);
         HdfSBufRecycle(reply);
         return ret;
@@ -209,7 +211,7 @@ int32_t GetDeviceMacAddr(struct HdfSBuf *reply, unsigned char *mac, uint8_t len)
 {
     uint8_t isEfuseSavedMac;
     uint32_t replayDataSize = 0;
-    const uint8_t *replayData = 0;
+    const uint8_t *replayData = NULL;
 
     if (!HdfSbufReadUint8(reply, &isEfuseSavedMac)) {
         HDF_LOGE("%s: HdfSbufReadUint8 failed, line: %d", __FUNCTION__, __LINE__);
@@ -235,11 +237,13 @@ int32_t HalCmdGetDevMacAddr(const char *ifName, int32_t type, unsigned char *mac
     int32_t ret;
     struct HdfSBuf *data = HdfSBufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: Fail to obtain sbuf data, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
     struct HdfSBuf *reply = HdfSBufObtainDefaultSize();
     if (reply == NULL) {
         HdfSBufRecycle(data);
+        HDF_LOGE("%s: Fail to obtain sbuf reply, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(data, ifName)) {
@@ -256,6 +260,7 @@ int32_t HalCmdGetDevMacAddr(const char *ifName, int32_t type, unsigned char *mac
     }
     ret = WifiCmdBlockSyncSend(WIFI_HAL_CMD_GET_DEV_MAC_ADDR, data, reply);
     if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: WifiCmdBlockSyncSend failed, line: %d", __FUNCTION__, __LINE__);
         HdfSBufRecycle(data);
         HdfSBufRecycle(reply);
         return ret;
@@ -271,10 +276,12 @@ int32_t HalCmdSetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
     int32_t ret;
     struct HdfSBuf *data = HdfSBufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: Fail to obtain sbuf data, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
     struct HdfSBuf *reply = HdfSBufObtainDefaultSize();
     if (reply == NULL) {
+        HDF_LOGE("%s: Fail to obtain sbuf reply, line: %d", __FUNCTION__, __LINE__);
         HdfSBufRecycle(data);
         return HDF_FAILURE;
     }
@@ -342,6 +349,7 @@ int32_t HalCmdGetValidFreqWithBand(const char *ifName, int32_t band, int32_t *fr
     }
     ret = WifiCmdBlockSyncSend(WIFI_HAL_CMD_GET_VALID_FREQ, data, reply);
     if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: WifiCmdBlockSyncSend failed, line: %d", __FUNCTION__, __LINE__);
         HdfSBufRecycle(data);
         HdfSBufRecycle(reply);
         return ret;
@@ -384,12 +392,10 @@ int32_t HalCmdSetTxPower(const char *ifName, int32_t power)
 
 static int32_t GetAsscociatedStas(struct HdfSBuf *reply, struct StaInfo *staInfo, uint32_t count, uint32_t *num)
 {
-    uint32_t bufSize;
     uint32_t infoSize;
     uint32_t replayDataSize = 0;
     const uint8_t *replayData = 0;
 
-    bufSize = sizeof(struct StaInfo) * count;
     if (!HdfSbufReadUint32(reply, num)) {
         HDF_LOGE("%s: HdfSbufReadUint32 failed, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
@@ -397,10 +403,10 @@ static int32_t GetAsscociatedStas(struct HdfSBuf *reply, struct StaInfo *staInfo
     if (*num != 0) {
         infoSize = sizeof(struct StaInfo) * (*num);
         if (!HdfSbufReadBuffer(reply, (const void **)(&replayData), &replayDataSize) || replayDataSize != infoSize) {
-            HDF_LOGE("%s: HdfSbufReadBuffer failed, retSize=%d,line: %d", __FUNCTION__, replayDataSize, __LINE__);
+            HDF_LOGE("%s: HdfSbufReadBuffer failed, relaySize=%d,line: %d", __FUNCTION__, replayDataSize, __LINE__);
             return HDF_FAILURE;
         }
-        if (memcpy_s(staInfo, bufSize, replayData, replayDataSize) != EOK) {
+        if (memcpy_s(staInfo, sizeof(struct StaInfo) * count, replayData, replayDataSize) != EOK) {
             HDF_LOGE("%s: memcpy failed, line: %d", __FUNCTION__, __LINE__);
             return HDF_FAILURE;
         }
@@ -428,6 +434,7 @@ int32_t HalCmdGetAsscociatedStas(const char *ifName, struct StaInfo *staInfo, ui
     }
     ret = WifiCmdBlockSyncSend(WIFI_HAL_CMD_GET_ASSOC_STA, data, reply);
     if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: WifiCmdBlockSyncSend failed, line: %d", __FUNCTION__, __LINE__);
         HdfSBufRecycle(data);
         HdfSBufRecycle(reply);
         return ret;
@@ -495,6 +502,7 @@ int32_t HalCmdSetScanningMacAddress(const char *ifName, unsigned char *scanMac, 
     }
     ret = WifiCmdBlockSyncSend(WIFI_HAL_CMD_SET_SCAN_MAC_ADDR, data, reply);
     if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: WifiCmdBlockSyncSend failed, line: %d", __FUNCTION__, __LINE__);
         HdfSBufRecycle(data);
         HdfSBufRecycle(reply);
         return ret;
@@ -542,7 +550,7 @@ static int32_t GetIfNames(struct HdfSBuf *reply, char **ifNames, uint32_t *num)
 
     for (i = 0; i < *num; i++) {
         if (memcpy_s(*ifNames + i * IFNAME_MAX_LEN, IFNAME_MAX_LEN, replayData + i * IFNAME_MAX_LEN,
-            replayDataSize) != EOK) {
+            IFNAME_MAX_LEN) != EOK) {
             HDF_LOGE("%s: memcpy failed, line: %d", __FUNCTION__, __LINE__);
             free(*ifNames);
             *ifNames = NULL;
@@ -573,6 +581,7 @@ int32_t HalCmdGetChipId(const char *ifName, uint8_t *chipId)
     }
     ret = WifiCmdBlockSyncSend(WIFI_HAL_CMD_GET_CHIPID, data, reply);
     if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: WifiCmdBlockSyncSend failed, line: %d", __FUNCTION__, __LINE__);
         HdfSBufRecycle(data);
         HdfSBufRecycle(reply);
         return ret;
@@ -594,10 +603,12 @@ int32_t HalCmdGetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t 
 
     struct HdfSBuf *data = HdfSBufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: Fail to obtain sbuf data, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
     struct HdfSBuf *reply = HdfSBufObtainDefaultSize();
     if (reply == NULL) {
+        HDF_LOGE("%s: Fail to obtain sbuf reply, line: %d", __FUNCTION__, __LINE__);
         HdfSBufRecycle(data);
         return HDF_FAILURE;
     }
@@ -609,6 +620,7 @@ int32_t HalCmdGetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t 
     }
     ret = WifiCmdBlockSyncSend(WIFI_HAL_CMD_GET_IFNAMES, data, reply);
     if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: WifiCmdBlockSyncSend failed, line: %d", __FUNCTION__, __LINE__);
         HdfSBufRecycle(data);
         HdfSBufRecycle(reply);
         return ret;

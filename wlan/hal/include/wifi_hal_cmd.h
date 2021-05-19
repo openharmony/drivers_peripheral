@@ -47,7 +47,6 @@ enum BaseCommands {
     CMD_BASE_GET_ADDR,
     CMD_BASE_SET_MODE,
     CMD_BASE_GET_HW_FEATURE = 10,
-//    CMD_BASE_SCAN,
     CMD_BASE_SET_NETDEV,
     CMD_BASE_SEND_ACTION,
     CMD_BASE_SET_CLIENT,
@@ -81,7 +80,7 @@ enum STACommands {
 };
 
 #define MESSAGE_CMD_BITS 16
-#define HDF_WIFI_CMD(SERVICEID, CMDID) (((uint32_t)SERVICEID) << 16) | (CMDID)
+#define HDF_WIFI_CMD(SERVICEID, CMDID) ((((uint32_t)SERVICEID) << 16) | (CMDID))
 
 typedef enum {
     WIFI_HAL_CMD_GET_NETWORK_INFO = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_GET_NETWORK_INFO),
@@ -123,4 +122,4 @@ void InitIWiFiList(void);
 #endif
 #endif
 
-#endif
+#endif /* WIFI_HAL_CMD_H */

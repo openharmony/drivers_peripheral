@@ -39,4 +39,4 @@ struct IWiFiList {
 #endif
 #endif
 
-#endif
+#endif /* WIFI_HAL_COMMON_H */

@@ -49,7 +49,7 @@ int32_t WifiHalEventRecv(struct HdfDevEventlistener *listener,
         return HDF_FAILURE;
     }
     struct CallbackEvent *callbackFunc = GetCallbackFunc();
-    if (callbackFunc != NULL && callbackFunc->cbFunc) {
+    if (callbackFunc != NULL && callbackFunc->cbFunc != NULL) {
         ret = callbackFunc->cbFunc(id, copyData);
     } else {
         HDF_LOGE("%s: callbackFunc have not initialized, line: %d", __FUNCTION__, __LINE__);

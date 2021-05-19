@@ -28,10 +28,8 @@ extern "C" {
 
 int32_t WifiMsgServiceInit(void);
 void WifiMsgServiceDeinit(void);
-
 int32_t WifiMsgRegisterEventListener(struct HdfDevEventlistener *listener);
 void WifiMsgUnregisterEventListener(struct HdfDevEventlistener *listener);
-
 int32_t WifiCmdBlockSyncSend(const uint32_t cmd, struct HdfSBuf *data, struct HdfSBuf *respData);
 
 #ifdef __cplusplus
@@ -39,6 +37,5 @@ int32_t WifiCmdBlockSyncSend(const uint32_t cmd, struct HdfSBuf *data, struct Hd
 }
 #endif
 #endif
-
 
 #endif /* end of wifi_driver_client.h */

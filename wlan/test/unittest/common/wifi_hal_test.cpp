@@ -177,7 +177,7 @@ HWTEST_F(WifiHalTest, WifiHalUnRegisterEventCallback001, TestSize.Level1)
 {
     int ret;
 
-    ret = g_wifi->unRegisterEventCallback();
+    ret = g_wifi->unregisterEventCallback();
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
