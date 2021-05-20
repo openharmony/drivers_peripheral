@@ -331,7 +331,7 @@ int32_t FormatDemuxerStop(void *handle);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerDestory(void *handle);
+int32_t FormatDemuxerDestroy(void *handle);
 
 /**
  * @brief Creates a muxer and returns its context handle.
@@ -353,7 +353,7 @@ int32_t FormatMuxerCreate(void **handle, FormatOutputConfig *outputConfig);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerDestory(const void *handle);
+int32_t FormatMuxerDestroy(const void *handle);
 
 /**
  * @brief Adds a media track source for the muxer. For details about track sources, see {@link TrackSource}.
