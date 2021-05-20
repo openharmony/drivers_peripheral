@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
+#include "display_gfx.h"
 #include <stdio.h>
 #include "hdf_log.h"
 #include "display_type.h"
-#include "display_gfx.h"
 
 int32_t GfxInitialize(GfxFuncs **funcs)
 {

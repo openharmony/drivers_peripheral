@@ -49,11 +49,24 @@ extern "C" {
 /**
  * @brief Provides interfaces for managing input devices.
  *
- * The interfaces can be used to perform basic operations on the input devices, such as opening and closing the device
- * files, querying information about a specified input device, and obtaining information about all input devices in
- * the device list.
+ * The interfaces can be used to perform basic operations on the input devices, such as scanning online devices,
+ * opening and closing the device files, querying information about a specified input device, and obtaining information
+ * about all input devices in the device list.
  */
 typedef struct {
+    /**
+     * @brief Scans all online input devices.
+     *
+     * @param staArr Indicates the pointer to the array storing information about the scanned input devices,
+     * including the device index and device type.
+     * @param arrLen Indicates the length of the array.
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+     * {@link RetStatus} otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*ScanInputDevice)(DevDesc *staArr, uint32_t arrLen);
+
     /**
      * @brief Opens a specified input device file.
      *
@@ -99,8 +112,8 @@ typedef struct {
      * @param devList Indicates the double pointer to information about all devices in the device list.
      * For details, see {@link DeviceInfo}.
      * @param size Indicates the number of elements in the <b>devList</b> array.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
-     * in {@link RetStatus} otherwise.
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+     * {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
      */
@@ -111,23 +124,32 @@ typedef struct {
  * @brief Defines interfaces for providing driver capabilities of input devices.
  */
 typedef struct {
-    InputManager *iInputManager;          /**< Device management interface for input devices */
-    InputController *iInputController;    /**< Service control interface for input devices */
-    InputReporter *iInputReporter;        /**< Data reporting interface for input devices */
+    InputManager *iInputManager;        /**< Device management interface for input devices */
+    InputController *iInputController;  /**< Service control interface for input devices */
+    InputReporter *iInputReporter;      /**< Data reporting interface for input devices */
 } IInputInterface;
 
 /**
  * @brief Gets all interfaces for performing operations on input devices.
  *
- * You can call this function after the input service is started.
- *
- * @param interface Indicates the double pointer to the interface for performing operations on input devices.
+ * @param interface Indicates the double pointer to the interfaces for performing operations on input devices.
  * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
  * {@link RetStatus} otherwise.
  * @since 1.0
  * @version 1.0
  */
 int32_t GetInputInterface(IInputInterface **interface);
+
+/**
+ * @brief Releases all interfaces for performing operations on input devices.
+ *
+ * @param inputInterface Indicates the pointer to the interfaces for performing operations on input devices.
+ * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+ * {@link RetStatus} otherwise.
+ * @since 1.0
+ * @version 1.0
+ */
+int32_t ReleaseInputInterface(IInputInterface *inputInterface);
 
 #ifdef __cplusplus
 }

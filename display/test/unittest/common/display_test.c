@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
+#include "display_test.h"
 #include <stdio.h>
 #include "securec.h"
 #include "hdf_log.h"
 #include "loadbmp_test.h"
-#include "display_test.h"
 
 DisplayTest g_displayTest;
 static GrallocBuffer g_buffer;
@@ -125,7 +125,7 @@ int32_t DisplayInit(void)
     }
     ret = GfxInitialize(&g_displayTest.gfxFuncs);
     if (ret != DISPLAY_SUCCESS || g_displayTest.gfxFuncs == NULL) {
-        HDF_LOGE("%s: gralloc initialize failure", __func__);
+        HDF_LOGE("%s: gfx initialize failure", __func__);
         return DISPLAY_FAILURE;
     }
     return DISPLAY_SUCCESS;
@@ -148,7 +148,7 @@ int32_t InitDisplayTest(void)
     if (g_displayTest.layerFuncs->InitDisplay != NULL) {
         ret = g_displayTest.layerFuncs->InitDisplay(g_displayTest.devId);
         if (ret != DISPLAY_SUCCESS) {
-            HDF_LOGE("%s: MPI VO can't be opened repeatly, so here bypass ret check", __func__);
+            HDF_LOGE("%s: MPI VO can't be opened repeatedly, so here bypass ret check", __func__);
             return DISPLAY_SUCCESS;
         }
     }
@@ -225,11 +225,10 @@ int32_t CloseLayerTest(void)
 int32_t SetLayerVisibleTest(void)
 {
     int32_t ret;
-    bool visibled = true;
 
     // set layer visible
     if (g_displayTest.layerFuncs->SetLayerVisible != NULL) {
-        ret = g_displayTest.layerFuncs->SetLayerVisible(g_displayTest.devId, g_displayTest.layerId, visibled);
+        ret = g_displayTest.layerFuncs->SetLayerVisible(g_displayTest.devId, g_displayTest.layerId, true);
         if (ret != DISPLAY_SUCCESS) {
             HDF_LOGE("%s: SetLayerVisible fail", __func__);
             return DISPLAY_FAILURE;

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "hdi_input_test.h"
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -24,7 +25,6 @@
 #include "osal_time.h"
 #include "hdf_log.h"
 #include "input_manager.h"
-#include "hdi_input_test.h"
 
 using namespace testing::ext;
 
@@ -49,8 +49,10 @@ void HdiInputTest::SetUpTestCase()
 
 void HdiInputTest::TearDownTestCase()
 {
-    free(g_inputInterface);
-    g_inputInterface = NULL;
+    if (g_inputInterface != NULL) {
+        free(g_inputInterface);
+        g_inputInterface = NULL;
+    }
 }
 
 void HdiInputTest::SetUp()
@@ -68,7 +70,7 @@ void HdiInputTest::TearDown()
     } \
 } while (0)
 
-void ReportEventPkgCallback(const EventPackage **pkgs, uint32_t count)
+static void ReportEventPkgCallback(const EventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     if (pkgs == NULL) {
         return;
@@ -76,6 +78,32 @@ void ReportEventPkgCallback(const EventPackage **pkgs, uint32_t count)
     for (uint32_t i = 0; i < count; i++) {
         HDF_LOGI("%s: pkgs[%d] = 0x%x, 0x%x, %d", __func__, i, pkgs[i]->type, pkgs[i]->code, pkgs[i]->value);
     }
+}
+
+void ReportHotPlugEventPkgCallback(const HotPlugEvent *msg)
+{
+    if (msg == NULL) {
+        return;
+    }
+    HDF_LOGI("%s: status =%d devId=%d type =%d", __func__, msg->status, msg->devIndex, msg->devType);
+}
+
+HWTEST_F(HdiInputTest, ScanInputDevice, TestSize.Level1)
+{
+    DevDesc sta[MAX_DEVICES] = {0};
+
+    HDF_LOGI("%s: [Input] RegisterCallbackAndReportData001 enter", __func__);
+    int32_t ret;
+
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
+
+    ret  = g_inputInterface->iInputManager->ScanInputDevice(sta, sizeof(sta)/sizeof(DevDesc));
+    if (!ret) {
+        HDF_LOGI("%s:%d, %d, %d, %d", __func__, sta[0].devType, sta[0].devIndex, sta[1].devType, sta[1].devIndex);
+    }
+
+    EXPECT_EQ(ret, INPUT_SUCCESS);
 }
 
 /**
@@ -315,7 +343,7 @@ HWTEST_F(HdiInputTest, RegisterCallback001, TestSize.Level1)
 
 /**
   * @tc.name: SetPowerStatus001
-  * @tc.desc: set devcie power status test
+  * @tc.desc: set device power status test
   * @tc.type: FUNC
   * @tc.require: AR000F867T
   */
@@ -336,7 +364,7 @@ HWTEST_F(HdiInputTest, SetPowerStatus001, TestSize.Level1)
 
 /**
   * @tc.name: SetPowerStatus002
-  * @tc.desc: set devcie power status test
+  * @tc.desc: set device power status test
   * @tc.type: FUNC
   * @tc.require: AR000F867T
   */
@@ -358,7 +386,7 @@ HWTEST_F(HdiInputTest, SetPowerStatus002, TestSize.Level1)
 
 /**
   * @tc.name: GetPowerStatus001
-  * @tc.desc: get devcie power status test
+  * @tc.desc: get device power status test
   * @tc.type: FUNC
   * @tc.require: AR000F867S
   */
@@ -380,7 +408,7 @@ HWTEST_F(HdiInputTest, GetPowerStatus001, TestSize.Level1)
 
 /**
   * @tc.name: GetPowerStatus002
-  * @tc.desc: get devcie power status test
+  * @tc.desc: get device power status test
   * @tc.type: FUNC
   * @tc.require: AR000F867S
   */
@@ -587,6 +615,7 @@ HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level1)
     HDF_LOGI("%s: [Input] RegisterCallbackAndReportData001 enter", __func__);
     int32_t ret;
     g_callback.ReportEventPkgCallback = ReportEventPkgCallback;
+    g_callback.ReportHotPlugEventCallback = ReportHotPlugEventPkgCallback;
 
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputReporter, INPUT_NULL_PTR);
@@ -596,6 +625,12 @@ HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level1)
     if (ret) {
         HDF_LOGE("%s: register callback failed for device 1, ret %d", __func__, ret);
     }
+
+    ret  = g_inputInterface->iInputReporter->RegisterHotPlugCallback(&g_callback);
+    if (ret) {
+        HDF_LOGE("%s: register callback failed for device manager, ret %d", __func__, ret);
+    }
+
     EXPECT_EQ(ret, INPUT_SUCCESS);
     HDF_LOGI("%s: wait 10s for testing, pls touch the panel now", __func__);
     HDF_LOGI("%s: The event data is as following:", __func__);

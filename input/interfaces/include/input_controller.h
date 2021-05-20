@@ -110,7 +110,7 @@ typedef struct {
      * @param devIndex Indicates the index of an input device. A maximum of 32 input devices are supported.
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
      * @param chipInfo Indicates the pointer to the chip information.
-     * @param length Indicates the length of the chip information.
+     * @param length Indicates the length of the chip information. The minimum value of length is 10.
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined
      * in {@link RetStatus} otherwise.
      * @since 1.0
@@ -124,7 +124,7 @@ typedef struct {
      * @param devIndex Indicates the index of an input device. A maximum of 32 input devices are supported.
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
      * @param vendorName Indicates the pointer to the module vendor name.
-     * @param length Indicates the length of the module vendor name.
+     * @param length Indicates the length of the module vendor name. The minimum value of length is 10.
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined
      * in {@link RetStatus} otherwise.
      * @since 1.0
@@ -138,7 +138,7 @@ typedef struct {
      * @param devIndex Indicates the index of an input device. A maximum of 32 input devices are supported.
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
      * @param chipName Indicates the pointer to the driver chip name.
-     * @param length Indicates the length of the driver chip name.
+     * @param length Indicates the length of the driver chip name. The minimum value of length is 10.
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined
      * in {@link RetStatus} otherwise.
      * @since 1.0
@@ -173,7 +173,7 @@ typedef struct {
      * @param testType Indicates the capacitance test type. For details, see {@link CapacitanceTest}.
      * @param result Indicates the pointer to the capacitance test result. The value is <b>SUCC</b> for a successful
      * operation and is an error code for a failed operation.
-     * @param length Indicates the length of the test result.
+     * @param length Indicates the length of the test result. The minimum value of length is 20.
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined
      * in {@link RetStatus} otherwise.
      * @since 1.0

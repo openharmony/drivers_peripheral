@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include "input_manager.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -21,15 +21,12 @@
 #include <malloc.h>
 #include <sys/ioctl.h>
 #include <securec.h>
-
 #include "hdf_io_service_if.h"
-
 #include "input_common.h"
-#include "input_manager.h"
 
-#define DEVICE_NODE_PATH "/dev/input/event"
-#define DEVICE_NODE_USB_PATH "/dev/usb/uhid"
 #define TOUCH_INDEX 1
+#define PLACEHOLDER_LENGTH 2
+#define PLACEHOLDER_LIMIT 10
 
 static InputDevManager *g_devManager;
 int32_t InstanceReporterHdi(InputReporter **hdi);
@@ -58,13 +55,13 @@ static int32_t GetInputDevice(uint32_t devIndex, DeviceInfo **devInfo)
             continue;
         }
         *devInfo = &pos->payload;
-        HDF_LOGI("%s: device%u get info succ", __func__, devIndex);
         pthread_mutex_unlock(&manager->mutex);
+        HDF_LOGI("%s: device%u get info succ", __func__, devIndex);
         return INPUT_SUCCESS;
     }
 
-    HDF_LOGE("%s: device%u doesn't exist, can't get device info", __func__, devIndex);
     pthread_mutex_unlock(&manager->mutex);
+    HDF_LOGE("%s: device%u doesn't exist, can't get device info", __func__, devIndex);
     return INPUT_FAILURE;
 }
 
@@ -87,9 +84,9 @@ static int32_t GetInputDeviceList(uint32_t *devNum, DeviceInfo **deviceList, uin
     DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &manager->devList, DeviceInfoNode, node) {
         if (tempSize >= size) {
             *devNum = manager->currentDevNum;
+            pthread_mutex_unlock(&manager->mutex);
             HDF_LOGE("%s: size is not enough, size = %u, devNum = %u", __func__,
                 size, *devNum);
-            pthread_mutex_unlock(&manager->mutex);
             return INPUT_FAILURE;
         }
         *tempList = &pos->payload;
@@ -122,16 +119,18 @@ static int32_t CloseInputDevice(uint32_t devIndex)
         return INPUT_SUCCESS;
     }
 
-    HDF_LOGE("%s: device%u doesn't exist", __func__, devIndex);
     pthread_mutex_unlock(&manager->mutex);
+    HDF_LOGE("%s: device%u doesn't exist", __func__, devIndex);
     return INPUT_FAILURE;
 }
 
-static int32_t AddService(const uint32_t index, const struct HdfIoService *service)
+static int32_t AddService(uint32_t index, const struct HdfIoService *service)
 {
     InputDevManager *manager = NULL;
-    DeviceInfoNode *device = (DeviceInfoNode *)malloc(sizeof(DeviceInfoNode));
+    DeviceInfoNode *device = NULL;
 
+    GET_MANAGER_CHECK_RETURN(manager);
+    device = (DeviceInfoNode *)malloc(sizeof(DeviceInfoNode));
     if (device == NULL) {
         HDF_LOGE("%s: malloc fail", __func__);
         return INPUT_NOMEM;
@@ -140,7 +139,6 @@ static int32_t AddService(const uint32_t index, const struct HdfIoService *servi
 
     device->payload.devIndex = index;
     device->payload.service = (void *)service;
-    GET_MANAGER_CHECK_RETURN(manager);
     pthread_mutex_lock(&manager->mutex);
     DListInsertTail(&device->node, &manager->devList);
     manager->currentDevNum++;
@@ -163,8 +161,8 @@ static int32_t CheckIndex(uint32_t devIndex)
     pthread_mutex_lock(&manager->mutex);
     DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &manager->devList, DeviceInfoNode, node) {
         if (pos->payload.devIndex == devIndex) {
-            HDF_LOGE("%s: the device%u has existed", __func__, devIndex);
             pthread_mutex_unlock(&manager->mutex);
+            HDF_LOGE("%s: the device%u has existed", __func__, devIndex);
             return INPUT_FAILURE;
         }
     }
@@ -182,7 +180,9 @@ static int32_t OpenInputDevice(uint32_t devIndex)
         return INPUT_FAILURE;
     }
 
-    ret = snprintf_s(serviceName, SERVICE_NAME_LEN, strlen("event") + 1, "%s%u", "event", devIndex);
+    int32_t len = (devIndex < PLACEHOLDER_LIMIT) ? 1 : PLACEHOLDER_LENGTH;
+    ret = snprintf_s(serviceName, SERVICE_NAME_LEN, strlen("hdf_input_event") + len, "%s%u",
+        "hdf_input_event", devIndex);
     if (ret == -1) {
         HDF_LOGE("%s: snprintf_s fail", __func__);
         return INPUT_FAILURE;
@@ -200,7 +200,60 @@ static int32_t OpenInputDevice(uint32_t devIndex)
         return INPUT_FAILURE;
     }
 
-    HDF_LOGI("%s: open dev%d succ, service name = %s", __func__, devIndex, serviceName);
+    HDF_LOGI("%s: open dev%u succ, service name = %s", __func__, devIndex, serviceName);
+    return INPUT_SUCCESS;
+}
+
+static int32_t ScanInputDevice(DevDesc *staArr, uint32_t arrLen)
+{
+    InputDevManager *manager = NULL;
+    struct HdfIoService *service = NULL;
+    struct HdfSBuf *reply = NULL;
+    char *data = {0};
+    uint32_t count = 0;
+    uint32_t replayDataSize = 0;
+    int32_t ret;
+
+    GET_MANAGER_CHECK_RETURN(manager);
+    pthread_mutex_lock(&manager->mutex);
+    if (manager->hostDev.service == NULL) {
+        manager->hostDev.service = HdfIoServiceBind(DEV_MANAGER_SERVICE_NAME);
+    }
+    service = manager->hostDev.service;
+    pthread_mutex_unlock(&manager->mutex);
+
+    if (service == NULL) {
+        HDF_LOGE("%s: HdfIoServiceBind failed", __func__);
+        return INPUT_FAILURE;
+    }
+    reply = HdfSBufObtainDefaultSize();
+    if (reply == NULL) {
+        HDF_LOGE("%s: fail to obtain sbuf data", __func__);
+        return INPUT_FAILURE;
+    }
+
+    ret = service->dispatcher->Dispatch(&service->object, 0, NULL, reply);
+    if (ret != INPUT_SUCCESS) {
+        HDF_LOGE("%s: dispatch fail", __func__);
+        HdfSBufRecycle(reply);
+        return INPUT_FAILURE;
+    }
+
+    while (count < arrLen) {
+        if (!HdfSbufReadBuffer(reply, (const void **)(&data), &replayDataSize) ||
+            replayDataSize != sizeof(DevDesc)) {
+            HDF_LOGE("%s: sbuf read failed", __func__);
+            break;
+        }
+        if (memcpy_s(&staArr[count], sizeof(DevDesc), data, replayDataSize) != EOK) {
+            HDF_LOGE("%s: memcpy failed, line: %d", __func__, __LINE__);
+            HdfSBufRecycle(reply);
+            return INPUT_FAILURE;
+        }
+        HDF_LOGI("%s: type = %d, id =%d", __func__, staArr[count].devType, staArr[count].devIndex);
+        count++;
+    }
+    HdfSBufRecycle(reply);
     return INPUT_SUCCESS;
 }
 
@@ -214,6 +267,7 @@ static int32_t InstanceManagerHdi(InputManager **manager)
 
     (void)memset_s(managerHdi, sizeof(InputManager), 0, sizeof(InputManager));
 
+    managerHdi->ScanInputDevice = ScanInputDevice;
     managerHdi->OpenInputDevice = OpenInputDevice;
     managerHdi->CloseInputDevice = CloseInputDevice;
     managerHdi->GetInputDevice = GetInputDevice;
@@ -305,12 +359,53 @@ int32_t GetInputInterface(IInputInterface **inputInterface)
 
     ret = InitDevManager();
     if (ret != INPUT_SUCCESS) {
-        HDF_LOGE("%s: failed to initialze manager", __func__);
+        HDF_LOGE("%s: failed to initialize manager", __func__);
         FreeInputHdi(inputHdi);
         return INPUT_FAILURE;
     }
 
     *inputInterface = inputHdi;
     HDF_LOGI("%s: exit succ", __func__);
+    return INPUT_SUCCESS;
+}
+
+int32_t ReleaseInputInterface(IInputInterface *inputInterface)
+{
+    DeviceInfoNode *pos = NULL;
+    DeviceInfoNode *next = NULL;
+    InputDevManager *manager = NULL;
+    int32_t ret;
+
+    if (inputInterface == NULL) {
+        return INPUT_NULL_PTR;
+    }
+
+    GET_MANAGER_CHECK_RETURN(manager);
+
+    pthread_mutex_lock(&manager->mutex);
+    DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &manager->devList, DeviceInfoNode, node) {
+        ret = HdfDeviceUnregisterEventListener(pos->payload.service, pos->payload.listener);
+        if (ret != HDF_SUCCESS) {
+            pthread_mutex_unlock(&manager->mutex);
+            HDF_LOGE("%s: failed to release listener", __func__);
+            return INPUT_FAILURE;
+        }
+        free(pos->payload.service);
+        pos->payload.service = NULL;
+        DListRemove(&pos->node);
+        free(pos);
+        pos = NULL;
+    }
+
+    pthread_mutex_unlock(&manager->mutex);
+    pthread_mutex_destroy(&manager->mutex);
+    free(manager);
+    manager = NULL;
+    g_devManager = NULL;
+
+    if (inputInterface != NULL) {
+        FreeInputHdi(inputInterface);
+        inputInterface = NULL;
+    }
     return INPUT_SUCCESS;
 }
