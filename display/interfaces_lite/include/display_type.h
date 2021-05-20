@@ -46,7 +46,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdint.h>
-#include <buffer_handle.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,23 +72,11 @@ typedef enum {
  *
  */
 typedef enum {
-    LAYER_TYPE_GRAPHIC,         /**< Graphic layer */
-    LAYER_TYPE_OVERLAY,         /**< Overlay layer */
-    LAYER_TYPE_SDIEBAND,        /**< Sideband layer */
-    LAYER_TYPE_CURSOR,          /**< Cursor Layer */
-    LAYER_TYPE_BUTT             /**< Empty layer */
+    LAYER_TYPE_GRAPHIC,         /* < Graphic layer */
+    LAYER_TYPE_OVERLAY,         /* < Overlay layer */
+    LAYER_TYPE_SDIEBAND,        /* < Sideband layer */
+    LAYER_TYPE_BUTT             /* < Empty layer */
 } LayerType;
-
-/* *
- * @brief Defines the buffer usage
- *
- */
-enum {
-    HBM_USE_CPU_READ = (1 << 0),        /**< CPU will read the memory */
-    HBM_USE_CPU_WRITE = (1 << 1),       /**< CPU will write the memory */
-    HBM_USE_MEM_MMZ = (1 << 2),         /**< will use mmz to allocate memory */
-    HBM_USE_MEM_DMA = (1 << 3),         /**< the allocator should support dma buffer */
-};
 
 /**
  * @brief Enumerates pixel formats.
@@ -152,10 +139,9 @@ typedef enum {
  *
  */
 typedef enum {
-    NORMAL_MEM = 0,       /**< Memory without cache */
-    CACHE_MEM,            /**< Memory with cache */
-    SHM_MEM,              /**< Shared memory */
-    DMA_MEM               /**< DMA Memory */
+    NORMAL_MEM = 0,       /* < Memory without cache */
+    CACHE_MEM,            /* < Memory with cache */
+    SHM_MEM               /* < Shared memory */
 } MemType;
 
 /**
@@ -281,6 +267,16 @@ typedef struct {
 } LayerAlpha;
 
 /**
+ * @brief Defines the buffer handle, including the shared memory key, shared memory ID, and physical memory address.
+ *
+ */
+typedef struct {
+    int32_t key;          /* < Shared memory key */
+    int32_t shmid;        /* < Unique ID of the shared memory */
+    uint64_t phyAddr;     /* < Physical memory address */
+} BufferHandle;
+
+/**
  * @brief Defines the memory buffer, such as virtual and physical memory addresses.
  *
  */
@@ -305,13 +301,12 @@ typedef struct {
  *
  */
 typedef struct {
-    int32_t fenceId;          /**< Fence ID of the buffer */
-    int32_t width;            /**< Buffer width */
-    int32_t height;           /**< Buffer height */
-    int32_t pitch;            /**< Number of bytes from one row of pixels in memory to the next */
-    PixelFormat pixFormat;    /**< Pixel format of the buffer */
-    BufferData data;          /**< Layer buffer data */
-    BufferHandle* hdl;        /**< Layer buffer handle */
+    int32_t fenceId;          /* < Fence ID of the buffer */
+    int32_t width;            /* < Buffer width */
+    int32_t height;           /* < Buffer height */
+    int32_t pitch;            /* < Number of bytes from one row of pixels in memory to the next */
+    PixelFormat pixFormat;    /* < Pixel format of the buffer */
+    BufferData data;          /* < Layer buffer data */
 } LayerBuffer;
 
 /**
@@ -394,93 +389,6 @@ typedef struct {
     TransformType rotateType;   /**< Rotation type */
     MirrorType mirrorType;      /**< Mirror type */
 } GfxOpt;
-
-#define PROPERTY_NAME_LEN  50
-
-/**
- * @brief Defines property object which contains name, property id and value.
- *
- */
-typedef struct {
-    char name[PROPERTY_NAME_LEN]; /**< Name of the property */
-    uint32_t propId;     /**< Property id which was decided in the DRM internal */
-    uint64_t value;      /**< the value of property  */
-} PropertyObject;
-
-/**
- * @brief Enumerates interface types.
- *
- */
-typedef enum {
-    DISP_INTF_HDMI = 0,       /**< HDMI interface */
-    DISP_INTF_LCD,            /**< LCD interface */
-    DISP_INTF_BT1120,         /**< BT1120 interface */
-    DISP_INTF_BT656,          /**< BT656 interface */
-    DISP_INTF_YPBPR,          /**< YPBPR interface */
-    DISP_INTF_RGB,            /**< RGB interface */
-    DISP_INTF_CVBS,           /**< CVBS interface */
-    DISP_INTF_SVIDEO,         /**< SVIDEO interface */
-    DISP_INTF_VGA,            /**< VGA interface */
-    DISP_INTF_MIPI,           /**< MIPI interface */
-    DISP_INTF_PANEL,          /**< PANEL interface */
-    DISP_INTF_BUTT,
-} InterfaceType;
-
-/**
- * @brief Defines the capability of the output.
- */
-typedef struct {
-    char name[PROPERTY_NAME_LEN];       /**< name of output */
-    InterfaceType type;                 /**< interface type of output */
-    uint32_t phyWidth;                  /**< Physical width */
-    uint32_t phyHeight;                 /**< Physical width */
-    uint32_t supportLayers;             /**< BitMask of LayerType */
-    uint32_t propertyCount;             /**< Count of properties */
-    PropertyObject* props;              /**< Array of property objects */
-} DisplayCapability;
-
-/**
- * @brief Defines output mode info
- */
-typedef struct {
-    int32_t width;      /**< width in pixel */
-    int32_t height;     /**< height in pixel */
-    uint32_t freshRate; /**< fresh rate in one second */
-} DisplayModeInfo;
-
-/**
- * @brief Defines information for allocate memory
- *
- */
-typedef struct {
-    uint32_t width;               /**< The width of the request allocation */
-    uint32_t height;              /**< The height of the request allocation */
-    uint64_t usage;               /**< The usage of the request allocation */
-    PixelFormat format;           /**< The format of the request allocation */
-    MemType type;                 /**< The memory of the request allocation */
-} AllocInfo;
-/**
- * @brief Enumerates power status.
- */
-
-typedef enum {
-    POWER_STATUS_ON,              /**< The power status is on */
-    POWER_STATUS_STANDBY,         /**< The power status is standby */
-    POWER_STATUS_SUSPEND,         /**< The power status is suspend */
-    POWER_STATUS_OFF,             /**< The power status is off */
-    POWER_STATUS_BUTT
-} PowerStatus;
-
-/**
- * @brief Enumerates composition type for special layer
- */
-typedef enum {
-    COMPOSITION_CLIENT,       /**< client composistion type, the composer should been cpu or gpu */
-    COMPOSITION_DEVICE,       /**< device composistion type, the composer should been a hardware */
-    COMPOSITION_CURSOR,       /**< cursor composistion type. it should been used for cursor */
-    COMPOSITION_VIDEO,        /**< cursor composistion type. it should been used for video */
-    COMPOSITION_BUTT
-} CompositionType;
 
 #ifdef __cplusplus
 }

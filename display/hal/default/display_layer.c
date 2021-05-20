@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 
+#include "display_layer.h"
+#include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <securec.h>
 #include "hdf_log.h"
 #include "display_type.h"
-#include "display_layer.h"
 
 #define DEV_ID             0
 #define LAYER_ID           0
@@ -102,7 +103,7 @@ static int32_t OpenLayer(uint32_t devId, const LayerInfo *layerInfo, uint32_t *l
     priv->fbSize = ((priv->pitch * priv->height) + 0xfff) & (~0xfff);
     priv->fbAddr = (void *)mmap(NULL, priv->fbSize, PROT_READ | PROT_WRITE, MAP_SHARED, priv->fd, 0);
     if (priv->fbAddr == NULL) {
-        HDF_LOGE("%s: mmap fb address failure", __func__);
+        HDF_LOGE("%s: mmap fb address failure, errno: %d", __func__, errno);
         close(priv->fd);
         priv->fd = -1;
         priv->pitch = 0;
@@ -133,6 +134,9 @@ static int32_t CloseLayer(uint32_t devId, uint32_t layerId)
         free(priv->layerAddr);
         priv->layerAddr = NULL;
     }
+    if (priv->fbAddr != NULL) {
+        munmap(priv->fbAddr, priv->fbSize);
+    }
     priv->fd = -1;
     return DISPLAY_SUCCESS;
 }
@@ -151,7 +155,7 @@ static int32_t GetDisplayInfo(uint32_t devId, DisplayInfo *dispInfo)
     dispInfo->width = priv->width;
     dispInfo->height = priv->height;
     dispInfo->rotAngle = ROTATE_NONE;
-    HDF_LOGD("%s: width = %d, height = %d, rotAngle = %d", __func__, dispInfo->width,
+    HDF_LOGD("%s: width = %u, height = %u, rotAngle = %u", __func__, dispInfo->width,
         dispInfo->height, dispInfo->rotAngle);
     return DISPLAY_SUCCESS;
 }
@@ -165,6 +169,10 @@ static int32_t Flush(uint32_t devId, uint32_t layerId, LayerBuffer *buffer)
     }
     if (layerId != LAYER_ID) {
         HDF_LOGE("%s: layerId invalid", __func__);
+        return DISPLAY_FAILURE;
+    }
+    if (buffer == NULL) {
+        HDF_LOGE("%s: buffer is null", __func__);
         return DISPLAY_FAILURE;
     }
 
@@ -235,7 +243,7 @@ int32_t LayerInitialize(LayerFuncs **funcs)
     lFuncs->Flush = Flush;
     lFuncs->GetLayerBuffer = GetLayerBuffer;
     *funcs = lFuncs;
-    HDF_LOGI("%s: layer initialize success", __func__);
+    HDF_LOGI("%s: success", __func__);
     return DISPLAY_SUCCESS;
 }
 

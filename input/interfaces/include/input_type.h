@@ -52,6 +52,7 @@ extern "C" {
 #define CHIP_NAME_LEN 10
 #define VENDOR_NAME_LEN 10
 #define SELF_TEST_RESULT_LEN 20
+#define DEV_MANAGER_SERVICE_NAME "hdf_input_host"
 
 /**
  * @brief Enumerates return values.
@@ -70,14 +71,15 @@ enum RetStatus {
  * @brief Enumerates input device types.
  */
 enum InputDevType {
-    INDEV_TYPE_TOUCH,       /**< Touchscreen */
-    INDEV_TYPE_KEY,         /**< Physical key */
-    INDEV_TYPE_KEYBOARD,    /**< Keyboard */
-    INDEV_TYPE_MOUSE,       /**< Mouse */
-    INDEV_TYPE_BUTTON,      /**< Virtual button */
-    INDEV_TYPE_CROWN,       /**< Watch crown */
-    INDEV_TYPE_ENCODER,     /**< Customized type of a specific function or event */
-    INDEV_TYPE_UNKNOWN,    /**< Unknown input device type */
+    INDEV_TYPE_TOUCH,               /**< Touchscreen */
+    INDEV_TYPE_KEY,                 /**< Physical key */
+    INDEV_TYPE_BUTTON,              /**< Virtual button */
+    INDEV_TYPE_CROWN,               /**< Watch crown */
+    INDEV_TYPE_ENCODER,             /**< Customized type of a specific function or event */
+    INDEV_TYPE_HID_BEGIN_POS = 33,  /* HID type start position */
+    INDEV_TYPE_MOUSE,               /**< Mouse */
+    INDEV_TYPE_KEYBOARD,            /**< Keyboard */
+    INDEV_TYPE_UNKNOWN,             /**< Unknown input device type */
 };
 
 /**
@@ -111,6 +113,17 @@ typedef struct {
     uint64_t timestamp;     /**< Timestamp of the input event */
 } EventPackage;
 
+typedef struct {
+    uint32_t devIndex;
+    uint32_t devType;
+    uint32_t status;
+} HotPlugEvent;
+
+typedef struct {
+    uint32_t devIndex;
+    uint32_t devType;
+} DevDesc;
+
 /**
  * @brief Describes the input event callback registered by the input service.
  */
@@ -118,15 +131,22 @@ typedef struct {
     /**
      * @brief Reports input event data by the registered callback.
      *
-     * @param eventData Indicates the pointer to the input event data reported by the input driver.
+     * @param pkgs describes the input event data package.
      * @param count Indicates the number of input event data packets.
-     * @param devIndex Indicates the index of an input device. A maximum of 32 input devices are supported.
-     * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
-     *
+     * @param devIndex Indicates the index of an input device.
      * @since 1.0
      * @version 1.0
      */
-    void (*ReportEventPkgCallback)(const EventPackage **pkgs, uint32_t count);
+    void (*ReportEventPkgCallback)(const EventPackage **pkgs, uint32_t count, uint32_t devIndex);
+
+    /**
+     * @brief Reports hot plug event data by the registered callback.
+     *
+     * @param event Indicates the pointer to the hot plug event data reported by the input driver.
+     * @since 1.0
+     * @version 1.0
+     */
+    void (*ReportHotPlugEventCallback)(const HotPlugEvent *event);
 } InputReportEventCb;
 
 /**

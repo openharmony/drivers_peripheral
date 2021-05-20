@@ -11,21 +11,54 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/lite/config/component/lite_component.gni")
-if (board_name == "hi3516dv300" || board_name == "hispark_taurus" ||
-    board_name == "hi3518ev300" || board_name == "hispark_aries" ||
-    board_name == "aegis_hi3516dv300") {
-  group("hdi_display") {
-    public_deps = [ "//device/hisilicon/hardware/display/libs:hdi_display" ]
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+
+  if (board_name == "hi3516dv300" || board_name == "hispark_taurus" ||
+      board_name == "hi3518ev300" || board_name == "hispark_aries" ||
+      board_name == "aegis_hi3516dv300") {
+    group("hdi_display") {
+      public_deps = [ "//device/hisilicon/hardware/display/libs:hdi_display" ]
+    }
   }
-}
-if (board_name == "sun8i") {
-  group("hdi_display") {
-    public_deps = [ "//vendor/allwinner/sun8i/hdi/display:hdi_display" ]
+} else {
+  import("//build/ohos.gni")
+
+  config("display_hdi_public_config") {
+    visibility = [ ":*" ]
+    include_dirs = [
+      "//drivers/peripheral/display/interfaces/include",
+      "//third_party/bounds_checking_function/include",
+      "//foundation/graphic/standard/utils/include",
+    ]
   }
-}
-if (board_name == "default") {
+
   group("hdi_display") {
-    public_deps = [ "//drivers/peripheral/display/hal/default:hdi_display" ]
+    deps = [
+      ":hdi_display_device",
+      ":hdi_display_gfx",
+      ":hdi_display_gralloc",
+      ":hdi_display_layer",
+    ]
+  }
+
+  group("hdi_display_device") {
+    deps = [ "//device/hisilicon/hardware/display/libs:display_device" ]
+    public_configs = [ ":display_hdi_public_config" ]
+  }
+
+  group("hdi_display_gfx") {
+    deps = [ "//device/hisilicon/hardware/display/libs:display_gfx" ]
+    public_configs = [ ":display_hdi_public_config" ]
+  }
+
+  group("hdi_display_gralloc") {
+    deps = [ "//device/hisilicon/hardware/display/libs:display_gralloc" ]
+    public_configs = [ ":display_hdi_public_config" ]
+  }
+
+  group("hdi_display_layer") {
+    deps = [ "//device/hisilicon/hardware/display/libs:display_layer" ]
+    public_configs = [ ":display_hdi_public_config" ]
   }
 }

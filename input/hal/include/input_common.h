@@ -26,8 +26,9 @@
 extern "C" {
 #endif
 
-#define SERVICE_NAME_LEN 16
+#define SERVICE_NAME_LEN 24
 #define MAX_POLLFD_NUM 10
+#define SCAN_DEV 0
 
 #define GET_MANAGER_CHECK_RETURN(manager) do { \
     manager = GetDevManager(); \
@@ -45,6 +46,12 @@ typedef struct {
     struct DListHead node;    /* Head node of a linked list */
 } DeviceInfoNode;
 
+typedef struct {
+    void *service;                       /**< Service of the device */
+    void *listener;                      /**< Event listener of the device */
+    InputReportEventCb *callback;        /**< Callback {@link InputReportEventCb} for reporting data */
+} HostDevInfo;
+
 /**
  * @brief Describes the input device manager.
  */
@@ -55,6 +62,7 @@ typedef struct {
     pthread_t thread;            /* Monitoring thread for polling */
     struct pollfd pollFds[MAX_POLLFD_NUM];    /* The records of poll fds */
     pthread_mutex_t mutex;       /* Mutex object to synchronize */
+    HostDevInfo hostDev;
 } InputDevManager;
 
 /**

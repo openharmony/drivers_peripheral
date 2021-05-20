@@ -20,11 +20,20 @@
 #define DISP_SERVICE_NAME    "hdf_disp"
 
 enum DispCmd {
-    DISP_CMD_INIT = 0,
-    DISP_CMD_GET_PANELINFO,
-    DISP_CMD_SET_POWERMODE,
+    DISP_CMD_GET_PANELINFO = 1,
+    DISP_CMD_SET_POWERSTATUS,
     DISP_CMD_SET_BACKLIGHT,
+    DISP_CMD_GET_POWERSTATUS,
+    DISP_CMD_GET_BACKLIGHT,
 };
+
+typedef enum {
+    POWER_STATUS_ON,
+    POWER_STATUS_STANDBY,
+    POWER_STATUS_SUSPEND,
+    POWER_STATUS_OFF,
+    POWER_STATUS_BUTT
+} PowerStatus;
 
 struct DispPara {
     uint32_t devId;
@@ -32,9 +41,20 @@ struct DispPara {
     uint32_t size;
 };
 
+typedef struct {
+    int32_t (*SetPowerStatus)(uint32_t devId, PowerStatus pStatus);
+    int32_t (*GetPowerStatus)(uint32_t devId, PowerStatus *pStatus);
+    int32_t (*SetBacklight)(uint32_t devId, uint32_t level);
+    int32_t (*GetBacklight)(uint32_t devId, uint32_t *level);
+    int32_t (*GetInfo)(uint32_t devId, struct DispInfo *info);
+} HalFuncs;
+
+HalFuncs *GetHalFuncs(void);
+
 int32_t DispInit(uint32_t devId);
 int32_t DispOn(uint32_t devId);
 int32_t DispOff(uint32_t devId);
 int32_t SetBacklight(uint32_t devId, uint32_t level);
 int32_t DispGetInfo(uint32_t devId, struct DispInfo *info);
+
 #endif /* DISP_HAL_H */

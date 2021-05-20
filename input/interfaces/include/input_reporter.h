@@ -47,16 +47,15 @@ extern "C" {
 /**
  * @brief Provides interfaces for reporting event data of input devices.
  *
- * The interfaces include the registration and unregistration of callbacks for reporting subscribed data of
- * specified input devices.
- *
+ * The interfaces include the registration and unregistration of callbacks for reporting subscribed data of specified
+ * input devices.
  */
 typedef struct {
     /**
      * @brief Registers a callback for reporting subscribed data of specified input devices.
      *
-     * After this callback is successfully registered, the driver can report the input event data to the input
-     * service through this callback.
+     * After this callback is successfully registered, the driver can report the input event data to the input service
+     * through this callback.
      *
      * @param devIndex Indicates the index of an input device. A maximum of 32 input devices are supported.
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
@@ -79,6 +78,29 @@ typedef struct {
      * @version 1.0
      */
     int32_t (*UnregisterReportCallback)(uint32_t devIndex);
+
+    /**
+     * @brief Registers a hot plug callback to the HDIs for input devices.
+     *
+     * All input devices can use this callback to report hot plug events.
+     *
+     * @param callback Indicates the pointer to the callback to register.
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+     * {@link RetStatus} otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*RegisterHotPlugCallback)(InputReportEventCb *callback);
+
+    /**
+     * @brief Unregisters the hot plug callback of input devices.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+     * {@link RetStatus} otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*UnregisterHotPlugCallback)(void);
 } InputReporter;
 
 #ifdef __cplusplus

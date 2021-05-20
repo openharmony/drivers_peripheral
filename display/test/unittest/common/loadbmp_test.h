@@ -56,9 +56,9 @@ typedef struct {
     uint32_t    width;        /* out */
     uint32_t    height;       /* out */
     uint32_t    stride;       /* in */
-    uint8_t     *picBuffer;   /* in/out */
     uint32_t    len;          /* picBuffer length */
     uint16_t    bpp;          /* bpp */
+    uint8_t     *picBuffer;   /* in/out */
 } OsdLogo;
 
 typedef struct {

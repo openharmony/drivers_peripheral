@@ -39,7 +39,7 @@ void HdiDisplayTest::SetUpTestCase()
         HDF_LOGE("%s: DisplayInit fail", __func__);
         ASSERT_TRUE(0);
     }
-    // sleep 1 to wait hdmi open
+    // sleep 1s to wait hdmi open
     sleep(1);
 }
 

@@ -108,8 +108,8 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
+    int32_t (*OpenLayer)(uint32_t devId, const LayerInfo *layerInfo, uint32_t *layerId);
 
-    int32_t (*CreateLayer)(uint32_t devId, const LayerInfo *layerInfo, uint32_t *layerId);
     /**
      * @brief Closes a layer that is no longer required on a specified display device.
      *
@@ -537,95 +537,6 @@ typedef struct {
      * @version 1.0
      */
     int32_t (*SnapShot)(uint32_t devId, LayerBuffer *buffer);
-
-    /**
-     * @brief Set the visible region for a layer
-     *
-     *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
-     * display device and 4 indicates the last display device.
-     * @param layerId Indicates the layer ID, which identifies a unique layer. You can perform operations on the layer
-     * with the specified layer ID.
-     * @param num Indiactes the count of rect. the region contains multiple IRect, the num means how much rects in the
-     * region.
-     * @param rect Indiactes the pointer of the rectes.
-     *
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
-     * otherwise.
-     * @since 2.0
-     * @version 2.0
-     */
-    int32_t (*SetLayerVisibleRegion)(uint32_t devId, uint32_t layerId, uint32_t num, IRect *rect);
-
-    /**
-     * @brief Set the buffer for a layer.
-     *
-     *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
-     * display device and 4 indicates the last display device.
-     * @param layerId Indicates the layer ID, which identifies a unique layer. You can perform operations on the layer
-     * with the specified layer ID.
-     * @param buffer Indiactes pointer of the buffer handle, the buffer handle should contain all the information of the
-     * buffer which will been used for composition
-     * @param fence Indiactes the fd of a sync file
-     *
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
-     * otherwise.
-     * @since 2.0
-     * @version 2.0
-     */
-    int32_t (*SetLayerBuffer)(uint32_t devId, uint32_t layerId, const BufferHandle *buffer, int32_t fence);
-
-    /**
-     * @brief Extension interface
-     *
-     *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
-     * display device and 4 indicates the last display device.
-     * @param layerId Indicates the layer ID, which identifies a unique layer. You can perform operations on the layer
-     * with the specified layer ID.
-     * @param cmd Indiactes externsion cmd, the implement will use it to identify different intention
-     *
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
-     * otherwise.
-     * @since 2.0
-     * @version 2.0
-     */
-    int32_t (*InvokeLayerCmd)(uint32_t devId, uint32_t layerId, uint32_t cmd, ...);
-
-    /**
-     * @brief set the composition type which the client expect
-     *
-     *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
-     * display device and 4 indicates the last display device.
-     * @param layerId Indicates the layer ID, which identifies a unique layer. You can perform operations on the layer
-     * with the specified layer ID.
-     * @param type Indicates composition type which the client expect, it may be chagne by the implement
-     *
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
-     * otherwise.
-     * @since 2.0
-     * @version 2.0
-     */
-    int32_t (*SetLayerCompositionType)(uint32_t devId, uint32_t layerId, CompositionType type);
-
-    /**
-     * @brief set the blend type
-     *
-     *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
-     * display device and 4 indicates the last display device.
-     * @param layerId Indicates the layer ID, which identifies a unique layer. You can perform operations on the layer
-     * with the specified layer ID.
-     * @param type Indicates blend type
-     *
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
-     * otherwise.
-     * @since 2.0
-     * @version 2.0
-     */
-    int32_t (*SetLayerBlendType)(uint32_t devId, uint32_t layerId, BlendType type);
 } LayerFuncs;
 
 /**

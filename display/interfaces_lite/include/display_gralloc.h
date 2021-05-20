@@ -59,7 +59,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*AllocMem)(const AllocInfo* info, BufferHandle** handle);
+    int32_t (*AllocMem)(GrallocBuffer *buffer);
 
     /**
      * @brief Releases memory.
@@ -69,7 +69,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    void (*FreeMem)(BufferHandle *handle);
+    void (*FreeMem)(GrallocBuffer *buffer);
 
     /**
      * @brief Maps memory to memory without cache in the process's address space.
@@ -80,7 +80,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    void *(*Mmap)(BufferHandle *handle);
+    void *(*Mmap)(GrallocBuffer *buffer);
 
     /**
      * @brief Maps memory to memory with cache in the process's address space.
@@ -103,7 +103,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*Unmap)(BufferHandle *handle);
+    int32_t (*Unmap)(GrallocBuffer *buffer);
 
     /**
      * @brief Flushes data from the cache to memory and invalidates the data in the cache.
@@ -115,7 +115,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*FlushCache)(BufferHandle *handle);
+    int32_t (*FlushCache)(GrallocBuffer *buffer);
 
     /**
      * @brief Flushes data from the cache mapped via {@link Mmap} to memory and invalidates the data in the cache.
@@ -127,19 +127,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*FlushMCache)(BufferHandle *buffer);
-
-    /**
-     * @brief Invalidate the Cache, it will update the cache from memory.
-     *
-     * @param buffer Indicates the pointer to the buffer of the cache which will been invalidated
-     *
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
-     * otherwise.
-     * @since 1.0
-     * @version 1.0
-     */
-    int32_t (*InvalidateCache)(BufferHandle* handle);
+    int32_t (*FlushMCache)(GrallocBuffer *buffer);
 } GrallocFuncs;
 
 /**

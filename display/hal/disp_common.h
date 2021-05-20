@@ -52,7 +52,7 @@ enum PowerMode {
     DISP_OFF,
 };
 
-/* output timming */
+/* output timing */
 enum IntfSync {
     OUTPUT_USER = 0,          /* User timing */
     OUTPUT_PAL,               /* PAL standard */

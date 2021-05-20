@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#include <stdio.h>
+#include "display_gralloc.h"
 #include <errno.h>
+#include <stdio.h>
 #include <sys/mman.h>
 #include <sys/shm.h>
 #include <securec.h>
 #include "hdf_log.h"
 #include "display_type.h"
-#include "display_gralloc.h"
 
 #define DEFAULT_READ_WRITE_PERMISSIONS   0666
 #define MAX_MALLOC_SIZE                  0x10000000UL
@@ -36,9 +36,9 @@ static int32_t AllocMem(GrallocBuffer *buffer)
         HDF_LOGE("%s: buffer is null", __func__);
         return DISPLAY_NULL_PTR;
     }
-    HDF_LOGD("%s: buffer->type = %d, buffer->size = %d", __func__, buffer->type, buffer->size);
-    if (buffer->size > MAX_MALLOC_SIZE || buffer->size == 0) {
-        HDF_LOGE("%s: size is invalid, size = %d", __func__, buffer->size);
+    HDF_LOGD("%s: buffer->type = %d, buffer->size = %u", __func__, buffer->type, buffer->size);
+    if ((buffer->size > MAX_MALLOC_SIZE) || (buffer->size == 0)) {
+        HDF_LOGE("%s: size is invalid, size = %u", __func__, buffer->size);
         return DISPLAY_FAILURE;
     }
     while ((shmid = shmget(key, buffer->size, IPC_CREAT | IPC_EXCL | DEFAULT_READ_WRITE_PERMISSIONS)) < 0) {

@@ -13,12 +13,11 @@
  * limitations under the License.
  */
 
+#include "disp_hal.h"
 #include <securec.h>
-#include "display_type.h"
 #include "hdf_io_service_if.h"
 #include "hdf_log.h"
 #include "hdf_sbuf.h"
-#include "disp_hal.h"
 
 #define OFFSET_TWO_BYTE    16
 #define MASK_TWO_BYTE      0xffff
@@ -28,16 +27,16 @@ static int32_t DispCmdSend(const uint32_t cmd, struct HdfSBuf *reqData, struct H
     struct HdfIoService *dispService = NULL;
 
     dispService = HdfIoServiceBind(DISP_SERVICE_NAME);
-    if (dispService == NULL || dispService->dispatcher == NULL || dispService->dispatcher->Dispatch == NULL) {
+    if ((dispService == NULL) || (dispService->dispatcher == NULL) || (dispService->dispatcher->Dispatch == NULL)) {
         HDF_LOGE("%s:bad remote service found", __func__);
         goto EXIT;
     }
     int32_t ret = dispService->dispatcher->Dispatch(&dispService->object, cmd, reqData, respData);
-    if (ret) {
-        HDF_LOGE("%s: cmd=%d, ret=%d", __func__, cmd, ret);
+    if (ret != DISPLAY_SUCCESS) {
+        HDF_LOGE("%s: cmd=%u, ret=%d", __func__, cmd, ret);
         goto EXIT;
     }
-    HDF_LOGI("%s: cmd=%d, ret=%d", __func__, cmd, ret);
+    HDF_LOGI("%s: cmd=%u, ret=%d", __func__, cmd, ret);
     HdfIoServiceRecycle(dispService);
     return DISPLAY_SUCCESS;
 
@@ -46,7 +45,7 @@ EXIT:
     return DISPLAY_FAILURE;
 }
 
-int32_t DispGetInfo(uint32_t devId, struct DispInfo *info)
+static int32_t GetInfo(uint32_t devId, struct DispInfo *info)
 {
     int32_t ret;
     struct DispInfo *tmpInfo = NULL;
@@ -73,7 +72,7 @@ int32_t DispGetInfo(uint32_t devId, struct DispInfo *info)
         goto EXIT;
     }
     ret = DispCmdSend(DISP_CMD_GET_PANELINFO, data, reply);
-    if (ret) {
+    if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("cmd:DISP_CMD_GET_PANEL_INFO failure");
         goto EXIT;
     }
@@ -83,9 +82,9 @@ int32_t DispGetInfo(uint32_t devId, struct DispInfo *info)
         goto EXIT;
     }
     (void)memcpy_s(info, sizeof(struct DispInfo), tmpInfo, dataSize);
-    HDF_LOGI("tmpInfo->width = %d, tmpInfo->height = %d", tmpInfo->width, tmpInfo->height);
-    HDF_LOGI("tmpInfo->hbp = %d, tmpInfo->hfp = %d", tmpInfo->hbp, tmpInfo->hfp);
-    HDF_LOGI("tmpInfo->frameRate = %d", tmpInfo->frameRate);
+    HDF_LOGI("tmpInfo->width = %u, tmpInfo->height = %u", tmpInfo->width, tmpInfo->height);
+    HDF_LOGI("tmpInfo->hbp = %u, tmpInfo->hfp = %u", tmpInfo->hbp, tmpInfo->hfp);
+    HDF_LOGI("tmpInfo->frameRate = %u", tmpInfo->frameRate);
     HDF_LOGI("tmpInfo->intfSync = %d", tmpInfo->intfSync);
     HdfSBufRecycle(data);
     HdfSBufRecycle(reply);
@@ -97,24 +96,67 @@ EXIT:
     return DISPLAY_FAILURE;
 }
 
-int32_t DispOn(uint32_t devId)
+static int32_t DispGetParaProcess(uint32_t devId, const uint32_t cmd, uint32_t *value)
 {
     int32_t ret;
-    uint32_t mode = DISP_ON;
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+
+    if (value == NULL) {
+        HDF_LOGE("%s: invalid param", __func__);
+        return DISPLAY_FAILURE;
+    }
+
+    data = HdfSBufObtainDefaultSize();
+    if (data == NULL) {
+        HDF_LOGE("%s: obtain data sbuf fail", __func__);
+        return DISPLAY_FAILURE;
+    }
+    reply = HdfSBufObtainDefaultSize();
+    if (reply == NULL) {
+        HDF_LOGE("%s: obtain reply sbuf fail", __func__);
+        goto EXIT;
+    }
+    if (!HdfSbufWriteUint32(data, devId)) {
+        HDF_LOGE("HdfSbufWriteUint32 failure");
+        goto EXIT;
+    }
+    ret = DispCmdSend(cmd, data, reply);
+    if (ret != DISPLAY_SUCCESS) {
+        HDF_LOGE("cmd:DISP_CMD_GET_PANEL_INFO failure");
+        goto EXIT;
+    }
+    if (!HdfSbufReadUint32(reply, value)) {
+        HDF_LOGE("HdfSbufReadUint32 failure");
+        goto EXIT;
+    }
+    HdfSBufRecycle(data);
+    HdfSBufRecycle(reply);
+    return DISPLAY_SUCCESS;
+
+EXIT:
+    HdfSBufRecycle(data);
+    HdfSBufRecycle(reply);
+    return DISPLAY_FAILURE;
+}
+
+static int32_t DispEventProcess(uint32_t devId, const uint32_t cmd, uint32_t val)
+{
+    int32_t ret;
 
     struct HdfSBuf *data = HdfSBufObtainDefaultSize();
     if (data == NULL) {
         HDF_LOGE("%s: obtain data sbuf fail", __func__);
         return DISPLAY_FAILURE;
     }
-    uint32_t para = (devId << OFFSET_TWO_BYTE) | (mode & 0xffff);
+    uint32_t para = (devId << OFFSET_TWO_BYTE) | (val & 0xffff);
     if (!HdfSbufWriteUint32(data, para)) {
         HDF_LOGE("HdfSbufWriteUint32 failure\n");
         goto EXIT;
     }
-    ret = DispCmdSend(DISP_CMD_SET_POWERMODE, data, NULL);
+    ret = DispCmdSend(cmd, data, NULL);
     if (ret) {
-        HDF_LOGE("cmd:DISP_CMD_SET_POWERMODE failure\n");
+        HDF_LOGE("cmd:DISP_CMD_SET_%s failure\n", (cmd == DISP_CMD_SET_POWERSTATUS) ? "POWERMODE" : "BACKLIGHT");
         goto EXIT;
     }
     HdfSBufRecycle(data);
@@ -125,83 +167,63 @@ EXIT:
     return DISPLAY_FAILURE;
 }
 
-int32_t SetBacklight(uint32_t devId, uint32_t level)
+static int32_t SetPowerStatus(uint32_t devId,  PowerStatus pStatus)
 {
-    int32_t ret;
-
-    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
-    if (data == NULL) {
-        HDF_LOGE("%s: obtain data sbuf fail", __func__);
-        return DISPLAY_FAILURE;
-    }
-    uint32_t para = (devId << OFFSET_TWO_BYTE) | (level & 0xffff);
-    if (!HdfSbufWriteUint32(data, para)) {
-        HDF_LOGE("HdfSbufWriteUint32 failure\n");
-        goto EXIT;
-    }
-    ret = DispCmdSend(DISP_CMD_SET_BACKLIGHT, data, NULL);
-    if (ret) {
-        HDF_LOGE("cmd:DISP_CMD_SET_BACKLIGHT failure\n");
-        goto EXIT;
-    }
-    HdfSBufRecycle(data);
-    return DISPLAY_SUCCESS;
-
-EXIT:
-    HdfSBufRecycle(data);
-    return DISPLAY_FAILURE;
+    return DispEventProcess(devId, DISP_CMD_SET_POWERSTATUS, pStatus);
 }
 
-int32_t DispOff(uint32_t devId)
+static int32_t GetPowerStatus(uint32_t devId,  PowerStatus *pStatus)
 {
-    int32_t ret;
-    uint32_t mode = DISP_OFF;
+    return DispGetParaProcess(devId, DISP_CMD_GET_POWERSTATUS, pStatus);
+}
 
-    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
-    if (data == NULL) {
-        HDF_LOGE("%s: obtain data sbuf fail", __func__);
-        return DISPLAY_FAILURE;
-    }
-    uint32_t para = (devId << OFFSET_TWO_BYTE) | (mode & 0xffff);
-    if (!HdfSbufWriteUint32(data, para)) {
-        HDF_LOGE("HdfSbufWriteUint32 failure\n");
-        goto EXIT;
-    }
-    ret = DispCmdSend(DISP_CMD_SET_POWERMODE, data, NULL);
-    if (ret) {
-        HDF_LOGE("cmd:DISP_CMD_SET_POWERMODE failure\n");
-        goto EXIT;
-    }
-    HdfSBufRecycle(data);
-    return DISPLAY_SUCCESS;
+static int32_t SetBacklight(uint32_t devId, uint32_t level)
+{
+    return DispEventProcess(devId, DISP_CMD_SET_BACKLIGHT, level);
+}
 
-EXIT:
-    HdfSBufRecycle(data);
-    return DISPLAY_FAILURE;
+static int32_t GetBacklight(uint32_t devId, uint32_t *level)
+{
+    return DispGetParaProcess(devId, DISP_CMD_GET_BACKLIGHT, level);
+}
+
+HalFuncs *GetHalFuncs(void)
+{
+    static HalFuncs *hFuncs = NULL;
+
+    if (hFuncs == NULL) {
+        hFuncs = (HalFuncs *)malloc(sizeof(HalFuncs));
+        if (hFuncs == NULL) {
+            HDF_LOGE("%s: malloc fail", __func__);
+            return NULL;
+        }
+        (void)memset_s(hFuncs, sizeof(HalFuncs), 0, sizeof(HalFuncs));
+        hFuncs->SetPowerStatus = SetPowerStatus;
+        hFuncs->GetPowerStatus = GetPowerStatus;
+        hFuncs->SetBacklight = SetBacklight;
+        hFuncs->GetBacklight = GetBacklight;
+        hFuncs->GetInfo = GetInfo;
+    }
+    return hFuncs;
 }
 
 int32_t DispInit(uint32_t devId)
 {
-    int32_t ret;
-
-    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
-    if (data == NULL) {
-        HDF_LOGE("%s: obtain data sbuf fail", __func__);
-        return DISPLAY_FAILURE;
-    }
-    if (!HdfSbufWriteUint32(data, devId)) {
-        HDF_LOGE("HdfSbufWriteUint32 failure\n");
-        goto EXIT;
-    }
-    ret = DispCmdSend(DISP_CMD_INIT, data, NULL);
-    if (ret) {
-        HDF_LOGE("cmd:DISP_CMD_INIT failure\n");
-        goto EXIT;
-    }
-    HdfSBufRecycle(data);
+    HDF_LOGI("%s: driver has inited", __func__);
     return DISPLAY_SUCCESS;
+}
 
-EXIT:
-    HdfSBufRecycle(data);
-    return DISPLAY_FAILURE;
+int32_t DispOn(uint32_t devId)
+{
+    return SetPowerStatus(devId, POWER_STATUS_ON);
+}
+
+int32_t DispOff(uint32_t devId)
+{
+    return SetPowerStatus(devId, POWER_STATUS_OFF);
+}
+
+int32_t DispGetInfo(uint32_t devId, struct DispInfo *info)
+{
+    return GetInfo(devId, info);
 }

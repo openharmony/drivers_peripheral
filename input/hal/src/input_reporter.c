@@ -12,18 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include "input_reporter.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <malloc.h>
 #include <sys/ioctl.h>
 #include <securec.h>
-
 #include "hdf_io_service_if.h"
 #include "hdf_syscall_adapter.h"
 #include "osal_time.h"
 #include "input_common.h"
-#include "input_reporter.h"
 
 #define POLL_WAIT_MS 100
 #define MOUSE_DATA_LEN 4
@@ -62,7 +60,7 @@ static int32_t EventListenerCallback(struct HdfDevEventlistener *listener, struc
         }
 
         if (!HdfSbufReadBuffer(data, (const void **)&pkgs[count], &len)) {
-            HDF_LOGE("%s: sbuf read failed", __func__);
+            HDF_LOGE("%s: sbuf read finished", __func__);
             break;
         }
 
@@ -74,7 +72,7 @@ static int32_t EventListenerCallback(struct HdfDevEventlistener *listener, struc
 
     DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &manager->devList, DeviceInfoNode, node) {
         if (pos->payload.service == service) {
-            pos->payload.callback->ReportEventPkgCallback((const EventPackage **)pkgs, count);
+            pos->payload.callback->ReportEventPkgCallback((const EventPackage **)pkgs, count, pos->payload.devIndex);
         }
     }
     return INPUT_SUCCESS;
@@ -116,9 +114,9 @@ static int32_t RegisterReportCallback(uint32_t devIndex, InputReportEventCb *cal
             return INPUT_FAILURE;
         }
         if (HdfDeviceRegisterEventListener(pos->payload.service, listener) != INPUT_SUCCESS) {
-            HDF_LOGE("%s: fail to register listener", __func__);
             free(listener);
             pthread_mutex_unlock(&manager->mutex);
+            HDF_LOGE("%s: fail to register listener", __func__);
             return INPUT_FAILURE;
         }
         manager->callbackNum++;
@@ -129,8 +127,8 @@ static int32_t RegisterReportCallback(uint32_t devIndex, InputReportEventCb *cal
         return INPUT_SUCCESS;
     }
 
-    HDF_LOGE("%s: device%u doesn't exist, can't register callback", __func__, devIndex);
     pthread_mutex_unlock(&manager->mutex);
+    HDF_LOGE("%s: device%u doesn't exist, can't register callback", __func__, devIndex);
     return INPUT_FAILURE;
 }
 
@@ -153,8 +151,8 @@ static int32_t UnregisterReportCallback(uint32_t devIndex)
         }
         if (pos->payload.callback != NULL) {
             if (HdfDeviceUnregisterEventListener(pos->payload.service, pos->payload.listener) != INPUT_SUCCESS) {
-                HDF_LOGE("%s: fail to unregister listener", __func__);
                 pthread_mutex_unlock(&manager->mutex);
+                HDF_LOGE("%s: fail to unregister listener", __func__);
                 return INPUT_FAILURE;
             }
             free(pos->payload.listener);
@@ -165,13 +163,101 @@ static int32_t UnregisterReportCallback(uint32_t devIndex)
             HDF_LOGI("%s: device%u unregister callback succ", __func__, devIndex);
             return INPUT_SUCCESS;
         } else {
+            pthread_mutex_unlock(&manager->mutex);
             HDF_LOGE("%s: device%u does not register callback", __func__, devIndex);
+            return INPUT_FAILURE;
         }
     }
 
-    HDF_LOGE("%s: device%u doesn't exist, can't unregister callback", __func__, devIndex);
     pthread_mutex_unlock(&manager->mutex);
+    HDF_LOGE("%s: device%u doesn't exist, can't unregister callback", __func__, devIndex);
     return INPUT_FAILURE;
+}
+
+static int32_t HotPlugEventListenerCallback(struct HdfDevEventlistener *listener,
+    struct HdfIoService *service, uint32_t id, struct HdfSBuf *data)
+{
+    (void)listener;
+    (void)id;
+    uint32_t len = 0;
+    HotPlugEvent *event = NULL;
+    InputDevManager *manager = NULL;
+
+    if (service == NULL || data == NULL) {
+        HDF_LOGE("%s: invalid param", __func__);
+        return INPUT_INVALID_PARAM;
+    }
+
+    GET_MANAGER_CHECK_RETURN(manager);
+    pthread_mutex_lock(&manager->mutex);
+
+    if (!HdfSbufReadBuffer(data, (const void **)&event, &len)) {
+        HDF_LOGE("%s: sbuf read finished", __func__);
+    }
+    manager->hostDev.callback->ReportHotPlugEventCallback((const HotPlugEvent *)event);
+    pthread_mutex_unlock(&manager->mutex);
+    return INPUT_SUCCESS;
+}
+
+static struct HdfDevEventlistener *HotPlugEventListenerInstance(void)
+{
+    struct HdfDevEventlistener *listener = (struct HdfDevEventlistener *)malloc(sizeof(struct HdfDevEventlistener));
+    if (listener == NULL) {
+        HDF_LOGE("%s: instance listener failed", __func__);
+        return NULL;
+    }
+
+    (void)memset_s(listener, sizeof(struct HdfDevEventlistener), 0, sizeof(struct HdfDevEventlistener));
+    listener->onReceive = HotPlugEventListenerCallback;
+    return listener;
+}
+
+static int32_t RegisterHotPlugCallback(InputReportEventCb *callback)
+{
+    InputDevManager *manager = NULL;
+    struct HdfIoService *service = NULL;
+
+    if ((callback == NULL) || (callback->ReportHotPlugEventCallback == NULL)) {
+        HDF_LOGE("%s: invalid param", __func__);
+        return INPUT_INVALID_PARAM;
+    }
+    GET_MANAGER_CHECK_RETURN(manager);
+
+    pthread_mutex_lock(&manager->mutex);
+    service = manager->hostDev.service;
+    if (service == NULL) {
+        manager->hostDev.service = HdfIoServiceBind(DEV_MANAGER_SERVICE_NAME);
+        service = manager->hostDev.service;
+    }
+
+    struct HdfDevEventlistener *listener = HotPlugEventListenerInstance();
+    if (listener == NULL) {
+        pthread_mutex_unlock(&manager->mutex);
+        HDF_LOGE("%s: fail to instance listener", __func__);
+        return INPUT_FAILURE;
+    }
+    if (HdfDeviceRegisterEventListener(service, listener) != INPUT_SUCCESS) {
+        pthread_mutex_unlock(&manager->mutex);
+        HDF_LOGE("%s: fail to register listener", __func__);
+        free(listener);
+        return INPUT_FAILURE;
+    }
+    manager->hostDev.callback = callback;
+    manager->hostDev.listener = (void *)listener;
+    pthread_mutex_unlock(&manager->mutex);
+    return INPUT_SUCCESS;
+}
+
+static int32_t UnregisterHotPlugCallback(void)
+{
+    InputDevManager *manager = NULL;
+    GET_MANAGER_CHECK_RETURN(manager);
+
+    pthread_mutex_lock(&manager->mutex);
+    manager->hostDev.callback = NULL;
+    manager->hostDev.listener = NULL;
+    pthread_mutex_unlock(&manager->mutex);
+    return INPUT_SUCCESS;
 }
 
 int32_t InstanceReporterHdi(InputReporter **reporter)
@@ -186,6 +272,8 @@ int32_t InstanceReporterHdi(InputReporter **reporter)
 
     reporterHdi->RegisterReportCallback = RegisterReportCallback;
     reporterHdi->UnregisterReportCallback = UnregisterReportCallback;
+    reporterHdi->RegisterHotPlugCallback = RegisterHotPlugCallback;
+    reporterHdi->UnregisterHotPlugCallback = UnregisterHotPlugCallback;
     *reporter = reporterHdi;
 
     return INPUT_SUCCESS;

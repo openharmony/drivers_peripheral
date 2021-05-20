@@ -25,5 +25,6 @@ const int TOUCH_INDEX = 1;
 const int INVALID_INDEX = 5;
 const int NAME_MAX_LEN = 10;
 const int TEST_RESULT_LEN = 32;
+const int MAX_DEVICES = 32;
 
 #endif
