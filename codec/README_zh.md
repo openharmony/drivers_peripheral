@@ -171,7 +171,13 @@ Codec驱动提供给framework层可直接调用的能力接口，主要功能有
 
 ## 相关仓<a name="section1371113476307"></a>
 
-驱动子系统
+[驱动子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E9%A9%B1%E5%8A%A8%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
 
-**hmf/drivers/peripheral/Codec**
+[drivers\_framework](https://gitee.com/openharmony/drivers_framework/blob/master/README_zh.md)
+
+[drivers\_adapter](https://gitee.com/openharmony/drivers_adapter/blob/master/README_zh.md)
+
+[drivers\_adapter\_khdf\_linux](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README_zh.md)
+
+drivers\_peripheral
 

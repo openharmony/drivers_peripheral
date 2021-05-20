@@ -138,6 +138,16 @@ The audio driver module provides functions that can be directly called by the au
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p17948193197"><a name="p17948193197"></a><a name="p17948193197"></a>Sets the channel mode for audio rendering.</p>
 </td>
 </tr>
+<tr id="row8960121911198"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p1896011190199"><a name="p1896011190199"></a><a name="p1896011190199"></a>int32_t (*GetRenderSpeed)(struct AudioRender *render, float *speed);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p209616197191"><a name="p209616197191"></a><a name="p209616197191"></a>Obtains the playback speed.</p>
+</td>
+</tr>
+<tr id="row10812112081919"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p12812520151919"><a name="p12812520151919"></a><a name="p12812520151919"></a>int32_t (*SetChannelMode)(struct AudioRender *render, enum AudioChannelMode mode);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p38125205195"><a name="p38125205195"></a><a name="p38125205195"></a>Sets the channel mode for audio rendering.</p>
+</td>
+</tr>
 <tr id="row12422102092613"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p194231720102610"><a name="p194231720102610"></a><a name="p194231720102610"></a>int32_t (*GetChannelMode)(struct AudioRender *render, enum AudioChannelMode *mode);</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p342315202267"><a name="p342315202267"></a><a name="p342315202267"></a>Obtains the current channel mode for audio rendering.</p>
@@ -161,9 +171,9 @@ For details about the invocation and implementation, see the API reference.
 
 [drivers\_framework](https://gitee.com/openharmony/drivers_framework/blob/master/README.md)
 
-[drivers\_adapter\_uhdf](https://gitee.com/openharmony/drivers_adapter_uhdf/blob/master/README.md)
+[drivers\_adapter](https://gitee.com/openharmony/drivers_adapter/blob/master/README.md)
 
 [drivers\_adapter\_khdf\_linux](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README.md)
 
-**hmf/drivers/peripheral/audio**
+drivers\_peripheral
 

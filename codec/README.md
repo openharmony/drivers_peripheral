@@ -171,7 +171,13 @@ For details about the invocation and implementation, see the API reference.
 
 ## Repositories Involved<a name="section1371113476307"></a>
 
-Driver subsystem
+[Driver subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/driver-subsystem.md)
 
-**hmf/drivers/peripheral/Codec**
+[drivers\_framework](https://gitee.com/openharmony/drivers_framework/blob/master/README.md)
+
+[drivers\_adapter](https://gitee.com/openharmony/drivers_adapter/blob/master/README.md)
+
+[drivers\_adapter\_khdf\_linux](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README.md)
+
+drivers\_peripheral
 
