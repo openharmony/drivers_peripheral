@@ -226,12 +226,12 @@ typedef enum {
 } StreamFlagType;
 
 /**
- * @brief Defines the buffer handle type. The virtual address of a handle maps to its physical address.
+ * @brief Defines the codec buffer handle type. The virtual address of a handle maps to its physical address.
  */
-typedef struct BufferHandle {
+typedef struct CodecBufferHandle {
     uint8_t *virAddr;   /**< Virtual address */
     uintptr_t handle;   /**< Physical address */
-} BufferHandle;
+} CodecBufferHandle;
 
 /**
 * @brief Enumerates buffer types.
@@ -253,7 +253,7 @@ typedef struct {
     union {
         uint8_t       *addr;  /**< Virtual address */
         int32_t       fd;     /**< File descriptor */
-        BufferHandle  handle; /**< Data handle. For details, see {@link BufferHandle} */
+        CodecBufferHandle  handle; /**< Data handle. For details, see {@link CodecBufferHandle} */
     };
     uint32_t offset;          /**< Buffer offset */
     uint32_t length;          /**< Length of valid data */
