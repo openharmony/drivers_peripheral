@@ -236,11 +236,9 @@ int InputServiceSample(void)
 
 [drivers\_framework](https://gitee.com/openharmony/drivers_framework/blob/master/README_zh.md)
 
-[drivers\_adapter\_uhdf](https://gitee.com/openharmony/drivers_adapter_uhdf/blob/master/README_zh.md)
+[drivers\_adapter](https://gitee.com/openharmony/drivers_adapter/blob/master/README_zh.md)
 
 [drivers\_adapter\_khdf\_linux](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README_zh.md)
 
-[drivers\_adapter\_khdf\_liteos](https://gitee.com/openharmony/drivers_adapter_khdf_liteos/blob/master/README_zh.md)
-
-drivers\_peripheral\_input
+drivers\_peripheral
 

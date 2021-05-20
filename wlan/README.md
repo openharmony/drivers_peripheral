@@ -176,3 +176,9 @@ static void *hal_main()
 
 [drivers\_framework](https://gitee.com/openharmony/drivers_framework/blob/master/README.md)
 
+[drivers\_adapter](https://gitee.com/openharmony/drivers_adapter/blob/master/README.md)
+
+[drivers\_adapter\_khdf\_linux](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README.md)
+
+drivers\_peripheral
+

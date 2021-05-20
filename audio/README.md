@@ -161,9 +161,9 @@ For details about the invocation and implementation, see the API reference.
 
 [drivers\_framework](https://gitee.com/openharmony/drivers_framework/blob/master/README.md)
 
-[drivers\_adapter\_uhdf](https://gitee.com/openharmony/drivers_adapter_uhdf/blob/master/README.md)
+[drivers\_adapter](https://gitee.com/openharmony/drivers_adapter/blob/master/README.md)
 
 [drivers\_adapter\_khdf\_linux](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README.md)
 
-**hmf/drivers/peripheral/audio**
+drivers\_peripheral
 

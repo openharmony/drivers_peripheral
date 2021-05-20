@@ -102,8 +102,8 @@ HAL模块使用步骤：
 
 1.  使用WifiConstruct创建一个WiFi实体。
 2.  用创建的WiFi实体调用start开启HAL和驱动之间的通道，获得驱动网卡信息。
-3.  通过createFeature一个apFeature或者staFeature。后面可通过这些Feature去调用具体的实现接口，下面基于创建的apFeature。
-4.  调用和使用相关接口：如setMacAddress设置MAC地址、getDeviceMacAddress获取设备的MAC地址等。
+3.  通过createFeature创建一个apFeature或者staFeature。后面可通过这些Feature去调用具体的实现接口。
+4.  下面基于创建的apFeature调用和使用相关接口：如setMacAddress设置MAC地址、getDeviceMacAddress获取设备的MAC地址等。
 5.  调用destroyFeature，销毁掉创建的这个Feature。
 6.  调用stop销毁创建的通道。
 7.  执行WifiDestruct销毁创建的WiFi实体。
@@ -175,4 +175,10 @@ static void *hal_main()
 [驱动子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E9%A9%B1%E5%8A%A8%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
 
 [drivers\_framework](https://gitee.com/openharmony/drivers_framework/blob/master/README_zh.md)
+
+[drivers\_adapter](https://gitee.com/openharmony/drivers_adapter/blob/master/README_zh.md)
+
+[drivers\_adapter\_khdf\_linux](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README_zh.md)
+
+drivers\_peripheral
 
