@@ -25,7 +25,7 @@ if (defined(ohos_lite)) {
   shared_library("hdi_sensor") {
     sources = [
       "$SENSOR_ROOT_DIR/hal/src/sensor_channel.c",
-      "$SENSOR_ROOT_DIR/hal/src/sensor_core.c",
+      "$SENSOR_ROOT_DIR/hal/src/sensor_controller.c",
       "$SENSOR_ROOT_DIR/hal/src/sensor_manager.c",
     ]
 
@@ -73,7 +73,7 @@ if (defined(ohos_lite)) {
     public_configs = [ ":libhdi_sensor_pub_config" ]
     sources = [
       "$SENSOR_ROOT_DIR/hal/src/sensor_channel.c",
-      "$SENSOR_ROOT_DIR/hal/src/sensor_core.c",
+      "$SENSOR_ROOT_DIR/hal/src/sensor_controller.c",
       "$SENSOR_ROOT_DIR/hal/src/sensor_manager.c",
     ]
 

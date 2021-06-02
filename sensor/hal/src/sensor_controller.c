@@ -18,12 +18,12 @@
 #include "osal_mem.h"
 #include "osal_mutex.h"
 #include "sensor_channel.h"
-#include "sensor_common_type.h"
-#include "sensor_core.h"
+#include "sensor_common.h"
+#include "sensor_controller.h"
 #include "sensor_if.h"
 #include "sensor_manager.h"
 
-#define HDF_LOG_TAG    sensor_core_c
+#define HDF_LOG_TAG    sensor_controller_c
 #define HDF_SENSOR_INFO_MAX_SIZE (4 * 1024) // 4kB
 
 void ReleaseAllSensorInfo(void)
@@ -159,7 +159,7 @@ static int32_t GetSensorInfo(struct SensorInformation **sensor, int32_t *count)
         }
 
         int32_t ret = pos->ioService->dispatcher->Dispatch(&pos->ioService->object,
-            SENSOR_IO_GET_INFO_LIST, NULL, reply);
+            SENSOR_IO_CMD_GET_INFO_LIST, NULL, reply);
         if (ret != SENSOR_SUCCESS) {
             HDF_LOGE("%s: Sensor dispatch info failed[%d]", __func__, ret);
             break;
@@ -190,34 +190,34 @@ static int32_t GetSensorInfo(struct SensorInformation **sensor, int32_t *count)
     return SENSOR_SUCCESS;
 }
 
-static int32_t DispatchSensorMsg(struct HdfIoService *ioService, int32_t cmd,
-    struct HdfSBuf *msg, struct HdfSBuf *reply)
-{
-    CHECK_NULL_PTR_RETURN_VALUE(ioService, SENSOR_NULL_PTR);
-    CHECK_NULL_PTR_RETURN_VALUE(ioService->dispatcher, SENSOR_NULL_PTR);
-    CHECK_NULL_PTR_RETURN_VALUE(ioService->dispatcher->Dispatch, SENSOR_NULL_PTR);
-
-    int32_t ret = ioService->dispatcher->Dispatch(&ioService->object, cmd, msg, reply);
-    if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%s: Sensor dispatch failed", __func__);
-        return SENSOR_FAILURE;
-    }
-
-    return ret;
-}
-
-static int32_t SendSensorMsg(int32_t sensorId, struct HdfSBuf *msg, struct HdfSBuf *reply)
+static struct HdfIoService *GetSensorServiceBySensorId(int32_t sensorId)
 {
     struct SensorDevManager *manager = GetSensorDevManager();
     struct SensorIdListNode *sensorIdPos = NULL;
 
     DLIST_FOR_EACH_ENTRY(sensorIdPos, &manager->sensorIdListHead, struct SensorIdListNode, node) {
         if (sensorIdPos->sensorId == sensorId) {
-            return DispatchSensorMsg(sensorIdPos->ioService, sensorId, msg, reply);
+            return sensorIdPos->ioService;
         }
     }
+    return NULL;
+}
 
-    return SENSOR_NOT_SUPPORT;
+static int32_t SendSensorMsg(int32_t sensorId, struct HdfSBuf *msg, struct HdfSBuf *reply)
+{
+    struct HdfIoService *ioService = NULL;
+
+    ioService = GetSensorServiceBySensorId(sensorId);
+    CHECK_NULL_PTR_RETURN_VALUE(ioService, SENSOR_NOT_SUPPORT);
+    CHECK_NULL_PTR_RETURN_VALUE(ioService->dispatcher, SENSOR_NULL_PTR);
+    CHECK_NULL_PTR_RETURN_VALUE(ioService->dispatcher->Dispatch, SENSOR_NULL_PTR);
+
+    int32_t ret = ioService->dispatcher->Dispatch(&ioService->object, SENSOR_IO_CMD_OPS, msg, reply);
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%s: Sensor dispatch failed", __func__);
+        return ret;
+    }
+    return ret;
 }
 
 static int32_t EnableSensor(int32_t sensorId)
@@ -228,8 +228,14 @@ static int32_t EnableSensor(int32_t sensorId)
         return SENSOR_FAILURE;
     }
 
-    if (!HdfSbufWriteInt32(msg, SENSOR_IO_ENABLE)) {
-        HDF_LOGE("%s: Sensor write failed", __func__);
+    if (!HdfSbufWriteInt32(msg, sensorId)) {
+        HDF_LOGE("%s: Sensor write id failed", __func__);
+        HdfSBufRecycle(msg);
+        return SENSOR_FAILURE;
+    }
+
+    if (!HdfSbufWriteInt32(msg, SENSOR_OPS_IO_CMD_ENABLE)) {
+        HDF_LOGE("%s: Sensor write enable failed", __func__);
         HdfSBufRecycle(msg);
         return SENSOR_FAILURE;
     }
@@ -251,8 +257,14 @@ static int32_t DisableSensor(int32_t sensorId)
         return SENSOR_FAILURE;
     }
 
-    if (!HdfSbufWriteInt32(msg, SENSOR_IO_DISABLE)) {
-        HDF_LOGE("%s: Sensor write failed", __func__);
+    if (!HdfSbufWriteInt32(msg, sensorId)) {
+        HDF_LOGE("%s: Sensor write id failed", __func__);
+        HdfSBufRecycle(msg);
+        return SENSOR_FAILURE;
+    }
+
+    if (!HdfSbufWriteInt32(msg, SENSOR_OPS_IO_CMD_DISABLE)) {
+        HDF_LOGE("%s: Sensor write disable failed", __func__);
         HdfSBufRecycle(msg);
         return SENSOR_FAILURE;
     }
@@ -273,7 +285,14 @@ static int32_t SetSensorBatch(int32_t sensorId, int64_t samplingInterval, int64_
         HDF_LOGE("%s: Msg failed to obtain sBuf", __func__);
         return SENSOR_FAILURE;
     }
-    if (!HdfSbufWriteInt32(msg, SENSOR_IO_SET_BATCH) || !HdfSbufWriteInt64(msg, samplingInterval) ||
+
+    if (!HdfSbufWriteInt32(msg, sensorId)) {
+        HDF_LOGE("%s: Sensor write id failed", __func__);
+        HdfSBufRecycle(msg);
+        return SENSOR_FAILURE;
+    }
+
+    if (!HdfSbufWriteInt32(msg, SENSOR_OPS_IO_CMD_SET_BATCH) || !HdfSbufWriteInt64(msg, samplingInterval) ||
         !HdfSbufWriteInt64(msg, interval)) {
         HDF_LOGE("%s: Sensor write failed", __func__);
         HdfSBufRecycle(msg);
@@ -297,7 +316,13 @@ static int32_t SetSensorMode(int32_t sensorId, int32_t mode)
         return SENSOR_FAILURE;
     }
 
-    if (!HdfSbufWriteInt32(msg, SENSOR_IO_SET_MODE) || !HdfSbufWriteInt32(msg, mode)) {
+    if (!HdfSbufWriteInt32(msg, sensorId)) {
+        HDF_LOGE("%s: Sensor write id failed", __func__);
+        HdfSBufRecycle(msg);
+        return SENSOR_FAILURE;
+    }
+
+    if (!HdfSbufWriteInt32(msg, SENSOR_OPS_IO_CMD_SET_MODE) || !HdfSbufWriteInt32(msg, mode)) {
         HDF_LOGE("%s: Sensor write failed", __func__);
         HdfSBufRecycle(msg);
         return SENSOR_FAILURE;
@@ -320,7 +345,13 @@ static int32_t SetSensorOption(int32_t sensorId, uint32_t option)
         return SENSOR_FAILURE;
     }
 
-    if (!HdfSbufWriteInt32(msg, SENSOR_IO_SET_OPTION) || !HdfSbufWriteUint32(msg, option)) {
+    if (!HdfSbufWriteInt32(msg, sensorId)) {
+        HDF_LOGE("%s: Sensor write id failed", __func__);
+        HdfSBufRecycle(msg);
+        return SENSOR_FAILURE;
+    }
+
+    if (!HdfSbufWriteInt32(msg, SENSOR_OPS_IO_CMD_SET_OPTION) || !HdfSbufWriteUint32(msg, option)) {
         HDF_LOGE("%s: Sensor write failed", __func__);
         HdfSBufRecycle(msg);
         return SENSOR_FAILURE;

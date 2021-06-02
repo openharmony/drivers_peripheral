@@ -18,7 +18,7 @@
 #include "osal_mutex.h"
 #include "osal_time.h"
 #include "sensor_channel.h"
-#include "sensor_common_type.h"
+#include "sensor_common.h"
 #include "sensor_manager.h"
 #include "sensor_type.h"
 
@@ -172,7 +172,6 @@ int32_t Unregister(void)
     HdfIoServiceGroupRecycle(manager->serviceGroup);
     manager->serviceGroup = NULL;
     manager->recordDataCb = NULL;
-
     (void)OsalMutexUnlock(&manager->mutex);
 
     return SENSOR_SUCCESS;
