@@ -18,8 +18,8 @@
 #include "hdf_io_service_if.h"
 #include "osal_mem.h"
 #include "sensor_channel.h"
-#include "sensor_common_type.h"
-#include "sensor_core.h"
+#include "sensor_common.h"
+#include "sensor_controller.h"
 #include "sensor_if.h"
 #include "sensor_manager.h"
 
@@ -158,7 +158,7 @@ const struct SensorInterface *NewSensorInterfaceInstance(void)
         return NULL;
     }
     manager->initState = true;
-    HDF_LOGE("%s: Get sensor device instance success", __func__);
+    HDF_LOGD("%s: Get sensor device instance success", __func__);
     return &sensorDevInstance;
 }
 

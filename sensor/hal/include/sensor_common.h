@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef HDI_SENSOR_COMMON_TYPE_H
-#define HDI_SENSOR_COMMON_TYPE_H
+#ifndef HDI_SENSOR_COMMON_H
+#define HDI_SENSOR_COMMON_H
 
 #include <stdio.h>
 #include "hdf_log.h"
@@ -33,4 +33,4 @@
     } \
 } while (0)
 
-#endif /* HDI_SENSOR_COMMON_TYPE_H */
+#endif /* HDI_SENSOR_COMMON_H */

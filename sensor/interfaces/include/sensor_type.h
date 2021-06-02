@@ -65,7 +65,6 @@ enum SensorStatus {
     SENSOR_NULL_PTR          = -5,   /**< The pointer is null. */
 };
 
-
 /**
  * @brief Enumerates sensor types.
  *
