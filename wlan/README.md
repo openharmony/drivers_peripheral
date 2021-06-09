@@ -14,7 +14,7 @@ This repository defines and implements the WLAN-related Hardware Driver Interfac
 2.  Obtaining the WLAN features supported by the device
 3.  Creating a WLAN feature instance
 
-**Figure  1**  WLAN driver module architecture<a name="fig14142101381112"></a>
+**Figure  1**  WLAN driver module architecture<a name="fig14142101381112"></a>  
 ![](figures/wlan-driver-module-architecture.png "wlan-driver-module-architecture")
 
 ## Directory Structure<a name="section161941989596"></a>
@@ -35,7 +35,7 @@ The directory structure of the WLAN repository is as follows:
 
 ## Available APIs<a name="section1564411661810"></a>
 
-The WLAN HAL module provides APIs for the Wi-Fi service, such as creating and destroying an  **IWiFi**  object and setting the MAC address.
+The WLAN HAL module provides APIs for the Wi-Fi service, such as creating and destroying an  **IWiFi**  object and setting the MAC address. The following table lists the APIs.
 
 **Table  1**  APIs provided by the WLAN HAL module
 
@@ -48,7 +48,7 @@ The WLAN HAL module provides APIs for the Wi-Fi service, such as creating and de
 </th>
 </tr>
 </thead>
-<tbody><tr id="row112150333476"><td class="cellrowborder" rowspan="4" valign="top" width="15.079999999999998%" headers="mcps1.2.4.1.1 "><p id="p2155710125317"><a name="p2155710125317"></a><a name="p2155710125317"></a>wifi_hal.h</p>
+<tbody><tr id="row112150333476"><td class="cellrowborder" rowspan="13" valign="top" width="15.079999999999998%" headers="mcps1.2.4.1.1 "><p id="p2155710125317"><a name="p2155710125317"></a><a name="p2155710125317"></a>wifi_hal.h</p>
 <p id="p189132019183"><a name="p189132019183"></a><a name="p189132019183"></a></p>
 </td>
 <td class="cellrowborder" valign="top" width="60.33%" headers="mcps1.2.4.1.2 "><p id="p363110387399"><a name="p363110387399"></a><a name="p363110387399"></a>int32_t WifiConstruct(struct IWiFi **wifiInstance);</p>
@@ -61,21 +61,100 @@ The WLAN HAL module provides APIs for the Wi-Fi service, such as creating and de
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p2627638173917"><a name="p2627638173917"></a><a name="p2627638173917"></a>Destroys an <strong id="b1088016455520"><a name="b1088016455520"></a><a name="b1088016455520"></a>IWiFi</strong> object.</p>
 </td>
 </tr>
-<tr id="row1121533316475"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p4950434142314"><a name="p4950434142314"></a><a name="p4950434142314"></a>int32_t (*start)(struct IWiFi *);</p>
+<tr id="row1121533316475"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p1978712110554"><a name="p1978712110554"></a><a name="p1978712110554"></a>int32_t (*CallbackFunc)(int32_t event, struct HdfSBuf *reqData);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p978721105517"><a name="p978721105517"></a><a name="p978721105517"></a>Defines a callback to listen for <strong id="b796718517433"><a name="b796718517433"></a><a name="b796718517433"></a>IWiFi</strong> asynchronous events.</p>
+</td>
+</tr>
+<tr id="row1214611564542"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p4950434142314"><a name="p4950434142314"></a><a name="p4950434142314"></a>int32_t (*start)(struct IWiFi *);</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p1162543816393"><a name="p1162543816393"></a><a name="p1162543816393"></a>Creates a channel between the HAL and the driver and obtains the NIC supported by the driver.</p>
 </td>
 </tr>
-<tr id="row172153335473"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p162433816392"><a name="p162433816392"></a><a name="p162433816392"></a>int32_t (*stop)(struct IWiFi *);</p>
+<tr id="row167876105514"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p162433816392"><a name="p162433816392"></a><a name="p162433816392"></a>int32_t (*stop)(struct IWiFi *);</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p186235383393"><a name="p186235383393"></a><a name="p186235383393"></a>Stops the channel between the HAL and the driver.</p>
 </td>
 </tr>
-<tr id="row451796205011"><td class="cellrowborder" rowspan="4" valign="top" width="15.079999999999998%" headers="mcps1.2.4.1.1 "><p id="p2659417135013"><a name="p2659417135013"></a><a name="p2659417135013"></a>wifi_hal_base_feature.h</p>
+<tr id="row77607815516"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p6760128135514"><a name="p6760128135514"></a><a name="p6760128135514"></a>int32_t (*getSupportFeature)(uint8_t *supType, uint32_t size);</p>
 </td>
-<td class="cellrowborder" valign="top" width="60.33%" headers="mcps1.2.4.1.2 "><p id="p15117233152315"><a name="p15117233152315"></a><a name="p15117233152315"></a>int32_t (*getFeatureType)(const struct IWiFiBaseFeature *);</p>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p1176014845516"><a name="p1176014845516"></a><a name="p1176014845516"></a>Obtains the WLAN features available for the device no matter whether it works as an AP, STA, or P2P server/client.</p>
 </td>
-<td class="cellrowborder" valign="top" width="24.59%" headers="mcps1.2.4.1.3 "><p id="p195182610507"><a name="p195182610507"></a><a name="p195182610507"></a>Obtains the feature type.</p>
+</tr>
+<tr id="row93918373572"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p2039103714572"><a name="p2039103714572"></a><a name="p2039103714572"></a>int32_t (*getSupportCombo)(uint64_t *combo, uint32_t size);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p13916375570"><a name="p13916375570"></a><a name="p13916375570"></a>Obtains the WLAN features available for the device that plays different roles simultaneously (any combination of AP, STA, and P2P server/client).</p>
+</td>
+</tr>
+<tr id="row25031321195815"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p13503142195814"><a name="p13503142195814"></a><a name="p13503142195814"></a>int32_t (*createFeature)(int32_t type, struct IWiFiBaseFeature **ifeature);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p11503172115585"><a name="p11503172115585"></a><a name="p11503172115585"></a>Creates an <strong id="b85498454446"><a name="b85498454446"></a><a name="b85498454446"></a>IWiFiBaseFeature</strong> object of a specified type.</p>
+</td>
+</tr>
+<tr id="row14371833185819"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p1443863325820"><a name="p1443863325820"></a><a name="p1443863325820"></a>int32_t (*getFeatureByIfName)(const char *ifName, struct IWiFiBaseFeature **ifeature);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p1343819334584"><a name="p1343819334584"></a><a name="p1343819334584"></a>Obtains an <strong id="b1678312213451"><a name="b1678312213451"></a><a name="b1678312213451"></a>IWiFiBaseFeature</strong> object based on a specified network interface name.</p>
+</td>
+</tr>
+<tr id="row03398561587"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p1933965615812"><a name="p1933965615812"></a><a name="p1933965615812"></a>int32_t (*registerEventCallback)(CallbackFunc cbFunc);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p103396560587"><a name="p103396560587"></a><a name="p103396560587"></a>Registers a callback to listen for IWiFi asynchronous events.</p>
+</td>
+</tr>
+<tr id="row894162955918"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p1694112914590"><a name="p1694112914590"></a><a name="p1694112914590"></a>int32_t (*unRegisterEventCallback)(void);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p18948295597"><a name="p18948295597"></a><a name="p18948295597"></a>Unregisters an <strong id="b1979834134512"><a name="b1979834134512"></a><a name="b1979834134512"></a>IWiFi</strong> callback.</p>
+</td>
+</tr>
+<tr id="row122731451103"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p2273125104"><a name="p2273125104"></a><a name="p2273125104"></a>int32_t (*destroyFeature)(struct IWiFiBaseFeature *ifeature);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p92731553017"><a name="p92731553017"></a><a name="p92731553017"></a>Destroys a specified <strong id="b15348165794518"><a name="b15348165794518"></a><a name="b15348165794518"></a>IWiFiBaseFeature</strong> object.</p>
+</td>
+</tr>
+<tr id="row172153335473"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p1292417115515"><a name="p1292417115515"></a><a name="p1292417115515"></a>int32_t (*resetDriver)(const uint8_t chipId);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p17272317145516"><a name="p17272317145516"></a><a name="p17272317145516"></a>Resets the WLAN driver with a specified chip ID.</p>
+</td>
+</tr>
+<tr id="row27321001058"><td class="cellrowborder" rowspan="3" valign="top" width="15.079999999999998%" headers="mcps1.2.4.1.1 "><p id="p134208191041"><a name="p134208191041"></a><a name="p134208191041"></a>wifi_hal_ap_feature.h</p>
+</td>
+<td class="cellrowborder" valign="top" width="60.33%" headers="mcps1.2.4.1.2 "><p id="p77321105516"><a name="p77321105516"></a><a name="p77321105516"></a>int32_t (*getAsscociatedStas)(const struct IWiFiAp *apFeature, struct StaInfo *staInfo, uint32_t count, uint32_t *num);</p>
+</td>
+<td class="cellrowborder" valign="top" width="24.59%" headers="mcps1.2.4.1.3 "><p id="p1673213014513"><a name="p1673213014513"></a><a name="p1673213014513"></a>Obtains information (MAC addresses only in the current version) about all the connected STAs.</p>
+</td>
+</tr>
+<tr id="row39802291664"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p149801729465"><a name="p149801729465"></a><a name="p149801729465"></a>int32_t (*setCountryCode)(const struct IWiFiAp *apFeature, const char *code, uint32_t len);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p098022910610"><a name="p098022910610"></a><a name="p098022910610"></a>Sets the country/region code.</p>
+</td>
+</tr>
+<tr id="row154191519248"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p94207191547"><a name="p94207191547"></a><a name="p94207191547"></a>int32_t InitApFeature(struct IWiFiAp **fe);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p2420191912418"><a name="p2420191912418"></a><a name="p2420191912418"></a>Initializes a specified AP feature. This function is called during the AP feature creation.</p>
+</td>
+</tr>
+<tr id="row14149145512411"><td class="cellrowborder" rowspan="2" valign="top" width="15.079999999999998%" headers="mcps1.2.4.1.1 "><p id="p18149155246"><a name="p18149155246"></a><a name="p18149155246"></a>wifi_hal_sta_feature.h</p>
+</td>
+<td class="cellrowborder" valign="top" width="60.33%" headers="mcps1.2.4.1.2 "><p id="p17149165511414"><a name="p17149165511414"></a><a name="p17149165511414"></a>int32_t (*setScanningMacAddres)(const struct IWiFiSta *staFeature, unsigned char *scanMac, uint8_t len);</p>
+</td>
+<td class="cellrowborder" valign="top" width="24.59%" headers="mcps1.2.4.1.3 "><p id="p181491255149"><a name="p181491255149"></a><a name="p181491255149"></a>Sets a single MAC address to scan for.</p>
+</td>
+</tr>
+<tr id="row1911174610816"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p211116460813"><a name="p211116460813"></a><a name="p211116460813"></a>int32_t InitStaFeature(struct IWiFiSta **fe);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p61111646183"><a name="p61111646183"></a><a name="p61111646183"></a>Initializes a specified STA feature. This function is called during the STA feature creation.</p>
+</td>
+</tr>
+<tr id="row451796205011"><td class="cellrowborder" rowspan="9" valign="top" width="15.079999999999998%" headers="mcps1.2.4.1.1 "><p id="p2659417135013"><a name="p2659417135013"></a><a name="p2659417135013"></a>wifi_hal_base_feature.h</p>
+</td>
+<td class="cellrowborder" valign="top" width="60.33%" headers="mcps1.2.4.1.2 "><p id="p73831421111010"><a name="p73831421111010"></a><a name="p73831421111010"></a>const char *(*getNetworkIfaceName)(const struct IWiFiBaseFeature *baseFeature);</p>
+</td>
+<td class="cellrowborder" valign="top" width="24.59%" headers="mcps1.2.4.1.3 "><p id="p16363321101014"><a name="p16363321101014"></a><a name="p16363321101014"></a>Obtains the name of a network interface.</p>
+</td>
+</tr>
+<tr id="row1657914017107"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p15117233152315"><a name="p15117233152315"></a><a name="p15117233152315"></a>int32_t (*getFeatureType)(const struct IWiFiBaseFeature *);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p195182610507"><a name="p195182610507"></a><a name="p195182610507"></a>Obtains the feature type.</p>
 </td>
 </tr>
 <tr id="row5518663503"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p125181260501"><a name="p125181260501"></a><a name="p125181260501"></a>int32_t (*setMacAddress)(const struct IWiFiBaseFeature *, unsigned char *, uint8_t);</p>
@@ -88,9 +167,29 @@ The WLAN HAL module provides APIs for the Wi-Fi service, such as creating and de
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p14519469509"><a name="p14519469509"></a><a name="p14519469509"></a>Obtains the device MAC address.</p>
 </td>
 </tr>
-<tr id="row18519136185016"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p145195620502"><a name="p145195620502"></a><a name="p145195620502"></a>int32_t (*setTxPower)(const struct IWiFiBaseFeature *, int32_t);</p>
+<tr id="row986761516115"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p2867181581116"><a name="p2867181581116"></a><a name="p2867181581116"></a>int32_t (*getValidFreqsWithBand)(const struct IWiFiBaseFeature *baseFeature, int32_t band, int32_t *freqs, uint32_t count, uint32_t *num);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p15867101551112"><a name="p15867101551112"></a><a name="p15867101551112"></a>Obtains the frequencies supported by the 2.4 GHz or 5 GHz band.</p>
+</td>
+</tr>
+<tr id="row18232258171117"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p145195620502"><a name="p145195620502"></a><a name="p145195620502"></a>int32_t (*setTxPower)(const struct IWiFiBaseFeature *, int32_t);</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p175191863503"><a name="p175191863503"></a><a name="p175191863503"></a>Sets the transmit power.</p>
+</td>
+</tr>
+<tr id="row1744948201219"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p7449128101215"><a name="p7449128101215"></a><a name="p7449128101215"></a>int32_t (*getChipId)(const struct IWiFiBaseFeature *baseFeature, uint8_t *chipId);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p1244998131219"><a name="p1244998131219"></a><a name="p1244998131219"></a>Obtains the chip ID of the current driver.</p>
+</td>
+</tr>
+<tr id="row34351131216"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p743711161213"><a name="p743711161213"></a><a name="p743711161213"></a>int32_t (*getIfNamesByChipId)(const uint8_t chipId, char **ifNames, uint32_t *num);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p164361118121"><a name="p164361118121"></a><a name="p164361118121"></a>Obtains names of all the NICs of the current chip based on the chip ID.</p>
+</td>
+</tr>
+<tr id="row18519136185016"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p182571320151215"><a name="p182571320151215"></a><a name="p182571320151215"></a>int32_t InitBaseFeature(struct IWiFiBaseFeature **fe);</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p17237192021219"><a name="p17237192021219"></a><a name="p17237192021219"></a>Initializes a specified base feature. This function is called during the base feature creation.</p>
 </td>
 </tr>
 </tbody>
@@ -102,7 +201,7 @@ The following describes how to use the WLAN HAL module.
 
 1.  Call the  **WifiConstruct**  function to create an  **IWiFi**  object.
 2.  Use the created  **IWiFi**  object to call the  **start**  function to create a channel between the HAL and the driver and obtain the driver NIC information.
-3.  Call the  **createFeature**  function to create an AP feature or station feature. You can call functions to perform operations on the created feature \(use an AP feature as an example\).
+3.  Call the  **createFeature**  function to create an AP feature or STA feature. You can call functions to perform operations on the created feature \(use an AP feature as an example\).
 4.  Call functions to perform operations, such as calling the  **setMacAddress**  function to set the MAC address and calling the  **getDeviceMacAddress**  function to obtain the device MAC address.
 5.  Call the  **destroyFeature**  function to destroy the created feature.
 6.  Call the  **stop**  function to stop the channel between the HAL and the driver.
