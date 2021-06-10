@@ -41,12 +41,12 @@ namespace {
 
         float *data = (float*)event->data;
         if (event->sensorId == 0) {
-            printf("time [%lld] sensor id [%d] data [%f]\n\r", event->timestamp, event->sensorId, *(data));
+            printf("sensor id [%d] data [%f]\n\r", event->sensorId, *(data));
             if (fabs(*data) > 1e-5) {
                 g_sensorDataFlag = 1;
             }
         } else if (event->sensorId == 1) {
-            printf("time [%lld] sensor id [%d] x-[%f] y-[%f] z-[%f]\n\r", event->timestamp,
+            printf("sensor id [%d] x-[%f] y-[%f] z-[%f]\n\r",
                 event->sensorId, (*data), *(data + 1), *(data + SENSOR_AXISZ));
             if (fabs(*data) > 1e-5) {
                 g_sensorDataFlag = 1;
@@ -197,7 +197,7 @@ HWTEST_F(HdfSensorTest, GetSensorList002, TestSize.Level1)
         EXPECT_NE(nullptr, sensorInfo);
         return;
     }
-    printf("get sensor list num[%d] size[%u]\n\r", count, sizeof(*sensorInfo));
+    printf("get sensor list num[%d]\n\r", count);
     info = sensorInfo;
     testSensorInfo = sensorInfo;
     accelSensorInfo = sensorInfo;

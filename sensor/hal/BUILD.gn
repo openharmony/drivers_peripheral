@@ -21,7 +21,7 @@ FWK_ROOT_DIR = "//drivers/framework"
 shared_library("hdi_sensor") {
   sources = [
     "$SENSOR_ROOT_DIR/hal/src/sensor_channel.c",
-    "$SENSOR_ROOT_DIR/hal/src/sensor_core.c",
+    "$SENSOR_ROOT_DIR/hal/src/sensor_controller.c",
     "$SENSOR_ROOT_DIR/hal/src/sensor_manager.c",
   ]
 

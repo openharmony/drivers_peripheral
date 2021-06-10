@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef HDI_SENSOR_CORE_H
-#define HDI_SENSOR_CORE_H
+#ifndef HDI_SENSOR_CONTROLLER_H
+#define HDI_SENSOR_CONTROLLER_H
 
 #include <stdint.h>
 #include <pthread.h>
@@ -22,14 +22,19 @@
 #include "sensor_if.h"
 #include "sensor_type.h"
 
-enum SensorMethodIoCmd {
-    SENSOR_IO_GET_INFO_LIST = 0xFFFF,
-    SENSOR_IO_ENABLE     = 1,
-    SENSOR_IO_DISABLE    = 2,
-    SENSOR_IO_SET_BATCH  = 3,
-    SENSOR_IO_SET_MODE   = 4,
-    SENSOR_IO_SET_OPTION = 5,
-    SENSOR_IO_END,
+enum SensorIoCmd {
+    SENSOR_IO_CMD_GET_INFO_LIST = 0,
+    SENSOR_IO_CMD_OPS           = 1,
+    SENSOR_IO_CMD_END,
+};
+
+enum SensorOpsIoCmd {
+    SENSOR_OPS_IO_CMD_ENABLE     = 1,
+    SENSOR_OPS_IO_CMD_DISABLE    = 2,
+    SENSOR_OPS_IO_CMD_SET_BATCH  = 3,
+    SENSOR_OPS_IO_CMD_SET_MODE   = 4,
+    SENSOR_OPS_IO_CMD_SET_OPTION = 5,
+    SENSOR_OPS_IO_CMD_END,
 };
 
 /* the basic description of a sensor is the same as that of the kernel of definition */
@@ -48,4 +53,4 @@ struct SensorBasicInformation {
 void GetSensorDeviceMethods(struct SensorInterface *device);
 void ReleaseAllSensorInfo(void);
 
-#endif /* HDI_SENSOR_CORE_H */
+#endif /* HDI_SENSOR_CONTROLLER_H */
