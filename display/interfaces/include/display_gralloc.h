@@ -50,9 +50,9 @@ typedef struct {
     /**
      * @brief Allocates memory based on the parameters passed by the GUI.
      *
-     * The allocated memory can be classified into shared memory, memory with cache, and memory without cache.
+     * @param info Indicates the pointer to the description info of the memory to allocate.
      *
-     * @param buffer Indicates the pointer to the buffer of the memory to allocate.
+     * @param handle Indicates the double pointer to the buffer of the memory to allocate.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
      * otherwise.
@@ -64,7 +64,7 @@ typedef struct {
     /**
      * @brief Releases memory.
      *
-     * @param buffer Indicates the pointer to the buffer of the memory to release.
+     * @param handle Indicates the pointer to the buffer of the memory to release.
      *
      * @since 1.0
      * @version 1.0
@@ -74,7 +74,7 @@ typedef struct {
     /**
      * @brief Maps memory to memory without cache in the process's address space.
      *
-     * @param buffer Indicates the pointer to the buffer of the memory to map.
+     * @param handle Indicates the pointer to the buffer of the memory to map.
      *
      * @return Returns the pointer to a valid address if the operation is successful; returns <b>NULL</b> otherwise.
      * @since 1.0
@@ -85,18 +85,18 @@ typedef struct {
     /**
      * @brief Maps memory to memory with cache in the process's address space.
      *
-     * @param buffer Indicates the pointer to the buffer of the memory to map.
+     * @param handle Indicates the pointer to the buffer of the memory to map.
      *
      * @return Returns the pointer to a valid address if the operation is successful; returns <b>NULL</b> otherwise.
      * @since 1.0
      * @version 1.0
      */
-    void *(*MmapCache)(GrallocBuffer *buffer);
+    void *(*MmapCache)(BufferHandle *handle);
 
     /**
      * @brief Unmaps memory, that is, removes any mappings in the process's address space.
      *
-     * @param buffer Indicates the pointer to the buffer of the memory to unmap.
+     * @param handle Indicates the pointer to the buffer of the memory to unmap.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
      * otherwise.
@@ -108,7 +108,7 @@ typedef struct {
     /**
      * @brief Flushes data from the cache to memory and invalidates the data in the cache.
      *
-     * @param buffer Indicates the pointer to the buffer of the cache to flush.
+     * @param handle Indicates the pointer to the buffer of the cache to flush.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
      * otherwise.
@@ -120,19 +120,19 @@ typedef struct {
     /**
      * @brief Flushes data from the cache mapped via {@link Mmap} to memory and invalidates the data in the cache.
      *
-     * @param buffer Indicates the pointer to the buffer of the cache to flush.
+     * @param handle Indicates the pointer to the buffer of the cache to flush.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
      * otherwise.
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*FlushMCache)(BufferHandle *buffer);
+    int32_t (*FlushMCache)(BufferHandle *handle);
 
     /**
      * @brief Invalidate the Cache, it will update the cache from memory.
      *
-     * @param buffer Indicates the pointer to the buffer of the cache which will been invalidated
+     * @param handle Indicates the pointer to the buffer of the cache which will been invalidated
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
      * otherwise.
