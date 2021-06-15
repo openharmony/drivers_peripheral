@@ -46,7 +46,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdint.h>
-#include <buffer_handle.h>
+#include "buffer_handle.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -89,6 +89,8 @@ enum {
     HBM_USE_CPU_WRITE = (1 << 1),       /**< CPU will write the memory */
     HBM_USE_MEM_MMZ = (1 << 2),         /**< will use mmz to allocate memory */
     HBM_USE_MEM_DMA = (1 << 3),         /**< the allocator should support dma buffer */
+    HBM_USE_MEM_SHARE = (1 << 4),       /**< the allocator should support shared memory buffer*/
+    HBM_USE_MEM_MMZ_CACHE = (1 << 5),   /**< will use mmz to allocate memory with cache*/
 };
 
 /**
@@ -144,19 +146,6 @@ typedef enum {
     ROTATE_270,             /**< Rotation by 270 degrees */
     ROTATE_BUTT             /**< Invalid operation */
 } TransformType;
-
-/**
- * @brief Enumerates memory types.
- *
- * Memory is allocated based on the type specified by the GUI.
- *
- */
-typedef enum {
-    NORMAL_MEM = 0,       /**< Memory without cache */
-    CACHE_MEM,            /**< Memory with cache */
-    SHM_MEM,              /**< Shared memory */
-    DMA_MEM               /**< DMA Memory */
-} MemType;
 
 /**
  * @brief Enumerates image blending types.
@@ -280,16 +269,6 @@ typedef struct {
     uint8_t gAlpha;       /**< Global alpha value, ranging from 0 to 255 */
 } LayerAlpha;
 
-/**
- * @brief Defines the memory buffer, such as virtual and physical memory addresses.
- *
- */
-typedef struct {
-    BufferHandle hdl;     /**< Buffer handle */
-    MemType type;         /**< Type of the requested memory */
-    uint32_t size;        /**< Size of the requested memory */
-    void *virAddr;        /**< Virtual address of the requested memory */
-} GrallocBuffer;
 
 /**
  * @brief Defines buffer data of a layer, including the virtual and physical memory addresses.
@@ -457,7 +436,6 @@ typedef struct {
     uint32_t height;              /**< The height of the request allocation */
     uint64_t usage;               /**< The usage of the request allocation */
     PixelFormat format;           /**< The format of the request allocation */
-    MemType type;                 /**< The memory of the request allocation */
 } AllocInfo;
 /**
  * @brief Enumerates power status.
@@ -469,7 +447,7 @@ typedef enum {
     POWER_STATUS_SUSPEND,         /**< The power status is suspend */
     POWER_STATUS_OFF,             /**< The power status is off */
     POWER_STATUS_BUTT
-} PowerStatus;
+} DispPowerStatus;
 
 /**
  * @brief Enumerates composition type for special layer

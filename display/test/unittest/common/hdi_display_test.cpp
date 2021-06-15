@@ -92,18 +92,18 @@ HWTEST_F(HdiDisplayTest, GetDisplayInfoTest001, TestSize.Level1)
 }
 
 /**
-  * @tc.name: OpenLayerTest001
+  * @tc.name: CreateLayer001
   * @tc.desc: open layer test
   * @tc.type: FUNC
   * @tc.require: AR000F868K, AR000F868O
   */
-HWTEST_F(HdiDisplayTest, OpenLayerTest001, TestSize.Level1)
+HWTEST_F(HdiDisplayTest, CreateLayerTest001, TestSize.Level1)
 {
     int32_t ret;
 
-    ret = OpenLayerTest();
+    ret = CreateLayerTest();
     if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("%s: OpenLayerTest fail", __func__);
+        HDF_LOGE("%s: CreateLayerTest fail", __func__);
         ASSERT_TRUE(0);
     }
     EXPECT_EQ(0, ret);

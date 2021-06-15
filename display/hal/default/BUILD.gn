@@ -22,12 +22,11 @@ shared_library("display_layer") {
   include_dirs = [
     "//drivers/peripheral/display/hal",
     "//drivers/peripheral/display/interfaces/include",
-    "//third_party/bounds_checking_function/include",
-    "//drivers/framework/ability/sbuf/include",
+    "//drivers/adapter/uhdf/posix/include",
     "//drivers/framework/include/utils",
+    "//drivers/framework/ability/sbuf/include",
     "//drivers/framework/utils/include",
     "//drivers/framework/include/core",
-    "//drivers/framework/include/osal",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
   ]
   deps = [
@@ -53,10 +52,13 @@ shared_library("display_gralloc") {
   sources = [ "display_gralloc.c" ]
   include_dirs = [
     "//drivers/peripheral/display/hal",
+    "//drivers/drivers/peripheral/display/hal",
     "//drivers/peripheral/display/interfaces/include",
-    "//third_party/bounds_checking_function/include",
+    "//drivers/framework/include/utils",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+    "//drivers/adapter/uhdf/posix/include",
   ]
+
   deps = [
     "//drivers/adapter/uhdf/posix:hdf_posix_osal",
     "//third_party/bounds_checking_function:libsec_shared",
@@ -79,9 +81,11 @@ shared_library("display_gfx") {
   include_dirs = [
     "//drivers/peripheral/display/hal",
     "//drivers/peripheral/display/interfaces/include",
-    "//third_party/bounds_checking_function/include",
+    "//drivers/framework/include/utils",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+    "//drivers/adapter/uhdf/posix/include",
   ]
+
   deps = [
     "//drivers/adapter/uhdf/posix:hdf_posix_osal",
     "//third_party/bounds_checking_function:libsec_shared",

@@ -83,7 +83,7 @@ static void SetBackground(void)
     }
 }
 
-static int32_t OpenLayer(uint32_t devId, const LayerInfo *layerInfo, uint32_t *layerId)
+static int32_t CreateLayer(uint32_t devId, const LayerInfo *layerInfo, uint32_t *layerId)
 {
     if (layerInfo == NULL || layerId == NULL) {
         HDF_LOGE("%s: pointer is null", __func__);
@@ -238,7 +238,7 @@ int32_t LayerInitialize(LayerFuncs **funcs)
     lFuncs->InitDisplay = InitDisplay;
     lFuncs->DeinitDisplay = DeinitDisplay;
     lFuncs->GetDisplayInfo = GetDisplayInfo;
-    lFuncs->OpenLayer = OpenLayer;
+    lFuncs->CreateLayer = CreateLayer;
     lFuncs->CloseLayer = CloseLayer;
     lFuncs->Flush = Flush;
     lFuncs->GetLayerBuffer = GetLayerBuffer;

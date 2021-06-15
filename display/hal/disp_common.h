@@ -15,6 +15,7 @@
 
 #ifndef DISP_COMMON_H
 #define DISP_COMMON_H
+#include <stdint.h>
 #include "hdf_log.h"
 
 #ifdef HDF_LOG_TAG
@@ -35,6 +36,22 @@
         return; \
     } \
 } while (0)
+
+#define DISPLAY_CHK_RETURN(val, ret, ...) \
+    do { \
+        if (val) { \
+            __VA_ARGS__; \
+            return (ret); \
+        } \
+    } while (0)
+
+#define DISPLAY_CHK_RETURN_NOT_VALUE(val, ...) \
+    do { \
+        if (val) { \
+            __VA_ARGS__; \
+            return; \
+        } \
+    } while (0)
 
 enum LayerId {
     GRA_LAYER_0,

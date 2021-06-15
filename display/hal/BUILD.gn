@@ -40,6 +40,7 @@ if (defined(ohos_lite)) {
       ":hdi_display_gralloc",
       ":hdi_display_layer",
     ]
+    public_configs = [ ":display_hdi_public_config" ]
   }
 
   group("hdi_display_device") {

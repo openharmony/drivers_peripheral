@@ -20,16 +20,15 @@
 #include "loadbmp_test.h"
 
 DisplayTest g_displayTest;
-static GrallocBuffer g_buffer;
+static BufferHandle* g_buffer;
 
-static int32_t LoadBmp(const int8_t *fileName, GrallocBuffer *buffer)
+static int32_t LoadBmp(const int8_t *fileName, BufferHandle **buffer)
 {
     int32_t ret;
     uint8_t *pBuf = NULL;
     OsdSurface surface;
     OsdBitMapFileHeader bmpFileHeader = {0};
     OsdBitMapInfo bmpInfo = {0};
-    const int32_t bytesPerPix = LAYER_BPP / BITS_PER_BYTE;
 
     if (fileName == NULL) {
         HDF_LOGE("%s: fileName is null", __func__);
@@ -39,20 +38,24 @@ static int32_t LoadBmp(const int8_t *fileName, GrallocBuffer *buffer)
         HDF_LOGE("%s: GetBmpInfo err", __func__);
         return DISPLAY_FAILURE;
     }
-    buffer->size = bytesPerPix * (bmpInfo.header.width + 1) * (bmpInfo.header.height + 1);
-    buffer->type = NORMAL_MEM;
+    AllocInfo info = {
+        .width = bmpInfo.header.width + 1,
+        .height = bmpInfo.header.height + 1,
+        .format = PIXEL_FMT_RGBA_8888,
+        .usage =  HBM_USE_MEM_MMZ
+    };
     // alloc picture buffer
     if (g_displayTest.grallocFuncs->AllocMem != NULL) {
-        ret = g_displayTest.grallocFuncs->AllocMem(buffer);
+        ret = g_displayTest.grallocFuncs->AllocMem(&info, buffer);
         if (ret != DISPLAY_SUCCESS) {
             HDF_LOGE("%s: pictureBuf alloc failure", __func__);
             return DISPLAY_FAILURE;
         }
     }
     // load bmp picture
-    pBuf = (uint8_t *)buffer->virAddr;
+    pBuf = (uint8_t *)(*buffer)->virAddr;
     surface.colorFmt = OSD_COLOR_FMT_RGB1555;
-    CreateSurfaceByBitMap(fileName, &surface, pBuf, buffer->size);
+    CreateSurfaceByBitMap(fileName, &surface, pBuf, (*buffer)->size);
     return DISPLAY_SUCCESS;
 }
 
@@ -190,7 +193,7 @@ int32_t GetDisplayInfoTest(void)
     return DISPLAY_SUCCESS;
 }
 
-int32_t OpenLayerTest(void)
+int32_t CreateLayerTest(void)
 {
     int32_t ret;
     LayerInfo layInfo;
@@ -198,10 +201,10 @@ int32_t OpenLayerTest(void)
     g_displayTest.devId = 0;
     // create layer
     GetLayerInfo(&layInfo);
-    if (g_displayTest.layerFuncs->OpenLayer != NULL) {
-        ret = g_displayTest.layerFuncs->OpenLayer(g_displayTest.devId, &layInfo, &g_displayTest.layerId);
+    if (g_displayTest.layerFuncs->CreateLayer != NULL) {
+        ret = g_displayTest.layerFuncs->CreateLayer(g_displayTest.devId, &layInfo, &g_displayTest.layerId);
         if (ret != DISPLAY_SUCCESS) {
-            HDF_LOGE("%s: OpenLayer fail", __func__);
+            HDF_LOGE("%s: CreateLayer fail", __func__);
             return DISPLAY_FAILURE;
         }
     }
@@ -319,7 +322,7 @@ int32_t BlitTest(void)
     int32_t ret;
     ISurface srcSurface = {0};
     ISurface dstSurface = {0};
-    GrallocBuffer pictureBuf;
+    BufferHandle* pictureBuf = NULL;
     int32_t layerBufSize = g_displayTest.displayInfo.width * g_displayTest.displayInfo.height * PIXEL_BYTE;
 
     // clean the layer buffer
@@ -332,7 +335,7 @@ int32_t BlitTest(void)
     }
     // use picture buffer to create source surface
     IRect srcRect = {0, 0, SAMPLE_IMAGE_WIDTH, SAMPLE_IMAGE_HEIGHT};
-    PicSourceSurfaceInit(&srcSurface, pictureBuf.hdl.phyAddr, LAYER_BPP);
+    PicSourceSurfaceInit(&srcSurface, pictureBuf->phyAddr, LAYER_BPP);
     // use layer buffer to create dest surface
     IRect dstRect = srcRect;
     DestSurfaceInit(&dstSurface, g_displayTest.buffer.data.phyAddr, LAYER_BPP);
@@ -349,7 +352,7 @@ int32_t BlitTest(void)
 EXIT:
     /* free picture buffer */
     if (g_displayTest.grallocFuncs->FreeMem != NULL) {
-        g_displayTest.grallocFuncs->FreeMem(&pictureBuf);
+        g_displayTest.grallocFuncs->FreeMem(pictureBuf);
     }
     return ret;
 }
@@ -382,12 +385,14 @@ int32_t AllocMemTest1(void)
 {
     int32_t ret = DISPLAY_FAILURE;
 
-    (void)memset_s(&g_buffer, sizeof(GrallocBuffer), 0, sizeof(GrallocBuffer));
-    g_buffer.type = NORMAL_MEM;
-    g_buffer.size = SAMPLE_IMAGE_WIDTH * SAMPLE_IMAGE_HEIGHT * LAYER_BPP / BITS_PER_BYTE;
-
+    AllocInfo info = {
+        .width = SAMPLE_IMAGE_WIDTH,
+        .height = SAMPLE_IMAGE_HEIGHT,
+        .format = PIXEL_FMT_RGBA_8888,
+        .usage =  HBM_USE_MEM_MMZ
+    };
     if (g_displayTest.grallocFuncs->AllocMem != NULL) {
-        ret = g_displayTest.grallocFuncs->AllocMem(&g_buffer);
+        ret = g_displayTest.grallocFuncs->AllocMem(&info, &g_buffer);
     }
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%s: normal memory allocMem failed", __func__);
@@ -400,12 +405,15 @@ int32_t MmapCacheTest(void)
 {
     int32_t ret = DISPLAY_FAILURE;
     void *mapCacheAddr = NULL;
+    AllocInfo info = {
+        .width = SAMPLE_RECT_WIDTH,
+        .height = SAMPLE_RECT_HEIGHT,
+        .format = PIXEL_FMT_RGBA_8888,
+        .usage =  HBM_USE_MEM_MMZ_CACHE
+    };
 
-    (void)memset_s(&g_buffer, sizeof(GrallocBuffer), 0, sizeof(GrallocBuffer));
-    g_buffer.type = NORMAL_MEM;
-    g_buffer.size = SAMPLE_RECT_WIDTH * SAMPLE_RECT_HEIGHT * PIXEL_BYTE;
     if (g_displayTest.grallocFuncs->AllocMem != NULL) {
-        ret = g_displayTest.grallocFuncs->AllocMem(&g_buffer);
+        ret = g_displayTest.grallocFuncs->AllocMem(&info, &g_buffer);
     }
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%s: normal memory allocMem failed", __func__);
@@ -413,7 +421,7 @@ int32_t MmapCacheTest(void)
     }
 
     if (g_displayTest.grallocFuncs->MmapCache != NULL) {
-        mapCacheAddr = g_displayTest.grallocFuncs->MmapCache(&g_buffer);
+        mapCacheAddr = g_displayTest.grallocFuncs->MmapCache(g_buffer);
         if (mapCacheAddr == NULL) {
             return DISPLAY_FAILURE;
         }
@@ -424,7 +432,7 @@ int32_t MmapCacheTest(void)
 int32_t FreeMemTest(void)
 {
     if (g_displayTest.grallocFuncs->FreeMem != NULL) {
-        g_displayTest.grallocFuncs->FreeMem(&g_buffer);
+        g_displayTest.grallocFuncs->FreeMem(g_buffer);
     }
     return DISPLAY_SUCCESS;
 }
@@ -432,12 +440,15 @@ int32_t FreeMemTest(void)
 int32_t AllocMemTest2(void)
 {
     int32_t ret = DISPLAY_FAILURE;
+    AllocInfo info = {
+        .width = SAMPLE_IMAGE_WIDTH,
+        .height = SAMPLE_IMAGE_HEIGHT,
+        .format = PIXEL_FMT_RGBA_8888,
+        .usage =  HBM_USE_MEM_MMZ
+    };
 
-    (void)memset_s(&g_buffer, sizeof(GrallocBuffer), 0, sizeof(GrallocBuffer));
-    g_buffer.type = CACHE_MEM;
-    g_buffer.size = SAMPLE_IMAGE_WIDTH * SAMPLE_IMAGE_HEIGHT * LAYER_BPP / BITS_PER_BYTE;
     if (g_displayTest.grallocFuncs->AllocMem != NULL) {
-        ret = g_displayTest.grallocFuncs->AllocMem(&g_buffer);
+        ret = g_displayTest.grallocFuncs->AllocMem(&info, &g_buffer);
     }
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%s: cache memory allocMem failed", __func__);
@@ -452,7 +463,7 @@ int32_t FlushMCacheTest(void)
     int32_t ret;
 
     if (g_displayTest.grallocFuncs->FlushMCache != NULL) {
-        ret = g_displayTest.grallocFuncs->FlushMCache(&g_buffer);
+        ret = g_displayTest.grallocFuncs->FlushMCache(g_buffer);
         if (ret != DISPLAY_SUCCESS) {
             return ret;
         }
