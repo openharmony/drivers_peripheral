@@ -78,8 +78,8 @@ int32_t CodecDeinit();
  *
  * @param index Indicates the index of the capabilities.
  * @param cap Indicates the pointer to the capabilities.
- * @return Returns <b>CODEC_SUCCESS</b> if the capabilities corresponding to the index are available;
- * returns <b>CODEC_END</b> otherwise.
+ * @return Returns <b>0</b> if the capabilities corresponding to the index are available;
+ * returns <b>-1</b> otherwise.
  */
 int32_t CodecEnumerateCapbility(uint32_t index, CodecCapbility *cap);
 
