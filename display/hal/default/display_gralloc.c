@@ -30,6 +30,7 @@
 #define SHM_MAX_KEY                      10000
 #define SHM_START_KEY                    1
 #define INVALID_SHMID -1
+#define BITS_PER_BYTE 8
 
 #define DIV_ROUND_UP(n, d) (((n) + (d)-1) / (d))
 #define ALIGN_UP(x, a) ((((x) + ((a)-1)) / (a)) * (a))
@@ -69,6 +70,7 @@ static const FormatInfo *GetFormatInfo(uint32_t format)
         {PIXEL_FMT_RGBX_8888,  32, NULL},  {PIXEL_FMT_RGBA_8888, 32,  NULL},
         {PIXEL_FMT_BGRX_8888,  32, NULL},  {PIXEL_FMT_BGRA_8888, 32,  NULL},
         {PIXEL_FMT_RGB_888,    24, NULL},  {PIXEL_FMT_BGR_565,   16,  NULL},
+        {PIXEL_FMT_RGBA_5551,  16, NULL},  {PIXEL_FMT_RGB_565,   16,  NULL},
         {PIXEL_FMT_BGRX_4444,  16, NULL},  {PIXEL_FMT_BGRA_4444, 16,  NULL},
         {PIXEL_FMT_RGBA_4444,  16, NULL},  {PIXEL_FMT_RGBX_4444, 16,  NULL},
         {PIXEL_FMT_BGRX_5551,  16, NULL},  {PIXEL_FMT_BGRA_5551, 16,  NULL},
@@ -85,7 +87,7 @@ static const FormatInfo *GetFormatInfo(uint32_t format)
     return NULL;
 }
 
-static uint32_t AdjustStrideFromFormat(uint32_t format, uint32_t height)
+static uint32_t AdjustStrideFromFormat(uint32_t format, uint32_t width)
 {
     const FormatInfo *fmtInfo = GetFormatInfo(format);
     if ((fmtInfo != NULL) && (fmtInfo->planes != NULL)) {
@@ -94,25 +96,26 @@ static uint32_t AdjustStrideFromFormat(uint32_t format, uint32_t height)
             sum += fmtInfo->planes->radio[i];
         }
         if (sum > 0) {
-            height = DIV_ROUND_UP((height * sum), fmtInfo->planes->radio[0]);
+            width = DIV_ROUND_UP((width * sum), fmtInfo->planes->radio[0]);
         }
-        HDF_LOGD("height adjust to : %d", height);
     }
-    return height;
+    return width;
 }
 
 static int32_t InitBufferHandle(PriBufferHandle* buffer, const AllocInfo* info)
 {
     int32_t size;
+    int32_t stride;
     int32_t h = ALIGN_UP(info->height, HEIGHT_ALIGN);
-    int32_t stride = ALIGN_UP(AdjustStrideFromFormat(info->format, info->width), WIDTH_ALIGN);
     const FormatInfo *fmtInfo = GetFormatInfo(info->format);
     if (fmtInfo == NULL) {
         HDF_LOGE("can not get format information : %d", buffer->hdl.format);
         return DISPLAY_FAILURE;
     }
-    size = h * stride * fmtInfo->bitsPerPixel;
-    HDF_LOGD(" the size : %d", size);
+
+    stride = ALIGN_UP(AdjustStrideFromFormat(info->format, info->width), WIDTH_ALIGN) *
+        fmtInfo->bitsPerPixel / BITS_PER_BYTE;
+    size = h * stride;
     buffer->hdl.width = info->width;
     buffer->hdl.stride = stride;
     buffer->hdl.height = info->height;
@@ -152,7 +155,6 @@ static int32_t AllocShm(BufferHandle *buffer)
     buffer->virAddr = pBase;
     buffer->key = key;
     ((PriBufferHandle*)buffer)->shmid = shmid;
-    HDF_LOGI("%s: Alloc shared memory succeed", __func__);
     key++;
     if (key >= SHM_MAX_KEY) {
         key = SHM_START_KEY;
