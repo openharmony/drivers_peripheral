@@ -172,7 +172,7 @@ static int32_t AllocMem(const AllocInfo* info, BufferHandle **buffer)
         __func__, errno));
     ret = InitBufferHandle(priBuffer, info);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, HDF_LOGE("%s: can not init buffe handle",
-        __func__); goto out);
+        __func__); goto OUT);
 
     BufferHandle *bufferHdl = &priBuffer->hdl;
     DISPLAY_CHK_RETURN(((bufferHdl->size > MAX_MALLOC_SIZE) || (bufferHdl->size == 0)),
@@ -185,7 +185,7 @@ static int32_t AllocMem(const AllocInfo* info, BufferHandle **buffer)
         ret = DISPLAY_NOT_SUPPORT;
     }
 
-out:
+OUT:
     if ((ret != DISPLAY_SUCCESS) && (bufferHdl != NULL)) {
         free(bufferHdl);
         bufferHdl = NULL;
