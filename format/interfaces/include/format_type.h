@@ -60,6 +60,14 @@ extern "C" {
 #define FORMAT_INVALID_PROGRAM_ID -1 /**< Indicates an invalid program ID. */
 
 /**
+ * @brief define FormatHandle type.
+ *
+ * @since 1.0
+ * @version 1.0
+ */
+typedef void* FormatHandle;
+
+/**
  * @brief Enumerates data frame types.
  *
  * @since 1.0
@@ -103,6 +111,7 @@ typedef enum {
     CODEC_G711U,    /**< G711u */
     CODEC_PCM,      /**< PCM */
     CODEC_MP3,      /**< MP3 */
+    CODEC_G726,     /**< G726 */
     CODEC_BUT,      /**< Undefined format */
 } CodecFormat;
 
@@ -467,6 +476,7 @@ typedef enum {
     MUXER_INFO_NEXT_OUTPUT_FILE_STARTED,     /**< The capturing started for the next output file. */
     MUXER_INFO_FILE_SPLIT_FINISHED,          /**< Manual file split is completed. */
     MUXER_INFO_FILE_START_TIME_MS,           /**< Start time of the captured file */
+    MUXER_INFO_NEXT_FILE_FD_NOT_SET,         /**< Next file fd is needed but not set */
 
     DEMUXER_INFO_PREPARED = 10000,           /**< The prepare function is asynchronously executed. This information
                                               * is reported after the execution is complete.
@@ -485,7 +495,12 @@ typedef enum {
  * @version 1.0
  */
 typedef enum {
-    ERROR_UNKNOWN = 0 /** Unknown error */
+    ERROR_CREATE_FILE_FAIL = 0, /** Create file failed */
+    ERROR_WRITE_FILE_FAIL, /** Write file failed */
+	ERROR_CLOSE_FILE_FAIL, /** Close file failed */
+	ERROR_READ_DATA_ERROR, /** Read date failed */
+	ERROR_INTERNAL_OPERATION_FAIL, /** Recoder internal operation failed, must stop recoder */
+    ERROR_UNKNOWN /** Unknown error */
 } FormatErrorType;
 
 /**

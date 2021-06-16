@@ -135,6 +135,9 @@ enum AudioFormat {
     AUDIO_FORMAT_AAC_ELD    = 0x1000004u, /**< AAC ELD */
     AUDIO_FORMAT_AAC_HE_V1  = 0x1000005u, /**< AAC HE_V1 */
     AUDIO_FORMAT_AAC_HE_V2  = 0x1000006u, /**< AAC HE_V2 */
+    AUDIO_FORMAT_G711A      = 0x2000001u, /**< G711A */
+    AUDIO_FORMAT_G711U      = 0x2000002u, /**< G711u */
+    AUDIO_FORMAT_G726       = 0x2000003u, /**< G726 */
 };
 
 /**

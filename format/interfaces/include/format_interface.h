@@ -84,7 +84,7 @@ void FormatDeInit(void);
  * @param handle Indicates the double pointer to the demuxer context handle.
  * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
  */
-int32_t FormatDemuxerCreate(const FormatSource *source, void **handle);
+int32_t FormatDemuxerCreate(const FormatSource *source, FormatHandle * const handle);
 
 /**
  * @brief Sets demuxer attributes.
@@ -103,7 +103,7 @@ int32_t FormatDemuxerCreate(const FormatSource *source, void **handle);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerSetParameter(const void *handle, int32_t trackId,
+int32_t FormatDemuxerSetParameter(const FormatHandle handle, int32_t trackId,
     const ParameterItem *metaData, int32_t metaDataCnt);
 
 /**
@@ -123,7 +123,7 @@ int32_t FormatDemuxerSetParameter(const void *handle, int32_t trackId,
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerGetParameter(const void *handle, int32_t trackId, ParameterItem *metaData);
+int32_t FormatDemuxerGetParameter(const FormatHandle handle, int32_t trackId, ParameterItem *metaData);
 
 /**
  * @brief Sets a callback for the demuxer.
@@ -136,7 +136,7 @@ int32_t FormatDemuxerGetParameter(const void *handle, int32_t trackId, Parameter
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerSetCallBack(void *handle, const FormatCallback *callBack);
+int32_t FormatDemuxerSetCallBack(const FormatHandle handle, const FormatCallback *callBack);
 
 /**
  * @brief Sets buffer information for the demuxer.
@@ -151,7 +151,7 @@ int32_t FormatDemuxerSetCallBack(void *handle, const FormatCallback *callBack);
  * as defined in {@link FormatBufferSetting}.
  * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
  */
-int32_t FormatDemuxerSetBufferConfig(void *handle, const FormatBufferSetting *setting);
+int32_t FormatDemuxerSetBufferConfig(const FormatHandle handle, const FormatBufferSetting *setting);
 
 /**
  * @brief Obtains the buffer information of the demuxer.
@@ -165,7 +165,7 @@ int32_t FormatDemuxerSetBufferConfig(void *handle, const FormatBufferSetting *se
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerGetBufferConfig(const void *handle, FormatBufferSetting *setting);
+int32_t FormatDemuxerGetBufferConfig(const FormatHandle handle, FormatBufferSetting *setting);
 
 /**
  * @brief Makes preparations for the demuxer.
@@ -178,7 +178,7 @@ int32_t FormatDemuxerGetBufferConfig(const void *handle, FormatBufferSetting *se
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerPrepare(void *handle);
+int32_t FormatDemuxerPrepare(const FormatHandle handle);
 
 /**
  * @brief Obtains the attributes of a media file.
@@ -192,7 +192,7 @@ int32_t FormatDemuxerPrepare(void *handle);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerGetFileInfo(void *handle, FileInfo *info);
+int32_t FormatDemuxerGetFileInfo(const FormatHandle handle, FileInfo *info);
 
 /**
  * @brief Selects a specified media track.
@@ -210,7 +210,7 @@ int32_t FormatDemuxerGetFileInfo(void *handle, FileInfo *info);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerSelectTrack(const void *handle, int32_t programId, int32_t trackId);
+int32_t FormatDemuxerSelectTrack(const FormatHandle handle, int32_t programId, int32_t trackId);
 
 /**
  * @brief Unselects a specified media track from which the demuxer reads data frames.
@@ -229,7 +229,7 @@ int32_t FormatDemuxerSelectTrack(const void *handle, int32_t programId, int32_t 
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerUnselectTrack(const void *handle, int32_t programId, int32_t trackId);
+int32_t FormatDemuxerUnselectTrack(const FormatHandle handle, int32_t programId, int32_t trackId);
 
 /**
  * @brief Starts the demuxer.
@@ -242,7 +242,7 @@ int32_t FormatDemuxerUnselectTrack(const void *handle, int32_t programId, int32_
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerStart(void *handle);
+int32_t FormatDemuxerStart(const FormatHandle handle);
 
 /**
  * @brief Obtains the ID of the media track selected by the demuxer for output.
@@ -261,7 +261,7 @@ int32_t FormatDemuxerStart(void *handle);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerGetSelectedTrack(const void *handle, int32_t *programId, int32_t trackId[], int32_t *nums);
+int32_t FormatDemuxerGetSelectedTrack(const FormatHandle handle, int32_t *programId, int32_t trackId[], int32_t *nums);
 
 /**
  * @brief Reads data frames.
@@ -277,7 +277,7 @@ int32_t FormatDemuxerGetSelectedTrack(const void *handle, int32_t *programId, in
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerReadFrame(const void *handle, FormatFrame *frame, int32_t timeOutMs);
+int32_t FormatDemuxerReadFrame(const FormatHandle handle, FormatFrame *frame, int32_t timeOutMs);
 
 /**
  * @brief Frees data frames.
@@ -290,7 +290,7 @@ int32_t FormatDemuxerReadFrame(const void *handle, FormatFrame *frame, int32_t t
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerFreeFrame(void *handle, FormatFrame *frame);
+int32_t FormatDemuxerFreeFrame(const FormatHandle handle, FormatFrame *frame);
 
 /**
  * @brief Seeks for a specified position for the demuxer.
@@ -306,7 +306,7 @@ int32_t FormatDemuxerFreeFrame(void *handle, FormatFrame *frame);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerSeek(const void *handle, int32_t streamIndex, int64_t timeStampUs, FormatSeekMode mode);
+int32_t FormatDemuxerSeek(const FormatHandle handle, int32_t streamIndex, int64_t timeStampUs, FormatSeekMode mode);
 
 /**
  * @brief Stops the demuxer from working.
@@ -318,7 +318,7 @@ int32_t FormatDemuxerSeek(const void *handle, int32_t streamIndex, int64_t timeS
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerStop(void *handle);
+int32_t FormatDemuxerStop(const FormatHandle handle);
 
 /**
  * @brief Destroys demuxer resources.
@@ -331,7 +331,7 @@ int32_t FormatDemuxerStop(void *handle);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatDemuxerDestroy(void *handle);
+int32_t FormatDemuxerDestroy(const FormatHandle handle);
 
 /**
  * @brief Creates a muxer and returns its context handle.
@@ -343,7 +343,7 @@ int32_t FormatDemuxerDestroy(void *handle);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerCreate(void **handle, FormatOutputConfig *outputConfig);
+int32_t FormatMuxerCreate(FormatHandle * const handle, const FormatOutputConfig *outputConfig);
 
 /**
  * @brief Destroys a muxer and releases its resources created by calling {@link FormatMuxerCreate}.
@@ -353,7 +353,7 @@ int32_t FormatMuxerCreate(void **handle, FormatOutputConfig *outputConfig);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerDestroy(const void *handle);
+int32_t FormatMuxerDestroy(const FormatHandle handle);
 
 /**
  * @brief Adds a media track source for the muxer. For details about track sources, see {@link TrackSource}.
@@ -367,7 +367,7 @@ int32_t FormatMuxerDestroy(const void *handle);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerAddTrack(void *handle, const TrackSource *trackSource);
+int32_t FormatMuxerAddTrack(const FormatHandle handle, const TrackSource *trackSource);
 
 /**
  * @brief Sets a callback for the muxer. For details about the callback, see {@link FormatCallback}.
@@ -380,7 +380,7 @@ int32_t FormatMuxerAddTrack(void *handle, const TrackSource *trackSource);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerSetCallBack(void *handle, const FormatCallback *callBack);
+int32_t FormatMuxerSetCallBack(const FormatHandle handle, const FormatCallback *callBack);
 
 /**
  * @brief Sets the orientation of the video track for the muxer.
@@ -394,7 +394,7 @@ int32_t FormatMuxerSetCallBack(void *handle, const FormatCallback *callBack);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerSetOrientation(void *handle, int degrees);
+int32_t FormatMuxerSetOrientation(const FormatHandle handle, int degrees);
 
 /**
  * @brief Sets the geographical information for the output file of the muxer.
@@ -408,7 +408,7 @@ int32_t FormatMuxerSetOrientation(void *handle, int degrees);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerSetLocation(const void *handle, int latitude, int longitude);
+int32_t FormatMuxerSetLocation(const FormatHandle handle, int latitude, int longitude);
 
 /**
  * @brief Sets the maximum size (in bytes) for the output file of the muxer.
@@ -423,7 +423,7 @@ int32_t FormatMuxerSetLocation(const void *handle, int latitude, int longitude);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerSetMaxFileSize(void *handle, int64_t bytes);
+int32_t FormatMuxerSetMaxFileSize(const FormatHandle handle, int64_t bytes);
 
 /**
  * @brief Sets the maximum duration (in seconds) for the output file.
@@ -442,7 +442,7 @@ int32_t FormatMuxerSetMaxFileSize(void *handle, int64_t bytes);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerSetMaxFileDuration(void *handle, int64_t durationUs);
+int32_t FormatMuxerSetMaxFileDuration(const FormatHandle handle, int64_t durationUs);
 
 /**
  * @brief Manually splits a file.
@@ -461,7 +461,7 @@ int32_t FormatMuxerSetMaxFileDuration(void *handle, int64_t durationUs);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerSetFileSplitDuration(const void *handle, ManualSplitType type,
+int32_t FormatMuxerSetFileSplitDuration(const FormatHandle handle, ManualSplitType type,
                                         int64_t timestampUs, uint32_t durationUs);
 
 /**
@@ -475,7 +475,7 @@ int32_t FormatMuxerSetFileSplitDuration(const void *handle, ManualSplitType type
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerStart(void *handle);
+int32_t FormatMuxerStart(FormatHandle handle);
 
 /**
  * @brief Writes data frames into the muxer.
@@ -488,7 +488,7 @@ int32_t FormatMuxerStart(void *handle);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerWriteFrame(const void *handle, const FormatFrame *frameData);
+int32_t FormatMuxerWriteFrame(const FormatHandle handle, const FormatFrame *frameData);
 
 /**
  * @brief Sets the descriptor for the next output file.
@@ -503,7 +503,7 @@ int32_t FormatMuxerWriteFrame(const void *handle, const FormatFrame *frameData);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerSetNextOutputFile(const void *handle, int32_t fd);
+int32_t FormatMuxerSetNextOutputFile(const FormatHandle handle, int32_t fd);
 
 /**
  * @brief Stops the muxer that was started by calling {@link FormatMuxerStart}.
@@ -516,7 +516,7 @@ int32_t FormatMuxerSetNextOutputFile(const void *handle, int32_t fd);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerStop(const void *handle, bool block);
+int32_t FormatMuxerStop(const FormatHandle handle, bool block);
 
 /**
  * @brief Sets muxer attributes.
@@ -533,7 +533,8 @@ int32_t FormatMuxerStop(const void *handle, bool block);
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerSetParameter(void *handle, int32_t trackId, const ParameterItem *item, int32_t itemNum);
+int32_t FormatMuxerSetParameter(const FormatHandle handle, int32_t trackId, const ParameterItem *item,
+    int32_t itemNum);
 
 /**
  * @brief Obtains muxer attributes.
@@ -552,7 +553,7 @@ int32_t FormatMuxerSetParameter(void *handle, int32_t trackId, const ParameterIt
  * @since 1.0
  * @version 1.0
  */
-int32_t FormatMuxerGetParameter(void *handle, int32_t trackId, ParameterItem *item, int32_t itemNum);
+int32_t FormatMuxerGetParameter(const FormatHandle handle, int32_t trackId, ParameterItem *item, int32_t itemNum);
 
 #ifdef __cplusplus
 #if __cplusplus
