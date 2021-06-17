@@ -497,9 +497,9 @@ typedef enum {
 typedef enum {
     ERROR_CREATE_FILE_FAIL = 0, /** Create file failed */
     ERROR_WRITE_FILE_FAIL, /** Write file failed */
-	ERROR_CLOSE_FILE_FAIL, /** Close file failed */
-	ERROR_READ_DATA_ERROR, /** Read date failed */
-	ERROR_INTERNAL_OPERATION_FAIL, /** Recoder internal operation failed, must stop recoder */
+    ERROR_CLOSE_FILE_FAIL, /** Close file failed */
+    ERROR_READ_DATA_ERROR, /** Read date failed */
+    ERROR_INTERNAL_OPERATION_FAIL, /** Recoder internal operation failed, must stop recoder */
     ERROR_UNKNOWN /** Unknown error */
 } FormatErrorType;
 

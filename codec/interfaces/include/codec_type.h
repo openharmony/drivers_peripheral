@@ -213,23 +213,23 @@ typedef enum {
  * @brief Enumerates audio bit rates.
  */
 typedef enum {
-    AUD_BPS_8K      = 8000,    /**< 8 kbit/s */
-    AUD_BPS_16K     = 16000,   /**< 16 kbit/s */
-    AUD_BPS_22K     = 22000,   /**< 22 kbit/s */
-    AUD_BPS_24K     = 24000,   /**< 24 kbit/s */
-    AUD_BPS_32K     = 32000,   /**< 32 kbit/s */
-    AUD_BPS_40K     = 40000,   /**< 40 kbit/s */
-    AUD_BPS_48K     = 48000,   /**< 48 kbit/s */
-    AUD_BPS_64K     = 64000,   /**< 64 kbit/s */
-    AUD_BPS_96K     = 96000,   /**< 96 kbit/s */
-    AUD_BPS_128K    = 128000,  /**< 128 kbit/s */
-    AUD_BPS_132K    = 132000,  /**< 132 kbit/s */
-    AUD_BPS_144K    = 144000,  /**< 144 kbit/s */
-    AUD_BPS_192K    = 192000,  /**< 192 kbit/s */
-    AUD_BPS_256K    = 256000,  /**< 256 kbit/s */
-    AUD_BPS_265K    = 265000,  /**< 265 kbit/s */
-    AUD_BPS_288K    = 288000,  /**< 288 kbit/s */
-    AUD_BPS_320K    = 320000,  /**< 320 kbit/s */
+    AUD_BITRATE_8K      = 8000,    /**< 8 kbit/s */
+    AUD_BITRATE_16K     = 16000,   /**< 16 kbit/s */
+    AUD_BITRATE_22K     = 22000,   /**< 22 kbit/s */
+    AUD_BITRATE_24K     = 24000,   /**< 24 kbit/s */
+    AUD_BITRATE_32K     = 32000,   /**< 32 kbit/s */
+    AUD_BITRATE_40K     = 40000,   /**< 40 kbit/s */
+    AUD_BITRATE_48K     = 48000,   /**< 48 kbit/s */
+    AUD_BITRATE_64K     = 64000,   /**< 64 kbit/s */
+    AUD_BITRATE_96K     = 96000,   /**< 96 kbit/s */
+    AUD_BITRATE_128K    = 128000,  /**< 128 kbit/s */
+    AUD_BITRATE_132K    = 132000,  /**< 132 kbit/s */
+    AUD_BITRATE_144K    = 144000,  /**< 144 kbit/s */
+    AUD_BITRATE_192K    = 192000,  /**< 192 kbit/s */
+    AUD_BITRATE_256K    = 256000,  /**< 256 kbit/s */
+    AUD_BITRATE_265K    = 265000,  /**< 265 kbit/s */
+    AUD_BITRATE_288K    = 288000,  /**< 288 kbit/s */
+    AUD_BITRATE_320K    = 320000,  /**< 320 kbit/s */
 } AudioBitRate;
 
 /**

@@ -1,0 +1,6 @@
+Changes:
+ o add G711A/G711U/G726 codec format
+ o format interface, use FormatHandle instead of void *
+
+Bug fixes:
+ o fix the codestyle warning of codec and foramt
