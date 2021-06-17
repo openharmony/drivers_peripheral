@@ -13,16 +13,14 @@
  * limitations under the License.
  */
 
-#ifndef UTILS_INCLUDE_BUFFER_HANDLE_H
-#define UTILS_INCLUDE_BUFFER_HANDLE_H
+#ifndef INCLUDE_BUFFER_HANDLE_H
+#define INCLUDE_BUFFER_HANDLE_H
 
 #include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define BUFFER_HANDLE_MAX_RESERVE_INTS 64
-#define BUFFER_HANDLE_MAX_RESERVE_FDS 64
 
 typedef struct {
     int32_t fd;           /**< buffer fd, -1 if not supported */
@@ -40,30 +38,8 @@ typedef struct {
     int32_t reserve[0];   /**< the data */
 } BufferHandle;
 
-/**
-* @Description: Init buffer handle, and must be freeed by FreeBufferHandle to avoid memory leak
-* @param reserveInts The number of reserved integers
-* @param reserveFds The number of reserved fds
-* @return Returns pointer to buffer handle if the operation is successful; returns <b>nullptr</b> otherwise.
-*/
-BufferHandle* AllocateBufferHandle(uint32_t reserveInts, uint32_t reserveFds);
-
-/**
-* @Description: Free buffer handle allocated by AllocateBufferHandle, and close the fd at the same time.
-* @param handle Buffer handle which is to be freed.
-* @return  Returns <b>0</b> if the operation is successful; returns <b>-1</b> if failed
-*/
-int32_t FreeBufferHandle(BufferHandle* handle);
-
-/**
-* @Description: clone a new buffer handle based on given buffer handle
-* @param handle Buffer handle which is to be cloned.
-* @return  Returns pointer to buffer handle if the operation is successful; returns <b>nullptr</b> otherwise.
-*/
-BufferHandle* CloneBufferHandle(const BufferHandle* handle);
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif // UTILS_INCLUDE_BUFFER_HANDLE_H
+#endif // INCLUDE_BUFFER_HANDLE_H
