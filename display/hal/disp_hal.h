@@ -16,6 +16,7 @@
 #ifndef DISP_HAL_H
 #define DISP_HAL_H
 #include "disp_common.h"
+#include "display_type.h"
 
 #define DISP_SERVICE_NAME    "hdf_disp"
 
@@ -27,14 +28,6 @@ enum DispCmd {
     DISP_CMD_GET_BACKLIGHT,
 };
 
-typedef enum {
-    POWER_STATUS_ON,
-    POWER_STATUS_STANDBY,
-    POWER_STATUS_SUSPEND,
-    POWER_STATUS_OFF,
-    POWER_STATUS_BUTT
-} PowerStatus;
-
 struct DispPara {
     uint32_t devId;
     void *par;
@@ -42,19 +35,12 @@ struct DispPara {
 };
 
 typedef struct {
-    int32_t (*SetPowerStatus)(uint32_t devId, PowerStatus pStatus);
-    int32_t (*GetPowerStatus)(uint32_t devId, PowerStatus *pStatus);
+    int32_t (*SetPowerStatus)(uint32_t devId, DispPowerStatus pStatus);
+    int32_t (*GetPowerStatus)(uint32_t devId, DispPowerStatus *pStatus);
     int32_t (*SetBacklight)(uint32_t devId, uint32_t level);
     int32_t (*GetBacklight)(uint32_t devId, uint32_t *level);
     int32_t (*GetInfo)(uint32_t devId, struct DispInfo *info);
 } HalFuncs;
 
 HalFuncs *GetHalFuncs(void);
-
-int32_t DispInit(uint32_t devId);
-int32_t DispOn(uint32_t devId);
-int32_t DispOff(uint32_t devId);
-int32_t SetBacklight(uint32_t devId, uint32_t level);
-int32_t DispGetInfo(uint32_t devId, struct DispInfo *info);
-
 #endif /* DISP_HAL_H */

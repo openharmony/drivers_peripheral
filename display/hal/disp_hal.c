@@ -167,12 +167,12 @@ EXIT:
     return DISPLAY_FAILURE;
 }
 
-static int32_t SetPowerStatus(uint32_t devId,  PowerStatus pStatus)
+static int32_t SetPowerStatus(uint32_t devId,  DispPowerStatus status)
 {
-    return DispEventProcess(devId, DISP_CMD_SET_POWERSTATUS, pStatus);
+    return DispEventProcess(devId, DISP_CMD_SET_POWERSTATUS, status);
 }
 
-static int32_t GetPowerStatus(uint32_t devId,  PowerStatus *pStatus)
+static int32_t GetPowerStatus(uint32_t devId,  DispPowerStatus *pStatus)
 {
     return DispGetParaProcess(devId, DISP_CMD_GET_POWERSTATUS, pStatus);
 }
@@ -205,25 +205,4 @@ HalFuncs *GetHalFuncs(void)
         hFuncs->GetInfo = GetInfo;
     }
     return hFuncs;
-}
-
-int32_t DispInit(uint32_t devId)
-{
-    HDF_LOGI("%s: driver has inited", __func__);
-    return DISPLAY_SUCCESS;
-}
-
-int32_t DispOn(uint32_t devId)
-{
-    return SetPowerStatus(devId, POWER_STATUS_ON);
-}
-
-int32_t DispOff(uint32_t devId)
-{
-    return SetPowerStatus(devId, POWER_STATUS_OFF);
-}
-
-int32_t DispGetInfo(uint32_t devId, struct DispInfo *info)
-{
-    return GetInfo(devId, info);
 }

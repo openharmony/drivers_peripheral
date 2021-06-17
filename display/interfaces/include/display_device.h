@@ -62,7 +62,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*SetDisplayPowerStatus)(uint32_t devId, PowerStatus status);
+    int32_t (*SetDisplayPowerStatus)(uint32_t devId, DispPowerStatus status);
 
     /**
      * @brief Obtains the power status.
@@ -78,7 +78,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*GetDisplayPowerStatus)(uint32_t devId, PowerStatus *status);
+    int32_t (*GetDisplayPowerStatus)(uint32_t devId, DispPowerStatus *status);
 
     /**
      * @brief Sets the backlight level.

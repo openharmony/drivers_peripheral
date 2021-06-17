@@ -74,7 +74,7 @@ int32_t DisplayUninit(void);
 int32_t InitDisplayTest(void);
 int32_t DeinitDisplayTest(void);
 int32_t GetDisplayInfoTest(void);
-int32_t OpenLayerTest(void);
+int32_t CreateLayerTest(void);
 int32_t CloseLayerTest(void);
 int32_t SetLayerVisibleTest(void);
 int32_t SetLayerDirtyRegionTest(void);

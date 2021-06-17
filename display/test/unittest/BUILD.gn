@@ -29,7 +29,8 @@ unittest("hdf_peripheral_display_test") {
     "//drivers/framework/include",
     "//drivers/framework/test/unittest/include",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-    "//drivers/peripheral/display/interfaces_lite/include",
+    "//drivers/peripheral/base",
+    "//drivers/peripheral/display/interfaces/include",
   ]
 
   sources = [
