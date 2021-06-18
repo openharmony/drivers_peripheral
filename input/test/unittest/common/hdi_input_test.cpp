@@ -29,7 +29,8 @@
 using namespace testing::ext;
 
 IInputInterface *g_inputInterface;
-InputReportEventCb g_callback;
+InputEventCb g_callback;
+InputHostCb g_hotplugCb;
 
 class HdiInputTest : public testing::Test {
 public:
@@ -204,12 +205,10 @@ HWTEST_F(HdiInputTest, GetInputDevice001, TestSize.Level1)
         HDF_LOGE("%s: get device1 failed, ret %d", __func__, ret);
     }
 
-    HDF_LOGI("%s: devindex = %u, fd = %d, devType = %u", __func__, dev->devIndex,
-           dev->fd, dev->devType);
+    HDF_LOGI("%s: devindex = %u, devType = %u", __func__, dev->devIndex,
+            dev->devType);
     HDF_LOGI("%s: chipInfo = %s, vendorName = %s, chipName = %s",
         __func__, dev->chipInfo, dev->vendorName, dev->chipName);
-    HDF_LOGI("%s: powerStatus = %u, solutionX = %u, solutionY = %u", __func__,
-        dev->powerStatus, dev->solutionX, dev->solutionY);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
 
@@ -236,12 +235,10 @@ HWTEST_F(HdiInputTest, GetInputDeviceList001, TestSize.Level1)
 
     for (uint32_t i = 0; i < num; i++) {
         HDF_LOGI("%s: num = %u, device[%d]'s info is:", __func__, num, i);
-        HDF_LOGI("%s: index = %u, fd = %d, devType = %u", __func__, dev[i]->devIndex,
-               dev[i]->fd, dev[i]->devType);
+        HDF_LOGI("%s: index = %u, devType = %u", __func__, dev[i]->devIndex,
+                dev[i]->devType);
         HDF_LOGI("%s: chipInfo = %s, vendorName = %s, chipName = %s",
             __func__, dev[i]->chipInfo, dev[i]->vendorName, dev[i]->chipName);
-        HDF_LOGI("%s: powerStatus = %u, solutionX = %u, solutionY = %u", __func__,
-            dev[i]->powerStatus, dev[i]->solutionX, dev[i]->solutionY);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
@@ -310,12 +307,10 @@ HWTEST_F(HdiInputTest, GetInputDevice002, TestSize.Level1)
     }
 
     HDF_LOGI("%s: After fill the info, new device0's info is:", __func__);
-    HDF_LOGI("%s: new devindex = %u, fd = %d, devType = %u", __func__, dev->devIndex,
-           dev->fd, dev->devType);
+    HDF_LOGI("%s: new devindex = %u, devType = %u", __func__, dev->devIndex,
+            dev->devType);
     HDF_LOGI("%s: new chipInfo = %s, vendorName = %s, chipName = %s",
         __func__, dev->chipInfo, dev->vendorName, dev->chipName);
-    HDF_LOGI("%s: new powerStatus = %u, solutionX = %u, solutionY = %u", __func__,
-        dev->powerStatus, dev->solutionX, dev->solutionY, dev->callback);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
 
@@ -329,7 +324,7 @@ HWTEST_F(HdiInputTest, RegisterCallback001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] RegisterCallbac001 enter", __func__);
     int32_t ret;
-    g_callback.ReportEventPkgCallback = ReportEventPkgCallback;
+    g_callback.EventPkgCallback = ReportEventPkgCallback;
 
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputReporter, INPUT_NULL_PTR);
@@ -614,8 +609,8 @@ HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] RegisterCallbackAndReportData001 enter", __func__);
     int32_t ret;
-    g_callback.ReportEventPkgCallback = ReportEventPkgCallback;
-    g_callback.ReportHotPlugEventCallback = ReportHotPlugEventPkgCallback;
+    g_callback.EventPkgCallback = ReportEventPkgCallback;
+    g_hotplugCb.HotPlugCallback = ReportHotPlugEventPkgCallback;
 
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputReporter, INPUT_NULL_PTR);
@@ -626,7 +621,7 @@ HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level1)
         HDF_LOGE("%s: register callback failed for device 1, ret %d", __func__, ret);
     }
 
-    ret  = g_inputInterface->iInputReporter->RegisterHotPlugCallback(&g_callback);
+    ret  = g_inputInterface->iInputReporter->RegisterHotPlugCallback(&g_hotplugCb);
     if (ret) {
         HDF_LOGE("%s: register callback failed for device manager, ret %d", __func__, ret);
     }

@@ -20,6 +20,9 @@
 #include "hdf_io_service_if.h"
 #include "input_common.h"
 
+#define ATTR_SBUF_LEN       1600
+#define ABILITY_SBUF_LEN    360
+
 InputDevManager *GetDevManager(void);
 
 static bool FillSbufData(struct HdfSBuf *data, int32_t cmd, const void *in)
@@ -38,6 +41,7 @@ static bool FillSbufData(struct HdfSBuf *data, int32_t cmd, const void *in)
             }
             break;
         default:
+            HDF_LOGE("%s: unknown cmd", __func__);
             break;
     }
     if (!ret) {
@@ -46,11 +50,58 @@ static bool FillSbufData(struct HdfSBuf *data, int32_t cmd, const void *in)
     return ret;
 }
 
+static bool ReadStrBuf(struct HdfSBuf *reply, void *buf, uint32_t length)
+{
+    const char *tempStr = NULL;
+    bool ret = false;
+
+    tempStr = HdfSbufReadString(reply);
+    if (tempStr != NULL) {
+        if (strncpy_s(buf, length, tempStr, strlen(tempStr)) == EOK) {
+            ret = true;
+        } else {
+            HDF_LOGE("%s: strncpy_s fail", __func__);
+        }
+    }
+    return ret;
+}
+
+static bool ReadAttrBuf(struct HdfSBuf *data, void *attr)
+{
+    uint32_t len = 0;
+    DevAttr *tmpAttr = NULL;
+
+    if (!HdfSbufReadBuffer(data, (const void **)&tmpAttr, &len)) {
+        HDF_LOGE("%s: HdfSbufReadBuffer failed, line: %d", __func__, __LINE__);
+        return false;
+    }
+    if (memcpy_s(attr, sizeof(DevAttr), tmpAttr, sizeof(DevAttr)) != EOK) {
+        HDF_LOGE("%s: memcpy_s failed, line: %d", __func__, __LINE__);
+        return false;
+    }
+    return true;
+}
+
+static bool ReadAbilityBuf(struct HdfSBuf *data, void *ability)
+{
+    uint32_t len = 0;
+    DevAbility *tmpAbility = NULL;
+
+    if (!HdfSbufReadBuffer(data, (const void **)&tmpAbility, &len)) {
+        HDF_LOGE("%s: HdfSbufReadBuffer failed, line: %d", __func__, __LINE__);
+        return false;
+    }
+    if (memcpy_s(ability, sizeof(DevAbility), tmpAbility, sizeof(DevAbility)) != EOK) {
+        HDF_LOGE("%s: memcpy_s failed, line: %d", __func__, __LINE__);
+        return false;
+    }
+    return true;
+}
+
 static bool ObtainSbufData(struct HdfSBuf *reply, int32_t cmd, void *out, uint32_t length)
 {
     bool ret = false;
     uint32_t tempInt;
-    const char *tempStr = NULL;
     switch (cmd) {
         case GET_PWR_STATUS:
         case GET_DEV_TYPE:
@@ -63,35 +114,43 @@ static bool ObtainSbufData(struct HdfSBuf *reply, int32_t cmd, void *out, uint32
         case GET_VENDOR_NAME:
         case GET_CHIP_NAME:
         case RUN_CAPAC_TEST:
-            tempStr = HdfSbufReadString(reply);
-            if (tempStr != NULL) {
-                if (strncpy_s(out, length, tempStr, strlen(tempStr)) == EOK) {
-                    ret = true;
-                } else {
-                    HDF_LOGE("%s: strncpy_s fail", __func__);
-                }
-            }
+            ret = ReadStrBuf(reply, out, length);
+            break;
+        case GET_DEV_ATTR:
+            ret = ReadAttrBuf(reply, out);
+            break;
+        case GET_DEV_ABILITY:
+            ret = ReadAbilityBuf(reply, out);
             break;
         default:
+            HDF_LOGE("%s: unknown cmd", __func__);
             break;
     }
     if (!ret) {
-        HDF_LOGE("%s: sbuf write or strncpy_s failed", __func__);
+        HDF_LOGE("%s: obtain data from sbuf failed", __func__);
     }
     return ret;
 }
 
-static int32_t InstanceCmdSbuf(struct HdfSBuf **data, struct HdfSBuf **reply)
+static int32_t InstanceCmdSbuf(struct HdfSBuf **data, struct HdfSBuf **reply, int32_t cmd)
 {
-    *data = HdfSBufObtainDefaultSize();
-    if (*data == NULL) {
-        HDF_LOGE("%s: fail to obtain sbuf data", __func__);
-        return INPUT_NULL_PTR;
+    switch (cmd) {
+        case GET_DEV_ATTR:
+            *data = HdfSBufObtainDefaultSize();
+            *reply = HdfSBufTypedObtainCapacity(SBUF_RAW, ATTR_SBUF_LEN);
+            break;
+        case GET_DEV_ABILITY:
+            *data = HdfSBufObtainDefaultSize();
+            *reply = HdfSBufTypedObtainCapacity(SBUF_RAW, ABILITY_SBUF_LEN);
+            break;
+        default:
+            *data = HdfSBufObtainDefaultSize();
+            *reply = HdfSBufObtainDefaultSize();
+            break;
     }
 
-    *reply = HdfSBufObtainDefaultSize();
-    if (*reply == NULL) {
-        HDF_LOGE("%s: fail to obtain sbuf reply", __func__);
+    if ((*data == NULL) || (*reply == NULL)) {
+        HDF_LOGE("%s: fail to obtain sbuf", __func__);
         goto EXIT;
     }
     return INPUT_SUCCESS;
@@ -110,7 +169,7 @@ static int32_t IoServiceOps(struct HdfIoService *service, int32_t cmd, const voi
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
 
-    if (InstanceCmdSbuf(&data, &reply) != INPUT_SUCCESS) {
+    if (InstanceCmdSbuf(&data, &reply, cmd) != INPUT_SUCCESS) {
         return INPUT_FAILURE;
     }
 
@@ -120,7 +179,6 @@ static int32_t IoServiceOps(struct HdfIoService *service, int32_t cmd, const voi
             goto EXIT;
         }
     }
-
     ret = service->dispatcher->Dispatch(&service->object, cmd, data, reply);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: dispatch fail", __func__);
@@ -144,7 +202,6 @@ static int32_t SetPowerStatus(uint32_t devIndex, uint32_t status)
     DeviceInfoNode *pos = NULL;
     DeviceInfoNode *next = NULL;
     InputDevManager *manager = NULL;
-    struct HdfIoService *service = NULL;
 
     if ((devIndex >= MAX_INPUT_DEV_NUM) || (status >= INPUT_POWER_STATUS_UNKNOWN)) {
         HDF_LOGE("%s: invalid param", __func__);
@@ -157,13 +214,11 @@ static int32_t SetPowerStatus(uint32_t devIndex, uint32_t status)
         if (pos->payload.devIndex != devIndex) {
             continue;
         }
-        service = (struct HdfIoService *)pos->payload.service;
-        if (IoServiceOps(service, SET_PWR_STATUS, &status, NULL, 0)) {
+        if (IoServiceOps(pos->service, SET_PWR_STATUS, &status, NULL, 0)) {
             pthread_mutex_unlock(&manager->mutex);
             HDF_LOGE("%s: set power status failed", __func__);
             return INPUT_FAILURE;
         }
-        pos->payload.powerStatus = status;
         pthread_mutex_unlock(&manager->mutex);
         return INPUT_SUCCESS;
     }
@@ -178,7 +233,6 @@ static int32_t GetPowerStatus(uint32_t devIndex, uint32_t *status)
     DeviceInfoNode *pos = NULL;
     DeviceInfoNode *next = NULL;
     InputDevManager *manager = NULL;
-    struct HdfIoService *service = NULL;
 
     if ((devIndex >= MAX_INPUT_DEV_NUM) || (status == NULL)) {
         HDF_LOGE("%s: invalid param", __func__);
@@ -191,8 +245,7 @@ static int32_t GetPowerStatus(uint32_t devIndex, uint32_t *status)
         if (pos->payload.devIndex != devIndex) {
             continue;
         }
-        service = (struct HdfIoService *)pos->payload.service;
-        if (IoServiceOps(service, GET_PWR_STATUS, NULL, status, sizeof(uint32_t))) {
+        if (IoServiceOps(pos->service, GET_PWR_STATUS, NULL, status, sizeof(uint32_t))) {
             pthread_mutex_unlock(&manager->mutex);
             HDF_LOGE("%s: get power status failed", __func__);
             return INPUT_FAILURE;
@@ -202,7 +255,6 @@ static int32_t GetPowerStatus(uint32_t devIndex, uint32_t *status)
             HDF_LOGE("%s: power status is unknown", __func__);
             return INPUT_FAILURE;
         }
-        pos->payload.powerStatus = *status;
         pthread_mutex_unlock(&manager->mutex);
         return INPUT_SUCCESS;
     }
@@ -217,7 +269,6 @@ static int32_t GetDeviceType(uint32_t devIndex, uint32_t *deviceType)
     DeviceInfoNode *pos = NULL;
     DeviceInfoNode *next = NULL;
     InputDevManager *manager = NULL;
-    struct HdfIoService *service = NULL;
 
     if ((devIndex >= MAX_INPUT_DEV_NUM) || (deviceType == NULL)) {
         HDF_LOGE("%s: invalid param", __func__);
@@ -230,8 +281,7 @@ static int32_t GetDeviceType(uint32_t devIndex, uint32_t *deviceType)
         if (pos->payload.devIndex != devIndex) {
             continue;
         }
-        service = (struct HdfIoService *)pos->payload.service;
-        if (IoServiceOps(service, GET_DEV_TYPE, NULL, deviceType, sizeof(uint32_t))) {
+        if (IoServiceOps(pos->service, GET_DEV_TYPE, NULL, deviceType, sizeof(uint32_t))) {
             pthread_mutex_unlock(&manager->mutex);
             HDF_LOGE("%s: get device type failed", __func__);
             return INPUT_FAILURE;
@@ -251,15 +301,14 @@ static int32_t GetDeviceType(uint32_t devIndex, uint32_t *deviceType)
     return INPUT_FAILURE;
 }
 
-static int32_t GetGeneralInfo(uint32_t devIndex, char *generalInfo, uint32_t length, uint32_t lengthLimit, int32_t cmd)
+static int32_t GetDevStringInfo(uint32_t devIndex, char *info, uint32_t len, uint32_t lenLimit, int32_t cmd)
 {
     DeviceInfoNode *pos = NULL;
     DeviceInfoNode *next = NULL;
     InputDevManager *manager = NULL;
-    void *info = NULL;
-    struct HdfIoService *service = NULL;
+    char *tempInfo = NULL;
 
-    if ((devIndex >= MAX_INPUT_DEV_NUM) || (generalInfo == NULL) || (length < lengthLimit)) {
+    if ((devIndex >= MAX_INPUT_DEV_NUM) || (info == NULL) || (len < lenLimit)) {
         HDF_LOGE("%s: invalid param", __func__);
         return INPUT_INVALID_PARAM;
     }
@@ -272,13 +321,13 @@ static int32_t GetGeneralInfo(uint32_t devIndex, char *generalInfo, uint32_t len
         }
         switch (cmd) {
             case GET_CHIP_NAME:
-                info = pos->payload.chipName;
+                tempInfo = pos->payload.chipName;
                 break;
             case GET_CHIP_INFO:
-                info = pos->payload.chipInfo;
+                tempInfo = pos->payload.chipInfo;
                 break;
             case GET_VENDOR_NAME:
-                info = pos->payload.vendorName;
+                tempInfo = pos->payload.vendorName;
                 break;
             default:
                 pthread_mutex_unlock(&manager->mutex);
@@ -286,14 +335,13 @@ static int32_t GetGeneralInfo(uint32_t devIndex, char *generalInfo, uint32_t len
                 return INPUT_FAILURE;
         }
 
-        service = (struct HdfIoService *)pos->payload.service;
-        if (IoServiceOps(service, cmd, NULL, info, lengthLimit)) {
+        if (IoServiceOps(pos->service, cmd, NULL, tempInfo, lenLimit)) {
             pthread_mutex_unlock(&manager->mutex);
             HDF_LOGE("%s: get information fail", __func__);
             return INPUT_FAILURE;
         }
 
-        if (strncpy_s(generalInfo, length, info, lengthLimit - 1) != EOK) {
+        if (strncpy_s(info, len, tempInfo, lenLimit - 1) != EOK) {
             pthread_mutex_unlock(&manager->mutex);
             HDF_LOGE("%s: strncpy_s fail", __func__);
             return INPUT_FAILURE;
@@ -311,17 +359,17 @@ static int32_t GetGeneralInfo(uint32_t devIndex, char *generalInfo, uint32_t len
 
 static int32_t GetChipName(uint32_t devIndex, char *chipName, uint32_t length)
 {
-    return GetGeneralInfo(devIndex, chipName, length, CHIP_NAME_LEN, GET_CHIP_NAME);
+    return GetDevStringInfo(devIndex, chipName, length, CHIP_NAME_LEN, GET_CHIP_NAME);
 }
 
 static int32_t GetChipInfo(uint32_t devIndex, char *chipInfo, uint32_t length)
 {
-    return GetGeneralInfo(devIndex, chipInfo, length, CHIP_INFO_LEN, GET_CHIP_INFO);
+    return GetDevStringInfo(devIndex, chipInfo, length, CHIP_INFO_LEN, GET_CHIP_INFO);
 }
 
 static int32_t GetVendorName(uint32_t devIndex, char *vendorName, uint32_t length)
 {
-    return GetGeneralInfo(devIndex, vendorName, length, VENDOR_NAME_LEN, GET_VENDOR_NAME);
+    return GetDevStringInfo(devIndex, vendorName, length, VENDOR_NAME_LEN, GET_VENDOR_NAME);
 }
 
 static int32_t SetGestureMode(uint32_t devIndex, uint32_t gestureMode)
@@ -329,7 +377,6 @@ static int32_t SetGestureMode(uint32_t devIndex, uint32_t gestureMode)
     DeviceInfoNode *pos = NULL;
     DeviceInfoNode *next = NULL;
     InputDevManager *manager = NULL;
-    struct HdfIoService *service = NULL;
 
     if (devIndex >= MAX_INPUT_DEV_NUM) {
         HDF_LOGE("%s: invalid param", __func__);
@@ -342,8 +389,7 @@ static int32_t SetGestureMode(uint32_t devIndex, uint32_t gestureMode)
         if (pos->payload.devIndex != devIndex) {
             continue;
         }
-        service = (struct HdfIoService *)pos->payload.service;
-        if (IoServiceOps(service, SET_GESTURE_MODE, &gestureMode, NULL, 0)) {
+        if (IoServiceOps(pos->service, SET_GESTURE_MODE, &gestureMode, NULL, 0)) {
             pthread_mutex_unlock(&manager->mutex);
             HDF_LOGE("%s: set gesture mode failed", __func__);
             return INPUT_FAILURE;
@@ -378,8 +424,7 @@ static int32_t RunCapacitanceTest(uint32_t devIndex, uint32_t testType, char *re
         if (pos->payload.devIndex != devIndex) {
             continue;
         }
-        struct HdfIoService *service = (struct HdfIoService *)pos->payload.service;
-        if (IoServiceOps(service, RUN_CAPAC_TEST, &testInfo.testType, testInfo.testResult, SELF_TEST_RESULT_LEN)) {
+        if (IoServiceOps(pos->service, RUN_CAPAC_TEST, &testInfo.testType, testInfo.testResult, SELF_TEST_RESULT_LEN)) {
             pthread_mutex_unlock(&manager->mutex);
             HDF_LOGE("%s: run capacitance test failed", __func__);
             return INPUT_FAILURE;
@@ -418,8 +463,7 @@ static int32_t RunExtraCommand(uint32_t devIndex, InputExtraCmd *cmdInfo)
         if (pos->payload.devIndex != devIndex) {
             continue;
         }
-        struct HdfIoService *service = (struct HdfIoService *)pos->payload.service;
-        if (IoServiceOps(service, RUN_EXTRA_CMD, cmdInfo, NULL, 0)) {
+        if (IoServiceOps(pos->service, RUN_EXTRA_CMD, cmdInfo, NULL, 0)) {
             pthread_mutex_unlock(&manager->mutex);
             HDF_LOGE("%s: run extra cmd failed", __func__);
             return INPUT_FAILURE;
@@ -431,6 +475,125 @@ static int32_t RunExtraCommand(uint32_t devIndex, InputExtraCmd *cmdInfo)
     pthread_mutex_unlock(&manager->mutex);
     HDF_LOGE("%s: device%d doesn't exist, can't run extra cmd", __func__, devIndex);
     return INPUT_FAILURE;
+}
+
+static int32_t GetDeviceAbility(uint32_t devIndex, DevAbility *ability)
+{
+    DeviceInfoNode *pos = NULL;
+    DeviceInfoNode *next = NULL;
+    InputDevManager *manager = NULL;
+
+    if (devIndex >= MAX_INPUT_DEV_NUM) {
+        HDF_LOGE("%s: invalid param", __func__);
+        return INPUT_INVALID_PARAM;
+    }
+    GET_MANAGER_CHECK_RETURN(manager);
+
+    pthread_mutex_lock(&manager->mutex);
+    DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &manager->devList, DeviceInfoNode, node) {
+        if (pos->payload.devIndex != devIndex) {
+            continue;
+        }
+        if (IoServiceOps(pos->service, GET_DEV_ABILITY, NULL, ability, sizeof(DevAbility))) {
+            pthread_mutex_unlock(&manager->mutex);
+            HDF_LOGE("%s: get dev ability failed", __func__);
+            return INPUT_FAILURE;
+        }
+
+        if (memcpy_s(&pos->payload.abilitySet, sizeof(DevAbility), ability, sizeof(DevAbility)) != EOK) {
+            HDF_LOGE("%s: memcpy_s failed in getting ability, line: %d", __func__, __LINE__);
+            pthread_mutex_unlock(&manager->mutex);
+            return INPUT_FAILURE;
+        }
+        pthread_mutex_unlock(&manager->mutex);
+        return INPUT_SUCCESS;
+    }
+    pthread_mutex_unlock(&manager->mutex);
+    HDF_LOGE("%s: device%u doesn't exist, can't get dev ability", __func__, devIndex);
+    return INPUT_FAILURE;
+}
+
+static int32_t UpdateAbilityInfo(uint32_t devIndex)
+{
+    int32_t ret;
+    DeviceInfoNode node;
+
+    ret = GetDeviceAbility(devIndex, &node.payload.abilitySet);
+    INPUT_CHECK_RETURN(ret);
+    return INPUT_SUCCESS;
+}
+
+static int32_t GetDeviceAttr(uint32_t devIndex, DevAttr *attr)
+{
+    DeviceInfoNode *pos = NULL;
+    DeviceInfoNode *next = NULL;
+    InputDevManager *manager = NULL;
+
+    if (devIndex >= MAX_INPUT_DEV_NUM) {
+        HDF_LOGE("%s: invalid param", __func__);
+        return INPUT_INVALID_PARAM;
+    }
+    GET_MANAGER_CHECK_RETURN(manager);
+    pthread_mutex_lock(&manager->mutex);
+    DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &manager->devList, DeviceInfoNode, node) {
+        if (pos->payload.devIndex != devIndex) {
+            continue;
+        }
+
+        if (IoServiceOps(pos->service, GET_DEV_ATTR, NULL, attr, sizeof(DevAttr))) {
+            pthread_mutex_unlock(&manager->mutex);
+            HDF_LOGE("%s: get dev attr failed", __func__);
+            return INPUT_FAILURE;
+        }
+
+        if (memcpy_s(&pos->payload.attrSet, sizeof(DevAttr), attr, sizeof(DevAttr)) != EOK) {
+            HDF_LOGE("%s: memcpy_s failed in getting attr", __func__);
+            pthread_mutex_unlock(&manager->mutex);
+            return INPUT_FAILURE;
+        }
+        pthread_mutex_unlock(&manager->mutex);
+        return INPUT_SUCCESS;
+    }
+    pthread_mutex_unlock(&manager->mutex);
+    HDF_LOGE("%s: device%u doesn't exist, can't get dev attr", __func__, devIndex);
+    return INPUT_FAILURE;
+}
+
+static int32_t UpdateAttrInfo(uint32_t devIndex)
+{
+    int32_t ret;
+    DeviceInfoNode node;
+
+    ret = GetDeviceAttr(devIndex, &node.payload.attrSet);
+    INPUT_CHECK_RETURN(ret);
+    return INPUT_SUCCESS;
+}
+
+static int32_t UpdateDevBaseInfo(uint32_t devIndex)
+{
+    int32_t ret;
+    DeviceInfoNode node;
+
+    ret = GetDeviceType(devIndex, &node.payload.devType);
+    INPUT_CHECK_RETURN(ret);
+    ret = GetChipName(devIndex, &node.payload.chipInfo[0], CHIP_INFO_LEN);
+    INPUT_CHECK_RETURN(ret);
+    ret = GetChipInfo(devIndex, &node.payload.vendorName[0], VENDOR_NAME_LEN);
+    INPUT_CHECK_RETURN(ret);
+    ret = GetVendorName(devIndex, &node.payload.chipName[0], CHIP_NAME_LEN);
+    INPUT_CHECK_RETURN(ret);
+    return INPUT_SUCCESS;
+}
+
+int32_t UpdateDevFullInfo(uint32_t devIndex)
+{
+    int32_t ret = UpdateDevBaseInfo(devIndex);
+    INPUT_CHECK_RETURN(ret);
+    ret = UpdateAbilityInfo(devIndex);
+    INPUT_CHECK_RETURN(ret);
+    ret = UpdateAttrInfo(devIndex);
+    INPUT_CHECK_RETURN(ret);
+    return INPUT_SUCCESS;
 }
 
 int32_t InstanceControllerHdi(InputController **controller)
