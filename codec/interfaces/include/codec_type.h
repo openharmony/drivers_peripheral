@@ -113,13 +113,25 @@ typedef enum {
  * @brief Enumerates resolutions.
  */
 typedef enum {
-    Resolution_CIF,     /**< 352x288 */
-    Resolution_360P,    /**< 640x360 */
-    Resolution_D1_PAL,  /**< 720x576 */
-    Resolution_D1_NTSC, /**< 720x480 */
-    Resolution_720P,    /**< 1280x720 */
-    Resolution_1080P,   /**< 1920x1080 */
-    Resolution_INVALID  /**< Invalid resolution */
+    RESOLUTION_CIF,     /**< 352x288 */
+    RESOLUTION_360P,    /**< 640x360 */
+    RESOLUTION_D1_PAL,  /**< 720x576 */
+    RESOLUTION_D1_NTSC, /**< 720x480 */
+    RESOLUTION_720P,    /**< 1280x720 */
+    RESOLUTION_1080P,   /**< 1920x1080 */
+    RESOLUTION_2560X1440, /**< 2560x1440 */
+    RESOLUTION_2592X1520, /**< 2592x1520 */
+    RESOLUTION_2592X1536, /**< 2592x1536 */
+    RESOLUTION_2592X1944, /**< 2592x1944 */
+    RESOLUTION_2688X1536, /**< 2688x1536 */
+    RESOLUTION_2716X1524, /**< 2716x1524 */
+    RESOLUTION_3840X2160, /**< 3840x2160 */
+    RESOLUTION_4096X2160, /**< 4096x2160 */
+    RESOLUTION_3000X3000, /**< 3000x3000 */
+    RESOLUTION_4000X3000, /**< 4000x3000 */
+    RESOLUTION_7680X4320, /**< 7680x4320 */
+    RESOLUTION_3840X8640, /**< 3840x8640 */
+    RESOLUTION_INVALID  /**< Invalid resolution */
 } PicSize;
 
 /**
@@ -201,17 +213,23 @@ typedef enum {
  * @brief Enumerates audio bit rates.
  */
 typedef enum {
-    AUD_AAC_BPS_8K      = 8000,    /**< 8 kbit/s */
-    AUD_AAC_BPS_16K     = 16000,   /**< 16 kbit/s */
-    AUD_AAC_BPS_22K     = 22000,   /**< 22 kbit/s */
-    AUD_AAC_BPS_24K     = 24000,   /**< 24 kbit/s */
-    AUD_AAC_BPS_32K     = 32000,   /**< 32 kbit/s */
-    AUD_AAC_BPS_48K     = 48000,   /**< 48 kbit/s */
-    AUD_AAC_BPS_64K     = 64000,   /**< 64 kbit/s */
-    AUD_AAC_BPS_96K     = 96000,   /**< 96 kbit/s */
-    AUD_AAC_BPS_128K    = 128000,  /**< 128 kbit/s */
-    AUD_AAC_BPS_256K    = 256000,  /**< 256 kbit/s */
-    AUD_AAC_BPS_320K    = 320000,  /**< 320 kbit/s */
+    AUD_BITRATE_8K      = 8000,    /**< 8 kbit/s */
+    AUD_BITRATE_16K     = 16000,   /**< 16 kbit/s */
+    AUD_BITRATE_22K     = 22000,   /**< 22 kbit/s */
+    AUD_BITRATE_24K     = 24000,   /**< 24 kbit/s */
+    AUD_BITRATE_32K     = 32000,   /**< 32 kbit/s */
+    AUD_BITRATE_40K     = 40000,   /**< 40 kbit/s */
+    AUD_BITRATE_48K     = 48000,   /**< 48 kbit/s */
+    AUD_BITRATE_64K     = 64000,   /**< 64 kbit/s */
+    AUD_BITRATE_96K     = 96000,   /**< 96 kbit/s */
+    AUD_BITRATE_128K    = 128000,  /**< 128 kbit/s */
+    AUD_BITRATE_132K    = 132000,  /**< 132 kbit/s */
+    AUD_BITRATE_144K    = 144000,  /**< 144 kbit/s */
+    AUD_BITRATE_192K    = 192000,  /**< 192 kbit/s */
+    AUD_BITRATE_256K    = 256000,  /**< 256 kbit/s */
+    AUD_BITRATE_265K    = 265000,  /**< 265 kbit/s */
+    AUD_BITRATE_288K    = 288000,  /**< 288 kbit/s */
+    AUD_BITRATE_320K    = 320000,  /**< 320 kbit/s */
 } AudioBitRate;
 
 /**
@@ -228,7 +246,7 @@ typedef enum {
 /**
  * @brief Defines the codec buffer handle type. The virtual address of a handle maps to its physical address.
  */
-typedef struct CodecBufferHandle {
+typedef struct {
     uint8_t *virAddr;   /**< Virtual address */
     uintptr_t handle;   /**< Physical address */
 } CodecBufferHandle;
@@ -236,7 +254,7 @@ typedef struct CodecBufferHandle {
 /**
 * @brief Enumerates buffer types.
  */
-typedef enum BufferType {
+typedef enum {
     BUFFER_TYPE_VIRTUAL = 0, /**< Virtual memory */
     BUFFER_TYPE_FD,          /**< File descriptor, which can be used cross processes */
     BUFFER_TYPE_HANDLE,      /**< Handle, which can be used cross processes */
@@ -273,7 +291,7 @@ typedef struct {
 /**
  * @brief Describes output information.
  */
-typedef struct OutputInfo {
+typedef struct {
     uint32_t   bufferCnt;      /**< Number of buffers */
     CodecBufferInfo *buffers;  /**< Pointer to the buffer description. For details, see {@link CodecBufferInfo}. */
     int64_t    timeStamp;      /**< Output timestamp */
@@ -291,6 +309,11 @@ typedef enum {
     MEDIA_MIMETYPE_VIDEO_AVC,      /**< H.264 video */
     MEDIA_MIMETYPE_VIDEO_HEVC,     /**< H.265 video */
     MEDIA_MIMETYPE_AUDIO_AAC,      /**< AAC audio */
+    MEDIA_MIMETYPE_AUDIO_G711A,    /**< G711A audio */
+    MEDIA_MIMETYPE_AUDIO_G711U,    /**< G711U audio */
+    MEDIA_MIMETYPE_AUDIO_G726,     /**< G726 audio */
+    MEDIA_MIMETYPE_AUDIO_PCM,      /**< PCM audio */
+    MEDIA_MIMETYPE_AUDIO_MP3,      /**< MP3 audio */
     MEDIA_MIMETYPE_INVALID,        /**< Invalid MIME type */
 } AvCodecMime;
 
@@ -354,7 +377,7 @@ typedef struct {
 /**
  * @brief Enumerates allocation modes of input and output buffers.
  */
-typedef enum AllocateBufferMode {
+typedef enum {
     ALLOCATE_INPUT_BUFFER_CODEC  = 0x1, /**< Input buffer allocated within the Codec module */
     ALLOCATE_INPUT_BUFFER_USER   = 0x2, /**< Input buffer allocated by an external user */
     ALLOCATE_OUTPUT_BUFFER_CODEC = 0x4, /**< Output buffer allocated within the Codec module */
@@ -364,7 +387,7 @@ typedef enum AllocateBufferMode {
 /**
  * @brief Enumerates playback capabilities.
  */
-typedef enum CapsMask {
+typedef enum {
     ADAPTIVE_PLAYBACK  = 0x1, /**< Adaptive playback */
     SECURE_PLAYBACK   = 0x2,  /**< Secure playback */
 } CapsMask;
@@ -372,7 +395,7 @@ typedef enum CapsMask {
 /**
  * @brief Defines the codec capability.
  */
-typedef struct Capbility {
+typedef struct {
     AvCodecMime mime;                   /**< MIME type */
     CodecType type;                     /**< Codec type */
     Alginment whAlignment;              /**< Value to align with the width and height */
@@ -393,11 +416,11 @@ typedef struct Capbility {
  * @brief Enumerates event types.
  */
 typedef enum {
-    EventError,            /**< Event error */
-    EventFlushCompelte,    /**< Buffer flush completed */
-    EventStopCompelte,     /**< Codec stopped */
-    EventOutFormatChanged, /**< Output format changed */
-    EventMax = 0x1FFFFFFF  /**< Maximum event value */
+    EVENT_ERROR,            /**< Event error */
+    EVENT_FLUSH_COMPLETE,    /**< Buffer flush completed */
+    EVENT_STOP_COMPLETE,     /**< Codec stopped */
+    EVENT_OUT_FORMAT_CHANGED, /**< Output format changed */
+    EVENT_MAX = 0x1FFFFFFF  /**< Maximum event value */
 } EventType;
 
 /**
@@ -474,10 +497,12 @@ typedef enum {
  * @brief Enumerates codec error types.
  */
 enum {
+    CODEC_SUCCESS = 0,               /**< success */
     CODEC_ERR_STREAM_BUF_FULL = 100, /**< Elementary stream buffer queue is full. */
     CODEC_ERR_FRAME_BUF_EMPTY,       /**< Frame buffer queue is empty. */
     CODEC_RECEIVE_EOS,               /**< End of streams */
     CODEC_ERR_INVALID_OP,            /**< Invalid operation */
+    CODEC_ERR_UNKOWN                 /**< unkown error */
 };
 
 #ifdef __cplusplus
