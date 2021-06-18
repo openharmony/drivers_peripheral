@@ -31,6 +31,7 @@ unittest("hdf_peripheral_input_test") {
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
     "//drivers/peripheral/input/hal/include",
     "//drivers/peripheral/input/interfaces/include",
+    "//third_party/FreeBSD/sys/dev/evdev",
   ]
 
   defines = [
