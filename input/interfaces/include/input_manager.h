@@ -149,7 +149,7 @@ int32_t GetInputInterface(IInputInterface **interface);
  * @since 1.0
  * @version 1.0
  */
-int32_t ReleaseInputInterface(IInputInterface *inputInterface);
+void ReleaseInputInterface(IInputInterface *inputInterface);
 
 #ifdef __cplusplus
 }

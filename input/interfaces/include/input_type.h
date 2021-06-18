@@ -42,18 +42,28 @@
 #include <stdbool.h>
 #include <sys/time.h>
 
+#ifndef _UAPI_INPUT_H
+#include <input-event-codes.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define MAX_INPUT_DEV_NUM 32
-#define MAX_NODE_PATH_LEN 64
 #define CHIP_INFO_LEN 10
 #define CHIP_NAME_LEN 10
 #define VENDOR_NAME_LEN 10
+#define DEV_NAME_LEN 32
 #define SELF_TEST_RESULT_LEN 20
 #define DEV_MANAGER_SERVICE_NAME "hdf_input_host"
-
+#ifdef DIV_ROUND_UP
+#undef DIV_ROUND_UP
+#endif
+#define DIV_ROUND_UP(nr, d) (((nr) + (d) - 1) / (d))
+#define BYTE_HAS_BITS 8
+#define BITS_TO_UINT64(count)    DIV_ROUND_UP(count, BYTE_HAS_BITS * sizeof(unsigned long))
+#define HDF_FF_CNT    (0x7f + 1)
 /**
  * @brief Enumerates return values.
  */
@@ -137,8 +147,10 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    void (*ReportEventPkgCallback)(const EventPackage **pkgs, uint32_t count, uint32_t devIndex);
+    void (*EventPkgCallback)(const EventPackage **pkgs, uint32_t count, uint32_t devIndex);
+} InputEventCb;
 
+typedef struct {
     /**
      * @brief Reports hot plug event data by the registered callback.
      *
@@ -146,26 +158,59 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    void (*ReportHotPlugEventCallback)(const HotPlugEvent *event);
-} InputReportEventCb;
+    void (*HotPlugCallback)(const HotPlugEvent *event);
+} InputHostCb;
+
+typedef struct {
+    unsigned long devProp[BITS_TO_UINT64(INPUT_PROP_CNT)];
+    unsigned long eventType[BITS_TO_UINT64(EV_CNT)];
+    unsigned long absCode[BITS_TO_UINT64(ABS_CNT)];
+    unsigned long relCode[BITS_TO_UINT64(REL_CNT)];
+    unsigned long keyCode[BITS_TO_UINT64(KEY_CNT)];
+    unsigned long ledCode[BITS_TO_UINT64(LED_CNT)];
+    unsigned long miscCode[BITS_TO_UINT64(MSC_CNT)];
+    unsigned long soundCode[BITS_TO_UINT64(SND_CNT)];
+    unsigned long forceCode[BITS_TO_UINT64(HDF_FF_CNT)];
+    unsigned long switchCode[BITS_TO_UINT64(SW_CNT)];
+    unsigned long keyType[BITS_TO_UINT64(KEY_CNT)];
+    unsigned long ledType[BITS_TO_UINT64(LED_CNT)];
+    unsigned long soundType[BITS_TO_UINT64(SND_CNT)];
+    unsigned long switchType[BITS_TO_UINT64(SW_CNT)];
+} DevAbility;
+
+typedef struct {
+    int32_t axis;
+    int32_t min;
+    int32_t max;
+    int32_t fuzz;
+    int32_t flat;
+    int32_t range;
+} DimensionInfo;
+
+typedef struct {
+    uint16_t busType;
+    uint16_t vendor;
+    uint16_t product;
+    uint16_t version;
+} InputDevIdentify;
+
+typedef struct {
+    char devName[DEV_NAME_LEN];
+    InputDevIdentify id;
+    DimensionInfo axisInfo[ABS_CNT];
+} DevAttr;
 
 /**
  * @brief Describes basic device information of the input device.
  */
 typedef struct {
     uint32_t devIndex;                   /**< Device index */
-    int32_t fd;                          /**< File descriptor of the device */
-    void *service;                       /**< Service of the device */
-    void *listener;                      /**< Event listener of the device */
     uint32_t devType;                    /**< Device type */
-    uint32_t powerStatus;                /**< Power status */
     char chipInfo[CHIP_INFO_LEN];        /**< Driver chip information */
     char vendorName[VENDOR_NAME_LEN];    /**< Module vendor name */
     char chipName[CHIP_NAME_LEN];        /**< Driver chip name */
-    char devNodePath[MAX_NODE_PATH_LEN]; /**< Device file path */
-    uint32_t solutionX;                  /**< Resolution in the X axis */
-    uint32_t solutionY;                  /**< Resolution in the Y axis */
-    InputReportEventCb *callback;        /**< Callback {@link InputReportEventCb} for reporting data */
+    DevAttr attrSet;
+    DevAbility abilitySet;
 } DeviceInfo;
 
 /**

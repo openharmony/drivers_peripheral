@@ -38,31 +38,39 @@ extern "C" {
     } \
 } while (0)
 
+#define INPUT_CHECK_RETURN(ret) do { \
+    if ((ret) != INPUT_SUCCESS) { \
+        HDF_LOGE("%s: failed, line:%d", __func__, __LINE__); \
+        return ret; \
+    } \
+} while (0)
+
 /**
  * @brief Describes the information nodes of input devices.
  */
 typedef struct {
-    DeviceInfo payload;       /* Device information payload */
-    struct DListHead node;    /* Head node of a linked list */
+    DeviceInfo payload;                      /* Device information payload */
+    struct HdfIoService *service;            /* Service of the device */
+    struct HdfDevEventlistener *listener;    /* Event listener of the device */
+    InputEventCb *eventCb;                   /* evtCallback {@link InputEventCb} for reporting data */
+    struct DListHead node;                   /* Head node of a linked list */
 } DeviceInfoNode;
 
 typedef struct {
-    void *service;                       /**< Service of the device */
-    void *listener;                      /**< Event listener of the device */
-    InputReportEventCb *callback;        /**< Callback {@link InputReportEventCb} for reporting data */
-} HostDevInfo;
+    struct HdfIoService *service;            /* Service of the device */
+    struct HdfDevEventlistener *listener;    /* Event listener of the device */
+    InputHostCb *hostCb;                     /* Callback {@link InputHostCb} for reporting data */
+} InputHostDev;
 
 /**
  * @brief Describes the input device manager.
  */
 typedef struct {
     struct DListHead devList;    /* Head node of the linked device list */
-    uint32_t currentDevNum;      /* Total number of current devices */
-    int32_t callbackNum;         /* The num of registered callback */
-    pthread_t thread;            /* Monitoring thread for polling */
-    struct pollfd pollFds[MAX_POLLFD_NUM];    /* The records of poll fds */
+    uint32_t attachedDevNum;     /* Total number of current devices */
+    int32_t evtCallbackNum;      /* The num of registered event callback */
     pthread_mutex_t mutex;       /* Mutex object to synchronize */
-    HostDevInfo hostDev;
+    InputHostDev hostDev;
 } InputDevManager;
 
 /**
@@ -93,6 +101,8 @@ enum InputIOsvcCmdId {
     GET_CHIP_INFO,
     GET_VENDOR_NAME,
     GET_CHIP_NAME,
+    GET_DEV_ATTR,
+    GET_DEV_ABILITY,
     SET_GESTURE_MODE,
     RUN_CAPAC_TEST,
     RUN_EXTRA_CMD,

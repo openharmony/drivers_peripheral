@@ -65,7 +65,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*RegisterReportCallback)(uint32_t devIndex, InputReportEventCb *callback);
+    int32_t (*RegisterReportCallback)(uint32_t devIndex, InputEventCb *callback);
 
     /**
      * @brief Unregisters the callback for reporting subscribed data of specified input devices.
@@ -90,7 +90,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*RegisterHotPlugCallback)(InputReportEventCb *callback);
+    int32_t (*RegisterHotPlugCallback)(InputHostCb *callback);
 
     /**
      * @brief Unregisters the hot plug callback of input devices.

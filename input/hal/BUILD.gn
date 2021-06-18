@@ -39,6 +39,7 @@ if (defined(ohos_lite)) {
       "$HDF_FWKS/core/shared/include",
       "$HDF_FWKS/utils/include",
       "//third_party/bounds_checking_function/include",
+      "//third_party/FreeBSD/sys/dev/evdev",
     ]
 
     deps = [
@@ -67,7 +68,10 @@ if (defined(ohos_lite)) {
   INPUT_ROOT_DIR = "//drivers/peripheral/input"
   config("input_hdi_public_config") {
     visibility = [ ":*" ]
-    include_dirs = [ "$INPUT_ROOT_DIR/interfaces/include" ]
+    include_dirs = [
+      "$INPUT_ROOT_DIR/interfaces/include",
+      "//third_party/FreeBSD/sys/dev/evdev",
+    ]
   }
 
   ohos_shared_library("hdi_input") {

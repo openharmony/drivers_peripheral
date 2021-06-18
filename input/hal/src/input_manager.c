@@ -31,6 +31,7 @@
 static InputDevManager *g_devManager;
 int32_t InstanceReporterHdi(InputReporter **hdi);
 int32_t InstanceControllerHdi(InputController **hdi);
+int32_t UpdateDevFullInfo(uint32_t devIndex);
 
 InputDevManager *GetDevManager(void)
 {
@@ -39,6 +40,7 @@ InputDevManager *GetDevManager(void)
 
 static int32_t GetInputDevice(uint32_t devIndex, DeviceInfo **devInfo)
 {
+    int32_t ret;
     DeviceInfoNode *pos = NULL;
     DeviceInfoNode *next = NULL;
     InputDevManager *manager = NULL;
@@ -47,6 +49,13 @@ static int32_t GetInputDevice(uint32_t devIndex, DeviceInfo **devInfo)
         HDF_LOGE("%s: invalid param", __func__);
         return INPUT_INVALID_PARAM;
     }
+
+    ret = UpdateDevFullInfo(devIndex);
+    if (ret != INPUT_SUCCESS) {
+        HDF_LOGE("%s: update dev info failed", __func__);
+        return ret;
+    }
+
     GET_MANAGER_CHECK_RETURN(manager);
 
     pthread_mutex_lock(&manager->mutex);
@@ -56,7 +65,7 @@ static int32_t GetInputDevice(uint32_t devIndex, DeviceInfo **devInfo)
         }
         *devInfo = &pos->payload;
         pthread_mutex_unlock(&manager->mutex);
-        HDF_LOGI("%s: device%u get info succ", __func__, devIndex);
+        HDF_LOGI("%s: device%u get dev info succ", __func__, devIndex);
         return INPUT_SUCCESS;
     }
 
@@ -83,7 +92,7 @@ static int32_t GetInputDeviceList(uint32_t *devNum, DeviceInfo **deviceList, uin
     pthread_mutex_lock(&manager->mutex);
     DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &manager->devList, DeviceInfoNode, node) {
         if (tempSize >= size) {
-            *devNum = manager->currentDevNum;
+            *devNum = manager->attachedDevNum;
             pthread_mutex_unlock(&manager->mutex);
             HDF_LOGE("%s: size is not enough, size = %u, devNum = %u", __func__,
                 size, *devNum);
@@ -93,7 +102,7 @@ static int32_t GetInputDeviceList(uint32_t *devNum, DeviceInfo **deviceList, uin
         tempList++;
         tempSize++;
     }
-    *devNum = manager->currentDevNum;
+    *devNum = manager->attachedDevNum;
     pthread_mutex_unlock(&manager->mutex);
     return INPUT_SUCCESS;
 }
@@ -111,10 +120,10 @@ static int32_t CloseInputDevice(uint32_t devIndex)
         if (pos->payload.devIndex != devIndex) {
             continue;
         }
-        HdfIoServiceRecycle((struct HdfIoService *)pos->payload.service);
+        HdfIoServiceRecycle(pos->service);
         DListRemove(&pos->node);
         free(pos);
-        manager->currentDevNum--;
+        manager->attachedDevNum--;
         pthread_mutex_unlock(&manager->mutex);
         return INPUT_SUCCESS;
     }
@@ -138,10 +147,10 @@ static int32_t AddService(uint32_t index, const struct HdfIoService *service)
     (void)memset_s(device, sizeof(DeviceInfoNode), 0, sizeof(DeviceInfoNode));
 
     device->payload.devIndex = index;
-    device->payload.service = (void *)service;
+    device->service = (struct HdfIoService *)service;
     pthread_mutex_lock(&manager->mutex);
     DListInsertTail(&device->node, &manager->devList);
-    manager->currentDevNum++;
+    manager->attachedDevNum++;
     pthread_mutex_unlock(&manager->mutex);
     return INPUT_SUCCESS;
 }
@@ -287,7 +296,8 @@ static int32_t InitDevManager(void)
     (void)memset_s(manager, sizeof(InputDevManager), 0, sizeof(InputDevManager));
     DListHeadInit(&manager->devList);
     pthread_mutex_init(&manager->mutex, NULL);
-    manager->callbackNum = 0;
+    manager->attachedDevNum = 0;
+    manager->evtCallbackNum = 0;
     g_devManager = manager;
     return INPUT_SUCCESS;
 }
@@ -369,43 +379,48 @@ int32_t GetInputInterface(IInputInterface **inputInterface)
     return INPUT_SUCCESS;
 }
 
-int32_t ReleaseInputInterface(IInputInterface *inputInterface)
+static void FreeDevManager(InputDevManager *manager)
+{
+    (void)HdfDeviceUnregisterEventListener(manager->hostDev.service, manager->hostDev.listener);
+    if (manager->hostDev.listener != NULL) {
+        free(manager->hostDev.listener);
+        manager->hostDev.listener = NULL;
+        manager->hostDev.hostCb = NULL;
+    }
+    (void)HdfIoServiceRecycle(manager->hostDev.service);
+    pthread_mutex_unlock(&manager->mutex);
+    pthread_mutex_destroy(&manager->mutex);
+    free(manager);
+    g_devManager = NULL;
+}
+
+void ReleaseInputInterface(IInputInterface *inputInterface)
 {
     DeviceInfoNode *pos = NULL;
     DeviceInfoNode *next = NULL;
     InputDevManager *manager = NULL;
-    int32_t ret;
 
     if (inputInterface == NULL) {
-        return INPUT_NULL_PTR;
+        return;
     }
+    FreeInputHdi(inputInterface);
+    inputInterface = NULL;
 
-    GET_MANAGER_CHECK_RETURN(manager);
-
+    if (g_devManager == NULL) {
+        return;
+    }
+    manager = g_devManager;
     pthread_mutex_lock(&manager->mutex);
     DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &manager->devList, DeviceInfoNode, node) {
-        ret = HdfDeviceUnregisterEventListener(pos->payload.service, pos->payload.listener);
-        if (ret != HDF_SUCCESS) {
-            pthread_mutex_unlock(&manager->mutex);
-            HDF_LOGE("%s: failed to release listener", __func__);
-            return INPUT_FAILURE;
+        (void)HdfDeviceUnregisterEventListener(pos->service, pos->listener);
+        if (pos->listener != NULL) {
+            free(pos->listener);
+            pos->listener = NULL;
+            pos->eventCb = NULL;
         }
-        free(pos->payload.service);
-        pos->payload.service = NULL;
+        (void)HdfIoServiceRecycle(pos->service);
         DListRemove(&pos->node);
         free(pos);
-        pos = NULL;
     }
-
-    pthread_mutex_unlock(&manager->mutex);
-    pthread_mutex_destroy(&manager->mutex);
-    free(manager);
-    manager = NULL;
-    g_devManager = NULL;
-
-    if (inputInterface != NULL) {
-        FreeInputHdi(inputInterface);
-        inputInterface = NULL;
-    }
-    return INPUT_SUCCESS;
+    FreeDevManager(manager);
 }
