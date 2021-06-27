@@ -35,6 +35,11 @@ static int32_t StartOnce(uint32_t duration)
 {
     struct VibratorDevice *priv = GetVibratorDevicePriv();
 
+    if (duration == 0) {
+        HDF_LOGE("%s:invalid duration para", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
     (void)OsalMutexLock(&priv->mutex);
     struct HdfSBuf *msg = HdfSBufObtainDefaultSize();
     if (msg == NULL) {
@@ -63,7 +68,7 @@ static int32_t StartOnce(uint32_t duration)
         HDF_LOGE("%s: dispatcher duration failed", __func__);
         HdfSBufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);
-        return HDF_FAILURE;
+        return ret;
     }
 
     HdfSBufRecycle(msg);
@@ -93,6 +98,7 @@ static int32_t Start(const char *effect)
     if (priv->ioService == NULL || priv->ioService->dispatcher == NULL ||
         priv->ioService->dispatcher->Dispatch == NULL) {
         HDF_LOGE("%s: para invalid", __func__);
+        HdfSBufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);
         return HDF_FAILURE;
     }
@@ -109,7 +115,7 @@ static int32_t Start(const char *effect)
         HDF_LOGE("%s: dispatcher effect failed", __func__);
         HdfSBufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);
-        return HDF_FAILURE;
+        return ret;
     }
 
     HdfSBufRecycle(msg);
@@ -150,7 +156,7 @@ static int32_t Stop(enum VibratorMode mode)
         HDF_LOGE("%s: dispatcher stop failed", __func__);
         HdfSBufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);
-        return HDF_FAILURE;
+        return ret;
     }
 
     HdfSBufRecycle(msg);
@@ -164,25 +170,24 @@ const struct VibratorInterface *NewVibratorInterfaceInstance(void)
     static struct VibratorInterface vibratorDevInstance;
     struct VibratorDevice *priv = GetVibratorDevicePriv();
 
-    if (!priv->initState) {
-        OsalMutexInit(&priv->mutex);
-
-        // Construct device interface instance
-        vibratorDevInstance.Start = Start;
-        vibratorDevInstance.StartOnce = StartOnce;
-        vibratorDevInstance.Stop = Stop;
-
-        priv->ioService = HdfIoServiceBind(VIBRATOR_SERVICE_NAME);
-        if (priv->ioService == NULL) {
-            HDF_LOGE("%s: get vibrator ioService failed", __func__);
-            OsalMutexDestroy(&priv->mutex);
-            return NULL;
-        }
-
-        priv->initState = true;
-        HDF_LOGD("get vibrator device instance success");
+    if (priv->initState) {
+        return &vibratorDevInstance;
     }
 
+    OsalMutexInit(&priv->mutex);
+    vibratorDevInstance.Start = Start;
+    vibratorDevInstance.StartOnce = StartOnce;
+    vibratorDevInstance.Stop = Stop;
+
+    priv->ioService = HdfIoServiceBind(VIBRATOR_SERVICE_NAME);
+    if (priv->ioService == NULL) {
+        HDF_LOGE("%s: get vibrator ioService failed", __func__);
+        OsalMutexDestroy(&priv->mutex);
+        return NULL;
+    }
+
+    priv->initState = true;
+    HDF_LOGD("get vibrator device instance success");
     return &vibratorDevInstance;
 }
 

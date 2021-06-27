@@ -87,8 +87,8 @@ HWTEST_F(HdfVibratorPerformanceTest, VibratorStartOnce001, TestSize.Level1)
     timeUsed = ((tv2.tv_sec * VIBRATOR_USEC_TIME + tv2.tv_nsec / VIBRATOR_MSEC_TIME) - 
         (tv1.tv_sec * VIBRATOR_USEC_TIME + tv1.tv_nsec / VIBRATOR_MSEC_TIME));
     EXPECT_GT(VIBRATOR_COMMON_TIME,timeUsed);
-    ASSERT_EQ(0, ret);
-    ASSERT_EQ(0, endRet);
+    EXPECT_EQ(0, ret);
+    EXPECT_EQ(0, endRet);
 }
 
 /**
@@ -111,8 +111,8 @@ HWTEST_F(HdfVibratorPerformanceTest, VibratorHapticDefaultTime001, TestSize.Leve
     timeUsed = ((tv2.tv_sec * VIBRATOR_USEC_TIME + tv2.tv_nsec / VIBRATOR_MSEC_TIME) - 
         (tv1.tv_sec * VIBRATOR_USEC_TIME + tv1.tv_nsec / VIBRATOR_MSEC_TIME));
     EXPECT_GT(VIBRATOR_COMMON_TIME, timeUsed);
-    ASSERT_EQ(0, ret);
-    ASSERT_EQ(0, endRet);
+    EXPECT_EQ(0, ret);
+    EXPECT_EQ(0, endRet);
 }
 
 /**
@@ -135,6 +135,6 @@ HWTEST_F(HdfVibratorPerformanceTest, VibratorHapticDefaultEffect001, TestSize.Le
     timeUsed = ((tv2.tv_sec * VIBRATOR_USEC_TIME + tv2.tv_nsec / VIBRATOR_MSEC_TIME) - 
         (tv1.tv_sec * VIBRATOR_USEC_TIME + tv1.tv_nsec / VIBRATOR_MSEC_TIME));
     EXPECT_GT(VIBRATOR_COMMON_TIME, timeUsed);
-    ASSERT_EQ(0, ret);
-    ASSERT_EQ(0, endRet);
+    EXPECT_EQ(0, ret);
+    EXPECT_EQ(0, endRet);
 }
