@@ -26,10 +26,10 @@
 using namespace testing::ext;
 
 namespace {
-    uint32_t g_duration = 2000;
+    uint32_t g_duration = 1000;
     uint32_t g_noDuration = 0;
     uint32_t g_sleepTime1 = 2000;
-    uint32_t g_sleepTime2 = 4000;
+    uint32_t g_sleepTime2 = 5000;
     const char *timeSequence = "vibrator_haptic_default_time";
     const char *builtIn = "vibrator_haptic_default_effect";
     const char *arbitraryStr = "arbitraryString";
@@ -73,7 +73,7 @@ void HdfVibratorTest::TearDown()
   */
 HWTEST_F(HdfVibratorTest, CheckVibratorInstanceIsEmpty, TestSize.Level1)
 {
-    ASSERT_TRUE(nullptr != g_vibratorDev);
+    EXPECT_TRUE(nullptr != g_vibratorDev);
 }
 
 /**
@@ -85,15 +85,15 @@ HWTEST_F(HdfVibratorTest, CheckVibratorInstanceIsEmpty, TestSize.Level1)
   */
 HWTEST_F(HdfVibratorTest, PerformOneShotVibratorDuration001, TestSize.Level1)
 {
-    ASSERT_TRUE(nullptr != g_vibratorDev);
+    EXPECT_TRUE(nullptr != g_vibratorDev);
 
     int32_t startRet = g_vibratorDev->StartOnce(g_duration);
-    ASSERT_EQ(startRet, HDF_SUCCESS);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
 
     OsalMSleep(g_sleepTime1);
 
     int32_t endRet = g_vibratorDev->Stop(VIBRATOR_MODE_ONCE);
-    ASSERT_EQ(endRet, HDF_SUCCESS);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
 }
 
 /**
@@ -105,13 +105,13 @@ HWTEST_F(HdfVibratorTest, PerformOneShotVibratorDuration001, TestSize.Level1)
   */
 HWTEST_F(HdfVibratorTest, PerformOneShotVibratorDuration002, TestSize.Level1)
 {
-    ASSERT_TRUE(nullptr != g_vibratorDev);
+    EXPECT_TRUE(nullptr != g_vibratorDev);
 
     int32_t startRet = g_vibratorDev->StartOnce(g_noDuration);
-    ASSERT_EQ(startRet, HDF_SUCCESS);
+    EXPECT_EQ(startRet, HDF_ERR_INVALID_PARAM);
 
     int32_t endRet = g_vibratorDev->Stop(VIBRATOR_MODE_ONCE);
-    ASSERT_EQ(endRet, HDF_SUCCESS);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
 }
 
 /**
@@ -123,15 +123,15 @@ HWTEST_F(HdfVibratorTest, PerformOneShotVibratorDuration002, TestSize.Level1)
   */
 HWTEST_F(HdfVibratorTest, ExecuteVibratorEffect001, TestSize.Level1)
 {
-    ASSERT_TRUE(nullptr != g_vibratorDev);
+    EXPECT_TRUE(nullptr != g_vibratorDev);
 
     int32_t startRet = g_vibratorDev->Start(timeSequence);
-    ASSERT_EQ(startRet, HDF_SUCCESS);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
 
     OsalMSleep(g_sleepTime2);
 
     int32_t endRet = g_vibratorDev->Stop(VIBRATOR_MODE_PRESET);
-    ASSERT_EQ(endRet, HDF_SUCCESS);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
 }
 
 /**
@@ -141,17 +141,17 @@ HWTEST_F(HdfVibratorTest, ExecuteVibratorEffect001, TestSize.Level1)
   *@tc.type: FUNC
   *@tc.require: AR000FK1J0,AR000FK1JP
   */
-HWTEST_F(HdfVibratorTest,ExecuteVibratorEffect002,TestSize.Level1)
+HWTEST_F(HdfVibratorTest, ExecuteVibratorEffect002, TestSize.Level1)
 {
-    ASSERT_TRUE(nullptr != g_vibratorDev);
+    EXPECT_TRUE(nullptr != g_vibratorDev);
 
     int32_t startRet = g_vibratorDev->Start(builtIn);
-    ASSERT_EQ(startRet, HDF_SUCCESS);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
 
     OsalMSleep(g_sleepTime1);
 
     int32_t endRet = g_vibratorDev->Stop(VIBRATOR_MODE_PRESET);
-    ASSERT_EQ(endRet, HDF_SUCCESS);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
 }
 
 /**
@@ -161,15 +161,15 @@ HWTEST_F(HdfVibratorTest,ExecuteVibratorEffect002,TestSize.Level1)
   *@tc.type: FUNC
   *@tc.require: AR000FK1J0,AR000FK1JP
   */
-HWTEST_F(HdfVibratorTest,ExecuteVibratorEffect003,TestSize.Level1)
+HWTEST_F(HdfVibratorTest, ExecuteVibratorEffect003, TestSize.Level1)
 {
-    ASSERT_TRUE(nullptr != g_vibratorDev);
+    EXPECT_TRUE(nullptr != g_vibratorDev);
 
     int32_t startRet = g_vibratorDev->Start(NULL);
-    ASSERT_EQ(startRet, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(startRet, HDF_ERR_INVALID_PARAM);
 
     int32_t endRet = g_vibratorDev->Stop(VIBRATOR_MODE_ONCE);
-    ASSERT_EQ(endRet, HDF_SUCCESS);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
 }
 
 /**
@@ -179,17 +179,17 @@ HWTEST_F(HdfVibratorTest,ExecuteVibratorEffect003,TestSize.Level1)
   *@tc.type: FUNC
   *@tc.require: AR000FK1JN,AR000FK1JP
   */
-HWTEST_F(HdfVibratorTest,ExecuteVibratorEffect004,TestSize.Level1)
+HWTEST_F(HdfVibratorTest, ExecuteVibratorEffect004, TestSize.Level1)
 {
-    ASSERT_TRUE(nullptr != g_vibratorDev);
+    EXPECT_TRUE(nullptr != g_vibratorDev);
 
     int32_t startRet = g_vibratorDev->Start(timeSequence);
-    ASSERT_EQ(startRet, HDF_SUCCESS);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
 
     OsalMSleep(g_sleepTime2);
 
     int32_t endRet = g_vibratorDev->Stop(VIBRATOR_MODE_ABNORMAL);
-    ASSERT_EQ(endRet, HDF_FAILURE);
+    EXPECT_EQ(endRet, HDF_FAILURE);
 }
 
 /**
@@ -200,22 +200,22 @@ HWTEST_F(HdfVibratorTest,ExecuteVibratorEffect004,TestSize.Level1)
   *@tc.type: FUNC
   *@tc.require: AR000FK1JN,AR000FK1JP
   */
-HWTEST_F(HdfVibratorTest,ExecuteVibratorEffect005,TestSize.Level1)
+HWTEST_F(HdfVibratorTest, ExecuteVibratorEffect005, TestSize.Level1)
 {
-    ASSERT_TRUE(nullptr != g_vibratorDev);
+    EXPECT_TRUE(nullptr != g_vibratorDev);
 
     int32_t stopRet = g_vibratorDev->Stop(VIBRATOR_MODE_ONCE);
-    ASSERT_EQ(stopRet, HDF_SUCCESS);
+    EXPECT_EQ(stopRet, HDF_SUCCESS);
 
     OsalMSleep(g_sleepTime1);
 
     int32_t startRet = g_vibratorDev->Start(timeSequence);
-    ASSERT_EQ(startRet, HDF_SUCCESS);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
 
     OsalMSleep(g_sleepTime2);
 
     int32_t endRet = g_vibratorDev->Stop(VIBRATOR_MODE_PRESET);
-    ASSERT_EQ(endRet, HDF_SUCCESS);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
 }
 
 /**
@@ -226,22 +226,22 @@ HWTEST_F(HdfVibratorTest,ExecuteVibratorEffect005,TestSize.Level1)
   *@tc.type: FUNC
   *@tc.require: AR000FK1JN,AR000FK1JP
   */
-HWTEST_F(HdfVibratorTest,ExecuteVibratorEffect006,TestSize.Level1)
+HWTEST_F(HdfVibratorTest, ExecuteVibratorEffect006, TestSize.Level1)
 {
-    ASSERT_TRUE(nullptr != g_vibratorDev);
+    EXPECT_TRUE(nullptr != g_vibratorDev);
 
     int32_t stopRet = g_vibratorDev->Stop(VIBRATOR_MODE_ONCE);
-    ASSERT_EQ(stopRet, HDF_SUCCESS);
+    EXPECT_EQ(stopRet, HDF_SUCCESS);
 
     OsalMSleep(g_sleepTime1);
 
     int32_t startRet = g_vibratorDev->Start(builtIn);
-    ASSERT_EQ(startRet, HDF_SUCCESS);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
 
     OsalMSleep(g_sleepTime2);
 
     int32_t endRet = g_vibratorDev->Stop(VIBRATOR_MODE_PRESET);
-    ASSERT_EQ(endRet, HDF_SUCCESS);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
 }
 
 /**
@@ -251,13 +251,13 @@ HWTEST_F(HdfVibratorTest,ExecuteVibratorEffect006,TestSize.Level1)
   *@tc.type: FUNC
   *@tc.require: AR000FK1JN,AR000FK1J0,AR000FK1JP
   */
-HWTEST_F(HdfVibratorTest,ExecuteVibratorEffect007,TestSize.Level1)
+HWTEST_F(HdfVibratorTest, ExecuteVibratorEffect007, TestSize.Level1)
 {
-    ASSERT_TRUE(nullptr != g_vibratorDev);
+    EXPECT_TRUE(nullptr != g_vibratorDev);
 
     int32_t startRet = g_vibratorDev->Start(arbitraryStr);
-    ASSERT_EQ(startRet, HDF_FAILURE);
+    EXPECT_EQ(startRet, HDF_FAILURE);
 
     int32_t endRet = g_vibratorDev->Stop(VIBRATOR_MODE_ONCE);
-    ASSERT_EQ(endRet, HDF_SUCCESS);
+    EXPECT_EQ(endRet, HDF_SUCCESS);
 }
