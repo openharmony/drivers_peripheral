@@ -42,7 +42,7 @@ namespace {
         float *data = (float*)event->data;
 
         if (event->sensorId == SENSOR_ID) {
-            printf("time [%lld] sensor id [%d] data [%f]\n\r", event->timestamp, event->sensorId, *(data));
+            printf("time [%lld] sensor id [%{public}d] data [%f]\n\r", event->timestamp, event->sensorId, *(data));
             if (fabs(*data) > 1e-5) {
                 g_sensorDataFlag = 1;
             }
