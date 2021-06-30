@@ -59,8 +59,8 @@ if (defined(ohos_lite)) {
     ]
     if (ohos_build_compiler != "clang") {
       cflags += [
-        "-wno-format",
-        "-wno-format-extra-args",
+        "-Wno-format",
+        "-Wno-format-extra-args",
       ]
     }
   }
