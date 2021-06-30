@@ -161,9 +161,10 @@ static int32_t GetSensorInfo(struct SensorInformation **sensor, int32_t *count)
         int32_t ret = pos->ioService->dispatcher->Dispatch(&pos->ioService->object,
             SENSOR_IO_CMD_GET_INFO_LIST, NULL, reply);
         if (ret != SENSOR_SUCCESS) {
-            HDF_LOGE("%s: Sensor dispatch info failed[%d]", __func__, ret);
+            HDF_LOGE("%s: Sensor dispatch info failed[%{public}d]", __func__, ret);
             break;
         }
+
         pos->sensorCount = GetSensorNumByManagerType(reply);
         manager->sensorSum += pos->sensorCount;
     }
@@ -217,7 +218,7 @@ static int32_t SendSensorMsg(int32_t sensorId, struct HdfSBuf *msg, struct HdfSB
         HDF_LOGE("%s: Sensor dispatch failed", __func__);
         return ret;
     }
-    return ret;
+    return SENSOR_SUCCESS;
 }
 
 static int32_t EnableSensor(int32_t sensorId)
@@ -242,7 +243,7 @@ static int32_t EnableSensor(int32_t sensorId)
 
     int32_t ret = SendSensorMsg(sensorId, msg, NULL);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%s: Sensor enable failed, ret[%d]", __func__, ret);
+        HDF_LOGE("%s: Sensor enable failed, ret[%{public}d]", __func__, ret);
     }
     HdfSBufRecycle(msg);
 
@@ -271,7 +272,7 @@ static int32_t DisableSensor(int32_t sensorId)
 
     int32_t ret = SendSensorMsg(sensorId, msg, NULL);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%s: Sensor disable failed, ret[%d]", __func__, ret);
+        HDF_LOGE("%s: Sensor disable failed, ret[%{public}d]", __func__, ret);
     }
     HdfSBufRecycle(msg);
 
@@ -301,7 +302,7 @@ static int32_t SetSensorBatch(int32_t sensorId, int64_t samplingInterval, int64_
 
     int32_t ret = SendSensorMsg(sensorId, msg, NULL);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%s: Sensor set batch failed, ret[%d]", __func__, ret);
+        HDF_LOGE("%s: Sensor set batch failed, ret[%{public}d]", __func__, ret);
     }
     HdfSBufRecycle(msg);
 
@@ -330,7 +331,7 @@ static int32_t SetSensorMode(int32_t sensorId, int32_t mode)
 
     int32_t ret = SendSensorMsg(sensorId, msg, NULL);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%s: Sensor set mode failed, ret[%d]", __func__, ret);
+        HDF_LOGE("%s: Sensor set mode failed, ret[%{public}d]", __func__, ret);
     }
     HdfSBufRecycle(msg);
 
@@ -359,7 +360,7 @@ static int32_t SetSensorOption(int32_t sensorId, uint32_t option)
 
     int32_t ret = SendSensorMsg(sensorId, msg, NULL);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%s: Sensor set option failed, ret[%d]", __func__, ret);
+        HDF_LOGE("%s: Sensor set option failed, ret[%{public}d]", __func__, ret);
     }
     HdfSBufRecycle(msg);
 
