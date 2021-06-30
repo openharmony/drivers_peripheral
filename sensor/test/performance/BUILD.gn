@@ -37,6 +37,12 @@ unittest("hdf_peripheral_sensor_test_performance") {
     "-fno-common",
     "-fno-strict-aliasing",
   ]
+  if (ohos_build_compiler != "clang") {
+    cflags += [
+      "-wno-format",
+      "-wno-format-extra-args",
+    ]
+  }
   deps = [
     "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
     "//drivers/adapter/uhdf/manager:hdf_core",

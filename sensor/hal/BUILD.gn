@@ -57,6 +57,12 @@ if (defined(ohos_lite)) {
       "-fno-common",
       "-fno-strict-aliasing",
     ]
+    if (ohos_build_compiler != "clang") {
+      cflags += [
+        "-wno-format",
+        "-wno-format-extra-args",
+      ]
+    }
   }
 
   lite_component("hdi") {
