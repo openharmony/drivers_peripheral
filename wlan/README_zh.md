@@ -48,7 +48,7 @@ WLAN驱动HAL模块提供给Wi-Fi service可直接调用的能力接口，主要
 </th>
 </tr>
 </thead>
-<tbody><tr id="row112150333476"><td class="cellrowborder" rowspan="13" valign="top" width="15.950000000000001%" headers="mcps1.2.4.1.1 "><p id="p2155710125317"><a name="p2155710125317"></a><a name="p2155710125317"></a>wifi_hal.h</p>
+<tbody><tr id="row112150333476"><td class="cellrowborder" rowspan="12" valign="top" width="15.950000000000001%" headers="mcps1.2.4.1.1 "><p id="p2155710125317"><a name="p2155710125317"></a><a name="p2155710125317"></a>wifi_hal.h</p>
 <p id="p189132019183"><a name="p189132019183"></a><a name="p189132019183"></a></p>
 </td>
 <td class="cellrowborder" valign="top" width="58.91%" headers="mcps1.2.4.1.2 "><p id="p363110387399"><a name="p363110387399"></a><a name="p363110387399"></a>int32_t WifiConstruct(struct IWiFi **wifiInstance);</p>
@@ -59,11 +59,6 @@ WLAN驱动HAL模块提供给Wi-Fi service可直接调用的能力接口，主要
 <tr id="row112151233194714"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p7629163817393"><a name="p7629163817393"></a><a name="p7629163817393"></a>int32_t WifiDestruct(struct IWiFi **wifiInstance);</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p2627638173917"><a name="p2627638173917"></a><a name="p2627638173917"></a>销毁IWiFi对象。</p>
-</td>
-</tr>
-<tr id="row1121533316475"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p1978712110554"><a name="p1978712110554"></a><a name="p1978712110554"></a>int32_t (*CallbackFunc)(int32_t event, struct HdfSBuf *reqData);</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p978721105517"><a name="p978721105517"></a><a name="p978721105517"></a>定义IWiFi回调函数的原型，监听异步事件。</p>
 </td>
 </tr>
 <tr id="row1214611564542"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p4950434142314"><a name="p4950434142314"></a><a name="p4950434142314"></a>int32_t (*start)(struct IWiFi *);</p>
@@ -116,7 +111,7 @@ WLAN驱动HAL模块提供给Wi-Fi service可直接调用的能力接口，主要
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p17272317145516"><a name="p17272317145516"></a><a name="p17272317145516"></a>WLAN驱动进行重置。</p>
 </td>
 </tr>
-<tr id="row27321001058"><td class="cellrowborder" rowspan="3" valign="top" width="15.950000000000001%" headers="mcps1.2.4.1.1 "><p id="p134208191041"><a name="p134208191041"></a><a name="p134208191041"></a>wifi_hal_ap_feature.h</p>
+<tr id="row27321001058"><td class="cellrowborder" rowspan="2" valign="top" width="15.950000000000001%" headers="mcps1.2.4.1.1 "><p id="p134208191041"><a name="p134208191041"></a><a name="p134208191041"></a>wifi_hal_ap_feature.h</p>
 </td>
 <td class="cellrowborder" valign="top" width="58.91%" headers="mcps1.2.4.1.2 "><p id="p77321105516"><a name="p77321105516"></a><a name="p77321105516"></a>int32_t (*getAsscociatedStas)(const struct IWiFiAp *apFeature, struct StaInfo *staInfo, uint32_t count, uint32_t *num);</p>
 </td>
@@ -128,24 +123,14 @@ WLAN驱动HAL模块提供给Wi-Fi service可直接调用的能力接口，主要
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p098022910610"><a name="p098022910610"></a><a name="p098022910610"></a>设置国家码。</p>
 </td>
 </tr>
-<tr id="row154191519248"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p94207191547"><a name="p94207191547"></a><a name="p94207191547"></a>int32_t InitApFeature(struct IWiFiAp **fe);</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p2420191912418"><a name="p2420191912418"></a><a name="p2420191912418"></a>初始化AP特性。wifi service在创建AP类型的特性时调用。</p>
-</td>
-</tr>
-<tr id="row14149145512411"><td class="cellrowborder" rowspan="2" valign="top" width="15.950000000000001%" headers="mcps1.2.4.1.1 "><p id="p18149155246"><a name="p18149155246"></a><a name="p18149155246"></a>wifi_hal_sta_feature.h</p>
+<tr id="row14149145512411"><td class="cellrowborder" rowspan="1" valign="top" width="15.950000000000001%" headers="mcps1.2.4.1.1 "><p id="p18149155246"><a name="p18149155246"></a><a name="p18149155246"></a>wifi_hal_sta_feature.h</p>
 </td>
 <td class="cellrowborder" valign="top" width="58.91%" headers="mcps1.2.4.1.2 "><p id="p17149165511414"><a name="p17149165511414"></a><a name="p17149165511414"></a>int32_t (*setScanningMacAddres)(const struct IWiFiSta *staFeature, unsigned char *scanMac, uint8_t len);</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.14%" headers="mcps1.2.4.1.3 "><p id="p181491255149"><a name="p181491255149"></a><a name="p181491255149"></a>设置扫描单个MAC地址。</p>
 </td>
 </tr>
-<tr id="row1911174610816"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p211116460813"><a name="p211116460813"></a><a name="p211116460813"></a>int32_t InitStaFeature(struct IWiFiSta **fe);</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p61111646183"><a name="p61111646183"></a><a name="p61111646183"></a>初始化STA特性。wifi service在创建STA类型的特性时调用。</p>
-</td>
-</tr>
-<tr id="row451796205011"><td class="cellrowborder" rowspan="9" valign="top" width="15.950000000000001%" headers="mcps1.2.4.1.1 "><p id="p2659417135013"><a name="p2659417135013"></a><a name="p2659417135013"></a>wifi_hal_base_feature.h</p>
+<tr id="row451796205011"><td class="cellrowborder" rowspan="8" valign="top" width="15.950000000000001%" headers="mcps1.2.4.1.1 "><p id="p2659417135013"><a name="p2659417135013"></a><a name="p2659417135013"></a>wifi_hal_base_feature.h</p>
 </td>
 <td class="cellrowborder" valign="top" width="58.91%" headers="mcps1.2.4.1.2 "><p id="p73831421111010"><a name="p73831421111010"></a><a name="p73831421111010"></a>const char *(*getNetworkIfaceName)(const struct IWiFiBaseFeature *baseFeature);</p>
 </td>
@@ -185,11 +170,6 @@ WLAN驱动HAL模块提供给Wi-Fi service可直接调用的能力接口，主要
 <tr id="row34351131216"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p743711161213"><a name="p743711161213"></a><a name="p743711161213"></a>int32_t (*getIfNamesByChipId)(const uint8_t chipId, char **ifNames, uint32_t *num);</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p164361118121"><a name="p164361118121"></a><a name="p164361118121"></a>通过芯片ID获得当前芯片所有的网卡名。</p>
-</td>
-</tr>
-<tr id="row18519136185016"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p182571320151215"><a name="p182571320151215"></a><a name="p182571320151215"></a>int32_t InitBaseFeature(struct IWiFiBaseFeature **fe);</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p17237192021219"><a name="p17237192021219"></a><a name="p17237192021219"></a>初始化基本特性。用于wifi service在创建任何类型的特性时。</p>
 </td>
 </tr>
 </tbody>
