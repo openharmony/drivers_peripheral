@@ -20,7 +20,6 @@
 #include "wifi_hal.h"
 #include "wifi_hal_ap_feature.h"
 #include "wifi_hal_base_feature.h"
-#include "wifi_hal_event.h"
 #include "wifi_hal_sta_feature.h"
 
 using namespace testing::ext;
@@ -91,22 +90,14 @@ void HdfWlanPerformanceTest::TearDown()
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
-static int32_t HalResetCallbackEvent(int32_t event, struct HdfSBuf *sbuf)
+static int32_t HalResetCallbackEvent(uint32_t event, void *data, const char *ifName)
 {
     (void)event;
-    unsigned char chipId;
-    int resetStatus;
-    if (sbuf == nullptr) {
-        return HDF_FAILURE;
-    }
-
-    if (!HdfSbufReadInt32(sbuf, &resetStatus)) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadUint8(sbuf, &chipId)) {
-        return HDF_FAILURE;
-    }
-    g_resetStatus = resetStatus;
+    (void)ifName;
+    int *resetStatus = nullptr;
+    resetStatus = (int *)data;
+    printf("HalResetCallbackEvent: receive resetStatus=%d \n", *resetStatus);
+    g_resetStatus = *resetStatus;
     return HDF_SUCCESS;
 }
 
@@ -433,7 +424,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalResetDriver001, TestSize.Level1)
     int timeUsed = 0;
     uint8_t i;
 
-    ret = g_wifi->registerEventCallback(HalResetCallbackEvent);
+    ret = g_wifi->registerEventCallback(HalResetCallbackEvent, "wlan0");
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);

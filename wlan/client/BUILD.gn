@@ -24,6 +24,11 @@ if (defined(ohos_lite)) {
     output_name = "wifi_driver_client"
     sources = [ "src/wifi_driver_client.c" ]
 
+    sources += [
+        "src/sbuf/sbuf_cmd_adapter.c",
+        "src/sbuf/sbuf_event_adapter.c",
+    ]
+
     include_dirs = [
       "include",
       "$FWK_ROOT_DIR/include/osal",
@@ -63,6 +68,11 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("wifi_driver_client") {
     sources = [ "$CLIENT_ROOT_DIR/client/src/wifi_driver_client.c" ]
+
+    sources += [
+        "$CLIENT_ROOT_DIR/client/src/sbuf/sbuf_cmd_adapter.c",
+        "$CLIENT_ROOT_DIR/client/src/sbuf/sbuf_event_adapter.c",
+    ]
 
     include_dirs = [
       "$CLIENT_ROOT_DIR/client/include",

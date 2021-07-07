@@ -13,17 +13,15 @@
  * limitations under the License.
  */
 
-#include <stdbool.h>
 #include "wifi_hal.h"
-#include "hdf_base.h"
-#include "hdf_log.h"
-#include "hdf_sbuf.h"
+#include <stdbool.h>
 #include "securec.h"
 #include "unistd.h"
+#include "hdf_log.h"
 #include "wifi_hal_cmd.h"
 #include "wifi_hal_common.h"
-#include "wifi_hal_event.h"
 #include "wifi_hal_util.h"
+#include "wifi_driver_client.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -32,8 +30,6 @@ extern "C" {
 #endif
 
 #define MAX_AUTH_NUM 1000
-
-static struct HdfDevEventlistener g_wifiHalEventListener = {0};
 static bool g_wifiIsStarted = false;
 
 static int32_t StartInner(struct IWiFi *iwifi)
@@ -48,23 +44,16 @@ static int32_t StartInner(struct IWiFi *iwifi)
         HDF_LOGE("%s: wifi has started already, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
-    ret = WifiMsgServiceInit();
+    ret = WifiDriverClientInit();
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: WifiMsgServiceInit failed, line: %d, error no: %d", __FUNCTION__, __LINE__, ret);
+        HDF_LOGE("%s: WifiDriverClientInit failed, line: %d, error no: %d", __FUNCTION__, __LINE__, ret);
         return ret;
     }
-    g_wifiHalEventListener.onReceive = WifiHalEventRecv;
-    ret = WifiMsgRegisterEventListener(&g_wifiHalEventListener);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: WifiMsgRegisterEventListener failed, line: %d, error no: %d", __FUNCTION__, __LINE__, ret);
-        WifiMsgServiceDeinit();
-        return ret;
-    }
+
     ret = HalCmdGetAvailableNetwork();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: HalCmdGetAvailableNetwork failed, line: %d, error no: %d", __FUNCTION__, __LINE__, ret);
-        WifiMsgUnregisterEventListener(&g_wifiHalEventListener);
-        WifiMsgServiceDeinit();
+        WifiDriverClientDeinit();
         return ret;
     }
     g_wifiIsStarted = true;
@@ -81,8 +70,7 @@ static int32_t StopInner(struct IWiFi *iwifi)
         HDF_LOGE("%s: wifi has stopped already, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
-    WifiMsgUnregisterEventListener(&g_wifiHalEventListener);
-    WifiMsgServiceDeinit();
+    WifiDriverClientDeinit();
     ClearIWiFiList();
     g_wifiIsStarted = false;
     return HDF_SUCCESS;
@@ -227,31 +215,26 @@ static int32_t DestroyFeatureInner(struct IWiFiBaseFeature *ifeature)
     return HDF_FAILURE;
 }
 
-static int32_t RegisterEventCallbackInner(CallbackFunc cbFunc)
+static int32_t RegisterEventCallbackInner(OnReceiveFunc onRecFunc, const char *ifName)
 {
-    if (cbFunc == NULL) {
+    if (onRecFunc == NULL || ifName == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    struct CallbackEvent *callbackFunc = GetCallbackFunc();
-    if (callbackFunc != NULL) {
-        if (callbackFunc->cbFunc != NULL) {
-            HDF_LOGE("%s: callback function has been registered, line: %d", __FUNCTION__, __LINE__);
-            return HDF_FAILURE;
-        }
-        callbackFunc->cbFunc = cbFunc;
-    } else {
+    if (RegisterEventCallback(onRecFunc, WIFI_KERNEL_TO_HAL_CLIENT, ifName) != HDF_SUCCESS) {
+        HDF_LOGE("%s: callback function has been registered, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
 
-static int32_t UnregisterEventCallbackInner(void)
+static int32_t UnregisterEventCallbackInner(OnReceiveFunc onRecFunc, const char *ifName)
 {
-    struct CallbackEvent *callbackFunc = GetCallbackFunc();
-    if (callbackFunc != NULL) {
-        callbackFunc->cbFunc = NULL;
+    if (onRecFunc == NULL || ifName == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
     }
+    UnregisterEventCallback(onRecFunc, WIFI_KERNEL_TO_HAL_CLIENT, ifName);
     return HDF_SUCCESS;
 }
 
@@ -316,18 +299,18 @@ static int32_t DestroyFeature(struct IWiFiBaseFeature *ifeature)
     return ret;
 }
 
-static int32_t RegisterEventCallback(CallbackFunc cbFunc)
+static int32_t HalRegisterEventCallback(OnReceiveFunc onRecFunc, const char *ifName)
 {
     HalMutexLock();
-    int32_t ret = RegisterEventCallbackInner(cbFunc);
+    int32_t ret = RegisterEventCallbackInner(onRecFunc, ifName);
     HalMutexUnlock();
     return ret;
 }
 
-static int32_t UnregisterEventCallback(void)
+static int32_t HalUnregisterEventCallback(OnReceiveFunc onRecFunc, const char *ifName)
 {
     HalMutexLock();
-    int32_t ret = UnregisterEventCallbackInner();
+    int32_t ret = UnregisterEventCallbackInner(onRecFunc, ifName);
     HalMutexUnlock();
     return ret;
 }
@@ -363,8 +346,8 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
         singleWifiInstance.createFeature = CreateFeature;
         singleWifiInstance.getFeatureByIfName = GetFeatureByIfName;
         singleWifiInstance.destroyFeature = DestroyFeature;
-        singleWifiInstance.registerEventCallback = RegisterEventCallback;
-        singleWifiInstance.unregisterEventCallback = UnregisterEventCallback;
+        singleWifiInstance.registerEventCallback = HalRegisterEventCallback;
+        singleWifiInstance.unregisterEventCallback = HalUnregisterEventCallback;
         singleWifiInstance.resetDriver = ResetDriver;
         InitIWiFiList();
         isInited = true;

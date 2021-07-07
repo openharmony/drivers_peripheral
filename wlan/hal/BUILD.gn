@@ -26,7 +26,6 @@ if (defined(ohos_lite)) {
       "src/wifi_hal_ap_feature.c",
       "src/wifi_hal_base_feature.c",
       "src/wifi_hal_cmd.c",
-      "src/wifi_hal_event.c",
       "src/wifi_hal_sta_feature.c",
       "src/wifi_hal_util.c",
     ]
@@ -77,7 +76,6 @@ if (defined(ohos_lite)) {
       "$HAL_ROOT_DIR/hal/src/wifi_hal_ap_feature.c",
       "$HAL_ROOT_DIR/hal/src/wifi_hal_base_feature.c",
       "$HAL_ROOT_DIR/hal/src/wifi_hal_cmd.c",
-      "$HAL_ROOT_DIR/hal/src/wifi_hal_event.c",
       "$HAL_ROOT_DIR/hal/src/wifi_hal_sta_feature.c",
       "$HAL_ROOT_DIR/hal/src/wifi_hal_util.c",
     ]

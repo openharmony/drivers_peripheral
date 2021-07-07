@@ -39,7 +39,6 @@
 #ifndef WIFI_HAL_H
 #define WIFI_HAL_H
 
-#include "hdf_sbuf.h"
 #include "wifi_hal_ap_feature.h"
 #include "wifi_hal_sta_feature.h"
 
@@ -53,14 +52,15 @@ extern "C" {
  * @brief Defines a callback to listen for <b>IWiFi</b> asynchronous events.
  *
  * @param event Indicates the event type passed to the callback.
- * @param reqData Indicates the pointer to the data passed to the callback.
+ * @param data Indicates the pointer to the data passed to the callback.
+ * @param ifName The interface name.
  *
  * @return Returns <b>0</b> if the <b>IWiFi</b> callback is defined; returns a negative value otherwise.
  *
  * @since 1.0
  * @version 1.0
  */
-typedef int32_t (*CallbackFunc)(int32_t event, struct HdfSBuf *reqData);
+typedef int32_t (*CallbackFunc)(uint32_t event, void *data, const char *ifName);
 
 /**
  * @brief Defines the basic WLAN features provided by the hardware abstraction layer (HAL).
@@ -161,7 +161,7 @@ struct IWiFi {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*registerEventCallback)(CallbackFunc cbFunc);
+    int32_t (*registerEventCallback)(CallbackFunc cbFunc, const char *ifName);
 
     /**
      * @brief Deregisters an <b>IWiFi</b> callback.
@@ -171,7 +171,7 @@ struct IWiFi {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*unregisterEventCallback)(void);
+    int32_t (*unregisterEventCallback)(CallbackFunc cbFunc, const char *ifName);
 
     /**
      * @brief Destroys a specified {@link IWiFiBaseFeature} object.
