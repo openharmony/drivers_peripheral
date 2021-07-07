@@ -1,0 +1,66 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+} else {
+  import("//build/ohos.gni")
+}
+import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/peripheral/audio/audio.gni")
+
+group("hdi_audio") {
+  if(is_standard_system) {
+    deps = [
+      "hal/hdi_passthrough/src:hdi_audio",
+      ":hdf_audio_json",
+      "hal/hdi_binder/proxy/src:audio_hdi_proxy_server",
+      "hal/hdi_binder/server/src:audio_hdi_adapter_server",
+      "supportlibs/adm_adapter/src:hdi_audio_interface_lib_capture",
+      "supportlibs/adm_adapter/src:hdi_audio_interface_lib_render",
+    ]
+    if (enable_audio_hal_notsupport_pathselect == false) {
+     deps += [
+      ":hdf_audio_path_json",
+      "hal/pathselect/src:hdi_audio_path_select",
+     ]
+    }
+  }
+}
+
+group("audio_test") {
+  if(is_standard_system) {
+    deps = [
+      "sample:audio_test_render",
+      "sample:audio_test_capture",
+    ]
+  }
+}
+
+ohos_prebuilt_etc("hdf_audio_json") {
+  if (is_standard_system) {
+    source = "//drivers/peripheral/audio/hal/hdi_passthrough/src/adapter_config.json"
+    relative_install_dir = "hdfconfig"
+    subsystem_name = "hdf"
+    part_name = "hdf"
+  }
+}
+
+ohos_prebuilt_etc("hdf_audio_path_json") {
+  if (is_standard_system) {
+    source = "//drivers/peripheral/audio/hal/pathselect/src/parse.json"
+    relative_install_dir = "hdfconfig"
+    subsystem_name = "hdf"
+    part_name = "hdf"
+  }
+}

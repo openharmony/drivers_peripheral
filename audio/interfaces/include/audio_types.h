@@ -174,13 +174,20 @@ enum AudioSampleRatesMask {
  * @brief Defines audio sampling attributes.
  */
 struct AudioSampleAttributes {
-    enum AudioCategory type; /**< Audio type. For details, see {@link AudioCategory} */
-    bool interleaved;        /**< Interleaving flag of audio data */
-    enum AudioFormat format; /**< Audio data format. For details, see {@link AudioFormat}. */
-    uint32_t sampleRate;     /**< Audio sampling rate */
-    uint32_t channelCount;   /**< Number of audio channels. For example, for the mono channel, the value is 1,
-                              * and for the stereo channel, the value is 2.
-                              */
+    enum AudioCategory type;   /**< Audio type. For details, see {@link AudioCategory} */
+    bool interleaved;          /**< Interleaving flag of audio data */
+    enum AudioFormat format;   /**< Audio data format. For details, see {@link AudioFormat}. */
+    uint32_t sampleRate;       /**< Audio sampling rate */
+    uint32_t channelCount;     /**< Number of audio channels. For example, for the mono channel, the value is 1,
+                                * and for the stereo channel, the value is 2.
+                                */
+    uint32_t period;           /**< Audio sampling period */ 
+    uint32_t frameSize;        /**< Frame size of the audio data */
+    bool isBigEndian;          /**< Big endian flag of audio data */
+    bool isSignedData;         /**< Signed or unsigned flag of audio data */
+    uint32_t startThreshold;   /**< Audio render start threshold. */
+    uint32_t stopThreshold;    /**< Audio render stop threshold. */
+    uint32_t silenceThreshold; /**< Audio capture buffer threshold. */
 };
 
 /**
@@ -247,5 +254,48 @@ enum AudioChannelMode {
     AUDIO_CHANNEL_RIGHT_MUTE, /**< Right channel muted. The stream of the left channel is output. */
     AUDIO_CHANNEL_BOTH_MUTE,  /**< Both left and right channels muted */
 };
+
+/**
+ * @brief Enumerates the execution types of the <b>DrainBuffer</b> function.
+ */
+enum AudioDrainNotifyType {
+    AUDIO_DRAIN_NORMAL_MODE, /**< The <b>DrainBuffer</b> function returns after all data finishes playback. */
+    AUDIO_DRAIN_EARLY_MODE,  /**< The <b>DrainBuffer</b> function returns before all the data of the current track
+                              * finishes playback to reserve time for a smooth track switch by the audio service.
+                              */
+};
+
+/**
+ * @brief Enumerates callback notification events.
+ */
+enum AudioCallbackType {
+    AUDIO_NONBLOCK_WRITE_COMPELETED, /**< The non-block write is complete. */
+    AUDIO_DRAIN_COMPELETED,          /**< The draining is complete. */
+    AUDIO_FLUSH_COMPLETED,           /**< The flush is complete. */
+    AUDIO_RENDER_FULL,               /**< The render buffer is full.*/
+    AUDIO_ERROR_OCCUR,               /**< An error occurs.*/
+};
+
+/**
+ * @brief Describes a mmap buffer.
+ */
+struct AudioMmapBufferDescripter {
+    void *memoryAddress;                 /**< Pointer to the mmap buffer */
+    int32_t memoryFd;                    /**< File descriptor of the mmap buffer */
+    int32_t totalBufferFrames;           /**< Total size of the mmap buffer (unit: frame )*/
+    int32_t transferFrameSize;           /**< Transfer size (unit: frame) */
+    int32_t isShareable;                 /**< Whether the mmap buffer can be shared among processes */
+};
+
+/**
+ * @brief Called when an event defined in {@link AudioCallbackType} occurs.
+ *
+ * @param AudioCallbackType Indicates the occurred event that triggers this callback.
+ * @param reserved Indicates the pointer to a reserved field.
+ * @param cookie Indicates the pointer to the cookie for data transmission.
+ * @return Returns <b>0</b> if the callback is successfully executed; returns a negative value otherwise.
+ * @see RegCallback
+ */
+typedef int32_t (*RenderCallback)(enum AudioCallbackType, void *reserved, void *cookie);
 
 #endif /* AUDIO_TYPES_H */

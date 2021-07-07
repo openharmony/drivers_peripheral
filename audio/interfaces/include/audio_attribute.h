@@ -94,6 +94,46 @@ struct AudioAttribute {
      * @return Returns <b>0</b> if the data channel ID is obtained; returns a negative value otherwise.
      */
     int32_t (*GetCurrentChannelId)(AudioHandle handle, uint32_t *channelId);
+
+    /**
+     * @brief Sets extra audio parameters.
+     *
+     * @param handle Indicates the audio handle.
+     * @param keyValueList Indicates the pointer to the key-value list of the extra audio parameters.
+     * The format is <i>key=value</i>. Separate multiple key-value pairs by semicolons (;).
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     */
+    int32_t (*SetExtraParams)(AudioHandle handle, const char *keyValueList);
+
+    /**
+     * @brief Obtains extra audio parameters.
+     *
+     * @param handle Indicates the audio handle.
+     * @param keyValueList Indicates the pointer to the key-value list of the extra audio parameters.
+     * The format is <i>key=value</i>. Separate multiple key-value pairs by semicolons (;).
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     */
+    int32_t (*GetExtraParams)(AudioHandle handle, char *keyValueList);
+
+    /**
+     * @brief Requests a mmap buffer.
+     *
+     * @param handle Indicates the audio handle.
+     * @param reqSize Indicates the size of the request mmap buffer.
+     * @param desc Indicates the pointer to the mmap buffer descriptor.
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     */
+    int32_t (*ReqMmapBuffer)(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc);
+
+    /**
+     * @brief Obtains the read/write position of the current mmap buffer.
+     *
+     * @param handle Indicates the audio handle.
+     * @param frames Indicates the pointer to the frame where the read/write starts.
+     * @param time Indicates the pointer to the timestamp associated with the frame where the read/write starts.
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     */
+    int32_t (*GetMmapPosition)(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time);
 };
 
 #endif /* AUDIO_ATTRIBUTE_H */

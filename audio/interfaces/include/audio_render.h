@@ -141,6 +141,29 @@ struct AudioRender {
      * @see SetChannelMode
      */
     int32_t (*GetChannelMode)(struct AudioRender *render, enum AudioChannelMode *mode);
+
+    /**
+     * @brief Registers an audio callback that will be invoked during playback when buffer data writing or
+     * buffer drain is complete.
+     *
+     * @param render Indicates the pointer to the <b>AudioRender</b> object to operate.
+     * @param callback Indicates the callback to register.
+     * @param cookie Indicates the pointer to the callback parameters.
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     * @see RegCallback
+     */
+    int32_t (*RegCallback)(struct AudioRender *render, RenderCallback callback, void* cookie);
+
+    /**
+     * @brief Drains the buffer.
+     *
+     * @param render Indicates the pointer to the <b>AudioRender</b> object to operate.
+     * @param type Indicates the pointer to the execution type of this function. For details,
+     * see {@link AudioDrainNotifyType}.
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     * @see RegCallback
+     */
+    int32_t (*DrainBuffer)(struct AudioRender *render, enum AudioDrainNotifyType *type);
 };
 
 #endif /* AUDIO_RENDER_H */
