@@ -324,7 +324,7 @@ int32_t GetComboInfo(uint64_t *comboInfo, uint32_t size)
         }
         if (!isComboValid) {
             HILOG_ERROR(LOG_DOMAIN, "%s: not support combo mode", __FUNCTION__);
-            ret = RET_CODE_FAILURE;
+            ret = RET_CODE_NOT_SUPPORT;
             break;
         }
         if (!HdfSbufReadBuffer(reply, (const void **)(&replayData), &replayDataSize)) {
@@ -618,7 +618,7 @@ int32_t SetScanMacAddr(const char *ifName, uint8_t *scanMac, uint8_t len)
         }
         if (!isFuncValid) {
             HILOG_ERROR(LOG_DOMAIN, "%s: not support to set scan mac addr", __FUNCTION__);
-            ret = RET_CODE_FAILURE;
+            ret = RET_CODE_NOT_SUPPORT;
             break;
         }
     } while (0);
@@ -739,7 +739,7 @@ int32_t GetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num)
     return ret;
 }
 
-int32_t SetResetDriver(const uint8_t chipId)
+int32_t SetResetDriver(const uint8_t chipId, const char *ifName)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -757,6 +757,11 @@ int32_t SetResetDriver(const uint8_t chipId)
     do{
         if (!HdfSbufWriteUint8(data, chipId)) {
             HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufWriteUint8 failed", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+        if (!HdfSbufWriteString(data, ifName)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;
         }

@@ -445,7 +445,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalResetDriver001, TestSize.Level1)
 
     g_resetStatus = HDF_FAILURE;
     clock_gettime(CLOCK_REALTIME, &tv1);
-    ret = g_wifi->resetDriver(chipId);
+    ret = g_wifi->resetDriver(chipId, "wlan0");
     clock_gettime(CLOCK_REALTIME, &tv2);
     EXPECT_EQ(HDF_SUCCESS, ret);
     timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -

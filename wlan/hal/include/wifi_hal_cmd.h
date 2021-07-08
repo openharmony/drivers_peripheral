@@ -38,7 +38,7 @@ int32_t HalCmdSetScanningMacAddress(const char *ifName, unsigned char *scanMac, 
 int32_t HalCmdGetValidFreqWithBand(const char *ifName, int32_t band, int32_t *freqs, uint32_t *num);
 int32_t HalCmdGetChipId(const char *ifName, uint8_t *chipId);
 int32_t HalCmdGetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num);
-int32_t HalCmdSetResetDriver(const uint8_t chipId);
+int32_t HalCmdSetResetDriver(const uint8_t chipId, const char *ifName);
 
 struct DListHead *GetNetworkHead(void);
 void ClearIWiFiList(void);

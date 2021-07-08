@@ -195,7 +195,7 @@ struct IWiFi {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*resetDriver)(const uint8_t chipId);
+    int32_t (*resetDriver)(const uint8_t chipId, const char *ifName);
 };
 
 /**

@@ -238,9 +238,9 @@ static int32_t UnregisterEventCallbackInner(OnReceiveFunc onRecFunc, const char 
     return HDF_SUCCESS;
 }
 
-static int32_t ResetDriverInner(uint8_t chipId)
+static int32_t ResetDriverInner(uint8_t chipId, const char *ifName)
 {
-    return HalCmdSetResetDriver(chipId);
+    return HalCmdSetResetDriver(chipId, ifName);
 }
 
 static int32_t Start(struct IWiFi *iwifi)
@@ -315,7 +315,7 @@ static int32_t HalUnregisterEventCallback(OnReceiveFunc onRecFunc, const char *i
     return ret;
 }
 
-static int32_t ResetDriver(const uint8_t chipId)
+static int32_t ResetDriver(const uint8_t chipId, const char *ifName)
 {
     if (getuid() >= MAX_AUTH_NUM) {
         HDF_LOGE("%s: don't have authorized access, line: %d", __FUNCTION__, __LINE__);
@@ -323,7 +323,7 @@ static int32_t ResetDriver(const uint8_t chipId)
     }
 
     HalMutexLock();
-    int32_t ret = ResetDriverInner(chipId);
+    int32_t ret = ResetDriverInner(chipId, ifName);
     HalMutexUnlock();
     return ret;
 }

@@ -221,10 +221,10 @@ int32_t HalCmdGetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t 
     return ret;
 }
 
-int32_t HalCmdSetResetDriver(const uint8_t chipId)
+int32_t HalCmdSetResetDriver(const uint8_t chipId, const char *ifName)
 {
     int32_t ret;
-    ret = SetResetDriver(chipId);
+    ret = SetResetDriver(chipId, ifName);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: SetResetDriver failed", __FUNCTION__);
     }
