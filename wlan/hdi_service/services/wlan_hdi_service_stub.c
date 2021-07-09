@@ -434,7 +434,7 @@ static int32_t WlanServiceStubResetDriver(struct HdfDeviceIoClient *client, stru
         HDF_LOGE(" %s: read chipid failed", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    ret = g_wifi->resetDriver(chipId);
+    ret = g_wifi->resetDriver(chipId, "wlan0");
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s reset driver failed! error code: %d", __func__, ret);
         return HDF_FAILURE;
