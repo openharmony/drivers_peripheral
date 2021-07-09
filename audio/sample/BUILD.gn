@@ -18,7 +18,7 @@ if (defined(ohos_lite)) {
 }
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-ohos_executable("audio_test_render") {
+ohos_executable("audio_sample_render") {
   include_dirs = [
     "//drivers/peripheral/audio/interfaces/include",
     "//utils/native/base/include",
@@ -71,7 +71,7 @@ ohos_executable("audio_test_render") {
   subsystem_name = "hdf"
 }
 
-ohos_executable("audio_test_capture") {
+ohos_executable("audio_sample_capture") {
   include_dirs = [
     "//drivers/peripheral/audio/interfaces/include",
     "//utils/native/base/include",
