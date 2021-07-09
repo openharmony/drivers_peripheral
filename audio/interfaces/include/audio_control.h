@@ -93,6 +93,25 @@ struct AudioControl {
      * @return Returns <b>0</b> if the flush is successful; returns a negative value otherwise.
      */
     int32_t (*Flush)(AudioHandle handle);
+
+    /**
+     * @brief Sets or cancels the standby mode of the audio device.
+     *
+     * @param handle Indicates the audio handle.
+     * @return Returns <b>0</b> if the device is set to standby mode; returns a positive value if the standby mode is
+     * canceled; returns a negative value if the setting fails.
+     */
+    int32_t (*TurnStandbyMode)(AudioHandle handle);
+
+    /**
+     * @brief Dumps information about the audio device.
+     *
+     * @param handle Indicates the audio handle.
+     * @param range Indicates the range of the device information to dump, which can be brief or full information.
+     * @param fd Indicates the file to which the device information will be dumped.
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     */
+    int32_t (*AudioDevDump)(AudioHandle handle, int32_t range, int32_t fd);
 };
 
 #endif /* AUDIO_CONTROL_H */
