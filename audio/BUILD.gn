@@ -38,11 +38,11 @@ group("hdi_audio") {
   }
 }
 
-group("audio_test") {
+group("audio_sample_client") {
   if(is_standard_system) {
     deps = [
-      "sample:audio_test_render",
-      "sample:audio_test_capture",
+      "sample:audio_sample_render",
+      "sample:audio_sample_capture",
     ]
   }
 }
