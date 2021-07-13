@@ -21,10 +21,7 @@
 using namespace testing::ext;
 
 namespace ClientTest {
-static struct HdfDevEventlistener g_devEventListener;
-static struct HdfDevEventlistener g_devEventListener1;
-static struct HdfDevEventlistener g_devEventListener2;
-
+const uint32_t DEFAULT_COMBO_SIZE = 10;
 class WifiClientTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -33,230 +30,142 @@ public:
     void TearDown();
 };
 
-void WifiClientTest::SetUpTestCase() {}
-
-void WifiClientTest::TearDownTestCase() {}
-
-void WifiClientTest::SetUp() {}
-
-void WifiClientTest::TearDown() {}
-
-static int OnWifiEventListener(struct HdfDevEventlistener *listener,
-    struct HdfIoService *service, uint32_t id, struct HdfSBuf *data)
+void WifiClientTest::SetUpTestCase()
 {
-    (void)listener;
-    (void)service;
-    (void)id;
-    if (data == NULL) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
+}
+
+void WifiClientTest::TearDownTestCase()
+{
+}
+
+void WifiClientTest::SetUp()
+{
+    WifiDriverClientInit();
+}
+
+void WifiClientTest::TearDown()
+{
+    WifiDriverClientDeinit();
 }
 
 /**
- * @tc.name: WifiClientInitAndDeinit001
- * @tc.desc: Initialize and uninitialize the WLAN client only once.
+ * @tc.name: WifiClientSetCountryCode001
+ * @tc.desc: Wifi client set country code function test
  * @tc.type: FUNC
- * @tc.require: AR000F869F, AR000F8QNL
+ * @tc.require: AR000FRMJC
  */
-HWTEST_F(WifiClientTest, WifiClientInitAndDeinit001, TestSize.Level1)
+HWTEST_F(WifiClientTest, WifiClientSetCountryCode001, TestSize.Level1)
 {
     int ret;
 
-    ret = WifiMsgServiceInit();
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    WifiMsgServiceDeinit();
+    ret = SetCountryCode("wlan0", "CN", 2);
+    EXPECT_EQ(RET_CODE_SUCCESS, ret);
 }
 
 /**
- * @tc.name: WifiClientInitAndDeinit002
- * @tc.desc: Initialize and uninitialize the WLAN client for multiple times.
+ * @tc.name: WifiClientGetUsableNetworkInfo001
+ * @tc.desc: Wifi client get usable networkInfo function test
  * @tc.type: FUNC
- * @tc.require: AR000F869F, AR000F8QNL
+ * @tc.require: AR000FRMJC
  */
-HWTEST_F(WifiClientTest, WifiClientInitAndDeinit002, TestSize.Level1)
+HWTEST_F(WifiClientTest, WifiClientGetUsableNetworkInfo001, TestSize.Level1)
 {
     int ret;
+    struct NetworkInfoResult networkInfo;
 
-    ret = WifiMsgServiceInit();
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    WifiMsgServiceDeinit();
-
-    ret = WifiMsgServiceInit();
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    WifiMsgServiceDeinit();
+    ret = GetUsableNetworkInfo(&networkInfo);
+    EXPECT_EQ(RET_CODE_SUCCESS, ret);
 }
 
 /**
- * @tc.name: WifiClientInitAndDeinit003
- * @tc.desc: Initialize the WLAN client for multiple times.
+ * @tc.name: WifiClientIsSupportCombo001
+ * @tc.desc: Wifi client is support combo function test
  * @tc.type: FUNC
- * @tc.require: AR000F869F, AR000F8QNL
+ * @tc.require: AR000FRMJC
  */
-HWTEST_F(WifiClientTest, WifiClientInitAndDeinit003, TestSize.Level1)
+HWTEST_F(WifiClientTest, WifiClientIsSupportCombo001, TestSize.Level1)
 {
     int ret;
+    uint8_t isSupportCombo;
 
-    ret = WifiMsgServiceInit();
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = WifiMsgServiceInit();
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    WifiMsgServiceDeinit();
+    ret = IsSupportCombo(&isSupportCombo);
+    EXPECT_EQ(RET_CODE_SUCCESS, ret);
 }
 
 /**
- * @tc.name: WifiRegisterListener001
- * @tc.desc: Register the listener for single registration and unregistration.
+ * @tc.name: WifiClientGetComboInfo001
+ * @tc.desc: Wifi client get combo info function test
  * @tc.type: FUNC
- * @tc.require: AR000F869F, AR000F8QNL
+ * @tc.require: AR000FRMJC
  */
-HWTEST_F(WifiClientTest, WifiRegisterListener001, TestSize.Level1)
+HWTEST_F(WifiClientTest, WifiClientGetComboInfo001, TestSize.Level1)
 {
     int ret;
+    uint64_t comboInfo[DEFAULT_COMBO_SIZE] = {};
 
-    g_devEventListener.onReceive = OnWifiEventListener;
-    ret = WifiMsgServiceInit();
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = WifiMsgRegisterEventListener(&g_devEventListener);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    WifiMsgUnregisterEventListener(&g_devEventListener);
-    WifiMsgServiceDeinit();
+    ret = GetComboInfo(comboInfo, DEFAULT_COMBO_SIZE);
+    EXPECT_EQ(RET_CODE_NOT_SUPPORT, ret);
 }
 
 /**
- * @tc.name: WifiRegisterListener002
- * @tc.desc: Register the listener for repeated registration and unregistration.
+ * @tc.name: WifiClientSetMacAddr001
+ * @tc.desc: Wifi client set mac addr function test
  * @tc.type: FUNC
- * @tc.require: AR000F869F, AR000F8QNL
+ * @tc.require: AR000FRMJC
  */
-HWTEST_F(WifiClientTest, WifiRegisterListener002, TestSize.Level1)
+HWTEST_F(WifiClientTest, WifiClientSetMacAddr001, TestSize.Level1)
 {
     int ret;
+    unsigned char mac[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
 
-    g_devEventListener.onReceive = OnWifiEventListener;
-    ret = WifiMsgServiceInit();
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = WifiMsgRegisterEventListener(&g_devEventListener);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    WifiMsgUnregisterEventListener(&g_devEventListener);
-    ret = WifiMsgRegisterEventListener(&g_devEventListener);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    WifiMsgUnregisterEventListener(&g_devEventListener);
-
-    WifiMsgServiceDeinit();
+    ret = SetMacAddr("wlan0", mac, ETH_ADDR_LEN);
+    EXPECT_EQ(RET_CODE_SUCCESS, ret);
 }
 
 /**
- * @tc.name: WifiRegisterListener003
- * @tc.desc: Register multiple listeners for registration and unregistration.
+ * @tc.name: WifiClientGetDevMacAddr001
+ * @tc.desc: Wifi client get mac addr function test
  * @tc.type: FUNC
- * @tc.require: AR000F869F
+ * @tc.require: AR000FRMJC
  */
-HWTEST_F(WifiClientTest, WifiRegisterListener003, TestSize.Level1)
+HWTEST_F(WifiClientTest, WifiClientGetDevMacAddr001, TestSize.Level1)
 {
     int ret;
+    unsigned char mac[ETH_ADDR_LEN] = {};
+    int32_t type = WIFI_IFTYPE_STATION;
 
-    g_devEventListener1.onReceive = OnWifiEventListener;
-    g_devEventListener2.onReceive = OnWifiEventListener;
-    ret = WifiMsgServiceInit();
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = WifiMsgRegisterEventListener(&g_devEventListener1);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = WifiMsgRegisterEventListener(&g_devEventListener2);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    WifiMsgUnregisterEventListener(&g_devEventListener1);
-    WifiMsgUnregisterEventListener(&g_devEventListener2);
-
-    WifiMsgServiceDeinit();
+    ret = GetDevMacAddr("wlan0", type, mac, ETH_ADDR_LEN);
+    EXPECT_NE(RET_CODE_FAILURE, ret);
 }
 
 /**
- * @tc.name: WifiRegisterListener004
- * @tc.desc: Repeatedly register a listener.
+ * @tc.name: WifiClientGetValidFreqByBand001
+ * @tc.desc: Wifi client get valid freq function test
  * @tc.type: FUNC
- * @tc.require: AR000F869F
+ * @tc.require: AR000FRMJC
  */
-HWTEST_F(WifiClientTest, WifiRegisterListener004, TestSize.Level1)
+HWTEST_F(WifiClientTest, WifiClientGetValidFreqByBand001, TestSize.Level1)
 {
     int ret;
+    int32_t band = IEEE80211_BAND_2GHZ;
+    struct FreqInfoResult result;
 
-    g_devEventListener.onReceive = OnWifiEventListener;
-    ret = WifiMsgServiceInit();
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = WifiMsgRegisterEventListener(&g_devEventListener);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = WifiMsgRegisterEventListener(&g_devEventListener);
-    EXPECT_NE(HDF_SUCCESS, ret);
-    WifiMsgUnregisterEventListener(&g_devEventListener);
-
-    WifiMsgServiceDeinit();
+    ret = GetValidFreqByBand("wlan0", band, &result);
+    EXPECT_EQ(RET_CODE_SUCCESS, ret);
 }
 
 /**
- * @tc.name: WifiRegisterListener005
- * @tc.desc: In abnormal condition, register the listener and no deregistration operation.
+ * @tc.name: WifiClientSetTxPower001
+ * @tc.desc: Wifi client set tx power function test
  * @tc.type: FUNC
- * @tc.require: AR000F869F
+ * @tc.require: AR000FRMJC
  */
-HWTEST_F(WifiClientTest, WifiRegisterListener005, TestSize.Level1)
+HWTEST_F(WifiClientTest, WifiClientSetTxPower001, TestSize.Level1)
 {
     int ret;
+    int32_t power = 10;
 
-    g_devEventListener.onReceive = NULL;
-    ret = WifiMsgServiceInit();
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = WifiMsgRegisterEventListener(&g_devEventListener);
-    EXPECT_NE(HDF_SUCCESS, ret);
-    WifiMsgServiceDeinit();
-}
-
-/**
- * @tc.name: WifiRegisterListener006
- * @tc.desc: Uninitialize a listener when the listener is not completely unregistered.
- * @tc.type: FUNC
- * @tc.require: AR000F869F
- */
-HWTEST_F(WifiClientTest, WifiRegisterListener006, TestSize.Level1)
-{
-    int ret;
-
-    g_devEventListener1.onReceive = OnWifiEventListener;
-    g_devEventListener2.onReceive = OnWifiEventListener;
-    ret = WifiMsgServiceInit();
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = WifiMsgRegisterEventListener(&g_devEventListener1);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = WifiMsgRegisterEventListener(&g_devEventListener2);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    WifiMsgUnregisterEventListener(&g_devEventListener1);
-    WifiMsgServiceDeinit();
-    WifiMsgUnregisterEventListener(&g_devEventListener2);
-    WifiMsgServiceDeinit();
-}
-
-/**
- * @tc.name: WifiRegisterListener007
- * @tc.desc: Cancel a listener when no listener is registered.
- * @tc.type: FUNC
- * @tc.require: AR000F869F
- */
-HWTEST_F(WifiClientTest, WifiRegisterListener007, TestSize.Level1)
-{
-    int ret;
-
-    g_devEventListener.onReceive = OnWifiEventListener;
-    ret = WifiMsgServiceInit();
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    WifiMsgUnregisterEventListener(&g_devEventListener);
-    ret = WifiMsgRegisterEventListener(&g_devEventListener);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    WifiMsgUnregisterEventListener(&g_devEventListener);
-
-    WifiMsgServiceDeinit();
+    ret = SetTxPower("wlan0", power);
+    EXPECT_EQ(RET_CODE_SUCCESS, ret);
 }
 };

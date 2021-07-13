@@ -21,7 +21,6 @@
 #include "wifi_hal.h"
 #include "wifi_hal_ap_feature.h"
 #include "wifi_hal_base_feature.h"
-#include "wifi_hal_event.h"
 #include "wifi_hal_sta_feature.h"
 
 using namespace testing::ext;
@@ -144,10 +143,10 @@ HWTEST_F(WifiHalTest, WifiHalGetFeatureByIfName001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
-static int32_t HalCallbackEvent(int32_t event, struct HdfSBuf *sbuf)
+static int32_t HalCallbackEvent(uint32_t event, void *respData, const char *ifName)
 {
     (void)event;
-    if (sbuf == nullptr) {
+    if (respData == nullptr) {
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -163,7 +162,7 @@ HWTEST_F(WifiHalTest, WifiHalRegisterEventCallback001, TestSize.Level1)
 {
     int ret;
 
-    ret = g_wifi->registerEventCallback(HalCallbackEvent);
+    ret = g_wifi->registerEventCallback(HalCallbackEvent, "wlan0");
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -177,7 +176,7 @@ HWTEST_F(WifiHalTest, WifiHalUnRegisterEventCallback001, TestSize.Level1)
 {
     int ret;
 
-    ret = g_wifi->unregisterEventCallback();
+    ret = g_wifi->unregisterEventCallback(HalCallbackEvent, "wlan0");
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 

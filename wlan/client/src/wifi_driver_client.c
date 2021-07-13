@@ -14,9 +14,10 @@
  */
 
 #include "wifi_driver_client.h"
-#include "hdf_log.h"
-#include "hdf_sbuf.h"
-#include "utils/hdf_base.h"
+#include <string.h>
+#include <stdlib.h>
+#include "wifi_common_cmd.h"
+#include "hilog/log.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -24,73 +25,75 @@ extern "C" {
 #endif
 #endif
 
-static struct HdfIoService *g_wifiService = NULL;
+#define MAX_CALL_BACK_COUNT 10
+static struct CallbackEvent *g_callbackEventMap[MAX_CALL_BACK_COUNT] = {NULL};
 
-static const char *DRIVER_SERVICE_NAME = "hdfwifi";
-
-int32_t WifiMsgServiceInit(void)
+void WifiEventReport(const char *ifName, uint32_t event, void *data)
 {
-    if (g_wifiService == NULL) {
-        g_wifiService = HdfIoServiceBind(DRIVER_SERVICE_NAME);
+    uint32_t i;
+
+    for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
+        if (g_callbackEventMap[i] != NULL && (strcmp(g_callbackEventMap[i]->ifName, ifName) == 0) &&
+            (((1 << event) & g_callbackEventMap[i]->eventType) != 0)) {
+            HILOG_INFO(LOG_DOMAIN, "%s: WifiEventReport send event = %d, ifName = %s",
+                __FUNCTION__, event, ifName);
+            g_callbackEventMap[i]->onRecFunc(event, data, ifName);
+        }
     }
-    if (g_wifiService == NULL) {
-        HDF_LOGE("%s: fail to get remote service!, line: %d", __FUNCTION__, __LINE__);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
 }
 
-int32_t WifiMsgRegisterEventListener(struct HdfDevEventlistener *listener)
+int32_t RegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName)
 {
-    if (g_wifiService == NULL || listener == NULL) {
-        HDF_LOGE("%s: params or g_wifiService is NULL, line: %d", __FUNCTION__, __LINE__);
-        return HDF_FAILURE;
+    uint32_t i;
+    struct CallbackEvent *callbackEvent = NULL;
+
+    if (onRecFunc == NULL || ifName == NULL) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return RET_CODE_INVALID_PARAM;
     }
-    if (HdfDeviceRegisterEventListener(g_wifiService, listener) != HDF_SUCCESS) {
-        HDF_LOGE("%s: fail to register event listener, line: %d", __FUNCTION__, __LINE__);
-        return HDF_FAILURE;
+    for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
+        if (g_callbackEventMap[i] != NULL && g_callbackEventMap[i]->eventType == eventType &&
+            (strcmp(g_callbackEventMap[i]->ifName, ifName) == 0) && g_callbackEventMap[i]->onRecFunc == onRecFunc) {
+            HILOG_INFO(LOG_DOMAIN, "%s the onRecFunc has been registered!", __FUNCTION__);
+            return RET_CODE_SUCCESS;
+        }
     }
-    return HDF_SUCCESS;
+    callbackEvent = (struct CallbackEvent *)malloc(sizeof(struct CallbackEvent));
+    if (callbackEvent == NULL) {
+        HILOG_ERROR(LOG_DOMAIN, "%s fail: malloc fail!", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    callbackEvent->eventType = eventType;
+    callbackEvent->ifName = ifName;
+    callbackEvent->onRecFunc = onRecFunc;
+    for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
+        if (g_callbackEventMap[i] == NULL) {
+            g_callbackEventMap[i] = callbackEvent;
+            return RET_CODE_SUCCESS;
+        }
+    }
+    HILOG_ERROR(LOG_DOMAIN, "%s fail: register onRecFunc num more than %d!", __FUNCTION__, MAX_CALL_BACK_COUNT);
+    return RET_CODE_FAILURE;
 }
 
-void WifiMsgUnregisterEventListener(struct HdfDevEventlistener *listener)
+void UnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName)
 {
-    if (g_wifiService == NULL || listener == NULL) {
-        HDF_LOGE("%s: params or g_wifiService is NULL, line: %d", __FUNCTION__, __LINE__);
+    uint32_t i;
+
+    if (onRecFunc == NULL || ifName == NULL) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return;
     }
-    if (HdfDeviceUnregisterEventListener(g_wifiService, listener)) {
-        HDF_LOGE("%s: fail to unregister listener, line: %d", __FUNCTION__, __LINE__);
+    for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
+        if (g_callbackEventMap[i] != NULL && g_callbackEventMap[i]->eventType == eventType &&
+            (strcmp(g_callbackEventMap[i]->ifName, ifName) == 0) && g_callbackEventMap[i]->onRecFunc == onRecFunc) {
+            g_callbackEventMap[i]->ifName = NULL;
+            g_callbackEventMap[i]->onRecFunc = NULL;
+            free(g_callbackEventMap[i]);
+            g_callbackEventMap[i] = NULL;
+            return;
+        }
     }
-}
-
-void WifiMsgServiceDeinit(void)
-{
-    if (g_wifiService == NULL) {
-        HDF_LOGE("%s: g_wifiService is NULL, line: %d", __FUNCTION__, __LINE__);
-        return;
-    }
-    if (HdfIoserviceGetListenerCount(g_wifiService) != 0) {
-        HDF_LOGE("%s: EventListener is not empty. cancel listener registration, line: %d", __FUNCTION__, __LINE__);
-        return;
-    }
-    HdfIoServiceRecycle(g_wifiService);
-    g_wifiService = NULL;
-}
-
-int32_t WifiCmdBlockSyncSend(const uint32_t cmd, struct HdfSBuf *reqData, struct HdfSBuf *respData)
-{
-    if (reqData == NULL) {
-        HDF_LOGE("%s: params is NULL, line: %d", __FUNCTION__, __LINE__);
-        return HDF_FAILURE;
-    }
-    if (g_wifiService == NULL || g_wifiService->dispatcher == NULL || g_wifiService->dispatcher->Dispatch == NULL) {
-        HDF_LOGE("%s: bad remote service found, line: %d", __FUNCTION__, __LINE__);
-        return HDF_FAILURE;
-    }
-    int32_t ret = g_wifiService->dispatcher->Dispatch(&g_wifiService->object, cmd, reqData, respData);
-    HDF_LOGI("%s: cmd=%u, ret=%d, line: %d", __FUNCTION__, cmd, ret, __LINE__);
-    return ret;
 }
 
 #ifdef __cplusplus
