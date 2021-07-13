@@ -70,7 +70,13 @@ void WifiHdiHalServiceTest::TearDown()
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-HWTEST_F(WifiHdiHalServiceTest, GetSupportFeatureComboTest_001, TestSize.Level0)
+/**
+ * @tc.name: GetSupportFeatureComboTest_001
+ * @tc.desc: Wifi hdi get support feature and combo function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, GetSupportFeatureComboTest_001, TestSize.Level1)
 {
 
     std::vector<uint8_t> supType;
@@ -84,7 +90,13 @@ HWTEST_F(WifiHdiHalServiceTest, GetSupportFeatureComboTest_001, TestSize.Level0)
     ASSERT_EQ(rc, HDF_ERR_NOT_SUPPORT);
 }
 
-HWTEST_F(WifiHdiHalServiceTest, CreateFeatureTest_002, TestSize.Level0)
+/**
+ * @tc.name: CreateFeatureTest_002
+ * @tc.desc: Wifi hdi create feature function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, CreateFeatureTest_002, TestSize.Level1)
 {
     std::shared_ptr<WifiFeatureInfo> ifeature = nullptr;
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
@@ -97,7 +109,13 @@ HWTEST_F(WifiHdiHalServiceTest, CreateFeatureTest_002, TestSize.Level0)
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-HWTEST_F(WifiHdiHalServiceTest, GetFeatureByIfNameTest_003, TestSize.Level0)
+/**
+ * @tc.name: GetFeatureByIfNameTest_003
+ * @tc.desc: Wifi hdi get feature by ifname function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, GetFeatureByIfNameTest_003, TestSize.Level1)
 {
     std::string ifName = "wlan0";
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
@@ -113,7 +131,13 @@ HWTEST_F(WifiHdiHalServiceTest, GetFeatureByIfNameTest_003, TestSize.Level0)
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-HWTEST_F(WifiHdiHalServiceTest, GetAsscociatedStasTest_004, TestSize.Level0)
+/**
+ * @tc.name: GetAsscociatedStasTest_004
+ * @tc.desc: Wifi hdi get assoc stas function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, GetAsscociatedStasTest_004, TestSize.Level1)
 {
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     std::shared_ptr<WifiFeatureInfo> ifeature = nullptr;
@@ -131,7 +155,13 @@ HWTEST_F(WifiHdiHalServiceTest, GetAsscociatedStasTest_004, TestSize.Level0)
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-HWTEST_F(WifiHdiHalServiceTest, SetCountryCodeTest_005, TestSize.Level0)
+/**
+ * @tc.name: SetCountryCodeTest_005
+ * @tc.desc: Wifi hdi set country code function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, SetCountryCodeTest_005, TestSize.Level1)
 {
     std::string code = "CN";
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
@@ -147,7 +177,13 @@ HWTEST_F(WifiHdiHalServiceTest, SetCountryCodeTest_005, TestSize.Level0)
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-HWTEST_F(WifiHdiHalServiceTest, GetNetworkIfaceNameTest_006, TestSize.Level0)
+/**
+ * @tc.name: GetNetworkIfaceNameTest_006
+ * @tc.desc: Wifi hdi get network interface name function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, GetNetworkIfaceNameTest_006, TestSize.Level1)
 {
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     std::shared_ptr<WifiFeatureInfo> ifeature = nullptr;
@@ -162,7 +198,13 @@ HWTEST_F(WifiHdiHalServiceTest, GetNetworkIfaceNameTest_006, TestSize.Level0)
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-HWTEST_F(WifiHdiHalServiceTest, GetFeatureTypeTest_007, TestSize.Level0)
+/**
+ * @tc.name: GetFeatureTypeTest_007
+ * @tc.desc: Wifi hdi get feature type function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, GetFeatureTypeTest_007, TestSize.Level1)
 {
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     std::shared_ptr<WifiFeatureInfo> ifeature = nullptr;
@@ -177,7 +219,13 @@ HWTEST_F(WifiHdiHalServiceTest, GetFeatureTypeTest_007, TestSize.Level0)
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-HWTEST_F(WifiHdiHalServiceTest, SetMacAddressTest_008, TestSize.Level0)
+/**
+ * @tc.name: SetMacAddressTest_008
+ * @tc.desc: Wifi hdi set mac addr function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, SetMacAddressTest_008, TestSize.Level1)
 {
     std::vector<uint8_t> mac = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
@@ -193,7 +241,13 @@ HWTEST_F(WifiHdiHalServiceTest, SetMacAddressTest_008, TestSize.Level0)
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-HWTEST_F(WifiHdiHalServiceTest, GetDeviceMacAddressTest_009, TestSize.Level0)
+/**
+ * @tc.name: GetDeviceMacAddressTest_009
+ * @tc.desc: Wifi hdi get device mac addr function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, GetDeviceMacAddressTest_009, TestSize.Level1)
 {
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     std::shared_ptr<WifiFeatureInfo> ifeature = nullptr;
@@ -209,7 +263,13 @@ HWTEST_F(WifiHdiHalServiceTest, GetDeviceMacAddressTest_009, TestSize.Level0)
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-HWTEST_F(WifiHdiHalServiceTest, GetFreqsWithBandTest_010, TestSize.Level0)
+/**
+ * @tc.name: GetFreqsWithBandTest_010
+ * @tc.desc: Wifi hdi get freqs function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, GetFreqsWithBandTest_010, TestSize.Level1)
 {
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     std::shared_ptr<WifiFeatureInfo> ifeature = nullptr;
@@ -227,7 +287,13 @@ HWTEST_F(WifiHdiHalServiceTest, GetFreqsWithBandTest_010, TestSize.Level0)
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-HWTEST_F(WifiHdiHalServiceTest, SetTxPowerTest_011, TestSize.Level0)
+/**
+ * @tc.name: SetTxPowerTest_011
+ * @tc.desc: Wifi hdi set tx power function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, SetTxPowerTest_011, TestSize.Level1)
 {
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     std::shared_ptr<WifiFeatureInfo> feature = nullptr;
@@ -243,7 +309,13 @@ HWTEST_F(WifiHdiHalServiceTest, SetTxPowerTest_011, TestSize.Level0)
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-HWTEST_F(WifiHdiHalServiceTest, GetChipIdTest_012, TestSize.Level0)
+/**
+ * @tc.name: GetChipIdTest_012
+ * @tc.desc: Wifi hdi get chip id function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, GetChipIdTest_012, TestSize.Level1)
 {
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_STATION;
     std::shared_ptr<WifiFeatureInfo> feature = nullptr;
@@ -263,7 +335,13 @@ HWTEST_F(WifiHdiHalServiceTest, GetChipIdTest_012, TestSize.Level0)
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-HWTEST_F(WifiHdiHalServiceTest, SetScanningMacAddressTest_013, TestSize.Level0)
+/**
+ * @tc.name: SetScanningMacAddressTest_013
+ * @tc.desc: Wifi hdi set scanning mac addr function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, SetScanningMacAddressTest_013, TestSize.Level1)
 {
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_STATION;
     std::shared_ptr<WifiFeatureInfo> feature = nullptr;
@@ -289,7 +367,13 @@ namespace{
     }
 }
 
-HWTEST_F(WifiHdiHalServiceTest, RegisterEventCallbackTest_014, TestSize.Level0)
+/**
+ * @tc.name: RegisterEventCallbackTest_014
+ * @tc.desc: Wifi hdi reister event call back function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, RegisterEventCallbackTest_014, TestSize.Level1)
 {
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
@@ -297,7 +381,13 @@ HWTEST_F(WifiHdiHalServiceTest, RegisterEventCallbackTest_014, TestSize.Level0)
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-HWTEST_F(WifiHdiHalServiceTest, UnregisterEventCallbackTest_015, TestSize.Level0)
+/**
+ * @tc.name: UnregisterEventCallbackTest_015
+ * @tc.desc: Wifi hdi unreister event call back function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, UnregisterEventCallbackTest_015, TestSize.Level1)
 {
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
@@ -305,7 +395,13 @@ HWTEST_F(WifiHdiHalServiceTest, UnregisterEventCallbackTest_015, TestSize.Level0
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-HWTEST_F(WifiHdiHalServiceTest, ResetDriverTest_016, TestSize.Level0)
+/**
+ * @tc.name: ResetDriverTest_016
+ * @tc.desc: Wifi hdi reset driver function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(WifiHdiHalServiceTest, ResetDriverTest_016, TestSize.Level1)
 {
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_STATION;
     std::shared_ptr<WifiFeatureInfo> feature = nullptr;

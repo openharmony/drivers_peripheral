@@ -48,7 +48,13 @@ void WifiClientTest::TearDown()
     WifiDriverClientDeinit();
 }
 
-HWTEST_F(WifiClientTest, WifiClientSetCountryCode001, TestSize.Level0)
+/**
+ * @tc.name: WifiClientSetCountryCode001
+ * @tc.desc: Wifi client set country code function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJC
+ */
+HWTEST_F(WifiClientTest, WifiClientSetCountryCode001, TestSize.Level1)
 {
     int ret;
 
@@ -56,7 +62,13 @@ HWTEST_F(WifiClientTest, WifiClientSetCountryCode001, TestSize.Level0)
     EXPECT_EQ(RET_CODE_SUCCESS, ret);
 }
 
-HWTEST_F(WifiClientTest, WifiClientGetUsableNetworkInfo001, TestSize.Level0)
+/**
+ * @tc.name: WifiClientGetUsableNetworkInfo001
+ * @tc.desc: Wifi client get usable networkInfo function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJC
+ */
+HWTEST_F(WifiClientTest, WifiClientGetUsableNetworkInfo001, TestSize.Level1)
 {
     int ret;
     struct NetworkInfoResult networkInfo;
@@ -65,7 +77,13 @@ HWTEST_F(WifiClientTest, WifiClientGetUsableNetworkInfo001, TestSize.Level0)
     EXPECT_EQ(RET_CODE_SUCCESS, ret);
 }
 
-HWTEST_F(WifiClientTest, WifiClientIsSupportCombo001, TestSize.Level0)
+/**
+ * @tc.name: WifiClientIsSupportCombo001
+ * @tc.desc: Wifi client is support combo function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJC
+ */
+HWTEST_F(WifiClientTest, WifiClientIsSupportCombo001, TestSize.Level1)
 {
     int ret;
     uint8_t isSupportCombo;
@@ -74,7 +92,13 @@ HWTEST_F(WifiClientTest, WifiClientIsSupportCombo001, TestSize.Level0)
     EXPECT_EQ(RET_CODE_SUCCESS, ret);
 }
 
-HWTEST_F(WifiClientTest, WifiClientGetComboInfo001, TestSize.Level0)
+/**
+ * @tc.name: WifiClientGetComboInfo001
+ * @tc.desc: Wifi client get combo info function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJC
+ */
+HWTEST_F(WifiClientTest, WifiClientGetComboInfo001, TestSize.Level1)
 {
     int ret;
     uint64_t comboInfo[DEFAULT_COMBO_SIZE] = {};
@@ -83,7 +107,13 @@ HWTEST_F(WifiClientTest, WifiClientGetComboInfo001, TestSize.Level0)
     EXPECT_EQ(RET_CODE_NOT_SUPPORT, ret);
 }
 
-HWTEST_F(WifiClientTest, WifiClientSetMacAddr001, TestSize.Level0)
+/**
+ * @tc.name: WifiClientSetMacAddr001
+ * @tc.desc: Wifi client set mac addr function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJC
+ */
+HWTEST_F(WifiClientTest, WifiClientSetMacAddr001, TestSize.Level1)
 {
     int ret;
     unsigned char mac[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
@@ -92,7 +122,13 @@ HWTEST_F(WifiClientTest, WifiClientSetMacAddr001, TestSize.Level0)
     EXPECT_EQ(RET_CODE_SUCCESS, ret);
 }
 
-HWTEST_F(WifiClientTest, WifiClientGetDevMacAddr001, TestSize.Level0)
+/**
+ * @tc.name: WifiClientGetDevMacAddr001
+ * @tc.desc: Wifi client get mac addr function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJC
+ */
+HWTEST_F(WifiClientTest, WifiClientGetDevMacAddr001, TestSize.Level1)
 {
     int ret;
     unsigned char mac[ETH_ADDR_LEN] = {};
@@ -102,7 +138,13 @@ HWTEST_F(WifiClientTest, WifiClientGetDevMacAddr001, TestSize.Level0)
     EXPECT_NE(RET_CODE_FAILURE, ret);
 }
 
-HWTEST_F(WifiClientTest, WifiClientGetValidFreqByBand001, TestSize.Level0)
+/**
+ * @tc.name: WifiClientGetValidFreqByBand001
+ * @tc.desc: Wifi client get valid freq function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJC
+ */
+HWTEST_F(WifiClientTest, WifiClientGetValidFreqByBand001, TestSize.Level1)
 {
     int ret;
     int32_t band = IEEE80211_BAND_2GHZ;
@@ -112,7 +154,13 @@ HWTEST_F(WifiClientTest, WifiClientGetValidFreqByBand001, TestSize.Level0)
     EXPECT_EQ(RET_CODE_SUCCESS, ret);
 }
 
-HWTEST_F(WifiClientTest, WifiClientSetTxPower001, TestSize.Level0)
+/**
+ * @tc.name: WifiClientSetTxPower001
+ * @tc.desc: Wifi client set tx power function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJC
+ */
+HWTEST_F(WifiClientTest, WifiClientSetTxPower001, TestSize.Level1)
 {
     int ret;
     int32_t power = 10;
