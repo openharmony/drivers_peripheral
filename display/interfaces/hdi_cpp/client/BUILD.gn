@@ -20,32 +20,34 @@ group("display_client") {
   }
 }
 
-ohos_shared_library("libhdi_display_layer_client") {
-  include_dirs = [
-    "../../include",
-    "//drivers/peripheral/base",
-  ]
-
-  sources = [ "display_layer_proxy.cpp" ]
-
-  deps = [
-    "$hdf_uhdf_path/hdi:libhdi",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/osal:libhdf_utils",
-    "//foundation/graphic/standard/utils:buffer_handle",
-  ]
-
-  if (is_standard_system) {
-    external_deps = [
-      "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+if (is_standard_system) {
+  ohos_shared_library("libhdi_display_layer_client") {
+    include_dirs = [
+      "../../include",
+      "//drivers/peripheral/base",
     ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
-  }
 
-  # install_images = [ "vendor" ]
-  subsystem_name = "hdf"
-  part_name = "hdf"
+    sources = [ "display_layer_proxy.cpp" ]
+
+    deps = [
+      "$hdf_uhdf_path/hdi:libhdi",
+      "//drivers/adapter/uhdf2/host:libhdf_host",
+      "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+      "//drivers/adapter/uhdf2/osal:libhdf_utils",
+      "//foundation/graphic/standard/utils:buffer_handle",
+    ]
+
+    if (is_standard_system) {
+      external_deps = [
+        "hiviewdfx_hilog_native:libhilog",
+        "ipc:ipc_core",
+      ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+
+    # install_images = [ "vendor" ]
+    subsystem_name = "hdf"
+    part_name = "hdf"
+  }
 }
