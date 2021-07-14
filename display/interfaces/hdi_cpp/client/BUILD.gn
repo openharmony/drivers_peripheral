@@ -15,17 +15,15 @@ import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
 group("display_client") {
-  deps = [ ":libhdi_display_layer_client" ]
+  if (is_standard_system) {
+    deps = [ ":libhdi_display_layer_client" ]
+  }
 }
 
 ohos_shared_library("libhdi_display_layer_client") {
   include_dirs = [
     "../../include",
-    "$hdf_framework_path/ability/sbuf/include",
-    "$hdf_uhdf_path/manager/include",
-    "$hdf_uhdf_path/include/hdi",
     "//drivers/peripheral/base",
-    "//foundation/graphic/standard/interfaces/innerkits/surface",
   ]
 
   sources = [ "display_layer_proxy.cpp" ]
@@ -35,7 +33,6 @@ ohos_shared_library("libhdi_display_layer_client") {
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/adapter/uhdf2/osal:libhdf_utils",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/graphic/standard/utils:buffer_handle",
   ]
 

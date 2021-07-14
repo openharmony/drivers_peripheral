@@ -20,7 +20,7 @@
 #include <message_parcel.h>
 #include <message_option.h>
 #include "idisplay_layer.h"
-#include "display_layer_service_impl_test.h"
+#include "display_layer_service_impl.h"
 
 namespace OHOS {
 namespace HDI {
