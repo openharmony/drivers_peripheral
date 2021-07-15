@@ -79,7 +79,7 @@ typedef enum {
 
 typedef struct {
     int32_t reassoc;
-    size_t ieLen;
+    uint32_t ieLen;
     uint8_t *ie;
     uint8_t *macAddr;
     uint8_t resv[2];
@@ -117,9 +117,9 @@ typedef struct {
 
 typedef struct {
     uint8_t *reqIe;
-    size_t reqIeLen;
+    uint32_t reqIeLen;
     uint8_t *respIe;
-    size_t respIeLen;
+    uint32_t respIeLen;
     uint8_t *bssid;
     uint8_t rsv[2];
     uint16_t status;
