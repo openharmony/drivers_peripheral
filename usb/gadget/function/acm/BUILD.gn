@@ -1,0 +1,34 @@
+# Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
+
+import("//build/ohos.gni")
+import("//drivers/adapter/uhdf2/uhdf.gni")
+
+group("usbfn_cdcacm") {
+  deps = [ ":libusbfn_cdcacm" ]
+}
+
+ohos_shared_library("libusbfn_cdcacm") {
+  include_dirs = [
+    "//drivers/peripheral/usb/interfaces/ddk/device",
+    "//drivers/peripheral/usb/interfaces/ddk/common",
+    "../include",
+  ]
+
+  sources = [ "cdcacm.c" ]
+
+  deps = [
+    "//drivers/adapter/uhdf2/config:uhdf_hcs_pkg",
+    "//drivers/adapter/uhdf2/host:libhdf_host",
+    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+    "//drivers/adapter/uhdf2/osal:libhdf_utils",
+    "//drivers/peripheral/usb/ddk:libusb_core",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  subsystem_name = "hdf"
+}

@@ -1,0 +1,345 @@
+# Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
+
+import("//build/ohos.gni")
+import("//drivers/adapter/uhdf2/uhdf.gni")
+
+LEVEL_DIR = "//drivers/peripheral/usb/sample/levelip"
+
+ohos_executable("acm_test") {
+  include_dirs = [
+    "//utils/native/base/include",
+    "$hdf_framework_path/core/manager/include",
+    "$hdf_framework_path/core/host/include",
+    "$hdf_framework_path/core/shared/include",
+    "$hdf_framework_path/include/osal",
+    "$hdf_framework_path/include/utils",
+    "$hdf_framework_path/include/core",
+    "$hdf_framework_path/utils/include",
+    "$hdf_framework_path/ability/sbuf/include",
+    "$hdf_framework_path/include/config",
+    "$hdf_framework_path/ability/config/hcs_parser/include",
+    "$hdf_uhdf_path/ipc/include",
+    "$hdf_uhdf_path/osal/include",
+    "$hdf_uhdf_path/include/config",
+    "$hdf_uhdf_path/include/host",
+    "$hdf_uhdf_path/shared/include",
+    "$hdf_uhdf_path/manager/include",
+    "//drivers/peripheral/usb/interfaces/ddk/device",
+    "//drivers/peripheral/usb/interfaces/ddk/common",
+    "//drivers/peripheral/usb/gadget/function/include",
+  ]
+
+  sources = [ "acm_test.c" ]
+
+  deps = [
+    "$hdf_uhdf_path/config:uhdf_hcs_pkg",
+    "$hdf_uhdf_path/hdi:libhdi",
+    "$hdf_uhdf_path/host:libhdf_host",
+    "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
+    "$hdf_uhdf_path/osal:libhdf_utils",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  install_enable = true
+  subsystem_name = "hdf"
+}
+
+ohos_executable("acm_read") {
+  include_dirs = [
+    "//utils/native/base/include",
+    "$hdf_framework_path/core/manager/include",
+    "$hdf_framework_path/core/host/include",
+    "$hdf_framework_path/core/shared/include",
+    "$hdf_framework_path/include/osal",
+    "$hdf_framework_path/include/utils",
+    "$hdf_framework_path/include/core",
+    "$hdf_framework_path/utils/include",
+    "$hdf_framework_path/ability/sbuf/include",
+    "$hdf_framework_path/include/config",
+    "$hdf_framework_path/ability/config/hcs_parser/include",
+    "$hdf_uhdf_path/ipc/include",
+    "$hdf_uhdf_path/osal/include",
+    "$hdf_uhdf_path/include/config",
+    "$hdf_uhdf_path/include/host",
+    "$hdf_uhdf_path/shared/include",
+    "$hdf_uhdf_path/manager/include",
+    "//drivers/peripheral/usb/interfaces/ddk/device",
+    "//drivers/peripheral/usb/interfaces/ddk/common",
+    "//drivers/peripheral/usb/gadget/function/include",
+  ]
+
+  sources = [ "acm_read.c" ]
+
+  deps = [
+    "$hdf_uhdf_path/config:uhdf_hcs_pkg",
+    "$hdf_uhdf_path/hdi:libhdi",
+    "$hdf_uhdf_path/host:libhdf_host",
+    "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
+    "$hdf_uhdf_path/osal:libhdf_utils",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  install_enable = true
+  subsystem_name = "hdf"
+}
+
+ohos_executable("acm_write") {
+  include_dirs = [
+    "//utils/native/base/include",
+    "$hdf_framework_path/core/manager/include",
+    "$hdf_framework_path/core/host/include",
+    "$hdf_framework_path/core/shared/include",
+    "$hdf_framework_path/include/osal",
+    "$hdf_framework_path/include/utils",
+    "$hdf_framework_path/include/core",
+    "$hdf_framework_path/utils/include",
+    "$hdf_framework_path/ability/sbuf/include",
+    "$hdf_framework_path/include/config",
+    "$hdf_framework_path/ability/config/hcs_parser/include",
+    "$hdf_uhdf_path/ipc/include",
+    "$hdf_uhdf_path/osal/include",
+    "$hdf_uhdf_path/include/config",
+    "$hdf_uhdf_path/include/host",
+    "$hdf_uhdf_path/shared/include",
+    "$hdf_uhdf_path/manager/include",
+    "//drivers/peripheral/usb/interfaces/ddk/device",
+    "//drivers/peripheral/usb/interfaces/ddk/common",
+    "//drivers/peripheral/usb/gadget/function/include",
+  ]
+
+  sources = [ "acm_write.c" ]
+
+  deps = [
+    "$hdf_uhdf_path/config:uhdf_hcs_pkg",
+    "$hdf_uhdf_path/hdi:libhdi",
+    "$hdf_uhdf_path/host:libhdf_host",
+    "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
+    "$hdf_uhdf_path/osal:libhdf_utils",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  install_enable = true
+  subsystem_name = "hdf"
+}
+
+ohos_executable("acm_speed_write") {
+  include_dirs = [
+    "//utils/native/base/include",
+    "$hdf_framework_path/core/manager/include",
+    "$hdf_framework_path/core/host/include",
+    "$hdf_framework_path/core/shared/include",
+    "$hdf_framework_path/include/osal",
+    "$hdf_framework_path/include/utils",
+    "$hdf_framework_path/include/core",
+    "$hdf_framework_path/utils/include",
+    "$hdf_framework_path/ability/sbuf/include",
+    "$hdf_framework_path/include/config",
+    "$hdf_framework_path/ability/config/hcs_parser/include",
+    "$hdf_uhdf_path/ipc/include",
+    "$hdf_uhdf_path/osal/include",
+    "$hdf_uhdf_path/include/config",
+    "$hdf_uhdf_path/include/host",
+    "$hdf_uhdf_path/shared/include",
+    "$hdf_uhdf_path/manager/include",
+    "//drivers/peripheral/usb/interfaces/ddk/device",
+    "//drivers/peripheral/usb/interfaces/ddk/common",
+    "//drivers/peripheral/usb/gadget/function/include",
+  ]
+
+  sources = [ "acm_speed_write.c" ]
+
+  deps = [
+    "$hdf_uhdf_path/config:uhdf_hcs_pkg",
+    "$hdf_uhdf_path/hdi:libhdi",
+    "$hdf_uhdf_path/host:libhdf_host",
+    "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
+    "$hdf_uhdf_path/osal:libhdf_utils",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  install_enable = true
+  subsystem_name = "hdf"
+}
+
+ohos_executable("acm_speed_read") {
+  include_dirs = [
+    "//utils/native/base/include",
+    "$hdf_framework_path/core/manager/include",
+    "$hdf_framework_path/core/host/include",
+    "$hdf_framework_path/core/shared/include",
+    "$hdf_framework_path/include/osal",
+    "$hdf_framework_path/include/utils",
+    "$hdf_framework_path/include/core",
+    "$hdf_framework_path/utils/include",
+    "$hdf_framework_path/ability/sbuf/include",
+    "$hdf_framework_path/include/config",
+    "$hdf_framework_path/ability/config/hcs_parser/include",
+    "$hdf_uhdf_path/ipc/include",
+    "$hdf_uhdf_path/osal/include",
+    "$hdf_uhdf_path/include/config",
+    "$hdf_uhdf_path/include/host",
+    "$hdf_uhdf_path/shared/include",
+    "$hdf_uhdf_path/manager/include",
+    "//drivers/peripheral/usb/interfaces/ddk/device",
+    "//drivers/peripheral/usb/interfaces/ddk/common",
+    "//drivers/peripheral/usb/gadget/function/include",
+  ]
+
+  sources = [ "acm_speed_read.c" ]
+
+  deps = [
+    "$hdf_uhdf_path/config:uhdf_hcs_pkg",
+    "$hdf_uhdf_path/hdi:libhdi",
+    "$hdf_uhdf_path/host:libhdf_host",
+    "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
+    "$hdf_uhdf_path/osal:libhdf_utils",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  install_enable = true
+  subsystem_name = "hdf"
+}
+
+ohos_executable("prop_test") {
+  include_dirs = [
+    "//utils/native/base/include",
+    "$hdf_framework_path/core/manager/include",
+    "$hdf_framework_path/core/host/include",
+    "$hdf_framework_path/core/shared/include",
+    "$hdf_framework_path/include/osal",
+    "$hdf_framework_path/include/utils",
+    "$hdf_framework_path/include/core",
+    "$hdf_framework_path/utils/include",
+    "$hdf_framework_path/ability/sbuf/include",
+    "$hdf_framework_path/include/config",
+    "$hdf_framework_path/ability/config/hcs_parser/include",
+    "$hdf_uhdf_path/ipc/include",
+    "$hdf_uhdf_path/osal/include",
+    "$hdf_uhdf_path/include/config",
+    "$hdf_uhdf_path/include/host",
+    "$hdf_uhdf_path/shared/include",
+    "$hdf_uhdf_path/manager/include",
+    "//drivers/peripheral/usb/interfaces/ddk/device",
+    "//drivers/peripheral/usb/interfaces/ddk/common",
+    "//drivers/peripheral/usb/gadget/function/include",
+  ]
+
+  sources = [ "prop_test.c" ]
+
+  deps = [
+    "$hdf_uhdf_path/config:uhdf_hcs_pkg",
+    "$hdf_uhdf_path/hdi:libhdi",
+    "$hdf_uhdf_path/host:libhdf_host",
+    "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
+    "$hdf_uhdf_path/osal:libhdf_utils",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  install_enable = true
+  subsystem_name = "hdf"
+}
+
+ohos_executable("level_ip") {
+  include_dirs = [
+    "//utils/native/base/include",
+    "$hdf_framework_path/core/manager/include",
+    "$hdf_framework_path/core/host/include",
+    "$hdf_framework_path/core/shared/include",
+    "$hdf_framework_path/include/osal",
+    "$hdf_framework_path/include/utils",
+    "$hdf_framework_path/include/core",
+    "$hdf_framework_path/utils/include",
+    "$hdf_framework_path/ability/sbuf/include",
+    "$hdf_framework_path/include/config",
+    "$hdf_framework_path/ability/config/hcs_parser/include",
+    "$hdf_uhdf_path/ipc/include",
+    "$hdf_uhdf_path/osal/include",
+    "$hdf_uhdf_path/include/config",
+    "$hdf_uhdf_path/include/host",
+    "$hdf_uhdf_path/shared/include",
+    "$hdf_uhdf_path/manager/include",
+    "$LEVEL_DIR/include",
+  ]
+  sources = [
+    "$LEVEL_DIR/src/arp.c",
+    "$LEVEL_DIR/src/cli.c",
+    "$LEVEL_DIR/src/dst.c",
+    "$LEVEL_DIR/src/icmpv4.c",
+    "$LEVEL_DIR/src/inet.c",
+    "$LEVEL_DIR/src/ip_input.c",
+    "$LEVEL_DIR/src/ip_output.c",
+    "$LEVEL_DIR/src/ipc.c",
+    "$LEVEL_DIR/src/main.c",
+    "$LEVEL_DIR/src/ping.c",
+    "$LEVEL_DIR/src/route.c",
+    "$LEVEL_DIR/src/skbuff.c",
+    "$LEVEL_DIR/src/sock.c",
+    "$LEVEL_DIR/src/socket.c",
+    "$LEVEL_DIR/src/tcp.c",
+    "$LEVEL_DIR/src/tcp_data.c",
+    "$LEVEL_DIR/src/tcp_input.c",
+    "$LEVEL_DIR/src/tcp_output.c",
+    "$LEVEL_DIR/src/timer.c",
+    "$LEVEL_DIR/src/utils.c",
+    "levelip/src/netdev.c",
+    "levelip/src/tuntap_if.c",
+  ]
+
+  cflags = [
+    "-Wno-address-of-packed-member",
+    "-Wall",
+  ]
+
+  deps = [
+    "$hdf_uhdf_path/config:uhdf_hcs_pkg",
+    "$hdf_uhdf_path/hdi:libhdi",
+    "$hdf_uhdf_path/host:libhdf_host",
+    "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
+    "$hdf_uhdf_path/osal:libhdf_utils",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  install_enable = true
+  subsystem_name = "hdf"
+}
