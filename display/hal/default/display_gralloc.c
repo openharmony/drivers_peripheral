@@ -165,6 +165,7 @@ static int32_t AllocShm(BufferHandle *buffer)
 static int32_t AllocMem(const AllocInfo* info, BufferHandle **buffer)
 {
     int32_t ret;
+    BufferHandle *bufferHdl = NULL;
     DISPLAY_CHK_RETURN((buffer == NULL), DISPLAY_NULL_PTR, HDF_LOGE("%s: in buffer is null", __func__));
     DISPLAY_CHK_RETURN((info == NULL), DISPLAY_NULL_PTR, HDF_LOGE("%s: in info is null", __func__));
     PriBufferHandle* priBuffer = calloc(1, sizeof(PriBufferHandle));
@@ -174,7 +175,7 @@ static int32_t AllocMem(const AllocInfo* info, BufferHandle **buffer)
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, HDF_LOGE("%s: can not init buffe handle",
         __func__); goto OUT);
 
-    BufferHandle *bufferHdl = &priBuffer->hdl;
+    bufferHdl = &priBuffer->hdl;
     DISPLAY_CHK_RETURN(((bufferHdl->size > MAX_MALLOC_SIZE) || (bufferHdl->size == 0)),
         DISPLAY_FAILURE, HDF_LOGE("%s: size is invalid %d ", __func__, bufferHdl->size); goto out);
 

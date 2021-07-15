@@ -91,6 +91,7 @@ enum {
     HBM_USE_MEM_DMA = (1 << 3),         /**< the allocator should support dma buffer */
     HBM_USE_MEM_SHARE = (1 << 4),       /**< the allocator should support shared memory buffer*/
     HBM_USE_MEM_MMZ_CACHE = (1 << 5),   /**< will use mmz to allocate memory with cache*/
+    HBM_USE_MEM_FB = (1 << 6),         /**< the buffer allocate for framebuffer */
 };
 
 /**
@@ -414,6 +415,8 @@ typedef struct {
     uint32_t phyWidth;                  /**< Physical width */
     uint32_t phyHeight;                 /**< Physical width */
     uint32_t supportLayers;             /**< BitMask of LayerType */
+    uint32_t virtualDispCount;           /**< the count of virtual displays supported*/
+    bool supportWriteBack;              /**< wether support writeback*/
     uint32_t propertyCount;             /**< Count of properties */
     PropertyObject* props;              /**< Array of property objects */
 } DisplayCapability;
@@ -425,6 +428,7 @@ typedef struct {
     int32_t width;      /**< width in pixel */
     int32_t height;     /**< height in pixel */
     uint32_t freshRate; /**< fresh rate in one second */
+    int32_t id;         /**< the id of the mode */
 } DisplayModeInfo;
 
 /**
