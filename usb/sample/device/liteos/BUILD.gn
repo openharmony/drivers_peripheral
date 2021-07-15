@@ -1,0 +1,193 @@
+# Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
+import("//build/lite/config/component/lite_component.gni")
+
+HDF_FRAMEWORKS = "//drivers/framework"
+LEVEL_DIR_LITEOS = "//drivers/peripheral/usb/sample/device/liteos/levelip"
+LEVEL_DIR = "//drivers/peripheral/usb/sample/levelip"
+
+lite_component("usbfn_sample") {
+  features = [
+    ":acm_test",
+    ":acm_read",
+    ":acm_write",
+    ":acm_speed_write",
+    ":prop_test",
+  ]
+}
+
+executable("acm_test") {
+  sources = [ "acm_test.c" ]
+
+  include_dirs = [
+    "$HDF_FRAMEWORKS/ability/sbuf/include",
+    "$HDF_FRAMEWORKS/core/shared/include",
+    "$HDF_FRAMEWORKS/core/host/include",
+    "$HDF_FRAMEWORKS/core/master/include",
+    "$HDF_FRAMEWORKS/include/core",
+    "$HDF_FRAMEWORKS/include/utils",
+    "$HDF_FRAMEWORKS/utils/include",
+    "$HDF_FRAMEWORKS/include/osal",
+    "//drivers/adapter/uhdf/posix/include",
+    "//third_party/bounds_checking_function/include",
+    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+  ]
+
+  deps = [
+    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+    "//drivers/adapter/uhdf/manager:hdf_core",
+    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
+  ]
+
+  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+  defines = [ "__USER__" ]
+
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Wno-format",
+    "-Wno-format-extra-args",
+  ]
+
+  ldflags = [
+    "-L$ohos_root_path/sysroot/usr/lib",
+    "-Wl,-rpath-link=$ohos_root_path/sysroot/usr/lib",
+    "-lstdc++",
+    "-lpthread",
+  ]
+}
+
+executable("acm_read") {
+  sources = [ "acm_read.c" ]
+
+  include_dirs = [
+    "$HDF_FRAMEWORKS/ability/sbuf/include",
+    "$HDF_FRAMEWORKS/core/shared/include",
+    "$HDF_FRAMEWORKS/core/host/include",
+    "$HDF_FRAMEWORKS/core/master/include",
+    "$HDF_FRAMEWORKS/include/core",
+    "$HDF_FRAMEWORKS/include/utils",
+    "$HDF_FRAMEWORKS/utils/include",
+    "$HDF_FRAMEWORKS/include/osal",
+    "//drivers/adapter/uhdf/posix/include",
+    "//third_party/bounds_checking_function/include",
+    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+  ]
+
+  deps = [
+    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+    "//drivers/adapter/uhdf/manager:hdf_core",
+    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
+  ]
+
+  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+  defines = [ "__USER__" ]
+
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Wno-format",
+    "-Wno-format-extra-args",
+  ]
+}
+
+executable("acm_write") {
+  sources = [ "acm_write.c" ]
+
+  include_dirs = [
+    "$HDF_FRAMEWORKS/ability/sbuf/include",
+    "$HDF_FRAMEWORKS/core/shared/include",
+    "$HDF_FRAMEWORKS/core/host/include",
+    "$HDF_FRAMEWORKS/core/master/include",
+    "$HDF_FRAMEWORKS/include/core",
+    "$HDF_FRAMEWORKS/include/utils",
+    "$HDF_FRAMEWORKS/utils/include",
+    "$HDF_FRAMEWORKS/include/osal",
+    "//drivers/adapter/uhdf/posix/include",
+    "//third_party/bounds_checking_function/include",
+    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+  ]
+
+  deps = [
+    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+    "//drivers/adapter/uhdf/manager:hdf_core",
+    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
+  ]
+
+  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+  defines = [ "__USER__" ]
+
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Wno-format",
+    "-Wno-format-extra-args",
+  ]
+}
+
+executable("acm_speed_write") {
+  sources = [ "acm_speed_write.c" ]
+
+  include_dirs = [
+    "$HDF_FRAMEWORKS/ability/sbuf/include",
+    "$HDF_FRAMEWORKS/core/shared/include",
+    "$HDF_FRAMEWORKS/core/host/include",
+    "$HDF_FRAMEWORKS/core/master/include",
+    "$HDF_FRAMEWORKS/include/core",
+    "$HDF_FRAMEWORKS/include/utils",
+    "$HDF_FRAMEWORKS/utils/include",
+    "$HDF_FRAMEWORKS/include/osal",
+    "//drivers/adapter/uhdf/posix/include",
+    "//third_party/bounds_checking_function/include",
+    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+  ]
+
+  deps = [
+    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+    "//drivers/adapter/uhdf/manager:hdf_core",
+    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
+  ]
+
+  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+  defines = [ "__USER__" ]
+
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Wno-format",
+    "-Wno-format-extra-args",
+  ]
+}
+
+executable("prop_test") {
+  sources = [ "prop_test.c" ]
+
+  include_dirs = [
+    "$HDF_FRAMEWORKS/ability/sbuf/include",
+    "$HDF_FRAMEWORKS/core/shared/include",
+    "$HDF_FRAMEWORKS/core/host/include",
+    "$HDF_FRAMEWORKS/core/master/include",
+    "$HDF_FRAMEWORKS/include/core",
+    "$HDF_FRAMEWORKS/include/utils",
+    "$HDF_FRAMEWORKS/utils/include",
+    "$HDF_FRAMEWORKS/include/osal",
+    "//drivers/adapter/uhdf/posix/include",
+    "//third_party/bounds_checking_function/include",
+    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+  ]
+
+  deps = [
+    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+    "//drivers/adapter/uhdf/manager:hdf_core",
+    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
+  ]
+
+  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+  defines = [ "__USER__" ]
+
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Wno-format",
+    "-Wno-format-extra-args",
+  ]
+}
