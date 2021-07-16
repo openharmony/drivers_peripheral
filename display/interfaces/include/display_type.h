@@ -91,7 +91,8 @@ enum {
     HBM_USE_MEM_DMA = (1 << 3),         /**< the allocator should support dma buffer */
     HBM_USE_MEM_SHARE = (1 << 4),       /**< the allocator should support shared memory buffer*/
     HBM_USE_MEM_MMZ_CACHE = (1 << 5),   /**< will use mmz to allocate memory with cache*/
-    HBM_USE_MEM_FB = (1 << 6),         /**< the buffer allocate for framebuffer */
+    HBM_USE_MEM_FB = (1 << 6),          /**< the buffer allocate for framebuffer */
+    HBM_USE_ASSIGN_SIZE = (1 << 7),     /**< assign memory size from requester */
 };
 
 /**
@@ -415,7 +416,7 @@ typedef struct {
     uint32_t phyWidth;                  /**< Physical width */
     uint32_t phyHeight;                 /**< Physical width */
     uint32_t supportLayers;             /**< BitMask of LayerType */
-    uint32_t virtualDispCount;           /**< the count of virtual displays supported*/
+    uint32_t virtualDispCount;          /**< the count of virtual displays supported*/
     bool supportWriteBack;              /**< wether support writeback*/
     uint32_t propertyCount;             /**< Count of properties */
     PropertyObject* props;              /**< Array of property objects */
@@ -440,6 +441,7 @@ typedef struct {
     uint32_t height;              /**< The height of the request allocation */
     uint64_t usage;               /**< The usage of the request allocation */
     PixelFormat format;           /**< The format of the request allocation */
+    uint32_t expectedSize;        /**< The size assigned by memory requester */
 } AllocInfo;
 /**
  * @brief Enumerates power status.
