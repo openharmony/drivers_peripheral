@@ -165,12 +165,8 @@ ohos_moduletest("usb_host_performance_test") {
 group("hdf_moduletest_usb") {
   testonly = true
   deps = [
-    ":usb_device_compose_func_test",
-    ":usb_device_net_func_test",
     ":usb_device_performance_test",
     ":usb_device_serial_func_test",
-    ":usb_host_compose_func_test",
-    ":usb_host_net_func_test",
     ":usb_host_performance_test",
     ":usb_host_raw_api_func_test",
     ":usb_host_serial_func_test",
