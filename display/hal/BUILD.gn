@@ -14,12 +14,8 @@
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
 
-  if (board_name == "hi3516dv300" || board_name == "hispark_taurus" ||
-      board_name == "hi3518ev300" || board_name == "hispark_aries" ||
-      board_name == "aegis_hi3516dv300") {
-    group("hdi_display") {
-      public_deps = [ "//device/hisilicon/hardware/display/libs:hdi_display" ]
-    }
+  group("hdi_display") {
+    public_deps = [ "//device/${device_company}/hardware/display:hdi_display" ]
   }
 } else {
   import("//build/ohos.gni")
