@@ -20,3 +20,6 @@ on post-fs-data
    chown system system /dev/hdf_input_event4
    chown system system /dev/hdf_input_event5
    chown system system /dev/hdf_input_event6
+   chown system system /dev/hdf_sensor_manager_ap
+   chown system system /dev/hdf_misc_vibrator
+   chown system system /dev/dev_mgr
