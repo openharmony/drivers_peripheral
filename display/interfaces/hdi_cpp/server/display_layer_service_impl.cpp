@@ -29,7 +29,6 @@ static GrallocFuncs *g_grallocFuncs = nullptr;
 
 DispErrCode DisplayLayerService::InitDisplay(unsigned int devId)
 {
-    HDF_LOGI("[service]--%{public}s: enter, devId = %{public}d", __func__, devId);
     if (g_layerFuncs != nullptr) {
         return DISPLAY_SUCCESS;
     }
@@ -66,7 +65,6 @@ DispErrCode DisplayLayerService::InitDisplay(unsigned int devId)
 
 DispErrCode DisplayLayerService::DeinitDisplay(unsigned int devId)
 {
-    HDF_LOGI("[service]--%{public}s: enter, devId = %{public}d", __func__, devId);
     if (g_layerFuncs != nullptr && g_layerFuncs->DeinitDisplay != nullptr) {
         (void)g_layerFuncs->DeinitDisplay(devId);
     }
@@ -75,7 +73,6 @@ DispErrCode DisplayLayerService::DeinitDisplay(unsigned int devId)
 
 DispErrCode DisplayLayerService::GetDisplayInfo(unsigned int devId, std::shared_ptr<DisplayInfo> &dispInfo)
 {
-    HDF_LOGI("[service]--%{public}s: enter, devId = %{public}d", __func__, devId);
     if (g_layerFuncs == nullptr) {
         HDF_LOGE("video display not inited");
         return DISPLAY_FAILURE;
@@ -87,8 +84,6 @@ DispErrCode DisplayLayerService::GetDisplayInfo(unsigned int devId, std::shared_
         return DISPLAY_FAILURE;
     }
 
-    HDF_LOGI("[service]--%{public}s: width = %{public}d, height = %{public}d, rotAngle = %{public}d",
-        __func__, dispInfo->width, dispInfo->height, dispInfo->rotAngle);
     return DISPLAY_SUCCESS;
 }
 
@@ -96,8 +91,6 @@ DispErrCode DisplayLayerService::CreateLayer(unsigned int devId, LayerInfo &laye
 {
     int32_t ret;
     LayerInfo info = layerInfo;
-    HDF_LOGI("[service]--%{public}s: width= %{public}d, height = %{public}d, type = %{public}d, bpp = %{public}d",
-        __func__, layerInfo.width, layerInfo.height, layerInfo.type, layerInfo.bpp);
     if (g_layerFuncs == nullptr) {
         ret = InitDisplay(devId);
         if (ret != DISPLAY_SUCCESS) {
@@ -126,7 +119,6 @@ DispErrCode DisplayLayerService::CreateLayer(unsigned int devId, LayerInfo &laye
 
 DispErrCode DisplayLayerService::CloseLayer(unsigned int devId, unsigned int layerId)
 {
-    HDF_LOGI("[service]--%{public}s: enter, devId = %{public}d", __func__, devId);
     if (g_layerFuncs == nullptr || g_layerFuncs->CloseLayer == nullptr) {
         HDF_LOGE("may not inited or CloseLayer nullptr");
         return DISPLAY_FAILURE;
@@ -137,7 +129,6 @@ DispErrCode DisplayLayerService::CloseLayer(unsigned int devId, unsigned int lay
 
 DispErrCode DisplayLayerService::SetLayerVisible(unsigned int devId, unsigned int layerId, bool visible)
 {
-    HDF_LOGI("[service]--%{public}s: devId = %{public}d, visible = %{public}d", __func__, devId, visible);
     if (g_layerFuncs == nullptr || g_layerFuncs->SetLayerVisible == nullptr) {
         HDF_LOGE("may not inited or SetLayerVisible nullptr");
         return DISPLAY_FAILURE;
@@ -148,7 +139,6 @@ DispErrCode DisplayLayerService::SetLayerVisible(unsigned int devId, unsigned in
 
 DispErrCode DisplayLayerService::GetLayerVisibleState(unsigned int devId, unsigned int layerId, bool &visible)
 {
-    HDF_LOGI("[service]--%{public}s: devId = %{public}d, visible is true", __func__, devId);
     if (g_layerFuncs == nullptr || g_layerFuncs->GetLayerVisibleState == nullptr) {
         HDF_LOGE("may not inited or GetLayerVisibleState nullptr");
         return DISPLAY_FAILURE;
@@ -159,8 +149,6 @@ DispErrCode DisplayLayerService::GetLayerVisibleState(unsigned int devId, unsign
 
 DispErrCode DisplayLayerService::SetLayerRect(unsigned int devId, unsigned int layerId, IRect &rect)
 {
-    HDF_LOGI("[service]--%{public}s: [x,y,w,h]= [%{public}d, %{public}d, %{public}d, %{public}d]",
-        __func__, rect.x, rect.y, rect.w, rect.h);
     if (g_layerFuncs == nullptr || g_layerFuncs->SetLayerSize == nullptr) {
         HDF_LOGE("may not inited or SetLayerSize nullptr");
         return DISPLAY_FAILURE;
@@ -177,14 +165,11 @@ DispErrCode DisplayLayerService::GetLayerRect(unsigned int devId, unsigned int l
     }
     int32_t ret = g_layerFuncs->GetLayerSize(devId, layerId, rect.get());
 
-    HDF_LOGI("[service]--%{public}s: [x,y,w,h] = [%{public}d, %{public}d, %{public}d, %{public}d]",
-        __func__, rect->x, rect->y, rect->w, rect->h);
     return (ret == DISPLAY_SUCCESS) ? DISPLAY_SUCCESS : DISPLAY_FAILURE;
 }
 
 DispErrCode DisplayLayerService::SetLayerZorder(unsigned int devId, unsigned int layerId, unsigned int zorder)
 {
-    HDF_LOGI("[service]--%{public}s: devId = %{public}d, zorder = %{public}d", __func__, devId, zorder);
     if (g_layerFuncs == nullptr || g_layerFuncs->SetLayerZorder == nullptr) {
         HDF_LOGE("may not inited or SetLayerZorder nullptr");
         return DISPLAY_FAILURE;
@@ -195,7 +180,6 @@ DispErrCode DisplayLayerService::SetLayerZorder(unsigned int devId, unsigned int
 
 DispErrCode DisplayLayerService::GetLayerZorder(unsigned int devId, unsigned int layerId, unsigned int &zorder)
 {
-    HDF_LOGI("[service]--%{public}s: devId = %{public}d, zorder is 3", __func__, devId);
     if (g_layerFuncs == nullptr || g_layerFuncs->GetLayerZorder == nullptr) {
         HDF_LOGE("may not inited or GetLayerZorder nullptr");
         return DISPLAY_FAILURE;
@@ -206,7 +190,6 @@ DispErrCode DisplayLayerService::GetLayerZorder(unsigned int devId, unsigned int
 
 DispErrCode DisplayLayerService::SetTransformMode(unsigned int devId, unsigned int layerId, TransformType &type)
 {
-    HDF_LOGI("[service]--%{public}s: devId = %{public}d, transformType = %{public}d", __func__, devId, type);
     if (g_layerFuncs == nullptr || g_layerFuncs->SetTransformMode == nullptr) {
         HDF_LOGE("may not inited or SetTransformMode nullptr");
         return DISPLAY_FAILURE;
@@ -217,8 +200,6 @@ DispErrCode DisplayLayerService::SetTransformMode(unsigned int devId, unsigned i
 
 DispErrCode DisplayLayerService::SetLayerBuffer(unsigned int devId, unsigned int layerId, const BufferHandle &buffer, int fence)
 {
-    HDF_LOGD("[service]--%{public}s: fd= %{public}d, w= %{public}d, h= %{public}d, size= %{public}d, fmt= %{public}d",
-        __func__, buffer.fd, buffer.width, buffer.height, buffer.size, buffer.format);
     if (g_layerFuncs == nullptr || g_layerFuncs->SetLayerBuffer == nullptr) {
         HDF_LOGE("may not inited or SetLayerBuffer nullptr");
         return DISPLAY_FAILURE;
