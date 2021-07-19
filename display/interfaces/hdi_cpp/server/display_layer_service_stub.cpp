@@ -15,6 +15,7 @@
 
 #include "display_layer_service_stub.h"
 #include <buffer_handle_parcel.h>
+#include <buffer_handle_utils.h>
 #include <hdf_log.h>
 #include <hdf_base.h>
 #include <hdf_sbuf_ipc.h>
@@ -268,10 +269,11 @@ int32_t DisplayLayerStub::LayerStubSetLayerBuffer(
         HDF_LOGE("%{public}s: read bufferHandle failed", __func__);
         return DISPLAY_FAILURE;
     }
-
+    buffer->virAddr = nullptr;
     uint32_t fence = data.ReadInt32();
 
     DispErrCode retCode = layerService_->SetLayerBuffer(devId, layerId, *buffer, fence);
+    (void)FreeBufferHandle(buffer);
     if (!reply.WriteInt32(static_cast<int32_t>(retCode))) {
         HDF_LOGE("%{public}s: write retcode failed", __func__);
         return HDF_FAILURE;
@@ -323,7 +325,7 @@ int32_t DisplayLayerStub::LayerStubOnRemoteRequest(int cmdId, MessageParcel &dat
             return LayerStubSetLayerTransformMode(data, reply, option);
         }
         default: {
-            HDF_LOGE("%{public}s: not support cmd %d", __func__, cmdId);
+            HDF_LOGE("%{public}s: not support cmd %{public}d", __func__, cmdId);
             return HDF_ERR_INVALID_PARAM;
         }
     }
