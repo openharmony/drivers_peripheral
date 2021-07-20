@@ -183,6 +183,7 @@ static int32_t HotPlugEventListenerCallback(struct HdfDevEventlistener *listener
     uint32_t len = 0;
     HotPlugEvent *event = NULL;
     InputDevManager *manager = NULL;
+    bool ret = false;
 
     if (service == NULL || data == NULL) {
         HDF_LOGE("%s: invalid param", __func__);
@@ -190,13 +191,16 @@ static int32_t HotPlugEventListenerCallback(struct HdfDevEventlistener *listener
     }
 
     GET_MANAGER_CHECK_RETURN(manager);
-    pthread_mutex_lock(&manager->mutex);
 
-    if (!HdfSbufReadBuffer(data, (const void **)&event, &len)) {
-        HDF_LOGE("%s: sbuf read finished", __func__);
+    ret = HdfSbufReadBuffer(data, (const void **)&event, &len);
+    if (!ret) {
+        HDF_LOGE("%s: read sbuf failed", __func__);
+        return INPUT_FAILURE;
     }
+    HDF_LOGI("%{public}s: hot plug callback start", __func__);
     manager->hostDev.hostCb->HotPlugCallback((const HotPlugEvent *)event);
-    pthread_mutex_unlock(&manager->mutex);
+    HDF_LOGI("%{public}s: hot plug callback end\n", __func__);
+
     return INPUT_SUCCESS;
 }
 
