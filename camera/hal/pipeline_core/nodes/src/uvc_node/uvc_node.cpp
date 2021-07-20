@@ -144,7 +144,6 @@ void UvcNode::DistributeBuffers()
                     if (frameSpec != frameVec_.end()) {
                         frame = *frameSpec;
                         frameVec_.erase(frameSpec);
-                        bufferNum_--;
                     }
                 }
             }

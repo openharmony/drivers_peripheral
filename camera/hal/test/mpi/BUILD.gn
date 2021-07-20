@@ -68,7 +68,7 @@ ohos_unittest("camera_case_unittest") {
     "$camera_path/device_manager/include/mpi",
     "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
     "//base/startup/syspara_lite/adapter/native/syspara/include",
-    "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include/dirver_adapter",
+    "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include/driver_adapter",
     "//device/hisilicon/hardware/media/proprietary/hal/camera/src/hispark_taurus/sdk/include",
     "$camera_path/utils/event",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",

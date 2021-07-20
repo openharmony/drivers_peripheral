@@ -29,12 +29,10 @@ RetCode StreamPipelineCore::CreatePipeline(const int32_t& mode)
     if (spec_ == nullptr) {
         return RC_ERROR;
     }
-
     std::shared_ptr<Pipeline> pipeline = builder_->Build(spec_);
     if (pipeline == nullptr) {
         return RC_ERROR;
     }
-
     return dispatcher_->Update(pipeline);
 }
 

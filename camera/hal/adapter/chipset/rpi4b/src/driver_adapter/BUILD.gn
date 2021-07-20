@@ -1,7 +1,7 @@
 # Copyright (c) Huawei Technologies Co., Ltd. 2021. All rights reserved.
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
-import("../../camera.gni")
+import("//drivers/peripheral/camera/hal/camera.gni")
 
 config("v4l2_config") {
   visibility = [ ":*" ]
@@ -41,7 +41,7 @@ config("v4l2_config") {
   }
 }
 
-ohos_shared_library("v4l2_adapter") {
+ohos_shared_library("camera_v4l2_adapter") {
   sources = [
     "src/v4l2_buffer.cpp",
     "src/v4l2_control.cpp",
@@ -52,8 +52,12 @@ ohos_shared_library("v4l2_adapter") {
   ]
 
   include_dirs = [
-    "./include",
     "$camera_path/include",
+    "//drivers/adapter/uhdf2/include/config",
+    "//drivers/adapter/uhdf2/osal/include",
+    "//drivers/framework/include/utils",
+    "//drivers/peripheral/camera/hal/adapter/chipset/rpi4b/src/driver_adapter/include",
+    "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
     "//utils/native/base/include",
   ]
 

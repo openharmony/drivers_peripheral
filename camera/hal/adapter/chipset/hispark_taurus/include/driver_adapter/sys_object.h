@@ -34,11 +34,11 @@ extern "C" {
 namespace OHOS::Camera {
 class SysObject {
 public:
-    SysObject();
-    ~SysObject();
-    void ConfigSys(std::vector<DeviceFormat>& format);
-    RetCode StartSys();
+    static SysObject* GetInstance();
     RetCode StopSys();
+    RetCode InitSys();
+    void StartSys();
+    void UnInitSys();
     void ViBindVpss(VI_PIPE viPipe, VI_CHN viChn, VPSS_GRP vpssGrp, VPSS_CHN vpssChn = 0);
     void ViUnBindVpss(VI_PIPE viPipe, VI_CHN viChn, VPSS_GRP vpssGrp, VPSS_CHN vpssChn = 0);
     void VpssBindVo(VPSS_GRP vpssGrp, VPSS_CHN vpssChn, VO_LAYER voLayer, VO_CHN voChn);
@@ -64,6 +64,34 @@ private:
     RetCode ReleaseProcBuffer();
     void SearchVencBuffer();
     void SearchBuffer();
+    void ConfigSys();
+    SysObject() {};
+    class AutoRelease {
+    public:
+        AutoRelease()
+        {
+            CameraSdkInit();
+            SysObject* sysInstance = SysObject::GetInstance();
+            if (sysInstance != nullptr) {
+                sysInstance->InitSys();
+            }
+        };
+        ~AutoRelease()
+        {
+            SysObject* sysInstance = SysObject::GetInstance();
+            if (sysInstance != nullptr) {
+                sysInstance->UnInitSys();
+            }
+
+            CameraSdkExit();
+
+            if (SysObject::instance_ != nullptr) {
+                delete SysObject::instance_;
+                SysObject::instance_ = nullptr;
+            }
+        };
+    };
+
 private:
     VB_CONFIG_S pstVbConfig_;
     BufCallback dequeueBuffer_;
@@ -82,26 +110,10 @@ private:
     std::mutex lock_;
     int32_t vpssVencChn_ = 0;
     uint64_t vencFrameNum_ = 0;
+    static SysObject* instance_;
+    static AutoRelease autoRel_;
 };
 
-struct SdkIncubator {
-    SdkIncubator()
-    {
-        CameraSdkInit();
-    }
-
-    ~SdkIncubator()
-    {
-        CameraSdkExit();
-    }
-};
-
-struct ThreadParam {
-      SysObject* pThis;
-      uint32_t timeout;
-};
-
-using ThreadParam = struct ThreadParam;
 }
 
 #endif // HOS_CAMERA_SYS_OBJECT_H

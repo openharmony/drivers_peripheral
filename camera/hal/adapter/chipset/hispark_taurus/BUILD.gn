@@ -132,6 +132,7 @@ group("hispark_taurus_build") {
     ":params.c",
     ":stream_supported_config.hcb",
     "src/driver_adapter:driver_adapter",
+    #"//device/hisilicon/hardware/media/proprietary/hal/camera/src/hispark_taurus:driver_adapter",
     "src/pipeline_core:camera_ipp_algo_example",
   ]
 }

@@ -99,7 +99,7 @@ ohos_shared_library("camera_pipeline_core") {
     "$camera_path/adapter/chipset/hispark_taurus/src/pipeline_core/nodes/venc_node",
     "$camera_path/adapter/chipset/hispark_taurus/src/pipeline_core/nodes/vpss_node",
     "$camera_path/adapter/chipset/hispark_taurus/config/pipeline_core",
-    "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include/dirver_adapter",
+    "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include/driver_adapter",
     "//device/hisilicon/hardware/media/proprietary/hal/camera/src/hispark_taurus/sdk/include",
     "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
     "//foundation/communication/ipc/ipc/native/src/core/include",

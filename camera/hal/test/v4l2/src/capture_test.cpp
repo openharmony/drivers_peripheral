@@ -167,60 +167,6 @@ TEST_F(UtestCaptureTest, camera_capture_0004)
 }
 
 /**
-  * @tc.name: video cannot capture
-  * @tc.desc: Preview + video, then capture a photo, expected not support.
-  * @tc.level: Level1
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-TEST_F(UtestCaptureTest, camera_capture_0005)
-{
-    std::cout << "==========[test log] Preview + video, then capture a photo." << std::endl;
-    std::cout << "==========[test log] First, create Preview + video." << std::endl;
-    // 配置两路流信息
-    // 获取流管理器
-    display_->AchieveStreamOperator();
-    // 启流
-    display_->intents = {Camera::PREVIEW, Camera::VIDEO};
-    display_->StartStream(display_->intents);
-    // 获取预览图
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_video, display_->captureId_preview, false, true);
-
-    std::shared_ptr<OHOS::CameraStandard::CameraMetadata> modeSetting = std::make_shared<OHOS::CameraStandard::CameraMetadata>(2, 128);
-    int64_t expoTime = 0;
-    modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
-    int64_t colorGains[4] = {0};
-    modeSetting->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
-
-    // 启动拍照流
-    std::shared_ptr<IBufferProducer> producerCapture = IBufferProducer::CreateBufferQueue();
-    producerCapture->SetQueueSize(8); // 8:set buffer queue size
-    if (producerCapture->GetQueueSize() != 8) { // 8:get buffer queue size
-        std::cout << "~~~~~~~" << std::endl;
-    }
-    auto callbackCapture = [this](std::shared_ptr<SurfaceBuffer> b) {
-        display_->BufferCallback(b, display_->capture_mode);
-        return;
-    };
-    producerCapture->SetCallback(callbackCapture);
-    std::shared_ptr<OHOS::Camera::StreamInfo> streamInfoCapture = std::make_shared<OHOS::Camera::StreamInfo>();
-    streamInfoCapture->streamId_ = display_->streamId_capture;
-    streamInfoCapture->width_ = 640; // 640:picture width
-    streamInfoCapture->height_ = 480; // 480:picture height
-    streamInfoCapture->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    streamInfoCapture->datasapce_ = 8; // 8:picture datasapce
-    streamInfoCapture->intent_ = Camera::STILL_CAPTURE;
-    streamInfoCapture->tunneledMode_ = 5; // 5:tunnel mode
-    streamInfoCapture->bufferQueue_ = producerCapture;
-    display_->streamInfos.push_back(streamInfoCapture);
-    // 查询IsStreamsSupported接口是否支持
-    Camera::StreamSupportType pType;
-    display_->rc = display_->streamOperator->IsStreamsSupported(Camera::NORMAL, modeSetting, streamInfoCapture, pType);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-}
-
-/**
   * @tc.name: preview and capture
   * @tc.desc: Commit 2 streams together, Preview and still_capture streams, isStreaming is false.
   * @tc.level: Level0
