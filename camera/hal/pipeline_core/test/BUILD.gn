@@ -60,8 +60,6 @@ ohos_unittest("pipeline_core_unittest") {
     "//utils/native/base/include",
     "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
     "$camera_path/../interfaces/include",
-    "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include/driver_adapter",
-    "//device/hisilicon/hardware/media/proprietary/hal/camera/src/hispark_taurus/sdk/include",
     "$camera_path/include",
     "$camera_path/hdi_impl",
     "$camera_path/hdi_impl/camera_host/include",

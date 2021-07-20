@@ -21,7 +21,6 @@ public:
     RetCode DestroyHostStream(const std::vector<int>& types) override;
     void GetStreamTypes(std::vector<int32_t>& s) const override;
     HostStreamInfo GetStreamInfo(const int32_t& id) const override;
-    HostStreamInfo GetStreamInfoFromRight(const int32_t& id) const override;
     BufferCb GetBufferCb(const int32_t& type) const override;
     HostStreamMgrImpl() = default;
     ~HostStreamMgrImpl() override = default;
@@ -41,6 +40,9 @@ RetCode HostStreamMgrImpl::CreateHostStream(const HostStreamInfo& info, BufferCb
     CAMERA_LOGI("bufferpool id = %llu , stream id = %d,stream type = %d",
         info.bufferPoolId_, info.streamId_, info.type_);
     streams_.push_back(HostStream::Create(info, c));
+    for (auto& stream : streams_) {
+        stream->SetStreamState(false);
+    }
     return RC_OK;
 }
 
@@ -75,22 +77,12 @@ void HostStreamMgrImpl::GetStreamTypes(std::vector<int32_t>& s) const
 
 HostStreamInfo HostStreamMgrImpl::GetStreamInfo(const int32_t& id) const
 {
-    auto it = std::find_if(streams_.begin(), streams_.end(), [id](const std::unique_ptr<HostStream>& s) {
-                return static_cast<std::underlying_type<StreamIntent>::type>(s->GetStreamType()) == id;
-                });
-    if (it != streams_.end()) {
-        return (*it)->GetStreamInfo();
-    }
-    return {};
-}
-
-HostStreamInfo HostStreamMgrImpl::GetStreamInfoFromRight(const int32_t& id) const
-{
-    auto it = std::find_if(streams_.rbegin(), streams_.rend(), [id](const std::unique_ptr<HostStream>& s) {
-                return static_cast<std::underlying_type<StreamIntent>::type>(s->GetStreamType()) == id;
-                });
-    if (it != streams_.rend()) {
-        return (*it)->GetStreamInfo();
+    for (auto& it : streams_) {
+        if (static_cast<std::underlying_type<StreamIntent>::type>(it->GetStreamType()) == id &&
+            it->GetStreamState() == false) {
+            it->SetStreamState(true);
+            return it->GetStreamInfo();
+        }
     }
     return {};
 }

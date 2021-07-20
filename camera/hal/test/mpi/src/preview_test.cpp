@@ -55,19 +55,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0001, TestSize.Level0)
 
 /**
   * @tc.name: Preview
-  * @tc.desc: Preview, mock power up.
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-HWTEST_F(PreviewTest, Camera_Preview_0002, TestSize.Level3)
-{
-    std::cout << "==========[test log] OpenCamera, mock power up."<< std::endl;
-    EXPECT_EQ(0, 1);
-}
-
-/**
-  * @tc.name: Preview
-  * @tc.desc: Preview stream, 1208*720, expected success.
+  * @tc.desc: Preview stream, 1280*720, expected success.
   * @tc.size: MediumTest
   * @tc.type: Function
   */

@@ -28,7 +28,7 @@ ViController::~ViController() {}
 
 RetCode ViController::Init()
 {
-    viObject_ = std::make_shared<ViObject>();
+    viObject_ = IViObject::CreateViObject();
     if (viObject_ == nullptr) {
         CAMERA_LOGE("%s Create ViObject fail", __FUNCTION__);
         return RC_ERROR;
