@@ -26,7 +26,6 @@ public:
     virtual RetCode DestroyHostStream(const std::vector<int>& types) = 0;
     virtual void GetStreamTypes(std::vector<int32_t>& s) const = 0;
     virtual HostStreamInfo GetStreamInfo(const int32_t& id) const = 0;
-    virtual HostStreamInfo GetStreamInfoFromRight(const int32_t& id) const = 0;
     virtual BufferCb GetBufferCb(const int32_t& type) const = 0;
     virtual ~HostStreamMgr() = default;
 };

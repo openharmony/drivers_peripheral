@@ -17,7 +17,7 @@
 #define HOS_CAMERA_VENC_CONTROLLER_H
 
 #include "icontroller.h"
-#include "venc_object.h"
+#include "ivenc_object.h"
 #include "device_manager_adapter.h"
 #include "mpi_adapter.h"
 
@@ -44,10 +44,6 @@ public:
     {
         return RC_OK;
     };
-    RetCode StartVencSanp()
-    {
-        return RC_OK;
-    };
     RetCode PowerUp(CameraId cameraId);
     RetCode PowerDown(CameraId cameraId);
     RetCode StopVenc();
@@ -70,7 +66,7 @@ public:
 private:
     std::mutex startVenclock_;
     bool startVencState_ = false;
-    std::shared_ptr<VencObject> vencObject_ = nullptr;
+    std::shared_ptr<IVencObject> vencObject_ = nullptr;
 };
 } // namespace OHOS::Camera
 #endif

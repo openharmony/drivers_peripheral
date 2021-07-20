@@ -69,49 +69,12 @@ HWTEST_F(OpenCameraTest, Camera_Open_0001, TestSize.Level0)
 }
 
 /**
-  * @tc.name: OpenCamera
-  * @tc.desc: OpenCamera, callback return error.
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-HWTEST_F(OpenCameraTest, Camera_Open_0040, TestSize.Level3)
-{
-    std::cout << "==========[test log]OpenCamera, success."<< std::endl;
-    EXPECT_EQ(0, 1);
-}
-
-/**
-  * @tc.name: OpenCamera
-  * @tc.desc: OpenCamera, mock power up.
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-HWTEST_F(OpenCameraTest, Camera_Open_0041, TestSize.Level3)
-{
-    std::cout << "==========[test log] OpenCamera, mock power up."<< std::endl;
-    EXPECT_EQ(0, 1);
-}
-
-/**
-  * @tc.name: OpenCamera
-  * @tc.desc: OpenCamera, mock power down.
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-HWTEST_F(OpenCameraTest, Camera_Open_0042, TestSize.Level3)
-{
-    std::cout << "==========[test log] OpenCamera, mock power down."<< std::endl;
-    EXPECT_EQ(0, 1);
-}
-
-
-/**
   * @tc.name: Open all Cameras
   * @tc.desc: Open every Cameras what the getCameraId get.
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(OpenCameraTest, Camera_Open_0050, TestSize.Level2)
+HWTEST_F(OpenCameraTest, Camera_Open_0010, TestSize.Level2)
 {
     std::cout << "==========[test log]Open all Cameras."<< std::endl;
     Test_->service->GetCameraIds(Test_->cameraIds);

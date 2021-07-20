@@ -43,7 +43,7 @@ ohos_executable("v4l2_main") {
     "../src/v4l2_fileformat.cpp",
     "../src/v4l2_stream.cpp",
     "../src/v4l2_uvc.cpp",
-    "./src/v4l2_main.cpp",
+    "./v4l2_main.cpp",
   ]
 
   include_dirs = [

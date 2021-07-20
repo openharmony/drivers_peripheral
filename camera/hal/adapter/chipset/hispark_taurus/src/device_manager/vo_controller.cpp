@@ -24,7 +24,7 @@ VoController::~VoController() {}
 
 RetCode VoController::Init()
 {
-    voObject_ = std::make_shared<VoObject>();
+    voObject_ = IVoObject::CreateVoObject();
     if (voObject_ == nullptr) {
         CAMERA_LOGE("%s Create VoObject fail", __FUNCTION__);
         return RC_ERROR;
