@@ -184,7 +184,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0132)
 TEST_F(UtestHdiIterTest, camera_hdi_0133)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->width = -1, return error." << std::endl;
-	// 创建并获取streamOperator信息
+    // 创建并获取streamOperator信息
     display_->AchieveStreamOperator();
     // 创建数据流
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
@@ -1126,7 +1126,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0161)
 
     // 释放流
     display_->rc = display_->streamOperator->ReleaseStreams({-1});
-    EXPECT_EQ(true, display_->rc != Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     std::cout << "streamOperator->ReleaseStreams's RetCode = " << display_->rc << std::endl;
     if (display_->rc == Camera::NO_ERROR) {
         std::cout << "==========[test log] ReleaseStreams success." << std::endl;

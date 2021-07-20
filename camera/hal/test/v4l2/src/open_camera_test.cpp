@@ -20,10 +20,15 @@ void UtestOpenCameraTest::TearDownTestCase(void)
 {}
 void UtestOpenCameraTest::SetUp(void)
 {
+    std::cout << "==========[test log] UtestOpenCameraTest::SetUp.display_0： "<<display_<< std::endl;
     if (display_ == nullptr) {
-    display_ = std::make_shared<TestDisplay>();
-    display_->FBInit();
-    display_->Init();
+        std::cout << "==========[test log] UtestOpenCameraTest::SetUp.display_1： "<<display_<< std::endl;
+        display_ = std::make_shared<TestDisplay>();
+        std::cout << "==========[test log] UtestOpenCameraTest::SetUp.display_2： "<<display_<< std::endl;
+        display_->FBInit();
+        std::cout << "==========[test log] UtestOpenCameraTest::SetUp.display_3： "<<display_<< std::endl;
+        display_->Init();
+        std::cout << "==========[test log] UtestOpenCameraTest::SetUp.display_4： "<<display_<< std::endl;
     }
 }
 void UtestOpenCameraTest::TearDown(void)

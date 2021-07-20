@@ -220,7 +220,7 @@ void TestDisplay::Init()
             return;
         }
         std::cout << "==========[test log] CreateCameraHost success." << std::endl;
-        }
+    }
     if (cameraDevice == nullptr) {
         cameraHost->GetCameraIds(cameraIds);
         const std::shared_ptr<OHOS::Camera::ICameraDeviceCallback> callback =

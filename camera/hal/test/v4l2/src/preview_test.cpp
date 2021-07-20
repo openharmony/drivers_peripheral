@@ -1216,8 +1216,8 @@ TEST_F(UtestPreviewTest, camera_preview_0061)
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     // 释放流
     display_->rc = display_->streamOperator->ReleaseStreams({-1});
-    EXPECT_EQ(true, display_->rc != Camera::NO_ERROR);
-    std::cout << "streamOperator->ReleaseStreams's RetCode = " << display_->rc << std::endl;
+    std::cout << "streamOperator->ReleaseStreams's rc = " << display_->rc << std::endl;
+    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     display_->rc = display_->streamOperator->ReleaseStreams({1001});
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     std::cout << "streamOperator->ReleaseStreams's RetCode = " << display_->rc << std::endl;
@@ -1239,7 +1239,7 @@ TEST_F(UtestPreviewTest, camera_preview_0062)
     std::shared_ptr<OHOS::Camera::StreamInfo> streamInfo = std::make_shared<OHOS::Camera::StreamInfo>();
     display_->rc = display_->streamOperator->ReleaseStreams({9999});
     std::cout << "streamOperator->ReleaseStreams's RetCode = " << display_->rc << std::endl;
-    EXPECT_EQ(true, display_->rc == Camera::CAMERA_CLOSED);
+    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
 }
 
 /**
