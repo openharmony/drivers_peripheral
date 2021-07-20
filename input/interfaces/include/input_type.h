@@ -54,7 +54,7 @@ extern "C" {
 #define CHIP_INFO_LEN 10
 #define CHIP_NAME_LEN 10
 #define VENDOR_NAME_LEN 10
-#define DEV_NAME_LEN 32
+#define DEV_NAME_LEN 64
 #define SELF_TEST_RESULT_LEN 20
 #define DEV_MANAGER_SERVICE_NAME "hdf_input_host"
 #ifdef DIV_ROUND_UP
