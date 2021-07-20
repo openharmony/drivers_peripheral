@@ -1,7 +1,7 @@
 # Copyright (c) Huawei Technologies Co., Ltd. 2021. All rights reserved.
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
-import("../../../camera.gni")
+import("//drivers/peripheral/camera/hal/camera.gni")
 
 #This Build.gn must be compiled using the Raspberry Pi cross compiler and executed on Raspberry Pi.#
 
@@ -35,6 +35,7 @@ config("v4l2_maintest") {
 }
 
 ohos_executable("v4l2_main") {
+  install_enable = true
   sources = [
     "../src/v4l2_buffer.cpp",
     "../src/v4l2_control.cpp",
@@ -42,13 +43,16 @@ ohos_executable("v4l2_main") {
     "../src/v4l2_fileformat.cpp",
     "../src/v4l2_stream.cpp",
     "../src/v4l2_uvc.cpp",
-    "./v4l2_main.cpp",
+    "./src/v4l2_main.cpp",
   ]
 
   include_dirs = [
-    "./",
     "$camera_path/include",
-    "$camera_path/platform/v4l2_adapter/include",
+    "//drivers/adapter/uhdf2/include/config",
+    "//drivers/adapter/uhdf2/osal/include",
+    "//drivers/framework/include/utils",
+    "//drivers/peripheral/camera/hal/adapter/chipset/rpi4b/src/driver_adapter/include",
+    "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
     "//utils/native/base/include",
   ]
 

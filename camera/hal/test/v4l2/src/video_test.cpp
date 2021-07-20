@@ -231,7 +231,7 @@ TEST_F(UtestVideoTest, camera_video_0010)
 
 /**
   * @tc.name: Video
-  * @tc.desc: Dynamic Video start&stop, for 5 times, success.
+  * @tc.desc: Video start&stop, for 5 times, success.
   * @tc.level: Level2
   * @tc.size: MediumTest
   * @tc.type: Function

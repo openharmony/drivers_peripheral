@@ -71,7 +71,7 @@ ohos_shared_library("camera_device_manager") {
     "//drivers/framework/include/utils",
     "//drivers/adapter/uhdf2/osal/include",
     "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
-    "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include/dirver_adapter",
+    "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include/driver_adapter",
     "//device/hisilicon/hardware/media/proprietary/hal/camera/src/hispark_taurus/sdk/include",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
   ]

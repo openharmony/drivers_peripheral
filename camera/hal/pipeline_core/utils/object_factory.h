@@ -59,5 +59,4 @@ private:
     std::unordered_map<std::string, CreatorFunc> builder_;
 };
 }
-
 #endif

@@ -47,19 +47,9 @@ void Imx600::InitCompensationRange(CameraStandard::CameraMetadata& camera_meta_d
     ISensor::InitCompensationRange(camera_meta_data);
 }
 
-void Imx600::InitSceneModesOverride(CameraStandard::CameraMetadata& camera_meta_data)
-{
-    ISensor::InitSceneModesOverride(camera_meta_data);
-}
-
 void Imx600::InitSensitivityRange(CameraStandard::CameraMetadata& camera_meta_data)
 {
     ISensor::InitSensitivityRange(camera_meta_data);
-}
-
-void Imx600::InitExposureTimeRange(CameraStandard::CameraMetadata& camera_meta_data)
-{
-    ISensor::InitExposureTimeRange(camera_meta_data);
 }
 
 void Imx600::Init(CameraStandard::CameraMetadata& camera_meta_data)
@@ -85,13 +75,10 @@ void Imx600::Init(CameraStandard::CameraMetadata& camera_meta_data)
     camera_meta_data.addEntry(OHOS_CONTROL_AWB_AVAILABLE_MODES, availableAwbModes.data(),
                               availableAwbModes.size());
 
-    InitSceneModesOverride(camera_meta_data);
-
     InitSensitivityRange(camera_meta_data);
-    InitExposureTimeRange(camera_meta_data);
 
     uint8_t faceDetectMode = OHOS_CAMERA_FACE_DETECT_MODE_OFF;
-    camera_metaData.addEntry(OHOS_STATISTICS_FACE_DETECT_MODE, &faceDetectMode,
+    camera_meta_data.addEntry(OHOS_STATISTICS_FACE_DETECT_MODE, &faceDetectMode,
                               1);
 }
 } // namespace OHOS::Camera

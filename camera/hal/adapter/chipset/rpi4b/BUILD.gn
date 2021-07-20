@@ -84,7 +84,7 @@ ohos_prebuilt_etc("params.c") {
 action("build_ipp_algo_config") {
   script = "$hdf_framework_path/tools/hc-gen/build_hcs.py"
   sources = [ rebase_path(
-          "//drivers/adapter/uhdf2/hcs/camera/hal/v4l2/rpi4b/pipeline_core/ipp_algo_example/ipp_algo_config.hcs") ]
+          "//drivers/adapter/uhdf2/hcs/camera/hal/v4l2/rpi4b/pipeline_core/ipp_algo_config.hcs") ]
   outputs = [ "$target_gen_dir/pipeline_core/ipp_algo_config.hcb" ]
   args = [
     "-o",
@@ -133,5 +133,7 @@ group("rpi4b_config") {
     ":ipp_algo_config.hcb",
     ":params.c",
     ":stream_supported_config.hcb",
+    "src/driver_adapter/main_test:v4l2_main",
+    "src/driver_adapter:camera_v4l2_adapter",
   ]
 }

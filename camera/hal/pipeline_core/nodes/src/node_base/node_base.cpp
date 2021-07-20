@@ -277,6 +277,7 @@ RetCode NodeBase::CollectBuffers()
     collectThread_ = std::make_shared<std::thread>([this] {
         RetCode rc = RC_ERROR;
         BufferManager* bufferManager = Camera::BufferManager::GetInstance();
+        int i = 0;
         std::shared_ptr<IPort> port = GetPort("out0");
         uint32_t bufferCount = port->format_.bufferCount_;
         while (streamRunning_ == true) {
@@ -302,10 +303,18 @@ RetCode NodeBase::CollectBuffers()
                 frameSpec->bufferPoolId_ = it;
                 frameSpec->bufferCount_ = bufferCount;
                 frameSpec->buffer_ = buffer;
+                if (i < bufferCount) {
+                    frameSpec->buffer_->SetIndex(i++);
+                } else {
+                    i = 0;
+                    frameSpec->buffer_->SetIndex(i++);
+                }
                 rc = ProvideBuffers(frameSpec);
                 CAMERA_LOGI("provide bffer:bufferpool id = %llu", frameSpec->bufferPoolId_);
                 if (rc == RC_ERROR) {
                     CAMERA_LOGE("provide buffer failed.");
+                } else {
+                    // bufferNum_++;
                 }
             }
         }
