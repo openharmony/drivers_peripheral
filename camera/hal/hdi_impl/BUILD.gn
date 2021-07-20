@@ -69,7 +69,14 @@ ohos_shared_library("camera_hdi_impl") {
     "$camera_path/hdi_impl/src/stream_operator/stream_thread.cpp",
     "$camera_path/hdi_impl/src/stream_operator/stream_video.cpp",
   ]
-
+  if (use_hitrace) {
+    sources += [
+      #trace log
+      "//base/hiviewdfx/hitrace/frameworks/native/hitrace.cpp",
+      "//base/hiviewdfx/hitrace/frameworks/native/hitracec.c",
+      "//base/hiviewdfx/hitrace/frameworks/native/hitraceid.cpp",
+    ]
+  }
   include_dirs = [
     "$camera_path/../interfaces/include",
     "$camera_path/../interfaces/include/server",
@@ -118,14 +125,17 @@ ohos_shared_library("camera_hdi_impl") {
     "$hdf_uhdf_path/manager/include",
     "$hdf_uhdf_path/include/hdi",
     "$hdf_framework_path/ability/sbuf/include",
-
-    #trace log
-    "//base/hiviewdfx/hitrace/frameworks/native",
-    "//base/hiviewdfx/hilog/frameworks/native/include",
-    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include",
-    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace",
   ]
 
+  if (use_hitrace) {
+    include_dirs += [
+      #trace log
+      "//base/hiviewdfx/hitrace/frameworks/native",
+      "//base/hiviewdfx/hilog/frameworks/native/include",
+      "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include",
+      "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace",
+    ]
+  }
   deps = [
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
@@ -140,12 +150,14 @@ ohos_shared_library("camera_hdi_impl") {
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
     "//utils/native/base:utils",
-    "//base/hiviewdfx/hitrace/frameworks/native:libhitrace_source",
   ]
 
   defines = []
   if (enable_camera_device_utest) {
     defines += [ "CAMERA_DEVICE_UTEST" ]
+  }
+  if (use_hitrace) {
+    defines += [ "HITRACE_LOG_ENABLED" ]
   }
 
   if (is_standard_system) {

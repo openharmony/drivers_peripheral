@@ -133,7 +133,7 @@ group("rpi4b_config") {
     ":ipp_algo_config.hcb",
     ":params.c",
     ":stream_supported_config.hcb",
-    "src/driver_adapter/main_test:v4l2_main",
     "src/driver_adapter:camera_v4l2_adapter",
+    "src/driver_adapter/main_test:v4l2_main",
   ]
 }
