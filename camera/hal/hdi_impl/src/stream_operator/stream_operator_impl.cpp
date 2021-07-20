@@ -24,8 +24,10 @@
 #include "offline_stream_context.h"
 #include "stream_supported_config.h"
 #include "watchdog.h"
-#include "hitrace.h"
 
+#ifdef HITRACE_LOG_ENABLED
+#include "hitrace.h"
+#endif //HITRACE_LOG_ENABLED
 namespace {
     constexpr uint32_t IS_STREAMING_QUEUE_SIZE = 7;
     constexpr uint32_t OTHRE_QUEUE_SIZE = 1;
@@ -61,8 +63,9 @@ CamRetCode StreamOperatorImpl::IsStreamsSupported(OperationMode mode,
 {
     WatchDog watchDog;
     watchDog.Init(WATCHDOG_TIMEOUT, requestCallback_);
+#ifdef HITRACE_LOG_ENABLED
     HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("streamOperator", HITRACE_FLAG_DEFAULT);
-
+#endif //HITRACE_LOG_ENABLED
     if (modeSetting == nullptr || pInfo == nullptr) {
         CAMERA_LOGE("stream info is null.");
         return INVALID_ARGUMENT;
@@ -106,8 +109,10 @@ CamRetCode StreamOperatorImpl::IsStreamsSupported(OperationMode mode,
     }
 
     pType = streamSupporteds.front()->streamSupportType_;
-    OHOS::HiviewDFX::HiTrace::End(traceId);
 
+#ifdef HITRACE_LOG_ENABLED
+    OHOS::HiviewDFX::HiTrace::End(traceId);
+#endif //HITRACE_LOG_ENABLED
     return NO_ERROR;
 }
 
@@ -242,8 +247,9 @@ CamRetCode StreamOperatorImpl::CreateStreams(const std::vector<std::shared_ptr<S
 
     WatchDog watchDog;
     watchDog.Init(WATCHDOG_TIMEOUT, requestCallback_);
+#ifdef HITRACE_LOG_ENABLED
     HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("streamOperator", HITRACE_FLAG_DEFAULT);
-
+#endif //HITRACE_LOG_ENABLED
     if (streamInfos.empty()) {
         CAMERA_LOGE("streamInfo is empty.");
         return INVALID_ARGUMENT;
@@ -272,8 +278,9 @@ CamRetCode StreamOperatorImpl::CreateStreams(const std::vector<std::shared_ptr<S
             return METHOD_NOT_SUPPORTED;
         }
     }
+#ifdef HITRACE_LOG_ENABLED
     OHOS::HiviewDFX::HiTrace::End(traceId);
-
+#endif //HITRACE_LOG_ENABLED
     return NO_ERROR;
 }
 
@@ -420,8 +427,9 @@ CamRetCode StreamOperatorImpl::ReleaseStreams(const std::vector<int>& streamIds)
     CAMERA_LOGI("begin to release stream");
     WatchDog watchDog;
     watchDog.Init(WATCHDOG_TIMEOUT, requestCallback_);
+#ifdef HITRACE_LOG_ENABLED
     HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("streamOperator", HITRACE_FLAG_DEFAULT);
-
+#endif //HITRACE_LOG_ENABLED
     RetCode rc = DestroyStreamPipeline(streamIds);
     if (rc != RC_OK) {
         CAMERA_LOGE("destroy stream pipe failed.");
@@ -441,8 +449,9 @@ CamRetCode StreamOperatorImpl::ReleaseStreams(const std::vector<int>& streamIds)
         CAMERA_LOGE("destroy stream failed.");
         return CAMERA_CLOSED;
     }
-
+#ifdef HITRACE_LOG_ENABLED
     OHOS::HiviewDFX::HiTrace::End(traceId);
+#endif //HITRACE_LOG_ENABLED
     CAMERA_LOGI("release streams success");
 
     return NO_ERROR;
@@ -573,8 +582,9 @@ CamRetCode StreamOperatorImpl::CommitStreams(OperationMode mode, const std::shar
     CAMERA_LOGV("enter");
     WatchDog watchDog;
     watchDog.Init(WATCHDOG_TIMEOUT, requestCallback_);
+#ifdef HITRACE_LOG_ENABLED
     HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("streamOperator", HITRACE_FLAG_DEFAULT);
-
+#endif //HITRACE_LOG_ENABLED
     auto cameraDevice = cameraDevice_.lock();
     if (cameraDevice == nullptr) {
         CAMERA_LOGE("camera device closed.");
@@ -605,8 +615,9 @@ CamRetCode StreamOperatorImpl::CommitStreams(OperationMode mode, const std::shar
         CAMERA_LOGE("create pipeline failed.");
         return INVALID_ARGUMENT;
     }
+#ifdef HITRACE_LOG_ENABLED
     OHOS::HiviewDFX::HiTrace::End(traceId);
-
+#endif //HITRACE_LOG_ENABLED
     return NO_ERROR;
 }
 
@@ -629,8 +640,9 @@ CamRetCode StreamOperatorImpl::AttachBufferQueue(int streamId,
     CAMERA_LOGD("AttachBufferQueue streamId = %d", streamId);
     WatchDog watchDog;
     watchDog.Init(WATCHDOG_TIMEOUT, requestCallback_);
+#ifdef HITRACE_LOG_ENABLED
     HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("streamOperator", HITRACE_FLAG_DEFAULT);
-
+#endif //HITRACE_LOG_ENABLED
     if (producer == nullptr || streamId < 0) {
         CAMERA_LOGW("input buffer producer is null.");
         return INVALID_ARGUMENT;
@@ -641,8 +653,9 @@ CamRetCode StreamOperatorImpl::AttachBufferQueue(int streamId,
         itr->second->AttachBufferQueue(producer);
         return NO_ERROR;
     }
-
+#ifdef HITRACE_LOG_ENABLED
     OHOS::HiviewDFX::HiTrace::End(traceId);
+#endif //HITRACE_LOG_ENABLED
     CAMERA_LOGD("input streamId find not found. [streamId = %d]", streamId);
     return INVALID_ARGUMENT;
 }
@@ -651,8 +664,9 @@ CamRetCode StreamOperatorImpl::DetachBufferQueue(int streamId)
 {
     WatchDog watchDog;
     watchDog.Init(WATCHDOG_TIMEOUT, requestCallback_);
+#ifdef HITRACE_LOG_ENABLED
     HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("streamOperator", HITRACE_FLAG_DEFAULT);
-
+#endif //HITRACE_LOG_ENABLED
     std::shared_ptr<StreamInfo> streamInfo = nullptr;
     for (auto& itr : streamMap_) {
         std::shared_ptr<StreamBase> stream = itr.second;
@@ -662,8 +676,9 @@ CamRetCode StreamOperatorImpl::DetachBufferQueue(int streamId)
             return NO_ERROR;
         }
     }
-
+#ifdef HITRACE_LOG_ENABLED
     OHOS::HiviewDFX::HiTrace::End(traceId);
+#endif //HITRACE_LOG_ENABLED
     CAMERA_LOGD("input streamId find not found. [streamId = %d]", streamId);
     return INVALID_ARGUMENT;
 }
@@ -672,8 +687,9 @@ CamRetCode StreamOperatorImpl::Capture(int captureId, const std::shared_ptr<Capt
 {
     WatchDog watchDog;
     watchDog.Init(WATCHDOG_TIMEOUT, requestCallback_);
+#ifdef HITRACE_LOG_ENABLED
     HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("streamOperator", HITRACE_FLAG_DEFAULT);
-
+#endif //HITRACE_LOG_ENABLED
     if (!ValidCaptureInfo(captureId, captureInfo)) {
         CAMERA_LOGE("capture streamIds is empty. [captureId = %d]", captureId);
         return INVALID_ARGUMENT;
@@ -696,8 +712,9 @@ CamRetCode StreamOperatorImpl::Capture(int captureId, const std::shared_ptr<Capt
         CAMERA_LOGE("preview start failed.");
         return DEVICE_ERROR;
     }
+#ifdef HITRACE_LOG_ENABLED
     OHOS::HiviewDFX::HiTrace::End(traceId);
-
+#endif //HITRACE_LOG_ENABLED
     return NO_ERROR;
 }
 
@@ -865,8 +882,9 @@ CamRetCode StreamOperatorImpl::ChangeToOfflineStream(const std::vector<int> &str
 {
     WatchDog watchDog;
     watchDog.Init(WATCHDOG_TIMEOUT, requestCallback_);
+#ifdef HITRACE_LOG_ENABLED
     HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("streamOperator", HITRACE_FLAG_DEFAULT);
-
+#endif //HITRACE_LOG_ENABLED
     if (callback == nullptr) {
         return INVALID_ARGUMENT;
     }
@@ -928,8 +946,9 @@ CamRetCode StreamOperatorImpl::ChangeToOfflineStream(const std::vector<int> &str
     }
 
     offlineOperator = oflstor_;
+#ifdef HITRACE_LOG_ENABLED
     OHOS::HiviewDFX::HiTrace::End(traceId);
-
+#endif //HITRACE_LOG_ENABLED
     return NO_ERROR;
 }
 
