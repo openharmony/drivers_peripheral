@@ -68,11 +68,6 @@ ohos_shared_library("camera_hdi_impl") {
     "$camera_path/hdi_impl/src/stream_operator/stream_supported_config.cpp",
     "$camera_path/hdi_impl/src/stream_operator/stream_thread.cpp",
     "$camera_path/hdi_impl/src/stream_operator/stream_video.cpp",
-
-    #trace log
-    "//base/hiviewdfx/hitrace/frameworks/native/hitrace.cpp",
-    "//base/hiviewdfx/hitrace/frameworks/native/hitracec.c",
-    "//base/hiviewdfx/hitrace/frameworks/native/hitraceid.cpp",
   ]
 
   include_dirs = [
@@ -145,6 +140,7 @@ ohos_shared_library("camera_hdi_impl") {
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
     "//utils/native/base:utils",
+    "//base/hiviewdfx/hitrace/frameworks/native:libhitrace_source",
   ]
 
   defines = []
