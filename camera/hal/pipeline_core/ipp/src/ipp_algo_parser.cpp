@@ -41,6 +41,7 @@ IppAlgoParser::~IppAlgoParser()
 
 RetCode IppAlgoParser::Init()
 {
+    ReleaseHcsTree();
     devResInstance_ = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (devResInstance_ == nullptr) {
         CAMERA_LOGE("get hcs interface failed.");

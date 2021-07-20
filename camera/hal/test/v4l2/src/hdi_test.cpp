@@ -295,7 +295,7 @@ TEST_F(UtestHdiTest, camera_hdi_0060)
 
 /**
   * @tc.name: UpdateSettings
-  * @tc.desc: UpdateSettings, OHOS_CONTROL_AWB_MODE:OHOS_CONTROL_AWB_MODE_AUTO.
+  * @tc.desc: UpdateSettings, OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_AUTO.
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -303,12 +303,12 @@ TEST_F(UtestHdiTest, camera_hdi_0060)
 TEST_F(UtestHdiTest, camera_hdi_0061)
 {
     std::cout << "==========[test log] UpdateSettings, ";
-    std::cout << "OHOS_CONTROL_AWB_MODE:OHOS_CONTROL_AWB_MODE_AUTO." << std::endl;
+    std::cout << "OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_AUTO." << std::endl;
     sleep(3);
     display_->OpenCamera();
     // 下发3A参数
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
-    uint8_t awbMode = OHOS_CONTROL_AWB_MODE_AUTO;
+    uint8_t awbMode = OHOS_CAMERA_AWB_MODE_AUTO;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
@@ -316,7 +316,7 @@ TEST_F(UtestHdiTest, camera_hdi_0061)
 
 /**
   * @tc.name: UpdateSettings
-  * @tc.desc: UpdateSettings, OHOS_CONTROL_AWB_MODE:OHOS_CONTROL_AWB_MODE_TWILIGHT.
+  * @tc.desc: UpdateSettings, OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_TWILIGHT.
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -324,12 +324,12 @@ TEST_F(UtestHdiTest, camera_hdi_0061)
 TEST_F(UtestHdiTest, camera_hdi_0063)
 {
     std::cout << "==========[test log] UpdateSettings, ";
-    std::cout << "OHOS_CONTROL_AWB_MODE:OHOS_CONTROL_AWB_MODE_TWILIGHT." << std::endl;
+    std::cout << "OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_TWILIGHT." << std::endl;
     sleep(3);
     display_->OpenCamera();
     // 下发3A参数
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
-    uint8_t awbMode = OHOS_CONTROL_AWB_MODE_TWILIGHT;
+    uint8_t awbMode = OHOS_CAMERA_AWB_MODE_TWILIGHT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
@@ -337,7 +337,7 @@ TEST_F(UtestHdiTest, camera_hdi_0063)
 
 /**
   * @tc.name: UpdateSettings
-  * @tc.desc: UpdateSettings, OHOS_CONTROL_AWB_MODE:OHOS_CONTROL_AWB_MODE_FLUORESCENT.
+  * @tc.desc: UpdateSettings, OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_FLUORESCENT.
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -345,12 +345,12 @@ TEST_F(UtestHdiTest, camera_hdi_0063)
 TEST_F(UtestHdiTest, camera_hdi_0065)
 {
     std::cout << "==========[test log] UpdateSettings, ";
-    std::cout << "OHOS_CONTROL_AWB_MODE:OHOS_CONTROL_AWB_MODE_FLUORESCENT." << std::endl;
+    std::cout << "OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_FLUORESCENT." << std::endl;
     sleep(3);
     display_->OpenCamera();
     // 下发3A参数
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
-    uint8_t awbMode = OHOS_CONTROL_AWB_MODE_FLUORESCENT;
+    uint8_t awbMode = OHOS_CAMERA_AWB_MODE_FLUORESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
@@ -358,7 +358,7 @@ TEST_F(UtestHdiTest, camera_hdi_0065)
 
 /**
   * @tc.name: UpdateSettings
-  * @tc.desc: UpdateSettings, OHOS_CONTROL_AWB_MODE:OHOS_CONTROL_AWB_MODE_WARM_FLUORESCENT.
+  * @tc.desc: UpdateSettings, OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT.
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -366,12 +366,12 @@ TEST_F(UtestHdiTest, camera_hdi_0065)
 TEST_F(UtestHdiTest, camera_hdi_0066)
 {
     std::cout << "==========[test log] UpdateSettings, ";
-    std::cout << "OHOS_CONTROL_AWB_MODE:OHOS_CONTROL_AWB_MODE_WARM_FLUORESCENT." << std::endl;
+    std::cout << "OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT." << std::endl;
     sleep(3);
     display_->OpenCamera();
     // 下发3A参数
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
-    uint8_t awbMode = OHOS_CONTROL_AWB_MODE_WARM_FLUORESCENT;
+    uint8_t awbMode = OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
@@ -452,12 +452,12 @@ TEST_F(UtestHdiTest, camera_hdi_0090)
     std::cout << "==========[test log] 1. Get the tags..." << std::endl;
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(resultsOriginal);
+    std::cout << "resultsOriginal.size = " << resultsOriginal.size() << std::endl;
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-
     // 新增这个tag
     std::vector<OHOS::Camera::MetaType> enableTag;
+    std::cout << "==========[test log] 2. Enable the tag: " << resultsOriginal[0] << std::endl;
     enableTag.push_back(resultsOriginal[1]);
-    std::cout << "==========[test log] 2. Enable the tag: " << resultsOriginal[1] << std::endl;
     display_->rc = display_->cameraDevice->EnableResult(enableTag);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
 }
@@ -539,8 +539,9 @@ TEST_F(UtestHdiTest, camera_hdi_0100)
 
     // 禁用一个tag
     std::vector<OHOS::Camera::MetaType> disableTag;
-    disableTag.push_back(resultsOriginal[2]);
+    disableTag.push_back(resultsOriginal[0]);
     display_->rc = display_->cameraDevice->DisableResult(disableTag);
+    std::cout << "rc = " << display_->rc << std::endl;
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     std::cout << "==========[test log] DisableResult the tag:" << resultsOriginal[0] << std::endl;
 

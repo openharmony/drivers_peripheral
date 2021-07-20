@@ -70,7 +70,7 @@ private:
 private:
     std::vector<HardwareConfiguration> hardwareList_;
     std::vector<std::shared_ptr<IManager>> managerList_;
-    std::shared_ptr<SysObject> sysObject_ = nullptr;
+    SysObject* sysObject_ = nullptr;
     NodeBufferCb nodeBufferCb_;
     MetaDataCb metaDataCb_;
     DeviceStatusCb deviceStatusCb_;

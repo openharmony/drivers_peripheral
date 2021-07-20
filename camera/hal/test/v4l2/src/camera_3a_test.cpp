@@ -66,7 +66,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0001)
 
 /**
   * @tc.name: updateSettings AWB
-  * @tc.desc: Preview，updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_AUTO, success.
+  * @tc.desc: Preview，updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_AUTO, success.
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -74,7 +74,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0001)
 TEST_F(UtestCamera3ATest, camera_3a_0002)
 {
     std::cout << "==========[test log] Preview，";
-    std::cout << "updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_AUTO, success." << std::endl;
+    std::cout << "updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_AUTO, success." << std::endl;
     EXPECT_EQ(true, display_->cameraDevice != nullptr);
     // 获取流管理器
     display_->AchieveStreamOperator();
@@ -88,9 +88,9 @@ TEST_F(UtestCamera3ATest, camera_3a_0002)
 
     // 下发3A参数
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
-    uint8_t awbMode = OHOS_CONTROL_AWB_MODE_AUTO;
+    uint8_t awbMode = OHOS_CAMERA_AWB_MODE_AUTO;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
-    std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CONTROL_AWB_MODE_AUTO." << std::endl;
+    std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CAMERA_AWB_MODE_AUTO." << std::endl;
     display_->cameraDevice->UpdateSettings(meta);
     sleep(2);
 
@@ -102,7 +102,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0002)
 
 /**
   * @tc.name: updateSettings AWB
-  * @tc.desc: Preview，updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_INCANDESCENT, success.
+  * @tc.desc: Preview，updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_INCANDESCENT, success.
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -110,7 +110,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0002)
 TEST_F(UtestCamera3ATest, camera_3a_0003)
 {
     std::cout << "==========[test log] Preview，";
-    std::cout << "updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_INCANDESCENT, success." << std::endl;
+    std::cout << "updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_INCANDESCENT, success." << std::endl;
     // 创建并获取streamOperator信息
     display_->AchieveStreamOperator();
     // 启流
@@ -121,10 +121,10 @@ TEST_F(UtestCamera3ATest, camera_3a_0003)
 
     // 下发3A参数
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
-    uint8_t awbMode = OHOS_CONTROL_AWB_MODE_INCANDESCENT;
+    uint8_t awbMode = OHOS_CAMERA_AWB_MODE_INCANDESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log] UpdateSettings,";
-    std::cout << "awb mode: OHOS_CONTROL_AWB_MODE_INCANDESCENT" << std::endl;
+    std::cout << "awb mode: OHOS_CAMERA_AWB_MODE_INCANDESCENT" << std::endl;
     display_->cameraDevice->UpdateSettings(meta);
 
     // 流操作的后置动作
@@ -135,7 +135,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0003)
 
 /**
   * @tc.name: updateSettings AWB
-  * @tc.desc: Preview，updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_FLUORESCENT, success.
+  * @tc.desc: Preview，updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_FLUORESCENT, success.
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -143,7 +143,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0003)
 TEST_F(UtestCamera3ATest, camera_3a_0004) // 3A mode white balance blue scene
 {
     std::cout << "==========[test log] Preview，";
-    std::cout << "updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_FLUORESCENT, success." << std::endl;
+    std::cout << "updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_FLUORESCENT, success." << std::endl;
     EXPECT_EQ(true, display_->cameraDevice != nullptr);
     // 获取流管理器
     display_->AchieveStreamOperator();
@@ -158,7 +158,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0004) // 3A mode white balance blue scene
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
     uint8_t awbMode =  AWB_MODE_WARM_FLUORESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
-    std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CONTROL_AWB_MODE_AUTO." << std::endl;
+    std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CAMERA_AWB_MODE_AUTO." << std::endl;
     display_->cameraDevice->UpdateSettings(meta);
     sleep(2);
 
@@ -170,7 +170,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0004) // 3A mode white balance blue scene
 
 /**
   * @tc.name: updateSettings AWB
-  * @tc.desc: Preview，updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_WARM_FLUORESCENT, success.
+  * @tc.desc: Preview，updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT, success.
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -178,7 +178,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0004) // 3A mode white balance blue scene
 TEST_F(UtestCamera3ATest, camera_3a_0005)
 {
     std::cout << "==========[test log] Preview，";
-    std::cout << "updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_WARM_FLUORESCENT, ";
+    std::cout << "updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT, ";
     std::cout << "success." << std::endl;
     // 创建并获取streamOperator信息
     display_->AchieveStreamOperator();
@@ -190,10 +190,10 @@ TEST_F(UtestCamera3ATest, camera_3a_0005)
 
     // 下发3A参数
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
-    uint8_t awbMode = OHOS_CONTROL_AWB_MODE_WARM_FLUORESCENT;
+    uint8_t awbMode = OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log] UpdateSettings, ";
-    std::cout << "awb mode: OHOS_CONTROL_AWB_MODE_WARM_FLUORESCENT" << std::endl;
+    std::cout << "awb mode: OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT" << std::endl;
     display_->cameraDevice->UpdateSettings(meta);
 
     // 流操作的后置动作
@@ -204,7 +204,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0005)
 
 /**
   * @tc.name: updateSettings AWB
-  * @tc.desc: Preview，updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_DAYLIGHT, success.
+  * @tc.desc: Preview，updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_DAYLIGHT, success.
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -212,7 +212,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0005)
 TEST_F(UtestCamera3ATest, camera_3a_0006)
 {
     std::cout << "==========[test log] Preview, ";
-    std::cout << "updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_DAYLIGHT, success." << std::endl;
+    std::cout << "updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_DAYLIGHT, success." << std::endl;
     // 创建并获取streamOperator信息
     display_->AchieveStreamOperator();
     // 创建数据流
@@ -223,9 +223,9 @@ TEST_F(UtestCamera3ATest, camera_3a_0006)
 
     // 下发3A参数
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
-    uint8_t awbMode = OHOS_CONTROL_AWB_MODE_DAYLIGHT;
+    uint8_t awbMode = OHOS_CAMERA_AWB_MODE_DAYLIGHT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
-    std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CONTROL_AWB_MODE_DAYLIGHT" << std::endl;
+    std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CAMERA_AWB_MODE_DAYLIGHT" << std::endl;
     display_->cameraDevice->UpdateSettings(meta);
     sleep(5);
 
@@ -237,7 +237,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0006)
 
 /**
   * @tc.name: updateSettings AWB
-  * @tc.desc: Preview，updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_CLOUDY_DAYLIGHT, success.
+  * @tc.desc: Preview，updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_CLOUDY_DAYLIGHT, success.
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -245,7 +245,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0006)
 TEST_F(UtestCamera3ATest, camera_3a_0007) // 3A mode reset
 {
     std::cout << "==========[test log] Preview，";
-    std::cout << "updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_CLOUDY_DAYLIGHT,";
+    std::cout << "updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_CLOUDY_DAYLIGHT,";
     std::cout << "success." << std::endl;
     // 创建并获取streamOperator信息
     display_->AchieveStreamOperator();
@@ -257,10 +257,10 @@ TEST_F(UtestCamera3ATest, camera_3a_0007) // 3A mode reset
 
     // 下发3A参数
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
-    uint8_t awbMode = OHOS_CONTROL_AWB_MODE_CLOUDY_DAYLIGHT;
+    uint8_t awbMode = OHOS_CAMERA_AWB_MODE_CLOUDY_DAYLIGHT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log] UpdateSettings, ";
-    std::cout << "awb mode: OHOS_CONTROL_AWB_MODE_CLOUDY_DAYLIGHT" << std::endl;
+    std::cout << "awb mode: OHOS_CAMERA_AWB_MODE_CLOUDY_DAYLIGHT" << std::endl;
     display_->cameraDevice->UpdateSettings(meta);
 
     // 流操作的后置动作
@@ -271,7 +271,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0007) // 3A mode reset
 
 /**
   * @tc.name: updateSettings AWB
-  * @tc.desc: Preview，updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_WARM_FLUORESCENT, success.
+  * @tc.desc: Preview，updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT, success.
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -279,7 +279,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0007) // 3A mode reset
 TEST_F(UtestCamera3ATest, camera_3a_0008)
 {
     std::cout << "==========[test log] Preview，";
-    std::cout << "updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_TWILIGHT, ";
+    std::cout << "updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_TWILIGHT, ";
     std::cout << "success." << std::endl;
     EXPECT_EQ(true, display_->cameraDevice != nullptr);
     // 获取流管理器
@@ -294,9 +294,9 @@ TEST_F(UtestCamera3ATest, camera_3a_0008)
 
     // 下发3A参数
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
-    uint8_t awbMode = OHOS_CONTROL_AWB_MODE_TWILIGHT;
+    uint8_t awbMode = OHOS_CAMERA_AWB_MODE_TWILIGHT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
-    std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CONTROL_AWB_MODE_TWILIGHT" << std::endl;
+    std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CAMERA_AWB_MODE_TWILIGHT" << std::endl;
     display_->cameraDevice->UpdateSettings(meta);
 
     // 释放流
@@ -307,7 +307,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0008)
 
 /**
   * @tc.name: updateSettings AWB
-  * @tc.desc: Preview，updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_WARM_FLUORESCENT, success.
+  * @tc.desc: Preview，updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT, success.
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -315,7 +315,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0008)
 TEST_F(UtestCamera3ATest, camera_3a_0009) // 3A mode white balance yellow scene
 {
     std::cout << "==========[test log] Preview，";
-    std::cout << "updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_SHADE, success." << std::endl;
+    std::cout << "updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_SHADE, success." << std::endl;
     // 创建并获取streamOperator信息
     display_->AchieveStreamOperator();
     // 创建数据流
@@ -326,9 +326,9 @@ TEST_F(UtestCamera3ATest, camera_3a_0009) // 3A mode white balance yellow scene
 
     // 下发3A参数
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
-    uint8_t awbMode = OHOS_CONTROL_AWB_MODE_SHADE;
+    uint8_t awbMode = OHOS_CAMERA_AWB_MODE_SHADE;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
-    std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CONTROL_AWB_MODE_SHADE" << std::endl;
+    std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CAMERA_AWB_MODE_SHADE" << std::endl;
     display_->cameraDevice->UpdateSettings(meta);
 
     // 流操作的后置动作
@@ -339,7 +339,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0009) // 3A mode white balance yellow scene
 
 /**
   * @tc.name: updateSettings AWB
-  * @tc.desc: Preview，updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_OFF, success.
+  * @tc.desc: Preview，updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_OFF, success.
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -347,7 +347,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0009) // 3A mode white balance yellow scene
 TEST_F(UtestCamera3ATest, camera_3a_0010)
 {
     std::cout << "==========[test log] Preview，";
-    std::cout << "updateSettings OHOS_CONTROL_AWB_MODE-OHOS_CONTROL_AWB_MODE_OFF, success." << std::endl;
+    std::cout << "updateSettings OHOS_CAMERA_AWB_MODE-OHOS_CAMERA_AWB_MODE_OFF, success." << std::endl;
     EXPECT_EQ(true, display_->cameraDevice != nullptr);
     // 获取流管理器
     display_->AchieveStreamOperator();
@@ -360,9 +360,9 @@ TEST_F(UtestCamera3ATest, camera_3a_0010)
 
     // 下发3A参数
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
-    uint8_t awbMode = OHOS_CONTROL_AWB_MODE_OFF;
+    uint8_t awbMode = OHOS_CAMERA_AWB_MODE_OFF;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
-    std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CONTROL_AWB_MODE_OFF" << std::endl;
+    std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CAMERA_AWB_MODE_OFF" << std::endl;
     display_->cameraDevice->UpdateSettings(meta);
 
     // 释放流
@@ -442,7 +442,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0031) // 3A mode white balance green scene
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
-    uint8_t awbMode = OHOS_CONTROL_AWB_MODE_TWILIGHT;
+    uint8_t awbMode = OHOS_CAMERA_AWB_MODE_TWILIGHT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->cameraDevice->UpdateSettings(meta);
     std::cout << "==========[test log] UpdateSettings, exposure for 10s." << std::endl;
@@ -483,18 +483,18 @@ TEST_F(UtestCamera3ATest, camera_3a_0040)
 
 /**
   * @tc.name: updateSettings AWB without preview
-  * @tc.desc: UpdateSettings-OHOS_CONTROL_AWB_MODE, without preview, success.
+  * @tc.desc: UpdateSettings-OHOS_CAMERA_AWB_MODE, without preview, success.
   * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
   */
 TEST_F(UtestCamera3ATest, camera_3a_0041)
 {
-    std::cout << "UpdateSettings-OHOS_CONTROL_AWB_MODE, success." << std::endl;
+    std::cout << "UpdateSettings-OHOS_CAMERA_AWB_MODE, success." << std::endl;
 
     // 下发3A参数
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
-    uint8_t awbMode = OHOS_CONTROL_AWB_MODE_AUTO;
+    uint8_t awbMode = OHOS_CAMERA_AWB_MODE_AUTO;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->cameraDevice->UpdateSettings(meta);
 }

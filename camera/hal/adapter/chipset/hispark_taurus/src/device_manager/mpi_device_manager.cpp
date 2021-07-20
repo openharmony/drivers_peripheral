@@ -65,14 +65,12 @@ RetCode MpiDeviceManager::PowerUp(CameraId cameraId)
 {
     if (sysInitFlag == false) {
         if (sysObject_ == nullptr) {
-            sysObject_ = std::make_shared<SysObject>();
+            sysObject_ = SysObject::GetInstance();
             if (sysObject_ == nullptr) {
                 CAMERA_LOGE("Create SysObject fail");
                 return RC_ERROR;
             }
         }
-        std::vector<DeviceFormat> format;
-        sysObject_->ConfigSys(format);
         sysObject_->StartSys();
         sysInitFlag = true;
     }
@@ -103,7 +101,7 @@ RetCode MpiDeviceManager::PowerDown(CameraId cameraId)
     }
     if (sysObject_ != nullptr) {
         sysObject_->StopSys();
-        sysObject_.reset();
+        sysObject_ = nullptr;
         sysInitFlag = false;
     }
     return rc;

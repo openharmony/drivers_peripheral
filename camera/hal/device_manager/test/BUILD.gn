@@ -68,7 +68,7 @@ ohos_unittest("device_manager_unittest") {
     "$camera_path/device_manager/include/mpi",
     "$camera_path/device_manager/src",
     "$camera_path/device_manager/src/mpi",
-    "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include/dirver_adapter",
+    "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include/driver_adapter",
     "//device/hisilicon/hardware/media/proprietary/hal/camera/src/hispark_taurus/sdk/include",
     "//utils/native/base/include",
     "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
@@ -80,6 +80,7 @@ ohos_unittest("device_manager_unittest") {
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
     "//drivers/framework/include/utils",
     "//drivers/adapter/uhdf2/osal/include",
+    "$camera_path/adapter/chipset/hispark_taurus/include/device_manager",
   ]
 
   if (need_link_hispark_taurus_lib) {

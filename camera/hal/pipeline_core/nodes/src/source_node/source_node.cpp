@@ -113,7 +113,6 @@ void SourceNode::DistributeBuffers()
                         if (frameSpec != frameVec_.end()) {
                             f = *frameSpec;
                             frameVec_.erase(frameSpec);
-                            bufferNum_--;
                         }
                 }
             }
