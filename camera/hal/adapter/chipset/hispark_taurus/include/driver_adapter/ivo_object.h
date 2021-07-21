@@ -13,27 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef HOS_CAMERA_VO_OBJECT_H
-#define HOS_CAMERA_VO_OBJECT_H
+#ifndef HOS_CAMERA_IVO_OBJECT_H
+#define HOS_CAMERA_IVO_OBJECT_H
 
 #include "mpi_adapter.h"
-extern "C" {
-#include "hal_vo.h"
-}
-
 
 namespace OHOS::Camera {
-class VoObject {
+class IVoObject {
 public:
-    VoObject();
-    ~VoObject();
-    void ConfigVo(std::vector<DeviceFormat>& format);
-    void StartVo();
-    void StopVo();
-
-private:
-    CAMERA_VO_CONFIG_S stVoConfig;
+    static std::shared_ptr<IVoObject> CreateVoObject();
+    virtual ~IVoObject() {};
+    virtual void ConfigVo(std::vector<DeviceFormat>& format) = 0;
+    virtual void StartVo() = 0;
+    virtual void StopVo() = 0;
 };
 }
 
-#endif // HOS_CAMERA_VO_OBJECT_H
+#endif // OHOS::Camera
+

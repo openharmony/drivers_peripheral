@@ -112,10 +112,11 @@ void Test::GetCameraAbility()
         } else {
             std::cout << "==========[test log]GetCameraIds success." << std::endl;
         }
-        rc = service->GetCameraAbility(cameraIds.front(), ability);
-        if (rc != Camera::NO_ERROR) {
-            std::cout << "==========[test log]GetCameraAbility failed, rc = " << rc << std::endl;
-        }
+        // rc = service->GetCameraAbility(cameraIds.front(), ability);
+        // if (rc != Camera::NO_ERROR) {
+        //     std::cout << "==========[test log]GetCameraAbility failed, rc = " << rc << std::endl;
+        // }
+        GetCameraMetadata();
     }
 }
 
@@ -138,10 +139,11 @@ void Test::Open()
 {
     if (cameraDevice == nullptr) {
         service->GetCameraIds(cameraIds);
-        rc = service->GetCameraAbility(cameraIds.front(), ability);
-        if (rc != Camera::NO_ERROR) {
-            std::cout << "==========[test log]GetCameraAbility failed, rc = " << rc << std::endl;
-        }
+        // rc = service->GetCameraAbility(cameraIds.front(), ability);
+        // if (rc != Camera::NO_ERROR) {
+        //     std::cout << "==========[test log]GetCameraAbility failed, rc = " << rc << std::endl;
+        // }
+        GetCameraMetadata();
         deviceCallback = new CameraDeviceCallback();
         rc = service->OpenCamera(cameraIds.front(), deviceCallback, cameraDevice);
         if (rc != Camera::NO_ERROR || cameraDevice == nullptr) {

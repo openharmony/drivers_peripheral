@@ -14,10 +14,10 @@
  */
 
 #include "v4l2_uvc.h"
-#include "securec.h"
 #include "v4l2_control.h"
 #include "v4l2_fileformat.h"
 #include "v4l2_dev.h"
+#include "securec.h"
 
 namespace OHOS::Camera {
 HosV4L2UVC::HosV4L2UVC() {}

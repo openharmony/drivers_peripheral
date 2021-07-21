@@ -57,10 +57,6 @@ public:
     {
         return RC_OK;
     };
-    RetCode StartVencSanp(SIZE_S* pstSize, bool bSupportDCF)
-    {
-        return RC_OK;
-    };
     RetCode PowerUp(CameraId cameraId);
     RetCode PowerDown(CameraId cameraId);
     void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag)

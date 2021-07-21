@@ -13,34 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef HOS_CAMERA_VPSS_OBJECT_H
-#define HOS_CAMERA_VPSS_OBJECT_H
+#ifndef HOS_CAMERA_IVI_OBJECT_H
+#define HOS_CAMERA_IVI_OBJECT_H
 
 #include "mpi_adapter.h"
-extern "C" {
-#include "hal_vi.h"
-#include "hal_proc.h"
-}
-
-#define INIT_PARAM_KEY_MAX_LEN 128
-
 
 namespace OHOS::Camera {
-class VpssObject {
+class IViObject {
 public:
-    void Init();
-    VpssObject();
-    ~VpssObject();
-    void ConfigVpss(std::vector<DeviceFormat>& format);
-    RetCode StartVpss();
-    RetCode StopVpss();
-
-private:
-    CAMERA_VI_CONFIG_S viConfig_;
-    HI_BOOL chnEnable_[VPSS_MAX_PHY_CHN_NUM] = {};
-    VPSS_CHN_ATTR_S vpssChnAttr_[VPSS_MAX_PHY_CHN_NUM] = {};
-    VPSS_GRP_ATTR_S vpssGrpAttr_;
+    static std::shared_ptr<IViObject> CreateViObject();
+    virtual ~IViObject() {};
+    virtual void ConfigVi(std::vector<DeviceFormat>& format) = 0;
+    virtual RetCode StartVi() = 0;
+    virtual RetCode StopVi() = 0;
+    virtual RetCode SetFlashlight(FlashMode mode, bool enable) = 0;
+    virtual RetCode UpdateSetting(const AdapterCmd command, const void* args) = 0;
+    virtual RetCode QuerySetting(const AdapterCmd command, void* args) = 0;
 };
 }
-#endif // HOS_CAMERA_VPSS_OBJECT_H
+#endif // namespace OHOS::Camera
 

@@ -20,10 +20,11 @@
 #include "icontroller.h"
 #include "idevice_manager.h"
 #include "imanager.h"
-#include "sys_object.h"
+#include "isys_object.h"
 #include "device_manager_adapter.h"
 #include <iostream>
 #include <vector>
+#include <string>
 
 namespace OHOS::Camera {
 class MpiDeviceManager : public IDeviceManager {
@@ -70,7 +71,7 @@ private:
 private:
     std::vector<HardwareConfiguration> hardwareList_;
     std::vector<std::shared_ptr<IManager>> managerList_;
-    SysObject* sysObject_ = nullptr;
+    std::shared_ptr<ISysObject> sysObject_ = nullptr;
     NodeBufferCb nodeBufferCb_;
     MetaDataCb metaDataCb_;
     DeviceStatusCb deviceStatusCb_;

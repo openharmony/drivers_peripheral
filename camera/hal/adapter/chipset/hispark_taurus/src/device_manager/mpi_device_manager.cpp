@@ -46,7 +46,24 @@ RetCode MpiDeviceManager::Init()
     for (auto iter = hardware.cbegin(); iter != hardware.cend(); iter++) {
         hardwareList_.push_back(*iter);
     }
+
     rc = CreateManager();
+    if (rc != RC_OK) {
+        CAMERA_LOGE("CreateManager fail");
+        return rc;
+    }
+
+    sysObject_ = ISysObject::CreateSysObject();
+    if (sysObject_ == nullptr) {
+        CAMERA_LOGE("Create SysObject fail");
+        return RC_ERROR;
+    }
+
+    rc = sysObject_->InitSys();
+    if (rc != RC_OK) {
+        CAMERA_LOGE("InitSys fail");
+    }
+
     return rc;
 }
 
@@ -64,13 +81,6 @@ std::vector<CameraId> MpiDeviceManager::GetCameraId()
 RetCode MpiDeviceManager::PowerUp(CameraId cameraId)
 {
     if (sysInitFlag == false) {
-        if (sysObject_ == nullptr) {
-            sysObject_ = SysObject::GetInstance();
-            if (sysObject_ == nullptr) {
-                CAMERA_LOGE("Create SysObject fail");
-                return RC_ERROR;
-            }
-        }
         sysObject_->StartSys();
         sysInitFlag = true;
     }
@@ -101,7 +111,6 @@ RetCode MpiDeviceManager::PowerDown(CameraId cameraId)
     }
     if (sysObject_ != nullptr) {
         sysObject_->StopSys();
-        sysObject_ = nullptr;
         sysInitFlag = false;
     }
     return rc;
