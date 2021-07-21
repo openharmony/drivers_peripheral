@@ -236,44 +236,6 @@ HWTEST_F(CaptureTest, Camera_Capture_0006, TestSize.Level0)
 
 /**
   * @tc.name: preview and capture
-  * @tc.desc: Commit 2 streams together, single shot for 10 times.
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-HWTEST_F(CaptureTest, Camera_Capture_0007, TestSize.Level0)
-{
-    std::cout << "==========[test log]Commit 2 streams together, single shot for 10 times." << std::endl;
-    // 配置两路流信息
-    Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
-    Test_->StartStream(Test_->intents);
-    // 捕获预览流
-    Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获拍照流，单拍
-    for (int i = 0; i < 10; i++) {
-      std::cout << "==========[test log]single shot: " << i << std::endl;
-      Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, false);
-    }
-    // 后处理
-    Test_->captureIds = {Test_->captureId_preview};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
-    Test_->StopStream(Test_->captureIds, Test_->streamIds);
-}
-
-/**
-  * @tc.name: preview and capture
-  * @tc.desc: Preview and still_capture streams, mock device power down, then Preview and still_capture again.
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-HWTEST_F(CaptureTest, Camera_Capture_0008, TestSize.Level3)
-{
-    std::cout << "==========[test log]check Capture: Preview and still_capture streams,";
-    std::cout  << " mock device power down, then Preview and still_capture again."<< std::endl;
-    EXPECT_EQ(1, 0);
-}
-
-/**
-  * @tc.name: preview and capture
   * @tc.desc: Commit 2 streams in order, Preview and still_capture streams.
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -295,45 +257,6 @@ HWTEST_F(CaptureTest, Camera_Capture_0010, TestSize.Level1)
     // 释放流
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
-    Test_->StopStream(Test_->captureIds, Test_->streamIds);
-}
-
-/**
-  * @tc.name: Only Still_capture stream
-  * @tc.desc: Only Still_capture stream, capture->isStreaming = false.
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-HWTEST_F(CaptureTest, Camera_Capture_0020, TestSize.Level1)
-{
-    std::cout << "==========[test log]check Capture: Still_capture stream, capture->isStreaming = false." << std::endl;
-    // 启流
-    Test_->intents = {Camera::STILL_CAPTURE};
-    Test_->StartStream(Test_->intents);
-    // 抓拍
-    Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, false);
-    // 后处理
-    Test_->streamIds = {Test_->streamId_capture};
-    Test_->StopStream(Test_->captureIds, Test_->streamIds);
-}
-
-/**
-  * @tc.name: Only Still_capture stream
-  * @tc.desc: Only Still_capture stream, capture->isStreaming = true.
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-HWTEST_F(CaptureTest, Camera_Capture_0021, TestSize.Level1)
-{
-    std::cout << "==========[test log]check Capture: Still_capture stream, capture->isStreaming = true." << std::endl;
-    // 启流
-    Test_->intents = {Camera::STILL_CAPTURE};
-    Test_->StartStream(Test_->intents);
-    // 抓拍
-    Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-    // 后处理
-    Test_->captureIds = {Test_->captureId_capture};
-    Test_->streamIds = {Test_->streamId_capture};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
 

@@ -17,7 +17,7 @@
 #define HOS_CAMERA_VPSS_CONTROLLER_H
 
 #include "icontroller.h"
-#include "vpss_object.h"
+#include "ivpss_object.h"
 #include "device_manager_adapter.h"
 #include "mpi_adapter.h"
 
@@ -53,7 +53,7 @@ public:
     void SetMetaDataFlag(bool metaDataFlag) {};
 
 private:
-    std::shared_ptr<VpssObject> vpssObject_ = nullptr;
+    std::shared_ptr<IVpssObject> vpssObject_ = nullptr;
     std::mutex startVpsslock_;
     bool startVpssState_ = false;
 };

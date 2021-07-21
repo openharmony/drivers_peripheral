@@ -17,7 +17,7 @@
 #define HOS_CAMERA_VO_CONTROLLER_H
 
 #include "icontroller.h"
-#include "vo_object.h"
+#include "ivo_object.h"
 #include "device_manager_adapter.h"
 #include "mpi_adapter.h"
 
@@ -55,7 +55,7 @@ public:
 private:
     std::mutex startVolock_;
     bool startVoState_ = false;
-    std::shared_ptr<VoObject> voObject_ = nullptr;
+    std::shared_ptr<IVoObject> voObject_ = nullptr;
 };
 } // namespace OHOS::Camera
 #endif

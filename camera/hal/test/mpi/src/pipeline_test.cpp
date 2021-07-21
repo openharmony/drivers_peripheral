@@ -127,7 +127,7 @@ HWTEST_F(PipelineTest, Camera_Ppl_0004, TestSize.Level2)
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
     Test_->streamInfo->bufferQueue_ = consumer->CreateProducer([this](void* addr, uint32_t size) {
-        Test_->SaveYUV("preview", addr, size);
+        Test_->SaveYUV("video", addr, size);
     });
     Test_->streamInfo->bufferQueue_->SetQueueSize(8);
     Test_->consumerMap_[Camera::PREVIEW] = consumer;
@@ -139,4 +139,43 @@ HWTEST_F(PipelineTest, Camera_Ppl_0004, TestSize.Level2)
     Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, Test_->ability);
     EXPECT_EQ(Test_->rc, Camera::INVALID_ARGUMENT);
     std::cout << "==========[test log]CommitStreams rc = " << Test_->rc << std::endl;
+}
+
+/**
+  * @tc.name: Only Still_capture stream
+  * @tc.desc: Only Still_capture stream, capture->isStreaming = false.
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+HWTEST_F(PipelineTest, Camera_Ppl_0005, TestSize.Level1)
+{
+    std::cout << "==========[test log]check Capture: Still_capture stream, capture->isStreaming = false." << std::endl;
+    // 启流
+    Test_->intents = {Camera::STILL_CAPTURE};
+    Test_->StartStream(Test_->intents);
+    // 抓拍
+    Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, false);
+    // 后处理
+    Test_->streamIds = {Test_->streamId_capture};
+    Test_->StopStream(Test_->captureIds, Test_->streamIds);
+}
+
+/**
+  * @tc.name: Only Still_capture stream
+  * @tc.desc: Only Still_capture stream, capture->isStreaming = true.
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+HWTEST_F(PipelineTest, Camera_Ppl_0006, TestSize.Level1)
+{
+    std::cout << "==========[test log]check Capture: Still_capture stream, capture->isStreaming = true." << std::endl;
+    // 启流
+    Test_->intents = {Camera::STILL_CAPTURE};
+    Test_->StartStream(Test_->intents);
+    // 抓拍
+    Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
+    // 后处理
+    Test_->captureIds = {Test_->captureId_capture};
+    Test_->streamIds = {Test_->streamId_capture};
+    Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }

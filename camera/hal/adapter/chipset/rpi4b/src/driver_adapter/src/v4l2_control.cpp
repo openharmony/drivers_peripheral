@@ -214,7 +214,6 @@ void HosV4L2Control::V4L2EnumExtControls(int fd, std::vector<DeviceControl>& con
 
     qCtrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
     while (!ExtControl(fd, &qCtrl)) {
-
         if (qCtrl.flags & V4L2_CTRL_FLAG_DISABLED) {
             CAMERA_LOGD("V4L2ENUMExtControls flags  V4L2_CTRL_FLAG_DISABLED\n");
             continue;
@@ -229,7 +228,6 @@ void HosV4L2Control::V4L2EnumExtControls(int fd, std::vector<DeviceControl>& con
             for (menu.index = qCtrl.minimum;
                     menu.index <= qCtrl.maximum;
                     menu.index++) {
-
                 menu.id = qCtrl.id;
                 rc = ioctl(fd, VIDIOC_QUERYMENU, &menu);
                 if (rc < 0) {
@@ -275,10 +273,9 @@ int HosV4L2Control::V4L2GetControl(int fd, std::vector<DeviceControl>& control, 
         for (menu.index = queryCtrl.minimum;
                 menu.index <= queryCtrl.maximum;
                 menu.index++) {
-
             menu.id = queryCtrl.id;
             rc = ioctl(fd, VIDIOC_QUERYMENU, &menu);
-            if (rc < 0){
+            if (rc < 0) {
                 continue;
             }
             CAMERA_LOGD("\t %d : %s\n", menu.index, menu.name);

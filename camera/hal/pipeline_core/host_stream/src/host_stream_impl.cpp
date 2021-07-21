@@ -19,6 +19,8 @@ public:
     StreamIntent GetStreamType() const override;
     HostStreamInfo GetStreamInfo() const override;
     int GetStreamId() const override;
+    bool GetStreamState() const override;
+    void SetStreamState(bool state) override;
     BufferCb GetBufferCb() const override;
     HostStreamImpl(const HostStreamInfo& type, BufferCb c = nullptr);
     ~HostStreamImpl() override = default;
@@ -43,6 +45,16 @@ int HostStreamImpl::GetStreamId() const
     return info_.streamId_;
 }
 
+bool HostStreamImpl::GetStreamState() const
+{
+    return info_.builed_;
+}
+
+void HostStreamImpl::SetStreamState(bool state)
+{
+    info_.builed_ = state;
+    return;
+}
 HostStreamInfo HostStreamImpl::GetStreamInfo() const
 {
     return info_;

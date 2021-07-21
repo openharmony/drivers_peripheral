@@ -33,8 +33,6 @@ ohos_executable("ohos_camera_demo") {
     "$camera_path/device_manager/include/",
     "$camera_path/device_manager/include/mpi",
     "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
-    "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include/driver_adapter",
-    "//device/hisilicon/hardware/media/proprietary/hal/camera/src/hispark_taurus/sdk/include",
     "$camera_path/utils/event",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
 
