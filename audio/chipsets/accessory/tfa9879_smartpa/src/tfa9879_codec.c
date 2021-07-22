@@ -267,7 +267,7 @@ static int GetCodecI2sFrequency(struct I2cMsg *msg, uint16_t *fqVal)
         .regValue = 0,
     };
     if (msg == NULL || msg->len < TFA9879_MSG_SIZE || fqVal == NULL) {
-        AUDIO_DEVICE_LOG_ERR("invalid parameter.");
+        AUDIO_DEVICE_LOG_ERR("input invalid parameter.");
         return HDF_ERR_INVALID_PARAM;
     }
     if (g_i2cDevAddr == TFA9879_I2C_DEV_ADDR_ADSEL2) {
@@ -314,7 +314,7 @@ static int SetCodecI2sFrequency(uint16_t frequencyVal)
     regAttr.regValue = ((frequencyVal << 6) & mask) | (oldVal & ~mask); // 00h[6-9]
     ret = Tfa9879RegRw(&regAttr, 0);
     if (ret != HDF_SUCCESS) {
-        AUDIO_DEVICE_LOG_ERR("Tfa9879RegRw fail.");
+        AUDIO_DEVICE_LOG_ERR("Tfa9879RegRw failed.");
         ReleaseObject(&oldMsg, 0, NULL);
         return HDF_FAILURE;
     }
@@ -340,7 +340,7 @@ static int GetCodecI2sFormat(struct I2cMsg *msg, uint16_t *fsVal)
     }
     ret = Tfa9879RegRw(&regAttr, I2C_FLAG_READ);
     if (ret != HDF_SUCCESS) {
-        AUDIO_DEVICE_LOG_ERR("Tfa9879RegRw fail.");
+        AUDIO_DEVICE_LOG_ERR("Tfa9879RegRw is failure.");
         return HDF_FAILURE;
     }
     msg->buf[0] = regAttr.regValue >> I2C_8BIT;                 // High 8 bit
@@ -366,7 +366,7 @@ static int SetCodecI2sFormat(uint16_t formatVal)
     }
     ret = GetCodecI2sFormat(&oldMsg, &oldVal);
     if (ret != HDF_SUCCESS) {
-        AUDIO_DEVICE_LOG_ERR("GetCodecI2sFrequency fail.");
+        AUDIO_DEVICE_LOG_ERR("GetCodecI2sFormat fail.");
         ReleaseObject(&oldMsg, 0, NULL);
         return HDF_FAILURE;
     }
@@ -442,7 +442,7 @@ static int I2c6PinInit(void)
 /*
  * i2s0 pin init
 */
-static void I2s0PinMux(char *regI2sBase)
+static void I2s0PinMux(const char *regI2sBase)
 {
     SysWritel((uintptr_t)regI2sBase + 0x0020, 0x673); // I2S_MCLK
     SysWritel((uintptr_t)regI2sBase + 0x0024, 0x633); // I2S_BCLK_TX
@@ -575,23 +575,23 @@ static const struct AudioKcontrol g_tfa9879AudioControls[] = {
     {
         .iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
         .name = "Master Playback Volume",
-        .Info = AudioInfoCtrlSw,
-        .Get = AudioGetCtrlSw,
-        .Put = AudioPutCtrlSw,
+        .Info = AudioInfoCtrlOps,
+        .Get = AudioGetCtrlOps,
+        .Set = AudioSetCtrlOps,
         .privateValue = (unsigned long) &g_tfa9879AudioRegParams[0],
     }, {
         .iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
         .name = "Playback Mute",
-        .Info = AudioInfoCtrlSw,
-        .Get = AudioGetCtrlSw,
-        .Put = AudioPutCtrlSw,
+        .Info = AudioInfoCtrlOps,
+        .Get = AudioGetCtrlOps,
+        .Set = AudioSetCtrlOps,
         .privateValue = (unsigned long) &g_tfa9879AudioRegParams[1],
     }, {
         .iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
         .name = "Render Channel Mode",
-        .Info = AudioInfoCtrlSw,
-        .Get = AiaoGetCtrlSw,
-        .Put = AiaoPutCtrlSw,
+        .Info = AudioInfoCtrlOps,
+        .Get = AiaoGetCtrlOps,
+        .Set = AiaoSetCtrlOps,
         .privateValue = (unsigned long) &g_tfa9879AudioRegParams[2],
     },
 };

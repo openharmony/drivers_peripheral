@@ -90,6 +90,10 @@ PathSelAnalysisJson *AudioSoGetPathSelAnalysisJson()
 
 int32_t InitCaptureSoHandle(const char *captureSoPath)
 {
+    if (captureSoPath == NULL) {
+        LOG_FUN_ERR("captureSoPath is NULL");
+        return HDF_FAILURE;
+    }
     if (g_ptrCaptureHandle == NULL) {
         g_ptrCaptureHandle = dlopen(captureSoPath, RTLD_LAZY);
         if (g_ptrCaptureHandle == NULL) {
@@ -110,6 +114,10 @@ int32_t InitCaptureSoHandle(const char *captureSoPath)
 
 int32_t InitRenderSoHandle(const char *renderSoPath)
 {
+    if (renderSoPath == NULL) {
+        LOG_FUN_ERR("renderSoPath is NULL");
+        return HDF_FAILURE;
+    }
     if (g_ptrRenderHandle == NULL) {
         g_ptrRenderHandle = dlopen(renderSoPath, RTLD_LAZY);
         if (g_ptrRenderHandle == NULL) {
@@ -131,6 +139,10 @@ int32_t InitRenderSoHandle(const char *renderSoPath)
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
 int32_t InitPathSelectSoHandle(const char *pathSelectSoPath)
 {
+    if (pathSelectSoPath == NULL) {
+        LOG_FUN_ERR("pathSelectSoPath is NULL");
+        return HDF_FAILURE;
+    }
     if (g_ptrPathSelHandle == NULL) {
         g_ptrPathSelHandle = dlopen(pathSelectSoPath, RTLD_LAZY);
         if (g_ptrPathSelHandle == NULL) {

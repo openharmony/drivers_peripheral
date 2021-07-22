@@ -53,7 +53,11 @@ int32_t AudioPathSelGetConfToJsonObj()
         LOG_FUN_ERR("parse.json file fail!");
         return HDF_FAILURE;
     }
-    fseek(fpJson, 0, SEEK_END);
+    if (fseek(fpJson, 0, SEEK_END) != HDF_SUCCESS) {
+        LOG_FUN_ERR("fseek fail!");
+        fclose(fpJson);
+        return HDF_FAILURE;
+    }
     int32_t jsonStrSize = ftell(fpJson);
     rewind(fpJson);
     pJsonStr = (char *)calloc(1, jsonStrSize);

@@ -159,11 +159,13 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
     }
     ret = CheckParaAttr(attrs);
     if (ret != HDF_SUCCESS) {
+        LOG_FUN_ERR("CheckParaAttr Fail");
         return ret;
     }
     int32_t formatValue = -1;
     ret = AttrFormatToBit(attrs, &formatValue);
     if (ret != HDF_SUCCESS) {
+        LOG_FUN_ERR("AttrFormatToBit Fail");
         return ret;
     }
     if (attrs->channelCount == 0) {
@@ -216,7 +218,7 @@ int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCap
         capabilityIndex->subPorts = (struct AudioSubPortCapability *)calloc(capabilityIndex->subPortsNum,
                                                                             sizeof(struct AudioSubPortCapability));
         if (capabilityIndex->subPorts == NULL) {
-            LOG_FUN_ERR("capabilityIndex->subPorts is NULL!");
+            LOG_FUN_ERR("capabilityIndex subPorts is NULL!");
             return HDF_FAILURE;
         }
         capabilityIndex->subPorts->portId = portIndex.portId;
@@ -856,7 +858,7 @@ int32_t AudioAdapterGetPassthroughMode(struct AudioAdapter *adapter, const struc
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter->portCapabilitys == NULL) {
-        LOG_FUN_ERR("hwAdapter portCapabilitys is NULL!");
+        LOG_FUN_ERR("portCapabilitys pointer is null!");
         return HDF_FAILURE;
     }
     struct AudioPortAndCapability *portCapabilitys = hwAdapter->portCapabilitys;

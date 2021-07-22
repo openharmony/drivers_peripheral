@@ -228,8 +228,7 @@ int32_t HdiServiceRenderPause(struct HdfDeviceIoClient *client,
     return render->control.Pause((AudioHandle)render);
 }
 
-int32_t HdiServiceRenderResume(struct HdfDeviceIoClient *client,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+int32_t HdiServiceRenderResume(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
         return HDF_FAILURE;
@@ -246,6 +245,7 @@ int32_t HdiServiceRenderFlush(struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
+        HDF_LOGI("%{public}s", "The parameter is empty");
         return HDF_FAILURE;
     }
     struct AudioRender *render = NULL;
@@ -304,9 +304,10 @@ int32_t HdiServiceRenderSetSampleAttr(struct HdfDeviceIoClient *client,
     if (client == NULL || data == NULL || reply == NULL) {
         return HDF_FAILURE;
     }
+    int ret;
     struct AudioSampleAttributes attrs;
     struct AudioRender *render = NULL;
-    int ret = AudioAdapterListCheckAndGetRender(&render, data);
+    ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
         return ret;
     }
@@ -366,6 +367,7 @@ int32_t HdiServiceRenderCheckSceneCapability(struct HdfDeviceIoClient *client,
     if (client == NULL || data == NULL || reply == NULL) {
         return HDF_FAILURE;
     }
+    uint32_t temporaryPins = 0;
     struct AudioSceneDescriptor scene;
     bool supported = false;
     struct AudioRender *render = NULL;
@@ -376,11 +378,10 @@ int32_t HdiServiceRenderCheckSceneCapability(struct HdfDeviceIoClient *client,
     if (!HdfSbufReadUint32(data, &scene.scene.id)) {
         return HDF_FAILURE;
     }
-    uint32_t tempPins = 0;
-    if (!HdfSbufReadUint32(data, &tempPins)) {
+    if (!HdfSbufReadUint32(data, &temporaryPins)) {
         return HDF_FAILURE;
     }
-    scene.desc.pins = (enum AudioPortPin)tempPins;
+    scene.desc.pins = (enum AudioPortPin)temporaryPins;
     ret = render->scene.CheckSceneCapability((AudioHandle)render, &scene, &supported);
     if (ret < 0) {
         return ret;
@@ -398,6 +399,7 @@ int32_t HdiServiceRenderSelectScene(struct HdfDeviceIoClient *client,
     if (client == NULL || data == NULL || reply == NULL) {
         return HDF_FAILURE;
     }
+    uint32_t tempPins = 0;
     struct AudioSceneDescriptor scene;
     struct AudioRender *render = NULL;
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
@@ -405,10 +407,11 @@ int32_t HdiServiceRenderSelectScene(struct HdfDeviceIoClient *client,
         return ret;
     }
     if (!HdfSbufReadUint32(data, &scene.scene.id)) {
+        HDF_LOGI("%{public}s", "Read Buf Fail");
         return HDF_FAILURE;
     }
-    uint32_t tempPins = 0;
     if (!HdfSbufReadUint32(data, &tempPins)) {
+        HDF_LOGI("%{public}s", "Read Buf Fail");
         return HDF_FAILURE;
     }
     scene.desc.pins = (enum AudioPortPin)tempPins;
@@ -419,6 +422,7 @@ int32_t HdiServiceRenderGetMute(struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
+        HDF_LOGI("%{public}s", "parameter is empty");
         return HDF_FAILURE;
     }
     bool mute = false;
