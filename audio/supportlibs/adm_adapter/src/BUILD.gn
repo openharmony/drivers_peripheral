@@ -51,6 +51,7 @@ config("audio_interface_config") {
 ohos_shared_library("hdi_audio_interface_lib_capture") {
   sources = [
     "audio_interface_lib_capture.c",
+    "audio_interface_lib_common.c",
     "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
   ]
 
@@ -97,6 +98,7 @@ ohos_shared_library("hdi_audio_interface_lib_capture") {
 ohos_shared_library("hdi_audio_interface_lib_render") {
   sources = [
     "audio_interface_lib_render.c",
+    "audio_interface_lib_common.c",
     "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
   ]
 

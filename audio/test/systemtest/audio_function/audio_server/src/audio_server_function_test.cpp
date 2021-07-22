@@ -241,7 +241,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0001, TestSize.
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -292,7 +292,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0002, TestSize.
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -344,7 +344,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0003, TestSize.
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
@@ -385,7 +385,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0004, TestSize.
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -440,7 +440,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0005, TestSize.
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -494,7 +494,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0006, TestSize.
     EXPECT_EQ(true, muteTrue);
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -548,7 +548,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0007, TestSize.
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -592,7 +592,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0008, TestSize.
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -632,7 +632,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0009, TestSize.
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -671,7 +671,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0010, TestSize.
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -753,7 +753,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0012, TestSize.
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);

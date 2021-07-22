@@ -38,6 +38,9 @@ int32_t HdiServiceGetFuncs()
 static int32_t HdiServiceGetAllAdapter(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     HDF_LOGE("%{public}s", "enter to HdiServiceGetAllAdapter ");
+    if (client == NULL || data == NULL || reply == NULL) {
+        return HDF_FAILURE;
+    }
     struct AudioAdapterDescriptor *descs = NULL;
     struct AudioManager *manager = g_serverManager;
     int32_t size = 0;
@@ -62,6 +65,9 @@ static int32_t HdiServiceGetAllAdapter(struct HdfDeviceIoClient *client, struct 
 int SwitchAdapter(struct AudioAdapterDescriptor *descs, const char *adapterNameCase, enum AudioPortDirection portFlag,
                   struct AudioPort *renderPort, const int size)
 {
+    if (descs == NULL || adapterNameCase == NULL || renderPort == NULL) {
+        return HDF_FAILURE;
+    }
     for (int index = 0; index < size; index++) {
         struct AudioAdapterDescriptor *desc = &descs[index];
         if (strcmp(desc->adapterName, adapterNameCase)) {
@@ -83,9 +89,9 @@ int SwitchAdapter(struct AudioAdapterDescriptor *descs, const char *adapterNameC
 
 static int32_t HdiServiceLoadAdapter(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGE("%{public}s", "HdiServiceLoadAdapter entry!");
-    int ret;
-    struct AudioManager *manager = NULL;
+    if (client == NULL || data == NULL || reply == NULL) {
+        return HDF_FAILURE;
+    }
     struct AudioAdapter *adapter = NULL;
     struct AudioPort renderPort;
     const char *adapterName = NULL;
@@ -94,7 +100,7 @@ static int32_t HdiServiceLoadAdapter(struct HdfDeviceIoClient *client, struct Hd
         HDF_LOGE("%{public}s", "adapterNameCase Is NULL");
         return HDF_FAILURE;
     }
-    ret = AudioAdapterCheckListExist(adapterName);
+    int32_t ret = AudioAdapterCheckListExist(adapterName);
     if (ret == HDF_ERR_INVALID_PARAM) {
         return HDF_FAILURE;
     }
@@ -107,7 +113,7 @@ static int32_t HdiServiceLoadAdapter(struct HdfDeviceIoClient *client, struct Hd
         return HDF_FAILURE;
     }
     enum AudioPortDirection port = (enum AudioPortDirection)tempDir;
-    manager = g_serverManager;
+    struct AudioManager *manager = g_serverManager;
     if (adapterName == NULL || manager == NULL || g_descs == NULL) {
         HDF_LOGE("%{public}s", "Point is NULL!");
         return HDF_FAILURE;
@@ -136,6 +142,9 @@ static int32_t HdiServiceLoadAdapter(struct HdfDeviceIoClient *client, struct Hd
 static int32_t HdiServiceInitAllPorts(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     HDF_LOGE("%{public}s", "HdiServiceInitAllPorts");
+    if (client == NULL || data == NULL || reply == NULL) {
+        return HDF_FAILURE;
+    }
     const char *adapterName = NULL;
     struct AudioAdapter *adapter = NULL;
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
@@ -155,6 +164,9 @@ static int32_t HdiServiceInitAllPorts(struct HdfDeviceIoClient *client, struct H
 
 static int32_t HdiServiceUnloadAdapter(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (client == NULL || data == NULL || reply == NULL) {
+        return HDF_FAILURE;
+    }
     struct AudioAdapter *adapter = NULL;
     const char *adapterName = NULL;
     int ret;
@@ -188,6 +200,9 @@ static int32_t HdiServiceGetPortCapability(struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     HDF_LOGE("%{public}s", "HdiServiceGetPortCapability in!");
+    if (client == NULL || data == NULL || reply == NULL) {
+        return HDF_FAILURE;
+    }
     struct AudioPort port;
     struct AudioPortCapability capability;
     struct AudioAdapter *adapter = NULL;
@@ -228,6 +243,9 @@ static int32_t HdiServiceSetPassthroughMode(struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     HDF_LOGE("%{public}s", "HdiServiceSetPassthroughMode in");
+    if (client == NULL || data == NULL || reply == NULL) {
+        return HDF_FAILURE;
+    }
     struct AudioPort port;
     enum AudioPortPassthroughMode mode;
     struct AudioAdapter *adapter = NULL;
@@ -270,6 +288,9 @@ static int32_t HdiServiceSetPassthroughMode(struct HdfDeviceIoClient *client,
 static int32_t HdiServiceGetPassthroughMode(struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (client == NULL || data == NULL || reply == NULL) {
+        return HDF_FAILURE;
+    }
     struct AudioPort port;
     enum AudioPortPassthroughMode mode;
     struct AudioAdapter *adapter = NULL;
@@ -295,7 +316,7 @@ static int32_t HdiServiceGetPassthroughMode(struct HdfDeviceIoClient *client,
         return HDF_FAILURE;
     }
     if (adapter == NULL) {
-        HDF_LOGE("%{public}s", "HdiServiceCreatRender adapter is NULL!");
+        HDF_LOGE("%{public}s", "adapter is NULL!");
         return HDF_FAILURE;
     }
     int ret = adapter->GetPassthroughMode(adapter, &port, &mode);
@@ -380,7 +401,7 @@ static int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, s
                                   struct HdfSBuf *reply)
 {
     unsigned int i;
-    if ((client == NULL) || (data == NULL)) {
+    if (client == NULL || data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s", "ControlDispatch: input para is NULL.");
         return HDF_FAILURE;
     }

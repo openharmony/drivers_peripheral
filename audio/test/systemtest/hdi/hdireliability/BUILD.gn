@@ -96,3 +96,83 @@ ohos_systemtest("AudioHdiCaptureReliabilityTest") {
   ]
 }
 ###########################end###########################
+###########################AudioHdiCaptureControlReliabilityTest###########################
+ohos_systemtest("AudioHdiCaptureControlReliabilityTest") {
+  module_out_path = module_output_path
+  sources = [
+        "src/audio_hdicapture_control_reliability_test.cpp",
+        "../../common/hdi_common/src/audio_hdi_common.cpp"
+        ]
+
+  include_dirs = [
+    "//drivers/peripheral/audio/hal/hdi_passthrough/include",
+    "//drivers/peripheral/audio/interfaces/include",
+    "//drivers/framework/include/core",
+    "//drivers/framework/include/utils",
+    "//drivers/framework/include/osal",
+    "//drivers/framework/include",
+    "//third_party/bounds_checking_function/include",
+    "//utils/native/base/include",
+    "//drivers/framework/ability/sbuf/include",
+    "//drivers/framework/utils/include",
+    "//drivers/framework/ability/sbuf/include",
+    "//drivers/adapter/uhdf2/osal/include",
+    "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
+    "//third_party/googletest/googletest/include/gtest",
+    "//drivers/peripheral/audio/test/systemtest/hdi/hdireliability/include",
+  ]
+  deps = [
+    "//utils/native/base:utils",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+}
+###########################end###########################
+###########################AudioHdiRenderControlReliabilityTest###########################
+ohos_systemtest("AudioHdiRenderControlReliabilityTest") {
+  module_out_path = module_output_path
+  sources = [
+        "src/audio_hdirender_control_reliability_test.cpp",
+        "../../common/hdi_common/src/audio_hdi_common.cpp"
+        ]
+
+  include_dirs = [
+    "//drivers/peripheral/audio/hal/hdi_passthrough/include",
+    "//drivers/peripheral/audio/interfaces/include",
+    "//drivers/framework/include/core",
+    "//drivers/framework/include/utils",
+    "//drivers/framework/include/osal",
+    "//drivers/framework/include",
+    "//third_party/bounds_checking_function/include",
+    "//utils/native/base/include",
+    "//drivers/framework/ability/sbuf/include",
+    "//drivers/framework/utils/include",
+    "//drivers/framework/ability/sbuf/include",
+    "//drivers/adapter/uhdf2/osal/include",
+    "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
+    "//third_party/googletest/googletest/include/gtest",
+    "//drivers/peripheral/audio/test/systemtest/hdi/hdireliability/include",
+  ]
+  deps = [
+    "//utils/native/base:utils",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+}
+###########################end###########################

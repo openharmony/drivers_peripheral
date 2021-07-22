@@ -1083,7 +1083,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderPosition_0001, Te
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1133,7 +1133,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderPosition_0002, Te
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1174,7 +1174,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderPosition_0003, Te
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);

@@ -53,7 +53,7 @@ int32_t FormatToBits(enum AudioFormat format, uint32_t *formatBits)
 
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount)
 {
-    if (frameRenderMode == NULL) {
+    if (frameRenderMode == NULL || frameCount == NULL) {
         return HDF_SUCCESS;
     }
     uint32_t formatBits = 0;
@@ -261,7 +261,7 @@ int32_t AudioRenderSetSampleAttributes(AudioHandle handle, const struct AudioSam
     hwRender->renderParam.frameRenderMode.attrs.stopThreshold = attrs->stopThreshold;
     hwRender->renderParam.frameRenderMode.attrs.silenceThreshold = attrs->silenceThreshold;
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
-    if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
+    if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL || hwRender->devDataHandle == NULL) {
         hwRender->renderParam.frameRenderMode.attrs = tempAttrs;
         LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
         return HDF_FAILURE;
