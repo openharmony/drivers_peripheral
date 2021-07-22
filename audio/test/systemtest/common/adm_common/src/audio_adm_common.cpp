@@ -77,7 +77,7 @@ int32_t WriteHwParamsToBuf(struct HdfSBuf *sBuf, struct AudioPcmHwParams hwParam
     if (sBuf == nullptr) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUint32(sBuf, hwParams.streamType)) {
+    if (!HdfSbufWriteUint32(sBuf, (uint32_t)hwParams.streamType)) {
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(sBuf, hwParams.channels)) {
@@ -98,10 +98,16 @@ int32_t WriteHwParamsToBuf(struct HdfSBuf *sBuf, struct AudioPcmHwParams hwParam
     if (!HdfSbufWriteString(sBuf, hwParams.cardServiceName)) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUint32(sBuf, hwParams.isBigEndian)) {
+    if (!HdfSbufWriteUint32(sBuf, hwParams.period)) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUint32(sBuf, hwParams.isSignedData)) {
+    if (!HdfSbufWriteUint32(sBuf, hwParams.frameSize)) {
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteUint32(sBuf, (uint32_t)(hwParams.isBigEndian))) {
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteUint32(sBuf, (uint32_t)(hwParams.isSignedData))) {
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(sBuf, hwParams.startThreshold)) {
@@ -111,12 +117,6 @@ int32_t WriteHwParamsToBuf(struct HdfSBuf *sBuf, struct AudioPcmHwParams hwParam
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(sBuf, hwParams.silenceThreshold)) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteUint32(sBuf, hwParams.period)) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteUint32(sBuf, hwParams.frameSize)) {
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
