@@ -22,37 +22,37 @@ int32_t GetInitCaptureParaAttrs(struct HdfSBuf *data, struct AudioSampleAttribut
     }
     uint32_t tempCapturePara = 0;
     if (!HdfSbufReadUint32(data, &tempCapturePara)) {
-        HDF_LOGE("%{public}s", " read buf fail");
+        HDF_LOGE("%{public}s", "Capture read buf fail");
         return HDF_FAILURE;
     }
     attrs->type = (enum AudioCategory)tempCapturePara;
     if (!HdfSbufReadUint32(data, &attrs->period)) {
-        HDF_LOGE("%{public}s", " read buf fail");
+        HDF_LOGE("%{public}s", "Capture read buf fail");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &attrs->frameSize)) {
-        HDF_LOGE("%{public}s", " read buf fail");
+        HDF_LOGE("%{public}s", "Capture read buf fail");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &attrs->startThreshold)) {
-        HDF_LOGE("%{public}s", " read buf fail");
+        HDF_LOGE("%{public}s", "Capture read buf fail");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &attrs->stopThreshold)) {
-        HDF_LOGE("%{public}s", " read buf fail");
+        HDF_LOGE("%{public}s", "Capture read buf fail");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &attrs->silenceThreshold)) {
-        HDF_LOGE("%{public}s", " read buf fail");
+        HDF_LOGE("%{public}s", "Capture read buf fail");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &tempCapturePara)) {
-        LOG_FUN_ERR("Failed to Get Speed sBuf!");
+        HDF_LOGE("%{public}s", "Failed to Get Speed sBuf!");
         return HDF_FAILURE;
     }
     attrs->isBigEndian = (bool)tempCapturePara;
     if (!HdfSbufReadUint32(data, &tempCapturePara)) {
-        LOG_FUN_ERR("Failed to Get Speed sBuf!");
+        HDF_LOGE("%{public}s", "Failed to Get Speed sBuf!");
         return HDF_FAILURE;
     }
     attrs->isSignedData = (bool)tempCapturePara;
@@ -67,7 +67,7 @@ int32_t GetInitCapturePara(struct HdfSBuf *data, struct AudioDeviceDescriptor *d
     }
     uint32_t tempCapturePara = 0;
     if (!HdfSbufReadUint32(data, &tempCapturePara)) {
-        LOG_FUN_ERR("Failed to Get Speed sBuf!");
+        HDF_LOGE("%{public}s", "Failed to Get Speed sBuf!");
         return HDF_FAILURE;
     }
     attrs->format = (enum AudioFormat)tempCapturePara;
@@ -80,7 +80,7 @@ int32_t GetInitCapturePara(struct HdfSBuf *data, struct AudioDeviceDescriptor *d
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &tempCapturePara)) {
-        LOG_FUN_ERR("Failed to Get Speed sBuf!");
+        HDF_LOGE("%{public}s", "Failed to Get Speed sBuf!");
         return HDF_FAILURE;
     }
     attrs->interleaved = (bool)tempCapturePara;
@@ -122,7 +122,7 @@ int32_t HdiServiceCreatCapture(struct HdfDeviceIoClient *client, struct HdfSBuf 
     HDF_LOGE("%{public}s, capturePid = %{public}u", "HdiServiceCreatCapture:", capturePid);
     int32_t ret = GetInitCapturePara(data, &devDesc, &attrs);
     if (ret < 0) {
-        LOG_FUN_ERR("read Render param failure!");
+        HDF_LOGE("%{public}s", "read Render param failure!");
         return HDF_FAILURE;
     }
     if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
@@ -298,9 +298,10 @@ int32_t HdiServiceCaptureSetSampleAttr(struct HdfDeviceIoClient *client,
     if (client == NULL || data == NULL || reply == NULL) {
         return HDF_FAILURE;
     }
+    int ret;
     struct AudioSampleAttributes attrs;
     struct AudioCapture *capture = NULL;
-    int ret = AudioAdapterListCheckAndGetCapture(&capture, data);
+    ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0) {
         return ret;
     }
@@ -363,6 +364,7 @@ int32_t HdiServiceCaptureCheckSceneCapability(struct HdfDeviceIoClient *client,
     struct AudioSceneDescriptor scene;
     bool supported = false;
     struct AudioCapture *capture = NULL;
+    uint32_t tempPins = 0;
     int ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0) {
         return ret;
@@ -370,7 +372,6 @@ int32_t HdiServiceCaptureCheckSceneCapability(struct HdfDeviceIoClient *client,
     if (!HdfSbufReadUint32(data, &scene.scene.id)) {
         return HDF_FAILURE;
     }
-    uint32_t tempPins = 0;
     if (!HdfSbufReadUint32(data, &tempPins)) {
         return HDF_FAILURE;
     }
@@ -415,9 +416,10 @@ int32_t HdiServiceCaptureGetMute(struct HdfDeviceIoClient *client,
     if (client == NULL || data == NULL || reply == NULL) {
         return HDF_FAILURE;
     }
+    int ret;
     bool mute = false;
     struct AudioCapture *capture = NULL;
-    int ret = AudioAdapterListCheckAndGetCapture(&capture, data);
+    ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0) {
         return ret;
     }
@@ -501,6 +503,8 @@ int32_t HdiServiceCaptureGetGainThreshold(struct HdfDeviceIoClient *client,
         return HDF_FAILURE;
     }
     float min, max;
+    uint32_t tempMin;
+    uint32_t tempMax;
     struct AudioCapture *capture = NULL;
     int ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0) {
@@ -510,11 +514,11 @@ int32_t HdiServiceCaptureGetGainThreshold(struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
-    uint32_t tempMin = (uint32_t)min;
+    tempMin = (uint32_t)min;
     if (!HdfSbufWriteUint32(reply, tempMin)) {
         return HDF_FAILURE;
     }
-    uint32_t tempMax = (uint32_t)max;
+    tempMax = (uint32_t)max;
     if (!HdfSbufWriteUint32(reply, tempMax)) {
         return HDF_FAILURE;
     }

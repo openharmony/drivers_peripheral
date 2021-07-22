@@ -129,6 +129,7 @@ int32_t AudioProxyRenderGetSampleAttributes(AudioHandle handle, struct AudioSamp
         return ret;
     }
     if (AudioProxyReadSapmleAttrbutes(reply, attrs)) {
+        LOG_FUN_ERR("AudioProxyReadSapmleAttrbutes FAIL");
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }
@@ -166,17 +167,20 @@ int32_t AudioProxyRenderCheckSceneCapability(AudioHandle handle,
     if (scene == NULL || supported == NULL) {
         return HDF_FAILURE;
     }
+    uint32_t tempPins;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     if (AudioProxyPreprocessRender(handle, &data, &reply) < 0) {
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(data, scene->scene.id)) {
+        LOG_FUN_ERR("scene->scene.id Write FAIL");
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }
-    uint32_t tempPins = scene->desc.pins;
+    tempPins = scene->desc.pins;
     if (!HdfSbufWriteUint32(data, tempPins)) {
+        LOG_FUN_ERR("tempPins Write FAIL");
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }
@@ -210,8 +214,8 @@ int32_t AudioProxyRenderSelectScene(AudioHandle handle, const struct AudioSceneD
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }
-    uint32_t tempPins = scene->desc.pins;
-    if (!HdfSbufWriteUint32(data, tempPins)) {
+    uint32_t temporaryPins = scene->desc.pins;
+    if (!HdfSbufWriteUint32(data, temporaryPins)) {
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }

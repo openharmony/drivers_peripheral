@@ -541,7 +541,7 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0001,
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -590,7 +590,7 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0002,
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -631,7 +631,7 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0003,
 
     void *result = nullptr;
     pthread_join(tids, &result);
-    ret = (int32_t)result;
+    ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);

@@ -169,6 +169,8 @@ int32_t AudioProxyCaptureCheckSceneCapability(AudioHandle handle,
     if (scene == NULL || supported == NULL) {
         return HDF_FAILURE;
     }
+    uint32_t tempPins;
+    uint32_t tempSupported = 0;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     if (AudioProxyPreprocessCapture(handle, &data, &reply) < 0) {
@@ -178,7 +180,7 @@ int32_t AudioProxyCaptureCheckSceneCapability(AudioHandle handle,
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }
-    uint32_t tempPins = scene->desc.pins;
+    tempPins = scene->desc.pins;
     if (!HdfSbufWriteUint32(data, tempPins)) {
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
@@ -189,7 +191,6 @@ int32_t AudioProxyCaptureCheckSceneCapability(AudioHandle handle,
         AudioProxyBufReplyRecycle(data, reply);
         return ret;
     }
-    uint32_t tempSupported = 0;
     if (!HdfSbufReadUint32(reply, &tempSupported)) {
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
@@ -377,14 +378,17 @@ int32_t AudioProxyCaptureGetCapturePosition(struct AudioCapture *capture, uint64
         return ret;
     }
     if (!HdfSbufReadUint64(reply, frames)) {
+        LOG_FUN_ERR("Read Buf FAIL");
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }
     if (!HdfSbufReadInt64(reply, &time->tvSec)) {
+        LOG_FUN_ERR("Read Buf FAIL");
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }
     if (!HdfSbufReadInt64(reply, &time->tvNSec)) {
+        LOG_FUN_ERR("Read Buf FAIL");
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }

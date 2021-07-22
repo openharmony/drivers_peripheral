@@ -38,9 +38,11 @@ int32_t AudioProxyCommonInitAttrs(struct HdfSBuf *data, const struct AudioSample
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(data, attrs->startThreshold)) {
+        LOG_FUN_ERR("startThreshold Write Fail");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(data, attrs->stopThreshold)) {
+        LOG_FUN_ERR("stopThreshold Write Fail");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(data, attrs->silenceThreshold)) {
@@ -176,7 +178,7 @@ int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCap
         capabilityIndex->subPorts = (struct AudioSubPortCapability *)calloc(capabilityIndex->subPortsNum,
             sizeof(struct AudioSubPortCapability));
         if (capabilityIndex->subPorts == NULL) {
-            LOG_FUN_ERR("capabilityIndex->subPorts is NULL!");
+            LOG_FUN_ERR("The pointer is null!");
             return HDF_FAILURE;
         }
         capabilityIndex->subPorts->portId = portIndex.portId;
@@ -532,7 +534,7 @@ int32_t AudioProxyAdapterGetPortCapability(struct AudioAdapter *adapter,
         return HDF_FAILURE;
     }
     int32_t portNum = hwAdapter->adapterDescriptor.portNum;
-    while (hwAdapterPortCapabilitys != NULL && portNum) {
+    while (hwAdapterPortCapabilitys != NULL && (portNum > 0)) {
         if (hwAdapterPortCapabilitys->port.portId == port->portId) {
             *capability = hwAdapterPortCapabilitys->capability;
             return HDF_SUCCESS;
@@ -576,6 +578,7 @@ int32_t AudioProxyAdapterSetPassthroughMode(struct AudioAdapter *adapter,
         return HDF_FAILURE;
     }
     if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
+        LOG_FUN_ERR("AudioProxyPreprocessSBuf Fail");
         return HDF_FAILURE;
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
@@ -585,6 +588,7 @@ int32_t AudioProxyAdapterSetPassthroughMode(struct AudioAdapter *adapter,
     }
     const char *adapterName = hwAdapter->adapterDescriptor.adapterName;
     if (!HdfSbufWriteString(data, adapterName)) {
+        LOG_FUN_ERR("adapterName Write Fail");
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }
@@ -595,6 +599,7 @@ int32_t AudioProxyAdapterSetPassthroughMode(struct AudioAdapter *adapter,
     }
     uint32_t tempMode = (uint32_t)mode;
     if (!HdfSbufWriteUint32(data, tempMode)) {
+        LOG_FUN_ERR("Mode Write Fail");
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }

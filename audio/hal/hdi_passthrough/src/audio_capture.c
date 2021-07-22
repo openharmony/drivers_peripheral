@@ -54,10 +54,6 @@ int32_t AudioCaptureStart(AudioHandle handle)
     if (hwCapture == NULL) {
         return HDF_FAILURE;
     }
-    if (hwCapture->devDataHandle == NULL) {
-        LOG_FUN_ERR("CaptureStart Bind Fail!");
-        return HDF_FAILURE;
-    }
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
         LOG_FUN_ERR("pInterfaceLibModeCapture Fail!");
@@ -65,6 +61,10 @@ int32_t AudioCaptureStart(AudioHandle handle)
     }
     if (hwCapture->captureParam.frameCaptureMode.buffer != NULL) {
         LOG_FUN_ERR("AudioCapture already start!");
+        return HDF_FAILURE;
+    }
+    if (hwCapture->devDataHandle == NULL) {
+        LOG_FUN_ERR("CaptureStart Bind Fail!");
         return HDF_FAILURE;
     }
     int32_t ret = (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam,
@@ -90,15 +90,15 @@ int32_t AudioCaptureStop(AudioHandle handle)
     if (hwCapture == NULL) {
         return HDF_FAILURE;
     }
+    if (hwCapture->devDataHandle == NULL) {
+        LOG_FUN_ERR("CaptureStart Bind Fail!");
+        return HDF_FAILURE;
+    }
     if (hwCapture->captureParam.frameCaptureMode.buffer != NULL) {
         AudioMemFree((void **)&hwCapture->captureParam.frameCaptureMode.buffer);
     } else {
         LOG_FUN_ERR("AudioCapture already stop!");
         return HDF_ERR_INVALID_OBJECT;
-    }
-    if (hwCapture->devDataHandle == NULL) {
-        LOG_FUN_ERR("CaptureStart Bind Fail!");
-        return HDF_FAILURE;
     }
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
@@ -504,6 +504,10 @@ int32_t AudioCaptureGetVolume(AudioHandle handle, float *volume)
     float volumeTemp = hwCapture->captureParam.captureMode.ctlParam.volume;
     float volMax = (float)hwCapture->captureParam.captureMode.ctlParam.volThreshold.volMax;
     float volMin = (float)hwCapture->captureParam.captureMode.ctlParam.volThreshold.volMin;
+    if ((volMax - volMin) == 0) {
+        LOG_FUN_ERR("Divisor cannot be zero!");
+        return HDF_FAILURE;
+    }
     volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / 2);
     int volumeT = (int)((pow(10, volumeTemp) + 5) / 10); // delet 0.X num
     *volume = (float)volumeT / 10;  // get volume (0-1)
@@ -644,6 +648,10 @@ int32_t AudioCaptureCaptureFrame(struct AudioCapture *capture, void *frame,
     }
     *replyBytes = hwCapture->captureParam.frameCaptureMode.bufferSize;
     hwCapture->captureParam.frameCaptureMode.frames += hwCapture->captureParam.frameCaptureMode.bufferFrameSize;
+    if (hwCapture->captureParam.frameCaptureMode.attrs.sampleRate == 0) {
+        LOG_FUN_ERR("Divisor cannot be zero!");
+        return HDF_FAILURE;
+    }
     int64_t totalTime = (hwCapture->captureParam.frameCaptureMode.bufferFrameSize * SEC_TO_NSEC) /
                         (int64_t)hwCapture->captureParam.frameCaptureMode.attrs.sampleRate;
     if (TimeToAudioTimeStampCapture(&totalTime, &hwCapture->captureParam.frameCaptureMode.time) == HDF_FAILURE) {

@@ -13,14 +13,22 @@
  * limitations under the License.
  */
 
-#include "audio_interface_lib_render.h"
+#include "audio_interface_lib_common.h"
 
 #define AUDIODRV_CTL_ELEM_IFACE_DAC 0
-#define AUDIODRV_CTL_ELEM_IFACE_GAIN 2
 #define AUDIODRV_CTL_ELEM_IFACE_MIX 3
 #define AUDIO_SBUF_EXTEND 16
-#define AUDIO_MIN_DEVICENUM 1
-/* Out Put Render */
+
+#define AUDIODRV_CTL_ELEM_IFACE_MIXER ((int32_t)2) /* virtual mixer device */
+#define AUDIODRV_CTL_ELEM_IFACE_ACODEC ((int32_t)4) /* Acodec device */
+#define AUDIODRV_CTL_ELEM_IFACE_AIAO ((int32_t)6)
+
+#define AUDIODRV_CTL_ACODEC_ENABLE 1
+#define AUDIODRV_CTL_ACODEC_DISABLE 0
+#define AUDIODRV_CTL_EXTERN_CODEC_STR "External Codec Enable"
+#define AUDIODRV_CTL_INTERNAL_CODEC_STR "Internally Codec Enable"
+
+/* Out Put Render/Capture */
 static struct AudioPcmHwParams {
     enum AudioStreamType streamType;
     uint32_t channels;
@@ -37,17 +45,6 @@ static struct AudioPcmHwParams {
     uint32_t stopThreshold;
     uint32_t silenceThreshold;
 } g_hwParams;
-
-#define AUDIODRV_CTL_ELEM_IFACE_MIXER ((int32_t)2) /* virtual mixer device */
-#define AUDIODRV_CTL_ELEM_TYPE_INTEGER ((int32_t)2) /* integer type */
-#define AUDIODRV_CTL_ELEM_IFACE_PGA ((int32_t)5) /* PGA device */
-#define AUDIODRV_CTL_ELEM_IFACE_ACODEC ((int32_t)4) /* Acodec device */
-#define AUDIODRV_CTL_ELEM_IFACE_AIAO ((int32_t)6)
-
-#define AUDIODRV_CTL_ACODEC_ENABLE 1
-#define AUDIODRV_CTL_ACODEC_DISABLE 0
-#define AUDIODRV_CTL_EXTERN_CODEC_STR "External Codec Enable"
-#define AUDIODRV_CTL_INTERNAL_CODEC_STR "Internally Codec Enable"
 
 struct AudioCtlElemId {
     const char *cardServiceName;
@@ -251,18 +248,18 @@ int32_t AudioCtlRenderGetVolume(struct DevHandle *handle, int cmdId, struct Audi
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioRenderObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("Failed to obtain sBuf");
+        LOG_FUN_ERR("RenderGetVolume Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     reply = AudioRenderObtainHdfSBuf();
     if (reply == NULL) {
-        LOG_FUN_ERR("Failed to obtain reply");
+        LOG_FUN_ERR("RenderGetVolume Failed to obtain reply");
         AudioRenderBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
     ret = AudioCtlRenderGetVolumeSBuf(sBuf, handleData);
     if (ret < 0) {
-        LOG_FUN_ERR("Failed to Get Volume sBuf!");
+        LOG_FUN_ERR("RenderGetVolume Failed to Get Volume sBuf!");
         AudioRenderBufReplyRecycle(sBuf, reply);
         return ret;
     }
@@ -270,13 +267,14 @@ int32_t AudioCtlRenderGetVolume(struct DevHandle *handle, int cmdId, struct Audi
     service = (struct HdfIoService *)handle->object;
     ret = AudioServiceRenderDispatch(service, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
+        LOG_FUN_ERR("RenderGetVolume RenderDispatch Failed!");
         AudioRenderBufReplyRecycle(sBuf, reply);
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue elemValue;
     memset_s(&elemValue, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
     if (!HdfSbufReadInt32(reply, &elemValue.value[0])) {
-        LOG_FUN_ERR("Failed to Get Volume sBuf!");
+        LOG_FUN_ERR("RenderGetVolume Failed to Get Volume sBuf!");
         AudioRenderBufReplyRecycle(sBuf, reply);
         return HDF_FAILURE;
     }
@@ -365,13 +363,13 @@ int32_t AudioCtlRenderSetPauseStu(struct DevHandle *handle, int cmdId, struct Au
 int32_t AudioCtlRenderSetMuteBuf(struct HdfSBuf *sBuf, struct AudioHwRenderParam *handleData)
 {
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("handleData or sBuf is NULL!");
+        LOG_FUN_ERR("RenderSetMuteBuf handleData or sBuf is NULL!");
         return HDF_FAILURE;
     }
     memset_s(&g_elemValue, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
     uint32_t card = handleData->renderMode.hwInfo.card;
     if (card < 0 || card >= AUDIO_SERVICE_MAX) {
-        LOG_FUN_ERR("card is Error!");
+        LOG_FUN_ERR("RenderSetMuteBuf card is Error!");
         return HDF_FAILURE;
     }
     g_elemValue.id.cardServiceName = g_audioService[card];
@@ -379,15 +377,19 @@ int32_t AudioCtlRenderSetMuteBuf(struct HdfSBuf *sBuf, struct AudioHwRenderParam
     g_elemValue.id.itemName = "Playback Mute";
     g_elemValue.value[0] = (int32_t)handleData->renderMode.ctlParam.mute;
     if (!HdfSbufWriteInt32(sBuf, g_elemValue.value[0])) {
+        LOG_FUN_ERR("RenderSetMuteBuf value[0] Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteInt32(sBuf, g_elemValue.id.iface)) {
+        LOG_FUN_ERR("RenderSetMuteBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, g_elemValue.id.cardServiceName)) {
+        LOG_FUN_ERR("RenderSetMuteBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, g_elemValue.id.itemName)) {
+        LOG_FUN_ERR("RenderSetMuteBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -398,19 +400,19 @@ int32_t AudioCtlRenderSetMuteStu(struct DevHandle *handle, int cmdId, struct Aud
     int32_t ret;
     LOG_FUN_INFO();
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("paras is NULL!");
+        LOG_FUN_ERR("RenderSetMuteStu paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioRenderObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("Failed to obtain sBuf");
+        LOG_FUN_ERR("RenderSetMuteStu Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     ret = AudioCtlRenderSetMuteBuf(sBuf, handleData);
     if (ret < 0) {
-        LOG_FUN_ERR("Failed to Set Mute sBuf!");
+        LOG_FUN_ERR("RenderSetMuteStu Failed to Set Mute sBuf!");
         AudioRenderBufReplyRecycle(sBuf, NULL);
         return ret;
     }
@@ -418,13 +420,13 @@ int32_t AudioCtlRenderSetMuteStu(struct DevHandle *handle, int cmdId, struct Aud
     cmdId -= CTRL_NUM;   // ADM Ctrl Num Begin zero
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("Service is NULL!");
+        LOG_FUN_ERR("RenderSetMuteStu Service is NULL!");
         AudioRenderBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
     ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("Failed to send service call!");
+        LOG_FUN_ERR("RenderSetMuteStu Failed to send service call!");
         AudioRenderBufReplyRecycle(sBuf, NULL);
         return ret;
     }
@@ -435,25 +437,28 @@ int32_t AudioCtlRenderSetMuteStu(struct DevHandle *handle, int cmdId, struct Aud
 int32_t AudioCtlRenderGetMuteSBuf(struct HdfSBuf *sBuf, struct AudioHwRenderParam *handleData)
 {
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("handleData or sBuf is NULL!");
+        LOG_FUN_ERR("RenderGetMuteSBuf handleData or sBuf is NULL!");
         return HDF_FAILURE;
     }
     memset_s(&g_elemValue, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
     uint32_t card = handleData->renderMode.hwInfo.card;
     if (card < 0 || card >= AUDIO_SERVICE_MAX) {
-        LOG_FUN_ERR("card is Error!");
+        LOG_FUN_ERR("RenderGetMuteSBuf card is Error!");
         return HDF_FAILURE;
     }
     g_elemValue.id.cardServiceName = g_audioService[card];
     g_elemValue.id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC;
     g_elemValue.id.itemName = "Playback Mute";
     if (!HdfSbufWriteInt32(sBuf, g_elemValue.id.iface)) {
+        LOG_FUN_ERR("RenderGetMuteSBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, g_elemValue.id.cardServiceName)) {
+        LOG_FUN_ERR("RenderGetMuteSBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, g_elemValue.id.itemName)) {
+        LOG_FUN_ERR("RenderGetMuteSBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -464,25 +469,25 @@ int32_t AudioCtlRenderGetMuteStu(struct DevHandle *handle, int cmdId, struct Aud
     int32_t ret;
     LOG_FUN_INFO();
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("paras is NULL!");
+        LOG_FUN_ERR("RenderGetMuteStu paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioRenderObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("Failed to obtain sBuf");
+        LOG_FUN_ERR("RenderGetMuteStu Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     reply = AudioRenderObtainHdfSBuf();
     if (reply == NULL) {
-        LOG_FUN_ERR("Failed to obtain reply");
+        LOG_FUN_ERR("RenderGetMuteStu Failed to obtain reply");
         AudioRenderBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
     ret = AudioCtlRenderGetMuteSBuf(sBuf, handleData);
     if (ret < 0) {
-        LOG_FUN_ERR("Failed to Get Mute sBuf!");
+        LOG_FUN_ERR("RenderGetMuteStu Failed to Get Mute sBuf!");
         AudioRenderBufReplyRecycle(sBuf, reply);
         return ret;
     }
@@ -490,13 +495,14 @@ int32_t AudioCtlRenderGetMuteStu(struct DevHandle *handle, int cmdId, struct Aud
     service = (struct HdfIoService *)handle->object;
     ret = AudioServiceRenderDispatch(service, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
+        LOG_FUN_ERR("RenderGetMuteStu RenderDispatch Failed!");
         AudioRenderBufReplyRecycle(sBuf, reply);
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue muteValueStu;
     memset_s(&muteValueStu, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
     if (!HdfSbufReadInt32(reply, &muteValueStu.value[0])) {
-        LOG_FUN_ERR("Failed to Get Volume sBuf!");
+        LOG_FUN_ERR("RenderGetMuteStu Failed to Get Volume sBuf!");
         AudioRenderBufReplyRecycle(sBuf, reply);
         return HDF_FAILURE;
     }
@@ -508,13 +514,13 @@ int32_t AudioCtlRenderGetMuteStu(struct DevHandle *handle, int cmdId, struct Aud
 int32_t AudioCtlRenderSetGainBuf(struct HdfSBuf *sBuf, struct AudioHwRenderParam *handleData)
 {
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("handleData or sBuf is NULL!");
+        LOG_FUN_ERR("RenderSetGainBuf handleData or sBuf is NULL!");
         return HDF_FAILURE;
     }
     memset_s(&g_elemValue, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
     uint32_t card = handleData->renderMode.hwInfo.card;
     if (card < 0 || card >= AUDIO_SERVICE_MAX) {
-        LOG_FUN_ERR("card is Error!");
+        LOG_FUN_ERR("RenderSetGainBuf card is Error!");
         return HDF_FAILURE;
     }
     g_elemValue.id.cardServiceName = g_audioService[card];
@@ -522,15 +528,19 @@ int32_t AudioCtlRenderSetGainBuf(struct HdfSBuf *sBuf, struct AudioHwRenderParam
     g_elemValue.id.itemName = "Mic Left Gain";
     g_elemValue.value[0] = (int32_t)handleData->renderMode.ctlParam.audioGain.gain;
     if (!HdfSbufWriteInt32(sBuf, g_elemValue.value[0])) {
+        LOG_FUN_ERR("RenderSetGainBuf value[0] Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteInt32(sBuf, g_elemValue.id.iface)) {
+        LOG_FUN_ERR("RenderSetGainBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, g_elemValue.id.cardServiceName)) {
+        LOG_FUN_ERR("RenderSetGainBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, g_elemValue.id.itemName)) {
+        LOG_FUN_ERR("RenderSetGainBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -541,19 +551,19 @@ int32_t AudioCtlRenderSetGainStu(struct DevHandle *handle, int cmdId, struct Aud
     int32_t ret;
     LOG_FUN_INFO();
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("paras is NULL!");
+        LOG_FUN_ERR("RenderSetGainStu paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioRenderObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("Failed to obtain sBuf");
+        LOG_FUN_ERR("RenderSetGainStu Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     ret = AudioCtlRenderSetGainBuf(sBuf, handleData);
     if (ret < 0) {
-        LOG_FUN_ERR("Failed to Set Gain sBuf!");
+        LOG_FUN_ERR("RenderSetGainStu Failed to Set Gain sBuf!");
         AudioRenderBufReplyRecycle(sBuf, NULL);
         return ret;
     }
@@ -561,13 +571,13 @@ int32_t AudioCtlRenderSetGainStu(struct DevHandle *handle, int cmdId, struct Aud
     cmdId -= CTRL_NUM;   // ADM Ctrl Num Begin zero
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("Service is NULL!");
+        LOG_FUN_ERR("RenderSetGainStu Service is NULL!");
         AudioRenderBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
     ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("Failed to send service call!");
+        LOG_FUN_ERR("RenderSetGainStu Failed to send service call!");
         AudioRenderBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
@@ -742,25 +752,28 @@ int32_t AudioCtlRenderSceneSelect(struct DevHandle *handle, int cmdId, struct Au
 int32_t AudioCtlRenderGetVolThresholdSBuf(struct HdfSBuf *sBuf, struct AudioHwRenderParam *handleData)
 {
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("The parameter is empty!");
+        LOG_FUN_ERR("RenderGetVolThresholdSBuf paras is NULL!");
         return HDF_FAILURE;
     }
     memset_s(&g_elemInfo, sizeof(struct AudioCtrlElemInfo), 0, sizeof(struct AudioCtrlElemInfo));
     uint32_t card = handleData->renderMode.hwInfo.card;
     if (card < 0 || card >= AUDIO_SERVICE_MAX) {
-        LOG_FUN_ERR("card is Invalid!");
+        LOG_FUN_ERR("RenderGetVolThresholdSBuf card is Invalid!");
         return HDF_FAILURE;
     }
     g_elemInfo.id.cardServiceName = g_audioService[card];
     g_elemInfo.id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC;
     g_elemInfo.id.itemName = "Master Playback Volume";
     if (!HdfSbufWriteInt32(sBuf, g_elemInfo.id.iface)) {
+        LOG_FUN_ERR("RenderGetVolThresholdSBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, g_elemInfo.id.cardServiceName)) {
+        LOG_FUN_ERR("RenderGetVolThresholdSBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, g_elemInfo.id.itemName)) {
+        LOG_FUN_ERR("RenderGetVolThresholdSBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -769,25 +782,28 @@ int32_t AudioCtlRenderGetVolThresholdSBuf(struct HdfSBuf *sBuf, struct AudioHwRe
 int32_t AudioCtlRenderSceneGetGainThresholdSBuf(struct HdfSBuf *sBuf, struct AudioHwRenderParam *handleData)
 {
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("The parameter is empty!");
+        LOG_FUN_ERR("RenderSceneGetGainThresholdSBuf paras is NULL!");
         return HDF_FAILURE;
     }
     memset_s(&g_elemInfo, sizeof(struct AudioCtrlElemInfo), 0, sizeof(struct AudioCtrlElemInfo));
     uint32_t card = handleData->renderMode.hwInfo.card;
     if (card < 0 || card >= AUDIO_SERVICE_MAX) {
-        LOG_FUN_ERR("card is Invalid!");
+        LOG_FUN_ERR("RenderSceneGetGainThresholdSBuf card is Invalid!");
         return HDF_FAILURE;
     }
     g_elemInfo.id.cardServiceName = g_audioService[card];
     g_elemInfo.id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER;
     g_elemInfo.id.itemName = "Mic Left Gain";
     if (!HdfSbufWriteInt32(sBuf, g_elemInfo.id.iface)) {
+        LOG_FUN_ERR("RenderSceneGetGainThresholdSBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, g_elemInfo.id.cardServiceName)) {
+        LOG_FUN_ERR("RenderSceneGetGainThresholdSBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, g_elemInfo.id.itemName)) {
+        LOG_FUN_ERR("RenderSceneGetGainThresholdSBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -798,25 +814,25 @@ int32_t AudioCtlRenderSceneGetGainThreshold(struct DevHandle *handle, int cmdId,
     LOG_FUN_INFO();
     int32_t ret;
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("paras is NULL!");
+        LOG_FUN_ERR("RenderSceneGetGainThreshold paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioRenderObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("Failed to obtain sBuf");
+        LOG_FUN_ERR("RenderSceneGetGainThreshold Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     reply = AudioRenderObtainHdfSBuf();
     if (reply == NULL) {
-        LOG_FUN_ERR("reply is NULL");
+        LOG_FUN_ERR("RenderSceneGetGainThreshold reply is NULL");
         AudioRenderBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
     ret = AudioCtlRenderSceneGetGainThresholdSBuf(sBuf, handleData);
     if (ret < 0) {
-        LOG_FUN_ERR("Get Threshold sBuf Fail!");
+        LOG_FUN_ERR("RenderSceneGetGainThreshold Get Threshold sBuf Fail!");
         AudioRenderBufReplyRecycle(sBuf, reply);
         return ret;
     }
@@ -830,12 +846,12 @@ int32_t AudioCtlRenderSceneGetGainThreshold(struct DevHandle *handle, int cmdId,
     struct AudioCtrlElemInfo gainThreshold;
     memset_s(&gainThreshold, sizeof(struct AudioCtrlElemInfo), 0, sizeof(struct AudioCtrlElemInfo));
     if (!HdfSbufReadInt32(reply, &gainThreshold.type)) {
-        LOG_FUN_ERR("Failed to Get Volume sBuf!");
+        LOG_FUN_ERR("RenderSceneGetGainThreshold Failed to Get Volume sBuf!");
         AudioRenderBufReplyRecycle(sBuf, reply);
         return HDF_FAILURE;
     }
     if (!HdfSbufReadInt32(reply, &gainThreshold.max)) {
-        LOG_FUN_ERR("Failed to Get Volume sBuf!");
+        LOG_FUN_ERR("RenderSceneGetGainThreshold Failed to Get Volume sBuf!");
         AudioRenderBufReplyRecycle(sBuf, reply);
         return HDF_FAILURE;
     }
@@ -906,7 +922,7 @@ int32_t AudioCtlRenderSetChannelModeBuf(struct HdfSBuf *sBuf, struct AudioHwRend
     memset_s(&g_elemValue, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
     uint32_t card = handleData->renderMode.hwInfo.card;
     if (card < 0 || card >= AUDIO_SERVICE_MAX) {
-        LOG_FUN_ERR("card is Error!");
+        LOG_FUN_ERR("RenderSetChannelModeBuf card is Error!");
         return HDF_FAILURE;
     }
     g_elemValue.id.cardServiceName = g_audioService[card];
@@ -974,25 +990,28 @@ int32_t AudioCtlRenderSetChannelMode(struct DevHandle *handle, int cmdId, struct
 int32_t AudioCtlRenderGetChannelModeSBuf(struct HdfSBuf *sBuf, struct AudioHwRenderParam *handleData)
 {
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("parameter is empty!");
+        LOG_FUN_ERR("RenderGetChannelModeSBuf parameter is empty!");
         return HDF_FAILURE;
     }
     memset_s(&g_elemValue, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
     uint32_t card = handleData->renderMode.hwInfo.card;
     if (card < 0 || card >= AUDIO_SERVICE_MAX) {
-        LOG_FUN_ERR("card is Error!");
+        LOG_FUN_ERR("RenderGetChannelModeSBuf card is Error!");
         return HDF_FAILURE;
     }
     g_elemValue.id.cardServiceName = g_audioService[card];
     g_elemValue.id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO;
     g_elemValue.id.itemName = "Render Channel Mode";
     if (!HdfSbufWriteInt32(sBuf, g_elemValue.id.iface)) {
+        LOG_FUN_ERR("RenderGetChannelModeSBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, g_elemValue.id.cardServiceName)) {
+        LOG_FUN_ERR("RenderGetChannelModeSBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, g_elemValue.id.itemName)) {
+        LOG_FUN_ERR("RenderGetChannelModeSBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -1056,15 +1075,19 @@ int32_t AudioCtlRenderSetAcodecSBuf(struct HdfSBuf *sBuf, const char *codec, int
     g_elemValue.id.itemName = codec;
     g_elemValue.value[0] = enable;
     if (!HdfSbufWriteInt32(sBuf, g_elemValue.value[0])) {
+        LOG_FUN_ERR("RenderSetAcodecSBuf value Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteInt32(sBuf, g_elemValue.id.iface)) {
+        LOG_FUN_ERR("RenderSetAcodecSBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, g_elemValue.id.cardServiceName)) {
+        LOG_FUN_ERR("RenderSetAcodecSBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, g_elemValue.id.itemName)) {
+        LOG_FUN_ERR("RenderSetAcodecSBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -1369,12 +1392,12 @@ int32_t AudioOutputRenderStartPrepare(struct DevHandle *handle, int cmdId, struc
     struct HdfIoService *service = NULL;
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("Service is NULL!");
+        LOG_FUN_ERR("RenderStartPrepare Service is NULL!");
         return HDF_FAILURE;
     }
     ret = service->dispatcher->Dispatch(&service->object, cmdId, NULL, NULL);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("Failed to send service call!");
+        LOG_FUN_ERR("RenderStartPrepare Failed to send service call!");
         return ret;
     }
     return HDF_SUCCESS;
@@ -1390,12 +1413,12 @@ int32_t AudioOutputRenderStop(struct DevHandle *handle, int cmdId, struct AudioH
     struct HdfIoService *service = NULL;
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("Service is NULL!");
+        LOG_FUN_ERR("RenderStop Service is NULL!");
         return HDF_FAILURE;
     }
     ret = service->dispatcher->Dispatch(&service->object, cmdId, NULL, NULL);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("Failed to send service call!");
+        LOG_FUN_ERR("RenderStop Failed to send service call!");
         return ret;
     }
     return HDF_SUCCESS;
@@ -1405,7 +1428,7 @@ int32_t AudioInterfaceLibOutputRender(struct DevHandle *handle, int cmdId, struc
 {
     LOG_FUN_INFO();
     if (handle == NULL) {
-        LOG_FUN_ERR("Input handle is NULL!");
+        LOG_FUN_ERR("Input Render handle is NULL!");
         return HDF_FAILURE;
     }
     if (handle->object == NULL || handleData == NULL) {
@@ -1439,22 +1462,6 @@ int32_t AudioInterfaceLibOutputRender(struct DevHandle *handle, int cmdId, struc
             break;
     }
     return ret;
-}
-
-struct HdfIoService *HdfIoServiceBindName(const char *serviceName)
-{
-    if (serviceName == NULL) {
-        LOG_FUN_ERR("service name NULL!");
-        return NULL;
-    }
-    if (strcmp(serviceName, "hdf_audio_control") == 0) {
-        return (HdfIoServiceBind("hdf_audio_control"));
-    }
-    if (strcmp(serviceName, "hdf_audio_render") == 0) {
-        return (HdfIoServiceBind("hdf_audio_render"));
-    }
-    LOG_FUN_ERR("service name not support!");
-    return NULL;
 }
 
 int32_t AudioBindServiceRenderObject(struct DevHandle *handle, const char *name)
@@ -1515,7 +1522,7 @@ void AudioCloseServiceRender(struct DevHandle *handle)
 {
     LOG_FUN_INFO();
     if (handle == NULL || handle->object == NULL) {
-        LOG_FUN_ERR("handle or handle->object is NULL");
+        LOG_FUN_ERR("Render handle or handle->object is NULL");
         return;
     }
     struct HdfIoService *service = (struct HdfIoService *)handle->object;
