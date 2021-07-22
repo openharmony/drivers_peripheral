@@ -114,13 +114,14 @@ void AudioProxyManagerUnloadAdapter(struct AudioManager *manager, struct AudioAd
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     const char *adapterName = NULL;
+    int32_t i = 0;
+    int32_t portNum;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (manager == NULL || adapter == NULL) {
         return;
     }
     if (hwAdapter->portCapabilitys != NULL) {
-        int32_t portNum = hwAdapter->adapterDescriptor.portNum;
-        int32_t i = 0;
+        portNum = hwAdapter->adapterDescriptor.portNum;
         while (i < portNum) {
             if (&hwAdapter->portCapabilitys[i] != NULL) {
                 AudioMemFree((void **)&hwAdapter->portCapabilitys[i].capability.subPorts);
