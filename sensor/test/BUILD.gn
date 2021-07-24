@@ -18,7 +18,10 @@ if (defined(ohos_lite)) {
   lite_component("hdf_test_sensor") {
     # add hdf subsystem unittest
     if (ohos_build_type == "debug") {
-      if (board_name == "hi3516dv300" || board_name == "hispark_taurus") {
+      if (ohos_kernel_type == "linux" && board_name == "hispark_taurus") {
+        deps = [ "unittest:hdf_peripheral_sensor_test" ]
+      } else if (ohos_kernel_type == "liteos_a" &&
+                 board_name == "hispark_taurus") {
         deps = [
           "performance:hdf_peripheral_sensor_test_performance",
           "unittest:hdf_peripheral_sensor_test",
