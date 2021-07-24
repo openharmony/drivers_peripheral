@@ -72,6 +72,7 @@ int32_t RegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const
             return RET_CODE_SUCCESS;
         }
     }
+    free(callbackEvent);
     HILOG_ERROR(LOG_DOMAIN, "%s fail: register onRecFunc num more than %d!", __FUNCTION__, MAX_CALL_BACK_COUNT);
     return RET_CODE_FAILURE;
 }
