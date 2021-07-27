@@ -16,6 +16,7 @@
 #include <chrono>
 #include <assert.h>
 #include <signal.h>
+#include <sys/prctl.h>
 #include "watchdog.h"
 
 namespace OHOS::Camera {
@@ -44,6 +45,8 @@ WatchDog::~WatchDog()
 
 void WatchDog::WaitForWakeUP()
 {
+    prctl(PR_SET_NAME, "camera_watchdog");
+
     std::unique_lock<std::mutex> l(lock_);
     cv_.wait_for(l, std::chrono::milliseconds(timeMs_), [this]() {
         return terminate_; });

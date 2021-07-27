@@ -151,18 +151,24 @@ RetCode NodeBase::Stop()
         return RC_OK;
     }
     streamRunning_ = false;
-    if (collectThread_ != nullptr) {
-        CAMERA_LOGI("collectThread need join");
-        collectThread_->join();
-        collectThread_ = nullptr;
-    }
 
-    for (auto& it : streamVec_) {
-        if (it.deliverThread_ != nullptr) {
+    BufferManager* bufferManager = Camera::BufferManager::GetInstance();
+    for (auto it : bufferPoolIdVec_) {
+        std::shared_ptr<IBufferPool> bufferPool = bufferManager->GetBufferPool(it);
+        bufferPool->NotifyStop(true);
+    }
+    for (auto& itr : streamVec_) {
+        if (itr.collectThread_ != nullptr) {
+            CAMERA_LOGI("collect thread need join");
+            itr.collectThread_->join();
+            delete itr.collectThread_;
+            itr.collectThread_ = nullptr;
+        }
+        if (itr.deliverThread_ != nullptr) {
             CAMERA_LOGI("deliver thread need join");
-            it.deliverThread_->join();
-            delete it.deliverThread_;
-            it.deliverThread_ = nullptr;
+            itr.deliverThread_->join();
+            delete itr.deliverThread_;
+            itr.deliverThread_ = nullptr;
         }
     }
     return RC_OK;
@@ -274,24 +280,25 @@ RetCode NodeBase::SetMetadata(std::shared_ptr<CameraStandard::CameraMetadata> me
 RetCode NodeBase::CollectBuffers()
 {
     CAMERA_LOGI("collect buffers enter");
-    collectThread_ = std::make_shared<std::thread>([this] {
-        RetCode rc = RC_ERROR;
-        BufferManager* bufferManager = Camera::BufferManager::GetInstance();
-        int i = 0;
-        std::shared_ptr<IPort> port = GetPort("out0");
-        uint32_t bufferCount = port->format_.bufferCount_;
-        while (streamRunning_ == true) {
-            for (auto it : bufferPoolIdVec_) {
-                std::shared_ptr<IBufferPool> bufferPool = bufferManager->GetBufferPool(it);
+    for (auto& it : streamVec_) {
+        it.collectThread_ = new std::thread([this, it] {
+            prctl(PR_SET_NAME, "collect_buffers");
+            RetCode rc = RC_ERROR;
+            BufferManager* bufferManager = Camera::BufferManager::GetInstance();
+            int i = 0;
+            std::shared_ptr<IPort> port = GetPort("out0");
+            uint32_t bufferCount = port->format_.bufferCount_;
+            while (streamRunning_ == true) {
+                std::shared_ptr<IBufferPool> bufferPool = bufferManager->GetBufferPool(it.bufferPoolId_);
                 if (bufferPool == nullptr) {
-                    CAMERA_LOGE("get bufferpool failed, id = %llu", it);
+                    CAMERA_LOGE("get bufferpool failed, id = %llu", it.bufferPoolId_);
                     return RC_ERROR;
                 }
-                std::shared_ptr<IBuffer> buffer = bufferPool->AcquireBuffer();
+                std::shared_ptr<IBuffer> buffer = bufferPool->AcquireBuffer(-1);
                 if (buffer == nullptr) {
                     continue;
                 }
-                if (port->format_.bufferPoolId_ == it) {
+                if (port->format_.bufferPoolId_ == it.bufferPoolId_) {
                     bufferCount = port->format_.bufferCount_;
                 } else {
                     port = GetPort("out1");
@@ -300,7 +307,7 @@ RetCode NodeBase::CollectBuffers()
 
                 UpdateCaptureId(buffer);
                 std::shared_ptr<FrameSpec> frameSpec = std::make_shared<FrameSpec>();
-                frameSpec->bufferPoolId_ = it;
+                frameSpec->bufferPoolId_ = it.bufferPoolId_;
                 frameSpec->bufferCount_ = bufferCount;
                 frameSpec->buffer_ = buffer;
                 if (i < bufferCount) {
@@ -317,12 +324,10 @@ RetCode NodeBase::CollectBuffers()
                     // bufferNum_++;
                 }
             }
-        }
-        CAMERA_LOGI("collect buffer thread closed");
-        return RC_OK;
-    });
-
-
+            CAMERA_LOGI("collect buffer thread closed");
+            return RC_OK;
+        });
+    }
     return RC_OK;
 }
 

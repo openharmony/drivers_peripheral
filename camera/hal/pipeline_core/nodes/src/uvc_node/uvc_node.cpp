@@ -132,6 +132,7 @@ void UvcNode::DistributeBuffers()
     for (auto& it : streamVec_) {
         CAMERA_LOGI("uvc node distribute thread bufferpool id = %{public}llu", it.bufferPoolId_);
         it.deliverThread_ = new std::thread([this, it] {
+        prctl(PR_SET_NAME, "distribute_buff");
             std::shared_ptr<FrameSpec> frame = nullptr;
             while (streamRunning_ == true) {
             {

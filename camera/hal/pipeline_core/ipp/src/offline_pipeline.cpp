@@ -31,6 +31,7 @@ RetCode OfflinePipeline::StartProcess()
 {
     running_ = true;
     processThread_ = new std::thread([this]() {
+        prctl(PR_SET_NAME, "offlinepipeline");
         while (running_) {
             HandleBuffers();
         }

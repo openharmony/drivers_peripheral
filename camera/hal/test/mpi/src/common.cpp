@@ -36,11 +36,11 @@ int32_t Test::SaveYUV(const char* type, const void* buffer, int32_t size)
     }
     char path[PATH_MAX] = {0};
     if (strncmp(type, "preview", strlen(type)) == 0) {
-        system("mkdir -p /mnt/preview");
-        sprintf_s(path, sizeof(path) / sizeof(path[0]), "/mnt/preview/%s_%lld.yuv", type, GetCurrentLocalTimeStamp());
+        system("mkdir -p /data/preview");
+        sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/preview/%s_%lld.yuv", type, GetCurrentLocalTimeStamp());
     } else {
-        system("mkdir -p /mnt/capture");
-        sprintf_s(path, sizeof(path) / sizeof(path[0]), "/mnt/capture/%s_%lld.jpg", type, GetCurrentLocalTimeStamp());
+        system("mkdir -p /data/capture");
+        sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/capture/%s_%lld.jpg", type, GetCurrentLocalTimeStamp());
     }
     std::cout << "save yuv to file:" << path << std::endl;
 
@@ -64,8 +64,8 @@ int32_t Test::SaveVideoFile(const char* type, const void* buffer, int32_t size, 
 {
     if (operationMode == 0) {
         char path[PATH_MAX] = {0};
-        system("mkdir -p /mnt/video");
-        sprintf_s(path, sizeof(path) / sizeof(path[0]), "/mnt/video/%s_%lld.h265", type, GetCurrentLocalTimeStamp());
+        system("mkdir -p /data/video");
+        sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/video/%s_%lld.h265", type, GetCurrentLocalTimeStamp());
         CAMERA_LOGI("%s, save yuv to file %s", __FUNCTION__, path);
         videoFd = open(path, O_RDWR | O_CREAT, 00766);
         if (videoFd == -1) {
@@ -112,10 +112,6 @@ void Test::GetCameraAbility()
         } else {
             std::cout << "==========[test log]GetCameraIds success." << std::endl;
         }
-        // rc = service->GetCameraAbility(cameraIds.front(), ability);
-        // if (rc != Camera::NO_ERROR) {
-        //     std::cout << "==========[test log]GetCameraAbility failed, rc = " << rc << std::endl;
-        // }
         GetCameraMetadata();
     }
 }
@@ -139,10 +135,6 @@ void Test::Open()
 {
     if (cameraDevice == nullptr) {
         service->GetCameraIds(cameraIds);
-        // rc = service->GetCameraAbility(cameraIds.front(), ability);
-        // if (rc != Camera::NO_ERROR) {
-        //     std::cout << "==========[test log]GetCameraAbility failed, rc = " << rc << std::endl;
-        // }
         GetCameraMetadata();
         deviceCallback = new CameraDeviceCallback();
         rc = service->OpenCamera(cameraIds.front(), deviceCallback, cameraDevice);
