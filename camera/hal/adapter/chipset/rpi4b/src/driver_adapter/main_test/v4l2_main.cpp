@@ -16,13 +16,13 @@
 #include <cstring>
 #include <cerrno>
 #include <fcntl.h>
-#include <unistd.h>
 #include <getopt.h>
-#include <linux/fb.h>
-#include <linux/videodev2.h>
+#include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/time.h>
+#include <linux/fb.h>
+#include <linux/videodev2.h>
 #include "securec.h"
 #include "v4l2_uvc.h"
 #include "v4l2_dev.h"
@@ -42,8 +42,8 @@ static pthread_t g_previewThreadId2;
 
 std::mutex g_frameBufferLock;
 
-static constexpr uint32_t g_buffersCount = 4;
-unsigned int g_bufCont = g_buffersCount;
+static constexpr uint32_t buffersCount = 4;
+unsigned int g_bufCont = buffersCount;
 
 int g_fbFd;
 int g_fbInitCont;
@@ -222,8 +222,8 @@ void ProcessImage(const unsigned char* p, unsigned char* fbp)
     constexpr uint32_t imageWidth = 640;
     constexpr uint32_t imageHeight = 480;
 
-    auto in = const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>(p));
-    int width = imageWidth ;
+    const unsigned char* in = p;
+    int width = imageWidth;
     int height = imageHeight;
     int istride = 1280;
     int x, y, j;
@@ -249,10 +249,8 @@ void ProcessImage(const unsigned char* p, unsigned char* fbp)
             r = RANGE_LIMIT(y0 + v + ((v * 103) >> 8));
             g = RANGE_LIMIT(y0 - ((u * 88) >> 8) - ((v * 183) >> 8));
             b = RANGE_LIMIT(y0 + u + ((u * 198) >> 8));
-
             fbp[location + 0] = (((g & 0x1C) << 3) | (b >> 3));
             fbp[location + 1] = ((r & 0xF8) | (g >> 5));
-
             yPos += 2;
 
             if (j & 0x01) {
@@ -294,8 +292,8 @@ void V4L2UvcCallback(const std::string cameraId, const std::vector<DeviceControl
                     CAMERA_LOGD("%s\n", iter->name.c_str());
                     continue;
                 }
-                CAMERA_LOGD("main test: %s value %d id 0x%x ctr_type %d minimum %d maximum %d step %d default_value %d\n",
-                    iter->name.c_str(), iter->value, iter->id, iter->type, iter->minimum, iter->maximum,
+                CAMERA_LOGD("main test: %s value %d id 0x%x ctr_type %d minimum %d maximum %d step %d \
+                    default_value %d\n", iter->name.c_str(), iter->value, iter->id, iter->type, iter->minimum, iter->maximum,
                     iter->step, iter->default_value);
                 if (iter->type == V4L2_CTRL_TYPE_MENU) {
                     for (auto itr = iter->menu.cbegin(); itr != iter->menu.cend(); itr++) {
@@ -480,7 +478,7 @@ void* V4L2FrameThread(void* data)
     int rc, i;
     const std::string devname((const char*)data);
     unsigned char* addr[g_bufCont];
-    std::shared_ptr<FrameSpec> buffptr[g_buffersCount];
+    std::shared_ptr<FrameSpec> buffptr[buffersCount];
     DeviceFormat format = {};
     unsigned int bufSize;
 
@@ -521,7 +519,7 @@ void* V4L2FrameThread(void* data)
         }
     }
 
-    if (V4L2StartFrame(devname, myV4L2Dev, buffptr, g_buffersCount) == RC_ERROR)
+    if (V4L2StartFrame(devname, myV4L2Dev, buffptr, buffersCount) == RC_ERROR)
         CAMERA_LOGE("main test:V4L2PreviewThread V4L2StartPreview fail\n");
 
 done:
@@ -578,13 +576,13 @@ static int PutMenuAndGetChr(void)
     return c;
 }
 
-void stopAllFrame(bool freeFb)
+void StopAllFrame(bool freeFb)
 {
     if (!g_camFrameV4l2Exit && !g_camFrameV4l2Exit2) {
         g_camFrameV4l2Exit = 1;
         g_camFrameV4l2Exit2 = 1;
 
-        CAMERA_LOGD("main test:stopAllFrame pthread_join g_previewThreadId2 %ld g_previewThreadId %ld\n",
+        CAMERA_LOGD("main test:StopAllFrame pthread_join g_previewThreadId2 %ld g_previewThreadId %ld\n",
             g_previewThreadId2, g_previewThreadId);
         pthread_join(g_previewThreadId2, nullptr);
         pthread_join(g_previewThreadId, nullptr);
@@ -597,16 +595,15 @@ void stopAllFrame(bool freeFb)
         if (!g_camFrameV4l2Exit2) {
             g_camFrameV4l2Exit2 = 1;
 
-            CAMERA_LOGD("main test:stopAllFrame pthread_join g_previewThreadId2 %ld\n", g_previewThreadId2);
+            CAMERA_LOGD("main test:StopAllFrame pthread_join g_previewThreadId2 %ld\n", g_previewThreadId2);
             pthread_join(g_previewThreadId2, nullptr);
             if (freeFb) {
                 FBUninit();
             }
-
         }
         if (!g_camFrameV4l2Exit) {
             g_camFrameV4l2Exit = 1;
-            CAMERA_LOGD("main test:stopAllFrame pthread_join g_previewThreadId %ld\n", g_previewThreadId);
+            CAMERA_LOGD("main test:StopAllFrame pthread_join g_previewThreadId %ld\n", g_previewThreadId);
             pthread_join(g_previewThreadId, nullptr);
 
             if (freeFb) {
@@ -667,7 +664,7 @@ void StartCapture()
 {
     std::string devName;
 
-    stopAllFrame(0);
+    StopAllFrame(0);
     if (g_isPreviewOn || g_isPreviewOnUvc) {
         if (g_isPreviewOn) {
             g_isPreviewOn = 0;
@@ -682,18 +679,16 @@ void StartCapture()
             g_isCaptureOnUvc = 1;
             g_camFrameV4l2Exit2 = 0;
             pthread_create(&g_previewThreadId2, nullptr, V4L2FrameThread, (void*)g_devNameUvc.c_str());
-
         }
 
         sleep(1);
-        stopAllFrame(0);
+        StopAllFrame(0);
 
         if (g_isCaptureOnUvc) {
             g_isPreviewOnUvc = 1;
             g_isCaptureOnUvc = 0;
             g_camFrameV4l2Exit2 = 0;
             pthread_create(&g_previewThreadId2, nullptr, V4L2FrameThread, (void*)g_devNameUvc.c_str());
-
         }
         if (g_isCaptureOn) {
             g_isPreviewOn = 1;
@@ -803,7 +798,7 @@ void StartVideo()
     int value;
     constexpr uint32_t videoTime = 10;
 
-    stopAllFrame(0);
+    StopAllFrame(0);
     if (g_isPreviewOn || g_isPreviewOnUvc) {
         if (g_isPreviewOn) {
             g_isPreviewOn = 0;
@@ -812,7 +807,6 @@ void StartVideo()
             g_camFrameV4l2Exit = 0;
             g_videoFd = open("bm2835.h264", O_RDWR | O_CREAT, 00766); // 00766:file operate permission
             pthread_create(&g_previewThreadId, nullptr, V4L2FrameThread, (void*)devName.c_str());
-
         }
 
         if (g_isPreviewOnUvc) {
@@ -825,14 +819,13 @@ void StartVideo()
         }
 
         sleep(videoTime);
-        stopAllFrame(0);
+        StopAllFrame(0);
 
         if (g_isVideoOnUvc) {
             g_isPreviewOnUvc = 1;
             g_isVideoOnUvc = 0;
             g_camFrameV4l2Exit2 = 0;
             pthread_create(&g_previewThreadId2, nullptr, V4L2FrameThread, (void*)g_devNameUvc.c_str());
-
         }
         if (g_isVideoOn) {
             g_isPreviewOn = 1;
@@ -850,10 +843,10 @@ void StartVideo()
 
 void QuitMain()
 {
-    stopAllFrame(1);
+    StopAllFrame(1);
     g_isPreviewOn = 0;
     g_isPreviewOnUvc = 0;
-    CAMERA_LOGD("main test:stopAllFrame(1) done\n");
+    CAMERA_LOGD("main test:StopAllFrame(1) done\n");
 
     sleep(1);
 
@@ -868,7 +861,7 @@ int main(int argc, char** argv)
     V4L2InitSensors();
 
     c = getopt_long(argc, argv, shortOptions, g_longOptions, &idx);
-    while(1) {
+    while (1) {
         switch (c) {
             case 'h':
                 c = PutMenuAndGetChr();

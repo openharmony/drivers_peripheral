@@ -13,32 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef HOS_CAMERA_VENC_OBJECT_H
-#define HOS_CAMERA_VENC_OBJECT_H
+#ifndef HOS_CAMERA_IVENC_OBJECT_H
+#define HOS_CAMERA_IVENC_OBJECT_H
 
 #include <string>
 #include "mpi_adapter.h"
 
-extern "C" {
-#include "hal_codec.h"
-}
-
 namespace OHOS::Camera {
-class VencObject {
+class IVencObject {
 public:
-    VencObject();
-    ~VencObject();
-    void ConfigVenc(uint32_t width, uint32_t height);
-    void StartVenc() {};
-    void StopVenc() {};
-    void StartEncoder(HI_U32 mode, HI_U32 w, HI_U32 h);
-    void EncoderProc(const void *buffer, std::string path);
-    void StopEncoder();
-    void dump();
-private:
-    int32_t vencChn;
+    static std::shared_ptr<IVencObject> CreateVencObject();
+    virtual ~IVencObject() {};
+    virtual void ConfigVenc(uint32_t width, uint32_t height) = 0;
+    virtual void StartVenc() = 0;
+    virtual void StopVenc() = 0;
+    virtual void StartEncoder(uint32_t mode, uint32_t w, uint32_t h) = 0;
+    virtual void EncoderProc(const void *buffer, std::string path) = 0;
+    virtual void StopEncoder() = 0;
+    virtual void dump() = 0;
 };
 }
 
-#endif // HOS_CAMERA_VENC_OBJECT_H
+#endif // OHOS::Camera
+
 

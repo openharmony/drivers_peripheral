@@ -1710,7 +1710,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0232, TestSize.Level2)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(HdiStreamTest, Camera_Hdi_0241, TestSize.Level0)
+HWTEST_F(HdiStreamTest, Camera_Hdi_0241, TestSize.Level2)
 {
     std::cout << "==========[test log]ChangeToOfflineStream, normal input." << std::endl;
     Test_->Open();

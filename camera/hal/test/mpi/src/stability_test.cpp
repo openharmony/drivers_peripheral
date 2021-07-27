@@ -39,7 +39,7 @@ void StabilityTest::TearDown(void)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(StabilityTest, Camera_Stability_0001, TestSize.Level3)
+HWTEST_F(StabilityTest, Camera_Stability_Open_0001, TestSize.Level3)
 {
     if (Test_->cameraDevice == nullptr) {
         std::cout << "==========[test log] Check Performance: OpenCamera, 100 times."<< std::endl;
@@ -68,7 +68,7 @@ HWTEST_F(StabilityTest, Camera_Stability_0001, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_preview_0001, TestSize.Level2)
+HWTEST_F(StabilityTest, Camera_Stability_Preview_0001, TestSize.Level3)
 {
     std::cout << "==========[test log] Check Performance: Preview for 100 times." << std::endl;
     for (int i = 1; i < 101; i++) {
@@ -93,25 +93,56 @@ HWTEST_F(PerformanceTest, Camera_Performance_preview_0001, TestSize.Level2)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_capture_0002, TestSize.Level2)
+HWTEST_F(StabilityTest, Camera_Stability_Capture_0001, TestSize.Level3)
 {
     std::cout << "==========[test log] Commit 2 streams together, Preview and still_capture streams,";
     std::cout << " for 100 times." << std::endl;
     // 打开相机
     Test_->Open();
-    // 配置两路流信息
-    Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
-    Test_->StartStream(Test_->intents);
-    // 捕获预览流
-    Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 循环拍照流捕获100次
     for (int i = 1; i < 101; i ++) {
+        // 配置两路流信息
+        Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
+        Test_->StartStream(Test_->intents);
+        // 捕获预览流
+        Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
+        // 循环拍照流捕获100次
         Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, false);
+        // 后处理
+        Test_->captureIds = {Test_->captureId_preview};
+        Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+        Test_->StopStream(Test_->captureIds, Test_->streamIds);
     }
-    // 后处理
-    Test_->captureIds = {Test_->captureId_preview};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
-    Test_->StopStream(Test_->captureIds, Test_->streamIds);
+}
+
+/**
+  * @tc.name: preview and capture
+  * @tc.desc: Dynamic capture start&stop, Preview and still_capture streams.
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+HWTEST_F(StabilityTest, Camera_Stability_Capture_0002, TestSize.Level3)
+{
+    std::cout << "==========[test log] Dynamic capture start&stop, ";
+    std::cout << "Preview and still_capture streams for 100 times." << std::endl;
+    // 打开相机
+    Test_->Open();
+    for (int i = 1; i < 101; i ++) {
+        // 启动预览流
+        Test_->intents = {Camera::PREVIEW};
+        Test_->StartStream(Test_->intents);
+        // 获取预览图
+        Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
+        // 启流
+        Test_->intents = {Camera::STILL_CAPTURE};
+        Test_->StartStream(Test_->intents);
+        // 抓拍
+        Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
+        Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
+        // 释放流
+        Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
+        Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+        Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    }
 }
 
 /**
@@ -120,7 +151,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_capture_0002, TestSize.Level2)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_video_0001, TestSize.Level2)
+HWTEST_F(StabilityTest, Camera_Stability_Video_0001, TestSize.Level3)
 {
     std::cout << "==========[test log] Performance: Preview + video, commit together, 100 times." << std::endl;
     // 打开相机
@@ -142,27 +173,57 @@ HWTEST_F(PerformanceTest, Camera_Performance_video_0001, TestSize.Level2)
 }
 
 /**
+  * @tc.name: Video
+  * @tc.desc: Dynamic Video start&stop, for 100 times, success.
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+HWTEST_F(StabilityTest, Camera_Stability_Video_0002, TestSize.Level3)
+{
+    std::cout << "==========[test log]Check video: Dynamic Video start&stop, for 100 times, success." << std::endl;
+    // 打开相机
+    Test_->Open();
+    for (int i = 0; i < 100; i++) {
+        // 启动预览流
+        Test_->intents = {Camera::PREVIEW};
+        Test_->StartStream(Test_->intents);
+        // 获取预览图
+        Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
+        // 启流
+        Test_->intents = {Camera::VIDEO};
+        Test_->StartStream(Test_->intents);
+        // 抓拍
+        Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
+        Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
+        // 释放流
+        Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
+        Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
+        Test_->StopStream(Test_->captureIds, Test_->streamIds);
+        }
+}
+
+/**
   * @tc.name: set 3A 100 times
   * @tc.desc: set 3A 100 times, check result.
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_3a_0002, TestSize.Level2)
+HWTEST_F(StabilityTest, Camera_Stability_3a_0001, TestSize.Level3)
 {
     std::cout << "==========[test log] Check Performance: Set 3A 100 times, check result." << std::endl;
     Test_->Open();
     // 下发3A参数
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     std::vector<uint8_t> awbMode = {
-        OHOS_CONTROL_AWB_MODE_OFF,
-        OHOS_CONTROL_AWB_MODE_AUTO,
-        OHOS_CONTROL_AWB_MODE_INCANDESCENT,
-        OHOS_CONTROL_AWB_MODE_FLUORESCENT,
-        OHOS_CONTROL_AWB_MODE_WARM_FLUORESCENT,
-        OHOS_CONTROL_AWB_MODE_DAYLIGHT,
-        OHOS_CONTROL_AWB_MODE_CLOUDY_DAYLIGHT,
-        OHOS_CONTROL_AWB_MODE_TWILIGHT,
-        OHOS_CONTROL_AWB_MODE_SHADE
+        OHOS_CAMERA_AWB_MODE_OFF,
+        OHOS_CAMERA_AWB_MODE_AUTO,
+        OHOS_CAMERA_AWB_MODE_INCANDESCENT,
+        OHOS_CAMERA_AWB_MODE_FLUORESCENT,
+        OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT,
+        OHOS_CAMERA_AWB_MODE_DAYLIGHT,
+        OHOS_CAMERA_AWB_MODE_CLOUDY_DAYLIGHT,
+        OHOS_CAMERA_AWB_MODE_TWILIGHT,
+        OHOS_CAMERA_AWB_MODE_SHADE
     };
     for (int round = 0; round < 10; round ++) {
         for (int i = 0; i < awbMode.size(); i ++) {
@@ -188,14 +249,14 @@ HWTEST_F(PerformanceTest, Camera_Performance_3a_0002, TestSize.Level2)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_flashlight_0001, TestSize.Level2)
+HWTEST_F(StabilityTest, Camera_Stability_Flashlight_0001, TestSize.Level3)
 {
     std::cout << "==========[test log]Performance: Turn on and off the flashlight, 1000 times." << std::endl;
     // 打开相机
     Test_->Open();
     // 循环打开、关闭手电筒
     bool status= true;
-    for (int i = 0; i < Times; i++) {
+    for (int i = 0; i < 1000; i++) {
         Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), status);
         if (Test_->rc != Camera::NO_ERROR) {
             std::cout << "==========[test log] Check Performance: Flashlight turn on fail, at the " << (i+1);
@@ -209,3 +270,4 @@ HWTEST_F(PerformanceTest, Camera_Performance_flashlight_0001, TestSize.Level2)
         }
     }
 }
+

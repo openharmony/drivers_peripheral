@@ -58,7 +58,7 @@ void UtestV4L2Dev::TearDown(void)
     std::cout << "TearDown.." << std::endl;
 }
 
-HWTEST_F(UtestV4L2Dev, InitUVC, TestSize.Level0)
+HWTEST_F(UtestV4L2Dev, InitUvc, TestSize.Level0)
 {
     V4L2UVC_->V4L2UvcDetectInit(V4L2UvcCallback);
 }
@@ -187,4 +187,4 @@ HWTEST_F(UtestV4L2Dev, ReleaseAll, TestSize.Level0)
 
     V4L2UVC_->V4L2UvcDetectUnInit();
 }
-}// namespace OHOS::Camera
+} // namespace OHOS::Camera

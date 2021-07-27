@@ -15,3 +15,4 @@ camera_path = "//drivers/peripheral/camera/hal"
 current_path = "."
 hispark_taurus_path = "//device/hisilicon/hispark_taurus"
 enable_camera_device_utest = false
+use_hitrace = false

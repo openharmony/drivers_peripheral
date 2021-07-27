@@ -95,30 +95,6 @@ HWTEST_F(FlashlightTest, Camera_Flashlight_0003, TestSize.Level3)
 
 /**
   * @tc.name: flashlight
-  * @tc.desc: Turn on/off the flashlight for 100 times, not the camera, success.
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-HWTEST_F(FlashlightTest, Camera_Flashlight_0004, TestSize.Level3)
-{
-    std::cout << "==========[test log]Only Turn on/off the flashlight 100 times, success." << std::endl;
-    for (int i = 0; i < 100; i++) {
-        if (i%2 != 0) {
-            Test_->status = false;
-        } else {
-            Test_->status = true;
-        }
-        Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), Test_->status);
-        if (Test_->rc != Camera::NO_ERROR) {
-            std::cout << "==========[test log]Flashlight turn on fail at the ";
-            std::cout << (i+1) <<"times, RetCode is " << Test_->rc << std::endl;
-        }
-        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    }
-}
-
-/**
-  * @tc.name: flashlight
   * @tc.desc: Open the camera, preview, then turn on the flashlight, expected return errorcode.
   * @tc.size: MediumTest
   * @tc.type: Function
