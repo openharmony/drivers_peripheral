@@ -77,14 +77,17 @@ public:
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = nullptr;
     std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>> streamInfos;
     std::shared_ptr<OHOS::Camera::StreamInfo> streamInfo = nullptr;
+    std::shared_ptr<OHOS::Camera::StreamInfo> streamInfo2 = nullptr;
     std::shared_ptr<OHOS::Camera::StreamInfo> streamInfo_pre = nullptr;
     std::shared_ptr<OHOS::Camera::StreamInfo> streamInfo_video = nullptr;
     std::shared_ptr<OHOS::Camera::StreamInfo> streamInfo_capture = nullptr;
     std::vector<std::string> cameraIds;
     int streamId_preview = 1000;
+    int streamId_preview_double = 1001;
     int streamId_capture = 1010;
     int streamId_video = 1020;
     int captureId_preview = 2000;
+    int captureId_preview_double = 2001;
     int captureId_capture = 2010;
     int captureId_video = 2020;
     std::vector<int> captureIds;

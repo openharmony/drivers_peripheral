@@ -42,6 +42,7 @@ public:
     virtual RetCode ReturnBuffer(std::shared_ptr<IBuffer>& buffer) override;
     virtual void EnableTracking(const int32_t id) override;
     virtual void SetId(const int64_t id) override;
+    virtual void NotifyStop(bool state) override;
 
 private:
     RetCode PrepareBuffer();
@@ -50,6 +51,7 @@ private:
 private:
     std::mutex lock_;
     std::condition_variable cv_;
+    std::atomic_bool streamStop_ = false;
     int64_t poolId_ = -1;
     int32_t trackingId_ = -1;
     uint32_t bufferCount_ = 0;

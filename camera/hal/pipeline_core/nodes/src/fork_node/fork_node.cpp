@@ -88,6 +88,7 @@ void ForkNode::ForkBuffers()
         }
     }
     forkThread_ = std::make_shared<std::thread>([this, bufferPoolId] {
+        prctl(PR_SET_NAME, "fork_buffers");
         BufferManager* bufferManager = Camera::BufferManager::GetInstance();
         std::shared_ptr<FrameSpec> frameSpec = std::make_shared<FrameSpec>();
         while (streamRunning_ == true) {

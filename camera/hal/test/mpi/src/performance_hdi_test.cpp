@@ -245,16 +245,16 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0060, TestSize.Level3)
     float time_use;
     float totle_time_use = 0;
     writeIntoFile.open("TimeConsuming.txt", ios::app);
-    for (int round = 0; round < 100; round ++) {
-        for (int i = 0; i < awbMode.size(); i ++) {
-            meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode.at(i), 1);
-            gettimeofday(&start, NULL);
-            Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
-            gettimeofday(&end, NULL);
-            time_use = calTime(start, end);
-            totle_time_use = totle_time_use + time_use;
-            sleep(1);
-        }
+    for (int round = 0; round < Times; round ++) {
+        int i = rand() % 10;
+        std::cout << "round = "<< round << ", i = " << i << std::endl;
+        meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode.at(i), 1);
+        gettimeofday(&start, NULL);
+        Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
+        gettimeofday(&end, NULL);
+        std::cout << "rc = "<< Test_->rc << std::endl;
+        time_use = calTime(start, end);
+        totle_time_use = totle_time_use + time_use;
     }
     float avrg_time = totle_time_use / Times;
     std::cout << "==========[test log] Performance: HDI_UpdateSettings's  turn on average time : ";
@@ -543,6 +543,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0160, TestSize.Level3)
     float totle_time_use = 0;
     writeIntoFile.open("TimeConsuming.txt", ios::app);
     for (int i = 0; i < Times; i ++) {
+        std::cout  << "Times =" << i << std::endl;
         // 打开相机
         Test_->Open();
         // 启动流
@@ -687,10 +688,11 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0190, TestSize.Level3)
     // 获取预览图
     int captureId = 2001;
     Test_->captureInfo = std::make_shared<Camera::CaptureInfo>();
-    Test_->captureInfo->streamIds_ = {-1};
+    Test_->captureInfo->streamIds_ = {Test_->streamId_preview};
     Test_->captureInfo->captureSetting_ = Test_->ability;
     Test_->captureInfo->enableShutterCallback_ = true;
     for (int i = 0; i < Times; i++) {
+        std::cout  << "Times =" << i << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->streamOperator->Capture(captureId, Test_->captureInfo, false);
         gettimeofday(&end, NULL);
@@ -732,10 +734,11 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0200, TestSize.Level3)
     // 获取预览图
     int captureId = 2001;
     Test_->captureInfo = std::make_shared<Camera::CaptureInfo>();
-    Test_->captureInfo->streamIds_ = {-1};
+    Test_->captureInfo->streamIds_ = {Test_->streamId_preview};
     Test_->captureInfo->captureSetting_ = Test_->ability;
     Test_->captureInfo->enableShutterCallback_ = true;
     for (int i = 0; i < Times; i++) {
+        std::cout  << "Times =" << i << std::endl;
         Test_->rc = Test_->streamOperator->Capture(captureId, Test_->captureInfo, true);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         gettimeofday(&start, NULL);

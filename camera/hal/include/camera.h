@@ -25,11 +25,13 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/prctl.h>
 #include "securec.h"
 #include <hdf_log.h>
 
 namespace OHOS::Camera {
 
+#define HDF_LOG_TAG camera_host
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #ifndef OHOS_DEBUG

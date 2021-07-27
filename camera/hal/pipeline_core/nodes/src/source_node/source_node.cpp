@@ -98,6 +98,7 @@ void SourceNode::DistributeBuffers()
     for (auto& it : streamVec_) {
         CAMERA_LOGI("source node distribute thread bufferpool id = %llu", it.bufferPoolId_);
         it.deliverThread_ = new std::thread([this, it] {
+            prctl(PR_SET_NAME, "source_node");
             std::shared_ptr<FrameSpec> f = nullptr;
             while (streamRunning_ == true) {
             {

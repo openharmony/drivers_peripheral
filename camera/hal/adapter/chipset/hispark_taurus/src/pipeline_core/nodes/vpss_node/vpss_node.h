@@ -39,6 +39,9 @@ public:
 
 private:
     std::shared_ptr<VpssController>         vpssController_ = nullptr;
+    std::mutex                              mtx_;
+    std::condition_variable                 cv_;
+    std::map<int64_t, std::list<std::shared_ptr<FrameSpec>>> buffer_;
 };
 } // namespace OHOS::Camera
 #endif
