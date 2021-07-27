@@ -201,7 +201,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0062, TestSize.Level2)
     Test_->streamInfo = std::make_shared<StreamInfo>();
     Test_->rc = Test_->streamOperator->ReleaseStreams({9999});
     std::cout << "streamOperator->ReleaseStreams's rc " << Test_->rc << std::endl;
-    EXPECT_EQ(true, Test_->rc == Camera::CAMERA_CLOSED);
+    EXPECT_EQ(true, Test_->rc == Camera::NO_ERROR);
 }
 
 /**

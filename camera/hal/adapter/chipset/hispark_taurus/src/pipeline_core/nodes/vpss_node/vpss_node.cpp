@@ -92,14 +92,21 @@ RetCode VpssNode::Stop()
         CAMERA_LOGE("stopvpss failed!");
         return RC_ERROR;
     }
-    if (collectThread_ != nullptr) {
-        CAMERA_LOGI("VpssNode::Stop collectThread need join");
-        collectThread_->join();
-        collectThread_ = nullptr;
+
+    BufferManager* bufferManager = Camera::BufferManager::GetInstance();
+    for (auto it : bufferPoolIdVec_) {
+        std::shared_ptr<IBufferPool> bufferPool = bufferManager->GetBufferPool(it);
+        bufferPool->NotifyStop(true);
     }
-    CAMERA_LOGI("collectThread join finish");
+    cv_.notify_all();
 
     for (auto& itr : streamVec_) {
+        if (itr.collectThread_ != nullptr) {
+            CAMERA_LOGI("VpssNode::Stop collectThread need join");
+            itr.collectThread_->join();
+            delete itr.collectThread_;
+            itr.collectThread_ = nullptr;
+        }
         if (itr.deliverThread_ != nullptr) {
             CAMERA_LOGI("deliver thread need join");
             itr.deliverThread_->join();
@@ -116,29 +123,27 @@ void VpssNode::DistributeBuffers()
     CAMERA_LOGI("distribute buffers enter");
     for (auto& it : streamVec_) {
         it.deliverThread_ = new std::thread([this, it] {
+        prctl(PR_SET_NAME, "distribute_buff");
             std::shared_ptr<FrameSpec> fms = nullptr;
             while (streamRunning_ == true) {
                 {
                     std::lock_guard<std::mutex> l(streamLock_);
-                    if (frameVec_.size() > 0) {
+                    if (buffer_.count(it.bufferPoolId_) > 0) {
                         CAMERA_LOGI("distribute buffer Num = %d", frameVec_.size());
-                        auto frameSpec = std::find_if(frameVec_.begin(), frameVec_.end(),
-                            [it](std::shared_ptr<FrameSpec> fs) {
-                                CAMERA_LOGI("vpss node port bufferPoolId = %llu, frame bufferPool Id = %llu",
-                                    it.bufferPoolId_, fs->bufferPoolId_);
-                                return it.bufferPoolId_ == fs->bufferPoolId_;
-                            });
-                        if (frameSpec != frameVec_.end()) {
-                            fms = *frameSpec;
-                            frameVec_.erase(frameSpec);
+                        for (auto& frameSpec : buffer_[it.bufferPoolId_]) {
+                            fms = frameSpec;
+                            buffer_[it.bufferPoolId_].pop_front();
+                            break;
                         }
                     }
                 }
                 if (fms != nullptr) {
+                    CAMERA_LOGI("vpss node distribute buffer: bufferPool Id = %llu",it.bufferPoolId_);
                     DeliverBuffers(fms);
                     fms = nullptr;
                 } else {
-                    usleep(10); // 10:sleep 10 second
+                    std::unique_lock <std::mutex> lck(mtx_);
+                    cv_.wait(lck);
                 }
             }
             CAMERA_LOGI("distribute buffer thread %llu  closed", it.bufferPoolId_);
@@ -150,7 +155,17 @@ void VpssNode::DistributeBuffers()
 
 void VpssNode::AchieveBuffer(std::shared_ptr<FrameSpec> frameSpec)
 {
-    NodeBase::AchieveBuffer(frameSpec);
+    if (frameSpec == nullptr) {
+        CAMERA_LOGE("frame Spec is null");
+        return;
+    }
+    {
+        std::lock_guard<std::mutex> l(streamLock_);
+        buffer_[frameSpec->bufferPoolId_].push_back(frameSpec);
+        CAMERA_LOGI("AchieveBuffer : bufferpool id = %llu", frameSpec->bufferPoolId_);
+    }
+    std::unique_lock <std::mutex> lck(mtx_);
+    cv_.notify_all();
 }
 
 void VpssNode::SendCallBack()

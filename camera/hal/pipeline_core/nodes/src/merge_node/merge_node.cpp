@@ -73,6 +73,7 @@ void MergeNode::DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec)
 void MergeNode::MergeBuffers()
 {
     mergeThread_ = std::make_shared<std::thread>([this] {
+        prctl(PR_SET_NAME, "merge_buffers");
         tmpVec_.clear();
         while (streamRunning_ == true) {
             if (bufferNum_ > 0) {
