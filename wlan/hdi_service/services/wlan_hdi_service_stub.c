@@ -34,7 +34,7 @@ int32_t WifiServiceCallback(struct HdfDeviceObject *device, struct HdfRemoteServ
 
     struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
     HdfSbufWriteInt32(dataSbuf, code);
-    HDF_LOGI("WifiServiceCallback enter , code = %d", code);
+    HDF_LOGI("WifiServiceCallback enter , code = %{public}d", code);
     int ret = callback->dispatcher->Dispatch(callback, RESET_STATUS_GET, dataSbuf, NULL);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("failed to do callback, error code: %d", ret);
@@ -231,9 +231,9 @@ static int32_t WlanServiceStudGetFeatureByIfName(struct HdfDeviceIoClient *clien
         HDF_LOGE("%s get FeatureByIfName failed!, error code: %d", __func__, ret);
         return HDF_FAILURE;
     }
-    ret = HdfSbufWriteInt32(reply, baseFeature->type);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s write type failed!, error code: %d", __func__, ret);
+    HDF_LOGI("%{public}s: start WlanDestroyFeature! baseFeature->type = %{public}d", __func__, baseFeature->type);
+    if(!HdfSbufWriteInt32(reply, baseFeature->type)){
+        HDF_LOGE("%{public}s: write wlanType failed!", __func__);
         return HDF_FAILURE;
     }
     return ret;
@@ -270,23 +270,11 @@ static bool HdfWlanAddRemoteObj(struct HdfDeviceIoClient *client, struct HdfRemo
 
 static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName)
 {
-    unsigned char chipId;
-    int resetStatus;
     static int32_t wifiStatus = -1;
-    struct HdfSBuf *dataSbuf = (struct HdfSBuf *)data;
+    int *resetStatus = nullptr;
+    resetStatus = (int *)data;
 
-    if (dataSbuf == NULL) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadInt32(dataSbuf, &resetStatus)) {
-        HDF_LOGE("%s: read reset status is failed!", __func__);
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadUint8(dataSbuf, &chipId)) {
-        HDF_LOGE("%s: read chipid is failed!", __func__);
-        return HDF_FAILURE;
-    }
-    wifiStatus = resetStatus;
+    wifiStatus = *resetStatus;
     struct HdfWlanRemoteNode *pos = NULL;
     struct DListHead *head = &HdfStubDriver()->remoteListHead;
     DLIST_FOR_EACH_ENTRY(pos, head, struct HdfWlanRemoteNode, node) {

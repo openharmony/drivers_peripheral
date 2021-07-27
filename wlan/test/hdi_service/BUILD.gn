@@ -64,10 +64,56 @@ ohos_unittest("WlanHdiServiceTest") {
   }
 }
 
+ohos_unittest("WlanHdiServiceTestC") {
+  module_out_path = module_output_path
+  sources = [
+    "wlan_hdi_hal_services_c_test.cpp"
+  ]
+
+  deps = [
+    "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
+    "$hdf_uhdf_path/osal:libhdf_utils",
+    "$hdf_uhdf_path/hdi:libhdi",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
+    "//utils/native/base:utils",
+    "//drivers/peripheral/wlan/client:wifi_driver_client",
+    "//drivers/peripheral/wlan/hal:wifi_hal",
+    "//drivers/peripheral/wlan/hdi_service:wifi_hdi_c_device",
+  ]
+
+  include_dirs = [
+    "include",
+    "//drivers/peripheral/wlan/interfaces/include",
+    "//drivers/peripheral/wlan/hdi_service/services",
+    "//drivers/peripheral/wlan/client/include",
+    "//drivers/peripheral/wlan/hal/include",
+    "//drivers/peripheral/wlan/hdi_service/include",
+    "$FWK_ROOT_DIR/core/shared/include",
+    "$FWK_ROOT_DIR/ability/sbuf/include",
+    "$FWK_ROOT_DIR/include",
+    "$FWK_ROOT_DIR/include/wifi",
+    "$FWK_ROOT_DIR/include/core",
+    "$FWK_ROOT_DIR/include/utils",
+    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/adapter/uhdf2/shared/include",
+    "//drivers/adapter/uhdf2/include/host",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+}
+
 ###########################end###########################
 group("unittest") {
   testonly = true
   deps = [
     ":WlanHdiServiceTest",
+    ":WlanHdiServiceTestC",
   ]
 }
