@@ -179,7 +179,7 @@ std::shared_ptr<IBuffer> BufferPool::AcquireBuffer(int timeout)
 
     // wait all the time, till idle list is avaliable.
     if (timeout < 0) {
-        cv_.wait(l, [this] { return !idleList_.empty(); });
+        cv_.wait(l, [this] { return !idleList_.empty() || streamStop_; });
         if (!idleList_.empty()) {
             auto it = idleList_.begin();
             busyList_.splice(busyList_.begin(), idleList_, it);
@@ -190,7 +190,7 @@ std::shared_ptr<IBuffer> BufferPool::AcquireBuffer(int timeout)
 
     // wait for timeout, or idle list is avaliable.
     if (timeout > 0) {
-        if (cv_.wait_for(l, std::chrono::seconds(timeout), [this] { return !idleList_.empty(); }) == false) {
+        if (cv_.wait_for(l, std::chrono::seconds(timeout), [this] { return !idleList_.empty() || streamStop_; }) == false) {
             CAMERA_LOGE("wait idle buffer timeout");
             return nullptr;
         }
@@ -241,5 +241,11 @@ void BufferPool::EnableTracking(const int32_t id)
 void BufferPool::SetId(const int64_t id)
 {
     poolId_ = id;
+}
+
+void BufferPool::NotifyStop(bool state)
+{
+    streamStop_ = state;
+    cv_.notify_all();
 }
 } // namespace OHOS::Camera

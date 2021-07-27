@@ -18,7 +18,6 @@
 #include "v4l2_dev.h"
 
 namespace OHOS::Camera {
-
 HosFileFormat::HosFileFormat() {}
 HosFileFormat::~HosFileFormat() {}
 
@@ -33,18 +32,15 @@ RetCode HosFileFormat::V4L2SearchFormat(int fd, std::vector<DeviceFormat>& fmtDe
     for (i = 0; i < fmtMax; ++i) {
         enumFmtDesc.index = i;
         enumFmtDesc.type  = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-
         if (ioctl(fd, VIDIOC_ENUM_FMT, &enumFmtDesc) < 0) {
             break;
         }
 
-        CAMERA_LOGD("[%d]Supported format with description = %s\n\n",
-            i, enumFmtDesc.description);
+        CAMERA_LOGD("[%d]Supported format with description = %s\n\n", i, enumFmtDesc.description);
 
         for (j = 0; j < fmtMax; ++j) {
             frmSize.index = j;
             frmSize.pixel_format = enumFmtDesc.pixelformat;
-
             if (ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmSize) < 0) {
                 break;
             }
@@ -59,13 +55,11 @@ RetCode HosFileFormat::V4L2SearchFormat(int fd, std::vector<DeviceFormat>& fmtDe
                 fraMival.pixel_format = frmSize.pixel_format;
                 fraMival.width = frmSize.discrete.width;
                 fraMival.height = frmSize.discrete.height;
-
                 if (ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &fraMival) < 0) {
                     break;
                 }
 
                 DeviceFormat currentFormat = {};
-
                 currentFormat.fmtdesc.description = std::string((char*)enumFmtDesc.description);
                 currentFormat.fmtdesc.pixelformat = enumFmtDesc.pixelformat;
                 currentFormat.fmtdesc.width = frmSize.discrete.width;
@@ -78,7 +72,6 @@ RetCode HosFileFormat::V4L2SearchFormat(int fd, std::vector<DeviceFormat>& fmtDe
                 CAMERA_LOGD("frame interval: %d, %d\n\n", fraMival.discrete.numerator, fraMival.discrete.denominator);
             }
         }
-
     }
 
     if (i == 0) {

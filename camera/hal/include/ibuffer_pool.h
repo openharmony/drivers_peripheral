@@ -52,6 +52,7 @@ public:
     // enable tracking buffers of pool
     virtual void EnableTracking(const int32_t id) = 0;
     virtual void SetId(const int64_t id) = 0;
+    virtual void NotifyStop(bool state) = 0;
 };
 } // namespace OHOS::Camera
 

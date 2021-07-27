@@ -148,20 +148,14 @@ RetCode StreamPipelineStrategy::SelectPipelineSpec(const int32_t& mode, Pipeline
             std::optional<int32_t> typeId = GetTypeId(std::string(pipeSpecPtr->nodeSpec[j].stream_type),
                 G_STREAM_TABLE_PTR, G_STREAM_TABLE_SIZE);
             struct PortFormat format {};
-            std::optional<int32_t> typeIdTmp = std::nullopt;
             if (typeId) {
                 HostStreamInfo hostStreamInfo = hostStreamMgr_->GetStreamInfo(typeId.value());
-                if (typeIdTmp && typeId == typeIdTmp) {
-                    HostStreamInfo hostStreamInfo = hostStreamMgr_->GetStreamInfoFromRight(typeId.value());
-                    CAMERA_LOGI("get stream info fromright");
-                }
                 PortFormat f = SetPortFormat(pipeSpecPtr, typeId, j, k, hostStreamInfo);
                 if (!f.needAllocation_) {
                     f.bufferPoolId_ =
                         static_cast<int64_t>(hostStreamInfo.bufferPoolId_);
                 }
                 format = f;
-                typeIdTmp = typeId;
                 nodeSpec.streamId_ = hostStreamInfo.streamId_;
             } else if (pipeSpecPtr->nodeSpec[j].portSpec[k].direction == 1) {
                 if (SetUpBasicOutPortFormat(pipe, info, format) != RC_OK) {

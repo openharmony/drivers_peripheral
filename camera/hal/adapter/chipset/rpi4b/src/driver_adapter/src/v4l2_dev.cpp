@@ -14,6 +14,7 @@
  */
 
 #include "v4l2_dev.h"
+#include <sys/prctl.h>
 
 namespace OHOS::Camera {
 std::map<std::string, std::string> HosV4L2Dev::deviceMatch = HosV4L2Dev::CreateDevMap();
@@ -228,6 +229,7 @@ void HosV4L2Dev::loopBuffers()
     struct epoll_event events[MAXSTREAMCOUNT];
 
     CAMERA_LOGD("!!! loopBuffers enter\n");
+    prctl(PR_SET_NAME, "v4l2_loopbuffer");
 
     while (streamNumber_ > 0) {
         nfds = epoll_wait(epollFd_, events, MAXSTREAMCOUNT, -1);
@@ -246,13 +248,13 @@ void HosV4L2Dev::loopBuffers()
                     continue;
                 }
             } else {
-                CAMERA_LOGD("loopBuffers: epoll invalid events = 0x%x or eventFd exit = %d\n", events[n].events, (events[n].data.fd == eventFd_));
+                CAMERA_LOGD("loopBuffers: epoll invalid events = 0x%x or eventFd exit = %d\n",
+                    events[n].events, (events[n].data.fd == eventFd_));
                 usleep(WATING_TIME);
             }
         }
 
     }
-
     CAMERA_LOGD("!!! loopBuffers exit\n");
 }
 
@@ -278,7 +280,6 @@ RetCode HosV4L2Dev::CreateEpoll(int fd, const unsigned int streamNumber)
         epollevent.events = EPOLLIN;
         epollevent.data.fd = eventFd_;
         epoll_ctl(epollFd_, EPOLL_CTL_ADD, eventFd_, &epollevent);
-
     } else {
         epollevent.events = EPOLLIN;
         epollevent.data.fd = fd;
@@ -305,7 +306,6 @@ void HosV4L2Dev::EraseEpoll(int fd)
     if (itr != epollEvent_.end()) {
         struct epoll_event event = *itr;
         epoll_ctl(epollFd_, EPOLL_CTL_DEL, fd, &event);
-
         std::lock_guard<std::mutex> l(epollLock_);
         epollEvent_.erase(itr);
     }
