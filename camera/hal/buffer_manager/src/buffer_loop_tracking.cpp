@@ -419,6 +419,7 @@ void BufferLoopTracking::HandleMessage()
 void BufferLoopTracking::StartTracking()
 {
     handler_ = std::make_unique<std::thread>([this] {
+        prctl(PR_SET_NAME, "buffertracking");
         do {
             HandleMessage();
         } while (running_.load() == true);

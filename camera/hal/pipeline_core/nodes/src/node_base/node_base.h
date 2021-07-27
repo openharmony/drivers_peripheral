@@ -34,9 +34,11 @@ namespace OHOS::Camera {
         return value; \
         } \
     } while (0);
+
 struct StreamSpec {
     int64_t         bufferPoolId_;
     std::thread*    deliverThread_ = nullptr;
+    std::thread*    collectThread_ = nullptr;
 };
 using StreamSpec = struct StreamSpec;
 

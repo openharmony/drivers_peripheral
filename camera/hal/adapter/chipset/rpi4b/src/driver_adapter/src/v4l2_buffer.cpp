@@ -16,8 +16,8 @@
 #include "v4l2_buffer.h"
 
 namespace OHOS::Camera {
-HosV4L2Buffers::HosV4L2Buffers(enum v4l2_memory memtype, enum v4l2_buf_type buffertype)
-    : memoryType_(memtype), bufferType_(buffertype)
+HosV4L2Buffers::HosV4L2Buffers(enum v4l2_memory memType, enum v4l2_buf_type bufferType)
+    : memoryType_(memType), bufferType_(bufferType)
 {
 }
 

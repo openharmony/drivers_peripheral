@@ -90,5 +90,4 @@ RetCode HosV4L2Streams::V4L2StreamFPSSet(int fd, DeviceFormat& format)
 
     return RC_OK;
 }
-
 } // namespace OHOS::Camera
