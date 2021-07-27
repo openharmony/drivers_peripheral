@@ -14,6 +14,7 @@
  */
 
 #include "v4l2_dev.h"
+#include <sys/prctl.h>
 
 namespace OHOS::Camera {
 std::map<std::string, std::string> HosV4L2Dev::deviceMatch = HosV4L2Dev::CreateDevMap();
@@ -228,6 +229,7 @@ void HosV4L2Dev::loopBuffers()
     struct epoll_event events[MAXSTREAMCOUNT];
 
     CAMERA_LOGD("!!! loopBuffers enter\n");
+    prctl(PR_SET_NAME, "v4l2_loopbuffer");
 
     while (streamNumber_ > 0) {
         nfds = epoll_wait(epollFd_, events, MAXSTREAMCOUNT, -1);

@@ -95,6 +95,7 @@ RetCode StreamThread::Resume()
 void StreamThread::Run()
 {
     CAMERA_LOGI("stream thread loop");
+    prctl(PR_SET_NAME, "stream_thread");
     while (!stopFlag_) {
         Process();
         if (pauseFlag_) {
