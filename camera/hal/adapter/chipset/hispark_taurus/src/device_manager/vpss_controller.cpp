@@ -24,7 +24,7 @@ VpssController::~VpssController() {}
 
 RetCode VpssController::Init()
 {
-    vpssObject_ = std::make_shared<VpssObject>();
+    vpssObject_ = IVpssObject::CreateVpssObject();
     if (vpssObject_ == nullptr) {
         CAMERA_LOGE("%s Create VpssObject fail", __FUNCTION__);
         return RC_ERROR;

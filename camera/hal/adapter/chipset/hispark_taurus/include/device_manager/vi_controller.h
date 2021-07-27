@@ -18,7 +18,7 @@
 
 #include "icontroller.h"
 #include "isensor.h"
-#include "vi_object.h"
+#include "ivi_object.h"
 #include "device_manager_adapter.h"
 #include "mpi_adapter.h"
 #include <map>
@@ -85,7 +85,7 @@ private:
     std::mutex metaDataSetlock_;
     bool metaDataFlag_ = false;
     bool startViState_ = false;
-    std::shared_ptr<ViObject> viObject_ = nullptr;
+    std::shared_ptr<IViObject> viObject_ = nullptr;
     std::vector<int32_t> abilityMetaData_;
 };
 } // namespace OHOS::Camera

@@ -24,7 +24,7 @@ VencController::~VencController() {}
 
 RetCode VencController::Init()
 {
-    vencObject_ = std::make_shared<VencObject>();
+    vencObject_ = IVencObject::CreateVencObject();
     if (vencObject_ == nullptr) {
         CAMERA_LOGE("%s Create VencObject fail", __FUNCTION__);
         return RC_ERROR;

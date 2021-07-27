@@ -38,5 +38,5 @@ public:
 std::shared_ptr<HosV4L2UVC> UtestV4L2Dev::V4L2UVC_ = nullptr;
 std::shared_ptr<HosV4L2Dev> UtestV4L2Dev::V4L2Dev_ = nullptr;
 std::vector<std::string> UtestV4L2Dev::cameraIDs_ = {};
-}// namespace OHOS::Camera
+} // namespace OHOS::Camera
 #endif

@@ -55,19 +55,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0001, TestSize.Level0)
 
 /**
   * @tc.name: Preview
-  * @tc.desc: Preview, mock power up.
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-HWTEST_F(PreviewTest, Camera_Preview_0002, TestSize.Level3)
-{
-    std::cout << "==========[test log] OpenCamera, mock power up."<< std::endl;
-    EXPECT_EQ(0, 1);
-}
-
-/**
-  * @tc.name: Preview
-  * @tc.desc: Preview stream, 1208*720, expected success.
+  * @tc.desc: Preview stream, 1280*720, expected success.
   * @tc.size: MediumTest
   * @tc.type: Function
   */
@@ -213,7 +201,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0062, TestSize.Level2)
     Test_->streamInfo = std::make_shared<StreamInfo>();
     Test_->rc = Test_->streamOperator->ReleaseStreams({9999});
     std::cout << "streamOperator->ReleaseStreams's rc " << Test_->rc << std::endl;
-    EXPECT_EQ(true, Test_->rc == Camera::CAMERA_CLOSED);
+    EXPECT_EQ(true, Test_->rc == Camera::NO_ERROR);
 }
 
 /**

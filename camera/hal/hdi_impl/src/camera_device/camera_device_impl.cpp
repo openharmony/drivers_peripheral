@@ -23,7 +23,7 @@
 #include "watchdog.h"
 #ifdef HITRACE_LOG_ENABLED
 #include "hitrace.h"
-#endfi //HITRACE_LOG_ENABLED
+#endif //HITRACE_LOG_ENABLED
 
 namespace OHOS::Camera {
 CameraDeviceImpl::CameraDeviceImpl(const std::string &cameraId,
