@@ -271,7 +271,7 @@ static bool HdfWlanAddRemoteObj(struct HdfDeviceIoClient *client, struct HdfRemo
 static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName)
 {
     static int32_t wifiStatus = -1;
-    int *resetStatus = nullptr;
+    int *resetStatus = NULL;
     resetStatus = (int *)data;
 
     wifiStatus = *resetStatus;
