@@ -42,7 +42,7 @@ void WifiHdiHalServiceTest::SetUpTestCase()
 {
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->WifiConstruct();
+    int32_t rc = wlanObj->wifiConstruct();
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -50,7 +50,7 @@ void WifiHdiHalServiceTest::TearDownTestCase()
 {
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->WifiDestruct();
+    int32_t rc = wlanObj->wifiDestruct();
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -58,7 +58,7 @@ void WifiHdiHalServiceTest::SetUp()
 {
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->Start();
+    int32_t rc = wlanObj->start();
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -66,7 +66,7 @@ void WifiHdiHalServiceTest::TearDown()
 {
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->Stop();
+    int32_t rc = wlanObj->stop();
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -84,9 +84,9 @@ HWTEST_F(WifiHdiHalServiceTest, GetSupportFeatureComboTest_001, TestSize.Level1)
 
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->GetSupportFeature(supType);
+    int32_t rc = wlanObj->getSupportFeature(supType);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetSupportCombo(combo);
+    rc = wlanObj->getSupportCombo(combo);
     ASSERT_EQ(rc, HDF_ERR_NOT_SUPPORT);
 }
 
@@ -103,9 +103,9 @@ HWTEST_F(WifiHdiHalServiceTest, CreateFeatureTest_002, TestSize.Level1)
 
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlan_type, ifeature);
+    int32_t rc = wlanObj->createFeature(wlan_type, ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(ifeature);
+    rc = wlanObj->destroyFeature(ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -123,11 +123,11 @@ HWTEST_F(WifiHdiHalServiceTest, GetFeatureByIfNameTest_003, TestSize.Level1)
 
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlan_type, ifeature);
+    int32_t rc = wlanObj->createFeature(wlan_type, ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetFeatureByIfName(ifName, ifeature);
+    rc = wlanObj->getFeatureByIfName(ifName, ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(ifeature);
+    rc = wlanObj->destroyFeature(ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -147,11 +147,11 @@ HWTEST_F(WifiHdiHalServiceTest, GetAsscociatedStasTest_004, TestSize.Level1)
 
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlan_type, ifeature);
+    int32_t rc = wlanObj->createFeature(wlan_type, ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetAsscociatedStas(ifeature, staInfo, count, num);
+    rc = wlanObj->getAsscociatedStas(ifeature, staInfo, count, num);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(ifeature);
+    rc = wlanObj->destroyFeature(ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -169,11 +169,11 @@ HWTEST_F(WifiHdiHalServiceTest, SetCountryCodeTest_005, TestSize.Level1)
 
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlan_type, ifeature);
+    int32_t rc = wlanObj->createFeature(wlan_type, ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->SetCountryCode(ifeature, code, sizeof(code));
+    rc = wlanObj->setCountryCode(ifeature, code, sizeof(code));
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(ifeature);
+    rc = wlanObj->destroyFeature(ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -190,11 +190,11 @@ HWTEST_F(WifiHdiHalServiceTest, GetNetworkIfaceNameTest_006, TestSize.Level1)
 
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlan_type, ifeature);
+    int32_t rc = wlanObj->createFeature(wlan_type, ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetNetworkIfaceName(ifeature);
+    rc = wlanObj->getNetworkIfaceName(ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(ifeature);
+    rc = wlanObj->destroyFeature(ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -211,11 +211,11 @@ HWTEST_F(WifiHdiHalServiceTest, GetFeatureTypeTest_007, TestSize.Level1)
 
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlan_type, ifeature);
+    int32_t rc = wlanObj->createFeature(wlan_type, ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetFeatureType(ifeature);
+    rc = wlanObj->getFeatureType(ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(ifeature);
+    rc = wlanObj->destroyFeature(ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -233,11 +233,11 @@ HWTEST_F(WifiHdiHalServiceTest, SetMacAddressTest_008, TestSize.Level1)
 
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlan_type, ifeature);
+    int32_t rc = wlanObj->createFeature(wlan_type, ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->SetMacAddress(ifeature, mac);
+    rc = wlanObj->setMacAddress(ifeature, mac);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(ifeature);
+    rc = wlanObj->destroyFeature(ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -255,11 +255,11 @@ HWTEST_F(WifiHdiHalServiceTest, GetDeviceMacAddressTest_009, TestSize.Level1)
 
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlan_type, ifeature);
+    int32_t rc = wlanObj->createFeature(wlan_type, ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetDeviceMacAddress(ifeature, mac, ETH_ADDR_LEN);
+    rc = wlanObj->getDeviceMacAddress(ifeature, mac, ETH_ADDR_LEN);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(ifeature);
+    rc = wlanObj->destroyFeature(ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -279,11 +279,11 @@ HWTEST_F(WifiHdiHalServiceTest, GetFreqsWithBandTest_010, TestSize.Level1)
 
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlan_type, ifeature);
+    int32_t rc = wlanObj->createFeature(wlan_type, ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetFreqsWithBand(ifeature, wlanBand, freq, WLAN_FREQ_MAX_NUM, count);
+    rc = wlanObj->getFreqsWithBand(ifeature, wlanBand, freq, WLAN_FREQ_MAX_NUM, count);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(ifeature);
+    rc = wlanObj->destroyFeature(ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -301,11 +301,11 @@ HWTEST_F(WifiHdiHalServiceTest, SetTxPowerTest_011, TestSize.Level1)
 
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlan_type, feature);
+    int32_t rc = wlanObj->createFeature(wlan_type, feature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->SetTxPower(feature, power);
+    rc = wlanObj->setTxPower(feature, power);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(feature);
+    rc = wlanObj->destroyFeature(feature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -325,13 +325,13 @@ HWTEST_F(WifiHdiHalServiceTest, GetChipIdTest_012, TestSize.Level1)
 
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlan_type, feature);
+    int32_t rc = wlanObj->createFeature(wlan_type, feature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetChipId(feature, chipId);
+    rc = wlanObj->getChipId(feature, chipId);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetIfNamesByChipId(chipId, ifName, num);
+    rc = wlanObj->getIfNamesByChipId(chipId, ifName, num);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(feature);
+    rc = wlanObj->destroyFeature(feature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -349,11 +349,11 @@ HWTEST_F(WifiHdiHalServiceTest, SetScanningMacAddressTest_013, TestSize.Level1)
 
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlan_type, feature);
+    int32_t rc = wlanObj->createFeature(wlan_type, feature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->SetScanningMacAddress(feature, scanMac, ETH_ADDR_LEN);
+    rc = wlanObj->setScanningMacAddress(feature, scanMac, ETH_ADDR_LEN);
     ASSERT_EQ(rc, HDF_ERR_NOT_SUPPORT);
-    rc = wlanObj->DestroyFeature(feature);
+    rc = wlanObj->destroyFeature(feature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -377,7 +377,7 @@ HWTEST_F(WifiHdiHalServiceTest, RegisterEventCallbackTest_014, TestSize.Level1)
 {
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->RegisterEventCallback(HalResetCallback);
+    int32_t rc = wlanObj->registerEventCallback(HalResetCallback);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -391,7 +391,7 @@ HWTEST_F(WifiHdiHalServiceTest, UnregisterEventCallbackTest_015, TestSize.Level1
 {
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->UnregisterEventCallback();
+    int32_t rc = wlanObj->unregisterEventCallback();
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -409,18 +409,18 @@ HWTEST_F(WifiHdiHalServiceTest, ResetDriverTest_016, TestSize.Level1)
 
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->RegisterEventCallback(HalResetCallback);
+    int32_t rc = wlanObj->registerEventCallback(HalResetCallback);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->CreateFeature(wlan_type, feature);
+    rc = wlanObj->createFeature(wlan_type, feature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetChipId(feature, chipId);
+    rc = wlanObj->getChipId(feature, chipId);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->ResetDriver(chipId);
+    rc = wlanObj->resetDriver(chipId);
     ASSERT_EQ(rc, HDF_SUCCESS);
     EXPECT_EQ(HDF_SUCCESS, g_status);
-    rc = wlanObj->UnregisterEventCallback();
+    rc = wlanObj->unregisterEventCallback();
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(feature);
+    rc = wlanObj->destroyFeature(feature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 
 }
