@@ -207,6 +207,29 @@ static void WifiEventResetDriverProcess(const char *ifName, int32_t event, struc
     WifiEventReport(ifName, event, &resetStatus);
 }
 
+static void WifiDriverEventRemainOnChannelProcess(const char *ifName, uint32_t event, struct HdfSBuf *reqData)
+{
+    WifiOnChannel result = {0};
+    if (!HdfSbufReadUint32(reqData, &(result.freq))) {
+        HILOG_ERROR(LOG_DOMAIN, "%s failed to get frequence.", __FUNCTION__);
+        return;
+    }
+    if (!HdfSbufReadUint32(reqData, &(result.duration))) {
+        HILOG_ERROR(LOG_DOMAIN, "%s failed to get duration.", __FUNCTION__);
+        return;
+    }
+    WifiEventReport(ifName, event, &result);
+}
+
+static void WifiDriverEventCancelRemainOnChannelProcess(const char *ifName, uint32_t event, struct HdfSBuf *reqData)
+{
+    WifiOnChannel result = {0};
+    if (!HdfSbufReadUint32(reqData, &(result.freq))) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get freq", __FUNCTION__);
+        return;
+    }
+    WifiEventReport(ifName, event, &result);
+}
 int OnWiFiEvents(struct HdfDevEventlistener *listener,
     struct HdfIoService *service, uint32_t eventId, struct HdfSBuf *data)
 {
@@ -255,6 +278,12 @@ int OnWiFiEvents(struct HdfDevEventlistener *listener,
             break;
         case WIFI_EVENT_RESET_DRIVER:
             WifiEventResetDriverProcess(ifName, eventId, data);
+            break;
+        case WIFI_EVENT_REMAIN_ON_CHANNEL:
+            WifiDriverEventRemainOnChannelProcess(ifName, eventId, data);
+            break;
+        case WIFI_EVENT_CANCEL_REMAIN_ON_CHANNEL:
+            WifiDriverEventCancelRemainOnChannelProcess(ifName, eventId, data);
             break;
         default:
             break;
