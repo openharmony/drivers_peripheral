@@ -30,7 +30,7 @@ const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
 
 const char *WLAN_SERVICE_NAME = "wlan_hal_c_service";
 
-class WifiHdiHalServiceCTest : public testing::Test {
+class HdfWifiServiceCTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -38,35 +38,35 @@ public:
     void TearDown();
 };
 
-void WifiHdiHalServiceCTest::SetUpTestCase()
+void HdfWifiServiceCTest::SetUpTestCase()
 {
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->Construct(wlanObj);
+    int32_t rc = wlanObj->construct(wlanObj);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-void WifiHdiHalServiceCTest::TearDownTestCase()
+void HdfWifiServiceCTest::TearDownTestCase()
 {
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->Destruct(wlanObj);
+    int32_t rc = wlanObj->destruct(wlanObj);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-void WifiHdiHalServiceCTest::SetUp()
+void HdfWifiServiceCTest::SetUp()
 {
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->Start(wlanObj);
+    int32_t rc = wlanObj->start(wlanObj);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-void WifiHdiHalServiceCTest::TearDown()
+void HdfWifiServiceCTest::TearDown()
 {
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->Stop(wlanObj);
+    int32_t rc = wlanObj->stop(wlanObj);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -76,7 +76,7 @@ void WifiHdiHalServiceCTest::TearDown()
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, GetSupportFeatureComboTest_001, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetSupportFeatureComboTest_001, TestSize.Level1)
 {
 
     uint8_t supType[PROTOCOL_80211_IFTYPE_NUM + 1] = {0};
@@ -84,9 +84,9 @@ HWTEST_F(WifiHdiHalServiceCTest, GetSupportFeatureComboTest_001, TestSize.Level1
 
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->GetSupportFeature(wlanObj, supType);
+    int32_t rc = wlanObj->getSupportFeature(wlanObj, supType);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetSupportCombo(wlanObj, combo);
+    rc = wlanObj->getSupportCombo(wlanObj, combo);
     ASSERT_EQ(rc, HDF_ERR_NOT_SUPPORT);
 }
 
@@ -96,18 +96,18 @@ HWTEST_F(WifiHdiHalServiceCTest, GetSupportFeatureComboTest_001, TestSize.Level1
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, CreateFeatureTest_002, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, CreateFeatureTest_002, TestSize.Level1)
 {
     struct WlanFeatureInfo *ifeature = nullptr;
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
 
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
+    int32_t rc = wlanObj->createFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
     printf("ifname = %s\n", ifeature->ifName);
     printf("type = %d\n", ifeature->wlanType);
-    rc = wlanObj->DestroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
+    rc = wlanObj->destroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -117,7 +117,7 @@ HWTEST_F(WifiHdiHalServiceCTest, CreateFeatureTest_002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, GetFeatureByIfNameTest_003, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetFeatureByIfNameTest_003, TestSize.Level1)
 {
     const char *ifName = "wlan0";
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
@@ -125,11 +125,11 @@ HWTEST_F(WifiHdiHalServiceCTest, GetFeatureByIfNameTest_003, TestSize.Level1)
 
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
+    int32_t rc = wlanObj->createFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetFeatureByIfName(wlanObj, ifName, (struct WlanFeatureInfo **)&ifeature);
+    rc = wlanObj->getFeatureByIfName(wlanObj, ifName, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
+    rc = wlanObj->destroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -139,7 +139,7 @@ HWTEST_F(WifiHdiHalServiceCTest, GetFeatureByIfNameTest_003, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, GetAsscociatedStasTest_004, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetAsscociatedStasTest_004, TestSize.Level1)
 {
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     struct WlanFeatureInfo *ifeature = nullptr;
@@ -148,11 +148,11 @@ HWTEST_F(WifiHdiHalServiceCTest, GetAsscociatedStasTest_004, TestSize.Level1)
 
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
+    int32_t rc = wlanObj->createFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetAsscociatedStas(wlanObj, ifeature, staInfo, WLAN_MAX_NUM_STA_WITH_AP, &num);
+    rc = wlanObj->getAsscociatedStas(wlanObj, ifeature, staInfo, WLAN_MAX_NUM_STA_WITH_AP, &num);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
+    rc = wlanObj->destroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -162,7 +162,7 @@ HWTEST_F(WifiHdiHalServiceCTest, GetAsscociatedStasTest_004, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, SetCountryCodeTest_005, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, SetCountryCodeTest_005, TestSize.Level1)
 {
     const char *code = "CN";
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
@@ -170,11 +170,11 @@ HWTEST_F(WifiHdiHalServiceCTest, SetCountryCodeTest_005, TestSize.Level1)
 
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
+    int32_t rc = wlanObj->createFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->SetCountryCode(wlanObj, ifeature, code, sizeof(code));
+    rc = wlanObj->setCountryCode(wlanObj, ifeature, code, sizeof(code));
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
+    rc = wlanObj->destroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -184,18 +184,18 @@ HWTEST_F(WifiHdiHalServiceCTest, SetCountryCodeTest_005, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, GetNetworkIfaceNameTest_006, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetNetworkIfaceNameTest_006, TestSize.Level1)
 {
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     struct WlanFeatureInfo *ifeature = nullptr;
 
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
+    int32_t rc = wlanObj->createFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetNetworkIfaceName(wlanObj, (struct WlanFeatureInfo *)ifeature);
+    rc = wlanObj->getNetworkIfaceName(wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
+    rc = wlanObj->destroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -205,18 +205,18 @@ HWTEST_F(WifiHdiHalServiceCTest, GetNetworkIfaceNameTest_006, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, GetFeatureTypeTest_007, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetFeatureTypeTest_007, TestSize.Level1)
 {
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     struct WlanFeatureInfo *ifeature = nullptr;
 
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
+    int32_t rc = wlanObj->createFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetFeatureType(wlanObj, (struct WlanFeatureInfo *)ifeature);
+    rc = wlanObj->getFeatureType(wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
+    rc = wlanObj->destroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -226,7 +226,7 @@ HWTEST_F(WifiHdiHalServiceCTest, GetFeatureTypeTest_007, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, SetMacAddressTest_008, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, SetMacAddressTest_008, TestSize.Level1)
 {
     uint8_t mac[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
@@ -234,11 +234,11 @@ HWTEST_F(WifiHdiHalServiceCTest, SetMacAddressTest_008, TestSize.Level1)
 
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
+    int32_t rc = wlanObj->createFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->SetMacAddress(wlanObj, (struct WlanFeatureInfo *)ifeature, mac, ETH_ADDR_LEN);
+    rc = wlanObj->setMacAddress(wlanObj, (struct WlanFeatureInfo *)ifeature, mac, ETH_ADDR_LEN);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
+    rc = wlanObj->destroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -248,7 +248,7 @@ HWTEST_F(WifiHdiHalServiceCTest, SetMacAddressTest_008, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, GetDeviceMacAddressTest_009, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetDeviceMacAddressTest_009, TestSize.Level1)
 {
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     struct WlanFeatureInfo *ifeature = nullptr;
@@ -256,11 +256,11 @@ HWTEST_F(WifiHdiHalServiceCTest, GetDeviceMacAddressTest_009, TestSize.Level1)
 
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
+    int32_t rc = wlanObj->createFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetDeviceMacAddress(wlanObj, (struct WlanFeatureInfo *)ifeature, mac, ETH_ADDR_LEN);
+    rc = wlanObj->getDeviceMacAddress(wlanObj, (struct WlanFeatureInfo *)ifeature, mac, ETH_ADDR_LEN);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
+    rc = wlanObj->destroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -270,7 +270,7 @@ HWTEST_F(WifiHdiHalServiceCTest, GetDeviceMacAddressTest_009, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, GetFreqsWithBandTest_010, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_010, TestSize.Level1)
 {
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     struct WlanFeatureInfo *ifeature = nullptr;
@@ -280,12 +280,12 @@ HWTEST_F(WifiHdiHalServiceCTest, GetFreqsWithBandTest_010, TestSize.Level1)
 
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
+    int32_t rc = wlanObj->createFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetFreqsWithBand(wlanObj, (struct WlanFeatureInfo *)ifeature, wlanBand, freq,
+    rc = wlanObj->getFreqsWithBand(wlanObj, (struct WlanFeatureInfo *)ifeature, wlanBand, freq,
                                    WLAN_FREQ_MAX_NUM, &count);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
+    rc = wlanObj->destroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -295,7 +295,7 @@ HWTEST_F(WifiHdiHalServiceCTest, GetFreqsWithBandTest_010, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, SetTxPowerTest_011, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_011, TestSize.Level1)
 {
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     struct WlanFeatureInfo *ifeature = nullptr;
@@ -303,11 +303,11 @@ HWTEST_F(WifiHdiHalServiceCTest, SetTxPowerTest_011, TestSize.Level1)
 
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
+    int32_t rc = wlanObj->createFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->SetTxPower(wlanObj, (struct WlanFeatureInfo *)ifeature, power);
+    rc = wlanObj->setTxPower(wlanObj, (struct WlanFeatureInfo *)ifeature, power);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
+    rc = wlanObj->destroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -317,7 +317,7 @@ HWTEST_F(WifiHdiHalServiceCTest, SetTxPowerTest_011, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, GetChipIdTest_012, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetChipIdTest_012, TestSize.Level1)
 {
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_STATION;
     struct WlanFeatureInfo *ifeature = nullptr;
@@ -327,14 +327,14 @@ HWTEST_F(WifiHdiHalServiceCTest, GetChipIdTest_012, TestSize.Level1)
 
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
+    int32_t rc = wlanObj->createFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetChipId(wlanObj, (struct WlanFeatureInfo *)ifeature, &chipId);
+    rc = wlanObj->getChipId(wlanObj, (struct WlanFeatureInfo *)ifeature, &chipId);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetIfNamesByChipId(wlanObj, chipId, &ifNames, &num);
+    rc = wlanObj->getIfNamesByChipId(wlanObj, chipId, &ifNames, &num);
     printf("ifnames = %s\n", ifNames);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
+    rc = wlanObj->destroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -344,7 +344,7 @@ HWTEST_F(WifiHdiHalServiceCTest, GetChipIdTest_012, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, SetScanningMacAddressTest_013, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, SetScanningMacAddressTest_013, TestSize.Level1)
 {
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_STATION;
     struct WlanFeatureInfo *ifeature = nullptr;
@@ -352,11 +352,11 @@ HWTEST_F(WifiHdiHalServiceCTest, SetScanningMacAddressTest_013, TestSize.Level1)
 
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->CreateFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
+    int32_t rc = wlanObj->createFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->SetScanningMacAddress(wlanObj, (struct WlanFeatureInfo *)ifeature, scanMac, ETH_ADDR_LEN);
+    rc = wlanObj->setScanningMacAddress(wlanObj, (struct WlanFeatureInfo *)ifeature, scanMac, ETH_ADDR_LEN);
     ASSERT_EQ(rc, HDF_ERR_NOT_SUPPORT);
-    rc = wlanObj->DestroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
+    rc = wlanObj->destroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -379,11 +379,11 @@ static int32_t HalResetCallbackEvent(uint32_t event, void *data, const char *ifN
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, RegisterEventCallbackTest_014, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, RegisterEventCallbackTest_014, TestSize.Level1)
 {
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->RegisterEventCallback(wlanObj, HalResetCallbackEvent);
+    int32_t rc = wlanObj->registerEventCallback(wlanObj, HalResetCallbackEvent);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -393,11 +393,11 @@ HWTEST_F(WifiHdiHalServiceCTest, RegisterEventCallbackTest_014, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, UnregisterEventCallbackTest_015, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, UnregisterEventCallbackTest_015, TestSize.Level1)
 {
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->UnregisterEventCallback(wlanObj);
+    int32_t rc = wlanObj->unregisterEventCallback(wlanObj);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -407,7 +407,7 @@ HWTEST_F(WifiHdiHalServiceCTest, UnregisterEventCallbackTest_015, TestSize.Level
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(WifiHdiHalServiceCTest, ResetDriverTest_016, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, ResetDriverTest_016, TestSize.Level1)
 {
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_STATION;
     struct WlanFeatureInfo *ifeature = nullptr;
@@ -415,18 +415,18 @@ HWTEST_F(WifiHdiHalServiceCTest, ResetDriverTest_016, TestSize.Level1)
 
     struct IWifiInterface *wlanObj = HdIWifiInterfaceGet(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);
-    int32_t rc = wlanObj->RegisterEventCallback(wlanObj, HalResetCallbackEvent);
+    int32_t rc = wlanObj->registerEventCallback(wlanObj, HalResetCallbackEvent);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->CreateFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
+    rc = wlanObj->createFeature(wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->GetChipId(wlanObj, (struct WlanFeatureInfo *)ifeature, &chipId);
+    rc = wlanObj->getChipId(wlanObj, (struct WlanFeatureInfo *)ifeature, &chipId);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->ResetDriver(wlanObj, chipId);
+    rc = wlanObj->resetDriver(wlanObj, chipId);
     ASSERT_EQ(rc, HDF_SUCCESS);
     EXPECT_EQ(HDF_SUCCESS, g_resetStatus);
-    rc = wlanObj->UnregisterEventCallback(wlanObj);
+    rc = wlanObj->unregisterEventCallback(wlanObj);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = wlanObj->DestroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
+    rc = wlanObj->destroyFeature(wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 };
