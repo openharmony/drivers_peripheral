@@ -32,6 +32,11 @@ IInputInterface *g_inputInterface;
 InputEventCb g_callback;
 InputHostCb g_hotplugCb;
 
+static void ReportHotPlugEventPkgCallback(const HotPlugEvent *msg);
+static void ReportEventPkgCallback(const EventPackage **pkgs, uint32_t count, uint32_t devIndex);
+static void CloseOnlineDev(DevDesc *sta, int32_t len);
+static void OpenOnlineDev(DevDesc *sta, int32_t len);
+
 class HdiInputTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -46,14 +51,14 @@ void HdiInputTest::SetUpTestCase()
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get input hdi failed, ret %d", __func__, ret);
     }
+
+    g_callback.EventPkgCallback = ReportEventPkgCallback;
+    g_hotplugCb.HotPlugCallback = ReportHotPlugEventPkgCallback;
 }
 
 void HdiInputTest::TearDownTestCase()
 {
-    if (g_inputInterface != NULL) {
-        free(g_inputInterface);
-        g_inputInterface = NULL;
-    }
+    ReleaseInputInterface(g_inputInterface);
 }
 
 void HdiInputTest::SetUp()
@@ -77,21 +82,96 @@ static void ReportEventPkgCallback(const EventPackage **pkgs, uint32_t count, ui
         return;
     }
     for (uint32_t i = 0; i < count; i++) {
-        HDF_LOGI("%s: pkgs[%d] = 0x%x, 0x%x, %d", __func__, i, pkgs[i]->type, pkgs[i]->code, pkgs[i]->value);
+        printf("%s: pkgs[%d] = 0x%x, 0x%x, %d\n", __func__, i, pkgs[i]->type, pkgs[i]->code, pkgs[i]->value);
     }
 }
 
-void ReportHotPlugEventPkgCallback(const HotPlugEvent *msg)
+static void ReportHotPlugEventPkgCallback(const HotPlugEvent *msg)
 {
+    int32_t ret;
     if (msg == NULL) {
         return;
     }
     HDF_LOGI("%s: status =%d devId=%d type =%d", __func__, msg->status, msg->devIndex, msg->devType);
+
+    if (msg->status == 0) {
+        ret = g_inputInterface->iInputManager->OpenInputDevice(msg->devIndex);
+        if (ret) {
+            HDF_LOGE("%s: open device[%u] failed, ret %d", __func__, msg->devIndex, ret);
+        }
+
+        ret  = g_inputInterface->iInputReporter->RegisterReportCallback(msg->devIndex, &g_callback);
+        if (ret) {
+            HDF_LOGE("%s: register callback failed for device[%d], ret %d", __func__, msg->devIndex, ret);
+        }
+    } else {
+        ret = g_inputInterface->iInputReporter->UnregisterReportCallback(msg->devIndex);
+        if (ret) {
+            HDF_LOGE("%s: unregister callback failed, ret %d", __func__, ret);
+        }
+
+        ret = g_inputInterface->iInputManager->CloseInputDevice(msg->devIndex);
+        if (ret) {
+            HDF_LOGE("%s: close device failed, ret %d", __func__, ret);
+        }
+    }
+}
+
+static void OpenOnlineDev(DevDesc *sta, int32_t len)
+{
+    int32_t ret = g_inputInterface->iInputManager->ScanInputDevice(sta, len);
+    if (ret) {
+        HDF_LOGE("%s: scan device failed, ret %d", __func__, ret);
+    }
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+
+    for (int32_t i = 0; i < len; i++) {
+        if (sta[i].devIndex == 0) {
+            break;
+        }
+        ret = g_inputInterface->iInputManager->OpenInputDevice(sta[i].devIndex);
+        if (ret) {
+            HDF_LOGE("%s: open device[%d] failed, ret %d", __func__, sta[i].devIndex, ret);
+        }
+        ASSERT_EQ(ret, INPUT_SUCCESS);
+
+        ret  = g_inputInterface->iInputReporter->RegisterReportCallback(sta[i].devIndex, &g_callback);
+        if (ret) {
+            HDF_LOGE("%s: register callback failed for device[%d], ret %d", __func__, sta[i].devIndex, ret);
+        }
+        ASSERT_EQ(ret, INPUT_SUCCESS);
+    }
+}
+
+static void CloseOnlineDev(DevDesc *sta, int32_t len)
+{
+    int32_t ret = g_inputInterface->iInputManager->ScanInputDevice(sta, len);
+    if (ret) {
+        HDF_LOGE("%s: scan device failed, ret %d", __func__, ret);
+    }
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+
+    for (int32_t i = 0; i < len; i++) {
+        if (sta[i].devIndex == 0) {
+            break;
+        }
+        ret = g_inputInterface->iInputReporter->UnregisterReportCallback(sta[i].devIndex);
+        if (ret) {
+            HDF_LOGE("%s: register callback failed for device[%d], ret %d", __func__, sta[i].devIndex, ret);
+        }
+        ASSERT_EQ(ret, INPUT_SUCCESS);
+
+        ret = g_inputInterface->iInputManager->CloseInputDevice(sta[i].devIndex);
+        if (ret) {
+            HDF_LOGE("%s: close device[%d] failed, ret %d", __func__, sta[i].devIndex, ret);
+        }
+        ASSERT_EQ(ret, INPUT_SUCCESS);
+    }
 }
 
 HWTEST_F(HdiInputTest, ScanInputDevice, TestSize.Level1)
 {
-    DevDesc sta[MAX_DEVICES] = {0};
+    DevDesc sta[MAX_DEVICES];
 
     HDF_LOGI("%s: [Input] RegisterCallbackAndReportData001 enter", __func__);
     int32_t ret;
@@ -104,6 +184,47 @@ HWTEST_F(HdiInputTest, ScanInputDevice, TestSize.Level1)
         HDF_LOGI("%s:%d, %d, %d, %d", __func__, sta[0].devType, sta[0].devIndex, sta[1].devType, sta[1].devIndex);
     }
 
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+HWTEST_F(HdiInputTest, HotPlugCallback, TestSize.Level1)
+{
+    HDF_LOGI("%s: [Input] HotPlugCallback Testcase enter", __func__);
+    int32_t ret = INPUT_SUCCESS;
+    DevDesc sta[MAX_DEVICES];
+
+    ret = memset_s(sta, sizeof(sta), 0, sizeof(sta));
+    if (ret != 0) {
+        HDF_LOGE("%s: memcpy failed, line %d", __func__, __LINE__);
+    }
+
+    INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputReporter, INPUT_NULL_PTR);
+    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
+
+    ret = g_inputInterface->iInputReporter->RegisterHotPlugCallback(&g_hotplugCb);
+    if (ret) {
+        HDF_LOGE("%s: register hotplug callback failed for device manager, ret %d", __func__, ret);
+    }
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+
+    OpenOnlineDev(sta, MAX_DEVICES);
+
+    HDF_LOGI("%s: wait 15s for testing, pls hotplug now", __func__);
+    HDF_LOGI("%s: The event data is as following:", __func__);
+    OsalMSleep(KEEP_ALIVE_TIME_MS);
+
+    ret = memset_s(sta, sizeof(sta), 0, sizeof(sta));
+    if (ret != 0) {
+        HDF_LOGE("%s: memcpy failed, line %d", __func__, __LINE__);
+    }
+
+    CloseOnlineDev(sta, MAX_DEVICES);
+
+    ret = g_inputInterface->iInputReporter->UnregisterHotPlugCallback();
+    if (ret) {
+        HDF_LOGE("%s: unregister hotplug callback failed for device manager, ret %d", __func__, ret);
+    }
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
 
@@ -231,7 +352,9 @@ HWTEST_F(HdiInputTest, GetInputDeviceList001, TestSize.Level1)
     if (ret) {
         HDF_LOGE("%s: get device list failed, ret %d", __func__, ret);
     }
-    ASSERT_LE(num, MAX_INPUT_DEV_NUM);  /* num <= MAX_INPUT_DEV_NUM return true */
+    ret = num <= MAX_INPUT_DEV_NUM ? HDF_SUCCESS : HDF_FAILURE;  /* num <= MAX_INPUT_DEV_NUM return true */
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+
 
     for (uint32_t i = 0; i < num; i++) {
         HDF_LOGI("%s: num = %u, device[%d]'s info is:", __func__, num, i);
@@ -324,7 +447,6 @@ HWTEST_F(HdiInputTest, RegisterCallback001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] RegisterCallbac001 enter", __func__);
     int32_t ret;
-    g_callback.EventPkgCallback = ReportEventPkgCallback;
 
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputReporter, INPUT_NULL_PTR);
@@ -609,25 +731,16 @@ HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] RegisterCallbackAndReportData001 enter", __func__);
     int32_t ret;
-    g_callback.EventPkgCallback = ReportEventPkgCallback;
-    g_hotplugCb.HotPlugCallback = ReportHotPlugEventPkgCallback;
 
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputReporter, INPUT_NULL_PTR);
-    INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
 
     ret  = g_inputInterface->iInputReporter->RegisterReportCallback(TOUCH_INDEX, &g_callback);
     if (ret) {
         HDF_LOGE("%s: register callback failed for device 1, ret %d", __func__, ret);
     }
-
-    ret  = g_inputInterface->iInputReporter->RegisterHotPlugCallback(&g_hotplugCb);
-    if (ret) {
-        HDF_LOGE("%s: register callback failed for device manager, ret %d", __func__, ret);
-    }
-
     EXPECT_EQ(ret, INPUT_SUCCESS);
-    HDF_LOGI("%s: wait 10s for testing, pls touch the panel now", __func__);
+    HDF_LOGI("%s: wait 15s for testing, pls touch the panel now", __func__);
     HDF_LOGI("%s: The event data is as following:", __func__);
     OsalMSleep(KEEP_ALIVE_TIME_MS);
 }
