@@ -33,32 +33,32 @@ class WlanInterfaceProxy : public IRemoteProxy<IWlan> {
 public:
     explicit WlanInterfaceProxy(const sptr<IRemoteObject>& impl) : IRemoteProxy<IWlan>(impl) {}
     virtual ~WlanInterfaceProxy() override {}
-    virtual int32_t WifiConstruct() override;
-    virtual int32_t WifiDestruct() override;
-    virtual int32_t Start() override;
-    virtual int32_t Stop() override;
-    virtual int32_t GetSupportFeature(std::vector<uint8_t>& supType) override;
-    virtual int32_t GetSupportCombo(std::vector<uint64_t>& combo) override;
-    virtual int32_t CreateFeature(int32_t type, std::shared_ptr<WifiFeatureInfo>& ifeature) override;
-    virtual int32_t GetFeatureByIfName(std::string& ifName, std::shared_ptr<WifiFeatureInfo>& ifeature) override;
-    virtual int32_t RegisterEventCallback(std::function<int32_t(int32_t event, struct HdfSBuf *sbuf)> cb) override;
-    virtual int32_t UnregisterEventCallback() override;
-    virtual int32_t DestroyFeature(std::shared_ptr<WifiFeatureInfo> ifeature) override;
-    virtual int32_t ResetDriver(const uint8_t chipId) override;
-    virtual int32_t GetAsscociatedStas(std::shared_ptr<WifiFeatureInfo> ifeature, std::shared_ptr<StaInfo> staInfo,
+    virtual int32_t wifiConstruct() override;
+    virtual int32_t wifiDestruct() override;
+    virtual int32_t start() override;
+    virtual int32_t stop() override;
+    virtual int32_t getSupportFeature(std::vector<uint8_t>& supType) override;
+    virtual int32_t getSupportCombo(std::vector<uint64_t>& combo) override;
+    virtual int32_t createFeature(int32_t type, std::shared_ptr<WifiFeatureInfo>& ifeature) override;
+    virtual int32_t getFeatureByIfName(std::string& ifName, std::shared_ptr<WifiFeatureInfo>& ifeature) override;
+    virtual int32_t registerEventCallback(std::function<int32_t(int32_t event, struct HdfSBuf *sbuf)> cb) override;
+    virtual int32_t unregisterEventCallback() override;
+    virtual int32_t destroyFeature(std::shared_ptr<WifiFeatureInfo> ifeature) override;
+    virtual int32_t resetDriver(const uint8_t chipId) override;
+    virtual int32_t getAsscociatedStas(std::shared_ptr<WifiFeatureInfo> ifeature, std::shared_ptr<StaInfo> staInfo,
         uint32_t count, std::vector<uint32_t>& num) override;
-    virtual int32_t SetCountryCode(std::shared_ptr<WifiFeatureInfo> ifeature, std::string& code, uint32_t len) override;
-    virtual int32_t GetNetworkIfaceName(std::shared_ptr<WifiFeatureInfo> ifeature) override;
-    virtual int32_t GetFeatureType(std::shared_ptr<WifiFeatureInfo> ifeature) override;
-    virtual int32_t SetMacAddress(std::shared_ptr<WifiFeatureInfo> ifeature, std::vector<uint8_t>& mac) override;
-    virtual int32_t GetDeviceMacAddress(std::shared_ptr<WifiFeatureInfo> ifeature, std::vector<uint8_t>& mac,
+    virtual int32_t setCountryCode(std::shared_ptr<WifiFeatureInfo> ifeature, std::string& code, uint32_t len) override;
+    virtual int32_t getNetworkIfaceName(std::shared_ptr<WifiFeatureInfo> ifeature) override;
+    virtual int32_t getFeatureType(std::shared_ptr<WifiFeatureInfo> ifeature) override;
+    virtual int32_t setMacAddress(std::shared_ptr<WifiFeatureInfo> ifeature, std::vector<uint8_t>& mac) override;
+    virtual int32_t getDeviceMacAddress(std::shared_ptr<WifiFeatureInfo> ifeature, std::vector<uint8_t>& mac,
         uint8_t len) override;
-    virtual int32_t GetFreqsWithBand(std::shared_ptr<WifiFeatureInfo> ifeature, int32_t band, std::vector<int32_t> freq,
+    virtual int32_t getFreqsWithBand(std::shared_ptr<WifiFeatureInfo> ifeature, int32_t band, std::vector<int32_t> freq,
         uint32_t count, uint32_t& num) override;
-    virtual int32_t SetTxPower(std::shared_ptr<WifiFeatureInfo> ifeature, int32_t power) override;
-    virtual int32_t GetChipId(std::shared_ptr<WifiFeatureInfo> ifeature, uint8_t& chipId) override;
-    virtual int32_t GetIfNamesByChipId(const uint8_t chipId, std::string& ifNames, uint32_t& num) override;
-    virtual int32_t SetScanningMacAddress(std::shared_ptr<WifiFeatureInfo> ifeature, std::vector<uint8_t>& scanMac,
+    virtual int32_t setTxPower(std::shared_ptr<WifiFeatureInfo> ifeature, int32_t power) override;
+    virtual int32_t getChipId(std::shared_ptr<WifiFeatureInfo> ifeature, uint8_t& chipId) override;
+    virtual int32_t getIfNamesByChipId(const uint8_t chipId, std::string& ifNames, uint32_t& num) override;
+    virtual int32_t setScanningMacAddress(std::shared_ptr<WifiFeatureInfo> ifeature, std::vector<uint8_t>& scanMac,
         uint8_t len) override;
     static int32_t CallbackWlanProxy(int32_t event, struct HdfSBuf *reqData);
     static std::function<int32_t(int32_t event, struct HdfSBuf *sbuf)> callback_;
