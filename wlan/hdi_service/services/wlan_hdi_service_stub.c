@@ -232,7 +232,7 @@ static int32_t WlanServiceStudGetFeatureByIfName(struct HdfDeviceIoClient *clien
         return HDF_FAILURE;
     }
     HDF_LOGI("%{public}s: start WlanDestroyFeature! baseFeature->type = %{public}d", __func__, baseFeature->type);
-    if(!HdfSbufWriteInt32(reply, baseFeature->type)){
+    if (!HdfSbufWriteInt32(reply, baseFeature->type)) {
         HDF_LOGE("%{public}s: write wlanType failed!", __func__);
         return HDF_FAILURE;
     }
@@ -459,6 +459,10 @@ static int32_t WlanServiceStubGetAsscociateSta(struct HdfDeviceIoClient *client,
         return HDF_FAILURE;
     }
     HdfSbufWriteUint32(reply, len);
+    if (!HdfSbufWriteBuffer(data, (const void *)staInfo, sizeof(struct StaInfo))) {
+        HDF_LOGE("%{public}s:write ifeature->ifName failed!", __func__);
+        return HDF_FAILURE;
+    }
     return ret;
 }
 
