@@ -47,7 +47,7 @@ sptr<IWlan> IWlan::Get(const std::string& serviceName)
     return nullptr;
 }
 
-int32_t WlanInterfaceProxy::WifiConstruct()
+int32_t WlanInterfaceProxy::wifiConstruct()
 {
     MessageParcel data;
     MessageParcel reply;
@@ -60,7 +60,7 @@ int32_t WlanInterfaceProxy::WifiConstruct()
     return ret;
 }
 
-int32_t WlanInterfaceProxy::WifiDestruct()
+int32_t WlanInterfaceProxy::wifiDestruct()
 {
     MessageParcel data;
     MessageParcel reply;
@@ -73,7 +73,7 @@ int32_t WlanInterfaceProxy::WifiDestruct()
     return ret;
 }
 
-int32_t WlanInterfaceProxy::Start()
+int32_t WlanInterfaceProxy::start()
 {
     MessageParcel data;
     MessageParcel reply;
@@ -86,7 +86,7 @@ int32_t WlanInterfaceProxy::Start()
     return ret;
 }
 
-int32_t WlanInterfaceProxy::Stop()
+int32_t WlanInterfaceProxy::stop()
 {
     MessageParcel data;
     MessageParcel reply;
@@ -99,7 +99,7 @@ int32_t WlanInterfaceProxy::Stop()
     return ret;
 }
 
-int32_t WlanInterfaceProxy::CreateFeature(int32_t type, std::shared_ptr<WifiFeatureInfo>& ifeature)
+int32_t WlanInterfaceProxy::createFeature(int32_t type, std::shared_ptr<WifiFeatureInfo>& ifeature)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -121,7 +121,7 @@ int32_t WlanInterfaceProxy::CreateFeature(int32_t type, std::shared_ptr<WifiFeat
     return ret;
 }
 
-int32_t WlanInterfaceProxy::GetSupportFeature(std::vector<uint8_t>& supType)
+int32_t WlanInterfaceProxy::getSupportFeature(std::vector<uint8_t>& supType)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -137,7 +137,7 @@ int32_t WlanInterfaceProxy::GetSupportFeature(std::vector<uint8_t>& supType)
     return ret;
 }
 
-int32_t WlanInterfaceProxy::GetSupportCombo(std::vector<uint64_t>& combo)
+int32_t WlanInterfaceProxy::getSupportCombo(std::vector<uint64_t>& combo)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -155,7 +155,7 @@ int32_t WlanInterfaceProxy::GetSupportCombo(std::vector<uint64_t>& combo)
     return ret;
 }
 
-int32_t WlanInterfaceProxy::GetFeatureByIfName(std::string& ifName, std::shared_ptr<WifiFeatureInfo>& ifeature)
+int32_t WlanInterfaceProxy::getFeatureByIfName(std::string& ifName, std::shared_ptr<WifiFeatureInfo>& ifeature)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -215,7 +215,7 @@ int IPCObjectStubWlan::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data,
     return ret;
 }
 
-int32_t WlanInterfaceProxy::RegisterEventCallback(std::function<int32_t(int32_t event, struct HdfSBuf *sbuf)> cb)
+int32_t WlanInterfaceProxy::registerEventCallback(std::function<int32_t(int32_t event, struct HdfSBuf *sbuf)> cb)
 {
     sptr<IPCObjectStub> callback = new IPCObjectStubWlan();
     OHOS::MessageParcel data;
@@ -235,7 +235,7 @@ int32_t WlanInterfaceProxy::RegisterEventCallback(std::function<int32_t(int32_t 
     return ret;
 }
 
-int32_t WlanInterfaceProxy::UnregisterEventCallback()
+int32_t WlanInterfaceProxy::unregisterEventCallback()
 {
     MessageParcel data;
     MessageParcel reply;
@@ -248,7 +248,7 @@ int32_t WlanInterfaceProxy::UnregisterEventCallback()
     return ret;
 }
 
-int32_t WlanInterfaceProxy::DestroyFeature(std::shared_ptr<WifiFeatureInfo> ifeature)
+int32_t WlanInterfaceProxy::destroyFeature(std::shared_ptr<WifiFeatureInfo> ifeature)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -272,7 +272,7 @@ int32_t WlanInterfaceProxy::DestroyFeature(std::shared_ptr<WifiFeatureInfo> ifea
     return ret;
 }
 
-int32_t WlanInterfaceProxy::ResetDriver(const uint8_t chipId)
+int32_t WlanInterfaceProxy::resetDriver(const uint8_t chipId)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -289,7 +289,7 @@ int32_t WlanInterfaceProxy::ResetDriver(const uint8_t chipId)
     return ret;
 }
 
-int32_t WlanInterfaceProxy::GetAsscociatedStas(std::shared_ptr<WifiFeatureInfo> ifeature, std::shared_ptr<StaInfo> staInfo,
+int32_t WlanInterfaceProxy::getAsscociatedStas(std::shared_ptr<WifiFeatureInfo> ifeature, std::shared_ptr<StaInfo> staInfo,
     uint32_t count, std::vector<uint32_t>& num)
 {
     MessageParcel data;
@@ -309,7 +309,7 @@ int32_t WlanInterfaceProxy::GetAsscociatedStas(std::shared_ptr<WifiFeatureInfo> 
     return ret;
 }
 
-int32_t WlanInterfaceProxy::SetCountryCode(std::shared_ptr<WifiFeatureInfo> ifeature, std::string& code, uint32_t len)
+int32_t WlanInterfaceProxy::setCountryCode(std::shared_ptr<WifiFeatureInfo> ifeature, std::string& code, uint32_t len)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -330,7 +330,7 @@ int32_t WlanInterfaceProxy::SetCountryCode(std::shared_ptr<WifiFeatureInfo> ifea
     return ret;
 }
 
-int32_t WlanInterfaceProxy::GetNetworkIfaceName(std::shared_ptr<WifiFeatureInfo> ifeature)
+int32_t WlanInterfaceProxy::getNetworkIfaceName(std::shared_ptr<WifiFeatureInfo> ifeature)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -349,7 +349,7 @@ int32_t WlanInterfaceProxy::GetNetworkIfaceName(std::shared_ptr<WifiFeatureInfo>
     return ret;
 }
 
-int32_t WlanInterfaceProxy::GetFeatureType(std::shared_ptr<WifiFeatureInfo> ifeature)
+int32_t WlanInterfaceProxy::getFeatureType(std::shared_ptr<WifiFeatureInfo> ifeature)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -368,7 +368,7 @@ int32_t WlanInterfaceProxy::GetFeatureType(std::shared_ptr<WifiFeatureInfo> ifea
     return ret;
 }
 
-int32_t WlanInterfaceProxy::SetMacAddress(std::shared_ptr<WifiFeatureInfo> ifeature, std::vector<uint8_t>& mac)
+int32_t WlanInterfaceProxy::setMacAddress(std::shared_ptr<WifiFeatureInfo> ifeature, std::vector<uint8_t>& mac)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -389,7 +389,7 @@ int32_t WlanInterfaceProxy::SetMacAddress(std::shared_ptr<WifiFeatureInfo> ifeat
     return ret;
 }
 
-int32_t WlanInterfaceProxy::GetDeviceMacAddress(std::shared_ptr<WifiFeatureInfo> ifeature, std::vector<uint8_t>& mac,
+int32_t WlanInterfaceProxy::getDeviceMacAddress(std::shared_ptr<WifiFeatureInfo> ifeature, std::vector<uint8_t>& mac,
     uint8_t len)
 {
     MessageParcel data;
@@ -413,7 +413,7 @@ int32_t WlanInterfaceProxy::GetDeviceMacAddress(std::shared_ptr<WifiFeatureInfo>
     return ret;
 }
 
-int32_t WlanInterfaceProxy::GetFreqsWithBand(std::shared_ptr<WifiFeatureInfo> ifeature, int32_t band,
+int32_t WlanInterfaceProxy::getFreqsWithBand(std::shared_ptr<WifiFeatureInfo> ifeature, int32_t band,
     std::vector<int32_t> freq, uint32_t count, uint32_t& num)
 {
     MessageParcel data;
@@ -440,7 +440,7 @@ int32_t WlanInterfaceProxy::GetFreqsWithBand(std::shared_ptr<WifiFeatureInfo> if
     return ret;
 }
 
-int32_t WlanInterfaceProxy::SetTxPower(std::shared_ptr<WifiFeatureInfo> ifeature, int32_t power)
+int32_t WlanInterfaceProxy::setTxPower(std::shared_ptr<WifiFeatureInfo> ifeature, int32_t power)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -461,7 +461,7 @@ int32_t WlanInterfaceProxy::SetTxPower(std::shared_ptr<WifiFeatureInfo> ifeature
     return ret;
 }
 
-int32_t WlanInterfaceProxy::GetChipId(std::shared_ptr<WifiFeatureInfo> ifeature, uint8_t& chipId)
+int32_t WlanInterfaceProxy::getChipId(std::shared_ptr<WifiFeatureInfo> ifeature, uint8_t& chipId)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -483,7 +483,7 @@ int32_t WlanInterfaceProxy::GetChipId(std::shared_ptr<WifiFeatureInfo> ifeature,
     return ret;
 }
 
-int32_t WlanInterfaceProxy::GetIfNamesByChipId(const uint8_t chipId, std::string& ifNames, uint32_t& num)
+int32_t WlanInterfaceProxy::getIfNamesByChipId(const uint8_t chipId, std::string& ifNames, uint32_t& num)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -504,7 +504,7 @@ int32_t WlanInterfaceProxy::GetIfNamesByChipId(const uint8_t chipId, std::string
     return ret;
 }
 
-int32_t WlanInterfaceProxy::SetScanningMacAddress(std::shared_ptr<WifiFeatureInfo> ifeature,
+int32_t WlanInterfaceProxy::setScanningMacAddress(std::shared_ptr<WifiFeatureInfo> ifeature,
     std::vector<uint8_t>& scanMac, uint8_t len)
 {
     MessageParcel data;
