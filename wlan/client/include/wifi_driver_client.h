@@ -134,7 +134,7 @@ typedef struct {
 } WifiDisconnect;
 
 enum WifiClientType {
-    WIFI_KERNEL_TO_WPA_CLIENT = 8447,  // 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<13
+    WIFI_KERNEL_TO_WPA_CLIENT = 11519,  // 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<13
     WIFI_KERNEL_TO_HAL_CLIENT = 32768, // 1<<15
     WIFI_CLIENT_BUTT
 };
