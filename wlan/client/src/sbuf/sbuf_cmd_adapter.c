@@ -1346,7 +1346,6 @@ int32_t WifiCmdSetClient(uint32_t clientNum)
     return ret;
 }
 
-//#ifdef CONFIG_OHOS_P2P
 int32_t WifiCmdProbeReqReport(const char* ifName, const int32_t *report)
 {
     if (ifName == NULL || report == NULL) {
@@ -1530,7 +1529,6 @@ RELEASE_DATA:
     HdfSBufRecycle(data);
     return ret;
 }
-//#endif
 
 #ifdef __cplusplus
 #if __cplusplus
