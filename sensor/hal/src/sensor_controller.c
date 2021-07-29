@@ -141,12 +141,18 @@ static int32_t GetSensorInfo(struct SensorInformation **sensor, int32_t *count)
     CHECK_NULL_PTR_RETURN_VALUE(sensor, SENSOR_NULL_PTR);
     CHECK_NULL_PTR_RETURN_VALUE(count, SENSOR_NULL_PTR);
 
-    struct SensorManagerNode *pos = NULL;
+    if (manager->sensorSum > 0) {
+        *count = manager->sensorSum;
+        *sensor = manager->sensorInfoEntry;
+        return SENSOR_SUCCESS;
+    }
+
     struct HdfSBuf *reply = HdfSBufObtain(HDF_SENSOR_INFO_MAX_SIZE);
     CHECK_NULL_PTR_RETURN_VALUE(reply, SENSOR_NULL_PTR);
 
     (void)OsalMutexLock(&manager->mutex);
     manager->sensorSum = 0;
+    struct SensorManagerNode *pos = NULL;
     DLIST_FOR_EACH_ENTRY(pos, &manager->managerHead, struct SensorManagerNode, node) {
         if (manager->sensorSum >= SENSOR_TYPE_MAX) {
             break;
