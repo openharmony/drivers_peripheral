@@ -241,31 +241,32 @@ int32_t AudioHdiRenderTest::PlayAudioFile(struct PrepareAudioPara& audiopara)
     int32_t ret = -1;
     struct AudioDeviceDescriptor devDesc = {};
     char absPath[PATH_MAX] = {0};
+    if (audiopara.adapter == nullptr  || audiopara.manager == nullptr) {
+        return HDF_FAILURE;
+    }
     if (realpath(audiopara.path, absPath) == nullptr) {
-        printf("path is not exist");
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         return HDF_FAILURE;
     }
     FILE *file = fopen(absPath, "rb");
     if (file == nullptr) {
-        return HDF_FAILURE;
-    }
-    if (audiopara.adapter == nullptr  || audiopara.manager == nullptr) {
-        return HDF_FAILURE;
-    }
-    ret = HMOS::Audio::InitAttrs(audiopara.attrs);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
-    if (WavHeadAnalysis(audiopara.headInfo, file, audiopara.attrs) < 0) {
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         return HDF_FAILURE;
     }
 
-    ret = HMOS::Audio::InitDevDesc(devDesc, (&audiopara.audioPort)->portId, audiopara.pins);
-    if (ret < 0) {
+    HMOS::Audio::InitAttrs(audiopara.attrs);
+
+    if (WavHeadAnalysis(audiopara.headInfo, file, audiopara.attrs) < 0) {
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+        fclose(file);
         return HDF_FAILURE;
     }
+
+    HMOS::Audio::InitDevDesc(devDesc, (&audiopara.audioPort)->portId, audiopara.pins);
+
     ret = audiopara.adapter->CreateRender(audiopara.adapter, &devDesc, &(audiopara.attrs), &audiopara.render);
     if (ret < 0 || audiopara.render == nullptr) {
+        fclose(file);
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         return HDF_FAILURE;
     }
@@ -274,6 +275,7 @@ int32_t AudioHdiRenderTest::PlayAudioFile(struct PrepareAudioPara& audiopara)
         fclose(file);
     } else {
         audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         fclose(file);
         return HDF_FAILURE;
     }
@@ -1075,16 +1077,18 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderPosition_0001, Te
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
-    sleep(3);
-    ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT(time.tvSec, timeExp);
-    EXPECT_GT(frames, INITIAL_VALUE);
+    sleep(1);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GT(time.tvSec, timeExp);
+        EXPECT_GT(frames, INITIAL_VALUE);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -1116,25 +1120,27 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderPosition_0002, Te
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
-    sleep(3);
-    ret = audiopara.render->control.Pause((AudioHandle)(audiopara.render));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT(time.tvSec, timeExp);
-    EXPECT_GT(frames, INITIAL_VALUE);
-    sleep(5);
-    ret = audiopara.render->control.Resume((AudioHandle)(audiopara.render));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT(time.tvSec, timeExp);
-    EXPECT_GT(frames, INITIAL_VALUE);
+    sleep(1);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->control.Pause((AudioHandle)(audiopara.render));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GT(time.tvSec, timeExp);
+        EXPECT_GT(frames, INITIAL_VALUE);
+        sleep(1);
+        ret = audiopara.render->control.Resume((AudioHandle)(audiopara.render));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GT(time.tvSec, timeExp);
+        EXPECT_GT(frames, INITIAL_VALUE);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -1166,16 +1172,18 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderPosition_0003, Te
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
-    sleep(3);
-    ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT(time.tvSec, timeExp);
-    EXPECT_GT(frames, INITIAL_VALUE);
+    sleep(1);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GT(time.tvSec, timeExp);
+        EXPECT_GT(frames, INITIAL_VALUE);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
