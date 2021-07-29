@@ -48,7 +48,7 @@ static int32_t GetSensorServiceList(void)
     CHECK_NULL_PTR_RETURN_VALUE(data, SENSOR_NULL_PTR);
     int32_t ret = HdfGetServiceNameByDeviceClass(DEVICE_CLASS_SENSOR, data);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%s :sensor manager get service class failed", __func__);
+        HDF_LOGE("%{public}s :sensor manager get service class failed", __func__);
         HdfSBufRecycle(data);
         return SENSOR_INVALID_SERVICE;
     }
@@ -68,7 +68,7 @@ static int32_t GetSensorServiceList(void)
         managerNode->sensorCount = 0;
         managerNode->ioService = HdfIoServiceBind(svcName);
         if (managerNode->ioService == NULL) {
-            HDF_LOGE("%s: Sensor manager get manager service name[%s] failed", __func__, svcName);
+            HDF_LOGE("%{public}s: Sensor manager get manager service name[%{public}s] failed", __func__, svcName);
             OsalMemFree(managerNode);
             managerNode = NULL;
             continue;
@@ -82,7 +82,7 @@ static int32_t GetSensorServiceList(void)
     data = NULL;
 
     if (DListIsEmpty(&manager->managerHead)) {
-        HDF_LOGE("%s: Sensor get service failed", __func__);
+        HDF_LOGE("%{public}s: Sensor get service failed", __func__);
         return SENSOR_INVALID_SERVICE;
     }
 
@@ -131,7 +131,7 @@ static int32_t InitSensorManager(void)
 
     int32_t ret = GetSensorServiceList();
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%s: Sensor get service failed", __func__);
+        HDF_LOGE("%{public}s: Sensor get service failed", __func__);
         ReleaseSensorServiceList();
         OsalMutexDestroy(&manager->mutex);
         OsalMutexDestroy(&manager->eventMutex);
@@ -154,11 +154,11 @@ const struct SensorInterface *NewSensorInterfaceInstance(void)
     GetSensorDeviceMethods(&sensorDevInstance);
 
     if (InitSensorManager() != SENSOR_SUCCESS) {
-        HDF_LOGE("%s: Sensor init manager failed", __func__);
+        HDF_LOGE("%{public}s: Sensor init manager failed", __func__);
         return NULL;
     }
     manager->initState = true;
-    HDF_LOGD("%s: Get sensor device instance success", __func__);
+    HDF_LOGD("%{public}s: Get sensor device instance success", __func__);
     return &sensorDevInstance;
 }
 
