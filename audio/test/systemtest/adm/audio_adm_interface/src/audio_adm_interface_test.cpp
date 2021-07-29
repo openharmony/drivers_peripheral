@@ -1935,7 +1935,10 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRead_0001, TestSize.Level1)
         ASSERT_NE(nullptr, writeBuf);
     }
     ret = WriteHwParamsToBuf(writeBuf, hwParams);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    if (ret < 0) {
+        HdfIoServiceRecycle(service);
+        ASSERT_EQ(HDF_SUCCESS, ret);	 
+	}
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_HW_PARAMS, writeBuf, writeReply);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
