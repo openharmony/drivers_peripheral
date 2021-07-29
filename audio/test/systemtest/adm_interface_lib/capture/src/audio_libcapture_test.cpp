@@ -95,12 +95,15 @@ void AudioLibCaptureTest::TearDown(void)
     }
     if (BindServiceCaptureSo != nullptr) {
         BindServiceCaptureSo = nullptr;
-    } else if (CloseServiceCaptureSo != nullptr) {
+    }
+    if (CloseServiceCaptureSo != nullptr) {
         CloseServiceCaptureSo = nullptr;
-    } else if (InterfaceLibOutputCapture != nullptr) {
-        InterfaceLibOutputCapture = nullptr;
-    } else {
+    }
+    if (InterfaceLibCtlCapture != nullptr) {
         InterfaceLibCtlCapture = nullptr;
+    }
+    if (InterfaceLibOutputCapture != nullptr) {
+        InterfaceLibOutputCapture = nullptr;
     }
 }
 
@@ -705,30 +708,7 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_Abnormal_0002, Te
     EXPECT_EQ(HDF_FAILURE, ret);
     CloseServiceCaptureSo(handle);
 }
-/**
-* @tc.name  test InterfaceLibCtlCapture API via don't binding control service.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_Abnormal_0003
-* @tc.desc  test Audio lib Interface CtlCapture, but there isn't binding control service,so Interface return -1.
-* @tc.author: liutian
-*/
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_Abnormal_0003, TestSize.Level1)
-{
-    int32_t ret = -1;
-    struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CAPTURE.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlCapture(handle, AUDIO_DRV_PCM_IOCTL_READ, &hwCapture->captureParam);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    CloseServiceCaptureSo(handle);
-    free(hwCapture);
-}
+
 /**
 * @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_HW_PARAMS.
 * @tc.number  SUB_Audio_InterfaceLibOutputCapture_HwParams_0001
@@ -1027,28 +1007,5 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Abnormal_0002,
     CloseServiceCaptureSo(handle);
     free(hwCapture);
 }
-/**
-* @tc.name  Test Outputcapture API via don't binding render service.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Abnormal_0003
-* @tc.desc  Test Outputcapture interface, return -1.
-* @tc.author: liutian
-*/
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Abnormal_0003, TestSize.Level1)
-{
-    int32_t ret = -1;
-    struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureFramepara(hwCapture->captureParam.frameCaptureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwCapture->captureParam);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    CloseServiceCaptureSo(handle);
-    free(hwCapture);
 }
 }

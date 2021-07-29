@@ -48,6 +48,7 @@ const string ADAPTER_NAME3 = "internal";
 const int BUFFER_SIZE = 16384;
 const int BUFFER_SIZE_LITTLE = 0;
 const uint64_t FILESIZE = 2048;
+const int64_t SECTONSEC = 1000000000;
 
 class AudioHdiCaptureTest : public testing::Test {
 public:
@@ -232,20 +233,22 @@ int32_t AudioHdiCaptureTest::RecordAudio(struct PrepareAudioPara& audiopara)
 {
     int32_t ret = -1;
     struct AudioDeviceDescriptor devDesc = {};
-    if (audiopara.adapter == nullptr || audiopara.adapter->CreateCapture == nullptr
-        || audiopara.manager == nullptr) {
+    if (audiopara.adapter == nullptr  || audiopara.manager == nullptr) {
         return HDF_FAILURE;
     }
     ret = InitAttrs(audiopara.attrs);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
+
     ret = InitDevDesc(devDesc, (&audiopara.audioPort)->portId, audiopara.pins);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
+
     ret = audiopara.adapter->CreateCapture(audiopara.adapter, &devDesc, &(audiopara.attrs), &audiopara.capture);
     if (ret < 0 || audiopara.capture == nullptr) {
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+        return HDF_FAILURE;
+    }
+    bool isMute = false;
+    ret = audiopara.capture->volume.SetMute(audiopara.capture, isMute);
+    if (ret < 0) {
+        audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         return HDF_FAILURE;
     }
@@ -253,11 +256,13 @@ int32_t AudioHdiCaptureTest::RecordAudio(struct PrepareAudioPara& audiopara)
     FILE *file = fopen(audiopara.path, "wb+");
     if (file == nullptr) {
         audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         return HDF_FAILURE;
     }
     ret = StartRecord(audiopara.capture, file, audiopara.fileSize);
     if (ret < 0) {
         audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         fclose(file);
         return HDF_FAILURE;
     }
@@ -518,7 +523,7 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0001,
     int32_t ret = -1;
     uint64_t frames = 0;
     int64_t timeExp = 0;
-    struct AudioTimeStamp time = {.tvSec = 0};
+    struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
     struct PrepareAudioPara audiopara = {
         .portType = PORT_IN, .adapterName = ADAPTER_NAME2.c_str(), .self = this, .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
@@ -533,16 +538,18 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0001,
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
-    sleep(3);
-    ret = audiopara.capture->GetCapturePosition(audiopara.capture, &frames, &time);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT(time.tvSec, timeExp);
-    EXPECT_GT(frames, INITIAL_VALUE);
+    sleep(1);
+    if (audiopara.capture != nullptr) {
+        ret = audiopara.capture->GetCapturePosition(audiopara.capture, &frames, &time);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GT((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
+        EXPECT_GT(frames, INITIAL_VALUE);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
@@ -559,7 +566,7 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0002,
     int32_t ret = -1;
     uint64_t frames = 0;
     int64_t timeExp = 0;
-    struct AudioTimeStamp time = {.tvSec = 0};
+    struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
     struct PrepareAudioPara audiopara = {
         .portType = PORT_IN, .adapterName = ADAPTER_NAME2.c_str(), .self = this, .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
@@ -574,24 +581,26 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0002,
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
-    sleep(3);
-    ret = audiopara.capture->control.Pause((AudioHandle)(audiopara.capture));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.capture->GetCapturePosition(audiopara.capture, &frames, &time);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT(time.tvSec, timeExp);
-    EXPECT_GT(frames, INITIAL_VALUE);
-    ret = audiopara.capture->control.Resume((AudioHandle)(audiopara.capture));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.capture->GetCapturePosition(audiopara.capture, &frames, &time);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT(time.tvSec, timeExp);
-    EXPECT_GT(frames, INITIAL_VALUE);
+    sleep(1);
+    if (audiopara.capture != nullptr) {
+        ret = audiopara.capture->control.Pause((AudioHandle)(audiopara.capture));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.capture->GetCapturePosition(audiopara.capture, &frames, &time);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GT((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
+        EXPECT_GT(frames, INITIAL_VALUE);
+        ret = audiopara.capture->control.Resume((AudioHandle)(audiopara.capture));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.capture->GetCapturePosition(audiopara.capture, &frames, &time);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GT((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
+        EXPECT_GT(frames, INITIAL_VALUE);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
@@ -608,7 +617,7 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0003,
     int32_t ret = -1;
     uint64_t frames = 0;
     int64_t timeExp = 0;
-    struct AudioTimeStamp time = {.tvSec = 0};
+    struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
     struct PrepareAudioPara audiopara = {
         .portType = PORT_IN, .adapterName = ADAPTER_NAME2.c_str(), .self = this, .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
@@ -623,16 +632,18 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0003,
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
-    sleep(3);
-    ret = audiopara.capture->GetCapturePosition(audiopara.capture, &frames, &time);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT(time.tvSec, timeExp);
-    EXPECT_GT(frames, INITIAL_VALUE);
+    sleep(1);
+    if (audiopara.capture != nullptr) {
+        ret = audiopara.capture->GetCapturePosition(audiopara.capture, &frames, &time);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GT((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
+        EXPECT_GT(frames, INITIAL_VALUE);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
@@ -652,7 +663,7 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0004,
     struct AudioAdapter *adapter = {};
     struct AudioCapture *capture = nullptr;
     uint64_t frames = 0;
-    struct AudioTimeStamp time = {.tvSec = 0};
+    struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
     int64_t timeExp = 0;
 
     ASSERT_NE(nullptr, GetAudioManager);
@@ -666,7 +677,7 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0004,
     }
     ret = capture->GetCapturePosition(capture, &frames, &time);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(time.tvSec, timeExp);
+    EXPECT_GT((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -721,7 +732,7 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0006,
     struct AudioAdapter *adapter = {};
     struct AudioCapture *capture = nullptr;
     uint64_t *framesNull = nullptr;
-    struct AudioTimeStamp time = {.tvSec = 0};
+    struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
 
     ASSERT_NE(nullptr, GetAudioManager);
     manager = *GetAudioManager();
@@ -809,7 +820,7 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0008,
 
     ret = capture->GetCapturePosition(capture, &frames, &time);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(time.tvSec, timeExp);
+    EXPECT_GT((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
     EXPECT_GT(frames, INITIAL_VALUE);
     ret = capture->GetCapturePosition(capture, &frames, &timeSec);
     EXPECT_EQ(HDF_SUCCESS, ret);
