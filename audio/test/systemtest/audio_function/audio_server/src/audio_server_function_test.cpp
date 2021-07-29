@@ -21,7 +21,7 @@ using namespace testing::ext;
 using namespace HMOS::Audio;
 
 namespace {
-const string AUDIO_FILE = "//bin/14031.wav";
+const string AUDIO_FILE = "//bin/audiorendertest.wav";
 const string AUDIO_CAPTURE_FILE = "//bin/audiocapture.wav";
 const string ADAPTER_NAME = "hdmi";
 const string ADAPTER_NAME2 = "usb";
@@ -130,31 +130,32 @@ int32_t AudioServerFunctionTest::PlayAudioFile(struct PrepareAudioPara& audiopar
     int32_t ret = -1;
     struct AudioDeviceDescriptor devDesc = {};
     char absPath[PATH_MAX] = {0};
+    if (audiopara.adapter == nullptr  || audiopara.manager == nullptr) {
+        return HDF_FAILURE;
+    }
     if (realpath(audiopara.path, absPath) == nullptr) {
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         return HDF_FAILURE;
     }
     FILE *file = fopen(absPath, "rb");
     if (file == nullptr) {
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         return HDF_FAILURE;
     }
 
-    if (audiopara.adapter == nullptr  || audiopara.manager == nullptr) {
-        return HDF_FAILURE;
-    }
     ret = HMOS::Audio::InitAttrs(audiopara.attrs);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
+
     if (WavHeadAnalysis(audiopara.headInfo, file, audiopara.attrs) < 0) {
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+        fclose(file);
         return HDF_FAILURE;
     }
 
     ret = HMOS::Audio::InitDevDesc(devDesc, (&audiopara.audioPort)->portId, audiopara.pins);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
+
     ret = audiopara.adapter->CreateRender(audiopara.adapter, &devDesc, &(audiopara.attrs), &audiopara.render);
     if (ret < 0 || audiopara.render == nullptr) {
+        fclose(file);
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         return HDF_FAILURE;
     }
@@ -163,6 +164,7 @@ int32_t AudioServerFunctionTest::PlayAudioFile(struct PrepareAudioPara& audiopar
         fclose(file);
     } else {
         audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         fclose(file);
         return HDF_FAILURE;
     }
@@ -177,13 +179,9 @@ int32_t AudioServerFunctionTest::RecordAudio(struct PrepareAudioPara& audiopara)
         return HDF_FAILURE;
     }
     ret = InitAttrs(audiopara.attrs);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
+
     ret = InitDevDesc(devDesc, (&audiopara.audioPort)->portId, audiopara.pins);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
+
     ret = audiopara.adapter->CreateCapture(audiopara.adapter, &devDesc, &(audiopara.attrs), &audiopara.capture);
     if (ret < 0 || audiopara.capture == nullptr) {
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
@@ -192,16 +190,21 @@ int32_t AudioServerFunctionTest::RecordAudio(struct PrepareAudioPara& audiopara)
     bool isMute = false;
     ret = audiopara.capture->volume.SetMute(audiopara.capture, isMute);
     if (ret < 0) {
+        audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         return HDF_FAILURE;
     }
 
     FILE *file = fopen(audiopara.path, "wb+");
     if (file == nullptr) {
         audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         return HDF_FAILURE;
     }
     ret = StartRecord(audiopara.capture, file, audiopara.fileSize);
     if (ret < 0) {
+        audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         fclose(file);
         return HDF_FAILURE;
     }
@@ -242,7 +245,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0001, TestSize.
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -276,24 +279,26 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0002, TestSize.
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
     sleep(1);
-    ret = audiopara.render->volume.SetMute(audiopara.render, muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sleep(3);
-    ret = audiopara.render->volume.SetVolume(audiopara.render, volumeMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    for (int i = 0; i < 10; i++) {
-        ret = audiopara.render->volume.SetVolume(audiopara.render, volumeArr[i]);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->volume.SetMute(audiopara.render, muteFalse);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        ret = audiopara.render->volume.GetVolume(audiopara.render, &volumeValue[i]);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        EXPECT_EQ(volumeArr[i], volumeValue[i]);
         sleep(1);
+        ret = audiopara.render->volume.SetVolume(audiopara.render, volumeMax);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        for (int i = 0; i < 10; i++) {
+            ret = audiopara.render->volume.SetVolume(audiopara.render, volumeArr[i]);
+            EXPECT_EQ(HDF_SUCCESS, ret);
+            ret = audiopara.render->volume.GetVolume(audiopara.render, &volumeValue[i]);
+            EXPECT_EQ(HDF_SUCCESS, ret);
+            EXPECT_EQ(volumeArr[i], volumeValue[i]);
+            sleep(1);
+    }
     }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
 
@@ -327,25 +332,27 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0003, TestSize.
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
     sleep(1);
-    ret = audiopara.render->volume.SetVolume(audiopara.render, volume);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sleep(1);
-    ret = audiopara.render->volume.SetMute(audiopara.render, muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->volume.GetMute(audiopara.render, &muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(true, muteTrue);
-    sleep(3);
-    ret = audiopara.render->volume.SetMute(audiopara.render, muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->volume.GetMute(audiopara.render, &muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(false, muteFalse);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->volume.SetVolume(audiopara.render, volume);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        sleep(1);
+        ret = audiopara.render->volume.SetMute(audiopara.render, muteTrue);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->volume.GetMute(audiopara.render, &muteTrue);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(true, muteTrue);
+        sleep(1);
+        ret = audiopara.render->volume.SetMute(audiopara.render, muteFalse);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->volume.GetMute(audiopara.render, &muteFalse);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(false, muteFalse);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -377,16 +384,19 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0004, TestSize.
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
     sleep(1);
-    ret = audiopara.render->control.Pause((AudioHandle)(audiopara.render));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sleep(3);
-    ret = audiopara.render->control.Resume((AudioHandle)(audiopara.render));
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->control.Pause((AudioHandle)(audiopara.render));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        sleep(1);
+        ret = audiopara.render->control.Resume((AudioHandle)(audiopara.render));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
+
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
 
@@ -422,26 +432,28 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0005, TestSize.
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
     sleep(1);
-    ret = audiopara.render->volume.GetGainThreshold(audiopara.render, &gainMin, &gainMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = audiopara.render->volume.SetGain(audiopara.render, gainMax-1);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->volume.GetGain(audiopara.render, &gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(gainMaxValue, gain);
-
-    sleep(1);
-    ret = audiopara.render->volume.SetGain(audiopara.render, gainMin+1);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->volume.GetGain(audiopara.render, &gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(gainMinValue, gain);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->volume.GetGainThreshold(audiopara.render, &gainMin, &gainMax);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    
+        ret = audiopara.render->volume.SetGain(audiopara.render, gainMax-1);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->volume.GetGain(audiopara.render, &gain);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(gainMaxValue, gain);
+    
+        sleep(1);
+        ret = audiopara.render->volume.SetGain(audiopara.render, gainMin+1);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->volume.GetGain(audiopara.render, &gain);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(gainMinValue, gain);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
 
@@ -473,29 +485,31 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0006, TestSize.
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
     sleep(1);
-    ret = audiopara.render->control.Pause((AudioHandle)(audiopara.render));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sleep(3);
-    for (int i = 0; i < 10; i++) {
-        ret = audiopara.render->volume.SetVolume(audiopara.render, volumeArr[i]);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        ret = audiopara.render->volume.GetVolume(audiopara.render, &volumeValue[i]);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        EXPECT_EQ(volumeArr[i], volumeValue[i]);
-        sleep(1);
+    if (audiopara.render != nullptr) {
+     ret = audiopara.render->control.Pause((AudioHandle)(audiopara.render));
+     EXPECT_EQ(HDF_SUCCESS, ret);
+     sleep(1);
+     for (int i = 0; i < 10; i++) {
+         ret = audiopara.render->volume.SetVolume(audiopara.render, volumeArr[i]);
+         EXPECT_EQ(HDF_SUCCESS, ret);
+         ret = audiopara.render->volume.GetVolume(audiopara.render, &volumeValue[i]);
+         EXPECT_EQ(HDF_SUCCESS, ret);
+         EXPECT_EQ(volumeArr[i], volumeValue[i]);
+         sleep(1);
+     }
+     ret = audiopara.render->control.Resume((AudioHandle)(audiopara.render));
+     EXPECT_EQ(HDF_SUCCESS, ret);
+     sleep(1);
+     ret = audiopara.render->volume.SetMute(audiopara.render, muteTrue);
+     EXPECT_EQ(HDF_SUCCESS, ret);
+     ret = audiopara.render->volume.GetMute(audiopara.render, &muteTrue);
+     EXPECT_EQ(HDF_SUCCESS, ret);
+     EXPECT_EQ(true, muteTrue);
     }
-    ret = audiopara.render->control.Resume((AudioHandle)(audiopara.render));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sleep(1);
-    ret = audiopara.render->volume.SetMute(audiopara.render, muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->volume.GetMute(audiopara.render, &muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(true, muteTrue);
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -526,30 +540,32 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0007, TestSize.
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
     sleep(1);
-    ret = audiopara.render->control.Pause((AudioHandle)(audiopara.render));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sleep(1);
-    ret = audiopara.render->volume.SetMute(audiopara.render, muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->volume.GetMute(audiopara.render, &muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(true, muteTrue);
-    ret = audiopara.render->volume.SetMute(audiopara.render, muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->volume.GetMute(audiopara.render, &muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(false, muteFalse);
-    sleep(3);
-    ret = audiopara.render->control.Resume((AudioHandle)(audiopara.render));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sleep(3);
-    ret = audiopara.render->volume.SetVolume(audiopara.render, volumeMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->control.Pause((AudioHandle)(audiopara.render));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        sleep(1);
+        ret = audiopara.render->volume.SetMute(audiopara.render, muteTrue);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->volume.GetMute(audiopara.render, &muteTrue);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(true, muteTrue);
+        ret = audiopara.render->volume.SetMute(audiopara.render, muteFalse);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->volume.GetMute(audiopara.render, &muteFalse);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(false, muteFalse);
+        sleep(1);
+        ret = audiopara.render->control.Resume((AudioHandle)(audiopara.render));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        sleep(1);
+        ret = audiopara.render->volume.SetVolume(audiopara.render, volumeMax);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -582,18 +598,20 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0008, TestSize.
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
     sleep(1);
-    ret = audiopara.render->SetRenderSpeed(audiopara.render, speed);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
-    ret = audiopara.render->GetRenderSpeed(audiopara.render, &speed);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
-    ret = audiopara.render->attr.GetCurrentChannelId(audiopara.render, &channelId);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(channelId, channelIdValue);
+    if (audiopara.render != nullptr) {
+     ret = audiopara.render->SetRenderSpeed(audiopara.render, speed);
+     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+     ret = audiopara.render->GetRenderSpeed(audiopara.render, &speed);
+     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+     ret = audiopara.render->attr.GetCurrentChannelId(audiopara.render, &channelId);
+     EXPECT_EQ(HDF_SUCCESS, ret);
+     EXPECT_EQ(channelId, channelIdValue);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -625,15 +643,17 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0009, TestSize.
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
     sleep(1);
-    ret = audiopara.render->attr.GetFrameSize(audiopara.render, &size);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sizeExpect = FrameSizeExpect(audiopara.attrs);
-    EXPECT_EQ(size, sizeExpect);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->attr.GetFrameSize(audiopara.render, &size);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        sizeExpect = FrameSizeExpect(audiopara.attrs);
+        EXPECT_EQ(size, sizeExpect);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -665,14 +685,16 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0010, TestSize.
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
     sleep(1);
-    ret = audiopara.render->attr.GetFrameCount(audiopara.render, &count);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT(count, zero);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->attr.GetFrameCount(audiopara.render, &count);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GT(count, zero);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -704,16 +726,18 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0011, TestSize.
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
-    sleep(3);
-    ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT(time.tvSec, timeExp);
-    EXPECT_GT(frames, INITIAL_VALUE);
+    sleep(1);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GT(time.tvSec, timeExp);
+        EXPECT_GT(frames, INITIAL_VALUE);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -747,14 +771,16 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0012, TestSize.
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
     sleep(1);
-    ret = audiopara.render->scene.CheckSceneCapability(audiopara.render, &scenes, &supported);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_TRUE(supported);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->scene.CheckSceneCapability(audiopara.render, &scenes, &supported);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_TRUE(supported);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -788,27 +814,29 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0013, TestSize.
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
     sleep(1);
-    audiopara.attrs.type = AUDIO_IN_MEDIA;
-    audiopara.attrs.interleaved = false;
-    audiopara.attrs.format = AUDIO_FORMAT_PCM_16_BIT;
-    audiopara.attrs.sampleRate = 48000;
-    audiopara.attrs.channelCount = 1;
-
-    ret = audiopara.render->attr.SetSampleAttributes(audiopara.render, &(audiopara.attrs));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->attr.GetSampleAttributes(audiopara.render, &attrsValue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_FALSE(attrsValue.interleaved);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
-    EXPECT_EQ(samplerateValue, attrsValue.sampleRate);
-    EXPECT_EQ(channelcountValue, attrsValue.channelCount);
+    if (audiopara.render != nullptr) {
+        audiopara.attrs.type = AUDIO_IN_MEDIA;
+        audiopara.attrs.interleaved = false;
+        audiopara.attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+        audiopara.attrs.sampleRate = 48000;
+        audiopara.attrs.channelCount = 1;
+    
+        ret = audiopara.render->attr.SetSampleAttributes(audiopara.render, &(audiopara.attrs));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->attr.GetSampleAttributes(audiopara.render, &attrsValue);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    
+        EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
+        EXPECT_FALSE(attrsValue.interleaved);
+        EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+        EXPECT_EQ(samplerateValue, attrsValue.sampleRate);
+        EXPECT_EQ(channelcountValue, attrsValue.channelCount);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -843,7 +871,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0001, TestSize
     ret = (intptr_t)result;
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
 }
@@ -871,20 +899,22 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0002, TestSize
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
-    sleep(3);
-    CaptureFrameStatus(0);
     sleep(1);
-    ret = audiopara.capture->control.Pause((AudioHandle)(audiopara.capture));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sleep(3);
-    ret = audiopara.capture->control.Resume((AudioHandle)(audiopara.capture));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    CaptureFrameStatus(1);
+    if (audiopara.capture != nullptr) {
+        CaptureFrameStatus(0);
+        sleep(1);
+        ret = audiopara.capture->control.Pause((AudioHandle)(audiopara.capture));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        sleep(1);
+        ret = audiopara.capture->control.Resume((AudioHandle)(audiopara.capture));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        CaptureFrameStatus(1);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
@@ -915,17 +945,19 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0003, TestSize
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
-    sleep(3);
-    ret = audiopara.capture->volume.SetVolume((AudioHandle)(audiopara.capture), val);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.capture->volume.GetVolume((AudioHandle)(audiopara.capture), &getVal);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_FLOAT_EQ(val, getVal);
+    sleep(1);
+    if (audiopara.capture != nullptr) {
+        ret = audiopara.capture->volume.SetVolume((AudioHandle)(audiopara.capture), val);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.capture->volume.GetVolume((AudioHandle)(audiopara.capture), &getVal);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_FLOAT_EQ(val, getVal);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
@@ -956,24 +988,26 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0004, TestSize
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
-    sleep(3);
-    ret = audiopara.capture->volume.SetMute((AudioHandle)(audiopara.capture), mute);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.capture->volume.GetMute((AudioHandle)(audiopara.capture), &isMute);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_TRUE(isMute);
-    isMute = false;
-    sleep(3);
-    ret = audiopara.capture->volume.SetMute((AudioHandle)(audiopara.capture), isMute);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.capture->volume.GetMute((AudioHandle)(audiopara.capture), &isMute);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_FALSE(isMute);
+    sleep(1);
+    if (audiopara.capture != nullptr) {
+        ret = audiopara.capture->volume.SetMute((AudioHandle)(audiopara.capture), mute);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.capture->volume.GetMute((AudioHandle)(audiopara.capture), &isMute);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_TRUE(isMute);
+        isMute = false;
+        sleep(1);
+        ret = audiopara.capture->volume.SetMute((AudioHandle)(audiopara.capture), isMute);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.capture->volume.GetMute((AudioHandle)(audiopara.capture), &isMute);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_FALSE(isMute);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
@@ -1007,27 +1041,29 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0005, TestSize
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
 
-    sleep(3);
-    ret = para.capture->volume.GetGainThreshold(para.capture, &gainMin, &gainMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = para.capture->volume.SetGain((AudioHandle)(para.capture), gainMax - 1);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    gainValue = gainMax - 1;
-    ret = para.capture->volume.GetGain((AudioHandle)(para.capture), &gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_FLOAT_EQ(gainValue, gain);
-    sleep(3);
-    ret = para.capture->volume.SetGain((AudioHandle)(para.capture), gainMin + 1);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    gainValue = gainMin + 1;
-    ret = para.capture->volume.GetGain((AudioHandle)(para.capture), &gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_FLOAT_EQ(gainValue, gain);
+    sleep(1);
+    if (para.capture != nullptr) {
+        ret = para.capture->volume.GetGainThreshold(para.capture, &gainMin, &gainMax);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = para.capture->volume.SetGain((AudioHandle)(para.capture), gainMax - 1);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        gainValue = gainMax - 1;
+        ret = para.capture->volume.GetGain((AudioHandle)(para.capture), &gain);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_FLOAT_EQ(gainValue, gain);
+        sleep(1);
+        ret = para.capture->volume.SetGain((AudioHandle)(para.capture), gainMin + 1);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        gainValue = gainMin + 1;
+        ret = para.capture->volume.GetGain((AudioHandle)(para.capture), &gain);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_FLOAT_EQ(gainValue, gain);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = para.capture->control.Stop((AudioHandle)(para.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);
     para.adapter->DestroyCapture(para.adapter, para.capture);
@@ -1062,26 +1098,28 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0006, TestSize
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
 
-    sleep(3);
-    CaptureFrameStatus(0);
-    usleep(300000);
-    ret = audiopara.capture->attr.SetSampleAttributes(audiopara.capture, &attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    usleep(300000);
-    CaptureFrameStatus(1);
-    sleep(3);
-    ret = audiopara.capture->attr.GetSampleAttributes(audiopara.capture, &attrsValue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_FALSE(attrsValue.interleaved);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
-    EXPECT_EQ(SAMPLERATEEXOECT, attrsValue.sampleRate);
-    EXPECT_EQ(CHANNELCOUNTEXOECT, attrsValue.channelCount);
+    sleep(1);
+    if (audiopara.capture != nullptr) {
+        CaptureFrameStatus(0);
+        usleep(300000);
+        ret = audiopara.capture->attr.SetSampleAttributes(audiopara.capture, &attrs);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        usleep(300000);
+        CaptureFrameStatus(1);
+        sleep(1);
+        ret = audiopara.capture->attr.GetSampleAttributes(audiopara.capture, &attrsValue);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
+        EXPECT_FALSE(attrsValue.interleaved);
+        EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+        EXPECT_EQ(SAMPLERATEEXOECT, attrsValue.sampleRate);
+        EXPECT_EQ(CHANNELCOUNTEXOECT, attrsValue.channelCount);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
@@ -1112,15 +1150,17 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0007, TestSize
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
-    sleep(3);
-    ret = audiopara.capture->attr.GetCurrentChannelId(audiopara.capture, &channelId);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(channelId, channelIdValue);
+    sleep(1);
+    if (audiopara.capture != nullptr) {
+        ret = audiopara.capture->attr.GetCurrentChannelId(audiopara.capture, &channelId);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(channelId, channelIdValue);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);
 
@@ -1152,16 +1192,18 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0008, TestSize
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
-    sleep(3);
-    ret = audiopara.capture->attr.GetFrameSize(audiopara.capture, &size);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sizeExpect = FrameSizeExpect(audiopara.attrs);
-    EXPECT_EQ(size, sizeExpect);
+    sleep(1);
+    if (audiopara.capture != nullptr) {
+        ret = audiopara.capture->attr.GetFrameSize(audiopara.capture, &size);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        sizeExpect = FrameSizeExpect(audiopara.attrs);
+        EXPECT_EQ(size, sizeExpect);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
@@ -1192,15 +1234,17 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0009, TestSize
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
-    sleep(3);
-    ret = audiopara.capture->attr.GetFrameCount(audiopara.capture, &count);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT(count, zero);
+    sleep(1);
+    if (audiopara.capture != nullptr) {
+        ret = audiopara.capture->attr.GetFrameCount(audiopara.capture, &count);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GT(count, zero);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
@@ -1231,16 +1275,18 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0010, TestSize
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
-    sleep(3);
-    ret = audiopara.capture->volume.GetGainThreshold((AudioHandle)(audiopara.capture), &min, &max);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(min, GAIN_MIN);
-    EXPECT_EQ(max, GAIN_MAX);
+    sleep(1);
+    if (audiopara.capture != nullptr) {
+        ret = audiopara.capture->volume.GetGainThreshold((AudioHandle)(audiopara.capture), &min, &max);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(min, GAIN_MIN);
+        EXPECT_EQ(max, GAIN_MAX);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);
 
@@ -1274,15 +1320,17 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0011, TestSize
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
-    sleep(3);
-    ret = audiopara.capture->scene.CheckSceneCapability(audiopara.capture, &scenes, &supported);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_TRUE(supported);
+    sleep(1);
+    if (audiopara.capture != nullptr) {
+        ret = audiopara.capture->scene.CheckSceneCapability(audiopara.capture, &scenes, &supported);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_TRUE(supported);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
@@ -1314,21 +1362,23 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Smartpa_Test_0001, TestSize
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
     sleep(1);
-    ret = audiopara.render->GetLatency(audiopara.render, &latencyTime);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_LT(expectedValue, latencyTime);
-    ret = audiopara.render->control.Pause((AudioHandle)(audiopara.render));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->control.Flush((AudioHandle)audiopara.render);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
-    sleep(3);
-    ret = audiopara.render->control.Resume((AudioHandle)(audiopara.render));
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->GetLatency(audiopara.render, &latencyTime);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_LT(expectedValue, latencyTime);
+        ret = audiopara.render->control.Pause((AudioHandle)(audiopara.render));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->control.Flush((AudioHandle)audiopara.render);
+        EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+        sleep(3);
+        ret = audiopara.render->control.Resume((AudioHandle)(audiopara.render));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Flush((AudioHandle)audiopara.render);
@@ -1363,20 +1413,22 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Smartpa_Test_0002, TestSize
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
     sleep(1);
-    ret = audiopara.render->volume.SetVolume(audiopara.render, volumeMax);
-    for (int i = 0; i < 10; i++) {
-        ret = audiopara.render->volume.SetVolume(audiopara.render, volumeArr[i]);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        ret = audiopara.render->volume.GetVolume(audiopara.render, &volumeValue[i]);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        EXPECT_EQ(volumeArr[i], volumeValue[i]);
-        sleep(3);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->volume.SetVolume(audiopara.render, volumeMax);
+        for (int i = 0; i < 10; i++) {
+            ret = audiopara.render->volume.SetVolume(audiopara.render, volumeArr[i]);
+            EXPECT_EQ(HDF_SUCCESS, ret);
+            ret = audiopara.render->volume.GetVolume(audiopara.render, &volumeValue[i]);
+            EXPECT_EQ(HDF_SUCCESS, ret);
+            EXPECT_EQ(volumeArr[i], volumeValue[i]);
+            sleep(1);
+        }
     }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -1406,24 +1458,26 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Smartpa_Test_0003, TestSize
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
     sleep(1);
-    bool muteTrue = true;
-    bool muteFalse = false;
-    ret = audiopara.render->volume.SetMute(audiopara.render, muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->volume.GetMute(audiopara.render, &muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(true, muteTrue);
-    sleep(3);
-    ret = audiopara.render->volume.SetMute(audiopara.render, muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->volume.GetMute(audiopara.render, &muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(false, muteFalse);
+    if (audiopara.render != nullptr) {
+        bool muteTrue = true;
+        bool muteFalse = false;
+        ret = audiopara.render->volume.SetMute(audiopara.render, muteTrue);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->volume.GetMute(audiopara.render, &muteTrue);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(true, muteTrue);
+        sleep(1);
+        ret = audiopara.render->volume.SetMute(audiopara.render, muteFalse);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->volume.GetMute(audiopara.render, &muteFalse);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(false, muteFalse);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -1455,16 +1509,18 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Smartpa_Test_0004, TestSize
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
-    sleep(3);
-    ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT(time.tvSec, timeExp);
-    EXPECT_GT(frames, INITIAL_VALUE);
+    sleep(1);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GT(time.tvSec, timeExp);
+        EXPECT_GT(frames, INITIAL_VALUE);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -1498,19 +1554,21 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Smartpa_Test_0005, TestSize
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
     sleep(1);
-    ret = audiopara.render->attr.GetFrameSize(audiopara.render, &size);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sizeExpect = FrameSizeExpect(audiopara.attrs);
-    EXPECT_EQ(size, sizeExpect);
-
-    ret = audiopara.render->attr.GetFrameCount(audiopara.render, &count);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT(count, zero);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->attr.GetFrameSize(audiopara.render, &size);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        sizeExpect = FrameSizeExpect(audiopara.attrs);
+        EXPECT_EQ(size, sizeExpect);
+    
+        ret = audiopara.render->attr.GetFrameCount(audiopara.render, &count);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GT(count, zero);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -1543,27 +1601,29 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Smartpa_Test_0006, TestSize
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
     sleep(1);
-    audiopara.attrs.type = AUDIO_IN_MEDIA;
-    audiopara.attrs.format = AUDIO_FORMAT_PCM_16_BIT;
-    audiopara.attrs.sampleRate = 48000;
-    audiopara.attrs.channelCount = 1;
-    audiopara.attrs.stopThreshold = INT_32_MAX;
-
-    ret = audiopara.render->attr.SetSampleAttributes(audiopara.render, &(audiopara.attrs));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->attr.GetSampleAttributes(audiopara.render, &attrsValue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
-    EXPECT_EQ(samplerateValue, attrsValue.sampleRate);
-    EXPECT_EQ(channelcountValue, attrsValue.channelCount);
-    EXPECT_EQ(INT_32_MAX, attrsValue.stopThreshold);
+    if (audiopara.render != nullptr) {
+        audiopara.attrs.type = AUDIO_IN_MEDIA;
+        audiopara.attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+        audiopara.attrs.sampleRate = 48000;
+        audiopara.attrs.channelCount = 1;
+        audiopara.attrs.stopThreshold = INT_32_MAX;
+    
+        ret = audiopara.render->attr.SetSampleAttributes(audiopara.render, &(audiopara.attrs));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->attr.GetSampleAttributes(audiopara.render, &attrsValue);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    
+        EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
+        EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+        EXPECT_EQ(samplerateValue, attrsValue.sampleRate);
+        EXPECT_EQ(channelcountValue, attrsValue.channelCount);
+        EXPECT_EQ(INT_32_MAX, attrsValue.stopThreshold);
+    }
 
     void *result = nullptr;
     pthread_join(tids, &result);
     ret = (intptr_t)result;
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->control.Stop((AudioHandle)(audiopara.render));
     EXPECT_EQ(HDF_SUCCESS, ret);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);

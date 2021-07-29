@@ -108,11 +108,14 @@ void AudioLibRenderTest::TearDown(void)
     }
     if (BindServiceRenderSo != nullptr) {
         BindServiceRenderSo = nullptr;
-    } else if (CloseServiceRenderSo != nullptr) {
+    } 
+    if (CloseServiceRenderSo != nullptr) {
         CloseServiceRenderSo = nullptr;
-    } else if (InterfaceLibOutputRender != nullptr) {
+    } 
+    if (InterfaceLibOutputRender != nullptr) {
         InterfaceLibOutputRender = nullptr;
-    } else {
+    } 
+    if (InterfaceLibCtlRender != nullptr) {
         InterfaceLibCtlRender = nullptr;
     }
 }
@@ -170,6 +173,9 @@ uint32_t AudioLibRenderTest::FrameLibStart(FILE *file, struct AudioSampleAttribu
     int numRead = 0;
     uint64_t *replyBytes = nullptr;
     remainingDataSize = wavHeadInfo.dataSize;
+    if (file == nullptr || hwRender == nullptr) {
+        return HDF_FAILURE;
+    }
     bufferSize = PcmFramesToBytes(attrs);
     char *frame = nullptr;
     frame = (char *)calloc(1, bufferSize);
@@ -1206,30 +1212,7 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Abnormal_0002, Test
     EXPECT_EQ(HDF_FAILURE, ret);
     CloseServiceRenderSo(handle);
 }
-/**
-* @tc.name  test InterfaceLibCtlRender API via don't binding control service.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Abnormal_0003
-* @tc.desc  test Audio lib Interface CtlRender, but there isn't binding control service,so Interface return -1.
-* @tc.author: zhouyongxiao
-*/
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Abnormal_0003, TestSize.Level1)
-{
-    int32_t ret = -1;
-    struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_RENDER.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_READ, &hwRender->renderParam);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    CloseServiceRenderSo(handle);
-    free(hwRender);
-}
+
 /**
 * @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTL_HW_PARAMS.
 * @tc.number  SUB_Audio_InterfaceLibOutputRender_HwParams_0001
@@ -1342,18 +1325,21 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001,
     if (realpath(AUDIO_FILE_PATH.c_str(), absPath) == nullptr) {
         cout << "path is not exist!" << endl;
         free(hwRender);
+        hwRender = nullptr;
         CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, absPath);
+        ASSERT_NE(nullptr, realpath(AUDIO_FILE_PATH.c_str(), absPath));
     }
     FILE *file = fopen(absPath, "rb");
     if (file == nullptr) {
         cout << "failed to open!" << endl;
         free(hwRender);
+        hwRender = nullptr;
         CloseServiceRenderSo(handle);
         ASSERT_NE(nullptr, file);
     }
     if (WavHeadAnalysis(wavHeadInfo, file, attrs) < 0) {
         free(hwRender);
+        hwRender = nullptr;
         fclose(file);
         CloseServiceRenderSo(handle);
         ASSERT_EQ(HDF_SUCCESS, ret);
@@ -1366,8 +1352,10 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001,
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
     fclose(file);
 }
+
 /**
 * @tc.name  test InterfaceLibCtlRender and InterfaceLibOutputRender API via Serial
     transmission of data flow and control flow.
@@ -1407,12 +1395,20 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_0001, Test
     expectedValue = hwRender->renderParam.renderMode.ctlParam.mute;
     EXPECT_EQ(expectedValue, muteValue);
     ret = LibStartAndStream(AUDIO_FILE_PATH, attrs, handler, hwRender, wavHeadInfo);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    if (ret < 0) {
+        CloseServiceRenderSo(handler);
+        CloseServiceRenderSo(handlec);
+        free(hwRender);
+        hwRender = nullptr;
+        ASSERT_EQ(HDF_SUCCESS, ret);
+    }
+
     ret = InterfaceLibOutputRender(handler, AUDIO_DRV_PCM_IOCTRL_STOP, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handler);
     CloseServiceRenderSo(handlec);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibOutputRender API via pause.
@@ -1502,29 +1498,5 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Abnormal_0002, T
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_WRITE, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
     CloseServiceRenderSo(handle);
-}
-/**
-* @tc.name  test InterfaceLibOutputRender via don't binding render service.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Abnormal_0003
-* @tc.desc  test Audio lib Interface OutputRender, but there isn't binding render service,so Interface return -1.
-* @tc.author: zhouyongxiao
-*/
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Abnormal_0003, TestSize.Level1)
-{
-    int32_t ret = -1;
-    struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitRenderFramepara(hwRender->renderParam.frameRenderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    CloseServiceRenderSo(handle);
-    free(hwRender);
 }
 }
