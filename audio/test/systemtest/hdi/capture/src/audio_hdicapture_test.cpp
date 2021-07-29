@@ -677,7 +677,7 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0004,
     }
     ret = capture->GetCapturePosition(capture, &frames, &time);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
+    EXPECT_EQ((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
