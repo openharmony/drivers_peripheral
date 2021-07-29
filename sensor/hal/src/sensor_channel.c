@@ -78,7 +78,7 @@ static int OnSensorEventReceived(struct HdfDevEventlistener *listener,
 
     (void)OsalMutexLock(&manager->eventMutex);
     if (!HdfSbufReadBuffer(data, (const void **)&event, &len) || event == NULL) {
-        HDF_LOGE("%s: Read sensor event fail!", __func__);
+        HDF_LOGE("%{public}s: Read sensor event fail!", __func__);
         (void)OsalMutexUnlock(&manager->eventMutex);
         return SENSOR_FAILURE;
     }
@@ -86,7 +86,7 @@ static int OnSensorEventReceived(struct HdfDevEventlistener *listener,
     uint8_t *buf = NULL;
     if (!HdfSbufReadBuffer(data, (const void **)&buf, &len) || buf == NULL) {
         (void)OsalMutexUnlock(&manager->eventMutex);
-        HDF_LOGE("%s: Read sensor data fail!", __func__);
+        HDF_LOGE("%{public}s: Read sensor data fail!", __func__);
         return SENSOR_FAILURE;
     } else {
         event->data = buf;
@@ -127,7 +127,7 @@ static int32_t AddSensorDevServiceGroup(void)
             (HdfIoServiceGroupAddService(manager->serviceGroup, pos->ioService) != SENSOR_SUCCESS)) {
             HdfIoServiceGroupRecycle(manager->serviceGroup);
             (void)OsalMutexUnlock(&manager->mutex);
-            HDF_LOGE("%s: Add service to group failed", __func__);
+            HDF_LOGE("%{public}s: Add service to group failed", __func__);
             return SENSOR_INVALID_SERVICE;
         }
     }
@@ -135,7 +135,7 @@ static int32_t AddSensorDevServiceGroup(void)
 
     int32_t ret = HdfIoServiceGroupRegisterListener(manager->serviceGroup, &g_listener);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%s: Register listener to group failed", __func__);
+        HDF_LOGE(%{public}s": Register listener to group failed", __func__);
         HdfIoServiceGroupRecycle(manager->serviceGroup);
         return ret;
     }
@@ -163,7 +163,7 @@ int32_t Unregister(void)
 
     int32_t ret = HdfIoServiceGroupUnregisterListener(manager->serviceGroup, &g_listener);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%s: Sensor unregister listener failed", __func__);
+        HDF_LOGE("%{public}s: Sensor unregister listener failed", __func__);
         return ret;
     }
 
