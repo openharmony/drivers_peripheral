@@ -361,7 +361,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0003, TestSize.
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
 }
 /**
-* @tc.name  Pause ��Resume and Stop audio file
+* @tc.name  Pause Resume and Stop audio file
 * @tc.number  SUB_Audio_Function_Render_Test_0004
 * @tc.desc  test Render function,call pause,resume and stop interface when the audio file is playing.
 * @tc.author: wangkang
