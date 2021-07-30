@@ -270,23 +270,11 @@ static bool HdfWlanAddRemoteObj(struct HdfDeviceIoClient *client, struct HdfRemo
 
 static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName)
 {
-    unsigned char chipId;
-    int resetStatus;
     static int32_t wifiStatus = -1;
-    struct HdfSBuf *dataSbuf = (struct HdfSBuf *)data;
+    int *resetStatus = NULL;
+    resetStatus = (int *)data;
 
-    if (dataSbuf == NULL) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadInt32(dataSbuf, &resetStatus)) {
-        HDF_LOGE("%s: read reset status is failed!", __func__);
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadUint8(dataSbuf, &chipId)) {
-        HDF_LOGE("%s: read chipid is failed!", __func__);
-        return HDF_FAILURE;
-    }
-    wifiStatus = resetStatus;
+    wifiStatus = *resetStatus;
     struct HdfWlanRemoteNode *pos = NULL;
     struct DListHead *head = &HdfStubDriver()->remoteListHead;
     DLIST_FOR_EACH_ENTRY(pos, head, struct HdfWlanRemoteNode, node) {
