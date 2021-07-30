@@ -30,20 +30,20 @@ using namespace testing::ext;
 using namespace HMOS::Audio;
 
 namespace {
-const int CONTROL_DISP_METHOD_CMD_ILLEGAL = 5;
-const int STREAM_DISP_METHOD_CMD_ILLEGAL = 20;
-const int CHANEL_MODE_ILLEGAL = 9;
-const int MAX_GAIN_VALUE = 15;
-const int MIN_GAIN_VALUE = 0;
-const int ERROR_GAIN_VALUE = MAX_GAIN_VALUE + 1;
-const string AUDIO_FILE_PATH = "//bin/audiorendertest.wav";
+    const int CONTROL_DISP_METHOD_CMD_ILLEGAL = 5;
+    const int STREAM_DISP_METHOD_CMD_ILLEGAL = 20;
+    const int CHANEL_MODE_ILLEGAL = 9;
+    const int MAX_GAIN_VALUE = 15;
+    const int MIN_GAIN_VALUE = 0;
+    const int ERROR_GAIN_VALUE = MAX_GAIN_VALUE + 1;
+    const string AUDIO_FILE_PATH = "//bin/audiorendertest.wav";
 
-class AudioAdmInterfaceTest : public testing::Test {
-public:
-    static void SetUpTestCase(void);
-    static void TearDownTestCase(void);
-    void SetUp();
-    void TearDown();
+    class AudioAdmInterfaceTest : public testing::Test {
+    public:
+        static void SetUpTestCase(void);
+        static void TearDownTestCase(void);
+        void SetUp();
+        void TearDown();
 };
 
 void AudioAdmInterfaceTest::SetUpTestCase(void) {};
@@ -1938,7 +1938,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRead_0001, TestSize.Level1)
     if (ret < 0) {
         HdfIoServiceRecycle(service);
         ASSERT_EQ(HDF_SUCCESS, ret);	 
-	}
+    }
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_HW_PARAMS, writeBuf, writeReply);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
