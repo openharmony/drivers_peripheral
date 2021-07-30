@@ -16,7 +16,7 @@ import("//build/ohos.gni")
 print("target_device: , ${device_type}")
 group("camera_hal") {
   if (is_standard_system) {
-    if (device_type == "Hi3516DV300") {
+    if ((device_type == "Hi3516DV300") || (device_type == "DAYU")) {
       deps = [
         "../interfaces/include/client:libcamera_client",
         "adapter/chipset/hispark_taurus:hispark_taurus_build",
