@@ -1407,7 +1407,7 @@ int32_t WifiCmdCancelRemainOnChannel(const char* ifName)
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
-    isSerializeFailed |= !HdfSbufWriteString(data, ifName);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
     int32_t ret;
     if (isSerializeFailed) {
         HILOG_ERROR(LOG_DOMAIN, "Serialize failed.");
