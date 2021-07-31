@@ -61,9 +61,6 @@ Note:If the text contains special characters, please escape them according to th
             <policy name="projectPolicy" desc="">
                 <policyitem type="license" name="GPL" path=".*" desc="linux kernel adapter codes"/>
                 <policyitem type="license" name="BSD" path=".*" desc="huawei codes"/>
-                <!--policyitem type="compatibility" name="GPL" path=".*" desc="linux kernel adapter codes"/-->
-                <!--policyitem type="compatibility" name="GPL-2.0+" path=".*" desc="linux kernel adapter codes"/-->
-                <policyitem type="copyright" name="HiSilicon (Shanghai) Technologies CO.," path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="hisi codes"/>
             </policy>
         </policylist>
         <filefilterlist>
@@ -92,13 +89,18 @@ Note:If the text contains special characters, please escape them according to th
                 <filteritem type="filename" name="*.gni"/>
             </filefilter>
             <filefilter name="readmeFileNamePolicyFilter" desc="Filters for README file policies" >
-                <filteritem type="filepath" name="dir name underproject/.*" desc="Describe the reason for filtering scan results"/>
+                <filteritem type="filepath" name="README.md" desc="Describe the reason for filtering scan results"/>
             </filefilter>
             <filefilter name="readmeOpenSourcefileNamePolicyFilter" desc="Filters for README.OpenSource file policies" >
                 <filteritem type="filepath" name="dir name underproject/.*" desc="Describe the reason for filtering scan results"/>
             </filefilter>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies" >
-                <filteritem type="filepath" name="dir name underproject/.*" desc="Describe the reason for filtering scan results"/>
+                <filteritem type="filepath" name="audio/figures/.*.png" desc="audio architecture diagram"/>
+                <filteritem type="filepath" name="display/figures/.*.png" desc="display architecture diagram"/>
+                <filteritem type="filepath" name="input/figures/.*.png" desc="input architecture diagram"/>
+                <filteritem type="filepath" name="sensor/figures/.*.png" desc="sensor architecture diagram"/>
+                <filteritem type="filepath" name="wlan/figures/.*.png" desc="wlan architecture diagram"/>
+                <filteritem type="filepath" name="display/test/resource/.*.bmp" desc="display test image"/>
             </filefilter>
         </filefilterlist>
     </oatconfig>
