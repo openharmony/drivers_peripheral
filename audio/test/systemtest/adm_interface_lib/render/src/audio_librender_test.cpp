@@ -70,6 +70,7 @@ public:
         struct DevHandle *handle, struct AudioHwRender *hwRender, struct AudioHeadInfo wavHeadInfo) const;
     uint32_t InitHwRender(struct AudioHwRender *hwRender, struct AudioSampleAttributes attrs,
         const std::string adapterNameCase) const;
+    int32_t LibHwOutputRender(struct AudioHwRender *hwRender, struct DevHandle *handlerender) const;
 };
 
 void AudioLibRenderTest::SetUpTestCase(void)
@@ -152,6 +153,19 @@ uint32_t AudioLibRenderTest::FormatToBits(enum AudioFormat format) const
 uint32_t AudioLibRenderTest::PcmBytesToFrames(const struct AudioFrameRenderMode &frameRenderMode, uint64_t bytes) const
 {
     return bytes / (frameRenderMode.attrs.channelCount * (FormatToBits(frameRenderMode.attrs.format) >> 3));
+}
+
+int32_t AudioLibRenderTest::LibHwOutputRender(struct AudioHwRender *hwRender, struct DevHandle *handlerender) const
+{
+    if (hwRender == nullptr || handlerender == nullptr) {
+        return HDF_FAILURE;
+    }
+    if (InterfaceLibOutputRender(handlerender, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam) ||
+        InterfaceLibOutputRender(handlerender, AUDIO_DRV_PCM_IOCTL_PREPARE, &hwRender->renderParam) ||
+        InterfaceLibOutputRender(handlerender, AUDIO_DRV_PCM_IOCTRL_START, &hwRender->renderParam)) {
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
 }
 
 /**
@@ -1315,15 +1329,10 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001,
     }
     ret = InitHwRender(hwRender, attrs, ADAPTER_NAME_USB);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_PREPARE, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_START, &hwRender->renderParam);
+    ret = LibHwOutputRender(hwRender, handle);
     EXPECT_EQ(HDF_SUCCESS, ret);
     char absPath[PATH_MAX] = {0};
     if (realpath(AUDIO_FILE_PATH.c_str(), absPath) == nullptr) {
-        cout << "path is not exist!" << endl;
         free(hwRender);
         hwRender = nullptr;
         CloseServiceRenderSo(handle);
@@ -1331,13 +1340,13 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001,
     }
     FILE *file = fopen(absPath, "rb");
     if (file == nullptr) {
-        cout << "failed to open!" << endl;
         free(hwRender);
         hwRender = nullptr;
         CloseServiceRenderSo(handle);
         ASSERT_NE(nullptr, file);
     }
-    if (WavHeadAnalysis(wavHeadInfo, file, attrs) < 0) {
+    ret = WavHeadAnalysis(wavHeadInfo, file, attrs);
+    if (ret < 0) {
         free(hwRender);
         hwRender = nullptr;
         fclose(file);
