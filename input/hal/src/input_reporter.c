@@ -231,6 +231,7 @@ static int32_t RegisterHotPlugCallback(InputHostCb *callback)
     if (manager->hostDev.service == NULL) {
         manager->hostDev.service = HdfIoServiceBind(DEV_MANAGER_SERVICE_NAME);
         if (manager->hostDev.service == NULL) {
+            pthread_mutex_unlock(&manager->mutex);
             return INPUT_FAILURE;
         }
     }
