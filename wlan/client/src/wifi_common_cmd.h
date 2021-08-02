@@ -130,7 +130,7 @@ typedef enum {
 
 struct CallbackEvent {
     uint32_t eventType;   //eventmap
-    const char *ifName;
+    char ifName[IFNAMSIZ + 1];
     OnReceiveFunc onRecFunc;
 };
 
