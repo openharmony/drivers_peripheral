@@ -75,7 +75,7 @@ void HdfWlanPerformanceTest::SetUp()
     int ret;
 
     ret = g_wifi->start(nullptr);
-    ASSERT_NE(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = g_wifi->start(g_wifi);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
@@ -85,7 +85,7 @@ void HdfWlanPerformanceTest::TearDown()
     int ret;
 
     ret = g_wifi->stop(nullptr);
-    ASSERT_NE(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = g_wifi->stop(g_wifi);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
