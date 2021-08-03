@@ -134,7 +134,7 @@ typedef struct {
 } WifiDisconnect;
 
 enum WifiClientType {
-    WIFI_KERNEL_TO_WPA_CLIENT = 8447,  // 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<13
+    WIFI_KERNEL_TO_WPA_CLIENT = 11519,  // 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<13
     WIFI_KERNEL_TO_HAL_CLIENT = 32768, // 1<<15
     WIFI_CLIENT_BUTT
 };
@@ -367,6 +367,31 @@ typedef struct {
     size_t dataLen;
 } WifiActionData;
 
+typedef struct {
+    uint32_t freq;
+    uint32_t duration;
+} WifiOnChannel;
+
+
+typedef struct {
+    uint8_t type;
+} WifiIfAdd;
+
+typedef struct {
+    uint8_t ifname[IFNAMSIZ];
+} WifiIfRemove;
+
+typedef struct {
+    uint32_t ieLen;
+    uint8_t appIeType;
+    uint8_t rsv[3];
+    uint8_t *ie;
+} WifiAppIe;
+
+typedef struct {
+    uint64_t drvFlags;
+} WifiGetDrvFlags;
+
 int32_t WifiEapolPacketSend(const char *ifName, const uint8_t *srcAddr, const uint8_t *dstAddr, uint8_t *buf,
     uint32_t length);
 int32_t WifiEapolPacketReceive(const char *ifName, WifiRxEapol *rxEapol);
@@ -388,7 +413,13 @@ int32_t WifiCmdSetNetdev(const char *ifName, WifiSetNewDev *info);
 int32_t WifiCmdStaRemove(const char *ifName, const uint8_t *addr, uint32_t addrLen);
 int32_t WifiCmdSendAction(const char *ifName, WifiActionData *actionData);
 int32_t WifiCmdSetClient(uint32_t clientNum);
-
+int32_t WifiCmdProbeReqReport(const char* ifName, const int32_t *report);
+int32_t WifiCmdRemainOnChannel(const char* ifName, const WifiOnChannel *onChannel);
+int32_t WifiCmdCancelRemainOnChannel(const char* ifName);
+int32_t WifiCmdAddIf(const char *ifname, const WifiIfAdd *ifAdd);
+int32_t WifiCmdRemoveIf(const char *ifname, const WifiIfRemove *ifRemove);
+int32_t WifiCmdSetApWpsP2pIe(const char *ifname, const WifiAppIe *appIe);
+int32_t WifiCmdGetDrvFlags(const char *ifname, WifiGetDrvFlags *params);
 #ifdef __cplusplus
 #if __cplusplus
 }
