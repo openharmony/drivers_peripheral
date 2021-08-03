@@ -1346,6 +1346,190 @@ int32_t WifiCmdSetClient(uint32_t clientNum)
     return ret;
 }
 
+int32_t WifiCmdProbeReqReport(const char* ifName, const int32_t *report)
+{
+    if (ifName == NULL || report == NULL) {
+        return RET_CODE_FAILURE;
+    }
+    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
+    if (data == NULL) {
+        return RET_CODE_FAILURE;
+    }
+    bool isSerializeFailed = false;
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, *report);
+    int32_t ret;
+    if (isSerializeFailed) {
+        HILOG_ERROR(LOG_DOMAIN, "Serialize failed.");
+        ret = RET_CODE_FAILURE;
+    } else {
+        ret = SendCmdSync(WIFI_WPA_CMD_PROBE_REQ_REPORT, data, NULL);
+        HdfSBufRecycle(data);
+        return ret;
+    }
+    HdfSBufRecycle(data);
+    return ret;
+}
+
+int32_t WifiCmdRemainOnChannel(const char* ifName, const WifiOnChannel *onChannel)
+{
+    if (ifName == NULL || onChannel == NULL) {
+        return RET_CODE_FAILURE;
+    }
+    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
+    if (data == NULL) {
+        return RET_CODE_FAILURE;
+    }
+    bool isSerializeFailed = false;
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint32(data, onChannel->freq);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint32(data, onChannel->duration);
+    int32_t ret;
+    if (isSerializeFailed) {
+        HILOG_ERROR(LOG_DOMAIN, "Serialize failed.");
+        ret = RET_CODE_FAILURE;
+    } else {
+        ret = SendCmdSync(WIFI_WPA_CMD_REMAIN_ON_CHANNEL, data, NULL);
+        HdfSBufRecycle(data);
+        return ret;
+    }
+    HdfSBufRecycle(data);
+    return ret;
+}
+
+int32_t WifiCmdCancelRemainOnChannel(const char* ifName)
+{
+    if (ifName == NULL) {
+        return RET_CODE_FAILURE;
+    }
+    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
+    if (data == NULL) {
+        return RET_CODE_FAILURE;
+    }
+    bool isSerializeFailed = false;
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
+    int32_t ret;
+    if (isSerializeFailed) {
+        HILOG_ERROR(LOG_DOMAIN, "Serialize failed.");
+        ret = RET_CODE_FAILURE;
+    } else {
+        ret = SendCmdSync(WIFI_WPA_CMD_CANCEL_REMAIN_ON_CHANNEL, data, NULL);
+        HdfSBufRecycle(data);
+        return ret;
+    }
+    HdfSBufRecycle(data);
+    return ret;
+}
+
+int32_t WifiCmdAddIf(const char *ifname, const WifiIfAdd *ifAdd)
+{
+    if (ifname == NULL || ifAdd == NULL) {
+        return RET_CODE_FAILURE;
+    }
+    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
+    if (data == NULL) {
+        return RET_CODE_FAILURE;
+    }
+    bool isSerializeFailed = false;
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifname);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint8(data, ifAdd->type);
+    int32_t ret;
+    if (isSerializeFailed) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        ret = RET_CODE_FAILURE;
+    } else {
+        ret = SendCmdSync(WIFI_WPA_CMD_ADD_IF, data, NULL);
+    }
+    HdfSBufRecycle(data);
+    return ret;
+}
+
+int32_t WifiCmdRemoveIf(const char *ifname, const WifiIfRemove *ifRemove)
+{
+     if (ifname == NULL || ifRemove == NULL) {
+        return RET_CODE_FAILURE;
+    }
+    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
+    if (data == NULL) {
+        return RET_CODE_FAILURE;
+    }
+    bool isSerializeFailed = false;
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifname);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, ifRemove, sizeof(WifiIfRemove));
+    int32_t ret;
+    if (isSerializeFailed) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        ret = RET_CODE_FAILURE;
+    } else {
+        ret = SendCmdSync(WIFI_WPA_CMD_REMOVE_IF, data, NULL);
+    }
+    HdfSBufRecycle(data);
+    return ret;
+}
+
+int32_t WifiCmdSetApWpsP2pIe(const char *ifname, const WifiAppIe *appIe)
+{
+    if (ifname == NULL || appIe == NULL) {
+        return RET_CODE_FAILURE;
+    }
+    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
+    if (data == NULL) {
+        return RET_CODE_FAILURE;
+    }
+    bool isSerializeFailed = false;
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifname);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint32(data, appIe->ieLen);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint8(data, appIe->appIeType);
+    if (appIe->ie == NULL) {
+        isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, appIe->ie, 0);
+    } else {
+        isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, appIe->ie, appIe->ieLen);
+    }
+    int32_t ret;
+    if (isSerializeFailed) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        ret = RET_CODE_FAILURE;
+    } else {
+        ret = SendCmdSync(WIFI_WPA_CMD_SET_AP_WPS_P2P_IE, data, NULL);
+    }
+    HdfSBufRecycle(data);
+    return ret;
+}
+
+int32_t WifiCmdGetDrvFlags(const char *ifname, WifiGetDrvFlags *params)
+{
+    if (ifname == NULL || params == NULL) {
+        return RET_CODE_FAILURE;
+    }
+    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
+    struct HdfSBuf *reply = HdfSBufObtainDefaultSize();
+    if (ifname == NULL || reply == NULL) {
+        return RET_CODE_FAILURE;
+    }
+    bool isSerializeFailed = false;
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifname);
+    int32_t ret;
+    if (isSerializeFailed) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        ret = RET_CODE_FAILURE;
+    } else {
+        ret = SendCmdSync(WIFI_WPA_CMD_GET_DRIVER_FLAGS, data, reply);
+    }
+
+    if (ret) {
+        ret = RET_CODE_FAILURE;
+        goto RELEASE_DATA;
+    }
+    if (!HdfSbufReadUint64(reply, &(params->drvFlags))) {
+        ret = RET_CODE_FAILURE;
+        goto RELEASE_DATA;
+    }
+RELEASE_DATA:
+    HdfSBufRecycle(reply);
+    HdfSBufRecycle(data);
+    return ret;
+}
+
 #ifdef __cplusplus
 #if __cplusplus
 }

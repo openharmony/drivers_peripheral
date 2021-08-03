@@ -18,11 +18,16 @@
 #include <stdlib.h>
 #include "wifi_common_cmd.h"
 #include "hilog/log.h"
+#include "securec.h"
 
 #ifdef __cplusplus
 #if __cplusplus
 extern "C" {
 #endif
+#endif
+
+#ifndef EOK
+#define EOK 0
 #endif
 
 #define MAX_CALL_BACK_COUNT 10
@@ -64,7 +69,9 @@ int32_t RegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const
         return RET_CODE_FAILURE;
     }
     callbackEvent->eventType = eventType;
-    callbackEvent->ifName = ifName;
+    if (strcpy_s(callbackEvent->ifName, IFNAMSIZ, ifName) != EOK) {
+        return RET_CODE_SUCCESS;
+    }
     callbackEvent->onRecFunc = onRecFunc;
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_callbackEventMap[i] == NULL) {
@@ -88,7 +95,6 @@ void UnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const 
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_callbackEventMap[i] != NULL && g_callbackEventMap[i]->eventType == eventType &&
             (strcmp(g_callbackEventMap[i]->ifName, ifName) == 0) && g_callbackEventMap[i]->onRecFunc == onRecFunc) {
-            g_callbackEventMap[i]->ifName = NULL;
             g_callbackEventMap[i]->onRecFunc = NULL;
             free(g_callbackEventMap[i]);
             g_callbackEventMap[i] = NULL;
