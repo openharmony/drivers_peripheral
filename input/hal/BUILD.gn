@@ -105,7 +105,6 @@ if (defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
-    module_install_dir = "lib"
     install_images = [ "system", "updater" ]
     part_name = "multimodalinput_base"
   }
