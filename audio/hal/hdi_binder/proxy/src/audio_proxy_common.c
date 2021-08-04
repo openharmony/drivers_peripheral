@@ -49,6 +49,7 @@ struct AudioManager *HdfProxyIoBindServiceName(const char *serviceName)
     }
     struct HDIServiceManager *serviceMgr = HDIServiceManagerGet();
     if (serviceMgr == NULL) {
+        LOG_FUN_ERR("serviceMgr is null");
         return NULL;
     }
     struct HdfRemoteService *remote = serviceMgr->GetService(serviceMgr, serviceName);
