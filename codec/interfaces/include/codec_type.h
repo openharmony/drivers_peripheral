@@ -180,7 +180,7 @@ typedef enum {
     YVU_SEMIPLANAR_420 = 0,  /**< YUV 420 SP */
     YVU_SEMIPLANAR_420_TILE, /**< YUV SP 420 TILE */
     PIX_FORMAT_INVALID       /**< Invalid format */
-} PixelFormat;
+} CodecPixelFormat;
 
 /**
  * @brief Enumerates audio channel modes.
