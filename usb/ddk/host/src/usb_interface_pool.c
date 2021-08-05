@@ -22,16 +22,6 @@
 
 static int32_t g_usbRequestObjectId = 0;
 
-static void IfPipeObjInit(struct UsbPipe *pipeObj)
-{
-    if (pipeObj == NULL) {
-        HDF_LOGE("%{public}s: invalid param", __func__);
-        return;
-    }
-
-    (void)pipeObj;
-}
-
 static HDF_STATUS IfFreePipeObj(struct UsbPipe *pipeObj)
 {
     HDF_STATUS ret = HDF_SUCCESS;
@@ -80,7 +70,7 @@ HDF_STATUS IfDestroyPipeObj(struct UsbSdkInterface *interfaceObj, struct UsbPipe
             found = true;
             DListRemove(&pipePos->object.entry);
             ret = IfFreePipeObj(pipePos);
-            if (HDF_SUCCESS != ret) {
+            if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s:%{public}d IfFreePipeObj fail, ret=%{public}d ", __func__, __LINE__, ret);
                 break;
             }
@@ -121,8 +111,6 @@ static HDF_STATUS IfFreeInterfaceObj(struct UsbSdkInterface *interfaceObj)
     interfaceObj->parentObjectId = 0;
     ret = IfDestroyPipeObj(interfaceObj, NULL);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d IfDestroyPipeObj fail, ret=%{public}d ", \
-            __func__, __LINE__, ret);
         return ret;
     }
     OsalMutexDestroy(&interfaceObj->listLock);
@@ -164,8 +152,6 @@ static HDF_STATUS IfFreeInterfacePool(struct UsbInterfacePool *interfacePool)
 
     ret = UsbIoDestroyQueue(interfacePool);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d UsbIoDestroyQueue faile, ret=%{public}d ",
-                 __func__, __LINE__, ret);
         return ret;
     }
 
@@ -173,8 +159,6 @@ static HDF_STATUS IfFreeInterfacePool(struct UsbInterfacePool *interfacePool)
     OsalMutexDestroy(&interfacePool->mutex);
     ret = UsbIfDestroyInterfaceObj(interfacePool, NULL);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d UsbIfDestroyInterfaceObj fail, ret=%{public}d ",
-            __func__, __LINE__, ret);
         return ret;
     }
     OsalMutexDestroy(&interfacePool->interfaceLock);
@@ -257,7 +241,7 @@ static struct UsbPipe *IfFindPipeObj(struct UsbSdkInterface *interfaceObj, struc
     if ((interfaceObj == NULL) || (interfaceObj->status == USB_INTERFACE_STATUS_REMOVE)
         || DListIsEmpty(&interfaceObj->pipeList)) {
         HDF_LOGE("%{public}s:%{public}d interfaceObj is NULL or status is remove or pipe list is empty.",
-        __func__, __LINE__);
+            __func__, __LINE__);
         return NULL;
     }
 
@@ -429,7 +413,6 @@ static int32_t IfGetRequestPipeType(
     interfaceQueryPara.interfaceIndex = interfaceId;
     interfaceObj = IfFindInterfaceObj(interfacePool, interfaceQueryPara, false, NULL, true);
     if (interfaceObj == NULL) {
-        HDF_LOGE("%{public}s:%{public}d IfFindInterfaceObj faile", __func__, __LINE__);
         return HDF_ERR_BAD_FD;
     }
 
@@ -438,7 +421,6 @@ static int32_t IfGetRequestPipeType(
     pipeQueryPara.pipeId = pipeId;
     pipeObj = IfFindPipeObj(interfaceObj, pipeQueryPara);
     if (pipeObj == NULL) {
-        HDF_LOGE("%{public}s:%{public}d IfFindPipeObj faile", __func__, __LINE__);
         return HDF_ERR_BAD_FD;
     }
 
@@ -457,7 +439,6 @@ static int32_t IfFillControlRequest(struct UsbHostRequest *hostRequest,
 
     ret = UsbProtocalFillControlSetup(setup, &ctrlReq);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d UsbProtocalFillControlSetup fail!", __func__, __LINE__);
         return ret;
     }
     if (ctrlReq.directon == USB_REQUEST_DIR_TO_DEVICE) {
@@ -467,7 +448,7 @@ static int32_t IfFillControlRequest(struct UsbHostRequest *hostRequest,
                 ctrlReq.buffer, ctrlReq.length);
             if (ret != EOK) {
                 HDF_LOGE("%{public}s:%{public}d memcpy_s fail, ctrlReq.length=%{public}d",
-                         __func__, __LINE__, ctrlReq.length);
+                    __func__, __LINE__, ctrlReq.length);
                 return ret;
             }
         }
@@ -519,7 +500,7 @@ static int32_t IfFillBulkRequest(struct UsbHostRequest *hostRequest,
     if ((params->dataReq.directon == USB_REQUEST_DIR_TO_DEVICE) && (requestData.length > 0)) {
         int ret = memcpy_s(hostRequest->buffer, hostRequest->bufLen, requestData.buffer, requestData.length);
         if (ret != EOK) {
-            HDF_LOGE("memcpy_s fail\n");
+            HDF_LOGE("%{public}s:%{public}d memcpy_s fail", __func__, __LINE__);
             return HDF_ERR_IO;
         }
     }
@@ -579,8 +560,6 @@ static int IfSubmitRequestToQueue(struct UsbIfRequest *requestObj)
 
     ret = UsbIoSendRequest(&interfacePool->submitRequestQueue, hostRequest);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d UsbIoSendRequest faile, ret=%{public}d ",
-                 __func__, __LINE__, ret);
         return ret;
     }
 
@@ -690,7 +669,7 @@ static struct UsbInterfacePool *IfGetInterfacePool(
 
     ret = UsbProtocalParseDescriptor(*devHandle, busNum, usbAddr);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d  faile, ret=%{public}d", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d faile, ret=%{public}d", __func__, __LINE__, ret);
         (void)RawCloseDevice(*devHandle);
         return NULL;
     }
@@ -700,7 +679,6 @@ static struct UsbInterfacePool *IfGetInterfacePool(
     poolQueryPara.usbAddr = usbAddr;
     interfacePool = IfFindInterfacePool(realSession, poolQueryPara, true);
     if ((interfacePool == NULL) || (interfacePool->device == NULL)) {
-        HDF_LOGE("%{public}s:%{public}d IfFindInterfacePool error", __func__, __LINE__);
         interfacePool = (struct UsbInterfacePool *)((*devHandle)->dev->privateObject);
         ret = IfDestoryDevice(realSession, interfacePool, *devHandle, false);
         return NULL;
@@ -716,6 +694,7 @@ int32_t UsbIfCreatPipeObj(struct UsbSdkInterface *interfaceObj, struct UsbPipe *
 
     pipeObjTemp = (struct UsbPipe *)OsalMemCalloc(sizeof(struct UsbPipe));
     if (pipeObjTemp == NULL) {
+        HDF_LOGE("%{public}s:%{public}d OsalMemCalloc faile", __func__, __LINE__);
         return HDF_ERR_MALLOC_FAIL;
     }
 
@@ -727,8 +706,6 @@ int32_t UsbIfCreatPipeObj(struct UsbSdkInterface *interfaceObj, struct UsbPipe *
     OsalMutexLock(&interfaceObj->listLock);
     DListInsertTail(&pipeObjTemp->object.entry, &interfaceObj->pipeList);
     OsalMutexUnlock(&interfaceObj->listLock);
-
-    IfPipeObjInit(pipeObjTemp);
 
     *pipeObj = pipeObjTemp;
     (*pipeObj)->info.interfaceId = interfaceObj->interface.info.interfaceIndex;
@@ -742,6 +719,7 @@ int32_t UsbIfCreatInterfaceObj(struct UsbInterfacePool *interfacePool, struct Us
 
     interfaceObjTemp = (struct UsbSdkInterface *)OsalMemCalloc(sizeof(struct UsbSdkInterface));
     if (interfaceObjTemp == NULL) {
+        HDF_LOGE("%{public}s:%{public}d OsalMemCalloc faile", __func__, __LINE__);
         return HDF_ERR_MALLOC_FAIL;
     }
 
@@ -882,16 +860,14 @@ const struct UsbInterface *UsbClaimInterface(
     if ((interfacePool == NULL) || (interfacePool->device == NULL)) {
         interfacePool = IfGetInterfacePool(&devHandle, realSession, busNum, usbAddr);
         if ((interfacePool == NULL) || (interfacePool->device == NULL)) {
-            HDF_LOGD("%{public}s:%{public}d interfacePool is NULL", __func__, __LINE__);
             return NULL;
         }
     }
 
     interfaceQueryPara.type = USB_INTERFACE_INTERFACE_INDEX_TYPE;
     interfaceQueryPara.interfaceIndex = interfaceIndex;
-    interfaceObj = IfFindInterfaceObj(interfacePool, interfaceQueryPara, true, &claimFlag, false);
+    interfaceObj = IfFindInterfaceObj(interfacePool, interfaceQueryPara, true, &claimFlag, true);
     if (interfaceObj == NULL) {
-        HDF_LOGE("%{public}s:%{public}d IfFindInterfaceObj failed", __func__, __LINE__);
         goto error;
     }
 
@@ -933,7 +909,6 @@ int UsbReleaseInterface(const struct UsbInterface *interfaceObj)
     queryPara.objectId = interfaceSdk->parentObjectId;
     interfacePool = IfFindInterfacePool(interfaceSdk->session, queryPara, false);
     if ((interfacePool == NULL) || (interfacePool->session == NULL)) {
-        HDF_LOGE("%{public}s:%{public}d IfFindInterfacePool faile", __func__, __LINE__);
         return HDF_ERR_BAD_FD;
     }
 
@@ -954,33 +929,38 @@ int UsbReleaseInterface(const struct UsbInterface *interfaceObj)
     return IfDestoryDevice(interfacePool->session, interfacePool, devHandle, true);
 }
 
-int UsbAddOrRemoveInterface(UsbInterfaceStatus status, struct UsbInterface *interfaceObj)
+int UsbAddOrRemoveInterface(struct UsbSession *session, uint8_t busNum, uint8_t usbAddr,
+    uint8_t interfaceIndex, UsbInterfaceStatus status)
 {
     int ret;
-    struct UsbSdkInterface *interfaceSdk = (struct UsbSdkInterface *)interfaceObj;
-    struct UsbPoolQueryPara queryPara;
+    struct UsbInterfaceQueryPara interfaceQueryPara;
+    struct UsbSdkInterface *interfaceObj = NULL;
+    struct UsbPoolQueryPara poolQueryPara;
     struct UsbInterfacePool *interfacePool = NULL;
     enum UsbPnpNotifyServiceCmd cmdType;
     struct UsbPnpAddRemoveInfo infoData;
-
-    if (interfaceSdk == NULL) {
-        HDF_LOGE("%{public}s:%{public}d interfaceObj is NULL", __func__, __LINE__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    if (interfaceSdk->status == status) {
-        HDF_LOGE("%{public}s:%{public}d interfaceSdk->status=%{public}d is error",
-                 __func__, __LINE__, interfaceSdk->status);
-        return HDF_ERR_INVALID_PARAM;
-    }
+    struct UsbSession *realSession = RawGetSession(session);
 
     /* Find interfacePool object */
-    queryPara.type = USB_POOL_OBJECT_ID_TYPE;
-    queryPara.objectId = interfaceSdk->parentObjectId;
-    interfacePool = IfFindInterfacePool(interfaceSdk->session, queryPara, false);
+    poolQueryPara.type = USB_POOL_NORMAL_TYPE;
+    poolQueryPara.busNum = busNum;
+    poolQueryPara.usbAddr = usbAddr;
+    interfacePool = IfFindInterfacePool(realSession, poolQueryPara, false);
     if (interfacePool == NULL) {
-        HDF_LOGE("%{public}s:%{public}d IfFindInterfacePool faile", __func__, __LINE__);
         return HDF_ERR_BAD_FD;
+    }
+
+    interfaceQueryPara.type = USB_INTERFACE_INTERFACE_INDEX_TYPE;
+    interfaceQueryPara.interfaceIndex = interfaceIndex;
+    interfaceObj = IfFindInterfaceObj(interfacePool, interfaceQueryPara, false, NULL, false);
+    if (interfaceObj == NULL) {
+        return HDF_ERR_BAD_FD;
+    }
+
+    if (interfaceObj->status == status) {
+        HDF_LOGE("%{public}s:%{public}d interfaceObj->status=%{public}d is error",
+            __func__, __LINE__, interfaceObj->status);
+        return HDF_ERR_INVALID_PARAM;
     }
 
     if (status == USB_INTERFACE_STATUS_ADD) {
@@ -989,19 +969,19 @@ int UsbAddOrRemoveInterface(UsbInterfaceStatus status, struct UsbInterface *inte
         cmdType = USB_PNP_NOTIFY_REMOVE_INTERFACE;
     } else {
         HDF_LOGE("%{public}s:%{public}d status=%{public}d is not define",
-                 __func__, __LINE__, status);
+            __func__, __LINE__, status);
         return HDF_ERR_INVALID_PARAM;
     }
 
     infoData.devNum = interfacePool->devAddr;
     infoData.busNum = interfacePool->busNum;
-    infoData.interfaceNumber = interfaceObj->info.interfaceIndex;
-    infoData.interfaceClass = interfaceObj->info.interfaceClass;
-    infoData.interfaceSubClass = interfaceObj->info.interfaceSubClass;
-    infoData.interfaceProtocol = interfaceObj->info.interfaceProtocol;
+    infoData.interfaceNumber = interfaceObj->interface.info.interfaceIndex;
+    infoData.interfaceClass = interfaceObj->interface.info.interfaceClass;
+    infoData.interfaceSubClass = interfaceObj->interface.info.interfaceSubClass;
+    infoData.interfaceProtocol = interfaceObj->interface.info.interfaceProtocol;
     ret = RawInitPnpService(cmdType, infoData);
     if (ret == HDF_SUCCESS) {
-        interfaceSdk->status = status;
+        interfaceObj->status = status;
     }
 
     return ret;
@@ -1030,7 +1010,6 @@ UsbInterfaceHandle *UsbOpenInterface(struct UsbInterface *interfaceObj)
     interfacePool = IfFindInterfacePool(interfaceSdk->session, poolQueryPara, false);
     if ((interfacePool  == NULL) || (interfacePool->device == NULL)
         || (interfacePool->device->devHandle == NULL)) {
-        HDF_LOGE("%{public}s:%{public}d IfFindInterfacePool faile", __func__, __LINE__);
         return NULL;
     }
 
@@ -1089,7 +1068,6 @@ int32_t UsbCloseInterface(UsbInterfaceHandle *interfaceHandle)
     interfaceQueryPara.interfaceIndex = ifaceHdl->interfaceIndex;
     interfaceObj = IfFindInterfaceObj(interfacePool, interfaceQueryPara, false, NULL, false);
     if (interfaceObj == NULL) {
-        HDF_LOGE("%{public}s:%{public}d IfFindInterfaceObj faile", __func__, __LINE__);
         return HDF_ERR_BAD_FD;
     }
 
@@ -1097,8 +1075,7 @@ int32_t UsbCloseInterface(UsbInterfaceHandle *interfaceHandle)
     if (AdapterAtomicDec(&interfacePool->ioRefCount) == 0) {
         ret = UsbIoStop(interfacePool);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d UsbIoStop failed, ret=%{public}d ",
-                __func__, __LINE__, ret);
+            HDF_LOGE("%{public}s:%{public}d UsbIoStop failed, ret=%{public}d ", __func__, __LINE__, ret);
             goto out;
         }
     }
@@ -1153,7 +1130,6 @@ int32_t UsbSelectInterfaceSetting(
     interfaceQueryPara.interfaceIndex = ifaceHdl->interfaceIndex;
     interfaceTemp = IfFindInterfaceObj(interfacePool, interfaceQueryPara, false, NULL, true);
     if (interfaceTemp == NULL) {
-        HDF_LOGE("%{public}s:%{public}d IfFindInterfaceObj failed", __func__, __LINE__);
         return HDF_FAILURE;
     }
     interfaceTemp->session = interfacePool->session;
@@ -1192,7 +1168,6 @@ int32_t UsbGetPipeInfo(UsbInterfaceHandle *interfaceHandle, uint8_t altSettingIn
     interfaceQueryPara.altSettingId = altSettingIndex;
     interfaceObj = IfFindInterfaceObj(interfacePool, interfaceQueryPara, false, NULL, true);
     if (interfaceObj == NULL) {
-        HDF_LOGE("%{public}s:%{public}d IfFindInterfaceObj faile", __func__, __LINE__);
         return HDF_ERR_BAD_FD;
     }
 
@@ -1201,7 +1176,6 @@ int32_t UsbGetPipeInfo(UsbInterfaceHandle *interfaceHandle, uint8_t altSettingIn
     pipeQueryPara.pipeId = pipeId;
     pipeObj = IfFindPipeObj(interfaceObj, pipeQueryPara);
     if (pipeObj == NULL) {
-        HDF_LOGE("%{public}s:%{public}d IfFindPipeObj faile", __func__, __LINE__);
         return HDF_ERR_BAD_FD;
     }
 
@@ -1241,7 +1215,6 @@ struct UsbRequest *UsbAllocRequest(UsbInterfaceHandle *interfaceHandle, int isoP
 
     hostRequest = RawAllocRequest(ifaceHdl->devHandle, isoPackets, length);
     if (hostRequest == NULL) {
-        HDF_LOGE("%{public}s:%{public}d RawAllocRequest UsbHostRequest error. ", __func__, __LINE__);
         OsalMemFree(requestObj);
         return NULL;
     }
@@ -1251,22 +1224,12 @@ struct UsbRequest *UsbAllocRequest(UsbInterfaceHandle *interfaceHandle, int isoP
     g_usbRequestObjectId %= MAX_OBJECT_ID;
     requestObj->request.object.objectId = g_usbRequestObjectId;
     DListHeadInit(&requestObj->request.object.entry);
-    OsalMutexInit(&requestObj->mutex);
     requestObj->request.compInfo.type = USB_REQUEST_TYPE_INVALID;
     requestObj->request.compInfo.buffer = hostRequest->buffer;
     requestObj->request.compInfo.length = hostRequest->length;
     requestObj->hostRequest = hostRequest;
     requestObj->isSyncReq = false;
     hostRequest->privateObj = requestObj;
-
-    /* Init request semaphore */
-    if (OsalSemInit(&requestObj->sem, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d OsalSemInit faile! ", __func__, __LINE__);
-        if (UsbFreeRequest((struct UsbRequest *)requestObj) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d UsbFreeRequest faile! ", __func__, __LINE__);
-        }
-        return NULL;
-    }
 
     return (struct UsbRequest *)requestObj;
 }
@@ -1290,11 +1253,9 @@ int UsbFreeRequest(struct UsbRequest *request)
 
     ret = RawFreeRequest(hostRequest);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d RawFreeRequest faile, ret=%{public}d", __func__, __LINE__, ret);
         return ret;
     }
 
-    OsalSemDestroy(&requestObj->sem);
     OsalMemFree(requestObj);
 
     return ret;
@@ -1322,7 +1283,7 @@ int32_t UsbFillRequest(struct UsbRequest *request, UsbInterfaceHandle *interface
     UsbRequestDirection directon;
     int32_t ret;
 
-    if ((requestObj == NULL) || (params == NULL)) {
+    if ((requestObj == NULL) || (params == NULL) || (ifaceHdl == NULL)) {
         HDF_LOGE("%{public}s:%{public}d params or request is NULL", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -1366,8 +1327,7 @@ int UsbCancelRequest(struct UsbRequest *request)
     hostRequest = requestObj->hostRequest;
     ret = RawCancelRequest(hostRequest);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d RawCancelRequest faile, ret=%{public}d ",
-            __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d RawCancelRequest faile, ret=%{public}d ", __func__, __LINE__, ret);
         return ret;
     }
 
@@ -1379,27 +1339,42 @@ int UsbCancelRequest(struct UsbRequest *request)
 int UsbSubmitRequestSync(struct UsbRequest *request)
 {
     int ret;
+    uint32_t waitTime;
+    struct UsbIfRequest *requestObj = (struct UsbIfRequest *)request;
 
-    if (request == NULL) {
+    if ((request == NULL) || (requestObj->hostRequest == NULL)) {
         HDF_LOGE("%{public}s:%{public}d request is NULL", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    struct UsbIfRequest *requestObj = (struct UsbIfRequest *)request;
-    requestObj->isSyncReq = true;
-
-    ret = IfSubmitRequestToQueue(requestObj);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d IfSubmitRequestToQueue faile, ret=%{public}d ",
-            __func__, __LINE__, ret);
-        return ret;
+    /* Init request semaphore */
+    if (OsalSemInit(&requestObj->hostRequest->sem, 0) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d OsalSemInit faile! ", __func__, __LINE__);
+        return HDF_ERR_IO;
+    }
+    requestObj->request.compInfo.status = USB_REQUEST_COMPLETED;
+    if (requestObj->hostRequest->timeout == USB_RAW_REQUEST_TIME_ZERO_MS) {
+        waitTime = HDF_WAIT_FOREVER;
+    } else {
+        waitTime = requestObj->hostRequest->timeout;
     }
 
-    ret = OsalSemWait(&requestObj->sem, HDF_WAIT_FOREVER);
+    requestObj->isSyncReq = true;
+    ret = IfSubmitRequestToQueue(requestObj);
     if (ret != HDF_SUCCESS) {
+        goto out;
+    }
+
+    ret = OsalSemWait(&requestObj->hostRequest->sem, waitTime);
+    if (ret == HDF_ERR_TIMEOUT) {
+        UsbCancelRequest(&requestObj->request);
+        RawHandleRequestCompletion(requestObj->hostRequest, USB_REQUEST_TIMEOUT);
+    } else if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d OsalSemWait faile, ret=%{public}d ", __func__, __LINE__, ret);
     }
 
+out:
+    OsalSemDestroy(&requestObj->hostRequest->sem);
     return ret;
 }
 

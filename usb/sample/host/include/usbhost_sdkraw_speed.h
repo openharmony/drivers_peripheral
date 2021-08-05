@@ -34,7 +34,7 @@
 #define ACM_NW                  30
 #define ACM_NR                  30
 #define READ_BUF_SIZE           8192
-#define USB_CTRL_SET_TIMEOUT    5000
+#define USB_CTRL_SET_TIMEOUT    0
 #define USB_PIPE_DIR_OFFSET     7
 
 typedef enum {
@@ -110,6 +110,7 @@ struct AcmDevice {
     uint8_t interfaceIndex[USB_MAX_INTERFACES];
     struct UsbCdcLineCoding lineCoding;
     struct OsalThread ioThread;
+    struct OsalThread ioSendThread;
 };
 
 #endif /* USB_HOST_SDK_RAW_SPEED_H */

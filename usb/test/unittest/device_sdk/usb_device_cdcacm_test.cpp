@@ -15,6 +15,9 @@
 
 extern "C" {
 #include "usb_device_cdcacm_test.h"
+#include "hdf_remote_service.h"
+#include "hdf_sbuf.h"
+#include "servmgr_hdi.h"
 }
 
 using namespace std;
@@ -316,6 +319,10 @@ struct UsbFnDeviceDesc g_acmFnDevice = {
     .deviceDesc    = &g_cdcMasterDeviceDesc,
     .deviceStrings = g_devStrings,
     .configs       = g_configs,
+};
+
+enum DevMasterCmd {
+    DEV_MASTER_RELEASE = 1,
 };
 
 static struct Serial *SerialAlloc(void)
@@ -768,5 +775,41 @@ void ReleaseAcmDevice(struct AcmDevice *acm)
     (void)UsbFnCloseInterface(acm->dataIface.handle);
     UsbFnStopRecvInterfaceEvent(acm->ctrlIface.fn);
     OsalMemFree(acm->port);
+}
+
+static struct HdfSBuf *g_data;
+static struct HdfSBuf *g_reply;
+int XtsRemoveDevice(void)
+{
+    int status;
+    struct HdfRemoteService *devMasterService = NULL;
+    struct HDIServiceManager *servmgr = HDIServiceManagerGet();
+
+    printf("+++XtsRemoveDevice start++\n");
+    if (servmgr == nullptr) {
+        printf("+++servmgr is null++\n");
+        return HDF_FAILURE;
+    }
+    devMasterService = servmgr->GetService(servmgr, DEV_MASTER_SERVICE_NAME);
+    HDIServiceManagerRelease(servmgr);
+    if (devMasterService == nullptr) {
+        printf("+++GetService error++\n");
+        return HDF_FAILURE;
+    }
+    g_data = HdfSBufTypedObtain(SBUF_IPC);
+    g_reply = HdfSBufTypedObtain(SBUF_IPC);
+    if (g_data == NULL || g_reply == NULL) {
+        HDF_LOGE("%{public}s: sbuf err", __func__);
+        return HDF_FAILURE;
+    }
+    status = devMasterService->dispatcher->Dispatch(devMasterService, DEV_MASTER_RELEASE, g_data, g_reply);
+    if (status !=  HDF_SUCCESS) {
+        printf("+++Dispatch error++\n");
+        return HDF_FAILURE;
+    }
+    HdfSBufRecycle(g_data);
+    HdfSBufRecycle(g_reply);
+    printf("+++XtsRemoveDevice finish++\n");
+    return HDF_SUCCESS;
 }
 

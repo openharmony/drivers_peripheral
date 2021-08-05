@@ -32,9 +32,11 @@ static bool g_readRuning = false;
 static void TestSpeed()
 {
     HdfSbufFlush(g_reply);
-    int status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_WRITE_SPEED, g_data, g_reply);
+    int status = g_acmService->dispatcher->Dispatch(g_acmService,
+        USB_SERIAL_WRITE_SPEED, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE_SPEED failed status = %{public}d", __func__, status);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE_SPEED failed status = %{public}d",
+            __func__, status);
         return;
     }
 }
@@ -43,9 +45,11 @@ static void GetTempSpeed()
 {
     float speed;
     HdfSbufFlush(g_reply);
-    int status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_WRITE_GET_TEMP_SPEED, g_data, g_reply);
+    int status = g_acmService->dispatcher->Dispatch(g_acmService,
+        USB_SERIAL_WRITE_GET_TEMP_SPEED, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE_GET_TEMP_SPEED failed status = %{public}d", __func__, status);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE_GET_TEMP_SPEED failed status = %{public}d",
+            __func__, status);
         return;
     }
     if (!HdfSbufReadFloat(g_reply, &speed)) {
@@ -59,9 +63,11 @@ static void GetSpeedDone()
 {
     uint8_t isDone = 0;
     HdfSbufFlush(g_reply);
-    int status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_WRITE_SPEED_DONE, g_data, g_reply);
+    int status = g_acmService->dispatcher->Dispatch(g_acmService,
+        USB_SERIAL_WRITE_SPEED_DONE, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE_SPEED_DONE failed status = %{public}d", __func__, status);
+        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE_SPEED_DONE failed status = %{public}d",
+            __func__, status);
         return;
     }
     if (!HdfSbufReadUint8(g_reply, &isDone)) {
@@ -104,7 +110,7 @@ int main(int argc, char *argv[])
     TestSpeed();
     g_readRuning = true;
     while (g_readRuning) {
-        sleep(2);
+        sleep(0x2);
         GetTempSpeed();
         GetSpeedDone();
     }

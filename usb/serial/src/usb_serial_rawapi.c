@@ -542,6 +542,7 @@ static void UsbSeriaDevicelFree(struct AcmDevice *acm)
         return;
     }
     OsalMemFree(port);
+    port = NULL;
 }
 
 static int32_t UsbSerialRead(struct SerialDevice *port, struct HdfSBuf *reply)
@@ -861,6 +862,7 @@ static int32_t UsbSerialReadSync(struct SerialDevice *port, struct HdfSBuf *repl
     ret = UsbRawSendBulkRequest(g_syncRequest, acm->devHandle, &requestData);
     if (ret) {
         HDF_LOGE("UsbRawSendBulkRequest faile, ret=%{public}d", ret);
+        return ret;
     }
 
     count = g_syncRequest->actualLength;
@@ -872,7 +874,6 @@ static int32_t UsbSerialReadSync(struct SerialDevice *port, struct HdfSBuf *repl
     HDF_LOGD("buffer:%{public}p-%{public}s-actualLength:%{public}d", g_syncRequest->buffer,
         (uint8_t *)g_syncRequest->buffer, count);
     memcpy_s(data, count, g_syncRequest->buffer, count);
-    HDF_LOGD("data:%{public}p-%{public}s", data, (uint8_t *)data);
     if (!HdfSbufWriteString(reply, (const char *)data)) {
         HDF_LOGE("%{public}s: sbuf write buffer failed", __func__);
         ret = HDF_ERR_IO;
@@ -881,7 +882,7 @@ static int32_t UsbSerialReadSync(struct SerialDevice *port, struct HdfSBuf *repl
     if (data != NULL) {
         OsalMemFree(data);
     }
-    return 0;
+    return HDF_SUCCESS;
 }
 
 static int SerialAddOrRemoveInterface(int cmd, struct SerialDevice *port, struct HdfSBuf *data)
@@ -975,20 +976,25 @@ static int32_t UsbSerialDriverBind(struct HdfDeviceObject *device)
         return HDF_FAILURE;
     }
     if (OsalMutexInit(&acm->lock) != HDF_SUCCESS) {
-        HDF_LOGE(" init lock fail!");
-        return HDF_FAILURE;
+        HDF_LOGE("%{public}s:%{public}d OsalMutexInit fail", __func__, __LINE__);
+        goto error;
     }
 
     info = (struct UsbPnpNotifyServiceInfo *)device->priv;
-    if (info) {
+    if (info != NULL) {
         acm->busNum       = info->busNum;
         acm->devAddr      = info->devNum;
         acm->interfaceCnt = info->interfaceLength;
         ret = memcpy_s((void *)(acm->interfaceIndex), USB_MAX_INTERFACES,
                        (const void*)info->interfaceNumber, info->interfaceLength);
         if (ret) {
-            HDF_LOGE("memcpy_s fail\n");
+            HDF_LOGE("%{public}s:%{public}d memcpy_s faile ret=%{public}d", \
+                __func__, __LINE__, ret);
+            goto lock_error;
         }
+    } else {
+        HDF_LOGE("%{public}s:%{public}d info is NULL!", __func__, __LINE__);
+        goto lock_error;
     }
 
     device->service = &(acm->service);
@@ -996,6 +1002,15 @@ static int32_t UsbSerialDriverBind(struct HdfDeviceObject *device)
     acm->device = device;
     HDF_LOGD("UsbSerialDriverBind=========================OK");
     return HDF_SUCCESS;
+
+lock_error:
+    if (OsalMutexDestroy(&acm->lock)) {
+        HDF_LOGE("%{public}s:%{public}d OsalMutexDestroy fail", __func__, __LINE__);
+    }
+error:
+    OsalMemFree(acm);
+    acm = NULL;
+    return HDF_FAILURE;
 }
 
 static void AcmProcessNotification(struct AcmDevice *acm, unsigned char *buf)
@@ -1346,6 +1361,10 @@ static void UsbSerialRelease(struct AcmDevice *acm)
 
     /* stop io thread and release all resources */
     UsbStopIo(acm);
+    if (g_syncRequest != NULL) {
+        UsbRawFreeRequest(g_syncRequest);
+        g_syncRequest = NULL;
+    }
     UsbFreeReadRequests(acm);
     UsbFreeNotifyReqeust(acm);
     UsbFreeWriteRequests(acm);
@@ -1408,6 +1427,9 @@ static void UsbSerialDriverRelease(struct HdfDeviceObject *device)
     UsbSeriaDevicelFree(acm);
     OsalMutexDestroy(&acm->writeLock);
     OsalMutexDestroy(&acm->readLock);
+    OsalMutexDestroy(&acm->lock);
+    OsalMemFree(acm);
+    acm = NULL;
     HDF_LOGD("%{public}s:%{public}d exit", __func__, __LINE__);
 }
 

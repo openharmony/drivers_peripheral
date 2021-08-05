@@ -16,11 +16,9 @@
 #ifndef HDF_USB_SERIAL_RAWAPI_H
 #define HDF_USB_SERIAL_RAWAPI_H
 
-#include "hdf_base.h"
-#include "hdf_device_desc.h"
-#include "osal_atomic.h"
-#include "usb_raw_api.h"
 #include "data_fifo.h"
+#include "hdf_device_desc.h"
+#include "usb_raw_api.h"
 
 #define USB_MAX_INTERFACES      32
 #define DATARATE                9600

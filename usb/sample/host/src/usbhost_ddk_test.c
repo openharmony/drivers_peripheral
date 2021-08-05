@@ -14,14 +14,8 @@
  */
 
 #include "usbhost_ddk_test.h"
-#ifdef __LITEOS_USB_HOST_DDK_TEST__
 #include <securec.h>
 #include <signal.h>
-#else
-#ifdef __MUSL__
-#include "signal.h"
-#endif
-#endif
 
 #define HDF_LOG_TAG     USB_HOST_DDK_TEST
 

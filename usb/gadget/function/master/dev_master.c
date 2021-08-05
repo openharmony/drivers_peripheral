@@ -625,6 +625,10 @@ static struct UsbFnDeviceDesc g_masterFuncDevice = {
     .configs       = g_configs,
 };
 
+enum DevMasterCmd {
+    DEV_MASTER_RELEASE = 1,
+};
+
 struct UsbFnDevice *g_fnDev = NULL;
 static int32_t MasterReleaseFuncDevice()
 {
@@ -637,16 +641,36 @@ static int32_t MasterReleaseFuncDevice()
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: remove usb function device failed", __func__);
     }
+    g_fnDev = NULL;
+    return ret;
+}
+
+static int32_t MasterReleaseFnDevice()
+{
+    int32_t ret = HDF_SUCCESS;
+
+    if (g_fnDev == NULL) {
+        HDF_LOGE("%{public}s: fnDev is null", __func__);
+        return ret;
+    }
+    ret = UsbFnRemoveDevice(g_fnDev);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: remove usb function device failed", __func__);
+    }
+    g_fnDev = NULL;
     return ret;
 }
 
 int32_t MasterDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    int32_t ret = HDF_SUCCESS;
-    if (client == NULL) {
-        return HDF_FAILURE;
+    switch (cmdId) {
+        case DEV_MASTER_RELEASE:
+            return MasterReleaseFnDevice();
+        default:
+            return HDF_ERR_NOT_SUPPORT;
     }
-    return ret;
+
+    return HDF_SUCCESS;
 }
 
 /* HdfDriverEntry implementations */

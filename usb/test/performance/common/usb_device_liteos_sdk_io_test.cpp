@@ -115,6 +115,18 @@ HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceRequestSync005, TestSize.Level1)
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
+HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceRequestSync006, TestSize.Level1)
+{
+    struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_REQUEST_SYNC006, -1};
+    EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
+}
+
+HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceRequestSync007, TestSize.Level1)
+{
+    struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_REQUEST_SYNC007, -1};
+    EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
+}
+
 HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceCancelRequest001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_CANCEL_REQUEST, -1};

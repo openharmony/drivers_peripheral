@@ -17,13 +17,7 @@
 #define USB_DDK_H
 
 #include "hdf_base.h"
-#ifndef __MUSL__
 #include <endian.h>
-#else
-#ifndef __BYTE_ORDER
-#define __BYTE_ORDER    __LITTLE_ENDIAN
-#endif
-#endif
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 #define CpuToLe16(x)  (x)

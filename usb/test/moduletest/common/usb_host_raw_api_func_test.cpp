@@ -1,19 +1,16 @@
 /*
- * UsbHostRawApiFuncTest.cpp
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * usb serial device function test source file
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Copyright (c) 2020-2021 Huawei Device Co., Ltd.
- *
- * This software is licensed under the terms of the GNU General Public
- * License version 2, as published by the Free Software Foundation, and
- * may be copied, distributed, and modified under those terms.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #include <cstdio>
@@ -58,8 +55,8 @@ HWTEST_F(UsbHostRawApiFuncTest, CheckRawApiWriteSync_001, TestSize.Level1)
     string wlog, rlog;
     wlog = "send data[" + data + "] to device";
     rlog = "recv data[" + data + "] from device";
-    ASSERT_EQ(system("hostacm_moduletest -RAW -syncRead &"), 0);
-    ASSERT_EQ(system(("hostacm_moduletest -RAW -syncWrite '" + data + "'").c_str()), 0);
+    ASSERT_EQ(system("usbhost_ddk_test -aR &"), 0);
+    ASSERT_EQ(system(("usbhost_ddk_test -aW '" + data + "'").c_str()), 0);
     sleep(3);
     EXPECT_TRUE(HasLog(wlog, startTs)) << "ErrInfo: cannot find sync write log";
     EXPECT_TRUE(HasLog(rlog, startTs, RLOG_FILE)) << "ErrInfo: cannot find sync recv log";
@@ -87,8 +84,8 @@ HWTEST_F(UsbHostRawApiFuncTest, CheckRawApiWriteSync_002, TestSize.Level1)
     for (int i = 0; data[i].size() > 0; i++) {
         wlog = "send data[" + data[i] + "] to device";
         rlog = "recv data[" + data[i] + "] from device";
-        ASSERT_EQ(system("hostacm_moduletest -RAW -syncRead &"), 0);
-        ASSERT_EQ(system(("hostacm_moduletest -RAW -syncWrite '" + data[i] + "'").c_str()), 0);
+        ASSERT_EQ(system("usbhost_ddk_test -aR &"), 0);
+        ASSERT_EQ(system(("usbhost_ddk_test -aW '" + data[i] + "'").c_str()), 0);
         sleep(3);
         EXPECT_TRUE(HasLog(wlog, startTs)) << "ErrInfo: cannot find sync write log";
         EXPECT_TRUE(HasLog(rlog, startTs, RLOG_FILE)) << "ErrInfo: cannot find sync recv log";
@@ -120,8 +117,8 @@ HWTEST_F(UsbHostRawApiFuncTest, CheckRawApiWriteSync_003, TestSize.Level2)
     double startTs;
     for (int i = 0; i < writeCnt; i++) {
         startTs = GetNowTs();
-        ASSERT_EQ(system("hostacm_moduletest -RAW -syncRead &"), 0);
-        ASSERT_EQ(system(("hostacm_moduletest -RAW -syncWrite '" + data + "'").c_str()), 0);
+        ASSERT_EQ(system("usbhost_ddk_test -aR &"), 0);
+        ASSERT_EQ(system(("usbhost_ddk_test -aW '" + data + "'").c_str()), 0);
         sleep(3);
         EXPECT_TRUE(HasLog(wlog, startTs)) << "ErrInfo: cannot find sync write log";
         EXPECT_TRUE(HasLog(rlog, startTs, RLOG_FILE)) << "ErrInfo: cannot find sync recv log";
@@ -139,7 +136,7 @@ HWTEST_F(UsbHostRawApiFuncTest, CheckRawApiWriteSync_003, TestSize.Level2)
 HWTEST_F(UsbHostRawApiFuncTest, CheckRawApiWriteAsync_001, TestSize.Level1)
 {
     printf("------start CheckRawApiWriteAsync_001------\n");
-    ASSERT_EQ(system("hostacm_moduletest -RAW -asyncRead &"), 0) << \
+    ASSERT_EQ(system("usbhost_ddk_test -ar &"), 0) << \
     "ErrInfo:  failed to start async read";
     sleep(3);
     const string data = "abc";
@@ -147,7 +144,7 @@ HWTEST_F(UsbHostRawApiFuncTest, CheckRawApiWriteAsync_001, TestSize.Level1)
     string wlog, rlog;
     wlog = "send data[" + data + "] to device";
     rlog = "recv data[" + data + "] from device";
-    ASSERT_EQ(system(("hostacm_moduletest -RAW -asyncWrite '" + data + "'").c_str()), 0);
+    ASSERT_EQ(system(("usbhost_ddk_test -aw '" + data + "'").c_str()), 0);
     sleep(3);
     EXPECT_TRUE(HasLog(wlog, startTs)) << "ErrInfo: cannot find async write log";
     EXPECT_TRUE(HasLog(rlog, startTs, RLOG_FILE)) << "ErrInfo: cannot find async recv log";
@@ -175,7 +172,7 @@ HWTEST_F(UsbHostRawApiFuncTest, CheckRawApiWriteAsync_002, TestSize.Level1)
     for (int i = 0; data[i].size() > 0; i++) {
         wlog = "send data[" + data[i] + "] to device";
         rlog = "recv data[" + data[i] + "] from device";
-        ASSERT_EQ(system(("hostacm_moduletest -RAW -asyncWrite '" + data[i] + "'").c_str()), 0);
+        ASSERT_EQ(system(("usbhost_ddk_test -aw '" + data[i] + "'").c_str()), 0);
         sleep(3);
         EXPECT_TRUE(HasLog(wlog, startTs)) << "ErrInfo: cannot find async write log";
         EXPECT_TRUE(HasLog(rlog, startTs, RLOG_FILE)) << "ErrInfo: cannot find async recv log";
@@ -207,12 +204,12 @@ HWTEST_F(UsbHostRawApiFuncTest, CheckRawApiWriteAsync_003, TestSize.Level2)
     double startTs;
     for (int i = 0; i < writeCnt; i++) {
         startTs = GetNowTs();
-        ASSERT_EQ(system(("hostacm_moduletest -RAW -asyncWrite '" + data + "'").c_str()), 0);
+        ASSERT_EQ(system(("usbhost_ddk_test -aw '" + data + "'").c_str()), 0);
         sleep(3);
         EXPECT_TRUE(HasLog(wlog, startTs)) << "ErrInfo: cannot find async write log";
         EXPECT_TRUE(HasLog(rlog, startTs, RLOG_FILE)) << "ErrInfo: cannot find async recv log";
     }
-    ASSERT_EQ(system("killall hostacm_moduletest"), 0) << "ErrInfo:  failed to kill async read";
+    ASSERT_EQ(system("killall usbhost_ddk_test"), 0) << "ErrInfo:  failed to kill async read";
     printf("------end CheckRawApiWriteAsync_003------\n");
 }
 }

@@ -27,8 +27,11 @@
 #include "osal_mutex.h"
 #include "osal_time.h"
 
+#define DEV_MASTER_SERVICE_NAME "usbfn_master"
 #define TEST_TIMES  10
-
+#define BUFFER_LEN 64
+#define WAIT_10MS 10
+#define SYNC_5000MS 500
 #define CDC_ACM
 #define QUEUE_SIZE              8
 #define PORT_RATE       9600
@@ -101,9 +104,9 @@ struct AcmDevice {
     bool                        pending;
     uint32_t                    enableEvtCnt;
     char                        *udcName;
-    char submit;
-    char submit_exit;
-    struct Serial            *port;
+    char                        submit;
+    char                        submitExit;
+    struct Serial               *port;
     struct UsbCdcLineCoding     lineCoding;
     uint16_t                    serialState;
 #define SERIAL_STATE_DCD        (1 << 0)
@@ -129,5 +132,6 @@ struct AcmDevice * SetUpAcmDevice(void);
 void ReleaseAcmDevice(struct AcmDevice *acm);
 void AcmEventCallback(struct UsbFnEvent *event);
 void AcmDeviceRelease(struct AcmDevice *acmDevice);
+int XtsRemoveDevice(void);
 
 #endif
