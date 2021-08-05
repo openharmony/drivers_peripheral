@@ -48,7 +48,7 @@ typedef enum {
 #define TARGET_MASK             0x3
 #define REQUEST_TYPE_MASK       0x3
 #define DIRECTION_MASK          0x1
-#define USB_CTRL_SET_TIMEOUT    5000
+#define USB_CTRL_SET_TIMEOUT    0
 
 struct AcmDevice;
 
@@ -115,4 +115,14 @@ struct AcmDevice {
     uint32_t readSize;
     struct UsbCdcLineCoding   lineCoding;
 };
+
+struct TestControlMsgData {
+    uint8_t request;
+    uint8_t requestType;
+    uint16_t value;
+    uint16_t index;
+    void *data;
+    uint16_t size;
+};
+
 #endif

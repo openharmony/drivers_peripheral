@@ -17,9 +17,16 @@ if (defined(ohos_lite)) {
   lite_component("hdf_test_usb_device") {
     if (ohos_build_type == "debug") {
       deps = [
+        "moduletest:hdf_peripheral_usb_test_module",
         "performance:hdf_usb_device_sdk_io_test",
         "unittest:hdf_usb_device_sdk_if_test",
       ]
+    }
+    features = []
+  }
+  lite_component("hdf_test_usb_host") {
+    if (ohos_build_type == "debug") {
+      deps = [ "unittest:usb_host_sdk_test" ]
     }
     features = []
   }

@@ -14,7 +14,6 @@
  */
 
 #include "usb_io_manage.h"
-#include "osal_time.h"
 #include "usb_raw_api_library.h"
 
 #define HDF_LOG_TAG USB_IO_MANAGE
@@ -81,13 +80,9 @@ static int IoSendProcess(void *interfacePoolArg)
             continue;
         }
 
-        /* The Submit request operation is retried up to
-         * USB_IO_SUBMIT_RETRY_TIME_CNT times. */
         for (i = 0; i < USB_IO_SUBMIT_RETRY_TIME_CNT; i++) {
             ret = RawSubmitRequest(submitRequest);
             if (ret != HDF_SUCCESS) {
-                HDF_LOGE("%{public}s:%{public}d RawSubmitRequest failed, i=%{public}d, ret=%{public}d",
-                    __func__, __LINE__, i, ret);
                 continue;
             }
             /* Submit success */
@@ -96,8 +91,6 @@ static int IoSendProcess(void *interfacePoolArg)
 
         if (i >= USB_IO_SUBMIT_RETRY_TIME_CNT) {
             HDF_LOGE("%{public}s:%{public}d submit request failes", __func__, __LINE__);
-            /* If submit request fails, the corresponding status is set and
-             * the callback function is called */
             submitRequest->status = USB_REQUEST_ERROR;
             UsbIoSetRequestCompletionInfo(submitRequest);
             continue;
@@ -142,7 +135,7 @@ static int IoAsyncReceiveProcess(void *interfacePoolArg)
         }
 
 
-        ret = RawHandleRequest(interfacePool->device->devHandle, NULL);
+        ret = RawHandleRequest(interfacePool->device->devHandle);
         if ((ret < 0) || (interfacePool->ioProcessStopStatus != USB_POOL_PROCESS_RUNNING)) {
             HDF_LOGE("%{public}s:%{public}d RawHandleRequest faile, stopStatus=%{public}d ret=%{public}d ",
                 __func__, __LINE__, interfacePool->ioProcessStopStatus, ret);
@@ -152,6 +145,7 @@ static int IoAsyncReceiveProcess(void *interfacePoolArg)
 
     OsalMutexLock(&interfacePool->ioStopLock);
     interfacePool->ioProcessStopStatus = USB_POOL_PROCESS_STOPED;
+    OsalSemPost(&interfacePool->submitRequestQueue.sem);
     OsalMutexUnlock(&interfacePool->ioStopLock);
 
     return HDF_SUCCESS;
@@ -191,7 +185,6 @@ HDF_STATUS UsbIoDestroyQueue(struct UsbInterfacePool *interfacePool)
 
 int32_t UsbIoSendRequest(struct UsbMessageQueue *msgQueue, struct UsbHostRequest *request)
 {
-
     if ((msgQueue == NULL) || (request == NULL)) {
         HDF_LOGE("%{public}s:%{public}d invalid parameter", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -223,8 +216,7 @@ HDF_STATUS UsbIoGetRequest(struct UsbMessageQueue *msgQueue, struct UsbHostReque
             __func__, __LINE__, ret);
         goto error;
     }
-    if (DListIsEmpty(&msgQueue->entry))
-    {
+    if (DListIsEmpty(&msgQueue->entry)) {
         ret = HDF_SUCCESS;
         goto error;
     }
@@ -327,7 +319,6 @@ HDF_STATUS UsbIoStop(struct UsbInterfacePool *interfacePool)
         return HDF_ERR_INVALID_PARAM;
     }
     if ((interfacePool->ioProcessStopStatus != USB_POOL_PROCESS_STOPED)) {
-        HDF_LOGD("%{public}s:%{public}d not stoped", __func__, __LINE__);
         OsalMutexLock(&interfacePool->ioStopLock);
         interfacePool->ioProcessStopStatus = USB_POOL_PROCESS_STOP;
         OsalSemPost(&interfacePool->submitRequestQueue.sem);
@@ -337,8 +328,6 @@ HDF_STATUS UsbIoStop(struct UsbInterfacePool *interfacePool)
             HDF_LOGE("%{public}s:%{public}d RawKillSignal ioProcessTid=%{public}d failed",
                 __func__, __LINE__, interfacePool->ioProcessTid);
         }
-    } else {
-        HDF_LOGD("%{public}s:%{public}d stoped", __func__, __LINE__);
     }
 
     while (interfacePool->ioProcessStopStatus != USB_POOL_PROCESS_STOPED) {
@@ -396,11 +385,9 @@ void UsbIoSetRequestCompletionInfo(void *requestArg)
     if ((hostRequest->requestType & USB_DDK_ENDPOINT_XFERTYPE_MASK) == USB_DDK_ENDPOINT_XFER_CONTROL) {
         requestObj->request.compInfo.buffer = requestObj->request.compInfo.buffer + USB_RAW_CONTROL_SETUP_SIZE;
     }
-
     if (requestObj->isSyncReq) {
-        OsalSemPost(&requestObj->sem);
+        OsalSemPost(&hostRequest->sem);
     }
-
     /* Fill in the request completion information. */
     /* Call user callback function. */
     if (hostRequest->userCallback) {

@@ -27,8 +27,9 @@
 
 #define USB_HOST_PNP_SERVICE_NAME "hdf_usb_pnp_notify_service"
 
+#define USB_RAW_REQUEST_TIME_ZERO_MS        (0)
 #define USB_RAW_REQUEST_DEFAULT_TIMEOUT     (1000)
-#define USB_RAW_EVENT_WAIT_DEFAULT_TIMEOUT  (60)    /* 60s */
+#define USB_RAW_REQUEST_TIMEOUT_MAX         (0xFFFFFFFF)
 
 #define DESC_HEADER_LENGTH  2
 
@@ -67,7 +68,6 @@ struct UsbMessageQueue {
     struct DListHead entry;
     struct OsalMutex mutex;
     struct OsalSem sem;
-    void *msgData;
 };
 
 struct UsbSession *RawGetSession(struct UsbSession *session);
@@ -76,8 +76,8 @@ int32_t RawExit(struct UsbSession *session);
 struct UsbDeviceHandle *RawOpenDevice(struct UsbSession *session, uint8_t busNum, uint8_t usbAddr);
 int32_t RawCloseDevice(struct UsbDeviceHandle *devHandle);
 int32_t RawClaimInterface(struct UsbDeviceHandle *devHandle, int interfaceNumber);
-unsigned char *RawMemAlloc(struct UsbDeviceHandle *devHandle, size_t length);
-int32_t RawMemFree(unsigned char *buffer, size_t length);
+struct UsbHostRequest *AllocRequest(struct UsbDeviceHandle *devHandle,  int isoPackets, size_t length);
+int32_t FreeRequest(struct UsbHostRequest *request);
 int32_t RawFillBulkRequest(struct UsbHostRequest *request, struct UsbDeviceHandle *devHandle,
     struct UsbFillRequestData *fillRequestData);
 int32_t RawFillControlSetup(unsigned char *setup, struct UsbControlRequestData *requestData);
@@ -108,8 +108,7 @@ int32_t RawReleaseInterface(struct UsbDeviceHandle *devHandle, int interfaceNumb
 int32_t RawResetDevice(struct UsbDeviceHandle *devHandle);
 int32_t RawSubmitRequest(struct UsbHostRequest *request);
 int32_t RawCancelRequest(struct UsbHostRequest *request);
-int RawHandleRequestTimeout(struct UsbDeviceHandle *devHandle, struct timeval *tv, int *completed);
-int32_t RawHandleRequest(struct UsbDeviceHandle *devHandle, int *completed);
+int32_t RawHandleRequest(struct UsbDeviceHandle *devHandle);
 int32_t RawClearHalt(struct UsbDeviceHandle *devHandle, uint8_t pipeAddress);
 int RawHandleRequestCompletion(struct UsbHostRequest *request, UsbRequestStatus status);
 int32_t RawSetInterfaceAltsetting(
@@ -118,5 +117,6 @@ UsbRawTidType RawGetTid(void);
 int32_t RawRegisterSignal(void);
 int32_t RawKillSignal(struct UsbDeviceHandle *devHandle, UsbRawTidType tid);
 int RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddRemoveInfo infoData);
+void RawRequestListInit(struct UsbDevice *deviceObj);
 
 #endif /* USB_RAW_API_LIBRARY_H */

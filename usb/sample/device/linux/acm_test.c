@@ -24,13 +24,12 @@
 #include <termios.h>
 #include "cdcacm.h"
 #include "osal_time.h"
-#ifdef __MUSL__
-#include "signal.h"
-#endif
+#include <signal.h>
+
 #define HDF_LOG_TAG   cdc_acm_test
 
 static int running = 1;
-static struct termios orgOpts, newOpts;
+static struct termios g_orgOpts, g_newOpts;
 static struct HdfSBuf *g_data;
 static struct HdfSBuf *g_reply;
 static struct HdfRemoteService *g_acmService;
@@ -103,10 +102,10 @@ static int StartThreadRead()
 
 static void SetTermios()
 {
-    tcgetattr(STDIN_FILENO, &orgOpts);
-    tcgetattr(STDIN_FILENO, &newOpts);
-    newOpts.c_lflag &= ~(ICANON | ECHOE | ECHOK | ECHONL);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newOpts);
+    tcgetattr(STDIN_FILENO, &g_orgOpts);
+    tcgetattr(STDIN_FILENO, &g_newOpts);
+    g_newOpts.c_lflag &= ~(ICANON | ECHOE | ECHOK | ECHONL);
+    tcsetattr(STDIN_FILENO, TCSANOW, &g_newOpts);
 }
 
 #define STR_LEN 256
@@ -127,7 +126,7 @@ void StopAcmTest(int signo)
     if (status) {
         HDF_LOGE("%{public}s: Dispatch USB_SERIAL_CLOSE err", __func__);
     }
-    tcsetattr(STDIN_FILENO, TCSANOW, &orgOpts);
+    tcsetattr(STDIN_FILENO, TCSANOW, &g_orgOpts);
     printf("acm_test exit.\n");
     exit(0);
 }

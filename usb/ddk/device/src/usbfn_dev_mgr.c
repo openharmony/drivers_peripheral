@@ -24,22 +24,23 @@
 #include "usbfn_io_mgr.h"
 
 #define HDF_LOG_TAG usbfn_dev_mgr
+#define SLEEP_100MS 100
+#define SLEEP_TIMES 20
 
 static struct DListHead g_devEntry = {0};
-static uint32_t intfCnt = 0;
-static uint32_t epCnt = 1;
-static uint32_t fnCntOld = 0;
+static uint32_t g_intfCnt = 0;
+static uint32_t g_epCnt = 1;
+static uint32_t g_fnCntOld = 0;
 static void GetInterfaceInfo(const struct UsbInterfaceDescriptor *intf,
     struct UsbFnDeviceMgr *devMgr, uint32_t fnCnt, const struct UsbFnConfiguration *config)
 {
-
-    if (fnCntOld != fnCnt) {
-        fnCntOld = fnCnt;
-        epCnt = 1;
+    if (g_fnCntOld != fnCnt) {
+        g_fnCntOld = fnCnt;
+        g_epCnt = 1;
     }
     struct UsbFnInterfaceInfo *info = NULL;
     if (intf->bDescriptorType == USB_DDK_DT_INTERFACE && intf->bNumEndpoints > 0) {
-        info = &devMgr->interfaceMgr[intfCnt].interface.info;
+        info = &devMgr->interfaceMgr[g_intfCnt].interface.info;
         info->index = intf->bInterfaceNumber;
         info->interfaceClass = intf->bInterfaceClass;
         info->subclass = intf->bInterfaceSubClass;
@@ -47,11 +48,11 @@ static void GetInterfaceInfo(const struct UsbInterfaceDescriptor *intf,
         info->numPipes = intf->bNumEndpoints;
         info->configIndex = config->configurationValue;
 
-        devMgr->interfaceMgr[intfCnt].interface.object = &devMgr->fnDev.object;
-        devMgr->interfaceMgr[intfCnt].funcMgr = &devMgr->funcMgr[fnCnt];
-        devMgr->interfaceMgr[intfCnt].startEpId = epCnt;
-        epCnt += intf->bNumEndpoints;
-        intfCnt++;
+        devMgr->interfaceMgr[g_intfCnt].interface.object = &devMgr->fnDev.object;
+        devMgr->interfaceMgr[g_intfCnt].funcMgr = &devMgr->funcMgr[fnCnt];
+        devMgr->interfaceMgr[g_intfCnt].startEpId = g_epCnt;
+        g_epCnt += intf->bNumEndpoints;
+        g_intfCnt++;
     }
 }
 
@@ -62,9 +63,9 @@ static void CreateInterface(struct UsbFnDeviceDesc *des, struct UsbFnDeviceMgr *
     int ret;
     struct UsbInterfaceDescriptor *intf = NULL;
 
-    intfCnt = 0;
-    epCnt = 1;
-    fnCntOld = 0;
+    g_intfCnt = 0;
+    g_epCnt = 1;
+    g_fnCntOld = 0;
     for (i = 0; des->configs[i] != NULL; i++) {
         for (j = 0; des->configs[i]->functions[j] != NULL; j++) {
             if (strncmp(des->configs[i]->functions[j]->funcName,
@@ -95,15 +96,21 @@ static int FindEmptyId(void)
 {
     int32_t i;
     int devCnt = 1;
+    int isUse = 0;
     struct UsbObject *obj = NULL;
     struct UsbObject *temp = NULL;
     if (g_devEntry.next != 0 && !DListIsEmpty(&g_devEntry)) {
         for (i = 1; i < MAX_LIST; i++) {
+            isUse = 0;
             DLIST_FOR_EACH_ENTRY_SAFE(obj, temp, &g_devEntry, \
                 struct UsbObject, entry) {
                 if (obj->objectId == i) {
+                    isUse = 1;
                     break;
                 }
+            }
+            if (isUse == 0) {
+                break;
             }
         }
         if (i == MAX_LIST) {
@@ -245,19 +252,29 @@ FREE_DEVMGR:
 int UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
 {
     int ret;
+    int i = 0;
     if (fnDevice == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
     struct UsbFnDeviceMgr *fnDevMgr = (struct UsbFnDeviceMgr *)fnDevice;
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
+
+    fnDevMgr->running = false;
+    while (fnDevMgr->running != true) {
+        i++;
+        OsalMSleep(SLEEP_100MS);
+        if (i > SLEEP_TIMES) {
+            HDF_LOGE("%s: wait thread exit timeout", __func__);
+            break;
+        }
+    }
+
     ret = OsalThreadDestroy(&fnDevMgr->thread);
     if (HDF_SUCCESS != ret) {
         HDF_LOGE("%{public}s:%{public}d OsalThreadDestroy failed, ret=%{public}d",
             __func__, __LINE__, ret);
         return ret;
     }
-    fnDevMgr->running = false;
-    OsalMSleep(500);
     ret = fnOps->delDevice(fnDevMgr->name, fnDevMgr->udcName, fnDevMgr->des);
     if (ret) {
         HDF_LOGE("%{public}s:%{public}d UsbFnMgrDeviceRemove failed", __func__, __LINE__);
@@ -431,6 +448,10 @@ static void HandleEpsIoEvent(const struct UsbFnReqEvent *reqEvent,
 static struct UsbFnFuncMgr *GetFuncMgr(const struct UsbFnDeviceMgr *devMgr, int ep0)
 {
     uint8_t i;
+
+    if (devMgr == NULL) {
+        return NULL;
+    }
     struct UsbFnFuncMgr *funcMgr = NULL;
     for (i = 0; i < devMgr->numFunc; i++) {
         funcMgr = devMgr->funcMgr + i;
@@ -446,6 +467,10 @@ static struct UsbHandleMgr *GetHandleMgr(const struct UsbFnDeviceMgr *devMgr, in
     uint8_t i, j;
     struct UsbHandleMgr      *handle  = NULL;
     struct UsbFnInterfaceMgr *intfMgr = NULL;
+
+    if (devMgr == NULL) {
+        return NULL;
+    }
     for (i = 0; i < devMgr->fnDev.numInterfaces; i++) {
         intfMgr = devMgr->interfaceMgr + i;
         if (intfMgr->isOpen == false) {
@@ -470,7 +495,7 @@ static int UsbFnEventProcess(void *arg)
     struct UsbFnEventAll event = {0};
     struct UsbFnFuncMgr *funcMgr = NULL;
     struct UsbHandleMgr *handle = NULL;
-    int32_t timeout = 1000;
+    int32_t timeout = SLEEP_100MS;
 
     while (true) {
         if (devMgr == NULL || devMgr->running == false) {
@@ -481,16 +506,13 @@ static int UsbFnEventProcess(void *arg)
         if (event.ep0Num + event.epNum == 0) {
             continue;
         }
-        if (devMgr == NULL || devMgr->running == false) {
-            break;
-        }
         ret = fnOps->pollEvent(&event, timeout);
         if (ret != 0) {
+            if (devMgr == NULL || devMgr->running == false) {
+                break;
+            }
             OsalMSleep(1);
             continue;
-        }
-        if (devMgr == NULL || devMgr->running == false) {
-            break;
         }
         for (i = 0; i < event.ep0Num; i++) {
             funcMgr = GetFuncMgr(devMgr, event.ep0[i]);
@@ -513,6 +535,10 @@ static int UsbFnEventProcess(void *arg)
             }
         }
     }
+    if (devMgr) {
+        devMgr->running = true;
+    }
+    HDF_LOGI("%s, exit\n", __func__);
     return 0;
 }
 
@@ -530,7 +556,7 @@ static int StartThreadIo(struct UsbFnDeviceMgr *fnDevMgr)
         HDF_LOGE("%{public}s:%{public}d OsalThreadCreate failed, ret=%{public}d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
-
+    HDF_LOGD("%{public}s: Usb device OsalThreadCreate!", __func__);
     ret = OsalThreadStart(&fnDevMgr->thread, &threadCfg);
     if (HDF_SUCCESS != ret) {
         HDF_LOGE("%{public}s:%{public}d OsalThreadStart failed, ret=%{public}d ", __func__, __LINE__, ret);

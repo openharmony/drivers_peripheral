@@ -84,6 +84,7 @@ struct UsbHostRequest {
     void *userData;
 
     /* the following fields are not visible to user */
+    struct HdfSListNode entry;
     struct DListHead list;
     struct UsbDeviceHandle *devHandle;
     UsbRawRequestCallback callback;
@@ -94,6 +95,7 @@ struct UsbHostRequest {
     unsigned char endPoint;
     unsigned int timeout;
     unsigned char requestType;
+    void *bulkUrb;
     union {
         void *urbs;
         void **isoUrbs;

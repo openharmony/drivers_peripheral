@@ -84,7 +84,7 @@ HWTEST_F(UsbHostPerformanceTest, CheckHostSdkProcInfo, TestSize.Level1)
     ASSERT_EQ(system(("nohup sh " + script + " pnp_host > /data/nohup.out &").c_str()), 0);
     printf("usb_watch_process.sh is running...\n");
     for (int i = 0; i < 1000; i++) {
-        system("hostacm_moduletest -SDK -syncWrite $RANDOM");
+        system("usbhost_ddk_test -AW $RANDOM");
         printf("Write data %d times\n", i);
         usleep(100 * 1000);
     }

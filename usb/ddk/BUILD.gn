@@ -35,9 +35,6 @@ ohos_shared_library("libusb_ddk_host") {
     "//drivers/peripheral/usb/interfaces/ddk/device",
     "//drivers/peripheral/usb/interfaces/ddk/host",
   ]
-  if (use_musl) {
-    include_dirs += [ "//third_party/musl/include" ]
-  }
   sources = [
     "host/src/linux_adapter.c",
     "host/src/usb_interface_pool.c",

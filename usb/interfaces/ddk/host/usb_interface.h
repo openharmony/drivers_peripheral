@@ -135,7 +135,8 @@ int32_t UsbExitHostSdk(struct UsbSession *session);
 const struct UsbInterface *UsbClaimInterface(struct UsbSession *session, uint8_t busNum,
     uint8_t usbAddr, uint8_t interfaceIndex);
 int UsbReleaseInterface(const struct UsbInterface *interfaceObj);
-int UsbAddOrRemoveInterface(UsbInterfaceStatus status, struct UsbInterface *interfaceObj);
+int UsbAddOrRemoveInterface(struct UsbSession *session, uint8_t busNum, uint8_t usbAddr,
+    uint8_t interfaceIndex, UsbInterfaceStatus status);
 UsbInterfaceHandle *UsbOpenInterface(struct UsbInterface *interfaceObj);
 int32_t UsbCloseInterface(UsbInterfaceHandle *interfaceHandle);
 int32_t UsbSelectInterfaceSetting(UsbInterfaceHandle *interfaceHandle, uint8_t settingIndex,

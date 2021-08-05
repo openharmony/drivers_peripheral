@@ -951,6 +951,7 @@ static int UsbFnAdapterDelDevice(const char *deviceName, const char *udcName,
         for (j = 0; des->configs[i]->functions[j] != NULL; j++) {
             if (strncmp(des->configs[i]->functions[j]->funcName,
                 FUNCTION_GENERIC, strlen(FUNCTION_GENERIC))) {
+                CleanConfigFs(deviceName, des->configs[i]->functions[j]->funcName);
                 continue;
             }
             CleanFunction(deviceName, des->configs[i]->functions[j]->funcName);
@@ -986,6 +987,21 @@ static int UsbFnAdapterWaitUDC(const char *deviceName, const char *udcName)
         OsalMDelay(DELAY_100MS);
     }
     return HDF_ERR_IO;
+}
+
+static int EnableDevice(const char *udcName,
+    const char *devName, struct UsbFnDeviceDesc *descriptor)
+{
+    int ret;
+    (void)UsbFnAdapterWriteUDC(devName, "none", 0);
+    if (!UsbFnAdapterWaitUDC(devName, udcName)) {
+        return 0;
+    }
+    ret = UsbFnAdapterWriteUDC(devName, udcName, 1);
+    if (ret) {
+        (void)UsbFnAdapterDelDevice(devName, udcName, descriptor);
+    }
+    return ret;
 }
 
 #define FFS_ADB "/config/usb_gadget/g1/functions/ffs.adb"
@@ -1039,23 +1055,13 @@ static int UsbFnAdapterCreateDevice(const char *udcName,
             if (ret < 0) {
                 HDF_LOGE("%{public}s: CreatFunc failure!", __func__);
                 (void)UsbFnAdapterWriteUDC(devName, "none", 0);
-                if (!UsbFnAdapterWaitUDC(devName, udcName)) {
-                    return HDF_ERR_INVALID_PARAM;
-                }
                 (void)UsbFnAdapterWriteUDC(devName, udcName, 1);
                 return HDF_ERR_INVALID_PARAM;
             }
         }
     }
-    (void)UsbFnAdapterWriteUDC(devName, "none", 0);
-    if (!UsbFnAdapterWaitUDC(devName, udcName)) {
-        return 0;
-    }
-    ret = UsbFnAdapterWriteUDC(devName, udcName, 1);
-    if (ret) {
-        (void)UsbFnAdapterDelDevice(devName, udcName, descriptor);
-    }
-    return ret;
+
+    return EnableDevice(udcName, devName, descriptor);
 }
 
 static int UsbFnAdapterGetPipeInfo(int ep, struct UsbFnPipeInfo *pipeInfo)
