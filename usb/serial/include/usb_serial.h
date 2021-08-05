@@ -16,13 +16,11 @@
 #ifndef HDF_USB_SERIAL_H
 #define HDF_USB_SERIAL_H
 
+#include "data_fifo.h"
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
-#include "osal_atomic.h"
 #include "usb_ddk.h"
-#include "usb_session.h"
 #include "usb_interface.h"
-#include "data_fifo.h"
 
 #define USB_MAX_INTERFACES      32
 #define DATARATE                9600
@@ -74,6 +72,7 @@ typedef enum {
 } AcmModuleTestCmdType;
 
 struct AcmDevice;
+
 struct AcmWb {
     struct UsbRequest *request;
     struct AcmDevice *instance;
@@ -83,7 +82,7 @@ struct AcmWb {
 };
 
 struct AcmRb {
-    uint8_t  *base;
+    uint8_t *base;
     int size;
     int index;
     int use;

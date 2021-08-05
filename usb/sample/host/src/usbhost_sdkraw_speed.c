@@ -147,7 +147,7 @@ static int UsbStartIo(struct AcmDevice *acm)
     threadCfg.name      = "usb io send thread";
     threadCfg.priority  = OSAL_THREAD_PRI_DEFAULT;
     threadCfg.stackSize = USB_IO_THREAD_STACK_SIZE;
-    ret = OsalThreadCreate(&acm->ioThread, \
+    ret = OsalThreadCreate(&acm->ioSendThread, \
                                (OsalThreadEntry)UsbIoSendThread, (void *)acm);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d OsalThreadCreate faile, ret=%{public}d ",
@@ -155,7 +155,7 @@ static int UsbStartIo(struct AcmDevice *acm)
         return ret;
     }
 
-    ret = OsalThreadStart(&acm->ioThread, &threadCfg);
+    ret = OsalThreadStart(&acm->ioSendThread, &threadCfg);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d OsalThreadStart faile, ret=%{public}d ",
                  __func__, __LINE__, ret);
@@ -188,6 +188,13 @@ static int UsbStopIo(struct AcmDevice *acm)
     HDF_LOGD("%{public}s:%{public}d", __func__, __LINE__);
 
     ret = OsalThreadDestroy(&acm->ioThread);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d OsalThreadDestroy faile, ret=%{public}d ",
+                 __func__, __LINE__, ret);
+        return ret;
+    }
+
+    ret = OsalThreadDestroy(&acm->ioSendThread);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d OsalThreadDestroy faile, ret=%{public}d ",
                  __func__, __LINE__, ret);
@@ -322,7 +329,6 @@ static int UsbAllocDataRequests(struct AcmDevice *acm)
             return HDF_ERR_MALLOC_FAIL;
         }
         struct UsbRawFillRequestData reqData;
-        acm->transmitting++;
         reqData.endPoint      = acm->dataEp->addr;
         reqData.numIsoPackets = 0;
         reqData.callback      = AcmTestBulkCallback;
@@ -483,7 +489,25 @@ static int32_t SerialBegin(struct AcmDevice *acm)
     }
     db = &acm->db[dbn];
     db->len = acm->dataSize;
-    memset(db->buf, 'b', TEST_LENGTH);
+    if (g_writeOrRead == TEST_READ) {
+        memset_s(db->buf, TEST_LENGTH, '0', TEST_LENGTH);
+    }
+    struct UsbRawFillRequestData reqData;
+    reqData.endPoint      = acm->dataEp->addr;
+    reqData.numIsoPackets = 0;
+    reqData.callback      = AcmTestBulkCallback;
+    reqData.userData      = (void *)db;
+    reqData.timeout       = USB_CTRL_SET_TIMEOUT;
+    reqData.buffer        = db->buf;
+    reqData.length        = acm->dataSize;
+
+    ret = UsbRawFillBulkRequest(db->request, acm->devHandle, &reqData);
+    if (ret) {
+        HDF_LOGE("%{public}s: FillInterruptRequest faile, ret=%{public}d",
+                 __func__, ret);
+        return HDF_FAILURE;
+    }
+
     ret = AcmStartdb(acm, db);
     return size;
 }

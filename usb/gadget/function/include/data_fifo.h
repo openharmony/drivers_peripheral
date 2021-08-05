@@ -27,10 +27,10 @@
 #endif
 
 struct DataFifo {
-    uint32_t	rdIdx;
-    uint32_t	wrIdx;
-    uint32_t	size;
-    void        *data;
+    uint32_t rdIdx;
+    uint32_t wrIdx;
+    uint32_t size;
+    void     *data;
 };
 
 /* DataFifo Helper function */

@@ -42,6 +42,8 @@ struct UsbDevice {
     size_t descriptorsLength;
     uint8_t activeConfig;
     struct UsbDeviceConfigDescriptor *configDescriptors;
+    struct OsalMutex requestLock;
+    struct HdfSList requestList;
     void *privateObject;
     void *privateData;
 };

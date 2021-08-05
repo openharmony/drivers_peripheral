@@ -1,19 +1,16 @@
 /*
- * UsbPerformanceTest.cpp
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * usb sdk performance test source file
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Copyright (c) 2020-2021 Huawei Device Co., Ltd.
- *
- * This software is licensed under the terms of the GNU General Public
- * License version 2, as published by the Free Software Foundation, and
- * may be copied, distributed, and modified under those terms.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #include <cstdio>
@@ -84,7 +81,7 @@ HWTEST_F(UsbHostPerformanceTest, CheckHostSdkProcInfo, TestSize.Level1)
     ASSERT_EQ(system(("nohup sh " + script + " pnp_host > /data/nohup.out &").c_str()), 0);
     printf("usb_watch_process.sh is running...\n");
     for (int i = 0; i < 1000; i++) {
-        system("hostacm_moduletest -SDK -syncWrite $RANDOM");
+        system("usbhost_ddk_test -AW $RANDOM");
         printf("Write data %d times\n", i);
         usleep(100 * 1000);
     }

@@ -29,6 +29,7 @@
 #include "osal_mutex.h"
 #include "osal_sem.h"
 #include "osal_thread.h"
+#include "osal_time.h"
 #include "osal_atomic.h"
 
 #define MAX_OBJECT_ID       (0x7FFFFFFF)

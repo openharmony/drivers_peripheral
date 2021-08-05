@@ -37,11 +37,31 @@ static inline unsigned char *ControlRequestGetData(struct UsbHostRequest *reques
     return request->buffer + USB_RAW_CONTROL_SETUP_SIZE;
 }
 
-static int32_t HandleSyncRequestStatus(UsbRequestStatus status)
+static int32_t HandleSyncRequestCompletion(struct UsbHostRequest *request, struct UsbRequestData *requestData)
 {
     int32_t ret;
+    uint32_t waitTime;
 
-    switch (status) {
+    if (request->timeout == USB_RAW_REQUEST_TIME_ZERO_MS) {
+        waitTime = HDF_WAIT_FOREVER;
+    } else {
+        waitTime = request->timeout;
+    }
+
+    ret = OsalSemWait(&request->sem, waitTime);
+    if (ret == HDF_ERR_TIMEOUT) {
+        RawCancelRequest(request);
+        RawHandleRequestCompletion(request, USB_REQUEST_TIMEOUT);
+    } else if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d OsalSemWait faile, ret=%{public}d ", __func__, __LINE__, ret);
+        goto out;
+    }
+
+    if (requestData->requested) {
+        *(requestData->requested) = request->actualLength;
+    }
+
+    switch (request->status) {
         case USB_REQUEST_COMPLETED:
             ret = HDF_SUCCESS;
             break;
@@ -58,11 +78,13 @@ static int32_t HandleSyncRequestStatus(UsbRequestStatus status)
             ret = HDF_ERR_IO;
             break;
         default:
-            HDF_LOGW("%{public}s: unrecognised status code %{public}d", __func__, status);
+            HDF_LOGW("%{public}s: unrecognised status code %{public}d", __func__, request->status);
             ret = HDF_FAILURE;
             break;
     }
 
+out:
+    OsalSemDestroy(&request->sem);
     return ret;
 }
 
@@ -97,20 +119,11 @@ static int32_t HandleSyncRequest(struct UsbHostRequest *request, struct UsbDevic
 
     ret = RawSubmitRequest(request);
     if (ret < 0) {
+        OsalSemDestroy(&request->sem);
         return ret;
     }
 
-    ret = OsalSemWait(&request->sem, HDF_WAIT_FOREVER);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d OsalSemWait faile, ret=%{public}d ", __func__, __LINE__, ret);
-        return ret;
-    }
-
-    if (requestData->requested) {
-        *(requestData->requested) = request->actualLength;
-    }
-
-    return HandleSyncRequestStatus(request->status);
+    return HandleSyncRequestCompletion(request, requestData);
 }
 
 static void GetInterfaceNumberDes(
@@ -651,9 +664,33 @@ static int32_t DescToConfig(const uint8_t *buf, int size, struct UsbRawConfigDes
     return ret;
 }
 
-static int32_t RawCheckRequestStatus(struct UsbHostRequest *request)
+static int32_t ControlRequestCompletion(struct UsbHostRequest *request, struct UsbControlRequestData *requestData)
 {
     int32_t ret;
+    uint32_t waitTime;
+
+    if (request->timeout == USB_RAW_REQUEST_TIME_ZERO_MS) {
+        waitTime = HDF_WAIT_FOREVER;
+    } else {
+        waitTime = request->timeout;
+    }
+
+    ret = OsalSemWait(&request->sem, waitTime);
+    if (ret == HDF_ERR_TIMEOUT) {
+        RawCancelRequest(request);
+        RawHandleRequestCompletion(request, USB_REQUEST_TIMEOUT);
+    } else if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d OsalSemWait faile, ret=%{public}d ", __func__, __LINE__, ret);
+        goto out;
+    }
+
+    if ((requestData->requestType & USB_DDK_ENDPOINT_DIR_MASK) == USB_PIPE_DIRECTION_IN) {
+        ret = memcpy_s(requestData->data, request->actualLength, ControlRequestGetData(request), request->actualLength);
+        if (ret != EOK) {
+            HDF_LOGE("%{public}s:%{public}d memcpy_s fail!", __func__, __LINE__);
+            goto out;
+        }
+    }
 
     switch (request->status) {
         case USB_REQUEST_COMPLETED:
@@ -677,6 +714,8 @@ static int32_t RawCheckRequestStatus(struct UsbHostRequest *request)
             break;
     }
 
+out:
+    OsalSemDestroy(&request->sem);
     return ret;
 }
 
@@ -825,26 +864,26 @@ out:
     return ret;
 }
 
-unsigned char *RawMemAlloc(struct UsbDeviceHandle *devHandle, size_t length)
+struct UsbHostRequest *AllocRequest(struct UsbDeviceHandle *devHandle,  int isoPackets, size_t length)
 {
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
 
-    if (osAdapterOps->allocMem == NULL) {
+    if (osAdapterOps->allocRequest == NULL) {
         return NULL;
     }
 
-    return osAdapterOps->allocMem(devHandle, length);
+    return osAdapterOps->allocRequest(devHandle,  isoPackets, length);
 }
 
-int32_t RawMemFree(unsigned char *buffer, size_t length)
+int32_t FreeRequest(struct UsbHostRequest *request)
 {
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
 
-    if (osAdapterOps->freeMem == NULL) {
+    if (osAdapterOps->freeRequest == NULL) {
         return HDF_ERR_NOT_SUPPORT;
     }
 
-    return osAdapterOps->freeMem(buffer, length);
+    return osAdapterOps->freeRequest(request);
 }
 
 int32_t RawFillBulkRequest(struct UsbHostRequest *request, struct UsbDeviceHandle *devHandle,
@@ -972,13 +1011,22 @@ int32_t RawSendControlRequest(struct UsbHostRequest *request, struct UsbDeviceHa
     setup = request->buffer;
     RawFillControlSetup(setup, requestData);
     if ((requestData->requestType & USB_DDK_ENDPOINT_DIR_MASK) == USB_PIPE_DIRECTION_OUT) {
-        fillRequestData.buffer = requestData->data;
+        fillRequestData.endPoint = 0;
         fillRequestData.length = requestData->length;
+        if (requestData->length > 0) {
+            ret = memcpy_s(request->buffer + USB_RAW_CONTROL_SETUP_SIZE, fillRequestData.length,
+                requestData->data, fillRequestData.length);
+            if (ret != EOK) {
+                HDF_LOGE("%{public}s:%{public}d memcpy_s fail, requestData.length=%{public}d",
+                         __func__, __LINE__, requestData->length);
+                return ret;
+            }
+        }
+        fillRequestData.length = USB_RAW_CONTROL_SETUP_SIZE + requestData->length;
     } else {
-        fillRequestData.buffer = NULL;
-        fillRequestData.length = 0;
+        fillRequestData.endPoint = (0x1  << USB_DIR_OFFSET);
     }
-
+    fillRequestData.userCallback = NULL;
     fillRequestData.callback  = SyncRequestCallback;
     fillRequestData.userData  = &completed;
     fillRequestData.timeout   = requestData->timeout;
@@ -992,25 +1040,11 @@ int32_t RawSendControlRequest(struct UsbHostRequest *request, struct UsbDeviceHa
 
     ret = RawSubmitRequest(request);
     if (ret < 0) {
+        OsalSemDestroy(&request->sem);
         return ret;
     }
 
-    ret = OsalSemWait(&request->sem, HDF_WAIT_FOREVER);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d OsalSemWait faile, ret=%{public}d ", __func__, __LINE__, ret);
-        return ret;
-    }
-
-    if ((requestData->requestType & USB_DDK_ENDPOINT_DIR_MASK) == USB_PIPE_DIRECTION_IN) {
-        ret = memcpy_s(requestData->data, request->actualLength, ControlRequestGetData(request), request->actualLength);
-        if (ret != EOK) {
-            HDF_LOGE("%{public}s:%{public}d memcpy_s fail!", __func__, __LINE__);
-            return ret;
-        }
-    }
-
-    ret = RawCheckRequestStatus(request);
-    return ret;
+    return ControlRequestCompletion(request, requestData);
 }
 
 int32_t RawSendBulkRequest(struct UsbHostRequest *request, struct UsbDeviceHandle *devHandle,
@@ -1036,23 +1070,10 @@ int32_t RawSendInterruptRequest(struct UsbHostRequest *request, struct UsbDevice
 
 struct UsbHostRequest *RawAllocRequest(struct UsbDeviceHandle *devHandle, int isoPackets, int length)
 {
-    size_t allocSize;
     struct UsbHostRequest *request = NULL;
-
-    allocSize = sizeof(struct UsbHostRequest)
-                + (sizeof(struct UsbIsoPacketDesc) * (size_t)isoPackets)
-                + (sizeof(unsigned char) * length);
-    request = (struct UsbHostRequest *)RawMemAlloc(devHandle, allocSize);
+    request = (struct UsbHostRequest *)AllocRequest(devHandle, isoPackets, length);
     if (request == NULL) {
-        HDF_LOGE("%{public}s RawMemAlloc fail\n", __func__);
-        return NULL;
-    }
-    request->numIsoPackets = isoPackets;
-    request->buffer = (unsigned char *)request + allocSize - length;
-    request->bufLen = length;
-    request->urbs = OsalMemAlloc(sizeof(struct UsbAdapterUrb));
-    if (request->urbs == NULL) {
-        HDF_LOGE("%{public}s OsalMemAlloc fail\n", __func__);
+        HDF_LOGE("%{public}s RawMemAlloc fail", __func__);
         return NULL;
     }
     return request;
@@ -1060,22 +1081,11 @@ struct UsbHostRequest *RawAllocRequest(struct UsbDeviceHandle *devHandle, int is
 
 int32_t RawFreeRequest(struct UsbHostRequest *request)
 {
-    size_t allocSize;
-
     if (request == NULL) {
         HDF_LOGE("%{public}s:%{public}d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (request->urbs)
-    {
-        OsalMemFree(request->urbs);
-        request->urbs = NULL;
-    }
-    allocSize = sizeof(struct UsbHostRequest)
-                + (sizeof(struct UsbIsoPacketDesc) * (size_t)(request->numIsoPackets))
-                + request->bufLen;
-
-    return RawMemFree((unsigned char *)request, allocSize);
+    return FreeRequest(request);
 }
 
 int32_t RawGetConfigDescriptor(struct UsbDevice *dev, uint8_t configIndex,
@@ -1097,7 +1107,7 @@ int32_t RawGetConfigDescriptor(struct UsbDevice *dev, uint8_t configIndex,
     }
 
     ret = GetConfigDescriptor(dev, configIndex, tempConfig.buf, sizeof(tempConfig.buf));
-    if (ret < 0) {
+    if (ret < HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d ret=%{public}d", __func__, __LINE__, ret);
         return ret;
     }
@@ -1109,7 +1119,7 @@ int32_t RawGetConfigDescriptor(struct UsbDevice *dev, uint8_t configIndex,
     }
 
     ret = GetConfigDescriptor(dev, configIndex, buf, configLen);
-    if (ret >= 0) {
+    if (ret >= HDF_SUCCESS) {
         ret = DescToConfig(buf, ret, config);
     }
 
@@ -1255,10 +1265,11 @@ int32_t RawResetDevice(struct UsbDeviceHandle *devHandle)
 
 int32_t RawSubmitRequest(struct UsbHostRequest *request)
 {
+    int32_t ret;
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
 
     if (request == NULL) {
-        HDF_LOGE("%{public}s: invalid param", __func__);
+        HDF_LOGE("%{public}s:%{public}d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -1266,7 +1277,12 @@ int32_t RawSubmitRequest(struct UsbHostRequest *request)
         return HDF_ERR_NOT_SUPPORT;
     }
 
-    return osAdapterOps->submitRequest(request);
+    ret = osAdapterOps->submitRequest(request);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d ret = %{public}d", __func__, __LINE__, ret);
+    }
+
+    return ret;
 }
 
 int32_t RawCancelRequest(struct UsbHostRequest *request)
@@ -1280,14 +1296,10 @@ int32_t RawCancelRequest(struct UsbHostRequest *request)
     return osAdapterOps->cancelRequest(request);
 }
 
-int RawHandleRequestTimeout(struct UsbDeviceHandle *devHandle, struct timeval *tv, int *completed)
+int32_t RawHandleRequest(struct UsbDeviceHandle *devHandle)
 {
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
     int ret;
-
-    if (completed && *completed) {
-        return HDF_SUCCESS;
-    }
 
     if (!osAdapterOps->urbCompleteHandle) {
         return HDF_ERR_NOT_SUPPORT;
@@ -1295,20 +1307,10 @@ int RawHandleRequestTimeout(struct UsbDeviceHandle *devHandle, struct timeval *t
 
     ret = osAdapterOps->urbCompleteHandle(devHandle);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: handleEvents error, return %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s:%{public}d handleEvents error, return %{public}d", __func__, __LINE__, ret);
     }
 
     return ret;
-}
-
-int32_t RawHandleRequest(struct UsbDeviceHandle *devHandle, int *completed)
-{
-    struct timeval timeValue;
-
-    timeValue.tv_sec = USB_RAW_EVENT_WAIT_DEFAULT_TIMEOUT;
-    timeValue.tv_usec = 0;
-
-    return RawHandleRequestTimeout(devHandle, &timeValue, completed);
 }
 
 int32_t RawClearHalt(struct UsbDeviceHandle *devHandle, uint8_t pipeAddress)
@@ -1326,7 +1328,6 @@ int32_t RawClearHalt(struct UsbDeviceHandle *devHandle, uint8_t pipeAddress)
 int RawHandleRequestCompletion(struct UsbHostRequest *request, UsbRequestStatus status)
 {
     request->status = status;
-
     if (request->callback) {
         request->callback((void *)request);
     }
@@ -1418,4 +1419,15 @@ error_sbuf:
     HdfIoServiceRecycle(serv);
 
     return ret;
+}
+
+void RawRequestListInit(struct UsbDevice *deviceObj)
+{
+    if (deviceObj == NULL) {
+        HDF_LOGE("%{public}s:%{public}d deviceObj is NULL!", __func__, __LINE__);
+        return;
+    }
+
+    OsalMutexInit(&deviceObj->requestLock);
+    HdfSListInit(&deviceObj->requestList);
 }
