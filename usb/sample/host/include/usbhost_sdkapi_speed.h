@@ -37,7 +37,7 @@
 #define ACM_NR                  30
 #define READ_BUF_SIZE           8192
 #define DIRECTION_MASK          0x1
-#define USB_CTRL_SET_TIMEOUT    5000
+#define USB_CTRL_SET_TIMEOUT    0
 #define USB_PIPE_DIR_OFFSET     7
 
 typedef enum {

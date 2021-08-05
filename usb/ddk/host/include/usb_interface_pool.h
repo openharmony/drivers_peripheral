@@ -106,8 +106,6 @@ struct UsbPoolQueryPara {
 
 struct UsbIfRequest {
     struct UsbRequest request;
-    struct OsalSem sem;
-    struct OsalMutex mutex;
     struct UsbHostRequest *hostRequest;
     bool isSyncReq;
 }__attribute__((aligned(4)));

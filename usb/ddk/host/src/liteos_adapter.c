@@ -14,6 +14,7 @@
  */
 
 #include "liteos_adapter.h"
+#include "los_spinlock.h"
 #ifdef LOSCFG_DRIVERS_HDF_USB_PNP_NOTIFY
 #include "usb_pnp_notify.h"
 #endif
@@ -24,15 +25,25 @@
 #define DESC_READ_LEN   256
 #define EP_NUM_MAX      30
 
+static bool g_CompleteExit;
+
+enum UrbState{
+    URB_INIT_STATE,
+    URB_SUBMIT_STATE,
+    URB_REAP_STATE,
+};
+
 struct Async {
     struct DListHead asynclist;
+    enum UrbState state;
     struct UsbDevice *dev;
     struct UsbAdapterUrb urb;
 };
 
 struct OsDev{
-    struct UsbAdapterDevice *adapterDevice;
     struct DListHead asyncCompleted;
+    struct UsbAdapterDevice *adapterDevice;
+    SPIN_LOCK_S completeLock;
     struct OsalMutex completeMux;
     struct OsalSem  cvWait;
 };
@@ -61,9 +72,29 @@ out:
     return mem;
 }
 
+static bool UsbFindUrb(struct Async *urb, struct DListHead *list)
+{
+    bool findFlag = false;
+    struct OsDev *osDev = CONTAINER_OF(list, struct OsDev, asyncCompleted);
+    struct Async * asPos = NULL;
+    struct Async * asTemp = NULL;
+    if (DListIsEmpty(&osDev->asyncCompleted)) {
+        return false;
+    }
+    DLIST_FOR_EACH_ENTRY_SAFE(asPos, asTemp, list,
+        struct Async, asynclist) {
+        if (asPos == urb) {
+            findFlag = true;
+            break;
+        }
+    }
+    return findFlag;
+}
+
 static void OsUrbComplete(struct UsbAdapterUrb *urb)
 {
-    struct Async *as = CONTAINER_OF(urb, struct Async, urb);
+    uint32_t save;
+    struct Async * as = CONTAINER_OF(urb, struct Async, urb);
     struct UsbDevice *dev = as->dev;
     if (dev == NULL){
         DPRINTFN(0, "--dev:%p\n", dev);
@@ -71,13 +102,18 @@ static void OsUrbComplete(struct UsbAdapterUrb *urb)
     }
     struct OsDev *osDev = (struct OsDev *)dev->privateData;
     if (osDev == NULL){
-        DPRINTFN(0, "--dev:%p\n", osDev);
+        DPRINTFN(0, "--osDev:%p\n", osDev);
         return;
     }
-    OsalMutexLock(&osDev->completeMux);
-    DListInsertTail(&as->asynclist, &osDev->asyncCompleted);
-    OsalMutexUnlock(&osDev->completeMux);
-    OsalSemPost(&osDev->cvWait);
+    as->state = URB_REAP_STATE;
+    LOS_SpinLockSave(&osDev->completeLock, &save);
+    if (UsbFindUrb(as, &osDev->asyncCompleted) == false){
+        DListInsertTail(&as->asynclist, &osDev->asyncCompleted);
+        LOS_SpinUnlockRestore(&osDev->completeLock, save);
+        OsalSemPost(&osDev->cvWait);
+    }else{
+        LOS_SpinUnlockRestore(&osDev->completeLock, save);
+    }
 }
 
 static int OsSubmitUrb(
@@ -117,37 +153,47 @@ static int OsControlMsg(struct UsbAdapterUrb *urb)
              USB_SHORT_XFER_OK, &actLen, urb->timeout);
     if (err) {
         DPRINTFN(1, "OsControlMsg!err:%d\n", err);
-        return HDF_FAILURE;
     }
     urb->actual_length = actLen;
     if (urb->complete) {
-        (urb->complete) (urb);
+        (urb->complete)(urb);
     }
-    return HDF_SUCCESS;
+    return err;
 }
 
 static int OsWaitUrb(struct OsDev *osDev)
 {
     if (osDev == NULL) {
-        return -1;
+        return HDF_FAILURE;
     }
-    OsalSemWait(&osDev->cvWait, HDF_WAIT_FOREVER);
+    do {
+        OsalSemWait(&osDev->cvWait, HDF_WAIT_FOREVER);
+    } while (!g_CompleteExit && DListIsEmpty(&osDev->asyncCompleted));
     return HDF_SUCCESS;
 }
 
 static int OsReapUrb(struct UsbDeviceHandle *handle, struct Async **urb)
 {
     int err = 0;
-    struct Async *as = NULL;
+    uint32_t save;
+    struct Async * as = NULL;
     struct UsbDevice *dev = handle->dev;
+    if ((handle == NULL) || (handle->dev == NULL) || (handle->dev->privateData == NULL)) {
+         PRINTK("invalid parmater\n");
+         return HDF_ERR_INVALID_PARAM;
+    }
     struct OsDev *osDev = (struct OsDev *)dev->privateData;
     err = OsWaitUrb(osDev);
-    OsalMutexLock(&osDev->completeMux);
+    if (dev->privateData == NULL) {
+         PRINTK("invalid parmater\n");
+         return HDF_ERR_INVALID_PARAM;
+    }
+    LOS_SpinLockSave(&osDev->completeLock, &save);
     if (!DListIsEmpty(&osDev->asyncCompleted)) {
         as = DLIST_FIRST_ENTRY(&osDev->asyncCompleted, struct Async, asynclist);
         DListRemove(&as->asynclist);
     }
-    OsalMutexUnlock(&osDev->completeMux);
+    LOS_SpinUnlockRestore(&osDev->completeLock, save);
     *urb = as;
     return err;
 }
@@ -211,8 +257,12 @@ static struct UsbDevice *OsAllocDevice(struct UsbSession *session, struct UsbDev
         DPRINTFN(0, "%s:%d no memory", __func__, __LINE__);
         return NULL;
     }
+
     dev->session = session;
     dev->devHandle = handle;
+
+    RawRequestListInit(dev);
+
     handle->dev = dev;
     return dev;
 }
@@ -305,6 +355,31 @@ static int OsParseConfigDescriptors(struct UsbDevice *dev)
     return HDF_SUCCESS;
 }
 
+static struct OsDev *OsDevAllocInit(void)
+{
+    struct OsDev *osDev = NULL;
+    osDev = OsalMemCalloc(sizeof(*osDev));
+    if (osDev == NULL) {
+        return NULL;
+    }
+    DListHeadInit(&osDev->asyncCompleted);
+    OsalSemInit(&osDev->cvWait, 0);
+    LOS_SpinInit(&osDev->completeLock);
+    OsalMutexInit(&osDev->completeMux);
+    return osDev;
+}
+
+static void OsDevDestory(struct OsDev *osDev)
+{
+    if (osDev == NULL) {
+        DPRINTFN(0, "invalid parma\n");
+        return;
+    }
+    OsalSemDestroy(&osDev->cvWait);
+    OsalMutexDestroy(&osDev->completeMux);
+    OsalMemFree(osDev);
+}
+
 static int OsInitDevice(struct UsbDevice *dev, uint8_t busNum, uint8_t devAddr)
 {
     struct OsDev *osDev = NULL;
@@ -312,12 +387,18 @@ static int OsInitDevice(struct UsbDevice *dev, uint8_t busNum, uint8_t devAddr)
 
     dev->busNum = busNum;
     dev->devAddr = devAddr;
-    osDev = OsalMemCalloc(sizeof(*osDev));
-    DListHeadInit(&osDev->asyncCompleted);
-    OsalSemInit(&osDev->cvWait, 0);
-    OsalMutexInit(&osDev->completeMux);
+    osDev = OsDevAllocInit();
+    if (osDev == NULL) {
+        DPRINTFN(0, "%s:%d osDev  is NULL\n", __func__, __LINE__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
+    g_CompleteExit = false;
 #ifdef LOSCFG_DRIVERS_HDF_USB_PNP_NOTIFY
-    osDev->adapterDevice = UsbPnpNotifyGetUsbDevice(dev->busNum, dev->devAddr);
+    struct UsbGetDevicePara paraData;
+    paraData.type = USB_PNP_DEVICE_ADDRESS_TYPE;
+    paraData.busNum = dev->busNum;
+    paraData.devNum = dev->devAddr;
+    osDev->adapterDevice = UsbPnpNotifyGetUsbDevice(paraData);
 #else
     osDev->adapterDevice = NULL;
 #endif
@@ -349,7 +430,7 @@ static int OsInitDevice(struct UsbDevice *dev, uint8_t busNum, uint8_t devAddr)
 
 static void OsFreeIsoUrbs(struct UsbHostRequest *request)
 {
-    struct UsbAdapterUrb *urb = NULL;
+    struct Async *urb = NULL;
 
     for (int i = 0; i < request->numUrbs; i++) {
         urb = request->isoUrbs[i];
@@ -357,6 +438,7 @@ static void OsFreeIsoUrbs(struct UsbHostRequest *request)
             break;
         }
         OsalMemFree(urb);
+        request->isoUrbs[i] = NULL;
     }
 
     OsalMemFree(request->isoUrbs);
@@ -380,9 +462,15 @@ static void OsDiscardUrbs(struct UsbHostRequest *request, int first, int last)
         } else {
             as = &(((struct Async *)request->urbs)[i]);
         }
+        if (as == NULL) {
+            DPRINTFN(0, "discard as null\n");
+            return;
+        }
         urb = &as->urb;
-        if (usb_unlink_urb(urb) == 0){
-            continue;
+        if (as->state == URB_SUBMIT_STATE){
+            DPRINTFN(0, "usb kill urb\n");
+            usb_kill_urb(urb);
+            DPRINTFN(0, "%s:%d discard request%p+as:%p\n", __func__, __LINE__, request, as);
         }
     }
 }
@@ -394,9 +482,8 @@ static int OsSubmitControlRequest(struct UsbHostRequest *request)
     struct Async *as = NULL;
     struct UsbAdapterHostEndpoint *uhe = NULL;
 
-    if ((request == NULL) || (request->length  > MAX_BULK_DATA_BUFFER_LENGTH) ||
-        (request->devHandle == NULL)) {
-        DPRINTFN(0, "%s:%d invalid param\n", __func__, __LINE__);
+    if ((request == NULL) || (request->length > MAX_BULK_DATA_BUFFER_LENGTH)
+        || (request->devHandle == NULL) || (request->buffer == NULL)) {
         return HDF_ERR_INVALID_PARAM;
     }
     struct UsbDeviceHandle *handle = request->devHandle;
@@ -410,29 +497,31 @@ static int OsSubmitControlRequest(struct UsbHostRequest *request)
         DPRINTFN(0, "no found endpoint\n");
         return -1;
     }
-    as = OsalMemCalloc(sizeof(*as));
-    if (as == NULL) {
+    if (request->urbs == NULL) {
+        as = OsalMemCalloc(sizeof(*as));
+        request->urbs =  (void *)as;
+        request->numUrbs = 1;
+    }
+
+    if (request->urbs == NULL) {
+        DPRINTFN(0, "%s:%d no mem", __func__, __LINE__);
         return HDF_ERR_MALLOC_FAIL;
     }
+    as = (struct Async *)request->urbs;
     DListHeadInit(&as->asynclist);
     as->dev = dev;
+    as->state = URB_SUBMIT_STATE;
     urb = &as->urb;
+    memset_s(urb, sizeof(*urb), 0, sizeof(*urb));
     urb->dev = adapterDevice;
     urb->endpoint = uhe;
     urb->timeout = 500;
     urb->transfer_buffer = request->buffer;
     urb->context = (void *)request;
     urb->complete = OsUrbComplete;
-    request->urbs = (void *)as;
-    request->numUrbs = 1;
     ret = OsControlMsg(urb);
     DPRINTFN(0, "OsSubmitControlRequest:ret:%d\n", ret);
     if (ret) {
-        OsalMemFree(as);
-        request->urbs = NULL;
-        if (errno == ENODEV) {
-            return HDF_DEV_ERR_NO_DEVICE;
-        }
         DPRINTFN(0, "submiturb failed, errno=%d\n", errno);
         return HDF_ERR_IO;
     }
@@ -462,8 +551,6 @@ static int OsSubmitBulkRequestHandleUrb(struct Async *pas, struct UsbHostRequest
                 request->requestType);
             return HDF_ERR_INVALID_PARAM;
     }
-    DListHeadInit(&pas->asynclist);
-
     urb->transfer_buffer = request->buffer + (number * bulkBufferLen);
     urb->complete = OsUrbComplete;
     if (number == request->numUrbs - 1) {
@@ -496,11 +583,13 @@ static int OsSubmitBulkRequestHandle(struct UsbHostRequest *request, struct Asyn
 
     for (i = 0, pas = as; i < numUrbs; i++, pas++) {
         urb = &pas->urb;
-
+        memset_s(urb, sizeof(*urb), 0, sizeof(*urb));
         ret = OsSubmitBulkRequestHandleUrb(pas, request, bulkBufferLen, i);
         if (ret != HDF_SUCCESS) {
             return ret;
         }
+        pas->state =  URB_SUBMIT_STATE;
+        DListHeadInit(&pas->asynclist);
         pas->dev = dev;
         urb->dev = adapterDevice;
         urb->endpoint = uhe;
@@ -510,8 +599,7 @@ static int OsSubmitBulkRequestHandle(struct UsbHostRequest *request, struct Asyn
             continue;
         }
         if (i == 0) {
-            OsalMemFree(as);
-            request->urbs = NULL;
+            DPRINTFN(0, "the first urb faild\n");
             return HDF_ERR_IO;
         }
         OsalMutexLock(&request->lock);
@@ -519,10 +607,7 @@ static int OsSubmitBulkRequestHandle(struct UsbHostRequest *request, struct Asyn
         if (errno != EREMOTEIO) {
             request->reqStatus = USB_REQUEST_ERROR;
         }
-        if (request->numRetired == numUrbs) {
-            OsalMemFree(as);
-            request->urbs = NULL;
-        }
+        OsDiscardUrbs(request, 0, i);
         OsalMutexUnlock(&request->lock);
         return HDF_SUCCESS;
     }
@@ -543,7 +628,7 @@ static int OsSubmitBulkRequest(struct UsbHostRequest *request)
 
     if (request->length > MAX_BULK_DATA_BUFFER_LENGTH || request->length <= 0) {
         DPRINTFN(0, "Bulk request size err\n");
-        return -1;
+        return HDF_FAILURE;
     }
 
     if (request->devHandle->caps & USB_ADAPTER_CAP_BULK_SCATTER_GATHER) {
@@ -556,12 +641,19 @@ static int OsSubmitBulkRequest(struct UsbHostRequest *request)
     } else {
         numUrbs = (request->length + bulkBufferLen - 1) / bulkBufferLen;
     }
-    as = OsalMemCalloc(numUrbs * sizeof(*as));
-    if (as == NULL) {
+    if (request->urbs == NULL) {
+        as = OsalMemCalloc(sizeof(*as));
+        request->urbs =  (void *)as;
+    } else if (numUrbs > 1) {
+        OsalMemFree(request->urbs);
+        as = OsalMemCalloc(numUrbs * sizeof(*as));
+        request->urbs =  (void *)as;
+    }
+    if (request->urbs == NULL) {
         DPRINTFN(0, "%s:%d no mem", __func__, __LINE__);
         return HDF_ERR_MALLOC_FAIL;
     }
-    request->urbs       = (void *)as;
+    as = (struct Async *)request->urbs;
     request->numUrbs    = numUrbs;
     request->numRetired = 0;
     request->reqStatus = USB_REQUEST_COMPLETED;
@@ -647,7 +739,7 @@ static int OsSubmitIsoUrbs(struct UsbHostRequest *request, int numUrbs, struct A
         request->numRetired += numUrbs - i;
         if (request->numRetired == numUrbs) {
             OsalMemFree(pUrbs);
-            request->urbs = NULL;
+            request->isoUrbs = NULL;
         }
         OsalMutexUnlock(&request->lock);
 
@@ -713,11 +805,11 @@ static int OsControlCompletion(struct UsbHostRequest *request, struct Async *as)
     struct UsbAdapterUrb *urb = &as->urb;
 
     OsalMutexLock(&request->lock);
+    request->numRetired++;
     request->actualLength += urb->actual_length;
     if (request->reqStatus == USB_REQUEST_CANCELLED) {
-        OsalMemFree(request->urbs);
-        request->urbs = NULL;
         OsalMutexUnlock(&request->lock);
+        as->state = URB_INIT_STATE;
         return RawHandleRequestCompletion(request, USB_REQUEST_CANCELLED);
     }
 
@@ -746,9 +838,8 @@ static int OsControlCompletion(struct UsbHostRequest *request, struct Async *as)
             status = USB_REQUEST_ERROR;
             break;
     }
-    OsalMemFree(request->urbs);
-    request->urbs = NULL;
     OsalMutexUnlock(&request->lock);
+    as->state = URB_INIT_STATE;
     return RawHandleRequestCompletion(request, status);
 }
 
@@ -828,7 +919,7 @@ static int OsIsoCompletion(struct UsbHostRequest *request, struct Async *as)
     if (urb->status == -ESHUTDOWN) {
         status = USB_REQUEST_NO_DEVICE;
     } else if (!((urb->status == HDF_SUCCESS) || (urb->status == -ENOENT) ||
-                 (urb->status == -ECONNRESET))) {
+        (urb->status == -ECONNRESET))) {
         status = USB_REQUEST_ERROR;
     } else {
         status = USB_REQUEST_COMPLETED;
@@ -893,12 +984,18 @@ static int OsUrbStatusToRequestStatus(struct UsbHostRequest *request, const stru
             }
             ret = HDF_FAILURE;
             break;
+        case -ECONNRESET:
+            ret = HDF_DEV_ERR_OP;
+            if (request->reqStatus == USB_REQUEST_COMPLETED) {
+                request->reqStatus = USB_REQUEST_CANCELLED;
+            }
+            break;
         default:
             DPRINTFN(0, "unknown urb status %d\n", urb->status);
             if (request->reqStatus == USB_REQUEST_COMPLETED) {
                 request->reqStatus = USB_REQUEST_ERROR;
             }
-            ret = HDF_DEV_ERR_NO_DEVICE;
+            ret = HDF_FAILURE;
             break;
     }
 
@@ -906,7 +1003,7 @@ static int OsUrbStatusToRequestStatus(struct UsbHostRequest *request, const stru
 }
 
 static int OsBulkCompletion(struct UsbHostRequest *request,
-    const struct Async *as)
+     struct Async *as)
 {
     int ret;
     int urbIdx = as - (struct Async *)request->urbs;
@@ -950,9 +1047,8 @@ out:
     return HDF_SUCCESS;
 
 completed:
-    OsalMemFree(request->urbs);
-    request->urbs = NULL;
     OsalMutexUnlock(&request->lock);
+    as->state = URB_INIT_STATE;
     return RawHandleRequestCompletion(request, request->reqStatus);
 }
 
@@ -966,7 +1062,7 @@ static void AdapterExit(struct UsbSession *session)
     return;
 }
 
-static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uint8_t busNum,  uint8_t usbAddr)
+static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uint8_t busNum, uint8_t usbAddr)
 {
     int ret;
     struct UsbDevice *dev = NULL;
@@ -1012,7 +1108,9 @@ static void AdapterCloseDevice(struct UsbDeviceHandle *handle)
         return;
     }
     dev = handle->dev;
-    AdapterAtomicDec(&dev->refcnt);
+    if(AdapterAtomicDec(&dev->refcnt)) {
+        return;
+    }
     OsalMutexLock(&dev->session->lock);
     HdfSListRemove(&dev->session->usbDevs, &dev->list);
     OsalMutexUnlock(&dev->session->lock);
@@ -1022,6 +1120,10 @@ static void AdapterCloseDevice(struct UsbDeviceHandle *handle)
     }
     if (dev->descriptors) {
         OsalMemFree(dev->descriptors);
+    }
+    if (dev->privateData) {
+        OsDevDestory(dev->privateData);
+        dev->privateData = NULL;
     }
     OsalMemFree(dev);
 
@@ -1062,6 +1164,12 @@ static int AdapterSetConfiguration(struct UsbDeviceHandle *handle, int activeCon
 
     if (adapterDevice->flags.usb_mode != USB_MODE_HOST) {
         return HDF_DEV_ERR_DEV_INIT_FAIL;
+    }
+    if ((activeConfig < 0) || (activeConfig >= adapterDevice->curr_config_no)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (activeConfig == adapterDevice->curr_config_index) {
+        return HDF_SUCCESS;
     }
     if (usbd_set_config_index(adapterDevice, activeConfig) != 0) {
         return HDF_ERR_IO;
@@ -1117,31 +1225,51 @@ static int AdapterResetDevice(struct UsbDeviceHandle *handle)
      return HDF_SUCCESS;
 }
 
-static void *AdapterMemAlloc(struct UsbDeviceHandle *handle, size_t len)
+static struct UsbHostRequest *AdapterAllocRequest(struct UsbDeviceHandle *handle, int isoPackets, size_t length)
 {
-    void *buffer = NULL;
-    struct UsbDevice *dev = handle->dev;
-    struct OsDev *osDev = (struct OsDev *)dev->privateData;
-    struct UsbAdapterDevice *adapterDevice = osDev->adapterDevice;
-    if (len < 0) {
-        DPRINTFN(0, "%s:invalid param\n", __func__);
+    size_t allocSize;
+    struct UsbHostRequest *request = NULL;
+
+    allocSize = sizeof(struct UsbHostRequest)
+                + (sizeof(struct UsbIsoPacketDesc) * (size_t)isoPackets)
+                + (sizeof(unsigned char) * length);
+    request = OsalMemCalloc(allocSize);
+    if (request == NULL) {
+        HDF_LOGE("%{public}s RawMemAlloc fail", __func__);
         return NULL;
     }
-    buffer = usb_buffer_alloc(adapterDevice, len, 0, 0);
-    if (buffer == NULL) {
-        DPRINTFN(0, "alloc  mem failed, errno=%d\n\n", errno);
-        return NULL;
-    }
-    return buffer;
+    request->numIsoPackets = isoPackets;
+    request->buffer = (unsigned char *)request + allocSize - length;
+    request->bufLen = length;
+    return request;
 }
 
-static int AdapterMemFree(void *buffer, size_t len)
+static int AdapterFreeRequest(struct UsbHostRequest *request)
 {
-    if (buffer == NULL) {
+    int retry = 0;
+    if (request == NULL) {
         DPRINTFN(0, "%s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    free(buffer);
+    if (request->numUrbs >  request->numRetired) {
+        OsDiscardUrbs(request, request->numRetired, request->numUrbs);
+        while (true) {
+            OsalMSleep(20);
+            if (request->numUrbs != request->numRetired) {
+                if (++retry > 10) {
+                    DPRINTFN(0, "request busy numUrbs:%d+numretired:%d\n", request->numUrbs, request->numRetired);
+                    return HDF_ERR_DEVICE_BUSY;
+                }
+                continue;
+            } else {
+                break;
+            }
+        }
+    }
+    if (request->urbs) {
+        OsalMemFree(request->urbs);
+    }
+    OsalMemFree((void *)request);
     return HDF_SUCCESS;
 }
 
@@ -1155,6 +1283,8 @@ static int AdapterSubmitRequest(struct UsbHostRequest *request)
     }
     OsalMutexInit(&(request->lock));
     request->actualLength = 0;
+    request->numRetired = 0;
+    request->numUrbs = 0;
     switch (request->requestType) {
         case USB_REQUEST_TYPE_CONTROL:
             ret = OsSubmitControlRequest(request);
@@ -1178,28 +1308,29 @@ static int AdapterSubmitRequest(struct UsbHostRequest *request)
 static int AdapterCancelRequest(struct UsbHostRequest *request)
 {
     if (!request->urbs) {
-        return HDF_ERR_BAD_FD;
+        DPRINTFN(0, "adapter cancel urb null\n");
+        goto end;
     }
 
     OsDiscardUrbs(request, 0, request->numUrbs);
-
-    if (!((request->requestType == USB_REQUEST_TYPE_BULK) && (request->reqStatus == USB_REQUEST_ERROR))) {
-        request->reqStatus = USB_REQUEST_CANCELLED;
-    }
-
+end:
     return HDF_SUCCESS;
 }
 
 static int AdapterUrbCompleteHandle(struct UsbDeviceHandle *devHandle)
 {
+    int ret;
+    struct UsbDevice *dev = NULL;
+    struct OsDev *osDev = NULL;
     struct UsbAdapterUrb *urb = NULL;
     struct Async *as = NULL;
     struct UsbHostRequest *request = NULL;
-    int ret;
-    if (devHandle == NULL) {
+    if ((devHandle == NULL) || (devHandle->dev == NULL) || (devHandle->dev->privateData == NULL)) {
         HDF_LOGE("%{public}s:%{public}d invalid parameter", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
+    dev = devHandle->dev;
+    osDev = (struct OsDev *)dev->privateData;
     ret = OsReapUrb(devHandle, &as);
     if (as == NULL) {
         HDF_LOGE("as is null\n");
@@ -1216,7 +1347,7 @@ static int AdapterUrbCompleteHandle(struct UsbDeviceHandle *devHandle)
             break;
         case USB_REQUEST_TYPE_BULK:
         case USB_REQUEST_TYPE_INTERRUPT:
-            ret = OsBulkCompletion(request, (const struct Async *)as);
+            ret = OsBulkCompletion(request, as);
             break;
         default:
             DPRINTFN(0, "%s:%d unrecognised requestType %u\n", __func__, __LINE__, request->requestType);
@@ -1239,8 +1370,8 @@ static struct UsbOsAdapterOps g_usbAdapter = {
     .setInterfaceAltsetting = AdapterSetInterface,
     .clearHalt = AdapterClearHalt,
     .resetDevice = AdapterResetDevice,
-    .allocMem = AdapterMemAlloc,
-    .freeMem = AdapterMemFree,
+    .allocRequest = AdapterAllocRequest,
+    .freeRequest = AdapterFreeRequest,
     .submitRequest = AdapterSubmitRequest,
     .cancelRequest = AdapterCancelRequest,
     .urbCompleteHandle = AdapterUrbCompleteHandle,
@@ -1263,11 +1394,13 @@ int UsbAdapterRegisterSignal(void)
 
 int UsbAdapterKillSignal(struct UsbDeviceHandle *handle, UsbRawTidType tid)
 {
-    if (handle != NULL && handle->dev != NULL) {
+    if ((handle != NULL) && (handle->dev != NULL)) {
         struct UsbDevice *dev = handle->dev;
         struct OsDev *osDev = (struct OsDev *)dev->privateData;
-	    if (osDev != NULL){
+	    if (osDev != NULL) {
+            g_CompleteExit = true;
             OsalSemPost(&osDev->cvWait);
+            DPRINTFN(0, "%s:%d sigal post\n", __func__, __LINE__);
             return HDF_SUCCESS;
         }
     }

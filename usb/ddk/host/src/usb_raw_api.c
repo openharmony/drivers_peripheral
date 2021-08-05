@@ -311,41 +311,5 @@ int UsbRawHandleRequests(UsbRawHandle *devHandle)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    return RawHandleRequest((struct UsbDeviceHandle *)devHandle, NULL);
-}
-
-int UsbRawAddOrRemoveInterface(
-    UsbInterfaceStatus status, UsbRawHandle *devHandle, const struct UsbRawInterfaceDescriptor *infDesPtr)
-{
-    int ret;
-    struct UsbDeviceHandle *handle = (struct UsbDeviceHandle *)devHandle;
-    enum UsbPnpNotifyServiceCmd cmdType;
-    struct UsbPnpAddRemoveInfo infoData;
-
-    if ((handle == NULL) || (handle->dev == NULL)) {
-        ret = HDF_ERR_INVALID_PARAM;
-        HDF_LOGE("%{public}s:%{public}d handle or dev is NULL, ret=%{public}d", __func__, __LINE__, ret);
-        return ret;
-    }
-
-    if (status == USB_INTERFACE_STATUS_ADD) {
-        cmdType = USB_PNP_NOTIFY_ADD_INTERFACE;
-    } else if (status == USB_INTERFACE_STATUS_REMOVE) {
-        cmdType = USB_PNP_NOTIFY_REMOVE_INTERFACE;
-    } else {
-        ret = HDF_ERR_INVALID_PARAM;
-        HDF_LOGE("%{public}s:%{public}d status=%{public}d is not define, ret=%{public}d",
-            __func__, __LINE__, status, ret);
-        return ret;
-    }
-
-    infoData.devNum = handle->dev->devAddr;
-    infoData.busNum = handle->dev->busNum;
-    infoData.interfaceNumber = infDesPtr->interfaceDescriptor.bInterfaceNumber;
-    infoData.interfaceClass = infDesPtr->interfaceDescriptor.bInterfaceClass;
-    infoData.interfaceSubClass = infDesPtr->interfaceDescriptor.bInterfaceSubClass;
-    infoData.interfaceProtocol = infDesPtr->interfaceDescriptor.bInterfaceProtocol;
-    ret = RawInitPnpService(cmdType, infoData);
-
-    return ret;
+    return RawHandleRequest((struct UsbDeviceHandle *)devHandle);
 }

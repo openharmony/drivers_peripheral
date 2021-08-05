@@ -14,6 +14,7 @@
  */
 
 #include "usbhost_ddk_test.h"
+#include "signal.h"
 
 #define HDF_LOG_TAG     USB_HOST_DDK_TEST
 
@@ -24,6 +25,7 @@
 #define ARGV_CMD_TYPE       (PARAM_GET_CMD_LEN - ARGV_CMD_API_TYPE)
 #define ARGV_CMD_PARAM      (PARAM_SET_CMD_LEN - ARGV_CMD_API_TYPE)
 #define READ_SLEEP_TIME     500
+int run;
 
 void TestHelp(void)
 {
@@ -185,7 +187,7 @@ static int TestCmdLoop(int cmdType, char *param)
         return HDF_FAILURE;
     }
 
-    for (;loopFlag == true;) {
+    for (;loopFlag == true && run;) {
         switch (cmdType) {
             case HOST_ACM_SYNC_READ:
                 UsbHostDdkTestSyncRead(NULL);
@@ -257,6 +259,13 @@ static int TestCmdLoop(int cmdType, char *param)
     return HDF_SUCCESS;
 }
 
+#ifdef __LITEOS_USB_HOST_DDK_TEST__
+static void *SigHandle(void *arg)
+{
+    run = 0;
+}
+#endif
+
 int main(int argc, char *argv[])
 {
     int status;
@@ -273,7 +282,7 @@ int main(int argc, char *argv[])
         TestHelp();
         return HDF_SUCCESS;
     }
-
+    run = 1;
     status = TestParaseCommand(argc, argv[ARGV_CMD_TYPE], &cmdType, apiType);
     if (status != HDF_SUCCESS) {
         printf("%s:%d TestParaseCommand status=%d err\n", __func__, __LINE__, status);
@@ -292,7 +301,9 @@ int main(int argc, char *argv[])
     if (UsbHostDdkTestOpen(cmdType) != HDF_SUCCESS) {
         goto out;
     }
-
+#ifdef __LITEOS_USB_HOST_DDK_TEST__
+    signal(SIGINT , SigHandle);
+#endif
     status = TestCmdLoop(cmdType, argv[ARGV_CMD_PARAM]);
     if(status == HDF_DEV_ERR_NO_DEVICE_SERVICE){
         goto out;

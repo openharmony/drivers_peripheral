@@ -25,6 +25,7 @@
 #define HDF_LOG_TAG USB_HOST_ACM
 #define STR_LEN     512
 
+static struct UsbRequest *g_syncRequest = NULL;
 static struct UsbRequest *g_ctrlCmdRequest = NULL;
 static bool g_acmReleaseFlag = false;
 static uint8_t *g_acmReadBuffer = NULL;
@@ -546,6 +547,7 @@ static void UsbSeriaDevicelFree(struct AcmDevice *acm)
         return;
     }
     OsalMemFree(port);
+    port = NULL;
 }
 
 static int32_t UsbSerialRead(struct SerialDevice *port, struct HdfSBuf *reply)
@@ -652,68 +654,61 @@ static int SerialGetBaudrate(struct SerialDevice *port, struct HdfSBuf *reply)
     HDF_LOGE("%{public}s:%{public}d baudRate=%{public}d", __func__, __LINE__, baudRate);
     return HDF_SUCCESS;
 }
-static struct UsbRequest *request = NULL;
+
 static int32_t UsbSerialReadSync(struct SerialDevice *port, struct HdfSBuf *reply)
 {
     int ret;
     struct AcmDevice *acm = port->acm;
     uint8_t *data = NULL;
     struct UsbRequestParams readParmas = {};
-    if (request == NULL) {
-        request = UsbAllocRequest(InterfaceIdToHandle(acm, acm->dataInPipe->interfaceId), 0, acm->readSize);
-        if (!request) {
+    if (g_syncRequest == NULL) {
+        g_syncRequest = UsbAllocRequest(InterfaceIdToHandle(acm, acm->dataInPipe->interfaceId), 0, acm->readSize);
+        if (!g_syncRequest) {
             HDF_LOGE("readReq request faild\n");
             return HDF_ERR_MALLOC_FAIL;
         }
-    }else{
-         HDF_LOGD("%{public}s:%{public}d request busy", __func__, __LINE__);
-         return HDF_ERR_DEVICE_BUSY;
     }
-    HDF_LOGD("%{public}s:%{public}d request:%{public}p \n", __func__, __LINE__, request);
+
+    HDF_LOGD("%{public}s:%{public}d request:%{public}p \n", __func__, __LINE__, g_syncRequest);
     readParmas.pipeAddress = acm->dataInPipe->pipeAddress;
     readParmas.pipeId = acm->dataInPipe->pipeId;
     readParmas.interfaceId = acm->dataInPipe->interfaceId;
     readParmas.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
     readParmas.timeout = USB_CTRL_SET_TIMEOUT;
     readParmas.dataReq.numIsoPackets = 0;
-    readParmas.dataReq.directon = (acm->dataInPipe->pipeDirection >> USB_DIR_OFFSET) & 0x1;
+    readParmas.dataReq.directon = (acm->dataInPipe->pipeDirection >> USB_DIR_OFFSET) & DIRECTION_MASK;
     readParmas.dataReq.length = acm->readSize;
-    ret = UsbFillRequest(request, InterfaceIdToHandle(acm, acm->dataInPipe->interfaceId), &readParmas);
-    if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%{public}s: UsbFillRequest faile, ret=%{public}d \n", __func__, ret);
+    ret = UsbFillRequest(g_syncRequest, InterfaceIdToHandle(acm, acm->dataInPipe->interfaceId), &readParmas);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d UsbFillRequest faile, ret=%{public}d", __func__, __LINE__, ret);
         return ret;
     }
 
-    ret = UsbSubmitRequestSync(request);
-    if (ret < 0) {
-        HDF_LOGE("UsbSubmitRequestSync faile, ret=%{public}d \n", ret);
-        return HDF_FAILURE;
+    ret = UsbSubmitRequestSync(g_syncRequest);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d UsbSubmitRequestSync faile, ret=%{public}d", __func__, __LINE__, ret);
+        return ret;
     }
 
-    uint32_t count = request->compInfo.actualLength;
+    uint32_t count = g_syncRequest->compInfo.actualLength;
     data = (uint8_t *)OsalMemCalloc(count + 1);
     if (data == NULL) {
-        HDF_LOGE("%{public}s: OsalMemCalloc error", __func__);
+        HDF_LOGE("%{public}s:%{public}d OsalMemCalloc error", __func__, __LINE__);
         return HDF_ERR_MALLOC_FAIL;
     }
     HDF_LOGD("buffer:%{public}p-%{public}s-actualLength:%{public}d", \
-        request->compInfo.buffer, (uint8_t *)request->compInfo.buffer, count);
-    memcpy_s(data, count, request->compInfo.buffer, count);
-    HDF_LOGD("data:%{public}p-%{public}s", data, (uint8_t *)data);
+        g_syncRequest->compInfo.buffer, (uint8_t *)g_syncRequest->compInfo.buffer, count);
+    memcpy_s(data, count, g_syncRequest->compInfo.buffer, count);
     if (!HdfSbufWriteString(reply, (const char *)data)) {
-        HDF_LOGE("%{public}s: sbuf write buffer failed", __func__);
+        HDF_LOGE("%{public}s:%{public}d sbuf write buffer failed", __func__, __LINE__);
     }
 
     if (data != NULL) {
         OsalMemFree(data);
+        data = NULL;
     }
 
-    if(request){
-        HDF_LOGE("%{public}s: FreeRequest", __func__);
-        UsbFreeRequest(request);
-        request = NULL;
-    }
-    return 0;
+    return HDF_SUCCESS;
 }
 
 static int32_t UsbStdCtrlCmd(struct SerialDevice *port, SerialOPCmd cmd, struct HdfSBuf *reply)
@@ -991,7 +986,6 @@ static int SerialAddOrRemoveInterface(int cmd, struct SerialDevice *port, struct
     struct AcmDevice *acm = port->acm;
     UsbInterfaceStatus status;
     uint32_t index;
-    struct UsbInterface *interfaceObj = NULL;
 
     if (!HdfSbufReadUint32(data, &index)) {
         HDF_LOGE("%{public}s:%{public}d sbuf read interfaceNum failed", __func__, __LINE__);
@@ -1007,20 +1001,7 @@ static int SerialAddOrRemoveInterface(int cmd, struct SerialDevice *port, struct
         return HDF_ERR_INVALID_PARAM;
     }
 
-    interfaceObj = GetUsbInterfaceById(acm, index);
-    if (interfaceObj == NULL) {
-        HDF_LOGE("%{public}s:%{public}d claim index=%{public}d fail", __func__, __LINE__, index);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    UsbAddOrRemoveInterface(status, interfaceObj);
-
-    if (interfaceObj != NULL) {
-        UsbReleaseInterface(interfaceObj);
-        interfaceObj = NULL;
-    }
-
-    return HDF_SUCCESS;
+    return UsbAddOrRemoveInterface(acm->session, acm->busNum, acm->devAddr, index, status);
 }
 
 static int32_t UsbSerialCheckCmd(struct SerialDevice *port, int cmd,
@@ -1204,8 +1185,8 @@ static int32_t UsbSerialDriverBind(struct HdfDeviceObject *device)
         return HDF_FAILURE;
     }
     if (OsalMutexInit(&acm->lock) != HDF_SUCCESS) {
-        HDF_LOGE(" init lock fail!");
-        return HDF_FAILURE;
+        HDF_LOGE("%{public}s:%{public}d OsalMutexInit fail", __func__, __LINE__);
+        goto error;
     }
     info = (struct UsbPnpNotifyServiceInfo *)device->priv;
     if (info != NULL) {
@@ -1217,19 +1198,28 @@ static int32_t UsbSerialDriverBind(struct HdfDeviceObject *device)
         ret = memcpy_s((void *)(acm->interfaceIndex), USB_MAX_INTERFACES,
               (const void*)info->interfaceNumber, info->interfaceLength);
         if (ret) {
-            HDF_LOGD("%{public}s:%{public}d memcpy_s faile ret=%{public}d", \
+            HDF_LOGE("%{public}s:%{public}d memcpy_s faile ret=%{public}d", \
                 __func__, __LINE__, ret);
-            if (OsalMutexDestroy(&acm->lock)) {
-                HDF_LOGE("unlock fail!");
-            }
-            return HDF_FAILURE;
+            goto lock_error;
         }
+    } else {
+        HDF_LOGE("%{public}s:%{public}d info is NULL!", __func__, __LINE__);
+        goto lock_error;
     }
     acm->device  = device;
     device->service = &(acm->service);
     acm->device->service->Dispatch = UsbSerialDeviceDispatch;
     HDF_LOGD("UsbSerialDriverBind=========================OK");
     return HDF_SUCCESS;
+
+lock_error:
+    if (OsalMutexDestroy(&acm->lock)) {
+        HDF_LOGE("%{public}s:%{public}d OsalMutexDestroy fail", __func__, __LINE__);
+    }
+error:
+    OsalMemFree(acm);
+    acm = NULL;
+    return HDF_FAILURE;
 }
 
 static void AcmProcessNotification(struct AcmDevice *acm, unsigned char *buf)
@@ -1377,8 +1367,16 @@ static void AcmReadBulk(struct UsbRequest *req)
 static void AcmFreeWriteRequests(struct AcmDevice *acm)
 {
     int i;
+    int ret;
     struct AcmWb *snd = NULL;
 
+    for (i = 0; i < ACM_NW; i++ ) {
+        snd = &acm->wb[i];
+        ret = UsbCancelRequest(snd->request);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("UsbCancelRequest rd faile, ret=%{public}d ", ret);
+        }
+    }
     for (i = 0; i < ACM_NW; i++) {
         snd = &acm->wb[i];
         if (snd->request != NULL) {
@@ -1391,12 +1389,18 @@ static void AcmFreeWriteRequests(struct AcmDevice *acm)
 static void AcmFreeReadRequests(struct AcmDevice *acm)
 {
     int i;
+    int ret;
 
     if (acm == NULL) {
         HDF_LOGE("%{public}s: acm is NULL", __func__);
         return;
     }
-
+    for (i = 0; i < ACM_NR; i++ ) {
+        ret = UsbCancelRequest(acm->readReq[i]);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("UsbCancelRequest rd faile, ret=%{public}d ", ret);
+        }
+    }
     for (i = 0; i < ACM_NR; i++) {
         if (acm->readReq[i]) {
             UsbFreeRequest(acm->readReq[i]);
@@ -1413,7 +1417,10 @@ static void AcmFreeNotifyReqeust(struct AcmDevice *acm)
         HDF_LOGE("%{public}s: acm or notifyReq is NULL", __func__);
         return;
     }
-
+    ret = UsbCancelRequest(acm->notifyReq);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("UsbCancelRequest rd faile, ret=%{public}d ", ret);
+    }
     ret = UsbFreeRequest(acm->notifyReq);
     if (ret == HDF_SUCCESS) {
         acm->notifyReq = NULL;
@@ -1603,6 +1610,10 @@ error:
 
 static void AcmFreeRequests(struct AcmDevice *acm)
 {
+    if (g_syncRequest != NULL) {
+        UsbFreeRequest(g_syncRequest);
+        g_syncRequest = NULL;
+    }
     AcmFreeReadRequests(acm);
     AcmFreeNotifyReqeust(acm);
     AcmFreeWriteRequests(acm);
@@ -1781,6 +1792,9 @@ static void UsbSerialDriverRelease(struct HdfDeviceObject *device)
     UsbSeriaDevicelFree(acm);
     OsalMutexDestroy(&acm->writeLock);
     OsalMutexDestroy(&acm->readLock);
+    OsalMutexDestroy(&acm->lock);
+    OsalMemFree(acm);
+    acm = NULL;
     HDF_LOGD("%{public}s:%{public}d exit", __func__, __LINE__);
 }
 

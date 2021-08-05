@@ -20,11 +20,11 @@ IFS=$'\n'
 read_log_file="/data/acm_read_xts"
 usb_dir="/sys/bus/usb/devices/1-1"
 max_ts=0
-pid=$(ps -ef | grep 'hostacm_moduletest' | grep -v grep | cut -F 2)
+pid=$(ps -ef | grep 'usbhost_ddk_test' | grep -v grep | cut -F 2)
 if [ ! "${pid}x" == "x" ];then
-    killall hostacm_moduletest
+    killall usbhost_ddk_test
 fi
-hostacm_moduletest -SDK -asyncRead &
+usbhost_ddk_test -Ar &
 cat /dev/null > $read_log_file
 while true
 do
@@ -37,7 +37,7 @@ do
             max_ts=$ts
             data=$(echo $line | grep 'XTSCHECK' | cut -F 4 | cut -d '[|]' -f 2 )
             echo "[`date +%s.%N`]" $data
-            hostacm_moduletest -SDK -asyncWrite $data
+            usbhost_ddk_test -Aw $data
         fi
         if [ "$data" == "GET_DESCRIPTOR" ];then
             id_vendor=$(cat ${usb_dir}/idVendor)
@@ -45,7 +45,7 @@ do
             bcd_device=$(cat ${usb_dir}/bcdDevice)
             b_configuration_value=$(cat ${usb_dir}/bConfigurationValue)
             echo "[`date +%s.%N`]" "$id_vendor $id_product $bcd_device $b_configuration_value"
-            hostacm_moduletest -SDK -asyncWrite "$id_vendor $id_product $bcd_device $b_configuration_value"
+            usbhost_ddk_test -Aw "$id_vendor $id_product $bcd_device $b_configuration_value"
         fi
     done
     sleep 0.1

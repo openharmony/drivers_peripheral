@@ -44,7 +44,7 @@ public:
 
 static struct UsbSession *session = NULL;
 static struct AcmDevice *acm = NULL;
-static struct AcmDevice device_service;
+static struct AcmDevice deviceService;
 static UsbRawHandle *devHandle = NULL;
 static UsbRawDevice *dev = NULL;
 static int activeConfig;
@@ -137,13 +137,13 @@ static int UsbStopIo(struct AcmDevice *acm)
 
 void UsbHostSdkIfTest::SetUpTestCase()
 {
-    acm = &device_service;
+    acm = &deviceService;
     UsbStartIo(acm);
 }
 
 void UsbHostSdkIfTest::TearDownTestCase()
 {
-    acm = &device_service;
+    acm = &deviceService;
     UsbStopIo(acm);
 }
 

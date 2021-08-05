@@ -85,18 +85,17 @@ static int UsbFnAdapterCreateFconfigString(struct FconfigString *configString,
 }
 
 static int UsbFnAdapterWriteGadget(int fd, int cmd,
-    struct FconfigString *gadgetName, const char *devName)
+    struct FconfigString *gadgetName)
 {
     int ret;
 
-    if (devName == NULL || gadgetName == NULL) {
+    if (gadgetName == NULL) {
         HDF_LOGE("%s: udcName is NULL", __func__);
         return HDF_ERR_IO;
     }
     ret = handle_ioctl(fd, cmd, gadgetName);
     if (ret) {
         HDF_LOGE("%s: ioctl failure!", __func__);
-        OsalMemFree(gadgetName->s);
         return HDF_ERR_IO;
     }
     return 0;
@@ -617,12 +616,12 @@ static int UsbFnAdapterCreateDevice(const char *udcName,
     ret = UsbFnAdapterCreateFconfigString(&gadgetName, devName);
     if (ret) {
         HDF_LOGE("%s: create gadget name failure!", __func__);
-        return HDF_ERR_IO;
+        goto FAIL;
     }
-    ret = UsbFnAdapterWriteGadget(fd, FCONFIG_CMD_MAKE_GADGET, &gadgetName, devName);
+    ret = UsbFnAdapterWriteGadget(fd, FCONFIG_CMD_MAKE_GADGET, &gadgetName);
     if (ret) {
         dprintf("%s: UsbFnAdapterWriteGadget failed!", __func__);
-        return HDF_ERR_IO;
+        goto EXIT;
     }
     ret = UsbFnAdapterWriteDevDesc(fd, &gadgetName, descriptor);
     if (ret) {
@@ -644,14 +643,14 @@ static int UsbFnAdapterCreateDevice(const char *udcName,
         dprintf("%s: UsbFnAdapterWriteFcofnigUDC failed!", __func__);
         goto EXIT;
     }
-    ret = UsbFnAdapterClosefn(fd);
-    if (ret != 0) {
-        dprintf("%s[%d] close fconfig failed\n", __func__, __LINE__);
-        goto EXIT;
-    }
-    dprintf("%s: success!\n", __func__);
+    dprintf("%s: create device success!\n", __func__);
 EXIT:
     OsalMemFree(gadgetName.s);
+FAIL:
+    if (UsbFnAdapterClosefn(fd) != 0) {
+        dprintf("%s[%d] close fconfig failed\n", __func__, __LINE__);
+    }
+
     return ret;
 }
 
@@ -737,7 +736,7 @@ static int UsbFnAdapterDelDevice(const char *devName, const char *udcName,
     if (ret) {
         goto FAIL;
     }
-    ret = UsbFnAdapterWriteGadget(configFd, FCONFIG_CMD_DROP_GADGET, &gadgetName, devName);
+    ret = UsbFnAdapterWriteGadget(configFd, FCONFIG_CMD_DROP_GADGET, &gadgetName);
     if (ret) {
         goto FAIL;
     }

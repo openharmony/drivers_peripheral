@@ -87,8 +87,7 @@ static int ReadThread(void *arg)
 pthread_t g_tid;
 static void StartPThreadRead()
 {
-    if ((pthread_create(&g_tid, NULL, ReadThread, NULL)) == -1)
-    {
+    if ((pthread_create(&g_tid, NULL, ReadThread, NULL)) == -1) {
         printf("create error!\n");
     }
 }

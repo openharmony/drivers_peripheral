@@ -61,13 +61,12 @@ static int CreateCtrPipe(struct UsbInterfacePool *pool)
     struct UsbPipe *pipe = NULL;
 
     if (pool == NULL) {
-        HDF_LOGE("%{public}s invalid para\n", __func__);
+        HDF_LOGE("%{public}s invalid para", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     ret = UsbIfCreatInterfaceObj(pool, &interfaceObj);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("UsbIfCreatInterfaceObj err\n");
         return HDF_ERR_MALLOC_FAIL;
     }
     interfaceObj->interface.info.interfaceIndex = USB_CTRL_INTERFACE_ID;
@@ -76,7 +75,6 @@ static int CreateCtrPipe(struct UsbInterfacePool *pool)
     interfaceObj->interface.info.curAltSetting = 0;
     ret = UsbIfCreatPipeObj(interfaceObj, &pipe);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("UsbIfCreatPipeObj create pipe error\n");
         return HDF_ERR_IO;
     }
 
@@ -94,7 +92,7 @@ static int UsbInterfaceInit(struct UsbSdkInterface *interfaceObj,
 {
     struct UsbInterfaceInfo *ptr = NULL;
 
-    if (NULL == interfaceObj || NULL == iface) {
+    if ((interfaceObj == NULL) || (iface == NULL)) {
         HDF_LOGE("%{public}s: invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -163,7 +161,7 @@ static const struct UsbRawEndpointDescriptor *UsbGetEpDesc(
         HDF_LOGE("%{public}s: invalid param", __func__);
         return NULL;
     }
-    if (ifDes->interfaceDescriptor.bNumEndpoints < idx + 1) {
+    if (ifDes->interfaceDescriptor.bNumEndpoints < (idx + 1)) {
         HDF_LOGE("%{public}s: invalid param numEp:%{public}d+idx:%{public}d\n ",
             __func__, ifDes->interfaceDescriptor.bNumEndpoints, idx);
         return NULL;
@@ -189,18 +187,15 @@ static int UsbProtocalCreatePipeObj(
         }
         ep = UsbGetEpDesc(ifDes, cnep);
         if (ep == NULL) {
-            HDF_LOGE("%{public}s:%{public}d UsbGetEpDesc ep is NULL", __func__, __LINE__);
             ret = HDF_ERR_INVALID_PARAM;
             break;
         }
         ret = UsbIfCreatPipeObj(interfaceObj, &pipe);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d create pipeObj error ret=%{public}d", __func__, __LINE__, ret);
             break;
         }
         ret = UsbPipeInit(pipe, ep, ++id);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d pipe init error ret=%{public}d", __func__, __LINE__, ret);
             break;
         }
     }
@@ -219,7 +214,6 @@ static int UsbProtocalCreatInterfaceObj(struct UsbRawConfigDescriptor *config, s
     for (int i = 0; i < config->configDescriptor.bNumInterfaces; i++) {
         itface = UsbGetInterfaceFromConfig(config, i);
         if (itface == NULL) {
-            HDF_LOGE("%{public}s:%{public}d UsbGetInterfaceFromConfig failed", __func__, __LINE__);
             ret = HDF_ERR_INVALID_PARAM;
             goto error;
         }
@@ -227,27 +221,23 @@ static int UsbProtocalCreatInterfaceObj(struct UsbRawConfigDescriptor *config, s
         for (j = 0; j < itface->numAltsetting; j++) {
             ifDes = UsbGetInterfaceDesc(itface, j);
             if (ifDes == NULL) {
-                HDF_LOGE("%{public}s:%{public}d j=%{public}d ifDes is NULL", __func__, __LINE__, j);
                 ret = HDF_ERR_INVALID_PARAM;
                 goto error;
             }
 
             ret = UsbIfCreatInterfaceObj(interfacePool, &interfaceObj);
             if (ret != HDF_SUCCESS) {
-                HDF_LOGE("%{public}s:%{public}d create interfaceObj failed ret=%{public}d", __func__, __LINE__, ret);
                 goto error;
             }
 
             ret = UsbInterfaceInit(interfaceObj, ifDes, itface);
             if (ret != 0) {
-                HDF_LOGE("%{public}s:%{public}d UsbInterfaceInit failed ret=%{public}d", __func__, __LINE__, ret);
                 ret = HDF_ERR_IO;
                 goto error;
             }
 
             ret = UsbProtocalCreatePipeObj(ifDes, interfaceObj);
             if (ret != HDF_SUCCESS) {
-                HDF_LOGE("%{public}s:%{public}d create pipeObj failed ret=%{public}d", __func__, __LINE__, ret);
                 goto error;
             }
         }
@@ -280,25 +270,21 @@ int UsbProtocalParseDescriptor(struct UsbDeviceHandle *devHandle, uint8_t busNum
 
     ret = CreateCtrPipe(interfacePool);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d CreateCtrPipe failed ret=%{public}d", __func__, __LINE__, ret);
         goto err;
     }
 
     ret = RawGetConfiguration(devHandle, &activeConfig);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d RawGetConfiguration failed ret=%{public}d", __func__, __LINE__, ret);
         goto err;
     }
 
     ret = RawGetConfigDescriptor(devHandle->dev, activeConfig, &config);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d RawGetConfigDescriptor failed ret=%{public}d", __func__, __LINE__, ret);
         goto free_config;
     }
 
     ret = UsbProtocalCreatInterfaceObj(config, interfacePool);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d creat interfaceObj failed ret=%{public}d", __func__, __LINE__, ret);
         goto free_config;
     }
 

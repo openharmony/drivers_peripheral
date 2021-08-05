@@ -42,27 +42,23 @@ public:
 };
 
 static struct UsbSession *session = NULL;
-static struct AcmDevice device_service;
-static struct AcmDevice *acm = &device_service;
+static struct AcmDevice deviceService;
+static struct AcmDevice *acm = &deviceService;
 
 void UsbHostSdkIfTest::SetUpTestCase()
 {
-
 }
 
 void UsbHostSdkIfTest::TearDownTestCase()
 {
-
 }
 
 void UsbHostSdkIfTest::SetUp()
 {
-
 }
 
 void UsbHostSdkIfTest::TearDown()
 {
-
 }
 
 static void AcmReadBulk(struct UsbRequest *req)
@@ -97,7 +93,6 @@ static void AcmWriteBulk(struct UsbRequest *req)
         default:
             return;
     }
-
     return;
 }
 
@@ -120,35 +115,13 @@ static int AcmWriteBufAlloc(struct AcmDevice *acm)
     return 0;
 }
 
-static void AcmProcessNotification(struct AcmDevice *acm, unsigned char *buf)
-{
-    struct UsbCdcNotification *dr = (struct UsbCdcNotification *)buf;
-    switch (dr->bNotificationType) {
-        case USB_DDK_CDC_NOTIFY_NETWORK_CONNECTION:
-            printf("%s - network connection: %d\n", __func__, dr->wValue);
-            break;
-        case USB_DDK_CDC_NOTIFY_SERIAL_STATE:
-            printf("the serial State change\n");
-            break;
-        default:
-            printf("%s-%d received: index %d len %d\n",
-                __func__,
-                dr->bNotificationType, dr->wIndex, dr->wLength);
-    }
-    return;
-}
-
 static void AcmCtrlIrq(struct UsbRequest *req)
 {
     if (req == NULL) {
         printf("%s:%d req is NULL!", __func__, __LINE__);
         return;
     }
-    int retval, ret;
-    struct AcmDevice *acm = (struct AcmDevice *)req->compInfo.userData;
-    unsigned int expectedSize, copySize, allocSize;
     int status = req->compInfo.status;
-    struct UsbCdcNotification *dr = (struct UsbCdcNotification *)req->compInfo.buffer;
     unsigned int currentSize = req->compInfo.actualLength;
     printf("Irqstatus:%d,actualLength:%u\n", status, currentSize);
     switch (status) {
@@ -157,58 +130,21 @@ static void AcmCtrlIrq(struct UsbRequest *req)
         default:
             return;
     }
-    if (acm->nbIndex) {
-        dr = (struct UsbCdcNotification *)acm->notificationBuffer;
-    }
-    if (dr == NULL) {
-        printf("%s:%d dr is NULL!", __func__, __LINE__);
-        return;
-    }
-    expectedSize = sizeof(struct UsbCdcNotification) + Le16ToCpu(dr->wLength);
-    if (currentSize < expectedSize) {
-        if (acm->nbSize < expectedSize) {
-            if (acm->nbSize) {
-                OsalMemFree(acm->notificationBuffer);
-                acm->nbSize = 0;
-            }
-            allocSize = expectedSize;
-            acm->notificationBuffer = (uint8_t *)OsalMemCalloc(allocSize);
-            if (!acm->notificationBuffer) {
-                return;
-            }
-            acm->nbSize = allocSize;
-        }
-        copySize = MIN(currentSize, expectedSize - acm->nbIndex);
-        ret = memcpy_s(&acm->notificationBuffer[acm->nbIndex], acm->nbSize - acm->nbIndex,
-               req->compInfo.buffer, copySize);
-        if (ret) {
-            printf("memcpy_s fail\n");
-        }
-        acm->nbIndex += copySize;
-        currentSize = acm->nbIndex;
-    }
-    if (currentSize >= expectedSize) {
-        AcmProcessNotification(acm, (unsigned char *)dr);
-        acm->nbIndex = 0;
-    }
-
-    retval = UsbSubmitRequestAsync(req);
 
     printf("%s:%d exit", __func__, __LINE__);
 }
 
-static struct UsbControlRequest UsbControlMsg( uint8_t request,
-    uint8_t requestType, uint16_t value, uint16_t index, void *data, uint16_t size)
+static struct UsbControlRequest UsbControlMsg(struct TestControlMsgData msgData)
 {
     struct UsbControlRequest dr;
-    dr.target = (UsbRequestTargetType)(requestType & TARGET_MASK);
-    dr.reqType = (UsbControlRequestType)((requestType >> 5) & REQUEST_TYPE_MASK);
-    dr.directon = (UsbRequestDirection)((requestType >> 7) & DIRECTION_MASK);
-    dr.request = request;
-    dr.value = CpuToLe16(value);
-    dr.index = CpuToLe16(index);
-    dr.buffer = data;
-    dr.length = CpuToLe16(size);
+    dr.target = (UsbRequestTargetType)(msgData.requestType & TARGET_MASK);
+    dr.reqType = (UsbControlRequestType)((msgData.requestType >> 5) & REQUEST_TYPE_MASK);
+    dr.directon = (UsbRequestDirection)((msgData.requestType >> 7) & DIRECTION_MASK);
+    dr.request = msgData.request;
+    dr.value = CpuToLe16(msgData.value);
+    dr.index = CpuToLe16(msgData.index);
+    dr.buffer = msgData.data;
+    dr.length = CpuToLe16(msgData.size);
     return dr;
 }
 static void AcmGetPipe()
@@ -274,7 +210,7 @@ static void AcmGetRequest()
     int ret;
     int i;
     acm->readSize = acm->dataInPipe->maxPacketSize;
-    for (i = 0; i < ACM_NR; i++){
+    for (i = 0; i < ACM_NR; i++) {
         acm->readReq[i] = UsbAllocRequest(acm->data_devHandle, 0, acm->readSize);
         EXPECT_NE(nullptr,  acm->readReq[i]);
     }
@@ -303,7 +239,7 @@ static void AcmFillReadRequest()
     int i;
     struct UsbRequestParams readParmas;
     int ret;
-    for (i = 0; i < ACM_NR; i++){
+    for (i = 0; i < ACM_NR; i++) {
         readParmas.userData = (void *)acm;
         readParmas.pipeAddress = acm->dataInPipe->pipeAddress;
         readParmas.pipeId = acm->dataInPipe->pipeId;
@@ -330,7 +266,7 @@ static void AcmFillWriteRequest()
     acm->writeSize = acm->dataOutPipe->maxPacketSize;
     size = (size > acm->writeSize) ? acm->writeSize : size;
 
-    for (i = 0; i < ACM_NW; i++){
+    for (i = 0; i < ACM_NW; i++) {
         acm->wb[i].len = size;
         ret = memcpy_s(acm->wb[i].buf, acm->writeSize, sendData, size);
         if (ret) {
@@ -374,10 +310,10 @@ static void AcmFillIntRequest()
 static void AcmFillCtrlRequest()
 {
     int ret;
-
     struct UsbRequestParams parmas;
-    uint16_t index = 0;
+    uint16_t index = 2;
     uint16_t value = 0;
+    struct TestControlMsgData msgData;
 
     parmas.interfaceId = USB_CTRL_INTERFACE_ID;
     parmas.pipeAddress = 0;
@@ -390,7 +326,14 @@ static void AcmFillCtrlRequest()
     acm->lineCoding.bCharFormat = CHARFORMAT;
     acm->lineCoding.bParityType = USB_CDC_NO_PARITY;
     acm->lineCoding.bDataBits = USB_CDC_1_STOP_BITS;
-    parmas.ctrlReq = UsbControlMsg(USB_DDK_CDC_REQ_SET_LINE_CODING,  USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE, value, index, &acm->lineCoding, sizeof (struct UsbCdcLineCoding));
+
+    msgData.request = USB_DDK_CDC_REQ_SET_LINE_CODING;
+    msgData.requestType = USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE;
+    msgData.value = value;
+    msgData.index = index;
+    msgData.data = &acm->lineCoding;
+    msgData.size = sizeof(struct UsbCdcLineCoding);
+    parmas.ctrlReq = UsbControlMsg(msgData);
     ret = UsbFillRequest(acm->ctrlReq, acm->ctrl_devHandle, &parmas);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
@@ -543,7 +486,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSubmitRequestAsync002, TestSize.Level1)
     int ret;
     int i;
 
-    for (i = 0; i < ACM_NR; i++){
+    for (i = 0; i < ACM_NR; i++) {
         ret = UsbSubmitRequestAsync(acm->wb[i].request);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
@@ -603,7 +546,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSubmitRequestAsync004, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbSubmitRequestAsync(acm->ctrlReq);
+    ret = UsbSubmitRequestAsync(acm->readReq[0]);
+
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -617,7 +561,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCancelRequest004, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbCancelRequest(acm->ctrlReq);
+    ret = UsbSubmitRequestAsync(acm->readReq[0]);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 

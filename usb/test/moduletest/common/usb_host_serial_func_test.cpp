@@ -148,8 +148,8 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteSync_001, TestSize.Level1)
     string wlog, rlog;
     wlog = "send data[" + data + "] to device";
     rlog = "recv data[" + data + "] from device";
-    ASSERT_EQ(system("hostacm_moduletest -SDK -syncRead &"), 0);
-    ASSERT_EQ(system(("hostacm_moduletest -SDK -syncWrite '" + data + "'").c_str()), 0);
+    ASSERT_EQ(system("usbhost_ddk_test -AR &"), 0);
+    ASSERT_EQ(system(("usbhost_ddk_test -AW '" + data + "'").c_str()), 0);
     sleep(3);
     EXPECT_TRUE(HasLog(wlog, startTs)) << "ErrInfo: cannot find sync write log";
     EXPECT_TRUE(HasLog(rlog, startTs, RLOG_FILE)) << "ErrInfo: cannot find sync recv log";
@@ -177,8 +177,8 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteSync_002, TestSize.Level1)
     for (int i = 0; data[i].size() > 0; i++) {
         wlog = "send data[" + data[i] + "] to device";
         rlog = "recv data[" + data[i] + "] from device";
-        ASSERT_EQ(system("hostacm_moduletest -SDK -syncRead &"), 0);
-        ASSERT_EQ(system(("hostacm_moduletest -SDK -syncWrite '" + data[i] + "'").c_str()), 0);
+        ASSERT_EQ(system("usbhost_ddk_test -AR &"), 0);
+        ASSERT_EQ(system(("usbhost_ddk_test -AW '" + data[i] + "'").c_str()), 0);
         sleep(3);
         EXPECT_TRUE(HasLog(wlog, startTs)) << "ErrInfo: cannot find sync write log";
         EXPECT_TRUE(HasLog(rlog, startTs, RLOG_FILE)) << "ErrInfo: cannot find sync recv log";
@@ -210,8 +210,8 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteSync_003, TestSize.Level2)
     double startTs;
     for (int i = 0; i < writeCnt; i++) {
         startTs = GetNowTs();
-        ASSERT_EQ(system("hostacm_moduletest -SDK -syncRead &"), 0);
-        ASSERT_EQ(system(("hostacm_moduletest -SDK -syncWrite '" + data + "'").c_str()), 0);
+        ASSERT_EQ(system("usbhost_ddk_test -AR &"), 0);
+        ASSERT_EQ(system(("usbhost_ddk_test -AW '" + data + "'").c_str()), 0);
         sleep(3);
         EXPECT_TRUE(HasLog(wlog, startTs)) << "ErrInfo: cannot find sync write log";
         EXPECT_TRUE(HasLog(rlog, startTs, RLOG_FILE)) << "ErrInfo: cannot find sync recv log";
@@ -229,7 +229,7 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteSync_003, TestSize.Level2)
 HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteAsync_001, TestSize.Level1)
 {
     printf("------start CheckUsbSerialIoWriteAsync_001------\n");
-    ASSERT_EQ(system("hostacm_moduletest -SDK -asyncRead &"), 0) << \
+    ASSERT_EQ(system("usbhost_ddk_test -Ar &"), 0) << \
     "ErrInfo:  failed to start async read";
     sleep(3);
     const string data = "abc";
@@ -237,7 +237,7 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteAsync_001, TestSize.Level1)
     string wlog, rlog;
     wlog = "send data[" + data + "] to device";
     rlog = "recv data[" + data + "] from device";
-    ASSERT_EQ(system(("hostacm_moduletest -SDK -asyncWrite '" + data + "'").c_str()), 0);
+    ASSERT_EQ(system(("usbhost_ddk_test -Aw '" + data + "'").c_str()), 0);
     sleep(3);
     EXPECT_TRUE(HasLog(wlog, startTs)) << "ErrInfo: cannot find async write log";
     EXPECT_TRUE(HasLog(rlog, startTs, RLOG_FILE)) << "ErrInfo: cannot find async recv log";
@@ -265,7 +265,7 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteAsync_002, TestSize.Level1)
     for (int i = 0; data[i].size() > 0; i++) {
         wlog = "send data[" + data[i] + "] to device";
         rlog = "recv data[" + data[i] + "] from device";
-        ASSERT_EQ(system(("hostacm_moduletest -SDK -asyncWrite '" + data[i] + "'").c_str()), 0);
+        ASSERT_EQ(system(("usbhost_ddk_test -Aw '" + data[i] + "'").c_str()), 0);
         sleep(3);
         EXPECT_TRUE(HasLog(wlog, startTs)) << "ErrInfo: cannot find async write log";
         EXPECT_TRUE(HasLog(rlog, startTs, RLOG_FILE)) << "ErrInfo: cannot find async recv log";
@@ -297,12 +297,12 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteAsync_003, TestSize.Level2)
     double startTs;
     for (int i = 0; i < writeCnt; i++) {
         startTs = GetNowTs();
-        ASSERT_EQ(system(("hostacm_moduletest -SDK -asyncWrite '" + data + "'").c_str()), 0);
+        ASSERT_EQ(system(("usbhost_ddk_test -Aw '" + data + "'").c_str()), 0);
         sleep(3);
         EXPECT_TRUE(HasLog(wlog, startTs)) << "ErrInfo: cannot find async write log";
         EXPECT_TRUE(HasLog(rlog, startTs, RLOG_FILE)) << "ErrInfo: cannot find async recv log";
     }
-    ASSERT_EQ(system("killall hostacm_moduletest"), 0) << "ErrInfo:  failed to kill async read";
+    ASSERT_EQ(system("killall usbhost_ddk_test"), 0) << "ErrInfo:  failed to kill async read";
     printf("------end CheckUsbSerialIoWriteAsync_003------\n");
 }
 
@@ -318,16 +318,16 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialStdCtrlCmdSync_001, TestSize.Level1)
     printf("------start UsbSerialStdCtrlCmdSync_001------\n");
     string targetLog;
     double startTs = GetNowTs();
-    ASSERT_EQ(system("hostacm_moduletest -SDK -ctrlWrite -des"), 0);
+    ASSERT_EQ(system("usbhost_ddk_test -AC"), 0);
     targetLog = "usb serial control command[CMD_STD_CTRL_GET_DESCRIPTOR] done";
     EXPECT_TRUE(HasLog(targetLog, startTs));
-    ASSERT_EQ(system("hostacm_moduletest -SDK -ctrlWrite -iface"), 0);
+    ASSERT_EQ(system("usbhost_ddk_test -Ai"), 0);
     targetLog = "usb serial control command[CMD_STD_CTRL_GET_INTERFACE] done";
     EXPECT_TRUE(HasLog(targetLog, startTs));
-    ASSERT_EQ(system("hostacm_moduletest -SDK -ctrlWrite -config"), 0);
+    ASSERT_EQ(system("usbhost_ddk_test -Ag"), 0);
     targetLog = "usb serial control command[CMD_STD_CTRL_GET_CONFIGURATION] done";
     EXPECT_TRUE(HasLog(targetLog, startTs));
-    ASSERT_EQ(system("hostacm_moduletest -SDK -ctrlWrite -status"), 0);
+    ASSERT_EQ(system("usbhost_ddk_test -As"), 0);
     targetLog = "usb serial control command[CMD_STD_CTRL_GET_STATUS] done";
     EXPECT_TRUE(HasLog(targetLog, startTs));
     printf("------end UsbSerialStdCtrlCmdSync_001------\n");
@@ -345,8 +345,8 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialStdCtrlCmdSync_002, TestSize.Level2)
     printf("------start UsbSerialStdCtrlCmdSync_002------\n");
     string targetLog;
     double startTs = GetNowTs();
-    ASSERT_EQ(system("hostacm_moduletest -SDK -ctrlWrite -status"), 0);
-    ASSERT_EQ(system("hostacm_moduletest -SDK -ctrlWrite -status"), 0);
+    ASSERT_EQ(system("usbhost_ddk_test -As"), 0);
+    ASSERT_EQ(system("usbhost_ddk_test -As"), 0);
     targetLog = "usb serial control command[CMD_STD_CTRL_GET_STATUS] done";
     EXPECT_TRUE(HasLog(targetLog, startTs));
     printf("------end UsbSerialStdCtrlCmdSync_002------\n");
@@ -364,7 +364,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialClsCtrlCmdSync, TestSize.Level1)
     printf("------start UsbSerialClsCtrlCmdSync------\n");
     string targetLog;
     double startTs = GetNowTs();
-    ASSERT_EQ(system("hostacm_moduletest -SDK -ctrlWrite -S"), 0);
+    ASSERT_EQ(system("usbhost_ddk_test -Ac"), 0);
     targetLog = "usb serial control command[CMD_CLASS_CTRL] done";
     EXPECT_TRUE(HasLog(targetLog, startTs));
     printf("------end UsbSerialClsCtrlCmdSync------\n");
@@ -382,7 +382,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialStdCtrlCmdAsync, TestSize.Level1)
     printf("------start UsbSerialStdCtrlCmdAsync------\n");
     string targetLog;
     double startTs = GetNowTs();
-    ASSERT_EQ(system("hostacm_moduletest -SDK -ctrlWrite -ades"), 0);
+    ASSERT_EQ(system("usbhost_ddk_test -Ad"), 0);
     targetLog = "usb serial control command[CMD_STD_CTRL_GET_DESCRIPTOR_ASYNC] done";
     EXPECT_TRUE(HasLog(targetLog, startTs));
     printf("------end UsbSerialStdCtrlCmdAsync------\n");
@@ -409,7 +409,7 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialDeviceInfo, TestSize.Level1)
     idVendor, idProduct, bDeviceClass,bDeviceSubClass, bDeviceProtocol);
     printf("targetLog==>%s\n", targetLog);
     double startTs = GetNowTs();
-    ASSERT_EQ(system("hostacm_moduletest -SDK -ctrlWrite -des"), 0);
+    ASSERT_EQ(system("usbhost_ddk_test -AC"), 0);
     EXPECT_TRUE(HasLog(string(targetLog), startTs, RLOG_FILE));
     printf("------end CheckUsbSerialDeviceInfo------\n");
 }
@@ -427,7 +427,7 @@ HWTEST_F(UsbHostSerialFuncTest, KillHostSdkProcess, TestSize.Level1)
     system("kill $(pidof pnp_host)");
     printf("Please waiting for restarting sdk process...\n");
     sleep(5);
-    ASSERT_EQ(system("hostacm_moduletest -SDK -asyncRead &"), 0) << \
+    ASSERT_EQ(system("usbhost_ddk_test -Ar &"), 0) << \
     "ErrInfo:  failed to start async read";
     sleep(3);
     const string data = "abc";
@@ -435,11 +435,11 @@ HWTEST_F(UsbHostSerialFuncTest, KillHostSdkProcess, TestSize.Level1)
     string wlog, rlog;
     wlog = "send data[" + data + "] to device";
     rlog = "recv data[" + data + "] from device";
-    ASSERT_EQ(system(("hostacm_moduletest -SDK -asyncWrite '" + data + "'").c_str()), 0);
+    ASSERT_EQ(system(("usbhost_ddk_test -Aw '" + data + "'").c_str()), 0);
     sleep(3);
     EXPECT_TRUE(HasLog(wlog, startTs)) << "ErrInfo: cannot find async write log";
     EXPECT_TRUE(HasLog(rlog, startTs, RLOG_FILE)) << "ErrInfo: cannot find async recv log";
-    system("killall hostacm_moduletest");
+    system("killall usbhost_ddk_test");
     printf("------end KillHostSdkProcess------\n");
 }
 }

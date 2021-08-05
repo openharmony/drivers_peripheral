@@ -47,7 +47,7 @@ typedef enum {
 #define ACM_NW                       16
 #define ACM_NR                       16
 #define READ_BUF_SIZE                8192
-#define USB_CTRL_SET_TIMEOUT         5000
+#define USB_CTRL_SET_TIMEOUT         0
 #define USB_PIPE_DIR_OFFSET          7
 
 struct AcmDevice;

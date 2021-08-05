@@ -114,8 +114,9 @@ static void FillUrb(struct UsbAdapterUrb *urb, int len)
         urb->streamId = 0;
         urb->endPoint = endNum;
     }
-
-    memset(urb->buffer, 'c', len);
+    if (endNum >> 7 == 0) {
+        memset(urb->buffer, 'c', len);
+    }
 }
 
 void SignalHandler(int signo)
@@ -146,10 +147,39 @@ void SignalHandler(int signo)
    }
 }
 
+static int SendProcess(void *argurb)
+{
+    int i;
+    int r;
+    while (!g_speedFlag) {
+        OsalSemWait(&sem, HDF_WAIT_FOREVER);
+        for (i = 0; i < TEST_CYCLE; i++) {
+            if (urb[i].inUse == 0) {
+                urb[i].inUse = 1;
+                urb[i].urb->userContext = (void*)(&urb[i]);
+                break;
+            }
+        }
+
+        if (i==TEST_CYCLE) {
+            i=TEST_CYCLE-1;
+        }
+        sendUrb = urb[i].urb;
+        FillUrb(sendUrb, TEST_LENGTH);
+        r = ioctl(fd, USBDEVFS_SUBMITURB, sendUrb);
+        if (r < 0) {
+            printf("SubmitBulkRequest: ret:%d errno=%d\n", r, errno);
+            urb[i].inUse = 0;
+            continue;
+        }
+        g_send_count++;
+    }
+    return 0;
+}
+
 static int ReapProcess(void *argurb)
 {
     int r;
-    int i;
     struct UsbAdapterUrb *urbrecv = NULL;
     if (signal(SIGUSR1, SignalHandler) == SIG_ERR) {
         printf("signal SIGUSR1 failed");
@@ -182,26 +212,7 @@ static int ReapProcess(void *argurb)
 
         struct UsbAdapterUrbs * urbs = urbrecv->userContext;
         urbs->inUse = 0;
-        for (i = 0; i < TEST_CYCLE; i++) {
-            if (urb[i].inUse == 0) {
-                urb[i].inUse = 1;
-                urb[i].urb->userContext = (void*)(&urb[i]);
-                break;
-            }
-        }
-
-        if (i==TEST_CYCLE) {
-            i=TEST_CYCLE-1;
-        }
-        sendUrb = urb[i].urb;
-        FillUrb(sendUrb, TEST_LENGTH);
-        r = ioctl(fd, USBDEVFS_SUBMITURB, sendUrb);
-        if (r < 0) {
-            printf("SubmitBulkRequest: ret:%d errno=%d\n", r, errno);
-            urb[i].inUse = 0;
-            continue;
-        }
-        g_send_count++;
+        OsalSemPost(&sem);
     }
     exitOk = true;
     return 0;
@@ -341,11 +352,12 @@ int main(int argc, char *argv[])
     }
 
     struct OsalThread urbReapProcess;
+    struct OsalThread urbSendProcess;
     struct OsalThreadParam threadCfg;
 
     (void)memset(&threadCfg, 0, sizeof(threadCfg));
     threadCfg.name = "urb reap process";
-    threadCfg.priority = OSAL_THREAD_PRI_LOW;
+    threadCfg.priority = OSAL_THREAD_PRI_DEFAULT;
     threadCfg.stackSize = URB_COMPLETE_PROCESS_STACK_SIZE;
 
     ret = OsalThreadCreate(&urbReapProcess, (OsalThreadEntry)ReapProcess, NULL);
@@ -355,6 +367,21 @@ int main(int argc, char *argv[])
     }
 
     ret = OsalThreadStart(&urbReapProcess, &threadCfg);
+    if (ret != HDF_SUCCESS) {
+        printf("OsalThreadStart fail, ret=%d\n", ret);
+    }
+
+    threadCfg.name = "urb send process";
+    threadCfg.priority = OSAL_THREAD_PRI_DEFAULT;
+    threadCfg.stackSize = URB_COMPLETE_PROCESS_STACK_SIZE;
+
+    ret = OsalThreadCreate(&urbSendProcess, (OsalThreadEntry)SendProcess, NULL);
+    if (ret != HDF_SUCCESS) {
+        printf("OsalThreadCreate fail, ret=%d\n", ret);
+        goto err;
+    }
+
+    ret = OsalThreadStart(&urbSendProcess, &threadCfg);
     if (ret != HDF_SUCCESS) {
         printf("OsalThreadStart fail, ret=%d\n", ret);
     }
