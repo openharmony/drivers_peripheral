@@ -25,10 +25,12 @@
 #define HDF_LOG_TAG    sensor_channel_c
 
 #define ACCEL_ACCURACY    (HDI_SENSOR_GRAVITY / HDI_SENSOR_ACCEL_LSB / HDI_SENSOR_UNITS)
+#define GYRO_ACCURACY    ((1 / 1000.0) * (3.14 / 180.0))
 
 static struct SensorCovertCoff g_sensorCovertCoff[] = {
     { SENSOR_TYPE_NONE, 0, DATA_X, { ACCEL_ACCURACY } },
     { SENSOR_TYPE_ACCELEROMETER, SENSOR_TYPE_MAX, DATA_XYZ, { ACCEL_ACCURACY, ACCEL_ACCURACY, ACCEL_ACCURACY } },
+    { SENSOR_TYPE_GYROSCOPE, SENSOR_TYPE_MAX, DATA_XYZ, { GYRO_ACCURACY, GYRO_ACCURACY, GYRO_ACCURACY } },
 };
 
 void SetSensorIdBySensorType(enum SensorTypeTag type, int32_t sensorId)
