@@ -68,13 +68,13 @@ static int32_t TestParaseCommand(int paramNum, const char *cmdParam, int *cmdTyp
     for (uint32_t i = 0; i < strlen(cmdParam); i++) {
         switch (cmdParam[i]) {
             case 'A':
-                strcpy(apiType, "-SDK");
+                strcpy_s(apiType, DATA_MAX_LEN, "-SDK");
                 break;
             case 'a':
-                strcpy(apiType, "-RAW");
+                strcpy_s(apiType, DATA_MAX_LEN, "-RAW");
                 break;
             case 'E':
-                strcpy(apiType, "-ECM");
+                strcpy_s(apiType, DATA_MAX_LEN, "-ECM");
                 break;
             case 'R':
                 if (paramNum != PARAM_GET_CMD_LEN) {

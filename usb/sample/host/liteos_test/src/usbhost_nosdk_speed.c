@@ -192,7 +192,7 @@ static int BeginProcess(unsigned char endPoint)
             }
         }
 
-        memset(data, 'c', TEST_LENGTH);
+        memset_s(data, TEST_LENGTH, 'c', TEST_LENGTH);
         data[TEST_LENGTH - 1] = '\0';
         urb[i].urb->transfer_buffer = (void *)data;
         urb[i].urb->transfer_buffer_length = TEST_LENGTH;

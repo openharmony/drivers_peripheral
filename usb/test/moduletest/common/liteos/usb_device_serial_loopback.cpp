@@ -52,7 +52,7 @@ HWTEST_F(UsbDeviceSerialLoopback, DeviceSerialLoopback, TestSize.Level1)
                 break;
             }
             acm_write(data);
-            memset(data, 0, sizeof(data));
+            memset_s(data, sizeof(data), 0, sizeof(data));
         }
     }
     printf("------end DeviceSerialLoopback------\n");
