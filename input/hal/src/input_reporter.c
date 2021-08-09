@@ -197,10 +197,7 @@ static int32_t HotPlugEventListenerCallback(struct HdfDevEventlistener *listener
         HDF_LOGE("%s: read sbuf failed", __func__);
         return INPUT_FAILURE;
     }
-    HDF_LOGI("%{public}s: hot plug callback start", __func__);
     manager->hostDev.hostCb->HotPlugCallback((const HotPlugEvent *)event);
-    HDF_LOGI("%{public}s: hot plug callback end\n", __func__);
-
     return INPUT_SUCCESS;
 }
 
