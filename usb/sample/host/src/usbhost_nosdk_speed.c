@@ -34,6 +34,7 @@
 #include "usbhost_nosdk_speed.h"
 #include "osal_time.h"
 #include "osal_mem.h"
+#include "securec.h"
 
 #define USB_DEV_FS_PATH "/dev/bus/usb"
 #define URB_COMPLETE_PROCESS_STACK_SIZE 8196
@@ -72,7 +73,7 @@ static int OpenDevice()
     char path[24];
     int ret;
 
-    ret = snprintf(path, sizeof(path), USB_DEV_FS_PATH "/%03u/%03u", g_busNum, g_devAddr);
+    ret = snprintf_s(path, 24, sizeof(path), USB_DEV_FS_PATH "/%03u/%03u", g_busNum, g_devAddr);
     if (ret < 0) {
         printf("path error\n");
         return ret;
@@ -115,7 +116,7 @@ static void FillUrb(struct UsbAdapterUrb *urb, int len)
         urb->endPoint = endNum;
     }
     if (endNum >> 7 == 0) {
-        memset(urb->buffer, 'c', len);
+        memset_s(urb->buffer, len, 'c', len);
     }
 }
 
@@ -248,7 +249,7 @@ static int BeginProcess(unsigned char endPoint)
         if (data == NULL) {
             return -1;
         }
-        memset(data, 'c', TEST_LENGTH);
+        memset_s(data, TEST_LENGTH, 'c', TEST_LENGTH);
         data[TEST_LENGTH - 1] = '\0';
         urb[i].urb->buffer = (void *)data;
         urb[i].urb->bufferLength = TEST_LENGTH;
@@ -355,7 +356,7 @@ int main(int argc, char *argv[])
     struct OsalThread urbSendProcess;
     struct OsalThreadParam threadCfg;
 
-    (void)memset(&threadCfg, 0, sizeof(threadCfg));
+    (void)memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
     threadCfg.name = "urb reap process";
     threadCfg.priority = OSAL_THREAD_PRI_DEFAULT;
     threadCfg.stackSize = URB_COMPLETE_PROCESS_STACK_SIZE;
