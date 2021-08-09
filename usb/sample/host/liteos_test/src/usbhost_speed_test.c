@@ -151,7 +151,7 @@ static enum speedServer checkServer(char* input)
 {
     char middle[10] = {0};
     enum speedServer out = SDKAPI_SERVER;
-    strncpy(middle, input, strlen(input));
+    strncpy_s(middle, 10, input, strlen(input));
     if (!strcmp(middle, "-SDK")) {
         out = SDKAPI_SERVER;
     } else if (!strcmp(middle, "-RAW")) {
