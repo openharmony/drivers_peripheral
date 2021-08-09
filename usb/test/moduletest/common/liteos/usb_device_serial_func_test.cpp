@@ -75,7 +75,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_002, TestSize.Level1)
     };
     char readBuf[256] = {0};
     for (int i = 0; strlen(data[i]) > 0; i++) {
-        memset(readBuf, 0, sizeof(readBuf));
+        memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         acm_write(const_cast<char *>(data[i]));
         acm_read(readBuf);
         EXPECT_EQ(strcmp(const_cast<char *>(data[i]), readBuf), 0);
@@ -97,7 +97,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_003, TestSize.Level2)
     for (int i = 0; i < 30; i++) {
         acm_write(wdata);
         acm_read(rdata);
-        memset(rdata, 0, sizeof(rdata));
+        memset_s(rdata, sizeof(rdata), 0, sizeof(rdata));
     }
     char writeBuf[] = "aaa111";
     char readBuf[256] = {0};
@@ -127,9 +127,9 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_004, TestSize.Level2)
     }
     char readBuf[256] = {0};
     char writeBuf[256] = {0};
-    strcpy(writeBuf, data.c_str());
+    strcpy_s(writeBuf, 256, data.c_str());
     for (int i = 0; i < writeCnt; i++) {
-        memset(readBuf, 0, sizeof(readBuf));
+        memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         acm_write(writeBuf);
         acm_read(readBuf);
         EXPECT_EQ(strcmp(writeBuf, readBuf), 0);

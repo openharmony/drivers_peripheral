@@ -56,7 +56,7 @@ HWTEST_F(UsbHostSerialLoopback, HostSerialLoopback, TestSize.Level1)
             UsbHostDdkTestOpen(HOST_ACM_SYNC_WRITE);
             UsbHostDdkTestSyncWrite(data);
             UsbHostDdkTestClose(HOST_ACM_SYNC_WRITE);
-            memset(data, 0, sizeof(data));
+            memset_s(data, sizeof(data), 0, sizeof(data));
         }
     }
     printf("------end HostSerialLoopback------\n");

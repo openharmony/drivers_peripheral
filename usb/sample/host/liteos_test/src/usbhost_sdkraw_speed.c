@@ -495,7 +495,7 @@ static int32_t SerialBegin(struct AcmDevice *acm)
     db->len = acm->dataSize;
 #if 0
     if (g_writeOrRead == TEST_READ) {
-        memset(db->buf, '0', TEST_LENGTH);
+        memset_s(db->buf, TEST_LENGTH, '0', TEST_LENGTH);
     }
     struct UsbRawFillRequestData reqData;
     reqData.endPoint      = acm->dataEp->addr;
