@@ -40,6 +40,7 @@
 #define WIFI_HAL_STA_FEATURE_H
 
 #include "wifi_hal_base_feature.h"
+#include "wifi_driver_client.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -70,6 +71,19 @@ struct IWiFiSta {
      * @version 1.0
      */
     int32_t (*setScanningMacAddress)(const struct IWiFiSta *staFeature, unsigned char *scanMac, uint8_t len);
+
+    /**
+     * @brief wlan hal start scan.
+     *
+     * @param ifName The interface name.
+     * @param scan start scan with param.
+     *
+     * @return Returns <b>0</b> if start scan is successfully; returns a negative value otherwise.
+     *
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*startScan)(const char *ifName, WifiScan *scan);
 };
 
 /**

@@ -43,6 +43,23 @@ static int32_t SetScanningMacAddress(const struct IWiFiSta *staFeature, unsigned
     return ret;
 }
 
+static int32_t StartScanInner(const char *ifName, WifiScan *scan)
+{
+    if (ifName == NULL || scan == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HalCmdStartScanInner(ifName, scan);
+}
+
+static int32_t StartScan(const char *ifName, WifiScan *scan)
+{
+    HalMutexLock();
+    int32_t ret = StartScanInner(ifName, scan);
+    HalMutexUnlock();
+    return ret;
+}
+
 int32_t InitStaFeature(struct IWiFiSta **fe)
 {
     if (fe == NULL || *fe == NULL) {
@@ -54,6 +71,7 @@ int32_t InitStaFeature(struct IWiFiSta **fe)
         return HDF_FAILURE;
     }
     (*fe)->setScanningMacAddress = SetScanningMacAddress;
+    (*fe)->startScan = StartScan;
     return HDF_SUCCESS;
 }
 

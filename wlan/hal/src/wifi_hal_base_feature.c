@@ -140,7 +140,7 @@ static int32_t GetValidFreqsWithBand(const struct IWiFiBaseFeature *baseFeature,
     return ret;
 }
 
-static int32_t SetTxPower(const struct IWiFiBaseFeature *baseFeature, int32_t power)
+static int32_t HalSetTxPower(const struct IWiFiBaseFeature *baseFeature, int32_t power)
 {
     HalMutexLock();
     int32_t ret = SetTxPowerInner(baseFeature, power);
@@ -148,7 +148,7 @@ static int32_t SetTxPower(const struct IWiFiBaseFeature *baseFeature, int32_t po
     return ret;
 }
 
-static int32_t GetChipId(const struct IWiFiBaseFeature *baseFeature, uint8_t *chipId)
+static int32_t HalGetChipId(const struct IWiFiBaseFeature *baseFeature, uint8_t *chipId)
 {
     HalMutexLock();
     int32_t ret = GetChipIdInner(baseFeature, chipId);
@@ -156,7 +156,7 @@ static int32_t GetChipId(const struct IWiFiBaseFeature *baseFeature, uint8_t *ch
     return ret;
 }
 
-static int32_t GetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num)
+static int32_t HalGetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num)
 {
     HalMutexLock();
     int32_t ret = GetIfNamesByChipIdInner(chipId, ifNames, num);
@@ -175,9 +175,9 @@ int32_t InitBaseFeature(struct IWiFiBaseFeature **fe)
     (*fe)->setMacAddress = SetMacAddress;
     (*fe)->getDeviceMacAddress = GetDeviceMacAddress;
     (*fe)->getValidFreqsWithBand = GetValidFreqsWithBand;
-    (*fe)->setTxPower = SetTxPower;
-    (*fe)->getChipId = GetChipId;
-    (*fe)->getIfNamesByChipId = GetIfNamesByChipId;
+    (*fe)->setTxPower = HalSetTxPower;
+    (*fe)->getChipId = HalGetChipId;
+    (*fe)->getIfNamesByChipId = HalGetIfNamesByChipId;
     return HDF_SUCCESS;
 }
 
