@@ -27,7 +27,6 @@ using namespace OHOS::HDI::WLAN::V1_0;
 namespace HdiTest {
 const int32_t WLAN_FREQ_MAX_NUM = 14;
 const int32_t WLAN_TX_POWER = 160;
-const int32_t ETH_ADDR_LEN = 6;
 
 constexpr const char *WLAN_SERVICE_NAME = "wlan_hal_service";
 class WifiHdiHalServiceTest : public testing::Test {

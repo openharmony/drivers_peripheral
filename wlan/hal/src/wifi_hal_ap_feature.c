@@ -54,7 +54,7 @@ static int32_t GetAsscociatedStas(const struct IWiFiAp *apFeature,
     return ret;
 }
 
-static int32_t SetCountryCode(const struct IWiFiAp *apFeature, const char *code, uint32_t len)
+static int32_t HalSetCountryCode(const struct IWiFiAp *apFeature, const char *code, uint32_t len)
 {
     HalMutexLock();
     int32_t ret = SetCountryCodeInner(apFeature, code, len);
@@ -73,7 +73,7 @@ int32_t InitApFeature(struct IWiFiAp **fe)
         return HDF_FAILURE;
     }
     (*fe)->getAsscociatedStas = GetAsscociatedStas;
-    (*fe)->setCountryCode = SetCountryCode;
+    (*fe)->setCountryCode = HalSetCountryCode;
     return HDF_SUCCESS;
 }
 
