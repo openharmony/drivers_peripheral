@@ -75,15 +75,19 @@ void WifiHalTest::TearDown()
 
 static void ParseScanResult(WifiScanResult *scanResult)
 {
-    printf("ParseScanResult: flags=%d, caps=%d, freq=%d, beaconInt=%d,\n", scanResult->flags, scanResult->caps, scanResult->freq, scanResult->beaconInt);
-    printf("ParseScanResult: qual=%d, beaconIeLen=%d, level=%d, age=%d, ieLen=%d,\n", scanResult->qual, scanResult->beaconIeLen, scanResult->level, scanResult->age, scanResult->ieLen);
+    printf("ParseScanResult: flags=%d, caps=%d, freq=%d, beaconInt=%d,\n",
+        scanResult->flags, scanResult->caps, scanResult->freq, scanResult->beaconInt);
+    printf("ParseScanResult: qual=%d, beaconIeLen=%d, level=%d, age=%d, ieLen=%d,\n",
+        scanResult->qual, scanResult->beaconIeLen, scanResult->level, scanResult->age, scanResult->ieLen);
 }
 
 static int32_t HalCallbackEventScanResult(uint32_t eventId, void *data, const char *ifName)
 {
     printf("HalCallbackEventScanResult ifName = %s, eventId = %d\n", ifName, eventId);
-
     switch (eventId) {
+        case WIFI_EVENT_SCAN_DONE:
+            printf("HalCallbackEventScanResult WIFI_EVENT_SCAN_DONE Process\n";
+            break;
         case WIFI_EVENT_SCAN_RESULT:
             ParseScanResult((WifiScanResult *)data);
             break;
@@ -348,19 +352,20 @@ HWTEST_F(WifiHalTest, WifiHalGetNetDevInfo001, TestSize.Level1)
 {
     int ret;
     uint32_t i;
-    struct NetDeviceInfoResult *netDeviceInfoResult = (struct NetDeviceInfoResult *)calloc(1, sizeof(struct NetDeviceInfoResult));
+    struct NetDeviceInfoResult *netDeviceInfoResult =
+        (struct NetDeviceInfoResult *)calloc(1, sizeof(struct NetDeviceInfoResult));
 
-    printf("xsxs: WifiHalGetNetDevInfo001 entry00000 g_wifi = %p\n", g_wifi);
     ret = g_wifi->getNetDevInfo(netDeviceInfoResult);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     for (i = 0; i < MAX_NETDEVICE_COUNT; i++) {
-        // if (netDeviceInfoResult->deviceInfos[i].ifName != nullptr) {
-            printf("WifiHalGetNetDevInfo001 i = %d\n", i);
-            printf("WifiHalGetNetDevInfo001 index=%d, ifName=%s\n", netDeviceInfoResult->deviceInfos[i].index, netDeviceInfoResult->deviceInfos[i].ifName);
-            printf("WifiHalGetNetDevInfo001 iftype=%d, mac=%02x:%02x:%02x:%02x:%02x:%02x\n", netDeviceInfoResult->deviceInfos[i].iftype, netDeviceInfoResult->deviceInfos[i].mac[0],
-                netDeviceInfoResult->deviceInfos[i].mac[1], netDeviceInfoResult->deviceInfos[i].mac[2], netDeviceInfoResult->deviceInfos[i].mac[3], netDeviceInfoResult->deviceInfos[i].mac[4], netDeviceInfoResult->deviceInfos[i].mac[5]);
-        // }
+        printf("WifiHalGetNetDevInfo001 index=%d, ifName=%s\n",
+            netDeviceInfoResult->deviceInfos[i].index, netDeviceInfoResult->deviceInfos[i].ifName);
+        printf("WifiHalGetNetDevInfo001 iftype=%d, mac=%02x:%02x:%02x:%02x:%02x:%02x\n",
+            netDeviceInfoResult->deviceInfos[i].iftype, netDeviceInfoResult->deviceInfos[i].mac[0],
+            netDeviceInfoResult->deviceInfos[i].mac[1], netDeviceInfoResult->deviceInfos[i].mac[2],
+            netDeviceInfoResult->deviceInfos[i].mac[3], netDeviceInfoResult->deviceInfos[i].mac[4], 
+            netDeviceInfoResult->deviceInfos[i].mac[5]);
     }
 }
 
@@ -378,6 +383,7 @@ HWTEST_F(WifiHalTest, WifiHalStartScan001, TestSize.Level1)
     EXPECT_NE(nullptr, staFeature);
     ret = staFeature->startScan(ifName, &scan);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    sleep(3);
 }
 
 };
