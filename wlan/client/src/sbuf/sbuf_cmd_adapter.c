@@ -500,8 +500,7 @@ int32_t SetTxPower(const char *ifName, int32_t power)
     return ret;
 }
 
-int32_t GetAssociatedStas(const char *ifName,
-    struct AssocStaInfoResult *result)
+int32_t GetAssociatedStas(const char *ifName, struct AssocStaInfoResult *result)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -796,18 +795,16 @@ int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
         HdfSBufRecycle(data);
         return RET_CODE_FAILURE;
     }
-    printf("xsxs: sbuf_cmd_adapter GetNetDeviceInfo cmd=%d\n", WIFI_HAL_CMD_GET_NETDEV_INFO);
     do{
         ret = SendCmdSync(WIFI_HAL_CMD_GET_NETDEV_INFO, data, reply);
         if (ret != RET_CODE_SUCCESS) {
             break;
         }
         if (!HdfSbufReadUint32(reply, &netdevNum)) {
-            HILOG_ERROR(LOG_DOMAIN, "xsxs: %s: HdfSbufReadUint32 failed", __FUNCTION__);
+            HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufReadUint32 failed", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;
         }
-        printf("xsxs: sbuf_cmd_adapter GetNetDeviceInfo netdevNum=%d\n", netdevNum);
         for (i = 0; i < netdevNum; i++) {
             if (!HdfSbufReadUint32(reply, &(netDeviceInfoResult->deviceInfos[i].index)) ||
                 !HdfSbufReadBuffer(reply, (const void **)(&ifName), &ifNameSize) ||
@@ -818,16 +815,15 @@ int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
                 break;
             }
             if (memcpy_s(netDeviceInfoResult->deviceInfos[i].ifName, ifNameSize, ifName, ifNameSize) != EOK) {
-                HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __func__);
+                HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __FUNCTION__);
                 ret = RET_CODE_FAILURE;
                 break;
             }
             if (memcpy_s(netDeviceInfoResult->deviceInfos[i].mac, macSize, replayData, macSize) != EOK) {
-                HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __func__);
+                HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __FUNCTION__);
                 ret = RET_CODE_FAILURE;
                 break;
             }
-            printf("xsxs: sbuf_cmd_adapter GetNetDeviceInfo i=%d, ifName=%s\n", i, netDeviceInfoResult->deviceInfos[i].ifName);
         }
     } while (0);
     HdfSBufRecycle(data);

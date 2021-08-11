@@ -245,7 +245,6 @@ static int32_t ResetDriverInner(uint8_t chipId, const char *ifName)
 
 static int32_t GetNetDevInfoInner(struct NetDeviceInfoResult *netDeviceInfoResult)
 {
-    printf("xsxs: GetNetDevInfoInner entry00000\n");
     if (netDeviceInfoResult == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
