@@ -86,7 +86,7 @@ static int32_t HalCallbackEventScanResult(uint32_t eventId, void *data, const ch
     printf("HalCallbackEventScanResult ifName = %s, eventId = %d\n", ifName, eventId);
     switch (eventId) {
         case WIFI_EVENT_SCAN_DONE:
-            printf("HalCallbackEventScanResult WIFI_EVENT_SCAN_DONE Process\n";
+            printf("HalCallbackEventScanResult WIFI_EVENT_SCAN_DONE Process\n");
             break;
         case WIFI_EVENT_SCAN_RESULT:
             ParseScanResult((WifiScanResult *)data);
