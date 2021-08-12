@@ -348,27 +348,6 @@ HWTEST_F(WifiHalTest, WifiHalSetCountryCode001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
-HWTEST_F(WifiHalTest, WifiHalGetNetDevInfo001, TestSize.Level1)
-{
-    int ret;
-    uint32_t i;
-    struct NetDeviceInfoResult *netDeviceInfoResult =
-        (struct NetDeviceInfoResult *)calloc(1, sizeof(struct NetDeviceInfoResult));
-
-    ret = g_wifi->getNetDevInfo(netDeviceInfoResult);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    for (i = 0; i < MAX_NETDEVICE_COUNT; i++) {
-        printf("WifiHalGetNetDevInfo001 index=%d, ifName=%s\n",
-            netDeviceInfoResult->deviceInfos[i].index, netDeviceInfoResult->deviceInfos[i].ifName);
-        printf("WifiHalGetNetDevInfo001 iftype=%d, mac=%02x:%02x:%02x:%02x:%02x:%02x\n",
-            netDeviceInfoResult->deviceInfos[i].iftype, netDeviceInfoResult->deviceInfos[i].mac[0],
-            netDeviceInfoResult->deviceInfos[i].mac[1], netDeviceInfoResult->deviceInfos[i].mac[2],
-            netDeviceInfoResult->deviceInfos[i].mac[3], netDeviceInfoResult->deviceInfos[i].mac[4], 
-            netDeviceInfoResult->deviceInfos[i].mac[5]);
-    }
-}
-
 HWTEST_F(WifiHalTest, WifiHalStartScan001, TestSize.Level1)
 {
     int ret;
