@@ -15,6 +15,7 @@
 
 #include "audio_manager.h"
 #include <dlfcn.h>
+#include <inttypes.h>
 #include <pthread.h>
 #include <securec.h>
 #include <signal.h>
@@ -273,7 +274,7 @@ int32_t FrameStartCapture(void *param)
         fwrite(frame, replyBytes, 1, file);
         totalSize += (replyBytes / PERIOD_SIZE); // 1024 = 1Kb
         if (totalSize % AUDIO_RECORD_INTERVAL_512KB == 0) { // 512KB
-            printf("\nRecording,the audio file size is %lluKb\n", totalSize);
+            printf("\nRecording,the audio file size is %" PRIu64 "Kb\n", totalSize);
         }
     } while ((totalSize <= AUDIO_TOTALSIZE_15M) && (!g_closeEnd)); // 15 * 1024 = 15M
     if (frame != NULL) {
