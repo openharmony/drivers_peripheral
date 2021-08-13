@@ -27,7 +27,6 @@ using namespace testing::ext;
 
 namespace HalTest {
 struct IWiFi *g_wifi = nullptr;
-const int32_t ETH_ADDR_LEN = 6;
 const int32_t WLAN_TX_POWER = 160;
 
 class WifiHalTest : public testing::Test {
@@ -72,6 +71,30 @@ void WifiHalTest::TearDown()
     ASSERT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = g_wifi->stop(g_wifi);
     ASSERT_EQ(HDF_SUCCESS, ret);
+}
+
+static void ParseScanResult(WifiScanResult *scanResult)
+{
+    printf("ParseScanResult: flags=%d, caps=%d, freq=%d, beaconInt=%d,\n",
+        scanResult->flags, scanResult->caps, scanResult->freq, scanResult->beaconInt);
+    printf("ParseScanResult: qual=%d, beaconIeLen=%d, level=%d, age=%d, ieLen=%d,\n",
+        scanResult->qual, scanResult->beaconIeLen, scanResult->level, scanResult->age, scanResult->ieLen);
+}
+
+static int32_t HalCallbackEventScanResult(uint32_t eventId, void *data, const char *ifName)
+{
+    printf("HalCallbackEventScanResult ifName = %s, eventId = %d\n", ifName, eventId);
+    switch (eventId) {
+        case WIFI_EVENT_SCAN_DONE:
+            printf("HalCallbackEventScanResult WIFI_EVENT_SCAN_DONE Process\n");
+            break;
+        case WIFI_EVENT_SCAN_RESULT:
+            ParseScanResult((WifiScanResult *)data);
+            break;
+        default:
+            break;
+    }
+    return HDF_SUCCESS;
 }
 
 /**
@@ -323,6 +346,23 @@ HWTEST_F(WifiHalTest, WifiHalSetCountryCode001, TestSize.Level1)
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+HWTEST_F(WifiHalTest, WifiHalStartScan001, TestSize.Level1)
+{
+    int ret;
+    struct IWiFiSta *staFeature = nullptr;
+    const char *ifName = "wlan0";
+    WifiScan scan = {0};
+
+    ret = g_wifi->registerEventCallback(HalCallbackEventScanResult, ifName);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
+    ret = staFeature->startScan(ifName, &scan);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    sleep(3);
 }
 
 };

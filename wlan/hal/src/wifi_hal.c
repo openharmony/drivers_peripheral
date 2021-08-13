@@ -243,6 +243,15 @@ static int32_t ResetDriverInner(uint8_t chipId, const char *ifName)
     return HalCmdSetResetDriver(chipId, ifName);
 }
 
+static int32_t GetNetDevInfoInner(struct NetDeviceInfoResult *netDeviceInfoResult)
+{
+    if (netDeviceInfoResult == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return GetNetDeviceInfo(netDeviceInfoResult);
+}
+
 static int32_t Start(struct IWiFi *iwifi)
 {
     HalMutexLock();
@@ -328,6 +337,14 @@ static int32_t ResetDriver(const uint8_t chipId, const char *ifName)
     return ret;
 }
 
+static int32_t GetNetDevInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
+{
+    HalMutexLock();
+    int32_t ret = GetNetDevInfoInner(netDeviceInfoResult);
+    HalMutexUnlock();
+    return ret;
+}
+
 int32_t WifiConstruct(struct IWiFi **wifiInstance)
 {
     static bool isInited = false;
@@ -349,6 +366,7 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
         singleWifiInstance.registerEventCallback = HalRegisterEventCallback;
         singleWifiInstance.unregisterEventCallback = HalUnregisterEventCallback;
         singleWifiInstance.resetDriver = ResetDriver;
+        singleWifiInstance.getNetDevInfo = GetNetDevInfo;
         InitIWiFiList();
         isInited = true;
     }

@@ -18,6 +18,7 @@
 
 #include "wifi_hal_ap_feature.h"
 #include "wifi_hal_common.h"
+#include "wifi_driver_client.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -39,6 +40,7 @@ int32_t HalCmdGetValidFreqWithBand(const char *ifName, int32_t band, int32_t *fr
 int32_t HalCmdGetChipId(const char *ifName, uint8_t *chipId);
 int32_t HalCmdGetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num);
 int32_t HalCmdSetResetDriver(const uint8_t chipId, const char *ifName);
+int32_t HalCmdStartScanInner(const char *ifName, WifiScan *scan);
 
 struct DListHead *GetNetworkHead(void);
 void ClearIWiFiList(void);

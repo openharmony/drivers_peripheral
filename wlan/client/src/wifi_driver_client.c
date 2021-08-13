@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "wifi_driver_client.h"
 #include <string.h>
 #include <stdlib.h>
 #include "wifi_common_cmd.h"
@@ -38,6 +37,9 @@ void WifiEventReport(const char *ifName, uint32_t event, void *data)
     uint32_t i;
 
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
+        if (g_callbackEventMap[i] != NULL) {
+            printf("xsxs: g_callbackEventMap[i]->ifName=%s\n", g_callbackEventMap[i]->ifName);
+        }
         if (g_callbackEventMap[i] != NULL && (strcmp(g_callbackEventMap[i]->ifName, ifName) == 0) &&
             (((1 << event) & g_callbackEventMap[i]->eventType) != 0)) {
             HILOG_INFO(LOG_DOMAIN, "%s: WifiEventReport send event = %d, ifName = %s",
@@ -69,8 +71,9 @@ int32_t RegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const
         return RET_CODE_FAILURE;
     }
     callbackEvent->eventType = eventType;
-    if (strcpy_s(callbackEvent->ifName, IFNAMSIZ, ifName) != EOK) {
-        return RET_CODE_SUCCESS;
+    if (strcpy_s(callbackEvent->ifName, IFNAMSIZ, ifName) != RET_CODE_SUCCESS) {
+        free(callbackEvent);
+        return RET_CODE_FAILURE;
     }
     callbackEvent->onRecFunc = onRecFunc;
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {

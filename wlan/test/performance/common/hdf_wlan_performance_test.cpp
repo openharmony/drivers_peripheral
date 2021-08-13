@@ -31,7 +31,6 @@ const int32_t MSEC_TIME = 1000;
 const int32_t COMMON_TIME = 3000;
 const int32_t MEDIUM_TIME = 20000;
 const int32_t LONG_TIME = 200000;
-const int32_t ETH_ADDR_LEN = 6;
 const int32_t WLAN_BAND_2G = 0;
 const int32_t WLAN_FREQ_MAX_NUM = 14;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
