@@ -815,7 +815,7 @@ static void EcmReadBulk(struct UsbRequest *req)
                 }
                 count = DataFifoWrite(&ecm->readFifo, data, size);
                 if (count != size) {
-                    HDF_LOGW("%{public}s: write %u less than expected %u", __func__, count, size);
+                    HDF_LOGW("%{public}s: write %u less than expected %zu", __func__, count, size);
                 }
             }
             OsalMutexUnlock(&ecm->readLock);
