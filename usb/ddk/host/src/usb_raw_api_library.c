@@ -168,7 +168,7 @@ static int GetInterfaceNumber(const uint8_t *buffer, size_t size, uint8_t nIntf[
          size2 > 0;
          (buffer2 += header->bLength, size2 -= header->bLength)) {
         if (size2 < sizeof(struct UsbiDescriptorHeader)) {
-            HDF_LOGW("%{public}s: descriptor has %{public}d excess bytes", __func__, size2);
+            HDF_LOGW("%{public}s: descriptor has %{public}zu excess bytes", __func__, size2);
             break;
         }
         header = (struct UsbiDescriptorHeader *)buffer2;
