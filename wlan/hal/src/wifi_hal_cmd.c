@@ -16,7 +16,7 @@
 #include "wifi_hal_cmd.h"
 #include "hdf_log.h"
 #include "securec.h"
-#include "wifi_driver_client.h"
+#include "wifi_hal_sta_feature.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -195,6 +195,16 @@ int32_t HalCmdSetScanningMacAddress(const char *ifName, unsigned char *scanMac, 
 {
     int32_t ret;
     ret = SetScanMacAddr(ifName, scanMac, len);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: SetScanMacAddr failed", __FUNCTION__);
+    }
+    return ret;
+}
+
+int32_t HalCmdStartScanInner(const char *ifName, WifiScan *scan)
+{
+    int32_t ret;
+    ret = WifiCmdScan(ifName, (WifiScan *)scan);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: SetScanMacAddr failed", __FUNCTION__);
     }

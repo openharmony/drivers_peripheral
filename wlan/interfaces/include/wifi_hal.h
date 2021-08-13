@@ -155,6 +155,7 @@ struct IWiFi {
      * @brief Registers a callback to listen for <b>IWiFi</b> asynchronous events.
      *
      * @param cbFunc Indicates the callback to register.
+     * @param ifName Indicates the pointer to the network interface name.
      *
      * @return Returns <b>0</b> if the callback is registered; returns a negative value otherwise.
      *
@@ -165,6 +166,9 @@ struct IWiFi {
 
     /**
      * @brief Deregisters an <b>IWiFi</b> callback.
+    
+     * @param cbFunc Indicates the callback to register.
+     * @param ifName Indicates the pointer to the network interface name.
      *
      * @return Returns <b>0</b> if the <b>IWiFi</b> callback is deregistered; returns a negative value otherwise.
      *
@@ -196,6 +200,18 @@ struct IWiFi {
      * @version 1.0
      */
     int32_t (*resetDriver)(const uint8_t chipId, const char *ifName);
+
+    /**
+     * @brief get net device infos.
+     *
+     * @param netDeviceInfoResult get net device infos.
+     *
+     * @return Returns <b>0</b> if get infos successful; returns a negative value otherwise.
+     *
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*getNetDevInfo)(struct NetDeviceInfoResult *netDeviceInfoResult);
 };
 
 /**

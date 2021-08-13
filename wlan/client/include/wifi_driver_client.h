@@ -134,8 +134,10 @@ typedef struct {
 } WifiDisconnect;
 
 enum WifiClientType {
-    WIFI_KERNEL_TO_WPA_CLIENT = 11519,  // 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<13
-    WIFI_KERNEL_TO_HAL_CLIENT = 32768, // 1<<15
+    /* 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<10 | 1<<11 | 1<<13 */
+    WIFI_KERNEL_TO_WPA_CLIENT = 11519,
+    /* 1<<15 | 1<<5 | 1<<4 */
+    WIFI_KERNEL_TO_HAL_CLIENT = 32816,
     WIFI_CLIENT_BUTT
 };
 
@@ -183,6 +185,19 @@ struct AssocStaInfoResult {
     struct AssocStaInfo infos[MAX_ASSOC_STA_NUM];
 };
 
+struct NetDeviceInfo {
+    uint32_t index;
+    char ifName[IFNAMSIZ];
+    uint8_t iftype;
+    uint8_t mac[ETH_ADDR_LEN];
+};
+
+#define MAX_NETDEVICE_COUNT 20
+
+struct NetDeviceInfoResult {
+    struct NetDeviceInfo deviceInfos[MAX_NETDEVICE_COUNT];
+};
+
 int32_t WifiDriverClientInit(void);
 void WifiDriverClientDeinit(void);
 
@@ -195,14 +210,14 @@ int32_t GetDevMacAddr(const char *ifName,
 int32_t GetValidFreqByBand(const char *ifName, int32_t band,
     struct FreqInfoResult *result);
 int32_t SetTxPower(const char *ifName, int32_t power);
-int32_t GetAssociatedStas(const char *ifName,
-    struct AssocStaInfoResult *result);
+int32_t GetAssociatedStas(const char *ifName, struct AssocStaInfoResult *result);
 int32_t SetCountryCode(const char *ifName, const char *code, uint32_t len);
 int32_t SetScanMacAddr(const char *ifName, uint8_t *scanMac, uint8_t len);
 
 int32_t GetChipId(const char *ifName, uint8_t *chipId);
 int32_t GetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num);
 int32_t SetResetDriver(const uint8_t chipId, const char *ifName);
+int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult);
 
 /* wpa related interface */
 #define MAX_SSID_LEN 32

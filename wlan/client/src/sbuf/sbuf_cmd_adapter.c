@@ -31,8 +31,7 @@ const char *DRIVER_SERVICE_NAME = "hdfwifi";
 struct HdfIoService *g_wifiService = NULL;
 static struct HdfDevEventlistener g_wifiDevEventListener;
 
-static int32_t SendCmdSync(const uint32_t cmd,
-    struct HdfSBuf *reqData, struct HdfSBuf *respData)
+static int32_t SendCmdSync(const uint32_t cmd, struct HdfSBuf *reqData, struct HdfSBuf *respData)
 {
     if (reqData == NULL) {
         HILOG_ERROR(LOG_DOMAIN, "%s: params is NULL", __FUNCTION__);
@@ -501,8 +500,7 @@ int32_t SetTxPower(const char *ifName, int32_t power)
     return ret;
 }
 
-int32_t GetAssociatedStas(const char *ifName,
-    struct AssocStaInfoResult *result)
+int32_t GetAssociatedStas(const char *ifName, struct AssocStaInfoResult *result)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -766,6 +764,67 @@ int32_t SetResetDriver(const uint8_t chipId, const char *ifName)
             break;
         }
         ret = SendCmdSync(WIFI_HAL_CMD_RESET_DRIVER, data, reply);
+    } while (0);
+    HdfSBufRecycle(data);
+    HdfSBufRecycle(reply);
+    return ret;
+}
+
+int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
+{
+    int32_t ret;
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    uint32_t netdevNum = 0;
+    uint32_t ifNameSize;
+    uint32_t macSize;
+    uint32_t i;
+    const uint8_t *replayData = NULL;
+    const char *ifName = NULL;
+
+    if (netDeviceInfoResult == NULL) {
+        HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
+    }
+    data = HdfSBufObtainDefaultSize();
+    if (data == NULL) {
+        return RET_CODE_FAILURE;
+    }
+    reply = HdfSBufObtainDefaultSize();
+    if (reply == NULL) {
+        HdfSBufRecycle(data);
+        return RET_CODE_FAILURE;
+    }
+    do{
+        ret = SendCmdSync(WIFI_HAL_CMD_GET_NETDEV_INFO, data, reply);
+        if (ret != RET_CODE_SUCCESS) {
+            break;
+        }
+        if (!HdfSbufReadUint32(reply, &netdevNum)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufReadUint32 failed", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+        for (i = 0; i < netdevNum; i++) {
+            if (!HdfSbufReadUint32(reply, &(netDeviceInfoResult->deviceInfos[i].index)) ||
+                !HdfSbufReadBuffer(reply, (const void **)(&ifName), &ifNameSize) ||
+                !HdfSbufReadUint8(reply, &(netDeviceInfoResult->deviceInfos[i].iftype)) ||
+                !HdfSbufReadBuffer(reply, (const void **)(&replayData), &macSize)) {
+                HILOG_ERROR(LOG_DOMAIN, "%s: read fail!", __FUNCTION__);
+                ret = RET_CODE_FAILURE;
+                break;
+            }
+            if (memcpy_s(netDeviceInfoResult->deviceInfos[i].ifName, ifNameSize, ifName, ifNameSize) != EOK) {
+                HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __FUNCTION__);
+                ret = RET_CODE_FAILURE;
+                break;
+            }
+            if (memcpy_s(netDeviceInfoResult->deviceInfos[i].mac, macSize, replayData, macSize) != EOK) {
+                HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __FUNCTION__);
+                ret = RET_CODE_FAILURE;
+                break;
+            }
+        }
     } while (0);
     HdfSBufRecycle(data);
     HdfSBufRecycle(reply);
