@@ -215,8 +215,8 @@ int UsbHostDdkTestAsyncRead(char *readSbuf)
         if (readSbuf != NULL) {
             memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
         }
-        printf("%s:%d %s-%d!\n", __func__, __LINE__, tmp, strlen(tmp));
-        HDF_LOGD("%{public}s:%{public}d %{public}s-%{public}d!", __func__, __LINE__, tmp, strlen(tmp));
+        printf("%s:%d %s-%lu!\n", __func__, __LINE__, tmp, strlen(tmp));
+        HDF_LOGD("%{public}s:%{public}d %{public}s-%{public}lu!", __func__, __LINE__, tmp, strlen(tmp));
         TestModuleWriteLog(HOST_ACM_ASYNC_READ, tmp, NULL);
     }
 
@@ -246,8 +246,8 @@ void UsbHostDdkTestAsyncWrite(char *buf)
         return;
     }
 
-    printf("%s:%d %s-%d!\n", __func__, __LINE__, buf, strlen(buf));
-    HDF_LOGI("%{public}s:%{public}d %{public}s-%{public}d!\n", __func__, __LINE__, buf, strlen(buf));
+    printf("%s:%d %s-%lu!\n", __func__, __LINE__, buf, strlen(buf));
+    HDF_LOGI("%{public}s:%{public}d %{public}s-%{public}lu!\n", __func__, __LINE__, buf, strlen(buf));
     TestModuleWriteLog(HOST_ACM_ASYNC_WRITE, buf, NULL);
 }
 
@@ -273,8 +273,8 @@ void UsbHostDdkTestSyncRead(char *readSbuf)
         if (readSbuf != NULL) {
             memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
         }
-        printf("%s:%d %s-%d!\n", __func__, __LINE__, tmp, strlen(tmp));
-        HDF_LOGD("%{public}s:%{public}d %{public}s-%{public}d !", __func__, __LINE__, tmp, strlen(tmp));
+        printf("%s:%d %s-%lu!\n", __func__, __LINE__, tmp, strlen(tmp));
+        HDF_LOGD("%{public}s:%{public}d %{public}s-%{public}lu !", __func__, __LINE__, tmp, strlen(tmp));
         TestModuleWriteLog(HOST_ACM_SYNC_READ, tmp, NULL);
     }
 }
@@ -302,8 +302,8 @@ void UsbHostDdkTestSyncWrite(char *buf)
         return;
     }
 
-    printf("%s:%d %s-%d!\n", __func__, __LINE__, buf, strlen(buf));
-    HDF_LOGD("%{public}s:%{public}d %{public}s-%{public}d!", __func__, __LINE__, buf, strlen(buf));
+    printf("%s:%d %s-%lu!\n", __func__, __LINE__, buf, strlen(buf));
+    HDF_LOGD("%{public}s:%{public}d %{public}s-%{public}lu!", __func__, __LINE__, buf, strlen(buf));
     TestModuleWriteLog(HOST_ACM_SYNC_WRITE, buf, NULL);
 }
 
