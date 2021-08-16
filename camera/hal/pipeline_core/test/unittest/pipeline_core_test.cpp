@@ -22,6 +22,11 @@
 
 using namespace testing::ext;
 namespace OHOS::Camera {
+enum testStreamId {
+    PREVIEW_ID,
+    VIDEO_ID,
+    CAPTURE_ID,
+};
 class PipelineCoreTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -59,7 +64,8 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewTest, TestSize.Level0)
     re = core->Init();
     EXPECT_TRUE(re == RC_OK);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = PREVIEW
+                .type_ = PREVIEW,
+                .streamId_ = PREVIEW_ID
                 }, nullptr);
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
@@ -78,7 +84,8 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalSnapshotTest, TestSize.Level0)
     re = core->Init();
     EXPECT_TRUE(re == RC_OK);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = STILL_CAPTURE
+                .type_ = STILL_CAPTURE,
+                .streamId_ = CAPTURE_ID
                 }, nullptr);
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
@@ -97,10 +104,12 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewSnapshotTest, TestSize.Leve
     re = core->Init();
     EXPECT_TRUE(re == RC_OK);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = PREVIEW
+                .type_ = PREVIEW,
+                .streamId_ = PREVIEW_ID
                 }, nullptr);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = STILL_CAPTURE
+                .type_ = STILL_CAPTURE,
+                .streamId_ = CAPTURE_ID
                 }, nullptr);
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
@@ -119,7 +128,8 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewToSnapshotTest, TestSize.Le
     re = core->Init();
     EXPECT_TRUE(re == RC_OK);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = PREVIEW
+                .type_ = PREVIEW,
+                .streamId_ = PREVIEW_ID
                 }, nullptr);
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
@@ -129,7 +139,8 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewToSnapshotTest, TestSize.Le
     re = s->CreatePipeline(0);
     EXPECT_TRUE(re == RC_OK);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = STILL_CAPTURE
+                .type_ = STILL_CAPTURE,
+                .streamId_ = CAPTURE_ID
                 }, nullptr);
     EXPECT_TRUE(re == RC_OK);
     re = s->CreatePipeline(0);
@@ -144,10 +155,12 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalSnapshotPreviewTest, TestSize.Leve
     re = core->Init();
     EXPECT_TRUE(re == RC_OK);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = STILL_CAPTURE
+                .type_ = STILL_CAPTURE,
+                .streamId_ = CAPTURE_ID
                 }, nullptr);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = PREVIEW
+                .type_ = PREVIEW,
+                .streamId_ = PREVIEW_ID
                 }, nullptr);
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
@@ -166,12 +179,14 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewPreviewTest, TestSize.Level
     re = core->Init();
     EXPECT_TRUE(re == RC_OK);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = PREVIEW
+                .type_ = PREVIEW,
+                .streamId_ = PREVIEW_ID
                 }, nullptr);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = PREVIEW
+                .type_ = PREVIEW,
+                .streamId_ = 2000
                 }, nullptr);
-    EXPECT_TRUE(re != RC_OK);
+    EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
     EXPECT_TRUE(s != nullptr);
     re = s->Init();
@@ -222,10 +237,12 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewSnapshotSingleConfigTest, T
     re = core->Init();
     EXPECT_TRUE(re == RC_OK);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = PREVIEW
+                .type_ = PREVIEW,
+                .streamId_ = PREVIEW_ID
                 }, nullptr);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = STILL_CAPTURE
+                .type_ = STILL_CAPTURE,
+                .streamId_ = CAPTURE_ID
                 }, nullptr);
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
@@ -247,10 +264,12 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewSnapshotConfigTest, TestSiz
     re = core->Init();
     EXPECT_TRUE(re == RC_OK);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = PREVIEW
+                .type_ = PREVIEW,
+                .streamId_ = PREVIEW_ID
                 }, nullptr);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = STILL_CAPTURE
+                .type_ = STILL_CAPTURE,
+                .streamId_ = CAPTURE_ID
                 }, nullptr);
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
@@ -270,10 +289,12 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewSnapshotDestroyTest, TestSi
     re = core->Init();
     EXPECT_TRUE(re == RC_OK);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = PREVIEW
+                .type_ = PREVIEW,
+                .streamId_ = PREVIEW_ID
                 }, nullptr);
     re = core->GetHostStreamMgr()->CreateHostStream({
-                .type_ = STILL_CAPTURE
+                .type_ = STILL_CAPTURE,
+                .streamId_ = CAPTURE_ID
                 }, nullptr);
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();

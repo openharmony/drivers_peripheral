@@ -73,6 +73,9 @@ RetCode HcsDeal::DealHcsData()
     if (pRootNode->name != nullptr) {
         CAMERA_LOGI("pRootNode = %s", pRootNode->name);
     }
+    if (cameraHostConfig->name == nullptr) {
+        CAMERA_LOGW("cameraHostConfig->name is null");
+    }
     CAMERA_LOGD("cameraHostConfig = %s", cameraHostConfig->name);
 
     const struct DeviceResourceNode *childNodeTmp = nullptr;
@@ -107,8 +110,8 @@ RetCode HcsDeal::DealCameraAbility(const struct DeviceResourceNode &node)
     }
 
     const struct DeviceResourceNode *metadataNode = pDevResIns->GetChildNode(&node, "metadata");
-    if (metadataNode == nullptr) {
-        CAMERA_LOGW("metadataNode is null");
+    if (metadataNode == nullptr || cameraId == nullptr) {
+        CAMERA_LOGW("metadataNode is null or cameraId is null");
     }
     RetCode rc = DealMetadata(cameraId, *metadataNode);
     if (rc != RC_OK) {

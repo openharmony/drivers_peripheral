@@ -152,7 +152,7 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
     streamInfoSnapshot->streamId_ = 1012;
     streamInfoSnapshot->width_ = 1920;
     streamInfoSnapshot->datasapce_ = 8;
-    streamInfoSnapshot->height_ = 1080;
+    streamInfoSnapshot->height_ = 960;
     streamInfoSnapshot->intent_ = STILL_CAPTURE;
     streamInfoSnapshot->format_ = PIXEL_FMT_YCRCB_420_SP;
     StreamConsumer snapshotConsumer;

@@ -179,7 +179,9 @@ std::shared_ptr<IBuffer> BufferPool::AcquireBuffer(int timeout)
 
     // wait all the time, till idle list is avaliable.
     if (timeout < 0) {
-        cv_.wait(l, [this] { return !idleList_.empty() || streamStop_; });
+        cv_.wait(l, [this] {
+            return !idleList_.empty() || streamStop_;
+            });
         if (!idleList_.empty()) {
             auto it = idleList_.begin();
             busyList_.splice(busyList_.begin(), idleList_, it);
@@ -190,7 +192,9 @@ std::shared_ptr<IBuffer> BufferPool::AcquireBuffer(int timeout)
 
     // wait for timeout, or idle list is avaliable.
     if (timeout > 0) {
-        if (cv_.wait_for(l, std::chrono::seconds(timeout), [this] { return !idleList_.empty() || streamStop_; }) == false) {
+        if (cv_.wait_for(l, std::chrono::seconds(timeout), [this] {
+            return !idleList_.empty() || streamStop_;
+            }) == false) {
             CAMERA_LOGE("wait idle buffer timeout");
             return nullptr;
         }

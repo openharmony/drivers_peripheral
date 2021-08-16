@@ -393,7 +393,7 @@ RetCode StreamBase::SwitchToOffline()
     return RC_ERROR;
 }
 
-int32_t StreamBase::GetQueueSize() const
+uint32_t StreamBase::GetQueueSize() const
 {
     return BUFFER_QUEUE_SIZE;
 }
