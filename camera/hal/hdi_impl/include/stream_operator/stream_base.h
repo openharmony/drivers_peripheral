@@ -52,7 +52,7 @@ public:
     virtual RetCode HandleOverStaticContext(const std::shared_ptr<OfflineStreamContext>& context);
     virtual RetCode HandleOverDynamicContext(const std::shared_ptr<OfflineStreamContext>& context);
     virtual RetCode SwitchToOffline();
-    virtual int32_t GetQueueSize() const;
+    virtual uint32_t GetQueueSize() const;
     virtual RetCode RequestCheck();
 
 protected:

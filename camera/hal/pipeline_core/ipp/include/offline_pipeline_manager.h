@@ -45,7 +45,7 @@ private:
     OfflinePipelineManager& operator=(OfflinePipelineManager&&);
     ~OfflinePipelineManager();
 
-    std::shared_ptr<OfflinePipeline> GetOfflinePipeline(int32_t streamType,
+    std::shared_ptr<OfflinePipeline> GetOfflinePipeline(int32_t streamId,
                                                         const std::shared_ptr<IStreamPipelineCore>& pipeline);
     std::shared_ptr<OfflinePipeline> FindOfflinePipeline(int32_t id);
 

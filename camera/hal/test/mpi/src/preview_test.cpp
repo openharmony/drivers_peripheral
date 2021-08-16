@@ -55,13 +55,13 @@ HWTEST_F(PreviewTest, Camera_Preview_0001, TestSize.Level0)
 
 /**
   * @tc.name: Preview
-  * @tc.desc: Preview stream, 1280*720, expected success.
+  * @tc.desc: Preview stream, 1280*960, expected success.
   * @tc.size: MediumTest
   * @tc.type: Function
   */
 HWTEST_F(PreviewTest, Camera_Preview_0004, TestSize.Level2)
 {
-    std::cout << "==========[test log]Preview stream, 1208*720, expected success." << std::endl;
+    std::cout << "==========[test log]Preview stream, 1280*960, expected success." << std::endl;
 
     // 创建并获取streamOperator信息
     Test_->streamOperatorCallback = new StreamOperatorCallback();
@@ -71,7 +71,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0004, TestSize.Level2)
     Test_->streamInfo = std::make_shared<StreamInfo>();
     Test_->streamInfo->streamId_ = Test_->streamId_preview;
     Test_->streamInfo->width_ = 1280;
-    Test_->streamInfo->height_ = 720;
+    Test_->streamInfo->height_ = 960;
     Test_->streamInfo->datasapce_ = 8;
     Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
     Test_->streamInfo->intent_ = Camera::PREVIEW;
