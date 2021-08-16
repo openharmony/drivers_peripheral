@@ -33,13 +33,13 @@ void Hos3516Demo::SetStreamInfo(std::shared_ptr<StreamInfo>& streamInfo,
         streamInfo->height_ = height;
     } else if (intent == STILL_CAPTURE) {
         constexpr uint32_t width = 1280;
-        constexpr uint32_t height = 720;
+        constexpr uint32_t height = 960;
         streamInfo->width_ = width;
         streamInfo->height_ = height;
         streamInfo->encodeType_ = ENCODE_TYPE_JPEG;
     } else {
         constexpr uint32_t width = 1280;
-        constexpr uint32_t height = 720;
+        constexpr uint32_t height = 960;
         streamInfo->width_ = width;
         streamInfo->height_ = height;
         streamInfo->encodeType_ = ENCODE_TYPE_H265;

@@ -200,7 +200,7 @@ HWTEST_F(PipelineTest, Camera_Ppl_0007, TestSize.Level1)
     Test_->streamInfo = std::make_shared<StreamInfo>();
     Test_->streamInfo->streamId_ = Test_->streamId_preview;
     Test_->streamInfo->width_ = 1280;
-    Test_->streamInfo->height_ = 720;
+    Test_->streamInfo->height_ = 960;
     Test_->streamInfo->datasapce_ = 8;
     Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
     Test_->streamInfo->intent_ = Camera::PREVIEW;
@@ -219,7 +219,7 @@ HWTEST_F(PipelineTest, Camera_Ppl_0007, TestSize.Level1)
     Test_->streamInfo2 = std::make_shared<StreamInfo>();
     Test_->streamInfo2->streamId_ = Test_->streamId_preview_double;
     Test_->streamInfo2->width_ = 1280;
-    Test_->streamInfo2->height_ = 720;
+    Test_->streamInfo2->height_ = 960;
     Test_->streamInfo2->datasapce_ = 8;
     Test_->streamInfo2->format_ = PIXEL_FMT_YCRCB_420_SP;
     Test_->streamInfo2->intent_ = Camera::PREVIEW;

@@ -56,7 +56,7 @@ ohos_shared_library("camera_v4l2_adapter") {
     "//drivers/adapter/uhdf2/include/config",
     "//drivers/adapter/uhdf2/osal/include",
     "//drivers/framework/include/utils",
-    "//drivers/peripheral/camera/hal/adapter/chipset/rpi4b/src/driver_adapter/include",
+    "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter/include",
     "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
     "//utils/native/base/include",
   ]

@@ -171,7 +171,7 @@ RetCode AlgoPlugin::LoadLib()
         return RC_ERROR;
     }
 
-    int ret = CheckLibPath(path_.c_str());
+    uint32_t ret = CheckLibPath(path_.c_str());
     if (ret == RC_ERROR) {
         CAMERA_LOGE("lib path:%{public}s is error.", path_.c_str());
         return RC_ERROR;
