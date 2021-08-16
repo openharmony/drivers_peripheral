@@ -15,25 +15,27 @@
 #ifndef AUDIO_PROXY_COMMON_H
 #define AUDIO_PROXY_COMMON_H
 
+#include "audio_internal.h"
 #include "hdf_audio_server.h"
-#include "servmgr_hdi.h"
-#include "hdf_remote_service.h"
-#include "devmgr_hdi.h"
-#include "osal_mem.h"
 
 #define CONFIG_CHANNEL_COUNT  2 // two channels
 #define GAIN_MAX 50.0
+#define STR_MAX 512
 
 struct HdfSBuf *AudioProxyObtainHdfSBuf();
 void AudioProxyBufReplyRecycle(struct HdfSBuf *data, struct HdfSBuf *reply);
 int32_t AudioProxyPreprocessSBuf(struct HdfSBuf **data, struct HdfSBuf **reply);
-struct AudioManager *HdfProxyIoBindServiceName(const char *serviceName);
-int32_t AudioProxyDispatchCall(int32_t id, struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t AudioProxyPreprocessRender(AudioHandle render, struct HdfSBuf **data, struct HdfSBuf **reply);
-int32_t AudioProxyPreprocessCapture(AudioHandle capture, struct HdfSBuf **data, struct HdfSBuf **reply);
+int32_t AudioProxyDispatchCall(struct HdfRemoteService *self, int32_t id, struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t AudioProxyPreprocessRender(struct AudioHwRender *render, struct HdfSBuf **data, struct HdfSBuf **reply);
+int32_t AudioProxyPreprocessCapture(struct AudioHwCapture *capture, struct HdfSBuf **data, struct HdfSBuf **reply);
 int32_t AudioProxyWriteSampleAttributes(struct HdfSBuf *data, const struct AudioSampleAttributes *attrs);
 int32_t AudioProxyReadSapmleAttrbutes(struct HdfSBuf *reply, struct AudioSampleAttributes *attrs);
-int32_t AudioProxyCommonSetCtrlParam(int cmId, AudioHandle handle, float param);
-int32_t AudioProxyCommonGetCtrlParam(int cmId, AudioHandle handle, float *param);
+int32_t AudioProxyCommonSetRenderCtrlParam(int cmId, AudioHandle handle, float param);
+int32_t AudioProxyCommonGetRenderCtrlParam(int cmId, AudioHandle handle, float *param);
+int32_t AudioProxyCommonSetCaptureCtrlParam(int cmId, AudioHandle handle, float param);
+int32_t AudioProxyCommonGetCaptureCtrlParam(int cmId, AudioHandle handle, float *param);
+int32_t AudioProxyGetMmapPositionRead(struct HdfSBuf *reply, uint64_t *frames, struct AudioTimeStamp *time);
+int32_t AudioProxyReqMmapBufferWrite(struct HdfSBuf *data, int32_t reqSize,
+    const struct AudioMmapBufferDescripter *desc);
 
 #endif

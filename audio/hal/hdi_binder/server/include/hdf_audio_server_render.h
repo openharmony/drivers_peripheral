@@ -16,14 +16,7 @@
 #ifndef HDF_AUDIO_SERVER_RENDER_H
 #define HDF_AUDIO_SERVER_RENDER_H
 
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-#include "hdf_log.h"
-#include "hdf_base.h"
 #include "hdf_device_desc.h"
-#include "hdf_remote_service.h"
-#include "hdf_audio_server_common.h"
 
 int32_t HdiServiceCreatRender(struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
@@ -80,6 +73,22 @@ int32_t HdiServiceRenderSetSpeed(struct HdfDeviceIoClient *client,
 int32_t HdiServiceRenderSetChannelMode(struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
 int32_t HdiServiceRenderGetChannelMode(struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceRenderSetExtraParams(struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceRenderGetExtraParams(struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceRenderReqMmapBuffer(struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceRenderGetMmapPosition(struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceRenderTurnStandbyMode(struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceRenderDevDump(struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceRenderRegCallback(struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceRenderDrainBuffer(struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
 
 #endif

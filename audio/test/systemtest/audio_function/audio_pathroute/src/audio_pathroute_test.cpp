@@ -64,30 +64,31 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct AudioManager *(*GetAudioManager)() = nullptr;
-    void *handleSo = nullptr;
-    int32_t GetLoadAdapter(struct AudioManager manager, enum AudioPortDirection portType,
-        const string adapterName, struct AudioAdapter **adapter, struct AudioPort& renderPort) const;
+    static TestAudioManager *(*GetAudioManager)();
+    static void *handleSo;
 };
 
-void AudioPathRouteTest::SetUpTestCase(void) {}
+TestAudioManager *(*AudioPathRouteTest::GetAudioManager)() = nullptr;
+void *AudioPathRouteTest::handleSo = nullptr;
 
-void AudioPathRouteTest::TearDownTestCase(void) {}
-
-void AudioPathRouteTest::SetUp(void)
+void AudioPathRouteTest::SetUpTestCase(void)
 {
+#ifdef __LITEOS__
+    char resolvedPath[] = "/usr/lib/libhdi_audio.so";
+#else
     char resolvedPath[] = "//system/lib/libhdi_audio.z.so";
+#endif
     handleSo = dlopen(resolvedPath, RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
     }
-    GetAudioManager = (struct AudioManager* (*)())(dlsym(handleSo, "GetAudioManagerFuncs"));
+    GetAudioManager = (TestAudioManager* (*)())(dlsym(handleSo, "GetAudioManagerFuncs"));
     if (GetAudioManager == nullptr) {
         return;
     }
 }
 
-void AudioPathRouteTest::TearDown(void)
+void AudioPathRouteTest::TearDownTestCase(void)
 {
     if (handleSo != nullptr) {
         dlclose(handleSo);
@@ -98,109 +99,55 @@ void AudioPathRouteTest::TearDown(void)
     }
 }
 
-int32_t AudioPathRouteTest::GetLoadAdapter(struct AudioManager manager, enum AudioPortDirection portType,
-    const string adapterName, struct AudioAdapter **adapter, struct AudioPort& audioPort) const
-{
-    int32_t ret = -1;
-    int size = 0;
-    struct AudioAdapterDescriptor *desc = nullptr;
-    struct AudioAdapterDescriptor *descs = nullptr;
-    if (adapter == nullptr) {
-        return HDF_FAILURE;
-    }
-    ret = manager.GetAllAdapters(&manager, &descs, &size);
-    if (ret != 0 || descs == nullptr || size == 0) {
-        return HDF_FAILURE;
-    } else {
-        int index = SwitchAdapter(descs, adapterName, portType, audioPort, size);
-        if (index < 0) {
-            return HDF_FAILURE;
-        } else {
-            desc = &descs[index];
-        }
-    }
-    if (desc == nullptr) {
-        return HDF_FAILURE;
-    } else {
-        ret = manager.LoadAdapter(&manager, desc, adapter);
-    }
-    if (ret != 0 || adapter == nullptr) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
+void AudioPathRouteTest::SetUp(void) {}
+
+void AudioPathRouteTest::TearDown(void) {}
 
 /**
-* @tc.name  Test the audio path route selection funtion of palyback scene
+* @tc.name  Test the audio path route selection function of palyback scene
 * @tc.number  SUB_Audio_AudioPathRoute_0001
-* @tc.desc  The audio path route can be opened sucessfuly,When it is set to
+* @tc.desc  The audio path route can be opened successfully,When it is set to
             palyback scene(attrs.type = AUDIO_IN_MEDIA,pins = PIN_OUT_SPEAKER)
 * @tc.author: liweiming
 */
 HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    enum AudioPortDirection portType = PORT_OUT;
     enum AudioPortPin pins = PIN_OUT_SPEAKER;
-    struct AudioPort renderPort = {};
-    struct AudioSampleAttributes attrs = {};
-    struct AudioDeviceDescriptor devDesc = {};
-    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
+    struct AudioAdapter *adapter = nullptr;
     ret = PowerOff(g_elemValues[0], g_elemValues[1]);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
-    ret = GetLoadAdapter(manager, portType, ADAPTER_USB, &adapter, renderPort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateRender(manager, pins, ADAPTER_USB, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitDevDesc(devDesc, renderPort.portId, pins);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
     ret = CheckRegisterStatus(g_elemValues[0].id, g_elemValues[1].id, REGISTER_STATUS_ON, REGISTER_STATUS_ON);
     EXPECT_EQ(HDF_SUCCESS, ret);
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
 }
 /**
-* @tc.name  Test the audio path route selection funtion via switching device SPEAKER to HEADSET
+* @tc.name  Test the audio path route selection function via switching device SPEAKER to HEADSET
 * @tc.number  SUB_Audio_AudioPathRoute_0002
-* @tc.desc  The audio path route can be opened sucessfuly,When switching
+* @tc.desc  The audio path route can be opened successfully,When switching
             device(attrs.type = AUDIO_IN_MEDIA,pins = PIN_OUT_HEADSET)
 * @tc.author: liweiming
 */
 HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    enum AudioPortDirection portType = PORT_OUT;
     enum AudioPortPin pins = PIN_OUT_SPEAKER;
-    struct AudioPort renderPort = {};
-    struct AudioSampleAttributes attrs = {};
-    struct AudioDeviceDescriptor devDesc = {};
-    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
+    struct AudioAdapter *adapter = nullptr;
     g_elemValues[0].value[0] = 1;
     g_elemValues[1].value[0] = 1;
     ret = PowerOff(g_elemValues[0], g_elemValues[1]);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
-    ret = GetLoadAdapter(manager, portType, ADAPTER_USB, &adapter, renderPort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateRender(manager, pins, ADAPTER_USB, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitDevDesc(devDesc, renderPort.portId, pins);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
     struct AudioSceneDescriptor scene = {
         .scene.id = 0,
         .desc.pins = PIN_OUT_HEADSET,
@@ -212,104 +159,71 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0002, TestSize.Level1)
     manager.UnloadAdapter(&manager, adapter);
 }
 /**
-* @tc.name  Test the audio path route selection funtion of playback sence
+* @tc.name  Test the audio path route selection function of playback sence
             when the audio path route has been opened
 * @tc.number  SUB_Audio_AudioPathRoute_0003
-* @tc.desc  The audio path route of playback scene can be opened sucessfuly,When The current
+* @tc.desc  The audio path route of playback scene can be opened successfully,When The current
             audio path route has been opened
 * @tc.author: liweiming
 */
 HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0003, TestSize.Level1)
 {
     int32_t ret = -1;
-    enum AudioPortDirection portType = PORT_OUT;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
-    struct AudioPort renderPort = {};
-    struct AudioSampleAttributes attrs = {};
-    struct AudioDeviceDescriptor devDesc = {};
+    struct AudioRender *render = nullptr;
     struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *renderFirst = nullptr;
-    struct AudioRender *renderSecond = nullptr;
     ret = PowerOff(g_elemValues[0], g_elemValues[1]);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
-    ret = GetLoadAdapter(manager, portType, ADAPTER_INTERNAL, &adapter, renderPort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_USB, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InitAttrs(attrs);
+    struct AudioSceneDescriptor scene = {
+        .scene.id = 0,
+        .desc.pins = PIN_OUT_SPEAKER,
+    };
+    ret = render->scene.SelectScene(AudioHandle(render), &scene);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitDevDesc(devDesc, renderPort.portId, pins);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = adapter->CreateRender(adapter, &devDesc, &attrs, &renderFirst);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
-    ret = adapter->CreateRender(adapter, &devDesc, &attrs, &renderSecond);
-    if (ret < 0) {
-        adapter->DestroyRender(adapter, renderFirst);
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
     ret = CheckRegisterStatus(g_elemValues[0].id, g_elemValues[1].id, REGISTER_STATUS_ON, REGISTER_STATUS_ON);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    adapter->DestroyRender(adapter, renderFirst);
-    adapter->DestroyRender(adapter, renderSecond);
+    adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
 }
 /**
-* @tc.name  Test the audio path route selection funtion of recording scene
+* @tc.name  Test the audio path route selection function of recording scene
 * @tc.number  SUB_Audio_AudioPathRoute_0004
-* @tc.desc  The audio path route can be opened sucessfuly,When it is set to
+* @tc.desc  The audio path route can be opened successfully,When it is set to
             recording scene(attrs.type = AUDIO_IN_MEDIA,pins = PIN_IN_MIC)
 * @tc.author: liweiming
 */
 HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0004, TestSize.Level1)
 {
     int32_t ret = -1;
-    enum AudioPortDirection portType = PORT_IN;
     enum AudioPortPin pins = PIN_IN_MIC;
-    struct AudioPort capturePort = {};
-    struct AudioSampleAttributes attrs = {};
-    struct AudioDeviceDescriptor devDesc = {};
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     g_elemValues[3].value[0] = 1;
     ret = PowerOff(g_elemValues[2], g_elemValues[3]);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
-    ret = GetLoadAdapter(manager, portType, ADAPTER_INTERNAL, &adapter, capturePort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateCapture(manager, pins, ADAPTER_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitDevDesc(devDesc, capturePort.portId, pins);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &capture);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
     ret = CheckRegisterStatus(g_elemValues[2].id, g_elemValues[3].id, REGISTER_STATUS_ON, REGISTER_STATUS_OFF);
     EXPECT_EQ(HDF_SUCCESS, ret);
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
 }
 /**
-* @tc.name  Test the audio path route selection funtion via switching device MIC to HS_MIC
+* @tc.name  Test the audio path route selection function via switching device MIC to HS_MIC
 * @tc.number  SUB_Audio_AudioPathRoute_0005
-* @tc.desc  The audio path route can be opened sucessfuly,When it is set to
+* @tc.desc  The audio path route can be opened successfully,When it is set to
             recording scene(attrs.type = AUDIO_IN_MEDIA,pins = PIN_IN_HS_MIC)
 * @tc.author: liweiming
 */
 HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0005, TestSize.Level1)
 {
     int32_t ret = -1;
-    enum AudioPortDirection portType = PORT_IN;
     enum AudioPortPin pins = PIN_IN_MIC;
-    struct AudioPort capturePort = {};
-    struct AudioSampleAttributes attrs = {};
-    struct AudioDeviceDescriptor devDesc = {};
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     g_elemValues[2].value[0] = 1;
@@ -317,18 +231,9 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0005, TestSize.Level1)
     ret = PowerOff(g_elemValues[2], g_elemValues[3]);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
-    ret = GetLoadAdapter(manager, portType, ADAPTER_INTERNAL, &adapter, capturePort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateCapture(manager, pins, ADAPTER_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitDevDesc(devDesc, capturePort.portId, pins);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &capture);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
     struct AudioSceneDescriptor scene = {
         .scene.id = 0,
         .desc.pins = PIN_IN_HS_MIC,
@@ -340,65 +245,45 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0005, TestSize.Level1)
     manager.UnloadAdapter(&manager, adapter);
 }
 /**
-* @tc.name  Test the audio path route selection funtion of recording sence
+* @tc.name  Test the audio path route selection function of recording sence
             when the audio path route has been opened
 * @tc.number  SUB_Audio_AudioPathRoute_0006
-* @tc.desc  The audio path route of recording scene can be opened sucessfuly,When The current
+* @tc.desc  The audio path route of recording scene can be opened successfully,When The current
             audio path route has been opened
 * @tc.author: liweiming
 */
 HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0006, TestSize.Level1)
 {
     int32_t ret = -1;
-    enum AudioPortDirection portType = PORT_IN;
-    enum AudioPortPin pins = PIN_IN_MIC;
-    struct AudioPort capturePort = {};
-    struct AudioSampleAttributes attrs = {};
-    struct AudioDeviceDescriptor devDesc = {};
     struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *captureFirst = nullptr;
-    struct AudioCapture *captureSecond = nullptr;
-    ret = PowerOff(g_elemValues[0], g_elemValues[1]);
+    struct AudioCapture *capture = nullptr;
+    g_elemValues[3].value[0] = 1;
+    ret = PowerOff(g_elemValues[2], g_elemValues[3]);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
-    ret = GetLoadAdapter(manager, portType, ADAPTER_INTERNAL, &adapter, capturePort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InitAttrs(attrs);
+    struct AudioSceneDescriptor scene = {
+        .scene.id = 0,
+        .desc.pins = PIN_IN_MIC,
+    };
+    ret = capture->scene.SelectScene(AudioHandle(capture), &scene);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitDevDesc(devDesc, capturePort.portId, pins);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &captureFirst);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
-    ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &captureSecond);
-    if (ret < 0) {
-        adapter->DestroyCapture(adapter, captureFirst);
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
     ret = CheckRegisterStatus(g_elemValues[2].id, g_elemValues[3].id, REGISTER_STATUS_ON, REGISTER_STATUS_OFF);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    adapter->DestroyCapture(adapter, captureFirst);
-    adapter->DestroyCapture(adapter, captureSecond);
+    adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
 }
 /**
-* @tc.name  Test the audio path route selection funtion via runing multi service scenarios
+* @tc.name  Test the audio path route selection function via runing multi service scenarios
 * @tc.number  SUB_Audio_AudioPathRoute_0007
-* @tc.desc  The audio path route can be opened sucessfuly,When runing multi service scenarios
+* @tc.desc  The audio path route can be opened successfully,When runing multi service scenarios
 * @tc.author: liweiming
 */
 HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0007, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioPort capturePort = {};
-    struct AudioPort renderPort = {};
-    struct AudioSampleAttributes attrs = {};
-    struct AudioDeviceDescriptor captureDesc = {};
-    struct AudioDeviceDescriptor renderDesc = {};
     struct AudioAdapter *captureAdapter = nullptr;
     struct AudioAdapter *renderAdapter = nullptr;
     struct AudioCapture *capture = nullptr;
@@ -407,30 +292,15 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0007, TestSize.Level1)
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = PowerOff(g_elemValues[2], g_elemValues[3]);
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
-    ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_INTERNAL, &captureAdapter, capturePort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_INTERNAL, &captureAdapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_USB, &renderAdapter, renderPort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitDevDesc(captureDesc, capturePort.portId, PIN_IN_MIC);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitDevDesc(renderDesc, renderPort.portId, PIN_OUT_SPEAKER);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = captureAdapter->CreateCapture(captureAdapter, &captureDesc, &attrs, &capture);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, captureAdapter);
-        manager.UnloadAdapter(&manager, renderAdapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
     ret = CheckRegisterStatus(g_elemValues[2].id, g_elemValues[3].id, REGISTER_STATUS_ON, REGISTER_STATUS_OFF);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = renderAdapter->CreateRender(renderAdapter, &renderDesc, &attrs, &render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_USB, &renderAdapter, &render);
     if (ret < 0) {
         captureAdapter->DestroyCapture(captureAdapter, capture);
         manager.UnloadAdapter(&manager, captureAdapter);
-        manager.UnloadAdapter(&manager, renderAdapter);
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
     ret = CheckRegisterStatus(g_elemValues[0].id, g_elemValues[1].id, REGISTER_STATUS_ON, REGISTER_STATUS_ON);

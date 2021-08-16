@@ -11,26 +11,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/test.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+if (defined(ohos_lite)) {
+  import("//build/lite/config/test.gni")
+  import("//drivers/peripheral/audio/audio.gni")
+} else {
+  import("//build/test.gni")
+  import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/peripheral/audio/audio.gni")
+}
 
 ###########################end###########################
 group("hdi") {
-  testonly = true
-  deps = []
-  deps += [
-    "adapter:AudioHdiAdapterTest",
-    "hdireliability:AudioHdiCaptureReliabilityTest",
-    "hdireliability:AudioHdiRenderReliabilityTest",
-    "render:AudioHdiRenderAttrTest",
-    "render:AudioHdiRenderControlTest",
-    "render:AudioHdiRenderVolumeTest",
-    "render:AudioHdiRenderSceneTest",
-    "render:AudioHdiRenderTest",
-    "capture:AudioHdiCaptureAttrTest",
-    "capture:AudioHdiCaptureControlTest",
-    "capture:AudioHdiCaptureVolumeTest",
-    "capture:AudioHdiCaptureSceneTest",
-    "capture:AudioHdiCaptureTest",
+  if (!defined(ohos_lite)) {
+    testonly = true
+  }
+  deps = [
+    "adapter:hdf_audio_hdi_adapter_test",
+    "hdireliability:hdf_audio_hdi_capture_reliability_test",
+    "hdireliability:hdf_audio_hdi_render_reliability_test",
+    "hdireliability:hdf_audio_hdi_capture_control_reliability_test",
+    "hdireliability:hdf_audio_hdi_render_control_reliability_test",
+    "render:hdf_audio_hdi_render_attr_test",
+    "render:hdf_audio_hdi_render_control_test",
+    "render:hdf_audio_hdi_render_volume_test",
+    "render:hdf_audio_hdi_render_scene_test",
+    "render:hdf_audio_hdi_render_test",
+    "capture:hdf_audio_hdi_capture_attr_test",
+    "capture:hdf_audio_hdi_capture_control_test",
+    "capture:hdf_audio_hdi_capture_volume_test",
+    "capture:hdf_audio_hdi_capture_scene_test",
+    "capture:hdf_audio_hdi_capture_test",
     ]
+  if (!enable_audio_mpi_so && !enable_audio_mpi_service) {
+    deps += [
+      "hdiperformace:hdf_audio_hdi_render_performace_test",
+      "hdiperformace:hdf_audio_hdi_capture_performace_test"
+    ]
+  }
 }

@@ -39,39 +39,6 @@ using namespace std;
 
 namespace HMOS {
 namespace Audio {
-int32_t WriteIdToBuf(struct HdfSBuf *sBuf, struct AudioCtlElemId id)
-{
-    if (sBuf == nullptr) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteInt32(sBuf, id.iface)) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteString(sBuf, id.cardServiceName)) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteString(sBuf, id.itemName)) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-int32_t WriteEleValueToBuf(struct HdfSBuf *sBuf, struct AudioCtlElemValue elemvalue)
-{
-    int32_t ret = -1;
-    if (sBuf == nullptr) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteInt32(sBuf, elemvalue.value[0])) {
-        return HDF_FAILURE;
-    }
-    ret = WriteIdToBuf(sBuf, elemvalue.id);
-    if (ret != HDF_SUCCESS) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
 int32_t WriteHwParamsToBuf(struct HdfSBuf *sBuf, struct AudioPcmHwParams hwParams)
 {
     if (sBuf == nullptr) {
@@ -122,110 +89,14 @@ int32_t WriteHwParamsToBuf(struct HdfSBuf *sBuf, struct AudioPcmHwParams hwParam
     return HDF_SUCCESS;
 }
 
-int32_t InitAttrs(struct AudioSampleAttributes& attrs)
-{
-    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
-    attrs.channelCount = G_CHANNELCOUNT;
-    attrs.sampleRate = G_SAMPLERATE;
-    attrs.interleaved = 0;
-    attrs.type = AUDIO_IN_MEDIA;
-    return HDF_SUCCESS;
-}
-
-uint32_t StringToInt(std::string flag)
-{
-    uint32_t temp = flag[0];
-    for (int i = flag.size() - 1; i >= 0; i--) {
-        temp <<= MOVE_LEFT_NUM;
-        temp += flag[i];
-    }
-    return temp;
-}
-
-uint32_t PcmFormatToBits(enum AudioFormat format)
-{
-    switch (format) {
-        case AUDIO_FORMAT_PCM_16_BIT:
-            return PCM_16_BIT;
-        case AUDIO_FORMAT_PCM_8_BIT:
-            return PCM_8_BIT;
-        default:
-            return PCM_8_BIT;
-    };
-}
-
-int32_t WavHeadAnalysis(struct AudioHeadInfo& wavHeadInfo, FILE *file, struct AudioSampleAttributes& attrs)
-{
-    int ret = 0;
-    if (file == nullptr) {
-        return HDF_FAILURE;
-    }
-    ret = fread(&wavHeadInfo, sizeof(wavHeadInfo), 1, file);
-    if (ret != 1) {
-        return HDF_FAILURE;
-    }
-    uint32_t audioRiffId = StringToInt(AUDIO_RIFF);
-    uint32_t audioFileFmt = StringToInt(AUDIO_WAVE);
-    uint32_t aduioDataId = StringToInt(AUDIO_DATA);
-    if (wavHeadInfo.testFileRiffId != audioRiffId || wavHeadInfo.testFileFmt != audioFileFmt ||
-        wavHeadInfo.dataId != aduioDataId) {
-        return HDF_FAILURE;
-    }
-    attrs.channelCount = wavHeadInfo.audioChannelNum;
-    attrs.sampleRate = wavHeadInfo.audioSampleRate;
-    switch (wavHeadInfo.audioBitsPerSample) {
-        case PCM_8_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_8_BIT;
-            break;
-        }
-        case PCM_16_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_16_BIT;
-            break;
-        }
-        case PCM_24_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_24_BIT;
-            break;
-        }
-        case PCM_32_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_32_BIT;
-            break;
-        }
-        default:
-            return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)
-{
-    uint32_t ret = 512 * (attrs.channelCount) * (PcmFormatToBits(attrs.format) >> 3);
-    return ret;
-}
-
-uint32_t FormatToBits(enum AudioFormat format)
-{
-    switch (format) {
-        case AUDIO_FORMAT_PCM_16_BIT:
-            return G_PCM16BIT;
-        case AUDIO_FORMAT_PCM_8_BIT:
-            return G_PCM8BIT;
-        default:
-            return G_PCM16BIT;
-    }
-}
-
-int32_t AdmRenderFramePrepare(const std::string path, char *&frame, unsigned long& numRead, unsigned long& frameSize)
+int32_t AdmRenderFramePrepare(const std::string &path, char *&frame, uint32_t& numRead, uint32_t& frameSize)
 {
     int32_t ret = -1;
-    int readSize = 0;
-    int bufferSize = 0;
-    int remainingDataSize = 0;
+    uint32_t readSize = 0;
+    uint32_t bufferSize = 0;
+
     struct AudioSampleAttributes attrs = {};
-    struct AudioHeadInfo headInfo = {};
-    ret = InitAttrs(attrs);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
+    InitAttrs(attrs);
     char absPath[PATH_MAX] = {0};
     if (realpath(path.c_str(), absPath) == nullptr) {
         return HDF_FAILURE;
@@ -234,34 +105,43 @@ int32_t AdmRenderFramePrepare(const std::string path, char *&frame, unsigned lon
     if (file == nullptr) {
         return HDF_FAILURE;
     }
+    struct AudioHeadInfo headInfo = {};
     ret = WavHeadAnalysis(headInfo, file, attrs);
     if (ret < 0) {
         fclose(file);
         return HDF_FAILURE;
     }
     bufferSize = PcmFramesToBytes(attrs);
+    if (bufferSize <= 0) {
+        fclose(file);
+        return HDF_FAILURE;
+    }
     frame = (char *)calloc(1, bufferSize);
     if (frame == nullptr) {
         fclose(file);
         return HDF_FAILURE;
     }
+    uint32_t remainingDataSize = 0;
     remainingDataSize = headInfo.dataSize;
     readSize = (remainingDataSize) > (bufferSize) ? (bufferSize) : (remainingDataSize);
     numRead = fread(frame, 1, readSize, file);
     if (numRead < 0) {
         fclose(file);
+        free(frame);
         return HDF_FAILURE;
     }
-    frameSize = numRead / (attrs.channelCount * (FormatToBits(attrs.format) >> Move_Right));
+    frameSize = numRead / (attrs.channelCount * (PcmFormatToBits(attrs.format) >> MOVE_RIGHT_NUM));
     fclose(file);
     return HDF_SUCCESS;
 }
 
-int32_t WriteFrameToSBuf(struct HdfSBuf *&sBufT, char *buf, unsigned long bufsize,
-    unsigned long frameSize, const std::string path)
+int32_t WriteFrameToSBuf(struct HdfSBuf *&sBufT, const std::string &path)
 {
     int32_t ret = -1;
     sBufT = HdfSBufObtainDefaultSize();
+    char *buf = nullptr;
+    uint32_t bufsize = 0;
+    uint32_t frameSize = 0;
     if (sBufT == NULL) {
         return HDF_FAILURE;
     }
@@ -271,32 +151,128 @@ int32_t WriteFrameToSBuf(struct HdfSBuf *&sBufT, char *buf, unsigned long bufsiz
         return HDF_FAILURE;
     }
 
-    if (!HdfSbufWriteUint32(sBufT, (uint32_t)(frameSize))) {
+    if (!HdfSbufWriteUint32(sBufT, frameSize)) {
+        free(buf);
+        buf = nullptr;
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteBuffer(sBufT, buf, bufsize)) {
+        free(buf);
+        buf = nullptr;
+        return HDF_FAILURE;
+    }
+    free(buf);
+    buf = nullptr;
+    return HDF_SUCCESS;
+}
+
+int32_t ObtainBuf(struct HdfSBuf *&readBuf, struct HdfSBuf *&readReply)
+{
+    readBuf = HdfSBufObtainDefaultSize();
+    if (readBuf == nullptr) {
+        return HDF_FAILURE;
+    }
+    readReply = HdfSBufObtainDefaultSize();
+    if (readReply == nullptr) {
+        HdfSBufRecycle(readBuf);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
 
-int32_t ObtainBuf(struct HdfSBuf *&writeBuf, struct HdfSBuf *&readBuf, struct HdfSBuf *&readReply)
+void RecycleBuf(struct HdfSBuf *&readBuf, struct HdfSBuf *&readReply)
 {
+    HdfSBufRecycle(readBuf);
+    HdfSBufRecycle(readReply);
+}
+
+int32_t WriteCtrlInfo(struct HdfIoService *service, struct AudioCtlElemValue writeElemValue)
+{
+    int32_t ret = -1;
+    struct HdfSBuf *writeBuf = nullptr;
+    if (service == nullptr || service->dispatcher == nullptr) {
+        return HDF_FAILURE;
+    }
+
     writeBuf = HdfSBufObtainDefaultSize();
     if (writeBuf == nullptr) {
         return HDF_FAILURE;
     }
-    readBuf = HdfSBufObtainDefaultSize();
-    if (readBuf == nullptr) {
+    ret = WriteEleValueToBuf(writeBuf, writeElemValue);
+    if (ret < 0) {
         HdfSBufRecycle(writeBuf);
         return HDF_FAILURE;
     }
-    readReply = HdfSBufObtainDefaultSize();
-    if (readReply == nullptr) {
+    ret = service->dispatcher->Dispatch(&service->object, AUDIODRV_CTRL_IOCTRL_ELEM_WRITE, writeBuf, nullptr);
+    if (ret < 0) {
         HdfSBufRecycle(writeBuf);
-        HdfSBufRecycle(readBuf);
         return HDF_FAILURE;
     }
+    HdfSBufRecycle(writeBuf);
+    return HDF_SUCCESS;
+}
+
+int32_t ReadCtrlInfo(struct HdfIoService *service, struct AudioCtlElemId id, int32_t expectValue)
+{
+    int32_t ret = -1;
+    struct HdfSBuf *readBuf = nullptr;
+    struct HdfSBuf *readReply = nullptr;
+    struct AudioCtlElemValue readElemValue = {};
+    if (service == nullptr || service->dispatcher == nullptr) {
+        return HDF_FAILURE;
+    }
+    ret = ObtainBuf(readBuf, readReply);
+    if (ret < 0) {
+        return HDF_FAILURE;
+    }
+    ret = WriteIdToBuf(readBuf, id);
+    if (ret < 0) {
+        RecycleBuf(readBuf, readReply);
+        return HDF_FAILURE;
+    }
+    ret = service->dispatcher->Dispatch(&service->object, AUDIODRV_CTRL_IOCTRL_ELEM_READ, readBuf, readReply);
+    if (ret < 0) {
+        RecycleBuf(readBuf, readReply);
+        return HDF_FAILURE;
+    }
+    ret = HdfSbufReadInt32(readReply, &readElemValue.value[0]);
+    if (ret < 0 || expectValue != readElemValue.value[0]) {
+        RecycleBuf(readBuf, readReply);
+        return HDF_FAILURE;
+    }
+    RecycleBuf(readBuf, readReply);
+    return HDF_SUCCESS;
+}
+int32_t WriteHwParams(string serviceName, struct HdfIoService *&service, struct AudioPcmHwParams hwParams)
+{
+    int32_t ret = -1;
+    struct HdfSBuf *writeBuf = nullptr;
+    struct HdfSBuf *writeReply = nullptr;
+    service = HdfIoServiceBind(serviceName.c_str());
+    if (service == nullptr || service->dispatcher == nullptr) {
+        return HDF_FAILURE;
+    }
+    writeBuf = HdfSBufObtainDefaultSize();
+    if (writeBuf == nullptr) {
+        HdfIoServiceRecycle(service);
+        service = nullptr;
+        return HDF_FAILURE;
+    }
+    ret = WriteHwParamsToBuf(writeBuf, hwParams);
+    if (ret < 0) {
+        HdfSBufRecycle(writeBuf);
+        HdfIoServiceRecycle(service);
+        service = nullptr;
+        return HDF_FAILURE;
+    }
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_HW_PARAMS, writeBuf, writeReply);
+    if (ret < 0) {
+        HdfSBufRecycle(writeBuf);
+        HdfIoServiceRecycle(service);
+        service = nullptr;
+        return HDF_FAILURE;
+    }
+    HdfSBufRecycle(writeBuf);
     return HDF_SUCCESS;
 }
 }

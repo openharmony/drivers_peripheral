@@ -16,15 +16,7 @@
 #ifndef AUDIO_PROXY_INTERNAL_H
 #define AUDIO_PROXY_INTERNAL_H
 
-#include "audio_render.h"
-#include "audio_capture.h"
 #include "audio_adapter.h"
-#include "audio_types.h"
-#include "audio_control.h"
-#include "audio_attribute.h"
-#include "audio_scene.h"
-#include "audio_volume.h"
-
 
 int32_t AudioProxyAdapterInitAllPorts(struct AudioAdapter *adapter);
 int32_t AudioProxyAdapterCreateRender(struct AudioAdapter *adapter,
@@ -50,13 +42,13 @@ int32_t AudioProxyRenderStop(AudioHandle handle);
 int32_t AudioProxyRenderPause(AudioHandle handle);
 int32_t AudioProxyRenderResume(AudioHandle handle);
 int32_t AudioProxyRenderFlush(AudioHandle handle);
-int32_t AudioProxyRenderGetFrameSize(AudioHandle handle, uint64_t *size);
-int32_t AudioProxyRenderGetFrameCount(AudioHandle handle, uint64_t *count);
-int32_t AudioProxyRenderSetSampleAttributes(AudioHandle handle,
+int32_t AudioProxyRenderGetFrameSize(const AudioHandle handle, uint64_t *size);
+int32_t AudioProxyRenderGetFrameCount(const AudioHandle handle, uint64_t *count);
+int32_t AudioProxyRenderSetSampleAttributes(const AudioHandle handle,
     const struct AudioSampleAttributes *attrs);
-int32_t AudioProxyRenderGetSampleAttributes(AudioHandle handle,
+int32_t AudioProxyRenderGetSampleAttributes(const AudioHandle handle,
     struct AudioSampleAttributes *attrs);
-int32_t AudioProxyRenderGetCurrentChannelId(AudioHandle handle, uint32_t *channelId);
+int32_t AudioProxyRenderGetCurrentChannelId(const AudioHandle handle, uint32_t *channelId);
 int32_t AudioProxyRenderCheckSceneCapability(AudioHandle handle,
     const struct AudioSceneDescriptor *scene, bool *supported);
 int32_t AudioProxyRenderSelectScene(AudioHandle handle,
@@ -77,32 +69,47 @@ int32_t AudioProxyRenderSetRenderSpeed(struct AudioRender *render, float speed);
 int32_t AudioProxyRenderGetRenderSpeed(struct AudioRender *render, float *speed);
 int32_t AudioProxyRenderSetChannelMode(struct AudioRender *render, enum AudioChannelMode mode);
 int32_t AudioProxyRenderGetChannelMode(struct AudioRender *render, enum AudioChannelMode *mode);
-int32_t AudioProxyCaptureStart(AudioHandle handle);
-int32_t AudioProxyCaptureStop(AudioHandle handle);
-int32_t AudioProxyCapturePause(AudioHandle handle);
-int32_t AudioProxyCaptureResume(AudioHandle handle);
-int32_t AudioProxyCaptureFlush(AudioHandle handle);
+int32_t AudioProxyRenderSetExtraParams(AudioHandle render, const char *keyValueList);
+int32_t AudioProxyRenderGetExtraParams(AudioHandle render, char *keyValueList, int32_t listLenth);
+int32_t AudioProxyRenderReqMmapBuffer(AudioHandle render, int32_t reqSize, struct AudioMmapBufferDescripter *desc);
+int32_t AudioProxyRenderGetMmapPosition(AudioHandle render, uint64_t *frames, struct AudioTimeStamp *time);
+int32_t AudioProxyRenderTurnStandbyMode(AudioHandle render);
+int32_t AudioProxyRenderAudioDevDump(AudioHandle render, int32_t range, int32_t fd);
+int32_t AudioProxyRenderRegCallback(struct AudioRender *render, RenderCallback callback, void *cookie);
+int32_t AudioProxyRenderDrainBuffer(struct AudioRender *render, enum AudioDrainNotifyType *type);
+int32_t AudioProxyCaptureStart(const AudioHandle handle);
+int32_t AudioProxyCaptureStop(const AudioHandle handle);
+int32_t AudioProxyCapturePause(const AudioHandle handle);
+int32_t AudioProxyCaptureResume(const AudioHandle handle);
+int32_t AudioProxyCaptureFlush(const AudioHandle handle);
 int32_t AudioProxyCaptureGetFrameSize(AudioHandle handle, uint64_t *size);
 int32_t AudioProxyCaptureGetFrameCount(AudioHandle handle, uint64_t *count);
 int32_t AudioProxyCaptureSetSampleAttributes(AudioHandle handle,
     const struct AudioSampleAttributes *attrs);
-int32_t AudioProxyCaptureGetSampleAttributes(AudioHandle handle,
+int32_t AudioProxyCaptureGetSampleAttributes(const AudioHandle handle,
     struct AudioSampleAttributes *attrs);
-int32_t AudioProxyCaptureGetCurrentChannelId(AudioHandle handle, uint32_t *channelId);
-int32_t AudioProxyCaptureCheckSceneCapability(AudioHandle handle,
+int32_t AudioProxyCaptureGetCurrentChannelId(const AudioHandle handle, uint32_t *channelId);
+int32_t AudioProxyCaptureCheckSceneCapability(const AudioHandle handle,
     const struct AudioSceneDescriptor *scene, bool *supported);
-int32_t AudioProxyCaptureSelectScene(AudioHandle handle,
+int32_t AudioProxyCaptureSelectScene(const AudioHandle handle,
     const struct AudioSceneDescriptor *scene);
-int32_t AudioProxyCaptureSetMute(AudioHandle handle, bool mute);
-int32_t AudioProxyCaptureGetMute(AudioHandle handle, bool *mute);
-int32_t AudioProxyCaptureSetVolume(AudioHandle handle, float volume);
-int32_t AudioProxyCaptureGetVolume(AudioHandle handle, float *volume);
-int32_t AudioProxyCaptureGetGainThreshold(AudioHandle handle, float *min, float *max);
-int32_t AudioProxyCaptureGetGain(AudioHandle handle, float *gain);
-int32_t AudioProxyCaptureSetGain(AudioHandle handle, float gain);
+int32_t AudioProxyCaptureSetMute(const AudioHandle handle, bool mute);
+int32_t AudioProxyCaptureGetMute(const AudioHandle handle, bool *mute);
+int32_t AudioProxyCaptureSetVolume(const AudioHandle handle, float volume);
+int32_t AudioProxyCaptureGetVolume(const AudioHandle handle, float *volume);
+int32_t AudioProxyCaptureGetGainThreshold(const AudioHandle handle, float *min, float *max);
+int32_t AudioProxyCaptureGetGain(const AudioHandle handle, float *gain);
+int32_t AudioProxyCaptureSetGain(const AudioHandle handle, float gain);
 int32_t AudioProxyCaptureCaptureFrame(struct AudioCapture *capture,
     void *frame, uint64_t requestBytes, uint64_t *replyBytes);
 int32_t AudioProxyCaptureGetCapturePosition(struct AudioCapture *capture,
     uint64_t *frames, struct AudioTimeStamp *time);
+int32_t AudioProxyCaptureSetExtraParams(AudioHandle capture, const char *keyValueList);
+int32_t AudioProxyCaptureGetExtraParams(const AudioHandle capture, char *keyValueList, int32_t listLenth);
+int32_t AudioProxyCaptureReqMmapBuffer(const AudioHandle capture,
+    int32_t reqSize, struct AudioMmapBufferDescripter *desc);
+int32_t AudioProxyCaptureGetMmapPosition(const AudioHandle capture, uint64_t *frames, struct AudioTimeStamp *time);
+int32_t AudioProxyCaptureTurnStandbyMode(const AudioHandle capture);
+int32_t AudioProxyCaptureAudioDevDump(AudioHandle capture, int32_t range, int32_t fd);
 
 #endif

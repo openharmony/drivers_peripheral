@@ -97,7 +97,7 @@ int32_t InitCaptureSoHandle(const char *captureSoPath)
     if (g_ptrCaptureHandle == NULL) {
         g_ptrCaptureHandle = dlopen(captureSoPath, RTLD_LAZY);
         if (g_ptrCaptureHandle == NULL) {
-            LOG_FUN_ERR("open lib capture so fail");
+            LOG_FUN_ERR("open lib capture so fail, reason:%s", dlerror());
             return HDF_FAILURE;
         }
         g_bindServiceCapture = dlsym(g_ptrCaptureHandle, "AudioBindServiceCapture");
@@ -121,7 +121,7 @@ int32_t InitRenderSoHandle(const char *renderSoPath)
     if (g_ptrRenderHandle == NULL) {
         g_ptrRenderHandle = dlopen(renderSoPath, RTLD_LAZY);
         if (g_ptrRenderHandle == NULL) {
-            LOG_FUN_ERR("open lib render so fail");
+            LOG_FUN_ERR("open lib render so fail, reason:%s", dlerror());
             return HDF_FAILURE;
         }
         g_bindServiceRender = dlsym(g_ptrRenderHandle, "AudioBindServiceRender");
@@ -146,7 +146,7 @@ int32_t InitPathSelectSoHandle(const char *pathSelectSoPath)
     if (g_ptrPathSelHandle == NULL) {
         g_ptrPathSelHandle = dlopen(pathSelectSoPath, RTLD_LAZY);
         if (g_ptrPathSelHandle == NULL) {
-            LOG_FUN_ERR("open lib render so fail");
+            LOG_FUN_ERR("open lib PathSelct so fail, reason:%s", dlerror());
             return HDF_FAILURE;
         }
         g_pathSelGetConfToJsonObj = dlsym(g_ptrPathSelHandle, "AudioPathSelGetConfToJsonObj");
@@ -234,6 +234,8 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
     hwAdapter->common.GetPassthroughMode = AudioAdapterGetPassthroughMode;
     *adapter = &hwAdapter->common;
     hwAdapter->adapterDescriptor = *desc;
+    hwAdapter->adapterMgrRenderFlag = 0; // The adapterMgrRenderFlag init is zero
+    hwAdapter->adapterMgrCaptureFlag = 0; // The adapterMgrCaptureFlag init is zero
     return HDF_SUCCESS;
 }
 

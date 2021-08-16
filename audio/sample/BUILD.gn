@@ -17,109 +17,209 @@ if (defined(ohos_lite)) {
   import("//build/ohos.gni")
 }
 import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/peripheral/audio/audio.gni")
 
-ohos_executable("audio_sample_render") {
-  include_dirs = [
-    "//drivers/peripheral/audio/interfaces/include",
-    "//utils/native/base/include",
-    "$hdf_framework_path/include",
-    "$hdf_framework_path/include/osal",
-    "$hdf_framework_path/include/utils",
-    "$hdf_framework_path/utils/include",
-    "$hdf_framework_path/ability/sbuf/include",
-    "$hdf_framework_path/core/adapter/syscall/include",
-    "$hdf_framework_path/core/adapter/vnode/include",
-    "$hdf_framework_path/core/shared/include",
-    "$hdf_framework_path/include/core/",
-    "$hdf_uhdf_path/osal/include",
-    "$hdf_uhdf_path/include/hdi",
-    "$hdf_uhdf_path/ipc/include",
-    "$hdf_uhdf_path/include/config",
-    "$hdf_uhdf_path/include/osal",
-    "$hdf_uhdf_path/include/host",
-    "$hdf_uhdf_path/shared/include",
-    "$hdf_uhdf_path/manager/include",
-    "$hdf_uhdf_path/host/include",
-    "$hdf_uhdf_path/include",
-    "$hdf_uhdf_path/common/security/include",
-  ]
+if (defined(ohos_lite)) {
+  executable("audio_sample_render") {
+    include_dirs = [
+      "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
+      "//utils/native/base/include",
+      "$hdf_framework_path/include",
+      "$hdf_framework_path/include/osal",
+      "$hdf_framework_path/include/utils",
+      "$hdf_framework_path/utils/include",
+      "$hdf_framework_path/ability/sbuf/include",
+      "$hdf_framework_path/core/adapter/syscall/include",
+      "$hdf_framework_path/core/adapter/vnode/include",
+      "$hdf_framework_path/core/shared/include",
+      "$hdf_framework_path/include/core/",
+      "$hdf_uhdf_path/osal/include",
+      "$hdf_uhdf_path/include/hdi",
+      "$hdf_uhdf_path/ipc/include",
+      "$hdf_uhdf_path/include/config",
+      "$hdf_uhdf_path/include/osal",
+      "$hdf_uhdf_path/include/host",
+      "$hdf_uhdf_path/shared/include",
+      "$hdf_uhdf_path/manager/include",
+      "$hdf_uhdf_path/host/include",
+      "$hdf_uhdf_path/include",
+      "$hdf_uhdf_path/common/security/include",
+      "//third_party/bounds_checking_function/include"
+    ]
 
-  sources = [
-    "framework_render.c",
-  ]
+    sources = [
+      "framework_render.c",
+    ]
+    
+    deps = [
+      "//third_party/bounds_checking_function:libsec_shared"
+    ]
 
-  deps = [
-    "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
-    "$hdf_uhdf_path/hcs:hdf_default.hcb",
-    "//utils/native/base:utils",
-    "$hdf_uhdf_path/hdi:libhdi",
-    "$hdf_uhdf_path/host:hdf_devhost",
-    "$hdf_uhdf_path/host:libhdf_host",
-    "$hdf_uhdf_path/config:libhdf_hcs",
-    "$hdf_uhdf_path/manager:hdf_devmgr.rc",
-    "$hdf_uhdf_path/manager:hdf_devmgr",
-    "$hdf_uhdf_path/osal:libhdf_utils",
-  ]
-
-  if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
+    defines = []
+    if (enable_audio_device_mpi) {
+      defines += [ "AUDIO_HAL_USER" ]
+    }
   }
 
-  install_enable = true
-  subsystem_name = "hdf"
-}
+  executable("audio_sample_capture") {
+    include_dirs = [
+      "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
+      "//utils/native/base/include",
+      "$hdf_framework_path/include",
+      "$hdf_framework_path/include/osal",
+      "$hdf_framework_path/include/utils",
+      "$hdf_framework_path/utils/include",
+      "$hdf_framework_path/ability/sbuf/include",
+      "$hdf_framework_path/core/adapter/syscall/include",
+      "$hdf_framework_path/core/adapter/vnode/include",
+      "$hdf_framework_path/core/shared/include",
+      "$hdf_framework_path/include/core/",
+      "$hdf_uhdf_path/osal/include",
+      "$hdf_uhdf_path/include/hdi",
+      "$hdf_uhdf_path/ipc/include",
+      "$hdf_uhdf_path/include/config",
+      "$hdf_uhdf_path/include/osal",
+      "$hdf_uhdf_path/include/host",
+      "$hdf_uhdf_path/shared/include",
+      "$hdf_uhdf_path/manager/include",
+      "$hdf_uhdf_path/host/include",
+      "$hdf_uhdf_path/include",
+      "$hdf_uhdf_path/common/security/include",
+      "//third_party/bounds_checking_function/include"
+    ]
 
-ohos_executable("audio_sample_capture") {
-  include_dirs = [
-    "//drivers/peripheral/audio/interfaces/include",
-    "//utils/native/base/include",
-    "$hdf_framework_path/include",
-    "$hdf_framework_path/include/osal",
-    "$hdf_framework_path/include/utils",
-    "$hdf_framework_path/utils/include",
-    "$hdf_framework_path/ability/sbuf/include",
-    "$hdf_framework_path/core/adapter/syscall/include",
-    "$hdf_framework_path/core/adapter/vnode/include",
-    "$hdf_framework_path/core/shared/include",
-    "$hdf_framework_path/include/core/",
-    "$hdf_uhdf_path/osal/include",
-    "$hdf_uhdf_path/include/hdi",
-    "$hdf_uhdf_path/ipc/include",
-    "$hdf_uhdf_path/include/config",
-    "$hdf_uhdf_path/include/osal",
-    "$hdf_uhdf_path/include/host",
-    "$hdf_uhdf_path/shared/include",
-    "$hdf_uhdf_path/manager/include",
-    "$hdf_uhdf_path/host/include",
-    "$hdf_uhdf_path/include",
-    "$hdf_uhdf_path/common/security/include",
-  ]
+    sources = [
+      "framework_capture.c",
+    ]
 
-  sources = [
-    "framework_capture.c",
-  ]
+    deps = [
+      "//third_party/bounds_checking_function:libsec_shared"
+    ]
+    
+    defines = []
+    if (enable_audio_device_mpi) {
+      defines += [ "AUDIO_HAL_USER" ]
+    }
+  }
+} else {
+  ohos_executable("audio_sample_render") {
+    include_dirs = [
+      "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
+      "//utils/native/base/include",
+      "$hdf_framework_path/include",
+      "$hdf_framework_path/include/osal",
+      "$hdf_framework_path/include/utils",
+      "$hdf_framework_path/utils/include",
+      "$hdf_framework_path/ability/sbuf/include",
+      "$hdf_framework_path/core/adapter/syscall/include",
+      "$hdf_framework_path/core/adapter/vnode/include",
+      "$hdf_framework_path/core/shared/include",
+      "$hdf_framework_path/include/core/",
+      "$hdf_uhdf_path/osal/include",
+      "$hdf_uhdf_path/include/hdi",
+      "$hdf_uhdf_path/ipc/include",
+      "$hdf_uhdf_path/include/config",
+      "$hdf_uhdf_path/include/osal",
+      "$hdf_uhdf_path/include/host",
+      "$hdf_uhdf_path/shared/include",
+      "$hdf_uhdf_path/manager/include",
+      "$hdf_uhdf_path/host/include",
+      "$hdf_uhdf_path/include",
+      "$hdf_uhdf_path/common/security/include",
+    ]
 
-  deps = [
-    "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
-    "$hdf_uhdf_path/hcs:hdf_default.hcb",
-    "//utils/native/base:utils",
-    "$hdf_uhdf_path/hdi:libhdi",
-    "$hdf_uhdf_path/host:hdf_devhost",
-    "$hdf_uhdf_path/host:libhdf_host",
-    "$hdf_uhdf_path/config:libhdf_hcs",
-    "$hdf_uhdf_path/manager:hdf_devmgr.rc",
-    "$hdf_uhdf_path/manager:hdf_devmgr",
-    "$hdf_uhdf_path/osal:libhdf_utils",
-  ]
+    sources = [
+      "framework_render.c",
+    ]
 
-  if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
+    deps = [
+      "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
+      "$hdf_uhdf_path/hcs:hdf_default.hcb",
+      "//utils/native/base:utils",
+      "$hdf_uhdf_path/hdi:libhdi",
+      "$hdf_uhdf_path/host:hdf_devhost",
+      "$hdf_uhdf_path/host:libhdf_host",
+      "$hdf_uhdf_path/config:libhdf_hcs",
+      "$hdf_uhdf_path/manager:hdf_devmgr.rc",
+      "$hdf_uhdf_path/manager:hdf_devmgr",
+      "$hdf_uhdf_path/osal:libhdf_utils",
+    ]
+
+    defines = []
+    if (enable_audio_device_mpi) {
+      defines += [ "AUDIO_HAL_USER" ]
+    }
+
+    if (is_standard_system) {
+      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+
+    install_enable = true
+    subsystem_name = "hdf"
   }
 
-  install_enable = true
-  subsystem_name = "hdf"
+  ohos_executable("audio_sample_capture") {
+    include_dirs = [
+      "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
+      "//utils/native/base/include",
+      "$hdf_framework_path/include",
+      "$hdf_framework_path/include/osal",
+      "$hdf_framework_path/include/utils",
+      "$hdf_framework_path/utils/include",
+      "$hdf_framework_path/ability/sbuf/include",
+      "$hdf_framework_path/core/adapter/syscall/include",
+      "$hdf_framework_path/core/adapter/vnode/include",
+      "$hdf_framework_path/core/shared/include",
+      "$hdf_framework_path/include/core/",
+      "$hdf_uhdf_path/osal/include",
+      "$hdf_uhdf_path/include/hdi",
+      "$hdf_uhdf_path/ipc/include",
+      "$hdf_uhdf_path/include/config",
+      "$hdf_uhdf_path/include/osal",
+      "$hdf_uhdf_path/include/host",
+      "$hdf_uhdf_path/shared/include",
+      "$hdf_uhdf_path/manager/include",
+      "$hdf_uhdf_path/host/include",
+      "$hdf_uhdf_path/include",
+      "$hdf_uhdf_path/common/security/include",
+    ]
+
+    sources = [
+      "framework_capture.c",
+    ]
+
+    deps = [
+      "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
+      "$hdf_uhdf_path/hcs:hdf_default.hcb",
+      "//utils/native/base:utils",
+      "$hdf_uhdf_path/hdi:libhdi",
+      "$hdf_uhdf_path/host:hdf_devhost",
+      "$hdf_uhdf_path/host:libhdf_host",
+      "$hdf_uhdf_path/config:libhdf_hcs",
+      "$hdf_uhdf_path/manager:hdf_devmgr.rc",
+      "$hdf_uhdf_path/manager:hdf_devmgr",
+      "$hdf_uhdf_path/osal:libhdf_utils",
+    ]
+
+    defines = []
+    if (enable_audio_device_mpi) {
+      defines += [ "AUDIO_HAL_USER" ]
+    }
+
+    if (is_standard_system) {
+      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+
+    install_enable = true
+    subsystem_name = "hdf"
+  }
 }
+

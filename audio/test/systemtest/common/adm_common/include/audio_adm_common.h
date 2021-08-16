@@ -36,45 +36,13 @@ to buffer
 #ifndef AUDIO_ADM_COMMON_H
 #define AUDIO_ADM_COMMON_H
 
-#include <gtest/gtest.h>
-#include "audio_adapter.h"
-#include "audio_internal.h"
-#include "audio_types.h"
-#include "hdf_io_service_if.h"
 #include "osal_mem.h"
-#include "hdf_sbuf.h"
+#include "audio_hdi_common.h"
 
 namespace HMOS {
 namespace Audio {
-const std::string HDF_CONTROL_SERVICE = "hdf_audio_control";
-const std::string HDF_RENDER_SERVICE = "hdf_audio_render";
-const std::string HDF_CAPTURE_SERVICE = "hdf_audio_capture";
-const int AUDIODRV_CTL_ELEM_IFACE_DAC = 0; /* virtual dac device */
-const int AUDIODRV_CTL_ELEM_IFACE_ADC = 1; /* virtual adc device */
-const int AUDIODRV_CTL_ELEM_IFACE_GAIN = 2; /* virtual adc device */
-const int AUDIODRV_CTL_ELEM_IFACE_MIXER = 3; /* virtual mixer device */
-const int AUDIODRV_CTL_ELEM_IFACE_ACODEC = 4; /* Acodec device */
-const int AUDIODRV_CTL_ELEM_IFACE_PGA = 5; /* PGA device */
-const int AUDIODRV_CTL_ELEM_IFACE_AIAO = 6; /* AIAO device */
-const std::string AUDIO_RIFF = "RIFF";
-const std::string AUDIO_WAVE = "WAVE";
-const std::string AUDIO_DATA = "data";
 const int REGISTER_STATUS_ON = 0;
 const int REGISTER_STATUS_OFF = 1;
-const int MOVE_LEFT_NUM = 8;
-const int G_CHANNELCOUNT = 2;
-const int G_SAMPLERATE = 2;
-const int G_PCM16BIT = 16;
-const int G_PCM8BIT = 8;
-const int G_PCM24BIT = 24;
-const int Move_Right = 3;
-
-enum ControlDispMethodCmd {
-    AUDIODRV_CTL_IOCTL_ELEM_INFO,
-    AUDIODRV_CTL_IOCTL_ELEM_READ,
-    AUDIODRV_CTL_IOCTL_ELEM_WRITE,
-    AUDIODRV_CTL_IOCTL_ELEM_BUTT,
-};
 
 enum StreamDispMethodCmd {
     AUDIO_DRV_PCM_IOCTRL_HW_PARAMS,
@@ -110,68 +78,25 @@ struct AudioPcmHwParams {
     uint32_t silenceThreshold;
 };
 
-struct AudioCtlElemId {
-    const char *cardServiceName;
-    int32_t iface;
-    const char *itemName; /* ASCII name of item */
-};
-
-struct AudioCtlElemValue {
-    struct AudioCtlElemId id;
-    int32_t value[2];
-};
-
 struct AudioXferi {
     char *buf;
     unsigned long bufsize;
     unsigned long frameSize;
 };
 
-enum AudioPCMBit {
-    PCM_8_BIT  = 8,
-    PCM_16_BIT = 16,
-    PCM_24_BIT = 24,
-    PCM_32_BIT = 32,
-};
-
-struct AudioHeadInfo {
-    uint32_t testFileRiffId;
-    uint32_t testFileRiffSize;
-    uint32_t testFileFmt;
-    uint32_t audioFileFmtId;
-    uint32_t audioFileFmtSize;
-    uint16_t audioFileFormat;
-    uint16_t audioChannelNum;
-    uint32_t audioSampleRate;
-    uint32_t audioByteRate;
-    uint16_t audioBlockAlign;
-    uint16_t audioBitsPerSample;
-    uint32_t dataId;
-    uint32_t dataSize;
-};
-
-int32_t WriteIdToBuf(struct HdfSBuf *sBuf, struct AudioCtlElemId id);
-
-int32_t WriteEleValueToBuf(struct HdfSBuf *sBuf, struct AudioCtlElemValue elemvalue);
-
 int32_t WriteHwParamsToBuf(struct HdfSBuf *sBuf, struct AudioPcmHwParams hwParams);
 
-int32_t WavHeadAnalysis(struct AudioHeadInfo& wavHeadInfo, FILE *file, struct AudioSampleAttributes& attrs);
+int32_t AdmRenderFramePrepare(const std::string &path, char *&frame, unsigned long& numRead, unsigned long& frameSize);
 
-uint32_t PcmFormatToBitsCapture(enum AudioFormat format);
+int32_t WriteFrameToSBuf(struct HdfSBuf *&sBufT, const std::string &path);
 
-int32_t InitAttrs(struct AudioSampleAttributes& attrs);
+int32_t ObtainBuf(struct HdfSBuf *&readBuf, struct HdfSBuf *&readReply);
 
-int32_t AdmRenderFramePrepare(const std::string path, char *&frame, unsigned long& numRead, unsigned long& frameSize);
+int32_t WriteCtrlInfo(struct HdfIoService *service, struct AudioCtlElemValue writeElemValue);
 
-uint32_t FormatToBits(enum AudioFormat format);
+int32_t ReadCtrlInfo(struct HdfIoService *service, struct AudioCtlElemId id, int32_t expectValue);
 
-uint32_t PcmBytesToFrames(const struct AudioFrameRenderMode& frameRenderMode, uint64_t bytes);
-
-int32_t WriteFrameToSBuf(struct HdfSBuf *&sBufT, char *buf, unsigned long bufsize,
-    unsigned long frameSize, const std::string path);
-
-int32_t ObtainBuf(struct HdfSBuf *&writeBuf, struct HdfSBuf *&readBuf, struct HdfSBuf *&readReply);
+int32_t WriteHwParams(std::string serviceName, struct HdfIoService *&service, struct AudioPcmHwParams hwParams);
 }
 }
 #endif // AUDIO_ADM_COMMON_H

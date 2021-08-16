@@ -11,13 +11,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/test.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+if (defined(ohos_lite)) {
+  import("//build/lite/config/test.gni")
+} else {
+  import("//build/test.gni")
+  import("//drivers/adapter/uhdf2/uhdf.gni")
+}
 
 #################################group#########################################
 group("systemtest") {
-  if(is_standard_system) {
+  if (!defined(ohos_lite)) {
     testonly = true
+  }
     deps = []
 
     deps += [
@@ -26,6 +31,5 @@ group("systemtest") {
       "hdi:hdi",
       "adm:adm",
     ]
-  }
 }
 ###############################################################################

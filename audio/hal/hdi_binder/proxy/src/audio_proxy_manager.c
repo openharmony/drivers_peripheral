@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "audio_proxy_manager.h"
-#include "audio_adapter_info_common.h"
+#include <servmgr_hdi.h>
 #include "audio_proxy_common.h"
 #include "audio_proxy_internal.h"
 
@@ -23,7 +22,7 @@
 #define FRAME_SIZE              1024
 #define CONFIG_FRAME_COUNT     ((8000 * 2 * 1 + (CONFIG_FRAME_SIZE - 1)) / CONFIG_FRAME_SIZE)
 
-int32_t AudioProxyManagerGetAllAdapters(struct AudioManager *manager,
+int32_t AudioProxyManagerGetAllAdapters(struct AudioProxyManager *manager,
                                         struct AudioAdapterDescriptor **descs,
                                         int *size)
 {
@@ -31,7 +30,7 @@ int32_t AudioProxyManagerGetAllAdapters(struct AudioManager *manager,
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     int32_t ret;
-    if (manager == NULL || descs == NULL || size == NULL) {
+    if (manager == NULL || manager->remote == NULL || descs == NULL || size == NULL) {
         return HDF_FAILURE;
     }
     if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
@@ -43,7 +42,7 @@ int32_t AudioProxyManagerGetAllAdapters(struct AudioManager *manager,
         LOG_FUN_ERR("AudioAdaptersForUser FAIL!");
         return ret;
     }
-    ret = AudioProxyDispatchCall(AUDIO_HDI_MGR_GET_ALL_ADAPTER, data, reply);
+    ret = AudioProxyDispatchCall(manager->remote, AUDIO_HDI_MGR_GET_ALL_ADAPTER, data, reply);
     if (ret != HDF_SUCCESS) {
         AudioProxyBufReplyRecycle(data, reply);
         LOG_FUN_ERR("Failed to send service call!");
@@ -53,14 +52,15 @@ int32_t AudioProxyManagerGetAllAdapters(struct AudioManager *manager,
     return HDF_SUCCESS;
 }
 
-int32_t AudioProxyManagerLoadAdapter(struct AudioManager *manager, const struct AudioAdapterDescriptor *desc,
+int32_t AudioProxyManagerLoadAdapter(struct AudioProxyManager *manager, const struct AudioAdapterDescriptor *desc,
                                      struct AudioAdapter **adapter)
 {
     LOG_FUN_INFO();
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
 
-    if (manager == NULL || desc == NULL || desc->adapterName == NULL || adapter == NULL) {
+    if (manager == NULL || manager->remote == NULL || desc == NULL ||
+        desc->adapterName == NULL || desc->ports == NULL || adapter == NULL) {
         return HDF_FAILURE;
     }
     if (AudioAdapterExist(desc->adapterName)) {
@@ -86,7 +86,7 @@ int32_t AudioProxyManagerLoadAdapter(struct AudioManager *manager, const struct 
         return HDF_FAILURE;
     }
     int32_t ret;
-    ret = AudioProxyDispatchCall(AUDIO_HDI_MGR_LOAD_ADAPTER, data, reply);
+    ret = AudioProxyDispatchCall(manager->remote, AUDIO_HDI_MGR_LOAD_ADAPTER, data, reply);
     if (ret < 0) {
         LOG_FUN_ERR("Failed to send service call!!");
         AudioProxyBufReplyRecycle(data, reply);
@@ -103,13 +103,14 @@ int32_t AudioProxyManagerLoadAdapter(struct AudioManager *manager, const struct 
     hwAdapter->common.SetPassthroughMode = AudioProxyAdapterSetPassthroughMode;
     hwAdapter->common.GetPassthroughMode = AudioProxyAdapterGetPassthroughMode;
     hwAdapter->adapterDescriptor = *desc;
+    hwAdapter->proxyRemoteHandle = manager->remote; // get dispatch Server
     *adapter = &hwAdapter->common;
     AudioProxyBufReplyRecycle(data, reply);
     LOG_FUN_INFO();
     return HDF_SUCCESS;
 }
 
-void AudioProxyManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter *adapter)
+void AudioProxyManagerUnloadAdapter(struct AudioProxyManager *manager, struct AudioAdapter *adapter)
 {
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
@@ -117,7 +118,7 @@ void AudioProxyManagerUnloadAdapter(struct AudioManager *manager, struct AudioAd
     int32_t i = 0;
     int32_t portNum;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
-    if (manager == NULL || adapter == NULL) {
+    if (manager == NULL || manager->remote == NULL || adapter == NULL) {
         return;
     }
     if (hwAdapter->portCapabilitys != NULL) {
@@ -133,7 +134,7 @@ void AudioProxyManagerUnloadAdapter(struct AudioManager *manager, struct AudioAd
     if (AudioProxyPreprocessSBuf(&data, &reply) == HDF_SUCCESS) {
         adapterName = hwAdapter->adapterDescriptor.adapterName;
         if (HdfSbufWriteString(data, adapterName)) {
-            int32_t ret = AudioProxyDispatchCall(AUDIO_HDI_MGR_UNLOAD_ADAPTER, data, reply);
+            int32_t ret = AudioProxyDispatchCall(manager->remote, AUDIO_HDI_MGR_UNLOAD_ADAPTER, data, reply);
             if (ret < 0) {
                 LOG_FUN_ERR("Send Server fail!");
             }
@@ -144,9 +145,36 @@ void AudioProxyManagerUnloadAdapter(struct AudioManager *manager, struct AudioAd
     return;
 }
 
-struct AudioManager *GetAudioProxyManagerFuncs(void)
+static void ProxyMgrConstruct(struct AudioProxyManager *proxyMgr)
+{
+    proxyMgr->GetAllAdapters = AudioProxyManagerGetAllAdapters;
+    proxyMgr->LoadAdapter = AudioProxyManagerLoadAdapter;
+    proxyMgr->UnloadAdapter = AudioProxyManagerUnloadAdapter;
+}
+
+struct AudioProxyManager *GetAudioProxyManagerFuncs(void)
 {
     LOG_FUN_INFO();
-    return HdfProxyIoBindServiceName(HDI_SERVER_NAME);
+    struct HDIServiceManager *serviceMgr = HDIServiceManagerGet();
+    if (serviceMgr == NULL) {
+        LOG_FUN_ERR("HDIServiceManagerGet failed!");
+        return NULL;
+    }
+    struct HdfRemoteService *remote = serviceMgr->GetService(serviceMgr, HDI_SERVER_NAME);
+    if (remote == NULL) {
+        LOG_FUN_ERR("Remote GetService failed!");
+        HDIServiceManagerRelease(serviceMgr);
+        return NULL;
+    }
+    HDIServiceManagerRelease(serviceMgr);
+    struct AudioProxyManager *proxyDevMgr = OsalMemAlloc(sizeof(struct AudioProxyManager));
+    if (proxyDevMgr == NULL) {
+        LOG_FUN_ERR("malloc failed!");
+        HdfRemoteServiceRecycle(remote);
+        return NULL;
+    }
+    ProxyMgrConstruct(proxyDevMgr);
+    proxyDevMgr->remote = remote;
+    return proxyDevMgr;
 }
 

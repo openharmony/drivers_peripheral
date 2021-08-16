@@ -11,15 +11,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/test.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+if (defined(ohos_lite)) {
+  import("//build/lite/config/test.gni")
+} else {
+  import("//build/test.gni")
+  import("//drivers/adapter/uhdf2/uhdf.gni")
+}
 
 ###########################end###########################
 group("function") {
-  testonly = true
-  deps = []
-  deps += [
-    "audio_server:AudioServerFunctionTest",
-    "audio_pathroute:AudioPathRouteTest",
-    ]
+  if (!defined(ohos_lite)) {
+    testonly = true
+  }
+  deps = [
+    "audio_server:hdf_audio_hdi_server_function_test",
+    "audio_pathroute:hdf_audio_hdi_path_route_test",
+    "audio_smartpa:hdf_audio_smartpa_test"
+  ]
 }

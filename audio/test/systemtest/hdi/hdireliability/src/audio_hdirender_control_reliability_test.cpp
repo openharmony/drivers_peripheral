@@ -22,10 +22,9 @@ using namespace testing::ext;
 using namespace HMOS::Audio;
 
 namespace {
-const string AUDIO_FILE = "//bin/audiorendertest.wav";
-const string ADAPTER_NAME = "hdmi";
-const string ADAPTER_NAME2 = "usb";
-const string ADAPTER_NAME3 = "internal";
+const string ADAPTER_NAME_HDMI = "hdmi";
+const string ADAPTER_NAME_USB = "usb";
+const string ADAPTER_NAME_INTERNAL = "internal";
 const int PTHREAD_SAMEADA_COUNT = 10;
 const int PTHREAD_DIFFADA_COUNT = 3;
 
@@ -35,73 +34,93 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct AudioManager *(*GetAudioManager)() = nullptr;
-    void *handleSo = nullptr;
-    static int32_t RelGetAllAdapter(struct RelRenderAdapterPara& ptr);
-    static int32_t RelLoadAdapter(struct RelRenderAdapterPara& ptr);
-    static int32_t RelUnloadAdapter(struct RelRenderAdapterPara& ptr);
-    static int32_t RelAudioCreateRender(struct RelRenderAdapterPara& ptr);
-    static int32_t RelAudioRenderStart(struct RelRenderAdapterPara& ptr);
-    static int32_t RelAudioRenderFrame(struct RelRenderAdapterPara& ptr);
-    static int32_t RelAudioRenderStop(struct RelRenderAdapterPara& ptr);
-    static int32_t RelAudioRenderStartAndFrame(struct RelRenderAdapterPara& ptr);
-    static int32_t RelAudioRenderProcedure(struct RelRenderAdapterPara& ptr);
-    static int32_t RelAudioRenderPause(struct RelRenderAdapterPara& ptr);
-    static int32_t RelAudioRenderResume(struct RelRenderAdapterPara& ptr);
-    static int32_t RelAudioRenderGetRenderPosition(struct RelRenderAdapterPara& ptr);
+    static TestAudioManager *(*GetAudioManager)();
+    static void *handleSo;
+#ifdef AUDIO_MPI_SO
+    static int32_t (*SdkInit)();
+    static void (*SdkExit)();
+    static void *sdkSo;
+#endif
+    static int32_t RelGetAllAdapter(struct PrepareAudioPara& ptr);
+    static int32_t RelLoadAdapter(struct PrepareAudioPara& ptr);
+    static int32_t RelUnloadAdapter(struct PrepareAudioPara& ptr);
+    static int32_t RelAudioCreateRender(struct PrepareAudioPara& ptr);
+    static int32_t RelAudioRenderStart(struct PrepareAudioPara& ptr);
+    static int32_t RelAudioRenderFrame(struct PrepareAudioPara& ptr);
+    static int32_t RelAudioRenderStop(struct PrepareAudioPara& ptr);
+    static int32_t RelAudioRenderStartAndFrame(struct PrepareAudioPara& ptr);
+    static int32_t RelAudioRenderProcedure(struct PrepareAudioPara& ptr);
+    static int32_t RelAudioRenderPause(struct PrepareAudioPara& ptr);
+    static int32_t RelAudioRenderResume(struct PrepareAudioPara& ptr);
+    static int32_t RelAudioRenderGetRenderPosition(struct PrepareAudioPara& ptr);
 };
 
 using THREAD_FUNC = void *(*)(void *);
 
-void AudioHdiRenderControlReliabilityTest::SetUpTestCase(void) {}
+TestAudioManager *(*AudioHdiRenderControlReliabilityTest::GetAudioManager)() = nullptr;
+void *AudioHdiRenderControlReliabilityTest::handleSo = nullptr;
+#ifdef AUDIO_MPI_SO
+    int32_t (*AudioHdiRenderControlReliabilityTest::SdkInit)() = nullptr;
+    void (*AudioHdiRenderControlReliabilityTest::SdkExit)() = nullptr;
+    void *AudioHdiRenderControlReliabilityTest::sdkSo = nullptr;
+#endif
 
-void AudioHdiRenderControlReliabilityTest::TearDownTestCase(void) {}
-
-void AudioHdiRenderControlReliabilityTest::SetUp(void)
+void AudioHdiRenderControlReliabilityTest::SetUpTestCase(void)
 {
-    char resolvedPath[] = "//system/lib/libaudio_hdi_proxy_server.z.so";
-    handleSo = dlopen(resolvedPath, RTLD_LAZY);
+#ifdef AUDIO_MPI_SO
+    char sdkResolvedPath[] = "//system/lib/libhdi_audio_interface_lib_render.z.so";
+    sdkSo = dlopen(sdkResolvedPath, RTLD_LAZY);
+    if (sdkSo == nullptr) {
+        return;
+    }
+    SdkInit = (int32_t (*)())(dlsym(sdkSo, "MpiSdkInit"));
+    if (SdkInit == nullptr) {
+        return;
+    }
+    SdkExit = (void (*)())(dlsym(sdkSo, "MpiSdkExit"));
+    if (SdkExit == nullptr) {
+        return;
+    }
+    SdkInit();
+#endif
+    handleSo = dlopen(RESOLVED_PATH.c_str(), RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
     }
-    GetAudioManager = (struct AudioManager* (*)())(dlsym(handleSo, "GetAudioProxyManagerFuncs"));
+    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
     if (GetAudioManager == nullptr) {
         return;
     }
 }
 
-void AudioHdiRenderControlReliabilityTest::TearDown(void)
+void AudioHdiRenderControlReliabilityTest::TearDownTestCase(void)
 {
+#ifdef AUDIO_MPI_SO
+    SdkExit();
+    if (sdkSo != nullptr) {
+        dlclose(sdkSo);
+        sdkSo = nullptr;
+    }
+    if (SdkInit != nullptr) {
+        SdkInit = nullptr;
+    }
+    if (SdkExit != nullptr) {
+        SdkExit = nullptr;
+    }
+#endif
     if (GetAudioManager != nullptr) {
         GetAudioManager = nullptr;
     }
 }
 
-struct RenderCharacteristic {
-    uint64_t getframes;
-};
+void AudioHdiRenderControlReliabilityTest::SetUp(void) {}
 
-struct RelRenderAdapterPara {
-    struct AudioManager *manager;
-    enum AudioPortDirection portType;
-    const char *adapterName;
-    struct AudioAdapter *adapter;
-    struct AudioPort renderPort;
-    void *param;
-    enum AudioPortPin pins;
-    const char *path;
-    struct AudioRender *render;
-    struct AudioHeadInfo headInfo;
-    struct AudioAdapterDescriptor *desc;
-    struct AudioAdapterDescriptor *descs;
-    struct RenderCharacteristic character;
-    struct AudioTimeStamp time = {.tvNSec = 1};
-};
+void AudioHdiRenderControlReliabilityTest::TearDown(void) {}
 
-int32_t AudioHdiRenderControlReliabilityTest::RelGetAllAdapter(struct RelRenderAdapterPara& ptr)
+int32_t AudioHdiRenderControlReliabilityTest::RelGetAllAdapter(struct PrepareAudioPara& ptr)
 {
     int size = 0;
-    auto *inst = (AudioHdiRenderControlReliabilityTest *)ptr.param;
+    auto *inst = (AudioHdiRenderControlReliabilityTest *)ptr.self;
     if (inst != nullptr && inst->GetAudioManager != nullptr) {
         ptr.manager = inst->GetAudioManager();
     }
@@ -112,7 +131,7 @@ int32_t AudioHdiRenderControlReliabilityTest::RelGetAllAdapter(struct RelRenderA
     if (ptr.descs == nullptr || size == 0) {
         return HDF_FAILURE;
     } else {
-        int index = SwitchAdapter(ptr.descs, ptr.adapterName, ptr.portType, ptr.renderPort, size);
+        int index = SwitchAdapter(ptr.descs, ptr.adapterName, ptr.portType, ptr.audioPort, size);
         if (index < 0) {
             return HDF_FAILURE;
         } else {
@@ -125,7 +144,7 @@ int32_t AudioHdiRenderControlReliabilityTest::RelGetAllAdapter(struct RelRenderA
     return HDF_SUCCESS;
 }
 
-int32_t AudioHdiRenderControlReliabilityTest::RelLoadAdapter(struct RelRenderAdapterPara& ptr)
+int32_t AudioHdiRenderControlReliabilityTest::RelLoadAdapter(struct PrepareAudioPara& ptr)
 {
     ptr.manager->LoadAdapter(ptr.manager, ptr.desc, &ptr.adapter);
 
@@ -135,7 +154,7 @@ int32_t AudioHdiRenderControlReliabilityTest::RelLoadAdapter(struct RelRenderAda
     return HDF_SUCCESS;
 }
 
-int32_t AudioHdiRenderControlReliabilityTest::RelAudioCreateRender(struct RelRenderAdapterPara& ptr)
+int32_t AudioHdiRenderControlReliabilityTest::RelAudioCreateRender(struct PrepareAudioPara& ptr)
 {
     int32_t ret = -1;
     struct AudioSampleAttributes attrs = {};
@@ -144,7 +163,7 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioCreateRender(struct RelRen
         return HDF_FAILURE;
     }
     InitAttrs(attrs);
-    InitDevDesc(devDesc, (&ptr.renderPort)->portId, ptr.pins);
+    InitDevDesc(devDesc, (&ptr.audioPort)->portId, ptr.pins);
     ret = ptr.adapter->CreateRender(ptr.adapter, &devDesc, &attrs, &ptr.render);
     if (ret < 0 || ptr.render == nullptr) {
         ptr.manager->UnloadAdapter(ptr.manager, ptr.adapter);
@@ -153,7 +172,7 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioCreateRender(struct RelRen
     return HDF_SUCCESS;
 }
 
-int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderStartAndFrame(struct RelRenderAdapterPara& ptr)
+int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderStartAndFrame(struct PrepareAudioPara& ptr)
 {
     int32_t ret = -1;
     struct AudioSampleAttributes attrs = {};
@@ -165,11 +184,10 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderStartAndFrame(struct
     if (file == nullptr) {
         return HDF_FAILURE;
     }
-    ret = InitAttrs(attrs);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
+    InitAttrs(attrs);
+
     if (HMOS::Audio::WavHeadAnalysis(ptr.headInfo, file, attrs) < 0) {
+        fclose(file);
         return HDF_FAILURE;
     } else {
         ret = HMOS::Audio::FrameStart(ptr.headInfo, ptr.render, file, attrs);
@@ -184,8 +202,11 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderStartAndFrame(struct
     return HDF_SUCCESS;
 }
 
-int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderStart(struct RelRenderAdapterPara& ptr)
+int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderStart(struct PrepareAudioPara& ptr)
 {
+    if (ptr.render == nullptr) {
+        return HDF_FAILURE;
+    }
     int32_t ret = -1;
     ret = ptr.render->control.Start((AudioHandle)(ptr.render));
     if (ret < 0) {
@@ -194,7 +215,7 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderStart(struct RelRend
     return HDF_SUCCESS;
 }
 
-int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderFrame(struct RelRenderAdapterPara& ptr)
+int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderFrame(struct PrepareAudioPara& ptr)
 {
     int32_t ret = -1;
     uint64_t requestBytes = 0;
@@ -220,8 +241,11 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderFrame(struct RelRend
     return HDF_SUCCESS;
 }
 
-int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderStop(struct RelRenderAdapterPara& ptr)
+int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderStop(struct PrepareAudioPara& ptr)
 {
+    if (ptr.render == nullptr) {
+        return HDF_FAILURE;
+    }
     int32_t ret = -1;
     ret = ptr.render->control.Stop((AudioHandle)(ptr.render));
     if (ret < 0) {
@@ -230,8 +254,11 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderStop(struct RelRende
     return HDF_SUCCESS;
 }
 
-int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderPause(struct RelRenderAdapterPara& ptr)
+int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderPause(struct PrepareAudioPara& ptr)
 {
+    if (ptr.render == nullptr) {
+        return HDF_FAILURE;
+    }
     int32_t ret = -1;
     ret = ptr.render->control.Pause((AudioHandle)(ptr.render));
     if (ret < 0) {
@@ -240,8 +267,11 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderPause(struct RelRend
     return HDF_SUCCESS;
 }
 
-int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderResume(struct RelRenderAdapterPara& ptr)
+int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderResume(struct PrepareAudioPara& ptr)
 {
+    if (ptr.render == nullptr) {
+        return HDF_FAILURE;
+    }
     int32_t ret = -1;
     ret = ptr.render->control.Resume((AudioHandle)(ptr.render));
     if (ret < 0) {
@@ -250,7 +280,7 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderResume(struct RelRen
     return HDF_SUCCESS;
 }
 
-int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderProcedure(struct RelRenderAdapterPara& ptr)
+int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderProcedure(struct PrepareAudioPara& ptr)
 {
     int32_t ret = -1;
     ret = RelGetAllAdapter(ptr);
@@ -270,13 +300,18 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderProcedure(struct Rel
 
     ret = RelAudioRenderStartAndFrame(ptr);
     if (ret < 0) {
+        ptr.adapter->DestroyRender(ptr.adapter, ptr.render);
+        ptr.manager->UnloadAdapter(ptr.manager, ptr.adapter);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
 
-int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderGetRenderPosition(struct RelRenderAdapterPara& ptr)
+int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderGetRenderPosition(struct PrepareAudioPara& ptr)
 {
+    if (ptr.render == nullptr) {
+        return HDF_FAILURE;
+    }
     int32_t ret = -1;
     ret = ptr.render->GetRenderPosition(ptr.render, &(ptr.character.getframes), &(ptr.time));
     if (ret < 0) {
@@ -294,15 +329,15 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderGetRenderPosition(st
 HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioGetAllAdapter_Reliability_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct RelRenderAdapterPara para = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+    struct PrepareAudioPara para = {
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
-    struct RelRenderAdapterPara arrpara[PTHREAD_SAMEADA_COUNT];
+    struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
-        ret = memcpy_s(&arrpara[i], sizeof(RelRenderAdapterPara), &para, sizeof(RelRenderAdapterPara));
+        ret = memcpy_s(&arrpara[i], sizeof(PrepareAudioPara), &para, sizeof(PrepareAudioPara));
         EXPECT_EQ(HDF_SUCCESS, ret);
         int32_t ret = pthread_create(&tids[i], NULL, (THREAD_FUNC)RelGetAllAdapter, &arrpara[i]);
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -323,15 +358,15 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioGetAllAdapter_
 HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioLoadlAdapter_Reliability_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct RelRenderAdapterPara para[PTHREAD_DIFFADA_COUNT] = {
+    struct PrepareAudioPara para[PTHREAD_DIFFADA_COUNT] = {
         {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME2.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME3.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }
     };
@@ -363,15 +398,15 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioLoadlAdapter_R
     int32_t ret = -1;
     int32_t failcount = 0;
     int32_t succeedcount = 0;
-    struct RelRenderAdapterPara para[PTHREAD_DIFFADA_COUNT] = {
+    struct PrepareAudioPara para[PTHREAD_DIFFADA_COUNT] = {
         {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME2.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME3.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }
     };
@@ -411,11 +446,11 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderStart_Re
     int32_t ret = -1;
     int32_t failcount = 0;
     int32_t succeedcount = 0;
-    struct RelRenderAdapterPara para = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME2.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+    struct PrepareAudioPara para = {
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
-    struct RelRenderAdapterPara arrpara[PTHREAD_SAMEADA_COUNT];
+    struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
 
     ret = RelGetAllAdapter(para);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -426,7 +461,7 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderStart_Re
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
-        ret = memcpy_s(&arrpara[i], sizeof(RelRenderAdapterPara), &para, sizeof(RelRenderAdapterPara));
+        ret = memcpy_s(&arrpara[i], sizeof(PrepareAudioPara), &para, sizeof(PrepareAudioPara));
         EXPECT_EQ(HDF_SUCCESS, ret);
         ret = pthread_create(&tids[i], NULL, (THREAD_FUNC)RelAudioRenderStart, &arrpara[i]);
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -444,10 +479,8 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderStart_Re
             failcount = failcount + 1;
         }
     }
-    ret = para.render->control.Stop((AudioHandle)(para.render));
+    ret = StopAudio(para);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    para.adapter->DestroyRender(para.adapter, para.render);
-    para.manager->UnloadAdapter(para.manager, para.adapter);
     EXPECT_EQ(failcount, PTHREAD_SAMEADA_COUNT - 1);
     EXPECT_EQ(succeedcount, 1);
 }
@@ -461,15 +494,15 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderStart_Re
 HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderStart_Reliability_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct RelRenderAdapterPara para[PTHREAD_DIFFADA_COUNT] = {
+    struct PrepareAudioPara para[PTHREAD_DIFFADA_COUNT] = {
         {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME2.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME3.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }
     };
@@ -485,14 +518,9 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderStart_Re
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
     for (int32_t i = 0; i < PTHREAD_DIFFADA_COUNT; ++i) {
-        void *result = nullptr;
-        pthread_join(tids[i], &result);
-        ret = (intptr_t)result;
+        para[i].tids = tids[i];
+        ret = ThreadRelease(para[i]);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        ret = para[i].render->control.Stop((AudioHandle)(para[i].render));
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        para[i].adapter->DestroyRender(para[i].adapter, para[i].render);
-        para[i].manager->UnloadAdapter(para[i].manager, para[i].adapter);
     }
 }
 
@@ -505,15 +533,15 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderStart_Re
 HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderFrame_Reliability_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct RelRenderAdapterPara para[PTHREAD_DIFFADA_COUNT] = {
+    struct PrepareAudioPara para[PTHREAD_DIFFADA_COUNT] = {
         {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME2.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME3.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }
     };
@@ -532,14 +560,9 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderFrame_Re
         usleep(50000);
     }
     for (int32_t i = 0; i < PTHREAD_DIFFADA_COUNT; ++i) {
-        void *result = nullptr;
-        pthread_join(tids[i], &result);
-        ret = (intptr_t)result;
+        para[i].tids = tids[i];
+        ret = ThreadRelease(para[i]);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        ret = para[i].render->control.Stop((AudioHandle)(para[i].render));
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        para[i].adapter->DestroyRender(para[i].adapter, para[i].render);
-        para[i].manager->UnloadAdapter(para[i].manager, para[i].adapter);
     }
 }
 
@@ -554,17 +577,17 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderStop_Rel
     int32_t ret = -1;
     int32_t failcount = 0;
     int32_t succeedcount = 0;
-    struct RelRenderAdapterPara para = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME2.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+    struct PrepareAudioPara para = {
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
-    struct RelRenderAdapterPara arrpara[PTHREAD_SAMEADA_COUNT];
+    struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
 
     ret = RelAudioRenderProcedure(para);
     ASSERT_EQ(HDF_SUCCESS, ret);
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
-        ret = memcpy_s(&arrpara[i], sizeof(RelRenderAdapterPara), &para, sizeof(RelRenderAdapterPara));
+        ret = memcpy_s(&arrpara[i], sizeof(PrepareAudioPara), &para, sizeof(PrepareAudioPara));
         EXPECT_EQ(HDF_SUCCESS, ret);
         int32_t ret = pthread_create(&tids[i], NULL, (THREAD_FUNC)RelAudioRenderStop, &arrpara[i]);
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -598,15 +621,15 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderStop_Rel
 HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderStop_Reliability_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct RelRenderAdapterPara para[PTHREAD_DIFFADA_COUNT] = {
+    struct PrepareAudioPara para[PTHREAD_DIFFADA_COUNT] = {
         {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME2.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME3.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }
     };
@@ -638,18 +661,18 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderPause_Re
     int32_t ret = -1;
     int32_t failcount = 0;
     int32_t succeedcount = 0;
-    struct RelRenderAdapterPara para = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+    struct PrepareAudioPara para = {
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
-    struct RelRenderAdapterPara arrpara[PTHREAD_SAMEADA_COUNT];
+    struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
 
     ret = RelAudioRenderProcedure(para);
     ASSERT_EQ(HDF_SUCCESS, ret);
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
-        ret = memcpy_s(&arrpara[i], sizeof(RelRenderAdapterPara), &para, sizeof(RelRenderAdapterPara));
+        ret = memcpy_s(&arrpara[i], sizeof(PrepareAudioPara), &para, sizeof(PrepareAudioPara));
         EXPECT_EQ(HDF_SUCCESS, ret);
         int32_t ret = pthread_create(&tids[i], NULL, (THREAD_FUNC)RelAudioRenderPause, &arrpara[i]);
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -668,9 +691,8 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderPause_Re
             failcount = failcount + 1;
         }
     }
-    para.render->control.Stop((AudioHandle)(para.render));
-    para.adapter->DestroyRender(para.adapter, para.render);
-    para.manager->UnloadAdapter(para.manager, para.adapter);
+    ret = StopAudio(para);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_EQ(failcount, PTHREAD_SAMEADA_COUNT - 1);
     EXPECT_EQ(succeedcount, 1);
 }
@@ -684,15 +706,15 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderPause_Re
 HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderPause_Reliability_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct RelRenderAdapterPara para[PTHREAD_DIFFADA_COUNT] = {
+    struct PrepareAudioPara para[PTHREAD_DIFFADA_COUNT] = {
         {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME2.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME3.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }
     };
@@ -704,14 +726,9 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderPause_Re
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
     for (int32_t i = 0; i < PTHREAD_DIFFADA_COUNT; ++i) {
-        void *result = nullptr;
-        pthread_join(tids[i], &result);
-        EXPECT_EQ(HDF_SUCCESS, (intptr_t)result);
-
-        ret = para[i].render->control.Stop((AudioHandle)(para[i].render));
+        para[i].tids = tids[i];
+        ret = ThreadRelease(para[i]);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        para[i].adapter->DestroyRender(para[i].adapter, para[i].render);
-        para[i].manager->UnloadAdapter(para[i].manager, para[i].adapter);
     }
 }
 
@@ -726,11 +743,11 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderResume_R
     int32_t ret = -1;
     int32_t failcount = 0;
     int32_t succeedcount = 0;
-    struct RelRenderAdapterPara para = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+    struct PrepareAudioPara para = {
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
-    struct RelRenderAdapterPara arrpara[PTHREAD_SAMEADA_COUNT];
+    struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
 
     ret = RelAudioRenderProcedure(para);
     ASSERT_EQ(HDF_SUCCESS, ret);
@@ -739,7 +756,7 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderResume_R
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
-        ret = memcpy_s(&arrpara[i], sizeof(RelRenderAdapterPara), &para, sizeof(RelRenderAdapterPara));
+        ret = memcpy_s(&arrpara[i], sizeof(PrepareAudioPara), &para, sizeof(PrepareAudioPara));
         EXPECT_EQ(HDF_SUCCESS, ret);
         int32_t ret = pthread_create(&tids[i], NULL, (THREAD_FUNC)RelAudioRenderResume, &arrpara[i]);
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -758,9 +775,8 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderResume_R
             failcount = failcount + 1;
         }
     }
-    para.render->control.Stop((AudioHandle)(para.render));
-    para.adapter->DestroyRender(para.adapter, para.render);
-    para.manager->UnloadAdapter(para.manager, para.adapter);
+    ret = StopAudio(para);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
 * @tc.name  test AudioRenderResume API via Multithread call.
@@ -771,15 +787,15 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderResume_R
 HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderResume_Reliability_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct RelRenderAdapterPara para[PTHREAD_DIFFADA_COUNT] = {
+    struct PrepareAudioPara para[PTHREAD_DIFFADA_COUNT] = {
         {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME2.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME3.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }
     };
@@ -793,14 +809,9 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderResume_R
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
     for (int32_t i = 0; i < PTHREAD_DIFFADA_COUNT; ++i) {
-        void *result = nullptr;
-        pthread_join(tids[i], &result);
-        EXPECT_EQ(HDF_SUCCESS, (intptr_t)result);
-
-        ret = para[i].render->control.Stop((AudioHandle)(para[i].render));
+        para[i].tids = tids[i];
+        ret = ThreadRelease(para[i]);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        para[i].adapter->DestroyRender(para[i].adapter, para[i].render);
-        para[i].manager->UnloadAdapter(para[i].manager, para[i].adapter);
     }
 }
 
@@ -815,18 +826,18 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderGetRende
 {
     int32_t ret = -1;
     int64_t timeExp = 0;
-    struct RelRenderAdapterPara para = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+    struct PrepareAudioPara para = {
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
-    struct RelRenderAdapterPara arrpara[PTHREAD_SAMEADA_COUNT];
+    struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
 
     ret = RelAudioRenderProcedure(para);
     ASSERT_EQ(HDF_SUCCESS, ret);
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
-        ret = memcpy_s(&arrpara[i], sizeof(RelRenderAdapterPara), &para, sizeof(RelRenderAdapterPara));
+        ret = memcpy_s(&arrpara[i], sizeof(PrepareAudioPara), &para, sizeof(PrepareAudioPara));
         EXPECT_EQ(HDF_SUCCESS, ret);
         int32_t ret = pthread_create(&tids[i], NULL, (THREAD_FUNC)RelAudioRenderGetRenderPosition, &arrpara[i]);
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -839,10 +850,8 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderGetRende
         EXPECT_LT(INITIAL_VALUE, arrpara[i].character.getframes);
         EXPECT_LT(timeExp, arrpara[i].time.tvNSec);
     }
-    ret = para.render->control.Stop((AudioHandle)(para.render));
+    ret = StopAudio(para);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    para.adapter->DestroyRender(para.adapter, para.render);
-    para.manager->UnloadAdapter(para.manager, para.adapter);
 }
 
 /**
@@ -856,15 +865,15 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderGetRende
 {
     int32_t ret = -1;
     int64_t timeExp = 0;
-    struct RelRenderAdapterPara para[PTHREAD_DIFFADA_COUNT] = {
+    struct PrepareAudioPara para[PTHREAD_DIFFADA_COUNT] = {
         {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME2.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }, {
-            .portType = PORT_OUT, .adapterName = ADAPTER_NAME3.c_str(), .param = this, .pins = PIN_OUT_SPEAKER,
+            .portType = PORT_OUT, .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
             .path = AUDIO_FILE.c_str()
         }
     };
@@ -877,16 +886,11 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderGetRende
     }
 
     for (int32_t i = 0; i < PTHREAD_DIFFADA_COUNT; ++i) {
-        void *result = nullptr;
-        pthread_join(tids[i], &result);
-        EXPECT_EQ(HDF_SUCCESS, (intptr_t)result);
+        para[i].tids = tids[i];
+        ret = ThreadRelease(para[i]);
+        EXPECT_EQ(HDF_SUCCESS, ret);
         EXPECT_LT(INITIAL_VALUE, para[i].character.getframes);
         EXPECT_LT(timeExp, para[i].time.tvNSec);
-
-        ret = para[i].render->control.Stop((AudioHandle)(para[i].render));
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        para[i].adapter->DestroyRender(para[i].adapter, para[i].render);
-        para[i].manager->UnloadAdapter(para[i].manager, para[i].adapter);
     }
 }
 }

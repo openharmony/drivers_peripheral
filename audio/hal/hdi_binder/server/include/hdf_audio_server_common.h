@@ -16,12 +16,12 @@
 #ifndef HDF_AUDIO_SERVER_COMMON_H
 #define HDF_AUDIO_SERVER_COMMON_H
 
-#include "audio_manager.h"
-#include "audio_types.h"
+#include "hdf_device_desc.h"
+#include "hdf_log.h"
 #include "audio_internal.h"
-#include "hdf_audio_server.h"
 
-#define MAX_AUDIO_ADAPTER_NUM_SERVER  3
+#define MAX_AUDIO_ADAPTER_NUM_SERVER    8   // Limit the number of sound cards supported to a maximum of 8
+#define STR_MAX 512
 
 /* RenderManage Info */
 struct AudioInfoInAdapter {
@@ -79,6 +79,13 @@ int32_t ReadAudioSapmleAttrbutes(struct HdfSBuf *data, struct AudioSampleAttribu
 int32_t WriteAudioSampleAttributes(struct HdfSBuf *reply, const struct AudioSampleAttributes *attrs);
 void AudioSetCaptureStatus(const char *adapterName, bool captureStatus);
 int32_t AudioGetCaptureStatus(const char *adapterName);
+int32_t ServerManageGetAdapterNum(void);
+struct AudioInfoInAdapter *ServerManageGetAdapters(void);
+void AdaptersServerManageRelease(struct AudioInfoInAdapter *adaptersManage, int32_t num);
+void AdaptersServerManageInfomationRecycle(void);
+int32_t AdaptersServerManageInit(struct AudioAdapterDescriptor *descs, int32_t num);
+int32_t HdiServicePositionWrite(struct HdfSBuf *reply,
+    uint64_t frames, struct AudioTimeStamp time);
 
 #endif
 
