@@ -202,7 +202,7 @@ void Test::StartStream(std::vector<Camera::StreamIntent> intents)
         } else if (intent == 1) {
             streamInfo_video->streamId_ = streamId_video;
             streamInfo_video->width_ = 1280;
-            streamInfo_video->height_ = 720;
+            streamInfo_video->height_ = 960;
             streamInfo_video->format_ = PIXEL_FMT_YCRCB_420_SP;
             streamInfo_video->datasapce_ = 8;
             streamInfo_video->intent_ = intent;
@@ -220,7 +220,7 @@ void Test::StartStream(std::vector<Camera::StreamIntent> intents)
         } else {
             streamInfo_capture->streamId_ = streamId_capture;
             streamInfo_capture->width_ = 1280;
-            streamInfo_capture->height_ = 720;
+            streamInfo_capture->height_ = 960;
             streamInfo_capture->format_ = PIXEL_FMT_YCRCB_420_SP;
             streamInfo_capture->datasapce_ = 8;
             streamInfo_capture->intent_ = intent;

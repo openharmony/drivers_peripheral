@@ -53,7 +53,6 @@ ohos_unittest("hdi_impl_unittest") {
     "unittest/utest_camera_device_impl.cpp",
     "unittest/utest_camera_hdi_base.cpp",
     "unittest/utest_camera_host_impl.cpp",
-    "unittest/utest_offline_stream_operator.cpp",
     "unittest/utest_stream_operator_impl.cpp",
   ]
 

@@ -33,7 +33,7 @@ RetCode OfflinePipelineManager::SwitchToOfflinePipeline(int32_t streamId,
                                                         const std::shared_ptr<IStreamPipelineCore>& pipeline,
                                                         std::function<void(std::shared_ptr<IBuffer>&)> callback)
 {
-    auto op = GetOfflinePipeline(streamType, pipeline);
+    auto op = GetOfflinePipeline(streamId, pipeline);
     if (op == nullptr) {
         CAMERA_LOGW("can't get offlinepipeline, abort switch.");
         return RC_ERROR;
@@ -99,13 +99,13 @@ RetCode OfflinePipelineManager::DestoryOfflinePipelines()
 }
 
 std::shared_ptr<OfflinePipeline>
-    OfflinePipelineManager::GetOfflinePipeline(int32_t streamType, const std::shared_ptr<IStreamPipelineCore>& pipeline)
+    OfflinePipelineManager::GetOfflinePipeline(int32_t streamId, const std::shared_ptr<IStreamPipelineCore>& pipeline)
 {
     if (pipeline == nullptr) {
         CAMERA_LOGE("online pipeline is nullptr.");
         return nullptr;
     }
-    return pipeline->GetOfflinePipeline(streamType);
+    return pipeline->GetOfflinePipeline(streamId);
 }
 
 std::shared_ptr<OfflinePipeline> OfflinePipelineManager::FindOfflinePipeline(int32_t id)
