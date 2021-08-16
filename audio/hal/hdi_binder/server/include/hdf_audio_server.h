@@ -15,16 +15,7 @@
 #ifndef HDF_AUDIO_SERVER_H
 #define HDF_AUDIO_SERVER_H
 
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-#include "hdf_log.h"
-#include "hdf_base.h"
 #include "hdf_device_desc.h"
-#include "hdf_remote_service.h"
-#include "audio_internal.h"
-#include "hdf_audio_server_render.h"
-#include "hdf_audio_server_capture.h"
 
 enum AudioHdiServerCmdId {
     /*************public*************/
@@ -66,6 +57,14 @@ enum AudioHdiServerCmdId {
     AUDIO_HDI_RENDER_SET_SPEED,
     AUDIO_HDI_RENDER_SET_CHANNEL_MODE,
     AUDIO_HDI_RENDER_GET_CHANNEL_MODE,
+    AUDIO_HDI_RENDER_SET_EXTRA_PARAMS,
+    AUDIO_HDI_RENDER_GET_EXTRA_PARAMS,
+    AUDIO_HDI_RENDER_REQ_MMAP_BUFFER,
+    AUDIO_HDI_RENDER_GET_MMAP_POSITION,
+    AUDIO_HDI_RENDER_TURN_STAND_BY_MODE,
+    AUDIO_HDI_RENDER_DEV_DUMP,
+    AUDIO_HDI_RENDER_REG_CALLBACK,
+    AUDIO_HDI_RENDER_DRAIN_BUFFER,
     /***********capture*************/
     AUDIO_HDI_CAPTURE_CREATE_CAPTURE,
     AUDIO_HDI_CAPTURE_DESTROY,
@@ -89,7 +88,13 @@ enum AudioHdiServerCmdId {
     AUDIO_HDI_CAPTURE_GET_GAIN,
     AUDIO_HDI_CAPTURE_SET_GAIN,
     AUDIO_HDI_CAPTURE_CAPTURE_FRAME,
-    AUDIO_HDI_CAPTURE_GET_CAPTURE_POSITION
+    AUDIO_HDI_CAPTURE_GET_CAPTURE_POSITION,
+    AUDIO_HDI_CAPTURE_SET_EXTRA_PARAMS,
+    AUDIO_HDI_CAPTURE_GET_EXTRA_PARAMS,
+    AUDIO_HDI_CAPTURE_REQ_MMAP_BUFFER,
+    AUDIO_HDI_CAPTURE_GET_MMAP_POSITION,
+    AUDIO_HDI_CAPTURE_TURN_STAND_BY_MODE,
+    AUDIO_HDI_CAPTURE_DEV_DUMP
 };
 
 typedef int32_t (*AudioAllfunc)(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply);

@@ -41,10 +41,9 @@ using namespace testing::ext;
 using namespace HMOS::Audio;
 
 namespace {
-const string ADAPTER_NAME = "hdmi";
-const string ADAPTER_NAME2 = "usb";
-const string ADAPTER_NAME3 = "internal";
-const int AUDIO_ADAPTER_MAX_NUM = 3;
+const string ADAPTER_NAME_USB = "usb";
+const string ADAPTER_NAME_INTERNAL = "internal";
+
 
 class AudioHdiAdapterTest : public testing::Test {
 public:
@@ -52,68 +51,74 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct AudioManager *(*GetAudioManager)() = nullptr;
-    void *handleSo = nullptr;
-    int32_t GetLoadAdapter(struct AudioManager manager, enum AudioPortDirection portType,
-                           const string adapterName, struct AudioAdapter **adapter, struct AudioPort& renderPort) const;
+    static TestAudioManager *(*GetAudioManager)();
+    static void *handleSo;
+#ifdef AUDIO_MPI_SO
+    static int32_t (*SdkInit)();
+    static void (*SdkExit)();
+    static void *sdkSo;
+#endif
 };
 
-void AudioHdiAdapterTest::SetUpTestCase(void) {}
+TestAudioManager *(*AudioHdiAdapterTest::GetAudioManager)() = nullptr;
+void *AudioHdiAdapterTest::handleSo = nullptr;
+#ifdef AUDIO_MPI_SO
+    int32_t (*AudioHdiAdapterTest::SdkInit)() = nullptr;
+    void (*AudioHdiAdapterTest::SdkExit)() = nullptr;
+    void *AudioHdiAdapterTest::sdkSo = nullptr;
+#endif
 
-void AudioHdiAdapterTest::TearDownTestCase(void) {}
-
-void AudioHdiAdapterTest::SetUp(void)
+void AudioHdiAdapterTest::SetUpTestCase(void)
 {
-    char resolvedPath[] = "//system/lib/libaudio_hdi_proxy_server.z.so";
-    handleSo = dlopen(resolvedPath, RTLD_LAZY);
+#ifdef AUDIO_MPI_SO
+    char sdkResolvedPath[] = "//system/lib/libhdi_audio_interface_lib_render.z.so";
+    sdkSo = dlopen(sdkResolvedPath, RTLD_LAZY);
+    if (sdkSo == nullptr) {
+        return;
+    }
+    SdkInit = (int32_t (*)())(dlsym(sdkSo, "MpiSdkInit"));
+    if (SdkInit == nullptr) {
+        return;
+    }
+    SdkExit = (void (*)())(dlsym(sdkSo, "MpiSdkExit"));
+    if (SdkExit == nullptr) {
+        return;
+    }
+    SdkInit();
+#endif
+    handleSo = dlopen(RESOLVED_PATH.c_str(), RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
     }
-    GetAudioManager = (struct AudioManager *(*)())(dlsym(handleSo, "GetAudioProxyManagerFuncs"));
+    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
     if (GetAudioManager == nullptr) {
         return;
     }
 }
 
-void AudioHdiAdapterTest::TearDown(void)
+void AudioHdiAdapterTest::TearDownTestCase(void)
 {
-    // step 2: input testsuit teardown step
+#ifdef AUDIO_MPI_SO
+    SdkExit();
+    if (sdkSo != nullptr) {
+        dlclose(sdkSo);
+        sdkSo = nullptr;
+    }
+    if (SdkInit != nullptr) {
+        SdkInit = nullptr;
+    }
+    if (SdkExit != nullptr) {
+        SdkExit = nullptr;
+    }
+#endif
     if (GetAudioManager != nullptr) {
         GetAudioManager = nullptr;
     }
 }
 
-int32_t AudioHdiAdapterTest::GetLoadAdapter(struct AudioManager manager, enum AudioPortDirection portType,
-    const string adapterName, struct AudioAdapter **adapter, struct AudioPort& audioPort) const
-{
-    int32_t ret = -1;
-    int size = 0;
-    struct AudioAdapterDescriptor *desc = nullptr;
-    struct AudioAdapterDescriptor *descs = nullptr;
-    if (adapter == nullptr) {
-        return HDF_FAILURE;
-    }
-    ret = manager.GetAllAdapters(&manager, &descs, &size);
-    if (ret < 0 || descs == nullptr || size == 0) {
-        return HDF_FAILURE;
-    } else {
-        int index = SwitchAdapter(descs, adapterName, portType, audioPort, size);
-        if (index < 0) {
-            return HDF_FAILURE;
-        } else {
-            desc = &descs[index];
-        }
-    }
-    if (desc == nullptr) {
-        return HDF_FAILURE;
-    } else {
-        ret = manager.LoadAdapter(&manager, desc, adapter);
-    }
-    if (ret < 0 || adapter == nullptr) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
+void AudioHdiAdapterTest::SetUp(void) {}
+
+void AudioHdiAdapterTest::TearDown(void) {}
 
 /**
 * @tc.name  Test GetAllAdapters API via legal input
@@ -128,7 +133,7 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_GetAllAdapters_0001, TestSize.Level1
     struct AudioAdapterDescriptor *descs = nullptr;
 
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager *manager = GetAudioManager();
+    TestAudioManager *manager = GetAudioManager();
     ASSERT_NE(nullptr, manager);
     ret = manager->GetAllAdapters(manager, &descs, &size);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -146,10 +151,10 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_GetAllAdapters_0002, TestSize.Level1
     int32_t ret = -1;
     int size = 0;
     struct AudioAdapterDescriptor *descs = nullptr;
-    struct AudioManager *manager1 = nullptr;
+    TestAudioManager *manager1 = nullptr;
 
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager *manager = GetAudioManager();
+    TestAudioManager *manager = GetAudioManager();
     ASSERT_NE(nullptr, manager);
     ret = manager->GetAllAdapters(manager1, &descs, &size);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -168,7 +173,7 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_GetAllAdapters_0003, TestSize.Level1
     struct AudioAdapterDescriptor **descs = nullptr;
 
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager *manager = GetAudioManager();
+    TestAudioManager *manager = GetAudioManager();
     ASSERT_NE(nullptr, manager);
     ret = manager->GetAllAdapters(manager, descs, &size);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -187,7 +192,7 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_GetAllAdapters_0004, TestSize.Level1
     struct AudioAdapterDescriptor *descs = nullptr;
 
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager *manager = GetAudioManager();
+    TestAudioManager *manager = GetAudioManager();
     ASSERT_NE(nullptr, manager);
     ret = manager->GetAllAdapters(manager, &descs, size);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -206,16 +211,13 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0001, TestSize.Level1)
     struct AudioAdapterDescriptor *descs = nullptr;
 
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager *manager = GetAudioManager();
-    ASSERT_NE(nullptr, manager);
-    ret = manager->GetAllAdapters(manager, &descs, &size);
+    TestAudioManager manager = *GetAudioManager();
+    ret = GetAdapters(manager, &descs, size);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ASSERT_NE(nullptr, descs);
-    ASSERT_EQ(AUDIO_ADAPTER_MAX_NUM, size);
     struct AudioAdapterDescriptor *desc = &descs[0];
-    struct AudioAdapter *adapter = nullptr;
     ASSERT_TRUE(desc != nullptr);
-    ret = manager->LoadAdapter(manager, desc, &adapter);
+    struct AudioAdapter *adapter = nullptr;
+    ret = manager.LoadAdapter(&manager, desc, &adapter);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = -1;
     if (adapter != nullptr) {
@@ -227,7 +229,7 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0001, TestSize.Level1)
         }
     }
     EXPECT_EQ(HDF_SUCCESS, ret);
-    manager->UnloadAdapter(manager, adapter);
+    manager.UnloadAdapter(&manager, adapter);
 }
 
 /**
@@ -243,21 +245,19 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0002, TestSize.Level1)
     struct AudioAdapterDescriptor *descs = nullptr;
 
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager *manager = GetAudioManager();
-    ASSERT_NE(nullptr, manager);
-    ret = manager->GetAllAdapters(manager, &descs, &size);
+    TestAudioManager manager = *GetAudioManager();
+    ret = GetAdapters(manager, &descs, size);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ASSERT_NE(nullptr, descs);
-    ASSERT_EQ(AUDIO_ADAPTER_MAX_NUM, size);
     struct AudioAdapterDescriptor *desc = &descs[0];
     desc->adapterName = "illegal";
-    struct AudioAdapter *adapter = nullptr;
     ASSERT_TRUE(desc != nullptr);
-    ret = manager->LoadAdapter(manager, desc, &adapter);
+    struct AudioAdapter *adapter = nullptr;
+
+    ret = manager.LoadAdapter(&manager, desc, &adapter);
     EXPECT_EQ(HDF_FAILURE, ret);
     desc->adapterName = "internal";
-    ret = manager->LoadAdapter(manager, desc, &adapter);
-    manager->UnloadAdapter(manager, adapter);
+    ret = manager.LoadAdapter(&manager, desc, &adapter);
+    manager.UnloadAdapter(&manager, adapter);
 }
 
 /**
@@ -277,7 +277,7 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0003, TestSize.Level1)
     };
 
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager *manager = GetAudioManager();
+    TestAudioManager *manager = GetAudioManager();
     ASSERT_NE(nullptr, manager);
     ret = manager->LoadAdapter(manager, &desc, &adapter);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -295,21 +295,19 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0004, TestSize.Level1)
     int32_t ret = -1;
     int size = 0;
     struct AudioAdapterDescriptor *descs = nullptr;
-    struct AudioManager *manager1 = nullptr;
+    TestAudioManager *managerNull = nullptr;
 
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager *manager = GetAudioManager();
-    ASSERT_NE(nullptr, manager);
-    ret = manager->GetAllAdapters(manager, &descs, &size);
+    TestAudioManager manager = *GetAudioManager();
+    ret = GetAdapters(manager, &descs, size);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ASSERT_NE(nullptr, descs);
-    ASSERT_EQ(AUDIO_ADAPTER_MAX_NUM, size);
     struct AudioAdapterDescriptor *desc = &descs[0];
-    struct AudioAdapter *adapter = nullptr;
     ASSERT_TRUE(desc != nullptr);
-    ret = manager->LoadAdapter(manager1, desc, &adapter);
+    struct AudioAdapter *adapter = nullptr;
+
+    ret = manager.LoadAdapter(managerNull, desc, &adapter);
     ASSERT_EQ(HDF_FAILURE, ret);
-    manager->UnloadAdapter(manager, adapter);
+    manager.UnloadAdapter(&manager, adapter);
 }
 
 /**
@@ -325,7 +323,7 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0005, TestSize.Level1)
     struct AudioAdapter *adapter = nullptr;
 
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager *manager = GetAudioManager();
+    TestAudioManager *manager = GetAudioManager();
     ASSERT_NE(nullptr, manager);
     ret = manager->LoadAdapter(manager, desc, &adapter);
     ASSERT_EQ(HDF_FAILURE, ret);
@@ -343,18 +341,16 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0006, TestSize.Level1)
     int32_t ret = -1;
     int size = 0;
     struct AudioAdapterDescriptor *descs = nullptr;
+    struct AudioAdapter **adapter = nullptr;
 
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager *manager = GetAudioManager();
-    ASSERT_NE(nullptr, manager);
-    ret = manager->GetAllAdapters(manager, &descs, &size);
+    TestAudioManager manager = *GetAudioManager();
+    ret = GetAdapters(manager, &descs, size);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ASSERT_NE(nullptr, descs);
-    ASSERT_EQ(AUDIO_ADAPTER_MAX_NUM, size);
     struct AudioAdapterDescriptor *desc = &descs[0];
-    struct AudioAdapter **adapter = nullptr;
     ASSERT_TRUE(desc != nullptr);
-    ret = manager->LoadAdapter(manager, desc, adapter);
+
+    ret = manager.LoadAdapter(&manager, desc, adapter);
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 
@@ -370,9 +366,9 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_0001, TestSize.L
     struct AudioAdapter *adapter = nullptr;
     struct AudioPort renderPort = {};
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
 
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, renderPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, renderPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapter);
@@ -395,12 +391,12 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_0002, TestSize.L
     struct AudioAdapter *adapter = nullptr;
     struct AudioAdapter *adapter1 = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
 
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME3, &adapter, renderPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_INTERNAL, &adapter, renderPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
-    ret2 = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter1, renderPortUsb);
+    ret2 = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter1, renderPortUsb);
     if (ret2 < 0 || adapter1 == nullptr) {
         manager.UnloadAdapter(&manager, adapter);
         ASSERT_EQ(HDF_SUCCESS, ret2);
@@ -428,35 +424,13 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_0003, TestSize.L
     struct AudioAdapter *adapter = nullptr;
     struct AudioAdapter *adapterNull = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
 
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapterNull);
     EXPECT_EQ(HDF_FAILURE, ret);
-    manager.UnloadAdapter(&manager, adapter);
-}
-
-/**
-* @tc.name  Test AudioAdapterInitAllPorts API when the adapter is smartpa.
-* @tc.number  SUB_Audio_HDI_AdapterInitAllPorts_0004
-* @tc.desc  Test AudioAdapterInitAllPorts interface, return 0 if the ports are initialized successfully.
-* @tc.author: liutian
-*/
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_0004, TestSize.Level1)
-{
-    int32_t ret = -1;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioPort renderPort = {};
-    ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
-
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, renderPort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ASSERT_NE(nullptr, adapter);
-    ret = adapter->InitAllPorts(adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
     manager.UnloadAdapter(&manager, adapter);
 }
 
@@ -472,10 +446,10 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0001, TestS
     struct AudioPort audioPort = {};
     struct AudioAdapter *adapter = {};
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
     struct AudioPortCapability capability = {};
 
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapter);
@@ -507,10 +481,10 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0002, TestS
     struct AudioPort audioPort = {};
     struct AudioAdapter *adapter = {};
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
     struct AudioPortCapability capability = {};
 
-    ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME2, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME_USB, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapter);
@@ -533,10 +507,10 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0003, TestS
     struct AudioPort audioPort = {};
     struct AudioAdapter *adapter = {};
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
     struct AudioPortCapability capability = {};
 
-    ret = GetLoadAdapter(manager, PORT_OUT_IN, ADAPTER_NAME2, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_OUT_IN, ADAPTER_NAME_USB, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapter);
@@ -560,9 +534,9 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0004, TestS
     struct AudioAdapter *adapterNull = nullptr;
     struct AudioPortCapability capability = {};
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
 
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME3, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_INTERNAL, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapter);
@@ -585,11 +559,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0005, TestS
     struct AudioAdapter *adapter = nullptr;
     struct AudioPortCapability capability = {};
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
     struct AudioPort audioPort = {};
     struct AudioPort audioPortError = { .dir = PORT_OUT, .portId = 9, .portName = "AIP" };
 
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME3, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_INTERNAL, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapter);
@@ -615,9 +589,9 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0006, TestS
     struct AudioAdapter *adapter = nullptr;
     struct AudioPortCapability *capabilityNull = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
 
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME3, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_INTERNAL, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapter);
@@ -640,10 +614,10 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0001, Test
     struct AudioPort audioPort = {};
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
     enum AudioPortPassthroughMode modeLpcm = PORT_PASSTHROUGH_AUTO;
 
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapter);
@@ -669,9 +643,9 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0002, Test
     struct AudioAdapter *adapter = nullptr;
     struct AudioPort audioPort = {};
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
 
-    ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME2, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME_USB, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapter);
@@ -695,9 +669,9 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0003, Test
     struct AudioAdapter *adapter = nullptr;
     struct AudioAdapter *adapterNull = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
 
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME3, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_INTERNAL, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->SetPassthroughMode(adapterNull, &audioPort, PORT_PASSTHROUGH_LPCM);
@@ -719,9 +693,9 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0004, Test
     enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
     struct AudioPort audioPortError = { .dir = PORT_OUT, .portId = 8, .portName = "AIP1" };
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapter);
@@ -746,9 +720,9 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0005, Test
     struct AudioPort audioPort = {};
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
 
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapter);
@@ -772,9 +746,9 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0001, Test
     enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_AUTO;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
 
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapter);
@@ -804,9 +778,9 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0002, Test
     struct AudioAdapter *adapter = nullptr;
     struct AudioAdapter *adapterNull = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
 
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapter);
@@ -831,9 +805,9 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0003, Test
     enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
     struct AudioPort audioPortError = { .dir = PORT_OUT, .portId = 8, .portName = "AIP" };
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapter);
@@ -859,9 +833,9 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0004, Test
     enum AudioPortPassthroughMode *modeNull = nullptr;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    struct AudioManager manager = *GetAudioManager();
+    TestAudioManager manager = *GetAudioManager();
 
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
     ret = adapter->InitAllPorts(adapter);

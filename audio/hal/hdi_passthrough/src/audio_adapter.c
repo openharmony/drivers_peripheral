@@ -39,11 +39,17 @@ int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender)
     hwRender->common.control.Pause = AudioRenderPause;
     hwRender->common.control.Resume = AudioRenderResume;
     hwRender->common.control.Flush = AudioRenderFlush;
+    hwRender->common.control.TurnStandbyMode = AudioRenderTurnStandbyMode;
+    hwRender->common.control.AudioDevDump = AudioRenderAudioDevDump;
     hwRender->common.attr.GetFrameSize = AudioRenderGetFrameSize;
     hwRender->common.attr.GetFrameCount = AudioRenderGetFrameCount;
     hwRender->common.attr.SetSampleAttributes = AudioRenderSetSampleAttributes;
     hwRender->common.attr.GetSampleAttributes = AudioRenderGetSampleAttributes;
     hwRender->common.attr.GetCurrentChannelId = AudioRenderGetCurrentChannelId;
+    hwRender->common.attr.SetExtraParams = AudioRenderSetExtraParams;
+    hwRender->common.attr.GetExtraParams = AudioRenderGetExtraParams;
+    hwRender->common.attr.ReqMmapBuffer = AudioRenderReqMmapBuffer;
+    hwRender->common.attr.GetMmapPosition = AudioRenderGetMmapPosition;
     hwRender->common.scene.CheckSceneCapability = AudioRenderCheckSceneCapability;
     hwRender->common.scene.SelectScene = AudioRenderSelectScene;
     hwRender->common.volume.SetMute = AudioRenderSetMute;
@@ -60,6 +66,8 @@ int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender)
     hwRender->common.GetRenderSpeed = AudioRenderGetRenderSpeed;
     hwRender->common.SetChannelMode = AudioRenderSetChannelMode;
     hwRender->common.GetChannelMode = AudioRenderGetChannelMode;
+    hwRender->common.RegCallback = AudioRenderRegCallback;
+    hwRender->common.DrainBuffer = AudioRenderDrainBuffer;
     return HDF_SUCCESS;
 }
 
@@ -155,6 +163,7 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
     }
     int32_t ret = CheckParaDesc(desc, TYPE_RENDER);
     if (ret != HDF_SUCCESS) {
+        LOG_FUN_ERR("CheckParaDesc Fail");
         return ret;
     }
     ret = CheckParaAttr(attrs);
@@ -270,10 +279,13 @@ int32_t AudioAdapterInitAllPorts(struct AudioAdapter *adapter)
         LOG_PARA_INFO("portCapabilitys already Init!");
         return HDF_SUCCESS;
     }
-    int32_t portNum = hwAdapter->adapterDescriptor.portNum;
+    uint32_t portNum = hwAdapter->adapterDescriptor.portNum;
     struct AudioPort *ports = hwAdapter->adapterDescriptor.ports;
     if (ports == NULL) {
         LOG_FUN_ERR("ports is NULL!");
+        return HDF_FAILURE;
+    }
+    if (portNum == 0) {
         return HDF_FAILURE;
     }
     struct AudioPortAndCapability *portCapability =
@@ -336,10 +348,11 @@ int32_t AudioSetAcodeModeRender(struct AudioHwRender *hwRender,
 }
 
 int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct AudioDeviceDescriptor *desc,
-                                    const struct AudioSampleAttributes *attrs, struct AudioAdapter *adapter)
+                                    const struct AudioSampleAttributes *attrs, struct AudioHwAdapter *hwAdapter)
 {
     LOG_FUN_INFO();
-    if (adapter == NULL || hwRender == NULL || desc == NULL || attrs == NULL) {
+    if (hwAdapter == NULL || hwRender == NULL || desc == NULL || attrs == NULL) {
+        LOG_FUN_ERR("Pointer is null!");
         return HDF_FAILURE;
     }
 
@@ -364,8 +377,6 @@ int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct
         return HDF_FAILURE;
     }
 #endif
-    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
-    LOG_PARA_INFO("CreateRender success");
     if (hwAdapter->adapterDescriptor.adapterName == NULL) {
         LOG_FUN_ERR("pointer is null!");
         return HDF_FAILURE;
@@ -389,7 +400,7 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
 {
     LOG_FUN_INFO();
     int32_t ret;
-    if (hwRender == NULL) {
+    if (hwRender == NULL || hwRender->devDataHandle == NULL || hwRender->devCtlHandle == NULL) {
         return HDF_FAILURE;
     }
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
@@ -445,8 +456,12 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
 int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
                                  const struct AudioSampleAttributes *attrs, struct AudioRender **render)
 {
-    LOG_FUN_INFO();
-    if (adapter == NULL || desc == NULL || attrs == NULL || render == NULL) {
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    if (hwAdapter == NULL || desc == NULL || attrs == NULL || render == NULL) {
+        return HDF_FAILURE;
+    }
+    if (hwAdapter->adapterMgrRenderFlag > 0) {
+        LOG_FUN_ERR("Create render repeatedly!");
         return HDF_FAILURE;
     }
     BindServiceRenderSo *pBindServiceRender = AudioSoGetBindServiceRender();
@@ -459,7 +474,7 @@ int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct Audi
         LOG_FUN_ERR("hwRender is NULL!");
         return HDF_FAILURE;
     }
-    int32_t ret = AudioAdapterCreateRenderPre(hwRender, desc, attrs, adapter);
+    int32_t ret = AudioAdapterCreateRenderPre(hwRender, desc, attrs, hwAdapter);
     if (ret != 0) {
         LOG_FUN_ERR("AudioAdapterCreateRenderPre fail");
         AudioMemFree((void **)&hwRender);
@@ -486,14 +501,19 @@ int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct Audi
         AudioMemFree((void **)&hwRender);
         return HDF_FAILURE;
     }
+    hwAdapter->adapterMgrRenderFlag++;
     *render = &hwRender->common;
     return HDF_SUCCESS;
 }
 
 int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRender *render)
 {
-    if (adapter == NULL || render == NULL) {
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    if (hwAdapter == NULL || render == NULL) {
         return HDF_FAILURE;
+    }
+    if (hwAdapter->adapterMgrRenderFlag > 0) {
+        hwAdapter->adapterMgrRenderFlag--;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL) {
@@ -519,11 +539,17 @@ int32_t GetAudioCaptureFunc(struct AudioHwCapture *hwCapture)
     hwCapture->common.control.Pause = AudioCapturePause;
     hwCapture->common.control.Resume = AudioCaptureResume;
     hwCapture->common.control.Flush = AudioCaptureFlush;
+    hwCapture->common.control.TurnStandbyMode = AudioCaptureTurnStandbyMode;
+    hwCapture->common.control.AudioDevDump = AudioCaptureAudioDevDump;
     hwCapture->common.attr.GetFrameSize = AudioCaptureGetFrameSize;
     hwCapture->common.attr.GetFrameCount = AudioCaptureGetFrameCount;
     hwCapture->common.attr.SetSampleAttributes = AudioCaptureSetSampleAttributes;
     hwCapture->common.attr.GetSampleAttributes = AudioCaptureGetSampleAttributes;
     hwCapture->common.attr.GetCurrentChannelId = AudioCaptureGetCurrentChannelId;
+    hwCapture->common.attr.SetExtraParams = AudioCaptureSetExtraParams;
+    hwCapture->common.attr.GetExtraParams = AudioCaptureGetExtraParams;
+    hwCapture->common.attr.ReqMmapBuffer = AudioCaptureReqMmapBuffer;
+    hwCapture->common.attr.GetMmapPosition = AudioCaptureGetMmapPosition;
     hwCapture->common.scene.CheckSceneCapability = AudioCaptureCheckSceneCapability;
     hwCapture->common.scene.SelectScene = AudioCaptureSelectScene;
     hwCapture->common.volume.SetMute = AudioCaptureSetMute;
@@ -578,6 +604,12 @@ int32_t InitHwCaptureParam(struct AudioHwCapture *hwCapture, const struct AudioD
     hwCapture->captureParam.frameCaptureMode.attrs.silenceThreshold = attrs->silenceThreshold;
     hwCapture->captureParam.frameCaptureMode.attrs.isBigEndian = attrs->isBigEndian;
     hwCapture->captureParam.frameCaptureMode.attrs.isSignedData = attrs->isSignedData;
+    /* Select Codec Mode */
+    if (hwCapture->captureParam.captureMode.hwInfo.deviceDescript.portId < AUDIO_SERVICE_PORTID_FLAG) {
+        hwCapture->captureParam.captureMode.hwInfo.card = AUDIO_SERVICE_IN;
+    } else {
+        hwCapture->captureParam.captureMode.hwInfo.card = AUDIO_SERVICE_OUT;
+    }
     return HDF_SUCCESS;
 }
 
@@ -603,10 +635,10 @@ void AudioReleaseCaptureHandle(struct AudioHwCapture *hwCapture)
 }
 
 int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const struct AudioDeviceDescriptor *desc,
-                                     const struct AudioSampleAttributes *attrs, struct AudioAdapter *adapter)
+                                     const struct AudioSampleAttributes *attrs, struct AudioHwAdapter *hwAdapter)
 {
-    LOG_FUN_INFO();
-    if (hwCapture == NULL || desc == NULL || attrs == NULL) {
+    if (hwCapture == NULL || desc == NULL || attrs == NULL || hwAdapter == NULL) {
+        LOG_FUN_ERR("Pointer Is Empty!");
         return HDF_FAILURE;
     }
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
@@ -631,7 +663,6 @@ int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const str
         return HDF_FAILURE;
     }
 #endif
-    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter->adapterDescriptor.adapterName == NULL) {
         LOG_FUN_ERR("adapterName is NULL!");
         return HDF_FAILURE;
@@ -654,7 +685,7 @@ int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const str
 int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
 {
     LOG_FUN_INFO();
-    if (hwCapture == NULL) {
+    if (hwCapture == NULL || hwCapture->devCtlHandle == NULL || hwCapture->devDataHandle == NULL) {
         return HDF_FAILURE;
     }
     int32_t ret;
@@ -700,8 +731,12 @@ int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
 int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
                                   const struct AudioSampleAttributes *attrs, struct AudioCapture **capture)
 {
-    LOG_FUN_INFO();
-    if (adapter == NULL || desc == NULL || attrs == NULL || capture == NULL) {
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    if (hwAdapter == NULL || desc == NULL || attrs == NULL || capture == NULL) {
+        return HDF_FAILURE;
+    }
+    if (hwAdapter->adapterMgrCaptureFlag > 0) {
+        LOG_FUN_ERR("Create capture repeatedly!");
         return HDF_FAILURE;
     }
     BindServiceCaptureSo *pBindServiceCapture = AudioSoGetBindServiceCapture();
@@ -714,26 +749,19 @@ int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct Aud
         LOG_FUN_ERR("calloc AudioHwCapture failed!");
         return HDF_FAILURE;
     }
-    int32_t ret = AudioAdapterCreateCapturePre(hwCapture, desc, attrs, adapter);
+    int32_t ret = AudioAdapterCreateCapturePre(hwCapture, desc, attrs, hwAdapter);
     if (ret != 0) {
         LOG_FUN_ERR("AudioAdapterCreateCapturePre fail");
         AudioMemFree((void **)&hwCapture);
         return HDF_FAILURE;
     }
-    /* Select Codec Mode */
-    if (hwCapture->captureParam.captureMode.hwInfo.deviceDescript.portId < AUDIO_SERVICE_PORTID_FLAG) {
-        hwCapture->captureParam.captureMode.hwInfo.card = AUDIO_SERVICE_IN;
-    } else {
-        hwCapture->captureParam.captureMode.hwInfo.card = AUDIO_SERVICE_OUT;
-    }
-
     hwCapture->devDataHandle = (*pBindServiceCapture)(CAPTURE_CMD);
     if (hwCapture->devDataHandle == NULL) {
         LOG_FUN_ERR("Capture bind service failed");
         AudioMemFree((void **)&hwCapture);
         return HDF_FAILURE;
     }
-    hwCapture->devCtlHandle = (*pBindServiceCapture)(CTRL_CMD_CAPTURE);
+    hwCapture->devCtlHandle = (*pBindServiceCapture)(CTRL_CMD);
     if (hwCapture->devCtlHandle == NULL) {
         LOG_FUN_ERR("Capture bind service failed");
         AudioReleaseCaptureHandle(hwCapture);
@@ -747,14 +775,19 @@ int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct Aud
         AudioMemFree((void **)&hwCapture);
         return HDF_FAILURE;
     }
+    hwAdapter->adapterMgrCaptureFlag++;
     *capture = &hwCapture->common;
     return HDF_SUCCESS;
 }
 
 int32_t AudioAdapterDestroyCapture(struct AudioAdapter *adapter, struct AudioCapture *capture)
 {
-    if (adapter == NULL || capture == NULL) {
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    if (hwAdapter == NULL || capture == NULL) {
         return HDF_FAILURE;
+    }
+    if (hwAdapter->adapterMgrCaptureFlag > 0) {
+        hwAdapter->adapterMgrCaptureFlag--;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
     if (hwCapture == NULL) {
@@ -797,8 +830,8 @@ int32_t AudioAdapterGetPortCapability(struct AudioAdapter *adapter, const struct
     return HDF_FAILURE;
 }
 
-int32_t AudioAdapterSetPassthroughMode(struct AudioAdapter *adapter, const struct AudioPort *port,
-                                       enum AudioPortPassthroughMode mode)
+int32_t AudioAdapterSetPassthroughMode(struct AudioAdapter *adapter,
+    const struct AudioPort *port, enum AudioPortPassthroughMode mode)
 {
     if (adapter == NULL || port == NULL || port->portName == NULL) {
         return HDF_FAILURE;
@@ -808,7 +841,7 @@ int32_t AudioAdapterSetPassthroughMode(struct AudioAdapter *adapter, const struc
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter->portCapabilitys == NULL) {
-        LOG_FUN_ERR("hwAdapter portCapabilitys is NULL!");
+        LOG_FUN_ERR("The pointer is null!");
         return HDF_FAILURE;
     }
     struct AudioPortAndCapability *portCapabilityTemp = hwAdapter->portCapabilitys;
@@ -831,7 +864,6 @@ int32_t AudioAdapterSetPassthroughMode(struct AudioAdapter *adapter, const struc
         LOG_FUN_ERR("portCapability->subPorts is NULL!");
         return HDF_FAILURE;
     }
-
     int32_t subPortNum = portCapability->subPortsNum;
     while (subPortCapability != NULL && subPortNum > 0) {
         if (subPortCapability->mask == mode) {

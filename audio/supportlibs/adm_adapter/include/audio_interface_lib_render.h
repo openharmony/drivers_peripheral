@@ -16,25 +16,13 @@
 #ifndef AUDIO_INTERFACE_LIB_RENDER_H
 #define AUDIO_INTERFACE_LIB_RENDER_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include "securec.h"
-#include "audio_internal.h"
-#include "audio_adapter.h"
-#include "osal_mem.h"
-#include "hdf_io_service_if.h"
-#include "hdf_sbuf.h"
+#include "audio_interface_lib_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define CTRL_CMD "control"          // For Bind control service
-#define RENDER_CMD "render"         // For Bind render service
-#define SERVIC_NAME_MAX_LEN 32
-#define CTRL_NUM 100
+#define RENDER_CMD  "render" // For Bind render service
 
 enum AudioCriBuffStatus {
     CIR_BUFF_NO_FULL = 1,
@@ -67,25 +55,39 @@ struct InterfaceLibCtlRenderList {
 };
 
 struct DevHandle *AudioBindServiceRender(const char *name);
-void AudioCloseServiceRender(struct DevHandle *handle);
+void AudioCloseServiceRender(const struct DevHandle *handle);
 int32_t AudioInterfaceLibModeRender(struct DevHandle *handle, struct AudioHwRenderParam *handleData, int cmdId);
-int32_t AudioOutputRenderHwParams(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioOutputRenderWrite(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioOutputRenderStop(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioOutputRenderStartPrepare(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioCtlRenderGetVolume(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioCtlRenderSetVolume(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioCtlRenderGetMuteStu(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioCtlRenderSetMuteStu(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioCtlRenderSetPauseStu(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioCtlRenderGetChannelMode(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioCtlRenderSetChannelMode(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioCtlRenderSetGainStu(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioCtlRenderGetGainStu(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioCtlRenderSceneSelect(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioCtlRenderSceneGetGainThreshold(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioCtlRenderSetAcodecMode(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioCtlRenderGetVolThreshold(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
+int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
+    const int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
+    const int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioOutputRenderStop(const struct DevHandle *handle,
+    const int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioOutputRenderStartPrepare(struct DevHandle *handle,
+    const int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
+int32_t AudioCtlRenderSetVolume(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioCtlRenderGetMuteStu(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
+int32_t AudioCtlRenderSetMuteStu(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioCtlRenderSetPauseStu(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioCtlRenderGetChannelMode(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
+int32_t AudioCtlRenderSetChannelMode(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioCtlRenderSetGainStu(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioCtlRenderGetGainStu(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
+int32_t AudioCtlRenderSceneSelect(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioCtlRenderSceneGetGainThreshold(const struct DevHandle *handle,
+    int cmdId, struct AudioHwRenderParam *handleData);
+int32_t AudioCtlRenderSetAcodecMode(const struct DevHandle *handle,
+    const int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioCtlRenderGetVolThreshold(const struct DevHandle *handle,
+    int cmdId, struct AudioHwRenderParam *handleData);
+int32_t AudioOutputRenderReqMmapBuffer(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
 
 #ifdef __cplusplus
 }

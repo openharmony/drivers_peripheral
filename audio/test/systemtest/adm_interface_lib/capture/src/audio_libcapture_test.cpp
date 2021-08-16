@@ -43,8 +43,7 @@ namespace {
 const string BIND_CONTROL = "control";
 const string BIND_CAPTURE = "capture";
 const string BIND_NAME_ERROR = "rendeo";
-const string CAPUTRE_PATH = "//bin/ceshi.wav";
-const string ADAPTER_NAME3 = "internal";
+const string ADAPTER_NAME_INTERNAL = "internal";
 
 class AudioLibCaptureTest : public testing::Test {
 public:
@@ -52,24 +51,37 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct DevHandle *(*BindServiceCaptureSo)(const char *) = nullptr;
-    int32_t (*InterfaceLibOutputCapture)(struct DevHandle *, int, struct AudioHwCaptureParam *) = nullptr;
-    int32_t (*InterfaceLibCtlCapture)(struct DevHandle *, int, struct AudioHwCaptureParam *) = nullptr;
-    void (*CloseServiceCaptureSo)(struct DevHandle *) = nullptr;
-    void *PtrHandle = nullptr;
+    static struct DevHandle *(*BindServiceCaptureSo)(const char *);
+    static int32_t (*InterfaceLibOutputCapture)(struct DevHandle *, int, struct AudioHwCaptureParam *);
+    static int32_t (*InterfaceLibCtlCapture)(struct DevHandle *, int, struct AudioHwCaptureParam *);
+    static void (*CloseServiceCaptureSo)(struct DevHandle *);
+#ifdef AUDIO_MPI_SO
+    static int32_t (*SdkInit)();
+    static void (*SdkExit)();
+#endif
+    static void *PtrHandle;
+    int32_t BindServiceAndHwCapture(struct AudioHwCapture *&hwCapture, const std::string BindName,
+                                    const std::string adapterNameCase, struct DevHandle *&handle) const;
 };
+
+struct DevHandle *(*AudioLibCaptureTest::BindServiceCaptureSo)(const char *) = nullptr;
+int32_t (*AudioLibCaptureTest::InterfaceLibOutputCapture)(struct DevHandle *, int,
+    struct AudioHwCaptureParam *) = nullptr;
+int32_t (*AudioLibCaptureTest::InterfaceLibCtlCapture)(struct DevHandle *, int, struct AudioHwCaptureParam *) = nullptr;
+void (*AudioLibCaptureTest::CloseServiceCaptureSo)(struct DevHandle *) = nullptr;
+#ifdef AUDIO_MPI_SO
+    int32_t (*AudioLibCaptureTest::SdkInit)() = nullptr;
+    void (*AudioLibCaptureTest::SdkExit)() = nullptr;
+#endif
+void *AudioLibCaptureTest::PtrHandle = nullptr;
 
 void AudioLibCaptureTest::SetUpTestCase(void)
 {
-}
-
-void AudioLibCaptureTest::TearDownTestCase(void)
-{
-}
-
-void AudioLibCaptureTest::SetUp(void)
-{
+#ifdef __LITEOS__
+    char resolvedPath[] = "/usr/lib/libhdi_audio_interface_lib_capture.so";
+#else
     char resolvedPath[] = "//system/lib/libhdi_audio_interface_lib_capture.z.so";
+#endif
     PtrHandle = dlopen(resolvedPath, RTLD_LAZY);
     if (PtrHandle == nullptr) {
         return;
@@ -85,14 +97,21 @@ void AudioLibCaptureTest::SetUp(void)
         dlclose(PtrHandle);
         return;
     }
+#ifdef AUDIO_MPI_SO
+    SdkInit = (int32_t (*)())(dlsym(PtrHandle, "MpiSdkInit"));
+    if (SdkInit == nullptr) {
+        return;
+    }
+    SdkExit = (void (*)())(dlsym(PtrHandle, "MpiSdkExit"));
+    if (SdkExit == nullptr) {
+        return;
+    }
+    SdkInit();
+#endif
 }
 
-void AudioLibCaptureTest::TearDown(void)
+void AudioLibCaptureTest::TearDownTestCase(void)
 {
-    if (PtrHandle != nullptr) {
-        dlclose(PtrHandle);
-        PtrHandle = nullptr;
-    }
     if (BindServiceCaptureSo != nullptr) {
         BindServiceCaptureSo = nullptr;
     }
@@ -105,6 +124,44 @@ void AudioLibCaptureTest::TearDown(void)
     if (InterfaceLibOutputCapture != nullptr) {
         InterfaceLibOutputCapture = nullptr;
     }
+#ifdef AUDIO_MPI_SO
+    SdkExit();
+    if (SdkInit != nullptr) {
+        SdkInit = nullptr;
+    }
+    if (SdkExit != nullptr) {
+        SdkExit = nullptr;
+    }
+#endif
+    if (PtrHandle != nullptr) {
+        dlclose(PtrHandle);
+        PtrHandle = nullptr;
+    }
+}
+
+void AudioLibCaptureTest::SetUp(void) {}
+
+void AudioLibCaptureTest::TearDown(void) {}
+
+int32_t AudioLibCaptureTest::BindServiceAndHwCapture(struct AudioHwCapture *&hwCapture,
+    const std::string BindName, const std::string adapterNameCase, struct DevHandle *&handle) const
+{
+    handle = BindServiceCaptureSo(BindName.c_str());
+    if (handle == nullptr) {
+        return HDF_FAILURE;
+    }
+    hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
+    if (hwCapture == nullptr) {
+        CloseServiceCaptureSo(handle);
+        return HDF_FAILURE;
+    }
+    if (InitHwCapture(hwCapture, adapterNameCase)) {
+        free(hwCapture);
+        hwCapture = nullptr;
+        CloseServiceCaptureSo(handle);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
 }
 
 /**
@@ -201,18 +258,11 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_MuteWrite_Read_00
     bool wishValue = 0;
     bool expectedValue = 1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwCapture *hwCapture = nullptr;
+
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CONTROL.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     hwCapture->captureParam.captureMode.ctlParam.mute = 0;
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_MUTE_WRITE_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -228,6 +278,7 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_MuteWrite_Read_00
     muteValue = hwCapture->captureParam.captureMode.ctlParam.mute;
     EXPECT_EQ(expectedValue, muteValue);
     free(hwCapture);
+    hwCapture = nullptr;
     CloseServiceCaptureSo(handle);
 }
 /**
@@ -241,20 +292,13 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_MuteWrite_Read_00
 {
     int32_t ret = -1;
     bool muteValue = 0;
+    bool wishValue = 0;
     bool expectedValue = 1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwCapture *hwCapture = nullptr;
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CONTROL.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     hwCapture->captureParam.captureMode.ctlParam.mute = 2;
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_MUTE_WRITE_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -262,7 +306,15 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_MuteWrite_Read_00
     EXPECT_EQ(HDF_SUCCESS, ret);
     muteValue = hwCapture->captureParam.captureMode.ctlParam.mute;
     EXPECT_EQ(expectedValue, muteValue);
+    hwCapture->captureParam.captureMode.ctlParam.mute = 0;
+    ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_MUTE_WRITE_CAPTURE, &hwCapture->captureParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_MUTE_READ_CAPTURE, &hwCapture->captureParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    muteValue = hwCapture->captureParam.captureMode.ctlParam.mute;
+    EXPECT_EQ(wishValue, muteValue);
     free(hwCapture);
+    hwCapture = nullptr;
     CloseServiceCaptureSo(handle);
 }
 /**
@@ -281,17 +333,9 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_VolumeWrite_Read_
     float volumeThresholdValueMax = 0;
     float volumeThresholdValueMin = 0;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwCapture *hwCapture = nullptr;
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CONTROL.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -304,7 +348,11 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_VolumeWrite_Read_
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_ELEM_READ_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     volumeValue = hwCapture->captureParam.captureMode.ctlParam.volume;
-    EXPECT_EQ(expectedValue1, volumeValue);
+    if (IS_ADM == false) {
+        EXPECT_EQ(126, volumeValue);
+    } else {
+        EXPECT_EQ(expectedValue1, volumeValue);
+    }
 
     hwCapture->captureParam.captureMode.ctlParam.volume = volumeThresholdValueMin+1;
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE, &hwCapture->captureParam);
@@ -313,7 +361,9 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_VolumeWrite_Read_
     EXPECT_EQ(HDF_SUCCESS, ret);
     volumeValue = hwCapture->captureParam.captureMode.ctlParam.volume;
     EXPECT_EQ(expectedValue2, volumeValue);
+
     free(hwCapture);
+    hwCapture = nullptr;
     CloseServiceCaptureSo(handle);
 }
 /**
@@ -326,36 +376,21 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_VolumeWrite_Read_
 HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_VolumeWrite_Read_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    float volumeValue;
+    struct DevHandle *handle = nullptr;
+    struct AudioHwCapture *hwCapture = nullptr;
+    float volumeValue = 0;
     float expectedValueMax = 87;
     float expectedValueMin = 0;
     float volumeThresholdValueMax = 0;
     float volumeThresholdValueMin = 0;
-    struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CONTROL.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     volumeThresholdValueMax = hwCapture->captureParam.captureMode.ctlParam.volThreshold.volMax;
     volumeThresholdValueMin = hwCapture->captureParam.captureMode.ctlParam.volThreshold.volMin;
 
-    hwCapture->captureParam.captureMode.ctlParam.volume = volumeThresholdValueMax;
-    ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE, &hwCapture->captureParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_ELEM_READ_CAPTURE, &hwCapture->captureParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    volumeValue = hwCapture->captureParam.captureMode.ctlParam.volume;
-    EXPECT_EQ(expectedValueMax, volumeValue);
     hwCapture->captureParam.captureMode.ctlParam.volume = volumeThresholdValueMin;
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -363,7 +398,21 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_VolumeWrite_Read_
     EXPECT_EQ(HDF_SUCCESS, ret);
     volumeValue = hwCapture->captureParam.captureMode.ctlParam.volume;
     EXPECT_EQ(expectedValueMin, volumeValue);
+
+    hwCapture->captureParam.captureMode.ctlParam.volume = volumeThresholdValueMax;
+    ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE, &hwCapture->captureParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_ELEM_READ_CAPTURE, &hwCapture->captureParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    volumeValue = hwCapture->captureParam.captureMode.ctlParam.volume;
+    if (IS_ADM == false) {
+        EXPECT_EQ(127, volumeValue);
+    } else {
+        EXPECT_EQ(expectedValueMax, volumeValue);
+    }
+
     free(hwCapture);
+    hwCapture = nullptr;
     CloseServiceCaptureSo(handle);
 }
 /**
@@ -377,19 +426,11 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_VolumeWrite_Read_
 {
     int32_t ret = -1;
     float volumeThresholdValueMax = 0;
+    struct AudioHwCapture *hwCapture = nullptr;
     float volumeThresholdValueMin = 0;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CONTROL.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -403,6 +444,7 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_VolumeWrite_Read_
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_FAILURE, ret);
     free(hwCapture);
+    hwCapture = nullptr;
     CloseServiceCaptureSo(handle);
 }
 /**
@@ -419,26 +461,23 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GetVolthresholdRe
     float expMax = 87;
     float expMix = 0;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwCapture *hwCapture = nullptr;
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CONTROL.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     volumeThresholdValueMax = hwCapture->captureParam.captureMode.ctlParam.volThreshold.volMax;
     volumeThresholdValueMin = hwCapture->captureParam.captureMode.ctlParam.volThreshold.volMin;
-    EXPECT_EQ(expMax, volumeThresholdValueMax);
+    if (IS_ADM == false) {
+        EXPECT_EQ(127, volumeThresholdValueMax);
+    } else {
+        EXPECT_EQ(expMax, volumeThresholdValueMax);
+    }
     EXPECT_EQ(expMix, volumeThresholdValueMin);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
+    hwCapture = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlCapture API via selecting scene.
@@ -450,21 +489,9 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_SelectScene_0001,
 {
     int32_t ret = -1;
     struct DevHandle* handle = nullptr;
-
-    handle = BindServiceCaptureSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-
-    struct AudioHwCapture* hwCapture = (struct AudioHwCapture*)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitHwCaptureFramepara(hwCapture->captureParam.frameCaptureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwCapture *hwCapture = nullptr;
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CONTROL.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     struct AudioSceneDescriptor scene = {
         .scene.id = 0,
@@ -482,6 +509,7 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_SelectScene_0001,
 
     CloseServiceCaptureSo(handle);
     free(hwCapture);
+    hwCapture = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlCapture API via writing normal value of gain and reading gain value.
@@ -493,20 +521,13 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_SelectScene_0001,
 HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    float gainValue;
-    float gainThresholdValueMax, gainThresholdValueMin;
+    float gainValue = 0;
+    float gainThresholdValueMax = 0;
+    float gainThresholdValueMin = 0;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwCapture *hwCapture = nullptr;
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CONTROL.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -538,6 +559,7 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_00
     EXPECT_EQ(2, gainValue);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
+    hwCapture = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlCapture API via writing boundary value of gain and reading gain value.
@@ -549,20 +571,13 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_00
 HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    float gainValue;
-    float gainThresholdValueMax, gainThresholdValueMin;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwCapture *hwCapture = nullptr;
+    float gainValue = 0;
+    float gainThresholdValueMax = 0;
+    float gainThresholdValueMin = 0;
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CONTROL.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -587,6 +602,7 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_00
     EXPECT_EQ(gainThresholdValueMin, gainValue);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
+    hwCapture = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlCapture API via writing invalid value of gain.
@@ -597,19 +613,12 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_00
 HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_0003, TestSize.Level1)
 {
     int32_t ret = -1;
+    float gainThresholdValueMax = 0;
+    float gainThresholdValueMin = 0;
+    struct AudioHwCapture *hwCapture = nullptr;
     struct DevHandle *handle = nullptr;
-    float gainThresholdValueMax, gainThresholdValueMin;
-    handle = BindServiceCaptureSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CONTROL.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -625,6 +634,7 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_00
     EXPECT_EQ(HDF_FAILURE, ret);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
+    hwCapture = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlCapture API via writing GetGainthreshold value.
@@ -639,17 +649,9 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GetGainthresholdR
     float expMax = 10;
     float expMix = 0;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwCapture *hwCapture = nullptr;
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CONTROL.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -659,6 +661,7 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GetGainthresholdR
     EXPECT_EQ(expMix, gainThresholdValueMin);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
+    hwCapture = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlCapture API via inputting cmdid invalid.
@@ -670,26 +673,21 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_Abnormal_0001, Te
 {
     int32_t ret = -1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwCapture *hwCapture = nullptr;
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CONTROL.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     ret = InterfaceLibCtlCapture(handle, 30, &hwCapture->captureParam);
     if (ret == 0) {
         CloseServiceCaptureSo(handle);
         free(hwCapture);
+        hwCapture = nullptr;
         ASSERT_EQ(HDF_FAILURE, ret);
     }
     EXPECT_EQ(HDF_FAILURE, ret);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
+    hwCapture = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlCapture API via inputting handleData invalid.
@@ -708,7 +706,6 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_Abnormal_0002, Te
     EXPECT_EQ(HDF_FAILURE, ret);
     CloseServiceCaptureSo(handle);
 }
-
 /**
 * @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_HW_PARAMS.
 * @tc.number  SUB_Audio_InterfaceLibOutputCapture_HwParams_0001
@@ -719,24 +716,15 @@ HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_HwParams_0001
 {
     int32_t ret = -1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CAPTURE.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureFramepara(hwCapture->captureParam.frameCaptureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwCapture *hwCapture = nullptr;
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CAPTURE.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
+    hwCapture = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE.
@@ -747,20 +735,10 @@ HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_HwParams_0001
 HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_Prepare_0001, TestSize.Level1)
 {
     int32_t ret = -1;
+    struct AudioHwCapture *hwCapture = nullptr;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CAPTURE.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureFramepara(hwCapture->captureParam.frameCaptureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CAPTURE.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -768,6 +746,7 @@ HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_Prepare_0001,
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
+    hwCapture = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTRL_START_CAPTURE.
@@ -777,21 +756,11 @@ HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_Prepare_0001,
 */
 HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_Start_0001, TestSize.Level1)
 {
-    int32_t ret = -1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CAPTURE.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureFramepara(hwCapture->captureParam.frameCaptureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwCapture *hwCapture = nullptr;
+    int32_t ret = -1;
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CAPTURE.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -801,6 +770,7 @@ HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_Start_0001, T
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
+    hwCapture = nullptr;
 }
 /**
 * @tc.name  Test AudioOutputcapture API via cmdid is AUDIO_DRV_PCM_IOCTL_READ.
@@ -813,19 +783,9 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Read_Stop_0001
 {
     int32_t ret = -1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CAPTURE.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureFramepara(hwCapture->captureParam.frameCaptureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwCapture *hwCapture = nullptr;
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CAPTURE.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -833,11 +793,12 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Read_Stop_0001
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTRL_START_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    hwCapture->captureParam.frameCaptureMode.buffer = (char *)calloc(1, 1024);
+    hwCapture->captureParam.frameCaptureMode.buffer = (char *)calloc(1, 16384);
     if (hwCapture->captureParam.frameCaptureMode.buffer == nullptr) {
         CloseServiceCaptureSo(handle);
         free(hwCapture);
-        ASSERT_NE(nullptr, hwCapture->captureParam.frameCaptureMode.buffer);
+        hwCapture = nullptr;
+        ASSERT_NE(nullptr, hwCapture);
     }
     ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTL_READ, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -845,7 +806,9 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Read_Stop_0001
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceCaptureSo(handle);
     free(hwCapture->captureParam.frameCaptureMode.buffer);
+    hwCapture->captureParam.frameCaptureMode.buffer = nullptr;
     free(hwCapture);
+    hwCapture = nullptr;
 }
 /**
 * @tc.name  Test AudioOutputcapture API data flow and control flow are serial.
@@ -858,41 +821,37 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_0001, TestSize
     int32_t ret = -1;
     struct DevHandle *handle1 = nullptr;
     struct DevHandle *handle2 = nullptr;
-    handle1 = BindServiceCaptureSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle1);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
+    struct AudioHwCapture *hwCapture = nullptr;
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CONTROL.c_str(), ADAPTER_NAME_INTERNAL, handle1);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
+    handle2 = BindServiceCaptureSo(BIND_CAPTURE.c_str());
+    if (handle2 == nullptr) {
         CloseServiceCaptureSo(handle1);
-        ASSERT_NE(nullptr, hwCapture);
+        free(hwCapture->captureParam.frameCaptureMode.buffer);
+        hwCapture->captureParam.frameCaptureMode.buffer = nullptr;
+        free(hwCapture);
+        hwCapture = nullptr;
+        ASSERT_NE(nullptr, handle2);
     }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
     hwCapture->captureParam.captureMode.ctlParam.mute = 0;
     ret = InterfaceLibCtlCapture(handle1, AUDIODRV_CTL_IOCTL_MUTE_WRITE_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlCapture(handle1, AUDIODRV_CTL_IOCTL_MUTE_READ_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    handle2 = BindServiceCaptureSo(BIND_CAPTURE.c_str());
-    if (handle2 == nullptr) {
-        CloseServiceCaptureSo(handle1);
-        free(hwCapture);
-        ASSERT_NE(nullptr, handle2);
-    }
-    ret = InitHwCaptureFramepara(hwCapture->captureParam.frameCaptureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+
     ret = InterfaceLibOutputCapture(handle2, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputCapture(handle2, AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputCapture(handle2, AUDIO_DRV_PCM_IOCTRL_START_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    hwCapture->captureParam.frameCaptureMode.buffer = (char *)calloc(1, 1024);
+    hwCapture->captureParam.frameCaptureMode.buffer = (char *)calloc(1, 16384);
     if (hwCapture->captureParam.frameCaptureMode.buffer == nullptr) {
         CloseServiceCaptureSo(handle1);
         CloseServiceCaptureSo(handle2);
         free(hwCapture);
+        hwCapture = nullptr;
         ASSERT_NE(nullptr, hwCapture->captureParam.frameCaptureMode.buffer);
     }
     ret = InterfaceLibOutputCapture(handle2, AUDIO_DRV_PCM_IOCTL_READ, &hwCapture->captureParam);
@@ -902,7 +861,9 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_0001, TestSize
     CloseServiceCaptureSo(handle1);
     CloseServiceCaptureSo(handle2);
     free(hwCapture->captureParam.frameCaptureMode.buffer);
+    hwCapture->captureParam.frameCaptureMode.buffer = nullptr;
     free(hwCapture);
+    hwCapture = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibOutputCapture API via pause.
@@ -914,22 +875,21 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Pause_0001, Te
 {
     int32_t ret = -1;
     struct DevHandle *handle = {};
-    handle = BindServiceCaptureSo(BIND_CAPTURE.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
+    struct AudioHwCapture *hwCapture = nullptr;
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CAPTURE.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
+    ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE, &hwCapture->captureParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTRL_START_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     hwCapture->captureParam.captureMode.ctlParam.pause = 1;
     ret = InterfaceLibOutputCapture(handle, AUDIODRV_CTL_IOCTL_PAUSE_WRITE_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
+    hwCapture = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibOutputCapture API via resume.
@@ -940,23 +900,22 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Pause_0001, Te
 HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Resume_0001, TestSize.Level1)
 {
     int32_t ret = -1;
+    struct AudioHwCapture *hwCapture = nullptr;
     struct DevHandle *handle = {};
-    handle = BindServiceCaptureSo(BIND_CAPTURE.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureMode(hwCapture->captureParam.captureMode);
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CAPTURE.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN, ADAPTER_NAME3.c_str());
+    ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE, &hwCapture->captureParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTRL_START_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     hwCapture->captureParam.captureMode.ctlParam.pause = 0;
     ret = InterfaceLibOutputCapture(handle, AUDIODRV_CTL_IOCTL_PAUSE_WRITE_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
+    hwCapture = nullptr;
 }
 /**
 * @tc.name  Test InterfaceLibOutputCapture API via setting the cmdId(30) is invalid
@@ -968,19 +927,15 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Abnormal_0001,
 {
     int32_t ret = -1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceCaptureSo(BIND_CAPTURE.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureFramepara(hwCapture->captureParam.frameCaptureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwCapture *hwCapture = nullptr;
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CAPTURE.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     ret = InterfaceLibOutputCapture(handle, 30, &hwCapture->captureParam);
     EXPECT_EQ(HDF_FAILURE, ret);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
+    hwCapture = nullptr;
 }
 /**
 * @tc.name  Test Outputcapture API via setting the incoming parameter handleData is empty
@@ -993,18 +948,14 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Abnormal_0002,
     int32_t ret = -1;
     struct DevHandle *handle = nullptr;
     struct AudioHwCaptureParam *handleData = nullptr;
-    handle = BindServiceCaptureSo(BIND_CAPTURE.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
-    if (hwCapture == nullptr) {
-        CloseServiceCaptureSo(handle);
-        ASSERT_NE(nullptr, hwCapture);
-    }
-    ret = InitHwCaptureFramepara(hwCapture->captureParam.frameCaptureMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwCapture *hwCapture = nullptr;
+    ret = BindServiceAndHwCapture(hwCapture, BIND_CAPTURE.c_str(), ADAPTER_NAME_INTERNAL, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTL_READ, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
+    hwCapture = nullptr;
 }
 }

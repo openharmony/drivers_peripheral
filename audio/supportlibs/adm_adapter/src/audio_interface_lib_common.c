@@ -33,3 +33,51 @@ struct HdfIoService *HdfIoServiceBindName(const char *serviceName)
     LOG_FUN_ERR("service name not support!");
     return NULL;
 }
+
+void AudioBufReplyRecycle(struct HdfSBuf *sBuf, struct HdfSBuf *reply)
+{
+    if (sBuf != NULL) {
+        HdfSBufRecycle(sBuf);
+    }
+    if (reply != NULL) {
+        HdfSBufRecycle(reply);
+    }
+}
+
+int32_t AudioServiceDispatch(struct HdfIoService *service,
+    int cmdId, struct HdfSBuf *sBuf, struct HdfSBuf *reply)
+{
+    if (service == NULL || service->dispatcher == NULL ||
+        service->dispatcher->Dispatch == NULL || sBuf == NULL) {
+        return HDF_FAILURE;
+    }
+
+    return service->dispatcher->Dispatch(&(service->object), cmdId, sBuf, reply);
+}
+
+struct HdfSBuf *AudioObtainHdfSBuf(void)
+{
+#ifdef AUDIO_HDF_SBUF_IPC
+    return HdfSBufTypedObtain(SBUF_IPC);
+#else
+    return HdfSBufTypedObtain(SBUF_RAW);
+#endif
+}
+
+int32_t AudioCtlGetVolThresholdRead(struct HdfSBuf *reply, struct AudioCtrlElemInfo *volThreshold)
+{
+    if (reply == NULL || volThreshold == NULL) {
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufReadInt32(reply, &volThreshold->type)) {
+        LOG_FUN_ERR("Failed to Get Volume sBuf!");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufReadInt32(reply, &volThreshold->max)) {
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufReadInt32(reply, &volThreshold->min)) {
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}

@@ -46,17 +46,29 @@ int32_t AudioGetSysTime(char *s, int32_t len)
     return ret;
 }
 
-int32_t AudioCheckParaAttr(const struct AudioSampleAttributes *attrs)
+int32_t CheckAttrSamplingRate(uint32_t param)
 {
-    if (NULL == attrs) {
-        return HDF_FAILURE;
+    switch (param) {
+        case TELHPONE_RATE:
+        case BROADCAST_AM_RATE:
+        case BROADCAST_FM_RATE:
+        case MINI_CAM_DV_RATE:
+        case MUSIC_RATE:
+        case HIGHT_MUSIC_RATE:
+        case AUDIO_SAMPLE_RATE_12000:
+        case AUDIO_SAMPLE_RATE_16000:
+        case AUDIO_SAMPLE_RATE_24000:
+        case AUDIO_SAMPLE_RATE_64000:
+        case AUDIO_SAMPLE_RATE_96000:
+            return HDF_SUCCESS;
+        default:
+            return HDF_ERR_NOT_SUPPORT;
     }
-    enum AudioCategory audioCategory = attrs->type;
-    if (AUDIO_IN_MEDIA != audioCategory && AUDIO_IN_COMMUNICATION != audioCategory) {
-        return HDF_ERR_NOT_SUPPORT;
-    }
-    enum AudioFormat audioFormat = attrs->format;
-    switch (audioFormat) {
+}
+
+int32_t CheckAttrFormat(enum AudioFormat param)
+{
+    switch (param) {
         case AUDIO_FORMAT_PCM_8_BIT:
         case AUDIO_FORMAT_PCM_16_BIT:
         case AUDIO_FORMAT_PCM_24_BIT:
@@ -71,16 +83,65 @@ int32_t AudioCheckParaAttr(const struct AudioSampleAttributes *attrs)
         default:
             return HDF_ERR_NOT_SUPPORT;
     }
-    uint32_t sampleRateTemp = attrs->sampleRate;
-    switch (sampleRateTemp) {
-        case TELHPONE_RATE:
-        case BROADCAST_AM_RATE:
-        case BROADCAST_FM_RATE:
-        case MINI_CAM_DV_RATE:
-        case MUSIC_RATE:
-        case HIGHT_MUSIC_RATE:
-            return HDF_SUCCESS;
-        default:
-            return HDF_ERR_NOT_SUPPORT;
+    return HDF_SUCCESS;
+}
+
+int32_t AudioCheckParaAttr(const struct AudioSampleAttributes *attrs)
+{
+    if (NULL == attrs) {
+        return HDF_FAILURE;
     }
+    int32_t ret;
+    enum AudioCategory audioCategory = attrs->type;
+    if (AUDIO_IN_MEDIA != audioCategory && AUDIO_IN_COMMUNICATION != audioCategory) {
+        return HDF_ERR_NOT_SUPPORT;
+    }
+    enum AudioFormat audioFormat = attrs->format;
+    ret = CheckAttrFormat(audioFormat);
+    if (ret < 0) {
+        return ret;
+    }
+    uint32_t sampleRateTemp = attrs->sampleRate;
+    return CheckAttrSamplingRate(sampleRateTemp);
+}
+
+int32_t TimeToAudioTimeStamp(uint64_t bufferFrameSize, struct AudioTimeStamp *time, uint32_t sampleRate)
+{
+    if (time == NULL) {
+        return HDF_FAILURE;
+    }
+    time->tvSec += bufferFrameSize / (int64_t)sampleRate;
+    int64_t lastBufFrames = bufferFrameSize % ((int64_t)sampleRate);
+    time->tvNSec += (lastBufFrames * SEC_TO_NSEC) / ((int64_t)sampleRate);
+    if (time->tvNSec >= SEC_TO_NSEC) {
+        time->tvSec += 1;
+        time->tvNSec -= SEC_TO_NSEC;
+    }
+    return HDF_SUCCESS;
+}
+
+void AudioLogRecord(int errorLevel, const char *format, ...)
+{
+    va_list args;
+    FILE *fp = NULL;
+    char timeStr[TIME_LEN];
+    char fileName[FILE_NAME_LEN];
+    va_start(args, format);
+    time_t timeLog = time(NULL);
+    strftime(fileName, sizeof(fileName), "//data/%Y-%m-%d_audio_history.log", localtime(&timeLog));
+    if (fileName[0] == '\0') {
+        va_end(args);
+        return;
+    }
+    if ((fp = fopen(fileName, "a+")) != NULL) {
+        strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", localtime(&timeLog));
+        if (errorLevel == (int)INFO) {
+            fprintf(fp, "[%s]-[%s]", timeStr, "INFO");
+            vfprintf(fp, format, args);
+            fprintf(fp, "\n");
+        }
+        fclose(fp);
+    }
+    va_end(args);
+    return;
 }

@@ -19,10 +19,15 @@ int32_t AudioProxyRenderCtrl(int cmId, AudioHandle handle)
 {
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (AudioProxyPreprocessRender(handle, &data, &reply) < 0) {
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The hwRender parameter is null");
         return HDF_FAILURE;
     }
-    int32_t ret = AudioProxyDispatchCall(cmId, data, reply);
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, cmId, data, reply);
     AudioProxyBufReplyRecycle(data, reply);
     return ret;
 }
@@ -60,17 +65,23 @@ int32_t AudioProxyRenderFlush(AudioHandle handle)
     return HDF_ERR_NOT_SUPPORT;
 }
 
-int32_t AudioProxyRenderGetFrameParameter(int cmId, AudioHandle handle, uint64_t *param)
+int32_t AudioProxyRenderGetFrameParameter(int cmId, const AudioHandle handle, uint64_t *param)
 {
     if (param == NULL) {
         return HDF_FAILURE;
     }
+    int32_t ret;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (AudioProxyPreprocessRender(handle, &data, &reply) < 0) {
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("invalid pointer");
         return HDF_FAILURE;
     }
-    int32_t ret = AudioProxyDispatchCall(cmId, data, reply);
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
+        return HDF_FAILURE;
+    }
+    ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, cmId, data, reply);
     if (ret < 0) {
         AudioProxyBufReplyRecycle(data, reply);
         return ret;
@@ -83,46 +94,57 @@ int32_t AudioProxyRenderGetFrameParameter(int cmId, AudioHandle handle, uint64_t
     return HDF_SUCCESS;
 }
 
-int32_t AudioProxyRenderGetFrameSize(AudioHandle handle, uint64_t *size)
+int32_t AudioProxyRenderGetFrameSize(const AudioHandle handle, uint64_t *size)
 {
     return AudioProxyRenderGetFrameParameter(AUDIO_HDI_RENDER_GET_FRAME_SIZE, handle, size);
 }
 
-int32_t AudioProxyRenderGetFrameCount(AudioHandle handle, uint64_t *count)
+int32_t AudioProxyRenderGetFrameCount(const AudioHandle handle, uint64_t *count)
 {
     return AudioProxyRenderGetFrameParameter(AUDIO_HDI_RENDER_GET_FRAME_COUNT, handle, count);
 }
 
-int32_t AudioProxyRenderSetSampleAttributes(AudioHandle handle, const struct AudioSampleAttributes *attrs)
+int32_t AudioProxyRenderSetSampleAttributes(const AudioHandle handle, const struct AudioSampleAttributes *attrs)
 {
     if (handle == NULL || attrs == NULL) {
         return HDF_FAILURE;
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (AudioProxyPreprocessRender(handle, &data, &reply) < 0) {
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("pointer is invalid");
+        return HDF_FAILURE;
+    }
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
         return HDF_FAILURE;
     }
     if (AudioProxyWriteSampleAttributes(data, attrs) < 0) {
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }
-    int32_t ret = AudioProxyDispatchCall(AUDIO_HDI_RENDER_SET_SAMPLE_ATTR, data, reply);
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_SET_SAMPLE_ATTR, data, reply);
     AudioProxyBufReplyRecycle(data, reply);
     return ret;
 }
 
-int32_t AudioProxyRenderGetSampleAttributes(AudioHandle handle, struct AudioSampleAttributes *attrs)
+int32_t AudioProxyRenderGetSampleAttributes(const AudioHandle handle,
+    struct AudioSampleAttributes *attrs)
 {
     if (attrs == NULL) {
         return HDF_FAILURE;
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (AudioProxyPreprocessRender(handle, &data, &reply) < 0) {
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The hwRender parameter is empty");
         return HDF_FAILURE;
     }
-    int32_t ret = AudioProxyDispatchCall(AUDIO_HDI_RENDER_GET_SAMPLE_ATTR, data, reply);
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_GET_SAMPLE_ATTR, data, reply);
     if (ret < 0) {
         LOG_FUN_ERR("AudioRenderGetSampleAttributes FAIL");
         AudioProxyBufReplyRecycle(data, reply);
@@ -137,17 +159,22 @@ int32_t AudioProxyRenderGetSampleAttributes(AudioHandle handle, struct AudioSamp
     return HDF_SUCCESS;
 }
 
-int32_t AudioProxyRenderGetCurrentChannelId(AudioHandle handle, uint32_t *channelId)
+int32_t AudioProxyRenderGetCurrentChannelId(const AudioHandle handle, uint32_t *channelId)
 {
     if (channelId == NULL) {
         return HDF_FAILURE;
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (AudioProxyPreprocessRender(handle, &data, &reply) < 0) {
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("pointer is null");
         return HDF_FAILURE;
     }
-    int32_t ret = AudioProxyDispatchCall(AUDIO_HDI_RENDER_GET_CUR_CHANNEL_ID, data, reply);
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_GET_CUR_CHANNEL_ID, data, reply);
     if (ret < 0) {
         LOG_FUN_ERR("AudioRenderGetCurrentChannelId FAIL");
         AudioProxyBufReplyRecycle(data, reply);
@@ -170,7 +197,13 @@ int32_t AudioProxyRenderCheckSceneCapability(AudioHandle handle,
     uint32_t tempPins;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (AudioProxyPreprocessRender(handle, &data, &reply) < 0) {
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The hwRender pointer is null");
+        return HDF_FAILURE;
+    }
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
+        LOG_FUN_ERR("AudioProxyPreprocessRender FAIL");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(data, scene->scene.id)) {
@@ -178,13 +211,14 @@ int32_t AudioProxyRenderCheckSceneCapability(AudioHandle handle,
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }
-    tempPins = scene->desc.pins;
+    tempPins = (uint32_t)scene->desc.pins;
     if (!HdfSbufWriteUint32(data, tempPins)) {
         LOG_FUN_ERR("tempPins Write FAIL");
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }
-    int32_t ret = AudioProxyDispatchCall(AUDIO_HDI_RENDER_CHECK_SCENE_CAPABILITY, data, reply);
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle,
+        AUDIO_HDI_RENDER_CHECK_SCENE_CAPABILITY, data, reply);
     if (ret < 0) {
         LOG_FUN_ERR("AudioRenderCheckSceneCapability FAIL");
         AudioProxyBufReplyRecycle(data, reply);
@@ -207,7 +241,12 @@ int32_t AudioProxyRenderSelectScene(AudioHandle handle, const struct AudioSceneD
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (AudioProxyPreprocessRender(handle, &data, &reply) < 0) {
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("parameter is null");
+        return HDF_FAILURE;
+    }
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(data, scene->scene.id)) {
@@ -219,7 +258,7 @@ int32_t AudioProxyRenderSelectScene(AudioHandle handle, const struct AudioSceneD
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }
-    int32_t ret = AudioProxyDispatchCall(AUDIO_HDI_RENDER_SELECT_SCENE, data, reply);
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_SELECT_SCENE, data, reply);
     AudioProxyBufReplyRecycle(data, reply);
     return ret;
 }
@@ -228,7 +267,12 @@ int32_t AudioProxyRenderSetMute(AudioHandle handle, bool mute)
 {
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (AudioProxyPreprocessRender(handle, &data, &reply) < 0) {
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The pointer is null");
+        return HDF_FAILURE;
+    }
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
         return HDF_FAILURE;
     }
     uint32_t tempMute = (uint32_t)mute;
@@ -236,7 +280,7 @@ int32_t AudioProxyRenderSetMute(AudioHandle handle, bool mute)
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }
-    int32_t ret = AudioProxyDispatchCall(AUDIO_HDI_RENDER_SET_MUTE, data, reply);
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_SET_MUTE, data, reply);
     AudioProxyBufReplyRecycle(data, reply);
     return ret;
 }
@@ -248,11 +292,16 @@ int32_t AudioProxyRenderGetMute(AudioHandle handle, bool *mute)
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (AudioProxyPreprocessRender(handle, &data, &reply) < 0) {
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The parameter is null");
         return HDF_FAILURE;
     }
-    int32_t ret = AudioProxyDispatchCall(AUDIO_HDI_RENDER_GET_MUTE, data, reply);
-    uint32_t tempMute;
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_GET_MUTE, data, reply);
+    uint32_t tempMute = 0;
     if (!HdfSbufReadUint32(reply, &tempMute)) {
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
@@ -263,17 +312,16 @@ int32_t AudioProxyRenderGetMute(AudioHandle handle, bool *mute)
     return ret;
 }
 
-
 int32_t AudioProxyRenderSetVolume(AudioHandle handle, float volume)
 {
     LOG_FUN_INFO();
-    return AudioProxyCommonSetCtrlParam(AUDIO_HDI_RENDER_SET_VOLUME, handle, volume);
+    return AudioProxyCommonSetRenderCtrlParam(AUDIO_HDI_RENDER_SET_VOLUME, handle, volume);
 }
 
 int32_t AudioProxyRenderGetVolume(AudioHandle handle, float *volume)
 {
     LOG_FUN_INFO();
-    return AudioProxyCommonGetCtrlParam(AUDIO_HDI_RENDER_GET_VOLUME, handle, volume);
+    return AudioProxyCommonGetRenderCtrlParam(AUDIO_HDI_RENDER_GET_VOLUME, handle, volume);
 }
 
 int32_t AudioProxyRenderGetGainThreshold(AudioHandle handle, float *min, float *max)
@@ -283,17 +331,22 @@ int32_t AudioProxyRenderGetGainThreshold(AudioHandle handle, float *min, float *
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (AudioProxyPreprocessRender(handle, &data, &reply) < 0) {
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The pointer is invalid");
         return HDF_FAILURE;
     }
-    int32_t ret = AudioProxyDispatchCall(AUDIO_HDI_RENDER_GET_GAIN_THRESHOLD, data, reply);
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_GET_GAIN_THRESHOLD, data, reply);
     if (ret < 0) {
         LOG_FUN_ERR("AudioRenderGetGainThreshold FAIL");
         AudioProxyBufReplyRecycle(data, reply);
         return ret;
     }
-    uint32_t tempMin;
-    uint32_t tempMax;
+    uint32_t tempMin = 0;
+    uint32_t tempMax = 0;
     if (!HdfSbufReadUint32(reply, &tempMin)) {
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
@@ -310,22 +363,27 @@ int32_t AudioProxyRenderGetGainThreshold(AudioHandle handle, float *min, float *
 
 int32_t AudioProxyRenderGetGain(AudioHandle handle, float *gain)
 {
-    return AudioProxyCommonGetCtrlParam(AUDIO_HDI_RENDER_GET_GAIN, handle, gain);
+    return AudioProxyCommonGetRenderCtrlParam(AUDIO_HDI_RENDER_GET_GAIN, handle, gain);
 }
 
 int32_t AudioProxyRenderSetGain(AudioHandle handle, float gain)
 {
-    return AudioProxyCommonSetCtrlParam(AUDIO_HDI_RENDER_SET_GAIN, handle, gain);
+    return AudioProxyCommonSetRenderCtrlParam(AUDIO_HDI_RENDER_SET_GAIN, handle, gain);
 }
 
 int32_t AudioProxyRenderGetLatency(struct AudioRender *render, uint32_t *ms)
 {
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (AudioProxyPreprocessRender((AudioHandle)render, &data, &reply) < 0) {
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The pointer is empty");
         return HDF_FAILURE;
     }
-    int32_t ret = AudioProxyDispatchCall(AUDIO_HDI_RENDER_GET_LATENCY, data, reply);
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_GET_LATENCY, data, reply);
     if (ret < 0) {
         LOG_FUN_ERR("AudioRenderGetLatency FAIL");
         AudioProxyBufReplyRecycle(data, reply);
@@ -348,7 +406,12 @@ int32_t AudioProxyRenderRenderFrame(struct AudioRender *render, const void *fram
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (AudioProxyPreprocessRender((AudioHandle)render, &data, &reply) < 0) {
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The hwRender parameter is null");
+        return HDF_FAILURE;
+    }
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
         LOG_FUN_ERR("AudioProxyPreprocessRender FAIL");
         return HDF_FAILURE;
     }
@@ -357,7 +420,7 @@ int32_t AudioProxyRenderRenderFrame(struct AudioRender *render, const void *fram
         LOG_FUN_ERR("HdfSbufWriteBuffer FAIL");
         return HDF_FAILURE;
     }
-    int32_t ret = AudioProxyDispatchCall(AUDIO_HDI_RENDER_RENDER_FRAME, data, reply);
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_RENDER_FRAME, data, reply);
     if (ret < 0) {
         if (ret != HDF_ERR_INVALID_OBJECT) {
             LOG_FUN_ERR("AudioRenderRenderFrame FAIL");
@@ -377,24 +440,24 @@ int32_t AudioProxyRenderGetRenderPosition(struct AudioRender *render, uint64_t *
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (AudioProxyPreprocessRender((AudioHandle)render, &data, &reply) < 0) {
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("hwRender or hwRender->proxyRemoteHandle invalid");
         return HDF_FAILURE;
     }
-    int32_t ret = AudioProxyDispatchCall(AUDIO_HDI_RENDER_GET_RENDER_POSITION, data, reply);
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
+        LOG_FUN_ERR("AudioProxyPreprocessRender FAIL");
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle,
+        AUDIO_HDI_RENDER_GET_RENDER_POSITION, data, reply);
     if (ret < 0) {
         LOG_FUN_ERR("AudioRenderGetRenderPosition FAIL");
         AudioProxyBufReplyRecycle(data, reply);
         return ret;
     }
-    if (!HdfSbufReadUint64(reply, frames)) {
-        AudioProxyBufReplyRecycle(data, reply);
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadInt64(reply, &time->tvSec)) {
-        AudioProxyBufReplyRecycle(data, reply);
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadInt64(reply, &time->tvNSec)) {
+    if (AudioProxyGetMmapPositionRead(reply, frames, time) < 0) {
+        LOG_FUN_ERR("AudioProxyGetMmapPositionRead FAIL");
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }
@@ -424,7 +487,13 @@ int32_t AudioProxyRenderSetChannelMode(struct AudioRender *render, enum AudioCha
 {
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (AudioProxyPreprocessRender((AudioHandle)render, &data, &reply) < 0) {
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("parameter is null");
+        return HDF_FAILURE;
+    }
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
+        LOG_FUN_ERR("AudioProxyPreprocessRender FAIL");
         return HDF_FAILURE;
     }
     uint32_t tempMode = (uint32_t)mode;
@@ -432,7 +501,7 @@ int32_t AudioProxyRenderSetChannelMode(struct AudioRender *render, enum AudioCha
         AudioProxyBufReplyRecycle(data, reply);
         return HDF_FAILURE;
     }
-    int32_t ret = AudioProxyDispatchCall(AUDIO_HDI_RENDER_SET_CHANNEL_MODE, data, reply);
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_SET_CHANNEL_MODE, data, reply);
     AudioProxyBufReplyRecycle(data, reply);
     return ret;
 }
@@ -444,11 +513,16 @@ int32_t AudioProxyRenderGetChannelMode(struct AudioRender *render, enum AudioCha
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (AudioProxyPreprocessRender((AudioHandle)render, &data, &reply) < 0) {
-        LOG_FUN_ERR("AudioProxyRenderGetChannelMode FAIL");
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("hwRender or hwRender->proxyRemoteHandle is NULL");
         return HDF_FAILURE;
     }
-    int32_t ret = AudioProxyDispatchCall(AUDIO_HDI_RENDER_GET_CHANNEL_MODE, data, reply);
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
+        LOG_FUN_ERR("AudioProxyPreprocessRender FAIL");
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_GET_CHANNEL_MODE, data, reply);
     if (ret < 0) {
         LOG_FUN_ERR("AudioRenderGetChannelMode FAIL");
         AudioProxyBufReplyRecycle(data, reply);
@@ -462,5 +536,261 @@ int32_t AudioProxyRenderGetChannelMode(struct AudioRender *render, enum AudioCha
     *mode = (enum AudioChannelMode)tempMode;
     AudioProxyBufReplyRecycle(data, reply);
     return HDF_SUCCESS;
+}
+
+int32_t AudioProxyRenderSetExtraParams(AudioHandle handle, const char *keyValueList)
+{
+    if (NULL == handle || NULL == keyValueList) {
+        LOG_FUN_ERR("The parameter is empty");
+        return HDF_FAILURE;
+    }
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The parameter is null");
+        return HDF_FAILURE;
+    }
+    if (AudioProxyPreprocessRender((AudioHandle)hwRender, &data, &reply) < 0) {
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteString(data, keyValueList)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_SET_EXTRA_PARAMS, data, reply);
+    AudioProxyBufReplyRecycle(data, reply);
+    return ret;
+}
+int32_t AudioProxyRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_t listLenth)
+{
+    LOG_PARA_INFO("AudioProxyRenderGetExtraParams enter!");
+    if (NULL == handle || NULL == keyValueList || listLenth <= 0) {
+        return HDF_FAILURE;
+    }
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("parameter is null");
+        return HDF_FAILURE;
+    }
+    if (AudioProxyPreprocessRender((AudioHandle)hwRender, &data, &reply) < 0) {
+        LOG_FUN_ERR("AudioProxyRenderGetExtraParams FAIL");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteInt32(data, listLenth)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_GET_EXTRA_PARAMS, data, reply);
+    if (ret < 0) {
+        LOG_FUN_ERR("AudioProxyRenderGetExtraParams FAIL");
+        AudioProxyBufReplyRecycle(data, reply);
+        return ret;
+    }
+    const char *strKeyValueList = NULL;
+    if ((strKeyValueList = HdfSbufReadString(reply)) == NULL) {
+        LOG_FUN_ERR("keyValueList Is empty");
+        AudioProxyBufReplyRecycle(data, reply);
+        return HDF_FAILURE;
+    }
+    ret = strncpy_s(keyValueList, listLenth - 1, strKeyValueList, strlen(strKeyValueList) + 1);
+    if (ret != 0) {
+        LOG_FUN_ERR("Copy failed!");
+        AudioProxyBufReplyRecycle(data, reply);
+        return HDF_FAILURE;
+    }
+    AudioProxyBufReplyRecycle(data, reply);
+    return ret;
+}
+
+int32_t AudioProxyRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc)
+{
+    if (NULL == handle || NULL == desc) {
+        return HDF_FAILURE;
+    }
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("hwRender or hwRender->proxyRemoteHandle is NULL");
+        return HDF_FAILURE;
+    }
+
+    if (AudioProxyPreprocessRender((AudioHandle)hwRender, &data, &reply) < 0) {
+        LOG_FUN_ERR("AudioProxyRenderReqMmapBuffer FAIL");
+        return HDF_FAILURE;
+    }
+    if (AudioProxyReqMmapBufferWrite(data, reqSize, desc) < 0) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_REQ_MMAP_BUFFER, data, reply);
+    if (ret < 0) {
+        LOG_FUN_ERR("AudioProxyRenderReqMmapBuffer FAIL");
+        AudioProxyBufReplyRecycle(data, reply);
+        return ret;
+    }
+
+    AudioProxyBufReplyRecycle(data, reply);
+    return ret;
+}
+
+int32_t AudioProxyRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time)
+{
+    if (NULL == handle || NULL == frames || NULL == time) {
+        return HDF_FAILURE;
+    }
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The parameter is empty");
+        return HDF_FAILURE;
+    }
+
+    if (AudioProxyPreprocessRender((AudioHandle)hwRender, &data, &reply) < 0) {
+        LOG_FUN_ERR("AudioProxyRenderGetMmapPosition FAIL");
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_GET_MMAP_POSITION, data, reply);
+    if (ret < 0) {
+        AudioProxyBufReplyRecycle(data, reply);
+        LOG_FUN_ERR("AudioProxyRenderGetMmapPosition FAIL");
+        return ret;
+    }
+    if (AudioProxyGetMmapPositionRead(reply, frames, time) < 0) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return HDF_FAILURE;
+    }
+    AudioProxyBufReplyRecycle(data, reply);
+    return HDF_SUCCESS;
+}
+
+int32_t AudioProxyRenderTurnStandbyMode(AudioHandle handle)
+{
+    if (NULL == handle) {
+        return HDF_FAILURE;
+    }
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("parameter is empty");
+        return HDF_FAILURE;
+    }
+
+    if (AudioProxyPreprocessRender((AudioHandle)hwRender, &data, &reply) < 0) {
+        LOG_FUN_ERR("AudioProxyRenderTurnStandbyMode FAIL");
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_TURN_STAND_BY_MODE, data, reply);
+    if (ret < 0) {
+        LOG_FUN_ERR("AudioProxyRenderTurnStandbyMode FAIL");
+        AudioProxyBufReplyRecycle(data, reply);
+        return ret;
+    }
+    AudioProxyBufReplyRecycle(data, reply);
+    return ret;
+}
+int32_t AudioProxyRenderAudioDevDump(AudioHandle handle, int32_t range, int32_t fd)
+{
+    if (NULL == handle) {
+        return HDF_FAILURE;
+    }
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The hwRender parameter is empty");
+        return HDF_FAILURE;
+    }
+    if (AudioProxyPreprocessRender((AudioHandle)hwRender, &data, &reply) < 0) {
+        LOG_FUN_ERR("AudioProxyRenderAudioDevDump FAIL");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteInt32(data, range)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        LOG_FUN_ERR("Write FAIL");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteInt32(data, fd)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_DEV_DUMP, data, reply);
+    if (ret < 0) {
+        LOG_FUN_ERR("AudioProxyRenderAudioDevDump FAIL");
+        AudioProxyBufReplyRecycle(data, reply);
+        return ret;
+    }
+    AudioProxyBufReplyRecycle(data, reply);
+    return ret;
+}
+int32_t AudioProxyRenderRegCallback(struct AudioRender *render, RenderCallback callback, void *cookie)
+{
+    if (NULL == render || NULL == callback || NULL == cookie) {
+        return HDF_FAILURE;
+    }
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The parameter is empty");
+        return HDF_FAILURE;
+    }
+    if (AudioProxyPreprocessRender((AudioHandle)hwRender, &data, &reply) < 0) {
+        LOG_FUN_ERR("AudioProxyRenderRegCallback FAIL");
+        return HDF_FAILURE;
+    }
+    uint64_t tempAddr = (uint64_t)cookie;
+    if (!HdfSbufWriteUint64(data, tempAddr)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return HDF_FAILURE;
+    }
+    tempAddr = (uint64_t)callback;
+    if (!HdfSbufWriteUint64(data, tempAddr)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_REG_CALLBACK, data, reply);
+    if (ret < 0) {
+        LOG_FUN_ERR("AudioProxyRenderRegCallback FAIL");
+        AudioProxyBufReplyRecycle(data, reply);
+        return ret;
+    }
+    AudioProxyBufReplyRecycle(data, reply);
+    return ret;
+}
+int32_t AudioProxyRenderDrainBuffer(struct AudioRender *render, enum AudioDrainNotifyType *type)
+{
+    if (NULL == render) {
+        return HDF_FAILURE;
+    }
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The hwRender parameter is empty");
+        return HDF_FAILURE;
+    }
+    if (AudioProxyPreprocessRender((AudioHandle)hwRender, &data, &reply) < 0) {
+        LOG_FUN_ERR("AudioProxyRenderDrainBuffer FAIL");
+        return HDF_FAILURE;
+    }
+    uint32_t tempType = (uint32_t)type;
+    if (!HdfSbufWriteUint32(data, tempType)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_DRAIN_BUFFER, data, reply);
+    if (ret < 0) {
+        LOG_FUN_ERR("AudioProxyRenderDrainBuffer FAIL");
+        AudioProxyBufReplyRecycle(data, reply);
+        return ret;
+    }
+    AudioProxyBufReplyRecycle(data, reply);
+    return ret;
 }
 

@@ -14,22 +14,28 @@
  */
 
 #include "hdf_audio_server.h"
+#include "hdf_audio_server_capture.h"
 #include "hdf_audio_server_common.h"
+#include "hdf_audio_server_render.h"
 
 #define HDF_LOG_TAG hdf_audio_server
+
 struct AudioAdapterDescriptor *g_descs = NULL;
 struct AudioManager *g_serverManager = NULL;
-
+#ifdef AUDIO_HAL_USER
+static void *g_mpiInitSo = NULL;
+#define SO_INTERFACE_LIB_MPI_PATH "/system/lib/libhdi_audio_interface_lib_mpi.z.so"
+#endif
 /**************************public************************/
 int32_t HdiServiceGetFuncs()
 {
-    HDF_LOGE("%{public}s", "enter to HdiServiceGetFuncs ");
+    HDF_LOGE("%{public}s: enter to", __func__);
     if (g_serverManager != NULL) {
         return HDF_SUCCESS;
     }
     g_serverManager = GetAudioManagerFuncs();
     if (g_serverManager == NULL) {
-        HDF_LOGE("%{public}s", "GetAudioManagerFuncs FAIL!\n");
+        HDF_LOGE("%{public}s: GetAudioManagerFuncs FAIL!", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -37,28 +43,40 @@ int32_t HdiServiceGetFuncs()
 
 static int32_t HdiServiceGetAllAdapter(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGE("%{public}s", "enter to HdiServiceGetAllAdapter ");
+    HDF_LOGE("%{public}s: enter to", __func__);
     if (client == NULL || data == NULL || reply == NULL) {
         return HDF_FAILURE;
     }
+    static bool getAdaptersFlag = true;
     struct AudioAdapterDescriptor *descs = NULL;
     struct AudioManager *manager = g_serverManager;
     int32_t size = 0;
+
     if (manager == NULL) {
-        HDF_LOGE("%{public}s", "Manager is NULL");
+        HDF_LOGE("%{public}s: Manager is NULL", __func__);
         return HDF_FAILURE;
     }
     int32_t ret = manager->GetAllAdapters(manager, &descs, &size);
     if (ret < 0) {
-        HDF_LOGE("%{public}s", "g_manager->GetAllAdapters error");
+        HDF_LOGE("%{public}s: g_manager->GetAllAdapters error", __func__);
         return HDF_FAILURE;
     }
     if (size > MAX_AUDIO_ADAPTER_NUM_SERVER || size == 0 || descs == NULL || ret < 0) {
-        HDF_LOGE("%{public}s", "size or g_descs is error");
+        HDF_LOGE("%{public}s: size or g_descs is error", __func__);
         return HDF_ERR_NOT_SUPPORT;
     }
     g_descs = descs;
-    HDF_LOGE("%{public}s", "GetAllAdapters out");
+    if (getAdaptersFlag == true) {  // Initialize only once
+        ret = AdaptersServerManageInit(descs, size);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: AdapterServerManageInit fail", __func__);
+
+            return ret;
+        }
+        getAdaptersFlag = false;
+    }
+    HDF_LOGE("%{public}s: out", __func__);
+
     return HDF_SUCCESS;
 }
 
@@ -70,18 +88,24 @@ int SwitchAdapter(struct AudioAdapterDescriptor *descs, const char *adapterNameC
     }
     for (int index = 0; index < size; index++) {
         struct AudioAdapterDescriptor *desc = &descs[index];
+        if (desc == NULL) {
+            continue;
+        }
+        if (desc->adapterName == NULL) {
+            return HDF_FAILURE;
+        }
         if (strcmp(desc->adapterName, adapterNameCase)) {
             continue;
         }
-        for (uint32_t port = 0; ((desc != NULL) && (port < desc->portNum)); port++) {
+        for (uint32_t port = 0; port < desc->portNum; port++) {
             if (desc->ports[port].dir == portFlag) {
                 *renderPort = desc->ports[port];
-                HDF_LOGE("%{public}s,%{public}d", "SwitchAdapter success!", portFlag);
+                HDF_LOGE("%{public}s: success!,%{public}d", __func__, portFlag);
                 return index;
             }
         }
     }
-    HDF_LOGE("%{public}s", "SwitchAdapter out!");
+    HDF_LOGE("%{public}s: out!", __func__);
     return HDF_FAILURE;
 }
 
@@ -95,9 +119,9 @@ static int32_t HdiServiceLoadAdapter(struct HdfDeviceIoClient *client, struct Hd
     struct AudioAdapter *adapter = NULL;
     struct AudioPort renderPort;
     const char *adapterName = NULL;
-    uint32_t tempDir;
+    uint32_t tempDir = 0;
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s", "adapterNameCase Is NULL");
+        HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
         return HDF_FAILURE;
     }
     int32_t ret = AudioAdapterCheckListExist(adapterName);
@@ -105,20 +129,21 @@ static int32_t HdiServiceLoadAdapter(struct HdfDeviceIoClient *client, struct Hd
         return HDF_FAILURE;
     }
     if (ret == HDF_SUCCESS) {
-        HDF_LOGE("%{public}s", "HdiServiceLoadAdapter: adapte already exist !");
+        HDF_LOGE("%{public}s: adapte already exist !", __func__);
         return HDF_SUCCESS;
     }
     if (!HdfSbufReadUint32(data, &tempDir)) {
-        HDF_LOGE("%{public}s", "HdiServiceLoadAdapter: adapter need Load!");
+        HDF_LOGE("%{public}s: adapter need Load!", __func__);
         return HDF_FAILURE;
     }
     enum AudioPortDirection port = (enum AudioPortDirection)tempDir;
     struct AudioManager *manager = g_serverManager;
     if (adapterName == NULL || manager == NULL || g_descs == NULL) {
-        HDF_LOGE("%{public}s", "Point is NULL!");
+        HDF_LOGE("%{public}s: Point is NULL!", __func__);
         return HDF_FAILURE;
     }
-    int index = SwitchAdapter(g_descs, adapterName, port, &renderPort, MAX_AUDIO_ADAPTER_NUM_SERVER);
+    int index = SwitchAdapter(g_descs, adapterName, port,
+        &renderPort, ServerManageGetAdapterNum());
     if (index < 0) {
         return HDF_ERR_NOT_SUPPORT;
     }
@@ -128,11 +153,11 @@ static int32_t HdiServiceLoadAdapter(struct HdfDeviceIoClient *client, struct Hd
         return HDF_ERR_NOT_SUPPORT;
     }
     if (adapter == NULL) {
-        HDF_LOGE("%{public}s", "load audio device failed");
+        HDF_LOGE("%{public}s: load audio device failed", __func__);
         return HDF_FAILURE;
     }
     if (AudioAdapterListAdd(adapterName, adapter)) {
-        HDF_LOGE("%{public}s", "AudioAdapterListAdd error!");
+        HDF_LOGE("%{public}s: AudioAdapterListAdd error!", __func__);
         manager->UnloadAdapter(manager, adapter);
         return HDF_FAILURE;
     }
@@ -141,22 +166,22 @@ static int32_t HdiServiceLoadAdapter(struct HdfDeviceIoClient *client, struct Hd
 
 static int32_t HdiServiceInitAllPorts(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGE("%{public}s", "HdiServiceInitAllPorts");
+    HDF_LOGE("%{public}s: HdiServiceInitAllPorts", __func__);
     if (client == NULL || data == NULL || reply == NULL) {
         return HDF_FAILURE;
     }
     const char *adapterName = NULL;
     struct AudioAdapter *adapter = NULL;
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s", "adapterNameCase Is NULL");
+        HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
         return HDF_FAILURE;
     }
     if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
-        HDF_LOGE("%{public}s", "AudioAdapterListGetAdapter fail");
+        HDF_LOGE("%{public}s: AudioAdapterListGetAdapter fail", __func__);
         return HDF_FAILURE;
     }
     if (adapter->InitAllPorts(adapter)) {
-        HDF_LOGE("%{public}s", "InitAllPorts fail");
+        HDF_LOGE("%{public}s: InitAllPorts fail", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -172,22 +197,22 @@ static int32_t HdiServiceUnloadAdapter(struct HdfDeviceIoClient *client, struct 
     int ret;
     struct AudioManager *manager = g_serverManager;
     if (manager == NULL) {
-        HDF_LOGE("%{public}s", "Point is NULL!");
+        HDF_LOGE("%{public}s: Point is NULL!", __func__);
         return HDF_FAILURE;
     }
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s", "adapterNameCase Is NULL");
+        HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
         return HDF_FAILURE;
     }
     ret = AudioAdapterListDestory(adapterName, &adapter);
     if (ret == HDF_FAILURE) {
-        HDF_LOGE("%{public}s", "Other dev Use the adapter");
+        HDF_LOGE("%{public}s: Other dev Use the adapter", __func__);
         return HDF_SUCCESS;
     } else if (ret == HDF_ERR_INVALID_PARAM) {
-        HDF_LOGE("%{public}s", "HdiServiceUnloadAdapter: param invalid!");
+        HDF_LOGE("%{public}s: param invalid!", __func__);
         return HDF_FAILURE;
     } else {
-        HDF_LOGE("%{public}s", "HdiServiceUnloadAdapter: Unload the adapter!");
+        HDF_LOGE("%{public}s: Unload the adapter!", __func__);
     }
     if (adapter == NULL) {
         return HDF_FAILURE;
@@ -199,7 +224,7 @@ static int32_t HdiServiceUnloadAdapter(struct HdfDeviceIoClient *client, struct 
 static int32_t HdiServiceGetPortCapability(struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGE("%{public}s", "HdiServiceGetPortCapability in!");
+    HDF_LOGE("%{public}s: enter", __func__);
     if (client == NULL || data == NULL || reply == NULL) {
         return HDF_FAILURE;
     }
@@ -209,7 +234,7 @@ static int32_t HdiServiceGetPortCapability(struct HdfDeviceIoClient *client,
     const char *adapterName = NULL;
     uint32_t tempDir;
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s", "adapterNameCase Is NULL");
+        HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &tempDir)) {
@@ -224,16 +249,16 @@ static int32_t HdiServiceGetPortCapability(struct HdfDeviceIoClient *client,
     }
     HDF_LOGE("port.portName = %{public}s", port.portName);
     if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
-        HDF_LOGE("%{public}s", "AudioAdapterListGetAdapter fail");
+        HDF_LOGE("%{public}s: AudioAdapterListGetAdapter fail", __func__);
         return HDF_FAILURE;
     }
     if (adapter == NULL) {
-        HDF_LOGE("%{public}s", "HdiServiceCreatRender adapter is NULL!");
+        HDF_LOGE("%{public}s: HdiServiceCreatRender adapter is NULL!", __func__);
         return HDF_FAILURE;
     }
     int32_t ret = adapter->GetPortCapability(adapter, &port, &capability);
     if (ret < 0) {
-        HDF_LOGE("%{public}s", "HdiServiceGetPortCapability ret failed");
+        HDF_LOGE("%{public}s: ret failed", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -242,7 +267,7 @@ static int32_t HdiServiceGetPortCapability(struct HdfDeviceIoClient *client,
 static int32_t HdiServiceSetPassthroughMode(struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGE("%{public}s", "HdiServiceSetPassthroughMode in");
+    HDF_LOGE("%{public}s: enter", __func__);
     if (client == NULL || data == NULL || reply == NULL) {
         return HDF_FAILURE;
     }
@@ -251,7 +276,7 @@ static int32_t HdiServiceSetPassthroughMode(struct HdfDeviceIoClient *client,
     struct AudioAdapter *adapter = NULL;
     const char *adapterName = NULL;
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s", "adapterNameCase Is NULL");
+        HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
         return HDF_FAILURE;
     }
     uint32_t tempDir;
@@ -273,13 +298,13 @@ static int32_t HdiServiceSetPassthroughMode(struct HdfDeviceIoClient *client,
         return HDF_FAILURE;
     }
     mode = (enum AudioPortPassthroughMode)tempMode;
-    HDF_LOGE("%{public}s mode = %{public}d", "SetPassthroughMode ready in", mode);
+    HDF_LOGE("%{public}s: ready in,mode = %{public}d", __func__, mode);
     if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
-        HDF_LOGE("%{public}s", "AudioAdapterListGetAdapter fail");
+        HDF_LOGE("%{public}s: AudioAdapterListGetAdapter fail", __func__);
         return HDF_FAILURE;
     }
     if (adapter == NULL) {
-        HDF_LOGE("%{public}s", "HdiServiceCreatRender adapter is NULL!");
+        HDF_LOGE("%{public}s: HdiServiceCreatRender adapter is NULL!", __func__);
         return HDF_FAILURE;
     }
     int ret = adapter->SetPassthroughMode(adapter, &port, mode);
@@ -291,12 +316,12 @@ static int32_t HdiServiceGetPassthroughMode(struct HdfDeviceIoClient *client,
     if (client == NULL || data == NULL || reply == NULL) {
         return HDF_FAILURE;
     }
-    struct AudioPort port;
-    enum AudioPortPassthroughMode mode;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_AUTO;
     struct AudioAdapter *adapter = NULL;
     const char *adapterName = NULL;
+    struct AudioPort port;
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s", "adapterNameCase Is NULL");
+        HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
         return HDF_FAILURE;
     }
     uint32_t tempDir = port.dir;
@@ -312,16 +337,16 @@ static int32_t HdiServiceGetPassthroughMode(struct HdfDeviceIoClient *client,
         return HDF_FAILURE;
     }
     if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
-        HDF_LOGE("%{public}s", "AudioAdapterListGetAdapter fail");
+        HDF_LOGE("%{public}s: AudioAdapterListGetAdapter fail", __func__);
         return HDF_FAILURE;
     }
     if (adapter == NULL) {
-        HDF_LOGE("%{public}s", "adapter is NULL!");
+        HDF_LOGE("%{public}s: adapter is NULL!", __func__);
         return HDF_FAILURE;
     }
     int ret = adapter->GetPassthroughMode(adapter, &port, &mode);
     if (ret < 0) {
-        HDF_LOGE("%{public}s", "GetPassthroughMode ret failed");
+        HDF_LOGE("%{public}s: GetPassthroughMode ret failed", __func__);
         return HDF_FAILURE;
     }
     uint32_t tempMode = (uint32_t)mode;
@@ -369,6 +394,14 @@ struct HdiServiceDispatchCmdHandleList g_hdiServiceDispatchCmdHandleList[] = {
     {AUDIO_HDI_RENDER_SET_SPEED, HdiServiceRenderSetSpeed},
     {AUDIO_HDI_RENDER_SET_CHANNEL_MODE, HdiServiceRenderSetChannelMode},
     {AUDIO_HDI_RENDER_GET_CHANNEL_MODE, HdiServiceRenderGetChannelMode},
+    {AUDIO_HDI_RENDER_SET_EXTRA_PARAMS, HdiServiceRenderSetExtraParams},
+    {AUDIO_HDI_RENDER_GET_EXTRA_PARAMS, HdiServiceRenderGetExtraParams},
+    {AUDIO_HDI_RENDER_REQ_MMAP_BUFFER, HdiServiceRenderReqMmapBuffer},
+    {AUDIO_HDI_RENDER_GET_MMAP_POSITION, HdiServiceRenderGetMmapPosition},
+    {AUDIO_HDI_RENDER_TURN_STAND_BY_MODE, HdiServiceRenderTurnStandbyMode},
+    {AUDIO_HDI_RENDER_DEV_DUMP, HdiServiceRenderDevDump},
+    {AUDIO_HDI_RENDER_REG_CALLBACK, HdiServiceRenderRegCallback},
+    {AUDIO_HDI_RENDER_DRAIN_BUFFER, HdiServiceRenderDrainBuffer},
 };
 
 static struct HdiServiceDispatchCmdHandleList g_hdiServiceDispatchCmdHandleCapList[] = {
@@ -395,6 +428,12 @@ static struct HdiServiceDispatchCmdHandleList g_hdiServiceDispatchCmdHandleCapLi
     {AUDIO_HDI_CAPTURE_SET_GAIN, HdiServiceCaptureSetGain},
     {AUDIO_HDI_CAPTURE_CAPTURE_FRAME, HdiServiceCaptureCaptureFrame},
     {AUDIO_HDI_CAPTURE_GET_CAPTURE_POSITION, HdiServiceCaptureGetCapturePosition},
+    {AUDIO_HDI_CAPTURE_SET_EXTRA_PARAMS, HdiServiceCaptureSetExtraParams},
+    {AUDIO_HDI_CAPTURE_GET_EXTRA_PARAMS, HdiServiceCaptureGetExtraParams},
+    {AUDIO_HDI_CAPTURE_REQ_MMAP_BUFFER, HdiServiceCaptureReqMmapBuffer},
+    {AUDIO_HDI_CAPTURE_GET_MMAP_POSITION, HdiServiceCaptureGetMmapPosition},
+    {AUDIO_HDI_CAPTURE_TURN_STAND_BY_MODE, HdiServiceCaptureTurnStandbyMode},
+    {AUDIO_HDI_CAPTURE_DEV_DUMP, HdiServiceCaptureDevDump},
 };
 
 static int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
@@ -402,15 +441,15 @@ static int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, s
 {
     unsigned int i;
     if (client == NULL || data == NULL || reply == NULL) {
-        HDF_LOGE("%{public}s", "ControlDispatch: input para is NULL.");
+        HDF_LOGE("%{public}s: ControlDispatch: input para is NULL.", __func__);
         return HDF_FAILURE;
     }
     HDF_LOGE("ControlDispatch: valid cmdId = %{public}d", cmdId);
 
-    if (cmdId > AUDIO_HDI_CAPTURE_GET_CAPTURE_POSITION || cmdId < 0) {
+    if (cmdId > AUDIO_HDI_CAPTURE_DEV_DUMP || cmdId < 0) {
         HDF_LOGE("ControlDispatch: invalid cmdId = %{public}d", cmdId);
         return HDF_FAILURE;
-    } else if (cmdId <= AUDIO_HDI_RENDER_GET_CHANNEL_MODE) {
+    } else if (cmdId <= AUDIO_HDI_RENDER_DRAIN_BUFFER) {
         for (i = 0; i < sizeof(g_hdiServiceDispatchCmdHandleList) /
             sizeof(g_hdiServiceDispatchCmdHandleList[0]); ++i) {
             if ((cmdId == (int)(g_hdiServiceDispatchCmdHandleList[i].cmd)) &&
@@ -433,8 +472,11 @@ static int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, s
 void AudioHdiServerRelease(struct HdfDeviceObject *deviceObject)
 {
     LOG_FUN_INFO();
+    /* g_renderAndCaptureManage release */
+    AdaptersServerManageInfomationRecycle();
+
     if (deviceObject == NULL) {
-        HDF_LOGE("deviceObject is null!");
+        HDF_LOGE("%{public}s: deviceObject is null!", __func__);
         return;
     }
     deviceObject->service = NULL;
@@ -445,7 +487,7 @@ int AudioHdiServerBind(struct HdfDeviceObject *deviceObject)
 {
     LOG_FUN_INFO();
     if (deviceObject == NULL) {
-        HDF_LOGE("deviceObject is null!");
+        HDF_LOGE("%{public}s: deviceObject is null!", __func__);
         return HDF_FAILURE;
     }
     static struct IDeviceIoService hdiService = {
@@ -464,7 +506,7 @@ int AudioHdiServerInit(struct HdfDeviceObject *deviceObject)
 {
     LOG_FUN_INFO();
     if (deviceObject == NULL) {
-        HDF_LOGE("deviceObject is null!");
+        HDF_LOGE("%{public}s: deviceObject is null!", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;

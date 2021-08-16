@@ -42,12 +42,8 @@ using namespace HMOS::Audio;
 namespace {
 const string BIND_CONTROL = "control";
 const string BIND_RENDER = "render";
-const string BIND_NAME_ERROR = "rendeo";
-const string AUDIO_FILE_PATH = "//bin/audiorendertest.wav";
-const int G_BUFFERSIZE = 256;
-const string ADAPTER_NAME_HDIMI = "hdmi";
+const string BIND_NAME_ERROR = "rendor";
 const string ADAPTER_NAME_USB = "usb";
-const string ADAPTER_NAME3 = "internal";
 
 class AudioLibRenderTest : public testing::Test {
 public:
@@ -55,35 +51,42 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct DevHandle *(*BindServiceRenderSo)(const char *) = nullptr;
-    int32_t (*InterfaceLibOutputRender)(struct DevHandle *, int, struct AudioHwRenderParam *) = nullptr;
-    int32_t (*InterfaceLibCtlRender)(struct DevHandle *, int, struct AudioHwRenderParam *) = nullptr;
-    void (*CloseServiceRenderSo)(struct DevHandle *) = nullptr;
-    void *PtrHandle = nullptr;
-    uint32_t PcmFormatToBits(enum AudioFormat format) const;
-    uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs) const;
+    static struct DevHandle *(*BindServiceRenderSo)(const char *);
+    static int32_t (*InterfaceLibOutputRender)(struct DevHandle *, int, struct AudioHwRenderParam *);
+    static int32_t (*InterfaceLibCtlRender)(struct DevHandle *, int, struct AudioHwRenderParam *);
+    static void (*CloseServiceRenderSo)(struct DevHandle *);
+    static void *PtrHandle;
+#ifdef AUDIO_MPI_SO
+    static int32_t (*SdkInit)();
+    static void (*SdkExit)();
+#endif
     uint32_t PcmBytesToFrames(const struct AudioFrameRenderMode &frameRenderMode, uint64_t bytes) const;
-    uint32_t FormatToBits(enum AudioFormat format) const;
-    uint32_t FrameLibStart(FILE *file, struct AudioSampleAttributes attrs,
+    int32_t FrameLibStart(FILE *file, struct AudioSampleAttributes attrs,
         struct AudioHeadInfo wavHeadInfo, struct AudioHwRender *hwRender) const;
-    uint32_t LibStartAndStream(const std::string path, struct AudioSampleAttributes attrs,
+    int32_t LibStartAndStream(const std::string path, struct AudioSampleAttributes attrs,
         struct DevHandle *handle, struct AudioHwRender *hwRender, struct AudioHeadInfo wavHeadInfo) const;
-    uint32_t InitHwRender(struct AudioHwRender *hwRender, struct AudioSampleAttributes attrs,
-        const std::string adapterNameCase) const;
     int32_t LibHwOutputRender(struct AudioHwRender *hwRender, struct DevHandle *handlerender) const;
+    int32_t BindServiceAndHwRender(struct AudioHwRender *&hwRender,
+        const std::string BindName, const std::string adapterNameCase, struct DevHandle *&handle) const;
 };
+
+struct DevHandle *(*AudioLibRenderTest::BindServiceRenderSo)(const char *) = nullptr;
+int32_t (*AudioLibRenderTest::InterfaceLibOutputRender)(struct DevHandle *, int, struct AudioHwRenderParam *) = nullptr;
+int32_t (*AudioLibRenderTest::InterfaceLibCtlRender)(struct DevHandle *, int, struct AudioHwRenderParam *) = nullptr;
+void (*AudioLibRenderTest::CloseServiceRenderSo)(struct DevHandle *) = nullptr;
+void *AudioLibRenderTest::PtrHandle = nullptr;
+#ifdef AUDIO_MPI_SO
+    int32_t (*AudioLibRenderTest::SdkInit)() = nullptr;
+    void (*AudioLibRenderTest::SdkExit)() = nullptr;
+#endif
 
 void AudioLibRenderTest::SetUpTestCase(void)
 {
-}
-
-void AudioLibRenderTest::TearDownTestCase(void)
-{
-}
-
-void AudioLibRenderTest::SetUp(void)
-{
+#ifdef __LITEOS__
+    char resolvedPath[] = "/usr/lib/libhdi_audio_interface_lib_render.so";
+#else
     char resolvedPath[] = "//system/lib/libhdi_audio_interface_lib_render.z.so";
+#endif
     PtrHandle = dlopen(resolvedPath, RTLD_LAZY);
     if (PtrHandle == nullptr) {
         return;
@@ -99,73 +102,57 @@ void AudioLibRenderTest::SetUp(void)
         dlclose(PtrHandle);
         return;
     }
+#ifdef AUDIO_MPI_SO
+    SdkInit = (int32_t (*)())(dlsym(PtrHandle, "MpiSdkInit"));
+    if (SdkInit == nullptr) {
+        return;
+    }
+    SdkExit = (void (*)())(dlsym(PtrHandle, "MpiSdkExit"));
+    if (SdkExit == nullptr) {
+        return;
+    }
+    SdkInit();
+#endif
 }
 
-void AudioLibRenderTest::TearDown(void)
+void AudioLibRenderTest::TearDownTestCase(void)
 {
+    if (BindServiceRenderSo != nullptr) {
+        BindServiceRenderSo = nullptr;
+    }
+    if (CloseServiceRenderSo != nullptr) {
+        CloseServiceRenderSo = nullptr;
+    }
+    if (InterfaceLibOutputRender != nullptr) {
+        InterfaceLibOutputRender = nullptr;
+    }
+    if (InterfaceLibCtlRender != nullptr) {
+        InterfaceLibCtlRender = nullptr;
+    }
+#ifdef AUDIO_MPI_SO
+    SdkExit();
+    if (SdkInit != nullptr) {
+        SdkInit = nullptr;
+    }
+    if (SdkExit != nullptr) {
+        SdkExit = nullptr;
+    }
+#endif
     if (PtrHandle != nullptr) {
         dlclose(PtrHandle);
         PtrHandle = nullptr;
     }
-    if (BindServiceRenderSo != nullptr) {
-        BindServiceRenderSo = nullptr;
-    } 
-    if (CloseServiceRenderSo != nullptr) {
-        CloseServiceRenderSo = nullptr;
-    } 
-    if (InterfaceLibOutputRender != nullptr) {
-        InterfaceLibOutputRender = nullptr;
-    } 
-    if (InterfaceLibCtlRender != nullptr) {
-        InterfaceLibCtlRender = nullptr;
-    }
 }
 
-uint32_t AudioLibRenderTest::PcmFormatToBits(enum AudioFormat format) const
-{
-    switch (format) {
-        case AUDIO_FORMAT_PCM_16_BIT:
-            return G_PCM16BIT;
-        case AUDIO_FORMAT_PCM_8_BIT:
-            return G_PCM8BIT;
-        default:
-            return G_PCM16BIT;
-    };
-}
+void AudioLibRenderTest::SetUp(void) {}
 
-uint32_t AudioLibRenderTest::PcmFramesToBytes(const struct AudioSampleAttributes attrs) const
-{
-    uint32_t ret = 1024 * attrs.channelCount * (PcmFormatToBits(attrs.format) >> 3);
-    return ret;
-}
-uint32_t AudioLibRenderTest::FormatToBits(enum AudioFormat format) const
-{
-    switch (format) {
-        case AUDIO_FORMAT_PCM_16_BIT:
-            return G_PCM16BIT;
-        case AUDIO_FORMAT_PCM_8_BIT:
-            return G_PCM8BIT;
-        default:
-            return G_PCM16BIT;
-    }
-}
+void AudioLibRenderTest::TearDown(void) {}
 
 uint32_t AudioLibRenderTest::PcmBytesToFrames(const struct AudioFrameRenderMode &frameRenderMode, uint64_t bytes) const
 {
-    return bytes / (frameRenderMode.attrs.channelCount * (FormatToBits(frameRenderMode.attrs.format) >> 3));
-}
-
-int32_t AudioLibRenderTest::LibHwOutputRender(struct AudioHwRender *hwRender, struct DevHandle *handlerender) const
-{
-    if (hwRender == nullptr || handlerender == nullptr) {
-        return HDF_FAILURE;
-    }
-    if (InterfaceLibOutputRender(handlerender, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam) ||
-        InterfaceLibOutputRender(handlerender, AUDIO_DRV_PCM_IOCTL_PREPARE, &hwRender->renderParam) ||
-        InterfaceLibOutputRender(handlerender, AUDIO_DRV_PCM_IOCTRL_START, &hwRender->renderParam)) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
+    uint32_t replyByte = static_cast<uint32_t>(bytes);
+    return replyByte / (frameRenderMode.attrs.channelCount * (PcmFormatToBits(frameRenderMode.attrs.format) >>
+                        MOVE_RIGHT_NUM));
 }
 
 /**
@@ -178,49 +165,40 @@ int32_t AudioLibRenderTest::LibHwOutputRender(struct AudioHwRender *hwRender, st
  *
  * @return Returns <b>0</b> if the initialization is successful; returns a negative value otherwise.
  */
-uint32_t AudioLibRenderTest::FrameLibStart(FILE *file, struct AudioSampleAttributes attrs,
+int32_t AudioLibRenderTest::FrameLibStart(FILE *file, struct AudioSampleAttributes attrs,
     struct AudioHeadInfo wavHeadInfo, struct AudioHwRender *hwRender) const
 {
-    int bufferSize = G_BUFFERSIZE;
-    int readSize = 0;
-    int remainingDataSize = 0;
     int numRead = 0;
-    uint64_t *replyBytes = nullptr;
-    remainingDataSize = wavHeadInfo.dataSize;
-    if (file == nullptr || hwRender == nullptr) {
+    uint32_t remainingDataSize = wavHeadInfo.dataSize;
+    uint32_t bufferSize = PcmFramesToBytes(attrs);
+    if (bufferSize <= 0) {
         return HDF_FAILURE;
     }
-    bufferSize = PcmFramesToBytes(attrs);
-    char *frame = nullptr;
-    frame = (char *)calloc(1, bufferSize);
-    if (frame == nullptr) {
+    hwRender->renderParam.frameRenderMode.buffer = (char *)calloc(1, bufferSize);
+    if (hwRender->renderParam.frameRenderMode.buffer == nullptr) {
         return HDF_FAILURE;
     }
-    replyBytes = (uint64_t *)calloc(1, bufferSize);
-    if (replyBytes == nullptr) {
-        free(frame);
+
+    uint32_t readSize = (remainingDataSize > bufferSize) ? bufferSize : remainingDataSize;
+    numRead = fread(hwRender->renderParam.frameRenderMode.buffer, 1, readSize, file);
+    if (numRead < 0) {
+        free(hwRender->renderParam.frameRenderMode.buffer);
+        hwRender->renderParam.frameRenderMode.buffer = nullptr;
         return HDF_FAILURE;
     }
-    do {
-        readSize = (remainingDataSize > bufferSize) ? bufferSize : remainingDataSize;
-        numRead = fread(frame, 1, readSize, file);
-        if (numRead > 0) {
-            hwRender->renderParam.frameRenderMode.buffer = (char *)frame;
-            hwRender->renderParam.frameRenderMode.bufferSize = numRead;
-            hwRender->renderParam.frameRenderMode.bufferFrameSize =
-                PcmBytesToFrames(hwRender->renderParam.frameRenderMode, numRead);
-            remainingDataSize -= numRead;
-        }
-    } while (0);
-    free(frame);
-    free(replyBytes);
+    hwRender->renderParam.frameRenderMode.bufferSize = numRead;
+    hwRender->renderParam.frameRenderMode.bufferFrameSize =
+        PcmBytesToFrames(hwRender->renderParam.frameRenderMode, numRead);
     return HDF_SUCCESS;
 }
 
-uint32_t AudioLibRenderTest::LibStartAndStream(const std::string path, struct AudioSampleAttributes attrs,
+int32_t AudioLibRenderTest::LibStartAndStream(const std::string path, struct AudioSampleAttributes attrs,
     struct DevHandle *handle, struct AudioHwRender *hwRender, struct AudioHeadInfo wavHeadInfo) const
 {
     int ret = -1;
+    if (handle == nullptr || hwRender == nullptr) {
+        return HDF_FAILURE;
+    }
     if (InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam) ||
         InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_PREPARE, &hwRender->renderParam) ||
         InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_START, &hwRender->renderParam)) {
@@ -246,30 +224,45 @@ uint32_t AudioLibRenderTest::LibStartAndStream(const std::string path, struct Au
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_WRITE, &hwRender->renderParam);
     if (ret < 0) {
         fclose(file);
+        free(hwRender->renderParam.frameRenderMode.buffer);
+        hwRender->renderParam.frameRenderMode.buffer = nullptr;
         return HDF_FAILURE;
     }
     fclose(file);
+    free(hwRender->renderParam.frameRenderMode.buffer);
+    hwRender->renderParam.frameRenderMode.buffer = nullptr;
     return HDF_SUCCESS;
 }
 
-uint32_t AudioLibRenderTest::InitHwRender(struct AudioHwRender *hwRender, struct AudioSampleAttributes attrs,
-    const std::string adapterNameCase) const
+int32_t AudioLibRenderTest::LibHwOutputRender(struct AudioHwRender *hwRender, struct DevHandle *handlerender) const
 {
-    int ret = -1;
+    if (hwRender == nullptr || handlerender == nullptr) {
+        return HDF_FAILURE;
+    }
+    if (InterfaceLibOutputRender(handlerender, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam) ||
+        InterfaceLibOutputRender(handlerender, AUDIO_DRV_PCM_IOCTL_PREPARE, &hwRender->renderParam) ||
+        InterfaceLibOutputRender(handlerender, AUDIO_DRV_PCM_IOCTRL_START, &hwRender->renderParam)) {
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t AudioLibRenderTest::BindServiceAndHwRender(struct AudioHwRender *&hwRender,
+    const std::string BindName, const std::string adapterNameCase, struct DevHandle *&handle) const
+{
+    handle = BindServiceRenderSo(BindName.c_str());
+    if (handle == nullptr) {
+        return HDF_FAILURE;
+    }
+    hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
     if (hwRender == nullptr) {
+        CloseServiceRenderSo(handle);
         return HDF_FAILURE;
     }
-    if (InitHwRenderMode(hwRender->renderParam.renderMode) or
-        InitRenderFramepara(hwRender->renderParam.frameRenderMode)) {
-        return HDF_FAILURE;
-    }
-    hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
-    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, adapterNameCase.c_str());
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
-    if (InitAttrs(attrs)) {
+    if (InitHwRender(hwRender, adapterNameCase)) {
+        CloseServiceRenderSo(handle);
+        free(hwRender);
+        hwRender = nullptr;
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -290,7 +283,7 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_BindServiceRender_0001, Test
 /**
 * @tc.name  test BindServiceRenderSo API via invalid input.
 * @tc.number  SUB_Audio_InterfaceLib_BindServiceRender_0002
-* @tc.desc  test Binding failed Service which invalid service Name is rendeo.
+* @tc.desc  test Binding failed service, where the service name is wrong.
 * @tc.author: zhouyongxiao
 */
 HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_BindServiceRender_0002, TestSize.Level1)
@@ -357,360 +350,149 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_BindServiceRender_0005, Test
 /**
 * @tc.name  test InterfaceLibCtlRender API via writing volume value of AcodecIn is normal value and reading
 *    this value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Volum_AcodecIn_Write_Read_0001
+* @tc.number  SUB_Audio_InterfaceLibCtlRender_Volume_AcodecIn_Write_Read_0001
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
 * @tc.author: zhouyongxiao
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volum_AcodecIn_Write_Read_0001, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volume_AcodecIn_Write_Read_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    float volumevalue = 0;
-    float volumeThresholdValueMax = 0;
-    float volumeThresholdValueMin = 0;
+    float volumeValue = 0;
+    float volumeThresholdValueMaxIn = 0;
+    float volumeThresholdValueMinIn = 0;
+    float volumeBoundaryValueIn = 127.9;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwRender *hwRender = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
-    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_USB.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    volumeThresholdValueMax = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
-    volumeThresholdValueMin = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
+    volumeThresholdValueMaxIn = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
+    volumeThresholdValueMinIn = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
 
-    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMax-1;
+    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMaxIn - 1;
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    volumevalue = hwRender->renderParam.renderMode.ctlParam.volume;
-    EXPECT_EQ(126, volumevalue);
+    volumeValue = hwRender->renderParam.renderMode.ctlParam.volume;
+    EXPECT_EQ(126, volumeValue);
 
-    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMin+1;
+    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMinIn + 1;
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    volumevalue = hwRender->renderParam.renderMode.ctlParam.volume;
-    EXPECT_EQ(41, volumevalue);
-
-    hwRender->renderParam.renderMode.ctlParam.volume = 127.9;
+    volumeValue = hwRender->renderParam.renderMode.ctlParam.volume;
+    if (IS_ADM) {
+        EXPECT_EQ(41, volumeValue);
+    } else {
+        EXPECT_EQ(1, volumeValue);
+    }
+    hwRender->renderParam.renderMode.ctlParam.volume = volumeBoundaryValueIn;
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    volumevalue = hwRender->renderParam.renderMode.ctlParam.volume;
-    EXPECT_EQ(127, volumevalue);
-
+    volumeValue = hwRender->renderParam.renderMode.ctlParam.volume;
+    EXPECT_EQ(127, volumeValue);
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlRender API via writing volume value of AcodecIn is boundary value and reading
 *    this value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Volum_AcodecIn_Write_Read_0002
+* @tc.number  SUB_Audio_InterfaceLibCtlRender_Volume_AcodecIn_Write_Read_0002
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
 * @tc.author: zhouyongxiao
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volum_AcodecIn_Write_Read_0002, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volume_AcodecIn_Write_Read_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    float volumevalue = 0;
-    float volumeThresholdValueMax = 0;
-    float volumeThresholdValueMin = 0;
+    struct AudioHwRender *hwRender = nullptr;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    float volumeThresholdValueMaxIn = 0;
+    float volumeThresholdValueMinIn = 0;
+    float volumeValue = 0;
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
-    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_USB.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    volumeThresholdValueMax = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
-    volumeThresholdValueMin = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
+    volumeThresholdValueMaxIn = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
+    volumeThresholdValueMinIn = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
 
-    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMax;
+    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMinIn;
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    volumevalue = hwRender->renderParam.renderMode.ctlParam.volume;
-    EXPECT_EQ(127, volumevalue);
+    volumeValue = hwRender->renderParam.renderMode.ctlParam.volume;
+    if (IS_ADM == false) {
+        EXPECT_EQ(0, volumeValue);
+    } else {
+        EXPECT_EQ(40, volumeValue);
+    }
 
-    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMin;
+    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMaxIn;
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    volumevalue = hwRender->renderParam.renderMode.ctlParam.volume;
-    EXPECT_EQ(40, volumevalue);
+    volumeValue = hwRender->renderParam.renderMode.ctlParam.volume;
+    EXPECT_EQ(127, volumeValue);
+
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlRender API via writing volume value is invalid value of AcodecIn.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Volum_AcodecIn_Write_Read_0003
+* @tc.number  SUB_Audio_InterfaceLibCtlRender_Volume_AcodecIn_Write_Read_0003
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
 * @tc.author: zhouyongxiao
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volum_AcodecIn_Write_Read_0003, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volume_AcodecIn_Write_Read_0003, TestSize.Level1)
 {
     int32_t ret = -1;
-    float volumeThresholdValueMax = 0;
-    float volumeThresholdValueMin = 0;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwRender *hwRender = nullptr;
+    float volumeThresholdValueMaxIn = 0;
+    float volumeThresholdValueMinIn = 0;
+
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
-    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_USB.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    volumeThresholdValueMax = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
-    volumeThresholdValueMin = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
+    volumeThresholdValueMaxIn = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
+    volumeThresholdValueMinIn = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
 
-    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMax + 1;
+    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMaxIn + 1;
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_FAILURE, ret);
 
-    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMin - 1;
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
-    EXPECT_EQ(HDF_FAILURE, ret);
-
-    CloseServiceRenderSo(handle);
-    free(hwRender);
-}
-/**
-* @tc.name  test InterfaceLibCtlRender API via writing volume value of smartpa is normal value and reading
-*    this value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Volum_AcodecOut_Write_Read_0001
-* @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
-* @tc.author: zhouyongxiao
-*/
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volum_AcodecOut_Write_Read_0001, TestSize.Level1)
-{
-    int32_t ret = -1;
-    float volumevalue = 0;
-    float volumeThresholdValueMax = 0;
-    float volumeThresholdValueMin = 0;
-    struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_OUT;
-    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_HDIMI.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    volumeThresholdValueMax = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
-    volumeThresholdValueMin = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
-
-    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMax-1;
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_READ, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    volumevalue = hwRender->renderParam.renderMode.ctlParam.volume;
-    EXPECT_EQ(187, volumevalue);
-
-    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMin+1;
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_READ, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    volumevalue = hwRender->renderParam.renderMode.ctlParam.volume;
-    EXPECT_EQ(1, volumevalue);
-
-    hwRender->renderParam.renderMode.ctlParam.volume = 127.9;
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_READ, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    volumevalue = hwRender->renderParam.renderMode.ctlParam.volume;
-    EXPECT_EQ(127, volumevalue);
-
-    CloseServiceRenderSo(handle);
-    free(hwRender);
-}
-/**
-* @tc.name  test InterfaceLibCtlRender API via writing volume value of smartpa is boundary value and reading
-*    this value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Volum_AcodecOut_Write_Read_0002
-* @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
-* @tc.author: zhouyongxiao
-*/
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volum_AcodecOut_Write_Read_0002, TestSize.Level1)
-{
-    int32_t ret = -1;
-    float volumevalue = 0;
-    float volumeThresholdValueMax = 0;
-    float volumeThresholdValueMin = 0;
-    struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_OUT;
-    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_HDIMI.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    volumeThresholdValueMax = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
-    volumeThresholdValueMin = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
-
-    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMax;
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_READ, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    volumevalue = hwRender->renderParam.renderMode.ctlParam.volume;
-    EXPECT_EQ(188, volumevalue);
-
-    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMin;
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_READ, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    volumevalue = hwRender->renderParam.renderMode.ctlParam.volume;
-    EXPECT_EQ(0, volumevalue);
-    CloseServiceRenderSo(handle);
-    free(hwRender);
-}
-/**
-* @tc.name  test InterfaceLibCtlRender API via writing volume value of smartpa is invalid value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Volum_AcodecOut_Write_Read_0003
-* @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
-* @tc.author: zhouyongxiao
-*/
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volum_AcodecOut_Write_Read_0003, TestSize.Level1)
-{
-    int32_t ret = -1;
-    float volumeThresholdValueMax = 0;
-    float volumeThresholdValueMin = 0;
-    struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_OUT;
-    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_HDIMI.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    volumeThresholdValueMax = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
-    volumeThresholdValueMin = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
-
-    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMax + 1;
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
-    EXPECT_EQ(HDF_FAILURE, ret);
-
-    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMin - 1;
+    hwRender->renderParam.renderMode.ctlParam.volume = volumeThresholdValueMinIn - 1;
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_FAILURE, ret);
 
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
-/**
-* @tc.name  test InterfaceLibCtlRender API via writing GetVolthreshold value that
-*    Hardware equipment of Acodec_ChangeOut.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_GetVolthresholdRead_0001
-* @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ.
-* @tc.author: zhouyongxiao
-*/
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GetVolthresholdRead_0001, TestSize.Level1)
-{
-    int32_t ret = -1;
-    float volumeThresholdValueMax = 0;
-    float volumeThresholdValueMin = 0;
-    float expMax = 188;
-    float expMix = 0;
-    struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
 
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_OUT;
-    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_HDIMI.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    volumeThresholdValueMax = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
-    volumeThresholdValueMin = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
-    EXPECT_EQ(expMax, volumeThresholdValueMax);
-    EXPECT_EQ(expMix, volumeThresholdValueMin);
-    CloseServiceRenderSo(handle);
-    free(hwRender);
-}
 /**
 * @tc.name  test InterfaceLibCtlRender API via writing GetVolthreshold value that
 *    Hardware equipment of Acodec_ChangeIn.
@@ -721,35 +503,31 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GetVolthresholdRead
 HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GetVolthresholdRead_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    float volumeThresholdValueMax = 0;
-    float volumeThresholdValueMin = 0;
+    float volumeThresholdValueMaxIn = 0;
+    float volumeThresholdValueMinIn = 0;
     float expMax = 127;
     float expMix = 40;
+    struct AudioHwRender *hwRender = nullptr;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
-    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_USB.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    volumeThresholdValueMax = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
-    volumeThresholdValueMin = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
-    EXPECT_EQ(expMax, volumeThresholdValueMax);
-    EXPECT_EQ(expMix, volumeThresholdValueMin);
+    volumeThresholdValueMaxIn = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
+    volumeThresholdValueMinIn = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
+    EXPECT_EQ(expMax, volumeThresholdValueMaxIn);
+    if (IS_ADM == false) {
+        EXPECT_EQ(0, volumeThresholdValueMinIn);
+    } else {
+        EXPECT_EQ(expMix, volumeThresholdValueMinIn);
+    }
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlRender API via writing ChannelMode value is normal value and reading this value.
@@ -763,21 +541,19 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_ChannelMode_Write_R
     int32_t ret = -1;
     float channelModeExc = 1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *impl = (struct AudioHwRender *)calloc(1, sizeof(struct AudioHwRender));
-    if (impl == nullptr) {
+    struct DevHandle *handleRender = nullptr;
+    struct AudioHwRender *impl = nullptr;
+    ret = BindServiceAndHwRender(impl, BIND_CONTROL.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    handleRender = BindServiceRenderSo(BIND_RENDER.c_str());
+    if (handleRender == nullptr) {
         CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
+        free(impl);
+        impl = nullptr;
+        ASSERT_NE(nullptr, handleRender);
     }
-    ret = InitHwRenderMode(impl->renderParam.renderMode);
+    ret = LibHwOutputRender(impl, handleRender);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(impl->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_USB.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitRenderFramepara(impl->renderParam.frameRenderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
     impl->renderParam.frameRenderMode.mode = AUDIO_CHANNEL_BOTH_RIGHT;
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_WRITE, &impl->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -793,9 +569,10 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_ChannelMode_Write_R
     EXPECT_EQ(HDF_SUCCESS, ret);
     channelModeExc = impl->renderParam.frameRenderMode.mode;
     EXPECT_EQ(AUDIO_CHANNEL_RIGHT_MUTE, channelModeExc);
-
+    CloseServiceRenderSo(handleRender);
     CloseServiceRenderSo(handle);
     free(impl);
+    impl = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlRender API via writing ChannelMode value is boundary value and reading this value.
@@ -808,22 +585,20 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_ChannelMode_Write_R
 {
     int32_t ret = -1;
     float channelModeExc = 1;
+    struct DevHandle *handleRender = nullptr;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *impl = (struct AudioHwRender *)calloc(1, sizeof(struct AudioHwRender));
-    if (impl == nullptr) {
+    struct AudioHwRender *impl = nullptr;
+    ret = BindServiceAndHwRender(impl, BIND_CONTROL.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    handleRender = BindServiceRenderSo(BIND_RENDER.c_str());
+    if (handleRender == nullptr) {
+        free(impl);
+        impl = nullptr;
         CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
+        ASSERT_NE(nullptr, handleRender);
     }
-    ret = InitHwRenderMode(impl->renderParam.renderMode);
+    ret = LibHwOutputRender(impl, handleRender);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(impl->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_USB.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitRenderFramepara(impl->renderParam.frameRenderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
     impl->renderParam.frameRenderMode.mode = AUDIO_CHANNEL_NORMAL;
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_WRITE, &impl->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -839,9 +614,10 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_ChannelMode_Write_R
     EXPECT_EQ(HDF_SUCCESS, ret);
     channelModeExc = impl->renderParam.frameRenderMode.mode;
     EXPECT_EQ(AUDIO_CHANNEL_BOTH_MUTE, channelModeExc);
-
+    CloseServiceRenderSo(handleRender);
     CloseServiceRenderSo(handle);
     free(impl);
+    impl = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlRender API via writing mute value that include 1 and 0 and reading mute value.
@@ -856,18 +632,10 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_MuteWrite_Read_0001
     bool wishValue = 0;
     bool expectedValue = 1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_USB.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwRender *hwRender = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     hwRender->renderParam.renderMode.ctlParam.mute = 0;
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_MUTE_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -884,6 +652,7 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_MuteWrite_Read_0001
     EXPECT_EQ(expectedValue, muteValue);
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlRender API via writing mute value that include 2 and reading mute value.
@@ -894,30 +663,31 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_MuteWrite_Read_0001
 HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_MuteWrite_Read_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    bool mutevalue = 0;
+    bool muteValue = 0;
+    bool wishValue = 0;
     bool expectedValue = 1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_USB.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwRender *hwRender = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     hwRender->renderParam.renderMode.ctlParam.mute = 2;
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_MUTE_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_MUTE_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    mutevalue = hwRender->renderParam.renderMode.ctlParam.mute;
-    EXPECT_EQ(expectedValue, mutevalue);
+    muteValue = hwRender->renderParam.renderMode.ctlParam.mute;
+    EXPECT_EQ(expectedValue, muteValue);
+    hwRender->renderParam.renderMode.ctlParam.mute = 0;
+    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_MUTE_WRITE, &hwRender->renderParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_MUTE_READ, &hwRender->renderParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    muteValue = hwRender->renderParam.renderMode.ctlParam.mute;
+    EXPECT_EQ(wishValue, muteValue);
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlRender API via selecting scene.
@@ -929,21 +699,9 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_CtlRender_SelectScene_0001, 
 {
     int32_t ret = -1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_USB.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitRenderFramepara(hwRender->renderParam.frameRenderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwRender *hwRender = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     struct AudioSceneDescriptor scene = {
         .scene.id = 0,
@@ -961,6 +719,7 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_CtlRender_SelectScene_0001, 
 
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlRender API via writing normal gain value.
@@ -971,22 +730,20 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_CtlRender_SelectScene_0001, 
 HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    float gainValue = 0;
+    struct AudioHwRender *hwRender = nullptr;
     struct DevHandle *handle = nullptr;
+    float gainValue = 0;
     float gainThresholdValueMax, gainThresholdValueMin;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     gainThresholdValueMax = hwRender->renderParam.renderMode.ctlParam.audioGain.gainMax;
     gainThresholdValueMin = hwRender->renderParam.renderMode.ctlParam.audioGain.gainMin;
     ret = InitHwRenderMode(hwRender->renderParam.renderMode);
     EXPECT_EQ(HDF_SUCCESS, ret);
+
     hwRender->renderParam.renderMode.ctlParam.audioGain.gain = gainThresholdValueMax - 1;
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_GAIN_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1010,6 +767,7 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_0001
     EXPECT_EQ(2, gainValue);
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlRender API via writing boundary value of gain and reading gain value.
@@ -1021,15 +779,12 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_0002
 {
     int32_t ret = -1;
     float gainValue = 0;
-    struct DevHandle *handle = nullptr;
     float gainThresholdValueMax, gainThresholdValueMin;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
+    struct DevHandle *handle = nullptr;
+    struct AudioHwRender *hwRender = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     gainThresholdValueMax = hwRender->renderParam.renderMode.ctlParam.audioGain.gainMax;
@@ -1052,6 +807,7 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_0002
     EXPECT_EQ(gainThresholdValueMax, gainValue);
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlRender API via writing gain invalid value.
@@ -1062,15 +818,12 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_0002
 HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_0003, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct DevHandle *handle = nullptr;
     float gainThresholdValueMax, gainThresholdValueMin;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
+    struct AudioHwRender *hwRender = nullptr;
+    struct DevHandle *handle = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     gainThresholdValueMax = hwRender->renderParam.renderMode.ctlParam.audioGain.gainMax;
@@ -1085,6 +838,7 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_0003
     EXPECT_EQ(HDF_FAILURE, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlRender API via getting gainthreshold value.
@@ -1095,25 +849,23 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_0003
 HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GetGainthresholdRead_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    float gainThresholdValueMax, gainThresholdValueMin;
+    float gainThresholdValueMaxGet, gainThresholdValueMinGet;
     float expMax = 10;
     float expMix = 0;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
+    struct AudioHwRender *hwRender = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    gainThresholdValueMax = hwRender->renderParam.renderMode.ctlParam.audioGain.gainMax;
-    gainThresholdValueMin = hwRender->renderParam.renderMode.ctlParam.audioGain.gainMin;
-    EXPECT_LT(expMax, gainThresholdValueMax);
-    EXPECT_EQ(expMix, gainThresholdValueMin);
+    gainThresholdValueMaxGet = hwRender->renderParam.renderMode.ctlParam.audioGain.gainMax;
+    gainThresholdValueMinGet = hwRender->renderParam.renderMode.ctlParam.audioGain.gainMin;
+    EXPECT_LT(expMax, gainThresholdValueMaxGet);
+    EXPECT_EQ(expMix, gainThresholdValueMinGet);
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlRender API via using Acodec_ChangeIn.
@@ -1125,53 +877,16 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Acodec_ChangeIn_000
 {
     int32_t ret = -1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
-    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_USB.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwRender *hwRender = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
+    hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);
-}
-/**
-* @tc.name  test InterfaceLibCtlRender API via using smartpa.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Acodec_ChangeOut_0001
-* @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT.
-* @tc.author: zhouyongxiao
-*/
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Acodec_ChangeOut_0001, TestSize.Level1)
-{
-    int32_t ret = -1;
-    struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_OUT;
-    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_HDIMI.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    CloseServiceRenderSo(handle);
-    free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlRender API via inputting invalid cmdid.
@@ -1183,27 +898,21 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Abnormal_0001, Test
 {
     int32_t ret = -1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_CONTROL.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-        NAME_LEN, ADAPTER_NAME_USB.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwRender *hwRender = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     ret = InterfaceLibCtlRender(handle, 50, &hwRender->renderParam);
     if (ret == 0) {
         CloseServiceRenderSo(handle);
         free(hwRender);
+        hwRender = nullptr;
         ASSERT_EQ(HDF_FAILURE, ret);
     }
     EXPECT_EQ(HDF_FAILURE, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibCtlRender API via inputting handleData invalid.
@@ -1237,20 +946,15 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_HwParams_0001, T
 {
     int32_t ret = -1;
     struct DevHandle *handle = nullptr;
-    struct AudioSampleAttributes attrs = {};
-    handle = BindServiceRenderSo(BIND_RENDER.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRender(hwRender, attrs, ADAPTER_NAME_USB);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwRender *hwRender = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTL_PREPARE.
@@ -1261,23 +965,18 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_HwParams_0001, T
 HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Prepare_0001, TestSize.Level1)
 {
     int32_t ret = -1;
+    struct AudioHwRender *hwRender = nullptr;
     struct DevHandle *handle = nullptr;
-    struct AudioSampleAttributes attrs = {};
-    handle = BindServiceRenderSo(BIND_RENDER.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRender(hwRender, attrs, ADAPTER_NAME_USB);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_PREPARE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTRL_START.
@@ -1289,16 +988,10 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Start_0001, Test
 {
     int32_t ret = -1;
     struct DevHandle *handle = nullptr;
-    struct AudioSampleAttributes attrs = {};
-    handle = BindServiceRenderSo(BIND_RENDER.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRender(hwRender, attrs, ADAPTER_NAME_USB);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwRender *hwRender = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_PREPARE, &hwRender->renderParam);
@@ -1307,6 +1000,7 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Start_0001, Test
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTL_WRITE and AUDIO_DRV_PCM_IOCTRL_STOP.
@@ -1318,25 +1012,18 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001,
 {
     int32_t ret = -1;
     struct DevHandle *handle = nullptr;
-    struct AudioSampleAttributes attrs = {};
     struct AudioHeadInfo wavHeadInfo = {};
-    handle = BindServiceRenderSo(BIND_RENDER.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitHwRender(hwRender, attrs, ADAPTER_NAME_USB);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwRender *hwRender = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     ret = LibHwOutputRender(hwRender, handle);
     EXPECT_EQ(HDF_SUCCESS, ret);
     char absPath[PATH_MAX] = {0};
-    if (realpath(AUDIO_FILE_PATH.c_str(), absPath) == nullptr) {
+    if (realpath(AUDIO_FILE.c_str(), absPath) == nullptr) {
         free(hwRender);
         hwRender = nullptr;
         CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, realpath(AUDIO_FILE_PATH.c_str(), absPath));
+        ASSERT_NE(nullptr, realpath(AUDIO_FILE.c_str(), absPath));
     }
     FILE *file = fopen(absPath, "rb");
     if (file == nullptr) {
@@ -1345,7 +1032,7 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001,
         CloseServiceRenderSo(handle);
         ASSERT_NE(nullptr, file);
     }
-    ret = WavHeadAnalysis(wavHeadInfo, file, attrs);
+    ret = WavHeadAnalysis(wavHeadInfo, file, hwRender->renderParam.frameRenderMode.attrs);
     if (ret < 0) {
         free(hwRender);
         hwRender = nullptr;
@@ -1353,18 +1040,19 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001,
         CloseServiceRenderSo(handle);
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
-    ret = FrameLibStart(file, attrs, wavHeadInfo, hwRender);
+    ret = FrameLibStart(file, hwRender->renderParam.frameRenderMode.attrs, wavHeadInfo, hwRender);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_STOP, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handle);
+    free(hwRender->renderParam.frameRenderMode.buffer);
+    hwRender->renderParam.frameRenderMode.buffer = nullptr;
     free(hwRender);
     hwRender = nullptr;
     fclose(file);
 }
-
 /**
 * @tc.name  test InterfaceLibCtlRender and InterfaceLibOutputRender API via Serial
     transmission of data flow and control flow.
@@ -1375,27 +1063,22 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001,
 HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    float muteValue = 1;
+    float muteValue = 0;
     float expectedValue = 0;
     struct DevHandle *handler = nullptr;
     struct DevHandle *handlec = nullptr;
-    struct AudioSampleAttributes attrs = {};
     struct AudioHeadInfo wavHeadInfo = {};
-    handler = BindServiceRenderSo(BIND_RENDER.c_str());
-    ASSERT_NE(nullptr, handler);
+    struct AudioHwRender *hwRender = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME_USB, handler);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     handlec = BindServiceRenderSo(BIND_CONTROL.c_str());
     if (handlec == nullptr) {
         CloseServiceRenderSo(handler);
+        free(hwRender);
+        hwRender = nullptr;
         ASSERT_NE(nullptr, handlec);
     }
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handler);
-        CloseServiceRenderSo(handlec);
-        ASSERT_NE(nullptr, hwRender);
-    }
-    ret = InitHwRender(hwRender, attrs, ADAPTER_NAME_USB);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+
     hwRender->renderParam.renderMode.ctlParam.mute = muteValue;
     ret = InterfaceLibCtlRender(handlec, AUDIODRV_CTL_IOCTL_MUTE_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1403,15 +1086,15 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_0001, Test
     EXPECT_EQ(HDF_SUCCESS, ret);
     expectedValue = hwRender->renderParam.renderMode.ctlParam.mute;
     EXPECT_EQ(expectedValue, muteValue);
-    ret = LibStartAndStream(AUDIO_FILE_PATH, attrs, handler, hwRender, wavHeadInfo);
+
+    ret = LibStartAndStream(AUDIO_FILE, hwRender->renderParam.frameRenderMode.attrs,
+        handler, hwRender, wavHeadInfo);
     if (ret < 0) {
         CloseServiceRenderSo(handler);
         CloseServiceRenderSo(handlec);
         free(hwRender);
-        hwRender = nullptr;
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
-
     ret = InterfaceLibOutputRender(handler, AUDIO_DRV_PCM_IOCTRL_STOP, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handler);
@@ -1429,19 +1112,17 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Pause_0001, Test
 {
     int32_t ret = -1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_RENDER.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
+    struct AudioHwRender *hwRender = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    ret = LibHwOutputRender(hwRender, handle);
     EXPECT_EQ(HDF_SUCCESS, ret);
     hwRender->renderParam.renderMode.ctlParam.pause = 1;
     ret = InterfaceLibOutputRender(handle, AUDIODRV_CTL_IOCTL_PAUSE_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibOutputRender API via resuming.
@@ -1453,19 +1134,17 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Resume_0001, Tes
 {
     int32_t ret = -1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_RENDER.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
-    ret = InitHwRenderMode(hwRender->renderParam.renderMode);
+    struct AudioHwRender *hwRender = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    ret = LibHwOutputRender(hwRender, handle);
     EXPECT_EQ(HDF_SUCCESS, ret);
     hwRender->renderParam.renderMode.ctlParam.pause = 0;
     ret = InterfaceLibOutputRender(handle, AUDIODRV_CTL_IOCTL_PAUSE_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibOutputRender API via setting the cmdId is invalid.
@@ -1477,19 +1156,15 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Abnormal_0001, T
 {
     int32_t ret = -1;
     struct DevHandle *handle = nullptr;
-    handle = BindServiceRenderSo(BIND_RENDER.c_str());
-    ASSERT_NE(nullptr, handle);
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
-        ASSERT_NE(nullptr, handle);
-    }
-    ret = InitRenderFramepara(hwRender->renderParam.frameRenderMode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioHwRender *hwRender = nullptr;
+    ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME_USB, handle);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     ret = InterfaceLibOutputRender(handle, 30, &hwRender->renderParam);
     EXPECT_EQ(HDF_FAILURE, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);
+    hwRender = nullptr;
 }
 /**
 * @tc.name  test InterfaceLibOutputRender API via inputting handleData is nullptr.

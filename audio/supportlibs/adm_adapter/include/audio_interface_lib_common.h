@@ -16,12 +16,68 @@
 #ifndef AUDIO_INTERFACE_LIB_COMMON_H
 #define AUDIO_INTERFACE_LIB_COMMON_H
 
-#include "audio_interface_lib_render.h"
-#include "audio_interface_lib_capture.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include "securec.h"
+#include "audio_internal.h"
+#include "audio_adapter.h"
+#include "osal_mem.h"
+#include "hdf_io_service_if.h"
+#include "hdf_sbuf.h"
 
-#define AUDIODRV_CTL_ELEM_IFACE_GAIN 2
-#define AUDIO_MIN_DEVICENUM 1
+#define CTRL_NUM 100
+#define SERVIC_NAME_MAX_LEN             32
+#define AUDIO_MIN_DEVICENUM             1
+#define AUDIODRV_CTL_ELEM_IFACE_GAIN    2
+
+#define AUDIO_WAIT_DELAY (10 * 1000)    // 10ms
+#define AUDIO_CAP_WAIT_DELAY (5 * 1000)    // 5ms
+
+#define CTRL_CMD    "control"          // For Bind control service
+
+struct AudioPcmHwParams {
+    enum AudioStreamType streamType;
+    uint32_t channels;
+    uint32_t rate;
+    uint32_t periodSize;
+    uint32_t periodCount;
+    enum AudioFormat format;
+    char *cardServiceName;
+    uint32_t period;
+    uint32_t frameSize;
+    uint32_t startThreshold;
+    uint32_t stopThreshold;
+    uint32_t silenceThreshold;
+    bool isBigEndian;
+    bool isSignedData;
+};
+
+struct AudioCtlElemId {
+    const char *cardServiceName;
+    const char *itemName; /* ASCII name of item */
+    int32_t iface;
+};
+
+struct AudioCtlElemValue {
+    struct AudioCtlElemId id;
+    int32_t value[2];
+};
+
+struct AudioCtrlElemInfo {
+    struct AudioCtlElemId id;
+    uint32_t count;     /* count of values */
+    int32_t type;       /* R: value type - AUDIODRV_CTL_ELEM_IFACE_MIXER_* */
+    int32_t min;        /* R: minimum value */
+    int32_t max;        /* R: maximum value */
+};
 
 struct HdfIoService *HdfIoServiceBindName(const char *serviceName);
+void AudioBufReplyRecycle(struct HdfSBuf *sBuf, struct HdfSBuf *reply);
+int32_t AudioServiceDispatch(struct HdfIoService *service, int cmdId,
+    struct HdfSBuf *sBuf, struct HdfSBuf *reply);
+struct HdfSBuf *AudioObtainHdfSBuf(void);
+int32_t AudioCtlGetVolThresholdRead(struct HdfSBuf *reply, struct AudioCtrlElemInfo *volThreshold);
 
 #endif /* AUDIO_INTERFACE_LIB_COMMON_H */
