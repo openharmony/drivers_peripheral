@@ -20,26 +20,23 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
 group("hdi_audio") {
-
-  deps = [
-    "hal/hdi_passthrough:hdi_audio"
-  ]
+  deps = [ "hal/hdi_passthrough:hdi_audio" ]
 
   if (defined(ohos_lite)) {
     deps += [ "config/lite:hdf_audio_json" ]
   } else {
-    deps += [ 
+    deps += [
       "config/linux:hdf_audio_json",
       "hal/hdi_binder/proxy:audio_hdi_proxy_server",
-      "hal/hdi_binder/server:audio_hdi_adapter_server"
+      "hal/hdi_binder/server:audio_hdi_adapter_server",
     ]
   }
 
   if (enable_audio_device_mpi) {
     deps += [
       "//device/hisilicon/hardware/media/proprietary/hal/audio:hdi_audio_interface_lib_capture",
-      "//device/hisilicon/hardware/media/proprietary/hal/audio:hdi_audio_interface_lib_render",
       "//device/hisilicon/hardware/media/proprietary/hal/audio:hdi_audio_interface_lib_mpi",
+      "//device/hisilicon/hardware/media/proprietary/hal/audio:hdi_audio_interface_lib_render",
     ]
   } else {
     deps += [
@@ -48,9 +45,7 @@ group("hdi_audio") {
     ]
   }
   if (enable_audio_hal_notsupport_pathselect == false) {
-    deps += [
-     "hal/pathselect:hdi_audio_path_select",
-    ]
+    deps += [ "hal/pathselect:hdi_audio_path_select" ]
 
     if (defined(ohos_lite)) {
       deps += [ "config/lite:hdf_audio_path_json" ]
@@ -62,7 +57,7 @@ group("hdi_audio") {
 
 group("audio_sample_client") {
   deps = [
+    "sample:audio_sample_capture",
     "sample:audio_sample_render",
-    "sample:audio_sample_capture"
   ]
 }

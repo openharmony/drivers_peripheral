@@ -23,13 +23,13 @@ group("systemtest") {
   if (!defined(ohos_lite)) {
     testonly = true
   }
-    deps = []
+  deps = []
 
-    deps += [
-      "adm_interface_lib:lib",
-      "audio_function:function",
-      "hdi:hdi",
-      "adm:adm",
-    ]
+  deps += [
+    "adm:adm",
+    "adm_interface_lib:lib",
+    "audio_function:function",
+    "hdi:hdi",
+  ]
 }
 ###############################################################################

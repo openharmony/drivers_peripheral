@@ -20,13 +20,13 @@ if (defined(ohos_lite)) {
 }
 
 if (defined(ohos_lite)) {
-###########################LITEOS##########################################
+  ###########################LITEOS##########################################
   ###########################hdf_audio_hdi_capture_attr_test#####################
   unittest("hdf_audio_hdi_capture_attr_test") {
     sources = [
-          "src/audio_hdicapture_attr_test.cpp",
-          "../../common/hdi_common/src/audio_hdi_common.cpp"
-          ]
+      "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "src/audio_hdicapture_attr_test.cpp",
+    ]
 
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
@@ -46,7 +46,7 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
       "//drivers/adapter/khdf/liteos/osal/include",
       "//drivers/adapter/uhdf2/shared/include",
-      "//drivers/adapter/uhdf2/include/hdi/" ,
+      "//drivers/adapter/uhdf2/include/hdi/",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/capture/include",
@@ -60,13 +60,14 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
   }
+
   ###########################end###########################
   ###########################hdf_audio_hdi_capture_control_test#####################
   unittest("hdf_audio_hdi_capture_control_test") {
     sources = [
-          "src/audio_hdicapture_control_test.cpp",
-          "../../common/hdi_common/src/audio_hdi_common.cpp"
-          ]
+      "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "src/audio_hdicapture_control_test.cpp",
+    ]
 
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
@@ -86,7 +87,7 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
       "//drivers/adapter/khdf/liteos/osal/include",
       "//drivers/adapter/uhdf2/shared/include",
-      "//drivers/adapter/uhdf2/include/hdi/" ,
+      "//drivers/adapter/uhdf2/include/hdi/",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/capture/include",
@@ -100,13 +101,14 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
   }
+
   ###########################end###########################
   ###########################hdf_audio_hdi_capture_volume_test#####################
   unittest("hdf_audio_hdi_capture_volume_test") {
     sources = [
-          "src/audio_hdicapture_volume_test.cpp",
-          "../../common/hdi_common/src/audio_hdi_common.cpp"
-          ]
+      "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "src/audio_hdicapture_volume_test.cpp",
+    ]
 
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
@@ -126,7 +128,7 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
       "//drivers/adapter/khdf/liteos/osal/include",
       "//drivers/adapter/uhdf2/shared/include",
-      "//drivers/adapter/uhdf2/include/hdi/" ,
+      "//drivers/adapter/uhdf2/include/hdi/",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/capture/include",
@@ -140,13 +142,14 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
   }
+
   ###########################end###########################
   ###########################hdf_audio_hdi_capture_scene_test#####################
   unittest("hdf_audio_hdi_capture_scene_test") {
     sources = [
-          "src/audio_hdicapture_scene_test.cpp",
-          "../../common/hdi_common/src/audio_hdi_common.cpp"
-          ]
+      "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "src/audio_hdicapture_scene_test.cpp",
+    ]
 
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
@@ -166,7 +169,7 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
       "//drivers/adapter/khdf/liteos/osal/include",
       "//drivers/adapter/uhdf2/shared/include",
-      "//drivers/adapter/uhdf2/include/hdi/" ,
+      "//drivers/adapter/uhdf2/include/hdi/",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/capture/include",
@@ -180,13 +183,14 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
   }
+
   ###########################end###########################
   ###########################hdf_audio_hdi_capture_test#####################
   unittest("hdf_audio_hdi_capture_test") {
     sources = [
-          "src/audio_hdicapture_test.cpp",
-          "../../common/hdi_common/src/audio_hdi_common.cpp"
-          ]
+      "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "src/audio_hdicapture_test.cpp",
+    ]
 
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
@@ -206,7 +210,7 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
       "//drivers/adapter/khdf/liteos/osal/include",
       "//drivers/adapter/uhdf2/shared/include",
-      "//drivers/adapter/uhdf2/include/hdi/" ,
+      "//drivers/adapter/uhdf2/include/hdi/",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/capture/include",
@@ -223,13 +227,14 @@ if (defined(ohos_lite)) {
 } else {
   ###########################systemtest##############################
   module_output_path = "hdf/audio"
+
   ###########################hdf_audio_hdi_capture_attr_test#####################
   ohos_systemtest("hdf_audio_hdi_capture_attr_test") {
     module_out_path = module_output_path
     sources = [
-          "src/audio_hdicapture_attr_test.cpp",
-          "../../common/hdi_common/src/audio_hdi_common.cpp"
-          ]
+      "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "src/audio_hdicapture_attr_test.cpp",
+    ]
 
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
@@ -276,14 +281,15 @@ if (defined(ohos_lite)) {
       defines += [ "AUDIO_MPI_SERVICE" ]
     }
   }
+
   ###########################end###########################
   ###########################hdf_audio_hdi_capture_control_test#####################
   ohos_systemtest("hdf_audio_hdi_capture_control_test") {
     module_out_path = module_output_path
     sources = [
-          "src/audio_hdicapture_control_test.cpp",
-          "../../common/hdi_common/src/audio_hdi_common.cpp"
-          ]
+      "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "src/audio_hdicapture_control_test.cpp",
+    ]
 
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
@@ -330,14 +336,15 @@ if (defined(ohos_lite)) {
       defines += [ "AUDIO_MPI_SERVICE" ]
     }
   }
+
   ###########################end###########################
   ###########################hdf_audio_hdi_capture_volume_test#####################
   ohos_systemtest("hdf_audio_hdi_capture_volume_test") {
     module_out_path = module_output_path
     sources = [
-          "src/audio_hdicapture_volume_test.cpp",
-          "../../common/hdi_common/src/audio_hdi_common.cpp"
-          ]
+      "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "src/audio_hdicapture_volume_test.cpp",
+    ]
 
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
@@ -384,14 +391,15 @@ if (defined(ohos_lite)) {
       defines += [ "AUDIO_MPI_SERVICE" ]
     }
   }
+
   ###########################end###########################################
   ###########################hdf_audio_hdi_capture_scene_test#####################
   ohos_systemtest("hdf_audio_hdi_capture_scene_test") {
     module_out_path = module_output_path
     sources = [
-          "src/audio_hdicapture_scene_test.cpp",
-          "../../common/hdi_common/src/audio_hdi_common.cpp"
-          ]
+      "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "src/audio_hdicapture_scene_test.cpp",
+    ]
 
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
@@ -438,14 +446,15 @@ if (defined(ohos_lite)) {
       defines += [ "AUDIO_MPI_SERVICE" ]
     }
   }
+
   ###########################end###########################
   ###########################hdf_audio_hdi_capture_test#####################
   ohos_systemtest("hdf_audio_hdi_capture_test") {
     module_out_path = module_output_path
     sources = [
-          "src/audio_hdicapture_test.cpp",
-          "../../common/hdi_common/src/audio_hdi_common.cpp"
-          ]
+      "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "src/audio_hdicapture_test.cpp",
+    ]
 
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",

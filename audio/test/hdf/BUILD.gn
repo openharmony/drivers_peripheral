@@ -29,16 +29,16 @@ ohos_unittest("hdf_audio_adm_test") {
     "//drivers/framework/test/unittest/include",
     "//drivers/framework/test/unittest/osal",
     "//drivers/framework/test/unittest/model/audio/include",
-    "//drivers/framework/model/audio/core/test/unittest/common"
+    "//drivers/framework/model/audio/core/test/unittest/common",
   ]
 
   defines = [ "__USER__" ]
   sources = [
+    "//drivers/framework/model/audio/core/test/unittest/common/audio_core_test.cpp",
     "//drivers/framework/model/audio/core/test/unittest/common/audio_host_test.cpp",
     "//drivers/framework/model/audio/core/test/unittest/common/audio_parse_test.cpp",
-    "//drivers/framework/model/audio/core/test/unittest/common/audio_core_test.cpp",
-    "//drivers/framework/model/audio/sapm/test/unittest/common/audio_sapm_test.cpp",
     "//drivers/framework/model/audio/dispatch/test/unittest/common/audio_stream_dispatch_test.cpp",
+    "//drivers/framework/model/audio/sapm/test/unittest/common/audio_sapm_test.cpp",
   ]
   deps = [
     "//drivers/adapter/uhdf2/osal:libhdf_utils",
@@ -63,7 +63,5 @@ ohos_unittest("hdf_audio_adm_test") {
 
 group("hdf_test_audio") {
   testonly = true
-  deps = [
-        ":hdf_audio_adm_test"
-  ]
+  deps = [ ":hdf_audio_adm_test" ]
 }

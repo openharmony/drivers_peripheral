@@ -24,7 +24,5 @@ group("adm") {
     testonly = true
   }
   deps = []
-  deps += [
-    "audio_adm_interface:hdf_audio_adm_interface_test",
-    ]
+  deps += [ "audio_adm_interface:hdf_audio_adm_interface_test" ]
 }

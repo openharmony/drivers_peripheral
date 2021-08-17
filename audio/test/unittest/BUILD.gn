@@ -7,13 +7,14 @@ module_output_path = "hdf/audio_hdi"
 
 ohos_unittest("AudioHdiTest") {
   module_out_path = module_output_path
-  sources = [ "common/audio_manager_test.cpp",
-              "common/audio_adapter_test.cpp",
-              "common/audio_render_test.cpp",
-              "common/audio_capture_test.cpp",
-              "common/audio_interface_lib_render_test.cpp",
-              "common/audio_interface_lib_capture_test.cpp"
-        ]
+  sources = [
+    "common/audio_adapter_test.cpp",
+    "common/audio_capture_test.cpp",
+    "common/audio_interface_lib_capture_test.cpp",
+    "common/audio_interface_lib_render_test.cpp",
+    "common/audio_manager_test.cpp",
+    "common/audio_render_test.cpp",
+  ]
 
   include_dirs = [
     "//drivers/peripheral/audio/test/unittest/common",
@@ -33,11 +34,11 @@ ohos_unittest("AudioHdiTest") {
 
   deps = [
     "$hdf_uhdf_path/osal:libhdf_utils",
+    "//drivers/peripheral/audio:hdi_audio",
+    "//drivers/peripheral/audio:hdi_audio_interface_lib_capture",
+    "//drivers/peripheral/audio:hdi_audio_interface_lib_render",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//drivers/peripheral/audio:hdi_audio",
-    "//drivers/peripheral/audio:hdi_audio_interface_lib_render",
-    "//drivers/peripheral/audio:hdi_audio_interface_lib_capture",
   ]
 
   cflags = [
