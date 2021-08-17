@@ -27,7 +27,7 @@
 
 static void UsbPnpSampleTestWriteLog(char *string)
 {
-    char str[STR_LEN] = {0};
+    char str[STR_LEN];
     FILE *fp = NULL;
     struct timeval time;
 
@@ -45,26 +45,26 @@ static void UsbPnpSampleTestWriteLog(char *string)
 static int32_t UsbPnpSampleTestServiceDispatch(struct HdfDeviceIoClient *client, int cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGI("%{public}s: %{public}d", __func__, __LINE__);
+    HDF_LOGI("%s: %d", __func__, __LINE__);
     return HDF_SUCCESS;
 }
 
 int UsbPnpSampleTestDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("%{public}s: %{public}d enter", __func__, __LINE__);
+    HDF_LOGI("%s: %d enter", __func__, __LINE__);
     static struct IDeviceIoService testService = {
         .Dispatch = UsbPnpSampleTestServiceDispatch,
         .Open = NULL,
         .Release = NULL,
     };
     deviceObject->service = &testService;
-    HDF_LOGI("%{public}s: %{public}d done", __func__, __LINE__);
+    HDF_LOGI("%s: %d done", __func__, __LINE__);
     return HDF_SUCCESS;
 }
 
 int UsbPnpSampleTestDriverInit(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("%{public}s: %{public}d", __func__, __LINE__);
+    HDF_LOGI("%s: %d", __func__, __LINE__);
 
     UsbPnpSampleTestWriteLog("usb pnp sample device driver was loaded successfully");
 
@@ -73,7 +73,7 @@ int UsbPnpSampleTestDriverInit(struct HdfDeviceObject *deviceObject)
 
 void UsbPnpSampleTestDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("%{public}s: %{public}d", __func__, __LINE__);
+    HDF_LOGI("%s: %d", __func__, __LINE__);
 
     (void)deviceObject;
 

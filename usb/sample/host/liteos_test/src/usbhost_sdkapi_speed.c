@@ -62,6 +62,9 @@ static int AcmDbAlloc(struct AcmDevice *acm)
     dbn = 0;
     i = 0;
     for (;;) {
+        if (TEST_CYCLE <= dbn) {
+            return -1;
+        }
         db = &acm->db[dbn];
         if (!db->use) {
             db->use = 1;
@@ -74,7 +77,7 @@ static int AcmDbAlloc(struct AcmDevice *acm)
     }
 }
 
-static int AcmDbIsAvail(struct AcmDevice *acm)
+static int AcmDbIsAvail(const struct AcmDevice *acm)
 {
     int i, n;
     n = TEST_CYCLE;
@@ -106,7 +109,7 @@ static int AcmStartDb(struct AcmDevice *acm,
     int rc;
     rc = UsbSubmitRequestAsync(db->request);
     if (rc < 0) {
-        HDF_LOGE("UsbSubmitRequestAsync failed, ret=%{public}d \n", rc);
+        HDF_LOGE("UsbSubmitRequestAsync failed, ret=%d \n", rc);
         db->use = 0;
     }
     return rc;
@@ -135,11 +138,11 @@ static int AcmDataBufAlloc(struct AcmDevice *acm)
     return 0;
 }
 
-static int AcmDataBufFree(struct AcmDevice *acm)
+static int AcmDataBufFree(const struct AcmDevice *acm)
 {
     int i;
     struct AcmDb *db;
-    for (db = &acm->db[0], i = 0; i < TEST_CYCLE; i++, db++) {
+    for (db = (struct AcmDb *)&acm->db[0], i = 0; i < TEST_CYCLE; i++, db++) {
         OsalMemFree(db->buf);
         db->use = 0;
     }
@@ -170,7 +173,9 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
         printf("#");
         fflush(stdout);
     }
-
+    if (db == NULL) {
+        return;
+    }
     db->use = 0;
     if (!g_speedFlag) {
         SerialBegin(db->instance);
@@ -182,7 +187,6 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
 
 static int32_t SerialBegin(struct AcmDevice *acm)
 {
-    uint32_t size = acm->dataSize;
     int32_t ret;
     struct AcmDb *db = NULL;
     int dbn;
@@ -199,7 +203,7 @@ static int32_t SerialBegin(struct AcmDevice *acm)
     db = &acm->db[dbn];
     db->len = acm->dataSize;
     ret = AcmStartDb(acm, db, NULL);
-    return size;
+    return ret;
 }
 
 
@@ -239,7 +243,7 @@ static struct UsbPipeInfo *EnumePipe(const struct AcmDevice *acm,
         if ((p.pipeDirection == pipeDirection) && (p.pipeType == pipeType)) {
             struct UsbPipeInfo *pi = OsalMemCalloc(sizeof(*pi));
             if (pi == NULL) {
-                HDF_LOGE("%{public}s: Alloc pipe failed", __func__);
+                HDF_LOGE("%s: Alloc pipe failed", __func__);
                 return NULL;
             }
             p.interfaceId = info->interfaceIndex;
@@ -255,7 +259,7 @@ static struct UsbPipeInfo *GetPipe(const struct AcmDevice *acm,
 {
     uint8_t i;
     if (acm == NULL) {
-        HDF_LOGE("%{public}s: invalid parmas", __func__);
+        HDF_LOGE("%s: invalid parmas", __func__);
         return NULL;
     }
     for (i = 0; i < acm->interfaceCnt; i++) {
@@ -283,7 +287,7 @@ static void SignalHandler()
     printf("\nSpeed:%f MB/s\n", speed);
 }
 
-static void ShowHelp(char *name)
+static void ShowHelp(const char *name)
 {
     printf(">> usage:\n");
     printf(">>      %s [<busNum> <devAddr>]  <ifaceNum> <w>/<r> [printdata]> \n", name);
@@ -454,8 +458,8 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
 
     while (!g_speedFlag) {
         if (g_writeOrRead == TEST_WRITE) {
-            SignalHandler();
             OsalSemWait(&timeSem, TEST_PRINT_TIME*1000);
+            SignalHandler();
         } else {
             OsalSemWait(&timeSem, 200);
         }
@@ -495,17 +499,17 @@ static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
 {
 
     if (client == NULL) {
-        HDF_LOGE("%{public}s: client is NULL", __func__);
+        HDF_LOGE("%s: client is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     if (client->device == NULL) {
-        HDF_LOGE("%{public}s: client->device is NULL", __func__);
+        HDF_LOGE("%s: client->device is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     if (client->device->service == NULL) {
-        HDF_LOGE("%{public}s: client->device->service is NULL", __func__);
+        HDF_LOGE("%s: client->device->service is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
@@ -528,20 +532,21 @@ static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
 static int32_t AcmDriverBind(struct HdfDeviceObject *device)
 {
     if (device == NULL) {
-        HDF_LOGE("%{public}s: device is null", __func__);
+        HDF_LOGE("%s: device is null", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     acm = (struct AcmDevice *)OsalMemCalloc(sizeof(*acm));
     if (acm == NULL) {
-        HDF_LOGE("%{public}s: Alloc usb acm device failed", __func__);
+        HDF_LOGE("%s: Alloc usb acm device failed", __func__);
         return HDF_FAILURE;
     }
 
     acm->device  = device;
     device->service = &(acm->service);
-    acm->device->service->Dispatch = AcmDeviceDispatch;
-
+    if (acm->device && acm->device->service) {
+        acm->device->service->Dispatch = AcmDeviceDispatch;
+    }
     return HDF_SUCCESS;
 }
 

@@ -131,25 +131,25 @@ struct UsbRequestParams {
 };
 
 int32_t UsbInitHostSdk(struct UsbSession **session);
-int32_t UsbExitHostSdk(struct UsbSession *session);
-const struct UsbInterface *UsbClaimInterface(struct UsbSession *session, uint8_t busNum,
+int32_t UsbExitHostSdk(const struct UsbSession *session);
+const struct UsbInterface *UsbClaimInterface(const struct UsbSession *session, uint8_t busNum,
     uint8_t usbAddr, uint8_t interfaceIndex);
 int UsbReleaseInterface(const struct UsbInterface *interfaceObj);
-int UsbAddOrRemoveInterface(struct UsbSession *session, uint8_t busNum, uint8_t usbAddr,
+int UsbAddOrRemoveInterface(const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr,
     uint8_t interfaceIndex, UsbInterfaceStatus status);
-UsbInterfaceHandle *UsbOpenInterface(struct UsbInterface *interfaceObj);
-int32_t UsbCloseInterface(UsbInterfaceHandle *interfaceHandle);
-int32_t UsbSelectInterfaceSetting(UsbInterfaceHandle *interfaceHandle, uint8_t settingIndex,
+UsbInterfaceHandle *UsbOpenInterface(const struct UsbInterface *interfaceObj);
+int32_t UsbCloseInterface(const UsbInterfaceHandle *interfaceHandle);
+int32_t UsbSelectInterfaceSetting(const UsbInterfaceHandle *interfaceHandle, uint8_t settingIndex,
     struct UsbInterface **interfaceObj);
-int32_t UsbGetPipeInfo(UsbInterfaceHandle *interfaceHandle, uint8_t settingIndex,
+int32_t UsbGetPipeInfo(const UsbInterfaceHandle *interfaceHandle, uint8_t settingIndex,
     uint8_t pipeId, struct UsbPipeInfo *pipeInfo);
-int32_t UsbClearInterfaceHalt(UsbInterfaceHandle *interfaceHandle, uint8_t pipeAddress);
-struct UsbRequest *UsbAllocRequest(UsbInterfaceHandle *interfaceHandle, int isoPackets, int length);
-int UsbFreeRequest(struct UsbRequest *request);
-int UsbSubmitRequestAsync(struct UsbRequest *request);
-int32_t UsbFillRequest(struct UsbRequest *request, UsbInterfaceHandle *interfaceHandle,
-    struct UsbRequestParams *params);
-int UsbCancelRequest(struct UsbRequest *request);
-int UsbSubmitRequestSync(struct UsbRequest *request);
+int32_t UsbClearInterfaceHalt(const UsbInterfaceHandle *interfaceHandle, uint8_t pipeAddress);
+struct UsbRequest *UsbAllocRequest(const UsbInterfaceHandle *interfaceHandle, int isoPackets, int length);
+int UsbFreeRequest(const struct UsbRequest *request);
+int UsbSubmitRequestAsync(const struct UsbRequest *request);
+int32_t UsbFillRequest(const struct UsbRequest *request, const UsbInterfaceHandle *interfaceHandle,
+    const struct UsbRequestParams *params);
+int UsbCancelRequest(const struct UsbRequest *request);
+int UsbSubmitRequestSync(const struct UsbRequest *request);
 
 #endif /* USB_INTERFACE_H */

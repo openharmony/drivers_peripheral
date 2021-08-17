@@ -18,29 +18,29 @@
 
 #define HDF_LOG_TAG USB_PROTOCOL
 
-int32_t UsbProtocalFillControlSetup(unsigned char *setup, struct UsbControlRequest *ctrlReq)
+int32_t UsbProtocalFillControlSetup(const unsigned char *setup, const struct UsbControlRequest *ctrlReq)
 {
     struct UsbRawControlSetup *setupData = (struct UsbRawControlSetup *)setup;
     int32_t ret = HDF_SUCCESS;
     if ((setup == NULL) || (ctrlReq == NULL)) {
-        HDF_LOGE("%{public}s:%{public}d invalid parameter", __func__, __LINE__);
+        HDF_LOGE("%s:%d invalid parameter", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     switch (ctrlReq->reqType) {
         case USB_REQUEST_TYPE_STANDARD:
         case USB_REQUEST_TYPE_CLASS:
-            setupData->requestType = (ctrlReq->directon << USB_DIR_OFFSET) |
-                (ctrlReq->reqType << USB_TYPE_OFFSET) |
-                (ctrlReq->target << USB_RECIP_OFFSET);
+            setupData->requestType = ((uint8_t)ctrlReq->directon << USB_DIR_OFFSET) |
+                ((uint8_t)ctrlReq->reqType << USB_TYPE_OFFSET) |
+                ((uint8_t)ctrlReq->target << USB_RECIP_OFFSET);
             setupData->request     = ctrlReq->request;
             setupData->value       = CpuToLe16(ctrlReq->value);
             setupData->index       = CpuToLe16(ctrlReq->index);
             setupData->length      = CpuToLe16(ctrlReq->length);
             break;
         case USB_REQUEST_TYPE_VENDOR:
-            setupData->requestType = (ctrlReq->directon << USB_DIR_OFFSET) |
-                (ctrlReq->reqType << USB_TYPE_OFFSET) |
-                (ctrlReq->target << USB_RECIP_OFFSET);
+            setupData->requestType = ((uint8_t)ctrlReq->directon << USB_DIR_OFFSET) |
+                ((uint8_t)ctrlReq->reqType << USB_TYPE_OFFSET) |
+                ((uint8_t)ctrlReq->target << USB_RECIP_OFFSET);
             setupData->request     = ctrlReq->request;
             setupData->value       = CpuToLe16(ctrlReq->value);
             setupData->index       = CpuToLe16(ctrlReq->index);
@@ -48,20 +48,20 @@ int32_t UsbProtocalFillControlSetup(unsigned char *setup, struct UsbControlReque
             break;
         default:
             ret = HDF_ERR_INVALID_PARAM;
-            HDF_LOGE("%{public}s:%{public}d invalid request type", __func__, __LINE__);
+            HDF_LOGE("%s:%d invalid request type", __func__, __LINE__);
             break;
     }
     return ret;
 }
 
-static int CreateCtrPipe(struct UsbInterfacePool *pool)
+static int CreateCtrPipe(const struct UsbInterfacePool *pool)
 {
     int ret = 0;
     struct UsbSdkInterface *interfaceObj = NULL;
     struct UsbPipe *pipe = NULL;
 
     if (pool == NULL) {
-        HDF_LOGE("%{public}s invalid para", __func__);
+        HDF_LOGE("%s invalid para", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -93,7 +93,7 @@ static int UsbInterfaceInit(struct UsbSdkInterface *interfaceObj,
     struct UsbInterfaceInfo *ptr = NULL;
 
     if ((interfaceObj == NULL) || (iface == NULL)) {
-        HDF_LOGE("%{public}s: invalid parameter", __func__);
+        HDF_LOGE("%s: invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     ptr = &interfaceObj->interface.info;
@@ -112,30 +112,29 @@ static int UsbInterfaceInit(struct UsbSdkInterface *interfaceObj,
 
 static int UsbPipeInit(struct UsbPipe *pipe, const struct UsbRawEndpointDescriptor *ep, uint8_t id)
 {
-    struct UsbPipeInfo *ptr = NULL;
     if ((pipe == NULL) || (ep == NULL)) {
-        HDF_LOGE("%{public}s: invalid parameter", __func__);
+        HDF_LOGE("%s: invalid parameter", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    ptr = &pipe->info;
-    ptr->pipeId = id;
-    ptr->maxPacketSize = ep->endpointDescriptor.wMaxPacketSize;
-    ptr->interval = ep->endpointDescriptor.bInterval;
-    ptr->pipeType =  ep->endpointDescriptor.bmAttributes & USB_DDK_ENDPOINT_XFERTYPE_MASK;
-    ptr->pipeAddress = ep->endpointDescriptor.bEndpointAddress & USB_DDK_ENDPOINT_NUMBER_MASK;
-    ptr->pipeDirection = ep->endpointDescriptor.bEndpointAddress & USB_DDK_ENDPOINT_DIR_MASK;
+
+    pipe->info.pipeId = id;
+    pipe->info.maxPacketSize = ep->endpointDescriptor.wMaxPacketSize;
+    pipe->info.interval = ep->endpointDescriptor.bInterval;
+    pipe->info.pipeType =  ep->endpointDescriptor.bmAttributes & USB_DDK_ENDPOINT_XFERTYPE_MASK;
+    pipe->info.pipeAddress = ep->endpointDescriptor.bEndpointAddress & USB_DDK_ENDPOINT_NUMBER_MASK;
+    pipe->info.pipeDirection = ep->endpointDescriptor.bEndpointAddress & USB_DDK_ENDPOINT_DIR_MASK;
     return HDF_SUCCESS;
 }
 
 static const struct UsbRawInterface *UsbGetInterfaceFromConfig(
-    struct UsbRawConfigDescriptor *config, uint8_t idx)
+    const struct UsbRawConfigDescriptor *config, uint8_t idx)
 {
     if (config == NULL) {
-        HDF_LOGE("%{public}s: invalid param", __func__);
+        HDF_LOGE("%s: invalid param", __func__);
         return NULL;
     }
     if (config->configDescriptor.bNumInterfaces < idx + 1) {
-        HDF_LOGE("%{public}s: invalid param", __func__);
+        HDF_LOGE("%s: invalid param", __func__);
         return NULL;
     }
 
@@ -147,7 +146,7 @@ static const struct UsbRawInterfaceDescriptor *UsbGetInterfaceDesc(
     const struct UsbRawInterface *altSetting, uint8_t settingIndex)
 {
     if (altSetting == NULL) {
-        HDF_LOGE("%{public}s: invalid param", __func__);
+        HDF_LOGE("%s: invalid param", __func__);
         return NULL;
     }
 
@@ -158,11 +157,11 @@ static const struct UsbRawEndpointDescriptor *UsbGetEpDesc(
     const struct UsbRawInterfaceDescriptor *ifDes, uint8_t idx)
 {
     if (ifDes == NULL) {
-        HDF_LOGE("%{public}s: invalid param", __func__);
+        HDF_LOGE("%s: invalid param", __func__);
         return NULL;
     }
     if (ifDes->interfaceDescriptor.bNumEndpoints < (idx + 1)) {
-        HDF_LOGE("%{public}s: invalid param numEp:%{public}d+idx:%{public}d\n ",
+        HDF_LOGE("%s: invalid param numEp:%d+idx:%d\n ",
             __func__, ifDes->interfaceDescriptor.bNumEndpoints, idx);
         return NULL;
     }
@@ -171,7 +170,7 @@ static const struct UsbRawEndpointDescriptor *UsbGetEpDesc(
 }
 
 static int UsbProtocalCreatePipeObj(
-    const struct UsbRawInterfaceDescriptor *ifDes, struct UsbSdkInterface *interfaceObj)
+    const struct UsbRawInterfaceDescriptor *ifDes, const struct UsbSdkInterface *interfaceObj)
 {
     int ret;
     uint8_t id = 0;
@@ -180,7 +179,7 @@ static int UsbProtocalCreatePipeObj(
 
     for (int cnep = 0; cnep < ifDes->interfaceDescriptor.bNumEndpoints; cnep++) {
         if (ifDes->interfaceDescriptor.bNumEndpoints > USB_MAXENDPOINTS) {
-            HDF_LOGE("%{public}s:%{public}d bNumEndpoints=%{public}d is error",
+            HDF_LOGE("%s:%d bNumEndpoints=%d is error",
                 __func__, __LINE__, ifDes->interfaceDescriptor.bNumEndpoints);
             ret = HDF_DEV_ERR_NORANGE;
             break;
@@ -203,7 +202,7 @@ static int UsbProtocalCreatePipeObj(
     return ret;
 }
 
-static int UsbProtocalCreatInterfaceObj(struct UsbRawConfigDescriptor *config, struct UsbInterfacePool *interfacePool)
+static int UsbProtocalCreatInterfaceObj(const struct UsbRawConfigDescriptor *config, const struct UsbInterfacePool *interfacePool)
 {
     uint8_t j;
     int ret;
@@ -254,14 +253,14 @@ int UsbProtocalParseDescriptor(struct UsbDeviceHandle *devHandle, uint8_t busNum
     struct UsbInterfacePool *interfacePool = NULL;
     struct UsbRawConfigDescriptor *config = NULL;
 
-    if ((devHandle == NULL) || (devHandle->dev == NULL)) {
-        HDF_LOGE("%{public}s:%{public}d invalid param", __func__, __LINE__);
+    if ((devHandle == NULL) || (devHandle->dev == NULL) || (devHandle->dev->session == NULL)) {
+        HDF_LOGE("%s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     ret = UsbIfCreatInterfacePool(devHandle->dev->session, busNum, devAddr, &interfacePool);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d UsbIfCreatInterfacePool error", __func__, __LINE__);
+        HDF_LOGE("%s:%d UsbIfCreatInterfacePool error", __func__, __LINE__);
         return HDF_ERR_IO;
     }
     interfacePool->session = devHandle->dev->session;

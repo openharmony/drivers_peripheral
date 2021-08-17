@@ -57,11 +57,11 @@ typedef enum {
 } AcmModuleTestCmdType;
 #endif
 
-int UsbHostDdkTestInit(char *apiType);
+int UsbHostDdkTestInit(const char *apiType);
 int UsbHostDdkTestAsyncRead(char *readSbuf);
-void UsbHostDdkTestAsyncWrite(char *buf);
+void UsbHostDdkTestAsyncWrite(const char *buf);
 void UsbHostDdkTestSyncRead(char *readSbuf);
-void UsbHostDdkTestSyncWrite(char *buf);
+void UsbHostDdkTestSyncWrite(const char *buf);
 void UsbHostDdkTestCtrlClass(char *readSbuf);
 void UsbHostDdkTestStdGetDes(char *readSbuf);
 void UsbHostDdkTestStdGetDesAsync(char *readSbuf);

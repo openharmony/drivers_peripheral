@@ -22,6 +22,6 @@
 #define USB_DEFAULT_ALTSETTING  0x0
 
 int UsbProtocalParseDescriptor(struct UsbDeviceHandle *devHandle, uint8_t busNum, uint8_t devAddr);
-int32_t UsbProtocalFillControlSetup(unsigned char *setup, struct UsbControlRequest *ctrlReq);
+int32_t UsbProtocalFillControlSetup(const unsigned char *setup, const struct UsbControlRequest *ctrlReq);
 
 #endif  /* HDF_USB_SERIAL_RAWAPI_H */

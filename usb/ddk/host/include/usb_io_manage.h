@@ -27,12 +27,12 @@
 #define USB_IO_SLEEP_MS_TIME                100
 #define USB_IO_STOP_WAIT_MAX_TIME           3
 
-HDF_STATUS UsbIoCreateQueue(struct UsbInterfacePool *interfacePool);
-HDF_STATUS UsbIoDestroyQueue(struct UsbInterfacePool *interfacePool);
-int32_t UsbIoSendRequest(struct UsbMessageQueue *msgQueue, struct UsbHostRequest *request);
-HDF_STATUS UsbIoGetRequest(struct UsbMessageQueue *msgQueue, struct UsbHostRequest **request);
+HDF_STATUS UsbIoCreateQueue(const struct UsbInterfacePool *interfacePool);
+HDF_STATUS UsbIoDestroyQueue(const struct UsbInterfacePool *interfacePool);
+int32_t UsbIoSendRequest(const struct UsbMessageQueue *msgQueue, const struct UsbHostRequest *request);
+HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHostRequest **request);
 HDF_STATUS UsbIoStart(struct UsbInterfacePool *interfacePool);
 HDF_STATUS UsbIoStop(struct UsbInterfacePool *interfacePool);
-void UsbIoSetRequestCompletionInfo(void *requestArg);
+void UsbIoSetRequestCompletionInfo(const void *requestArg);
 
 #endif /* USB_IO_MANAGE_H */

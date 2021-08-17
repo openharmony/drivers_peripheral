@@ -155,7 +155,7 @@ void UsbHostSdkIfTest::TearDown()
 {
 }
 
-static void AcmWriteBulkCallback(void *requestArg)
+static void AcmWriteBulkCallback(const void *requestArg)
 {
     struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
 
@@ -178,7 +178,7 @@ static void AcmWriteBulkCallback(void *requestArg)
     wb->use = 0;
 }
 
-static void AcmReadBulkCallback(void *requestArg)
+static void AcmReadBulkCallback(const void *requestArg)
 {
     struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
 
@@ -197,7 +197,7 @@ static void AcmReadBulkCallback(void *requestArg)
 
     switch (req->status) {
         case USB_REQUEST_COMPLETED:
-            HDF_LOGD("Bulk status: %{public}d+size:%{public}zu\n", req->status, size);
+            HDF_LOGD("Bulk status: %{public}d+size:%{public}u\n", req->status, size);
             if (size) {
                 uint8_t *data = req->buffer;
                 uint32_t count;
@@ -240,7 +240,7 @@ static void AcmProcessNotification(struct AcmDevice *acm, unsigned char *buf)
     }
 }
 
-static void AcmNotifyReqCallback(void *requestArg)
+static void AcmNotifyReqCallback(const void *requestArg)
 {
     struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
 
@@ -330,7 +330,7 @@ static int AcmWriteBufAlloc(struct AcmDevice *acm)
     return HDF_SUCCESS;
 }
 
-static void AcmCtrlReqCallback(void *requestArg)
+static void AcmCtrlReqCallback(const void *requestArg)
 {
     printf("%s:%d entry!", __func__, __LINE__);
 }

@@ -74,7 +74,7 @@ static int OpenDevice()
     paraData.busNum = g_busNum;
     paraData.devNum = g_devAddr;
     fd = UsbPnpNotifyGetUsbDevice(paraData);
-    if (!fd) {
+    if (fd == NULL) {
         printf("err fd\n");
         return -1;
     }
@@ -117,7 +117,7 @@ static int SendProcess(void *argurb)
         sendUrb = urb[i].urb;
         r = usb_setup_endpoint(fd, uhe, 1024);
         if (r) {
-            DPRINTFN(0, "setup faild err:%d\n", err);
+            DPRINTFN(0, "setup faild ret:%d\n", r);
             return r;
         }
         r = usb_submit_urb(sendUrb, 0);
@@ -157,7 +157,7 @@ static int BeginProcess(unsigned char endPoint)
 {
     int r;
     char *data = NULL;
-    int transNum = 0;
+    const int transNum = 0;
     int i;
     double speed = 0;
 
@@ -167,7 +167,7 @@ static int BeginProcess(unsigned char endPoint)
     }
 
     uhe = usb_find_host_endpoint(fd, USB_REQUEST_TYPE_BULK, endPoint);
-    if (!uhe) {
+    if (uhe == NULL) {
         printf("usb_find_host_endpoint error\n");
         return -1;
     }
@@ -207,7 +207,7 @@ static int BeginProcess(unsigned char endPoint)
             sendUrb = urb[i].urb;
             r = usb_setup_endpoint(fd, uhe, 1024);
             if (r) {
-                DPRINTFN(0, "setup faild err:%d\n", err);
+                DPRINTFN(0, "setup faild ret:%d\n", r);
                 return r;
             }
             r = usb_submit_urb(sendUrb, 0);
@@ -244,7 +244,7 @@ static int BeginProcess(unsigned char endPoint)
     return HDF_SUCCESS;
 }
 
-static void ShowHelp(char *name)
+static void ShowHelp(const char *name)
 {
     printf(">> usage:\n");
     printf(">>      %s [<busNum> <devAddr>]  <ifaceNum> <endpoint> [<printdata>]\n", name);
@@ -383,17 +383,17 @@ static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
 {
 
     if (client == NULL) {
-        HDF_LOGE("%{public}s: client is NULL", __func__);
+        HDF_LOGE("%s: client is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     if (client->device == NULL) {
-        HDF_LOGE("%{public}s: client->device is NULL", __func__);
+        HDF_LOGE("%s: client->device is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     if (client->device->service == NULL) {
-        HDF_LOGE("%{public}s: client->device->service is NULL", __func__);
+        HDF_LOGE("%s: client->device->service is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
@@ -416,20 +416,21 @@ static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
 static int32_t AcmDriverBind(struct HdfDeviceObject *device)
 {
     if (device == NULL) {
-        HDF_LOGE("%{public}s: device is null", __func__);
+        HDF_LOGE("%s: device is null", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     acm = (struct AcmDevice *)OsalMemCalloc(sizeof(*acm));
     if (acm == NULL) {
-        HDF_LOGE("%{public}s: Alloc usb acm device failed", __func__);
+        HDF_LOGE("%s: Alloc usb acm device failed", __func__);
         return HDF_FAILURE;
     }
 
     acm->device  = device;
     device->service = &(acm->service);
-    acm->device->service->Dispatch = AcmDeviceDispatch;
-
+    if (acm->device && acm->device->service) {
+        acm->device->service->Dispatch = AcmDeviceDispatch;
+    }
     return HDF_SUCCESS;
 }
 

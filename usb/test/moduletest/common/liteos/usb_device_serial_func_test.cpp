@@ -127,7 +127,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_004, TestSize.Level2)
     }
     char readBuf[256] = {0};
     char writeBuf[256] = {0};
-    strcpy_s(writeBuf, 256, data.c_str());
+    strcpy_s(writeBuf, sizeof(writeBuf), data.c_str());
     for (int i = 0; i < writeCnt; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         acm_write(writeBuf);
@@ -177,7 +177,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_002, TestSize.Level1)
     char readBuf[100] = {0};
     acm_prop_write(propName, writeBuf);
     acm_prop_read(propName, readBuf);
-    printf("readBuf==>%s", readBuf);
+    printf("readBuf==>%s\n", readBuf);
     EXPECT_EQ(strcmp(const_cast<char *>(writeBuf), readBuf), 0);
     printf("------end HcsPropTest_002------\n");
 }
@@ -196,7 +196,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_003, TestSize.Level1)
     char readBuf[100] = {0};
     acm_prop_write(propName, writeBuf);
     acm_prop_read(propName, readBuf);
-    printf("readBuf==>%s", readBuf);
+    printf("readBuf==>%s\n", readBuf);
     EXPECT_EQ(strcmp(const_cast<char *>(writeBuf), readBuf), 0);
     printf("------end HcsPropTest_003------\n");
 }
@@ -234,7 +234,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_005, TestSize.Level1)
     char readBuf[100] = {0};
     acm_prop_write(propName, writeBuf);
     acm_prop_read(propName, readBuf);
-    printf("readBuf==>%s", readBuf);
+    printf("readBuf==>%s\n", readBuf);
     EXPECT_EQ(strcmp(const_cast<char *>(writeBuf), readBuf), 0);
     printf("------end HcsPropTest_005------\n");
 }
