@@ -110,7 +110,11 @@ static int32_t g_closeEnd = 0;
 pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t g_functionCond = PTHREAD_COND_INITIALIZER;
 int g_waitSleep = 0;
-
+#ifdef AUDIO_HAL_USER
+void *g_sdkHandle;
+int (*g_sdkInitSp)() = NULL;
+void (*g_sdkExitSp)() = NULL;
+#endif
 enum RenderMenuId {
     RENDER_START = 1,
     RENDER_STOP,
@@ -783,6 +787,25 @@ int32_t InitParam()
             LOG_FUN_ERR("GetPassthroughManagerFunc Fail");
             return HDF_FAILURE;
         }
+#ifdef AUDIO_HAL_USER
+        char sdkResolvedPath[] = "//system/lib/libhdi_audio_interface_lib_render.z.so";
+        g_sdkHandle = dlopen(sdkResolvedPath, 1);
+        if (g_sdkHandle == NULL) {
+            LOG_FUN_ERR("Open so Fail, reason:%s", dlerror());
+            return HDF_FAILURE;
+        }
+        g_sdkInitSp = (int32_t (*)())(dlsym(g_sdkHandle, "MpiSdkInit"));
+        if (g_sdkInitSp == NULL) {
+            LOG_FUN_ERR("Get sdk init Funcs Fail");
+            return HDF_FAILURE;
+        }
+        g_sdkExitSp = (void (*)())(dlsym(g_sdkHandle, "MpiSdkExit"));
+        if (g_sdkExitSp == NULL) {
+            LOG_FUN_ERR("Get sdk exit Funcs Fail");
+            return HDF_FAILURE;
+        }
+        g_sdkInitSp();
+#endif
     } else {
         if (GetRenderProxyManagerFunc(adapterNameCase) < 0) {
             LOG_FUN_ERR("GetProxyManagerFunc Fail");
@@ -1192,6 +1215,14 @@ int32_t main(int32_t argc, char const *argv[])
     } else {
         g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
     }
+#ifdef AUDIO_HAL_USER
+    if (soMode) {
+        g_sdkExitSp();
+        if (g_sdkHandle != NULL) {
+            dlclose(g_sdkHandle);
+        }
+    }
+#endif
     dlclose(g_handle);
     return 0;
 }

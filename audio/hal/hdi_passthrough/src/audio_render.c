@@ -935,6 +935,19 @@ int32_t AudioRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct 
     if (render == NULL || frames == NULL || time == NULL) {
         return HDF_FAILURE;
     }
+#ifndef AUDIO_HAL_USER
+        InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
+        if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
+            LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+            return HDF_FAILURE;
+        }
+        int ret = (*pInterfaceLibModeRender)(render->devDataHandle,
+            &render->renderParam, AUDIO_DRV_PCM_IOCTL_MMAP_POSITION);
+        if (ret < 0) {
+            LOG_FUN_ERR("Get Position FAIL!");
+            return HDF_FAILURE;
+        }
+#endif
     *frames = render->renderParam.frameRenderMode.frames;
     render->renderParam.frameRenderMode.time.tvSec = render->renderParam.frameRenderMode.frames /
                                        (int64_t)render->renderParam.frameRenderMode.attrs.sampleRate;
