@@ -25,7 +25,7 @@ group("lib") {
   }
   deps = []
   deps += [
-    "render:hdf_audio_lib_render_test",
     "capture:hdf_audio_lib_capture_test",
-    ]
+    "render:hdf_audio_lib_render_test",
+  ]
 }

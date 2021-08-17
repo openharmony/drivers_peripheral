@@ -20,13 +20,13 @@ if (defined(ohos_lite)) {
 }
 
 if (defined(ohos_lite)) {
-###########################-LITEOS-############################################
-###########################hdf_audio_adm_interface_test###########################
+  ###########################-LITEOS-############################################
+  ###########################hdf_audio_adm_interface_test###########################
   unittest("hdf_audio_adm_interface_test") {
     sources = [
-      "src/audio_adm_interface_test.cpp",
       "../../common/adm_common/src/audio_adm_common.cpp",
       "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "src/audio_adm_interface_test.cpp",
     ]
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
@@ -59,25 +59,26 @@ if (defined(ohos_lite)) {
       "-fsigned-char",
       "-fno-common",
       "-fno-strict-aliasing",
-      "-std=c++11"
+      "-std=c++11",
     ]
 
     deps = [
-      "//third_party/bounds_checking_function:libsec_shared",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//drivers/adapter/uhdf/manager:hdf_core",
-      "//drivers/adapter/uhdf/posix:hdf_posix_osal"
+      "//drivers/adapter/uhdf/posix:hdf_posix_osal",
+      "//third_party/bounds_checking_function:libsec_shared",
     ]
   }
 } else {
   module_output_path = "hdf/audio"
+
   ###########################hdf_audio_adm_interface_test###########################
   ohos_systemtest("hdf_audio_adm_interface_test") {
     module_out_path = module_output_path
     sources = [
-      "src/audio_adm_interface_test.cpp",
       "../../common/adm_common/src/audio_adm_common.cpp",
       "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "src/audio_adm_interface_test.cpp",
     ]
 
     include_dirs = [
@@ -109,18 +110,18 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
     deps = [
+      "//drivers/adapter/uhdf2/config:libhdf_hcs",
+      "//drivers/adapter/uhdf2/hcs:hdf_default.hcb",
+      "//drivers/adapter/uhdf2/hdi:libhdi",
+      "//drivers/adapter/uhdf2/host:hdf_devhost",
+      "//drivers/adapter/uhdf2/host:libhdf_host",
+      "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+      "//drivers/adapter/uhdf2/manager:hdf_devmgr",
+      "//drivers/adapter/uhdf2/manager:hdf_devmgr.rc",
+      "//drivers/adapter/uhdf2/osal:libhdf_utils",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
       "//utils/native/base:utils",
-      "//drivers/adapter/uhdf2/hdi:libhdi",
-      "//drivers/adapter/uhdf2/manager:hdf_devmgr",
-      "//drivers/adapter/uhdf2/manager:hdf_devmgr.rc",
-      "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-      "//drivers/adapter/uhdf2/osal:libhdf_utils",
-      "//drivers/adapter/uhdf2/host:hdf_devhost",
-      "//drivers/adapter/uhdf2/host:libhdf_host",
-      "//drivers/adapter/uhdf2/config:libhdf_hcs",
-      "//drivers/adapter/uhdf2/hcs:hdf_default.hcb",
     ]
     defines = []
     if (enable_audio_adm_so) {
@@ -137,5 +138,6 @@ if (defined(ohos_lite)) {
     }
   }
 }
+
 ###########################end###########################
 

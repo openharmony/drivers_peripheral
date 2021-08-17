@@ -20,14 +20,14 @@ if (defined(ohos_lite)) {
 }
 
 if (defined(ohos_lite)) {
-###########################LITEOS##########################################
-###########################hdf_audio_lib_capture_test###########################
+  ###########################LITEOS##########################################
+  ###########################hdf_audio_lib_capture_test###########################
   unittest("hdf_audio_lib_capture_test") {
     sources = [
-          "src/audio_libcapture_test.cpp",
-          "../../common/lib_common/src/audio_lib_common.cpp",
-          "../../common/hdi_common/src/audio_hdi_common.cpp"
-          ]
+      "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "../../common/lib_common/src/audio_lib_common.cpp",
+      "src/audio_libcapture_test.cpp",
+    ]
 
     include_dirs = [
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
@@ -61,23 +61,22 @@ if (defined(ohos_lite)) {
       "-fsigned-char",
       "-fno-common",
       "-fno-strict-aliasing",
-      "-std=c++11"
+      "-std=c++11",
     ]
 
-    deps = [
-      "//third_party/bounds_checking_function:libsec_shared"
-    ]
+    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
   }
 } else {
   module_output_path = "hdf/audio"
+
   ###########################hdf_audio_lib_capture_test###########################
   ohos_systemtest("hdf_audio_lib_capture_test") {
     module_out_path = module_output_path
     sources = [
-          "src/audio_libcapture_test.cpp",
-          "../../common/lib_common/src/audio_lib_common.cpp",
-          "../../common/hdi_common/src/audio_hdi_common.cpp"
-          ]
+      "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "../../common/lib_common/src/audio_lib_common.cpp",
+      "src/audio_libcapture_test.cpp",
+    ]
 
     include_dirs = [
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
@@ -110,9 +109,9 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
     deps = [
-      "//utils/native/base:utils",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
+      "//utils/native/base:utils",
     ]
     defines = []
     if (enable_audio_adm_so) {

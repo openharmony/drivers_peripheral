@@ -68,21 +68,21 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
       "//drivers/adapter/khdf/liteos/osal/include",
       "//drivers/adapter/uhdf2/shared/include",
-      "//drivers/adapter/uhdf2/include/hdi/"
+      "//drivers/adapter/uhdf2/include/hdi/",
     ]
 
     sources = [
+      "$hdf_framework_path/ability/sbuf/src/hdf_sbuf.c",
+      "$hdf_framework_path/support/posix/src/osal_mem.c",
       "src/hdf_audio_server.c",
       "src/hdf_audio_server_capture.c",
       "src/hdf_audio_server_common.c",
       "src/hdf_audio_server_render.c",
-      "$hdf_framework_path/support/posix/src/osal_mem.c",
-      "$hdf_framework_path/ability/sbuf/src/hdf_sbuf.c"
     ]
 
     deps = [
       "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
-      "//third_party/bounds_checking_function:libsec_shared"
+      "//third_party/bounds_checking_function:libsec_shared",
     ]
 
     public_configs = [ ":hdi_service_config" ]
@@ -105,7 +105,7 @@ if (defined(ohos_lite)) {
       "$hdf_framework_path/ability/sbuf/include",
       "$hdf_framework_path/utils/include",
       "$hdf_framework_path/ability/sbuf/include",
-      "$hdf_uhdf_path/osal/include"
+      "$hdf_uhdf_path/osal/include",
     ]
 
     sources = [
@@ -116,17 +116,17 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
-      "$hdf_uhdf_path/osal:libhdf_utils",
-      "$hdf_uhdf_path/manager:hdf_devmgr",
-      "$hdf_uhdf_path/manager:hdf_devmgr.rc",
-      "//utils/native/base:utils",
-      "$hdf_uhdf_path/hdi:libhdi",
-      "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
-      "$hdf_uhdf_path/host:hdf_devhost",
-      "$hdf_uhdf_path/host:libhdf_host",
       "$hdf_uhdf_path/config:libhdf_hcs",
       "$hdf_uhdf_path/hcs:hdf_default.hcb",
+      "$hdf_uhdf_path/hdi:libhdi",
+      "$hdf_uhdf_path/host:hdf_devhost",
+      "$hdf_uhdf_path/host:libhdf_host",
+      "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
+      "$hdf_uhdf_path/manager:hdf_devmgr",
+      "$hdf_uhdf_path/manager:hdf_devmgr.rc",
+      "$hdf_uhdf_path/osal:libhdf_utils",
+      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
+      "//utils/native/base:utils",
     ]
 
     defines = []
@@ -144,4 +144,3 @@ if (defined(ohos_lite)) {
     subsystem_name = "hdf"
   }
 }
-

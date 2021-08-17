@@ -9,4 +9,3 @@ copy("hdf_audio_path_json") {
   sources = [ "//drivers/peripheral/audio/config/parse.json" ]
   outputs = [ "${root_out_dir}/etc/parse.json" ]
 }
-

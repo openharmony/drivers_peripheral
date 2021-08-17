@@ -49,10 +49,10 @@ config("pathseltct_config") {
 if (defined(ohos_lite)) {
   shared_library("hdi_audio_path_select") {
     sources = [
-      "src/audio_pathselect.c",
-      "//third_party/cJSON/cJSON.c",
       "$hdf_framework_path/support/posix/src/osal_time.c",
-      "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c"
+      "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
+      "//third_party/cJSON/cJSON.c",
+      "src/audio_pathselect.c",
     ]
 
     include_dirs = [
@@ -74,20 +74,18 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
       "//drivers/adapter/khdf/liteos/osal/include",
       "//drivers/adapter/uhdf2/shared/include",
-      "//drivers/adapter/uhdf2/include/hdi/"
+      "//drivers/adapter/uhdf2/include/hdi/",
     ]
 
-    deps = [
-      "//third_party/bounds_checking_function:libsec_shared"
-    ]
+    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
     public_configs = [ ":pathseltct_config" ]
   }
 } else {
   ohos_shared_library("hdi_audio_path_select") {
     sources = [
-      "//third_party/cJSON/cJSON.c",
       "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
+      "//third_party/cJSON/cJSON.c",
       "src/audio_pathselect.c",
     ]
 
@@ -104,20 +102,20 @@ if (defined(ohos_lite)) {
       "$hdf_framework_path/ability/sbuf/include",
       "$hdf_framework_path/utils/include",
       "$hdf_framework_path/ability/sbuf/include",
-      "$hdf_uhdf_path/osal/include"
+      "$hdf_uhdf_path/osal/include",
     ]
 
     deps = [
-      "$hdf_uhdf_path/osal:libhdf_utils",
-      "$hdf_uhdf_path/manager:hdf_devmgr",
-      "$hdf_uhdf_path/manager:hdf_devmgr.rc",
-      "//utils/native/base:utils",
-      "$hdf_uhdf_path/hdi:libhdi",
-      "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
-      "$hdf_uhdf_path/host:hdf_devhost",
-      "$hdf_uhdf_path/host:libhdf_host",
       "$hdf_uhdf_path/config:libhdf_hcs",
       "$hdf_uhdf_path/hcs:hdf_default.hcb",
+      "$hdf_uhdf_path/hdi:libhdi",
+      "$hdf_uhdf_path/host:hdf_devhost",
+      "$hdf_uhdf_path/host:libhdf_host",
+      "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
+      "$hdf_uhdf_path/manager:hdf_devmgr",
+      "$hdf_uhdf_path/manager:hdf_devmgr.rc",
+      "$hdf_uhdf_path/osal:libhdf_utils",
+      "//utils/native/base:utils",
     ]
 
     if (is_standard_system) {

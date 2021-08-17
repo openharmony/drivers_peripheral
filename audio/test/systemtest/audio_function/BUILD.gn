@@ -24,8 +24,8 @@ group("function") {
     testonly = true
   }
   deps = [
-    "audio_server:hdf_audio_hdi_server_function_test",
     "audio_pathroute:hdf_audio_hdi_path_route_test",
-    "audio_smartpa:hdf_audio_smartpa_test"
+    "audio_server:hdf_audio_hdi_server_function_test",
+    "audio_smartpa:hdf_audio_smartpa_test",
   ]
 }

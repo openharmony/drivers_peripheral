@@ -14,4 +14,3 @@ if (is_standard_system) {
     part_name = "hdf"
   }
 }
-
