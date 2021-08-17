@@ -480,6 +480,17 @@ void AudioHdiServerRelease(struct HdfDeviceObject *deviceObject)
         return;
     }
     deviceObject->service = NULL;
+#ifdef AUDIO_HAL_USER
+    if (g_mpiInitSo == NULL) {
+        return;
+    }
+    int32_t (*mpiExit)() = dlsym(g_mpiInitSo, "AudioMpiSysExit");
+    if (mpiExit == NULL) {
+        return;
+    }
+    mpiExit();
+    dlclose(g_mpiInitSo);
+#endif
     return;
 }
 
@@ -509,6 +520,21 @@ int AudioHdiServerInit(struct HdfDeviceObject *deviceObject)
         HDF_LOGE("%{public}s: deviceObject is null!", __func__);
         return HDF_FAILURE;
     }
+#ifdef AUDIO_HAL_USER
+    g_mpiInitSo = dlopen(SO_INTERFACE_LIB_MPI_PATH, RTLD_LAZY);
+    if (g_mpiInitSo == NULL) {
+        LOG_FUN_ERR("Open so Fail, reason:%s", dlerror());
+        return HDF_FAILURE;
+    }
+    int32_t (*mpiInit)() = dlsym(g_mpiInitSo, "AudioMpiSysInit");
+    if (mpiInit == NULL) {
+        dlclose(g_mpiInitSo);
+        return HDF_FAILURE;
+    }
+    if (mpiInit() < 0) {
+        return HDF_FAILURE;
+    }
+#endif
     return HDF_SUCCESS;
 }
 

@@ -639,6 +639,25 @@ int32_t InitParam()
             LOG_FUN_ERR("GetCapturePassthroughManagerFunc Fail");
             return HDF_FAILURE;
         }
+#ifdef AUDIO_HAL_USER
+        char sdkResolvedPath[] = "//system/lib/libhdi_audio_interface_lib_capture.z.so";
+        g_sdkHandle = dlopen(sdkResolvedPath, 1);
+        if (g_sdkHandle == NULL) {
+            LOG_FUN_ERR("Open so Invalid, reason:%s", dlerror());
+            return HDF_FAILURE;
+        }
+        g_sdkInitSp = (int32_t (*)())(dlsym(g_sdkHandle, "MpiSdkInit"));
+        if (g_sdkInitSp == NULL) {
+            LOG_FUN_ERR("Get sdk init Funcs Invalid");
+            return HDF_FAILURE;
+        }
+        g_sdkExitSp = (void (*)())(dlsym(g_sdkHandle, "MpiSdkExit"));
+        if (g_sdkExitSp == NULL) {
+            LOG_FUN_ERR("Get sdk exit Funcs Invalid");
+            return HDF_FAILURE;
+        }
+        g_sdkInitSp();
+#endif
     } else {
         // (strcmp(func,"GetAudioProxyManagerFuncs") == 0)
         if (GetCaptureProxyManagerFunc(adapterNameCase) < 0) {
@@ -1058,6 +1077,14 @@ int32_t main(int32_t argc, char const *argv[])
     } else {
         g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
     }
+#ifdef AUDIO_HAL_USER
+        if (soMode) {
+            g_sdkExitSp();
+            if (g_sdkHandle != NULL) {
+                dlclose(g_sdkHandle);
+            }
+        }
+#endif
     dlclose(g_handle);
     printf("Record file path:%s\n", g_path);
     return 0;

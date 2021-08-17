@@ -849,6 +849,20 @@ int32_t AudioCaptureGetMmapPosition(AudioHandle handle, uint64_t *frames, struct
     if (capture == NULL || frames == NULL || time == NULL) {
         return HDF_FAILURE;
     }
+#ifndef AUDIO_HAL_USER
+    InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
+    if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
+        LOG_FUN_ERR("pInterfaceLibModeCapture Fail!");
+        return HDF_FAILURE;
+    }
+    int32_t ret = (*pInterfaceLibModeCapture)(capture->devDataHandle, &capture->captureParam,
+                                              AUDIO_DRV_PCM_IOCTL_MMAP_POSITION_CAPTURE);
+    if (ret < 0) {
+        LOG_FUN_ERR("GetMmapPosition SetParams FAIL");
+        return HDF_FAILURE;
+    }
+    LOG_PARA_INFO("GetMmapPosition SUCCESS!");
+#endif
     *frames = capture->captureParam.frameCaptureMode.frames;
     capture->captureParam.frameCaptureMode.time.tvSec = capture->captureParam.frameCaptureMode.frames /
                                        (int64_t)capture->captureParam.frameCaptureMode.attrs.sampleRate;

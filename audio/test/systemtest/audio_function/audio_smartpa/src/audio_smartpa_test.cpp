@@ -21,7 +21,6 @@ using namespace testing::ext;
 using namespace HMOS::Audio;
 
 namespace {
-const string AUDIO_FILE = "//bin/audiorendertest.wav";
 const string ADAPTER_NAME_HDMI = "hdmi";
 const string ADAPTER_NAME_USB = "usb";
 const string ADAPTER_NAME_INTERNAL = "internal";
@@ -35,7 +34,7 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static struct AudioManager *(*GetAudioManager)();
+    static TestAudioManager *(*GetAudioManager)();
     static void *handleSo;
     static struct DevHandle *(*BindServiceRenderSo)(const char *);
     static int32_t (*InterfaceLibOutputRender)(struct DevHandle *, int, struct AudioHwRenderParam *);
@@ -44,11 +43,11 @@ public:
     static void *PtrHandle;
     static int32_t GetManager(struct PrepareAudioPara& audiopara);
     uint32_t FrameSizeExpect(const struct AudioSampleAttributes attrs);
-    uint32_t BindServiceAndHwRender(struct AudioHwRender *&hwRender, const std::string BindName,
+    int32_t BindServiceAndHwRender(struct AudioHwRender *&hwRender, const std::string BindName,
          const std::string adapterNameCase, struct DevHandle *&handle) const;
 };
 
-struct AudioManager *(*AudioSmartPaTest::GetAudioManager)() = nullptr;
+TestAudioManager *(*AudioSmartPaTest::GetAudioManager)() = nullptr;
 void *AudioSmartPaTest::handleSo = nullptr;
 struct DevHandle *(*AudioSmartPaTest::BindServiceRenderSo)(const char *) = nullptr;
 int32_t (*AudioSmartPaTest::InterfaceLibOutputRender)(struct DevHandle *, int, struct AudioHwRenderParam *) = nullptr;
@@ -59,21 +58,19 @@ using THREAD_FUNC = void *(*)(void *);
 
 void AudioSmartPaTest::SetUpTestCase(void)
 {
-    string functionName = "GetAudioManagerFuncs";
-    string resolvedPath = "//system/lib/libhdi_audio.z.so";
-    if (IS_SERVICE) {
-        functionName = "GetAudioProxyManagerFuncs";
-        resolvedPath = "//system/lib/libaudio_hdi_proxy_server.z.so";
-    }
-    handleSo = dlopen(resolvedPath.c_str(), RTLD_LAZY);
+    handleSo = dlopen(RESOLVED_PATH.c_str(), RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
     }
-    GetAudioManager = (struct AudioManager *(*)())(dlsym(handleSo, functionName.c_str()));
+    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
     if (GetAudioManager == nullptr) {
         return;
     }
+#ifdef __LITEOS__
+    string resolvedPathOne = "/usr/lib/libhdi_audio_interface_lib_render.so";
+#else
     string resolvedPathOne = "//system/lib/libhdi_audio_interface_lib_render.z.so";
+#endif
     PtrHandle = dlopen(resolvedPathOne.c_str(), RTLD_LAZY);
     if (PtrHandle == nullptr) {
         return;
@@ -139,7 +136,7 @@ uint32_t AudioSmartPaTest::FrameSizeExpect(const struct AudioSampleAttributes at
     return sizeExpect;
 }
 
-uint32_t AudioSmartPaTest::BindServiceAndHwRender(struct AudioHwRender *&hwRender,
+int32_t AudioSmartPaTest::BindServiceAndHwRender(struct AudioHwRender *&hwRender,
     const std::string BindName, const std::string adapterNameCase, struct DevHandle *&handle) const
 {
     handle = BindServiceRenderSo(BindName.c_str());
@@ -154,6 +151,7 @@ uint32_t AudioSmartPaTest::BindServiceAndHwRender(struct AudioHwRender *&hwRende
     if (InitHwRender(hwRender, adapterNameCase)) {
         CloseServiceRenderSo(handle);
         free(hwRender);
+        hwRender = nullptr;
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -167,33 +165,31 @@ uint32_t AudioSmartPaTest::BindServiceAndHwRender(struct AudioHwRender *&hwRende
 HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    uint32_t latencyTime = 0;
-    uint32_t expectedValue = 0;
     struct PrepareAudioPara audiopara = {
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
+    uint32_t latencyTime = 0;
+    uint32_t expectedValue = 0;
 
     ret = GetManager(audiopara);
     ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
-    if (ret != 0) {
-        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
-        ASSERT_EQ(ret, HDF_SUCCESS);
-    }
+    ASSERT_EQ(HDF_SUCCESS, ret);
     sleep(1);
-    ret = audiopara.render->GetLatency(audiopara.render, &latencyTime);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_LT(expectedValue, latencyTime);
-    ret = audiopara.render->control.Pause((AudioHandle)(audiopara.render));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->control.Flush((AudioHandle)audiopara.render);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
-    sleep(3);
-    ret = audiopara.render->control.Resume((AudioHandle)(audiopara.render));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->GetLatency(audiopara.render, &latencyTime);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_LT(expectedValue, latencyTime);
+        ret = audiopara.render->control.Pause((AudioHandle)(audiopara.render));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->control.Flush((AudioHandle)audiopara.render);
+        EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+        sleep(1);
+        ret = audiopara.render->control.Resume((AudioHandle)(audiopara.render));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+    }
     ret = ThreadRelease(audiopara);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
@@ -207,32 +203,30 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0002, TestSize.Level1
 {
     int32_t ret = -1;
     float volumeMax = 1.0;
-    float volumeValue[10] = {0};
-    float volumeArr[10] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
     struct PrepareAudioPara audiopara = {
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
+    float volumeValue[10] = {0};
+    float volumeArr[10] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 
     ret = GetManager(audiopara);
     ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
-    if (ret != 0) {
-        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
-        ASSERT_EQ(ret, HDF_SUCCESS);
-    }
+    ASSERT_EQ(HDF_SUCCESS, ret);
     sleep(1);
-    ret = audiopara.render->volume.SetVolume(audiopara.render, volumeMax);
-    for (int i = 0; i < 10; i++) {
-        ret = audiopara.render->volume.SetVolume(audiopara.render, volumeArr[i]);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        ret = audiopara.render->volume.GetVolume(audiopara.render, &volumeValue[i]);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        EXPECT_EQ(volumeArr[i], volumeValue[i]);
-        sleep(3);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->volume.SetVolume(audiopara.render, volumeMax);
+        for (int i = 0; i < 10; i++) {
+            ret = audiopara.render->volume.SetVolume(audiopara.render, volumeArr[i]);
+            EXPECT_EQ(HDF_SUCCESS, ret);
+            ret = audiopara.render->volume.GetVolume(audiopara.render, &volumeValue[i]);
+            EXPECT_EQ(HDF_SUCCESS, ret);
+            EXPECT_EQ(volumeArr[i], volumeValue[i]);
+            usleep(30000);
+        }
     }
-
     ret = ThreadRelease(audiopara);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
@@ -254,25 +248,23 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0003, TestSize.Level1
     ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
-    if (ret != 0) {
-        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    ASSERT_EQ(HDF_SUCCESS, ret);
     sleep(1);
     bool muteTrue = true;
     bool muteFalse = false;
-    ret = audiopara.render->volume.SetMute(audiopara.render, muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->volume.GetMute(audiopara.render, &muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(true, muteTrue);
-    sleep(3);
-    ret = audiopara.render->volume.SetMute(audiopara.render, muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->volume.GetMute(audiopara.render, &muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(false, muteFalse);
-
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->volume.SetMute(audiopara.render, muteTrue);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->volume.GetMute(audiopara.render, &muteTrue);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(true, muteTrue);
+        sleep(1);
+        ret = audiopara.render->volume.SetMute(audiopara.render, muteFalse);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->volume.GetMute(audiopara.render, &muteFalse);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(false, muteFalse);
+    }
     ret = ThreadRelease(audiopara);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
@@ -297,16 +289,14 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0004, TestSize.Level1
     ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
-    if (ret != 0) {
-        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    sleep(2);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GT(time.tvSec, timeExp);
+        EXPECT_GT(frames, INITIAL_VALUE);
     }
-    sleep(3);
-    ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT(time.tvSec, timeExp);
-    EXPECT_GT(frames, INITIAL_VALUE);
-
     ret = ThreadRelease(audiopara);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
@@ -332,20 +322,18 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0005, TestSize.Level1
     ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
-    if (ret != 0) {
-        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    ASSERT_EQ(HDF_SUCCESS, ret);
     sleep(1);
-    ret = audiopara.render->attr.GetFrameSize(audiopara.render, &size);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sizeExpect = FrameSizeExpect(audiopara.attrs);
-    EXPECT_EQ(size, sizeExpect);
+    if (audiopara.render != nullptr) {
+        ret = audiopara.render->attr.GetFrameSize(audiopara.render, &size);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        sizeExpect = FrameSizeExpect(audiopara.attrs);
+        EXPECT_EQ(size, sizeExpect);
 
-    ret = audiopara.render->attr.GetFrameCount(audiopara.render, &count);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT(count, zero);
-
+        ret = audiopara.render->attr.GetFrameCount(audiopara.render, &count);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GT(count, zero);
+    }
     ret = ThreadRelease(audiopara);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
@@ -370,28 +358,27 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0006, TestSize.Level1
     ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
-    if (ret != 0) {
-        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
     sleep(1);
-    audiopara.attrs.type = AUDIO_IN_MEDIA;
-    audiopara.attrs.format = AUDIO_FORMAT_PCM_16_BIT;
-    audiopara.attrs.sampleRate = 48000;
-    audiopara.attrs.channelCount = 1;
-    audiopara.attrs.stopThreshold = INT_32_MAX;
+    if (audiopara.render != nullptr) {
+        audiopara.attrs.type = AUDIO_IN_MEDIA;
+        audiopara.attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+        audiopara.attrs.sampleRate = 48000;
+        audiopara.attrs.channelCount = 1;
+        audiopara.attrs.stopThreshold = INT_32_MAX;
 
-    ret = audiopara.render->attr.SetSampleAttributes(audiopara.render, &(audiopara.attrs));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.render->attr.GetSampleAttributes(audiopara.render, &attrsValue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->attr.SetSampleAttributes(audiopara.render, &(audiopara.attrs));
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->attr.GetSampleAttributes(audiopara.render, &attrsValue);
+        EXPECT_EQ(HDF_SUCCESS, ret);
 
-    EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
-    EXPECT_EQ(samplerateValue, attrsValue.sampleRate);
-    EXPECT_EQ(channelcountValue, attrsValue.channelCount);
-    EXPECT_EQ(INT_32_MAX, attrsValue.stopThreshold);
-
+        EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
+        EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+        EXPECT_EQ(samplerateValue, attrsValue.sampleRate);
+        EXPECT_EQ(channelcountValue, attrsValue.channelCount);
+        EXPECT_EQ(INT_32_MAX, attrsValue.stopThreshold);
+    }
     ret = ThreadRelease(audiopara);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
