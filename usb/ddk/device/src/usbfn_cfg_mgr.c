@@ -34,11 +34,11 @@ static uint32_t UsbFnCfgMgrParseDevDesc(const struct DeviceResourceNode *devDesc
     uint16_t value;
 
     if (drsOps->GetUint8(devDescNode, DESC_LENGTH, &devDesc->bLength, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read length fail!", __func__);
+        HDF_LOGE("%s: read length fail!", __func__);
         return HDF_FAILURE;
     }
     if (devDesc->bLength != sizeof(struct UsbDeviceDescriptor)) {
-        HDF_LOGE("%{public}s: dev desc length is not ringht!", __func__);
+        HDF_LOGE("%s: dev desc length is not ringht!", __func__);
         return HDF_FAILURE;
     }
     if (drsOps->GetUint8(devDescNode, DESC_TYPE, &devDesc->bDescriptorType, 0) != HDF_SUCCESS || \
@@ -50,30 +50,30 @@ static uint32_t UsbFnCfgMgrParseDevDesc(const struct DeviceResourceNode *devDesc
         drsOps->GetUint8(devDescNode, USBDEV_PRODUCT, &devDesc->iProduct, 0) != HDF_SUCCESS || \
         drsOps->GetUint8(devDescNode, USBDEV_SERIALNUM, &devDesc->iSerialNumber, 0) != HDF_SUCCESS || \
         drsOps->GetUint8(devDescNode, USBDEV_NUMCFG, &devDesc->bNumConfigurations, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read fail!", __func__);
+        HDF_LOGE("%s: read fail!", __func__);
         return HDF_FAILURE;
     }
     if (devDesc->bDescriptorType != USB_DDK_DT_DEVICE) {
-        HDF_LOGE("%{public}s: dev desc length is not ringht!", __func__);
+        HDF_LOGE("%s: dev desc length is not ringht!", __func__);
         return HDF_FAILURE;
     }
     if (drsOps->GetUint16(devDescNode, USBDEV_BCD, &value, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read bcdUSB fail!", __func__);
+        HDF_LOGE("%s: read bcdUSB fail!", __func__);
         return HDF_FAILURE;
     }
     devDesc->bcdUSB = Le16ToCpu(value);
     if (drsOps->GetUint16(devDescNode, USBDEV_VENDOR, &value, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read idVendor fail!", __func__);
+        HDF_LOGE("%s: read idVendor fail!", __func__);
         return HDF_FAILURE;
     }
     devDesc->idVendor = Le16ToCpu(value);
     if (drsOps->GetUint16(devDescNode, USBDEV_IDPRODUCT, &value, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read idProduct fail!", __func__);
+        HDF_LOGE("%s: read idProduct fail!", __func__);
         return HDF_FAILURE;
     }
     devDesc->idProduct = Le16ToCpu(value);
     if (drsOps->GetUint16(devDescNode, USBDEV_BCDDEVICE, &value, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read bcdDevice fail!", __func__);
+        HDF_LOGE("%s: read bcdDevice fail!", __func__);
         return HDF_FAILURE;
     }
     devDesc->bcdDevice = Le16ToCpu(value);
@@ -88,31 +88,31 @@ static int32_t UsbFnCfgMgrParseUsbFnDevDesc(const struct DeviceResourceNode *nod
     const char *childNodeName = NULL;
     const struct DeviceResourceNode *devDescNode = NULL;
     if (node == NULL || fnDevDesc == NULL) {
-        HDF_LOGE("%{public}s: node or fnDevDesc is null!", __func__);
+        HDF_LOGE("%s: node or fnDevDesc is null!", __func__);
         return HDF_FAILURE;
     }
     drsOps = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (drsOps == NULL || drsOps->GetChildNode == NULL) {
-        HDF_LOGE("%{public}s: invalid drs ops failure!", __func__);
+        HDF_LOGE("%s: invalid drs ops failure!", __func__);
         return HDF_FAILURE;
     }
     if (drsOps->GetString(node, "usb_dev_desc", &childNodeName, NULL) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: get usb_dev_desc node name failure!", __func__);
+        HDF_LOGE("%s: get usb_dev_desc node name failure!", __func__);
         return HDF_FAILURE;
     }
     devDescNode = drsOps->GetChildNode(node, childNodeName);
     if (devDescNode == NULL) {
-        HDF_LOGE("%{public}s: childDevDescNode is null!", __func__);
+        HDF_LOGE("%s: childDevDescNode is null!", __func__);
         return HDF_FAILURE;
     }
     fnDevDesc->deviceDesc =
         (struct UsbDeviceDescriptor *)OsalMemCalloc(sizeof(struct UsbDeviceDescriptor));
     if (fnDevDesc->deviceDesc == NULL) {
-        HDF_LOGE("%{public}s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
         return HDF_FAILURE;
     }
     if (UsbFnCfgMgrParseDevDesc(devDescNode, drsOps, fnDevDesc->deviceDesc)) {
-        HDF_LOGE("%{public}s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
         goto FAIL;
     }
     return HDF_SUCCESS;
@@ -138,12 +138,12 @@ static int32_t UsbFnCfgMgrParseString(const struct DeviceResourceNode *node,
     }
     strCount = drsOps->GetElemNum(node, "stringList");
     if (strCount <= 0) {
-        HDF_LOGE("%{public}s: stringList not found!", __func__);
+        HDF_LOGE("%s: stringList not found!", __func__);
         return HDF_FAILURE;
     }
     fnString->strings = (struct UsbString *)OsalMemCalloc((strCount + 1) * sizeof(struct UsbString));
     if (fnString->strings == NULL) {
-        HDF_LOGE("%{public}s: fnString->strings is null!", __func__);
+        HDF_LOGE("%s: fnString->strings is null!", __func__);
         goto FREE_USB_STRING;
     }
     fnString->strings[strCount].s = NULL;
@@ -151,12 +151,12 @@ static int32_t UsbFnCfgMgrParseString(const struct DeviceResourceNode *node,
     for (iCount = 0; iCount < strCount; iCount++) {
         ret = drsOps->GetStringArrayElem(node, "stringList", iCount, &strNodeName, NULL);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: read stringList fail!", __func__);
+            HDF_LOGE("%s: read stringList fail!", __func__);
             goto FREE_USB_STRING;
         }
         strNode = drsOps->GetChildNode(node, strNodeName);
         if (strNode == NULL) {
-            HDF_LOGE("%{public}s: StrNode is null!", __func__);
+            HDF_LOGE("%s: StrNode is null!", __func__);
             goto FREE_USB_STRING;
         }
         struct UsbString *usbStr = fnString->strings + iCount;
@@ -231,26 +231,26 @@ static int32_t UsbFnCfgMgrParseUsbFnDevStrings(const struct DeviceResourceNode *
     const struct DeviceResourceNode *fnDevStrNode = NULL;
 
     if (node == NULL || fnDevDesc == NULL) {
-        HDF_LOGE("%{public}s: node or fnDevDesc is null!", __func__);
+        HDF_LOGE("%s: node or fnDevDesc is null!", __func__);
         return HDF_FAILURE;
     }
     drsOps = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (drsOps == NULL || drsOps->GetChildNode == NULL) {
-        HDF_LOGE("%{public}s: invalid drs ops failure!", __func__);
+        HDF_LOGE("%s: invalid drs ops failure!", __func__);
         return HDF_FAILURE;
     }
     if (drsOps->GetString(node, "usb_dev_string", &fnDevStrNodeName, NULL) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: get dev strings name failure!", __func__);
+        HDF_LOGE("%s: get dev strings name failure!", __func__);
         return HDF_FAILURE;
     }
     fnDevStrNode = drsOps->GetChildNode(node, fnDevStrNodeName);
     if (fnDevStrNode == NULL) {
-        HDF_LOGE("%{public}s: childDevDescNode is null!", __func__);
+        HDF_LOGE("%s: childDevDescNode is null!", __func__);
         return HDF_FAILURE;
     }
     fnDevDesc->deviceStrings = UsbFnCfgMgrParseStrings(fnDevStrNode, drsOps);
     if (fnDevDesc->deviceStrings == NULL) {
-        HDF_LOGE("%{public}s: parse device string error!", __func__);
+        HDF_LOGE("%s: parse device string error!", __func__);
         return HDF_FAILURE;
     }
 
@@ -274,7 +274,7 @@ static int32_t UsbFnCfgMgrParseAccocInterfaceDesc(const struct DeviceResourceNod
         drsOps->GetUint8(node, FUNCTION_SUBCLASS, &desc->bFunctionSubClass, 0) != HDF_SUCCESS || \
         drsOps->GetUint8(node, FUNCTION_PROTOCOL, &desc->bFunctionProtocol, 0) != HDF_SUCCESS || \
         drsOps->GetUint8(node, FUNCTION_INDEX, &desc->iFunction, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read fail!", __func__);
+        HDF_LOGE("%s: read fail!", __func__);
         return HDF_FAILURE;
     }
 
@@ -299,7 +299,7 @@ static int32_t UsbFnCfgMgrParseInterfaceDesc(const struct DeviceResourceNode *no
         drsOps->GetUint8(node, INTERFACE_SUBCLASS, &desc->bInterfaceSubClass, 0) != HDF_SUCCESS || \
         drsOps->GetUint8(node, INTERFACE_PROTOCOL, &desc->bInterfaceProtocol, 0) != HDF_SUCCESS || \
         drsOps->GetUint8(node, INTERFACE_INTERFACE, &desc->iInterface, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read fail!", __func__);
+        HDF_LOGE("%s: read fail!", __func__);
         return HDF_FAILURE;
     }
 
@@ -322,14 +322,14 @@ static int32_t UsbFnCfgMgrParseEndpointDesc(const struct DeviceResourceNode *nod
         drsOps->GetUint8(node, ENDPOINT_MATTR, &desc->bmAttributes, 0) != HDF_SUCCESS || \
         drsOps->GetUint16(node, ENDPOINT_MAXPACKSIZE_W, &value, 0) != HDF_SUCCESS || \
         drsOps->GetUint8(node, ENDPOINT_INTERVAL, &desc->bInterval, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read fail!", __func__);
+        HDF_LOGE("%s: read fail!", __func__);
         return HDF_FAILURE;
     }
     desc->wMaxPacketSize = Le16ToCpu(value);
     if (USB_DDK_DT_ENDPOINT_AUDIO_SIZE == desc->bLength) {
         if (drsOps->GetUint8(node, ENDPOINT_REFRESH, &desc->bRefresh, 0) != HDF_SUCCESS || \
             drsOps->GetUint8(node, ENDPOINT_SYNCADDR, &desc->bSynchAddress, 0) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: read fail!", __func__);
+            HDF_LOGE("%s: read fail!", __func__);
             return HDF_FAILURE;
         }
     }
@@ -349,7 +349,7 @@ static int32_t UsbFnCfgMgrParseStringDesc(const struct DeviceResourceNode *node,
     if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS || \
         drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS || \
         drsOps->GetUint16(node, STRING_DATA, &value, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read fail!", __func__);
+        HDF_LOGE("%s: read fail!", __func__);
         return HDF_FAILURE;
     }
     desc->wData[0] = Le16ToCpu(value);
@@ -372,7 +372,7 @@ static int32_t UsbFnCfgMgrParseSspIsocEndpointDesc(const struct DeviceResourceNo
         drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS || \
         drsOps->GetUint16(node, SSP_ISOC_EPCOMP_WReseved, &sValue, 0) != HDF_SUCCESS || \
         drsOps->GetUint32(node, SSP_ISOC_EPCOMP_DWPERINTERVAL, &iValue, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read fail!", __func__);
+        HDF_LOGE("%s: read fail!", __func__);
         return HDF_FAILURE;
     }
     desc->wReseved = Le16ToCpu(sValue);
@@ -396,7 +396,7 @@ static int32_t UsbFnCfgMgrParseSsEndpointDesc(const struct DeviceResourceNode *n
         drsOps->GetUint8(node, SS_EP_COMP_MAXBURST, &desc->bMaxBurst, 0) != HDF_SUCCESS || \
         drsOps->GetUint8(node, SS_EP_COMP_MTTRIBUTE, &desc->bmAttributes, 0) != HDF_SUCCESS || \
         drsOps->GetUint16(node, SS_EP_COMP_WPERINTERVAL, &sValue, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read fail!", __func__);
+        HDF_LOGE("%s: read fail!", __func__);
         return HDF_FAILURE;
     }
     desc->wBytesPerInterval = Le16ToCpu(sValue);
@@ -422,7 +422,7 @@ static int32_t UsbFnCfgMgrParseQualifierDesc(const struct DeviceResourceNode *no
         drsOps->GetUint8(node, QUALIFIER_MAXSIZE, &desc->bMaxPacketSize0, 0) != HDF_SUCCESS || \
         drsOps->GetUint8(node, QUALIFIER_NUMCFG, &desc->bNumConfigurations, 0) != HDF_SUCCESS || \
         drsOps->GetUint16(node, QUALIFIER_BCD, &sValue, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read fail!", __func__);
+        HDF_LOGE("%s: read fail!", __func__);
         return HDF_FAILURE;
     }
     desc->bcdUSB = Le16ToCpu(sValue);
@@ -445,7 +445,7 @@ static int32_t UsbFnCfgMgrParseOtgDesc(const struct DeviceResourceNode *node,
     if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS || \
         drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS || \
         drsOps->GetUint8(node, OTG_MTTRIBUTE, &desc->bmAttributes, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read fail!", __func__);
+        HDF_LOGE("%s: read fail!", __func__);
         return HDF_FAILURE;
     }
     if (length == sizeof (struct UsbOtg20Descriptor)) {
@@ -472,7 +472,7 @@ static int32_t UsbFnCfgMgrParseDebugDesc(const struct DeviceResourceNode *node,
         drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS || \
         drsOps->GetUint8(node, DEBUG_IN, &desc->bDebugInEndpoint, 0) != HDF_SUCCESS || \
         drsOps->GetUint8(node, DEBUG_OUT, &desc->bDebugOutEndpoint, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read fail!", __func__);
+        HDF_LOGE("%s: read fail!", __func__);
         return HDF_FAILURE;
     }
 
@@ -493,7 +493,7 @@ static int32_t UsbFnCfgMgrParseSecurityDesc(const struct DeviceResourceNode *nod
         drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS || \
         drsOps->GetUint8(node, SECURITY_ENCRYTYPE, &desc->bNumEncryptionTypes, 0) != HDF_SUCCESS || \
         drsOps->GetUint16(node, SECURITY_TOTALLENGTH, &sValue, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read fail!", __func__);
+        HDF_LOGE("%s: read fail!", __func__);
         return HDF_FAILURE;
     }
     desc->wTotalLength = Le16ToCpu(sValue);
@@ -578,11 +578,11 @@ static struct UsbDescriptorHeader *UsbFnCfgMgrParseDesc(const struct DeviceResou
         return NULL;
     }
     if (drsOps->GetUint8(node, DESC_LENGTH, &length, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read length fail!", __func__);
+        HDF_LOGE("%s: read length fail!", __func__);
         return NULL;
     }
     if (drsOps->GetUint8(node, DESC_TYPE, &descType, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read type fail!", __func__);
+        HDF_LOGE("%s: read type fail!", __func__);
         return NULL;
     }
     descBuff = (uint8_t *)OsalMemCalloc(length * sizeof(uint8_t));
@@ -591,7 +591,7 @@ static struct UsbDescriptorHeader *UsbFnCfgMgrParseDesc(const struct DeviceResou
     }
     ret = UsbFnCfgMgrParseDescriptor(node, drsOps, descBuff, descType, length);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: length = 0x%{public}x, descType = 0x%{public}x Parse fail!",
+        HDF_LOGE("%s: length = 0x%x, descType = 0x%x Parse fail!",
             __func__, length, descType);
         OsalMemFree(descBuff);
         return NULL;
@@ -619,7 +619,7 @@ static struct UsbDescriptorHeader **UsbFnCfgMgrParseFunDesc(const struct DeviceR
     descriptors = \
         (struct UsbDescriptorHeader **)OsalMemCalloc((descCount + 1) * sizeof(struct UsbDescriptorHeader *));
     if (descriptors == NULL) {
-        HDF_LOGE("%{public}s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
         return NULL;
     }
     descriptors[descCount] = NULL;
@@ -649,33 +649,33 @@ static int32_t UsbFnCfgMgrParseUsbFnFunction(const struct DeviceResourceNode *no
     const struct DeviceResourceIface *drsOps, struct UsbFnFunction *fun)
 {
     if (node == NULL || fun == NULL) {
-        HDF_LOGE("%{public}s: node or fnDevDesc or drsOps is null!", __func__);
+        HDF_LOGE("%s: node or fnDevDesc or drsOps is null!", __func__);
         return HDF_FAILURE;
     }
     if (drsOps->GetString(node, "funcName", &fun->funcName, NULL) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: get function name failure!", __func__);
+        HDF_LOGE("%s: get function name failure!", __func__);
         return HDF_FAILURE;
     }
     fun->strings = UsbFnCfgMgrParseStrings(node, drsOps);
     if (fun->strings == NULL) {
-        HDF_LOGE("%{public}s: parse device string error!", __func__);
+        HDF_LOGE("%s: parse device string error!", __func__);
         return HDF_FAILURE;
     }
     fun->fsDescriptors = UsbFnCfgMgrParseFunDesc(node, drsOps, "fsDescList");
     if (fun->fsDescriptors == NULL) {
-        HDF_LOGE("%{public}s: parse FS_DESC error!", __func__);
+        HDF_LOGE("%s: parse FS_DESC error!", __func__);
     }
     fun->hsDescriptors = UsbFnCfgMgrParseFunDesc(node, drsOps, "hsDescList");
     if (fun->hsDescriptors == NULL) {
-        HDF_LOGE("%{public}s: parse HS_DESC error!", __func__);
+        HDF_LOGE("%s: parse HS_DESC error!", __func__);
     }
     fun->ssDescriptors = UsbFnCfgMgrParseFunDesc(node, drsOps, "ssDescList");
     if (fun->ssDescriptors == NULL) {
-        HDF_LOGE("%{public}s: parse SS_DESC error!", __func__);
+        HDF_LOGE("%s: parse SS_DESC error!", __func__);
     }
     fun->sspDescriptors = UsbFnCfgMgrParseFunDesc(node, drsOps, "sspDescList");
     if (fun->sspDescriptors == NULL) {
-        HDF_LOGE("%{public}s: parse SSP_DESC error!", __func__);
+        HDF_LOGE("%s: parse SSP_DESC error!", __func__);
     }
 
     return HDF_SUCCESS;
@@ -692,13 +692,13 @@ static int32_t UsbFnCfgMgrParseUsbFnFunctions(const struct DeviceResourceNode *n
 
     funCount = drsOps->GetElemNum(node, "functionList");
     if (funCount <= 0) {
-        HDF_LOGE("%{public}s: get functionList num failed!", __func__);
+        HDF_LOGE("%s: get functionList num failed!", __func__);
         return HDF_FAILURE;
     }
     fnConfig->functions = \
         (struct UsbFnFunction **)OsalMemCalloc((funCount + 1) * sizeof(struct UsbFnFunction *));
     if (fnConfig->functions == NULL) {
-        HDF_LOGE("%{public}s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
         return HDF_FAILURE;
     }
     fnConfig->functions[funCount] = NULL;
@@ -706,21 +706,21 @@ static int32_t UsbFnCfgMgrParseUsbFnFunctions(const struct DeviceResourceNode *n
         fnConfig->functions[iCount] = \
             (struct UsbFnFunction *)OsalMemCalloc(sizeof(struct UsbFnFunction));
         if (fnConfig->functions[iCount] == NULL) {
-            HDF_LOGE("%{public}s: OsalMemCalloc failure!", __func__);
+            HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
             goto FREE_FUNTION;
         }
         ret = drsOps->GetStringArrayElem(node, "functionList", iCount, &funNodeName, NULL);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: read stringList fail!", __func__);
+            HDF_LOGE("%s: read stringList fail!", __func__);
             goto FREE_FUNTION;
         }
         funNode = drsOps->GetChildNode(node, funNodeName);
         if (funNode == NULL) {
-            HDF_LOGE("%{public}s: funNode not found!", __func__);
+            HDF_LOGE("%s: funNode not found!", __func__);
             goto FREE_FUNTION;
         }
         if (UsbFnCfgMgrParseUsbFnFunction(funNode, drsOps, fnConfig->functions[iCount]) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: parse function error!", __func__);
+            HDF_LOGE("%s: parse function error!", __func__);
             goto FREE_FUNTION;
         }
     }
@@ -738,27 +738,27 @@ static int32_t UsbFnCfgMgrParseUsbFnConfiguration(const struct DeviceResourceNod
     struct DeviceResourceIface *drsOps, struct UsbFnConfiguration *fnConfig)
 {
     if (node == NULL || fnConfig == NULL || drsOps == NULL) {
-        HDF_LOGE("%{public}s: node or fnDevDesc or drsOps is null!", __func__);
+        HDF_LOGE("%s: node or fnDevDesc or drsOps is null!", __func__);
         return HDF_FAILURE;
     }
     if (drsOps->GetUint8(node, "configurationValue", &fnConfig->configurationValue, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read strCount fail!", __func__);
+        HDF_LOGE("%s: read strCount fail!", __func__);
         return HDF_FAILURE;
     }
     if (drsOps->GetUint8(node, "iConfiguration", &fnConfig->iConfiguration, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read strCount fail!", __func__);
+        HDF_LOGE("%s: read strCount fail!", __func__);
         return HDF_FAILURE;
     }
     if (drsOps->GetUint8(node, "attributes", &fnConfig->attributes, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read strCount fail!", __func__);
+        HDF_LOGE("%s: read strCount fail!", __func__);
         return HDF_FAILURE;
     }
     if (drsOps->GetUint16(node, "maxPower", &fnConfig->maxPower, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read strCount fail!", __func__);
+        HDF_LOGE("%s: read strCount fail!", __func__);
         return HDF_FAILURE;
     }
     if (UsbFnCfgMgrParseUsbFnFunctions(node, drsOps, fnConfig) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: parse functions failure!", __func__);
+        HDF_LOGE("%s: parse functions failure!", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -775,13 +775,13 @@ static int32_t UsbFnCfgMgrParseUsbFnCfgLists(const struct DeviceResourceNode *co
 
     configCount = drsOps->GetElemNum(configNode, "configList");
     if (configCount <= 0) {
-        HDF_LOGE("%{public}s: get configList num failed!", __func__);
+        HDF_LOGE("%s: get configList num failed!", __func__);
         return HDF_FAILURE;
     }
     fnDevDesc->configs =
         (struct UsbFnConfiguration **)OsalMemCalloc((configCount + 1) * sizeof(struct UsbFnConfiguration *));
     if (fnDevDesc->configs == NULL) {
-        HDF_LOGE("%{public}s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
         return HDF_FAILURE;
     }
     fnDevDesc->configs[configCount] = NULL;
@@ -789,22 +789,22 @@ static int32_t UsbFnCfgMgrParseUsbFnCfgLists(const struct DeviceResourceNode *co
         fnDevDesc->configs[count] = \
             (struct UsbFnConfiguration *)OsalMemCalloc(sizeof(struct UsbFnConfiguration));
         if (fnDevDesc->configs[count] == NULL) {
-            HDF_LOGE("%{public}s: OsalMemCalloc failure!", __func__);
+            HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
             goto FREE_CONFIG;
         }
         ret = drsOps->GetStringArrayElem(configNode, "configList", count, &childConfigNodeName, NULL);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: read stringList fail!", __func__);
+            HDF_LOGE("%s: read stringList fail!", __func__);
             goto FREE_CONFIG;
         }
         childConfigNode = drsOps->GetChildNode(configNode, childConfigNodeName);
         if (childConfigNode == NULL) {
-            HDF_LOGE("%{public}s: StrNode is null!", __func__);
+            HDF_LOGE("%s: StrNode is null!", __func__);
             goto FREE_CONFIG;
         }
         if (UsbFnCfgMgrParseUsbFnConfiguration(childConfigNode, drsOps,
             fnDevDesc->configs[count]) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: parse config failure!", __func__);
+            HDF_LOGE("%s: parse config failure!", __func__);
             goto FREE_CONFIG;
         }
     }
@@ -826,25 +826,25 @@ static int32_t UsbFnCfgMgrParseUsbFnConfigurations(const struct DeviceResourceNo
     const struct DeviceResourceNode *configNode = NULL;
 
     if (node == NULL || fnDevDesc == NULL) {
-        HDF_LOGE("%{public}s: node or fnDevDesc is null!", __func__);
+        HDF_LOGE("%s: node or fnDevDesc is null!", __func__);
         return HDF_FAILURE;
     }
     drsOps = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (drsOps == NULL || drsOps->GetChildNode == NULL) {
-        HDF_LOGE("%{public}s: invalid drs ops failure!", __func__);
+        HDF_LOGE("%s: invalid drs ops failure!", __func__);
         return HDF_FAILURE;
     }
     if (drsOps->GetString(node, "usb_configuration", &configNodeName, NULL) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: get config node name failure!", __func__);
+        HDF_LOGE("%s: get config node name failure!", __func__);
         return HDF_FAILURE;
     }
     configNode = drsOps->GetChildNode(node, configNodeName);
     if (configNode == NULL) {
-        HDF_LOGE("%{public}s: configNode is null!", __func__);
+        HDF_LOGE("%s: configNode is null!", __func__);
         return HDF_FAILURE;
     }
     if (UsbFnCfgMgrParseUsbFnCfgLists(configNode, drsOps, fnDevDesc) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: parse usb config lists failure!", __func__);
+        HDF_LOGE("%s: parse usb config lists failure!", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -856,29 +856,29 @@ struct UsbFnDeviceDesc *UsbFnCfgMgrGetInstanceFromHCS(const struct DeviceResourc
     struct UsbFnDeviceDesc *usbDevDesc = NULL;
 
     if (node == NULL) {
-        HDF_LOGE("%{public}s: node is null!", __func__);
+        HDF_LOGE("%s: node is null!", __func__);
         return NULL;
     }
 
     usbDevDesc =
         (struct UsbFnDeviceDesc *)OsalMemCalloc(sizeof(*usbDevDesc));
     if (usbDevDesc == NULL) {
-        HDF_LOGE("%{public}s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
         return NULL;
     }
     ret = UsbFnCfgMgrParseUsbFnDevDesc(node, usbDevDesc);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: parse device descriptor failure!", __func__);
+        HDF_LOGE("%s: parse device descriptor failure!", __func__);
         return NULL;
     }
     ret = UsbFnCfgMgrParseUsbFnDevStrings(node, usbDevDesc);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: parse device string failure!", __func__);
+        HDF_LOGE("%s: parse device string failure!", __func__);
         goto FAIL_DEV_STRING;
     }
     ret = UsbFnCfgMgrParseUsbFnConfigurations(node, usbDevDesc);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: parse config descriptor failure!", __func__);
+        HDF_LOGE("%s: parse config descriptor failure!", __func__);
         goto FAIL_DEV_STRING;
     }
 
@@ -951,7 +951,7 @@ void UsbFnCfgMgrFreeConfigs(struct UsbFnConfiguration **fnConfigs)
 void UsbFnCfgMgrFreeUsbFnDeviceDesc(struct UsbFnDeviceDesc *fnDevDesc)
 {
     if (fnDevDesc == NULL) {
-        HDF_LOGE("%{public}s: fnDevDesc null!", __func__);
+        HDF_LOGE("%s: fnDevDesc null!", __func__);
         return;
     }
     if (fnDevDesc->deviceDesc) {
@@ -990,7 +990,7 @@ static int32_t IsDevDescPropAndGetValue(const struct UsbFnInterface *intf, const
     }
     fnDevMgr = (struct UsbFnDeviceMgr *)intf->object;
     if (fnDevMgr == NULL || fnDevMgr->des == NULL || fnDevMgr->des->deviceDesc == NULL) {
-        HDF_LOGE("%{public}s: fnDevMgr is null", __func__);
+        HDF_LOGE("%s: fnDevMgr is null", __func__);
         return 0;
     }
     if (strcmp(USBDEV_CLASS, name) == 0) {
@@ -1018,7 +1018,7 @@ static int32_t IsDevDescPropAndGetValue(const struct UsbFnInterface *intf, const
     } else if (strcmp(USBDEV_BCDDEVICE, name) == 0) {
         *value = (uint16_t)fnDevMgr->des->deviceDesc->bcdDevice;
     } else {
-        HDF_LOGE("%{public}s: other prop", __func__);
+        HDF_LOGE("%s: other prop", __func__);
         return 0;
     }
     return 1;
@@ -1058,15 +1058,15 @@ static const char *UsbFnCfgGetPropValueFromPropList(const struct UsbFnDeviceMgr 
     const struct DeviceResourceNode *propNode = NULL;
 
     if (drsOps->GetUint8(propListNode, "configNum", &configNum, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read length fail!", __func__);
+        HDF_LOGE("%s: read length fail!", __func__);
         return NULL;
     }
     if (drsOps->GetUint8(propListNode, "interfaceNum", &interfaceNum, 0) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read length fail!", __func__);
+        HDF_LOGE("%s: read length fail!", __func__);
         return NULL;
     }
     if ((intf->info.index != interfaceNum) || (intf->info.configIndex != configNum)) {
-        HDF_LOGE("%{public}s: prop List is not ringt!", __func__);
+        HDF_LOGE("%s: prop List is not ringt!", __func__);
         return NULL;
     }
     propCount = drsOps->GetElemNum(propListNode, "propList");
@@ -1076,12 +1076,12 @@ static const char *UsbFnCfgGetPropValueFromPropList(const struct UsbFnDeviceMgr 
     for (count = 0; count < propCount; count++) {
         ret = drsOps->GetStringArrayElem(propListNode, "propList", count, &propNodeName, NULL);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: read stringList fail!", __func__);
+            HDF_LOGE("%s: read stringList fail!", __func__);
             return NULL;
         }
         propNode = drsOps->GetChildNode(propListNode, propNodeName);
         if (propNode == NULL) {
-            HDF_LOGE("%{public}s: propNode is null!", __func__);
+            HDF_LOGE("%s: propNode is null!", __func__);
             return NULL;
         }
         if (drsOps->GetString(propNode, "name", &propName, 0) != HDF_SUCCESS) {
@@ -1116,12 +1116,12 @@ static const char *UsbFnCfgGetPropValueFromHcs(const struct UsbFnDeviceMgr *fnDe
     for (count = 0; count < propTabCount; count++) {
         ret = drsOps->GetStringArrayElem(customNode, "propTable", count, &propNodeName, NULL);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: read stringList fail!", __func__);
+            HDF_LOGE("%s: read stringList fail!", __func__);
             return NULL;
         }
         propListNode = drsOps->GetChildNode(customNode, propNodeName);
         if (propListNode == NULL) {
-            HDF_LOGE("%{public}s: propNode is null!", __func__);
+            HDF_LOGE("%s: propNode is null!", __func__);
             return NULL;
         }
         propValue = UsbFnCfgGetPropValueFromPropList(fnDevMgr, intf, drsOps, propListNode, name);
@@ -1145,17 +1145,17 @@ static const char *UsbFnCfgFindPropFromHcs(const struct UsbFnInterface *intf, co
     }
     fnDevMgr = (struct UsbFnDeviceMgr *)intf->object;
     if (fnDevMgr == NULL || fnDevMgr->node == NULL) {
-        HDF_LOGE("%{public}s: node is null", __func__);
+        HDF_LOGE("%s: node is null", __func__);
         return NULL;
     }
     drsOps = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (drsOps == NULL || drsOps->GetChildNode == NULL) {
-        HDF_LOGE("%{public}s: invalid drs ops failure!", __func__);
+        HDF_LOGE("%s: invalid drs ops failure!", __func__);
         return NULL;
     }
     customNode = drsOps->GetChildNode(fnDevMgr->node, "custom_prop");
     if (customNode == NULL) {
-        HDF_LOGE("%{public}s: childDevDescNode is null!", __func__);
+        HDF_LOGE("%s: childDevDescNode is null!", __func__);
         return NULL;
     }
     propValue = UsbFnCfgGetPropValueFromHcs(fnDevMgr, intf, drsOps, customNode, name);
@@ -1219,7 +1219,7 @@ static int32_t UsbFnCfgChangeDevceDes(const struct UsbFnInterface *intf, const c
     fnDevMgr = (struct UsbFnDeviceMgr *)intf->object;
     if (fnDevMgr == NULL || fnDevMgr->des == NULL || fnDevMgr->des->deviceDesc == NULL ||
         fnDevMgr->des->deviceStrings == NULL) {
-        HDF_LOGE("%{public}s: null", __func__);
+        HDF_LOGE("%s: null", __func__);
         return HDF_FAILURE;
     }
     if (sscanf_s(value, "%x", &data) <= 0) {
@@ -1279,14 +1279,14 @@ int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf,
         } else {
             fnCfgPropMgr = UsbfnCfgMgrFindPropMgr(intf, registInfo->name);
             if (fnCfgPropMgr == NULL) {
-                HDF_LOGE("%{public}s:%{public}s not found", __func__, registInfo->name);
+                HDF_LOGE("%s:%s not found", __func__, registInfo->name);
                 return HDF_FAILURE;
             }
         }
     } else {
         fnCfgPropMgr = OsalMemCalloc(sizeof(struct UsbFnCfgPropMgr));
         if (fnCfgPropMgr == NULL) {
-            HDF_LOGE("%{public}s:%{public}d OsalMemCalloc failure!", __func__, __LINE__);
+            HDF_LOGE("%s:%d OsalMemCalloc failure!", __func__, __LINE__);
             return HDF_FAILURE;
         }
     }
@@ -1295,12 +1295,12 @@ int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf,
     fnCfgPropMgr->intf = intf;
     ret = snprintf_s(fnCfgPropMgr->name, MAX_LEN, MAX_LEN - 1, "%s", registInfo->name);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_FAILURE;
     }
     ret = snprintf_s(fnCfgPropMgr->value, MAX_LEN, MAX_LEN - 1, "%s", registInfo->value);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_FAILURE;
     }
     fnCfgPropMgr->getPropCallback = registInfo->getProp;
@@ -1350,7 +1350,7 @@ int32_t UsbFnCfgMgrGetProp(const struct UsbFnInterface *intf, const char *name, 
             }
             ret = memcpy_s(value, strlen(propValue), propValue, strlen(propValue));
             if (ret < 0) {
-                HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+                HDF_LOGE("%s: snprintf_s failed", __func__);
                 return HDF_FAILURE;
             }
             return HDF_SUCCESS;

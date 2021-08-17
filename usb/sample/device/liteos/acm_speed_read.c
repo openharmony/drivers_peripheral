@@ -53,27 +53,27 @@ int main(int argc, char *argv[])
 {
     int status;
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");
-    if (g_acmService == NULL) {
-        HDF_LOGE("%{public}s: GetService err", __func__);
+    if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
+        HDF_LOGE("%s: GetService err", __func__);
         return HDF_FAILURE;
     }
 
     g_data = HdfSBufObtainDefaultSize();
     g_reply = HdfSBufObtainDefaultSize();
     if (g_data == NULL || g_reply == NULL) {
-        HDF_LOGE("%{public}s: GetService err", __func__);
+        HDF_LOGE("%s: GetService err", __func__);
         return HDF_FAILURE;
     }
 
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_OPEN, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_OPEN err", __func__);
+        HDF_LOGE("%s: Dispatch USB_SERIAL_OPEN err", __func__);
         return HDF_FAILURE;
     }
 
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_READ_SPEED, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_OPEN err", __func__);
+        HDF_LOGE("%s: Dispatch USB_SERIAL_OPEN err", __func__);
         return HDF_FAILURE;
     }
     HdfSBufRecycle(g_data);

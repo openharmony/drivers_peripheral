@@ -15,8 +15,10 @@
 
 #include "usbhost_ddk_test.h"
 #include "signal.h"
+#include "osal_thread.h"
 
 #define HDF_LOG_TAG     USB_HOST_DDK_TEST
+#define STR_LEN 256
 
 #define PARAM_CMD_LENGTH    3
 #define PARAM_SET_CMD_LEN   3
@@ -26,7 +28,7 @@
 #define ARGV_CMD_PARAM      (PARAM_SET_CMD_LEN - ARGV_CMD_API_TYPE)
 #define READ_SLEEP_TIME     500
 int run;
-
+static struct OsalThread      g_Getchar;
 void TestHelp(void)
 {
     printf("usage: usbhost_ddk_test [options]\n");
@@ -60,7 +62,7 @@ void TestHelp(void)
 static int32_t TestParaseCommand(int paramNum, const char *cmdParam, int *cmdType, char *apiType)
 {
     if ((cmdParam == NULL) || (cmdType == NULL) || (apiType == NULL) || (strlen(cmdParam) < PARAM_CMD_LENGTH)) {
-        HDF_LOGE("%{public}s:%{public}d command or cmdType is NULL or cmdParam length is error",
+        HDF_LOGE("%s:%d command or cmdType is NULL or cmdParam length is error",
             __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -176,14 +178,14 @@ static int32_t TestParaseCommand(int paramNum, const char *cmdParam, int *cmdTyp
     return HDF_SUCCESS;
 }
 
-static int TestCmdLoop(int cmdType, char *param)
+static int TestCmdLoop(int cmdType, const char *param)
 {
     bool loopFlag = true;
     bool asyncFlag = false;
     int cnt = 0;
 
     if (TestGetExitFlag() == true) {
-        HDF_LOGD("%{public}s:%{public}d g_exitFlag is true!", __func__, __LINE__);
+        HDF_LOGD("%s:%d g_exitFlag is true!", __func__, __LINE__);
         return HDF_FAILURE;
     }
 
@@ -265,6 +267,37 @@ static void *SigHandle(void *arg)
     run = 0;
 }
 #endif
+static int GetCharThread(void *arg)
+{
+    char str[STR_LEN] = {0};
+    while (run) {
+        str[0] = getchar();
+    }
+    return 0;
+}
+#define HDF_PROCESS_STACK_SIZE 10000
+static int StartThreadGetChar()
+{
+    int ret;
+    struct OsalThreadParam threadCfg;
+    memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
+    threadCfg.name = "get char process";
+    threadCfg.priority = OSAL_THREAD_PRI_DEFAULT;
+    threadCfg.stackSize = HDF_PROCESS_STACK_SIZE;
+
+    ret = OsalThreadCreate(&g_Getchar, (OsalThreadEntry)GetCharThread, NULL);
+    if (HDF_SUCCESS != ret) {
+        HDF_LOGE("%s:%d OsalThreadCreate faile, ret=%d ", __func__, __LINE__, ret);
+        return HDF_ERR_DEVICE_BUSY;
+    }
+
+    ret = OsalThreadStart(&g_Getchar, &threadCfg);
+    if (HDF_SUCCESS != ret) {
+        HDF_LOGE("%s:%d OsalThreadStart faile, ret=%d ", __func__, __LINE__, ret);
+        return HDF_ERR_DEVICE_BUSY;
+    }
+    return 0;
+}
 
 int main(int argc, char *argv[])
 {
@@ -272,8 +305,8 @@ int main(int argc, char *argv[])
     int cmdType;
     char apiType[DATA_MAX_LEN];
 
-    if (argc < PARAM_GET_CMD_LEN) {
-        HDF_LOGE("%{public}s:%{public}d invalid parma, argc=%{public}d", __func__, __LINE__, argc);
+    if (argc < PARAM_GET_CMD_LEN || argv[ARGV_CMD_TYPE] == NULL) {
+        HDF_LOGE("%s:%d invalid parma, argc=%d", __func__, __LINE__, argc);
         return HDF_FAILURE;
     }
 
@@ -283,18 +316,22 @@ int main(int argc, char *argv[])
         return HDF_SUCCESS;
     }
     run = 1;
+
+    StartThreadGetChar();
     status = TestParaseCommand(argc, argv[ARGV_CMD_TYPE], &cmdType, apiType);
     if (status != HDF_SUCCESS) {
+        run = 0;
         printf("%s:%d TestParaseCommand status=%d err\n", __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d TestParaseCommand status=%{public}d err", __func__, __LINE__, status);
+        HDF_LOGE("%s:%d TestParaseCommand status=%d err", __func__, __LINE__, status);
         TestHelp();
         return status;
     }
 
     status = UsbHostDdkTestInit(apiType);
     if (status) {
+        run = 0;
         printf("%s:%d UsbHostDdkTestInit status=%d err\n", __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d UsbHostDdkTestInit status=%{public}d err", __func__, __LINE__, status);
+        HDF_LOGE("%s:%d UsbHostDdkTestInit status=%d err", __func__, __LINE__, status);
         return status;
     }
 
@@ -316,10 +353,9 @@ int main(int argc, char *argv[])
     }
 
 out:
+    run = 0;
     TestExit();
-
-    HDF_LOGI("%{public}s:%{public}d moduleTest end", __func__, __LINE__);
-
+    HDF_LOGI("%s:%d moduleTest end", __func__, __LINE__);
     return HDF_SUCCESS;
 }
 

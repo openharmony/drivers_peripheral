@@ -90,23 +90,23 @@ struct UsbDevicePriv {
 #define USB_ADAPTER_CAP_REAP_AFTER_DISCONNECT       0x10
 
 struct UsbOsAdapterOps {
-    int (*init)(struct UsbSession *session);
-    void (*exit)(struct UsbSession *session);
+    int (*init)(const struct UsbSession *session);
+    void (*exit)(const struct UsbSession *session);
     struct UsbDeviceHandle *(*openDevice)(struct UsbSession *session, uint8_t busNum, uint8_t usbAddr);
     void (*closeDevice)(struct UsbDeviceHandle *devHandle);
-    int (*getConfigDescriptor)(struct UsbDevice *device, uint8_t configIndex, void *buffer, size_t len);
-    int (*getConfiguration)(struct UsbDeviceHandle *devHandle, uint8_t *activeConfig);
+    int (*getConfigDescriptor)(const struct UsbDevice *device, uint8_t configIndex, void *buffer, size_t len);
+    int (*getConfiguration)(const struct UsbDeviceHandle *devHandle, uint8_t *activeConfig);
     int (*setConfiguration)(struct UsbDeviceHandle *devHandle, int activeConfig);
-    int (*claimInterface)(struct UsbDeviceHandle *devHandle, unsigned int interfaceNumber);
-    int (*releaseInterface)(struct UsbDeviceHandle *devHandle, unsigned int interfaceNumber);
-    int (*setInterfaceAltsetting)(struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber, uint8_t altsetting);
-    int (*clearHalt)(struct UsbDeviceHandle *devHandle, unsigned int endpoint);
-    int (*resetDevice)(struct UsbDeviceHandle *devHandle);
-    struct UsbHostRequest * (*allocRequest)(struct UsbDeviceHandle *handle, int isoPackets, size_t len);
+    int (*claimInterface)(const struct UsbDeviceHandle *devHandle, unsigned int interfaceNumber);
+    int (*releaseInterface)(const struct UsbDeviceHandle *devHandle, unsigned int interfaceNumber);
+    int (*setInterfaceAltsetting)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber, uint8_t altsetting);
+    int (*clearHalt)(const struct UsbDeviceHandle *devHandle, unsigned int endpoint);
+    int (*resetDevice)(const struct UsbDeviceHandle *devHandle);
+    struct UsbHostRequest * (*allocRequest)(const struct UsbDeviceHandle *handle, int isoPackets, size_t len);
     int (*freeRequest)(struct UsbHostRequest *request);
     int (*submitRequest)(struct UsbHostRequest *request);
     int (*cancelRequest)(struct UsbHostRequest *request);
-    int (*urbCompleteHandle)(struct UsbDeviceHandle *devHandle);
+    int (*urbCompleteHandle)(const struct UsbDeviceHandle *devHandle);
 };
 
 struct UsbOsAdapterOps *UsbAdapterGetOps(void);

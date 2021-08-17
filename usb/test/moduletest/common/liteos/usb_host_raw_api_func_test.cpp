@@ -176,7 +176,7 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadSync_005, TestSize.Level2)
     }
     char readBuf[256] = {0};
     char writeBuf[256] = {0};
-    strcpy_s(writeBuf, 256, data.c_str());
+    strcpy_s(writeBuf, sizeof(writeBuf), data.c_str());
     for (int i = 0; i < writeCnt; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_SYNC_WRITE);
@@ -194,7 +194,7 @@ static void TestAsyncRead(char *readBuf, int timeout)
 {
     printf("------TestAsyncRead start-----");
     if (strlen(readBuf) > 0) {
-        memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
+        memset_s(readBuf, strlen(readBuf), 0, strlen(readBuf));
     }
     timeout = timeout * 1000;
     UsbHostDdkTestOpen(HOST_ACM_ASYNC_READ);
@@ -326,7 +326,7 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadAsync_005, TestSize.Level2)
     }
     char readBuf[256] = {0};
     char writeBuf[256] = {0};
-    strcpy_s(writeBuf, 256, data.c_str());
+    strcpy_s(writeBuf, sizeof(writeBuf), data.c_str());
     for (int i = 0; i < writeCnt; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_ASYNC_WRITE);

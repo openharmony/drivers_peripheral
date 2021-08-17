@@ -58,17 +58,17 @@ static void GetFilePath(const char *path, const char *fileName,  char *filePath)
     int ret;
     ret = strcpy_s(filePath, MAX_PATHLEN - 1, path);
     if (ret) {
-            HDF_LOGE("%{public}s: strcpy_s failure!", __func__);
+            HDF_LOGE("%s: strcpy_s failure!", __func__);
     }
     if (filePath[strlen(path) - 1] != '/') {
         ret = strcat_s(filePath, MAX_PATHLEN - 1, "/");
         if (ret) {
-            HDF_LOGE("%{public}s: strcat_s failure!", __func__);
+            HDF_LOGE("%s: strcat_s failure!", __func__);
         }
     }
     ret = strcat_s(filePath, MAX_PATHLEN - 1, fileName);
     if (ret) {
-        HDF_LOGE("%{public}s: strcat_s failure!", __func__);
+        HDF_LOGE("%s: strcat_s failure!", __func__);
     }
 }
 
@@ -103,7 +103,7 @@ static bool IsDeviceDirExist(const char *deviceName)
     char tmp[MAX_PATHLEN] = {0};
     int32_t ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s", CONFIGFS_DIR, deviceName);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return false;
     }
 
@@ -115,7 +115,7 @@ static int UsbFnWriteFile(const char *path, const char *str)
     int ret;
     FILE *fp = fopen(path, "w");
     if (fp == NULL) {
-        HDF_LOGE("%{public}s: UsbFnWriteFile failure!", __func__);
+        HDF_LOGE("%s: UsbFnWriteFile failure!", __func__);
         return HDF_ERR_BAD_FD;
     }
     if (strlen(str) == 0) {
@@ -138,19 +138,19 @@ static int UsbFnWriteProp(const char *deviceName,
     char tmpVal[MAX_NAMELEN] = {0};
     int32_t ret;
     if (deviceName == NULL || propName == NULL) {
-        HDF_LOGE("%{public}s: INVALID PARAM!", __func__);
+        HDF_LOGE("%s: INVALID PARAM!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/%s",
         CONFIGFS_DIR, deviceName, propName);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_ERR_IO;
     }
 
     ret = snprintf_s(tmpVal, MAX_NAMELEN, MAX_NAMELEN - 1, "0x%x", propValue);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_ERR_IO;
     }
 
@@ -166,21 +166,21 @@ static int UsbFnWriteConfString(const char *deviceName,
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/configs/b.%d/strings/0x%x",
                      CONFIGFS_DIR, deviceName, configVal, lang);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_ERR_IO;
     }
 
     if (!IsDirExist(tmp)) {
         ret = mkdir(tmp, S_IREAD | S_IWRITE);
         if (ret) {
-            HDF_LOGE("%{public}s: mkdir failure!", __func__);
+            HDF_LOGE("%s: mkdir failure!", __func__);
             return HDF_ERR_IO;
         }
     }
 
     ret = snprintf_s(tmpPath, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/configuration", tmp);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_ERR_IO;
     }
 
@@ -197,20 +197,20 @@ static int UsbFnWriteDesString(const char *deviceName,
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/strings/0x%x",
         CONFIGFS_DIR, deviceName, lang);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_ERR_IO;
     }
     if (!IsDirExist(tmp)) {
         ret = mkdir(tmp, S_IREAD | S_IWRITE);
         if (ret) {
-            HDF_LOGE("%{public}s: mkdir failure!", __func__);
+            HDF_LOGE("%s: mkdir failure!", __func__);
             return HDF_ERR_IO;
         }
     }
 
     ret = snprintf_s(tmpPath, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s", tmp, stringName);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_ERR_IO;
     }
 
@@ -224,13 +224,13 @@ static int UsbFnAdapterCreateFunc(const char *configPath, const char *funcPath)
 
     ret = mkdir(funcPath, S_IREAD | S_IWRITE);
     if (ret) {
-        HDF_LOGE("%{public}s: mkdir failure!", __func__);
+        HDF_LOGE("%s: mkdir failure!", __func__);
         return HDF_ERR_IO;
     }
 
     ret = symlink(funcPath, configPath);
     if (ret) {
-        HDF_LOGE("%{public}s: symlink failed", __func__);
+        HDF_LOGE("%s: symlink failed", __func__);
         return HDF_ERR_IO;
     }
     usleep(SLEEP_100MS);
@@ -242,7 +242,7 @@ static int UsbFnReadFile(const char *path, char *str, uint16_t len)
     int ret;
     FILE *fp = fopen(path, "r");
     if (fp == NULL) {
-        HDF_LOGE("%{public}s: fopen failure!", __func__);
+        HDF_LOGE("%s: fopen failure!", __func__);
         return HDF_ERR_BAD_FD;
     }
     ret = fread(str, len, 1, fp);
@@ -266,7 +266,7 @@ static int UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName, int
 
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/UDC", CONFIGFS_DIR, deviceName);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_ERR_IO;
     }
     if (enable) {
@@ -285,7 +285,7 @@ static int UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName, int
         ret = snprintf_s(tmpCmd, MAX_PATHLEN, MAX_PATHLEN - 1, "echo \"\" > %s/%s/UDC",
             CONFIGFS_DIR, deviceName);
         if (ret < 0) {
-            HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+            HDF_LOGE("%s: snprintf_s failed", __func__);
             return HDF_ERR_IO;
         }
         system(tmpCmd);
@@ -328,19 +328,19 @@ static int UsbFnAdapterCreatInterface(const char *interfaceName, int nameLen)
     }
     fd = UsbFnAdapterOpenFn();
     if (fd <= 0) {
-        HDF_LOGE("%{public}s: UsbFnAdapterOpenFn failure!",  __func__);
+        HDF_LOGE("%s: UsbFnAdapterOpenFn failure!",  __func__);
         return HDF_ERR_IO;
     }
 
     fnnew.nameLen = nameLen;
     ret = snprintf_s(fnnew.name, MAX_NAMELEN, MAX_NAMELEN - 1, "%s", interfaceName);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_ERR_IO;
     }
     ret = ioctl(fd, FUNCTIONFS_NEWFN, &fnnew);
     if (ret) {
-        HDF_LOGE("%{public}s: FUNCTIONFS_NEWFN failure!",  __func__);
+        HDF_LOGE("%s: FUNCTIONFS_NEWFN failure!",  __func__);
         return HDF_ERR_IO;
     }
     ret = UsbFnAdapterClosefn(fd);
@@ -364,12 +364,12 @@ static int UsbFnAdapterDelInterface(const char *interfaceName, int nameLen)
     fnnew.nameLen = nameLen;
     ret = snprintf_s(fnnew.name, MAX_NAMELEN, MAX_NAMELEN - 1, "%s", interfaceName);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_ERR_IO;
     }
     ret = ioctl(fd, FUNCTIONFS_DELFN, &fnnew);
     if (ret) {
-        HDF_LOGE("%{public}s: FUNCTIONFS_DELFN failure!",  __func__);
+        HDF_LOGE("%s: FUNCTIONFS_DELFN failure!",  __func__);
         return HDF_ERR_IO;
     }
     ret = UsbFnAdapterClosefn(fd);
@@ -388,7 +388,7 @@ static int UsbFnAdapterOpenPipe(const char *interfaceName, int epIndex)
 
     ret = snprintf_s(epName, MAX_NAMELEN, MAX_NAMELEN - 1, "/dev/functionfs/%s.ep%u", interfaceName, epIndex);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_ERR_IO;
     }
 
@@ -400,7 +400,7 @@ static int UsbFnAdapterOpenPipe(const char *interfaceName, int epIndex)
         usleep(SLEEP_100MS);
     }
     if (ep < 0) {
-        HDF_LOGE("unable to open %{public}s", epName);
+        HDF_LOGE("unable to open %s", epName);
         return HDF_DEV_ERR_NO_DEVICE;
     }
     return ep;
@@ -525,7 +525,7 @@ static int WriteFuncDescriptors(uint8_t **whereDec, struct UsbDescriptorHeader *
     for (i = 0; headDes[i] != NULL; i++) {
         ret = memcpy_s(*whereDec, headDes[i]->bLength, headDes[i], headDes[i]->bLength);
         if (ret != EOK) {
-            HDF_LOGE("%{public}s: memcpy_s failure!", __func__);
+            HDF_LOGE("%s: memcpy_s failure!", __func__);
             return HDF_FAILURE;
         }
         *whereDec += headDes[i]->bLength;
@@ -587,7 +587,7 @@ static int UsbFnAdapterCreatPipes(int ep0, const struct UsbFnFunction *func)
 
     dec = OsalMemCalloc(header.length);
     if (dec == NULL) {
-        HDF_LOGE("%{public}s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
     whereDec = dec;
@@ -711,7 +711,7 @@ static int CreatDeviceDir(const char *devName)
     if (!IsDirExist(tmp)) {
         ret = mkdir(tmp, S_IREAD | S_IWRITE);
         if (ret) {
-            HDF_LOGE("%{public}s: mkdir failure!", __func__);
+            HDF_LOGE("%s: mkdir failure!", __func__);
             return HDF_ERR_IO;
         }
     }
@@ -790,7 +790,7 @@ static int CreatKernelFunc(const char *devName, const struct UsbFnFunction *func
     }
     ret = UsbFnAdapterCreateFunc(configPath, funcPath);
     if (ret) {
-        HDF_LOGE("%{public}s: UsbFnAdapterCreateFunc failure!",  __func__);
+        HDF_LOGE("%s: UsbFnAdapterCreateFunc failure!",  __func__);
         return HDF_ERR_IO;
     }
     return ret;
@@ -815,25 +815,25 @@ static int CreatFunc(const char *devName, const struct UsbFnFunction *functions,
     }
     ret = UsbFnAdapterCreatInterface(interfaceName, strlen(interfaceName));
     if (ret) {
-        HDF_LOGE("%{public}s: UsbFnAdapterCreatInterface failure!",  __func__);
+        HDF_LOGE("%s: UsbFnAdapterCreatInterface failure!",  __func__);
         CleanConfigFs(devName, interfaceName);
         return HDF_ERR_IO;
     }
 
     fd = UsbFnAdapterOpenPipe(interfaceName, 0);
     if (fd <= 0) {
-        HDF_LOGE("%{public}s: UsbFnAdapterOpenPipe failure!",  __func__);
+        HDF_LOGE("%s: UsbFnAdapterOpenPipe failure!",  __func__);
         CleanConfigFs(devName, interfaceName);
         return HDF_ERR_IO;
     }
     ret = UsbFnAdapterCreatPipes(fd, functions);
     if (ret) {
-        HDF_LOGE("%{public}s: UsbFnAdapterCreatPipes failure!",  __func__);
+        HDF_LOGE("%s: UsbFnAdapterCreatPipes failure!",  __func__);
         return HDF_ERR_IO;
     }
     ret = UsbFnAdapterClosePipe(fd);
     if (ret) {
-        HDF_LOGE("%{public}s: UsbFnAdapterClosePipe failure!",  __func__);
+        HDF_LOGE("%s: UsbFnAdapterClosePipe failure!",  __func__);
         return HDF_ERR_IO;
     }
     return 0;
@@ -903,7 +903,7 @@ static void CleanFunction(const char *devName, const char *funcName)
     int ret;
     ret = UsbFnAdapterDelInterface(funcName, strlen(funcName));
     if (ret) {
-        HDF_LOGE("%{public}s: UsbFnAdapterDelInterface failure!", __func__);
+        HDF_LOGE("%s: UsbFnAdapterDelInterface failure!", __func__);
         return;
     }
     CleanConfigFs(devName, funcName);
@@ -920,7 +920,7 @@ static void UsbFnAdapterCleanDevice(const char *devName)
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/functions/",
         CONFIGFS_DIR, devName);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return;
     }
     if ((dir = opendir(tmp)) == NULL) {
@@ -975,13 +975,13 @@ static int UsbFnAdapterWaitUDC(const char *deviceName, const char *udcName)
 
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/UDC", CONFIGFS_DIR, deviceName);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_ERR_IO;
     }
     for (i = 0; i < OPEN_CNT * 0x2; i++) {
         (void)UsbFnReadFile(tmp, udcTmp, strlen(udcName));
         if (!strcmp(udcName, udcTmp)) {
-            HDF_LOGD("%{public}s: hdc enable udc!", __func__);
+            HDF_LOGD("%s: hdc enable udc!", __func__);
             return 0;
         }
         OsalMDelay(DELAY_100MS);
@@ -1024,7 +1024,7 @@ static int UsbFnAdapterCreateDevice(const char *udcName,
 
     ret = WriteDeviceDescriptor(devName, descriptor->deviceDesc, descriptor->deviceStrings);
     if (ret) {
-        HDF_LOGE("%{public}s: WriteDeviceDescriptor failure!", __func__);
+        HDF_LOGE("%s: WriteDeviceDescriptor failure!", __func__);
         return HDF_ERR_IO;
     }
 
@@ -1032,7 +1032,7 @@ static int UsbFnAdapterCreateDevice(const char *udcName,
         confVal = descriptor->configs[i]->configurationValue;
         ret = WriteConfPowerAttributes(devName, descriptor->configs[i], confVal);
         if (ret) {
-            HDF_LOGE("%{public}s: WriteConfPowerAttributes failure!", __func__);
+            HDF_LOGE("%s: WriteConfPowerAttributes failure!", __func__);
             return HDF_ERR_IO;
         }
 
@@ -1040,7 +1040,7 @@ static int UsbFnAdapterCreateDevice(const char *udcName,
             ret = UsbFnWriteConfString(devName, confVal, descriptor->deviceStrings[j]->language,
                 descriptor->deviceStrings[j]->strings[descriptor->configs[i]->iConfiguration].s);
             if (ret < 0) {
-                HDF_LOGE("%{public}s: UsbFnWriteConfString failure!", __func__);
+                HDF_LOGE("%s: UsbFnWriteConfString failure!", __func__);
                 return HDF_ERR_INVALID_PARAM;
             }
         }
@@ -1053,7 +1053,7 @@ static int UsbFnAdapterCreateDevice(const char *udcName,
                 ret = CreatFunc(devName, descriptor->configs[i]->functions[j], confVal);
             }
             if (ret < 0) {
-                HDF_LOGE("%{public}s: CreatFunc failure!", __func__);
+                HDF_LOGE("%s: CreatFunc failure!", __func__);
                 (void)UsbFnAdapterWriteUDC(devName, "none", 0);
                 (void)UsbFnAdapterWriteUDC(devName, udcName, 1);
                 return HDF_ERR_INVALID_PARAM;
@@ -1074,7 +1074,7 @@ static int UsbFnAdapterGetPipeInfo(int ep, struct UsbFnPipeInfo *pipeInfo)
     struct UsbEndpointDescriptor desc;
     ret = ioctl(ep, FUNCTIONFS_ENDPOINT_DESC, &desc);
     if (ret) {
-        HDF_LOGE("%{public}s: FUNCTIONFS_ENDPOINT_DESC failure!", __func__);
+        HDF_LOGE("%s: FUNCTIONFS_ENDPOINT_DESC failure!", __func__);
         return HDF_ERR_IO;
     }
 
@@ -1212,7 +1212,7 @@ static int UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int timeout)
     for (i = 0; i < event->ep0Num; i++) {
         if (event->ep0[i] <= 0) {
             OsalMemFree(pfds);
-            HDF_LOGE("%{public}s: ep[%{public}d] = %{public}d", __func__, i, event->ep0[i]);
+            HDF_LOGE("%s: ep[%d] = %d", __func__, i, event->ep0[i]);
             return HDF_ERR_INVALID_PARAM;
         }
         pfds[i].fd = event->ep0[i];
@@ -1221,7 +1221,7 @@ static int UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int timeout)
     for (i = 0; i < event->epNum; i++) {
         if (event->epx[i] <= 0) {
             OsalMemFree(pfds);
-            HDF_LOGE("%{public}s: ep[%{public}d] = %{public}d", __func__, i, event->epx[i]);
+            HDF_LOGE("%s: ep[%d] = %d", __func__, i, event->epx[i]);
             return HDF_ERR_INVALID_PARAM;
         }
         pfds[i + event->ep0Num].fd = event->epx[i];
@@ -1232,7 +1232,7 @@ static int UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int timeout)
         OsalMemFree(pfds);
         return HDF_ERR_TIMEOUT;
     } else if (ret < 0) {
-        HDF_LOGE("%{public}s: interrupt", __func__);
+        HDF_LOGE("%s: interrupt", __func__);
         OsalMemFree(pfds);
         return HDF_ERR_IO;
     }

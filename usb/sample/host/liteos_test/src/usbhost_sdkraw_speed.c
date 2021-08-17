@@ -66,7 +66,7 @@ static bool g_printData = false;
 static struct OsalSem sem;
 static struct OsalSem timeSem;
 static int sigCnt = 0;
-static void AcmTestBulkCallback(void *requestArg);
+static void AcmTestBulkCallback(const void *requestArg);
 static int32_t SerialBegin(struct AcmDevice *acm);
 
 static int UsbIoThread(void *data)
@@ -98,13 +98,13 @@ static int UsbIoThread(void *data)
         }
 
         if (g_stopIoThreadFlag == true) {
-            HDF_LOGD("%{public}s:%{public}d", __func__, __LINE__);
+            HDF_LOGD("%s:%d", __func__, __LINE__);
             g_stopIoThreadFlag = false;
             break;
         }
     }
 
-    HDF_LOGD("%{public}s:%{public}d exit", __func__, __LINE__);
+    HDF_LOGD("%s:%d exit", __func__, __LINE__);
 
     return HDF_SUCCESS;
 }
@@ -127,7 +127,7 @@ static int UsbStartIo(struct AcmDevice *acm)
     struct OsalThreadParam threadCfg;
     int ret;
 
-    HDF_LOGI("%{public}s start", __func__);
+    HDF_LOGI("%s start", __func__);
     g_stopIoThreadFlag = false;
 
     /* creat Io thread */
@@ -139,14 +139,14 @@ static int UsbStartIo(struct AcmDevice *acm)
     ret = OsalThreadCreate(&acm->ioThread, \
                            (OsalThreadEntry)UsbIoThread, (void *)acm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d OsalThreadCreate faile, ret=%{public}d ",
+        HDF_LOGE("%s:%d OsalThreadCreate faile, ret=%d ",
                  __func__, __LINE__, ret);
         return ret;
     }
 
     ret = OsalThreadStart(&acm->ioThread, &threadCfg);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d OsalThreadStart faile, ret=%{public}d ",
+        HDF_LOGE("%s:%d OsalThreadStart faile, ret=%d ",
                  __func__, __LINE__, ret);
         return ret;
     }
@@ -158,14 +158,14 @@ static int UsbStartIo(struct AcmDevice *acm)
     ret = OsalThreadCreate(&acm->ioSendThread, \
                                (OsalThreadEntry)UsbIoSendThread, (void *)acm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d OsalThreadCreate faile, ret=%{public}d ",
+        HDF_LOGE("%s:%d OsalThreadCreate faile, ret=%d ",
                  __func__, __LINE__, ret);
         return ret;
     }
 
     ret = OsalThreadStart(&acm->ioSendThread, &threadCfg);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d OsalThreadStart faile, ret=%{public}d ",
+        HDF_LOGE("%s:%d OsalThreadStart faile, ret=%d ",
                  __func__, __LINE__, ret);
         return ret;
     }
@@ -230,7 +230,7 @@ static int UsbGetConfigDescriptor(UsbRawHandle *devHandle, struct UsbRawConfigDe
                  __func__, __LINE__, ret);
         return HDF_FAILURE;
     }
-    HDF_LOGE("%{public}s:%{public}d activeConfig=%{public}d", __func__, __LINE__, activeConfig);
+    HDF_LOGE("%s:%d activeConfig=%d", __func__, __LINE__, activeConfig);
     dev = UsbRawGetDevice(devHandle);
     if (dev == NULL) {
         printf("%s:%d UsbRawGetDevice failed",
@@ -264,12 +264,13 @@ static int UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConfigDe
         const struct UsbRawInterface *interface = config->interface[interfaceIndex];
         uint8_t ifaceClass = interface->altsetting->interfaceDescriptor.bInterfaceClass;
         uint8_t numEndpoints = interface->altsetting->interfaceDescriptor.bNumEndpoints;
-
-        ret = UsbRawClaimInterface(acm->devHandle, interfaceIndex);
-        if (ret) {
-            printf("%s:%d claim interface %{public}u failed",
-                     __func__, __LINE__, i);
-            return ret;
+        if (acm->devHandle) {
+            ret = UsbRawClaimInterface(acm->devHandle, interfaceIndex);
+            if (ret) {
+                printf("%s:%d claim interface %u failed",
+                         __func__, __LINE__, i);
+                return ret;
+            }
         }
 
         switch (ifaceClass) {
@@ -428,10 +429,10 @@ static int AcmDataBufAlloc(struct AcmDevice *acm)
     }
     return HDF_SUCCESS;
 }
-static int AcmDataBufFree(struct AcmDevice *acm)
+static int AcmDataBufFree(const struct AcmDevice *acm)
 {
 
-    struct AcmDb *db = &acm->db[0];
+    struct AcmDb *db = (struct AcmDb *)&acm->db[0];
     int i;
     for (i = 0; i < TEST_CYCLE; i++, db++) {
         if (db->buf) {
@@ -442,16 +443,16 @@ static int AcmDataBufFree(struct AcmDevice *acm)
     return 0;
 }
 
-static void AcmTestBulkCallback(void *requestArg)
+static void AcmTestBulkCallback(const void *requestArg)
 {
     struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
     if (req == NULL) {
-        HDF_LOGE("%{public}s:%{pulib}d req is NULL!", __func__, __LINE__);
+        HDF_LOGE("%s:%{pulib}d req is NULL!", __func__, __LINE__);
         return;
     }
     struct AcmDb *db  = (struct AcmDb *)req->userData;
     if (db == NULL) {
-        HDF_LOGE("%{public}s:%{pulib}d userData(db) is NULL!", __func__, __LINE__);
+        HDF_LOGE("%s:%{pulib}d userData(db) is NULL!", __func__, __LINE__);
         return;
     }
 
@@ -477,7 +478,6 @@ static void AcmTestBulkCallback(void *requestArg)
 
 static int32_t SerialBegin(struct AcmDevice *acm)
 {
-    uint32_t size = acm->dataSize;
     int32_t ret;
     struct AcmDb *db = NULL;
     int dbn;
@@ -508,13 +508,13 @@ static int32_t SerialBegin(struct AcmDevice *acm)
 
     ret = UsbRawFillBulkRequest(db->request, acm->devHandle, &reqData);
     if (ret) {
-        HDF_LOGE("%{public}s: FillInterruptRequest faile, ret=%{public}d",
+        HDF_LOGE("%s: FillInterruptRequest faile, ret=%d",
                  __func__, ret);
         return HDF_FAILURE;
     }
 #endif
     ret = AcmStartdb(acm, db);
-    return size;
+    return ret;
 }
 
 static void SignalHandler(void)
@@ -529,7 +529,7 @@ static void SignalHandler(void)
     printf("\nSpeed:%f MB/s\n", speed);
 }
 
-static void ShowHelp(char *name)
+static void ShowHelp(const char *name)
 {
     printf(">> usage:\n");
     printf(">>      %s [<busNum> <devAddr>]  <ifaceNum> <w>/<r> [printdata]> \n", name);
@@ -688,8 +688,8 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
 
     while (!g_speedFlag) {
         if (g_writeOrRead == TEST_WRITE) {
-            SignalHandler();
             OsalSemWait(&timeSem, TEST_PRINT_TIME*1000);
+            SignalHandler();
         } else {
             OsalSemWait(&timeSem, 200);
         }
@@ -728,17 +728,17 @@ static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
 {
 
     if (client == NULL) {
-        HDF_LOGE("%{public}s: client is NULL", __func__);
+        HDF_LOGE("%s: client is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     if (client->device == NULL) {
-        HDF_LOGE("%{public}s: client->device is NULL", __func__);
+        HDF_LOGE("%s: client->device is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     if (client->device->service == NULL) {
-        HDF_LOGE("%{public}s: client->device->service is NULL", __func__);
+        HDF_LOGE("%s: client->device->service is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
@@ -761,19 +761,21 @@ static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
 static int32_t AcmDriverBind(struct HdfDeviceObject *device)
 {
     if (device == NULL) {
-        HDF_LOGE("%{public}s: device is null", __func__);
+        HDF_LOGE("%s: device is null", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     acm = (struct AcmDevice *)OsalMemCalloc(sizeof(*acm));
     if (acm == NULL) {
-        HDF_LOGE("%{public}s: Alloc usb acm device failed", __func__);
+        HDF_LOGE("%s: Alloc usb acm device failed", __func__);
         return HDF_FAILURE;
     }
 
     acm->device  = device;
     device->service = &(acm->service);
-    acm->device->service->Dispatch = AcmDeviceDispatch;
+    if (acm->device && acm->device->service) {
+        acm->device->service->Dispatch = AcmDeviceDispatch;
+    }
 
     return HDF_SUCCESS;
 }

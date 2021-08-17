@@ -1,18 +1,3 @@
-/*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 #include "securec.h"
 #include "hdf_log.h"
 #include "osal_mem.h"
@@ -92,7 +77,7 @@ void speedInit()
             g_service = HdfIoServiceBind(SERVER_NAME_NOSDK);
             break;
     }
-    if (g_service == NULL) {
+    if (g_service == NULL || g_service->dispatcher == NULL || g_service->dispatcher->Dispatch == NULL) {
         printf("%s: GetService spdserver=%d err \n", __func__, spdserver);
         return;
     }
@@ -123,7 +108,7 @@ void speedExit()
         printf("%s: Dispatch USB_SERIAL_CLOSE err status = %d\n", __func__, status);
     }
 
-    if (g_service) {
+    if (g_service != NULL) {
         HdfIoServiceRecycle(g_service);
         g_service = NULL;
     }
@@ -161,12 +146,11 @@ static void *stop_handler(void *arg)
     }
 }
 
-
-static enum speedServer checkServer(char* input)
+static enum speedServer checkServer(const char* input)
 {
     char middle[10] = {0};
     enum speedServer out = SDKAPI_SERVER;
-    strncpy_s(middle, 10, input, strlen(input));
+    strncpy_s(middle, sizeof(middle), input, strlen(input));
     if (!strcmp(middle, "-SDK")) {
         out = SDKAPI_SERVER;
     } else if (!strcmp(middle, "-RAW")) {
@@ -178,20 +162,29 @@ static enum speedServer checkServer(char* input)
     }
     return out;
 }
+
 int main(int argc, char *argv[]) {
     struct UsbSpeedTest test;
     int busNum = 1;
     int devAddr = 2;
     int ifaceNum = 3;
     int writeOrRead;
-    bool printData;
+    bool printData = false;
     int paramNum;
     int ret = 0;
     if (argc == 7) {
-        spdserver = checkServer(argv[1]);
-        busNum = atoi(argv[2]);
-        devAddr = atoi(argv[3]);
-        ifaceNum = atoi(argv[4]);
+        if (argv[1] != NULL) {
+            spdserver = checkServer(argv[1]);
+        }
+        if (argv[2] != NULL) {
+            busNum = atoi(argv[2]);
+        }
+        if (argv[3] != NULL) {
+            devAddr = atoi(argv[3]);
+        }
+        if (argv[4] != NULL) {
+            ifaceNum = atoi(argv[4]);
+        }
         if (!strncmp(argv[5], "r", 1)) {
             writeOrRead = TEST_READ;
         } else if (!strncmp(argv[5], "w", 1)) {
@@ -229,7 +222,7 @@ int main(int argc, char *argv[]) {
         printf("Error: parameter error!\n\n");
         ShowHelp(argv[0]);
         ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
     paramNum = argc - 1;
     test.busNum = busNum;
@@ -247,18 +240,18 @@ int main(int argc, char *argv[]) {
     if ((err = pthread_sigmask(SIG_BLOCK, &mask, NULL)) != 0) {
         printf("SIG_BLOCK error\n");
         ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
     if (pthread_create(&threads, NULL, stop_handler, NULL) != 0) {
         printf("Could not create core thread\n");
         ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
 
     speedInit();
     speedTest(test);
     kill(stopHandlerTid, SIGINT);
     pthread_join(threads, NULL);
-end:
+END:
     return ret;
 }

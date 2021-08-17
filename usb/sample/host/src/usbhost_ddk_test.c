@@ -65,18 +65,21 @@ struct HdfRemoteService *g_acmService = NULL;
 static bool g_speedFlag = false;
 static bool g_exitFlag = false;
 
-int UsbHostDdkTestInit(char *apiType)
+int UsbHostDdkTestInit(const char *apiType)
 {
 #ifndef __LITEOS_USB_HOST_DDK_TEST__
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();
     if (servmgr == NULL) {
-        HDF_LOGE("%{public}s:%{public}d HDIServiceManagerGet err", __func__, __LINE__);
+        HDF_LOGE("%s:%d HDIServiceManagerGet err", __func__, __LINE__);
         return HDF_FAILURE;
     }
 #endif
+    if (apiType == NULL) {
+        return HDF_FAILURE;
+    }
     if (!strcmp(apiType, "-SDK")) {
         printf("%s:%d test SDK API, service=%s\n", __func__, __LINE__, g_acmServiceName);
-        HDF_LOGI("%{public}s:%{public}d test SDK API, service=%{public}s", __func__, __LINE__, g_acmServiceName);
+        HDF_LOGI("%s:%d test SDK API, service=%s", __func__, __LINE__, g_acmServiceName);
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
         g_acmService = HdfIoServiceBind(g_acmServiceName);
 #else
@@ -84,7 +87,7 @@ int UsbHostDdkTestInit(char *apiType)
 #endif
     } else if (!strcmp(apiType, "-RAW")) {
         printf("%s:%d test RAW API, service=%s\n", __func__, __LINE__, g_acmRawServiceName);
-        HDF_LOGI("%{public}s:%{public}d test RAW API, service=%{public}s", __func__, __LINE__, g_acmRawServiceName);
+        HDF_LOGI("%s:%d test RAW API, service=%s", __func__, __LINE__, g_acmRawServiceName);
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
         g_acmService = HdfIoServiceBind(g_acmRawServiceName);
 #else
@@ -92,7 +95,7 @@ int UsbHostDdkTestInit(char *apiType)
 #endif
     } else if (!strcmp(apiType, "-ECM")) {
         printf("%s:%d test ECM API, service=%s\n", __func__, __LINE__, g_ecmServiceName);
-        HDF_LOGI("%{public}s:%{public}d test ECM API, service=%{public}s", __func__, __LINE__, g_ecmServiceName);
+        HDF_LOGI("%s:%d test ECM API, service=%s", __func__, __LINE__, g_ecmServiceName);
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
         g_acmService = HdfIoServiceBind(g_ecmServiceName);
 #else
@@ -100,7 +103,7 @@ int UsbHostDdkTestInit(char *apiType)
 #endif
     } else {
         printf("%s:%d apiType=%s is not define\n", __func__, __LINE__, apiType);
-        HDF_LOGE("%{public}s:%{public}d apiType=%{public}s is not define", __func__, __LINE__, apiType);
+        HDF_LOGE("%s:%d apiType=%s is not define", __func__, __LINE__, apiType);
         return HDF_FAILURE;
     }
 #ifndef __LITEOS_USB_HOST_DDK_TEST__
@@ -108,7 +111,7 @@ int UsbHostDdkTestInit(char *apiType)
 #endif
     if (g_acmService == NULL) {
         printf("%s:%d GetService err\n", __func__, __LINE__);
-        HDF_LOGE("%{public}s:%{public}d GetService err", __func__, __LINE__);
+        HDF_LOGE("%s:%d GetService err", __func__, __LINE__);
         return HDF_FAILURE;
     }
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
@@ -120,7 +123,7 @@ int UsbHostDdkTestInit(char *apiType)
 #endif
     if (g_data == NULL || g_reply == NULL) {
         printf("%s:%d HdfSBufTypedObtain err\n", __func__, __LINE__);
-        HDF_LOGE("%{public}s:%{public}d HdfSBufTypedObtain err", __func__, __LINE__);
+        HDF_LOGE("%s:%d HdfSBufTypedObtain err", __func__, __LINE__);
         return HDF_FAILURE;
     }
 
@@ -182,8 +185,8 @@ static void TestModuleWriteLog(int cmdType, const char *string, struct TestUsbDe
         }
 
         if (ret < HDF_SUCCESS) {
-            printf("%s:%d cmdType=%d snprintf_s failed\n", __func__, __LINE__, cmdType);
-            HDF_LOGE("%{public}s:%{public}d cmdType=%{public}d snprintf_s failed", __func__, __LINE__, cmdType);
+            printf("%s:%d cmdType=%d snprintf_s failed ret=%d\n", __func__, __LINE__, cmdType, ret);
+            HDF_LOGE("%s:%d cmdType=%d snprintf_s failed", __func__, __LINE__, cmdType);
             goto out;
         }
 
@@ -205,7 +208,7 @@ int UsbHostDdkTestAsyncRead(char *readSbuf)
     if (status < 0) {
         g_exitFlag = true;
         printf("%s:%d Dispatch USB_SERIAL_READ failed status = %d\n", __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d Dispatch USB_SERIAL_READ failed status = %{public}d",
+        HDF_LOGE("%s:%d Dispatch USB_SERIAL_READ failed status = %d",
             __func__, __LINE__, status);
         return status;
     }
@@ -213,23 +216,29 @@ int UsbHostDdkTestAsyncRead(char *readSbuf)
     const char *tmp = HdfSbufReadString(g_reply);
     if (tmp && strlen(tmp) > 0) {
         if (readSbuf != NULL) {
-            memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
+            errno_t err = memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
+            if (err != EOK) {
+                HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
+            }
         }
-        printf("%s:%d %s-%zu!\n", __func__, __LINE__, tmp, strlen(tmp));
-        HDF_LOGD("%{public}s:%{public}d %{public}s-%{public}zu!", __func__, __LINE__, tmp, strlen(tmp));
+        printf("%s:%d %s-%d!\n", __func__, __LINE__, tmp, strlen(tmp));
+        HDF_LOGD("%s:%d %s-%d!", __func__, __LINE__, tmp, strlen(tmp));
         TestModuleWriteLog(HOST_ACM_ASYNC_READ, tmp, NULL);
     }
 
     return HDF_SUCCESS;
 }
 
-void UsbHostDdkTestAsyncWrite(char *buf)
+void UsbHostDdkTestAsyncWrite(const char *buf)
 {
+    if (buf == NULL) {
+        return;
+    }
     HdfSbufFlush(g_data);
 
     if (!HdfSbufWriteString(g_data, buf)) {
         printf("%s:%d HdfSbufWriteString error\n", __func__, __LINE__);
-        HDF_LOGE("%{public}s:%{public}d HdfSbufWriteString error", __func__, __LINE__);
+        HDF_LOGE("%s:%d HdfSbufWriteString error", __func__, __LINE__);
         return;
     }
 
@@ -241,13 +250,13 @@ void UsbHostDdkTestAsyncWrite(char *buf)
     if (status <= HDF_SUCCESS) {
         g_exitFlag = true;
         printf("%s:%d Dispatch USB_SERIAL_WRITE failed status = %d\n", __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d Dispatch USB_SERIAL_WRITE failed status = %{public}d",
+        HDF_LOGE("%s:%d Dispatch USB_SERIAL_WRITE failed status = %d",
             __func__, __LINE__, status);
         return;
     }
 
-    printf("%s:%d %s-%zu!\n", __func__, __LINE__, buf, strlen(buf));
-    HDF_LOGI("%{public}s:%{public}d %{public}s-%{public}zu!\n", __func__, __LINE__, buf, strlen(buf));
+    printf("%s:%d %s-%d!\n", __func__, __LINE__, buf, strlen(buf));
+    HDF_LOGI("%s:%d %s-%d!\n", __func__, __LINE__, buf, strlen(buf));
     TestModuleWriteLog(HOST_ACM_ASYNC_WRITE, buf, NULL);
 }
 
@@ -263,7 +272,7 @@ void UsbHostDdkTestSyncRead(char *readSbuf)
     if (status) {
         g_exitFlag = true;
         printf("%s:%d Dispatch CMD_READ_DATA_SYNC failed status = %d\n", __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d Dispatch CMD_READ_DATA_SYNC failed status = %{public}d",
+        HDF_LOGE("%s:%d Dispatch CMD_READ_DATA_SYNC failed status = %d",
             __func__, __LINE__, status);
         return;
     }
@@ -271,21 +280,24 @@ void UsbHostDdkTestSyncRead(char *readSbuf)
     const char *tmp = HdfSbufReadString(g_reply);
     if (tmp && strlen(tmp) > 0) {
         if (readSbuf != NULL) {
-            memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
+            errno_t err = memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
+            if (err != EOK) {
+                HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
+            }
         }
-        printf("%s:%d %s-%zu!\n", __func__, __LINE__, tmp, strlen(tmp));
-        HDF_LOGD("%{public}s:%{public}d %{public}s-%{public}zu !", __func__, __LINE__, tmp, strlen(tmp));
+        printf("%s:%d %s-%d!\n", __func__, __LINE__, tmp, strlen(tmp));
+        HDF_LOGD("%s:%d %s-%d !", __func__, __LINE__, tmp, strlen(tmp));
         TestModuleWriteLog(HOST_ACM_SYNC_READ, tmp, NULL);
     }
 }
 
-void UsbHostDdkTestSyncWrite(char *buf)
+void UsbHostDdkTestSyncWrite(const char *buf)
 {
     HdfSbufFlush(g_data);
 
     if (!HdfSbufWriteString(g_data, buf)) {
         printf("%s:%d HdfSbufWriteString error\n", __func__, __LINE__);
-        HDF_LOGE("%{public}s:%{public}d HdfSbufWriteString error", __func__, __LINE__);
+        HDF_LOGE("%s:%d HdfSbufWriteString error", __func__, __LINE__);
         return;
     }
 
@@ -297,13 +309,13 @@ void UsbHostDdkTestSyncWrite(char *buf)
     if (status <  HDF_SUCCESS) {
         g_exitFlag = true;
         printf("%s:%d Dispatch CMD_WRITE_DATA_SYNC failed status = %d\n", __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d Dispatch CMD_WRITE_DATA_SYNC failed status = %{public}d",
+        HDF_LOGE("%s:%d Dispatch CMD_WRITE_DATA_SYNC failed status = %d",
             __func__, __LINE__, status);
         return;
     }
 
-    printf("%s:%d %s-%zu!\n", __func__, __LINE__, buf, strlen(buf));
-    HDF_LOGD("%{public}s:%{public}d %{public}s-%{public}zu!", __func__, __LINE__, buf, strlen(buf));
+    printf("%s:%d %s-%d!\n", __func__, __LINE__, buf, strlen(buf));
+    HDF_LOGD("%s:%d %s-%d!", __func__, __LINE__, buf, strlen(buf));
     TestModuleWriteLog(HOST_ACM_SYNC_WRITE, buf, NULL);
 }
 
@@ -319,12 +331,15 @@ void UsbHostDdkTestCtrlClass(char *readSbuf)
     if (status < 0) {
         g_exitFlag = true;
         printf("%s:%d Dispatch CMD_CLASS_CTRL_SYNC failed status = %d\n", __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d Dispatch CMD_CLASS_CTRL_SYNC failed status = %{public}d",
+        HDF_LOGE("%s:%d Dispatch CMD_CLASS_CTRL_SYNC failed status = %d",
             __func__, __LINE__, status);
     } else {
         if (readSbuf != NULL) {
             const char tmp[DATA_MAX_LEN] = "CMD_CLASS_CTRL";
-            memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
+            errno_t err = memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
+            if (err != EOK) {
+                HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
+            }
         }
         printf("%s:%d usb serial control CMD_CLASS_CTRL command done\n", __func__, __LINE__);
         TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_CLASS_CTRL", NULL);
@@ -342,7 +357,7 @@ void UsbHostDdkTestStdGetDes(char *readSbuf)
     if (status < 0) {
         g_exitFlag = true;
         printf("%s:%d Dispatch UsbHostDdkTestStdGetDes failed status = %d\n",  __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d Dispatch UsbHostDdkTestStdGetDes failed status = %{public}d",
+        HDF_LOGE("%s:%d Dispatch UsbHostDdkTestStdGetDes failed status = %d",
             __func__, __LINE__, status);
     }
 
@@ -351,13 +366,16 @@ void UsbHostDdkTestStdGetDes(char *readSbuf)
     const char *tmp = HdfSbufReadString(g_reply);
     if (tmp && strlen(tmp) > 0) {
         if (readSbuf != NULL) {
-            memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
+            errno_t err = memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
+            if (err != EOK) {
+                HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
+            }
         }
         printf("%s:%d %s!\n", __func__, __LINE__, tmp);
         TestModuleWriteLog(HOST_ACM_CTRL_READ, tmp, NULL);
     } else {
         printf("%s:%d HdfSbufReadBuffer faile\n", __func__, __LINE__);
-        HDF_LOGE("%{public}s:%{public}d HdfSbufReadBuffer faile", __func__, __LINE__);
+        HDF_LOGE("%s:%d HdfSbufReadBuffer faile", __func__, __LINE__);
     }
 }
 
@@ -372,7 +390,7 @@ void UsbHostDdkTestStdGetDesAsync(char *readSbuf)
     if (status < 0) {
         g_exitFlag = true;
         printf("%s:%d Dispatch CMD_STD_CTRL_GET_DESCRIPTOR_ASYNC failed status = %d\n", __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d Dispatch CMD_STD_CTRL_GET_DESCRIPTOR_ASYNC failed status = %{public}d",
+        HDF_LOGE("%s:%d Dispatch CMD_STD_CTRL_GET_DESCRIPTOR_ASYNC failed status = %d",
             __func__, __LINE__, status);
         return;
     }
@@ -382,13 +400,16 @@ void UsbHostDdkTestStdGetDesAsync(char *readSbuf)
     const char *tmp = HdfSbufReadString(g_reply);
     if (tmp && strlen(tmp) > 0) {
         if (readSbuf != NULL) {
-            memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
+            errno_t err = memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
+            if (err != EOK) {
+                HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
+            }
         }
         printf("%s:%d %s!\n", __func__, __LINE__, tmp);
         TestModuleWriteLog(HOST_ACM_CTRL_READ, tmp, NULL);
     } else {
         printf("%s:%d HdfSbufReadBuffer faile\n", __func__, __LINE__);
-        HDF_LOGE("%{public}s:%{public}d HdfSbufReadBuffer faile", __func__, __LINE__);
+        HDF_LOGE("%s:%d HdfSbufReadBuffer faile", __func__, __LINE__);
     }
 }
 
@@ -405,19 +426,22 @@ void UsbHostDdkTestStdGetStatus(char *readSbuf)
     if (status < 0) {
         g_exitFlag = true;
         printf("%s:%d Dispatch CMD_STD_CTRL_GET_STATUS_CMD failed status = %d\n", __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d Dispatch CMD_STD_CTRL_GET_STATUS_CMD failed status = %{public}d",
+        HDF_LOGE("%s:%d Dispatch CMD_STD_CTRL_GET_STATUS_CMD failed status = %d",
             __func__, __LINE__, status);
     }
 
     status = HdfSbufReadUint16(g_reply, &data);
     if (status == false) {
-        printf("%s:%d HdfSbufReadBuffer status = %d, data=%d\n", __func__, __LINE__, status, data);
-        HDF_LOGE("%{public}s:%{public}d HdfSbufReadBuffer status=%{public}d, data=%{public}d",
-            __func__, __LINE__, status, data);
+        printf("%s:%d HdfSbufReadBuffer status = %d\n", __func__, __LINE__, status);
+        HDF_LOGE("%s:%d HdfSbufReadBuffer status=%d",
+            __func__, __LINE__, status);
     } else {
         if (readSbuf != NULL) {
             const char tmp[DATA_MAX_LEN] = "CMD_STD_CTRL_GET_STATUS";
-            memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
+            errno_t err = memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
+            if (err != EOK) {
+                HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
+            }
         }
         printf("%s:%d usb serial control CMD_STD_CTRL_GET_STATUS command done,data=%d\n", __func__, __LINE__, data);
         TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_STD_CTRL_GET_STATUS", NULL);
@@ -439,7 +463,7 @@ void TestStdGetConf(void)
     if (status < 0) {
         g_exitFlag = true;
         printf("%s:%d Dispatch CMD_STD_CTRL_GET_CONFIGURATION failed status = %d\n", __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d Dispatch CMD_STD_CTRL_GET_CONFIGURATION failed status = %{public}d",
+        HDF_LOGE("%s:%d Dispatch CMD_STD_CTRL_GET_CONFIGURATION failed status = %d",
             __func__, __LINE__, status);
     }
 
@@ -448,7 +472,7 @@ void TestStdGetConf(void)
     status = HdfSbufReadUint8(g_reply, &data);
     if (status < 0) {
         printf("%s:%d HdfSbufReadBuffer status = %d\n", __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d HdfSbufReadBuffer status = %{public}d", __func__, __LINE__, status);
+        HDF_LOGE("%s:%d HdfSbufReadBuffer status = %d", __func__, __LINE__, status);
     }
 }
 
@@ -465,7 +489,7 @@ void TestStdGetInterface(void)
     if (status < 0) {
         g_exitFlag = true;
         printf("%s:%d Dispatch CMD_STD_CTRL_GET_INTERFACE failed status = %d\n", __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d Dispatch CMD_STD_CTRL_GET_INTERFACE failed status = %{public}d",
+        HDF_LOGE("%s:%d Dispatch CMD_STD_CTRL_GET_INTERFACE failed status = %d",
             __func__, __LINE__, status);
     }
 
@@ -474,17 +498,17 @@ void TestStdGetInterface(void)
     status = HdfSbufReadUint8(g_reply, &data);
     if (status < 0) {
         printf("%s:%d HdfSbufReadBuffer status = %d\n", __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d HdfSbufReadBuffer status = %{public}d", __func__, __LINE__, status);
+        HDF_LOGE("%s:%d HdfSbufReadBuffer status = %d", __func__, __LINE__, status);
     }
 }
 
-static int TestSpeedWrite(char *buf)
+static int TestSpeedWrite(const char *buf)
 {
     HdfSbufFlush(g_data);
 
     if (!HdfSbufWriteString(g_data, (char *)buf)) {
         printf("%s:%d HdfSbufWriteString error\n", __func__, __LINE__);
-        HDF_LOGE("%{public}s:%{public}d HdfSbufWriteString error", __func__, __LINE__);
+        HDF_LOGE("%s:%d HdfSbufWriteString error", __func__, __LINE__);
         return HDF_FAILURE;
     }
 
@@ -521,9 +545,12 @@ void TestSpeed(void)
     int cnt = 0;
     struct itimerval newValue;
     struct itimerval oldValue;
-    time_t second = 30;
+    const time_t second = 30;
 
     data = OsalMemAlloc(DATA_MAX_LEN);
+    if (data == NULL) {
+        return;
+    }
     memset_s(data, DATA_MAX_LEN, 0x38, DATA_MAX_LEN);
     data[DATA_MAX_LEN - 1] = '\0';
 
@@ -536,7 +563,7 @@ void TestSpeed(void)
 
     gettimeofday(&time, NULL);
     printf("##:sec%ld usec%ld\n", time.tv_sec, time.tv_usec);
-    HDF_LOGD("##:sec%{public}ld usec%{public}ld\n", time.tv_sec, time.tv_usec);
+    HDF_LOGD("##:sec%ld usec%ld\n", time.tv_sec, time.tv_usec);
     setitimer(ITIMER_REAL, &newValue, &oldValue);
     gettimeofday(&time, NULL);
 
@@ -560,7 +587,7 @@ void TestSpeed(void)
 
     gettimeofday(&time, NULL);
     printf("##:sec%ld usec%ld+cnt:%d\n",   time.tv_sec, time.tv_usec, cnt);
-    HDF_LOGD("##:sec%{public}ld usec%ld+cnt:%{public}d",   time.tv_sec, time.tv_usec, cnt);
+    HDF_LOGD("##:sec%ld usec%ld+cnt:%d",   time.tv_sec, time.tv_usec, cnt);
     printf("Speed:%dKB\n", ((cnt * 512) / (30  * 1024)));
 }
 
@@ -570,7 +597,7 @@ void UsbHostDdkTestSetBaudrate(uint32_t value)
 
     if (!HdfSbufWriteUint32(g_data, value)) {
         printf("%s:%d HdfSbufWriteString error\n", __func__, __LINE__);
-        HDF_LOGE("%{public}s:%{public}d HdfSbufWriteString error", __func__, __LINE__);
+        HDF_LOGE("%s:%d HdfSbufWriteString error", __func__, __LINE__);
         return;
     }
 
@@ -582,19 +609,19 @@ void UsbHostDdkTestSetBaudrate(uint32_t value)
     if (status != HDF_SUCCESS) {
         g_exitFlag = true;
         printf("%s:%d Dispatch CMD_SET_BAUDRATE failed status = %d\n", __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d Dispatch CMD_SET_BAUDRATE failed status = %{public}d",
+        HDF_LOGE("%s:%d Dispatch CMD_SET_BAUDRATE failed status = %d",
             __func__, __LINE__, status);
         return;
     }
 
     printf("%s:%d CMD_SET_BAUDRATE success\n", __func__, __LINE__);
-    HDF_LOGI("%{public}s:%{public}d CMD_SET_BAUDRATE success", __func__, __LINE__);
+    HDF_LOGI("%s:%d CMD_SET_BAUDRATE success", __func__, __LINE__);
     TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_SET_BAUDRATE", NULL);
 }
 
 void UsbHostDdkTestGetBaudrate(char *readSbuf)
 {
-    uint32_t value;
+    uint32_t value = 0;
 
     HdfSbufFlush(g_reply);
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
@@ -605,7 +632,7 @@ void UsbHostDdkTestGetBaudrate(char *readSbuf)
     if (status < 0) {
         g_exitFlag = true;
         printf("%s:%d Dispatch CMD_GET_BAUDRATE failed status = %d\n", __func__, __LINE__, status);
-        HDF_LOGE("%{public}s:%{public}d Dispatch CMD_GET_BAUDRATE failed status = %{public}d",
+        HDF_LOGE("%s:%d Dispatch CMD_GET_BAUDRATE failed status = %d",
             __func__, __LINE__, status);
         return;
     }
@@ -613,13 +640,16 @@ void UsbHostDdkTestGetBaudrate(char *readSbuf)
     if (HdfSbufReadUint32(g_reply, &value)) {
         if (readSbuf != NULL) {
             const char tmp[DATA_MAX_LEN] = "CMD_GET_BAUDRATE";
-            memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
+            errno_t err = memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
+            if (err != EOK) {
+                HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
+            }
         }
         printf("%s:%d baudrate=%d usb serial control CMD_GET_BAUDRATE command done\n", __func__, __LINE__, value);
         TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_GET_BAUDRATE", NULL);
     } else {
         printf("%s:%d HdfSbufReadUint32 failed!\n", __func__, __LINE__);
-        HDF_LOGD("%{public}s:%{public}d HdfSbufReadUint32 failed!",
+        HDF_LOGD("%s:%d HdfSbufReadUint32 failed!",
             __func__, __LINE__);
     }
 }
@@ -629,7 +659,7 @@ void UsbHostDdkTestAddInterface(uint32_t value)
     HdfSbufFlush(g_data);
 
     if (!HdfSbufWriteUint32(g_data, value)) {
-        HDF_LOGE("%{public}s:%{public}d HdfSbufWriteString error", __func__, __LINE__);
+        HDF_LOGE("%s:%d HdfSbufWriteString error", __func__, __LINE__);
         return;
     }
 
@@ -640,13 +670,13 @@ void UsbHostDdkTestAddInterface(uint32_t value)
 #endif
     if (status != HDF_SUCCESS) {
         g_exitFlag = true;
-        HDF_LOGE("%{public}s:%{public}d Dispatch CMD_ADD_INTERFACE failed status = %{public}d",
+        HDF_LOGE("%s:%d Dispatch CMD_ADD_INTERFACE failed status = %d",
             __func__, __LINE__, status);
         return;
     }
 
     printf("%s:%d CMD_ADD_INTERFACE success!\n", __func__, __LINE__);
-    HDF_LOGD("%{public}s:%{public}d CMD_ADD_INTERFACE success!", __func__, __LINE__);
+    HDF_LOGD("%s:%d CMD_ADD_INTERFACE success!", __func__, __LINE__);
 }
 
 void UsbHostDdkTestRemoveInterface(uint32_t value)
@@ -654,7 +684,7 @@ void UsbHostDdkTestRemoveInterface(uint32_t value)
     HdfSbufFlush(g_data);
 
     if (!HdfSbufWriteUint32(g_data, value)) {
-        HDF_LOGE("%{public}s:%{public}d HdfSbufWriteString error", __func__, __LINE__);
+        HDF_LOGE("%s:%d HdfSbufWriteString error", __func__, __LINE__);
         return;
     }
 
@@ -665,25 +695,25 @@ void UsbHostDdkTestRemoveInterface(uint32_t value)
 #endif
     if (status != HDF_SUCCESS) {
         g_exitFlag = true;
-        HDF_LOGE("%{public}s:%{public}d Dispatch CMD_REMOVE_INTERFACE failed status = %{public}d",
+        HDF_LOGE("%s:%d Dispatch CMD_REMOVE_INTERFACE failed status = %d",
             __func__, __LINE__, status);
         return;
     }
 
     printf("%s:%d CMD_REMOVE_INTERFACE success!\n", __func__, __LINE__);
-    HDF_LOGD("%{public}s:%{public}d CMD_REMOVE_INTERFACE success!", __func__, __LINE__);
+    HDF_LOGD("%s:%d CMD_REMOVE_INTERFACE success!", __func__, __LINE__);
 }
 
 int UsbHostDdkTestOpen(int cmdType)
 {
     if(g_exitFlag == true) {
-        HDF_LOGD("%{public}s:%{public}d g_exitFlag is true!", __func__, __LINE__);
+        HDF_LOGD("%s:%d g_exitFlag is true!", __func__, __LINE__);
         return HDF_FAILURE;
     }
 
     HdfSbufFlush(g_data);
     if (!HdfSbufWriteInt32(g_data, cmdType)) {
-        HDF_LOGE("%{public}s:%{public}d HdfSbufWriteString error", __func__, __LINE__);
+        HDF_LOGE("%s:%d HdfSbufWriteString error", __func__, __LINE__);
         return HDF_FAILURE;
     }
 
@@ -694,7 +724,7 @@ int UsbHostDdkTestOpen(int cmdType)
 #endif
     if (status) {
         g_exitFlag = true;
-        HDF_LOGE("%{public}s:%{public}d Dispatch CMD_OPEN_PARM status=%{public}d err",
+        HDF_LOGE("%s:%d Dispatch CMD_OPEN_PARM status=%d err",
             __func__, __LINE__, status);
     }
 
@@ -704,13 +734,13 @@ int UsbHostDdkTestOpen(int cmdType)
 int UsbHostDdkTestClose(int cmdType)
 {
     if(g_exitFlag == true) {
-        HDF_LOGD("%{public}s:%{public}d g_exitFlag is true!", __func__, __LINE__);
+        HDF_LOGD("%s:%d g_exitFlag is true!", __func__, __LINE__);
         return HDF_FAILURE;
     }
 
     HdfSbufFlush(g_data);
     if (!HdfSbufWriteInt32(g_data, cmdType)) {
-        HDF_LOGE("%{public}s:%{public}d HdfSbufWriteString error", __func__, __LINE__);
+        HDF_LOGE("%s:%d HdfSbufWriteString error", __func__, __LINE__);
         return HDF_FAILURE;
     }
 
@@ -721,7 +751,7 @@ int UsbHostDdkTestClose(int cmdType)
 #endif
     if (status) {
         g_exitFlag = true;
-        HDF_LOGE("%{public}s:%{public}d Dispatch CMD_CLOSE_PARM status=%{public}d err",
+        HDF_LOGE("%s:%d Dispatch CMD_CLOSE_PARM status=%d err",
             __func__, __LINE__, status);
     }
 

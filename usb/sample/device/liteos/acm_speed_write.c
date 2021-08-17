@@ -54,7 +54,7 @@ static void TestSpeed()
     int status = g_acmService->dispatcher->Dispatch(&g_acmService->object,
         USB_SERIAL_WRITE_SPEED, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE_SPEED failed status = %{public}d",
+        HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE_SPEED failed status = %d",
             __func__, status);
         return;
     }
@@ -62,18 +62,18 @@ static void TestSpeed()
 
 static void GetTempSpeed()
 {
-    float calc = 10000;
-    uint32_t speed;
+    const float calc = 10000;
+    uint32_t speed = 0;
     HdfSbufFlush(g_reply);
     int status = g_acmService->dispatcher->Dispatch(&g_acmService->object,
         USB_SERIAL_WRITE_GET_TEMP_SPEED_UINT32, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE_GET_TEMP_SPEED failed status = %{public}d",
+        HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE_GET_TEMP_SPEED failed status = %d",
             __func__, status);
         return;
     }
     if (!HdfSbufReadUint32(g_reply, &speed)) {
-        HDF_LOGE("%{public}s: HdfSbufReadFloat failed", __func__);
+        HDF_LOGE("%s: HdfSbufReadFloat failed", __func__);
         return;
     }
     printf("speed : %f MB/s\n", (float)speed / calc);
@@ -86,12 +86,12 @@ static void GetSpeedDone()
     int status = g_acmService->dispatcher->Dispatch(&g_acmService->object,
         USB_SERIAL_WRITE_SPEED_DONE, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE_SPEED_DONE failed status = %{public}d",
+        HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE_SPEED_DONE failed status = %d",
             __func__, status);
         return;
     }
     if (!HdfSbufReadUint8(g_reply, &isDone)) {
-        HDF_LOGE("%{public}s: HdfSbufReadFloat failed", __func__);
+        HDF_LOGE("%s: HdfSbufReadFloat failed", __func__);
         return;
     }
     if (isDone) {
@@ -103,21 +103,21 @@ int main(int argc, char *argv[])
 {
     int status;
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");
-    if (g_acmService == NULL) {
-        HDF_LOGE("%{public}s: GetService err", __func__);
+    if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
+        HDF_LOGE("%s: GetService err", __func__);
         return HDF_FAILURE;
     }
 
     g_data = HdfSBufObtainDefaultSize();
     g_reply = HdfSBufObtainDefaultSize();
     if (g_data == NULL || g_reply == NULL) {
-        HDF_LOGE("%{public}s: GetService err", __func__);
+        HDF_LOGE("%s: GetService err", __func__);
         return HDF_FAILURE;
     }
 
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_OPEN, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_OPEN err", __func__);
+        HDF_LOGE("%s: Dispatch USB_SERIAL_OPEN err", __func__);
         return HDF_FAILURE;
     }
 
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
 
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_CLOSE err", __func__);
+        HDF_LOGE("%s: Dispatch USB_SERIAL_CLOSE err", __func__);
         return HDF_FAILURE;
     }
 

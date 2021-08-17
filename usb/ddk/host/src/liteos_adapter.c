@@ -54,13 +54,13 @@ static void *OsAdapterRealloc(void *ptr, size_t oldSize, size_t newSize)
 
     mem = OsalMemAlloc(newSize);
     if (mem == NULL) {
-        HDF_LOGE("%{public}s:%{public}d", __func__, __LINE__);
+        HDF_LOGE("%s:%d", __func__, __LINE__);
         goto out;
     }
 
     if (oldSize > 0) {
         if (memmove_s(mem, newSize, ptr, oldSize) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d", __func__, __LINE__);
+            HDF_LOGE("%s:%d", __func__, __LINE__);
             OsalMemFree(mem);
             mem = NULL;
             goto out;
@@ -138,12 +138,12 @@ static int OsSubmitUrb(
 static int OsControlMsg(struct UsbAdapterUrb *urb)
 {
     int err;
-    uint16_t actLen;
+    uint16_t actLen = 0;
     struct UsbAdapterDevice *adapterDevice = urb->dev;
     void *buffer = urb->transfer_buffer;
     struct UsbAdapterDeviceRequest req;
 
-    err = memcpy_s(&req, sizeof(req), buffer, sizeof(req));
+    err = memcpy_s(&req, sizeof(struct UsbAdapterDeviceRequest), buffer, sizeof(req));
     if (err != HDF_SUCCESS) {
         DPRINTFN(0, "%s:%d err=%d\n", __func__, __LINE__, err);
         err = HDF_ERR_IO;
@@ -172,22 +172,22 @@ static int OsWaitUrb(struct OsDev *osDev)
     return HDF_SUCCESS;
 }
 
-static int OsReapUrb(struct UsbDeviceHandle *handle, struct Async **urb)
+static int OsReapUrb(const struct UsbDeviceHandle *handle, struct Async **urb)
 {
+    if ((handle == NULL) || (handle->dev == NULL) || (handle->dev->privateData == NULL)) {
+         PRINTK("invalid parmater\n");
+         return HDF_ERR_INVALID_PARAM;
+    }
     int err = 0;
     uint32_t save;
     struct Async * as = NULL;
     struct UsbDevice *dev = handle->dev;
-    if ((handle == NULL) || (handle->dev == NULL) || (handle->dev->privateData == NULL)) {
+    if (dev->privateData == NULL) {
          PRINTK("invalid parmater\n");
          return HDF_ERR_INVALID_PARAM;
     }
     struct OsDev *osDev = (struct OsDev *)dev->privateData;
     err = OsWaitUrb(osDev);
-    if (dev->privateData == NULL) {
-         PRINTK("invalid parmater\n");
-         return HDF_ERR_INVALID_PARAM;
-    }
     LOS_SpinLockSave(&osDev->completeLock, &save);
     if (!DListIsEmpty(&osDev->asyncCompleted)) {
         as = DLIST_FIRST_ENTRY(&osDev->asyncCompleted, struct Async, asynclist);
@@ -420,7 +420,7 @@ static int OsInitDevice(struct UsbDevice *dev, uint8_t busNum, uint8_t devAddr)
         return ret;
     }
     ret = memcpy_s(&dev->deviceDescriptor, sizeof(struct UsbDeviceDescriptor),
-        &osDev->adapterDevice->ddesc,  USB_DDK_DT_DEVICE_SIZE);
+        &osDev->adapterDevice->ddesc, USB_DDK_DT_DEVICE_SIZE);
     if (ret != HDF_SUCCESS) {
         DPRINTFN(0, "%s:%d ret=%d\n", __func__, __LINE__, ret);
         ret = HDF_ERR_IO;
@@ -481,6 +481,7 @@ static int OsSubmitControlRequest(struct UsbHostRequest *request)
     struct UsbAdapterUrb *urb = NULL;
     struct Async *as = NULL;
     struct UsbAdapterHostEndpoint *uhe = NULL;
+    struct OsDev *osDev = NULL;
 
     if ((request == NULL) || (request->length > MAX_BULK_DATA_BUFFER_LENGTH)
         || (request->devHandle == NULL) || (request->buffer == NULL)) {
@@ -488,7 +489,9 @@ static int OsSubmitControlRequest(struct UsbHostRequest *request)
     }
     struct UsbDeviceHandle *handle = request->devHandle;
     struct UsbDevice *dev = handle->dev;
-    struct OsDev *osDev = (struct OsDev *)dev->privateData;
+    if (dev) {
+        osDev = (struct OsDev *)dev->privateData;
+    }
     struct UsbAdapterDevice *adapterDevice = osDev->adapterDevice;
     unsigned char endPoint = request->endPoint;
     UsbPipeType pipeType = request->requestType;
@@ -621,7 +624,7 @@ static int OsSubmitBulkRequest(struct UsbHostRequest *request)
     int bulkBufferLen;
     int numUrbs;
 
-    if (request == NULL) {
+    if ((request == NULL) || (request->devHandle == NULL)) {
         DPRINTFN(0, "%s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -944,8 +947,8 @@ static int OsProcessAbnormalReap(struct UsbHostRequest *request, const struct Us
         unsigned char *target = request->buffer + request->actualLength;
         if (urb->transfer_buffer != target) {
             ret = memmove_s(target, urb->actual_length, urb->transfer_buffer, urb->actual_length);
-            if (ret) {
-                DPRINTFN(0, "%s: memmove_s failed", __func__);
+            if (ret != EOK) {
+                DPRINTFN(0, "%s: memmove_s failed, ret=%d", __func__, ret);
             }
         }
         request->actualLength += urb->actual_length;
@@ -1052,12 +1055,12 @@ completed:
     return RawHandleRequestCompletion(request, request->reqStatus);
 }
 
-static int AdapterInit(struct UsbSession *session)
+static int AdapterInit(const struct UsbSession *session)
 {
     return HDF_SUCCESS;
 }
 
-static void AdapterExit(struct UsbSession *session)
+static void AdapterExit(const struct UsbSession *session)
 {
     return;
 }
@@ -1111,6 +1114,9 @@ static void AdapterCloseDevice(struct UsbDeviceHandle *handle)
     if(AdapterAtomicDec(&dev->refcnt)) {
         return;
     }
+    if (!dev->session) {
+        return;
+    }
     OsalMutexLock(&dev->session->lock);
     HdfSListRemove(&dev->session->usbDevs, &dev->list);
     OsalMutexUnlock(&dev->session->lock);
@@ -1131,19 +1137,19 @@ static void AdapterCloseDevice(struct UsbDeviceHandle *handle)
     OsalMemFree(handle);
 }
 
-static int AdapterGetConfigDescriptor(struct UsbDevice *dev,
+static int AdapterGetConfigDescriptor(const struct UsbDevice *dev,
     uint8_t configIndex, void *buffer, size_t len)
 {
     struct OsDev *osDev = (struct OsDev *)dev->privateData;
     struct UsbAdapterDevice *adapterDevice = osDev->adapterDevice;
-    if (memcpy_s(buffer, len, adapterDevice->cdesc, len) != EOK) {
+    if (memcpy_s(buffer, UGETW(adapterDevice->cdesc->wTotalLength), adapterDevice->cdesc, len) != EOK) {
         DPRINTFN(0, "memcpy_s fail");
         return HDF_ERR_IO;
     }
     return len;
 }
 
-static int AdapterGetConfiguration(struct UsbDeviceHandle *handle, uint8_t *activeConfig)
+static int AdapterGetConfiguration(const struct UsbDeviceHandle *handle, uint8_t *activeConfig)
 {
     struct UsbDevice *dev = handle->dev;
     struct OsDev *osDev = (struct OsDev *)dev->privateData;
@@ -1178,17 +1184,17 @@ static int AdapterSetConfiguration(struct UsbDeviceHandle *handle, int activeCon
     return HDF_SUCCESS;
 }
 
-static int AdapterClaimInterface(struct UsbDeviceHandle *handle, unsigned int interfaceNumber)
+static int AdapterClaimInterface(const struct UsbDeviceHandle *handle, unsigned int interfaceNumber)
 {
     return HDF_SUCCESS;
 }
 
-static int AdapterReleaseInterface(struct UsbDeviceHandle *handle, unsigned int interfaceNumber)
+static int AdapterReleaseInterface(const struct UsbDeviceHandle *handle, unsigned int interfaceNumber)
 {
     return HDF_SUCCESS;
 }
 
-static int AdapterSetInterface(struct UsbDeviceHandle *handle, uint8_t interface, uint8_t altSetting)
+static int AdapterSetInterface(const struct UsbDeviceHandle *handle, uint8_t interface, uint8_t altSetting)
 {
     struct UsbDevice *dev = handle->dev;
     struct OsDev *osDev = (struct OsDev *)dev->privateData;
@@ -1205,7 +1211,7 @@ static int AdapterSetInterface(struct UsbDeviceHandle *handle, uint8_t interface
     return HDF_SUCCESS;
 }
 
-static int AdapterClearHalt(struct UsbDeviceHandle *handle, unsigned int endPoint)
+static int AdapterClearHalt(const struct UsbDeviceHandle *handle, unsigned int endPoint)
 {
     struct UsbDevice *dev = handle->dev;
     struct OsDev *osDev = (struct OsDev *)dev->privateData;
@@ -1220,12 +1226,12 @@ static int AdapterClearHalt(struct UsbDeviceHandle *handle, unsigned int endPoin
     return ret;
 }
 
-static int AdapterResetDevice(struct UsbDeviceHandle *handle)
+static int AdapterResetDevice(const struct UsbDeviceHandle *handle)
 {
      return HDF_SUCCESS;
 }
 
-static struct UsbHostRequest *AdapterAllocRequest(struct UsbDeviceHandle *handle, int isoPackets, size_t length)
+static struct UsbHostRequest *AdapterAllocRequest(const struct UsbDeviceHandle *handle, int isoPackets, size_t length)
 {
     size_t allocSize;
     struct UsbHostRequest *request = NULL;
@@ -1235,7 +1241,7 @@ static struct UsbHostRequest *AdapterAllocRequest(struct UsbDeviceHandle *handle
                 + (sizeof(unsigned char) * length);
     request = OsalMemCalloc(allocSize);
     if (request == NULL) {
-        HDF_LOGE("%{public}s RawMemAlloc fail", __func__);
+        HDF_LOGE("%s RawMemAlloc fail", __func__);
         return NULL;
     }
     request->numIsoPackets = isoPackets;
@@ -1268,8 +1274,10 @@ static int AdapterFreeRequest(struct UsbHostRequest *request)
     }
     if (request->urbs) {
         OsalMemFree(request->urbs);
+        request->urbs = NULL;
     }
     OsalMemFree((void *)request);
+    request = NULL;
     return HDF_SUCCESS;
 }
 
@@ -1317,7 +1325,7 @@ end:
     return HDF_SUCCESS;
 }
 
-static int AdapterUrbCompleteHandle(struct UsbDeviceHandle *devHandle)
+static int AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
 {
     int ret;
     struct UsbDevice *dev = NULL;
@@ -1326,7 +1334,7 @@ static int AdapterUrbCompleteHandle(struct UsbDeviceHandle *devHandle)
     struct Async *as = NULL;
     struct UsbHostRequest *request = NULL;
     if ((devHandle == NULL) || (devHandle->dev == NULL) || (devHandle->dev->privateData == NULL)) {
-        HDF_LOGE("%{public}s:%{public}d invalid parameter", __func__, __LINE__);
+        HDF_LOGE("%s:%d invalid parameter", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     dev = devHandle->dev;
@@ -1412,8 +1420,12 @@ int AdapterAtomicInc(OsalAtomic *v)
     int valOld;
     int val;
     uint32_t status;
-    Atomic *p = (Atomic *)&(v)->counter;
-
+    Atomic *p = NULL;
+    if (v) {
+        p = (Atomic *)&(v)->counter;
+    } else {
+        return HDF_FAILURE;
+    }
     do {
         __asm__ __volatile__("ldrex   %1, [%4]\n"
                              "mov   %0, %1\n"
@@ -1429,5 +1441,9 @@ int AdapterAtomicInc(OsalAtomic *v)
 
 int AdapterAtomicDec(OsalAtomic *v)
 {
-    return LOS_AtomicDecRet((Atomic *)&(v)->counter);
+    if (v) {
+        return LOS_AtomicDecRet((Atomic *)&(v)->counter);
+    } else {
+        return HDF_FAILURE;
+    }
 }

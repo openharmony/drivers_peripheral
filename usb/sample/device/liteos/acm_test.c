@@ -45,13 +45,13 @@ struct HdfIoService *g_acmService;
 struct OsalThread      g_thread;
 struct OsalMutex       g_lock;
 
-static void TestWrite(char *buf)
+static void TestWrite(const char *buf)
 {
     HdfSbufFlush(g_data);
     (void)HdfSbufWriteString(g_data, buf);
     int status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_WRITE, g_data, g_reply);
     if (status <= 0) {
-        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_WRITE failed status = %{public}d", __func__, status);
+        HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE failed status = %d", __func__, status);
     }
 }
 
@@ -100,7 +100,7 @@ static void Test02()
     char str[STR_LEN] = {0};
     char *getStr = NULL;
     if (OsalMutexInit(&g_lock) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: init lock fail!", __func__);
+        HDF_LOGE("%s: init lock fail!", __func__);
         return;
     }
     while (1) {
@@ -120,7 +120,7 @@ static void Test02()
             getchar();
             getStr = gets_s(str, STR_LEN - 1);
             if (getStr == NULL) {
-                HDF_LOGE("%{public}s: gets_s faile", __func__);
+                HDF_LOGE("%s: gets_s faile", __func__);
             }
             TestWrite(str);
         } else if (c == 'q') {
@@ -133,21 +133,21 @@ int main(int argc, char *argv[])
 {
     int status;
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");
-    if (g_acmService == NULL) {
-        HDF_LOGE("%{public}s: GetService err", __func__);
+    if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
+        HDF_LOGE("%s: GetService err", __func__);
         return HDF_FAILURE;
     }
 
     g_data = HdfSBufObtainDefaultSize();
     g_reply = HdfSBufObtainDefaultSize();
     if (g_data == NULL || g_reply == NULL) {
-        HDF_LOGE("%{public}s: GetService err", __func__);
+        HDF_LOGE("%s: GetService err", __func__);
         return HDF_FAILURE;
     }
 
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_OPEN, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_OPEN err", __func__);
+        HDF_LOGE("%s: Dispatch USB_SERIAL_OPEN err", __func__);
         return HDF_FAILURE;
     }
 
@@ -155,12 +155,11 @@ int main(int argc, char *argv[])
 
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%{public}s: Dispatch USB_SERIAL_CLOSE err", __func__);
+        HDF_LOGE("%s: Dispatch USB_SERIAL_CLOSE err", __func__);
         return HDF_FAILURE;
     }
 
     HdfSBufRecycle(g_data);
     HdfSBufRecycle(g_reply);
-
-    return 0;
+    return HDF_SUCCESS;
 }
