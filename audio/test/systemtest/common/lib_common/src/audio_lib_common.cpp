@@ -39,23 +39,6 @@ using namespace std;
 
 namespace HMOS {
 namespace Audio {
-int32_t InitAttrs(struct AudioSampleAttributes& attrs)
-{
-    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
-    attrs.channelCount = G_CHANNELCOUNT;
-    attrs.sampleRate = G_SAMPLERATE;
-    attrs.interleaved = 0;
-    attrs.type = AUDIO_IN_MEDIA;
-    attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
-    attrs.frameSize = G_PCM16BIT * G_CHANNELCOUNT / MOVE_LEFT_NUM;
-    attrs.isBigEndian = true;
-    attrs.isSignedData = true;
-    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (G_PCM16BIT * attrs.channelCount / MOVE_LEFT_NUM);
-    attrs.stopThreshold = STOP_THRESHOLD;
-    attrs.silenceThreshold = 0;
-    return HDF_SUCCESS;
-}
-
 int32_t InitRenderFramepara(struct AudioFrameRenderMode& frameRenderMode)
 {
     InitAttrs(frameRenderMode.attrs);
@@ -115,54 +98,39 @@ int32_t InitHwCaptureMode(struct AudioHwCaptureMode& captureMode)
     return HDF_SUCCESS;
 }
 
-uint32_t StringToInt(std::string flag)
+uint32_t InitHwRender(struct AudioHwRender *&hwRender, const std::string adapterNameCase)
 {
-    uint32_t temp = flag[0];
-    for (int i = flag.size() - 1; i >= 0; i--) {
-        temp <<= MOVE_LEFT_NUM;
-        temp += flag[i];
+    int ret = -1;
+    if (hwRender == nullptr) {
+        return HDF_FAILURE;
     }
-    return temp;
+    if (InitHwRenderMode(hwRender->renderParam.renderMode) ||
+        InitRenderFramepara(hwRender->renderParam.frameRenderMode)) {
+        return HDF_FAILURE;
+    }
+    hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
+    ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
+        NAME_LEN, adapterNameCase.c_str());
+    if (ret < 0) {
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
 }
 
-int32_t WavHeadAnalysis(struct AudioHeadInfo& wavHeadInfo, FILE *file, struct AudioSampleAttributes& attrs)
+uint32_t InitHwCapture(struct AudioHwCapture *&hwCapture, const std::string adapterNameCase)
 {
-    int32_t ret = 0;
-    if (file == nullptr) {
+    int ret = -1;
+    if (hwCapture == nullptr) {
         return HDF_FAILURE;
     }
-    ret = fread(&wavHeadInfo, sizeof(wavHeadInfo), 1, file);
-    if (ret != 1) {
+    if (InitHwCaptureMode(hwCapture->captureParam.captureMode) ||
+        InitHwCaptureFramepara(hwCapture->captureParam.frameCaptureMode)) {
         return HDF_FAILURE;
     }
-    uint32_t audioRiffId = StringToInt(AUDIO_RIFF);
-    uint32_t audioFileFmt = StringToInt(AUDIO_WAVE);
-    uint32_t aduioDataId = StringToInt(AUDIO_DATA);
-    if (wavHeadInfo.testFileRiffId != audioRiffId || wavHeadInfo.testFileFmt != audioFileFmt ||
-        wavHeadInfo.dataId != aduioDataId) {
+    ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName,
+        NAME_LEN, adapterNameCase.c_str());
+    if (ret < 0) {
         return HDF_FAILURE;
-    }
-    attrs.channelCount = wavHeadInfo.audioChannelNum;
-    attrs.sampleRate = wavHeadInfo.audioSampleRate;
-    switch (wavHeadInfo.audioBitsPerSample) {
-        case PCM_8_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_8_BIT;
-            break;
-        }
-        case PCM_16_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_16_BIT;
-            break;
-        }
-        case PCM_24_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_24_BIT;
-            break;
-        }
-        case PCM_32_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_32_BIT;
-            break;
-        }
-        default:
-            return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }

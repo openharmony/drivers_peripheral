@@ -17,7 +17,7 @@
  * @addtogroup Audio
  * @{
  *
- * @brief Defines audio-related APIs, including custom data types and functions for capture drivers funtion.
+ * @brief Defines audio-related APIs, including custom data types and functions for capture drivers function.
  * accessing a driver adapter, and capturing audios.
  *
  * @since 1.0
@@ -41,10 +41,9 @@ using namespace testing::ext;
 using namespace HMOS::Audio;
 
 namespace {
-const string AUDIO_CAPTURE_FILE = "//bin/audiocapturetest.wav";
-const string ADAPTER_NAME = "hdmi";
-const string ADAPTER_NAME2 = "usb";
-const string ADAPTER_NAME3 = "internal";
+const string ADAPTER_NAME_HDMI = "hdmi";
+const string ADAPTER_NAME_USB = "usb";
+const string ADAPTER_NAME_INTERNAL = "internal";
 
 class AudioHdiCaptureSceneTest : public testing::Test {
 public:
@@ -52,97 +51,71 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct AudioManager *(*GetAudioManager)() = nullptr;
-    void *handleSo = nullptr;
-    int32_t GetLoadAdapter(struct AudioManager manager, enum AudioPortDirection portType,
-                           const string adapterName, struct AudioAdapter **adapter, struct AudioPort& audioPort) const;
-    int32_t AudioCreateCapture(enum AudioPortPin pins, struct AudioManager manager,
-                               struct AudioPort capturePort, struct AudioAdapter *adapter,
-                               struct AudioCapture **capture) const;
+    static TestAudioManager *(*GetAudioManager)();
+    static void *handleSo;
+#ifdef AUDIO_MPI_SO
+    static int32_t (*SdkInit)();
+    static void (*SdkExit)();
+    static void *sdkSo;
+#endif
     int32_t AudioCaptureStart(const string path, struct AudioCapture *capture) const;
 };
 
-void AudioHdiCaptureSceneTest::SetUpTestCase(void) {}
+TestAudioManager *(*AudioHdiCaptureSceneTest::GetAudioManager)() = nullptr;
+void *AudioHdiCaptureSceneTest::handleSo = nullptr;
+#ifdef AUDIO_MPI_SO
+    int32_t (*AudioHdiCaptureSceneTest::SdkInit)() = nullptr;
+    void (*AudioHdiCaptureSceneTest::SdkExit)() = nullptr;
+    void *AudioHdiCaptureSceneTest::sdkSo = nullptr;
+#endif
 
-void AudioHdiCaptureSceneTest::TearDownTestCase(void) {}
-
-void AudioHdiCaptureSceneTest::SetUp(void)
+void AudioHdiCaptureSceneTest::SetUpTestCase(void)
 {
-    char resolvedPath[] = "//system/lib/libaudio_hdi_proxy_server.z.so";
-    handleSo = dlopen(resolvedPath, RTLD_LAZY);
+#ifdef AUDIO_MPI_SO
+    char sdkResolvedPath[] = "//system/lib/libhdi_audio_interface_lib_render.z.so";
+    sdkSo = dlopen(sdkResolvedPath, RTLD_LAZY);
+    if (sdkSo == nullptr) {
+        return;
+    }
+    SdkInit = (int32_t (*)())(dlsym(sdkSo, "MpiSdkInit"));
+    if (SdkInit == nullptr) {
+        return;
+    }
+    SdkExit = (void (*)())(dlsym(sdkSo, "MpiSdkExit"));
+    if (SdkExit == nullptr) {
+        return;
+    }
+    SdkInit();
+#endif
+    handleSo = dlopen(RESOLVED_PATH.c_str(), RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
     }
-    GetAudioManager = (struct AudioManager *(*)())(dlsym(handleSo, "GetAudioProxyManagerFuncs"));
+    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
     if (GetAudioManager == nullptr) {
         return;
     }
 }
 
-void AudioHdiCaptureSceneTest::TearDown(void)
+void AudioHdiCaptureSceneTest::TearDownTestCase(void)
 {
+#ifdef AUDIO_MPI_SO
+    SdkExit();
+    if (sdkSo != nullptr) {
+        dlclose(sdkSo);
+        sdkSo = nullptr;
+    }
+    if (SdkInit != nullptr) {
+        SdkInit = nullptr;
+    }
+    if (SdkExit != nullptr) {
+        SdkExit = nullptr;
+    }
+#endif
     if (GetAudioManager != nullptr) {
         GetAudioManager = nullptr;
     }
 }
-
-int32_t AudioHdiCaptureSceneTest::GetLoadAdapter(struct AudioManager manager, enum AudioPortDirection portType,
-    const string adapterName, struct AudioAdapter **adapter, struct AudioPort& audioPort) const
-{
-    int32_t ret = -1;
-    int size = 0;
-    struct AudioAdapterDescriptor *desc = nullptr;
-    struct AudioAdapterDescriptor *descs = nullptr;
-    if (adapter == nullptr) {
-        return HDF_FAILURE;
-    }
-    ret = manager.GetAllAdapters(&manager, &descs, &size);
-    if (ret < 0 || descs == nullptr || size == 0) {
-        return HDF_FAILURE;
-    } else {
-        int index = SwitchAdapter(descs, adapterName, portType, audioPort, size);
-        if (index < 0) {
-            return HDF_FAILURE;
-        } else {
-            desc = &descs[index];
-        }
-    }
-    if (desc == nullptr) {
-        return HDF_FAILURE;
-    } else {
-        ret = manager.LoadAdapter(&manager, desc, adapter);
-    }
-    if (ret < 0 || adapter == nullptr) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-int32_t AudioHdiCaptureSceneTest::AudioCreateCapture(enum AudioPortPin pins, struct AudioManager manager,
-    struct AudioPort capturePort, struct AudioAdapter *adapter, struct AudioCapture **capture) const
-{
-    int32_t ret = -1;
-    struct AudioSampleAttributes attrs = {};
-    struct AudioDeviceDescriptor devDesc = {};
-    if (adapter == nullptr || adapter->CreateCapture == nullptr || capture == nullptr) {
-        return HDF_FAILURE;
-    }
-    ret = InitAttrs(attrs);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
-    ret = InitDevDesc(devDesc, capturePort.portId, pins);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
-    ret = adapter->CreateCapture(adapter, &devDesc, &attrs, capture);
-    if (ret < 0 || *capture == nullptr) {
-        manager.UnloadAdapter(&manager, adapter);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
 int32_t AudioHdiCaptureSceneTest::AudioCaptureStart(const string path, struct AudioCapture *capture) const
 {
     int32_t ret = -1;
@@ -164,6 +137,8 @@ int32_t AudioHdiCaptureSceneTest::AudioCaptureStart(const string path, struct Au
     fclose(file);
     return HDF_SUCCESS;
 }
+void AudioHdiCaptureSceneTest::SetUp(void) {}
+void AudioHdiCaptureSceneTest::TearDown(void) {}
 
 /**
 * @tc.name   Test AudioCaptureCheckSceneCapability API and check scene's capability
@@ -175,24 +150,13 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
 {
     int32_t ret = -1;
     bool supported = false;
-    struct AudioPort capturePort = {};
-    enum AudioPortDirection portType = PORT_IN;
-    enum AudioPortPin pins = PIN_IN_MIC;
+    struct AudioSceneDescriptor scenes = {};
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    struct AudioSceneDescriptor scenes = {};
-
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, portType, ADAPTER_NAME2, &adapter, capturePort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
-
-    ret = AudioCreateCapture(pins, manager, capturePort, adapter, &capture);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_IN_MIC;
     ret = capture->scene.CheckSceneCapability(capture, &scenes, &supported);
@@ -203,33 +167,22 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
     manager.UnloadAdapter(&manager, adapter);
 }
 /**
-* @tc.name   Test checking scene's capability where the scene is not configed in the josn.
+* @tc.name   Test checking scene's capability where the scene is not configured in the json.
 * @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_0002
-* @tc.desc  Test AudioCreateCapture interface,return -1 if the scene is not configed in the josn.
+* @tc.desc  Test AudioCreateCapture interface,return -1 if the scene is not configured in the json.
 * @tc.author: ZHANGHAILIN
 */
 HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_0002, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = true;
-    struct AudioPort capturePort = {};
-    enum AudioPortDirection portType = PORT_IN;
-    enum AudioPortPin pins = PIN_IN_MIC;
+    struct AudioSceneDescriptor scenes = {};
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    struct AudioSceneDescriptor scenes = {};
-
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, portType, ADAPTER_NAME2, &adapter, capturePort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
-
-    ret = AudioCreateCapture(pins, manager, capturePort, adapter, &capture);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
     scenes.scene.id = 5;
     scenes.desc.pins = PIN_IN_MIC;
     ret = capture->scene.CheckSceneCapability(capture, &scenes, &supported);
@@ -248,25 +201,14 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
 {
     int32_t ret = -1;
     bool supported = true;
-    struct AudioPort capturePort = {};
-    enum AudioPortDirection portType = PORT_IN;
-    enum AudioPortPin pins = PIN_IN_MIC;
+    struct AudioSceneDescriptor scenes = {};
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
-    struct AudioSceneDescriptor scenes = {};
-
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, portType, ADAPTER_NAME2, &adapter, capturePort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
-
-    ret = AudioCreateCapture(pins, manager, capturePort, adapter, &capture);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_IN_MIC;
     ret = capture->scene.CheckSceneCapability(captureNull, &scenes, &supported);
@@ -289,24 +231,13 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
 {
     int32_t ret = -1;
     bool supported = true;
-    struct AudioPort capturePort = {};
-    enum AudioPortDirection portType = PORT_IN;
-    enum AudioPortPin pins = PIN_IN_MIC;
+    struct AudioSceneDescriptor *scenes = nullptr;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    struct AudioSceneDescriptor *scenes = nullptr;
-
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, portType, ADAPTER_NAME2, &adapter, capturePort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
-
-    ret = AudioCreateCapture(pins, manager, capturePort, adapter, &capture);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
 
     ret = capture->scene.CheckSceneCapability(capture, scenes, &supported);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -327,33 +258,19 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
 HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_0005, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioPort capturePort = {};
-    enum AudioPortDirection portType = PORT_IN;
-    enum AudioPortPin pins = PIN_IN_MIC;
+    struct AudioSceneDescriptor scenes = {};
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    struct AudioSceneDescriptor scenes = {};
-
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, portType, ADAPTER_NAME2, &adapter, capturePort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
 
-    ret = AudioCreateCapture(pins, manager, capturePort, adapter, &capture);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_IN_MIC;
     ret = capture->scene.CheckSceneCapability(capture, &scenes, nullptr);
     EXPECT_EQ(HDF_FAILURE, ret);
 
-    ret = AudioCaptureStart(AUDIO_CAPTURE_FILE, capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    capture->control.Stop((AudioHandle)capture);
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -366,24 +283,13 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
 HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioPort capturePort = {};
-    enum AudioPortDirection portType = PORT_IN;
-    enum AudioPortPin pins = PIN_IN_MIC;
+    struct AudioSceneDescriptor scenes = {};
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    struct AudioSceneDescriptor scenes = {};
-
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, portType, ADAPTER_NAME2, &adapter, capturePort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
-
-    ret = AudioCreateCapture(pins, manager, capturePort, adapter, &capture);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_IN_MIC;
     ret = capture->scene.SelectScene(capture, &scenes);
@@ -401,24 +307,13 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0001, T
 HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioPort capturePort = {};
-    enum AudioPortDirection portType = PORT_IN;
-    enum AudioPortPin pins = PIN_IN_MIC;
+    struct AudioSceneDescriptor scenes = {};
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    struct AudioSceneDescriptor scenes = {};
-
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, portType, ADAPTER_NAME2, &adapter, capturePort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
-
-    ret = AudioCreateCapture(pins, manager, capturePort, adapter, &capture);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
 
     ret = AudioCaptureStart(AUDIO_CAPTURE_FILE, capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -441,25 +336,15 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0002, T
 HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0003, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioPort capturePort = {};
-    enum AudioPortDirection portType = PORT_IN;
-    enum AudioPortPin pins = PIN_IN_MIC;
+    struct AudioSceneDescriptor scenes = {};
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
-    struct AudioSceneDescriptor scenes = {};
-
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, portType, ADAPTER_NAME2, &adapter, capturePort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
 
-    ret = AudioCreateCapture(pins, manager, capturePort, adapter, &capture);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_IN_MIC;
     ret = capture->scene.SelectScene(captureNull, &scenes);
@@ -477,24 +362,13 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0003, T
 HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0004, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioPort capturePort = {};
-    enum AudioPortDirection portType = PORT_IN;
-    enum AudioPortPin pins = PIN_IN_MIC;
+    struct AudioSceneDescriptor *scenes = nullptr;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    struct AudioSceneDescriptor *scenes = nullptr;
-
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, portType, ADAPTER_NAME2, &adapter, capturePort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
-
-    ret = AudioCreateCapture(pins, manager, capturePort, adapter, &capture);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
 
     ret = capture->scene.SelectScene(capture, scenes);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -503,32 +377,22 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0004, T
     manager.UnloadAdapter(&manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureSelectScene API where the scene is not configed in the josn.
+* @tc.name  Test AudioCaptureSelectScene API where the scene is not configured in the json.
 * @tc.number  SUB_Audio_HDI_AudioCaptureSelectScene_0005
-* @tc.desc  Test AudioCaptureSelectScene, return -1 if the scene is not configed in the josn.
+* @tc.desc  Test AudioCaptureSelectScene, return -1 if the scene is not configured in the json.
 * @tc.author: ZHANGHAILIN
 */
 HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0005, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioPort capturePort = {};
-    enum AudioPortDirection portType = PORT_IN;
-    enum AudioPortPin pins = PIN_IN_MIC;
+    struct AudioSceneDescriptor scenes = {};
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    struct AudioSceneDescriptor scenes = {};
-
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, portType, ADAPTER_NAME2, &adapter, capturePort);
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
 
-    ret = AudioCreateCapture(pins, manager, capturePort, adapter, &capture);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
     scenes.scene.id = 5;
     scenes.desc.pins = PIN_OUT_HDMI;
     ret = capture->scene.SelectScene(capture, &scenes);

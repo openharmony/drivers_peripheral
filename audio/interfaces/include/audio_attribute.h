@@ -113,7 +113,7 @@ struct AudioAttribute {
      * The format is <i>key=value</i>. Separate multiple key-value pairs by semicolons (;).
      * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
      */
-    int32_t (*GetExtraParams)(AudioHandle handle, char *keyValueList);
+    int32_t (*GetExtraParams)(AudioHandle handle, char *keyValueList, int32_t listLenth);
 
     /**
      * @brief Requests a mmap buffer.

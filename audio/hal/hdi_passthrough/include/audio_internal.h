@@ -21,6 +21,9 @@
 #include "audio_common.h"
 #include "hdf_base.h"
 #include <math.h>
+#include <sys/mman.h>
+#include <pthread.h>
+#include <errno.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,6 +45,14 @@ extern "C" {
 #define VOLUME_CHANGE 100
 #define SEC_TO_NSEC 1000000000
 #define HDMI_PORT_ID 12
+#define MAP_MAX 100
+#define FORMAT_ONE "%-5d  %-10d  %-20llu  %-15s  %s\n"
+#define FORMAT_TWO "%-5d  %-10d  %s\n"
+#define ERROR_LOG_MAX_NUM 8
+#define ERROR_REASON_DESC_LEN 128
+#define RANGE_MAX 5
+#define RANGE_MIN 4
+#define EXTPARAM_LEN 32
 
 #ifndef LOGE
     #define LOGE(fmt, arg...) printf("[Audio:E]" fmt "\n", ##arg)
@@ -78,22 +89,48 @@ extern "C" {
     #define STATIC_T
 #endif
 
+#ifdef __LITEOS__
+#define SO_INTERFACE_LIB_RENDER_PATH "/usr/lib/libhdi_audio_interface_lib_render.so"
+#define SO_INTERFACE_LIB_CAPTURE_PATH "/usr/lib/libhdi_audio_interface_lib_capture.so"
+#else
 #define SO_INTERFACE_LIB_RENDER_PATH "/system/lib/libhdi_audio_interface_lib_render.z.so"
 #define SO_INTERFACE_LIB_CAPTURE_PATH "/system/lib/libhdi_audio_interface_lib_capture.z.so"
+#endif
 
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
+#ifdef __LITEOS__
+#define SO_CJSON_LIB_PATHSELECT_PATH "/usr/lib/libhdi_audio_path_select.so"
+#else
 #define SO_CJSON_LIB_PATHSELECT_PATH "/system/lib/libhdi_audio_path_select.z.so"
+#endif
 #endif
 
 #define  USECASE_AUDIO_RENDER_DEEP_BUFFER  "deep-buffer-render"
 #define  USECASE_AUDIO_RENDER_LOW_LATENCY  "low-latency-render"
 
+#define AUDIO_ATTR_PARAM_ROUTE "attr-route"
+#define ROUTE_SAMPLE "attr-route=x;"
+#define AUDIO_ATTR_PARAM_FORMAT "attr-format"
+#define FORMAT_SAMPLE "attr-format=xx;"
+#define AUDIO_ATTR_PARAM_CHANNELS "attr-channels"
+#define CHANNELS_SAMPLE "attr-channels=x;"
+#define AUDIO_ATTR_PARAM_FRAME_COUNT "attr-frame-count"
+#define FRAME_COUNT_SAMPLE "attr-frame-count=xxxxxxxxxxxxxxxxxxxx;"
+#define AUDIO_ATTR_PARAM_SAMPLING_RATE "attr-sampling-rate"
+#define SAMPLING_RATE_SAMPLE "attr-sampling-rate=xxxxx"
+#define AUDIO_ATTR_PARAM_CONNECT "usb-connect"
+#define AUDIO_ATTR_PARAM_DISCONNECT "usb-disconnect"
 #define TELHPONE_RATE 8000
 #define BROADCAST_AM_RATE 11025
 #define BROADCAST_FM_RATE 22050
 #define MINI_CAM_DV_RATE 32000
 #define MUSIC_RATE 44100
 #define HIGHT_MUSIC_RATE 48000
+#define AUDIO_SAMPLE_RATE_12000 12000
+#define AUDIO_SAMPLE_RATE_16000 16000
+#define AUDIO_SAMPLE_RATE_24000 24000
+#define AUDIO_SAMPLE_RATE_64000 64000
+#define AUDIO_SAMPLE_RATE_96000 96000
 #define OPEN_AUDIO_LOG_WITH_TIME 1
 #define MAX_TIME_INFO_LEN 64
 
@@ -141,6 +178,9 @@ struct AudioHwAdapter {
     struct AudioAdapter common;
     struct AudioAdapterDescriptor adapterDescriptor;
     struct AudioPortAndCapability *portCapabilitys;
+    struct HdfRemoteService *proxyRemoteHandle; // proxyRemoteHandle
+    int32_t adapterMgrRenderFlag;
+    int32_t adapterMgrCaptureFlag;
 };
 
 struct AudioFrameRenderMode {
@@ -158,6 +198,9 @@ struct AudioFrameRenderMode {
     char *buffer;
     uint64_t bufferFrameSize;
     uint64_t bufferSize;
+    RenderCallback callback;
+    void* cookie;
+    struct AudioMmapBufferDescripter mmapBufDesc;
 };
 
 struct AudioGain {
@@ -176,6 +219,10 @@ struct AudioCtlParam {
     float volume;
     float speed;
     bool pause;
+    bool stop;
+    pthread_mutex_t mutex;
+    bool mutexFlag;
+    pthread_cond_t functionCond;
     struct AudioVol volThreshold;
     struct AudioGain audioGain;
 };
@@ -231,11 +278,27 @@ struct AudioHwRenderParam {
     struct AudioFrameRenderMode frameRenderMode;
 };
 
+struct ErrorDump {
+    int32_t errorCode;
+    int32_t count;
+    uint64_t frames;
+    char* reason;                       // Specific reasons for failure
+    char* currentTime;
+};
+
+struct ErrorLog {
+    uint32_t totalErrors;
+    uint32_t iter;
+    struct ErrorDump errorDump[ERROR_LOG_MAX_NUM];
+};
+
 struct AudioHwRender {
     struct AudioRender common;
     struct AudioHwRenderParam renderParam;
     struct DevHandle *devDataHandle;   // Bind Data handle
     struct DevHandle *devCtlHandle;    // Bind Ctl handle
+    struct HdfRemoteService *proxyRemoteHandle; // proxyRemoteHandle
+    struct ErrorLog errorLog;
 };
 
 struct AudioHwCaptureMode {
@@ -258,6 +321,7 @@ struct AudioFrameCaptureMode {
     char *buffer;
     uint64_t bufferFrameSize;
     uint64_t bufferSize;
+    struct AudioMmapBufferDescripter mmapBufDesc;
 };
 
 struct AudioHwCaptureParam {
@@ -270,6 +334,26 @@ struct AudioHwCapture {
     struct AudioHwCaptureParam captureParam;
     struct DevHandleCapture *devDataHandle;   // Bind Data handle
     struct DevHandleCapture *devCtlHandle;    // Bind Ctl handle
+    struct HdfRemoteService *proxyRemoteHandle; // proxyRemoteHandle
+    struct ErrorLog errorLog;
+};
+
+struct ParamValMap {
+    char key[EXTPARAM_LEN];
+    char value[EXTPARAM_LEN];
+};
+
+struct ExtraParams {
+    int32_t route;
+    int32_t format;
+    uint32_t channels;
+    uint64_t frames;
+    uint32_t sampleRate;
+    bool flag;
+};
+
+enum ErrorDumpCode {
+    WRITE_FRAME_ERROR_CODE = -5,
 };
 
 enum AudioAdaptType {
@@ -301,6 +385,10 @@ enum AudioInterfaceLibParaCmdList {
     AUDIO_DRV_PCM_IOCTRL_PAUSE_CAPTURE,
     AUDIO_DRV_PCM_IOCTRL_RESUME,
     AUDIO_DRV_PCM_IOCTRL_RESUME_CAPTURE,
+    AUDIO_DRV_PCM_IOCTL_MMAP_BUFFER,
+    AUDIO_DRV_PCM_IOCTL_MMAP_BUFFER_CAPTURE,
+    AUDIO_DRV_PCM_IOCTL_MMAP_POSITION,
+    AUDIO_DRV_PCM_IOCTL_MMAP_POSITION_CAPTURE,
     AUDIO_DRV_PCM_IOCTL_BUTT,
 };
 
@@ -374,7 +462,14 @@ int32_t AudioRenderSetRenderSpeed(struct AudioRender *render, float speed);
 int32_t AudioRenderGetRenderSpeed(struct AudioRender *render, float *speed);
 int32_t AudioRenderSetChannelMode(struct AudioRender *render, enum AudioChannelMode mode);
 int32_t AudioRenderGetChannelMode(struct AudioRender *render, enum AudioChannelMode *mode);
-
+int32_t AudioRenderSetExtraParams(AudioHandle handle, const char *keyValueList);
+int32_t AudioRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_t listLenth);
+int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc);
+int32_t AudioRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time);
+int32_t AudioRenderTurnStandbyMode(AudioHandle handle);
+int32_t AudioRenderAudioDevDump(AudioHandle handle, int32_t range, int32_t fd);
+int32_t AudioRenderRegCallback(struct AudioRender *render, RenderCallback callback, void* cookie);
+int32_t AudioRenderDrainBuffer(struct AudioRender *render, enum AudioDrainNotifyType *type);
 int32_t AudioCaptureStart(AudioHandle handle);
 int32_t AudioCaptureStop(AudioHandle handle);
 int32_t AudioCapturePause(AudioHandle handle);
@@ -398,6 +493,12 @@ int32_t AudioCaptureSetGain(AudioHandle handle, float gain);
 int32_t AudioCaptureCaptureFrame(struct AudioCapture *capture, void *frame,
                                  uint64_t requestBytes, uint64_t *replyBytes);
 int32_t AudioCaptureGetCapturePosition(struct AudioCapture *capture, uint64_t *frames, struct AudioTimeStamp *time);
+int32_t AudioCaptureSetExtraParams(AudioHandle handle, const char *keyValueList);
+int32_t AudioCaptureGetExtraParams(AudioHandle handle, char *keyValueList, int32_t listLenth);
+int32_t AudioCaptureReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc);
+int32_t AudioCaptureGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time);
+int32_t AudioCaptureTurnStandbyMode(AudioHandle handle);
+int32_t AudioCaptureAudioDevDump(AudioHandle handle, int32_t range, int32_t fd);
 
 #ifdef __cplusplus
 }

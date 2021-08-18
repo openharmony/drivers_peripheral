@@ -41,10 +41,8 @@ using namespace testing::ext;
 using namespace HMOS::Audio;
 
 namespace {
-const string AUDIO_FILE = "//bin/audiorendertest.wav";
-const string ADAPTER_NAME = "hdmi";
-const string ADAPTER_NAME2 = "usb";
-const string ADAPTER_NAME3 = "internal";
+const string ADAPTER_NAME_USB = "usb";
+const string ADAPTER_NAME_INTERNAL = "internal";
 
 class AudioHdiRenderSceneTest : public testing::Test {
 public:
@@ -52,234 +50,76 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct AudioManager *(*GetAudioManager)() = nullptr;
-    void *handleSo = nullptr;
-    int32_t GetLoadAdapter(struct AudioManager manager, enum AudioPortDirection portType,
-                           const string adapterName, struct AudioAdapter **adapter, struct AudioPort& audioPort) const;
-    int32_t AudioCreateRender(enum AudioPortPin pins, struct AudioManager manager, struct AudioAdapter *adapter,
-                              const struct AudioPort renderPort, struct AudioRender **render) const;
-    int32_t AudioRenderStart(const string path, struct AudioRender *render) const;
-    static int32_t GetLoadAdapterAudioPara(struct PrepareAudioPara& audiopara);
-    static int32_t PlayAudioFile(struct PrepareAudioPara& audiopara);
+    static TestAudioManager *(*GetAudioManager)();
+    static void *handleSo;
+#ifdef AUDIO_MPI_SO
+    static int32_t (*SdkInit)();
+    static void (*SdkExit)();
+    static void *sdkSo;
+#endif
 };
 
 using THREAD_FUNC = void *(*)(void *);
 
-void AudioHdiRenderSceneTest::SetUpTestCase(void) {}
+TestAudioManager *(*AudioHdiRenderSceneTest::GetAudioManager)() = nullptr;
+void *AudioHdiRenderSceneTest::handleSo = nullptr;
+#ifdef AUDIO_MPI_SO
+    int32_t (*AudioHdiRenderSceneTest::SdkInit)() = nullptr;
+    void (*AudioHdiRenderSceneTest::SdkExit)() = nullptr;
+    void *AudioHdiRenderSceneTest::sdkSo = nullptr;
+#endif
 
-void AudioHdiRenderSceneTest::TearDownTestCase(void) {}
-
-void AudioHdiRenderSceneTest::SetUp(void)
+void AudioHdiRenderSceneTest::SetUpTestCase(void)
 {
-    char resolvedPath[] = "//system/lib/libaudio_hdi_proxy_server.z.so";
-    handleSo = dlopen(resolvedPath, RTLD_LAZY);
+#ifdef AUDIO_MPI_SO
+    char sdkResolvedPath[] = "//system/lib/libhdi_audio_interface_lib_render.z.so";
+    sdkSo = dlopen(sdkResolvedPath, RTLD_LAZY);
+    if (sdkSo == nullptr) {
+        return;
+    }
+    SdkInit = (int32_t (*)())(dlsym(sdkSo, "MpiSdkInit"));
+    if (SdkInit == nullptr) {
+        return;
+    }
+    SdkExit = (void (*)())(dlsym(sdkSo, "MpiSdkExit"));
+    if (SdkExit == nullptr) {
+        return;
+    }
+    SdkInit();
+#endif
+    handleSo = dlopen(RESOLVED_PATH.c_str(), RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
     }
-    GetAudioManager = (struct AudioManager* (*)())(dlsym(handleSo, "GetAudioProxyManagerFuncs"));
+    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
     if (GetAudioManager == nullptr) {
         return;
     }
 }
 
-void AudioHdiRenderSceneTest::TearDown(void)
+void AudioHdiRenderSceneTest::TearDownTestCase(void)
 {
+#ifdef AUDIO_MPI_SO
+    SdkExit();
+    if (sdkSo != nullptr) {
+        dlclose(sdkSo);
+        sdkSo = nullptr;
+    }
+    if (SdkInit != nullptr) {
+        SdkInit = nullptr;
+    }
+    if (SdkExit != nullptr) {
+        SdkExit = nullptr;
+    }
+#endif
     if (GetAudioManager != nullptr) {
         GetAudioManager = nullptr;
     }
 }
 
-int32_t AudioHdiRenderSceneTest::GetLoadAdapter(struct AudioManager manager, enum AudioPortDirection portType,
-    const string adapterName, struct AudioAdapter **adapter, struct AudioPort& audioPort) const
-{
-    int32_t ret = -1;
-    int size = 0;
-    struct AudioAdapterDescriptor *desc = nullptr;
-    struct AudioAdapterDescriptor *descs = nullptr;
-    if (adapter == nullptr) {
-        return HDF_FAILURE;
-    }
-    ret = manager.GetAllAdapters(&manager, &descs, &size);
-    if (ret < 0 || descs == nullptr || size == 0) {
-        return HDF_FAILURE;
-    } else {
-        int index = SwitchAdapter(descs, adapterName, portType, audioPort, size);
-        if (index < 0) {
-            return HDF_FAILURE;
-        } else {
-            desc = &descs[index];
-        }
-    }
-    if (desc == nullptr) {
-        return HDF_FAILURE;
-    } else {
-        ret = manager.LoadAdapter(&manager, desc, adapter);
-    }
-    if (ret < 0 || adapter == nullptr) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
+void AudioHdiRenderSceneTest::SetUp(void) {}
 
-int32_t AudioHdiRenderSceneTest::AudioCreateRender(enum AudioPortPin pins, struct AudioManager manager,
-    struct AudioAdapter *adapter, const struct AudioPort renderPort, struct AudioRender **render) const
-{
-    int32_t ret = -1;
-    struct AudioSampleAttributes attrs = {};
-    struct AudioDeviceDescriptor devDesc = {};
-    if (adapter == nullptr || adapter->CreateRender == nullptr || render == nullptr) {
-        return HDF_FAILURE;
-    }
-    ret = InitAttrs(attrs);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
-    ret = InitDevDesc(devDesc, renderPort.portId, pins);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
-    ret = adapter->CreateRender(adapter, &devDesc, &attrs, render);
-    if (ret < 0 || *render == nullptr) {
-        manager.UnloadAdapter(&manager, adapter);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-int32_t AudioHdiRenderSceneTest::AudioRenderStart(const string path, struct AudioRender *render) const
-{
-    int32_t ret = -1;
-    struct AudioSampleAttributes attrs = {};
-    struct AudioHeadInfo headInfo = {};
-
-    if (render == nullptr) {
-        return HDF_FAILURE;
-    }
-    ret = InitAttrs(attrs);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
-    char absPath[PATH_MAX] = {0};
-    if (realpath(path.c_str(), absPath) == nullptr) {
-        printf("path is not exist");
-        return HDF_FAILURE;
-    }
-    FILE *file = fopen(absPath, "rb");
-    if (file == nullptr) {
-        return HDF_FAILURE;
-    }
-    ret = WavHeadAnalysis(headInfo, file, attrs);
-    if (ret < 0) {
-        fclose(file);
-        return HDF_FAILURE;
-    }
-    ret = FrameStart(headInfo, render, file, attrs);
-    if (ret < 0) {
-        fclose(file);
-        return HDF_FAILURE;
-    }
-    fclose(file);
-    return HDF_SUCCESS;
-}
-
-struct PrepareAudioPara {
-    struct AudioManager *manager;
-    enum AudioPortDirection portType;
-    const char *adapterName;
-    struct AudioAdapter *adapter;
-    struct AudioPort audioPort;
-    void *self;
-    enum AudioPortPin pins;
-    const char *path;
-    struct AudioRender *render;
-    struct AudioCapture *capture;
-    struct AudioHeadInfo headInfo;
-    struct AudioAdapterDescriptor *desc;
-    struct AudioAdapterDescriptor *descs;
-    char *frame;
-    uint64_t requestBytes;
-    uint64_t replyBytes;
-    uint64_t fileSize;
-    struct AudioSampleAttributes attrs;
-};
-
-int32_t AudioHdiRenderSceneTest::GetLoadAdapterAudioPara(struct PrepareAudioPara& audiopara)
-{
-    int32_t ret = -1;
-    int size = 0;
-    auto *inst = (AudioHdiRenderSceneTest *)audiopara.self;
-    if (inst != nullptr && inst->GetAudioManager != nullptr) {
-        audiopara.manager = inst->GetAudioManager();
-    }
-    if (audiopara.manager == nullptr) {
-        return HDF_FAILURE;
-    }
-    ret = audiopara.manager->GetAllAdapters(audiopara.manager, &audiopara.descs, &size);
-    if (ret < 0 || audiopara.descs == nullptr || size == 0) {
-        return HDF_FAILURE;
-    } else {
-        int index = SwitchAdapter(audiopara.descs, audiopara.adapterName,
-            audiopara.portType, audiopara.audioPort, size);
-        if (index < 0) {
-            return HDF_FAILURE;
-        } else {
-            audiopara.desc = &audiopara.descs[index];
-        }
-    }
-    if (audiopara.desc == nullptr) {
-        return HDF_FAILURE;
-    } else {
-        ret = audiopara.manager->LoadAdapter(audiopara.manager, audiopara.desc, &audiopara.adapter);
-    }
-    if (ret < 0 || audiopara.adapter == nullptr) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-int32_t AudioHdiRenderSceneTest::PlayAudioFile(struct PrepareAudioPara& audiopara)
-{
-    int32_t ret = -1;
-    struct AudioDeviceDescriptor devDesc = {};
-    char absPath[PATH_MAX] = {0};
-    if (realpath(audiopara.path, absPath) == nullptr) {
-        printf("path is not exist");
-        return HDF_FAILURE;
-    }
-    FILE *file = fopen(absPath, "rb");
-    if (file == nullptr) {
-        return HDF_FAILURE;
-    }
-    if (audiopara.adapter == nullptr  || audiopara.manager == nullptr) {
-        return HDF_FAILURE;
-    }
-    ret = HMOS::Audio::InitAttrs(audiopara.attrs);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
-    if (WavHeadAnalysis(audiopara.headInfo, file, audiopara.attrs) < 0) {
-        return HDF_FAILURE;
-    }
-
-    ret = HMOS::Audio::InitDevDesc(devDesc, (&audiopara.audioPort)->portId, audiopara.pins);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
-    ret = audiopara.adapter->CreateRender(audiopara.adapter, &devDesc, &(audiopara.attrs), &audiopara.render);
-    if (ret < 0 || audiopara.render == nullptr) {
-        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
-        return HDF_FAILURE;
-    }
-    ret = HMOS::Audio::FrameStart(audiopara.headInfo, audiopara.render, file, audiopara.attrs);
-    if (ret == HDF_SUCCESS) {
-        fclose(file);
-    } else {
-        audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
-        fclose(file);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
+void AudioHdiRenderSceneTest::TearDown(void) {}
 
 /**
 * @tc.name   Test AudioRenderCheckSceneCapability API and check scene's capability
@@ -292,19 +132,12 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0001,
     int32_t ret = -1;
     bool supported = false;
     struct AudioSceneDescriptor scenes = {};
-    struct AudioPort renderPort = {};
-    struct AudioAdapter *adapter = {};
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, renderPort);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = AudioCreateRender(PIN_OUT_SPEAKER, manager, adapter, renderPort, &render);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_OUT_SPEAKER;
@@ -326,19 +159,12 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0002,
     int32_t ret = -1;
     bool supported = true;
     struct AudioSceneDescriptor scenes = {};
-    struct AudioPort renderPort = {};
-    struct AudioAdapter *adapter = {};
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, renderPort);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = AudioCreateRender(PIN_OUT_SPEAKER, manager, adapter, renderPort, &render);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     scenes.scene.id = 5;
     scenes.desc.pins = PIN_OUT_SPEAKER;
@@ -359,20 +185,13 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0003,
     int32_t ret = -1;
     bool supported = true;
     struct AudioSceneDescriptor scenes = {};
-    struct AudioPort renderPort = {};
-    struct AudioAdapter *adapter = {};
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, renderPort);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = AudioCreateRender(PIN_OUT_SPEAKER, manager, adapter, renderPort, &render);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_OUT_SPEAKER;
@@ -393,19 +212,12 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0004,
     int32_t ret = -1;
     bool supported = true;
     struct AudioSceneDescriptor *scenes = nullptr;
-    struct AudioPort renderPort = {};
-    struct AudioAdapter *adapter = {};
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, renderPort);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = AudioCreateRender(PIN_OUT_SPEAKER, manager, adapter, renderPort, &render);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = render->scene.CheckSceneCapability(render, scenes, &supported);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -423,19 +235,12 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0005,
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
-    struct AudioPort renderPort = {};
-    struct AudioAdapter *adapter = {};
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, renderPort);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = AudioCreateRender(PIN_OUT_SPEAKER, manager, adapter, renderPort, &render);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_OUT_SPEAKER;
@@ -455,32 +260,23 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0001, Tes
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
-    struct AudioPort renderPort = {};
-    struct AudioAdapter *adapter = {};
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, renderPort);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = AudioCreateRender(PIN_OUT_SPEAKER, manager, adapter, renderPort, &render);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
-
+    TestAudioManager manager = *GetAudioManager();
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_OUT_SPEAKER;
+
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = render->scene.SelectScene(render, &scenes);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
-    ret = AudioRenderStart(AUDIO_FILE, render);
+    ret = AudioRenderStartAndOneFrame(render);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = render->control.Stop((AudioHandle)render);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -494,22 +290,13 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0002, Tes
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
-    struct AudioPort renderPort = {};
-    struct AudioAdapter *adapter = {};
+    TestAudioManager manager = {};
+    struct AudioAdapter *adapter =nullptr;
     struct AudioRender *render = nullptr;
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, renderPort);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = AudioCreateRender(PIN_OUT_SPEAKER, manager, adapter, renderPort, &render);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
-
-    ret = AudioRenderStart(AUDIO_FILE, render);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    manager = *GetAudioManager();
+    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_OUT_SPEAKER;
@@ -517,8 +304,6 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0002, Tes
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = render->control.Stop((AudioHandle)render);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -532,20 +317,13 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0003, Tes
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
-    struct AudioPort renderPort = {};
-    struct AudioAdapter *adapter = {};
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, renderPort);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = AudioCreateRender(PIN_OUT_SPEAKER, manager, adapter, renderPort, &render);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_IN_MIC;
@@ -565,19 +343,12 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0004, Tes
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor *scenes = nullptr;
-    struct AudioPort renderPort = {};
-    struct AudioAdapter *adapter = {};
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, renderPort);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = AudioCreateRender(PIN_OUT_SPEAKER, manager, adapter, renderPort, &render);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = render->scene.SelectScene(render, scenes);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -595,19 +366,12 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0005, Tes
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
-    struct AudioPort renderPort = {};
-    struct AudioAdapter *adapter = {};
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    struct AudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME2, &adapter, renderPort);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = AudioCreateRender(PIN_OUT_SPEAKER, manager, adapter, renderPort, &render);
-    if (ret < 0) {
-        manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    TestAudioManager manager = *GetAudioManager();
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 
     scenes.scene.id = 5;
     scenes.desc.pins = PIN_OUT_HDMI;

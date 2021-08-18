@@ -26,11 +26,20 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <stdarg.h>
 #include "securec.h"
+
+enum {INFO};
+#define FILE_NAME_LEN 256
+#define TIME_LEN 32
 
 void AudioDlClose(void **ppHandleSo);
 void AudioMemFree(void **ppMem);
 int32_t AudioGetSysTime(char *s, int32_t len);
+int32_t CheckAttrFormat(enum AudioFormat param);
+int32_t CheckAttrSamplingRate(uint32_t param);
 int32_t AudioCheckParaAttr(const struct AudioSampleAttributes *attrs);
+int32_t TimeToAudioTimeStamp(uint64_t bufferFrameSize, struct AudioTimeStamp *time, uint32_t sampleRate);
+void AudioLogRecord(int errorLevel, const char *format, ...);
 
 #endif

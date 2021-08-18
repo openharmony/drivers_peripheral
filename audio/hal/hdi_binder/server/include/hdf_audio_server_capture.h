@@ -15,14 +15,7 @@
 #ifndef HDF_AUDIO_SERVER_CAPTURE_H
 #define HDF_AUDIO_SERVER_CAPTURE_H
 
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-#include "hdf_log.h"
-#include "hdf_base.h"
 #include "hdf_device_desc.h"
-#include "hdf_remote_service.h"
-#include "hdf_audio_server_common.h"
 
 int32_t HdiServiceCreatCapture(struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
@@ -69,6 +62,18 @@ int32_t HdiServiceCaptureSetGain(struct HdfDeviceIoClient *client,
 int32_t HdiServiceCaptureCaptureFrame(struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
 int32_t HdiServiceCaptureGetCapturePosition(struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceCaptureSetExtraParams(struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceCaptureGetExtraParams(struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceCaptureReqMmapBuffer(struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceCaptureGetMmapPosition(struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceCaptureTurnStandbyMode(struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceCaptureDevDump(struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
 
 #endif

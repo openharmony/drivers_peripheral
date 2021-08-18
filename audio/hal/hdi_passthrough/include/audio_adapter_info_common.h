@@ -16,8 +16,6 @@
 #ifndef AUDIO_ADAPTER_INFO_COMMON_H
 #define AUDIO_ADAPTER_INFO_COMMON_H
 
-#include <stdint.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <dlfcn.h>
 #include <sys/stat.h>
@@ -26,8 +24,10 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <time.h>
 #include "securec.h"
 #include "audio_types.h"
+#include "audio_internal.h"
 
 struct AudioAdapterDescriptor *AudioAdapterGetConfigOut(void);
 struct AudioAdapterDescriptor *AudioAdapterGetConfigDescs(void);
@@ -35,4 +35,18 @@ int32_t AudioAdapterGetAdapterNum(void);
 int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size);
 int32_t AudioAdapterExist(const char *adapterName);
 int32_t HdmiPortInit(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex);
+int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamValMap[], int32_t *count);
+int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key, void *value);
+int32_t GetErrorReason(int reason, char* reasonDesc);
+int32_t GetCurrentTime(char *time);
+int32_t CheckAttrRoute(int32_t param);
+int32_t CheckAttrChannel(uint32_t param);
+int32_t TransferRoute(char *value, int32_t *route);
+int32_t TransferFormat(char *value, int32_t *format);
+int32_t TransferChannels(char *value, uint32_t *channels);
+int32_t TransferFrames(char *value, uint64_t *frames);
+int32_t TransferSampleRate(char *value, uint32_t *sampleRate);
+int32_t FormatToBits(enum AudioFormat format, uint32_t *formatBits);
+int32_t BitsToFormat(enum AudioFormat *format, int32_t formatBits);
+int32_t SetExtParam(const char *key, char *value, struct ExtraParams *mExtraParams);
 #endif

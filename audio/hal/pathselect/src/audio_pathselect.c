@@ -21,7 +21,7 @@
 #define HS_MIC      "micHs"
 #define JSON_UNPRINT 1
 
-static cJSON *g_cJsonObj;
+static cJSON *g_cJsonObj = NULL;
 
 /* Depend on Audio_types.h : enum AudioCategory */
 enum AudioCategoryPathSel {
@@ -45,7 +45,6 @@ enum AudioPortPinPathSel {
 
 int32_t AudioPathSelGetConfToJsonObj()
 {
-    LOG_FUN_INFO();
     FILE *fpJson = NULL;
     char *pJsonStr = NULL;
     fpJson = fopen(CJSONFILE_CONFIG_PATH, "r");
@@ -60,6 +59,10 @@ int32_t AudioPathSelGetConfToJsonObj()
     }
     int32_t jsonStrSize = ftell(fpJson);
     rewind(fpJson);
+    if (jsonStrSize <= 0) {
+        fclose(fpJson);
+        return HDF_FAILURE;
+    }
     pJsonStr = (char *)calloc(1, jsonStrSize);
     if (NULL == pJsonStr) {
         fclose(fpJson);
@@ -144,7 +147,7 @@ static int32_t AudioPathSelGetPlanRenderScene(struct AudioHwRenderParam *renderS
         return HDF_FAILURE;
     }
     if (snprintf_s(pathName, sizeof(pathName), sizeof(pathName) - 1, "%s %s", useCase, deviceType) < 0) {
-        LOG_FUN_ERR("snprintf_s failed!");
+        LOG_FUN_ERR("snprintf_s Invalid!");
         return HDF_FAILURE;
     }
     if (g_cJsonObj == NULL) {
@@ -153,12 +156,12 @@ static int32_t AudioPathSelGetPlanRenderScene(struct AudioHwRenderParam *renderS
     }
     cJSON *pathNode = cJSON_GetObjectItem(g_cJsonObj, pathName);
     if (pathNode == NULL) {
-        LOG_FUN_ERR("Get Object Fail!");
+        LOG_FUN_ERR("Get Object Invalid!");
         return HDF_ERR_NOT_SUPPORT;
     }
     cJSON *deviceNode = cJSON_GetObjectItem(g_cJsonObj, deviceType);
     if (deviceNode == NULL) {
-        LOG_FUN_ERR("Get Object Fail!");
+        LOG_FUN_ERR("Get Object Invalid!");
         return HDF_ERR_NOT_SUPPORT;
     }
     ret = strncpy_s(renderSceneParam->renderMode.hwInfo.pathSelect.useCase,
@@ -233,14 +236,12 @@ static int32_t AudioPathSelGetPlanCaptureScene(struct AudioHwCaptureParam *captu
 
 static int32_t AudioCapturePathSelGetUsecaseDevice(struct AudioHwCaptureParam *captureParam, const char *pathName)
 {
-    LOG_FUN_INFO();
     if (captureParam == NULL || pathName == NULL || g_cJsonObj == NULL) {
         LOG_FUN_ERR("AudioCapturePathSelGetUsecaseDevice param Is NULL");
         return HDF_FAILURE;
     }
     int32_t pathIndex = 0;
     char *pathKey = NULL;
-    int32_t pathValue;
     int32_t ret;
     cJSON *pathNode = cJSON_GetObjectItem(g_cJsonObj, pathName);
     if (pathNode == NULL) {
@@ -255,7 +256,7 @@ static int32_t AudioCapturePathSelGetUsecaseDevice(struct AudioHwCaptureParam *c
     while (pathList != NULL) {
         cJSON *device = cJSON_GetObjectItem(pathList, "name");
         if (device == NULL) {
-            LOG_FUN_ERR("Get Object Fail!");
+            LOG_FUN_ERR("Get Object Invalid!");
             return HDF_FAILURE;
         }
         pathKey = device->valuestring;
@@ -263,8 +264,11 @@ static int32_t AudioCapturePathSelGetUsecaseDevice(struct AudioHwCaptureParam *c
             pathList = pathList->next;
             continue;
         }
-        pathValue = cJSON_GetObjectItem(pathList, "value")->valueint;
-        captureParam->captureMode.hwInfo.pathSelect.pathPlan[pathIndex].value = pathValue;
+        device = cJSON_GetObjectItem(pathList, "value");
+        if (device == NULL) {
+            return HDF_FAILURE;
+        }
+        captureParam->captureMode.hwInfo.pathSelect.pathPlan[pathIndex].value = device->valueint;
         ret = strncpy_s(captureParam->captureMode.hwInfo.pathSelect.pathPlan[pathIndex].pathPlanName,
                         PATHPLAN_LEN - 1, pathKey, strlen(pathKey) + 1);
         if (ret != 0) {
@@ -282,29 +286,20 @@ static int32_t AudioCapturePathSelGetUsecaseDevice(struct AudioHwCaptureParam *c
     return HDF_SUCCESS;
 }
 
-static int32_t AudioCapturePathSelGetDevice(struct AudioHwCaptureParam *captureParam, const char *deviceType)
+static int32_t AudioCapturePathSelGetDeviceSplit(struct AudioHwCaptureParam *captureParam, cJSON *deviceList)
 {
     LOG_FUN_INFO();
-    if (captureParam == NULL || deviceType == NULL || g_cJsonObj == NULL) {
-        LOG_FUN_ERR("AudioCapturePathSelGetUsecaseDevice param Is NULL");
-        return HDF_FAILURE;
-    }
     int32_t decIndex = 0;
     char *decKey = NULL;
     int32_t decValue;
     int32_t ret;
-    cJSON *deviceNode = cJSON_GetObjectItem(g_cJsonObj, deviceType);
-    if (deviceNode == NULL) {
-        LOG_FUN_ERR("Get deviceType Fail!");
-        return HDF_FAILURE;
-    }
-    cJSON *deviceList = deviceNode->child;
-    if (deviceList == NULL) {
-        LOG_FUN_ERR("Get deviceList Fail!");
+    cJSON *device = NULL;
+    if (captureParam == NULL || deviceList == NULL) {
+        LOG_FUN_ERR("param Is NULL");
         return HDF_FAILURE;
     }
     while (deviceList != NULL) {
-        cJSON *device = cJSON_GetObjectItem(deviceList, "name");
+        device = cJSON_GetObjectItem(deviceList, "name");
         if (device == NULL) {
             LOG_FUN_ERR("Get Object Fail!");
             return HDF_FAILURE;
@@ -314,7 +309,11 @@ static int32_t AudioCapturePathSelGetDevice(struct AudioHwCaptureParam *captureP
             deviceList = deviceList->next;
             continue;
         }
-        decValue = cJSON_GetObjectItem(deviceList, "value")->valueint;
+        device = cJSON_GetObjectItem(deviceList, "value");
+        if (device == NULL) {
+            return HDF_FAILURE;
+        }
+        decValue = device->valueint;
         captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[decIndex].value = decValue;
         ret = strncpy_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[decIndex].deviceSwitch,
                         PATHPLAN_LEN - 1, decKey, strlen(decKey) + 1);
@@ -330,6 +329,30 @@ static int32_t AudioCapturePathSelGetDevice(struct AudioHwCaptureParam *captureP
         return HDF_FAILURE;
     }
     captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceNum = decIndex;
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioCapturePathSelGetDevice(struct AudioHwCaptureParam *captureParam, const char *deviceType)
+{
+    LOG_FUN_INFO();
+    if (captureParam == NULL || deviceType == NULL || g_cJsonObj == NULL) {
+        LOG_FUN_ERR("AudioCapturePathSelGetUsecaseDevice param Is NULL");
+        return HDF_FAILURE;
+    }
+    cJSON *deviceNode = cJSON_GetObjectItem(g_cJsonObj, deviceType);
+    if (deviceNode == NULL) {
+        LOG_FUN_ERR("Get deviceType Fail!");
+        return HDF_FAILURE;
+    }
+    cJSON *deviceList = deviceNode->child;
+    if (deviceList == NULL) {
+        LOG_FUN_ERR("Get deviceList Fail!");
+        return HDF_FAILURE;
+    }
+    if (AudioCapturePathSelGetDeviceSplit(captureParam, deviceList) < 0) {
+        LOG_FUN_ERR("AudioCapturePathSelGetDeviceSplit Fail!");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
@@ -383,14 +406,12 @@ static int32_t AudioPathSelGetPlanCapture(struct AudioHwCaptureParam *capturePar
 
 static int32_t AudioRenderPathSelGetUsecaseDevice(struct AudioHwRenderParam *renderParam, const char *pathName)
 {
-    LOG_FUN_INFO();
     if (renderParam == NULL || pathName == NULL || g_cJsonObj == NULL) {
         LOG_FUN_ERR("AudioPathSelGetUsecaseDevice param Is NULL");
         return HDF_FAILURE;
     }
     int32_t pathIndex = 0;
     char *pathKey = NULL;
-    int32_t pathValue;
     int32_t ret;
     cJSON *pathNode = cJSON_GetObjectItem(g_cJsonObj, pathName);
     if (pathNode == NULL) {
@@ -413,8 +434,11 @@ static int32_t AudioRenderPathSelGetUsecaseDevice(struct AudioHwRenderParam *ren
             pathList = pathList->next;
             continue;
         }
-        pathValue = cJSON_GetObjectItem(pathList, "value")->valueint;
-        renderParam->renderMode.hwInfo.pathSelect.pathPlan[pathIndex].value = pathValue;
+        device = cJSON_GetObjectItem(pathList, "value");
+        if (device == NULL) {
+            return HDF_FAILURE;
+        }
+        renderParam->renderMode.hwInfo.pathSelect.pathPlan[pathIndex].value = device->valueint;
         ret = strncpy_s(renderParam->renderMode.hwInfo.pathSelect.pathPlan[pathIndex].pathPlanName,
                         PATHPLAN_LEN - 1, pathKey, strlen(pathKey));
         if (ret != 0) {
@@ -434,14 +458,12 @@ static int32_t AudioRenderPathSelGetUsecaseDevice(struct AudioHwRenderParam *ren
 
 static int32_t AudioRenderPathSelGetDevice(struct AudioHwRenderParam *renderParam, const char *deviceType)
 {
-    LOG_FUN_INFO();
     if (renderParam == NULL || deviceType == NULL || g_cJsonObj == NULL) {
         LOG_FUN_ERR("AudioPathSelGetDevice param Is NULL");
         return HDF_FAILURE;
     }
     char *decKey = NULL;
     int32_t decIndex = 0;
-    int32_t decValue;
     int32_t ret;
     cJSON *deviceNode = cJSON_GetObjectItem(g_cJsonObj, deviceType);
     if (deviceNode == NULL) {
@@ -456,7 +478,7 @@ static int32_t AudioRenderPathSelGetDevice(struct AudioHwRenderParam *renderPara
     while (deviceList != NULL) {
         cJSON *device = cJSON_GetObjectItem(deviceList, "name");
         if (device == NULL) {
-            LOG_FUN_ERR("Get Object Fail!");
+            LOG_FUN_ERR("Get Object Invalid!");
             return HDF_FAILURE;
         }
         decKey = device->valuestring;
@@ -464,8 +486,11 @@ static int32_t AudioRenderPathSelGetDevice(struct AudioHwRenderParam *renderPara
             deviceList = deviceList->next;
             continue;
         }
-        decValue = cJSON_GetObjectItem(deviceList, "value")->valueint;
-        renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[decIndex].value = decValue;
+        device = cJSON_GetObjectItem(deviceList, "value");
+        if (device == NULL) {
+            return HDF_FAILURE;
+        }
+        renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[decIndex].value = device->valueint;
         ret = strncpy_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[decIndex].deviceSwitch,
                         PATHPLAN_LEN - 1, decKey, strlen(decKey) + 1);
         if (ret != 0) {
