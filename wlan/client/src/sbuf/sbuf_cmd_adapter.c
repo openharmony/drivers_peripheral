@@ -30,6 +30,7 @@ const char *DRIVER_SERVICE_NAME = "hdfwifi";
 
 struct HdfIoService *g_wifiService = NULL;
 static struct HdfDevEventlistener g_wifiDevEventListener;
+static bool g_isHasRegisterListener = false;
 
 static int32_t SendCmdSync(const uint32_t cmd, struct HdfSBuf *reqData, struct HdfSBuf *respData)
 {
@@ -173,6 +174,7 @@ static int32_t WifiMsgRegisterEventListener(struct HdfDevEventlistener *listener
         HILOG_ERROR(LOG_DOMAIN, "%s: fail to register event listener, line: %d", __FUNCTION__, __LINE__);
         return RET_CODE_FAILURE;
     }
+    g_isHasRegisterListener = true;
     return RET_CODE_SUCCESS;
 }
 
@@ -184,6 +186,7 @@ static void WifiMsgUnregisterEventListener(struct HdfDevEventlistener *listener)
     if (HdfDeviceUnregisterEventListener(g_wifiService, listener)) {
         HILOG_ERROR(LOG_DOMAIN, "%s: fail to unregister event listener, line: %d", __FUNCTION__, __LINE__);
     }
+    g_isHasRegisterListener = false;
 }
 
 extern int OnWiFiEvents(struct HdfDevEventlistener *listener,
@@ -200,6 +203,10 @@ int32_t WifiDriverClientInit(void)
         return RET_CODE_FAILURE;
     }
     g_wifiDevEventListener.onReceive  = OnWiFiEvents;
+    if (g_isHasRegisterListener) {
+        HILOG_INFO(LOG_DOMAIN, "%s:has register listener!", __FUNCTION__);
+        return RET_CODE_SUCCESS;
+    }
     ret = WifiMsgRegisterEventListener(&g_wifiDevEventListener);
     if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_DOMAIN, "%s: register event listener faild, line: %d", __FUNCTION__, __LINE__);
