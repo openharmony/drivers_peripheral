@@ -16,25 +16,13 @@
 #ifndef AUDIO_INTERFACE_LIB_CAPTURE_H
 #define AUDIO_INTERFACE_LIB_CAPTURE_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include "securec.h"
-#include "audio_internal.h"
-#include "audio_adapter.h"
-#include "osal_mem.h"
-#include "hdf_io_service_if.h"
-#include "hdf_sbuf.h"
+#include "audio_interface_lib_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define CTRL_CMD_CAPTURE "control"            // For Bind control service
-#define CAPTURE_CMD "capture"                 // For Bind capture service
-#define SERVIC_NAME_MAX_LEN 32
-#define CTRL_NUM 100
+#define CAPTURE_CMD "capture"   // For Bind capture service
 
 enum AudioCriBuffStatusCapture {
     CIR_BUFF_NORMAL = 1,
@@ -58,30 +46,38 @@ enum AudioInterfaceLibCaptureCtrl {
 };
 
 struct DevHandleCapture *AudioBindServiceCapture(const char *name);
-void AudioCloseServiceCapture(struct DevHandleCapture *handle);
+void AudioCloseServiceCapture(const struct DevHandleCapture *handle);
 int32_t AudioInterfaceLibModeCapture(struct DevHandleCapture *handle,
-                                     struct AudioHwCaptureParam *handleData,
-                                     int cmdId);
-int32_t AudioOutputCaptureHwParams(struct DevHandleCapture *handle,
-                                   int cmdId,
-                                   struct AudioHwCaptureParam *handleData);
-int32_t AudioOutputCaptureRead(struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData);
-int32_t AudioOutputCaptureStop(struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData);
-int32_t AudioOutputCaptureStartPrepare(struct DevHandleCapture *handle,
+    struct AudioHwCaptureParam *handleData, int cmdId);
+int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
+    int cmdId, const struct AudioHwCaptureParam *handleData);
+int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureGetVolume(struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureSetVolume(struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureGetMuteStu(struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureSetMuteStu(struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureSetPauseStu(struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureSetGainStu(struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureGetGainStu(struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureSceneSelect(struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureGetGainThreshold(struct DevHandleCapture *handle,
-                                        int cmdId,
-                                        struct AudioHwCaptureParam *handleData);
-
-int32_t AudioCtlCaptureGetVolThreshold(struct DevHandleCapture *handle,
+int32_t AudioOutputCaptureStop(const struct DevHandleCapture *handle,
+    int cmdId, const struct AudioHwCaptureParam *handleData);
+int32_t AudioOutputCaptureStartPrepare(const struct DevHandleCapture *handle,
+    int cmdId, const struct AudioHwCaptureParam *handleData);
+int32_t AudioCtlCaptureGetVolume(const struct DevHandleCapture *handle,
+    int cmdId, struct AudioHwCaptureParam *handleData);
+int32_t AudioCtlCaptureSetVolume(const struct DevHandleCapture *handle,
+    int cmdId, const struct AudioHwCaptureParam *handleData);
+int32_t AudioCtlCaptureGetMuteStu(const struct DevHandleCapture *handle,
+    int cmdId, struct AudioHwCaptureParam *handleData);
+int32_t AudioCtlCaptureSetMuteStu(const struct DevHandleCapture *handle,
+    int cmdId, const struct AudioHwCaptureParam *handleData);
+int32_t AudioCtlCaptureSetPauseStu(const struct DevHandleCapture *handle,
+    int cmdId, const struct AudioHwCaptureParam *handleData);
+int32_t AudioCtlCaptureSetGainStu(const struct DevHandleCapture *handle,
+    int cmdId, const struct AudioHwCaptureParam *handleData);
+int32_t AudioCtlCaptureGetGainStu(const struct DevHandleCapture *handle,
+    int cmdId, struct AudioHwCaptureParam *handleData);
+int32_t AudioCtlCaptureSceneSelect(const struct DevHandleCapture *handle,
+    int cmdId, const struct AudioHwCaptureParam *handleData);
+int32_t AudioCtlCaptureGetGainThreshold(const struct DevHandleCapture *handle,
+    int cmdId, struct AudioHwCaptureParam *handleData);
+int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
+    int cmdId, struct AudioHwCaptureParam *handleData);
+int32_t AudioOutputCaptureReqMmapBuffer(struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData);
 #ifdef __cplusplus
 }

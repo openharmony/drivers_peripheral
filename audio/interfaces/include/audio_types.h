@@ -285,6 +285,7 @@ struct AudioMmapBufferDescripter {
     int32_t totalBufferFrames;           /**< Total size of the mmap buffer (unit: frame )*/
     int32_t transferFrameSize;           /**< Transfer size (unit: frame) */
     int32_t isShareable;                 /**< Whether the mmap buffer can be shared among processes */
+    uint32_t offset;
 };
 
 /**

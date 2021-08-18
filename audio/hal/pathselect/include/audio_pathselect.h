@@ -16,16 +16,16 @@
 #ifndef AUDIO_PATHSELECT_H
 #define AUDIO_PATHSELECT_H
 
-#include <stdlib.h>
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
 #include "audio_types.h"
 #include "audio_common.h"
 #include "audio_internal.h"
 #include "cJSON.h"
 
+#ifdef __LITEOS__
+#define CJSONFILE_CONFIG_PATH "/etc/parse.json"
+#else
 #define CJSONFILE_CONFIG_PATH "/system/etc/hdfconfig/parse.json"
+#endif
 
 int32_t AudioPathSelGetConfToJsonObj();
 int32_t AudioPathSelAnalysisJson(void *adapterParam, enum AudioAdaptType adaptType);

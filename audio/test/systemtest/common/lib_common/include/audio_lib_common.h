@@ -36,21 +36,10 @@
 #ifndef AUDIO_LIB_COMMON_H
 #define AUDIO_LIB_COMMON_H
 
-#include <gtest/gtest.h>
-#include "audio_internal.h"
+#include "audio_hdi_common.h"
 
 namespace HMOS {
 namespace Audio {
-const std::string AUDIO_RIFF = "RIFF";
-const std::string AUDIO_WAVE = "WAVE";
-const std::string AUDIO_DATA = "data";
-const uint32_t INDEX_END = 555;
-const int G_CHANNELCOUNT = 2;
-const int G_SAMPLERATE = 48000;
-const int G_PCM16BIT = 16;
-const int G_PCM8BIT = 8;
-const int G_PCM24BIT = 24;
-const int G_PCM32BIT = 32;
 const int G_PERIODSIZE = 4096;
 const int G_PERIODCOUNT = 8;
 const int G_BYTERATE = 48000;
@@ -58,35 +47,8 @@ const int G_BUFFERFRAMESIZE = 0;
 const int G_BUFFERSIZE1 = 128;
 const int G_SILENCETHRESHOLE = 0;
 const int G_PORTID = 0;
-const int MOVE_LEFT_NUM = 8;
-const int DEEP_BUFFER_RENDER_PERIOD_SIZE = 4096;
 const int STOP_THRESHOLD = 32;
 const int START_THRESHOLD = 8;
-
-enum AudioPCMBit {
-    PCM_8_BIT  = 8,
-    PCM_16_BIT = 16,
-    PCM_24_BIT = 24,
-    PCM_32_BIT = 32,
-};
-
-struct AudioHeadInfo {
-    uint32_t testFileRiffId;
-    uint32_t testFileRiffSize;
-    uint32_t testFileFmt;
-    uint32_t audioFileFmtId;
-    uint32_t audioFileFmtSize;
-    uint16_t audioFileFormat;
-    uint16_t audioChannelNum;
-    uint32_t audioSampleRate;
-    uint32_t audioByteRate;
-    uint16_t audioBlockAlign;
-    uint16_t audioBitsPerSample;
-    uint32_t dataId;
-    uint32_t dataSize;
-};
-
-int32_t InitAttrs(struct AudioSampleAttributes& attrs);
 
 int32_t InitRenderFramepara(struct AudioFrameRenderMode& frameRenderMode);
 
@@ -96,7 +58,9 @@ int32_t InitHwRenderMode(struct AudioHwRenderMode& renderMode);
 
 int32_t InitHwCaptureMode(struct AudioHwCaptureMode& captureMode);
 
-int32_t WavHeadAnalysis(struct AudioHeadInfo& wavHeadInfo, FILE *file, struct AudioSampleAttributes& attrs);
+uint32_t InitHwRender(struct AudioHwRender *&hwRender, const std::string adapterNameCase);
+
+uint32_t InitHwCapture(struct AudioHwCapture *&hwCapture, const std::string adapterNameCase);
 }
 }
 #endif // AUDIO_LIB_COMMON_H
