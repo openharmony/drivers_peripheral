@@ -311,7 +311,7 @@ int32_t FrameStartCaptureMmap(void *param)
     if (ret < 0) {
         printf("GetMmapPosition fail,please check.\n");
     }
-    printf("frames = %"PRIu64", tvSec = %lld, tvNSec = %lld\n", frames, timeStamp.tvSec, timeStamp.tvNSec);
+    printf("frames = %"PRIu64", tvSec = %"PRId64", tvNSec = %"PRId64"\n", frames, timeStamp.tvSec, timeStamp.tvNSec);
     fclose(fp);
     fp = NULL;
     return HDF_SUCCESS;
