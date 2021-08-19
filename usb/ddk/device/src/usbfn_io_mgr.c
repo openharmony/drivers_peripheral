@@ -21,7 +21,7 @@ static int ReqToIoData(struct UsbFnRequest *req, struct IoData *ioData,
     uint32_t aio, uint32_t timeout)
 {
     if (req == NULL || ioData == NULL) {
-        HDF_LOGE("%{public}s:%{public}d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     struct ReqList *reqList = (struct ReqList *) req;
@@ -44,13 +44,13 @@ int OpenEp0AndMapAddr(struct UsbFnFuncMgr *funcMgr)
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
     funcMgr->fd = fnOps->openPipe(funcMgr->name, 0);
     if (funcMgr->fd <= 0) {
-        HDF_LOGE("%{public}s:%{public}d openPipe failed", __func__, __LINE__);
+        HDF_LOGE("%s:%d openPipe failed", __func__, __LINE__);
         return HDF_ERR_IO;
     }
 
     ret = fnOps->queueInit(funcMgr->fd);
     if (ret) {
-        HDF_LOGE("%{public}s:%{public}d queueInit failed", __func__, __LINE__);
+        HDF_LOGE("%s:%d queueInit failed", __func__, __LINE__);
         return HDF_ERR_IO;
     }
     return 0;
@@ -64,7 +64,7 @@ static UsbFnRequestType GetReqType(struct UsbHandleMgr *handle, uint8_t pipe)
     if (pipe > 0) {
         ret = UsbFnIoMgrInterfaceGetPipeInfo(&(handle->intfMgr->interface), pipe - 1, &info);
         if (ret) {
-            HDF_LOGE("%{public}s:%{public}d UsbFnMgrInterfaceGetPipeInfo err", __func__, __LINE__);
+            HDF_LOGE("%s:%d UsbFnMgrInterfaceGetPipeInfo err", __func__, __LINE__);
             type = USB_REQUEST_TYPE_INVALID;
         }
         if (info.dir == USB_PIPE_DIRECTION_IN) {
@@ -99,13 +99,13 @@ struct UsbFnRequest *UsbFnIoMgrRequestAlloc(struct UsbHandleMgr *handle, uint8_t
     }
     mapAddr = fnOps->mapAddr(ep, len);
     if (mapAddr == NULL) {
-        HDF_LOGE("%{public}s:%{public}d mapAddr failed", __func__, __LINE__);
+        HDF_LOGE("%s:%d mapAddr failed", __func__, __LINE__);
         return NULL;
     }
 
     reqList = OsalMemCalloc(sizeof(struct ReqList));
     if (reqList == NULL) {
-        HDF_LOGE("%{public}s:%{public}d OsalMemCalloc err", __func__, __LINE__);
+        HDF_LOGE("%s:%d OsalMemCalloc err", __func__, __LINE__);
         return NULL;
     }
     req = &reqList->req;
@@ -132,7 +132,7 @@ int UsbFnIoMgrRequestFree(struct UsbFnRequest *req)
     struct GenericMemory mem;
     int ret;
     if (req == NULL) {
-        HDF_LOGE("%{public}s:%{public}d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -141,14 +141,14 @@ int UsbFnIoMgrRequestFree(struct UsbFnRequest *req)
 
     ret = fnOps->unmapAddr(req->buf, req->length);
     if (ret) {
-        HDF_LOGE("%{public}s:%{public}d ummapAddr failed, ret=%{public}d ", __func__, __LINE__, ret);
+        HDF_LOGE("%s:%d ummapAddr failed, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
     mem.size = req->length;
     mem.buf = (uint32_t)req->buf;
     ret = fnOps->releaseBuf(reqList->fd, &mem);
     if (ret) {
-        HDF_LOGE("%{public}s:%{public}d releaseBuf err", __func__, __LINE__);
+        HDF_LOGE("%s:%d releaseBuf err", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -163,7 +163,7 @@ int UsbFnIoMgrRequestSubmitAsync(struct UsbFnRequest *req)
     struct IoData ioData = {0};
     struct ReqList *reqList = NULL;
     if (req == NULL) {
-        HDF_LOGE("%{public}s:%{public}d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     reqList = (struct ReqList *) req;
@@ -182,7 +182,7 @@ int UsbFnIoMgrRequestCancel(struct UsbFnRequest *req)
     struct IoData ioData = {0};
     struct ReqList *reqList = NULL;
     if (req == NULL) {
-        HDF_LOGE("%{public}s:%{public}d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     reqList = (struct ReqList *) req;
@@ -200,7 +200,7 @@ int UsbFnIoMgrRequestGetStatus(struct UsbFnRequest *req, UsbRequestStatus *statu
     struct IoData ioData = {0};
     struct ReqList *reqList;
     if (req == NULL) {
-        HDF_LOGE("%{public}s:%{public}d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     reqList = (struct ReqList *) req;
@@ -220,7 +220,7 @@ int UsbFnIoMgrRequestSubmitSync(struct UsbFnRequest *req, uint32_t timeout)
     struct ReqList *reqList;
 
     if (req == NULL) {
-        HDF_LOGE("%{public}s:%{public}d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     reqList = (struct ReqList *) req;
@@ -254,13 +254,13 @@ static int HandleInit(struct UsbHandleMgr *handle, struct UsbFnInterfaceMgr *int
 
         ret = fnOps->queueInit(handle->fds[i]);
         if (ret) {
-            HDF_LOGE("%{public}s: queueInit failed ret = %{public}d", __func__, ret);
+            HDF_LOGE("%s: queueInit failed ret = %d", __func__, ret);
             return HDF_ERR_IO;
         }
 
         handle->reqEvent[i] = OsalMemCalloc(sizeof(struct UsbFnReqEvent) * MAX_REQUEST);
         if (handle->reqEvent[i] == NULL) {
-            HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);
+            HDF_LOGE("%s: OsalMemCalloc failed", __func__);
             goto FREE_EVENT;
         }
     }
@@ -282,7 +282,7 @@ struct UsbHandleMgr *UsbFnIoMgrInterfaceOpen(struct UsbFnInterface *interface)
     }
     struct UsbFnInterfaceMgr *interfaceMgr = (struct UsbFnInterfaceMgr *)interface;
     if (interfaceMgr->isOpen) {
-        HDF_LOGE("%{public}s: interface has opened", __func__);
+        HDF_LOGE("%s: interface has opened", __func__);
         return NULL;
     }
     struct UsbHandleMgr *handle = OsalMemCalloc(sizeof(struct UsbHandleMgr));
@@ -292,7 +292,7 @@ struct UsbHandleMgr *UsbFnIoMgrInterfaceOpen(struct UsbFnInterface *interface)
 
     ret = HandleInit(handle, interfaceMgr);
     if (ret) {
-        HDF_LOGE("%{public}s: HandleInit failed", __func__);
+        HDF_LOGE("%s: HandleInit failed", __func__);
         OsalMemFree(handle);
         return NULL;
     }
@@ -307,26 +307,26 @@ int UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle)
     int ret;
     uint32_t i;
     if (handle == NULL) {
-        HDF_LOGE("%{public}s:%{public}d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
     struct UsbFnInterfaceMgr *interfaceMgr = handle->intfMgr;
 
     if (interfaceMgr == NULL || interfaceMgr->isOpen == false) {
-        HDF_LOGE("%{public}s:%{public}d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     for (i = 0; i < handle->numFd; i++) {
         ret = fnOps->queueDel(handle->fds[i]);
         if (ret) {
-            HDF_LOGE("%{public}s:%{public}d queueDel failed, ret=%{public}d ", __func__, __LINE__, ret);
+            HDF_LOGE("%s:%d queueDel failed, ret=%d ", __func__, __LINE__, ret);
             return HDF_ERR_DEVICE_BUSY;
         }
 
         ret = fnOps->closePipe(handle->fds[i]);
         if (ret) {
-            HDF_LOGE("%{public}s:%{public}d closePipe failed, ret=%{public}d ", __func__, __LINE__, ret);
+            HDF_LOGE("%s:%d closePipe failed, ret=%d ", __func__, __LINE__, ret);
             return HDF_ERR_DEVICE_BUSY;
         }
         handle->fds[i] = -1;
@@ -345,7 +345,7 @@ int UsbFnIoMgrInterfaceGetPipeInfo(struct UsbFnInterface *interface,
     int ret;
     int fd;
     if (info == NULL || interface == NULL || pipeId >= interface->info.numPipes) {
-        HDF_LOGE("%{public}s:%{public}d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
@@ -354,19 +354,19 @@ int UsbFnIoMgrInterfaceGetPipeInfo(struct UsbFnInterface *interface,
         fd = interfaceMgr->handle->fds[pipeId];
         ret = fnOps->getPipeInfo(fd, info);
         if (ret) {
-            HDF_LOGE("%{public}s: getPipeInfo failed", __func__);
+            HDF_LOGE("%s: getPipeInfo failed", __func__);
             return HDF_ERR_DEVICE_BUSY;
         }
     } else {
         fd = fnOps->openPipe(interfaceMgr->funcMgr->name, interfaceMgr->startEpId + pipeId);
         if (fd <= 0) {
-            HDF_LOGE("%{public}s: openPipe failed", __func__);
+            HDF_LOGE("%s: openPipe failed", __func__);
             return HDF_ERR_IO;
         }
         ret = fnOps->getPipeInfo(fd, info);
         if (ret) {
             fnOps->closePipe(fd);
-            HDF_LOGE("%{public}s: getPipeInfo failed", __func__);
+            HDF_LOGE("%s: getPipeInfo failed", __func__);
             return HDF_ERR_DEVICE_BUSY;
         }
         fnOps->closePipe(fd);

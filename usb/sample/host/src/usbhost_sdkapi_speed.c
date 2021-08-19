@@ -100,7 +100,7 @@ static int AcmStartDb(struct AcmDevice *acm,
     int rc;
     rc = UsbSubmitRequestAsync(db->request);
     if (rc < 0) {
-        HDF_LOGE("UsbSubmitRequestAsync failed, ret=%{public}d \n", rc);
+        HDF_LOGE("UsbSubmitRequestAsync failed, ret=%d \n", rc);
         db->use = 0;
     }
     return rc;
@@ -223,7 +223,7 @@ static struct UsbPipeInfo *EnumePipe(const struct AcmDevice *acm,
         if ((p.pipeDirection == pipeDirection) && (p.pipeType == pipeType)) {
             struct UsbPipeInfo *pi = OsalMemCalloc(sizeof(*pi));
             if (pi == NULL) {
-                HDF_LOGE("%{public}s: Alloc pipe failed", __func__);
+                HDF_LOGE("%s: Alloc pipe failed", __func__);
                 return NULL;
             }
             p.interfaceId = info->interfaceIndex;
@@ -239,7 +239,7 @@ static struct UsbPipeInfo *GetPipe(const struct AcmDevice *acm,
 {
     uint8_t i;
     if (acm == NULL) {
-        HDF_LOGE("%{public}s: invalid parmas", __func__);
+        HDF_LOGE("%s: invalid parmas", __func__);
         return NULL;
     }
     for (i = 0; i < acm->interfaceCnt; i++) {
@@ -330,7 +330,7 @@ int main(int argc, char *argv[])
 
     struct AcmDevice *acm = (struct AcmDevice *)OsalMemCalloc(sizeof(*acm));
     if (acm == NULL) {
-        HDF_LOGE("%{public}s: Alloc usb serial device failed", __func__);
+        HDF_LOGE("%s: Alloc usb serial device failed", __func__);
         ret = HDF_FAILURE;
         goto end;
     }
@@ -341,7 +341,7 @@ int main(int argc, char *argv[])
 
     ret = UsbInitHostSdk(NULL);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: UsbInitHostSdk faild", __func__);
+        HDF_LOGE("%s: UsbInitHostSdk faild", __func__);
         ret = HDF_ERR_IO;
         goto end;
     }
@@ -354,7 +354,7 @@ int main(int argc, char *argv[])
         if (acm->iface[i]) {
             acm->devHandle[i] = UsbOpenInterface(acm->iface[i]);
             if (acm->devHandle[i] == NULL) {
-                HDF_LOGE("%{public}s: UsbOpenInterface null", __func__);
+                HDF_LOGE("%s: UsbOpenInterface null", __func__);
             }
         }
         else
@@ -374,13 +374,13 @@ int main(int argc, char *argv[])
 
     acm->dataSize = TEST_LENGTH;
     if (AcmDataBufAlloc(acm) < 0) {
-        HDF_LOGE("%{public}s:%{public}d AcmDataBufAlloc fail", __func__, __LINE__);
+        HDF_LOGE("%s:%d AcmDataBufAlloc fail", __func__, __LINE__);
     }
     for (int i = 0; i < TEST_CYCLE; i++) {
         struct AcmDb *snd = &(acm->db[i]);
         snd->request = UsbAllocRequest(InterfaceIdToHandle(acm, acm->dataPipe->interfaceId), 0, acm->dataSize);
         if (snd->request == NULL) {
-            HDF_LOGE("%{public}s:%{public}d snd request fail", __func__, __LINE__);
+            HDF_LOGE("%s:%d snd request fail", __func__, __LINE__);
         }
         int rc;
         acm->transmitting++;
@@ -399,7 +399,7 @@ int main(int argc, char *argv[])
         snd->dbNum = acm->transmitting;
         rc = UsbFillRequest(snd->request, InterfaceIdToHandle(acm, acm->dataPipe->interfaceId), &parmas);
         if (HDF_SUCCESS != rc) {
-            HDF_LOGE("%{public}s:UsbFillRequest faile,ret=%{public}d \n", __func__, rc);
+            HDF_LOGE("%s:UsbFillRequest faile,ret=%d \n", __func__, rc);
             return rc;
         }
     }
