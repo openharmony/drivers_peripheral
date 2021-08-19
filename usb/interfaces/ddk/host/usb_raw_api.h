@@ -23,7 +23,7 @@
 
 typedef void *UsbRawDevice;
 typedef void *UsbRawHandle;
-typedef void (*UsbRawRequestCallback)(void *requestArg);
+typedef void (*UsbRawRequestCallback)(const void *requestArg);
 
 struct UsbControlRequestData {
     uint8_t requestType;
@@ -94,38 +94,39 @@ struct UsbRawConfigDescriptor {
 };
 
 int UsbRawInit(struct UsbSession **session);
-int UsbRawExit(struct UsbSession *session);
-UsbRawHandle *UsbRawOpenDevice(struct UsbSession *session, uint8_t busNum, uint8_t usbAddr);
-int UsbRawCloseDevice(UsbRawHandle *devHandle);
-int UsbRawSendControlRequest(struct UsbRawRequest *request, UsbRawHandle *devHandle,
-    struct UsbControlRequestData *requestData);
-int UsbRawSendBulkRequest(struct UsbRawRequest *request, UsbRawHandle *devHandle, struct UsbRequestData *requestData);
-int UsbRawSendInterruptRequest(struct UsbRawRequest *request, UsbRawHandle *devHandle,
-    struct UsbRequestData *requestData);
-int UsbRawGetConfigDescriptor(UsbRawDevice *rawDev, uint8_t configIndex, struct UsbRawConfigDescriptor **config);
-void UsbRawFreeConfigDescriptor(struct UsbRawConfigDescriptor *config);
-int UsbRawGetConfiguration(UsbRawHandle *devHandle, int *config);
-int UsbRawSetConfiguration(UsbRawHandle *devHandle, int config);
-int UsbRawGetDescriptor(struct UsbRawRequest *request, UsbRawHandle *devHandle, struct UsbRawDescriptorParam *param,
-    unsigned char *data);
-UsbRawDevice *UsbRawGetDevice(UsbRawHandle *devHandle);
-int UsbRawGetDeviceDescriptor(UsbRawDevice *rawDev, struct UsbDeviceDescriptor *desc);
-int UsbRawClaimInterface(UsbRawHandle *devHandle, int interfaceNumber);
-int UsbRawReleaseInterface(UsbRawHandle *devHandle, int interfaceNumber);
-int UsbRawResetDevice(UsbRawHandle *devHandle);
-struct UsbRawRequest *UsbRawAllocRequest(UsbRawHandle *devHandle, int isoPackets, int length);
-int UsbRawFreeRequest(struct UsbRawRequest *request);
-int UsbRawFillBulkRequest(struct UsbRawRequest *request, UsbRawHandle *devHandle,
-    struct UsbRawFillRequestData *fillData);
-int UsbRawFillControlSetup(unsigned char *setup, struct UsbControlRequestData *requestData);
-int UsbRawFillControlRequest(struct UsbRawRequest *request, UsbRawHandle *devHandle,
-    struct UsbRawFillRequestData *fillData);
-int UsbRawFillInterruptRequest(struct UsbRawRequest *request, UsbRawHandle *devHandle,
-    struct UsbRawFillRequestData *fillData);
-int UsbRawFillIsoRequest(struct UsbRawRequest *request, UsbRawHandle *devHandle,
-    struct UsbRawFillRequestData *fillData);
-int UsbRawSubmitRequest(struct UsbRawRequest *request);
-int UsbRawCancelRequest(struct UsbRawRequest *request);
-int UsbRawHandleRequests(UsbRawHandle *devHandle);
+int UsbRawExit(const struct UsbSession *session);
+UsbRawHandle *UsbRawOpenDevice(const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr);
+int UsbRawCloseDevice(const UsbRawHandle *devHandle);
+int UsbRawSendControlRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+    const struct UsbControlRequestData *requestData);
+int UsbRawSendBulkRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+    const struct UsbRequestData *requestData);
+int UsbRawSendInterruptRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+    const struct UsbRequestData *requestData);
+int UsbRawGetConfigDescriptor(const UsbRawDevice *rawDev, uint8_t configIndex, struct UsbRawConfigDescriptor **config);
+void UsbRawFreeConfigDescriptor(const struct UsbRawConfigDescriptor *config);
+int UsbRawGetConfiguration(const UsbRawHandle *devHandle, int *config);
+int UsbRawSetConfiguration(const UsbRawHandle *devHandle, int config);
+int UsbRawGetDescriptor(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+    const struct UsbRawDescriptorParam *param, const unsigned char *data);
+UsbRawDevice *UsbRawGetDevice(const UsbRawHandle *devHandle);
+int UsbRawGetDeviceDescriptor(const UsbRawDevice *rawDev, struct UsbDeviceDescriptor *desc);
+int UsbRawClaimInterface(const UsbRawHandle *devHandle, int interfaceNumber);
+int UsbRawReleaseInterface(const UsbRawHandle *devHandle, int interfaceNumber);
+int UsbRawResetDevice(const UsbRawHandle *devHandle);
+struct UsbRawRequest *UsbRawAllocRequest(const UsbRawHandle *devHandle, int isoPackets, int length);
+int UsbRawFreeRequest(const struct UsbRawRequest *request);
+int UsbRawFillBulkRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+    const struct UsbRawFillRequestData *fillData);
+int UsbRawFillControlSetup(const unsigned char *setup, const struct UsbControlRequestData *requestData);
+int UsbRawFillControlRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+    const struct UsbRawFillRequestData *fillData);
+int UsbRawFillInterruptRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+    const struct UsbRawFillRequestData *fillData);
+int UsbRawFillIsoRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+    const struct UsbRawFillRequestData *fillData);
+int UsbRawSubmitRequest(const struct UsbRawRequest *request);
+int UsbRawCancelRequest(const struct UsbRawRequest *request);
+int UsbRawHandleRequests(const UsbRawHandle *devHandle);
 
 #endif /* USB_RAW_API_H */

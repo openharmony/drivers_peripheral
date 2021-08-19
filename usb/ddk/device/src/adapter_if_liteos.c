@@ -225,7 +225,7 @@ static int UsbFnAdapterOpenPipe(const char *funcName, int epIndex)
 
     ret = snprintf_s(epName, MAX_NAMELEN, MAX_NAMELEN - 1, "/dev/%s/ep%u", funcName, epIndex);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+        HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_ERR_IO;
     }
 
@@ -237,7 +237,7 @@ static int UsbFnAdapterOpenPipe(const char *funcName, int epIndex)
         usleep(SLEEP_TIME);
     }
     if (ep < 0) {
-        HDF_LOGE("unable to open %{public}s", epName);
+        HDF_LOGE("unable to open %s", epName);
         return HDF_ERR_IO;
     }
     return ep;
@@ -374,7 +374,7 @@ static int WriteFuncDescriptors(uint8_t **whereDec, struct UsbDescriptorHeader *
     for (i = 0; headDes[i] != NULL; i++) {
         ret = memcpy_s(*whereDec, headDes[i]->bLength, headDes[i], headDes[i]->bLength);
         if (ret != EOK) {
-            HDF_LOGE("%{public}s: memcpy_s failure!", __func__);
+            HDF_LOGE("%s: memcpy_s failure!", __func__);
             return HDF_FAILURE;
         }
         *whereDec += headDes[i]->bLength;
@@ -424,7 +424,7 @@ static int UsbFnAdapterCreatPipes(int ep0, const struct UsbFnFunction *func)
 
     dec = OsalMemCalloc(header.length);
     if (dec == NULL) {
-        HDF_LOGE("%{public}s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
     whereDec = dec;
@@ -675,7 +675,7 @@ static int UsbFnAdapterDelConfigs(int configFd, struct FconfigString *gadgetName
         ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1,
             "b.%d", confVal);
         if (ret < 0) {
-            HDF_LOGE("%{public}s: snprintf_s failed", __func__);
+            HDF_LOGE("%s: snprintf_s failed", __func__);
             return HDF_ERR_IO;
         }
         ret = UsbFnAdapterCreateFconfigString(&configName, tmp);
@@ -887,7 +887,7 @@ static int UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int timeout)
     memset_s(&pfds, sizeof(pfds), 0, sizeof(pfds));
     for (i = 0; i < event->ep0Num; i++) {
         if (event->ep0[i] <= 0) {
-            HDF_LOGE("%{public}s: ep[%{public}d] = %{public}d", __func__, i, event->ep0[i]);
+            HDF_LOGE("%s: ep[%d] = %d", __func__, i, event->ep0[i]);
             return HDF_ERR_INVALID_PARAM;
         }
         pfds[i].fd = event->ep0[i];
@@ -895,7 +895,7 @@ static int UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int timeout)
     }
     for (i = 0; i < event->epNum; i++) {
         if (event->epx[i] <= 0) {
-            HDF_LOGE("%{public}s: ep[%{public}d] = %{public}d", __func__, i, event->epx[i]);
+            HDF_LOGE("%s: ep[%d] = %d", __func__, i, event->epx[i]);
             return HDF_ERR_INVALID_PARAM;
         }
         pfds[i + event->ep0Num].fd = event->epx[i];
@@ -904,16 +904,16 @@ static int UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int timeout)
     for (i = 0; i < (event->ep0Num + event->epNum); i++) {
         pfds[i].revents = handle_poll(pfds[i].fd, timeout);
         if (pfds[i].revents < 0) {
-            HDF_LOGE("%{public}s: handle_poll failed", __func__);
+            HDF_LOGE("%s: handle_poll failed", __func__);
             return HDF_ERR_INVALID_PARAM;
         }
     }
     if (Ep0Event(event, &pfds[0]) < 0) {
-        HDF_LOGE("%{public}s: handle_poll failed", __func__);
+        HDF_LOGE("%s: handle_poll failed", __func__);
         return HDF_ERR_IO;
     }
     if (EpEvent(event, &pfds[0]) < 0) {
-        HDF_LOGE("%{public}s: handle_poll failed", __func__);
+        HDF_LOGE("%s: handle_poll failed", __func__);
         return HDF_ERR_IO;
     }
     return 0;
