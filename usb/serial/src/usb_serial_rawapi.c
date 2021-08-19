@@ -1148,7 +1148,7 @@ static void AcmReadBulkCallback(const void *requestArg)
 
     switch (req->status) {
         case USB_REQUEST_COMPLETED:
-            HDF_LOGD("Bulk status: %d+size:%u", req->status, size);
+            HDF_LOGD("Bulk status: %d+size:%zu", req->status, size);
             if (size) {
                 uint8_t *data = req->buffer;
                 uint32_t count;
