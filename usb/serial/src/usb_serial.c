@@ -1357,7 +1357,7 @@ static void AcmReadBulk(struct UsbRequest *req)
 
     switch (status) {
         case 0:
-            HDF_LOGD("Bulk status: %d+size:%u\n", status, size);
+            HDF_LOGD("Bulk status: %d+size:%zu\n", status, size);
             if (size) {
                 uint8_t *data = req->compInfo.buffer;
                 uint32_t count;

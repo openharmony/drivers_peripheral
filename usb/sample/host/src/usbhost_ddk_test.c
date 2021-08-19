@@ -221,8 +221,8 @@ int UsbHostDdkTestAsyncRead(char *readSbuf)
                 HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
             }
         }
-        printf("%s:%d %s-%d!\n", __func__, __LINE__, tmp, strlen(tmp));
-        HDF_LOGD("%s:%d %s-%d!", __func__, __LINE__, tmp, strlen(tmp));
+        printf("%s:%d %s-%zu!\n", __func__, __LINE__, tmp, strlen(tmp));
+        HDF_LOGD("%s:%d %s-%zu!", __func__, __LINE__, tmp, strlen(tmp));
         TestModuleWriteLog(HOST_ACM_ASYNC_READ, tmp, NULL);
     }
 
@@ -255,8 +255,8 @@ void UsbHostDdkTestAsyncWrite(const char *buf)
         return;
     }
 
-    printf("%s:%d %s-%d!\n", __func__, __LINE__, buf, strlen(buf));
-    HDF_LOGI("%s:%d %s-%d!\n", __func__, __LINE__, buf, strlen(buf));
+    printf("%s:%d %s-%zu!\n", __func__, __LINE__, buf, strlen(buf));
+    HDF_LOGI("%s:%d %s-%zu!\n", __func__, __LINE__, buf, strlen(buf));
     TestModuleWriteLog(HOST_ACM_ASYNC_WRITE, buf, NULL);
 }
 
@@ -285,8 +285,8 @@ void UsbHostDdkTestSyncRead(char *readSbuf)
                 HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
             }
         }
-        printf("%s:%d %s-%d!\n", __func__, __LINE__, tmp, strlen(tmp));
-        HDF_LOGD("%s:%d %s-%d !", __func__, __LINE__, tmp, strlen(tmp));
+        printf("%s:%d %s-%zu!\n", __func__, __LINE__, tmp, strlen(tmp));
+        HDF_LOGD("%s:%d %s-%zu !", __func__, __LINE__, tmp, strlen(tmp));
         TestModuleWriteLog(HOST_ACM_SYNC_READ, tmp, NULL);
     }
 }
@@ -314,8 +314,8 @@ void UsbHostDdkTestSyncWrite(const char *buf)
         return;
     }
 
-    printf("%s:%d %s-%d!\n", __func__, __LINE__, buf, strlen(buf));
-    HDF_LOGD("%s:%d %s-%d!", __func__, __LINE__, buf, strlen(buf));
+    printf("%s:%d %s-%zu!\n", __func__, __LINE__, buf, strlen(buf));
+    HDF_LOGD("%s:%d %s-%zu!", __func__, __LINE__, buf, strlen(buf));
     TestModuleWriteLog(HOST_ACM_SYNC_WRITE, buf, NULL);
 }
 
