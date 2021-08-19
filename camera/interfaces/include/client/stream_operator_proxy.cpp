@@ -93,7 +93,7 @@ CamRetCode StreamOperatorProxy::CreateStreams(
         std::shared_ptr<StreamInfo> streamInfo = streamInfos.at(i);
         bRet = UtilsDataStub::EncodeStreamInfo(streamInfo, data);
         if (!bRet) {
-            HDF_LOGE("%s: write streamInfo failed. index = %d", __func__, i);
+            HDF_LOGE("%s: write streamInfo failed. index = %zu", __func__, i);
             return INVALID_ARGUMENT;
         }
     }
