@@ -781,7 +781,7 @@ int32_t FormatToBits(enum AudioFormat format, uint32_t *formatBits)
     }
 }
 
-int32_t BitsToFormat(enum AudioFormat *format, int32_t formatBits)
+int32_t BitsToFormat(enum AudioFormat *format, long formatBits)
 {
     if (format == NULL) {
         return HDF_FAILURE;
@@ -804,7 +804,7 @@ int32_t BitsToFormat(enum AudioFormat *format, int32_t formatBits)
     }
 }
 
-int32_t CheckAttrRoute(int32_t param)
+int32_t CheckAttrRoute(long param)
 {
     if (param < DEEP_BUFF || param > LOW_LATRNCY) {
         return HDF_FAILURE;
@@ -812,7 +812,7 @@ int32_t CheckAttrRoute(int32_t param)
     return HDF_SUCCESS;
 }
 
-int32_t CheckAttrChannel(uint32_t param)
+int32_t CheckAttrChannel(unsigned long param)
 {
     if (param != 1 && param != 2) { // channel 1 and 2
         return HDF_FAILURE;
@@ -827,7 +827,7 @@ int32_t TransferRoute(char *value, int32_t *route)
     }
     char *endptr = NULL;
     errno = 0;
-    int32_t tempRoute = strtol(value, &endptr, DECIMAL_SYSTEM);
+    long tempRoute = strtol(value, &endptr, DECIMAL_SYSTEM);
     if ((errno == ERANGE && (tempRoute == LONG_MAX || tempRoute == LONG_MIN)) || (errno != 0 && tempRoute == 0)) {
         return HDF_FAILURE;
     }
@@ -845,7 +845,7 @@ int32_t TransferFormat(char *value, int32_t *format)
     }
     char *endptr = NULL;
     errno = 0;
-    int32_t tempFormat = strtol(value, &endptr, DECIMAL_SYSTEM);
+    long tempFormat = strtol(value, &endptr, DECIMAL_SYSTEM);
     if ((errno == ERANGE && (tempFormat == LONG_MAX || tempFormat == LONG_MIN)) || (errno != 0 && tempFormat == 0)) {
         return HDF_FAILURE;
     }
@@ -867,7 +867,7 @@ int32_t TransferChannels(char *value, uint32_t *channels)
     }
     char *endptr = NULL;
     errno = 0;
-    int32_t tempChannels = strtoul(value, &endptr, DECIMAL_SYSTEM);
+    unsigned long tempChannels = strtoul(value, &endptr, DECIMAL_SYSTEM);
     if ((errno == ERANGE && (tempChannels == ULONG_MAX)) || (errno != 0 && tempChannels == 0)) {
         return HDF_FAILURE;
     }
@@ -901,7 +901,7 @@ int32_t TransferSampleRate(char *value, uint32_t *sampleRate)
     }
     char *endptr = NULL;
     errno = 0;
-    uint32_t tempSampleRate = strtoul(value, &endptr, DECIMAL_SYSTEM);
+    unsigned long tempSampleRate = strtoul(value, &endptr, DECIMAL_SYSTEM);
     if ((errno == ERANGE && (tempSampleRate == ULONG_MAX)) || (errno != 0 && tempSampleRate == 0)) {
         return HDF_FAILURE;
     }
