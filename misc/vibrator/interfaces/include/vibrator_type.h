@@ -17,10 +17,10 @@
  * @addtogroup Vibrator
  * @{
  *
- * @brief Provides unified APIs for vibrator services to access vibrator drivers.
+ * @brief Provides unified APIs for vibrator services to access the vibrator driver.
  *
- * A vibrator service can obtain a vibrator driver object or agent and then call APIs provided by this object or
- *  agent to access different types of vibrator devices.
+ * After obtaining a driver object or agent, a vibrator service starts or stops the vibrator 
+ * using the functions provided by the driver object or agent.
  *
  * @version 1.0
  */
@@ -28,7 +28,7 @@
 /**
  * @file vibrator_type.h
  *
- * @brief Defines the data used by the vibrator module, including the vibrator types, vibrator effect.
+ * @brief Defines the vibrator data structure, including the vibration mode and effect type.
  *
  * @since 2.2
  * @version 1.0
@@ -46,14 +46,14 @@ extern "C" {
 #endif /* __cplusplus */
 
 /**
- * @brief Enumerates return values of the vibrator mode.
+ * @brief Enumerates the vibration modes of this vibrator.
  *
  * @since 2.2
  */
 enum VibratorMode {
-    VIBRATOR_MODE_ONCE   = 0,    /**< The mode of stopping a one-shot vibration effect. */
-    VIBRATOR_MODE_PRESET = 1,    /**< The mode of stopping a preset vibration effect. */
-    VIBRATOR_MODE_ABNORMAL       /**< The mode of test abnormal effect. */
+    VIBRATOR_MODE_ONCE   = 0,    /**< Indicates the one-shot vibration with the given duration. */
+    VIBRATOR_MODE_PRESET = 1,    /**< Indicates the periodic vibration with the preset effect. */
+    VIBRATOR_MODE_ABNORMAL       /**< Indicates the abnormal effect in testing. */
 };
 
 #ifdef __cplusplus
