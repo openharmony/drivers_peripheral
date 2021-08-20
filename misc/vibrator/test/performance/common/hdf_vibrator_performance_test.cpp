@@ -30,8 +30,8 @@ namespace {
     const int32_t VIBRATOR_MSEC_TIME = 1000;
     const int32_t VIBRATOR_DURATION  = 2000;
     const int32_t VIBRATOR_COMMON_TIME = 500;
-    const char *timeSequence = "vibrator_haptic_default_time";
-    const char *builtIn = "vibrator_haptic_default_effect";
+    const char *g_timeSequence = "vibrator.haptic.default.time";
+    const char *g_builtIn = "vibrator.haptic.default.effect";
     const struct VibratorInterface *g_vibratorPerformanceDev = nullptr;
     }
 
@@ -104,7 +104,7 @@ HWTEST_F(HdfVibratorPerformanceTest, VibratorHapticDefaultTime001, TestSize.Leve
     struct timespec tv2 = (struct timespec){0};
 
     clock_gettime(CLOCK_REALTIME, &tv1);
-    int ret = g_vibratorPerformanceDev->Start(timeSequence);
+    int ret = g_vibratorPerformanceDev->Start(g_timeSequence);
     int endRet = g_vibratorPerformanceDev->Stop(VIBRATOR_MODE_PRESET);
     clock_gettime(CLOCK_REALTIME, &tv2);
     
@@ -128,7 +128,7 @@ HWTEST_F(HdfVibratorPerformanceTest, VibratorHapticDefaultEffect001, TestSize.Le
     struct timespec tv2 = (struct timespec){0};
 
     clock_gettime(CLOCK_REALTIME, &tv1);
-    int ret = g_vibratorPerformanceDev->Start(builtIn);
+    int ret = g_vibratorPerformanceDev->Start(g_builtIn);
     int endRet = g_vibratorPerformanceDev->Stop(VIBRATOR_MODE_PRESET);
     clock_gettime(CLOCK_REALTIME, &tv2);
     
