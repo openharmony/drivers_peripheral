@@ -101,7 +101,7 @@ static bool ReadAbilityBuf(struct HdfSBuf *data, void *ability)
 static bool ObtainSbufData(struct HdfSBuf *reply, int32_t cmd, void *out, uint32_t length)
 {
     bool ret = false;
-    uint32_t tempInt;
+    uint32_t tempInt = 0;
     switch (cmd) {
         case GET_PWR_STATUS:
         case GET_DEV_TYPE:
