@@ -236,7 +236,6 @@ int OnWiFiEvents(struct HdfDevEventlistener *listener,
     (void)listener;
     (void)service;
     (void)data;
-    int32_t ret = 0;
 
     if (data == NULL) {
         HILOG_ERROR(LOG_DOMAIN, "%s: params is NULL, line: %d", __FUNCTION__, __LINE__);
@@ -245,7 +244,7 @@ int OnWiFiEvents(struct HdfDevEventlistener *listener,
     const char *ifName = HdfSbufReadString(data);
     if (ifName == NULL) {
         HILOG_ERROR(LOG_DOMAIN, "%s fail to get ifname", __FUNCTION__);
-        return HDF_FAILURE;
+        return RET_CODE_FAILURE;
     }
     HILOG_INFO(LOG_DOMAIN, "%s: WifiDriverEventProcess event=%d", __FUNCTION__, eventId);
     switch (eventId) {
@@ -288,7 +287,7 @@ int OnWiFiEvents(struct HdfDevEventlistener *listener,
         default:
             break;
     }
-    return ret;
+    return RET_CODE_SUCCESS;
 }
 
 #ifdef __cplusplus
