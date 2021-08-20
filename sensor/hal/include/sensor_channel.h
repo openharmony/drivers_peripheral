@@ -19,9 +19,12 @@
 #include "hdf_io_service_if.h"
 #include "sensor_type.h"
 
-#define HDI_SENSOR_GRAVITY    (9.80665f)
-#define HDI_SENSOR_ACCEL_LSB  1024
-#define HDI_SENSOR_UNITS      1000
+#define HDI_SENSOR_GRAVITY      (9.80665f)
+#define HDI_SENSOR_ACCEL_LSB     1024
+#define HDI_SENSOR_UNITS        1000
+#define HDI_SENSOR_PI           (3.14f)
+#define HDI_SENSOR_SEMICIRCLE   (180.0f)
+#define HDI_SENSOR_FLOAT_UNITS  (1000.0f)
 
 enum SensorDataDimension {
     DATA_X             = 1,
