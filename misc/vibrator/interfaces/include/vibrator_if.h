@@ -17,10 +17,10 @@
  * @addtogroup Vibrator
  * @{
  *
- * @brief Provides unified APIs for vibrator services to access vibrator drivers.
+ * @brief Provides a driver for upper-layer vibrator services.
  *
- * A vibrator service can obtain a vibrator driver object or agent and then call APIs provided by this object or
- *  agent to access different types of vibrator devices based on the vibrator.
+ * After obtaining a driver object or agent, a vibrator service starts or stops the vibrator
+ * using the functions provided by the driver object or agent.
  *
  * @since 2.2
  */
@@ -28,7 +28,8 @@
 /**
  * @file vibrator_if.h
  *
- * @brief Declares the APIs provided by the vibrator module to control vibrator.
+ * @brief Declares common APIs in the vibrator module. The APIs can be used to control
+ * the vibrator to perform a one-shot or periodic vibration.
  *
  * @since 2.2
  * @version 1.0
@@ -48,32 +49,41 @@ extern "C" {
 
 struct VibratorInterface {
     /**
-     * @brief Controls this vibrator to perform a one-shot vibration at a given duration.
+     * @brief Controls the vibrator to perform a one-shot vibration that lasts for a given duration.
+     *
+     * One-shot vibration is mutually exclusive with periodic vibration. Before using one-shot vibration,
+     * exit periodic vibration.
      *
      * @param duration Indicates the duration that the one-shot vibration lasts, in milliseconds.
-     * @return Returns <b>0</b> if the sensor is successfully disabled; returns a negative value otherwise.
+      * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
      *
      * @since 2.2
      * @version 1.0
      */
     int32_t (*StartOnce)(uint32_t duration);
     /**
-     * @brief Controls this vibrator to perform a one-shot vibration with a preset vibration effect.
+     * @brief Controls the vibrator to perform a periodic vibration with the preset effect.
      *
-     * @param effectType Indicates the preset vibration effect.
-     * @return Returns <b>0</b> if the sensor is successfully disabled; returns a negative value otherwise.
+     * One-shot vibration is mutually exclusive with periodic vibration. Before using periodic vibration,
+     * exit one-shot vibration.
+     *
+     * @param effectType Indicates the pointer to the preset effect type. It is recommended that the
+     * maximum length be 64 bytes.
+      * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
      *
      * @since 2.2
      * @version 1.0
      */
     int32_t (*Start)(const char *effectType);
     /**
-     * @brief Controls this vibrator to stop the vibration.
+     * @brief Stops the vibration.
      *
-     * @param mode Indicates the mode of the vibration to stop.The values can be time or
-     * preset, respectively representing a one-shot vibration effect, a preset vibration effect.
+     * Before the vibrator starts, it must stop vibrating in any mode. This function can be used during
+     * and after the vibrating process.
+     *
+     * @param mode Indicates the vibration mode, which can be one-shot or periodic. For details,
      * see {@link VibratorMode}.
-     * @return Returns <b>0</b> if the sensor is successfully disabled; returns a negative value otherwise.
+      * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
      *
      * @since 2.2
      * @version 1.0
@@ -83,9 +93,8 @@ struct VibratorInterface {
 
 /**
  * @brief Creates a <b>VibratorInterface</b> instance.
- * You can use the instance to obtain vibrator information, controls this vibrator to perform a one-shot vibration
- * with a preset vibration effect or this vibrator to perform a one-shot vibration at a given duration and
- * stops vibrator.
+ *
+ * The obtained <b>VibratorInterface</b> instance can be used to control the vibrator to vibrate as configured.
  *
  * @return Returns a non-zero value if the instance is successfully created; returns <b>0</b> otherwise.
  *
@@ -95,9 +104,9 @@ struct VibratorInterface {
 const struct VibratorInterface *NewVibratorInterfaceInstance(void);
 
 /**
- * @brief Releases the <b>VibratorInterface</b> instance.
+ * @brief Releases this <b>VibratorInterface</b> instance to free up related resources.
  *
- * @return Returns <b>0</b> if the instance is successfully released; returns a negative value otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
  *
  * @since 2.2
  * @version 1.0
