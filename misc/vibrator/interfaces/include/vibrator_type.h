@@ -53,6 +53,7 @@ extern "C" {
 enum VibratorMode {
     VIBRATOR_MODE_ONCE   = 0,    /**< Indicates the one-shot vibration with the given duration. */
     VIBRATOR_MODE_PRESET = 1,    /**< Indicates the periodic vibration with the preset effect. */
+    VIBRATOR_MODE_BUT    = 2,    /**< Indicates the invalid effect. */
 };
 
 #ifdef __cplusplus

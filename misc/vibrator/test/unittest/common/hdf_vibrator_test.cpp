@@ -188,7 +188,7 @@ HWTEST_F(HdfVibratorTest, ExecuteVibratorEffect004, TestSize.Level1)
 
     OsalMSleep(g_sleepTime2);
 
-    int32_t endRet = g_vibratorDev->Stop(-1);
+    int32_t endRet = g_vibratorDev->Stop(VIBRATOR_MODE_BUT);
     EXPECT_EQ(endRet, HDF_FAILURE);
 }
 
