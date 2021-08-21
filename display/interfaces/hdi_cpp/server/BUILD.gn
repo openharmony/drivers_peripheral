@@ -39,9 +39,12 @@ if (is_standard_system) {
       "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
       "//drivers/adapter/uhdf2/osal:libhdf_utils",
       "//drivers/peripheral/display/hal:hdi_display_gralloc",
-      "//drivers/peripheral/display/hal:hdi_display_layer",
       "//foundation/graphic/standard/utils:buffer_handle",
     ]
+
+    if (target_cpu == "arm") {
+      deps += [ "//drivers/peripheral/display/hal:hdi_display_layer" ]
+    }
 
     if (is_standard_system) {
       external_deps = [
