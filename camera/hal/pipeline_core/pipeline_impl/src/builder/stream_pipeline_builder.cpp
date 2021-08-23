@@ -34,7 +34,7 @@ std::shared_ptr<Pipeline> StreamPipelineBuilder::Build(const std::shared_ptr<Pip
             std::string nodeName;
             size_t pos = it.name_.find_first_of('#');
             nodeName = it.name_.substr(0, pos);
-            std::shared_ptr<INode> newNode = NodeFactory::Instance().CreateShared(nodeName, it.name_, it.type_, it.streamId_);
+            std::shared_ptr<INode> newNode = NodeFactory::Instance().CreateShared(nodeName, it.name_, it.type_);
             if (newNode == nullptr) {
                 CAMERA_LOGI("create node failed! \n");
                 return nullptr;
@@ -79,7 +79,8 @@ std::shared_ptr<Pipeline> StreamPipelineBuilder::Build(const std::shared_ptr<Pip
 
 RetCode StreamPipelineBuilder::Destroy(int streamId)
 {
-    pipeline_.reset();
+    CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
+    pipeline_->nodes_.clear();
     return RC_OK;
 }
 

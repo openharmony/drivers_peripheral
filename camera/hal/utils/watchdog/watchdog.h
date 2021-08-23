@@ -16,10 +16,10 @@
 #ifndef HOS_CAMERA_WATCHDOG_H
 #define HOS_CAMERA_WATCHDOG_H
 
-#include <thread>
-#include <mutex>
 #include <condition_variable>
 #include <memory>
+#include <mutex>
+#include <thread>
 
 namespace OHOS::Camera {
 class WatchDog {
@@ -37,10 +37,20 @@ private:
     std::function<void()> executor_ = nullptr;
     std::condition_variable cv_;
     std::mutex lock_;
-    std::thread handleThread_;
+    std::unique_ptr<std::thread> handleThread_ = nullptr;
     bool terminate_ = false;
     bool isKill_ = false;
 };
+
+#define WATCHDOG_TIMEOUT 10000
+
+#define PLACE_A_WATCHDOG(t, f, k) \
+    WatchDog _dog;                \
+    _dog.Init(t, f, k);
+
+#define PLACE_A_WATCHDOG_DEFAULT_TIME(f, k) PLACE_A_WATCHDOG(WATCHDOG_TIMEOUT, f, k)
+#define PLACE_A_SELFKILL_WATCHDOG           PLACE_A_WATCHDOG_DEFAULT_TIME(nullptr, true)
+#define PLACE_A_NOKILL_WATCHDOG(f)          PLACE_A_WATCHDOG_DEFAULT_TIME(f, false);
 } // namespace OHOS::Camera
 
 #endif

@@ -19,12 +19,11 @@
 #include "camera_device.h"
 #include "camera.h"
 #include "camera_metadata_info.h"
-#include "stream_operator_impl.h"
+#include "stream_operator.h"
 #include <mutex>
 
 namespace OHOS::Camera {
 class IPipelineCore;
-class StreamOperator;
 class CameraDeviceImpl : public CameraDevice, public std::enable_shared_from_this<CameraDeviceImpl> {
 public:
     CameraDeviceImpl(const std::string &cameraId,
@@ -74,7 +73,7 @@ private:
     std::shared_ptr<IPipelineCore> pipelineCore_;
     OHOS::sptr<ICameraDeviceCallback> cameraDeciceCallback_;
     OHOS::sptr<IStreamOperatorCallback> spCameraDeciceCallback_;
-    OHOS::sptr<StreamOperatorImpl> spStreamOperator_;
+    OHOS::sptr<StreamOperator> spStreamOperator_;
     ResultCallbackMode metaResultMode_;
     std::vector<MetaType> deviceMetaTypes_;
     std::mutex enabledRstMutex_;

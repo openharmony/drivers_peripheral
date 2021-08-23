@@ -16,10 +16,14 @@
 #include "ipp_node.h"
 
 namespace OHOS::Camera {
-IppNode::IppNode(const std::string& name, const std::string& type, const int streamId)
-        :NodeBase(name, type, streamId) {}
+IppNode::IppNode(const std::string& name, const std::string& type)
+    : NodeBase(name, type)
+{
+}
+
 IppNode::~IppNode() {}
-RetCode IppNode::Init()
+
+RetCode IppNode::Init(const int32_t streamId)
 {
     // initialize algo plugin
     if (offlineMode_.load()) {
@@ -38,38 +42,43 @@ RetCode IppNode::Init()
     return RC_OK;
 }
 
-RetCode IppNode::Start()
+RetCode IppNode::Start(const int32_t streamId)
 {
+    NodeBase::Start(streamId);
     // start offline stream process thread
     if (offlineMode_.load()) {
         return RC_OK;
     }
     algoPlugin_ = algoPluginManager_->GetAlgoPlugin(IPP_ALGO_MODE_NORMAL);
-    NodeBase::Start();
     StartProcess();
-    streamRunning_ = true;
     return RC_OK;
 }
 
-RetCode IppNode::Stop()
+RetCode IppNode::Flush(const int32_t streamId)
+{
+    if (offlineMode_.load()) {
+        return RC_OK;
+    }
+
+    algoPlugin_->Flush();
+    NodeBase::Flush(streamId);
+    return RC_OK;
+}
+
+RetCode IppNode::Stop(const int32_t streamId)
 {
     // stop offline stream process thread
     if (offlineMode_.load()) {
         return RC_OK;
     }
-    if (streamRunning_ == false) {
-        return RC_OK;
-    }
-    streamRunning_ = false;
-    algoPlugin_->Flush();
     algoPlugin_->Stop();
 
     StopProcess();
-    NodeBase::Stop();
+    NodeBase::Stop(streamId);
     return RC_OK;
 }
 
-RetCode IppNode::Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+RetCode IppNode::Config(const int32_t streamId, const CaptureMeta& meta)
 {
     // configure algo
     // NodeBase::Configure
@@ -80,20 +89,20 @@ RetCode IppNode::Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
     return RC_OK;
 }
 
-void IppNode::DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec)
+void IppNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     std::vector<std::shared_ptr<IBuffer>> cache;
-    cache.emplace_back(frameSpec->buffer_);
+    cache.emplace_back(buffer);
 
     ReceiveCache(cache);
     return;
 }
 
-void IppNode::DeliverBuffers(std::vector<std::shared_ptr<FrameSpec>> buffers)
+void IppNode::DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers)
 {
     std::vector<std::shared_ptr<IBuffer>> cache;
     for (auto it : buffers) {
-        cache.emplace_back(it->buffer_);
+        cache.emplace_back(it);
     }
 
     ReceiveCache(cache);
@@ -111,13 +120,12 @@ void IppNode::ProcessCache(std::vector<std::shared_ptr<IBuffer>>& buffers)
     }
     std::shared_ptr<CameraStandard::CameraMetadata> meta = nullptr;
     if (algoPlugin_ != nullptr) {
-        CAMERA_LOGV("process buffers with algo, input buffer count = %u.", buffers.size());
+        CAMERA_LOGV("process buffers with algo, input buffer count = %{public}u.", buffers.size());
         algoPlugin_->Process(outBuffer, buffers, meta);
     }
 
     std::shared_ptr<IBuffer> algoProduct = nullptr;
-    std::vector<std::shared_ptr<IBuffer> > recycleBuffers {
-    };
+    std::vector<std::shared_ptr<IBuffer>> recycleBuffers{};
     ClassifyOutputBuffer(outBuffer, buffers, algoProduct, recycleBuffers);
 
     DeliverAlgoProductBuffer(algoProduct);
@@ -141,13 +149,11 @@ void IppNode::DeliverCancelCache(std::vector<std::shared_ptr<IBuffer>>& buffers)
     }
 
     std::shared_ptr<IBuffer> algoProduct = nullptr;
-    std::vector<std::shared_ptr<IBuffer> > recycleBuffers {
-    };
+    std::vector<std::shared_ptr<IBuffer>> recycleBuffers{};
     ClassifyOutputBuffer(outBuffer, buffers, algoProduct, recycleBuffers);
     if (algoProduct == nullptr) {
         return;
     }
-    algoProduct->SetValidFlag(false);
     DeliverAlgoProductBuffer(algoProduct);
     DeliverCache(recycleBuffers);
 
@@ -162,8 +168,7 @@ RetCode IppNode::GetOutputBuffer(std::vector<std::shared_ptr<IBuffer>>& buffers,
         return RC_ERROR;
     }
 
-    PortFormat format {
-    };
+    PortFormat format{};
     outPort->GetFormat(format);
     auto id = format.bufferPoolId_;
     for (auto it : buffers) {
@@ -200,10 +205,7 @@ void IppNode::DeliverAlgoProductBuffer(std::shared_ptr<IBuffer>& result)
             CAMERA_LOGE("can't find out port, deliver algo product failed.");
             return;
         }
-        std::shared_ptr<FrameSpec> spec = std::make_shared<FrameSpec>();
-        spec->bufferPoolId_ = result->GetPoolId();
-        spec->buffer_ = result;
-        outPort->DeliverBuffer(spec);
+        outPort->DeliverBuffer(result);
     }
 
     return;
@@ -225,8 +227,7 @@ void IppNode::ClassifyOutputBuffer(std::shared_ptr<IBuffer>& outBuffer,
         return;
     }
 
-    PortFormat format {
-    };
+    PortFormat format{};
     outPort->GetFormat(format);
     auto id = format.bufferPoolId_;
     auto it = std::find_if(inBuffers.begin(), inBuffers.end(),
@@ -238,6 +239,8 @@ void IppNode::ClassifyOutputBuffer(std::shared_ptr<IBuffer>& outBuffer,
     product = *it;
     inBuffers.erase(it);
     recycleBuffers = inBuffers;
+    product->SetCaptureId(inBuffers[0]->GetCaptureId());
+    product->SetBufferStatus(inBuffers[0]->GetBufferStatus());
     return;
 }
 REGISTERNODE(IppNode, {"ipp"});

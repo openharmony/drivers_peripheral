@@ -81,8 +81,14 @@ public:
     virtual CamRetCode IsStreamsSupported(
         OperationMode mode,
         const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
-        const std::shared_ptr<StreamInfo> &info,
+        const std::vector<std::shared_ptr<StreamInfo>> &info,
         StreamSupportType &type) = 0;
+
+    virtual CamRetCode IsStreamsSupported(
+        OperationMode mode,
+        const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
+        const std::shared_ptr<StreamInfo> &info,
+        StreamSupportType &type){return NO_ERROR;};
 
     /**
      * @brief Creates streams.
@@ -216,7 +222,7 @@ public:
      * @brief Converts a specific stream to an offline stream.
      *
      * Only photographing streams can be converted into offline streams.
-     * Due to the limited processing capability, some devices may spend a long period of time on algorithm processing during photographing, causing the capture requests to stack in the module. 
+     * Due to the limited processing capability, some devices may spend a long period of time on algorithm processing during photographing, causing the capture requests to stack in the module.
      * Converting to an offline stream enables the bottom-layer device to close and the offline stream to take over for subsequent processing.
      *
      * @param streamIds Indicates the IDs of the streams to be converted.

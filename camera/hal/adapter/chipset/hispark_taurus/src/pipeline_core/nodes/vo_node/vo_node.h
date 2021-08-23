@@ -19,17 +19,18 @@
 #include "vo_controller.h"
 #include "vo_manager.h"
 #include "mpi_node.h"
+#include "sink_node.h"
 #include "device_manager_adapter.h"
 #include "mpi_device_manager.h"
 #include "camera.h"
 
 namespace OHOS::Camera {
-class VoNode : public MpiNode {
+class VoNode : public MpiNode, public SinkNode {
 public:
-    VoNode(const std::string& name, const std::string& type, const int streamId);
-    ~VoNode() override = default;
-    RetCode Start() override;
-    RetCode Stop() override;
+    VoNode(const std::string& name, const std::string& type);
+    ~VoNode() override;
+    RetCode Start(const int32_t streamId) override;
+    RetCode Stop(const int32_t streamId) override;
     RetCode GetDeviceController();
 
 private:

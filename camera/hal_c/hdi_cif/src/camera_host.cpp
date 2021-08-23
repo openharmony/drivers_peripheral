@@ -126,43 +126,43 @@ CamRetCode CameraHost::Init()
 {
     host_ = new CameraHostCIF();
     if (host_ == nullptr) {
-        CAMERA_LOGE("%s, create camera host failed.", __FUNCTION__);
+        CAMERA_LOGE("%{public}s, create camera host failed.", __FUNCTION__);
         return INSUFFICIENT_RESOURCES;
     }
 
     handler_ = ::dlopen(CAMERA_C_HAL_LIB_PATH, RTLD_NOW);
     if (handler_ == nullptr) {
-        CAMERA_LOGE("%s, dlopen %s failed, %s", __FUNCTION__, CAMERA_C_HAL_LIB_PATH, ::dlerror());
+        CAMERA_LOGE("%{public}s, dlopen %{public}s failed, %{public}s", __FUNCTION__, CAMERA_C_HAL_LIB_PATH, ::dlerror());
         return INSUFFICIENT_RESOURCES;
     }
 
     host_->SetCallback = reinterpret_cast<HOST_C_FUNC_SETCALLBACK>(::dlsym(handler_, "SetCallback"));
     if (host_->SetCallback == nullptr) {
-        CAMERA_LOGE("%s, can't get symbol of function SetCallback, %s", __FUNCTION__, ::dlerror());
+        CAMERA_LOGE("%{public}s, can't get symbol of function SetCallback, %{public}s", __FUNCTION__, ::dlerror());
         return INSUFFICIENT_RESOURCES;
     }
 
     host_->GetCameraIds = reinterpret_cast<HOST_C_FUNC_GETCAMERAIDS>(::dlsym(handler_, "GetCameraIds"));
     if (host_->GetCameraIds == nullptr) {
-        CAMERA_LOGE("%s, can't get symbol of function GetCameraIds, %s", __FUNCTION__, ::dlerror());
+        CAMERA_LOGE("%{public}s, can't get symbol of function GetCameraIds, %{public}s", __FUNCTION__, ::dlerror());
         return INSUFFICIENT_RESOURCES;
     }
 
     host_->GetCameraAbility = reinterpret_cast<HOST_C_FUNC_GETCAMERAABILITY>(::dlsym(handler_, "GetCameraAbility"));
     if (host_->GetCameraAbility == nullptr) {
-        CAMERA_LOGE("%s, can't get symbol of function GetCameraAbility, %s", __FUNCTION__, ::dlerror());
+        CAMERA_LOGE("%{public}s, can't get symbol of function GetCameraAbility, %{public}s", __FUNCTION__, ::dlerror());
         return INSUFFICIENT_RESOURCES;
     }
 
     host_->OpenCamera = reinterpret_cast<HOST_C_FUNC_OPENCAMERA>(::dlsym(handler_, "OpenCamera"));
     if (host_->OpenCamera == nullptr) {
-        CAMERA_LOGE("%s, can't get symbol of function OpenCamera, %s", __FUNCTION__, ::dlerror());
+        CAMERA_LOGE("%{public}s, can't get symbol of function OpenCamera, %{public}s", __FUNCTION__, ::dlerror());
         return INSUFFICIENT_RESOURCES;
     }
 
     host_->SetFlashlight = reinterpret_cast<HOST_C_FUNC_SETFLASHLIGHT>(::dlsym(handler_, "SetFlashlight"));
     if (host_->SetFlashlight == nullptr) {
-        CAMERA_LOGE("%s, can't get symbol of function SetFlashlight, %s", __FUNCTION__, ::dlerror());
+        CAMERA_LOGE("%{public}s, can't get symbol of function SetFlashlight, %{public}s", __FUNCTION__, ::dlerror());
         return INSUFFICIENT_RESOURCES;
     }
 

@@ -14,387 +14,566 @@
  */
 
 #include "stream_base.h"
-#include <cstdio>
-#include <string>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <display_type.h>
-#include <surface_type.h>
-#include "buffer_manager.h"
 #include "buffer_adapter.h"
-#include "image_buffer.h"
-
-namespace {
-    constexpr uint32_t BUFFER_QUEUE_SIZE = 8;
-    constexpr uint32_t STRIDER_ALIGNMENT = 8;
-}
+#include "buffer_manager.h"
+#include "watchdog.h"
 
 namespace OHOS::Camera {
-StreamBase::StreamBase()
+
+std::map<StreamIntent, std::string> IStream::g_avaliableStreamType = {
+    {PREVIEW, STREAM_INTENT_TO_STRING(PREVIEW)},
+    {VIDEO, STREAM_INTENT_TO_STRING(VIDEO)},
+    {STILL_CAPTURE, STREAM_INTENT_TO_STRING(STILL_CAPTURE)},
+    {POST_VIEW, STREAM_INTENT_TO_STRING(POST_VIEW)},
+    {ANALYZE, STREAM_INTENT_TO_STRING(ANALYZE)},
+    {CUSTOM, STREAM_INTENT_TO_STRING(CUSTOM)},
+};
+
+StreamBase::StreamBase(const int32_t id,
+                       const StreamIntent type,
+                       std::shared_ptr<IPipelineCore>& p,
+                       std::shared_ptr<CaptureMessageOperator>& m)
 {
+    streamId_ = id;
+    streamType_ = static_cast<int32_t>(type);
+    pipelineCore_ = p;
+    messenger_ = m;
 }
 
 StreamBase::~StreamBase()
 {
+    if (state_ == STREAM_STATE_BUSY) {
+        StopStream();
+    }
+
+    if (hostStreamMgr_ != nullptr) {
+        hostStreamMgr_->DestroyHostStream({streamId_});
+    }
+
+    if (pipeline_ != nullptr) {
+        pipeline_->DestroyPipeline({streamId_});
+    }
 }
 
-RetCode StreamBase::Init(const std::shared_ptr<StreamInfo> &streamInfo)
+RetCode StreamBase::ConfigStream(StreamConfiguration& config)
 {
-    RetCode rc = RC_ERROR;
-    if (streamInfo == nullptr) {
-        CAMERA_LOGE("input param is null.");
-        return rc;
-    }
-    streamInfo_ = streamInfo;
-    if (streamInfo_->bufferQueue_ != nullptr) {
-        producer_ = OHOS::Surface::CreateSurfaceAsProducer(streamInfo_->bufferQueue_);
+    if (state_ != STREAM_STATE_IDLE) {
+        return RC_ERROR;
     }
 
-    CAMERA_LOGD("init stream id = %d", streamInfo_->streamId_);
-    rc = CreateBufferPool();
-    if (rc != RC_OK) {
-        CAMERA_LOGE("create buffer pool failed.");
-        return rc;
+    streamConfig_ = config;
+    streamConfig_.usage = GetUsage();
+    if (tunnel_ != nullptr) {
+        streamConfig_.tunnelMode = true;
     }
-
-    if (attribute_ == nullptr) {
-        attribute_ = std::make_shared<StreamAttribute>();
-        if (attribute_ == nullptr) {
-            return RC_ERROR;
-        }
-    }
-
-    attribute_->streamId_ = streamInfo_->streamId_;
-    attribute_->width_ = streamInfo_->width_;
-    attribute_->height_ = streamInfo_->height_;
-    attribute_->overrideFormat_ = streamInfo_->format_;
-    attribute_->overrideDatasapce_ = streamInfo_->datasapce_;
-    attribute_->producerUsage_ = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA;
-    attribute_->producerBufferCount_ = GetQueueSize();
-    attribute_->maxBatchCaptureCount_ = GetQueueSize();
-    attribute_->maxCaptureCount_ = 1;
-
+    streamConfig_.bufferCount = GetBufferCount();
+    streamConfig_.maxBatchCaptureCount = 1;
+    streamConfig_.maxCaptureCount = 1;
+    // TODO:get device cappability to overide configuration
     return RC_OK;
 }
 
-RetCode StreamBase::RequestCheck()
+RetCode StreamBase::CommitStream()
 {
-    if (streamInfo_ == nullptr) {
-        CAMERA_LOGW("stream info is null.");
+    if (state_ != STREAM_STATE_IDLE) {
         return RC_ERROR;
     }
 
-    if (producer_ == nullptr) {
-        CAMERA_LOGW("buffer queue is null.");
-        return RC_ERROR;
-    }
-    return RC_OK;
-}
+    CHECK_IF_PTR_NULL_RETURN_VALUE(pipelineCore_, RC_ERROR);
 
-RetCode StreamBase::Request()
-{
-    if (!isOnline) {
-        return RC_OK;
-    }
+    pipeline_ = pipelineCore_->GetStreamPipelineCore();
+    CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
 
-    if (RequestCheck() == RC_ERROR) {
-        return RC_ERROR;
-    }
+    hostStreamMgr_ = pipelineCore_->GetHostStreamMgr();
+    CHECK_IF_PTR_NULL_RETURN_VALUE(hostStreamMgr_, RC_ERROR);
 
-    if (!requestFlag_) {
-        return RC_OK;
-    }
+    HostStreamInfo info;
+    info.type_ = static_cast<StreamIntent>(streamType_);
+    info.streamId_ = streamId_;
+    info.width_ = streamConfig_.width;
+    info.height_ = streamConfig_.height;
+    info.format_ = streamConfig_.format;
+    info.usage_ = streamConfig_.usage;
+    info.encodeType_ = streamConfig_.encodeType;
 
-    OHOS::sptr<OHOS::SurfaceBuffer> sb = nullptr;
-    // get surface buffer from producer client
-    int32_t fence = 0;
-    OHOS::BufferRequestConfig config = {
-        .width = streamInfo_->width_,
-        .height = streamInfo_->height_,
-        .strideAlignment = STRIDER_ALIGNMENT,
-        .format = streamInfo_->format_,
-        .usage = attribute_->producerUsage_,
-        .timeout = 0
-    };
-    OHOS::SurfaceError sfError = producer_->RequestBuffer(sb, fence, config);
-    if (sfError == OHOS::SURFACE_ERROR_NO_BUFFER) {
-        return RC_OK;
-    }
-    if (sfError != OHOS::SURFACE_ERROR_OK) {
-        CAMERA_LOGE("get producer buffer failed. [streamId = %{public}d] [sfError = %{public}d]",
-            streamInfo_->streamId_, sfError);
-        return RC_ERROR;
-    }
+    if (streamConfig_.tunnelMode) {
+        BufferManager* mgr = BufferManager::GetInstance();
+        CHECK_IF_PTR_NULL_RETURN_VALUE(mgr, RC_ERROR);
 
-    std::shared_ptr<IBuffer> cameraBuffer = nullptr;
-    {
-        std::unique_lock<std::mutex> l(bmLock_);
-        auto it = std::find_if(bufferMap_.begin(), bufferMap_.end(),
-            [&sb](const std::pair<std::shared_ptr<IBuffer>, OHOS::sptr<OHOS::SurfaceBuffer>>& p) {
-                return sb == p.second;
-            });
-        if (it == bufferMap_.end()) {
-            // surface buffer change to camera buffer
-            cameraBuffer = std::make_shared<ImageBuffer>(CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL);
-            RetCode rc = BufferAdapter::SurfaceBufferToCameraBuffer(sb, cameraBuffer);
-            if (rc != RC_OK) {
-                CAMERA_LOGE("surface buffer change failed. [streamId = %{public}d]", streamInfo_->streamId_);
+        if (bufferPool_ == nullptr) {
+            poolId_ = mgr->GenerateBufferPoolId();
+            CHECK_IF_EQUAL_RETURN_VALUE(poolId_, 0, RC_ERROR);
+
+            bufferPool_ = mgr->GetBufferPool(poolId_);
+            if (bufferPool_ == nullptr) {
+                CAMERA_LOGE("stream [id:%{public}d] get buffer pool failed.", streamId_);
                 return RC_ERROR;
             }
-            cameraBuffer->SetIndex(++bufferIndex);
-            bufferMap_[cameraBuffer] = sb;
-        } else {
-            cameraBuffer = it->first;
         }
-    }
 
-    // add buffer to buffer pool
-    if (streamInfo_->encodeType_ != 0) {
-        cameraBuffer->SetEncodeType(streamInfo_->encodeType_);
-    }
-    cameraBuffer->SetFenceId(fence);
-    RetCode rc = bufferPool_->AddBuffer(cameraBuffer);
-    if (rc != RC_OK) {
-        CAMERA_LOGE("buffer enq failed. [streamId = %{public}d]", streamInfo_->streamId_);
-        return RC_ERROR;
-    }
-
-    {
-        std::lock_guard<std::mutex> l(frameLock_);
-        frameCount_++;
-        pipeBuffer_.emplace_back(cameraBuffer);
-        CAMERA_LOGD("buffer enqueue. [index = %d, streamId = %d, addr = %p]",
-            cameraBuffer->GetIndex(), streamInfo_->streamId_, sb->GetVirAddr());
-    }
-    return RC_OK;
-}
-
-RetCode StreamBase::Result(const std::shared_ptr<IBuffer> &buffer, OperationType optType)
-{
-    if (buffer == nullptr) {
-        CAMERA_LOGE("result buffer is null. [streamId = %d]", streamInfo_->streamId_);
-        return RC_ERROR;
-    }
-
-    int32_t index = buffer->GetIndex();
-    std::shared_ptr<IBuffer> cameraBuffer = nullptr;
-    {
-        std::lock_guard<std::mutex> l(frameLock_);
-        auto itcb = std::find(pipeBuffer_.begin(), pipeBuffer_.end(), buffer);
-        if (itcb == pipeBuffer_.end()) {
-            CAMERA_LOGE("fatal error, can't find camera buffer [index:%{public}d] [streamId = %{public}d]",
-                index, streamInfo_->streamId_);
+        info.bufferPoolId_ = poolId_;
+        info.bufferCount_ = GetBufferCount();
+        RetCode rc = bufferPool_->Init(streamConfig_.width, streamConfig_.height, streamConfig_.usage,
+                                       streamConfig_.format, GetBufferCount(), CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL);
+        if (rc != RC_OK) {
+            CAMERA_LOGE("stream [id:%{public}d] initialize buffer pool failed.", streamId_);
             return RC_ERROR;
         }
-        cameraBuffer = *itcb;
-        pipeBuffer_.erase(itcb);
     }
 
-    OHOS::sptr<OHOS::SurfaceBuffer> surfaceBuffer = nullptr;
+    RetCode rc = hostStreamMgr_->CreateHostStream(info, [this](std::shared_ptr<IBuffer> buffer) {
+        HandleResult(buffer);
+        return;
+    });
+    if (rc != RC_OK) {
+        CAMERA_LOGE("commit stream [id:%{public}d] to pipeline failed.", streamId_);
+        return RC_ERROR;
+    }
+    CAMERA_LOGI("commit a stream to pipeline id[%{public}d], w[%{public}d], h[%{public}d], poolId[%{public}llu], encodeType = %{public}d", info.streamId_,
+                info.width_, info.height_, info.bufferPoolId_, info.encodeType_);
+    state_ = STREAM_STATE_ACTIVE;
+
+    return RC_OK;
+}
+
+RetCode StreamBase::StartStream()
+{
+    CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
+
+    if (state_ != STREAM_STATE_ACTIVE) {
+        return RC_ERROR;
+    }
+
+    CAMERA_LOGI("start stream [id:%{public}d] begin", streamId_);
+    tunnel_->NotifyStart();
+
+    uint32_t n = GetBufferCount();
+    for (uint32_t i = 0; i < n; i++) {
+        DeliverBuffer();
+    }
+
+    RetCode rc = pipeline_->Prepare({streamId_});
+    if (rc != RC_OK) {
+        CAMERA_LOGE("pipeline [id:%{public}d] prepare failed", streamId_);
+        return rc;
+    }
+
+    state_ = STREAM_STATE_BUSY;
+    std::string threadName =
+        g_avaliableStreamType[static_cast<StreamIntent>(streamType_)] + "#" + std::to_string(streamId_);
+    handler_ = std::make_unique<std::thread>([this, &threadName] {
+        prctl(PR_SET_NAME, threadName.c_str());
+        while (state_ == STREAM_STATE_BUSY) {
+            HandleRequest();
+        }
+    });
+    if (handler_ == nullptr) {
+        state_ = STREAM_STATE_ACTIVE;
+        return RC_ERROR;
+    }
+
+    rc = pipeline_->Start({streamId_});
+    if (rc != RC_OK) {
+        CAMERA_LOGE("pipeline [%{public}d] start failed", streamId_);
+        return RC_ERROR;
+    }
+    CAMERA_LOGI("start stream [id:%{public}d] end", streamId_);
+
+    return RC_OK;
+}
+
+RetCode StreamBase::StopStream()
+{
+    CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
+    if (state_ == STREAM_STATE_IDLE) {
+        CAMERA_LOGI("stream [id:%{public}d], no need to stop", streamId_);
+        return RC_OK;
+    }
+    CAMERA_LOGI("stop stream [id:%{public}d] begin", streamId_);
+
+    state_ = STREAM_STATE_IDLE;
+
+    tunnel_->NotifyStop();
+    cv_.notify_one();
+    if (handler_ != nullptr) {
+        handler_->join();
+    }
+
+    if (!waitingList_.empty()) {
+        auto request = waitingList_.front();
+        if (request != nullptr && request->IsContinous()) {
+            request->Cancel();
+        }
+    }
     {
-        std::unique_lock<std::mutex> l(bmLock_);
-        auto itsb = bufferMap_.find(cameraBuffer);
-        if (itsb == bufferMap_.end()) {
-            CAMERA_LOGE("fatal error, can't find surface buffer [index:%{public}d] [streamId = %{public}d]",
-                __FUNCTION__, index, streamInfo_->streamId_);
+        std::unique_lock<std::mutex> l(wtLock_);
+        waitingList_.clear();
+    }
+
+    RetCode rc = pipeline_->Flush({streamId_});
+    if (rc != RC_OK) {
+        CAMERA_LOGE("stream [id:%{public}d], pipeline flush failed", streamId_);
+        return RC_ERROR;
+    }
+
+    CAMERA_LOGI("stream [id:%{public}d] is waiting buffers returned", streamId_);
+    tunnel_->WaitForAllBufferReturned();
+    CAMERA_LOGI("stream [id:%{public}d], all buffers are returned.", streamId_);
+
+    rc = pipeline_->Stop({streamId_});
+    if (rc != RC_OK) {
+        CAMERA_LOGE("stream [id:%{public}d], pipeline stop failed", streamId_);
+        return RC_ERROR;
+    }
+
+    if (lastRequest_->IsContinous() && !inTransitList_.empty()) {
+        std::shared_ptr<ICaptureMessage> endMessage =
+            std::make_shared<CaptureEndedMessage>(streamId_, lastRequest_->GetCaptureId(),
+            lastRequest_->GetEndTime(), lastRequest_->GetOwnerCount(), tunnel_->GetFrameCount());
+        CAMERA_LOGV("end of stream [%{public}d], ready to send end message", streamId_);
+        messenger_->SendMessage(endMessage);
+    }
+
+    CAMERA_LOGI("stop stream [id:%{public}d] end", streamId_);
+    isFirstRequest = true;
+
+    inTransitList_.clear();
+    tunnel_->CleanBuffers();
+    bufferPool_->ClearBuffers();
+    return RC_OK;
+}
+
+RetCode StreamBase::AddRequest(std::shared_ptr<CaptureRequest>& request)
+{
+    CHECK_IF_PTR_NULL_RETURN_VALUE(request, RC_ERROR);
+    request->AddOwner(shared_from_this());
+
+    request->SetFirstRequest(false);
+    if (isFirstRequest) {
+        RetCode rc = StartStream();
+        if (rc != RC_OK) {
+            CAMERA_LOGE("start stream [id:%{public}d] failed", streamId_);
             return RC_ERROR;
         }
-        surfaceBuffer = bufferMap_[cameraBuffer];
+        request->SetFirstRequest(true);
+        isFirstRequest = false;
     }
 
-    RetCode rc = bufferPool_->ReturnBuffer(cameraBuffer);
-    if (rc != RC_OK) {
-        CAMERA_LOGE("buffpool return buffer failed");
+    {
+        std::unique_lock<std::mutex> l(wtLock_);
+        waitingList_.emplace_back(request);
+        cv_.notify_one();
     }
 
-    int32_t fence = 0;
-    OHOS::BufferFlushConfig flushConf = {
-        .damage = {
-            .x = 0,
-            .y = 0,
-            .w = streamInfo_->width_,
-            .h = streamInfo_->height_
-        },
-        .timestamp = 0
-    };
-    if (producer_ != nullptr) {
-        if (optType == STREAM_BUFFER_FLUSH) {
-            CAMERA_LOGD("buffer dequeue. [index = %d, streamId = %d, addr = %p]",
-                index, streamInfo_->streamId_, surfaceBuffer->GetVirAddr());
-            producer_->FlushBuffer(surfaceBuffer, fence, flushConf);
-        } else {
-            CAMERA_LOGD("buffer cancel. [index = %d, streamId = %d, addr = %p]",
-                index, streamInfo_->streamId_, surfaceBuffer->GetVirAddr());
-            producer_->CancelBuffer(surfaceBuffer);
+    return RC_OK;
+}
+
+RetCode StreamBase::CancelRequest(const std::shared_ptr<CaptureRequest>& request)
+{
+    CHECK_IF_PTR_NULL_RETURN_VALUE(request, RC_ERROR);
+
+    {
+        // We don't care if this request is continious-capture or single-capture, just erase it.
+        // And those requests in inTransitList_ will be removed in HandleResult.
+        std::unique_lock<std::mutex> wl(wtLock_);
+        auto it = std::find(waitingList_.begin(), waitingList_.end(), request);
+        if (it != waitingList_.end()) {
+            waitingList_.erase(it);
+            CAMERA_LOGI("stream [id:%{public}d], cancel request(capture id:%{public}d) success",
+                streamId_, request->GetCaptureId());
         }
     }
 
-    std::unique_lock<std::mutex> l(frameLock_);
-    frameCount_--;
-    return RC_OK;
-}
-
-RetCode StreamBase::CreateBufferPool()
-{
-    if (streamInfo_ == nullptr) {
-        CAMERA_LOGE("cannot create bufferpool by invalid streaminfo");
-        return RC_ERROR;
-    }
-
-    BufferManager *bufMgr = BufferManager::GetInstance();
-    if (bufMgr == nullptr) {
-        CAMERA_LOGW("buffer manager is null.");
-        return RC_ERROR;
-    }
-
-    int64_t bufPoolId = bufMgr->GenerateBufferPoolId();
-    if (bufPoolId == 0) {
-        CAMERA_LOGW("generate buffer poolId failed.");
-        return RC_ERROR;
-    }
-
-    bufferPool_ = bufMgr->GetBufferPool(bufPoolId);
-    if (bufferPool_ == nullptr) {
-        CAMERA_LOGE("get buffer pool is null.");
-        return RC_ERROR;
-    }
-
-    CAMERA_LOGV("get buffer pool id = %lld, instance = %p", bufPoolId, bufferPool_.get());
-    bufferPoolId_ = static_cast<uint64_t>(bufPoolId);
-
-    uint32_t nCount = GetQueueSize();
-    if (producer_ != nullptr) {
-        producer_->SetQueueSize(nCount);
-    }
-
-    uint32_t nUsage = CAMERA_USAGE_SW_WRITE_OFTEN |
-        CAMERA_USAGE_SW_READ_OFTEN | CAMERA_USAGE_MEM_DMA;
-
-    PixelFormat pf = static_cast<PixelFormat>(streamInfo_->format_);
-    uint32_t format = BufferAdapter::PixelFormatToCameraFormat(pf);
-
-    RetCode rc = bufferPool_->Init(streamInfo_->width_, streamInfo_->height_,
-        nUsage, format, nCount, CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL);
-
-    return rc;
-}
-
-uint64_t StreamBase::GetCurrentLocalTimeStamp()
-{
-    std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> tp =
-        std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
-    auto tmp = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch());
-    return static_cast<uint64_t>(tmp.count());
-}
-
-RetCode StreamBase::AttachBufferQueue(const OHOS::sptr<OHOS::IBufferProducer> &producer)
-{
-    if (streamInfo_ == nullptr) {
-        CAMERA_LOGE("stream info is null.");
-        return RC_ERROR;
-    }
-
-    streamInfo_->bufferQueue_ = producer;
-    if (streamInfo_->bufferQueue_ != nullptr) {
-        producer_ = OHOS::Surface::CreateSurfaceAsProducer(streamInfo_->bufferQueue_);
+    if (request->IsContinous()) {
+        // may be this is the last request
+        std::unique_lock<std::mutex> tl(tsLock_);
+        auto it = std::find(inTransitList_.begin(), inTransitList_.end(), request);
+        if (it == inTransitList_.end()) {
+            std::shared_ptr<ICaptureMessage> endMessage =
+                std::make_shared<CaptureEndedMessage>(streamId_, request->GetCaptureId(), request->GetEndTime(),
+                                                      request->GetOwnerCount(), tunnel_->GetFrameCount());
+            CAMERA_LOGV("end of stream [%{public}d], ready to send end message", streamId_);
+            messenger_->SendMessage(endMessage);
+        }
     }
     return RC_OK;
 }
 
-RetCode StreamBase::DetachBufferQueue()
+void StreamBase::HandleRequest()
 {
-    if (streamInfo_ == nullptr) {
-        CAMERA_LOGE("stream info is null.");
-        return RC_ERROR;
+    if (waitingList_.empty()) {
+        std::unique_lock<std::mutex> l(wtLock_);
+        if (waitingList_.empty()) {
+            cv_.wait(l, [this] { return !(state_ == STREAM_STATE_BUSY && waitingList_.empty()); });
+        }
     }
-
-    streamInfo_->bufferQueue_ = nullptr;
-    producer_ = nullptr;
-    return RC_OK;
-}
-
-RetCode StreamBase::GetStreamAttribute(std::shared_ptr<StreamAttribute> &attribute) const
-{
-    attribute = attribute_;
-    if (attribute == nullptr) {
-        return RC_ERROR;
-    }
-    return RC_OK;
-}
-
-std::shared_ptr<StreamInfo>& StreamBase::GetStreamInfo()
-{
-    return streamInfo_;
-}
-
-RetCode StreamBase::Release()
-{
-    bufferPoolId_ = 0;
-    // stop reques buffer,destroy producer
-    return RC_OK;
-}
-
-uint64_t StreamBase::GetBufferPoolId() const
-{
-    return bufferPoolId_;
-}
-
-void StreamBase::Stop()
-{
-    requestFlag_ = false;
-
-    if (!isOnline) {
+    if (state_ != STREAM_STATE_BUSY) {
         return;
     }
 
-    if (bufferPool_ == nullptr || producer_ == nullptr) {
+    std::shared_ptr<CaptureRequest> request = nullptr;
+    {
+        // keep a copy of continious-capture in waitingList_, unless it's going to be canceled.
+        std::unique_lock<std::mutex> l(wtLock_);
+        if (waitingList_.empty()) {
+            return;
+        }
+        request = waitingList_.front();
+        CHECK_IF_PTR_NULL_RETURN_VOID(request);
+        if (!request->IsContinous()) {
+            waitingList_.pop_front();
+        }
+    }
+    if (request == nullptr) {
+        CAMERA_LOGE("fatal error, stream [%{public}d] request list is not empty, but can't get one", streamId_);
         return;
     }
 
-    // FIXME: call device to flush buffer
     {
-        std::lock_guard<std::mutex> l(frameLock_);
-        for (auto it : pipeBuffer_) {
-            RetCode rc = bufferPool_->ReturnBuffer(it);
-            if (rc != RC_OK) {
-                CAMERA_LOGE("buffpool return buffer failed");
-            }
-            std::unique_lock<std::mutex> cl(bmLock_);
-            auto itsb = bufferMap_.find(it);
-            if (itsb == bufferMap_.end()) {
+        std::unique_lock<std::mutex> l(tsLock_);
+        if (request->NeedCancel()) {
+            return;
+        }
+        inTransitList_.emplace_back(request);
+    }
+    request->Process(streamId_);
+
+    return;
+}
+
+RetCode StreamBase::Capture(const std::shared_ptr<CaptureRequest>& request)
+{
+    CHECK_IF_PTR_NULL_RETURN_VALUE(request, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
+
+    RetCode rc = RC_ERROR;
+
+    rc = pipeline_->Config({streamId_}, request->GetCaptureSetting());
+    if (rc != RC_OK) {
+        CAMERA_LOGE("stream [id:%{public}d] config pipeline failed.", streamId_);
+        return RC_ERROR;
+    }
+
+    rc = pipeline_->Capture({streamId_}, request->GetCaptureId());
+    if (rc != RC_OK) {
+        CAMERA_LOGE("stream [id:%{public}d] take a capture failed.", streamId_);
+        return RC_ERROR;
+    }
+
+    if (request->IsFirstOne()) {
+        if (messenger_ == nullptr) {
+            CAMERA_LOGE("stream [id:%{public}d] can't send message, messenger_ is null", streamId_);
+            return RC_ERROR;
+        }
+        std::shared_ptr<ICaptureMessage> startMessage = std::make_shared<CaptureStartedMessage>(
+            streamId_, request->GetCaptureId(), request->GetBeginTime(), request->GetOwnerCount());
+        messenger_->SendMessage(startMessage);
+        request->SetFirstRequest(false);
+    }
+
+    // DeliverBuffer must be called after Capture, or this capture request will miss a buffer.
+    {
+        PLACE_A_SELFKILL_WATCHDOG;
+        do {
+            rc = DeliverBuffer();
+        } while (rc != RC_OK && state_ == STREAM_STATE_BUSY);
+    }
+
+    return RC_OK;
+}
+
+RetCode StreamBase::DeliverBuffer()
+{
+    CHECK_IF_PTR_NULL_RETURN_VALUE(tunnel_, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(bufferPool_, RC_ERROR);
+
+    std::shared_ptr<IBuffer> buffer = tunnel_->GetBuffer();
+    CHECK_IF_PTR_NULL_RETURN_VALUE(buffer, RC_ERROR);
+
+    buffer->SetEncodeType(streamConfig_.encodeType);
+    buffer->SetStreamId(streamId_);
+    bufferPool_->AddBuffer(buffer);
+    CAMERA_LOGI("stream [id:%{public}d] enqueue buffer index:%{public}d", streamId_, buffer->GetIndex());
+    return RC_OK;
+}
+
+void StreamBase::HandleResult(std::shared_ptr<IBuffer>& buffer)
+{
+    CHECK_IF_PTR_NULL_RETURN_VOID(buffer);
+    if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_INVALID) {
+        CAMERA_LOGI("stream [id:%{public}d], this buffer(index:%{public}d) has nothing to do with request.", streamId_,
+                    buffer->GetIndex());
+        ReceiveBuffer(buffer);
+        return;
+    }
+
+    if (buffer->GetStreamId() != streamId_) {
+        CAMERA_LOGE("fatal error, stream [%{public}d] reveived a wrong buffer, index:%{public}d. this buffer belongs to stream:%{public}d",
+            streamId_, buffer->GetIndex(), buffer->GetStreamId());
+        return;
+    }
+
+    int32_t captureId = buffer->GetCaptureId();
+    std::shared_ptr<CaptureRequest> request = nullptr;
+    {
+        std::unique_lock<std::mutex> l(tsLock_);
+        for (auto& r : inTransitList_) {
+            if (r == nullptr) {
                 continue;
             }
-             CAMERA_LOGI("buffer cancel. [index = %d, streamId = %d, addr = %p]",
-                it->GetIndex(), streamInfo_->streamId_, bufferMap_[it]->GetVirAddr());
-            producer_->CancelBuffer(bufferMap_[it]);
+            if (r->GetCaptureId() == captureId) {
+                request = r;
+            }
         }
-        pipeBuffer_.clear();
+    }
+    if (request == nullptr) {
+        CAMERA_LOGI("stream [id:%{public}d], this buffer(index:%{public}d) has nothing to do with request.",
+            streamId_, buffer->GetIndex());
+        buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
+        ReceiveBuffer(buffer);
+        return;
+    }
+    request->AttachBuffer(buffer);
+    // TODO: To synchronize multiple stream, bottom-layer device stream need be synchronized first.
+    request->OnResult(streamId_);
+    lastRequest_ = request;
+
+    return;
+}
+
+RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
+{
+    CHECK_IF_PTR_NULL_RETURN_VALUE(request, RC_ERROR);
+    auto buffer = request->GetAttachedBuffer();
+    CameraBufferStatus status = buffer->GetBufferStatus();
+    if (status != CAMERA_BUFFER_STATUS_OK) {
+        if (status != CAMERA_BUFFER_STATUS_DROP) {
+            std::shared_ptr<ICaptureMessage> errorMessage =
+                std::make_shared<CaptureErrorMessage>(streamId_, request->GetCaptureId(), request->GetEndTime(),
+                                                      request->GetOwnerCount(), static_cast<StreamError>(status));
+            messenger_->SendMessage(errorMessage);
+        }
+    }
+    if (request->NeedShutterCallback() || messenger_ != nullptr) {
+        std::shared_ptr<ICaptureMessage> shutterMessage = std::make_shared<FrameShutterMessage>(
+            streamId_, request->GetCaptureId(), request->GetEndTime(), request->GetOwnerCount());
+        messenger_->SendMessage(shutterMessage);
     }
 
     {
-        std::unique_lock<std::mutex> cl(bmLock_);
-        bufferMap_.clear();
+        // inTransitList_ may have multiple copies of continious-capture request, we just need erase one of them.
+        std::unique_lock<std::mutex> l(tsLock_);
+        for (auto it = inTransitList_.begin(); it != inTransitList_.end(); it++) {
+            if ((*it) == request) {
+                inTransitList_.erase(it);
+                break;
+            }
+        }
     }
+
+    ReceiveBuffer(buffer);
+
+    bool isEnded = false;
+    if (!request->IsContinous()) {
+        isEnded = true;
+    } else if (request->NeedCancel()) {
+        isEnded = true;
+    }
+    if (isEnded) {
+        // if this is the last request of capture, send CaptureEndedMessage.
+        std::unique_lock<std::mutex> l(tsLock_);
+        auto it = std::find(inTransitList_.begin(), inTransitList_.end(), request);
+        if (it == inTransitList_.end()) {
+            std::shared_ptr<ICaptureMessage> endMessage =
+                std::make_shared<CaptureEndedMessage>(streamId_, request->GetCaptureId(), request->GetEndTime(),
+                                                      request->GetOwnerCount(), tunnel_->GetFrameCount());
+            CAMERA_LOGV("end of stream [%{public}d], ready to send end message", streamId_);
+            messenger_->SendMessage(endMessage);
+        }
+    }
+    return RC_OK;
 }
 
-RetCode StreamBase::HandleOverStaticContext(const std::shared_ptr<OfflineStreamContext>& context)
+RetCode StreamBase::ReceiveBuffer(std::shared_ptr<IBuffer>& buffer)
 {
-    return RC_ERROR;
+    CHECK_IF_PTR_NULL_RETURN_VALUE(buffer, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(tunnel_, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(bufferPool_, RC_ERROR);
+
+    CAMERA_LOGI("stream [id:%{public}d] dequeue buffer index:%{public}d, status:%{public}d", streamId_, buffer->GetIndex(),
+                buffer->GetBufferStatus());
+    bufferPool_->ReturnBuffer(buffer);
+    tunnel_->PutBuffer(buffer);
+    return RC_OK;
 }
 
-RetCode StreamBase::HandleOverDynamicContext(const std::shared_ptr<OfflineStreamContext>& context)
+uint64_t StreamBase::GetFrameCount() const
 {
-    return RC_ERROR;
+    CHECK_IF_PTR_NULL_RETURN_VALUE(tunnel_, 0);
+    return tunnel_->GetFrameCount();
 }
 
-RetCode StreamBase::SwitchToOffline()
+RetCode StreamBase::AttachStreamTunnel(std::shared_ptr<StreamTunnel>& tunnel)
 {
-    return RC_ERROR;
+    if (state_ == STREAM_STATE_BUSY || state_ == STREAM_STATE_OFFLINE) {
+        return RC_ERROR;
+    }
+
+    tunnel_ = tunnel;
+    CHECK_IF_PTR_NULL_RETURN_VALUE(tunnel_, RC_ERROR);
+    tunnel_->SetBufferCount(GetBufferCount());
+    TunnelConfig config = {streamConfig_.width, streamConfig_.height, streamConfig_.format, streamConfig_.usage};
+    tunnel_->Config(config);
+
+    streamConfig_.tunnelMode = true;
+    return RC_OK;
 }
 
-uint32_t StreamBase::GetQueueSize() const
+RetCode StreamBase::DetachStreamTunnel()
 {
-    return BUFFER_QUEUE_SIZE;
+    if (state_ == STREAM_STATE_BUSY || state_ == STREAM_STATE_OFFLINE) {
+        return RC_ERROR;
+    }
+
+    tunnel_.reset();
+    streamConfig_.tunnelMode = false;
+
+    state_ = STREAM_STATE_IDLE;
+    return RC_OK;
+}
+
+RetCode StreamBase::ChangeToOfflineStream(std::shared_ptr<OfflineStream> offlineStream)
+{
+    return RC_OK;
+}
+
+uint64_t StreamBase::GetUsage()
+{
+    return CAMERA_USAGE_SW_WRITE_OFTEN | CAMERA_USAGE_SW_READ_OFTEN | CAMERA_USAGE_MEM_DMA;
+}
+
+uint32_t StreamBase::GetBufferCount()
+{
+    return 3; // 3: buffer count
+}
+
+StreamConfiguration StreamBase::GetStreamAttribute() const
+{
+    return streamConfig_;
+}
+
+int32_t StreamBase::GetStreamId() const
+{
+    return streamId_;
+}
+
+bool StreamBase::IsRunning() const
+{
+    return state_ == STREAM_STATE_BUSY;
+}
+
+bool StreamBase::GetTunnelMode() const
+{
+    return streamConfig_.tunnelMode;
 }
 } // namespace OHOS::Camera

@@ -32,7 +32,7 @@ public:
     virtual CamRetCode Release() override;
 
 public:
-    RetCode CreateOfflineStream(int32_t id, std::shared_ptr<OfflineStreamContext>& context);
+    RetCode CommitOfflineStream(const std::shared_ptr<OfflineStream>& of);
 
 private:
     std::shared_ptr<OfflineStream> FindStreamByCaptureId(int32_t captureId);

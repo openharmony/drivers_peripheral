@@ -19,29 +19,27 @@
 #include "vpss_controller.h"
 #include "vpss_manager.h"
 #include "mpi_node.h"
+#include "source_node.h"
 #include "device_manager_adapter.h"
 #include "mpi_device_manager.h"
 #include "idevice_manager.h"
 #include "camera.h"
 
 namespace OHOS::Camera {
-class VpssNode : public MpiNode {
+class VpssNode : public MpiNode, public SourceNode {
 public:
-    VpssNode(const std::string& name, const std::string& type, const int streamId);
+    VpssNode(const std::string& name, const std::string& type);
     ~VpssNode() override;
     RetCode GetDeviceController();
-    RetCode Start() override;
-    RetCode Stop() override;
-    void DistributeBuffers();
-    void AchieveBuffer(std::shared_ptr<FrameSpec> frameSpec);
-    void SendCallBack();
+    RetCode Init(const int32_t streamId) override;
+    RetCode Start(const int32_t streamId) override;
+    RetCode Flush(const int32_t streamId) override;
+    RetCode Stop(const int32_t streamId) override;
+    void SetBufferCallback() override;
     RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
 
 private:
     std::shared_ptr<VpssController>         vpssController_ = nullptr;
-    std::mutex                              mtx_;
-    std::condition_variable                 cv_;
-    std::map<int64_t, std::list<std::shared_ptr<FrameSpec>>> buffer_;
 };
 } // namespace OHOS::Camera
 #endif

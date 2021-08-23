@@ -15,10 +15,10 @@
 #include <unistd.h>
 
 namespace OHOS::Camera {
-UvcNode::UvcNode(const std::string& name, const std::string& type, const int streamId)
-        :NodeBase(name, type, streamId)
+UvcNode::UvcNode(const std::string& name, const std::string& type)
+        :NodeBase(name, type)
 {
-    CAMERA_LOGI("%s enter, type(%s), stream id = %d\n", name_.c_str(), type_.c_str(), streamId);
+    CAMERA_LOGI("%s enter, type(%s)\n", name_.c_str(), type_.c_str());
 }
 
 UvcNode::~UvcNode()
@@ -65,7 +65,7 @@ RetCode UvcNode::StartCheck(int64_t &bufferPoolId)
     return RC_OK;
 }
 
-RetCode UvcNode::Start()
+RetCode UvcNode::Start(const int32_t streamId)
 {
     int64_t bufferPoolId;
     if (StartCheck(bufferPoolId) == RC_ERROR) {
@@ -106,7 +106,7 @@ RetCode UvcNode::Start()
     return RC_OK;
 }
 
-RetCode UvcNode::Stop()
+RetCode UvcNode::Stop(const int32_t streamId)
 {
     RetCode rc = RC_OK;
     rc = sensorController_->Stop();
@@ -119,18 +119,15 @@ RetCode UvcNode::Stop()
 
 RetCode UvcNode::Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
 {
-    RetCode rc = RC_OK;
-    IS_NULLPTR(meta)
-    rc = sensorController_->Configure(meta);
-    IS_ERROR(rc)
-    return rc;
+    CHECK_IF_PTR_NULL_RETURN_VALUE(meta, RC_ERROR);
+    return sensorController_->Configure(meta);
 }
 
 void UvcNode::DistributeBuffers()
 {
     CAMERA_LOGI("uvc node distribute buffers enter");
     for (auto& it : streamVec_) {
-        CAMERA_LOGI("uvc node distribute thread bufferpool id = %{public}llu", it.bufferPoolId_);
+        CAMERA_LOGI("uvc node distribute thread bufferpool id = %llu", it.bufferPoolId_);
         it.deliverThread_ = new std::thread([this, it] {
         prctl(PR_SET_NAME, "distribute_buff");
             std::shared_ptr<FrameSpec> frame = nullptr;
@@ -179,7 +176,7 @@ RetCode UvcNode::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)
 {
     CAMERA_LOGI("provide buffers enter.");
     if (sensorController_->SendFrameBuffer(frameSpec) == RC_OK) {
-        CAMERA_LOGD("sendframebuffer success bufferpool id = %{public}llu", frameSpec->bufferPoolId_);
+        CAMERA_LOGD("sendframebuffer success bufferpool id = %llu", frameSpec->bufferPoolId_);
         return RC_OK;
     }
     return RC_ERROR;

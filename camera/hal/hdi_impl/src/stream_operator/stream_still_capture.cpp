@@ -16,8 +16,13 @@
 #include "stream_still_capture.h"
 
 namespace OHOS::Camera {
-StreamStillCapture::StreamStillCapture()
+StreamStillCapture::StreamStillCapture(const int32_t id,
+                                       const StreamIntent type,
+                                       std::shared_ptr<IPipelineCore>& p,
+                                       std::shared_ptr<CaptureMessageOperator>& m)
+    : StreamBase(id, type, p, m)
 {
+    CAMERA_LOGV("enter");
 }
 
 StreamStillCapture::~StreamStillCapture()
@@ -25,49 +30,127 @@ StreamStillCapture::~StreamStillCapture()
     CAMERA_LOGV("enter");
 }
 
-RetCode StreamStillCapture::HandleOverStaticContext(const std::shared_ptr<OfflineStreamContext>& context)
+void StreamStillCapture::HandleResult(std::shared_ptr<IBuffer>& buffer)
 {
-    if (streamInfo_ == nullptr) {
-        CAMERA_LOGE("can't handle over stream info");
-        return RC_ERROR;
+    if (state_ == STREAM_STATE_OFFLINE) {
+        std::lock_guard<std::mutex> l(offlineLock_);
+        auto stream = offlineStream.lock();
+        if (stream == nullptr) {
+            return;
+        }
+        stream->ReceiveOfflineBuffer(buffer);
     }
-    context->streamInfo = streamInfo_;
 
-    if (bufferPool_ == nullptr) {
-        CAMERA_LOGE("can't handle over buffer pool");
-        return RC_ERROR;
-    }
-    context->bufferPool = bufferPool_;
-
-    if (producer_ == nullptr) {
-        CAMERA_LOGE("can't handle over buffer queue");
-        return RC_ERROR;
-    }
-    context->bufferQueue = producer_;
-
-    return RC_OK;
+    StreamBase::HandleResult(buffer);
+    return;
 }
 
-RetCode StreamStillCapture::HandleOverDynamicContext(const std::shared_ptr<OfflineStreamContext>& context)
+RetCode StreamStillCapture::Capture(const std::shared_ptr<CaptureRequest>& request)
 {
-    context->restBuffers = bufferMap_;
-
-    context->restBufferCount = static_cast<uint32_t>(restBufferInOffline_);
-    CAMERA_LOGI("there is/are %u buffer(s) left in stream %d.",
-        context->restBufferCount, streamInfo_->streamId_);
-
-    return RC_OK;
-}
-
-RetCode StreamStillCapture::SwitchToOffline()
-{
-    if (isOnline == false) {
+    std::lock_guard<std::mutex> l(offlineLock_);
+    if (state_ == STREAM_STATE_OFFLINE) {
         return RC_OK;
     }
-    isOnline = false;
-    restBufferInOffline_ = frameCount_;
-    frameCount_ = 0;
+
+    return StreamBase::Capture(request);
+}
+
+RetCode StreamStillCapture::ChangeToOfflineStream(std::shared_ptr<OfflineStream> offlineStream)
+{
+    auto context = std::make_shared<OfflineStreamContext>();
+    CHECK_IF_PTR_NULL_RETURN_VALUE(context, RC_ERROR);
+    context->streamInfo = streamConfig_;
+    context->tunnel = tunnel_;
+    CHECK_IF_PTR_NULL_RETURN_VALUE(context->tunnel, RC_ERROR);
+    context->bufferPool = bufferPool_;
+    CHECK_IF_PTR_NULL_RETURN_VALUE(context->bufferPool, RC_ERROR);
+    context->pipeline = pipeline_;
+    CHECK_IF_PTR_NULL_RETURN_VALUE(context->pipeline.lock(), RC_ERROR);
+
+    {
+        std::unique_lock<std::mutex> l(wtLock_);
+        waitingList_.clear();
+    }
+
+    std::lock_guard<std::mutex> l(offlineLock_);
+    {
+        std::lock_guard<std::mutex> l(tsLock_);
+        context->restRequests = inTransitList_;
+        state_ = STREAM_STATE_OFFLINE;
+        CAMERA_LOGI("there is/are %{public}u request(s) left in stream %{public}d.", context->restRequests.size(), streamId_);
+    }
+
+    RetCode rc = offlineStream->Init(context);
+    if (rc != RC_OK) {
+        CAMERA_LOGE("offline stream [id:%{public}d] init failed", streamId_);
+        return RC_ERROR;
+    }
+
     return RC_OK;
+}
+
+RetCode StreamStillCapture::StopStream()
+{
+    CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
+    if (state_ == STREAM_STATE_IDLE) {
+        CAMERA_LOGI("stream [id:%{public}d], no need to stop", streamId_);
+        return RC_OK;
+    }
+    CAMERA_LOGI("stop stream [id:%{public}d] begin", streamId_);
+
+    if (state_ != STREAM_STATE_OFFLINE) {
+        state_ = STREAM_STATE_IDLE;
+    }
+
+    tunnel_->NotifyStop();
+    cv_.notify_one();
+    if (handler_ != nullptr) {
+        handler_->join();
+    }
+
+    if (!waitingList_.empty()) {
+        auto request = waitingList_.front();
+        if (request != nullptr && request->IsContinous()) {
+            request->Cancel();
+        }
+    }
+    {
+        std::unique_lock<std::mutex> l(wtLock_);
+        waitingList_.clear();
+    }
+
+    RetCode rc = pipeline_->Flush({streamId_});
+    if (rc != RC_OK) {
+        CAMERA_LOGE("stream [id:%{public}d], pipeline flush failed", streamId_);
+        return RC_ERROR;
+    }
+
+    if (state_ != STREAM_STATE_OFFLINE) {
+        CAMERA_LOGI("stream [id:%{public}d] is waiting buffers returned", streamId_);
+        tunnel_->WaitForAllBufferReturned();
+        CAMERA_LOGI("stream [id:%{public}d], all buffers are returned.", streamId_);
+    }
+
+    rc = pipeline_->Stop({streamId_});
+    if (rc != RC_OK) {
+        CAMERA_LOGE("stream [id:%{public}d], pipeline stop failed", streamId_);
+        return RC_ERROR;
+    }
+
+    CAMERA_LOGI("stop stream [id:%{public}d] end", streamId_);
+    isFirstRequest = true;
+
+    if (state_ != STREAM_STATE_OFFLINE) {
+        inTransitList_.clear();
+        tunnel_->CleanBuffers();
+        bufferPool_->ClearBuffers();
+    }
+    return RC_OK;
+}
+
+bool StreamStillCapture::IsRunning() const
+{
+    return state_ == STREAM_STATE_BUSY || state_ == STREAM_STATE_OFFLINE;
 }
 
 REGISTERSTREAM(StreamStillCapture, {"STILL_CAPTURE"});

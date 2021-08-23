@@ -38,7 +38,7 @@ std::shared_ptr<CameraDevice> CameraDevice::CreateCameraDevice(const std::string
         CAMERA_LOGW("create camera device failed. [cameraId = %{public}s]", cameraId.c_str());
         return nullptr;
     }
-    CAMERA_LOGD("create camera device success. [cameraId = %s]", cameraId.c_str());
+    CAMERA_LOGD("create camera device success. [cameraId = %{public}s]", cameraId.c_str());
 
     // set deviceManager metadata & dev status callback
     std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();

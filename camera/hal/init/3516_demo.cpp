@@ -125,7 +125,7 @@ RetCode Hos3516Demo::CaptureOff(const int captureId, const CaptureMode mode) con
     }
 
     if (rc != Camera::NO_ERROR) {
-        CAMERA_LOGE("demo test: CaptureOff CancelCapture error mode %d rc == %{public}d\n", mode, rc);
+        CAMERA_LOGE("demo test: CaptureOff CancelCapture error mode %{public}d rc == %{public}d\n", mode, rc);
         return RC_ERROR;
     }
     CAMERA_LOGD("demo test: CaptureOff exit");
@@ -301,7 +301,7 @@ RetCode Hos3516Demo::CreatStreams(const int streamIdSecond, StreamIntent intent)
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
     std::vector<std::shared_ptr<StreamInfo>>().swap(streamInfos);
 
-    CAMERA_LOGD("demo test: CreatStreams streamIdSecond = %d", streamIdSecond);
+    CAMERA_LOGD("demo test: CreatStreams streamIdSecond = %{public}d", streamIdSecond);
     GetStreamOpt();
     if (streamOperator_ == nullptr) {
         CAMERA_LOGE("demo test: CreatStreams GetStreamOpt() is nullptr\n");

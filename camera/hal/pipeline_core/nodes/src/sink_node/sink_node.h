@@ -21,12 +21,20 @@
 #include "node_base.h"
 
 namespace OHOS::Camera {
-class SinkNode : public NodeBase {
+class SinkNode : virtual public NodeBase {
 public:
-    SinkNode(const std::string& name, const std::string& type, const int streamId);
+    SinkNode(const std::string& name, const std::string& type);
     ~SinkNode() override = default;
-    RetCode Start() override;
-    RetCode Stop() override;
+    RetCode Start(const int32_t streamId) override;
+    RetCode Stop(const int32_t streamId) override;
+    void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
+    void SetCallBack(BufferCb c) override
+    {
+        cb_ = c;
+    }
+
+protected:
+    BufferCb  cb_;
 };
 }// namespace OHOS::Camera
 #endif

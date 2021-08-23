@@ -20,8 +20,8 @@ namespace OHOS::Camera {
 RetCode BufferAdapter::SurfaceBufferToCameraBuffer(const OHOS::sptr<OHOS::SurfaceBuffer>& surfaceBuffer,
     const std::shared_ptr<IBuffer>& buffer)
 {
-    CHECK_EXPECT_EQUAL_RETURN(buffer == nullptr || surfaceBuffer == nullptr, true, RC_ERROR);
-    CHECK_EXPECT_NOT_EQUAL_RETURN(buffer->GetSourceType(),
+    CHECK_IF_EQUAL_RETURN_VALUE(buffer == nullptr || surfaceBuffer == nullptr, true, RC_ERROR);
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(buffer->GetSourceType(),
         CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL, RC_ERROR);
     BufferHandle* bufHandle = surfaceBuffer->GetBufferHandle();
     if (bufHandle == nullptr) {
@@ -48,8 +48,8 @@ RetCode BufferAdapter::SurfaceBufferToCameraBuffer(const OHOS::sptr<OHOS::Surfac
 RetCode BufferAdapter::CameraBufferToSurfaceBuffer(const std::shared_ptr<IBuffer>& buffer,
                                                    const OHOS::sptr<OHOS::SurfaceBuffer>& surfaceBuffer)
 {
-    CHECK_EXPECT_EQUAL_RETURN(buffer == nullptr || surfaceBuffer == nullptr, true, RC_ERROR);
-    CHECK_EXPECT_NOT_EQUAL_RETURN(buffer->GetSourceType(),
+    CHECK_IF_EQUAL_RETURN_VALUE(buffer == nullptr || surfaceBuffer == nullptr, true, RC_ERROR);
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(buffer->GetSourceType(),
         CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL, RC_ERROR);
 
     BufferHandle* pHandle = surfaceBuffer->GetBufferHandle();
@@ -74,8 +74,8 @@ RetCode BufferAdapter::CameraBufferToSurfaceBuffer(const std::shared_ptr<IBuffer
 RetCode BufferAdapter::SetExtInfoToSurfaceBuffer(const std::shared_ptr<IBuffer>& buffer,
                                                   const OHOS::sptr<OHOS::SurfaceBuffer>& surfaceBuffer)
 {
-    CHECK_EXPECT_EQUAL_RETURN(buffer == nullptr || surfaceBuffer == nullptr, true, RC_ERROR);
-    CHECK_EXPECT_NOT_EQUAL_RETURN(buffer->GetSourceType(),
+    CHECK_IF_EQUAL_RETURN_VALUE(buffer == nullptr || surfaceBuffer == nullptr, true, RC_ERROR);
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(buffer->GetSourceType(),
         CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL, RC_ERROR);
 
     EsFrmaeInfo info = buffer->GetEsFrameInfo();

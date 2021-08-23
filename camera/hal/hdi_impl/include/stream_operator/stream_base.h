@@ -16,70 +16,79 @@
 #ifndef STREAM_OPERATOR_STREAM_BASE_H
 #define STREAM_OPERATOR_STREAM_BASE_H
 
-#include <string>
-#include <functional>
-#include <atomic>
-#include <chrono>
-#include <map>
-#include "utils.h"
-#include <surface.h>
+#include "ibuffer.h"
 #include "ibuffer_pool.h"
-#include "object_factory.h"
-#include "offline_stream_context.h"
+#include "istream.h"
 
 namespace OHOS::Camera {
-using ResultBufferCallback = std::function<void (int32_t captureId, int32_t streamId)>;
-class StreamBase {
+class StreamBase : public IStream, public std::enable_shared_from_this<StreamBase> {
 public:
-    StreamBase();
+    StreamBase(const int32_t id,
+               const StreamIntent type,
+               std::shared_ptr<IPipelineCore>& p,
+               std::shared_ptr<CaptureMessageOperator>& m);
     virtual ~StreamBase();
-    StreamBase(const StreamBase &other) = delete;
-    StreamBase(StreamBase &&other) = delete;
-    StreamBase& operator=(const StreamBase &other) = delete;
-    StreamBase& operator=(StreamBase &&other) = delete;
+    StreamBase(const StreamBase& other) = delete;
+    StreamBase(StreamBase&& other) = delete;
+    StreamBase& operator=(const StreamBase& other) = delete;
+    StreamBase& operator=(StreamBase&& other) = delete;
 
 public:
-    virtual RetCode Init(const std::shared_ptr<StreamInfo> &streamInfo);
-    virtual RetCode AttachBufferQueue(const OHOS::sptr<OHOS::IBufferProducer> &producer);
-    virtual RetCode DetachBufferQueue();
-    virtual RetCode GetStreamAttribute(std::shared_ptr<StreamAttribute> &attribute) const;
-    virtual std::shared_ptr<StreamInfo>& GetStreamInfo();
-    virtual RetCode Request();
-    virtual RetCode Result(const std::shared_ptr<IBuffer> &buffer, OperationType optType);
-    virtual RetCode Release();
-    virtual uint64_t GetBufferPoolId() const;
-    virtual void Stop();
-    virtual RetCode HandleOverStaticContext(const std::shared_ptr<OfflineStreamContext>& context);
-    virtual RetCode HandleOverDynamicContext(const std::shared_ptr<OfflineStreamContext>& context);
-    virtual RetCode SwitchToOffline();
-    virtual uint32_t GetQueueSize() const;
-    virtual RetCode RequestCheck();
+    virtual RetCode ConfigStream(StreamConfiguration& config) override;
+    virtual RetCode CommitStream() override;
+    virtual RetCode StartStream() override;
+    virtual RetCode StopStream() override;
+    virtual RetCode AddRequest(std::shared_ptr<CaptureRequest>& request) override;
+    virtual RetCode CancelRequest(const std::shared_ptr<CaptureRequest>& request) override;
+    virtual RetCode AttachStreamTunnel(std::shared_ptr<StreamTunnel>& tunnel) override;
+    virtual RetCode DetachStreamTunnel() override;
+    virtual RetCode ChangeToOfflineStream(std::shared_ptr<OfflineStream> offlineStream) override;
+    virtual bool GetTunnelMode() const override;
+    virtual StreamConfiguration GetStreamAttribute() const override;
+    virtual int32_t GetStreamId() const override;
+    virtual RetCode Capture(const std::shared_ptr<CaptureRequest>& request) override;
+    virtual RetCode OnFrame(const std::shared_ptr<CaptureRequest>& request) override;
+    virtual bool IsRunning() const override;
+
+    virtual void HandleRequest();
+    virtual uint64_t GetUsage();
+    virtual uint32_t GetBufferCount();
+    virtual void HandleResult(std::shared_ptr<IBuffer>& buffer);
+    virtual RetCode DeliverBuffer();
+    virtual RetCode ReceiveBuffer(std::shared_ptr<IBuffer>& buffer);
+    virtual uint64_t GetFrameCount() const;
+
+    enum StreamState {
+        STREAM_STATE_IDLE = 0,
+        STREAM_STATE_ACTIVE,
+        STREAM_STATE_BUSY,
+        STREAM_STATE_OFFLINE,
+    };
 
 protected:
-    virtual RetCode CreateBufferPool();
-    virtual uint64_t GetCurrentLocalTimeStamp();
-
-protected:
-    std::shared_ptr<StreamInfo> streamInfo_ = nullptr;
-    std::shared_ptr<StreamAttribute> attribute_ = nullptr;
-    uint64_t bufferPoolId_ = 0;
-    std::mutex                          bmLock_;
+    int32_t streamId_ = -1;
+    int32_t streamType_ = -1;
+    bool isFirstRequest = true;
+    uint64_t frameCount = 0;
+    std::shared_ptr<IPipelineCore> pipelineCore_ = nullptr;
+    std::shared_ptr<IStreamPipelineCore> pipeline_ = nullptr;
+    std::shared_ptr<HostStreamMgr> hostStreamMgr_ = nullptr;
+    std::shared_ptr<CaptureMessageOperator> messenger_ = nullptr;
+    StreamConfiguration streamConfig_ = {};
+    std::atomic<StreamState> state_ = STREAM_STATE_IDLE;
+    std::shared_ptr<StreamTunnel> tunnel_ = nullptr;
     std::shared_ptr<IBufferPool> bufferPool_ = nullptr;
-    std::map<std::shared_ptr<IBuffer>, OHOS::sptr<OHOS::SurfaceBuffer>> bufferMap_ = {};
-    std::list<std::shared_ptr<IBuffer>> pipeBuffer_ = {};
-    uint64_t frameCount_ = 0;
-    std::mutex frameLock_;
-    OHOS::sptr<OHOS::Surface> producer_ = nullptr;
-    std::atomic<bool> isOnline = true;
-    std::atomic<bool> requestFlag_ = true;
-    int32_t bufferIndex = -1;
-};
+    uint64_t poolId_ = 0;
 
-using StreamFactory = RegisterFactoty<StreamBase>;
-#define REGISTERSTREAM(cls, ...) \
-namespace { \
-static std::string g_##cls = StreamFactory::Instance().DoRegister<cls>(__VA_ARGS__, \
-    []() { return std::make_shared<cls>(); }); \
-}
+    std::mutex wtLock_ = {};
+    std::list<std::shared_ptr<CaptureRequest>> waitingList_ = {};
+    std::condition_variable cv_ = {};
+
+    std::mutex tsLock_ = {};
+    std::list<std::shared_ptr<CaptureRequest>> inTransitList_ = {};
+
+    std::unique_ptr<std::thread> handler_ = nullptr;
+    std::shared_ptr<CaptureRequest> lastRequest_ = nullptr;
+};
 } // end namespace OHOS::Camera
 #endif // STREAM_OPERATOR_STREAM_BASE_H
