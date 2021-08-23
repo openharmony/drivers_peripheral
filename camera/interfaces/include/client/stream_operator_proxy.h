@@ -28,7 +28,7 @@ public:
     virtual CamRetCode IsStreamsSupported(
         OperationMode mode,
         const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
-        const std::shared_ptr<StreamInfo> &pInfo,
+        const std::vector<std::shared_ptr<StreamInfo>>& pInfo,
         StreamSupportType &pType) override;
     virtual CamRetCode CreateStreams(
         const std::vector<std::shared_ptr<StreamInfo>> &streamInfos) override;

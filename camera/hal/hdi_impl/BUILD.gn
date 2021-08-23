@@ -58,15 +58,14 @@ ohos_shared_library("camera_hdi_impl") {
     "$camera_path/hdi_impl/src/camera_host/hcs_deal.cpp",
     "$camera_path/hdi_impl/src/offline_stream_operator/offline_stream.cpp",
     "$camera_path/hdi_impl/src/offline_stream_operator/offline_stream_operator.cpp",
-    "$camera_path/hdi_impl/src/stream_operator/camera_capture.cpp",
+    "$camera_path/hdi_impl/src/stream_operator/capture_message.cpp",
+    "$camera_path/hdi_impl/src/stream_operator/capture_request.cpp",
     "$camera_path/hdi_impl/src/stream_operator/stream_base.cpp",
     "$camera_path/hdi_impl/src/stream_operator/stream_operator.cpp",
-    "$camera_path/hdi_impl/src/stream_operator/stream_operator_impl.cpp",
     "$camera_path/hdi_impl/src/stream_operator/stream_post_view.cpp",
     "$camera_path/hdi_impl/src/stream_operator/stream_preview.cpp",
     "$camera_path/hdi_impl/src/stream_operator/stream_still_capture.cpp",
-    "$camera_path/hdi_impl/src/stream_operator/stream_supported_config.cpp",
-    "$camera_path/hdi_impl/src/stream_operator/stream_thread.cpp",
+    "$camera_path/hdi_impl/src/stream_operator/stream_tunnel.cpp",
     "$camera_path/hdi_impl/src/stream_operator/stream_video.cpp",
   ]
   include_dirs = [

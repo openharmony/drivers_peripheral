@@ -13,10 +13,12 @@
 #include "venc_node.h"
 
 namespace OHOS::Camera {
-VencNode::VencNode(const std::string& name, const std::string& type, const int streamId)
-    :MpiNode(name, type, streamId)
+VencNode::VencNode(const std::string& name, const std::string& type)
+    : MpiNode(name, type)
+    , SinkNode(name, type)
+    , NodeBase(name, type)
 {
-    CAMERA_LOGI("%s enter, type(%s), stream id = %d\n", name_.c_str(), type_.c_str(), streamId);
+    CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
 
 RetCode VencNode::GetDeviceController() const
@@ -24,13 +26,18 @@ RetCode VencNode::GetDeviceController() const
     return RC_OK;
 }
 
-RetCode VencNode::Start()
+RetCode VencNode::Start(const int32_t streamId)
 {
     return RC_OK;
 }
-RetCode VencNode::Stop()
+RetCode VencNode::Stop(const int32_t streamId)
 {
     return RC_OK;
+}
+
+VencNode::~VencNode()
+{
+    CAMERA_LOGV("%{public}s, venc node dtor.", __FUNCTION__);
 }
 
 REGISTERNODE(VencNode, {"venc"})

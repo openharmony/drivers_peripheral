@@ -14,20 +14,26 @@
 #include "sink_node.h"
 
 namespace OHOS::Camera {
-SinkNode::SinkNode(const std::string& name, const std::string& type, const int streamId)
-    : NodeBase(name, type, streamId)
+SinkNode::SinkNode(const std::string& name, const std::string& type)
+    : NodeBase(name, type)
 {
-    CAMERA_LOGI("%s enter, type(%s), stream id = %d\n", name_.c_str(), type_.c_str(), streamId);
+    CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
 
-RetCode SinkNode::Start()
+RetCode SinkNode::Start(const int32_t streamId)
 {
     return RC_OK;
 }
 
-RetCode SinkNode::Stop()
+RetCode SinkNode::Stop(const int32_t streamId)
 {
     return RC_OK;
+}
+
+void SinkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
+{
+    cb_(buffer);
+    return;
 }
 
 REGISTERNODE(SinkNode, {"sink"})

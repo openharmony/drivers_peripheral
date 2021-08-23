@@ -17,6 +17,11 @@
 #define HOS_CAMERA_MPI_ADAPTER_H
 
 #include <vector>
+#include <string>
+#include <thread>
+#include <list>
+#include <mutex>
+#include <map>
 #include "camera.h"
 #include "ibuffer.h"
 #include "stream.h"
@@ -35,12 +40,27 @@ using DeviceFormat = struct _DeviceFormat {
    int32_t rotation;
 };
 
+using PortConfig = struct _PortConfig {
+    int32_t streamId_;
+    int32_t bufferCount_;
+    int32_t width_;
+    int32_t height_;
+    int32_t framerate_;
+    uint32_t format_;
+    int32_t srcPortId_;
+    int32_t dstPortId_;
+    uint64_t usage_;
+    bool isExtPool_;
+    CameraEncodeType encodeType_;
+};
+
 enum ThreadState : uint32_t {
     THREAD_STOP = 0,
     THREAD_RUNNING,
     THREAD_DESTROY,
     THREAD_NEED_CREATE,
 };
+
 enum PoolState : uint32_t {
     POOL_INACTIVE = 0,
     POOL_ACTIVE = 1,
@@ -48,6 +68,7 @@ enum PoolState : uint32_t {
 
 using PoolSpec = struct _PoolSpec {
     uint32_t poolId;
+    int32_t streamId_;
     uint32_t statue;
     uint32_t isCreated;
     int32_t  portNum;

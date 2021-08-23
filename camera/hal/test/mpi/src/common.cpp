@@ -66,7 +66,7 @@ int32_t Test::SaveVideoFile(const char* type, const void* buffer, int32_t size, 
         char path[PATH_MAX] = {0};
         system("mkdir -p /data/video");
         sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/video/%s_%lld.h265", type, GetCurrentLocalTimeStamp());
-        CAMERA_LOGI("%s, save yuv to file %s", __FUNCTION__, path);
+        CAMERA_LOGI("%{public}s, save yuv to file %{public}s", __FUNCTION__, path);
         videoFd = open(path, O_RDWR | O_CREAT, 00766);
         if (videoFd == -1) {
             std::cout << "open file failed, errno = " << strerror(errno) << std::endl;
@@ -273,7 +273,7 @@ void Test::StartCapture(int streamId, int captureId, bool shutterCallback, bool 
 
 void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
 {
-    if (sizeof(captureIds) > 0) {
+    if (captureIds.size() > 0) {
         for (auto &captureId : captureIds) {
             rc = streamOperator->CancelCapture(captureId);
             EXPECT_EQ(true, rc == Camera::NO_ERROR);
@@ -286,7 +286,7 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
         }
     }
     SaveVideoFile("video", nullptr, 0, 2);
-    if (sizeof(streamIds) > 0) {
+    if (streamIds.size() > 0) {
         rc = streamOperator->ReleaseStreams(streamIds);
         EXPECT_EQ(true, rc == Camera::NO_ERROR);
         if (rc == Camera::NO_ERROR) {
@@ -341,10 +341,13 @@ OHOS::sptr<OHOS::IBufferProducer> Test::StreamConsumer::CreateProducer(std::func
             if (buffer != nullptr) {
                 void* addr = buffer->GetVirAddr();
                 uint32_t size = buffer->GetSize();
+                uint64_t pa = buffer->GetPhyAddr();
+                CAMERA_LOGI("consumer receive buffer add = %{public}llu", pa);
                 if (callback_ != nullptr) {
                     callback_(addr, size);
                 }
                 consumer_->ReleaseBuffer(buffer, -1);
+                CAMERA_LOGI("consumer release buffer add = %{public}llu", pa);
                 shotCount_--;
                 if (shotCount_ == 0) {
                     std::unique_lock<std::mutex> l(l_);

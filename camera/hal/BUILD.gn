@@ -11,16 +11,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
+import("camera.gni")
 
 print("target_device: , ${device_name}")
 group("camera_hal") {
   if (is_standard_system) {
     deps = [
       "../interfaces/include/client:libcamera_client",
-      "adapter/chipset/hispark_taurus:hispark_taurus_build",
-
-      #      "adapter/platform/v4l2:rpi4b_build",    # build v4l2
       "buffer_manager:camera_buffer_manager",
       "device_manager:camera_device_manager",
       "hdi_impl:camera_hdi_impl",
@@ -28,6 +25,11 @@ group("camera_hal") {
       "pipeline_core:camera_pipeline_core",
       "utils:camera_utils",
     ]
+    if (is_support_mpi) {
+      deps += [ "adapter/chipset/hispark_taurus:hispark_taurus_build" ]
+    } else if (is_support_v4l2) {
+      deps += [ "adapter/platform/v4l2:rpi4b_build" ]
+    }
   }
 }
 

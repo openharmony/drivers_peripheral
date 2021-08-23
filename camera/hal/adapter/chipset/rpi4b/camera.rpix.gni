@@ -1,0 +1,8 @@
+if (!defined(defines)) {
+  defines = []
+}
+
+is_support_v4l2=true
+if (is_support_v4l2) {
+  defines += ["SUPPORT_V4L2"]
+}

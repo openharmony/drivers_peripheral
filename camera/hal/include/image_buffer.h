@@ -47,11 +47,12 @@ public:
     virtual uint64_t GetFrameNumber() const override;
     virtual int64_t GetPoolId() const override;
     virtual int32_t GetCaptureId() const override;
-    virtual bool GetValidFlag() const override;
+    virtual CameraBufferStatus GetBufferStatus() const override;
     virtual int32_t GetSequenceId() const override;
     virtual int32_t GetFenceId() const override;
     virtual EsFrmaeInfo GetEsFrameInfo() const override;
     virtual int32_t GetEncodeType() const override;
+    virtual int32_t GetStreamId() const override;
 
     virtual void SetIndex(const int32_t index) override;
     virtual void SetWidth(const uint32_t width) override;
@@ -67,11 +68,12 @@ public:
     virtual void SetFrameNumber(const uint64_t frameNumber) override;
     virtual void SetPoolId(const int64_t id) override;
     virtual void SetCaptureId(const int32_t id) override;
-    virtual void SetValidFlag(const bool flag) override;
+    virtual void SetBufferStatus(const CameraBufferStatus flag) override;
     virtual void SetSequenceId(const int32_t sequence) override;
     virtual void SetFenceId(const int32_t fence) override;
     virtual void SetEncodeType(const int32_t type) override;
     virtual void SetEsFrameSize(const int32_t frameSize) override;
+    virtual void SetStreamId(const int32_t streamId) override;
 
     virtual void Free() override;
     virtual bool operator==(const IBuffer& u) override;
@@ -92,12 +94,12 @@ private:
     uint64_t timeStamp_ = 0;
     int64_t poolId_ = -1;
     int32_t captureId_ = -1;
-    bool valid_ = true;
+    CameraBufferStatus status_ = CAMERA_BUFFER_STATUS_OK;
     int32_t sequenceId_ = -1;
     int32_t fenceId_ = -1;
     int32_t encodeType_ = 0;
     EsFrmaeInfo esInfo_ = {-1, -1, -1, -1};
-
+    int32_t streamId_ = -1;
     std::mutex l_;
 };
 } // namespace OHOS::Camera

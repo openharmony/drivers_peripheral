@@ -25,7 +25,7 @@ namespace OHOS::Camera {
 CamRetCode StreamOperatorProxy::IsStreamsSupported(
     OperationMode mode,
     const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
-    const std::shared_ptr<StreamInfo> &pInfo,
+    const std::vector<std::shared_ptr<StreamInfo>> &pInfo,
     StreamSupportType &pType)
 {
     MessageParcel data;
@@ -50,16 +50,20 @@ CamRetCode StreamOperatorProxy::IsStreamsSupported(
         return INVALID_ARGUMENT;
     }
 
-    nullFlag = (pInfo != nullptr);
-    if (!data.WriteBool(nullFlag)) {
-        HDF_LOGE("%s: write streaminfo nullflag failed", __func__);
+    size_t count = pInfo.size();
+    if (!data.WriteInt32(static_cast<int32_t>(count))) {
+        HDF_LOGE("%s: write pInfo count failed", __func__);
         return INVALID_ARGUMENT;
     }
 
-    // stub stream info
-    if (nullFlag && !UtilsDataStub::EncodeStreamInfo(pInfo, data)) {
-        HDF_LOGE("%s: write streamInfo failed", __func__);
-        return INVALID_ARGUMENT;
+    bool bRet = true;
+    for (size_t i = 0; i < count; i++) {
+        std::shared_ptr<StreamInfo> streamInfo = pInfo.at(i);
+        bRet = UtilsDataStub::EncodeStreamInfo(streamInfo, data);
+        if (!bRet) {
+            HDF_LOGE("%s: write streamInfo failed. index = %d", __func__, i);
+            return INVALID_ARGUMENT;
+        }
     }
 
     int32_t ret = Remote()->SendRequest(
@@ -93,7 +97,7 @@ CamRetCode StreamOperatorProxy::CreateStreams(
         std::shared_ptr<StreamInfo> streamInfo = streamInfos.at(i);
         bRet = UtilsDataStub::EncodeStreamInfo(streamInfo, data);
         if (!bRet) {
-            HDF_LOGE("%s: write streamInfo failed. index = %zu", __func__, i);
+            HDF_LOGE("%s: write streamInfo failed. index = %d", __func__, i);
             return INVALID_ARGUMENT;
         }
     }

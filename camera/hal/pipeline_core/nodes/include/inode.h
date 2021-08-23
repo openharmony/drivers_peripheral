@@ -32,14 +32,15 @@ public:
     virtual std::string GetName() const = 0;
     virtual RetCode SetFormat(const PortFormat& format) = 0;
     virtual RetCode GetFormat(PortFormat& format) const = 0;
+    virtual int32_t GetStreamId() const = 0;
     virtual RetCode Connect(const std::shared_ptr<IPort>& peer) = 0;
     virtual RetCode DisConnect() = 0;
     virtual int32_t Direction() const = 0;
     virtual std::shared_ptr<INode> GetNode() const = 0;
     virtual std::shared_ptr<IPort> Peer() const = 0;
-    virtual void DeliverBuffer(std::shared_ptr<FrameSpec> frameSpec) = 0;
-    virtual void SetCaptureId(const int32_t captureId) = 0;
-    virtual int32_t GetCaptureId() const = 0;
+    virtual void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) = 0;
+    virtual void DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers) = 0;
+    virtual void DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec) = 0;
     virtual void DeliverBuffers(std::vector<std::shared_ptr<FrameSpec>> mergeVec) = 0;
     PortFormat format_ {};
 };
@@ -50,34 +51,34 @@ public:
     virtual ~INode() = default;
     virtual std::string GetName() const = 0;
     virtual std::string GetType() const = 0;
-    virtual int GetStreamId() const = 0;
     virtual std::shared_ptr<IPort> GetPort(const std::string& name) = 0;
-    virtual RetCode Init() = 0;
-    virtual RetCode Start() = 0;
-    virtual RetCode Stop() = 0;
-    virtual RetCode Config() = 0;
-    virtual RetCode Capture(const std::vector<int32_t>& streamIds, const int32_t captureId) = 0;
+    virtual RetCode Init(const int32_t streamId) = 0;
+    virtual RetCode Start(const int32_t streamId) = 0;
+    virtual RetCode Flush(const int32_t streamId) = 0;
+    virtual RetCode Stop(const int32_t streamId) = 0;
+    virtual RetCode Config(const int32_t streamId, const CaptureMeta& meta) = 0;
+    virtual RetCode Capture(const int32_t streamId, const int32_t captureId) = 0;
     virtual int32_t GetNumberOfInPorts() const = 0;
     virtual int32_t GetNumberOfOutPorts() const = 0;
     virtual std::vector<std::shared_ptr<IPort>> GetInPorts() const = 0;
     virtual std::vector<std::shared_ptr<IPort>> GetOutPorts() = 0;
     virtual std::shared_ptr<IPort> GetOutPortById(const int32_t id) = 0;
-    virtual void GetFrameInfo() = 0;
-    virtual RetCode SetMetadata(std::shared_ptr<CameraStandard::CameraMetadata> meta) = 0;
-    virtual RetCode CollectBuffers() = 0;
+    virtual void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) = 0;
+    virtual void DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers) = 0;
+    virtual void SetCallBack(BufferCb c) = 0;
+
+    virtual RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) = 0;
     virtual void DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec) = 0;
     virtual void DeliverBuffers(std::vector<std::shared_ptr<FrameSpec>> mergeVec) = 0;
-    virtual RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) = 0;
-    virtual void SetCallBack(BufferCb c) = 0;
 };
 
 
-using NodeFactory = RegisterFactoty<INode, const std::string&, const std::string&, const int>;
+using NodeFactory = RegisterFactoty<INode, const std::string&, const std::string&>;
 
 #define REGISTERNODE(cls, ...) \
 namespace { \
     static std::string g_##cls = NodeFactory::Instance().DoRegister<cls>(__VA_ARGS__, \
-                [](const std::string& name, const std::string& type, const int streamId) {return std::make_shared<cls>(name, type, streamId);});\
+                [](const std::string& name, const std::string& type) {return std::make_shared<cls>(name, type);});\
 }
 }
 

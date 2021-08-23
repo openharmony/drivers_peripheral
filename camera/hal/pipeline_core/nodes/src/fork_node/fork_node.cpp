@@ -15,10 +15,10 @@
 #include "securec.h"
 
 namespace OHOS::Camera {
-ForkNode::ForkNode(const std::string& name, const std::string& type, const int streamId)
-        :NodeBase(name, type, streamId)
+ForkNode::ForkNode(const std::string& name, const std::string& type)
+        :NodeBase(name, type)
 {
-    CAMERA_LOGI("%s enter, type(%s), stream id = %d\n", name_.c_str(), type_.c_str(), streamId);
+    CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
 
 ForkNode::~ForkNode()
@@ -33,7 +33,7 @@ ForkNode::~ForkNode()
     CAMERA_LOGI("fork Node exit.");
 }
 
-RetCode ForkNode::Start()
+RetCode ForkNode::Start(const int32_t streamId)
 {
     inPutPorts_ = GetInPorts();
     GetOutPorts();
@@ -46,7 +46,7 @@ RetCode ForkNode::Start()
     return RC_OK;
 }
 
-RetCode ForkNode::Stop()
+RetCode ForkNode::Stop(const int32_t streamId)
 {
     streamRunning_ = false;
     cv_.notify_all();
@@ -70,7 +70,7 @@ void ForkNode::DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec)
     for (auto& it : outPutPorts_) {
         if (it->format_.bufferPoolId_ == frameSpec->bufferPoolId_) {
             it->DeliverBuffer(frameSpec);
-            CAMERA_LOGI("fork node deliver bufferpoolid = %llu",it->format_.bufferPoolId_);
+            CAMERA_LOGI("fork node deliver bufferpoolid = %{public}llu",it->format_.bufferPoolId_);
             return;
          }
     }
@@ -83,7 +83,7 @@ void ForkNode::ForkBuffers()
         for (auto& out : outPutPorts_) {
             if (out->format_.bufferPoolId_ != in->format_.bufferPoolId_) {
                 bufferPoolId = out->format_.bufferPoolId_;
-                CAMERA_LOGI("fork buffer get bufferpoolid = %llu",out->format_.bufferPoolId_);
+                CAMERA_LOGI("fork buffer get bufferpoolid = %{public}llu",out->format_.bufferPoolId_);
             }
         }
     }
@@ -112,7 +112,7 @@ void ForkNode::ForkBuffers()
             frameSpec->buffer_ = buffer;
             for (auto& it : outPutPorts_) {
                 if (it->format_.bufferPoolId_ == frameSpec->bufferPoolId_) {
-                    CAMERA_LOGI("fork node deliver bufferpoolid = %llu",it->format_.bufferPoolId_);
+                    CAMERA_LOGI("fork node deliver bufferpoolid = %{public}llu",it->format_.bufferPoolId_);
                     it->DeliverBuffer(frameSpec);
                     break;
                 }

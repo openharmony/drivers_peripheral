@@ -27,6 +27,8 @@ public:
     virtual void GetStreamTypes(std::vector<int32_t>& s) const = 0;
     virtual HostStreamInfo GetStreamInfo(const int32_t& id) const = 0;
     virtual BufferCb GetBufferCb(const int32_t& type) const = 0;
+    virtual void GetStreamIds(std::vector<int32_t>& s) const = 0;
+    virtual int32_t DesignateStreamIdForType(const int32_t streamType) = 0;
     virtual ~HostStreamMgr() = default;
 };
 }

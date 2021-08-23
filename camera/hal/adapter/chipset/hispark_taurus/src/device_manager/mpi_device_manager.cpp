@@ -504,7 +504,7 @@ RetCode MpiDeviceManager::GetAbilityMetaData(std::shared_ptr<CameraStandard::Cam
         for (auto iter = managerList_.cbegin(); iter != managerList_.cend(); iter++) {
             RetCode rc = (*iter)->GetAbilityMetaData(meta);
             if (rc == RC_ERROR) {
-                CAMERA_LOGE("Get %d AbilityMetaData fail", (*iter)->GetManagerId());
+                CAMERA_LOGE("Get %{public}d AbilityMetaData fail", (*iter)->GetManagerId());
             }
             if ((*iter)->GetMetaDataFlag()) {
                 sendFlag = true;
@@ -574,5 +574,15 @@ void MpiDeviceManager::SetDevStatusCallBack(const DeviceStatusCb cb)
 RetCode MpiDeviceManager::SetFlashlight(FlashMode flashMode, bool enable, CameraId cameraId)
 {
     return std::static_pointer_cast<ViController>(GetController(DM_M_VI, DM_C_VI))->SetFlashlight(flashMode, enable);
+}
+
+RetCode MpiDeviceManager::PreConfig(const ModeMeta& meta, const std::vector<DeviceStreamSetting>& settings)
+{
+    return sysObject_->PreConfig(meta, settings);
+}
+
+RetCode MpiDeviceManager::Flush(int32_t streamId)
+{
+    return sysObject_->Flush(streamId);
 }
 } // namespace OHOS::Camera

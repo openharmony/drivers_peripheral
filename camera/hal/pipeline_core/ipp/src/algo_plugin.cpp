@@ -42,7 +42,7 @@ RetCode AlgoPlugin::Init(std::shared_ptr<CameraStandard::CameraMetadata> meta)
     // parse metadata
     int ret = algoHandler_->func.Init(nullptr);
     if (ret == 0) {
-        CAMERA_LOGI("algo init success, ret = %d", ret);
+        CAMERA_LOGI("algo init success, ret = %{public}d", ret);
         return RC_OK;
     }
 
@@ -57,7 +57,7 @@ RetCode AlgoPlugin::Start()
     }
     int ret = algoHandler_->func.Start();
     if (ret != 0) {
-        CAMERA_LOGE("start algo failed, ret = %d", ret);
+        CAMERA_LOGE("start algo failed, ret = %{public}d", ret);
         return RC_ERROR;
     }
 
