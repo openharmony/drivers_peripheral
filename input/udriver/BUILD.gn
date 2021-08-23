@@ -21,15 +21,13 @@ ohos_shared_library("libhdf_input_hotplug") {
     "//third_party/FreeBSD/sys/dev/evdev",
     "$INPUT_ROOT_DIR//hal/include",
   ]
-  sources = [
-        "hotplug.c",
-    ]
+  sources = [ "hotplug.c" ]
 
   deps = [
-        "//drivers/adapter/uhdf2/host:libhdf_host",
-        "//drivers/adapter/uhdf2/osal:libhdf_utils",
-        "//utils/native/base:utils",
-    ]
+    "//drivers/adapter/uhdf2/host:libhdf_host",
+    "//drivers/adapter/uhdf2/osal:libhdf_utils",
+    "//utils/native/base:utils",
+  ]
 
   if (is_standard_system) {
     external_deps = [ "hiviewdfx_hilog_native:libhilog" ]

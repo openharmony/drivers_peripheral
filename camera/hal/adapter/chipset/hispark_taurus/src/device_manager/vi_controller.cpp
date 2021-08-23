@@ -30,7 +30,7 @@ RetCode ViController::Init()
 {
     viObject_ = IViObject::CreateViObject();
     if (viObject_ == nullptr) {
-        CAMERA_LOGE("%s Create ViObject fail", __FUNCTION__);
+        CAMERA_LOGE("%{public}s Create ViObject fail", __FUNCTION__);
         return RC_ERROR;
     }
     return RC_OK;
@@ -38,7 +38,7 @@ RetCode ViController::Init()
 
 std::shared_ptr<ISensor> ViController::GetSensor(std::string sensorName)
 {
-    CAMERA_LOGI("%s GetSensor %s", __FUNCTION__, sensorName.c_str());
+    CAMERA_LOGI("%{public}s GetSensor %{public}s", __FUNCTION__, sensorName.c_str());
     return GetSensorFactory.GetSensorByName(sensorName);
 }
 
@@ -47,7 +47,7 @@ RetCode ViController::PowerUp(CameraId cameraId)
     RetCode rc = RC_OK;
     if (GetPowerOnState() == false) {
         SetPowerOnState(true);
-        CAMERA_LOGI("%s Vi Powerup", __FUNCTION__);
+        CAMERA_LOGI("%{public}s Vi Powerup", __FUNCTION__);
         return rc;
     }
     return rc;
@@ -58,7 +58,7 @@ RetCode ViController::PowerDown(CameraId cameraId)
     RetCode rc = RC_OK;
     if (GetPowerOnState() == true) {
         SetPowerOnState(false);
-        CAMERA_LOGI("%s Vi PowerDown", __FUNCTION__);
+        CAMERA_LOGI("%{public}s Vi PowerDown", __FUNCTION__);
         return rc;
     }
     return rc;
@@ -68,7 +68,7 @@ RetCode ViController::ConfigVi()
 {
     std::vector<DeviceFormat> format;
     viObject_->ConfigVi(format);
-    CAMERA_LOGI("%s Vi ConfigVenc", __FUNCTION__);
+    CAMERA_LOGI("%{public}s Vi ConfigVenc", __FUNCTION__);
     return RC_OK;
 }
 
@@ -80,13 +80,13 @@ RetCode ViController::StartVi()
         viObject_->StartVi();
         startViState_ = true;
     }
-    CAMERA_LOGI("%s Vi StartVi", __FUNCTION__);
+    CAMERA_LOGI("%{public}s Vi StartVi", __FUNCTION__);
     return rc;
 }
 
 RetCode ViController::StopVi()
 {
-    CAMERA_LOGI("%s Vi StopVi", __FUNCTION__);
+    CAMERA_LOGI("%{public}s Vi StopVi", __FUNCTION__);
     std::lock_guard<std::mutex> l(startVilock_);
     RetCode rc = RC_OK;
     if (startViState_ == true) {
@@ -127,17 +127,17 @@ RetCode ViController::SendIspMetaData(std::shared_ptr<CameraStandard::CameraMeta
 {
     common_metadata_header_t* data = meta->get();
     if (data == nullptr) {
-        CAMERA_LOGE("%s data is nullptr", __FUNCTION__);
+        CAMERA_LOGE("%{public}s data is nullptr", __FUNCTION__);
         return RC_ERROR;
     }
     RetCode rc = SendAEMetaData(*data);
     if (rc == RC_ERROR) {
-        CAMERA_LOGE("%s SendAEMetaData fail", __FUNCTION__);
+        CAMERA_LOGE("%{public}s SendAEMetaData fail", __FUNCTION__);
         return rc;
     }
     rc = SendAWBMetaData(*data);
     if (rc == RC_ERROR) {
-        CAMERA_LOGE("%s SendAWBMetaData fail", __FUNCTION__);
+        CAMERA_LOGE("%{public}s SendAWBMetaData fail", __FUNCTION__);
     }
     return rc;
 }
@@ -150,10 +150,10 @@ RetCode ViController::SendAEMetaData(common_metadata_header_t& data)
     int ret = find_camera_metadata_item(&data, OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &entry);
     if (ret == 0) {
         expo = *(entry.data.i32);
-        rc = viObject_->UpdateSetting(CMD_AE_EXPO, (char*)&expo);
-        CAMERA_LOGD("%s Set CMD_AE_EXPO [%d]", __FUNCTION__, expo);
+        rc = viObject_->UpdateSetting(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, (char*)&expo);
+        CAMERA_LOGD("%{public}s Set CMD_AE_EXPO [%{public}d]", __FUNCTION__, expo);
         if (rc == RC_ERROR) {
-            CAMERA_LOGE("%s Send CMD_AE_EXPO fail", __FUNCTION__);
+            CAMERA_LOGE("%{public}s Send CMD_AE_EXPO fail", __FUNCTION__);
             return rc;
         }
     }
@@ -168,10 +168,10 @@ RetCode ViController::SendAWBMetaData(common_metadata_header_t& data)
     int ret = find_camera_metadata_item(&data, OHOS_CONTROL_AWB_MODE, &entry);
     if (ret == 0) {
         awbMode = *(entry.data.u8);
-        rc = viObject_->UpdateSetting(CMD_AWB_MODE, (char*)&awbMode);
-        CAMERA_LOGD("%s Set CMD_AWB_MODE [%d]", __FUNCTION__, awbMode);
+        rc = viObject_->UpdateSetting(OHOS_CONTROL_AWB_MODE, (char*)&awbMode);
+        CAMERA_LOGD("%{public}s Set CMD_AWB_MODE [%{public}d]", __FUNCTION__, awbMode);
         if (rc == RC_ERROR) {
-            CAMERA_LOGE("%s Send CMD_AWB_MODE fail", __FUNCTION__);
+            CAMERA_LOGE("%{public}s Send CMD_AWB_MODE fail", __FUNCTION__);
             return rc;
         }
     }
@@ -187,12 +187,12 @@ RetCode ViController::GetIspMetaData(std::shared_ptr<CameraStandard::CameraMetad
 {
     RetCode rc = GetAEMetaData(meta);
     if (rc == RC_ERROR) {
-        CAMERA_LOGE("%s GetAEMetaData fail", __FUNCTION__);
+        CAMERA_LOGE("%{public}s GetAEMetaData fail", __FUNCTION__);
         return rc;
     }
     rc = GetAWBMetaData(meta);
     if (rc == RC_ERROR) {
-        CAMERA_LOGE("%s GetAWBMetaData fail", __FUNCTION__);
+        CAMERA_LOGE("%{public}s GetAWBMetaData fail", __FUNCTION__);
     }
     return rc;
 }
@@ -206,9 +206,9 @@ RetCode ViController::GetAEMetaData(std::shared_ptr<CameraStandard::CameraMetada
     for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
         switch (*iter) {
             case OHOS_SENSOR_EXPOSURE_TIME: {
-                rc = viObject_->QuerySetting(CMD_AE_EXPOTIME, (char*)&expoTime);
+                rc = viObject_->QuerySetting(OHOS_SENSOR_EXPOSURE_TIME, (char*)&expoTime);
                 if (rc == RC_ERROR) {
-                    CAMERA_LOGE("%s CMD_AE_EXPOTIME QuerySetting fail", __FUNCTION__);
+                    CAMERA_LOGE("%{public}s CMD_AE_EXPOTIME QuerySetting fail", __FUNCTION__);
                     return rc;
                 }
                 if (oldExpoTime != expoTime) {
@@ -217,7 +217,7 @@ RetCode ViController::GetAEMetaData(std::shared_ptr<CameraStandard::CameraMetada
                     oldExpoTime = expoTime;
                 }
                 meta->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
-                CAMERA_LOGD("%s Get CMD_AE_EXPOTIME [%d]", __FUNCTION__, expoTime);
+                CAMERA_LOGD("%{public}s Get CMD_AE_EXPOTIME [%{public}d]", __FUNCTION__, expoTime);
                 break;
             }
             default:
@@ -236,9 +236,9 @@ RetCode ViController::GetAWBMetaData(std::shared_ptr<CameraStandard::CameraMetad
     for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
         switch (*iter) {
             case OHOS_SENSOR_COLOR_CORRECTION_GAINS: {
-                rc = viObject_->QuerySetting(CMD_AWB_COLORGAINS,    (char*)colorGains);
+                rc = viObject_->QuerySetting(OHOS_SENSOR_COLOR_CORRECTION_GAINS, (char*)colorGains);
                 if (rc == RC_ERROR) {
-                    CAMERA_LOGE("%s CMD_AWB_COLORGAINS QuerySetting fail", __FUNCTION__);
+                    CAMERA_LOGE("%{public}s CMD_AWB_COLORGAINS QuerySetting fail", __FUNCTION__);
                     return rc;
                 }
                 int gainsSize = 4;
@@ -249,7 +249,7 @@ RetCode ViController::GetAWBMetaData(std::shared_ptr<CameraStandard::CameraMetad
                 }
                 static constexpr int DATA_COUNT = 4;
                 meta->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, DATA_COUNT);
-                CAMERA_LOGD("%s Get CMD_AWB_COLORGAINS [%f,%f,%f,%f]",
+                CAMERA_LOGD("%{public}s Get CMD_AWB_COLORGAINS [%{public}f,%{public}f,%{public}f,%{public}f]",
                     __FUNCTION__,
                     colorGains[0], // 0:数组范围
                     colorGains[1], // 1:数组范围

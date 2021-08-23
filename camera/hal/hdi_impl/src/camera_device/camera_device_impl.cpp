@@ -16,14 +16,13 @@
 #include "camera_device_impl.h"
 #include <chrono>
 #include "ipipeline_core.h"
-#include "stream_operator_impl.h"
 #include "camera_host_config.h"
 #include "idevice_manager.h"
 #include "camera_metadata_info.h"
 #include "watchdog.h"
-#ifdef HITRACE_LOG_ENABLED
-#include "hitrace.h"
-#endif //HITRACE_LOG_ENABLED
+
+#define HDI_DEVICE_PLACE_A_WATCHDOG \
+    PLACE_A_NOKILL_WATCHDOG(std::bind(&CameraDeviceImpl::OnRequestTimeout, this));
 
 namespace OHOS::Camera {
 CameraDeviceImpl::CameraDeviceImpl(const std::string &cameraId,
@@ -43,11 +42,8 @@ CamRetCode CameraDeviceImpl::GetStreamOperator(
     const OHOS::sptr<IStreamOperatorCallback> &callback,
     OHOS::sptr<IStreamOperator> &streamOperator)
 {
-    WatchDog watchDog;
-    watchDog.Init(WATCHDOG_TIMEOUT, std::bind(&CameraDeviceImpl::OnRequestTimeout, this));
-#ifdef HITRACE_LOG_ENABLED
-    HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("cameraDevice", HITRACE_FLAG_DEFAULT);
-#endif //HITRACE_LOG_ENABLED
+    HDI_DEVICE_PLACE_A_WATCHDOG;
+    DFX_LOCAL_HITRACE_BEGIN;
     if (callback == nullptr) {
         CAMERA_LOGW("input callback is null.");
         return INVALID_ARGUMENT;
@@ -55,31 +51,24 @@ CamRetCode CameraDeviceImpl::GetStreamOperator(
 
     spCameraDeciceCallback_ = callback;
     if (spStreamOperator_ == nullptr) {
-        spStreamOperator_ = new(std::nothrow) StreamOperatorImpl(spCameraDeciceCallback_, shared_from_this());
+        spStreamOperator_ = new(std::nothrow) StreamOperator(spCameraDeciceCallback_, shared_from_this());
         if (spStreamOperator_ == nullptr) {
             CAMERA_LOGW("create stream operator failed.");
             return DEVICE_ERROR;
         }
+        spStreamOperator_->Init();
         ismOperator_ = spStreamOperator_;
     }
     streamOperator = ismOperator_;
 
-    spStreamOperator_->SetRequestCallback([this](){
-        cameraDeciceCallback_->OnError(REQUEST_TIMEOUT, 0);
-    });
-#ifdef HITRACE_LOG_ENABLED
-    OHOS::HiviewDFX::HiTrace::End(traceId);
-#endif //HITRACE_LOG_ENABLED
+    DFX_LOCAL_HITRACE_END;
     return NO_ERROR;
 }
 
 CamRetCode CameraDeviceImpl::UpdateSettings(const std::shared_ptr<CameraSetting> &settings)
 {
-    WatchDog watchDog;
-    watchDog.Init(WATCHDOG_TIMEOUT, std::bind(&CameraDeviceImpl::OnRequestTimeout, this));
-#ifdef HITRACE_LOG_ENABLED
-    HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("cameraDevice", HITRACE_FLAG_DEFAULT);
-#endif //HITRACE_LOG_ENABLED
+    HDI_DEVICE_PLACE_A_WATCHDOG;
+    DFX_LOCAL_HITRACE_BEGIN;
     if (settings == nullptr) {
         CAMERA_LOGE("input settings is null.");
         return INVALID_ARGUMENT;
@@ -91,9 +80,7 @@ CamRetCode CameraDeviceImpl::UpdateSettings(const std::shared_ptr<CameraSetting>
     }
 
     pipelineCore_->UpdateMetadata(settings);
-#ifdef HITRACE_LOG_ENABLED
-    OHOS::HiviewDFX::HiTrace::End(traceId);
-#endif //HITRACE_LOG_ENABLED
+    DFX_LOCAL_HITRACE_END;
     return NO_ERROR;
 }
 
@@ -116,11 +103,8 @@ ResultCallbackMode CameraDeviceImpl::GetMetaResultMode() const
 
 CamRetCode CameraDeviceImpl::GetEnabledResults(std::vector<MetaType> &results)
 {
-    WatchDog watchDog;
-    watchDog.Init(WATCHDOG_TIMEOUT, std::bind(&CameraDeviceImpl::OnRequestTimeout, this));
-#ifdef HITRACE_LOG_ENABLED
-    HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("cameraDevice", HITRACE_FLAG_DEFAULT);
-#endif //HITRACE_LOG_ENABLED
+    HDI_DEVICE_PLACE_A_WATCHDOG;
+    DFX_LOCAL_HITRACE_BEGIN;
     if (deviceMetaTypes_.empty()) {
         RetCode rc = GetEnabledFromCfg();
         if (rc != RC_OK) {
@@ -134,9 +118,7 @@ CamRetCode CameraDeviceImpl::GetEnabledResults(std::vector<MetaType> &results)
     if (enabledResults_.empty()) {
         enabledResults_ = deviceMetaTypes_;
     }
-#ifdef HITRACE_LOG_ENABLED
-    OHOS::HiviewDFX::HiTrace::End(traceId);
-#endif //HITRACE_LOG_ENABLED
+    DFX_LOCAL_HITRACE_END;
     return NO_ERROR;
 }
 
@@ -170,7 +152,7 @@ RetCode CameraDeviceImpl::GetEnabledFromCfg()
     int ret = find_camera_metadata_item(metadata,
         OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, &entry);
     if (ret == 0) {
-        CAMERA_LOGD("find_camera_metadata_item tags = %d. type = %d", entry.count, entry.data_type);
+        CAMERA_LOGD("find_camera_metadata_item tags = %{public}d. type = %{public}d", entry.count, entry.data_type);
         for (int i = 0; i < entry.count; i++) {
             deviceMetaTypes_.push_back(*(entry.data.i32 + i));
         }
@@ -181,11 +163,8 @@ RetCode CameraDeviceImpl::GetEnabledFromCfg()
 
 CamRetCode CameraDeviceImpl::EnableResult(const std::vector<MetaType> &results)
 {
-    WatchDog watchDog;
-    watchDog.Init(WATCHDOG_TIMEOUT, std::bind(&CameraDeviceImpl::OnRequestTimeout, this));
-#ifdef HITRACE_LOG_ENABLED
-    HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("cameraDevice", HITRACE_FLAG_DEFAULT);
-#endif //HITRACE_LOG_ENABLED
+    HDI_DEVICE_PLACE_A_WATCHDOG;
+    DFX_LOCAL_HITRACE_BEGIN;
     std::unique_lock<std::mutex> l(enabledRstMutex_);
     for (auto &metaType : results) {
         auto itr = std::find(enabledResults_.begin(), enabledResults_.end(), metaType);
@@ -202,19 +181,14 @@ CamRetCode CameraDeviceImpl::EnableResult(const std::vector<MetaType> &results)
         return INVALID_ARGUMENT;
     }
     deviceManager->SetAbilityMetaDataTag(enabledResults_);
-#ifdef HITRACE_LOG_ENABLED
-    OHOS::HiviewDFX::HiTrace::End(traceId);
-#endif //HITRACE_LOG_ENABLED
+    DFX_LOCAL_HITRACE_END;
     return NO_ERROR;
 }
 
 CamRetCode CameraDeviceImpl::DisableResult(const std::vector<MetaType> &results)
 {
-    WatchDog watchDog;
-    watchDog.Init(WATCHDOG_TIMEOUT, std::bind(&CameraDeviceImpl::OnRequestTimeout, this));
-#ifdef HITRACE_LOG_ENABLED
-    HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("cameraDevice", HITRACE_FLAG_DEFAULT);
-#endif //HITRACE_LOG_ENABLED
+    HDI_DEVICE_PLACE_A_WATCHDOG;
+    DFX_LOCAL_HITRACE_BEGIN;
     CamRetCode ret = NO_ERROR;
     std::unique_lock<std::mutex> l(enabledRstMutex_);
     for (auto &metaType : results) {
@@ -233,9 +207,7 @@ CamRetCode CameraDeviceImpl::DisableResult(const std::vector<MetaType> &results)
         return INVALID_ARGUMENT;
     }
     deviceManager1->SetAbilityMetaDataTag(enabledResults_);
-#ifdef HITRACE_LOG_ENABLED
-    OHOS::HiviewDFX::HiTrace::End(traceId);
-#endif //HITRACE_LOG_ENABLED
+    DFX_LOCAL_HITRACE_END;
     return NO_ERROR;
 }
 
@@ -333,13 +305,11 @@ bool CameraDeviceImpl::CompareTagData(const camera_metadata_item_t &baseEntry,
 
 void CameraDeviceImpl::Close()
 {
-    WatchDog watchDog;
-    watchDog.Init(WATCHDOG_TIMEOUT, std::bind(&CameraDeviceImpl::OnRequestTimeout, this));
-#ifdef HITRACE_LOG_ENABLED
-    HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("cameraDevice", HITRACE_FLAG_DEFAULT);
-#endif //HITRACE_LOG_ENABLED
+    HDI_DEVICE_PLACE_A_WATCHDOG;
+    DFX_LOCAL_HITRACE_BEGIN;
+
     if (spStreamOperator_ != nullptr) {
-        spStreamOperator_->Stop();
+        spStreamOperator_->ReleaseStreams();
         spStreamOperator_ = nullptr;
     }
 
@@ -374,13 +344,11 @@ void CameraDeviceImpl::Close()
             CAMERA_LOGE("physic camera powerdown failed [phyCameraId = %{public}s].", phyCameraId.c_str());
             continue;
         }
-        CAMERA_LOGD("[phyCameraId = %s] powerdown success.", phyCameraId.c_str());
+        CAMERA_LOGD("[phyCameraId = %{public}s] powerdown success.", phyCameraId.c_str());
     }
 
     isOpened_ = false;
-#ifdef HITRACE_LOG_ENABLED
-    OHOS::HiviewDFX::HiTrace::End(traceId);
-#endif //HITRACE_LOG_ENABLED
+    DFX_LOCAL_HITRACE_END;
     CAMERA_LOGD("camera close success.");
 }
 

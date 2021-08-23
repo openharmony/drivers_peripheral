@@ -23,20 +23,16 @@
 #include "icamera_host_callback.h"
 #include "icamera_device.h"
 
-#ifdef HITRACE_LOG_ENABLED
-#include "hitrace.h"
-#endif //HITRACE_LOG_ENABLED
-
 namespace OHOS::Camera {
 
 CameraHostImpl::CameraHostImpl()
 {
-    CAMERA_LOGD("ctor, instance = %p", this);
+    CAMERA_LOGD("ctor, instance = %{public}p", this);
 }
 
 CameraHostImpl::~CameraHostImpl()
 {
-    CAMERA_LOGD("dtor, instance = %p", this);
+    CAMERA_LOGD("dtor, instance = %{public}p", this);
 }
 
 CamRetCode CameraHostImpl::Init()
@@ -85,26 +81,23 @@ CamRetCode CameraHostImpl::Init()
 
 CamRetCode CameraHostImpl::SetCallback(const OHOS::sptr<ICameraHostCallback> &callback)
 {
-#ifdef HITRACE_LOG_ENABLED
-    HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("cameraHost", HITRACE_FLAG_DEFAULT);
-#endif //HITRACE_LOG_ENABLED
+    DFX_LOCAL_HITRACE_BEGIN;
+
     if (callback == nullptr) {
         CAMERA_LOGW("host callback is null.");
         return INVALID_ARGUMENT;
     }
 
     cameraHostCallback_ = callback;
-#ifdef HITRACE_LOG_ENABLED
-    OHOS::HiviewDFX::HiTrace::End(traceId);
-#endif //HITRACE_LOG_ENABLED
+
+    DFX_LOCAL_HITRACE_END;
     return NO_ERROR;
 }
 
 CamRetCode CameraHostImpl::GetCameraIds(std::vector<std::string> &cameraIds)
 {
-#ifdef HITRACE_LOG_ENABLED
-    HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("cameraHost", HITRACE_FLAG_DEFAULT);
-#endif //HITRACE_LOG_ENABLED
+    DFX_LOCAL_HITRACE_BEGIN;
+
     CameraHostConfig *config = CameraHostConfig::GetInstance();
     if (config == nullptr) {
         return INVALID_ARGUMENT;
@@ -113,18 +106,15 @@ CamRetCode CameraHostImpl::GetCameraIds(std::vector<std::string> &cameraIds)
     if (rc != RC_OK) {
         return INVALID_ARGUMENT;
     }
-#ifdef HITRACE_LOG_ENABLED
-    OHOS::HiviewDFX::HiTrace::End(traceId);
-#endif //HITRACE_LOG_ENABLED
+
+    DFX_LOCAL_HITRACE_END;
     return NO_ERROR;
 }
 
 CamRetCode CameraHostImpl::GetCameraAbility(const std::string &cameraId,
     std::shared_ptr<CameraAbility> &ability)
 {
-#ifdef HITRACE_LOG_ENABLED
-    HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("cameraHost", HITRACE_FLAG_DEFAULT);
-#endif //HITRACE_LOG_ENABLED
+    DFX_LOCAL_HITRACE_BEGIN;
     CameraHostConfig *config = CameraHostConfig::GetInstance();
     if (config == nullptr) {
         return INVALID_ARGUMENT;
@@ -133,9 +123,7 @@ CamRetCode CameraHostImpl::GetCameraAbility(const std::string &cameraId,
     if (rc != RC_OK) {
         return INVALID_ARGUMENT;
     }
-#ifdef HITRACE_LOG_ENABLED
-    OHOS::HiviewDFX::HiTrace::End(traceId);
-#endif //HITRACE_LOG_ENABLED
+    DFX_LOCAL_HITRACE_END;
     return NO_ERROR;
 }
 
@@ -144,9 +132,7 @@ CamRetCode CameraHostImpl::OpenCamera(const std::string &cameraId,
     OHOS::sptr<ICameraDevice> &device)
 {
     CAMERA_LOGD("OpenCamera entry");
-#ifdef HITRACE_LOG_ENABLED
-    HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("cameraHost", HITRACE_FLAG_DEFAULT);
-#endif //HITRACE_LOG_ENABLED
+    DFX_LOCAL_HITRACE_BEGIN;
     if (CameraIdInvalid(cameraId) != RC_OK || callback == nullptr) {
         CAMERA_LOGW("open camera id is empty or callback is null.");
         return INVALID_ARGUMENT;
@@ -197,9 +183,7 @@ CamRetCode CameraHostImpl::OpenCamera(const std::string &cameraId,
 
     cameraDevice->SetStatus(true);
     CAMERA_LOGD("open camera success.");
-#ifdef HITRACE_LOG_ENABLED
-    OHOS::HiviewDFX::HiTrace::End(traceId);
-#endif //HITRACE_LOG_ENABLED
+    DFX_LOCAL_HITRACE_END;
     return NO_ERROR;
 }
 
@@ -283,15 +267,13 @@ void CameraHostImpl::CameraPowerDown(const std::vector<std::string> &phyCameraId
             CAMERA_LOGE("physic camera powerdown failed [cameraId = %{public}s].", cameraId.c_str());
             continue;
         }
-        CAMERA_LOGD("[cameraId = %s] powerdown success.", cameraId.c_str());
+        CAMERA_LOGD("[cameraId = %{public}s] powerdown success.", cameraId.c_str());
     }
 }
 
 CamRetCode CameraHostImpl::SetFlashlight(const std::string &cameraId,  bool &isEnable)
 {
-#ifdef HITRACE_LOG_ENABLED
-    HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("cameraHost", HITRACE_FLAG_DEFAULT);
-#endif //HITRACE_LOG_ENABLED
+    DFX_LOCAL_HITRACE_BEGIN;
     if (CameraIdInvalid(cameraId) != RC_OK) {
         CAMERA_LOGE("camera id is not found [cameraId = %{public}s].", cameraId.c_str());
         return INVALID_ARGUMENT;
@@ -325,9 +307,7 @@ CamRetCode CameraHostImpl::SetFlashlight(const std::string &cameraId,  bool &isE
         }
         return DEVICE_ERROR;
     }
-#ifdef HITRACE_LOG_ENABLED
-    OHOS::HiviewDFX::HiTrace::End(traceId);
-#endif //HITRACE_LOG_ENABLED
+    DFX_LOCAL_HITRACE_END;
 }
 
 RetCode CameraHostImpl::SetFlashlight(const std::vector<std::string> &phyCameraIds,
@@ -387,7 +367,7 @@ void CameraHostImpl::OnCameraStatus(CameraId cameraId,
         physicalCameraIds.push_back(physicalCameraId);
         RetCode rc = config->AddCameraId(logicalCameraId, physicalCameraIds, ability);
         if (rc == RC_OK && logicalCameraId.size() > 0) {
-            CAMERA_LOGI("add physicalCameraIds %d logicalCameraId %s",
+            CAMERA_LOGI("add physicalCameraIds %{public}d logicalCameraId %{public}s",
                 static_cast<int>(cameraId), logicalCameraId.c_str());
             if (cameraHostCallback_ != nullptr) {
                 cameraHostCallback_->OnCameraStatus(logicalCameraId, status);
@@ -406,7 +386,7 @@ void CameraHostImpl::OnCameraStatus(CameraId cameraId,
         physicalCameraIds.push_back(physicalCameraId);
         logicalCameraId = config->SubtractCameraId(physicalCameraIds);
         if (logicalCameraId.size() > 0) {
-            CAMERA_LOGI("Subtract physicalCameraIds %d logicalCameraId %s",
+            CAMERA_LOGI("Subtract physicalCameraIds %{public}d logicalCameraId %{public}s",
                 static_cast<int>(cameraId), logicalCameraId.c_str());
             if (cameraHostCallback_ != nullptr) {
                 cameraHostCallback_->OnCameraStatus(logicalCameraId, status);

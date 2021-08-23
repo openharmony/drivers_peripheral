@@ -25,10 +25,10 @@ namespace OHOS::Camera{
 class MergeNode : public NodeBase
 {
 public:
-    MergeNode(const std::string& name, const std::string& type, const int streamId);
+    MergeNode(const std::string& name, const std::string& type);
     ~MergeNode() override;
-    RetCode Start() override;
-    RetCode Stop() override;
+    RetCode Start(const int32_t streamId) override;
+    RetCode Stop(const int32_t streamId) override;
     void DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
     void MergeBuffers();
 private:
@@ -38,6 +38,7 @@ private:
     std::vector<std::shared_ptr<FrameSpec>>     tmpVec_;
     std::shared_ptr<std::thread>                mergeThread_ = nullptr;
     uint64_t bufferNum_ = 0;
+    std::atomic_bool                           streamRunning_ = false;
 };
 }// namespace OHOS::Camera
 #endif

@@ -17,7 +17,6 @@
 #define HOS_BUFFER_ALLOCATOR_H
 
 #include "buffer_allocator_factory.h"
-#include "camera.h"
 #include "ibuffer.h"
 #include "ibuffer_allocator.h"
 #include <memory>

@@ -20,12 +20,12 @@
 #include "mpi_device_manager.h"
 
 namespace OHOS::Camera {
-class MpiNode : public NodeBase {
+class MpiNode : virtual public NodeBase {
 public:
-    MpiNode(const std::string& name, const std::string& type, const int streamId);
-    ~MpiNode() override = default;
-    RetCode ConnectMpi();
-    RetCode DisConnectMpi();
+    MpiNode(const std::string& name, const std::string& type);
+    ~MpiNode() override;
+    RetCode ConnectMpi(const int32_t streamId);
+    RetCode DisConnectMpi(const int32_t streamId);
     RetCode GetMpiDeviceManager();
     void SendCallBack() {}
 

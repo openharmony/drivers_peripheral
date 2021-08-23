@@ -14,33 +14,28 @@
  */
 
 #include "offline_stream_operator.h"
-
-#ifdef HITRACE_LOG_ENABLED
-#include "hitrace.h"
-#endif //HITRACE_LOG_ENABLED
-
 #include "watchdog.h"
 
 namespace OHOS::Camera {
 OfflineStreamOperator::OfflineStreamOperator(OHOS::sptr<IStreamOperatorCallback>& callback)
 {
     callback_ = callback;
-    CAMERA_LOGV("ctor, instance = %p", this);
+    CAMERA_LOGV("ctor, instance = %{public}p", this);
 }
 
 OfflineStreamOperator::~OfflineStreamOperator()
 {
-    CAMERA_LOGV("dtor, instance = %p", this);
+    CAMERA_LOGV("dtor, instance = %{public}p", this);
     offlineStreamMap_.clear();
 }
 
 CamRetCode OfflineStreamOperator::CancelCapture(int captureId)
 {
-    WatchDog watchDog;
-    watchDog.Init(WATCHDOG_TIMEOUT, nullptr, true);
-#ifdef HITRACE_LOG_ENABLED
-    HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("offlineStreamOperator", HITRACE_FLAG_DEFAULT);
-#endif //HITRACE_LOG_ENABLED
+    CHECK_IF_EQUAL_RETURN_VALUE(captureId < 0, true, INVALID_ARGUMENT);
+
+    PLACE_A_SELFKILL_WATCHDOG;
+    DFX_LOCAL_HITRACE_BEGIN;
+
     std::shared_ptr<OfflineStream> stream = FindStreamByCaptureId(captureId);
     if (stream == nullptr) {
         CAMERA_LOGD("can't find stream by captureId %{public}d, buffer all returned.", captureId);
@@ -51,19 +46,16 @@ CamRetCode OfflineStreamOperator::CancelCapture(int captureId)
         CAMERA_LOGE("cancel captureId %{public}d failed", captureId);
         return DEVICE_ERROR;
     }
-#ifdef HITRACE_LOG_ENABLED
-    OHOS::HiviewDFX::HiTrace::End(traceId);
-#endif //HITRACE_LOG_ENABLED
+
+    DFX_LOCAL_HITRACE_END;
     return NO_ERROR;
 }
 
 CamRetCode OfflineStreamOperator::ReleaseStreams(const std::vector<int>& streamIds)
 {
-    WatchDog watchDog;
-    watchDog.Init(WATCHDOG_TIMEOUT, nullptr, true);
-#ifdef HITRACE_LOG_ENABLED
-    HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("offlineStreamOperator", HITRACE_FLAG_DEFAULT);
-#endif //HITRACE_LOG_ENABLED
+    PLACE_A_SELFKILL_WATCHDOG;
+    DFX_LOCAL_HITRACE_BEGIN;
+
     for (auto it : streamIds) {
         RetCode ret = offlineStreamMap_[it]->Release();
         if (ret != RC_OK) {
@@ -75,19 +67,16 @@ CamRetCode OfflineStreamOperator::ReleaseStreams(const std::vector<int>& streamI
             offlineStreamMap_.erase(it);
         }
     }
-#ifdef HITRACE_LOG_ENABLED
-    OHOS::HiviewDFX::HiTrace::End(traceId);
-#endif //HITRACE_LOG_ENABLED
+
+    DFX_LOCAL_HITRACE_END;
     return NO_ERROR;
 }
 
 CamRetCode OfflineStreamOperator::Release()
 {
-    WatchDog watchDog;
-    watchDog.Init(WATCHDOG_TIMEOUT, nullptr, true);
-#ifdef HITRACE_LOG_ENABLED
-    HiviewDFX::HiTraceId traceId = OHOS::HiviewDFX::HiTrace::Begin("offlineStreamOperator", HITRACE_FLAG_DEFAULT);
-#endif //HITRACE_LOG_ENABLED
+    PLACE_A_SELFKILL_WATCHDOG;
+    DFX_LOCAL_HITRACE_BEGIN;
+
     {
         std::lock_guard<std::mutex> l(lock_);
         for (auto it = offlineStreamMap_.begin(); it != offlineStreamMap_.end(); it++) {
@@ -96,28 +85,17 @@ CamRetCode OfflineStreamOperator::Release()
 
         offlineStreamMap_.clear();
     }
-#ifdef HITRACE_LOG_ENABLED
-    OHOS::HiviewDFX::HiTrace::End(traceId);
-#endif //HITRACE_LOG_ENABLED
+
+    DFX_LOCAL_HITRACE_END;
     return NO_ERROR;
 }
 
-RetCode OfflineStreamOperator::CreateOfflineStream(int32_t id, std::shared_ptr<OfflineStreamContext>& context)
+RetCode OfflineStreamOperator::CommitOfflineStream(const std::shared_ptr<OfflineStream>& of)
 {
-    auto stream = std::make_shared<OfflineStream>(id, context, callback_);
-    if (stream == nullptr) {
-        CAMERA_LOGE("create offline stream %{public}d failed.", id);
-        return RC_ERROR;
-    }
-
-    if (stream->Init() != RC_OK) {
-        CAMERA_LOGE("initialize offline stream %{public}d failed.", id);
-        return RC_ERROR;
-    }
-
+    CHECK_IF_PTR_NULL_RETURN_VALUE(of, RC_ERROR);
     {
         std::lock_guard<std::mutex> l(lock_);
-        offlineStreamMap_[id] = stream;
+        offlineStreamMap_[of->GetStreamId()] = of;
     }
     return RC_OK;
 }

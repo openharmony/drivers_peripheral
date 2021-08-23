@@ -14,31 +14,66 @@
 #ifndef HOS_CAMERA_SOURCE_NODE_H
 #define HOS_CAMERA_SOURCE_NODE_H
 
-#include <vector>
-#include "device_manager_adapter.h"
-#include "v4l2_device_manager.h"
-#include "utils.h"
 #include "camera.h"
 #include "node_base.h"
-#include "sensor_controller.h"
-#include "sensor_manager.h"
+#include "utils.h"
+#include <vector>
 
-namespace OHOS::Camera{
-class SourceNode : public NodeBase
-{
+namespace OHOS::Camera {
+class SourceNode : virtual public NodeBase {
 public:
-    SourceNode(const std::string& name, const std::string& type, const int streamId);
+    SourceNode(const std::string& name, const std::string& type);
     ~SourceNode() override;
-    RetCode Start() override;
-    RetCode Stop() override;
-    RetCode GetDeviceController();
-    RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta);
-    void DistributeBuffers();
-    void AchieveBuffer(std::shared_ptr<FrameSpec> frameSpec);
-    void SendCallBack();
-    RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
-private:
-    std::shared_ptr<SensorController>       sensorController_ = nullptr;
+    virtual RetCode Init(const int32_t streamId) override;
+    virtual RetCode Start(const int32_t streamId) override;
+    virtual RetCode Flush(const int32_t streamId) override;
+    virtual RetCode Stop(const int32_t streamId) override;
+    virtual RetCode Capture(const int32_t streamId, const int32_t captureId) override;
+    virtual RetCode Config(const int32_t streamId, const CaptureMeta& meta) override;
+    virtual void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
+    virtual RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
+
+    virtual void OnPackBuffer(std::shared_ptr<FrameSpec> frameSpec);
+    virtual void SetBufferCallback();
+
+protected:
+    class PortHandler {
+    public:
+        PortHandler() = default;
+        virtual ~PortHandler() = default;
+        PortHandler(std::shared_ptr<IPort>& p);
+        RetCode StartCollectBuffers();
+        RetCode StopCollectBuffers();
+        RetCode StartDistributeBuffers();
+        RetCode StopDistributeBuffers();
+        void OnBuffer(std::shared_ptr<IBuffer>& buffer);
+
+    private:
+        void CollectBuffers();
+        void DistributeBuffers();
+        void FlushBuffers();
+
+    private:
+        std::shared_ptr<IPort> port = nullptr;
+
+        bool cltRun = false;
+        std::unique_ptr<std::thread> collector = nullptr;
+
+        bool dbtRun = false;
+        std::unique_ptr<std::thread> distributor = nullptr;
+
+        std::shared_ptr<IBufferPool> pool = nullptr;
+
+        std::condition_variable rbcv;
+        std::mutex rblock;
+        std::list<std::shared_ptr<IBuffer>> respondBufferList = {};
+    };
+
+    std::mutex hndl_ = {};
+    std::unordered_map<int32_t, std::shared_ptr<PortHandler>> handler_ = {};
+
+    std::mutex requestLock_;
+    std::unordered_map<int32_t, std::list<int32_t>> captureRequests_ = {};
 };
-}// namespace OHOS::Camera
+} // namespace OHOS::Camera
 #endif

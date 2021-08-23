@@ -300,7 +300,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0020, TestSize.Level3)
         Test_->streamInfo->intent_ = Camera::PREVIEW;
         Test_->streamInfo->tunneledMode_ = 5;
         Camera::StreamSupportType pType;
-        Test_->rc = Test_->streamOperator->IsStreamsSupported(NORMAL, modeSetting, Test_->streamInfo, pType);
+        Test_->rc = Test_->streamOperator->IsStreamsSupported(NORMAL, modeSetting, {Test_->streamInfo}, pType);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         EXPECT_NE(pType, NOT_SUPPORTED);
         if (Test_->rc == Camera::NO_ERROR) {

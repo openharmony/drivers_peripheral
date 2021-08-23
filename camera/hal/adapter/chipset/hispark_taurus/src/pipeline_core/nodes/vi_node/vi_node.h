@@ -25,14 +25,15 @@
 namespace OHOS::Camera {
 class ViNode : public MpiNode {
 public:
-    ViNode(const std::string& name, const std::string& type, const int streamId);
+    ViNode(const std::string& name, const std::string& type);
     ~ViNode() override = default;
-    RetCode Start() override;
-    RetCode Stop() override;
+    RetCode Start(const int32_t streamId) override;
+    RetCode Stop(const int32_t streamId) override;
     RetCode GetDeviceController();
     RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta);
 private:
     std::shared_ptr<ViController>       viController_ = nullptr;
+    std::atomic_bool                    streamRunning_ = false;
 };
 } // namespace OHOS::Camera
 #endif

@@ -14,144 +14,284 @@
 #include "source_node.h"
 #include <unistd.h>
 
-namespace OHOS::Camera{
-SourceNode::SourceNode(const std::string& name, const std::string& type, const int streamId)
-    :NodeBase(name, type, streamId)
+namespace OHOS::Camera {
+SourceNode::SourceNode(const std::string& name, const std::string& type) : NodeBase(name, type)
 {
-    CAMERA_LOGI("%s enter, type(%s), stream id = %d\n", name_.c_str(), type_.c_str(), streamId);
-}
-
-RetCode SourceNode::GetDeviceController()
-{
-    CameraId cameraId = CAMERA_FIRST;
-    sleep(2);
-    sensorController_ = std::static_pointer_cast<SensorController>
-        (deviceManager_->GetController(cameraId, DM_M_SENSOR, DM_C_SENSOR));
-    if (sensorController_ == nullptr) {
-        CAMERA_LOGE("get device controller failed");
-        return RC_ERROR;
-    }
-    return RC_OK;
-}
-
-RetCode SourceNode::Start()
-{
-    RetCode rc = RC_OK;
-    GetDeviceManager();
-    rc = GetDeviceController();
-    if (rc == RC_ERROR) {
-        CAMERA_LOGE("GetDeviceController failed.");
-        return RC_ERROR;
-    }
-    GetOutPorts();
-    for (auto& it : outPutPorts_) {
-        DeviceFormat format;
-        format.fmtdesc.pixelformat = V4L2_PIX_FMT_YUYV;
-        format.fmtdesc.width = it->format_.w_;
-        format.fmtdesc.height = it->format_.h_;
-        int bufCnt = it->format_.bufferCount_;
-        rc = sensorController_->Start(bufCnt, format);
-        if (rc == RC_ERROR) {
-            CAMERA_LOGE("start failed.");
-            return RC_ERROR;
-        }
-    }
-    SendCallBack();
-    GetFrameInfo();
-    if (streamRunning_ == false) {
-        CAMERA_LOGI("SourceNode streamrunning = false");
-        streamRunning_ = true;
-        CollectBuffers();
-        DistributeBuffers();
-    }
-    return RC_OK;
+    CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
 
 SourceNode::~SourceNode()
 {
-    NodeBase::Stop();
-    CAMERA_LOGI("~source Node exit.");
+    CAMERA_LOGV("%{public}s, source node dtor.", __FUNCTION__);
 }
 
-RetCode SourceNode::Stop()
+RetCode SourceNode::Init(const int32_t streamId)
 {
-    RetCode rc = RC_OK;
-    rc = sensorController_->Stop();
-    if (rc == RC_ERROR) {
-        CAMERA_LOGE("stopvi failed!");
+    return RC_OK;
+}
+
+RetCode SourceNode::Start(const int32_t streamId)
+{
+    std::shared_ptr<IPort> port = nullptr;
+    auto outPorts = GetOutPorts();
+    for (auto& p : outPorts) {
+        PortFormat format = {};
+        p->GetFormat(format);
+        if (streamId == format.streamId_) {
+            port = p;
+            break;
+        }
+    }
+    if (port == nullptr) {
         return RC_ERROR;
     }
-    return NodeBase::Stop();
-}
-RetCode SourceNode::Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
-{
-    RetCode rc = RC_OK;
-    IS_NULLPTR(meta)
-    rc = sensorController_->Configure(meta);
-    IS_ERROR(rc)
-    return rc;
+
+    {
+        std::lock_guard<std::mutex> l(hndl_);
+        if (handler_.count(streamId) > 0) {
+            CAMERA_LOGI("stream [%{public}d] start again, skip", streamId);
+            return RC_OK;
+        }
+    }
+
+    SetBufferCallback();
+    std::shared_ptr<PortHandler> ph = std::make_shared<PortHandler>(port);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(ph, RC_ERROR);
+    {
+        std::lock_guard<std::mutex> l(hndl_);
+        handler_[streamId] = ph;
+    }
+    RetCode rc = handler_[streamId]->StartCollectBuffers();
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
+
+    rc = handler_[streamId]->StartDistributeBuffers();
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
+
+    return RC_OK;
 }
 
-void SourceNode::DistributeBuffers()
+RetCode SourceNode::Flush(const int32_t streamId)
 {
-    CAMERA_LOGI("source node distribute buffers enter");
-    for (auto& it : streamVec_) {
-        CAMERA_LOGI("source node distribute thread bufferpool id = %llu", it.bufferPoolId_);
-        it.deliverThread_ = new std::thread([this, it] {
-            prctl(PR_SET_NAME, "source_node");
-            std::shared_ptr<FrameSpec> f = nullptr;
-            while (streamRunning_ == true) {
-            {
-                std::lock_guard<std::mutex> l(streamLock_);
-                if (frameVec_.size() > 0) {
-                    CAMERA_LOGI("distribute buffer Num = %d", frameVec_.size());
-                    auto frameSpec = std::find_if(frameVec_.begin(), frameVec_.end(),
-                        [it](std::shared_ptr<FrameSpec> fs) {
-                            CAMERA_LOGI("source node port bufferPoolId = %llu, frame bufferPool Id = %llu",
-                                it.bufferPoolId_, fs->bufferPoolId_);
-                            return it.bufferPoolId_ == fs->bufferPoolId_;
-                        });
-                        if (frameSpec != frameVec_.end()) {
-                            f = *frameSpec;
-                            frameVec_.erase(frameSpec);
-                        }
-                }
-            }
-                if (f != nullptr) {
-                    DeliverBuffers(f);
-                    f = nullptr;
-                    continue;
-                }
-                usleep(10);
-            }
-            CAMERA_LOGI("distribute buffer thread %llu  closed", it.bufferPoolId_);
-            return;
-        });
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(handler_.count(streamId) > 0, true, RC_ERROR);
+    handler_[streamId]->StopCollectBuffers();
+    return RC_OK;
+}
+
+RetCode SourceNode::Stop(const int32_t streamId)
+{
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(handler_.count(streamId) > 0, true, RC_ERROR);
+    handler_[streamId]->StopDistributeBuffers();
+
+    {
+        std::lock_guard<std::mutex> l(hndl_);
+        auto it = handler_.find(streamId);
+        if (it != handler_.end()) {
+            handler_.erase(it);
+        }
     }
+    return RC_OK;
+}
+
+RetCode SourceNode::Config(const int32_t streamId, const CaptureMeta& meta)
+{
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(handler_.count(streamId) > 0, true, RC_ERROR);
+    return RC_OK;
+}
+
+void SourceNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
+{
+    CHECK_IF_PTR_NULL_RETURN_VOID(buffer);
+    int32_t id = buffer->GetStreamId();
+    {
+        std::lock_guard<std::mutex> l(requestLock_);
+        CAMERA_LOGV("deliver a buffer to stream id:%{public}d, queue size:%{public}u",
+            id, captureRequests_[id].size());
+        if (captureRequests_.count(id) == 0) {
+            buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
+        } else if (captureRequests_[id].empty()) {
+            buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
+        } else {
+            buffer->SetCaptureId(captureRequests_[id].front());
+            captureRequests_[id].pop_front();
+        }
+    }
+    NodeBase::DeliverBuffer(buffer);
+}
+
+void SourceNode::OnPackBuffer(std::shared_ptr<FrameSpec> frameSpec)
+{
+    CHECK_IF_PTR_NULL_RETURN_VOID(frameSpec);
+    auto buffer = frameSpec->buffer_;
+    CHECK_IF_PTR_NULL_RETURN_VOID(buffer);
+    handler_[buffer->GetStreamId()]->OnBuffer(buffer);
     return;
 }
 
-void SourceNode::AchieveBuffer(std::shared_ptr<FrameSpec> frameSpec)
+void SourceNode::SetBufferCallback()
 {
-    NodeBase::AchieveBuffer(frameSpec);
-}
-
-void SourceNode::SendCallBack()
-{
-    sensorController_->SetNodeCallBack([&](std::shared_ptr<FrameSpec> frameSpec) {
-        AchieveBuffer(frameSpec);
-    });
     return;
 }
 
 RetCode SourceNode::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)
 {
-    CAMERA_LOGI("provide buffers enter.");
-    if (sensorController_->SendFrameBuffer(frameSpec) == RC_OK) {
-        CAMERA_LOGI("sendframebuffer success bufferpool id = %llu", frameSpec->bufferPoolId_);
-        return RC_OK;
-    }
-    return RC_ERROR;
+    return RC_OK;
 }
+
+RetCode SourceNode::Capture(const int32_t streamId, const int32_t captureId)
+{
+    std::lock_guard<std::mutex> l(requestLock_);
+    if (captureRequests_.count(streamId) == 0) {
+        captureRequests_[streamId] = {captureId};
+    } else {
+        captureRequests_[streamId].emplace_back(captureId);
+    }
+    CAMERA_LOGV("received a request from stream [id:%{public}d], queue size:%{public}u",
+        streamId, captureRequests_[streamId].size());
+    return RC_OK;
+}
+
+SourceNode::PortHandler::PortHandler(std::shared_ptr<IPort>& p)
+{
+    port = p;
+}
+
+RetCode SourceNode::PortHandler::StartCollectBuffers()
+{
+    CHECK_IF_PTR_NULL_RETURN_VALUE(port, RC_ERROR);
+    PortFormat format = {};
+    port->GetFormat(format);
+    int streamId = format.streamId_;
+
+    pool = BufferManager::GetInstance()->GetBufferPool(format.bufferPoolId_);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(pool, RC_ERROR);
+    pool->NotifyStart();
+
+    cltRun = true;
+    collector = std::make_unique<std::thread>([this, &streamId] {
+        std::string name = "collect#" + std::to_string(streamId);
+        prctl(PR_SET_NAME, name.c_str());
+        while (cltRun) {
+            CollectBuffers();
+        }
+    });
+
+    return RC_OK;
+}
+
+RetCode SourceNode::PortHandler::StopCollectBuffers()
+{
+    cltRun = false;
+    pool->NotifyStop();
+    if (collector != nullptr) {
+        collector->join();
+    }
+
+    CHECK_IF_PTR_NULL_RETURN_VALUE(pool, RC_ERROR);
+    auto node = port->GetNode();
+    if (node != nullptr) {
+        uint32_t n = pool->GetIdleBufferCount();
+        for (uint32_t i = 0; i < n; i++) {
+            auto buffer = pool->AcquireBuffer(-1);
+            node->DeliverBuffer(buffer);
+        }
+    }
+    return RC_OK;
+}
+
+void SourceNode::PortHandler::CollectBuffers()
+{
+    CHECK_IF_PTR_NULL_RETURN_VOID(pool);
+    std::shared_ptr<IBuffer> buffer = pool->AcquireBuffer(-1);
+    CHECK_IF_PTR_NULL_RETURN_VOID(buffer);
+
+    PortFormat format = {};
+    port->GetFormat(format);
+    std::shared_ptr<FrameSpec> frameSpec = std::make_shared<FrameSpec>();
+    frameSpec->bufferPoolId_ = format.bufferPoolId_;
+    frameSpec->bufferCount_ = format.bufferCount_;
+    frameSpec->buffer_ = buffer;
+
+    auto node = port->GetNode();
+    CHECK_IF_PTR_NULL_RETURN_VOID(node);
+    RetCode rc = node->ProvideBuffers(frameSpec);
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("provide buffer failed.");
+    }
+}
+
+RetCode SourceNode::PortHandler::StartDistributeBuffers()
+{
+    dbtRun = true;
+    distributor = std::make_unique<std::thread>([this] {
+        PortFormat format = {};
+        port->GetFormat(format);
+        int id = format.streamId_;
+        std::string name = "collect#" + std::to_string(id);
+        prctl(PR_SET_NAME, name.c_str());
+        while (dbtRun) {
+            DistributeBuffers();
+        }
+    });
+
+    return RC_OK;
+}
+
+RetCode SourceNode::PortHandler::StopDistributeBuffers()
+{
+    FlushBuffers();
+    dbtRun = false;
+    rbcv.notify_one();
+    if (distributor != nullptr) {
+        distributor->join();
+    }
+
+    return RC_OK;
+}
+
+void SourceNode::PortHandler::DistributeBuffers()
+{
+    std::unique_lock<std::mutex> l(rblock);
+    rbcv.wait(l, [this] { return dbtRun == false || !respondBufferList.empty(); });
+
+    if (!dbtRun) {
+        return;
+    }
+
+    auto node = port->GetNode();
+    CHECK_IF_PTR_NULL_RETURN_VOID(node);
+    auto buffer = respondBufferList.front();
+    node->DeliverBuffer(buffer);
+    respondBufferList.pop_front();
+
+    return;
+}
+
+void SourceNode::PortHandler::OnBuffer(std::shared_ptr<IBuffer>& buffer)
+{
+    std::unique_lock<std::mutex> l(rblock);
+    respondBufferList.emplace_back(buffer);
+    rbcv.notify_one();
+
+    return;
+}
+
+void SourceNode::PortHandler::FlushBuffers()
+{
+    if (respondBufferList.empty()) {
+        return;
+    }
+
+    auto node = port->GetNode();
+    CHECK_IF_PTR_NULL_RETURN_VOID(node);
+    std::unique_lock<std::mutex> l(rblock);
+    while (!respondBufferList.empty()) {
+        auto buffer = respondBufferList.front();
+        node->DeliverBuffer(buffer);
+        respondBufferList.pop_front();
+    }
+
+    return;
+}
+
 REGISTERNODE(SourceNode, {"source"})
 } // namespace OHOS::Camera

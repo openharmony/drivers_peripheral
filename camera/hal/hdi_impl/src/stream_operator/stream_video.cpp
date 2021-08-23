@@ -16,8 +16,13 @@
 #include "stream_video.h"
 
 namespace OHOS::Camera {
-StreamVideo::StreamVideo()
+StreamVideo::StreamVideo(const int32_t id,
+                         const StreamIntent type,
+                         std::shared_ptr<IPipelineCore>& p,
+                         std::shared_ptr<CaptureMessageOperator>& m)
+    : StreamBase(id, type, p, m)
 {
+    CAMERA_LOGV("enter");
 }
 
 StreamVideo::~StreamVideo()

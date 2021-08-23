@@ -17,14 +17,52 @@
 #define HOS_CAMERA_STREAM_H
 
 #include "ibuffer.h"
+#include "camera_metadata_info.h"
 #include <memory>
 
 namespace OHOS::Camera {
+
+using ModeMeta = std::shared_ptr<OHOS::CameraStandard::CameraMetadata>;
+using CaptureMeta = std::shared_ptr<OHOS::CameraStandard::CameraMetadata>;
+
+struct StreamConfiguration {
+    int32_t id;
+    int32_t type;
+    uint32_t width;
+    uint32_t height;
+    uint32_t format;
+    uint64_t usage;
+    int32_t dataspace;
+    bool tunnelMode;
+    int32_t minFrameDuration;
+    int32_t encodeType;
+    uint32_t bufferCount;
+    int32_t maxBatchCaptureCount;
+    int32_t maxCaptureCount;
+};
+
+struct DeviceStreamSetting {
+    int32_t streamId;
+    uint32_t bufferCount;
+    uint32_t width;
+    uint32_t height;
+    uint32_t format;
+    uint64_t usage;
+    CameraEncodeType encodeType;
+    /*other settings*/
+};
+
+enum DynamicStreamSwitchMode {
+    DYNAMIC_STREAM_SWITCH_NOT_SUPPORT = 0,
+    DYNAMIC_STREAM_SWITCH_SUPPORT,
+    DYNAMIC_STREAM_SWITCH_NEED_INNER_RESTART,
+};
+
 struct FrameSpec {
     int64_t    bufferPoolId_;
     uint32_t   bufferCount_;
     std::shared_ptr<IBuffer>    buffer_;
 };
-using FrameSpec = struct FrameSpec;
+
 }
 #endif

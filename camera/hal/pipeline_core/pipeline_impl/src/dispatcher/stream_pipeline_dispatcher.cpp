@@ -49,22 +49,41 @@ RetCode StreamPipelineDispatcher::Update(const std::shared_ptr<Pipeline>& p)
 
     std::unordered_map<int, std::vector<std::shared_ptr<INode>>> seqNode;
     for (const auto& it : sink) {
-        GenerateNodeSeq(seqNode[it->GetStreamId()], it);
+        auto inPorts = it->GetInPorts();
+        if (!inPorts.empty()) {
+            // sink node has only one port, and it is a in-port
+            GenerateNodeSeq(seqNode[inPorts[0]->GetStreamId()], it);
+        }
     }
 
     std::swap(seqNode_, seqNode);
     CAMERA_LOGI("------------------------Node Seq(UpStream) Dump Begin-------------\n");
     for (auto [ss, vv] : seqNode_) {
-        CAMERA_LOGI("sink stream id:%d \n", ss);
+        CAMERA_LOGI("sink stream id:%{public}d \n", ss);
         for (auto it : vv) {
-            CAMERA_LOGI("seq node name:%s\n", it->GetName().c_str());
+            CAMERA_LOGI("seq node name:%{public}s\n", it->GetName().c_str());
         }
     }
     CAMERA_LOGI("------------------------Node Seq(UpStream) Dump End-------------\n");
     return RC_OK;
 }
 
-RetCode StreamPipelineDispatcher::Start(const int& streamId)
+RetCode StreamPipelineDispatcher::Prepare(const int32_t streamId)
+{
+    if (seqNode_.count(streamId) == 0) {
+        return RC_ERROR;
+    }
+
+    RetCode re = RC_OK;
+    for (auto it = seqNode_[streamId].rbegin(); it != seqNode_[streamId].rend(); it++) {
+        CAMERA_LOGV("init node %{public}s begin",(*it)->GetName().c_str());
+        re = (*it)->Init(streamId) | re;
+        CAMERA_LOGV("init node %{public}s end", (*it)->GetName().c_str());
+    }
+    return re;
+}
+
+RetCode StreamPipelineDispatcher::Start(const int32_t streamId)
 {
     if (seqNode_.count(streamId) == 0) {
         return RC_ERROR;
@@ -73,15 +92,13 @@ RetCode StreamPipelineDispatcher::Start(const int& streamId)
     RetCode re = RC_OK;
     for (auto it = seqNode_[streamId].rbegin(); it != seqNode_[streamId].rend(); it++) {
         CAMERA_LOGV("start node %{public}s begin",(*it)->GetName().c_str());
-        re = (*it)->Init() | re;
-        re = (*it)->Start() | re;
+        re = (*it)->Start(streamId) | re;
         CAMERA_LOGV("start node %{public}s end", (*it)->GetName().c_str());
     }
-    streamNum_++;
     return re;
 }
 
-RetCode StreamPipelineDispatcher::Config(const int& streamId)
+RetCode StreamPipelineDispatcher::Config(const int32_t streamId, const CaptureMeta& meta)
 {
     if (seqNode_.count(streamId) == 0) {
         return RC_ERROR;
@@ -89,37 +106,64 @@ RetCode StreamPipelineDispatcher::Config(const int& streamId)
 
     RetCode re = RC_OK;
     for (auto it = seqNode_[streamId].rbegin(); it != seqNode_[streamId].rend(); it++) {
-        re = (*it)->Config() | re;
+        re = (*it)->Config(streamId, meta) | re;
     }
     return re;
 }
 
-RetCode StreamPipelineDispatcher::Stop(const int& streamId)
+RetCode StreamPipelineDispatcher::Flush(const int32_t streamId)
+{
+    if (seqNode_.count(streamId) == 0) {
+        return RC_ERROR;
+    }
+
+    RetCode re = RC_OK;
+    for (auto it = seqNode_[streamId].rbegin(); it != seqNode_[streamId].rend(); it++) {
+        CAMERA_LOGV("flush node %{public}s begin",(*it)->GetName().c_str());
+        re = (*it)->Flush(streamId) | re;
+        CAMERA_LOGV("flush node %{public}s end", (*it)->GetName().c_str());
+    }
+    return re;
+}
+
+RetCode StreamPipelineDispatcher::Stop(const int32_t streamId)
 {
     if (seqNode_.count(streamId) == 0) {
         return RC_OK;
     }
 
     RetCode re = RC_OK;
-    for (auto it = seqNode_[streamId].begin(); it != seqNode_[streamId].end(); it++) {
-        CAMERA_LOGV("stop node %{public}s begin",(*it)->GetName().c_str());
-        if ((*it)->GetNumberOfOutPorts() > 1 && streamNum_ != 1) {
-            CAMERA_LOGI("node %{public}s can't be stoped, stream num = %d",
-                (*it)->GetName().c_str(), streamNum_);
-            break;
-        }
-        re = (*it)->Stop() | re;
-        CAMERA_LOGV("stop node %s end", (*it)->GetName().c_str());
+    for (auto it = seqNode_[streamId].rbegin(); it != seqNode_[streamId].rend(); it++) {
+        CAMERA_LOGV("stop node %{public}s begin", (*it)->GetName().c_str());
+        re = (*it)->Stop(streamId) | re;
+        CAMERA_LOGV("stop node %{public}s end", (*it)->GetName().c_str());
     }
-    streamNum_--;
     return re;
 }
 
-RetCode StreamPipelineDispatcher::Destroy(const int& streamId)
+RetCode StreamPipelineDispatcher::Capture(const int32_t streamId, const int32_t captureId)
 {
-    if (streamNum_ == 0){
-        seqNode_.clear(); // fixme
+    if (seqNode_.count(streamId) == 0) {
+        return RC_ERROR;
     }
+
+    RetCode re = RC_OK;
+    for (auto it = seqNode_[streamId].begin(); it != seqNode_[streamId].end(); it++) {
+        re = (*it)->Capture(streamId, captureId) | re;
+    }
+
+    return re;
+}
+
+RetCode StreamPipelineDispatcher::Destroy(const int32_t streamId)
+{
+    auto it = seqNode_.find(streamId);
+    if (it == seqNode_.end()) {
+        CAMERA_LOGV("pipeline for stream [id:%{public}d] doesn't exists, no need to destroy.", streamId);
+        return RC_OK;
+    }
+    seqNode_.erase(streamId);
+
     return RC_OK;
 }
 
@@ -136,19 +180,5 @@ std::shared_ptr<INode> StreamPipelineDispatcher::GetNode(const int32_t streamId,
         }
     }
     return node;
-}
-
-RetCode StreamPipelineDispatcher::Capture(const std::vector<int32_t>& streamIds,
-    const int32_t id, const int32_t captureId)
-{
-    if (seqNode_.count(id) == 0) {
-        return RC_ERROR;
-    }
-
-    for (auto it = seqNode_[id].rbegin(); it != seqNode_[id].rend(); it++) {
-        (*it)->Capture(streamIds, captureId);
-    }
-
-    return RC_OK;
 }
 }

@@ -23,22 +23,23 @@ namespace OHOS::Camera {
 
 class StreamPipelineDispatcher : public NoCopyable, private ConfigParser {
 public:
-    static std::unique_ptr<StreamPipelineDispatcher> Create();
-    virtual RetCode Update(const std::shared_ptr<Pipeline>& p);
-    virtual RetCode Start(const int& streamId = -1);
-    virtual RetCode Config(const int& streamId = -1);
-    virtual RetCode Stop(const int& streamId = -1);
-    virtual RetCode Destroy(const int& streamId = -1);
     StreamPipelineDispatcher() = default;
     virtual ~StreamPipelineDispatcher() = default;
+    static std::unique_ptr<StreamPipelineDispatcher> Create();
+    virtual RetCode Update(const std::shared_ptr<Pipeline>& p);
+    virtual RetCode Prepare(const int32_t id);
+    virtual RetCode Start(const int32_t id);
+    virtual RetCode Config(const int32_t id, const CaptureMeta& meta);
+    virtual RetCode Capture(const int32_t ids, const int32_t captureId);
+    virtual RetCode Flush(const int32_t id);
+    virtual RetCode Stop(const int32_t id);
+    virtual RetCode Destroy(const int32_t id);
     virtual std::shared_ptr<INode> GetNode(const int32_t streamId, const std::string name);
-    virtual RetCode Capture(const std::vector<int32_t>& steamIds, const int32_t id, const int32_t captureId);
 protected:
     void GenerateNodeSeq(std::vector<std::shared_ptr<INode>>& nodeVec,
                 const std::shared_ptr<INode>& node);
 protected:
     std::unordered_map<int, std::vector<std::shared_ptr<INode>>> seqNode_;
-    uint8_t             streamNum_ = 0;
 };
 }
 #endif

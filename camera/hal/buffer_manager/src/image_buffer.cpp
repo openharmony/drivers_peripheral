@@ -116,9 +116,9 @@ int32_t ImageBuffer::GetCaptureId() const
     return captureId_;
 }
 
-bool ImageBuffer::GetValidFlag() const
+CameraBufferStatus ImageBuffer::GetBufferStatus() const
 {
-    return valid_;
+    return status_;
 }
 
 int32_t ImageBuffer::GetSequenceId() const
@@ -139,6 +139,11 @@ EsFrmaeInfo ImageBuffer::GetEsFrameInfo() const
 int32_t ImageBuffer::GetEncodeType() const
 {
     return encodeType_;
+}
+
+int32_t ImageBuffer::GetStreamId() const
+{
+    return streamId_;
 }
 
 void ImageBuffer::SetIndex(const int32_t index)
@@ -239,10 +244,10 @@ void ImageBuffer::SetCaptureId(const int32_t id)
     return;
 }
 
-void ImageBuffer::SetValidFlag(const bool flag)
+void ImageBuffer::SetBufferStatus(const CameraBufferStatus flag)
 {
     std::lock_guard<std::mutex> l(l_);
-    valid_ = flag;
+    status_ = flag;
     return;
 }
 
@@ -271,6 +276,13 @@ void ImageBuffer::SetEncodeType(const int32_t type)
 {
     std::lock_guard<std::mutex> l(l_);
     encodeType_ = type;
+    return;
+}
+
+void ImageBuffer::SetStreamId(const int32_t streamId)
+{
+    std::lock_guard<std::mutex> l(l_);
+    streamId_ = streamId;
     return;
 }
 

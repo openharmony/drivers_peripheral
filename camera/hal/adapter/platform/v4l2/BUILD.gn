@@ -6,7 +6,7 @@ import("//drivers/peripheral/camera/hal/camera.gni")
 action("build_camera_host_config") {
   script = "$hdf_framework_path/tools/hc-gen/build_hcs.py"
   sources = [ rebase_path(
-          "//vendor/hisilicon/Hi3516DV300/hdf_config/uhdf/camera/hal/v4l2/rpi4b/hdi_impl/camera_host_config.hcs") ]
+          "//drivers/adapter/uhdf2/hcs/camera/hal/v4l2/rpi4b/hdi_impl/camera_host_config.hcs") ]
   outputs = [ "$target_gen_dir/config/hdi_impl/camera_host_config.hcb" ]
   args = [
     "-o",
@@ -27,7 +27,7 @@ ohos_prebuilt_etc("camera_host_config.hcb") {
 action("build_stream_supported_config") {
   script = "$hdf_framework_path/tools/hc-gen/build_hcs.py"
   sources = [ rebase_path(
-          "//vendor/hisilicon/Hi3516DV300/hdf_config/uhdf/camera/hal/v4l2/rpi4b/hdi_impl/stream_supported_config.hcs") ]
+          "//drivers/adapter/uhdf2/hcs/camera/hal/v4l2/rpi4b/hdi_impl/stream_supported_config.hcs") ]
   outputs = [ "$target_gen_dir/config/hdi_impl/stream_supported_config.hcb" ]
   args = [
     "-o",
@@ -58,7 +58,7 @@ ohos_prebuilt_etc("config.c") {
             "$camera_path/pipeline_core/pipeline_impl/src/strategy/config/config.c"),
         "-t",
         rebase_path(
-            "//vendor/hisilicon/Hi3516DV300/hdf_config/uhdf/camera/hal/v4l2/rpi4b/pipeline_core/config.hcs"),
+            "//drivers/adapter/uhdf2/hcs/camera/hal/v4l2/rpi4b/pipeline_core/config.hcs"),
       ],
       "")
 }
@@ -76,7 +76,7 @@ ohos_prebuilt_etc("params.c") {
             "$camera_path/pipeline_core/pipeline_impl/src/strategy/config/params.c"),
         "-t",
         rebase_path(
-            "//vendor/hisilicon/Hi3516DV300/hdf_config/uhdf/camera/hal/v4l2/rpi4b/pipeline_core/params.hcs"),
+            "//drivers/adapter/uhdf2/hcs/camera/hal/v4l2/rpi4b/pipeline_core/params.hcs"),
       ],
       "")
 }
@@ -84,7 +84,7 @@ ohos_prebuilt_etc("params.c") {
 action("build_ipp_algo_config") {
   script = "$hdf_framework_path/tools/hc-gen/build_hcs.py"
   sources = [ rebase_path(
-          "//vendor/hisilicon/Hi3516DV300/hdf_config/uhdf/camera/hal/v4l2/rpi4b/pipeline_core/ipp_algo_config.hcs") ]
+          "//drivers/adapter/uhdf2/hcs/camera/hal/v4l2/rpi4b/pipeline_core/ipp_algo_config.hcs") ]
   outputs = [ "$target_gen_dir/pipeline_core/ipp_algo_config.hcb" ]
   args = [
     "-o",

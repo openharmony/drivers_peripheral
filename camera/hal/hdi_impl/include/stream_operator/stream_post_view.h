@@ -21,7 +21,10 @@
 namespace OHOS::Camera {
 class StreamPostView : public StreamBase {
 public:
-    StreamPostView();
+    StreamPostView(const int32_t id,
+                       const StreamIntent type,
+                       std::shared_ptr<IPipelineCore>& p,
+                       std::shared_ptr<CaptureMessageOperator>& m);
     virtual ~StreamPostView();
 };
 } // end namespace OHOS::Camera

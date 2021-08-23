@@ -14,10 +14,10 @@
 #include "merge_node.h"
 #include <unistd.h>
 namespace OHOS::Camera{
-MergeNode::MergeNode(const std::string& name, const std::string& type, const int streamId)
-        :NodeBase(name, type, streamId)
+MergeNode::MergeNode(const std::string& name, const std::string& type)
+        :NodeBase(name, type)
 {
-    CAMERA_LOGI("%s enter, type(%s), stream id = %d\n", name_.c_str(), type_.c_str(), streamId);
+    CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
 
 MergeNode::~MergeNode()
@@ -31,7 +31,7 @@ MergeNode::~MergeNode()
     }
 }
 
-RetCode MergeNode::Start()
+RetCode MergeNode::Start(const int32_t streamId)
 {
     GetOutPorts();
     if (streamRunning_ == false) {
@@ -42,7 +42,7 @@ RetCode MergeNode::Start()
     return RC_OK;
 }
 
-RetCode MergeNode::Stop()
+RetCode MergeNode::Stop(const int32_t streamId)
 {
     streamRunning_ = false;
     cv_.notify_all();
@@ -77,7 +77,8 @@ void MergeNode::MergeBuffers()
         tmpVec_.clear();
         while (streamRunning_ == true) {
             if (bufferNum_ > 0) {
-                for (auto& it : outPutPorts_) {
+                auto outPorts = GetOutPorts();
+                for (auto& it : outPorts) {
                     if (tmpVec_.size() == 0) {
                     {
                         std::unique_lock<std::mutex> lck(mtx_);
@@ -107,7 +108,7 @@ void MergeNode::MergeBuffers()
                         }
                     }
                     } else if (tmpVec_.size() == 2) {
-                        for (auto it : outPutPorts_) {
+                        for (auto it : outPorts) {
                             it->DeliverBuffers(tmpVec_);
                             tmpVec_.clear();
                         }

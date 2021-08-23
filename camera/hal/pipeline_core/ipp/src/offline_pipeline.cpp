@@ -96,14 +96,13 @@ RetCode OfflinePipeline::CancelCapture(int32_t captureId)
             });
         if (it == bufferCache_.end()) {
             CAMERA_LOGE("cancel capture failed, capture id = %{public}d doesn't exist", captureId);
-            return RC_ERROR;
+            return RC_OK;
         }
         cache = *it;
         bufferCache_.erase(it);
     }
     for (auto it : cache) {
-        it->SetValidFlag(false);
-        it->SetFrameNumber(0);
+        it->SetBufferStatus(CAMERA_BUFFER_STATUS_DROP);
     }
     DeliverCancelCache(cache);
     CAMERA_LOGE("cancel capture end");
@@ -124,8 +123,7 @@ RetCode OfflinePipeline::FlushOfflineStream()
             bufferCache_.pop_front();
 
             for (auto it : cache) {
-                it->SetValidFlag(false);
-                it->SetFrameNumber(0);
+                it->SetBufferStatus(CAMERA_BUFFER_STATUS_DROP);
             }
             DeliverCancelCache(cache);
         }
@@ -136,13 +134,13 @@ RetCode OfflinePipeline::FlushOfflineStream()
 
 void OfflinePipeline::ReceiveCache(std::vector<std::shared_ptr<IBuffer>>& buffers)
 {
+    if (!buffers.empty() && buffers[0]->GetBufferStatus() != CAMERA_BUFFER_STATUS_OK) {
+        DeliverCancelCache(buffers);
+        return;
+    }
+
     std::unique_lock<std::mutex> l(queueLock_);
     bufferCache_.emplace_back(buffers);
-    for (auto it : buffers) {
-        it->SetFrameNumber(frameCount_);
-    }
-    CAMERA_LOGV("receive framenumber %llu", frameCount_);
-    frameCount_++;
     cv_.notify_one();
 
     return;

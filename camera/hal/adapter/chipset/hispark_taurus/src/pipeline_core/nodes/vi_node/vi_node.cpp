@@ -13,10 +13,11 @@
 
 #include "vi_node.h"
 namespace OHOS::Camera{
-ViNode::ViNode(const std::string& name, const std::string& type, const int streamId)
-        :MpiNode(name, type, streamId)
+ViNode::ViNode(const std::string& name, const std::string& type)
+        : MpiNode(name, type)
+        , NodeBase(name, type)
 {
-    CAMERA_LOGI("%s enter, type(%s), stream id = %d\n", name_.c_str(), type_.c_str(), streamId);
+    CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
 
 RetCode ViNode::GetDeviceController()
@@ -31,7 +32,7 @@ RetCode ViNode::GetDeviceController()
     return RC_OK;
 }
 
-RetCode ViNode::Start()
+RetCode ViNode::Start(const int32_t streamId)
 {
     RetCode rc = RC_OK;
     rc = GetDeviceController();
@@ -49,7 +50,7 @@ RetCode ViNode::Start()
         CAMERA_LOGE("startvi failed.");
         return RC_ERROR;
     }
-    rc = ConnectMpi();
+    rc = ConnectMpi(streamId);
     if (rc == RC_ERROR) {
         CAMERA_LOGE("connectMpi failed.");
         return RC_ERROR;
@@ -58,7 +59,7 @@ RetCode ViNode::Start()
     return RC_OK;
 }
 
-RetCode ViNode::Stop()
+RetCode ViNode::Stop(const int32_t streamId)
 {
     RetCode rc = RC_OK;
     if (streamRunning_ == false) {
@@ -66,7 +67,7 @@ RetCode ViNode::Stop()
         return RC_OK;
     }
     streamRunning_ = false;
-    rc = DisConnectMpi();
+    rc = DisConnectMpi(streamId);
     if (rc == RC_ERROR) {
         CAMERA_LOGE("DisConnectMpi failed!");
         return RC_ERROR;
@@ -81,11 +82,8 @@ RetCode ViNode::Stop()
 
 RetCode ViNode::Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
 {
-    RetCode rc = RC_OK;
-    IS_NULLPTR(meta)
-    rc = viController_->Configure(meta);
-    IS_ERROR(rc)
-    return rc;
+    CHECK_IF_PTR_NULL_RETURN_VALUE(meta, RC_ERROR);
+    return viController_->Configure(meta);
 }
 
 REGISTERNODE(ViNode, {"vi"})

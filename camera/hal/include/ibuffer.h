@@ -19,6 +19,12 @@
 #include "camera.h"
 
 namespace OHOS::Camera {
+enum CameraBufferStatus {
+    CAMERA_BUFFER_STATUS_OK = 0,
+    CAMERA_BUFFER_STATUS_DROP,
+    CAMERA_BUFFER_STATUS_INVALID,
+};
+
 class IBuffer {
 public:
     virtual ~IBuffer(){};
@@ -38,11 +44,12 @@ public:
     virtual uint64_t GetFrameNumber() const = 0;
     virtual int64_t GetPoolId() const = 0;
     virtual int32_t GetCaptureId() const = 0;
-    virtual bool GetValidFlag() const = 0;
+    virtual CameraBufferStatus GetBufferStatus() const = 0;
     virtual int32_t GetSequenceId() const = 0;
     virtual int32_t GetFenceId() const = 0;
     virtual EsFrmaeInfo GetEsFrameInfo() const = 0;
     virtual int32_t GetEncodeType() const = 0;
+    virtual int32_t GetStreamId() const = 0;
 
     virtual void SetIndex(const int32_t index) = 0;
     virtual void SetWidth(const uint32_t width) = 0;
@@ -58,11 +65,12 @@ public:
     virtual void SetFrameNumber(const uint64_t frameNumber) = 0;
     virtual void SetPoolId(const int64_t id) = 0;
     virtual void SetCaptureId(const int32_t id) = 0;
-    virtual void SetValidFlag(const bool flag) = 0;
+    virtual void SetBufferStatus(const CameraBufferStatus flag) = 0;
     virtual void SetSequenceId(const int32_t sequence) = 0;
     virtual void SetFenceId(const int32_t fence) = 0;
     virtual void SetEncodeType(const int32_t type) = 0;
     virtual void SetEsFrameSize(const int32_t frameSize) = 0;
+    virtual void SetStreamId(const int32_t streamId) = 0;
 
     virtual void Free() = 0;
 

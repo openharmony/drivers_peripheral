@@ -12,7 +12,9 @@
  */
 
 #include "stream_pipeline_core.h"
+#include "idevice_manager.h"
 #include "ipp_node.h"
+
 namespace OHOS::Camera {
 RetCode StreamPipelineCore::Init()
 {
@@ -22,14 +24,31 @@ RetCode StreamPipelineCore::Init()
     return RC_OK;
 }
 
+RetCode StreamPipelineCore::PreConfig(const ModeMeta& meta)
+{
+    auto deviceManager = IDeviceManager::GetInstance();
+    CHECK_IF_PTR_NULL_RETURN_VALUE(deviceManager, RC_ERROR);
+
+    std::vector<DeviceStreamSetting> settings = {};
+    std::vector<int32_t> ids = {};
+    context_->streamMgr_->GetStreamIds(ids);
+    for (auto i : ids) {
+        auto info = context_->streamMgr_->GetStreamInfo(i);
+        DeviceStreamSetting setting = {info.streamId_, info.bufferCount_, info.width_,     info.height_,
+                                       info.format_,   info.usage_,       static_cast<CameraEncodeType>(info.encodeType_)};
+        settings.emplace_back(setting);
+    }
+    return deviceManager->PreConfig(meta, settings);
+}
+
 RetCode StreamPipelineCore::CreatePipeline(const int32_t& mode)
 {
     std::lock_guard<std::mutex> l(mutex_);
-    std::shared_ptr<PipelineSpec> spec_ = strategy_->GeneratePipelineSpec(mode);
-    if (spec_ == nullptr) {
+    std::shared_ptr<PipelineSpec> spec = strategy_->GeneratePipelineSpec(mode);
+    if (spec == nullptr) {
         return RC_ERROR;
     }
-    std::shared_ptr<Pipeline> pipeline = builder_->Build(spec_);
+    std::shared_ptr<Pipeline> pipeline = builder_->Build(spec);
     if (pipeline == nullptr) {
         return RC_ERROR;
     }
@@ -44,6 +63,16 @@ RetCode StreamPipelineCore::DestroyPipeline(const std::vector<int>& streamIds)
         re = dispatcher_->Destroy(it) | re;
         re = builder_->Destroy(it) | re;
         re = strategy_->Destroy(it) | re;
+    }
+    return re;
+}
+
+RetCode StreamPipelineCore::Prepare(const std::vector<int>& streamIds)
+{
+    std::lock_guard<std::mutex> l(mutex_);
+    RetCode re = RC_OK;
+    for (const auto& it : streamIds) {
+        re = dispatcher_->Prepare(it) | re;
     }
     return re;
 }
@@ -63,19 +92,41 @@ RetCode StreamPipelineCore::Stop(const std::vector<int>& streamIds)
     std::lock_guard<std::mutex> l(mutex_);
     RetCode re = RC_OK;
     for (const auto& it : streamIds) {
-        CAMERA_LOGV("stop stream %{public}d begin",it);
+        CAMERA_LOGV("stop stream %{public}d begin", it);
         re = dispatcher_->Stop(it) | re;
         CAMERA_LOGV("stop stream %{public}d end", it);
     }
     return re;
 }
 
-RetCode StreamPipelineCore::Config(const std::vector<int>& streamIds)
+RetCode StreamPipelineCore::Config(const std::vector<int>& streamIds, const CaptureMeta& meta)
 {
     std::lock_guard<std::mutex> l(mutex_);
     RetCode re = RC_OK;
     for (const auto& it : streamIds) {
-        re = dispatcher_->Config(it) | re;
+        re = dispatcher_->Config(it, meta) | re;
+    }
+    return re;
+}
+
+RetCode StreamPipelineCore::Capture(const std::vector<int>& streamIds, const int32_t captureId)
+{
+    std::lock_guard<std::mutex> l(mutex_);
+    RetCode re = RC_OK;
+    for (const auto& it : streamIds) {
+        re = dispatcher_->Capture(it, captureId) | re;
+    }
+    return re;
+}
+
+RetCode StreamPipelineCore::Flush(const std::vector<int>& streamIds)
+{
+    std::lock_guard<std::mutex> l(mutex_);
+    RetCode re = RC_OK;
+    for (const auto& it : streamIds) {
+        CAMERA_LOGV("flush stream %{public}d begin", it);
+        re = dispatcher_->Flush(it) | re;
+        CAMERA_LOGV("flush stream %{public}d end", it);
     }
     return re;
 }
@@ -87,18 +138,41 @@ std::shared_ptr<OfflinePipeline> StreamPipelineCore::GetOfflinePipeline(const in
     return std::static_pointer_cast<IppNode>(node);
 }
 
-RetCode StreamPipelineCore::Capture(const std::vector<int32_t>& streamIds,
-    const std::vector<int32_t>& ids, int32_t captureId)
+OperationMode StreamPipelineCore::GetCurrentMode() const
 {
-    std::lock_guard<std::mutex> l(mutex_);
-    for (const auto& it : ids) {
-        dispatcher_->Capture(streamIds, it, captureId);
+    return mode_;
+}
+
+DynamicStreamSwitchMode StreamPipelineCore::CheckStreamsSupported(OperationMode mode,
+                                                                  const ModeMeta& meta,
+                                                                  const std::vector<StreamConfiguration>& configs)
+{
+    // TODO: check metadata
+    CHECK_IF_PTR_NULL_RETURN_VALUE(meta, DYNAMIC_STREAM_SWITCH_NOT_SUPPORT);
+    CHECK_IF_EQUAL_RETURN_VALUE(configs.empty(), true, DYNAMIC_STREAM_SWITCH_NOT_SUPPORT);
+
+    std::vector<DeviceStreamSetting> settings = {};
+    std::vector<int32_t> ids = {};
+    context_->streamMgr_->GetStreamIds(ids);
+
+    // no streams are running
+    CHECK_IF_EQUAL_RETURN_VALUE(ids.empty(), true, DYNAMIC_STREAM_SWITCH_SUPPORT);
+
+    std::vector<int32_t> types = {};
+    for (const auto it : configs) {
+        types.emplace_back(static_cast<std::underlying_type<StreamIntent>::type>(it.type));
     }
-    return RC_OK;
+    std::sort(types.begin(), types.end(), [](const int32_t& f, const int32_t& n) { return f < n; });
+    if (strategy_->CheckPipelineSpecExist(mode, types) == RC_OK) {
+        return DYNAMIC_STREAM_SWITCH_NEED_INNER_RESTART;
+    }
+
+    return DYNAMIC_STREAM_SWITCH_NOT_SUPPORT;
 }
 
 std::shared_ptr<IStreamPipelineCore> IStreamPipelineCore::Create(const std::shared_ptr<NodeContext>& c)
 {
     return std::make_shared<StreamPipelineCore>(c);
 }
-}
+
+} // namespace OHOS::Camera
