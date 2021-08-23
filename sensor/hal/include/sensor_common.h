@@ -21,14 +21,14 @@
 
 #define CHECK_NULL_PTR_RETURN_VALUE(ptr, ret) do { \
     if ((ptr) == NULL) { \
-        HDF_LOGE("%s:line:%d pointer is null and return ret", __func__, __LINE__); \
+        HDF_LOGE("%s:line:%{public}d pointer is null and return ret", __func__, __LINE__); \
         return (ret); \
     } \
 } while (0)
 
 #define CHECK_NULL_PTR_RETURN(ptr) do { \
     if ((ptr) == NULL) { \
-        HDF_LOGE("%s:line:%d pointer is null and return", __func__, __LINE__); \
+        HDF_LOGE("%s:line:%{public}d pointer is null and return", __func__, __LINE__); \
         return; \
     } \
 } while (0)
