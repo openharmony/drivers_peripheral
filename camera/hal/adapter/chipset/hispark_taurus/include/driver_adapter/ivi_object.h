@@ -17,6 +17,7 @@
 #define HOS_CAMERA_IVI_OBJECT_H
 
 #include "mpi_adapter.h"
+#include "camera_metadata_info.h"
 
 namespace OHOS::Camera {
 class IViObject {
@@ -27,8 +28,8 @@ public:
     virtual RetCode StartVi() = 0;
     virtual RetCode StopVi() = 0;
     virtual RetCode SetFlashlight(FlashMode mode, bool enable) = 0;
-    virtual RetCode UpdateSetting(const AdapterCmd command, const void* args) = 0;
-    virtual RetCode QuerySetting(const AdapterCmd command, void* args) = 0;
+    virtual RetCode UpdateSetting(const camera_device_metadata_tag_t command, const void* args) = 0;
+    virtual RetCode QuerySetting(const camera_device_metadata_tag_t command, void* args) = 0;
 };
 }
 #endif // namespace OHOS::Camera

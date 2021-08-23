@@ -14,18 +14,18 @@
 #include "transform_node.h"
 
 namespace OHOS::Camera {
-TransformNode::TransformNode(const std::string& name, const std::string& type, const int streamId)
+TransformNode::TransformNode(const std::string& name, const std::string& type)
         :NodeBase(name, type, streamId)
 {
-    CAMERA_LOGI("%s enter, type(%s), stream id = %d\n", name_.c_str(), type_.c_str(), streamId);
+    CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
 
-RetCode TransformNode::Start()
+RetCode TransformNode::Start(const int32_t streamId)
 {
     return RC_OK;
 }
 
-RetCode TransformNode::Stop()
+RetCode TransformNode::Stop(const int32_t streamId)
 {
     return RC_OK;
 }

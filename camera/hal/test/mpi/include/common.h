@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #ifndef CAMERA_TEST_COMMON_H
-#define CAMERA_TEST_COMMIN_H
+#define CAMERA_TEST_COMMON_H
 
 #include <stdlib.h>
 #include <limits.h>

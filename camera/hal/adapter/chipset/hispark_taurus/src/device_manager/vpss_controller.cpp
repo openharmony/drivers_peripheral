@@ -26,7 +26,7 @@ RetCode VpssController::Init()
 {
     vpssObject_ = IVpssObject::CreateVpssObject();
     if (vpssObject_ == nullptr) {
-        CAMERA_LOGE("%s Create VpssObject fail", __FUNCTION__);
+        CAMERA_LOGE("%{public}s Create VpssObject fail", __FUNCTION__);
         return RC_ERROR;
     }
     return RC_OK;
@@ -37,7 +37,7 @@ RetCode VpssController::PowerUp(CameraId cameraId)
     RetCode rc = RC_OK;
     if (GetPowerOnState() == false) {
         SetPowerOnState(true);
-        CAMERA_LOGI("%s Vpss Powerup", __FUNCTION__);
+        CAMERA_LOGI("%{public}s Vpss Powerup", __FUNCTION__);
         return rc;
     }
     return rc;
@@ -48,7 +48,7 @@ RetCode VpssController::PowerDown(CameraId cameraId)
     RetCode rc = RC_OK;
     if (GetPowerOnState() == true) {
         SetPowerOnState(false);
-        CAMERA_LOGI("%s Vpss PowerDown", __FUNCTION__);
+        CAMERA_LOGI("%{public}s Vpss PowerDown", __FUNCTION__);
         return rc;
     }
     return rc;
@@ -58,7 +58,7 @@ RetCode VpssController::ConfigVpss()
 {
     std::vector<DeviceFormat> format;
     vpssObject_->ConfigVpss(format);
-    CAMERA_LOGI("%s Vpss ConfigVpss", __FUNCTION__);
+    CAMERA_LOGI("%{public}s Vpss ConfigVpss", __FUNCTION__);
     return RC_OK;
 };
 
@@ -70,13 +70,13 @@ RetCode VpssController::StartVpss()
         vpssObject_->StartVpss();
         startVpssState_ = true;
     }
-    CAMERA_LOGI("%s Vpss StartVpss", __FUNCTION__);
+    CAMERA_LOGI("%{public}s Vpss StartVpss", __FUNCTION__);
     return rc;
 };
 
 RetCode VpssController::StopVpss()
 {
-    CAMERA_LOGI("%s Vpss StopVpss", __FUNCTION__);
+    CAMERA_LOGI("%{public}s Vpss StopVpss", __FUNCTION__);
     std::lock_guard<std::mutex> l(startVpsslock_);
     RetCode rc = RC_OK;
     if (startVpssState_ == true) {

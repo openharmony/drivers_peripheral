@@ -22,6 +22,8 @@ public:
     void GetStreamTypes(std::vector<int32_t>& s) const override;
     HostStreamInfo GetStreamInfo(const int32_t& id) const override;
     BufferCb GetBufferCb(const int32_t& type) const override;
+    void GetStreamIds(std::vector<int32_t>& s) const;
+    int32_t DesignateStreamIdForType(const int32_t streamType);
     HostStreamMgrImpl() = default;
     ~HostStreamMgrImpl() override = default;
 protected:
@@ -34,11 +36,11 @@ RetCode HostStreamMgrImpl::CreateHostStream(const HostStreamInfo& info, BufferCb
                 return s->GetStreamId() == info.streamId_;
                 });
     if (it != streams_.end()) {
-        CAMERA_LOGE("fail to CreateHostStream cause streamid %d error",info.streamId_);
-        return RC_ERROR;
+        CAMERA_LOGE("host stream %{public}d exists.", info.streamId_);
+        return RC_OK;
     }
-    CAMERA_LOGI("bufferpool id = %llu , stream id = %d,stream type = %d",
-        info.bufferPoolId_, info.streamId_, info.type_);
+    CAMERA_LOGI("bufferpool id = %{public}llu , stream id = %{public}d,stream type = %{public}d, encode = %{public}d",
+        info.bufferPoolId_, info.streamId_, info.type_, info.encodeType_);
     streams_.push_back(HostStream::Create(info, c));
     for (auto& stream : streams_) {
         stream->SetStreamState(false);
@@ -75,12 +77,17 @@ void HostStreamMgrImpl::GetStreamTypes(std::vector<int32_t>& s) const
                 });
 }
 
+void HostStreamMgrImpl::GetStreamIds(std::vector<int32_t>& s) const
+{
+    for (auto& it : streams_) {
+        s.emplace_back(it->GetStreamId());
+    }
+}
+
 HostStreamInfo HostStreamMgrImpl::GetStreamInfo(const int32_t& id) const
 {
     for (auto& it : streams_) {
-        if (static_cast<std::underlying_type<StreamIntent>::type>(it->GetStreamType()) == id &&
-            it->GetStreamState() == false) {
-            it->SetStreamState(true);
+        if (it->GetStreamId() == id) {
             return it->GetStreamInfo();
         }
     }
@@ -96,6 +103,18 @@ BufferCb HostStreamMgrImpl::GetBufferCb(const int& streamId) const
         return (*it)->GetBufferCb();
     }
     return nullptr;
+}
+
+int32_t HostStreamMgrImpl::DesignateStreamIdForType(const int32_t streamType)
+{
+    for (auto& it : streams_) {
+        if (streamType == it->GetStreamType()) {
+            if (it->GetStreamState() == false) {
+                it->SetStreamState(true);
+                return it->GetStreamId();
+            }
+        }
+    }
 }
 
 std::shared_ptr<HostStreamMgr> HostStreamMgr::Create()

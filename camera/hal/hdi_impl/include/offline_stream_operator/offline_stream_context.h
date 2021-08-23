@@ -17,21 +17,23 @@
 #define HOS_CAMERA_OFFLINE_STREAM_CONTEXT_H
 
 #include "camera.h"
+#include "capture_message.h"
+#include "capture_request.h"
 #include "ibuffer_pool.h"
 #include "istream_pipeline_core.h"
-#include "surface.h"
+#include "stream_tunnel.h"
 #include "utils.h"
-#include <map>
+#include <list>
 #include <memory>
 
 namespace OHOS::Camera {
+class CaptureRequest;
 struct OfflineStreamContext {
-    std::shared_ptr<StreamInfo> streamInfo;
+    StreamConfiguration streamInfo;
+    std::shared_ptr<StreamTunnel> tunnel;
     std::shared_ptr<IBufferPool> bufferPool;
     std::weak_ptr<IStreamPipelineCore> pipeline;
-    OHOS::sptr<OHOS::Surface> bufferQueue;
-    std::map<std::shared_ptr<IBuffer>, OHOS::sptr<SurfaceBuffer>> restBuffers;
-    uint32_t restBufferCount;
+    std::list<std::shared_ptr<CaptureRequest>> restRequests;
 };
 } // namespace OHOS::Camera
 #endif

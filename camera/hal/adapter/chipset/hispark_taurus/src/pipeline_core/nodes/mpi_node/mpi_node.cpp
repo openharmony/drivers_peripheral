@@ -13,10 +13,10 @@
 
 #include "mpi_node.h"
 namespace OHOS::Camera {
-MpiNode::MpiNode(const std::string& name, const std::string& type, const int streamId)
-    :NodeBase(name, type, streamId)
+MpiNode::MpiNode(const std::string& name, const std::string& type)
+    :NodeBase(name, type)
 {
-    CAMERA_LOGI("%s enter, type(%s), stream id = %d\n", name_.c_str(), type_.c_str(), streamId);
+    CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
 
 RetCode MpiNode::GetMpiDeviceManager()
@@ -30,44 +30,82 @@ RetCode MpiNode::GetMpiDeviceManager()
 }
 
 
-RetCode MpiNode::ConnectMpi()
+RetCode MpiNode::ConnectMpi(const int32_t streamId)
 {
-    RetCode rc = RC_OK;
+    CHECK_IF_PTR_NULL_RETURN_VALUE(deviceManager_, RC_ERROR);
     std::vector<std::shared_ptr<IPort>> ports = GetOutPorts();
-    if (ports.empty() || deviceManager_ == nullptr) {
-        CAMERA_LOGE("have no outport or devicemanager is null");
+    if (ports.empty()) {
         return RC_OK;
     }
-    for (const auto& it : ports) {
-        CAMERA_LOGV("%s, mpp try to connect %s to %s.", __FUNCTION__,
-                it->GetNode()->GetName().c_str(), it->Peer()->GetNode()->GetName().c_str());
-        rc = deviceManager_->Connect(name_, it->GetName(), it->Peer()->GetNode()->GetName(), it->Peer()->GetName());
-        if (rc == RC_ERROR) {
-            CAMERA_LOGE("failed to connect.");
-            return rc;
+
+    std::shared_ptr<IPort> port = nullptr;
+    for (auto& it : ports) {
+        PortFormat f;
+        it->GetFormat(f);
+        if (f.streamId_ == streamId) {
+            port = it;
+            break;
         }
-        CAMERA_LOGI("connect success");
     }
+    if (port == nullptr) {
+        CAMERA_LOGV("can't find port for stream id:%{public}d, no need to connect", streamId);
+        return RC_OK;
+    }
+
+    auto peerPort = port->Peer();
+    CHECK_IF_PTR_NULL_RETURN_VALUE(peerPort, RC_ERROR);
+    auto peerNode = peerPort->GetNode();
+    CHECK_IF_PTR_NULL_RETURN_VALUE(peerNode, RC_ERROR);
+
+    CAMERA_LOGI("mpp try to connect %{public}s to %{public}s.", port->GetNode()->GetName().c_str(), peerNode->GetName().c_str());
+    RetCode rc = deviceManager_->Connect(name_, port->GetName(), peerNode->GetName(), peerPort->GetName());
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("failed to connect.");
+        return rc;
+    }
+
     return rc;
 }
 
-RetCode MpiNode::DisConnectMpi()
+RetCode MpiNode::DisConnectMpi(const int32_t streamId)
 {
-    RetCode rc = RC_OK;
+    CHECK_IF_PTR_NULL_RETURN_VALUE(deviceManager_, RC_ERROR);
     std::vector<std::shared_ptr<IPort>> ports = GetOutPorts();
-    if (ports.empty() || deviceManager_ == nullptr) {
-        CAMERA_LOGE("have no outport or devicemanager is null");
+    if (ports.empty()) {
         return RC_OK;
     }
-    for (const auto& it : ports) {
-        rc = deviceManager_->UnConnect(name_, it->GetName(), it->Peer()->GetNode()->GetName(),
-            it->Peer()->GetName());
-        if (rc == RC_ERROR) {
-            CAMERA_LOGE("failed to unconnect.");
-            return rc;
+
+    std::shared_ptr<IPort> port = nullptr;
+    for (auto& it : ports) {
+        PortFormat f;
+        it->GetFormat(f);
+        if (f.streamId_ == streamId) {
+            port = it;
+            break;
         }
-        CAMERA_LOGI("disconnect success");
     }
+    if (port == nullptr) {
+        CAMERA_LOGE("can't find port for stream id:%{public}d, no need to disconnect", streamId);
+        return RC_OK;
+    }
+
+    auto peerPort = port->Peer();
+    CHECK_IF_PTR_NULL_RETURN_VALUE(peerPort, RC_ERROR);
+    auto peerNode = peerPort->GetNode();
+    CHECK_IF_PTR_NULL_RETURN_VALUE(peerNode, RC_ERROR);
+
+    CAMERA_LOGI("mpp try to disconnect %{public}s and %{public}s.", port->GetNode()->GetName().c_str(), peerNode->GetName().c_str());
+    RetCode rc = deviceManager_->UnConnect(name_, port->GetName(), peerNode->GetName(), peerPort->GetName());
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("failed to disconnect.");
+        return rc;
+    }
+
     return rc;
+}
+
+MpiNode::~MpiNode()
+{
+    CAMERA_LOGV("%{public}s, mpi node dtor.", __FUNCTION__);
 }
 } // namespace OHOS::Camera

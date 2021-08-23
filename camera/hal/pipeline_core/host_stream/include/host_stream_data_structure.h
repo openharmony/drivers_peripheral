@@ -27,6 +27,7 @@ struct HostStreamInfo {
     uint64_t usage_;
     uint64_t bufferPoolId_;
     uint32_t bufferCount_;
+    int32_t encodeType_;
     bool builed_ = false;
 };
 using HostStreamInfo = struct HostStreamInfo;

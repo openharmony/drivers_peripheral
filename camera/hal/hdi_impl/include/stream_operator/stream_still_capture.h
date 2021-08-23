@@ -21,16 +21,22 @@
 namespace OHOS::Camera {
 class StreamStillCapture : public StreamBase {
 public:
-    StreamStillCapture();
+    StreamStillCapture(const int32_t id,
+                       const StreamIntent type,
+                       std::shared_ptr<IPipelineCore>& p,
+                       std::shared_ptr<CaptureMessageOperator>& m);
     virtual ~StreamStillCapture();
 
 public:
-    virtual RetCode HandleOverStaticContext(const std::shared_ptr<OfflineStreamContext>& context) override;
-    virtual RetCode HandleOverDynamicContext(const std::shared_ptr<OfflineStreamContext>& context) override;
-    virtual RetCode SwitchToOffline() override;
+    virtual void HandleResult(std::shared_ptr<IBuffer>& buffer) override;
+    virtual RetCode Capture(const std::shared_ptr<CaptureRequest>& request) override;
+    virtual RetCode ChangeToOfflineStream(std::shared_ptr<OfflineStream> offlineStream) override;
+    virtual RetCode StopStream() override;
+    virtual bool IsRunning() const override;
 
 private:
-    uint64_t restBufferInOffline_ = 0;
+    std::weak_ptr<OfflineStream> offlineStream;
+    std::mutex offlineLock_ = {};
 };
 } // end namespace OHOS::Camera
 #endif // HDI_STREAM_STILL_CAPTURE_H

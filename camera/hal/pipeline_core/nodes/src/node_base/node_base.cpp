@@ -31,6 +31,13 @@ RetCode PortBase::GetFormat(PortFormat& format) const
     return RC_OK;
 }
 
+int32_t PortBase::GetStreamId() const
+{
+    PortFormat format = {};
+    GetFormat(format);
+    return format.streamId_;
+}
+
 RetCode PortBase::Connect(const std::shared_ptr<IPort>& peer)
 {
     peer_ = peer;
@@ -66,26 +73,26 @@ std::shared_ptr<IPort> PortBase::Peer() const
     return peer_;
 }
 
-void PortBase::DeliverBuffer(std::shared_ptr<FrameSpec> frameSpec)
+void PortBase::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
-    Peer()->GetNode()->DeliverBuffers(frameSpec);
+    auto peerPort = Peer();
+    CHECK_IF_PTR_NULL_RETURN_VOID(peerPort);
+    auto peerNode = peerPort->GetNode();
+    CHECK_IF_PTR_NULL_RETURN_VOID(peerNode);
+    peerNode->DeliverBuffer(buffer);
+
     return;
 }
 
-void PortBase::DeliverBuffers(std::vector<std::shared_ptr<FrameSpec>> mergeVec)
+void PortBase::DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers)
 {
-    Peer()->GetNode()->DeliverBuffers(mergeVec);
+    auto peerPort = Peer();
+    CHECK_IF_PTR_NULL_RETURN_VOID(peerPort);
+    auto peerNode = peerPort->GetNode();
+    CHECK_IF_PTR_NULL_RETURN_VOID(peerNode);
+    peerNode->DeliverBuffers(buffers);
+
     return;
-}
-
-void PortBase::SetCaptureId(const int32_t captureId)
-{
-    captureId_ = captureId;
-}
-
-int32_t PortBase::GetCaptureId() const
-{
-    return captureId_.load();
 }
 
 std::string NodeBase::GetName() const
@@ -98,33 +105,10 @@ std::string NodeBase::GetType() const
     return type_;
 }
 
-int NodeBase::GetStreamId() const
-{
-    return streamId_;
-}
-
-void NodeBase::AchieveBuffer(std::shared_ptr<FrameSpec> frameSpec)
-{
-    CAMERA_LOGI("achieve buffer enter");
-    if (frameSpec == nullptr) {
-        CAMERA_LOGE("frame Spec is null");
-        return;
-    }
-    {
-        std::lock_guard<std::mutex> l(streamLock_);
-        frameVec_.push_back(frameSpec);
-        CAMERA_LOGI("AchieveBuffer : bufferpool id = %llu", frameSpec->bufferPoolId_);
-    }
-
-    return;
-}
-
 std::shared_ptr<IPort> NodeBase::GetPort(const std::string& name)
 {
     auto it = std::find_if(portVec_.begin(), portVec_.end(),
-        [name](std::shared_ptr<IPort> p) {
-            return p->GetName() == name;
-        });
+                           [name](std::shared_ptr<IPort> p) { return p->GetName() == name; });
     if (it != portVec_.end()) {
         return *it;
     }
@@ -133,50 +117,29 @@ std::shared_ptr<IPort> NodeBase::GetPort(const std::string& name)
     return port;
 }
 
-RetCode NodeBase::Init()
+RetCode NodeBase::Init(const int32_t streamId)
 {
     return RC_OK;
 }
 
-RetCode NodeBase::Start()
+RetCode NodeBase::Start(const int32_t streamId)
 {
-    CAMERA_LOGI("name:%s start enter\n", name_.c_str());
+    CAMERA_LOGI("name:%{public}s start enter\n", name_.c_str());
     return RC_OK;
 }
 
-RetCode NodeBase::Stop()
+RetCode NodeBase::Flush(const int32_t streamId)
 {
-    if (streamRunning_ == false) {
-        CAMERA_LOGI("streamrunning is already false");
-        return RC_OK;
-    }
-    streamRunning_ = false;
-
-    BufferManager* bufferManager = Camera::BufferManager::GetInstance();
-    for (auto it : bufferPoolIdVec_) {
-        std::shared_ptr<IBufferPool> bufferPool = bufferManager->GetBufferPool(it);
-        bufferPool->NotifyStop(true);
-    }
-    for (auto& itr : streamVec_) {
-        if (itr.collectThread_ != nullptr) {
-            CAMERA_LOGI("collect thread need join");
-            itr.collectThread_->join();
-            delete itr.collectThread_;
-            itr.collectThread_ = nullptr;
-        }
-        if (itr.deliverThread_ != nullptr) {
-            CAMERA_LOGI("deliver thread need join");
-            itr.deliverThread_->join();
-            delete itr.deliverThread_;
-            itr.deliverThread_ = nullptr;
-        }
-    }
     return RC_OK;
 }
 
-RetCode NodeBase::Config()
+RetCode NodeBase::Stop(const int32_t streamId)
 {
-    CAMERA_LOGI("name:%s config enter\n", name_.c_str());
+    return RC_OK;
+}
+
+RetCode NodeBase::Config(const int32_t streamId, const CaptureMeta& meta)
+{
     return RC_OK;
 }
 
@@ -215,181 +178,53 @@ std::vector<std::shared_ptr<IPort>> NodeBase::GetInPorts() const
 
 std::vector<std::shared_ptr<IPort>> NodeBase::GetOutPorts()
 {
-    CAMERA_LOGI("port num = %d", portVec_.size());
+    std::vector<std::shared_ptr<IPort>> out = {};
     for (const auto& it : portVec_) {
         if (it->Direction() == 1) {
-            outPutPorts_.push_back(it);
+            out.push_back(it);
         }
     }
-    return outPutPorts_;
+    return out;
 }
 
 std::shared_ptr<IPort> NodeBase::GetOutPortById(const int32_t id)
 {
-    int32_t count = 0;
     auto ports = GetOutPorts();
-    for (auto& it : ports) {
-        if (count == id) {
-            return it;
-        }
-        count++;
+    if (ports.size() <= id) {
+        return nullptr;
     }
-
-    return nullptr;
+    return ports[id];
 }
 
-RetCode NodeBase::GetDeviceManager()
+RetCode NodeBase::Capture(const int32_t streamId, const int32_t captureId)
 {
-    deviceManager_ = IDeviceManager::GetInstance();
-    if (deviceManager_ == nullptr) {
-        CAMERA_LOGE("get device manager failed.");
-        return RC_ERROR;
-    }
     return RC_OK;
 }
 
-void NodeBase::GetFrameInfo()
+void NodeBase::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
-    StreamSpec streamSpec;
-    int32_t portnum = GetNumberOfOutPorts();
-    CAMERA_LOGI("portnum = %d ", portnum);
-    if (bufferPoolIdVec_.size() >= portnum) {
-        return;
-    }
-    for (auto& it : outPutPorts_) {
-        streamSpec.bufferPoolId_ = it->format_.bufferPoolId_;
-        streamSpec.deliverThread_ = nullptr;
-        streamVec_.push_back(streamSpec);
-        bufferPoolIdVec_.push_back(it->format_.bufferPoolId_);
-        CAMERA_LOGI("get frameinfo bufferpool id = %llu ", streamSpec.bufferPoolId_);
-    }
-    return;
-}
-
-RetCode NodeBase::SetMetadata(std::shared_ptr<CameraStandard::CameraMetadata> meta)
-{
-    if (meta == nullptr) {
-        CAMERA_LOGE("meta is null");
-        return RC_ERROR;
-    }
-    meta_ = meta;
-    return RC_OK;
-}
-
-
-RetCode NodeBase::CollectBuffers()
-{
-    CAMERA_LOGI("collect buffers enter");
-    for (auto& it : streamVec_) {
-        it.collectThread_ = new std::thread([this, it] {
-            prctl(PR_SET_NAME, "collect_buffers");
-            RetCode rc = RC_ERROR;
-            BufferManager* bufferManager = Camera::BufferManager::GetInstance();
-            int i = 0;
-            std::shared_ptr<IPort> port = GetPort("out0");
-            uint32_t bufferCount = port->format_.bufferCount_;
-            while (streamRunning_ == true) {
-                std::shared_ptr<IBufferPool> bufferPool = bufferManager->GetBufferPool(it.bufferPoolId_);
-                if (bufferPool == nullptr) {
-                    CAMERA_LOGE("get bufferpool failed, id = %llu", it.bufferPoolId_);
-                    return RC_ERROR;
-                }
-                std::shared_ptr<IBuffer> buffer = bufferPool->AcquireBuffer(-1);
-                if (buffer == nullptr) {
-                    continue;
-                }
-                if (port->format_.bufferPoolId_ == it.bufferPoolId_) {
-                    bufferCount = port->format_.bufferCount_;
-                } else {
-                    port = GetPort("out1");
-                    bufferCount = port->format_.bufferCount_;
-                }
-
-                UpdateCaptureId(buffer);
-                std::shared_ptr<FrameSpec> frameSpec = std::make_shared<FrameSpec>();
-                frameSpec->bufferPoolId_ = it.bufferPoolId_;
-                frameSpec->bufferCount_ = bufferCount;
-                frameSpec->buffer_ = buffer;
-                if (i < bufferCount) {
-                    frameSpec->buffer_->SetIndex(i++);
-                } else {
-                    i = 0;
-                    frameSpec->buffer_->SetIndex(i++);
-                }
-                rc = ProvideBuffers(frameSpec);
-                CAMERA_LOGI("provide bffer:bufferpool id = %llu", frameSpec->bufferPoolId_);
-                if (rc == RC_ERROR) {
-                    CAMERA_LOGE("provide buffer failed.");
-                } else {
-                    // bufferNum_++;
-                }
-            }
-            CAMERA_LOGI("collect buffer thread closed");
-            return RC_OK;
-        });
-    }
-    return RC_OK;
-}
-
-void NodeBase::DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec)
-{
-    CAMERA_LOGI("deliver buffers enter");
-    if (GetNumberOfOutPorts() == 0) {
-        cb_(frameSpec->buffer_);
-    }
-    for (auto it : outPutPorts_) {
-        if (it->format_.bufferPoolId_ == frameSpec->bufferPoolId_) {
-            it->DeliverBuffer(frameSpec);
+    auto outPorts = GetOutPorts();
+    for (auto it : outPorts) {
+        if (it->format_.bufferPoolId_ == buffer->GetPoolId()) {
+            it->DeliverBuffer(buffer);
             return;
         }
     }
     return;
 }
 
-RetCode NodeBase::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)
+void NodeBase::DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers)
 {
-    CAMERA_LOGI("base node provideBuffers enter");
-    return RC_OK;
-}
-
-RetCode NodeBase::Capture(const std::vector<int32_t>& streamIds, const int32_t captureId)
-{
-    // FIXME: replace streamIds by one streamId, and configure one port.
-    for (auto streamId : streamIds) {
-        CAMERA_LOGV("stream id = %d, capture id = %d", streamId, captureId);
-        std::shared_ptr<IPort> port = nullptr;
-        for (auto& it : outPutPorts_) {
-            PortFormat f {};
-            it->GetFormat(f);
-            if (f.streamId_ == streamId) {
-                port = it;
-            }
-            CAMERA_LOGI("acquire id = %d, port stream id = %d", streamId, f.streamId_);
-        }
-        if (port == nullptr) {
-            return RC_OK;
-        }
-        port->SetCaptureId(captureId);
+    if (buffers.empty()) {
+        return;
     }
-    return RC_OK;
-}
-
-RetCode NodeBase::UpdateCaptureId(const std::shared_ptr<IBuffer>& buffer)
-{
-    auto poolId = buffer->GetPoolId();
-    std::shared_ptr<IPort> port = nullptr;
-    for (auto& it : outPutPorts_) {
-        PortFormat f {};
-        it->GetFormat(f);
-        if (f.bufferPoolId_ == poolId) {
-            port = it;
+    auto outPorts = GetOutPorts();
+    for (auto it : outPorts) {
+        if (it->format_.bufferPoolId_ == buffers[0]->GetPoolId()) {
+            it->DeliverBuffers(buffers);
+            return;
         }
     }
-    if (port == nullptr) {
-        return RC_OK;
-    }
-    buffer->SetCaptureId(port->GetCaptureId());
-
-    return RC_OK;
+    return;
 }
-} //namespace OHOS::Camera
+} // namespace OHOS::Camera

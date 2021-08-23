@@ -26,10 +26,10 @@
 namespace OHOS::Camera {
 class UvcNode : public NodeBase {
 public:
-    UvcNode(const std::string& name, const std::string& type, const int streamId);
+    UvcNode(const std::string& name, const std::string& type);
     ~UvcNode() override;
-    RetCode Start() override;
-    RetCode Stop() override;
+    RetCode Start(const int32_t streamId) override;
+    RetCode Stop(const int32_t streamId) override;
     RetCode GetDeviceController();
     RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta);
     void DistributeBuffers();

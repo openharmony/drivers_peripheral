@@ -15,10 +15,10 @@
 
 namespace OHOS::Camera {
 
-DummyNode::DummyNode(const std::string& name, const std::string& type, const int streamId)
-        :NodeBase(name, type, streamId)
+DummyNode::DummyNode(const std::string& name, const std::string& type)
+        :NodeBase(name, type)
 {
-    CAMERA_LOGI("%s enter, type(%s), stream id = %d\n", name_.c_str(), type_.c_str(), streamId);
+    CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
 
 REGISTERNODE(DummyNode, {"dummy", "sensor"})

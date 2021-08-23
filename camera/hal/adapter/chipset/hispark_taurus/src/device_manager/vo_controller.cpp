@@ -26,7 +26,7 @@ RetCode VoController::Init()
 {
     voObject_ = IVoObject::CreateVoObject();
     if (voObject_ == nullptr) {
-        CAMERA_LOGE("%s Create VoObject fail", __FUNCTION__);
+        CAMERA_LOGE("%{public}s Create VoObject fail", __FUNCTION__);
         return RC_ERROR;
     }
     return RC_OK;
@@ -37,7 +37,7 @@ RetCode VoController::PowerUp(CameraId cameraId)
     RetCode rc = RC_OK;
     if (GetPowerOnState() == false) {
         SetPowerOnState(true);
-        CAMERA_LOGI("%s Vo Powerup", __FUNCTION__);
+        CAMERA_LOGI("%{public}s Vo Powerup", __FUNCTION__);
         return rc;
     }
     return rc;
@@ -48,7 +48,7 @@ RetCode VoController::PowerDown(CameraId cameraId)
     RetCode rc = RC_OK;
     if (GetPowerOnState() == true) {
         SetPowerOnState(false);
-        CAMERA_LOGI("%s Vo PowerDown", __FUNCTION__);
+        CAMERA_LOGI("%{public}s Vo PowerDown", __FUNCTION__);
         return rc;
     }
     return rc;
@@ -58,7 +58,7 @@ RetCode VoController::ConfigVo()
 {
     std::vector<DeviceFormat> format;
     voObject_->ConfigVo(format);
-    CAMERA_LOGI("%s Vo ConfigVenc", __FUNCTION__);
+    CAMERA_LOGI("%{public}s Vo ConfigVenc", __FUNCTION__);
     return RC_OK;
 };
 
@@ -70,13 +70,13 @@ RetCode VoController::StartVo()
         voObject_->StartVo();
         startVoState_ = true;
     }
-    CAMERA_LOGI("%s Vo StartVo", __FUNCTION__);
+    CAMERA_LOGI("%{public}s Vo StartVo", __FUNCTION__);
     return rc;
 };
 
 RetCode VoController::StopVo()
 {
-    CAMERA_LOGI("%s Vo StopVo", __FUNCTION__);
+    CAMERA_LOGI("%{public}s Vo StopVo", __FUNCTION__);
     std::lock_guard<std::mutex> l(startVolock_);
     RetCode rc = RC_OK;
     if (startVoState_ == true) {

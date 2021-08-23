@@ -86,15 +86,16 @@ int32_t StreamOperatorStub::StreamOperatorStubIsStreamsSupported(
         UtilsDataStub::DecodeCameraMetadata(data, metadata);
     }
 
-    std::shared_ptr<StreamInfo> pInfo = nullptr;
-    nullFlag = data.ReadBool();
-    if (nullFlag) {
-        pInfo = std::make_shared<StreamInfo>();
-        UtilsDataStub::DecodeStreamInfo(data, pInfo);
+    int32_t count = data.ReadInt32();
+    std::vector<std::shared_ptr<StreamInfo>> streamInfos;
+    for (int i = 0; i < count; i++) {
+        std::shared_ptr<StreamInfo> streamInfo = std::make_shared<StreamInfo>();
+        UtilsDataStub::DecodeStreamInfo(data, streamInfo);
+        streamInfos.push_back(streamInfo);
     }
 
     StreamSupportType streamSupportType;
-    CamRetCode ret = IsStreamsSupported(operationMode, metadata, pInfo, streamSupportType);
+    CamRetCode ret = IsStreamsSupported(operationMode, metadata, streamInfos, streamSupportType);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
         HDF_LOGE("%s: write retcode failed", __func__);
         return HDF_FAILURE;

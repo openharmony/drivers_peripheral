@@ -16,32 +16,49 @@
 #ifndef HOS_CAMERA_H
 #define HOS_CAMERA_H
 
-#include <functional>
-#include <cstdio>
+#include "securec.h"
 #include <cstdint>
+#include <cstdio>
+#include <functional>
+#include <hdf_log.h>
 #include <pthread.h>
 #include <stdint.h>
+#include <sys/prctl.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <sys/prctl.h>
-#include "securec.h"
-#include <hdf_log.h>
+
+#ifdef HITRACE_LOG_ENABLED
+#include "hitrace.h"
+#define DFX_LOCAL_HITRACE_BEGIN     \
+    HiviewDFX::HiTraceId _trace_id; \
+    _trace_id = OHOS::HiviewDFX::HiTrace::Begin(__FUNCTION__, HITRACE_FLAG_DEFAULT);
+#define DFX_LOCAL_HITRACE_END OHOS::HiviewDFX::HiTrace::End(_trace_id);
+#else
+#define DFX_LOCAL_HITRACE_BEGIN
+#define DFX_LOCAL_HITRACE_END
+#endif // HITRACE_LOG_ENABLED
+
+#if 0
+#if __GLIBC__ == 2 && __GLIBC_MINOR__ < 30
+#include <sys/syscall.h>
+#define gettid() (pid_t) syscall(SYS_gettid)
+#endif
+#endif
 
 namespace OHOS::Camera {
-
 #define HDF_LOG_TAG camera_host
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #ifndef OHOS_DEBUG
-#define DECORATOR_HDFLOG(op, fmt, args...) \
-    do {                                  \
-        op("%s() " fmt, __FUNCTION__, ##args);        \
+#define DECORATOR_HDFLOG(op, fmt, args...)             \
+    do {                                               \
+        op("%{public}s() " fmt, __FUNCTION__, ##args); \
     } while (0)
 #else
-#define DECORATOR_HDFLOG(op, fmt, args...)                                                \
-    do {                                                                                 \
+#define DECORATOR_HDFLOG(op, fmt, args...)                                     \
+    do {                                                                       \
         op("{%s()-%s:%d} " fmt, __FUNCTION__, __FILENAME__, __LINE__, ##args); \
     } while (0)
 #endif
@@ -52,7 +69,62 @@ namespace OHOS::Camera {
 #define CAMERA_LOGV(fmt, ...) DECORATOR_HDFLOG(HDF_LOGV, fmt, ##__VA_ARGS__)
 #define CAMERA_LOGD(fmt, ...) DECORATOR_HDFLOG(HDF_LOGD, fmt, ##__VA_ARGS__)
 
-constexpr uint32_t WATCHDOG_TIMEOUT = 10000;
+#if 0
+#define GET_CURRENT_TIME_MS                                                                                   \
+    struct timeval _tv;                                                                                       \
+    gettimeofday(&_tv, NULL);                                                                                 \
+    struct tm* _tm = localtime(&_tv.tv_sec);                                                                  \
+    int _ms = _tv.tv_usec / 1000;                                                                             \
+    char now[25] = {0};                                                                                       \
+    sprintf_s(now, sizeof(now), "%02d-%02d %02d:%02d:%02d.%03d", _tm->tm_mon + 1, _tm->tm_mday, _tm->tm_hour, \
+              _tm->tm_min, _tm->tm_sec, _ms);
+
+#define CAMERA_LOGE(fmt, ...)                                                               \
+    do {                                                                                    \
+        GET_CURRENT_TIME_MS;                                                                \
+        pid_t pid = getpid();                                                               \
+        pid_t tid = gettid();                                                               \
+        printf("%s %4u %4u E " fmt "\n", now, (uint32_t)pid, (uint32_t)tid, ##__VA_ARGS__); \
+        fflush(stdout);                                                                     \
+    } while (0);
+
+#define CAMERA_LOGW(fmt, ...)                                                               \
+    do {                                                                                    \
+        GET_CURRENT_TIME_MS;                                                                \
+        pid_t pid = getpid();                                                               \
+        pid_t tid = gettid();                                                               \
+        printf("%s %4u %4u W " fmt "\n", now, (uint32_t)pid, (uint32_t)tid, ##__VA_ARGS__); \
+        fflush(stdout);                                                                     \
+    } while (0);
+
+#define CAMERA_LOGI(fmt, ...)                                                               \
+    do {                                                                                    \
+        GET_CURRENT_TIME_MS;                                                                \
+        pid_t pid = getpid();                                                               \
+        pid_t tid = gettid();                                                               \
+        printf("%s %4u %4u I " fmt "\n", now, (uint32_t)pid, (uint32_t)tid, ##__VA_ARGS__); \
+        fflush(stdout);                                                                     \
+    } while (0);
+
+#define CAMERA_LOGV(fmt, ...)                                                               \
+    do {                                                                                    \
+        GET_CURRENT_TIME_MS;                                                                \
+        pid_t pid = getpid();                                                               \
+        pid_t tid = gettid();                                                               \
+        printf("%s %4u %4u V " fmt "\n", now, (uint32_t)pid, (uint32_t)tid, ##__VA_ARGS__); \
+        fflush(stdout);                                                                     \
+    } while (0);
+
+#define CAMERA_LOGD(fmt, ...)                                                               \
+    do {                                                                                    \
+        GET_CURRENT_TIME_MS;                                                                \
+        pid_t pid = getpid();                                                               \
+        pid_t tid = gettid();                                                               \
+        printf("%s %4u %4u D " fmt "\n", now, (uint32_t)pid, (uint32_t)tid, ##__VA_ARGS__); \
+        fflush(stdout);                                                                     \
+    } while (0);
+#endif
+
 constexpr uint32_t FRAME_SIZE_TAG = 100;
 
 using RetCode = uint32_t;
@@ -148,21 +220,33 @@ using EsFrmaeInfo = struct EsFrmaeInfo {
     int64_t timestamp;
 };
 
-#define CHECK_EXPECT_NOT_EQUAL_RETURN(arg1, arg2, ret)                    \
-    if ((arg1) != (arg2)) {                                               \
-        CAMERA_LOGE("%s, %u, %s is not equal to %s, return", __FUNCTION__,\
-            __LINE__, #arg1, #arg2);                                      \
-        return (ret);                                                     \
+#define CHECK_IF_NOT_EQUAL_RETURN_VALUE(arg1, arg2, ret)                                                            \
+    if ((arg1) != (arg2)) {                                                                                         \
+        CAMERA_LOGE("%{public}u, %{public}s is not equal to %{public}s, return %{public}s", __LINE__, #arg1, #arg2, \
+                    #ret);                                                                                          \
+        return (ret);                                                                                               \
     }
 
-#define CHECK_EXPECT_EQUAL_RETURN(arg1, arg2, ret)                    \
-    if ((arg1) == (arg2)) {                                           \
-        CAMERA_LOGE("%s, %u, %s is equal to %s, return", __FUNCTION__,\
-            __LINE__, #arg1, #arg2);                                  \
-        return (ret);                                                 \
+#define CHECK_IF_EQUAL_RETURN_VALUE(arg1, arg2, ret)                                                                   \
+    if ((arg1) == (arg2)) {                                                                                            \
+        CAMERA_LOGE("%{public}u, %{public}s is equal to %{public}s, return %{public}s", __LINE__, #arg1, #arg2, #ret); \
+        return (ret);                                                                                                  \
     }
 
-#define CHECK_PTR_NULL_RETURN(ptr, ret) CHECK_EXPECT_EQUAL_RETURN(ptr, nullptr, ret)
+#define CHECK_IF_PTR_NULL_RETURN_VALUE(ptr, ret) CHECK_IF_EQUAL_RETURN_VALUE(ptr, nullptr, ret)
 
+#define CHECK_IF_NOT_EQUAL_RETURN_VOID(arg1, arg2)                                                        \
+    if ((arg1) != (arg2)) {                                                                               \
+        CAMERA_LOGE("%{public}u, %{public}s is not equal to %{public}s, return", __LINE__, #arg1, #arg2); \
+        return;                                                                                           \
+    }
+
+#define CHECK_IF_EQUAL_RETURN_VOID(arg1, arg2)                                                        \
+    if ((arg1) == (arg2)) {                                                                           \
+        CAMERA_LOGE("%{public}u, %{public}s is equal to %{public}s, return", __LINE__, #arg1, #arg2); \
+        return;                                                                                       \
+    }
+
+#define CHECK_IF_PTR_NULL_RETURN_VOID(ptr) CHECK_IF_EQUAL_RETURN_VOID(ptr, nullptr)
 } // namespace OHOS::Camera
 #endif

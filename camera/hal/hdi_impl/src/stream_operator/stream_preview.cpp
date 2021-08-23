@@ -14,15 +14,16 @@
  */
 
 #include "stream_preview.h"
-#include <display_type.h>
-#include <surface_type.h>
-#include "buffer_manager.h"
-#include "buffer_adapter.h"
-#include "image_buffer.h"
 
 namespace OHOS::Camera {
-StreamPreview::StreamPreview()
+
+StreamPreview::StreamPreview(const int32_t id,
+                             const StreamIntent type,
+                             std::shared_ptr<IPipelineCore>& p,
+                             std::shared_ptr<CaptureMessageOperator>& m)
+    : StreamBase(id, type, p, m)
 {
+    CAMERA_LOGV("enter");
 }
 
 StreamPreview::~StreamPreview()

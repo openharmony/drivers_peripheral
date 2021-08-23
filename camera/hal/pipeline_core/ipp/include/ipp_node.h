@@ -25,14 +25,15 @@
 namespace OHOS::Camera {
 class IppNode : public NodeBase, public OfflinePipeline {
 public:
-    IppNode(const std::string& name, const std::string& type, const int streamId);
+    IppNode(const std::string& name, const std::string& type);
     ~IppNode();
-    virtual RetCode Init() override;
-    virtual RetCode Start() override;
-    virtual RetCode Stop() override;
-    RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta);
-    virtual void DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
-    virtual void DeliverBuffers(std::vector<std::shared_ptr<FrameSpec>> buffers) override;
+    virtual RetCode Init(const int32_t streamId) override;
+    virtual RetCode Start(const int32_t streamId) override;
+    virtual RetCode Stop(const int32_t streamId) override;
+    virtual RetCode Flush(const int32_t streamId) override;
+    virtual RetCode Config(const int32_t streamId, const CaptureMeta& meta) override;
+    virtual void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
+    virtual void DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
     virtual void ProcessCache(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
     virtual void DeliverCache(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
     virtual void DeliverCancelCache(std::vector<std::shared_ptr<IBuffer>>& buffers) override;

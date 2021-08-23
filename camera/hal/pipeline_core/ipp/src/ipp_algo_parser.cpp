@@ -48,7 +48,7 @@ RetCode IppAlgoParser::Init()
         return RC_ERROR;
     }
 
-    CAMERA_LOGI("pathname = %s", pathName_.c_str());
+    CAMERA_LOGI("pathname = %{public}s", pathName_.c_str());
     SetHcsBlobPath(pathName_.c_str());
     rootNode_ = devResInstance_->GetRootNode();
     if (rootNode_ == nullptr) {
@@ -56,7 +56,7 @@ RetCode IppAlgoParser::Init()
         return RC_ERROR;
     }
     if (rootNode_->name != nullptr) {
-        CAMERA_LOGI("rootNode = %s", rootNode_->name);
+        CAMERA_LOGI("rootNode = %{public}s", rootNode_->name);
     }
 
     return RC_OK;
@@ -69,7 +69,7 @@ AlgoPluginList IppAlgoParser::ConstructPluginByHcsData()
         return {};
     }
     if (ippAlgoConfig->name != nullptr) {
-        CAMERA_LOGI("config name = %s", ippAlgoConfig->name);
+        CAMERA_LOGI("config name = %{public}s", ippAlgoConfig->name);
     }
 
     AlgoPluginList pluginList = {};
@@ -81,7 +81,7 @@ AlgoPluginList IppAlgoParser::ConstructPluginByHcsData()
             return {};
         }
         std::string nodeName = std::string(childNodeTmp->name);
-        CAMERA_LOGI("subnode name = %s", nodeName.c_str());
+        CAMERA_LOGI("subnode name = %{public}s", nodeName.c_str());
         std::shared_ptr<AlgoPlugin> plugin = ConstructPlugin(childNodeTmp);
         if (plugin != nullptr) {
             pluginList.emplace_back(plugin);
@@ -120,7 +120,7 @@ std::shared_ptr<AlgoPlugin> IppAlgoParser::ConstructPlugin(const DeviceResourceN
     }
     auto it = algoModeMap_.find(std::string(mode));
     if (it == algoModeMap_.end()) {
-        CAMERA_LOGE("invalid mode %s", mode);
+        CAMERA_LOGE("invalid mode %{public}s", mode);
         return nullptr;
     }
 

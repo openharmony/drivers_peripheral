@@ -15,10 +15,12 @@
 #include "mpi_device_manager.h"
 
 namespace OHOS::Camera{
-VoNode::VoNode(const std::string& name, const std::string& type, const int streamId)
-        :MpiNode(name, type, streamId)
+VoNode::VoNode(const std::string& name, const std::string& type)
+        : MpiNode(name, type)
+        , SinkNode(name, type)
+        , NodeBase(name,type)
 {
-    CAMERA_LOGI("%s enter, type(%s), stream id = %d\n", name_.c_str(), type_.c_str(), streamId);
+    CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
 
 RetCode VoNode::GetDeviceController()
@@ -33,7 +35,7 @@ RetCode VoNode::GetDeviceController()
     return RC_OK;
 }
 
-RetCode VoNode::Start()
+RetCode VoNode::Start(const int32_t streamId)
 {
     RetCode rc = RC_OK;
     rc = GetDeviceController();
@@ -51,18 +53,13 @@ RetCode VoNode::Start()
         CAMERA_LOGE("startvo failed.");
         return RC_ERROR;
     }
-    streamRunning_ = true;
     return RC_OK;
 }
-RetCode VoNode::Stop()
+
+RetCode VoNode::Stop(const int32_t streamId)
 {
     RetCode rc = RC_OK;
-    if (streamRunning_ == false) {
-        CAMERA_LOGI("vo node : streamrunning is already false");
-        return RC_OK;
-    }
-    streamRunning_ = false;
-    rc = DisConnectMpi();
+    rc = DisConnectMpi(streamId);
     if (rc == RC_ERROR) {
         CAMERA_LOGE("DisConnectMpi failed!");
         return RC_ERROR;
@@ -73,6 +70,11 @@ RetCode VoNode::Stop()
         return RC_ERROR;
     }
     return RC_OK;
+}
+
+VoNode::~VoNode()
+{
+    CAMERA_LOGV("%{public}s, vo node dtor.", __FUNCTION__);
 }
 
 REGISTERNODE(VoNode, {"vo"})

@@ -51,7 +51,7 @@ public:
             consumer_->RegisterConsumerListener(listener);
 
             auto producer = consumer_->GetProducer();
-            CAMERA_LOGI("%s, to create a buffer queue producer %p", __FUNCTION__, producer.GetRefPtr());
+            CAMERA_LOGI("%{public}s, to create a buffer queue producer %{public}p", __FUNCTION__, producer.GetRefPtr());
 
             if (producer == nullptr) {
                 return nullptr;

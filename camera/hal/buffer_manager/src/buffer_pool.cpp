@@ -22,7 +22,7 @@
 namespace OHOS::Camera {
 BufferPool::BufferPool()
 {
-    CAMERA_LOGI("BufferPool construct, instance = %p", this);
+    CAMERA_LOGI("BufferPool construct, instance = %{public}p", this);
 }
 
 BufferPool::~BufferPool()
@@ -106,7 +106,9 @@ RetCode BufferPool::PrepareBuffer()
 RetCode BufferPool::DestroyBuffer()
 {
     if (bufferSourceType_ == CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL) {
-        CAMERA_LOGI("no need destroy buffer");
+        std::unique_lock<std::mutex> l(lock_);
+        idleList_.clear();
+        busyList_.clear();
         return RC_OK;
     }
 
@@ -121,11 +123,11 @@ RetCode BufferPool::DestroyBuffer()
         for (auto it : idleList_) {
             RetCode ret = bufferAllocator_->UnmapBuffer(it);
             if (ret != RC_OK) {
-                CAMERA_LOGE("unmap (%d) buffer failed", it->GetIndex());
+                CAMERA_LOGE("unmap (%{public}d) buffer failed", it->GetIndex());
             }
             ret = bufferAllocator_->FreeBuffer(it);
             if (ret != RC_OK) {
-                CAMERA_LOGE("free (%d) buffer failed", it->GetIndex());
+                CAMERA_LOGE("free (%{public}d) buffer failed", it->GetIndex());
             }
         }
         idleList_.clear();
@@ -152,13 +154,6 @@ RetCode BufferPool::DestroyBuffer()
 RetCode BufferPool::AddBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     std::unique_lock<std::mutex> l(lock_);
-
-    if (idleList_.size() + busyList_.size() >= bufferCount_) {
-        CAMERA_LOGI("buffer pool is full, cannot add buffer.");
-        return RC_ERROR;
-    }
-
-    CAMERA_LOGD("add buffer %d", buffer->GetIndex());
     buffer->SetPoolId(poolId_);
     idleList_.emplace_back(buffer);
     cv_.notify_one();
@@ -172,20 +167,22 @@ std::shared_ptr<IBuffer> BufferPool::AcquireBuffer(int timeout)
     // return buffer immediately, if idle buffer is avaliable;
     if (!idleList_.empty()) {
         auto it = idleList_.begin();
+        auto buffer = *it;
         busyList_.splice(busyList_.begin(), idleList_, it);
-        CAMERA_LOGI("acquire buffer immediately : %d", (*it)->GetIndex());
+        CAMERA_LOGV("acquire buffer immediately, index = %{public}d", buffer->GetIndex());
         return *it;
     }
 
     // wait all the time, till idle list is avaliable.
     if (timeout < 0) {
         cv_.wait(l, [this] {
-            return !idleList_.empty() || streamStop_;
+            return !idleList_.empty() || stop_;
             });
         if (!idleList_.empty()) {
             auto it = idleList_.begin();
+            auto buffer = *it;
             busyList_.splice(busyList_.begin(), idleList_, it);
-            CAMERA_LOGI("acquire buffer wait all the time : %d", (*it)->GetIndex());
+            CAMERA_LOGV("acquire buffer wait all the time, index = %{public}d", buffer->GetIndex());
             return *it;
         }
     }
@@ -193,15 +190,16 @@ std::shared_ptr<IBuffer> BufferPool::AcquireBuffer(int timeout)
     // wait for timeout, or idle list is avaliable.
     if (timeout > 0) {
         if (cv_.wait_for(l, std::chrono::seconds(timeout), [this] {
-            return !idleList_.empty() || streamStop_;
+            return !idleList_.empty() || stop_;
             }) == false) {
             CAMERA_LOGE("wait idle buffer timeout");
             return nullptr;
         }
         if (!idleList_.empty()) {
             auto it = idleList_.begin();
+            auto buffer = *it;
             busyList_.splice(busyList_.begin(), idleList_, it);
-            CAMERA_LOGI("acquire buffer wait %ds : %d", timeout, (*it)->GetIndex());
+            CAMERA_LOGV("acquire buffer wait %{public}ds, index = %{public}d", timeout, buffer->GetIndex());
             return *it;
         }
     }
@@ -247,9 +245,27 @@ void BufferPool::SetId(const int64_t id)
     poolId_ = id;
 }
 
-void BufferPool::NotifyStop(bool state)
+void BufferPool::NotifyStop()
 {
-    streamStop_ = state;
+    stop_ = true;
     cv_.notify_all();
 }
+
+void BufferPool::NotifyStart()
+{
+    stop_ = false;
+    cv_.notify_all();
+}
+
+void BufferPool::ClearBuffers()
+{
+    DestroyBuffer();
+}
+
+uint32_t BufferPool::GetIdleBufferCount()
+{
+    std::unique_lock<std::mutex> l(lock_);
+    return idleList_.size();
+}
+
 } // namespace OHOS::Camera

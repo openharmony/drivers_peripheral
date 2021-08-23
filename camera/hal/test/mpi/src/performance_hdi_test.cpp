@@ -456,7 +456,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0120, TestSize.Level0)
     Camera::StreamSupportType pType;
     for (int i = 0; i < Times; i++) {
         gettimeofday(&start, NULL);
-        Test_->rc = Test_->streamOperator->IsStreamsSupported(NORMAL, modeSetting, Test_->streamInfo, pType);
+        Test_->rc = Test_->streamOperator->IsStreamsSupported(NORMAL, modeSetting, {Test_->streamInfo}, pType);
         gettimeofday(&end, NULL);
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;

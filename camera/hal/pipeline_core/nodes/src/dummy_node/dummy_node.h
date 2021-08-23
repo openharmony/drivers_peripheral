@@ -18,7 +18,7 @@
 namespace OHOS::Camera {
 class DummyNode : public NodeBase {
 public:
-    DummyNode(const std::string& name, const std::string& type, const int streamId);
+    DummyNode(const std::string& name, const std::string& type);
     ~DummyNode() override = default;
 };
 }

@@ -16,6 +16,7 @@
 
 #include <stdint.h>
 #include "mpi_node.h"
+#include "sink_node.h"
 #include "device_manager_adapter.h"
 #include "mpi_device_manager.h"
 #include "camera.h"
@@ -23,12 +24,12 @@
 #include "venc_manager.h"
 
 namespace OHOS::Camera {
-class VencNode : public MpiNode {
+class VencNode : public MpiNode, public SinkNode{
 public:
-    VencNode(const std::string& name, const std::string& type, const int streamId);
-    ~VencNode() override = default;
-    RetCode Start() override;
-    RetCode Stop() override;
+    VencNode(const std::string& name, const std::string& type);
+    ~VencNode() override;
+    RetCode Start(const int32_t streamId) override;
+    RetCode Stop(const int32_t streamId) override;
     RetCode GetDeviceController() const;
 };
 } // namespace OHOS::Camera

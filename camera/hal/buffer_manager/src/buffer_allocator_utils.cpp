@@ -64,7 +64,7 @@ std::shared_ptr<IBuffer> BufferAllocatorUtils::AllocBuffer(const int32_t source,
                                                            const uint32_t format)
 {
     auto allocator = GetBufferAllocator(source);
-    CHECK_PTR_NULL_RETURN(allocator, nullptr);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(allocator, nullptr);
 
     return allocator->AllocBuffer(width, height, usage, format);
 }
@@ -72,35 +72,35 @@ std::shared_ptr<IBuffer> BufferAllocatorUtils::AllocBuffer(const int32_t source,
 RetCode BufferAllocatorUtils::FreeBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     auto allocator = GetAllocator(buffer);
-    CHECK_PTR_NULL_RETURN(allocator, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(allocator, RC_ERROR);
     return allocator->FreeBuffer(buffer);
 }
 
 RetCode BufferAllocatorUtils::MapBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     auto allocator = GetAllocator(buffer);
-    CHECK_PTR_NULL_RETURN(allocator, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(allocator, RC_ERROR);
     return allocator->MapBuffer(buffer);
 }
 
 RetCode BufferAllocatorUtils::UnmapBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     auto allocator = GetAllocator(buffer);
-    CHECK_PTR_NULL_RETURN(allocator, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(allocator, RC_ERROR);
     return allocator->UnmapBuffer(buffer);
 }
 
 RetCode BufferAllocatorUtils::FlushCache(std::shared_ptr<IBuffer>& buffer)
 {
     auto allocator = GetAllocator(buffer);
-    CHECK_PTR_NULL_RETURN(allocator, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(allocator, RC_ERROR);
     return allocator->FlushCache(buffer);
 }
 
 RetCode BufferAllocatorUtils::InvalidateCache(std::shared_ptr<IBuffer>& buffer)
 {
     auto allocator = GetAllocator(buffer);
-    CHECK_PTR_NULL_RETURN(allocator, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(allocator, RC_ERROR);
     return allocator->InvalidateCache(buffer);
 }
 } // namespace OHOS::Camera

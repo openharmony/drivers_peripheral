@@ -15,16 +15,17 @@
 #include <unistd.h>
 
 namespace OHOS::Camera{
-VpssNode::VpssNode(const std::string& name, const std::string& type, const int streamId)
-        :MpiNode(name, type, streamId)
+VpssNode::VpssNode(const std::string& name, const std::string& type)
+        : MpiNode(name, type)
+        , SourceNode(name, type)
+        , NodeBase(name,type)
 {
-    CAMERA_LOGI("%s enter, type(%s), stream id = %d\n", name_.c_str(), type_.c_str(), streamId);
+    CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
 
 VpssNode::~VpssNode()
 {
-    NodeBase::Stop();
-    CAMERA_LOGI("~Vpss Node exit.");
+    CAMERA_LOGV("%{public}s, vpss node dtor.", __FUNCTION__);
 }
 
 RetCode VpssNode::GetDeviceController()
@@ -39,7 +40,12 @@ RetCode VpssNode::GetDeviceController()
     return RC_OK;
 }
 
-RetCode VpssNode::Start()
+RetCode VpssNode::Init(const int32_t streamId)
+{
+    return RC_OK;
+}
+
+RetCode VpssNode::Start(const int32_t streamId)
 {
     RetCode rc = RC_OK;
     rc = GetDeviceController();
@@ -57,32 +63,23 @@ RetCode VpssNode::Start()
         CAMERA_LOGE("startvpss failed.");
         return RC_ERROR;
     }
-    CAMERA_LOGI("%s, beign to connect", __FUNCTION__);
-    rc = ConnectMpi();
+    CAMERA_LOGI("%{public}s, begin to connect", __FUNCTION__);
+    rc = ConnectMpi(streamId);
     if (rc == RC_ERROR) {
         CAMERA_LOGE("startvpss failed.");
         return RC_ERROR;
     }
-    SendCallBack();
-    GetFrameInfo();
-    if (streamRunning_ == false) {
-        CAMERA_LOGI("streamrunning = false");
-        streamRunning_ = true;
-        CollectBuffers();
-        DistributeBuffers();
-    }
-    return RC_OK;
+    rc = SourceNode::Start(streamId);
+    return rc;
 }
 
-RetCode VpssNode::Stop()
+RetCode VpssNode::Flush(const int32_t streamId)
 {
     RetCode rc = RC_OK;
-    if (streamRunning_ == false) {
-        CAMERA_LOGI("vpss node : streamrunning is already false");
-        return RC_OK;
-    }
-    streamRunning_ = false;
-    rc = DisConnectMpi();
+    rc = SourceNode::Flush(streamId);
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
+
+    rc = DisConnectMpi(streamId);
     if (rc == RC_ERROR) {
         CAMERA_LOGE("DisConnectMpi failed!");
         return RC_ERROR;
@@ -92,101 +89,31 @@ RetCode VpssNode::Stop()
         CAMERA_LOGE("stopvpss failed!");
         return RC_ERROR;
     }
+    rc = IDeviceManager::GetInstance()->Flush(streamId);
 
-    BufferManager* bufferManager = Camera::BufferManager::GetInstance();
-    for (auto it : bufferPoolIdVec_) {
-        std::shared_ptr<IBufferPool> bufferPool = bufferManager->GetBufferPool(it);
-        bufferPool->NotifyStop(true);
-    }
-    cv_.notify_all();
-
-    for (auto& itr : streamVec_) {
-        if (itr.collectThread_ != nullptr) {
-            CAMERA_LOGI("VpssNode::Stop collectThread need join");
-            itr.collectThread_->join();
-            delete itr.collectThread_;
-            itr.collectThread_ = nullptr;
-        }
-        if (itr.deliverThread_ != nullptr) {
-            CAMERA_LOGI("deliver thread need join");
-            itr.deliverThread_->join();
-            delete itr.deliverThread_;
-            itr.deliverThread_ = nullptr;
-        }
-    }
-
-    return RC_OK;
+    return rc;
 }
 
-void VpssNode::DistributeBuffers()
+RetCode VpssNode::Stop(const int32_t streamId)
 {
-    CAMERA_LOGI("distribute buffers enter");
-    for (auto& it : streamVec_) {
-        it.deliverThread_ = new std::thread([this, it] {
-        prctl(PR_SET_NAME, "distribute_buff");
-            std::shared_ptr<FrameSpec> fms = nullptr;
-            while (streamRunning_ == true) {
-                {
-                    std::lock_guard<std::mutex> l(streamLock_);
-                    if (buffer_.count(it.bufferPoolId_) > 0) {
-                        CAMERA_LOGI("distribute buffer Num = %d", frameVec_.size());
-                        for (auto& frameSpec : buffer_[it.bufferPoolId_]) {
-                            fms = frameSpec;
-                            buffer_[it.bufferPoolId_].pop_front();
-                            break;
-                        }
-                    }
-                }
-                if (fms != nullptr) {
-                    CAMERA_LOGI("vpss node distribute buffer: bufferPool Id = %llu",it.bufferPoolId_);
-                    DeliverBuffers(fms);
-                    fms = nullptr;
-                } else {
-                    std::unique_lock <std::mutex> lck(mtx_);
-                    cv_.wait(lck);
-                }
-            }
-            CAMERA_LOGI("distribute buffer thread %llu  closed", it.bufferPoolId_);
-            return;
-        });
-    }
-    return;
+    return SourceNode::Stop(streamId);
 }
 
-void VpssNode::AchieveBuffer(std::shared_ptr<FrameSpec> frameSpec)
-{
-    if (frameSpec == nullptr) {
-        CAMERA_LOGE("frame Spec is null");
-        return;
-    }
-    {
-        std::lock_guard<std::mutex> l(streamLock_);
-        buffer_[frameSpec->bufferPoolId_].push_back(frameSpec);
-        CAMERA_LOGI("AchieveBuffer : bufferpool id = %llu", frameSpec->bufferPoolId_);
-    }
-    std::unique_lock <std::mutex> lck(mtx_);
-    cv_.notify_all();
-}
-
-void VpssNode::SendCallBack()
+void VpssNode::SetBufferCallback()
 {
     deviceManager_->SetNodeCallBack([&](std::shared_ptr<FrameSpec> frameSpec) {
-            AchieveBuffer(frameSpec);
-            });
+            OnPackBuffer(frameSpec);
+    });
     return;
 }
 
 RetCode VpssNode::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)
 {
-    std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();
-    CAMERA_LOGI("%s, ready to send frame buffer, bufferpool id = %llu", __FUNCTION__, frameSpec->bufferPoolId_);
-    if (deviceManager->SendFrameBuffer(frameSpec) == RC_OK) {
-        CAMERA_LOGI("%s, send frame buffer success, bufferpool id = %llu", __FUNCTION__, frameSpec->bufferPoolId_);
+    if (deviceManager_->SendFrameBuffer(frameSpec) == RC_OK) {
         return RC_OK;
     }
     CAMERA_LOGE("provide buffer failed.");
     return RC_ERROR;
 }
-
 REGISTERNODE(VpssNode, {"vpss"})
 } // namespace OHOS::Camera

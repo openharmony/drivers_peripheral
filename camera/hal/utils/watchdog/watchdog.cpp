@@ -28,7 +28,7 @@ void WatchDog::Init(int ms, std::function<void()> executor, bool isKill)
     timeMs_ = ms;
     isKill_ = isKill;
     executor_ = executor;
-    handleThread_ = std::thread(&WatchDog::WaitForWakeUP, this);
+    handleThread_ = std::make_unique<std::thread>(&WatchDog::WaitForWakeUP, this);
 }
 
 WatchDog::~WatchDog()
@@ -38,8 +38,8 @@ WatchDog::~WatchDog()
         terminate_ = true;
         cv_.notify_one();
     }
-    if (&handleThread_ && handleThread_.joinable()) {
-        handleThread_.join();
+    if (handleThread_ != nullptr && handleThread_->joinable()) {
+        handleThread_->join();
     }
 }
 

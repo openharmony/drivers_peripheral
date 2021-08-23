@@ -67,7 +67,14 @@ public:
     virtual RetCode SetFlashlight(FlashMode flashMode, bool enable, CameraId cameraId = CAMERA_MAX) = 0;
     virtual void Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta) = 0;
     virtual void SetCallBack(UvcMetaDataCb cb) {};
-
+    virtual RetCode PreConfig(const ModeMeta& meta, const std::vector<DeviceStreamSetting>& settings)
+    {
+        return RC_OK;
+    }
+    virtual RetCode Flush(int32_t streamId)
+    {
+        return RC_OK;
+    }
 };
 } // namespace OHOS::Camera
 #endif

@@ -16,7 +16,11 @@
 #include "stream_post_view.h"
 
 namespace OHOS::Camera {
-StreamPostView::StreamPostView()
+StreamPostView::StreamPostView(const int32_t id,
+                               const StreamIntent type,
+                               std::shared_ptr<IPipelineCore>& p,
+                               std::shared_ptr<CaptureMessageOperator>& m)
+    : StreamBase(id, type, p, m)
 {
 }
 
