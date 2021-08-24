@@ -67,13 +67,6 @@ ohos_unittest("pipeline_core_unittest") {
     "$camera_path/hdi_impl/stream_operator/include",
     "$camera_path/hdi_impl/include",
     "$camera_path/device_manager/include",
-    "$camera_path/adapter/chipset/hispark_taurus/include/device_manager",
-    "$camera_path/adapter/chipset/hispark_taurus/src/pipeline_core/nodes/mpi_node",
-    "$camera_path/adapter/chipset/hispark_taurus/src/pipeline_core/nodes/vi_node",
-    "$camera_path/adapter/chipset/hispark_taurus/src/pipeline_core/nodes/vo_node",
-    "$camera_path/adapter/chipset/hispark_taurus/src/pipeline_core/nodes/venc_node",
-    "$camera_path/adapter/chipset/hispark_taurus/src/pipeline_core/nodes/vpss_node",
-    "$camera_path/adapter/chipset/hispark_taurus/config/pipeline_core",
     "$camera_path/pipeline_core",
     "$camera_path/pipeline_core/host_stream/include",
     "$camera_path/pipeline_core/utils",
@@ -109,6 +102,17 @@ ohos_unittest("pipeline_core_unittest") {
     "//drivers/framework/utils/include",
     "//drivers/adapter/uhdf2/osal/include",
   ]
+  if (is_support_mpi) {
+    include_dirs += [
+      "$camera_path/adapter/chipset/hispark_taurus/include/device_manager",
+      "$camera_path/adapter/chipset/hispark_taurus/src/pipeline_core/nodes/mpi_node",
+      "$camera_path/adapter/chipset/hispark_taurus/src/pipeline_core/nodes/vi_node",
+      "$camera_path/adapter/chipset/hispark_taurus/src/pipeline_core/nodes/vo_node",
+      "$camera_path/adapter/chipset/hispark_taurus/src/pipeline_core/nodes/venc_node",
+      "$camera_path/adapter/chipset/hispark_taurus/src/pipeline_core/nodes/vpss_node",
+      "$camera_path/adapter/chipset/hispark_taurus/config/pipeline_core",
+    ]
+  }
 
   deps = [
     "$camera_path/buffer_manager:camera_buffer_manager",

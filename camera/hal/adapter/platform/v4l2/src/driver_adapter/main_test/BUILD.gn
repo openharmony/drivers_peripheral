@@ -58,7 +58,7 @@ ohos_executable("v4l2_main") {
 
   deps = [ "//utils/native/base:utils" ]
 
-  defines = [ "V4L2_MAIN_TEST" ]
+  defines += [ "V4L2_MAIN_TEST" ]
 
   public_configs = [ ":v4l2_maintest" ]
   subsystem_name = "hdf"
