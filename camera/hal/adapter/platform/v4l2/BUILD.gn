@@ -112,28 +112,15 @@ config("example_config") {
   ]
 }
 
-ohos_shared_library("camera_ipp_algo_example") {
-  sources = [ "src/pipeline_core/ipp_algo_example/ipp_algo_example.c" ]
-
-  include_dirs = [
-    "$camera_path/pipeline_core/ipp/include",
-    "//utils/native/base/include",
-  ]
-  deps = [ "//utils/native/base:utils" ]
-  public_configs = [ ":example_config" ]
-  subsystem_name = "hdf"
-  part_name = "hdf"
-}
-
 group("rpi4b_build") {
   public_deps = [
     ":camera_host_config.hcb",
-    ":camera_ipp_algo_example",
     ":config.c",
     ":ipp_algo_config.hcb",
     ":params.c",
     ":stream_supported_config.hcb",
     "src/driver_adapter:camera_v4l2_adapter",
-    "src/driver_adapter/main_test:v4l2_main",
+    "src/pipeline_core:camera_ipp_algo_example",
+    "//drivers/peripheral/camera/hal/adapter/chipset/rpi4b/src/driver_adapter/main_test:v4l2_main",
   ]
 }
