@@ -5,6 +5,7 @@ if (!defined(defines)) {
 }
 
 is_support_mpi=true
+is_support_v4l2=false
 if (is_support_mpi) {
   defines += ["SUPPORT_MPI"]
 }
