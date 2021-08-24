@@ -2,17 +2,6 @@
 import("//build/ohos.gni")
 import("//drivers/peripheral/camera/hal/camera.gni")
 
-need_link_hispark_taurus_lib = true
-if (need_link_hispark_taurus_lib) {
-  if (use_musl) {
-    hispark_taurus_lib_path =
-        "//device/hisilicon/hardware/media/hal/camera/libs/hispark_taurus/"
-  } else {
-    hispark_taurus_lib_path =
-        "//device/hisilicon/hardware/media/hal/camera/libs/hispark_taurus/std"
-  }
-}
-
 config("device_manager_config") {
   visibility = [ ":*" ]
 
@@ -69,12 +58,6 @@ ohos_shared_library("hispark_taurus_camera_device_manager") {
     "//drivers/adapter/uhdf2/osal/include",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
   ]
-
-  if (need_link_hispark_taurus_lib) {
-    outdir = rebase_path("$hispark_taurus_lib_path")
-    ldflags = [ "-L$outdir" ]
-    ldflags += [ "-ldriver_adapter.z" ]
-  }
 
   deps = [
     "$camera_path/device_manager:camera_device_manager",
