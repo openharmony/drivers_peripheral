@@ -54,7 +54,7 @@ private:
     bool CheckNumequal(T oldnum,T num,int size)
     {
         if (oldnum == nullptr || num == nullptr) {
-            CAMERA_LOGE("oldnum or num is nullptr")
+            CAMERA_LOGE("oldnum or num is nullptr");
             return false;
         }
         for (int i = 0; size > 0; i++, size--) {
