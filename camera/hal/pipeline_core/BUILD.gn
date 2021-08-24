@@ -56,7 +56,7 @@ ohos_shared_library("camera_pipeline_core") {
     "$camera_path/pipeline_core/pipeline_impl/src/stream_pipeline_core.cpp",
     "$camera_path/pipeline_core/src/pipeline_core.cpp",
   ]
-    if (is_support_mpi) {
+  if (is_support_mpi) {
     sources += [
       "$camera_path/adapter/chipset/hispark_taurus/src/pipeline_core/nodes/mpi_node/mpi_node.cpp",
       "$camera_path/adapter/chipset/hispark_taurus/src/pipeline_core/nodes/venc_node/venc_node.cpp",
