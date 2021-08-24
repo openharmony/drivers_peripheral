@@ -63,7 +63,7 @@ ohos_shared_library("camera_device_manager") {
     "//drivers/framework/include/utils",
     "//drivers/adapter/uhdf2/osal/include",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
-    "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include"
+    "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include",
   ]
 
   if (is_support_mpi) {
@@ -72,7 +72,8 @@ ohos_shared_library("camera_device_manager") {
       "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include/driver_adapter",
     ]
 
-    hispark_taurus_lib_path = "//device/hisilicon/hardware/media/hal/camera/libs/hispark_taurus/"
+    hispark_taurus_lib_path =
+        "//device/hisilicon/hardware/media/hal/camera/libs/hispark_taurus/"
     outdir = rebase_path("$hispark_taurus_lib_path")
     ldflags = [ "-L$outdir" ]
     ldflags += [ "-ldriver_adapter.z" ]
