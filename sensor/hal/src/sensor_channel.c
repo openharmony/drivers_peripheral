@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-#include "securec.h"
+#include "sensor_channel.h"
+#include <securec.h>
 #include "hdf_io_service_if.h"
 #include "osal_mutex.h"
 #include "osal_time.h"
-#include "sensor_channel.h"
 #include "sensor_common.h"
 #include "sensor_manager.h"
 #include "sensor_type.h"
