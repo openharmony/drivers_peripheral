@@ -21,7 +21,6 @@
 #include "osal_time.h"
 #include "vibrator_if.h"
 #include "vibrator_type.h"
-#include "osal_time.h"
 
 using namespace testing::ext;
 

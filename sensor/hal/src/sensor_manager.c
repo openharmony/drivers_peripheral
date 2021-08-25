@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "sensor_manager.h"
 #include <fcntl.h>
 #include "hdf_dlist.h"
 #include "hdf_io_service_if.h"
@@ -21,7 +22,6 @@
 #include "sensor_common.h"
 #include "sensor_controller.h"
 #include "sensor_if.h"
-#include "sensor_manager.h"
 
 #define HDF_LOG_TAG    sensor_manager_c
 
