@@ -58,14 +58,13 @@ enum InterFacesCmd {
     WLAN_SERVICE_GET_CHIPID,
     WLAN_SERVICE_GET_NAME_BYCHIPID,
     WLAN_SERVICE_SET_SACN_MACADDR,
-};
-
-enum CallBackEvent{
-    RESET_STATUS_GET = 0,
+    WLAN_SERVICE_GET_NETDEV_INFO,
+    WLAN_SERVICE_START_SCAN,
 };
 
 struct WifiHdi {
-    int32_t (*callback)(struct HdfDeviceObject *device, struct HdfRemoteService *callback, int32_t code);
+    int32_t (*callback)(struct HdfDeviceObject *device, struct HdfRemoteService *callback, uint32_t event,
+        void *data, const char *ifName);
 };
 
 struct FeatureInfo {

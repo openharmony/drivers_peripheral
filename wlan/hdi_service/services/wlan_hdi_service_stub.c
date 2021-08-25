@@ -28,17 +28,48 @@ const int32_t WLAN_FREQ_MAX_NUM = 14;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
 #define ETH_ADDR_LEN 6
 
-int32_t WifiServiceCallback(struct HdfDeviceObject *device, struct HdfRemoteService *callback, int32_t code)
+static int32_t WifiServiceCallback(struct HdfDeviceObject *device, struct HdfRemoteService *callback,
+    uint32_t eventId, void *data, const char *ifName)
 {
     (void)device;
+    int ret = HDF_SUCCESS;
+    int32_t *code;
+    WifiScanResult *scanResult;
 
+    HDF_LOGI("WifiServiceCallback enter , eventId = %{public}d", eventId);
     struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
-    HdfSbufWriteInt32(dataSbuf, code);
-    HDF_LOGI("WifiServiceCallback enter , code = %{public}d", code);
-    int ret = callback->dispatcher->Dispatch(callback, RESET_STATUS_GET, dataSbuf, NULL);
+    if (dataSbuf == NULL) {
+        HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteString(dataSbuf, ifName)) {
+        HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
+        goto finished;
+    }
+    switch (eventId) {
+        case WIFI_EVENT_RESET_DRIVER:
+            code = (int32_t *)data;
+            if (!HdfSbufWriteInt32(dataSbuf, *code)) {
+                HDF_LOGE("%s: code write failed!", __func__);
+                goto finished;
+            }
+            break;
+        case WIFI_EVENT_SCAN_RESULT:
+            scanResult = (WifiScanResult *)data;
+            if (!HdfSbufWriteBuffer(dataSbuf, (const void *)scanResult, sizeof(WifiScanResult))) {
+                HDF_LOGE("%{public}s:write ifeature->ifName failed!", __func__);
+                goto finished;
+            }
+            break;
+        default:
+            goto finished;
+    }
+    ret = callback->dispatcher->Dispatch(callback, eventId, dataSbuf, NULL);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("failed to do callback, error code: %d", ret);
     }
+
+finished:
     HdfSBufRecycle(dataSbuf);
     return ret;
 }
@@ -270,11 +301,6 @@ static bool HdfWlanAddRemoteObj(struct HdfDeviceIoClient *client, struct HdfRemo
 
 static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName)
 {
-    static int32_t wifiStatus = -1;
-    int *resetStatus = NULL;
-    resetStatus = (int *)data;
-
-    wifiStatus = *resetStatus;
     struct HdfWlanRemoteNode *pos = NULL;
     struct DListHead *head = &HdfStubDriver()->remoteListHead;
     DLIST_FOR_EACH_ENTRY(pos, head, struct HdfWlanRemoteNode, node) {
@@ -287,7 +313,7 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
             HDF_LOGE("%s: ptr null!", __func__);
             return HDF_FAILURE;
         }
-        int32_t ret = WifiHdiImplInstance()->callback(pos->client->device, pos->callbackObj, wifiStatus);
+        int32_t ret = WifiHdiImplInstance()->callback(pos->client->device, pos->callbackObj, event, data, ifName);
         if(ret != HDF_SUCCESS) {
             HDF_LOGE("%s: dispatch code fialed, error code: %d", __func__, ret);
             return ret;
@@ -295,7 +321,6 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
     }
     return HDF_SUCCESS;
 }
-
 
 static int32_t WlanServiceStudRegCallback(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
@@ -313,15 +338,15 @@ static int32_t WlanServiceStudRegCallback(struct HdfDeviceIoClient *client, stru
         return HDF_ERR_INVALID_PARAM;
     }
     (void)OsalMutexLock(&HdfStubDriver()->mutex);
-    if (HdfWlanAddRemoteObj(client, callback)) {
-        ret = g_wifi->registerEventCallback(HdfWLanCallbackFun, "wlan0");
-        if (ret != HDF_SUCCESS) {
-            (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
-            HDF_LOGE("%s: Register failed!, error code: %d", __func__, ret);
-        }
-    } else {
+    ret = HdfWlanAddRemoteObj(client, callback);
+    if (ret != HDF_SUCCESS) {
+        (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
         HDF_LOGE("%s: HdfSensorAddRemoteObj false", __func__);
-        return HDF_FAILURE;
+        return ret;
+    }
+    ret = g_wifi->registerEventCallback(HdfWLanCallbackFun, "wlan0");
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: Register failed!, error code: %d", __func__, ret);
     }
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
     return ret;
@@ -843,6 +868,52 @@ static int32_t WlanServiceStubSetScanMacAddr(struct HdfDeviceIoClient *client, s
     return ret;
 }
 
+static int32_t WlanServiceStubGetNetdevInfo(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
+    struct HdfSBuf *reply)
+{
+    (void)client;
+    (void)data;
+    int32_t ret;
+    struct NetDeviceInfoResult *netDeviceInfoResult =
+        (struct NetDeviceInfoResult *)calloc(1, sizeof(struct NetDeviceInfoResult));
+
+    ret = g_wifi->getNetDevInfo(netDeviceInfoResult);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s get netdev info failed!, error code: %d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteBuffer(reply, netDeviceInfoResult, sizeof(struct NetDeviceInfoResult))) {
+        HDF_LOGE("%s: write buffer fail!", __func__);
+        ret = HDF_ERR_IO;
+    }
+    free(netDeviceInfoResult);
+    return ret;
+}
+
+static int32_t WlanServiceStubStartScan(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
+    struct HdfSBuf *reply)
+{
+    (void)client;
+    (void)reply;
+    int32_t ret;
+    uint32_t dataSize = 0;
+    WifiScan *scan;
+
+    const char *ifName = HdfSbufReadString(data);
+    if (ifName == NULL) {
+        HDF_LOGE("%s: name is NULL", __func__);
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufReadBuffer(reply, (const void **)(&scan), &dataSize) || dataSize != sizeof(WifiScan)) {
+        return HDF_FAILURE;
+    }
+    ret = g_staFeature->startScan(ifName, scan);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s get netdev info failed!, error code: %d", __func__, ret);
+    }
+    return ret;
+}
+
 int32_t WlanHdiServiceOnRemoteRequest(struct HdfDeviceIoClient *client, int cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
@@ -893,6 +964,10 @@ int32_t WlanHdiServiceOnRemoteRequest(struct HdfDeviceIoClient *client, int cmdI
             return WlanServiceStubGetNameByChipId(client, data, reply);
         case WLAN_SERVICE_SET_SACN_MACADDR:
             return WlanServiceStubSetScanMacAddr(client, data, reply);
+        case WLAN_SERVICE_GET_NETDEV_INFO:
+            return WlanServiceStubGetNetdevInfo(client, data, reply);
+        case WLAN_SERVICE_START_SCAN:
+            return WlanServiceStubStartScan(client, data, reply);
         default:
             HDF_LOGW("SampleServiceDispatch: not support cmd %d", cmdId);
             return HDF_ERR_INVALID_PARAM;

@@ -28,8 +28,7 @@ extern "C" {
 
 #define ETH_ADDR_LEN  6
 
-static int32_t WlanProxyCall(struct IWifiInterface *self,
-    int32_t id, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t WlanProxyCall(struct IWifiInterface *self, int32_t id, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (self->remote == NULL || self->remote->dispatcher == NULL ||
         self->remote->dispatcher->Dispatch == NULL) {
@@ -56,8 +55,8 @@ static int32_t WlanConstruct(struct IWifiInterface *self)
     ec = WlanProxyCall(self, WLAN_SERVICE_CONSTRUCT, data, reply);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
-        goto finished;
     }
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -85,8 +84,8 @@ static int32_t WlanDestruct(struct IWifiInterface *self)
     ec = WlanProxyCall(self, WLAN_SERVICE_DECONSTRUCT, data, reply);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
-        goto finished;
     }
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -114,8 +113,8 @@ static int32_t WlanStart(struct IWifiInterface *self)
     ec = WlanProxyCall(self, WLAN_SERVICE_START, data, reply);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
-        goto finished;
     }
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -143,8 +142,8 @@ static int32_t WlanStop(struct IWifiInterface *self)
     ec = WlanProxyCall(self, WLAN_SERVICE_STOP, data, reply);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
-        goto finished;
     }
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -185,6 +184,7 @@ static int32_t WlanCreateFeature(struct IWifiInterface *self, const int32_t type
     (*ifeature)->ifName = strdup(ifname);
     HdfSbufReadInt32(reply, &wlanType);
     (*ifeature)->wlanType = wlanType;
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -222,8 +222,8 @@ static int32_t WlanDestroyFeature(struct IWifiInterface *self, struct WlanFeatur
     ec = WlanProxyCall(self, WLAN_SERVICE_DESTROY_FEATURE, data, reply);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
-        goto finished;
     }
+
 finished:
     OsalMemFree(ifeature);
     if (ifeature->ifName != NULL) {
@@ -271,8 +271,8 @@ static int32_t WlanGetAsscociatedStas(struct IWifiInterface *self, const struct 
     if(!HdfSbufReadBuffer(reply, (const void **)&staInfo, &count)){
         HDF_LOGE("%{public}s: read num failed! error code is %{public}d", __func__, ec);
         ec = HDF_ERR_MALLOC_FAIL;
-        goto finished;
     }
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -315,8 +315,8 @@ static int32_t WlanGetChipId(struct IWifiInterface *self, const struct WlanFeatu
     if (!HdfSbufReadUint8(reply, chipId)) {
         HDF_LOGE("%{public}s: get chipId failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
-        goto finished;
     }
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -358,6 +358,7 @@ static int32_t WlanGetDeviceMacAddress(struct IWifiInterface *self, const struct
         goto finished;
     }
     mac = (unsigned char *)HdfSbufReadUnpadBuffer(reply, len);
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -368,7 +369,8 @@ finished:
     return ec;
 }
 
-static int32_t WlanGetFeatureByIfName(struct IWifiInterface *self,  const char *ifName, struct WlanFeatureInfo **ifeature)
+static int32_t WlanGetFeatureByIfName(struct IWifiInterface *self,  const char *ifName,
+    struct WlanFeatureInfo **ifeature)
 {
     int32_t ec = HDF_FAILURE;
     int32_t wlanType = 0;
@@ -399,6 +401,7 @@ static int32_t WlanGetFeatureByIfName(struct IWifiInterface *self,  const char *
         goto finished;
     }
     (*ifeature)->wlanType = wlanType;
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -451,8 +454,8 @@ finished:
     return ec;
 }
 
-static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, int32_t band, int32_t *freqs,
-    uint32_t count, uint32_t *num)
+static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature,
+    int32_t band, int32_t *freqs, uint32_t count, uint32_t *num)
 {
     int32_t ec = HDF_FAILURE;
 
@@ -493,6 +496,7 @@ static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct Wl
             goto finished;
         }
     }
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -569,8 +573,9 @@ static int32_t WlanGetNetworkIfaceName(struct IWifiInterface *self, struct WlanF
         goto finished;
     }
     const char *ifName = HdfSbufReadString(reply);
-    HDF_LOGE("%{public}s: ifName is %{public}s!", __func__, ifName);
+    HDF_LOGI("%{public}s: ifName is %{public}s!", __func__, ifName);
     ifeature->ifName = strdup(ifName);
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -608,6 +613,7 @@ static int32_t WlanGetSupportCombo(struct IWifiInterface *self, uint64_t *combo)
             }
         }
     }
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -640,6 +646,7 @@ static int32_t WlanGetSupportFeature(struct IWifiInterface *self, uint8_t *supTy
     }
     HdfSbufReadUint32(reply, &size);
     supType = (uint8_t *)HdfSbufReadUnpadBuffer(reply, size);
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -652,33 +659,11 @@ finished:
 
 int32_t (*callback_)(uint32_t event, void *data, const char *ifName);
 
-int32_t CallbackWlanProxy(uint32_t event, void *data, const char *ifName)
-{
-    HDF_LOGI("%s: enter", __func__);
-    if (data == NULL) {
-        HDF_LOGE("%s: ptr NULL", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    callback_(event, data, ifName);
-    return HDF_SUCCESS;
-}
-
-static int ServiceManagerTestCallbackDispatch(struct HdfRemoteService *service, int code, 
+static int ServiceManagerTestCallbackDispatch(struct HdfRemoteService *service, int eventId, 
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    int32_t ret = 0;
-
-    switch (code){
-        case RESET_STATUS_GET:
-            ret = CallbackWlanProxy((int32_t)code, data, "wlan0");
-            if (ret != 0) {
-                HDF_LOGE("%s: failed, error code is %d", __func__, ret);
-            }
-            break;
-        default:
-            break;
-    }
-    return HDF_SUCCESS;
+    const char *ifName = HdfSbufReadString(data);
+    return callback_(eventId, data, ifName);
 }
 
 static struct HdfRemoteDispatcher g_callbackDispatcher = {
@@ -707,6 +692,7 @@ static int32_t WlanRegisterEventCallback(struct IWifiInterface *self, CallbackFu
         goto finished;
     }
     callback_ = cbFunc;
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -734,8 +720,8 @@ static int32_t WlanUnregisterEventCallback(struct IWifiInterface *self)
     ec = WlanProxyCall(self, WLAN_SERVICE_UNREGISTER_CALLBACK, data, reply);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
-        goto finished;
     }
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -768,8 +754,8 @@ static int32_t WlanResetDriver(struct IWifiInterface *self, const uint8_t chipId
     ec = WlanProxyCall(self, WLAN_SERVICE_RESET_DRIVER, data, reply);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
-        goto finished;
     }
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -780,7 +766,8 @@ finished:
     return ec;
 }
 
-static int32_t WlanSetCountryCode(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, const char *code, uint32_t len)
+static int32_t WlanSetCountryCode(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature,
+    const char *code, uint32_t len)
 {
     int32_t ec = HDF_FAILURE;
 
@@ -807,8 +794,8 @@ static int32_t WlanSetCountryCode(struct IWifiInterface *self, const struct Wlan
     ec = WlanProxyCall(self, WLAN_SERVICE_SET_COUNTRY_CODE, data, reply);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
-        goto finished;
     }
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -819,7 +806,8 @@ finished:
     return ec;
 }
 
-static int32_t WlanSetMacAddress(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, unsigned char *mac, uint8_t len)
+static int32_t WlanSetMacAddress(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature,
+    unsigned char *mac, uint8_t len)
 {
     int32_t ec = HDF_FAILURE;
 
@@ -848,8 +836,8 @@ static int32_t WlanSetMacAddress(struct IWifiInterface *self, const struct WlanF
     ec = WlanProxyCall(self, WLAN_SERVICE_SET_MAC_ADDR, data, reply);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
-        goto finished;
     }
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -860,7 +848,8 @@ finished:
     return ec;
 }
 
-static int32_t WlanSetScanningMacAddress(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, unsigned char *scanMac, uint8_t len)
+static int32_t WlanSetScanningMacAddress(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature,
+    unsigned char *scanMac, uint8_t len)
 {
     int32_t ec = HDF_FAILURE;
 
@@ -894,8 +883,8 @@ static int32_t WlanSetScanningMacAddress(struct IWifiInterface *self, const stru
     ec = WlanProxyCall(self, WLAN_SERVICE_SET_SACN_MACADDR, data, reply);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
-        goto finished;
     }
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -933,8 +922,88 @@ static int32_t WlanSetTxPower(struct IWifiInterface *self, const struct WlanFeat
     ec = WlanProxyCall(self, WLAN_SERVICE_SET_TX_POWR, data, reply);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
+    }
+
+finished:
+    if (data != NULL) {
+        HdfSBufRecycle(data);
+    }
+    if (reply != NULL) {
+        HdfSBufRecycle(reply);
+    }
+    return ec;
+}
+
+static int32_t WlanGetNetDevInfo(struct IWifiInterface *self, struct NetDeviceInfoResult *netDeviceInfoResult)
+{
+    int32_t ec = HDF_FAILURE;
+    uint32_t dataSize = 0;
+    struct NetDeviceInfoResult *respNetdevInfo = NULL;
+
+    if (self == NULL) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    if (data == NULL || reply == NULL) {
+        HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
+    ec = WlanProxyCall(self, WLAN_SERVICE_GET_NETDEV_INFO, data, reply);
+    if (ec != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
+        goto finished;
+    }
+    if (!HdfSbufReadBuffer(reply, (const void **)(&respNetdevInfo), &dataSize) ||
+        dataSize != sizeof(struct NetDeviceInfoResult)) {
+        ec = HDF_FAILURE;
+        goto finished;
+    }
+    if (memcpy_s(netDeviceInfoResult, sizeof(struct NetDeviceInfoResult), respNetdevInfo, dataSize) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s failed!", __func__);
+        ec = HDF_FAILURE;
+    }
+
+finished:
+    if (data != NULL) {
+        HdfSBufRecycle(data);
+    }
+    if (reply != NULL) {
+        HdfSBufRecycle(reply);
+    }
+    return ec;
+}
+
+static int32_t WlanStartScan(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, WifiScan *scan)
+{
+    int32_t ec = HDF_FAILURE;
+
+    if (self == NULL) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    if (data == NULL || reply == NULL) {
+        HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
+    if (!HdfSbufWriteString(data, ifeature->ifName)) {
+        HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
+    if (!HdfSbufWriteBuffer(data, scan, sizeof(WifiScan))) {
+        HDF_LOGE("%s: write buffer fail!", __func__);
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
+    ec = WlanProxyCall(self, WLAN_SERVICE_START_SCAN, data, reply);
+    if (ec != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
+    }
+
 finished:
     if (data != NULL) {
         HdfSBufRecycle(data);
@@ -970,6 +1039,8 @@ static void IwifiConstruct(struct IWifiInterface *inst)
     inst->setMacAddress = WlanSetMacAddress;
     inst->setScanningMacAddress = WlanSetScanningMacAddress;
     inst->setTxPower = WlanSetTxPower;
+    inst->getNetDevInfo = WlanGetNetDevInfo;
+    inst->startScan = WlanStartScan;
 }
 
 struct IWifiInterface *HdIWifiInterfaceGet(const char *serviceName)
@@ -996,7 +1067,7 @@ struct IWifiInterface *HdIWifiInterfaceGet(const char *serviceName)
     return wlanClient;
 }
 
-void HdiSampleRelease(struct IWifiInterface *instance)
+void HdIWifiInterfaceRelease(struct IWifiInterface *instance)
 {
     if (instance == NULL) {
         return;
