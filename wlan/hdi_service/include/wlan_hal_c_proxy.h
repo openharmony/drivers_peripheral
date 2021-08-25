@@ -44,26 +44,30 @@ struct IWifiInterface {
     int32_t (*unregisterEventCallback)(struct IWifiInterface *self);
     int32_t (*destroyFeature)(struct IWifiInterface *self, struct WlanFeatureInfo *ifeature);
     int32_t (*resetDriver)(struct IWifiInterface *self, const uint8_t chipId);
-    int32_t (*getAsscociatedStas)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, struct StaInfo *staInfo,
-        uint32_t count, uint32_t *num);
-    int32_t (*setCountryCode)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, const char *code, uint32_t len);
+    int32_t (*getAsscociatedStas)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature,
+        struct StaInfo *staInfo, uint32_t count, uint32_t *num);
+    int32_t (*setCountryCode)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, const char *code,
+        uint32_t len);
     int32_t (*getNetworkIfaceName)(struct IWifiInterface *self, struct WlanFeatureInfo *ifeature);
     int32_t (*getFeatureType)(struct IWifiInterface *self, struct WlanFeatureInfo *ifeature);
-    int32_t (*setMacAddress)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, unsigned char *mac, uint8_t len);
-    int32_t (*getDeviceMacAddress)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, unsigned char *mac, uint8_t len);
-    int32_t (*getFreqsWithBand)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, int32_t band, int32_t *freqs,
-        uint32_t count, uint32_t *num);
+    int32_t (*setMacAddress)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, unsigned char *mac,
+        uint8_t len);
+    int32_t (*getDeviceMacAddress)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature,
+        unsigned char *mac, uint8_t len);
+    int32_t (*getFreqsWithBand)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, int32_t band,
+        int32_t *freqs, uint32_t count, uint32_t *num);
     int32_t (*setTxPower)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, int32_t power);
     int32_t (*getChipId)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, uint8_t *chipId);
     int32_t (*getIfNamesByChipId)(struct IWifiInterface *self, const uint8_t chipId, char **ifNames, uint32_t *num);
-    int32_t (*setScanningMacAddress)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, unsigned char *scanMac, uint8_t len);
+    int32_t (*setScanningMacAddress)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature,
+        unsigned char *scanMac, uint8_t len);
 };
 
 struct IWifiInterface *HdIWifiInterfaceGet(const char *serviceName);
 
 void HdIWifiInterfaceRelease(struct IWifiInterface *instance);
 
-int32_t CallbackWlanProxy(uint32_t event, void *data, const char *ifName);
+int32_t CallbackWlanProxy(uint32_t eventId, void *data, const char *ifName);
 
 #ifdef __cplusplus
 }

@@ -65,6 +65,7 @@ public:
     virtual int32_t setScanningMacAddress(std::shared_ptr<WifiFeatureInfo> ifeature, std::vector<uint8_t>& scanMac,
         uint8_t len) = 0;
 };
+
 }
 }
 }

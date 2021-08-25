@@ -65,7 +65,7 @@ enum CallBackEvent{
 };
 
 struct WifiHdi {
-    int32_t (*callback)(struct HdfDeviceObject *device, struct HdfRemoteService *callback, int32_t code);
+    int32_t (*callback)(struct HdfDeviceObject *device, struct HdfRemoteService *callback, uint32_t event, void *data);
 };
 
 struct FeatureInfo {
