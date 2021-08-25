@@ -52,6 +52,12 @@ namespace {
             if (fabs(*data) > 1e-5) {
                 g_sensorDataFlag = 1;
             }
+        } else if (event->sensorId == SENSOR_TYPE_BAROMETER) {
+            printf("sensor id [%d] barometer[%f] temperature[%f] \n\r",
+                event->sensorId, (*data), *(data + 1));
+            if (fabs(*data) > 1e-5) {
+                g_sensorDataFlag = 1;
+            }
         }
 
         return 0;
@@ -162,6 +168,7 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
     struct SensorInformation *info = nullptr;
     struct SensorInformation *testSensorInfo = nullptr;
     struct SensorInformation *accelSensorInfo = nullptr;
+    struct SensorInformation *barometerSensorInfo = nullptr;
     int32_t count = 0;
     
     int32_t ret = g_sensorDev->GetAllSensors(&sensorInfo, &count);
@@ -175,6 +182,7 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
     info = sensorInfo;
     testSensorInfo = sensorInfo;
     accelSensorInfo = sensorInfo;
+    barometerSensorInfo = sensorInfo;
 
     for (int i = 0; i < count; i++) {
         printf("get sensoriId[%d], info name[%s], power[%f]\n\r", info->sensorId, info->sensorName, info->power);
@@ -183,6 +191,9 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
         } else if (info->sensorId == 1) {
             accelSensorInfo = info;
         }
+        else if (info->sensorId == SENSOR_TYPE_BAROMETER) {
+            barometerSensorInfo = info;
+        }
         info++;
         if (testSensorInfo->sensorTypeId == 0) {
             EXPECT_STREQ("sensor_test", testSensorInfo->sensorName);
@@ -190,6 +201,9 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
         }
         if (accelSensorInfo->sensorTypeId == 1) {
             EXPECT_STREQ("accelerometer", accelSensorInfo->sensorName);
+        }
+        if (barometerSensorInfo->sensorTypeId == SENSOR_TYPE_BAROMETER) {
+            EXPECT_STREQ("barometer", barometerSensorInfo->sensorName);
         }
     }
 }
@@ -263,7 +277,6 @@ HWTEST_F(HdfSensorTest, EnableSensor002, TestSize.Level1)
 {  
     struct SensorInformation *sensorInfo = nullptr;
     int32_t count = 0;
-    
     int32_t ret = g_sensorDev->GetAllSensors(&sensorInfo, &count);
     EXPECT_EQ(0, ret);
     ret = g_sensorDev->Enable(-1);
