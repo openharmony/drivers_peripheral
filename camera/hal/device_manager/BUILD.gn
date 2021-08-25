@@ -1,96 +1,12 @@
 # Copyright (c) Huawei Technologies Co., Ltd. 2021. All rights reserved.
 import("//build/ohos.gni")
-import("../camera.gni")
+import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/peripheral/camera/hal/camera.gni")
 
-config("device_manager_config") {
-  visibility = [ ":*" ]
-
-  cflags_cc = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-Wno-error",
-    "-DGST_DISABLE_DEPRECATED",
-    "-DHAVE_CONFIG_H",
-    "-DCOLORSPACE=\"videoconvert\"",
-    "-fno-strict-aliasing",
-    "-Wno-sign-compare",
-    "-Wno-builtin-requires-header",
-    "-Wno-unused-variable",
-    "-Wno-unused-label",
-    "-Wno-implicit-function-declaration",
-    "-Wno-format",
-    "-Wno-int-conversion",
-    "-Wno-unused-function",
-    "-Wno-thread-safety-attributes",
-    "-Wno-inconsistent-missing-override",
-    "-fno-rtti",
-    "-fno-exceptions",
-    "-ffunction-sections",
-    "-fdata-sections",
-  ]
-}
-
-ohos_shared_library("camera_device_manager") {
-  sources = [
-    "$current_path/src/icontroller.cpp",
-    "$current_path/src/idevice_manager.cpp",
-    "$current_path/src/imanager.cpp",
-    "$current_path/src/isensor.cpp",
-  ]
+group("camera_device_manager") {
   if (is_support_mpi) {
-    sources += [
-      "$camera_path/adapter/chipset/hispark_taurus/src/device_manager/imx335.cpp",
-      "$camera_path/adapter/chipset/hispark_taurus/src/device_manager/imx600.cpp",
-      "$camera_path/adapter/chipset/hispark_taurus/src/device_manager/mpi_device_manager.cpp",
-      "$camera_path/adapter/chipset/hispark_taurus/src/device_manager/venc_controller.cpp",
-      "$camera_path/adapter/chipset/hispark_taurus/src/device_manager/venc_manager.cpp",
-      "$camera_path/adapter/chipset/hispark_taurus/src/device_manager/vi_controller.cpp",
-      "$camera_path/adapter/chipset/hispark_taurus/src/device_manager/vi_manager.cpp",
-      "$camera_path/adapter/chipset/hispark_taurus/src/device_manager/vo_controller.cpp",
-      "$camera_path/adapter/chipset/hispark_taurus/src/device_manager/vo_manager.cpp",
-      "$camera_path/adapter/chipset/hispark_taurus/src/device_manager/vpss_controller.cpp",
-      "$camera_path/adapter/chipset/hispark_taurus/src/device_manager/vpss_manager.cpp",
-    ]
+    public_deps = [ "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/src/device_manager:camera_device_manager" ]
+  } else if (is_support_v4l2) {
+    public_deps = [ "//drivers/peripheral/camera/hal/adapter/chipset/rpi4b/src/device_manager:camera_device_manager" ]
   }
-
-  include_dirs = [
-    "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
-    "$camera_path/include",
-    "$camera_path/utils/event",
-    "$current_path/include",
-    "//utils/native/base/include",
-    "//drivers/framework/include/utils",
-    "//drivers/adapter/uhdf2/osal/include",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
-    "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include",
-  ]
-
-  if (is_support_mpi) {
-    include_dirs += [
-      "$camera_path/adapter/chipset/hispark_taurus/include/device_manager",
-      "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include/driver_adapter",
-    ]
-
-    hispark_taurus_lib_path =
-        "//device/hisilicon/hardware/media/hal/camera/libs/hispark_taurus/"
-    outdir = rebase_path("$hispark_taurus_lib_path")
-    ldflags = [ "-L$outdir" ]
-    ldflags += [ "-ldriver_adapter.z" ]
-  }
-
-  deps = [
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
-    "//utils/native/base:utils",
-  ]
-
-  if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
-  }
-
-  public_configs = [ ":device_manager_config" ]
-  subsystem_name = "hdf"
-  part_name = "hdf"
 }
