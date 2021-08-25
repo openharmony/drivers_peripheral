@@ -659,33 +659,11 @@ finished:
 
 int32_t (*callback_)(uint32_t event, void *data, const char *ifName);
 
-int32_t CallbackWlanProxy(uint32_t eventId, void *data, const char *ifName)
-{
-    HDF_LOGI("%s: enter", __func__);
-    if (data == NULL) {
-        HDF_LOGE("%s: ptr NULL", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    callback_(eventId, data, ifName);
-    return HDF_SUCCESS;
-}
-
 static int ServiceManagerTestCallbackDispatch(struct HdfRemoteService *service, int eventId, 
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    int32_t ret = 0;
-
-    switch (eventId){
-        case RESET_STATUS_GET:
-            ret = CallbackWlanProxy((int32_t)eventId, data, "wlan0");
-            if (ret != 0) {
-                HDF_LOGE("%s: failed, error eventId is %d", __func__, ret);
-            }
-            break;
-        default:
-            break;
-    }
-    return HDF_SUCCESS;
+    const char *ifName = HdfSbufReadString(data);
+    return callback_(eventId, data, ifName);
 }
 
 static struct HdfRemoteDispatcher g_callbackDispatcher = {
@@ -956,6 +934,86 @@ finished:
     return ec;
 }
 
+static int32_t WlanGetNetDevInfo(struct IWifiInterface *self, struct NetDeviceInfoResult *netDeviceInfoResult)
+{
+    int32_t ec = HDF_FAILURE;
+    uint32_t dataSize = 0;
+    struct NetDeviceInfoResult *respNetdevInfo = NULL;
+
+    if (self == NULL) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    if (data == NULL || reply == NULL) {
+        HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
+    ec = WlanProxyCall(self, WLAN_SERVICE_GET_NETDEV_INFO, data, reply);
+    if (ec != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
+        goto finished;
+    }
+    if (!HdfSbufReadBuffer(reply, (const void **)(&respNetdevInfo), &dataSize) ||
+        dataSize != sizeof(struct NetDeviceInfoResult)) {
+        ec = HDF_FAILURE;
+        goto finished;
+    }
+    if (memcpy_s(netDeviceInfoResult, sizeof(struct NetDeviceInfoResult), respNetdevInfo, dataSize) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s failed!", __func__);
+        ec = HDF_FAILURE;
+    }
+
+finished:
+    if (data != NULL) {
+        HdfSBufRecycle(data);
+    }
+    if (reply != NULL) {
+        HdfSBufRecycle(reply);
+    }
+    return ec;
+}
+
+static int32_t WlanStartScan(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, WifiScan *scan)
+{
+    int32_t ec = HDF_FAILURE;
+
+    if (self == NULL) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    if (data == NULL || reply == NULL) {
+        HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
+    if (!HdfSbufWriteString(data, ifeature->ifName)) {
+        HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
+    if (!HdfSbufWriteBuffer(data, scan, sizeof(WifiScan))) {
+        HDF_LOGE("%s: write buffer fail!", __func__);
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
+    ec = WlanProxyCall(self, WLAN_SERVICE_START_SCAN, data, reply);
+    if (ec != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
+    }
+
+finished:
+    if (data != NULL) {
+        HdfSBufRecycle(data);
+    }
+    if (reply != NULL) {
+        HdfSBufRecycle(reply);
+    }
+    return ec;
+}
+
 static void IwifiConstruct(struct IWifiInterface *inst)
 {
     inst->construct = WlanConstruct;
@@ -981,6 +1039,8 @@ static void IwifiConstruct(struct IWifiInterface *inst)
     inst->setMacAddress = WlanSetMacAddress;
     inst->setScanningMacAddress = WlanSetScanningMacAddress;
     inst->setTxPower = WlanSetTxPower;
+    inst->getNetDevInfo = WlanGetNetDevInfo;
+    inst->startScan = WlanStartScan;
 }
 
 struct IWifiInterface *HdIWifiInterfaceGet(const char *serviceName)

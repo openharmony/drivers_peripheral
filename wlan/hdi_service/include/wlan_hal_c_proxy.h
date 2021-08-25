@@ -61,6 +61,8 @@ struct IWifiInterface {
     int32_t (*getIfNamesByChipId)(struct IWifiInterface *self, const uint8_t chipId, char **ifNames, uint32_t *num);
     int32_t (*setScanningMacAddress)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature,
         unsigned char *scanMac, uint8_t len);
+    int32_t (*getNetDevInfo)(struct IWifiInterface *self, struct NetDeviceInfoResult *netDeviceInfoResult);
+    int32_t (*startScan)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, WifiScan *scan);
 };
 
 struct IWifiInterface *HdIWifiInterfaceGet(const char *serviceName);
