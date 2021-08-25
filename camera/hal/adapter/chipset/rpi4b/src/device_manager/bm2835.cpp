@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "imx335.h"
+#include "bm2835.h"
 #include <vector>
 
 namespace OHOS::Camera {
