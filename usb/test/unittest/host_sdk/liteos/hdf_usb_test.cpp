@@ -47,6 +47,7 @@ enum HdfLiteUsbTestCmd {
     USB_HOSTSDK_CLOSE_INTERFACE_003_TEST,
     USB_HOSTSDK_OPEN_INTERFACE_004_TEST,
     USB_HOSTSDK_OPEN_INTERFACE_005_TEST,
+    USB_HOSTSDK_CLOSE_INTERFACE_005_TEST,
     USB_HOSTSDK_OPEN_INTERFACE_006_TEST,
     USB_HOSTSDK_SELECT_INTERFACE_001_TEST,
     USB_HOSTSDK_SELECT_INTERFACE_002_TEST,
@@ -115,6 +116,7 @@ enum HdfLiteUsbTestCmd {
     USB_HOSTSDK_ADD_INTERFACE_002_TEST,
     USB_HOSTSDK_REMOVE_INTERFACE_003_TEST,
     USB_HOSTSDK_ADD_INTERFACE_003_TEST,
+    USB_HOSTSDK_CLOSE_INTERFACE_006_TEST,
 };
 
 class HdfLiteUsbTest : public testing::Test {
@@ -430,6 +432,18 @@ HWTEST_F(HdfLiteUsbTest, CheckHostSdkIfOpenInterface005, TestSize.Level1)
 }
 
 /**
+ * @tc.number    : CheckHostSdkIfCloseInterface005
+ * @tc.name      :
+ * @tc.type      : PERF
+ * @tc.level     : Level 1
+ */
+HWTEST_F(HdfLiteUsbTest, CheckHostSdkIfCloseInterface005, TestSize.Level1)
+{
+    struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_CLOSE_INTERFACE_005_TEST, -1};
+    EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
+}
+
+/**
  * @tc.number    : CheckHostSdkIfOpenInterface006
  * @tc.name      :
  * @tc.type      : PERF
@@ -440,7 +454,6 @@ HWTEST_F(HdfLiteUsbTest, CheckHostSdkIfOpenInterface006, TestSize.Level1)
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_OPEN_INTERFACE_006_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
-
 
 /**
  * @tc.number    : CheckHostSdkIfSelectInterfaceSetting001
@@ -513,7 +526,6 @@ HWTEST_F(HdfLiteUsbTest, CheckHostSdkIfSelectInterfaceSetting006, TestSize.Level
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_SELECT_INTERFACE_006_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
-
 
 /**
  * @tc.number    : CheckHostSdkIfClaimInterface007
@@ -1195,5 +1207,17 @@ HWTEST_F(HdfLiteUsbTest, CheckHostSdkIfRemoveInterface003, TestSize.Level1)
 HWTEST_F(HdfLiteUsbTest, CheckHostSdkIfAddInterface003, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_ADD_INTERFACE_003_TEST, -1};
+    EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
+}
+
+/**
+ * @tc.number    : CheckHostSdkIfCloseInterface006
+ * @tc.name      :
+ * @tc.type      : PERF
+ * @tc.level     : Level 1
+ */
+HWTEST_F(HdfLiteUsbTest, CheckHostSdkIfCloseInterface006, TestSize.Level1)
+{
+    struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_CLOSE_INTERFACE_006_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }

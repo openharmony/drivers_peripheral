@@ -41,7 +41,7 @@
 
 #define TEST_LENGTH     512
 #define TEST_CYCLE      30
-#define TEST_TIME       30
+#define TEST_TIME       0xffffffff
 #define TEST_PRINT_TIME 2
 
 static pid_t tid;
@@ -51,9 +51,9 @@ static unsigned int g_busNum = 1;
 static unsigned int g_devAddr = 2;
 static int fd;
 static struct OsalSem sem;
-static unsigned int g_send_count = 0;
-static unsigned int g_recv_count = 0;
-static unsigned int g_byteTotal = 0;
+static uint64_t g_send_count = 0;
+static uint64_t g_recv_count = 0;
+static uint64_t g_byteTotal = 0;
 static struct UsbAdapterUrbs urb[TEST_CYCLE];
 static struct UsbAdapterUrb *sendUrb = NULL;
 static bool g_printData = false;
@@ -122,7 +122,7 @@ static void FillUrb(struct UsbAdapterUrb *urb, int len)
 
 void SignalHandler(int signo)
 {
-    static int sigCnt = 0;
+    static uint32_t sigCnt = 0;
     struct itimerval new_value, old_value;
     double speed = 0;
     switch (signo) {
@@ -182,6 +182,7 @@ static int ReapProcess(void *argurb)
 {
     int r;
     struct UsbAdapterUrb *urbrecv = NULL;
+    struct itimerval new_value, old_value;
     if (signal(SIGUSR1, SignalHandler) == SIG_ERR) {
         printf("signal SIGUSR1 failed");
         return HDF_ERR_IO;
@@ -197,6 +198,13 @@ static int ReapProcess(void *argurb)
             continue;
         }
         if (urbrecv->status == 0) {
+            if (g_byteTotal == 0) {
+                new_value.it_value.tv_sec = TEST_PRINT_TIME;
+                new_value.it_value.tv_usec = 0;
+                new_value.it_interval.tv_sec = TEST_PRINT_TIME;
+                new_value.it_interval.tv_usec = 0;
+                setitimer(ITIMER_REAL, &new_value, &old_value);
+            }
             g_recv_count++;
             g_byteTotal += urbrecv->actualLength;
         }
@@ -224,11 +232,8 @@ static int BeginProcess(unsigned char endPoint)
     int r;
     char *data = NULL;
     struct timeval time;
-    struct timeval newtime;
-    struct itimerval new_value, old_value;
     int transNum = 0;
     int i;
-    double speed = 0;
 
     if (fd < 0 || endPoint <= 0) {
         printf("parameter error\n");
@@ -257,14 +262,7 @@ static int BeginProcess(unsigned char endPoint)
 
     gettimeofday(&time, NULL);
     signal(SIGINT, SignalHandler);
-    if (endPoint >> 7 == 0) {
-        signal(SIGALRM, SignalHandler);
-        new_value.it_value.tv_sec = TEST_PRINT_TIME;
-        new_value.it_value.tv_usec = 0;
-        new_value.it_interval.tv_sec = TEST_PRINT_TIME;
-        new_value.it_interval.tv_usec = 0;
-        setitimer(ITIMER_REAL, &new_value, &old_value);
-    }
+    signal(SIGALRM, SignalHandler);
 
     printf("test NO SDK endpoint:%d\n", endPoint);
     printf("Start: sec%ld usec%ld\n", time.tv_sec, time.tv_usec);
@@ -285,15 +283,6 @@ static int BeginProcess(unsigned char endPoint)
 
     while (!g_speedFlag) {
         OsalMSleep(10);
-    }
-
-    gettimeofday(&newtime, NULL);
-    if (endPoint >> 7 == 0)
-    {
-        speed = (g_byteTotal * 1.0) / (TEST_TIME  * 1024 * 1024);
-        printf("\r\nEnd: sec%ld usec%ld g_recv_count=%d g_send_count=%d urb dataSize=%d total transfer size=%d byte\n",
-            newtime.tv_sec, newtime.tv_usec, g_recv_count, g_send_count, TEST_LENGTH, g_byteTotal);
-        printf("Speed:%f MB/s\n", speed);
     }
 
     kill(tid, SIGUSR1);

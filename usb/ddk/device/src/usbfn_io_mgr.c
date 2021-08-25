@@ -103,9 +103,9 @@ struct UsbFnRequest *UsbFnIoMgrRequestAlloc(struct UsbHandleMgr *handle, uint8_t
         return NULL;
     }
 
-    reqList = OsalMemCalloc(sizeof(struct ReqList));
+    reqList = UsbFnMemCalloc(sizeof(struct ReqList));
     if (reqList == NULL) {
-        HDF_LOGE("%s:%d OsalMemCalloc err", __func__, __LINE__);
+        HDF_LOGE("%s:%d UsbFnMemCalloc err", __func__, __LINE__);
         return NULL;
     }
     req = &reqList->req;
@@ -119,6 +119,7 @@ struct UsbFnRequest *UsbFnIoMgrRequestAlloc(struct UsbHandleMgr *handle, uint8_t
     reqList->fd = ep;
     reqList->buf = (uint32_t)mapAddr;
     reqList->pipe = pipe;
+    reqList->bufLen = len;
     req->length = len;
     req->obj = handle->intfMgr->interface.object;
     req->buf = mapAddr;
@@ -139,12 +140,12 @@ int UsbFnIoMgrRequestFree(struct UsbFnRequest *req)
     struct ReqList *reqList = (struct ReqList *) req;
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
 
-    ret = fnOps->unmapAddr(req->buf, req->length);
+    ret = fnOps->unmapAddr(req->buf, reqList->bufLen);
     if (ret) {
         HDF_LOGE("%s:%d ummapAddr failed, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
-    mem.size = req->length;
+    mem.size = reqList->bufLen;
     mem.buf = (uint32_t)req->buf;
     ret = fnOps->releaseBuf(reqList->fd, &mem);
     if (ret) {
@@ -153,7 +154,7 @@ int UsbFnIoMgrRequestFree(struct UsbFnRequest *req)
     }
 
     DListRemove(&reqList->entry);
-    OsalMemFree(reqList);
+    UsbFnMemFree(reqList);
     return 0;
 }
 
@@ -258,9 +259,9 @@ static int HandleInit(struct UsbHandleMgr *handle, struct UsbFnInterfaceMgr *int
             return HDF_ERR_IO;
         }
 
-        handle->reqEvent[i] = OsalMemCalloc(sizeof(struct UsbFnReqEvent) * MAX_REQUEST);
+        handle->reqEvent[i] = UsbFnMemCalloc(sizeof(struct UsbFnReqEvent) * MAX_REQUEST);
         if (handle->reqEvent[i] == NULL) {
-            HDF_LOGE("%s: OsalMemCalloc failed", __func__);
+            HDF_LOGE("%s: UsbFnMemCalloc failed", __func__);
             goto FREE_EVENT;
         }
     }
@@ -269,7 +270,7 @@ static int HandleInit(struct UsbHandleMgr *handle, struct UsbFnInterfaceMgr *int
 
 FREE_EVENT:
    for (j = 0; j < i; j++) {
-        OsalMemFree(handle->reqEvent[j]);
+        UsbFnMemFree(handle->reqEvent[j]);
     }
     return HDF_ERR_IO;
 }
@@ -285,7 +286,7 @@ struct UsbHandleMgr *UsbFnIoMgrInterfaceOpen(struct UsbFnInterface *interface)
         HDF_LOGE("%s: interface has opened", __func__);
         return NULL;
     }
-    struct UsbHandleMgr *handle = OsalMemCalloc(sizeof(struct UsbHandleMgr));
+    struct UsbHandleMgr *handle = UsbFnMemCalloc(sizeof(struct UsbHandleMgr));
     if (handle == NULL) {
         return NULL;
     }
@@ -293,7 +294,7 @@ struct UsbHandleMgr *UsbFnIoMgrInterfaceOpen(struct UsbFnInterface *interface)
     ret = HandleInit(handle, interfaceMgr);
     if (ret) {
         HDF_LOGE("%s: HandleInit failed", __func__);
-        OsalMemFree(handle);
+        UsbFnMemFree(handle);
         return NULL;
     }
 
@@ -330,10 +331,10 @@ int UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle)
             return HDF_ERR_DEVICE_BUSY;
         }
         handle->fds[i] = -1;
-        OsalMemFree(handle->reqEvent[i]);
+        UsbFnMemFree(handle->reqEvent[i]);
     }
 
-    OsalMemFree(handle);
+    UsbFnMemFree(handle);
     interfaceMgr->isOpen = false;
     interfaceMgr->handle = NULL;
     return 0;

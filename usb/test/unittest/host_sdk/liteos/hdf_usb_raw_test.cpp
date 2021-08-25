@@ -181,8 +181,6 @@ void HdfLiteUsbRawTest::SetUpTestCase()
 
 void HdfLiteUsbRawTest::TearDownTestCase()
 {
-    struct HdfTestMsg msg = {TEST_USB_HOST_RAW_TYPE, USB_RAW_SDK_IF_STOP_IO, -1};
-    HdfTestSendMsgToService(&msg);
     HdfTestCloseService();
 }
 
@@ -1758,6 +1756,18 @@ HWTEST_F(HdfLiteUsbRawTest, CheckRawSdkIfCancelRequest003, TestSize.Level1)
 HWTEST_F(HdfLiteUsbRawTest, CheckRawSdkIfCancelRequest004, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_RAW_TYPE, USB_RAW_SDK_IF_CANCEL_REQUEST_004_TEST, -1};
+    EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
+}
+
+/**
+ * @tc.number    : UsbStopIo
+ * @tc.name      :
+ * @tc.type      : PERFs
+ * @tc.level     : Level 1
+ */
+HWTEST_F(HdfLiteUsbRawTest, UsbStopIo, TestSize.Level1)
+{
+    struct HdfTestMsg msg = {TEST_USB_HOST_RAW_TYPE, USB_RAW_SDK_IF_STOP_IO, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 

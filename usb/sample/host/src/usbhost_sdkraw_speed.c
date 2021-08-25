@@ -52,9 +52,9 @@
 static struct AcmDevice *acm = NULL;
 static bool g_stopIoThreadFlag = false;
 static unsigned int g_speedFlag = 0;
-static unsigned int g_send_count = 0;
-static unsigned int g_recv_count = 0;
-static unsigned int g_byteTotal = 0;
+static uint64_t g_send_count = 0;
+static uint64_t g_recv_count = 0;
+static uint64_t g_byteTotal = 0;
 static bool g_writeOrRead = TEST_WRITE;
 static bool g_printData = false;
 static struct OsalSem sem;
@@ -441,6 +441,7 @@ static int AcmDataBufAlloc(struct AcmDevice *acm)
 static void AcmTestBulkCallback(const void *requestArg)
 {
     struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
+    struct itimerval new_value, old_value;
     if (req == NULL) {
         HDF_LOGE("%s:%{pulib}d req is NULL!", __func__, __LINE__);
         return;
@@ -452,6 +453,13 @@ static void AcmTestBulkCallback(const void *requestArg)
     }
 
     if (req->status == USB_REQUEST_COMPLETED) {
+        if (g_byteTotal == 0) {
+            new_value.it_value.tv_sec = TEST_PRINT_TIME;
+            new_value.it_value.tv_usec = 0;
+            new_value.it_interval.tv_sec = TEST_PRINT_TIME;
+            new_value.it_interval.tv_usec = 0;
+            setitimer(ITIMER_REAL, &new_value, &old_value);
+        }
         g_recv_count++;
         g_byteTotal += req->actualLength;
     } else {
@@ -514,7 +522,7 @@ static int32_t SerialBegin(struct AcmDevice *acm)
 
 void SignalHandler(int signo)
 {
-    static int sigCnt = 0;
+    static uint32_t sigCnt = 0;
     struct itimerval new_value, old_value;
     double speed = 0;
     switch (signo) {
@@ -557,10 +565,7 @@ int main(int argc, char *argv[])
     int devAddr = 2;
     int ifaceNum = 3;
     struct timeval time;
-    struct timeval newtime;
-    struct itimerval new_value, old_value;
     int i = 0;
-    double speed = 0;
     if (argc == 6) {
         busNum = atoi(argv[1]);
         devAddr = atoi(argv[2]);
@@ -654,15 +659,8 @@ int main(int argc, char *argv[])
     }
 
     signal(SIGINT, SignalHandler);
+    signal(SIGALRM, SignalHandler);
     gettimeofday(&time, NULL);
-    if (g_writeOrRead == TEST_WRITE) {
-        signal(SIGALRM, SignalHandler);
-        new_value.it_value.tv_sec = TEST_PRINT_TIME;
-        new_value.it_value.tv_usec = 0;
-        new_value.it_interval.tv_sec = TEST_PRINT_TIME;
-        new_value.it_interval.tv_usec = 0;
-        setitimer(ITIMER_REAL, &new_value, &old_value);
-    }
 
     printf("test SDK rawAPI [%s]\n", g_writeOrRead?"write":"read");
     printf("Start: sec%ld usec%ld\n", time.tv_sec, time.tv_usec);
@@ -676,14 +674,6 @@ int main(int argc, char *argv[])
         OsalMSleep(10);
     }
 
-    if (g_writeOrRead == TEST_WRITE)
-    {
-        speed = (g_byteTotal * 1.0) / (TEST_TIME  * 1024 * 1024);
-        gettimeofday(&newtime, NULL);
-        printf("\r\nEnd: sec%ld usec%ld g_recv_count=%d g_send_count=%d urb dataSize=%d total transfer size=%d byte\n",
-            newtime.tv_sec, newtime.tv_usec, g_recv_count, g_send_count, acm->dataSize, g_byteTotal);
-        printf("Speed:%f MB/s\n", speed);
-    }
     (void)UsbStopIo(acm);
 end:
     if (ret != HDF_SUCCESS) {
