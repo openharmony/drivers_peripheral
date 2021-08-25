@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
+#include "sensor_controller.h"
 #include <fcntl.h>
-#include "securec.h"
+#include <securec.h>
 #include "osal_mem.h"
 #include "osal_mutex.h"
 #include "sensor_channel.h"
 #include "sensor_common.h"
-#include "sensor_controller.h"
 #include "sensor_if.h"
 #include "sensor_manager.h"
 
