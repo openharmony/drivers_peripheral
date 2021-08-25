@@ -4,9 +4,6 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/camera/hal/camera.gni")
 
 group("camera_device_manager") {
-  if (is_support_mpi) {
-    public_deps = [ "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/src/device_manager:camera_device_manager" ]
-  } else if (is_support_v4l2) {
-    public_deps = [ "//drivers/peripheral/camera/hal/adapter/chipset/rpi4b/src/device_manager:camera_device_manager" ]
-  }
+  public_deps = []
+  public_deps += [ "${camera_device_manager_deps}" ]
 }
