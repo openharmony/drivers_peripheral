@@ -28,13 +28,16 @@ const int32_t WLAN_FREQ_MAX_NUM = 14;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
 #define ETH_ADDR_LEN 6
 
-int32_t WifiServiceCallback(struct HdfDeviceObject *device, struct HdfRemoteService *callback, int32_t code)
+int32_t WifiServiceCallback(struct HdfDeviceObject *device, struct HdfRemoteService *callback,
+    uint32_t event, void *data)
 {
     (void)device;
+    int32_t *code = NULL;
 
+    code =  (int32_t *)data;
     struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
-    HdfSbufWriteInt32(dataSbuf, code);
-    HDF_LOGI("WifiServiceCallback enter , code = %{public}d", code);
+    HdfSbufWriteInt32(dataSbuf, *code);
+    HDF_LOGI("WifiServiceCallback enter , code = %{public}d", *code);
     int ret = callback->dispatcher->Dispatch(callback, RESET_STATUS_GET, dataSbuf, NULL);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("failed to do callback, error code: %d", ret);
@@ -270,11 +273,6 @@ static bool HdfWlanAddRemoteObj(struct HdfDeviceIoClient *client, struct HdfRemo
 
 static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName)
 {
-    static int32_t wifiStatus = -1;
-    int *resetStatus = NULL;
-    resetStatus = (int *)data;
-
-    wifiStatus = *resetStatus;
     struct HdfWlanRemoteNode *pos = NULL;
     struct DListHead *head = &HdfStubDriver()->remoteListHead;
     DLIST_FOR_EACH_ENTRY(pos, head, struct HdfWlanRemoteNode, node) {
@@ -287,7 +285,7 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
             HDF_LOGE("%s: ptr null!", __func__);
             return HDF_FAILURE;
         }
-        int32_t ret = WifiHdiImplInstance()->callback(pos->client->device, pos->callbackObj, wifiStatus);
+        int32_t ret = WifiHdiImplInstance()->callback(pos->client->device, pos->callbackObj, event, data);
         if(ret != HDF_SUCCESS) {
             HDF_LOGE("%s: dispatch code fialed, error code: %d", __func__, ret);
             return ret;
@@ -295,7 +293,6 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
     }
     return HDF_SUCCESS;
 }
-
 
 static int32_t WlanServiceStudRegCallback(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
@@ -313,15 +310,15 @@ static int32_t WlanServiceStudRegCallback(struct HdfDeviceIoClient *client, stru
         return HDF_ERR_INVALID_PARAM;
     }
     (void)OsalMutexLock(&HdfStubDriver()->mutex);
-    if (HdfWlanAddRemoteObj(client, callback)) {
-        ret = g_wifi->registerEventCallback(HdfWLanCallbackFun, "wlan0");
-        if (ret != HDF_SUCCESS) {
-            (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
-            HDF_LOGE("%s: Register failed!, error code: %d", __func__, ret);
-        }
-    } else {
+    ret = HdfWlanAddRemoteObj(client, callback);
+    if (ret != HDF_SUCCESS) {
+        (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
         HDF_LOGE("%s: HdfSensorAddRemoteObj false", __func__);
-        return HDF_FAILURE;
+        return ret;
+    }
+    ret = g_wifi->registerEventCallback(HdfWLanCallbackFun, "wlan0");
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: Register failed!, error code: %d", __func__, ret);
     }
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
     return ret;
