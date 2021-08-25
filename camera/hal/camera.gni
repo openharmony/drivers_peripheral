@@ -11,13 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build/ohos.gni")
-if (product_name == "Hi3516DV300") {
-  is_support_v4l2=false
-  import("//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/camera.hi3516dv300.gni")
-} else if (product_name == "rpi3" || product_name == "ohos-arm64") {
-  is_support_mpi=false
-  import("//drivers/peripheral/camera/hal/adapter/chipset/rpi4b/camera.rpix.gni")
-}
+import(
+    "//drivers/peripheral/camera/hal/adapter/chipset/gni/camera.${product_name}.gni")
 
 camera_path = "//drivers/peripheral/camera/hal"
 current_path = "."
@@ -25,5 +20,5 @@ enable_camera_device_utest = false
 
 use_hitrace = false
 if (use_hitrace) {
-  defines += ["HITRACE_LOG_ENABLED"]
+  defines += [ "HITRACE_LOG_ENABLED" ]
 }

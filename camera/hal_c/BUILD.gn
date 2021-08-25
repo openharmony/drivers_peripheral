@@ -13,8 +13,6 @@
 
 import("//build/ohos.gni")
 
-print("target_device: , ${device_name}")
-
 group("camera_hal") {
   deps = [ "hdi_cif:hdi_cif" ]
 }
