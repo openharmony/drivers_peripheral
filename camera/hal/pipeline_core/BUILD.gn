@@ -4,9 +4,6 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/camera/hal/camera.gni")
 
 group("camera_pipeline_core") {
-  if (is_support_mpi) {
-    deps = [ "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/src/pipeline_core:camera_pipeline_core" ]
-  } else if (is_support_v4l2) {
-    deps = [ "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/pipeline_core:camera_pipeline_core" ]
-  }
+  deps = []
+  deps += [ "${camera_pipeline_core_deps}" ]
 }
