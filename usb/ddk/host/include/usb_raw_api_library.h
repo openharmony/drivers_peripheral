@@ -70,6 +70,13 @@ struct UsbMessageQueue {
     struct OsalSem sem;
 };
 
+struct RawUsbRamTestList {
+    uint32_t address;
+    uint32_t size;
+    struct DListHead list;
+    struct OsalMutex lock;
+};
+
 struct UsbSession *RawGetSession(const struct UsbSession *session);
 int32_t RawInit(struct UsbSession **session);
 int32_t RawExit(const struct UsbSession *session);
@@ -118,5 +125,9 @@ int32_t RawRegisterSignal(void);
 int32_t RawKillSignal(struct UsbDeviceHandle *devHandle, UsbRawTidType tid);
 int RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddRemoveInfo infoData);
 void RawRequestListInit(struct UsbDevice *deviceObj);
+void *RawUsbMemAlloc(size_t size);
+void *RawUsbMemCalloc(size_t size);
+void RawUsbMemFree(void *mem);
+int RawUsbMemTestTrigger(bool enable);
 
 #endif /* USB_RAW_API_LIBRARY_H */

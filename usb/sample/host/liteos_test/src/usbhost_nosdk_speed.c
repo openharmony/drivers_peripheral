@@ -48,16 +48,16 @@ static int g_devAddr = 2;
 static struct OsalSem sem;
 static struct OsalSem timeSem;
 
-static unsigned int g_send_count = 0;
-static unsigned int g_recv_count = 0;
-static unsigned int g_byteTotal = 0;
+static uint64_t g_send_count = 0;
+static uint64_t g_recv_count = 0;
+static uint64_t g_byteTotal = 0;
 static struct UsbAdapterUrbs urb[TEST_CYCLE];
 static struct urb *sendUrb = NULL;
 static bool g_printData = false;
 static unsigned char endNum;
 static struct OsalSem timeSem;
 static struct usb_device * fd;
-static int sigCnt = 0;
+static uint32_t sigCnt = 0;
 static struct UsbAdapterHostEndpoint *uhe = NULL;
 static bool g_writeOrRead = TEST_WRITE;
 static struct AcmDevice *acm = NULL;
@@ -87,7 +87,7 @@ static int ClaimInterface(unsigned int iface)
     return HDF_SUCCESS;
 }
 
-void SignalHandler()
+void SpeedPrint()
 {
     double speed = 0;
 
@@ -136,6 +136,9 @@ static void UrbComplete(struct urb *curUrb)
     int i;
     for (i = 0; i < TEST_CYCLE; i++) {
         if(urb[i].urb == curUrb) {
+            if (g_byteTotal == 0) {
+                OsalSemPost(&timeSem);
+            }
             g_recv_count++;
             g_byteTotal += curUrb->actual_length;
             if (g_printData == true) {
@@ -159,7 +162,6 @@ static int BeginProcess(unsigned char endPoint)
     char *data = NULL;
     const int transNum = 0;
     int i;
-    double speed = 0;
 
     if (endPoint <= 0) {
         printf("parameter error\n");
@@ -220,21 +222,10 @@ static int BeginProcess(unsigned char endPoint)
         }
     }
 
+    OsalSemWait(&timeSem, TEST_TIME);
     while (!g_speedFlag) {
-        if (g_writeOrRead == TEST_WRITE) {
-            OsalSemWait(&timeSem, TEST_PRINT_TIME*1000);
-            SignalHandler();
-        } else {
-            OsalSemWait(&timeSem, 200);
-        }
-    }
-
-    if (endPoint >> 7 == 0)
-    {
-        speed = (g_byteTotal * 1.0) / (TEST_TIME  * 1024 * 1024);
-        printf("\r\nEnd: g_recv_count=%d g_send_count=%d urb dataSize=%d total transfer size=%d byte\n",
-            g_recv_count, g_send_count, TEST_LENGTH, g_byteTotal);
-        printf("Speed:%f MB/s\n", speed);
+        OsalSemWait(&timeSem, TEST_PRINT_TIME*1000);
+        SpeedPrint();
     }
 
     for (i = 0; i < TEST_CYCLE; i++) {

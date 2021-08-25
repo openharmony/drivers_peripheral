@@ -29,7 +29,7 @@ int32_t UsbProtocalFillControlSetup(const unsigned char *setup, const struct Usb
     switch (ctrlReq->reqType) {
         case USB_REQUEST_TYPE_STANDARD:
         case USB_REQUEST_TYPE_CLASS:
-            setupData->requestType = ((uint8_t)ctrlReq->directon << USB_DIR_OFFSET) |
+            setupData->requestType = (((uint8_t)ctrlReq->directon) << USB_DIR_OFFSET) |
                 ((uint8_t)ctrlReq->reqType << USB_TYPE_OFFSET) |
                 ((uint8_t)ctrlReq->target << USB_RECIP_OFFSET);
             setupData->request     = ctrlReq->request;
@@ -290,7 +290,7 @@ int UsbProtocalParseDescriptor(struct UsbDeviceHandle *devHandle, uint8_t busNum
 free_config:
     if (config != NULL) {
         RawClearConfiguration(config);
-        OsalMemFree(config);
+        RawUsbMemFree(config);
         config = NULL;
     }
 

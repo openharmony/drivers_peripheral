@@ -167,6 +167,13 @@ executable("acm_speed_write") {
     "-Wno-format",
     "-Wno-format-extra-args",
   ]
+
+  ldflags = [
+    "-L$ohos_root_path/sysroot/usr/lib",
+    "-Wl,-rpath-link=$ohos_root_path/sysroot/usr/lib",
+    "-lstdc++",
+    "-lpthread",
+  ]
 }
 
 executable("acm_speed_read") {
@@ -200,6 +207,13 @@ executable("acm_speed_read") {
     "-Wextra",
     "-Wno-format",
     "-Wno-format-extra-args",
+  ]
+
+  ldflags = [
+    "-L$ohos_root_path/sysroot/usr/lib",
+    "-Wl,-rpath-link=$ohos_root_path/sysroot/usr/lib",
+    "-lstdc++",
+    "-lpthread",
   ]
 }
 

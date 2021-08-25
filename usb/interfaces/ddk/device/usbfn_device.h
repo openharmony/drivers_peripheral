@@ -77,5 +77,6 @@ int UsbFnRemoveDevice(struct UsbFnDevice *fnDevice);
 const struct UsbFnDevice *UsbFnGetDevice(const char *udcName);
 int UsbFnGetDeviceState(struct UsbFnDevice *fnDevice, UsbFnDeviceState *devState);
 const struct UsbFnInterface *UsbFnGetInterface(struct UsbFnDevice *fnDevice, uint8_t interfaceIndex);
+int UsbFnMemTestTrigger(bool enable);
 
 #endif /* USBFN_DEVICE_H */
