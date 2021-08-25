@@ -14,9 +14,9 @@
  */
 
 #include "vibrator_controller.h"
+#include <securec.h>
 #include "hdf_base.h"
 #include "hdf_log.h"
-#include <securec.h>
 #include "vibrator_if.h"
 
 #define HDF_LOG_TAG vibrator_controller_c
