@@ -67,14 +67,39 @@ void HdfWifiServiceCTest::TearDown()
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-static int32_t HalResetCallbackEvent(uint32_t event, void *data, const char *ifName)
+static void HdiProcessScanResult(struct HdfSBuf *dataBuf)
 {
-    (void)event;
+    WifiScanResult *scanResult = nullptr;
+    uint32_t dataSize = 0;
+
+    if (!HdfSbufReadBuffer(dataBuf, (const void **)(&scanResult), &dataSize) || dataSize != sizeof(WifiScanResult)) {
+        HDF_LOGE("%s: HdfSbufReadBuffer scanResult failed!", __func__);
+        return;
+    }
+    printf("HdiProcessScanResult: flags=%d, caps=%d, freq=%d, beaconInt=%d,\n",
+        scanResult->flags, scanResult->caps, scanResult->freq, scanResult->beaconInt);
+    printf("HdiProcessScanResult: qual=%d, beaconIeLen=%d, level=%d, age=%d, ieLen=%d,\n",
+        scanResult->qual, scanResult->beaconIeLen, scanResult->level, scanResult->age, scanResult->ieLen);
+}
+
+static int32_t HalResetCallbackEvent(uint32_t eventId, void *data, const char *ifName)
+{
     (void)ifName;
     struct HdfSBuf *dataBuf = (struct HdfSBuf*)data;
 
-    HdfSbufReadInt32(dataBuf, &g_resetStatus);
-    printf("HalResetCallbackEvent: receive resetStatus=%d \n", g_resetStatus);
+    switch (eventId) {
+        case WIFI_EVENT_RESET_DRIVER:
+            if (!HdfSbufReadInt32(dataBuf, &g_resetStatus)) {
+                HDF_LOGE("%s: feature->type write failed!", __func__);
+            }
+            printf("HalResetCallbackEvent: receive resetStatus=%d \n", g_resetStatus);
+            break;
+        case WIFI_EVENT_SCAN_RESULT:
+            HdiProcessScanResult(dataBuf);
+            break;
+        default:
+            break;
+    }
     return HDF_SUCCESS;
 }
 
@@ -340,6 +365,44 @@ HWTEST_F(HdfWifiServiceCTest, SetScanningMacAddressTest_013, TestSize.Level1)
     ASSERT_EQ(rc, HDF_ERR_NOT_SUPPORT);
     rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: GetNetdevInfoTest_001
+ * @tc.desc: Wifi hdi get netdev info function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(HdfWifiServiceCTest, GetNetdevInfoTest_001, TestSize.Level1)
+{
+    int32_t rc;
+    struct NetDeviceInfoResult netDeviceInfoResult;
+
+    (void)memset_s(&netDeviceInfoResult, sizeof(struct NetDeviceInfoResult), 0, sizeof(struct NetDeviceInfoResult));
+    rc = g_wlanObj->getNetDevInfo(g_wlanObj, (struct NetDeviceInfoResult *)&netDeviceInfoResult);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: HdfWifiServiceCTest
+ * @tc.desc: Wifi hdi start scan function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(HdfWifiServiceCTest, StartScanTest_001, TestSize.Level1)
+{
+    int32_t rc;
+    const int32_t wlan_type = PROTOCOL_80211_IFTYPE_STATION;
+    struct WlanFeatureInfo *ifeature = nullptr;
+    WifiScan scan = {0};
+
+    rc = g_wlanObj->createFeature(g_wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->startScan(g_wlanObj, (struct WlanFeatureInfo *)ifeature, &scan);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    sleep(3);
 }
 
 /**

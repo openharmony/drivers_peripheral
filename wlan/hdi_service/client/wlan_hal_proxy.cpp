@@ -200,7 +200,7 @@ int IPCObjectStubWlan::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data,
     status = data.ReadInt32();
     HdfSbufWriteInt32(dataSbuf, status);
     switch (code) {
-        case RESET_STATUS_GET:
+        case WIFI_EVENT_RESET_DRIVER:
             ret = WlanInterfaceProxy::CallbackWlanProxy((int32_t)code, dataSbuf);
             if (ret != 0) {
                 HDF_LOGE("%s:  failed, error code is %d", __func__, ret);

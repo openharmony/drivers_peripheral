@@ -57,8 +57,8 @@ public:
     virtual int32_t setMacAddress(std::shared_ptr<WifiFeatureInfo> ifeature, std::vector<uint8_t>& mac) = 0;
     virtual int32_t getDeviceMacAddress(std::shared_ptr<WifiFeatureInfo> ifeature, std::vector<uint8_t>& mac,
         uint8_t len) = 0;
-    virtual int32_t getFreqsWithBand(std::shared_ptr<WifiFeatureInfo> ifeature, int32_t band, std::vector<int32_t> freq,
-        uint32_t count, uint32_t& num) = 0;
+    virtual int32_t getFreqsWithBand(std::shared_ptr<WifiFeatureInfo> ifeature, int32_t band,
+        std::vector<int32_t> freq, uint32_t count, uint32_t& num) = 0;
     virtual int32_t setTxPower(std::shared_ptr<WifiFeatureInfo> ifeature, int32_t power) = 0;
     virtual int32_t getChipId(std::shared_ptr<WifiFeatureInfo> ifeature, uint8_t& chipId) = 0;
     virtual int32_t getIfNamesByChipId(const uint8_t chipId, std::string& ifNames, uint32_t& num) = 0;
