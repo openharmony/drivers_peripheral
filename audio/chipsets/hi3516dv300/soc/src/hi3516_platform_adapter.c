@@ -9,9 +9,7 @@
 #include "gpio_if.h"
 #include <linux/slab.h>
 #include "audio_core.h"
-#include "audio_platform_base.h"
 #include "hi3516_platform_ops.h"
-#include "osal_io.h"
 #include "osal_mem.h"
 
 #define HDF_LOG_TAG hi3516_platform_adapter
