@@ -27,7 +27,7 @@ using namespace testing::ext;
 
 namespace {
     int32_t g_sensorDataFlag = 0;
-    const int32_t SENSOR_ID = 0;
+    const int32_t SENSOR_ID = 10;
     const int32_t SENSOR_INTERVAL = 200000000;
     const int32_t SENSOR_POLL_TIME = 1;
     const int32_t SENSOR_WAIT_TIME = 400;
@@ -41,6 +41,7 @@ namespace {
         }
 
         float *data = (float*)event->data;
+        int32_t *hallData = (int32_t*)event->data;
         if (event->sensorId == 0) {
             printf("sensor id [%d] data [%f]\n\r", event->sensorId, *(data));
             if (fabs(*data) > 1e-5) {
@@ -56,6 +57,12 @@ namespace {
             printf("sensor id [%d] barometer[%f] temperature[%f] \n\r",
                 event->sensorId, (*data), *(data + 1));
             if (fabs(*data) > 1e-5) {
+                g_sensorDataFlag = 1;
+            }
+        } else if (event->sensorId == SENSOR_TYPE_HALL) {
+            printf("sensor id [%d] hall-[%d] \n\r",
+                event->sensorId, (*hallData));
+            if (*hallData == 0 || *hallData == 1) {
                 g_sensorDataFlag = 1;
             }
         }
@@ -169,6 +176,7 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
     struct SensorInformation *testSensorInfo = nullptr;
     struct SensorInformation *accelSensorInfo = nullptr;
     struct SensorInformation *barometerSensorInfo = nullptr;
+	struct SensorInformation *hallSensorInfo = nullptr;
     int32_t count = 0;
     
     int32_t ret = g_sensorDev->GetAllSensors(&sensorInfo, &count);
@@ -183,6 +191,7 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
     testSensorInfo = sensorInfo;
     accelSensorInfo = sensorInfo;
     barometerSensorInfo = sensorInfo;
+	hallSensorInfo = sensorInfo;
 
     for (int i = 0; i < count; i++) {
         printf("get sensoriId[%d], info name[%s], power[%f]\n\r", info->sensorId, info->sensorName, info->power);
@@ -194,6 +203,9 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
         else if (info->sensorId == SENSOR_TYPE_BAROMETER) {
             barometerSensorInfo = info;
         }
+		else if (info->sensorId == SENSOR_TYPE_HALL) {
+            hallSensorInfo = info;
+        }
         info++;
         if (testSensorInfo->sensorTypeId == 0) {
             EXPECT_STREQ("sensor_test", testSensorInfo->sensorName);
@@ -204,6 +216,9 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
         }
         if (barometerSensorInfo->sensorTypeId == SENSOR_TYPE_BAROMETER) {
             EXPECT_STREQ("barometer", barometerSensorInfo->sensorName);
+        }
+		if (hallSensorInfo->sensorTypeId == SENSOR_TYPE_HALL) {
+            EXPECT_STREQ("hallrometer", hallSensorInfo->sensorName);
         }
     }
 }
@@ -344,8 +359,14 @@ HWTEST_F(HdfSensorTest, SetSensorMode001, TestSize.Level1)
     EXPECT_EQ(0, ret);
     ret = g_sensorDev->SetBatch(SENSOR_ID, SENSOR_INTERVAL, SENSOR_POLL_TIME);
     EXPECT_EQ(0, ret);
-    ret = g_sensorDev->SetMode(SENSOR_ID, SENSOR_MODE_REALTIME);
-    EXPECT_EQ(0, ret);
+    if (SENSOR_ID == SENSOR_TYPE_HALL) {
+        ret = g_sensorDev->SetMode(SENSOR_ID, SENSOR_MODE_ON_CHANGE);
+        EXPECT_EQ(0, ret);
+        return;
+    } else {
+        ret = g_sensorDev->SetMode(SENSOR_ID, SENSOR_MODE_REALTIME);
+        EXPECT_EQ(0, ret);
+    }
     ret = g_sensorDev->Enable(SENSOR_ID);
     EXPECT_EQ(0, ret);
     OsalMSleep(SENSOR_WAIT_TIME);
@@ -373,8 +394,14 @@ HWTEST_F(HdfSensorTest, SetSensorMode002, TestSize.Level1)
     EXPECT_EQ(0, ret);
     ret = g_sensorDev->SetBatch(SENSOR_ID, SENSOR_INTERVAL, SENSOR_POLL_TIME);
     EXPECT_EQ(0, ret);
-    ret = g_sensorDev->SetMode(SENSOR_ID, SENSOR_MODE_ON_CHANGE);
-    EXPECT_EQ(-1, ret);
+    if (SENSOR_ID == SENSOR_TYPE_HALL) {
+        ret = g_sensorDev->SetMode(SENSOR_ID, SENSOR_MODE_ON_CHANGE);
+        EXPECT_EQ(-1, ret);
+        return;
+    } else {
+        ret = g_sensorDev->SetMode(SENSOR_ID, SENSOR_MODE_REALTIME);
+        EXPECT_EQ(-1, ret);
+    }
     ret = g_sensorDev->Enable(SENSOR_ID);
     EXPECT_EQ(0, ret);
     OsalMSleep(SENSOR_WAIT_TIME);
