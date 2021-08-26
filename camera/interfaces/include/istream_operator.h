@@ -81,14 +81,14 @@ public:
     virtual CamRetCode IsStreamsSupported(
         OperationMode mode,
         const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
-        const std::vector<std::shared_ptr<StreamInfo>> &info,
+        const std::shared_ptr<StreamInfo> &info,
         StreamSupportType &type) = 0;
 
     virtual CamRetCode IsStreamsSupported(
         OperationMode mode,
         const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
-        const std::shared_ptr<StreamInfo> &info,
-        StreamSupportType &type){return NO_ERROR;};
+        const std::vector<std::shared_ptr<StreamInfo>> &info,
+        StreamSupportType &type) = 0;
 
     /**
      * @brief Creates streams.
