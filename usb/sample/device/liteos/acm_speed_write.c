@@ -26,6 +26,8 @@
 #include "osal_time.h"
 #include "osal_file.h"
 #include "securec.h"
+#include "signal.h"
+#include <pthread.h>
 #define HDF_LOG_TAG   cdc_acm_speed
 
 enum UsbSerialCmd {
@@ -48,6 +50,7 @@ static struct HdfSBuf *g_data;
 static struct HdfSBuf *g_reply;
 static struct HdfIoService *g_acmService;
 static bool g_readRuning = false;
+static sigset_t g_mask;
 static void TestSpeed()
 {
     HdfSbufFlush(g_reply);
@@ -76,32 +79,66 @@ static void GetTempSpeed()
         HDF_LOGE("%s: HdfSbufReadFloat failed", __func__);
         return;
     }
-    printf("speed : %f MB/s\n", (float)speed / calc);
+    if (speed > 0) {
+        printf("speed : %f MB/s\n", (float)speed / calc);
+    }
+
 }
 
-static void GetSpeedDone()
+static void WriteSpeedDone()
 {
-    uint8_t isDone = 0;
-    HdfSbufFlush(g_reply);
-    int status = g_acmService->dispatcher->Dispatch(&g_acmService->object,
+    int status = g_acmService->dispatcher->Dispatch(g_acmService,
         USB_SERIAL_WRITE_SPEED_DONE, g_data, g_reply);
     if (status) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE_SPEED_DONE failed status = %d",
             __func__, status);
         return;
     }
-    if (!HdfSbufReadUint8(g_reply, &isDone)) {
-        HDF_LOGE("%s: HdfSbufReadFloat failed", __func__);
+}
+
+static void *StopHandler(void *arg)
+{
+    int err, signo;
+    for (;;) {
+        err = sigwait(&g_mask, &signo);
+        if (err != 0) {
+            printf("Sigwait failed: %d\n", err);
+        }
+
+        switch (signo) {
+        case SIGINT:
+        case SIGQUIT:
+            printf("acm_speed_write exit\n");
+            WriteSpeedDone();
+            g_readRuning = false;
+            return NULL;
+        default:
+            printf("Unexpected signal %d\n", signo);
+        }
+    }
+}
+
+pthread_t g_threads;
+static void StartStopHandler()
+{
+    int err;
+    sigemptyset(&g_mask);
+    sigaddset(&g_mask, SIGINT);
+    sigaddset(&g_mask, SIGQUIT);
+    if ((err = pthread_sigmask(SIG_BLOCK, &g_mask, NULL)) != 0) {
+        printf("SIG_BLOCK error\n");
         return;
     }
-    if (isDone) {
-        g_readRuning = false;
+    if (pthread_create(&g_threads, NULL, StopHandler, NULL) != 0) {
+        printf("Could not create core thread\n");
+        return;
     }
 }
 
 int main(int argc, char *argv[])
 {
     int status;
+
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");
     if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
         HDF_LOGE("%s: GetService err", __func__);
@@ -120,13 +157,14 @@ int main(int argc, char *argv[])
         HDF_LOGE("%s: Dispatch USB_SERIAL_OPEN err", __func__);
         return HDF_FAILURE;
     }
-
+    StartStopHandler();
     TestSpeed();
     g_readRuning = true;
     while (g_readRuning) {
         sleep(0x2);
-        GetTempSpeed();
-        GetSpeedDone();
+        if (g_readRuning) {
+            GetTempSpeed();
+        }
     }
 
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_CLOSE, g_data, g_reply);

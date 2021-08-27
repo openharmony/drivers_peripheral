@@ -415,7 +415,7 @@ void UsbHostDdkTestStdGetDesAsync(char *readSbuf)
 
 void UsbHostDdkTestStdGetStatus(char *readSbuf)
 {
-    uint16_t data;
+    uint16_t data = 0;
 
     HdfSbufFlush(g_reply);
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
@@ -574,9 +574,10 @@ void TestSpeed(void)
 #endif
     (void)snprintf_s(str, BUFFER_MAX_LEN, BUFFER_MAX_LEN - 1, "[XTSCHECK] %d.%06d, send data to device\n",
         time.tv_sec, time.tv_usec);
-    (void)fwrite(str, strlen(str), 1, fp);
-    (void)fclose(fp);
-
+    if (fp != NULL) {
+        (void)fwrite(str, strlen(str), 1, fp);
+        (void)fclose(fp);
+    }
     while (!g_speedFlag) {
         if (TestSpeedWrite(data) < HDF_SUCCESS) {
             OsalMSleep(SPEED_SLEEP_TIME);

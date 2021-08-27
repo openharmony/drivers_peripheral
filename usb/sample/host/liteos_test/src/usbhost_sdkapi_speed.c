@@ -43,14 +43,14 @@
 #define HDF_LOG_TAG   USB_HOST_ACM
 
 static bool g_speedFlag = false;
-static unsigned int g_recv_count = 0;
-static unsigned int g_send_count = 0;
-static unsigned int g_byteTotal = 0;
+static uint64_t g_recv_count = 0;
+static uint64_t g_send_count = 0;
+static uint64_t g_byteTotal = 0;
 static bool g_writeOrRead = TEST_WRITE;
 static bool g_printData = false;
 static struct AcmDevice *acm = NULL;
 static struct OsalSem timeSem;
-static int sigCnt = 0;
+static uint32_t sigCnt = 0;
 
 static void AcmTestBulkCallback(struct UsbRequest *req);
 static int32_t SerialBegin(struct AcmDevice *acm);
@@ -119,6 +119,9 @@ static int AcmDataBufAlloc(struct AcmDevice *acm)
 {
     int i;
     struct AcmDb *db;
+	if (acm == NULL) {
+        return 0;
+	}
     for (db = &acm->db[0], i = 0; i < TEST_CYCLE; i++, db++) {
         db->buf = OsalMemCalloc(acm->dataSize);
         if (!db->buf) {
@@ -153,10 +156,14 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
 {
     if (req == NULL) {
         printf("req is null\r\n");
+        return;
     }
     int status = req->compInfo.status;
     struct AcmDb *db  = (struct AcmDb *)req->compInfo.userData;
     if (status == 0) {
+        if (g_byteTotal == 0) {
+            OsalSemPost(&timeSem);
+        }
         g_recv_count++;
         g_byteTotal += req->compInfo.actualLength;
     }
@@ -181,8 +188,6 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
         SerialBegin(db->instance);
         g_send_count++;
     }
-
-    return;
 }
 
 static int32_t SerialBegin(struct AcmDevice *acm)
@@ -276,7 +281,7 @@ static struct UsbPipeInfo *GetPipe(const struct AcmDevice *acm,
     return NULL;
 }
 
-static void SignalHandler()
+static void SpeedPrint()
 {
     double speed = 0;
     sigCnt++;
@@ -328,7 +333,6 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     int devAddr = 2;
     int ifaceNum = 3;
     int32_t ret = HDF_SUCCESS;
-    double speed = 0;
     struct UsbSpeedTest *input = NULL;
     uint32_t size = 0;
     int i;
@@ -456,20 +460,10 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
         g_send_count++;
     }
 
+    OsalSemWait(&timeSem, TEST_TIME);
     while (!g_speedFlag) {
-        if (g_writeOrRead == TEST_WRITE) {
-            OsalSemWait(&timeSem, TEST_PRINT_TIME*1000);
-            SignalHandler();
-        } else {
-            OsalSemWait(&timeSem, 200);
-        }
-    }
-    if (g_writeOrRead == TEST_WRITE)
-    {
-        speed = (g_byteTotal * 1.0) / (TEST_TIME  * 1024 * 1024);
-        printf("\r\nEnd: g_recv_count=%d g_send_count=%d urb dataSize=%d total transfer size=%d byte\n",
-             g_recv_count, g_send_count, acm->dataSize, g_byteTotal);
-        printf("Speed:%f MB/s\n", speed);
+        OsalSemWait(&timeSem, TEST_PRINT_TIME*1000);
+        SpeedPrint();
     }
 
     for (i = 0; i < TEST_CYCLE; i++) {

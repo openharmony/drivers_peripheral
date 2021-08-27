@@ -32,6 +32,9 @@
 #define SLEEP_TIME 100000
 #define OPEN_CNT 30
 
+static struct RawUsbRamTestList *g_usbRamTestHead = NULL;
+static bool g_usbRamTestFlag = false;
+
 static int UsbFnAdapterOpenFn()
 {
     int i;
@@ -69,15 +72,15 @@ static int UsbFnAdapterCreateFconfigString(struct FconfigString *configString,
     }
     strLen = strlen(name);
     configString->len = strLen;
-    configString->s = OsalMemCalloc(strLen + 1);
+    configString->s = UsbFnMemCalloc(strLen + 1);
     if (configString->s == NULL) {
-        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
     ret = memcpy_s(configString->s, (strLen + 1), name, strLen);
     if (ret) {
         HDF_LOGE("%s: memcpy_s failure!", __func__);
-        OsalMemFree(configString->s);
+        UsbFnMemFree(configString->s);
         return HDF_ERR_MALLOC_FAIL;
     }
     *(configString->s + configString->len) = '\0';
@@ -141,9 +144,9 @@ static int UsbFnAdapterWriteDevString(int fd, struct FconfigDevStrings *devStrin
         devStrings->strCount++;
         usbString++;
     }
-    devStrings->strings = OsalMemCalloc((devStrings->strCount + 1)* sizeof(struct FconfigUsbString));
+    devStrings->strings = UsbFnMemCalloc((devStrings->strCount + 1)* sizeof(struct FconfigUsbString));
     if (devStrings->strings == NULL) {
-        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
     devStrings->strings[devStrings->strCount].str.len = 0;
@@ -154,7 +157,7 @@ static int UsbFnAdapterWriteDevString(int fd, struct FconfigDevStrings *devStrin
         ret = UsbFnAdapterCreateFconfigString(&devStrings->strings[jCount].str, usbString[jCount].s);
         if (ret) {
             HDF_LOGE("%s: create string failure!", __func__);
-            OsalMemFree(devStrings->strings[jCount].str.s);
+            UsbFnMemFree(devStrings->strings[jCount].str.s);
             goto FAIL;
         }
     }
@@ -164,15 +167,15 @@ static int UsbFnAdapterWriteDevString(int fd, struct FconfigDevStrings *devStrin
         goto FAIL;
     }
     for (jCount = 0; jCount < (int)devStrings->strCount; jCount++) {
-        OsalMemFree(devStrings->strings[jCount].str.s);
+        UsbFnMemFree(devStrings->strings[jCount].str.s);
     }
-    OsalMemFree(devStrings->strings);
+    UsbFnMemFree(devStrings->strings);
     return 0;
 FAIL:
     while ((--jCount) >= 0) {
-        OsalMemFree(devStrings->strings[jCount].str.s);
+        UsbFnMemFree(devStrings->strings[jCount].str.s);
     }
-    OsalMemFree(devStrings->strings);
+    UsbFnMemFree(devStrings->strings);
     return -1;
 }
 
@@ -282,7 +285,7 @@ static int UsbFnWriteStrings(int ep0, struct UsbFnStrings **strings)
     struct UsbFunctionfsStringsHead headerStr = {0};
 
     GetHeaderStr(strings, &headerStr);
-    str = OsalMemCalloc(headerStr.length);
+    str = UsbFnMemCalloc(headerStr.length);
     if (str == NULL) {
         return HDF_ERR_MALLOC_FAIL;
     }
@@ -319,10 +322,10 @@ static int UsbFnWriteStrings(int ep0, struct UsbFnStrings **strings)
     if (handle_write(ep0, str, headerStr.length) < 0) {
         goto ERR;
     }
-    OsalMemFree(str);
+    UsbFnMemFree(str);
     return 0;
 ERR:
-    OsalMemFree(str);
+    UsbFnMemFree(str);
     return HDF_FAILURE;
 }
 
@@ -422,9 +425,9 @@ static int UsbFnAdapterCreatPipes(int ep0, const struct UsbFnFunction *func)
 
     GetCountAndHead(&header, &fsCount, &hsCount, &ssCount, func);
 
-    dec = OsalMemCalloc(header.length);
+    dec = UsbFnMemCalloc(header.length);
     if (dec == NULL) {
-        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
     whereDec = dec;
@@ -458,11 +461,11 @@ static int UsbFnAdapterCreatPipes(int ep0, const struct UsbFnFunction *func)
 
     if (handle_write(ep0, dec, header.length) < 0) {
         HDF_LOGE("unable do write descriptors");
-        OsalMemFree(dec);
+        UsbFnMemFree(dec);
         return HDF_ERR_IO;
     }
 
-    OsalMemFree(dec);
+    UsbFnMemFree(dec);
     ret = UsbFnWriteStrings(ep0, func->strings);
     return ret;
 }
@@ -501,7 +504,7 @@ static int UsbFnAdapterWriteFunctions(int fd, struct UsbFnConfiguration *UsbFnCo
             HDF_LOGE("%s: ioctl failure!", __func__);
             goto FAIL;
         }
-        OsalMemFree(funcInfo.funcName.s);
+        UsbFnMemFree(funcInfo.funcName.s);
         if (cmd == FCONFIG_CMD_DROP_FUNCTION) {
             continue;
         }
@@ -523,7 +526,7 @@ static int UsbFnAdapterWriteFunctions(int fd, struct UsbFnConfiguration *UsbFnCo
 FAIL2:
     UsbFnAdapterClosePipe(fdEp0);
 FAIL:
-    OsalMemFree(funcInfo.funcName.s);
+    UsbFnMemFree(funcInfo.funcName.s);
     return -1;
 }
 
@@ -558,7 +561,7 @@ static int UsbFnAdapterWriteConfigs(int fd, struct FconfigString *gadgetName,
         }
         ret = UsbFnAdapterFillConfigDesc(&configDesc.cfgDesc, descriptor->configs[iCount]);
         if (ret) {
-            HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
+            HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
             return HDF_ERR_MALLOC_FAIL;
         }
         ret=handle_ioctl(fd, FCONFIG_CMD_ADD_CONFIG, &configDesc);
@@ -572,7 +575,7 @@ static int UsbFnAdapterWriteConfigs(int fd, struct FconfigString *gadgetName,
             HDF_LOGE("%s: write func failure!", __func__);
             return HDF_ERR_MALLOC_FAIL;
         }
-        OsalMemFree(configDesc.configName.s);
+        UsbFnMemFree(configDesc.configName.s);
     }
     return 0;
 }
@@ -597,7 +600,7 @@ static int UsbFnAdapterWriteFcofnigUDC(int fd, int cmd, struct FconfigString *ga
     if (ret) {
         HDF_LOGE("%s: ioctl failure!", __func__);
     }
-    OsalMemFree(udcInfo.udcName.s);
+    UsbFnMemFree(udcInfo.udcName.s);
 
     return ret;
 }
@@ -645,7 +648,7 @@ static int UsbFnAdapterCreateDevice(const char *udcName,
     }
     dprintf("%s: create device success!\n", __func__);
 EXIT:
-    OsalMemFree(gadgetName.s);
+    UsbFnMemFree(gadgetName.s);
 FAIL:
     if (UsbFnAdapterClosefn(fd) != 0) {
         dprintf("%s[%d] close fconfig failed\n", __func__, __LINE__);
@@ -693,7 +696,7 @@ static int UsbFnAdapterDelConfigs(int configFd, struct FconfigString *gadgetName
         }
         ret = UsbFnAdapterFillConfigDesc(&configDesc.cfgDesc, descriptor->configs[iCount]);
         if (ret) {
-            HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
+            HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
             goto FAIL;
         }
         ret=handle_ioctl(configFd, FCONFIG_CMD_REMOVE_CONFIG, &configDesc);
@@ -701,11 +704,11 @@ static int UsbFnAdapterDelConfigs(int configFd, struct FconfigString *gadgetName
             HDF_LOGE("%s: ioctl failure!", __func__);
             goto FAIL;
         }
-        OsalMemFree(configName.s);
+        UsbFnMemFree(configName.s);
     }
     return 0;
 FAIL:
-    OsalMemFree(configName.s);
+    UsbFnMemFree(configName.s);
     return -1;
 }
 
@@ -743,7 +746,7 @@ static int UsbFnAdapterDelDevice(const char *devName, const char *udcName,
     ret = UsbFnAdapterClosefn(configFd);
 
 FAIL:
-    OsalMemFree(gadgetName.s);
+    UsbFnMemFree(gadgetName.s);
     return ret;
 }
 
@@ -979,7 +982,7 @@ static int UsbFnWriteProp(const char *deviceName,
         HDF_LOGE("%s: close failure!", __func__);
     }
 FAIL:
-    OsalMemFree(info.gadgetName.s);
+    UsbFnMemFree(info.gadgetName.s);
 
     return ret;
 }
@@ -1019,9 +1022,84 @@ static int UsbFnWriteDesString(const char *deviceName,
         HDF_LOGE("%s: close failure!", __func__);
     }
 FAIL:
-    OsalMemFree(info.gadgetName.s);
+    UsbFnMemFree(info.gadgetName.s);
 
     return ret;
+}
+
+void *UsbFnMemAlloc(size_t size)
+{
+    return UsbFnMemCalloc(size);
+}
+
+void *UsbFnMemCalloc(size_t size)
+{
+    void *buf = NULL;
+    struct RawUsbRamTestList *testEntry = NULL;
+    struct RawUsbRamTestList *pos = NULL;
+    uint32_t totalSize = 0;
+
+    buf = OsalMemAlloc(size);
+    if (buf != NULL) {
+        (void)memset_s(buf, size, 0, size);
+    }
+    if (g_usbRamTestFlag) {
+        if (g_usbRamTestHead == NULL) {
+            g_usbRamTestHead = OsalMemAlloc(sizeof(struct RawUsbRamTestList));
+            OsalMutexInit(&g_usbRamTestHead->lock);
+            DListHeadInit(&g_usbRamTestHead->list);
+        }
+        testEntry = OsalMemAlloc(sizeof(struct RawUsbRamTestList));
+        testEntry->address = (uint32_t) buf;
+        testEntry->size = size;
+
+        OsalMutexLock(&g_usbRamTestHead->lock);
+        DListInsertTail(&testEntry->list, &g_usbRamTestHead->list);
+        DLIST_FOR_EACH_ENTRY(pos, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
+            totalSize += pos->size;
+        }
+        OsalMutexUnlock(&g_usbRamTestHead->lock);
+
+        HDF_LOGE("%{public}s add size=%{public}d totalSize=%{public}d", __func__, (uint32_t)size, totalSize);
+    }
+    return buf;
+}
+
+void UsbFnMemFree(void *mem)
+{
+    struct RawUsbRamTestList *pos = NULL;
+    struct RawUsbRamTestList *tmp = NULL;
+    uint32_t totalSize = 0;
+    uint32_t size = 0;
+
+    if (mem != NULL) {
+        free(mem);
+    }
+    else {
+        return;
+    }
+
+    if ((g_usbRamTestFlag == true) && (g_usbRamTestHead != NULL)) {
+        OsalMutexLock(&g_usbRamTestHead->lock);
+        DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
+            if ((NULL != pos) && (pos->address == (uint32_t)mem))
+            {
+                size = pos->size;
+                DListRemove(&pos->list);
+                free(pos);
+                continue;
+            }
+            totalSize += pos->size;
+        }
+        OsalMutexUnlock(&g_usbRamTestHead->lock);
+        HDF_LOGE("%{public}s rm size=%{public}d totalSize=%{public}d", __func__, size, totalSize);
+    }
+}
+
+int UsbFnAdpMemTestTrigger(bool enable)
+{
+    g_usbRamTestFlag = enable;
+    return HDF_SUCCESS;
 }
 
 static struct UsbFnAdapterOps g_usbFnAdapter = {

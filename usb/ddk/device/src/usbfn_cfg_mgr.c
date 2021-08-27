@@ -106,18 +106,18 @@ static int32_t UsbFnCfgMgrParseUsbFnDevDesc(const struct DeviceResourceNode *nod
         return HDF_FAILURE;
     }
     fnDevDesc->deviceDesc =
-        (struct UsbDeviceDescriptor *)OsalMemCalloc(sizeof(struct UsbDeviceDescriptor));
+        (struct UsbDeviceDescriptor *)UsbFnMemCalloc(sizeof(struct UsbDeviceDescriptor));
     if (fnDevDesc->deviceDesc == NULL) {
-        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
         return HDF_FAILURE;
     }
     if (UsbFnCfgMgrParseDevDesc(devDescNode, drsOps, fnDevDesc->deviceDesc)) {
-        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
         goto FAIL;
     }
     return HDF_SUCCESS;
 FAIL:
-    OsalMemFree(fnDevDesc->deviceDesc);
+    UsbFnMemFree(fnDevDesc->deviceDesc);
     return HDF_FAILURE;
 }
 
@@ -141,7 +141,7 @@ static int32_t UsbFnCfgMgrParseString(const struct DeviceResourceNode *node,
         HDF_LOGE("%s: stringList not found!", __func__);
         return HDF_FAILURE;
     }
-    fnString->strings = (struct UsbString *)OsalMemCalloc((strCount + 1) * sizeof(struct UsbString));
+    fnString->strings = (struct UsbString *)UsbFnMemCalloc((strCount + 1) * sizeof(struct UsbString));
     if (fnString->strings == NULL) {
         HDF_LOGE("%s: fnString->strings is null!", __func__);
         goto FREE_USB_STRING;
@@ -170,7 +170,7 @@ static int32_t UsbFnCfgMgrParseString(const struct DeviceResourceNode *node,
 
     return HDF_SUCCESS;
 FREE_USB_STRING:
-    OsalMemFree(fnString->strings);
+    UsbFnMemFree(fnString->strings);
     return HDF_FAILURE;
 }
 
@@ -191,14 +191,14 @@ static struct UsbFnStrings **UsbFnCfgMgrParseStrings(const struct DeviceResource
     if (strTabCount <= 0) {
         return NULL;
     }
-    fnStrings = (struct UsbFnStrings **)OsalMemCalloc((strTabCount + 1) * sizeof(struct UsbFnStrings *));
+    fnStrings = (struct UsbFnStrings **)UsbFnMemCalloc((strTabCount + 1) * sizeof(struct UsbFnStrings *));
     if (fnStrings == NULL) {
         return NULL;
     }
     fnStrings[strTabCount] = NULL;
     for (count = 0; count < strTabCount; count++) {
         fnStrings[count] =
-            (struct UsbFnStrings *)OsalMemCalloc(sizeof(struct UsbFnStrings));
+            (struct UsbFnStrings *)UsbFnMemCalloc(sizeof(struct UsbFnStrings));
         if (fnStrings[count] == NULL) {
             goto FREE_STRING;
         }
@@ -217,9 +217,9 @@ static struct UsbFnStrings **UsbFnCfgMgrParseStrings(const struct DeviceResource
     return fnStrings;
 FREE_STRING:
     while ((--count) >= 0) {
-        OsalMemFree(fnStrings[count]);
+        UsbFnMemFree(fnStrings[count]);
     }
-    OsalMemFree(fnStrings);
+    UsbFnMemFree(fnStrings);
     return NULL;
 }
 
@@ -585,7 +585,7 @@ static struct UsbDescriptorHeader *UsbFnCfgMgrParseDesc(const struct DeviceResou
         HDF_LOGE("%s: read type fail!", __func__);
         return NULL;
     }
-    descBuff = (uint8_t *)OsalMemCalloc(length * sizeof(uint8_t));
+    descBuff = (uint8_t *)UsbFnMemCalloc(length * sizeof(uint8_t));
     if (descBuff == NULL) {
         return NULL;
     }
@@ -593,7 +593,7 @@ static struct UsbDescriptorHeader *UsbFnCfgMgrParseDesc(const struct DeviceResou
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: length = 0x%x, descType = 0x%x Parse fail!",
             __func__, length, descType);
-        OsalMemFree(descBuff);
+        UsbFnMemFree(descBuff);
         return NULL;
     }
 
@@ -617,9 +617,9 @@ static struct UsbDescriptorHeader **UsbFnCfgMgrParseFunDesc(const struct DeviceR
         return NULL;
     }
     descriptors = \
-        (struct UsbDescriptorHeader **)OsalMemCalloc((descCount + 1) * sizeof(struct UsbDescriptorHeader *));
+        (struct UsbDescriptorHeader **)UsbFnMemCalloc((descCount + 1) * sizeof(struct UsbDescriptorHeader *));
     if (descriptors == NULL) {
-        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
         return NULL;
     }
     descriptors[descCount] = NULL;
@@ -639,9 +639,9 @@ static struct UsbDescriptorHeader **UsbFnCfgMgrParseFunDesc(const struct DeviceR
     return descriptors;
 FREE_DESC_HEAD:
     while ((--iCount) >= 0) {
-        OsalMemFree(descriptors[iCount]);
+        UsbFnMemFree(descriptors[iCount]);
     }
-    OsalMemFree(descriptors);
+    UsbFnMemFree(descriptors);
     return NULL;
 }
 
@@ -696,17 +696,17 @@ static int32_t UsbFnCfgMgrParseUsbFnFunctions(const struct DeviceResourceNode *n
         return HDF_FAILURE;
     }
     fnConfig->functions = \
-        (struct UsbFnFunction **)OsalMemCalloc((funCount + 1) * sizeof(struct UsbFnFunction *));
+        (struct UsbFnFunction **)UsbFnMemCalloc((funCount + 1) * sizeof(struct UsbFnFunction *));
     if (fnConfig->functions == NULL) {
-        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
         return HDF_FAILURE;
     }
     fnConfig->functions[funCount] = NULL;
     for (iCount = 0; iCount < funCount; iCount++) {
         fnConfig->functions[iCount] = \
-            (struct UsbFnFunction *)OsalMemCalloc(sizeof(struct UsbFnFunction));
+            (struct UsbFnFunction *)UsbFnMemCalloc(sizeof(struct UsbFnFunction));
         if (fnConfig->functions[iCount] == NULL) {
-            HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
+            HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
             goto FREE_FUNTION;
         }
         ret = drsOps->GetStringArrayElem(node, "functionList", iCount, &funNodeName, NULL);
@@ -728,9 +728,9 @@ static int32_t UsbFnCfgMgrParseUsbFnFunctions(const struct DeviceResourceNode *n
     return HDF_SUCCESS;
 FREE_FUNTION:
     while ((--iCount) > 0) {
-        OsalMemFree((void *)fnConfig->functions[iCount]);
+        UsbFnMemFree((void *)fnConfig->functions[iCount]);
     }
-    OsalMemFree(fnConfig->functions);
+    UsbFnMemFree(fnConfig->functions);
     return HDF_FAILURE;
 }
 
@@ -779,17 +779,17 @@ static int32_t UsbFnCfgMgrParseUsbFnCfgLists(const struct DeviceResourceNode *co
         return HDF_FAILURE;
     }
     fnDevDesc->configs =
-        (struct UsbFnConfiguration **)OsalMemCalloc((configCount + 1) * sizeof(struct UsbFnConfiguration *));
+        (struct UsbFnConfiguration **)UsbFnMemCalloc((configCount + 1) * sizeof(struct UsbFnConfiguration *));
     if (fnDevDesc->configs == NULL) {
-        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
         return HDF_FAILURE;
     }
     fnDevDesc->configs[configCount] = NULL;
     for (count = 0; count < configCount; count++) {
         fnDevDesc->configs[count] = \
-            (struct UsbFnConfiguration *)OsalMemCalloc(sizeof(struct UsbFnConfiguration));
+            (struct UsbFnConfiguration *)UsbFnMemCalloc(sizeof(struct UsbFnConfiguration));
         if (fnDevDesc->configs[count] == NULL) {
-            HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
+            HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
             goto FREE_CONFIG;
         }
         ret = drsOps->GetStringArrayElem(configNode, "configList", count, &childConfigNodeName, NULL);
@@ -812,9 +812,9 @@ static int32_t UsbFnCfgMgrParseUsbFnCfgLists(const struct DeviceResourceNode *co
     return HDF_SUCCESS;
 FREE_CONFIG:
     while ((--count) >= 0) {
-        OsalMemFree(fnDevDesc->deviceStrings[count]);
+        UsbFnMemFree(fnDevDesc->deviceStrings[count]);
     }
-    OsalMemFree(fnDevDesc->deviceStrings);
+    UsbFnMemFree(fnDevDesc->deviceStrings);
     return HDF_FAILURE;
 }
 
@@ -861,9 +861,9 @@ struct UsbFnDeviceDesc *UsbFnCfgMgrGetInstanceFromHCS(const struct DeviceResourc
     }
 
     usbDevDesc =
-        (struct UsbFnDeviceDesc *)OsalMemCalloc(sizeof(*usbDevDesc));
+        (struct UsbFnDeviceDesc *)UsbFnMemCalloc(sizeof(*usbDevDesc));
     if (usbDevDesc == NULL) {
-        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
         return NULL;
     }
     ret = UsbFnCfgMgrParseUsbFnDevDesc(node, usbDevDesc);
@@ -885,8 +885,8 @@ struct UsbFnDeviceDesc *UsbFnCfgMgrGetInstanceFromHCS(const struct DeviceResourc
     return usbDevDesc;
 
  FAIL_DEV_STRING:
-    OsalMemFree(usbDevDesc->deviceDesc);
-    OsalMemFree(usbDevDesc);
+    UsbFnMemFree(usbDevDesc->deviceDesc);
+    UsbFnMemFree(usbDevDesc);
     return NULL;
 }
 
@@ -895,9 +895,9 @@ void UsbFnCfgMgrFreeFnStrings(struct UsbFnStrings **fnStrings)
     int8_t iCount;
 
     for (iCount = 0; (fnStrings[iCount] != NULL); iCount++) {
-        OsalMemFree(fnStrings[iCount]);
+        UsbFnMemFree(fnStrings[iCount]);
     }
-    OsalMemFree(fnStrings);
+    UsbFnMemFree(fnStrings);
 }
 
 void UsbFnCfgMgrFreeFuncDescHead(struct UsbDescriptorHeader **descHeads)
@@ -905,9 +905,9 @@ void UsbFnCfgMgrFreeFuncDescHead(struct UsbDescriptorHeader **descHeads)
     int8_t iCount;
 
     for (iCount = 0; (descHeads[iCount] != NULL); iCount++) {
-        OsalMemFree(descHeads[iCount]);
+        UsbFnMemFree(descHeads[iCount]);
     }
-    OsalMemFree(descHeads);
+    UsbFnMemFree(descHeads);
 }
 
 void UsbFnCfgMgrFreeFunctions(struct UsbFnFunction **fnFunctions)
@@ -930,9 +930,9 @@ void UsbFnCfgMgrFreeFunctions(struct UsbFnFunction **fnFunctions)
         if (fnFunctions[iCount]->sspDescriptors) {
             UsbFnCfgMgrFreeFuncDescHead(fnFunctions[iCount]->sspDescriptors);
         }
-        OsalMemFree(fnFunctions[iCount]);
+        UsbFnMemFree(fnFunctions[iCount]);
     }
-    OsalMemFree(fnFunctions);
+    UsbFnMemFree(fnFunctions);
 }
 
 void UsbFnCfgMgrFreeConfigs(struct UsbFnConfiguration **fnConfigs)
@@ -943,9 +943,9 @@ void UsbFnCfgMgrFreeConfigs(struct UsbFnConfiguration **fnConfigs)
         if (fnConfigs[iCount]->functions) {
             UsbFnCfgMgrFreeFunctions(fnConfigs[iCount]->functions);
         }
-        OsalMemFree(fnConfigs[iCount]);
+        UsbFnMemFree(fnConfigs[iCount]);
     }
-    OsalMemFree(fnConfigs);
+    UsbFnMemFree(fnConfigs);
 }
 
 void UsbFnCfgMgrFreeUsbFnDeviceDesc(struct UsbFnDeviceDesc *fnDevDesc)
@@ -955,7 +955,7 @@ void UsbFnCfgMgrFreeUsbFnDeviceDesc(struct UsbFnDeviceDesc *fnDevDesc)
         return;
     }
     if (fnDevDesc->deviceDesc) {
-        OsalMemFree(fnDevDesc->deviceDesc);
+        UsbFnMemFree(fnDevDesc->deviceDesc);
     }
     if (fnDevDesc->deviceStrings) {
         UsbFnCfgMgrFreeFnStrings(fnDevDesc->deviceStrings);
@@ -963,7 +963,7 @@ void UsbFnCfgMgrFreeUsbFnDeviceDesc(struct UsbFnDeviceDesc *fnDevDesc)
     if (fnDevDesc->configs) {
         UsbFnCfgMgrFreeConfigs(fnDevDesc->configs);
     }
-    OsalMemFree(fnDevDesc);
+    UsbFnMemFree(fnDevDesc);
 }
 
 static int32_t IsPropRegisted(const struct UsbFnInterface *intf, const char *name)
@@ -1284,9 +1284,9 @@ int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf,
             }
         }
     } else {
-        fnCfgPropMgr = OsalMemCalloc(sizeof(struct UsbFnCfgPropMgr));
+        fnCfgPropMgr = UsbFnMemCalloc(sizeof(struct UsbFnCfgPropMgr));
         if (fnCfgPropMgr == NULL) {
-            HDF_LOGE("%s:%d OsalMemCalloc failure!", __func__, __LINE__);
+            HDF_LOGE("%s:%d UsbFnMemCalloc failure!", __func__, __LINE__);
             return HDF_FAILURE;
         }
     }

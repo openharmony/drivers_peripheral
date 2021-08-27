@@ -33,6 +33,10 @@
 #define SLEEP_100MS 100000
 #define DELAY_100MS 100
 #define OPEN_CNT 30
+
+static struct RawUsbRamTestList *g_usbRamTestHead = NULL;
+static bool g_usbRamTestFlag = false;
+
 static bool IsDirExist(const char *dir)
 {
     if (NULL == dir) {
@@ -123,11 +127,14 @@ static int UsbFnWriteFile(const char *path, const char *str)
     }
     ret = fwrite(str, strlen(str), 1, fp);
     if (ret != 1) {
-        fclose(fp);
+        if (fclose(fp)) {
+            return HDF_FAILURE;
+        }
         return HDF_FAILURE;
     }
-    fclose(fp);
-
+    if (fclose(fp)) {
+        return HDF_FAILURE;
+    }
     return 0;
 }
 
@@ -247,10 +254,14 @@ static int UsbFnReadFile(const char *path, char *str, uint16_t len)
     }
     ret = fread(str, len, 1, fp);
     if (ret < 0) {
-        fclose(fp);
+        if (fclose(fp)) {
+            return HDF_FAILURE;
+        }
         return HDF_ERR_IO;
     }
-    fclose(fp);
+    if (fclose(fp)) {
+        return HDF_FAILURE;
+    }
     return 0;
 }
 
@@ -445,7 +456,7 @@ static int UsbFnWriteStrings(int ep0, struct UsbFnStrings **strings)
     struct UsbFunctionfsStringsHead headerStr = {0};
 
     GetHeaderStr(strings, &headerStr);
-    str = OsalMemCalloc(headerStr.length);
+    str = UsbFnMemCalloc(headerStr.length);
     if (str == NULL) {
         return HDF_ERR_MALLOC_FAIL;
     }
@@ -482,10 +493,10 @@ static int UsbFnWriteStrings(int ep0, struct UsbFnStrings **strings)
     if (write(ep0, str, headerStr.length) < 0) {
         goto ERR;
     }
-    OsalMemFree(str);
+    UsbFnMemFree(str);
     return 0;
 ERR:
-    OsalMemFree(str);
+    UsbFnMemFree(str);
     return HDF_FAILURE;
 }
 
@@ -585,9 +596,9 @@ static int UsbFnAdapterCreatPipes(int ep0, const struct UsbFnFunction *func)
 
     GetCountAndHead(&header, &fsCount, &hsCount, &ssCount, func);
 
-    dec = OsalMemCalloc(header.length);
+    dec = UsbFnMemCalloc(header.length);
     if (dec == NULL) {
-        HDF_LOGE("%s: OsalMemCalloc failure!", __func__);
+        HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
     whereDec = dec;
@@ -621,11 +632,11 @@ static int UsbFnAdapterCreatPipes(int ep0, const struct UsbFnFunction *func)
 
     if (write(ep0, dec, header.length) < 0) {
         HDF_LOGE("unable do write descriptors");
-        OsalMemFree(dec);
+        UsbFnMemFree(dec);
         return HDF_ERR_IO;
     }
 
-    OsalMemFree(dec);
+    UsbFnMemFree(dec);
     ret = UsbFnWriteStrings(ep0, func->strings);
 
     usleep(SLEEP_100MS);
@@ -1163,13 +1174,13 @@ static void Ep0Event(struct UsbFnEventAll *event, struct pollfd *pfds)
     int ret;
     uint8_t i;
     for (i = 0; i < event->ep0Num; i++) {
-        if (pfds[i].revents & POLLIN) {
+        if ((uint32_t)pfds[i].revents & POLLIN) {
             ret = read(event->ep0[i], &event->ep0Event[i].ctrlEvent, sizeof(struct UsbFnCtrlEvent));
             if (!ret) {
                 HDF_LOGE("unable to read event from ep0");
             }
             event->ep0Event[i].type = USB_EP0_CTRL_EVENT;
-        } else if (pfds[i].revents & POLLOUT) {
+        } else if ((uint32_t)pfds[i].revents & POLLOUT) {
             ret = ioctl(event->ep0[i], FUNCTIONFS_ENDPOINT_GET_EP0_EVENT, &event->ep0Event[i].reqEvent);
             if (!ret) {
                 HDF_LOGE("unable to read reqEvent from ep0");
@@ -1205,13 +1216,13 @@ static int UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int timeout)
     if (event->ep0Num + event->epNum == 0) {
         return HDF_ERR_INVALID_PARAM;
     }
-    pfds = OsalMemCalloc((event->ep0Num + event->epNum) * sizeof(struct pollfd));
+    pfds = UsbFnMemCalloc((event->ep0Num + event->epNum) * sizeof(struct pollfd));
     if (pfds == NULL) {
         return HDF_ERR_MALLOC_FAIL;
     }
     for (i = 0; i < event->ep0Num; i++) {
         if (event->ep0[i] <= 0) {
-            OsalMemFree(pfds);
+            UsbFnMemFree(pfds);
             HDF_LOGE("%s: ep[%d] = %d", __func__, i, event->ep0[i]);
             return HDF_ERR_INVALID_PARAM;
         }
@@ -1220,7 +1231,7 @@ static int UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int timeout)
     }
     for (i = 0; i < event->epNum; i++) {
         if (event->epx[i] <= 0) {
-            OsalMemFree(pfds);
+            UsbFnMemFree(pfds);
             HDF_LOGE("%s: ep[%d] = %d", __func__, i, event->epx[i]);
             return HDF_ERR_INVALID_PARAM;
         }
@@ -1229,16 +1240,16 @@ static int UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int timeout)
     }
     ret = poll(pfds, event->ep0Num + event->epNum, timeout);
     if (ret == 0) {
-        OsalMemFree(pfds);
+        UsbFnMemFree(pfds);
         return HDF_ERR_TIMEOUT;
     } else if (ret < 0) {
         HDF_LOGE("%s: interrupt", __func__);
-        OsalMemFree(pfds);
+        UsbFnMemFree(pfds);
         return HDF_ERR_IO;
     }
     Ep0Event(event, pfds);
     EpEvent(event, pfds);
-    OsalMemFree(pfds);
+    UsbFnMemFree(pfds);
     return 0;
 }
 
@@ -1248,6 +1259,81 @@ static int UsbFnAdapterRequestGetStatus(int ep, const struct IoData *ioData)
         return HDF_ERR_INVALID_PARAM;
     }
     return ioctl(ep, FUNCTIONFS_ENDPOINT_GET_REQ_STATUS, ioData);
+}
+
+void *UsbFnMemAlloc(size_t size)
+{
+    return UsbFnMemCalloc(size);
+}
+
+void *UsbFnMemCalloc(size_t size)
+{
+    void *buf = NULL;
+    struct RawUsbRamTestList *testEntry = NULL;
+    struct RawUsbRamTestList *pos = NULL;
+    uint32_t totalSize = 0;
+
+    buf = OsalMemAlloc(size);
+    if (buf != NULL) {
+        (void)memset_s(buf, size, 0, size);
+    }
+    if (g_usbRamTestFlag) {
+        if (g_usbRamTestHead == NULL) {
+            g_usbRamTestHead = OsalMemAlloc(sizeof(struct RawUsbRamTestList));
+            OsalMutexInit(&g_usbRamTestHead->lock);
+            DListHeadInit(&g_usbRamTestHead->list);
+        }
+        testEntry = OsalMemAlloc(sizeof(struct RawUsbRamTestList));
+        testEntry->address = (uint32_t) buf;
+        testEntry->size = size;
+
+        OsalMutexLock(&g_usbRamTestHead->lock);
+        DListInsertTail(&testEntry->list, &g_usbRamTestHead->list);
+        DLIST_FOR_EACH_ENTRY(pos, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
+            totalSize += pos->size;
+        }
+        OsalMutexUnlock(&g_usbRamTestHead->lock);
+
+        HDF_LOGE("%{public}s add size=%{public}d totalSize=%{public}d", __func__, (uint32_t)size, totalSize);
+    }
+    return buf;
+}
+
+void UsbFnMemFree(void *mem)
+{
+    struct RawUsbRamTestList *pos = NULL;
+    struct RawUsbRamTestList *tmp = NULL;
+    uint32_t totalSize = 0;
+    uint32_t size = 0;
+
+    if (mem != NULL) {
+        free(mem);
+    }
+    else {
+        return;
+    }
+
+    if ((g_usbRamTestFlag == true) && (g_usbRamTestHead != NULL)) {
+        OsalMutexLock(&g_usbRamTestHead->lock);
+        DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
+            if ((NULL != pos) && (pos->address == (uint32_t)mem))
+            {
+                size = pos->size;
+                DListRemove(&pos->list);
+                free(pos);
+                continue;
+            }
+            totalSize += pos->size;
+        }
+        OsalMutexUnlock(&g_usbRamTestHead->lock);
+        HDF_LOGE("%{public}s rm size=%{public}d totalSize=%{public}d", __func__, size, totalSize);
+    }
+}
+
+int UsbFnAdpMemTestTrigger(bool enable)
+{
+    g_usbRamTestFlag = enable;
+    return HDF_SUCCESS;
 }
 
 static struct UsbFnAdapterOps g_usbFnAdapter = {

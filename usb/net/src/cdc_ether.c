@@ -309,7 +309,7 @@ out:
 static int32_t EcmOpen(struct EcmDevice *ecm, struct HdfSBuf *data)
 {
     int ret;
-    int32_t cmdType;
+    int32_t cmdType = HOST_ECM_ADD_INTERFACE;
 
     if ((ecm == NULL) || (data == NULL)) {
         HDF_LOGE("%s: invalid parma", __func__);
@@ -419,7 +419,7 @@ static int32_t EcmClose(struct EcmDevice *ecm, struct HdfSBuf *data)
 static int32_t EcmWrite(struct EcmDevice *ecm, struct HdfSBuf *data)
 {
     uint32_t size;
-    uint32_t totalSize;
+    uint32_t totalSize = 0;
     int32_t ret;
     uint8_t *tmp = NULL;
     int wbn;
@@ -445,7 +445,7 @@ static int32_t EcmWrite(struct EcmDevice *ecm, struct HdfSBuf *data)
             HDF_LOGE("%s:%d no write buf", __func__, __LINE__);
             return size;
         }
-        if (ECM_NW > wbn) {
+        if (wbn < ECM_NW) {
             wb = &ecm->wb[wbn];
         }
         if (size > ecm->writeSize){
@@ -455,15 +455,17 @@ static int32_t EcmWrite(struct EcmDevice *ecm, struct HdfSBuf *data)
             len = size;
             size = 0;
         }
-        ret = memcpy_s(wb->buf, ecm->writeSize, tmp, len);
-        if (ret) {
-            HDF_LOGE("%s:%d memcpy_s fail", __func__, __LINE__);
-            return size;
+        if (wb->buf) {
+            ret = memcpy_s(wb->buf, ecm->writeSize, tmp, len);
+            if (ret) {
+                HDF_LOGE("%s:%d memcpy_s fail", __func__, __LINE__);
+                return size;
+            }
+            tmp += len;
+            wb->len = len;
+            wb->ecm = ecm;
+            ret = EcmStartWb(ecm, wb);
         }
-        tmp += len;
-        wb->len = len;
-        wb->ecm = ecm;
-        ret = EcmStartWb(ecm, wb);
     }
 
     return totalSize;
@@ -476,8 +478,8 @@ static int32_t EcmGetMac(struct EcmDevice *ecm, struct HdfSBuf *reply)
 
 static int EcmAddOrRemoveInterface(int cmd, struct EcmDevice *ecm, struct HdfSBuf *data)
 {
-    UsbInterfaceStatus status;
-    uint32_t index;
+    UsbInterfaceStatus status = USB_INTERFACE_STATUS_NORMAL;
+    uint32_t index = 0;
     if (ecm == NULL) {
         HDF_LOGE("%d: invalid parma", __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -871,7 +873,7 @@ int32_t EcmAllocIntReq(struct EcmDevice *ecm)
     int32_t ret;
     struct UsbRequestParams intParmas = {};
     if (ecm == NULL || ecm->intPipe == NULL) {
-        return HDF_FAILURE; 
+        return HDF_FAILURE;
     }
     ecm->notifyReq = UsbAllocRequest(InterfaceIdToHandle(ecm, ecm->intPipe->interfaceId), 0, ecm->intSize);
     if (!ecm->notifyReq) {
@@ -886,7 +888,7 @@ int32_t EcmAllocIntReq(struct EcmDevice *ecm)
     intParmas.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
     intParmas.timeout = USB_CTRL_SET_TIMEOUT;
     intParmas.dataReq.numIsoPackets = 0;
-    intParmas.dataReq.directon = (ecm->intPipe->pipeDirection >> USB_DIR_OFFSET) & 0x1;
+    intParmas.dataReq.directon = (((uint32_t)(ecm->intPipe->pipeDirection)) >> USB_DIR_OFFSET) & 0x1;
     intParmas.dataReq.length = ecm->intSize;
     ret = UsbFillRequest(ecm->notifyReq, InterfaceIdToHandle(ecm, ecm->intPipe->interfaceId), &intParmas);
     if (ret != HDF_SUCCESS) {
@@ -914,7 +916,7 @@ void EcmAllocReadReq(struct EcmDevice *ecm)
         readParmas.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
         readParmas.timeout = USB_CTRL_SET_TIMEOUT;
         readParmas.dataReq.numIsoPackets = 0;
-        readParmas.dataReq.directon = (ecm->dataInPipe->pipeDirection >> USB_DIR_OFFSET) & 0x1;
+        readParmas.dataReq.directon = (((uint32_t)(ecm->dataInPipe->pipeDirection)) >> USB_DIR_OFFSET) & 0x1;
         readParmas.dataReq.length = ecm->readSize;
         ret = UsbFillRequest(ecm->readReq[i], InterfaceIdToHandle(ecm, ecm->dataInPipe->interfaceId), &readParmas);
         if (ret != HDF_SUCCESS) {

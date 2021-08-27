@@ -181,16 +181,16 @@ static int AllocInterfaceAndFuncMgr(struct UsbFnDeviceMgr *fnDevMgr, struct UsbF
         return HDF_ERR_IO;
     }
 
-    fnDevMgr->interfaceMgr = OsalMemCalloc(fnDevMgr->fnDev.numInterfaces * sizeof(struct UsbFnInterfaceMgr));
+    fnDevMgr->interfaceMgr = UsbFnMemCalloc(fnDevMgr->fnDev.numInterfaces * sizeof(struct UsbFnInterfaceMgr));
     if (fnDevMgr->interfaceMgr == NULL) {
-        HDF_LOGE("%s:%d OsalMemCalloc failure!", __func__, __LINE__);
+        HDF_LOGE("%s:%d UsbFnMemCalloc failure!", __func__, __LINE__);
         return HDF_ERR_IO;
     }
 
-    fnDevMgr->funcMgr = OsalMemCalloc(fnDevMgr->numFunc * sizeof(struct UsbFnFuncMgr));
+    fnDevMgr->funcMgr = UsbFnMemCalloc(fnDevMgr->numFunc * sizeof(struct UsbFnFuncMgr));
     if (fnDevMgr->funcMgr == NULL) {
-        HDF_LOGE("%s:%d OsalMemCalloc failure!", __func__, __LINE__);
-        OsalMemFree(fnDevMgr->interfaceMgr);
+        HDF_LOGE("%s:%d UsbFnMemCalloc failure!", __func__, __LINE__);
+        UsbFnMemFree(fnDevMgr->interfaceMgr);
         return HDF_ERR_IO;
     }
     return 0;
@@ -208,9 +208,9 @@ const struct UsbFnDeviceMgr *UsbFnMgrDeviceCreate(const char *udcName,
         return NULL;
     }
 
-    fnDevMgr = OsalMemCalloc(sizeof(struct UsbFnDeviceMgr));
+    fnDevMgr = UsbFnMemCalloc(sizeof(struct UsbFnDeviceMgr));
     if (fnDevMgr == NULL) {
-        HDF_LOGE("%s:%d OsalMemCalloc failure!", __func__, __LINE__);
+        HDF_LOGE("%s:%d UsbFnMemCalloc failure!", __func__, __LINE__);
         return NULL;
     }
 
@@ -242,10 +242,10 @@ const struct UsbFnDeviceMgr *UsbFnMgrDeviceCreate(const char *udcName,
     return fnDevMgr;
 
 FREE_INTF_FUNC_MGR:
-    OsalMemFree(fnDevMgr->interfaceMgr);
-    OsalMemFree(fnDevMgr->funcMgr);
+    UsbFnMemFree(fnDevMgr->interfaceMgr);
+    UsbFnMemFree(fnDevMgr->funcMgr);
 FREE_DEVMGR:
-    OsalMemFree(fnDevMgr);
+    UsbFnMemFree(fnDevMgr);
     return NULL;
 }
 
@@ -284,18 +284,18 @@ int UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
     UsbFnCfgMgrUnRegisterAllProp();
 
     if (fnDevMgr->funcMgr != NULL) {
-        OsalMemFree(fnDevMgr->funcMgr);
+        UsbFnMemFree(fnDevMgr->funcMgr);
         fnDevMgr->funcMgr = NULL;
     }
     if (fnDevMgr->interfaceMgr != NULL) {
-        OsalMemFree(fnDevMgr->interfaceMgr);
+        UsbFnMemFree(fnDevMgr->interfaceMgr);
         fnDevMgr->interfaceMgr = NULL;
     }
     if (fnDevMgr->node) {
         UsbFnCfgMgrFreeUsbFnDeviceDesc(fnDevMgr->des);
         fnDevMgr->des = NULL;
     }
-    OsalMemFree(fnDevMgr);
+    UsbFnMemFree(fnDevMgr);
     fnDevMgr = NULL;
     return 0;
 }

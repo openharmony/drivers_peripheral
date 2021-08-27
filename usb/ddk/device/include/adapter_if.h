@@ -223,6 +223,17 @@ struct UsbFnAdapterOps {
         uint16_t lang, const char *stringName, const char *stringValue);
 };
 
+struct RawUsbRamTestList {
+    uint32_t address;
+    uint32_t size;
+    struct DListHead list;
+    struct OsalMutex lock;
+};
+
 struct UsbFnAdapterOps *UsbFnAdapterGetOps(void);
+void *UsbFnMemAlloc(size_t size);
+void *UsbFnMemCalloc(size_t size);
+void UsbFnMemFree(void *mem);
+int UsbFnAdpMemTestTrigger(bool enable);
 
 #endif /* USBFN_ADAPTER_H */

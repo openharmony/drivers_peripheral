@@ -38,6 +38,9 @@ static int32_t g_inFifo = 0;
 /* Usb Serial Related Functions */
 static int32_t UsbSerialStartTx(struct UsbSerial *port)
 {
+    if (port == NULL) {
+        return HDF_FAILURE;
+    }
     struct DListHead *pool = &port->writePool;
     int32_t ret;
     if (port->acm == NULL) {
@@ -50,6 +53,9 @@ static int32_t UsbSerialStartTx(struct UsbSerial *port)
             break;
         }
         req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
+        if (req == NULL) {
+            break;
+        }
         len = DataFifoRead(&port->writeFifo, req->buf, port->acm->dataInPipe.maxPacketSize);
         if (len == 0) {
             break;
@@ -160,13 +166,116 @@ static void UsbSerialFreeRequests(struct DListHead *head, int *allocated)
     }
 }
 
+static bool g_isStartRead = false;
+static bool g_isReadDone = false;
+static uint64_t g_readCnt = 0;
+struct timeval g_readTimeStart, g_readTimeEnd;
+static float g_readSpeed = 0;
+static bool isGetReadTimeStart = false;
 static void UsbSerialReadComplete(uint8_t pipe, struct UsbFnRequest *req)
 {
     struct UsbSerial *port = (struct UsbSerial *)req->context;
+    if (g_isReadDone != true && g_isStartRead == true && req->status == USB_REQUEST_COMPLETED) {
+        g_readCnt += req->actual;
+        if (isGetReadTimeStart == false) {
+            isGetReadTimeStart = true;
+            gettimeofday(&g_readTimeStart, NULL);
+        }
+    }
     OsalMutexLock(&port->lock);
     DListInsertTail(&req->list, &port->readQueue);
     UsbSerialRxPush(port);
     OsalMutexUnlock(&port->lock);
+}
+
+static int SpeedReadThread(void *arg)
+{
+    g_readCnt = 0;
+    g_isReadDone = false;
+    g_readSpeed = 0;
+    isGetReadTimeStart = false;
+    double timeUse;
+    double usec = 1000000;
+    double k = 1024;
+    struct timeval timeTmp;
+    while (!g_isReadDone) {
+        if (g_readCnt == 0) {
+            OsalSleep(1);
+            continue;
+        } else {
+            OsalSleep(1);
+        }
+        gettimeofday(&timeTmp, NULL);
+        timeUse = (double)(timeTmp.tv_sec - g_readTimeStart.tv_sec) +
+        (double)timeTmp.tv_usec / usec - (double)g_readTimeStart.tv_usec / usec;
+        g_readSpeed = (float)((double)g_readCnt / k / k / timeUse);
+    }
+    timeUse = (double)(g_readTimeEnd.tv_sec - g_readTimeStart.tv_sec) +
+        (double)g_readTimeEnd.tv_usec / usec - (double)g_readTimeStart.tv_usec / usec;
+    HDF_LOGD("timeUse = %lf\n", timeUse);
+    g_readSpeed = (float)((double)g_readCnt / k / k / timeUse);
+    HDF_LOGD("%s: g_speed = %f MB/s", __func__, g_readSpeed);
+    return HDF_SUCCESS;
+}
+
+#define HDF_PROCESS_STACK_SIZE 10000
+struct OsalThread g_threadRead;
+static int StartThreadReadSpeed(struct UsbSerial *port)
+{
+    int ret;
+    struct OsalThreadParam threadCfg;
+    memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
+    threadCfg.name = "speed read process";
+    threadCfg.priority = OSAL_THREAD_PRI_LOW;
+    threadCfg.stackSize = HDF_PROCESS_STACK_SIZE;
+
+    ret = OsalThreadCreate(&g_threadRead, (OsalThreadEntry)SpeedReadThread, port);
+    if (HDF_SUCCESS != ret) {
+        HDF_LOGE("%s:%d OsalThreadCreate faile, ret=%d ", __func__, __LINE__, ret);
+        return HDF_ERR_DEVICE_BUSY;
+    }
+
+    ret = OsalThreadStart(&g_threadRead, &threadCfg);
+    if (HDF_SUCCESS != ret) {
+        HDF_LOGE("%s:%d OsalThreadStart faile, ret=%d ", __func__, __LINE__, ret);
+        return HDF_ERR_DEVICE_BUSY;
+    }
+    return 0;
+}
+
+static int32_t UsbSerialGetTempReadSpeed(struct UsbSerial *port, struct HdfSBuf *reply)
+{
+    if (!HdfSbufWriteFloat(reply, g_readSpeed)) {
+        HDF_LOGE("%s: HdfSbufWriteFloat failed", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t UsbSerialGetTempReadSpeedInt(struct UsbSerial *port, struct HdfSBuf *reply)
+{
+    uint32_t calc = 10000;
+    if (!HdfSbufWriteUint32(reply, (uint32_t)(g_readSpeed * calc))) {
+        HDF_LOGE("%s: HdfSbufWriteUint32 failed", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t UsbSerialReadSpeedDone(struct UsbSerial *port)
+{
+    gettimeofday(&g_readTimeEnd, NULL);
+    g_isReadDone = true;
+    g_isStartRead = false;
+    return HDF_SUCCESS;
+}
+
+static int32_t UsbSerialReadSpeedStart(struct UsbSerial *port)
+{
+    g_inFifo = 0;
+    g_isStartRead = true;
+    StartThreadReadSpeed(port);
+    return HDF_SUCCESS;
 }
 
 static void UsbSerialWriteComplete(uint8_t pipe, struct UsbFnRequest *req)
@@ -238,7 +347,7 @@ static int32_t UsbSerialAllocWriteRequests(struct UsbSerial *port, int num)
 static int32_t UsbSerialStartIo(struct UsbSerial *port)
 {
     struct DListHead *head = &port->readPool;
-    int32_t          ret;
+    int32_t          ret = HDF_SUCCESS;
     uint32_t         started;
 
     /* allocate requests for read/write */
@@ -356,19 +465,22 @@ int32_t UsbSerialClose(struct UsbSerial *port)
     return HDF_SUCCESS;
 }
 
-#define TIME_SPEED 30
 #define WRITE_SPEED_REQ_NUM 8
 struct UsbFnRequest  *g_req[WRITE_SPEED_REQ_NUM] = {NULL};
 static bool g_isWriteDone = false;
-static uint32_t g_writeCnt = 0;
+static uint64_t g_writeCnt = 0;
 struct timeval g_timeStart, g_timeEnd;
 static float g_speed = 0;
-
+static bool isGetWriteTimeStart = false;
 static void UsbSerialWriteSpeedComplete(uint8_t pipe, struct UsbFnRequest *req)
 {
     switch (req->status) {
         case USB_REQUEST_COMPLETED:
             g_writeCnt += req->actual;
+            if (isGetWriteTimeStart == false) {
+                isGetWriteTimeStart = true;
+                gettimeofday(&g_timeStart, NULL);
+            }
             if (g_isWriteDone) {
                 UsbFnFreeRequest(req);
             } else {
@@ -390,13 +502,14 @@ static int SpeedThread(void *arg)
     int i;
     g_writeCnt = 0;
     g_isWriteDone = false;
+    isGetWriteTimeStart = false;
+    g_speed = 0;
     double timeUse;
-    uint32_t timeCnt = 0;
     double usec = 1000000;
     double k = 1024;
     struct timeval timeTmp;
     struct UsbSerial *port = (struct UsbSerial *)arg;
-    gettimeofday(&g_timeStart, NULL);
+
     for (i = 0; i < WRITE_SPEED_REQ_NUM; i++) {
         g_req[i] = UsbFnAllocRequest(port->acm->dataIface.handle, port->acm->dataInPipe.id,
             port->acm->dataInPipe.maxPacketSize);
@@ -410,10 +523,11 @@ static int SpeedThread(void *arg)
         UsbFnSubmitRequestAsync(g_req[i]);
     }
     while (!g_isWriteDone) {
-        OsalSleep(1);
-        if (++timeCnt > TIME_SPEED) {
-            g_isWriteDone = true;
-            gettimeofday(&g_timeEnd, NULL);
+        if (g_writeCnt == 0) {
+            OsalSleep(1);
+            continue;
+        } else {
+            OsalSleep(1);
         }
         gettimeofday(&timeTmp, NULL);
         timeUse = (double)(timeTmp.tv_sec - g_timeStart.tv_sec) +
@@ -428,7 +542,6 @@ static int SpeedThread(void *arg)
     return HDF_SUCCESS;
 }
 
-#define HDF_PROCESS_STACK_SIZE 10000
 struct OsalThread     g_thread;
 static int StartThreadSpeed(struct UsbSerial *port)
 {
@@ -473,24 +586,16 @@ static int32_t UsbSerialGetTempSpeedInt(struct UsbSerial *port, struct HdfSBuf *
     return HDF_SUCCESS;
 }
 
-static int32_t UsbSerialSpeedDone(struct UsbSerial *port, struct HdfSBuf *reply)
+static int32_t UsbSerialSpeedDone(struct UsbSerial *port)
 {
-    if (!HdfSbufWriteUint8(reply, (uint8_t)g_isWriteDone)) {
-        HDF_LOGE("%s: HdfSbufWriteUint8 failed", __func__);
-        return HDF_FAILURE;
-    }
+    gettimeofday(&g_timeEnd, NULL);
+    g_isWriteDone = true;
     return HDF_SUCCESS;
 }
 
 static int32_t UsbSerialSpeed(struct UsbSerial *port)
 {
     StartThreadSpeed(port);
-    return HDF_SUCCESS;
-}
-
-static int32_t UsbSerialReadSpeedStart(void)
-{
-    g_inFifo = 0;
     return HDF_SUCCESS;
 }
 
@@ -740,11 +845,17 @@ static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
         case USB_SERIAL_WRITE_GET_TEMP_SPEED:
             return UsbSerialGetTempSpeed(port, reply);
         case USB_SERIAL_WRITE_SPEED_DONE:
-            return UsbSerialSpeedDone(port, reply);
+            return UsbSerialSpeedDone(port);
         case USB_SERIAL_WRITE_GET_TEMP_SPEED_UINT32:
             return UsbSerialGetTempSpeedInt(port, reply);
         case USB_SERIAL_READ_SPEED:
-            return UsbSerialReadSpeedStart();
+            return UsbSerialReadSpeedStart(port);
+        case USB_SERIAL_READ_GET_TEMP_SPEED:
+            return UsbSerialGetTempReadSpeed(port, reply);
+        case USB_SERIAL_READ_SPEED_DONE:
+            return UsbSerialReadSpeedDone(port);
+        case USB_SERIAL_READ_GET_TEMP_SPEED_UINT32:
+            return UsbSerialGetTempReadSpeedInt(port, reply);
         default:
             return HDF_ERR_NOT_SUPPORT;
     }
@@ -762,6 +873,9 @@ static void AcmDeviceDestroy(struct UsbAcmDevice *acm)
 
 static void AcmCtrlComplete(uint8_t pipe, struct UsbFnRequest *req)
 {
+    if (req == NULL) {
+        return;
+    }
     struct CtrlInfo *ctrlInfo = (struct CtrlInfo *)req->context;
     struct UsbAcmDevice *acm = ctrlInfo->acm;
     if ((req == NULL) || (req->status != USB_REQUEST_COMPLETED)) {
@@ -953,6 +1067,9 @@ static struct UsbFnRequest *AcmGetCtrlReq(struct UsbAcmDevice *acm)
 
 static void AcmSetup(struct UsbAcmDevice *acm, struct UsbFnCtrlRequest *setup)
 {
+    if (acm == NULL || setup == NULL) {
+        return;
+    }
     struct UsbFnRequest *req = NULL;
     struct CtrlInfo *ctrlInfo = NULL;
     uint16_t value  = Le16ToCpu(setup->value);
@@ -977,7 +1094,9 @@ static void AcmSetup(struct UsbAcmDevice *acm, struct UsbFnCtrlRequest *setup)
             if (acm->lineCoding.dwDTERate == 0) {
                 acm->lineCoding = acm->port->lineCoding;
             }
-            memcpy_s(req->buf, req->length, &acm->lineCoding, ret);
+            if (memcpy_s(req->buf, req->length, &acm->lineCoding, ret) != EOK) {
+                return;
+            }
             break;
         case USB_DDK_CDC_REQ_SET_CONTROL_LINE_STATE:
             ret = 0;
@@ -1088,7 +1207,7 @@ static int32_t AcmSendNotifyRequest(struct UsbAcmDevice *acm, uint8_t type,
 {
     struct UsbFnRequest *req = acm->notifyReq;
     struct UsbCdcNotification *notify = NULL;
-    int ret;
+    int ret = HDF_SUCCESS;
 
     if (req == NULL || req->buf == NULL) {
         HDF_LOGE("%s: req is null", __func__);
@@ -1105,7 +1224,9 @@ static int32_t AcmSendNotifyRequest(struct UsbAcmDevice *acm, uint8_t type,
     notify->wValue = CpuToLe16(value);
     notify->wIndex = CpuToLe16(acm->ctrlIface.fn->info.index);
     notify->wLength = CpuToLe16(length);
-    memcpy_s((void *)(notify + 1), length, data, length);
+    if (memcpy_s((void *)(notify + 1), length, data, length)  != EOK) {
+        return HDF_FAILURE;
+    }
 
     ret = UsbFnSubmitRequestAsync(req);
     if (ret != HDF_SUCCESS) {
@@ -1241,7 +1362,9 @@ static int32_t AcmParseEachIface(struct UsbAcmDevice *acm, struct UsbFnDevice *f
 {
     struct UsbFnInterface *fnIface = NULL;
     uint32_t i;
-
+    if (fnDev == NULL) {
+        return HDF_FAILURE;
+    }
     for (i = 0; i < fnDev->numInterfaces; i++) {
         fnIface = (struct UsbFnInterface *)UsbFnGetInterface(fnDev, i);
         if (fnIface == NULL) {

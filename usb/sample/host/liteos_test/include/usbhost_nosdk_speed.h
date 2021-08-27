@@ -26,7 +26,7 @@
 
 #define TEST_LENGTH             512
 #define TEST_CYCLE              30
-#define TEST_TIME               30
+#define TEST_TIME               0xffffffff
 #define TEST_PRINT_TIME         2
 #define TEST_WRITE              true
 #define TEST_READ               false

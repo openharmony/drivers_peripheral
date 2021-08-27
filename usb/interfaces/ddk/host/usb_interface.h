@@ -151,5 +151,6 @@ int32_t UsbFillRequest(const struct UsbRequest *request, const UsbInterfaceHandl
     const struct UsbRequestParams *params);
 int UsbCancelRequest(const struct UsbRequest *request);
 int UsbSubmitRequestSync(const struct UsbRequest *request);
+int UsbMemTestTrigger(bool enable);
 
 #endif /* USB_INTERFACE_H */
