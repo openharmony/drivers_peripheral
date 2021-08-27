@@ -12,11 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <hdf_device_desc.h>
+#include "codec_stub.h"
 #include <hdf_log.h>
 #include <osal_mem.h>
-#include "codec_interface.h"
 #include "codec_callback_proxy.h"
+#include "codec_interface.h"
 #include "icodec.h"
 #include "stub_msgproc.h"
 
@@ -59,8 +59,7 @@ static int32_t SerCodecEnumerateCapbility(struct HdfDeviceIoClient *client, stru
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t errNum = HDF_SUCCESS;
-    // libcodec.so undifined
-    // int32_t errNum = CodecEnumerateCapbility(index, &capbility);
+    // int32_t errNum = CodecEnumerateCapbility(index, &capbility);  //libcodec.so undifined
     if (errNum != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call CodecEnumerateCapbility fuc failed!", __func__);
         return errNum;

@@ -20,6 +20,40 @@
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+int32_t CodecProxyParseAlignment(struct HdfSBuf *reply, Alginment *alginment)
+{
+    if (reply == NULL || alginment == NULL) {
+        HDF_LOGE("%{public}s: params NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufReadInt32(reply, &alginment->widthAlginment)) {
+        HDF_LOGE("%{public}s: read widthAlginment failed!", __func__);
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufReadInt32(reply, &alginment->heightAlginment)) {
+        HDF_LOGE("%{public}s: read heightAlginment failed!", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t CodecProxyParseRect(struct HdfSBuf *reply, Rect *rectangle)
+{
+    if (reply == NULL || rectangle == NULL) {
+        HDF_LOGE("%{public}s: params NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufReadInt32(reply, &rectangle->width)) {
+        HDF_LOGE("%{public}s: read width failed!", __func__);
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufReadInt32(reply, &rectangle->height)) {
+        HDF_LOGE("%{public}s: read height failed!", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t CodecProxyParseArray(struct HdfSBuf *reply, ResizableArray *resArr)
 {
     if (reply == NULL || resArr == NULL) {
@@ -52,22 +86,13 @@ int32_t CodecProxyParseGottenCapbility(struct HdfSBuf *reply, CodecCapbility *ca
     if (!HdfSbufReadUint32(reply, (uint32_t*)&cap->type)) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufReadInt32(reply, &cap->whAlignment.widthAlginment)) {
+    if (CodecProxyParseAlignment(reply, &cap->whAlignment) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufReadInt32(reply, &cap->whAlignment.heightAlginment)) {
+    if (CodecProxyParseRect(reply, &cap->minSize) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufReadInt32(reply, &cap->minSize.width)) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadInt32(reply, &cap->minSize.height)) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadInt32(reply, &cap->maxSize.width)) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadInt32(reply, &cap->maxSize.height)) {
+    if (CodecProxyParseRect(reply, &cap->maxSize) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint64(reply, &cap->minBitRate)) {
