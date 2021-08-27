@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include "cdcacm.h"
 #include "osal_time.h"
-
+#include <signal.h>
 #define HDF_LOG_TAG   cdc_acm_speed
 
 struct HdfSBuf *g_data;
@@ -56,13 +56,13 @@ static void GetTempSpeed()
         HDF_LOGE("%s: HdfSbufReadFloat failed", __func__);
         return;
     }
-    printf("speed : %f MB/s\n", speed);
+    if (speed > 0) {
+        printf("speed : %f MB/s\n", speed);
+    }
 }
 
-static void GetSpeedDone()
+static void WriteSpeedDone()
 {
-    uint8_t isDone = 0;
-    HdfSbufFlush(g_reply);
     int status = g_acmService->dispatcher->Dispatch(g_acmService,
         USB_SERIAL_WRITE_SPEED_DONE, g_data, g_reply);
     if (status) {
@@ -70,13 +70,13 @@ static void GetSpeedDone()
             __func__, status);
         return;
     }
-    if (!HdfSbufReadUint8(g_reply, &isDone)) {
-        HDF_LOGE("%s: HdfSbufReadFloat failed", __func__);
-        return;
-    }
-    if (isDone) {
-        g_readRuning = false;
-    }
+}
+
+void StopWriteSpeedTest(int signo)
+{
+    WriteSpeedDone();
+    g_readRuning = false;
+    printf("acm_speed_write exit.\n");
 }
 
 int main(int argc, char *argv[])
@@ -107,12 +107,14 @@ int main(int argc, char *argv[])
         return HDF_FAILURE;
     }
 
+    signal(SIGINT, StopWriteSpeedTest);
     TestSpeed();
     g_readRuning = true;
     while (g_readRuning) {
         sleep(0x2);
-        GetTempSpeed();
-        GetSpeedDone();
+        if (g_readRuning) {
+            GetTempSpeed();
+        }
     }
 
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_CLOSE, g_data, g_reply);

@@ -31,7 +31,7 @@ static void *OsAdapterRealloc(void *ptr, size_t oldSize, size_t newSize)
 {
     void *mem;
 
-    mem = OsalMemAlloc(newSize);
+    mem = RawUsbMemAlloc(newSize);
     if (mem == NULL) {
         HDF_LOGE("%s:%d", __func__, __LINE__);
         goto out;
@@ -40,13 +40,13 @@ static void *OsAdapterRealloc(void *ptr, size_t oldSize, size_t newSize)
     if (oldSize > 0) {
         if (memmove_s(mem, newSize, ptr, oldSize) != HDF_SUCCESS) {
             HDF_LOGE("%s:%d", __func__, __LINE__);
-            OsalMemFree(mem);
+            RawUsbMemFree(mem);
             mem = NULL;
             goto out;
         }
     }
 
-    OsalMemFree(ptr);
+    RawUsbMemFree(ptr);
 out:
     return mem;
 }
@@ -92,7 +92,7 @@ static struct UsbDeviceHandle *OsCallocDeviceHandle(void)
 {
     struct UsbDeviceHandle *handle = NULL;
 
-    handle = OsalMemCalloc(sizeof(*handle));
+    handle = RawUsbMemCalloc(sizeof(*handle));
     if (handle == NULL) {
         HDF_LOGE("%s: allocate handle failed", __func__);
         return NULL;
@@ -105,7 +105,7 @@ static struct UsbDeviceHandle *OsCallocDeviceHandle(void)
 
 static struct UsbDevice *OsAllocDevice(struct UsbSession *session, struct UsbDeviceHandle *handle)
 {
-    struct UsbDevice *dev = OsalMemCalloc(sizeof(*dev));
+    struct UsbDevice *dev = RawUsbMemCalloc(sizeof(*dev));
     if (dev == NULL) {
         HDF_LOGE("%s:%d no memory", __func__, __LINE__);
         return NULL;
@@ -204,7 +204,7 @@ static int OsParseConfigDescriptors(struct UsbDevice *dev)
     if (numConfigs == 0) {
         return HDF_SUCCESS;
     }
-    dev->configDescriptors = OsalMemAlloc(numConfigs * sizeof(struct UsbDeviceConfigDescriptor));
+    dev->configDescriptors = RawUsbMemAlloc(numConfigs * sizeof(struct UsbDeviceConfigDescriptor));
     if (dev->configDescriptors == NULL) {
         HDF_LOGE("%s:%d", __func__, __LINE__);
         return HDF_ERR_MALLOC_FAIL;
@@ -325,10 +325,10 @@ static void OsFreeIsoUrbs(struct UsbHostRequest *request)
         if (urb == NULL) {
             break;
         }
-        OsalMemFree(urb);
+        RawUsbMemFree(urb);
     }
 
-    OsalMemFree(request->isoUrbs);
+    RawUsbMemFree(request->isoUrbs);
     request->isoUrbs = NULL;
 }
 
@@ -367,7 +367,7 @@ static int OsSubmitControlRequest(struct UsbHostRequest *request)
     }
 
     fd = request->devHandle->fd;
-    urb = OsalMemCalloc(sizeof(*urb));
+    urb = RawUsbMemCalloc(sizeof(*urb));
     if (urb == NULL) {
         return HDF_ERR_MALLOC_FAIL;
     }
@@ -383,7 +383,7 @@ static int OsSubmitControlRequest(struct UsbHostRequest *request)
     ret = ioctl(fd, USBDEVFS_SUBMITURB, urb);
     if (ret < 0) {
         HDF_LOGE("submiturb failed, errno=%d", errno);
-        OsalMemFree(urb);
+        RawUsbMemFree(urb);
         request->urbs = NULL;
         if (errno == ENODEV) {
             return HDF_DEV_ERR_NO_DEVICE;
@@ -495,9 +495,9 @@ static int OsSubmitBulkRequest(struct UsbHostRequest *request)
     }
 
     if (numUrbs != 1) {
-        urbs = OsalMemCalloc(numUrbs * sizeof(*urbs));
+        urbs = RawUsbMemCalloc(numUrbs * sizeof(*urbs));
         if (request->bulkUrb) {
-            OsalMemFree(request->bulkUrb);
+            RawUsbMemFree(request->bulkUrb);
         }
         request->bulkUrb = urbs;
         request->urbs = NULL;
@@ -527,7 +527,7 @@ static int OsAllocIsoUrbs(struct UsbHostRequest *request, int numUrbs, struct Us
 
     for (i = 0; i < numUrbs; i++) {
         int numPackets = MIN(numPacketsLeft, MAX_ISO_PACKETS_PER_URB);
-        urb = OsalMemCalloc(sizeof(struct UsbAdapterUrb));
+        urb = RawUsbMemCalloc(sizeof(struct UsbAdapterUrb));
         if (urb == NULL) {
             OsFreeIsoUrbs(request);
             return HDF_ERR_MALLOC_FAIL;
@@ -578,7 +578,7 @@ static int OsSubmitIsoUrbs(struct UsbHostRequest *request, int numUrbs, struct U
         request->reqStatus = USB_REQUEST_ERROR;
         request->numRetired += numUrbs - i;
         if (request->numRetired == numUrbs) {
-            OsalMemFree(pUrbs);
+            RawUsbMemFree(pUrbs);
             request->urbs = NULL;
         }
         break;
@@ -619,9 +619,9 @@ static int OsSubmitIsoRequest(struct UsbHostRequest *request)
         return HDF_ERR_INVALID_PARAM;
     }
     numUrbs = (request->numIsoPackets + (MAX_ISO_PACKETS_PER_URB - 1)) / MAX_ISO_PACKETS_PER_URB;
-    pUrbs = OsalMemCalloc(numUrbs * sizeof(*pUrbs));
+    pUrbs = RawUsbMemCalloc(numUrbs * sizeof(*pUrbs));
     if (pUrbs == NULL) {
-        HDF_LOGE("%s:%d OsalMemCalloc pUrbs failed", __func__, __LINE__);
+        HDF_LOGE("%s:%d RawUsbMemCalloc pUrbs failed", __func__, __LINE__);
         return HDF_ERR_MALLOC_FAIL;
     }
     request->isoUrbs = (void **)pUrbs;
@@ -643,7 +643,7 @@ static int OsControlCompletion(struct UsbHostRequest *request, struct UsbAdapter
 
     request->actualLength += urb->actualLength;
     if (request->reqStatus == USB_REQUEST_CANCELLED) {
-        OsalMemFree(request->urbs);
+        RawUsbMemFree(request->urbs);
         request->urbs = NULL;
         return RawHandleRequestCompletion(request, USB_REQUEST_CANCELLED);
     }
@@ -669,7 +669,7 @@ static int OsControlCompletion(struct UsbHostRequest *request, struct UsbAdapter
             status = USB_REQUEST_ERROR;
             break;
     }
-    OsalMemFree(request->urbs);
+    RawUsbMemFree(request->urbs);
     request->urbs = NULL;
     return RawHandleRequestCompletion(request, status);
 }
@@ -892,7 +892,7 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
 
     ret = OsInitDevice(dev, busNum, usbAddr);
     if (ret) {
-        OsalMemFree(dev);
+        RawUsbMemFree(dev);
         goto err;
     }
 
@@ -906,7 +906,7 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
 
 err:
     OsalMutexDestroy(&handle->lock);
-    OsalMemFree(handle);
+    RawUsbMemFree(handle);
     return NULL;
 }
 
@@ -929,16 +929,16 @@ static void AdapterCloseDevice(struct UsbDeviceHandle *handle)
     OsalMutexUnlock(&dev->session->lock);
 
     if (dev->configDescriptors) {
-        OsalMemFree(dev->configDescriptors);
+        RawUsbMemFree(dev->configDescriptors);
     }
     if (dev->descriptors) {
-        OsalMemFree(dev->descriptors);
+        RawUsbMemFree(dev->descriptors);
     }
-    OsalMemFree(dev);
+    RawUsbMemFree(dev);
 
     close(handle->fd);
     OsalMutexDestroy(&handle->lock);
-    OsalMemFree(handle);
+    RawUsbMemFree(handle);
 }
 
 static int AdapterGetConfigDescriptor(const struct UsbDevice *dev,
@@ -1142,9 +1142,9 @@ static struct UsbHostRequest *AdapterAllocRequest(const struct UsbDeviceHandle *
     request->numIsoPackets = isoPackets;
     request->buffer = (unsigned char *)request + allocSize - len;
     request->bufLen = len;
-    request->bulkUrb = OsalMemCalloc(sizeof(struct UsbAdapterUrb));
+    request->bulkUrb = RawUsbMemCalloc(sizeof(struct UsbAdapterUrb));
     if (request->bulkUrb == NULL) {
-        HDF_LOGE("%s OsalMemAlloc fail", __func__);
+        HDF_LOGE("%s RawUsbMemAlloc fail", __func__);
         return NULL;
     }
     request->urbs = request->bulkUrb;
@@ -1162,7 +1162,7 @@ static int AdapterFreeRequest(struct UsbHostRequest *request)
                 + (sizeof(struct UsbIsoPacketDesc) * (size_t)(request->numIsoPackets))
                 + request->bufLen;
     if (request->bulkUrb){
-        OsalMemFree(request->bulkUrb);
+        RawUsbMemFree(request->bulkUrb);
         request->bulkUrb = NULL;
     }
     request->urbs = NULL;

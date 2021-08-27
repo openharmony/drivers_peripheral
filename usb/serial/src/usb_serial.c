@@ -254,7 +254,7 @@ static int UsbGetDescriptor(struct UsbDescriptorParams *descParams)
     controlParams.target = USB_REQUET_TARGET_DEVICE;
     controlParams.reqType = USB_REQUEST_TYPE_STANDARD;
     controlParams.directon = USB_REQUEST_DIR_FROM_DEVICE;
-    controlParams.value = (((uint32_t)descParams->type) << offset) + descParams->index;
+    controlParams.value = (((uint32_t)(descParams->type)) << offset) + descParams->index;
     controlParams.index = 0;
     controlParams.data = descParams->buf;
     controlParams.size = descParams->size;
@@ -823,7 +823,7 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
     const char *tmp = NULL;
     int wbn;
     struct AcmWb *wb = NULL;
-    if (port == NULL) {
+    if (port == NULL || data == NULL) {
         HDF_LOGE("%d: invalid parma", __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }

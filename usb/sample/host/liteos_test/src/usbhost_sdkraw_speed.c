@@ -58,14 +58,14 @@
 static struct AcmDevice *acm = NULL;
 static bool g_stopIoThreadFlag = false;
 static unsigned int g_speedFlag = 0;
-static unsigned int g_send_count = 0;
-static unsigned int g_recv_count = 0;
-static unsigned int g_byteTotal = 0;
+static uint64_t g_send_count = 0;
+static uint64_t g_recv_count = 0;
+static uint64_t g_byteTotal = 0;
 static bool g_writeOrRead = TEST_WRITE;
 static bool g_printData = false;
 static struct OsalSem sem;
 static struct OsalSem timeSem;
-static int sigCnt = 0;
+static uint32_t sigCnt = 0;
 static void AcmTestBulkCallback(const void *requestArg);
 static int32_t SerialBegin(struct AcmDevice *acm);
 
@@ -113,13 +113,14 @@ static int UsbIoSendThread(void *data)
 {
     struct AcmDevice *acm = (struct AcmDevice *)data;
 
-    for (;;) {
+    while (!g_stopIoThreadFlag) {
         OsalSemWait(&sem, HDF_WAIT_FOREVER);
         if (!g_speedFlag) {
             SerialBegin(acm);
             g_send_count++;
         }
     }
+    return 0;
 }
 
 static int UsbStartIo(struct AcmDevice *acm)
@@ -267,7 +268,7 @@ static int UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConfigDe
         if (acm->devHandle) {
             ret = UsbRawClaimInterface(acm->devHandle, interfaceIndex);
             if (ret) {
-                printf("%s:%d claim interface %u failed",
+                printf("%s:%d claim interface %d failed",
                          __func__, __LINE__, i);
                 return ret;
             }
@@ -457,6 +458,9 @@ static void AcmTestBulkCallback(const void *requestArg)
     }
 
     if (req->status == USB_REQUEST_COMPLETED) {
+        if (g_byteTotal == 0) {
+            OsalSemPost(&timeSem);
+        }
         g_recv_count++;
         g_byteTotal += req->actualLength;
     } else {
@@ -493,31 +497,12 @@ static int32_t SerialBegin(struct AcmDevice *acm)
     }
     db = &acm->db[dbn];
     db->len = acm->dataSize;
-#if 0
-    if (g_writeOrRead == TEST_READ) {
-        memset_s(db->buf, TEST_LENGTH, '0', TEST_LENGTH);
-    }
-    struct UsbRawFillRequestData reqData;
-    reqData.endPoint      = acm->dataEp->addr;
-    reqData.numIsoPackets = 0;
-    reqData.callback      = AcmTestBulkCallback;
-    reqData.userData      = (void *)db;
-    reqData.timeout       = USB_CTRL_SET_TIMEOUT;
-    reqData.buffer        = db->buf;
-    reqData.length        = acm->dataSize;
 
-    ret = UsbRawFillBulkRequest(db->request, acm->devHandle, &reqData);
-    if (ret) {
-        HDF_LOGE("%s: FillInterruptRequest faile, ret=%d",
-                 __func__, ret);
-        return HDF_FAILURE;
-    }
-#endif
     ret = AcmStartdb(acm, db);
     return ret;
 }
 
-static void SignalHandler(void)
+static void SpeedPrint(void)
 {
     double speed = 0;
 
@@ -575,7 +560,6 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     int ifaceNum = 3;
     uint32_t size;
     int i = 0;
-    double speed = 0;
     struct UsbSpeedTest *input = NULL;
 
     if (acm->busy) {
@@ -686,21 +670,10 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
         g_send_count++;
     }
 
+    OsalSemWait(&timeSem, TEST_TIME);
     while (!g_speedFlag) {
-        if (g_writeOrRead == TEST_WRITE) {
-            OsalSemWait(&timeSem, TEST_PRINT_TIME*1000);
-            SignalHandler();
-        } else {
-            OsalSemWait(&timeSem, 200);
-        }
-    }
-
-    if (g_writeOrRead == TEST_WRITE)
-    {
-        speed = (g_byteTotal * 1.0) / (TEST_TIME  * 1024 * 1024);
-        printf("\r\nEnd:g_recv_count=%d g_send_count=%d urb dataSize=%d total transfer size=%d byte\n",
-            g_recv_count, g_send_count, acm->dataSize, g_byteTotal);
-        printf("Speed:%f MB/s\n", speed);
+        OsalSemWait(&timeSem, TEST_PRINT_TIME*1000);
+        SpeedPrint();
     }
 
     UsbStopIo(acm);

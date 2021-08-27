@@ -98,7 +98,7 @@ void UsbRawFreeConfigDescriptor(const struct UsbRawConfigDescriptor *config)
     }
 
     RawClearConfiguration((struct UsbRawConfigDescriptor *)config);
-    OsalMemFree((void *)config);
+    RawUsbMemFree((void *)config);
     config = NULL;
 }
 

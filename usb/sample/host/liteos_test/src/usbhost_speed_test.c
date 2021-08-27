@@ -37,7 +37,7 @@ static struct HdfIoService *g_service = NULL;
 static struct HdfSBuf *g_data = NULL;
 static struct HdfSBuf *g_reply = NULL;
 static struct OsalMutex g_lock;
-static enum speedServer spdserver;
+static enum speedServer spdserver = SDKAPI_SERVER;
 
 static sigset_t mask;
 pid_t stopHandlerTid;
@@ -139,7 +139,7 @@ static void *stop_handler(void *arg)
         case SIGQUIT:
             printf("normal exit\n");
             speedExit();
-            pthread_exit(0);
+            return 0;
         default:
             printf("Unexpected signal %d\n", signo);
         }

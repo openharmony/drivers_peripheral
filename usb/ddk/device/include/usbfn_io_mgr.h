@@ -33,6 +33,7 @@ struct ReqList {
     uint8_t             pipe;
     int                 fd;
     uint32_t            buf;
+    uint32_t            bufLen;
     struct UsbHandleMgr *handle;
 };
 
