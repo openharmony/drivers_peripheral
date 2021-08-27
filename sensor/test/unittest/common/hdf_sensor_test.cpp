@@ -176,7 +176,7 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
     struct SensorInformation *testSensorInfo = nullptr;
     struct SensorInformation *accelSensorInfo = nullptr;
     struct SensorInformation *barometerSensorInfo = nullptr;
-	struct SensorInformation *hallSensorInfo = nullptr;
+    struct SensorInformation *hallSensorInfo = nullptr;
     int32_t count = 0;
     
     int32_t ret = g_sensorDev->GetAllSensors(&sensorInfo, &count);
@@ -191,7 +191,7 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
     testSensorInfo = sensorInfo;
     accelSensorInfo = sensorInfo;
     barometerSensorInfo = sensorInfo;
-	hallSensorInfo = sensorInfo;
+    hallSensorInfo = sensorInfo;
 
     for (int i = 0; i < count; i++) {
         printf("get sensoriId[%d], info name[%s], power[%f]\n\r", info->sensorId, info->sensorName, info->power);
@@ -199,11 +199,9 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
             testSensorInfo = info;
         } else if (info->sensorId == 1) {
             accelSensorInfo = info;
-        }
-        else if (info->sensorId == SENSOR_TYPE_BAROMETER) {
+        } else if (info->sensorId == SENSOR_TYPE_BAROMETER) {
             barometerSensorInfo = info;
-        }
-		else if (info->sensorId == SENSOR_TYPE_HALL) {
+        } else if (info->sensorId == SENSOR_TYPE_HALL) {
             hallSensorInfo = info;
         }
         info++;
@@ -217,7 +215,7 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
         if (barometerSensorInfo->sensorTypeId == SENSOR_TYPE_BAROMETER) {
             EXPECT_STREQ("barometer", barometerSensorInfo->sensorName);
         }
-		if (hallSensorInfo->sensorTypeId == SENSOR_TYPE_HALL) {
+        if (hallSensorInfo->sensorTypeId == SENSOR_TYPE_HALL) {
             EXPECT_STREQ("hallrometer", hallSensorInfo->sensorName);
         }
     }
