@@ -28,7 +28,7 @@ public:
     ~ForkNode() override;
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;
-    void DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
+    void DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
     void ForkBuffers();
 
 private:
@@ -37,6 +37,8 @@ private:
     std::shared_ptr<std::thread>          forkThread_ = nullptr;
     std::shared_ptr<FrameSpec>            forkSpec_ = nullptr;
     std::vector<std::shared_ptr<IPort>>   inPutPorts_;
+    std::vector<std::shared_ptr<IPort>>   outPutPorts_;
+    std::atomic_bool                    streamRunning_ = false;
 };
 }// namespace OHOS::Camera
 #endif
