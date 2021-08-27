@@ -112,7 +112,7 @@ config("example_config") {
   ]
 }
 
-group("rpi4b_build") {
+group("rpi3_build") {
   public_deps = [
     ":camera_host_config.hcb",
     ":config.c",
@@ -121,6 +121,6 @@ group("rpi4b_build") {
     ":stream_supported_config.hcb",
     "src/driver_adapter:camera_v4l2_adapter",
     "src/pipeline_core:camera_ipp_algo_example",
-    "//drivers/peripheral/camera/hal/adapter/chipset/rpi4b/src/driver_adapter/main_test:v4l2_main",
+    "//drivers/peripheral/camera/hal/adapter/chipset/rpi3/src/driver_adapter/main_test:v4l2_main",
   ]
 }

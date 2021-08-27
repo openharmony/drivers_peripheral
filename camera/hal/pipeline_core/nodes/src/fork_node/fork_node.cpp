@@ -36,8 +36,7 @@ ForkNode::~ForkNode()
 RetCode ForkNode::Start(const int32_t streamId)
 {
     inPutPorts_ = GetInPorts();
-    GetOutPorts();
-    GetFrameInfo();
+    outPutPorts_ = GetOutPorts();
     if (streamRunning_ == false) {
         CAMERA_LOGI("streamrunning = false");
         streamRunning_ = true;

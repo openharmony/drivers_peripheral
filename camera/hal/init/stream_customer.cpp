@@ -24,6 +24,7 @@ void StreamCustomer::CamFrame(const std::function<void(void*, uint32_t)> callbac
     OHOS::Rect damage;
     int32_t flushFence = 0;
     int64_t timestamp = 0;
+    constexpr uint32_t delayTime = 12000;
 
     CAMERA_LOGD("demo test:enter CamFrame thread ++ \n");
 
@@ -37,8 +38,9 @@ void StreamCustomer::CamFrame(const std::function<void(void*, uint32_t)> callbac
                 CAMERA_LOGE("demo test:CamFrame callback+++++++++++++++++++++++");
                 callback(addr, size);
             }
+            consumer_->ReleaseBuffer(buff, -1);
         }
-        consumer_->ReleaseBuffer(buff, -1);
+        usleep(delayTime);
     } while (camFrameExit_ == 0);
 
     CAMERA_LOGD("demo test:Exiting CamFrame thread -- \n");
