@@ -17,6 +17,40 @@
 #include <osal_mem.h>
 #include "codec_interface.h"
 
+int32_t CodecSerPackAlginment(struct HdfSBuf *reply, Alginment *alginment)
+{
+    if (reply == NULL || alginment == NULL) {
+        HDF_LOGE("%{public}s: params null!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufWriteInt32(reply, alginment->widthAlginment)) {
+        HDF_LOGE("%{public}s: Write widthAlginment failed!", __func__);
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteInt32(reply, alginment->heightAlginment)) {
+        HDF_LOGE("%{public}s: Write heightAlginment failed!", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t CodecSerPackRect(struct HdfSBuf *reply, Rect *rectangle)
+{
+    if (reply == NULL || rectangle == NULL) {
+        HDF_LOGE("%{public}s: params null!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufWriteInt32(reply, rectangle->width)) {
+        HDF_LOGE("%{public}s: Write width failed!", __func__);
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteInt32(reply, rectangle->height)) {
+        HDF_LOGE("%{public}s: Write height failed!", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t CodecSerPackArray(struct HdfSBuf *reply, ResizableArray *resArr)
 {
     if (reply == NULL || resArr == NULL) {
@@ -45,71 +79,45 @@ int32_t CodecSerPackCapbility(struct HdfSBuf *reply, CodecCapbility *cap)
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(reply, (uint32_t)cap->mime)) {
-        HDF_LOGE("%{public}s: Write mime failed!", __func__);
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(reply, (uint32_t)cap->type)) {
-        HDF_LOGE("%{public}s: Write type failed!", __func__);
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteInt32(reply, cap->whAlignment.widthAlginment)) {
-        HDF_LOGE("%{public}s: Write widthAlginment failed!", __func__);
+    if (CodecSerPackAlginment(reply, &cap->whAlignment) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteInt32(reply, cap->whAlignment.heightAlginment)) {
-        HDF_LOGE("%{public}s: Write heightAlginment failed!", __func__);
+    if (CodecSerPackRect(reply, &cap->minSize) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteInt32(reply, cap->minSize.width)) {
-        HDF_LOGE("%{public}s: Write width failed!", __func__);
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteInt32(reply, cap->minSize.height)) {
-        HDF_LOGE("%{public}s: Write height failed!", __func__);
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteInt32(reply, cap->maxSize.width)) {
-        HDF_LOGE("%{public}s: Write width failed!", __func__);
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteInt32(reply, cap->maxSize.height)) {
-        HDF_LOGE("%{public}s: Write height failed!", __func__);
+    if (CodecSerPackRect(reply, &cap->maxSize) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint64(reply, cap->minBitRate)) {
-        HDF_LOGE("%{public}s: Write minBitRate failed!", __func__);
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint64(reply, cap->maxBitRate)) {
-        HDF_LOGE("%{public}s: Write maxBitRate failed!", __func__);
         return HDF_FAILURE;
     }
     if (CodecSerPackArray(reply, &cap->supportProfiles) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Write supportProfiles failed!", __func__);
         return HDF_FAILURE;
     }
     if (CodecSerPackArray(reply, &cap->supportLevels) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Write supportLevels failed!", __func__);
         return HDF_FAILURE;
     }
     if (CodecSerPackArray(reply, &cap->supportPixelFormats) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Write supportPixelFormats failed!", __func__);
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(reply, cap->minInputBufferNum)) {
-        HDF_LOGE("%{public}s: Write minInputBufferNum failed!", __func__);
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(reply, cap->minOutputBufferNum)) {
-        HDF_LOGE("%{public}s: Write minOutputBufferNum failed!", __func__);
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(reply, cap->allocateMask)) {
-        HDF_LOGE("%{public}s: Write allocateMask failed!", __func__);
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(reply, cap->capsMask)) {
-        HDF_LOGE("%{public}s: Write capsMask failed!", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
