@@ -1564,24 +1564,25 @@ int32_t WifiCmdSetApWpsP2pIe(const char *ifname, const WifiAppIe *appIe)
 
 int32_t WifiCmdGetDrvFlags(const char *ifname, WifiGetDrvFlags *params)
 {
+    int32_t ret;
+
     if (ifname == NULL || params == NULL) {
         return RET_CODE_FAILURE;
     }
     struct HdfSBuf *data = HdfSBufObtainDefaultSize();
     struct HdfSBuf *reply = HdfSBufObtainDefaultSize();
     if (ifname == NULL || reply == NULL) {
-        return RET_CODE_FAILURE;
+        ret = RET_CODE_FAILURE;
+        goto RELEASE_DATA;
     }
     bool isSerializeFailed = false;
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifname);
-    int32_t ret;
     if (isSerializeFailed) {
         HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_GET_DRIVER_FLAGS, data, reply);
     }
-
     if (ret) {
         ret = RET_CODE_FAILURE;
         goto RELEASE_DATA;
