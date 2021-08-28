@@ -27,7 +27,7 @@ using namespace testing::ext;
 
 namespace {
     int32_t g_sensorDataFlag = 0;
-    const int32_t SENSOR_ID = 10;
+    const int32_t SENSOR_ID = 0;
     const int32_t SENSOR_INTERVAL = 200000000;
     const int32_t SENSOR_POLL_TIME = 1;
     const int32_t SENSOR_WAIT_TIME = 400;
@@ -360,7 +360,6 @@ HWTEST_F(HdfSensorTest, SetSensorMode001, TestSize.Level1)
     if (SENSOR_ID == SENSOR_TYPE_HALL) {
         ret = g_sensorDev->SetMode(SENSOR_ID, SENSOR_MODE_ON_CHANGE);
         EXPECT_EQ(0, ret);
-        return;
     } else {
         ret = g_sensorDev->SetMode(SENSOR_ID, SENSOR_MODE_REALTIME);
         EXPECT_EQ(0, ret);
@@ -392,14 +391,8 @@ HWTEST_F(HdfSensorTest, SetSensorMode002, TestSize.Level1)
     EXPECT_EQ(0, ret);
     ret = g_sensorDev->SetBatch(SENSOR_ID, SENSOR_INTERVAL, SENSOR_POLL_TIME);
     EXPECT_EQ(0, ret);
-    if (SENSOR_ID == SENSOR_TYPE_HALL) {
-        ret = g_sensorDev->SetMode(SENSOR_ID, SENSOR_MODE_ON_CHANGE);
-        EXPECT_EQ(-1, ret);
-        return;
-    } else {
-        ret = g_sensorDev->SetMode(SENSOR_ID, SENSOR_MODE_REALTIME);
-        EXPECT_EQ(-1, ret);
-    }
+    ret = g_sensorDev->SetMode(SENSOR_ID, SENSOR_MODE_DEFAULT);
+    EXPECT_EQ(-1, ret);
     ret = g_sensorDev->Enable(SENSOR_ID);
     EXPECT_EQ(0, ret);
     OsalMSleep(SENSOR_WAIT_TIME);
