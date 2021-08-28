@@ -184,9 +184,9 @@ int32_t HalCmdGetAsscociatedStas(const char *ifName, struct StaInfo *staInfo, ui
 int32_t HalCmdSetCountryCode(const char *ifName, const char *code, uint32_t len)
 {
     int32_t ret;
-    ret = SetCountryCode(ifName, code, len);
+    ret = WifiSetCountryCode(ifName, code, len);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: SetCountryCode failed", __FUNCTION__);
+        HDF_LOGE("%s: WifiSetCountryCode failed", __FUNCTION__);
     }
     return ret;
 }
@@ -214,9 +214,9 @@ int32_t HalCmdStartScanInner(const char *ifName, WifiScan *scan)
 int32_t HalCmdGetChipId(const char *ifName, uint8_t *chipId)
 {
     int32_t ret;
-    ret = GetChipId(ifName, chipId);
+    ret = AcquireChipId(ifName, chipId);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: GetChipId failed", __FUNCTION__);
+        HDF_LOGE("%s: AcquireChipId failed", __FUNCTION__);
     }
     return ret;
 }

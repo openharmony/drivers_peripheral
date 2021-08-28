@@ -807,7 +807,7 @@ int32_t GetAssociatedStas(const char *ifName,
     return RET_CODE_SUCCESS;
 }
 
-int32_t SetCountryCode(const char *ifName, const char *code, uint32_t len)
+int32_t WifiSetCountryCode(const char *ifName, const char *code, uint32_t len)
 {
     uint32_t ifaceId = if_nametoindex(ifName);
     struct nl_msg *msg = nlmsg_alloc();
@@ -880,7 +880,7 @@ int32_t SetScanMacAddr(const char *ifName, uint8_t *scanMac, uint8_t len)
     return ret;
 }
 
-int32_t GetChipId(const char *ifName, uint8_t *chipId)
+int32_t AcquireChipId(const char *ifName, uint8_t *chipId)
 {
     (void)ifName;
     (void)chipId;
