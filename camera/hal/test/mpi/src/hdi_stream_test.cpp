@@ -52,12 +52,10 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0120, TestSize.Level0)
     // 配置mode 和 modeSetting
     Camera::OperationMode mode = Camera::NORMAL;
     std::shared_ptr<CameraStandard::CameraMetadata> modeSetting = std::make_shared<CameraStandard::CameraMetadata>(2, 128);
-#if 0
     int64_t expoTime = 0;
     modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
     int64_t colorGains[4] = {0};
     modeSetting->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
-#endif
     // 配置流信息
     Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
     Test_->streamInfo->streamId_ = 1001; // 1001:流id
@@ -77,7 +75,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0120, TestSize.Level0)
     Camera::StreamSupportType pType;
     Test_->rc = Test_->streamOperator->IsStreamsSupported(NORMAL, modeSetting, {Test_->streamInfo}, pType);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    EXPECT_NE(pType, NOT_SUPPORTED);
+    EXPECT_NE(pType, Camera::NOT_SUPPORTED);
     if (Test_->rc == Camera::NO_ERROR) {
         std::cout << "==========[test log]Check hdi: IsStreamsSupported success, pType = " << pType << std::endl;
     } else {
@@ -144,9 +142,9 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0122, TestSize.Level2)
     Test_->streamOperatorCallback = new StreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    Test_->streamInfo = nullptr;
     Camera::StreamSupportType pType;
-    Test_->rc = Test_->streamOperator->IsStreamsSupported(NORMAL, Test_->ability, {Test_->streamInfo}, pType);
+    std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>> infos = {};
+    Test_->rc = Test_->streamOperator->IsStreamsSupported(NORMAL, Test_->ability, infos, pType);
     EXPECT_EQ(Test_->rc, Camera::INVALID_ARGUMENT);
     if (Test_->rc == Camera::NO_ERROR) {
         std::cout << "==========[test log]Check hdi: IsStreamsSupported success." << std::endl;
@@ -179,12 +177,6 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0123, TestSize.Level1)
     // 配置mode 和 modeSetting
     Camera::OperationMode mode = Camera::NORMAL;
     std::shared_ptr<CameraStandard::CameraMetadata> modeSetting = std::make_shared<CameraStandard::CameraMetadata>(2, 128);
-#if 0
-    int64_t colorGains[4] = {0};
-    modeSetting->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
-    int64_t expoTime = 0;
-    modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
-#endif
     // 配置流信息
     Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
     Test_->streamInfo->width_ = 640; // 640:流宽度
@@ -203,8 +195,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0123, TestSize.Level1)
     Test_->consumerMap_[Test_->streamInfo->intent_] = consumer;
     Camera::StreamSupportType pType;
     Test_->rc = Test_->streamOperator->IsStreamsSupported(NORMAL, modeSetting, {Test_->streamInfo}, pType);
-    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    EXPECT_EQ(pType, NOT_SUPPORTED);
+    EXPECT_EQ(Test_->rc, Camera::INVALID_ARGUMENT);
     if (Test_->rc == Camera::NO_ERROR) {
         std::cout << "==========[test log]Check hdi: IsStreamsSupported success, pType = " << pType << std::endl;
     } else {
@@ -509,7 +500,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0137, TestSize.Level2)
 #endif
     Camera::StreamSupportType pType;
     Test_->rc = Test_->streamOperator->IsStreamsSupported(NORMAL, modeSetting, {Test_->streamInfo}, pType);
-    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+    EXPECT_EQ(Test_->rc, Camera::INVALID_ARGUMENT);
     if (Test_->rc == Camera::NO_ERROR) {
         std::cout << "==========[test log]Check hdi: IsStreamsSupported success." << std::endl;
     } else {
@@ -600,7 +591,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0139, TestSize.Level2)
     Test_->streamInfo->bufferQueue_->SetQueueSize(8);
     Camera::StreamSupportType pType;
     Test_->rc = Test_->streamOperator->IsStreamsSupported(NORMAL, modeSetting, {Test_->streamInfo}, pType);
-    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+    EXPECT_EQ(Test_->rc, INVALID_ARGUMENT);
     if (Test_->rc == Camera::NO_ERROR) {
         std::cout << "==========[test log]Check hdi: IsStreamsSupported success." << std::endl;
     } else {

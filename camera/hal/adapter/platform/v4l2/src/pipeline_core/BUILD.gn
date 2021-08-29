@@ -94,7 +94,7 @@ ohos_shared_library("camera_pipeline_core") {
     "$camera_path/pipeline_core/ipp/include",
     "$camera_path/interfaces/hdi",
     "$camera_path/utils/event",
-    "$camera_path/adapter/chipset/rpi4b/include/device_manager",
+    "$camera_path/adapter/chipset/rpi3/include/device_manager",
     "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/v4l2_source_node",
     "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/uvc_node",
     "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter/include/",
