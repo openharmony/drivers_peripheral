@@ -372,12 +372,9 @@ RetCode StreamBase::Capture(const std::shared_ptr<CaptureRequest>& request)
     }
 
     // DeliverBuffer must be called after Capture, or this capture request will miss a buffer.
-    {
-        PLACE_A_SELFKILL_WATCHDOG;
-        do {
-            rc = DeliverBuffer();
-        } while (rc != RC_OK && state_ == STREAM_STATE_BUSY);
-    }
+    do {
+        rc = DeliverBuffer();
+    } while (rc != RC_OK && state_ == STREAM_STATE_BUSY);
 
     return RC_OK;
 }
@@ -454,10 +451,17 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
             messenger_->SendMessage(errorMessage);
         }
     }
-    if (request->NeedShutterCallback() || messenger_ != nullptr) {
+    if (request->NeedShutterCallback() && messenger_ != nullptr) {
         std::shared_ptr<ICaptureMessage> shutterMessage = std::make_shared<FrameShutterMessage>(
             streamId_, request->GetCaptureId(), request->GetEndTime(), request->GetOwnerCount());
         messenger_->SendMessage(shutterMessage);
+    }
+
+    bool isEnded = false;
+    if (!request->IsContinous()) {
+        isEnded = true;
+    } else if (request->NeedCancel()) {
+        isEnded = true;
     }
 
     {
@@ -469,28 +473,22 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
                 break;
             }
         }
+
+        if (isEnded) {
+            // if this is the last request of capture, send CaptureEndedMessage.
+            auto it = std::find(inTransitList_.begin(), inTransitList_.end(), request);
+            if (it == inTransitList_.end()) {
+                std::shared_ptr<ICaptureMessage> endMessage =
+                    std::make_shared<CaptureEndedMessage>(streamId_, request->GetCaptureId(), request->GetEndTime(),
+                                                          request->GetOwnerCount(), tunnel_->GetFrameCount());
+                CAMERA_LOGV("end of stream [%d], ready to send end message, capture id = %d",
+                    streamId_, request->GetCaptureId());
+                messenger_->SendMessage(endMessage);
+            }
+        }
     }
 
     ReceiveBuffer(buffer);
-
-    bool isEnded = false;
-    if (!request->IsContinous()) {
-        isEnded = true;
-    } else if (request->NeedCancel()) {
-        isEnded = true;
-    }
-    if (isEnded) {
-        // if this is the last request of capture, send CaptureEndedMessage.
-        std::unique_lock<std::mutex> l(tsLock_);
-        auto it = std::find(inTransitList_.begin(), inTransitList_.end(), request);
-        if (it == inTransitList_.end()) {
-            std::shared_ptr<ICaptureMessage> endMessage =
-                std::make_shared<CaptureEndedMessage>(streamId_, request->GetCaptureId(), request->GetEndTime(),
-                                                      request->GetOwnerCount(), tunnel_->GetFrameCount());
-            CAMERA_LOGV("end of stream [%{public}d], ready to send end message", streamId_);
-            messenger_->SendMessage(endMessage);
-        }
-    }
     return RC_OK;
 }
 

@@ -372,6 +372,7 @@ RetCode Hos3516Demo::CaptureOnDualStreams(const int streamIdSecond)
         streamOperator_->ReleaseStreams(previewCaptureInfo->streamIds_);
         return RC_ERROR;
     }
+    streamCustomerPreview_->ReceiveFrameOn(nullptr);
 
     std::shared_ptr<Camera::CaptureInfo> secondCaptureInfo = std::make_shared<Camera::CaptureInfo>();
     secondCaptureInfo->streamIds_ = {streamIdSecond};
@@ -379,28 +380,28 @@ RetCode Hos3516Demo::CaptureOnDualStreams(const int streamIdSecond)
     previewCaptureInfo->enableShutterCallback_ = false;
 
     if (streamIdSecond == STREAM_ID_CAPTURE) {
-        streamCustomerCapture_->ReceiveFrameOn([this](void* addr, const uint32_t size) {
-            StoreImage(addr, size);
-        });
-
         rc = streamOperator_->Capture(CAPTURE_ID_CAPTURE, secondCaptureInfo, true);
         if (rc != Camera::NO_ERROR) {
             CAMERA_LOGE("demo test: CaptureOnDualStreams CAPTURE_ID_CAPTURE error\n");
             streamOperator_->ReleaseStreams(secondCaptureInfo->streamIds_);
             return RC_ERROR;
         }
-    } else {
-        OpenVideoFile();
-        streamCustomerVideo_->ReceiveFrameOn([this](void* addr, const uint32_t size) {
-            StoreVideo(addr, size);
-        });
 
+        streamCustomerCapture_->ReceiveFrameOn([this](void* addr, const uint32_t size) {
+            StoreImage(addr, size);
+        });
+    } else {
         rc = streamOperator_->Capture(CAPTURE_ID_VIDEO, secondCaptureInfo, true);
         if (rc != Camera::NO_ERROR) {
             CAMERA_LOGE("demo test: CaptureOnDualStreams CAPTURE_ID_VIDEO error\n");
             streamOperator_->ReleaseStreams(secondCaptureInfo->streamIds_);
             return RC_ERROR;
         }
+
+        OpenVideoFile();
+        streamCustomerVideo_->ReceiveFrameOn([this](void* addr, const uint32_t size) {
+            StoreVideo(addr, size);
+        });
     }
 
     CAMERA_LOGD("demo test: CaptuCaptureOnDualStreamsreON exit");

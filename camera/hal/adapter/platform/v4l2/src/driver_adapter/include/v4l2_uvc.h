@@ -21,6 +21,8 @@
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
 #include <sys/select.h>
+#include <linux/netlink.h>
+#include <sys/socket.h>
 #include <unistd.h>
 #include <sys/eventfd.h>
 #include "v4l2_common.h"
@@ -45,6 +47,20 @@ private:
     void V4L2UvcMatchDev(const std::string      name, const std::string v4l2Device, bool inOut);
     RetCode V4L2UvcEnmeDevices();
     void loopUvcDevice();
+    const char* V4L2GetUsbValue(const char* key, const char* str, int len);
+    void V4L2GetUsbString(std::string& action, std::string& subsystem,
+        std::string& devnode, char* buf, unsigned int len);
+
+    int uDevFd_ = -1;
+    int eventFd_ = -1;
+    int uvcDetectEnable_ = 0;
+
+    UvcCallback uvcCallbackFun_ = nullptr;
+
+    std::vector<DeviceControl> control_;
+    std::vector<DeviceFormat> format_;
+
+    std::thread* uvcDetectThread_ = nullptr;
 };
 } // namespace OHOS::Camera
 
