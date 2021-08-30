@@ -28,15 +28,7 @@ void OpenCameraTest::SetUp(void)
 }
 void OpenCameraTest::TearDown(void)
 {
-    if (Test_->hostCallback != nullptr) {
-        delete Test_->hostCallback;
-        Test_->hostCallback = nullptr;
-    }
 
-    if (Test_->deviceCallback != nullptr) {
-        delete Test_->deviceCallback;
-        Test_->deviceCallback = nullptr;
-    }
 }
 
 /**
@@ -85,14 +77,14 @@ HWTEST_F(OpenCameraTest, Camera_Open_0010, TestSize.Level2)
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         if (Test_->rc== Camera::NO_ERROR) {
         std::cout << "==========[test log]OpenCamera success, cameraId = " << cameraId << std::endl;
-    } else {
-        std::cout << "==========[test log]OpenCamera fail, Test_->rc = ";
-        std::cout << Test_->rc << ", cameraId = " << cameraId << std::endl;
-    }
+        } else {
+            std::cout << "==========[test log]OpenCamera fail, Test_->rc = ";
+            std::cout << Test_->rc << ", cameraId = " << cameraId << std::endl;
+        }
 
-    if (Test_->cameraDevice!= nullptr) {
-        Test_->cameraDevice->Close();
-    }
+        if (Test_->cameraDevice!= nullptr) {
+            Test_->cameraDevice->Close();
+        }
     }
 }
 

@@ -153,19 +153,6 @@ void Test::Close()
         std::cout << "cameraDevice->Close" << std::endl;
         cameraDevice = nullptr;
     }
-    consumerMap_.clear();
-    if (hostCallback != nullptr) {
-        delete hostCallback;
-        hostCallback = nullptr;
-    }
-    if (deviceCallback != nullptr) {
-        delete deviceCallback;
-        deviceCallback = nullptr;
-    }
-    if (streamOperatorCallback != nullptr) {
-        delete streamOperatorCallback;
-        streamOperatorCallback = nullptr;
-    }
 }
 
 void Test::StartStream(std::vector<Camera::StreamIntent> intents)
