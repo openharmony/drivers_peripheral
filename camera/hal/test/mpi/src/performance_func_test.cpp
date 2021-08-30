@@ -63,18 +63,6 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0001, TestSize.Level3)
         totle_time_use = totle_time_use + time_use;
         // 后处理，关闭相机
         Test_->Close();
-        if (Test_->hostCallback != nullptr) {
-            delete Test_->hostCallback;
-            Test_->hostCallback = nullptr;
-        }
-        if (Test_->deviceCallback != nullptr) {
-            delete Test_->deviceCallback;
-            Test_->deviceCallback = nullptr;
-        }
-        if (Test_->streamOperatorCallback != nullptr) {
-            delete Test_->streamOperatorCallback;
-            Test_->streamOperatorCallback = nullptr;
-        }
     }
     float avrg_time = totle_time_use/ Times;
     EXPECT_LT(avrg_time, 80000);
@@ -169,18 +157,6 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0003, TestSize.Level3)
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
 
-        if (Test_->hostCallback != nullptr) {
-            delete Test_->hostCallback;
-            Test_->hostCallback = nullptr;
-        }
-        if (Test_->deviceCallback != nullptr) {
-            delete Test_->deviceCallback;
-            Test_->deviceCallback = nullptr;
-        }
-        if (Test_->streamOperatorCallback != nullptr) {
-            delete Test_->streamOperatorCallback;
-            Test_->streamOperatorCallback = nullptr;
-        }
     }
     float avrg_time = totle_time_use/ Times;
     EXPECT_LT(avrg_time, 100000);
