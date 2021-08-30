@@ -258,8 +258,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0015, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: DFX
   */
-HWTEST_F(DfxTest, Camera_Dfx_0020, TestSize.Level3)
-{
+HWTEST_F(DfxTest, Camera_Dfx_0020, TestSize.Level3) {
     std::cout << "==========[test log] Dfx: mock Hdi_IsStreamsSupported_Timeout." << std::endl;
     bool result = false;
     std::string property="Hdi_IsStreamsSupported_Timeout";
