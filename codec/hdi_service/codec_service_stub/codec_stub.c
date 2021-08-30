@@ -49,7 +49,8 @@ static int32_t SerCodecDeinit(struct HdfDeviceIoClient *client, struct HdfSBuf *
     }
     return errNum;
 }
-static int32_t SerCodecEnumerateCapbility(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerCodecEnumerateCapbility(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
+                                          struct HdfSBuf *reply)
 {
     uint32_t index;
     CodecCapbility capbility;
@@ -58,8 +59,7 @@ static int32_t SerCodecEnumerateCapbility(struct HdfDeviceIoClient *client, stru
         HDF_LOGE("%{public}s: read index data failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t errNum = HDF_SUCCESS;
-    // int32_t errNum = CodecEnumerateCapbility(index, &capbility);  //libcodec.so undifined
+    int32_t errNum = HDF_SUCCESS; // CodecEnumerateCapbility(index, &capbility); libcodec.so undifined
     if (errNum != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call CodecEnumerateCapbility fuc failed!", __func__);
         return errNum;
