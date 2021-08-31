@@ -13,22 +13,29 @@
  * limitations under the License.
  */
 
-#include "create_devicemanager_factory.h"
+#ifndef HDI_CODEC_CALLBACK_CODECCALLBACK_H
+#define HDI_CODEC_CALLBACK_CODECCALLBACK_H
+#include "codec_type.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
-namespace OHOS::Camera {
-    std::string deviceName = "V4L2DeviceManager";
-IDeviceManager::IDeviceManager() {}
+struct HdfRemoteService;
 
-IDeviceManager::~IDeviceManager() {}
+enum {
+    CMD_CODEC_ON_EVENT,
+    CMD_CODEC_INPUT_BUFFER_AVAILABLE,
+    CMD_CODEC_OUTPUT_BUFFER_AVAILABLE,
+};
 
-std::shared_ptr<IDeviceManager> IDeviceManager::GetInstance()
-{
-    std::string deviceName = "V4L2DeviceManager";
-    static std::shared_ptr<IDeviceManager> deviceManger = nullptr;
-    if (deviceManger == nullptr) {
-        deviceManger = GetDeviceManagerFactory.GetDeviceManagerByName(deviceName);
-    }
-    return deviceManger;
+struct ICodecCallback {
+    struct HdfRemoteService *remote;
+    CodecCallback callback;
+};
+
+#ifdef __cplusplus
 }
-}// namespace OHOS::Camera
+#endif /* __cplusplus */
+
+#endif // HDI_CODEC_CALLBACK_CODECCALLBACK_H

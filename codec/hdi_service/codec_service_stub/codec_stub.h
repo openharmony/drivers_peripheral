@@ -12,23 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef CODEC_STUB_H
+#define CODEC_STUB_H
 
-#include "create_devicemanager_factory.h"
+#include <hdf_device_desc.h>
+#include "codec_type.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
-namespace OHOS::Camera {
-    std::string deviceName = "V4L2DeviceManager";
-IDeviceManager::IDeviceManager() {}
+int32_t CodecServiceOnRemoteRequest(struct HdfDeviceIoClient *client, int cmdId,
+                                    struct HdfSBuf *data, struct HdfSBuf *reply);
 
-IDeviceManager::~IDeviceManager() {}
-
-std::shared_ptr<IDeviceManager> IDeviceManager::GetInstance()
-{
-    std::string deviceName = "V4L2DeviceManager";
-    static std::shared_ptr<IDeviceManager> deviceManger = nullptr;
-    if (deviceManger == nullptr) {
-        deviceManger = GetDeviceManagerFactory.GetDeviceManagerByName(deviceName);
-    }
-    return deviceManger;
+#ifdef __cplusplus
 }
-}// namespace OHOS::Camera
+#endif /* __cplusplus */
+
+#endif // CODEC_STUB_H
