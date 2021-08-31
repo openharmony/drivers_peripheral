@@ -211,10 +211,10 @@ int32_t GetValidFreqByBand(const char *ifName, int32_t band,
     struct FreqInfoResult *result);
 int32_t SetTxPower(const char *ifName, int32_t power);
 int32_t GetAssociatedStas(const char *ifName, struct AssocStaInfoResult *result);
-int32_t SetCountryCode(const char *ifName, const char *code, uint32_t len);
+int32_t WifiSetCountryCode(const char *ifName, const char *code, uint32_t len);
 int32_t SetScanMacAddr(const char *ifName, uint8_t *scanMac, uint8_t len);
 
-int32_t GetChipId(const char *ifName, uint8_t *chipId);
+int32_t AcquireChipId(const char *ifName, uint8_t *chipId);
 int32_t GetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num);
 int32_t SetResetDriver(const uint8_t chipId, const char *ifName);
 int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult);

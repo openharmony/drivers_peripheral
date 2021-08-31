@@ -58,7 +58,7 @@ HWTEST_F(WifiClientTest, WifiClientSetCountryCode001, TestSize.Level1)
 {
     int ret;
 
-    ret = SetCountryCode("wlan0", "CN", 2);
+    ret = WifiSetCountryCode("wlan0", "CN", 2);
     EXPECT_EQ(RET_CODE_SUCCESS, ret);
 }
 
