@@ -143,8 +143,8 @@ enum WifiClientType {
 
 typedef int32_t (*OnReceiveFunc)(uint32_t event, void *data, const char *ifName);
 
-int32_t RegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
-void UnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
+int32_t WifiRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
+void WifiUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
 
 /* hal related interface */
 #define MAX_2GHZ_CHANNEL_NUM 14
