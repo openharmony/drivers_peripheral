@@ -221,7 +221,7 @@ static int32_t RegisterEventCallbackInner(OnReceiveFunc onRecFunc, const char *i
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (RegisterEventCallback(onRecFunc, WIFI_KERNEL_TO_HAL_CLIENT, ifName) != HDF_SUCCESS) {
+    if (WifiRegisterEventCallback(onRecFunc, WIFI_KERNEL_TO_HAL_CLIENT, ifName) != HDF_SUCCESS) {
         HDF_LOGE("%s: callback function has been registered, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
@@ -234,7 +234,7 @@ static int32_t UnregisterEventCallbackInner(OnReceiveFunc onRecFunc, const char 
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    UnregisterEventCallback(onRecFunc, WIFI_KERNEL_TO_HAL_CLIENT, ifName);
+    WifiUnregisterEventCallback(onRecFunc, WIFI_KERNEL_TO_HAL_CLIENT, ifName);
     return HDF_SUCCESS;
 }
 

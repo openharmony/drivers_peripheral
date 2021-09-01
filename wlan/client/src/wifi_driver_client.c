@@ -49,7 +49,7 @@ void WifiEventReport(const char *ifName, uint32_t event, void *data)
     }
 }
 
-int32_t RegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName)
+int32_t WifiRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName)
 {
     uint32_t i;
     struct CallbackEvent *callbackEvent = NULL;
@@ -87,7 +87,7 @@ int32_t RegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const
     return RET_CODE_FAILURE;
 }
 
-void UnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName)
+void WifiUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName)
 {
     uint32_t i;
 
