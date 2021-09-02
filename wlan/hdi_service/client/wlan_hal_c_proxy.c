@@ -225,10 +225,8 @@ static int32_t WlanDestroyFeature(struct IWifiInterface *self, struct WlanFeatur
     }
 
 finished:
+    OsalMemFree(ifeature->ifName);
     OsalMemFree(ifeature);
-    if (ifeature->ifName != NULL) {
-        free(ifeature->ifName);
-    }
     if (data != NULL) {
         HdfSBufRecycle(data);
     }
