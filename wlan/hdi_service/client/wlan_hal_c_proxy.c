@@ -661,6 +661,8 @@ static int ServiceManagerTestCallbackDispatch(struct HdfRemoteService *service, 
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     const char *ifName = HdfSbufReadString(data);
+    printf("ServiceManagerTestCallbackDispatch ifName = %s\n", ifName);
+    printf("ServiceManagerTestCallbackDispatch eventId = %s\n", eventId);
     return callback_(eventId, data, ifName);
 }
 
