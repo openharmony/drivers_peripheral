@@ -658,7 +658,7 @@ finished:
 int32_t (*callback_)(uint32_t event, void *data, const char *ifName);
 
 static int ServiceManagerTestCallbackDispatch(struct HdfRemoteService *service, int eventId,
-     struct HdfSBuf *data, struct HdfSBuf *reply)
+    struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     const char *ifName = HdfSbufReadString(data);
     return callback_(eventId, data, ifName);
