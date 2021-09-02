@@ -13,6 +13,25 @@
  * limitations under the License.
  */
 
+/**
+ * @addtogroup USB
+ * @{
+ *
+ * @brief Declares USB-related APIs, including the custom data types and functions used to obtain descriptors, interface objects, and request objects, and to submit requests.
+ *
+ * @since 1.0
+ * @version 1.0
+ */
+
+/**
+ * @file usb_ddk.h
+ *
+ * @brief Defines the USB-related structures.
+ * 
+ * @since 1.0
+ * @version 1.0
+ */
+
 #ifndef USB_DDK_H
 #define USB_DDK_H
 
@@ -20,33 +39,83 @@
 #include <endian.h>
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
+/**
+ * @brief Implements 16-bit little-endian conversion.
+ */
 #define CpuToLe16(x)  (x)
+/**
+ * @brief Implements 32-bit little-endian conversion.
+ */
 #define CpuToLe32(x)  (x)
 #else
+/**
+ * @brief Implements 16-bit little-endian conversion.
+ */
 #define CpuToLe16(x)  ((((x) >> 8) & 0xffu) | (((x) & 0xffu) << 8))
+/**
+ * @brief Implements 32-bit little-endian conversion.
+ */
 #define CpuToLe32(x)  \
     ((((x) & 0xff000000u) >> 24) | (((x) & 0x00ff0000u) >>  8) | \
     (((x) & 0x0000ff00u) <<  8) | (((x) & 0x000000ffu) << 24))
 #endif
 
+/**
+ * @brief Implements 16-bit little-endian conversion.
+ */
 #define Le16ToCpu               CpuToLe16
+/**
+ * @brief Implements 16-bit little-endian conversion.
+ */
 #define Le32ToCpu               CpuToLe32
 
+/**
+ * @brief Configures the bus power-on feature.
+ */
 #define USB_CFG_BUS_POWERED     0x80
+
+/**
+ * @brief Configures the automatic power-on feature.
+ */
 #define USB_CFG_SELF_POWERED    0x40
+
+/**
+ * @brief Configures the remote wakeup feature.
+ */
 #define USB_CFG_REMOTE_WAKEUP   0x20
 
+/**
+ * @brief Defines the data direction bit offset. For details, see {@link UsbRequestDirection}.
+ */
 #define USB_DIR_OFFSET          0x07
+
+/**
+ * @brief Defines the control request type offset. For details, see {@link UsbControlRequestType}.
+ */
 #define USB_TYPE_OFFSET         0x05
+
+/**
+ * @brief Defines the control request packet type offset. For details, see {@link UsbRequestTargetType}.
+ */
 #define USB_RECIP_OFFSET        0x00
 
+/**
+ * @brief Defines the USB string index.
+ */
 enum {
+    /** Manufacturer index */
     USB_FUNC_MANUFACTURER_IDX,
+    /** Product index */
     USB_FUNC_PRODUCT_IDX,
+    /** Product SN index */
     USB_FUNC_SERIAL_IDX,
+    /** Index of the first valid string */
     USB_FUNC_FIRST_AVAIL_IDX,
 };
 
+/**
+ * @brief Renames a descriptor structure.
+ */
 enum {
     FUNCTIONFS_DESCRIPTORS_MAGIC = 1,
     FUNCTIONFS_STRINGS_MAGIC = 2,
@@ -470,14 +539,29 @@ struct UsbCdcEtherDesc {
 #define UsbiConfigurationDescriptor                 UsbConfigDescriptor
 #define UsbiInterfaceDescriptor                     UsbInterfaceDescriptor
 
+/**
+ * @brief Checks whether the specified endpoint is in the input direction (the direction in which data is transferred from the device to the host). For details, see {@link UsbRequestDirection}.
+ *
+ * @param ep Indicates the endpoint address, which is in the <b>uint8_t</b> format.
+ *
+ * @return Returns <b>1</b> if the specified endpoint is in the input direction; returns <b>0</b> otherwise.
+ */
 static inline int UsbEndpointDirIn(uint8_t ep)
 {
     return ((ep & USB_DDK_ENDPOINT_DIR_MASK) == USB_DDK_DIR_IN);
 }
 
+/**
+ * @brief Checks whether the specified endpoint is in the output direction (the direction in which data is transferred from the host to the device). For details, see {@link UsbRequestDirection}.
+ *
+ * @param ep Indicates the endpoint address, which is in the <b>uint8_t</b> format.
+ *
+ * @return Returns <b>1</b> if the specified endpoint is in the output direction; returns <b>0</b> otherwise.
+ */
 static inline int UsbEndpointDirOut(uint8_t ep)
 {
     return ((ep & USB_DDK_ENDPOINT_DIR_MASK) == USB_DDK_DIR_OUT);
 }
 
 #endif /* USB_DDK_H */
+/** @} */
