@@ -57,7 +57,8 @@ RetCode MpiNode::ConnectMpi(const int32_t streamId)
     auto peerNode = peerPort->GetNode();
     CHECK_IF_PTR_NULL_RETURN_VALUE(peerNode, RC_ERROR);
 
-    CAMERA_LOGI("mpp try to connect %{public}s to %{public}s.", port->GetNode()->GetName().c_str(), peerNode->GetName().c_str());
+    CAMERA_LOGI("mpp try to connect %{public}s to %{public}s.",
+        port->GetNode()->GetName().c_str(), peerNode->GetName().c_str());
     RetCode rc = deviceManager_->Connect(name_, port->GetName(), peerNode->GetName(), peerPort->GetName());
     if (rc == RC_ERROR) {
         CAMERA_LOGE("failed to connect.");
@@ -94,7 +95,8 @@ RetCode MpiNode::DisConnectMpi(const int32_t streamId)
     auto peerNode = peerPort->GetNode();
     CHECK_IF_PTR_NULL_RETURN_VALUE(peerNode, RC_ERROR);
 
-    CAMERA_LOGI("mpp try to disconnect %{public}s and %{public}s.", port->GetNode()->GetName().c_str(), peerNode->GetName().c_str());
+    CAMERA_LOGI("mpp try to disconnect %{public}s and %{public}s.",
+        port->GetNode()->GetName().c_str(), peerNode->GetName().c_str());
     RetCode rc = deviceManager_->UnConnect(name_, port->GetName(), peerNode->GetName(), peerPort->GetName());
     if (rc == RC_ERROR) {
         CAMERA_LOGE("failed to disconnect.");

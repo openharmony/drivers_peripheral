@@ -246,7 +246,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0060, TestSize.Level3)
     float totle_time_use = 0;
     writeIntoFile.open("TimeConsuming.txt", ios::app);
     for (int round = 0; round < Times; round ++) {
-        int i = rand() % 10;
+        int i = rand() % 9;
         std::cout << "round = "<< round << ", i = " << i << std::endl;
         meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode.at(i), 1);
         gettimeofday(&start, NULL);

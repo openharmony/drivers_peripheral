@@ -26,7 +26,7 @@ RetCode IspManager::CreateController(ControllerId controllerId, std::string hard
 {
     RetCode rc = RC_OK;
     if (controllerId == DM_C_ISP) {
-        if (!CheckCameraIdList(hardwareName)){
+        if (!CheckCameraIdList(hardwareName)) {
             std::shared_ptr<IspController> isp = std::make_shared<IspController>(hardwareName);
             if (isp == nullptr) {
                 return RC_ERROR;
@@ -115,5 +115,4 @@ bool IspManager::CheckCameraIdList(std::string hardwareName)
     }
     return false;
 }
-
 } // namespace OHOS::Camera

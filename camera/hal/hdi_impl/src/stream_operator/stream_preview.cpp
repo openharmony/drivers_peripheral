@@ -16,7 +16,6 @@
 #include "stream_preview.h"
 
 namespace OHOS::Camera {
-
 StreamPreview::StreamPreview(const int32_t id,
                              const StreamIntent type,
                              std::shared_ptr<IPipelineCore>& p,

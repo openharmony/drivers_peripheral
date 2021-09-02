@@ -11,21 +11,19 @@
  * limitations under the License.
  */
 
-#ifndef HOS_CAMERA_SOURCE_NODE_H
-#define HOS_CAMERA_SOURCE_NODE_H
+#ifndef HOS_CAMERA_V4L2_SOURCE_NODE_H
+#define HOS_CAMERA_V4L2_SOURCE_NODE_H
 
 #include <vector>
 #include "device_manager_adapter.h"
 #include "v4l2_device_manager.h"
 #include "utils.h"
-#include "camera.h"
-#include "node_base.h"
+#include "source_node.h"
 #include "sensor_controller.h"
 #include "sensor_manager.h"
 
 namespace OHOS::Camera{
-class V4L2SourceNode : public SourceNode
-{
+class V4L2SourceNode : public SourceNode {
 public:
     V4L2SourceNode(const std::string& name, const std::string& type);
     ~V4L2SourceNode() override;
@@ -34,17 +32,14 @@ public:
     RetCode Flush(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;
     RetCode GetDeviceController();
-    void DistributeBuffers();
-    void AchieveBuffer(std::shared_ptr<FrameSpec> frameSpec);
-    void SendCallBack();
+    void SetBufferCallback() override;
     RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
-    RetCode Capture(const int32_t streamId, const int32_t captureId) override;
-    void DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
 
 private:
     std::mutex                              requestLock_;
     std::map<int32_t, std::list<int32_t>>   captureRequests_ = {};
     std::shared_ptr<SensorController>       sensorController_ = nullptr;
+    std::shared_ptr<IDeviceManager>     deviceManager_ = nullptr;
 };
-}// namespace OHOS::Camera
+} // namespace OHOS::Camera
 #endif

@@ -254,7 +254,12 @@ void Hos3516Demo::StoreImage(const void* bufStart, const uint32_t size) const
     int imgFD = 0;
     int ret;
 
-    sprintf_s(path, sizeof(path), "/data/3516_%ld.jpeg", time(nullptr));
+    struct timeval start;
+    gettimeofday(&start, nullptr);
+    if (sprintf_s(path, sizeof(path), "/data/3516_%ld.jpeg", start.tv_usec) < 0) {
+        CAMERA_LOGE("sprintf_s error .....\n");
+        return;
+    }
 
     imgFD = open(path, O_RDWR | O_CREAT, 00766); // 00766:file operate permission
     if (imgFD == -1) {
@@ -288,7 +293,10 @@ void Hos3516Demo::OpenVideoFile()
     constexpr uint32_t pathLen = 30;
     char path[pathLen] = {0};
 
-    sprintf_s(path, sizeof(path), "/data/3516_video%ld.h265", time(nullptr));
+    if (sprintf_s(path, sizeof(path), "/data/3516_video%ld.h264", time(nullptr)) < 0) {
+        CAMERA_LOGE("%s: sprintf  failed", __func__);
+        return;
+    }
     videoFd_ = open(path, O_RDWR | O_CREAT, 00766); // 00766:file operate permission
     if (videoFd_ < 0) {
         CAMERA_LOGE("demo test: StartVideo open /data/3516.yuv %{public}s\n", strerror(errno));

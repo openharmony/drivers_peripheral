@@ -22,7 +22,6 @@
 #include <set>
 
 namespace OHOS::Camera {
-
 StreamOperator::StreamOperator(const OHOS::sptr<IStreamOperatorCallback>& callback,
                                const std::weak_ptr<CameraDevice>& device)
 {
@@ -170,10 +169,9 @@ CamRetCode StreamOperator::IsStreamsSupported(OperationMode mode,
     return NO_ERROR;
 }
 
-DynamicStreamSwitchMode
-    StreamOperator::CheckStreamsSupported(OperationMode mode,
-                                          const std::shared_ptr<CameraStandard::CameraMetadata>& modeSetting,
-                                          const std::vector<std::shared_ptr<StreamInfo>>& infos)
+DynamicStreamSwitchMode StreamOperator::CheckStreamsSupported(OperationMode mode,
+                                                            const std::shared_ptr<CameraStandard::CameraMetadata>& modeSetting,
+                                                            const std::vector<std::shared_ptr<StreamInfo>>& infos)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamPipeline_, DYNAMIC_STREAM_SWITCH_NOT_SUPPORT);
     std::vector<StreamConfiguration> configs = {};
@@ -184,14 +182,13 @@ DynamicStreamSwitchMode
         config.height = it->height_;
         PixelFormat pf = static_cast<PixelFormat>(it->format_);
         config.format = BufferAdapter::PixelFormatToCameraFormat(pf);
-        config.dataspace = it->datasapce_; // FIXME: fix spell error
+        config.dataspace = it->datasapce_; // fix spell error
         config.tunnelMode = it->tunneledMode_;
         config.minFrameDuration = it->minFrameDuration_;
         config.encodeType = it->encodeType_;
         configs.emplace_back(config);
     }
-
-    // TODO: search device capability to check if this configuration is supported.
+    // search device capability to check if this configuration is supported.
     return streamPipeline_->CheckStreamsSupported(mode, modeSetting, configs);
 }
 
@@ -219,7 +216,7 @@ CamRetCode StreamOperator::CreateStreams(const std::vector<std::shared_ptr<Strea
         scg.height = it->height_;
         PixelFormat pf = static_cast<PixelFormat>(it->format_);
         scg.format = BufferAdapter::PixelFormatToCameraFormat(pf);
-        scg.dataspace = it->datasapce_; // FIXME: fix misspell
+        scg.dataspace = it->datasapce_; // fix misspell
         scg.tunnelMode = it->tunneledMode_;
         scg.minFrameDuration = it->minFrameDuration_;
         scg.encodeType = it->encodeType_;
@@ -559,8 +556,7 @@ void StreamOperator::HandleCallbackMessage(MessageGroup& message)
     CHECK_IF_PTR_NULL_RETURN_VOID(message[0]);
     CaptureMessageType type = message[0]->GetMessageType();
     switch (type) {
-        case CAPTURE_MESSAGE_TYPE_ON_STARTED:
-        {
+        case CAPTURE_MESSAGE_TYPE_ON_STARTED: {
             std::vector<int32_t> ids = {};
             for (auto cm : message) {
                 auto m = std::static_pointer_cast<CaptureStartedMessage>(cm);
@@ -568,10 +564,9 @@ void StreamOperator::HandleCallbackMessage(MessageGroup& message)
                 ids.push_back(m->GetStreamId());
             }
             OnCaptureStarted(message[0]->GetCaptureId(), ids);
+            break;
         }
-        break;
-        case CAPTURE_MESSAGE_TYPE_ON_ERROR:
-        {
+        case CAPTURE_MESSAGE_TYPE_ON_ERROR: {
             std::vector<std::shared_ptr<CaptureErrorInfo>> info = {};
             for (auto cm : message) {
                 auto m = std::static_pointer_cast<CaptureErrorMessage>(cm);
@@ -582,10 +577,9 @@ void StreamOperator::HandleCallbackMessage(MessageGroup& message)
                 info.push_back(edi);
             }
             OnCaptureError(message[0]->GetCaptureId(), info);
+            break;
         }
-        break;
-        case CAPTURE_MESSAGE_TYPE_ON_ENDED:
-        {
+        case CAPTURE_MESSAGE_TYPE_ON_ENDED: {
             std::vector<std::shared_ptr<CaptureEndedInfo>> info = {};
             for (auto cm : message) {
                 auto m = std::static_pointer_cast<CaptureEndedMessage>(cm);
@@ -596,10 +590,9 @@ void StreamOperator::HandleCallbackMessage(MessageGroup& message)
                 info.push_back(edi);
             }
             OnCaptureEnded(message[0]->GetCaptureId(), info);
+            break;
         }
-        break;
-        case CAPTURE_MESSAGE_TYPE_ON_SHUTTER:
-        {
+        case CAPTURE_MESSAGE_TYPE_ON_SHUTTER: {
             std::vector<int32_t> ids = {};
             for (auto cm : message) {
                 auto m = std::static_pointer_cast<FrameShutterMessage>(cm);
@@ -607,12 +600,11 @@ void StreamOperator::HandleCallbackMessage(MessageGroup& message)
                 ids.push_back(m->GetStreamId());
             }
             OnFrameShutter(message[0]->GetCaptureId(), ids, message[0]->GetTimestamp());
+            break;
         }
-        break;
         default:
-        break;
+           break;
     }
-
     return;
 }
 
@@ -646,5 +638,4 @@ void StreamOperator::OnFrameShutter(int32_t captureId, const std::vector<int32_t
     CHECK_IF_EQUAL_RETURN_VOID(callback_, nullptr);
     callback_->OnFrameShutter(captureId, streamIds, timestamp);
 }
-
 } // end namespace OHOS::Camera

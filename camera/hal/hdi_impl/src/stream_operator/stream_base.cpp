@@ -19,7 +19,6 @@
 #include "watchdog.h"
 
 namespace OHOS::Camera {
-
 std::map<StreamIntent, std::string> IStream::g_avaliableStreamType = {
     {PREVIEW, STREAM_INTENT_TO_STRING(PREVIEW)},
     {VIDEO, STREAM_INTENT_TO_STRING(VIDEO)},
@@ -69,7 +68,7 @@ RetCode StreamBase::ConfigStream(StreamConfiguration& config)
     streamConfig_.bufferCount = GetBufferCount();
     streamConfig_.maxBatchCaptureCount = 1;
     streamConfig_.maxCaptureCount = 1;
-    // TODO:get device cappability to overide configuration
+    // get device cappability to overide configuration
     return RC_OK;
 }
 
@@ -129,8 +128,8 @@ RetCode StreamBase::CommitStream()
         CAMERA_LOGE("commit stream [id:%{public}d] to pipeline failed.", streamId_);
         return RC_ERROR;
     }
-    CAMERA_LOGI("commit a stream to pipeline id[%{public}d], w[%{public}d], h[%{public}d], poolId[%{public}llu], encodeType = %{public}d", info.streamId_,
-                info.width_, info.height_, info.bufferPoolId_, info.encodeType_);
+    CAMERA_LOGI("commit a stream to pipeline id[%{public}d], w[%{public}d], h[%{public}d], poolId[%{public}llu], \
+        encodeType = %{public}d", info.streamId_, info.width_, info.height_, info.bufferPoolId_, info.encodeType_);
     state_ = STREAM_STATE_ACTIVE;
 
     return RC_OK;
@@ -146,11 +145,6 @@ RetCode StreamBase::StartStream()
 
     CAMERA_LOGI("start stream [id:%{public}d] begin", streamId_);
     tunnel_->NotifyStart();
-
-    uint32_t n = GetBufferCount();
-    for (uint32_t i = 0; i < n; i++) {
-        DeliverBuffer();
-    }
 
     RetCode rc = pipeline_->Prepare({streamId_});
     if (rc != RC_OK) {
@@ -250,6 +244,13 @@ RetCode StreamBase::AddRequest(std::shared_ptr<CaptureRequest>& request)
 
     request->SetFirstRequest(false);
     if (isFirstRequest) {
+        uint32_t n = GetBufferCount();
+        if (!request->IsContinous()) {
+            for (uint32_t i = 0; i < n; i++) {
+                DeliverBuffer();
+            }
+        }
+
         RetCode rc = StartStream();
         if (rc != RC_OK) {
             CAMERA_LOGE("start stream [id:%{public}d] failed", streamId_);
@@ -405,8 +406,8 @@ void StreamBase::HandleResult(std::shared_ptr<IBuffer>& buffer)
     }
 
     if (buffer->GetStreamId() != streamId_) {
-        CAMERA_LOGE("fatal error, stream [%{public}d] reveived a wrong buffer, index:%{public}d. this buffer belongs to stream:%{public}d",
-            streamId_, buffer->GetIndex(), buffer->GetStreamId());
+        CAMERA_LOGE("fatal error, stream [%{public}d] reveived a wrong buffer, index:%{public}d. \
+            this buffer belongs to stream:%{public}d", streamId_, buffer->GetIndex(), buffer->GetStreamId());
         return;
     }
 
@@ -431,7 +432,7 @@ void StreamBase::HandleResult(std::shared_ptr<IBuffer>& buffer)
         return;
     }
     request->AttachBuffer(buffer);
-    // TODO: To synchronize multiple stream, bottom-layer device stream need be synchronized first.
+    // To synchronize multiple stream, bottom-layer device stream need be synchronized first.
     request->OnResult(streamId_);
     lastRequest_ = request;
 
@@ -498,8 +499,8 @@ RetCode StreamBase::ReceiveBuffer(std::shared_ptr<IBuffer>& buffer)
     CHECK_IF_PTR_NULL_RETURN_VALUE(tunnel_, RC_ERROR);
     CHECK_IF_PTR_NULL_RETURN_VALUE(bufferPool_, RC_ERROR);
 
-    CAMERA_LOGI("stream [id:%{public}d] dequeue buffer index:%{public}d, status:%{public}d", streamId_, buffer->GetIndex(),
-                buffer->GetBufferStatus());
+    CAMERA_LOGI("stream [id:%{public}d] dequeue buffer index:%{public}d, status:%{public}d",
+        streamId_, buffer->GetIndex(), buffer->GetBufferStatus());
     bufferPool_->ReturnBuffer(buffer);
     tunnel_->PutBuffer(buffer);
     return RC_OK;

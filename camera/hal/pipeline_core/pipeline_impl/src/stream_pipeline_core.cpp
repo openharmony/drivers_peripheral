@@ -34,8 +34,8 @@ RetCode StreamPipelineCore::PreConfig(const ModeMeta& meta)
     context_->streamMgr_->GetStreamIds(ids);
     for (auto i : ids) {
         auto info = context_->streamMgr_->GetStreamInfo(i);
-        DeviceStreamSetting setting = {info.streamId_, info.bufferCount_, info.width_,     info.height_,
-                                       info.format_,   info.usage_,       static_cast<CameraEncodeType>(info.encodeType_)};
+        DeviceStreamSetting setting = {info.streamId_, info.bufferCount_, info.width_, info.height_,
+            info.format_, info.usage_, static_cast<CameraEncodeType>(info.encodeType_)};
         settings.emplace_back(setting);
     }
     return deviceManager->PreConfig(meta, settings);
@@ -147,7 +147,7 @@ DynamicStreamSwitchMode StreamPipelineCore::CheckStreamsSupported(OperationMode 
                                                                   const ModeMeta& meta,
                                                                   const std::vector<StreamConfiguration>& configs)
 {
-    // TODO: check metadata
+    // check metadata
     CHECK_IF_PTR_NULL_RETURN_VALUE(meta, DYNAMIC_STREAM_SWITCH_NOT_SUPPORT);
     CHECK_IF_EQUAL_RETURN_VALUE(configs.empty(), true, DYNAMIC_STREAM_SWITCH_NOT_SUPPORT);
 

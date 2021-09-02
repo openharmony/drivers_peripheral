@@ -33,10 +33,19 @@ void StreamCustomer::CamFrame(const std::function<void(void*, uint32_t)> callbac
         consumer_->AcquireBuffer(buff, flushFence, timestamp, damage);
         if (buff != nullptr) {
             void* addr = buff->GetVirAddr();
-            uint32_t size = buff->GetSize();
+            int32_t size = buff->GetSize();
             if (callback != nullptr) {
-                CAMERA_LOGE("demo test:CamFrame callback+++++++++++++++++++++++");
-                callback(addr, size);
+                int32_t gotSize = 0;
+                int32_t frameNum = 0;
+                int isKey = 0;
+                int64_t timestamp;
+                buff->ExtraGet("dataSize", gotSize);
+                buff->ExtraGet("isKeyFrame", isKey);
+                buff->ExtraGet("timeStamp", timestamp);
+                buff->ExtraGet("frameNum", frameNum);
+                CAMERA_LOGE("demo test:CamFrame callback +++++++ Size == %d frameNum = %d timestamp == %lld\n",
+                    gotSize, frameNum, timestamp);
+                callback(addr, gotSize);
             }
             consumer_->ReleaseBuffer(buff, -1);
         }

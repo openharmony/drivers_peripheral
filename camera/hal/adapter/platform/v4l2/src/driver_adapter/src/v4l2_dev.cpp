@@ -253,7 +253,6 @@ void HosV4L2Dev::loopBuffers()
                 usleep(WATING_TIME);
             }
         }
-
     }
     CAMERA_LOGD("!!! loopBuffers exit\n");
 }
@@ -289,7 +288,6 @@ RetCode HosV4L2Dev::CreateEpoll(int fd, const unsigned int streamNumber)
 
         epoll_ctl(epollFd_, EPOLL_CTL_ADD, fd, &epollevent);
     }
-
     return RC_OK;
 }
 
@@ -302,7 +300,6 @@ void HosV4L2Dev::EraseEpoll(int fd)
             return false;
         }
     });
-
     if (itr != epollEvent_.end()) {
         struct epoll_event event = *itr;
         epoll_ctl(epollFd_, EPOLL_CTL_DEL, fd, &event);
@@ -501,7 +498,7 @@ RetCode HosV4L2Dev::QuerySetting(const std::string& cameraID, AdapterCmd command
     return RC_OK;
 }
 
-RetCode HosV4L2Dev::GetNumberCtrls (const std::string& cameraID, std::vector<DeviceControl>& control)
+RetCode HosV4L2Dev::GetNumberCtrls(const std::string& cameraID, std::vector<DeviceControl>& control)
 {
     int32_t fd;
 
@@ -638,32 +635,32 @@ RetCode HosV4L2Dev::ConfigSys(const std::string& cameraID, V4l2FmtCmd command, D
     switch (command) {
         case CMD_V4L2_GET_FORMAT:
             rc = myFileFormat_->V4L2GetFmt(fd, format);
-        break;
+            break;
 
         case CMD_V4L2_SET_FORMAT:
             rc = myFileFormat_->V4L2SetFmt(fd, format);
-        break;
+            break;
 
         case CMD_V4L2_GET_CROPCAP:
             rc = myFileFormat_->V4L2GetCropCap(fd, format);
-        break;
+            break;
 
         case CMD_V4L2_GET_CROP:
             rc = myFileFormat_->V4L2GetCrop(fd, format);
-        break;
+            break;
 
         case CMD_V4L2_SET_CROP:
             rc = myFileFormat_->V4L2SetCrop(fd, format);
-        break;
+            break;
 
         case CMD_V4L2_SET_FPS:
         case CMD_V4L2_GET_FPS:
             rc = ConfigFps(fd, format, command);
-        break;
+            break;
 
         default:
             CAMERA_LOGE("HosV4L2Dev::ConfigSys unknow command\n");
-        break;
+            break;
     }
 
     if (rc != RC_OK) {

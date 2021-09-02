@@ -16,7 +16,7 @@
 
 namespace OHOS::Camera {
 ForkNode::ForkNode(const std::string& name, const std::string& type)
-        :NodeBase(name, type)
+    :SourceNode(name, type), NodeBase(name, type)
 {
     CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
@@ -57,19 +57,22 @@ RetCode ForkNode::Stop(const int32_t streamId)
     return RC_OK;
 }
 
-void ForkNode::DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec)
+void ForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
-    if (frameSpec == nullptr) {
+    if (buffer == nullptr) {
         CAMERA_LOGE("frameSpec is null");
         return;
     }
-    std::unique_lock <std::mutex> lck(mtx_);
-    forkSpec_ = frameSpec;
-    cv_.notify_one();
+    int32_t id = buffer->GetStreamId();
+    {
+        std::unique_lock <std::mutex> lck(mtx_);
+        tmpBuffer_ = buffer;
+        cv_.notify_one();
+    }
     for (auto& it : outPutPorts_) {
-        if (it->format_.bufferPoolId_ == frameSpec->bufferPoolId_) {
-            it->DeliverBuffer(frameSpec);
-            CAMERA_LOGI("fork node deliver bufferpoolid = %{public}llu",it->format_.bufferPoolId_);
+        if (it->format_.streamId_ == id) {
+            it->DeliverBuffer(buffer);
+            CAMERA_LOGI("fork node deliver buffer streamid = %{public}d", it->format_.streamId_);
             return;
          }
     }
@@ -77,42 +80,47 @@ void ForkNode::DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec)
 
 void ForkNode::ForkBuffers()
 {
-    int64_t bufferPoolId = 0;
+    int32_t id = 0;
+    uint64_t bufferPoolId = 0;
     for (auto& in : inPutPorts_) {
         for (auto& out : outPutPorts_) {
-            if (out->format_.bufferPoolId_ != in->format_.bufferPoolId_) {
+            if (out->format_.streamId_ != in->format_.streamId_) {
+                id = out->format_.streamId_;
                 bufferPoolId = out->format_.bufferPoolId_;
-                CAMERA_LOGI("fork buffer get bufferpoolid = %{public}llu",out->format_.bufferPoolId_);
+                CAMERA_LOGI("fork buffer get buffer streamId = %{public}d", out->format_.streamId_);
             }
         }
     }
-    forkThread_ = std::make_shared<std::thread>([this, bufferPoolId] {
+    forkThread_ = std::make_shared<std::thread>([this, id, bufferPoolId] {
         prctl(PR_SET_NAME, "fork_buffers");
         BufferManager* bufferManager = Camera::BufferManager::GetInstance();
         std::shared_ptr<FrameSpec> frameSpec = std::make_shared<FrameSpec>();
+        std::shared_ptr<IBuffer> buffer = nullptr;
         while (streamRunning_ == true) {
-            std::unique_lock <std::mutex> lck(mtx_);
-            cv_.wait(lck);
-            std::shared_ptr<IBufferPool> bufferPool = bufferManager->GetBufferPool(bufferPoolId);
-            if (bufferPool == nullptr) {
-                CAMERA_LOGE("get bufferpool failed");
-                return RC_ERROR;
+            {
+                std::unique_lock <std::mutex> lck(mtx_);
+                cv_.wait(lck);
+                std::shared_ptr<IBufferPool> bufferPool = bufferManager->GetBufferPool(bufferPoolId);
+                if (bufferPool == nullptr) {
+                    CAMERA_LOGE("get bufferpool failed");
+                    return RC_ERROR;
+                }
+                CAMERA_LOGI("fork node acquirebuffer enter");
+                buffer = bufferPool->AcquireBuffer();
+                CAMERA_LOGI("fork node acquirebuffer exit");
+                if (buffer == nullptr) {
+                    CAMERA_LOGE("acquire buffer failed.");
+                    continue;
+                }
+                if (memcpy_s(buffer->GetVirAddress(), buffer->GetSize(),
+                    tmpBuffer_->GetVirAddress(), tmpBuffer_->GetSize()) != 0) {
+                        CAMERA_LOGE("memcpy_s failed.");
+                }
             }
-            CAMERA_LOGI("fork node acquirebuffer enter");
-            std::shared_ptr<IBuffer> buffer = bufferPool->AcquireBuffer();
-            CAMERA_LOGI("fork node acquirebuffer exit");
-            if (buffer == nullptr) {
-                CAMERA_LOGE("acquire buffer failed.");
-                continue;
-            }
-            memcpy_s(buffer->GetVirAddress(), buffer->GetSize(), forkSpec_->buffer_->GetVirAddress(),
-                    forkSpec_->buffer_->GetSize());
-            frameSpec->bufferPoolId_ = bufferPoolId;
-            frameSpec->buffer_ = buffer;
             for (auto& it : outPutPorts_) {
-                if (it->format_.bufferPoolId_ == frameSpec->bufferPoolId_) {
-                    CAMERA_LOGI("fork node deliver bufferpoolid = %{public}llu",it->format_.bufferPoolId_);
-                    it->DeliverBuffer(frameSpec);
+                if (it->format_.streamId_ == id) {
+                    CAMERA_LOGI("fork node deliver buffer streamid = %{public}d", it->format_.streamId_);
+                    it->DeliverBuffer(buffer);
                     break;
                 }
             }

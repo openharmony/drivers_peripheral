@@ -101,7 +101,7 @@ RetCode HosFileFormat::V4L2GetFmtDescs(int fd, std::vector<DeviceFormat>& fmtDes
     return rc;
 }
 
-RetCode HosFileFormat::V4L2GetCapability(int fd, const std::string& dev_name, std::string& cameraId)
+RetCode HosFileFormat::V4L2GetCapability(int fd, const std::string& devName, std::string& cameraId)
 {
     struct v4l2_capability cap = {};
 
@@ -119,7 +119,7 @@ RetCode HosFileFormat::V4L2GetCapability(int fd, const std::string& dev_name, st
     }
 
     std::lock_guard<std::mutex> l(HosV4L2Dev::deviceFdLock_);
-    HosV4L2Dev::deviceMatch.insert(std::make_pair(std::string((char*)cap.driver), dev_name));
+    HosV4L2Dev::deviceMatch.insert(std::make_pair(std::string((char*)cap.driver), devName));
 
     CAMERA_LOGD("v4l2 driver name = %s\n", cap.driver);
     CAMERA_LOGD("v4l2 capabilities = 0x%x\n", cap.capabilities);
@@ -262,16 +262,18 @@ void HosFileFormat::V4L2CloseDevice(int fd)
 void HosFileFormat::V4L2MatchDevice(std::vector<std::string>& cameraIDs)
 {
     struct stat st = {};
-    char dev_name[16] = {0};
+    char devName[16] = {0};
     std::string name = DEVICENAMEX;
     int fd = 0;
     int rc = 0;
 
     for (auto &it : cameraIDs) {
         for (int i = 0; i < MAXVIDEODEVICE; ++i) {
-            sprintf_s(dev_name, sizeof(dev_name), "%s%d", name.c_str(), i);
+            if ((sprintf_s(devName, sizeof(devName), "%s%d", name.c_str(), i)) < 0 ) {
+                CAMERA_LOGE("%s: sprintf devName failed", __func__);
+            }
 
-            if (stat(dev_name, &st) != 0) {
+            if (stat(devName, &st) != 0) {
                 continue;
             }
 
@@ -279,12 +281,12 @@ void HosFileFormat::V4L2MatchDevice(std::vector<std::string>& cameraIDs)
                 continue;
             }
 
-            fd = open(dev_name, O_RDWR | O_NONBLOCK, 0);
+            fd = open(devName, O_RDWR | O_NONBLOCK, 0);
             if (fd == -1) {
                 continue;
             }
 
-            rc = V4L2GetCapability(fd, dev_name, it);
+            rc = V4L2GetCapability(fd, devName, it);
             if (rc == RC_ERROR) {
                 close(fd);
                 continue;
