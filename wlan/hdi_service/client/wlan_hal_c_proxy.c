@@ -261,12 +261,12 @@ static int32_t WlanGetAsscociatedStas(struct IWifiInterface *self, const struct 
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
         goto finished;
     }
-    if(!HdfSbufReadUint32(reply, num)){
+    if (!HdfSbufReadUint32(reply, num)) {
         HDF_LOGE("%{public}s: read num failed! error code is %{public}d", __func__, ec);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if(!HdfSbufReadBuffer(reply, (const void **)&staInfo, &count)){
+    if (!HdfSbufReadBuffer(reply, (const void **)&staInfo, &count)) {
         HDF_LOGE("%{public}s: read num failed! error code is %{public}d", __func__, ec);
         ec = HDF_ERR_MALLOC_FAIL;
     }
@@ -657,8 +657,8 @@ finished:
 
 int32_t (*callback_)(uint32_t event, void *data, const char *ifName);
 
-static int ServiceManagerTestCallbackDispatch(struct HdfRemoteService *service, int eventId, 
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int ServiceManagerTestCallbackDispatch(struct HdfRemoteService *service, int eventId,
+     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     const char *ifName = HdfSbufReadString(data);
     return callback_(eventId, data, ifName);
@@ -1022,7 +1022,7 @@ static void IwifiConstruct(struct IWifiInterface *inst)
     inst->destroyFeature = WlanDestroyFeature;
     inst->getAsscociatedStas = WlanGetAsscociatedStas;
     inst->getChipId = WlanGetChipId;
-    inst->getDeviceMacAddress =WlanGetDeviceMacAddress;
+    inst->getDeviceMacAddress = WlanGetDeviceMacAddress;
     inst->getFeatureByIfName = WlanGetFeatureByIfName;
     inst->getFeatureType = WlanGetFeatureType;
     inst->getFreqsWithBand = WlanGetFreqsWithBand;
