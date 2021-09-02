@@ -877,8 +877,11 @@ static void AcmCtrlComplete(uint8_t pipe, struct UsbFnRequest *req)
         return;
     }
     struct CtrlInfo *ctrlInfo = (struct CtrlInfo *)req->context;
+    if (ctrlInfo == NULL) {
+        return;
+    }
     struct UsbAcmDevice *acm = ctrlInfo->acm;
-    if ((req == NULL) || (req->status != USB_REQUEST_COMPLETED)) {
+    if (req->status != USB_REQUEST_COMPLETED) {
         HDF_LOGD("%s: ctrl completion error %d", __func__, req->status);
         goto out;
     }

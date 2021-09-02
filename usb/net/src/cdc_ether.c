@@ -56,7 +56,7 @@ static int EcmWbAlloc(struct EcmDevice *ecm)
         wbn = (wbn + 1) % ECM_NW;
         if (++i >= ECM_NW) {
             OsalMutexUnlock(&ecm->writeLock);
-            return -1;
+            return 0;
         }
     }
     OsalMutexUnlock(&ecm->writeLock);
