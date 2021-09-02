@@ -45,11 +45,12 @@ private:
     void V4L2UvcSearchCapability(const std::string devName, const std::string v4l2Device, bool inOut);
     RetCode V4L2UvcGetCap(const std::string v4l2Device, struct v4l2_capability& cap);
     void V4L2UvcMatchDev(const std::string      name, const std::string v4l2Device, bool inOut);
-    RetCode V4L2UvcEnmeDevices();
+    void V4L2UvcEnmeDevices();
     void loopUvcDevice();
     const char* V4L2GetUsbValue(const char* key, const char* str, int len);
     void V4L2GetUsbString(std::string& action, std::string& subsystem,
         std::string& devnode, char* buf, unsigned int len);
+    RetCode V4L2UVCGetCapability(int fd, const std::string devName, std::string& cameraId);
 
     int uDevFd_ = -1;
     int eventFd_ = -1;

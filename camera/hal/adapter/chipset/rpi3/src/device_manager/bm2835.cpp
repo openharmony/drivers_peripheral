@@ -67,7 +67,6 @@ void Imx335::Init(CameraStandard::CameraMetadata& camera_metaData)
     InitSensitivityRange(camera_metaData);
 
     uint8_t faceDetectMode = OHOS_CAMERA_FACE_DETECT_MODE_OFF;
-    camera_metaData.addEntry(OHOS_STATISTICS_FACE_DETECT_MODE, &faceDetectMode,
-                              1);
+    camera_metaData.addEntry(OHOS_STATISTICS_FACE_DETECT_MODE, &faceDetectMode, 1);
 }
 } // namespace OHOS::Camera

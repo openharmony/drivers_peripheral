@@ -18,29 +18,28 @@
 #include "device_manager_adapter.h"
 #include "v4l2_device_manager.h"
 #include "utils.h"
-#include "camera.h"
-#include "node_base.h"
+#include "source_node.h"
 #include "sensor_controller.h"
 #include "sensor_manager.h"
 
 namespace OHOS::Camera {
-class UvcNode : public NodeBase {
+class UvcNode : public SourceNode {
 public:
     UvcNode(const std::string& name, const std::string& type);
     ~UvcNode() override;
+    RetCode Init(const int32_t streamId) override;
+    RetCode Flush(const int32_t streamId) override;
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;
     RetCode GetDeviceController();
-    RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta);
-    void DistributeBuffers();
-    void AchieveBuffer(std::shared_ptr<FrameSpec> frameSpec);
-    void SendCallBack();
+    void SetBufferCallback();
     RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
 protected:
     RetCode StartCheck(int64_t &bufferPoolId);
 private:
     std::shared_ptr<SensorController>       sensorController_ = nullptr;
     std::shared_ptr<IBufferPool>            bufferPool_ = nullptr;
+    std::shared_ptr<IDeviceManager>     deviceManager_ = nullptr;
 };
-}// namespace OHOS::Camera
+} // namespace OHOS::Camera
 #endif

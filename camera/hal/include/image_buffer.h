@@ -73,6 +73,9 @@ public:
     virtual void SetFenceId(const int32_t fence) override;
     virtual void SetEncodeType(const int32_t type) override;
     virtual void SetEsFrameSize(const int32_t frameSize) override;
+    virtual void SetEsTimestamp(const uint64_t timeStamp) override;
+    virtual void SetEsKeyFrame(const int32_t isKey) override;
+    virtual void SetEsFrameNum(const int32_t frameNum) override;
     virtual void SetStreamId(const int32_t streamId) override;
 
     virtual void Free() override;
@@ -98,7 +101,7 @@ private:
     int32_t sequenceId_ = -1;
     int32_t fenceId_ = -1;
     int32_t encodeType_ = 0;
-    EsFrmaeInfo esInfo_ = {-1, -1, -1, -1};
+    EsFrmaeInfo esInfo_ = {-1, -1, -1, -1, -1};
     int32_t streamId_ = -1;
     std::mutex l_;
 };

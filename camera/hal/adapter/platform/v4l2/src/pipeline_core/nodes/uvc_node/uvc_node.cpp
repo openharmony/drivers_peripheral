@@ -16,14 +16,14 @@
 
 namespace OHOS::Camera {
 UvcNode::UvcNode(const std::string& name, const std::string& type)
-        :NodeBase(name, type)
+        : SourceNode(name, type)
+        , NodeBase(name,type)
 {
     CAMERA_LOGI("%s enter, type(%s)\n", name_.c_str(), type_.c_str());
 }
 
 UvcNode::~UvcNode()
 {
-    NodeBase::Stop();
     CAMERA_LOGI("~uvc Node exit.");
 }
 
@@ -31,7 +31,6 @@ UvcNode::~UvcNode()
 RetCode UvcNode::GetDeviceController()
 {
     CameraId cameraId = CAMERA_THIRD;
-    sleep(2);
     sensorController_ = std::static_pointer_cast<SensorController>
         (deviceManager_->GetController(cameraId, DM_M_SENSOR, DM_C_SENSOR));
     if (sensorController_ == nullptr) {
@@ -41,9 +40,23 @@ RetCode UvcNode::GetDeviceController()
     return RC_OK;
 }
 
+RetCode UvcNode::Init(const int32_t streamId)
+{
+    return RC_OK;
+}
+
+RetCode UvcNode::Flush(const int32_t streamId)
+{
+    return RC_OK;
+}
+
 RetCode UvcNode::StartCheck(int64_t &bufferPoolId)
 {
-    GetDeviceManager();
+    deviceManager_ = IDeviceManager::GetInstance();
+    if (deviceManager_ == nullptr) {
+        CAMERA_LOGE("get device manager failed.");
+        return RC_ERROR;
+    }
     if (GetDeviceController() == RC_ERROR) {
         CAMERA_LOGE("GetDeviceController failed.");
         return RC_ERROR;
@@ -71,7 +84,8 @@ RetCode UvcNode::Start(const int32_t streamId)
     if (StartCheck(bufferPoolId) == RC_ERROR) {
         return RC_ERROR;
     }
-    for (auto& iter : outPutPorts_) {
+    std::vector<std::shared_ptr<IPort>> outPorts = GetOutPorts();
+    for (auto& iter : outPorts) {
         RetCode ret = bufferPool_->Init(iter->format_.w_,
             iter->format_.h_,
             iter->format_.usage_,
@@ -95,79 +109,18 @@ RetCode UvcNode::Start(const int32_t streamId)
             return RC_ERROR;
         }
     }
-    GetFrameInfo();
-    SendCallBack();
-    if (streamRunning_ == false) {
-        CAMERA_LOGI("streamrunning = false");
-        streamRunning_ = true;
-        CollectBuffers();
-        DistributeBuffers();
-    }
-    return RC_OK;
+    return SourceNode::Start(streamId);
 }
 
 RetCode UvcNode::Stop(const int32_t streamId)
 {
-    RetCode rc = RC_OK;
-    rc = sensorController_->Stop();
-    if (rc == RC_ERROR) {
-        CAMERA_LOGE("stopvi failed!");
-        return RC_ERROR;
-    }
-    return NodeBase::Stop();
+    return SourceNode::Stop(streamId);
 }
 
-RetCode UvcNode::Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
-{
-    CHECK_IF_PTR_NULL_RETURN_VALUE(meta, RC_ERROR);
-    return sensorController_->Configure(meta);
-}
-
-void UvcNode::DistributeBuffers()
-{
-    CAMERA_LOGI("uvc node distribute buffers enter");
-    for (auto& it : streamVec_) {
-        CAMERA_LOGI("uvc node distribute thread bufferpool id = %llu", it.bufferPoolId_);
-        it.deliverThread_ = new std::thread([this, it] {
-        prctl(PR_SET_NAME, "distribute_buff");
-            std::shared_ptr<FrameSpec> frame = nullptr;
-            while (streamRunning_ == true) {
-            {
-                std::lock_guard<std::mutex> l(streamLock_);
-                if (frameVec_.size() > 0) {
-                    auto frameSpec = std::find_if(frameVec_.begin(), frameVec_.end(),
-                    [it](std::shared_ptr<FrameSpec> fs) {
-                        return it.bufferPoolId_ == fs->bufferPoolId_;
-                    });
-                    if (frameSpec != frameVec_.end()) {
-                        frame = *frameSpec;
-                        frameVec_.erase(frameSpec);
-                    }
-                }
-            }
-                if (frame != nullptr) {
-                    DeliverBuffers(frame);
-                    frame = nullptr;
-                    continue;
-                }
-                usleep(10);
-            }
-            CAMERA_LOGI("uvc node distribute buffer thread %llu  closed", it.bufferPoolId_);
-            return;
-        });
-    }
-    return;
-}
-
-void UvcNode::AchieveBuffer(std::shared_ptr<FrameSpec> frameSpec)
-{
-    NodeBase::AchieveBuffer(frameSpec);
-}
-
-void UvcNode::SendCallBack()
+void UvcNode::SetBufferCallback()
 {
     sensorController_->SetNodeCallBack([&](std::shared_ptr<FrameSpec> frameSpec) {
-            AchieveBuffer(frameSpec);
+            OnPackBuffer(frameSpec);
             });
     return;
 }

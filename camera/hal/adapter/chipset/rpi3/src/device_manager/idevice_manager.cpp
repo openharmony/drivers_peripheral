@@ -31,4 +31,4 @@ std::shared_ptr<IDeviceManager> IDeviceManager::GetInstance()
     }
     return deviceManger;
 }
-}// namespace OHOS::Camera
+} // namespace OHOS::Camera

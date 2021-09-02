@@ -176,5 +176,4 @@ RetCode SensorManager::DestroyController(ControllerId controllerId, std::string 
     }
     return RC_ERROR;
 }
-
 } // namespace OHOS::Camera

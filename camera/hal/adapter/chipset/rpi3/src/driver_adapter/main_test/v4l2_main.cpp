@@ -293,8 +293,8 @@ void V4L2UvcCallback(const std::string cameraId, const std::vector<DeviceControl
                     continue;
                 }
                 CAMERA_LOGD("main test: %s value %d id 0x%x ctr_type %d minimum %d maximum %d step %d \
-                    default_value %d\n", iter->name.c_str(), iter->value, iter->id, iter->type, iter->minimum, iter->maximum,
-                    iter->step, iter->default_value);
+                    default_value %d\n", iter->name.c_str(), iter->value, iter->id, iter->type, iter->minimum,
+                                         iter->maximum, iter->step, iter->default_value);
                 if (iter->type == V4L2_CTRL_TYPE_MENU) {
                     for (auto itr = iter->menu.cbegin(); itr != iter->menu.cend(); itr++) {
                         CAMERA_LOGD("main test: %s index %d id 0x%x value %lld\n",
@@ -815,7 +815,6 @@ void StartVideo()
             g_camFrameV4l2Exit2 = 0;
             g_videoFdUvc = open("uvc.h264", O_RDWR | O_CREAT, 00766); // 00766:file operate permission
             pthread_create(&g_previewThreadId2, nullptr, V4L2FrameThread, (void*)g_devNameUvc.c_str());
-
         }
 
         sleep(videoTime);

@@ -31,7 +31,9 @@ RetCode EnumeratorManager::Init()
         CAMERA_LOGE("%s Create HosV4L2UVC fail", __FUNCTION__);
         return RC_ERROR;
     }
-    uvcVideo_->V4L2UvcDetectInit([&](const std::string hardwareName, std::vector<DeviceControl>& deviceControl, std::vector<DeviceFormat>& deviceFormat, bool uvcState) {
+    uvcVideo_->V4L2UvcDetectInit([&](const std::string hardwareName,
+        std::vector<DeviceControl>& deviceControl,
+        std::vector<DeviceFormat>& deviceFormat, bool uvcState) {
         UvcCallBack(hardwareName, deviceControl, deviceFormat, uvcState);
     });
     return RC_OK;
@@ -42,7 +44,9 @@ void EnumeratorManager::SetCallBack(UvcDataCb cb)
     uvcCb_ = cb;
 }
 
-void EnumeratorManager::UvcCallBack(const std::string hardwareName, std::vector<DeviceControl>& deviceControl, std::vector<DeviceFormat>& deviceFormat, bool uvcState)
+void EnumeratorManager::UvcCallBack(const std::string hardwareName,
+    std::vector<DeviceControl>& deviceControl,
+    std::vector<DeviceFormat>& deviceFormat, bool uvcState)
 {
     if (uvcCb_ == nullptr) {
         CAMERA_LOGE("%s uvcCb_ is nullptr", __FUNCTION__);
@@ -50,6 +54,4 @@ void EnumeratorManager::UvcCallBack(const std::string hardwareName, std::vector<
     }
     uvcCb_(hardwareName, deviceControl, deviceFormat, uvcState);
 }
-
-
 } // namespace OHOS::Camera

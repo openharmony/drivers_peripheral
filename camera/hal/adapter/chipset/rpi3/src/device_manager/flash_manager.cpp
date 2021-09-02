@@ -105,5 +105,4 @@ RetCode FlashManager::PowerDown(std::string hardwareName)
     }
     return RC_ERROR;
 }
-
 } // namespace OHOS::Camera

@@ -34,7 +34,7 @@ RetCode IspController::PowerUp()
     RetCode rc = RC_OK;
     if (GetPowerOnState() == false) {
         SetPowerOnState(true);
-        CAMERA_LOGI("%s Isp Powerup",__FUNCTION__);
+        CAMERA_LOGI("%s Isp Powerup", __FUNCTION__);
         return rc;
     }
     return rc;
@@ -45,7 +45,7 @@ RetCode IspController::PowerDown()
     RetCode rc = RC_OK;
     if (GetPowerOnState() == true) {
         SetPowerOnState(false);
-        CAMERA_LOGI("%s Isp PowerDown",__FUNCTION__);
+        CAMERA_LOGI("%s Isp PowerDown", __FUNCTION__);
         return rc;
     }
     return rc;
@@ -58,7 +58,7 @@ RetCode IspController::Start()
     if (startIspState_ == false) {
         startIspState_ = true;
     }
-    CAMERA_LOGI("%s Isp Start",__FUNCTION__);
+    CAMERA_LOGI("%s Isp Start", __FUNCTION__);
     return rc;
 }
 
@@ -69,7 +69,7 @@ RetCode IspController::Stop()
     if (startIspState_ == true) {
         startIspState_ = false;
     }
-    CAMERA_LOGI("%s Isp Stop",__FUNCTION__);
+    CAMERA_LOGI("%s Isp Stop", __FUNCTION__);
     return rc;
 }
 
@@ -77,5 +77,4 @@ RetCode IspController::Configure(std::shared_ptr<CameraStandard::CameraMetadata>
 {
     return RC_OK;
 }
-
 } // namespace OHOS::Camera
