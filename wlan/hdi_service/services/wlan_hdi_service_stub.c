@@ -270,7 +270,7 @@ static int32_t WlanServiceStudGetFeatureByIfName(struct HdfDeviceIoClient *clien
     return ret;
 }
 
-static bool HdfWlanAddRemoteObj(struct HdfDeviceIoClient *client, struct HdfRemoteService *callbackObj)
+static int32_t HdfWlanAddRemoteObj(struct HdfDeviceIoClient *client, struct HdfRemoteService *callbackObj)
 {
     struct HdfWlanRemoteNode *pos = NULL;
     struct DListHead *head = &HdfStubDriver()->remoteListHead;
