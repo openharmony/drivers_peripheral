@@ -64,10 +64,10 @@ namespace {
 
     void SensorDataVerification(const float &data, const struct SensorDevelopmentList &sensorNode)
     {
-       for (int32_t j = 0; j < sensorNode.dataDimension; ++j) {
-           printf("sensor id :[%d], data[%d]: %f\n\r", sensorNode.sensorTypeId, j + 1, *(&data + j));
-           if (sensorNode.dataForm == 0) {
-               if (*(&data + j) == sensorNode.valueRange[j].highThreshold ||
+        for (int32_t j = 0; j < sensorNode.dataDimension; ++j) {
+            printf("sensor id :[%d], data[%d]: %f\n\r", sensorNode.sensorTypeId, j + 1, *(&data + j));
+            if (sensorNode.dataForm == 0) {
+                if (*(&data + j) == sensorNode.valueRange[j].highThreshold ||
                     *(&data + j) == sensorNode.valueRange[j].lowThreshold) {
                     g_sensorDataFlag &= 1;
                 } else {
@@ -76,8 +76,8 @@ namespace {
                 }
            }
 
-           if (sensorNode.dataForm == 1) {
-               if (*(&data + j) > sensorNode.valueRange[j].lowThreshold &&
+            if (sensorNode.dataForm == 1) {
+                if (*(&data + j) > sensorNode.valueRange[j].lowThreshold &&
                     *(&data + j) < sensorNode.valueRange[j].highThreshold) {
                     g_sensorDataFlag &= 1;
                     printf("g_sensorDataFlag = 1;");
