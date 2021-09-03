@@ -55,7 +55,7 @@ namespace {
     };
 
     static int g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
-    int32_t g_sensorDataFlag = 1;
+    static int32_t g_sensorDataFlag = 1;
     const int32_t SENSOR_ID = 0;
     const int32_t SENSOR_INTERVAL = 200000000;
     const int32_t SENSOR_POLL_TIME = 1;
