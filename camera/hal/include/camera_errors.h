@@ -88,5 +88,5 @@ const int32_t  ERR_INVALID_CAMERA_ID = BASE_CAMERA_ERR_OFFSET + 12;
 /** Unknown error */
 const int32_t  ERR_UNKNOWN = BASE_CAMERA_ERR_OFFSET + 200;
 }  // namespace OHOS::Camera
-}  // namespace OHOS
+
 #endif  // CAMERA_ERRORS_H
