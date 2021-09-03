@@ -44,7 +44,7 @@ namespace {
     static struct SensorValueRange g_accelRange[] = {{11, -11}, {11, -11}, {11, -11}};
     static struct SensorValueRange g_proximityRange[] = {{5, 0}};
     static struct SensorValueRange g_hallRange[] = {{1, 0}};
-    static struct SensorValueRange g_barmoterRange[] = {{1100, 300},{85, -40}};
+    static struct SensorValueRange g_barmoterRange[] = {{1100, 300}, {85, -40}};
 
     static struct SensorDevelopmentList g_sensorList[] = {
         {SENSOR_TYPE_NONE, "sensor_test", "default", 1, 1, g_testRange},
@@ -55,30 +55,30 @@ namespace {
     };
 
     static int g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
-    static int32_t g_sensorDataFlag = 1;
+    int32_t g_sensorDataFlag = 1;
     const int32_t SENSOR_ID = 0;
     const int32_t SENSOR_INTERVAL = 200000000;
     const int32_t SENSOR_POLL_TIME = 1;
     const int32_t SENSOR_WAIT_TIME = 400;
     const struct SensorInterface *g_sensorDev = nullptr;
 
-    void SensorDataVerification(const float &data, const struct SensorDevelopmentList sensorNode)
+    void SensorDataVerification(const float &data, const struct SensorDevelopmentList &sensorNode)
     {
         for (int32_t j = 0; j < sensorNode.dataDimension; ++j) {
-            printf("sensor id :[%d], data[%d]: %f\n\r", sensorNode.sensorTypeId, j, (data + j));
+            printf("sensor id :[%d], data[%d]: %f\n\r", sensorNode.sensorTypeId, j + 1, *(&data + j));
             if (sensorNode.dataForm == 0) {
-                if ((data + j) == sensorNode.valueRange[j].highThreshold ||
-                    (data + j) == sensorNode.valueRange[j].lowThreshold) {
+                if (*(&data + j) == sensorNode.valueRange[j].highThreshold ||
+                    *(&data + j) == sensorNode.valueRange[j].lowThreshold) {
                     g_sensorDataFlag &= 1;
                 }
             } else if (sensorNode.dataForm == 1) {
-                if ((data + j) > sensorNode.valueRange[j].lowThreshold &&
-                    (data + j) < sensorNode.valueRange[j].highThreshold) {
+                if (*(&data + j) > sensorNode.valueRange[j].lowThreshold &&
+                    *(&data + j) < sensorNode.valueRange[j].highThreshold) {
                     g_sensorDataFlag &= 1;
                 }
             } else {
                 g_sensorDataFlag = 0;
-                printf("%s: %s Not expected\n\r",__func__, sensorNode.sensorName);
+                printf("%s: %s Not expected\n\r", __func__, sensorNode.sensorName);
             }
         }
     }
