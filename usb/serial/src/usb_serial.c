@@ -451,10 +451,10 @@ static int SerialCtrlMsg(struct AcmDevice *acm, uint8_t request,
     controlParams.size = len;
 
     parmas.interfaceId = USB_CTRL_INTERFACE_ID;
-    if (acm->ctrPipe) {
+    if (acm->ctrPipe != NULL) {
         parmas.pipeAddress = acm->ctrPipe->pipeAddress;
+        parmas.pipeId = acm->ctrPipe->pipeId;
     }
-    parmas.pipeId = acm->ctrPipe->pipeId;
     parmas.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
     parmas.timeout = USB_CTRL_SET_TIMEOUT;
     parmas.ctrlReq = UsbControlSetUp(&controlParams);
@@ -854,7 +854,7 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
         HDF_LOGE("memcpy_s fail, ret=%d", ret);
     }
     wb->len = size;
-    if (!acm->dataOutPipe || !wb) {
+    if ((acm == NULL) || (acm->dataOutPipe == NULL) || (wb == NULL)) {
         return HDF_ERR_INVALID_PARAM;
     }
     ret = AcmStartWbSync(acm, wb, acm->dataOutPipe);
@@ -1268,6 +1268,11 @@ static int AcmCtrlIrqCheckSize(struct UsbRequest *req, struct AcmDevice *acm,
     unsigned int copySize;
     int ret;
 
+    if ((req == NULL) || (acm == NULL) || (dr == NULL)) {
+        HDF_LOGE("%s:%d Invalid parameter", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
     unsigned int currentSize = req->compInfo.actualLength;
     HDF_LOGD("actualLength:%u\n", currentSize);
 
@@ -1305,10 +1310,9 @@ static int AcmCtrlIrqCheckSize(struct UsbRequest *req, struct AcmDevice *acm,
 static void AcmCtrlIrq(struct UsbRequest *req)
 {
     if (req == NULL) {
-        HDF_LOGE("%s:%{pulib}d req is NULL!", __func__, __LINE__);
+        HDF_LOGE("%s:%d req is NULL!", __func__, __LINE__);
         goto exit;
     }
-    int retval;
     int ret;
     struct AcmDevice *acm = (struct AcmDevice *)req->compInfo.userData;
     int status = req->compInfo.status;
@@ -1321,11 +1325,11 @@ static void AcmCtrlIrq(struct UsbRequest *req)
         default:
             goto exit;
     }
-    if (acm && acm->nbIndex) {
+    if ((acm != NULL) && acm->nbIndex) {
         dr = (struct UsbCdcNotification *)acm->notificationBuffer;
     }
-    if (dr == NULL) {
-        HDF_LOGE("%s:%{pulib}d dr is NULL!", __func__, __LINE__);
+    if ((dr == NULL) || (acm == NULL)) {
+        HDF_LOGE("%s:%d dr or acm is NULL!", __func__, __LINE__);
         goto exit;
     }
 
@@ -1334,7 +1338,7 @@ static void AcmCtrlIrq(struct UsbRequest *req)
         goto exit;
     }
 
-    retval = UsbSubmitRequestAsync(req);
+    UsbSubmitRequestAsync(req);
 
 exit:
     HDF_LOGE("%s:%d exit", __func__, __LINE__);
@@ -1343,7 +1347,7 @@ exit:
 static void AcmReadBulk(struct UsbRequest *req)
 {
     if (req == NULL) {
-        HDF_LOGE("%s:%{pulib}d req is NULL!", __func__, __LINE__);
+        HDF_LOGE("%s:%d req is NULL!", __func__, __LINE__);
         return;
     }
     int retval;
@@ -1351,7 +1355,7 @@ static void AcmReadBulk(struct UsbRequest *req)
     size_t size = req->compInfo.actualLength;
     struct AcmDevice *acm = (struct AcmDevice *)req->compInfo.userData;
     if (acm == NULL || acm->port == NULL) {
-        HDF_LOGE("%s:%{pulib}d acm is NULL!", __func__, __LINE__);
+        HDF_LOGE("%s:%d acm is NULL!", __func__, __LINE__);
         return;
     }
 
@@ -1381,7 +1385,7 @@ static void AcmReadBulk(struct UsbRequest *req)
 
     retval = UsbSubmitRequestAsync(req);
     if (retval && retval != -EPERM) {
-        HDF_LOGE("%s - usb_submit_urb failed: %d\n", __func__, retval);
+        HDF_LOGE("%s - usb_submit_urb failed: %d", __func__, retval);
     }
 }
 

@@ -42,8 +42,8 @@ public:
 };
 
 static struct UsbSession *session = NULL;
-static struct AcmDevice deviceService;
-static struct AcmDevice *acm = &deviceService;
+static struct AcmDevice g_deviceService;
+static struct AcmDevice *acm = &g_deviceService;
 static struct UsbInterface *ecm_dataIface = NULL;
 static struct UsbInterface *ecm_intIface = NULL;
 static UsbInterfaceHandle *ecm_data_devHandle = NULL;
@@ -510,7 +510,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface005, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface006, TestSize.Level1)
 {
-    acm = &deviceService;
+    acm = &g_deviceService;
     acm->busNum = 1U;
     acm->devAddr = 2U;
 
@@ -1451,7 +1451,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest004, TestSize.Level1)
     struct UsbRequestParams parmas;
     uint16_t index = 0;
     uint16_t value = 0;
-    struct TestControlMsgData msgData;
+    struct TestControlMsgData msgData = {0};
 
     parmas.interfaceId = USB_CTRL_INTERFACE_ID;
     parmas.pipeAddress = 0;
@@ -1581,7 +1581,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest008, TestSize.Level1)
     struct UsbRequestParams parmas;
     uint16_t index = 0;
     uint16_t value = 0;
-    struct TestControlMsgData msgData;
+    struct TestControlMsgData msgData = {0};
 
     parmas.interfaceId = USB_CTRL_INTERFACE_ID;
     parmas.pipeAddress = 0;

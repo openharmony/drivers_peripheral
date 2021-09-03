@@ -18,26 +18,23 @@
 #include <unistd.h>
 #include <gtest/gtest.h>
 #include "securec.h"
-extern "C" {
 #include "lib_acm_test.h"
-}
 
 using namespace std;
 using namespace testing::ext;
 
 namespace {
-
 class UsbDeviceSerialFuncTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
 };
 
-void UsbDeviceSerialFuncTest::SetUpTestCase(){
+void UsbDeviceSerialFuncTest::SetUpTestCase() {
     acm_open();
 }
 
-void UsbDeviceSerialFuncTest::TearDownTestCase(){
+void UsbDeviceSerialFuncTest::TearDownTestCase() {
     acm_close();
 }
 
@@ -152,8 +149,8 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_001, TestSize.Level1)
     const char *propName2= "idProduct";
     char propValue1[] = "12d1";
     char propValue2[] = "5000";
-    char readBuf1[100] = {0};
-    char readBuf2[100] = {0};
+    char readBuf1[256] = {0};
+    char readBuf2[256] = {0};
     acm_prop_read(propName1, readBuf1);
     printf("readBuf1==>%s\n", readBuf1);
     EXPECT_EQ(strcmp(propValue1, readBuf1), 0);
@@ -174,7 +171,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_002, TestSize.Level1)
     printf("------start HcsPropTest_002------\n");
     const char *propName= "idVendor";
     const char *writeBuf= "1234";
-    char readBuf[100] = {0};
+    char readBuf[256] = {0};
     acm_prop_write(propName, writeBuf);
     acm_prop_read(propName, readBuf);
     printf("readBuf==>%s\n", readBuf);
@@ -193,7 +190,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_003, TestSize.Level1)
     printf("------start HcsPropTest_003------\n");
     const char *propName= "idVendor";
     const char *writeBuf= "12d1";
-    char readBuf[100] = {0};
+    char readBuf[256] = {0};
     acm_prop_write(propName, writeBuf);
     acm_prop_read(propName, readBuf);
     printf("readBuf==>%s\n", readBuf);
@@ -212,7 +209,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_004, TestSize.Level1)
     printf("------start HcsPropTest_004------\n");
     const char *propName= "testp";
     const char *propValue= "a123";
-    char readBuf[100] = {0};
+    char readBuf[256] = {0};
     acm_prop_regist(propName, propValue);
     acm_prop_read(propName, readBuf);
     printf("readBuf==>%s", readBuf);
@@ -231,7 +228,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_005, TestSize.Level1)
     printf("------start HcsPropTest_005------\n");
     const char *propName= "testp";
     const char *writeBuf= "111";
-    char readBuf[100] = {0};
+    char readBuf[256] = {0};
     acm_prop_write(propName, writeBuf);
     acm_prop_read(propName, readBuf);
     printf("readBuf==>%s\n", readBuf);

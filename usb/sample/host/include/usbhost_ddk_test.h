@@ -33,6 +33,10 @@
 #endif
 #include "osal_time.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #define DATA_MAX_LEN        512
 
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
@@ -78,5 +82,8 @@ void TestStdGetInterface(void);
 void TestSpeed(void);
 void TestExit(void);
 bool TestGetExitFlag(void);
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif

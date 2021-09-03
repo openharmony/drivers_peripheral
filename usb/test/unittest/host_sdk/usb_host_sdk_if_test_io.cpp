@@ -42,8 +42,8 @@ public:
 };
 
 static struct UsbSession *session = NULL;
-static struct AcmDevice deviceService;
-static struct AcmDevice *acm = &deviceService;
+static struct AcmDevice g_deviceService;
+static struct AcmDevice *acm = &g_deviceService;
 
 void UsbHostSdkIfTest::SetUpTestCase()
 {
@@ -313,7 +313,7 @@ static void AcmFillCtrlRequest()
     struct UsbRequestParams parmas;
     uint16_t index = 2;
     uint16_t value = 0;
-    struct TestControlMsgData msgData;
+    struct TestControlMsgData msgData = {0};
 
     parmas.interfaceId = USB_CTRL_INTERFACE_ID;
     parmas.pipeAddress = 0;

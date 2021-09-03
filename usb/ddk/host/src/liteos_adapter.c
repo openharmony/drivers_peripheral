@@ -284,6 +284,11 @@ static int OsReadDescriptors(struct UsbDevice *dev)
             return HDF_ERR_MALLOC_FAIL;
         }
         ptr = (uint8_t *)dev->descriptors + dev->descriptorsLength;
+        if (ptr == NULL) {
+            DPRINTFN(0, "%s:%d ptr is NULL\n", __func__, __LINE__);
+            ret = HDF_ERR_INVALID_PARAM;
+            return ret;
+        }
         memset_s(ptr, DESC_READ_LEN, 0, DESC_READ_LEN);
         ret = memcpy_s(ptr, DESC_READ_LEN, osDev->adapterDevice->cdesc,
             UGETW(osDev->adapterDevice->cdesc->wTotalLength));
@@ -1148,6 +1153,10 @@ static int AdapterGetConfigDescriptor(const struct UsbDevice *dev,
 {
     struct OsDev *osDev = (struct OsDev *)dev->privateData;
     struct UsbAdapterDevice *adapterDevice = osDev->adapterDevice;
+    if ((buffer == NULL) || (adapterDevice == NULL) || (adapterDevice->cdesc == NULL)) {
+        DPRINTFN(0, "invalid param is NULL");
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (memcpy_s(buffer, UGETW(adapterDevice->cdesc->wTotalLength), adapterDevice->cdesc, len) != EOK) {
         DPRINTFN(0, "memcpy_s fail");
         return HDF_ERR_IO;
@@ -1414,7 +1423,7 @@ int UsbAdapterKillSignal(struct UsbDeviceHandle *handle, UsbRawTidType tid)
 	    if (osDev != NULL) {
             g_CompleteExit = true;
             OsalSemPost(&osDev->cvWait);
-            DPRINTFN(0, "%s:%d sigal post\n", __func__, __LINE__);
+            HDF_LOGD("%s:%d sigal post", __func__, __LINE__);
             return HDF_SUCCESS;
         }
     }

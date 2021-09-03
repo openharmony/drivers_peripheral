@@ -59,7 +59,7 @@ int32_t check_service()
 {
     if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
         HDF_LOGE("%s: GetService err", __func__);
-        return HDF_FAILURE; 
+        return HDF_FAILURE;
     }
     if (g_data == NULL || g_reply == NULL) {
         HDF_LOGE("%s: GetService err", __func__);

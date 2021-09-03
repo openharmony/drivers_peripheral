@@ -207,7 +207,7 @@ HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHos
     if ((msgQueue == NULL) || (request == NULL)) {
         ret = HDF_ERR_INVALID_OBJECT;
         HDF_LOGE("%s:%d invalid parameter", __func__, __LINE__);
-        goto error;
+        return ret;
     }
 
     ret = OsalSemWait((struct OsalSem *)&msgQueue->sem, HDF_WAIT_FOREVER);
