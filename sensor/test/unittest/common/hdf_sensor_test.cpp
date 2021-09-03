@@ -74,7 +74,7 @@ namespace {
                     g_sensorDataFlag = 0;
                     printf("%s: %s Not expected\n\r", __func__, sensorNode.sensorName);
                 }
-           }
+            }
 
             if (sensorNode.dataForm == 1) {
                 if (*(&data + j) > sensorNode.valueRange[j].lowThreshold &&
@@ -85,8 +85,8 @@ namespace {
                     g_sensorDataFlag = 0;
                     printf("%s: %s Not expected\n\r", __func__, sensorNode.sensorName);
                 }
-           }
-       }
+            }
+        }
     }
 
     int SensorTestDataCallback(const struct SensorEvents *event)
