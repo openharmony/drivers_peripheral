@@ -270,20 +270,20 @@ static int32_t WlanServiceStudGetFeatureByIfName(struct HdfDeviceIoClient *clien
     return ret;
 }
 
-static bool HdfWlanAddRemoteObj(struct HdfDeviceIoClient *client, struct HdfRemoteService *callbackObj)
+static int32_t HdfWlanAddRemoteObj(struct HdfDeviceIoClient *client, struct HdfRemoteService *callbackObj)
 {
     struct HdfWlanRemoteNode *pos = NULL;
     struct DListHead *head = &HdfStubDriver()->remoteListHead;
 
     if ((client == NULL) || (callbackObj == NULL)) {
         HDF_LOGE("%s: client == NULL or callbackObj == NULL", __func__);
-        return false;
+        return HDF_FAILURE;
     }
     if (!DListIsEmpty(head)) {
         DLIST_FOR_EACH_ENTRY(pos, head, struct HdfWlanRemoteNode, node) {
             if (pos->client == client) {
                 HDF_LOGE("%s: pos->client == client", __func__);
-                return false;
+                return HDF_FAILURE;
             }
         }
     }
@@ -291,12 +291,12 @@ static bool HdfWlanAddRemoteObj(struct HdfDeviceIoClient *client, struct HdfRemo
         (struct HdfWlanRemoteNode*)OsalMemAlloc(sizeof(struct HdfWlanRemoteNode));
     if (newRemoteNode == NULL) {
         HDF_LOGE("%s:newRemoteNode == NULL", __func__);
-        return false;
+        return HDF_FAILURE;
     }
     newRemoteNode->client = client;
     newRemoteNode->callbackObj = callbackObj;
     DListInsertTail(&newRemoteNode->node, head);
-    return true;
+    return HDF_SUCCESS;
 }
 
 static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName)
