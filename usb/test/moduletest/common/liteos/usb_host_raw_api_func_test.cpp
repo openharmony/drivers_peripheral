@@ -26,23 +26,20 @@ using namespace std;
 using namespace testing::ext;
 
 namespace {
-
 const int TEST_COUNT = 3;
-
-
 class UsbHostRawApiFuncTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
 };
 
-void UsbHostRawApiFuncTest::SetUpTestCase(){
+void UsbHostRawApiFuncTest::SetUpTestCase() {
     printf("------start UsbHostRawApiFuncTest------\n");
     const char *apiType = "-RAW";
     UsbHostDdkTestInit(const_cast<char*>(apiType));
 }
 
-void UsbHostRawApiFuncTest::TearDownTestCase(){
+void UsbHostRawApiFuncTest::TearDownTestCase() {
     char writeBuf[] = "q";
     UsbHostDdkTestOpen(HOST_ACM_ASYNC_WRITE);
     UsbHostDdkTestAsyncWrite(writeBuf);
@@ -61,8 +58,8 @@ void UsbHostRawApiFuncTest::TearDownTestCase(){
 HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadSync_001, TestSize.Level1)
 {
     printf("------start UsbSerialReadSync_001------\n");
-    char writeBuf[256] = "abc";
-    char readBuf[256] = {0};
+    char writeBuf[512] = "abc";
+    char readBuf[512] = {0};
     UsbHostDdkTestOpen(HOST_ACM_SYNC_WRITE);
     UsbHostDdkTestSyncWrite(writeBuf);
     UsbHostDdkTestClose(HOST_ACM_SYNC_WRITE);
@@ -83,8 +80,8 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadSync_001, TestSize.Level1)
 HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadSync_002, TestSize.Level1)
 {
     printf("------start UsbSerialReadSync_002------\n");
-    char writeBuf[256] = "abc";
-    char readBuf[256] = {0};
+    char writeBuf[512] = "abc";
+    char readBuf[512] = {0};
     UsbHostDdkTestOpen(HOST_ACM_ASYNC_WRITE);
     UsbHostDdkTestAsyncWrite(writeBuf);
     UsbHostDdkTestClose(HOST_ACM_ASYNC_WRITE);
@@ -111,7 +108,7 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadSync_003, TestSize.Level1)
         "0!a@1#b$2%c^3&D*4(E)5-F_",
         ""
     };
-    char readBuf[256] = {0};
+    char readBuf[512] = {0};
     for (int i = 0; strlen(data[i]) > 0 > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_SYNC_WRITE);
@@ -141,7 +138,7 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadSync_004, TestSize.Level1)
         "0!a@1#b$2%c^3&D*4(E)5-F_",
         ""
     };
-    char readBuf[256] = {0};
+    char readBuf[512] = {0};
     for (int i = 0; strlen(data[i]) > 0 > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_ASYNC_WRITE);
@@ -174,8 +171,8 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadSync_005, TestSize.Level2)
         data += s;
         n++;
     }
-    char readBuf[256] = {0};
-    char writeBuf[256] = {0};
+    char readBuf[512] = {0};
+    char writeBuf[512] = {0};
     strcpy_s(writeBuf, sizeof(writeBuf), data.c_str());
     for (int i = 0; i < writeCnt; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
@@ -198,9 +195,9 @@ static void TestAsyncRead(char *readBuf, int timeout)
     }
     timeout = timeout * 1000;
     UsbHostDdkTestOpen(HOST_ACM_ASYNC_READ);
-    while(timeout-- > 0) {
+    while (timeout-- > 0) {
         UsbHostDdkTestAsyncRead(readBuf);
-        if (strlen(readBuf) > 0){
+        if (strlen(readBuf) > 0) {
             break;
         }
         usleep(1000);
@@ -219,8 +216,8 @@ static void TestAsyncRead(char *readBuf, int timeout)
 HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadAsync_001, TestSize.Level1)
 {
     printf("------start UsbSerialReadAsync_001------\n");
-    char writeBuf[256] = "abc";
-    char readBuf[256] = {0};
+    char writeBuf[512] = "abc";
+    char readBuf[512] = {0};
     UsbHostDdkTestOpen(HOST_ACM_ASYNC_WRITE);
     UsbHostDdkTestAsyncWrite(writeBuf);
     UsbHostDdkTestClose(HOST_ACM_ASYNC_WRITE);
@@ -239,8 +236,8 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadAsync_001, TestSize.Level1)
 HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadAsync_002, TestSize.Level1)
 {
     printf("------start UsbSerialReadAsync_002------\n");
-    char writeBuf[256] = "abc";
-    char readBuf[256] = {0};
+    char writeBuf[512] = "abc";
+    char readBuf[512] = {0};
     UsbHostDdkTestOpen(HOST_ACM_SYNC_WRITE);
     UsbHostDdkTestSyncWrite(writeBuf);
     UsbHostDdkTestClose(HOST_ACM_SYNC_WRITE);
@@ -265,7 +262,7 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadAsync_003, TestSize.Level1)
         "0!a@1#b$2%c^3&D*4(E)5-F_",
         ""
     };
-    char readBuf[256] = {0};
+    char readBuf[512] = {0};
     for (int i = 0; strlen(data[i]) > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_ASYNC_WRITE);
@@ -293,7 +290,7 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadAsync_004, TestSize.Level1)
         "0!a@1#b$2%c^3&D*4(E)5-F_",
         ""
     };
-    char readBuf[256] = {0};
+    char readBuf[512] = {0};
     for (int i = 0; strlen(data[i]) > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_SYNC_WRITE);
@@ -324,8 +321,8 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadAsync_005, TestSize.Level2)
         data += s;
         n++;
     }
-    char readBuf[256] = {0};
-    char writeBuf[256] = {0};
+    char readBuf[512] = {0};
+    char writeBuf[512] = {0};
     strcpy_s(writeBuf, sizeof(writeBuf), data.c_str());
     for (int i = 0; i < writeCnt; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));

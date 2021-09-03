@@ -20,13 +20,14 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include "usbfn_device.h"
-#include "usbfn_request.h"
-#include "usbfn_interface.h"
 #include "osal_atomic.h"
 #include "osal_mutex.h"
 #include "osal_time.h"
 
+extern "C" {
+#include "usbfn_device.h"
+#include "usbfn_request.h"
+#include "usbfn_interface.h"
 #define DEV_MASTER_SERVICE_NAME "usbfn_master"
 #define TEST_TIMES  10
 #define BUFFER_LEN 64
@@ -133,5 +134,5 @@ void ReleaseAcmDevice(struct AcmDevice *acm);
 void AcmEventCallback(struct UsbFnEvent *event);
 void AcmDeviceRelease(struct AcmDevice *acmDevice);
 int XtsRemoveDevice(void);
-
+}
 #endif

@@ -116,7 +116,7 @@ void speedExit()
     HdfSBufRecycle(g_reply);
 }
 
-static void ShowHelp(char *name)
+static void ShowHelp(const char *name)
 {
     printf(">> usage:\n");
     printf(">>      %s <-SDK>/<-RAW>/<-NOSDK> [<busNum> <devAddr>]  <ifaceNum> <w>/<r>/<endpoint> [printdata]> \n", name);
@@ -150,6 +150,10 @@ static enum speedServer checkServer(const char* input)
 {
     char middle[10] = {0};
     enum speedServer out = SDKAPI_SERVER;
+    if (input == NULL) {
+        HDF_LOGE("%s:%d input is NULL", __func__, __LINE__);
+        return out;
+    }
     strncpy_s(middle, sizeof(middle), input, strlen(input));
     if (!strcmp(middle, "-SDK")) {
         out = SDKAPI_SERVER;
