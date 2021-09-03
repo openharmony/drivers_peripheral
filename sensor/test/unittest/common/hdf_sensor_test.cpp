@@ -26,13 +26,62 @@
 using namespace testing::ext;
 
 namespace {
-    int32_t g_sensorDataFlag = 0;
+    struct SensorValueRange {
+        float highThreshold;
+        float lowThreshold;
+    };
+
+    struct SensorDevelopmentList {
+        int32_t sensorTypeId;
+        char sensorName[SENSOR_NAME_MAX_LEN];
+        char vendorName[SENSOR_NAME_MAX_LEN];
+        int32_t dataForm;    // 0: fixed, 1: range
+        int32_t dataDimension;
+        struct SensorValueRange *valueRange;
+    };
+
+    static struct SensorValueRange g_testRange[] = {{1e5, 0}};
+    static struct SensorValueRange g_accelRange[] = {{11, -11}, {11, -11}, {11, -11}};
+    static struct SensorValueRange g_proximityRange[] = {{5, 0}};
+    static struct SensorValueRange g_hallRange[] = {{1, 0}};
+    static struct SensorValueRange g_barmoterRange[] = {{1100, 300},{85, -40}};
+
+    static struct SensorDevelopmentList g_sensorList[] = {
+        {SENSOR_TYPE_NONE, "sensor_test", "default", 1, 1, g_testRange},
+        {SENSOR_TYPE_ACCELEROMETER, "accelerometer", "borsh_bmi160", 1, 3, g_accelRange},
+        {SENSOR_TYPE_PROXIMITY, "proximitymeter", "stk3338", 0, 1, g_proximityRange},
+        {SENSOR_TYPE_HALL, "hallrometer", "akm_ak8789", 0, 1, g_hallRange},
+        {SENSOR_TYPE_BAROMETER, "barometer", "borsh_bmp180", 1, 2, g_barmoterRange},
+    };
+
+    static int g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
+    static int32_t g_sensorDataFlag = 1;
     const int32_t SENSOR_ID = 0;
     const int32_t SENSOR_INTERVAL = 200000000;
     const int32_t SENSOR_POLL_TIME = 1;
     const int32_t SENSOR_WAIT_TIME = 400;
-    const int32_t SENSOR_AXISZ = 2;
     const struct SensorInterface *g_sensorDev = nullptr;
+
+    void SensorDataVerification(const float &data, const struct SensorDevelopmentList sensorNode)
+    {
+        for (int32_t j = 0; j < sensorNode.dataDimension; ++j) {
+            printf("sensor id :[%d], data[%d]: %f\n\r", sensorNode.sensorTypeId, j, (data + j));
+            if (sensorNode.dataForm == 0) {
+                if ((data + j) == sensorNode.valueRange[j].highThreshold ||
+                    (data + j) == sensorNode.valueRange[j].lowThreshold) {
+                    g_sensorDataFlag &= 1;
+                }
+            } else if (sensorNode.dataForm == 1) {
+                if ((data + j) > sensorNode.valueRange[j].lowThreshold &&
+                    (data + j) < sensorNode.valueRange[j].highThreshold) {
+                    g_sensorDataFlag &= 1;
+                }
+            } else {
+                g_sensorDataFlag = 0;
+                printf("%s: %s Not expected\n\r",__func__, sensorNode.sensorName);
+            }
+        }
+    }
 
     int SensorTestDataCallback(const struct SensorEvents *event)
     {
@@ -41,29 +90,10 @@ namespace {
         }
 
         float *data = (float*)event->data;
-        int32_t *hallData = (int32_t*)event->data;
-        if (event->sensorId == 0) {
-            printf("sensor id [%d] data [%f]\n\r", event->sensorId, *(data));
-            if (fabs(*data) > 1e-5) {
-                g_sensorDataFlag = 1;
-            }
-        } else if (event->sensorId == 1) {
-            printf("sensor id [%d] x-[%f] y-[%f] z-[%f]\n\r",
-                event->sensorId, (*data), *(data + 1), *(data + SENSOR_AXISZ));
-            if (fabs(*data) > 1e-5) {
-                g_sensorDataFlag = 1;
-            }
-        } else if (event->sensorId == SENSOR_TYPE_BAROMETER) {
-            printf("sensor id [%d] barometer[%f] temperature[%f] \n\r",
-                event->sensorId, (*data), *(data + 1));
-            if (fabs(*data) > 1e-5) {
-                g_sensorDataFlag = 1;
-            }
-        } else if (event->sensorId == SENSOR_TYPE_HALL) {
-            printf("sensor id [%d] hall-[%d] \n\r",
-                event->sensorId, (*hallData));
-            if (*hallData == 0 || *hallData == 1) {
-                g_sensorDataFlag = 1;
+
+        for (int i = 0; i < g_listNum; ++i) {
+            if (event->sensorId == g_sensorList[i].sensorTypeId) {
+                SensorDataVerification(*data, g_sensorList[i]);
             }
         }
 
@@ -146,7 +176,7 @@ HWTEST_F(HdfSensorTest, RegisterSensorDataCb001, TestSize.Level1)
     int32_t ret = g_sensorDev->Register(SensorTestDataCallback);
     EXPECT_EQ(0, ret);
     ret = g_sensorDev->Unregister();
-    EXPECT_EQ(0, ret); 
+    EXPECT_EQ(0, ret);
 }
 
 /**
@@ -170,15 +200,11 @@ HWTEST_F(HdfSensorTest, RegisterSensorDataCb002, TestSize.Level1)
   * @tc.require: SR000F869M, AR000F869Q
   */
 HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
-{   
+{
     struct SensorInformation *sensorInfo = nullptr;
     struct SensorInformation *info = nullptr;
-    struct SensorInformation *testSensorInfo = nullptr;
-    struct SensorInformation *accelSensorInfo = nullptr;
-    struct SensorInformation *barometerSensorInfo = nullptr;
-    struct SensorInformation *hallSensorInfo = nullptr;
     int32_t count = 0;
-    
+    int j;
     int32_t ret = g_sensorDev->GetAllSensors(&sensorInfo, &count);
     EXPECT_EQ(0, ret);
 
@@ -188,36 +214,23 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
     }
     printf("get sensor list num[%d]\n\r", count);
     info = sensorInfo;
-    testSensorInfo = sensorInfo;
-    accelSensorInfo = sensorInfo;
-    barometerSensorInfo = sensorInfo;
-    hallSensorInfo = sensorInfo;
 
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; ++i) {
         printf("get sensoriId[%d], info name[%s], power[%f]\n\r", info->sensorId, info->sensorName, info->power);
-        if (info->sensorId == 0) {
-            testSensorInfo = info;
-        } else if (info->sensorId == 1) {
-            accelSensorInfo = info;
-        } else if (info->sensorId == SENSOR_TYPE_BAROMETER) {
-            barometerSensorInfo = info;
-        } else if (info->sensorId == SENSOR_TYPE_HALL) {
-            hallSensorInfo = info;
+        for (j = 0; j < g_listNum; ++j) {
+            if (info->sensorId == g_sensorList[j].sensorTypeId) {
+                EXPECT_STREQ(g_sensorList[j].sensorName, info->sensorName);
+                EXPECT_STREQ(g_sensorList[j].vendorName, info->vendorName);
+                break;
+            }
+        }
+
+        if (j == g_listNum) {
+            EXPECT_GT(g_listNum, j);
+            printf("%s: The sensor ID[%d] does not match. Please check the use case or the reported sensor ID",
+            __func__, info->sensorId);
         }
         info++;
-        if (testSensorInfo->sensorTypeId == 0) {
-            EXPECT_STREQ("sensor_test", testSensorInfo->sensorName);
-            EXPECT_STREQ("default", testSensorInfo->vendorName);
-        }
-        if (accelSensorInfo->sensorTypeId == 1) {
-            EXPECT_STREQ("accelerometer", accelSensorInfo->sensorName);
-        }
-        if (barometerSensorInfo->sensorTypeId == SENSOR_TYPE_BAROMETER) {
-            EXPECT_STREQ("barometer", barometerSensorInfo->sensorName);
-        }
-        if (hallSensorInfo->sensorTypeId == SENSOR_TYPE_HALL) {
-            EXPECT_STREQ("hallrometer", hallSensorInfo->sensorName);
-        }
     }
 }
 
@@ -233,13 +246,13 @@ HWTEST_F(HdfSensorTest, GetSensorList002, TestSize.Level1)
 {
     struct SensorInformation *sensorInfo = nullptr;
     int32_t count = 0;
-    
+
     int32_t ret = g_sensorDev->GetAllSensors(nullptr, &count);
     EXPECT_EQ(SENSOR_NULL_PTR, ret);
     ret = g_sensorDev->GetAllSensors(&sensorInfo, nullptr);
     EXPECT_EQ(SENSOR_NULL_PTR, ret);
     ret = g_sensorDev->GetAllSensors(nullptr, nullptr);
-    EXPECT_EQ(SENSOR_NULL_PTR, ret); 
+    EXPECT_EQ(SENSOR_NULL_PTR, ret);
 }
 
 /**
@@ -287,7 +300,7 @@ HWTEST_F(HdfSensorTest, EnableSensor001, TestSize.Level1)
   * @tc.require: SR000F869M, AR000F869R
   */
 HWTEST_F(HdfSensorTest, EnableSensor002, TestSize.Level1)
-{  
+{
     struct SensorInformation *sensorInfo = nullptr;
     int32_t count = 0;
     int32_t ret = g_sensorDev->GetAllSensors(&sensorInfo, &count);
@@ -308,7 +321,7 @@ HWTEST_F(HdfSensorTest, SetSensorBatch001, TestSize.Level1)
 {
     struct SensorInformation *sensorInfo = nullptr;
     int32_t count = 0;
-    
+
     int32_t ret = g_sensorDev->Register(SensorTestDataCallback);
     EXPECT_EQ(0, ret);
     ret = g_sensorDev->GetAllSensors(&sensorInfo, &count);
@@ -333,11 +346,11 @@ HWTEST_F(HdfSensorTest, SetSensorBatch002, TestSize.Level1)
 {
     struct SensorInformation *sensorInfo = nullptr;
     int32_t count = 0;
-    
+
     int32_t ret = g_sensorDev->GetAllSensors(&sensorInfo, &count);
     EXPECT_EQ(0, ret);
     ret = g_sensorDev->SetBatch(-1, 0, 0);
-    EXPECT_EQ(-2, ret);   
+    EXPECT_EQ(-2, ret);
 }
 
 /**
