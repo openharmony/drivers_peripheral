@@ -48,8 +48,6 @@ ohos_prebuilt_etc("stream_supported_config.hcb") {
 ohos_prebuilt_etc("config.c") {
   source =
       "$camera_path/pipeline_core/pipeline_impl/src/strategy/config/config.c"
-  relative_install_dir = "hdfconfig"
-  subsystem_name = "hdf"
   exec_script(
       "//drivers/framework/tools/hc-gen/build_hcs.py",
       [
@@ -66,8 +64,6 @@ ohos_prebuilt_etc("config.c") {
 ohos_prebuilt_etc("params.c") {
   source =
       "$camera_path/pipeline_core/pipeline_impl/src/strategy/config/params.c"
-  relative_install_dir = "hdfconfig"
-  subsystem_name = "hdf"
   exec_script(
       "//drivers/framework/tools/hc-gen/build_hcs.py",
       [
