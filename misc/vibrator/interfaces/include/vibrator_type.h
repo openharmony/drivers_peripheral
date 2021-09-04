@@ -19,7 +19,7 @@
  *
  * @brief Provides unified APIs for vibrator services to access the vibrator driver.
  *
- * After obtaining a driver object or agent, a vibrator service starts or stops the vibrator 
+ * After obtaining a driver object or agent, a vibrator service starts or stops the vibrator
  * using the functions provided by the driver object or agent.
  *
  * @version 1.0
