@@ -70,7 +70,9 @@ int32_t AudioRenderBuffInit(struct PlatformHost *platformHost)
     platformHost->renderBufInfo.virtAddr = (uint32_t *)LOS_DmaMemAlloc(&platformHost->renderBufInfo.phyAddr, buffSize,
         AUDIO_CACHE_ALIGN_SIZE, DMA_NOCACHE);
 #else
-    platformHost->renderBufInfo.virtAddr = dma_alloc_wc(NULL, buffSize,
+    struct device tmpDev;
+    tmpDev.coherent_dma_mask = 0xffffffffUL;
+    platformHost->renderBufInfo.virtAddr = dma_alloc_wc(&tmpDev, buffSize,
         (dma_addr_t *)&platformHost->renderBufInfo.phyAddr, GFP_DMA | GFP_KERNEL);
 #endif
     if (platformHost->renderBufInfo.virtAddr == NULL) {
@@ -98,7 +100,7 @@ int32_t AudioRenderBuffFree(struct PlatformHost *platformHost)
     LOS_DmaMemFree(platformHost->renderBufInfo.virtAddr);
 #else
     dma_free_wc(NULL, platformHost->renderBufInfo.cirBufSize, platformHost->renderBufInfo.virtAddr,
-                          platformHost->renderBufInfo.phyAddr);
+                platformHost->renderBufInfo.phyAddr);
 #endif
     }
 
@@ -130,7 +132,9 @@ int32_t AudioCaptureBuffInit(struct PlatformHost *platformHost)
     platformHost->captureBufInfo.virtAddr = (uint32_t *)LOS_DmaMemAlloc(&platformHost->captureBufInfo.phyAddr, buffSize,
         AUDIO_CACHE_ALIGN_SIZE, DMA_NOCACHE);
 #else
-    platformHost->captureBufInfo.virtAddr = dma_alloc_wc(NULL, buffSize,
+    struct device tmpDev;
+    tmpDev.coherent_dma_mask = 0xffffffffUL;
+    platformHost->captureBufInfo.virtAddr = dma_alloc_wc(&tmpDev, buffSize,
         (dma_addr_t *)&platformHost->captureBufInfo.phyAddr, GFP_DMA | GFP_KERNEL);
 #endif
     if (platformHost->captureBufInfo.virtAddr == NULL) {
@@ -157,7 +161,7 @@ int32_t AudioCaptureBuffFree(struct PlatformHost *platformHost)
     LOS_DmaMemFree(platformHost->captureBufInfo.virtAddr);
 #else
     dma_free_wc(NULL, platformHost->captureBufInfo.cirBufSize, platformHost->captureBufInfo.virtAddr,
-                          platformHost->captureBufInfo.phyAddr);
+                platformHost->captureBufInfo.phyAddr);
 #endif
     }
     AUDIO_DRIVER_LOG_DEBUG("g_captureBuffFreeCount: %d", g_captureBuffFreeCount++);
