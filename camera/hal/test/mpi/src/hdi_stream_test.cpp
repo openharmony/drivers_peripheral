@@ -492,12 +492,6 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0137, TestSize.Level2)
     // 配置mode 和 modeSetting
     Camera::OperationMode mode = Camera::NORMAL;
     std::shared_ptr<CameraStandard::CameraMetadata> modeSetting = std::make_shared<CameraStandard::CameraMetadata>(2, 128);
-#if 0
-    int64_t expoTime = 0;
-    modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
-    int64_t colorGains[4] = {0};
-    modeSetting->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
-#endif
     Camera::StreamSupportType pType;
     Test_->rc = Test_->streamOperator->IsStreamsSupported(NORMAL, modeSetting, {Test_->streamInfo}, pType);
     EXPECT_EQ(Test_->rc, Camera::INVALID_ARGUMENT);
@@ -566,13 +560,6 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0139, TestSize.Level2)
     // 配置mode 和 modeSetting
     Camera::OperationMode mode = Camera::NORMAL;
     std::shared_ptr<CameraStandard::CameraMetadata> modeSetting = nullptr;
-#if 0
-    std::shared_ptr<CameraStandard::CameraMetadata> modeSetting = std::make_shared<CameraStandard::CameraMetadata>(2, 128);
-    int64_t expoTime = 0;
-    modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
-    int64_t colorGains[4] = {0};
-    modeSetting->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
-#endif
     // 配置流信息
     Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
     Test_->streamInfo->streamId_ = 1001;
