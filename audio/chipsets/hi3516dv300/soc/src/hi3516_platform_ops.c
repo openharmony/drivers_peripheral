@@ -99,7 +99,7 @@ int32_t AudioRenderBuffFree(struct PlatformHost *platformHost)
     LOS_DmaMemFree(platformHost->renderBufInfo.virtAddr);
 #else
     dma_free_wc(NULL, platformHost->renderBufInfo.cirBufSize, platformHost->renderBufInfo.virtAddr,
-                          platformHost->renderBufInfo.phyAddr);
+                platformHost->renderBufInfo.phyAddr);
 #endif
     }
 
@@ -159,7 +159,7 @@ int32_t AudioCaptureBuffFree(struct PlatformHost *platformHost)
     LOS_DmaMemFree(platformHost->captureBufInfo.virtAddr);
 #else
     dma_free_wc(NULL, platformHost->captureBufInfo.cirBufSize, platformHost->captureBufInfo.virtAddr,
-                          platformHost->captureBufInfo.phyAddr);
+                platformHost->captureBufInfo.phyAddr);
 #endif
     }
     AUDIO_DRIVER_LOG_DEBUG("g_captureBuffFreeCount: %d", g_captureBuffFreeCount++);
