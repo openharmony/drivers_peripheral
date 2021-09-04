@@ -74,7 +74,7 @@ void ForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
             it->DeliverBuffer(buffer);
             CAMERA_LOGI("fork node deliver buffer streamid = %{public}d", it->format_.streamId_);
             return;
-         }
+        }
     }
 }
 
