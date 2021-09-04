@@ -70,7 +70,8 @@ int32_t AudioRenderBuffInit(struct PlatformHost *platformHost)
     platformHost->renderBufInfo.virtAddr = (uint32_t *)LOS_DmaMemAlloc(&platformHost->renderBufInfo.phyAddr, buffSize,
         AUDIO_CACHE_ALIGN_SIZE, DMA_NOCACHE);
 #else
-    struct device tmpDev = {0};
+    struct device tmpDev;
+    tmpDev.coherent_dma_mask = 0xffffffffUL;
     platformHost->renderBufInfo.virtAddr = dma_alloc_wc(&tmpDev, buffSize,
         (dma_addr_t *)&platformHost->renderBufInfo.phyAddr, GFP_DMA | GFP_KERNEL);
 #endif
@@ -131,7 +132,8 @@ int32_t AudioCaptureBuffInit(struct PlatformHost *platformHost)
     platformHost->captureBufInfo.virtAddr = (uint32_t *)LOS_DmaMemAlloc(&platformHost->captureBufInfo.phyAddr, buffSize,
         AUDIO_CACHE_ALIGN_SIZE, DMA_NOCACHE);
 #else
-    struct device tmpDev = {0};
+    struct device tmpDev;
+    tmpDev.coherent_dma_mask = 0xffffffffUL;
     platformHost->captureBufInfo.virtAddr = dma_alloc_wc(&tmpDev, buffSize,
         (dma_addr_t *)&platformHost->captureBufInfo.phyAddr, GFP_DMA | GFP_KERNEL);
 #endif
