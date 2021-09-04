@@ -29,8 +29,8 @@ namespace {
     uint32_t g_noDuration = 0;
     uint32_t g_sleepTime1 = 2000;
     uint32_t g_sleepTime2 = 5000;
-    const char *g_timeSequence = "vibrator.haptic.default.time";
-    const char *g_builtIn = "vibrator.haptic.default.effect";
+    const char *g_timeSequence = "haptic.clock.time";
+    const char *g_builtIn = "haptic.default.effect";
     const char *g_arbitraryStr = "arbitraryString";
     const struct VibratorInterface *g_vibratorDev = nullptr;
 }
