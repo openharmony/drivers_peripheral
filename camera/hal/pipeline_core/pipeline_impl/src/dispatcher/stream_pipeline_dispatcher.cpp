@@ -76,7 +76,7 @@ RetCode StreamPipelineDispatcher::Prepare(const int32_t streamId)
 
     RetCode re = RC_OK;
     for (auto it = seqNode_[streamId].rbegin(); it != seqNode_[streamId].rend(); it++) {
-        CAMERA_LOGV("init node %{public}s begin",(*it)->GetName().c_str());
+        CAMERA_LOGV("init node %{public}s begin", (*it)->GetName().c_str());
         re = (*it)->Init(streamId) | re;
         CAMERA_LOGV("init node %{public}s end", (*it)->GetName().c_str());
     }
@@ -119,7 +119,7 @@ RetCode StreamPipelineDispatcher::Flush(const int32_t streamId)
 
     RetCode re = RC_OK;
     for (auto it = seqNode_[streamId].rbegin(); it != seqNode_[streamId].rend(); it++) {
-        CAMERA_LOGV("flush node %{public}s begin",(*it)->GetName().c_str());
+        CAMERA_LOGV("flush node %{public}s begin", (*it)->GetName().c_str());
         re = (*it)->Flush(streamId) | re;
         CAMERA_LOGV("flush node %{public}s end", (*it)->GetName().c_str());
     }

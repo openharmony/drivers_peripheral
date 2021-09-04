@@ -14,8 +14,7 @@
 #include "vi_node.h"
 namespace OHOS::Camera{
 ViNode::ViNode(const std::string& name, const std::string& type)
-        : MpiNode(name, type)
-        , NodeBase(name, type)
+        : MpiNode(name, type), NodeBase(name, type)
 {
     CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }

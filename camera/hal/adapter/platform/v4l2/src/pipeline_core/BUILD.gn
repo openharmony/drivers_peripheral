@@ -33,6 +33,8 @@ config("pipe_config") {
 
 ohos_shared_library("camera_pipeline_core") {
   sources = [
+    "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/uvc_node/uvc_node.cpp",
+    "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/v4l2_source_node/v4l2_source_node.cpp",
     "$camera_path/pipeline_core/host_stream/src/host_stream_impl.cpp",
     "$camera_path/pipeline_core/host_stream/src/host_stream_mgr_impl.cpp",
     "$camera_path/pipeline_core/ipp/src/algo_plugin.cpp",
@@ -42,13 +44,12 @@ ohos_shared_library("camera_pipeline_core") {
     "$camera_path/pipeline_core/ipp/src/offline_pipeline.cpp",
     "$camera_path/pipeline_core/ipp/src/offline_pipeline_manager.cpp",
     "$camera_path/pipeline_core/nodes/src/dummy_node/dummy_node.cpp",
+    "$camera_path/pipeline_core/nodes/src/fork_node/fork_node.cpp",
     "$camera_path/pipeline_core/nodes/src/merge_node/merge_node.cpp",
     "$camera_path/pipeline_core/nodes/src/node_base/node_base.cpp",
     "$camera_path/pipeline_core/nodes/src/sensor_node/sensor_node.cpp",
     "$camera_path/pipeline_core/nodes/src/sink_node/sink_node.cpp",
     "$camera_path/pipeline_core/nodes/src/source_node/source_node.cpp",
-
-    #"$camera_path/pipeline_core/nodes/src/fork_node/fork_node.cpp",
     "$camera_path/pipeline_core/pipeline_impl/src/builder/stream_pipeline_builder.cpp",
     "$camera_path/pipeline_core/pipeline_impl/src/dispatcher/stream_pipeline_dispatcher.cpp",
     "$camera_path/pipeline_core/pipeline_impl/src/parser/config_parser.cpp",
@@ -57,9 +58,6 @@ ohos_shared_library("camera_pipeline_core") {
     "$camera_path/pipeline_core/pipeline_impl/src/strategy/stream_pipeline_strategy.cpp",
     "$camera_path/pipeline_core/pipeline_impl/src/stream_pipeline_core.cpp",
     "$camera_path/pipeline_core/src/pipeline_core.cpp",
-
-    #"$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/v4l2_source_node/v4l2_source_node.cpp",
-    #"$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/uvc_node/uvc_node.cpp",
   ]
   include_dirs = [
     "//utils/native/base/include",
@@ -77,10 +75,10 @@ ohos_shared_library("camera_pipeline_core") {
     "$camera_path/pipeline_core/host_stream/include",
     "$camera_path/pipeline_core/utils",
     "$camera_path/pipeline_core/nodes/include",
+    "$camera_path/pipeline_core/nodes/src/sensor_node",
     "$camera_path/pipeline_core/nodes/src/node_base",
     "$camera_path/pipeline_core/nodes/src/sink_node",
     "$camera_path/pipeline_core/nodes/src/source_node",
-    "$camera_path/pipeline_core/nodes/src/sensor_node",
     "$camera_path/pipeline_core/nodes/src/merge_node",
     "$camera_path/pipeline_core/nodes/src/dummy_node",
     "$camera_path/pipeline_core/pipeline_impl/include",

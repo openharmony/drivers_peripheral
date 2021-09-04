@@ -27,7 +27,7 @@ RetCode SensorController::Init()
 {
     sensorVideo_ = std::make_shared<HosV4L2Dev>();
     if (sensorVideo_ == nullptr) {
-        CAMERA_LOGE("%s Create HosV4L2Dev fail",__FUNCTION__);
+        CAMERA_LOGE("%s Create HosV4L2Dev fail", __FUNCTION__);
         return RC_ERROR;
     }
     return RC_OK;
@@ -38,7 +38,7 @@ RetCode SensorController::PowerUp()
     RetCode rc = RC_OK;
     if (GetPowerOnState() == false) {
         SetPowerOnState(true);
-        CAMERA_LOGI("%s Sensor Powerup",__FUNCTION__);
+        CAMERA_LOGI("%s Sensor Powerup", __FUNCTION__);
         return rc;
     }
     return rc;
@@ -49,7 +49,7 @@ RetCode SensorController::PowerDown()
     RetCode rc = RC_OK;
     if (GetPowerOnState() == true) {
         SetPowerOnState(false);
-        CAMERA_LOGI("%s Sensor PowerDown",__FUNCTION__);
+        CAMERA_LOGI("%s Sensor PowerDown", __FUNCTION__);
         return rc;
     }
     return rc;
@@ -62,7 +62,7 @@ RetCode SensorController::Configure(std::shared_ptr<CameraStandard::CameraMetada
 
 RetCode SensorController::Start(int buffCont, DeviceFormat& format)
 {
-    CAMERA_LOGI("%s Start",__FUNCTION__);
+    CAMERA_LOGI("%s Start", __FUNCTION__);
     std::lock_guard<std::mutex> l(startSensorLock_);
     RetCode rc = RC_OK;
     if (startSensorState_ == false) {
@@ -77,7 +77,7 @@ RetCode SensorController::Start(int buffCont, DeviceFormat& format)
 
 RetCode SensorController::Stop()
 {
-    CAMERA_LOGI("%s Stop",__FUNCTION__);
+    CAMERA_LOGI("%s Stop", __FUNCTION__);
     std::lock_guard<std::mutex> l(startSensorLock_);
     RetCode rc = RC_OK;
     if (startSensorState_ == true) {
@@ -92,7 +92,7 @@ RetCode SensorController::Stop()
 RetCode SensorController::SendFrameBuffer(std::shared_ptr<FrameSpec> buffer)
 {
     if (buffCont_ >= 1) {
-        CAMERA_LOGI("%s buffCont_ %d",__FUNCTION__, buffCont_);
+        CAMERA_LOGI("%s buffCont_ %d", __FUNCTION__, buffCont_);
         sensorVideo_->CreatBuffer(GetName(), buffer);
         if (buffCont_ == 1) {
             sensorVideo_->StartStream(GetName());
@@ -138,9 +138,9 @@ void SensorController::BufferCallback(std::shared_ptr<FrameSpec> buffer)
         metaDataFlag_ = false;
     } else {
         if (rc == RC_ERROR) {
-            CAMERA_LOGE("%s GetAbilityMetaData error",__FUNCTION__);
+            CAMERA_LOGE("%s GetAbilityMetaData error", __FUNCTION__);
         } else {
-            CAMERA_LOGI("%s no send",__FUNCTION__);
+            CAMERA_LOGI("%s no send", __FUNCTION__);
         }
     }
 }
@@ -175,12 +175,12 @@ RetCode SensorController::GetSensorMetaData(std::shared_ptr<CameraStandard::Came
     RetCode rc;
     rc = GetAEMetaData(meta);
     if (rc == RC_ERROR) {
-        CAMERA_LOGE("%s GetAEMetaData fail",__FUNCTION__);
+        CAMERA_LOGE("%s GetAEMetaData fail", __FUNCTION__);
         return rc;
     }
     rc = GetAWBMetaData(meta);
     if (rc == RC_ERROR) {
-        CAMERA_LOGE("%s GetAWBMetaData fail",__FUNCTION__);
+        CAMERA_LOGE("%s GetAWBMetaData fail", __FUNCTION__);
     }
     return rc;
 }
@@ -194,10 +194,10 @@ RetCode SensorController::GetAEMetaData(std::shared_ptr<CameraStandard::CameraMe
     for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
         switch (*iter) {
             case OHOS_SENSOR_EXPOSURE_TIME: {
-                rc = sensorVideo_->QuerySetting(GetName(), CMD_AE_EXPO,(int*)&expoTime);
+                rc = sensorVideo_->QuerySetting(GetName(), CMD_AE_EXPO, (int*)&expoTime);
                 CAMERA_LOGD("%s Get CMD_AE_EXPOTIME [%d]", __FUNCTION__, expoTime);
                 if (rc == RC_ERROR) {
-                    CAMERA_LOGE("%s CMD_AE_EXPO QuerySetting fail",__FUNCTION__);
+                    CAMERA_LOGE("%s CMD_AE_EXPO QuerySetting fail", __FUNCTION__);
                     return rc;
                 }
                 if (oldExpoTime != expoTime) {
@@ -224,23 +224,25 @@ RetCode SensorController::GetAWBMetaData(std::shared_ptr<CameraStandard::CameraM
     for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
         switch (*iter) {
             case OHOS_SENSOR_COLOR_CORRECTION_GAINS: {
-                rc = sensorVideo_->QuerySetting(GetName(), CMD_AWB_COLORGAINS,(int*)colorGains);
-                CAMERA_LOGD("%s Get CMD_AWB_COLORGAINS [%f,%f,%f,%f]", __FUNCTION__, colorGains[0], colorGains[1], colorGains[2], colorGains[3]);
+                rc = sensorVideo_->QuerySetting(GetName(), CMD_AWB_COLORGAINS, (int*)colorGains);
+                CAMERA_LOGD("%s Get CMD_AWB_COLORGAINS [%f,%f,%f,%f]",
+                    __FUNCTION__, colorGains[0], colorGains[1], colorGains[2], colorGains[3]);
                 if (rc == RC_ERROR) {
-                    CAMERA_LOGE("%s CMD_AWB_COLORGAINS QuerySetting fail",__FUNCTION__);
+                    CAMERA_LOGE("%s CMD_AWB_COLORGAINS QuerySetting fail", __FUNCTION__);
                     return rc;
                 }
                 int gainsSize = 4;
                 if (!CheckNumequal(oldColorGains, colorGains, gainsSize)) {
                     std::lock_guard<std::mutex> l(metaDataFlaglock_);
                     metaDataFlag_ = true;
-                    (void)memcpy_s(oldColorGains, sizeof(oldColorGains) / sizeof(float), colorGains, gainsSize * sizeof(float));
+                    (void)memcpy_s(oldColorGains, sizeof(oldColorGains) / sizeof(float), colorGains,
+                        gainsSize * sizeof(float));
                 }
                 meta->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
                 break;
             }
             default:
-            break;
+                break;
         }
     }
     return rc;
@@ -248,25 +250,25 @@ RetCode SensorController::GetAWBMetaData(std::shared_ptr<CameraStandard::CameraM
 
 RetCode SensorController::SendSensorMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta)
 {
-    common_metadata_header_t * data = meta->get();
+    common_metadata_header_t *data = meta->get();
     if (data == nullptr) {
-        CAMERA_LOGE("%s data is nullptr",__FUNCTION__);
+        CAMERA_LOGE("%s data is nullptr", __FUNCTION__);
         return RC_ERROR;
     }
     RetCode rc;
     rc = SendAEMetaData(data);
     if (rc == RC_ERROR) {
-        CAMERA_LOGE("%s SendAEMetaData fail",__FUNCTION__);
+        CAMERA_LOGE("%s SendAEMetaData fail", __FUNCTION__);
         return rc;
     }
     rc = SendAWBMetaData(data);
     if (rc == RC_ERROR) {
-        CAMERA_LOGE("%s SendAWBMetaData fail",__FUNCTION__);
+        CAMERA_LOGE("%s SendAWBMetaData fail", __FUNCTION__);
     }
     return rc;
 }
 
-RetCode SensorController::SendAEMetaData(common_metadata_header_t * data)
+RetCode SensorController::SendAEMetaData(common_metadata_header_t *data)
 {
     int32_t expo = 0;
     RetCode rc = RC_OK;
@@ -276,23 +278,23 @@ RetCode SensorController::SendAEMetaData(common_metadata_header_t * data)
         expo = *(entry.data.i32);
         if (expo != 0) {
             int32_t aemode = 1;
-            rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_EXPO,(int*)&aemode);
-            rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_EXPOTIME,(int*)&expo);
+            rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_EXPO, (int*)&aemode);
+            rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_EXPOTIME, (int*)&expo);
             CAMERA_LOGD("%s Set CMD_AE_EXPO EXPOTIME[%d] EXPO[%d]", __FUNCTION__, expo, aemode);
         } else {
             int32_t aemode = 0;
-            rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_EXPO,(int*)&aemode);
+            rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_EXPO, (int*)&aemode);
             CAMERA_LOGD("%s Set CMD_AE_EXPOTIME [%d]", __FUNCTION__, aemode);
         }
         if (rc == RC_ERROR) {
-            CAMERA_LOGE("%s Send CMD_AE_EXPOTIME fail",__FUNCTION__);
+            CAMERA_LOGE("%s Send CMD_AE_EXPOTIME fail", __FUNCTION__);
             return rc;
         }
     }
     return rc;
 }
 
-RetCode SensorController::SendAWBMetaData(common_metadata_header_t * data)
+RetCode SensorController::SendAWBMetaData(common_metadata_header_t *data)
 {
     uint8_t awbMode = 0;
     RetCode rc = RC_OK;
@@ -300,14 +302,13 @@ RetCode SensorController::SendAWBMetaData(common_metadata_header_t * data)
     int ret = find_camera_metadata_item(data, OHOS_CONTROL_AWB_MODE, &entry);
     if (ret == 0) {
         awbMode = *(entry.data.u8);
-        rc = sensorVideo_->UpdateSetting(GetName(), CMD_AWB_MODE,(int*)&awbMode);
+        rc = sensorVideo_->UpdateSetting(GetName(), CMD_AWB_MODE, (int*)&awbMode);
         CAMERA_LOGD("%s Set CMD_AWB_MODE [%d]", __FUNCTION__, awbMode);
         if (rc == RC_ERROR) {
-            CAMERA_LOGE("%s Send CMD_AWB_MODE fail",__FUNCTION__);
+            CAMERA_LOGE("%s Send CMD_AWB_MODE fail", __FUNCTION__);
             return rc;
         }
     }
     return rc;
 }
-
 } // namespace OHOS::Camera

@@ -82,7 +82,7 @@ HWTEST_F(OpenCameraTest, Camera_Open_0010, TestSize.Level2)
             std::cout << Test_->rc << ", cameraId = " << cameraId << std::endl;
         }
 
-        if (Test_->cameraDevice!= nullptr) {
+        if (Test_->cameraDevice != nullptr) {
             Test_->cameraDevice->Close();
         }
     }

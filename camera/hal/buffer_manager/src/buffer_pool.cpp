@@ -267,5 +267,4 @@ uint32_t BufferPool::GetIdleBufferCount()
     std::unique_lock<std::mutex> l(lock_);
     return idleList_.size();
 }
-
 } // namespace OHOS::Camera

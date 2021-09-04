@@ -70,6 +70,9 @@ public:
     virtual void SetFenceId(const int32_t fence) = 0;
     virtual void SetEncodeType(const int32_t type) = 0;
     virtual void SetEsFrameSize(const int32_t frameSize) = 0;
+    virtual void SetEsTimestamp(const uint64_t timeStamp) = 0;
+    virtual void SetEsKeyFrame(const int32_t isKey) = 0;
+    virtual void SetEsFrameNum(const int32_t frameNum) = 0;
     virtual void SetStreamId(const int32_t streamId) = 0;
 
     virtual void Free() = 0;

@@ -115,8 +115,8 @@ RetCode OfflineStream::ReturnBuffer(std::shared_ptr<IBuffer>& buffer)
 
     CHECK_IF_PTR_NULL_RETURN_VALUE(buffer, RC_ERROR);
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_INVALID) {
-        CAMERA_LOGI("offline stream [id:%{public}d], this buffer(index:%{public}d) has nothing to do with request.", streamId_,
-                    buffer->GetIndex());
+        CAMERA_LOGI("offline stream [id:%{public}d], this buffer(index:%{public}d) has nothing to do with request.",
+            streamId_, buffer->GetIndex());
         tunnel->PutBuffer(buffer);
         bufferPool->ReturnBuffer(buffer);
         return RC_OK;
@@ -130,10 +130,9 @@ RetCode OfflineStream::ReturnBuffer(std::shared_ptr<IBuffer>& buffer)
         auto it = std::find_if(
             context_->restRequests.begin(), context_->restRequests.end(),
             [captureId](const std::shared_ptr<CaptureRequest>& r) { return r->GetCaptureId() == captureId; });
-
         if (it == context_->restRequests.end()) {
-            CAMERA_LOGE("fatal error, offline stream [%{public}d] reveived a wrong buffer, index:%{public}d.", streamId_,
-                        buffer->GetIndex());
+            CAMERA_LOGE("fatal error, offline stream [%{public}d] reveived a wrong buffer, index:%{public}d.",
+                streamId_, buffer->GetIndex());
             return RC_ERROR;
         }
         request = *it;
@@ -160,7 +159,8 @@ RetCode OfflineStream::ReturnBuffer(std::shared_ptr<IBuffer>& buffer)
         streamId_, request->GetCaptureId(), request->GetEndTime(), request->GetOwnerCount(), tunnel->GetFrameCount());
     messenger_->SendMessage(endMessage);
 
-    CAMERA_LOGI("offline stream [id:%{public}d] dequeue buffer index:%{public}d, status:%{public}d", streamId_, buffer->GetIndex(),
+    CAMERA_LOGI("offline stream [id:%{public}d] dequeue buffer index:%{public}d, status:%{public}d",
+        streamId_, buffer->GetIndex(),
                 buffer->GetBufferStatus());
     bufferPool->ReturnBuffer(buffer);
     tunnel->PutBuffer(buffer);
@@ -174,7 +174,6 @@ bool OfflineStream::CheckCaptureIdExist(int32_t captureId)
     auto it =
         std::find_if(context_->restRequests.begin(), context_->restRequests.end(),
                      [captureId](const std::shared_ptr<CaptureRequest>& r) { return r->GetCaptureId() == captureId; });
-
     if (it != context_->restRequests.end()) {
         return true;
     }
@@ -189,8 +188,7 @@ void OfflineStream::HandleMessage(MessageGroup& message)
     CHECK_IF_PTR_NULL_RETURN_VOID(message[0]);
     CaptureMessageType type = message[0]->GetMessageType();
     switch (type) {
-        case CAPTURE_MESSAGE_TYPE_ON_ERROR:
-        {
+        case CAPTURE_MESSAGE_TYPE_ON_ERROR: {
             std::vector<std::shared_ptr<CaptureErrorInfo>> info = {};
             for (auto cm : message) {
                 auto m = std::static_pointer_cast<CaptureErrorMessage>(cm);
@@ -201,10 +199,9 @@ void OfflineStream::HandleMessage(MessageGroup& message)
                 info.push_back(edi);
             }
             OnCaptureError(message[0]->GetCaptureId(), info);
+            break;
         }
-        break;
-        case CAPTURE_MESSAGE_TYPE_ON_ENDED:
-        {
+        case CAPTURE_MESSAGE_TYPE_ON_ENDED: {
             std::vector<std::shared_ptr<CaptureEndedInfo>> info = {};
             for (auto cm : message) {
                 auto m = std::static_pointer_cast<CaptureEndedMessage>(cm);
@@ -215,10 +212,10 @@ void OfflineStream::HandleMessage(MessageGroup& message)
                 info.push_back(edi);
             }
             OnCaptureEnded(message[0]->GetCaptureId(), info);
+            break;
         }
-        break;
         default:
-        break;
+            break;
     }
     return;
 }
@@ -234,5 +231,4 @@ void OfflineStream::OnCaptureError(int32_t captureId, const std::vector<std::sha
     CHECK_IF_EQUAL_RETURN_VOID(callback_, nullptr);
     callback_->OnCaptureError(captureId, infos);
 }
-
 } // namespace OHOS::Camera

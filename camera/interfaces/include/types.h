@@ -16,7 +16,8 @@
 /**
  * @file types.h
  *
- * @brief Declares data types used by the Hardware Driver Interfaces (HDIs) of this module.
+ * @brief Declares data types
+ * used by the Hardware Driver Interfaces (HDIs) of this module.
  *
  * @since 1.0
  * @version 1.0
@@ -36,6 +37,13 @@
 namespace OHOS::Camera {
 using CameraAbility = CameraStandard::CameraMetadata;
 using CameraSetting = CameraStandard::CameraMetadata;
+
+/**
+ * @brief buffer key information of ExtraGet() and ExtraSet().
+ */
+const std::string dataSize = "dataSize";     // int32_t
+const std::string timeStamp = "timeStamp";   // int64_t
+const std::string isKeyFrame = "isKeyFrame"; // int32_t 1:true 0:false
 
 /**
  * @brief Enumerates return values of the HDIs.
@@ -198,9 +206,12 @@ using StreamInfo = struct _StreamInfo {
 
     /**
      * Tunnel mode. The value <b>true</b> means that the tunnel mode is enabled, and <b>false</b> means the opposite.
-	 *
- * After the tunnel mode is enabled, the hardware abstraction layer (HAL) does not directly interact with the upper layer. Instead, it uses the producer handle provided by the graphics layer to transfer frame data.
-     * You need to disable the tunnel mode for IoT devices that do not support or require image data caching and forwarding of preview streams.
+     *
+     * After the tunnel mode is enabled,
+     * the hardware abstraction layer (HAL) does not directly interact with the upper layer.
+     * Instead, it uses the producer handle provided by the graphics layer to transfer frame data.
+     * You need to disable the tunnel mode for IoT devices that do not support
+     * or require image data caching and forwarding of preview streams.
      */
     bool tunneledMode_;
 
@@ -221,7 +232,8 @@ using StreamInfo = struct _StreamInfo {
 };
 
 /**
- * @brief Enumerates the support types of the stream. For details about the application scenario, see {@link IsStreamsSupported}.
+ * @brief Enumerates the support types of the stream. For details about the application scenario,
+ * see {@link IsStreamsSupported}.
  */
 using StreamSupportType = enum _StreamSupportType : int32_t {
     /**
@@ -230,7 +242,8 @@ using StreamSupportType = enum _StreamSupportType : int32_t {
     DYNAMIC_SUPPORTED,
 
     /**
-     * The stream cannot be dynamically created, and the corresponding parameters take effect only after the existing stream is stopped and reconfigured.
+     * The stream cannot be dynamically created,
+     * and the corresponding parameters take effect only after the existing stream is stopped and reconfigured.
      */
     RE_CONFIGURED_REQUIRED,
 

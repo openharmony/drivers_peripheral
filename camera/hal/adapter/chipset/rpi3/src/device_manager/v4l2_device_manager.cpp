@@ -28,12 +28,13 @@ V4L2DeviceManager::~V4L2DeviceManager() {}
 RetCode V4L2DeviceManager::Init()
 {
     RetCode rc = RC_ERROR;
-    std::vector<HardwareConfiguration> hardware = {{CAMERA_FIRST, DM_M_SENSOR, DM_C_SENSOR, (std::string) "bm2835 mmal"},
-                                                    {CAMERA_FIRST, DM_M_ISP, DM_C_ISP, (std::string) "isp"},
-                                                    {CAMERA_FIRST, DM_M_FLASH, DM_C_FLASH, (std::string) "flash"},
-                                                    {CAMERA_SECOND, DM_M_SENSOR, DM_C_SENSOR, (std::string) "Imx600"},
-                                                    {CAMERA_SECOND, DM_M_ISP, DM_C_ISP, (std::string) "isp"},
-                                                    {CAMERA_SECOND, DM_M_FLASH, DM_C_FLASH, (std::string) "flash"}};
+    std::vector<HardwareConfiguration> hardware = {
+        {CAMERA_FIRST, DM_M_SENSOR, DM_C_SENSOR, (std::string)"bm2835 mmal"},
+        {CAMERA_FIRST, DM_M_ISP, DM_C_ISP, (std::string)"isp"},
+        {CAMERA_FIRST, DM_M_FLASH, DM_C_FLASH, (std::string)"flash"},
+        {CAMERA_SECOND, DM_M_SENSOR, DM_C_SENSOR, (std::string)"Imx600"},
+        {CAMERA_SECOND, DM_M_ISP, DM_C_ISP, (std::string)"isp"},
+        {CAMERA_SECOND, DM_M_FLASH, DM_C_FLASH, (std::string)"flash"}};
     std::vector<std::string> hardwareName;
     for (auto iter = hardware.cbegin(); iter != hardware.cend(); iter++) {
         if ((*iter).controllerId == DM_C_SENSOR) {
@@ -42,7 +43,7 @@ RetCode V4L2DeviceManager::Init()
     }
     rc = HosV4L2Dev::Init(hardwareName);
     if (rc == RC_ERROR) {
-        CAMERA_LOGE("%s HosV4L2Dev Init fail",__FUNCTION__);
+        CAMERA_LOGE("%s HosV4L2Dev Init fail", __FUNCTION__);
         return RC_ERROR;
     }
 
@@ -63,12 +64,12 @@ RetCode V4L2DeviceManager::Init()
     rc = CreateManager();
     enumeratorManager_ = std::make_shared<EnumeratorManager>();
     if (enumeratorManager_ == nullptr) {
-        CAMERA_LOGE("%s Create EnumeratorManager fail",__FUNCTION__);
+        CAMERA_LOGE("%s Create EnumeratorManager fail", __FUNCTION__);
         return RC_ERROR;
     }
     rc = enumeratorManager_->Init();
     if (rc == RC_ERROR) {
-        CAMERA_LOGE("%s EnumeratorManager Init fail",__FUNCTION__);
+        CAMERA_LOGE("%s EnumeratorManager Init fail", __FUNCTION__);
         return rc;
     }
     SetCallBack(nullptr);
@@ -179,7 +180,8 @@ RetCode V4L2DeviceManager::DestroyManager()
 {
     return RC_OK;
 }
-std::shared_ptr<IController> V4L2DeviceManager::GetController(CameraId cameraId, ManagerId managerId, ControllerId controllerId)
+std::shared_ptr<IController> V4L2DeviceManager::GetController(CameraId cameraId, ManagerId managerId,
+    ControllerId controllerId)
 {
     for (auto iter = managerList_.cbegin(); iter != managerList_.cend(); iter++) {
         if ((*iter)->GetManagerId() == managerId) {
@@ -256,9 +258,11 @@ void V4L2DeviceManager::Configure(std::shared_ptr<CameraStandard::CameraMetadata
 RetCode V4L2DeviceManager::SetFlashlight(FlashMode flashMode, bool enable, CameraId cameraId)
 {
     if (cameraId == CAMERA_MAX) {
-        return std::static_pointer_cast<FlashController>(GetController(CAMERA_FIRST, DM_M_FLASH, DM_C_FLASH))->SetFlashlight(flashMode, enable);
+        return std::static_pointer_cast<FlashController>(
+            GetController(CAMERA_FIRST, DM_M_FLASH, DM_C_FLASH))->SetFlashlight(flashMode, enable);
     } else {
-        return std::static_pointer_cast<FlashController>(GetController(cameraId, DM_M_FLASH, DM_C_FLASH))->SetFlashlight(flashMode, enable);
+        return std::static_pointer_cast<FlashController>(
+            GetController(cameraId, DM_M_FLASH, DM_C_FLASH))->SetFlashlight(flashMode, enable);
     }
 }
 
@@ -270,9 +274,11 @@ void V4L2DeviceManager::SetMetaDataCallBack(const MetaDataCb cb, CameraId camera
     for (auto iter = managerList_.cbegin(); iter != managerList_.cend(); iter++) {
         if ((*iter)->GetManagerId() == DM_M_SENSOR) {
             if (cameraId == CAMERA_MAX) {
-                (std::static_pointer_cast<SensorManager>(*iter))->SetMetaDataCallBack(cb, CameraIdToHardware(CAMERA_FIRST,DM_M_SENSOR));
+                (std::static_pointer_cast<SensorManager>(*iter))->SetMetaDataCallBack(cb,
+                    CameraIdToHardware(CAMERA_FIRST, DM_M_SENSOR));
             } else {
-                (std::static_pointer_cast<SensorManager>(*iter))->SetMetaDataCallBack(cb, CameraIdToHardware(cameraId,DM_M_SENSOR));
+                (std::static_pointer_cast<SensorManager>(*iter))->SetMetaDataCallBack(cb,
+                    CameraIdToHardware(cameraId, DM_M_SENSOR));
             }
         }
     }
@@ -280,8 +286,7 @@ void V4L2DeviceManager::SetMetaDataCallBack(const MetaDataCb cb, CameraId camera
 
 std::string V4L2DeviceManager::CameraIdToHardware(CameraId cameraId, ManagerId managerId)
 {
-    for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend(); iter++)
-    {
+    for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend(); iter++) {
         if ((*iter).managerId == managerId && (*iter).cameraId == cameraId) {
             return (*iter).hardwareName;
         }
@@ -292,12 +297,14 @@ std::string V4L2DeviceManager::CameraIdToHardware(CameraId cameraId, ManagerId m
 void V4L2DeviceManager::SetCallBack(UvcMetaDataCb cb)
 {
     uvcCb_ = cb;
-    enumeratorManager_->SetCallBack([&](const std::string hardwareName, std::vector<DeviceControl>& deviceControl, std::vector<DeviceFormat>& deviceFormat, bool uvcState) {
+    enumeratorManager_->SetCallBack([&](const std::string hardwareName, std::vector<DeviceControl>& deviceControl,
+        std::vector<DeviceFormat>& deviceFormat, bool uvcState) {
         UvcCallBack(hardwareName, deviceControl, deviceFormat, uvcState);
     });
 }
 
-void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<DeviceControl>& deviceControl, std::vector<DeviceFormat>& deviceFormat, bool uvcState)
+void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<DeviceControl>& deviceControl,
+    std::vector<DeviceFormat>& deviceFormat, bool uvcState)
 {
     if (uvcState) {
         CAMERA_LOGI("UvcCallBack up %s begine", hardwareName.c_str());
@@ -305,7 +312,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         if (id == CAMERA_MAX) {
             return;
         }
-        RetCode rc = GetManager(DM_M_SENSOR)->CreateController(DM_C_SENSOR,hardwareName);
+        RetCode rc = GetManager(DM_M_SENSOR)->CreateController(DM_C_SENSOR, hardwareName);
         if (rc == RC_ERROR) {
             return;
         }
@@ -320,9 +327,9 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
             physicalSize.push_back((*iter).fmtdesc.width);
             physicalSize.push_back((*iter).fmtdesc.height);
         }
-        std::shared_ptr<CameraStandard::CameraMetadata> meta = std::make_shared<CameraStandard::CameraMetadata>(30, 2000);
-        meta->addEntry(OHOS_SENSOR_INFO_PHYSICAL_SIZE, physicalSize.data(),
-                              physicalSize.size());
+        std::shared_ptr<CameraStandard::CameraMetadata> meta = std::make_shared<CameraStandard::CameraMetadata>(30,
+            2000);
+        meta->addEntry(OHOS_SENSOR_INFO_PHYSICAL_SIZE, physicalSize.data(), physicalSize.size());
         if (uvcCb_ == nullptr) {
             CAMERA_LOGE("uvcCb_ is nullptr");
             return;
@@ -335,7 +342,8 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         if (id == CAMERA_MAX) {
             return;
         }
-        RetCode rc = std::static_pointer_cast<SensorManager>(GetManager(DM_M_SENSOR))->DestroyController(DM_C_SENSOR,hardwareName);
+        RetCode rc = std::static_pointer_cast<SensorManager>(GetManager(DM_M_SENSOR))->DestroyController(DM_C_SENSOR,
+            hardwareName);
         if (rc == RC_ERROR) {
             return;
         }
@@ -349,7 +357,8 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
             CAMERA_LOGE("uvcCb_ is nullptr");
             return;
         }
-        std::shared_ptr<CameraStandard::CameraMetadata> meta = std::make_shared<CameraStandard::CameraMetadata>(30, 2000);
+        std::shared_ptr<CameraStandard::CameraMetadata> meta = std::make_shared<CameraStandard::CameraMetadata>(30,
+            2000);
         uvcCb_(meta, uvcState, id);
     }
 }
@@ -384,5 +393,4 @@ CameraId V4L2DeviceManager::ReturnEnableCameraId(std::string hardwareName)
     }
     return CAMERA_MAX;
 }
-
 } // namespace OHOS::Camera

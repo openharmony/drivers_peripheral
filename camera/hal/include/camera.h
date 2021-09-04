@@ -218,6 +218,7 @@ using EsFrmaeInfo = struct EsFrmaeInfo {
     int32_t align;
     int32_t isKey;
     int64_t timestamp;
+    int32_t frameNum;
 };
 
 #define CHECK_IF_NOT_EQUAL_RETURN_VALUE(arg1, arg2, ret)                                                            \

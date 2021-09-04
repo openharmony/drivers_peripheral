@@ -22,7 +22,6 @@ constexpr uint32_t STRIDE_ALIGNMENT = 8;
 } // namespace
 
 namespace OHOS::Camera {
-
 StreamTunnel::~StreamTunnel()
 {
     CAMERA_LOGV("enter");
@@ -130,6 +129,13 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
 
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK) {
         int32_t fence = 0;
+        EsFrmaeInfo esInfo = buffer->GetEsFrameInfo();
+        if (esInfo.size != -1 && esInfo.timestamp != -1 ) {
+            sb->ExtraSet("dataSize", esInfo.size);
+            sb->ExtraSet("isKeyFrame", esInfo.isKey);
+            sb->ExtraSet("timeStamp", esInfo.timestamp);
+            sb->ExtraSet("frameNum", esInfo.frameNum);
+        }
         bufferQueue_->FlushBuffer(sb, fence, flushConfig_);
         frameCount_++;
     } else {
@@ -192,7 +198,9 @@ void StreamTunnel::NotifyStart()
 void StreamTunnel::WaitForAllBufferReturned()
 {
     std::unique_lock<std::mutex> l(finishLock_);
-    finishCV_.wait(l, [this]{ return restBuffers == 0; });
+    finishCV_.wait(l, [this]{
+        return restBuffers == 0;
+        });
 
     return;
 }
