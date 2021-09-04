@@ -132,7 +132,8 @@ CamRetCode CameraHost::Init()
 
     handler_ = ::dlopen(CAMERA_C_HAL_LIB_PATH, RTLD_NOW);
     if (handler_ == nullptr) {
-        CAMERA_LOGE("%{public}s, dlopen %{public}s failed, %{public}s", __FUNCTION__, CAMERA_C_HAL_LIB_PATH, ::dlerror());
+        CAMERA_LOGE("%{public}s, dlopen %{public}s failed, %{public}s",
+            __FUNCTION__, CAMERA_C_HAL_LIB_PATH, ::dlerror());
         return INSUFFICIENT_RESOURCES;
     }
 

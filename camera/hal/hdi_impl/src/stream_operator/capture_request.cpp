@@ -17,7 +17,6 @@
 #include <sys/time.h>
 
 namespace OHOS::Camera {
-
 CaptureRequest::CaptureRequest(const int32_t id,
                                const int32_t n,
                                CaptureSetting& setting,

@@ -19,23 +19,23 @@
 #include "device_manager_adapter.h"
 #include "utils.h"
 #include "camera.h"
-#include "node_base.h"
+#include "source_node.h"
 
 namespace OHOS::Camera {
-class ForkNode : public NodeBase {
+class ForkNode : public SourceNode {
 public:
     ForkNode(const std::string& name, const std::string& type);
     ~ForkNode() override;
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;
-    void DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
+    void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
     void ForkBuffers();
 
 private:
     std::mutex                            mtx_;
     std::condition_variable               cv_;
     std::shared_ptr<std::thread>          forkThread_ = nullptr;
-    std::shared_ptr<FrameSpec>            forkSpec_ = nullptr;
+    std::shared_ptr<IBuffer>              tmpBuffer_ = nullptr;
     std::vector<std::shared_ptr<IPort>>   inPutPorts_;
     std::vector<std::shared_ptr<IPort>>   outPutPorts_;
     std::atomic_bool                    streamRunning_ = false;

@@ -32,7 +32,7 @@ RetCode FlashController::PowerUp()
     RetCode rc = RC_OK;
     if (GetPowerOnState() == false) {
         SetPowerOnState(true);
-        CAMERA_LOGI("%s Flash Powerup",__FUNCTION__);
+        CAMERA_LOGI("%s Flash Powerup", __FUNCTION__);
         return rc;
     }
     return rc;
@@ -43,7 +43,7 @@ RetCode FlashController::PowerDown()
     RetCode rc = RC_OK;
     if (GetPowerOnState() == true) {
         SetPowerOnState(false);
-        CAMERA_LOGI("%s Flash PowerDown",__FUNCTION__);
+        CAMERA_LOGI("%s Flash PowerDown", __FUNCTION__);
         return rc;
     }
     return rc;
@@ -60,5 +60,4 @@ RetCode FlashController::GetAbilityMetaData(std::shared_ptr<CameraStandard::Came
 {
     return RC_OK;
 }
-
 } // namespace OHOS::Camera

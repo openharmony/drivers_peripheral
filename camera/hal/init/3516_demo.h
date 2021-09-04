@@ -22,6 +22,7 @@
 #include <hdf_log.h>
 #include <surface.h>
 #include <time.h>
+#include <sys/time.h>
 #include <display_type.h>
 #include "camera.h"
 #include "camera_metadata_info.h"

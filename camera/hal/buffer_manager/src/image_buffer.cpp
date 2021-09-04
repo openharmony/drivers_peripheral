@@ -272,6 +272,27 @@ void ImageBuffer::SetEsFrameSize(const int32_t frameSize)
     return;
 }
 
+void ImageBuffer::SetEsTimestamp(const uint64_t timeStamp)
+{
+    std::lock_guard<std::mutex> l(l_);
+    esInfo_.timestamp = timeStamp;
+    return;
+}
+
+void ImageBuffer::SetEsKeyFrame(const int32_t isKey)
+{
+    std::lock_guard<std::mutex> l(l_);
+    esInfo_.isKey = isKey;
+    return;
+}
+
+void ImageBuffer::SetEsFrameNum(const int32_t frameNum)
+{
+    std::lock_guard<std::mutex> l(l_);
+    esInfo_.frameNum = frameNum;
+    return;
+}
+
 void ImageBuffer::SetEncodeType(const int32_t type)
 {
     std::lock_guard<std::mutex> l(l_);
