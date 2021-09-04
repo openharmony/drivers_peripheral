@@ -232,7 +232,7 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
         }
 
         if (j == g_listNum) {
-            EXPECT_GT(g_listNum, j);
+            EXPECT_NE(g_listNum, j);
             printf("%s: The sensor ID[%d] does not match. Please check the use case or the reported sensor ID",
             __func__, info->sensorId);
         }
