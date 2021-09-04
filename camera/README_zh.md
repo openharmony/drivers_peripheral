@@ -6,42 +6,44 @@ OHOS_STD/drivers_peripheral
     .
     ├── hal
     │   ├── adapter
-    │   │   └── chipset
-    │   │       ├── hispark_taurus
-    │   │       │   ├── config
-    │   │       │   │   ├── driver
-    │   │       │   │   ├── hdi_impl
-    │   │       │   │   └── pipeline_core
-    │   │       │   ├── include
-    │   │       │   │   └── device_manager
-    │   │       │   └── src
-    │   │       │       ├── device_manager
-    │   │       │       ├── driver_adapter
-    │   │       │       └── pipeline_core
-    │   │       │           ├── ipp_algo_example
-    │   │       │           └── nodes
-    │   │       │               ├── mpi_node
-    │   │       │               ├── venc_node
-    │   │       │               ├── vi_node
-    │   │       │               ├── vo_node
-    │   │       │               └── vpss_node
-    │   │       └── rpi4b
-    │   │           ├── config
-    │   │           │   ├── hdi_impl
-    │   │           │   └── pipeline_core
-    │   │           ├── include
-    │   │           │   └── device_manager
+    │   │   ├── chipset
+    │   │   │   ├── gni
+    │   │   │   ├── hispark_taurus
+    │   │   │   │   ├── include
+    │   │   │   │   │   ├── device_manager
+    │   │   │   │   │   └── driver_adapter
+    │   │   │   │   └── src
+    │   │   │   │       ├── device_manager
+    │   │   │   │       ├── driver_adapter
+    │   │   │   │       └── pipeline_core
+    │   │   │   │           ├── ipp_algo_example
+    │   │   │   │           └── nodes
+    │   │   │   │               ├── mpi_node
+    │   │   │   │               ├── venc_node
+    │   │   │   │               ├── vi_node
+    │   │   │   │               ├── vo_node
+    │   │   │   │               └── vpss_node
+    │   │   │   └── rpi3
+    │   │   │       ├── include
+    │   │   │       │   └── device_manager
+    │   │   │       └── src
+    │   │   │           ├── device_manager
+    │   │   │           └── driver_adapter
+    │   │   │               ├── main_test
+    │   │   │               └── test
+    │   │   │                   └── unittest
+    │   │   │                       └── include
+    │   │   └── platform
+    │   │       └── v4l2
     │   │           └── src
-    │   │               ├── device_manager
     │   │               ├── driver_adapter
     │   │               │   ├── include
-    │   │               │   ├── main_test
-    │   │               │   ├── src
-    │   │               │   └── test
-    │   │               │       └── unittest
-    │   │               │           └── include
+    │   │               │   └── src
     │   │               └── pipeline_core
-    │   │                   └── ipp_algo_example
+    │   │                   ├── ipp_algo_example
+    │   │                   └── nodes
+    │   │                       ├── uvc_node
+    │   │                       └── v4l2_source_node
     │   ├── buffer_manager
     │   │   ├── include
     │   │   ├── src
@@ -89,8 +91,7 @@ OHOS_STD/drivers_peripheral
     │   │   │       ├── sensor_node
     │   │   │       ├── sink_node
     │   │   │       ├── source_node
-    │   │   │       ├── transform_node
-    │   │   │       └── uvc_node
+    │   │   │       └── transform_node
     │   │   ├── pipeline_impl
     │   │   │   ├── include
     │   │   │   └── src
@@ -126,6 +127,7 @@ OHOS_STD/drivers_peripheral
             │   └── operator
             ├── client
             └── server
+
 ```
 
 # 接口说明
@@ -213,7 +215,7 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @return CamRetCode
      */
     CamRetCode GetStreamOperator([in] IStreamOperatorCallback callback, [out] IStreamOperator operator);
-    
+
     /**
      * @brief 更新设备控制参数
      *
@@ -221,7 +223,7 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @return CamRetCode
      */
     CamRetCode UpdateSettings(CameraSetting setting);
-    
+
     /**
      * @brief 设置Result回调模式和回调函数
      *
@@ -230,7 +232,7 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @return CamRetCode
      */
     CamRetCode SetResultMode([in] ResultCallbackMode mode);
-    
+
     /**
      * @brief 获取使能的ResultMeta
      *
@@ -238,7 +240,7 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @return CamRetCode
      */
     CamRetCode GetEnabledResults([out] MetaType[] results);
-    
+
     /**
      * @brief 使能具体的ResultMeta
      *
@@ -246,7 +248,7 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @return CamRetCode
      */
     CamRetCode EnableResult([in] MetaType[] results);
-    
+
     /**
      * @brief 禁止具体的ResultMeta
      *
@@ -254,12 +256,12 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @return CamRetCode
      */
     CamRetCode DisableResult(in] MetaType[] results);
-    
+
     /**
      * @brief 关闭Camera设备
      */
     void Close();
-    
+
 
 
 ### 包：
@@ -281,7 +283,7 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @return RetCode
      */
     RetCode IsStreamsSupported([in] OperationMode mode, [in] CameraMetadata modeSetting, [in] StreamInfo[] info, [out] StreamSupportType type);
-    
+
      /**
      * @brief 创建流
      *
@@ -289,7 +291,7 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @return RetCode
      */
     RetCode CreateStreams([in] StreamInfo[] streamInfo);
-    
+
     /**
      * @brief 释放流
      *
@@ -297,7 +299,7 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @return RetCode
      */
     RetCode ReleaseStreams([in] int[] streamIds);
-    
+
     /**
      * @brief 使能相机流的配置，并配置工作模式
      *
@@ -307,7 +309,7 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @see OperationMode
      */
     RetCode CommitStreams([in] OperationMode mode, [in] CameraMetadata modeSetting);
-    
+
     /**
      * @brief 获取所有流特征
      *
@@ -316,7 +318,7 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @return RetCode
      */
     RetCode GetStreamAttributes([out] StreamAttribute[] attributes);
-    
+
     /**
      * @brief 关联BufferQueue
      *
@@ -325,7 +327,7 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @return RetCode
      */
     RetCode AttachBufferQueue([in] streamId, [in] IBufferClientProducer producer);
-    
+
     /**
      * @brief 取消关联BufferQueue
      *
@@ -333,7 +335,7 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @return RetCode
      */
     RetCode DetachBufferQueue([in] int streamId);
-    
+
     /**
      * @brief 捕获图像
      *
@@ -344,14 +346,14 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @return RetCode
      */
     RetCode Capture([in] int captureId, [in] CaptureInfo[] info, [in] bool isStreaming);
-    
+
     /**
      * @brief 取消图像捕获
      *
      * @return RetCode
      */
     RetCode CancelCapture([in] int captureId);
-    
+
     /**
      * @brief 将普通流转换成离线流
      *
@@ -377,7 +379,7 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @return RetCode
      */
     RetCode CancelCapture([in] int captureId);
-    
+
     /**
      * @brief 释放离线流资源
      *
@@ -385,14 +387,14 @@ CamRetCode SetFlashlight[in] String cameraId, [out] boolean isEnable);
      * @return RetCode
      */
     RetCode ReleaseStreams([in] int[] streamIds);
-    
+
     /**
      * @brief 释放IOfflineStreamOperator句柄
      *
      * @return RetCode
      */
     RetCode Release();`
-    
+
 ## 数据结构定义
 
     interfaces/hdi/types.h

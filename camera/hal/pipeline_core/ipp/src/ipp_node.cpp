@@ -168,7 +168,7 @@ RetCode IppNode::GetOutputBuffer(std::vector<std::shared_ptr<IBuffer>>& buffers,
         return RC_ERROR;
     }
 
-    PortFormat format{};
+    PortFormat format {};
     outPort->GetFormat(format);
     auto id = format.bufferPoolId_;
     for (auto it : buffers) {
@@ -227,7 +227,7 @@ void IppNode::ClassifyOutputBuffer(std::shared_ptr<IBuffer>& outBuffer,
         return;
     }
 
-    PortFormat format{};
+    PortFormat format {};
     outPort->GetFormat(format);
     auto id = format.bufferPoolId_;
     auto it = std::find_if(inBuffers.begin(), inBuffers.end(),
