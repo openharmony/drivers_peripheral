@@ -26,6 +26,7 @@ const int32_t WLAN_FREQ_MAX_NUM = 14;
 const int32_t WLAN_TX_POWER = 160;
 const int32_t DEFAULT_COMBO_SIZE = 6;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
+const uint32_t RESET_TIME = 20;
 
 const char *WLAN_SERVICE_NAME = "wlan_hal_c_service";
 
@@ -368,12 +369,12 @@ HWTEST_F(HdfWifiServiceCTest, SetScanningMacAddressTest_013, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetNetdevInfoTest_001
+ * @tc.name: GetNetdevInfoTest_014
  * @tc.desc: Wifi hdi get netdev info function test
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, GetNetdevInfoTest_001, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetNetdevInfoTest_014, TestSize.Level1)
 {
     int32_t rc;
     struct NetDeviceInfoResult netDeviceInfoResult;
@@ -384,48 +385,14 @@ HWTEST_F(HdfWifiServiceCTest, GetNetdevInfoTest_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: HdfWifiServiceCTest
- * @tc.desc: Wifi hdi start scan function test
- * @tc.type: FUNC
- * @tc.require: AR000FRMJB
- */
-HWTEST_F(HdfWifiServiceCTest, StartScanTest_001, TestSize.Level1)
-{
-    int32_t rc;
-    const int32_t wlan_type = PROTOCOL_80211_IFTYPE_STATION;
-    struct WlanFeatureInfo *ifeature = nullptr;
-    WifiScan scan = {0};
-
-    rc = g_wlanObj->createFeature(g_wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->startScan(g_wlanObj, (struct WlanFeatureInfo *)ifeature, &scan);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    sleep(3);
-}
-
-/**
- * @tc.name: RegisterEventCallbackTest_014
+ * @tc.name: RegisterEventCallbackTest_015
  * @tc.desc: Wifi hdi reister event call back function test
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, RegisterEventCallbackTest_014, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, RegisterEventCallbackTest_015, TestSize.Level1)
 {
     int32_t rc = g_wlanObj->registerEventCallback(g_wlanObj, HalResetCallbackEvent);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-}
-
-/**
- * @tc.name: UnregisterEventCallbackTest_015
- * @tc.desc: Wifi hdi unreister event call back function test
- * @tc.type: FUNC
- * @tc.require: AR000FRMJB
- */
-HWTEST_F(HdfWifiServiceCTest, UnregisterEventCallbackTest_015, TestSize.Level1)
-{
-    int32_t rc = g_wlanObj->unregisterEventCallback(g_wlanObj);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
@@ -440,19 +407,52 @@ HWTEST_F(HdfWifiServiceCTest, ResetDriverTest_016, TestSize.Level1)
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_STATION;
     struct WlanFeatureInfo *ifeature = nullptr;
     uint8_t chipId= 0;
+    int32_t rc;
 
-    int32_t rc = g_wlanObj->registerEventCallback(g_wlanObj, HalResetCallbackEvent);
-    ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->createFeature(g_wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->getChipId(g_wlanObj, (struct WlanFeatureInfo *)ifeature, &chipId);
     ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->resetDriver(g_wlanObj, chipId);
     ASSERT_EQ(rc, HDF_SUCCESS);
     EXPECT_EQ(HDF_SUCCESS, g_resetStatus);
-    rc = g_wlanObj->unregisterEventCallback(g_wlanObj);
+    sleep(RESET_TIME);
+}
+
+/**
+ * @tc.name: StartScanTest_017
+ * @tc.desc: Wifi hdi start scan function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(HdfWifiServiceCTest, StartScanTest_017, TestSize.Level1)
+{
+    int32_t rc;
+    const int32_t wlan_type = PROTOCOL_80211_IFTYPE_STATION;
+    struct WlanFeatureInfo *ifeature = nullptr;
+    WifiScan scan = {0};
+
+    rc = g_wlanObj->createFeature(g_wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->startScan(g_wlanObj, (struct WlanFeatureInfo *)ifeature, &scan);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
+    sleep(10);
 }
+
+/**
+ * @tc.name: UnregisterEventCallbackTest_018
+ * @tc.desc: Wifi hdi unreister event call back function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(HdfWifiServiceCTest, UnregisterEventCallbackTest_018, TestSize.Level1)
+{
+    int32_t rc = g_wlanObj->unregisterEventCallback(g_wlanObj);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+}
+
 };

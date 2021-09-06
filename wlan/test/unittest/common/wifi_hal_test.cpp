@@ -362,7 +362,7 @@ HWTEST_F(WifiHalTest, WifiHalStartScan001, TestSize.Level1)
     EXPECT_NE(nullptr, staFeature);
     ret = staFeature->startScan(ifName, &scan);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    sleep(3);
+    sleep(10);
 }
 
 };
