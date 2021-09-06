@@ -47,6 +47,7 @@ const int AUDIO_CACHE_ALIGN_SIZE = 64;
 const int DELAY_TIME = 5;
 const int LOOP_COUNT = 100;
 
+static struct device tmpDev = {0};
 int32_t AudioRenderBuffInit(struct PlatformHost *platformHost)
 {
     uint64_t buffSize;
@@ -70,7 +71,7 @@ int32_t AudioRenderBuffInit(struct PlatformHost *platformHost)
     platformHost->renderBufInfo.virtAddr = (uint32_t *)LOS_DmaMemAlloc(&platformHost->renderBufInfo.phyAddr, buffSize,
         AUDIO_CACHE_ALIGN_SIZE, DMA_NOCACHE);
 #else
-    struct device tmpDev;
+
     tmpDev.coherent_dma_mask = 0xffffffffUL;
     platformHost->renderBufInfo.virtAddr = dma_alloc_wc(&tmpDev, buffSize,
         (dma_addr_t *)&platformHost->renderBufInfo.phyAddr, GFP_DMA | GFP_KERNEL);
@@ -99,7 +100,7 @@ int32_t AudioRenderBuffFree(struct PlatformHost *platformHost)
 #ifdef __LITEOS__
     LOS_DmaMemFree(platformHost->renderBufInfo.virtAddr);
 #else
-    dma_free_wc(NULL, platformHost->renderBufInfo.cirBufSize, platformHost->renderBufInfo.virtAddr,
+    dma_free_wc(&tmpDev, platformHost->renderBufInfo.cirBufSize, platformHost->renderBufInfo.virtAddr,
                 platformHost->renderBufInfo.phyAddr);
 #endif
     }
@@ -132,7 +133,6 @@ int32_t AudioCaptureBuffInit(struct PlatformHost *platformHost)
     platformHost->captureBufInfo.virtAddr = (uint32_t *)LOS_DmaMemAlloc(&platformHost->captureBufInfo.phyAddr, buffSize,
         AUDIO_CACHE_ALIGN_SIZE, DMA_NOCACHE);
 #else
-    struct device tmpDev;
     tmpDev.coherent_dma_mask = 0xffffffffUL;
     platformHost->captureBufInfo.virtAddr = dma_alloc_wc(&tmpDev, buffSize,
         (dma_addr_t *)&platformHost->captureBufInfo.phyAddr, GFP_DMA | GFP_KERNEL);
@@ -160,7 +160,7 @@ int32_t AudioCaptureBuffFree(struct PlatformHost *platformHost)
 #ifdef __LITEOS__
     LOS_DmaMemFree(platformHost->captureBufInfo.virtAddr);
 #else
-    dma_free_wc(NULL, platformHost->captureBufInfo.cirBufSize, platformHost->captureBufInfo.virtAddr,
+    dma_free_wc(&tmpDev, platformHost->captureBufInfo.cirBufSize, platformHost->captureBufInfo.virtAddr,
                 platformHost->captureBufInfo.phyAddr);
 #endif
     }
