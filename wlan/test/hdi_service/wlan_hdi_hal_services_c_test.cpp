@@ -112,7 +112,6 @@ static int32_t HalResetCallbackEvent(uint32_t eventId, void *data, const char *i
  */
 HWTEST_F(HdfWifiServiceCTest, GetSupportFeatureComboTest_001, TestSize.Level1)
 {
-
     uint8_t supType[PROTOCOL_80211_IFTYPE_NUM + 1] = {0};
     uint64_t combo[DEFAULT_COMBO_SIZE] = {0};
 
@@ -454,5 +453,4 @@ HWTEST_F(HdfWifiServiceCTest, UnregisterEventCallbackTest_018, TestSize.Level1)
     int32_t rc = g_wlanObj->unregisterEventCallback(g_wlanObj);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
-
 };
