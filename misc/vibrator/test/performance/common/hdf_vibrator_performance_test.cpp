@@ -30,8 +30,8 @@ namespace {
     const int32_t VIBRATOR_MSEC_TIME = 1000;
     const int32_t VIBRATOR_DURATION  = 2000;
     const int32_t VIBRATOR_COMMON_TIME = 500;
-    const char *g_timeSequence = "vibrator.haptic.default.time";
-    const char *g_builtIn = "vibrator.haptic.default.effect";
+    const char *g_timeSequence = "haptic.clock.timer";
+    const char *g_builtIn = "haptic.default.effect";
     const struct VibratorInterface *g_vibratorPerformanceDev = nullptr;
     }
 
