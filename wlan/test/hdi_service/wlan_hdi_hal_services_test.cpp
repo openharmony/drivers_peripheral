@@ -421,6 +421,6 @@ HWTEST_F(WifiHdiHalServiceTest, ResetDriverTest_016, TestSize.Level1)
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = wlanObj->destroyFeature(feature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-
+    sleep(20);
 }
 };
