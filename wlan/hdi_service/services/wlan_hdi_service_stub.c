@@ -904,7 +904,7 @@ static int32_t WlanServiceStubStartScan(struct HdfDeviceIoClient *client, struct
         HDF_LOGE("%s: name is NULL", __func__);
         return HDF_FAILURE;
     }
-    if (!HdfSbufReadBuffer(reply, (const void **)(&scan), &dataSize) || dataSize != sizeof(WifiScan)) {
+    if (!HdfSbufReadBuffer(data, (const void **)(&scan), &dataSize) || dataSize != sizeof(WifiScan)) {
         return HDF_FAILURE;
     }
     ret = g_staFeature->startScan(ifName, scan);
