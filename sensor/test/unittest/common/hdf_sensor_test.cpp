@@ -44,14 +44,14 @@ namespace {
     static struct SensorValueRange g_accelRange[] = {{11, -11}, {11, -11}, {11, -11}};
     static struct SensorValueRange g_proximityRange[] = {{5, 0}};
     static struct SensorValueRange g_hallRange[] = {{1, 0}};
-    static struct SensorValueRange g_barmoterRange[] = {{1100, 300}, {85, -40}};
+    static struct SensorValueRange g_barometerRange[] = {{1100, 300}, {85, -40}};
 
     static struct SensorDevelopmentList g_sensorList[] = {
         {SENSOR_TYPE_NONE, "sensor_test", "default", 1, 1, g_testRange},
         {SENSOR_TYPE_ACCELEROMETER, "accelerometer", "borsh_bmi160", 1, 3, g_accelRange},
         {SENSOR_TYPE_PROXIMITY, "proximitymeter", "stk3338", 0, 1, g_proximityRange},
         {SENSOR_TYPE_HALL, "hallrometer", "akm_ak8789", 0, 1, g_hallRange},
-        {SENSOR_TYPE_BAROMETER, "barometer", "borsh_bmp180", 1, 2, g_barmoterRange},
+        {SENSOR_TYPE_BAROMETER, "barometer", "borsh_bmp180", 1, 2, g_barometerRange},
     };
 
     static int g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
