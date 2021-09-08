@@ -90,9 +90,11 @@ static int ClaimInterface(unsigned int iface)
 void SpeedPrint()
 {
     double speed = 0;
+    uint64_t count = 0;
 
     sigCnt++;
-    if (sigCnt * TEST_PRINT_TIME >= TEST_TIME) {
+    count = sigCnt * TEST_PRINT_TIME;
+    if (count >= TEST_TIME) {
         g_speedFlag = 1;
     }
     speed = (g_byteTotal * 1.0) / (sigCnt * TEST_PRINT_TIME  * 1024 * 1024);

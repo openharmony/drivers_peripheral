@@ -665,7 +665,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocCtrlRequest008, TestSize.Level
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocCtrlRequest009, TestSize.Level1)
 {
     struct UsbFnRequest *req = nullptr;
-	UsbFnInterfaceHandle handle = NULL;
+    UsbFnInterfaceHandle handle = NULL;
     req = UsbFnAllocCtrlRequest(handle, 0);
     EXPECT_TRUE(nullptr == req);
 }
@@ -956,7 +956,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCloseInterface001, TestSize.Level1)
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.handle);
     ret = UsbFnCloseInterface(g_acmDevice->ctrlIface.handle);
     EXPECT_TRUE(HDF_SUCCESS == ret);
-	g_acmDevice->ctrlIface.handle = NULL;
+    g_acmDevice->ctrlIface.handle = NULL;
 }
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCloseInterface002, TestSize.Level1)
@@ -966,7 +966,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCloseInterface002, TestSize.Level1)
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
     ret = UsbFnCloseInterface(g_acmDevice->dataIface.handle);
     EXPECT_TRUE(HDF_SUCCESS == ret);
-	g_acmDevice->dataIface.handle = NULL;
+    g_acmDevice->dataIface.handle = NULL;
 }
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCloseInterface003, TestSize.Level1)

@@ -13,14 +13,13 @@
  * limitations under the License.
  */
 
+#include "usb_host_serial_loopback.h"
 #include <cstdio>
 #include <cstring>
 #include <unistd.h>
 #include <gtest/gtest.h>
 #include "securec.h"
-extern "C" {
 #include "usbhost_ddk_test.h"
-}
 
 using namespace std;
 using namespace testing::ext;
@@ -32,12 +31,12 @@ public:
     static void TearDownTestCase();
 };
 
-void UsbHostSerialLoopback::SetUpTestCase(){
+void UsbHostSerialLoopback::SetUpTestCase() {
     const char *apiType = "-SDK";
     UsbHostDdkTestInit(const_cast<char*>(apiType));
 }
 
-void UsbHostSerialLoopback::TearDownTestCase(){
+void UsbHostSerialLoopback::TearDownTestCase() {
     TestExit();
 }
 
@@ -45,7 +44,7 @@ HWTEST_F(UsbHostSerialLoopback, HostSerialLoopback, TestSize.Level1)
 {
     printf("------start HostSerialLoopback------\n");
     char data[256] = {0};
-    for ( ; ; ) {
+    for (;;) {
         UsbHostDdkTestOpen(HOST_ACM_SYNC_READ);
         UsbHostDdkTestSyncRead(data);
         UsbHostDdkTestClose(HOST_ACM_SYNC_READ);
@@ -61,5 +60,4 @@ HWTEST_F(UsbHostSerialLoopback, HostSerialLoopback, TestSize.Level1)
     }
     printf("------end HostSerialLoopback------\n");
 }
-
 }

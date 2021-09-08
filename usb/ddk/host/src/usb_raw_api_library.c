@@ -1498,7 +1498,11 @@ void *RawUsbMemCalloc(size_t size)
             DListHeadInit(&g_usbRamTestHead->list);
         }
         testEntry = OsalMemAlloc(sizeof(struct RawUsbRamTestList));
-        testEntry->address = (uint32_t) buf;
+        if (testEntry == NULL) {
+            HDF_LOGE("%s:%d testEntry is NULL", __func__, __LINE__);
+            return buf;
+        }
+        testEntry->address = (uintptr_t)buf;
         testEntry->size = size;
 
         OsalMutexLock(&g_usbRamTestHead->lock);
@@ -1520,27 +1524,29 @@ void RawUsbMemFree(void *mem)
     uint32_t totalSize = 0;
     uint32_t size = 0;
 
-    if (mem != NULL) {
-        free(mem);
-    }
-    else {
+    if (mem == NULL) {
         return;
     }
 
     if ((g_usbRamTestFlag == true) && (g_usbRamTestHead != NULL)) {
         OsalMutexLock(&g_usbRamTestHead->lock);
         DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
-            if ((NULL != pos) && (pos->address == (uint32_t)mem))
-            {
+            if ((pos != NULL) && (pos->address == (uintptr_t)mem)) {
                 size = pos->size;
                 DListRemove(&pos->list);
                 free(pos);
                 continue;
             }
-            totalSize += pos->size;
+            if (pos != NULL) {
+                totalSize += pos->size;
+            }
         }
         OsalMutexUnlock(&g_usbRamTestHead->lock);
         HDF_LOGE("%{public}s rm size=%{public}d totalSize=%{public}d", __func__, size, totalSize);
+    }
+
+    if (mem != NULL) {
+        free(mem);
     }
 }
 

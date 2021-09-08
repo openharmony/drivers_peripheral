@@ -118,7 +118,7 @@ static int AcmStartDb(struct AcmDevice *acm,
 static int AcmDataBufAlloc(struct AcmDevice *acm)
 {
     int i;
-    struct AcmDb *db;
+    struct AcmDb *db = NULL;
 	if (acm == NULL) {
         return 0;
 	}

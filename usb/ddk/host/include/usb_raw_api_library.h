@@ -71,7 +71,7 @@ struct UsbMessageQueue {
 };
 
 struct RawUsbRamTestList {
-    uint32_t address;
+    uintptr_t address;
     uint32_t size;
     struct DListHead list;
     struct OsalMutex lock;

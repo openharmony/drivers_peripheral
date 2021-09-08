@@ -750,8 +750,9 @@ static int32_t SerialWrite(struct SerialDevice *port, struct HdfSBuf *data)
         HDF_LOGE("no write buf\n");
         return HDF_SUCCESS;
     }
-    if (wbn >= ACM_NW) {
-        wb = 0;
+    if (wbn < 0) {
+        HDF_LOGE("AcmWbAlloc failed\n");
+        return HDF_FAILURE;
     }
     wb = &acm->wb[wbn];
     tmp = HdfSbufReadString(data);
@@ -760,8 +761,8 @@ static int32_t SerialWrite(struct SerialDevice *port, struct HdfSBuf *data)
         return HDF_ERR_IO;
     }
     size = strlen(tmp) + 1;
-    size = (size > acm->dataOutEp->maxPacketSize) ? acm->dataOutEp->maxPacketSize : size;
-    if (acm->dataOutEp) {
+    if (acm->dataOutEp != NULL) {
+        size = (size > acm->dataOutEp->maxPacketSize) ? acm->dataOutEp->maxPacketSize : size;
         ret = memcpy_s(wb->buf, acm->dataOutEp->maxPacketSize, tmp, size);
         if (ret != EOK) {
             HDF_LOGE("%s: memcpy_s fail", __func__);
@@ -821,7 +822,7 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
         HDF_LOGE("no write buf\n");
         return HDF_SUCCESS;
     }
-    
+
     if (wbn >= ACM_NW) {
         wb = 0;
     }
@@ -1110,8 +1111,11 @@ static void AcmNotifyReqCallback(const void *requestArg)
     if (acm->nbIndex) {
         dr = (struct UsbCdcNotification *)acm->notificationBuffer;
     }
-    if (dr) {
+    if (dr != NULL) {
         expectedSize = sizeof(struct UsbCdcNotification) + Le16ToCpu(dr->wLength);
+    } else {
+        HDF_LOGE("%s:%d dr is NULL!", __func__, __LINE__);
+        return;
     }
     if (currentSize < expectedSize) {
         if (AcmNotificationBufferProcess(req, acm, currentSize, expectedSize) != HDF_SUCCESS) {
