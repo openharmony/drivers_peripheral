@@ -24,7 +24,6 @@
 #include <unordered_map>
 
 namespace OHOS::Camera {
-
 struct TunnelConfig {
     uint32_t width;
     uint32_t height;
