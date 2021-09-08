@@ -120,7 +120,7 @@ unsigned char* DoFbMmap(const int pmemfd)
     constexpr uint32_t bit = 8;
     int screensize = g_vInfo.xres * g_vInfo.yres * g_vInfo.bits_per_pixel / bit;
 
-    auto ret = reinterpret_cast<unsigned char*>(
+    unsigned char* ret = reinterpret_cast<unsigned char*>(
         mmap(nullptr, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, pmemfd, 0));
     if (ret == MAP_FAILED) {
         CAMERA_LOGE("main test:do_mmap: pmem mmap() failed: %s (%d)\n", strerror(errno), errno);

@@ -25,7 +25,6 @@
 #include <vector>
 
 namespace OHOS::Camera {
-
 enum CaptureMessageType {
     CAPTURE_MESSAGE_TYPE_INVALID = 0,
     CAPTURE_MESSAGE_TYPE_ON_STARTED,
