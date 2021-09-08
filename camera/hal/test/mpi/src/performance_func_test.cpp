@@ -156,7 +156,6 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0003, TestSize.Level3)
         gettimeofday(&end, NULL);
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
-
     }
     float avrg_time = totle_time_use/ Times;
     EXPECT_LT(avrg_time, 100000);
