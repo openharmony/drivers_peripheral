@@ -24,7 +24,7 @@
 #include "venc_manager.h"
 
 namespace OHOS::Camera {
-class VencNode : public MpiNode, public SinkNode{
+class VencNode : public MpiNode, public SinkNode {
 public:
     VencNode(const std::string& name, const std::string& type);
     ~VencNode() override;

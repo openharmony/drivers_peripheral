@@ -269,7 +269,7 @@ void HosFileFormat::V4L2MatchDevice(std::vector<std::string>& cameraIDs)
 
     for (auto &it : cameraIDs) {
         for (int i = 0; i < MAXVIDEODEVICE; ++i) {
-            if ((sprintf_s(devName, sizeof(devName), "%s%d", name.c_str(), i)) < 0 ) {
+            if ((sprintf_s(devName, sizeof(devName), "%s%d", name.c_str(), i)) < 0) {
                 CAMERA_LOGE("%s: sprintf devName failed", __func__);
             }
 
