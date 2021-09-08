@@ -82,9 +82,9 @@ HWTEST_F(VideoTest, Camera_Video_0002, TestSize.Level1)
     } else {
         std::cout << "==========[test log]check Capture: UpdateSettings fail, rc = " << Test_->rc << std::endl;
     }
-    sleep(5);
     // 捕获录像流
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
+    sleep(5);
     // 后处理
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
@@ -237,12 +237,45 @@ HWTEST_F(VideoTest, Camera_Video_0021, TestSize.Level1)
     } else {
         std::cout << "==========[test log]check Capture: UpdateSettings fail, rc = " << Test_->rc << std::endl;
     }
-    sleep(5);
     // 捕获预览流
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
+    sleep(5);
     // 后处理
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
 
+/**
+  * @tc.name: Video
+  * @tc.desc: Preview and video streams + 3A, Commit 2 streams together, capture in order.
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+HWTEST_F(VideoTest, Camera_Video_0022, TestSize.Level2)
+{
+    std::cout << "==========[test log]Check video: Preview and video streams + 3A, ";
+    std::cout << "Commit 2 streams together, capture in order." << std::endl;
+    // 配置两路流信息
+    Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
+    Test_->StartStream(Test_->intents);
+    // 捕获预览流
+    Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
+    // 下发3A参数，增加曝光度
+    std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
+    int32_t expo = 0xb0;
+    meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
+    Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
+    if (Test_->rc == Camera::NO_ERROR) {
+        std::cout << "==========[test log]check Capture: UpdateSettings success, for 10s." << std::endl;
+    } else {
+        std::cout << "==========[test log]check Capture: UpdateSettings fail, rc = " << Test_->rc << std::endl;
+    }
+    // 捕获录像流
+    Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
+    sleep(1800);
+    // 后处理
+    Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
+    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
+    Test_->StopStream(Test_->captureIds, Test_->streamIds);
+}
