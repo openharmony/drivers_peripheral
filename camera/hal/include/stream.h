@@ -21,7 +21,6 @@
 #include <memory>
 
 namespace OHOS::Camera {
-
 using ModeMeta = std::shared_ptr<OHOS::CameraStandard::CameraMetadata>;
 using CaptureMeta = std::shared_ptr<OHOS::CameraStandard::CameraMetadata>;
 
@@ -49,7 +48,7 @@ struct DeviceStreamSetting {
     uint32_t format;
     uint64_t usage;
     CameraEncodeType encodeType;
-    /*other settings*/
+    /* other settings */
 };
 
 enum DynamicStreamSwitchMode {
@@ -63,6 +62,5 @@ struct FrameSpec {
     uint32_t   bufferCount_;
     std::shared_ptr<IBuffer>    buffer_;
 };
-
 }
 #endif

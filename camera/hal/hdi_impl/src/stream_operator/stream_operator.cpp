@@ -170,8 +170,8 @@ CamRetCode StreamOperator::IsStreamsSupported(OperationMode mode,
 }
 
 DynamicStreamSwitchMode StreamOperator::CheckStreamsSupported(OperationMode mode,
-                                                            const std::shared_ptr<CameraStandard::CameraMetadata>& modeSetting,
-                                                            const std::vector<std::shared_ptr<StreamInfo>>& infos)
+    const std::shared_ptr<CameraStandard::CameraMetadata>& modeSetting,
+    const std::vector<std::shared_ptr<StreamInfo>>& infos)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamPipeline_, DYNAMIC_STREAM_SWITCH_NOT_SUPPORT);
     std::vector<StreamConfiguration> configs = {};
