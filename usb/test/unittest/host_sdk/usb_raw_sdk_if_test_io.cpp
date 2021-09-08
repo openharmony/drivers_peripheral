@@ -30,13 +30,11 @@ extern "C" {
 using namespace std;
 using namespace testing::ext;
 
-namespace {
+namespace acmraw{
 class UsbHostSdkIfTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
 };
 
 #define USB_RAW_IO_SLEEP_MS_TIME    500
@@ -48,8 +46,8 @@ static UsbRawHandle *devHandle = NULL;
 static UsbRawDevice *dev = NULL;
 static int activeConfig;
 static bool g_stopIoThreadFlag = false;
-
 static void AcmRawInit();
+
 static int UsbIoThread(void *data)
 {
     int ret;
@@ -147,17 +145,9 @@ void UsbHostSdkIfTest::TearDownTestCase()
     UsbStopIo(acm);
 }
 
-void UsbHostSdkIfTest::SetUp()
-{
-}
-
-void UsbHostSdkIfTest::TearDown()
-{
-}
-
 static void AcmWriteBulkCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
+    struct UsbRawRequest *req = reinterpret_cast<struct UsbRawRequest *>(const_cast<void *>(requestArg));
 
     printf("%s:%d entry!", __func__, __LINE__);
 
@@ -180,8 +170,7 @@ static void AcmWriteBulkCallback(const void *requestArg)
 
 static void AcmReadBulkCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
-
+    struct UsbRawRequest *req = reinterpret_cast<struct UsbRawRequest *>(const_cast<void *>(requestArg));
     printf("%s:%d entry!", __func__, __LINE__);
 
     if (req == NULL) {
@@ -224,10 +213,9 @@ static void AcmReadBulkCallback(const void *requestArg)
 
 static void AcmNotifyReqCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
+    struct UsbRawRequest *req = reinterpret_cast<struct UsbRawRequest *>(const_cast<void *>(requestArg));
 
     printf("%s:%d entry!", __func__, __LINE__);
-
     if (req == NULL) {
         printf("%s:%d req is NULL!", __func__, __LINE__);
         return;

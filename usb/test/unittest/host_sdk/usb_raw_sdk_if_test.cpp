@@ -44,7 +44,7 @@ public:
 
 static struct UsbSession *session = NULL;
 static struct AcmDevice *acm = NULL;
-static struct AcmDevice deviceService;
+static struct AcmDevice g_deviceService;
 static UsbRawHandle *devHandle = NULL;
 static UsbRawDevice *dev = NULL;
 static int activeConfig;
@@ -137,13 +137,13 @@ static int UsbStopIo(struct AcmDevice *acm)
 
 void UsbHostSdkIfTest::SetUpTestCase()
 {
-    acm = &deviceService;
+    acm = &g_deviceService;
     UsbStartIo(acm);
 }
 
 void UsbHostSdkIfTest::TearDownTestCase()
 {
-    acm = &deviceService;
+    acm = &g_deviceService;
     UsbStopIo(acm);
 }
 
@@ -243,36 +243,24 @@ static void AcmProcessNotification(struct AcmDevice *acm, unsigned char *buf)
 static void AcmNotifyReqCallback(const void *requestArg)
 {
     struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
-
-    printf("%s:%d entry!", __func__, __LINE__);
-
     if (req == NULL) {
-        printf("%s:%d req is NULL!", __func__, __LINE__);
         return;
     }
     struct AcmDevice *acm = (struct AcmDevice *)req->userData;
     if (acm == NULL) {
-        printf("%s:%d userData(acm) is NULL!", __func__, __LINE__);
         return;
     }
     struct UsbCdcNotification *dr = (struct UsbCdcNotification *)req->buffer;
     if (dr == NULL) {
-        printf("%s:%d req->buffer(dr) is NULL!", __func__, __LINE__);
         return;
     }
     unsigned int currentSize = req->actualLength;
     unsigned int expectedSize, copySize, allocSize;
     int ret;
-
-    printf("Irqstatus:%d,actualLength:%u\n", req->status, currentSize);
-
-    if (req->status != USB_REQUEST_COMPLETED) {
+    if (req->status != USB_REQUEST_COMPLETED)
         goto exit;
-    }
-
-    if (acm->nbIndex) {
+    if (acm->nbIndex)
         dr = (struct UsbCdcNotification *)acm->notificationBuffer;
-    }
     expectedSize = sizeof(struct UsbCdcNotification) + Le16ToCpu(dr->wLength);
     if (currentSize < expectedSize) {
         if (acm->nbSize < expectedSize) {
@@ -282,17 +270,15 @@ static void AcmNotifyReqCallback(const void *requestArg)
             }
             allocSize = expectedSize;
             acm->notificationBuffer = (uint8_t *)OsalMemCalloc(allocSize);
-            if (!acm->notificationBuffer) {
+            if (!acm->notificationBuffer)
                 goto exit;
-            }
             acm->nbSize = allocSize;
         }
         copySize = MIN(currentSize, expectedSize - acm->nbIndex);
         ret = memcpy_s(&acm->notificationBuffer[acm->nbIndex], acm->nbSize - acm->nbIndex,
             req->buffer, copySize);
-        if (ret) {
+        if (ret)
             printf("memcpy_s fail\n");
-        }
         acm->nbIndex += copySize;
         currentSize = acm->nbIndex;
     }
@@ -300,14 +286,10 @@ static void AcmNotifyReqCallback(const void *requestArg)
         AcmProcessNotification(acm, (unsigned char *)dr);
         acm->nbIndex = 0;
     }
-
-    if (UsbRawSubmitRequest(req)) {
+    if (UsbRawSubmitRequest(req))
         printf("%s - UsbRawSubmitRequest failed", __func__);
-    }
-
 exit:
     printf("%s:%d exit", __func__, __LINE__);
-
 }
 
 static int AcmWriteBufAlloc(struct AcmDevice *acm)
