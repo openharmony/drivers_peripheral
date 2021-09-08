@@ -28,7 +28,7 @@ void OpenCameraTest::SetUp(void)
 }
 void OpenCameraTest::TearDown(void)
 {
-
+    ;
 }
 
 /**

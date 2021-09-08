@@ -120,7 +120,7 @@ unsigned char* DoFbMmap(const int pmemfd)
     constexpr uint32_t bit = 8;
     int screensize = g_vInfo.xres * g_vInfo.yres * g_vInfo.bits_per_pixel / bit;
 
-    unsigned char* ret = reinterpret_cast<unsigned char*>(
+    unsigned char *ret = reinterpret_cast<unsigned char*>(
         mmap(nullptr, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, pmemfd, 0));
     if (ret == MAP_FAILED) {
         CAMERA_LOGE("main test:do_mmap: pmem mmap() failed: %s (%d)\n", strerror(errno), errno);
@@ -294,7 +294,7 @@ void V4L2UvcCallback(const std::string cameraId, const std::vector<DeviceControl
                 }
                 CAMERA_LOGD("main test: %s value %d id 0x%x ctr_type %d minimum %d maximum %d step %d \
                     default_value %d\n", iter->name.c_str(), iter->value, iter->id, iter->type, iter->minimum,
-                                         iter->maximum, iter->step, iter->default_value);
+                    iter->maximum, iter->step, iter->default_value);
                 if (iter->type == V4L2_CTRL_TYPE_MENU) {
                     for (auto itr = iter->menu.cbegin(); itr != iter->menu.cend(); itr++) {
                         CAMERA_LOGD("main test: %s index %d id 0x%x value %lld\n",
