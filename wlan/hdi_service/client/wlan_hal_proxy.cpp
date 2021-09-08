@@ -291,7 +291,7 @@ int32_t WlanInterfaceProxy::resetDriver(const uint8_t chipId)
     return ret;
 }
 
-int32_t WlanInterfaceProxy::getAsscociatedStas(std::shared_ptr<WifiFeatureInfo> ifeature, 
+int32_t WlanInterfaceProxy::getAsscociatedStas(std::shared_ptr<WifiFeatureInfo> ifeature,
     std::shared_ptr<StaInfo> staInfo, uint32_t count, std::vector<uint32_t>& num)
 {
     MessageParcel data;
