@@ -79,7 +79,7 @@ int32_t Test::SaveVideoFile(const char* type, const void* buffer, int32_t size, 
             return 0;
         }
         CAMERA_LOGI("%{public}s, save yuv to file %{public}s", __FUNCTION__, path);
-        videoFd = open(path, O_RDWR | O_CREAT, 00766);
+        videoFd = open(path, O_RDWR | O_CREAT, 00766); // 00766:file jurisdiction
         if (videoFd == -1) {
             std::cout << "open file failed, errno = " << strerror(errno) << std::endl;
             return -1;
