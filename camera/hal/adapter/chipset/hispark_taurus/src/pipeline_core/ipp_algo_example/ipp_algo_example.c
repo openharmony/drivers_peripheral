@@ -38,8 +38,8 @@ int Flush()
     return 0;
 }
 
-int Process(const IppAlgoBuffer* inBuffer[], int inBufferCount, const IppAlgoBuffer* outBuffer,
-    const IppAlgoMeta* meta)
+int Process(const IppAlgoBuffer *inBuffer[], int inBufferCount, const IppAlgoBuffer *outBuffer,
+    const IppAlgoMeta *meta)
 {
     printf("ipp algo example Process ...\n");
     if (inBuffer == NULL || inBufferCount > MAX_BUFFER_COUNT) {
@@ -87,7 +87,7 @@ int Process(const IppAlgoBuffer* inBuffer[], int inBufferCount, const IppAlgoBuf
     return 0;
 }
 
-int Stop()
+int Stop(void)
 {
     printf("ipp algo example Stop ...\n");
     return 0;
