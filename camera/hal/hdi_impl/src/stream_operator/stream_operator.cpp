@@ -476,7 +476,7 @@ CamRetCode StreamOperator::CancelCapture(int captureId)
     auto itr = requestMap_.find(captureId);
     if (itr == requestMap_.end()) {
         CAMERA_LOGE("can't cancel capture [id = %{public}d], this capture doesn't exist", captureId);
-        return NO_ERROR;
+        return INVALID_ARGUMENT;
     }
 
     RetCode rc = itr->second->Cancel();
