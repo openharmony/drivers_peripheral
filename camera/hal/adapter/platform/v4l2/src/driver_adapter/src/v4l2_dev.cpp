@@ -519,7 +519,7 @@ RetCode HosV4L2Dev::GetNumberCtrls(const std::string& cameraID, std::vector<Devi
     return myControl_->V4L2GetCtrls(fd, control, control.size());
 }
 
-RetCode HosV4L2Dev::SetNumberCtrls (const std::string& cameraID, std::vector<DeviceControl>& control)
+RetCode HosV4L2Dev::SetNumberCtrls(const std::string& cameraID, std::vector<DeviceControl>& control)
 {
     int32_t fd;
 

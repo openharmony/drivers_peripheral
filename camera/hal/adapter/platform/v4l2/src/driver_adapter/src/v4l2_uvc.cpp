@@ -281,7 +281,6 @@ void HosV4L2UVC::loopUvcDevice()
     fd_set fds;
     int rc;
     constexpr uint32_t delayTime = 200000;
-
     CAMERA_LOGD("UVC:loopUVCDevice fd = %d getuid() = %d\n", uDevFd_, getuid());
     V4L2UvcEnmeDevices();
 
@@ -295,7 +294,6 @@ void HosV4L2UVC::loopUvcDevice()
             constexpr uint32_t buffSize = 4096;
             char buf[buffSize] = {};
             unsigned int len = recv(uDevFd_, buf, sizeof(buf), 0);
-
             if (len > 0 && (strstr(buf, "video4linux") != nullptr)) {
                 std::string action = "";
                 std::string subsystem = "";
@@ -304,7 +302,6 @@ void HosV4L2UVC::loopUvcDevice()
                 if (subsystem == "video4linux") {
                     CAMERA_LOGD("UVC:ACTION = %s, SUBSYSTEM = %s, DEVNAME = %s\n",
                                 action.c_str(), subsystem.c_str(), devnode.c_str());
-
                     if (action == "remove") {
                         for (auto &itr : HosV4L2Dev::deviceMatch) {
                             if (itr.second == devnode) {
@@ -324,7 +321,6 @@ void HosV4L2UVC::loopUvcDevice()
                             CAMERA_LOGE("UVC:loop V4L2UvcGetCap error rc %d\n", rc);
                             continue;
                         }
-
                         CAMERA_LOGD("UVC:loop HosV4L2Dev::deviceMatch %s\n", action.c_str());
                         V4L2UvcMatchDev(std::string((char*)cap.driver), devName, true);
                     }

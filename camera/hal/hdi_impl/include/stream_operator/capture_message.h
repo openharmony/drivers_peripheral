@@ -152,4 +152,3 @@ private:
 };
 } // namespace OHOS::Camera
 #endif
-

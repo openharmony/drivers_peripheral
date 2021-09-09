@@ -169,7 +169,8 @@ CamRetCode StreamOperator::IsStreamsSupported(OperationMode mode,
     return NO_ERROR;
 }
 
-DynamicStreamSwitchMode StreamOperator::CheckStreamsSupported(OperationMode mode,
+DynamicStreamSwitchMode StreamOperator::CheckStreamsSupported(
+    OperationMode mode,
     const std::shared_ptr<CameraStandard::CameraMetadata>& modeSetting,
     const std::vector<std::shared_ptr<StreamInfo>>& infos)
 {
@@ -208,7 +209,6 @@ CamRetCode StreamOperator::CreateStreams(const std::vector<std::shared_ptr<Strea
             CAMERA_LOGE("create stream [id = %{public}d] failed.", it->streamId_);
             return INSUFFICIENT_RESOURCES;
         }
-
         StreamConfiguration scg;
         scg.id = it->streamId_;
         scg.type = it->intent_;
@@ -240,7 +240,6 @@ CamRetCode StreamOperator::CreateStreams(const std::vector<std::shared_ptr<Strea
                 return INVALID_ARGUMENT;
             }
         }
-
         {
             std::lock_guard<std::mutex> l(streamLock_);
             streamMap_[stream->GetStreamId()] = stream;
@@ -603,7 +602,7 @@ void StreamOperator::HandleCallbackMessage(MessageGroup& message)
             break;
         }
         default:
-           break;
+            break;
     }
     return;
 }
