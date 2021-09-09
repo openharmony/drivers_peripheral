@@ -237,6 +237,34 @@ HWTEST_F(CaptureTest, Camera_Capture_0006, TestSize.Level0)
 
 /**
   * @tc.name: preview and capture
+  * @tc.desc: Commit 2 streams together, Preview and still_capture streams, isStreaming is false,
+  * Do not stop the stream, multiple single capture
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+HWTEST_F(CaptureTest, Camera_Capture_0007, TestSize.Level0)
+{
+    std::cout << "==========[test log]check Capture: Commit 2 streams together,";
+    std::cout << "Preview and still_capture streams, isStreaming is false, multiple single capture" << std::endl;
+    // 配置两路流信息
+    Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
+    Test_->StartStream(Test_->intents);
+    // 捕获预览流
+    Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
+    // 捕获拍照流，多次单拍
+    Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, false);
+    sleep(1);
+    Test_->StartCapture(Test_->streamId_capture, (Test_->captureId_capture) + 1, false, false);
+    sleep(1);
+    Test_->StartCapture(Test_->streamId_capture, (Test_->captureId_capture) + 2, false, false);
+    // 后处理
+    Test_->captureIds = {Test_->captureId_preview};
+    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+    Test_->StopStream(Test_->captureIds, Test_->streamIds);
+}
+
+/**
+  * @tc.name: preview and capture
   * @tc.desc: Commit 2 streams in order, Preview and still_capture streams.
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -317,4 +345,3 @@ HWTEST_F(CaptureTest, Camera_Capture_0040, TestSize.Level2)
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
-
