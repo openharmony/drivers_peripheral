@@ -44,6 +44,7 @@ ohos_unittest("camera_case_unittest") {
     "./src/performance_hdi_test.cpp",
     "./src/pipeline_test.cpp",
     "./src/preview_test.cpp",
+    "./src/resolution_test.cpp",
     "./src/stability_test.cpp",
     "./src/video_test.cpp",
   ]

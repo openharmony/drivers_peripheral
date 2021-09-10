@@ -164,3 +164,65 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0003, TestSize.Level3)
     writeIntoFile << "==========[test log] Performance: Close camera's average time consuming: ";
     writeIntoFile << avrg_time << "us." << std::endl;
 }
+
+/**
+  * @tc.name: Continuous startup streams and shutdown streams.
+  * @tc.desc: Continuous startup streams and shutdown streams.
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+HWTEST_F(PerformanceFuncTest, Camera_Performance_0004, TestSize.Level3)
+{
+    std::cout << "==========[test log] Performance: Check Start Streams's time and";
+    std::cout << "Stop Stream's time consuming." << std::endl;
+    struct timeval start;
+    struct timeval end;
+    float time_use;
+    float totle_time_use = 0;
+    writeIntoFile.open("TimeConsuming.txt", ios::app);
+    Test_ = std::make_shared<OHOS::Camera::Test>();
+    Test_->Init();
+    Test_->Open();
+    for (int i = 0; i < Times; i++) {
+        // 创建并获取streamOperator信息
+        Test_->streamOperatorCallback = new StreamOperatorCallback();
+        Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
+        EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR || Test_->streamOperator == nullptr);
+        // 创建数据流
+        Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
+        Test_->streamInfo->streamId_ = 1001;
+        Test_->streamInfo->width_ = 1920;
+        Test_->streamInfo->height_ = 1080;
+        Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
+        Test_->streamInfo->datasapce_ = 10;
+        Test_->streamInfo->intent_ = Camera::PREVIEW;
+        Test_->streamInfo->tunneledMode_ = 5;
+        std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
+        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+        Test_->streamInfo->bufferQueue_ = preview_consumer->CreateProducer([this](void* addr, uint32_t size) {
+            Test_->SaveYUV("preview", addr, size);
+        });
+        Test_->streamInfo->bufferQueue_->SetQueueSize(8);
+        Test_->consumerMap_[Camera::PREVIEW] = preview_consumer;
+        std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
+        Test_->streamInfos.push_back(Test_->streamInfo);
+        gettimeofday(&start, NULL);
+        Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+        // 配流起流
+        Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, Test_->ability);
+        gettimeofday(&end, NULL);
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+        // 释放流
+        Test_->rc = Test_->streamOperator->ReleaseStreams({1001});
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+        time_use = calTime(start, end);
+        totle_time_use = totle_time_use + time_use;
+    }
+    float avrg_time = totle_time_use / Times;
+    EXPECT_LT(avrg_time, 100000);
+    std::cout << "==========[test log] Performance: Start Streams's and Stop Stream's average time consuming: ";
+    std::cout << avrg_time << "us." << std::endl;
+    writeIntoFile << "==========[test log] Performance: Start Streams's and Stop Stream's average time consuming: ";
+    writeIntoFile << avrg_time << "us. " << std::endl;
+}

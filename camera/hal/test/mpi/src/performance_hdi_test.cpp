@@ -944,4 +944,3 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0230, TestSize.Level0)
     writeIntoFile << avrg_time << "us. " << std::endl;
     writeIntoFile.close();
 }
-
