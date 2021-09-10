@@ -271,4 +271,3 @@ HWTEST_F(StabilityTest, Camera_Stability_Flashlight_0001, TestSize.Level3)
         }
     }
 }
-
