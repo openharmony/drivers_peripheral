@@ -30,7 +30,6 @@ void PreviewTest::SetUp(void)
 void PreviewTest::TearDown(void)
 {
     Test_->Close();
-
 }
 
 /**
