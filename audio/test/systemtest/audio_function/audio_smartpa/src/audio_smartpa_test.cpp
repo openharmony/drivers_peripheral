@@ -58,6 +58,9 @@ using THREAD_FUNC = void *(*)(void *);
 
 void AudioSmartPaTest::SetUpTestCase(void)
 {
+    if (access(RESOLVED_PATH.c_str(), 0)) {
+        return;
+    }
     handleSo = dlopen(RESOLVED_PATH.c_str(), RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
@@ -182,6 +185,8 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0001, TestSize.Level1
         ret = audiopara.render->GetLatency(audiopara.render, &latencyTime);
         EXPECT_EQ(HDF_SUCCESS, ret);
         EXPECT_LT(expectedValue, latencyTime);
+        FrameStatus(0);
+        usleep(1000);
         ret = audiopara.render->control.Pause((AudioHandle)(audiopara.render));
         EXPECT_EQ(HDF_SUCCESS, ret);
         ret = audiopara.render->control.Flush((AudioHandle)audiopara.render);
@@ -189,6 +194,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0001, TestSize.Level1
         sleep(1);
         ret = audiopara.render->control.Resume((AudioHandle)(audiopara.render));
         EXPECT_EQ(HDF_SUCCESS, ret);
+        FrameStatus(1);
     }
     ret = ThreadRelease(audiopara);
     EXPECT_EQ(HDF_SUCCESS, ret);

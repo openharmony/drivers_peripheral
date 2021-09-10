@@ -87,6 +87,9 @@ void AudioHdiCaptureVolumeTest::SetUpTestCase(void)
     }
     SdkInit();
 #endif
+    if (access(RESOLVED_PATH.c_str(), 0)) {
+        return;
+    }
     handleSo = dlopen(RESOLVED_PATH.c_str(), RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
@@ -125,23 +128,16 @@ int32_t AudioHdiCaptureVolumeTest::AudioCaptureStart(const string path, struct A
     int32_t ret = -1;
     struct AudioSampleAttributes attrs = {};
     if (capture == nullptr) {
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    ret = InitAttrs(attrs);
-    if (ret < 0) {
-        return HDF_FAILURE;
-    }
+    InitAttrs(attrs);
     FILE *file = fopen(path.c_str(), "wb+");
     if (file == nullptr) {
         return HDF_FAILURE;
     }
     ret = FrameStartCapture(capture, file, attrs);
-    if (ret < 0) {
-        fclose(file);
-        return HDF_FAILURE;
-    }
     fclose(file);
-    return HDF_SUCCESS;
+    return ret;
 }
 
 /**
@@ -160,20 +156,20 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureSetMute_0001, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.SetMute(capture, muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.GetMute(capture, &muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_TRUE(muteTrue);
 
     ret = capture->volume.SetMute(capture, muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.GetMute(capture, &muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_FALSE(muteFalse);
 
     adapter->DestroyCapture(adapter, capture);
@@ -196,12 +192,12 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureSetMute_0002, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.SetMute(captureNull, muteTrue);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     ret = capture->volume.SetMute(captureNull, muteFalse);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -221,13 +217,13 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureSetMute_0003, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.SetMute(capture, muteValue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.GetMute(capture, &muteValue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_TRUE(muteValue);
 
     adapter->DestroyCapture(adapter, capture);
@@ -250,17 +246,17 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureGetMute_0001, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.GetMute(capture, &muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(muteTrue, defaultmute);
 
     ret = capture->volume.SetMute(capture, muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.GetMute(capture, &muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_FALSE(muteFalse);
 
     adapter->DestroyCapture(adapter, capture);
@@ -283,15 +279,15 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureGetMute_0002, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetMute(captureNull, &muteTrue);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     ret = capture->volume.GetMute(captureNull, &muteFalse);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     ret = capture->volume.GetMute(capture, nullptr);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -318,26 +314,26 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureSetVolume_0001, Te
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.SetVolume(capture, volumeInit);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetVolume(capture, &volumeInit);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(volumeInitExpc, volumeInit);
     ret = capture->volume.SetVolume(capture, volumeLow);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetVolume(capture, &volumeLow);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(volumeLowExpc, volumeLow);
     ret = capture->volume.SetVolume(capture, volumeMid);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetVolume(capture, &volumeMid);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(volumeMidExpc, volumeMid);
     ret = capture->volume.SetVolume(capture, volumeHigh);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetVolume(capture, &volumeHigh);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(volumeHighExpc, volumeHigh);
 
     adapter->DestroyCapture(adapter, capture);
@@ -363,25 +359,25 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureSetVolume_0002, Te
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.SetVolume(capture, volumeMin);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetVolume(capture, &volumeMin);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(volumeMinExpc, volumeMin);
 
     ret = capture->volume.SetVolume(capture, volumeMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetVolume(capture, &volumeMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(volumeMaxExpc, volumeMax);
 
     ret = capture->volume.SetVolume(capture, volumeMinBoundary);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     ret = capture->volume.SetVolume(capture, volumeMaxBoundary);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -402,10 +398,10 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureSetVolume_0003, Te
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.SetVolume(captureNull, volume);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -426,12 +422,12 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureGetVolume_001, Tes
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.SetVolume(capture, volume);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetVolume(capture, &volume);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(defaultVolume, volume);
 
     adapter->DestroyCapture(adapter, capture);
@@ -453,18 +449,18 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureGetVolume_002, Tes
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = AudioCaptureStart(AUDIO_CAPTURE_FILE, capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.SetVolume(capture, volume);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetVolume(capture, &volume);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(defaultVolume, volume);
 
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -484,10 +480,10 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureGetVolume_0003, Te
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.GetVolume(captureNull, &volume);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -508,10 +504,10 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGainThreshold_0001, 
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.GetGainThreshold((AudioHandle)capture, &min, &max);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(min, GAIN_MIN);
     EXPECT_EQ(max, GAIN_MAX);
 
@@ -535,10 +531,10 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGainThreshold_0002, 
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.GetGainThreshold((AudioHandle)captureNull, &min, &max);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -559,10 +555,10 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGainThreshold_0003, 
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.GetGainThreshold((AudioHandle)capture, minNull, &max);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -583,10 +579,10 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGainThreshold_0004, 
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.GetGainThreshold((AudioHandle)capture, &min, maxNull);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -607,10 +603,10 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureSetGain_0001, TestSize.
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.GetGainThreshold((AudioHandle)capture, &min, &max);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     float gain = max - 1;
     float gainMax = max;
     float gainMin = min;
@@ -618,21 +614,21 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureSetGain_0001, TestSize.
     float gainMaxExpc = max;
     float gainMinExpc = min;
     ret = capture->volume.SetGain((AudioHandle)capture, gainMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetGain((AudioHandle)capture, &gainMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(gainMaxExpc, gainMax);
 
     ret = capture->volume.SetGain((AudioHandle)capture, gainMin);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetGain((AudioHandle)capture, &gainMin);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(gainMinExpc, gainMin);
 
     ret = capture->volume.SetGain((AudioHandle)capture, gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetGain((AudioHandle)capture, &gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(gainExpc, gain);
 
     adapter->DestroyCapture(adapter, capture);
@@ -654,17 +650,17 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureSetGain_0002, TestSize.
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetGainThreshold((AudioHandle)capture, &min, &max);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     float gainOne = max+1;
     float gainSec = min-1;
     ret = capture->volume.SetGain((AudioHandle)capture, gainOne);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 
     ret = capture->volume.SetGain((AudioHandle)capture, gainSec);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -685,10 +681,10 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureSetGain_0003, TestSize.
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.SetGain((AudioHandle)captureNull, gain);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -709,16 +705,16 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGain_0001, TestSize.
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetGainThreshold((AudioHandle)capture, &min, &max);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     float gain = min+1;
     float gainValue = min+1;
     ret = capture->volume.SetGain((AudioHandle)capture, gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetGain((AudioHandle)capture, &gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(gainValue, gain);
 
     capture->control.Stop((AudioHandle)capture);
@@ -741,9 +737,9 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGain_0002, TestSize.
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetGain((AudioHandle)captureNull, &gainValue);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -763,12 +759,12 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGain_0003, TestSize.
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.SetGain((AudioHandle)capture, gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetGain((AudioHandle)capture, &gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(gainOne, gain);
 
     adapter->DestroyCapture(adapter, capture);
@@ -789,10 +785,10 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGain_0004, TestSize.
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.GetGain((AudioHandle)capture, gainNull);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);

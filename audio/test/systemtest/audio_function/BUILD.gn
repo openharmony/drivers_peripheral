@@ -16,6 +16,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/test.gni")
   import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/peripheral/audio/audio.gni")
 }
 
 ###########################end###########################
@@ -23,9 +24,18 @@ group("function") {
   if (!defined(ohos_lite)) {
     testonly = true
   }
-  deps = [
-    "audio_pathroute:hdf_audio_hdi_path_route_test",
-    "audio_server:hdf_audio_hdi_server_function_test",
-    "audio_smartpa:hdf_audio_smartpa_test",
-  ]
+  deps = [ "audio_server:hdf_audio_hdi_server_function_test" ]
+  if (defined(ohos_lite)) {
+    deps += [
+      "audio_pathroute:hdf_audio_hdi_path_route_test",
+      "audio_smartpa:hdf_audio_smartpa_test",
+    ]
+  } else {
+    if (enable_audio_adm_so || enable_audio_adm_service) {
+      deps += [ "audio_smartpa:hdf_audio_smartpa_test" ]
+    }
+    if (enable_audio_adm_so) {
+      deps += [ "audio_pathroute:hdf_audio_hdi_path_route_test" ]
+    }
+  }
 }

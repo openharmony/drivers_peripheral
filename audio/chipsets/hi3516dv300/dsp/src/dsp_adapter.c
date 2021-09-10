@@ -22,8 +22,8 @@
 
 static int32_t DspLinkDeviceInit(const struct AudioCard *card, const struct DaiDevice *device);
 static int32_t DspDeviceInit(const struct DspDevice *device);
-static int32_t DspDeviceReadReg(struct DspDevice *device, uint8_t *buf, uint32_t len);
-static int32_t DspDeviceWriteReg(struct DspDevice *device, uint8_t *buf, uint32_t len);
+static int32_t DspDeviceReadReg(const struct DspDevice *device, uint8_t *buf, uint32_t len);
+static int32_t DspDeviceWriteReg(const struct DspDevice *device, uint8_t *buf, uint32_t len);
 static int32_t DspLinkStartup(const struct AudioCard *card, const struct DaiDevice *device);
 static int32_t DspLinkHwParams(const struct AudioCard *card,
     const struct AudioPcmHwParams *param, const struct DaiDevice *device);
@@ -261,7 +261,7 @@ static int32_t DspDeviceInit(const struct DspDevice *device)
     return HDF_SUCCESS;
 }
 
-static int32_t DspDeviceReadReg(struct DspDevice *device, uint8_t *buf, uint32_t len)
+static int32_t DspDeviceReadReg(const struct DspDevice *device, uint8_t *buf, uint32_t len)
 {
     int32_t ret;
 
@@ -283,7 +283,7 @@ static int32_t DspDeviceReadReg(struct DspDevice *device, uint8_t *buf, uint32_t
     return HDF_SUCCESS;
 }
 
-static int32_t DspDeviceWriteReg(struct DspDevice *device, uint8_t *buf, uint32_t len)
+static int32_t DspDeviceWriteReg(const struct DspDevice *device, uint8_t *buf, uint32_t len)
 {
     int32_t ret;
 

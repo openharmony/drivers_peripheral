@@ -41,12 +41,15 @@ int32_t GetErrorReason(int reason, char* reasonDesc);
 int32_t GetCurrentTime(char *time);
 int32_t CheckAttrRoute(long param);
 int32_t CheckAttrChannel(unsigned long param);
-int32_t TransferRoute(char *value, int32_t *route);
-int32_t TransferFormat(char *value, int32_t *format);
-int32_t TransferChannels(char *value, uint32_t *channels);
-int32_t TransferFrames(char *value, uint64_t *frames);
-int32_t TransferSampleRate(char *value, uint32_t *sampleRate);
+int32_t TransferRoute(const char *value, int32_t *route);
+int32_t TransferFormat(const char *value, int32_t *format);
+int32_t TransferChannels(const char *value, uint32_t *channels);
+int32_t TransferFrames(const char *value, uint64_t *frames);
+int32_t TransferSampleRate(const char *value, uint32_t *sampleRate);
 int32_t FormatToBits(enum AudioFormat format, uint32_t *formatBits);
 int32_t BitsToFormat(enum AudioFormat *format, long formatBits);
-int32_t SetExtParam(const char *key, char *value, struct ExtraParams *mExtraParams);
+int32_t SetExtParam(const char *key, const char *value, struct ExtraParams *mExtraParams);
+int32_t AudioSetExtraParams(const char *keyValueList, int32_t *count,
+    struct ExtraParams *mExtraParams, int32_t *sumOk);
+
 #endif

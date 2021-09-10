@@ -47,7 +47,7 @@ enum AudioInterfaceLibCaptureCtrl {
 
 struct DevHandleCapture *AudioBindServiceCapture(const char *name);
 void AudioCloseServiceCapture(const struct DevHandleCapture *handle);
-int32_t AudioInterfaceLibModeCapture(struct DevHandleCapture *handle,
+int32_t AudioInterfaceLibModeCapture(const struct DevHandleCapture *handle,
     struct AudioHwCaptureParam *handleData, int cmdId);
 int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData);
@@ -77,8 +77,9 @@ int32_t AudioCtlCaptureGetGainThreshold(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData);
 int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData);
-int32_t AudioOutputCaptureReqMmapBuffer(struct DevHandleCapture *handle,
-    int cmdId, struct AudioHwCaptureParam *handleData);
+int32_t AudioOutputCaptureReqMmapBuffer(const struct DevHandleCapture *handle,
+    int cmdId, const struct AudioHwCaptureParam *handleData);
+
 #ifdef __cplusplus
 }
 #endif

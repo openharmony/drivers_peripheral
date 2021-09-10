@@ -13,7 +13,6 @@
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
-  import("//drivers/peripheral/audio/audio.gni")
 } else {
   import("//build/test.gni")
   import("//drivers/adapter/uhdf2/uhdf.gni")
@@ -32,20 +31,31 @@ group("hdi") {
     "capture:hdf_audio_hdi_capture_scene_test",
     "capture:hdf_audio_hdi_capture_test",
     "capture:hdf_audio_hdi_capture_volume_test",
-    "hdireliability:hdf_audio_hdi_capture_control_reliability_test",
-    "hdireliability:hdf_audio_hdi_capture_reliability_test",
-    "hdireliability:hdf_audio_hdi_render_control_reliability_test",
-    "hdireliability:hdf_audio_hdi_render_reliability_test",
     "render:hdf_audio_hdi_render_attr_test",
     "render:hdf_audio_hdi_render_control_test",
     "render:hdf_audio_hdi_render_scene_test",
     "render:hdf_audio_hdi_render_test",
     "render:hdf_audio_hdi_render_volume_test",
   ]
-  if (!enable_audio_mpi_so && !enable_audio_mpi_service) {
+  if (defined(ohos_lite)) {
     deps += [
       "hdiperformace:hdf_audio_hdi_capture_performace_test",
       "hdiperformace:hdf_audio_hdi_render_performace_test",
     ]
+  } else {
+    if (enable_audio_adm_service) {
+      deps += [
+        "hdireliability:hdf_audio_hdi_capture_control_reliability_test",
+        "hdireliability:hdf_audio_hdi_capture_reliability_test",
+        "hdireliability:hdf_audio_hdi_render_control_reliability_test",
+        "hdireliability:hdf_audio_hdi_render_reliability_test",
+      ]
+    }
+    if (enable_audio_adm_service || enable_audio_adm_so) {
+      deps += [
+        "hdiperformace:hdf_audio_hdi_capture_performace_test",
+        "hdiperformace:hdf_audio_hdi_render_performace_test",
+      ]
+    }
   }
 }

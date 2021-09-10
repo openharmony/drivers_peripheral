@@ -46,6 +46,7 @@ const int MMAP_MAX_FRAME_SIZE = 4096 * 2 * 3;
 const int AUDIO_CACHE_ALIGN_SIZE = 64;
 const int DELAY_TIME = 5;
 const int LOOP_COUNT = 100;
+const int DELAY_LOOP_COUNT = 500;
 
 static struct device tmpDev = {0};
 int32_t AudioRenderBuffInit(struct PlatformHost *platformHost)
@@ -742,19 +743,20 @@ int32_t PlatformWriteExec(const struct AudioCard *card, struct AudioTxData *txDa
         return HDF_FAILURE;
     }
 
-    if (platformHost->renderBufInfo.runStatus == 1) {
-        if ((platformHost->renderBufInfo.enable == 0) &&
-            (platformHost->pcmInfo.totalStreamSize > startThreshold)) {
-            AopHalDevEnable(platformHost->captureBufInfo.chnId);
-            platformHost->renderBufInfo.enable = 1;
-        }
-    }
-
     if (SetWriteBuffWptr(platformHost, buffSize, txData) != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("SetWriteBuffWptr: failed.");
         OsalMutexUnlock(&platformHost->renderBufInfo.buffMutex);
         return HDF_FAILURE;
     }
+
+    if (platformHost->renderBufInfo.runStatus == 1) {
+        if ((platformHost->renderBufInfo.enable == 0) &&
+            (platformHost->pcmInfo.totalStreamSize >= startThreshold)) {
+            AopHalDevEnable(platformHost->renderBufInfo.chnId);
+            platformHost->renderBufInfo.enable = 1;
+        }
+    }
+
     OsalMutexUnlock(&platformHost->renderBufInfo.buffMutex);
 
     AUDIO_DRIVER_LOG_DEBUG("now total = %d", platformHost->pcmInfo.totalStreamSize);
@@ -823,21 +825,20 @@ static int32_t PlatformMmapWriteSub(const struct AudioCard *card, struct Platfor
                          buffSize : (buffSize / MIN_PERIOD_SIZE + 1) * MIN_PERIOD_SIZE;
     uint32_t lastBuffSize = ((totalSize % pageSize) == 0) ? pageSize : (totalSize % pageSize);
     uint32_t loopTimes = (lastBuffSize == pageSize) ? (totalSize / pageSize) : (totalSize / pageSize + 1);
-    txData.frames = pageSize / frameSize;
     txData.buf = OsalMemCalloc(pageSize);
     if (txData.buf == NULL) {
         AUDIO_DRIVER_LOG_ERR("txData.buf is null.");
         return HDF_FAILURE;
     }
     platformHost->renderBufInfo.framesPosition = 0;
-    while (count <= loopTimes) {
+    while (count <= loopTimes && platformHost->renderBufInfo.runStatus != 0) {
         uint32_t copyLength = (count < loopTimes) ? pageSize : lastBuffSize;
-        ret = CopyFromUser(txData.buf, txMmapData->memoryAddress + offset, copyLength);
-        if (ret != EOK) {
+        if (CopyFromUser(txData.buf, txMmapData->memoryAddress + offset, copyLength) != 0) {
             AUDIO_DRIVER_LOG_ERR("memcpy_s failed.");
             OsalMemFree(txData.buf);
             return HDF_FAILURE;
         }
+        txData.frames = copyLength / frameSize;
         ret = PlatformMmapWriteData(card, &txData);
         if (ret != HDF_SUCCESS) {
             OsalMemFree(txData.buf);
@@ -851,7 +852,31 @@ static int32_t PlatformMmapWriteSub(const struct AudioCard *card, struct Platfor
     return HDF_SUCCESS;
 }
 
-int32_t PlatformMmapWrite(const struct AudioCard *card, struct AudioTxMmapData *txMmapData)
+static void PlatformMmapGetHoldAndDelay(const struct AudioTxMmapData *txMmapData, struct PlatformHost *platformHost,
+    uint32_t *hold, uint32_t *delayms)
+{
+    if (NULL == hold || NULL == delayms || NULL == txMmapData || NULL == platformHost) {
+        return;
+    }
+    uint32_t frameSize = platformHost->pcmInfo.channels * (platformHost->pcmInfo.bitWidth / MIN_PERIOD_COUNT);
+    uint32_t totalSize = txMmapData->totalBufferFrames * frameSize;
+    if (totalSize < BUFFER_SIZE1) {
+        *hold = HOLD_NUM1;
+        *delayms = DELAY_TIME1;
+    } else if (totalSize < BUFFER_SIZE2) {
+        *hold = HOLD_NUM2;
+        *delayms = DELAY_TIME2;
+    } else if (totalSize < BUFFER_SIZE3) {
+        *hold = HOLD_NUM3;
+        *delayms = DELAY_TIME3;
+    } else {
+        *hold = HOLD_NUM4;
+        *delayms = DELAY_TIME4;
+    }
+    return;
+}
+
+int32_t PlatformMmapWrite(const struct AudioCard *card, const struct AudioTxMmapData *txMmapData)
 {
     int32_t ret;
     struct PlatformHost *platformHost = NULL;
@@ -888,6 +913,18 @@ int32_t PlatformMmapWrite(const struct AudioCard *card, struct AudioTxMmapData *
     if (ret != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("PlatformMmapWriteSub failed.");
         return HDF_FAILURE;
+    }
+    int tryCount = DELAY_LOOP_COUNT;
+    uint32_t hold = BUFFER_SIZE1;
+    uint32_t delayms = DELAY_TIME1;
+    PlatformMmapGetHoldAndDelay(txMmapData, platformHost, &hold, &delayms);
+    while (tryCount > 0
+        && !AopPlayIsCompleted(platformHost, txMmapData->totalBufferFrames, hold)) {
+        tryCount--;
+        OsalMDelay(delayms);
+    }
+    if (tryCount <= 0) {
+        AUDIO_DRIVER_LOG_ERR("AopPlayIsCompleted is failed,Wait timeout.");
     }
     AUDIO_DRIVER_LOG_DEBUG("render mmap write success.");
     return HDF_SUCCESS;
@@ -1044,18 +1081,17 @@ int32_t PlatformMmapReadSub(const struct AudioCard *card, struct PlatformHost *p
             }
         }
         count = LOOP_COUNT;
-        ret = CopyToUser(rxMmapData->memoryAddress + offset, rxData.buf, rxData.bufSize);
-        if (ret != HDF_SUCCESS) {
+        if (CopyToUser(rxMmapData->memoryAddress + offset, rxData.buf, rxData.bufSize) != 0) {
             AUDIO_DRIVER_LOG_ERR("CopyToUser failed.");
             return HDF_FAILURE;
         }
         offset += rxData.bufSize;
         platformHost->captureBufInfo.framesPosition += rxData.bufSize / frameSize;
-    } while (offset < totalSize);
+    } while (offset < totalSize && platformHost->captureBufInfo.runStatus != 0);
     return HDF_SUCCESS;
 }
 
-int32_t PlatformMmapRead(const struct AudioCard *card, struct AudioRxMmapData *rxMmapData)
+int32_t PlatformMmapRead(const struct AudioCard *card, const struct AudioRxMmapData *rxMmapData)
 {
     int32_t ret;
     struct PlatformHost *platformHost = NULL;
@@ -1121,7 +1157,8 @@ int32_t PlatformCaptureStart(struct AudioCard *card)
         AUDIO_DRIVER_LOG_ERR("PlatformCreatePlatformHost failed.");
         return HDF_FAILURE;
     }
-
+    platformHost->captureBufInfo.runStatus = 1;
+    platformHost->captureBufInfo.enable = 0;
     AipHalSetRxStart(platformHost->captureBufInfo.chnId, HI_TRUE);
 
     ret = AudioSampSetPowerMonitor(card, false);

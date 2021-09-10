@@ -168,7 +168,10 @@ uint32_t AudioLibRenderTest::PcmBytesToFrames(const struct AudioFrameRenderMode 
 int32_t AudioLibRenderTest::FrameLibStart(FILE *file, struct AudioSampleAttributes attrs,
     struct AudioHeadInfo wavHeadInfo, struct AudioHwRender *hwRender) const
 {
-    int numRead = 0;
+    if (hwRender == nullptr) {
+        return HDF_FAILURE;
+    }
+    size_t numRead = 0;
     uint32_t remainingDataSize = wavHeadInfo.dataSize;
     uint32_t bufferSize = PcmFramesToBytes(attrs);
     if (bufferSize <= 0) {
@@ -180,15 +183,15 @@ int32_t AudioLibRenderTest::FrameLibStart(FILE *file, struct AudioSampleAttribut
     }
 
     uint32_t readSize = (remainingDataSize > bufferSize) ? bufferSize : remainingDataSize;
-    numRead = fread(hwRender->renderParam.frameRenderMode.buffer, 1, readSize, file);
-    if (numRead < 0) {
+    numRead = fread(hwRender->renderParam.frameRenderMode.buffer, readSize, 1, file);
+    if (numRead < 1) {
         free(hwRender->renderParam.frameRenderMode.buffer);
         hwRender->renderParam.frameRenderMode.buffer = nullptr;
         return HDF_FAILURE;
     }
-    hwRender->renderParam.frameRenderMode.bufferSize = numRead;
+    hwRender->renderParam.frameRenderMode.bufferSize = readSize;
     hwRender->renderParam.frameRenderMode.bufferFrameSize =
-        PcmBytesToFrames(hwRender->renderParam.frameRenderMode, numRead);
+        PcmBytesToFrames(hwRender->renderParam.frameRenderMode, readSize);
     return HDF_SUCCESS;
 }
 
@@ -554,21 +557,23 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_ChannelMode_Write_R
     }
     ret = LibHwOutputRender(impl, handleRender);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    impl->renderParam.frameRenderMode.mode = AUDIO_CHANNEL_BOTH_RIGHT;
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_WRITE, &impl->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_READ, &impl->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    channelModeExc = impl->renderParam.frameRenderMode.mode;
-    EXPECT_EQ(AUDIO_CHANNEL_BOTH_RIGHT, channelModeExc);
+    if (impl != nullptr) {
+        impl->renderParam.frameRenderMode.mode = AUDIO_CHANNEL_BOTH_RIGHT;
+        ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_WRITE, &impl->renderParam);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_READ, &impl->renderParam);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        channelModeExc = impl->renderParam.frameRenderMode.mode;
+        EXPECT_EQ(AUDIO_CHANNEL_BOTH_RIGHT, channelModeExc);
 
-    impl->renderParam.frameRenderMode.mode = AUDIO_CHANNEL_RIGHT_MUTE;
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_WRITE, &impl->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_READ, &impl->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    channelModeExc = impl->renderParam.frameRenderMode.mode;
-    EXPECT_EQ(AUDIO_CHANNEL_RIGHT_MUTE, channelModeExc);
+        impl->renderParam.frameRenderMode.mode = AUDIO_CHANNEL_RIGHT_MUTE;
+        ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_WRITE, &impl->renderParam);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_READ, &impl->renderParam);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        channelModeExc = impl->renderParam.frameRenderMode.mode;
+        EXPECT_EQ(AUDIO_CHANNEL_RIGHT_MUTE, channelModeExc);
+    }
     CloseServiceRenderSo(handleRender);
     CloseServiceRenderSo(handle);
     free(impl);
@@ -599,21 +604,23 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_ChannelMode_Write_R
     }
     ret = LibHwOutputRender(impl, handleRender);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    impl->renderParam.frameRenderMode.mode = AUDIO_CHANNEL_NORMAL;
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_WRITE, &impl->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_READ, &impl->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    channelModeExc = impl->renderParam.frameRenderMode.mode;
-    EXPECT_EQ(AUDIO_CHANNEL_NORMAL, channelModeExc);
+    if (impl != nullptr){
+        impl->renderParam.frameRenderMode.mode = AUDIO_CHANNEL_NORMAL;
+        ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_WRITE, &impl->renderParam);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_READ, &impl->renderParam);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        channelModeExc = impl->renderParam.frameRenderMode.mode;
+        EXPECT_EQ(AUDIO_CHANNEL_NORMAL, channelModeExc);
 
-    impl->renderParam.frameRenderMode.mode = AUDIO_CHANNEL_BOTH_MUTE;
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_WRITE, &impl->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_READ, &impl->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    channelModeExc = impl->renderParam.frameRenderMode.mode;
-    EXPECT_EQ(AUDIO_CHANNEL_BOTH_MUTE, channelModeExc);
+        impl->renderParam.frameRenderMode.mode = AUDIO_CHANNEL_BOTH_MUTE;
+        ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_WRITE, &impl->renderParam);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_READ, &impl->renderParam);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        channelModeExc = impl->renderParam.frameRenderMode.mode;
+        EXPECT_EQ(AUDIO_CHANNEL_BOTH_MUTE, channelModeExc);
+    }
     CloseServiceRenderSo(handleRender);
     CloseServiceRenderSo(handle);
     free(impl);
@@ -1032,20 +1039,22 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001,
         CloseServiceRenderSo(handle);
         ASSERT_NE(nullptr, file);
     }
-    ret = WavHeadAnalysis(wavHeadInfo, file, hwRender->renderParam.frameRenderMode.attrs);
-    if (ret < 0) {
-        free(hwRender);
-        hwRender = nullptr;
-        fclose(file);
-        CloseServiceRenderSo(handle);
-        ASSERT_EQ(HDF_SUCCESS, ret);
+    if (hwRender != nullptr) {
+        ret = WavHeadAnalysis(wavHeadInfo, file, hwRender->renderParam.frameRenderMode.attrs);
+        if (ret < 0) {
+            free(hwRender);
+            hwRender = nullptr;
+            fclose(file);
+            CloseServiceRenderSo(handle);
+            ASSERT_EQ(HDF_SUCCESS, ret);
+        }
+        ret = FrameLibStart(file, hwRender->renderParam.frameRenderMode.attrs, wavHeadInfo, hwRender);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_WRITE, &hwRender->renderParam);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_STOP, &hwRender->renderParam);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
-    ret = FrameLibStart(file, hwRender->renderParam.frameRenderMode.attrs, wavHeadInfo, hwRender);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_WRITE, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_STOP, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handle);
     free(hwRender->renderParam.frameRenderMode.buffer);
     hwRender->renderParam.frameRenderMode.buffer = nullptr;
@@ -1078,25 +1087,26 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_0001, Test
         hwRender = nullptr;
         ASSERT_NE(nullptr, handlec);
     }
+    if (hwRender != nullptr) {
+        hwRender->renderParam.renderMode.ctlParam.mute = muteValue;
+        ret = InterfaceLibCtlRender(handlec, AUDIODRV_CTL_IOCTL_MUTE_WRITE, &hwRender->renderParam);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = InterfaceLibCtlRender(handlec, AUDIODRV_CTL_IOCTL_MUTE_READ, &hwRender->renderParam);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        expectedValue = hwRender->renderParam.renderMode.ctlParam.mute;
+        EXPECT_EQ(expectedValue, muteValue);
 
-    hwRender->renderParam.renderMode.ctlParam.mute = muteValue;
-    ret = InterfaceLibCtlRender(handlec, AUDIODRV_CTL_IOCTL_MUTE_WRITE, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handlec, AUDIODRV_CTL_IOCTL_MUTE_READ, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    expectedValue = hwRender->renderParam.renderMode.ctlParam.mute;
-    EXPECT_EQ(expectedValue, muteValue);
-
-    ret = LibStartAndStream(AUDIO_FILE, hwRender->renderParam.frameRenderMode.attrs,
-        handler, hwRender, wavHeadInfo);
-    if (ret < 0) {
-        CloseServiceRenderSo(handler);
-        CloseServiceRenderSo(handlec);
-        free(hwRender);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+        ret = LibStartAndStream(AUDIO_FILE, hwRender->renderParam.frameRenderMode.attrs,
+            handler, hwRender, wavHeadInfo);
+        if (ret < 0) {
+            CloseServiceRenderSo(handler);
+            CloseServiceRenderSo(handlec);
+            free(hwRender);
+            ASSERT_EQ(HDF_SUCCESS, ret);
+        }
     ret = InterfaceLibOutputRender(handler, AUDIO_DRV_PCM_IOCTRL_STOP, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    }
     CloseServiceRenderSo(handler);
     CloseServiceRenderSo(handlec);
     free(hwRender);
