@@ -17,63 +17,63 @@
 
 #include "hdf_device_desc.h"
 
-int32_t HdiServiceCreatCapture(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCreatCapture(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureDestory(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureDestory(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureStart(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureStart(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureStop(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureStop(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCapturePause(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCapturePause(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureResume(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureResume(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureFlush(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureFlush(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureGetFrameSize(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureGetFrameSize(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureGetFrameCount(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureGetFrameCount(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureSetSampleAttr(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureSetSampleAttr(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureGetSampleAttr(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureGetSampleAttr(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureGetCurChannelId(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureGetCurChannelId(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureCheckSceneCapability(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureCheckSceneCapability(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureSelectScene(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureSelectScene(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureGetMute(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureGetMute(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureSetMute(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureSetMute(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureSetVolume(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureSetVolume(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureGetVolume(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureGetVolume(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureGetGainThreshold(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureGetGainThreshold(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureGetGain(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureGetGain(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureSetGain(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureSetGain(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureCaptureFrame(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureCaptureFrame(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureGetCapturePosition(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureGetCapturePosition(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureSetExtraParams(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureSetExtraParams(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureGetExtraParams(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureGetExtraParams(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureReqMmapBuffer(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureReqMmapBuffer(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureGetMmapPosition(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureGetMmapPosition(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureTurnStandbyMode(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureTurnStandbyMode(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceCaptureDevDump(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCaptureDevDump(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
 
 #endif

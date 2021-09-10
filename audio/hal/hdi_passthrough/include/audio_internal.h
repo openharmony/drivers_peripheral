@@ -22,6 +22,8 @@
 #include "hdf_base.h"
 #include <math.h>
 #include <sys/mman.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <pthread.h>
 #include <errno.h>
 
@@ -53,6 +55,24 @@ extern "C" {
 #define RANGE_MAX 5
 #define RANGE_MIN 4
 #define EXTPARAM_LEN 32
+
+/**
+ * @brief Enumerates HAL return value types.
+ */
+typedef enum {
+    AUDIO_HAL_SUCCESS = 0,
+    AUDIO_HAL_ERR_INTERNAL = -1,      /* audio system internal errors */
+    AUDIO_HAL_ERR_NOT_SUPPORT = -2,   /* operation is not supported */
+    AUDIO_HAL_ERR_INVALID_PARAM = -3, /* parameter is invaild */
+    AUDIO_HAL_ERR_INVALID_OBJECT = -4, /**< Invalid object. */
+    AUDIO_HAL_ERR_MALLOC_FAIL = -6, /**< Memory allocation fails. */
+
+    #define HDF_AUDIO_HAL_ERR_START (-7000) /**< Defines the start of the device module error codes. */
+    #define HDF_AUDIO_HAL_ERR_NUM(v) (HDF_AUDIO_HAL_ERR_START + (v)) /**< Defines the device module error codes. */
+    AUDIO_HAL_ERR_NOTREADY = HDF_AUDIO_HAL_ERR_NUM(-1),      /* audio adapter is not ready */
+    AUDIO_HAL_ERR_AI_BUSY = HDF_AUDIO_HAL_ERR_NUM(-2),         /* audio capture is busy now */
+    AUDIO_HAL_ERR_AO_BUSY = HDF_AUDIO_HAL_ERR_NUM(-3),         /* audio render is busy now */
+} AUDIO_HAL_ERR_CODE;
 
 #ifndef LOGE
     #define LOGE(fmt, arg...) printf("[Audio:E]" fmt "\n", ##arg)
@@ -421,10 +441,31 @@ PathSelGetConfToJsonObj *AudioSoGetPathSelGetConfToJsonObj();
 PathSelAnalysisJson *AudioSoGetPathSelAnalysisJson();
 #endif
 
+int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender);
+int32_t CheckParaDesc(const struct AudioDeviceDescriptor *desc, const char *type);
+int32_t CheckParaAttr(const struct AudioSampleAttributes *attrs);
+int32_t AttrFormatToBit(const struct AudioSampleAttributes *attrs, int32_t *format);
+int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDeviceDescriptor *desc,
+                          const struct AudioSampleAttributes *attrs);
+int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex);
+void AudioAdapterReleaseCapSubPorts(const struct AudioPortAndCapability *portCapabilitys, int32_t num);
 int32_t AudioAdapterInitAllPorts(struct AudioAdapter *adapter);
+void AudioReleaseRenderHandle(struct AudioHwRender *hwRender);
+int32_t AudioSetAcodeModeRender(struct AudioHwRender *hwRender,
+                                const InterfaceLibModeRenderSo *pInterfaceLibMode);
+int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct AudioDeviceDescriptor *desc,
+                                    const struct AudioSampleAttributes *attrs, const struct AudioHwAdapter *hwAdapter);
+int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender);
 int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
                                  const struct AudioSampleAttributes *attrs, struct AudioRender **render);
 int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRender *render);
+int32_t GetAudioCaptureFunc(struct AudioHwCapture *hwCapture);
+int32_t InitHwCaptureParam(struct AudioHwCapture *hwCapture, const struct AudioDeviceDescriptor *desc,
+                           const struct AudioSampleAttributes *attrs);
+void AudioReleaseCaptureHandle(struct AudioHwCapture *hwCapture);
+int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const struct AudioDeviceDescriptor *desc,
+                                     const struct AudioSampleAttributes *attrs, struct AudioHwAdapter *hwAdapter);
+int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture);
 int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
                                   const struct AudioSampleAttributes *attrs, struct AudioCapture **capture);
 int32_t AudioAdapterDestroyCapture(struct AudioAdapter *adapter, struct AudioCapture *capture);
@@ -434,6 +475,7 @@ int32_t AudioAdapterSetPassthroughMode(struct AudioAdapter *adapter, const struc
                                        enum AudioPortPassthroughMode mode);
 int32_t AudioAdapterGetPassthroughMode(struct AudioAdapter *adapter, const struct AudioPort *port,
                                        enum AudioPortPassthroughMode *mode);
+int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount);
 int32_t AudioRenderStart(AudioHandle handle);
 int32_t AudioRenderStop(AudioHandle handle);
 int32_t AudioRenderPause(AudioHandle handle);
@@ -494,7 +536,7 @@ int32_t AudioCaptureCaptureFrame(struct AudioCapture *capture, void *frame,
                                  uint64_t requestBytes, uint64_t *replyBytes);
 int32_t AudioCaptureGetCapturePosition(struct AudioCapture *capture, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioCaptureSetExtraParams(AudioHandle handle, const char *keyValueList);
-int32_t AudioCaptureGetExtraParams(AudioHandle handle, char *keyValueList, int32_t listLenth);
+int32_t AudioCaptureGetExtraParams(const AudioHandle handle, char *keyValueList, int32_t listLenth);
 int32_t AudioCaptureReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc);
 int32_t AudioCaptureGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioCaptureTurnStandbyMode(AudioHandle handle);

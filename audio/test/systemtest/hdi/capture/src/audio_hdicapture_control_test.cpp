@@ -86,6 +86,9 @@ void AudioHdiCaptureControlTest::SetUpTestCase(void)
     }
     SdkInit();
 #endif
+    if (access(RESOLVED_PATH.c_str(), 0)) {
+        return;
+    }
     handleSo = dlopen(RESOLVED_PATH.c_str(), RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
@@ -136,7 +139,7 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_AudioCreateCapture_0001, Test
     TestAudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateCapture(manager, pins, ADAPTER_NAME_USB, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -161,21 +164,21 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_AudioCreateCapture_0002, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = GetLoadAdapter(manager, portType, ADAPTER_NAME_USB, &adapter, audioPort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     InitAttrs(attrs);
     InitDevDesc(DevDesc, audioPort.portId, PIN_IN_MIC);
     ret = adapter->CreateCapture(adapter, &DevDesc, &attrs, &firstCapture);
     if (ret < 0) {
         manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
     ret = adapter->CreateCapture(adapter, &DevDesc, &attrs, &secondCapture);
 #if defined (AUDIO_ADM_SERVICE) || defined (AUDIO_MPI_SERVICE)
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     adapter->DestroyCapture(adapter, secondCapture);
 #endif
 #if defined (AUDIO_ADM_SO) || defined (AUDIO_MPI_SO) || defined (__LITEOS__)
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
     adapter->DestroyCapture(adapter, firstCapture);
 #endif
     manager.UnloadAdapter(&manager, adapter);
@@ -201,20 +204,20 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_AudioCreateCapture_0003, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = GetLoadAdapter(manager, portType, ADAPTER_NAME_USB, &adapter, audioPort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     InitAttrs(attrs);
     InitDevDesc(renderDevDesc, audioPort.portId, PIN_OUT_SPEAKER);
     InitDevDesc(captureDevDesc, audioPort.portId, PIN_IN_MIC);
     ret = adapter->CreateRender(adapter, &renderDevDesc, &attrs, &render);
     if (ret < 0) {
         manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
     ret = adapter->CreateCapture(adapter, &captureDevDesc, &attrs, &capture);
     if (ret < 0) {
         adapter->DestroyRender(adapter, render);
         manager.UnloadAdapter(&manager, adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
     adapter->DestroyRender(adapter, render);
     adapter->DestroyCapture(adapter, capture);
@@ -238,12 +241,12 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_AudioCreateCapture_0004, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateCapture(manager, pins, ADAPTER_NAME_USB, &adapterFirst, &captureFirst);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = AudioCreateCapture(manager, pins, ADAPTER_NAME_INTERNAL, &adapterSecond, &captureSecond);
     if (ret < 0) {
         adapterFirst->DestroyCapture(adapterFirst, captureFirst);
         manager.UnloadAdapter(&manager, adapterFirst);
-        ASSERT_EQ(HDF_SUCCESS, ret);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
     adapterFirst->DestroyCapture(adapterFirst, captureFirst);
     adapterSecond->DestroyCapture(adapterSecond, captureSecond);
@@ -271,13 +274,13 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_AudioCreateCapture_0005, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = GetLoadAdapter(manager, portType, ADAPTER_NAME_USB, &adapter, capturePort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = InitDevDesc(devDesc, capturePort.portId, pins);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->CreateCapture(adapterNull, &devDesc, &attrs, &capture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -300,11 +303,11 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_AudioCreateCapture_0006, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = GetLoadAdapter(manager, portType, ADAPTER_NAME_USB, &adapter, capturePort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->CreateCapture(adapter, devDesc, &attrs, &capture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -328,11 +331,11 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_AudioCreateCapture_0007, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = GetLoadAdapter(manager, portType, ADAPTER_NAME_USB, &adapter, capturePort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = InitDevDesc(devDesc, capturePort.portId, pins);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->CreateCapture(adapter, &devDesc, attrs, &capture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -356,13 +359,13 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_AudioCreateCapture_0008, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = GetLoadAdapter(manager, portType, ADAPTER_NAME_USB, &adapter, capturePort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = InitDevDesc(devDesc, capturePort.portId, pins);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, capture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
     manager.UnloadAdapter(&manager, adapter);
 }
 /**
@@ -385,13 +388,13 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_AudioCreateCapture_0009, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = GetLoadAdapter(manager, portType, ADAPTER_NAME_HDMI, &adapter, capturePort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = InitDevDesc(devDesc, capturePort.portId, pins);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &capture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -411,9 +414,9 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_AudioDestroyCapture_0001, Tes
     TestAudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateCapture(manager, pins, ADAPTER_NAME_USB, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->DestroyCapture(adapter, capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     manager.UnloadAdapter(&manager, adapter);
 }
 /**
@@ -433,11 +436,11 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_AudioDestroyCapture_0002, Tes
     TestAudioManager manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateCapture(manager, pins, ADAPTER_NAME_USB, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->DestroyCapture(adapterNull, capture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
     ret = adapter->DestroyCapture(adapter, capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     manager.UnloadAdapter(&manager, adapter);
 }
 /**
@@ -457,9 +460,9 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_AudioDestroyCapture_0003, Tes
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = GetLoadAdapter(manager, portType, ADAPTER_NAME_USB, &adapter, capturePort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->DestroyCapture(adapter, capture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
     manager.UnloadAdapter(&manager, adapter);
 }
 /**
@@ -479,9 +482,9 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureStart_0001, TestSize.L
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateCapture(manager, pins, ADAPTER_NAME_USB, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Start((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     capture->control.Stop((AudioHandle)capture);
     adapter->DestroyCapture(adapter, capture);
@@ -505,9 +508,9 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureStart_0002, TestSize.L
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateCapture(manager, pins, ADAPTER_NAME_USB, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Start((AudioHandle)captureNull);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     capture->control.Stop((AudioHandle)capture);
     adapter->DestroyCapture(adapter, capture);
@@ -530,11 +533,11 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureStart_0003, TestSize.L
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateCapture(manager, pins, ADAPTER_NAME_USB, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Start((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Start((AudioHandle)capture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_AI_BUSY, ret);
 
     capture->control.Stop((AudioHandle)capture);
     adapter->DestroyCapture(adapter, capture);
@@ -556,9 +559,9 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_0001, TestSize.Le
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -579,11 +582,11 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_0002, TestSize.Le
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -604,11 +607,11 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_0003, TestSize.Le
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Start((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     capture->control.Stop((AudioHandle)capture);
     adapter->DestroyCapture(adapter, capture);
@@ -631,9 +634,9 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_0004, TestSize.Le
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateCapture(manager, pins, ADAPTER_NAME_USB, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -655,9 +658,9 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_0005, TestSize.Le
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Stop((AudioHandle)captureNull);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -678,12 +681,12 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_0001, TestSize.L
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Pause((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -703,14 +706,14 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_0002, TestSize.L
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Pause((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Pause((AudioHandle)capture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, ret);
 
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -731,12 +734,12 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_0003, TestSize.L
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Pause((AudioHandle)captureNull);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -757,9 +760,9 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_0004, TestSize.L
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateCapture(manager, pins, ADAPTER_NAME_USB, &adapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Pause((AudioHandle)capture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -780,11 +783,11 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_0005, TestSize.L
     ASSERT_NE(nullptr, GetAudioManager);
 
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Pause((AudioHandle)capture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -805,13 +808,13 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_0001, TestSize.
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Pause((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Resume((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -831,16 +834,16 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_0002, TestSize.
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Pause((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Resume((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Resume((AudioHandle)capture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, ret);
 
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -861,12 +864,12 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_0003, TestSize.
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Resume((AudioHandle)capture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, ret);
 
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -887,14 +890,14 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_0004, TestSize.
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Pause((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Resume((AudioHandle)captureNull);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -914,11 +917,11 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_0005, TestSize.
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Resume((AudioHandle)capture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);
@@ -939,13 +942,13 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_0006, TestSize.
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Pause((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Resume((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Start((AudioHandle)capture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_AI_BUSY, ret);
 
     capture->control.Stop((AudioHandle)capture);
     adapter->DestroyCapture(adapter, capture);
@@ -969,23 +972,23 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_0007, TestSize.
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret1 = AudioCreateStartCapture(manager, &captureOne, &adapterOne, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret1);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret1);
     ret1 = captureOne->control.Pause((AudioHandle)captureOne);
-    EXPECT_EQ(HDF_SUCCESS, ret1);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret1);
     ret1 = captureOne->control.Resume((AudioHandle)captureOne);
-    EXPECT_EQ(HDF_SUCCESS, ret1);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret1);
     ret1 = captureOne->control.Stop((AudioHandle)captureOne);
-    EXPECT_EQ(HDF_SUCCESS, ret1);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret1);
     adapterOne->DestroyCapture(adapterOne, captureOne);
     manager.UnloadAdapter(&manager, adapterOne);
     ret2 = AudioCreateStartCapture(manager, &captureSec, &adapterSec, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret2);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret2);
     ret2 = captureSec->control.Pause((AudioHandle)captureSec);
-    EXPECT_EQ(HDF_SUCCESS, ret2);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret2);
     ret2 = captureSec->control.Resume((AudioHandle)captureSec);
-    EXPECT_EQ(HDF_SUCCESS, ret2);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret2);
     ret2 = captureSec->control.Stop((AudioHandle)captureSec);
-    EXPECT_EQ(HDF_SUCCESS, ret2);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret2);
     adapterSec->DestroyCapture(adapterSec, captureSec);
     manager.UnloadAdapter(&manager, adapterSec);
 }
@@ -1005,9 +1008,9 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureFlush_0001, TestSize.L
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Flush((AudioHandle)capture);
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
 
@@ -1031,11 +1034,11 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CaptureFlush_0002, TestSize.L
     manager = *GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Flush((AudioHandle)captureNull);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
     manager.UnloadAdapter(&manager, adapter);

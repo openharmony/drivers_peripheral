@@ -48,7 +48,7 @@
 #define MAX_AUDIO_ADAPTER_NUM_T 3
 #define FILE_CAPTURE_SIZE (1024 * 1024 * 3) // 3M
 #define BUFFER_LEN 256
-#define EXT_PARAMS_MAXLEN 106
+#define EXT_PARAMS_MAXLEN 107
 
 
 struct StrParaCapture {
@@ -261,7 +261,7 @@ int32_t StopButtonCapture(struct AudioCapture **captureS)
     return HDF_SUCCESS;
 }
 
-int32_t FrameStartCaptureMmap(void *param)
+int32_t FrameStartCaptureMmap(const void *param)
 {
     if (param == NULL) {
         return HDF_FAILURE;
@@ -281,6 +281,7 @@ int32_t FrameStartCaptureMmap(void *param)
     int fd = fileno(fp);
     if (fd == -1) {
         printf("fileno failed, fd is %d\n", fd);
+        fclose(fp);
         return HDF_FAILURE;
     }
     ftruncate(fd, FILE_CAPTURE_SIZE);
@@ -290,11 +291,14 @@ int32_t FrameStartCaptureMmap(void *param)
     desc.transferFrameSize = DEEP_BUFFER_RENDER_PERIOD_SIZE / 4; // One frame size 4 bit
     desc.offset = 0; // Recording must be 0
     // start
+    if (capture == NULL || capture->attr.ReqMmapBuffer == NULL) {
+        fclose(fp);
+        return HDF_FAILURE;
+    }
     int32_t ret = capture->attr.ReqMmapBuffer(capture, FILE_CAPTURE_SIZE, &desc);
     if (ret < 0) {
         printf("Request map fail,please check.\n");
         fclose(fp);
-        fp = NULL;
         return HDF_FAILURE;
     }
     ret = msync(desc.memoryAddress, FILE_CAPTURE_SIZE, MS_ASYNC);
@@ -302,22 +306,11 @@ int32_t FrameStartCaptureMmap(void *param)
         printf("sync fail.\n");
     }
     munmap(desc.memoryAddress, FILE_CAPTURE_SIZE);
-
-    uint64_t frames;
-    struct AudioTimeStamp timeStamp;
-    timeStamp.tvNSec = 0;
-    timeStamp.tvSec = 0;
-    ret = capture->attr.GetMmapPosition(capture, &frames, &timeStamp);
-    if (ret < 0) {
-        printf("GetMmapPosition fail,please check.\n");
-    }
-    printf("frames = %"PRIu64", tvSec = %"PRId64", tvNSec = %"PRId64"\n", frames, timeStamp.tvSec, timeStamp.tvNSec);
     fclose(fp);
-    fp = NULL;
     return HDF_SUCCESS;
 }
 
-int32_t FrameStartCapture(void *param)
+int32_t FrameStartCapture(const void *param)
 {
     if (param == NULL) {
         return HDF_FAILURE;
@@ -333,6 +326,10 @@ int32_t FrameStartCapture(void *param)
     uint32_t failCount = 0;
     char *frame = (char *)calloc(1, bufferSize);
     if (frame == NULL) {
+        return HDF_FAILURE;
+    }
+    if (capture == NULL || capture->CaptureFrame == NULL) {
+        free(frame);
         return HDF_FAILURE;
     }
     do {
@@ -580,6 +577,9 @@ int32_t GetCaptureProxyManagerFunc(const char *adapterNameCase)
     struct AudioProxyManager *(*getAudioManager)() = NULL;
     getAudioManager = (struct AudioProxyManager *(*)())(dlsym(g_captureHandle, "GetAudioProxyManagerFuncs"));
     proxyManager = getAudioManager();
+    if (proxyManager == NULL) {
+        return HDF_FAILURE;
+    }
     ret = proxyManager->GetAllAdapters(proxyManager, &descs, &size);
     int32_t check = size > MAX_AUDIO_ADAPTER_NUM_T || size == 0 || descs == NULL || ret < 0;
     if (check) {
@@ -622,6 +622,9 @@ int32_t InitParam()
     char resolvedPath[PATH_LEN] = {0};
     char func[PATH_LEN] = {0};
     if (SelectLoadingMode(resolvedPath, func) < 0) {
+        return HDF_FAILURE;
+    }
+    if (access(resolvedPath, 0)) {
         return HDF_FAILURE;
     }
     g_captureHandle = dlopen(resolvedPath, 1);
@@ -847,6 +850,10 @@ int32_t SetCaptureAttributes()
 {
     int32_t ret;
     struct AudioSampleAttributes attrs;
+    if (g_capture == NULL || g_capture->attr.GetSampleAttributes == NULL) {
+        LOG_FUN_ERR("pointer is NULL");
+        return HDF_FAILURE;
+    }
     ret = g_capture->attr.GetSampleAttributes((AudioHandle)g_capture, &attrs);
     if (ret < 0) {
         LOG_FUN_ERR("GetCaptureAttributes failed\n");
@@ -1019,22 +1026,22 @@ void ProcessMenu(int32_t choice)
 
 void Choice()
 {
-    int32_t choice = 0;
-    while (choice < GET_CAPTURE_POSITION + 1 && choice >= 0) {
+    int32_t option = 0;
+    while (option < GET_CAPTURE_POSITION + 1 && option >= 0) {
         system("clear");
         PrintMenu2();
         printf("your choice is:\n");
-        int32_t ret = CheckInputName(INPUT_INT, (void *)&choice);
+        int32_t ret = CheckInputName(INPUT_INT, (void *)&option);
         if (ret < 0) {
             continue;
         }
-        if (choice < CAPTURE_START || choice > GET_CAPTURE_POSITION + 1) {
+        if (option < CAPTURE_START || option > GET_CAPTURE_POSITION + 1) {
             printf("You input is wrong,");
-            choice = 0;
+            option = 0;
             SystemInputFail();
             continue;
         }
-        ProcessMenu(choice);
+        ProcessMenu(option);
     }
 }
 
@@ -1045,7 +1052,7 @@ int32_t main(int32_t argc, char const *argv[])
         return 0;
     }
     int32_t ret;
-    if (argv[1] == NULL) {
+    if (argv[1] == NULL || strlen(argv[1]) == 0) {
         return HDF_FAILURE;
     }
     ret = strncpy_s(g_path, PATH_LEN - 1, argv[1], strlen(argv[1]) + 1);
@@ -1075,7 +1082,9 @@ int32_t main(int32_t argc, char const *argv[])
         g_manager->UnloadAdapter(g_manager, g_adapter);
         soMode = true;
     } else {
-        g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
+        if (g_proxyManager != NULL) {
+            g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
+        }
     }
 #ifdef AUDIO_HAL_USER
         if (soMode) {

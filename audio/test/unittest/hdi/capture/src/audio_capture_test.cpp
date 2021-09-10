@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
-#include "audio_internal.h"
+#include "audio_capture_test.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include "audio_internal.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -39,17 +40,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureStopWhenHandleIsNull, TestSize.Level0)
     struct AudioHwCapture *hwCapture = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     int32_t ret = AudioCaptureStop(handle);
-    EXPECT_EQ(HDF_FAILURE, ret);
-}
-
-HWTEST_F(AudioCaptureTest, AudioCaptureStopWhenParamIsVaild, TestSize.Level0)
-{
-    struct AudioHwCapture *hwCapture = new AudioHwCapture;
-    AudioHandle handle = (AudioHandle)hwCapture;
-    int32_t ret = AudioCaptureStop(handle);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    delete(hwCapture);
-    hwCapture = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 }
 
 HWTEST_F(AudioCaptureTest, AudioCaptureResumeWhenHandleIsNull, TestSize.Level0)
@@ -57,15 +48,16 @@ HWTEST_F(AudioCaptureTest, AudioCaptureResumeWhenHandleIsNull, TestSize.Level0)
     struct AudioHwCapture *hwCapture = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     int32_t ret = AudioCaptureResume(handle);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 }
 
-HWTEST_F(AudioCaptureTest, AudioCaptureResumeWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioCaptureTest, AudioCaptureResumeWhenPauseIsFalse, TestSize.Level0)
 {
     struct AudioHwCapture *hwCapture = new AudioHwCapture;
     AudioHandle handle = (AudioHandle)hwCapture;
+    hwCapture->captureParam.captureMode.ctlParam.pause = false;
     int32_t ret = AudioCaptureResume(handle);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
     delete(hwCapture);
     hwCapture = nullptr;
 }
@@ -76,7 +68,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSetSampleAttributesWhenHandleIsNull, Test
     AudioHandle handle = (AudioHandle)hwCapture;
     AudioSampleAttributes *attrs = new AudioSampleAttributes;
     int32_t ret = AudioCaptureSetSampleAttributes(handle, attrs);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
     delete(attrs);
     attrs = nullptr;
 }
@@ -87,29 +79,16 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSetSampleAttributesWhenAttrsIsNull, TestS
     AudioHandle handle = (AudioHandle)hwCapture;
     AudioSampleAttributes *attrs = nullptr;
     int32_t ret = AudioCaptureSetSampleAttributes(handle, attrs);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
     delete(hwCapture);
     hwCapture = nullptr;
-}
-
-HWTEST_F(AudioCaptureTest, AudioCaptureSetSampleAttributesWhenParamIsVaild, TestSize.Level0)
-{
-    struct AudioHwCapture *hwCapture = new AudioHwCapture;
-    AudioHandle handle = (AudioHandle)hwCapture;
-    AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    int32_t ret = AudioCaptureSetSampleAttributes(handle, attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    delete(hwCapture);
-    hwCapture = nullptr;
-    delete(attrs);
-    attrs = nullptr;
 }
 
 HWTEST_F(AudioCaptureTest, AudioCaptureGetSampleAttributesWhenHandleIsNull, TestSize.Level0)
 {
     AudioSampleAttributes *attrs = new AudioSampleAttributes;
     int32_t ret = AudioCaptureGetSampleAttributes(nullptr, attrs);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
     delete(attrs);
     attrs = nullptr;
 }
@@ -119,7 +98,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureGetSampleAttributesWhenAttrsIsNull, TestS
     struct AudioHwCapture *hwCapture = new AudioHwCapture;
     AudioHandle handle = (AudioHandle)hwCapture;
     int32_t ret = AudioCaptureGetSampleAttributes(handle, nullptr);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
     delete(hwCapture);
     hwCapture = nullptr;
 }
@@ -143,17 +122,6 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSetMuteWhenHandleIsNull, TestSize.Level0)
     AudioHandle handle = (AudioHandle)hwCapture;
     bool mute = true;
     int32_t ret = AudioCaptureSetMute(handle, mute);
-    EXPECT_EQ(HDF_FAILURE, ret);
-}
-
-HWTEST_F(AudioCaptureTest, AudioCaptureSetMuteParamIsVaild, TestSize.Level0)
-{
-    struct AudioHwCapture *hwCapture = new AudioHwCapture;
-    AudioHandle handle = (AudioHandle)hwCapture;
-    bool mute = false;
-    int32_t ret = AudioCaptureSetMute(handle, mute);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    delete(hwCapture);
-    hwCapture = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 }
 }

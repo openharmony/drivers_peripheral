@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 #include <unistd.h>
 #include "audio_proxy_manager.h"
 #include "audio_types.h"
@@ -46,7 +47,7 @@
 #define DEEP_BUFFER_RENDER_PERIOD_COUNT 8
 #define INT_32_MAX 0x7fffffff
 #define PERIOD_SIZE 1024
-#define EXT_PARAMS_MAXLEN 106
+#define EXT_PARAMS_MAXLEN 107
 
 enum AudioPCMBit {
     PCM_8_BIT  = 8,       /**< 8-bit PCM */
@@ -234,7 +235,7 @@ int32_t InitDevDesc(struct AudioDeviceDescriptor *devDesc, uint32_t portId)
     return HDF_SUCCESS;
 }
 
-uint32_t StringToInt(char *flag)
+uint32_t StringToInt(const char *flag)
 {
     if (flag == NULL) {
         return 0;
@@ -299,6 +300,7 @@ int32_t SwitchAdapter(struct AudioAdapterDescriptor *descs,
     if (descs == NULL || adapterNameCase == NULL || renderPort == NULL) {
         return HDF_FAILURE;
     }
+    uint32_t port;
     for (int32_t index = 0; index < size; index++) {
         desc = &descs[index];
         if (desc == NULL) {
@@ -310,7 +312,7 @@ int32_t SwitchAdapter(struct AudioAdapterDescriptor *descs,
         if (strcmp(desc->adapterName, adapterNameCase)) {
             continue;
         }
-        for (uint32_t port = 0; port < desc->portNum; port++) {
+        for (port = 0; port < desc->portNum; port++) {
             // Only find out the port of out in the sound card
             if (desc->ports[port].dir == portFlag) {
                 *renderPort = desc->ports[port];
@@ -328,9 +330,9 @@ void StreamClose(int32_t sig)
     g_closeEnd = 1;
 }
 
-uint32_t PcmFormatToBits(enum AudioFormat format)
+uint32_t PcmFormatToBits(enum AudioFormat formatBit)
 {
-    switch (format) {
+    switch (formatBit) {
         case AUDIO_FORMAT_PCM_16_BIT:
             return PCM_16_BIT;
         case AUDIO_FORMAT_PCM_8_BIT:
@@ -386,10 +388,11 @@ int32_t StopAudioFiles(struct AudioRender **renderS)
         fclose(g_file);
         g_file = NULL;
     }
+    printf("Stop Successful\n");
     return ret;
 }
 
-int32_t FrameStartMmap(void *param)
+int32_t FrameStartMmap(const void *param)
 {
     if (param == NULL) {
         return HDF_FAILURE;
@@ -414,7 +417,6 @@ int32_t FrameStartMmap(void *param)
     if (fd == -1) {
         printf("fileno failed, fd is %d\n", fd);
         fclose(fp);
-        fp = NULL;
         return HDF_FAILURE;
     }
     // Init param
@@ -423,28 +425,22 @@ int32_t FrameStartMmap(void *param)
     desc.transferFrameSize = DEEP_BUFFER_RENDER_PERIOD_SIZE / 4; // One frame size 4 bit
     desc.offset = sizeof(g_wavHeadInfo);
     // start
+    if (render == NULL || render->attr.ReqMmapBuffer == NULL) {
+        fclose(fp);
+        return HDF_FAILURE;
+    }
     int32_t ret = render->attr.ReqMmapBuffer(render, reqSize, &desc);
     if (ret < 0) {
         printf("Request map fail,please check.\n");
         fclose(fp);
-        fp = NULL;
         return HDF_FAILURE;
     }
-    uint64_t frames;
-    struct AudioTimeStamp timeStamp;
-    timeStamp.tvNSec = 0;
-    timeStamp.tvSec = 0;
-    ret = render->attr.GetMmapPosition(render, &frames, &timeStamp);
-    if (ret < 0) {
-        printf("GetMmapPosition fail,please check.\n");
-    }
-    printf("frames = %"PRIu64", tvSec = %"PRId64", tvNSec = %"PRId64"\n", frames, timeStamp.tvSec, timeStamp.tvNSec);
+    munmap(desc.memoryAddress, reqSize);
     fclose(fp);
-    fp = NULL;
-    return ret;
+    return HDF_SUCCESS;
 }
 
-int32_t FrameStart(void *param)
+int32_t FrameStart(const void *param)
 {
     if (param == NULL) {
         return HDF_FAILURE;
@@ -456,10 +452,13 @@ int32_t FrameStart(void *param)
     int32_t ret;
     int32_t readSize;
     int32_t remainingDataSize = g_wavHeadInfo.testFileRiffSize;
-    int32_t numRead;
+    uint32_t numRead;
     signal(SIGINT, StreamClose);
     uint64_t replyBytes;
     if (g_file == NULL) {
+        return HDF_FAILURE;
+    }
+    if (render == NULL || render->RenderFrame == NULL) {
         return HDF_FAILURE;
     }
     do {
@@ -724,6 +723,9 @@ int32_t GetRenderProxyManagerFunc(const char *adapterNameCase)
     struct AudioProxyManager *(*getAudioManager)() = NULL;
     getAudioManager = (struct AudioProxyManager *(*)())(dlsym(g_handle, "GetAudioProxyManagerFuncs"));
     proxyManager = getAudioManager();
+    if (proxyManager == NULL) {
+        return HDF_FAILURE;
+    }
     ret = proxyManager->GetAllAdapters(proxyManager, &descs, &size);
     int32_t temp = size > MAX_AUDIO_ADAPTER_NUM_T || size == 0 || descs == NULL || ret < 0;
     if (temp) {
@@ -737,7 +739,7 @@ int32_t GetRenderProxyManagerFunc(const char *adapterNameCase)
         return HDF_ERR_NOT_SUPPORT;
     }
     struct AudioAdapterDescriptor *desc = &descs[index];
-    if (proxyManager->LoadAdapter(proxyManager, desc, &g_adapter) != 0) {
+    if (proxyManager->LoadAdapter(proxyManager, desc, &g_adapter)) {
         LOG_FUN_ERR("Load Adapter Fail");
         return HDF_ERR_NOT_SUPPORT;
     }
@@ -952,6 +954,9 @@ void PrintAttributesFromat()
 }
 int32_t SelectAttributesFomat(uint32_t *fomat)
 {
+    if (fomat == NULL) {
+        return HDF_FAILURE;
+    }
     PrintAttributesFromat();
     printf("Please select audio format,If not selected, the default is 16bit:");
     uint32_t ret;
@@ -1183,7 +1188,7 @@ int32_t main(int32_t argc, char const *argv[])
         printf("usage:[1]%s [2]%s\n", argv[0], "/test/test.wav");
         return 0;
     }
-    if (argv[1] == NULL) {
+    if (argv[1] == NULL || strlen(argv[1]) == 0) {
         return HDF_FAILURE;
     }
     int32_t ret = strncpy_s(g_path, PATH_LEN - 1, argv[1], strlen(argv[1]) + 1);
@@ -1213,7 +1218,9 @@ int32_t main(int32_t argc, char const *argv[])
         soMode = true;
         g_manager->UnloadAdapter(g_manager, g_adapter);
     } else {
-        g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
+        if (g_proxyManager != NULL) {
+            g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
+        }
     }
 #ifdef AUDIO_HAL_USER
     if (soMode) {

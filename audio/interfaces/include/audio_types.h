@@ -181,7 +181,7 @@ struct AudioSampleAttributes {
     uint32_t channelCount;     /**< Number of audio channels. For example, for the mono channel, the value is 1,
                                 * and for the stereo channel, the value is 2.
                                 */
-    uint32_t period;           /**< Audio sampling period */ 
+    uint32_t period;           /**< Audio sampling period */
     uint32_t frameSize;        /**< Frame size of the audio data */
     bool isBigEndian;          /**< Big endian flag of audio data */
     bool isSignedData;         /**< Signed or unsigned flag of audio data */

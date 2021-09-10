@@ -16,6 +16,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/test.gni")
   import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/peripheral/audio/audio.gni")
 }
 
 ###########################end###########################
@@ -24,8 +25,17 @@ group("lib") {
     testonly = true
   }
   deps = []
-  deps += [
-    "capture:hdf_audio_lib_capture_test",
-    "render:hdf_audio_lib_render_test",
-  ]
+  if (defined(ohos_lite)) {
+    deps += [
+      "capture:hdf_audio_lib_capture_test",
+      "render:hdf_audio_lib_render_test",
+    ]
+  } else {
+    if (enable_audio_adm_so || enable_audio_mpi_so) {
+      deps += [
+        "capture:hdf_audio_lib_capture_test",
+        "render:hdf_audio_lib_render_test",
+      ]
+    }
+  }
 }
