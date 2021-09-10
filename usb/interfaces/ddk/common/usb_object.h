@@ -13,6 +13,24 @@
  * limitations under the License.
  */
 
+/**
+ * @addtogroup USB
+ * @{
+ *
+ * @brief Declares USB-related APIs, including the custom data types and functions used to obtain descriptors, interface objects, and request objects, and to submit requests.
+ *
+ * @since 1.0
+ * @version 1.0
+ */
+
+/**
+ * @file usb_object.h
+ *
+ * @brief Defines USB common data types, including the enumerated values returned by functions and definitions of other common data structures.
+ *
+ * @since 1.0
+ * @version 1.0
+ */
 #ifndef USB_OBJECT_H
 #define USB_OBJECT_H
 
@@ -32,49 +50,87 @@
 #include "osal_time.h"
 #include "osal_atomic.h"
 
+/**
+ * @brief Defines the maximum object ID.
+ */
 #define MAX_OBJECT_ID       (0x7FFFFFFF)
 
+/**
+ * @brief Defines the USB request status type.
+ *
+ * You can use this function to check the request execution status.
+ */
 typedef enum {
-    /* request completed without error. */
+    /** Request completed */
     USB_REQUEST_COMPLETED,
-    /* request completed with short data. */
+    /** Request completed beforehand */
     USB_REQUEST_COMPLETED_SHORT,
-    /* request failed */
+    /** Request error */
     USB_REQUEST_ERROR,
-    /* the request timeout */
+    /** Request timeout */
     USB_REQUEST_TIMEOUT,
-    /* request was cancelled */
+    /** Request canceled */
     USB_REQUEST_CANCELLED,
-    /* request wall stalled */
+    /** Request stopped */
     USB_REQUEST_STALL,
-    /* Device was disconnected */
+    /** Device disconnected */
     USB_REQUEST_NO_DEVICE,
-    /* Device sent more data than requested */
+    /** Overflow error. The amount of sent data is more than requested. */
     USB_REQUEST_OVERFLOW,
 } UsbRequestStatus;
 
+/**
+ * @brief Defines the USB pipe direction.
+ */
 typedef enum {
+    /** Output direction (from the host to the device) */
     USB_PIPE_DIRECTION_OUT = 0x00,
+    /** Input direction (from the device to the host) */
     USB_PIPE_DIRECTION_IN = 0x80,
 } UsbPipeDirection;
 
+/**
+ * @brief Defines the USB pipe type.
+ */
 typedef enum {
+    /** Control transfer */
     USB_PIPE_TYPE_CONTROL = 0U,
+    /**
+     * Isochronous transfer is mainly used for transmitting time-dependent information, such as audio and video data, at a constant rate. Each isochronous transfer involves one or multiple isochronous transactions, each containing token packets and data packets but no handshake packets.
+     * This transfer mode ensures the timeliness of transfer but does not guarantee the correctness of data due to the absence of handshake. 
+     * Different from bulk transfer, isochronous transfer allows a certain bit error rate (BER) under certain conditions, so as to ensure that 
+     *  audio and video data are transmitted on a real-time basis.
+     */
     USB_PIPE_TYPE_ISOCHRONOUS = 1U,
+    /** Bulk transfer */
     USB_PIPE_TYPE_BULK = 2U,
+    /** Interrupt transfer */
     USB_PIPE_TYPE_INTERRUPT = 3U,
 } UsbPipeType;
 
+/**
+ * @brief Defines the USB interface status.
+ */
 typedef enum {
+    /** Normal */
     USB_INTERFACE_STATUS_NORMAL,
+    /** Interface addition */
     USB_INTERFACE_STATUS_ADD,
+    /** Interface removal */
     USB_INTERFACE_STATUS_REMOVE,
+    /** Other status */
     USB_INTERFACE_STATUS_OTHER,
 } UsbInterfaceStatus;
 
+/**
+ * @brief Defines the USB basic object, which is contained in the data structure provided for users. It is used to mark an external object and create an object linked list.
+ */
 struct UsbObject {
+    /** Basic object ID */
     int32_t objectId;
+    /** Bidirectional linked list header */
     struct DListHead entry;
 };
 
 #endif /* USB_OBJECT_H */
+/** @} */
