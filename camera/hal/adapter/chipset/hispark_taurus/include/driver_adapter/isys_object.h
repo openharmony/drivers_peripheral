@@ -42,8 +42,8 @@ public:
     virtual RetCode RequestBuffer(std::shared_ptr<FrameSpec> &frameSpec) = 0;
     virtual RetCode PreConfig(const std::shared_ptr<CameraStandard::CameraMetadata>& meta,
         const std::vector<DeviceStreamSetting>& settings) = 0;
+    virtual RetCode StartRecvFrame(int32_t streamId) = 0;
+    virtual RetCode StopRecvFrame(int32_t streamId) = 0;
 };
 }
 #endif // OHOS::Camera
-
-
