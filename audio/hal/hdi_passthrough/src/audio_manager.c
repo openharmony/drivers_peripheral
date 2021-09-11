@@ -94,6 +94,9 @@ int32_t InitCaptureSoHandle(const char *captureSoPath)
         LOG_FUN_ERR("captureSoPath is NULL");
         return HDF_FAILURE;
     }
+    if (access(captureSoPath, 0)) {
+        return HDF_FAILURE;
+    }
     if (g_ptrCaptureHandle == NULL) {
         g_ptrCaptureHandle = dlopen(captureSoPath, RTLD_LAZY);
         if (g_ptrCaptureHandle == NULL) {
@@ -116,6 +119,9 @@ int32_t InitRenderSoHandle(const char *renderSoPath)
 {
     if (renderSoPath == NULL) {
         LOG_FUN_ERR("renderSoPath is NULL");
+        return HDF_FAILURE;
+    }
+    if (access(renderSoPath, 0)) {
         return HDF_FAILURE;
     }
     if (g_ptrRenderHandle == NULL) {
@@ -143,6 +149,9 @@ int32_t InitPathSelectSoHandle(const char *pathSelectSoPath)
         LOG_FUN_ERR("pathSelectSoPath is NULL");
         return HDF_FAILURE;
     }
+    if (access(pathSelectSoPath, 0)) {
+        return HDF_FAILURE;
+    }
     if (g_ptrPathSelHandle == NULL) {
         g_ptrPathSelHandle = dlopen(pathSelectSoPath, RTLD_LAZY);
         if (g_ptrPathSelHandle == NULL) {
@@ -168,24 +177,27 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
     int32_t ret;
     LOG_FUN_INFO();
     if (manager == NULL || descs == NULL || size == NULL) {
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     ret = AudioAdaptersForUser(descs, size);
     if (ret < 0) {
         LOG_FUN_ERR("AudioAdaptersForUser FAIL!");
-
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_NOTREADY; // Failed to read sound card configuration file
+    }
+    if (g_captureSoPath == NULL || g_renderSoPath == NULL) {
+        LOG_FUN_ERR("sopath is error");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = InitCaptureSoHandle(g_captureSoPath);
     if (ret < 0) {
         LOG_FUN_ERR("InitCaptureSoHandle FAIL!");
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = InitRenderSoHandle(g_renderSoPath);
     if (ret < 0) {
         LOG_FUN_ERR("InitRenderSoHandle FAIL!");
         AudioDlClose(&g_ptrCaptureHandle);
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
     ret = InitPathSelectSoHandle(g_pathSelectSoPath);
@@ -193,7 +205,7 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
         LOG_FUN_ERR("InitPathSelectSoHandle FAIL!");
         AudioDlClose(&g_ptrRenderHandle);
         AudioDlClose(&g_ptrCaptureHandle);
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = g_pathSelGetConfToJsonObj();
     if (ret < 0) {
@@ -201,28 +213,28 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
         AudioDlClose(&g_ptrRenderHandle);
         AudioDlClose(&g_ptrCaptureHandle);
         AudioDlClose(&g_ptrPathSelHandle);
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
 #endif
-    return HDF_SUCCESS;
+    return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct AudioAdapterDescriptor *desc,
                                 struct AudioAdapter **adapter)
 {
     LOG_FUN_INFO();
-    if (manager == NULL || desc == NULL || desc->adapterName == NULL || adapter == NULL) {
-        return HDF_FAILURE;
+    if (manager == NULL || desc == NULL || desc->adapterName == NULL || desc->ports == NULL || adapter == NULL) {
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     LOGV("%s: adapter name %s", __func__, desc->adapterName);
     if (AudioAdapterExist(desc->adapterName)) {
         LOGE("%s: not supported this adapter %s", __func__, desc->adapterName);
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)calloc(1, sizeof(*hwAdapter));
     if (hwAdapter == NULL) {
         LOGE("%s: calloc AudioHwAdapter failed", __func__);
-        return -ENOMEM;
+        return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     hwAdapter->common.InitAllPorts = AudioAdapterInitAllPorts;
     hwAdapter->common.CreateRender = AudioAdapterCreateRender;
@@ -236,7 +248,7 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
     hwAdapter->adapterDescriptor = *desc;
     hwAdapter->adapterMgrRenderFlag = 0; // The adapterMgrRenderFlag init is zero
     hwAdapter->adapterMgrCaptureFlag = 0; // The adapterMgrCaptureFlag init is zero
-    return HDF_SUCCESS;
+    return AUDIO_HAL_SUCCESS;
 }
 
 void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter *adapter)

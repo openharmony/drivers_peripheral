@@ -781,6 +781,7 @@ int32_t AudioCtlCaptureGetGainThreshold(const struct DevHandleCapture *handle,
         return HDF_FAILURE;
     }
     struct AudioCtrlElemInfo gainThreshold;
+    memset_s(&gainThreshold, sizeof(struct AudioCtrlElemInfo), 0, sizeof(struct AudioCtrlElemInfo));
     if (!HdfSbufReadInt32(reply, &gainThreshold.type)) {
         LOG_FUN_ERR("CaptureGetGainThreshold Failed to HdfSbufReadBuffer!");
         AudioBufReplyRecycle(sBuf, reply);
@@ -870,7 +871,8 @@ int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
     return ret;
 }
 
-int32_t AudioInterfaceLibCtlCapture(struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData)
+int32_t AudioInterfaceLibCtlCapture(const struct DevHandleCapture *handle,
+    int cmdId, struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
 
@@ -962,6 +964,7 @@ int32_t AudioOutputCaptureReadFrame(struct HdfIoService *service, int cmdId, str
         return HDF_FAILURE;
     }
     if (service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
+        LOG_FUN_ERR("service->dispatcher is null!");
         return HDF_FAILURE;
     }
     do {
@@ -987,6 +990,7 @@ int32_t AudioOutputCaptureReadFrame(struct HdfIoService *service, int cmdId, str
     } while (tryNumReply > 0);
     if (tryNumReply <= 0) {
         HdfSBufRecycle(reply);
+        LOG_FUN_ERR("Out of tryNumReply!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -1088,12 +1092,12 @@ int32_t AudioOutputCaptureStop(const struct DevHandleCapture *handle,
     return HDF_SUCCESS;
 }
 
-int32_t MmapDescWriteBufferCapture(struct HdfSBuf *sBuf, struct AudioHwCaptureParam *handleData)
+int32_t MmapDescWriteBufferCapture(struct HdfSBuf *sBuf, const struct AudioHwCaptureParam *handleData)
 {
     if (sBuf == NULL || handleData == NULL) {
         return HDF_FAILURE;
     }
-    uint64_t mmapAddr = (uint64_t)(handleData->frameCaptureMode.mmapBufDesc.memoryAddress);
+    uint64_t mmapAddr = (uint64_t)(uintptr_t)(handleData->frameCaptureMode.mmapBufDesc.memoryAddress);
     if (!HdfSbufWriteUint64(sBuf, mmapAddr)) {
         return HDF_FAILURE;
     }
@@ -1115,8 +1119,8 @@ int32_t MmapDescWriteBufferCapture(struct HdfSBuf *sBuf, struct AudioHwCapturePa
     return HDF_SUCCESS;
 }
 
-int32_t AudioOutputCaptureReqMmapBuffer(struct DevHandleCapture *handle,
-    int cmdId, struct AudioHwCaptureParam *handleData)
+int32_t AudioOutputCaptureReqMmapBuffer(const struct DevHandleCapture *handle,
+    int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         return HDF_FAILURE;
@@ -1147,7 +1151,7 @@ int32_t AudioOutputCaptureReqMmapBuffer(struct DevHandleCapture *handle,
     return HDF_SUCCESS;
 }
 
-int32_t AudioOutputCaptureGetMmapPosition(struct DevHandleCapture *handle,
+int32_t AudioOutputCaptureGetMmapPosition(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -1183,7 +1187,7 @@ int32_t AudioOutputCaptureGetMmapPosition(struct DevHandleCapture *handle,
     return HDF_SUCCESS;
 }
 
-int32_t AudioInterfaceLibOutputCapture(struct DevHandleCapture *handle, int cmdId,
+int32_t AudioInterfaceLibOutputCapture(const struct DevHandleCapture *handle, int cmdId,
                                        struct AudioHwCaptureParam *handleData)
 {
     if (handle == NULL) {
@@ -1295,8 +1299,8 @@ void AudioCloseServiceCapture(const struct DevHandleCapture *handle)
     return;
 }
 
-int32_t AudioInterfaceLibModeCapture(struct DevHandleCapture * const handle,
-    struct AudioHwCaptureParam * const handleData, int cmdId)
+int32_t AudioInterfaceLibModeCapture(const struct DevHandleCapture *handle,
+    struct AudioHwCaptureParam *handleData, int cmdId)
 {
     LOG_FUN_INFO();
     if (handle == NULL || handle->object == NULL || handleData == NULL) {

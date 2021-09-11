@@ -18,77 +18,77 @@
 
 #include "hdf_device_desc.h"
 
-int32_t HdiServiceCreatRender(struct HdfDeviceIoClient *client,
+int32_t HdiServiceCreatRender(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderDestory(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderDestory(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderStart(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderStart(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderStop(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderStop(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderPause(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderPause(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderResume(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderResume(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderFlush(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderFlush(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderGetFrameSize(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderGetFrameSize(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderGetFrameCount(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderGetFrameCount(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderSetSampleAttr(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderSetSampleAttr(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderGetSampleAttr(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderGetSampleAttr(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderGetCurChannelId(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderGetCurChannelId(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderCheckSceneCapability(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderCheckSceneCapability(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderSelectScene(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderSelectScene(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderGetMute(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderGetMute(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderSetMute(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderSetMute(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderSetVolume(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderSetVolume(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderGetVolume(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderGetVolume(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderGetGainThreshold(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderGetGainThreshold(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderGetGain(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderGetGain(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderSetGain(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderSetGain(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderGetLatency(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderGetLatency(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderRenderFrame(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderRenderFrame(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderGetRenderPosition(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderGetRenderPosition(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderGetSpeed(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderGetSpeed(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderSetSpeed(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderSetSpeed(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderSetChannelMode(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderSetChannelMode(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderGetChannelMode(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderGetChannelMode(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderSetExtraParams(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderSetExtraParams(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderGetExtraParams(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderGetExtraParams(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderReqMmapBuffer(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderReqMmapBuffer(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderGetMmapPosition(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderGetMmapPosition(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderTurnStandbyMode(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderTurnStandbyMode(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderDevDump(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderDevDump(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderRegCallback(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderRegCallback(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceRenderDrainBuffer(struct HdfDeviceIoClient *client,
+int32_t HdiServiceRenderDrainBuffer(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
 
 #endif

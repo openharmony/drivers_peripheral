@@ -34,11 +34,12 @@ int32_t AudioProxyDispatchCall(struct HdfRemoteService *self,
     int32_t id, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (data == NULL || reply == NULL || self == NULL) {
-        return HDF_FAILURE;
+        LOG_FUN_ERR("AudioProxyDispatchCall parameter is null");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (self->dispatcher == NULL || self->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("AudioProxyDispatchCall obj is null");
-        return HDF_ERR_INVALID_OBJECT;
+        LOG_FUN_ERR("AudioProxyDispatchCall Remote obj is null");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     return self->dispatcher->Dispatch(self, id, data, reply);
 }
@@ -229,26 +230,26 @@ int32_t AudioProxyCommonSetRenderCtrlParam(int cmId, AudioHandle handle, float p
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
         LOG_FUN_ERR("The hwRender parameter is null");
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (param < 0) {
         LOG_FUN_ERR("Set param is invalid, Please check param!");
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (cmId == AUDIO_HDI_RENDER_SET_VOLUME) {
         if (param > 1.0) {
             LOG_FUN_ERR("volume param Is error!");
-            return HDF_FAILURE;
+            return AUDIO_HAL_ERR_INVALID_PARAM;
         }
         param = param * PROXY_VOLUME_CHANGE;
     }
     if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     uint32_t tempParam = (uint32_t)param;
     if (!HdfSbufWriteUint32(data, tempParam)) {
         AudioProxyBufReplyRecycle(data, reply);
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, cmId, data, reply);
     AudioProxyBufReplyRecycle(data, reply);
@@ -259,27 +260,27 @@ int32_t AudioProxyCommonGetRenderCtrlParam(int cmId, AudioHandle handle, float *
 {
     LOG_FUN_INFO();
     if (param == NULL) {
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
         LOG_FUN_ERR("The pointer is empty");
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, cmId, data, reply);
     if (ret < 0) {
         AudioProxyBufReplyRecycle(data, reply);
-        return HDF_FAILURE;
+        return ret;
     }
     uint32_t tempParam = 0;
     if (!HdfSbufReadUint32(reply, &tempParam)) {
         AudioProxyBufReplyRecycle(data, reply);
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     if (cmId == AUDIO_HDI_RENDER_GET_VOLUME) {
         *param = (float)tempParam / PROXY_VOLUME_CHANGE;
@@ -287,7 +288,7 @@ int32_t AudioProxyCommonGetRenderCtrlParam(int cmId, AudioHandle handle, float *
         *param = (float)tempParam;
     }
     AudioProxyBufReplyRecycle(data, reply);
-    return HDF_SUCCESS;
+    return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioProxyCommonSetCaptureCtrlParam(int cmId, AudioHandle handle, float param)
@@ -298,26 +299,26 @@ int32_t AudioProxyCommonSetCaptureCtrlParam(int cmId, AudioHandle handle, float 
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
         LOG_FUN_ERR("The hwCapture parameter is null");
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (param < 0) {
         LOG_FUN_ERR("Set param is invalid, Please check param!");
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (cmId == AUDIO_HDI_CAPTURE_SET_VOLUME) {
         if (param > 1.0) {
             LOG_FUN_ERR("volume param Is error!");
-            return HDF_FAILURE;
+            return AUDIO_HAL_ERR_INVALID_PARAM;
         }
         param = param * PROXY_VOLUME_CHANGE;
     }
     if (AudioProxyPreprocessCapture(hwCapture, &data, &reply) < 0) {
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     uint32_t tempParam = (uint32_t)param;
     if (!HdfSbufWriteUint32(data, tempParam)) {
         AudioProxyBufReplyRecycle(data, reply);
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     int32_t ret = AudioProxyDispatchCall(hwCapture->proxyRemoteHandle, cmId, data, reply);
     AudioProxyBufReplyRecycle(data, reply);
@@ -328,27 +329,27 @@ int32_t AudioProxyCommonGetCaptureCtrlParam(int cmId, AudioHandle handle, float 
 {
     LOG_FUN_INFO();
     if (param == NULL) {
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
         LOG_FUN_ERR("The hwCapture parameter is invalid");
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (AudioProxyPreprocessCapture(hwCapture, &data, &reply) < 0) {
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = AudioProxyDispatchCall(hwCapture->proxyRemoteHandle, cmId, data, reply);
     if (ret < 0) {
         AudioProxyBufReplyRecycle(data, reply);
-        return HDF_FAILURE;
+        return ret;
     }
     uint32_t tempParam = 0;
     if (!HdfSbufReadUint32(reply, &tempParam)) {
         AudioProxyBufReplyRecycle(data, reply);
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     if (cmId == AUDIO_HDI_CAPTURE_GET_VOLUME) {
         *param = (float)tempParam / PROXY_VOLUME_CHANGE;
@@ -356,7 +357,7 @@ int32_t AudioProxyCommonGetCaptureCtrlParam(int cmId, AudioHandle handle, float 
         *param = (float)tempParam;
     }
     AudioProxyBufReplyRecycle(data, reply);
-    return HDF_SUCCESS;
+    return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioProxyGetMmapPositionRead(struct HdfSBuf *reply, uint64_t *frames, struct AudioTimeStamp *time)
@@ -385,11 +386,11 @@ int32_t AudioProxyReqMmapBufferWrite(struct HdfSBuf *data, int32_t reqSize,
     if (!HdfSbufWriteInt32(data, reqSize)) {
         return HDF_FAILURE;
     }
-    uint64_t memAddr = (uint64_t)desc->memoryAddress;
+    uint64_t memAddr = (uint64_t)(uintptr_t)desc->memoryAddress;
     if (!HdfSbufWriteUint64(data, memAddr)) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteInt32(data, desc->memoryFd)) {
+    if (!HdfSbufWriteFileDescriptor(data, desc->memoryFd)) {
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteInt32(data, desc->totalBufferFrames)) {

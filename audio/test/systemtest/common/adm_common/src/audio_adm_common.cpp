@@ -89,10 +89,10 @@ int32_t WriteHwParamsToBuf(struct HdfSBuf *sBuf, struct AudioPcmHwParams hwParam
     return HDF_SUCCESS;
 }
 
-int32_t AdmRenderFramePrepare(const std::string &path, char *&frame, uint32_t& numRead, uint32_t& frameSize)
+int32_t AdmRenderFramePrepare(const std::string& path, char *&frame, uint32_t& readSize, uint32_t& frameSize)
 {
     int32_t ret = -1;
-    uint32_t readSize = 0;
+    size_t numRead = 0;
     uint32_t bufferSize = 0;
 
     struct AudioSampleAttributes attrs = {};
@@ -124,18 +124,18 @@ int32_t AdmRenderFramePrepare(const std::string &path, char *&frame, uint32_t& n
     uint32_t remainingDataSize = 0;
     remainingDataSize = headInfo.dataSize;
     readSize = (remainingDataSize) > (bufferSize) ? (bufferSize) : (remainingDataSize);
-    numRead = fread(frame, 1, readSize, file);
-    if (numRead < 0) {
+    numRead = fread(frame, readSize, 1, file);
+    if (numRead < 1) {
         fclose(file);
         free(frame);
         return HDF_FAILURE;
     }
-    frameSize = numRead / (attrs.channelCount * (PcmFormatToBits(attrs.format) >> MOVE_RIGHT_NUM));
+    frameSize = readSize / (attrs.channelCount * (PcmFormatToBits(attrs.format) >> MOVE_RIGHT_NUM));
     fclose(file);
     return HDF_SUCCESS;
 }
 
-int32_t WriteFrameToSBuf(struct HdfSBuf *&sBufT, const std::string &path)
+int32_t WriteFrameToSBuf(struct HdfSBuf *&sBufT, const std::string& path)
 {
     int32_t ret = -1;
     sBufT = HdfSBufObtainDefaultSize();

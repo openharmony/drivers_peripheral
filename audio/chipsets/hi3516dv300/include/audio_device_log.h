@@ -16,6 +16,15 @@ extern "C" {
 #endif
 #endif /* __cplusplus */
 
+#ifdef __LITEOS__
+#define AUDIO_DEVICE_LOG_DEBUG(fmt, arg...) do { \
+    } while (0)
+#else
+#define AUDIO_DEVICE_LOG_DEBUG(fmt, arg...) do { \
+    HDF_LOGD("[%s][line:%d]: " fmt, __func__, __LINE__, ##arg); \
+    } while (0)
+#endif
+
 #define AUDIO_DEVICE_LOG_ERR(fmt, arg...) do { \
     HDF_LOGE("[%s][line:%d]: " fmt, __func__, __LINE__, ##arg); \
     } while (0)
@@ -26,10 +35,6 @@ extern "C" {
 
 #define AUDIO_DEVICE_LOG_WARNING(fmt, arg...) do { \
     HDF_LOGW("[%s][line:%d]: " fmt, __func__, __LINE__, ##arg); \
-    } while (0)
-
-#define AUDIO_DEVICE_LOG_DEBUG(fmt, arg...) do { \
-    HDF_LOGD("[%s][line:%d]: " fmt, __func__, __LINE__, ##arg); \
     } while (0)
 
 #ifdef __cplusplus

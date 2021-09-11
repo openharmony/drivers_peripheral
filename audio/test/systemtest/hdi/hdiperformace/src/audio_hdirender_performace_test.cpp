@@ -87,6 +87,9 @@ void AudioHdiRenderPerformaceTest::SetUpTestCase(void)
     }
     SdkInit();
 #endif
+    if (access(RESOLVED_PATH.c_str(), 0)) {
+        return;
+    }
     handleSo = dlopen(RESOLVED_PATH.c_str(), RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
@@ -144,7 +147,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerGetAllAdapters_
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.manager->GetAllAdapters(audiopara.manager, &audiopara.descs, &size);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
@@ -169,7 +172,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerLoadAdapter_Per
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
     ret = audiopara.manager->GetAllAdapters(audiopara.manager, &audiopara.descs, &size);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     audiopara.desc = &audiopara.descs[0];
     ASSERT_NE(nullptr, audiopara.desc);
 
@@ -177,7 +180,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerLoadAdapter_Per
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.manager->LoadAdapter(audiopara.manager, audiopara.desc, &audiopara.adapter);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
@@ -203,13 +206,13 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerUnLoadAdapter_P
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
     ret = audiopara.manager->GetAllAdapters(audiopara.manager, &audiopara.descs, &size);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     audiopara.desc = &audiopara.descs[0];
     ASSERT_NE(nullptr, audiopara.desc);
 
     for (int i = 0; i < COUNT; ++i) {
         ret = audiopara.manager->LoadAdapter(audiopara.manager, audiopara.desc, &audiopara.adapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
         gettimeofday(&audiopara.start, NULL);
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         gettimeofday(&audiopara.end, NULL);
@@ -239,12 +242,12 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerInitAllPorts_Pe
     ASSERT_NE(nullptr, audiopara.manager);
     ret = GetLoadAdapter(*audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.adapter->InitAllPorts(audiopara.adapter);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
@@ -272,14 +275,14 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioGetPortCapability_Perf
     ASSERT_NE(nullptr, audiopara.manager);
     ret = GetLoadAdapter(*audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.adapter->InitAllPorts(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.adapter->GetPortCapability(audiopara.adapter, &audiopara.audioPort, &audiopara.capability);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
@@ -308,19 +311,19 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioSetPassthroughMode_Per
     ASSERT_NE(nullptr, audiopara.manager);
     ret = GetLoadAdapter(*audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.adapter->InitAllPorts(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.adapter->SetPassthroughMode(audiopara.adapter, &audiopara.audioPort, audiopara.mode);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
         ret = audiopara.adapter->GetPassthroughMode(audiopara.adapter, &audiopara.audioPort, &audiopara.mode);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(PORT_PASSTHROUGH_LPCM, audiopara.mode);
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
@@ -347,16 +350,16 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioGetPassthroughMode_Per
     ASSERT_NE(nullptr, audiopara.manager);
     ret = GetLoadAdapter(*audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.adapter->InitAllPorts(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.adapter->SetPassthroughMode(audiopara.adapter, &audiopara.audioPort, audiopara.mode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.adapter->GetPassthroughMode(audiopara.adapter, &audiopara.audioPort, &audiopara.mode);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(PORT_PASSTHROUGH_LPCM, audiopara.mode);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
@@ -387,21 +390,23 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetLatency_Perfo
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
     ret = PlayAudioFile(audiopara);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
-        gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.render->GetLatency(audiopara.render, &latencyTime);
-        gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        EXPECT_LT(latencyTimeExpc, latencyTime);
-        audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
+        if (audiopara.render->GetLatency != nullptr) {
+            gettimeofday(&audiopara.start, NULL);
+            ret = audiopara.render->GetLatency(audiopara.render, &latencyTime);
+            gettimeofday(&audiopara.end, NULL);
+            EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+            EXPECT_LT(latencyTimeExpc, latencyTime);
+            audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
-        audiopara.totalTime += audiopara.delayTime;
+            audiopara.totalTime += audiopara.delayTime;
+        }
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     ret = StopAudio(audiopara);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 
 /**
@@ -423,7 +428,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioCreateRender_Performan
     ASSERT_NE(nullptr, audiopara.manager);
     ret = GetLoadAdapter(*audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     InitAttrs(audiopara.attrs);
     InitDevDesc(audiopara.devDesc, audiopara.audioPort.portId, audiopara.pins);
 
@@ -434,7 +439,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioCreateRender_Performan
         gettimeofday(&audiopara.end, NULL);
         if (ret < 0 || audiopara.render == nullptr) {
             audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
-            ASSERT_EQ(HDF_SUCCESS, ret);
+            ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
         }
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
@@ -465,7 +470,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioDestroyRender_Performa
     ASSERT_NE(nullptr, audiopara.manager);
     ret = GetLoadAdapter(*audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     InitAttrs(audiopara.attrs);
     InitDevDesc(audiopara.devDesc, audiopara.audioPort.portId, audiopara.pins);
     for (int i = 0; i < COUNT; ++i) {
@@ -473,7 +478,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioDestroyRender_Performa
                                               &audiopara.render);
         if (ret < 0 || audiopara.render == nullptr) {
             audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
-            ASSERT_EQ(HDF_SUCCESS, ret);
+            ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
         }
         gettimeofday(&audiopara.start, NULL);
         audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
@@ -505,20 +510,23 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetRenderPositio
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
     ret = PlayAudioFile(audiopara);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
-        gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.render->GetRenderPosition(audiopara.render, &audiopara.character.getframes, &audiopara.time);
-        gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
+        if (audiopara.render->GetRenderPosition != nullptr) {
+            gettimeofday(&audiopara.start, NULL);
+            ret = audiopara.render->GetRenderPosition(audiopara.render, &audiopara.character.getframes,
+                &audiopara.time);
+            gettimeofday(&audiopara.end, NULL);
+            EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+            audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
-        audiopara.totalTime += audiopara.delayTime;
+            audiopara.totalTime += audiopara.delayTime;
+        }
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     ret = StopAudio(audiopara);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 
 /**
@@ -541,9 +549,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetRenderSpeed_P
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
@@ -559,7 +567,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetRenderSpeed_P
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     ret = StopAudio(audiopara);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 
 /**
@@ -582,9 +590,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetRenderSpeed_P
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
@@ -598,7 +606,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetRenderSpeed_P
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     ret = StopAudio(audiopara);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 
 /**
@@ -621,25 +629,25 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetChannelMode_P
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->SetChannelMode(audiopara.render, mode);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
         ret = audiopara.render->GetChannelMode(audiopara.render, &mode);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(AUDIO_CHANNEL_NORMAL, mode);
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     ret = StopAudio(audiopara);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 
 /**
@@ -662,17 +670,17 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetChannelMode_P
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->SetChannelMode(audiopara.render, mode);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->GetChannelMode(audiopara.render, &mode);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(AUDIO_CHANNEL_NORMAL, mode);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
@@ -681,7 +689,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetChannelMode_P
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     ret = StopAudio(audiopara);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 
 /**
@@ -703,15 +711,15 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetFrameCount_Pe
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->attr.GetFrameCount(audiopara.render, &audiopara.character.getframecount);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
@@ -719,7 +727,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetFrameCount_Pe
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     ret = StopAudio(audiopara);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 
 /**
@@ -741,13 +749,13 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetCurrentChanne
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->attr.GetCurrentChannelId(audiopara.render, &audiopara.character.getcurrentchannelId);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
@@ -779,9 +787,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderFlush_Performanc
     for (int i = 0; i < COUNT; ++i) {
         ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                                 &audiopara.render);
-        ASSERT_EQ(HDF_SUCCESS, ret);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
         ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->control.Flush((AudioHandle)audiopara.render);
         gettimeofday(&audiopara.end, NULL);
@@ -790,7 +798,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderFlush_Performanc
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
         ret = StopAudio(audiopara);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
@@ -816,21 +824,21 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetFrameSize_Per
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     for (int i = 0; i < COUNT; ++i) {
         ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->attr.GetFrameSize(audiopara.render, &audiopara.character.getframesize);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_GT(audiopara.character.getframesize, zero);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
         ret = audiopara.render->control.Stop((AudioHandle)audiopara.render);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
@@ -859,13 +867,13 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderCheckSceneCapabi
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->scene.CheckSceneCapability(audiopara.render, &scenes, &audiopara.character.supported);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
@@ -896,20 +904,16 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSelectScene_Perf
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->scene.SelectScene(audiopara.render, &scenes);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
-        ret = AudioRenderStartAndOneFrame(audiopara.render);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        ret = audiopara.render->control.Stop((AudioHandle)audiopara.render);
-        EXPECT_EQ(HDF_SUCCESS, ret);
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
@@ -936,17 +940,17 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetMute_Performa
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->volume.SetMute(audiopara.render, false);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
         ret = audiopara.render->volume.GetMute(audiopara.render, &audiopara.character.getmute);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_FALSE(audiopara.character.getmute);
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
@@ -974,14 +978,14 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetMute_Performa
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->volume.SetMute(audiopara.render, false);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->volume.GetMute(audiopara.render, &audiopara.character.getmute);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_FALSE(audiopara.character.getmute);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
@@ -1012,18 +1016,18 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetVolume_Perfor
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->volume.SetVolume(audiopara.render, audiopara.character.setvolume);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
         ret = audiopara.render->volume.GetVolume(audiopara.render, &audiopara.character.getvolume);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(audiopara.character.setvolume, audiopara.character.getvolume);
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
@@ -1051,13 +1055,13 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetVolume_Perfor
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->volume.GetVolume(audiopara.render, &audiopara.character.getvolume);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
@@ -1087,14 +1091,14 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetGainThreshold
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->volume.GetGainThreshold(audiopara.render, &audiopara.character.gainthresholdmin,
                 &audiopara.character.gainthresholdmax);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
@@ -1124,12 +1128,12 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetGain_Performa
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->volume.GetGain(audiopara.render, &audiopara.character.getgain);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
@@ -1159,18 +1163,18 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetGain_Performa
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->volume.SetGain(audiopara.render, audiopara.character.setgain);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
         ret = audiopara.render->volume.GetGain(audiopara.render, &audiopara.character.getgain);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(audiopara.character.setgain, audiopara.character.getgain);
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
@@ -1196,29 +1200,36 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderFrame_Performanc
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-
+    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+                            &audiopara.render);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
+    if (ret < 0) {
+        audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    }
+    ret = RenderFramePrepare(audiopara.path, audiopara.frame, audiopara.requestBytes);
+    if (ret < 0) {
+        audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    }
     for (int i = 0; i < COUNT; ++i) {
-        ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                                &audiopara.render);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-        ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        ret = RenderFramePrepare(audiopara.path, audiopara.frame, audiopara.requestBytes);
-        EXPECT_EQ(HDF_SUCCESS, ret);
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->RenderFrame(audiopara.render, audiopara.frame, audiopara.requestBytes,
                                             &audiopara.replyBytes);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
-        ret = StopAudio(audiopara);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        if (audiopara.frame != nullptr) {
-            free(audiopara.frame);
-            audiopara.frame = nullptr;
-        }
+    }
+    ret = StopAudio(audiopara);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    if (audiopara.frame != nullptr) {
+        free(audiopara.frame);
+        audiopara.frame = nullptr;
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(NORMALLATENCY, audiopara.averageDelayTime);
@@ -1245,19 +1256,89 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderStart_Performanc
     for (int i = 0; i < COUNT; ++i) {
         ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                                 &audiopara.render);
-        ASSERT_EQ(HDF_SUCCESS, ret);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
         ret = StopAudio(audiopara);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
+}
+/**
+* @tc.name  the performace of AudioRenderStop
+* @tc.number  SUB_Audio_HDI_AudioRenderStop_Performance_0001
+* @tc.desc  tests the performace of AudioRenderStop interface by executing 1000 times,
+*           and calculates the delay time and average of Delay Time.
+* @tc.author: liutian
+*/
+HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderStop_Performance_0001, TestSize.Level1)
+{
+    int32_t ret = -1;
+    struct PrepareAudioPara audiopara = {
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER, .totalTime = 0
+    };
+    ASSERT_NE(nullptr, GetAudioManager);
+    audiopara.manager = GetAudioManager();
+    ASSERT_NE(nullptr, audiopara.manager);
+
+    for (int i = 0; i < COUNT; ++i) {
+        ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+                                &audiopara.render);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+        ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+        gettimeofday(&audiopara.start, NULL);
+        ret = audiopara.render->control.Stop((AudioHandle)audiopara.render);
+        gettimeofday(&audiopara.end, NULL);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+        audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
+                              (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
+        audiopara.totalTime += audiopara.delayTime;
+        audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    }
+    audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
+    EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
+}
+/**
+* @tc.name  the performace of AudioRenderSetSampleAttributes
+* @tc.number  SUB_Audio_HDI_AudioRenderSetSampleAttributes_Performance_0001
+* @tc.desc  tests the performace of AudioRenderSetSampleAttributes interface by executing 1000 times,
+*           and calculates the delay time and average of Delay Time.
+* @tc.author: liutian
+*/
+HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetSampleAttributes_Performance_0001, TestSize.Level1)
+{
+    int32_t ret = -1;
+    struct PrepareAudioPara audiopara = {
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER, .totalTime = 0
+    };
+    ASSERT_NE(nullptr, GetAudioManager);
+    audiopara.manager = GetAudioManager();
+    ASSERT_NE(nullptr, audiopara.manager);
+    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+                            &audiopara.render);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    InitAttrs(audiopara.attrs);
+    for (int i = 0; i < COUNT; ++i) {
+        gettimeofday(&audiopara.start, NULL);
+        ret = audiopara.render->attr.SetSampleAttributes(audiopara.render, &audiopara.attrs);
+        gettimeofday(&audiopara.end, NULL);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+        audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
+                              (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
+        audiopara.totalTime += audiopara.delayTime;
+    }
+    audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
+    EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
+    audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
+    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
 }
 /**
 * @tc.name  the performace of AudioRenderPause
@@ -1278,16 +1359,16 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderPause_Performanc
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->control.Pause((AudioHandle)audiopara.render);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         ret = audiopara.render->control.Resume((AudioHandle)audiopara.render);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
@@ -1295,7 +1376,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderPause_Performanc
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     ret = StopAudio(audiopara);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 
 /**
@@ -1317,16 +1398,16 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderResume_Performan
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         ret = audiopara.render->control.Pause((AudioHandle)audiopara.render);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->control.Resume((AudioHandle)audiopara.render);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
@@ -1334,7 +1415,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderResume_Performan
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     ret = StopAudio(audiopara);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
 * @tc.name  the performace of AudioRenderGetSampleAttributes
@@ -1355,14 +1436,14 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetSampleAttribu
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     InitAttrs(audiopara.attrs);
 
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->attr.GetSampleAttributes(audiopara.render, &audiopara.attrs);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
@@ -1371,5 +1452,186 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetSampleAttribu
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+}
+/**
+* @tc.name  the performace of AudioRenderReqMmapBuffer
+* @tc.number  SUB_Audio_HDI_AudioRenderReqMmapBuffer_Performance_0001
+* @tc.desc  tests the performace of AudioRenderReqMmapBuffer interface by executing 1000 times,
+*           and calculates the delay time and average of Delay Time.
+* @tc.author: liutian
+*/
+HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderReqMmapBuffer_Performance_0001, TestSize.Level1)
+{
+    int32_t ret = -1;
+    bool isRender = true;
+    uint32_t reqSize = 0;
+    struct AudioMmapBufferDescripter desc = {};
+    struct PrepareAudioPara audiopara = {
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER, .totalTime = 0
+    };
+    ASSERT_NE(nullptr, GetAudioManager);
+    audiopara.manager = GetAudioManager();
+    ASSERT_NE(nullptr, audiopara.manager);
+
+    for (int i = 0; i < COUNT; ++i) {
+        audiopara.render = nullptr;
+        FILE *fp = fopen(LOW_LATENCY_AUDIO_FILE.c_str(), "rb+");
+        ASSERT_NE(nullptr, fp);
+        ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+                                &audiopara.render);
+        if (ret < 0 || audiopara.render == nullptr) {
+            fclose(fp);
+            ASSERT_EQ(HDF_SUCCESS, ret);
+            ASSERT_EQ(nullptr, audiopara.render);
+        }
+        InitAttrs(audiopara.attrs);
+        audiopara.attrs.startThreshold = 0;
+        ret = audiopara.render->attr.SetSampleAttributes(audiopara.render, &(audiopara.attrs));
+        ret = InitMmapDesc(fp, desc, reqSize, isRender);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
+        gettimeofday(&audiopara.start, NULL);
+        ret = audiopara.render->attr.ReqMmapBuffer((AudioHandle)audiopara.render, reqSize, &desc);
+        gettimeofday(&audiopara.end, NULL);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        if (ret == 0) {
+            munmap(desc.memoryAddress, reqSize);
+        }
+        audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
+                              (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
+        audiopara.totalTime += audiopara.delayTime;
+        ret = audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+        audiopara.adapter = nullptr;
+        fclose(fp);
+        usleep(500);
+    }
+    audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
+    EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
+}
+
+/**
+* @tc.name  the performace of AudioRenderGetMmapPosition
+* @tc.number  SUB_Audio_HDI_AudioRenderGetMmapPosition_Performance_0001
+* @tc.desc  tests the performace of AudioRenderRenderGetMmapPosition interface by executing 1000 times,
+*           and calculates the delay time and average of Delay Time.
+* @tc.author: liutian
+*/
+HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetMmapPosition_Performance_0001, TestSize.Level1)
+{
+    int32_t ret = -1;
+    uint64_t framesRendering = 0;
+    int64_t timeExp = 0;
+    struct PrepareAudioPara audiopara = {
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .path = LOW_LATENCY_AUDIO_FILE.c_str(), .totalTime = 0
+    };
+    ASSERT_NE(nullptr, GetAudioManager);
+    audiopara.manager = GetAudioManager();
+    ASSERT_NE(nullptr, audiopara.manager);
+    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+                            &audiopara.render);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+
+    ret = PlayMapAudioFile(audiopara);
+    if (ret != 0) {
+        audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
+        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    }
+    for (int i = 0; i < COUNT; ++i) {
+        gettimeofday(&audiopara.start, NULL);
+        ret = audiopara.render->attr.GetMmapPosition(audiopara.render, &framesRendering, &(audiopara.time));
+        gettimeofday(&audiopara.end, NULL);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+        EXPECT_GT((audiopara.time.tvSec) * SECTONSEC + (audiopara.time.tvNSec), timeExp);
+        EXPECT_GT(framesRendering, INITIAL_VALUE);
+        audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
+                              (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
+        audiopara.totalTime += audiopara.delayTime;
+    }
+    audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
+    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
+    EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
+}
+
+/**
+* @tc.name  the performace of AudioRenderSetExtraParams
+* @tc.number  SUB_Audio_HDI_AudioRenderSetExtraParams_Performance_0001
+* @tc.desc  tests the performace of AudioRenderSetExtraParams interface by executing 1000 times,
+*           and calculates the delay time and average of Delay Time.
+* @tc.author: liutian
+*/
+HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetExtraParams_Performance_0001, TestSize.Level1)
+{
+    int32_t ret = -1;
+    char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
+    struct PrepareAudioPara audiopara = {
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+    };
+    ASSERT_NE(nullptr, GetAudioManager);
+    audiopara.manager = GetAudioManager();
+    ASSERT_NE(nullptr, audiopara.manager);
+    ret = AudioCreateStartRender(*audiopara.manager, &audiopara.render, &audiopara.adapter, ADAPTER_NAME_USB);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+
+    for (int i = 0; i < COUNT; ++i) {
+        gettimeofday(&audiopara.start, NULL);
+        ret = audiopara.render->attr.SetExtraParams((AudioHandle)audiopara.render, keyValueList);
+        gettimeofday(&audiopara.end, NULL);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+        audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
+                              (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
+        audiopara.totalTime += audiopara.delayTime;
+    }
+    audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
+    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
+    EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
+}
+
+/**
+* @tc.name  the performace of AudioRenderGetExtraParams
+* @tc.number  SUB_Audio_HDI_AudioRenderGetExtraParams_Performance_0001
+* @tc.desc  tests the performace of AudioRenderGetExtraParams interface by executing 1000 times,
+*           and calculates the delay time and average of Delay Time.
+* @tc.author: liutian
+*/
+HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetExtraParams_Performance_0001, TestSize.Level1)
+{
+    int32_t ret = -1;
+    struct PrepareAudioPara audiopara = {
+        .portType = PORT_OUT, .self = this, .pins = PIN_OUT_SPEAKER, .path = AUDIO_FILE.c_str()
+    };
+    char keyValueList[] = "attr-format=24;attr-frame-count=4096;";
+    char keyValueListExp[] = "attr-route=0;attr-format=24;attr-channels=2;attr-frame-count=4096;\
+attr-sampling-rate=48000";
+    int32_t listLenth = 256;
+    ASSERT_NE(nullptr, GetAudioManager);
+    audiopara.manager = GetAudioManager();
+    ASSERT_NE(nullptr, audiopara.manager);
+
+    ret = AudioCreateStartRender(*audiopara.manager, &audiopara.render, &audiopara.adapter, ADAPTER_NAME_USB);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    ret = audiopara.render->attr.SetExtraParams((AudioHandle)audiopara.render, keyValueList);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+
+    for (int i = 0; i < COUNT; ++i) {
+        char keyValueListValue[256] = {};
+        gettimeofday(&audiopara.start, NULL);
+        ret = audiopara.render->attr.GetExtraParams((AudioHandle)audiopara.render, keyValueListValue, listLenth);
+        gettimeofday(&audiopara.end, NULL);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+        EXPECT_STREQ(keyValueListExp, keyValueListValue);
+        audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
+                              (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
+        audiopara.totalTime += audiopara.delayTime;
+    }
+    audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
+    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
+    EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 }

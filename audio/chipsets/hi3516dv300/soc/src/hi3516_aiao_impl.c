@@ -14,6 +14,7 @@
 #include "osal_io.h"
 
 #define HDF_LOG_TAG hi3516_aiao_impl
+#define MMAP_RENDER_HOLD 1024
 
 void *g_regAiaoBase = NULL;   // AIAO Reg Base Addr
 
@@ -497,6 +498,35 @@ int AopHalSetTransSize(unsigned int chnId, unsigned int value)
     AiaoHalWriteReg(AopTransSizeReg(chnId), unTmp.u32);
 
     return HDF_SUCCESS;
+}
+
+bool AopPlayIsCompleted(struct PlatformHost *platformHost, uint32_t totalBufferFrames, uint32_t hold)
+{
+    unsigned int rptr;
+    unsigned int wptr;
+    unsigned int temp;
+    const int rightShift = 3;
+    unsigned int chnId = platformHost->renderBufInfo.chnId;
+    uint32_t cirBufSize = platformHost->renderBufInfo.cirBufSize;
+    uint32_t frameSize = platformHost->pcmInfo.channels * (platformHost->pcmInfo.bitWidth >> rightShift);
+    uint32_t totalSize = totalBufferFrames * frameSize;
+
+    rptr = AiaoHalReadReg(AopBuffRptrReg(chnId));
+    wptr = AiaoHalReadReg(AopBuffWptrReg(chnId));
+    if (wptr >= rptr) {
+        temp = wptr - rptr;
+        if (temp <= hold) {
+            return true;
+        }
+    } else {
+        if (totalSize < cirBufSize) {
+            return true;
+        }
+        if (((cirBufSize - rptr) + wptr) <= hold) {
+            return true;
+        }
+    }
+    return false;
 }
 
 int AopHalSetTxStart(unsigned int chnId, bool en)

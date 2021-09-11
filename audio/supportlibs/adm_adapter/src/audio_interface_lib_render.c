@@ -129,7 +129,8 @@ int32_t AudioCtlRenderGetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwRe
     return HDF_SUCCESS;
 }
 
-int32_t AudioCtlRenderSetVolume(const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
+int32_t AudioCtlRenderSetVolume(const struct DevHandle *handle, int cmdId,
+    const struct AudioHwRenderParam *handleData)
 {
     int32_t ret;
 
@@ -196,6 +197,7 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue elemValue;
+    memset_s(&elemValue, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
     if (!HdfSbufReadInt32(reply, &elemValue.value[0])) {
         LOG_FUN_ERR("RenderGetVolume Failed to Get Volume sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
@@ -314,7 +316,8 @@ int32_t AudioCtlRenderSetMuteBuf(struct HdfSBuf *sBuf, const struct AudioHwRende
     return HDF_SUCCESS;
 }
 
-int32_t AudioCtlRenderSetMuteStu(const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
+int32_t AudioCtlRenderSetMuteStu(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData)
 {
     int32_t ret;
 
@@ -416,6 +419,7 @@ int32_t AudioCtlRenderGetMuteStu(const struct DevHandle *handle, int cmdId, stru
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue muteValueStu;
+    memset_s(&muteValueStu, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
     if (!HdfSbufReadInt32(reply, &muteValueStu.value[0])) {
         LOG_FUN_ERR("RenderGetMuteStu Failed to Get Volume sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
@@ -564,6 +568,7 @@ int32_t AudioCtlRenderGetGainStu(const struct DevHandle *handle, int cmdId, stru
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue gainValueStu;
+    memset_s(&gainValueStu, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
     if (!HdfSbufReadInt32(reply, &gainValueStu.value[0])) {
         LOG_FUN_ERR("Failed to Get Gain sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
@@ -758,6 +763,7 @@ int32_t AudioCtlRenderSceneGetGainThreshold(const struct DevHandle *handle,
         return HDF_FAILURE;
     }
     struct AudioCtrlElemInfo gainThreshold;
+    memset_s(&gainThreshold, sizeof(struct AudioCtrlElemInfo), 0, sizeof(struct AudioCtrlElemInfo));
     if (!HdfSbufReadInt32(reply, &gainThreshold.type)) {
         LOG_FUN_ERR("RenderSceneGetGainThreshold Failed to Get Volume sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
@@ -952,6 +958,7 @@ int32_t AudioCtlRenderGetChannelMode(const struct DevHandle *handle, int cmdId, 
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue elemValue;
+    memset_s(&elemValue, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
     if (!HdfSbufReadInt32(reply, &elemValue.value[0])) {
         LOG_FUN_ERR("Failed to Get ChannelMode sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
@@ -1007,7 +1014,7 @@ int32_t AudioCtlRenderChangeInAcodec(struct HdfIoService *service,
 }
 
 int32_t AudioCtlRenderSetAcodecMode(const struct DevHandle *handle,
-    const int cmdId, const struct AudioHwRenderParam *handleData)
+    int cmdId, const struct AudioHwRenderParam *handleData)
 {
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("paras is NULL!");
@@ -1058,7 +1065,7 @@ int32_t AudioCtlRenderSetAcodecMode(const struct DevHandle *handle,
     return HDF_SUCCESS;
 }
 
-int32_t AudioInterfaceLibCtlRender(struct DevHandle *handle, const int cmdId, struct AudioHwRenderParam *handleData)
+int32_t AudioInterfaceLibCtlRender(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
 {
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("paras is NULL!");
@@ -1156,14 +1163,15 @@ int32_t FrameSbufWriteBuffer(struct HdfSBuf *sBuf, const struct AudioHwRenderPar
     if (!HdfSbufWriteUint32(sBuf, (uint32_t)(handleData->frameRenderMode.bufferFrameSize))) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteBuffer(sBuf, handleData->frameRenderMode.buffer, handleData->frameRenderMode.bufferSize)) {
+    if (!HdfSbufWriteBuffer(sBuf, handleData->frameRenderMode.buffer,
+        (uint32_t)handleData->frameRenderMode.bufferSize)) {
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
 
 int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
-    const int cmdId, const struct AudioHwRenderParam *handleData)
+    int cmdId, const struct AudioHwRenderParam *handleData)
 {
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("The parameter is empty");
@@ -1197,7 +1205,7 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
 }
 
 int32_t AudioOutputRenderWriteFrame(struct HdfIoService *service,
-    const int cmdId, struct HdfSBuf *sBuf, struct HdfSBuf *reply)
+    int cmdId, struct HdfSBuf *sBuf, struct HdfSBuf *reply)
 {
     int32_t ret;
     int32_t tryNum = 50; // try send sBuf 50 count
@@ -1238,13 +1246,13 @@ int32_t AudioOutputRenderWriteFrame(struct HdfIoService *service,
 }
 
 int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
-    const int cmdId, const struct AudioHwRenderParam *handleData)
+    int cmdId, const struct AudioHwRenderParam *handleData)
 {
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         return HDF_FAILURE;
     }
     struct HdfIoService *service = NULL;
-    size_t sbufSize = handleData->frameRenderMode.bufferSize + AUDIO_SBUF_EXTEND;
+    size_t sbufSize = (size_t)handleData->frameRenderMode.bufferSize + AUDIO_SBUF_EXTEND;
     struct HdfSBuf *sBuf = HdfSBufTypedObtainCapacity(SBUF_RAW, sbufSize);
     if (sBuf == NULL) {
         LOG_FUN_ERR("Get sBuf Fail");
@@ -1274,8 +1282,8 @@ int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
     return HDF_SUCCESS;
 }
 
-int32_t AudioOutputRenderStartPrepare(struct DevHandle *handle,
-    const int cmdId, const struct AudioHwRenderParam *handleData)
+int32_t AudioOutputRenderStartPrepare(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData)
 {
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         return HDF_FAILURE;
@@ -1296,7 +1304,7 @@ int32_t AudioOutputRenderStartPrepare(struct DevHandle *handle,
 }
 
 int32_t AudioOutputRenderStop(const struct DevHandle *handle,
-    const int cmdId, const struct AudioHwRenderParam *handleData)
+    int cmdId, const struct AudioHwRenderParam *handleData)
 {
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         return HDF_FAILURE;
@@ -1315,12 +1323,12 @@ int32_t AudioOutputRenderStop(const struct DevHandle *handle,
     return HDF_SUCCESS;
 }
 
-int32_t MmapDescWriteBuffer(struct HdfSBuf *sBuf, struct AudioHwRenderParam *handleData)
+int32_t MmapDescWriteBuffer(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData)
 {
     if (sBuf == NULL || handleData == NULL) {
         return HDF_FAILURE;
     }
-    uint64_t mmapAddr = (uint64_t)(handleData->frameRenderMode.mmapBufDesc.memoryAddress);
+    uint64_t mmapAddr = (uint64_t)(uintptr_t)(handleData->frameRenderMode.mmapBufDesc.memoryAddress);
     if (!HdfSbufWriteUint64(sBuf, mmapAddr)) {
         return HDF_FAILURE;
     }
@@ -1342,7 +1350,8 @@ int32_t MmapDescWriteBuffer(struct HdfSBuf *sBuf, struct AudioHwRenderParam *han
     return HDF_SUCCESS;
 }
 
-int32_t AudioOutputRenderReqMmapBuffer(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
+int32_t AudioOutputRenderReqMmapBuffer(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData)
 {
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         return HDF_FAILURE;
@@ -1372,7 +1381,8 @@ int32_t AudioOutputRenderReqMmapBuffer(struct DevHandle *handle, int cmdId, stru
     return HDF_SUCCESS;
 }
 
-int32_t AudioOutputRenderGetMmapPosition(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
+int32_t AudioOutputRenderGetMmapPosition(const struct DevHandle *handle,
+    int cmdId, struct AudioHwRenderParam *handleData)
 {
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         return HDF_FAILURE;
@@ -1406,7 +1416,8 @@ int32_t AudioOutputRenderGetMmapPosition(struct DevHandle *handle, int cmdId, st
     return HDF_SUCCESS;
 }
 
-int32_t AudioInterfaceLibOutputRender(struct DevHandle *handle, const int cmdId, struct AudioHwRenderParam *handleData)
+int32_t AudioInterfaceLibOutputRender(const struct DevHandle *handle,
+    int cmdId, struct AudioHwRenderParam *handleData)
 {
     if (handle == NULL) {
         LOG_FUN_ERR("Input Render handle is NULL!");
@@ -1510,7 +1521,8 @@ void AudioCloseServiceRender(const struct DevHandle *handle)
     return;
 }
 
-int32_t AudioInterfaceLibModeRender(struct DevHandle *handle, struct AudioHwRenderParam *handleData, int cmdId)
+int32_t AudioInterfaceLibModeRender(const struct DevHandle *handle,
+    struct AudioHwRenderParam *handleData, int cmdId)
 {
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("paras is NULL!");

@@ -134,10 +134,10 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_0001, Te
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = render->volume.GetGainThreshold((AudioHandle)render, &min, &max);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(min, GAIN_MIN);
     EXPECT_EQ(max, GAIN_MAX);
 
@@ -161,10 +161,10 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_0002, Te
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = render->volume.GetGainThreshold((AudioHandle)renderNull, &min, &max);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
@@ -185,10 +185,10 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_0003, Te
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = render->volume.GetGainThreshold((AudioHandle)render, minNull, &max);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
@@ -209,9 +209,9 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_0004, Te
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGainThreshold(render, &min, maxNull);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
@@ -232,9 +232,9 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderSetGain_0001, TestSize.Le
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGainThreshold((AudioHandle)render, &min, &max);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     float gain = 10.8;
     float gainMax = max;
     float gainMin = min;
@@ -242,21 +242,21 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderSetGain_0001, TestSize.Le
     float gainMaxExpc = max;
     float gainMinExpc = min;
     ret = render->volume.SetGain(render, gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGain(render, &gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(gainExpc, gain);
 
     ret = render->volume.SetGain(render, gainMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGain(render, &gainMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(gainMaxExpc, gainMax);
 
     ret = render->volume.SetGain(render, gainMin);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGain(render, &gainMin);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(gainMinExpc, gainMin);
 
     adapter->DestroyRender(adapter, render);
@@ -278,17 +278,17 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderSetGain_0002, TestSize.Le
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGainThreshold((AudioHandle)render, &min, &max);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     float gainOne = max+1;
     float gainSec = min-1;
     ret = render->volume.SetGain(render, gainOne);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 
     ret = render->volume.SetGain(render, gainSec);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
@@ -308,10 +308,10 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderSetGain_0003, TestSize.Le
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = render->volume.SetGain(render, gain);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
@@ -332,10 +332,10 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderSetGain_0004, TestSize.Le
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = render->volume.SetGain((AudioHandle)renderNull, gain);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
@@ -356,16 +356,16 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGain_0001, TestSize.Le
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGainThreshold((AudioHandle)render, &min, &max);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     float gain = min+1;
     float gainValue = min+1;
     ret = render->volume.SetGain(render, gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGain(render, &gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(gainValue, gain);
 
     render->control.Stop((AudioHandle)render);
@@ -388,10 +388,10 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGain_0002, TestSize.Le
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = render->volume.GetGain((AudioHandle)renderNull, &gain);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -411,12 +411,12 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGain_0003, TestSize.Le
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = render->volume.SetGain(render, gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGain(render, &gain);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(gain, gainOne);
 
     adapter->DestroyRender(adapter, render);
@@ -437,9 +437,9 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGain_0004, TestSize.Le
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGain((AudioHandle)render, gainNull);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -459,23 +459,23 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderSetMute_0001, TestSi
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = render->volume.SetMute(render, muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetMute(render, &muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(false, muteFalse);
 
     ret = render->volume.SetMute(render, muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetMute(render, &muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(true, muteTrue);
 
     muteTrue = false;
     ret = render->volume.SetMute(render, muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_FALSE(muteTrue);
 
     adapter->DestroyRender(adapter, render);
@@ -497,9 +497,9 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderSetMute_0002, TestSi
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.SetMute(renderNull, mute);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -518,12 +518,12 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderSetMute_0003, TestSi
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = render->volume.SetMute(render, muteValue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetMute(render, &muteValue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(true, muteValue);
 
     adapter->DestroyRender(adapter, render);
@@ -546,17 +546,17 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderGetMute_0001, TestSi
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = render->volume.GetMute(render, &muteTrue);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(muteTrue, defaultmute);
 
     ret = render->volume.SetMute(render, muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = render->volume.GetMute(render, &muteFalse);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_FALSE(muteFalse);
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
@@ -578,15 +578,15 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderGetMute_0002, TestSi
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetMute(renderNull, &muteTrue);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     ret = render->volume.GetMute(renderNull, &muteFalse);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     ret = render->volume.GetMute(render, nullptr);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -612,27 +612,27 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderSetVolume_0001, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = render->volume.SetVolume(render, volumeInit);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetVolume(render, &volumeInit);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(volumeInitExpc, volumeInit);
     ret = render->volume.SetVolume(render, volumeLow);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetVolume(render, &volumeLow);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(volumeLowExpc, volumeLow);
     ret = render->volume.SetVolume(render, volumeMid);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetVolume(render, &volumeMid);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(volumeMidExpc, volumeMid);
     ret = render->volume.SetVolume(render, volumeHigh);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetVolume(render, &volumeHigh);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(volumeHighExpc, volumeHigh);
 
     adapter->DestroyRender(adapter, render);
@@ -658,24 +658,24 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderSetVolume_0002, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.SetVolume(render, volumeMin);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetVolume(render, &volumeMin);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(volumeMinExpc, volumeMin);
 
     ret = render->volume.SetVolume(render, volumeMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetVolume(render, &volumeMax);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(volumeMaxExpc, volumeMax);
 
     ret = render->volume.SetVolume(render, volumeMinBoundary);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     ret = render->volume.SetVolume(render, volumeMaxBoundary);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
@@ -696,9 +696,9 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderSetVolume_0003, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.SetVolume(renderNull, volume);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
@@ -719,12 +719,12 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderGetVolume_001, TestS
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = render->volume.SetVolume(render, volume);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetVolume(render, &volume);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(volumeDefault, volume);
 
     adapter->DestroyRender(adapter, render);
@@ -746,16 +746,16 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderGetVolume_002, TestS
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = render->volume.SetVolume(render, volume);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetVolume(render, &volume);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(defaultVolume, volume);
 
     ret = render->control.Stop((AudioHandle)render);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
 }
@@ -775,9 +775,9 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderGetVolume_0003, Test
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager manager = *GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetVolume(renderNull, &volume);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
     adapter->DestroyRender(adapter, render);
     manager.UnloadAdapter(&manager, adapter);
 }
