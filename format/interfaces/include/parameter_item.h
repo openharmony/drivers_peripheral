@@ -53,7 +53,8 @@ typedef enum {
     KEY_TYPE_LANGUAGE     = 0x6c616e67, /**< Track language, which is usually the language of audio and subtitles.
                                          * The value type is <b>cstring</b>.
                                          */
-    KEY_TYPE_PRE_CACHE    = 0x70726361  /**< Precapture cache size. The value type is <b>int</b> */
+    KEY_TYPE_PRE_CACHE    = 0x70726361,  /**< Precapture cache size. The value type is <b>int</b> */
+    KEY_TYPE_SET_SYNC_BUFFER_MSEC = 0x73796e62 /**< Set sync buffer size, uint ms. The value type is <b>int</b> */
 } KeyType;
 
 /**
