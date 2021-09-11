@@ -477,6 +477,7 @@ typedef enum {
     MUXER_INFO_FILE_SPLIT_FINISHED,          /**< Manual file split is completed. */
     MUXER_INFO_FILE_START_TIME_MS,           /**< Start time of the captured file */
     MUXER_INFO_NEXT_FILE_FD_NOT_SET,         /**< Next file fd is needed but not set */
+    MUXER_INFO_NO_FRAME_DATA,                /**< There is No frame data to send to recorder */
 
     DEMUXER_INFO_PREPARED = 10000,           /**< The prepare function is asynchronously executed. This information
                                               * is reported after the execution is complete.
