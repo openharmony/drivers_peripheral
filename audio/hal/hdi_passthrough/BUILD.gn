@@ -148,6 +148,18 @@ if (defined(ohos_lite)) {
 
     public_configs = [ ":hdi_audio_config" ]
 
+    cflags = []
+    ldflags = []
+
+    if (enable_coverage) {
+      cflags = [
+        "-ftest-coverage",
+        "-fprofile-arcs",
+      ]
+
+      ldflags = [ "--coverage" ]
+    }
+
     subsystem_name = "hdf"
   }
 }

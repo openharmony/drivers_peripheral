@@ -97,7 +97,7 @@ enum AudioHdiServerCmdId {
     AUDIO_HDI_CAPTURE_DEV_DUMP
 };
 
-typedef int32_t (*AudioAllfunc)(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply);
+typedef int32_t (*AudioAllfunc)(const struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply);
 struct HdiServiceDispatchCmdHandleList {
     enum AudioHdiServerCmdId cmd;
     AudioAllfunc func;

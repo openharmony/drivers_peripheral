@@ -86,9 +86,9 @@ struct AudioXferi {
 
 int32_t WriteHwParamsToBuf(struct HdfSBuf *sBuf, struct AudioPcmHwParams hwParams);
 
-int32_t AdmRenderFramePrepare(const std::string &path, char *&frame, unsigned long& numRead, unsigned long& frameSize);
+int32_t AdmRenderFramePrepare(const std::string& path, char *&frame, unsigned long& numRead, unsigned long& frameSize);
 
-int32_t WriteFrameToSBuf(struct HdfSBuf *&sBufT, const std::string &path);
+int32_t WriteFrameToSBuf(struct HdfSBuf *&sBufT, const std::string& path);
 
 int32_t ObtainBuf(struct HdfSBuf *&readBuf, struct HdfSBuf *&readReply);
 

@@ -46,7 +46,7 @@ struct AudioProxyManager {
     int32_t (*GetAllAdapters)(struct AudioProxyManager *manager, struct AudioAdapterDescriptor **descs, int32_t *size);
     int32_t (*LoadAdapter)(struct AudioProxyManager *manager, const struct AudioAdapterDescriptor *desc,
                            struct AudioAdapter **adapter);
-    void (*UnloadAdapter)(struct AudioProxyManager *manager, struct AudioAdapter *adapter);
+    void (*UnloadAdapter)(const struct AudioProxyManager *manager, const struct AudioAdapter *adapter);
 };
 
 int32_t AudioProxyManagerGetAllAdapters(struct AudioProxyManager *manager,
@@ -54,7 +54,7 @@ int32_t AudioProxyManagerGetAllAdapters(struct AudioProxyManager *manager,
                                         int *size);
 int32_t AudioProxyManagerLoadAdapter(struct AudioProxyManager *manager, const struct AudioAdapterDescriptor *desc,
                                      struct AudioAdapter **adapter);
-void AudioProxyManagerUnloadAdapter(struct AudioProxyManager *manager, struct AudioAdapter *adapter);
+void AudioProxyManagerUnloadAdapter(const struct AudioProxyManager *manager, const struct AudioAdapter *adapter);
 
 struct AudioProxyManager *GetAudioProxyManagerFuncs(void);
 

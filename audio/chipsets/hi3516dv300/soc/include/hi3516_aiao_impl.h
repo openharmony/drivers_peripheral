@@ -11,6 +11,7 @@
 
 #include <linux/types.h>
 #include "hi3516_common.h"
+#include "audio_platform_base.h"
 /* AIO  base addres */
 #define AIAO_REG_BASE            0x113b0000
 #define AIO_CLK_SEL_SEPARATE     0x0
@@ -156,6 +157,26 @@ typedef enum {
     RX_CH_NUM3  = 3,
     RX_CH_NUM4  = 4,
 } RxChNum;
+
+typedef enum {
+    HOLD_NUM1   = 300,
+    HOLD_NUM2   = 600,
+    HOLD_NUM3 = 900,
+    HOLD_NUM4 = 1024,
+} HoldNum;
+
+typedef enum {
+    DELAY_TIME1 = 1,
+    DELAY_TIME2 = 2,
+    DELAY_TIME3 = 3,
+    DELAY_TIME4 = 5,
+} DelayTime;
+
+typedef enum {
+    BUFFER_SIZE1 = 1024,
+    BUFFER_SIZE2 = 2048,
+    BUFFER_SIZE3 = 4096,
+} BufferSize;
 
 typedef enum {
     HI_AUDIO_CLK_SELECT_BASE       = 0,  /* Audio base clk. */
@@ -484,5 +505,6 @@ int32_t AipSetAttr(unsigned int chnId, unsigned int channelCnt, unsigned int bit
 void ShowAllAiaoRegister(void);
 int32_t AiaoDeviceInit(unsigned int chnId);
 int32_t I2sCrgCfgInit(unsigned int chnId);
+bool AopPlayIsCompleted(struct PlatformHost *platformHost, uint32_t totalBufferFrames, uint32_t hold);
 
 #endif // __HI3516_ACODEC_H__

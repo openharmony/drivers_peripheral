@@ -31,25 +31,25 @@ int32_t AudioProxyManagerGetAllAdapters(struct AudioProxyManager *manager,
     struct HdfSBuf *reply = NULL;
     int32_t ret;
     if (manager == NULL || manager->remote == NULL || descs == NULL || size == NULL) {
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = AudioAdaptersForUser(descs, size);
     if (ret < 0) {
         AudioProxyBufReplyRecycle(data, reply);
         LOG_FUN_ERR("AudioAdaptersForUser FAIL!");
-        return ret;
+        return AUDIO_HAL_ERR_NOTREADY; // Failed to read sound card configuration file
     }
     ret = AudioProxyDispatchCall(manager->remote, AUDIO_HDI_MGR_GET_ALL_ADAPTER, data, reply);
-    if (ret != HDF_SUCCESS) {
+    if (ret != AUDIO_HAL_SUCCESS) {
         AudioProxyBufReplyRecycle(data, reply);
         LOG_FUN_ERR("Failed to send service call!");
         return ret;
     }
     AudioProxyBufReplyRecycle(data, reply);
-    return HDF_SUCCESS;
+    return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioProxyManagerLoadAdapter(struct AudioProxyManager *manager, const struct AudioAdapterDescriptor *desc,
@@ -61,29 +61,29 @@ int32_t AudioProxyManagerLoadAdapter(struct AudioProxyManager *manager, const st
 
     if (manager == NULL || manager->remote == NULL || desc == NULL ||
         desc->adapterName == NULL || desc->ports == NULL || adapter == NULL) {
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (AudioAdapterExist(desc->adapterName)) {
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     // adapterName
     if (!HdfSbufWriteString(data, desc->adapterName)) {
         AudioProxyBufReplyRecycle(data, reply);
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     // dir
     uint32_t tempDir = (uint32_t)desc->ports->dir;
     if (!HdfSbufWriteUint32(data, tempDir)) {
         AudioProxyBufReplyRecycle(data, reply);
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)calloc(1, sizeof(struct AudioHwAdapter));
     if (hwAdapter == NULL) {
         AudioProxyBufReplyRecycle(data, reply);
-        return HDF_FAILURE;
+        return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     int32_t ret;
     ret = AudioProxyDispatchCall(manager->remote, AUDIO_HDI_MGR_LOAD_ADAPTER, data, reply);
@@ -93,7 +93,6 @@ int32_t AudioProxyManagerLoadAdapter(struct AudioProxyManager *manager, const st
         AudioMemFree((void **)&hwAdapter);
         return ret;
     }
-    /* check return result from server first */
     hwAdapter->common.InitAllPorts = AudioProxyAdapterInitAllPorts;
     hwAdapter->common.CreateRender = AudioProxyAdapterCreateRender;
     hwAdapter->common.DestroyRender = AudioProxyAdapterDestroyRender;
@@ -107,10 +106,10 @@ int32_t AudioProxyManagerLoadAdapter(struct AudioProxyManager *manager, const st
     *adapter = &hwAdapter->common;
     AudioProxyBufReplyRecycle(data, reply);
     LOG_FUN_INFO();
-    return HDF_SUCCESS;
+    return AUDIO_HAL_SUCCESS;
 }
 
-void AudioProxyManagerUnloadAdapter(struct AudioProxyManager *manager, struct AudioAdapter *adapter)
+void AudioProxyManagerUnloadAdapter(const struct AudioProxyManager *manager, const struct AudioAdapter *adapter)
 {
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
@@ -131,7 +130,7 @@ void AudioProxyManagerUnloadAdapter(struct AudioProxyManager *manager, struct Au
         }
         AudioMemFree((void **)&hwAdapter->portCapabilitys);
     }
-    if (AudioProxyPreprocessSBuf(&data, &reply) == HDF_SUCCESS) {
+    if (AudioProxyPreprocessSBuf(&data, &reply) == AUDIO_HAL_SUCCESS) {
         adapterName = hwAdapter->adapterDescriptor.adapterName;
         if (HdfSbufWriteString(data, adapterName)) {
             int32_t ret = AudioProxyDispatchCall(manager->remote, AUDIO_HDI_MGR_UNLOAD_ADAPTER, data, reply);

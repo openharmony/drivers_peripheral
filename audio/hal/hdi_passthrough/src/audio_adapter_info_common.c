@@ -166,7 +166,7 @@ int32_t AudioAdapterExist(const char *adapterName)
 }
 
 static int32_t AudioAdapterPortSync(struct AudioPort *outPorts,
-    struct AudioPort *desPorts, uint32_t portNum)
+    const struct AudioPort *desPorts, uint32_t portNum)
 {
     uint32_t index;
     int32_t ret;
@@ -261,7 +261,7 @@ static void AudioAdapterJudegReleaseDescs(const struct AudioAdapterDescriptor *d
     }
 }
 
-static void AudioAdapterReleaseDescs(struct AudioAdapterDescriptor *descs, int32_t adapterNum)
+static void AudioAdapterReleaseDescs(const struct AudioAdapterDescriptor *descs, int32_t adapterNum)
 {
     int32_t adapterIdx = 0;
 
@@ -281,7 +281,7 @@ static void AudioAdapterReleaseDescs(struct AudioAdapterDescriptor *descs, int32
     AudioMemFree((void **)&descs);
 }
 
-static int32_t AudioAdapterGetDir(char *dir)
+static int32_t AudioAdapterGetDir(const char *dir)
 {
     if (dir == NULL) {
         return HDF_FAILURE;
@@ -297,7 +297,7 @@ static int32_t AudioAdapterGetDir(char *dir)
     }
 }
 
-static int32_t AudioAdaptersGetArraySize(cJSON *cJsonObj, int *size)
+static int32_t AudioAdaptersGetArraySize(const cJSON *cJsonObj, int *size)
 {
     int adapterArraySize;
 
@@ -319,7 +319,7 @@ static int32_t AudioAdaptersGetArraySize(cJSON *cJsonObj, int *size)
     return HDF_SUCCESS;
 }
 
-static int32_t AudioAdapterParsePort(struct AudioPort *info, cJSON *port)
+static int32_t AudioAdapterParsePort(struct AudioPort *info, const cJSON *port)
 {
     int32_t ret;
     uint32_t tmpId;
@@ -334,7 +334,7 @@ static int32_t AudioAdapterParsePort(struct AudioPort *info, cJSON *port)
     }
 
     portDir = cJSON_GetObjectItem(port, "dir");
-    if (portDir == NULL) {
+    if (portDir == NULL || portDir->valuestring == NULL) {
         return HDF_FAILURE;
     }
     ret = AudioAdapterGetDir(portDir->valuestring);
@@ -384,7 +384,7 @@ static int32_t AudioAdapterParsePort(struct AudioPort *info, cJSON *port)
     return HDF_SUCCESS;
 }
 
-static int32_t AudioAdapterParsePorts(struct AudioAdapterDescriptor *desc, cJSON *adapter)
+static int32_t AudioAdapterParsePorts(struct AudioAdapterDescriptor *desc, const cJSON *adapter)
 {
     uint32_t i;
     int32_t ret, tmpNum;
@@ -438,7 +438,7 @@ static int32_t AudioAdapterParsePorts(struct AudioAdapterDescriptor *desc, cJSON
 }
 
 static int32_t AudioAdapterParseAdapter(struct AudioAdapterDescriptor *desc,
-                                        cJSON *adapter)
+                                        const cJSON *adapter)
 {
     int32_t ret;
 
@@ -485,8 +485,11 @@ static char *AudioAdaptersGetConfig(const char *fpath)
 {
     char *pJsonStr = NULL;
 
-    if (fpath == NULL || access(fpath, F_OK | R_OK)) {
+    if (fpath == NULL) {
         /* The file path is bad or unreadable */
+        return NULL;
+    }
+    if (access(fpath, F_OK | R_OK)) {
         return NULL;
     }
     FILE *fp = fopen(fpath, "r");
@@ -548,7 +551,7 @@ cJSON *AudioAdaptersGetConfigToJsonObj(const char *fpath)
 }
 
 static int32_t AudioAdaptersSetAdapter(struct AudioAdapterDescriptor **descs,
-    int32_t adapterNum, cJSON *adaptersObj)
+    int32_t adapterNum, const cJSON *adaptersObj)
 {
     int32_t i, ret;
     cJSON *adapterObj = NULL;
@@ -820,7 +823,7 @@ int32_t CheckAttrChannel(unsigned long param)
     return HDF_SUCCESS;
 }
 
-int32_t TransferRoute(char *value, int32_t *route)
+int32_t TransferRoute(const char *value, int32_t *route)
 {
     if (value == NULL || route == NULL) {
         return HDF_FAILURE;
@@ -838,7 +841,7 @@ int32_t TransferRoute(char *value, int32_t *route)
     return ret;
 }
 
-int32_t TransferFormat(char *value, int32_t *format)
+int32_t TransferFormat(const char *value, int32_t *format)
 {
     if (value == NULL || format == NULL) {
         return HDF_FAILURE;
@@ -860,7 +863,7 @@ int32_t TransferFormat(char *value, int32_t *format)
     return ret;
 }
 
-int32_t TransferChannels(char *value, uint32_t *channels)
+int32_t TransferChannels(const char *value, uint32_t *channels)
 {
     if (value == NULL || channels == NULL) {
         return HDF_FAILURE;
@@ -878,7 +881,7 @@ int32_t TransferChannels(char *value, uint32_t *channels)
     return ret;
 }
 
-int32_t TransferFrames(char *value, uint64_t *frames)
+int32_t TransferFrames(const char *value, uint64_t *frames)
 {
     if (value == NULL || frames == NULL) {
         return HDF_FAILURE;
@@ -894,7 +897,7 @@ int32_t TransferFrames(char *value, uint64_t *frames)
     }
 }
 
-int32_t TransferSampleRate(char *value, uint32_t *sampleRate)
+int32_t TransferSampleRate(const char *value, uint32_t *sampleRate)
 {
     if (value == NULL || sampleRate == NULL) {
         return HDF_FAILURE;
@@ -928,7 +931,7 @@ int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamVal
     char *tempBuf = buffer;
     char *outPtr = NULL;
     char *inPtr = NULL;
-    while (((mParaMap[i] = strtok_r(tempBuf, ";", &outPtr)) != NULL) && i < MAP_MAX) {
+    while (i < MAP_MAX && ((mParaMap[i] = strtok_r(tempBuf, ";", &outPtr)) != NULL)) {
         tempBuf = mParaMap[i];
         if ((mParaMap[i] = strtok_r(tempBuf, "=", &inPtr)) != NULL) {
             ret = strncpy_s(mParamValMap[i].key, EXTPARAM_LEN - 1, mParaMap[i], strlen(mParaMap[i]) + 1);
@@ -980,16 +983,15 @@ int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key,
         LOG_FUN_ERR("sprintf_s failed!");
         return HDF_FAILURE;
     }
-    ret = strncat_s(keyValueList, listLenth - 1, strValue, strlen(strValue));
+    ret = strncat_s(keyValueList, listLenth, strValue, strlen(strValue));
     if (ret < 0) {
         LOG_FUN_ERR("strcat_s failed!");
         return HDF_FAILURE;
     }
-
     return HDF_SUCCESS;
 }
 
-int32_t SetExtParam(const char *key, char *value, struct ExtraParams *mExtraParams)
+int32_t SetExtParam(const char *key, const char *value, struct ExtraParams *mExtraParams)
 {
     if (key == NULL || value == NULL || mExtraParams == NULL) {
         return HDF_FAILURE;
@@ -1080,5 +1082,36 @@ int32_t GetCurrentTime(char *currentTime)
     }
 
     return HDF_SUCCESS;
+}
+
+int32_t AudioSetExtraParams(const char *keyValueList, int32_t *count,
+    struct ExtraParams *mExtraParams, int32_t *sumOk)
+{
+    if (keyValueList == NULL || count == NULL || mExtraParams == NULL || sumOk == NULL) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    struct ParamValMap mParamValMap[MAP_MAX];
+    int32_t ret = KeyValueListToMap(keyValueList, mParamValMap, count);
+    if (ret < 0) {
+        LOG_FUN_ERR("Convert to map FAIL!");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    int index = 0;
+    mExtraParams->route = -1;
+    mExtraParams->format = -1;
+    mExtraParams->channels = 0;
+    mExtraParams->frames = 0;
+    mExtraParams->sampleRate = 0;
+    mExtraParams->flag = false;
+    while (index < *count) {
+        ret = SetExtParam(mParamValMap[index].key, mParamValMap[index].value, mExtraParams);
+        if (ret < 0) {
+            return AUDIO_HAL_ERR_INTERNAL;
+        } else {
+            (*sumOk)++;
+        }
+        index++;
+    }
+    return AUDIO_HAL_SUCCESS;
 }
 
