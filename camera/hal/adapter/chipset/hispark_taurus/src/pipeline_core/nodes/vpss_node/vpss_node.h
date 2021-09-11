@@ -37,9 +37,12 @@ public:
     RetCode Stop(const int32_t streamId) override;
     void SetBufferCallback() override;
     RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
+    RetCode Capture(const int32_t streamId, const int32_t captureId) override;
+    RetCode CancelCapture(const int32_t streamId) override;
 
 private:
     std::shared_ptr<VpssController>         vpssController_ = nullptr;
+    std::map<int32_t, int32_t>              ids_ = {};
 };
 } // namespace OHOS::Camera
 #endif

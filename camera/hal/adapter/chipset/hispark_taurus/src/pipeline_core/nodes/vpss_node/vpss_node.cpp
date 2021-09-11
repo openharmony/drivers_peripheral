@@ -68,6 +68,7 @@ RetCode VpssNode::Start(const int32_t streamId)
         return RC_ERROR;
     }
     rc = SourceNode::Start(streamId);
+    ids_[streamId] = -1;
     return rc;
 }
 
@@ -113,5 +114,28 @@ RetCode VpssNode::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)
     CAMERA_LOGE("provide buffer failed.");
     return RC_ERROR;
 }
+
+RetCode VpssNode::Capture(const int32_t streamId, const int32_t captureId)
+{
+    RetCode ret = SourceNode::Capture(streamId, captureId);
+    if (ret != RC_OK) {
+        return ret;
+    }
+
+    if (captureId == ids_[streamId]) {
+        return RC_OK;
+    }
+
+    ret = IDeviceManager::GetInstance()->StartRecvFrame(streamId);
+    ids_[streamId] = captureId;
+    return ret;
+}
+
+RetCode VpssNode::CancelCapture(const int32_t streamId)
+{
+    return IDeviceManager::GetInstance()->StopRecvFrame(streamId);
+}
+
+
 REGISTERNODE(VpssNode, {"vpss"})
 } // namespace OHOS::Camera
