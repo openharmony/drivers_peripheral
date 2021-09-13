@@ -51,7 +51,7 @@ static uint16_t g_i2cDevAddr;
 /* Tfa9879 Special Region Begin */
 static void SysWritel(unsigned long addr, unsigned int value)
 {
-    *(volatile unsigned int *)(addr) = value;
+    *(volatile unsigned int *)(volatile uintptr_t)(addr) = value;
 }
 
 /* tfa9879 21 control register default value */
@@ -204,7 +204,7 @@ int Tfa9879RegRw(struct Tfa9879RegAttr *regAttr, uint16_t rwFlag)
     DevHandle i2cHandle;
     int16_t transferMsgCount = 1;
     uint8_t regs[I2C_REG_LEN];
-    struct I2cMsg msgs[I2C_MSG_NUM];
+    struct I2cMsg msgs[I2C_MSG_NUM] = {0};
     AUDIO_DEVICE_LOG_DEBUG("entry.\n");
     if (regAttr == NULL || rwFlag < 0 || rwFlag > 1) {
         AUDIO_DEVICE_LOG_ERR("invalid parameter.");
