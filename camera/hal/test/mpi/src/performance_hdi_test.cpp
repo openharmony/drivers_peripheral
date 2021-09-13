@@ -695,6 +695,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0190, TestSize.Level3)
         std::cout  << "Times =" << i << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->streamOperator->Capture(captureId, Test_->captureInfo, false);
+        captureId++;
         gettimeofday(&end, NULL);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         time_use = calTime(start, end);

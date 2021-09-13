@@ -75,6 +75,14 @@ public:
     {
         return RC_OK;
     }
+    virtual RetCode StartRecvFrame(int32_t streamId)
+    {
+        return RC_OK;
+    }
+    virtual RetCode StopRecvFrame(int32_t streamId)
+    {
+        return RC_OK;
+    }
 };
 } // namespace OHOS::Camera
 #endif

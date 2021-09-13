@@ -119,6 +119,16 @@ RetCode StreamPipelineCore::Capture(const std::vector<int>& streamIds, const int
     return re;
 }
 
+RetCode StreamPipelineCore::CancelCapture(const std::vector<int>& streamIds)
+{
+    std::lock_guard<std::mutex> l(mutex_);
+    RetCode re = RC_OK;
+    for (const auto& it : streamIds) {
+        re = dispatcher_->CancelCapture(it) | re;
+    }
+    return re;
+}
+
 RetCode StreamPipelineCore::Flush(const std::vector<int>& streamIds)
 {
     std::lock_guard<std::mutex> l(mutex_);
@@ -174,5 +184,4 @@ std::shared_ptr<IStreamPipelineCore> IStreamPipelineCore::Create(const std::shar
 {
     return std::make_shared<StreamPipelineCore>(c);
 }
-
 } // namespace OHOS::Camera
