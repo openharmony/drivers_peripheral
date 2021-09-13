@@ -112,6 +112,10 @@ typedef enum {
     CODEC_PCM,      /**< PCM */
     CODEC_MP3,      /**< MP3 */
     CODEC_G726,     /**< G726 */
+    CODEC_OPUS,     /**< OPUS */
+    CODEC_FLAC,     /**< FLAC */
+    CODEC_VORBIS,   /**< VORBIS */
+    CODEC_APE,      /**< APE */
     CODEC_BUT,      /**< Undefined format */
 } CodecFormat;
 
