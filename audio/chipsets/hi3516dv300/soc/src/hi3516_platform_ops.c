@@ -144,7 +144,7 @@ int32_t AudioCaptureBuffInit(struct PlatformHost *platformHost)
     }
     platformHost->captureBufInfo.cirBufSize = buffSize;
 
-    AUDIO_DRIVER_LOG_DEBUG("phyAddr = %x virtAddr = %x",
+    AUDIO_DRIVER_LOG_DEBUG("phyAddr = %lu virtAddr = %p",
         platformHost->captureBufInfo.phyAddr, platformHost->captureBufInfo.virtAddr);
 
     return HDF_SUCCESS;
@@ -243,7 +243,7 @@ int32_t AudioAiInit(const struct PlatformHost *platformHost)
 
 static void SysWritelI2s(unsigned long addr, unsigned int value)
 {
-    *(volatile unsigned int *)(addr) = value;
+    *(volatile unsigned int *)(volatile uintptr_t)(addr) = value;
 }
 
 int32_t AiaoSysPinMux(void)
