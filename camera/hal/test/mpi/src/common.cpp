@@ -184,7 +184,7 @@ void Test::StartStream(std::vector<Camera::StreamIntent> intents)
     for (auto& intent : intents) {
         if (intent == 0) {
             streamInfo_pre->streamId_ = streamId_preview;
-            streamInfo_pre->width_ = 832; // 832:width of stream
+            streamInfo_pre->width_ = 640; // 640:width of stream
             streamInfo_pre->height_ = 480; // 480: height of stream
             streamInfo_pre->format_ = PIXEL_FMT_YCRCB_420_SP;
             streamInfo_pre->datasapce_ = 8; // 8:datasapce of stream
@@ -235,7 +235,6 @@ void Test::StartStream(std::vector<Camera::StreamIntent> intents)
             streamInfos.push_back(streamInfo_capture);
         }
     }
-
     rc = streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(false, rc != Camera::NO_ERROR);
     if (rc == Camera::NO_ERROR) {

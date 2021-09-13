@@ -295,6 +295,7 @@ RetCode StreamBase::CancelRequest(const std::shared_ptr<CaptureRequest>& request
                                                       request->GetOwnerCount(), tunnel_->GetFrameCount());
             CAMERA_LOGV("end of stream [%{public}d], ready to send end message", streamId_);
             messenger_->SendMessage(endMessage);
+            pipeline_->CancelCapture({streamId_});
         }
     }
     return RC_OK;
@@ -442,6 +443,7 @@ void StreamBase::HandleResult(std::shared_ptr<IBuffer>& buffer)
 RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(request, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
     auto buffer = request->GetAttachedBuffer();
     CameraBufferStatus status = buffer->GetBufferStatus();
     if (status != CAMERA_BUFFER_STATUS_OK) {
@@ -485,6 +487,7 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
                 CAMERA_LOGV("end of stream [%d], ready to send end message, capture id = %d",
                     streamId_, request->GetCaptureId());
                 messenger_->SendMessage(endMessage);
+                pipeline_->CancelCapture({streamId_});
             }
         }
     }
