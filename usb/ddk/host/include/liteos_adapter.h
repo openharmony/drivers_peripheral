@@ -102,7 +102,7 @@ struct UsbOsAdapterOps {
     int (*setInterfaceAltsetting)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber, uint8_t altsetting);
     int (*clearHalt)(const struct UsbDeviceHandle *devHandle, unsigned int endpoint);
     int (*resetDevice)(const struct UsbDeviceHandle *devHandle);
-    struct UsbHostRequest * (*allocRequest)(const struct UsbDeviceHandle *handle, int isoPackets, size_t len);
+    struct UsbHostRequest *(*allocRequest)(const struct UsbDeviceHandle *handle, int isoPackets, size_t len);
     int (*freeRequest)(struct UsbHostRequest *request);
     int (*submitRequest)(struct UsbHostRequest *request);
     int (*cancelRequest)(struct UsbHostRequest *request);

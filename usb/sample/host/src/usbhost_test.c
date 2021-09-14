@@ -189,7 +189,7 @@ static int TestCmdLoop(int cmdType, const char *param)
         return HDF_FAILURE;
     }
 
-    for (;loopFlag == true && run;) {
+    while ((loopFlag == true) && (run != false)) {
         switch (cmdType) {
             case HOST_ACM_SYNC_READ:
                 UsbHostDdkTestSyncRead(NULL);
@@ -339,7 +339,7 @@ int main(int argc, char *argv[])
         goto out;
     }
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
-    signal(SIGINT , SigHandle);
+    signal(SIGINT, SigHandle);
 #endif
     status = TestCmdLoop(cmdType, argv[ARGV_CMD_PARAM]);
     if(status == HDF_DEV_ERR_NO_DEVICE_SERVICE){

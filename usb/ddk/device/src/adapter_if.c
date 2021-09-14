@@ -1307,7 +1307,7 @@ void UsbFnMemFree(void *mem)
     uint32_t size = 0;
 
     if (mem != NULL) {
-        free(mem);
+        OsalMemFree(mem);
     }
     else {
         return;
@@ -1320,7 +1320,7 @@ void UsbFnMemFree(void *mem)
             {
                 size = pos->size;
                 DListRemove(&pos->list);
-                free(pos);
+                OsalMemFree(pos);
                 continue;
             }
             totalSize += pos->size;

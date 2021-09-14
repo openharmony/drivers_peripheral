@@ -217,7 +217,7 @@ static struct UsbInterface *GetUsbInterfaceById(const struct AcmDevice *acm,
 {
     struct UsbInterface *tmpIf = NULL;
     tmpIf = (struct UsbInterface *)UsbClaimInterface(NULL, acm->busNum, \
-            acm->devAddr, interfaceIndex);
+        acm->devAddr, interfaceIndex);
     return tmpIf;
 }
 
@@ -283,7 +283,7 @@ static struct UsbPipeInfo *GetPipe(const struct AcmDevice *acm,
 
 static void SpeedPrint()
 {
-    double speed = 0;
+    double speed;
     sigCnt++;
     if (sigCnt * TEST_PRINT_TIME >= TEST_TIME) {
         g_speedFlag = true;
@@ -412,9 +412,9 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
             goto end;
         }
     }
-    if(g_writeOrRead == TEST_WRITE) {
+    if (g_writeOrRead == TEST_WRITE) {
         acm->dataPipe = GetPipe(acm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_OUT);
-    }else {
+    } else {
         acm->dataPipe = GetPipe(acm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_IN);
     }
     if (acm->dataPipe == NULL) {
@@ -453,7 +453,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
         }
     }
 
-    printf("test SDK API [%s]\n", g_writeOrRead?"write":"read");
+    printf("test SDK API [%s]\n", g_writeOrRead ? "write" : "read");
 
     for (i = 0; i < TEST_CYCLE; i++) {
         SerialBegin(acm);
@@ -462,7 +462,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
 
     OsalSemWait(&timeSem, TEST_TIME);
     while (!g_speedFlag) {
-        OsalSemWait(&timeSem, TEST_PRINT_TIME*1000);
+        OsalSemWait(&timeSem, TEST_PRINT_TIME * 1000);
         SpeedPrint();
     }
 

@@ -1161,7 +1161,7 @@ static int AdapterFreeRequest(struct UsbHostRequest *request)
     allocSize = sizeof(struct UsbHostRequest)
                 + (sizeof(struct UsbIsoPacketDesc) * (size_t)(request->numIsoPackets))
                 + request->bufLen;
-    if (request->bulkUrb){
+    if (request->bulkUrb) {
         RawUsbMemFree(request->bulkUrb);
         request->bulkUrb = NULL;
     }

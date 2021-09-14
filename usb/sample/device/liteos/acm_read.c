@@ -96,9 +96,8 @@ int main(int argc, char *argv[])
         HDF_LOGE("%s: fopen err", __func__);
         return HDF_FAILURE;
     }
-    while (1) {
-        TestRead(fp);
-    }
+
+    TestRead(fp);
     (void)fclose(fp);
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status) {

@@ -44,14 +44,11 @@ pid_t stopHandlerTid;
 
 void speedTest(struct UsbSpeedTest test)
 {
-    int ret = 0;
-
     OsalMutexLock(&g_lock);
     HdfSbufFlush(g_data);
     bool bufok = HdfSbufWriteBuffer(g_data, (const void *)&test, sizeof(test));
     if (!bufok) {
         printf("HdfSbufWriteBuffer err");
-        ret = 0;
         goto RET;
     }
     int status = g_service->dispatcher->Dispatch(&g_service->object, USB_SERIAL_SPEED, g_data, g_reply);
@@ -119,7 +116,7 @@ void speedExit()
 static void ShowHelp(const char *name)
 {
     printf(">> usage:\n");
-    printf(">>      %s <-SDK>/<-RAW>/<-NOSDK> [<busNum> <devAddr>]  <ifaceNum> <w>/<r>/<endpoint> [printdata]> \n", name);
+    printf(">> %s <-SDK>/<-RAW>/<-NOSDK> [<busNum> <devAddr>]  <ifaceNum> <w>/<r>/<endpoint> [printdata]> \n", name);
     printf("\n");
 }
 
@@ -134,13 +131,11 @@ static void *stop_handler(void *arg)
             printf("Sigwait failed: %d\n", err);
         }
 
-        switch (signo) {
-        case SIGINT:
-        case SIGQUIT:
+        if ((signo == SIGINT) || (signo == SIGQUIT)) {
             printf("normal exit\n");
             speedExit();
             return 0;
-        default:
+        } else {
             printf("Unexpected signal %d\n", signo);
         }
     }
@@ -149,9 +144,10 @@ static void *stop_handler(void *arg)
 static enum speedServer checkServer(const char* input)
 {
     char middle[10] = {0};
-    enum speedServer out = SDKAPI_SERVER;
+    enum speedServer out;
     if (input == NULL) {
         HDF_LOGE("%s:%d input is NULL", __func__, __LINE__);
+        out = SDKAPI_SERVER;
         return out;
     }
     strncpy_s(middle, sizeof(middle), input, strlen(input));
@@ -167,76 +163,75 @@ static enum speedServer checkServer(const char* input)
     return out;
 }
 
-int main(int argc, char *argv[]) {
-    struct UsbSpeedTest test;
-    int busNum = 1;
-    int devAddr = 2;
-    int ifaceNum = 3;
+static int GetWriteOrReadFlag(const char *buffer)
+{
     int writeOrRead;
+
+    if (!strncmp(buffer, "r", 1)) {
+        writeOrRead = TEST_READ;
+    } else if (!strncmp(buffer, "w", 1)) {
+        writeOrRead = TEST_WRITE;
+    } else {
+        writeOrRead = atoi(buffer);
+    }
+
+    return writeOrRead;
+}
+
+static int CheckParam(int argc, char *argv[], struct UsbSpeedTest *speedTest)
+{
+    int ret = HDF_SUCCESS;
     bool printData = false;
     int paramNum;
-    int ret = 0;
-    if (argc == 7) {
-        if (argv[1] != NULL) {
+
+    if ((argv == NULL) || (speedTest == NULL)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    switch (argc) {
+        case 7:
+        case 6:
             spdserver = checkServer(argv[1]);
-        }
-        if (argv[2] != NULL) {
-            busNum = atoi(argv[2]);
-        }
-        if (argv[3] != NULL) {
-            devAddr = atoi(argv[3]);
-        }
-        if (argv[4] != NULL) {
-            ifaceNum = atoi(argv[4]);
-        }
-        if (!strncmp(argv[5], "r", 1)) {
-            writeOrRead = TEST_READ;
-        } else if (!strncmp(argv[5], "w", 1)) {
-            writeOrRead = TEST_WRITE;
-        } else {
-            writeOrRead = atoi(argv[5]);
-        }
-        if (writeOrRead == TEST_READ)
-        {
-            printData = (strncmp(argv[6], "printdata", 1))?false:true;
-        }
-    } else if (argc == 6) {
-        spdserver = checkServer(argv[1]);
-        busNum = atoi(argv[2]);
-        devAddr = atoi(argv[3]);
-        ifaceNum = atoi(argv[4]);
-        if (!strncmp(argv[5], "r", 1)) {
-            writeOrRead = TEST_READ;
-        } else if (!strncmp(argv[5], "w", 1)) {
-            writeOrRead = TEST_WRITE;
-        } else {
-            writeOrRead = atoi(argv[5]);
-        }
-    } else if (argc == 4) {
-        spdserver = checkServer(argv[1]);
-        ifaceNum = atoi(argv[2]);
-        if (!strncmp(argv[3], "r", 1)) {
-            writeOrRead = TEST_READ;
-        } else if (!strncmp(argv[3], "w", 1)) {
-            writeOrRead = TEST_WRITE;
-        } else {
-            writeOrRead = atoi(argv[3]);
-        }
-    } else {
-        printf("Error: parameter error!\n\n");
-        ShowHelp(argv[0]);
-        ret = HDF_FAILURE;
+            speedTest->busNum = atoi(argv[2]);
+            speedTest->devAddr = atoi(argv[3]);
+            speedTest->ifaceNum = atoi(argv[4]);
+            speedTest->writeOrRead = GetWriteOrReadFlag(argv[5]);
+            if ((argc == 7) && (speedTest->writeOrRead == TEST_READ)) {
+                printData = (strncmp(argv[6], "printdata", 1)) ? false : true;
+            }
+            break;
+        case 4:
+            spdserver = checkServer(argv[1]);
+            speedTest->busNum = 1;
+            speedTest->devAddr = 2;
+            speedTest->ifaceNum = atoi(argv[2]);
+            speedTest->writeOrRead = GetWriteOrReadFlag(argv[3]);
+            break;
+        default:
+            printf("Error: parameter error!\n\n");
+            ShowHelp(argv[0]);
+            ret = HDF_FAILURE;
+            break;
+    }
+    if (ret == HDF_SUCCESS) {
+        paramNum = argc - 1;
+        speedTest->printData = printData;
+        speedTest->paramNum = paramNum;
+    }
+
+    return ret;
+}
+
+int main(int argc, char *argv[])
+{
+    int ret;
+    struct UsbSpeedTest test;
+
+    ret = CheckParam(argc, argv, &test);
+    if (ret != HDF_SUCCESS) {
         goto END;
     }
-    paramNum = argc - 1;
-    test.busNum = busNum;
-    test.devAddr = devAddr;
-    test.ifaceNum = ifaceNum;
-    test.writeOrRead = writeOrRead;
-    test.printData = printData;
-    test.paramNum = paramNum;
-    pthread_t threads;
 
+    pthread_t threads;
     int err;
     sigemptyset(&mask);
     sigaddset(&mask, SIGINT);

@@ -144,7 +144,7 @@ static int UsbFnAdapterWriteDevString(int fd, struct FconfigDevStrings *devStrin
         devStrings->strCount++;
         usbString++;
     }
-    devStrings->strings = UsbFnMemCalloc((devStrings->strCount + 1)* sizeof(struct FconfigUsbString));
+    devStrings->strings = UsbFnMemCalloc((devStrings->strCount + 1) * sizeof(struct FconfigUsbString));
     if (devStrings->strings == NULL) {
         HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
         return HDF_ERR_MALLOC_FAIL;
@@ -1073,7 +1073,7 @@ void UsbFnMemFree(void *mem)
     uint32_t size = 0;
 
     if (mem != NULL) {
-        free(mem);
+        OsalMemFree(mem);
     }
     else {
         return;
@@ -1086,7 +1086,7 @@ void UsbFnMemFree(void *mem)
             {
                 size = pos->size;
                 DListRemove(&pos->list);
-                free(pos);
+                OsalMemFree(pos);
                 continue;
             }
             totalSize += pos->size;

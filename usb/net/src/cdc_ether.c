@@ -445,10 +445,13 @@ static int32_t EcmWrite(struct EcmDevice *ecm, struct HdfSBuf *data)
             HDF_LOGE("%s:%d no write buf", __func__, __LINE__);
             return size;
         }
-        if (wbn < ECM_NW) {
+        if (wbn < ECM_NW && wbn >= 0) {
             wb = &ecm->wb[wbn];
         }
-        if (size > ecm->writeSize){
+        if (wb == NULL) {
+            return HDF_ERR_INVALID_PARAM;
+        }
+        if (size > ecm->writeSize) {
             len = ecm->writeSize;
             size -= ecm->writeSize;
         } else {
@@ -774,7 +777,7 @@ static void EcmCtrlIrq(struct UsbRequest *req)
         copySize = MIN(currentSize, expectedSize - ecm->nbIndex);
         ret = memcpy_s(&ecm->notificationBuffer[ecm->nbIndex], ecm->nbSize - ecm->nbIndex,
                req->compInfo.buffer, copySize);
-        if (ret != EOK){
+        if (ret != EOK) {
             HDF_LOGE("memcpy_s fail, ret=%d", ret);
         }
         ecm->nbIndex += copySize;

@@ -22,7 +22,6 @@
 #include "usbfn_request.h"
 #include "usbfn_interface.h"
 #include "adapter_if.h"
-#include "osal_mem.h"
 #include "osal_thread.h"
 
 #define HDF_PROCESS_STACK_SIZE 10000

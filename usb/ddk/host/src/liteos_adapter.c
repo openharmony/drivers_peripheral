@@ -27,7 +27,7 @@
 
 static bool g_CompleteExit;
 
-enum UrbState{
+enum UrbState {
     URB_INIT_STATE,
     URB_SUBMIT_STATE,
     URB_REAP_STATE,
@@ -40,7 +40,7 @@ struct Async {
     struct UsbAdapterUrb urb;
 };
 
-struct OsDev{
+struct OsDev {
     struct DListHead asyncCompleted;
     struct UsbAdapterDevice *adapterDevice;
     SPIN_LOCK_S completeLock;
@@ -76,13 +76,12 @@ static bool UsbFindUrb(struct Async *urb, struct DListHead *list)
 {
     bool findFlag = false;
     struct OsDev *osDev = CONTAINER_OF(list, struct OsDev, asyncCompleted);
-    struct Async * asPos = NULL;
-    struct Async * asTemp = NULL;
+    struct Async *asPos = NULL;
+    struct Async *asTemp = NULL;
     if (DListIsEmpty(&osDev->asyncCompleted)) {
         return false;
     }
-    DLIST_FOR_EACH_ENTRY_SAFE(asPos, asTemp, list,
-        struct Async, asynclist) {
+    DLIST_FOR_EACH_ENTRY_SAFE(asPos, asTemp, list, struct Async, asynclist) {
         if (asPos == urb) {
             findFlag = true;
             break;
@@ -94,24 +93,24 @@ static bool UsbFindUrb(struct Async *urb, struct DListHead *list)
 static void OsUrbComplete(struct UsbAdapterUrb *urb)
 {
     uint32_t save;
-    struct Async * as = CONTAINER_OF(urb, struct Async, urb);
+    struct Async *as = CONTAINER_OF(urb, struct Async, urb);
     struct UsbDevice *dev = as->dev;
-    if (dev == NULL){
+    if (dev == NULL) {
         DPRINTFN(0, "--dev:%p\n", dev);
         return;
     }
     struct OsDev *osDev = (struct OsDev *)dev->privateData;
-    if (osDev == NULL){
+    if (osDev == NULL) {
         DPRINTFN(0, "--osDev:%p\n", osDev);
         return;
     }
     as->state = URB_REAP_STATE;
     LOS_SpinLockSave(&osDev->completeLock, &save);
-    if (UsbFindUrb(as, &osDev->asyncCompleted) == false){
+    if (UsbFindUrb(as, &osDev->asyncCompleted) == false) {
         DListInsertTail(&as->asynclist, &osDev->asyncCompleted);
         LOS_SpinUnlockRestore(&osDev->completeLock, save);
         OsalSemPost(&osDev->cvWait);
-    }else{
+    } else {
         LOS_SpinUnlockRestore(&osDev->completeLock, save);
     }
 }
@@ -180,7 +179,7 @@ static int OsReapUrb(const struct UsbDeviceHandle *handle, struct Async **urb)
     }
     int err = 0;
     uint32_t save;
-    struct Async * as = NULL;
+    struct Async *as = NULL;
     struct UsbDevice *dev = handle->dev;
     if (dev->privateData == NULL) {
          PRINTK("invalid parmater\n");
@@ -472,7 +471,7 @@ static void OsDiscardUrbs(struct UsbHostRequest *request, int first, int last)
             return;
         }
         urb = &as->urb;
-        if (as->state == URB_SUBMIT_STATE){
+        if (as->state == URB_SUBMIT_STATE) {
             DPRINTFN(0, "usb kill urb\n");
             usb_kill_urb(urb);
             DPRINTFN(0, "%s:%d discard request%p+as:%p\n", __func__, __LINE__, request, as);
@@ -480,30 +479,18 @@ static void OsDiscardUrbs(struct UsbHostRequest *request, int first, int last)
     }
 }
 
-static int OsSubmitControlRequest(struct UsbHostRequest *request)
+static int OsSubmitControlMsg(
+    struct UsbHostRequest *request, struct UsbAdapterDevice *adapterDevice, struct UsbDevice *dev)
 {
     int ret;
-    struct UsbAdapterUrb *urb = NULL;
     struct Async *as = NULL;
+    struct UsbAdapterUrb *urb = NULL;
     struct UsbAdapterHostEndpoint *uhe = NULL;
-    struct OsDev *osDev = NULL;
-    struct UsbAdapterDevice *adapterDevice = NULL;
-
     if ((request == NULL) || (request->length > MAX_BULK_DATA_BUFFER_LENGTH)
-        || (request->devHandle == NULL) || (request->buffer == NULL)) {
+        || (request->buffer == NULL) || (adapterDevice == NULL) || (dev == NULL)) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct UsbDeviceHandle *handle = request->devHandle;
-    struct UsbDevice *dev = handle->dev;
-    if (dev) {
-        osDev = (struct OsDev *)dev->privateData;
-    }
-    if (osDev) {
-        adapterDevice = osDev->adapterDevice;
-    }
-    unsigned char endPoint = request->endPoint;
-    UsbPipeType pipeType = request->requestType;
-    uhe = usb_find_host_endpoint(adapterDevice, pipeType, endPoint);
+    uhe = usb_find_host_endpoint(adapterDevice, request->requestType, request->endPoint);
     if (uhe == NULL) {
         DPRINTFN(0, "no found endpoint\n");
         return -1;
@@ -536,7 +523,29 @@ static int OsSubmitControlRequest(struct UsbHostRequest *request)
         DPRINTFN(0, "submiturb failed, errno=%d\n", errno);
         return HDF_ERR_IO;
     }
+
     return HDF_SUCCESS;
+}
+
+static int OsSubmitControlRequest(struct UsbHostRequest *request)
+{
+    struct OsDev *osDev = NULL;
+    struct UsbAdapterDevice *adapterDevice = NULL;
+
+    if ((request == NULL) || (request->length > MAX_BULK_DATA_BUFFER_LENGTH)
+        || (request->devHandle == NULL) || (request->buffer == NULL)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    struct UsbDeviceHandle *handle = request->devHandle;
+    struct UsbDevice *dev = handle->dev;
+    if (dev) {
+        osDev = (struct OsDev *)dev->privateData;
+    }
+    if (osDev) {
+        adapterDevice = osDev->adapterDevice;
+    }
+
+    return OsSubmitControlMsg(request, adapterDevice, dev);
 }
 
 static int OsSubmitBulkRequestHandleUrb(struct Async *pas, struct UsbHostRequest *request,
@@ -1013,8 +1022,7 @@ static int OsUrbStatusToRequestStatus(struct UsbHostRequest *request, const stru
     return ret;
 }
 
-static int OsBulkCompletion(struct UsbHostRequest *request,
-     struct Async *as)
+static int OsBulkCompletion(struct UsbHostRequest *request, struct Async *as)
 {
     int ret;
     int urbIdx = as - (struct Async *)request->urbs;
@@ -1061,6 +1069,30 @@ completed:
     OsalMutexUnlock(&request->lock);
     as->state = URB_INIT_STATE;
     return RawHandleRequestCompletion(request, request->reqStatus);
+}
+
+static int OsFreeRequest(struct UsbHostRequest *request)
+{
+    int retry = 0;
+    if (request == NULL) {
+        DPRINTFN(0, "%s:%d invalid param", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    while (true) {
+        OsalMSleep(20);
+        if (request->numUrbs != request->numRetired) {
+            if (++retry > 10) {
+                DPRINTFN(0, "request busy numUrbs:%d+numretired:%d\n", request->numUrbs, request->numRetired);
+                return HDF_ERR_DEVICE_BUSY;
+            }
+            continue;
+        } else {
+            break;
+        }
+    }
+
+    return HDF_SUCCESS;
 }
 
 static int AdapterInit(const struct UsbSession *session)
@@ -1122,7 +1154,7 @@ static void AdapterCloseDevice(struct UsbDeviceHandle *handle)
         HDF_LOGE("%s:%d RawKillSignal failed", __func__, __LINE__);
     }
     dev = handle->dev;
-    if(AdapterAtomicDec(&dev->refcnt)) {
+    if (AdapterAtomicDec(&dev->refcnt)) {
         return;
     }
     if (!dev->session) {
@@ -1267,24 +1299,16 @@ static struct UsbHostRequest *AdapterAllocRequest(const struct UsbDeviceHandle *
 
 static int AdapterFreeRequest(struct UsbHostRequest *request)
 {
-    int retry = 0;
+    int ret;
     if (request == NULL) {
         DPRINTFN(0, "%s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (request->numUrbs >  request->numRetired) {
         OsDiscardUrbs(request, request->numRetired, request->numUrbs);
-        while (true) {
-            OsalMSleep(20);
-            if (request->numUrbs != request->numRetired) {
-                if (++retry > 10) {
-                    DPRINTFN(0, "request busy numUrbs:%d+numretired:%d\n", request->numUrbs, request->numRetired);
-                    return HDF_ERR_DEVICE_BUSY;
-                }
-                continue;
-            } else {
-                break;
-            }
+        ret = OsFreeRequest(request);
+        if (ret != HDF_SUCCESS) {
+            return ret;
         }
     }
     if (request->urbs) {

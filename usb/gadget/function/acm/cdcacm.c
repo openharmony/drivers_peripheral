@@ -128,21 +128,21 @@ static void UsbSerialRxPush(struct UsbSerial *port)
                 HDF_LOGV("%s: unexpected status %d", __func__, req->status);
                 break;
         }
-        if (g_inFifo) {
-            if (req->actual) {
-                uint32_t size = req->actual;
-                uint8_t *data = req->buf;
-                uint32_t count;
 
-                if (DataFifoIsFull(&port->readFifo)) {
-                    DataFifoSkip(&port->readFifo, size);
-                }
-                count = DataFifoWrite(&port->readFifo, data, size);
-                if (count != size) {
-                    HDF_LOGW("%s: write %u less than expected %u", __func__, count, size);
-                }
+        if (g_inFifo && req->actual) {
+            uint32_t size = req->actual;
+            uint8_t *data = req->buf;
+            uint32_t count;
+
+            if (DataFifoIsFull(&port->readFifo)) {
+                DataFifoSkip(&port->readFifo, size);
+            }
+            count = DataFifoWrite(&port->readFifo, data, size);
+            if (count != size) {
+                HDF_LOGW("%s: write %u less than expected %u", __func__, count, size);
             }
         }
+
         DListRemove(&req->list);
         DListInsertTail(&req->list, &port->readPool);
         port->readStarted--;
@@ -240,7 +240,7 @@ static int StartThreadReadSpeed(struct UsbSerial *port)
         HDF_LOGE("%s:%d OsalThreadStart faile, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
-    return 0;
+    return HDF_SUCCESS;
 }
 
 static int32_t UsbSerialGetTempReadSpeed(struct UsbSerial *port, struct HdfSBuf *reply)
@@ -274,8 +274,7 @@ static int32_t UsbSerialReadSpeedStart(struct UsbSerial *port)
 {
     g_inFifo = 0;
     g_isStartRead = true;
-    StartThreadReadSpeed(port);
-    return HDF_SUCCESS;
+    return StartThreadReadSpeed(port);
 }
 
 static void UsbSerialWriteComplete(uint8_t pipe, struct UsbFnRequest *req)
@@ -795,32 +794,9 @@ static int32_t UsbSerialRegistProp(struct UsbAcmDevice *acmDevice, struct HdfSBu
     return HDF_SUCCESS;
 }
 
-static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
+static int32_t AcmSerialCmd(struct UsbAcmDevice *acm, int cmd, struct UsbSerial *port,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    struct UsbAcmDevice *acm = NULL;
-    struct UsbSerial *port = NULL;
-
-    if (client == NULL) {
-        HDF_LOGE("%s: client is NULL", __func__);
-        return HDF_ERR_INVALID_OBJECT;
-    }
-
-    if (client->device == NULL) {
-        HDF_LOGE("%s: client->device is NULL", __func__);
-        return HDF_ERR_INVALID_OBJECT;
-    }
-
-    if (client->device->service == NULL) {
-        HDF_LOGE("%s: client->device->service is NULL", __func__);
-        return HDF_ERR_INVALID_OBJECT;
-    }
-
-    acm = (struct UsbAcmDevice *)client->device->service;
-    port = acm->port;
-    if (port == NULL) {
-        return HDF_ERR_IO;
-    }
     switch (cmd) {
         case USB_SERIAL_OPEN:
             return UsbSerialOpen(port);
@@ -859,8 +835,27 @@ static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
         default:
             return HDF_ERR_NOT_SUPPORT;
     }
-
     return HDF_SUCCESS;
+}
+
+static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
+    struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    struct UsbAcmDevice *acm = NULL;
+    struct UsbSerial *port = NULL;
+
+    if (client == NULL || client->device == NULL || client->device->service) {
+        HDF_LOGE("%s: client is NULL", __func__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
+
+    acm = (struct UsbAcmDevice *)client->device->service;
+    port = acm->port;
+    if (port == NULL) {
+        return HDF_ERR_IO;
+    }
+
+    return AcmSerialCmd(acm, cmd, port, data, reply);
 }
 
 static void AcmDeviceDestroy(struct UsbAcmDevice *acm)
@@ -1097,7 +1092,7 @@ static void AcmSetup(struct UsbAcmDevice *acm, struct UsbFnCtrlRequest *setup)
             if (acm->lineCoding.dwDTERate == 0) {
                 acm->lineCoding = acm->port->lineCoding;
             }
-            if (memcpy_s(req->buf, req->length, &acm->lineCoding, ret) != EOK) {
+            if (memcpy_s(req->buf, ret, &acm->lineCoding, ret) != EOK) {
                 return;
             }
             break;
@@ -1210,7 +1205,7 @@ static int32_t AcmSendNotifyRequest(struct UsbAcmDevice *acm, uint8_t type,
 {
     struct UsbFnRequest *req = acm->notifyReq;
     struct UsbCdcNotification *notify = NULL;
-    int ret = HDF_SUCCESS;
+    int ret;
 
     if (req == NULL || req->buf == NULL) {
         HDF_LOGE("%s: req is null", __func__);
