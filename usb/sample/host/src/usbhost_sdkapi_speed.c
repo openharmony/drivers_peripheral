@@ -424,8 +424,6 @@ int main(int argc, char *argv[])
 
     while (!g_speedFlag)
         OsalMSleep(10);
-
-
 end:
     if (ret != HDF_SUCCESS) {
         printf("please check whether usb drv so is existing or not,like acm, ecm, if not, remove it and test again!\n");

@@ -202,7 +202,8 @@ static int UsbProtocalCreatePipeObj(
     return ret;
 }
 
-static int UsbProtocalCreatInterfaceObj(const struct UsbRawConfigDescriptor *config, const struct UsbInterfacePool *interfacePool)
+static int UsbProtocalCreatInterfaceObj(const struct UsbRawConfigDescriptor *config,
+    const struct UsbInterfacePool *interfacePool)
 {
     uint8_t j;
     int ret;

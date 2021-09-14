@@ -12,22 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "securec.h"
-#include "hdf_log.h"
-#include "osal_mem.h"
-#include "hdf_io_service_if.h"
-#include <unistd.h>
-#include <sys/time.h>
-#include <stdio.h>
 #include <fcntl.h>
-#include "osal_thread.h"
-#include "osal_mutex.h"
-#include "osal_time.h"
-#include "osal_file.h"
-#include "securec.h"
-#include "signal.h"
+#include <hdf_io_service_if.h>
+#include <hdf_log.h>
+#include <osal_file.h>
+#include <osal_mutex.h>
+#include <osal_mem.h>
+#include <osal_time.h>
+#include <osal_thread.h>
 #include <pthread.h>
+#include <securec.h>
+#include <signal.h>
+#include <stdio.h>
+#include <sys/time.h>
+#include <unistd.h>
 #define HDF_LOG_TAG   cdc_acm_speed
 
 enum UsbSerialCmd {
@@ -84,7 +82,6 @@ static void GetTempSpeed()
     if (speed > 0) {
         printf("speed : %f MB/s\n", (float)speed / calc);
     }
-
 }
 
 static void ReadSpeedDone()
@@ -108,14 +105,14 @@ static void *StopHandler(void *arg)
         }
 
         switch (signo) {
-        case SIGINT:
-        case SIGQUIT:
-            printf("acm_speed_read exit\n");
-            ReadSpeedDone();
-            g_readRuning = false;
-            return NULL;
-        default:
-            printf("Unexpected signal %d\n", signo);
+            case SIGINT:
+            case SIGQUIT:
+                printf("acm_speed_read exit\n");
+                ReadSpeedDone();
+                g_readRuning = false;
+                return NULL;
+            default:
+                printf("Unexpected signal %d\n", signo);
         }
     }
 }
@@ -123,11 +120,10 @@ static void *StopHandler(void *arg)
 pthread_t g_threads;
 static void StartStopHandler()
 {
-    int err;
     sigemptyset(&g_mask);
     sigaddset(&g_mask, SIGINT);
     sigaddset(&g_mask, SIGQUIT);
-    if ((err = pthread_sigmask(SIG_BLOCK, &g_mask, NULL)) != 0) {
+    if (pthread_sigmask(SIG_BLOCK, &g_mask, NULL) != 0) {
         printf("SIG_BLOCK error\n");
         return;
     }

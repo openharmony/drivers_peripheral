@@ -13,7 +13,7 @@
 
 config DRIVERS_HDF_USBFN_CDCACM
     bool "Enable HDF cdc acm driver"
-    default y
+    default n
     depends on DRIVERS_HDF
     help
       Answer Y to enable HDF cdc acm driver.
