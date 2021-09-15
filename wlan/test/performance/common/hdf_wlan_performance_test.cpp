@@ -43,7 +43,6 @@ const uint32_t IFNAME_MAX_NUM = 32;
 const uint32_t MAX_IF_NAME_LENGTH = 16;
 const uint32_t SIZE = 4;
 
-static int32_t g_resetStatus = -1;
 
 class HdfWlanPerformanceTest : public testing::Test {
 public:
@@ -87,17 +86,6 @@ void HdfWlanPerformanceTest::TearDown()
     ASSERT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = g_wifi->stop(g_wifi);
     ASSERT_EQ(HDF_SUCCESS, ret);
-}
-
-static int32_t HalResetCallbackEvent(uint32_t event, void *data, const char *ifName)
-{
-    (void)event;
-    (void)ifName;
-    int *resetStatus = nullptr;
-    resetStatus = (int *)data;
-    printf("HalResetCallbackEvent: receive resetStatus=%d \n", *resetStatus);
-    g_resetStatus = *resetStatus;
-    return HDF_SUCCESS;
 }
 
 /**
