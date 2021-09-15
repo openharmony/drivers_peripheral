@@ -749,7 +749,8 @@ int32_t UsbIfCreatInterfaceObj(const struct UsbInterfacePool *interfacePool, str
     return HDF_SUCCESS;
 }
 
-HDF_STATUS UsbIfDestroyInterfaceObj(const struct UsbInterfacePool *interfacePool, const struct UsbSdkInterface *interfaceObj)
+HDF_STATUS UsbIfDestroyInterfaceObj(const struct UsbInterfacePool *interfacePool,
+    const struct UsbSdkInterface *interfaceObj)
 {
     HDF_STATUS ret = HDF_SUCCESS;
     struct UsbSdkInterface *interfacePos = NULL;
@@ -1115,7 +1116,7 @@ int32_t UsbSelectInterfaceSetting(
     struct UsbSdkInterface *interfacePos = NULL;
     struct UsbSdkInterface *interfaceTemp = NULL;
     struct UsbInterfaceQueryPara interfaceQueryPara = {0};
-    int32_t ret = 0;
+    int32_t ret;
 
     if ((interfaceHandle == NULL) || (interfaceObj == NULL)) {
         HDF_LOGE("%s:%d handle is NULL", __func__, __LINE__);

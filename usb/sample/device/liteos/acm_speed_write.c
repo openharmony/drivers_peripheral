@@ -12,22 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "securec.h"
-#include "hdf_log.h"
-#include "osal_mem.h"
-#include "hdf_io_service_if.h"
-#include <unistd.h>
-#include <sys/time.h>
-#include <stdio.h>
 #include <fcntl.h>
-#include "osal_thread.h"
-#include "osal_mutex.h"
-#include "osal_time.h"
-#include "osal_file.h"
-#include "securec.h"
-#include "signal.h"
+#include <hdf_io_service_if.h>
+#include <hdf_log.h>
+#include <osal_file.h>
+#include <osal_mutex.h>
+#include <osal_mem.h>
+#include <osal_time.h>
+#include <osal_thread.h>
 #include <pthread.h>
+#include <securec.h>
+#include <signal.h>
+#include <stdio.h>
+#include <sys/time.h>
+#include <unistd.h>
 #define HDF_LOG_TAG   cdc_acm_speed
 
 enum UsbSerialCmd {
@@ -82,7 +80,6 @@ static void GetTempSpeed()
     if (speed > 0) {
         printf("speed : %f MB/s\n", (float)speed / calc);
     }
-
 }
 
 static void WriteSpeedDone()

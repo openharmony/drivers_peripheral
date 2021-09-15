@@ -12,17 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include "cdcacm.h"
+#include <osal_time.h>
 #include <hdf_log.h>
 #include <hdf_remote_service.h>
 #include <hdf_sbuf.h>
 #include <servmgr_hdi.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <stdio.h>
-#include "cdcacm.h"
-#include "osal_time.h"
 #include <signal.h>
+#include <stdio.h>
+#include <sys/time.h>
+#include <unistd.h>
 #define HDF_LOG_TAG   cdc_acm_speed_read
 
 struct HdfSBuf *g_data;
@@ -59,7 +58,6 @@ static void GetTempSpeed()
     if (speed > 0) {
         printf("speed : %f MB/s\n", speed);
     }
-
 }
 
 static void ReadSpeedDone()

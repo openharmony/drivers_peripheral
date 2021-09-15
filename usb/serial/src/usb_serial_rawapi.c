@@ -750,7 +750,7 @@ static int32_t SerialWrite(struct SerialDevice *port, struct HdfSBuf *data)
         HDF_LOGE("no write buf\n");
         return HDF_SUCCESS;
     }
-    if (wbn < 0) {
+    if (wbn < 0 || wbn >= ACM_NW) {
         HDF_LOGE("AcmWbAlloc failed\n");
         return HDF_FAILURE;
     }

@@ -341,7 +341,7 @@ static int ParseEndpoint(struct UsbRawEndpointDescriptor *endPoint, const uint8_
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    ret = memcpy_s(extra, len+endPoint->extraLength, buffer, len);
+    ret = memcpy_s(extra, len + endPoint->extraLength, buffer, len);
     if (ret != EOK) {
         HDF_LOGE("%s:%d memcpy_s fail!", __func__, __LINE__);
         return HDF_ERR_IO;
@@ -415,7 +415,7 @@ static int RawParseDescriptor(int size, const uint8_t *buffer, enum UsbRawDescri
     return ret;
 }
 
-static int ParseInterfaceMemcpy(struct UsbRawInterfaceDescriptor *ifp, int len, const uint8_t *buffer)
+static int ParseInterfaceCopy(struct UsbRawInterfaceDescriptor *ifp, int len, const uint8_t *buffer)
 {
     int ret;
 
@@ -425,7 +425,7 @@ static int ParseInterfaceMemcpy(struct UsbRawInterfaceDescriptor *ifp, int len, 
         goto err;
     }
 
-    ret = memcpy_s((void *)ifp->extra, len+ifp->extraLength, buffer, len);
+    ret = memcpy_s((void *)ifp->extra, len + ifp->extraLength, buffer, len);
     if (ret != EOK) {
         HDF_LOGE("%s:%d memcpy_s fail, ret=%d", __func__, __LINE__, ret);
         goto err;
@@ -513,7 +513,7 @@ static int ParseInterface(struct UsbRawInterface *usbInterface, const uint8_t *b
 
         len = FindNextDescriptor(buffer, size);
         if (len) {
-            ret = ParseInterfaceMemcpy(ifp, len, buffer);
+            ret = ParseInterfaceCopy(ifp, len, buffer);
             if (ret != EOK) {
                 goto err;
             }
@@ -556,7 +556,7 @@ static int ParseConfigurationDes(struct UsbRawConfigDescriptor *config, const ui
             goto err;
         }
 
-        ret = memcpy_s((void *)config->extra, len+config->extraLength, buffer, len);
+        ret = memcpy_s((void *)config->extra, len + config->extraLength, buffer, len);
         if (ret != EOK) {
             HDF_LOGE("%s:%d memcpy_s fail! ret=%d", __func__, __LINE__, ret);
             goto err;
@@ -597,9 +597,9 @@ static int ParseConfiguration(struct UsbRawConfigDescriptor *config, const uint8
     uint8_t j;
     int len;
     struct UsbRawInterface *usbInterface = NULL;
-    uint8_t nIntf[USB_MAXINTERFACES];
-    uint8_t nAlts[USB_MAXINTERFACES];
-    int intfNum = 0;
+    uint8_t nIntf[USB_MAXINTERFACES] = {0};
+    uint8_t nAlts[USB_MAXINTERFACES] = {0};
+    int intfNum;
 
     if (size < USB_DDK_DT_CONFIG_SIZE) {
         HDF_LOGE("%s: size=%d is short", __func__, size);
@@ -688,7 +688,7 @@ static int32_t ControlRequestCompletion(
     }
 
     if ((requestData->requestType & USB_DDK_ENDPOINT_DIR_MASK) == USB_PIPE_DIRECTION_IN) {
-        ret = memcpy_s(requestData->data, request->actualLength+requestData->length,
+        ret = memcpy_s(requestData->data, request->actualLength + requestData->length,
             ControlRequestGetData(request), request->actualLength);
         if (ret != EOK) {
             HDF_LOGE("%s:%d memcpy_s fail! ret=%d", __func__, __LINE__, ret);
@@ -1531,10 +1531,10 @@ void RawUsbMemFree(void *mem)
     if ((g_usbRamTestFlag == true) && (g_usbRamTestHead != NULL)) {
         OsalMutexLock(&g_usbRamTestHead->lock);
         DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
-            if ((pos != NULL) && (pos->address == (uintptr_t)mem)) {
+            if ((pos != NULL) && (mem != NULL) && (pos->address == (uintptr_t)mem)) {
                 size = pos->size;
                 DListRemove(&pos->list);
-                free(pos);
+                OsalMemFree(pos);
                 continue;
             }
             if (pos != NULL) {
@@ -1546,7 +1546,7 @@ void RawUsbMemFree(void *mem)
     }
 
     if (mem != NULL) {
-        free(mem);
+        OsalMemFree(mem);
     }
 }
 

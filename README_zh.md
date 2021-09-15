@@ -20,6 +20,7 @@
 -   input：Input HDI接口定义及其实现，对上层输入系统服务提供操作input设备的驱动能力，包括input设备管理、业务流控制、数据上报等，详见input目录下的[readme](input/README_zh.md)文档。
 -   sensor：Sensor HDI接口定义与实现，接口主要包括所有Sensor信息查询、Sensor启停、Sensor订阅/去订阅、Sensor参数配置等稳定的接口，简化服务开发，详见sensor目录下的[readme](sensor/README_zh.md)文档。
 -   wlan：WLAN HDI接口定义与实现，包括创建和销毁HAL层和WLAN驱动的通道、获取本设备支持的WLAN特性等，详见wlan目录下的[readme](wlan/README_zh.md)文档。
+-   usb：USB DDK接口定义与实现，负责提供USB Host侧和USB Device侧的设备管理、配置、数据读写等接口，详见usb目录下的[readme](usb/README_zh.md)文档。
 
 ## 相关仓<a name="section1371113476307"></a>
 

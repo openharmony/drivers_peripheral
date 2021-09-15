@@ -115,7 +115,7 @@ static void FillUrb(struct UsbAdapterUrb *urb, int len)
         urb->streamId = 0;
         urb->endPoint = endNum;
     }
-    if (endNum >> 7 == 0) {
+    if ((endNum >> 7) == 0) {
         memset_s(urb->buffer, len, 'c', len);
     }
 }
