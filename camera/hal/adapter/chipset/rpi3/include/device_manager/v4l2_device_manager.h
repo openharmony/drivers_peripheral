@@ -40,13 +40,14 @@ public:
     RetCode PowerUp(CameraId cameraId);
     RetCode PowerDown(CameraId cameraId);
     std::vector<CameraId> GetCameraId();
-    RetCode SetFlashlight(FlashMode flashMode, bool enable, CameraId cameraId = CAMERA_MAX );
+    RetCode SetFlashlight(FlashMode flashMode, bool enable, CameraId cameraId = CAMERA_MAX);
     void Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta);
     void SetMetaDataCallBack(const MetaDataCb cb, CameraId cameraId = CAMERA_MAX);
     void SetCallBack(UvcMetaDataCb cb);
 
 private:
-    void UvcCallBack(const std::string hardwareName, std::vector<DeviceControl>& deviceControl, std::vector<DeviceFormat>& deviceFormat, bool uvcState);
+    void UvcCallBack(const std::string hardwareName, std::vector<DeviceControl>& deviceControl,
+        std::vector<DeviceFormat>& deviceFormat, bool uvcState);
     void UvcinfoToMetaData();
     RetCode CreateController(CameraId cameraId, std::shared_ptr<IManager> manager, ManagerId managerId);
     RetCode DestroyController();

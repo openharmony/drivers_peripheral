@@ -31,7 +31,8 @@ public:
 
     RetCode Init();
     void SetCallBack(UvcDataCb cb);
-    void UvcCallBack(const std::string hardwareName, std::vector<DeviceControl>& deviceControl, std::vector<DeviceFormat>& deviceFormat, bool uvcState);
+    void UvcCallBack(const std::string hardwareName, std::vector<DeviceControl>& deviceControl,
+        std::vector<DeviceFormat>& deviceFormat, bool uvcState);
 
 private:
     UvcDataCb uvcCb_;

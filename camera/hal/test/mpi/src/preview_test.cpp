@@ -30,7 +30,6 @@ void PreviewTest::SetUp(void)
 void PreviewTest::TearDown(void)
 {
     Test_->Close();
-
 }
 
 /**
@@ -264,29 +263,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0091, TestSize.Level2)
     Test_->captureInfo->enableShutterCallback_ = false;
     bool isStreaming = true;
     Test_->rc = Test_->streamOperator->Capture(captureId, Test_->captureInfo, isStreaming);
-    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    if (Test_->rc == Camera::NO_ERROR) {
-        std::cout << "==========[test log]Test_->streamOperator->Capture success." << std::endl;
-    } else {
-        std::cout << "==========[test log]Test_->streamOperator->Capture fail, Test_->rc = ";
-        std::cout << Test_->rc << std::endl;
-    }
-    sleep(5);
-    Test_->rc = Test_->streamOperator->CancelCapture(captureId);
-    if (Test_->rc == Camera::NO_ERROR) {
-        std::cout << "==========[test log]Test_->streamOperator->CancelCapture success." << std::endl;
-    } else {
-        std::cout << "==========[test log]Test_->streamOperator->CancelCapture fail, Test_->rc = ";
-        std::cout << Test_->rc << std::endl;
-    }
-
-    // 释放流
-    Test_->rc = Test_->streamOperator->ReleaseStreams(Test_->captureInfo->streamIds_);
-    if (Test_->rc == Camera::NO_ERROR) {
-        std::cout << "==========[test log]ReleaseStreams 2 success." << std::endl;
-    } else {
-        std::cout << "==========[test log]ReleaseStreams 2 fail, rc = " << Test_->rc << std::endl;
-    }
+    EXPECT_EQ(Test_->rc, Camera::INVALID_ARGUMENT);
     // 关闭设备
     Test_->cameraDevice->Close();
     std::cout << "cameraDevice->Close" << std::endl;

@@ -880,7 +880,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0147, TestSize.Level2)
     Test_->streamInfos.push_back(Test_->streamInfo);
     Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
     std::cout << "streamOperator->CreateStreams's rc " << Test_->rc << std::endl;
-    EXPECT_EQ(Test_->rc, Camera::METHOD_NOT_SUPPORTED);
+    EXPECT_EQ(Test_->rc, Camera::INSUFFICIENT_RESOURCES);
 }
 
 /**

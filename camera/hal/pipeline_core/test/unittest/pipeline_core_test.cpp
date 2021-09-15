@@ -251,10 +251,11 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewSnapshotSingleConfigTest, T
     EXPECT_TRUE(re == RC_OK);
     re = s->CreatePipeline(0);
     EXPECT_TRUE(re == RC_OK);
-    re = s->Config({0});
-    EXPECT_TRUE(re == RC_OK);
-    re = s->Config({2});
-    EXPECT_TRUE(re == RC_OK);
+    CaptureMeta meta;
+    re = s->Config({0}, meta);
+    EXPECT_TRUE(re != RC_OK);
+    re = s->Config({3}, meta);
+    EXPECT_TRUE(re != RC_OK);
 }
 HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewSnapshotConfigTest, TestSize.Level0)
 {
@@ -273,13 +274,16 @@ HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewSnapshotConfigTest, TestSiz
                 }, nullptr);
     EXPECT_TRUE(re == RC_OK);
     std::shared_ptr<IStreamPipelineCore> s = core->GetStreamPipelineCore();
+    CaptureMeta meta;
     EXPECT_TRUE(s != nullptr);
     re = s->Init();
     EXPECT_TRUE(re == RC_OK);
     re = s->CreatePipeline(0);
     EXPECT_TRUE(re == RC_OK);
-    re = s->Config({0, 2});
-    EXPECT_TRUE(re == RC_OK);
+    re = s->Config({0}, meta);
+    EXPECT_TRUE(re != RC_OK);
+    re = s->Config({3}, meta);
+    EXPECT_TRUE(re != RC_OK);
 }
 HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewSnapshotDestroyTest, TestSize.Level0)
 {

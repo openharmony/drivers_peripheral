@@ -99,8 +99,6 @@ HWTEST_F(DispatcherTest, ConfigTest, TestSize.Level0)
     EXPECT_TRUE(d != nullptr);
     RetCode re = d->Update(pipeline);
     EXPECT_TRUE(re == RC_OK);
-    re = d->Config(0);
-    EXPECT_TRUE(re == RC_OK);
 }
 
 HWTEST_F(DispatcherTest, AbConfigTest, TestSize.Level0)
@@ -125,7 +123,5 @@ HWTEST_F(DispatcherTest, AbConfigTest, TestSize.Level0)
     EXPECT_TRUE(d != nullptr);
     RetCode re = d->Update(pipeline);
     EXPECT_TRUE(re == RC_OK);
-    re = d->Config();
-    EXPECT_TRUE(re != RC_OK);
 }
 }

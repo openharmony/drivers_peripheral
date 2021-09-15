@@ -36,15 +36,23 @@ int32_t Test::SaveYUV(const char* type, const void* buffer, int32_t size)
     }
     char path[PATH_MAX] = {0};
     if (strncmp(type, "preview", strlen(type)) == 0) {
-        system("mkdir -p /data/preview");
-        sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/preview/%s_%lld.yuv", type, GetCurrentLocalTimeStamp());
+        system("mkdir -p /data/camera/preview");
+        if (sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/camera/preview/%s_%lld.yuv",
+            type, GetCurrentLocalTimeStamp()) < 0) {
+            CAMERA_LOGE("%s: sprintf path failed", __func__);
+            return 0;
+        }
     } else {
-        system("mkdir -p /data/capture");
-        sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/capture/%s_%lld.jpg", type, GetCurrentLocalTimeStamp());
+        system("mkdir -p /data/camera/capture");
+        if (sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/camera/capture/%s_%lld.jpg",
+            type, GetCurrentLocalTimeStamp()) < 0) {
+            CAMERA_LOGE("%s: sprintf path failed", __func__);
+            return 0;
+        }
     }
     std::cout << "save yuv to file:" << path << std::endl;
 
-    int imgFd = open(path, O_RDWR | O_CREAT, 00766);
+    int imgFd = open(path, O_RDWR | O_CREAT, 00766); // 00766:file jurisdiction
     if (imgFd == -1) {
         std::cout << "open file failed, errno = " << strerror(errno) << std::endl;
         return -1;
@@ -64,10 +72,14 @@ int32_t Test::SaveVideoFile(const char* type, const void* buffer, int32_t size, 
 {
     if (operationMode == 0) {
         char path[PATH_MAX] = {0};
-        system("mkdir -p /data/video");
-        sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/video/%s_%lld.h265", type, GetCurrentLocalTimeStamp());
+        system("mkdir -p /data/camera/video");
+        if (sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/camera/video/%s_%lld.h265",
+            type, GetCurrentLocalTimeStamp()) < 0) {
+            CAMERA_LOGE("%s: sprintf path failed", __func__);
+            return 0;
+        }
         CAMERA_LOGI("%{public}s, save yuv to file %{public}s", __FUNCTION__, path);
-        videoFd = open(path, O_RDWR | O_CREAT, 00766);
+        videoFd = open(path, O_RDWR | O_CREAT, 00766); // 00766:file jurisdiction
         if (videoFd == -1) {
             std::cout << "open file failed, errno = " << strerror(errno) << std::endl;
             return -1;
@@ -127,7 +139,7 @@ void Test::GetCameraMetadata()
     camera_metadata_item_t entry;
     int ret = find_camera_metadata_item(data, OHOS_CONTROL_AE_AVAILABLE_MODES, &entry);
     if (ret == 0) {
-      std::cout << "==========[test log] get OHOS_CONTROL_AE_AVAILABLE_MODES success" << std::endl;
+        std::cout << "==========[test log] get OHOS_CONTROL_AE_AVAILABLE_MODES success" << std::endl;
     }
 }
 
@@ -172,58 +184,57 @@ void Test::StartStream(std::vector<Camera::StreamIntent> intents)
     for (auto& intent : intents) {
         if (intent == 0) {
             streamInfo_pre->streamId_ = streamId_preview;
-            streamInfo_pre->width_ = 640;
-            streamInfo_pre->height_ = 480;
+            streamInfo_pre->width_ = 640; // 640:width of stream
+            streamInfo_pre->height_ = 480; // 480: height of stream
             streamInfo_pre->format_ = PIXEL_FMT_YCRCB_420_SP;
-            streamInfo_pre->datasapce_ = 8;
+            streamInfo_pre->datasapce_ = 8; // 8:datasapce of stream
             streamInfo_pre->intent_ = intent;
-            streamInfo_pre->tunneledMode_ = 5;
+            streamInfo_pre->tunneledMode_ = 5; // 5:tunneledMode of stream
             std::shared_ptr<StreamConsumer> consumer_pre = std::make_shared<StreamConsumer>();
             std::cout << "==========[test log]received a preview buffer ... 0" << std::endl;
             streamInfo_pre->bufferQueue_ = consumer_pre->CreateProducer([this](void* addr, uint32_t size) {
                 SaveYUV("preview", addr, size);
             });
-            streamInfo_pre->bufferQueue_->SetQueueSize(8);
+            streamInfo_pre->bufferQueue_->SetQueueSize(8); // 8:bufferqueue size
             consumerMap_[intent] = consumer_pre;
             streamInfos.push_back(streamInfo_pre);
         } else if (intent == 1) {
             streamInfo_video->streamId_ = streamId_video;
-            streamInfo_video->width_ = 1280;
-            streamInfo_video->height_ = 960;
+            streamInfo_video->width_ = 1280; // 1280:width of stream
+            streamInfo_video->height_ = 960; // 960: height of stream
             streamInfo_video->format_ = PIXEL_FMT_YCRCB_420_SP;
-            streamInfo_video->datasapce_ = 8;
+            streamInfo_video->datasapce_ = 8; // 8:datasapce of stream
             streamInfo_video->intent_ = intent;
             streamInfo_video->encodeType_ = ENCODE_TYPE_H265;
-            streamInfo_video->tunneledMode_ = 5;
+            streamInfo_video->tunneledMode_ = 5; // 5:tunneledMode of stream
             std::shared_ptr<StreamConsumer> consumer_video = std::make_shared<StreamConsumer>();
             std::cout << "==========[test log]received a video buffer ... 1" << std::endl;
             SaveVideoFile("video", nullptr, 0, 0);
             streamInfo_video->bufferQueue_ = consumer_video->CreateProducer([this](void* addr, uint32_t size) {
                 SaveVideoFile("video", addr, size, 1);
             });
-            streamInfo_video->bufferQueue_->SetQueueSize(8);
+            streamInfo_video->bufferQueue_->SetQueueSize(8); // 8:bufferqueue size
             consumerMap_[intent] = consumer_video;
             streamInfos.push_back(streamInfo_video);
         } else {
             streamInfo_capture->streamId_ = streamId_capture;
-            streamInfo_capture->width_ = 1280;
-            streamInfo_capture->height_ = 960;
+            streamInfo_capture->width_ = 1280; // 1280:width of stream
+            streamInfo_capture->height_ = 960; // 960: height of stream
             streamInfo_capture->format_ = PIXEL_FMT_YCRCB_420_SP;
-            streamInfo_capture->datasapce_ = 8;
+            streamInfo_capture->datasapce_ = 8; // 8:datasapce of stream
             streamInfo_capture->intent_ = intent;
             streamInfo_capture->encodeType_ = ENCODE_TYPE_JPEG;
-            streamInfo_capture->tunneledMode_ = 5;
+            streamInfo_capture->tunneledMode_ = 5; // 5:tunneledMode of stream
             std::shared_ptr<StreamConsumer> consumer_capture = std::make_shared<StreamConsumer>();
             std::cout << "==========[test log]received a capture buffer ... 2" << std::endl;
             streamInfo_capture->bufferQueue_ = consumer_capture->CreateProducer([this](void* addr, uint32_t size) {
                 SaveYUV("capture", addr, size);
             });
-            streamInfo_capture->bufferQueue_->SetQueueSize(8);
+            streamInfo_capture->bufferQueue_->SetQueueSize(8); // 8:bufferqueue size
             consumerMap_[intent] = consumer_capture;
             streamInfos.push_back(streamInfo_capture);
         }
     }
-
     rc = streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(false, rc != Camera::NO_ERROR);
     if (rc == Camera::NO_ERROR) {
@@ -238,7 +249,7 @@ void Test::StartStream(std::vector<Camera::StreamIntent> intents)
     } else {
         std::cout << "==========[test log]CommitStreams fail, rc = " << rc << std::endl;
     }
-    sleep(2);
+    sleep(2); // 2:The program waits two seconds
     std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(streamInfos);
 }
 
@@ -255,7 +266,7 @@ void Test::StartCapture(int streamId, int captureId, bool shutterCallback, bool 
     } else {
         std::cout << "==========[test log]check Capture: Capture fail, rc = " << rc << std::endl;
     }
-    sleep(5);
+    sleep(5); // 5:Wait 5 seconds for the program to run
 }
 
 void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
@@ -272,7 +283,7 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
             }
         }
     }
-    SaveVideoFile("video", nullptr, 0, 2);
+    SaveVideoFile("video", nullptr, 0, 2); // 2:Operation Mode
     if (streamIds.size() > 0) {
         rc = streamOperator->ReleaseStreams(streamIds);
         EXPECT_EQ(true, rc == Camera::NO_ERROR);
@@ -348,5 +359,4 @@ OHOS::sptr<OHOS::IBufferProducer> Test::StreamConsumer::CreateProducer(std::func
     });
     return producer;
 }
-
 }

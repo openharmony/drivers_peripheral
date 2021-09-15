@@ -36,6 +36,7 @@ public:
     virtual RetCode Stop(const std::vector<int32_t>& ids) override;
     virtual RetCode Config(const std::vector<int32_t>& ids, const CaptureMeta& meta) override;
     virtual RetCode Capture(const std::vector<int32_t>& ids, const int32_t captureId) override;
+    virtual RetCode CancelCapture(const std::vector<int>& streamIds) override;
     virtual std::shared_ptr<OfflinePipeline> GetOfflinePipeline(const int32_t id) override;
     virtual OperationMode GetCurrentMode() const override;
     virtual DynamicStreamSwitchMode CheckStreamsSupported(OperationMode mode,
