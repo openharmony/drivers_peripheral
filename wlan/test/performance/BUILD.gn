@@ -70,7 +70,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/wlan/hal/include",
       "//drivers/peripheral/wlan/interfaces/include",
     ]
-    sources = [ "./common/hdf_wlan_performance_test.cpp", ]
+    sources = [ "./common/hdf_wlan_performance_test.cpp" ]
     cflags = [
       "-Wall",
       "-Wextra",
