@@ -48,7 +48,7 @@
  */
 typedef enum {
     /** USB device object */
-    USB_REQUET_TARGET_DEVICE,
+    USB_REQUEST_TARGET_DEVICE,
     /** Interface object */
     USB_REQUEST_TARGET_INTERFACE,
     /** Endpoint object */

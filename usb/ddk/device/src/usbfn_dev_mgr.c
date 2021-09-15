@@ -16,7 +16,6 @@
 #include "usbfn_dev_mgr.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
-#include "osal_mem.h"
 #include "osal_time.h"
 #include "osal_thread.h"
 #include "securec.h"
@@ -96,7 +95,7 @@ static int FindEmptyId(void)
 {
     int32_t i;
     int devCnt = 1;
-    int isUse = 0;
+    int isUse;
     struct UsbObject *obj = NULL;
     struct UsbObject *temp = NULL;
     if (g_devEntry.next != 0 && !DListIsEmpty(&g_devEntry)) {
@@ -486,6 +485,23 @@ static struct UsbHandleMgr *GetHandleMgr(const struct UsbFnDeviceMgr *devMgr, in
     return handle;
 }
 
+static void HandleEp0Event(struct UsbFnDeviceMgr *devMgr, struct UsbFnEventAll event)
+{
+    uint8_t i;
+    struct UsbFnFuncMgr *funcMgr = NULL;
+    for (i = 0; i < event.ep0Num; i++) {
+        funcMgr = GetFuncMgr(devMgr, event.ep0[i]);
+        if (funcMgr == NULL) {
+            return;
+        }
+        if (event.ep0Event[i].type == USB_EP0_CTRL_EVENT) {
+            HandleEp0CtrlEvent(funcMgr, &event.ep0Event[i].ctrlEvent);
+        } else if (event.ep0Event[i].type == USB_EP0_IO_COMPLETED) {
+            HandleEp0IoEvent(funcMgr, &event.ep0Event[i].reqEvent);
+        }
+    }
+}
+
 static int UsbFnEventProcess(void *arg)
 {
     int ret;
@@ -493,7 +509,6 @@ static int UsbFnEventProcess(void *arg)
     struct UsbFnDeviceMgr *devMgr = (struct UsbFnDeviceMgr *)arg;
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
     struct UsbFnEventAll event;
-    struct UsbFnFuncMgr *funcMgr = NULL;
     struct UsbHandleMgr *handle = NULL;
     int32_t timeout = SLEEP_100MS;
 
@@ -514,17 +529,7 @@ static int UsbFnEventProcess(void *arg)
             OsalMSleep(1);
             continue;
         }
-        for (i = 0; i < event.ep0Num; i++) {
-            funcMgr = GetFuncMgr(devMgr, event.ep0[i]);
-            if (funcMgr == NULL) {
-                continue;
-            }
-            if (event.ep0Event[i].type == USB_EP0_CTRL_EVENT) {
-                HandleEp0CtrlEvent(funcMgr, &event.ep0Event[i].ctrlEvent);
-            } else if (event.ep0Event[i].type == USB_EP0_IO_COMPLETED) {
-                HandleEp0IoEvent(funcMgr, &event.ep0Event[i].reqEvent);
-            }
-        }
+        HandleEp0Event(devMgr, event);
         for (i = 0; i < event.epNum; i++) {
             handle = GetHandleMgr(devMgr, event.epx[i]);
             if (handle == NULL) {

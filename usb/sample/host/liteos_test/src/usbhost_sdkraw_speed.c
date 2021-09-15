@@ -74,7 +74,7 @@ static int UsbIoThread(void *data)
     int ret;
     struct AcmDevice *acm = (struct AcmDevice *)data;
 
-    for (;;) {
+    while(true) {
         if (acm == NULL) {
             printf("%s:%d acm is NULL", __func__, __LINE__);
             OsalMSleep(USB_RAW_IO_SLEEP_MS_TIME);
@@ -157,17 +157,17 @@ static int UsbStartIo(struct AcmDevice *acm)
     threadCfg.priority  = OSAL_THREAD_PRI_DEFAULT;
     threadCfg.stackSize = USB_IO_THREAD_STACK_SIZE;
     ret = OsalThreadCreate(&acm->ioSendThread, \
-                               (OsalThreadEntry)UsbIoSendThread, (void *)acm);
+        (OsalThreadEntry)UsbIoSendThread, (void *)acm);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s:%d OsalThreadCreate faile, ret=%d ",
-                 __func__, __LINE__, ret);
+            __func__, __LINE__, ret);
         return ret;
     }
 
     ret = OsalThreadStart(&acm->ioSendThread, &threadCfg);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s:%d OsalThreadStart faile, ret=%d ",
-                 __func__, __LINE__, ret);
+            __func__, __LINE__, ret);
         return ret;
     }
 
@@ -199,14 +199,14 @@ static int UsbStopIo(struct AcmDevice *acm)
     ret = OsalThreadDestroy(&acm->ioThread);
     if (ret != HDF_SUCCESS) {
         printf("%s:%d OsalThreadDestroy faile, ret=%d ",
-                 __func__, __LINE__, ret);
+            __func__, __LINE__, ret);
         return ret;
     }
 
     ret = OsalThreadDestroy(&acm->ioSendThread);
     if (ret != HDF_SUCCESS) {
         printf("%s:%d OsalThreadDestroy faile, ret=%d ",
-                 __func__, __LINE__, ret);
+            __func__, __LINE__, ret);
         return ret;
     }
 
@@ -221,21 +221,21 @@ static int UsbGetConfigDescriptor(UsbRawHandle *devHandle, struct UsbRawConfigDe
 
     if (devHandle == NULL) {
         printf("%s:%d devHandle is NULL",
-                 __func__, __LINE__);
+            __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     ret = UsbRawGetConfiguration(devHandle, &activeConfig);
     if (ret) {
         printf("%s:%d UsbRawGetConfiguration failed, ret=%d",
-                 __func__, __LINE__, ret);
+            __func__, __LINE__, ret);
         return HDF_FAILURE;
     }
     HDF_LOGE("%s:%d activeConfig=%d", __func__, __LINE__, activeConfig);
     dev = UsbRawGetDevice(devHandle);
     if (dev == NULL) {
         printf("%s:%d UsbRawGetDevice failed",
-                 __func__, __LINE__);
+            __func__, __LINE__);
         return HDF_FAILURE;
     }
 
@@ -256,7 +256,7 @@ static int UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConfigDe
 
     if ((acm == NULL) || (config == NULL)) {
         printf("%s:%d acm or config is NULL",
-                 __func__, __LINE__);
+            __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -269,7 +269,7 @@ static int UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConfigDe
             ret = UsbRawClaimInterface(acm->devHandle, interfaceIndex);
             if (ret) {
                 printf("%s:%d claim interface %d failed",
-                         __func__, __LINE__, i);
+                    __func__, __LINE__, i);
                 return ret;
             }
         }
@@ -280,7 +280,7 @@ static int UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConfigDe
                 acm->notifyEp = OsalMemAlloc(sizeof(struct UsbEndpoint));
                 if (acm->notifyEp == NULL) {
                     printf("%s:%d allocate endpoint failed",
-                             __func__, __LINE__);
+                        __func__, __LINE__);
                     break;
                 }
                 /* get the first endpoint by default */
@@ -298,7 +298,7 @@ static int UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConfigDe
                         acm->dataInEp = OsalMemAlloc(sizeof(struct UsbEndpoint));
                         if (acm->dataInEp == NULL) {
                             printf("%s:%d allocate dataInEp failed",
-                                     __func__, __LINE__);
+                                __func__, __LINE__);
                             break;
                         }
                         acm->dataInEp->addr = endPoint->endpointDescriptor.bEndpointAddress;
@@ -308,7 +308,7 @@ static int UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConfigDe
                         acm->dataOutEp = OsalMemAlloc(sizeof(struct UsbEndpoint));
                         if (acm->dataOutEp == NULL) {
                             printf("%s:%d allocate dataOutEp failed",
-                                     __func__, __LINE__);
+                                __func__, __LINE__);
                             break;
                         }
                         acm->dataOutEp->addr = endPoint->endpointDescriptor.bEndpointAddress;
@@ -350,7 +350,7 @@ static int UsbAllocDataRequests(struct AcmDevice *acm)
         ret = UsbRawFillBulkRequest(snd->request, acm->devHandle, &reqData);
         if (ret) {
             printf("%s: FillInterruptRequest faile, ret=%d",
-                     __func__, ret);
+                __func__, ret);
             return HDF_FAILURE;
         }
     }
@@ -504,7 +504,7 @@ static int32_t SerialBegin(struct AcmDevice *acm)
 
 static void SpeedPrint(void)
 {
-    double speed = 0;
+    double speed;
 
     sigCnt++;
     if (sigCnt * TEST_PRINT_TIME >= TEST_TIME) {
@@ -559,7 +559,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     int devAddr = 2;
     int ifaceNum = 3;
     uint32_t size;
-    int i = 0;
+    int i;
     struct UsbSpeedTest *input = NULL;
 
     if (acm->busy) {
@@ -642,7 +642,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
         goto end;
     }
     acm->dataSize = TEST_LENGTH;
-    acm->dataEp = (g_writeOrRead == TEST_WRITE)?acm->dataOutEp:acm->dataInEp;
+    acm->dataEp = (g_writeOrRead==TEST_WRITE) ? acm->dataOutEp : acm->dataInEp;
 
     ret = AcmDataBufAlloc(acm);
     if (ret < 0) {
@@ -663,7 +663,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
         goto end;
     }
 
-    printf("test SDK rawAPI [%s]\n", g_writeOrRead?"write":"read");
+    printf("test SDK rawAPI [%s]\n", g_writeOrRead ? "write" : "read");
 
     for (i = 0; i < TEST_CYCLE; i++) {
         SerialBegin(acm);
@@ -672,7 +672,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
 
     OsalSemWait(&timeSem, TEST_TIME);
     while (!g_speedFlag) {
-        OsalSemWait(&timeSem, TEST_PRINT_TIME*1000);
+        OsalSemWait(&timeSem, TEST_PRINT_TIME * 1000);
         SpeedPrint();
     }
 

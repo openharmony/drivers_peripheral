@@ -149,11 +149,27 @@ static int TestPropRegist(const char *propName, const char *propValue)
     return status;
 }
 
+static int TestProp(const char *propName, const char *propValue,
+    bool setProp, bool getProp, bool registProp)
+{
+    int ret = HDF_SUCCESS;
+    if (DispatcherInit() != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    if (getProp) {
+        ret = TestPropGet(propName);
+    } else if (setProp) {
+        ret = TestPropSet(propName, propValue);
+    } else if (registProp) {
+        ret = TestPropRegist(propName, propValue);
+    }
+    DispatcherDeInit();
+    return ret;
+}
 
 int main(int argc, char *argv[])
 {
     int ch;
-    int ret;
     const char *serviceName = NULL;
     const char *propName = NULL;
     const char *propValue = NULL;
@@ -196,17 +212,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (DispatcherInit() != HDF_SUCCESS) {
-        return HDF_FAILURE;
-    }
-    if (getProp) {
-        ret = TestPropGet(propName);
-    } else if (setProp) {
-    	ret = TestPropSet(propName, propValue);
-    } else if (registProp) {
-        ret = TestPropRegist(propName, propValue);
-    }
-    DispatcherDeInit();
-    return HDF_SUCCESS;
+    return TestProp(propName, propValue, setProp, getProp, registProp);
 }
 

@@ -121,11 +121,12 @@ void acm_write(const char *buf)
 void acm_read(char *str, int timeout)
 {
     int ret;
+    uint32_t maxLen = 256;
     if (check_service()) {
         HDF_LOGE("%s: GetService err", __func__);
         return;
     }
-    while(timeout-- > 0) {
+    while (timeout-- > 0) {
         HdfSbufFlush(g_reply);
         int status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_READ, g_data, g_reply);
         if (status) {
@@ -134,7 +135,7 @@ void acm_read(char *str, int timeout)
         }
         const char *tmp = HdfSbufReadString(g_reply);
         if (str && tmp && strlen(tmp) > 0) {
-            ret = memcpy_s(str, 256, tmp, strlen(tmp));
+            ret = memcpy_s(str, maxLen, tmp, strlen(tmp));
             if (ret != EOK) {
                 HDF_LOGE("%s:%d ret=%d memcpy_s error", ret);
             }
@@ -185,6 +186,7 @@ void acm_prop_write(const char *propName, const char *propValue)
 
 void acm_prop_read(const char *propName, char *propValue)
 {
+    uint32_t maxLen = 256;
     if (check_service()) {
         HDF_LOGE("%s: GetService err", __func__);
         return;
@@ -199,7 +201,7 @@ void acm_prop_read(const char *propName, char *propValue)
     }
     const char *tmp = HdfSbufReadString(g_reply);
     if (propValue && tmp && strlen(tmp) > 0) {
-        errno_t err = memcpy_s(propValue, 256, tmp, strlen(tmp));
+        errno_t err = memcpy_s(propValue, maxLen, tmp, strlen(tmp));
         if (err != EOK) {
             HDF_LOGE("%s:%d err=%d memcpy_s error", err);
         }
