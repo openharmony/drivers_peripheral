@@ -155,6 +155,20 @@ RetCode StreamPipelineDispatcher::Capture(const int32_t streamId, const int32_t 
     return re;
 }
 
+RetCode StreamPipelineDispatcher::CancelCapture(const int32_t streamId)
+{
+    if (seqNode_.count(streamId) == 0) {
+        return RC_ERROR;
+    }
+
+    RetCode re = RC_OK;
+    for (auto it = seqNode_[streamId].begin(); it != seqNode_[streamId].end(); it++) {
+        re = (*it)->CancelCapture(streamId) | re;
+    }
+
+    return re;
+}
+
 RetCode StreamPipelineDispatcher::Destroy(const int32_t streamId)
 {
     auto it = seqNode_.find(streamId);

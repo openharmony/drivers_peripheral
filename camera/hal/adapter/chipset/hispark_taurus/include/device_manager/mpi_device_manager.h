@@ -58,6 +58,8 @@ public:
     void Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta);
     virtual RetCode PreConfig(const ModeMeta& meta, const std::vector<DeviceStreamSetting>& settings) override;
     virtual RetCode Flush(int32_t streamId) override;
+    virtual RetCode StartRecvFrame(int32_t streamId) override;
+    virtual RetCode StopRecvFrame(int32_t streamId) override;
 
 private:
     RetCode CreateController(std::shared_ptr<IManager> manager, ManagerId managerId);

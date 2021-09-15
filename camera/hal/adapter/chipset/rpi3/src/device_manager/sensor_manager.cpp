@@ -125,7 +125,7 @@ void SensorManager::SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTa
 
 std::shared_ptr<ISensor> SensorManager::GetSensor(std::string sensorName)
 {
-    CAMERA_LOGI("%s GetSensor %s",__FUNCTION__,sensorName.c_str());
+    CAMERA_LOGI("%s GetSensor %s", __FUNCTION__, sensorName.c_str());
     if (sensorName == "bm2835 mmal") {
         return GetSensorFactory.GetSensorByName("Bm2835");
     } else {

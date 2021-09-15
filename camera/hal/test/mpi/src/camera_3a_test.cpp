@@ -445,4 +445,3 @@ HWTEST_F(Camera3ATest, Camera_3a_0041, TestSize.Level2) {
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     Test_->cameraDevice->UpdateSettings(meta);
 }
-
