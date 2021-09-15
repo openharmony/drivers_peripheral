@@ -10,7 +10,6 @@
 #include "audio_platform_base.h"
 #include "devsvc_manager_clnt.h"
 #include "hdf_base.h"
-#include "hdf_log.h"
 #include "hi3516_common_func.h"
 #include "hi3516_platform_ops.h"
 
