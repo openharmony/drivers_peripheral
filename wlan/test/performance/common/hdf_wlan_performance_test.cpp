@@ -35,7 +35,6 @@ const int32_t WLAN_BAND_2G = 0;
 const int32_t WLAN_FREQ_MAX_NUM = 14;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
 const uint32_t DEFAULT_COMBO_SIZE = 10;
-const uint32_t RESET_TIME = 20;
 const uint32_t WLAN_MIN_CHIPID = 0;
 const uint32_t WLAN_MAX_CHIPID = 2;
 const uint32_t IFNAME_MIN_NUM = 0;
@@ -261,7 +260,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetAsscociatedStas001, TestSize.Level1)
 {
     int ret;
     struct IWiFiAp *apFeature = nullptr;
-    struct StaInfo staInfo[WLAN_MAX_NUM_STA_WITH_AP] = {0};
+    struct StaInfo staInfo[WLAN_MAX_NUM_STA_WITH_AP] = {{0}};
     uint32_t num = 0;
     struct timespec tv1 = (struct timespec){0};
     struct timespec tv2 = (struct timespec){0};
