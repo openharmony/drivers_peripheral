@@ -413,7 +413,7 @@ static int32_t SerCodecDequeInput(struct HdfDeviceIoClient *client, struct HdfSB
 static int32_t SerCodecQueueOutput(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     uint32_t timeoutMs = 0;
-    int releaseFenceFd = 0;
+    int releaseFenceFd;
     uint32_t handle = 0;
     uint32_t bufCnt;
     OutputInfo outInfo = {0};
