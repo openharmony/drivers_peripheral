@@ -14,8 +14,6 @@
  */
 #include "proxy_msgproc.h"
 #include <hdf_log.h>
-#include <osal_mem.h>
-#include <securec.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,7 +59,6 @@ int32_t CodecProxyParseArray(struct HdfSBuf *reply, ResizableArray *resArr)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    resArr->actualLen = 0;
     if (!HdfSbufReadUint32(reply, &resArr->actualLen)) {
         HDF_LOGE("%{public}s: read actualLen failed!", __func__);
         return HDF_FAILURE;
@@ -204,7 +201,7 @@ int32_t CodecProxyPackBufferInfo(struct HdfSBuf *data, CodecBufferInfo *buffers)
             return HDF_FAILURE;
         }
     } else if (buffers->type == BUFFER_TYPE_FD) {
-        if (!HdfSbufWriteInt32(data, buffers->fd)) {
+        if (!HdfSbufWriteFileDescriptor(data, buffers->fd)) {
             HDF_LOGE("%{public}s: Write fd failed!", __func__);
             return HDF_FAILURE;
         }
@@ -294,7 +291,8 @@ int32_t CodecProxyParseBufferInfo(struct HdfSBuf *reply, CodecBufferInfo *buffer
             return HDF_FAILURE;
         }
     } else if (buffers->type == BUFFER_TYPE_FD) {
-        if (!HdfSbufReadInt32(reply, &buffers->fd)) {
+        buffers->fd = HdfSbufReadFileDescriptor(reply);
+        if (buffers->fd < 0) {
             HDF_LOGE("%{public}s: read fd failed!", __func__);
             return HDF_FAILURE;
         }
