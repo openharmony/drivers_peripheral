@@ -35,6 +35,7 @@ const int32_t WLAN_BAND_2G = 0;
 const int32_t WLAN_FREQ_MAX_NUM = 14;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
 const uint32_t DEFAULT_COMBO_SIZE = 10;
+const uint32_t RESET_TIME = 20;
 const uint32_t WLAN_MIN_CHIPID = 0;
 const uint32_t WLAN_MAX_CHIPID = 2;
 const uint32_t IFNAME_MIN_NUM = 0;
@@ -42,6 +43,7 @@ const uint32_t IFNAME_MAX_NUM = 32;
 const uint32_t MAX_IF_NAME_LENGTH = 16;
 const uint32_t SIZE = 4;
 
+static int32_t g_resetStatus = -1;
 
 class HdfWlanPerformanceTest : public testing::Test {
 public:
@@ -85,6 +87,17 @@ void HdfWlanPerformanceTest::TearDown()
     ASSERT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = g_wifi->stop(g_wifi);
     ASSERT_EQ(HDF_SUCCESS, ret);
+}
+
+static int32_t HalResetCallbackEvent(uint32_t event, void *data, const char *ifName)
+{
+    (void)event;
+    (void)ifName;
+    int *resetStatus = nullptr;
+    resetStatus = (int *)data;
+    printf("HalResetCallbackEvent: receive resetStatus=%d \n", *resetStatus);
+    g_resetStatus = *resetStatus;
+    return HDF_SUCCESS;
 }
 
 /**
@@ -389,6 +402,21 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetIfNamesByChipId001, TestSize.Level1)
     free(ifNames);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: WifiHalRegisterEventCallback001
+ * @tc.desc: Wifi hal register callback function test
+ * @tc.type: FUNC
+ * @tc.require: AR000F869G
+ */
+HWTEST_F(HdfWlanPerformanceTest, WifiHalRegisterEventCallback001, TestSize.Level1)
+{
+    int ret;
+
+    ret = g_wifi->registerEventCallback(HalResetCallbackEvent, "wlan0");
+    sleep(RESET_TIME);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 };
