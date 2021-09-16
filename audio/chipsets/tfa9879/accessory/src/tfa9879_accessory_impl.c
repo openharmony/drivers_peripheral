@@ -10,9 +10,7 @@
 #include "audio_accessory_base.h"
 #include "audio_core.h"
 #include "audio_device_log.h"
-#include "audio_sapm.h"
 #include "gpio_if.h"
-#include "hdf_log.h"
 #include "i2c_if.h"
 
 #define HDF_LOG_TAG "tfa9879_codec"

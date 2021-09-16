@@ -10,7 +10,6 @@
 #include <asm/io.h>
 #include "audio_device_log.h"
 #include "hdf_base.h"
-#include "hdf_log.h"
 #include "osal_io.h"
 
 #define HDF_LOG_TAG hi3516_aiao_impl
