@@ -88,6 +88,8 @@ HWTEST_F(CodecObjCTest, CodecObjCTest_004, TestSize.Level0)
     ASSERT_EQ(ec, HDF_SUCCESS);
     ASSERT_EQ(cap.mime, MEDIA_MIMETYPE_VIDEO_AVC);
     ASSERT_EQ(cap.type, AUDIO_DECODER);
+    ASSERT_EQ(cap.whAlignment.widthAlginment, 10);
+    ASSERT_EQ(cap.supportLevels.actualLen, 3);
 
     HdiCodecRelease(codecObj);
 }

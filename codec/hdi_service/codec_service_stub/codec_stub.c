@@ -445,7 +445,8 @@ static int32_t SerCodecQueueOutput(struct HdfDeviceIoClient *client, struct HdfS
         OsalMemFree(outInfo.buffers);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufReadInt32(data, &releaseFenceFd)) {
+    releaseFenceFd = HdfSbufReadFileDescriptor(data);
+    if (releaseFenceFd < 0) {
         HDF_LOGE("%{public}s: read timeoutMs data failed!", __func__);
         OsalMemFree(outInfo.buffers);
         return HDF_ERR_INVALID_PARAM;
@@ -488,7 +489,7 @@ static int32_t SerCodecDequeueOutput(struct HdfDeviceIoClient *client, struct Hd
         OsalMemFree(outInfo.buffers);
         return errNum;
     }
-    if (!HdfSbufWriteInt32(reply, acquireFd)) {
+    if (!HdfSbufWriteFileDescriptor(reply, acquireFd)) {
         HDF_LOGE("%{public}s: write acquireFd failed!", __func__);
         OsalMemFree(outInfo.buffers);
         return HDF_ERR_INVALID_PARAM;
