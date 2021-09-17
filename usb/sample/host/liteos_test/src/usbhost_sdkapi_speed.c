@@ -61,7 +61,7 @@ static int AcmDbAlloc(struct AcmDevice *acm)
     struct AcmDb *db = NULL;
     dbn = 0;
     i = 0;
-    for (;;) {
+    while (true) {
         if (TEST_CYCLE <= dbn) {
             return -1;
         }
@@ -81,8 +81,9 @@ static int AcmDbIsAvail(const struct AcmDevice *acm)
 {
     int i, n;
     n = TEST_CYCLE;
-    for (i = 0; i < TEST_CYCLE; i++)
+    for (i = 0; i < TEST_CYCLE; i++) {
         n -= acm->db[i].use;
+    }
     return n;
 }
 
@@ -119,9 +120,9 @@ static int AcmDataBufAlloc(struct AcmDevice *acm)
 {
     int i;
     struct AcmDb *db = NULL;
-	if (acm == NULL) {
+    if (acm == NULL) {
         return 0;
-	}
+    }
     for (db = &acm->db[0], i = 0; i < TEST_CYCLE; i++, db++) {
         db->buf = OsalMemCalloc(acm->dataSize);
         if (!db->buf) {
@@ -132,8 +133,7 @@ static int AcmDataBufAlloc(struct AcmDevice *acm)
                 db->buf = NULL;
             }
             return -HDF_ERR_MALLOC_FAIL;
-        }
-        else {
+        } else {
             memset_s(db->buf, acm->dataSize, 'a', acm->dataSize);
             db->instance = acm;
         }
@@ -166,13 +166,11 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
         }
         g_recv_count++;
         g_byteTotal += req->compInfo.actualLength;
-    }
-    else {
+    } else {
         printf("error status=%d\r\n", status);
     }
 
-    if (g_printData == true)
-    {
+    if (g_printData == true) {
         for (unsigned int i = 0; i < req->compInfo.actualLength; i++)
             printf("%c", req->compInfo.buffer[i]);
         fflush(stdout);
@@ -228,13 +226,10 @@ static struct UsbPipeInfo *EnumePipe(const struct AcmDevice *acm,
     int ret;
     struct UsbInterfaceInfo *info = NULL;
     UsbInterfaceHandle *interfaceHandle = NULL;
-    if (USB_PIPE_TYPE_CONTROL == pipeType)
-    {
+    if (USB_PIPE_TYPE_CONTROL == pipeType) {
         info = &acm->ctrIface->info;
         interfaceHandle = acm->ctrDevHandle;
-    }
-    else
-    {
+    } else {
         info = &acm->iface[interfaceIndex]->info;
         interfaceHandle = InterfaceIdToHandle(acm, info->interfaceIndex);
     }
@@ -285,7 +280,7 @@ static void SpeedPrint()
 {
     double speed;
     sigCnt++;
-    if (sigCnt * TEST_PRINT_TIME >= TEST_TIME) {
+    if ((sigCnt * TEST_PRINT_TIME) >= TEST_TIME) {
         g_speedFlag = true;
     }
     speed = (g_byteTotal * 1.0) / (sigCnt * TEST_PRINT_TIME  * 1024 * 1024);
@@ -327,21 +322,15 @@ static int32_t UsbSerialClose()
     return HDF_SUCCESS;
 }
 
-static int32_t UsbSerialSpeed(struct HdfSBuf *data)
+static int32_t UsbSerialSpeedInit(struct UsbSpeedTest *input, int *ifaceNum)
 {
+    int32_t ret = HDF_SUCCESS;
     int busNum = 1;
     int devAddr = 2;
-    int ifaceNum = 3;
-    int32_t ret = HDF_SUCCESS;
-    struct UsbSpeedTest *input = NULL;
-    uint32_t size = 0;
-    int i;
-    if (acm->busy) {
-        printf("%s: speed test busy\n", __func__);
-        ret = HDF_ERR_IO;
-        goto end;
+    if (input == NULL) {
+        return HDF_ERR_INVALID_PARAM;
     }
-    acm->busy = true;
+
     g_speedFlag = false;
     g_send_count = 0;
     g_recv_count = 0;
@@ -350,30 +339,22 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     g_writeOrRead = TEST_WRITE;
     sigCnt = 0;
 
-    (void)HdfSbufReadBuffer(data, (const void **)&input, &size);
-    if ((input == NULL) || (size != sizeof(struct UsbSpeedTest))) {
-        printf("%s: sbuf read buffer failed", __func__);
-        ret = HDF_ERR_IO;
-        goto end;
-    }
-
     UsbGetDevInfo(&busNum, &devAddr);
     if (input->paramNum == 6) {
         busNum = input->busNum;
         devAddr = input->devAddr;
-        ifaceNum = input->ifaceNum;
+        *ifaceNum = input->ifaceNum;
         g_writeOrRead = input->writeOrRead;
-        if (g_writeOrRead == TEST_READ)
-        {
+        if (g_writeOrRead == TEST_READ) {
             g_printData = input->printData;
         }
     } else if (input->paramNum == 5) {
         busNum = input->busNum;
         devAddr = input->devAddr;
-        ifaceNum = input->ifaceNum;
+        *ifaceNum = input->ifaceNum;
         g_writeOrRead = input->writeOrRead;
     } else if (input->paramNum == 3) {
-        ifaceNum = input->ifaceNum;
+        *ifaceNum = input->ifaceNum;
         g_writeOrRead = input->writeOrRead;
     } else {
         printf("Error: parameter error! \n\n");
@@ -385,8 +366,17 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     acm->busNum = busNum;
     acm->devAddr = devAddr;
     acm->interfaceCnt = 1;
-    acm->interfaceIndex[0] = ifaceNum;
+    acm->interfaceIndex[0] = *ifaceNum;
     OsalSemInit(&timeSem, 0);
+
+end:
+    return ret;
+}
+
+static int32_t UsbSpeedDdkInit()
+{
+    int32_t ret;
+    int i;
 
     ret = UsbInitHostSdk(NULL);
     if (ret != HDF_SUCCESS) {
@@ -405,9 +395,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
             if (acm->devHandle[i] == NULL) {
                 printf("%s: UsbOpenInterface null", __func__);
             }
-        }
-        else
-        {
+        } else {
             ret = HDF_FAILURE;
             goto end;
         }
@@ -425,13 +413,19 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     if (AcmDataBufAlloc(acm) < 0) {
         printf("%s:%d AcmDataBufAlloc fail", __func__, __LINE__);
     }
-    for (i = 0; i < TEST_CYCLE; i++) {
+end:
+    return ret;
+}
+
+static int32_t UsbSpeedRequestHandle()
+{
+    int32_t rc;
+    for (int i = 0; i < TEST_CYCLE; i++) {
         struct AcmDb *snd = &(acm->db[i]);
         snd->request = UsbAllocRequest(InterfaceIdToHandle(acm, acm->dataPipe->interfaceId), 0, acm->dataSize);
         if (snd->request == NULL) {
             printf("%s:%d snd request fail", __func__, __LINE__);
         }
-        int rc;
         acm->transmitting++;
         struct UsbRequestParams parmas = {};
         parmas.interfaceId = acm->dataPipe->interfaceId;
@@ -447,10 +441,70 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
         parmas.dataReq.directon = (acm->dataPipe->pipeDirection >> USB_PIPE_DIR_OFFSET) & 0x1;
         snd->dbNum = acm->transmitting;
         rc = UsbFillRequest(snd->request, InterfaceIdToHandle(acm, acm->dataPipe->interfaceId), &parmas);
-        if (HDF_SUCCESS != rc) {
+        if (rc != HDF_SUCCESS) {
             printf("%s:UsbFillRequest faile,ret=%d \n", __func__, rc);
-            return rc;
+            goto end;
         }
+    }
+
+end:
+    return rc;
+}
+
+static void UsbSpeedDdkExit()
+{
+    int i;
+
+    for (i = 0; i < TEST_CYCLE; i++) {
+        struct AcmDb *snd = &(acm->db[i]);
+        UsbCancelRequest(snd->request);
+        UsbFreeRequest(snd->request);
+    }
+    AcmDataBufFree(acm);
+    for (i = 0; i < acm->interfaceCnt; i++) {
+        UsbCloseInterface(acm->devHandle[i]);
+        UsbReleaseInterface(acm->iface[i]);
+    }
+    UsbExitHostSdk(NULL);
+    OsalSemDestroy(&timeSem);
+    acm->busy = false;
+}
+
+static int32_t UsbSerialSpeed(struct HdfSBuf *data)
+{
+    int ifaceNum = 3;
+    int32_t ret = HDF_SUCCESS;
+    struct UsbSpeedTest *input = NULL;
+    uint32_t size = 0;
+    int i;
+    if (acm->busy == true) {
+        printf("%s: speed test busy\n", __func__);
+        ret = HDF_ERR_IO;
+        goto end;
+    } else {
+        acm->busy = true;
+    }
+
+    (void)HdfSbufReadBuffer(data, (const void **)&input, &size);
+    if ((input == NULL) || (size != sizeof(struct UsbSpeedTest))) {
+        printf("%s: sbuf read buffer failed", __func__);
+        ret = HDF_ERR_IO;
+        goto end;
+    }
+
+    ret = UsbSerialSpeedInit(input, &ifaceNum);
+    if (ret != HDF_SUCCESS) {
+        goto end;
+    }
+
+    ret = UsbSpeedDdkInit();
+    if (ret != HDF_SUCCESS) {
+        goto end;
+    }
+
+    ret = UsbSpeedRequestHandle();
+    if (ret != HDF_SUCCESS) {
+        goto end;
     }
 
     printf("test SDK API [%s]\n", g_writeOrRead ? "write" : "read");
@@ -466,19 +520,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
         SpeedPrint();
     }
 
-    for (i = 0; i < TEST_CYCLE; i++) {
-        struct AcmDb *snd = &(acm->db[i]);
-        UsbCancelRequest(snd->request);
-        UsbFreeRequest(snd->request);
-    }
-    AcmDataBufFree(acm);
-    for (i = 0; i < acm->interfaceCnt; i++) {
-        UsbCloseInterface(acm->devHandle[i]);
-        UsbReleaseInterface(acm->iface[i]);
-    }
-    UsbExitHostSdk(NULL);
-    OsalSemDestroy(&timeSem);
-    acm->busy = false;
+    UsbSpeedDdkExit();
 
 end:
     if (ret != HDF_SUCCESS) {
@@ -487,11 +529,9 @@ end:
     return ret;
 }
 
-
 static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-
     if (client == NULL) {
         HDF_LOGE("%s: client is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;

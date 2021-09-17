@@ -17,7 +17,8 @@
  * @addtogroup USB
  * @{
  *
- * @brief Declares USB-related APIs, including the custom data types and functions used to obtain descriptors, interface objects, and request objects, and to submit requests.
+ * @brief Declares USB-related APIs, including the custom data types and functions
+ * used to obtain descriptors, interface objects, and request objects, and to submit requests.
  *
  * @since 1.0
  * @version 1.0
@@ -540,7 +541,8 @@ struct UsbCdcEtherDesc {
 #define UsbiInterfaceDescriptor                     UsbInterfaceDescriptor
 
 /**
- * @brief Checks whether the specified endpoint is in the input direction (the direction in which data is transferred from the device to the host). For details, see {@link UsbRequestDirection}.
+ * @brief Checks whether the specified endpoint is in the input direction (the direction in
+ * which data is transferred from the device to the host). For details, see {@link UsbRequestDirection}.
  *
  * @param ep Indicates the endpoint address, which is in the <b>uint8_t</b> format.
  *
@@ -552,7 +554,8 @@ static inline int UsbEndpointDirIn(uint8_t ep)
 }
 
 /**
- * @brief Checks whether the specified endpoint is in the output direction (the direction in which data is transferred from the host to the device). For details, see {@link UsbRequestDirection}.
+ * @brief Checks whether the specified endpoint is in the output direction (the direction in which data is
+ * transferred from the host to the device). For details, see {@link UsbRequestDirection}.
  *
  * @param ep Indicates the endpoint address, which is in the <b>uint8_t</b> format.
  *

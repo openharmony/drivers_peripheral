@@ -26,6 +26,8 @@
 #define TEST_CYCLE              30
 #define TEST_TIME               0xffffffff
 #define TEST_PRINT_TIME         2
+#define TEST_PRINT_TIME_UINT    1000
+
 #define TEST_WRITE              true
 #define TEST_READ               false
 #define USB_MAX_INTERFACES      32

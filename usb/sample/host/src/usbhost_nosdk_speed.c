@@ -43,6 +43,9 @@
 #define TEST_CYCLE      30
 #define TEST_TIME       0xffffffff
 #define TEST_PRINT_TIME 2
+#define TEST_PRINT_TIME_UINT    1000
+#define ENDPOINT_IN_OFFSET 7
+
 
 static pid_t tid;
 static int exitOk = false;
@@ -115,7 +118,7 @@ static void FillUrb(struct UsbAdapterUrb *urb, int len)
         urb->streamId = 0;
         urb->endPoint = endNum;
     }
-    if ((endNum >> 7) == 0) {
+    if ((endNum >> ENDPOINT_IN_OFFSET) == 0) {
         memset_s(urb->buffer, len, 'c', len);
     }
 }

@@ -277,8 +277,9 @@ static void AcmNotifyReqCallback(const void *requestArg)
         copySize = MIN(currentSize, expectedSize - acm->nbIndex);
         ret = memcpy_s(&acm->notificationBuffer[acm->nbIndex], acm->nbSize - acm->nbIndex,
             req->buffer, copySize);
-        if (ret)
+        if (ret) {
             printf("memcpy_s fail\n");
+        }
         acm->nbIndex += copySize;
         currentSize = acm->nbIndex;
     }

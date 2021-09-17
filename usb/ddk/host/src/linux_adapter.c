@@ -332,7 +332,7 @@ static void OsFreeIsoUrbs(struct UsbHostRequest *request)
     request->isoUrbs = NULL;
 }
 
-static void OsDiscardUrbs(struct UsbHostRequest *request, int first, int last)
+static void OsDiscardUrbs(struct UsbHostRequest * const request, int first, int last)
 {
     struct UsbAdapterUrb *urb = NULL;
 
@@ -815,8 +815,7 @@ static int OsUrbStatusToRequestStatus(struct UsbHostRequest *request, const stru
     return ret;
 }
 
-static int OsBulkCompletion(struct UsbHostRequest *request,
-    const struct UsbAdapterUrb *urb)
+static int OsBulkCompletion(struct UsbHostRequest * const request, const struct UsbAdapterUrb *urb)
 {
     int ret;
     int urbIdx = urb - (struct UsbAdapterUrb *)request->urbs;
@@ -1204,7 +1203,7 @@ static int AdapterSubmitRequest(struct UsbHostRequest *request)
     return ret;
 }
 
-static int AdapterCancelRequest(struct UsbHostRequest *request)
+static int AdapterCancelRequest(struct UsbHostRequest * const request)
 {
     if (!request->urbs) {
         HDF_LOGE("%s:%d", __func__, __LINE__);

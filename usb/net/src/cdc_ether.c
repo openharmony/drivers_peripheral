@@ -425,16 +425,11 @@ static int32_t EcmWrite(struct EcmDevice *ecm, struct HdfSBuf *data)
     int wbn;
     uint32_t len;
     struct EcmWb *wb = NULL;
-    if (ecm == NULL) {
-        HDF_LOGE("%d: invalid parma", __LINE__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (ecm->openFlag == false) {
+
+    if (ecm == NULL || ecm->openFlag == false) {
         return HDF_ERR_BAD_FD;
     }
-
     if (!HdfSbufReadBuffer(data, (const void **)&tmp, &totalSize)) {
-        HDF_LOGE("UsbEcmWrite HdfSbufReadBuffer err");
         return HDF_ERR_IO;
     }
     size = totalSize;
@@ -461,7 +456,6 @@ static int32_t EcmWrite(struct EcmDevice *ecm, struct HdfSBuf *data)
         if (wb->buf) {
             ret = memcpy_s(wb->buf, ecm->writeSize, tmp, len);
             if (ret) {
-                HDF_LOGE("%s:%d memcpy_s fail", __func__, __LINE__);
                 return size;
             }
             tmp += len;
@@ -470,7 +464,6 @@ static int32_t EcmWrite(struct EcmDevice *ecm, struct HdfSBuf *data)
             ret = EcmStartWb(ecm, wb);
         }
     }
-
     return totalSize;
 }
 

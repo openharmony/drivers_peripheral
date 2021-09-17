@@ -1299,7 +1299,7 @@ void *UsbFnMemCalloc(size_t size)
     return buf;
 }
 
-void UsbFnMemFree(void *mem)
+void UsbFnMemFree(void * const mem)
 {
     struct RawUsbRamTestList *pos = NULL;
     struct RawUsbRamTestList *tmp = NULL;
@@ -1308,8 +1308,7 @@ void UsbFnMemFree(void *mem)
 
     if (mem != NULL) {
         OsalMemFree(mem);
-    }
-    else {
+    } else {
         return;
     }
 

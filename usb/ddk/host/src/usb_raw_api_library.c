@@ -415,7 +415,7 @@ static int RawParseDescriptor(int size, const uint8_t *buffer, enum UsbRawDescri
     return ret;
 }
 
-static int ParseInterfaceCopy(struct UsbRawInterfaceDescriptor *ifp, int len, const uint8_t *buffer)
+static int ParseInterfaceCopy(struct UsbRawInterfaceDescriptor * const ifp, int len, const uint8_t *buffer)
 {
     int ret;
 
@@ -1531,7 +1531,7 @@ void RawUsbMemFree(void *mem)
     if ((g_usbRamTestFlag == true) && (g_usbRamTestHead != NULL)) {
         OsalMutexLock(&g_usbRamTestHead->lock);
         DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
-            if ((pos != NULL) && (mem != NULL) && (pos->address == (uintptr_t)mem)) {
+            if ((pos != NULL) && (mem != NULL) && (pos->address != (uintptr_t)NULL) && (pos->address == (uintptr_t)mem)) {
                 size = pos->size;
                 DListRemove(&pos->list);
                 OsalMemFree(pos);

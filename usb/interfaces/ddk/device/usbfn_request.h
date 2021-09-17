@@ -71,63 +71,66 @@ typedef void *UsbFnInterfaceHandle;
 /**
  * @brief Applies for a control (EP0) request.
  *
- * You can use this function to apply for a control (EP0) request based on the specified USB interface handle and length.
+ * You can use this function to apply for a control (EP0)
+ * request based on the specified USB interface handle and length.
  *
  * @param handle Indicates the USB interface handle. It can be set to any <b>UsbFnInterfaceHandle</b>.
- * @param len Indicates the request data length. The maximum value is <b>2048</b>. An error will be thrown if the passed value is greater than <b>2048</b>.
- *                    You are advised to set the value to the <b>bMaxPacketSize0</b> defined by the device descriptor.
- *                    The data length set by <b>bMaxPacketSize0</b> prevails if a greater value is specified.
+ * @param len Indicates the request data length. The maximum value is <b>2048</b>. An error will be
+ * thrown if the passed value is greater than <b>2048</b>.
+ * You are advised to set the value to the <b>bMaxPacketSize0</b> defined by the device descriptor.
+ * The data length set by <b>bMaxPacketSize0</b> prevails if a greater value is specified.
  *
- * @return Returns the pointer to the <b>UsbFnRequest</b> if the operation is successful; returns <b>NULL</b> otherwise. 
+ * @return Returns the pointer to the <b>UsbFnRequest</b> if the operation is successful;
+ * returns <b>NULL</b> otherwise.
  */
 struct UsbFnRequest *UsbFnAllocCtrlRequest(UsbFnInterfaceHandle handle, uint32_t len);
 
 /**
  * @brief Allocates a USB request.
  *
- * You can use this function to allocate a USB request based on the specified USB interface handle, pipe ID, and length.
+ * You can use this function to allocate a USB request based on the
+ * specified USB interface handle, pipe ID, and length.
  *
  * @param handle Indicates the USB interface handle.
  * @param pipe Indicates the pipe ID. The value ranges from 0 to the total number of pipes on the USB interface.
- * @param len Indicates the request data length. The maximum value is <b>2048</b>. An error will be thrown if the passed value is greater than <b>2048</b>.
- *                    You are advised to set the value to the <b>wMaxPacketSize</b> defined by the endpoint descriptor.
- *                    The data length set by <b>wMaxPacketSize</b> prevails if a greater value is specified.
+ * @param len Indicates the request data length. The maximum value is <b>2048</b>. An error will be thrown
+ * if the passed value is greater than <b>2048</b>.
+ * You are advised to set the value to the <b>wMaxPacketSize</b> defined by the endpoint descriptor.
+ * The data length set by <b>wMaxPacketSize</b> prevails if a greater value is specified.
  *
- * @return Returns the pointer to the <b>UsbFnRequest</b> if the operation is successful; returns <b>NULL</b> otherwise. 
+ * @return Returns the pointer to the <b>UsbFnRequest</b> if the operation is successful;
+ * returns <b>NULL</b> otherwise.
  */
 struct UsbFnRequest *UsbFnAllocRequest(UsbFnInterfaceHandle handle, uint8_t pipe, uint32_t len);
 
 /**
  * @brief Releases a specified USB request.
  *
- * 
- *
  * @param req Indicates the pointer to the USB request.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link UsbErrorType} otherwise.
+ * @return Returns <b>0</b> if the operation is successful;
+ * returns a negative value defined in {@link UsbErrorType} otherwise.
  */
 int UsbFnFreeRequest(struct UsbFnRequest *req);
 
 /**
- * 
- *
  * Obtains the status of a specified USB request.
  *
  * @param req Indicates the pointer to the USB request.
  * @param status Indicates the pointer to the status of the USB request.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link UsbErrorType} otherwise.
+ * @return Returns <b>0</b> if the operation is successful;
+ * returns a negative value defined in {@link UsbErrorType} otherwise.
  */
 int UsbFnGetRequestStatus(struct UsbFnRequest *req, UsbRequestStatus *status);
 
 /**
  * @brief Sends a non-isochronous USB request based on the passed request.
  *
- * 
- *
  * @param req Indicates the pointer to the USB request.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link UsbErrorType} otherwise.
+ * @return Returns <b>0</b> if the operation is successful;
+ * returns a negative value defined in {@link UsbErrorType} otherwise.
  */
 int UsbFnSubmitRequestAsync(struct UsbFnRequest *req);
 
@@ -138,19 +141,20 @@ int UsbFnSubmitRequestAsync(struct UsbFnRequest *req);
  *
  * @param req Indicates the pointer to the USB request.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link UsbErrorType} otherwise.
+ * @return Returns <b>0</b> if the operation is successful;
+ * returns a negative value defined in {@link UsbErrorType} otherwise.
  */
 int UsbFnCancelRequest(struct UsbFnRequest *req);
 
 /**
  * @brief Sends an isochronous USB request with a timeout interval based on the passed request.
  *
- * 
- *
  * @param req Indicates the pointer to the USB request.
- * @param timeout Indicates the timeout interval for canceling a USB request. The value <b>0</b> indicates that the system waits until the USB request is complete.
+ * @param timeout Indicates the timeout interval for canceling a USB request.
+ * The value <b>0</b> indicates that the system waits until the USB request is complete.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link UsbErrorType} otherwise.
+ * @return Returns <b>0</b> if the operation is successful;
+ * returns a negative value defined in {@link UsbErrorType} otherwise.
  */
 int UsbFnSubmitRequestSync(struct UsbFnRequest *req, uint32_t timeout);
 

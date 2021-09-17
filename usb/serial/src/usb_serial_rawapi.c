@@ -743,7 +743,6 @@ static int32_t SerialWrite(struct SerialDevice *port, struct HdfSBuf *data)
         HDF_LOGE("%d: invalid parma", __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-
     if (AcmWbIsAvail(acm)) {
         wbn = AcmWbAlloc(acm);
     } else {
@@ -755,6 +754,9 @@ static int32_t SerialWrite(struct SerialDevice *port, struct HdfSBuf *data)
         return HDF_FAILURE;
     }
     wb = &acm->wb[wbn];
+    if (wb == NULL) {
+        return HDF_FAILURE;
+    }
     tmp = HdfSbufReadString(data);
     if (tmp == NULL) {
         HDF_LOGE("%s: sbuf read buffer failed", __func__);
@@ -770,7 +772,6 @@ static int32_t SerialWrite(struct SerialDevice *port, struct HdfSBuf *data)
     }
     wb->len = size;
     ret = AcmStartWb(acm, wb);
-
     return size;
 }
 

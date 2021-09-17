@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 
+extern "C" {
 #include "usb_device_cdcacm_test.h"
+}
 #include "hdf_remote_service.h"
 #include "hdf_sbuf.h"
 #include "servmgr_hdi.h"
