@@ -14,6 +14,7 @@
  */
 
 #include "stream_still_capture.h"
+#include "offline_stream.h"
 
 namespace OHOS::Camera {
 StreamStillCapture::StreamStillCapture(const int32_t id,

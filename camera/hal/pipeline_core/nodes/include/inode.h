@@ -82,5 +82,4 @@ namespace { \
                 [](const std::string& name, const std::string& type) {return std::make_shared<cls>(name, type);}); \
 }
 }
-
 #endif

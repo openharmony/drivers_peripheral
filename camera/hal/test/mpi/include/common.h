@@ -98,6 +98,14 @@ public:
     std::shared_ptr<CameraAbility> ability = nullptr;
     OHOS::sptr<ICameraDevice> cameraDevice = nullptr;
     bool status;
+    bool onCameraStatusFlag;
+    bool onFlashlightStatusFlag;
+    bool onErrorFlag;
+    bool onResultFlag;
+    bool captureStartFlag;
+    bool captureEndFlag;
+    bool captureErrorFlag;
+    bool frameShutterFlag;
     int previewBufCnt = 0;
     int32_t videoFd = -1;
     class StreamConsumer;
@@ -140,6 +148,66 @@ public:
         std::thread* consumerThread_ = nullptr;
         std::function<void(void*, uint32_t)> callback_ = nullptr;
     };
+};
+
+class HdiHostCallback : public CameraHostCallback {
+public:
+    Test *test_;
+    HdiHostCallback(Test *test)
+    {
+        test_ = test;
+    }
+    virtual void OnCameraStatus(const std::string &cameraId, CameraStatus status) override
+    {
+        test_->onCameraStatusFlag = true;
+    }
+    virtual void OnFlashlightStatus(const std::string &cameraId, FlashlightStatus status) override
+    {
+        test_->onFlashlightStatusFlag = true;
+    }
+};
+class HdiDeviceCallback : public CameraDeviceCallback {
+public:
+    Test *test_;
+    HdiDeviceCallback(Test *test)
+    {
+        test_ = test;
+    }
+    virtual void OnError(ErrorType type, int32_t errorMsg) override
+    {
+        test_->onErrorFlag = true;
+    }
+    virtual void OnResult(uint64_t timestamp, const std::shared_ptr<CameraStandard::CameraMetadata> &result) override
+    {
+        test_->onResultFlag = true;
+    }
+};
+class HdiOperatorCallback : public StreamOperatorCallback {
+public:
+    Test *test_;
+    HdiOperatorCallback(Test *test)
+    {
+        test_ = test;
+    }
+    virtual void OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId) override
+    {
+        test_->captureStartFlag = true;
+    }
+    virtual void OnCaptureEnded(int32_t captureId,
+        const std::vector<std::shared_ptr<CaptureEndedInfo>> &info) override
+    {
+        test_->captureEndFlag = true;
+    }
+    virtual void OnCaptureError(int32_t captureId,
+        const std::vector<std::shared_ptr<CaptureErrorInfo>> &info) override
+    {
+        test_->captureErrorFlag = true;
+    }
+    virtual void OnFrameShutter(int32_t captureId,
+        const std::vector<int32_t> &streamId, uint64_t timestamp) override
+    {
+        test_->frameShutterFlag = true;
+    }
 };
 }
 #endif

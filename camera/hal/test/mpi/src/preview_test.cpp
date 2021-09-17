@@ -271,23 +271,51 @@ HWTEST_F(PreviewTest, Camera_Preview_0091, TestSize.Level2)
 
 /**
   * @tc.name: Preview
-  * @tc.desc: The same CaptureID, Create capture twice, expected success.
+  * @tc.desc: The same CaptureID, Create capture twice, expected failed.
   * @tc.size: MediumTest
   * @tc.type: Function
   */
 HWTEST_F(PreviewTest, Camera_Preview_0092, TestSize.Level2)
 {
-    std::cout << "==========[test log]The same CaptureID, Create capture twice, expected success." << std::endl;
+    std::cout << "==========[test log]The same CaptureID, Create capture twice, expected failed." << std::endl;
     // 启动流
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
     // 获取预览图
-    Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
+    Test_->captureInfo = std::make_shared<Camera::CaptureInfo>();
+    Test_->captureInfo->streamIds_ = {Test_->streamId_preview};
+    Test_->captureInfo->captureSetting_ = Test_->ability;
+    Test_->captureInfo->enableShutterCallback_ = true;
+    Test_->rc = Test_->streamOperator->Capture(Test_->captureId_preview, Test_->captureInfo, true);
+    EXPECT_EQ(true, Test_->rc == Camera::NO_ERROR);
+    if (Test_->rc == Camera::NO_ERROR) {
+        std::cout << "==========[test log]check Capture: Capture success, " << Test_->captureId_preview << std::endl;
+    } else {
+        std::cout << "==========[test log]check Capture: Capture fail, rc = " << Test_->rc << std::endl;
+    }
+    Test_->rc = Test_->streamOperator->Capture(Test_->captureId_preview, Test_->captureInfo, true);
+    EXPECT_EQ(false, Test_->rc == Camera::NO_ERROR);
+    if (Test_->rc == Camera::NO_ERROR) {
+        std::cout << "==========[test log]check Capture: Capture success, " << Test_->captureId_preview << std::endl;
+    } else {
+        std::cout << "==========[test log]check Capture: Capture fail, rc = " << Test_->rc << std::endl;
+    }
+    Test_->rc = Test_->streamOperator->CancelCapture(Test_->captureId_preview);
+    EXPECT_EQ(true, Test_->rc == Camera::NO_ERROR);
+    if (Test_->rc == Camera::NO_ERROR) {
+        std::cout << "======[test log]check Capture: CancelCapture success," << Test_->captureId_preview << std::endl;
+    } else {
+        std::cout << "==========[test log]check Capture: CancelCapture fail, rc = " << Test_->rc << std::endl;
+        std::cout << "captureId = " << Test_->captureId_preview << std::endl;
+    }
     // 释放流
-    Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
-    Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->rc = Test_->streamOperator->ReleaseStreams(Test_->streamIds);
+    if (Test_->rc == Camera::NO_ERROR) {
+        std::cout << "==========[test log]check Capture: ReleaseStreams success." << std::endl;
+    } else {
+        std::cout << "==========[test log]check Capture: ReleaseStreams fail, rc = " << Test_->rc << std::endl;
+    }
 }
 
 /**

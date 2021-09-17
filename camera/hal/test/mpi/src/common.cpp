@@ -110,7 +110,7 @@ void Test::Init()
         }
         ASSERT_TRUE(service != nullptr);
     }
-    hostCallback = new CameraHostCallback();
+    hostCallback = new HdiHostCallback(this);
     service->SetCallback(hostCallback);
 }
 
@@ -148,7 +148,7 @@ void Test::Open()
     if (cameraDevice == nullptr) {
         service->GetCameraIds(cameraIds);
         GetCameraMetadata();
-        deviceCallback = new CameraDeviceCallback();
+        deviceCallback = new HdiDeviceCallback(this);
         rc = service->OpenCamera(cameraIds.front(), deviceCallback, cameraDevice);
         if (rc != Camera::NO_ERROR || cameraDevice == nullptr) {
             std::cout << "==========[test log]OpenCamera failed, rc = " << rc << std::endl;
@@ -170,7 +170,7 @@ void Test::Close()
 void Test::StartStream(std::vector<Camera::StreamIntent> intents)
 {
     EXPECT_EQ(true, cameraDevice != nullptr);
-    streamOperatorCallback = new StreamOperatorCallback();
+    streamOperatorCallback = new HdiOperatorCallback(this);
     rc = cameraDevice->GetStreamOperator(streamOperatorCallback, streamOperator);
     EXPECT_EQ(true, rc == Camera::NO_ERROR);
     if (rc == Camera::NO_ERROR) {
@@ -266,19 +266,21 @@ void Test::StartCapture(int streamId, int captureId, bool shutterCallback, bool 
     } else {
         std::cout << "==========[test log]check Capture: Capture fail, rc = " << rc << std::endl;
     }
-    sleep(5); // 5:Wait 5 seconds for the program to run
+    sleep(1); // 1:Wait 1 seconds for the program to run
 }
 
 void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
 {
     if (captureIds.size() > 0) {
+        std::cout << "captureIds.size() = " << captureIds.size() << std::endl;
         for (auto &captureId : captureIds) {
+            std::cout << "captureId = " << captureId << std::endl;
             rc = streamOperator->CancelCapture(captureId);
             EXPECT_EQ(true, rc == Camera::NO_ERROR);
             if (rc == Camera::NO_ERROR) {
                 std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
             } else {
-                std::cout << "==========[test log]check Capture: CancelCapture fail, rc = " << rc;
+                std::cout << "==========[test log]check Capture: CancelCapture fail, rc = " << rc << std::endl;
                 std::cout << "captureId = " << captureId << std::endl;
             }
         }
