@@ -30,7 +30,7 @@ using CaptureSetting = std::weak_ptr<CameraStandard::CameraMetadata>;
 
 class CaptureRequest final : public std::enable_shared_from_this<CaptureRequest> {
 public:
-    CaptureRequest(const int32_t id, const int32_t n, CaptureSetting& setting, bool needReport, bool isContinous);
+    CaptureRequest(const int32_t id, const int32_t n, CaptureSetting& setting, bool needReport, bool isContinuous);
     ~CaptureRequest();
     RetCode AddOwner(const std::weak_ptr<IStream>& owner);
     RetCode Process(const int32_t id);
@@ -77,7 +77,7 @@ private:
     std::unique_ptr<RequestSemaphore> semr_ = nullptr;
     CaptureSetting settings_;
     bool needShutterCallback_ = false;
-    bool isContinous_ = false;
+    bool isContinuous_ = false;
     std::shared_ptr<IBuffer> buffer_ = nullptr;
     std::atomic<bool> needCancel_ = false;
     uint32_t ownerCount_ = 0;

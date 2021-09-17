@@ -18,10 +18,10 @@
 
 #include "camera.h"
 #include "capture_request.h"
+#include "capture_message.h"
 #include "ibuffer.h"
 #include "ipipeline_core.h"
 #include "object_factory.h"
-#include "offline_stream.h"
 #include "stream_tunnel.h"
 #include <memory>
 #include <string>
@@ -33,7 +33,7 @@ namespace OHOS::Camera {
 class CaptureRequest;
 class OfflineStream;
 
-static std::map<StreamIntent, std::string> g_avaliableStreamType;
+static std::map<StreamIntent, std::string> g_availableStreamType;
 
 class IStream {
 public:
@@ -55,7 +55,7 @@ public:
     virtual bool IsRunning() const = 0;
 
 public:
-    static std::map<StreamIntent, std::string> g_avaliableStreamType;
+    static std::map<StreamIntent, std::string> g_availableStreamType;
 };
 
 using StreamFactory = RegisterFactoty<IStream,

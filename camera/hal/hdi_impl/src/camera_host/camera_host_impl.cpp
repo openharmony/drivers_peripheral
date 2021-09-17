@@ -300,11 +300,11 @@ CamRetCode CameraHostImpl::SetFlashlight(const std::string &cameraId,  bool &isE
     FlashlightStatus flashlightStatus = FLASHLIGHT_UNAVAILABLE;
     rc = SetFlashlight(phyCameraIds, isEnable, flashlightStatus);
     if (rc == RC_OK && flashlightStatus != FLASHLIGHT_UNAVAILABLE) {
-        return NO_ERROR;
-    } else {
         if (cameraHostCallback_ != nullptr) {
             cameraHostCallback_->OnFlashlightStatus(cameraId, flashlightStatus);
         }
+        return NO_ERROR;
+    } else {
         return DEVICE_ERROR;
     }
     DFX_LOCAL_HITRACE_END;

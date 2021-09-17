@@ -19,7 +19,7 @@
 #include "watchdog.h"
 
 namespace OHOS::Camera {
-std::map<StreamIntent, std::string> IStream::g_avaliableStreamType = {
+std::map<StreamIntent, std::string> IStream::g_availableStreamType = {
     {PREVIEW, STREAM_INTENT_TO_STRING(PREVIEW)},
     {VIDEO, STREAM_INTENT_TO_STRING(VIDEO)},
     {STILL_CAPTURE, STREAM_INTENT_TO_STRING(STILL_CAPTURE)},
@@ -100,9 +100,8 @@ RetCode StreamBase::CommitStream()
         CHECK_IF_PTR_NULL_RETURN_VALUE(mgr, RC_ERROR);
 
         if (bufferPool_ == nullptr) {
-            poolId_ = mgr->GenerateBufferPoolId();
+            poolId_ = static_cast<uint64_t>(mgr->GenerateBufferPoolId());
             CHECK_IF_EQUAL_RETURN_VALUE(poolId_, 0, RC_ERROR);
-
             bufferPool_ = mgr->GetBufferPool(poolId_);
             if (bufferPool_ == nullptr) {
                 CAMERA_LOGE("stream [id:%{public}d] get buffer pool failed.", streamId_);
@@ -154,7 +153,7 @@ RetCode StreamBase::StartStream()
 
     state_ = STREAM_STATE_BUSY;
     std::string threadName =
-        g_avaliableStreamType[static_cast<StreamIntent>(streamType_)] + "#" + std::to_string(streamId_);
+        g_availableStreamType[static_cast<StreamIntent>(streamType_)] + "#" + std::to_string(streamId_);
     handler_ = std::make_unique<std::thread>([this, &threadName] {
         prctl(PR_SET_NAME, threadName.c_str());
         while (state_ == STREAM_STATE_BUSY) {
@@ -295,7 +294,8 @@ RetCode StreamBase::CancelRequest(const std::shared_ptr<CaptureRequest>& request
                                                       request->GetOwnerCount(), tunnel_->GetFrameCount());
             CAMERA_LOGV("end of stream [%{public}d], ready to send end message", streamId_);
             messenger_->SendMessage(endMessage);
-            pipeline_->CancelCapture({streamId_});
+            pipeline_->CancelCapture({
+                streamId_});
         }
     }
     return RC_OK;
@@ -487,7 +487,8 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
                 CAMERA_LOGV("end of stream [%d], ready to send end message, capture id = %d",
                     streamId_, request->GetCaptureId());
                 messenger_->SendMessage(endMessage);
-                pipeline_->CancelCapture({streamId_});
+                pipeline_->CancelCapture({
+                    streamId_});
             }
         }
     }
