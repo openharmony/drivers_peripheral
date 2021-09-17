@@ -187,9 +187,9 @@ HWTEST_F(BufferManagerTest, TestGrallocBuffer, TestSize.Level0)
         EXPECT_EQ(true, bufferPool != nullptr);
 
         RetCode rc = RC_ERROR;
-        rc = bufferPool->Init(1920, 1080,
+        rc = bufferPool->Init(1280, 720,
                               CAMERA_USAGE_SW_WRITE_OFTEN | CAMERA_USAGE_SW_READ_OFTEN | CAMERA_USAGE_MEM_DMA, f, 3,
-                              CAMERA_BUFFER_SOURCE_TYPE_GRALLOC);
+                              CAMERA_BUFFER_SOURCE_TYPE_HEAP);
         EXPECT_EQ(true, rc == RC_OK);
     }
 }
@@ -387,7 +387,7 @@ bool BufferManagerTest::Stream::Init(sptr<IBufferProducer>& producer)
     RetCode rc = RC_ERROR;
 
     if (producer == nullptr) {
-        rc = bufferPool_->Init(width_, height_, usage_, format_, queueSize_, CAMERA_BUFFER_SOURCE_TYPE_GRALLOC);
+        rc = bufferPool_->Init(width_, height_, usage_, format_, queueSize_, CAMERA_BUFFER_SOURCE_TYPE_HEAP);
         std::cout << "init inner buffer loop" << std::endl;
     }
 
@@ -400,7 +400,7 @@ bool BufferManagerTest::Stream::Init(sptr<IBufferProducer>& producer)
 
         requestConfig_.width = static_cast<int32_t>(width_);
         requestConfig_.height = static_cast<int32_t>(height_);
-        requestConfig_.strideAlignment = 8;
+        requestConfig_.strideAlignment = 8; // 8:value of strideAlignment
         requestConfig_.format = static_cast<int32_t>(BufferAdapter::CameraFormatToPixelFormat(format_));
         requestConfig_.usage = static_cast<int32_t>(BufferAdapter::CameraUsageToGrallocUsage(usage_));
         requestConfig_.timeout = 0;
@@ -603,7 +603,7 @@ bool BufferManagerTest::Pipeline::BuildPipeline()
     }
     BufferTracking::AddTrackingNode(0, sourceNode_->name_);
     std::shared_ptr<Node> tmpNode = sourceNode_;
-    for (int i = 1; i < 9; i++) {
+    for (int i = 1; i < 9; i++) { // 9: numbers of node
         std::string name = "node";
         name += std::to_string(i);
         auto n = std::make_shared<Node>(name);
@@ -633,7 +633,7 @@ void BufferManagerTest::Pipeline::CollectBuffers()
             if (bufferPool == nullptr) {
                 continue;
             }
-            auto buffer = bufferPool->AcquireBuffer(3);
+            auto buffer = bufferPool->AcquireBuffer(3); // 3:Minimum number of buffer rotation
             if (buffer == nullptr) {
                 continue;
             }
@@ -680,10 +680,8 @@ void BufferManagerTest::Pipeline::StopStream()
 {
     running = false;
     collectThread_->join();
-    delete collectThread_;
 
     localStream_->deliverThread_->join();
-    delete localStream_->deliverThread_;
 
     BufferTracking::DeleteTrackingStream(0);
     BufferTracking::StopTracking();
@@ -715,7 +713,7 @@ void BufferManagerTest::Node::Receive(std::shared_ptr<IBuffer>& buffer)
 
 void BufferManagerTest::Node::Process(std::shared_ptr<IBuffer>& buffer)
 {
-    std::this_thread::sleep_for(std::chrono::microseconds(5000));
+    std::this_thread::sleep_for(std::chrono::microseconds(5000)); // 5000:microsecond
     Deliver(buffer);
     return;
 }

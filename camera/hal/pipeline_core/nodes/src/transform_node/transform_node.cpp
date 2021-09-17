@@ -15,7 +15,7 @@
 
 namespace OHOS::Camera {
 TransformNode::TransformNode(const std::string& name, const std::string& type)
-        :NodeBase(name, type, streamId)
+    :NodeBase(name, type, streamId)
 {
     CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }

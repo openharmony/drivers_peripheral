@@ -58,6 +58,7 @@ public:
     virtual RetCode Stop(const int32_t streamId) = 0;
     virtual RetCode Config(const int32_t streamId, const CaptureMeta& meta) = 0;
     virtual RetCode Capture(const int32_t streamId, const int32_t captureId) = 0;
+    virtual RetCode CancelCapture(const int32_t streamId) = 0;
     virtual int32_t GetNumberOfInPorts() const = 0;
     virtual int32_t GetNumberOfOutPorts() const = 0;
     virtual std::vector<std::shared_ptr<IPort>> GetInPorts() const = 0;
@@ -78,7 +79,7 @@ using NodeFactory = RegisterFactoty<INode, const std::string&, const std::string
 #define REGISTERNODE(cls, ...) \
 namespace { \
     static std::string g_##cls = NodeFactory::Instance().DoRegister<cls>(__VA_ARGS__, \
-                [](const std::string& name, const std::string& type) {return std::make_shared<cls>(name, type);});\
+                [](const std::string& name, const std::string& type) {return std::make_shared<cls>(name, type);}); \
 }
 }
 

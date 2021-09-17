@@ -71,6 +71,7 @@ public:
     RetCode Stop(const int32_t streamId) override;
     RetCode Config(const int32_t streamId, const CaptureMeta& meta) override;
     RetCode Capture(const int32_t streamId, const int32_t captureId) override;
+    RetCode CancelCapture(const int32_t streamId) override;
     int32_t GetNumberOfInPorts() const override;
     int32_t GetNumberOfOutPorts() const override;
     std::vector<std::shared_ptr<IPort>> GetInPorts() const override;

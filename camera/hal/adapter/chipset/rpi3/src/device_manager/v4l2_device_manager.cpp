@@ -235,7 +235,7 @@ bool V4L2DeviceManager::CheckCameraIdList(CameraId cameraId)
 
 bool V4L2DeviceManager::CheckManagerList(ManagerId managerId)
 {
-    if (0 == managerList_.size()) {
+    if (managerList_.size() == 0) {
         return false;
     }
     for (auto iter = managerList_.cbegin(); iter != managerList_.cend(); iter++) {

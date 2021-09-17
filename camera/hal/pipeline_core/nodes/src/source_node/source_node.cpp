@@ -150,6 +150,11 @@ RetCode SourceNode::Capture(const int32_t streamId, const int32_t captureId)
     return RC_OK;
 }
 
+RetCode SourceNode::CancelCapture(const int32_t streamId)
+{
+    return RC_OK;
+}
+
 SourceNode::PortHandler::PortHandler(std::shared_ptr<IPort>& p)
 {
     port = p;

@@ -585,4 +585,14 @@ RetCode MpiDeviceManager::Flush(int32_t streamId)
 {
     return sysObject_->Flush(streamId);
 }
+
+RetCode MpiDeviceManager::StartRecvFrame(int32_t streamId)
+{
+    return sysObject_->StartRecvFrame(streamId);
+}
+
+RetCode MpiDeviceManager::StopRecvFrame(int32_t streamId)
+{
+    return sysObject_->StopRecvFrame(streamId);
+}
 } // namespace OHOS::Camera

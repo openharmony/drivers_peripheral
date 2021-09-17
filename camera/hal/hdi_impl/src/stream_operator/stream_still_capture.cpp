@@ -78,7 +78,7 @@ RetCode StreamStillCapture::ChangeToOfflineStream(std::shared_ptr<OfflineStream>
         context->restRequests = inTransitList_;
         state_ = STREAM_STATE_OFFLINE;
         CAMERA_LOGI("there is/are %{public}u request(s) left in stream %{public}d.",
-        context->restRequests.size(), streamId_);
+            context->restRequests.size(), streamId_);
     }
 
     RetCode rc = offlineStream->Init(context);

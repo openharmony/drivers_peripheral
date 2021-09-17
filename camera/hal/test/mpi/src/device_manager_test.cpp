@@ -52,4 +52,3 @@ HWTEST_F(DeviceManagerTest, Camera_Device_0001, TestSize.Level2)
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
-

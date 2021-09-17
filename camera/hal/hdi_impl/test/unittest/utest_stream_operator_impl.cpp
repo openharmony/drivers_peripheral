@@ -189,7 +189,7 @@ HWTEST_F(StreamOperatorImplTest, UTestCapture, TestSize.Level0)
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
     std::shared_ptr<StreamInfo> streamInfo = std::make_shared<StreamInfo>();
     streamInfo->streamId_ = 1005;
-    streamInfo->width_ = 720;
+    streamInfo->width_ = 640;
     streamInfo->height_ = 480;
     streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
     streamInfo->datasapce_ = 8;

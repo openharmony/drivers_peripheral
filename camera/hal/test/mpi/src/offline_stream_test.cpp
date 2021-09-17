@@ -97,7 +97,7 @@ HWTEST_F(OfflineStreamTest, Camera_Offline_0002, TestSize.Level2)
     Test_->offlineStreamOperatorCallback = Test_->streamOperatorCallback;
     Test_->rc = Test_->streamOperator->ChangeToOfflineStream(
         {Test_->streamId_preview}, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
-    ASSERT_EQ(Test_->rc, Camera::DEVICE_ERROR);
+    ASSERT_EQ(Test_->rc, Camera::METHOD_NOT_SUPPORTED);
     std::cout << "==========[test log]Check offline: ChangeToOfflineStream rc = " << Test_->rc << std::endl;
     ASSERT_EQ(true, Test_->offlineStreamOperator == nullptr);
     std::cout << "==========[test log]Check offline stream: offline StreamOperator == nullptr." << std::endl;
@@ -130,7 +130,7 @@ HWTEST_F(OfflineStreamTest, Camera_Offline_0003, TestSize.Level2)
     Test_->offlineStreamOperatorCallback = Test_->streamOperatorCallback;
     Test_->rc = Test_->streamOperator->ChangeToOfflineStream(
         {Test_->streamId_video}, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
-    ASSERT_EQ(Test_->rc, Camera::DEVICE_ERROR);
+    ASSERT_EQ(Test_->rc, Camera::METHOD_NOT_SUPPORTED);
     std::cout << "==========[test log]Check offline: ChangeToOfflineStream rc = " << Test_->rc << std::endl;
     ASSERT_EQ(Test_->offlineStreamOperator, nullptr);
     std::cout << "==========[test log]Check offline stream: offline StreamOperator == nullptr." << std::endl;
