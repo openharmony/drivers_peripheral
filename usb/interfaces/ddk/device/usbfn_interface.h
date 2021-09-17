@@ -155,7 +155,10 @@ struct UsbFnCtrlRequest {
     uint16_t value;
     /** Request index value */
     uint16_t index;
-    /** Number of bytes in the data communication phase, which must be less than the value of <b>bMaxPacketSize0</b> defined in the device descriptor */
+    /**
+    * Number of bytes in the data communication phase, which must be less than the
+    * value of <b>bMaxPacketSize0</b> defined in the device descriptor
+    */
     uint16_t length;
 } __attribute__((packed));
 
@@ -231,7 +234,8 @@ typedef void (*UsbFnEventCallback)(struct UsbFnEvent *event);
  * @param name Indicates the pointer to the attribute name of the string type.
  * @param value Indicates the pointer to the attribute value of the string type.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link UsbErrorType} otherwise.
+ * @return Returns <b>0</b> if the operation is successful;
+ * returns a negative value defined in {@link UsbErrorType} otherwise.
  */
 typedef int32_t (*UsbFnPropCallback)(const struct UsbFnInterface *intf, const char *name, const char *value);
 
@@ -250,17 +254,21 @@ struct UsbFnRegistInfo {
 };
 
 /**
- * @brief Defines the callback called when the USB interface starts a thread to receive EP0 events, such as the setup event.
- *
- * 
+ * @brief Defines the callback called when the USB interface starts a thread to receive EP0 events,
+ * such as the setup event.
  *
  * @param interface Indicates the pointer to the USB interface object.
- * @param eventMask Indicates the type of the event to be processed. The event is defined by <b>UsbFnDeviceState</b>. Each bit of <b>eventMask</b> indicates an event.
- * For example, if the value of <b>eventMask</b> is <b>0xff</b>, all events are received; if the value of <b>eventMask</b> is <b>0x01</b>, only the <b>USBFN_STATE_BIND</b> event is received.
- * @param callback Indicates the callback function called after a request is processed. It needs to be defined by the application.
+ * @param eventMask Indicates the type of the event to be processed.
+ * The event is defined by <b>UsbFnDeviceState</b>.
+ * Each bit of <b>eventMask</b> indicates an event.
+ * For example, if the value of <b>eventMask</b> is <b>0xff</b>, all events are received;
+ * if the value of <b>eventMask</b> is <b>0x01</b>, only the <b>USBFN_STATE_BIND</b> event is received.
+ * @param callback Indicates the callback function called after a request is processed.
+ * It needs to be defined by the application.
  * @param context Indicates the pointer to the private context data.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link UsbErrorType} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value
+ * defined in {@link UsbErrorType} otherwise.
  */
 int UsbFnStartRecvInterfaceEvent(struct UsbFnInterface *interface, uint32_t eventMask,
     UsbFnEventCallback callback, void *context);
@@ -268,11 +276,10 @@ int UsbFnStartRecvInterfaceEvent(struct UsbFnInterface *interface, uint32_t even
 /**
  * @brief Defines the callback called when the USB interface stops receiving EP0 events.
  *
- * 
- *
  * @param interface Indicates the pointer to the USB interface object.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link UsbErrorType} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative
+ * value defined in {@link UsbErrorType} otherwise.
  */
 int UsbFnStopRecvInterfaceEvent(struct UsbFnInterface *interface);
 
@@ -283,8 +290,8 @@ int UsbFnStopRecvInterfaceEvent(struct UsbFnInterface *interface);
  *
  * @param interface Indicates the pointer to the USB interface object.
  *
- * @return Returns a <b>#UsbFnInterfaceHandle</b> containing the USB interface information if the operation is successful; returns <b>NULL</b> otherwise.
- 
+ * @return Returns a <b>#UsbFnInterfaceHandle</b> containing the USB interface information
+ * if the operation is successful; returns <b>NULL</b> otherwise.
  */
 UsbFnInterfaceHandle UsbFnOpenInterface(struct UsbFnInterface *interface);
 
@@ -295,32 +302,34 @@ UsbFnInterfaceHandle UsbFnOpenInterface(struct UsbFnInterface *interface);
  *
  * @param UsbFnInterfaceHandle Indicates the handle of the USB interface object.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link UsbErrorType} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value
+ * defined in {@link UsbErrorType} otherwise.
  */
 int UsbFnCloseInterface(UsbFnInterfaceHandle handle);
 
 /**
  * @brief Obtains USB pipe information based on the specified pipe ID.
  *
- * 
- *
  * @param interface Indicates the pointer to the USB interface object.
  * @param pipeId Indicates the pipe ID. The value ranges from 0 to the total number of pipes on the USB interface.
  * @param info Indicates the pointer to the obtained pipe information.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link UsbErrorType} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative
+ * value defined in {@link UsbErrorType} otherwise.
  */
 int UsbFnGetInterfacePipeInfo(struct UsbFnInterface *interface, uint8_t pipeId, struct UsbFnPipeInfo *info);
 
 /**
  * @brief Registers custom attributes for a USB interface.
  *
- * In addition to custom attributes, you can use this function to register the callback function for the request of obtaining and setting custom attributes.
+ * In addition to custom attributes, you can use this function to register the callback function
+ * for the request of obtaining and setting custom attributes.
  *
  * @param interface Indicates the pointer to the USB interface object.
  * @param registInfo Indicates the pointer to the attribute information.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link UsbErrorType} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative
+ * value defined in {@link UsbErrorType} otherwise.
  */
 int UsbFnRegistInterfaceProp(const struct UsbFnInterface *interface,
     const struct UsbFnRegistInfo *registInfo);
@@ -328,16 +337,19 @@ int UsbFnRegistInterfaceProp(const struct UsbFnInterface *interface,
 /**
  * @brief Obtains custom attributes of a USB interface.
  *
- * 
- *
- * Custom attributes can be any of the following: attributes of device descriptors, such as VID and PID, attributes of the USB interface defined in the HCS file, and attributes registered in the code at the application layer.
- * For example, if <b>name</b> is <b>idVendor</b> when obtaining the VID, the obtained value will be stored in <b>value</b> as a hex string.
+ * Custom attributes can be any of the following: attributes of device descriptors, such as VID and PID,
+ * attributes of the USB interface defined in the HCS file, and attributes registered
+ * in the code at the application layer.
+ * For example, if <b>name</b> is <b>idVendor</b> when obtaining the VID, the obtained value will be
+ * stored in <b>value</b> as a hex string.
  *
  * @param interface Indicates the pointer to the USB interface object.
  * @param name Indicates the pointer to the attribute name of the string type.
- * @param value Indicates the pointer to the attribute value of the string type. Except integer data, which is a string converted from hex data, all the other types of data are strings by default.
+ * @param value Indicates the pointer to the attribute value of the string type. Except integer data,
+ * which is a string converted from hex data, all the other types of data are strings by default.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link UsbErrorType} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative
+ * value defined in {@link UsbErrorType} otherwise.
  */
 int UsbFnGetInterfaceProp(const struct UsbFnInterface *interface,
     const char *name, char *value);
@@ -345,16 +357,19 @@ int UsbFnGetInterfaceProp(const struct UsbFnInterface *interface,
 /**
  * @brief Sets custom attributes of a USB interface.
  *
- * 
- *
- * Custom attributes can be any of the following: attributes of device descriptors, such as VID and PID, attributes of the USB interface defined in the HCS file, and attributes registered in the code at the application layer.
- * For example, if <b>name</b> is <b>idVendor</b> when setting the VID, the set value will be stored in <b>value</b> as a hex string.
+ * Custom attributes can be any of the following: attributes of device descriptors, such as VID and PID,
+ * attributes of the USB interface defined in the HCS file, and attributes registered
+ * in the code at the application layer.
+ * For example, if <b>name</b> is <b>idVendor</b> when setting the VID, the set value will be
+ * stored in <b>value</b> as a hex string.
  *
  * @param interface Indicates the pointer to the USB interface object.
  * @param name Indicates the pointer to the attribute name of the string type.
- * @param value Indicates the pointer to the attribute value of the string type. Except integer data, which is a string converted from hex data, all the other types of data are strings by default.
+ * @param value Indicates the pointer to the attribute value of the string type. Except integer data,
+ * which is a string converted from hex data, all the other types of data are strings by default.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link UsbErrorType} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative
+ * value defined in {@link UsbErrorType} otherwise.
  */
 int UsbFnSetInterfaceProp(const struct UsbFnInterface *interface,
     const char *name, const char *value);

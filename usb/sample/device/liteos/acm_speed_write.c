@@ -16,10 +16,10 @@
 #include <hdf_io_service_if.h>
 #include <hdf_log.h>
 #include <osal_file.h>
-#include <osal_mutex.h>
 #include <osal_mem.h>
-#include <osal_time.h>
+#include <osal_mutex.h>
 #include <osal_thread.h>
+#include <osal_time.h>
 #include <pthread.h>
 #include <securec.h>
 #include <signal.h>
@@ -96,21 +96,21 @@ static void WriteSpeedDone()
 static void *StopHandler(void *arg)
 {
     int err, signo;
-    for (;;) {
+    while (1) {
         err = sigwait(&g_mask, &signo);
         if (err != 0) {
             printf("Sigwait failed: %d\n", err);
         }
 
         switch (signo) {
-        case SIGINT:
-        case SIGQUIT:
-            printf("acm_speed_write exit\n");
-            WriteSpeedDone();
-            g_readRuning = false;
-            return NULL;
-        default:
-            printf("Unexpected signal %d\n", signo);
+            case SIGINT:
+            case SIGQUIT:
+                printf("acm_speed_write exit\n");
+                WriteSpeedDone();
+                g_readRuning = false;
+                return NULL;
+            default:
+                printf("Unexpected signal %d\n", signo);
         }
     }
 }

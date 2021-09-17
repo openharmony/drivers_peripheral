@@ -17,7 +17,8 @@
  * @addtogroup USB
  * @{
  *
- * @brief Declares USB-related APIs, including the custom data types and functions used to obtain descriptors, interface objects, and request objects, and to submit requests.
+ * @brief Declares USB-related APIs, including the custom data types and functions used to obtain descriptors, 
+ *  interface objects, and request objects, and to submit requests.
  *
  * @since 1.0
  * @version 1.0
@@ -86,7 +87,8 @@ typedef enum {
 /**
  * @brief Defines the request parameter type.
  *
- * It will be filled in the corresponding field in {@link UsbRequestParams} to indicate whether the request parameter is of the control type or data type.
+ * It will be filled in the corresponding field in {@link UsbRequestParams} to indicate whether the request parameter
+ * is of the control type or data type.
  */
 typedef enum {
     /** Control type */
@@ -154,7 +156,7 @@ struct UsbInterfaceInfo {
     uint8_t altSettings;
     /** Index of the current enabled interface */
     uint8_t curAltSetting;
-    /** Pipe quantity*/
+    /** Pipe quantity */
     uint8_t pipeNum;
     /** Interface class */
     uint8_t interfaceClass;
@@ -195,8 +197,11 @@ struct UsbRequestCompInfo {
 /**
  * @brief Defines a USB request.
  *
- * There are two types of request objects: <b>UsbObject</b> (USB basic object) and <b>UsbRequestCompInfo</b> (USB request completion information ). You can query the current request execution status through the USB request completion information.
- * The isochronous (block) request and non-isochronous (non-block) request share this data structure but use different application interfaces. The isochronous (block) request uses the <b>UsbSubmitRequestSync</b> interface,
+ * There are two types of request objects: <b>UsbObject</b> (USB basic object) and <b>UsbRequestCompInfo</b>
+ * (USB request completion information ). You can query the current request execution status through the USB request
+ * completion information.
+ * The isochronous (block) request and non-isochronous (non-block) request share this data structure but use different
+ * application interfaces. The isochronous (block) request uses the <b>UsbSubmitRequestSync</b> interface,
  * whereas the non-isochronous (non-block) request uses the <b>UsbSubmitRequestAsync</b> interface.
  */
 struct UsbRequest {
@@ -207,7 +212,8 @@ struct UsbRequest {
 }__attribute__((aligned(4)));
 
 /**
- * @brief Defines the callback function for completion of a user request. It will be used to fill the {@link UsbRequestParams} object.
+ * @brief Defines the callback function for completion of a user request. It will be used to fill the
+ * {@link UsbRequestParams} object.
  */
 typedef void (*UsbRequestCallback)(struct UsbRequest *request);
 
@@ -248,7 +254,8 @@ struct UsbRequestParamsData {
 };
 
 /**
- * @brief Defines a USB request parameter object, which can be {@link UsbControlRequest} (control request parameter) or {@link UsbRequestParamsData} (data request parameter).
+ * @brief Defines a USB request parameter object, which can be {@link UsbControlRequest} (control request parameter)
+ * or {@link UsbRequestParamsData} (data request parameter).
  */
 struct UsbRequestParams {
     /** Interface ID */
@@ -279,9 +286,11 @@ struct UsbRequestParams {
  *
  * You can use this function to allocate and initialize resources.
  *
- * @param session Indicates the double pointer to the session context. It can be set to <b>NULL</b> or a value defined in {@link UsbSession}.
+ * @param session Indicates the double pointer to the session context. It can be set to <b>NULL</b> or a value defined
+ * in {@link UsbSession}.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int32_t UsbInitHostSdk(struct UsbSession **session);
 
@@ -290,9 +299,11 @@ int32_t UsbInitHostSdk(struct UsbSession **session);
  *
  * You can use this function to release occupied resources.
  *
- * @param session Indicates the pointer to the session context. It can be set to <b>NULL</b> or a value defined in {@link UsbSession}.
+ * @param session Indicates the pointer to the session context. It can be set to <b>NULL</b> or a value defined in
+ * {@link UsbSession}.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise. 
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise. 
  */
 int32_t UsbExitHostSdk(const struct UsbSession *session);
 
@@ -301,13 +312,16 @@ int32_t UsbExitHostSdk(const struct UsbSession *session);
  *
  * 
  *
- * @param session Indicates the pointer to the session context. It can be set to <b>NULL</b> or a value defined in {@link UsbSession}.
+ * @param session Indicates the pointer to the session context. It can be set to <b>NULL</b> or a value defined in
+ * {@link UsbSession}.
  * @param busNum Indicates the USB device bus number.
  * @param usbAddr Indicates the USB device address.
- * @param interfaceIndex Indicates the index of the interface object to be obtained. This parameter is defined in the <b>UsbInterfaceInfo</b> structure.
+ * @param interfaceIndex Indicates the index of the interface object to be obtained. This parameter is defined in the
+ * <b>UsbInterfaceInfo</b> structure.
  * The default index of the control interface is <b>0xFF</b>.
  *
- * @return Returns the pointer to the <b>UsbInterface</b> structure if the operation is successful; returns <b>NULL</b> otherwise. 
+ * @return Returns the pointer to the <b>UsbInterface</b> structure if the operation is successful; returns <b>NULL</b>
+ * otherwise. 
  */
 const struct UsbInterface *UsbClaimInterface(const struct UsbSession *session, uint8_t busNum,
     uint8_t usbAddr, uint8_t interfaceIndex);
@@ -317,7 +331,8 @@ const struct UsbInterface *UsbClaimInterface(const struct UsbSession *session, u
  *
  * @param interfaceObj Indicates the pointer to the USB interface object to release.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbReleaseInterface(const struct UsbInterface *interfaceObj);
 
@@ -327,7 +342,8 @@ int UsbReleaseInterface(const struct UsbInterface *interfaceObj);
  * @param status Indicates the interface operation status.
  * @param interfaceObj Indicates the pointer to the USB interface object to add or remove.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbAddOrRemoveInterface(const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr,
     uint8_t interfaceIndex, UsbInterfaceStatus status);
@@ -337,7 +353,8 @@ int UsbAddOrRemoveInterface(const struct UsbSession *session, uint8_t busNum, ui
  *
  * @param interfaceObj Indicates the pointer to the USB interface object to open.
  *
- * @return Returns the pointer to the <b>UsbInterfaceHandle</b> if the operation is successful; returns <b>NULL</b> otherwise.
+ * @return Returns the pointer to the <b>UsbInterfaceHandle</b> if the operation is successful; returns <b>NULL</b>
+ * otherwise.
  */
 UsbInterfaceHandle *UsbOpenInterface(const struct UsbInterface *interfaceObj);
 
@@ -346,7 +363,8 @@ UsbInterfaceHandle *UsbOpenInterface(const struct UsbInterface *interfaceObj);
  *
  * @param interfaceHandle Indicates the pointer to the handle of the USB interface object to close.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int32_t UsbCloseInterface(const UsbInterfaceHandle *interfaceHandle);
 
@@ -356,7 +374,8 @@ int32_t UsbCloseInterface(const UsbInterfaceHandle *interfaceHandle);
  * @param interfaceHandle Indicates the pointer to the USB interface handle.
  * @param settingIndex Indicates the index of the optional configuration.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int32_t UsbSelectInterfaceSetting(const UsbInterfaceHandle *interfaceHandle, uint8_t settingIndex,
     struct UsbInterface **interfaceObj);
@@ -385,13 +404,15 @@ int32_t UsbClearInterfaceHalt(const UsbInterfaceHandle *interfaceHandle, uint8_t
 /**
  * @brief Allocates a USB request.
  *
- * I/O requests are allocated based on the size of the user space. If they are used to send isochronous transfer packets, extra space will be allocated.
+ * I/O requests are allocated based on the size of the user space. If they are used to send isochronous transfer
+ * packets, extra space will be allocated.
  *
  * @param interfaceHandle Indicates the pointer to the USB interface handle.
  * @param isoPackets Indicates the number of isochronous transfer packets. For details, see {@link UsbPipeType}.
  * @param length Indicates the size of the user space to allocate.
  *
- * @return Returns the pointer to the <b>UsbRequest</b> structure if the operation is successful; returns <b>NULL</b> otherwise.
+ * @return Returns the pointer to the <b>UsbRequest</b> structure if the operation is successful; returns <b>NULL</b>
+ * otherwise.
  */
 struct UsbRequest *UsbAllocRequest(const UsbInterfaceHandle *interfaceHandle, int isoPackets, int length);
 
@@ -400,7 +421,8 @@ struct UsbRequest *UsbAllocRequest(const UsbInterfaceHandle *interfaceHandle, in
  *
  * @param request Indicates the pointer to the USB request.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbFreeRequest(const struct UsbRequest *request);
 
@@ -409,7 +431,8 @@ int UsbFreeRequest(const struct UsbRequest *request);
  *
  * @param request Indicates the pointer to the USB request.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbSubmitRequestAsync(const struct UsbRequest *request);
 
@@ -422,7 +445,8 @@ int UsbSubmitRequestAsync(const struct UsbRequest *request);
  * @param interfaceHandle Indicates the pointer to the USB interface handle.
  * @param params Indicates the pointer to a list of parameters to fill. For details, see {@link UsbRequestParams}.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int32_t UsbFillRequest(const struct UsbRequest *request, const UsbInterfaceHandle *interfaceHandle,
     const struct UsbRequestParams *params);
@@ -441,7 +465,8 @@ int UsbCancelRequest(const struct UsbRequest *request);
  *
  * @param request Indicates the pointer to the USB request.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbSubmitRequestSync(const struct UsbRequest *request);
 int UsbMemTestTrigger(bool enable);

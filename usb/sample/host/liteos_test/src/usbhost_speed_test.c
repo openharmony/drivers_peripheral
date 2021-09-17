@@ -125,7 +125,7 @@ static void *stop_handler(void *arg)
     int err, signo;
     stopHandlerTid = getpid();
 
-    for (;;) {
+    while (true) {
         err = sigwait(&mask, &signo);
         if (err != 0) {
             printf("Sigwait failed: %d\n", err);

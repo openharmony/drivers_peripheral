@@ -16,10 +16,10 @@
 #include <hdf_io_service_if.h>
 #include <hdf_log.h>
 #include <osal_file.h>
-#include <osal_mutex.h>
 #include <osal_mem.h>
-#include <osal_time.h>
+#include <osal_mutex.h>
 #include <osal_thread.h>
+#include <osal_time.h>
 #include <pthread.h>
 #include <securec.h>
 #include <signal.h>
@@ -98,7 +98,7 @@ static void ReadSpeedDone()
 static void *StopHandler(void *arg)
 {
     int err, signo;
-    for (;;) {
+    while (1) {
         err = sigwait(&g_mask, &signo);
         if (err != 0) {
             printf("Sigwait failed: %d\n", err);
