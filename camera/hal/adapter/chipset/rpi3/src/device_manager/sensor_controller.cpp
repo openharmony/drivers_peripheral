@@ -19,7 +19,7 @@
 namespace OHOS::Camera {
 SensorController::SensorController() {}
 
-SensorController::SensorController(std::string hardwareName) : IController(hardwareName),buffCont_(0) {}
+SensorController::SensorController(std::string hardwareName) : IController(hardwareName), buffCont_(0) {}
 
 SensorController::~SensorController() {}
 
@@ -125,7 +125,7 @@ void SensorController::BufferCallback(std::shared_ptr<FrameSpec> buffer)
         return;
     }
     nodeBufferCb_(buffer);
-    std::shared_ptr<CameraStandard::CameraMetadata> meta = std::make_shared<CameraStandard::CameraMetadata>(30,2000);
+    std::shared_ptr<CameraStandard::CameraMetadata> meta = std::make_shared<CameraStandard::CameraMetadata>(30, 2000);
     RetCode rc;
     rc = GetAbilityMetaData(meta);
     std::lock_guard<std::mutex> l(metaDataFlaglock_);

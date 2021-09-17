@@ -28,7 +28,7 @@ void OpenCameraTest::SetUp(void)
 }
 void OpenCameraTest::TearDown(void)
 {
-
+    ;
 }
 
 /**
@@ -94,4 +94,3 @@ int main(int argc, char *argv[])
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
-

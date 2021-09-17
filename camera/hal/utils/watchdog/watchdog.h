@@ -44,9 +44,10 @@ private:
 
 #define WATCHDOG_TIMEOUT 10000
 
-#define PLACE_A_WATCHDOG(t, f, k) \
+#define PLACE_A_WATCHDOG(t, f, k) do { \
     WatchDog _dog;                \
-    _dog.Init(t, f, k);
+    _dog.Init(t, f, k); \
+} while (0)
 
 #define PLACE_A_WATCHDOG_DEFAULT_TIME(f, k) PLACE_A_WATCHDOG(WATCHDOG_TIMEOUT, f, k)
 #define PLACE_A_SELFKILL_WATCHDOG           PLACE_A_WATCHDOG_DEFAULT_TIME(nullptr, true)

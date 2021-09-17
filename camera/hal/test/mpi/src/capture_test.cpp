@@ -197,10 +197,15 @@ HWTEST_F(CaptureTest, Camera_Capture_0005, TestSize.Level2)
     Test_->consumerMap_[Camera::STILL_CAPTURE] = capture_consumer;
     // 查询IsStreamsSupported接口是否支持
     Camera::StreamSupportType pType;
-    std::shared_ptr<CameraStandard::CameraMetadata> modeSetting;
+    std::shared_ptr<CameraStandard::CameraMetadata> modeSetting = std::make_shared<CameraStandard::CameraMetadata>(2, 128);
+    int64_t expoTime = 0;
+    modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
+    int64_t colorGains[4] = {0};
+    modeSetting->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
     Test_->rc = Test_->streamOperator->IsStreamsSupported(Camera::NORMAL, modeSetting, {streamInfo_capture}, pType);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    EXPECT_EQ(true, pType == Camera::NOT_SUPPORTED);
+    std::cout << "ptype = " << pType << std::endl;
+    EXPECT_EQ(true, pType == Camera::RE_CONFIGURED_REQUIRED);
     // 后处理
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
@@ -224,6 +229,34 @@ HWTEST_F(CaptureTest, Camera_Capture_0006, TestSize.Level0)
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     // 捕获拍照流，单拍
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, false);
+    // 后处理
+    Test_->captureIds = {Test_->captureId_preview};
+    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+    Test_->StopStream(Test_->captureIds, Test_->streamIds);
+}
+
+/**
+  * @tc.name: preview and capture
+  * @tc.desc: Commit 2 streams together, Preview and still_capture streams, isStreaming is false,
+  * Do not stop the stream, multiple single capture
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+HWTEST_F(CaptureTest, Camera_Capture_0007, TestSize.Level0)
+{
+    std::cout << "==========[test log]check Capture: Commit 2 streams together,";
+    std::cout << "Preview and still_capture streams, isStreaming is false, multiple single capture" << std::endl;
+    // 配置两路流信息
+    Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
+    Test_->StartStream(Test_->intents);
+    // 捕获预览流
+    Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
+    // 捕获拍照流，多次单拍
+    Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, false);
+    sleep(1);
+    Test_->StartCapture(Test_->streamId_capture, (Test_->captureId_capture) + 1, false, false);
+    sleep(1);
+    Test_->StartCapture(Test_->streamId_capture, (Test_->captureId_capture) + 2, false, false);
     // 后处理
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
@@ -312,4 +345,3 @@ HWTEST_F(CaptureTest, Camera_Capture_0040, TestSize.Level2)
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
-

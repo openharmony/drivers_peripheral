@@ -45,13 +45,13 @@ public:
 
 private:
     RetCode SendSensorMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
-    RetCode SendAEMetaData(common_metadata_header_t * data);
-    RetCode SendAWBMetaData(common_metadata_header_t * data);
+    RetCode SendAEMetaData(common_metadata_header_t *data);
+    RetCode SendAWBMetaData(common_metadata_header_t *data);
     RetCode GetSensorMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
     RetCode GetAEMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
     RetCode GetAWBMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
     template <typename T>
-    bool CheckNumequal(T oldnum,T num,int size)
+    bool CheckNumequal(T oldnum, T num, int size)
     {
         if (oldnum == nullptr || num == nullptr) {
             CAMERA_LOGE("oldnum or num is nullptr");

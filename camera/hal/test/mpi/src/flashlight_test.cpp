@@ -177,4 +177,3 @@ HWTEST_F(FlashlightTest, Camera_Flashlight_0020, TestSize.Level1)
     std::cout << "==========[test log]check the flashlight status is off." << std::endl;
     sleep(5);
 }
-

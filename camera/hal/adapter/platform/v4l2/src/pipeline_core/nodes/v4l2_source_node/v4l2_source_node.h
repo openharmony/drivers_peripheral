@@ -22,7 +22,7 @@
 #include "sensor_controller.h"
 #include "sensor_manager.h"
 
-namespace OHOS::Camera{
+namespace OHOS::Camera {
 class V4L2SourceNode : public SourceNode {
 public:
     V4L2SourceNode(const std::string& name, const std::string& type);

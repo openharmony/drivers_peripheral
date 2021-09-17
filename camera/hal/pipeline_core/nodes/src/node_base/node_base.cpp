@@ -201,6 +201,11 @@ RetCode NodeBase::Capture(const int32_t streamId, const int32_t captureId)
     return RC_OK;
 }
 
+RetCode NodeBase::CancelCapture(const int32_t streamId)
+{
+    return RC_OK;
+}
+
 void NodeBase::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     auto outPorts = GetOutPorts();
