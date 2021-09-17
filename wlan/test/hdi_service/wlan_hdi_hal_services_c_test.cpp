@@ -68,7 +68,7 @@ void HdfWifiServiceCTest::TearDown()
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-static void HdiProcessScanResult(struct HdfSBuf *dataBuf)
+static void HdiProcessScanResult(const struct HdfSBuf *dataBuf)
 {
     WifiScanResult *scanResult = nullptr;
     uint32_t dataSize = 0;
@@ -289,14 +289,13 @@ HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_010, TestSize.Level1)
 {
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     struct WlanFeatureInfo *ifeature = nullptr;
-    int32_t freq[WLAN_FREQ_MAX_NUM] = {0};
+    struct Freq freq = {0};
     int32_t wlanBand = 0;
     uint32_t count = 0;
 
     int32_t rc = g_wlanObj->createFeature(g_wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->getFreqsWithBand(g_wlanObj, (struct WlanFeatureInfo *)ifeature, wlanBand, freq,
-                                   WLAN_FREQ_MAX_NUM, &count);
+    rc = g_wlanObj->getFreqsWithBand(g_wlanObj, (struct WlanFeatureInfo *)ifeature, wlanBand, freq, &count);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);

@@ -230,6 +230,7 @@ static void WifiDriverEventCancelRemainOnChannelProcess(const char *ifName, uint
     }
     WifiEventReport(ifName, event, &result);
 }
+
 int OnWiFiEvents(struct HdfDevEventlistener *listener,
     struct HdfIoService *service, uint32_t eventId, struct HdfSBuf *data)
 {
