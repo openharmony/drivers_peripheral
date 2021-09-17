@@ -19,6 +19,8 @@
 #include "wifi_hal.h"
 #include "wifi_hal_ap_feature.h"
 
+#define WLAN_FREQ_MAX_NUM 14
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -27,6 +29,10 @@ struct HdfSBuf;
 struct WlanFeatureInfo {
     char *ifName;
     int32_t wlanType;
+};
+
+struct Freq {
+    int32_t para[WLAN_FREQ_MAX_NUM];   
 };
 
 struct IWifiInterface {
@@ -55,7 +61,7 @@ struct IWifiInterface {
     int32_t (*getDeviceMacAddress)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature,
         unsigned char *mac, uint8_t len);
     int32_t (*getFreqsWithBand)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, int32_t band,
-        int32_t *freqs, uint32_t count, uint32_t *num);
+        struct Freq freq, uint32_t *num);
     int32_t (*setTxPower)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, int32_t power);
     int32_t (*getChipId)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, uint8_t *chipId);
     int32_t (*getIfNamesByChipId)(struct IWifiInterface *self, const uint8_t chipId, char **ifNames, uint32_t *num);

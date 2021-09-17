@@ -326,7 +326,7 @@ static int32_t WlanServiceStudRegCallback(struct HdfDeviceIoClient *client, stru
 {
     (void)client;
     (void)reply;
-    int32_t ret = 0;
+    int32_t ret;
 
     if (data == NULL) {
         HDF_LOGE("%s: Data is NULL", __func__);

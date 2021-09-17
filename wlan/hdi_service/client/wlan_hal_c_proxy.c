@@ -453,7 +453,7 @@ finished:
 }
 
 static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature,
-    int32_t band, int32_t *freqs, uint32_t count, uint32_t *num)
+    int32_t band, struct Freq freq, uint32_t *num)
 {
     int32_t ec = HDF_FAILURE;
 
