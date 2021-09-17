@@ -273,7 +273,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetAsscociatedStas001, TestSize.Level1)
 {
     int ret;
     struct IWiFiAp *apFeature = nullptr;
-    struct StaInfo staInfo[WLAN_MAX_NUM_STA_WITH_AP] = {0};
+    struct StaInfo staInfo[WLAN_MAX_NUM_STA_WITH_AP] = {{0}};
     uint32_t num = 0;
     struct timespec tv1 = (struct timespec){0};
     struct timespec tv2 = (struct timespec){0};
@@ -402,6 +402,21 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetIfNamesByChipId001, TestSize.Level1)
     free(ifNames);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: WifiHalRegisterEventCallback001
+ * @tc.desc: Wifi hal register callback function test
+ * @tc.type: FUNC
+ * @tc.require: AR000F869G
+ */
+HWTEST_F(HdfWlanPerformanceTest, WifiHalRegisterEventCallback001, TestSize.Level1)
+{
+    int ret;
+
+    ret = g_wifi->registerEventCallback(HalResetCallbackEvent, "wlan0");
+    sleep(RESET_TIME);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 };

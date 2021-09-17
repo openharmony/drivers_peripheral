@@ -60,4 +60,34 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
   }
+} else {
+  module_output_path = "hdf/wlan"
+  ohos_unittest("hdf_performance_wifi") {
+    module_out_path = module_output_path
+    include_dirs = [
+      "//drivers/peripheral/wlan/client/include",
+      "//drivers/peripheral/wlan/interfaces/include",
+    ]
+    sources = [ "./common/hdf_wlan_performance_test.cpp" ]
+    cflags = [
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fsigned-char",
+      "-fno-common",
+      "-fno-strict-aliasing",
+    ]
+    deps = [
+      "$hdf_uhdf_path/osal:libhdf_utils",
+      "$hdf_uhdf_path/test/unittest/common:libhdf_test_common",
+      "//drivers/peripheral/wlan/client:wifi_driver_client",
+      "//drivers/peripheral/wlan/hal:wifi_hal",
+      "//utils/native/base:utils",
+    ]
+    if (is_standard_system) {
+      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+  }
 }
