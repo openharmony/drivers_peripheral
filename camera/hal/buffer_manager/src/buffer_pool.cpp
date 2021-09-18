@@ -164,7 +164,7 @@ std::shared_ptr<IBuffer> BufferPool::AcquireBuffer(int timeout)
 {
     std::unique_lock<std::mutex> l(lock_);
 
-    // return buffer immediately, if idle buffer is avaliable;
+    // return buffer immediately, if idle buffer is available;
     if (!idleList_.empty()) {
         auto it = idleList_.begin();
         auto buffer = *it;
@@ -173,7 +173,7 @@ std::shared_ptr<IBuffer> BufferPool::AcquireBuffer(int timeout)
         return *it;
     }
 
-    // wait all the time, till idle list is avaliable.
+    // wait all the time, till idle list is available.
     if (timeout < 0) {
         cv_.wait(l, [this] {
             return !idleList_.empty() || stop_;
@@ -187,7 +187,7 @@ std::shared_ptr<IBuffer> BufferPool::AcquireBuffer(int timeout)
         }
     }
 
-    // wait for timeout, or idle list is avaliable.
+    // wait for timeout, or idle list is available.
     if (timeout > 0) {
         if (cv_.wait_for(l, std::chrono::seconds(timeout), [this] {
             return !idleList_.empty() || stop_;
@@ -204,7 +204,7 @@ std::shared_ptr<IBuffer> BufferPool::AcquireBuffer(int timeout)
         }
     }
 
-    // timeout == 0. return nullptr buffer immediately, although idle buffer is not avaliable.
+    // timeout == 0. return nullptr buffer immediately, although idle buffer is not available.
     return nullptr;
 }
 

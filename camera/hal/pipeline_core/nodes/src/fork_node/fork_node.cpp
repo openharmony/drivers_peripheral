@@ -15,8 +15,7 @@
 #include "securec.h"
 
 namespace OHOS::Camera {
-ForkNode::ForkNode(const std::string& name, const std::string& type)
-    :SourceNode(name, type), NodeBase(name, type)
+ForkNode::ForkNode(const std::string& name, const std::string& type) : SourceNode(name, type), NodeBase(name, type)
 {
     CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }

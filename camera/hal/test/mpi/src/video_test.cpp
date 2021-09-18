@@ -273,7 +273,7 @@ HWTEST_F(VideoTest, Camera_Video_0022, TestSize.Level2)
     }
     // 捕获录像流
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    sleep(1800);
+    sleep(900);
     // 后处理
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};

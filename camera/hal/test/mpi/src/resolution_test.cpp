@@ -107,8 +107,8 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0001, TestSize.Level3)
     std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
     // 捕获预览流
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获拍照流，单拍
-    Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, false);
+    // 捕获拍照流
+    Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
     // 后处理
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
@@ -138,7 +138,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0002, TestSize.Level3)
     // 配置预览流信息
     Test_->streamInfo_pre = std::make_shared<Camera::StreamInfo>();
     Test_->streamInfo_pre->streamId_ = Test_->streamId_preview;
-    Test_->streamInfo_pre->width_ = 853; // 640:width of stream
+    Test_->streamInfo_pre->width_ = 853; // 853:width of stream
     Test_->streamInfo_pre->height_ = 480; // 480: height of stream
     Test_->streamInfo_pre->format_ = PIXEL_FMT_YCRCB_420_SP;
     Test_->streamInfo_pre->datasapce_ = 8; // 8:datasapce of stream
@@ -146,6 +146,92 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0002, TestSize.Level3)
     Test_->streamInfo_pre->tunneledMode_ = 5; // 5:tunneledMode of stream
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+    std::cout << "==========[test log]received a preview buffer ... 0" << std::endl;
+    Test_->streamInfo_pre->bufferQueue_ = preview_consumer->CreateProducer([this](void* addr, uint32_t size) {
+        Test_->SaveYUV("preview", addr, size);
+    });
+    Test_->streamInfo_pre->bufferQueue_->SetQueueSize(8); // 8:size of bufferQueue
+    Test_->consumerMap_[Camera::PREVIEW] = preview_consumer;
+    Test_->streamInfos.push_back(Test_->streamInfo_pre);
+    // 配置录像流信息
+    Test_->streamInfo_video = std::make_shared<Camera::StreamInfo>();
+    Test_->streamInfo_video->streamId_ = Test_->streamId_video;
+    Test_->streamInfo_video->width_ = 1280; // 1280:width of stream
+    Test_->streamInfo_video->height_ = 720; // 960: height of stream
+    Test_->streamInfo_video->format_ = PIXEL_FMT_YCRCB_420_SP;
+    Test_->streamInfo_video->datasapce_ = 8; // 8:datasapce of stream
+    Test_->streamInfo_video->intent_ = Camera::VIDEO;
+    Test_->streamInfo_video->encodeType_ = ENCODE_TYPE_H265;
+    Test_->streamInfo_video->tunneledMode_ = 5; // 5:tunneledMode of stream
+    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer_video =
+        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+    std::cout << "==========[test log]received a video buffer ... 1" << std::endl;
+    Test_->SaveVideoFile("video", nullptr, 0, 0);
+    Test_->streamInfo_video->bufferQueue_ = consumer_video->CreateProducer([this](void* addr, uint32_t size) {
+        Test_->SaveVideoFile("video", addr, size, 1);
+    });
+    Test_->streamInfo_video->bufferQueue_->SetQueueSize(8); // 8:bufferqueue size
+    Test_->consumerMap_[Camera::VIDEO] = consumer_video;
+    Test_->streamInfos.push_back(Test_->streamInfo_video);
+    // 配流启流
+    Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
+    EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR);
+    if (Test_->rc == Camera::NO_ERROR) {
+        std::cout << "==========[test log]CreateStreams success." << std::endl;
+    } else {
+        std::cout << "==========[test log]CreateStreams fail, rc = " << Test_->rc << std::endl;
+    }
+    Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, Test_->ability);
+    EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR);
+    if (Test_->rc == Camera::NO_ERROR) {
+        std::cout << "==========[test log]CommitStreams success." << std::endl;
+    } else {
+        std::cout << "==========[test log]CommitStreams fail, rc = " << Test_->rc << std::endl;
+    }
+    sleep(2); // 2:The program waits two seconds
+    std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
+    // 捕获预览流
+    Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
+    // 捕获录像流，连拍
+    Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
+    // 后处理
+    Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
+    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
+    Test_->StopStream(Test_->captureIds, Test_->streamIds);
+}
+
+/**
+  * @tc.name: preview and capture
+  * @tc.desc: Preview and Video streams, Commit 2 streams together,
+  * which Preview's resolving power is 640 * 360 and Video's resolving power is 1280 * 720
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+HWTEST_F(ResolutionTest, Camera_Resolution_0003, TestSize.Level3)
+{
+    std::cout << "==========[test log]check Capture: Preview and Video streams.";
+    std::cout << "which Preview's resolution is 640 * 360";
+    std::cout << "and Video's resolution is 1280 * 720" << std::endl;
+    Test_->streamOperatorCallback = new StreamOperatorCallback();
+    Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
+    EXPECT_EQ(true, Test_->rc == Camera::NO_ERROR);
+    if (Test_->rc == Camera::NO_ERROR) {
+        std::cout << "==========[test log]GetStreamOperator success." << std::endl;
+    } else {
+        std::cout << "==========[test log]GetStreamOperator fail, rc = " << Test_->rc << std::endl;
+    }
+    // 配置预览流信息
+    Test_->streamInfo_pre = std::make_shared<Camera::StreamInfo>();
+    Test_->streamInfo_pre->streamId_ = Test_->streamId_preview;
+    Test_->streamInfo_pre->width_ = 640; // 640:width of stream
+    Test_->streamInfo_pre->height_ = 360; // 360: height of stream
+    Test_->streamInfo_pre->format_ = PIXEL_FMT_YCRCB_420_SP;
+    Test_->streamInfo_pre->datasapce_ = 8; // 8:datasapce of stream
+    Test_->streamInfo_pre->intent_ = Camera::PREVIEW;
+    Test_->streamInfo_pre->tunneledMode_ = 5; // 5:tunneledMode of stream
+    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
+        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+    std::cout << "==========[test log]received a preview buffer ... 0" << std::endl;
     Test_->streamInfo_pre->bufferQueue_ = preview_consumer->CreateProducer([this](void* addr, uint32_t size) {
         Test_->SaveYUV("preview", addr, size);
     });

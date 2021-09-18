@@ -30,7 +30,6 @@ void HdiCallbackTest::SetUp(void)
 void HdiCallbackTest::TearDown(void)
 {
     Test_->Close();
-
 }
 
 /**
@@ -41,7 +40,22 @@ void HdiCallbackTest::TearDown(void)
   */
 HWTEST_F(HdiCallbackTest, Camera_Hdi_1001, TestSize.Level0)
 {
-    std::cout << "==========[test log] CameraHostCallback, OnCameraStatus."<< std::endl;
+    Test_->Open();
+    Test_->onCameraStatusFlag = false;
+    std::cout << "==========[test log]Preview stream, 640*480, expected success." << std::endl;
+    // 启动流
+    Test_->intents = {Camera::PREVIEW};
+    Test_->StartStream(Test_->intents);
+    // 获取预览图
+    Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
+    // 释放流
+    Test_->captureIds = {Test_->captureId_preview};
+    Test_->streamIds = {Test_->streamId_preview};
+    Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    if (Test_->onCameraStatusFlag) {
+        std::cout << "==========[test log]OnCameraStatus" << std::endl;
+    }
+    EXPECT_EQ(Test_->onCameraStatusFlag, false);
 }
 
 /**
@@ -52,12 +66,19 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1001, TestSize.Level0)
   */
 HWTEST_F(HdiCallbackTest, Camera_Hdi_1002, TestSize.Level0)
 {
-    std::cout << "==========[test log] CameraHostCallback, OnFlashlightStatus."<< std::endl;
-    Test_->service->GetCameraIds(Test_->cameraIds);
-    std::string cameraId = Test_->cameraIds.front();
-    Test_->deviceCallback = new CameraDeviceCallback();
-    Test_->rc = Test_->service->OpenCamera(cameraId, Test_->deviceCallback, Test_->cameraDevice);
+    Test_->GetCameraAbility();
+    Test_->onFlashlightStatusFlag = false;
+    std::cout << "==========[test log]Turn on the flashlight, not the camera, success." << std::endl;
+    Test_->status = true;
+    Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), Test_->status);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+    Test_->status = false;
+    Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), Test_->status);
+    sleep(5);
+    if (Test_->onFlashlightStatusFlag) {
+        std::cout << "==========[test log]OnFlashlightStatus" << std::endl;
+    }
+    EXPECT_EQ(Test_->onFlashlightStatusFlag, true);
 }
 
 /**
@@ -68,7 +89,22 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1002, TestSize.Level0)
   */
 HWTEST_F(HdiCallbackTest, Camera_Hdi_1010, TestSize.Level0)
 {
-    std::cout << "==========[test log]CameraDeviceCallback, OnError." << std::endl;
+    Test_->Open();
+    Test_->onErrorFlag = false;
+    std::cout << "==========[test log]Preview stream, 640*480, expected success." << std::endl;
+    // 启动流
+    Test_->intents = {Camera::PREVIEW};
+    Test_->StartStream(Test_->intents);
+    // 获取预览图
+    Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
+    // 释放流
+    Test_->captureIds = {Test_->captureId_preview};
+    Test_->streamIds = {Test_->streamId_preview};
+    Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    if (Test_->onErrorFlag) {
+        std::cout << "==========[test log]OnError" << std::endl;
+    }
+    EXPECT_EQ(Test_->onErrorFlag, false);
 }
 
 /**
@@ -79,35 +115,31 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1010, TestSize.Level0)
   */
 HWTEST_F(HdiCallbackTest, Camera_Hdi_1011, TestSize.Level0)
 {
+    Test_->onResultFlag = false;
     Test_->Open();
     EXPECT_EQ(true, Test_->cameraDevice != nullptr);
-    std::cout << "==========[test log]CameraDeviceCallback, OnResult." << std::endl;
+    std::cout << "==========[test log]Check hdi_device: SetResultMode is ON_CHANGED." << std::endl;
     std::vector<Camera::MetaType> enableTypes;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(enableTypes);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     for (auto &type : enableTypes) {
         std::cout << "==========[test log] hdi_device: type = " << type << std::endl;
     }
-    Test_->rc = Test_->cameraDevice->SetResultMode(Camera::PER_FRAME);
-    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+    Test_->rc = Test_->cameraDevice->SetResultMode(Camera::ON_CHANGED);
     // 启动流
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 新增这个tag
-    std::vector<Camera::MetaType> enable_tag;
-    enable_tag.push_back(OHOS_SENSOR_EXPOSURE_TIME);
-    enable_tag.push_back(OHOS_SENSOR_COLOR_CORRECTION_GAINS);
-    Test_->rc = Test_->cameraDevice->EnableResult(enable_tag);
-    std::cout << "==========[test log] EnableResult rc = " << Test_->rc << std::endl;
-    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     // 获取预览图
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    std::cout << "==========[test log] Please cover the camera..." << std::endl;
-    sleep(10);
     // 释放流
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+    if (Test_->onResultFlag) {
+        std::cout << "==========[test log]OnResult" << std::endl;
+    }
+    EXPECT_EQ(Test_->onResultFlag, false);
 }
 
 /**
@@ -118,8 +150,9 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1011, TestSize.Level0)
   */
 HWTEST_F(HdiCallbackTest, Camera_Hdi_1020, TestSize.Level0)
 {
-    std::cout << "==========[test log] IStreamOpereatorCallback, OnCaptureStarted." << std::endl;
     Test_->Open();
+    Test_->captureStartFlag = false;
+    std::cout << "==========[test log]Preview stream, 640*480, expected success." << std::endl;
     // 启动流
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
@@ -129,6 +162,10 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1020, TestSize.Level0)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    if (Test_->captureStartFlag) {
+        std::cout << "==========[test log]OnCaptureStarted" << std::endl;
+    }
+    EXPECT_EQ(Test_->captureStartFlag, true);
 }
 
 /**
@@ -139,19 +176,22 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1020, TestSize.Level0)
   */
 HWTEST_F(HdiCallbackTest, Camera_Hdi_1021, TestSize.Level0)
 {
-    std::cout << "==========[test log]IStreamOpereatorCallback, OnCaptureEnded" << std::endl;
     Test_->Open();
-    // 配置两路流信息
-    Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
+    Test_->captureEndFlag = false;
+    std::cout << "==========[test log]Preview stream, 640*480, expected success." << std::endl;
+    // 启动流
+    Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // 获取预览图
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获拍照流，单拍
-    Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, false);
-    // 后处理
+    // 释放流
     Test_->captureIds = {Test_->captureId_preview};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+    Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    if (Test_->captureEndFlag) {
+        std::cout << "==========[test log]OnCaptureEnded" << std::endl;
+    }
+    EXPECT_EQ(Test_->captureEndFlag, true);
 }
 
 /**
@@ -173,17 +213,20 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1022, TestSize.Level0)
   */
 HWTEST_F(HdiCallbackTest, Camera_Hdi_1023, TestSize.Level0)
 {
-    std::cout << "==========[test log] IStreamOpereatorCallback, OnFrameShutter." << std::endl;
     Test_->Open();
-    // 配置两路流信息
-    Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
+    Test_->frameShutterFlag = false;
+    std::cout << "==========[test log]Preview stream, 640*480, expected success." << std::endl;
+    // 启动流
+    Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // 获取预览图
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, true, true);
-    // 捕获拍照流，连拍
-    Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, true, true);
-    // 后处理
-    Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+    // 释放流
+    Test_->captureIds = {Test_->captureId_preview};
+    Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    if (Test_->frameShutterFlag) {
+        std::cout << "==========[test log]OnFrameShutter" << std::endl;
+    }
+    EXPECT_EQ(Test_->frameShutterFlag, true);
 }

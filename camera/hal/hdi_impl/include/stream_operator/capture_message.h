@@ -58,6 +58,7 @@ protected:
 
 class CaptureStartedMessage final : public ICaptureMessage {
 public:
+    virtual ~CaptureStartedMessage() = default;
     CaptureStartedMessage(int32_t streamId, int32_t captureId, uint64_t time, uint32_t count)
         : ICaptureMessage(streamId, captureId, time, count)
     {
@@ -70,6 +71,7 @@ public:
 
 class CaptureEndedMessage final : public ICaptureMessage {
 public:
+    virtual ~CaptureEndedMessage() = default;
     CaptureEndedMessage(int32_t streamId, int32_t captureId, uint64_t time, uint32_t peerCount, uint32_t frameCount)
         : ICaptureMessage(streamId, captureId, time, peerCount)
     {
@@ -90,6 +92,7 @@ private:
 
 class CaptureErrorMessage final : public ICaptureMessage {
 public:
+    virtual ~CaptureErrorMessage() = default;
     CaptureErrorMessage(int32_t streamId, int32_t captureId, uint64_t time, uint32_t peerCount, StreamError errorCode)
         : ICaptureMessage(streamId, captureId, time, peerCount)
     {
@@ -112,6 +115,7 @@ private:
 
 class FrameShutterMessage final : public ICaptureMessage {
 public:
+    virtual ~FrameShutterMessage() = default;
     FrameShutterMessage(int32_t streamId, int32_t captureId, uint64_t time, uint32_t count)
         : ICaptureMessage(streamId, captureId, time, count)
     {

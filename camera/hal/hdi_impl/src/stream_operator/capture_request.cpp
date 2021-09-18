@@ -21,14 +21,14 @@ CaptureRequest::CaptureRequest(const int32_t id,
                                const int32_t n,
                                CaptureSetting& setting,
                                bool needReport,
-                               bool isContinous)
+                               bool isContinuous)
 {
     semp_ = std::make_unique<RequestSemaphore>(n);
     semr_ = std::make_unique<RequestSemaphore>(n);
     captureId_ = id;
     settings_ = setting;
     needShutterCallback_ = needReport;
-    isContinous_ = isContinous;
+    isContinuous_ = isContinuous;
 }
 
 CaptureRequest::~CaptureRequest()
@@ -113,7 +113,7 @@ bool CaptureRequest::NeedShutterCallback() const
 
 bool CaptureRequest::IsContinous() const
 {
-    return isContinous_;
+    return isContinuous_;
 }
 
 int32_t CaptureRequest::GetCaptureId() const

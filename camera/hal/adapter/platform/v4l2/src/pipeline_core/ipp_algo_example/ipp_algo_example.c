@@ -20,7 +20,7 @@
 
 #define MAX_BUFFER_COUNT 100
 
-int Init(IppAlgoMeta *meta)
+int Init(const IppAlgoMeta *meta)
 {
     printf("ipp algo example Init ...\n");
     return 0;
@@ -38,7 +38,7 @@ int Flush()
     return 0;
 }
 
-int Process(IppAlgoBuffer *inBuffer[], int inBufferCount, IppAlgoBuffer *outBuffer, IppAlgoMeta *meta)
+int Process(IppAlgoBuffer *inBuffer[], int inBufferCount, IppAlgoBuffer *outBuffer, const IppAlgoMeta *meta)
 {
     printf("ipp algo example Process ...\n");
     if (inBuffer == NULL || inBufferCount > MAX_BUFFER_COUNT) {

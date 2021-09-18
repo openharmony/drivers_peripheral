@@ -15,8 +15,7 @@
 #include <unistd.h>
 
 namespace OHOS::Camera {
-UvcNode::UvcNode(const std::string& name, const std::string& type)
-    : SourceNode(name, type), NodeBase(name, type)
+UvcNode::UvcNode(const std::string& name, const std::string& type) : SourceNode(name, type), NodeBase(name, type)
 {
     CAMERA_LOGI("%s enter, type(%s)\n", name_.c_str(), type_.c_str());
 }

@@ -204,7 +204,7 @@ CamRetCode StreamOperator::CreateStreams(const std::vector<std::shared_ptr<Strea
             return INVALID_ARGUMENT;
         }
         std::shared_ptr<IStream> stream = StreamFactory::Instance().CreateShared(
-            IStream::g_avaliableStreamType[it->intent_], it->streamId_, it->intent_, pipelineCore_, messenger_);
+            IStream::g_availableStreamType[it->intent_], it->streamId_, it->intent_, pipelineCore_, messenger_);
         if (stream == nullptr) {
             CAMERA_LOGE("create stream [id = %{public}d] failed.", it->streamId_);
             return INSUFFICIENT_RESOURCES;
@@ -245,7 +245,7 @@ CamRetCode StreamOperator::CreateStreams(const std::vector<std::shared_ptr<Strea
             streamMap_[stream->GetStreamId()] = stream;
         }
         CAMERA_LOGI("create stream success [id:%{public}d] [type:%{public}s]", stream->GetStreamId(),
-                    IStream::g_avaliableStreamType[it->intent_].c_str());
+                    IStream::g_availableStreamType[it->intent_].c_str());
     }
     DFX_LOCAL_HITRACE_END;
     return NO_ERROR;
