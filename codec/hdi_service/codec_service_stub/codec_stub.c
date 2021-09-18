@@ -59,7 +59,7 @@ static int32_t SerCodecEnumerateCapbility(struct HdfDeviceIoClient *client, stru
         HDF_LOGE("%{public}s: read index data failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t errNum = HDF_SUCCESS; // libcodec.so undifined
+    int32_t errNum = HDF_SUCCESS;
     if (errNum != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call CodecEnumerateCapbility fuc failed!", __func__);
         return errNum;
