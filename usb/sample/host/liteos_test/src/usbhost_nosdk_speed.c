@@ -41,7 +41,7 @@
 
 #define USB_DEV_FS_PATH "/dev/bus/usb"
 #define URB_COMPLETE_PROCESS_STACK_SIZE 8196
-
+#define ENDPOINT_IN_OFFSET 7
 static int g_speedFlag = 0;
 static int g_busNum = 1;
 static int g_devAddr = 2;
@@ -56,7 +56,7 @@ static struct urb *sendUrb = NULL;
 static bool g_printData = false;
 static unsigned char endNum;
 static struct OsalSem timeSem;
-static struct usb_device *fd;
+static struct usb_device *fd = NULL;
 static uint32_t sigCnt = 0;
 static struct UsbAdapterHostEndpoint *uhe = NULL;
 static bool g_writeOrRead = TEST_WRITE;
@@ -151,7 +151,7 @@ static void UrbComplete(struct urb *curUrb)
 {
     int i;
     for (i = 0; i < TEST_CYCLE; i++) {
-        if(urb[i].urb == curUrb) {
+        if (urb[i].urb == curUrb) {
             if (g_byteTotal == 0) {
                 OsalSemPost(&timeSem);
             }
@@ -245,7 +245,7 @@ static int BeginProcess(unsigned char endPoint)
 
     OsalSemWait(&timeSem, TEST_TIME);
     while (!g_speedFlag) {
-        OsalSemWait(&timeSem, TEST_PRINT_TIME * 1000);
+        OsalSemWait(&timeSem, TEST_PRINT_TIME * TEST_PRINT_TIME_UINT);
         SpeedPrint();
     }
 
@@ -262,7 +262,6 @@ static void ShowHelp(const char *name)
     printf(">>      %s [<busNum> <devAddr>]  <ifaceNum> <endpoint> [<printdata>]\n", name);
     printf("\n");
 }
-
 
 static void UsbGetDevInfo(int *busNum, int *devNum)
 {
@@ -316,9 +315,8 @@ static int32_t UsbSerialSpeedInit(struct UsbSpeedTest *input, int *ifaceNum)
         g_devAddr = input->devAddr;
         *ifaceNum = input->ifaceNum;
         endNum = input->writeOrRead;
-        g_writeOrRead = ((endNum >> 7) == 0) ? TEST_WRITE : TEST_READ;
-        if (g_writeOrRead == TEST_READ)
-        {
+        g_writeOrRead = ((endNum >> ENDPOINT_IN_OFFSET) == 0) ? TEST_WRITE : TEST_READ;
+        if (g_writeOrRead == TEST_READ) {
             g_printData = input->printData;
         }
     } else if (input->paramNum == 5) {
@@ -326,11 +324,11 @@ static int32_t UsbSerialSpeedInit(struct UsbSpeedTest *input, int *ifaceNum)
         g_devAddr = input->devAddr;
         *ifaceNum = input->ifaceNum;
         endNum = input->writeOrRead;
-        g_writeOrRead = ((endNum >> 7) == 0) ? TEST_WRITE : TEST_READ;
+        g_writeOrRead = ((endNum >> ENDPOINT_IN_OFFSET) == 0) ? TEST_WRITE : TEST_READ;
     } else if (input->paramNum == 3) {
         *ifaceNum = input->ifaceNum;
         endNum = input->writeOrRead;
-        g_writeOrRead = ((endNum >> 7) == 0) ? TEST_WRITE : TEST_READ;
+        g_writeOrRead = ((endNum >> ENDPOINT_IN_OFFSET) == 0) ? TEST_WRITE : TEST_READ;
     } else {
         printf("Error: parameter error! \n\n");
         ShowHelp("speedtest");
@@ -485,7 +483,6 @@ static void AcmDriverRelease(struct HdfDeviceObject *device)
 {
 }
 
-
 struct HdfDriverEntry g_usbNoSdkSpeedDriverEntry = {
     .moduleVersion = 1,
     .moduleName    = "usb_nosdkspeed",
@@ -495,4 +492,3 @@ struct HdfDriverEntry g_usbNoSdkSpeedDriverEntry = {
 };
 
 HDF_INIT(g_usbNoSdkSpeedDriverEntry);
-

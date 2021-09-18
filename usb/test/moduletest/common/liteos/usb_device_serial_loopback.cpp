@@ -15,8 +15,8 @@
 
 #include <cstdio>
 #include <cstring>
-#include <unistd.h>
 #include <gtest/gtest.h>
+#include <unistd.h>
 #include "securec.h"
 #include "lib_acm_test.h"
 
@@ -30,11 +30,13 @@ public:
     static void TearDownTestCase();
 };
 
-void UsbDeviceSerialLoopback::SetUpTestCase() {
+void UsbDeviceSerialLoopback::SetUpTestCase()
+{
     acm_open();
 }
 
-void UsbDeviceSerialLoopback::TearDownTestCase() {
+void UsbDeviceSerialLoopback::TearDownTestCase()
+{
     acm_close();
 }
 
@@ -42,7 +44,7 @@ HWTEST_F(UsbDeviceSerialLoopback, DeviceSerialLoopback, TestSize.Level1)
 {
     printf("------start DeviceSerialLoopback------\n");
     char data[256] = {0};
-    for (;;) {
+    while (1) {
         acm_read(data);
         if (strlen(data) > 0) {
             if (strcmp(data, "q") == 0) {

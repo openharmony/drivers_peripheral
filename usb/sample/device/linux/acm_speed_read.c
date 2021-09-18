@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 #include "cdcacm.h"
-#include <osal_time.h>
 #include <hdf_log.h>
 #include <hdf_remote_service.h>
 #include <hdf_sbuf.h>
+#include <osal_time.h>
 #include <servmgr_hdi.h>
 #include <signal.h>
 #include <stdio.h>

@@ -30,7 +30,7 @@ extern "C" {
 using namespace std;
 using namespace testing::ext;
 
-namespace acmraw{
+namespace acmraw {
 class UsbHostSdkIfTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -46,7 +46,6 @@ static UsbRawHandle *devHandle = NULL;
 static UsbRawDevice *dev = NULL;
 static int activeConfig;
 static bool g_stopIoThreadFlag = false;
-static void AcmRawInit();
 
 static int UsbIoThread(void *data)
 {
@@ -132,22 +131,16 @@ static int UsbStopIo(struct AcmDevice *acm)
     return HDF_SUCCESS;
 }
 
-void UsbHostSdkIfTest::SetUpTestCase()
-{
-    acm = &deviceService;
-    AcmRawInit();
-    UsbStartIo(acm);
-}
-
 void UsbHostSdkIfTest::TearDownTestCase()
 {
     acm = &deviceService;
     UsbStopIo(acm);
 }
 
+extern "C" {
 static void AcmWriteBulkCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = reinterpret_cast<struct UsbRawRequest *>(const_cast<void *>(requestArg));
+    struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
 
     printf("%s:%d entry!", __func__, __LINE__);
 
@@ -170,7 +163,7 @@ static void AcmWriteBulkCallback(const void *requestArg)
 
 static void AcmReadBulkCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = reinterpret_cast<struct UsbRawRequest *>(const_cast<void *>(requestArg));
+    struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
     printf("%s:%d entry!", __func__, __LINE__);
 
     if (req == NULL) {
@@ -213,7 +206,7 @@ static void AcmReadBulkCallback(const void *requestArg)
 
 static void AcmNotifyReqCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = reinterpret_cast<struct UsbRawRequest *>(const_cast<void *>(requestArg));
+    struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
 
     printf("%s:%d entry!", __func__, __LINE__);
     if (req == NULL) {
@@ -233,7 +226,7 @@ static void AcmNotifyReqCallback(const void *requestArg)
     unsigned int currentSize = req->actualLength;
     printf("Irqstatus:%d,actualLength:%u\n", req->status, currentSize);
 }
-
+}
 static int AcmWriteBufAlloc(struct AcmDevice *acm)
 {
     struct AcmWb *wb = &acm->wb[0];
@@ -484,6 +477,12 @@ static void AcmRawInit()
     AcmRawFillCtrlReq();
 }
 
+void UsbHostSdkIfTest::SetUpTestCase()
+{
+    acm = &deviceService;
+    AcmRawInit();
+    UsbStartIo(acm);
+}
 
 /**
  * @tc.number    : CheckRawSdkIfSendControlRequest001

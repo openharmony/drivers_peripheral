@@ -17,7 +17,8 @@
  * @addtogroup USB
  * @{
  *
- * @brief Declares USB-related APIs, including the custom data types and functions used to obtain descriptors, interface objects, and request objects, and to submit requests.
+ * @brief Declares USB-related APIs, including the custom data types and functions used to obtain descriptors,
+ * interface objects, and request objects, and to submit requests.
  *
  * @since 1.0
  * @version 1.0
@@ -26,7 +27,8 @@
 /**
  * @file usb_object.h
  *
- * @brief Defines USB common data types, including the enumerated values returned by functions and definitions of other common data structures.
+ * @brief Defines USB common data types, including the enumerated values returned by
+ * functions and definitions of other common data structures.
  *
  * @since 1.0
  * @version 1.0
@@ -96,9 +98,13 @@ typedef enum {
     /** Control transfer */
     USB_PIPE_TYPE_CONTROL = 0U,
     /**
-     * Isochronous transfer is mainly used for transmitting time-dependent information, such as audio and video data, at a constant rate. Each isochronous transfer involves one or multiple isochronous transactions, each containing token packets and data packets but no handshake packets.
-     * This transfer mode ensures the timeliness of transfer but does not guarantee the correctness of data due to the absence of handshake. 
-     * Different from bulk transfer, isochronous transfer allows a certain bit error rate (BER) under certain conditions, so as to ensure that 
+     * Isochronous transfer is mainly used for transmitting time-dependent information, such as
+     * audio and video data,at a constant rate. Each isochronous transfer involves one or multiple
+     * isochronous transactions, each containing token packets and data packets but no handshake packets.
+     * This transfer mode ensures the timeliness of transfer but does not guarantee the correctness
+     * of data due to the absence of handshake.
+     * Different from bulk transfer, isochronous transfer allows a certain bit error rate (BER)
+     * under certain conditions, so as to ensure that
      *  audio and video data are transmitted on a real-time basis.
      */
     USB_PIPE_TYPE_ISOCHRONOUS = 1U,
@@ -123,7 +129,8 @@ typedef enum {
 } UsbInterfaceStatus;
 
 /**
- * @brief Defines the USB basic object, which is contained in the data structure provided for users. It is used to mark an external object and create an object linked list.
+ * @brief Defines the USB basic object, which is contained in the data structure provided for users.
+ * It is used to mark an external object and create an object linked list.
  */
 struct UsbObject {
     /** Basic object ID */

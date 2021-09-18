@@ -24,7 +24,6 @@
 #include "osal_mutex.h"
 #include "osal_time.h"
 
-extern "C" {
 #include "usbfn_device.h"
 #include "usbfn_request.h"
 #include "usbfn_interface.h"
@@ -134,5 +133,5 @@ void ReleaseAcmDevice(struct AcmDevice *acm);
 void AcmEventCallback(struct UsbFnEvent *event);
 void AcmDeviceRelease(struct AcmDevice *acmDevice);
 int XtsRemoveDevice(void);
-}
+
 #endif

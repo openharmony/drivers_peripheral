@@ -18,9 +18,7 @@
 #include <unistd.h>
 #include <gtest/gtest.h>
 #include "securec.h"
-extern "C" {
 #include "usbhost_ddk_test.h"
-}
 
 using namespace std;
 using namespace testing::ext;
@@ -33,13 +31,15 @@ public:
     static void TearDownTestCase();
 };
 
-void UsbHostRawApiFuncTest::SetUpTestCase() {
+void UsbHostRawApiFuncTest::SetUpTestCase()
+{
     printf("------start UsbHostRawApiFuncTest------\n");
     const char *apiType = "-RAW";
     UsbHostDdkTestInit(const_cast<char*>(apiType));
 }
 
-void UsbHostRawApiFuncTest::TearDownTestCase() {
+void UsbHostRawApiFuncTest::TearDownTestCase()
+{
     char writeBuf[] = "q";
     UsbHostDdkTestOpen(HOST_ACM_ASYNC_WRITE);
     UsbHostDdkTestAsyncWrite(writeBuf);

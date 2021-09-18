@@ -33,7 +33,8 @@
 /**
  * @brief Defines a USB device object, which is obtained when a device is created.
  *
- * <b>UsbFnDevice</b> corresponds to the device object in the USB specifications. Wherein, <b>object</b> is the identifier of the device,
+ * <b>UsbFnDevice</b> corresponds to the device object in the USB specifications.
+ * Wherein, <b>object</b> is the identifier of the device,
  * <b>numInterfaces</b>indicates the number of interfaces.
  */
 struct UsbFnDevice {
@@ -81,13 +82,16 @@ struct UsbFnStrings {
 /**
  * @brief Defines a USB device.
  *
- * The <b>UsbFnFunction</b> structure contains multiple strings and descriptors. It is used to describe a functional device, for example, a serial port or network adapter.
+ * The <b>UsbFnFunction</b> structure contains multiple strings and descriptors.
+ * It is used to describe a functional device, for example, a serial port or network adapter.
  */
 struct UsbFnFunction {
     /** Pointer to the function driver name:
      * Naming format: f_generic.x acm.x ecm.x
-     * Use the symbol dot (.) as the separator. <b>f_generic</b> is the common driver capability provided by this API,
-     * whereas <b>acm</b> or <b>ecm</b> is the function drive capability provided by the kernel. A value does not need to be assigned to the descriptor.
+     * Use the symbol dot (.) as the separator. <b>f_generic</b> is the common driver
+     * capability provided by this API,
+     * whereas <b>acm</b> or <b>ecm</b> is the function drive capability provided by the kernel.
+     * A value does not need to be assigned to the descriptor.
      * You can simply use <b>UsbFnCreateDevice</b> to create a device.
      */
     const char                 *funcName;
@@ -153,7 +157,8 @@ struct UsbFnDescriptorData {
  * @param udcName Indicates the pointer to the UDC name, which is obtained based on the UDC driver.
  * @param descriptor Indicates the pointer to USB device descriptor data.
  *
- * @return Returns the pointer to the <b>UsbFnDevice</b> if the operation is successful; returns <b>NULL</b> otherwise. 
+ * @return Returns the pointer to the <b>UsbFnDevice</b> if the operation is successful;
+ * returns <b>NULL</b> otherwise.
  */
 const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName, const struct UsbFnDescriptorData *descriptor);
 
@@ -164,7 +169,8 @@ const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName, const struct Us
  *
  * @param fnDevice Indicates the pointer to the USB device object.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link UsbErrorType} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value
+ * defined in {@link UsbErrorType} otherwise.
  */
 int UsbFnRemoveDevice(struct UsbFnDevice *fnDevice);
 const struct UsbFnDevice *UsbFnGetDevice(const char *udcName);
@@ -178,7 +184,8 @@ int UsbFnGetDeviceState(struct UsbFnDevice *fnDevice, UsbFnDeviceState *devState
  * @param fnDevice Indicates the pointer to the USB device object.
  * @param interfaceIndex Indicates the interface index, which is numbered from <b>0</b>.
  *
- * @return Returns the pointer to the <b>UsbFnInterface</b> if the operation is successful; returns <b>NULL</b> otherwise. 
+ * @return Returns the pointer to the <b>UsbFnInterface</b> if the operation is successful;
+ * returns <b>NULL</b> otherwise.
  */
 const struct UsbFnInterface *UsbFnGetInterface(struct UsbFnDevice *fnDevice, uint8_t interfaceIndex);
 int UsbFnMemTestTrigger(bool enable);
