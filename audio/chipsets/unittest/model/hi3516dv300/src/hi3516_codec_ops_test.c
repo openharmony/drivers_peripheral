@@ -8,7 +8,6 @@
 
 #include "hi3516_codec_ops_test.h"
 #include "audio_codec_base.h"
-#include "audio_platform_base.h"
 #include "devsvc_manager_clnt.h"
 #include "hdf_base.h"
 #include "hi3516_codec_ops.h"
