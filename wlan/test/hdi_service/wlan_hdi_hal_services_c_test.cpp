@@ -22,7 +22,6 @@
 using namespace testing::ext;
 
 namespace HdiTest {
-const int32_t WLAN_FREQ_MAX_NUM = 14;
 const int32_t WLAN_TX_POWER = 160;
 const int32_t DEFAULT_COMBO_SIZE = 6;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
