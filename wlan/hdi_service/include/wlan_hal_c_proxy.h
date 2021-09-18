@@ -32,7 +32,7 @@ struct WlanFeatureInfo {
 };
 
 struct Freq {
-    int32_t para[WLAN_FREQ_MAX_NUM];   
+    int32_t para[WLAN_FREQ_MAX_NUM];
 };
 
 struct IWifiInterface {
