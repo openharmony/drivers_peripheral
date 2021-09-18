@@ -14,8 +14,6 @@
  */
 #include "stub_msgproc.h"
 #include <hdf_log.h>
-#include <osal_mem.h>
-#include "codec_interface.h"
 
 int32_t CodecSerPackAlginment(struct HdfSBuf *reply, Alginment *alginment)
 {
@@ -58,7 +56,6 @@ int32_t CodecSerPackArray(struct HdfSBuf *reply, ResizableArray *resArr)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    resArr->actualLen = 0;
     if (!HdfSbufWriteUint32(reply, resArr->actualLen)) {
         HDF_LOGE("%{public}s: Write actualLen failed!", __func__);
         return HDF_FAILURE;
@@ -201,7 +198,7 @@ int32_t CodecSerPackBufferInfo(struct HdfSBuf *reply, CodecBufferInfo *buffers)
             return HDF_FAILURE;
         }
     } else if (buffers->type == BUFFER_TYPE_FD) {
-        if (!HdfSbufWriteInt32(reply, buffers->fd)) {
+        if (!HdfSbufWriteFileDescriptor(reply, buffers->fd)) {
             HDF_LOGE("%{public}s: Write fd failed!", __func__);
             return HDF_FAILURE;
         }
@@ -288,7 +285,8 @@ int32_t CodecSerParseBufferInfo(struct HdfSBuf *data, CodecBufferInfo *buffers)
             return HDF_FAILURE;
         }
     } else if (buffers->type == BUFFER_TYPE_FD) {
-        if (!HdfSbufReadInt32(data, &buffers->fd)) {
+        buffers->fd = HdfSbufReadFileDescriptor(data);
+        if (buffers->fd < 0) {
             HDF_LOGE("%{public}s: read fd failed!", __func__);
             return HDF_FAILURE;
         }

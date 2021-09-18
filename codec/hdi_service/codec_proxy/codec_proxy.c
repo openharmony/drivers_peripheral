@@ -561,7 +561,7 @@ int32_t CodecProxyQueueOutput(struct ICodec *self, CODEC_HANDLETYPE handle, Outp
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteInt32(data, (int32_t)releaseFenceFd)) {
+    if (!HdfSbufWriteFileDescriptor(data, releaseFenceFd)) {
         HDF_LOGE("%{public}s: write input releaseFenceFd failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -608,7 +608,8 @@ int32_t CodecProxyDequeueOutput(struct ICodec *self, CODEC_HANDLETYPE handle, ui
         CodecProxySBufRecycle(data, reply);
         return ret;
     }
-    if (!HdfSbufReadInt32(reply, acquireFd)) {
+    *acquireFd = HdfSbufReadFileDescriptor(reply);
+    if (*acquireFd < 0) {
         HDF_LOGE("%{public}s: read acquireFd failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
