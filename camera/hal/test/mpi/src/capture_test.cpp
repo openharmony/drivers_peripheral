@@ -30,7 +30,6 @@ void CaptureTest::SetUp(void)
 void CaptureTest::TearDown(void)
 {
     Test_->Close();
-
 }
 
 /**

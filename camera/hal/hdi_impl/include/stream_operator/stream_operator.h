@@ -21,10 +21,10 @@
 #include "istream.h"
 #include "istream_operator.h"
 #include "offline_stream_operator.h"
+#include "offline_stream.h"
 #include "stream_operator_service_stub.h"
 #include "surface.h"
 #include "types.h"
-
 namespace OHOS::Camera {
 class StreamOperator : public StreamOperatorStub {
 public:

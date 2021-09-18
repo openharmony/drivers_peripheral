@@ -59,6 +59,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0010, TestSize.Level3)
     float totle_time_use = 0;
     writeIntoFile.open("TimeConsuming.txt", ios::app);
     for (int i= 0; i < Times; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->service->GetCameraIds(Test_->cameraIds);
         gettimeofday(&end, NULL);
@@ -91,6 +92,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0020, TestSize.Level0)
         Test_->rc = Test_->service->GetCameraIds(Test_->cameraIds);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         for (int i= 0; i < Times; i++) {
+            std::cout << "Running " << i << " time" << std::endl;
             gettimeofday(&start, NULL);
             Test_->rc = Test_->service->GetCameraAbility(Test_->cameraIds.front(), Test_->ability);
             gettimeofday(&end, NULL);
@@ -124,6 +126,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0030, TestSize.Level3)
     float totle_time_use = 0;
     writeIntoFile.open("TimeConsuming.txt", ios::app);
     for (int i= 0; i < Times; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->service->OpenCamera(cameraId, Test_->deviceCallback, Test_->cameraDevice);
         gettimeofday(&end, NULL);
@@ -157,6 +160,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0040, TestSize.Level3)
     float time_use;
     float totle_time_use = 0;
     for (int i = 0; i < Times/2; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         // 打开手电筒
         status = true;
         gettimeofday(&start, NULL);
@@ -202,6 +206,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0050, TestSize.Level3)
     float totle_time_use = 0;
     writeIntoFile.open("TimeConsuming.txt", ios::app);
     for (int i = 0; i < Times; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
         gettimeofday(&end, NULL);
@@ -284,6 +289,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0070, TestSize.Level3)
     Test_->rc = Test_->cameraDevice->GetEnabledResults(enableTypes);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     for (int i = 0; i < Times; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->cameraDevice->SetResultMode(Camera::PER_FRAME);
         gettimeofday(&end, NULL);
@@ -316,6 +322,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0080, TestSize.Level3)
     Test_->Open();
     std::vector<Camera::MetaType> results;
     for (int i = 0; i < Times; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->cameraDevice->GetEnabledResults(results);
         gettimeofday(&end, NULL);
@@ -355,6 +362,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0090, TestSize.Level3)
     std::vector<Camera::MetaType> enable_tag;
     enable_tag.push_back(results_original[1]);
     for (int i = 0; i < Times; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->cameraDevice->EnableResult(enable_tag);
         gettimeofday(&end, NULL);
@@ -394,6 +402,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0100, TestSize.Level3)
     std::vector<Camera::MetaType> disable_tag;
     disable_tag.push_back(results_original[1]);
     for (int i = 0; i < Times; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->cameraDevice->DisableResult(disable_tag);
         gettimeofday(&end, NULL);
@@ -432,7 +441,8 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0120, TestSize.Level0)
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     // 配置mode 和 modeSetting
     Camera::OperationMode mode = Camera::NORMAL;
-    std::shared_ptr<CameraStandard::CameraMetadata> modeSetting = std::make_shared<CameraStandard::CameraMetadata>(2, 128);
+    std::shared_ptr<CameraStandard::CameraMetadata> modeSetting =
+        std::make_shared<CameraStandard::CameraMetadata>(2, 128);
     int64_t colorGains[4] = {0};
     modeSetting->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
     int64_t expoTime = 0;
@@ -455,6 +465,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0120, TestSize.Level0)
     Test_->consumerMap_[Test_->streamInfo->intent_] = consumer;
     Camera::StreamSupportType pType;
     for (int i = 0; i < Times; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->streamOperator->IsStreamsSupported(NORMAL, modeSetting, {Test_->streamInfo}, pType);
         gettimeofday(&end, NULL);
@@ -465,8 +476,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0120, TestSize.Level0)
     float avrg_time = totle_time_use / Times;
     std::cout << "==========[test log] Performance: HDI_IsStreamsSupported's average time: ";
     std::cout << avrg_time << "us. " << std::endl;
-    writeIntoFile << "==========[test log] Performance: HDI_IsStreamsSupported's average time: ";
-    writeIntoFile << avrg_time << "us. " << std::endl;
+    writeIntoFile << "HDI_IsStreamsSupported's average time: " << avrg_time << "us. " << std::endl;
     writeIntoFile.close();
 }
 
@@ -484,9 +494,9 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0130, TestSize.Level3)
     float time_use;
     float totle_time_use = 0;
     writeIntoFile.open("TimeConsuming.txt", ios::app);
+    Test_->Open();
     for (int i = 0; i < Times; i ++) {
-        // 打开相机
-        Test_->Open();
+        std::cout << "Running " << i << " time" << std::endl;
         // 创建并获取streamOperator信息
         Test_->streamOperatorCallback = new StreamOperatorCallback();
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
@@ -541,11 +551,10 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0160, TestSize.Level3)
     struct timeval end;
     float time_use;
     float totle_time_use = 0;
+    Test_->Open();
     writeIntoFile.open("TimeConsuming.txt", ios::app);
     for (int i = 0; i < Times; i ++) {
         std::cout  << "Times =" << i << std::endl;
-        // 打开相机
-        Test_->Open();
         // 启动流
         Test_->intents = {Camera::PREVIEW};
         Test_->StartStream(Test_->intents);
@@ -574,14 +583,15 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0160, TestSize.Level3)
 HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0170, TestSize.Level3)
 {
     std::cout << "==========[test log] Performance: CommitStreams's time consuming." << std::endl;
+
     struct timeval start;
     struct timeval end;
     float time_use;
     float totle_time_use = 0;
     writeIntoFile.open("TimeConsuming.txt", ios::app);
+    Test_->Open();
     for (int i = 0; i < Times; i ++) {
-        // 打开相机
-        Test_->Open();
+        std::cout << "Running " << i << " time" << std::endl;
         // 创建并获取streamOperator信息
         Test_->streamOperatorCallback = new StreamOperatorCallback();
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
@@ -647,6 +657,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0180, TestSize.Level3)
     Test_->StartStream(Test_->intents);
     std::vector<std::shared_ptr<Camera::StreamAttribute>> attributes;
     for (int i = 0; i < Times; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->streamOperator->GetStreamAttributes(attributes);
         gettimeofday(&end, NULL);
@@ -694,12 +705,25 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0190, TestSize.Level3)
     for (int i = 0; i < Times; i++) {
         std::cout  << "Times =" << i << std::endl;
         gettimeofday(&start, NULL);
-        Test_->rc = Test_->streamOperator->Capture(captureId, Test_->captureInfo, false);
-        captureId++;
+        Test_->rc = Test_->streamOperator->Capture(captureId, Test_->captureInfo, true);
+        if (Test_->rc == Camera::NO_ERROR) {
+            std::cout << "==========[test log]check Capture: Capture success, " << captureId << std::endl;
+        } else {
+            std::cout << "==========[test log]check Capture: Capture fail, rc = " << Test_->rc << std::endl;
+        }
         gettimeofday(&end, NULL);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
+        sleep(1);
+        Test_->rc = Test_->streamOperator->CancelCapture(captureId++);
+        if (Test_->rc == Camera::NO_ERROR) {
+            std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
+        } else {
+            std::cout << "==========[test log]check Capture: CancelCapture fail, rc = " << Test_->rc << std::endl;
+            std::cout << "captureId = " << captureId << std::endl;
+        }
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
     float avrg_time = totle_time_use / Times;
     std::cout << "==========[test log] Performance: HDI_Capture's average time consuming: ";
@@ -708,9 +732,9 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0190, TestSize.Level3)
     writeIntoFile << avrg_time << "us. " << std::endl;
     writeIntoFile.close();
     // 后处理
-    Test_->captureIds = {};
     Test_->streamIds = {Test_->streamId_preview};
-    Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->rc = Test_->streamOperator->ReleaseStreams(Test_->streamIds);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 }
 
 /**
@@ -742,6 +766,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0200, TestSize.Level3)
         std::cout  << "Times =" << i << std::endl;
         Test_->rc = Test_->streamOperator->Capture(captureId, Test_->captureInfo, true);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+        sleep(1);
         gettimeofday(&start, NULL);
         Test_->rc = Test_->streamOperator->CancelCapture(captureId);
         gettimeofday(&end, NULL);
@@ -756,9 +781,9 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0200, TestSize.Level3)
     writeIntoFile << avrg_time << "us. " << std::endl;
     writeIntoFile.close();
     // 后处理
-    Test_->captureIds = {};
     Test_->streamIds = {Test_->streamId_preview};
-    Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->rc = Test_->streamOperator->ReleaseStreams(Test_->streamIds);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 }
 
 /**
@@ -780,37 +805,44 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0210, TestSize.Level3)
     Test_->streamOperatorCallback = new StreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    // 创建数据流
-    Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
-    Test_->streamInfo->streamId_ = 1001;
-    Test_->streamInfo->width_ = 640;
-    Test_->streamInfo->height_ = 480;
-    Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    Test_->streamInfo->intent_ = Camera::PREVIEW;
-    Test_->streamInfo->datasapce_ = 8;
-    Test_->streamInfo->tunneledMode_ = 5;
-    std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
-    Test_->streamInfos.push_back(Test_->streamInfo);
-    Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
-    std::cout << "==========[test log]Check hdi: streamOperator->CreateStreams's rc " << Test_->rc << std::endl;
-    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    // 配流起流
-    Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, Test_->ability);
-    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    std::cout << "==========[test log]Check hdi: streamOperator->CommitStreams's rc " << Test_->rc << std::endl;
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-      std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    OHOS::sptr<OHOS::IBufferProducer> producer = consumer->CreateProducer([this](void* addr, uint32_t size) {
-        Test_->SaveYUV("preview", addr, size);
-    });
     for (int i = 0; i < Times; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
+        // 创建数据流
+        Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
+        Test_->streamInfo->streamId_ = Test_->streamId_preview;
+        Test_->streamInfo->width_ = 640;
+        Test_->streamInfo->height_ = 480;
+        Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
+        Test_->streamInfo->intent_ = Camera::PREVIEW;
+        Test_->streamInfo->datasapce_ = 8;
+        Test_->streamInfo->tunneledMode_ = 5;
+        std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
+        Test_->streamInfos.push_back(Test_->streamInfo);
+        Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
+        std::cout << "==========[test log]Check hdi: streamOperator->CreateStreams's rc " << Test_->rc << std::endl;
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+        // 配流起流
+        Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, Test_->ability);
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+        std::cout << "==========[test log]Check hdi: streamOperator->CommitStreams's rc " << Test_->rc << std::endl;
+        std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
+        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+        OHOS::sptr<OHOS::IBufferProducer> producer = consumer->CreateProducer([this](void* addr, uint32_t size) {
+            Test_->SaveYUV("preview", addr, size);
+        });
         gettimeofday(&start, NULL);
         Test_->rc = Test_->streamOperator->AttachBufferQueue(Test_->streamInfo->streamId_, producer);
+        std::cout << "==========[test log]Check hdi: streamOperator->AttachBufferQueue's rc " << Test_->rc << std::endl;
         gettimeofday(&end, NULL);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
         Test_->rc = Test_->streamOperator->DetachBufferQueue(Test_->streamInfo->streamId_);
+        std::cout << "==========[test log]Check hdi: streamOperator->DetachBufferQueue's rc " << Test_->rc << std::endl;
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+        // 释放流
+        Test_->streamIds = {Test_->streamId_preview};
+        Test_->rc = Test_->streamOperator->ReleaseStreams(Test_->streamIds);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
     float avrg_time = totle_time_use / Times;
@@ -819,10 +851,6 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0210, TestSize.Level3)
     writeIntoFile << "==========[test log] Performance: HDI_AttachBufferQueue's average time consuming: ";
     writeIntoFile << avrg_time << "us. " << std::endl;
     writeIntoFile.close();
-    // 释放流
-    Test_->captureIds = {};
-    Test_->streamIds = {1001};
-    Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
 
 /**
@@ -838,43 +866,51 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0220, TestSize.Level3)
     struct timeval end;
     float time_use;
     float totle_time_use = 0;
-    writeIntoFile.open("TimeConsuming.txt", ios::app);
-    // 打开相机
     Test_->Open();
-    Test_->streamOperatorCallback = new StreamOperatorCallback();
-    Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
-    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    // 创建数据流
-    Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
-    Test_->streamInfo->intent_ = Camera::PREVIEW;
-    Test_->streamInfo->streamId_ = 1001;
-    Test_->streamInfo->width_ = 640;
-    Test_->streamInfo->height_ = 480;
-    Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    Test_->streamInfo->datasapce_ = 8;
-    Test_->streamInfo->tunneledMode_ = 5;
-    std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
-    Test_->streamInfos.push_back(Test_->streamInfo);
-    Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
-    std::cout << "==========[test log]Check hdi: streamOperator->CreateStreams's rc " << Test_->rc << std::endl;
-    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    // 配流起流
-    Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, Test_->ability);
-    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    std::cout << "==========[test log]Check hdi: streamOperator->CommitStreams's rc " << Test_->rc << std::endl;
-    std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
-      std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    OHOS::sptr<OHOS::IBufferProducer> producer = consumer->CreateProducer([this](void* addr, uint32_t size) {
-        Test_->SaveYUV("preview", addr, size);
-    });
+    writeIntoFile.open("TimeConsuming.txt", ios::app);
     for (int i = 0; i < Times; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
+        Test_->streamOperatorCallback = new StreamOperatorCallback();
+        Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+        // 创建数据流
+        Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
+        Test_->streamInfo->intent_ = Camera::PREVIEW;
+        Test_->streamInfo->streamId_ = Test_->streamId_preview;
+        Test_->streamInfo->width_ = 640;
+        Test_->streamInfo->height_ = 480;
+        Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
+        Test_->streamInfo->datasapce_ = 8;
+        Test_->streamInfo->tunneledMode_ = 5;
+        std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
+        Test_->streamInfos.push_back(Test_->streamInfo);
+        Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
+        std::cout << "==========[test log]Check hdi: streamOperator->CreateStreams's rc " << Test_->rc << std::endl;
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+        // 配流起流
+        Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, Test_->ability);
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+        std::cout << "==========[test log]Check hdi: streamOperator->CommitStreams's rc " << Test_->rc << std::endl;
+        std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
+        std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+        OHOS::sptr<OHOS::IBufferProducer> producer = consumer->CreateProducer([this](void* addr, uint32_t size) {
+            Test_->SaveYUV("preview", addr, size);
+        });
         Test_->rc = Test_->streamOperator->AttachBufferQueue(Test_->streamInfo->streamId_, producer);
+        std::cout << "==========[test log]Check hdi: streamOperator->AttachBufferQueue's rc ";
+        std::cout << Test_->rc << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->streamOperator->DetachBufferQueue(Test_->streamInfo->streamId_);
+        std::cout << "==========[test log]Check hdi: streamOperator->DetachBufferQueue's rc ";
+        std::cout << Test_->rc << std::endl;
         gettimeofday(&end, NULL);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
+        // 释放流
+        Test_->streamIds = {Test_->streamId_preview};
+        Test_->rc = Test_->streamOperator->ReleaseStreams(Test_->streamIds);
+        EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
     float avrg_time = totle_time_use / Times;
     std::cout << "==========[test log] Performance: HDI_DetachBufferQueue's average time consuming: ";
@@ -882,10 +918,6 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0220, TestSize.Level3)
     writeIntoFile << "==========[test log] Performance: HDI_DetachBufferQueue's average time consuming: ";
     writeIntoFile << avrg_time << "us. " << std::endl;
     writeIntoFile.close();
-    // 释放流
-    Test_->captureIds = {};
-    Test_->streamIds = {1001};
-    Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
 
 /**
@@ -901,9 +933,10 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0230, TestSize.Level0)
     struct timeval end;
     float time_use;
     float totle_time_use = 0;
+    Test_->Open();
     writeIntoFile.open("TimeConsuming.txt", ios::app);
-    for (int i = 0; i < Times; i ++) {
-        Test_->Open();
+    for (int i = 0; i < Times; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         // 1、配置两路流信息
         Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
         Test_->StartStream(Test_->intents);
@@ -911,7 +944,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0230, TestSize.Level0)
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
         // 3、捕获拍照流，连拍
         Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-        sleep(5);
+        sleep(1);
         // 4、转成离线流
         Test_->offlineStreamOperatorCallback = Test_->streamOperatorCallback;
         gettimeofday(&start, NULL);
@@ -935,7 +968,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0230, TestSize.Level0)
         // 6、离线流的后处理
         Test_->cameraDevice->Close();
         std::cout << "==========[test log] Pretend to wait 5s for callback..." << std::endl;
-        sleep(5);
+        sleep(1);
         Test_->StopOfflineStream(Test_->captureId_capture);
     }
     float avrg_time = totle_time_use / Times;

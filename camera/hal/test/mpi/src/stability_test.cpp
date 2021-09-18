@@ -47,6 +47,7 @@ HWTEST_F(StabilityTest, Camera_Stability_Open_0001, TestSize.Level3)
         Test_->service->GetCameraIds(Test_->cameraIds);
         Test_->deviceCallback = new CameraDeviceCallback();
         for (int i = 0; i < 100; i++) {
+            std::cout << "Running " << i << " time" << std::endl;
             Test_->rc =
                 Test_->service->OpenCamera(Test_->cameraIds.front(), Test_->deviceCallback, Test_->cameraDevice);
             EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
@@ -72,6 +73,7 @@ HWTEST_F(StabilityTest, Camera_Stability_Preview_0001, TestSize.Level3)
 {
     std::cout << "==========[test log] Check Performance: Preview for 100 times." << std::endl;
     for (int i = 1; i < 101; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         std::cout << "==========[test log] Check Performance: Preview: " << i << " times. " << std::endl;
         // 打开相机
         Test_->Open();
@@ -99,7 +101,8 @@ HWTEST_F(StabilityTest, Camera_Stability_Capture_0001, TestSize.Level3)
     std::cout << " for 100 times." << std::endl;
     // 打开相机
     Test_->Open();
-    for (int i = 1; i < 101; i ++) {
+    for (int i = 1; i < 101; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         // 配置两路流信息
         Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
         Test_->StartStream(Test_->intents);
@@ -126,7 +129,8 @@ HWTEST_F(StabilityTest, Camera_Stability_Capture_0002, TestSize.Level3)
     std::cout << "Preview and still_capture streams for 100 times." << std::endl;
     // 打开相机
     Test_->Open();
-    for (int i = 1; i < 101; i ++) {
+    for (int i = 1; i < 101; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         // 启动预览流
         Test_->intents = {Camera::PREVIEW};
         Test_->StartStream(Test_->intents);
@@ -157,6 +161,7 @@ HWTEST_F(StabilityTest, Camera_Stability_Video_0001, TestSize.Level3)
     // 打开相机
     Test_->Open();
     for (int i = 1; i < 101; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         std::cout << "==========[test log] Performance: Preview + video, commit together, success." << std::endl;
         // 配置两路流信息
         Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
@@ -184,6 +189,7 @@ HWTEST_F(StabilityTest, Camera_Stability_Video_0002, TestSize.Level3)
     // 打开相机
     Test_->Open();
     for (int i = 0; i < 100; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
         // 启动预览流
         Test_->intents = {Camera::PREVIEW};
         Test_->StartStream(Test_->intents);
@@ -225,8 +231,8 @@ HWTEST_F(StabilityTest, Camera_Stability_3a_0001, TestSize.Level3)
         OHOS_CAMERA_AWB_MODE_TWILIGHT,
         OHOS_CAMERA_AWB_MODE_SHADE
     };
-    for (int round = 0; round < 10; round ++) {
-        for (int i = 0; i < awbMode.size(); i ++) {
+    for (int round = 0; round < 10; round++) {
+        for (int i = 0; i < awbMode.size(); i++) {
             int times = (round * 10) + i + 1;
             std::cout << "==========[test log] Check Performance: Set 3A Times: " << times << std::endl;
             meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode.at(i), 1);
@@ -238,7 +244,7 @@ HWTEST_F(StabilityTest, Camera_Stability_3a_0001, TestSize.Level3)
                 std::cout << "==========[test log] Check Performance: UpdateSettings fail, , at the " << (i+1);
                 std::cout <<"times, RetCode is " << Test_->rc << std::endl;
             }
-            sleep(2);
+            sleep(1);
         }
     }
 }
@@ -252,12 +258,11 @@ HWTEST_F(StabilityTest, Camera_Stability_3a_0001, TestSize.Level3)
 HWTEST_F(StabilityTest, Camera_Stability_Flashlight_0001, TestSize.Level3)
 {
     std::cout << "==========[test log]Performance: Turn on and off the flashlight, 1000 times." << std::endl;
-    // 打开相机
     Test_->GetCameraAbility();
     // 循环打开、关闭手电筒
-    bool status= true;
     for (int i = 0; i < 1000; i++) {
         std::cout <<"times: " << i << std::endl;
+        bool status= true;
         Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), status);
         if (Test_->rc != Camera::NO_ERROR) {
             std::cout << "==========[test log] Check Performance: Flashlight turn on fail, at the " << (i+1);
@@ -269,5 +274,6 @@ HWTEST_F(StabilityTest, Camera_Stability_Flashlight_0001, TestSize.Level3)
             std::cout << "==========[test log] Check Performance: Flashlight turn off fail, at the " <<(i+1);
             std::cout<<"times, RetCode is " << Test_->rc << std::endl;
         }
+        sleep(1);
     }
 }

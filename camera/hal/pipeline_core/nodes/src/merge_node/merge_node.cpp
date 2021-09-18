@@ -14,8 +14,7 @@
 #include "merge_node.h"
 #include <unistd.h>
 namespace OHOS::Camera{
-MergeNode::MergeNode(const std::string& name, const std::string& type)
-    :NodeBase(name, type)
+MergeNode::MergeNode(const std::string& name, const std::string& type) : NodeBase(name, type)
 {
     CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }

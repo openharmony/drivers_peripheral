@@ -40,13 +40,6 @@
 #define DFX_LOCAL_HITRACE_END
 #endif // HITRACE_LOG_ENABLED
 
-#if 0
-#if __GLIBC__ == 2 && __GLIBC_MINOR__ < 30
-#include <sys/syscall.h>
-#define gettid() (pid_t) syscall(SYS_gettid)
-#endif
-#endif
-
 namespace OHOS::Camera {
 #define HDF_LOG_TAG camera_host
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
@@ -68,62 +61,6 @@ namespace OHOS::Camera {
 #define CAMERA_LOGI(fmt, ...) DECORATOR_HDFLOG(HDF_LOGI, fmt, ##__VA_ARGS__)
 #define CAMERA_LOGV(fmt, ...) DECORATOR_HDFLOG(HDF_LOGV, fmt, ##__VA_ARGS__)
 #define CAMERA_LOGD(fmt, ...) DECORATOR_HDFLOG(HDF_LOGD, fmt, ##__VA_ARGS__)
-
-#if 0
-#define GET_CURRENT_TIME_MS                                                                                   \
-    struct timeval _tv;                                                                                       \
-    gettimeofday(&_tv, NULL);                                                                                 \
-    struct tm* _tm = localtime(&_tv.tv_sec);                                                                  \
-    int _ms = _tv.tv_usec / 1000;                                                                             \
-    char now[25] = {0};                                                                                       \
-    sprintf_s(now, sizeof(now), "%02d-%02d %02d:%02d:%02d.%03d", _tm->tm_mon + 1, _tm->tm_mday, _tm->tm_hour, \
-              _tm->tm_min, _tm->tm_sec, _ms);
-
-#define CAMERA_LOGE(fmt, ...)                                                               \
-    do {                                                                                    \
-        GET_CURRENT_TIME_MS;                                                                \
-        pid_t pid = getpid();                                                               \
-        pid_t tid = gettid();                                                               \
-        printf("%s %4u %4u E " fmt "\n", now, (uint32_t)pid, (uint32_t)tid, ##__VA_ARGS__); \
-        fflush(stdout);                                                                     \
-    } while (0);
-
-#define CAMERA_LOGW(fmt, ...)                                                               \
-    do {                                                                                    \
-        GET_CURRENT_TIME_MS;                                                                \
-        pid_t pid = getpid();                                                               \
-        pid_t tid = gettid();                                                               \
-        printf("%s %4u %4u W " fmt "\n", now, (uint32_t)pid, (uint32_t)tid, ##__VA_ARGS__); \
-        fflush(stdout);                                                                     \
-    } while (0);
-
-#define CAMERA_LOGI(fmt, ...)                                                               \
-    do {                                                                                    \
-        GET_CURRENT_TIME_MS;                                                                \
-        pid_t pid = getpid();                                                               \
-        pid_t tid = gettid();                                                               \
-        printf("%s %4u %4u I " fmt "\n", now, (uint32_t)pid, (uint32_t)tid, ##__VA_ARGS__); \
-        fflush(stdout);                                                                     \
-    } while (0);
-
-#define CAMERA_LOGV(fmt, ...)                                                               \
-    do {                                                                                    \
-        GET_CURRENT_TIME_MS;                                                                \
-        pid_t pid = getpid();                                                               \
-        pid_t tid = gettid();                                                               \
-        printf("%s %4u %4u V " fmt "\n", now, (uint32_t)pid, (uint32_t)tid, ##__VA_ARGS__); \
-        fflush(stdout);                                                                     \
-    } while (0);
-
-#define CAMERA_LOGD(fmt, ...)                                                               \
-    do {                                                                                    \
-        GET_CURRENT_TIME_MS;                                                                \
-        pid_t pid = getpid();                                                               \
-        pid_t tid = gettid();                                                               \
-        printf("%s %4u %4u D " fmt "\n", now, (uint32_t)pid, (uint32_t)tid, ##__VA_ARGS__); \
-        fflush(stdout);                                                                     \
-    } while (0);
-#endif
 
 constexpr uint32_t FRAME_SIZE_TAG = 100;
 

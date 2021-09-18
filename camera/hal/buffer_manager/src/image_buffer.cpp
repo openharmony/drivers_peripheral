@@ -272,7 +272,7 @@ void ImageBuffer::SetEsFrameSize(const int32_t frameSize)
     return;
 }
 
-void ImageBuffer::SetEsTimestamp(const uint64_t timeStamp)
+void ImageBuffer::SetEsTimestamp(const int64_t timeStamp)
 {
     std::lock_guard<std::mutex> l(l_);
     esInfo_.timestamp = timeStamp;

@@ -15,8 +15,7 @@
 
 namespace OHOS::Camera {
 
-DummyNode::DummyNode(const std::string& name, const std::string& type)
-    : NodeBase(name, type)
+DummyNode::DummyNode(const std::string& name, const std::string& type) : NodeBase(name, type)
 {
     CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
