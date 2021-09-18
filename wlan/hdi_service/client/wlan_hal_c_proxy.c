@@ -453,7 +453,7 @@ finished:
 }
 
 static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature,
-    int32_t band, struct Freq freq, uint32_t *num)
+    int32_t band, struct Freq *freq, uint32_t *num)
 {
     int32_t ec = HDF_FAILURE;
 
@@ -488,7 +488,7 @@ static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct Wl
         goto finished;
     }
     for (uint32_t i = 0; i < (*num); i++) {
-        if (!HdfSbufReadInt32(reply, &freqs[i])) {
+        if (!HdfSbufReadInt32(reply, &(freq->para[i]))) {
             HDF_LOGE("%s: write freq failed", __func__);
             ec = HDF_FAILURE;
             goto finished;

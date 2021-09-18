@@ -229,15 +229,15 @@ void WifiDriverClientDeinit(void)
     g_wifiService = NULL;
 }
 
-static int32_t HdfSBufObtainDefault(struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t HdfSBufObtainDefault(struct HdfSBuf **data, struct HdfSBuf **reply)
 {
-    data = HdfSBufObtainDefaultSize();
-    if (data == NULL) {
+    *data = HdfSBufObtainDefaultSize();
+    if (*data == NULL) {
         return RET_CODE_FAILURE;
     }
-    reply = HdfSBufObtainDefaultSize();
-    if (reply == NULL) {
-        HdfSBufRecycle(data);
+    *reply = HdfSBufObtainDefaultSize();
+    if (*reply == NULL) {
+        HdfSBufRecycle(*data);
         return RET_CODE_FAILURE;
     }
     return RET_CODE_SUCCESS;
@@ -253,7 +253,7 @@ int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    HdfSBufObtainDefault(data, reply);
+    HdfSBufObtainDefault(&data, &reply);
     ret = SendCmdSync(WIFI_HAL_CMD_GET_NETWORK_INFO, data, reply);
     if (ret == RET_CODE_SUCCESS) {
         ret = ParserNetworkInfo(reply, result);
@@ -275,7 +275,7 @@ int32_t IsSupportCombo(uint8_t *isSupportCombo)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    HdfSBufObtainDefault(data, reply);
+    HdfSBufObtainDefault(&data, &reply);
     ret = SendCmdSync(WIFI_HAL_CMD_IS_SUPPORT_COMBO, data, reply);
     do {
         if (ret != RET_CODE_SUCCESS) {
@@ -306,7 +306,7 @@ int32_t GetComboInfo(uint64_t *comboInfo, uint32_t size)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    HdfSBufObtainDefault(data, reply);
+    HdfSBufObtainDefault(&data, &reply);
     ret = SendCmdSync(WIFI_HAL_CMD_GET_SUPPORT_COMBO, data, reply);
     do {
         if (ret != RET_CODE_SUCCESS) {
@@ -349,7 +349,7 @@ int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    HdfSBufObtainDefault(data, reply);
+    HdfSBufObtainDefault(&data, &reply);
     do {
         if (!HdfSbufWriteString(data, ifName)) {
             HILOG_ERROR(LOG_DOMAIN, "%s: write ifName failed", __FUNCTION__);
@@ -378,7 +378,7 @@ int32_t GetDevMacAddr(const char *ifName, int32_t type, uint8_t *mac, uint8_t le
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    HdfSBufObtainDefault(data, reply);
+    HdfSBufObtainDefault(&data, &reply);
     do {
         if (!HdfSbufWriteString(data, ifName)) {
             HILOG_ERROR(LOG_DOMAIN, "%s: write ifName failed", __FUNCTION__);
@@ -412,7 +412,7 @@ int32_t GetValidFreqByBand(const char *ifName, int32_t band, struct FreqInfoResu
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    HdfSBufObtainDefault(data, reply);
+    HdfSBufObtainDefault(&data, &reply);
     do {
         if (!HdfSbufWriteString(data, ifName)) {
             HILOG_ERROR(LOG_DOMAIN, "%s: write ifName failed", __FUNCTION__);
@@ -446,7 +446,7 @@ int32_t SetTxPower(const char *ifName, int32_t power)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    HdfSBufObtainDefault(data, reply);
+    HdfSBufObtainDefault(&data, &reply);
     do {
         if (!HdfSbufWriteString(data, ifName)) {
             HILOG_ERROR(LOG_DOMAIN, "%s: write ifName failed", __FUNCTION__);
@@ -475,7 +475,7 @@ int32_t GetAssociatedStas(const char *ifName, struct AssocStaInfoResult *result)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    HdfSBufObtainDefault(data, reply);
+    HdfSBufObtainDefault(&data, &reply);
     do {
         if (!HdfSbufWriteString(data, ifName)) {
             HILOG_ERROR(LOG_DOMAIN, "%s: write ifName failed", __FUNCTION__);
@@ -504,7 +504,7 @@ int32_t WifiSetCountryCode(const char *ifName, const char *code, uint32_t len)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    HdfSBufObtainDefault(data, reply);
+    HdfSBufObtainDefault(&data, &reply);
     do {
         if (!HdfSbufWriteString(data, ifName)) {
             HILOG_ERROR(LOG_DOMAIN, "%s: write ifName failed", __FUNCTION__);
@@ -534,7 +534,7 @@ int32_t SetScanMacAddr(const char *ifName, uint8_t *scanMac, uint8_t len)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    HdfSBufObtainDefault(data, reply);
+    HdfSBufObtainDefault(&data, &reply);
     do {
         if (!HdfSbufWriteString(data, ifName)) {
             HILOG_ERROR(LOG_DOMAIN, "%s: write ifName failed", __FUNCTION__);
@@ -576,7 +576,7 @@ int32_t AcquireChipId(const char *ifName, uint8_t *chipId)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    HdfSBufObtainDefault(data, reply);
+    HdfSBufObtainDefault(&data, &reply);
     do {
         if (!HdfSbufWriteString(data, ifName)) {
             HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufWriteString failed", __FUNCTION__);
@@ -644,7 +644,7 @@ int32_t GetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    HdfSBufObtainDefault(data, reply);
+    HdfSBufObtainDefault(&data, &reply);
     do {
         if (!HdfSbufWriteUint8(data, chipId)) {
             HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufWriteUint8 failed", __FUNCTION__);
@@ -668,7 +668,7 @@ int32_t SetResetDriver(const uint8_t chipId, const char *ifName)
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
 
-    HdfSBufObtainDefault(data, reply);
+    HdfSBufObtainDefault(&data, &reply);
     do{
         if (!HdfSbufWriteUint8(data, chipId)) {
             HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufWriteUint8 failed", __FUNCTION__);
@@ -703,7 +703,7 @@ int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    HdfSBufObtainDefault(data, reply);
+    HdfSBufObtainDefault(&data, &reply);
     do{
         ret = SendCmdSync(WIFI_HAL_CMD_GET_NETDEV_INFO, data, reply);
         if (ret != RET_CODE_SUCCESS) {
