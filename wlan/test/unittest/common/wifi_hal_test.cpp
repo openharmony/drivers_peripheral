@@ -73,7 +73,7 @@ void WifiHalTest::TearDown()
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
-static void ParseScanResult(const WifiScanResult *scanResult)
+static void ParseScanResult(WifiScanResult *scanResult)
 {
     printf("ParseScanResult: flags=%d, caps=%d, freq=%d, beaconInt=%d,\n",
         scanResult->flags, scanResult->caps, scanResult->freq, scanResult->beaconInt);
