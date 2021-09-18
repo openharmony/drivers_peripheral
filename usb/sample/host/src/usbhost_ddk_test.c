@@ -65,6 +65,27 @@ struct HdfRemoteService *g_acmService = NULL;
 static bool g_speedFlag = false;
 static bool g_exitFlag = false;
 
+int UsbObtainSbuf()
+{
+    if (g_acmService == NULL) {
+        HDF_LOGE("%s:%d GetService err", __func__, __LINE__);
+        return HDF_FAILURE;
+    }
+
+#ifdef __LITEOS_USB_HOST_DDK_TEST__
+    g_data = HdfSBufObtainDefaultSize();
+    g_reply = HdfSBufObtainDefaultSize();
+#else
+    g_data = HdfSBufTypedObtain(SBUF_IPC);
+    g_reply = HdfSBufTypedObtain(SBUF_IPC);
+#endif
+    if (g_data == NULL || g_reply == NULL) {
+        HDF_LOGE("%s:%d HdfSBufTypedObtain err", __func__, __LINE__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int UsbHostDdkTestInit(const char *apiType)
 {
 #ifndef __LITEOS_USB_HOST_DDK_TEST__
@@ -109,24 +130,9 @@ int UsbHostDdkTestInit(const char *apiType)
 #ifndef __LITEOS_USB_HOST_DDK_TEST__
     HDIServiceManagerRelease(servmgr);
 #endif
-    if (g_acmService == NULL) {
-        printf("%s:%d GetService err\n", __func__, __LINE__);
-        HDF_LOGE("%s:%d GetService err", __func__, __LINE__);
+    if(UsbObtainSbuf() != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-#ifdef __LITEOS_USB_HOST_DDK_TEST__
-    g_data = HdfSBufObtainDefaultSize();
-    g_reply = HdfSBufObtainDefaultSize();
-#else
-    g_data = HdfSBufTypedObtain(SBUF_IPC);
-    g_reply = HdfSBufTypedObtain(SBUF_IPC);
-#endif
-    if (g_data == NULL || g_reply == NULL) {
-        printf("%s:%d HdfSBufTypedObtain err\n", __func__, __LINE__);
-        HDF_LOGE("%s:%d HdfSBufTypedObtain err", __func__, __LINE__);
-        return HDF_FAILURE;
-    }
-
     return HDF_SUCCESS;
 }
 

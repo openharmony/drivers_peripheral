@@ -16,10 +16,10 @@
 #include "usb_host_serial_func_test.h"
 #include <cstdio>
 #include <cstring>
-#include <unistd.h>
 #include <gtest/gtest.h>
-#include "securec.h"
+#include <unistd.h>
 #include "usbhost_ddk_test.h"
+#include "securec.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -32,13 +32,15 @@ public:
     static void TearDownTestCase();
 };
 
-void UsbHostSerialFuncTest::SetUpTestCase() {
+void UsbHostSerialFuncTest::SetUpTestCase()
+{
     printf("------start UsbHostSerialFuncTest------\n");
     const char *apiType = "-SDK";
     UsbHostDdkTestInit(const_cast<char*>(apiType));
 }
 
-void UsbHostSerialFuncTest::TearDownTestCase() {
+void UsbHostSerialFuncTest::TearDownTestCase()
+{
     const char *apiType = "-SDK";
     UsbHostDdkTestInit(const_cast<char*>(apiType));
     char writeBuf[] = "q";
@@ -493,7 +495,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialGetDeviceInfo_001, TestSize.Level1)
     char targetLog[logMaxLen] = {0};
     const char *fmt = "device descriptor info:[%s %s %s %s %s]\n";
     snprintf_s(targetLog, logMaxLen, logMaxLen -1, fmt, \
-        idVendor, idProduct, bDeviceClass,bDeviceSubClass, bDeviceProtocol);
+        idVendor, idProduct, bDeviceClass, bDeviceSubClass, bDeviceProtocol);
     printf("targetLog==>%s-%d\n", targetLog, strlen(targetLog));
     char readBuf[DATA_MAX_LEN] = {0};
     UsbHostDdkTestOpen(HOST_ACM_CTRL_SYNC_DESCRIPTOR);

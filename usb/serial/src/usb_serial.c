@@ -1385,7 +1385,7 @@ static void AcmFreeWriteRequests(struct AcmDevice *acm)
     int ret;
     struct AcmWb *snd = NULL;
 
-    for (i = 0; i < ACM_NW; i++ ) {
+    for (i = 0; i < ACM_NW; i++) {
         snd = &acm->wb[i];
         ret = UsbCancelRequest(snd->request);
         if (ret != HDF_SUCCESS) {
@@ -1410,7 +1410,7 @@ static void AcmFreeReadRequests(struct AcmDevice *acm)
         HDF_LOGE("%s: acm is NULL", __func__);
         return;
     }
-    for (i = 0; i < ACM_NR; i++ ) {
+    for (i = 0; i < ACM_NR; i++) {
         ret = UsbCancelRequest(acm->readReq[i]);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("UsbCancelRequest rd faile, ret=%d ", ret);
@@ -1646,7 +1646,8 @@ static int32_t AcmAllocRequests(const struct AcmDevice *acm)
 
     for (int i = 0; i < ACM_NW; i++) {
         struct AcmWb *snd = (struct AcmWb *)&(acm->wb[i]);
-        snd->request = UsbAllocRequest(InterfaceIdToHandle((struct AcmDevice *)acm, acm->dataOutPipe->interfaceId), 0, acm->writeSize);
+        snd->request = UsbAllocRequest(InterfaceIdToHandle((struct AcmDevice *)acm,
+            acm->dataOutPipe->interfaceId), 0, acm->writeSize);
         snd->instance = (struct AcmDevice *)acm;
         if (snd->request == NULL) {
             HDF_LOGE("%s:%d snd request fail", __func__, __LINE__);

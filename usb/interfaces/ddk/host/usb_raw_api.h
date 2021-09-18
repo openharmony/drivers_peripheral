@@ -17,7 +17,8 @@
  * @addtogroup USB
  * @{
  *
- * @brief Declares USB-related APIs, including the custom data types and functions used to obtain descriptors, interface objects, and request objects, and to submit requests.
+ * @brief Declares USB-related APIs, including the custom data types and functions used to obtain descriptors,
+ * interface objects, and request objects, and to submit requests.
  *
  * @since 1.0
  * @version 1.0
@@ -26,7 +27,8 @@
 /**
  * @file usb_raw_api.h
  *
- * @brief Defines the data types and interface functions provided by the USB driver development kit (DDK) in expert mode.
+ * @brief Defines the data types and interface functions provided by the USB driver development kit (DDK) in
+ * expert mode.
  *
  * @since 1.0
  * @version 1.0
@@ -53,7 +55,8 @@ typedef void *UsbRawDevice;
 typedef void *UsbRawHandle;
 
 /**
- * @brief Defines a pointer to the callback called when a user request in expert mode is complete. This callback function is used to fill the <b>#UsbRawFillRequestData</b> object.
+ * @brief Defines a pointer to the callback called when a user request in expert mode is complete. This callback
+ * function is used to fill the <b>#UsbRawFillRequestData</b> object.
  */
 typedef void (*UsbRawRequestCallback)(const void *requestArg);
 
@@ -78,7 +81,8 @@ struct UsbControlRequestData {
 };
 
 /**
- * @brief Defines request parameters for filling the <b>UsbRawSendBulkRequest</b> or <b>UsbRawSendInterruptRequest</b> function.
+ * @brief Defines request parameters for filling the <b>UsbRawSendBulkRequest</b> or <b>UsbRawSendInterruptRequest</b>
+ * function.
  * Request data to be sent
  */
 struct UsbRequestData {
@@ -184,7 +188,8 @@ struct UsbRawInterface {
 struct UsbRawConfigDescriptor {
     /** Standard USB configuration descriptor */
     struct UsbConfigDescriptor configDescriptor;
-    /** Pointer to the interface array supported by the configuration. The maximum number of interfaces is determined by USB_MAXINTERFACES. */
+    /** Pointer to the interface array supported by the configuration. The maximum number of interfaces is determined
+    * by USB_MAXINTERFACES. */
     const struct UsbRawInterface *interface[USB_MAXINTERFACES];
     /** Pointer to the extra descriptor */
     const unsigned char *extra;
@@ -197,9 +202,11 @@ struct UsbRawConfigDescriptor {
  *
  * You can use this function to allocate and initialize resources.
  *
- * @param session Indicates the pointer to the session context. It can be set to <b>NULL</b> or a value defined in {@link UsbSession}.
+ * @param session Indicates the pointer to the session context. It can be set to <b>NULL</b> or a value defined in
+ * {@link UsbSession}.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawInit(struct UsbSession **session);
 
@@ -208,20 +215,24 @@ int UsbRawInit(struct UsbSession **session);
  *
  * You can use this function to release occupied resources.
  *
- * @param session Indicates the pointer to the session context. It can be set to <b>NULL</b> or a value defined in {@link UsbSession}.
+ * @param session Indicates the pointer to the session context. It can be set to <b>NULL</b> or a value defined in
+ * {@link UsbSession}.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawExit(const struct UsbSession *session);
 
 /**
  * @brief Opens a USB device object.
  *
- * @param session Indicates the pointer to the session context. It can be set to <b>NULL</b> or a value defined in {@link UsbSession}.
+ * @param session Indicates the pointer to the session context. It can be set to <b>NULL</b> or a value defined in
+ * {@link UsbSession}.
  * @param busNum Indicates the USB device bus number.
  * @param usbAddr Indicates the USB device address.
  *
- * @return Returns the pointer to the <b>UsbRawHandle</b> if the operation is successful; returns <b>NULL</b> otherwise. 
+ * @return Returns the pointer to the <b>UsbRawHandle</b> if the operation is successful; returns <b>NULL</b>
+ * otherwise. 
  */
 UsbRawHandle *UsbRawOpenDevice(const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr);
 
@@ -230,7 +241,8 @@ UsbRawHandle *UsbRawOpenDevice(const struct UsbSession *session, uint8_t busNum,
  *
  * @param devHandle Indicates the pointer to the device handle.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawCloseDevice(const UsbRawHandle *devHandle);
 
@@ -241,7 +253,8 @@ int UsbRawCloseDevice(const UsbRawHandle *devHandle);
  * @param devHandle Indicates the pointer to the device handle.
  * @param requestData Indicates the pointer to the request data to send.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawSendControlRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbControlRequestData *requestData);
@@ -253,7 +266,8 @@ int UsbRawSendControlRequest(const struct UsbRawRequest *request, const UsbRawHa
  * @param devHandle Indicates the pointer to the device handle.
  * @param requestData Indicates the pointer to the request data to send.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawSendBulkRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbRequestData *requestData);
@@ -264,7 +278,8 @@ int UsbRawSendBulkRequest(const struct UsbRawRequest *request, const UsbRawHandl
  * @param devHandle Indicates the pointer to the device handle.
  * @param requestData Indicates the pointer to the request data to send.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawSendInterruptRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbRequestData *requestData);
@@ -276,7 +291,8 @@ int UsbRawSendInterruptRequest(const struct UsbRawRequest *request, const UsbRaw
  * @param configIndex Indicates the ID of the device configuration descriptor.
  * @param config Indicates the double pointer to the device configuration descriptor.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawGetConfigDescriptor(const UsbRawDevice *rawDev, uint8_t configIndex, struct UsbRawConfigDescriptor **config);
 
@@ -294,7 +310,8 @@ void UsbRawFreeConfigDescriptor(const struct UsbRawConfigDescriptor *config);
  * @param devHandle Indicates the pointer to the device handle.
  * @param config Indicates the pointer to the device configuration descriptor.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawGetConfiguration(const UsbRawHandle *devHandle, int *config);
 
@@ -304,7 +321,8 @@ int UsbRawGetConfiguration(const UsbRawHandle *devHandle, int *config);
  * @param devHandle Indicates the pointer to the device handle.
  * @param config Indicates the device configuration descriptor.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawSetConfiguration(const UsbRawHandle *devHandle, int config);
 
@@ -316,7 +334,8 @@ int UsbRawSetConfiguration(const UsbRawHandle *devHandle, int config);
  * @param param Indicates the pointer to the descriptor parameter. For details, see {@link UsbRawDescriptorParam}.
  * @param data Indicates the pointer to the descriptor address.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawGetDescriptor(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbRawDescriptorParam *param, const unsigned char *data);
@@ -336,7 +355,8 @@ UsbRawDevice *UsbRawGetDevice(const UsbRawHandle *devHandle);
  * @param rawDev Indicates the pointer to the USB raw device.
  * @param desc Indicates the pointer to the device descriptor.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawGetDeviceDescriptor(const UsbRawDevice *rawDev, struct UsbDeviceDescriptor *desc);
 
@@ -346,7 +366,8 @@ int UsbRawGetDeviceDescriptor(const UsbRawDevice *rawDev, struct UsbDeviceDescri
  * @param devHandle Indicates the pointer to the device handle of the interface to declare.
  * @param interfaceNumber Indicates the number of the interface to declare.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawClaimInterface(const UsbRawHandle *devHandle, int interfaceNumber);
 
@@ -356,7 +377,8 @@ int UsbRawClaimInterface(const UsbRawHandle *devHandle, int interfaceNumber);
  * @param devHandle Indicates the pointer to the device handle of the interface to release.
  * @param interfaceNumber Indicates the number of the interface to release.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawReleaseInterface(const UsbRawHandle *devHandle, int interfaceNumber);
 
@@ -365,7 +387,8 @@ int UsbRawReleaseInterface(const UsbRawHandle *devHandle, int interfaceNumber);
  *
  * @param devHandle Indicates the pointer to the device handle.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawResetDevice(const UsbRawHandle *devHandle);
 
@@ -375,10 +398,12 @@ int UsbRawResetDevice(const UsbRawHandle *devHandle);
  * For details about isochronous transfer, see {@link UsbPipeType}.
  *
  * @param devHandle Indicates the pointer to the device handle.
- * @param isoPackets Indicates the number of isochronous transfer packet descriptors to allocate. The value must be a non-negative number.
+ * @param isoPackets Indicates the number of isochronous transfer packet descriptors to allocate. The value must be a
+ * non-negative number.
  * @param length Indicates the size of the user space to allocate.
  *
- * @return Returns the pointer to the <b>UsbHostRequest</b> structure if the operation is successful; returns <b>NULL</b> otherwise. 
+ * @return Returns the pointer to the <b>UsbHostRequest</b> structure if the operation is successful; returns
+ * <b>NULL</b> otherwise. 
  */
 struct UsbRawRequest *UsbRawAllocRequest(const UsbRawHandle *devHandle, int isoPackets, int length);
 
@@ -386,7 +411,8 @@ struct UsbRawRequest *UsbRawAllocRequest(const UsbRawHandle *devHandle, int isoP
  * @brief Releases the previously allocated transfer request.
  *
  * @param request Indicates the pointer to the transfer request to release.
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawFreeRequest(const struct UsbRawRequest *request);
 
@@ -397,7 +423,8 @@ int UsbRawFreeRequest(const struct UsbRawRequest *request);
  * @param devHandle Indicates the pointer to the device handle.
  * @param fillRequestData Indicates the pointer to the request data to fill.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawFillBulkRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbRawFillRequestData *fillData);
@@ -408,7 +435,8 @@ int UsbRawFillBulkRequest(const struct UsbRawRequest *request, const UsbRawHandl
  * @param setup Indicates the pointer to the control information.
  * @param requestData Indicates the pointer to the request data to fill.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawFillControlSetup(const unsigned char *setup, const struct UsbControlRequestData *requestData);
 
@@ -419,7 +447,8 @@ int UsbRawFillControlSetup(const unsigned char *setup, const struct UsbControlRe
  * @param devHandle Indicates the pointer to the device handle.
  * @param fillRequestData Indicates the pointer to the request data to fill.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawFillControlRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbRawFillRequestData *fillData);
@@ -431,7 +460,8 @@ int UsbRawFillControlRequest(const struct UsbRawRequest *request, const UsbRawHa
  * @param devHandle Indicates the pointer to the device handle.
  * @param fillRequestData Indicates the pointer to the request data to fill.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawFillInterruptRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbRawFillRequestData *fillData);
@@ -443,7 +473,8 @@ int UsbRawFillInterruptRequest(const struct UsbRawRequest *request, const UsbRaw
  * @param devHandle Indicates the pointer to the device handle.
  * @param fillRequestData Indicates the pointer to the request data to fill.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawFillIsoRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbRawFillRequestData *fillData);
@@ -453,7 +484,8 @@ int UsbRawFillIsoRequest(const struct UsbRawRequest *request, const UsbRawHandle
  *
  * @param request Indicates the pointer to the request to submit.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawSubmitRequest(const struct UsbRawRequest *request);
 
@@ -462,7 +494,8 @@ int UsbRawSubmitRequest(const struct UsbRawRequest *request);
  *
  * @param request Indicates the pointer to the request to cancel.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawCancelRequest(const struct UsbRawRequest *request);
 
@@ -471,7 +504,8 @@ int UsbRawCancelRequest(const struct UsbRawRequest *request);
  *
  * @param devHandle Indicates the pointer to the device handle.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS} otherwise.
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
+ * otherwise.
  */
 int UsbRawHandleRequests(const UsbRawHandle *devHandle);
 

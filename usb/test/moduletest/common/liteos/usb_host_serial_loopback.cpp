@@ -16,10 +16,10 @@
 #include "usb_host_serial_loopback.h"
 #include <cstdio>
 #include <cstring>
-#include <unistd.h>
 #include <gtest/gtest.h>
-#include "securec.h"
+#include <unistd.h>
 #include "usbhost_ddk_test.h"
+#include "securec.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -31,12 +31,14 @@ public:
     static void TearDownTestCase();
 };
 
-void UsbHostSerialLoopback::SetUpTestCase() {
+void UsbHostSerialLoopback::SetUpTestCase()
+{
     const char *apiType = "-SDK";
     UsbHostDdkTestInit(const_cast<char*>(apiType));
 }
 
-void UsbHostSerialLoopback::TearDownTestCase() {
+void UsbHostSerialLoopback::TearDownTestCase()
+{
     TestExit();
 }
 

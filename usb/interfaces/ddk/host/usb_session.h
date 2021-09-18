@@ -17,7 +17,8 @@
  * @addtogroup USB
  * @{
  *
- * @brief Declares USB-related APIs, including the custom data types and functions used to obtain descriptors, interface objects, and request objects, and to submit requests.
+ * @brief Declares USB-related APIs, including the custom data types and functions used to obtain descriptors, 
+ * interface objects, and request objects, and to submit requests.
  *
  * @since 1.0
  * @version 1.0
@@ -39,9 +40,11 @@
 /**
  * @brief Defines a session context object.
  *
- * A session context object allows a program to use the driver development kit (DDK) independently. This can prevent interference between users of a single DDK. Such a session can be initiated by using <b>UsbInitHostSdk()</b> or
+ * A session context object allows a program to use the driver development kit (DDK) independently. This can prevent
+ * interference between users of a single DDK. Such a session can be initiated by using <b>UsbInitHostSdk()</b> or
  * <b>UsbRawInit()</b> and destroyed by using <b>UsbExitHostSdk()</b> or <b>UsbRawExit()</b>.
- * If a program has only one user, you can ignore the session context. You just need to pass <b>NULL</b> in each function call that requires context, and the default session context will be used.
+ * If a program has only one user, you can ignore the session context. You just need to pass <b>NULL</b> in each
+ * function call that requires context, and the default session context will be used.
  */
 struct UsbSession {
     /** Device linked list */

@@ -15,8 +15,8 @@
 
 #include <cstdio>
 #include <cstring>
-#include <unistd.h>
 #include <gtest/gtest.h>
+#include <unistd.h>
 #include "securec.h"
 #include "lib_acm_test.h"
 
@@ -30,11 +30,13 @@ public:
     static void TearDownTestCase();
 };
 
-void UsbDeviceSerialFuncTest::SetUpTestCase() {
+void UsbDeviceSerialFuncTest::SetUpTestCase()
+{
     acm_open();
 }
 
-void UsbDeviceSerialFuncTest::TearDownTestCase() {
+void UsbDeviceSerialFuncTest::TearDownTestCase()
+{
     acm_close();
 }
 

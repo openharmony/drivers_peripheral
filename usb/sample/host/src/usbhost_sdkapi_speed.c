@@ -416,7 +416,6 @@ int main(int argc, char *argv[])
 
     printf("test SDK API [%s]\n", g_writeOrRead?"write":"read");
     printf("Start: sec%ld usec%ld\n", time.tv_sec, time.tv_usec);
-
     for (i = 0; i < TEST_CYCLE; i++) {
         SerialBegin(acm);
         g_send_count++;
