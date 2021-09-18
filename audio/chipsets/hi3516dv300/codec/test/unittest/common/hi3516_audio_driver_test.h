@@ -11,7 +11,7 @@
 
 #include "hdf_types.h"
 
-const int32_t g_testHi3516AudioDriverType    = 702;
+const int32_t G_TEST_HI3516_AUDIO_DRIVER_TYPE    = 702;
 
 using HdfHi3516AudioDriverTestCmd = enum {
     TESTDAIHWPARAMS,

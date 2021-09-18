@@ -7,8 +7,8 @@
  */
 
 #include "hi3516_dai_adapter_test.h"
-#include "audio_host.h"
 #include "audio_dai_if.h"
+#include "audio_host.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "hi3516_common_func.h"

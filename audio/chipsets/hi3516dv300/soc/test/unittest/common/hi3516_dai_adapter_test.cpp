@@ -43,7 +43,7 @@ void Hi3516DaiAdapterTest::TearDown()
 
 HWTEST_F(Hi3516DaiAdapterTest, Hi3516DaiAdapterTest_DaiHwParams, TestSize.Level0)
 {
-    struct HdfTestMsg msg = {g_testHi3516AudioDriverType, TESTDAIHWPARAMS, -1};
+    struct HdfTestMsg msg = {G_TEST_HI3516_AUDIO_DRIVER_TYPE, TESTDAIHWPARAMS, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 }
