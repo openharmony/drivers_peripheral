@@ -295,7 +295,7 @@ HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_010, TestSize.Level1)
 
     int32_t rc = g_wlanObj->createFeature(g_wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->getFreqsWithBand(g_wlanObj, (struct WlanFeatureInfo *)ifeature, wlanBand,freq,
+    rc = g_wlanObj->getFreqsWithBand(g_wlanObj, (struct WlanFeatureInfo *)ifeature, wlanBand, freq,
                                     WLAN_FREQ_MAX_NUM, &count);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
