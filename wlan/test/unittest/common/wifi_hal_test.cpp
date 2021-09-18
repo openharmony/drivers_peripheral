@@ -81,7 +81,7 @@ static void ParseScanResult(const WifiScanResult *scanResult)
         scanResult->qual, scanResult->beaconIeLen, scanResult->level, scanResult->age, scanResult->ieLen);
 }
 
-static int32_t HalCallbackEventScanResult(uint32_t eventId, const void *data, const char *ifName)
+static int32_t HalCallbackEventScanResult(uint32_t eventId, void *data, const char *ifName)
 {
     printf("HalCallbackEventScanResult ifName = %s, eventId = %d\n", ifName, eventId);
     switch (eventId) {
