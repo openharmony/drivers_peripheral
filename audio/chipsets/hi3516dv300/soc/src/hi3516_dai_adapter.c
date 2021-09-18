@@ -324,12 +324,29 @@ static int32_t DaiDriverInit(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
+static void DaiDriverRelease(struct HdfDeviceObject *device)
+{
+    struct DaiHost *daiHost = NULL;
+
+    if (device == NULL) {
+        AUDIO_DRIVER_LOG_ERR("device is NULL");
+        return;
+    }
+
+    daiHost = (struct DaiHost *)device->service;
+    if (daiHost == NULL) {
+        AUDIO_DRIVER_LOG_ERR("daiHost is NULL");
+        return;
+    }
+    OsalMemFree(daiHost);
+}
+
 /* HdfDriverEntry definitions */
 struct HdfDriverEntry g_daiDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "DAI_HI3516",
     .Bind = DaiDriverBind,
     .Init = DaiDriverInit,
-    .Release = NULL,
+    .Release = DaiDriverRelease,
 };
 HDF_INIT(g_daiDriverEntry);
