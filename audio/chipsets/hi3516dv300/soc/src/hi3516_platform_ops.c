@@ -853,7 +853,7 @@ static int32_t PlatformMmapWriteSub(const struct AudioCard *card, struct Platfor
 }
 
 static void PlatformMmapGetHoldAndDelay(const struct AudioTxMmapData *txMmapData, const struct PlatformHost *platformHost,
-    uint32_t const *hold, uint32_t const *delayms)
+    uint32_t *hold, uint32_t *delayms)
 {
     if (NULL == hold || NULL == delayms || NULL == txMmapData || NULL == platformHost) {
         return;
