@@ -67,7 +67,7 @@ void HdfWifiServiceCTest::TearDown()
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-static void HdiProcessScanResult(const struct HdfSBuf *dataBuf)
+static void HdiProcessScanResult(struct HdfSBuf *dataBuf)
 {
     WifiScanResult *scanResult = nullptr;
     uint32_t dataSize = 0;
