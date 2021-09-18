@@ -324,7 +324,7 @@ static int32_t DaiDriverInit(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-static void DaiDriverRelease(struct HdfDeviceObject *device)
+static void DaiDriverRelease(const struct HdfDeviceObject *device)
 {
     struct DaiHost *daiHost = NULL;
 
