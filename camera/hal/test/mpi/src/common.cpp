@@ -52,7 +52,7 @@ int32_t Test::SaveYUV(const char* type, const void* buffer, int32_t size)
     }
     std::cout << "save yuv to file:" << path << std::endl;
 
-    int imgFd = open(path, O_RDWR | O_CREAT, 00766); // 00766:file jurisdiction
+    int imgFd = open(path, O_RDWR | O_CREAT | O_APPEND, 00766); // 00766:file jurisdiction
     if (imgFd == -1) {
         std::cout << "open file failed, errno = " << strerror(errno) << std::endl;
         return -1;
