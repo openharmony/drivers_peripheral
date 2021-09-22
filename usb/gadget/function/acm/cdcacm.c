@@ -844,7 +844,7 @@ static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
     struct UsbAcmDevice *acm = NULL;
     struct UsbSerial *port = NULL;
 
-    if (client == NULL || client->device == NULL || client->device->service) {
+    if (client == NULL || client->device == NULL || client->device->service == NULL) {
         HDF_LOGE("%s: client is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
