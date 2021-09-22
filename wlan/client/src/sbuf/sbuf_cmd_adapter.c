@@ -229,7 +229,7 @@ void WifiDriverClientDeinit(void)
     g_wifiService = NULL;
 }
 
-static int32_t HdfSBufObtainDefault(struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t HdfSBufObtainDefault(const struct HdfSBuf *data, const struct HdfSBuf *reply)
 {
     data = HdfSBufObtainDefaultSize();
     if (data == NULL) {
@@ -237,7 +237,7 @@ static int32_t HdfSBufObtainDefault(struct HdfSBuf *data, struct HdfSBuf *reply)
     }
     reply = HdfSBufObtainDefaultSize();
     if (reply == NULL) {
-        HdfSBufRecycle(data);
+        HdfSBufRecycle((struct HdfSBuf *)data);
         return RET_CODE_FAILURE;
     }
     return RET_CODE_SUCCESS;
