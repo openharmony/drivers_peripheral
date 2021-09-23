@@ -790,7 +790,6 @@ int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
     const char *ifName = NULL;
 
     if (netDeviceInfoResult == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
     data = HdfSBufObtainDefaultSize();
@@ -817,17 +816,14 @@ int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
                 !HdfSbufReadBuffer(reply, (const void **)(&ifName), &ifNameSize) ||
                 !HdfSbufReadUint8(reply, &(netDeviceInfoResult->deviceInfos[i].iftype)) ||
                 !HdfSbufReadBuffer(reply, (const void **)(&replayData), &macSize)) {
-                HILOG_ERROR(LOG_DOMAIN, "%s: read fail!", __FUNCTION__);
                 ret = RET_CODE_FAILURE;
                 break;
             }
             if (memcpy_s(netDeviceInfoResult->deviceInfos[i].ifName, ifNameSize, ifName, ifNameSize) != EOK) {
-                HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __FUNCTION__);
                 ret = RET_CODE_FAILURE;
                 break;
             }
             if (memcpy_s(netDeviceInfoResult->deviceInfos[i].mac, macSize, replayData, macSize) != EOK) {
-                HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __FUNCTION__);
                 ret = RET_CODE_FAILURE;
                 break;
             }
@@ -1512,7 +1508,7 @@ int32_t WifiCmdAddIf(const char *ifname, const WifiIfAdd *ifAdd)
 
 int32_t WifiCmdRemoveIf(const char *ifname, const WifiIfRemove *ifRemove)
 {
-     if (ifname == NULL || ifRemove == NULL) {
+    if (ifname == NULL || ifRemove == NULL) {
         return RET_CODE_FAILURE;
     }
     struct HdfSBuf *data = HdfSBufObtainDefaultSize();
