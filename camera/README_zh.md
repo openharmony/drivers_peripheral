@@ -30,20 +30,20 @@ HarmonyOS 相机驱动框架模型对上实现相机HDI接口，对下实现相�
 /drivers/peripheral/input
     .
     ├── hal                         # camera模块的hal层代码
-    │   ├── adapter                 # camera模块平台适配层的实现
-    │   ├── buffer_manager
-    │   ├── device_manager
-    │   ├── hdi_impl
-    │   ├── include
-    │   ├── init                     # HDI接口使用样例实现
-    │   ├── pipeline_core
-    │   ├── test                    # 模块测试代码实现
-    │   └── utils
-    ├── hal_c
-    │   ├── hdi_cif
-    │   └── include
-    └── interfaces                # camera模块对上层服务提供的驱动能力接口
-        └── include               # camera模块对外提供的接口定义
+    │   ├── adapter                 # camera hal平台适配层的实现
+    │   ├── buffer_manager          # camera hal统一的Buffer管理
+    │   ├── device_manager          # 提供camera hal层设备管理能力，包括设备枚举、设备能力查询等
+    │   ├── hdi_impl                # camera hal HDI的具体实现
+    │   ├── include                 # camera hal层内部的头文件
+    │   ├── init                    # camera hal层HDI接口使用样例实现
+    │   ├── pipeline_core           # camera hal层pipeline核心代码 
+    │   ├── test                    # camera hal层测试代码实现
+    │   └── utils                   # camera hal层工具类代码，目前提供的是watchdog
+    ├── hal_c                       # 提供C实现的HAL接口
+    │   ├── hdi_cif                 # C实现的HDI接口适配代码
+    │   └── include                 # C形式的HDI接口
+    └── interfaces                  # camera hal对上层服务提供的驱动能力接口
+        └── include                 # camera hal对外提供的HDI定义
 
 
 ```
@@ -346,7 +346,7 @@ HarmonyOS 相机驱动框架模型对上实现相机HDI接口，对下实现相�
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span>const std::vector&lt;int32_t&gt; &amp;streamIds, uint64_t timestamp)</td>
   <td>帧捕获回调</td>
- 
+
 </table>
 
 ## 使用方法
@@ -363,11 +363,11 @@ cameraHost->GetCameraIds(cameraIds); #
 ### 打开camera设备并获取到device
 
     const std::shared_ptr<Camera::ICameraDeviceCallback> callback = std::make_shared<Camera::ICameraDeviceCallback>();
-
+    
     std::shared_ptr<Camera::CameraDevice> device;
-
+    
     std::cout << "cameraIds.front() = " << cameraIds.front() << std::endl;
-
+    
     Camera::CamRetCode rc = cameraHost->OpenCamera(cameraIds.front(), callback, device);
 
 
@@ -396,4 +396,4 @@ cameraHost->GetCameraIds(cameraIds); #
 
 [vendor_hisilicon/tree/master/Hi3516DV300/hdf_config](https://gitee.com/openharmony/vendor_hisilicon/blob/master/README_zh.md)
 
-drivers\_peripheral
+[drivers\_peripheral](https://gitee.com/openharmony/drivers_peripheral)
