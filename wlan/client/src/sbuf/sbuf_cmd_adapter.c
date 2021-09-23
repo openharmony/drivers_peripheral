@@ -253,7 +253,6 @@ int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    
     if (HdfSBufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
