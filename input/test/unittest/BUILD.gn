@@ -11,48 +11,90 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/lite/config/test.gni")
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+  import("//build/lite/config/test.gni")
+} else {
+  import("//build/ohos.gni")
+  import("//build/test.gni")
+  import("//drivers/adapter/uhdf2/uhdf.gni")
+}
 
-unittest("hdf_peripheral_input_test") {
-  output_extension = "bin"
-  output_dir = "$root_out_dir/test/unittest/hdf"
-  include_dirs = [
-    "//third_party/googletest/googletest/include",
-    "//third_party/bounds_checking_function/include",
-    "//drivers/framework/ability/sbuf/include",
-    "//drivers/framework/include/platform",
-    "//drivers/framework/include/core",
-    "//drivers/framework/include/osal",
-    "//drivers/adapter/uhdf/posix/include",
-    "//drivers/framework/include/utils",
-    "//drivers/framework/include/config",
-    "//drivers/framework/include",
-    "//drivers/framework/test/unittest/include",
-    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-    "//drivers/peripheral/input/hal/include",
-    "//drivers/peripheral/input/interfaces/include",
-    "//third_party/FreeBSD/sys/dev/evdev",
-  ]
+if (defined(ohos_lite)) {
+  unittest("hdf_peripheral_input_test") {
+    output_extension = "bin"
+    output_dir = "$root_out_dir/test/unittest/hdf"
+    include_dirs = [
+      "//third_party/googletest/googletest/include",
+      "//third_party/bounds_checking_function/include",
+      "//drivers/framework/ability/sbuf/include",
+      "//drivers/framework/include/platform",
+      "//drivers/framework/include/core",
+      "//drivers/framework/include/osal",
+      "//drivers/adapter/uhdf/posix/include",
+      "//drivers/framework/include/utils",
+      "//drivers/framework/include/config",
+      "//drivers/framework/include",
+      "//drivers/framework/test/unittest/include",
+      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "//drivers/peripheral/input/hal/include",
+      "//drivers/peripheral/input/interfaces/include",
+      "//third_party/FreeBSD/sys/dev/evdev",
+    ]
 
-  defines = [
-    "__USER__",
-    "__HDMI_SUPPORT__",
-  ]
-  sources = [ "./common/hdi_input_test.cpp" ]
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-fsigned-char",
-    "-fno-common",
-    "-fno-strict-aliasing",
-  ]
-  deps = [
-    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-    "//drivers/adapter/uhdf/manager:hdf_core",
-    "//drivers/adapter/uhdf/platform:hdf_platform",
-    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
-    "//drivers/peripheral/input/hal:hdi_input",
-  ]
-  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+    sources = [ "./common/hdi_input_test.cpp" ]
+    cflags = [
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fsigned-char",
+      "-fno-common",
+      "-fno-strict-aliasing",
+    ]
+    if (ohos_build_compiler != "clang") {
+      cflags += [
+        "-Wno-format",
+        "-Wno-format-extra-args",
+      ]
+    }
+    deps = [
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//drivers/adapter/uhdf/manager:hdf_core",
+      "//drivers/adapter/uhdf/platform:hdf_platform",
+      "//drivers/adapter/uhdf/posix:hdf_posix_osal",
+      "//drivers/adapter/uhdf/test/unittest/common:hdf_test_common",
+      "//drivers/peripheral/input/hal:hdi_input",
+    ]
+    public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+  }
+} else {
+  module_output_path = "hdf/input"
+  ohos_unittest("hdf_unittest_input") {
+    module_out_path = module_output_path
+    include_dirs = [
+      "//drivers/framework/test/unittest/include",
+      "//drivers/peripheral/input/hal/include",
+      "//drivers/peripheral/input/interfaces/include",
+    ]
+    sources = [ "./common/hdi_input_test.cpp" ]
+    cflags = [
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fsigned-char",
+      "-fno-common",
+      "-fno-strict-aliasing",
+    ]
+    deps = [
+      "$hdf_uhdf_path/osal:libhdf_utils",
+      "$hdf_uhdf_path/test/unittest/common:libhdf_test_common",
+      "//drivers/peripheral/input/hal:hdi_input",
+      "//utils/native/base:utils",
+    ]
+    if (is_standard_system) {
+      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+  }
 }
