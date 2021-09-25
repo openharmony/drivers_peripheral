@@ -18,6 +18,7 @@
 
 #include "wifi_hal.h"
 #include "wifi_hal_ap_feature.h"
+#include <osal_mem.h>
 
 #ifdef __cplusplus
 extern "C" {
