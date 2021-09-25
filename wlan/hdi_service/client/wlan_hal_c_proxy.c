@@ -463,7 +463,6 @@ static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct Wl
     struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
     freqs = (int32_t *)OsalMemCalloc(sizeof(int32_t));
     if (freqs == NULL) {
-        HDF_LOGE("%s fail : freqs malloc fail!", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
     if (data == NULL || reply == NULL) {

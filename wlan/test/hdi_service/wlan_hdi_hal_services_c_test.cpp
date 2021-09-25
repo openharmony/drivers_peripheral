@@ -22,7 +22,6 @@
 using namespace testing::ext;
 
 namespace HdiTest {
-const int32_t WLAN_FREQ_MAX_NUM = 14;
 const int32_t WLAN_TX_POWER = 160;
 const int32_t DEFAULT_COMBO_SIZE = 6;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
@@ -73,7 +72,8 @@ static void HdiProcessScanResult(const struct HdfSBuf *dataBuf)
     WifiScanResult *scanResult = nullptr;
     uint32_t dataSize = 0;
 
-    if (!HdfSbufReadBuffer((struct HdfSBuf *)dataBuf, (const void **)(&scanResult), &dataSize) || dataSize != sizeof(WifiScanResult)) {
+    if (!HdfSbufReadBuffer((struct HdfSBuf *)dataBuf, (const void **)(&scanResult), &dataSize)
+        || dataSize != sizeof(WifiScanResult)) {
         HDF_LOGE("%s: HdfSbufReadBuffer scanResult failed!", __func__);
         return;
     }
