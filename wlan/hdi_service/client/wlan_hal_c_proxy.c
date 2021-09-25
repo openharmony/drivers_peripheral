@@ -19,7 +19,6 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <hdf_sbuf.h>
-#include <osal_mem.h>
 #include <servmgr_hdi.h>
 
 #ifdef __cplusplus
@@ -465,8 +464,7 @@ static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct Wl
     freqs = (int32_t *)OsalMemCalloc(sizeof(int32_t));
     if (freqs == NULL) {
         HDF_LOGE("%s fail : freqs malloc fail!", __func__);
-        ec = HDF_ERR_MALLOC_FAIL;
-        goto finished;
+        return HDF_ERR_MALLOC_FAIL;
     }
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
@@ -507,9 +505,6 @@ finished:
     }
     if (reply != NULL) {
         HdfSBufRecycle(reply);
-    }
-     if (freqs != NULL) {
-        OsalMemFree(freqs);
     }
     return ec;
 }

@@ -68,12 +68,12 @@ void HdfWifiServiceCTest::TearDown()
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-static void HdiProcessScanResult(struct HdfSBuf *dataBuf)
+static void HdiProcessScanResult(const struct HdfSBuf *dataBuf)
 {
     WifiScanResult *scanResult = nullptr;
     uint32_t dataSize = 0;
 
-    if (!HdfSbufReadBuffer(dataBuf, (const void **)(&scanResult), &dataSize) || dataSize != sizeof(WifiScanResult)) {
+    if (!HdfSbufReadBuffer((struct HdfSBuf *)dataBuf, (const void **)(&scanResult), &dataSize) || dataSize != sizeof(WifiScanResult)) {
         HDF_LOGE("%s: HdfSbufReadBuffer scanResult failed!", __func__);
         return;
     }
@@ -96,7 +96,7 @@ static int32_t HalResetCallbackEvent(uint32_t eventId, void *data, const char *i
             printf("HalResetCallbackEvent: receive resetStatus=%d \n", g_resetStatus);
             break;
         case WIFI_EVENT_SCAN_RESULT:
-            HdiProcessScanResult(dataBuf);
+            HdiProcessScanResult((const struct HdfSBuf *)dataBuf);
             break;
         default:
             break;
