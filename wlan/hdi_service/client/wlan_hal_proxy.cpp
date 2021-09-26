@@ -197,6 +197,8 @@ int IPCObjectStubWlan::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data,
         HDF_LOGE("%s: dataSbuf malloc failed!", __func__);
         HdfSBufRecycle(dataSbuf);
     }
+    const char *name = data.ReadCString();
+    HDF_LOGI("IPCObjectStubWlan::OnRemoteRequest called, ifName = %{public}s", name);
     status = data.ReadInt32();
     HdfSbufWriteInt32(dataSbuf, status);
     switch (code) {
