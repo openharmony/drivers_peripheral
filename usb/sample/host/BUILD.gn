@@ -105,7 +105,7 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
 
-    install_enable = true
+    install_enable = false
     subsystem_name = "hdf"
   }
 
@@ -182,7 +182,7 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
 
-    install_enable = true
+    install_enable = false
     subsystem_name = "hdf"
   }
 
@@ -213,7 +213,7 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
 
-    install_enable = true
+    install_enable = false
     subsystem_name = "hdf"
   }
 
@@ -244,7 +244,7 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
 
-    install_enable = true
+    install_enable = false
     subsystem_name = "hdf"
   }
 
@@ -293,7 +293,7 @@ if (defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
-    install_enable = true
+    install_enable = false
     subsystem_name = "hdf"
   }
 
@@ -324,7 +324,7 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
 
-    install_enable = true
+    install_enable = false
     subsystem_name = "hdf"
   }
 }
