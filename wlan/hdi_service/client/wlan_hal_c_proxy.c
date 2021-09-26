@@ -19,7 +19,6 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <hdf_sbuf.h>
-#include <osal_mem.h>
 #include <servmgr_hdi.h>
 
 #ifdef __cplusplus
@@ -453,7 +452,7 @@ finished:
 }
 
 static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature,
-    int32_t band, int32_t *freqs, uint32_t count, uint32_t *num)
+    int32_t band, int32_t *freqs, uint32_t *num)
 {
     int32_t ec = HDF_FAILURE;
 
@@ -462,6 +461,10 @@ static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct Wl
     }
     struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
     struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    freqs = (int32_t *)OsalMemCalloc(sizeof(int32_t));
+    if (freqs == NULL) {
+        return HDF_ERR_MALLOC_FAIL;
+    }
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -488,7 +491,7 @@ static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct Wl
         goto finished;
     }
     for (uint32_t i = 0; i < (*num); i++) {
-        if (!HdfSbufReadInt32(reply, &freqs[i])) {
+        if (!HdfSbufReadInt32(reply, freqs)) {
             HDF_LOGE("%s: write freq failed", __func__);
             ec = HDF_FAILURE;
             goto finished;
