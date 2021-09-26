@@ -22,7 +22,6 @@
 using namespace testing::ext;
 
 namespace HdiTest {
-const int32_t WLAN_FREQ_MAX_NUM = 14;
 const int32_t WLAN_TX_POWER = 160;
 const int32_t DEFAULT_COMBO_SIZE = 6;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
@@ -68,12 +67,13 @@ void HdfWifiServiceCTest::TearDown()
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-static void HdiProcessScanResult(struct HdfSBuf *dataBuf)
+static void HdiProcessScanResult(const struct HdfSBuf *dataBuf)
 {
     WifiScanResult *scanResult = nullptr;
     uint32_t dataSize = 0;
 
-    if (!HdfSbufReadBuffer(dataBuf, (const void **)(&scanResult), &dataSize) || dataSize != sizeof(WifiScanResult)) {
+    if (!HdfSbufReadBuffer((struct HdfSBuf *)dataBuf, (const void **)(&scanResult), &dataSize)
+        || dataSize != sizeof(WifiScanResult)) {
         HDF_LOGE("%s: HdfSbufReadBuffer scanResult failed!", __func__);
         return;
     }
@@ -96,7 +96,7 @@ static int32_t HalResetCallbackEvent(uint32_t eventId, void *data, const char *i
             printf("HalResetCallbackEvent: receive resetStatus=%d \n", g_resetStatus);
             break;
         case WIFI_EVENT_SCAN_RESULT:
-            HdiProcessScanResult(dataBuf);
+            HdiProcessScanResult((const struct HdfSBuf *)dataBuf);
             break;
         default:
             break;
@@ -289,14 +289,16 @@ HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_010, TestSize.Level1)
 {
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     struct WlanFeatureInfo *ifeature = nullptr;
-    int32_t freq[WLAN_FREQ_MAX_NUM] = {0};
+    int32_t *freqs = NULL;
     int32_t wlanBand = 0;
     uint32_t count = 0;
 
     int32_t rc = g_wlanObj->createFeature(g_wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->getFreqsWithBand(g_wlanObj, (struct WlanFeatureInfo *)ifeature, wlanBand, freq,
-                                    WLAN_FREQ_MAX_NUM, &count);
+    rc = g_wlanObj->getFreqsWithBand(g_wlanObj, (struct WlanFeatureInfo *)ifeature, wlanBand, freqs, &count);
+    if (freqs != NULL) {
+        OsalMemFree(freqs);
+    }
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);

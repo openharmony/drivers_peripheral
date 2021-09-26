@@ -16,6 +16,7 @@
 #ifndef HDI_SAMPLE_CLIENT_C_INF_H
 #define HDI_SAMPLE_CLIENT_C_INF_H
 
+#include <osal_mem.h>
 #include "wifi_hal.h"
 #include "wifi_hal_ap_feature.h"
 
@@ -55,7 +56,7 @@ struct IWifiInterface {
     int32_t (*getDeviceMacAddress)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature,
         unsigned char *mac, uint8_t len);
     int32_t (*getFreqsWithBand)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, int32_t band,
-        int32_t *freqs, uint32_t count, uint32_t *num);
+        int32_t *freqs, uint32_t *num);
     int32_t (*setTxPower)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, int32_t power);
     int32_t (*getChipId)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, uint8_t *chipId);
     int32_t (*getIfNamesByChipId)(struct IWifiInterface *self, const uint8_t chipId, char **ifNames, uint32_t *num);
