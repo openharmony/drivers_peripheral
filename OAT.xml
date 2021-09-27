@@ -100,6 +100,8 @@ Note:If the text contains special characters, please escape them according to th
                 <filteritem type="filepath" name="input/figures/.*.png" desc="input architecture diagram"/>
                 <filteritem type="filepath" name="sensor/figures/.*.png" desc="sensor architecture diagram"/>
                 <filteritem type="filepath" name="wlan/figures/.*.png" desc="wlan architecture diagram"/>
+                <filteritem type="filepath" name="camera/figures/.*.png" desc="camera architecture diagram"/>
+                <filteritem type="filepath" name="usb/figures/.*.png" desc="usb architecture diagram"/>
                 <filteritem type="filepath" name="display/test/resource/.*.bmp" desc="display test image"/>
             </filefilter>
         </filefilterlist>
