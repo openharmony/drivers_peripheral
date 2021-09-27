@@ -198,12 +198,12 @@ typedef struct {
 } AiaoClkInfo;
 
 typedef enum {
-    HI_AIO_MODE_I2S_MASTER  = 0,   /* AIO I2S master mode */
-    HI_AIO_MODE_I2S_SLAVE,         /* AIO I2S slave mode */
-    HI_AIO_MODE_PCM_SLAVE_STD,     /* AIO PCM slave standard mode */
-    HI_AIO_MODE_PCM_SLAVE_NON_STD,    /* AIO PCM slave non-standard mode */
-    HI_AIO_MODE_PCM_MASTER_STD,    /* AIO PCM master standard mode */
-    HI_AIO_MODE_PCM_MASTER_NON_STD,   /* AIO PCM master non-standard mode */
+    HI_AIO_MODE_I2S_SERVER  = 0,   /* AIO I2S server mode */
+    HI_AIO_MODE_I2S_SLAVE,         /* AIO I2S client mode */
+    HI_AIO_MODE_PCM_SLAVE_STD,     /* AIO PCM client standard mode */
+    HI_AIO_MODE_PCM_SLAVE_NON_STD,    /* AIO PCM client non-standard mode */
+    HI_AIO_MODE_PCM_SERVER_STD,    /* AIO PCM server standard mode */
+    HI_AIO_MODE_PCM_SERVER_NON_STD,   /* AIO PCM server non-standard mode */
     HI_AIO_MODE_BUTT
 } AudioWorkMode;
 
@@ -222,7 +222,7 @@ typedef enum {
 typedef struct {
     AudioSampleRate sampleRate;        /* sample rate */
     AudioBitWidth   bitWidth;          /* bit_width */
-    AudioWorkMode   workMode;          /* master or slave mode */
+    AudioWorkMode   workMode;          /* server or client mode */
     AudioSndMode    soundMode;         /* momo or steror */
     int32_t         expandFlag;        /* expand 8bit to 16bit, use AI_EXPAND(only valid for AI 8bit),
                                           use AI_CUT(only valid for extern codec for 24bit) */
