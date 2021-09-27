@@ -1,33 +1,18 @@
 /*
- * Copyright (c) 2013-2019, Huawei Technologies Co., Ltd. All rights reserved.
- * Copyright (c) 2020, Huawei Device Co., Ltd. All rights reserved.
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * 1. Redistributions of source code must retain the above copyright notice, this list of
- *    conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice, this list
- *    of conditions and the following disclaimer in the documentation and/or other materials
- *    provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its contributors may be used
- *    to endorse or promote products derived from this software without specific prior written
- *    permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 #include "securec.h"
 #include "hdf_log.h"
 #include "osal_mem.h"
@@ -59,7 +44,7 @@ int32_t check_service()
 {
     if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
         HDF_LOGE("%s: GetService err", __func__);
-        return HDF_FAILURE; 
+        return HDF_FAILURE;
     }
     if (g_data == NULL || g_reply == NULL) {
         HDF_LOGE("%s: GetService err", __func__);
@@ -121,11 +106,12 @@ void acm_write(const char *buf)
 void acm_read(char *str, int timeout)
 {
     int ret;
+    uint32_t maxLen = 256;
     if (check_service()) {
         HDF_LOGE("%s: GetService err", __func__);
         return;
     }
-    while(timeout-- > 0) {
+    while (timeout-- > 0) {
         HdfSbufFlush(g_reply);
         int status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_READ, g_data, g_reply);
         if (status) {
@@ -134,7 +120,7 @@ void acm_read(char *str, int timeout)
         }
         const char *tmp = HdfSbufReadString(g_reply);
         if (str && tmp && strlen(tmp) > 0) {
-            ret = memcpy_s(str, 256, tmp, strlen(tmp));
+            ret = memcpy_s(str, maxLen, tmp, strlen(tmp));
             if (ret != EOK) {
                 HDF_LOGE("%s:%d ret=%d memcpy_s error", ret);
             }
@@ -185,6 +171,7 @@ void acm_prop_write(const char *propName, const char *propValue)
 
 void acm_prop_read(const char *propName, char *propValue)
 {
+    uint32_t maxLen = 256;
     if (check_service()) {
         HDF_LOGE("%s: GetService err", __func__);
         return;
@@ -199,7 +186,7 @@ void acm_prop_read(const char *propName, char *propValue)
     }
     const char *tmp = HdfSbufReadString(g_reply);
     if (propValue && tmp && strlen(tmp) > 0) {
-        errno_t err = memcpy_s(propValue, 256, tmp, strlen(tmp));
+        errno_t err = memcpy_s(propValue, maxLen, tmp, strlen(tmp));
         if (err != EOK) {
             HDF_LOGE("%s:%d err=%d memcpy_s error", err);
         }
