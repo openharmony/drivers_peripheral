@@ -597,7 +597,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0015, TestSi
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = "hdf_audio_codec_dev0",
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
-        .id.itemName = "Master Playback Volume",
+        .id.itemName = "Main Playback Volume",
         .value[0] = 100,
     };
     ret = WriteCtrlInfo(service, elemValue);
@@ -624,7 +624,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0016, TestSi
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = "hdf_audio_codec_dev0",
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
-        .id.itemName = "Master Playback Volume",
+        .id.itemName = "Main Playback Volume",
         .value[0] = 40,
     };
     ret = WriteCtrlInfo(service, elemValue);
@@ -650,7 +650,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0017, TestSi
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = "hdf_audio_codec_dev0",
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
-        .id.itemName = "Master Playback Volume",
+        .id.itemName = "Main Playback Volume",
         .value[0] = 127,
     };
     ret = WriteCtrlInfo(service, elemValue);
@@ -672,7 +672,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0018, TestSi
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = "hdf_audio_codec_dev0",
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
-        .id.itemName = "Master Playback Volume",
+        .id.itemName = "Main Playback Volume",
         .value[0] = 128,
     };
     service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
@@ -695,7 +695,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0019, TestSi
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = "hdf_audio_codec_dev0",
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
-        .id.itemName = "Master Playback Volume",
+        .id.itemName = "Main Playback Volume",
         .value[0] = 39,
     };
     service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
