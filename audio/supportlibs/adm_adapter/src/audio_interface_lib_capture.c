@@ -122,7 +122,7 @@ int32_t AudioCtlCaptureSetPauseBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
     struct AudioCtlElemValue elemCaptureValue;
     elemCaptureValue.id.cardServiceName = g_audioLibCaptureService[card];
     elemCaptureValue.id.iface = AUDIODRV_CTL_CAPTUREELEM_IFACE_MIXER;
-    elemCaptureValue.id.itemName = "Master Playback Pause";
+    elemCaptureValue.id.itemName = "Main Playback Pause";
     elemCaptureValue.value[0] = (int32_t)handleData->captureMode.ctlParam.pause;
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.value[0])) {
         LOG_FUN_ERR("CaptureSetPauseBuf pause Write Fail!");
@@ -195,7 +195,7 @@ int32_t AudioCtlCaptureGetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwC
     struct AudioCtlElemValue elemCaptureValue;
     elemCaptureValue.id.cardServiceName = g_audioLibCaptureService[card];
     elemCaptureValue.id.iface = AUDIODRV_CTL_ELEM_IFACE_ADC;
-    elemCaptureValue.id.itemName = "Master Capture Volume";
+    elemCaptureValue.id.itemName = "Main Capture Volume";
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.id.iface)) {
         LOG_FUN_ERR("CaptureGetVolumeSBuf iface Write Fail!");
         return HDF_FAILURE;
@@ -272,7 +272,7 @@ int32_t AudioCtlCaptureSetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwC
     struct AudioCtlElemValue elemCaptureValue;
     elemCaptureValue.id.cardServiceName = g_audioLibCaptureService[card];
     elemCaptureValue.id.iface = AUDIODRV_CTL_ELEM_IFACE_ADC;
-    elemCaptureValue.id.itemName = "Master Capture Volume";
+    elemCaptureValue.id.itemName = "Main Capture Volume";
     elemCaptureValue.value[0] = (int32_t)handleData->captureMode.ctlParam.volume;
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.value[0])) {
         LOG_FUN_ERR("CaptureSetVolumeSBuf value[0] Write Fail!");
@@ -812,7 +812,7 @@ int32_t AudioCtlCaptureGetVolThresholdSBuf(struct HdfSBuf *sBuf, const struct Au
     struct AudioCtrlElemInfo elemCaptureInfo;
     elemCaptureInfo.id.cardServiceName = g_audioLibCaptureService[card];
     elemCaptureInfo.id.iface = AUDIODRV_CTL_ELEM_IFACE_ADC;
-    elemCaptureInfo.id.itemName = "Master Capture Volume";
+    elemCaptureInfo.id.itemName = "Main Capture Volume";
     if (!HdfSbufWriteInt32(sBuf, elemCaptureInfo.id.iface)) {
         LOG_FUN_ERR("elemCaptureInfo.id.iface iface Write Fail!");
         return HDF_FAILURE;

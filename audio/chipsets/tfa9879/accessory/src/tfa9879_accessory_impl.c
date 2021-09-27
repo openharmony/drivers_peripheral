@@ -571,7 +571,7 @@ static const struct AudioMixerControl g_tfa9879AudioRegParams[] = {
 static const struct AudioKcontrol g_tfa9879AudioControls[] = {
     {
         .iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
-        .name = "Master Playback Volume",
+        .name = "Main Playback Volume",
         .Info = AudioInfoCtrlOps,
         .Get = AudioAccessoryGetCtrlOps,
         .Set = AudioAccessorySetCtrlOps,
