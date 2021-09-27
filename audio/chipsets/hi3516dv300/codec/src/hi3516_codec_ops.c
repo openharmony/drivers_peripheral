@@ -123,14 +123,14 @@ static const struct AudioMixerControl g_audioRegParams[] = {
 static const struct AudioKcontrol g_audioControls[] = {
     {
         .iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
-        .name = "Master Playback Volume",
+        .name = "Main Playback Volume",
         .Info = AudioInfoCtrlOps,
         .Get = AudioCodecAiaoGetCtrlOps,
         .Set = AudioCodecAiaoSetCtrlOps,
         .privateValue = (unsigned long)&g_audioRegParams[PLAYBACK_VOLUME],
     }, {
         .iface = AUDIODRV_CTL_ELEM_IFACE_ADC,
-        .name = "Master Capture Volume",
+        .name = "Main Capture Volume",
         .Info = AudioInfoCtrlOps,
         .Get = AudioCodecGetCtrlOps,
         .Set = AudioCodecSetCtrlOps,
