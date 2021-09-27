@@ -1635,7 +1635,7 @@ HWTEST_F(hdfUsbRawTest, CheckRawSdkIfFillBulkRequest003, TestSize.Level1)
 HWTEST_F(hdfUsbRawTest, CheckRawSdkIfFillBulkRequest004, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_RAW_TYPE, USB_RAW_SDK_IF_FILL_BULK_REQUEST_004_TEST, -1};
-    EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
+    EXPECT_EQ(-1, HdfTestSendMsgToService(&msg));
 }
 
 /**
@@ -1671,7 +1671,7 @@ HWTEST_F(hdfUsbRawTest, CheckRawSdkIfSubmitRequest001, TestSize.Level1)
 HWTEST_F(hdfUsbRawTest, CheckRawSdkIfSubmitRequest002, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_RAW_TYPE, USB_RAW_SDK_IF_SUBMIT_REQUEST_002_TEST, -1};
-    EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
+    EXPECT_EQ(-1, HdfTestSendMsgToService(&msg));
 }
 
 /**

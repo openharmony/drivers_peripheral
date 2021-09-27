@@ -14,8 +14,10 @@
 import("//build/lite/config/component/lite_component.gni")
 
 HDF_FWKS = "//drivers/framework"
+USB_OUTPUT_DIR = "$root_out_dir/test/functiontest/hdf/usb"
 
 executable("liteos_host_speed_test") {
+  output_dir = "$USB_OUTPUT_DIR"
   sources = [ "src/usbhost_speed_test.c" ]
   include_dirs = [
     "$HDF_FWKS/ability/sbuf/include",

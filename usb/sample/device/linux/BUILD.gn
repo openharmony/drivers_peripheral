@@ -55,7 +55,7 @@ ohos_executable("acm_test") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  install_enable = true
+  install_enable = false
   subsystem_name = "hdf"
 }
 
@@ -100,7 +100,7 @@ ohos_executable("acm_read") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  install_enable = true
+  install_enable = false
   subsystem_name = "hdf"
 }
 
@@ -145,7 +145,7 @@ ohos_executable("acm_write") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  install_enable = true
+  install_enable = false
   subsystem_name = "hdf"
 }
 
@@ -190,7 +190,7 @@ ohos_executable("acm_speed_write") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  install_enable = true
+  install_enable = false
   subsystem_name = "hdf"
 }
 
@@ -235,7 +235,7 @@ ohos_executable("acm_speed_read") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  install_enable = true
+  install_enable = false
   subsystem_name = "hdf"
 }
 
@@ -280,6 +280,6 @@ ohos_executable("prop_test") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  install_enable = true
+  install_enable = false
   subsystem_name = "hdf"
 }

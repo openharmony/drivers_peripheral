@@ -1284,7 +1284,7 @@ void *UsbFnMemCalloc(size_t size)
             DListHeadInit(&g_usbRamTestHead->list);
         }
         testEntry = OsalMemAlloc(sizeof(struct RawUsbRamTestList));
-        testEntry->address = (uint32_t) buf;
+        testEntry->address = (uintptr_t)buf;
         testEntry->size = size;
 
         OsalMutexLock(&g_usbRamTestHead->lock);

@@ -279,8 +279,11 @@ static struct UsbPipeInfo *GetPipe(const struct AcmDevice *acm,
 static void SpeedPrint()
 {
     double speed;
+    uint64_t count;
+
     sigCnt++;
-    if ((sigCnt * TEST_PRINT_TIME) >= TEST_TIME) {
+    count = sigCnt * TEST_PRINT_TIME;
+    if (count >= TEST_TIME) {
         g_speedFlag = true;
     }
     speed = (g_byteTotal * 1.0) / (sigCnt * TEST_PRINT_TIME  * 1024 * 1024);
@@ -438,7 +441,7 @@ static int32_t UsbSpeedRequestHandle()
         parmas.userData = (void *)snd;
         parmas.dataReq.length = acm->dataSize;
         parmas.dataReq.buffer = snd->buf;
-        parmas.dataReq.directon = (acm->dataPipe->pipeDirection >> USB_PIPE_DIR_OFFSET) & 0x1;
+        parmas.dataReq.directon = (((uint8_t)acm->dataPipe->pipeDirection) >> USB_PIPE_DIR_OFFSET) & 0x1;
         snd->dbNum = acm->transmitting;
         rc = UsbFillRequest(snd->request, InterfaceIdToHandle(acm, acm->dataPipe->interfaceId), &parmas);
         if (rc != HDF_SUCCESS) {
