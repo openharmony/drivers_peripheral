@@ -199,9 +199,9 @@ typedef struct {
 
 typedef enum {
     HI_AIO_MODE_I2S_SERVER  = 0,   /* AIO I2S server mode */
-    HI_AIO_MODE_I2S_SLAVE,         /* AIO I2S client mode */
-    HI_AIO_MODE_PCM_SLAVE_STD,     /* AIO PCM client standard mode */
-    HI_AIO_MODE_PCM_SLAVE_NON_STD,    /* AIO PCM client non-standard mode */
+    HI_AIO_MODE_I2S_CLIENT,         /* AIO I2S client mode */
+    HI_AIO_MODE_PCM_CLIENT_STD,     /* AIO PCM client standard mode */
+    HI_AIO_MODE_PCM_CLIENT_NON_STD,    /* AIO PCM client non-standard mode */
     HI_AIO_MODE_PCM_SERVER_STD,    /* AIO PCM server standard mode */
     HI_AIO_MODE_PCM_SERVER_NON_STD,   /* AIO PCM server non-standard mode */
     HI_AIO_MODE_BUTT
