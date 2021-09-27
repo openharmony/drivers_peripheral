@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "IPCStreamOperator_fuzzer.h"
+#include "ipc_stream_operator_fuzzer.h"
 #include "fuzz_base.h"
 
 #include <cstddef>
@@ -24,7 +24,7 @@ public:
     virtual CamRetCode IsStreamsSupported(
         OperationMode mode,
         const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
-        const std::vector<std::shared_ptr<StreamInfo>> &pInfo,
+        const std::vector<std::shared_ptr<StreamInfo>> &info,
         StreamSupportType &type) override
     {
         return OHOS::Camera::NO_ERROR;
@@ -100,13 +100,15 @@ static void fuzzAccountService(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     if (size > sizeof(uint32_t)) {
         uint32_t code = U32_AT(data);
-        data = data + sizeof(uint32_t);
+        uint8_t *number = data;
+        number = number + sizeof(uint32_t);
         if (code == 7) { // 7:code size
             return;
         }
-        size = size - sizeof(uint32_t);
+        size_t length = size;
+        length = length - sizeof(uint32_t);
         dataMessageParcel.WriteInterfaceToken(StreamOperatorStub::GetDescriptor());
-        dataMessageParcel.WriteBuffer(data, size);
+        dataMessageParcel.WriteBuffer(number, length);
         dataMessageParcel.RewindRead(0);
         onRemoteRequest(code, dataMessageParcel);
     }

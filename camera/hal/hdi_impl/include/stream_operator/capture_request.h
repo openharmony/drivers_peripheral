@@ -84,5 +84,4 @@ private:
     bool isFirstRequest_ = false;
 };
 } // namespace OHOS::Camera
-
 #endif

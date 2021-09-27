@@ -13,21 +13,27 @@
  * limitations under the License.
  */
 
-#include "IPCStreamOperatorCallback_fuzzer.h"
+#include "ipc_offline_fuzzer.h"
 #include "fuzz_base.h"
 
 #include <cstddef>
 #include <cstdint>
 
-class IPCStreamOperatorCallbackFuzzer : public StreamOperatorCallbackStub {
+class IPCOfflineFuzzer : public OfflineStreamOperatorStub {
 public:
-    virtual void OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamIds) override {}
-    virtual void OnCaptureEnded(int32_t captureId,
-        const std::vector<std::shared_ptr<CaptureEndedInfo>> &infos) override {}
-    virtual void OnCaptureError(int32_t captureId,
-        const std::vector<std::shared_ptr<CaptureErrorInfo>> &infos) override {}
-    virtual void OnFrameShutter(int32_t captureId,
-        const std::vector<int32_t> &streamIds, uint64_t timestamp) override {}
+    virtual CamRetCode CancelCapture(int captureId)
+    {
+        (void)captureId;
+        return OHOS::Camera::NO_ERROR;
+    }
+    virtual CamRetCode ReleaseStreams(const std::vector<int>& streamIds)
+    {
+        return OHOS::Camera::NO_ERROR;
+    }
+    virtual CamRetCode Release()
+    {
+        return OHOS::Camera::NO_ERROR;
+    }
 };
 
 static uint32_t U32_AT(const uint8_t *ptr)
@@ -39,8 +45,8 @@ static int32_t onRemoteRequest(uint32_t code, MessageParcel &data)
 {
     MessageParcel reply;
     MessageOption option;
-    IPCStreamOperatorCallbackFuzzer IPCStreamSerCall;
-    auto ret = IPCStreamSerCall.OnRemoteRequest(code, data, reply, option);
+    IPCOfflineFuzzer IPCOfflineSer;
+    auto ret = IPCOfflineSer.OnRemoteRequest(code, data, reply, option);
     return ret;
 }
 
@@ -49,12 +55,15 @@ static void fuzzAccountService(const uint8_t *data, size_t size)
     MessageParcel reply;
     MessageOption option;
     MessageParcel dataMessageParcel;
+    uint32_t code = U32_AT(data);
+
+    uint8_t *number = data;
+    number = number + sizeof(uint32_t);
     if (size > sizeof(uint32_t)) {
-        uint32_t code = U32_AT(data);
-        data = data + sizeof(uint32_t);
-        size = size - sizeof(uint32_t);
-        dataMessageParcel.WriteInterfaceToken(StreamOperatorCallbackStub::GetDescriptor());
-        dataMessageParcel.WriteBuffer(data, size);
+        size_t length = size;
+        length = length - sizeof(uint32_t);
+        dataMessageParcel.WriteInterfaceToken(OfflineStreamOperatorStub::GetDescriptor());
+        dataMessageParcel.WriteBuffer(number, length);
         dataMessageParcel.RewindRead(0);
         onRemoteRequest(code, dataMessageParcel);
     }
