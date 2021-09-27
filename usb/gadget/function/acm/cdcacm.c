@@ -42,7 +42,7 @@ static int32_t UsbSerialStartTx(struct UsbSerial *port)
         return HDF_FAILURE;
     }
     struct DListHead *pool = &port->writePool;
-    int32_t ret;
+    int32_t ret = HDF_FAILURE;
     if (port->acm == NULL) {
         return HDF_SUCCESS;
     }
@@ -739,6 +739,7 @@ static int32_t UsbSerialSetProp(struct UsbAcmDevice *acmDevice, struct HdfSBuf *
     if (propValue == NULL) {
         return HDF_ERR_IO;
     }
+    (void)memset_s(&tmp, sizeof(tmp), 0, sizeof(tmp));
     ret = snprintf_s(tmp, USB_MAX_PACKET_SIZE, USB_MAX_PACKET_SIZE - 1, "%s", propValue);
     if (ret < 0) {
         HDF_LOGE("%s: snprintf_s failed", __func__);
@@ -844,7 +845,8 @@ static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
     struct UsbAcmDevice *acm = NULL;
     struct UsbSerial *port = NULL;
 
-    if (client == NULL || client->device == NULL || client->device->service == NULL) {
+    if (client == NULL || client->device == NULL || \
+        client->device->service == NULL) {
         HDF_LOGE("%s: client is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
@@ -1201,7 +1203,7 @@ static void UsbAcmEventCallback(struct UsbFnEvent *event)
 }
 
 static int32_t AcmSendNotifyRequest(struct UsbAcmDevice *acm, uint8_t type,
-    uint16_t value, void *data, uint32_t length)
+    uint16_t value, const void *data, uint32_t length)
 {
     struct UsbFnRequest *req = acm->notifyReq;
     struct UsbCdcNotification *notify = NULL;
@@ -1306,6 +1308,7 @@ static int32_t AcmParseEachPipe(struct UsbAcmDevice *acm, struct UsbAcmInterface
 
     for (i = 0; i < fnIface->info.numPipes; i++) {
         struct UsbFnPipeInfo pipeInfo;
+        (void)memset_s(&pipeInfo, sizeof(pipeInfo), 0, sizeof(pipeInfo));
         ret = UsbFnGetInterfacePipeInfo(fnIface, i, &pipeInfo);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s: get pipe info error", __func__);

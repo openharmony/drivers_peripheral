@@ -220,6 +220,7 @@ static int UsbFnAdapterOpenPipe(const char *funcName, int epIndex)
 {
     int ret;
     char epName[MAX_NAMELEN];
+    const char *pName = &epName[0];
     int i;
     int ep;
     if (funcName == NULL || epIndex < 0) {
@@ -233,7 +234,7 @@ static int UsbFnAdapterOpenPipe(const char *funcName, int epIndex)
     }
 
     for (i = 0; i < OPEN_CNT; i++) {
-        ep = handle_open(&epName[0]);
+        ep = handle_open(pName);
         if (ep > 0) {
             break;
         }
@@ -758,6 +759,7 @@ static int UsbFnAdapterGetPipeInfo(int ep, struct UsbFnPipeInfo *pipeInfo)
     }
 
     struct usb_endpoint_descriptor desc;
+    (void)memset_s(&desc, sizeof(desc), 0, sizeof(desc));
     ret = handle_ioctl(ep, GENERIC_CMD_GET_PIPE_INFO, &desc);
     if (ret) {
         HDF_LOGE("%s: FUNCTIONFS_ENDPOINT_DESC failure!", __func__);
@@ -881,6 +883,7 @@ static int UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int timeout)
 {
     uint8_t i;
     struct FconfigPollFd pfds[16] = {0};
+    struct FconfigPollFd *pfd = &pfds[0];
     if (event == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
@@ -911,11 +914,11 @@ static int UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int timeout)
             return HDF_ERR_INVALID_PARAM;
         }
     }
-    if (Ep0Event(event, &pfds[0]) < 0) {
+    if (Ep0Event(event, pfd) < 0) {
         HDF_LOGE("%s: handle_poll failed", __func__);
         return HDF_ERR_IO;
     }
-    if (EpEvent(event, &pfds[0]) < 0) {
+    if (EpEvent(event, pfd) < 0) {
         HDF_LOGE("%s: handle_poll failed", __func__);
         return HDF_ERR_IO;
     }
@@ -1050,7 +1053,7 @@ void *UsbFnMemCalloc(size_t size)
             DListHeadInit(&g_usbRamTestHead->list);
         }
         testEntry = OsalMemAlloc(sizeof(struct RawUsbRamTestList));
-        testEntry->address = (uint32_t) buf;
+        testEntry->address = (uintptr_t)buf;
         testEntry->size = size;
 
         OsalMutexLock(&g_usbRamTestHead->lock);
@@ -1081,14 +1084,15 @@ void UsbFnMemFree(void * const mem)
     if ((g_usbRamTestFlag == true) && (g_usbRamTestHead != NULL)) {
         OsalMutexLock(&g_usbRamTestHead->lock);
         DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
-            if ((NULL != pos) && (pos->address == (uint32_t)mem))
-            {
+            if ((pos != NULL) && (pos->address == (uintptr_t)mem)) {
                 size = pos->size;
                 DListRemove(&pos->list);
                 OsalMemFree(pos);
                 continue;
             }
-            totalSize += pos->size;
+            if (pos != NULL) {
+                totalSize += pos->size;
+            }
         }
         OsalMutexUnlock(&g_usbRamTestHead->lock);
         HDF_LOGE("%{public}s rm size=%{public}d totalSize=%{public}d", __func__, size, totalSize);

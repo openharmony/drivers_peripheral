@@ -135,7 +135,7 @@ static void ShowHelp(const char *name)
     printf("\n");
 }
 
-static void *stop_handler(void *arg)
+static void *stop_handler()
 {
     int err, signo;
     stopHandlerTid = getpid();
@@ -199,7 +199,7 @@ static int CheckParam(int argc, char *argv[], struct UsbSpeedTest *speedTest)
     bool printData = false;
     int paramNum;
 
-    if ((argv == NULL) || (speedTest == NULL)) {
+    if ((argv == NULL) || (speedTest == NULL) || (argc <= 0)) {
         return HDF_ERR_INVALID_PARAM;
     }
     switch (argc) {
@@ -247,11 +247,10 @@ int main(int argc, char *argv[])
     }
 
     pthread_t threads;
-    int err;
     sigemptyset(&mask);
     sigaddset(&mask, SIGINT);
     sigaddset(&mask, SIGQUIT);
-    if ((err = pthread_sigmask(SIG_BLOCK, &mask, NULL)) != 0) {
+    if (pthread_sigmask(SIG_BLOCK, &mask, NULL) != 0) {
         printf("SIG_BLOCK error\n");
         ret = HDF_FAILURE;
         goto END;
