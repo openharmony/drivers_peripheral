@@ -29,7 +29,7 @@ ohos_fuzztest("IPCCameraDeviceRemote_fuzzer") {
   ]
   sources = [
     "$camera_path/../interfaces/include/server/camera_device_service_stub.cpp",
-    "./IPCCameraDeviceRemote_fuzzer/IPCCameraDeviceRemote_fuzzer.cpp",
+    "./IPCCameraDeviceRemote_fuzzer/ipc_camera_device_remote_fuzzer.cpp",
   ]
 
   include_dirs = [
@@ -103,7 +103,8 @@ ohos_fuzztest("IPCCameraHostService_fuzzer") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "./IPCCameraHostService_fuzzer/IPCCameraHostService_fuzzer.cpp" ]
+  sources =
+      [ "./IPCCameraHostService_fuzzer/ipc_camera_host_service_fuzzer.cpp" ]
 
   include_dirs = [
     "./include",
@@ -176,7 +177,7 @@ ohos_fuzztest("IPCOffline_fuzzer") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "./IPCOffline_fuzzer/IPCOffline_fuzzer.cpp" ]
+  sources = [ "./IPCOffline_fuzzer/ipc_offline_fuzzer.cpp" ]
 
   include_dirs = [
     "./include",
@@ -249,7 +250,7 @@ ohos_fuzztest("IPCStreamOperator_fuzzer") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "./IPCStreamOperator_fuzzer/IPCStreamOperator_fuzzer.cpp" ]
+  sources = [ "./IPCStreamOperator_fuzzer/ipc_stream_operator_fuzzer.cpp" ]
 
   include_dirs = [
     "./include",
@@ -322,8 +323,9 @@ ohos_fuzztest("IPCCameraDeviceCallback_fuzzer") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources =
-      [ "./IPCCameraDeviceCallback_fuzzer/IPCCameraDeviceCallback_fuzzer.cpp" ]
+  sources = [
+    "./IPCCameraDeviceCallback_fuzzer/ipc_camera_device_callback_fuzzer.cpp",
+  ]
 
   include_dirs = [
     "./include",
@@ -397,7 +399,7 @@ ohos_fuzztest("IPCCameraHostCallback_fuzzer") {
     "-fno-omit-frame-pointer",
   ]
   sources =
-      [ "./IPCCameraHostCallback_fuzzer/IPCCameraHostCallback_fuzzer.cpp" ]
+      [ "./IPCCameraHostCallback_fuzzer/ipc_camera_host_callback_fuzzer.cpp" ]
 
   include_dirs = [
     "./include",
@@ -470,9 +472,7 @@ ohos_fuzztest("IPCStreamOperatorCallback_fuzzer") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [
-    "./IPCStreamOperatorCallback_fuzzer/IPCStreamOperatorCallback_fuzzer.cpp",
-  ]
+  sources = [ "./IPCStreamOperatorCallback_fuzzer/ipc_stream_operator_callback_fuzzer.cpp" ]
 
   include_dirs = [
     "./include",

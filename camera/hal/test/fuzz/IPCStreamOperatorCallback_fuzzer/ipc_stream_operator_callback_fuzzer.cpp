@@ -13,40 +13,21 @@
  * limitations under the License.
  */
 
-#include "IPCCameraDeviceRemote_fuzzer.h"
+#include "ipc_stream_operator_callback_fuzzer.h"
 #include "fuzz_base.h"
 
 #include <cstddef>
 #include <cstdint>
 
-class IPCCameraDeviceRemoteFuzzer : public CameraDeviceStub {
+class IPCStreamOperatorCallbackFuzzer : public StreamOperatorCallbackStub {
 public:
-    virtual CamRetCode GetStreamOperator(const OHOS::sptr<IStreamOperatorCallback> &callback,
-        OHOS::sptr<IStreamOperator> &streamOperator) override
-        {
-            return OHOS::Camera::NO_ERROR;
-        }
-    virtual CamRetCode UpdateSettings(const std::shared_ptr<CameraSetting> &settings) override
-    {
-        return OHOS::Camera::NO_ERROR;
-    }
-    virtual CamRetCode SetResultMode(const ResultCallbackMode &mode) override
-    {
-        return OHOS::Camera::NO_ERROR;
-    }
-    virtual CamRetCode GetEnabledResults(std::vector<MetaType> &results) override
-    {
-        return OHOS::Camera::NO_ERROR;
-    }
-    virtual CamRetCode EnableResult(const std::vector<MetaType> &results) override
-    {
-        return OHOS::Camera::NO_ERROR;
-    }
-    virtual CamRetCode DisableResult(const std::vector<MetaType> &results) override
-    {
-        return OHOS::Camera::NO_ERROR;
-    }
-    virtual void Close() override{}
+    virtual void OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamIds) override {}
+    virtual void OnCaptureEnded(int32_t captureId,
+        const std::vector<std::shared_ptr<CaptureEndedInfo>> &infos) override {}
+    virtual void OnCaptureError(int32_t captureId,
+        const std::vector<std::shared_ptr<CaptureErrorInfo>> &infos) override {}
+    virtual void OnFrameShutter(int32_t captureId,
+        const std::vector<int32_t> &streamIds, uint64_t timestamp) override {}
 };
 
 static uint32_t U32_AT(const uint8_t *ptr)
@@ -58,9 +39,8 @@ static int32_t onRemoteRequest(uint32_t code, MessageParcel &data)
 {
     MessageParcel reply;
     MessageOption option;
-    IPCCameraDeviceRemoteFuzzer IPCDevice;
-
-    auto ret = IPCDevice.OnRemoteRequest(code, data, reply, option);
+    IPCStreamOperatorCallbackFuzzer IPCStreamSerCall;
+    auto ret = IPCStreamSerCall.OnRemoteRequest(code, data, reply, option);
     return ret;
 }
 
@@ -71,13 +51,12 @@ static void fuzzAccountService(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     if (size > sizeof(uint32_t)) {
         uint32_t code = U32_AT(data);
-        if (code == 1) { // 1:code size
-            return;
-        }
-        data = data + sizeof(uint32_t);
-        size = size - sizeof(uint32_t);
-        dataMessageParcel.WriteInterfaceToken(CameraDeviceStub::GetDescriptor());
-        dataMessageParcel.WriteBuffer(data, size);
+        uint8_t *number = data;
+        number = number + sizeof(uint32_t);
+        size_t length = size;
+        length = length - sizeof(uint32_t);
+        dataMessageParcel.WriteInterfaceToken(StreamOperatorCallbackStub::GetDescriptor());
+        dataMessageParcel.WriteBuffer(number, length);
         dataMessageParcel.RewindRead(0);
         onRemoteRequest(code, dataMessageParcel);
     }
