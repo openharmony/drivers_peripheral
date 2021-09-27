@@ -78,7 +78,7 @@ int32_t AudioCtlRenderSetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwRe
     struct AudioCtlElemValue elemValue;
     elemValue.id.cardServiceName = g_audioLibRenderService[card];
     elemValue.id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC;
-    elemValue.id.itemName = "Master Playback Volume";
+    elemValue.id.itemName = "Main Playback Volume";
     elemValue.value[0] = (int32_t)handleData->renderMode.ctlParam.volume;
     if (!HdfSbufWriteInt32(sBuf, elemValue.value[0])) {
         LOG_FUN_ERR("RenderSetVolumeSBuf Write Fail!");
@@ -113,7 +113,7 @@ int32_t AudioCtlRenderGetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwRe
     struct AudioCtlElemValue elemValue;
     elemValue.id.cardServiceName = g_audioLibRenderService[card];
     elemValue.id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC;
-    elemValue.id.itemName = "Master Playback Volume";
+    elemValue.id.itemName = "Main Playback Volume";
     if (!HdfSbufWriteInt32(sBuf, elemValue.id.iface)) {
         LOG_FUN_ERR("RenderGetVolumeSBuf iface Write Fail!");
         return HDF_FAILURE;
@@ -222,7 +222,7 @@ int32_t AudioCtlRenderSetPauseBuf(struct HdfSBuf *sBuf, const struct AudioHwRend
     struct AudioCtlElemValue elemValue;
     elemValue.id.cardServiceName = g_audioLibRenderService[card];
     elemValue.id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER;
-    elemValue.id.itemName = "Master Playback Pause";
+    elemValue.id.itemName = "Main Playback Pause";
     elemValue.value[0] = (int32_t)handleData->renderMode.ctlParam.pause;
     if (!HdfSbufWriteInt32(sBuf, elemValue.value[0])) {
         LOG_FUN_ERR("RenderSetPauseBuf pause Write Fail!");
@@ -681,7 +681,7 @@ int32_t AudioCtlRenderGetVolThresholdSBuf(struct HdfSBuf *sBuf, const struct Aud
     struct AudioCtrlElemInfo elemInfo;
     elemInfo.id.cardServiceName = g_audioLibRenderService[card];
     elemInfo.id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC;
-    elemInfo.id.itemName = "Master Playback Volume";
+    elemInfo.id.itemName = "Main Playback Volume";
     if (!HdfSbufWriteInt32(sBuf, elemInfo.id.iface)) {
         LOG_FUN_ERR("RenderGetVolThresholdSBuf iface Write Fail!");
         return HDF_FAILURE;
