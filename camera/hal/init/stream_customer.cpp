@@ -14,6 +14,7 @@
  */
 
 #include "stream_customer.h"
+#include "video_key_info.h"
 
 namespace OHOS::Camera {
 StreamCustomer::StreamCustomer() {}
@@ -39,10 +40,9 @@ void StreamCustomer::CamFrame(const std::function<void(void*, uint32_t)> callbac
                 int32_t frameNum = 0;
                 int isKey = 0;
                 int64_t timestamp;
-                buff->ExtraGet("dataSize", gotSize);
-                buff->ExtraGet("isKeyFrame", isKey);
-                buff->ExtraGet("timeStamp", timestamp);
-                buff->ExtraGet("frameNum", frameNum);
+                buff->ExtraGet(OHOS::Camera::dataSize, gotSize);
+                buff->ExtraGet(OHOS::Camera::isKeyFrame, isKey);
+                buff->ExtraGet(OHOS::Camera::timeStamp, timestamp);
                 CAMERA_LOGE("demo test:CamFrame callback +++++++ Size == %d frameNum = %d timestamp == %lld\n",
                     gotSize, frameNum, timestamp);
                 callback(addr, gotSize);

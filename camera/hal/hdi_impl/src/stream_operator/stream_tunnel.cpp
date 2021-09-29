@@ -15,6 +15,7 @@
 #include "stream_tunnel.h"
 #include "buffer_adapter.h"
 #include "image_buffer.h"
+#include "video_key_info.h"
 
 namespace {
 constexpr uint32_t REQUEST_TIMEOUT = 0;
@@ -129,12 +130,11 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
 
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK) {
         int32_t fence = 0;
-        EsFrmaeInfo esInfo = buffer->GetEsFrameInfo();
+        EsFrameInfo esInfo = buffer->GetEsFrameInfo();
         if (esInfo.size != -1 && esInfo.timestamp != -1) {
-            sb->ExtraSet("dataSize", esInfo.size);
-            sb->ExtraSet("isKeyFrame", esInfo.isKey);
-            sb->ExtraSet("timeStamp", esInfo.timestamp);
-            sb->ExtraSet("frameNum", esInfo.frameNum);
+            sb->ExtraSet(OHOS::Camera::dataSize, esInfo.size);
+            sb->ExtraSet(OHOS::Camera::isKeyFrame, esInfo.isKey);
+            sb->ExtraSet(OHOS::Camera::timeStamp, esInfo.timestamp);
         }
         bufferQueue_->FlushBuffer(sb, fence, flushConfig_);
         frameCount_++;

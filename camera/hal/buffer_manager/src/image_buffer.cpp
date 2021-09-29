@@ -131,7 +131,7 @@ int32_t ImageBuffer::GetFenceId() const
     return fenceId_;
 }
 
-EsFrmaeInfo ImageBuffer::GetEsFrameInfo() const
+EsFrameInfo ImageBuffer::GetEsFrameInfo() const
 {
     return esInfo_;
 }
