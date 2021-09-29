@@ -184,7 +184,7 @@ int UsbFnRegistInterfaceProp(const struct UsbFnInterface *interface,
 int UsbFnGetInterfaceProp(const struct UsbFnInterface *interface,
     const char *name, char *value)
 {
-    if (name == NULL || interface == NULL) {
+    if (name == NULL || interface == NULL || value == NULL) {
         HDF_LOGE("%s: INVALID PARAM", __func__);
         return HDF_ERR_INVALID_PARAM;
     }

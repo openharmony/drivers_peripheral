@@ -14,6 +14,7 @@
 import("//build/lite/config/component/lite_component.gni")
 
 HDF_FRAMEWORKS = "//drivers/framework"
+USB_OUTPUT_DIR = "$root_out_dir/test/functiontest/hdf/usb"
 
 lite_component("usbfn_sample") {
   features = [
@@ -27,6 +28,7 @@ lite_component("usbfn_sample") {
 }
 
 executable("acm_test") {
+  output_dir = "$USB_OUTPUT_DIR"
   sources = [ "acm_test.c" ]
 
   include_dirs = [
@@ -68,6 +70,7 @@ executable("acm_test") {
 }
 
 executable("acm_read") {
+  output_dir = "$USB_OUTPUT_DIR"
   sources = [ "acm_read.c" ]
 
   include_dirs = [
@@ -102,6 +105,7 @@ executable("acm_read") {
 }
 
 executable("acm_write") {
+  output_dir = "$USB_OUTPUT_DIR"
   sources = [ "acm_write.c" ]
 
   include_dirs = [
@@ -136,6 +140,7 @@ executable("acm_write") {
 }
 
 executable("acm_speed_write") {
+  output_dir = "$USB_OUTPUT_DIR"
   sources = [ "acm_speed_write.c" ]
 
   include_dirs = [
@@ -177,6 +182,7 @@ executable("acm_speed_write") {
 }
 
 executable("acm_speed_read") {
+  output_dir = "$USB_OUTPUT_DIR"
   sources = [ "acm_speed_read.c" ]
 
   include_dirs = [
@@ -218,6 +224,7 @@ executable("acm_speed_read") {
 }
 
 executable("prop_test") {
+  output_dir = "$USB_OUTPUT_DIR"
   sources = [ "prop_test.c" ]
 
   include_dirs = [

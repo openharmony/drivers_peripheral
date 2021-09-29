@@ -273,12 +273,12 @@ static int OsReadDescriptors(struct UsbDevice *dev)
     int len;
     int ret;
     if (dev == NULL) {
-        HDF_LOGE("%s:%d dev is NULL!", __func__, __LINE__);;
+        HDF_LOGE("%s:%d dev is NULL!", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     struct OsDev *osDev = (struct OsDev *)dev->privateData;
     if ((osDev == NULL) || (osDev->adapterDevice == NULL) || (osDev->adapterDevice->cdesc == NULL)) {
-        HDF_LOGE("%s:%d is NULL!", __func__, __LINE__);;
+        HDF_LOGE("%s:%d is NULL!", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -286,7 +286,7 @@ static int OsReadDescriptors(struct UsbDevice *dev)
         size_t oldLen = allocLen;
         allocLen += DESC_READ_LEN;
         dev->descriptors = OsAdapterRealloc(dev->descriptors, oldLen, allocLen);
-        if (!dev->descriptors) {
+        if ((dev->descriptors == NULL) || (dev->descriptorsLength > allocLen)) {
             DPRINTFN(0, "%s:%d\n", __func__, __LINE__);
             return HDF_ERR_MALLOC_FAIL;
         }
@@ -1198,7 +1198,7 @@ static int AdapterGetConfigDescriptor(const struct UsbDevice *dev,
         DPRINTFN(0, "invalid param is NULL");
         return HDF_ERR_INVALID_PARAM;
     }
-    if (memcpy_s(buffer, UGETW(adapterDevice->cdesc->wTotalLength), adapterDevice->cdesc, len) != EOK) {
+    if (memcpy_s(buffer, len, adapterDevice->cdesc, UGETW(adapterDevice->cdesc->wTotalLength)) != EOK) {
         DPRINTFN(0, "memcpy_s fail");
         return HDF_ERR_IO;
     }
@@ -1470,7 +1470,7 @@ int AdapterAtomicInc(OsalAtomic *v)
 {
     int valOld;
     int val;
-    uint32_t status;
+    uint32_t status = 1;
     Atomic *p = NULL;
     if (v) {
         p = (Atomic *)&(v)->counter;

@@ -184,9 +184,6 @@ int main(int argc, char *argv[])
                 break;
             case 'r':
                 propName = optarg;
-                if (optind >= argc || argv[optind] == NULL) {
-                    return HDF_FAILURE;
-                }
                 propValue = argv[optind];
                 registProp = true;
                 break;
@@ -196,9 +193,6 @@ int main(int argc, char *argv[])
                 break;
             case 's':
                 propName = optarg;
-                if (optind >= argc || argv[optind] == NULL) {
-                    return HDF_FAILURE;
-                }
                 propValue = argv[optind];
                 setProp = true;
                 break;

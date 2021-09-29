@@ -45,8 +45,8 @@ void UsbHostSerialLoopback::TearDownTestCase()
 HWTEST_F(UsbHostSerialLoopback, HostSerialLoopback, TestSize.Level1)
 {
     printf("------start HostSerialLoopback------\n");
-    char data[256] = {0};
-    for (;;) {
+    char data[512] = {0};
+    while (true) {
         UsbHostDdkTestOpen(HOST_ACM_SYNC_READ);
         UsbHostDdkTestSyncRead(data);
         UsbHostDdkTestClose(HOST_ACM_SYNC_READ);

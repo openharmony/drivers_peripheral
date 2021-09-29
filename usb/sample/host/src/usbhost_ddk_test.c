@@ -130,7 +130,7 @@ int UsbHostDdkTestInit(const char *apiType)
 #ifndef __LITEOS_USB_HOST_DDK_TEST__
     HDIServiceManagerRelease(servmgr);
 #endif
-    if(UsbObtainSbuf() != HDF_SUCCESS) {
+    if (UsbObtainSbuf() != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;

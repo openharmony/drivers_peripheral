@@ -95,7 +95,7 @@ void SpeedPrint()
     sigCnt++;
     count = sigCnt * TEST_PRINT_TIME;
     if (count >= TEST_TIME) {
-        g_speedFlag = 1;
+        g_speedFlag = true;
     }
     speed = (g_byteTotal * 1.0) / (sigCnt * TEST_PRINT_TIME  * 1024 * 1024);
     printf("\nSpeed:%f MB/s\n", speed);
