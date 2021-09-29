@@ -20,7 +20,6 @@ executable("liteos_host_speed_test") {
   output_dir = "$USB_OUTPUT_DIR"
   sources = [ "src/usbhost_speed_test.c" ]
   include_dirs = [
-    "$HDF_FWKS/ability/sbuf/include",
     "$HDF_FWKS/core/shared/include",
     "$HDF_FWKS/core/host/include",
     "$HDF_FWKS/core/master/include",

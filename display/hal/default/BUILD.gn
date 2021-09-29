@@ -24,7 +24,6 @@ shared_library("display_layer") {
     "//drivers/peripheral/display/interfaces/include",
     "//drivers/adapter/uhdf/posix/include",
     "//drivers/framework/include/utils",
-    "//drivers/framework/ability/sbuf/include",
     "//drivers/framework/utils/include",
     "//drivers/framework/include/core",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",

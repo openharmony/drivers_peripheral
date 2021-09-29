@@ -36,7 +36,6 @@ if (defined(ohos_lite)) {
       "$FWK_ROOT_DIR/include/utils",
       "$FWK_ROOT_DIR/include/osal",
       "$FWK_ROOT_DIR/include/core",
-      "$FWK_ROOT_DIR/ability/sbuf/include",
       "//drivers/adapter/uhdf/posix/include",
       "//third_party/bounds_checking_function/include",
     ]
@@ -90,7 +89,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "//drivers/adapter/uhdf2/osal:libhdf_utils",
+      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//utils/native/base:utils",
     ]
     defines = [ "__OHOS__USER__" ]

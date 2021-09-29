@@ -108,12 +108,9 @@ ohos_shared_library("camera_pipeline_core") {
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
 
     # hcs parser
-    "//drivers/framework/include/config",
     "//drivers/framework/include/osal",
     "//drivers/framework/include/utils",
-    "//drivers/adapter/uhdf2/include/config",
     "//drivers/adapter/uhdf2/osal/include",
-    "//drivers/framework/ability/config/hcs_parser/include",
     "//system/core/include/cutils",
     "//drivers/framework/utils/include",
     "//drivers/adapter/uhdf2/osal/include",
@@ -125,8 +122,7 @@ ohos_shared_library("camera_pipeline_core") {
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
 
     # hcs parser
-    "$hdf_uhdf_path/config:libhdf_hcs",
-    "$hdf_uhdf_path/osal:libhdf_utils",
+    "$hdf_uhdf_path/utils:libhdf_utils",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/graphic/standard:libsurface",
   ]

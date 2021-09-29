@@ -38,15 +38,13 @@ if (defined(ohos_lite)) {
       "//drivers/framework/include/osal",
       "//drivers/framework/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/framework/ability/sbuf/include",
       "//drivers/framework/utils/include",
-      "//drivers/framework/ability/sbuf/include",
       "//drivers/adapter/uhdf2/osal/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
 
     deps = [
-      "//drivers/adapter/uhdf2/osal:libhdf_utils",
+      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
@@ -83,15 +81,13 @@ if (defined(ohos_lite)) {
       "//drivers/framework/include/osal",
       "//drivers/framework/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/framework/ability/sbuf/include",
       "//drivers/framework/utils/include",
-      "//drivers/framework/ability/sbuf/include",
       "//drivers/adapter/uhdf2/osal/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
 
     deps = [
-      "//drivers/adapter/uhdf2/osal:libhdf_utils",
+      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
