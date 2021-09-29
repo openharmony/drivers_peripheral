@@ -98,14 +98,10 @@ ohos_unittest("hdi_impl_unittest") {
     "$camera_path/pipeline_core/ipp/include",
 
     # HCS
-    "//drivers/framework/include/config",
     "//drivers/framework/include/osal",
     "//drivers/framework/include/utils",
-    "//drivers/adapter/uhdf2/include/config",
-    "//drivers/framework/ability/config/hcs_parser/include",
     "//system/core/include/cutils",
     "//drivers/adapter/uhdf2/osal/include",
-    "$hdf_framework_path/ability/sbuf/include",
     "$hdf_uhdf_path/manager/include",
     "$hdf_uhdf_path/include/hdi",
 
@@ -119,9 +115,8 @@ ohos_unittest("hdi_impl_unittest") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
     "$camera_path/pipeline_core:camera_pipeline_core",
-    "$hdf_uhdf_path/config:libhdf_hcs",
     "$hdf_uhdf_path/hdi:libhdi",
-    "$hdf_uhdf_path/osal:libhdf_utils",
+    "$hdf_uhdf_path/utils:libhdf_utils",
     "../../../interfaces/include/client:libcamera_client",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",

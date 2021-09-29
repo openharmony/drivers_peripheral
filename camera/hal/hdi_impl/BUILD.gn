@@ -106,16 +106,12 @@ ohos_shared_library("camera_hdi_impl") {
     "$camera_path/pipeline_core/ipp/include",
 
     # HCS文件解析需要
-    "//drivers/framework/include/config",
     "//drivers/framework/include/osal",
     "//drivers/framework/include/utils",
-    "//drivers/adapter/uhdf2/include/config",
     "//drivers/adapter/uhdf2/osal/include",
-    "//drivers/framework/ability/config/hcs_parser/include",
     "//system/core/include/cutils",
     "$hdf_uhdf_path/manager/include",
     "$hdf_uhdf_path/include/hdi",
-    "$hdf_framework_path/ability/sbuf/include",
   ]
 
   if (use_hitrace) {
@@ -132,9 +128,8 @@ ohos_shared_library("camera_hdi_impl") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/pipeline_core:camera_pipeline_core",
     "$camera_path/utils:camera_utils",
-    "$hdf_uhdf_path/config:libhdf_hcs",
     "$hdf_uhdf_path/hdi:libhdi",
-    "$hdf_uhdf_path/osal:libhdf_utils",
+    "$hdf_uhdf_path/utils:libhdf_utils",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",

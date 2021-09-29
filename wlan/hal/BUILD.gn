@@ -39,7 +39,6 @@ if (defined(ohos_lite)) {
       "$FWK_ROOT_DIR/include",
       "$FWK_ROOT_DIR/include/wifi",
       "$FWK_ROOT_DIR/include/utils",
-      "$FWK_ROOT_DIR/ability/sbuf/include",
       "//drivers/adapter/uhdf/posix/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
@@ -87,7 +86,7 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     ]
     deps = [
-      "//drivers/adapter/uhdf2/osal:libhdf_utils",
+      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//drivers/peripheral/wlan/client:wifi_driver_client",
       "//utils/native/base:utils",
     ]

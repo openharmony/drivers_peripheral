@@ -33,7 +33,7 @@ if (is_standard_system) {
       "$hdf_uhdf_path/hdi:libhdi",
       "//drivers/adapter/uhdf2/host:libhdf_host",
       "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-      "//drivers/adapter/uhdf2/osal:libhdf_utils",
+      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//foundation/graphic/standard/utils:buffer_handle",
     ]
 

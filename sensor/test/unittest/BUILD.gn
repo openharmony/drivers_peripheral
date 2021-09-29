@@ -26,7 +26,6 @@ if (defined(ohos_lite)) {
     output_dir = "$root_out_dir/test/unittest/hdf"
     include_dirs = [
       "//third_party/bounds_checking_function/include",
-      "//drivers/framework/ability/sbuf/include",
       "//drivers/framework/include/platform",
       "//drivers/framework/include/core",
       "//drivers/framework/include/osal",
@@ -76,7 +75,7 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
     deps = [
-      "$hdf_uhdf_path/osal:libhdf_utils",
+      "$hdf_uhdf_path/utils:libhdf_utils",
       "//drivers/peripheral/sensor/hal:hdi_sensor",
       "//utils/native/base:utils",
     ]

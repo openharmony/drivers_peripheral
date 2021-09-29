@@ -26,7 +26,7 @@ ohos_unittest("WlanHdiServiceTest") {
   deps = [
     "$hdf_uhdf_path/hdi:libhdi",
     "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
-    "$hdf_uhdf_path/osal:libhdf_utils",
+    "$hdf_uhdf_path/utils:libhdf_utils",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/peripheral/wlan/client:wifi_driver_client",
     "//drivers/peripheral/wlan/hal:wifi_hal",
@@ -45,7 +45,6 @@ ohos_unittest("WlanHdiServiceTest") {
     "//drivers/peripheral/wlan/hal/include",
     "//drivers/peripheral/wlan/hdi_service/include",
     "$FWK_ROOT_DIR/core/shared/include",
-    "$FWK_ROOT_DIR/ability/sbuf/include",
     "$FWK_ROOT_DIR/include",
     "$FWK_ROOT_DIR/include/wifi",
     "$FWK_ROOT_DIR/include/core",
@@ -69,7 +68,7 @@ ohos_unittest("WlanHdiServiceTestC") {
   deps = [
     "$hdf_uhdf_path/hdi:libhdi",
     "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
-    "$hdf_uhdf_path/osal:libhdf_utils",
+    "$hdf_uhdf_path/utils:libhdf_utils",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/peripheral/wlan/client:wifi_driver_client",
     "//drivers/peripheral/wlan/hal:wifi_hal",
@@ -88,7 +87,6 @@ ohos_unittest("WlanHdiServiceTestC") {
     "//drivers/peripheral/wlan/hal/include",
     "//drivers/peripheral/wlan/hdi_service/include",
     "$FWK_ROOT_DIR/core/shared/include",
-    "$FWK_ROOT_DIR/ability/sbuf/include",
     "$FWK_ROOT_DIR/include",
     "$FWK_ROOT_DIR/include/wifi",
     "$FWK_ROOT_DIR/include/core",

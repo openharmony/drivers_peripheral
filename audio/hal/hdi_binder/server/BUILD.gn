@@ -54,12 +54,6 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
       "//drivers/peripheral/audio/hal/hdi_binder/server/include",
-      "$hdf_framework_path/include/core",
-      "$hdf_framework_path/include/utils",
-      "$hdf_framework_path/include/osal",
-      "$hdf_framework_path/ability/sbuf/include",
-      "$hdf_framework_path/utils/include",
-      "$hdf_framework_path/include",
       "$hdf_framework_path/core/sec/include",
       "$hdf_framework_path/core/shared/include",
       "$hdf_framework_path/core/host/include",
@@ -72,8 +66,8 @@ if (defined(ohos_lite)) {
     ]
 
     sources = [
-      "$hdf_framework_path/ability/sbuf/src/hdf_sbuf.c",
       "$hdf_framework_path/support/posix/src/osal_mem.c",
+      "$hdf_framework_path/utils/src/hdf_sbuf.c",
       "src/hdf_audio_server.c",
       "src/hdf_audio_server_capture.c",
       "src/hdf_audio_server_common.c",
@@ -97,15 +91,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/hal/hdi_binder/server/include",
-      "$hdf_framework_path/include/core",
-      "$hdf_framework_path/include/utils",
-      "$hdf_framework_path/include/osal",
-      "$hdf_framework_path/include",
       "//third_party/bounds_checking_function/include",
-      "$hdf_framework_path/ability/sbuf/include",
-      "$hdf_framework_path/utils/include",
-      "$hdf_framework_path/ability/sbuf/include",
-      "$hdf_uhdf_path/osal/include",
     ]
 
     sources = [
@@ -116,15 +102,10 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$hdf_uhdf_path/config:libhdf_hcs",
-      "$hdf_uhdf_path/hcs:hdf_default.hcb",
       "$hdf_uhdf_path/hdi:libhdi",
-      "$hdf_uhdf_path/host:hdf_devhost",
       "$hdf_uhdf_path/host:libhdf_host",
       "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
-      "$hdf_uhdf_path/manager:hdf_devmgr",
-      "$hdf_uhdf_path/manager:hdf_devmgr.rc",
-      "$hdf_uhdf_path/osal:libhdf_utils",
+      "$hdf_uhdf_path/utils:libhdf_utils",
       "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
       "//utils/native/base:utils",
     ]
