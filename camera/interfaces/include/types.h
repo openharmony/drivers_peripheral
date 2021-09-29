@@ -39,13 +39,6 @@ using CameraAbility = CameraStandard::CameraMetadata;
 using CameraSetting = CameraStandard::CameraMetadata;
 
 /**
- * @brief buffer key information of ExtraGet() and ExtraSet().
- */
-const std::string dataSize = "dataSize";     // int32_t
-const std::string timeStamp = "timeStamp";   // int64_t
-const std::string isKeyFrame = "isKeyFrame"; // int32_t 1:true 0:false
-
-/**
  * @brief Enumerates return values of the HDIs.
  */
 using CamRetCode = enum _CamRetCode : int32_t {
