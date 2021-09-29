@@ -59,7 +59,7 @@ int OpenEp0AndMapAddr(struct UsbFnFuncMgr *funcMgr)
 static UsbFnRequestType GetReqType(struct UsbHandleMgr *handle, uint8_t pipe)
 {
     int ret;
-    struct UsbFnPipeInfo info;
+    struct UsbFnPipeInfo info = {0};
     UsbFnRequestType type = USB_REQUEST_TYPE_INVALID;
     if (pipe > 0) {
         ret = UsbFnIoMgrInterfaceGetPipeInfo(&(handle->intfMgr->interface), pipe - 1, &info);
@@ -94,8 +94,10 @@ struct UsbFnRequest *UsbFnIoMgrRequestAlloc(struct UsbHandleMgr *handle, uint8_t
             }
         }
         ep = funcMgr->fd;
-    } else {
+    } else if (pipe <= MAX_EP) {
         ep = handle->fds[pipe - 1];
+    } else {
+        return NULL;
     }
     mapAddr = fnOps->mapAddr(ep, len);
     if (mapAddr == NULL) {
@@ -117,7 +119,7 @@ struct UsbFnRequest *UsbFnIoMgrRequestAlloc(struct UsbHandleMgr *handle, uint8_t
     }
     reqList->handle = handle;
     reqList->fd = ep;
-    reqList->buf = (uint32_t)mapAddr;
+    reqList->buf = (uintptr_t)mapAddr;
     reqList->pipe = pipe;
     reqList->bufLen = len;
     req->length = len;
@@ -146,7 +148,7 @@ int UsbFnIoMgrRequestFree(struct UsbFnRequest *req)
         return HDF_ERR_DEVICE_BUSY;
     }
     mem.size = reqList->bufLen;
-    mem.buf = (uint32_t)req->buf;
+    mem.buf = (uintptr_t)req->buf;
     ret = fnOps->releaseBuf(reqList->fd, &mem);
     if (ret) {
         HDF_LOGE("%s:%d releaseBuf err", __func__, __LINE__);

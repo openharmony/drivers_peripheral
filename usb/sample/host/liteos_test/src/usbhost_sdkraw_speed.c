@@ -508,10 +508,12 @@ static int32_t SerialBegin(struct AcmDevice *acm)
 static void SpeedPrint(void)
 {
     double speed;
+    uint64_t count;
 
     sigCnt++;
-    if (sigCnt * TEST_PRINT_TIME >= TEST_TIME) {
-        g_speedFlag = 1;
+    count = sigCnt * TEST_PRINT_TIME;
+    if (count >= TEST_TIME) {
+        g_speedFlag = true;
     }
     speed = (g_byteTotal * 1.0) / (sigCnt * TEST_PRINT_TIME  * 1024 * 1024);
     printf("\nSpeed:%f MB/s\n", speed);

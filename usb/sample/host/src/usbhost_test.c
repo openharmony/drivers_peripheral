@@ -178,6 +178,48 @@ static int32_t TestParaseCommand(int paramNum, const char *cmdParam, int *cmdTyp
     return HDF_SUCCESS;
 }
 
+static void TestCmdLoopOther(int cmdType, const char *param)
+{
+    switch (cmdType) {
+        case HOST_ACM_CTRL_CLASS_SYNC:
+            UsbHostDdkTestCtrlClass(NULL);
+            break;
+        case HOST_ACM_CTRL_GET_STATUS:
+            UsbHostDdkTestStdGetStatus(NULL);
+            break;
+        case HOST_ACM_CTRL_SYNC_DESCRIPTOR:
+            UsbHostDdkTestStdGetDes(NULL);
+            break;
+        case HOST_ACM_CTRL_ASYNC_DESCRIPTOR:
+            UsbHostDdkTestStdGetDesAsync(NULL);
+            usleep(READ_SLEEP_TIME);
+            break;
+        case HOST_ACM_CTRL_GET_CONFIGURATION:
+            TestStdGetConf();
+            break;
+        case HOST_ACM_CTRL_GET_INTERFACE:
+            TestStdGetInterface();
+            break;
+        case HOST_ACM_SPEED_TEST:
+            TestSpeed();
+            break;
+        case HOST_ACM_SET_BAUDRATE:
+            UsbHostDdkTestSetBaudrate(atoi(param));
+            break;
+        case HOST_ACM_GET_BAUDRATE:
+            UsbHostDdkTestGetBaudrate(NULL);
+            break;
+        case HOST_ACM_ADD_INTERFACE:
+            UsbHostDdkTestAddInterface(atoi(param));
+            break;
+        case HOST_ACM_REMOVE_INTERFACE:
+            UsbHostDdkTestRemoveInterface(atoi(param));
+            break;
+        default:
+            break;
+    }
+}
+
 static int TestCmdLoop(int cmdType, const char *param)
 {
     bool loopFlag = true;
@@ -216,41 +258,8 @@ static int TestCmdLoop(int cmdType, const char *param)
             case HOST_ACM_ASYNC_WRITE:
                 UsbHostDdkTestAsyncWrite(param);
                 break;
-            case HOST_ACM_CTRL_CLASS_SYNC:
-                UsbHostDdkTestCtrlClass(NULL);
-                break;
-            case HOST_ACM_CTRL_GET_STATUS:
-                UsbHostDdkTestStdGetStatus(NULL);
-                break;
-            case HOST_ACM_CTRL_SYNC_DESCRIPTOR:
-                UsbHostDdkTestStdGetDes(NULL);
-                break;
-            case HOST_ACM_CTRL_ASYNC_DESCRIPTOR:
-                UsbHostDdkTestStdGetDesAsync(NULL);
-                usleep(READ_SLEEP_TIME);
-                break;
-            case HOST_ACM_CTRL_GET_CONFIGURATION:
-                TestStdGetConf();
-                break;
-            case HOST_ACM_CTRL_GET_INTERFACE:
-                TestStdGetInterface();
-                break;
-            case HOST_ACM_SPEED_TEST:
-                TestSpeed();
-                break;
-            case HOST_ACM_SET_BAUDRATE:
-                UsbHostDdkTestSetBaudrate(atoi(param));
-                break;
-            case HOST_ACM_GET_BAUDRATE:
-                UsbHostDdkTestGetBaudrate(NULL);
-                break;
-            case HOST_ACM_ADD_INTERFACE:
-                UsbHostDdkTestAddInterface(atoi(param));
-                break;
-            case HOST_ACM_REMOVE_INTERFACE:
-                UsbHostDdkTestRemoveInterface(atoi(param));
-                break;
             default:
+                TestCmdLoopOther(cmdType, param);
                 break;
         }
 
@@ -305,7 +314,7 @@ int main(int argc, char *argv[])
     int cmdType;
     char apiType[DATA_MAX_LEN];
 
-    if (argc < PARAM_GET_CMD_LEN || argv[ARGV_CMD_TYPE] == NULL) {
+    if ((argc < ARGV_CMD_TYPE) || (argc < PARAM_GET_CMD_LEN) || (argv[ARGV_CMD_TYPE] == NULL)) {
         HDF_LOGE("%s:%d invalid parma, argc=%d", __func__, __LINE__, argc);
         return HDF_FAILURE;
     }

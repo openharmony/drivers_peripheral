@@ -34,7 +34,6 @@ public:
 
 void UsbDeviceSdkIfTest::SetUpTestCase()
 {
-    XtsRemoveDevice();
 }
 
 void UsbDeviceSdkIfTest::TearDownTestCase()

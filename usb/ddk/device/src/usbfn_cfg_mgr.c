@@ -925,7 +925,7 @@ void UsbFnCfgMgrFreeFunctions(struct UsbFnFunction **fnFunctions)
             UsbFnCfgMgrFreeFuncDescHead(fnFunctions[iCount]->hsDescriptors);
         }
         if (fnFunctions[iCount]->ssDescriptors) {
-            UsbFnCfgMgrFreeFuncDescHead(fnFunctions[iCount]->hsDescriptors);
+            UsbFnCfgMgrFreeFuncDescHead(fnFunctions[iCount]->ssDescriptors);
         }
         if (fnFunctions[iCount]->sspDescriptors) {
             UsbFnCfgMgrFreeFuncDescHead(fnFunctions[iCount]->sspDescriptors);

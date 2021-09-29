@@ -132,6 +132,5 @@ struct AcmDevice * SetUpAcmDevice(void);
 void ReleaseAcmDevice(struct AcmDevice *acm);
 void AcmEventCallback(struct UsbFnEvent *event);
 void AcmDeviceRelease(struct AcmDevice *acmDevice);
-int XtsRemoveDevice(void);
 
 #endif

@@ -385,6 +385,10 @@ static int AcmStartWb(struct AcmDevice *acm, struct AcmWb *wb)
 {
     struct UsbRawFillRequestData reqData;
     int ret;
+    if ((acm == NULL) || (wb == NULL) || (acm->dataOutEp == NULL)
+        || (acm->devHandle == NULL) || (wb->request == NULL)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
 
     acm->transmitting++;
 
@@ -824,10 +828,13 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
         return HDF_SUCCESS;
     }
 
-    if (wbn >= ACM_NW) {
-        wb = 0;
+    if (wbn >= ACM_NW || wbn < 0) {
+        wbn = 0;
     }
     wb = &acm->wb[wbn];
+    if ((wb == NULL) || (wb->buf == NULL)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     tmp = HdfSbufReadString((struct HdfSBuf *)data);
     if (tmp == NULL) {
         HDF_LOGE("%s: sbuf read buffer failed", __func__);

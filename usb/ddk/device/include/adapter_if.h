@@ -114,7 +114,7 @@ struct FconfigDevDescString {
 
 struct FconfigPollFd {
     int fd;
-    int revents;
+    uint32_t revents;
     int events;
 };
 
@@ -166,17 +166,17 @@ struct IoData {
     uint32_t read;      /* 0 for write ,1 for read */
     uint32_t len;       /* the len of this io request */
     uint32_t timeout;   /* sync timeout */
-    uint32_t buf;       /* the address of map buf */
+    uintptr_t buf;       /* the address of map buf */
 };
 
 struct GenericMemory {
     size_t size;
-    uint32_t buf;
+    uintptr_t buf;
     char storage[];
 };
 
 struct UsbFnReqEvent {
-    uint32_t buf;
+    uintptr_t buf;
     uint32_t actual;
     int      status;
 };
@@ -224,7 +224,7 @@ struct UsbFnAdapterOps {
 };
 
 struct RawUsbRamTestList {
-    uint32_t address;
+    uintptr_t address;
     uint32_t size;
     struct DListHead list;
     struct OsalMutex lock;

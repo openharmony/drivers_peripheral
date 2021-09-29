@@ -14,7 +14,9 @@
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
 
+  USB_OUTPUT_DIR = "$root_out_dir/test/functiontest/hdf/usb"
   executable("usbhost_ddk_test") {
+    output_dir = "$USB_OUTPUT_DIR"
     sources = [
       "src/usbhost_ddk_test.c",
       "src/usbhost_test.c",
@@ -105,7 +107,7 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
 
-    install_enable = true
+    install_enable = false
     subsystem_name = "hdf"
   }
 
@@ -182,7 +184,7 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
 
-    install_enable = true
+    install_enable = false
     subsystem_name = "hdf"
   }
 
@@ -213,7 +215,7 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
 
-    install_enable = true
+    install_enable = false
     subsystem_name = "hdf"
   }
 
@@ -244,7 +246,7 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
 
-    install_enable = true
+    install_enable = false
     subsystem_name = "hdf"
   }
 
@@ -293,7 +295,7 @@ if (defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
-    install_enable = true
+    install_enable = false
     subsystem_name = "hdf"
   }
 
@@ -324,7 +326,7 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
 
-    install_enable = true
+    install_enable = false
     subsystem_name = "hdf"
   }
 }
