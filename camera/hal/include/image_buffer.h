@@ -50,7 +50,7 @@ public:
     virtual CameraBufferStatus GetBufferStatus() const override;
     virtual int32_t GetSequenceId() const override;
     virtual int32_t GetFenceId() const override;
-    virtual EsFrmaeInfo GetEsFrameInfo() const override;
+    virtual EsFrameInfo GetEsFrameInfo() const override;
     virtual int32_t GetEncodeType() const override;
     virtual int32_t GetStreamId() const override;
 
@@ -101,7 +101,7 @@ private:
     int32_t sequenceId_ = -1;
     int32_t fenceId_ = -1;
     int32_t encodeType_ = 0;
-    EsFrmaeInfo esInfo_ = {-1, -1, -1, -1, -1};
+    EsFrameInfo esInfo_ = {-1, -1, -1, -1, -1};
     int32_t streamId_ = -1;
     std::mutex l_;
 };
