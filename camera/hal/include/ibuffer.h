@@ -47,7 +47,7 @@ public:
     virtual CameraBufferStatus GetBufferStatus() const = 0;
     virtual int32_t GetSequenceId() const = 0;
     virtual int32_t GetFenceId() const = 0;
-    virtual EsFrmaeInfo GetEsFrameInfo() const = 0;
+    virtual EsFrameInfo GetEsFrameInfo() const = 0;
     virtual int32_t GetEncodeType() const = 0;
     virtual int32_t GetStreamId() const = 0;
 

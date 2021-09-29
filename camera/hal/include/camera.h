@@ -150,7 +150,7 @@ enum AwbMode : uint32_t {
     AWB_MODE_WARM_FLUORESCENT,
 };
 
-using EsFrmaeInfo = struct EsFrmaeInfo {
+using EsFrameInfo = struct EsFrameInfo {
     int32_t size;
     int32_t align;
     int32_t isKey;

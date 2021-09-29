@@ -78,7 +78,7 @@ RetCode BufferAdapter::SetExtInfoToSurfaceBuffer(const std::shared_ptr<IBuffer>&
     CHECK_IF_NOT_EQUAL_RETURN_VALUE(buffer->GetSourceType(),
         CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL, RC_ERROR);
 
-    EsFrmaeInfo info = buffer->GetEsFrameInfo();
+    EsFrameInfo info = buffer->GetEsFrameInfo();
     if (info.size != -1) {
         surfaceBuffer->SetInt32(FRAME_SIZE_TAG, info.size);
     }
