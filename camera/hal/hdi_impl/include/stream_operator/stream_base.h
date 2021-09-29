@@ -19,6 +19,7 @@
 #include "ibuffer.h"
 #include "ibuffer_pool.h"
 #include "istream.h"
+#include "capture_request.h"
 
 namespace OHOS::Camera {
 class StreamBase : public IStream, public std::enable_shared_from_this<StreamBase> {

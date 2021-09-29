@@ -17,7 +17,6 @@
 #define STREAM_OPERATOR_ISTREAM_H
 
 #include "camera.h"
-#include "capture_request.h"
 #include "capture_message.h"
 #include "ibuffer.h"
 #include "ipipeline_core.h"
