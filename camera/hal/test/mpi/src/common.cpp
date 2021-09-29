@@ -70,6 +70,7 @@ int32_t Test::SaveYUV(const char* type, const void* buffer, int32_t size)
 
 int32_t Test::SaveVideoFile(const char* type, const void* buffer, int32_t size, int32_t operationMode)
 {
+    std::cout << "SaveVideoFile:  operationMode = " << operationMode << " videoFd = "<< videoFd << std::endl;
     if (operationMode == 0) {
         char path[PATH_MAX] = {0};
         system("mkdir -p /data/camera/video");
@@ -89,11 +90,13 @@ int32_t Test::SaveVideoFile(const char* type, const void* buffer, int32_t size, 
         if (ret == -1) {
             std::cout << "write file failed, error = " << strerror(errno) << std::endl;
             close(videoFd);
+            videoFd = -1;
             return -1;
         }
     } else {
         if (videoFd != -1) {
             close(videoFd);
+            videoFd = -1;
         }
     }
     return 0;

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "IPCCameraHostCallback_fuzzer.h"
+#include "ipc_camera_host_callback_fuzzer.h"
 #include "fuzz_base.h"
 
 #include <cstddef>
@@ -46,10 +46,12 @@ static void fuzzAccountService(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     if (size > sizeof(uint32_t)) {
         uint32_t code = U32_AT(data);
-        data = data + sizeof(uint32_t);
-        size = size - sizeof(uint32_t);
+        uint8_t *number = data;
+        number = number + sizeof(uint32_t);
+        size_t length = size;
+        length = length - sizeof(uint32_t);
         dataMessageParcel.WriteInterfaceToken(CameraHostCallbackStub::GetDescriptor());
-        dataMessageParcel.WriteBuffer(data, size);
+        dataMessageParcel.WriteBuffer(number, length);
         dataMessageParcel.RewindRead(0);
         onRemoteRequest(code, dataMessageParcel);
     }

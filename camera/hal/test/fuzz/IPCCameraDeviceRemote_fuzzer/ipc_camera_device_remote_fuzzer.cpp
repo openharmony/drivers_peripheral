@@ -13,26 +13,40 @@
  * limitations under the License.
  */
 
-#include "IPCOffline_fuzzer.h"
+#include "ipc_camera_device_remote_fuzzer.h"
 #include "fuzz_base.h"
 
 #include <cstddef>
 #include <cstdint>
 
-class IPCOfflineFuzzer : public OfflineStreamOperatorStub {
+class IPCCameraDeviceRemoteFuzzer : public CameraDeviceStub {
 public:
-    virtual CamRetCode CancelCapture(int captureId)
+    virtual CamRetCode GetStreamOperator(const OHOS::sptr<IStreamOperatorCallback> &callback,
+        OHOS::sptr<IStreamOperator> &streamOperator) override
+        {
+            return OHOS::Camera::NO_ERROR;
+        }
+    virtual CamRetCode UpdateSettings(const std::shared_ptr<CameraSetting> &settings) override
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode ReleaseStreams(const std::vector<int>& streamIds)
+    virtual CamRetCode SetResultMode(const ResultCallbackMode &mode) override
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode Release()
+    virtual CamRetCode GetEnabledResults(std::vector<MetaType> &results) override
     {
         return OHOS::Camera::NO_ERROR;
     }
+    virtual CamRetCode EnableResult(const std::vector<MetaType> &results) override
+    {
+        return OHOS::Camera::NO_ERROR;
+    }
+    virtual CamRetCode DisableResult(const std::vector<MetaType> &results) override
+    {
+        return OHOS::Camera::NO_ERROR;
+    }
+    virtual void Close() override{}
 };
 
 static uint32_t U32_AT(const uint8_t *ptr)
@@ -44,8 +58,9 @@ static int32_t onRemoteRequest(uint32_t code, MessageParcel &data)
 {
     MessageParcel reply;
     MessageOption option;
-    IPCOfflineFuzzer IPCOfflineSer;
-    auto ret = IPCOfflineSer.OnRemoteRequest(code, data, reply, option);
+    IPCCameraDeviceRemoteFuzzer IPCDevice;
+
+    auto ret = IPCDevice.OnRemoteRequest(code, data, reply, option);
     return ret;
 }
 
@@ -54,13 +69,17 @@ static void fuzzAccountService(const uint8_t *data, size_t size)
     MessageParcel reply;
     MessageOption option;
     MessageParcel dataMessageParcel;
-    uint32_t code = U32_AT(data);
-
-    data = data + sizeof(uint32_t);
     if (size > sizeof(uint32_t)) {
-        size = size - sizeof(uint32_t);
-        dataMessageParcel.WriteInterfaceToken(OfflineStreamOperatorStub::GetDescriptor());
-        dataMessageParcel.WriteBuffer(data, size);
+        uint32_t code = U32_AT(data);
+        if (code == 1) { // 1:code size
+            return;
+        }
+        uint8_t *number = data;
+        number = number + sizeof(uint32_t);
+        size_t length = size;
+        length = length - sizeof(uint32_t);
+        dataMessageParcel.WriteInterfaceToken(CameraDeviceStub::GetDescriptor());
+        dataMessageParcel.WriteBuffer(number, length);
         dataMessageParcel.RewindRead(0);
         onRemoteRequest(code, dataMessageParcel);
     }

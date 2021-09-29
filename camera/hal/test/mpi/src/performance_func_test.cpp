@@ -202,7 +202,6 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0004, TestSize.Level3)
         totle_time_use = totle_time_use + time_use;
     }
     float avrg_time = totle_time_use / Times;
-    EXPECT_LT(avrg_time, 100000);
     std::cout << "==========[test log] Performance: Start Streams's and Stop Stream's average time consuming: ";
     std::cout << avrg_time << "us." << std::endl;
     writeIntoFile << "==========[test log] Performance: Start Streams's and Stop Stream's average time consuming: ";
@@ -382,9 +381,79 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0007, TestSize.Level3)
     }
     float avrg_time = totle_time_use / Times;
     EXPECT_LT(avrg_time, 100000);
-    std::cout << " then Preview and Video average time consuming: " << std::endl;
+    std::cout << " video and capture and video average time consuming: " << std::endl;
     std::cout << avrg_time << "us." << std::endl;
-    writeIntoFile << "==========[test log] Performance: Preview and Video";
-    writeIntoFile << "then start one Preview average time consuming: " << std::endl;
+    writeIntoFile << "==========[test log] Performance: ";
+    writeIntoFile << "video and capture and video average time consuming: " << std::endl;
+    writeIntoFile << avrg_time << "us. " << std::endl;
+}
+
+/**
+  * @tc.name: Preview and Capture, then Preview and Video, then Preview and Capture
+  * @tc.desc: Preview and Capture, then Preview and Video, then Preview and Capture
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+HWTEST_F(PerformanceFuncTest, Camera_Performance_0008, TestSize.Level3)
+{
+std::cout << "==========[test log] Performance: Preview and Capture, then Preview and Video,";
+    std::cout << "then Preview and Capture" << std::endl;
+    struct timeval start;
+    struct timeval end;
+    float time_use;
+    float totle_time_use = 0;
+    writeIntoFile.open("TimeConsuming.txt", ios::app);
+    Test_ = std::make_shared<OHOS::Camera::Test>();
+    Test_->Init();
+    Test_->Open();
+    for (int i = 0; i < Times; i++) {
+        std::cout << "Running " << i << " time" << std::endl;
+        gettimeofday(&start, NULL);
+        // 配置两路流信息
+        Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
+        Test_->StartStream(Test_->intents);
+        // 捕获预览流
+        Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
+        // 捕获拍照流，连拍
+        Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
+        // 后处理
+        Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
+        Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+        Test_->StopStream(Test_->captureIds, Test_->streamIds);
+        Test_->consumerMap_.clear();
+        // 配置两路流信息
+        Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
+        Test_->StartStream(Test_->intents);
+        // 捕获预览流
+        Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
+        // 捕获录像流
+        Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
+        // 后处理
+        Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
+        Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
+        Test_->StopStream(Test_->captureIds, Test_->streamIds);
+        Test_->consumerMap_.clear();
+        // 配置两路流信息
+        Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
+        Test_->StartStream(Test_->intents);
+        // 捕获预览流
+        Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
+        // 捕获拍照流，连拍
+        Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
+        // 后处理
+        Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
+        Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+        Test_->StopStream(Test_->captureIds, Test_->streamIds);
+        Test_->consumerMap_.clear();
+        gettimeofday(&end, NULL);
+        time_use = calTime(start, end);
+        totle_time_use = totle_time_use + time_use;
+    }
+    float avrg_time = totle_time_use / Times;
+    EXPECT_LT(avrg_time, 100000);
+    std::cout << " capture and video and capture average time consuming: " << std::endl;
+    std::cout << avrg_time << "us." << std::endl;
+    writeIntoFile << "==========[test log] Performance: ";
+    writeIntoFile << "capture and video and capture average time consuming: " << std::endl;
     writeIntoFile << avrg_time << "us. " << std::endl;
 }
