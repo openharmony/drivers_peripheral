@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/lite/config/component/lite_component.gni")
 import("//build/lite/config/test.gni")
 
 unittest("hdf_peripheral_display_test") {
@@ -34,9 +35,9 @@ unittest("hdf_peripheral_display_test") {
   ]
 
   sources = [
-    "./common/display_test.c",
-    "./common/hdi_display_test.cpp",
-    "./common/loadbmp_test.c",
+    "display_test.c",
+    "hdi_display_test.cpp",
+    "loadbmp_test.c",
   ]
 
   deps = [

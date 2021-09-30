@@ -59,12 +59,6 @@ extern "C" {
 /* LCD division coefficient */
 #define LCD_DIV_COE            0x182ed6
 
-#ifdef __LITEOS__
-#define PIC_RES_PATH           "/user/data/gfx_test.bmp"
-#else
-#define PIC_RES_PATH           "/storage/data/gfx_test.bmp"
-#endif
-
 typedef struct {
     LayerFuncs *layerFuncs;
     GrallocFuncs *grallocFuncs;
