@@ -35,7 +35,6 @@ if (defined(ohos_lite)) {
       "$FWK_ROOT_DIR/include",
       "$FWK_ROOT_DIR/include/utils",
       "$FWK_ROOT_DIR/core/shared/include",
-      "$FWK_ROOT_DIR/ability/sbuf/include",
       "$FWK_ROOT_DIR/include/core",
       "//drivers/adapter/uhdf/posix/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
@@ -83,7 +82,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-      "//drivers/adapter/uhdf2/osal:libhdf_utils",
+      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//utils/native/base:utils",
     ]
 

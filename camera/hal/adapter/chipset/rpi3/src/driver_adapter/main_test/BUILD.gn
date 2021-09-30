@@ -46,7 +46,6 @@ ohos_executable("v4l2_main") {
 
   include_dirs = [
     "$camera_path/include",
-    "//drivers/adapter/uhdf2/include/config",
     "//drivers/adapter/uhdf2/osal/include",
     "//drivers/framework/include/utils",
     "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter/include",

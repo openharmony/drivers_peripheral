@@ -25,7 +25,7 @@ if (defined(ohos_lite)) {
   unittest("hdf_audio_hdi_path_route_test") {
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
-      "//drivers/framework/ability/sbuf/src/hdf_sbuf.c",
+      "//drivers/framework/utils/src/hdf_sbuf.c",
       "src/audio_pathroute_test.cpp",
     ]
 
@@ -36,7 +36,6 @@ if (defined(ohos_lite)) {
       "//drivers/framework/include/core",
       "//drivers/framework/include/utils",
       "//drivers/framework/include/osal",
-      "//drivers/framework/ability/sbuf/include",
       "//drivers/framework/utils/include",
       "//drivers/framework/include",
       "//drivers/framework/core/sec/include",
@@ -90,9 +89,7 @@ if (defined(ohos_lite)) {
       "//drivers/framework/include/osal",
       "//drivers/framework/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/framework/ability/sbuf/include",
       "//drivers/framework/utils/include",
-      "//drivers/framework/ability/sbuf/include",
       "//drivers/adapter/uhdf2/osal/include",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//drivers/peripheral/audio/test/systemtest/audio_function/audio_pathroute/include",
@@ -107,15 +104,10 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
     deps = [
-      "//drivers/adapter/uhdf2/config:libhdf_hcs",
-      "//drivers/adapter/uhdf2/hcs:hdf_default.hcb",
       "//drivers/adapter/uhdf2/hdi:libhdi",
-      "//drivers/adapter/uhdf2/host:hdf_devhost",
       "//drivers/adapter/uhdf2/host:libhdf_host",
       "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-      "//drivers/adapter/uhdf2/manager:hdf_devmgr",
-      "//drivers/adapter/uhdf2/manager:hdf_devmgr.rc",
-      "//drivers/adapter/uhdf2/osal:libhdf_utils",
+      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
       "//utils/native/base:utils",
