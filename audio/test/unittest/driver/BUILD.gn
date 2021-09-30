@@ -18,13 +18,11 @@ ohos_unittest("khdf_audio_driver_test") {
   module_out_path = module_output_path
 
   include_dirs = [
-    "//drivers/framework/ability/sbuf/include",
     "//drivers/framework/include/platform",
     "//drivers/framework/include/core",
     "//drivers/framework/include/osal",
     "//drivers/adapter/uhdf/posix/include",
     "//drivers/framework/include/utils",
-    "//drivers/framework/include/config",
     "//drivers/framework/include",
     "//drivers/framework/test/unittest/include",
     "//drivers/framework/test/unittest/osal",
@@ -40,8 +38,8 @@ ohos_unittest("khdf_audio_driver_test") {
     "//drivers/peripheral/audio/chipsets/hi3516dv300/soc/test/unittest/common/hi3516_platform_ops_test.cpp",
   ]
   deps = [
-    "//drivers/adapter/uhdf2/osal:libhdf_utils",
     "//drivers/adapter/uhdf2/test/unittest/common:libhdf_test_common",
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//utils/native/base:utils",
   ]
 

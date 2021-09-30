@@ -32,7 +32,6 @@ executable("acm_test") {
   sources = [ "acm_test.c" ]
 
   include_dirs = [
-    "$HDF_FRAMEWORKS/ability/sbuf/include",
     "$HDF_FRAMEWORKS/core/shared/include",
     "$HDF_FRAMEWORKS/core/host/include",
     "$HDF_FRAMEWORKS/core/master/include",
@@ -74,7 +73,6 @@ executable("acm_read") {
   sources = [ "acm_read.c" ]
 
   include_dirs = [
-    "$HDF_FRAMEWORKS/ability/sbuf/include",
     "$HDF_FRAMEWORKS/core/shared/include",
     "$HDF_FRAMEWORKS/core/host/include",
     "$HDF_FRAMEWORKS/core/master/include",
@@ -109,7 +107,6 @@ executable("acm_write") {
   sources = [ "acm_write.c" ]
 
   include_dirs = [
-    "$HDF_FRAMEWORKS/ability/sbuf/include",
     "$HDF_FRAMEWORKS/core/shared/include",
     "$HDF_FRAMEWORKS/core/host/include",
     "$HDF_FRAMEWORKS/core/master/include",
@@ -144,7 +141,6 @@ executable("acm_speed_write") {
   sources = [ "acm_speed_write.c" ]
 
   include_dirs = [
-    "$HDF_FRAMEWORKS/ability/sbuf/include",
     "$HDF_FRAMEWORKS/core/shared/include",
     "$HDF_FRAMEWORKS/core/host/include",
     "$HDF_FRAMEWORKS/core/master/include",
@@ -186,7 +182,6 @@ executable("acm_speed_read") {
   sources = [ "acm_speed_read.c" ]
 
   include_dirs = [
-    "$HDF_FRAMEWORKS/ability/sbuf/include",
     "$HDF_FRAMEWORKS/core/shared/include",
     "$HDF_FRAMEWORKS/core/host/include",
     "$HDF_FRAMEWORKS/core/master/include",
@@ -228,7 +223,6 @@ executable("prop_test") {
   sources = [ "prop_test.c" ]
 
   include_dirs = [
-    "$HDF_FRAMEWORKS/ability/sbuf/include",
     "$HDF_FRAMEWORKS/core/shared/include",
     "$HDF_FRAMEWORKS/core/host/include",
     "$HDF_FRAMEWORKS/core/master/include",

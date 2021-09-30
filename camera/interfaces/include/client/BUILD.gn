@@ -21,7 +21,6 @@ group("camera_client") {
 ohos_shared_library("libcamera_client") {
   include_dirs = [
     "../",
-    "$hdf_framework_path/ability/sbuf/include",
     "$hdf_uhdf_path/manager/include",
     "$hdf_uhdf_path/include/hdi",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
@@ -49,7 +48,7 @@ ohos_shared_library("libcamera_client") {
     "$hdf_uhdf_path/hdi:libhdi",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/osal:libhdf_utils",
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",

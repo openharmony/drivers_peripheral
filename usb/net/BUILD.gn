@@ -32,7 +32,7 @@ ohos_shared_library("libusbhost_ecm") {
   deps = [
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/osal:libhdf_utils",
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/usb/ddk:libusb_core",
     "//utils/native/base:utils",
   ]

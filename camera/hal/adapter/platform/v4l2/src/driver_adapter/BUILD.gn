@@ -53,7 +53,6 @@ ohos_shared_library("camera_v4l2_adapter") {
 
   include_dirs = [
     "$camera_path/include",
-    "//drivers/adapter/uhdf2/include/config",
     "//drivers/adapter/uhdf2/osal/include",
     "//drivers/framework/include/utils",
     "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter/include",

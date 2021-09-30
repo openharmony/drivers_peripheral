@@ -34,7 +34,7 @@ ohos_unittest("codec_test") {
   ]
 
   deps = [
-    "//drivers/adapter/uhdf2/osal:libhdf_utils",
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/codec/hdi_service:codec_client",
     "//drivers/peripheral/codec/hdi_service:codec_service",
     "//third_party/googletest:gtest_main",

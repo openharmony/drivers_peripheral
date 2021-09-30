@@ -28,7 +28,7 @@ ohos_shared_library("libcodec_client") {
     "//drivers/adapter/uhdf2/hdi:libhdi",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/osal:libhdf_utils",
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
   ]
 
   if (is_standard_system) {
@@ -67,7 +67,7 @@ ohos_shared_library("libcodec_server") {
     "//drivers/adapter/uhdf2/hdi:libhdi",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/osal:libhdf_utils",
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/codec/hdi_service:codec_client",
   ]
 

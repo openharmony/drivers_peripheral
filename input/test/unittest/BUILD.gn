@@ -27,13 +27,11 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//third_party/googletest/googletest/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/framework/ability/sbuf/include",
       "//drivers/framework/include/platform",
       "//drivers/framework/include/core",
       "//drivers/framework/include/osal",
       "//drivers/adapter/uhdf/posix/include",
       "//drivers/framework/include/utils",
-      "//drivers/framework/include/config",
       "//drivers/framework/include",
       "//drivers/framework/test/unittest/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
@@ -86,8 +84,8 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
     deps = [
-      "$hdf_uhdf_path/osal:libhdf_utils",
       "$hdf_uhdf_path/test/unittest/common:libhdf_test_common",
+      "$hdf_uhdf_path/utils:libhdf_utils",
       "//drivers/peripheral/input/hal:hdi_input",
       "//utils/native/base:utils",
     ]
