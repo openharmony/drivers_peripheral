@@ -41,9 +41,9 @@ void UtestLogicCameraTest::TearDown(void)
 TEST_F(UtestLogicCameraTest, camera_logic_0001)
 {
     std::cout << "==========[test log] test single stream"<< std::endl;
-    // 获取流管理器
+    // Get the stream manager
     display_->AchieveStreamOperator();
-    // 配置预览流信息
+    // Configure preview stream information
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8);
     if (producer->GetQueueSize() != 8) {
@@ -73,7 +73,7 @@ TEST_F(UtestLogicCameraTest, camera_logic_0001)
         std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc <<" , streamId = ";
         std::cout << display_->streamId_capture <<", intent = Camera::STILL_CAPTURE" << std::endl;
     }
-    // 提交流信息
+    // Submit stream information
     display_->rc = display_->streamOperator->CommitStreams(DUAL, nullptr);
     EXPECT_EQ(false, display_->rc != Camera::NO_ERROR);
     if (display_->rc == Camera::NO_ERROR) {
@@ -81,9 +81,9 @@ TEST_F(UtestLogicCameraTest, camera_logic_0001)
     } else {
         std::cout << "==========[test log] CommitStreams DUAL fail, rc = " << display_->rc << std::endl;
     }
-    // 捕获
+    // capture
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    // 后处理
+    // post-processing
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview};
     display_->StopStream(display_->captureIds, display_->streamIds);

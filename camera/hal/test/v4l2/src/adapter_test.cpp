@@ -40,14 +40,14 @@ void UtestAdapterTest::TearDown(void)
 TEST_F(UtestAdapterTest, camera_adapter_0001)
 {
     std::cout << "==========[test log] Preview stream, expected success." << std::endl;
-    // 获取流管理器
+    // Get the stream manager
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview};
     display_->StopStream(display_->captureIds, display_->streamIds);

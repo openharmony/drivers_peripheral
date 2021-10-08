@@ -61,7 +61,7 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0001, TestSize.Level3)
         gettimeofday(&end, NULL);
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
-        // 后处理，关闭相机
+        // Post-processing, turn off the camera
         Test_->Close();
     }
     float avrg_time = totle_time_use/ Times;
@@ -91,11 +91,11 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0002, TestSize.Level3)
     Test_->Open();
     for (int i = 0; i < Times; i++) {
         std::cout << "Running " << i << " time" << std::endl;
-        // 创建并获取streamOperator信息
+        // Create and get streamOperator information
         Test_->streamOperatorCallback = new StreamOperatorCallback();
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
         EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR || Test_->streamOperator == nullptr);
-        // 创建数据流
+        // Create data flow
         Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
         Test_->streamInfo->streamId_ = 1001;
         Test_->streamInfo->width_ = 1920;
@@ -116,13 +116,13 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0002, TestSize.Level3)
         gettimeofday(&start, NULL);
         Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-        // 配流起流
+        // Flow distribution
         Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, Test_->ability);
         gettimeofday(&end, NULL);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
-        // 释放流
+        // Release stream
         Test_->rc = Test_->streamOperator->ReleaseStreams({1001});
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
@@ -187,13 +187,13 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0004, TestSize.Level3)
     Test_->Open();
     for (int i = 0; i < Times; i++) {
         std::cout << "Running " << i << " time" << std::endl;
-        // 启动流
+        // Start stream
         gettimeofday(&start, NULL);
         Test_->intents = {Camera::PREVIEW};
         Test_->StartStream(Test_->intents);
-        // 获取预览图
+        // Get preview
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 释放流
+        // Release stream
         Test_->captureIds = {Test_->captureId_preview};
         Test_->streamIds = {Test_->streamId_preview};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -202,6 +202,8 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0004, TestSize.Level3)
         totle_time_use = totle_time_use + time_use;
     }
     float avrg_time = totle_time_use / Times;
+    // EXPECT_LT(avrg_time, 100000); // Here, the average duration of 1000 times of continuous start
+    // and stop streaming has exceeded 100ms,which is not included in the delivery content
     std::cout << "==========[test log] Performance: Start Streams's and Stop Stream's average time consuming: ";
     std::cout << avrg_time << "us." << std::endl;
     writeIntoFile << "==========[test log] Performance: Start Streams's and Stop Stream's average time consuming: ";
@@ -228,23 +230,23 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0005, TestSize.Level3)
     for (int i = 0; i < Times; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
-        // 配置两路流信息
+        // Configure two stream information
         Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
         Test_->StartStream(Test_->intents);
-        // 捕获预览流
+        // Capture preview stream
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 捕获拍照流，单拍
+        // Capture camera stream, single capture
         Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-        // 后处理
+        // Post-processing
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
         Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
-        // 配置预览流
+        // Configure preview stream
         Test_->intents = {Camera::PREVIEW};
         Test_->StartStream(Test_->intents);
-        // 捕获预览流
+        // Capture preview stream
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 释放预览流
+        // Release preview stream
         Test_->captureIds = {Test_->captureId_preview};
         Test_->streamIds = {Test_->streamId_preview};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -283,23 +285,23 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0006, TestSize.Level3)
     for (int i = 0; i < Times; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
-        // 配置两路流信息
+        // Configure two stream information
         Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
         Test_->StartStream(Test_->intents);
-        // 捕获预览流
+        // Capture preview stream
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 捕获录像流
+        // Capture video stream
         Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-        // 后处理
+        // Post-processing
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
         Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
-        // 配置预览流
+        // Configure preview stream
         Test_->intents = {Camera::PREVIEW};
         Test_->StartStream(Test_->intents);
-        // 捕获预览流
+        // Capture preview stream
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 释放预览流
+        // Release preview stream
         Test_->captureIds = {Test_->captureId_preview};
         Test_->streamIds = {Test_->streamId_preview};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -339,38 +341,38 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0007, TestSize.Level3)
     for (int i = 0; i < Times; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
-        // 配置两路流信息
+        // Configure two stream information
         Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
         Test_->StartStream(Test_->intents);
-        // 捕获预览流
+        // Capture preview stream
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 捕获录像流
+        // Capture video stream
         Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-        // 后处理
+        // Post-processing
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
         Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
         Test_->consumerMap_.clear();
-        // 配置两路流信息
+        // Configure two stream information
         Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
         Test_->StartStream(Test_->intents);
-        // 捕获预览流
+        // Capture preview stream
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 捕获拍照流，连拍
+        // Capture camera stream, continuous capture
         Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-        // 后处理
+        // Post-processing
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
         Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
         Test_->consumerMap_.clear();
-        // 配置两路流信息
+        // Configure two stream information
         Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
         Test_->StartStream(Test_->intents);
-        // 捕获预览流
+        // Capture preview stream
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 捕获录像流
+        // Capture video stream
         Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-        // 后处理
+        // Post-processing
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
         Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -409,38 +411,38 @@ std::cout << "==========[test log] Performance: Preview and Capture, then Previe
     for (int i = 0; i < Times; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
-        // 配置两路流信息
+        // Configure two stream information
         Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
         Test_->StartStream(Test_->intents);
-        // 捕获预览流
+        // Capture preview stream
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 捕获拍照流，连拍
+        // Capture camera stream, continuous capture
         Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-        // 后处理
+        // Post-processing
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
         Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
         Test_->consumerMap_.clear();
-        // 配置两路流信息
+        // Configure two stream information
         Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
         Test_->StartStream(Test_->intents);
-        // 捕获预览流
+        // Capture preview stream
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 捕获录像流
+        // Capture video stream
         Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-        // 后处理
+        // Post-processing
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
         Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
         Test_->consumerMap_.clear();
-        // 配置两路流信息
+        // Configure two stream information
         Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
         Test_->StartStream(Test_->intents);
-        // 捕获预览流
+        // Capture preview stream
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 捕获拍照流，连拍
+        // Capture camera stream, continuous capture
         Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-        // 后处理
+        // Post-processing
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
         Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);

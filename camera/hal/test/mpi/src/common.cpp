@@ -58,7 +58,7 @@ int32_t Test::SaveYUV(const char* type, const void* buffer, int32_t size)
         return -1;
     }
 
-    int ret = write(imgFd, buffer, size);
+    int32_t ret = write(imgFd, buffer, size);
     if (ret == -1) {
         std::cout << "write file failed, error = " << strerror(errno) << std::endl;
         close(imgFd);

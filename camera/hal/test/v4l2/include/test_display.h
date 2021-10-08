@@ -67,7 +67,7 @@
 
 class TestDisplay {
 public:
-    // 这个应该根据底层获取size大小设置
+    // This should get the size setting according to the bottom layer
     unsigned int bufSize_ = 614400; // 614400:bufSize
     unsigned char* displayBuf_;
     unsigned int camframeV4l2Exit_ = 1;

@@ -124,7 +124,7 @@ CamRetCode CameraDeviceImpl::GetEnabledResults(std::vector<MetaType> &results)
 
 RetCode CameraDeviceImpl::GetEnabledFromCfg()
 {
-    // 获取devicemanager
+    // Get devicemanager
     std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();
     if (deviceManager == nullptr) {
         CAMERA_LOGW("device manager is null.");
