@@ -125,10 +125,10 @@ uint32_t HeapBufferAllocator::CalculateSize(const uint32_t width,
         case CAMERA_FORMAT_YCBCR_420_P:
         case CAMERA_FORMAT_YCRCB_420_P:
         /*
-            yuv的固定计算公式
+            Fixed calculation formula of yuv
             yuv420 size= w * h * 3 / 2
         */
-            return width * height * 3 / 2; // 3:yuv的固定计算值 2:yuv的固定计算值
+            return width * height * 3 / 2; // 3:Fixed calculated value of yuv 2:Fixed calculated value of yuv
             break;
         case CAMERA_FORMAT_YCBCR_422_P:
         case CAMERA_FORMAT_YUV_422_I:
@@ -139,10 +139,10 @@ uint32_t HeapBufferAllocator::CalculateSize(const uint32_t width,
         case CAMERA_FORMAT_YVYU_422_PKG:
         case CAMERA_FORMAT_VYUY_422_PKG:
         /*
-            yuv的固定计算公式
+            Fixed calculation formula of yuv
             yuv422 size= w * h * 2
         */
-            return width * height * 2; // 2:yuv的固定计算值
+            return width * height * 2; // 2:Fixed calculated value of yuv
             break;
         default:
             break;

@@ -42,12 +42,12 @@ void AdapterTest::TearDown(void)
 HWTEST_F(AdapterTest, Camera_Adapter_0001, TestSize.Level0)
 {
     std::cout << "==========[test log]Preview stream, 640*480, expected success." << std::endl;
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);

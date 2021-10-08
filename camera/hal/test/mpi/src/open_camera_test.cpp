@@ -90,7 +90,7 @@ HWTEST_F(OpenCameraTest, Camera_Open_0010, TestSize.Level2)
 
 int main(int argc, char *argv[])
 {
-    // 开始批跑
+    // start test
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

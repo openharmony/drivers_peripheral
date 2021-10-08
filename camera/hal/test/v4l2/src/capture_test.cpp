@@ -39,15 +39,15 @@ void UtestCaptureTest::TearDown(void)
   */
 TEST_F(UtestCaptureTest, camera_capture_0001)
 {
-    // 获取流管理器
+    // Get the stream manager
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_capture, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview, display_->streamId_capture};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -64,30 +64,30 @@ TEST_F(UtestCaptureTest, camera_capture_0002)
 {
     std::cout << "==========[test log] Preview + capture, then cloase camera,";
     std::cout << "and preview + capture again." << std::endl;
-    // 获取流管理器
+    // Get the stream manager
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_capture, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview, display_->streamId_capture};
     display_->StopStream(display_->captureIds, display_->streamIds);
 
     // the 2nd time
-    // 配置两路流信息
-    // 获取流管理器
+    // Configure two streams of information
+    // Get the stream manager
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_capture, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview, display_->streamId_capture};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -103,15 +103,15 @@ TEST_F(UtestCaptureTest, camera_capture_0002)
 TEST_F(UtestCaptureTest, camera_capture_0003)
 {
     std::cout << "==========[test log] Capture with 3A, success." << std::endl;
-    // 获取流管理器
+    // Get the stream manager
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_capture, display_->captureId_preview, false, true);
-    // 下发3A参数，增加曝光度
+    // Issue 3A parameters to increase exposure
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
@@ -121,7 +121,7 @@ TEST_F(UtestCaptureTest, camera_capture_0003)
     } else {
         std::cout << "==========[test log] UpdateSettings fail, rc = " << display_->rc << std::endl;
     }
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview, display_->streamId_capture};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -138,29 +138,29 @@ TEST_F(UtestCaptureTest, camera_capture_0004)
 {
     std::cout << "==========[test log] Preview + capture, then switch to preview + video." << std::endl;
     std::cout << "==========[test log] First, create preview + capture." << std::endl;
-    // 获取流管理器
+    // Get the stream manager
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_capture, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview, display_->streamId_capture};
     display_->StopStream(display_->captureIds, display_->streamIds);
 
     std::cout << "==========[test log] Next, switch to preview + video." << display_->rc << std::endl;
-    // 获取流管理器
+    // Get the stream manager
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW, Camera::VIDEO};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_video, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview, display_->streamId_video};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -175,12 +175,12 @@ TEST_F(UtestCaptureTest, camera_capture_0004)
   */
 TEST_F(UtestCaptureTest, camera_capture_0006)
 {
-    // 获取流管理器
+    // Get the stream manager
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, false);
     display_->StartCapture(display_->streamId_capture, display_->captureId_preview, false, false);
     display_->captureIds = {display_->captureId_preview};
@@ -198,23 +198,23 @@ TEST_F(UtestCaptureTest, camera_capture_0006)
 TEST_F(UtestCaptureTest, camera_capture_0010)
 {
     std::cout << "==========[test log] Preview and still_capture streams." << std::endl;
-    // 配置两路流信息
+    // Configure two streams of information
     EXPECT_EQ(true, display_->cameraDevice != nullptr);
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 抓拍
+    // Start capture
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
 
-    // 配置拍照流信息
+    // Configure capture stream information
     display_->intents = {Camera::STILL_CAPTURE};
     display_->StartStream(display_->intents);
-    // 抓拍
+    // Start capture
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
 
-    // 后处理
+    // post-processing
     display_->rc = display_->streamOperator->CancelCapture(display_->captureId_capture);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     if (display_->rc == Camera::NO_ERROR) {
@@ -255,7 +255,7 @@ TEST_F(UtestCaptureTest, camera_capture_0010)
 TEST_F(UtestCaptureTest, camera_capture_0020)
 {
     std::cout << "==========[test log] No preview, only still_capture." << std::endl;
-    // 启流
+    // start stream
     display_->AchieveStreamOperator();
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:buffer queue size
@@ -307,7 +307,7 @@ TEST_F(UtestCaptureTest, camera_capture_0020)
 TEST_F(UtestCaptureTest, camera_capture_0021)
 {
     std::cout << "==========[test log] Still_capture stream, capture->isStreaming = true." << std::endl;
-    // 启流
+    // start stream
     display_->AchieveStreamOperator();
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferqueue size

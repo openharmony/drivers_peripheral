@@ -43,12 +43,12 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1001, TestSize.Level0)
     Test_->Open();
     Test_->onCameraStatusFlag = false;
     std::cout << "==========[test log]Preview stream, 640*480, expected success." << std::endl;
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -92,12 +92,12 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1010, TestSize.Level0)
     Test_->Open();
     Test_->onErrorFlag = false;
     std::cout << "==========[test log]Preview stream, 640*480, expected success." << std::endl;
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -126,12 +126,12 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1011, TestSize.Level0)
         std::cout << "==========[test log] hdi_device: type = " << type << std::endl;
     }
     Test_->rc = Test_->cameraDevice->SetResultMode(Camera::ON_CHANGED);
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -153,12 +153,12 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1020, TestSize.Level0)
     Test_->Open();
     Test_->captureStartFlag = false;
     std::cout << "==========[test log]Preview stream, 640*480, expected success." << std::endl;
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -179,12 +179,12 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1021, TestSize.Level0)
     Test_->Open();
     Test_->captureEndFlag = false;
     std::cout << "==========[test log]Preview stream, 640*480, expected success." << std::endl;
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -216,12 +216,12 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1023, TestSize.Level0)
     Test_->Open();
     Test_->frameShutterFlag = false;
     std::cout << "==========[test log]Preview stream, 640*480, expected success." << std::endl;
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, true, true);
-    // 释放流
+    // release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);

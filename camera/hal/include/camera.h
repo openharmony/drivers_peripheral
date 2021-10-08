@@ -120,21 +120,9 @@ enum CameraBufferFormat : uint32_t {
 };
 
 enum CameraEncodeType : int32_t {
-    /**
-     * 未设置编码类型
-     */
     CAMERA_ENCODE_NULL = 0,
-    /**
-     * 编码类型为H264
-     */
     CAMERA_ENCODE_H264 = 1,
-    /**
-     * 编码类型为H265
-     */
     CAMERA_ENCODE_H265 = 2,
-    /**
-     * 编码类型为JPEG
-     */
     CAMERA_ENCODE_JPEG = 3,
 };
 

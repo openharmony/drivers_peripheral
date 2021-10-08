@@ -285,7 +285,7 @@ TEST_F(UtestHdiTest, camera_hdi_0060)
     std::cout << "==========[test log] UpdateSettings, OHOS_CONTROL_AE_EXPOSURE_COMPENSATION." << std::endl;
     sleep(3);
     display_->OpenCamera();
-    // 下发3A参数
+    // Issue 3A parameters
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
@@ -306,7 +306,7 @@ TEST_F(UtestHdiTest, camera_hdi_0061)
     std::cout << "OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_AUTO." << std::endl;
     sleep(3);
     display_->OpenCamera();
-    // 下发3A参数
+    // Issue 3A parameters
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_AUTO;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
@@ -327,7 +327,7 @@ TEST_F(UtestHdiTest, camera_hdi_0063)
     std::cout << "OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_TWILIGHT." << std::endl;
     sleep(3);
     display_->OpenCamera();
-    // 下发3A参数
+    // Issue 3A parameters
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_TWILIGHT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
@@ -348,7 +348,7 @@ TEST_F(UtestHdiTest, camera_hdi_0065)
     std::cout << "OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_FLUORESCENT." << std::endl;
     sleep(3);
     display_->OpenCamera();
-    // 下发3A参数
+    // Issue 3A parameters
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_FLUORESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
@@ -369,7 +369,7 @@ TEST_F(UtestHdiTest, camera_hdi_0066)
     std::cout << "OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT." << std::endl;
     sleep(3);
     display_->OpenCamera();
-    // 下发3A参数
+    // Issue 3A parameters
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
@@ -448,13 +448,13 @@ TEST_F(UtestHdiTest, camera_hdi_0080)
 TEST_F(UtestHdiTest, camera_hdi_0090)
 {
     std::cout << "==========[test log] EnableResult one tag, without preview, success." << std::endl;
-    // 获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device
     std::cout << "==========[test log] 1. Get the tags..." << std::endl;
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(resultsOriginal);
     std::cout << "resultsOriginal.size = " << resultsOriginal.size() << std::endl;
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 新增这个tag
+    // add this tag
     std::vector<OHOS::Camera::MetaType> enableTag;
     std::cout << "==========[test log] 2. Enable the tag: " << resultsOriginal[0] << std::endl;
     enableTag.push_back(resultsOriginal[1]);
@@ -472,28 +472,28 @@ TEST_F(UtestHdiTest, camera_hdi_0090)
 TEST_F(UtestHdiTest, camera_hdi_0091)
 {
     std::cout << "==========[test log] EnableResult multiple tags, success." << std::endl;
-    // 获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(resultsOriginal);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
 
-    // 禁用所有tag
+    // Disable all tags
     std::cout << "then, disable the tag..." << std::endl;
     display_->rc = display_->cameraDevice->DisableResult(resultsOriginal);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
 
-    // 再次获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device again
     std::vector<OHOS::Camera::MetaType> results;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(results);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     EXPECT_GT(results.size(), 0);
 
-    // 新增多个tag
+    // Add multiple tags
     std::cout << "then, enable the tag..." << std::endl;
     display_->rc = display_->cameraDevice->EnableResult(resultsOriginal);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
 
-    // 再次获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device again
     display_->rc = display_->cameraDevice->GetEnabledReuslts(results);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
 }
@@ -508,12 +508,12 @@ TEST_F(UtestHdiTest, camera_hdi_0091)
 TEST_F(UtestHdiTest, camera_hdi_0092)
 {
     std::cout << "==========[test log] EnableResult error tag, expected fail." << std::endl;
-    // 获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(resultsOriginal);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
 
-    // 新增一个tag
+    // add a tag
     std::vector<OHOS::Camera::MetaType> enableTag;
     enableTag.push_back(0);
     std::cout << "then, enable the tag..." << std::endl;
@@ -531,13 +531,13 @@ TEST_F(UtestHdiTest, camera_hdi_0092)
 TEST_F(UtestHdiTest, camera_hdi_0100)
 {
     std::cout << "==========[test log] DisEnabledReuslts, expected success." << std::endl;
-    // 获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(resultsOriginal);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     std::cout << "==========[test log] GetEnabledReuslts, size = " << resultsOriginal.size() << std::endl;
 
-    // 禁用一个tag
+    // disable a tag
     std::vector<OHOS::Camera::MetaType> disableTag;
     disableTag.push_back(resultsOriginal[0]);
     display_->rc = display_->cameraDevice->DisableResult(disableTag);
@@ -545,7 +545,7 @@ TEST_F(UtestHdiTest, camera_hdi_0100)
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     std::cout << "==========[test log] DisableResult the tag:" << resultsOriginal[0] << std::endl;
 
-    // 再次获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device again
     std::vector<OHOS::Camera::MetaType> results;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(results);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
@@ -561,17 +561,17 @@ TEST_F(UtestHdiTest, camera_hdi_0100)
 TEST_F(UtestHdiTest, camera_hdi_0101)
 {
     std::cout << "==========[test log] DisableResult all tag, success." << std::endl;
-    // 获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(resultsOriginal);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
 
-    // 禁用所有tag
+    // Disable all tags
     std::cout << "then, disable the tag..." << std::endl;
     display_->rc = display_->cameraDevice->DisableResult(resultsOriginal);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
 
-    // 再次获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device again
     std::vector<OHOS::Camera::MetaType> results;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(results);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
@@ -587,12 +587,12 @@ TEST_F(UtestHdiTest, camera_hdi_0101)
 TEST_F(UtestHdiTest, camera_hdi_0102)
 {
     std::cout << "==========[test log] DisableResult error tag, expected fail." << std::endl;
-    // 获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(resultsOriginal);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
 
-    // 禁用一个tag
+    // disable a tag
     std::vector<OHOS::Camera::MetaType> disableTag;
     disableTag.push_back(0);
     std::cout << "then, disenable the tag..." << std::endl;
@@ -600,7 +600,7 @@ TEST_F(UtestHdiTest, camera_hdi_0102)
     std::cout << "==========[test log] rc = " << display_->rc << std::endl;
     EXPECT_EQ(false, display_->rc == Camera::NO_ERROR);
 
-    // 再次获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device again
     std::vector<OHOS::Camera::MetaType> results;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(results);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);

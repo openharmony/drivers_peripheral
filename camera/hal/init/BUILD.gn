@@ -57,7 +57,7 @@ ohos_executable("ohos_camera_demo") {
     "$camera_path/pipeline_core/pipeline_impl/src/strategy",
     "$camera_path/pipeline_core/ipp/include",
 
-    # HCS
+    # hcs parser
     "//drivers/framework/include/osal",
     "//drivers/framework/include/utils",
     "//drivers/adapter/uhdf2/osal/include",

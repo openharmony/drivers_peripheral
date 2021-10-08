@@ -40,14 +40,14 @@ void UtestHdiFuncTest::TearDown(void)
 TEST_F(UtestHdiFuncTest, camera_hdi_0190)
 {
     std::cout << "==========[test log] Capture, input normal." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -64,12 +64,12 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0191)
 {
     std::cout << "==========[test log] Preview, Capture->captureInfo->streamID = -1 ,return error." << std::endl;
     display_->OpenCamera();
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     int captureId = 2001;
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
     captureInfo->streamIds_ = {-1};
@@ -96,12 +96,12 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0192)
 {
     std::cout << "==========[test log] Preview,";
     std::cout << "Capture->captureInfo->streamID = 2147483647 ,return success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     int captureId = 2001;
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
     captureInfo->streamIds_ = {2147483647};
@@ -137,14 +137,14 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0193)
 {
     std::cout << "==========[test log] Preview,";
     std::cout << "Capture->captureInfo->enableShutterCallback = false ,return success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -161,12 +161,12 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0194)
 {
     std::cout << "==========[test log] Preview, Capture->isStreaming = false ,expected success." << std::endl;
     std::cout << "==========[test log] Preview, Capture->isStreaming = false ,expected success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     int captureId = 2001;
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
     captureInfo->streamIds_ = {display_->streamId_preview};
@@ -181,7 +181,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0194)
     } else {
         std::cout << "==========[test log] CancelCapture fail, rc = " << display_->rc << std::endl;
     }
-    // 释放流
+    // release stream
     display_->rc = display_->streamOperator->ReleaseStreams(captureInfo->streamIds_);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     if (display_->rc == Camera::NO_ERROR) {
@@ -202,12 +202,12 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0195)
 {
     std::cout << "==========[test log] Preview, Capture->captureId = -1 ,return error." << std::endl;
     display_->OpenCamera();
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     int captureId = -1;
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
     captureInfo->streamIds_ = {display_->streamId_preview};
@@ -234,14 +234,14 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0196)
 {
     std::cout << "==========[test log] Preview,";
     std::cout << "Capture->captureInfo->enableShutterCallback = true ,return success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, true, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -257,14 +257,14 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0196)
 TEST_F(UtestHdiFuncTest, camera_hdi_0200)
 {
     std::cout << "==========[test log] CancelCapture, success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -280,12 +280,12 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0200)
 TEST_F(UtestHdiFuncTest, camera_hdi_0201)
 {
     std::cout << "==========[test log] CancelCapture captureID = -1, expected fail." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     int captureId = 100;
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
     captureInfo->streamIds_ = {display_->streamId_preview};
@@ -303,7 +303,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0201)
     } else {
         std::cout << "==========[test log] CancelCapture fail, rc = " << display_->rc << std::endl;
     }
-    // 释放流
+    // release stream
     display_->rc = display_->streamOperator->ReleaseStreams(captureInfo->streamIds_);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     if (display_->rc == Camera::NO_ERROR) {
@@ -324,7 +324,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0210)
 {
     std::cout << "==========[test log] AttachBufferQueue, normal input." << std::endl;
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -361,7 +361,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0210)
         std::cout << "==========[test log] AttachBufferQueue fail, rc = " << display_->rc << std::endl;
     }
     sleep(3);
-    // 释放流
+    // release stream
     display_->streamIds = {1001};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
@@ -377,7 +377,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0211)
 {
     std::cout << "==========[test log] AttachBufferQueue, streamID is not exist.." << std::endl;
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     display_->streamInfo = std::make_shared<OHOS::Camera::StreamInfo>();
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
@@ -413,7 +413,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0211)
         std::cout << "==========[test log] AttachBufferQueue fail, rc = " << display_->rc << std::endl;
     }
     sleep(3);
-    //释放流
+    //Release the stream
     display_->streamIds = {1001};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
@@ -435,7 +435,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0212)
         std::cout << "==========[test log] GetStreamOperator fail, rc = " << display_->rc << std::endl;
     }
     std::shared_ptr<IBufferProducer> producer = nullptr;
-    // 创建数据流
+    // Create data stream
     display_->streamInfo = std::make_shared<OHOS::Camera::StreamInfo>();
     display_->streamInfo->streamId_ = 1001;
     display_->streamInfo->width_ = 640; // 640:picture width
@@ -462,7 +462,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0212)
         std::cout << "==========[test log] AttachBufferQueue fail, rc = " << display_->rc << std::endl;
     }
     sleep(3);
-    // 释放流
+    // release stream
     display_->streamIds = {1001};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
@@ -478,7 +478,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0220)
 {
     std::cout << "==========[test log] DetachBufferQueue, normal input." << std::endl;
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -518,7 +518,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0220)
     } else {
         std::cout << "==========[test log] DetachBufferQueue fail, rc = " << display_->rc << std::endl;
     }
-    // 释放流
+    // release stream
     display_->streamIds = {1001};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
@@ -534,7 +534,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0221)
 {
     std::cout << "==========[test log] DetachBufferQueue, streamID is not exist." << std::endl;
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -573,7 +573,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0221)
     } else {
         std::cout << "==========[test log] DetachBufferQueue fail, rc = " << display_->rc << std::endl;
     }
-    // 释放流
+    // release stream
     display_->streamIds = {1001};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }

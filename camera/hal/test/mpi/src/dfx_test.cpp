@@ -60,12 +60,12 @@ HWTEST_F(DfxTest, Camera_Dfx_0001, TestSize.Level3)
     result = OHOS::system::SetParameter(property, value);
     if(result){
         Test_->Open();
-       // 启动流
+        // Start stream
         Test_->intents = {Camera::PREVIEW};
         Test_->StartStream(Test_->intents);
-        // 获取预览图
+        // Get preview
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 释放流
+        // release stream
         Test_->captureIds = {Test_->captureId_preview};
         Test_->streamIds = {Test_->streamId_preview};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -117,7 +117,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0011, TestSize.Level3)
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_UpdateSettings_Timeout = " << parameter << std::endl;
         Test_->Open();
-        // 下发3A参数
+        // Issue 3A parameters
         std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
         int32_t expo = 0xa0;
         meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
@@ -208,20 +208,20 @@ HWTEST_F(DfxTest, Camera_Dfx_0014, TestSize.Level3)
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_DisableResult_Timeout = " << parameter << std::endl;
         Test_->Open();
-        // 获取设备当前支持的参数tag
+        // Get the parameter tag currently supported by the device
         std::vector<Camera::MetaType> results_original;
         Test_->rc = Test_->cameraDevice->GetEnabledResults(results_original);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         std::cout << "==========[test log]GetEnabledResults, size = " << results_original.size() << std::endl;
 
-        // 禁用一个tag
+        // disable a tag
         std::vector<Camera::MetaType> disable_tag;
         disable_tag.push_back(results_original[2]);
         Test_->rc = Test_->cameraDevice->DisableResult(disable_tag);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         std::cout << "==========[test log]Check hdi_device: DisableResult the tag:" << results_original[0] << std::endl;
 
-        // 再次获取设备当前支持的参数tag
+        // Get the parameter tag currently supported by the device again
         std::vector<Camera::MetaType> results;
         Test_->rc = Test_->cameraDevice->GetEnabledResults(results);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
@@ -268,26 +268,26 @@ HWTEST_F(DfxTest, Camera_Dfx_0020, TestSize.Level3) {
     if(result){
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_IsStreamsSupported_Timeout = " << parameter << std::endl;
-        // 打开相机
+        // Turn on the camera
         Test_->Open();
         EXPECT_EQ(false, Test_->cameraDevice == nullptr);
-        // 获取streamOperator
+        // Get streamOperator
         Test_->streamOperatorCallback = new StreamOperatorCallback();
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-        // 配置mode 和 modeSetting
+        // Configure mode and modeSetting
         Camera::OperationMode mode = Camera::NORMAL;
         std::shared_ptr<CameraStandard::CameraMetadata> modeSetting = std::make_shared<CameraStandard::CameraMetadata>(2, 128);
         int64_t expoTime = 0;
         modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
         int64_t colorGains[4] = {0};
         modeSetting->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
-        // 配置流信息
+        // Configure stream information
         Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
-        Test_->streamInfo->streamId_ = 1001; // 1001:流id
+        Test_->streamInfo->streamId_ = 1001; // 1001:streamId
         Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-        Test_->streamInfo->height_ = 480; // 480:流高度
-        Test_->streamInfo->width_ = 640; // 640:流宽度
+        Test_->streamInfo->height_ = 480; // 480:height of stream
+        Test_->streamInfo->width_ = 640; // 640:width of stream
         Test_->streamInfo->datasapce_ = 8;
         std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
@@ -329,11 +329,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0021, TestSize.Level3)
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_CreateStreams_Timeout = " << parameter << std::endl;
         Test_->Open();
-        // 创建并获取streamOperator信息
+        // Create and get streamOperator information
         Test_->streamOperatorCallback = new StreamOperatorCallback();
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
         EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR || Test_->streamOperator == nullptr);
-        // 创建数据流
+        // Create data stream
         Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
         Test_->streamInfo->streamId_ = 1001;
         Test_->streamInfo->width_ = 640;
@@ -351,7 +351,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0021, TestSize.Level3)
         Test_->streamInfos.push_back(Test_->streamInfo);
         Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-        // 释放流
+        // release stream
         std::vector<int> streamIds;
         streamIds.push_back(Test_->streamInfo->streamId_);
         Test_->rc = Test_->streamOperator->ReleaseStreams(streamIds);
@@ -378,11 +378,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0022, TestSize.Level3)
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_ReleaseStreams_Timeout = " << parameter << std::endl;
         Test_->Open();
-        // 创建并获取streamOperator信息
+        // Create and get streamOperator information
         Test_->streamOperatorCallback = new StreamOperatorCallback();
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
         EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR || Test_->streamOperator == nullptr);
-        // 创建数据流
+        // Create data stream
         Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
         Test_->streamInfo->streamId_ = 1001;
         Test_->streamInfo->width_ = 640;
@@ -400,7 +400,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0022, TestSize.Level3)
         Test_->streamInfos.push_back(Test_->streamInfo);
         Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-        // 释放流
+        // release stream
         std::vector<int> streamIds;
         streamIds.push_back(Test_->streamInfo->streamId_);
         Test_->rc = Test_->streamOperator->ReleaseStreams(streamIds);
@@ -427,10 +427,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0023, TestSize.Level3)
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_CommitStreams_Timeout = " << parameter << std::endl;
         Test_->Open();
-        // 启动流
+        // Start stream
         Test_->intents = {Camera::PREVIEW};
         Test_->StartStream(Test_->intents);
-        // 释放流
+        // release stream
         Test_->captureIds = {};
         Test_->streamIds = {Test_->streamId_preview};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -459,7 +459,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0024, TestSize.Level3)
         Test_->streamOperatorCallback = new StreamOperatorCallback();
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-        // 创建数据流
+        // Create data stream
         Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
         Test_->streamInfo->streamId_ = 1001;
         Test_->streamInfo->height_ = 480;
@@ -473,7 +473,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0024, TestSize.Level3)
         Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
         std::cout << "==========[test log]Check hdi: streamOperator->CreateStreams's rc " << Test_->rc << std::endl;
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-        // 配流起流
+        // Distribution stream
         Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, Test_->ability);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         std::cout << "==========[test log]Check hdi: streamOperator->CommitStreams's rc " << Test_->rc << std::endl;
@@ -489,7 +489,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0024, TestSize.Level3)
         } else {
             std::cout << "==========[test log]Check hdi: AttachBufferQueue fail, rc = " << Test_->rc << std::endl;
         }
-        // 释放流
+        // release stream
         Test_->captureIds = {};
         Test_->streamIds = {1001};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -518,7 +518,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0025, TestSize.Level3)
         Test_->streamOperatorCallback = new StreamOperatorCallback();
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-        // 创建数据流
+        // Create data stream
         Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
         Test_->streamInfo->streamId_ = 1001;
         Test_->streamInfo->width_ = 640;
@@ -532,7 +532,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0025, TestSize.Level3)
         Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
         std::cout << "==========[test log]Check hdi: streamOperator->CreateStreams's rc " << Test_->rc << std::endl;
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-        // 配流起流
+        // Distribution stream
         Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, Test_->ability);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         std::cout << "==========[test log]Check hdi: streamOperator->CommitStreams's rc " << Test_->rc << std::endl;
@@ -552,7 +552,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0025, TestSize.Level3)
         Test_->rc = Test_->streamOperator->DetachBufferQueue(Test_->streamInfo->streamId_);
         std::cout << "==========[test log]Check hdi: streamOperator->DetachBufferQueue's rc " << Test_->rc << std::endl;
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-        // 释放流
+        // release stream
         Test_->captureIds = {};
         Test_->streamIds = {1001};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -578,12 +578,12 @@ HWTEST_F(DfxTest, Camera_Dfx_0026, TestSize.Level3)
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_Capture_Timeout = " << parameter << std::endl;
         Test_->Open();
-        // 配置预览流信息
+        // Configure preview stream information
         Test_->intents = {Camera::PREVIEW};
         Test_->StartStream(Test_->intents);
-        // 捕获预览流
+        // Capture preview stream
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, true, true);
-        // 后处理
+        // post-processing
         Test_->captureIds = {Test_->captureId_preview};
         Test_->streamIds = {Test_->streamId_preview};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -609,15 +609,15 @@ HWTEST_F(DfxTest, Camera_Dfx_0027, TestSize.Level3)
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_ChangeToOfflineStream_Timeout = " << parameter << std::endl;
         Test_->Open();
-        // 1、配置两路流信息
+        // 1. Configure two streams of information
         Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
         Test_->StartStream(Test_->intents);
-        // 2、捕获预览流
+        // 2. Capture the preview stream
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 3、捕获拍照流，连拍
+        // 3. Capture the camera stream, continuous shooting
         Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
         sleep(5);
-        // 4、转成离线流
+        // 4. Convert to offline stream
         Test_->offlineStreamOperatorCallback = Test_->streamOperatorCallback;
         Test_->rc = Test_->streamOperator->ChangeToOfflineStream(
             {Test_->streamId_capture}, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
@@ -629,11 +629,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0027, TestSize.Level3)
         } else {
             std::cout << "==========[test log] offline StreamOperator == nullptr" << std::endl;
         }
-        // 5、原先流的后处理
+        // 5. Post-processing of the original stream
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
         Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
-        // 6、离线流的后处理
+        // 6. Post-processing of offline streams
         Test_->cameraDevice->Close();
         std::cout << "==========[test log] Pretend to wait 5s for callback..." << std::endl;
         sleep(5);
@@ -660,15 +660,15 @@ HWTEST_F(DfxTest, Camera_Dfx_0030, TestSize.Level3)
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_Offline_CancelCapture_Timeout = " << parameter << std::endl;
         Test_->Open();
-        // 1、配置两路流信息
+        // 1. Configure two streams of information
         Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
         Test_->StartStream(Test_->intents);
-        // 2、捕获预览流
+        // 2. Capture the preview stream
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 3、捕获拍照流，连拍
+        // 3. Capture the camera stream, continuous shooting
         Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
         sleep(5);
-        // 4、转成离线流
+        // 4. Convert to offline stream
         Test_->offlineStreamOperatorCallback = Test_->streamOperatorCallback;
         Test_->rc = Test_->streamOperator->ChangeToOfflineStream(
             {Test_->streamId_capture}, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
@@ -680,11 +680,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0030, TestSize.Level3)
         } else {
             std::cout << "==========[test log] offline StreamOperator == nullptr" << std::endl;
         }
-        // 5、原先流的后处理
+        // 5. Post-processing of the original stream
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
         Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
-        // 6、离线流的后处理
+        // 6. Post-processing of offline streams
         Test_->cameraDevice->Close();
         std::cout << "==========[test log] Pretend to wait 5s for callback..." << std::endl;
         sleep(5);
@@ -711,15 +711,15 @@ HWTEST_F(DfxTest, Camera_Dfx_0031, TestSize.Level3)
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_Offline_ReleaseStreams_Timeout = " << parameter << std::endl;
         Test_->Open();
-        // 1、配置两路流信息
+        // 1. Configure two streams of information
         Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
         Test_->StartStream(Test_->intents);
-        // 2、捕获预览流
+        // 2. Capture the preview stream
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 3、捕获拍照流，连拍
+        // 3. Capture the camera stream, continuous shooting
         Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
         sleep(5);
-        // 4、转成离线流
+        // 4. Convert to offline stream
         Test_->offlineStreamOperatorCallback = Test_->streamOperatorCallback;
         Test_->rc = Test_->streamOperator->ChangeToOfflineStream(
             {Test_->streamId_capture}, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
@@ -731,11 +731,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0031, TestSize.Level3)
         } else {
             std::cout << "==========[test log] offline StreamOperator == nullptr" << std::endl;
         }
-        // 5、原先流的后处理
+        // 5. Post-processing of the original stream
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
         Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
-        // 6、离线流的后处理
+        // 6. Post-processing of offline streams
         Test_->cameraDevice->Close();
         std::cout << "==========[test log] Pretend to wait 5s for callback..." << std::endl;
         sleep(5);
@@ -762,15 +762,15 @@ HWTEST_F(DfxTest, Camera_Dfx_0032, TestSize.Level3)
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_Offline_Release_Timeout = " << parameter << std::endl;
         Test_->Open();
-        // 1、配置两路流信息
+        // 1. Configure two streams of information
         Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
         Test_->StartStream(Test_->intents);
-        // 2、捕获预览流
+        // 2. Capture the preview stream
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-        // 3、捕获拍照流，连拍
+        // 3. Capture the camera stream, continuous shooting
         Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
         sleep(5);
-        // 4、转成离线流
+        // 4. Convert to offline stream
         Test_->offlineStreamOperatorCallback = Test_->streamOperatorCallback;
         Test_->rc = Test_->streamOperator->ChangeToOfflineStream(
             {Test_->streamId_capture}, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
@@ -782,11 +782,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0032, TestSize.Level3)
         } else {
             std::cout << "==========[test log] offline StreamOperator == nullptr" << std::endl;
         }
-        // 5、原先流的后处理
+        // 5. Post-processing of the original stream
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
         Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
-        // 6、离线流的后处理
+        // 6. Post-processing of offline streams
         Test_->cameraDevice->Close();
         std::cout << "==========[test log] Pretend to wait 5s for callback..." << std::endl;
         sleep(5);

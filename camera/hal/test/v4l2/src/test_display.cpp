@@ -35,7 +35,7 @@ int32_t TestDisplay::SaveYUV(char* type, unsigned char* buffer, int32_t size)
     sprintf_s(path, sizeof(path) / sizeof(path[0]), "/mnt/yuv/%s_%lld.yuv", type, GetCurrentLocalTimeStamp());
     CAMERA_LOGI("%s, save yuv to file %s", __FUNCTION__, path);
     system("mkdir -p /mnt/yuv");
-    int imgFd = open(path, O_RDWR | O_CREAT, 00766); // 00766:文件权限
+    int imgFd = open(path, O_RDWR | O_CREAT, 00766); // 00766: file permissions
     if (imgFd == -1) {
         CAMERA_LOGI("%s, open file failed, errno = %s.", __FUNCTION__, strerror(errno));
         return -1;
@@ -158,8 +158,8 @@ void TestDisplay::ProcessImage(const unsigned char* p, unsigned char* fbp)
 
     for (y = ypos; y < (height + ypos); y++) {
         for (j = 0, x = xpos; j < width; j++, x++) {
-            location = (x + vinfo_.xoffset) * (vinfo_.bits_per_pixel / 8) + // 8:每次要处理的字节数
-            (y + vinfo_.yoffset) * finfo_.line_length; // 一次加一个y的行数
+            location = (x + vinfo_.xoffset) * (vinfo_.bits_per_pixel / 8) + // 8: The bytes for each time
+            (y + vinfo_.yoffset) * finfo_.line_length; // add one y number of rows at a time
 
             y0 = in[y_pos];
             u = in[u_pos] - 128; // 128:display size
@@ -183,7 +183,7 @@ void TestDisplay::ProcessImage(const unsigned char* p, unsigned char* fbp)
         y_pos = 0; // 0:Pixel initial value
         u_pos = 1; // 1:Pixel initial value
         v_pos = 3; // 3:Pixel initial value
-        in += istride; // 输入的buffer一次加一行的偏移位，istride等于预览宽度*2个字节。
+        in += istride; // add one y number of rows at a time
     }
 }
 
@@ -295,7 +295,7 @@ float TestDisplay::calTime(struct timeval start, struct timeval end)
 
 void TestDisplay::AchieveStreamOperator()
 {
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     std::shared_ptr<OHOS::Camera::IStreamOperatorCallback> streamOperatorCallback =
         std::make_shared<OHOS::Camera::IStreamOperatorCallback>();
     rc = cameraDevice->GetStreamOperator(streamOperatorCallback, streamOperator);
@@ -395,7 +395,7 @@ void TestDisplay::StartStream(std::vector<OHOS::Camera::StreamIntent> intents)
 
 void TestDisplay::StartCapture(int streamId, int captureId, bool shutterCallback, bool isStreaming)
 {
-    // 获取预览图
+    // Get preview
     captureInfo = std::make_shared<Camera::CaptureInfo>();
     captureInfo->streamIds_ = {streamId};
     captureInfo->captureSetting_ = ability;
@@ -425,7 +425,7 @@ void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& str
         }
     }
     if (sizeof(streamIds) > 0) {
-        // 释放流
+        // release stream
         rc = streamOperator->ReleaseStreams(streamIds);
         EXPECT_EQ(true, rc == Camera::NO_ERROR);
         if (rc == Camera::NO_ERROR) {

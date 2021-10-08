@@ -41,12 +41,12 @@ void PreviewTest::TearDown(void)
 HWTEST_F(PreviewTest, Camera_Preview_0001, TestSize.Level0)
 {
     std::cout << "==========[test log]Preview stream, 640*480, expected success." << std::endl;
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 释放流
+    // Release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -62,11 +62,11 @@ HWTEST_F(PreviewTest, Camera_Preview_0004, TestSize.Level2)
 {
     std::cout << "==========[test log]Preview stream, 1280*960, expected success." << std::endl;
 
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     Test_->streamOperatorCallback = new StreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    // 创建数据流
+    // Create data flow
     Test_->streamInfo = std::make_shared<StreamInfo>();
     Test_->streamInfo->streamId_ = Test_->streamId_preview;
     Test_->streamInfo->width_ = 1280;
@@ -86,12 +86,12 @@ HWTEST_F(PreviewTest, Camera_Preview_0004, TestSize.Level2)
     Test_->streamInfos.push_back(Test_->streamInfo);
     Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    // 配流起流
+    // Flow distribution
     Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, Test_->ability);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 释放流
+    // Release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -106,7 +106,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0004, TestSize.Level2)
 HWTEST_F(PreviewTest, Camera_Preview_0010, TestSize.Level0)
 {
     std::cout << "==========[test log]GetStreamOperator success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     Test_->streamOperatorCallback = new StreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR || Test_->streamOperator == nullptr);
@@ -121,7 +121,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0010, TestSize.Level0)
 HWTEST_F(PreviewTest, Camera_Preview_0011, TestSize.Level2)
 {
     std::cout << "==========[test log]GetStreamOperator, input nullptr." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     Test_->rc = Test_->cameraDevice->GetStreamOperator(nullptr, Test_->streamOperator);
     std::cout << "GetStreamOperator's rc " << Test_->rc << std::endl;
     EXPECT_EQ(Camera::CamRetCode::INVALID_ARGUMENT, Test_->rc);
@@ -136,11 +136,11 @@ HWTEST_F(PreviewTest, Camera_Preview_0011, TestSize.Level2)
 HWTEST_F(PreviewTest, Camera_Preview_0040, TestSize.Level2)
 {
     std::cout << "==========[test log]Preview, CommitStreams Metadata = nullptr." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     Test_->streamOperatorCallback = new StreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    // 配流起流
+    // Flow distribution
     Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, nullptr);
     EXPECT_EQ(true, Test_->rc == INVALID_ARGUMENT);
 }
@@ -154,11 +154,11 @@ HWTEST_F(PreviewTest, Camera_Preview_0040, TestSize.Level2)
 HWTEST_F(PreviewTest, Camera_Preview_0050, TestSize.Level2)
 {
     std::cout << "==========[test log]Preview, CommitStreams no CreateStreams, expected fail." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     Test_->streamOperatorCallback = new StreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    // 配流起流
+    // Flow distribution
     Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, Test_->ability);
     std::cout << "streamOperator->CommitStreams's rc " << Test_->rc << std::endl;
     EXPECT_EQ(true, Test_->rc == INVALID_ARGUMENT);
@@ -173,12 +173,12 @@ HWTEST_F(PreviewTest, Camera_Preview_0050, TestSize.Level2)
 HWTEST_F(PreviewTest, Camera_Preview_0060, TestSize.Level1)
 {
     std::cout << "==========[test log]Preview  and release streams, success." << std::endl;
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 释放流
+    // Release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -193,7 +193,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0060, TestSize.Level1)
 HWTEST_F(PreviewTest, Camera_Preview_0062, TestSize.Level2)
 {
     std::cout << "==========[test log]ReleaseStreams no exist streamID, expect success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     Test_->streamOperatorCallback = new StreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR || Test_->streamOperator == nullptr);
@@ -212,10 +212,10 @@ HWTEST_F(PreviewTest, Camera_Preview_0062, TestSize.Level2)
 HWTEST_F(PreviewTest, Camera_Preview_0090, TestSize.Level2)
 {
     std::cout << "==========[test log]CancelCapture without Create capture ." << std::endl;
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 不捕获预览图，直接取消捕获
+    // Do not capture the preview image, directly cancel the capture
     int captureId = 100;
     Test_->rc = Test_->streamOperator->CancelCapture(captureId);
     EXPECT_EQ(true, Test_->rc == Camera::INVALID_ARGUMENT);
@@ -224,7 +224,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0090, TestSize.Level2)
     } else {
         std::cout << "==========[test log]CancelCapture fail, rc = " << Test_->rc << std::endl;
     }
-    // 释放流
+    // Release stream
     Test_->rc = Test_->streamOperator->ReleaseStreams({Test_->streamId_preview});
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     if (Test_->rc == Camera::NO_ERROR) {
@@ -243,10 +243,10 @@ HWTEST_F(PreviewTest, Camera_Preview_0090, TestSize.Level2)
 HWTEST_F(PreviewTest, Camera_Preview_0091, TestSize.Level2)
 {
     std::cout << "==========[test log]Create capture, then release streams." << std::endl;
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 释放流
+    // Release stream
     Test_->rc = Test_->streamOperator->ReleaseStreams({Test_->streamId_preview});
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     if (Test_->rc == Camera::NO_ERROR) {
@@ -255,7 +255,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0091, TestSize.Level2)
         std::cout << "==========[test log]ReleaseStreams fail, rc = " << Test_->rc << std::endl;
     }
 
-    // 获取预览图
+    // Get preview
     int captureId = 100;
     Test_->captureInfo = std::make_shared<CaptureInfo>();
     Test_->captureInfo->streamIds_ = {Test_->streamId_preview};
@@ -264,7 +264,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0091, TestSize.Level2)
     bool isStreaming = true;
     Test_->rc = Test_->streamOperator->Capture(captureId, Test_->captureInfo, isStreaming);
     EXPECT_EQ(Test_->rc, Camera::INVALID_ARGUMENT);
-    // 关闭设备
+    // Turn off the device
     Test_->cameraDevice->Close();
     std::cout << "cameraDevice->Close" << std::endl;
 }
@@ -278,15 +278,15 @@ HWTEST_F(PreviewTest, Camera_Preview_0091, TestSize.Level2)
 HWTEST_F(PreviewTest, Camera_Preview_0092, TestSize.Level2)
 {
     std::cout << "==========[test log]The same CaptureID, Create capture twice, expected failed." << std::endl;
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->captureInfo = std::make_shared<Camera::CaptureInfo>();
     Test_->captureInfo->streamIds_ = {Test_->streamId_preview};
     Test_->captureInfo->captureSetting_ = Test_->ability;
     Test_->captureInfo->enableShutterCallback_ = true;
-    // 同样的captureId,第一次拍照
+    // The same captureId, the first time to take a photo
     Test_->rc = Test_->streamOperator->Capture(Test_->captureId_preview, Test_->captureInfo, true);
     EXPECT_EQ(true, Test_->rc == Camera::NO_ERROR);
     if (Test_->rc == Camera::NO_ERROR) {
@@ -295,7 +295,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0092, TestSize.Level2)
         std::cout << "==========[test log]check Capture: Capture fail, rc = " << Test_->rc << std::endl;
     }
     sleep(1);
-    // 同样的captureId,第二次拍照
+    // The same captureId, take the second photo
     Test_->rc = Test_->streamOperator->Capture(Test_->captureId_preview, Test_->captureInfo, true);
     EXPECT_EQ(false, Test_->rc == Camera::NO_ERROR);
     if (Test_->rc == Camera::NO_ERROR) {
@@ -312,7 +312,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0092, TestSize.Level2)
         std::cout << "==========[test log]check Capture: CancelCapture fail, rc = " << Test_->rc << std::endl;
         std::cout << "captureId = " << Test_->captureId_preview << std::endl;
     }
-    // 释放流
+    // Release stream
     Test_->streamIds = {Test_->streamId_preview};
     std::cout << "Test_->streamIds size = " << Test_->streamIds.size() << std::endl;
     Test_->rc = Test_->streamOperator->ReleaseStreams(Test_->streamIds);
@@ -333,13 +333,13 @@ HWTEST_F(PreviewTest, Camera_Preview_0092, TestSize.Level2)
 HWTEST_F(PreviewTest, Camera_Preview_0093, TestSize.Level2)
 {
     std::cout << "==========[test log]Different captureIDs, Create capture，expected success." << std::endl;
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, false);
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_capture, false, false);
-    // 释放流
+    // Release stream
     Test_->captureIds = {};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
