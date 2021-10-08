@@ -251,10 +251,10 @@ RetCode ViController::GetAWBMetaData(std::shared_ptr<CameraStandard::CameraMetad
                 meta->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, DATA_COUNT);
                 CAMERA_LOGD("%{public}s Get CMD_AWB_COLORGAINS [%{public}f,%{public}f,%{public}f,%{public}f]",
                     __FUNCTION__,
-                    colorGains[0], // 0:数组范围
-                    colorGains[1], // 1:数组范围
-                    colorGains[2], // 2:数组范围
-                    colorGains[3]); // 3:数组范围
+                    colorGains[0], // 0:Array range
+                    colorGains[1], // 1:Array range
+                    colorGains[2], // 2:Array range
+                    colorGains[3]); // 3:Array range
                 break;
             }
             default:

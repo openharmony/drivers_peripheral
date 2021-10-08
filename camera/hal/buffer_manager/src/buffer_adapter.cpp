@@ -194,7 +194,7 @@ uint64_t BufferAdapter::CameraUsageToGrallocUsage(const uint64_t cameraUsage)
 {
     uint64_t grallocUsage = 0;
     uint64_t test = 1;
-    const uint32_t BYTE = 8; // 一个字节8个bit
+    const uint32_t BYTE = 8; // 8 bits per byte
     for (uint32_t i = 0; i < sizeof(cameraUsage) * BYTE; i++) {
         switch (cameraUsage & (test << i)) {
             case CAMERA_USAGE_SW_READ_OFTEN:
@@ -218,7 +218,7 @@ uint64_t BufferAdapter::GrallocUsageToCameraUsage(const uint64_t usage)
 {
     uint64_t cameraUsage = 0;
     uint64_t test = 1;
-    const uint32_t BYTE = 8; // 一个字节8个bit
+    const uint32_t BYTE = 8; // 8 bits per byte
     for (uint32_t i = 0; i < sizeof(usage) * BYTE; i++) {
         switch (usage & (test << i)) {
             case HBM_USE_CPU_READ:

@@ -43,12 +43,12 @@ void PipelineTest::TearDown(void)
 HWTEST_F(PipelineTest, Camera_Ppl_0001, TestSize.Level0)
 {
     std::cout << "==========[test log]Check ppl: preview success." << std::endl;
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 释放流
+    // Release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -63,14 +63,14 @@ HWTEST_F(PipelineTest, Camera_Ppl_0001, TestSize.Level0)
 HWTEST_F(PipelineTest, Camera_Ppl_0002, TestSize.Level1)
 {
     std::cout << "==========[test log]Check ppl: preview + capture success." << std::endl;
-    // 配置两路流信息
+    // Configure two stream information
     Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获拍照流，连拍
+    // Capture camera stream, continuous capture
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-    // 后处理
+    // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -85,14 +85,14 @@ HWTEST_F(PipelineTest, Camera_Ppl_0002, TestSize.Level1)
 HWTEST_F(PipelineTest, Camera_Ppl_0003, TestSize.Level1)
 {
     std::cout << "==========[test log]Check ppl:Check ppl: preview + video success." << std::endl;
-    // 配置两路流信息
+    // Configure two stream information
     Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获录像流
+    // Capture video stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    // 后处理
+    // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -139,7 +139,7 @@ HWTEST_F(PipelineTest, Camera_Ppl_0004, TestSize.Level2)
     Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, Test_->ability);
     EXPECT_EQ(Test_->rc, Camera::INVALID_ARGUMENT);
     std::cout << "==========[test log]CommitStreams rc = " << Test_->rc << std::endl;
-    // 后处理
+    // Post-processing
     Test_->streamIds = {Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
@@ -153,12 +153,12 @@ HWTEST_F(PipelineTest, Camera_Ppl_0004, TestSize.Level2)
 HWTEST_F(PipelineTest, Camera_Ppl_0005, TestSize.Level1)
 {
     std::cout << "==========[test log]check ppl: Still_capture stream, capture->isStreaming = false." << std::endl;
-    // 启流
+    // Start stream
     Test_->intents = {Camera::STILL_CAPTURE};
     Test_->StartStream(Test_->intents);
-    // 抓拍
+    // Start capture
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, false);
-    // 后处理
+    // Post-processing
     Test_->streamIds = {Test_->streamId_capture};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
@@ -172,12 +172,12 @@ HWTEST_F(PipelineTest, Camera_Ppl_0005, TestSize.Level1)
 HWTEST_F(PipelineTest, Camera_Ppl_0006, TestSize.Level1)
 {
     std::cout << "==========[test log]check ppl: Still_capture stream, capture->isStreaming = true." << std::endl;
-    // 启流
+    // Start stream
     Test_->intents = {Camera::STILL_CAPTURE};
     Test_->StartStream(Test_->intents);
-    // 抓拍
+    // Start capture
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-    // 后处理
+    // Post-processing
     Test_->captureIds = {Test_->captureId_capture};
     Test_->streamIds = {Test_->streamId_capture};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -192,11 +192,11 @@ HWTEST_F(PipelineTest, Camera_Ppl_0006, TestSize.Level1)
 HWTEST_F(PipelineTest, Camera_Ppl_0007, TestSize.Level1)
 {
     std::cout << "==========[test log]Check ppl: double preview streams." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     Test_->streamOperatorCallback = new StreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    // 创建数据流 1
+    // Create data stream 1
     Test_->streamInfo = std::make_shared<StreamInfo>();
     Test_->streamInfo->streamId_ = Test_->streamId_preview;
     Test_->streamInfo->width_ = 1280;
@@ -215,7 +215,7 @@ HWTEST_F(PipelineTest, Camera_Ppl_0007, TestSize.Level1)
     std::vector<std::shared_ptr<StreamInfo>>().swap(Test_->streamInfos);
     Test_->streamInfos.push_back(Test_->streamInfo);
 
-    // 创建数据流 2
+    // Create data stream 2
     Test_->streamInfo2 = std::make_shared<StreamInfo>();
     Test_->streamInfo2->streamId_ = Test_->streamId_preview_double;
     Test_->streamInfo2->width_ = 1280;
@@ -235,13 +235,13 @@ HWTEST_F(PipelineTest, Camera_Ppl_0007, TestSize.Level1)
 
     Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    // 配流起流
+    // Flow distribution
     Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, Test_->ability);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     Test_->StartCapture(Test_->streamId_preview_double, Test_->captureId_preview_double, false, true);
-    // 释放流
+    // Release stream
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_preview_double};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_preview_double};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);

@@ -30,24 +30,24 @@ void DeviceManagerTest::SetUp(void)
 void DeviceManagerTest::TearDown(void)
 {
     Test_->Close();
-
 }
 
 /**
   * @tc.name: Check device manager.
-  * @tc.desc: 请求GBM/ION buffer命令，参数正常，通过Display模块申请buffer申请buffer成功。
+  * @tc.desc: The GBM/ION buffer command is requested, the parameters are normal,
+  * and the buffer application through the Display module is successful.
   * @tc.size: MediumTest
   * @tc.type: Function
   */
 HWTEST_F(DeviceManagerTest, Camera_Device_0001, TestSize.Level2)
 {
     std::cout << "==========[test log]Preview stream, 640*480, expected success." << std::endl;
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);

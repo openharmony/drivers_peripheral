@@ -33,4 +33,4 @@ echo "libcamera_utils.z.so(B): "$camera_utils
 
 total=$[libcamera_client+camera_buffer_manager+camera_device_manager+camera_hdi_impl+camera_pipeline_core+camera_utils]
 
-echo "so包总共(KB)："`expr $total / 1024`
+echo "so package total(KB)："`expr $total / 1024`

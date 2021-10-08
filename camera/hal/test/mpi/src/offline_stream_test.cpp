@@ -44,15 +44,15 @@ HWTEST_F(OfflineStreamTest, Camera_Offline_0001, TestSize.Level0)
 {
     std::cout << "==========[test log]Preview and still_capture streams, ";
     std::cout << " Change still_capture To OfflineStream, excepted success." << std::endl;
-    // 配置两路流信息
+    // Configure two streams of information
     Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获拍照流，连拍
+    // Capture the photo stream, continuous capture
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
     sleep(5);
-    // 转成离线流
+    // Convert to offline stream
     Test_->offlineStreamOperatorCallback = Test_->streamOperatorCallback;
     Test_->rc = Test_->streamOperator->ChangeToOfflineStream(
         {Test_->streamId_capture}, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
@@ -64,11 +64,11 @@ HWTEST_F(OfflineStreamTest, Camera_Offline_0001, TestSize.Level0)
     } else {
         std::cout << "==========[test log]Check offline stream: offline StreamOperator == nullptr" << std::endl;
     }
-    // 原先流的后处理
+    // Post-processing of the original stream
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
-    // 离线流的后处理
+    // Post-processing of offline streams
     Test_->cameraDevice->Close();
     std::cout << "==========[test log]Check offline stream: Pretend to wait 5s for callback..." << std::endl;
     sleep(5);
@@ -85,15 +85,15 @@ HWTEST_F(OfflineStreamTest, Camera_Offline_0002, TestSize.Level2)
 {
     std::cout << "==========[test log]Check offline stream: Preview and still_capture streams, ";
     std::cout << " Change Preview To OfflineStream, excepted fail." << std::endl;
-    // 配置两路流信息
+    // Configure two streams of information
     Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获拍照流，连拍
+    // Capture the photo stream, continuous capture
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
     sleep(5);
-    // 转成离线流
+    // Convert to offline stream
     Test_->offlineStreamOperatorCallback = Test_->streamOperatorCallback;
     Test_->rc = Test_->streamOperator->ChangeToOfflineStream(
         {Test_->streamId_preview}, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
@@ -101,7 +101,7 @@ HWTEST_F(OfflineStreamTest, Camera_Offline_0002, TestSize.Level2)
     std::cout << "==========[test log]Check offline: ChangeToOfflineStream rc = " << Test_->rc << std::endl;
     ASSERT_EQ(true, Test_->offlineStreamOperator == nullptr);
     std::cout << "==========[test log]Check offline stream: offline StreamOperator == nullptr." << std::endl;
-    // 原先流的后处理
+    // Post-processing of the original stream
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -118,15 +118,15 @@ HWTEST_F(OfflineStreamTest, Camera_Offline_0003, TestSize.Level2)
 {
     std::cout << "==========[test log]Check offline stream: Preview and video streams, ";
     std::cout << "Change video To OfflineStream, excepted fail." << std::endl;
-    // 配置两路流信息
+    // Configure two streams of information
     Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获拍照流，连拍
+    // Capture the photo stream, continuous capture
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
     sleep(5);
-    // 转成离线流
+    // Convert to offline stream
     Test_->offlineStreamOperatorCallback = Test_->streamOperatorCallback;
     Test_->rc = Test_->streamOperator->ChangeToOfflineStream(
         {Test_->streamId_video}, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
@@ -134,7 +134,7 @@ HWTEST_F(OfflineStreamTest, Camera_Offline_0003, TestSize.Level2)
     std::cout << "==========[test log]Check offline: ChangeToOfflineStream rc = " << Test_->rc << std::endl;
     ASSERT_EQ(Test_->offlineStreamOperator, nullptr);
     std::cout << "==========[test log]Check offline stream: offline StreamOperator == nullptr." << std::endl;
-    // 原先流的后处理
+    // Post-processing of the original stream
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);

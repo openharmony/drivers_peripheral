@@ -40,14 +40,14 @@ void UtestPipelineTest::TearDown(void)
 TEST_F(UtestPipelineTest, camera_ppl_0001)
 {
     std::cout << "==========[test log] Check ppl: preview success." << std::endl;
-    // 获取流管理器
+    // Get the stream manager
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -63,15 +63,15 @@ TEST_F(UtestPipelineTest, camera_ppl_0001)
 TEST_F(UtestPipelineTest, camera_ppl_0002)
 {
     std::cout << "==========[test log] Check ppl: preview + capture success." << std::endl;
-    // 获取流管理器
+    // Get the stream manager
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview, display_->captureId_capture};
     display_->streamIds = {display_->streamId_preview, display_->streamId_capture};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -87,15 +87,15 @@ TEST_F(UtestPipelineTest, camera_ppl_0002)
 TEST_F(UtestPipelineTest, camera_ppl_0003)
 {
     std::cout << "==========[test log] Check ppl: preview + video success." << std::endl;
-    // 获取流管理器
+    // Get the stream manager
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW, Camera::VIDEO};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_video, display_->captureId_video, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview, display_->captureId_video};
     display_->streamIds = {display_->streamId_preview, display_->streamId_video};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -115,7 +115,7 @@ TEST_F(UtestPipelineTest, camera_ppl_0004)
 
     EXPECT_EQ(true, display_->cameraDevice != nullptr);
     display_->AchieveStreamOperator();
-    // 创建视频流
+    // Create video stream
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferqueue size

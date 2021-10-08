@@ -52,7 +52,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0001, TestSize.Level3)
     } else {
         std::cout << "==========[test log]GetStreamOperator fail, rc = " << Test_->rc << std::endl;
     }
-    // 配置预览流信息
+    // Configure preview stream information
     Test_->streamInfo_pre = std::make_shared<Camera::StreamInfo>();
     Test_->streamInfo_pre->streamId_ = Test_->streamId_preview;
     Test_->streamInfo_pre->width_ = 640; // 640:width of stream
@@ -69,7 +69,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0001, TestSize.Level3)
     Test_->streamInfo_pre->bufferQueue_->SetQueueSize(8); // 8:size of bufferQueue
     Test_->consumerMap_[Camera::PREVIEW] = preview_consumer;
     Test_->streamInfos.push_back(Test_->streamInfo_pre);
-    // 配置拍照流信息
+    // Configure capture stream information
     Test_->streamInfo_capture = std::make_shared<Camera::StreamInfo>();
     Test_->streamInfo_capture->streamId_ = Test_->streamId_capture;
     Test_->streamInfo_capture->width_ = 1280; // 1280:width of stream
@@ -88,7 +88,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0001, TestSize.Level3)
     Test_->streamInfo_capture->bufferQueue_->SetQueueSize(8); // 8:bufferqueue size
     Test_->consumerMap_[Camera::STILL_CAPTURE] = consumer_capture;
     Test_->streamInfos.push_back(Test_->streamInfo_capture);
-    // 配流启流
+    // distribution start
     Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
     EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR);
     if (Test_->rc == Camera::NO_ERROR) {
@@ -105,11 +105,11 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0001, TestSize.Level3)
     }
     sleep(2); // 2:The program waits two seconds
     std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获拍照流
+    // Capture the capture stream
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-    // 后处理
+    // post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -135,7 +135,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0002, TestSize.Level3)
     } else {
         std::cout << "==========[test log]GetStreamOperator fail, rc = " << Test_->rc << std::endl;
     }
-    // 配置预览流信息
+    // Configure preview stream information
     Test_->streamInfo_pre = std::make_shared<Camera::StreamInfo>();
     Test_->streamInfo_pre->streamId_ = Test_->streamId_preview;
     Test_->streamInfo_pre->width_ = 853; // 853:width of stream
@@ -153,7 +153,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0002, TestSize.Level3)
     Test_->streamInfo_pre->bufferQueue_->SetQueueSize(8); // 8:size of bufferQueue
     Test_->consumerMap_[Camera::PREVIEW] = preview_consumer;
     Test_->streamInfos.push_back(Test_->streamInfo_pre);
-    // 配置录像流信息
+    // Configure video stream information
     Test_->streamInfo_video = std::make_shared<Camera::StreamInfo>();
     Test_->streamInfo_video->streamId_ = Test_->streamId_video;
     Test_->streamInfo_video->width_ = 1280; // 1280:width of stream
@@ -173,7 +173,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0002, TestSize.Level3)
     Test_->streamInfo_video->bufferQueue_->SetQueueSize(8); // 8:bufferqueue size
     Test_->consumerMap_[Camera::VIDEO] = consumer_video;
     Test_->streamInfos.push_back(Test_->streamInfo_video);
-    // 配流启流
+    // distribution start
     Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
     EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR);
     if (Test_->rc == Camera::NO_ERROR) {
@@ -190,11 +190,11 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0002, TestSize.Level3)
     }
     sleep(2); // 2:The program waits two seconds
     std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获录像流，连拍
+    // Capture video stream，Continuous capture
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    // 后处理
+    // post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -220,7 +220,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0003, TestSize.Level3)
     } else {
         std::cout << "==========[test log]GetStreamOperator fail, rc = " << Test_->rc << std::endl;
     }
-    // 配置预览流信息
+    // Configure preview stream information
     Test_->streamInfo_pre = std::make_shared<Camera::StreamInfo>();
     Test_->streamInfo_pre->streamId_ = Test_->streamId_preview;
     Test_->streamInfo_pre->width_ = 640; // 640:width of stream
@@ -238,7 +238,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0003, TestSize.Level3)
     Test_->streamInfo_pre->bufferQueue_->SetQueueSize(8); // 8:size of bufferQueue
     Test_->consumerMap_[Camera::PREVIEW] = preview_consumer;
     Test_->streamInfos.push_back(Test_->streamInfo_pre);
-    // 配置录像流信息
+    // Configure video stream information
     Test_->streamInfo_video = std::make_shared<Camera::StreamInfo>();
     Test_->streamInfo_video->streamId_ = Test_->streamId_video;
     Test_->streamInfo_video->width_ = 1280; // 1280:width of stream
@@ -258,7 +258,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0003, TestSize.Level3)
     Test_->streamInfo_video->bufferQueue_->SetQueueSize(8); // 8:bufferqueue size
     Test_->consumerMap_[Camera::VIDEO] = consumer_video;
     Test_->streamInfos.push_back(Test_->streamInfo_video);
-    // 配流启流
+    // distribution start
     Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
     EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR);
     if (Test_->rc == Camera::NO_ERROR) {
@@ -275,11 +275,11 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0003, TestSize.Level3)
     }
     sleep(2); // 2:The program waits two seconds
     std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获录像流，连拍
+    // Capture video stream，Continuous capture
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    // 后处理
+    // post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
