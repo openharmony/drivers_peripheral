@@ -44,14 +44,14 @@ HWTEST_F(VideoTest, Camera_Video_0001, TestSize.Level0)
 {
     std::cout << "==========[test log]Check video: Preview and video streams, ";
     std::cout << "Commit 2 streams together, capture in order." << std::endl;
-    // 配置两路流信息
+    // Configure two stream information
     Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获录像流
+    // Capture video stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    // 后处理
+    // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -67,12 +67,12 @@ HWTEST_F(VideoTest, Camera_Video_0002, TestSize.Level1)
 {
     std::cout << "==========[test log]Check video: Preview and video streams + 3A, ";
     std::cout << "Commit 2 streams together, capture in order." << std::endl;
-    // 配置两路流信息
+    // Configure two stream information
     Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 下发3A参数，增加曝光度
+    // Issue 3A parameters to increase exposure
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     int32_t expo = 0xb0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
@@ -82,10 +82,10 @@ HWTEST_F(VideoTest, Camera_Video_0002, TestSize.Level1)
     } else {
         std::cout << "==========[test log]check Capture: UpdateSettings fail, rc = " << Test_->rc << std::endl;
     }
-    // 捕获录像流
+    // Capture video stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
     sleep(5);
-    // 后处理
+    // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -101,28 +101,28 @@ HWTEST_F(VideoTest, Camera_Video_0003, TestSize.Level1)
 {
     std::cout << "==========[test log]Check video: Preview + video, ";
     std::cout << "commit together, then close device, and preview + video again." << std::endl;
-    // 配置两路流信息
+    // Configure two stream information
     Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获录像流
+    // Capture video stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    // 后处理
+    // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
     Test_->consumerMap_.clear();
     std::cout << "==========[test log]Check video: The 2nd time." << std::endl;
-    // 第二次配置两路流信息
-    // 配置两路流信息
+    // second Configure two stream information
+    // Configure two stream information
     Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获录像流
+    // Capture video stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    // 后处理
+    // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -138,28 +138,28 @@ HWTEST_F(VideoTest, Camera_Video_0004, TestSize.Level1)
 {
     std::cout << "==========[test log]Check video: Preview + video, ";
     std::cout << "commit together, then close device, and preview + capture." << std::endl;
-    // 配置两路流信息
+    // Configure two stream information
     Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获录像流
+    // Capture video stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    // 后处理
+    // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
     Test_->consumerMap_.clear();
 
     std::cout << "==========[test log]Check video: The 2nd time." << std::endl;
-    // 配置两路流信息
+    // Configure two stream information
     Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获拍照流，连拍
+    // Capture camera stream, continuous capture
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-    // 后处理
+    // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -174,14 +174,14 @@ HWTEST_F(VideoTest, Camera_Video_0004, TestSize.Level1)
 HWTEST_F(VideoTest, Camera_Video_0005, TestSize.Level0)
 {
     std::cout << "==========[test log]Check video: Preview + video, commit together, success." << std::endl;
-    // 配置两路流信息
+    // Configure two stream information
     Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 捕获录像流
+    // Capture video stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    // 后处理
+    // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -196,18 +196,18 @@ HWTEST_F(VideoTest, Camera_Video_0005, TestSize.Level0)
 HWTEST_F(VideoTest, Camera_Video_0020, TestSize.Level1)
 {
     std::cout << "==========[test log]Check video: Video mode, preview, success." << std::endl;
-    // 启动预览流
+    // Start preview stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 启流
+    // Start stream
     Test_->intents = {Camera::VIDEO};
     Test_->StartStream(Test_->intents);
-    // 抓拍
+    // Start capture
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    // 释放流
+    // Release stream
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -222,12 +222,12 @@ HWTEST_F(VideoTest, Camera_Video_0020, TestSize.Level1)
 HWTEST_F(VideoTest, Camera_Video_0021, TestSize.Level1)
 {
     std::cout << "==========[test log]Check video: Video mode, preview, set 3A, success." << std::endl;
-    // 配置两路流信息
+    // Configure two stream information
     Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 下发3A参数，增加曝光度
+    // Issue 3A parameters to increase exposure
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     int32_t expo = 0xc0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
@@ -237,10 +237,10 @@ HWTEST_F(VideoTest, Camera_Video_0021, TestSize.Level1)
     } else {
         std::cout << "==========[test log]check Capture: UpdateSettings fail, rc = " << Test_->rc << std::endl;
     }
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
     sleep(5);
-    // 后处理
+    // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -256,12 +256,12 @@ HWTEST_F(VideoTest, Camera_Video_0022, TestSize.Level2)
 {
     std::cout << "==========[test log]Check video: Preview and video streams + 3A, ";
     std::cout << "Commit 2 streams together, capture in order." << std::endl;
-    // 配置两路流信息
+    // Configure two stream information
     Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
     Test_->StartStream(Test_->intents);
-    // 捕获预览流
+    // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 下发3A参数，增加曝光度
+    // Issue 3A parameters to increase exposure
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     int32_t expo = 0xb0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
@@ -271,10 +271,10 @@ HWTEST_F(VideoTest, Camera_Video_0022, TestSize.Level2)
     } else {
         std::cout << "==========[test log]check Capture: UpdateSettings fail, rc = " << Test_->rc << std::endl;
     }
-    // 捕获录像流
+    // Capture video stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
     sleep(900);
-    // 后处理
+    // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);

@@ -74,7 +74,7 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0060, TestSize.Level0)
     std::cout << "==========[test log]Check hdi_device: UpdateSettings,";
     std::cout <<" OHOS_CONTROL_AE_EXPOSURE_COMPENSATION." << std::endl;
     Test_->Open();
-    // 下发3A参数
+    // Issue 3A parameters
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
@@ -94,19 +94,19 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0061, TestSize.Level2)
     std::cout << "==========[test log]Check hdi_device: UpdateSettings, ";
     std::cout <<"OHOS_CONTROL_AWB_MODE:OHOS_CONTROL_AWB_MODE_AUTO." << std::endl;
     Test_->Open();
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 下发3A参数
+    // Issue 3A parameters
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_AUTO;
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log]UpdateSettings, awb : OHOS_CONTROL_AWB_MODE_AUTO." << std::endl;
     Test_->cameraDevice->UpdateSettings(meta);
     sleep(2);
-    // 释放流
+    // Release stream
     Test_->streamIds = {Test_->streamId_preview};
     Test_->captureIds = {Test_->captureId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -123,19 +123,19 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0062, TestSize.Level2)
     std::cout << "==========[test log]Check hdi_device: UpdateSettings, ";
     std::cout <<"OHOS_CONTROL_AWB_MODE:OHOS_CONTROL_AWB_MODE_CLOUDY_DAYLIGHT." << std::endl;
     Test_->Open();
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 下发3A参数
+    // Issue 3A parameters
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_CLOUDY_DAYLIGHT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log]UpdateSettings, awb : OHOS_CONTROL_AWB_MODE_CLOUDY_DAYLIGHT." << std::endl;
     Test_->cameraDevice->UpdateSettings(meta);
     sleep(2);
-    // 释放流
+    // Release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -152,19 +152,19 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0063, TestSize.Level2)
     std::cout << "==========[test log]Check hdi_device: UpdateSettings,";
     std::cout << "OHOS_CONTROL_AWB_MODE:OHOS_CONTROL_AWB_MODE_TWILIGHT." << std::endl;
     Test_->Open();
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 下发3A参数
+    // Issue 3A parameters
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_TWILIGHT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log]UpdateSettings, awb : OHOS_CONTROL_AWB_MODE_TWILIGHT." << std::endl;
     Test_->cameraDevice->UpdateSettings(meta);
     sleep(2);
-    // 释放流
+    // Release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -181,19 +181,19 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0065, TestSize.Level2)
     std::cout << "==========[test log]Check hdi_device: UpdateSettings,";
     std::cout << "OHOS_CONTROL_AWB_MODE:OHOS_CONTROL_AWB_MODE_FLUORESCENT." << std::endl;
     Test_->Open();
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 下发3A参数
+    // Issue 3A parameters
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_FLUORESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log]UpdateSettings, awb : OHOS_CONTROL_AWB_MODE_FLUORESCENT." << std::endl;
     Test_->cameraDevice->UpdateSettings(meta);
     sleep(2);
-    // 释放流
+    // Release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -210,19 +210,19 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0066, TestSize.Level2)
     std::cout << "==========[test log]Check hdi_device: UpdateSettings,";
     std::cout << "OHOS_CONTROL_AWB_MODE:OHOS_CONTROL_AWB_MODE_WARM_FLUORESCENT." << std::endl;
     Test_->Open();
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 下发3A参数
+    // Issue 3A parameters
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log]UpdateSettings, awb : OHOS_CONTROL_AWB_MODE_WARM_FLUORESCENT." << std::endl;
     Test_->cameraDevice->UpdateSettings(meta);
     sleep(2);
-    // 释放流
+    // Release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -239,12 +239,12 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0067, TestSize.Level2)
     std::cout << "==========[test log]Check hdi_device: UpdateSettings,";
     std::cout <<" OHOS_CONTROL_AWB_MODE: illegal value(input AE value)." << std::endl;
     Test_->Open();
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 下发3A参数
+    // Issue 3A parameters
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AE_MODE_ON_ALWAYS_FLASH;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
@@ -252,7 +252,7 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0067, TestSize.Level2)
     std::cout << "cameraDevice->UpdateSettings's rc " << Test_->rc << std::endl;
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     sleep(5);
-    // 释放流
+    // Release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -269,12 +269,12 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0068, TestSize.Level2)
     std::cout << "==========[test log]Check hdi_device: UpdateSettings,";
     std::cout <<" OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, illegal value." << std::endl;
     Test_->Open();
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
-    // 下发3A参数
+    // Issue 3A parameters
     std::shared_ptr<Camera::CameraSetting> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     int32_t expo = 0xFFFF;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
@@ -282,7 +282,7 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0068, TestSize.Level2)
     std::cout << "cameraDevice->UpdateSettings's rc " << Test_->rc << std::endl;
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     sleep(5);
-    // 释放流
+    // Release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -359,13 +359,13 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0090, TestSize.Level0)
 {
     std::cout << "==========[test log]Check hdi_device: EnableResult one tag, without preview, success." << std::endl;
     Test_->Open();
-    // 获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device
     std::cout << "==========[test log]Check hdi_device: 1. Get the tags..." << std::endl;
     std::vector<Camera::MetaType> results_original;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results_original);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 
-    // 新增这个tag
+    // add this tag
     std::vector<Camera::MetaType> enable_tag;
     enable_tag.push_back(results_original[1]);
     std::cout << "==========[test log]Check hdi_device: 2. Enable the tag: " << results_original[1] << std::endl;
@@ -383,27 +383,27 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0091, TestSize.Level2)
 {
     std::cout << "==========[test log]Check hdi_device: EnableResult multiple tags, success." << std::endl;
     Test_->Open();
-    // 1、获取设备当前支持的参数tag
+    // 1、Get the parameter tag currently supported by the device
     std::vector<Camera::MetaType> results_original;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results_original);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 
-    // 2、禁用所有tag
+    // 2、Disable all tags
     std::cout << "then, disable the tag..." << std::endl;
     Test_->rc = Test_->cameraDevice->DisableResult(results_original);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 
-    // 3、再次获取设备当前支持的参数tag
+    // 3、Get the parameter tag currently supported by the device again
     std::vector<Camera::MetaType> results;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 
-    // 新增多个tag
+    // Add multiple tags
     std::cout << "then, enable the tag..." << std::endl;
     Test_->rc = Test_->cameraDevice->EnableResult(results_original);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 
-    // 再次获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device again
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 }
@@ -418,12 +418,12 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0092, TestSize.Level2)
 {
     std::cout << "==========[test log]Check hdi_device: EnableResult error tag, expected fail." << std::endl;
     Test_->Open();
-    // 获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device
     std::vector<Camera::MetaType> results_original;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results_original);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 
-    // 新增一个tag
+    // add a tag
     std::vector<Camera::MetaType> enable_tag;
     enable_tag.push_back(0);
     std::cout << "then, enable the tag..." << std::endl;
@@ -441,20 +441,20 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0100, TestSize.Level0)
 {
     std::cout << "==========[test log]Check hdi_device: DisEnabledReuslts, expected success." << std::endl;
     Test_->Open();
-    // 获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device
     std::vector<Camera::MetaType> results_original;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results_original);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     std::cout << "==========[test log]GetEnabledResults, size = " << results_original.size() << std::endl;
 
-    // 禁用一个tag
+    // Disable a tag
     std::vector<Camera::MetaType> disable_tag;
     disable_tag.push_back(results_original[2]);
     Test_->rc = Test_->cameraDevice->DisableResult(disable_tag);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     std::cout << "==========[test log]Check hdi_device: DisableResult the tag:" << results_original[0] << std::endl;
 
-    // 再次获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device again
     std::vector<Camera::MetaType> results;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
@@ -470,17 +470,17 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0101, TestSize.Level2)
 {
     std::cout << "==========[test log]Check hdi_device: DisableResult all tag, success." << std::endl;
     Test_->Open();
-    // 获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device
     std::vector<Camera::MetaType> results_original;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results_original);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 
-    // 禁用所有tag
+    // Disable all tags
     std::cout << "then, disable the tag..." << std::endl;
     Test_->rc = Test_->cameraDevice->DisableResult(results_original);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 
-    // 再次获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device again
     std::vector<Camera::MetaType> results;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
@@ -496,19 +496,19 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0102, TestSize.Level2)
 {
     std::cout << "==========[test log]Check hdi_device: DisableResult error tag, expected success." << std::endl;
     Test_->Open();
-    // 获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device
     std::vector<Camera::MetaType> results_original;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results_original);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 
-    // 禁用一个tag
+    // Disable a tag
     std::vector<Camera::MetaType> disable_tag;
     disable_tag.push_back(0);
     std::cout << "then, disenable the tag..." << std::endl;
     Test_->rc = Test_->cameraDevice->DisableResult(disable_tag);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 
-    // 再次获取设备当前支持的参数tag
+    // Get the parameter tag currently supported by the device again
     std::vector<Camera::MetaType> results;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);

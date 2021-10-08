@@ -39,14 +39,14 @@ void UtestPreviewTest::TearDown(void)
 TEST_F(UtestPreviewTest, camera_preview_0001)
 {
     std::cout << "==========[test log] Preview stream, expected success." << std::endl;
-    // 获取流管理器
+    // Get the stream manager
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -62,9 +62,9 @@ TEST_F(UtestPreviewTest, camera_preview_0001)
 TEST_F(UtestPreviewTest, camera_preview_0003)
 {
     std::cout << "==========[test log] Preview, format error, expected return errorCode." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -105,10 +105,10 @@ TEST_F(UtestPreviewTest, camera_preview_0003)
 TEST_F(UtestPreviewTest, camera_preview_0010)
 {
     std::cout << "==========[test log] GetStreamOperator success." << std::endl;
-    // 获取配置的cameraId
+    // Get the configured cameraId
     display_->cameraHost->GetCameraIds(display_->cameraIds);
     std::cout << "cameraIds.front() = " << display_->cameraIds.front() << std::endl;
-    // 打开camera设备并获取到device
+    // Open the camera device and get the device
     const std::shared_ptr<OHOS::Camera::ICameraDeviceCallback> callback =
         std::make_shared<OHOS::Camera::ICameraDeviceCallback>();
     display_->rc = display_->cameraHost->OpenCamera(display_->cameraIds.front(), callback, display_->cameraDevice);
@@ -127,16 +127,16 @@ TEST_F(UtestPreviewTest, camera_preview_0010)
 TEST_F(UtestPreviewTest, camera_preview_0011)
 {
     std::cout << "==========[test log] GetStreamOperator, input nullptr." << std::endl;
-    // 获取配置的cameraId
+    // Get the configured cameraId
     display_->cameraHost->GetCameraIds(display_->cameraIds);
     std::cout << "cameraIds.front() = " << display_->cameraIds.front() << std::endl;
-    // 打开camera设备并获取到device
+    // Open the camera device and get the device
     const std::shared_ptr<OHOS::Camera::ICameraDeviceCallback> callback =
         std::make_shared<OHOS::Camera::ICameraDeviceCallback>();
     display_->rc = display_->cameraHost->OpenCamera(display_->cameraIds.front(), callback, display_->cameraDevice);
     std::cout << "OpenCamera's RetCode = " << display_->rc << std::endl;
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     std::shared_ptr<OHOS::Camera::IStreamOperatorCallback> streamOperatorCallback = nullptr;
     display_->rc = display_->cameraDevice->GetStreamOperator(streamOperatorCallback, display_->streamOperator);
     std::cout << "GetStreamOperator's RetCode = " << display_->rc << std::endl;
@@ -153,9 +153,9 @@ TEST_F(UtestPreviewTest, camera_preview_0011)
 TEST_F(UtestPreviewTest, camera_preview_0020)
 {
     std::cout << "==========[test log] CreateStreams, success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -182,7 +182,7 @@ TEST_F(UtestPreviewTest, camera_preview_0020)
     std::cout << "CreateStreams's RetCode = " << display_->rc << std::endl;
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     std::cout << "==========[test log] CreateStreams, success." << std::endl;
-    // 提交流信息
+    // Submit stream information
     display_->rc = display_->streamOperator->CommitStreams(NORMAL, nullptr);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     if (display_->rc == Camera::NO_ERROR) {
@@ -190,9 +190,9 @@ TEST_F(UtestPreviewTest, camera_preview_0020)
     } else {
         std::cout << "==========[test log] CommitStreams fail, rc = " << display_->rc << std::endl;
     }
-    // 捕获
+    // capture
     display_->StartCapture(1001, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {1001};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -208,9 +208,9 @@ TEST_F(UtestPreviewTest, camera_preview_0020)
 TEST_F(UtestPreviewTest, camera_preview_0021)
 {
     std::cout << "==========[test log] CreateStreams, success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -254,7 +254,7 @@ TEST_F(UtestPreviewTest, camera_preview_0022)
     std::cout << "==========[test log] CreateStreams, StreamInfo->streamId = 2147483647,";
     std::cout << "return success." << std::endl;
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -285,13 +285,13 @@ TEST_F(UtestPreviewTest, camera_preview_0022)
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc << std::endl;
     }
-    // 提交流信息
+    // Submit stream information
     display_->rc = display_->streamOperator->CommitStreams(NORMAL, nullptr);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     std::cout << "==========[test log] CommitStreams success." << std::endl;
-    // 捕获
+    // capture
     display_->StartCapture(2147483647, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {2147483647};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -307,9 +307,9 @@ TEST_F(UtestPreviewTest, camera_preview_0022)
 TEST_F(UtestPreviewTest, camera_preview_0023)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->width = -1, return error." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -352,9 +352,9 @@ TEST_F(UtestPreviewTest, camera_preview_0023)
 TEST_F(UtestPreviewTest, camera_preview_0024)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->width = 2147483647, success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -380,10 +380,10 @@ TEST_F(UtestPreviewTest, camera_preview_0024)
     display_->rc = display_->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << display_->rc << std::endl;
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 提交流信息
+    // Submit stream information
     display_->rc = display_->streamOperator->CommitStreams(NORMAL, nullptr);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 捕获
+    // capture
     int captureId = 2001;
     display_->captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
     display_->captureInfo->streamIds_ = {1001};
@@ -391,7 +391,7 @@ TEST_F(UtestPreviewTest, camera_preview_0024)
     display_->rc = display_->streamOperator->Capture(captureId, display_->captureInfo, true);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     sleep(3);
-    // 释放流
+    // release stream
     std::vector<int> streamIds;
     streamIds.push_back(streamInfo->streamId_);
     display_->rc = display_->streamOperator->ReleaseStreams(streamIds);
@@ -410,9 +410,9 @@ TEST_F(UtestPreviewTest, camera_preview_0024)
 TEST_F(UtestPreviewTest, camera_preview_0025)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->height = -1, return error." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -455,9 +455,9 @@ TEST_F(UtestPreviewTest, camera_preview_0025)
 TEST_F(UtestPreviewTest, camera_preview_0026)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->height = 2147483647, success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -483,10 +483,10 @@ TEST_F(UtestPreviewTest, camera_preview_0026)
     display_->rc = display_->streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams's RetCode = " << display_->rc << std::endl;
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 提交流信息
+    // Submit stream information
     display_->rc = display_->streamOperator->CommitStreams(NORMAL, nullptr);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 捕获
+    // capture
     int captureId = 2001;
     display_->captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
     display_->captureInfo->streamIds_ = {1001};
@@ -494,7 +494,7 @@ TEST_F(UtestPreviewTest, camera_preview_0026)
     display_->rc = display_->streamOperator->Capture(captureId, display_->captureInfo, true);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     sleep(3);
-    // 释放流
+    // release stream
     std::vector<int> streamIds;
     streamIds.push_back(streamInfo->streamId_);
     display_->rc = display_->streamOperator->ReleaseStreams(streamIds);
@@ -514,7 +514,7 @@ TEST_F(UtestPreviewTest, camera_preview_0027)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->format = -1, return error." << std::endl;
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -557,9 +557,9 @@ TEST_F(UtestPreviewTest, camera_preview_0027)
 TEST_F(UtestPreviewTest, camera_preview_0028)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->format = 2147483647, success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -590,7 +590,7 @@ TEST_F(UtestPreviewTest, camera_preview_0028)
     }
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     std::cout << "==========[test log] CreateStreams, success." << std::endl;
-    // 提交流信息
+    // Submit stream information
     display_->rc = display_->streamOperator->CommitStreams(NORMAL, nullptr);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     if (display_->rc == Camera::NO_ERROR) {
@@ -598,9 +598,9 @@ TEST_F(UtestPreviewTest, camera_preview_0028)
     } else {
         std::cout << "==========[test log] CommitStreams fail, rc = " << display_->rc << std::endl;
     }
-    // 捕获
+    // capture
     display_->StartCapture(1001, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {1001};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -617,7 +617,7 @@ TEST_F(UtestPreviewTest, camera_preview_0029)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->datasapce = -1, return error." << std::endl;
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -660,9 +660,9 @@ TEST_F(UtestPreviewTest, camera_preview_0029)
 TEST_F(UtestPreviewTest, camera_preview_0030)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->datasapce = 2147483647, success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -693,13 +693,13 @@ TEST_F(UtestPreviewTest, camera_preview_0030)
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc << std::endl;
     }
-    // 提交流信息
+    // Submit stream information
     display_->rc = display_->streamOperator->CommitStreams(NORMAL, nullptr);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     std::cout << "==========[test log] CommitStreams success." << std::endl;
-    // 捕获
+    // capture
     display_->StartCapture(1001, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {1001};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -716,14 +716,14 @@ TEST_F(UtestPreviewTest, camera_preview_0031)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->StreamIntent = ";
     std::cout << "Camera::PREVIEW, success." << std::endl;
-    // 获取流管理器
+    // Get the stream manager
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 捕获
+    // capture
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -739,15 +739,15 @@ TEST_F(UtestPreviewTest, camera_preview_0031)
 TEST_F(UtestPreviewTest, camera_preview_0032)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->StreamIntent = Camera::VIDEO, success." << std::endl;
-    // 获取流管理器
+    // Get the stream manager
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW, Camera::VIDEO};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_video, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview, display_->streamId_capture};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -764,15 +764,15 @@ TEST_F(UtestPreviewTest, camera_preview_0033)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->StreamIntent = ";
     std::cout << "Camera::STILL_CAPTURE, success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_capture, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview, display_->streamId_capture};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -789,9 +789,9 @@ TEST_F(UtestPreviewTest, camera_preview_0034)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->StreamIntent = ";
     std::cout << "Camera::POST_VIEW;, success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建预览流
+    // Create preview stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -821,7 +821,7 @@ TEST_F(UtestPreviewTest, camera_preview_0034)
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc << std::endl;
     }
-    // 释放流
+    // release stream
     std::vector<int> streamIds;
     streamIds.push_back(streamInfo->streamId_);
     display_->rc = display_->streamOperator->ReleaseStreams(streamIds);
@@ -845,9 +845,9 @@ TEST_F(UtestPreviewTest, camera_preview_0035)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->StreamIntent = ";
     std::cout << "Camera::ANALYZE;, success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -874,7 +874,7 @@ TEST_F(UtestPreviewTest, camera_preview_0035)
     std::cout << "streamOperator->CreateStreams's RetCode = " << display_->rc << std::endl;
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     std::cout << "==========[test log] CreateStreams success." << std::endl;
-    // 释放流
+    // release stream
     std::vector<int> streamIds;
     streamIds.push_back(streamInfo->streamId_);
     display_->rc = display_->streamOperator->ReleaseStreams(streamIds);
@@ -899,9 +899,9 @@ TEST_F(UtestPreviewTest, camera_preview_0036)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->StreamIntent = ";
     std::cout << "Camera::CUSTOM, not support." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -944,9 +944,9 @@ TEST_F(UtestPreviewTest, camera_preview_0036)
 TEST_F(UtestPreviewTest, camera_preview_0037)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->tunneledMode = false, success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -990,9 +990,9 @@ TEST_F(UtestPreviewTest, camera_preview_0038)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->minFrameDuration = -1, ";
     std::cout << "return error." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -1033,9 +1033,9 @@ TEST_F(UtestPreviewTest, camera_preview_0039)
 {
     std::cout << "==========[test log] CreateStreams, StreamInfo->minFrameDuration = 2147483647, ";
     std::cout << "success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -1075,13 +1075,13 @@ TEST_F(UtestPreviewTest, camera_preview_0039)
 TEST_F(UtestPreviewTest, camera_preview_0040)
 {
     std::cout << "==========[test log] Preview, CommitStreams Metadata = nullptr." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 配流起流
+    // Distribution stream
     display_->rc = display_->streamOperator->CommitStreams(Camera::NORMAL, nullptr);
     std::cout << "streamOperator->CommitStreams's RetCode = " << display_->rc << std::endl;
     EXPECT_EQ(true, display_->rc == Camera::CamRetCode::DEVICE_ERROR);
-    // 释放流
+    // release stream
     std::vector<int> streamIds;
     streamIds.push_back(-1);
     display_->rc = display_->streamOperator->ReleaseStreams(streamIds);
@@ -1097,13 +1097,13 @@ TEST_F(UtestPreviewTest, camera_preview_0040)
 TEST_F(UtestPreviewTest, camera_preview_0050)
 {
     std::cout << "==========[test log] Preview, CommitStreams without CreateStreams, expected fail." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 配流起流
+    // Distribution stream
     display_->rc = display_->streamOperator->CommitStreams(Camera::NORMAL, nullptr);
     std::cout << "streamOperator->CommitStreams's RetCode = " << display_->rc << std::endl;
     EXPECT_EQ(true, display_->rc == Camera::CamRetCode::DEVICE_ERROR);
-    // 释放流
+    // release stream
     std::vector<int> streamIds;
     streamIds.push_back(-1);
     display_->rc = display_->streamOperator->ReleaseStreams(streamIds);
@@ -1119,9 +1119,9 @@ TEST_F(UtestPreviewTest, camera_preview_0050)
 TEST_F(UtestPreviewTest, camera_preview_0060)
 {
     std::cout << "==========[test log] Preview  and release streams, success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -1146,10 +1146,10 @@ TEST_F(UtestPreviewTest, camera_preview_0060)
     streamInfos.push_back(streamInfo);
     display_->rc = display_->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 配流起流
+    // Distribution stream
     display_->rc = display_->streamOperator->CommitStreams(Camera::NORMAL, nullptr);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 获取预览图
+    // Get preview
     int captureId = 2001;
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
     captureInfo->streamIds_ = {1001};
@@ -1159,7 +1159,7 @@ TEST_F(UtestPreviewTest, camera_preview_0060)
     sleep(5);
     display_->streamOperator->CancelCapture(captureId);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 释放流
+    // release stream
     display_->rc = display_->streamOperator->ReleaseStreams(captureInfo->streamIds_);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
 }
@@ -1174,9 +1174,9 @@ TEST_F(UtestPreviewTest, camera_preview_0060)
 TEST_F(UtestPreviewTest, camera_preview_0061)
 {
     std::cout << "==========[test log] ReleaseStreams-> streamID = -1, expected success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建预览流
+    // Create preview stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -1201,10 +1201,10 @@ TEST_F(UtestPreviewTest, camera_preview_0061)
     streamInfos.push_back(streamInfo);
     display_->rc = display_->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 配流起流
+    // Distribution stream
     display_->rc = display_->streamOperator->CommitStreams(Camera::NORMAL, nullptr);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 获取预览图
+    // Get preview
     int captureId = 2001;
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
     captureInfo->streamIds_ = {1001};
@@ -1214,7 +1214,7 @@ TEST_F(UtestPreviewTest, camera_preview_0061)
     sleep(5);
     display_->streamOperator->CancelCapture(captureId);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 释放流
+    // release stream
     display_->rc = display_->streamOperator->ReleaseStreams({-1});
     std::cout << "streamOperator->ReleaseStreams's rc = " << display_->rc << std::endl;
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
@@ -1233,7 +1233,7 @@ TEST_F(UtestPreviewTest, camera_preview_0061)
 TEST_F(UtestPreviewTest, camera_preview_0062)
 {
     std::cout << "==========[test log] ReleaseStreams no exist streamID, expect success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
     std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>> streamInfos;
     std::shared_ptr<OHOS::Camera::StreamInfo> streamInfo = std::make_shared<OHOS::Camera::StreamInfo>();
@@ -1252,9 +1252,9 @@ TEST_F(UtestPreviewTest, camera_preview_0062)
 TEST_F(UtestPreviewTest, camera_preview_0070)
 {
     std::cout << "==========[test log] Preview, Capture->captureInfo->streamID = -1 ,return error." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建预览流
+    // Create preview stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -1281,12 +1281,12 @@ TEST_F(UtestPreviewTest, camera_preview_0070)
     if (display_->rc != Camera::NO_ERROR)
     std::cout << "==============[test log]CreateStreams failed!" << std::endl;
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 配流起流
+    // Distribution stream
     display_->rc = display_->streamOperator->CommitStreams(Camera::NORMAL, nullptr);
     if (display_->rc != Camera::NO_ERROR)
     std::cout << "==============[test log]CommitStreams failed!" << std::endl;
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 获取预览图
+    // Get preview
     int captureId = 2001;
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
     captureInfo->streamIds_ = {-1};
@@ -1309,9 +1309,9 @@ TEST_F(UtestPreviewTest, camera_preview_0071)
 {
     std::cout << "==========[test log] Preview, Capture->captureInfo->streamID = 2147483647 ,";
     std::cout << "return success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -1336,10 +1336,10 @@ TEST_F(UtestPreviewTest, camera_preview_0071)
     streamInfos.push_back(streamInfo);
     display_->rc = display_->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 配流起流
+    // Distribution stream
     display_->rc = display_->streamOperator->CommitStreams(Camera::NORMAL, nullptr);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 获取预览图
+    // Get preview
     int captureId = 2001;
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
     captureInfo->streamIds_ = {2147483647};
@@ -1349,7 +1349,7 @@ TEST_F(UtestPreviewTest, camera_preview_0071)
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     sleep(5);
     display_->streamOperator->CancelCapture(captureId);
-    // 释放流
+    // release stream
     display_->rc = display_->streamOperator->ReleaseStreams(captureInfo->streamIds_);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
 }
@@ -1365,14 +1365,14 @@ TEST_F(UtestPreviewTest, camera_preview_0072)
 {
     std::cout << "==========[test log] Preview, Capture->captureInfo->enableShutterCallback = false ,";
     std::cout << "return success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -1388,12 +1388,12 @@ TEST_F(UtestPreviewTest, camera_preview_0072)
 TEST_F(UtestPreviewTest, camera_preview_0073)
 {
     std::cout << "==========[test log] Preview, Capture->isStreaming = false ,expected success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     int captureId = 2001;
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
     captureInfo->streamIds_ = {display_->streamId_preview};
@@ -1403,7 +1403,7 @@ TEST_F(UtestPreviewTest, camera_preview_0073)
     sleep(5);
     display_->streamOperator->CancelCapture(captureId);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 释放流
+    // release stream
     display_->rc = display_->streamOperator->ReleaseStreams(captureInfo->streamIds_);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
 }
@@ -1418,12 +1418,12 @@ TEST_F(UtestPreviewTest, camera_preview_0073)
 TEST_F(UtestPreviewTest, camera_preview_0074)
 {
     std::cout << "==========[test log] Preview, Capture->captureId = -1 ,return error." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     int captureId = -1;
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
     captureInfo->streamIds_ = {display_->streamId_preview};
@@ -1444,14 +1444,14 @@ TEST_F(UtestPreviewTest, camera_preview_0075)
 {
     std::cout << "==========[test log] Preview, Capture->captureInfo->enableShutterCallback = true ,";
     std::cout << "return success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, true, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -1467,9 +1467,9 @@ TEST_F(UtestPreviewTest, camera_preview_0075)
 TEST_F(UtestPreviewTest, camera_preview_0080)
 {
     std::cout << "==========[test log] CancelCapture captureID = -1, expected fail." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -1494,10 +1494,10 @@ TEST_F(UtestPreviewTest, camera_preview_0080)
     streamInfos.push_back(streamInfo);
     display_->rc = display_->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 配流起流
+    // Distribution stream
     display_->rc = display_->streamOperator->CommitStreams(Camera::NORMAL, nullptr);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 获取预览图
+    // Get preview
     int captureId = 100;
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
     captureInfo->streamIds_ = {1001};
@@ -1510,7 +1510,7 @@ TEST_F(UtestPreviewTest, camera_preview_0080)
     EXPECT_EQ(OHOS::Camera::CamRetCode::INVALID_ARGUMENT, display_->rc);
     display_->rc = display_->streamOperator->CancelCapture(captureId);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    // 释放流
+    // release stream
     display_->rc = display_->streamOperator->ReleaseStreams(captureInfo->streamIds_);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
 }
@@ -1525,12 +1525,12 @@ TEST_F(UtestPreviewTest, camera_preview_0080)
 TEST_F(UtestPreviewTest, camera_preview_0090)
 {
     std::cout << "==========[test log] CancelCapture without Create capture ." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     int captureId = 100;
     display_->rc = display_->streamOperator->CancelCapture(captureId);
     if (display_->rc == Camera::NO_ERROR) {
@@ -1551,14 +1551,14 @@ TEST_F(UtestPreviewTest, camera_preview_0090)
 TEST_F(UtestPreviewTest, camera_preview_0091)
 {
     std::cout << "==========[test log] Create capture, then release streams." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -1574,15 +1574,15 @@ TEST_F(UtestPreviewTest, camera_preview_0091)
 TEST_F(UtestPreviewTest, camera_preview_0092)
 {
     std::cout << "==========[test log] The same CaptureID, Create capture twice, expected fail." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 启流
+    // start stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    // 释放流
+    // release stream
     display_->captureIds = {display_->captureId_preview};
     display_->streamIds = {display_->streamId_preview};
     display_->StopStream(display_->captureIds, display_->streamIds);
@@ -1598,12 +1598,12 @@ TEST_F(UtestPreviewTest, camera_preview_0092)
 TEST_F(UtestPreviewTest, camera_preview_0093)
 {
     std::cout << "==========[test log] Different captureIDs, Create capture，expected success." << std::endl;
-    // 创建并获取streamOperator信息
+    // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    // 创建数据流
+    // Create data stream
     display_->intents = {Camera::PREVIEW};
     display_->StartStream(display_->intents);
-    // 获取预览图
+    // Get preview
     int captureId = 100;
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
     captureInfo->streamIds_ = {display_->streamId_preview};
@@ -1614,7 +1614,7 @@ TEST_F(UtestPreviewTest, camera_preview_0093)
     display_->rc = display_->streamOperator->Capture(captureId + 1, captureInfo, isStreaming);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
     display_->streamOperator->CancelCapture(captureId);
-    // 释放流
+    // release stream
     display_->rc = display_->streamOperator->ReleaseStreams(captureInfo->streamIds_);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
 }

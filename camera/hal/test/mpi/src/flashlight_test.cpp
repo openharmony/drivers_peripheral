@@ -104,10 +104,10 @@ HWTEST_F(FlashlightTest, Camera_Flashlight_0010, TestSize.Level1)
     std::cout << "==========[test log]Open the camera, preview, then turn on the flashlight,";
     std::cout <<" expected return errorcode." << std::endl;
     Test_->Open();
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     Test_->status = true;
     Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), Test_->status);
@@ -120,7 +120,7 @@ HWTEST_F(FlashlightTest, Camera_Flashlight_0010, TestSize.Level1)
     }
     std::cout << "==========[test log]turn off/on flashlight fail, preview go on, for 5s." << std::endl;
     sleep(5);
-    // 释放流
+    // release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -137,10 +137,10 @@ HWTEST_F(FlashlightTest, Camera_Flashlight_0011, TestSize.Level1)
     std::cout << "==========[test log]Open the camera, preview, then turn on the flashlight,";
     std::cout <<" expected return errorcode." << std::endl;
     Test_->Open();
-    // 启动流
+    // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
-    // 获取预览图
+    // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     Test_->status = false;
     Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), Test_->status);
@@ -152,7 +152,7 @@ HWTEST_F(FlashlightTest, Camera_Flashlight_0011, TestSize.Level1)
     }
     std::cout << "==========[test log]turn off the flashlight fail, preview go on, for 5s." << std::endl;
     sleep(5);
-    // 释放流
+    // release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
@@ -171,9 +171,9 @@ HWTEST_F(FlashlightTest, Camera_Flashlight_0020, TestSize.Level1)
     Test_->status = true;
     Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), Test_->status);
     sleep(5);
-    // 打开相机，预览
+    // Open the camera, preview
     Test_->Open();
-    // 这里想查询手电筒状态，目前只支持回调上报
+    // query the status of the flashlight, currently only supports callback reporting
     std::cout << "==========[test log]check the flashlight status is off." << std::endl;
     sleep(5);
 }

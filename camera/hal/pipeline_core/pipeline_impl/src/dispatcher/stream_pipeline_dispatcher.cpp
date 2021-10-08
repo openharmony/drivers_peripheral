@@ -189,7 +189,7 @@ std::shared_ptr<INode> StreamPipelineDispatcher::GetNode(const int32_t streamId,
 
     std::shared_ptr<INode> node = nullptr;
     for (auto it = seqNode_[streamId].rbegin(); it != seqNode_[streamId].rend(); it++) {
-        if (name == (*it)->GetName().substr(0, 3)) { // 0:复制字符串的起始位 3:复制字符串的长度 从指定位置得到名字
+        if (name == (*it)->GetName().substr(0, 3)) {  // 3:Copy length
             node = *it;
         }
     }

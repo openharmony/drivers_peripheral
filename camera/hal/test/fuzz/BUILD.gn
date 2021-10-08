@@ -534,7 +534,7 @@ group("fuzztest") {
   testonly = true
   deps = [
     ":IPCCameraDeviceCallback_fuzzer",
-    ":IPCCameraDeviceRemote_fuzzer",  #引用测试套
+    ":IPCCameraDeviceRemote_fuzzer",
     ":IPCCameraHostCallback_fuzzer",
     ":IPCCameraHostService_fuzzer",
     ":IPCOffline_fuzzer",

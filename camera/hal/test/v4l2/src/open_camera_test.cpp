@@ -209,7 +209,7 @@ TEST_F(UtestOpenCameraTest, camera_open_0050)
 
 int main(int argc, char *argv[])
 {
-    // 开始批跑
+    // start running all tests
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

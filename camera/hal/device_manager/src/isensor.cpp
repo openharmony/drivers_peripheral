@@ -86,6 +86,6 @@ void ISensor::InitSensitivityRange(CameraStandard::CameraMetadata& camera_meta_d
     };
     camera_meta_data.addEntry(OHOS_SENSOR_INFO_SENSITIVITY_RANGE,
         &sensitivityRange,
-        sizeof(sensitivityRange) / sizeof(int32_t)); // sensor灵敏度范围
+        sizeof(sensitivityRange) / sizeof(int32_t)); // sensor sensitivity range
 }
 } // namespace OHOS::Camera
