@@ -41,12 +41,12 @@ namespace {
     };
 
     static struct SensorValueRange g_testRange[] = {{1e5, 0}};
-    static struct SensorValueRange g_accelRange[] = {{78, 0}, {78, 0}, {78, 0}};
+    static struct SensorValueRange g_accelRange[] = {{78, -78}, {78, -78}, {78, -78}};
     static struct SensorValueRange g_alsRange[] = {{10000, 0}, {10000, 0}, {10000, 0}, {10000, 0}};
     static struct SensorValueRange g_proximityRange[] = {{5, 0}};
     static struct SensorValueRange g_hallRange[] = {{1, 0}};
-    static struct SensorValueRange g_barometerRange[] = {{1100, 300}, {85, -40}};
-    static struct SensorValueRange magneticRange[] = {{35, 0},{35, 0},{35, 0}};
+    static struct SensorValueRange g_barometerRange[] = {{1100, -1100}, {1100, -1100}};
+    static struct SensorValueRange g_magneticRange[] = {{35, -35}, {35, -35}, {35, -35}};
 
     static struct SensorDevelopmentList g_sensorList[] = {
         {SENSOR_TYPE_NONE, "sensor_test", "default", 1, 1, g_testRange},
@@ -55,7 +55,7 @@ namespace {
         {SENSOR_TYPE_HALL, "hallrometer", "akm_ak8789", 0, 1, g_hallRange},
         {SENSOR_TYPE_BAROMETER, "barometer", "borsh_bmp180", 1, 2, g_barometerRange},
         {SENSOR_TYPE_AMBIENT_LIGHT, "als", "rohm_bh1745", 1, 4, g_alsRange},
-        {SENSOR_TYPE_MAGNETIC_FIELD, "magnetometer", "st_lsm303", 1, 3, magneticRange},
+        {SENSOR_TYPE_MAGNETIC_FIELD, "magnetometer", "st_lsm303", 1, 3, g_magneticRange},
     };
 
     static int g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
