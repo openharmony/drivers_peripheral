@@ -273,7 +273,7 @@ HWTEST_F(VideoTest, Camera_Video_0022, TestSize.Level2)
     }
     // Capture video stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    sleep(900);
+    sleep(300);
     // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
