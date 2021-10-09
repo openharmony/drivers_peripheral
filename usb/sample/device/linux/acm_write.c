@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "usb_dev_test.h"
 #include <hdf_log.h>
 #include <hdf_remote_service.h>
 #include <hdf_sbuf.h>
@@ -24,9 +25,9 @@
 
 #define HDF_LOG_TAG   cdc_acm_write
 
-struct HdfSBuf *g_data;
-struct HdfSBuf *g_reply;
-struct HdfRemoteService *g_acmService;
+static struct HdfSBuf *g_data;
+static struct HdfSBuf *g_reply;
+static struct HdfRemoteService *g_acmService;
 
 static void TestWrite(char *buf)
 {
@@ -40,7 +41,7 @@ static void TestWrite(char *buf)
 
 #define STR_LEN 1024
 #define NUM_INPUT 2
-int main(int argc, char *argv[])
+int acm_write(int argc, char *argv[])
 {
     char str[STR_LEN] = {0};
     int status;

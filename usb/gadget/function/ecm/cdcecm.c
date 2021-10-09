@@ -433,10 +433,10 @@ static int32_t UsbEcmWrite(struct UsbEcm *port, struct HdfSBuf *data)
 
 static void EcmDoNotify(struct UsbEcmDevice *ecm)
 {
-    struct UsbFnRequest     *req = ecm->notifyReq;
+    struct UsbFnRequest *req = ecm->notifyReq;
     struct UsbCdcNotification *event = NULL;
-    uint32_t        *data = NULL;
-    int             status;
+    uint32_t *data = NULL;
+    int status;
 
     if (!req) {
         return;
@@ -500,7 +500,7 @@ static void EcmNotify(struct UsbEcmDevice *ecm)
 
 static void EcmNotifyComplete(uint8_t pipe, struct UsbFnRequest *req)
 {
-    struct UsbEcmDevice         *ecm = req->context;
+    struct UsbEcmDevice *ecm = req->context;
     struct UsbCdcNotification *event = req->buf;
     ecm->notifyReq = req;
     switch (req->status) {
@@ -517,10 +517,10 @@ static void EcmNotifyComplete(uint8_t pipe, struct UsbFnRequest *req)
 static int EcmSetup(const struct UsbEcmDevice *ecm, const struct UsbFnCtrlRequest *ctrl)
 {
     struct UsbFnRequest *req = ecm->ep0Req;
-    int         ret = -1;
-    uint16_t    index = Le16ToCpu(ctrl->index);
-    uint16_t    value = Le16ToCpu(ctrl->value);
-    uint16_t    length = Le16ToCpu(ctrl->length);
+    int ret = -1;
+    uint16_t index = Le16ToCpu(ctrl->index);
+    uint16_t value = Le16ToCpu(ctrl->value);
+    uint16_t length = Le16ToCpu(ctrl->length);
 
     switch ((ctrl->reqType << 0x08) | ctrl->request) {
         case ((USB_DDK_DIR_OUT | USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE) << 0x08)
@@ -607,7 +607,6 @@ static int32_t EcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
 
 static int EcmEnable(struct UsbEcmDevice *ecm)
 {
-
     int ret;
     struct UsbEcm *port = ecm->port;
 
@@ -629,7 +628,6 @@ static int EcmEnable(struct UsbEcmDevice *ecm)
 
     return HDF_SUCCESS;
 }
-
 
 static void EcmDisable(const struct UsbEcmDevice *ecm)
 {
@@ -723,6 +721,7 @@ static int32_t EcmParseEachPipe(struct UsbEcmDevice *ecm, struct UsbEcmInterface
     int ret;
     for (i = 0; i < fnIface->info.numPipes; i++) {
         struct UsbFnPipeInfo pipeInfo;
+        (void)memset_s(&pipeInfo, sizeof(pipeInfo), 0, sizeof(pipeInfo));
         ret = UsbFnGetInterfacePipeInfo(fnIface, i, &pipeInfo);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s: get pipe info error", __func__);

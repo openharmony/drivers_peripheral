@@ -82,7 +82,7 @@ struct UsbAcmPipe {
 
 struct UsbAcmInterface {
     struct UsbFnInterface       *fn;
-    UsbFnInterfaceHandle                   handle;
+    UsbFnInterfaceHandle        handle;
 };
 
 struct UsbAcmDevice {

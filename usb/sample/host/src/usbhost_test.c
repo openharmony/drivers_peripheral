@@ -28,7 +28,11 @@
 #define ARGV_CMD_PARAM      (PARAM_SET_CMD_LEN - ARGV_CMD_API_TYPE)
 #define READ_SLEEP_TIME     500
 int run;
+
+#ifdef __LITEOS_USB_HOST_DDK_TEST__
 static struct OsalThread      g_Getchar;
+#endif
+
 void TestHelp(void)
 {
     printf("usage: usbhost_ddk_test [options]\n");
@@ -275,7 +279,7 @@ static void *SigHandle(void *arg)
 {
     run = 0;
 }
-#endif
+
 static int GetCharThread(void *arg)
 {
     char str[STR_LEN] = {0};
@@ -284,9 +288,12 @@ static int GetCharThread(void *arg)
     }
     return 0;
 }
+#endif
+
 #define HDF_PROCESS_STACK_SIZE 10000
 static int StartThreadGetChar()
 {
+#ifdef __LITEOS_USB_HOST_DDK_TEST__
     int ret;
     struct OsalThreadParam threadCfg;
     memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
@@ -305,6 +312,7 @@ static int StartThreadGetChar()
         HDF_LOGE("%s:%d OsalThreadStart faile, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
+#endif
     return 0;
 }
 

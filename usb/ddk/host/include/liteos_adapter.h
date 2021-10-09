@@ -105,7 +105,7 @@ struct UsbOsAdapterOps {
     struct UsbHostRequest *(*allocRequest)(const struct UsbDeviceHandle *handle, int isoPackets, size_t len);
     int (*freeRequest)(struct UsbHostRequest *request);
     int (*submitRequest)(struct UsbHostRequest *request);
-    int (*cancelRequest)(struct UsbHostRequest *request);
+    int (*cancelRequest)(const struct UsbHostRequest *request);
     int (*urbCompleteHandle)(const struct UsbDeviceHandle *devHandle);
 };
 

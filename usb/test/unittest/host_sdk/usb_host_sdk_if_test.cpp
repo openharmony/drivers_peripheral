@@ -41,13 +41,13 @@ public:
     void TearDown();
 };
 
-static struct UsbSession *session = NULL;
+static struct UsbSession *g_session = NULL;
 static struct AcmDevice g_deviceService;
-static struct AcmDevice *acm = &g_deviceService;
-static struct UsbInterface *ecm_dataIface = NULL;
-static struct UsbInterface *ecm_intIface = NULL;
-static UsbInterfaceHandle *ecm_data_devHandle = NULL;
-static UsbInterfaceHandle *ecm_int_devHandle = NULL;
+static struct AcmDevice *g_acm = &g_deviceService;
+static struct UsbInterface *g_ecmDataIface = NULL;
+static struct UsbInterface *g_ecmIntIface = NULL;
+static UsbInterfaceHandle *g_ecmDataDevHandle = NULL;
+static UsbInterfaceHandle *g_ecmIntDevHandle = NULL;
 
 void UsbHostSdkIfTest::SetUpTestCase()
 {
@@ -201,8 +201,8 @@ static struct UsbControlRequest UsbControlMsg(struct TestControlMsgData msgData)
 {
     struct UsbControlRequest dr;
     dr.target = (UsbRequestTargetType)(msgData.requestType & TARGET_MASK);
-    dr.reqType = (UsbControlRequestType)((msgData.requestType >> 5) & REQUEST_TYPE_MASK);
-    dr.directon = (UsbRequestDirection)((msgData.requestType >> 7) & DIRECTION_MASK);
+    dr.reqType = (UsbControlRequestType)((msgData.requestType >> USB_TYPE_OFFSET) & REQUEST_TYPE_MASK);
+    dr.directon = (UsbRequestDirection)((msgData.requestType >> USB_DIR_OFFSET) & DIRECTION_MASK);
     dr.request = msgData.request;
     dr.value = CpuToLe16(msgData.value);
     dr.index = CpuToLe16(msgData.index);
@@ -221,9 +221,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfInit001, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbInitHostSdk(&session);
+    ret = UsbInitHostSdk(&g_session);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    acm->session = session;
+    g_acm->session = g_session;
 }
 
 /**
@@ -236,7 +236,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfExit001, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbExitHostSdk(acm->session);
+    ret = UsbExitHostSdk(g_acm->session);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -281,10 +281,10 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfInit003, TestSize.Level1)
 
     for (i = 0; i < 100; i++)
     {
-        ret = UsbInitHostSdk(&session);
+        ret = UsbInitHostSdk(&g_session);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        acm->session = session;
-        ret = UsbExitHostSdk(acm->session);
+        g_acm->session = g_session;
+        ret = UsbExitHostSdk(g_acm->session);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
@@ -355,9 +355,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfInit006, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbInitHostSdk(&session);
+    ret = UsbInitHostSdk(&g_session);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    acm->session = session;
+    g_acm->session = g_session;
 }
 
 /**
@@ -368,13 +368,13 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfInit006, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface001, TestSize.Level1)
 {
-    acm->busNum = 1U;
-    acm->devAddr = 2U;
-    acm->interfaceIndex = 1U;
+    g_acm->busNum = 1U;
+    g_acm->devAddr = 2U;
+    g_acm->interfaceIndex = 1U;
 
-    acm->dataIface =  (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum,
-        acm->devAddr, acm->interfaceIndex);
-    EXPECT_NE(nullptr,  acm->dataIface);
+    g_acm->dataIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
+        g_acm->devAddr, g_acm->interfaceIndex);
+    EXPECT_NE(nullptr,  g_acm->dataIface);
 }
 
 /**
@@ -387,7 +387,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfReleaseInterface001, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbReleaseInterface(acm->dataIface);
+    ret = UsbReleaseInterface(g_acm->dataIface);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -399,13 +399,13 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfReleaseInterface001, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface002, TestSize.Level1)
 {
-    acm->busNum = 1U;
-    acm->devAddr = 2U;
-    acm->interfaceIndex = 0U;
+    g_acm->busNum = 1U;
+    g_acm->devAddr = 2U;
+    g_acm->interfaceIndex = 0U;
 
-    acm->intIface =  (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum,
-        acm->devAddr, acm->interfaceIndex);
-    EXPECT_NE(nullptr,  acm->intIface);
+    g_acm->intIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
+        g_acm->devAddr, g_acm->interfaceIndex);
+    EXPECT_NE(nullptr,  g_acm->intIface);
 }
 
 /**
@@ -418,7 +418,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfReleaseInterface002, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbReleaseInterface(acm->intIface);
+    ret = UsbReleaseInterface(g_acm->intIface);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -430,13 +430,13 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfReleaseInterface002, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface003, TestSize.Level1)
 {
-    acm->busNum = 1U;
-    acm->devAddr = 2U;
-    acm->interfaceIndex = 255U;
+    g_acm->busNum = 1U;
+    g_acm->devAddr = 2U;
+    g_acm->interfaceIndex = 255U;
 
-    acm->ctrIface =  (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum,
-        acm->devAddr, acm->interfaceIndex);
-    EXPECT_NE(nullptr,  acm->ctrIface);
+    g_acm->ctrIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
+        g_acm->devAddr, g_acm->interfaceIndex);
+    EXPECT_NE(nullptr,  g_acm->ctrIface);
 }
 
 /**
@@ -449,7 +449,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfReleaseInterface003, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbReleaseInterface(acm->ctrIface);
+    ret = UsbReleaseInterface(g_acm->ctrIface);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -476,13 +476,13 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfReleaseInterface004, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface004, TestSize.Level1)
 {
-    acm->busNum = 1U;
-    acm->devAddr = 2U;
-    acm->interfaceIndex = 2U;
+    g_acm->busNum = 1U;
+    g_acm->devAddr = 2U;
+    g_acm->interfaceIndex = 2U;
 
-    acm->dataIface =  (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum,
-        acm->devAddr, acm->interfaceIndex);
-    EXPECT_NE(nullptr,  acm->dataIface);
+    g_acm->dataIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
+        g_acm->devAddr, g_acm->interfaceIndex);
+    EXPECT_NE(nullptr,  g_acm->dataIface);
 }
 
 /**
@@ -493,13 +493,13 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface004, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface005, TestSize.Level1)
 {
-    acm->busNum = 1U;
-    acm->devAddr = 2U;
-    acm->interfaceIndex = 3U;
+    g_acm->busNum = 1U;
+    g_acm->devAddr = 2U;
+    g_acm->interfaceIndex = 3U;
 
-    acm->dataIface =  (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum,
-        acm->devAddr, acm->interfaceIndex);
-    EXPECT_NE(nullptr,  acm->dataIface);
+    g_acm->dataIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
+        g_acm->devAddr, g_acm->interfaceIndex);
+    EXPECT_NE(nullptr,  g_acm->dataIface);
 }
 
 /**
@@ -510,34 +510,34 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface005, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface006, TestSize.Level1)
 {
-    acm = &g_deviceService;
-    acm->busNum = 1U;
-    acm->devAddr = 2U;
+    g_acm = &g_deviceService;
+    g_acm->busNum = 1U;
+    g_acm->devAddr = 2U;
 
-    acm->interfaceIndex = 3U;
-    acm->dataIface =  (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum,
-        acm->devAddr, acm->interfaceIndex);
-    EXPECT_NE(nullptr,  acm->dataIface);
+    g_acm->interfaceIndex = 3U;
+    g_acm->dataIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
+        g_acm->devAddr, g_acm->interfaceIndex);
+    EXPECT_NE(nullptr,  g_acm->dataIface);
 
-    acm->interfaceIndex = 2U;
-    acm->intIface =  (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum,
-        acm->devAddr, acm->interfaceIndex);
-    EXPECT_NE(nullptr,  acm->intIface);
+    g_acm->interfaceIndex = 2U;
+    g_acm->intIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
+        g_acm->devAddr, g_acm->interfaceIndex);
+    EXPECT_NE(nullptr,  g_acm->intIface);
 
-    acm->interfaceIndex = 0U;
-    ecm_intIface =  (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum,
-        acm->devAddr, acm->interfaceIndex);
-    EXPECT_NE(nullptr,  ecm_intIface);
+    g_acm->interfaceIndex = 0U;
+    g_ecmIntIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
+        g_acm->devAddr, g_acm->interfaceIndex);
+    EXPECT_NE(nullptr,  g_ecmIntIface);
 
-    acm->interfaceIndex = 1U;
-    ecm_dataIface =  (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum,
-        acm->devAddr, acm->interfaceIndex);
-    EXPECT_NE(nullptr,  ecm_dataIface);
+    g_acm->interfaceIndex = 1U;
+    g_ecmDataIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
+        g_acm->devAddr, g_acm->interfaceIndex);
+    EXPECT_NE(nullptr,  g_ecmDataIface);
 
-    acm->interfaceIndex = 255U;
-    acm->ctrIface =  (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum,
-        acm->devAddr, acm->interfaceIndex);
-    EXPECT_NE(nullptr,  acm->ctrIface);
+    g_acm->interfaceIndex = 255U;
+    g_acm->ctrIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
+        g_acm->devAddr, g_acm->interfaceIndex);
+    EXPECT_NE(nullptr,  g_acm->ctrIface);
 }
 
 /**
@@ -548,8 +548,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface006, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfOpenInterface001, TestSize.Level1)
 {
-    acm->data_devHandle = UsbOpenInterface(acm->dataIface);
-    EXPECT_NE(nullptr,  acm->data_devHandle);
+    g_acm->data_devHandle = UsbOpenInterface(g_acm->dataIface);
+    EXPECT_NE(nullptr,  g_acm->data_devHandle);
 }
 
 /**
@@ -562,7 +562,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface001, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbCloseInterface(acm->data_devHandle);
+    ret = UsbCloseInterface(g_acm->data_devHandle);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -574,8 +574,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface001, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfOpenInterface002, TestSize.Level1)
 {
-    acm->int_devHandle = UsbOpenInterface(acm->intIface);
-    EXPECT_NE(nullptr,  acm->int_devHandle);
+    g_acm->int_devHandle = UsbOpenInterface(g_acm->intIface);
+    EXPECT_NE(nullptr,  g_acm->int_devHandle);
 }
 
 /**
@@ -588,7 +588,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface002, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbCloseInterface(acm->int_devHandle);
+    ret = UsbCloseInterface(g_acm->int_devHandle);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -600,8 +600,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface002, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfOpenInterface003, TestSize.Level1)
 {
-    acm->ctrl_devHandle = UsbOpenInterface(acm->ctrIface);
-    EXPECT_NE(nullptr,  acm->ctrl_devHandle);
+    g_acm->ctrl_devHandle = UsbOpenInterface(g_acm->ctrIface);
+    EXPECT_NE(nullptr,  g_acm->ctrl_devHandle);
 }
 
 /**
@@ -628,7 +628,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface004, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbCloseInterface(acm->ctrl_devHandle);
+    ret = UsbCloseInterface(g_acm->ctrl_devHandle);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -640,8 +640,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface004, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfOpenInterface004, TestSize.Level1)
 {
-    acm->data_devHandle = UsbOpenInterface(NULL);
-    EXPECT_EQ(nullptr,  acm->data_devHandle);
+    g_acm->data_devHandle = UsbOpenInterface(NULL);
+    EXPECT_EQ(nullptr,  g_acm->data_devHandle);
 }
 
 /**
@@ -656,8 +656,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfOpenInterface005, TestSize.Level1)
 
     for (i = 0; i < 100; i++)
     {
-        acm->data_devHandle = UsbOpenInterface(acm->dataIface);
-        EXPECT_NE(nullptr,  acm->data_devHandle);
+        g_acm->data_devHandle = UsbOpenInterface(g_acm->dataIface);
+        EXPECT_NE(nullptr,  g_acm->data_devHandle);
     }
 }
 
@@ -669,16 +669,16 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfOpenInterface005, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfOpenInterface006, TestSize.Level1)
 {
-    acm->data_devHandle = UsbOpenInterface(acm->dataIface);
-    EXPECT_NE(nullptr,  acm->data_devHandle);
-    acm->int_devHandle = UsbOpenInterface(acm->intIface);
-    EXPECT_NE(nullptr,  acm->int_devHandle);
-    acm->ctrl_devHandle = UsbOpenInterface(acm->ctrIface);
-    EXPECT_NE(nullptr,  acm->ctrl_devHandle);
-    ecm_data_devHandle = UsbOpenInterface(ecm_dataIface);
-    EXPECT_NE(nullptr,  ecm_data_devHandle);
-    ecm_int_devHandle = UsbOpenInterface(ecm_intIface);
-    EXPECT_NE(nullptr,  ecm_int_devHandle);
+    g_acm->data_devHandle = UsbOpenInterface(g_acm->dataIface);
+    EXPECT_NE(nullptr,  g_acm->data_devHandle);
+    g_acm->int_devHandle = UsbOpenInterface(g_acm->intIface);
+    EXPECT_NE(nullptr,  g_acm->int_devHandle);
+    g_acm->ctrl_devHandle = UsbOpenInterface(g_acm->ctrIface);
+    EXPECT_NE(nullptr,  g_acm->ctrl_devHandle);
+    g_ecmDataDevHandle = UsbOpenInterface(g_ecmDataIface);
+    EXPECT_NE(nullptr,  g_ecmDataDevHandle);
+    g_ecmIntDevHandle = UsbOpenInterface(g_ecmIntIface);
+    EXPECT_NE(nullptr,  g_ecmIntDevHandle);
 }
 
 /**
@@ -692,7 +692,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting001, TestSize.Lev
     int ret;
     int settingIndex = 0;
 
-    ret = UsbSelectInterfaceSetting(ecm_data_devHandle, settingIndex, &ecm_dataIface);
+    ret = UsbSelectInterfaceSetting(g_ecmDataDevHandle, settingIndex, &g_ecmDataIface);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -707,7 +707,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting002, TestSize.Lev
     int ret;
     int settingIndex = 10;
 
-    ret = UsbSelectInterfaceSetting(ecm_data_devHandle, settingIndex, &ecm_dataIface);
+    ret = UsbSelectInterfaceSetting(g_ecmDataDevHandle, settingIndex, &g_ecmDataIface);
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 
@@ -722,7 +722,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting003, TestSize.Lev
     int ret;
     int settingIndex = 100;
 
-    ret = UsbSelectInterfaceSetting(ecm_data_devHandle, settingIndex, &ecm_dataIface);
+    ret = UsbSelectInterfaceSetting(g_ecmDataDevHandle, settingIndex, &g_ecmDataIface);
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 
@@ -737,7 +737,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting004, TestSize.Lev
     int ret;
     int settingIndex = 200;
 
-    ret = UsbSelectInterfaceSetting(ecm_data_devHandle, settingIndex, &ecm_dataIface);
+    ret = UsbSelectInterfaceSetting(g_ecmDataDevHandle, settingIndex, &g_ecmDataIface);
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 
@@ -752,7 +752,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting005, TestSize.Lev
     int ret;
     int settingIndex = 255;
 
-    ret = UsbSelectInterfaceSetting(ecm_data_devHandle, settingIndex, &ecm_dataIface);
+    ret = UsbSelectInterfaceSetting(g_ecmDataDevHandle, settingIndex, &g_ecmDataIface);
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 
@@ -767,7 +767,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting006, TestSize.Lev
     int ret;
     int settingIndex = 1;
 
-    ret = UsbSelectInterfaceSetting(ecm_data_devHandle, settingIndex, &ecm_dataIface);
+    ret = UsbSelectInterfaceSetting(g_ecmDataDevHandle, settingIndex, &g_ecmDataIface);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -779,12 +779,13 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting006, TestSize.Lev
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface007, TestSize.Level1)
 {
-    acm->busNum = 1U;
-    acm->devAddr = 2U;
-    acm->interfaceIndex = 0U;
+    g_acm->busNum = 1U;
+    g_acm->devAddr = 2U;
+    g_acm->interfaceIndex = 0U;
 
-    ecm_intIface =  (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum, acm->devAddr, acm->interfaceIndex);
-    EXPECT_NE(nullptr,  ecm_intIface);
+    g_ecmIntIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
+        g_acm->devAddr, g_acm->interfaceIndex);
+    EXPECT_NE(nullptr,  g_ecmIntIface);
 }
 
 /**
@@ -795,12 +796,13 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface007, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface008, TestSize.Level1)
 {
-    acm->busNum = 100U;
-    acm->devAddr = 200U;
-    acm->interfaceIndex = 100U;
+    g_acm->busNum = 100U;
+    g_acm->devAddr = 200U;
+    g_acm->interfaceIndex = 100U;
 
-    ecm_dataIface =  (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum, acm->devAddr, acm->interfaceIndex);
-    EXPECT_EQ(nullptr,  ecm_dataIface);
+    g_ecmDataIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
+        g_acm->devAddr, g_acm->interfaceIndex);
+    EXPECT_EQ(nullptr,  g_ecmDataIface);
 }
 
 /**
@@ -811,12 +813,13 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface008, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface009, TestSize.Level1)
 {
-    acm->busNum = 1U;
-    acm->devAddr = 2U;
-    acm->interfaceIndex = 1U;
+    g_acm->busNum = 1U;
+    g_acm->devAddr = 2U;
+    g_acm->interfaceIndex = 1U;
 
-    ecm_dataIface =  (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum, acm->devAddr, acm->interfaceIndex);
-    EXPECT_NE(nullptr,  ecm_dataIface);
+    g_ecmDataIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
+        g_acm->devAddr, g_acm->interfaceIndex);
+    EXPECT_NE(nullptr,  g_ecmDataIface);
 }
 
 /**
@@ -831,21 +834,21 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe001, TestSize.Level1)
     struct UsbPipeInfo p;
     int i;
 
-    for (i = 0;  i <= acm->dataIface->info.pipeNum; i++) {
-        ret = UsbGetPipeInfo(NULL, acm->dataIface->info.curAltSetting, i, &p);
+    for (i = 0;  i <= g_acm->dataIface->info.pipeNum; i++) {
+        ret = UsbGetPipeInfo(NULL, g_acm->dataIface->info.curAltSetting, i, &p);
         if (ret < 0) {
             continue;
         }
         if ((p.pipeDirection == USB_PIPE_DIRECTION_IN) && (p.pipeType == USB_PIPE_TYPE_BULK)) {
             struct UsbPipeInfo *pi = (UsbPipeInfo *)OsalMemCalloc(sizeof(*pi));
             EXPECT_NE(nullptr,  pi);
-            p.interfaceId = acm->dataIface->info.interfaceIndex;
+            p.interfaceId = g_acm->dataIface->info.interfaceIndex;
             *pi = p;
-            acm->dataInPipe = pi;
+            g_acm->dataInPipe = pi;
             break;
         }
     }
-    EXPECT_EQ(nullptr,  acm->dataInPipe);
+    EXPECT_EQ(nullptr,  g_acm->dataInPipe);
 }
 
 /**
@@ -860,21 +863,21 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe002, TestSize.Level1)
     struct UsbPipeInfo p;
     int i;
 
-    for (i = 0;  i <= acm->dataIface->info.pipeNum; i++) {
-        ret = UsbGetPipeInfo(acm->data_devHandle, acm->dataIface->info.curAltSetting, i, &p);
+    for (i = 0;  i <= g_acm->dataIface->info.pipeNum; i++) {
+        ret = UsbGetPipeInfo(g_acm->data_devHandle, g_acm->dataIface->info.curAltSetting, i, &p);
         if (ret < 0) {
             continue;
         }
         if ((p.pipeDirection == USB_PIPE_DIRECTION_IN) && (p.pipeType == USB_PIPE_TYPE_BULK)) {
             struct UsbPipeInfo *pi = (UsbPipeInfo *)OsalMemCalloc(sizeof(*pi));
             EXPECT_NE(nullptr,  pi);
-            p.interfaceId = acm->dataIface->info.interfaceIndex;
+            p.interfaceId = g_acm->dataIface->info.interfaceIndex;
             *pi = p;
-            acm->dataInPipe = pi;
+            g_acm->dataInPipe = pi;
             break;
         }
     }
-    EXPECT_NE(nullptr,  acm->dataInPipe);
+    EXPECT_NE(nullptr,  g_acm->dataInPipe);
 }
 
 /**
@@ -889,21 +892,21 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe003, TestSize.Level1)
     struct UsbPipeInfo p;
     int i;
 
-    for (i = 0;  i <= acm->dataIface->info.pipeNum; i++) {
-        ret = UsbGetPipeInfo(NULL, acm->dataIface->info.curAltSetting, i, &p);
+    for (i = 0;  i <= g_acm->dataIface->info.pipeNum; i++) {
+        ret = UsbGetPipeInfo(NULL, g_acm->dataIface->info.curAltSetting, i, &p);
         if (ret < 0) {
             continue;
         }
         if ((p.pipeDirection == USB_PIPE_DIRECTION_OUT) && (p.pipeType == USB_PIPE_TYPE_BULK)) {
             struct UsbPipeInfo *pi = (UsbPipeInfo *)OsalMemCalloc(sizeof(*pi));
             EXPECT_NE(nullptr,  pi);
-            p.interfaceId = acm->dataIface->info.interfaceIndex;
+            p.interfaceId = g_acm->dataIface->info.interfaceIndex;
             *pi = p;
-            acm->dataOutPipe = pi;
+            g_acm->dataOutPipe = pi;
             break;
         }
     }
-    EXPECT_EQ(nullptr,  acm->dataOutPipe);
+    EXPECT_EQ(nullptr,  g_acm->dataOutPipe);
 }
 
 /**
@@ -918,21 +921,21 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe004, TestSize.Level1)
     struct UsbPipeInfo p;
     int i;
 
-    for (i = 0;  i <= acm->dataIface->info.pipeNum; i++) {
-        ret = UsbGetPipeInfo(acm->data_devHandle, acm->dataIface->info.curAltSetting, i, &p);
+    for (i = 0;  i <= g_acm->dataIface->info.pipeNum; i++) {
+        ret = UsbGetPipeInfo(g_acm->data_devHandle, g_acm->dataIface->info.curAltSetting, i, &p);
         if (ret < 0) {
             continue;
         }
         if ((p.pipeDirection == USB_PIPE_DIRECTION_OUT) && (p.pipeType == USB_PIPE_TYPE_BULK)) {
             struct UsbPipeInfo *pi = (UsbPipeInfo *)OsalMemCalloc(sizeof(*pi));
             EXPECT_NE(nullptr,  pi);
-            p.interfaceId = acm->dataIface->info.interfaceIndex;
+            p.interfaceId = g_acm->dataIface->info.interfaceIndex;
             *pi = p;
-            acm->dataOutPipe = pi;
+            g_acm->dataOutPipe = pi;
             break;
         }
     }
-    EXPECT_NE(nullptr,  acm->dataOutPipe);
+    EXPECT_NE(nullptr,  g_acm->dataOutPipe);
 }
 
 /**
@@ -947,20 +950,20 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe005, TestSize.Level1)
     struct UsbPipeInfo p;
     int i;
 
-    for (i = 0;  i <= acm->intIface->info.pipeNum; i++) {
-        ret = UsbGetPipeInfo(NULL, acm->intIface->info.curAltSetting, i, &p);
+    for (i = 0;  i <= g_acm->intIface->info.pipeNum; i++) {
+        ret = UsbGetPipeInfo(NULL, g_acm->intIface->info.curAltSetting, i, &p);
         if (ret < 0) {
             continue;
         }
         if ((p.pipeDirection == USB_PIPE_DIRECTION_IN) && (p.pipeType == USB_PIPE_TYPE_INTERRUPT)) {
             struct UsbPipeInfo *pi = (UsbPipeInfo *)OsalMemCalloc(sizeof(*pi));
-            p.interfaceId = acm->intIface->info.interfaceIndex;
+            p.interfaceId = g_acm->intIface->info.interfaceIndex;
             *pi = p;
-            acm->intPipe = pi;
+            g_acm->intPipe = pi;
             break;
         }
     }
-    EXPECT_EQ(nullptr,  acm->intPipe);
+    EXPECT_EQ(nullptr,  g_acm->intPipe);
 }
 
 /**
@@ -975,20 +978,20 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe006, TestSize.Level1)
     struct UsbPipeInfo p;
     int i;
 
-    for (i = 0;  i <= acm->intIface->info.pipeNum; i++) {
-        ret = UsbGetPipeInfo(acm->int_devHandle, acm->intIface->info.curAltSetting, i, &p);
+    for (i = 0;  i <= g_acm->intIface->info.pipeNum; i++) {
+        ret = UsbGetPipeInfo(g_acm->int_devHandle, g_acm->intIface->info.curAltSetting, i, &p);
         if (ret < 0) {
             continue;
         }
         if ((p.pipeDirection == USB_PIPE_DIRECTION_IN) && (p.pipeType == USB_PIPE_TYPE_INTERRUPT)) {
             struct UsbPipeInfo *pi = (UsbPipeInfo *)OsalMemCalloc(sizeof(*pi));
-            p.interfaceId = acm->intIface->info.interfaceIndex;
+            p.interfaceId = g_acm->intIface->info.interfaceIndex;
             *pi = p;
-            acm->intPipe = pi;
+            g_acm->intPipe = pi;
             break;
         }
     }
-    EXPECT_NE(nullptr,  acm->intPipe);
+    EXPECT_NE(nullptr,  g_acm->intPipe);
 }
 
 /**
@@ -1003,22 +1006,22 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe007, TestSize.Level1)
     struct UsbPipeInfo p;
     int i;
 
-    acm->interfaceIndex = 255;
+    g_acm->interfaceIndex = 255;
 
-    for (i = 0;  i <= acm->ctrIface->info.pipeNum; i++) {
-        ret = UsbGetPipeInfo(NULL, acm->ctrIface->info.curAltSetting, i, &p);
+    for (i = 0;  i <= g_acm->ctrIface->info.pipeNum; i++) {
+        ret = UsbGetPipeInfo(NULL, g_acm->ctrIface->info.curAltSetting, i, &p);
         if (ret < 0) {
             continue;
         }
         if ((p.pipeDirection == USB_PIPE_DIRECTION_OUT) && (p.pipeType == USB_PIPE_TYPE_CONTROL)) {
             struct UsbPipeInfo *pi = (UsbPipeInfo *)OsalMemCalloc(sizeof(*pi));
-            p.interfaceId = acm->interfaceIndex;
+            p.interfaceId = g_acm->interfaceIndex;
             *pi = p;
-            acm->ctrPipe = pi;
+            g_acm->ctrPipe = pi;
             break;
         }
     }
-    EXPECT_EQ(nullptr,  acm->ctrPipe);
+    EXPECT_EQ(nullptr,  g_acm->ctrPipe);
 }
 
 /**
@@ -1033,22 +1036,22 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe008, TestSize.Level1)
     struct UsbPipeInfo p;
     int i;
 
-    acm->interfaceIndex = 255;
+    g_acm->interfaceIndex = 255;
 
-    for (i = 0;  i <= acm->ctrIface->info.pipeNum; i++) {
-        ret = UsbGetPipeInfo(acm->ctrl_devHandle, acm->ctrIface->info.curAltSetting, i, &p);
+    for (i = 0;  i <= g_acm->ctrIface->info.pipeNum; i++) {
+        ret = UsbGetPipeInfo(g_acm->ctrl_devHandle, g_acm->ctrIface->info.curAltSetting, i, &p);
         if (ret < 0) {
             continue;
         }
         if ((p.pipeDirection == USB_PIPE_DIRECTION_OUT) && (p.pipeType == USB_PIPE_TYPE_CONTROL)) {
             struct UsbPipeInfo *pi = (UsbPipeInfo *)OsalMemCalloc(sizeof(*pi));
-            p.interfaceId = acm->interfaceIndex;
+            p.interfaceId = g_acm->interfaceIndex;
             *pi = p;
-            acm->ctrPipe = pi;
+            g_acm->ctrPipe = pi;
             break;
         }
     }
-    EXPECT_NE(nullptr,  acm->ctrPipe);
+    EXPECT_NE(nullptr,  g_acm->ctrPipe);
 }
 
 /**
@@ -1076,7 +1079,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe010, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbGetPipeInfo(acm->ctrl_devHandle, 0, 0, NULL);
+    ret = UsbGetPipeInfo(g_acm->ctrl_devHandle, 0, 0, NULL);
     EXPECT_NE(HDF_SUCCESS,  ret);
 
 }
@@ -1092,7 +1095,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe011, TestSize.Level1)
     int ret;
     struct UsbPipeInfo p;
 
-    ret = UsbGetPipeInfo(acm->ctrl_devHandle, 0, 0, &p);
+    ret = UsbGetPipeInfo(g_acm->ctrl_devHandle, 0, 0, &p);
     EXPECT_EQ(HDF_SUCCESS,  ret);
 }
 
@@ -1106,11 +1109,11 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest001, TestSize.Level1)
 {
     int i;
 
-    acm->readSize = acm->dataInPipe->maxPacketSize;
-    printf("------readSize = [%d]------\n", acm->readSize);
+    g_acm->readSize = g_acm->dataInPipe->maxPacketSize;
+    printf("------readSize = [%d]------\n", g_acm->readSize);
     for (i = 0; i < ACM_NR; i++) {
-        acm->readReq[i] = UsbAllocRequest(NULL, 0, acm->readSize);
-        EXPECT_EQ(nullptr,  acm->readReq[i]);
+        g_acm->readReq[i] = UsbAllocRequest(NULL, 0, g_acm->readSize);
+        EXPECT_EQ(nullptr,  g_acm->readReq[i]);
     }
 }
 
@@ -1124,11 +1127,11 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest002, TestSize.Level1)
 {
     int i;
 
-    acm->readSize = acm->dataInPipe->maxPacketSize;
-    printf("------readSize = [%d]------\n", acm->readSize);
+    g_acm->readSize = g_acm->dataInPipe->maxPacketSize;
+    printf("------readSize = [%d]------\n", g_acm->readSize);
     for (i = 0; i < ACM_NR; i++) {
-        acm->readReq[i] = UsbAllocRequest(acm->data_devHandle, 0, acm->readSize);
-        EXPECT_NE(nullptr,  acm->readReq[i]);
+        g_acm->readReq[i] = UsbAllocRequest(g_acm->data_devHandle, 0, g_acm->readSize);
+        EXPECT_NE(nullptr,  g_acm->readReq[i]);
     }
 }
 
@@ -1144,7 +1147,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFreeRequest001, TestSize.Level1)
     int i;
 
     for (i = 0; i < ACM_NR; i++) {
-        ret = UsbFreeRequest(acm->readReq[i]);
+        ret = UsbFreeRequest(g_acm->readReq[i]);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
@@ -1160,14 +1163,14 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest003, TestSize.Level1)
     int i;
     int ret;
 
-    acm->writeSize = acm->dataOutPipe->maxPacketSize;
-    ret = AcmWriteBufAlloc(acm);
+    g_acm->writeSize = g_acm->dataOutPipe->maxPacketSize;
+    ret = AcmWriteBufAlloc(g_acm);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     for (i = 0; i < ACM_NW; i++) {
-        acm->wb[i].request = UsbAllocRequest(NULL, 0, acm->writeSize);
-        acm->wb[i].instance = acm;
-        EXPECT_EQ(nullptr,  acm->wb[i].request);
+        g_acm->wb[i].request = UsbAllocRequest(NULL, 0, g_acm->writeSize);
+        g_acm->wb[i].instance = g_acm;
+        EXPECT_EQ(nullptr,  g_acm->wb[i].request);
     }
 }
 
@@ -1182,14 +1185,14 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest004, TestSize.Level1)
     int i;
     int ret;
 
-    acm->writeSize = acm->dataOutPipe->maxPacketSize;
-    ret = AcmWriteBufAlloc(acm);
+    g_acm->writeSize = g_acm->dataOutPipe->maxPacketSize;
+    ret = AcmWriteBufAlloc(g_acm);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     for (i = 0; i < ACM_NW; i++) {
-        acm->wb[i].request = UsbAllocRequest(acm->data_devHandle, 0, acm->writeSize);
-        acm->wb[i].instance = acm;
-        EXPECT_NE(nullptr,  acm->wb[i].request);
+        g_acm->wb[i].request = UsbAllocRequest(g_acm->data_devHandle, 0, g_acm->writeSize);
+        g_acm->wb[i].instance = g_acm;
+        EXPECT_NE(nullptr,  g_acm->wb[i].request);
     }
 }
 
@@ -1205,7 +1208,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFreeRequest002, TestSize.Level1)
     int i;
 
     for (i = 0; i < ACM_NR; i++) {
-        ret = UsbFreeRequest(acm->wb[i].request);
+        ret = UsbFreeRequest(g_acm->wb[i].request);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
@@ -1218,9 +1221,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFreeRequest002, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest005, TestSize.Level1)
 {
-    acm->intSize = acm->intPipe->maxPacketSize;
-    acm->notifyReq = UsbAllocRequest(NULL, 0, acm->intSize);
-    EXPECT_EQ(nullptr,  acm->notifyReq);
+    g_acm->intSize = g_acm->intPipe->maxPacketSize;
+    g_acm->notifyReq = UsbAllocRequest(NULL, 0, g_acm->intSize);
+    EXPECT_EQ(nullptr,  g_acm->notifyReq);
 }
 
 /**
@@ -1231,9 +1234,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest005, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest006, TestSize.Level1)
 {
-    acm->intSize = acm->intPipe->maxPacketSize;
-    acm->notifyReq = UsbAllocRequest(acm->int_devHandle, 0, acm->intSize);
-    EXPECT_NE(nullptr,  acm->notifyReq);
+    g_acm->intSize = g_acm->intPipe->maxPacketSize;
+    g_acm->notifyReq = UsbAllocRequest(g_acm->int_devHandle, 0, g_acm->intSize);
+    EXPECT_NE(nullptr,  g_acm->notifyReq);
 }
 
 /**
@@ -1246,7 +1249,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFreeRequest003, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbFreeRequest(acm->notifyReq);
+    ret = UsbFreeRequest(g_acm->notifyReq);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -1258,9 +1261,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFreeRequest003, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest007, TestSize.Level1)
 {
-    acm->ctrlSize = sizeof (struct UsbCdcLineCoding);
-    acm->ctrlReq = UsbAllocRequest(NULL, 0, acm->ctrlSize);
-    EXPECT_EQ(nullptr,  acm->ctrlReq);
+    g_acm->ctrlSize = sizeof (struct UsbCdcLineCoding);
+    g_acm->ctrlReq = UsbAllocRequest(NULL, 0, g_acm->ctrlSize);
+    EXPECT_EQ(nullptr,  g_acm->ctrlReq);
 }
 
 /**
@@ -1271,9 +1274,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest007, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest008, TestSize.Level1)
 {
-    acm->ctrlSize = sizeof (struct UsbCdcLineCoding);
-    acm->ctrlReq = UsbAllocRequest(acm->ctrl_devHandle, 0, acm->ctrlSize);
-    EXPECT_NE(nullptr,  acm->ctrlReq);
+    g_acm->ctrlSize = sizeof (struct UsbCdcLineCoding);
+    g_acm->ctrlReq = UsbAllocRequest(g_acm->ctrl_devHandle, 0, g_acm->ctrlSize);
+    EXPECT_NE(nullptr,  g_acm->ctrlReq);
 }
 
 /**
@@ -1286,7 +1289,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFreeRequest004, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbFreeRequest(acm->ctrlReq);
+    ret = UsbFreeRequest(g_acm->ctrlReq);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -1314,25 +1317,25 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest009, TestSize.Level1)
 {
     int i;
 
-    acm->readSize = acm->dataInPipe->maxPacketSize;
+    g_acm->readSize = g_acm->dataInPipe->maxPacketSize;
     for (i = 0; i < ACM_NR; i++) {
-        acm->readReq[i] = UsbAllocRequest(acm->data_devHandle, 0, acm->readSize);
-        EXPECT_NE(nullptr,  acm->readReq[i]);
+        g_acm->readReq[i] = UsbAllocRequest(g_acm->data_devHandle, 0, g_acm->readSize);
+        EXPECT_NE(nullptr,  g_acm->readReq[i]);
     }
 
-    acm->writeSize = acm->dataOutPipe->maxPacketSize;
+    g_acm->writeSize = g_acm->dataOutPipe->maxPacketSize;
     for (int i = 0; i < ACM_NW; i++) {
-        acm->wb[i].request = UsbAllocRequest(acm->data_devHandle, 0, acm->writeSize);
-        acm->wb[i].instance = acm;
-        EXPECT_NE(nullptr,  acm->wb[i].request);
+        g_acm->wb[i].request = UsbAllocRequest(g_acm->data_devHandle, 0, g_acm->writeSize);
+        g_acm->wb[i].instance = g_acm;
+        EXPECT_NE(nullptr,  g_acm->wb[i].request);
     }
 
-    acm->intSize = acm->intPipe->maxPacketSize;
-    acm->notifyReq = UsbAllocRequest(acm->int_devHandle, 0, acm->intSize);
-    EXPECT_NE(nullptr,  acm->notifyReq);
-    acm->ctrlSize = sizeof (struct UsbCdcLineCoding);
-    acm->ctrlReq = UsbAllocRequest(acm->ctrl_devHandle, 0, acm->ctrlSize);
-    EXPECT_NE(nullptr,  acm->ctrlReq);
+    g_acm->intSize = g_acm->intPipe->maxPacketSize;
+    g_acm->notifyReq = UsbAllocRequest(g_acm->int_devHandle, 0, g_acm->intSize);
+    EXPECT_NE(nullptr,  g_acm->notifyReq);
+    g_acm->ctrlSize = sizeof (struct UsbCdcLineCoding);
+    g_acm->ctrlReq = UsbAllocRequest(g_acm->ctrl_devHandle, 0, g_acm->ctrlSize);
+    EXPECT_NE(nullptr,  g_acm->ctrlReq);
 }
 
 /**
@@ -1360,17 +1363,18 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest001, TestSize.Level1)
     int i;
 
     for (i = 0; i < 1; i++) {
-        readParmas.userData = (void *)acm;
-        readParmas.pipeAddress = acm->dataInPipe->pipeAddress;
-        readParmas.pipeId = acm->dataInPipe->pipeId;
-        readParmas.interfaceId = acm->dataInPipe->interfaceId;
+        readParmas.userData = (void *)g_acm;
+        readParmas.pipeAddress = g_acm->dataInPipe->pipeAddress;
+        readParmas.pipeId = g_acm->dataInPipe->pipeId;
+        readParmas.interfaceId = g_acm->dataInPipe->interfaceId;
         readParmas.callback = AcmReadBulk;
         readParmas.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
         readParmas.timeout = USB_CTRL_SET_TIMEOUT;
         readParmas.dataReq.numIsoPackets = 0;
-        readParmas.dataReq.directon = (UsbRequestDirection)((acm->dataInPipe->pipeDirection >> 7) & 0x1);
-        readParmas.dataReq.length = acm->readSize;
-        ret = UsbFillRequest(acm->readReq[i], acm->data_devHandle, &readParmas);
+        readParmas.dataReq.directon = (UsbRequestDirection)((g_acm->dataInPipe->pipeDirection >> USB_DIR_OFFSET) \
+            & 0x1);
+        readParmas.dataReq.length = g_acm->readSize;
+        ret = UsbFillRequest(g_acm->readReq[i], g_acm->data_devHandle, &readParmas);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
@@ -1389,27 +1393,27 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest002, TestSize.Level1)
     char sendData[] = {"abcde\0"};
     uint32_t size = strlen(sendData) + 1;
 
-    acm->writeSize = acm->dataOutPipe->maxPacketSize;
-    size = (size > acm->writeSize) ? acm->writeSize : size;
+    g_acm->writeSize = g_acm->dataOutPipe->maxPacketSize;
+    size = (size > g_acm->writeSize) ? g_acm->writeSize : size;
 
     for (i = 0; i < 1; i++) {
-        acm->wb[i].len = size;
-        ret = memcpy_s(acm->wb[i].buf, acm->writeSize, sendData, size);
+        g_acm->wb[i].len = size;
+        ret = memcpy_s(g_acm->wb[i].buf, g_acm->writeSize, sendData, size);
         if (ret) {
             printf("memcpy_s fial");
         }
 
-        parmas.interfaceId = acm->dataOutPipe->interfaceId;
-        parmas.pipeAddress = acm->dataOutPipe->pipeAddress;
-        parmas.pipeId = acm->dataOutPipe->pipeId;
+        parmas.interfaceId = g_acm->dataOutPipe->interfaceId;
+        parmas.pipeAddress = g_acm->dataOutPipe->pipeAddress;
+        parmas.pipeId = g_acm->dataOutPipe->pipeId;
         parmas.callback = AcmWriteBulk;
         parmas.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
         parmas.timeout = USB_CTRL_SET_TIMEOUT;
         parmas.dataReq.numIsoPackets = 0;
-        parmas.userData = (void *)&acm->wb[i];
-        parmas.dataReq.length = acm->wb[i].len;
-        parmas.dataReq.buffer = acm->wb[i].buf;
-        ret = UsbFillRequest(acm->wb[i].request, acm->data_devHandle, &parmas);
+        parmas.userData = (void *)&g_acm->wb[i];
+        parmas.dataReq.length = g_acm->wb[i].len;
+        parmas.dataReq.buffer = g_acm->wb[i].buf;
+        ret = UsbFillRequest(g_acm->wb[i].request, g_acm->data_devHandle, &parmas);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
@@ -1425,17 +1429,18 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest003, TestSize.Level1)
     int ret;
     struct UsbRequestParams intParmas;
 
-    intParmas.userData = (void *)acm;
-    intParmas.pipeAddress = acm->intPipe->pipeAddress;
-    intParmas.pipeId = acm->intPipe->pipeId;
-    intParmas.interfaceId = acm->intPipe->interfaceId;
+    intParmas.userData = (void *)g_acm;
+    intParmas.pipeAddress = g_acm->intPipe->pipeAddress;
+    intParmas.pipeId = g_acm->intPipe->pipeId;
+    intParmas.interfaceId = g_acm->intPipe->interfaceId;
     intParmas.callback = AcmCtrlIrq;
     intParmas.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
     intParmas.timeout = USB_CTRL_SET_TIMEOUT;
     intParmas.dataReq.numIsoPackets = 0;
-    intParmas.dataReq.directon = (UsbRequestDirection)((acm->intPipe->pipeDirection >> USB_PIPE_DIR_OFFSET) & DIRECTION_MASK);
-    intParmas.dataReq.length = acm->intSize;
-    ret = UsbFillRequest(acm->notifyReq, acm->int_devHandle, &intParmas);
+    intParmas.dataReq.directon = (UsbRequestDirection)((g_acm->intPipe->pipeDirection >> USB_PIPE_DIR_OFFSET) \
+        & DIRECTION_MASK);
+    intParmas.dataReq.length = g_acm->intSize;
+    ret = UsbFillRequest(g_acm->notifyReq, g_acm->int_devHandle, &intParmas);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -1460,19 +1465,19 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest004, TestSize.Level1)
     parmas.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
     parmas.timeout = USB_CTRL_SET_TIMEOUT;
 
-    acm->lineCoding.dwDTERate = CpuToLe32(9600);
-    acm->lineCoding.bCharFormat = CHARFORMAT;
-    acm->lineCoding.bParityType = USB_CDC_NO_PARITY;
-    acm->lineCoding.bDataBits = USB_CDC_1_STOP_BITS;
+    g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
+    g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
+    g_acm->lineCoding.bParityType = USB_CDC_NO_PARITY;
+    g_acm->lineCoding.bDataBits = DATA_BITS_LENGTH;
 
     msgData.request = USB_DDK_CDC_REQ_SET_LINE_CODING;
     msgData.requestType = USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE;
     msgData.value = value;
     msgData.index = index;
-    msgData.data = &acm->lineCoding;
+    msgData.data = &g_acm->lineCoding;
     msgData.size = sizeof (struct UsbCdcLineCoding);
     parmas.ctrlReq = UsbControlMsg(msgData);
-    ret = UsbFillRequest(acm->ctrlReq, acm->ctrl_devHandle, &parmas);
+    ret = UsbFillRequest(g_acm->ctrlReq, g_acm->ctrl_devHandle, &parmas);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -1490,17 +1495,18 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest005, TestSize.Level1)
     int i;
 
     for (i = 0; i < ACM_NR; i++) {
-        readParmas.userData = (void *)acm;
-        readParmas.pipeAddress = acm->dataInPipe->pipeAddress;
-        readParmas.pipeId = acm->dataInPipe->pipeId;
-        readParmas.interfaceId = acm->dataInPipe->interfaceId;
+        readParmas.userData = (void *)g_acm;
+        readParmas.pipeAddress = g_acm->dataInPipe->pipeAddress;
+        readParmas.pipeId = g_acm->dataInPipe->pipeId;
+        readParmas.interfaceId = g_acm->dataInPipe->interfaceId;
         readParmas.callback = AcmReadBulk;
         readParmas.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
         readParmas.timeout = USB_CTRL_SET_TIMEOUT;
         readParmas.dataReq.numIsoPackets = 0;
-        readParmas.dataReq.directon = (UsbRequestDirection)((acm->dataInPipe->pipeDirection >> 7) & 0x1);
-        readParmas.dataReq.length = acm->readSize;
-        ret = UsbFillRequest(acm->readReq[i], acm->data_devHandle, &readParmas);
+        readParmas.dataReq.directon = (UsbRequestDirection)((g_acm->dataInPipe->pipeDirection >> USB_DIR_OFFSET) \
+            & 0x1);
+        readParmas.dataReq.length = g_acm->readSize;
+        ret = UsbFillRequest(g_acm->readReq[i], g_acm->data_devHandle, &readParmas);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
@@ -1519,27 +1525,27 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest006, TestSize.Level1)
     char sendData[] = {"abcde\0"};
     uint32_t size = strlen(sendData) + 1;
 
-    acm->writeSize = acm->dataOutPipe->maxPacketSize;
-    size = (size > acm->writeSize) ? acm->writeSize : size;
+    g_acm->writeSize = g_acm->dataOutPipe->maxPacketSize;
+    size = (size > g_acm->writeSize) ? g_acm->writeSize : size;
 
     for (i = 0; i < ACM_NR; i++) {
-        acm->wb[i].len = size;
-        ret = memcpy_s(acm->wb[i].buf, acm->writeSize, sendData, size);
+        g_acm->wb[i].len = size;
+        ret = memcpy_s(g_acm->wb[i].buf, g_acm->writeSize, sendData, size);
         if (ret) {
             printf("memcpy_s fial");
         }
 
-        parmas.interfaceId = acm->dataOutPipe->interfaceId;
-        parmas.pipeAddress = acm->dataOutPipe->pipeAddress;
-        parmas.pipeId = acm->dataOutPipe->pipeId;
+        parmas.interfaceId = g_acm->dataOutPipe->interfaceId;
+        parmas.pipeAddress = g_acm->dataOutPipe->pipeAddress;
+        parmas.pipeId = g_acm->dataOutPipe->pipeId;
         parmas.callback = AcmWriteBulk;
         parmas.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
         parmas.timeout = USB_CTRL_SET_TIMEOUT;
         parmas.dataReq.numIsoPackets = 0;
-        parmas.userData = (void *)&acm->wb[i];
-        parmas.dataReq.length = acm->wb[i].len;
-        parmas.dataReq.buffer = acm->wb[i].buf;
-        ret = UsbFillRequest(acm->wb[i].request, acm->data_devHandle, &parmas);
+        parmas.userData = (void *)&g_acm->wb[i];
+        parmas.dataReq.length = g_acm->wb[i].len;
+        parmas.dataReq.buffer = g_acm->wb[i].buf;
+        ret = UsbFillRequest(g_acm->wb[i].request, g_acm->data_devHandle, &parmas);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
@@ -1555,17 +1561,18 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest007, TestSize.Level1)
     int ret;
     struct UsbRequestParams intParmas;
 
-    intParmas.userData = (void *)acm;
-    intParmas.pipeAddress = acm->intPipe->pipeAddress;
-    intParmas.pipeId = acm->intPipe->pipeId;
-    intParmas.interfaceId = acm->intPipe->interfaceId;
+    intParmas.userData = (void *)g_acm;
+    intParmas.pipeAddress = g_acm->intPipe->pipeAddress;
+    intParmas.pipeId = g_acm->intPipe->pipeId;
+    intParmas.interfaceId = g_acm->intPipe->interfaceId;
     intParmas.callback = AcmCtrlIrq;
     intParmas.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
     intParmas.timeout = USB_CTRL_SET_TIMEOUT;
     intParmas.dataReq.numIsoPackets = 0;
-    intParmas.dataReq.directon = (UsbRequestDirection)((acm->intPipe->pipeDirection >> USB_PIPE_DIR_OFFSET) & DIRECTION_MASK);
-    intParmas.dataReq.length = acm->intSize;
-    ret = UsbFillRequest(acm->notifyReq, acm->int_devHandle, &intParmas);
+    intParmas.dataReq.directon = (UsbRequestDirection)((g_acm->intPipe->pipeDirection >> USB_PIPE_DIR_OFFSET) \
+        & DIRECTION_MASK);
+    intParmas.dataReq.length = g_acm->intSize;
+    ret = UsbFillRequest(g_acm->notifyReq, g_acm->int_devHandle, &intParmas);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -1590,19 +1597,19 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest008, TestSize.Level1)
     parmas.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
     parmas.timeout = USB_CTRL_SET_TIMEOUT;
 
-    acm->lineCoding.dwDTERate = CpuToLe32(9600);
-    acm->lineCoding.bCharFormat = CHARFORMAT;
-    acm->lineCoding.bParityType = USB_CDC_NO_PARITY;
-    acm->lineCoding.bDataBits = USB_CDC_1_STOP_BITS;
+    g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
+    g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
+    g_acm->lineCoding.bParityType = USB_CDC_NO_PARITY;
+    g_acm->lineCoding.bDataBits = DATA_BITS_LENGTH;
 
     msgData.request = USB_DDK_CDC_REQ_SET_LINE_CODING;
     msgData.requestType = USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE;
     msgData.value = value;
     msgData.index = index;
-    msgData.data = &acm->lineCoding;
+    msgData.data = &g_acm->lineCoding;
     msgData.size = sizeof (struct UsbCdcLineCoding);
     parmas.ctrlReq = UsbControlMsg(msgData);
-    ret = UsbFillRequest(acm->ctrlReq, acm->ctrl_devHandle, &parmas);
+    ret = UsbFillRequest(g_acm->ctrlReq, g_acm->ctrl_devHandle, &parmas);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -1725,7 +1732,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClearInterfaceHalt001, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbClearInterfaceHalt(acm->data_devHandle, acm->dataInPipe->pipeAddress);
+    ret = UsbClearInterfaceHalt(g_acm->data_devHandle, g_acm->dataInPipe->pipeAddress);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -1739,7 +1746,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClearInterfaceHalt002, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbClearInterfaceHalt(acm->data_devHandle, acm->dataOutPipe->pipeAddress);
+    ret = UsbClearInterfaceHalt(g_acm->data_devHandle, g_acm->dataOutPipe->pipeAddress);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -1753,7 +1760,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClearInterfaceHalt003, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbClearInterfaceHalt(acm->int_devHandle, acm->intPipe->pipeAddress);
+    ret = UsbClearInterfaceHalt(g_acm->int_devHandle, g_acm->intPipe->pipeAddress);
     EXPECT_NE(HDF_SUCCESS, ret);
 }
 
@@ -1767,7 +1774,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClearInterfaceHalt004, TestSize.Level1)
 {
     int ret;
 
-    ret = UsbClearInterfaceHalt(acm->ctrl_devHandle, acm->ctrPipe->pipeAddress);
+    ret = UsbClearInterfaceHalt(g_acm->ctrl_devHandle, g_acm->ctrPipe->pipeAddress);
     EXPECT_NE(HDF_SUCCESS, ret);
 }
 
@@ -1796,8 +1803,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfRemoveInterface001, TestSize.Level1)
     int ret;
     UsbInterfaceStatus status = USB_INTERFACE_STATUS_REMOVE;
 
-    ret = UsbAddOrRemoveInterface(acm->session, acm->busNum, acm->devAddr,
-        acm->dataIface->info.interfaceIndex, status);
+    ret = UsbAddOrRemoveInterface(g_acm->session, g_acm->busNum, g_acm->devAddr,
+        g_acm->dataIface->info.interfaceIndex, status);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -1814,8 +1821,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAddInterface001, TestSize.Level1)
 
     sleep(1);
 
-    ret = UsbAddOrRemoveInterface(acm->session, acm->busNum, acm->devAddr,
-        acm->dataIface->info.interfaceIndex, status);
+    ret = UsbAddOrRemoveInterface(g_acm->session, g_acm->busNum, g_acm->devAddr,
+        g_acm->dataIface->info.interfaceIndex, status);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -1832,8 +1839,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfRemoveInterface002, TestSize.Level1)
 
     sleep(1);
 
-    ret = UsbAddOrRemoveInterface(acm->session, acm->busNum, acm->devAddr,
-        acm->intIface->info.interfaceIndex, status);
+    ret = UsbAddOrRemoveInterface(g_acm->session, g_acm->busNum, g_acm->devAddr,
+        g_acm->intIface->info.interfaceIndex, status);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -1850,8 +1857,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAddInterface002, TestSize.Level1)
 
     sleep(1);
 
-    ret = UsbAddOrRemoveInterface(acm->session, acm->busNum, acm->devAddr,
-        acm->intIface->info.interfaceIndex, status);
+    ret = UsbAddOrRemoveInterface(g_acm->session, g_acm->busNum, g_acm->devAddr,
+        g_acm->intIface->info.interfaceIndex, status);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -1866,8 +1873,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfRemoveInterface003, TestSize.Level1)
     int ret;
     UsbInterfaceStatus status = USB_INTERFACE_STATUS_REMOVE;
 
-    ret = UsbAddOrRemoveInterface(acm->session, acm->busNum, acm->devAddr,
-        acm->ctrIface->info.interfaceIndex, status);
+    ret = UsbAddOrRemoveInterface(g_acm->session, g_acm->busNum, g_acm->devAddr,
+        g_acm->ctrIface->info.interfaceIndex, status);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -1882,8 +1889,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAddInterface003, TestSize.Level1)
     int ret;
     UsbInterfaceStatus status = USB_INTERFACE_STATUS_ADD;
 
-    ret = UsbAddOrRemoveInterface(acm->session, acm->busNum, acm->devAddr,
-        acm->ctrIface->info.interfaceIndex, status);
+    ret = UsbAddOrRemoveInterface(g_acm->session, g_acm->busNum, g_acm->devAddr,
+        g_acm->ctrIface->info.interfaceIndex, status);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 

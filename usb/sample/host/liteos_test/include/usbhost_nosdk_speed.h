@@ -34,7 +34,7 @@
 #define TEST_READ               false
 #define USB_MAX_INTERFACES      32
 #define DATARATE                9600
-#define CHARFORMAT              8
+#define DATA_BITS_LENGTH        8
 #define ACM_NW                  30
 #define ACM_NR                  30
 #define READ_BUF_SIZE           8192

@@ -485,7 +485,7 @@ static struct UsbHandleMgr *GetHandleMgr(const struct UsbFnDeviceMgr *devMgr, in
     return handle;
 }
 
-static void HandleEp0Event(struct UsbFnDeviceMgr *devMgr, struct UsbFnEventAll event)
+static void HandleEp0Event(const struct UsbFnDeviceMgr *devMgr, struct UsbFnEventAll event)
 {
     uint8_t i;
     struct UsbFnFuncMgr *funcMgr = NULL;

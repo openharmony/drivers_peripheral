@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "usb_dev_test.h"
 #include <unistd.h>
 #include <sys/time.h>
 #include <stdio.h>
@@ -33,10 +34,10 @@ static struct HdfRemoteService *g_acmService;
 static void ShowUsage()
 {
     HDF_LOGE("Usage options:\n");
-    HDF_LOGE("-g : name of getting prop, as: -g idProduct");
-    HDF_LOGE("-s : name of setting prop, as: -s idProduct 0xa4b7");
-    HDF_LOGE("-r : regist prop, as: -r testa aaaaa");
-    HDF_LOGE("-h : show this help message");
+    HDF_LOGE("g : name of getting prop, as: g idProduct");
+    HDF_LOGE("s : name of setting prop, as: s idProduct 0xa4b7");
+    HDF_LOGE("r : regist prop, as: r testa aaaaa");
+    HDF_LOGE("h : show this help message");
 }
 
 static int DispatcherInit(void)
@@ -86,7 +87,7 @@ static int TestPropGet(const char *propName)
         HDF_LOGE("%s:failed to write result", __func__);
         goto FAIL;
     }
-    HDF_LOGE("%s: %s = %s", __func__, propName, propVal);
+    HDF_LOGE("%s: %s = %s\n", __func__, propName, propVal);
 
 FAIL:
     return status;
@@ -143,44 +144,39 @@ static int TestPropRegist(const char *propName, const char *propValue)
 }
 
 
-int main(int argc, char *argv[])
+int prop_test(int argc, char *argv[])
 {
     int ch;
     int ret;
-    const char *serviceName = NULL;
     const char *propName = NULL;
     const char *propValue = NULL;
     bool setProp = false;
     bool getProp = false;
     bool registProp = false;
 
-    while ((ch = getopt(argc, argv, "S:r:g:s:h?")) != OPTION_EDN) {
-        switch (ch) {
-            case 'S':
-                serviceName = optarg;
-                break;
-            case 'r':
-                propName = optarg;
-                propValue = argv[optind];
-                registProp = true;
-                break;
-            case 'g':
-                propName = optarg;
-                getProp = true;
-                break;
-            case 's':
-                propName = optarg;
-                propValue = argv[optind];
-                setProp = true;
-                break;
-            case 'h':
-            case '?':
-                ShowUsage();
-                return 0;
-                break;
-            default:
-                break;
-        }
+    ch = *(argv[1]);
+    switch (ch) {
+        case 'r':
+            propName = argv[0x2];
+            propValue = argv[0x3];
+            registProp = true;
+            break;
+        case 'g':
+            propName = argv[0x2];
+            getProp = true;
+            break;
+        case 's':
+            propName = argv[0x2];
+            propValue = argv[0x3];
+            setProp = true;
+            break;
+        case 'h':
+        case '?':
+            ShowUsage();
+            return 0;
+            break;
+        default:
+            break;
     }
 
     if (DispatcherInit() != HDF_SUCCESS) {
@@ -189,7 +185,7 @@ int main(int argc, char *argv[])
     if (getProp) {
         ret = TestPropGet(propName);
     } else if (setProp) {
-    	ret = TestPropSet(propName, propValue);
+        ret = TestPropSet(propName, propValue);
     } else if (registProp) {
         ret = TestPropRegist(propName, propValue);
     }

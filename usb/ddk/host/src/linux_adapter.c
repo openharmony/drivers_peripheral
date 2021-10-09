@@ -332,7 +332,7 @@ static void OsFreeIsoUrbs(struct UsbHostRequest *request)
     request->isoUrbs = NULL;
 }
 
-static void OsDiscardUrbs(struct UsbHostRequest * const request, int first, int last)
+static void OsDiscardUrbs(const struct UsbHostRequest *request, int first, int last)
 {
     struct UsbAdapterUrb *urb = NULL;
 

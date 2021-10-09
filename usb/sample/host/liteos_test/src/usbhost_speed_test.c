@@ -135,7 +135,7 @@ static void ShowHelp(const char *name)
     printf("\n");
 }
 
-static void *stop_handler()
+static void *StopHandler(void)
 {
     int err, signo;
     stopHandlerTid = getpid();
@@ -193,7 +193,7 @@ static int GetWriteOrReadFlag(const char *buffer)
     return writeOrRead;
 }
 
-static int CheckParam(int argc, char *argv[], struct UsbSpeedTest *speedTest)
+static int CheckParam(int argc, const char *argv[], struct UsbSpeedTest *speedTest)
 {
     int ret = HDF_SUCCESS;
     bool printData = false;
@@ -255,7 +255,7 @@ int main(int argc, char *argv[])
         ret = HDF_FAILURE;
         goto END;
     }
-    if (pthread_create(&threads, NULL, stop_handler, NULL) != 0) {
+    if (pthread_create(&threads, NULL, StopHandler, NULL) != 0) {
         printf("Could not create core thread\n");
         ret = HDF_FAILURE;
         goto END;

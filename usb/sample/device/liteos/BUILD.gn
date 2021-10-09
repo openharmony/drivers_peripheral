@@ -14,22 +14,21 @@
 import("//build/lite/config/component/lite_component.gni")
 
 HDF_FRAMEWORKS = "//drivers/framework"
-USB_OUTPUT_DIR = "$root_out_dir/test/functiontest/hdf/usb"
+USB_OUTPUT_DIR = "$root_out_dir/test/unittest/usb"
 
 lite_component("usbfn_sample") {
-  features = [
-    ":acm_test",
-    ":acm_read",
-    ":acm_write",
-    ":acm_speed_write",
-    ":acm_speed_read",
-    ":prop_test",
-  ]
+  features = [ ":usb_dev_test" ]
 }
 
-executable("acm_test") {
+executable("usb_dev_test") {
   output_dir = "$USB_OUTPUT_DIR"
-  sources = [ "acm_test.c" ]
+  sources = [
+    "acm_speed_read.c",
+    "acm_speed_write.c",
+    "acm_test.c",
+    "prop_test.c",
+    "usb_dev_test.c",
+  ]
 
   include_dirs = [
     "$HDF_FRAMEWORKS/core/shared/include",
@@ -65,189 +64,5 @@ executable("acm_test") {
     "-Wl,-rpath-link=$ohos_root_path/sysroot/usr/lib",
     "-lstdc++",
     "-lpthread",
-  ]
-}
-
-executable("acm_read") {
-  output_dir = "$USB_OUTPUT_DIR"
-  sources = [ "acm_read.c" ]
-
-  include_dirs = [
-    "$HDF_FRAMEWORKS/core/shared/include",
-    "$HDF_FRAMEWORKS/core/host/include",
-    "$HDF_FRAMEWORKS/core/master/include",
-    "$HDF_FRAMEWORKS/include/core",
-    "$HDF_FRAMEWORKS/include/utils",
-    "$HDF_FRAMEWORKS/utils/include",
-    "$HDF_FRAMEWORKS/include/osal",
-    "//drivers/adapter/uhdf/posix/include",
-    "//third_party/bounds_checking_function/include",
-    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-  ]
-
-  deps = [
-    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-    "//drivers/adapter/uhdf/manager:hdf_core",
-    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
-  ]
-
-  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-  defines = [ "__USER__" ]
-
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Wno-format",
-    "-Wno-format-extra-args",
-  ]
-}
-
-executable("acm_write") {
-  output_dir = "$USB_OUTPUT_DIR"
-  sources = [ "acm_write.c" ]
-
-  include_dirs = [
-    "$HDF_FRAMEWORKS/core/shared/include",
-    "$HDF_FRAMEWORKS/core/host/include",
-    "$HDF_FRAMEWORKS/core/master/include",
-    "$HDF_FRAMEWORKS/include/core",
-    "$HDF_FRAMEWORKS/include/utils",
-    "$HDF_FRAMEWORKS/utils/include",
-    "$HDF_FRAMEWORKS/include/osal",
-    "//drivers/adapter/uhdf/posix/include",
-    "//third_party/bounds_checking_function/include",
-    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-  ]
-
-  deps = [
-    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-    "//drivers/adapter/uhdf/manager:hdf_core",
-    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
-  ]
-
-  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-  defines = [ "__USER__" ]
-
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Wno-format",
-    "-Wno-format-extra-args",
-  ]
-}
-
-executable("acm_speed_write") {
-  output_dir = "$USB_OUTPUT_DIR"
-  sources = [ "acm_speed_write.c" ]
-
-  include_dirs = [
-    "$HDF_FRAMEWORKS/core/shared/include",
-    "$HDF_FRAMEWORKS/core/host/include",
-    "$HDF_FRAMEWORKS/core/master/include",
-    "$HDF_FRAMEWORKS/include/core",
-    "$HDF_FRAMEWORKS/include/utils",
-    "$HDF_FRAMEWORKS/utils/include",
-    "$HDF_FRAMEWORKS/include/osal",
-    "//drivers/adapter/uhdf/posix/include",
-    "//third_party/bounds_checking_function/include",
-    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-  ]
-
-  deps = [
-    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-    "//drivers/adapter/uhdf/manager:hdf_core",
-    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
-  ]
-
-  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-  defines = [ "__USER__" ]
-
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Wno-format",
-    "-Wno-format-extra-args",
-  ]
-
-  ldflags = [
-    "-L$ohos_root_path/sysroot/usr/lib",
-    "-Wl,-rpath-link=$ohos_root_path/sysroot/usr/lib",
-    "-lstdc++",
-    "-lpthread",
-  ]
-}
-
-executable("acm_speed_read") {
-  output_dir = "$USB_OUTPUT_DIR"
-  sources = [ "acm_speed_read.c" ]
-
-  include_dirs = [
-    "$HDF_FRAMEWORKS/core/shared/include",
-    "$HDF_FRAMEWORKS/core/host/include",
-    "$HDF_FRAMEWORKS/core/master/include",
-    "$HDF_FRAMEWORKS/include/core",
-    "$HDF_FRAMEWORKS/include/utils",
-    "$HDF_FRAMEWORKS/utils/include",
-    "$HDF_FRAMEWORKS/include/osal",
-    "//drivers/adapter/uhdf/posix/include",
-    "//third_party/bounds_checking_function/include",
-    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-  ]
-
-  deps = [
-    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-    "//drivers/adapter/uhdf/manager:hdf_core",
-    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
-  ]
-
-  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-  defines = [ "__USER__" ]
-
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Wno-format",
-    "-Wno-format-extra-args",
-  ]
-
-  ldflags = [
-    "-L$ohos_root_path/sysroot/usr/lib",
-    "-Wl,-rpath-link=$ohos_root_path/sysroot/usr/lib",
-    "-lstdc++",
-    "-lpthread",
-  ]
-}
-
-executable("prop_test") {
-  output_dir = "$USB_OUTPUT_DIR"
-  sources = [ "prop_test.c" ]
-
-  include_dirs = [
-    "$HDF_FRAMEWORKS/core/shared/include",
-    "$HDF_FRAMEWORKS/core/host/include",
-    "$HDF_FRAMEWORKS/core/master/include",
-    "$HDF_FRAMEWORKS/include/core",
-    "$HDF_FRAMEWORKS/include/utils",
-    "$HDF_FRAMEWORKS/utils/include",
-    "$HDF_FRAMEWORKS/include/osal",
-    "//drivers/adapter/uhdf/posix/include",
-    "//third_party/bounds_checking_function/include",
-    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-  ]
-
-  deps = [
-    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-    "//drivers/adapter/uhdf/manager:hdf_core",
-    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
-  ]
-
-  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-  defines = [ "__USER__" ]
-
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Wno-format",
-    "-Wno-format-extra-args",
   ]
 }

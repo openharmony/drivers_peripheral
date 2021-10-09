@@ -39,11 +39,11 @@ enum UsbSerialCmd {
     USB_SERIAL_REGIST_PROP,
 };
 
-struct HdfSBuf *g_data;
-struct HdfSBuf *g_reply;
-struct HdfIoService *g_acmService;
-struct OsalThread      g_thread;
-struct OsalMutex       g_lock;
+static struct HdfSBuf *g_data;
+static struct HdfSBuf *g_reply;
+static struct HdfIoService *g_acmService;
+static struct OsalThread      g_thread;
+static struct OsalMutex       g_lock;
 
 static void TestWrite(const char *buf)
 {
@@ -129,7 +129,7 @@ static void Test02()
     }
 }
 
-int main(int argc, char *argv[])
+int acm_test(int argc, char *argv[])
 {
     int status;
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");

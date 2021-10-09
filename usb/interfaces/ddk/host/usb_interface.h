@@ -379,7 +379,7 @@ int32_t UsbCloseInterface(const UsbInterfaceHandle *interfaceHandle);
  */
 int32_t UsbSelectInterfaceSetting(const UsbInterfaceHandle *interfaceHandle, uint8_t settingIndex,
     struct UsbInterface **interfaceObj);
-	
+
 /**
  * @brief Obtains pipe information from the specified optional configuration.
  *

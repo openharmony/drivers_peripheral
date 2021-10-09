@@ -57,7 +57,7 @@ static bool IsDir(const char *path)
     return false;
 }
 
-static void GetFilePath(const char *path, const char *fileName,  char *filePath)
+static void GetFilePath(const char *path, const char *fileName, char *filePath)
 {
     int ret;
     ret = strcpy_s(filePath, MAX_PATHLEN - 1, path);
@@ -138,8 +138,7 @@ static int UsbFnWriteFile(const char *path, const char *str)
     return 0;
 }
 
-static int UsbFnWriteProp(const char *deviceName,
-    const char *propName, uint32_t propValue)
+static int UsbFnWriteProp(const char *deviceName, const char *propName, uint32_t propValue)
 {
     char tmp[MAX_PATHLEN] = {0};
     char tmpVal[MAX_NAMELEN] = {0};
@@ -1306,17 +1305,14 @@ void UsbFnMemFree(void * const mem)
     uint32_t totalSize = 0;
     uint32_t size = 0;
 
-    if (mem != NULL) {
-        OsalMemFree(mem);
-    } else {
+    if (mem == NULL) {
         return;
     }
 
     if ((g_usbRamTestFlag == true) && (g_usbRamTestHead != NULL)) {
         OsalMutexLock(&g_usbRamTestHead->lock);
         DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
-            if ((NULL != pos) && (pos->address == (uint32_t)mem))
-            {
+            if ((pos != NULL) && (mem != NULL) && (pos->address == (uintptr_t)mem)) {
                 size = pos->size;
                 DListRemove(&pos->list);
                 OsalMemFree(pos);
@@ -1326,6 +1322,10 @@ void UsbFnMemFree(void * const mem)
         }
         OsalMutexUnlock(&g_usbRamTestHead->lock);
         HDF_LOGE("%{public}s rm size=%{public}d totalSize=%{public}d", __func__, size, totalSize);
+    }
+
+    if (mem != NULL) {
+        OsalMemFree(mem);
     }
 }
 

@@ -14,7 +14,7 @@
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
 
-  USB_OUTPUT_DIR = "$root_out_dir/test/functiontest/hdf/usb"
+  USB_OUTPUT_DIR = "$root_out_dir/test/unittest/usb"
   executable("usbhost_ddk_test") {
     output_dir = "$USB_OUTPUT_DIR"
     sources = [
@@ -243,37 +243,6 @@ if (defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
-    install_enable = false
-    subsystem_name = "hdf"
-  }
-
-  ohos_executable("usbhost_sdk_test") {
-    include_dirs = [
-      "//drivers/peripheral/usb/ddk/common/include",
-      "//drivers/peripheral/usb/ddk/host/include",
-      "//drivers/peripheral/usb/interfaces/ddk/common",
-      "//drivers/peripheral/usb/interfaces/ddk/host",
-      "//drivers/peripheral/usb/gadget/function/include",
-      "include",
-      "//drivers/peripheral/usb/serial/include",
-    ]
-
-    sources = [ "src/usbhost_sdk_test.c" ]
-
-    deps = [
-      "//drivers/adapter/uhdf2/host:libhdf_host",
-      "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-      "//drivers/adapter/uhdf2/utils:libhdf_utils",
-      "//drivers/peripheral/usb/ddk:libusb_core",
-      "//utils/native/base:utils",
-    ]
-
-    if (is_standard_system) {
-      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
-    } else {
-      external_deps = [ "hilog:libhilog" ]
-    }
-
     install_enable = false
     subsystem_name = "hdf"
   }

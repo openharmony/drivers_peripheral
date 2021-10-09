@@ -388,8 +388,8 @@ struct UsbCdcEtherDesc {
 #define USB_DDK_DT_RPIPE                            0x22
 #define USB_DDK_DT_CS_RADIO_CONTROL                 0x23
 #define USB_DDK_DT_PIPE_USAGE                       0x24
-#define	USB_DDK_DT_SS_ENDPOINT_COMP                 0x30
-#define	USB_DDK_DT_SSP_ISOC_ENDPOINT_COMP           0x31
+#define USB_DDK_DT_SS_ENDPOINT_COMP                 0x30
+#define USB_DDK_DT_SSP_ISOC_ENDPOINT_COMP           0x31
 #define USB_DDK_DT_CS_DEVICE                        (USB_DDK_TYPE_CLASS | USB_DDK_DT_DEVICE)
 #define USB_DDK_DT_CS_CONFIG                        (USB_DDK_TYPE_CLASS | USB_DDK_DT_CONFIG)
 #define USB_DDK_DT_CS_STRING                        (USB_DDK_TYPE_CLASS | USB_DDK_DT_STRING)
@@ -495,11 +495,11 @@ struct UsbCdcEtherDesc {
 #define USB_DDK_CDC_SUBCLASS_NCM                    0x0D
 #define USB_DDK_CDC_SUBCLASS_MBIM                   0x0E
 
-#define	USB_DDK_CDC_PACKET_TYPE_PROMISCUOUS         (1 << 0)
-#define	USB_DDK_CDC_PACKET_TYPE_ALL_MULTICAST       (1 << 1)
-#define	USB_DDK_CDC_PACKET_TYPE_DIRECTED            (1 << 2)
-#define	USB_DDK_CDC_PACKET_TYPE_BROADCAST           (1 << 3)
-#define	USB_DDK_CDC_PACKET_TYPE_MULTICAST           (1 << 4)
+#define USB_DDK_CDC_PACKET_TYPE_PROMISCUOUS         (1 << 0)
+#define USB_DDK_CDC_PACKET_TYPE_ALL_MULTICAST       (1 << 1)
+#define USB_DDK_CDC_PACKET_TYPE_DIRECTED            (1 << 2)
+#define USB_DDK_CDC_PACKET_TYPE_BROADCAST           (1 << 3)
+#define USB_DDK_CDC_PACKET_TYPE_MULTICAST           (1 << 4)
 
 #define USB_DDK_CDC_ACM_PROTO_VENDOR                0xFF
 

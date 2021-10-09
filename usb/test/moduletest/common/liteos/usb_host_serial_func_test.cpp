@@ -18,8 +18,8 @@
 #include <cstring>
 #include <gtest/gtest.h>
 #include <unistd.h>
-#include "usbhost_ddk_test.h"
 #include "securec.h"
+#include "usbhost_ddk_test.h"
 
 using namespace std;
 using namespace testing::ext;
