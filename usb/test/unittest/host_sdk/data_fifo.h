@@ -19,9 +19,9 @@
 #include "hdf_base.h"
 
 struct DataFifo {
-    uint32_t	rdIdx;
-    uint32_t	wrIdx;
-    uint32_t	size;
+    uint32_t rdIdx;
+    uint32_t wrIdx;
+    uint32_t size;
     void        *data;
 };
 
@@ -106,7 +106,7 @@ static inline uint32_t DataFifoRead(struct DataFifo *fifo, uint8_t *data, uint32
     size = MIN(size, DataFifoLen(fifo));
     end = data + size;
     while (data < end) {
-	*data++ = buf[fifo->rdIdx++ & mask];
+        *data++ = buf[fifo->rdIdx++ & mask];
     }
     return size;
 }

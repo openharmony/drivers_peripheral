@@ -953,8 +953,7 @@ static int UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName, int
     return 0;
 }
 
-static int UsbFnWriteProp(const char *deviceName,
-    const char *propName, uint32_t propValue)
+static int UsbFnWriteProp(const char *deviceName, const char *propName, uint32_t propValue)
 {
     struct FconfigDevdescInfo info;
     int ret;
@@ -1075,16 +1074,14 @@ void UsbFnMemFree(void * const mem)
     uint32_t totalSize = 0;
     uint32_t size = 0;
 
-    if (mem != NULL) {
-        OsalMemFree(mem);
-    } else {
+    if (mem == NULL) {
         return;
     }
 
     if ((g_usbRamTestFlag == true) && (g_usbRamTestHead != NULL)) {
         OsalMutexLock(&g_usbRamTestHead->lock);
         DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
-            if ((pos != NULL) && (pos->address == (uintptr_t)mem)) {
+            if ((pos != NULL) && (mem != NULL) && (pos->address == (uintptr_t)mem)) {
                 size = pos->size;
                 DListRemove(&pos->list);
                 OsalMemFree(pos);
@@ -1096,6 +1093,10 @@ void UsbFnMemFree(void * const mem)
         }
         OsalMutexUnlock(&g_usbRamTestHead->lock);
         HDF_LOGE("%{public}s rm size=%{public}d totalSize=%{public}d", __func__, size, totalSize);
+    }
+
+    if (mem != NULL) {
+        OsalMemFree(mem);
     }
 }
 

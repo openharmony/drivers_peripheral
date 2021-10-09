@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <fcntl.h>
 #include <hdf_io_service_if.h>
 #include <hdf_log.h>
@@ -115,7 +116,7 @@ static void *StopHandler(void *arg)
     }
 }
 
-pthread_t g_threads;
+static pthread_t g_threads;
 static void StartStopHandler()
 {
     int err;
@@ -132,7 +133,7 @@ static void StartStopHandler()
     }
 }
 
-int main(int argc, char *argv[])
+int acm_speed_write(int argc, char *argv[])
 {
     int status;
 

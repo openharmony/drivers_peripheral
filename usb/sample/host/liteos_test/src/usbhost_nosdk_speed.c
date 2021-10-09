@@ -134,7 +134,7 @@ static int SendProcess(void *argurb)
     return 0;
 }
 
-static void UrbCompleteHandle(struct urb *curUrb)
+static void UrbCompleteHandle(const struct urb *curUrb)
 {
     if (g_printData == true) {
         for (int i = 0; i < curUrb->actual_length; i++) {
@@ -292,7 +292,7 @@ static int32_t UsbSerialClose()
     return HDF_SUCCESS;
 }
 
-static int32_t UsbSerialSpeedInit(struct UsbSpeedTest *input, int *ifaceNum)
+static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNum)
 {
     int32_t ret = HDF_SUCCESS;
     if (input == NULL) {

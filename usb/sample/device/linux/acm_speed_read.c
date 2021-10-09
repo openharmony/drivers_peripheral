@@ -12,7 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "cdcacm.h"
+#include "usb_dev_test.h"
 #include <hdf_log.h>
 #include <hdf_remote_service.h>
 #include <hdf_sbuf.h>
@@ -24,9 +26,9 @@
 #include <unistd.h>
 #define HDF_LOG_TAG   cdc_acm_speed_read
 
-struct HdfSBuf *g_data;
-struct HdfSBuf *g_reply;
-struct HdfRemoteService *g_acmService;
+static struct HdfSBuf *g_data;
+static struct HdfSBuf *g_reply;
+static struct HdfRemoteService *g_acmService;
 static bool g_readRuning = false;
 static void TestSpeed()
 {
@@ -78,7 +80,7 @@ void StopReadSpeedTest(int signo)
     printf("acm_speed_read exit.\n");
 }
 
-int main(int argc, char *argv[])
+int acm_speed_read(int argc, char *argv[])
 {
     int status;
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();

@@ -16,12 +16,11 @@ set -e
 
 IFS=$'\n'
 read_log_file="/data/acm_read_xts"
-max_ts=0
-pid=$(ps -ef | grep 'acm_read' | grep -v grep | cut -F 2)
+pid=$(ps -ef | grep 'usb_dev_test' | grep -v grep | cut -F 2)
 if [ ! "${pid}x" == "x" ];then
-    killall acm_read
+    killall usb_dev_test
 fi
-acm_read &
+usb_dev_test -1 abc &
 cat /dev/null > $read_log_file
 while true
 do
@@ -29,12 +28,10 @@ do
     cat /dev/null > $read_log_file
     for line in $lines
     do
-        ts=$(echo $line | grep 'XTSCHECK' | cut -F 2 | cut -d ',' -f 1)
-        if [ `echo "$ts > $max_ts" | bc` -eq 1 ];then
-            max_ts=$ts
-            data=$(echo $line | grep 'XTSCHECK' | cut -F 4 | cut -d '[|]' -f 2)
+        data=$(echo $line | grep 'XTSCHECK' | cut -F 4 | cut -d '[|]' -f 2)
+        if [ ! "${data}x" == "x" ];then
             echo "[`date +%s.%N`]" $data
-            acm_write $data
+            usb_dev_test -2 $data
         fi
     done
     sleep 0.1

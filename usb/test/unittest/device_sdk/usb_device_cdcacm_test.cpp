@@ -335,9 +335,9 @@ static struct Serial *SerialAlloc(void)
     DListHeadInit(&port->writePool);
 
     port->lineCoding.dwDTERate = CpuToLe32(PORT_RATE);
-    port->lineCoding.bCharFormat = CHAR_FORMAT;
+    port->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
     port->lineCoding.bParityType = USB_CDC_NO_PARITY;
-    port->lineCoding.bDataBits = USB_CDC_1_STOP_BITS;
+    port->lineCoding.bDataBits = DATA_BIT;
     return port;
 }
 
