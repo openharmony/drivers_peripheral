@@ -194,7 +194,7 @@ struct UsbFnInterfaceInfo {
  * @brief Defines USB interface objects.
  */
 struct UsbFnInterface {
-	/** Pointer to the USB object */
+    /** Pointer to the USB object */
     const struct UsbObject    *object;
     /** USB interface information */
     struct UsbFnInterfaceInfo info;

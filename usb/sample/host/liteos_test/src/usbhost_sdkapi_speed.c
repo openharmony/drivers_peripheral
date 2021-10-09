@@ -325,7 +325,7 @@ static int32_t UsbSerialClose()
     return HDF_SUCCESS;
 }
 
-static int32_t UsbSerialSpeedInit(struct UsbSpeedTest *input, int *ifaceNum)
+static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNum)
 {
     int32_t ret = HDF_SUCCESS;
     int busNum = 1;

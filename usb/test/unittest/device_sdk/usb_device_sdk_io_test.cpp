@@ -24,7 +24,7 @@ using namespace std;
 using namespace testing::ext;
 namespace {
 static struct AcmDevice *g_acmDevice = nullptr;
-class UsbDeviceSdkIfTest : public testing::Test {
+class UsbDeviceSdkIoTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -32,30 +32,30 @@ public:
     void TearDown();
 };
 
-void UsbDeviceSdkIfTest::SetUpTestCase()
+void UsbDeviceSdkIoTest::SetUpTestCase()
 {
 }
 
-void UsbDeviceSdkIfTest::TearDownTestCase()
+void UsbDeviceSdkIoTest::TearDownTestCase()
 {
 }
 
-void UsbDeviceSdkIfTest::SetUp()
+void UsbDeviceSdkIoTest::SetUp()
 {
 }
 
-void UsbDeviceSdkIfTest::TearDown()
+void UsbDeviceSdkIoTest::TearDown()
 {
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCreateDevice001, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCreateDevice001, TestSize.Level1)
 {
     g_acmDevice = SetUpAcmDevice();
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->fnDev);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestAsync001, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync001, TestSize.Level1)
 {
     int ret;
     ret = UsbFnSubmitRequestAsync(nullptr);
@@ -77,7 +77,7 @@ static void ReadComplete(uint8_t pipe, struct UsbFnRequest *req)
     g_acmDevice->submit = 1;
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestAsync002, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync002, TestSize.Level1)
 {
     struct UsbFnRequest *req = nullptr;
     int ret;
@@ -109,7 +109,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestAsync002, TestSize.Level1)
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestAsync003, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync003, TestSize.Level1)
 {
     struct UsbFnRequest *req = nullptr;
     int ret;
@@ -144,7 +144,7 @@ static void WriteComplete(uint8_t pipe, struct UsbFnRequest *req)
     g_acmDevice->submit = 1;
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestAsync004, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync004, TestSize.Level1)
 {
     int ret;
     struct UsbFnRequest  *req = nullptr;
@@ -169,7 +169,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestAsync004, TestSize.Level1)
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestAsync005, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync005, TestSize.Level1)
 {
     int ret;
     int loopTime = TEST_TIMES;
@@ -197,14 +197,14 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestAsync005, TestSize.Level1)
     }
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestSync001, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync001, TestSize.Level1)
 {
     int ret;
     ret = UsbFnSubmitRequestSync(nullptr, 0);
     EXPECT_TRUE(ret != HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestSync002, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync002, TestSize.Level1)
 {
     struct UsbFnRequest *req = nullptr;
     int ret;
@@ -225,7 +225,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestSync002, TestSize.Level1)
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestSync003, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync003, TestSize.Level1)
 {
     struct UsbFnRequest *req = nullptr;
     int ret;
@@ -254,7 +254,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestSync003, TestSize.Level1)
     }
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestSync004, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync004, TestSize.Level1)
 {
     int ret;
     struct UsbFnRequest  *req = nullptr;
@@ -274,7 +274,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestSync004, TestSize.Level1)
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestSync005, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync005, TestSize.Level1)
 {
     int ret;
     int loopTime = TEST_TIMES;
@@ -297,7 +297,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestSync005, TestSize.Level1)
     }
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestSync006, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync006, TestSize.Level1)
 {
     struct UsbFnRequest *req = nullptr;
     int ret;
@@ -313,7 +313,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestSync006, TestSize.Level1)
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestSync007, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync007, TestSize.Level1)
 {
     struct UsbFnRequest *req = nullptr;
     int ret;
@@ -321,7 +321,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRequestSync007, TestSize.Level1)
     EXPECT_TRUE(ret != 0);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetReqStatus001, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus001, TestSize.Level1)
 {
     int ret;
     UsbRequestStatus status;
@@ -338,7 +338,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetReqStatus001, TestSize.Level1)
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetReqStatus002, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus002, TestSize.Level1)
 {
     int ret;
     UsbRequestStatus status;
@@ -354,7 +354,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetReqStatus002, TestSize.Level1)
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetReqStatus003, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus003, TestSize.Level1)
 {
     int ret;
     struct UsbFnRequest *notifyReq = nullptr;
@@ -369,7 +369,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetReqStatus003, TestSize.Level1)
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetReqStatus004, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus004, TestSize.Level1)
 {
     int ret;
     UsbRequestStatus status;
@@ -390,7 +390,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetReqStatus004, TestSize.Level1)
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetReqStatus005, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus005, TestSize.Level1)
 {
     int ret;
     UsbRequestStatus status;
@@ -399,7 +399,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetReqStatus005, TestSize.Level1)
     EXPECT_TRUE(ret != HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq001, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq001, TestSize.Level1)
 {
     int ret;
     EXPECT_NE(nullptr, g_acmDevice);
@@ -407,7 +407,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq001, TestSize.Level1)
     EXPECT_TRUE(ret != HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq002, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq002, TestSize.Level1)
 {
     int ret;
     struct UsbFnRequest *notifyReq = nullptr;
@@ -424,7 +424,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq002, TestSize.Level1)
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq003, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq003, TestSize.Level1)
 {
     int ret;
     struct UsbFnRequest  *req = nullptr;
@@ -451,7 +451,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq003, TestSize.Level1)
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq004, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq004, TestSize.Level1)
 {
     int ret;
     struct UsbFnRequest *req = nullptr;
@@ -468,7 +468,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq004, TestSize.Level1)
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq005, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq005, TestSize.Level1)
 {
     int ret;
     struct UsbFnRequest *req = nullptr;
@@ -483,7 +483,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq005, TestSize.Level1)
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq006, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq006, TestSize.Level1)
 {
     int ret;
     struct UsbFnRequest *req = nullptr;
@@ -498,7 +498,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq006, TestSize.Level1)
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq007, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq007, TestSize.Level1)
 {
     int ret;
     struct UsbFnRequest *ctrlReq = nullptr;
@@ -513,7 +513,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq007, TestSize.Level1)
     EXPECT_TRUE(ret == HDF_SUCCESS);
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq008, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq008, TestSize.Level1)
 {
     int ret;
     int count = 0;
@@ -533,7 +533,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCancelReq008, TestSize.Level1)
     }
 }
 
-HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRemoveDevice002, TestSize.Level1)
+HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRemoveDevice002, TestSize.Level1)
 {
     int ret;
 

@@ -81,7 +81,7 @@ HWTEST_F(UsbDevicePerformanceTest, CheckDeviceSdkProcInfo, TestSize.Level1)
     ASSERT_EQ(system(("nohup sh " + script + " usbfnMaster_host > /data/nohup.out &").c_str()), 0);
     printf("usb_watch_process.sh is running...\n");
     for (int i = 0; i < 1000; i++) {
-        system("acm_write $RANDOM");
+        system("usb_dev_test -2 $RANDOM");
         printf("Write data %d times\n", i);
         usleep(100 * 1000);
     }

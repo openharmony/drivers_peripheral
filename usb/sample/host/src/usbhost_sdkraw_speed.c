@@ -366,9 +366,9 @@ static int32_t UsbSerialDeviceAlloc(struct AcmDevice *acm)
         return HDF_FAILURE;
     }
     port->lineCoding.dwDTERate   = CpuToLe32(DATARATE);
-    port->lineCoding.bCharFormat = CHARFORMAT;
+    port->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
     port->lineCoding.bParityType = USB_CDC_NO_PARITY;
-    port->lineCoding.bDataBits   = USB_CDC_1_STOP_BITS;
+    port->lineCoding.bDataBits   = DATA_BITS_LENGTH;
     acm->lineCoding = port->lineCoding;
     acm->port = port;
     port->acm = acm;

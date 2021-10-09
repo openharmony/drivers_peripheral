@@ -567,7 +567,8 @@ static int IfSubmitRequestToQueue(const struct UsbIfRequest *requestObj)
 }
 
 static int32_t IfFillRequestByPipeType(struct UsbIfRequest *requestObj, UsbPipeType pipeType,
-    struct UsbHostRequest *hostRequest, const struct UsbDeviceHandle *devHandle, const struct UsbRequestParams *params)
+    struct UsbHostRequest *hostRequest, const struct UsbDeviceHandle *devHandle,
+    const struct UsbRequestParams *params)
 {
     int32_t ret;
 
@@ -807,7 +808,7 @@ HDF_STATUS UsbIfDestroyInterfaceObj(const struct UsbInterfacePool *interfacePool
 }
 
 int UsbIfCreatInterfacePool(const struct UsbSession *session, uint8_t busNum, uint8_t devAddr,
-                            struct UsbInterfacePool **interfacePool)
+    struct UsbInterfacePool **interfacePool)
 {
     struct UsbInterfacePool *interfacePoolTemp = NULL;
     static int32_t idNum = 0;

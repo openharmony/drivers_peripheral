@@ -66,7 +66,7 @@ struct FconfigDevStrings {
     struct FconfigString    gadgetName;
     uint16_t                language;
     uint32_t                strCount;
-    struct FconfigUsbString	*strings;
+    struct FconfigUsbString *strings;
 } __attribute__((packed));
 
 struct FconfigDevDesc {
@@ -118,7 +118,7 @@ struct FconfigPollFd {
     int events;
 };
 
-#define	FUNCTIONFS_ENDPOINT_DESC             _IOR('g', 130, struct UsbEndpointDescriptor)
+#define FUNCTIONFS_ENDPOINT_DESC             _IOR('g', 130, struct UsbEndpointDescriptor)
 
 #define FUNCTIONFS_NEWFN                     _IOW('g', 60, struct FuncNew)
 #define FUNCTIONFS_DELFN                     _IOW('g', 61, struct FuncNew)
@@ -144,7 +144,7 @@ struct FconfigPollFd {
 
 struct UsbFnCtrlEvent {
     union {
-        struct UsbFnCtrlRequest	 setup;
+        struct UsbFnCtrlRequest  setup;
     } __attribute__((packed))    u;
     uint8_t                      type;
     uint8_t                      pad[3];

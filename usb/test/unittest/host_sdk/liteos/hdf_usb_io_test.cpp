@@ -118,18 +118,18 @@ enum HdfLiteUsbTestCmd {
     USB_HOSTSDK_CLOSE_INTERFACE_006_TEST,
 };
 
-class hdfUsbTest1 : public testing::Test {
+class HdfUsbIoTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
 };
 
-void hdfUsbTest1::SetUpTestCase()
+void HdfUsbIoTest::SetUpTestCase()
 {
     HdfTestOpenService();
 }
 
-void hdfUsbTest1::TearDownTestCase()
+void HdfUsbIoTest::TearDownTestCase()
 {
     HdfTestCloseService();
 }
@@ -140,7 +140,7 @@ void hdfUsbTest1::TearDownTestCase()
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfInit001, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfInit001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_INIT_001_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -152,7 +152,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfInit001, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfClaimInterface006, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfClaimInterface006, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_CLAIM_INTERFACE_006_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -164,7 +164,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfClaimInterface006, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfOpenInterface006, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfOpenInterface006, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_OPEN_INTERFACE_006_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -176,7 +176,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfOpenInterface006, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfSelectInterfaceSetting006, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfSelectInterfaceSetting006, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_SELECT_INTERFACE_006_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -189,7 +189,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfSelectInterfaceSetting006, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfClaimInterface007, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfClaimInterface007, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_CLAIM_INTERFACE_007_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -201,7 +201,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfClaimInterface007, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfClaimInterface008, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfClaimInterface008, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_CLAIM_INTERFACE_008_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -213,7 +213,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfClaimInterface008, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfGetPipe002, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfGetPipe002, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_GET_PIPE_002_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -225,7 +225,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfGetPipe002, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfGetPipe004, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfGetPipe004, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_GET_PIPE_004_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -237,7 +237,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfGetPipe004, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfGetPipe006, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfGetPipe006, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_GET_PIPE_006_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -249,7 +249,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfGetPipe006, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfGetPipe008, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfGetPipe008, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_GET_PIPE_008_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -261,7 +261,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfGetPipe008, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfAllocRequest009, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfAllocRequest009, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_ALLOC_REQUEST_009_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -273,7 +273,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfAllocRequest009, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfFillRequest001, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfFillRequest001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_FILL_REQUEST_001_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -285,7 +285,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfFillRequest001, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfFillRequest002, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfFillRequest002, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_FILL_REQUEST_002_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -297,7 +297,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfFillRequest002, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfFillRequest003, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfFillRequest003, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_FILL_REQUEST_003_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -309,7 +309,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfFillRequest003, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfFillRequest004, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfFillRequest004, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_FILL_REQUEST_004_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -321,7 +321,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfFillRequest004, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfSubmitRequestSync003, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfSubmitRequestSync003, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_SUBMIT_REQUEST_SYNC_003_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -333,7 +333,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfSubmitRequestSync003, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfSubmitRequestSync002, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfSubmitRequestSync002, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_SUBMIT_REQUEST_SYNC_002_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -345,7 +345,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfSubmitRequestSync002, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfSubmitRequestSync001, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfSubmitRequestSync001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_SUBMIT_REQUEST_SYNC_001_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -357,7 +357,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfSubmitRequestSync001, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfSubmitRequestSync004, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfSubmitRequestSync004, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_SUBMIT_REQUEST_SYNC_004_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -369,7 +369,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfSubmitRequestSync004, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfFreeRequest001, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfFreeRequest001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_FREE_REQUEST_001_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -381,7 +381,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfFreeRequest001, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfFreeRequest002, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfFreeRequest002, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_FREE_REQUEST_002_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -393,7 +393,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfFreeRequest002, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfFreeRequest003, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfFreeRequest003, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_FREE_REQUEST_003_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -405,7 +405,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfFreeRequest003, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfFreeRequest004, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfFreeRequest004, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_FREE_REQUEST_004_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -417,7 +417,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfFreeRequest004, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfCloseInterface001, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfCloseInterface001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_CLOSE_INTERFACE_001_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -429,7 +429,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfCloseInterface001, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfCloseInterface002, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfCloseInterface002, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_CLOSE_INTERFACE_002_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -441,7 +441,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfCloseInterface002, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfCloseInterface003, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfCloseInterface003, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_CLOSE_INTERFACE_003_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -453,7 +453,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfCloseInterface003, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfReleaseInterface001, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfReleaseInterface001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_RELEASE_INTERFACE_001_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -465,7 +465,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfReleaseInterface001, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfReleaseInterface002, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfReleaseInterface002, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_RELEASE_INTERFACE_002_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -477,7 +477,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfReleaseInterface002, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfReleaseInterface003, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfReleaseInterface003, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_RELEASE_INTERFACE_003_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
@@ -489,7 +489,7 @@ HWTEST_F(hdfUsbTest1, CheckHostSdkIfReleaseInterface003, TestSize.Level1)
  * @tc.type      : PERF
  * @tc.level     : Level 1
  */
-HWTEST_F(hdfUsbTest1, CheckHostSdkIfExit001, TestSize.Level1)
+HWTEST_F(HdfUsbIoTest, CheckHostSdkIfExit001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_HOST_TYPE, USB_HOSTSDK_EXIT_001_TEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));

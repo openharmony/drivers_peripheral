@@ -186,8 +186,7 @@ if (defined(ohos_lite)) {
     sources = [ "//drivers/peripheral/usb/test/unittest/host_sdk/usb_host_sdk_if_test.cpp" ]
 
     deps = [
-      "//drivers/adapter/uhdf2/config:uhdf_hcs_pkg",
-      "//drivers/adapter/uhdf2/osal:libhdf_utils",
+      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//drivers/peripheral/usb/ddk:libusb_core",
       "//utils/native/base:utils",
     ]
@@ -220,7 +219,7 @@ if (defined(ohos_lite)) {
     deps = [
       "//drivers/adapter/uhdf2/host:libhdf_host",
       "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-      "//drivers/adapter/uhdf2/osal:libhdf_utils",
+      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//drivers/peripheral/usb/ddk:libusb_core",
       "//utils/native/base:utils",
     ]
@@ -250,8 +249,7 @@ if (defined(ohos_lite)) {
     sources = [ "//drivers/peripheral/usb/test/unittest/host_sdk/usb_host_sdk_if_test_io.cpp" ]
 
     deps = [
-      "//drivers/adapter/uhdf2/config:uhdf_hcs_pkg",
-      "//drivers/adapter/uhdf2/osal:libhdf_utils",
+      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//drivers/peripheral/usb/ddk:libusb_core",
       "//utils/native/base:utils",
     ]
@@ -282,7 +280,7 @@ if (defined(ohos_lite)) {
     deps = [
       "//drivers/adapter/uhdf2/host:libhdf_host",
       "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-      "//drivers/adapter/uhdf2/osal:libhdf_utils",
+      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//drivers/peripheral/usb/ddk:libusb_core",
       "//utils/native/base:utils",
     ]

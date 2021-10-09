@@ -50,12 +50,12 @@ protected:
 HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_001, TestSize.Level1)
 {
     printf("------start DeviceIOTest_001------\n");
-    ASSERT_EQ(system("acm_read &"), 0) << "ErrInfo:  failed to start acm_read";
+    ASSERT_EQ(system("usb_dev_test -1 abc &"), 0) << "ErrInfo:  failed to start acm read";
     sleep(2);
     const string data = "abc123";
     double startTs = GetNowTs();
     string wlog, rlog;
-    ASSERT_EQ(system(("acm_write '" + data + "'").c_str()), 0);
+    ASSERT_EQ(system(("usb_dev_test -2 '" + data + "'").c_str()), 0);
     wlog = "send data[" + data + "] to host";
     rlog = "recv data[" + data + "] from host";
     sleep(2);
@@ -82,7 +82,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_002, TestSize.Level1)
     double startTs = GetNowTs();
     string wlog, rlog;
     for (int i = 0; data[i].size() > 0; i++) {
-        ASSERT_EQ(system(("acm_write '" + data[i] + "'").c_str()), 0);
+        ASSERT_EQ(system(("usb_dev_test -2 '" + data[i] + "'").c_str()), 0);
         wlog = "send data[" + data[i] + "] to host";
         rlog = "recv data[" + data[i] + "] from host";
         sleep(2);
@@ -102,13 +102,13 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_003, TestSize.Level2)
 {
     printf("------start DeviceIOTest_003------\n");
     for (int i = 0; i < 30; i++) {
-        system("acm_write `date +%s%N | md5sum | cut -c 1-32`");
+        system("usb_dev_test -2 `date +%s%N | md5sum | cut -c 1-32`");
     }
     sleep(1);
     double startTs = GetNowTs();
     string wlog, rlog;
     const string data = "abc";
-    ASSERT_EQ(system(("acm_write '" + data + "'").c_str()), 0);
+    ASSERT_EQ(system(("usb_dev_test -2 '" + data + "'").c_str()), 0);
     wlog = "send data[" + data + "] to host";
     rlog = "recv data[" + data + "] from host";
     sleep(2);
@@ -135,12 +135,12 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsConfigTest_001, TestSize.Level1)
     const char *fmt = "recv data[%s %s %s %s] from host";
     snprintf_s(targetLog, logMaxLen, logMaxLen -1, fmt, idVendor, \
              idPorduct, bcdDevice, configurationValue);
-    const char *cmd = "acm_write GET_DESCRIPTOR";
+    const char *cmd = "usb_dev_test -2 GET_DESCRIPTOR";
     double startTs = GetNowTs();
     ASSERT_EQ(system(cmd), 0);
     sleep(1);
     EXPECT_TRUE(HasLog(string(targetLog), startTs, RLOG_FILE));
-    ASSERT_EQ(system("killall acm_read"), 0) << "ErrInfo:  failed to kill acm_read";
+    ASSERT_EQ(system("killall usb_dev_test"), 0) << "ErrInfo:  failed to kill usb_dev_test";
     printf("------end HcsConfigTest_001------\n");
 }
 
@@ -156,21 +156,13 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsConfigTest_002, TestSize.Level2)
     const char *idVendor = "18d2";
     const char *idProduct = "4ee8";
     const char *bDeviceProtocol = "01";
-    const int cmdMaxLen = 100;
-    char cmd[cmdMaxLen] = {0};
-    const char *fmt = "hilog -x | grep 'TestPropGet: %s(string) = %s'";
+
     ASSERT_EQ(system(("prop_test -s idVendor " + string(idVendor)).c_str()), 0);
     ASSERT_EQ(system(("prop_test -s idProduct " + string(idProduct)).c_str()), 0);
     ASSERT_EQ(system(("prop_test -s bDeviceProtocol " + string(bDeviceProtocol)).c_str()), 0);
     ASSERT_EQ(system("prop_test -g idVendor"), 0);
-    snprintf_s(cmd, cmdMaxLen, cmdMaxLen -1, fmt, "idVendor", idVendor);
-    ASSERT_EQ(system(cmd), 0);
     ASSERT_EQ(system("prop_test -g idProduct"), 0);
-    snprintf_s(cmd, cmdMaxLen, cmdMaxLen -1, fmt, "idProduct", idProduct);
-    ASSERT_EQ(system(cmd), 0);
     ASSERT_EQ(system("prop_test -g bDeviceProtocol"), 0);
-    snprintf_s(cmd, cmdMaxLen, cmdMaxLen -1, fmt, "bDeviceProtocol", bDeviceProtocol);
-    ASSERT_EQ(system(cmd), 0);
     ASSERT_EQ(system("prop_test -s idVendor 12d1"), 0);
     ASSERT_EQ(system("prop_test -s idProduct 5000"), 0);
     ASSERT_EQ(system("prop_test -s bDeviceProtocol 00"), 0);

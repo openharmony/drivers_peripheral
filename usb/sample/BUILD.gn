@@ -14,14 +14,9 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-group("hdf_ddk_functiontest_usb") {
+group("hdf_ddk_sample_usb") {
   deps = [
-    "//drivers/peripheral/usb/sample/device/linux:acm_read",
-    "//drivers/peripheral/usb/sample/device/linux:acm_speed_read",
-    "//drivers/peripheral/usb/sample/device/linux:acm_speed_write",
-    "//drivers/peripheral/usb/sample/device/linux:acm_test",
-    "//drivers/peripheral/usb/sample/device/linux:acm_write",
-    "//drivers/peripheral/usb/sample/device/linux:prop_test",
+    "//drivers/peripheral/usb/sample/device/linux:usb_dev_test",
     "//drivers/peripheral/usb/sample/host:libusb_pnp_sample_driver",
     "//drivers/peripheral/usb/sample/host:usbhost_ddk_test",
     "//drivers/peripheral/usb/sample/host:usbhost_nosdk_speed_test",

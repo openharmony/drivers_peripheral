@@ -939,7 +939,7 @@ void UsbFnCfgMgrFreeConfigs(struct UsbFnConfiguration **fnConfigs)
 {
     int8_t iCount;
 
-    for (iCount = 0; (fnConfigs[iCount] != NULL); iCount++) {
+    for (iCount = 0; fnConfigs[iCount] != NULL; iCount++) {
         if (fnConfigs[iCount]->functions) {
             UsbFnCfgMgrFreeFunctions(fnConfigs[iCount]->functions);
         }
@@ -1173,11 +1173,11 @@ static int32_t UsbFnCfgChangeUdcName(const struct UsbFnDeviceMgr *fnDevMgr,
     }
     ret = fnOps->writeUDC(fnDevMgr->name, fnDevMgr->udcName, 0);
     if (ret) {
-    	return HDF_FAILURE;
+        return HDF_FAILURE;
     }
     ret = fnOps->writeUDC(fnDevMgr->name, fnDevMgr->udcName, 1);
     if (ret) {
-    	return HDF_FAILURE;
+        return HDF_FAILURE;
     }
 
     return HDF_SUCCESS;
@@ -1251,7 +1251,6 @@ static struct UsbFnCfgPropMgr *UsbfnCfgMgrFindPropMgr(const struct UsbFnInterfac
     DLIST_FOR_EACH_ENTRY_SAFE(obj, temp, &g_cfgEntry, \
         struct UsbFnCfgPropMgr, entry) {
         if (obj->intf && (obj->intf == intf) && strcmp(name, obj->name) == 0) {
-
             return obj;
         }
     }

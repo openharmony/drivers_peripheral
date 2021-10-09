@@ -27,7 +27,7 @@
 using namespace testing::ext;
 
 namespace ModuleTest {
-class UsbFnDeviceSdkIOTest : public testing::Test {
+class UsbDeviceLiteosSdkIoTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -35,135 +35,135 @@ public:
     void TearDown();
 };
 
-void UsbFnDeviceSdkIOTest::SetUpTestCase()
+void UsbDeviceLiteosSdkIoTest::SetUpTestCase()
 {
     HdfTestOpenService();
 }
 
-void UsbFnDeviceSdkIOTest::TearDownTestCase()
+void UsbDeviceLiteosSdkIoTest::TearDownTestCase()
 {
     HdfTestCloseService();
 }
 
-void UsbFnDeviceSdkIOTest::SetUp() {}
+void UsbDeviceLiteosSdkIoTest::SetUp() {}
 
-void UsbFnDeviceSdkIOTest::TearDown() {}
+void UsbDeviceLiteosSdkIoTest::TearDown() {}
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceCreate001, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceCreate001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_CREATE_DEVICE, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceRequestAsync001, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceRequestAsync001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_REQUEST_ASYNC, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceRequestAsync002, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceRequestAsync002, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_REQUEST_ASYNC002, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceRequestAsync003, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceRequestAsync003, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_REQUEST_ASYNC003, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceRequestAsync004, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceRequestAsync004, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_REQUEST_ASYNC004, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceRequestAsync005, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceRequestAsync005, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_REQUEST_ASYNC005, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceRequestSync001, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceRequestSync001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_REQUEST_SYNC, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceRequestSync002, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceRequestSync002, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_REQUEST_SYNC002, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceRequestSync003, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceRequestSync003, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_REQUEST_SYNC003, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceRequestSync004, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceRequestSync004, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_REQUEST_SYNC004, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceRequestSync005, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceRequestSync005, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_REQUEST_SYNC005, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceRequestSync006, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceRequestSync006, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_REQUEST_SYNC006, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceRequestSync007, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceRequestSync007, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_REQUEST_SYNC007, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceCancelRequest001, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceCancelRequest001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_CANCEL_REQUEST, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceCancelRequest002, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceCancelRequest002, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_CANCEL_REQUEST002, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceCancelRequest003, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceCancelRequest003, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_CANCEL_REQUEST003, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceCancelRequest004, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceCancelRequest004, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_CANCEL_REQUEST004, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceCancelRequest005, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceCancelRequest005, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_CANCEL_REQUEST005, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceCancelRequest006, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceCancelRequest006, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_CANCEL_REQUEST006, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(UsbFnDeviceSdkIOTest, UsbDeviceDelete001, TestSize.Level1)
+HWTEST_F(UsbDeviceLiteosSdkIoTest, UsbDeviceDelete001, TestSize.Level1)
 {
     struct HdfTestMsg msg = {TEST_USB_DEVICE_TYPE, USB_DEVICE_DELETE_DEVICE002, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));

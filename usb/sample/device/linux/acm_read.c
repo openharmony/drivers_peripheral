@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "usb_dev_test.h"
 #include <hdf_log.h>
 #include <hdf_remote_service.h>
 #include <hdf_sbuf.h>
@@ -25,9 +26,9 @@
 
 #define HDF_LOG_TAG   cdc_acm_read
 
-struct HdfSBuf *g_data;
-struct HdfSBuf *g_reply;
-struct HdfRemoteService *g_acmService;
+static struct HdfSBuf *g_data;
+static struct HdfSBuf *g_reply;
+static struct HdfRemoteService *g_acmService;
 
 #define STR_LEN  8192
 #define SLEEP_READ 100000
@@ -57,7 +58,7 @@ static void TestRead(FILE *fp)
     usleep(SLEEP_READ);
 }
 
-int main(int argc, char *argv[])
+int acm_read(int argc, char *argv[])
 {
     int status;
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();

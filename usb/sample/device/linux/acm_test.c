@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "usb_dev_test.h"
 #include <hdf_log.h>
 #include <hdf_remote_service.h>
 #include <hdf_sbuf.h>
@@ -132,7 +133,7 @@ void StopAcmTest(int signo)
     printf("acm_test exit.\n");
 }
 
-int main(int argc, char *argv[])
+int acm_test(int argc, char *argv[])
 {
     int status;
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();

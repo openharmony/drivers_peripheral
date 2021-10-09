@@ -525,7 +525,7 @@ static int TestSpeedWrite(const char *buf)
 #endif
     if (status <= HDF_SUCCESS) {
         g_exitFlag = true;
-	    return HDF_FAILURE;
+        return HDF_FAILURE;
     }
 
     return HDF_SUCCESS;
@@ -713,7 +713,7 @@ void UsbHostDdkTestRemoveInterface(uint32_t value)
 
 int UsbHostDdkTestOpen(int cmdType)
 {
-    if(g_exitFlag == true) {
+    if (g_exitFlag == true) {
         HDF_LOGD("%s:%d g_exitFlag is true!", __func__, __LINE__);
         return HDF_FAILURE;
     }
@@ -740,7 +740,7 @@ int UsbHostDdkTestOpen(int cmdType)
 
 int UsbHostDdkTestClose(int cmdType)
 {
-    if(g_exitFlag == true) {
+    if (g_exitFlag == true) {
         HDF_LOGD("%s:%d g_exitFlag is true!", __func__, __LINE__);
         return HDF_FAILURE;
     }

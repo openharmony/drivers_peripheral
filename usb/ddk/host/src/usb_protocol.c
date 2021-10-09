@@ -87,8 +87,7 @@ static int CreateCtrPipe(const struct UsbInterfacePool *pool)
 }
 
 static int UsbInterfaceInit(struct UsbSdkInterface *interfaceObj,
-    const struct UsbRawInterfaceDescriptor *iface,
-    const struct UsbRawInterface *altsettings)
+    const struct UsbRawInterfaceDescriptor *iface, const struct UsbRawInterface *altsettings)
 {
     struct UsbInterfaceInfo *ptr = NULL;
 
