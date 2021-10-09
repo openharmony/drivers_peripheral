@@ -33,7 +33,7 @@
 #define READ_BUF_SIZE           8192
 
 #define PORT_RATE       9600
-#define CHAR_FORMAT     8
+#define DATA_BIT        8
 static int32_t g_inFifo = 0;
 /* Usb Serial Related Functions */
 static int32_t UsbSerialStartTx(struct UsbSerial *port)
@@ -1449,9 +1449,9 @@ static int32_t UsbSerialAlloc(struct UsbAcmDevice *acm)
     DListHeadInit(&port->writePool);
 
     port->lineCoding.dwDTERate = CpuToLe32(PORT_RATE);
-    port->lineCoding.bCharFormat = CHAR_FORMAT;
+    port->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
     port->lineCoding.bParityType = USB_CDC_NO_PARITY;
-    port->lineCoding.bDataBits = USB_CDC_1_STOP_BITS;
+    port->lineCoding.bDataBits = DATA_BIT;
 
     acm->port = port;
     return HDF_SUCCESS;

@@ -12,53 +12,35 @@
 # limitations under the License.
 
 if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
+  lite_component("hdf_manual_test_usb_device") {
+    if (ohos_build_type == "debug") {
+      deps = [
+        "device_sdk:hdf_usb_device_sdk_if_test",
+        "//drivers/peripheral/usb/test/performance:hdf_usb_device_sdk_io_test",
+      ]
+    }
+    features = []
+  }
+  lite_component("hdf_manual_test_usb_host") {
+    if (ohos_build_type == "debug") {
+      deps = [
+        "host_sdk:usb_host_raw_io_test",
+        "host_sdk:usb_host_raw_test",
+        "host_sdk:usb_host_sdk_io_test",
+        "host_sdk:usb_host_sdk_test",
+      ]
+    }
+    features = []
+  }
 } else {
   import("//build/config/sanitizers/sanitizers.gni")
   import("//build/test.gni")
   import("//drivers/adapter/uhdf2/uhdf.gni")
-}
 
-if (defined(ohos_lite)) {
-  unittest("hdf_usb_device_sdk_if_test") {
-    output_extension = "bin"
-    output_dir = "$root_out_dir/test/unittest/hdf"
-    include_dirs = [
-      "//third_party/googletest/googletest/include",
-      "//third_party/bounds_checking_function/include",
-      "//drivers/framework/ability/sbuf/include",
-      "//drivers/framework/include/platform",
-      "//drivers/framework/include/core",
-      "//drivers/framework/include/osal",
-      "//drivers/adapter/uhdf/posix/include",
-      "//drivers/framework/include/utils",
-      "//drivers/framework/include/config",
-      "//drivers/framework/include",
-      "//drivers/framework/test/unittest/include",
-      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-    ]
-
-    sources = [ "//drivers/peripheral/usb/test/unittest/common/usb_device_liteos_sdk_test.cpp" ]
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/adapter/uhdf/manager:hdf_core",
-      "//drivers/adapter/uhdf/platform:hdf_platform",
-      "//drivers/adapter/uhdf/posix:hdf_posix_osal",
-      "//drivers/adapter/uhdf/test/unittest/common:hdf_test_common",
-    ]
-    public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-    cflags = [
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-fsigned-char",
-      "-fno-common",
-      "-fno-strict-aliasing",
-    ]
-  }
-} else {
   module_output_path = "hdf/usb"
-  ohos_unittest("usb_device_sdk_if_test") {
+  ohos_unittest("usb_device_sdk_io_test") {
     module_out_path = module_output_path
     include_dirs = [
       "//drivers/peripheral/usb/ddk/common/include",
@@ -86,7 +68,7 @@ if (defined(ohos_lite)) {
 
     sources = [
       "//drivers/peripheral/usb/test/unittest/device_sdk/usb_device_cdcacm_test.cpp",
-      "//drivers/peripheral/usb/test/unittest/device_sdk/usb_device_sdk_if_test.cpp",
+      "//drivers/peripheral/usb/test/unittest/device_sdk/usb_device_sdk_io_test.cpp",
     ]
     deps = [
       "$hdf_uhdf_path/hdi:libhdi",
@@ -102,5 +84,13 @@ if (defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
+  }
+
+  group("hdf_manual_test_usb") {
+    testonly = true
+    deps = [
+      ":usb_device_sdk_io_test",
+      "host_sdk:hdf_unittest_usb_host",
+    ]
   }
 }

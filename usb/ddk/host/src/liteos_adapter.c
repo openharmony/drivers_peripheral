@@ -457,7 +457,7 @@ static void OsFreeIsoUrbs(struct UsbHostRequest *request)
     request->isoUrbs = NULL;
 }
 
-static void OsDiscardUrbs(struct UsbHostRequest * const request, int first, int last)
+static void OsDiscardUrbs(const struct UsbHostRequest *request, int first, int last)
 {
     struct UsbAdapterUrb *urb = NULL;
     struct Async *as = NULL;
@@ -1361,7 +1361,7 @@ static int AdapterSubmitRequest(struct UsbHostRequest *request)
     return ret;
 }
 
-static int AdapterCancelRequest(struct UsbHostRequest * const request)
+static int AdapterCancelRequest(const struct UsbHostRequest *request)
 {
     if (!request->urbs) {
         DPRINTFN(0, "adapter cancel urb null\n");

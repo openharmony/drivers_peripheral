@@ -721,7 +721,7 @@ static void EcmProcessNotification(struct EcmDevice *ecm, unsigned char *buf)
         case USB_DDK_CDC_NOTIFY_NETWORK_CONNECTION:
             HDF_LOGE("%s - network connection: %s\n", __func__,  (dr->wValue ? "on" : "off"));
             break;
-        case USB_DDK_CDC_NOTIFY_SPEED_CHANGE:	/* tx/rx rates */
+        case USB_DDK_CDC_NOTIFY_SPEED_CHANGE:
             HDF_LOGE("%s - speed change wLength: %d\n", __func__, dr->wLength);
             break;
         default:
