@@ -270,8 +270,8 @@ static int OsReadDescriptors(struct UsbDevice *dev)
 {
     size_t allocLen = 0;
     uint8_t *ptr = NULL;
-    int len;
     int ret;
+    size_t count;
     if (dev == NULL) {
         HDF_LOGE("%s:%d dev is NULL!", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -297,8 +297,12 @@ static int OsReadDescriptors(struct UsbDevice *dev)
             return ret;
         }
         memset_s(ptr, DESC_READ_LEN, 0, DESC_READ_LEN);
-        ret = memcpy_s(ptr, DESC_READ_LEN, osDev->adapterDevice->cdesc,
-            UGETW(osDev->adapterDevice->cdesc->wTotalLength));
+        count = UGETW(osDev->adapterDevice->cdesc->wTotalLength);
+        if ((count < 0) || (count > DESC_READ_LEN)) {
+            ret = HDF_ERR_IO;
+            return ret;
+        }
+        ret = memcpy_s(ptr, DESC_READ_LEN, osDev->adapterDevice->cdesc, count);
         if (ret != HDF_SUCCESS) {
             DPRINTFN(0, "%s:%d ret=%d\n", __func__, __LINE__, ret);
             ret = HDF_ERR_IO;
@@ -306,8 +310,7 @@ static int OsReadDescriptors(struct UsbDevice *dev)
         }
         DPRINTFN(0, "%s:+configdes_size:%d+type:%d\n", __func__,
             UGETW(osDev->adapterDevice->cdesc->wTotalLength), osDev->adapterDevice->cdesc->bDescriptorType);
-        len = UGETW(osDev->adapterDevice->cdesc->wTotalLength);
-        dev->descriptorsLength += (size_t)len;
+        dev->descriptorsLength += count;
     } while (dev->descriptorsLength == allocLen);
 
     return HDF_SUCCESS;
@@ -1194,11 +1197,17 @@ static int AdapterGetConfigDescriptor(const struct UsbDevice *dev,
 {
     struct OsDev *osDev = (struct OsDev *)dev->privateData;
     struct UsbAdapterDevice *adapterDevice = osDev->adapterDevice;
-    if ((buffer == NULL) || (adapterDevice == NULL) || (adapterDevice->cdesc == NULL)) {
+    size_t count;
+    if ((buffer == NULL) || (len == 0) || (adapterDevice == NULL) || (adapterDevice->cdesc == NULL)) {
         DPRINTFN(0, "invalid param is NULL");
         return HDF_ERR_INVALID_PARAM;
     }
-    if (memcpy_s(buffer, len, adapterDevice->cdesc, UGETW(adapterDevice->cdesc->wTotalLength)) != EOK) {
+    count = UGETW(adapterDevice->cdesc->wTotalLength);
+    if ((count < 0) || (count > len)) {
+        DPRINTFN(0, "count length is error");
+        return HDF_ERR_IO;
+    }
+    if (memcpy_s(buffer, len, adapterDevice->cdesc, count) != EOK) {
         DPRINTFN(0, "memcpy_s fail");
         return HDF_ERR_IO;
     }
@@ -1470,7 +1479,7 @@ int AdapterAtomicInc(OsalAtomic *v)
 {
     int valOld;
     int val;
-    uint32_t status = 1;
+    uint32_t status = 0;
     Atomic *p = NULL;
     if (v) {
         p = (Atomic *)&(v)->counter;

@@ -6,6 +6,7 @@
  * See the LICENSE file in the root of this repository for complete details.
  */
 
+#include "hdf_usb_raw_io_test.h"
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -13,12 +14,9 @@
 #include <gtest/gtest.h>
 #include <string>
 #include <unistd.h>
-#include "hdf_uhdf_test.h"
-#include "hdf_io_service_if.h"
 
 using namespace testing::ext;
 
-#define HDF_TEST_NAME "/dev/hdf_test"
 namespace {
 enum HdfLiteUsbRawTestCmd {
     USB_RAW_SDK_IF_START_IO,
