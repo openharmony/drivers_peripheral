@@ -413,7 +413,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0211)
         std::cout << "==========[test log] AttachBufferQueue fail, rc = " << display_->rc << std::endl;
     }
     sleep(3);
-    //Release the stream
+    // Release the stream
     display_->streamIds = {1001};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
