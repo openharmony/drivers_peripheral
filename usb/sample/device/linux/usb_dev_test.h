@@ -13,11 +13,6 @@
  * limitations under the License.
  */
 
-#include <hdf_log.h>
-#include <hdf_remote_service.h>
-#include <hdf_sbuf.h>
-#include <servmgr_hdi.h>
-
 int acm_read(int argc, char *argv[]);
 int acm_speed_read(int argc, char *argv[]);
 int acm_speed_write(int argc, char *argv[]);

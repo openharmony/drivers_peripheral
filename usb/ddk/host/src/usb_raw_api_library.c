@@ -1531,16 +1531,13 @@ void RawUsbMemFree(void *mem)
     if ((g_usbRamTestFlag == true) && (g_usbRamTestHead != NULL)) {
         OsalMutexLock(&g_usbRamTestHead->lock);
         DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
-            if ((pos != NULL) && (mem != NULL) && (pos->address != (uintptr_t)NULL)
-                && (pos->address == (uintptr_t)mem)) {
+            if (pos->address == (uintptr_t)mem) {
                 size = pos->size;
                 DListRemove(&pos->list);
                 OsalMemFree(pos);
                 continue;
             }
-            if (pos != NULL) {
-                totalSize += pos->size;
-            }
+            totalSize += pos->size;
         }
         OsalMutexUnlock(&g_usbRamTestHead->lock);
         HDF_LOGE("%{public}s rm size=%{public}d totalSize=%{public}d", __func__, size, totalSize);

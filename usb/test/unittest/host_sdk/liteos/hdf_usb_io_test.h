@@ -13,7 +13,12 @@
  * limitations under the License.
  */
 
-int acm_speed_read(int argc, char *argv[]);
-int acm_speed_write(int argc, char *argv[]);
-int acm_test(int argc, char *argv[]);
-int prop_test(int argc, char *argv[]);
+#ifndef HDF_USB_IO_TEST_H
+#define HDF_USB_IO_TEST_H
+
+#include "hdf_uhdf_test.h"
+#include "hdf_io_service_if.h"
+
+#define HDF_TEST_NAME "/dev/hdf_test"
+
+#endif

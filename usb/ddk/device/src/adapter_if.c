@@ -303,7 +303,7 @@ static int UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName, int
     return 0;
 }
 
-static int UsbFnAdapterOpenFn()
+static int UsbFnAdapterOpenFn(void)
 {
     int i;
     int ep = -1;
@@ -1312,7 +1312,7 @@ void UsbFnMemFree(void * const mem)
     if ((g_usbRamTestFlag == true) && (g_usbRamTestHead != NULL)) {
         OsalMutexLock(&g_usbRamTestHead->lock);
         DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
-            if ((pos != NULL) && (mem != NULL) && (pos->address == (uintptr_t)mem)) {
+            if (pos->address == (uintptr_t)mem) {
                 size = pos->size;
                 DListRemove(&pos->list);
                 OsalMemFree(pos);
