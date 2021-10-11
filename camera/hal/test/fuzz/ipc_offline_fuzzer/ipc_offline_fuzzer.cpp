@@ -13,16 +13,27 @@
  * limitations under the License.
  */
 
-#include "ipc_camera_device_callback_fuzzer.h"
+#include "ipc_offline_fuzzer.h"
 #include "fuzz_base.h"
 
 #include <cstddef>
 #include <cstdint>
 
-class IPCCameraDeviceCallbackFuzzer : public CameraDeviceCallbackStub {
+class IPCOfflineFuzzer : public OfflineStreamOperatorStub {
 public:
-    virtual void OnError(ErrorType type, int32_t errorCode) override {}
-    virtual void OnResult(uint64_t timestamp, const std::shared_ptr<CameraStandard::CameraMetadata> &result) override {}
+    virtual CamRetCode CancelCapture(int captureId)
+    {
+        (void)captureId;
+        return OHOS::Camera::NO_ERROR;
+    }
+    virtual CamRetCode ReleaseStreams(const std::vector<int>& streamIds)
+    {
+        return OHOS::Camera::NO_ERROR;
+    }
+    virtual CamRetCode Release()
+    {
+        return OHOS::Camera::NO_ERROR;
+    }
 };
 
 static uint32_t U32_AT(const uint8_t *ptr)
@@ -34,27 +45,24 @@ static int32_t onRemoteRequest(uint32_t code, MessageParcel &data)
 {
     MessageParcel reply;
     MessageOption option;
-    IPCCameraDeviceCallbackFuzzer IPCDeviceCallback;
-
-    auto ret = IPCDeviceCallback.OnRemoteRequest(code, data, reply, option);
+    IPCOfflineFuzzer IPCOfflineSer;
+    auto ret = IPCOfflineSer.OnRemoteRequest(code, data, reply, option);
     return ret;
 }
 
-static void fuzzAccountService(const uint8_t *data, size_t size)
+static void IpcFuzzService(const uint8_t *data, size_t size)
 {
     MessageParcel reply;
     MessageOption option;
     MessageParcel dataMessageParcel;
+    uint32_t code = U32_AT(data);
+
+    uint8_t *number = data;
+    number = number + sizeof(uint32_t);
     if (size > sizeof(uint32_t)) {
-        uint32_t code = U32_AT(data);
-        if (code == 1) { // 1:code size
-            return;
-        }
-        uint8_t *number = data;
-        number = number + sizeof(uint32_t);
         size_t length = size;
         length = length - sizeof(uint32_t);
-        dataMessageParcel.WriteInterfaceToken(CameraDeviceCallbackStub::GetDescriptor());
+        dataMessageParcel.WriteInterfaceToken(OfflineStreamOperatorStub::GetDescriptor());
         dataMessageParcel.WriteBuffer(number, length);
         dataMessageParcel.RewindRead(0);
         onRemoteRequest(code, dataMessageParcel);
@@ -63,7 +71,7 @@ static void fuzzAccountService(const uint8_t *data, size_t size)
 
 static void OnRemoteRequestFunc(const uint8_t *data, size_t size)
 {
-    fuzzAccountService(data, size);
+    IpcFuzzService(data, size);
 }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
