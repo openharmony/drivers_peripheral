@@ -15,7 +15,6 @@
 
 #include "ipp_algo.h"
 #include <stdio.h>
-#include <unistd.h>
 #include "securec.h"
 
 #define MAX_BUFFER_COUNT 100
