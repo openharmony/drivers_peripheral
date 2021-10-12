@@ -35,7 +35,7 @@
 static struct RawUsbRamTestList *g_usbRamTestHead = NULL;
 static bool g_usbRamTestFlag = false;
 
-static int UsbFnAdapterOpenFn()
+static int UsbFnAdapterOpenFn(void)
 {
     int i;
     int ep;
@@ -140,7 +140,7 @@ static int UsbFnAdapterWriteDevString(int fd, struct FconfigDevStrings *devStrin
     devStrings->language = usbFnString->language;
     devStrings->strCount = 0;
     usbString = usbFnString->strings;
-    while (usbString->s){
+    while (usbString->s) {
         devStrings->strCount++;
         usbString++;
     }
@@ -1081,15 +1081,13 @@ void UsbFnMemFree(void * const mem)
     if ((g_usbRamTestFlag == true) && (g_usbRamTestHead != NULL)) {
         OsalMutexLock(&g_usbRamTestHead->lock);
         DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
-            if ((pos != NULL) && (mem != NULL) && (pos->address == (uintptr_t)mem)) {
+            if (pos->address == (uintptr_t)mem) {
                 size = pos->size;
                 DListRemove(&pos->list);
                 OsalMemFree(pos);
                 continue;
             }
-            if (pos != NULL) {
-                totalSize += pos->size;
-            }
+            totalSize += pos->size;
         }
         OsalMutexUnlock(&g_usbRamTestHead->lock);
         HDF_LOGE("%{public}s rm size=%{public}d totalSize=%{public}d", __func__, size, totalSize);
