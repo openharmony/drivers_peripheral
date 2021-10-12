@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <unistd.h>
+
 #define HDF_LOG_TAG   cdc_acm_speed
 
 enum UsbSerialCmd {
@@ -50,7 +51,8 @@ static struct HdfSBuf *g_reply;
 static struct HdfIoService *g_acmService;
 static bool g_readRuning = false;
 static sigset_t g_mask;
-static void TestSpeed()
+
+static void TestSpeed(void)
 {
     HdfSbufFlush(g_reply);
     int status = g_acmService->dispatcher->Dispatch(&g_acmService->object,
@@ -62,7 +64,7 @@ static void TestSpeed()
     }
 }
 
-static void GetTempSpeed()
+static void GetTempSpeed(void)
 {
     const float calc = 10000;
     uint32_t speed = 0;
@@ -83,7 +85,7 @@ static void GetTempSpeed()
     }
 }
 
-static void WriteSpeedDone()
+static void WriteSpeedDone(void)
 {
     int status = g_acmService->dispatcher->Dispatch(g_acmService,
         USB_SERIAL_WRITE_SPEED_DONE, g_data, g_reply);
@@ -117,13 +119,12 @@ static void *StopHandler(void *arg)
 }
 
 static pthread_t g_threads;
-static void StartStopHandler()
+static void StartStopHandler(void)
 {
-    int err;
     sigemptyset(&g_mask);
     sigaddset(&g_mask, SIGINT);
     sigaddset(&g_mask, SIGQUIT);
-    if ((err = pthread_sigmask(SIG_BLOCK, &g_mask, NULL)) != 0) {
+    if ((pthread_sigmask(SIG_BLOCK, &g_mask, NULL)) != 0) {
         printf("SIG_BLOCK error\n");
         return;
     }
