@@ -46,7 +46,7 @@ public:
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual void Close() override{}
+    virtual void Close() override {}
 };
 
 static uint32_t U32_AT(const uint8_t *ptr)
@@ -64,7 +64,7 @@ static int32_t onRemoteRequest(uint32_t code, MessageParcel &data)
     return ret;
 }
 
-static void fuzzAccountService(const uint8_t *data, size_t size)
+static void IpcFuzzService(const uint8_t *data, size_t size)
 {
     MessageParcel reply;
     MessageOption option;
@@ -87,7 +87,7 @@ static void fuzzAccountService(const uint8_t *data, size_t size)
 
 static void OnRemoteRequestFunc(const uint8_t *data, size_t size)
 {
-    fuzzAccountService(data, size);
+    IpcFuzzService(data, size);
 }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)

@@ -63,7 +63,7 @@ public:
         return OHOS::Camera::NO_ERROR;
     }
     virtual CamRetCode Capture(int captureId,
-        const std::shared_ptr<CaptureInfo>& captureInfo, bool isStreaming) override{}
+        const std::shared_ptr<CaptureInfo>& captureInfo, bool isStreaming) override {}
         {
             return OHOS::Camera::NO_ERROR;
         }
@@ -93,7 +93,7 @@ static int32_t onRemoteRequest(uint32_t code, MessageParcel &data)
     return ret;
 }
 
-static void fuzzAccountService(const uint8_t *data, size_t size)
+static void IpcFuzzService(const uint8_t *data, size_t size)
 {
     MessageParcel reply;
     MessageOption option;
@@ -114,13 +114,13 @@ static void fuzzAccountService(const uint8_t *data, size_t size)
     }
 }
 
-static void OnRemoteRequest_Fun1(const uint8_t *data, size_t size)
+static void OnRemoteRequestFunc(const uint8_t *data, size_t size)
 {
-    fuzzAccountService(data, size);
+    IpcFuzzService(data, size);
 }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    OnRemoteRequest_Fun1(data, size);
+    OnRemoteRequestFunc(data, size);
     return 0;
 }
