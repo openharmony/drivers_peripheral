@@ -17,7 +17,7 @@ print("product_name : , ${product_name}")
 group("camera_hal") {
   if (is_standard_system) {
     deps = [
-      "../interfaces/include/client:libcamera_client",
+      "../interfaces/hdi_cpp/client:libcamera_client",
       "buffer_manager:camera_buffer_manager",
       "device_manager:camera_device_manager",
       "hdi_impl:camera_hdi_impl",

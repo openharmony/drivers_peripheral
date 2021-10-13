@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "stream_operator_service_stub.h"
+#include "stream_operator_stub.h"
 #include <hdf_log.h>
 #include <hdf_base.h>
 #include <hdf_sbuf_ipc.h>

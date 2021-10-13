@@ -13,18 +13,16 @@
  * limitations under the License.
  */
 
-#include "camera_host_callback.h"
-#include <iostream>
+#include "camera_device_callback.h"
 
 namespace OHOS::Camera {
-void CameraHostCallback::OnCameraStatus(const std::string &cameraId, CameraStatus status)
+void CameraDeviceCallback::OnError(ErrorType type, int32_t errorMsg)
 {
-    std::cout << "~###############OnCameraStatus" << std::endl;
+    std::cout << "~###############CameraDeviceCallback OnError" << std::endl;
 }
 
-void CameraHostCallback::OnFlashlightStatus(const std::string &cameraId, FlashlightStatus status)
+void CameraDeviceCallback::OnResult(uint64_t timestamp, const std::shared_ptr<CameraStandard::CameraMetadata> &result)
 {
-    std::cout << "CameraHostCallback OnFlashlightStatus cameraId = " << cameraId <<
-        "$$$$$$$ FlashlightStatus = " << status << std::endl;
+    std::cout << "~###############CameraDeviceCallback OnResult" << std::endl;
 }
 }

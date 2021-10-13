@@ -17,7 +17,7 @@
 #define HOS_CAMERA_OFFLINE_STREAM_OPERATOR_H
 
 #include "camera.h"
-#include "offline_stream_operator_service_stub.h"
+#include "offline_stream_operator_stub.h"
 #include "offline_stream.h"
 #include <map>
 #include <mutex>

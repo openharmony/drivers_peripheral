@@ -17,7 +17,7 @@
 #include <hdf_base.h>
 #include <osal_mem.h>
 #include <hdf_device_desc.h>
-#include "camera_host_service_stub.h"
+#include "camera_host_stub.h"
 
 #define HDF_LOG_TAG camera_service
 
@@ -64,7 +64,7 @@ int HdfCameraHostDriverBind(HdfDeviceObject *deviceObject)
 
 void HdfCameraHostDriverRelease(HdfDeviceObject *deviceObject)
 {
-    if (deviceObject == nullptr || deviceObject->service == nullptr ) {
+    if (deviceObject == nullptr || deviceObject->service == nullptr) {
         HDF_LOGE("HdfCameraHostDriverRelease： deviceObject or deviceObject->service  is NULL!");
         return;
     }

@@ -49,7 +49,8 @@ int32_t StreamOperatorCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel
     return ret;
 }
 
-int32_t StreamOperatorCallbackStub::OnCaptureStartedStub(MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t StreamOperatorCallbackStub::OnCaptureStartedStub(MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
 {
     int32_t captureId = data.ReadInt32();
     std::vector<int32_t> streamIds;
@@ -62,7 +63,8 @@ int32_t StreamOperatorCallbackStub::OnCaptureStartedStub(MessageParcel &data, Me
     return HDF_SUCCESS;
 }
 
-int32_t StreamOperatorCallbackStub::OnCaptureEndedStub(MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t StreamOperatorCallbackStub::OnCaptureEndedStub(MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
 {
     int32_t captureId = data.ReadInt32();
     int32_t count = data.ReadInt32();
@@ -85,7 +87,8 @@ int32_t StreamOperatorCallbackStub::OnCaptureEndedStub(MessageParcel &data, Mess
     return HDF_SUCCESS;
 }
 
-int32_t StreamOperatorCallbackStub::OnCaptureErrorStub(MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t StreamOperatorCallbackStub::OnCaptureErrorStub(MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
 {
     int32_t captureId = data.ReadInt32();
     int32_t count = data.ReadInt32();
@@ -108,7 +111,8 @@ int32_t StreamOperatorCallbackStub::OnCaptureErrorStub(MessageParcel &data, Mess
     return HDF_SUCCESS;
 }
 
-int32_t StreamOperatorCallbackStub::OnFrameShutterStub(MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t StreamOperatorCallbackStub::OnFrameShutterStub(MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
 {
     int32_t captureId = data.ReadInt32();
     std::vector<int32_t> streamIds;
