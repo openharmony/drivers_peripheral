@@ -18,11 +18,12 @@ ohos_executable("ohos_camera_demo") {
   include_dirs = [
     "./include",
     "$camera_path/../interfaces/include",
-    "$camera_path/../interfaces/include/client",
-    "$camera_path/../interfaces/include/server",
-    "$camera_path/../interfaces/include/callback/host",
-    "$camera_path/../interfaces/include/callback/device",
-    "$camera_path/../interfaces/include/callback/operator",
+    "$camera_path/../interfaces/hdi_cpp/utils/include",
+    "$camera_path/../interfaces/hdi_cpp/client/include",
+    "$camera_path/../interfaces/hdi_cpp/server/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/host/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/device/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/operator/include",
     "$camera_path/include",
     "$camera_path/hdi_impl",
     "$camera_path/hdi_impl/include",
@@ -70,7 +71,7 @@ ohos_executable("ohos_camera_demo") {
   ]
 
   deps = [
-    "$camera_path/../interfaces/include/client:libcamera_client",
+    "$camera_path/../interfaces/hdi_cpp/client:libcamera_client",
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",

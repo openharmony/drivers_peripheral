@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "camera_device_service_stub.h"
+#include "camera_device_stub.h"
 #include <hdf_log.h>
 #include <hdf_base.h>
 #include <hdf_sbuf_ipc.h>

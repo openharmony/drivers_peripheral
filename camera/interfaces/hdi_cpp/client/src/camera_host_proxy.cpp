@@ -38,7 +38,7 @@ sptr<ICameraHost> ICameraHost::Get(const char *serviceName)
             return hostSptr;
         }
         HDF_LOGE("%s: GetService failed! serviceName = %s", __func__, serviceName);
-    } while(false);
+    } while (false);
 
     HDF_LOGE("%s: get %s failed!", __func__, serviceName);
     return nullptr;

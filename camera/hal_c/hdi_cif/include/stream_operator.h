@@ -18,7 +18,7 @@
 
 #include "istream_operator.h"
 #include "stream_operator_c_if.h"
-#include "stream_operator_service_stub.h"
+#include "stream_operator_stub.h"
 
 namespace OHOS::Camera {
 class StreamOperator : public StreamOperatorStub {
@@ -30,7 +30,8 @@ public:
         StreamSupportType &pType) override;
     virtual CamRetCode CreateStreams(const std::vector<std::shared_ptr<StreamInfo>> &streamInfos) override;
     virtual CamRetCode ReleaseStreams(const std::vector<int> &streamIds) override;
-    virtual CamRetCode CommitStreams(OperationMode mode, const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting) override;
+    virtual CamRetCode CommitStreams(OperationMode mode,
+        const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting) override;
     virtual CamRetCode GetStreamAttributes(std::vector<std::shared_ptr<StreamAttribute>> &attributes) override;
     virtual CamRetCode AttachBufferQueue(int streamId, const OHOS::sptr<OHOS::IBufferProducer> &producer) override;
     virtual CamRetCode DetachBufferQueue(int streamId) override;
