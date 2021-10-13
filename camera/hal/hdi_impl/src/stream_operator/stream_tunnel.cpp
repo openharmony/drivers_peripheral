@@ -129,7 +129,7 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
     }
 
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK) {
-        int32_t fence = 0;
+        int32_t fence = -1;
         EsFrameInfo esInfo = buffer->GetEsFrameInfo();
         if (esInfo.size != -1 && esInfo.timestamp != -1) {
             sb->ExtraSet(OHOS::Camera::dataSize, esInfo.size);
