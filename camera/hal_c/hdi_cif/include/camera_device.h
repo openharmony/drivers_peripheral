@@ -20,7 +20,7 @@
 #include "camera_metadata_c_if.h"
 #include "camera_types_c_if.h"
 #include "icamera_device.h"
-#include "camera_device_service_stub.h"
+#include "camera_device_stub.h"
 
 namespace OHOS::Camera {
 class CameraDevice : public CameraDeviceStub {

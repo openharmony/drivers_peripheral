@@ -19,7 +19,7 @@
 #include "camera.h"
 #include "ioffline_stream_operator.h"
 #include "stream_operator_c_if.h"
-#include "offline_stream_operator_service_stub.h"
+#include "offline_stream_operator_stub.h"
 
 namespace OHOS::Camera {
 class OfflineStreamOperator : public OfflineStreamOperatorStub {

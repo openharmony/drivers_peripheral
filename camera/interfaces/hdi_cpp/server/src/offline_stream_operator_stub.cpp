@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "offline_stream_operator_service_stub.h"
+#include "offline_stream_operator_stub.h"
 #include <hdf_log.h>
 #include <hdf_base.h>
 #include <hdf_sbuf_ipc.h>
@@ -45,7 +45,7 @@ int32_t OfflineStreamOperatorStub::OnRemoteRequest(uint32_t code, MessageParcel 
 }
 
 int32_t OfflineStreamOperatorStub::OfflineStreamOperatorStubCancelCapture(
-MessageParcel &data, MessageParcel &reply, MessageOption &option)
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     int32_t captureId = data.ReadInt32();
     CamRetCode ret = CancelCapture(captureId);
@@ -58,7 +58,7 @@ MessageParcel &data, MessageParcel &reply, MessageOption &option)
 }
 
 int32_t OfflineStreamOperatorStub::OfflineStreamOperatorStubReleaseStreams(
-MessageParcel &data, MessageParcel &reply, MessageOption &option)
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     std::vector<int32_t> streamIds;
     if (!data.ReadInt32Vector(&streamIds)) {
@@ -76,7 +76,7 @@ MessageParcel &data, MessageParcel &reply, MessageOption &option)
 }
 
 int32_t OfflineStreamOperatorStub::OfflineStreamOperatorStubRelease(
-MessageParcel &data, MessageParcel &reply, MessageOption &option)
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     CamRetCode ret = Release();
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {

@@ -13,19 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef CAMERA_HOST_CALLBACK_CLIENT_STUB_H
-#define CAMERA_HOST_CALLBACK_CLIENT_STUB_H
+#ifndef STREAM_OPERATOR_CALLBACK_CLIENT_STUB_H
+#define STREAM_OPERATOR_CALLBACK_CLIENT_STUB_H
 
-#include "icamera_host_callback.h"
+#include "istream_operator_callback.h"
 #include "iremote_stub.h"
 #include "message_parcel.h"
 #include "parcel.h"
 
 namespace OHOS::Camera {
-class CameraHostCallbackStub : public IRemoteStub<ICameraHostCallback> {
+class StreamOperatorCallbackStub : public IRemoteStub<IStreamOperatorCallback> {
 public:
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
         MessageOption &option) override;
+    int32_t OnCaptureStartedStub(MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int32_t OnCaptureEndedStub(MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int32_t OnCaptureErrorStub(MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int32_t OnFrameShutterStub(MessageParcel &data, MessageParcel &reply, MessageOption &option);
 };
 }
-#endif // CAMERA_HOST_CALLBACK_CLIENT_STUB_H
+#endif // STREAM_OPERATOR_CALLBACK_CLIENT_STUB_H
