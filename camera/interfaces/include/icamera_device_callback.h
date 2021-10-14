@@ -31,13 +31,9 @@
 #include <hdf_log.h>
 #include <iremote_broker.h>
 #include "types.h"
+#include "cmd_common.h"
 
 namespace OHOS::Camera {
-enum {
-    CMD_CAMERA_DEVICE_CALLBACK_ON_ERROR = 0,
-    CMD_CAMERA_DEVICE_CALLBACK_ON_RESULT,
-};
-
 class ICameraDeviceCallback : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"HDI.Camera.V1_0.DeviceCallback");
@@ -56,11 +52,13 @@ public:
     virtual void OnError(ErrorType type, int32_t errorCode) = 0;
 
     /**
-     * @brief Called to report metadata related to the camera device. For details about the reporting mode, see {@link SetResultMode}.
+     * @brief Called to report metadata related to the camera device.
+     * For details about the reporting mode, see {@link SetResultMode}.
      *
      * @param timestamp Indicates the timestamp when the metadata is reported.
      * @param result Indicates the metadata reported. The reported metadata is specified by {@link EnableResult}.
-     * You can call {@link GetEnabledResults} to obtain enabled metadata and call {@link DisableResult} to disable metadata reporting.
+     * You can call {@link GetEnabledResults} to obtain enabled metadata and
+     * call {@link DisableResult} to disable metadata reporting.
      *
      * @since 1.0
      * @version 1.0

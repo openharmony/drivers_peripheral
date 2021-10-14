@@ -20,6 +20,7 @@ group("camera_client") {
 
 ohos_shared_library("libcamera_client") {
   include_dirs = [
+    "../server/include",
     "./include",
     "../../include",
     "../utils/include",

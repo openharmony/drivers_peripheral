@@ -34,18 +34,9 @@
 #include "icamera_device_callback.h"
 #include "istream_operator.h"
 #include "istream_operator_callback.h"
+#include "cmd_common.h"
 
 namespace OHOS::Camera {
-enum {
-    CMD_CAMERA_DEVICE_GET_STREAM_OPERATOR = 0,
-    CMD_CAMERA_DEVICE_UPDATE_SETTINGS,
-    CMD_CAMERA_DEVICE_SET_RESULT_MODE,
-    CMD_CAMERA_DEVICE_GET_ENABLED_RESULTS,
-    CMD_CAMERA_DEVICE_ENABLE_RESULT,
-    CMD_CAMERA_DEVICE_DISABLE_RESULT,
-    CMD_CAMERA_DEVICE_CLOSE,
-};
-
 class ICameraDevice : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"HDI.Camera.V1_0.Device");

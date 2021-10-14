@@ -24,16 +24,9 @@
 #include "camera_host.h"
 #include "types.h"
 #include "camera.h"
+#include "cmd_common.h"
 
 namespace OHOS::Camera {
-enum {
-    CMD_CAMERA_HOST_SET_CALLBACK = 0,
-    CMD_CAMERA_HOST_GET_CAMERAID,
-    CMD_CAMERA_HOST_GET_CAMERA_ABILITY,
-    CMD_CAMERA_HOST_OPEN_CAMERA,
-    CMD_CAMERA_HOST_SET_FLASH_LIGHT,
-};
-
 class CameraHostStub {
 public:
     CameraHostStub();

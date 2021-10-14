@@ -35,7 +35,7 @@ void CameraDeviceCallbackProxy::OnError(ErrorType type, int32_t errorMsg)
         return;
     }
 
-    int32_t ret = Remote()->SendRequest(CMD_CAMERA_DEVICE_CALLBACK_REMOTE_ON_ERROR, data, reply, option);
+    int32_t ret = Remote()->SendRequest(CMD_CAMERA_DEVICE_CALLBACK_ON_ERROR, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return;
@@ -64,7 +64,7 @@ void CameraDeviceCallbackProxy::OnResult(uint64_t timestamp,
     }
 
     int32_t ret = Remote()->SendRequest(
-        CMD_CAMERA_DEVICE_CALLBACK_REMOTE_ON_RESULT, data, reply, option);
+        CMD_CAMERA_DEVICE_CALLBACK_ON_RESULT, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return;

@@ -61,7 +61,7 @@ CamRetCode CameraHostProxy::SetCallback(const OHOS::sptr<ICameraHostCallback> &c
         return INVALID_ARGUMENT;
     }
 
-    int32_t ret = Remote()->SendRequest(CMD_CAMERA_HOST_REMOTE_SET_CALLBACK, data, reply, option);
+    int32_t ret = Remote()->SendRequest(CMD_CAMERA_HOST_SET_CALLBACK, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return INVALID_ARGUMENT;
@@ -76,7 +76,7 @@ CamRetCode CameraHostProxy::GetCameraIds(std::vector<std::string> &cameraIds)
     MessageParcel reply;
     MessageOption option;
 
-    int32_t ret = Remote()->SendRequest(CMD_CAMERA_HOST_REMOTE_GET_CAMERAID, data, reply, option);
+    int32_t ret = Remote()->SendRequest(CMD_CAMERA_HOST_GET_CAMERAID, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return INVALID_ARGUMENT;
@@ -105,7 +105,7 @@ CamRetCode CameraHostProxy::GetCameraAbility(const std::string &cameraId,
     }
 
     int32_t ret = Remote()->SendRequest(
-        CMD_CAMERA_HOST_REMOTE_GET_CAMERA_ABILITY, data, reply, option);
+        CMD_CAMERA_HOST_GET_CAMERA_ABILITY, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return INVALID_ARGUMENT;
@@ -141,7 +141,7 @@ CamRetCode CameraHostProxy::OpenCamera(const std::string &cameraId,
         return INVALID_ARGUMENT;
     }
 
-    int32_t ret = Remote()->SendRequest(CMD_CAMERA_HOST_REMOTE_OPEN_CAMERA, data, reply, option);
+    int32_t ret = Remote()->SendRequest(CMD_CAMERA_HOST_OPEN_CAMERA, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return INVALID_ARGUMENT;
@@ -176,7 +176,7 @@ CamRetCode CameraHostProxy::SetFlashlight(const std::string &cameraId, bool &isE
         return INVALID_ARGUMENT;
     }
 
-    int32_t ret = Remote()->SendRequest(CMD_CAMERA_HOST_REMOTE_SET_FLASH_LIGHT, data, reply, option);
+    int32_t ret = Remote()->SendRequest(CMD_CAMERA_HOST_SET_FLASH_LIGHT, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return INVALID_ARGUMENT;

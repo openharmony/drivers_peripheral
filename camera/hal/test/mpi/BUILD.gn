@@ -53,6 +53,7 @@ ohos_unittest("camera_case_unittest") {
     "//third_party/googletest/googletest/include/gtest",
     "./include",
     "$camera_path/../interfaces/include",
+    "$camera_path/../interfaces/hdi_cpp/server/include",
     "$camera_path/../interfaces/hdi_cpp/utils/include",
     "$camera_path/../interfaces/hdi_cpp/client/include",
     "$camera_path/../interfaces/hdi_cpp/callback/host/include",

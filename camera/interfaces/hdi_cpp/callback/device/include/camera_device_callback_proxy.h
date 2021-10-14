@@ -19,6 +19,7 @@
 #include <iremote_proxy.h>
 #include <hdf_log.h>
 #include "icamera_device_callback.h"
+#include "cmd_common.h"
 
 namespace OHOS::Camera {
 class CameraDeviceCallbackProxy : public IRemoteProxy<ICameraDeviceCallback> {
@@ -32,9 +33,6 @@ public:
     virtual void OnResult(uint64_t timestamp, const std::shared_ptr<CameraStandard::CameraMetadata> &result) override;
 
 private:
-    static constexpr int CMD_CAMERA_DEVICE_CALLBACK_REMOTE_ON_ERROR = 0;
-    static constexpr int CMD_CAMERA_DEVICE_CALLBACK_REMOTE_ON_RESULT = 1;
-
     static inline BrokerDelegator<CameraDeviceCallbackProxy> delegator_;
 };
 }
