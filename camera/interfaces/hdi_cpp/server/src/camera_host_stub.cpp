@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "camera_host_service_stub.h"
+#include "camera_host_stub.h"
 #include <hdf_log.h>
 #include <hdf_base.h>
 #include <hdf_sbuf_ipc.h>
@@ -160,7 +160,7 @@ int32_t CameraHostStub::CameraHostStubSetFlashlight(
 int32_t CameraHostStub::CameraHostServiceStubOnRemoteRequest(int cmdId, MessageParcel &data,
     MessageParcel &reply, MessageOption &option)
 {
-    switch(cmdId) {
+    switch (cmdId) {
         case CMD_CAMERA_HOST_SET_CALLBACK: {
             return CameraHostStubSetCallback(data, reply, option);
         }

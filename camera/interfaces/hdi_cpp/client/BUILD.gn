@@ -20,7 +20,12 @@ group("camera_client") {
 
 ohos_shared_library("libcamera_client") {
   include_dirs = [
-    "../",
+    "./include",
+    "../../include",
+    "../utils/include",
+    "../callback/device/include",
+    "../callback/host/include",
+    "../callback/operator/include",
     "$hdf_uhdf_path/manager/include",
     "$hdf_uhdf_path/include/hdi",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
@@ -32,16 +37,17 @@ ohos_shared_library("libcamera_client") {
   ]
 
   sources = [
-    "../callback/device/camera_device_callback.cpp",
-    "../callback/device/camera_device_callback_stub.cpp",
-    "../callback/host/camera_host_callback.cpp",
-    "../callback/host/camera_host_callback_stub.cpp",
-    "../callback/operator/stream_operator_callback.cpp",
-    "../callback/operator/stream_operator_callback_stub.cpp",
-    "camera_device_proxy.cpp",
-    "camera_host_proxy.cpp",
-    "offline_stream_operator_proxy.cpp",
-    "stream_operator_proxy.cpp",
+    "../callback/device/src/camera_device_callback.cpp",
+    "../callback/device/src/camera_device_callback_stub.cpp",
+    "../callback/host/src/camera_host_callback.cpp",
+    "../callback/host/src/camera_host_callback_stub.cpp",
+    "../callback/operator/src/stream_operator_callback.cpp",
+    "../callback/operator/src/stream_operator_callback_stub.cpp",
+    "../utils/src/utils_data_stub.cpp",
+    "./src/camera_device_proxy.cpp",
+    "./src/camera_host_proxy.cpp",
+    "./src/offline_stream_operator_proxy.cpp",
+    "./src/stream_operator_proxy.cpp",
   ]
 
   deps = [

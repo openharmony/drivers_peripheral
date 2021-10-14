@@ -53,7 +53,7 @@ private:
 };
 }
 
-void *CameraHostStubInstance();
+void *CameraHostStubInstance(void);
 
 void DestroyCameraHostStub(void *obj);
 

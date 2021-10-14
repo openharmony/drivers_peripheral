@@ -34,14 +34,14 @@ config("hdi_cif_config") {
 
 ohos_shared_library("hdi_cif") {
   sources = [
-    "$camera_path/../interfaces/include/callback/device/camera_device_callback_proxy.cpp",
-    "$camera_path/../interfaces/include/callback/host/camera_host_callback_proxy.cpp",
-    "$camera_path/../interfaces/include/callback/operator/stream_operator_callback_proxy.cpp",
-    "$camera_path/../interfaces/include/server/camera_device_service_stub.cpp",
-    "$camera_path/../interfaces/include/server/camera_host_driver.cpp",
-    "$camera_path/../interfaces/include/server/camera_host_service_stub.cpp",
-    "$camera_path/../interfaces/include/server/offline_stream_operator_service_stub.cpp",
-    "$camera_path/../interfaces/include/server/stream_operator_service_stub.cpp",
+    "$camera_path/../interfaces/hdi_cpp/callback/device/src/camera_device_callback_proxy.cpp",
+    "$camera_path/../interfaces/hdi_cpp/callback/host/src/camera_host_callback_proxy.cpp",
+    "$camera_path/../interfaces/hdi_cpp/callback/operator/src/stream_operator_callback_proxy.cpp",
+    "$camera_path/../interfaces/hdi_cpp/server/src/camera_device_stub.cpp",
+    "$camera_path/../interfaces/hdi_cpp/server/src/camera_host_driver.cpp",
+    "$camera_path/../interfaces/hdi_cpp/server/src/camera_host_stub.cpp",
+    "$camera_path/../interfaces/hdi_cpp/server/src/offline_stream_operator_stub.cpp",
+    "$camera_path/../interfaces/hdi_cpp/server/src/stream_operator_stub.cpp",
     "src/buffer_producer_wrapper.cpp",
     "src/camera_device.cpp",
     "src/camera_device_callback_wrapper.cpp",

@@ -28,7 +28,7 @@ ohos_fuzztest("IPCCameraDeviceRemote_fuzzer") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "$camera_path/../interfaces/include/server/camera_device_service_stub.cpp",
+    "$camera_path/../interfaces/hdi_cpp/server/camera_device_stub.cpp",
     "./IPCCameraDeviceRemote_fuzzer/ipc_camera_device_remote_fuzzer.cpp",
   ]
 
@@ -36,11 +36,12 @@ ohos_fuzztest("IPCCameraDeviceRemote_fuzzer") {
     "./include",
     "$camera_path/test/fuzz/IPCCameraDeviceRemote_fuzzer",
     "$camera_path/../interfaces/include",
-    "$camera_path/../interfaces/include/client",
-    "$camera_path/../interfaces/include/server",
-    "$camera_path/../interfaces/include/callback/host",
-    "$camera_path/../interfaces/include/callback/device",
-    "$camera_path/../interfaces/include/callback/operator",
+    "$camera_path/../interfaces/hdi_cpp/utils/include",
+    "$camera_path/../interfaces/hdi_cpp/client/include",
+    "$camera_path/../interfaces/hdi_cpp/server/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/host/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/device/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/operator/include",
     "$camera_path/include",
     "$camera_path/hdi_impl",
     "$camera_path/hdi_impl/include",
@@ -62,7 +63,7 @@ ohos_fuzztest("IPCCameraDeviceRemote_fuzzer") {
   ]
 
   deps = [
-    "$camera_path/../interfaces/include/client:libcamera_client",
+    "$camera_path/../interfaces/hdi_cpp/client:libcamera_client",
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
@@ -109,11 +110,12 @@ ohos_fuzztest("IPCCameraHostService_fuzzer") {
     "./include",
     "$camera_path/test/fuzz/IPCCameraHostService_fuzzer",
     "$camera_path/../interfaces/include",
-    "$camera_path/../interfaces/include/client",
-    "$camera_path/../interfaces/include/server",
-    "$camera_path/../interfaces/include/callback/host",
-    "$camera_path/../interfaces/include/callback/device",
-    "$camera_path/../interfaces/include/callback/operator",
+    "$camera_path/../interfaces/hdi_cpp/utils/include",
+    "$camera_path/../interfaces/hdi_cpp/client/include",
+    "$camera_path/../interfaces/hdi_cpp/server/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/host/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/device/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/operator/include",
     "$camera_path/include",
     "$camera_path/hdi_impl",
     "$camera_path/hdi_impl/include",
@@ -135,7 +137,7 @@ ohos_fuzztest("IPCCameraHostService_fuzzer") {
   ]
 
   deps = [
-    "$camera_path/../interfaces/include/client:libcamera_client",
+    "$camera_path/../interfaces/hdi_cpp/client:libcamera_client",
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
@@ -181,11 +183,12 @@ ohos_fuzztest("IPCOffline_fuzzer") {
     "./include",
     "$camera_path/test/fuzz/IPCOffline_fuzzer",
     "$camera_path/../interfaces/include",
-    "$camera_path/../interfaces/include/client",
-    "$camera_path/../interfaces/include/server",
-    "$camera_path/../interfaces/include/callback/host",
-    "$camera_path/../interfaces/include/callback/device",
-    "$camera_path/../interfaces/include/callback/operator",
+    "$camera_path/../interfaces/hdi_cpp/utils/include",
+    "$camera_path/../interfaces/hdi_cpp/client/include",
+    "$camera_path/../interfaces/hdi_cpp/server/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/host/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/device/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/operator/include",
     "$camera_path/include",
     "$camera_path/hdi_impl",
     "$camera_path/hdi_impl/include",
@@ -207,7 +210,7 @@ ohos_fuzztest("IPCOffline_fuzzer") {
   ]
 
   deps = [
-    "$camera_path/../interfaces/include/client:libcamera_client",
+    "$camera_path/../interfaces/hdi_cpp/client:libcamera_client",
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
@@ -253,11 +256,12 @@ ohos_fuzztest("IPCStreamOperator_fuzzer") {
     "./include",
     "$camera_path/test/fuzz/IPCStreamOperator_fuzzer",
     "$camera_path/../interfaces/include",
-    "$camera_path/../interfaces/include/client",
-    "$camera_path/../interfaces/include/server",
-    "$camera_path/../interfaces/include/callback/host",
-    "$camera_path/../interfaces/include/callback/device",
-    "$camera_path/../interfaces/include/callback/operator",
+    "$camera_path/../interfaces/hdi_cpp/utils/include",
+    "$camera_path/../interfaces/hdi_cpp/client/include",
+    "$camera_path/../interfaces/hdi_cpp/server/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/host/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/device/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/operator/include",
     "$camera_path/include",
     "$camera_path/hdi_impl",
     "$camera_path/hdi_impl/include",
@@ -279,7 +283,7 @@ ohos_fuzztest("IPCStreamOperator_fuzzer") {
   ]
 
   deps = [
-    "$camera_path/../interfaces/include/client:libcamera_client",
+    "$camera_path/../interfaces/hdi_cpp/client:libcamera_client",
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
@@ -327,11 +331,12 @@ ohos_fuzztest("IPCCameraDeviceCallback_fuzzer") {
     "./include",
     "$camera_path/test/fuzz/IPCCameraDeviceCallback_fuzzer",
     "$camera_path/../interfaces/include",
-    "$camera_path/../interfaces/include/client",
-    "$camera_path/../interfaces/include/server",
-    "$camera_path/../interfaces/include/callback/host",
-    "$camera_path/../interfaces/include/callback/device",
-    "$camera_path/../interfaces/include/callback/operator",
+    "$camera_path/../interfaces/hdi_cpp/utils/include",
+    "$camera_path/../interfaces/hdi_cpp/client/include",
+    "$camera_path/../interfaces/hdi_cpp/server/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/host/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/device/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/operator/include",
     "$camera_path/include",
     "$camera_path/hdi_impl",
     "$camera_path/hdi_impl/include",
@@ -353,7 +358,7 @@ ohos_fuzztest("IPCCameraDeviceCallback_fuzzer") {
   ]
 
   deps = [
-    "$camera_path/../interfaces/include/client:libcamera_client",
+    "$camera_path/../interfaces/hdi_cpp/client:libcamera_client",
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
@@ -400,11 +405,12 @@ ohos_fuzztest("IPCCameraHostCallback_fuzzer") {
     "./include",
     "$camera_path/test/fuzz/IPCCameraHostCallback_fuzzer",
     "$camera_path/../interfaces/include",
-    "$camera_path/../interfaces/include/client",
-    "$camera_path/../interfaces/include/server",
-    "$camera_path/../interfaces/include/callback/host",
-    "$camera_path/../interfaces/include/callback/device",
-    "$camera_path/../interfaces/include/callback/operator",
+    "$camera_path/../interfaces/hdi_cpp/utils/include",
+    "$camera_path/../interfaces/hdi_cpp/client/include",
+    "$camera_path/../interfaces/hdi_cpp/server/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/host/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/device/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/operator/include",
     "$camera_path/include",
     "$camera_path/hdi_impl",
     "$camera_path/hdi_impl/include",
@@ -426,7 +432,7 @@ ohos_fuzztest("IPCCameraHostCallback_fuzzer") {
   ]
 
   deps = [
-    "$camera_path/../interfaces/include/client:libcamera_client",
+    "$camera_path/../interfaces/hdi_cpp/client:libcamera_client",
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
@@ -472,11 +478,12 @@ ohos_fuzztest("IPCStreamOperatorCallback_fuzzer") {
     "./include",
     "$camera_path/test/fuzz/IPCStreamOperatorCallback_fuzzer",
     "$camera_path/../interfaces/include",
-    "$camera_path/../interfaces/include/client",
-    "$camera_path/../interfaces/include/server",
-    "$camera_path/../interfaces/include/callback/host",
-    "$camera_path/../interfaces/include/callback/device",
-    "$camera_path/../interfaces/include/callback/operator",
+    "$camera_path/../interfaces/hdi_cpp/utils/include",
+    "$camera_path/../interfaces/hdi_cpp/client/include",
+    "$camera_path/../interfaces/hdi_cpp/server/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/host/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/device/include",
+    "$camera_path/../interfaces/hdi_cpp/callback/operator/include",
     "$camera_path/include",
     "$camera_path/hdi_impl",
     "$camera_path/hdi_impl/include",
@@ -498,7 +505,7 @@ ohos_fuzztest("IPCStreamOperatorCallback_fuzzer") {
   ]
 
   deps = [
-    "$camera_path/../interfaces/include/client:libcamera_client",
+    "$camera_path/../interfaces/hdi_cpp/client:libcamera_client",
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",

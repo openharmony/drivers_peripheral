@@ -45,6 +45,4 @@ int32_t CameraDeviceCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &
     }
     return 0;
 }
-
-
 }
