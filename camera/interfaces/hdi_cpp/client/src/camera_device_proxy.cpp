@@ -41,7 +41,7 @@ CamRetCode CameraDeviceProxy::GetStreamOperator(
     }
 
     int32_t ret = Remote()->SendRequest(
-        CMD_CAMERA_DEVICE_REMOTE_GET_STREAM_OPERATOR, data, reply, option);
+        CMD_CAMERA_DEVICE_GET_STREAM_OPERATOR, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return INVALID_ARGUMENT;
@@ -91,7 +91,7 @@ CamRetCode CameraDeviceProxy::SetResultMode(const ResultCallbackMode &mode)
     }
 
     int32_t ret = Remote()->SendRequest(
-        CMD_CAMERA_DEVICE_REMOTE_SET_RESULT_MODE, data, reply, option);
+        CMD_CAMERA_DEVICE_SET_RESULT_MODE, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return INVALID_ARGUMENT;
@@ -107,7 +107,7 @@ CamRetCode CameraDeviceProxy::GetEnabledResults(std::vector<MetaType> &results)
     MessageOption option;
 
     int32_t ret = Remote()->SendRequest(
-        CMD_CAMERA_DEVICE_REMOTE_GET_ENABLED_RESULTS, data, reply, option);
+        CMD_CAMERA_DEVICE_GET_ENABLED_RESULTS, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return INVALID_ARGUMENT;
@@ -134,7 +134,7 @@ CamRetCode CameraDeviceProxy::EnableResult(const std::vector<MetaType> &results)
     }
 
     int32_t ret = Remote()->SendRequest(
-        CMD_CAMERA_DEVICE_REMOTE_ENABLE_RESULT, data, reply, option);
+        CMD_CAMERA_DEVICE_ENABLE_RESULT, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return INVALID_ARGUMENT;
@@ -155,7 +155,7 @@ CamRetCode CameraDeviceProxy::DisableResult(const std::vector<MetaType> &results
     }
 
     int32_t ret = Remote()->SendRequest(
-        CMD_CAMERA_DEVICE_REMOTE_DISABLE_RESULT, data, reply, option);
+        CMD_CAMERA_DEVICE_DISABLE_RESULT, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return INVALID_ARGUMENT;
@@ -171,7 +171,7 @@ void CameraDeviceProxy::Close()
     MessageOption option;
 
     int32_t ret = Remote()->SendRequest(
-        CMD_CAMERA_DEVICE_REMOTE_CLOSE, data, reply, option);
+        CMD_CAMERA_DEVICE_CLOSE, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
     }

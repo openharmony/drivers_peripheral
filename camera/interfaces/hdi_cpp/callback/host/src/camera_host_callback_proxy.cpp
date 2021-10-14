@@ -34,7 +34,7 @@ void CameraHostCallbackProxy::OnCameraStatus(const std::string &cameraId, Camera
         return;
     }
 
-    int32_t ret = Remote()->SendRequest(CMD_CAMERA_HOST_CALLBACK_REMOTE_ON_STATUS, data, reply, option);
+    int32_t ret = Remote()->SendRequest(CMD_CAMERA_HOST_CALLBACK_ON_STATUS, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return;
@@ -57,7 +57,7 @@ void CameraHostCallbackProxy::OnFlashlightStatus(const std::string &cameraId, Fl
         return;
     }
 
-    int32_t ret = Remote()->SendRequest(CMD_CAMERA_HOST_CALLBACK__REMOTE_ON_FLASHLIGHT_STATUS, data, reply, option);
+    int32_t ret = Remote()->SendRequest(CMD_CAMERA_HOST_CALLBACK_ON_FLASHLIGHT_STATUS, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return;

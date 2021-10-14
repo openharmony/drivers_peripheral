@@ -18,6 +18,7 @@
 
 #include <iremote_proxy.h>
 #include "icamera_host.h"
+#include "cmd_common.h"
 
 namespace OHOS::Camera {
 class ICameraHostCallback;
@@ -36,12 +37,6 @@ public:
     virtual CamRetCode SetFlashlight(const std::string &cameraId, bool &isEnable) override;
 
 private:
-    static constexpr int CMD_CAMERA_HOST_REMOTE_SET_CALLBACK = 0;
-    static constexpr int CMD_CAMERA_HOST_REMOTE_GET_CAMERAID = 1;
-    static constexpr int CMD_CAMERA_HOST_REMOTE_GET_CAMERA_ABILITY = 2;
-    static constexpr int CMD_CAMERA_HOST_REMOTE_OPEN_CAMERA = 3;
-    static constexpr int CMD_CAMERA_HOST_REMOTE_SET_FLASH_LIGHT = 4;
-
     static inline BrokerDelegator<CameraHostProxy> delegator_;
 };
 }
