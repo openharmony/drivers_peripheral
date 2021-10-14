@@ -33,11 +33,16 @@ public:
     virtual RetCode DestroyManager() = 0;
     virtual std::shared_ptr<IController> GetController(ManagerId managerId, ControllerId controllerId)
     {
+        (void)managerId;
+        (void)controllerId;
         return nullptr;
     };
     virtual std::shared_ptr<IController>
         GetController(CameraId cameraId, ManagerId managerId, ControllerId controllerId)
     {
+        (void)cameraId;
+        (void)managerId;
+        (void)controllerId;
         return nullptr;
     };
     virtual RetCode PowerUp(CameraId cameraId) = 0;
@@ -48,39 +53,80 @@ public:
     virtual RetCode Connect(std::string controller,
         std::string portNum, std::string connectController, std::string connectPortNum)
     {
+        (void)controller;
+        (void)portNum;
+        (void)connectController;
+        (void)connectPortNum;
         return RC_OK;
     };
     virtual RetCode UnConnect(std::string controller,
         std::string portNum, std::string connectController, std::string connectPortNum)
     {
+        (void)controller;
+        (void)portNum;
+        (void)connectController;
+        (void)connectPortNum;
         return RC_OK;
     };
-    virtual void BufferCallback(std::shared_ptr<FrameSpec> buffer) {};
-    virtual void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag) {};
+    virtual void BufferCallback(std::shared_ptr<FrameSpec> buffer)
+    {
+        (void)buffer;
+        return;
+    };
+    virtual void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag)
+    {
+        (void)abilityMetaDataTag;
+        return;
+    };
     virtual RetCode SendFrameBuffer(std::shared_ptr<FrameSpec> buffer, CameraId cameraId = CAMERA_MAX)
     {
+        (void)buffer;
+        (void)cameraId;
         return RC_OK;
     };
-    virtual void SetNodeCallBack(const NodeBufferCb cb, CameraId cameraId = CAMERA_MAX) {};
-    virtual void SetMetaDataCallBack(const MetaDataCb cb, CameraId cameraId = CAMERA_MAX) {};
-    virtual void SetDevStatusCallBack(const DeviceStatusCb cb) {};
+    virtual void SetNodeCallBack(const NodeBufferCb cb, CameraId cameraId = CAMERA_MAX)
+    {
+        (void)cb;
+        (void)cameraId;
+        return;
+    };
+    virtual void SetMetaDataCallBack(const MetaDataCb cb, CameraId cameraId = CAMERA_MAX)
+    {
+        (void)cb;
+        (void)cameraId;
+        return;
+    };
+    virtual void SetDevStatusCallBack(const DeviceStatusCb cb)
+    {
+        (void)cb;
+        return;
+    };
     virtual RetCode SetFlashlight(FlashMode flashMode, bool enable, CameraId cameraId = CAMERA_MAX) = 0;
     virtual void Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta) = 0;
-    virtual void SetCallBack(UvcMetaDataCb cb) {};
+    virtual void SetCallBack(UvcMetaDataCb cb)
+    {
+        (void)cb;
+        return;
+    };
     virtual RetCode PreConfig(const ModeMeta& meta, const std::vector<DeviceStreamSetting>& settings)
     {
+        (void)meta;
+        (void)settings;
         return RC_OK;
     }
     virtual RetCode Flush(int32_t streamId)
     {
+        (void)streamId;
         return RC_OK;
     }
     virtual RetCode StartRecvFrame(int32_t streamId)
     {
+        (void)streamId;
         return RC_OK;
     }
     virtual RetCode StopRecvFrame(int32_t streamId)
     {
+        (void)streamId;
         return RC_OK;
     }
 };
