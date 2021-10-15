@@ -19,6 +19,7 @@
 #include <iremote_proxy.h>
 #include <hdf_log.h>
 #include "istream_operator_callback.h"
+#include "cmd_common.h"
 
 namespace OHOS::Camera {
 class StreamOperatorCallbackProxy : public IRemoteProxy<IStreamOperatorCallback> {
@@ -37,11 +38,6 @@ public:
         const std::vector<int32_t> &streamId, uint64_t timestamp) override;
 
 private:
-    static constexpr int CMD_STREAM_OPERATOR_CALLBACK_REMOTE_ON_CAPTURE_STARTED = 0;
-    static constexpr int CMD_STREAM_OPERATOR_CALLBACK_REMOTE_ON_CAPTURE_ENDED = 1;
-    static constexpr int CMD_STREAM_OPERATOR_CALLBACK_REMOTE_ON_CAPTURE_ERROR = 2;
-    static constexpr int CMD_STREAM_OPERATOR_CALLBACK_REMOTE_ON_FRAME_SHUTTER = 3;
-
     static inline BrokerDelegator<StreamOperatorCallbackProxy> delegator_;
 };
 }

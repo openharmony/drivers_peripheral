@@ -19,6 +19,7 @@
 #include <iremote_proxy.h>
 #include "icamera_device.h"
 #include "istream_operator_callback.h"
+#include "cmd_common.h"
 
 namespace OHOS::Camera {
 class CameraDeviceProxy : public IRemoteProxy<ICameraDevice> {
@@ -37,14 +38,6 @@ public:
     virtual void Close() override;
 
 private:
-    static constexpr int CMD_CAMERA_DEVICE_REMOTE_GET_STREAM_OPERATOR = 0;
-    static constexpr int CMD_CAMERA_DEVICE_REMOTE_UPDATE_SERTTINGS = 1;
-    static constexpr int CMD_CAMERA_DEVICE_REMOTE_SET_RESULT_MODE = 2;
-    static constexpr int CMD_CAMERA_DEVICE_REMOTE_GET_ENABLED_RESULTS = 3;
-    static constexpr int CMD_CAMERA_DEVICE_REMOTE_ENABLE_RESULT = 4;
-    static constexpr int CMD_CAMERA_DEVICE_REMOTE_DISABLE_RESULT = 5;
-    static constexpr int CMD_CAMERA_DEVICE_REMOTE_CLOSE = 6;
-
     static inline BrokerDelegator<CameraDeviceProxy> delegator_;
 };
 }

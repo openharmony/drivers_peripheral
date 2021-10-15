@@ -18,6 +18,7 @@
 
 #include <iremote_proxy.h>
 #include "ioffline_stream_operator.h"
+#include "cmd_common.h"
 
 namespace OHOS::Camera {
 class OfflineStreamOperatorProxy : public IRemoteProxy<IOfflineStreamOperator> {
@@ -31,10 +32,6 @@ public:
     virtual CamRetCode Release() override;
 
 private:
-    static constexpr int CMD_OFFLINE_STREAM_OPERATOR_CANCEL_CAPTURE = 0;
-    static constexpr int CMD_OFFLINE_STREAM_OPERATOR_RELEASE_STREAMS = 1;
-    static constexpr int CMD_OFFLINE_STREAM_OPERATOR_RELEASE = 2;
-
     static inline BrokerDelegator<OfflineStreamOperatorProxy> delegator_;
 };
 }
