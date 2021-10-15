@@ -22,7 +22,10 @@ if (defined(ohos_lite)) {
         deps = [ "unittest:hdf_peripheral_misc_test_vibrator" ]
       } else if (ohos_kernel_type == "liteos_a" &&
                  board_name == "hispark_taurus") {
-        deps = [ "unittest:hdf_peripheral_misc_test_vibrator" ]
+                deps = [
+          "performance:hdf_peripheral_misc_test_vibrator_performance",
+          "unittest:hdf_peripheral_misc_test_vibrator",
+        ]
       }
     }
     features = []
@@ -30,6 +33,9 @@ if (defined(ohos_lite)) {
 } else {
   group("hdf_test_vibrator") {
     testonly = true
-    deps = [ "unittest:hdf_unittest_vibrator" ]
+            deps = [
+          "performance:hdf_peripheral_misc_test_vibrator_performance",
+          "unittest:hdf_peripheral_misc_test_vibrator",
+        ]
   }
 }
