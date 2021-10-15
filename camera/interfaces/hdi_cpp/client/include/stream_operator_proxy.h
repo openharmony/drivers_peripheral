@@ -18,6 +18,7 @@
 
 #include <iremote_proxy.h>
 #include "istream_operator.h"
+#include "cmd_common.h"
 
 namespace OHOS::Camera {
 class StreamOperatorProxy : public IRemoteProxy<IStreamOperator> {
@@ -53,17 +54,6 @@ public:
         OHOS::sptr<IOfflineStreamOperator> &offlineOperator) override;
 
 private:
-    static constexpr int CMD_STREAM_OPERATOR_IS_STREAMS_SUPPORTED = 0;
-    static constexpr int CMD_STREAM_OPERATOR_CREATE_STREAMS = 1;
-    static constexpr int CMD_STREAM_OPERATOR_RELEASE_STREAMS = 2;
-    static constexpr int CMD_STREAM_OPERATOR_COMMIT_STREAMS = 3;
-    static constexpr int CMD_STREAM_OPERATOR_GET_STREAM_ATTRIBUTES = 4;
-    static constexpr int CMD_STREAM_OPERATOR_ATTACH_BUFFER_QUEUE = 5;
-    static constexpr int CMD_STREAM_OPERATOR_DETACH_BUFFER_QUEUE = 6;
-    static constexpr int CMD_STREAM_OPERATOR_CAPTURE = 7;
-    static constexpr int CMD_STREAM_OPERATOR_CANCEL_CAPTURE = 8;
-    static constexpr int CMD_STREAM_OPERATOR_CHANGE_TO_OFFLINE_STREAM = 9;
-
     static inline BrokerDelegator<StreamOperatorProxy> delegator_;
 };
 }

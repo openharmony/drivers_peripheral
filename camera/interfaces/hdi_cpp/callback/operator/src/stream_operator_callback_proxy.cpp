@@ -35,7 +35,7 @@ void StreamOperatorCallbackProxy::OnCaptureStarted(int32_t captureId, const std:
     }
 
     int32_t ret = Remote()->SendRequest(
-        CMD_STREAM_OPERATOR_CALLBACK_REMOTE_ON_CAPTURE_STARTED, data, reply, option);
+        CMD_STREAM_OPERATOR_CALLBACK_ON_CAPTURE_STARTED, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return;
@@ -69,7 +69,7 @@ void StreamOperatorCallbackProxy::OnCaptureEnded(int32_t captureId,
     }
 
     int32_t ret = Remote()->SendRequest(
-        CMD_STREAM_OPERATOR_CALLBACK_REMOTE_ON_CAPTURE_ENDED, data, reply, option);
+        CMD_STREAM_OPERATOR_CALLBACK_ON_CAPTURE_ENDED, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return;
@@ -103,7 +103,7 @@ void StreamOperatorCallbackProxy::OnCaptureError(int32_t captureId,
     }
 
     int32_t ret = Remote()->SendRequest(
-        CMD_STREAM_OPERATOR_CALLBACK_REMOTE_ON_CAPTURE_ERROR, data, reply, option);
+        CMD_STREAM_OPERATOR_CALLBACK_ON_CAPTURE_ERROR, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return;
@@ -133,7 +133,7 @@ void StreamOperatorCallbackProxy::OnFrameShutter(int32_t captureId,
     }
 
     int32_t ret = Remote()->SendRequest(
-        CMD_STREAM_OPERATOR_CALLBACK_REMOTE_ON_FRAME_SHUTTER, data, reply, option);
+        CMD_STREAM_OPERATOR_CALLBACK_ON_FRAME_SHUTTER, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
         return;

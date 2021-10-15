@@ -31,15 +31,9 @@
 #include <hdf_log.h>
 #include <iremote_broker.h>
 #include "types.h"
+#include "cmd_common.h"
 
 namespace OHOS::Camera {
-enum {
-    CMD_STREAM_OPERATOR_CALLBACK_ON_CAPTURE_STARTED = 0,
-    CMD_STREAM_OPERATOR_CALLBACK_ON_CAPTURE_ENDED,
-    CMD_STREAM_OPERATOR_CALLBACK_ON_CAPTURE_ERROR,
-    CMD_STREAM_OPERATOR_CALLBACK_ON_FRAME_SHUTTER,
-};
-
 class IStreamOperatorCallback : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"HDI.Camera.V1_0.StreamOperatorCallback");

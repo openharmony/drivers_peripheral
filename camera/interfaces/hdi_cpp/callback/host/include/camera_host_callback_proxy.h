@@ -19,6 +19,7 @@
 #include <iremote_proxy.h>
 #include <hdf_log.h>
 #include "icamera_host_callback.h"
+#include "cmd_common.h"
 
 namespace OHOS::Camera {
 class CameraHostCallbackProxy : public IRemoteProxy<ICameraHostCallback> {
@@ -32,9 +33,6 @@ public:
     virtual void OnFlashlightStatus(const std::string &cameraId, FlashlightStatus status);
 
 private:
-    static constexpr int CMD_CAMERA_HOST_CALLBACK_REMOTE_ON_STATUS = 0;
-    static constexpr int CMD_CAMERA_HOST_CALLBACK__REMOTE_ON_FLASHLIGHT_STATUS = 1;
-
     static inline BrokerDelegator<CameraHostCallbackProxy> delegator_;
 };
 }

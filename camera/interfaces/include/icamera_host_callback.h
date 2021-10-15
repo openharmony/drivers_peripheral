@@ -31,13 +31,9 @@
 #include <hdf_log.h>
 #include <iremote_broker.h>
 #include "types.h"
+#include "cmd_common.h"
 
 namespace OHOS::Camera {
-enum {
-    CMD_CAMERA_HOST_CALLBACK_ON_STATUS = 0,
-    CMD_CAMERA_HOST_CALLBACK_ON_FLASHLIGHT_STATUS,
-};
-
 class ICameraHostCallback : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"HDI.Camera.V1_0.HostCallback");

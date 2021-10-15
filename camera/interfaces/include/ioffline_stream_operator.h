@@ -31,14 +31,9 @@
 #include <iservmgr_hdi.h>
 #include <hdf_log.h>
 #include "types.h"
+#include "cmd_common.h"
 
 namespace OHOS::Camera {
-enum {
-    CMD_OFFLINE_STREAM_OPERATOR_CANCEL_CAPTURE = 0,
-    CMD_OFFLINE_STREAM_OPERATOR_RELEASE_STREAMS,
-    CMD_OFFLINE_STREAM_OPERATOR_RELEASE,
-};
-
 class IOfflineStreamOperator : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"HDI.Camera.V1_0.OfflineStreamOperator");
