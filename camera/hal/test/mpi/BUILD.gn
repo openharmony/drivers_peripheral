@@ -131,7 +131,7 @@ ohos_unittest("camera_case_unittest") {
 
   external_deps += [
     "ipc:ipc_core",
-    "samgr_L2:samgr_proxy",
+    "samgr_standard:samgr_proxy",
     "startup_l2:syspara",
   ]
 
