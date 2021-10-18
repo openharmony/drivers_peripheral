@@ -42,7 +42,6 @@ ohos_unittest("khdf_audio_driver_test") {
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//utils/native/base:utils",
   ]
-
   cflags = [
     "-Wall",
     "-Wextra",
