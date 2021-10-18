@@ -182,6 +182,7 @@ static int32_t CheckIndex(uint32_t devIndex)
 static int32_t OpenInputDevice(uint32_t devIndex)
 {
     int32_t ret;
+    int32_t len;
     struct HdfIoService *service = NULL;
     char serviceName[SERVICE_NAME_LEN] = {0};
 
@@ -189,7 +190,7 @@ static int32_t OpenInputDevice(uint32_t devIndex)
         return INPUT_FAILURE;
     }
 
-    int32_t len = (devIndex < PLACEHOLDER_LIMIT) ? 1 : PLACEHOLDER_LENGTH;
+    len = (devIndex < PLACEHOLDER_LIMIT) ? 1 : PLACEHOLDER_LENGTH;
     ret = snprintf_s(serviceName, SERVICE_NAME_LEN, strlen("hdf_input_event") + len, "%s%u",
         "hdf_input_event", devIndex);
     if (ret == -1) {
