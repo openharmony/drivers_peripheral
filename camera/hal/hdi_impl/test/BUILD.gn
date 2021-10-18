@@ -139,6 +139,6 @@ ohos_unittest("hdi_impl_unittest") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  external_deps += [ "samgr_L2:samgr_proxy" ]
+  external_deps += [ "samgr_standard:samgr_proxy" ]
   public_configs = [ ":camhdi_impl_utest_config" ]
 }
