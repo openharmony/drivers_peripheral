@@ -79,35 +79,13 @@ static int32_t StartOnce(uint32_t duration)
     return HDF_SUCCESS;
 }
 
-static int32_t CovertVibratorEffectName(char *effectName, int32_t len)
-{
-    for (int i = 0; i < len; i++) {
-        if (effectName[i] == '.') {
-            effectName[i] = '_';
-        }
-    }
-    return HDF_SUCCESS;
-}
-
 static int32_t Start(const char *effect)
 {
     struct VibratorDevice *priv = GetVibratorDevicePriv();
-    char effectName[EFFECT_SUN];
 
     if (effect == NULL) {
         HDF_LOGE("%s: start vibrator effect type invalid", __func__);
         return HDF_ERR_INVALID_PARAM;
-    }
-
-    if (strcpy_s(&effectName[0], EFFECT_SUN, effect) != HDF_SUCCESS) {
-        HDF_LOGE("%s: failed to copy string", __func__);
-        return HDF_FAILURE;
-    }
-
-    int32_t effectRet = CovertVibratorEffectName(effectName, EFFECT_SUN);
-    if (effectRet == HDF_FAILURE) {
-        HDF_LOGE("%s: covert effectName failed", __func__);
-        return HDF_FAILURE;
     }
 
     (void)OsalMutexLock(&priv->mutex);
@@ -127,7 +105,7 @@ static int32_t Start(const char *effect)
         return HDF_FAILURE;
     }
 
-    if (!HdfSbufWriteString(msg, effectName)) {
+    if (!HdfSbufWriteString(msg, effect)) {
         HDF_LOGE("%s: write effectName failed", __func__);
         HdfSBufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);
