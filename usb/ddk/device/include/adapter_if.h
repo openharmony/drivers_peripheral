@@ -233,7 +233,7 @@ struct RawUsbRamTestList {
 struct UsbFnAdapterOps *UsbFnAdapterGetOps(void);
 void *UsbFnMemAlloc(size_t size);
 void *UsbFnMemCalloc(size_t size);
-void UsbFnMemFree(void * const mem);
+void UsbFnMemFree(const void *mem);
 int UsbFnAdpMemTestTrigger(bool enable);
 
 #endif /* USBFN_ADAPTER_H */

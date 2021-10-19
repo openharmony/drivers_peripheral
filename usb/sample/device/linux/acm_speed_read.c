@@ -13,17 +13,18 @@
  * limitations under the License.
  */
 
-#include "cdcacm.h"
-#include "usb_dev_test.h"
+#include <stdio.h>
+#include <osal_time.h>
+#include <sys/time.h>
 #include <hdf_log.h>
 #include <hdf_remote_service.h>
 #include <hdf_sbuf.h>
-#include <osal_time.h>
 #include <servmgr_hdi.h>
 #include <signal.h>
-#include <stdio.h>
-#include <sys/time.h>
 #include <unistd.h>
+#include "cdcacm.h"
+#include "usb_dev_test.h"
+
 #define HDF_LOG_TAG   cdc_acm_speed_read
 
 static struct HdfSBuf *g_data;
@@ -80,7 +81,7 @@ void StopReadSpeedTest(int signo)
     printf("acm_speed_read exit.\n");
 }
 
-int acm_speed_read(int argc, char *argv[])
+int acm_speed_read(int argc, const char *argv[])
 {
     int status;
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();

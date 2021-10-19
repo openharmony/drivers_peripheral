@@ -607,12 +607,12 @@ end:
     return ret;
 }
 
-static int32_t UsbSpeedDdkInit(struct UsbSession *session)
+static int32_t UsbSpeedDdkInit(const struct UsbSession *session)
 {
     int32_t ret;
     UsbRawHandle *devHandle = NULL;
 
-    ret = UsbRawInit(&session);
+    ret = UsbRawInit((struct UsbSession **)&session);
     if (ret) {
         HDF_LOGE("%s: UsbRawInit faild\n", __func__);
         return HDF_ERR_IO;
