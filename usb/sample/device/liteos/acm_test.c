@@ -129,7 +129,7 @@ static void Test02()
     }
 }
 
-int acm_test(int argc, char *argv[])
+int acm_test(int argc, const char *argv[])
 {
     int status;
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");

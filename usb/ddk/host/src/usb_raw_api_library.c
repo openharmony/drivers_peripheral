@@ -895,12 +895,16 @@ int32_t RawFillBulkRequest(struct UsbHostRequest *request, const struct UsbDevic
     int32_t ret;
 
     if ((request == NULL) || (request->buffer == NULL) || (devHandle == NULL)
-        || (fillRequestData == NULL) || (fillRequestData->buffer == NULL)) {
+        || (fillRequestData == NULL)) {
         HDF_LOGE("%s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (UsbEndpointDirOut(fillRequestData->endPoint)) {
+        if (fillRequestData->buffer == NULL) {
+            HDF_LOGE("%s:%d invalid param", __func__, __LINE__);
+            return HDF_ERR_INVALID_PARAM;
+        }
         ret = memcpy_s(request->buffer, request->bufLen, fillRequestData->buffer, fillRequestData->length);
         if (ret != EOK) {
             HDF_LOGE("%s:%d memcpy_s fail!", __func__, __LINE__);
