@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_DISPLAY_LAYER_V1_0_INTERFACE_PROXY_H
-#define OHOS_HDI_DISPLAY_LAYER_V1_0_INTERFACE_PROXY_H
+#ifndef HDI_DISPLAY_LAYER_PROXY_V1_0_H
+#define HDI_DISPLAY_LAYER_PROXY_V1_0_H
 
 #include <iremote_proxy.h>
 #include "idisplay_layer.h"
@@ -23,11 +23,10 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
-class DisplayLayerProxy : public IRemoteProxy<IDisplayLayer> {
+class VideoLayerProxy : public IRemoteProxy<IDisplayLayer> {
 public:
-    explicit DisplayLayerProxy(const sptr<IRemoteObject>& impl) : IRemoteProxy<IDisplayLayer>(impl) {}
-    virtual ~DisplayLayerProxy() {}
+    explicit VideoLayerProxy(const sptr<IRemoteObject>& impl) : IRemoteProxy<IDisplayLayer>(impl) {}
+    virtual ~VideoLayerProxy() {}
 
     virtual DispErrCode InitDisplay(unsigned int devId) override;
     virtual DispErrCode DeinitDisplay(unsigned int devId) override;
@@ -59,12 +58,11 @@ private:
     static constexpr int  CMD_DISPLAY_LAYER_REMOTE_SET_TRANSFORM_MODE = 11;
     static constexpr int  CMD_DISPLAY_LAYER_REMOTE_SET_LAYER_BUFFER = 12;
 
-    static inline BrokerDelegator<DisplayLayerProxy> delegator_;
+    static inline BrokerDelegator<VideoLayerProxy> delegator_;
 };
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI
 } // namespace OHOS
 
-#endif // OHOS_HDI_DISPLAY_LAYER_V1_0_INTERFACE_PROXY_H
+#endif // HDI_DISPLAY_LAYER_PROXY_V1_0_H

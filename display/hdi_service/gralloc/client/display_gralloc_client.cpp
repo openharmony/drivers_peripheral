@@ -22,7 +22,6 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
 IDisplayGralloc *IDisplayGralloc::Get()
 {
     IDisplayGralloc *instance = nullptr;
@@ -74,7 +73,7 @@ int32_t DisplayGrallocClient::Unmap(const BufferHandle &handle) const
 {
     auto ret = mapperAdapter_->UnmapBuffer(handle);
     if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("%{public}s: failed, ret %d", __func__, ret);
+        HDF_LOGE("%{public}s: failed, ret %{public}d", __func__, ret);
     } 
     return ret;
 }
@@ -83,7 +82,7 @@ int32_t DisplayGrallocClient::FlushCache(const BufferHandle &handle) const
 {
     auto ret = mapperAdapter_->FlushCache(handle);
     if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGE("%{public}s: failed, ret %d", __func__, ret);
+        HDF_LOGE("%{public}s: failed, ret %{public}d", __func__, ret);
     } 
     return ret;
 }
@@ -92,7 +91,7 @@ int32_t DisplayGrallocClient::InvalidateCache(const BufferHandle &handle) const
 {
     auto ret = mapperAdapter_->InvalidateCache(handle);
     if (ret != DISPLAY_SUCCESS) {
-        HDF_LOGI("%{public}s: failed, ret %d", __func__, ret);
+        HDF_LOGI("%{public}s: failed, ret %{public}d", __func__, ret);
     } 
     return ret;
 }
@@ -108,7 +107,6 @@ int32_t DisplayGrallocClient::FlushMCache(const BufferHandle &handle) const
     (void)handle;
     return DISPLAY_NOT_SUPPORT;
 }
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_DISPLAY_LAYER_V1_0_INTERFACE_SERVICE_H
-#define OHOS_HDI_DISPLAY_LAYER_V1_0_INTERFACE_SERVICE_H
+#ifndef HDI_VIDEO_LAYER_SERVICE_V1_0_H
+#define HDI_VIDEO_LAYER_SERVICE_V1_0_H
 
 #include "idisplay_layer.h"
 
@@ -22,10 +22,8 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
-class DisplayLayerService : public IDisplayLayer {
+class VideoLayerService : public IDisplayLayer {
 public:
-
     virtual DispErrCode InitDisplay(unsigned int devId) override;
     virtual DispErrCode DeinitDisplay(unsigned int devId) override;
     virtual DispErrCode GetDisplayInfo(unsigned int devId, std::shared_ptr<DisplayInfo> &dispInfo) override;
@@ -40,10 +38,9 @@ public:
     virtual DispErrCode SetTransformMode(unsigned int devId, unsigned int layerId, TransformType &type) override;
     virtual DispErrCode SetLayerBuffer(unsigned int devId, unsigned int layerId, const BufferHandle &buffer, int fence) override;
 };
-
 } // namespace V1_0 
 } // namespace Display
 } // namespace HDI
 } // namespace OHOS
 
-#endif // OHOS_HDI_DISPLAY_LAYER_V1_0_INTERFACE_SERVICE_H
+#endif // HDI_VIDEO_LAYER_SERVICE_V1_0_H

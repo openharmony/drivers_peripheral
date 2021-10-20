@@ -39,4 +39,4 @@ private:
 } // namespace HDI
 } // namespace DISPLAY
 
-#endif
+#endif // HDI_GFX_COMPOSITION_H

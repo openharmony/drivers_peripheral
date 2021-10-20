@@ -20,8 +20,8 @@
 #include <unordered_set>
 #include <memory.h>
 #include "display_device.h"
-#include "hdi_layer.h"
 #include "hdi_composer.h"
+#include "hdi_layer.h"
 
 namespace OHOS {
 namespace HDI {

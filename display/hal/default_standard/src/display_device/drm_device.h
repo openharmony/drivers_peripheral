@@ -19,13 +19,13 @@
 #include <memory>
 #include <xf86drm.h>
 #include <xf86drmMode.h>
+#include "drm_connector.h"
+#include "drm_crtc.h"
+#include "drm_encoder.h"
+#include "drm_plane.h"
 #include "hdi_device_common.h"
 #include "hdi_device_interface.h"
 #include "hdi_display.h"
-#include "drm_crtc.h"
-#include "drm_connector.h"
-#include "drm_encoder.h"
-#include "drm_plane.h"
 #include "hdi_shared_fd.h"
 
 namespace OHOS {
@@ -76,6 +76,5 @@ private:
 } // namespace OHOS
 } // namespace HDI
 } // namespace DISPLAY
-
 
 #endif // DRM_DEVICE_H

@@ -25,7 +25,6 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
 class ParcelUtils {
 public:
     static int32_t UnpackAllocInfo(MessageParcel &data, AllocInfo *pAllocInfo)
@@ -58,18 +57,17 @@ public:
             HDF_LOGE("%{public}s: write AllocInfo usage failed", __func__);
             return DISPLAY_PARAM_ERR;
         }
-        if (!data.WriteUint32(pAllocInfo->format)) {// enum type 
+        if (!data.WriteUint32(pAllocInfo->format)) { 
             HDF_LOGE("%{public}s: write AllocInfo format failed", __func__);
             return DISPLAY_PARAM_ERR;
         }
-        if (!data.WriteUint32(pAllocInfo->expectedSize)) {// enum type
+        if (!data.WriteUint32(pAllocInfo->expectedSize)) {
             HDF_LOGE("%{public}s: write AllocInfo type failed", __func__);
             return DISPLAY_PARAM_ERR;
         }
         return DISPLAY_SUCCESS;
     }
 };
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI

@@ -128,7 +128,11 @@ static inline void BlendAtop(ColorRGBAf &src, ColorRGBAf &dst)
 }
 
 // blend dst
-static inline void BlendDst(ColorRGBAf &src, ColorRGBAf &dst) {}
+static inline void BlendDst(ColorRGBAf &src, ColorRGBAf &dst)
+{
+    (void)src;
+    (void)dst;
+}
 
 // blend dst atop
 static inline void BlendDstAtop(ColorRGBAf &src, ColorRGBAf &dst)

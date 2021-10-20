@@ -32,6 +32,7 @@ const char *AUTH_INTERFACE_NAME = "wl_drm_auth";
 
 static void AuthenticationStatus(void *data, struct wl_drm_auth *wlDrmAuth, uint32_t status)
 {
+    (void)wlDrmAuth;
     DISPLAY_LOGD("AuthenticationStatus the status %{public}d", status);
     WaylandDisplay *display = data;
     display->authStatus = status;
@@ -79,7 +80,7 @@ WaylandDisplay *InitWaylandClient()
     dsp = calloc(1, sizeof(WaylandDisplay));
     DISPLAY_CHK_RETURN((dsp == NULL), NULL, DISPLAY_LOGE("can not alloc memory errno : %{public}d", errno));
     dsp->display = wl_display_connect(NULL);
-    DISPLAY_CHK_RETURN((dsp->display == NULL), NULL, DISPLAY_LOGE("display connect failed errno: %d", errno);
+    DISPLAY_CHK_RETURN((dsp->display == NULL), NULL, DISPLAY_LOGE("display connect failed, errno: %{public}d", errno);
         DeInitWaylandClient(dsp));
     dsp->registry = wl_display_get_registry(dsp->display);
     DISPLAY_CHK_RETURN((dsp->registry == NULL), NULL, DISPLAY_LOGE("can not get registry"); DeInitWaylandClient(dsp));

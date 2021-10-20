@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include "display_test.h"
 #include "display_type.h"

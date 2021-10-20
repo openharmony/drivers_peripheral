@@ -15,11 +15,9 @@
 
 #include "drm_device.h"
 #include <string>
-#include <memory>
 #include <errno.h>
 #include <fcntl.h>
-#include <xf86drm.h>
-#include <xf86drmMode.h>
+#include <memory>
 #include <drm_fourcc.h>
 #include "display_common.h"
 #include "drm_display.h"
@@ -58,28 +56,24 @@ int DrmDevice::GetDrmFd()
     return mDrmFd->GetFd();
 }
 
-typedef struct {
+using PixelFormatConvertTbl = struct PixFmtConvertTbl{
     uint32_t drmFormat;
     PixelFormat pixFormat;
-} PixelFormatConvertTbl;
+};
 
 uint32_t DrmDevice::ConvertToDrmFormat(PixelFormat fmtIn)
 {
-    /*
-    DRM_FORMAT_NV16 - PIXEL_FMT_YCBCR_422_SP  DRM_FORMAT_NV61 - PIXEL_FMT_YCRCB_422_SP
-    DRM_FORMAT_YUV422 - PIXEL_FMT_YCBCR_422_P} DRM_FORMAT_YVU422 - PIXEL_FMT_YCRCB_422_P
-    now gbm can not support YUV 422
-   */
     static const PixelFormatConvertTbl convertTable[] = {
-        {DRM_FORMAT_XBGR8888,  PIXEL_FMT_RGBX_8888 },  {DRM_FORMAT_ABGR8888, PIXEL_FMT_RGBA_8888 },
-        {DRM_FORMAT_RGB888,    PIXEL_FMT_RGB_888   },  {DRM_FORMAT_RGB565,   PIXEL_FMT_BGR_565   },
-        {DRM_FORMAT_BGRX4444,  PIXEL_FMT_BGRX_4444 },  {DRM_FORMAT_BGRA4444, PIXEL_FMT_BGRA_4444 },
-        {DRM_FORMAT_RGBA4444,  PIXEL_FMT_RGBA_4444 },  {DRM_FORMAT_RGBX4444, PIXEL_FMT_RGBX_4444 },
-        {DRM_FORMAT_BGRX5551,  PIXEL_FMT_BGRX_5551 },  {DRM_FORMAT_BGRA5551, PIXEL_FMT_BGRA_5551 },
-        {DRM_FORMAT_BGRX8888,  PIXEL_FMT_BGRX_8888 },  {DRM_FORMAT_ARGB8888, PIXEL_FMT_BGRA_8888 },
-        {DRM_FORMAT_NV12,     PIXEL_FMT_YCBCR_420_SP}, {DRM_FORMAT_NV21, PIXEL_FMT_YCRCB_420_SP  },
-        {DRM_FORMAT_YUV420,   PIXEL_FMT_YCBCR_420_P}, {DRM_FORMAT_YVU420, PIXEL_FMT_YCRCB_420_P  },
-
+        {DRM_FORMAT_XBGR8888, PIXEL_FMT_RGBX_8888}, {DRM_FORMAT_ABGR8888, PIXEL_FMT_RGBA_8888},
+        {DRM_FORMAT_RGB888, PIXEL_FMT_RGB_888}, {DRM_FORMAT_RGB565, PIXEL_FMT_BGR_565},
+        {DRM_FORMAT_BGRX4444, PIXEL_FMT_BGRX_4444}, {DRM_FORMAT_BGRA4444, PIXEL_FMT_BGRA_4444},
+        {DRM_FORMAT_RGBA4444, PIXEL_FMT_RGBA_4444}, {DRM_FORMAT_RGBX4444, PIXEL_FMT_RGBX_4444},
+        {DRM_FORMAT_BGRX5551, PIXEL_FMT_BGRX_5551}, {DRM_FORMAT_BGRA5551, PIXEL_FMT_BGRA_5551},
+        {DRM_FORMAT_BGRX8888, PIXEL_FMT_BGRX_8888}, {DRM_FORMAT_ARGB8888, PIXEL_FMT_BGRA_8888},
+        {DRM_FORMAT_NV12, PIXEL_FMT_YCBCR_420_SP}, {DRM_FORMAT_NV21, PIXEL_FMT_YCRCB_420_SP},
+        {DRM_FORMAT_YUV420, PIXEL_FMT_YCBCR_420_P}, {DRM_FORMAT_YVU420, PIXEL_FMT_YCRCB_420_P},
+        {DRM_FORMAT_NV16, PIXEL_FMT_YCBCR_422_SP}, {DRM_FORMAT_NV61, PIXEL_FMT_YCRCB_422_SP},
+        {DRM_FORMAT_YUV422, PIXEL_FMT_YCBCR_422_P}, {DRM_FORMAT_YVU422, PIXEL_FMT_YCRCB_422_P},
     };
     uint32_t fmtOut = 0;
     for (uint32_t i = 0; i < sizeof(convertTable) / sizeof(convertTable[0]); i++) {
@@ -128,8 +122,7 @@ int32_t DrmDevice::GetProperty(const uint32_t objId, uint32_t objType, const std
 
 int32_t DrmDevice::Init()
 {
-    int ret;
-    ret = drmSetClientCap(GetDrmFd(), DRM_CLIENT_CAP_UNIVERSAL_PLANES, 1);
+    int ret = drmSetClientCap(GetDrmFd(), DRM_CLIENT_CAP_UNIVERSAL_PLANES, 1);
     DISPLAY_CHK_RETURN((ret), DISPLAY_FAILURE,
         DISPLAY_LOGE("DRM_CLIENT_CAP_UNIVERSAL_PLANES set failed %{public}s", strerror(errno)));
     ret = drmSetClientCap(GetDrmFd(), DRM_CLIENT_CAP_ATOMIC, 1);

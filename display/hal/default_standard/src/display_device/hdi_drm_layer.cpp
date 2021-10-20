@@ -14,10 +14,8 @@
  */
 
 #include "hdi_drm_layer.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include <errno.h>
-#include <xf86drm.h>
-#include <xf86drmMode.h>
 #include "drm_device.h"
 
 namespace OHOS {

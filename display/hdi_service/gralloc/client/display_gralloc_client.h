@@ -27,7 +27,6 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
 class DisplayGrallocClient : public IDisplayGralloc {
 public:
     DisplayGrallocClient();
@@ -45,7 +44,6 @@ private:
     std::shared_ptr<MapperAdapter> mapperAdapter_;
     sptr<IDisplayAllocator> allocatorProxy_;
 };
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI

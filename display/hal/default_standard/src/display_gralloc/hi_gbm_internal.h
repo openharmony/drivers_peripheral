@@ -37,4 +37,4 @@ struct gbm_bo {
     uint32_t size;
 };
 
-#endif
+#endif // HI_GBM_INTERNEL_H

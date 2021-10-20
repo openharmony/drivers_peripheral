@@ -24,13 +24,12 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
 class MapperAdapter {
 public:
     MapperAdapter();
     virtual ~MapperAdapter();
     bool IsReady();
-    int32_t MapBuffer(const BufferHandle& handle, void*& outData) const;
+    int32_t MapBuffer(const BufferHandle& handle, void *&outData) const;
     int32_t UnmapBuffer(const BufferHandle& handle) const;
     int32_t InvalidateCache(const BufferHandle& handle) const;
     int32_t FlushCache(const BufferHandle& handle) const;
@@ -39,7 +38,6 @@ public:
 private:
     GrallocFuncs *mapperFuncs_ = nullptr;
 };
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI

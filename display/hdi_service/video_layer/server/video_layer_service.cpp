@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "display_layer_service_impl.h"
+#include "video_layer_service.h"
 #include <hdf_log.h>
 #include <hdf_base.h>
 #include "display_gralloc.h"
@@ -23,11 +23,10 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
 static LayerFuncs *g_layerFuncs = nullptr;
 static GrallocFuncs *g_grallocFuncs = nullptr;
 
-DispErrCode DisplayLayerService::InitDisplay(unsigned int devId)
+DispErrCode VideoLayerService::InitDisplay(unsigned int devId)
 {
     if (g_layerFuncs != nullptr) {
         return DISPLAY_SUCCESS;
@@ -63,7 +62,7 @@ DispErrCode DisplayLayerService::InitDisplay(unsigned int devId)
     return DISPLAY_SUCCESS;
 }
 
-DispErrCode DisplayLayerService::DeinitDisplay(unsigned int devId)
+DispErrCode VideoLayerService::DeinitDisplay(unsigned int devId)
 {
     if (g_layerFuncs != nullptr && g_layerFuncs->DeinitDisplay != nullptr) {
         (void)g_layerFuncs->DeinitDisplay(devId);
@@ -71,7 +70,7 @@ DispErrCode DisplayLayerService::DeinitDisplay(unsigned int devId)
     return DISPLAY_SUCCESS;
 }
 
-DispErrCode DisplayLayerService::GetDisplayInfo(unsigned int devId, std::shared_ptr<DisplayInfo> &dispInfo)
+DispErrCode VideoLayerService::GetDisplayInfo(unsigned int devId, std::shared_ptr<DisplayInfo> &dispInfo)
 {
     if (g_layerFuncs == nullptr) {
         HDF_LOGE("video display not inited");
@@ -87,7 +86,7 @@ DispErrCode DisplayLayerService::GetDisplayInfo(unsigned int devId, std::shared_
     return DISPLAY_SUCCESS;
 }
 
-DispErrCode DisplayLayerService::CreateLayer(unsigned int devId, LayerInfo &layerInfo, unsigned int &layerId)
+DispErrCode VideoLayerService::CreateLayer(unsigned int devId, LayerInfo &layerInfo, unsigned int &layerId)
 {
     int32_t ret;
     LayerInfo info = layerInfo;
@@ -117,7 +116,7 @@ DispErrCode DisplayLayerService::CreateLayer(unsigned int devId, LayerInfo &laye
     return DISPLAY_SUCCESS;
 }
 
-DispErrCode DisplayLayerService::CloseLayer(unsigned int devId, unsigned int layerId)
+DispErrCode VideoLayerService::CloseLayer(unsigned int devId, unsigned int layerId)
 {
     if (g_layerFuncs == nullptr || g_layerFuncs->CloseLayer == nullptr) {
         HDF_LOGE("may not inited or CloseLayer nullptr");
@@ -127,7 +126,7 @@ DispErrCode DisplayLayerService::CloseLayer(unsigned int devId, unsigned int lay
     return DISPLAY_SUCCESS;
 }
 
-DispErrCode DisplayLayerService::SetLayerVisible(unsigned int devId, unsigned int layerId, bool visible)
+DispErrCode VideoLayerService::SetLayerVisible(unsigned int devId, unsigned int layerId, bool visible)
 {
     if (g_layerFuncs == nullptr || g_layerFuncs->SetLayerVisible == nullptr) {
         HDF_LOGE("may not inited or SetLayerVisible nullptr");
@@ -137,7 +136,7 @@ DispErrCode DisplayLayerService::SetLayerVisible(unsigned int devId, unsigned in
     return (ret == DISPLAY_SUCCESS) ? DISPLAY_SUCCESS : DISPLAY_FAILURE;
 }
 
-DispErrCode DisplayLayerService::GetLayerVisibleState(unsigned int devId, unsigned int layerId, bool &visible)
+DispErrCode VideoLayerService::GetLayerVisibleState(unsigned int devId, unsigned int layerId, bool &visible)
 {
     if (g_layerFuncs == nullptr || g_layerFuncs->GetLayerVisibleState == nullptr) {
         HDF_LOGE("may not inited or GetLayerVisibleState nullptr");
@@ -147,7 +146,7 @@ DispErrCode DisplayLayerService::GetLayerVisibleState(unsigned int devId, unsign
     return (ret == DISPLAY_SUCCESS) ? DISPLAY_SUCCESS : DISPLAY_FAILURE;
 }
 
-DispErrCode DisplayLayerService::SetLayerRect(unsigned int devId, unsigned int layerId, IRect &rect)
+DispErrCode VideoLayerService::SetLayerRect(unsigned int devId, unsigned int layerId, IRect &rect)
 {
     if (g_layerFuncs == nullptr || g_layerFuncs->SetLayerSize == nullptr) {
         HDF_LOGE("may not inited or SetLayerSize nullptr");
@@ -157,7 +156,7 @@ DispErrCode DisplayLayerService::SetLayerRect(unsigned int devId, unsigned int l
     return (ret == DISPLAY_SUCCESS) ? DISPLAY_SUCCESS : DISPLAY_FAILURE;
 }
 
-DispErrCode DisplayLayerService::GetLayerRect(unsigned int devId, unsigned int layerId, std::shared_ptr<IRect> &rect)
+DispErrCode VideoLayerService::GetLayerRect(unsigned int devId, unsigned int layerId, std::shared_ptr<IRect> &rect)
 {
     if (g_layerFuncs == nullptr || g_layerFuncs->GetLayerSize == nullptr) {
         HDF_LOGE("may not inited or GetLayerSize nullptr");
@@ -168,7 +167,7 @@ DispErrCode DisplayLayerService::GetLayerRect(unsigned int devId, unsigned int l
     return (ret == DISPLAY_SUCCESS) ? DISPLAY_SUCCESS : DISPLAY_FAILURE;
 }
 
-DispErrCode DisplayLayerService::SetLayerZorder(unsigned int devId, unsigned int layerId, unsigned int zorder)
+DispErrCode VideoLayerService::SetLayerZorder(unsigned int devId, unsigned int layerId, unsigned int zorder)
 {
     if (g_layerFuncs == nullptr || g_layerFuncs->SetLayerZorder == nullptr) {
         HDF_LOGE("may not inited or SetLayerZorder nullptr");
@@ -178,7 +177,7 @@ DispErrCode DisplayLayerService::SetLayerZorder(unsigned int devId, unsigned int
     return (ret == DISPLAY_SUCCESS) ? DISPLAY_SUCCESS : DISPLAY_FAILURE;
 }
 
-DispErrCode DisplayLayerService::GetLayerZorder(unsigned int devId, unsigned int layerId, unsigned int &zorder)
+DispErrCode VideoLayerService::GetLayerZorder(unsigned int devId, unsigned int layerId, unsigned int &zorder)
 {
     if (g_layerFuncs == nullptr || g_layerFuncs->GetLayerZorder == nullptr) {
         HDF_LOGE("may not inited or GetLayerZorder nullptr");
@@ -188,7 +187,7 @@ DispErrCode DisplayLayerService::GetLayerZorder(unsigned int devId, unsigned int
     return (ret == DISPLAY_SUCCESS) ? DISPLAY_SUCCESS : DISPLAY_FAILURE;
 }
 
-DispErrCode DisplayLayerService::SetTransformMode(unsigned int devId, unsigned int layerId, TransformType &type)
+DispErrCode VideoLayerService::SetTransformMode(unsigned int devId, unsigned int layerId, TransformType &type)
 {
     if (g_layerFuncs == nullptr || g_layerFuncs->SetTransformMode == nullptr) {
         HDF_LOGE("may not inited or SetTransformMode nullptr");
@@ -198,7 +197,7 @@ DispErrCode DisplayLayerService::SetTransformMode(unsigned int devId, unsigned i
     return (ret == DISPLAY_SUCCESS) ? DISPLAY_SUCCESS : DISPLAY_FAILURE;
 }
 
-DispErrCode DisplayLayerService::SetLayerBuffer(unsigned int devId, unsigned int layerId, const BufferHandle &buffer, int fence)
+DispErrCode VideoLayerService::SetLayerBuffer(unsigned int devId, unsigned int layerId, const BufferHandle &buffer, int fence)
 {
     if (g_layerFuncs == nullptr || g_layerFuncs->SetLayerBuffer == nullptr) {
         HDF_LOGE("may not inited or SetLayerBuffer nullptr");
@@ -210,7 +209,6 @@ DispErrCode DisplayLayerService::SetLayerBuffer(unsigned int devId, unsigned int
     (void)g_grallocFuncs->Unmap(&bufferTemp);
     return (ret == DISPLAY_SUCCESS) ? DISPLAY_SUCCESS : DISPLAY_FAILURE;
 }
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI

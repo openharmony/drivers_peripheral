@@ -35,8 +35,8 @@
  * @version 2.0
  */
 
-#ifndef OHOS_HDI_DISPLAY_LAYER_V1_0_INTERFACE_H
-#define OHOS_HDI_DISPLAY_LAYER_V1_0_INTERFACE_H
+#ifndef HDI_IDISPLAY_LAYER_PXY_V1_0_H
+#define HDI_IDISPLAY_LAYER_PXY_V1_0_H
 
 #include <iservmgr_hdi.h>
 #include "display_type.h"
@@ -45,7 +45,6 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
 class IDisplayLayer : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"HDI.DISPLAY.LAYER.V1_0");
@@ -288,11 +287,10 @@ public:
         int fence) = 0;
 
 }; // class IDisplayLayer
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI
 } // namespace OHOS
 
-#endif  // OHOS_HDI_DISPLAY_LAYER_V1_0_INTERFACE_H
+#endif  // HDI_IDISPLAY_LAYER_PXY_V1_0_H
 /** @} */

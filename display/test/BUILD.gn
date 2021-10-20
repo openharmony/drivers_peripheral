@@ -24,5 +24,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   group("hdf_test_display") {
+    testonly = true
+    deps = [ "unittest/standard:hdf_unittest_display" ]
   }
 }

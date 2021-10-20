@@ -17,8 +17,8 @@ group("hdf_unittest_display") {
   testonly = true
   deps = [
     ":devicetest",
-    #    ":gralloctest",
-    #    ":gfxtest"
+    ":gfxtest",
+    ":gralloctest",
   ]
 }
 
@@ -50,7 +50,7 @@ ohos_unittest("gralloctest") {
   module_out_path = module_output_path
   sources = [ "display_gralloc/display_gralloc_test.cpp" ]
   deps = [
-    "//drivers/peripheral/display/hal/default_standard:displaygralloc",
+    "//drivers/peripheral/display/hal/default_standard:def_display_gralloc",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
@@ -76,7 +76,7 @@ ohos_unittest("gfxtest") {
   ]
   deps = [
     "//drivers/peripheral/display/hal:hdi_display_gfx",
-    "//drivers/peripheral/display/hal/default_standard:displaygralloc",
+    "//drivers/peripheral/display/hal/default_standard:def_display_gralloc",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
@@ -103,8 +103,8 @@ ohos_unittest("devicetest") {
   deps = [
     ":disp_hdi_test_common",
     "//drivers/peripheral/display/hal:hdi_display_gfx",
-    "//drivers/peripheral/display/hal/default_standard:display_device_drm",
-    "//drivers/peripheral/display/hal/default_standard:displaygralloc",
+    "//drivers/peripheral/display/hal/default_standard:def_display_device",
+    "//drivers/peripheral/display/hal/default_standard:def_display_gralloc",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]

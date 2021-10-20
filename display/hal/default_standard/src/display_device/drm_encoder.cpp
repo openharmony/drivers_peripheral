@@ -14,6 +14,7 @@
  */
 
 #include "drm_encoder.h"
+
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {

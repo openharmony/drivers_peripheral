@@ -23,7 +23,6 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
 class IDisplayGralloc {
 public:
     virtual ~IDisplayGralloc() = default;
@@ -132,7 +131,6 @@ public:
      */
     virtual int32_t InvalidateCache(const BufferHandle &handle) const = 0;
 };
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI
