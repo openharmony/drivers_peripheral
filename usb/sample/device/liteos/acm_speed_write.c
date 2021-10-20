@@ -134,7 +134,7 @@ static void StartStopHandler(void)
     }
 }
 
-int acm_speed_write(int argc, char *argv[])
+int acm_speed_write(int argc, const char *argv[])
 {
     int status;
 

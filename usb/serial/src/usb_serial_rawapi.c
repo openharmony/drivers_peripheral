@@ -1404,8 +1404,8 @@ static void UsbSerialRelease(struct AcmDevice *acm)
     UsbFreeNotifyReqeust(acm);
     UsbFreeWriteRequests(acm);
     AcmWriteBufFree(acm);
-    (void)UsbRawCloseDevice(acm->devHandle);
     UsbReleaseInterfaces(acm);
+    (void)UsbRawCloseDevice(acm->devHandle);
     UsbRawFreeConfigDescriptor(acm->config);
     acm->config = NULL;
     UsbRawExit(acm->session);

@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <unistd.h>
+
 #define HDF_LOG_TAG   cdc_acm_speed
 
 enum UsbSerialCmd {
@@ -134,7 +135,7 @@ static void StartStopHandler()
     }
 }
 
-int acm_speed_read(int argc, char *argv[])
+int acm_speed_read(int argc, const char *argv[])
 {
     int status;
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");

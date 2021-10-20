@@ -33,7 +33,7 @@ static void ShowUsage()
 int main(int argc, char *argv[])
 {
     int ch;
-    char **arg = &argv[1];
+    const char **arg = (const char **)&argv[1];
     while ((ch = getopt(argc, argv, "1:2:3:4:5:6:h?")) != OPTION_EDN) {
         switch (ch) {
             case '1':

@@ -58,7 +58,7 @@ static void TestRead(FILE *fp)
     usleep(SLEEP_READ);
 }
 
-int acm_read(int argc, char *argv[])
+int acm_read(int argc, const char *argv[])
 {
     int status;
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();

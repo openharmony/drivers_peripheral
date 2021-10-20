@@ -144,7 +144,7 @@ static int TestPropRegist(const char *propName, const char *propValue)
 }
 
 
-int prop_test(int argc, char *argv[])
+int prop_test(int argc, const char *argv[])
 {
     int ch;
     int ret;

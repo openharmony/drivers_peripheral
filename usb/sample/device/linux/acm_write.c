@@ -41,7 +41,7 @@ static void TestWrite(char *buf)
 
 #define STR_LEN 1024
 #define NUM_INPUT 2
-int acm_write(int argc, char *argv[])
+int acm_write(int argc, const char *argv[])
 {
     char str[STR_LEN] = {0};
     int status;
@@ -82,7 +82,7 @@ int acm_write(int argc, char *argv[])
         }
         (void)fwrite(str, strlen(str), 1, fp);
         (void)fclose(fp);
-        TestWrite(argv[1]);
+        TestWrite((char *)argv[1]);
     }
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status) {
