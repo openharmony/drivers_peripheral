@@ -14,28 +14,37 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-group("display_client") {
+group("video_layer_service") {
   if (is_standard_system) {
-    deps = [ ":libhdi_display_layer_client" ]
+    deps = [ ":libhdi_video_layer_service" ]
   }
 }
 
 if (is_standard_system) {
-  ohos_shared_library("libhdi_display_layer_client") {
+  ohos_shared_library("libhdi_video_layer_service") {
     include_dirs = [
-      "../../include",
+      "//drivers/peripheral/display/interfaces/include",
       "//drivers/peripheral/base",
     ]
 
-    sources = [ "display_layer_proxy.cpp" ]
+    sources = [
+      "video_layer_driver.cpp",
+      "video_layer_service.cpp",
+      "video_layer_stub.cpp",
+    ]
 
     deps = [
       "$hdf_uhdf_path/hdi:libhdi",
-      "//drivers/adapter/uhdf2/host:libhdf_host",
-      "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-      "//drivers/adapter/uhdf2/utils:libhdf_utils",
+      "$hdf_uhdf_path/host:libhdf_host",
+      "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
+      "$hdf_uhdf_path/utils:libhdf_utils",
+      "//drivers/peripheral/display/hal:hdi_display_gralloc",
       "//foundation/graphic/standard/utils:buffer_handle",
     ]
+
+    if (target_cpu == "arm") {
+      deps += [ "//drivers/peripheral/display/hal:hdi_display_layer" ]
+    }
 
     if (is_standard_system) {
       external_deps = [
@@ -46,7 +55,6 @@ if (is_standard_system) {
       external_deps = [ "hilog:libhilog" ]
     }
 
-    # install_images = [ "vendor" ]
     subsystem_name = "hdf"
     part_name = "hdf"
   }

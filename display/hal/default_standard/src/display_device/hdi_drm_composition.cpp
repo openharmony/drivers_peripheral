@@ -14,7 +14,7 @@
  */
 
 #include "hdi_drm_composition.h"
-#include <errno.h>
+#include <cerrno>
 #include "hdi_drm_layer.h"
 
 namespace OHOS {

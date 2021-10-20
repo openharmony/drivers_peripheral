@@ -13,26 +13,24 @@
  * limitations under the License.
  */
 
-#include "display_layer_service_stub.h"
+#include "video_layer_stub.h"
 #include <buffer_handle_parcel.h>
 #include <buffer_handle_utils.h>
 #include <hdf_log.h>
 #include <hdf_base.h>
 #include <hdf_sbuf_ipc.h>
-#include "idisplay_layer.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
 DisplayLayerStub::DisplayLayerStub()
 {
 }
 
 DispErrCode DisplayLayerStub::Init()
 {
-    layerService_ = std::make_shared<DisplayLayerService>();
+    layerService_ = std::make_shared<VideoLayerService>();
     if (layerService_ == nullptr) {
         HDF_LOGE("%{public}s: layer service start failed", __func__);
         return DISPLAY_FAILURE;
@@ -331,7 +329,6 @@ int32_t DisplayLayerStub::LayerStubOnRemoteRequest(int cmdId, MessageParcel &dat
     }
     return HDF_SUCCESS;
 }
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI
@@ -370,8 +367,7 @@ int32_t LayerServiceOnRemoteRequest(void *stub, int cmdId, struct HdfSBuf *data,
         return HDF_FAILURE;
     }
 
-    DisplayLayerStub *layerStub =
-        reinterpret_cast<DisplayLayerStub *>(stub);
+    DisplayLayerStub *layerStub = reinterpret_cast<DisplayLayerStub *>(stub);
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
 

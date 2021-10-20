@@ -37,4 +37,4 @@ struct DrmHisiliconPhyaddr {
 }
 #endif
 
-#endif /* HISILICON_DRM_H */
+#endif // HISILICON_DRM_H

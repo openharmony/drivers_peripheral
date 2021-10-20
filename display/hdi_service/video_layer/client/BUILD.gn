@@ -14,37 +14,37 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-group("display_service") {
+config("video_layer_public_config") {
+  include_dirs = [
+    "//drivers/peripheral/display/interfaces/include",
+    "//drivers/peripheral/display/hdi_service/video_layer/client",
+    "//drivers/adapter/uhdf2/include/hdi",
+  ]
+}
+
+group("video_layer_client") {
   if (is_standard_system) {
-    deps = [ ":libhdi_display_layer_service" ]
+    deps = [ ":libhdi_video_layer_client" ]
+    public_configs = [ ":video_layer_public_config" ]
   }
 }
 
 if (is_standard_system) {
-  ohos_shared_library("libhdi_display_layer_service") {
+  ohos_shared_library("libhdi_video_layer_client") {
     include_dirs = [
-      "../../include",
+      "//drivers/peripheral/display/interfaces/include",
       "//drivers/peripheral/base",
     ]
 
-    sources = [
-      "display_hdi_driver.cpp",
-      "display_layer_service_impl.cpp",
-      "display_layer_service_stub.cpp",
-    ]
+    sources = [ "video_layer_proxy.cpp" ]
 
     deps = [
       "$hdf_uhdf_path/hdi:libhdi",
-      "//drivers/adapter/uhdf2/host:libhdf_host",
-      "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-      "//drivers/adapter/uhdf2/utils:libhdf_utils",
-      "//drivers/peripheral/display/hal:hdi_display_gralloc",
+      "$hdf_uhdf_path/host:libhdf_host",
+      "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
+      "$hdf_uhdf_path/utils:libhdf_utils",
       "//foundation/graphic/standard/utils:buffer_handle",
     ]
-
-    if (target_cpu == "arm") {
-      deps += [ "//drivers/peripheral/display/hal:hdi_display_layer" ]
-    }
 
     if (is_standard_system) {
       external_deps = [

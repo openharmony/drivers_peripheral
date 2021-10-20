@@ -464,7 +464,7 @@ TEST_P(GfxRotateTest, Blit)
     ASSERT_TRUE(ret == DISPLAY_SUCCESS);
 }
 // BLEND_AKD BLEND_AKS has no function to test it
-const BlendType BLEND_TYPES[] = {
+static const BlendType BLEND_TYPES[] = {
     BLEND_NONE,
     BLEND_CLEAR,                /* < CLEAR blending    {0, 0} */
     BLEND_SRC,                  /* < SRC blending      {Sa, Sc} */
@@ -480,13 +480,14 @@ const BlendType BLEND_TYPES[] = {
     BLEND_XOR,                  /* < XOR blending */
     BLEND_DST,                  /* < DST blending */
 };
-const uint32_t FILL_COLORS[] = {
+
+static const uint32_t FILL_COLORS[] = {
     0,
     0xffffffff,
     0xaaaaaaaa,
 };
 
-const RotateParam TEST_ROTATE_PARAMS[] = {
+static const RotateParam TEST_ROTATE_PARAMS[] = {
     {ROTATE_NONE, BLEND_SRC, 200, 100},
     {ROTATE_90, BLEND_SRC, 979, 200},
     {ROTATE_180, BLEND_SRC, 1719, 979},

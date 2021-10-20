@@ -36,6 +36,7 @@ int32_t HdiGfxComposition::Init()
 bool HdiGfxComposition::CanHandle(HdiLayer &hdiLayer)
 {
     DISPLAY_LOGD();
+    (void)hdiLayer;
     return true;
 }
 

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "drm_device.h"
 #include "drm_plane.h"
+#include "drm_device.h"
 
 namespace OHOS {
 namespace HDI {

@@ -44,16 +44,16 @@ int32_t GbmGrallocUninitialize();
 int32_t GbmGrallocInitialize();
 
 #ifdef GRALLOC_LOCK_DEBUG
-#define GRALLOC_LOCK(format, ...)                                                                         \
-    do {                                                                                                  \
-        HDF_LOGD("[%s@%s:%d] GrallocLock " format "\n", __FUNCTION__, __FILE__, __LINE__, ##__VA_ARGS__); \
-        pthread_mutex_lock(&g_lock);                                                                      \
+#define GRALLOC_LOCK(format, ...)                                                                                    \
+    do {                                                                                                             \
+        HDF_LOGD("[%{public}s@%{public}s:%{public}d]" format "\n", __FUNCTION__, __FILE__, __LINE__, ##__VA_ARGS__); \
+        pthread_mutex_lock(&g_lock);                                                                                 \
     } while (0)
 
-#define GRALLOC_UNLOCK(format, ...)                                                                         \
-    do {                                                                                                    \
-        HDF_LOGD("[%s@%s:%d] GrallocUnLock " format "\n", __FUNCTION__, __FILE__, __LINE__, ##__VA_ARGS__); \
-        pthread_mutex_unlock(&g_lock);                                                                      \
+#define GRALLOC_UNLOCK(format, ...)                                                                                  \
+    do {                                                                                                             \
+        HDF_LOGD("[%{public}s@%{public}s:%{public}d]" format "\n", __FUNCTION__, __FILE__, __LINE__, ##__VA_ARGS__); \
+        pthread_mutex_unlock(&g_lock);                                                                               \
     } while (0)
 #else
 #define GRALLOC_LOCK(format, ...)    \
@@ -71,4 +71,4 @@ int32_t GbmGrallocInitialize();
 }
 #endif
 
-#endif
+#endif // DISPLAY_GRALLOC_GBM_H

@@ -104,8 +104,7 @@ int32_t DrmDisplay::SetDisplayPowerStatus(DispPowerStatus status)
 {
     DISPLAY_LOGD("the status %{public}d ", status);
     uint32_t drmPowerState = 0;
-    int ret;
-    ret = ConvertToDrmPowerState(status, drmPowerState);
+    int ret = ConvertToDrmPowerState(status, drmPowerState);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_PARAM_ERR,
         DISPLAY_LOGE("unkown power status %{public}d", status));
     mConnector->SetDpmsState(drmPowerState);
@@ -197,7 +196,7 @@ int32_t DrmDisplay::PushFirstFrame()
     DrmMode mode;
     ret = mConnector->GetModeFromId(mCrtc->GetActiveModeId(), mode);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
-        DISPLAY_LOGE("can not get the mode from id %d", mCrtc->GetActiveModeId()));
+        DISPLAY_LOGE("can not get the mode from id %{public}d", mCrtc->GetActiveModeId()));
     AllocInfo info = {
         .width = mode.GetModeInfoPtr()->hdisplay,
         .height = mode.GetModeInfoPtr()->vdisplay,
@@ -236,6 +235,7 @@ int32_t DrmDisplay::ChosePreferenceMode()
 int32_t DrmDisplay::RegDisplayVBlankCallback(VBlankCallback cb, void *data)
 {
     DISPLAY_LOGD("the VBlankCallback %{public}p ", cb);
+    (void)data;
     std::shared_ptr<VsyncCallBack> vsyncCb = std::make_shared<VsyncCallBack>(cb, nullptr);
     DrmVsyncWorker::GetInstance().ReqesterVBlankCb(vsyncCb);
     return DISPLAY_SUCCESS;
@@ -258,7 +258,6 @@ int32_t DrmDisplay::SetDisplayBacklight(uint32_t value)
 {
     return mConnector->SetBrightness(value);
 }
-
 } // namespace OHOS
 } // namespace HDI
 } // namespace DISPLAY

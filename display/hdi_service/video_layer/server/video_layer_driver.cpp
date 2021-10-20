@@ -17,7 +17,7 @@
 #include <hdf_log.h>
 #include <hdf_device_desc.h>
 #include <osal_mem.h>
-#include "display_layer_service_stub.h"
+#include "video_layer_stub.h"
 
 #define HDF_LOG_TAG display_hdi_service
 
@@ -33,13 +33,13 @@ static int32_t DisplayHdiServiceDispatch(struct HdfDeviceIoClient *client, int c
     return LayerServiceOnRemoteRequest(displayHdiService->instance, cmdId, data, reply);
 }
 
-int HdfDisplayHostDriverInit(struct HdfDeviceObject *deviceObject)
+static int32_t HdfDisplayHostDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%{public}s: enter", __func__);
     return HDF_SUCCESS;
 }
 
-int HdfDisplayHostDriverBind(struct HdfDeviceObject *deviceObject)
+static int32_t HdfDisplayHostDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HdfDisplayHdiService *displayHdiService =
         reinterpret_cast<HdfDisplayHdiService *>(OsalMemAlloc(sizeof(HdfDisplayHdiService)));
@@ -58,7 +58,7 @@ int HdfDisplayHostDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-void HdfDisplayHostDriverRelease(HdfDeviceObject *deviceObject)
+static void HdfDisplayHostDriverRelease(HdfDeviceObject *deviceObject)
 {
     HdfDisplayHdiService *displayHdiService = CONTAINER_OF(deviceObject->service, HdfDisplayHdiService, ioservice);
     OsalMemFree(displayHdiService);
@@ -66,7 +66,7 @@ void HdfDisplayHostDriverRelease(HdfDeviceObject *deviceObject)
 
 struct HdfDriverEntry g_displayHostDriverEntry = {
     .moduleVersion = 1,
-    .moduleName = "hdi_display_layer_service",
+    .moduleName = "hdi_video_layer_service",
     .Bind = HdfDisplayHostDriverBind,
     .Init = HdfDisplayHostDriverInit,
     .Release = HdfDisplayHostDriverRelease,
