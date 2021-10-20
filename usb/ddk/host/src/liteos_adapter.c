@@ -647,7 +647,7 @@ static int OsSubmitBulkRequestHandle(
     return HDF_SUCCESS;
 }
 
-static int OsSubmitBulkRequest(struct UsbHostRequest *request)
+static int OsSubmitBulkRequest(struct UsbHostRequest * const request)
 {
     struct Async *as = NULL;
     int bulkBufferLen;

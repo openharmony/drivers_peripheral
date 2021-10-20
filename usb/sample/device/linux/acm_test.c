@@ -133,7 +133,7 @@ void StopAcmTest(int signo)
     printf("acm_test exit.\n");
 }
 
-int acm_test(int argc, char *argv[])
+int acm_test(int argc, const char *argv[])
 {
     int status;
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();
