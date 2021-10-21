@@ -27,7 +27,7 @@ if (defined(ohos_lite)) {
       "//utils/native/base/include",
       "//third_party/bounds_checking_function/include",
       "$hdf_framework_path/include/utils",
-      "//drivers/adapter/khdf/liteos/osal/include"
+      "//drivers/adapter/khdf/liteos/osal/include",
     ]
 
     sources = [ "framework_render.c" ]
@@ -47,7 +47,7 @@ if (defined(ohos_lite)) {
       "//utils/native/base/include",
       "//third_party/bounds_checking_function/include",
       "$hdf_framework_path/include/utils",
-      "//drivers/adapter/khdf/liteos/osal/include"
+      "//drivers/adapter/khdf/liteos/osal/include",
     ]
 
     sources = [ "framework_capture.c" ]
