@@ -232,7 +232,7 @@ struct AudioProxyManager *GetAudioProxyManagerFuncs(void)
         return NULL;
     }
     HDIServiceManagerRelease(serviceMgr);
-    struct AudioProxyManager *proxyDevMgr = (struct AudioProxyManager *)OsalMemAlloc(sizeof(struct AudioProxyManager));
+    struct AudioProxyManager *proxyDevMgr = (struct AudioProxyManager *)(intptr_t)OsalMemAlloc(sizeof(struct AudioProxyManager));
     if (proxyDevMgr == NULL) {
         LOG_FUN_ERR("malloc failed!");
         HdfRemoteServiceRecycle(remote);
