@@ -328,7 +328,7 @@ int32_t BlitTest(void)
     // clean the layer buffer
     (void)memset_s(g_displayTest.buffer.data.virAddr, layerBufSize, 0, layerBufSize);
     // load bmp test picture
-    ret = LoadBmp((const int8_t *)"./gfx_test.bmp", &pictureBuf);
+    ret = LoadBmp((const int8_t *)PIC_RES_PATH, &pictureBuf);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%s: LoadBmp fail", __func__);
         return DISPLAY_FAILURE;
