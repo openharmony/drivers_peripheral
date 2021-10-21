@@ -68,7 +68,7 @@ if (defined(ohos_lite)) {
       "//drivers/adapter/khdf/liteos/osal/include",
       "$hdf_framework_path/utils/include",
       "$hdf_framework_path/include/osal",
-      "$hdf_framework_path/include/core"
+      "$hdf_framework_path/include/core",
     ]
 
     deps = [
@@ -101,7 +101,7 @@ if (defined(ohos_lite)) {
       "//drivers/adapter/khdf/liteos/osal/include",
       "$hdf_framework_path/utils/include",
       "$hdf_framework_path/include/osal",
-      "$hdf_framework_path/include/core"
+      "$hdf_framework_path/include/core",
     ]
 
     deps = [
