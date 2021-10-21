@@ -14,6 +14,7 @@
  */
 
 #include "audio_interface_lib_render.h"
+#include "audio_hal_log.h"
 
 #define AUDIODRV_CTL_ELEM_IFACE_DAC 0
 #define AUDIODRV_CTL_ELEM_IFACE_MIX 3

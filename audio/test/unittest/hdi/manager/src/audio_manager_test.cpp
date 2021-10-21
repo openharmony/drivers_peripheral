@@ -35,7 +35,7 @@ void AudioManagerTest::TearDownTestCase()
 {
 }
 
-HWTEST_F(AudioManagerTest, AudioManagerGetAllAdaptersWhenManagerIsNull, TestSize.Level0)
+HWTEST_F(AudioManagerTest, AudioManagerGetAllAdaptersWhenManagerIsNull, TestSize.Level1)
 {
     struct AudioManager *managerFuncs = GetAudioManagerFuncs();
     int32_t size = 0;
@@ -45,7 +45,7 @@ HWTEST_F(AudioManagerTest, AudioManagerGetAllAdaptersWhenManagerIsNull, TestSize
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 }
 
-HWTEST_F(AudioManagerTest, AudioManagerGetAllAdaptersWhenDescsIsNull, TestSize.Level0)
+HWTEST_F(AudioManagerTest, AudioManagerGetAllAdaptersWhenDescsIsNull, TestSize.Level1)
 {
     struct AudioManager *managerFuncs = GetAudioManagerFuncs();
     int32_t size = 0;
@@ -53,7 +53,7 @@ HWTEST_F(AudioManagerTest, AudioManagerGetAllAdaptersWhenDescsIsNull, TestSize.L
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 }
 
-HWTEST_F(AudioManagerTest, AudioManagerGetAllAdaptersWhenSizeIsNull, TestSize.Level0)
+HWTEST_F(AudioManagerTest, AudioManagerGetAllAdaptersWhenSizeIsNull, TestSize.Level1)
 {
     struct AudioManager *managerFuncs = GetAudioManagerFuncs();
     int32_t *size = nullptr;
@@ -62,7 +62,7 @@ HWTEST_F(AudioManagerTest, AudioManagerGetAllAdaptersWhenSizeIsNull, TestSize.Le
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 }
 
-HWTEST_F(AudioManagerTest, AudioManagerGetAllAdaptersWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioManagerTest, AudioManagerGetAllAdaptersWhenParamIsVaild, TestSize.Level1)
 {
     struct AudioManager *managerFuncs = GetAudioManagerFuncs();
     int32_t size = 0;
@@ -71,7 +71,7 @@ HWTEST_F(AudioManagerTest, AudioManagerGetAllAdaptersWhenParamIsVaild, TestSize.
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
-HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenManagerIsNull, TestSize.Level0)
+HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenManagerIsNull, TestSize.Level1)
 {
     struct AudioManager *managerFuncs = GetAudioManagerFuncs();
     struct AudioManager *manager = nullptr;
@@ -83,7 +83,7 @@ HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenManagerIsNull, TestSize.Le
     desc = nullptr;
 }
 
-HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenDescIsNull, TestSize.Level0)
+HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenDescIsNull, TestSize.Level1)
 {
     struct AudioManager *managerFuncs = GetAudioManagerFuncs();
     const struct AudioAdapterDescriptor *desc = nullptr;
@@ -92,7 +92,7 @@ HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenDescIsNull, TestSize.Level
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 }
 
-HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenAdapterNameIsNull, TestSize.Level0)
+HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenAdapterNameIsNull, TestSize.Level1)
 {
     struct AudioManager *managerFuncs = GetAudioManagerFuncs();
     struct AudioAdapterDescriptor descTemp;
@@ -103,7 +103,7 @@ HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenAdapterNameIsNull, TestSiz
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 }
 
-HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenAdapterIsNull, TestSize.Level0)
+HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenAdapterIsNull, TestSize.Level1)
 {
     struct AudioManager *managerFuncs = GetAudioManagerFuncs();
     const struct AudioAdapterDescriptor *desc = new AudioAdapterDescriptor;
@@ -113,16 +113,57 @@ HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenAdapterIsNull, TestSize.Le
     desc = nullptr;
 }
 
-HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenDescIsError, TestSize.Level1)
 {
+    int32_t ret;
     struct AudioManager *managerFuncs = GetAudioManagerFuncs();
-    struct AudioAdapterDescriptor *desc = new AudioAdapterDescriptor;
-    desc->adapterName = "usb";
+    ASSERT_NE(managerFuncs, nullptr);
+    int32_t size = 0;
+    struct AudioAdapterDescriptor *descs;
+    ret = managerFuncs->GetAllAdapters(managerFuncs, &descs, &size);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
+    struct AudioAdapterDescriptor *desc = &descs[size];
     static struct AudioAdapter *adapter;
-    int32_t ret = managerFuncs->LoadAdapter(managerFuncs, desc, &adapter);
+    ret = managerFuncs->LoadAdapter(managerFuncs, desc, &adapter);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_OBJECT, ret);
+    managerFuncs->UnloadAdapter(managerFuncs, adapter);
+    adapter = nullptr;
+}
+
+HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenAdapterNameIsError, TestSize.Level1)
+{
+    int32_t ret;
+    struct AudioManager *managerFuncs = GetAudioManagerFuncs();
+    ASSERT_NE(managerFuncs, nullptr);
+    int32_t size = 0;
+    struct AudioAdapterDescriptor *descs;
+    ret = managerFuncs->GetAllAdapters(managerFuncs, &descs, &size);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
+    struct AudioAdapterDescriptor *desc = &descs[0];
+    desc->adapterName = "abc";
+    static struct AudioAdapter *adapter;
+    ret = managerFuncs->LoadAdapter(managerFuncs, desc, &adapter);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    managerFuncs->UnloadAdapter(managerFuncs, adapter);
+    adapter = nullptr;
+}
+
+HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenParamIsVaild, TestSize.Level1)
+{
+    int32_t ret;
+    struct AudioManager *managerFuncs = GetAudioManagerFuncs();
+    ASSERT_NE(managerFuncs, nullptr);
+    int32_t size = 0;
+    struct AudioAdapterDescriptor *descs;
+    ret = managerFuncs->GetAllAdapters(managerFuncs, &descs, &size);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
+    struct AudioAdapterDescriptor *desc = &descs[0];
+    static struct AudioAdapter *adapter;
+    ret = managerFuncs->LoadAdapter(managerFuncs, desc, &adapter);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    delete(desc);
-    desc = nullptr;
     managerFuncs->UnloadAdapter(managerFuncs, adapter);
     adapter = nullptr;
 }

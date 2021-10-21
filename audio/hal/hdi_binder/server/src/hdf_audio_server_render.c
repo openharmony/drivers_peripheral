@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 #include "hdf_audio_server_render.h"
+#include "audio_hal_log.h"
 #include "hdf_audio_server_common.h"
+
 
 int32_t GetInitRenderParaAttrs(struct HdfSBuf *data, struct AudioSampleAttributes *attrs)
 {
@@ -119,7 +121,6 @@ int32_t HdiServiceCreatRender(const struct HdfDeviceIoClient *client,
     if (!HdfSbufReadUint32(data, &renderPid)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    HDF_LOGE("HdiServiceCreatRender: renderPid = %{public}u", renderPid);
     int32_t ret = GetInitRenderPara(data, &devDesc, &attrs);
     if (ret < 0) {
         HDF_LOGE("%{public}s: GetInitRenderPara fail", __func__);
@@ -219,7 +220,6 @@ int32_t HdiServiceRenderPause(const struct HdfDeviceIoClient *client,
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    HDF_LOGE("%{public}s: enter", __func__);
     struct AudioRender *render = NULL;
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
@@ -599,13 +599,12 @@ int32_t HdiServiceRenderRenderFrame(const struct HdfDeviceIoClient *client,
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    HDF_LOGI("%{public}s: enter", __func__);
     char *frame = NULL;
-    uint32_t requestBytes;
-    uint64_t replyBytes;
+    uint32_t requestBytes = 0;
+    uint64_t replyBytes = 0;
     struct AudioRender *render = NULL;
     const char *adapterName = NULL;
-    uint32_t pid;
+    uint32_t pid = 0;
     if (HdiServiceRenderCaptureReadData(data, &adapterName, &pid) < 0) {
         HDF_LOGE("%{public}s: HdiServiceRenderCaptureReadData fail!", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
@@ -627,7 +626,6 @@ int32_t HdiServiceRenderRenderFrame(const struct HdfDeviceIoClient *client,
     AudioSetRenderStatus(adapterName, true);
     ret = render->RenderFrame((AudioHandle)render, (const void *)frame, (uint64_t)requestBytes, &replyBytes);
     AudioSetRenderStatus(adapterName, false);
-    HDF_LOGE("%{public}s,%{public}u,%{public}llu", __func__, requestBytes, replyBytes);
     if (ret < 0) {
         HDF_LOGE("%{public}s: HdiServiceRenderRenderFrame ", __func__);
         return ret;
@@ -723,7 +721,6 @@ int32_t HdiServiceRenderSetChannelMode(const struct HdfDeviceIoClient *client,
 int32_t HdiServiceRenderGetChannelMode(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGE("%{public}s: enter", __func__);
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -741,7 +738,6 @@ int32_t HdiServiceRenderGetChannelMode(const struct HdfDeviceIoClient *client,
     if (!HdfSbufWriteUint32(reply, tempMode)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    HDF_LOGE("%{public}s: out", __func__);
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -772,7 +768,7 @@ int32_t HdiServiceRenderGetExtraParams(const struct HdfDeviceIoClient *client,
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    int32_t listLenth;
+    int32_t listLenth = 0;
     struct AudioRender *render = NULL;
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
@@ -866,7 +862,6 @@ int32_t HdiServiceRenderDevDump(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t range = 0;
-    int32_t fd = 0;
     struct AudioRender *render = NULL;
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
@@ -875,9 +870,11 @@ int32_t HdiServiceRenderDevDump(const struct HdfDeviceIoClient *client,
     if (!HdfSbufReadInt32(data, &range)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (!HdfSbufReadInt32(data, &fd)) {
+    ret = HdfSbufReadFileDescriptor(data);
+    if (ret < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
+    int32_t fd = ret;
     return render->control.AudioDevDump((AudioHandle)render, range, fd);
 }
 
@@ -903,7 +900,7 @@ int32_t HdiServiceRenderRegCallback(const struct HdfDeviceIoClient *client, stru
         HDF_LOGE("%{public}s: read callback pointer Is NULL", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    pCallback = (RenderCallback)tempAddr;
+    pCallback = (RenderCallback)(uintptr_t)tempAddr;
     return render->RegCallback((AudioHandle)render, pCallback, cookie);
 }
 

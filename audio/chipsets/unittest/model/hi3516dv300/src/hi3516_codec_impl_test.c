@@ -46,13 +46,12 @@ int32_t TestAcodecDeviceInit(void)
 
 int32_t TestAcodecHalReadReg(void)
 {
-    int ret;
     unsigned int offset;
     const int offsetValue = 0x14;
     HDF_LOGI("%s: enter", __func__);
 
     offset = offsetValue;
-    ret = AcodecHalReadReg(offset);
+    (void)AcodecHalReadReg(offset);
 
     // ret is  value that is storaged in address.
     HDF_LOGI("%s: success", __func__);
@@ -94,6 +93,21 @@ int32_t TestAcodecSetI2s1Fs(void)
     return HDF_SUCCESS;
 }
 
+int32_t TestAcodecSetI2s1FsInvalidRate(void)
+{
+    int ret;
+    unsigned int rate;
+    HDF_LOGI("%s: enter", __func__);
+    rate = AUDIO_SAMPLE_RATE_BUTT;
+    ret = AcodecSetI2s1Fs(rate);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: TestAcodecSetI2s1FsInvalidRate fail ret = %d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("%s: success", __func__);
+    return HDF_SUCCESS;
+}
+
 int32_t TestAcodecSetI2s1DataWidth(void)
 {
     int ret;
@@ -109,5 +123,27 @@ int32_t TestAcodecSetI2s1DataWidth(void)
     }
 
     HDF_LOGI("%s: success", __func__);
+    return HDF_SUCCESS;
+}
+
+int32_t TestAcodecSetI2s1DataWidthInvalidBitWidth(void)
+{
+    int ret;
+    unsigned int bitWidth;
+    HDF_LOGI("%s: enter", __func__);
+    bitWidth = BIT_WIDTH32;
+    ret = AcodecSetI2s1DataWidth(bitWidth);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: TestAcodecSetI2s1DataWidthInvalidBitWidth fail ret = %d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("%s: success", __func__);
+    return HDF_SUCCESS;
+}
+
+int32_t TestShowAllAcodecRegister(void)
+{
+    HDF_LOGI("TestShowAllAcodecRegister: enter");
+    ShowAllAcodecRegister();
     return HDF_SUCCESS;
 }

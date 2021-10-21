@@ -14,6 +14,8 @@
  */
 
 #include "hdf_audio_server.h"
+#include "audio_adapter_info_common.h"
+#include "audio_hal_log.h"
 #include "hdf_audio_server_capture.h"
 #include "hdf_audio_server_common.h"
 #include "hdf_audio_server_render.h"
@@ -66,6 +68,7 @@ static int32_t HdiServiceGetAllAdapter(const struct HdfDeviceIoClient *client,
         HDF_LOGE("%{public}s: size or g_descs is error", __func__);
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
+    AudioSetFuzzCheckFlag(false);
     g_descs = descs;
     if (getAdaptersFlag == true) {  // Initialize only once
         ret = AdaptersServerManageInit(descs, size);
@@ -236,7 +239,7 @@ static int32_t HdiServiceGetPortCapability(const struct HdfDeviceIoClient *clien
     struct AudioPortCapability capability;
     struct AudioAdapter *adapter = NULL;
     const char *adapterName = NULL;
-    uint32_t tempDir;
+    uint32_t tempDir = 0;
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
         HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -283,7 +286,7 @@ static int32_t HdiServiceSetPassthroughMode(const struct HdfDeviceIoClient *clie
         HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    uint32_t tempDir;
+    uint32_t tempDir = 0;
     if (!HdfSbufReadUint32(data, &tempDir)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }

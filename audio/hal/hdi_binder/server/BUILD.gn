@@ -79,6 +79,10 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function:libsec_shared",
     ]
 
+    if (enable_audio_hal_hdf_log) {
+      defines = [ "AUDIO_HAL_HDF_LOG" ]
+    }
+
     public_configs = [ ":hdi_service_config" ]
   }
 
@@ -118,6 +122,10 @@ if (defined(ohos_lite)) {
       external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
     } else {
       external_deps = [ "hilog:libhilog" ]
+    }
+
+    if (enable_audio_hal_hdf_log) {
+      defines += [ "AUDIO_HAL_HDF_LOG" ]
     }
 
     public_configs = [ ":hdi_service_config" ]

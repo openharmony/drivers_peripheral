@@ -51,5 +51,16 @@ int32_t BitsToFormat(enum AudioFormat *format, long formatBits);
 int32_t SetExtParam(const char *key, const char *value, struct ExtraParams *mExtraParams);
 int32_t AudioSetExtraParams(const char *keyValueList, int32_t *count,
     struct ExtraParams *mExtraParams, int32_t *sumOk);
+void AudioAdapterAddrMgrInit(void);
+int32_t AudioAddAdapterAddrToList(AudioHandle adapter, const struct AudioAdapterDescriptor *desc);
+int32_t AudioCheckAdapterAddr(AudioHandle adapter);
+int32_t AudioDelAdapterAddrFromList(AudioHandle adapter);
+int32_t AudioAddRenderAddrToList(AudioHandle render);
+int32_t AudioCheckRenderAddr(AudioHandle render);
+int32_t AudioDelRenderAddrFromList(AudioHandle render);
+int32_t AudioAddCaptureAddrToList(AudioHandle capture);
+int32_t AudioCheckCaptureAddr(AudioHandle capture);
+int32_t AudioDelCaptureAddrFromList(AudioHandle capture);
+void AudioSetFuzzCheckFlag(bool check);
 
 #endif

@@ -18,9 +18,13 @@ extern "C" {
 #endif /* __cplusplus */
 
 int32_t TestCodecDeviceInit(void);
+int32_t TestCodecDeviceInitFail(void);
 int32_t TestCodecDaiDeviceInit(void);
+int32_t TestCodecDaiDeviceInitFail(void);
 int32_t TestCodecDaiStartup(void);
 int32_t TestCodecDaiHwParams(void);
+int32_t TestCodecDaiInvalidBitWidthParam(void);
+int32_t TestCodecDaiInvalidRateParam(void);
 
 #ifdef __cplusplus
 #if __cplusplus

@@ -14,6 +14,7 @@
  */
 
 #include "audio_interface_lib_common.h"
+#include "audio_hal_log.h"
 
 struct HdfIoService *HdfIoServiceBindName(const char *serviceName)
 {

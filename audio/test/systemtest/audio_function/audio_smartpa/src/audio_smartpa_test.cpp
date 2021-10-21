@@ -42,7 +42,6 @@ public:
     static void (*CloseServiceRenderSo)(struct DevHandle *);
     static void *PtrHandle;
     static int32_t GetManager(struct PrepareAudioPara& audiopara);
-    uint32_t FrameSizeExpect(const struct AudioSampleAttributes attrs);
     int32_t BindServiceAndHwRender(struct AudioHwRender *&hwRender, const std::string BindName,
          const std::string adapterNameCase, struct DevHandle *&handle) const;
 };
@@ -58,10 +57,11 @@ using THREAD_FUNC = void *(*)(void *);
 
 void AudioSmartPaTest::SetUpTestCase(void)
 {
-    if (access(RESOLVED_PATH.c_str(), 0)) {
+    char absPath[PATH_MAX] = {0};
+    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
         return;
     }
-    handleSo = dlopen(RESOLVED_PATH.c_str(), RTLD_LAZY);
+    handleSo = dlopen(absPath, RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
     }
@@ -93,6 +93,10 @@ void AudioSmartPaTest::SetUpTestCase(void)
 
 void AudioSmartPaTest::TearDownTestCase(void)
 {
+    if (handleSo != nullptr) {
+        dlclose(handleSo);
+        handleSo = nullptr;
+    }
     if (GetAudioManager != nullptr) {
         GetAudioManager = nullptr;
     }
@@ -128,15 +132,6 @@ int32_t AudioSmartPaTest::GetManager(struct PrepareAudioPara& audiopara)
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
-}
-
-uint32_t AudioSmartPaTest::FrameSizeExpect(const struct AudioSampleAttributes attrs)
-{
-    if (attrs.channelCount < 1 || attrs.channelCount > 2) {
-        return 0;
-    }
-    uint32_t sizeExpect = FRAME_SIZE * (attrs.channelCount) * (PcmFormatToBits(attrs.format) >> MOVE_RIGHT_NUM);
-    return sizeExpect;
 }
 
 int32_t AudioSmartPaTest::BindServiceAndHwRender(struct AudioHwRender *&hwRender,
@@ -333,7 +328,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0005, TestSize.Level1
     if (audiopara.render != nullptr) {
         ret = audiopara.render->attr.GetFrameSize(audiopara.render, &size);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        sizeExpect = FrameSizeExpect(audiopara.attrs);
+        sizeExpect = PcmFramesToBytes(audiopara.attrs);
         EXPECT_EQ(size, sizeExpect);
 
         ret = audiopara.render->attr.GetFrameCount(audiopara.render, &count);
@@ -580,7 +575,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0012, TestSize.Level1
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = HMOS::Audio::GetLoadAdapter(*audiopara.manager, audiopara.portType, audiopara.adapterName,
+    ret = HMOS::Audio::GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
                                       &audiopara.adapter, audiopara.audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.adapter->InitAllPorts(audiopara.adapter);

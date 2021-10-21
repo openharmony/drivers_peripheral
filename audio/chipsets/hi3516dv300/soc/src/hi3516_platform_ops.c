@@ -32,9 +32,11 @@ const int AUDIO_BUFF_MIN = 128;
 const int AUDIO_RECORD_MIN = 1024 * 16;
 const int BITSTOBYTE = 8;
 
+#ifndef __LITEOS__
 static int g_captureBuffFreeCount = 0;
 static int g_renderBuffFreeCount = 0;
 static int g_renderBuffInitCount = 0;
+#endif
 
 const int MIN_PERIOD_SIZE = 4096;
 const int MAX_PERIOD_SIZE = 1024 * 16;
@@ -48,7 +50,11 @@ const int DELAY_TIME = 5;
 const int LOOP_COUNT = 100;
 const int DELAY_LOOP_COUNT = 500;
 
-static struct device g_dmaAllocDev = {0};
+#ifndef __LITEOS__
+static struct device renderDev = {0};
+static struct device captureDev = {0};
+#endif
+
 int32_t AudioRenderBuffInit(struct PlatformHost *platformHost)
 {
     uint64_t buffSize;
@@ -72,9 +78,8 @@ int32_t AudioRenderBuffInit(struct PlatformHost *platformHost)
     platformHost->renderBufInfo.virtAddr = (uint32_t *)LOS_DmaMemAlloc(&platformHost->renderBufInfo.phyAddr, buffSize,
         AUDIO_CACHE_ALIGN_SIZE, DMA_NOCACHE);
 #else
-
-    g_dmaAllocDev.coherent_dma_mask = 0xffffffffUL;
-    platformHost->renderBufInfo.virtAddr = dma_alloc_wc(&g_dmaAllocDev, buffSize,
+    renderDev.coherent_dma_mask = 0xffffffffUL;
+    platformHost->renderBufInfo.virtAddr = dma_alloc_wc(&renderDev, buffSize,
         (dma_addr_t *)&platformHost->renderBufInfo.phyAddr, GFP_DMA | GFP_KERNEL);
 #endif
     if (platformHost->renderBufInfo.virtAddr == NULL) {
@@ -83,8 +88,6 @@ int32_t AudioRenderBuffInit(struct PlatformHost *platformHost)
     }
     platformHost->renderBufInfo.cirBufSize = buffSize;
 
-    AUDIO_DRIVER_LOG_DEBUG("phyAddr = %x virtAddr = %x",
-        platformHost->renderBufInfo.phyAddr, platformHost->renderBufInfo.virtAddr);
     AUDIO_DRIVER_LOG_DEBUG("g_renderBuffInitCount: %d", g_renderBuffInitCount++);
 
     return HDF_SUCCESS;
@@ -101,7 +104,7 @@ int32_t AudioRenderBuffFree(struct PlatformHost *platformHost)
 #ifdef __LITEOS__
     LOS_DmaMemFree(platformHost->renderBufInfo.virtAddr);
 #else
-    dma_free_wc(&g_dmaAllocDev, platformHost->renderBufInfo.cirBufSize, platformHost->renderBufInfo.virtAddr,
+    dma_free_wc(&renderDev, platformHost->renderBufInfo.cirBufSize, platformHost->renderBufInfo.virtAddr,
                 platformHost->renderBufInfo.phyAddr);
 #endif
     }
@@ -134,8 +137,8 @@ int32_t AudioCaptureBuffInit(struct PlatformHost *platformHost)
     platformHost->captureBufInfo.virtAddr = (uint32_t *)LOS_DmaMemAlloc(&platformHost->captureBufInfo.phyAddr, buffSize,
         AUDIO_CACHE_ALIGN_SIZE, DMA_NOCACHE);
 #else
-    g_dmaAllocDev.coherent_dma_mask = 0xffffffffUL;
-    platformHost->captureBufInfo.virtAddr = dma_alloc_wc(&g_dmaAllocDev, buffSize,
+    captureDev.coherent_dma_mask = 0xffffffffUL;
+    platformHost->captureBufInfo.virtAddr = dma_alloc_wc(&captureDev, buffSize,
         (dma_addr_t *)&platformHost->captureBufInfo.phyAddr, GFP_DMA | GFP_KERNEL);
 #endif
     if (platformHost->captureBufInfo.virtAddr == NULL) {
@@ -143,9 +146,6 @@ int32_t AudioCaptureBuffInit(struct PlatformHost *platformHost)
         return HDF_FAILURE;
     }
     platformHost->captureBufInfo.cirBufSize = buffSize;
-
-    AUDIO_DRIVER_LOG_DEBUG("phyAddr = %lu virtAddr = %p",
-        platformHost->captureBufInfo.phyAddr, platformHost->captureBufInfo.virtAddr);
 
     return HDF_SUCCESS;
 }
@@ -161,7 +161,7 @@ int32_t AudioCaptureBuffFree(struct PlatformHost *platformHost)
 #ifdef __LITEOS__
     LOS_DmaMemFree(platformHost->captureBufInfo.virtAddr);
 #else
-    dma_free_wc(&g_dmaAllocDev, platformHost->captureBufInfo.cirBufSize, platformHost->captureBufInfo.virtAddr,
+    dma_free_wc(&captureDev, platformHost->captureBufInfo.cirBufSize, platformHost->captureBufInfo.virtAddr,
                 platformHost->captureBufInfo.phyAddr);
 #endif
     }
@@ -418,6 +418,7 @@ int32_t PlatformHwParams(const struct AudioCard *card, const struct AudioPcmHwPa
 
     platformHost->pcmInfo.rate     = param->rate;
     platformHost->pcmInfo.frameSize = param->channels * platformHost->pcmInfo.bitWidth / BITSTOBYTE;
+    platformHost->pcmInfo.channels = param->channels;
 
     platformHost->renderBufInfo.chnId = 0;
     platformHost->captureBufInfo.chnId = 0;
@@ -612,15 +613,10 @@ static int32_t UpdateWriteBuffOffset(struct PlatformHost *platformHost,
     devId = platformHost->renderBufInfo.chnId;
     rptr = AiaoHalReadReg(AopBuffRptrReg(devId));
     wptr = AiaoHalReadReg(AopBuffWptrReg(devId));
-    AUDIO_DRIVER_LOG_DEBUG("rptrReg = [0x%08x, wptrReg = [0x%08x], input size = [%u]",
-        rptr, wptr, buffSize);
-
     if (wptr >= rptr) {
         // [S ... R ... W ... E]
         buffAvailable = platformHost->renderBufInfo.cirBufSize - (wptr - rptr);
-
         if (buffAvailable < buffSize + AUDIO_BUFF_MIN) {
-            AUDIO_DRIVER_LOG_DEBUG("not available buffer.");
             txData->status = ENUM_CIR_BUFF_FULL;
             return HDF_SUCCESS;
         }
@@ -633,9 +629,7 @@ static int32_t UpdateWriteBuffOffset(struct PlatformHost *platformHost,
     } else {
         // [S ... W ... R ... E]
         buffAvailable = rptr - wptr;
-
         if (buffAvailable < buffSize + AUDIO_BUFF_MIN) {
-            AUDIO_DRIVER_LOG_DEBUG("not available buffer.");
             txData->status = ENUM_CIR_BUFF_FULL;
             return HDF_SUCCESS;
         }
@@ -715,7 +709,7 @@ int32_t PlatformWriteExec(const struct AudioCard *card, struct AudioTxData *txDa
     uint64_t buffSize;
     uint64_t startThreshold;
     struct PlatformHost *platformHost = NULL;
-    AUDIO_DRIVER_LOG_DEBUG("entry.");
+
     if (card == NULL || card->rtd == NULL || card->rtd->platform == NULL ||
         txData == NULL || txData->buf == NULL) {
         AUDIO_DRIVER_LOG_ERR("param is null.");
@@ -758,8 +752,6 @@ int32_t PlatformWriteExec(const struct AudioCard *card, struct AudioTxData *txDa
     }
 
     OsalMutexUnlock(&platformHost->renderBufInfo.buffMutex);
-
-    AUDIO_DRIVER_LOG_DEBUG("now total = %d", platformHost->pcmInfo.totalStreamSize);
     return HDF_SUCCESS;
 }
 
@@ -833,7 +825,7 @@ static int32_t PlatformMmapWriteSub(const struct AudioCard *card, struct Platfor
     platformHost->renderBufInfo.framesPosition = 0;
     while (count <= loopTimes && platformHost->renderBufInfo.runStatus != 0) {
         uint32_t copyLength = (count < loopTimes) ? pageSize : lastBuffSize;
-        if (CopyFromUser(txData.buf, txMmapData->memoryAddress + offset, copyLength) != 0) {
+        if (CopyFromUser(txData.buf, (char *)txMmapData->memoryAddress + offset, copyLength) != 0) {
             AUDIO_DRIVER_LOG_ERR("memcpy_s failed.");
             OsalMemFree(txData.buf);
             return HDF_FAILURE;
@@ -855,7 +847,7 @@ static int32_t PlatformMmapWriteSub(const struct AudioCard *card, struct Platfor
 static void PlatformMmapGetHoldAndDelay(const struct AudioTxMmapData *txMmapData,
                                         const struct PlatformHost *platformHost, uint32_t *hold, uint32_t *delayms)
 {
-    if (NULL == hold || NULL == delayms || NULL == txMmapData || NULL == platformHost) {
+    if (hold == NULL || delayms == NULL || txMmapData == NULL || platformHost == NULL) {
         return;
     }
     uint32_t frameSize = platformHost->pcmInfo.channels * (platformHost->pcmInfo.bitWidth / MIN_PERIOD_COUNT);
@@ -953,15 +945,12 @@ static int32_t UpdateReadBuffData(const struct PlatformHost *platformHost,
             *tranferSize = platformHost->captureBufInfo.trafBufSize;
             *buffOffset = rptr + *tranferSize;
         } else {
-            AUDIO_DRIVER_LOG_DEBUG("PlatformRead: not available data.");
             rxData->buf = (char *)(platformHost->captureBufInfo.virtAddr) + rptr;
             rxData->status = ENUM_CIR_BUFF_EMPTY;
             rxData->bufSize = 0;
             rxData->frames = 0;
             return HDF_SUCCESS;
         }
-
-    AUDIO_DRIVER_LOG_DEBUG("tranferSize : %d  buffOffset : %d ", *tranferSize, *buffOffset);
     } else {
         // [S ... W ... R ... E]
         validData = rptr + platformHost->captureBufInfo.trafBufSize;
@@ -974,12 +963,7 @@ static int32_t UpdateReadBuffData(const struct PlatformHost *platformHost,
             *tranferSize = platformHost->captureBufInfo.cirBufSize - rptr;
             *buffOffset = 0;
         }
-        AUDIO_DRIVER_LOG_DEBUG("tranferSize : %d  rptrReg.u32 : %d ", *tranferSize, rptr);
     }
-
-    AUDIO_DRIVER_LOG_DEBUG("rptrReg = [0x%08x], wptrReg = [0x%08x], max size = [%u]",
-        rptr, wptr, platformHost->captureBufInfo.trafBufSize);
-
     return HDF_SUCCESS;
 }
 
@@ -1017,12 +1001,12 @@ int32_t PlatformRead(const struct AudioCard *card, struct AudioRxData *rxData)
     OsalMutexUnlock(&platformHost->captureBufInfo.buffMutex);
 
     if (rxData->status == ENUM_CIR_BUFF_EMPTY) {
-        AUDIO_DRIVER_LOG_DEBUG("not available data wait a minute.");
         return HDF_SUCCESS;
     }
 
     if (!platformHost->pcmInfo.isBigEndian) {
-        if (AudioDataBigEndianChange(rxData->buf, tranferSize, platformHost->pcmInfo.bitWidth) != HDF_SUCCESS) {
+        if (rxData->buf == NULL ||
+            AudioDataBigEndianChange(rxData->buf, tranferSize, platformHost->pcmInfo.bitWidth) != HDF_SUCCESS) {
             AUDIO_DRIVER_LOG_ERR("AudioDataBigEndianChange: failed.");
             return HDF_FAILURE;
         }
@@ -1081,7 +1065,7 @@ int32_t PlatformMmapReadSub(const struct AudioCard *card, struct PlatformHost *p
             }
         }
         count = LOOP_COUNT;
-        if (CopyToUser(rxMmapData->memoryAddress + offset, rxData.buf, rxData.bufSize) != 0) {
+        if (CopyToUser((char *)rxMmapData->memoryAddress + offset, rxData.buf, rxData.bufSize) != 0) {
             AUDIO_DRIVER_LOG_ERR("CopyToUser failed.");
             return HDF_FAILURE;
         }
