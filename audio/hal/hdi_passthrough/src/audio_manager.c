@@ -13,10 +13,17 @@
  * limitations under the License.
  */
 
+#include "audio_manager.h"
+#include <limits.h>
 #include "audio_adapter_info_common.h"
+#include "audio_hal_log.h"
 #include "audio_interface_lib_capture.h"
 #include "audio_interface_lib_render.h"
-#include "audio_internal.h"
+
+#define HDF_LOG_TAG hal_audio_manager
+
+struct AudioAdapterDescriptor *g_localAddrAudioAdapterOut = NULL; // add for Fuzz
+int g_localAdapterNum = 0; // add for Fuzz
 
 BindServiceRenderSo g_bindServiceRender = NULL;
 InterfaceLibModeRenderSo g_interfaceLibModeRender = NULL;
@@ -94,11 +101,13 @@ int32_t InitCaptureSoHandle(const char *captureSoPath)
         LOG_FUN_ERR("captureSoPath is NULL");
         return HDF_FAILURE;
     }
-    if (access(captureSoPath, 0)) {
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(captureSoPath, pathBuf) == NULL) {
         return HDF_FAILURE;
     }
     if (g_ptrCaptureHandle == NULL) {
-        g_ptrCaptureHandle = dlopen(captureSoPath, RTLD_LAZY);
+        char *cPathBuf = pathBuf;
+        g_ptrCaptureHandle = dlopen(cPathBuf, RTLD_LAZY);
         if (g_ptrCaptureHandle == NULL) {
             LOG_FUN_ERR("open lib capture so fail, reason:%s", dlerror());
             return HDF_FAILURE;
@@ -121,11 +130,13 @@ int32_t InitRenderSoHandle(const char *renderSoPath)
         LOG_FUN_ERR("renderSoPath is NULL");
         return HDF_FAILURE;
     }
-    if (access(renderSoPath, 0)) {
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(renderSoPath, pathBuf) == NULL) {
         return HDF_FAILURE;
     }
     if (g_ptrRenderHandle == NULL) {
-        g_ptrRenderHandle = dlopen(renderSoPath, RTLD_LAZY);
+        char *cPathBuf = pathBuf;
+        g_ptrRenderHandle = dlopen(cPathBuf, RTLD_LAZY);
         if (g_ptrRenderHandle == NULL) {
             LOG_FUN_ERR("open lib render so fail, reason:%s", dlerror());
             return HDF_FAILURE;
@@ -149,11 +160,13 @@ int32_t InitPathSelectSoHandle(const char *pathSelectSoPath)
         LOG_FUN_ERR("pathSelectSoPath is NULL");
         return HDF_FAILURE;
     }
-    if (access(pathSelectSoPath, 0)) {
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(pathSelectSoPath, pathBuf) == NULL) {
         return HDF_FAILURE;
     }
     if (g_ptrPathSelHandle == NULL) {
-        g_ptrPathSelHandle = dlopen(pathSelectSoPath, RTLD_LAZY);
+        char *cPathBuf = pathBuf;
+        g_ptrPathSelHandle = dlopen(cPathBuf, RTLD_LAZY);
         if (g_ptrPathSelHandle == NULL) {
             LOG_FUN_ERR("open lib PathSelct so fail, reason:%s", dlerror());
             return HDF_FAILURE;
@@ -174,12 +187,11 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
                                    struct AudioAdapterDescriptor **descs,
                                    int *size)
 {
-    int32_t ret;
     LOG_FUN_INFO();
     if (manager == NULL || descs == NULL || size == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    ret = AudioAdaptersForUser(descs, size);
+    int32_t ret = AudioAdaptersForUser(descs, size);
     if (ret < 0) {
         LOG_FUN_ERR("AudioAdaptersForUser FAIL!");
         return AUDIO_HAL_ERR_NOTREADY; // Failed to read sound card configuration file
@@ -187,6 +199,13 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
     if (g_captureSoPath == NULL || g_renderSoPath == NULL) {
         LOG_FUN_ERR("sopath is error");
         return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (*descs && size && (*size) > 0) { // Fuzz test
+        g_localAddrAudioAdapterOut  = *descs;
+        g_localAdapterNum = *size;
+    } else {
+        LOG_FUN_ERR("Get AudioAdapterDescriptor Failed");
+        return AUDIO_HAL_ERR_INVALID_OBJECT;
     }
     ret = InitCaptureSoHandle(g_captureSoPath);
     if (ret < 0) {
@@ -201,7 +220,7 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
     }
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
     ret = InitPathSelectSoHandle(g_pathSelectSoPath);
-    if (ret < 0) {
+    if (ret < 0 || g_pathSelGetConfToJsonObj == NULL) {
         LOG_FUN_ERR("InitPathSelectSoHandle FAIL!");
         AudioDlClose(&g_ptrRenderHandle);
         AudioDlClose(&g_ptrCaptureHandle);
@@ -226,10 +245,26 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
     if (manager == NULL || desc == NULL || desc->adapterName == NULL || desc->ports == NULL || adapter == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
+    bool descFlag = false;
+    if (g_localAdapterNum <= 0 || g_localAdapterNum > SUPPORT_ADAPTER_NUM_MAX) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (g_localAddrAudioAdapterOut != NULL) { // Fuzz test
+        for (int index = 0; index < g_localAdapterNum; index++) {
+            if (&g_localAddrAudioAdapterOut[index] == desc) {
+                descFlag = true;
+                break;
+            }
+        }
+        if (!descFlag) {
+            LOG_FUN_ERR("The desc address passed in is invalid");
+            return AUDIO_HAL_ERR_INVALID_OBJECT;
+        }
+    }
     LOGV("%s: adapter name %s", __func__, desc->adapterName);
     if (AudioAdapterExist(desc->adapterName)) {
         LOGE("%s: not supported this adapter %s", __func__, desc->adapterName);
-        return AUDIO_HAL_ERR_INTERNAL;
+        return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)calloc(1, sizeof(*hwAdapter));
     if (hwAdapter == NULL) {
@@ -244,15 +279,26 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
     hwAdapter->common.GetPortCapability = AudioAdapterGetPortCapability;
     hwAdapter->common.SetPassthroughMode = AudioAdapterSetPassthroughMode;
     hwAdapter->common.GetPassthroughMode = AudioAdapterGetPassthroughMode;
-    *adapter = &hwAdapter->common;
     hwAdapter->adapterDescriptor = *desc;
     hwAdapter->adapterMgrRenderFlag = 0; // The adapterMgrRenderFlag init is zero
     hwAdapter->adapterMgrCaptureFlag = 0; // The adapterMgrCaptureFlag init is zero
+    int32_t ret = AudioAddAdapterAddrToList((AudioHandle)(&hwAdapter->common), desc);
+    if (ret < 0) { // add for Fuzz
+        LOG_FUN_ERR("AudioAdapterAddrGet check Failed");
+        AudioMemFree((void **)&hwAdapter);
+        return ret;
+    }
+    *adapter = &hwAdapter->common;
     return AUDIO_HAL_SUCCESS;
 }
 
 void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter *adapter)
 {
+    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
+    if (ret < 0) {
+        LOG_FUN_ERR("The adapter address passed in is invalid");
+        return;
+    }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (manager == NULL || hwAdapter == NULL) {
         return;
@@ -268,6 +314,9 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
         }
         AudioMemFree((void **)&hwAdapter->portCapabilitys);
     }
+    if (AudioDelAdapterAddrFromList((AudioHandle)adapter)) {
+        LOG_FUN_ERR("adapter or render not in MgrList");
+    }
     AudioMemFree((void **)&adapter);
 }
 
@@ -279,5 +328,10 @@ static struct AudioManager g_audioManagerFuncs = {
 
 struct AudioManager *GetAudioManagerFuncs(void)
 {
+    static bool audioAdapterAddrMgrFlag = false;
+    if (!audioAdapterAddrMgrFlag) {
+        AudioAdapterAddrMgrInit(); // memset for Fuzz
+        audioAdapterAddrMgrFlag = true;
+    }
     return &g_audioManagerFuncs;
 }

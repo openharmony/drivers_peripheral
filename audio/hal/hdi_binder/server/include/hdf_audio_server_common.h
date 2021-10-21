@@ -74,6 +74,9 @@ int32_t AudioGetRenderStatus(const char *adapterName);
 int32_t AudioAdapterListCheckAndGetRender(struct AudioRender **render, struct HdfSBuf *data);
 int32_t AudioAdapterListGetCapture(const char *adapterName,
     struct AudioCapture **capture, uint32_t pid);
+int32_t AudioAdapterFrameGetCapture(const char *adapterName,
+    struct AudioCapture **capture, uint32_t pid, uint32_t *index);
+void AudioSetCaptureBusy(uint32_t index, bool captureStatus);
 int32_t AudioAdapterListCheckAndGetCapture(struct AudioCapture **capture, struct HdfSBuf *data);
 int32_t ReadAudioSapmleAttrbutes(struct HdfSBuf *data, struct AudioSampleAttributes *attrs);
 int32_t WriteAudioSampleAttributes(struct HdfSBuf *reply, const struct AudioSampleAttributes *attrs);

@@ -16,551 +16,313 @@
 #include "audio_adapter_test.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "audio_internal.h"
+#include "audio_common_test.h"
 
 using namespace std;
+using namespace comfun;
 using namespace testing::ext;
 namespace {
-const int PORTNUM = 1;
-const int AUDIO_CHANNELCOUNT = 2;
-const int AUDIO_PORT_ID = 2; // portId
-const int AUDIO_SAMPLE_RATE_48K = 48000;
-const int DEEP_BUFFER_RENDER_PERIOD_SIZE = 4096;
-const int INT_32_MAX = 0x7fffffff;
-const int DEFAULT_RENDER_SAMPLING_RATE = 48000;
-const int DEEP_BUFFER_RENDER_PERIOD_COUNT = 8;
-
-static int32_t InitPort(struct AudioPort &portIndex)
-{
-    portIndex.dir = PORT_OUT;
-    portIndex.portId = 1;
-    portIndex.portName = "usb";
-    return HDF_SUCCESS;
-}
-
-static int32_t InitHwRender(struct AudioHwRender &hwRender,
-    const struct AudioDeviceDescriptor &desc, const struct AudioSampleAttributes &attrs)
-{
-    hwRender.renderParam.renderMode.hwInfo.deviceDescript = desc;
-    hwRender.renderParam.frameRenderMode.attrs = attrs;
-    hwRender.renderParam.renderMode.ctlParam.audioGain.gainMax = 15; // gainMax 15
-    hwRender.renderParam.renderMode.ctlParam.audioGain.gainMin = 0;
-    hwRender.renderParam.frameRenderMode.frames = 0;
-    hwRender.renderParam.frameRenderMode.time.tvNSec = 0;
-    hwRender.renderParam.frameRenderMode.time.tvSec = 0;
-    hwRender.renderParam.frameRenderMode.byteRate = DEFAULT_RENDER_SAMPLING_RATE;
-    hwRender.renderParam.frameRenderMode.periodSize = DEEP_BUFFER_RENDER_PERIOD_SIZE;
-    hwRender.renderParam.frameRenderMode.periodCount = DEEP_BUFFER_RENDER_PERIOD_COUNT;
-    hwRender.renderParam.frameRenderMode.attrs.period = attrs.period;
-    hwRender.renderParam.frameRenderMode.attrs.frameSize = attrs.frameSize;
-    hwRender.renderParam.frameRenderMode.attrs.startThreshold = attrs.startThreshold;
-    hwRender.renderParam.frameRenderMode.attrs.stopThreshold = attrs.stopThreshold;
-    hwRender.renderParam.frameRenderMode.attrs.silenceThreshold = attrs.silenceThreshold;
-    hwRender.renderParam.frameRenderMode.attrs.isBigEndian = attrs.isBigEndian;
-    hwRender.renderParam.frameRenderMode.attrs.isSignedData = attrs.isSignedData;
-    return HDF_SUCCESS;
-}
-
-static int32_t InitHwCapture(struct AudioHwCapture &hwCapture, const struct AudioDeviceDescriptor &desc,
-    const struct AudioSampleAttributes &attrs)
-{
-    hwCapture.captureParam.captureMode.hwInfo.deviceDescript = desc;
-    hwCapture.captureParam.frameCaptureMode.attrs = attrs;
-    hwCapture.captureParam.captureMode.ctlParam.audioGain.gainMax = 15; // gainMax 15
-    hwCapture.captureParam.captureMode.ctlParam.audioGain.gainMin = 0;
-    hwCapture.captureParam.frameCaptureMode.frames = 0;
-    hwCapture.captureParam.frameCaptureMode.time.tvNSec = 0;
-    hwCapture.captureParam.frameCaptureMode.time.tvSec = 0;
-    hwCapture.captureParam.frameCaptureMode.byteRate = DEFAULT_RENDER_SAMPLING_RATE;
-    hwCapture.captureParam.frameCaptureMode.periodSize = DEEP_BUFFER_RENDER_PERIOD_SIZE;
-    hwCapture.captureParam.frameCaptureMode.periodCount = DEEP_BUFFER_RENDER_PERIOD_COUNT;
-    hwCapture.captureParam.frameCaptureMode.attrs.period = attrs.period;
-    hwCapture.captureParam.frameCaptureMode.attrs.frameSize = attrs.frameSize;
-    hwCapture.captureParam.frameCaptureMode.attrs.startThreshold = attrs.startThreshold;
-    hwCapture.captureParam.frameCaptureMode.attrs.stopThreshold = attrs.stopThreshold;
-    hwCapture.captureParam.frameCaptureMode.attrs.silenceThreshold = attrs.silenceThreshold;
-    hwCapture.captureParam.frameCaptureMode.attrs.isBigEndian = attrs.isBigEndian;
-    hwCapture.captureParam.frameCaptureMode.attrs.isSignedData = attrs.isSignedData;
-    return HDF_SUCCESS;
-}
-
-static int32_t InitAttrs(struct AudioSampleAttributes &attrs)
-{
-    /* Initialization of audio parameters for playback */
-    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
-    attrs.channelCount = AUDIO_CHANNELCOUNT;
-    attrs.sampleRate = AUDIO_SAMPLE_RATE_48K;
-    attrs.interleaved = 0;
-    attrs.type = AUDIO_IN_MEDIA;
-    attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
-    /* PERIOD_SIZE * 16 * attrs.channelCount / 8 */
-    attrs.frameSize = 16 * attrs.channelCount / 8;
-    attrs.isBigEndian = false;
-    attrs.isSignedData = true;
-    /* DEEP_BUFFER_RENDER_PERIOD_SIZE / (16 * attrs->channelCount / 8) */
-    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (16 * attrs.channelCount / 8);
-    attrs.stopThreshold = INT_32_MAX;
-    attrs.silenceThreshold = 0;
-    return HDF_SUCCESS;
-}
-
-static int32_t InitDevDesc(struct AudioDeviceDescriptor &devDesc)
-{
-    /* Initialization of audio parameters for playback */
-    devDesc.portId = 0;
-    devDesc.pins = PIN_OUT_SPEAKER;
-    devDesc.desc = NULL;
-    return HDF_SUCCESS;
-}
-
-static int32_t InitAttrsCapture(struct AudioSampleAttributes &attrs)
-{
-    /* Initialization of audio parameters for playback */
-    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
-    attrs.channelCount = AUDIO_CHANNELCOUNT;
-    attrs.sampleRate = AUDIO_SAMPLE_RATE_48K;
-    attrs.interleaved = 0;
-    attrs.type = AUDIO_IN_MEDIA;
-    attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
-     /* PERIOD_SIZE * 16 * attrs.channelCount / 8,Byte */
-    attrs.frameSize = 16 * attrs.channelCount / 8;
-    attrs.isBigEndian = false;
-    attrs.isSignedData = true;
-    /* DEEP_BUFFER_RENDER_PERIOD_SIZE / (16 * attrs.channelCount / 8) */
-    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (16 * attrs.channelCount / 8);
-    attrs.stopThreshold = INT_32_MAX;
-    /* 16 * 1024 */
-    attrs.silenceThreshold = 16 * 1024;
-    return HDF_SUCCESS;
-}
-
-static int32_t InitDevDescCapture(struct AudioDeviceDescriptor &devDesc)
-{
-    /* Initialization of audio parameters for playback */
-    devDesc.portId = 0;
-    devDesc.pins = PIN_IN_MIC;
-    devDesc.desc = NULL;
-    return HDF_SUCCESS;
-}
-
 class AudioAdapterTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
+    struct AudioManager *managerFuncs = nullptr;
+    struct AudioAdapterDescriptor *descs = nullptr;
+    struct AudioAdapterDescriptor *desc = nullptr;
+    struct AudioAdapter *adapter = nullptr;
+    virtual void SetUp();
+    virtual void TearDown();
 };
 
-void AudioAdapterTest::SetUpTestCase()
+void AudioAdapterTest::SetUp()
 {
+    managerFuncs = GetAudioManagerFuncs();
+    ASSERT_NE(managerFuncs, nullptr);
+    int32_t size = 0;
+    ASSERT_EQ(HDF_SUCCESS, managerFuncs->GetAllAdapters(managerFuncs, &descs, &size));
+    desc = &descs[0];
+    ASSERT_EQ(HDF_SUCCESS, managerFuncs->LoadAdapter(managerFuncs, desc, &adapter));
 }
 
-void AudioAdapterTest::TearDownTestCase()
+void AudioAdapterTest::TearDown()
 {
+    managerFuncs->UnloadAdapter(managerFuncs, adapter);
+    adapter = nullptr;
 }
 
-HWTEST_F(AudioAdapterTest, GetAudioRenderFuncWhenHwRenderIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, GetAudioRenderFuncWhenHwRenderIsNull, TestSize.Level1)
 {
     struct AudioHwRender *hwRender = nullptr;
-    int32_t ret = GetAudioRenderFunc(hwRender);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(HDF_FAILURE, GetAudioRenderFunc(hwRender));
 }
 
-HWTEST_F(AudioAdapterTest, GetAudioRenderFuncWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, GetAudioRenderFuncWhenParamIsVaild, TestSize.Level1)
 {
-    struct AudioHwRender *hwRender = new AudioHwRender;
-    int32_t ret = GetAudioRenderFunc(hwRender);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    delete(hwRender);
-    hwRender = nullptr;
+    struct AudioHwRender hwRender;
+    EXPECT_EQ(HDF_SUCCESS, GetAudioRenderFunc(&hwRender));
 }
 
-HWTEST_F(AudioAdapterTest, CheckParaDescWhenDescIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, CheckParaDescWhenDescIsNull, TestSize.Level1)
 {
     const struct AudioDeviceDescriptor *desc = nullptr;
     const char *type = "Render";
-    int32_t ret = CheckParaDesc(desc, type);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(HDF_FAILURE, CheckParaDesc(desc, type));
 }
 
-HWTEST_F(AudioAdapterTest, CheckParaDescWhenTypeIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, CheckParaDescWhenTypeIsNull, TestSize.Level1)
 {
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
+    struct AudioDeviceDescriptor desc;
     const char *type = nullptr;
-    int32_t ret = CheckParaDesc(desc, type);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(desc);
-    desc = nullptr;
+    EXPECT_EQ(HDF_FAILURE, CheckParaDesc(&desc, type));
 }
 
-HWTEST_F(AudioAdapterTest, CheckParaDescWhenPortIdLessThanZero, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, CheckParaDescWhenPortIdLessThanZero, TestSize.Level1)
 {
-    struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const char *type = "Render";
-    desc->portId = AUDIO_HAL_ERR_NOT_SUPPORT;
-    int32_t ret = CheckParaDesc((const struct AudioDeviceDescriptor *)desc, type);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
-    delete(desc);
-    desc = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, CheckParaDescWhenPinsIsPinNone, TestSize.Level0)
-{
-    struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const char *type = "Render";
-    desc->pins = PIN_NONE;
-    int32_t ret = CheckParaDesc((const struct AudioDeviceDescriptor *)desc, type);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
-    delete(desc);
-    desc = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, CheckParaDescWhenTypeIsError, TestSize.Level0)
-{
-    int32_t ret;
     struct AudioDeviceDescriptor desc;
-    ret = InitDevDesc(desc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(desc));
+    const char *type = "Render";
+    desc.portId = AUDIO_HAL_ERR_NOT_SUPPORT;
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, CheckParaDesc(&desc, type));
+}
+
+HWTEST_F(AudioAdapterTest, CheckParaDescWhenPinsIsPinNone, TestSize.Level1)
+{
+    struct AudioDeviceDescriptor desc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(desc));
+    const char *type = "Render";
+    desc.pins = PIN_NONE;
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, CheckParaDesc(&desc, type));
+}
+
+HWTEST_F(AudioAdapterTest, CheckParaDescWhenTypeIsError, TestSize.Level1)
+{
+    struct AudioDeviceDescriptor desc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(desc));
     const char *type = "123";
-    ret = CheckParaDesc(&desc, type);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, CheckParaDesc(&desc, type));
 }
 
-HWTEST_F(AudioAdapterTest, CheckParaDescWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, CheckParaDescWhenParamIsVaild, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioDeviceDescriptor desc;
-    ret = InitDevDesc(desc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(desc));
     const char *type = "Render";
-    ret = CheckParaDesc(&desc, type);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, CheckParaDesc(&desc, type));
 }
 
-HWTEST_F(AudioAdapterTest, CheckParaAttrWhenAttrsIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, CheckParaAttrWhenAttrsIsNull, TestSize.Level1)
 {
     const struct AudioSampleAttributes *attrs = nullptr;
-    int32_t ret = CheckParaAttr(attrs);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(HDF_FAILURE, CheckParaAttr(attrs));
 }
 
-HWTEST_F(AudioAdapterTest, CheckParaAttrWhenPeriodLessThanZero, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, CheckParaAttrWhenPeriodLessThanZero, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioSampleAttributes attrs;
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
     attrs.period = AUDIO_HAL_ERR_NOT_SUPPORT;
-    ret = CheckParaAttr(&attrs);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, CheckParaAttr(&attrs));
 }
 
-HWTEST_F(AudioAdapterTest, CheckParaAttrWhenTypeIsNotSupport, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, CheckParaAttrWhenTypeIsNotSupport, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioSampleAttributes attrs;
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
     attrs.type = (enum AudioCategory)AUDIO_HAL_ERR_NOT_SUPPORT;
-    ret = CheckParaAttr(&attrs);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, CheckParaAttr(&attrs));
 }
 
-HWTEST_F(AudioAdapterTest, CheckParaAttrWhenFormatIsNotSupport, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, CheckParaAttrWhenFormatIsNotSupport, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioSampleAttributes attrs;
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
     attrs.format = AUDIO_FORMAT_G726;
-    ret = CheckParaAttr(&attrs);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, CheckParaAttr(&attrs));
 }
 
-HWTEST_F(AudioAdapterTest, CheckParaAttrWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, CheckParaAttrWhenParamIsVaild, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioSampleAttributes attrs;
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = CheckParaAttr(&attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS,  InitAttrs(attrs));
+    EXPECT_EQ(HDF_SUCCESS, CheckParaAttr(&attrs));
 }
 
-HWTEST_F(AudioAdapterTest, AttrFormatToBitWhenAttrsIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AttrFormatToBitWhenAttrsIsNull, TestSize.Level1)
 {
     const struct AudioSampleAttributes *attrs = nullptr;
-    int32_t formatTmp = -1;
-    int32_t *format = &formatTmp;
-    int32_t ret = AttrFormatToBit(attrs, format);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    int32_t format = -1;
+    EXPECT_EQ(HDF_FAILURE, AttrFormatToBit(attrs, &format));
 }
 
-HWTEST_F(AudioAdapterTest, AttrFormatToBitWhenFormatIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AttrFormatToBitWhenFormatIsNull, TestSize.Level1)
 {
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
+    struct AudioSampleAttributes attrs;
     int32_t *format = nullptr;
-    int32_t ret = AttrFormatToBit(attrs, format);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(attrs);
-    attrs = nullptr;
+    EXPECT_EQ(HDF_FAILURE, AttrFormatToBit(&attrs, format));
 }
 
-HWTEST_F(AudioAdapterTest, AttrFormatToBitWhenAttrsIsNotSupport, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AttrFormatToBitWhenAttrsIsNotSupport, TestSize.Level1)
 {
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    int32_t formatTmp = -1;
-    int32_t *format = &formatTmp;
-    int32_t ret = AttrFormatToBit(attrs, format);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
-    delete(attrs);
-    attrs = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, AttrFormatToBitWhenParamIsVaild, TestSize.Level0)
-{
-    int32_t ret;
     struct AudioSampleAttributes attrs;
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    int32_t formatTmp = -1;
-    int32_t *format = &formatTmp;
-    ret = AttrFormatToBit(&attrs, format);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
+    attrs.format = AUDIO_FORMAT_AAC_MAIN;
+    int32_t format = -1;
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AttrFormatToBit(&attrs, &format));
 }
 
-HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenHwRenderIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AttrFormatToBitWhenParamIsVaild, TestSize.Level1)
 {
-    struct AudioHwRender *hwRender = nullptr;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    int32_t ret = InitHwRenderParam(hwRender, desc, attrs);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(desc);
-    desc = nullptr;
-    delete(attrs);
-    attrs = nullptr;
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
+    int32_t format = -1;
+    EXPECT_EQ(HDF_SUCCESS, AttrFormatToBit(&attrs, &format));
 }
 
-HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenDescIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenHwRenderIsNull, TestSize.Level1)
 {
-    struct AudioHwRender *hwRender = new AudioHwRender;
-    const struct AudioDeviceDescriptor *desc = nullptr;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    int32_t ret = InitHwRenderParam(hwRender, desc, attrs);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(hwRender);
-    hwRender = nullptr;
-    delete(attrs);
-    attrs = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenAttrsIsNull, TestSize.Level0)
-{
-    struct AudioHwRender *hwRender = new AudioHwRender;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = nullptr;
-    int32_t ret = InitHwRenderParam(hwRender, desc, attrs);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(hwRender);
-    hwRender = nullptr;
-    delete(desc);
-    desc = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenPortIdLessThanZero, TestSize.Level0)
-{
-    int32_t ret;
     struct AudioDeviceDescriptor desc;
-    ret = InitDevDesc(desc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_FAILURE, InitHwRenderParam(nullptr, &desc, &attrs));
+}
+
+HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenDescIsNull, TestSize.Level1)
+{
+    struct AudioHwRender hwRender;
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_FAILURE, InitHwRenderParam(&hwRender, nullptr, &attrs));
+}
+
+HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenAttrsIsNull, TestSize.Level1)
+{
+    struct AudioHwRender hwRender;
+    struct AudioDeviceDescriptor desc;
+    EXPECT_EQ(HDF_FAILURE, InitHwRenderParam(&hwRender, &desc, nullptr));
+}
+
+HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenPortIdLessThanZero, TestSize.Level1)
+{
+    struct AudioDeviceDescriptor desc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(desc));
     desc.portId = AUDIO_HAL_ERR_NOT_SUPPORT;
     struct AudioSampleAttributes attrs;
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
     struct AudioHwRender hwRender;
-    ret = InitHwRender(hwRender, desc, attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitHwRenderParam(&hwRender, &desc, &attrs);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitHwRender(hwRender, desc, attrs));
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, InitHwRenderParam(&hwRender, &desc, &attrs));
 }
 
-HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenPeriodLessThanZero, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenPeriodLessThanZero, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioDeviceDescriptor desc;
-    ret = InitDevDesc(desc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(desc));
     struct AudioSampleAttributes attrs;
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
     attrs.period = AUDIO_HAL_ERR_NOT_SUPPORT;
     struct AudioHwRender hwRender;
-    ret = InitHwRender(hwRender, desc, attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitHwRenderParam(&hwRender, &desc, &attrs);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitHwRender(hwRender, desc, attrs));
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, InitHwRenderParam(&hwRender, &desc, &attrs));
 }
 
-HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenFormatIsNotSupport, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenFormatIsNotSupport, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioDeviceDescriptor desc;
-    ret = InitDevDesc(desc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(desc));
     struct AudioSampleAttributes attrs;
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
     attrs.format = AUDIO_FORMAT_AAC_MAIN;
     struct AudioHwRender hwRender;
-    ret = InitHwRender(hwRender, desc, attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitHwRenderParam(&hwRender, &desc, &attrs);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitHwRender(hwRender, desc, attrs));
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, InitHwRenderParam(&hwRender, &desc, &attrs));
 }
 
-HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenChannelCountIsZero, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenChannelCountIsZero, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioDeviceDescriptor desc;
-    ret = InitDevDesc(desc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(desc));
     struct AudioSampleAttributes attrs;
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
     attrs.channelCount = 0;
     struct AudioHwRender hwRender;
-    ret = InitHwRender(hwRender, desc, attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitHwRenderParam(&hwRender, &desc, &attrs);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitHwRender(hwRender, desc, attrs));
+    EXPECT_EQ(HDF_FAILURE, InitHwRenderParam(&hwRender, &desc, &attrs));
 }
 
-HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenParamIsVaild, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioDeviceDescriptor desc;
-    ret = InitDevDesc(desc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(desc));
     struct AudioSampleAttributes attrs;
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
     struct AudioHwRender hwRender;
-    ret = InitHwRender(hwRender, desc, attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitHwRenderParam(&hwRender, &desc, &attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitHwRender(hwRender, desc, attrs));
+    EXPECT_EQ(HDF_SUCCESS, InitHwRenderParam(&hwRender, &desc, &attrs));
 }
 
-HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenCapabilityIndexIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenCapabilityIndexIsNull, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioPort portIndex;
-    ret = InitPort(portIndex);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitPort(portIndex));
     struct AudioPortCapability *capabilityIndex = nullptr;
-    ret = InitForGetPortCapability(portIndex, capabilityIndex);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(HDF_FAILURE, InitForGetPortCapability(portIndex, capabilityIndex));
 }
 
-HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenDirIsPortIn, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenDirIsPortIn, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioPort portIndex;
-    ret = InitPort(portIndex);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitPort(portIndex));
     portIndex.dir = PORT_IN;
-    struct AudioPortCapability *capabilityIndex = new AudioPortCapability;
-    ret = InitForGetPortCapability(portIndex, capabilityIndex);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    delete(capabilityIndex);
-    capabilityIndex = nullptr;
+    struct AudioPortCapability capabilityIndex;
+    EXPECT_EQ(HDF_SUCCESS, InitForGetPortCapability(portIndex, &capabilityIndex));
 }
 
-HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenPortIdIsZero, TestSize.Level0)
+void TestInitForGetPortCapability(uint32_t portId)
 {
-    int32_t ret;
     struct AudioPort portIndex;
-    ret = InitPort(portIndex);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    portIndex.portId = 0;
-    struct AudioPortCapability *capabilityIndex = new AudioPortCapability;
-    ret = InitForGetPortCapability(portIndex, capabilityIndex);
-    if (HDF_SUCCESS != ret) {
-        delete(capabilityIndex);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    EXPECT_EQ(HDF_SUCCESS, InitPort(portIndex));
+    portIndex.portId = portId;
+    struct AudioPortCapability capabilityIndex;
+    ASSERT_EQ(HDF_SUCCESS, InitForGetPortCapability(portIndex, &capabilityIndex));
 
-    EXPECT_NE(capabilityIndex->subPorts, nullptr);
-    if (capabilityIndex->subPorts != nullptr) {
-        EXPECT_EQ(capabilityIndex->subPorts->portId, portIndex.portId);
-        EXPECT_EQ(capabilityIndex->subPorts->desc, portIndex.portName);
-        EXPECT_EQ(capabilityIndex->subPorts->mask, PORT_PASSTHROUGH_LPCM);
+    EXPECT_NE(capabilityIndex.subPorts, nullptr);
+    if (capabilityIndex.subPorts != nullptr) {
+        EXPECT_EQ(capabilityIndex.subPorts->portId, portIndex.portId);
+        EXPECT_EQ(capabilityIndex.subPorts->desc, portIndex.portName);
+        EXPECT_EQ(capabilityIndex.subPorts->mask, PORT_PASSTHROUGH_LPCM);
     }
-    if (capabilityIndex->subPorts != nullptr) {
-        free(capabilityIndex->subPorts);
-        capabilityIndex->subPorts = nullptr;
+    if (capabilityIndex.subPorts != nullptr) {
+        free(capabilityIndex.subPorts);
+        capabilityIndex.subPorts = nullptr;
     }
-    delete(capabilityIndex);
-    capabilityIndex = nullptr;
 }
 
-HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenPortIdIsOne, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenPortIdIsZero, TestSize.Level1)
 {
-    int32_t ret;
+    TestInitForGetPortCapability(0);
+}
+
+HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenPortIdIsOne, TestSize.Level1)
+{
     struct AudioPort portIndex;
-    ret = InitPort(portIndex);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitPort(portIndex));
     portIndex.portId = 1;
-    struct AudioPortCapability *capabilityIndex = new AudioPortCapability;
-    ret = InitForGetPortCapability(portIndex, capabilityIndex);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    delete(capabilityIndex);
-    capabilityIndex = nullptr;
+    struct AudioPortCapability capabilityIndex;
+    EXPECT_EQ(HDF_SUCCESS, InitForGetPortCapability(portIndex, &capabilityIndex));
 }
 
-HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenPortIdIsHdmiPortId, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenPortIdIsHdmiPortId, TestSize.Level1)
 {
-    int32_t ret;
-    struct AudioPort portIndex;
-    ret = InitPort(portIndex);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    portIndex.portId = HDMI_PORT_ID;
-    struct AudioPortCapability *capabilityIndex = new AudioPortCapability;
-    ret = InitForGetPortCapability(portIndex, capabilityIndex);
-    if (HDF_SUCCESS != ret) {
-        delete(capabilityIndex);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
-
-    EXPECT_NE(capabilityIndex->subPorts, nullptr);
-    if (capabilityIndex->subPorts != nullptr) {
-        EXPECT_EQ(capabilityIndex->subPorts->portId, portIndex.portId);
-        EXPECT_EQ(capabilityIndex->subPorts->desc, portIndex.portName);
-        EXPECT_EQ(capabilityIndex->subPorts->mask, PORT_PASSTHROUGH_LPCM);
-    }
-    if (capabilityIndex->subPorts != nullptr) {
-        free(capabilityIndex->subPorts);
-        capabilityIndex->subPorts = nullptr;
-    }
-    delete(capabilityIndex);
-    capabilityIndex = nullptr;
+    TestInitForGetPortCapability(HDMI_PORT_ID);
 }
 
-HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenPortIdIsTwo, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenPortIdIsTwo, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioPort portIndex;
-    ret = InitPort(portIndex);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitPort(portIndex));
     portIndex.dir = PORT_OUT;
     portIndex.portId = AUDIO_PORT_ID;
-    struct AudioPortCapability *capabilityIndex = new AudioPortCapability;
-    ret = InitForGetPortCapability(portIndex, capabilityIndex);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(capabilityIndex);
-    capabilityIndex = nullptr;
+    struct AudioPortCapability capabilityIndex;
+    EXPECT_EQ(HDF_FAILURE, InitForGetPortCapability(portIndex, &capabilityIndex));
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterReleaseCapSubPortsWhenPortCapabilitysIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterReleaseCapSubPortsWhenPortCapabilitysIsNull, TestSize.Level1)
 {
     const struct AudioPortAndCapability *portCapabilitys = nullptr;
     int32_t num = PORTNUM;
@@ -568,666 +330,742 @@ HWTEST_F(AudioAdapterTest, AudioAdapterReleaseCapSubPortsWhenPortCapabilitysIsNu
     EXPECT_EQ(nullptr, portCapabilitys);
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterReleaseCapSubPortsWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterReleaseCapSubPortsWhenParamIsVaild, TestSize.Level1)
 {
-    struct AudioPortAndCapability *portCapabilitys = new AudioPortAndCapability;
+    struct AudioPortAndCapability portCapabilitys;
     struct AudioSubPortCapability *subPorts =
         (struct AudioSubPortCapability *)calloc(1, sizeof(struct AudioSubPortCapability));
-    portCapabilitys->capability.subPorts = subPorts;
+    ASSERT_NE(subPorts, nullptr);
+    portCapabilitys.capability.subPorts = subPorts;
     int32_t num = PORTNUM;
-    AudioAdapterReleaseCapSubPorts((const struct AudioPortAndCapability *)portCapabilitys, num);
-    EXPECT_EQ(nullptr, portCapabilitys->capability.subPorts);
-    EXPECT_NE(nullptr, portCapabilitys);
-    delete(portCapabilitys);
-    portCapabilitys = nullptr;
-    subPorts = nullptr;
+    AudioAdapterReleaseCapSubPorts(&portCapabilitys, num);
+    EXPECT_EQ(nullptr, portCapabilitys.capability.subPorts);
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterInitAllPortsWhenAdapterIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterInitAllPortsWhenAdapterIsNull, TestSize.Level1)
 {
-    struct AudioAdapter *adapter = nullptr;
-    int32_t ret = AudioAdapterInitAllPorts(adapter);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterInitAllPorts(nullptr));
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterInitAllPortsWhenPortCapabilitysIsNotNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterInitAllPortsWhenPortCapabilitysIsNotNull, TestSize.Level1)
 {
-    struct AudioHwAdapter *hwAdapter = new AudioHwAdapter;
-    struct AudioPortAndCapability *portCapabilitys = new AudioPortAndCapability;
-    EXPECT_NE(nullptr, portCapabilitys);
-    hwAdapter->portCapabilitys = portCapabilitys;
-    int32_t ret = AudioAdapterInitAllPorts((struct AudioAdapter *)hwAdapter);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    delete(hwAdapter);
-    hwAdapter = nullptr;
-    delete(portCapabilitys);
-    portCapabilitys = nullptr;
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    struct AudioPortAndCapability capability;
+    struct AudioPortAndCapability *pCapability = hwAdapter->portCapabilitys;
+    hwAdapter->portCapabilitys = &capability;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterInitAllPorts((struct AudioAdapter *)hwAdapter));
+    hwAdapter->portCapabilitys = pCapability;
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterInitAllPortsWhenPortsIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterInitAllPortsWhenPortsIsNull, TestSize.Level1)
 {
-    struct AudioHwAdapter *hwAdapter = new AudioHwAdapter;
-    hwAdapter->portCapabilitys = nullptr;
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    struct AudioPort *pPorts = hwAdapter->adapterDescriptor.ports;
     hwAdapter->adapterDescriptor.ports = nullptr;
-    int32_t ret = AudioAdapterInitAllPorts((struct AudioAdapter *)hwAdapter);
-    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
-    delete(hwAdapter);
-    hwAdapter = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioAdapterInitAllPorts((struct AudioAdapter *)hwAdapter));
+    hwAdapter->adapterDescriptor.ports = pPorts;
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterInitAllPortsWhenPortNumIsZero, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterInitAllPortsWhenPortNumIsZero, TestSize.Level1)
 {
-    struct AudioHwAdapter *hwAdapter = new AudioHwAdapter;
-    hwAdapter->portCapabilitys = nullptr;
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     hwAdapter->adapterDescriptor.portNum = 0;
-    struct AudioPort *ports = new AudioPort;
-    hwAdapter->adapterDescriptor.ports = ports;
-    int32_t ret = AudioAdapterInitAllPorts((struct AudioAdapter *)hwAdapter);
-    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
-    delete(hwAdapter);
-    hwAdapter = nullptr;
-    delete(ports);
-    ports = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioAdapterInitAllPorts((struct AudioAdapter *)hwAdapter));
 }
 
-HWTEST_F(AudioAdapterTest, AudioReleaseRenderHandleWhenHwRenderIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterInitAllPortsWhenParamIsVaild, TestSize.Level1)
+{
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterInitAllPorts(adapter));
+}
+
+HWTEST_F(AudioAdapterTest, AudioReleaseRenderHandleWhenHwRenderIsNull, TestSize.Level1)
 {
     struct AudioHwRender *hwRender = nullptr;
     AudioReleaseRenderHandle(hwRender);
     EXPECT_EQ(nullptr, hwRender);
 }
 
-HWTEST_F(AudioAdapterTest, AudioSetAcodeModeRenderWhenHwRenderIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioSetAcodeModeRenderWhenHwRenderIsNull, TestSize.Level1)
+{
+    InterfaceLibModeRenderSo pInterfaceLibModeRender;
+    EXPECT_EQ(HDF_FAILURE, AudioSetAcodeModeRender(nullptr, &pInterfaceLibModeRender));
+}
+
+HWTEST_F(AudioAdapterTest, AudioSetAcodeModeRenderWhenpInterfaceLibModeRenderIsNull, TestSize.Level1)
+{
+    struct AudioHwRender hwRender;
+    EXPECT_EQ(HDF_FAILURE, AudioSetAcodeModeRender(&hwRender, nullptr));
+}
+
+HWTEST_F(AudioAdapterTest, AudioSetAcodeModeRenderWhenpDevCtlHandleIsNull, TestSize.Level1)
+{
+    struct AudioHwRender hwRender;
+    InterfaceLibModeRenderSo pInterfaceLibModeRender;
+    hwRender.devCtlHandle = nullptr;
+    EXPECT_EQ(HDF_FAILURE, AudioSetAcodeModeRender(&hwRender, &pInterfaceLibModeRender));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderPreWhenHwRenderIsNull, TestSize.Level1)
 {
     struct AudioHwRender *hwRender = nullptr;
-    InterfaceLibModeRenderSo *pInterfaceLibModeRender = new InterfaceLibModeRenderSo;
-    int32_t ret = AudioSetAcodeModeRender(hwRender, pInterfaceLibModeRender);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(pInterfaceLibModeRender);
-    pInterfaceLibModeRender = nullptr;
+    struct AudioDeviceDescriptor desc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(desc));
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    EXPECT_EQ(HDF_FAILURE, AudioAdapterCreateRenderPre(hwRender, &desc, &attrs, hwAdapter));
 }
 
-HWTEST_F(AudioAdapterTest, AudioSetAcodeModeRenderWhenpInterfaceLibModeRenderIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderPreWhenDescIsNull, TestSize.Level1)
 {
-    struct AudioHwRender *hwRender = new AudioHwRender;
-    InterfaceLibModeRenderSo *pInterfaceLibModeRender = nullptr;
-    int32_t ret = AudioSetAcodeModeRender(hwRender, pInterfaceLibModeRender);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(hwRender);
-    hwRender = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, AudioSetAcodeModeRenderWhenpDevCtlHandleIsNull, TestSize.Level0)
-{
-    struct AudioHwRender *hwRender = new AudioHwRender;
-    InterfaceLibModeRenderSo *pInterfaceLibModeRender = new InterfaceLibModeRenderSo;
-    hwRender->devCtlHandle = nullptr;
-    int32_t ret = AudioSetAcodeModeRender(hwRender, pInterfaceLibModeRender);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(hwRender);
-    hwRender = nullptr;
-    delete(pInterfaceLibModeRender);
-    pInterfaceLibModeRender = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderPreWhenHwRenderIsNull, TestSize.Level0)
-{
-    struct AudioHwRender *hwRender = nullptr;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    struct AudioHwAdapter *hwadapter = new AudioHwAdapter;
-    int32_t ret = AudioAdapterCreateRenderPre(hwRender, desc, attrs, hwadapter);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(desc);
-    desc = nullptr;
-    delete(attrs);
-    attrs = nullptr;
-    delete(hwadapter);
-    hwadapter = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderPreWhenDescIsNull, TestSize.Level0)
-{
-    struct AudioHwRender *hwRender = new AudioHwRender;
-    const struct AudioDeviceDescriptor *desc = nullptr;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    struct AudioHwAdapter *hwadapter = new AudioHwAdapter;
-    int32_t ret = AudioAdapterCreateRenderPre(hwRender, desc, attrs, hwadapter);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(hwRender);
-    hwRender = nullptr;
-    delete(attrs);
-    attrs = nullptr;
-    delete(hwadapter);
-    hwadapter = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderPreWhenAttrsIsNull, TestSize.Level0)
-{
-    struct AudioHwRender *hwRender = new AudioHwRender;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = nullptr;
-    struct AudioHwAdapter *hwadapter = new AudioHwAdapter;
-    int32_t ret = AudioAdapterCreateRenderPre(hwRender, desc, attrs, hwadapter);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(hwRender);
-    hwRender = nullptr;
-    delete(desc);
-    desc = nullptr;
-    delete(hwadapter);
-    hwadapter = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderPreWhenAdapterIsNull, TestSize.Level0)
-{
-    struct AudioHwRender *hwRender = new AudioHwRender;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    struct AudioHwAdapter *hwadapter = nullptr;
-    int32_t ret = AudioAdapterCreateRenderPre(hwRender, desc, attrs, hwadapter);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(hwRender);
-    hwRender = nullptr;
-    delete(desc);
-    desc = nullptr;
-    delete(attrs);
-    attrs = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderPreWhenPortIdLessThanZero, TestSize.Level0)
-{
-    int32_t ret;
-    struct AudioManager *managerFuncs = GetAudioManagerFuncs();
-    int32_t size = 0;
-    struct AudioAdapterDescriptor *descs;
-    ret = managerFuncs->GetAllAdapters(managerFuncs, &descs, &size);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    struct AudioPort *ports = new AudioPort;
-    struct AudioAdapterDescriptor *desc = new AudioAdapterDescriptor;
-    desc->adapterName = "usb";
-    desc->ports = ports;
-    struct AudioAdapter *adapter;
-    ret = managerFuncs->LoadAdapter(managerFuncs, desc, &adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
     struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    EXPECT_NE(hwRender, nullptr);
+    ASSERT_NE(hwRender, nullptr);
+    struct AudioDeviceDescriptor *desc = nullptr;
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    int32_t ret = AudioAdapterCreateRenderPre(hwRender, desc, &attrs, hwAdapter);
+    EXPECT_EQ(HDF_FAILURE, ret);
+    free(hwRender);
+    hwRender = nullptr;
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderPreWhenAttrsIsNull, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
+    ASSERT_NE(hwRender, nullptr);
+    struct AudioDeviceDescriptor desc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(desc));
+    struct AudioSampleAttributes *attrs = nullptr;
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    int32_t ret = AudioAdapterCreateRenderPre(hwRender, &desc, attrs, hwAdapter);
+    EXPECT_EQ(HDF_FAILURE, ret);
+    free(hwRender);
+    hwRender = nullptr;
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderPreWhenAdapterIsNull, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
+    ASSERT_NE(hwRender, nullptr);
+    struct AudioDeviceDescriptor desc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(desc));
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
+    struct AudioHwAdapter *hwAdapter = nullptr;
+    int32_t ret = AudioAdapterCreateRenderPre(hwRender, &desc, &attrs, hwAdapter);
+    EXPECT_EQ(HDF_FAILURE, ret);
+    free(hwRender);
+    hwRender = nullptr;
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderPreWhenPortIdLessThanZero, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
+    ASSERT_NE(hwRender, nullptr);
     struct AudioDeviceDescriptor devDesc;
-    ret = InitDevDesc(devDesc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(devDesc));
     devDesc.portId = AUDIO_HAL_ERR_NOT_SUPPORT;
     struct AudioSampleAttributes attrs;
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = AudioAdapterCreateRenderPre(hwRender, &devDesc, &attrs, (struct AudioHwAdapter *)adapter);
-    EXPECT_EQ(HDF_FAILURE, ret);
-
-    delete(ports);
-    ports = nullptr;
-    delete(desc);
-    desc = nullptr;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
+    EXPECT_EQ(HDF_FAILURE, AudioAdapterCreateRenderPre(hwRender, &devDesc, &attrs, (struct AudioHwAdapter *)adapter));
     free(hwRender);
     hwRender = nullptr;
-    managerFuncs->UnloadAdapter(managerFuncs, adapter);
-    adapter = nullptr;
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderPreWhenAdapterNameIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderPreWhenAdapterNameIsNull, TestSize.Level1)
 {
-    int32_t ret;
-    struct AudioManager *managerFuncs = GetAudioManagerFuncs();
-    int32_t size = 0;
-    struct AudioAdapterDescriptor *descs;
-    ret = managerFuncs->GetAllAdapters(managerFuncs, &descs, &size);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    struct AudioPort *ports = new AudioPort;
-    struct AudioAdapterDescriptor *desc = new AudioAdapterDescriptor;
-    desc->adapterName = "usb";
-    desc->ports = ports;
-    struct AudioAdapter *adapter;
-    ret = managerFuncs->LoadAdapter(managerFuncs, desc, &adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
     struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    EXPECT_NE(hwRender, nullptr);
+    ASSERT_NE(hwRender, nullptr);
     struct AudioDeviceDescriptor devDesc;
-    ret = InitDevDesc(devDesc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(devDesc));
     struct AudioSampleAttributes attrs;
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
     struct AudioHwAdapter *hwAdapter = reinterpret_cast<AudioHwAdapter *>(adapter);
     hwAdapter->adapterDescriptor.adapterName = nullptr;
-    ret = AudioAdapterCreateRenderPre(hwRender, &devDesc, &attrs, hwAdapter);
-    EXPECT_EQ(HDF_FAILURE, ret);
-
-    delete(ports);
-    ports = nullptr;
-    delete(desc);
-    desc = nullptr;
+    EXPECT_EQ(HDF_FAILURE, AudioAdapterCreateRenderPre(hwRender, &devDesc, &attrs, hwAdapter));
     free(hwRender);
     hwRender = nullptr;
-    managerFuncs->UnloadAdapter(managerFuncs, adapter);
-    adapter = nullptr;
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderPreWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderPreWhenParamIsVaild, TestSize.Level1)
 {
-    int32_t ret;
-    struct AudioManager *managerFuncs = GetAudioManagerFuncs();
-    int32_t size = 0;
-    struct AudioAdapterDescriptor *descs;
-    ret = managerFuncs->GetAllAdapters(managerFuncs, &descs, &size);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    struct AudioPort *ports = new AudioPort;
-    struct AudioAdapterDescriptor *desc = new AudioAdapterDescriptor;
-    desc->adapterName = "usb";
-    desc->ports = ports;
-    struct AudioAdapter *adapter;
-    ret = managerFuncs->LoadAdapter(managerFuncs, desc, &adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
     struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
-    EXPECT_NE(hwRender, nullptr);
+    ASSERT_NE(hwRender, nullptr);
     struct AudioDeviceDescriptor devDesc;
-    ret = InitDevDesc(devDesc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(devDesc));
     struct AudioSampleAttributes attrs;
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = AudioAdapterCreateRenderPre(hwRender, &devDesc, &attrs, (struct AudioHwAdapter *)adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    delete(ports);
-    ports = nullptr;
-    delete(desc);
-    desc = nullptr;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
+    struct AudioHwAdapter *hwAdapter = reinterpret_cast<AudioHwAdapter *>(adapter);
+    EXPECT_EQ(HDF_SUCCESS, AudioAdapterCreateRenderPre(hwRender, &devDesc, &attrs, hwAdapter));
     free(hwRender);
     hwRender = nullptr;
-    managerFuncs->UnloadAdapter(managerFuncs, adapter);
-    adapter = nullptr;
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterBindServiceRenderWhenHwRenderIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterBindServiceRenderWhenHwRenderIsNull, TestSize.Level1)
 {
-    struct AudioHwRender *hwRender = nullptr;
-    int32_t ret = AudioAdapterBindServiceRender(hwRender);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(HDF_FAILURE, AudioAdapterBindServiceRender(nullptr));
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderWhenAdapterIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderWhenAdapterIsNull, TestSize.Level1)
 {
-    struct AudioAdapter *adapter = nullptr;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    struct AudioRender *render;
-    int32_t ret = AudioAdapterCreateRender(adapter, desc, attrs, &render);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(desc);
-    desc = nullptr;
-    delete(attrs);
-    attrs = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderWhenDescIsNull, TestSize.Level0)
-{
-    struct AudioAdapter *adapter = new AudioAdapter;
-    const struct AudioDeviceDescriptor *desc = nullptr;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    struct AudioRender *render;
-    int32_t ret = AudioAdapterCreateRender(adapter, desc, attrs, &render);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(adapter);
-    adapter = nullptr;
-    delete(attrs);
-    attrs = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderWhenAttrsIsNull, TestSize.Level0)
-{
-    struct AudioAdapter *adapter = new AudioAdapter;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = nullptr;
-    struct AudioRender *render;
-    int32_t ret = AudioAdapterCreateRender(adapter, desc, attrs, &render);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(adapter);
-    adapter = nullptr;
-    delete(desc);
-    desc = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderWhenRenderIsNull, TestSize.Level0)
-{
-    struct AudioAdapter *adapter = new AudioAdapter;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    struct AudioRender **render = nullptr;
-    int32_t ret = AudioAdapterCreateRender(adapter, desc, attrs, render);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(adapter);
-    adapter = nullptr;
-    delete(desc);
-    desc = nullptr;
-    delete(attrs);
-    attrs = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, AudioAdapterDestroyRenderWhenAdapterIsNull, TestSize.Level0)
-{
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = new AudioRender;
-    int32_t ret = AudioAdapterDestroyRender(adapter, render);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(render);
-    render = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, AudioAdapterDestroyRenderWhenRenderIsNull, TestSize.Level0)
-{
-    struct AudioAdapter *adapter = new AudioAdapter;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioAdapterDestroyRender(adapter, render);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(adapter);
-    adapter = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, GetAudioCaptureFuncWhenHwCaptureIsNull, TestSize.Level0)
-{
-    struct AudioHwCapture *hwCapture = nullptr;
-    int32_t ret = GetAudioCaptureFunc(hwCapture);
-    EXPECT_EQ(HDF_FAILURE, ret);
-}
-
-HWTEST_F(AudioAdapterTest, GetAudioCaptureFuncWhenParamIsVaild, TestSize.Level0)
-{
-    struct AudioHwCapture *hwCapture = new AudioHwCapture;
-    int32_t ret = GetAudioCaptureFunc(hwCapture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    delete(hwCapture);
-    hwCapture = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenHwCaptureIsNull, TestSize.Level0)
-{
-    struct AudioHwCapture *hwCapture = nullptr;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    int32_t ret = InitHwCaptureParam(hwCapture, desc, attrs);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(desc);
-    desc = nullptr;
-    delete(attrs);
-    attrs = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenDescIsNull, TestSize.Level0)
-{
-    struct AudioHwCapture *hwCapture = new AudioHwCapture;
-    const struct AudioDeviceDescriptor *desc = nullptr;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    int32_t ret = InitHwCaptureParam(hwCapture, desc, attrs);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(hwCapture);
-    hwCapture = nullptr;
-    delete(attrs);
-    attrs = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenAttrsIsNull, TestSize.Level0)
-{
-    struct AudioHwCapture *hwCapture = new AudioHwCapture;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = nullptr;
-    int32_t ret = InitHwCaptureParam(hwCapture, desc, attrs);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(hwCapture);
-    hwCapture = nullptr;
-    delete(desc);
-    desc = nullptr;
-}
-
-HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenPortIdLessThanZero, TestSize.Level0)
-{
-    int32_t ret;
     struct AudioDeviceDescriptor desc;
-    ret = InitDevDescCapture(desc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    struct AudioSampleAttributes attrs;
+    struct AudioRender *render;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterCreateRender(nullptr, &desc, &attrs, &render));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderWhenDescIsNull, TestSize.Level1)
+{
+    struct AudioSampleAttributes attrs;
+    struct AudioRender *render;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterCreateRender(adapter, nullptr, &attrs, &render));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderWhenAttrsIsNull, TestSize.Level1)
+{
+    struct AudioDeviceDescriptor devDesc;
+    struct AudioRender *render;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterCreateRender(adapter, &devDesc, nullptr, &render));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderWhenRenderIsNull, TestSize.Level1)
+{
+    struct AudioDeviceDescriptor devDesc;
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterCreateRender(adapter, &devDesc, &attrs, nullptr));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderWhenAdapterMgrRenderFlagIsGreaterThanOne, TestSize.Level1)
+{
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    hwAdapter->adapterMgrRenderFlag = 1;
+    struct AudioDeviceDescriptor devDesc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(devDesc));
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
+    struct AudioRender *render;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL,
+        AudioAdapterCreateRender((struct AudioAdapter *)hwAdapter, &devDesc, &attrs, &render));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderWhenPeriodIsLessThanZero, TestSize.Level1)
+{
+    struct AudioDeviceDescriptor devDesc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(devDesc));
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
+    attrs.period = -1;
+    struct AudioRender *render;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioAdapterCreateRender(adapter, &devDesc, &attrs, &render));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderWhenParamIsVaild, TestSize.Level1)
+{
+    struct AudioDeviceDescriptor devDesc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(devDesc));
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
+    struct AudioRender *render;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterCreateRender(adapter, &devDesc, &attrs, &render));
+    EXPECT_EQ(HDF_SUCCESS, AudioAdapterDestroyRender(adapter, render));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterDestroyRenderWhenAdapterIsNull, TestSize.Level1)
+{
+    struct AudioRender render;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterDestroyRender(nullptr, &render));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterDestroyRenderWhenRenderIsNull, TestSize.Level1)
+{
+    struct AudioRender *render = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterDestroyRender(adapter, render));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterDestroyRenderWhenBufferIsNotNull, TestSize.Level1)
+{
+    struct AudioDeviceDescriptor devDesc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDesc(devDesc));
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
+    struct AudioRender *render;
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterCreateRender(adapter, &devDesc, &attrs, &render));
+
+    AudioHandle handle = (AudioHandle)render;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart(handle));
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterDestroyRender(adapter, render));
+}
+
+HWTEST_F(AudioAdapterTest, GetAudioCaptureFuncWhenHwCaptureIsNull, TestSize.Level1)
+{
+    struct AudioHwCapture *hwCapture = nullptr;
+    EXPECT_EQ(HDF_FAILURE, GetAudioCaptureFunc(hwCapture));
+}
+
+HWTEST_F(AudioAdapterTest, GetAudioCaptureFuncWhenParamIsVaild, TestSize.Level1)
+{
+    struct AudioHwCapture hwCapture;
+    EXPECT_EQ(HDF_SUCCESS, GetAudioCaptureFunc(&hwCapture));
+}
+
+HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenHwCaptureIsNull, TestSize.Level1)
+{
+    struct AudioDeviceDescriptor desc;
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_FAILURE, InitHwCaptureParam(nullptr, &desc, &attrs));
+}
+
+HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenDescIsNull, TestSize.Level1)
+{
+    struct AudioHwCapture hwCapture;
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_FAILURE, InitHwCaptureParam(&hwCapture, nullptr, &attrs));
+}
+
+HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenAttrsIsNull, TestSize.Level1)
+{
+    struct AudioHwCapture hwCapture;
+    struct AudioDeviceDescriptor desc;
+    EXPECT_EQ(HDF_FAILURE, InitHwCaptureParam(&hwCapture, &desc, nullptr));
+}
+
+HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenPortIdLessThanZero, TestSize.Level1)
+{
+    struct AudioDeviceDescriptor desc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDescCapture(desc));
     desc.portId = AUDIO_HAL_ERR_NOT_SUPPORT;
     struct AudioSampleAttributes attrs;
-    ret = InitAttrsCapture(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitAttrsCapture(attrs));
     struct AudioHwCapture hwCapture;
-    ret = InitHwCapture(hwCapture, desc, attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitHwCaptureParam(&hwCapture, &desc, &attrs);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitHwCapture(hwCapture, desc, attrs));
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, InitHwCaptureParam(&hwCapture, &desc, &attrs));
 }
 
-HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenPeriodLessThanZero, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenPeriodLessThanZero, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioDeviceDescriptor desc;
-    ret = InitDevDescCapture(desc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitDevDescCapture(desc));
     struct AudioSampleAttributes attrs;
-    ret = InitAttrsCapture(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitAttrsCapture(attrs));
     attrs.period = AUDIO_HAL_ERR_NOT_SUPPORT;
     struct AudioHwCapture hwCapture;
-    ret = InitHwCapture(hwCapture, desc, attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitHwCaptureParam(&hwCapture, &desc, &attrs);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitHwCapture(hwCapture, desc, attrs));
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, InitHwCaptureParam(&hwCapture, &desc, &attrs));
 }
 
-HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenFormatIsNotSupport, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenFormatIsNotSupport, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioDeviceDescriptor desc;
-    ret = InitDevDescCapture(desc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitDevDescCapture(desc));
     struct AudioSampleAttributes attrs;
-    ret = InitAttrsCapture(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitAttrsCapture(attrs));
     attrs.format = AUDIO_FORMAT_AAC_MAIN;
     struct AudioHwCapture hwCapture;
-    ret = InitHwCapture(hwCapture, desc, attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitHwCaptureParam(&hwCapture, &desc, &attrs);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitHwCapture(hwCapture, desc, attrs));
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, InitHwCaptureParam(&hwCapture, &desc, &attrs));
 }
 
-HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenChannelCountIsZero, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenChannelCountIsZero, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioDeviceDescriptor desc;
-    ret = InitDevDescCapture(desc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitDevDescCapture(desc));
     struct AudioSampleAttributes attrs;
-    ret = InitAttrsCapture(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitAttrsCapture(attrs));
     attrs.channelCount = 0;
     struct AudioHwCapture hwCapture;
-    ret = InitHwCapture(hwCapture, desc, attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitHwCaptureParam(&hwCapture, &desc, &attrs);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitHwCapture(hwCapture, desc, attrs));
+    EXPECT_EQ(HDF_FAILURE, InitHwCaptureParam(&hwCapture, &desc, &attrs));
 }
 
-HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenParamIsVaild, TestSize.Level1)
 {
-    int32_t ret;
     struct AudioDeviceDescriptor desc;
-    ret = InitDevDescCapture(desc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitDevDescCapture(desc));
     struct AudioSampleAttributes attrs;
-    ret = InitAttrsCapture(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitAttrsCapture(attrs));
     struct AudioHwCapture hwCapture;
-    ret = InitHwCapture(hwCapture, desc, attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = InitHwCaptureParam(&hwCapture, &desc, &attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, InitHwCapture(hwCapture, desc, attrs));
+    EXPECT_EQ(HDF_SUCCESS, InitHwCaptureParam(&hwCapture, &desc, &attrs));
 }
 
-HWTEST_F(AudioAdapterTest, AudioReleaseCaptureHandleWhenHwRenderIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioReleaseCaptureHandleWhenHwCaptureIsNull, TestSize.Level1)
 {
     struct AudioHwCapture *hwCapture = nullptr;
     AudioReleaseCaptureHandle(hwCapture);
     EXPECT_EQ(nullptr, hwCapture);
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateCapturePreWhenHwRenderIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateCapturePreWhenHwCaptureIsNull, TestSize.Level1)
 {
     struct AudioHwCapture *hwCapture = nullptr;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    struct AudioHwAdapter *hwadapter = new AudioHwAdapter;
-    int32_t ret = AudioAdapterCreateCapturePre(hwCapture, desc, attrs, hwadapter);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(desc);
-    desc = nullptr;
-    delete(attrs);
-    attrs = nullptr;
-    delete(hwadapter);
-    hwadapter = nullptr;
+    struct AudioDeviceDescriptor desc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDescCapture(desc));
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrsCapture(attrs));
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    EXPECT_EQ(HDF_FAILURE, AudioAdapterCreateCapturePre(hwCapture, &desc, &attrs, hwAdapter));
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateCapturePreWhenDescIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateCapturePreWhenDescIsNull, TestSize.Level1)
 {
-    struct AudioHwCapture *hwCapture = new AudioHwCapture;
-    const struct AudioDeviceDescriptor *desc = nullptr;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    struct AudioHwAdapter *hwadapter = new AudioHwAdapter;
-    int32_t ret = AudioAdapterCreateCapturePre(hwCapture, desc, attrs, hwadapter);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(hwCapture);
+    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
+    ASSERT_NE(hwCapture, nullptr);
+    struct AudioDeviceDescriptor *desc = nullptr;
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrsCapture(attrs));
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    EXPECT_EQ(HDF_FAILURE, AudioAdapterCreateCapturePre(hwCapture, desc, &attrs, hwAdapter));
+    free(hwCapture);
     hwCapture = nullptr;
-    delete(attrs);
-    attrs = nullptr;
-    delete(hwadapter);
-    hwadapter = nullptr;
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateCapturePreWhenAttrsIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateCapturePreWhenAttrsIsNull, TestSize.Level1)
 {
-    struct AudioHwCapture *hwCapture = new AudioHwCapture;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = nullptr;
-    struct AudioHwAdapter *hwadapter = new AudioHwAdapter;
-    int32_t ret = AudioAdapterCreateCapturePre(hwCapture, desc, attrs, hwadapter);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(hwCapture);
+    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
+    ASSERT_NE(hwCapture, nullptr);
+    struct AudioDeviceDescriptor desc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDescCapture(desc));
+    struct AudioSampleAttributes *attrs = nullptr;
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    EXPECT_EQ(HDF_FAILURE, AudioAdapterCreateCapturePre(hwCapture, &desc, attrs, hwAdapter));
+    free(hwCapture);
     hwCapture = nullptr;
-    delete(desc);
-    desc = nullptr;
-    delete(hwadapter);
-    hwadapter = nullptr;
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateCapturePreWhenAdapterIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateCapturePreWhenAdapterIsNull, TestSize.Level1)
 {
-    struct AudioHwCapture *hwCapture = new AudioHwCapture;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    struct AudioHwAdapter *hwadapter = nullptr;
-    int32_t ret = AudioAdapterCreateCapturePre(hwCapture, desc, attrs, hwadapter);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    delete(hwCapture);
+    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
+    ASSERT_NE(hwCapture, nullptr);
+    struct AudioDeviceDescriptor desc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDescCapture(desc));
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrsCapture(attrs));
+    struct AudioHwAdapter *hwAdapter = nullptr;
+    EXPECT_EQ(HDF_FAILURE, AudioAdapterCreateCapturePre(hwCapture, &desc, &attrs, hwAdapter));
+    free(hwCapture);
     hwCapture = nullptr;
-    delete(desc);
-    desc = nullptr;
-    delete(attrs);
-    attrs = nullptr;
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterInterfaceLibModeCaptureWhenHwCaptureIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterInterfaceLibModeCaptureWhenHwCaptureIsNull, TestSize.Level1)
 {
-    struct AudioHwCapture *hwCapture = nullptr;
-    int32_t ret = AudioAdapterInterfaceLibModeCapture(hwCapture);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(HDF_FAILURE, AudioAdapterInterfaceLibModeCapture(nullptr));
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateCaptureWhenAdapterIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateCaptureWhenAdapterIsNull, TestSize.Level1)
 {
-    struct AudioAdapter *adapter = nullptr;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
+    struct AudioDeviceDescriptor desc;
+    struct AudioSampleAttributes attrs;
     struct AudioCapture *capture;
-    int32_t ret = AudioAdapterCreateCapture(adapter, desc, attrs, &capture);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(desc);
-    desc = nullptr;
-    delete(attrs);
-    attrs = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterCreateCapture(nullptr, &desc, &attrs, &capture));
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateCaptureWhenDescIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateCaptureWhenDescIsNull, TestSize.Level1)
 {
-    struct AudioAdapter *adapter = new AudioAdapter;
-    const struct AudioDeviceDescriptor *desc = nullptr;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
+    struct AudioSampleAttributes attrs;
     struct AudioCapture *capture;
-    int32_t ret = AudioAdapterCreateCapture(adapter, desc, attrs, &capture);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(adapter);
-    adapter = nullptr;
-    delete(attrs);
-    attrs = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterCreateCapture(adapter, nullptr, &attrs, &capture));
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateCaptureWhenAttrsIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateCaptureWhenAttrsIsNull, TestSize.Level1)
 {
-    struct AudioAdapter *adapter = new AudioAdapter;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = nullptr;
+    struct AudioDeviceDescriptor devDesc;
     struct AudioCapture *capture;
-    int32_t ret = AudioAdapterCreateCapture(adapter, desc, attrs, &capture);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(adapter);
-    adapter = nullptr;
-    delete(desc);
-    desc = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterCreateCapture(adapter, &devDesc, nullptr, &capture));
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterCreateCaptureWhenCaptureIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateCaptureWhenCaptureIsNull, TestSize.Level1)
 {
-    struct AudioAdapter *adapter = new AudioAdapter;
-    const struct AudioDeviceDescriptor *desc = new AudioDeviceDescriptor;
-    const struct AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    struct AudioCapture **capture = nullptr;
-    int32_t ret = AudioAdapterCreateCapture(adapter, desc, attrs, capture);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(adapter);
-    adapter = nullptr;
-    delete(desc);
-    desc = nullptr;
-    delete(attrs);
-    attrs = nullptr;
+    struct AudioDeviceDescriptor devDesc;
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterCreateCapture(adapter, &devDesc, &attrs, nullptr));
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterDestroyCaptureWhenAdapterIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateCaptureWhenAdapterMgrCaptureFlagIsGreaterThanOne, TestSize.Level1)
 {
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = new AudioCapture;
-    int32_t ret = AudioAdapterDestroyCapture(adapter, capture);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(capture);
-    capture = nullptr;
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    hwAdapter->adapterMgrCaptureFlag = 1;
+    struct AudioDeviceDescriptor devDesc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDescCapture(devDesc));
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrsCapture(attrs));
+    struct AudioCapture *capture;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL,
+        AudioAdapterCreateCapture((struct AudioAdapter *)adapter, &devDesc, &attrs, &capture));
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterDestroyCaptureWhenCaptureIsNull, TestSize.Level0)
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateCaptureWhenPeriodIsLessThanZero, TestSize.Level1)
 {
-    struct AudioAdapter *adapter = new AudioAdapter;
-    struct AudioCapture *capture = nullptr;
-    int32_t ret = AudioAdapterDestroyCapture(adapter, capture);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(adapter);
-    adapter = nullptr;
+    struct AudioDeviceDescriptor devDesc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDescCapture(devDesc));
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrsCapture(attrs));
+    attrs.period = -1;
+    struct AudioCapture *capture;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioAdapterCreateCapture(adapter, &devDesc, &attrs, &capture));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterCreateCaptureWhenParamIsVaild, TestSize.Level1)
+{
+    struct AudioDeviceDescriptor devDesc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDescCapture(devDesc));
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrsCapture(attrs));
+    struct AudioCapture *capture;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterCreateCapture(adapter, &devDesc, &attrs, &capture));
+    EXPECT_EQ(HDF_SUCCESS, AudioAdapterDestroyCapture(adapter, capture));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterDestroyCaptureWhenAdapterIsNull, TestSize.Level1)
+{
+    struct AudioCapture capture;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterDestroyCapture(nullptr, &capture));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterDestroyCaptureWhenCaptureIsNull, TestSize.Level1)
+{
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterDestroyCapture(adapter, nullptr));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterDestroyCaptureWhenBufferIsNotNull, TestSize.Level1)
+{
+    struct AudioDeviceDescriptor devDesc;
+    EXPECT_EQ(HDF_SUCCESS, InitDevDescCapture(devDesc));
+    struct AudioSampleAttributes attrs;
+    EXPECT_EQ(HDF_SUCCESS, InitAttrsCapture(attrs));
+    struct AudioCapture *capture;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterCreateCapture(adapter, &devDesc, &attrs, &capture));
+
+    AudioHandle handle = (AudioHandle)capture;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioCaptureStart(handle));
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterDestroyCapture(adapter, capture));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPortCapabilityWhenAdapterIsNull, TestSize.Level1)
+{
+    struct AudioPort port;
+    struct AudioPortCapability capability;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterGetPortCapability(nullptr, &port, &capability));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPortCapabilityWhenPortIsNull, TestSize.Level1)
+{
+    struct AudioPortCapability capability;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterGetPortCapability(adapter, nullptr, &capability));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPortCapabilityWhenCapabilityIsNull, TestSize.Level1)
+{
+    struct AudioPort *port = desc->ports;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterGetPortCapability(adapter, port, nullptr));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPortCapabilityWhenPortNameIsNull, TestSize.Level1)
+{
+    struct AudioPort port;
+    port.portName = nullptr;
+    struct AudioPortCapability capability;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterGetPortCapability(adapter, &port, &capability));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPortCapabilityWhenPortCapabilitysIsNull, TestSize.Level1)
+{
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    hwAdapter->portCapabilitys = nullptr;
+    struct AudioPort *port = desc->ports;
+    struct AudioPortCapability capability;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL,
+        AudioAdapterGetPortCapability((struct AudioAdapter *)hwAdapter, port, &capability));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPortCapabilityWhenPortNumIsZero, TestSize.Level1)
+{
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    hwAdapter->adapterDescriptor.portNum = 0;
+    struct AudioPort *port = desc->ports;
+    struct AudioPortCapability capability;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL,
+        AudioAdapterGetPortCapability((struct AudioAdapter *)hwAdapter, port, &capability));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPortCapabilityWhenParamIsVaild, TestSize.Level1)
+{
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterInitAllPorts(adapter));
+    struct AudioPort *port = desc->ports;
+    struct AudioPortCapability capability;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterGetPortCapability(adapter, port, &capability));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPortCapabilityWhenPortIdIsError, TestSize.Level1)
+{
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterInitAllPorts(adapter));
+    struct AudioPort *port = desc->ports;
+    uint32_t portId = port->portId;
+    port->portId = 1;
+    struct AudioPortCapability capability;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioAdapterGetPortCapability(adapter, port, &capability));
+    port->portId = portId;
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterSetPassthroughModeWhenAdapterIsNull, TestSize.Level1)
+{
+    struct AudioPort port;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterSetPassthroughMode(nullptr, &port, mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterSetPassthroughModeWhenPortIsNull, TestSize.Level1)
+{
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterSetPassthroughMode(adapter, nullptr, mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterSetPassthroughModeWhenPortNameIsNull, TestSize.Level1)
+{
+    struct AudioPort port;
+    port.portName = nullptr;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterSetPassthroughMode(adapter, &port, mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterSetPassthroughModeWhenPortDirIsPortIn, TestSize.Level1)
+{
+    struct AudioPort port;
+    port.portName = "usb";
+    port.dir = PORT_IN;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioAdapterSetPassthroughMode(adapter, &port, mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterSetPassthroughModeWhenPortCapabilitysIsNull, TestSize.Level1)
+{
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    hwAdapter->portCapabilitys = nullptr;
+    struct AudioPort *port = desc->ports;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioAdapterSetPassthroughMode((struct AudioAdapter *)hwAdapter, port, mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterSetPassthroughModeWhenPortIdIsError, TestSize.Level1)
+{
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterInitAllPorts(adapter));
+    struct AudioPort *port = desc->ports;
+    uint32_t portId = port->portId;
+    port->portId = 1;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioAdapterSetPassthroughMode(adapter, port, mode));
+    port->portId = portId;
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterSetPassthroughModeWhenPortNumIsZero, TestSize.Level1)
+{
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterInitAllPorts(adapter));
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    hwAdapter->adapterDescriptor.portNum = 0;
+    struct AudioPort *port = desc->ports;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioAdapterSetPassthroughMode((struct AudioAdapter *)hwAdapter, port, mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterSetPassthroughModeWhenSubPortsIsNull, TestSize.Level1)
+{
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterInitAllPorts(adapter));
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    free(hwAdapter->portCapabilitys->capability.subPorts);
+    hwAdapter->portCapabilitys->capability.subPorts = nullptr;
+    struct AudioPort *port = desc->ports;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioAdapterSetPassthroughMode((struct AudioAdapter *)hwAdapter, port, mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterSetPassthroughModeWhenParamIsVaild, TestSize.Level1)
+{
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterInitAllPorts(adapter));
+    struct AudioPort *port = desc->ports;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterSetPassthroughMode(adapter, port, mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterSetPassthroughModeWhenModeIsError, TestSize.Level1)
+{
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterInitAllPorts(adapter));
+    struct AudioPort *port = desc->ports;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_RAW;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioAdapterSetPassthroughMode(adapter, port, mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPassthroughModeWhenAdapterIsNull, TestSize.Level1)
+{
+    struct AudioPort port;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterGetPassthroughMode(nullptr, &port, &mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPassthroughModeWhenPortIsNull, TestSize.Level1)
+{
+    struct AudioPort *port = nullptr;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterGetPassthroughMode(adapter, port, &mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPassthroughModeWhenModeIsNull, TestSize.Level1)
+{
+    struct AudioPort *port = desc->ports;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterGetPassthroughMode(adapter, port, nullptr));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPassthroughModeWhenPortNameIsNull, TestSize.Level1)
+{
+    struct AudioPort port;
+    port.portName = nullptr;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterGetPassthroughMode(adapter, &port, &mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPassthroughModeWhenPortDirIsPortIn, TestSize.Level1)
+{
+    struct AudioPort port;
+    port.portName = "usb";
+    port.dir = PORT_IN;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioAdapterGetPassthroughMode(adapter, &port, &mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPassthroughModeWhenPortCapabilitysIsNull, TestSize.Level1)
+{
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    hwAdapter->portCapabilitys = nullptr;
+    struct AudioPort *port = desc->ports;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioAdapterGetPassthroughMode((AudioAdapter *)hwAdapter, port, &mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPassthroughModeWhenPortNumIsZero, TestSize.Level1)
+{
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterInitAllPorts(adapter));
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    hwAdapter->adapterDescriptor.portNum = 0;
+    struct AudioPort *port = desc->ports;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioAdapterGetPassthroughMode((AudioAdapter *)hwAdapter, port, &mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPassthroughModeWhenParamIsVaild, TestSize.Level1)
+{
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterInitAllPorts(adapter));
+    struct AudioPort *port = desc->ports;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterGetPassthroughMode(adapter, port, &mode));
+}
+
+HWTEST_F(AudioAdapterTest, AudioAdapterGetPassthroughModeWhenPortIdIsError, TestSize.Level1)
+{
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterInitAllPorts(adapter));
+    struct AudioPort *port = desc->ports;
+    uint32_t portId = port->portId;
+    port->portId = 1;
+    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioAdapterGetPassthroughMode(adapter, port, &mode));
+    port->portId = portId;
 }
 }

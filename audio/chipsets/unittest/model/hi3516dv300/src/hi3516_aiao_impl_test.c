@@ -22,44 +22,44 @@ const unsigned int SAMPLERATE = 48000;
 int32_t TestAiaoHalSysInit(void)
 {
     int ret;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAiaoHalSysInit: enter");
     ret = AiaoHalSysInit();
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AiaoHalSysInit fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAiaoHalSysInit: AiaoHalSysInit fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAiaoHalSysInit: success");
     return HDF_SUCCESS;
 }
 
 int32_t TestAiaoClockReset(void)
 {
     int ret;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAiaoClockReset: enter");
     ret = AiaoClockReset();
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AiaoClockReset fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAiaoClockReset: AiaoClockReset fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAiaoClockReset: success");
     return HDF_SUCCESS;
 }
 
 int32_t TestAiaoHalReadReg(void)
 {
-    int ret;
+    uint32_t ret;
     unsigned int offset;
     const unsigned int offValue = 0x100;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAiaoHalReadReg: enter");
     offset = offValue;
     ret = AiaoHalReadReg(offset);
     if (ret == 0x0) {
-        HDF_LOGE("%s: AiaoHalReadReg fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAiaoHalReadReg: AiaoHalReadReg fail ret = %d", ret);
         return HDF_FAILURE;
     }
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAiaoHalReadReg: success");
     return HDF_SUCCESS;
 }
 
@@ -71,14 +71,31 @@ int32_t TestAopHalSetBuffRptr(void)
 
     chnId = 0;
     value = 0;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAopHalSetBuffRptr: enter");
     ret = AopHalSetBuffRptr(chnId, value);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AopHalSetBuffRptr fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAopHalSetBuffRptr: AopHalSetBuffRptr fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAopHalSetBuffRptr: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAopHalSetBuffRptrInvalidChdId(void)
+{
+    int ret;
+    unsigned int chnId;
+    unsigned int value;
+    chnId = R_CHANNEL_ID_MAX;
+    value = 0;
+    HDF_LOGI("TestAopHalSetBuffRptrInvalidChdId: enter");
+    ret = AopHalSetBuffRptr(chnId, value);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAopHalSetBuffRptrInvalidChdId: AopHalSetBuffRptr fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAopHalSetBuffRptrInvalidChdId: success");
     return HDF_SUCCESS;
 }
 
@@ -90,14 +107,31 @@ int32_t TestAopHalSetBuffWptr(void)
 
     chnId = 0;
     value = 0;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAopHalSetBuffWptr: enter");
     ret = AopHalSetBuffWptr(chnId, value);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AopHalSetBuffWptr fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAopHalSetBuffWptr: AopHalSetBuffWptr fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAopHalSetBuffWptr: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAopHalSetBuffWptrInvalidChnId(void)
+{
+    int ret;
+    unsigned int chnId;
+    unsigned int value;
+    chnId = W_CHANNEL_ID_MAX;
+    value = 0;
+    HDF_LOGI("TestAopHalSetBuffWptrInvalidChnId: enter");
+    ret = AopHalSetBuffWptr(chnId, value);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAopHalSetBuffWptrInvalidChnID: AopHalSetBuffWptr fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAopHalSetBuffWptrInvalidChnID: success");
     return HDF_SUCCESS;
 }
 
@@ -106,17 +140,34 @@ int32_t TestAopHalSetBufferAddr(void)
     int ret;
     unsigned int chnId;
     unsigned int value;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAopHalSetBufferAddr: enter");
 
     chnId = 0;
     value = 0;
     ret = AopHalSetBufferAddr(chnId, value);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AopHalSetBufferAddr fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAopHalSetBufferAddr: AopHalSetBufferAddr fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAopHalSetBufferAddr: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAopHalSetBufferAddrInvalidChnId(void)
+{
+    int ret;
+    unsigned int chnId;
+    unsigned int value;
+    HDF_LOGI("TestAopHalSetBufferAddrInvalidChnId: enter");
+    chnId = W_CHANNEL_ID_MAX;
+    value = 0;
+    ret = AopHalSetBufferAddr(chnId, value);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAopHalSetBufferAddrInvalidChnId: AopHalSetBufferAddr fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAopHalSetBufferAddrInvalidChnId success");
     return HDF_SUCCESS;
 }
 
@@ -128,14 +179,31 @@ int32_t TestAipHalSetBufferAddr(void)
 
     chnId = 0;
     value = 0;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAipHalSetBufferAddr: enter");
     ret = AipHalSetBufferAddr(chnId, value);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AipHalSetBufferAddr fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAipHalSetBufferAddr: AipHalSetBufferAddr fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAipHalSetBufferAddr: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAipHalSetBufferAddrInvalidChnId(void)
+{
+    int ret;
+    unsigned int chnId;
+    unsigned int value;
+    chnId = W_CHANNEL_ID_MAX;
+    value = 0;
+    HDF_LOGI("TestAipHalSetBufferAddrInvalidChnId: enter");
+    ret = AipHalSetBufferAddr(chnId, value);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAipHalSetBufferAddrInvalidChnId: AipHalSetBufferAddr fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAipHalSetBufferAddrInvalidChnId: success");
     return HDF_SUCCESS;
 }
 
@@ -147,14 +215,31 @@ int32_t TestAipHalSetBufferSize(void)
 
     chnId = 0;
     value = 0;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAipHalSetBufferSize: enter");
     ret = AipHalSetBufferSize(chnId, value);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AipHalSetBufferSize fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAipHalSetBufferSize: AipHalSetBufferSize fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAipHalSetBufferSize: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAipHalSetBufferSizeInvalidChnId(void)
+{
+    int ret;
+    unsigned int chnId;
+    unsigned int value;
+    chnId = HI_AO_DEV_MAX_NUM;
+    value = 0;
+    HDF_LOGI("TestAipHalSetBufferSizeInvalidChnId: enter");
+    ret = AipHalSetBufferSize(chnId, value);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAipHalSetBufferSizeInvalidChnId: AipHalSetBufferSize fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAipHalSetBufferSizeInvalidChnId: success");
     return HDF_SUCCESS;
 }
 
@@ -168,14 +253,32 @@ int32_t TestAipHalSetTransSize(void)
     chnId = 0;
     value = transferSize;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAipHalSetTransSize: enter");
     ret = AipHalSetTransSize(chnId, value);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AipHalSetTransSize fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAipHalSetTransSize: AipHalSetTransSize fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAipHalSetTransSize: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAipHalSetTransSizeInvalidChnId(void)
+{
+    int ret;
+    unsigned int chnId;
+    unsigned int value;
+    const unsigned int transferSize = 320;
+    chnId = HI_AO_DEV_MAX_NUM;
+    value = transferSize;
+    HDF_LOGI("TestAipHalSetTransSizeInvalidChnId: enter");
+    ret = AipHalSetTransSize(chnId, value);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAipHalSetTransSizeInvalidChnId: AipHalSetTransSize fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAipHalSetTransSizeInvalidChnId: success");
     return HDF_SUCCESS;
 }
 
@@ -186,14 +289,30 @@ int32_t TestAipHalSetRxStart(void)
     bool en = HI_TRUE;
 
     chnId = 0;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAipHalSetRxStart: enter");
     ret = AipHalSetRxStart(chnId, en);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AipHalSetRxStart fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAipHalSetRxStart: AipHalSetRxStart fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAipHalSetRxStart: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAipHalSetRxStartInvalidChnId(void)
+{
+    int ret;
+    unsigned int chnId;
+    bool en = HI_TRUE;
+    chnId = HI_AI_DEV_MAX_NUM;
+    HDF_LOGI("TestAipHalSetRxStartInvalid: enter");
+    ret = AipHalSetRxStart(chnId, en);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAipHalSetRxStartInvalid: AipHalSetRxStart fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAipHalSetRxStartInvalid: success");
     return HDF_SUCCESS;
 }
 
@@ -205,14 +324,31 @@ int32_t TestAipHalSetBuffWptr(void)
 
     chnId = 0;
     value = 0;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAipHalSetBuffWptr: enter");
     ret = AipHalSetBuffWptr(chnId, value);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AipHalSetBuffWptr fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAipHalSetBuffWptr: AipHalSetBuffWptr fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAipHalSetBuffWptr: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAipHalSetBuffWptrInvalidChnId(void)
+{
+    int ret;
+    unsigned int chnId;
+    unsigned int value;
+    chnId = W_CHANNEL_ID_MAX;
+    value = 0;
+    HDF_LOGI("TestAipHalSetBuffWptrInvalidChnId: enter");
+    ret = AipHalSetBuffWptr(chnId, value);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAipHalSetBuffWptrInvalidChnId: AipHalSetBuffWptr fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAipHalSetBuffWptrInvalidChnId: success");
     return HDF_SUCCESS;
 }
 
@@ -224,14 +360,31 @@ int32_t TestAipHalSetBuffRptr(void)
 
     chnId = 0;
     value = 0;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAipHalSetBuffRptr: enter");
     ret = AipHalSetBuffRptr(chnId, value);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AipHalSetBuffRptr fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAipHalSetBuffRptr: AipHalSetBuffRptr fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAipHalSetBuffRptrs: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAipHalSetBuffRptrInvalidChnId(void)
+{
+    int ret;
+    unsigned int chnId;
+    unsigned int value;
+    chnId = HI_AI_DEV_MAX_NUM;
+    value = 0;
+    HDF_LOGI("TestAipHalSetBuffRptrInvalidChnId: enter");
+    ret = AipHalSetBuffRptr(chnId, value);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAipHalSetBuffRptrInvalidChnId: AipHalSetBuffRptr fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAipHalSetBuffRptrInvalidChnId: success");
     return HDF_SUCCESS;
 }
 
@@ -243,14 +396,31 @@ int32_t TestAopHalSetBufferSize(void)
 
     chnId = 0;
     value = 0;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAopHalSetBufferSize: enter");
     ret = AopHalSetBufferSize(chnId, value);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AopHalSetBufferSize fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAopHalSetBufferSize: AopHalSetBufferSize fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAopHalSetBufferSize: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAopHalSetBufferSizeInvalidChnId(void)
+{
+    int ret;
+    unsigned int chnId;
+    unsigned int value;
+    chnId = HI_AO_DEV_MAX_NUM;
+    value = 0;
+    HDF_LOGI("TestAopHalSetBufferSizeInvalidChnId: enter");
+    ret = AopHalSetBufferSize(chnId, value);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAopHalSetBufferSizeInvalidChnId: AopHalSetBufferSize fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAopHalSetBufferSizeInvalidChnId: success");
     return HDF_SUCCESS;
 }
 
@@ -262,14 +432,31 @@ int32_t TestAopHalSetTransSize(void)
 
     chnId = 0;
     value = 0;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAopHalSetTransSize: enter");
     ret = AopHalSetTransSize(chnId, value);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AopHalSetTransSize fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAopHalSetTransSize: AopHalSetTransSize fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAopHalSetTransSize: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAopHalSetTransSizeInvalidChnId(void)
+{
+    int ret;
+    unsigned int chnId;
+    unsigned int value;
+    chnId = HI_AO_DEV_MAX_NUM;
+    value = 0;
+    HDF_LOGI("TestAopHalSetTransSizeInvalidChnId: enter");
+    ret = AopHalSetTransSize(chnId, value);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAopHalSetTransSizeInvalidChnId: AopHalSetTransSize fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAopHalSetTransSizeInvalidChnId: success");
     return HDF_SUCCESS;
 }
 
@@ -278,16 +465,39 @@ int32_t TestAopHalSetTxStart(void)
     int ret;
     unsigned int chnId;
     bool en = HI_TRUE;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAopHalSetTxStart: enter");
 
     chnId = 0;
     ret = AopHalSetTxStart(chnId, en);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AopHalSetTxStart fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAopHalSetTxStart: AopHalSetTxStart fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAopHalSetTxStart: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAopHalSetTxStartInvalidChnId(void)
+{
+    int ret;
+    unsigned int chnId;
+    bool en = HI_TRUE;
+    HDF_LOGI("TestAopHalSetTxStartInvalidChnId: enter");
+    chnId = HI_AO_DEV_MAX_NUM;
+    ret = AopHalSetTxStart(chnId, en);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAopHalSetTxStartInvalidChnId: AopHalSetTxStart fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAopHalSetTxStartInvalidChnId: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestShowAllAiaoRegister(void)
+{
+    HDF_LOGI("TestShowAllAiaoRegister: enter");
+    ShowAllAiaoRegister();
     return HDF_SUCCESS;
 }
 
@@ -297,14 +507,14 @@ int32_t TestAopHalDevEnable(void)
     unsigned int chnId;
 
     chnId = 0;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAopHalDevEnable: enter");
     ret = AopHalDevEnable(chnId);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AopHalDevEnable fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAopHalDevEnable: AopHalDevEnable fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAopHalDevEnable: success");
     return HDF_SUCCESS;
 }
 
@@ -314,32 +524,32 @@ int32_t TestAipBuffRptrReg(void)
     uint32_t m;
     const uint32_t aipRptrReg = 0x108C;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAipBuffRptrReg: enter");
     m = 0;
     ret = AipBuffRptrReg(m);
     if (ret != aipRptrReg) {
-        HDF_LOGE("%s: AipBuffRptrReg fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAipBuffRptrReg: AipBuffRptrReg fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAipBuffRptrReg: success");
     return HDF_SUCCESS;
 }
 
 int32_t TestAipBuffWptrReg(void)
 {
-    int ret;
+    uint32_t ret;
     uint32_t m;
     const uint32_t aipWptrReg = 0x1088;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAipBuffWptrReg: enter");
     m = 0;
     ret = AipBuffWptrReg(m);
     if (ret != aipWptrReg) {
-        HDF_LOGE("%s: AipBuffWptrReg fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAipBuffWptrReg: AipBuffWptrReg fail ret = %d", ret);
         return HDF_FAILURE;
     }
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAipBuffWptrReg: success");
     return HDF_SUCCESS;
 }
 
@@ -349,15 +559,15 @@ int32_t TestAopBuffRptrReg(void)
     uint32_t m;
     const uint32_t aopRptrReg = 0x208C;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAopBuffRptrReg: enter");
     m = 0;
     ret = AopBuffRptrReg(m);
     if (ret != aopRptrReg) {
-        HDF_LOGE("%s: AopBuffRptrReg fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAopBuffRptrReg: AopBuffRptrReg fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAopBuffRptrReg: success");
     return HDF_SUCCESS;
 }
 
@@ -367,15 +577,15 @@ int32_t TestAopBuffWptrReg(void)
     uint32_t m;
     const uint32_t aopWptrReg = 0x2088;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAopBuffWptrReg: enter");
     m = 0;
     ret = AopBuffWptrReg(m);
     if (ret != aopWptrReg) {
-        HDF_LOGE("%s: AopBuffWptrReg fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAopBuffWptrReg: AopBuffWptrReg fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAopBuffWptrReg: success");
     return HDF_SUCCESS;
 }
 
@@ -387,14 +597,32 @@ int32_t TestAopSetSysCtlReg(void)
     unsigned int bitWidth = BITWIDTH;
     unsigned int rate = SAMPLERATE;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAopSetSysCtlReg: enter");
     ret = AopSetSysCtlReg(chnId, channelCnt, bitWidth, rate);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AopBuffWptrReg fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAopSetSysCtlReg: AopBuffWptrReg fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAopSetSysCtlReg: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAopSetSysCtlRegInvalidRate(void)
+{
+    int ret;
+    int32_t chnId = 0;
+    unsigned int channelCnt = CHANNELNUM;
+    unsigned int bitWidth = BITWIDTH;
+    unsigned int rate = AUDIO_SAMPLE_RATE_BUTT;
+
+    HDF_LOGI("TestAopSetSysCtlRegInvalidRate: enter");
+    ret = AopSetSysCtlReg(chnId, channelCnt, bitWidth, rate);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAopSetSysCtlRegInvalidRate: AopBuffWptrReg fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAopSetSysCtlRegInvalidRate: success");
     return HDF_SUCCESS;
 }
 
@@ -405,16 +633,49 @@ int32_t TestAopSetAttr(void)
     unsigned int channelCnt = CHANNELNUM;
     unsigned int bitWidth = BITWIDTH;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAopSetAttr: enter");
     ret = AopSetAttr(chnId, channelCnt, bitWidth);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AopSetAttr fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAopSetAttr: AopSetAttr fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAopSetAttr: success");
     return HDF_SUCCESS;
 }
+
+int32_t TestAopSetAttrInvalidChannelCnt(void)
+{
+    int ret;
+    int32_t chnId = 0;
+    unsigned int channelCnt = CHANNELNUM * CHANNELNUM;
+    unsigned int bitWidth = BITWIDTH;
+    HDF_LOGI("TestAopSetAttrInvalidChannelCnt: enter");
+    ret = AipSetAttr(chnId, channelCnt, bitWidth);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAopSetAttrInvalidChannelCnt: AipSetAttr fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAopSetAttrInvalidChannelCnt: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAopSetAttrInvalidBitWidth(void)
+{
+    int ret;
+    int32_t chnId = 0;
+    unsigned int channelCnt = CHANNELNUM;
+    unsigned int bitWidth = BITWIDTH * CHANNELNUM;
+    HDF_LOGI("TestAopSetAttrInvalidBitWidth: enter");
+    ret = AipSetAttr(chnId, channelCnt, bitWidth);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAopSetAttrInvalidBitWidth: AipSetAttr fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAopSetAttrInvalidBitWidth: success");
+    return HDF_SUCCESS;
+}
+
 int32_t TestAipSetSysCtlReg(void)
 {
     int ret;
@@ -423,14 +684,32 @@ int32_t TestAipSetSysCtlReg(void)
     unsigned int bitWidth = BITWIDTH;
     unsigned int rate = SAMPLERATE;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAipSetSysCtlReg: enter");
     ret = AipSetSysCtlReg(chnId, channelCnt, bitWidth, rate);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AipSetSysCtlReg fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAipSetSysCtlReg: AipSetSysCtlReg fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAipSetSysCtlReg: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAipSetSysCtlRegInvalidRate(void)
+{
+    int ret;
+    int32_t chnId = 0;
+    unsigned int channelCnt = CHANNELNUM;
+    unsigned int bitWidth = BITWIDTH;
+    unsigned int rate = AUDIO_SAMPLE_RATE_BUTT;
+
+    HDF_LOGI("TestAipSetSysCtlRegInvalidRate: enter");
+    ret = AipSetSysCtlReg(chnId, channelCnt, bitWidth, rate);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAipSetSysCtlRegInvalidRate: AipSetSysCtlReg fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAipSetSysCtlRegInvalidRate: success");
     return HDF_SUCCESS;
 }
 
@@ -441,32 +720,63 @@ int32_t TestAipSetAttr(void)
     unsigned int channelCnt = CHANNELNUM;
     unsigned int bitWidth = BITWIDTH;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAipSetAttr: enter");
     ret = AipSetAttr(chnId, channelCnt, bitWidth);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AipSetAttr fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAipSetAttr: AipSetAttr fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAipSetAttr: success");
     return HDF_SUCCESS;
 }
 
+int32_t TestAipSetAttrInvalidChannelCnt(void)
+{
+    int ret;
+    int32_t chnId = 0;
+    unsigned int channelCnt = CHANNELNUM * CHANNELNUM;
+    unsigned int bitWidth = BITWIDTH;
+    HDF_LOGI("TestAipSetAttrInvalidChannelCnt: enter");
+    ret = AipSetAttr(chnId, channelCnt, bitWidth);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAipSetAttrInvalidChannelCnt: AipSetAttr fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAipSetAttrInvalidChannelCnt: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestAipSetAttrInvalidBitWidth(void)
+{
+    int ret;
+    int32_t chnId = 0;
+    unsigned int channelCnt = CHANNELNUM;
+    unsigned int bitWidth = BITWIDTH * CHANNELNUM;
+    HDF_LOGI("TestAipSetAttrInvalidBitWidth: enter");
+    ret = AipSetAttr(chnId, channelCnt, bitWidth);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestAipSetAttrInvalidBitWidth: AipSetAttr fail ret = %d", ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGI("TestAipSetAttrInvalidBitWidth: success");
+    return HDF_SUCCESS;
+}
 
 int32_t TestAiaoDeviceInit(void)
 {
     int ret;
     int32_t chnId;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAiaoDeviceInit: enter");
     chnId = 0;
     ret = AiaoDeviceInit(chnId);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AiaoDeviceInit fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAiaoDeviceInit: AiaoDeviceInit fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAiaoDeviceInit: success");
     return HDF_SUCCESS;
 }
 
@@ -475,14 +785,14 @@ int32_t TestI2sCrgCfgInit(void)
     int ret;
     int32_t chnId;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestI2sCrgCfgInit: enter");
     chnId = 0;
     ret = I2sCrgCfgInit(chnId);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: I2sCrgCfgInit fail ret = %d", __func__, ret);
+        HDF_LOGE("TestI2sCrgCfgInit: I2sCrgCfgInit fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestI2sCrgCfgInit: success");
     return HDF_SUCCESS;
 }

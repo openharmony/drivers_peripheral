@@ -14,6 +14,7 @@
  */
 
 #include "hdf_audio_server_capture.h"
+#include "audio_hal_log.h"
 #include "hdf_audio_server_common.h"
 
 int32_t GetInitCaptureParaAttrs(struct HdfSBuf *data, struct AudioSampleAttributes *attrs)
@@ -574,24 +575,20 @@ int32_t HdiServiceCaptureCaptureFrame(const struct HdfDeviceIoClient *client,
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    HDF_LOGI("%{public}s: enter", __func__);
     char *frame = NULL;
-    uint64_t requestBytes, replyBytes;
+    uint64_t requestBytes = 0;
+    uint64_t replyBytes = 0;
     struct AudioCapture *capture = NULL;
     const char *adapterName = NULL;
-    uint32_t pid;
+    uint32_t pid = 0;
+    uint32_t index = 0;
     if (HdiServiceRenderCaptureReadData(data, &adapterName, &pid) < 0) {
         HDF_LOGE("%{public}s: HdiServiceRenderRenderFrame:HdiServiceRenderCaptureReadData fail!", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    int32_t ret = AudioAdapterListGetCapture(adapterName, &capture, pid);
+    int32_t ret = AudioAdapterFrameGetCapture(adapterName, &capture, pid, &index);
     if (ret < 0) {
         HDF_LOGE("%{public}s: AudioAdapterListGetRender fail", __func__);
-        return ret;
-    }
-    ret = AudioGetCaptureStatus(adapterName);
-    if (ret < 0) {
-        HDF_LOGE("%{public}s: AudioGetCaptureStatus fail", __func__);
         return ret;
     }
     if (!HdfSbufReadUint64(data, &requestBytes)) {
@@ -601,9 +598,9 @@ int32_t HdiServiceCaptureCaptureFrame(const struct HdfDeviceIoClient *client,
     if (frame == NULL) {
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
-    AudioSetCaptureStatus(adapterName, true);
+    AudioSetCaptureBusy(index, true);
     ret = capture->CaptureFrame((AudioHandle)capture, (void *)frame, requestBytes, &replyBytes);
-    AudioSetCaptureStatus(adapterName, false);
+    AudioSetCaptureBusy(index, false);
     if (ret < 0) {
         AudioMemFree((void **)&frame);
         return ret;
@@ -677,7 +674,7 @@ int32_t HdiServiceCaptureGetExtraParams(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
-    int32_t listLenth;
+    int32_t listLenth = 0;
     if (!HdfSbufReadInt32(data, &listLenth)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -774,15 +771,15 @@ int32_t HdiServiceCaptureDevDump(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
-
     int32_t range = 0;
-    int32_t fd = 0;
     if (!HdfSbufReadInt32(data, &range)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (!HdfSbufReadInt32(data, &fd)) {
+    ret = HdfSbufReadFileDescriptor(data);
+    if (ret < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
+    int32_t fd = ret;
     return capture->control.AudioDevDump((AudioHandle)capture, range, fd);
 }
 

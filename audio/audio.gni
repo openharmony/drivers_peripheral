@@ -4,6 +4,8 @@
 enable_audio_device_mpi = false
 #If set flag is false, the pathselect will be built; if set flag is true, the notSupport pathselect version will be built.
 enable_audio_hal_notsupport_pathselect = false
+#If set flag is false, the printf log will be built; if set flag is true, the hdf log version will be built.
+enable_audio_hal_hdf_log = true
 
 # testcase build switch
 #If flag is true, the ADM_SO version testcase will be built; if set flag is false, the other version will be built.

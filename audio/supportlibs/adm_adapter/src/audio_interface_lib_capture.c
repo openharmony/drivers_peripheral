@@ -14,6 +14,7 @@
  */
 
 #include "audio_interface_lib_capture.h"
+#include "audio_hal_log.h"
 
 /* virtual mixer device */
 #define AUDIODRV_CTL_CAPTUREELEM_IFACE_MIXER ((int32_t)2)

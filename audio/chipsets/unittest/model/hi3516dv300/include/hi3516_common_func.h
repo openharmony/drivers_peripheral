@@ -22,6 +22,7 @@ typedef enum {
     OUTER = 1,
 }AudioType;
 
+int32_t InitHwParam(struct AudioPcmHwParams *codecHwParam);
 int32_t GetAudioCard(struct AudioCard **card, AudioType *type);
 
 #ifdef __cplusplus

@@ -16,567 +16,1212 @@
 #include "audio_render_test.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "audio_internal.h"
+#include "audio_common_test.h"
 
 using namespace std;
+using namespace comfun;
 using namespace testing::ext;
 namespace {
-const int FREAM_DATA = 4096;
-
 class AudioRenderTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
+    struct AudioManager *managerFuncs = nullptr;
+    struct AudioAdapterDescriptor *descs = nullptr;
+    struct AudioAdapterDescriptor *desc = nullptr;
+    struct AudioAdapter *adapter = nullptr;
+    struct AudioDeviceDescriptor devDesc = {};
+    struct AudioSampleAttributes attrs = {};
+    struct AudioRender *render = nullptr;
+
+    virtual void SetUp();
+    virtual void TearDown();
 };
 
-void AudioRenderTest::SetUpTestCase()
+void AudioRenderTest::SetUp()
 {
+    managerFuncs = GetAudioManagerFuncs();
+    ASSERT_NE(managerFuncs, nullptr);
+    int32_t size = 0;
+    ASSERT_EQ(HDF_SUCCESS,  managerFuncs->GetAllAdapters(managerFuncs, &descs, &size));
+
+    desc = &descs[0];
+    ASSERT_EQ(HDF_SUCCESS, managerFuncs->LoadAdapter(managerFuncs, desc, &adapter));
+    ASSERT_EQ(HDF_SUCCESS, InitDevDesc(devDesc));
+    ASSERT_EQ(HDF_SUCCESS, InitAttrs(attrs));
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioAdapterCreateRender(adapter, &devDesc, &attrs, &render));
 }
 
-void AudioRenderTest::TearDownTestCase()
+void AudioRenderTest::TearDown()
 {
+    ASSERT_EQ(HDF_SUCCESS, AudioAdapterDestroyRender(adapter, render));
+    managerFuncs->UnloadAdapter(managerFuncs, adapter);
+    adapter = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenFrameRenderModeIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenFrameRenderModeIsNull, TestSize.Level1)
 {
     const struct AudioFrameRenderMode *frameRenderMode = nullptr;
-    uint64_t bytes = FREAM_DATA;
+    uint64_t bytes = FRAME_DATA;
     uint32_t frameCount = 0;
-    int32_t ret = PcmBytesToFrames(frameRenderMode, bytes, &frameCount);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(HDF_FAILURE, PcmBytesToFrames(frameRenderMode, bytes, &frameCount));
 }
 
-HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenFrameCountIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenFrameCountIsNull, TestSize.Level1)
 {
     const struct AudioFrameRenderMode *frameRenderMode = new struct AudioFrameRenderMode;
-    uint64_t bytes = FREAM_DATA;
+    uint64_t bytes = FRAME_DATA;
     uint32_t *frameCount = nullptr;
-    int32_t ret = PcmBytesToFrames(frameRenderMode, bytes, frameCount);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(HDF_FAILURE, PcmBytesToFrames(frameRenderMode, bytes, frameCount));
     delete(frameRenderMode);
     frameRenderMode = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenParamIsNotSupport, TestSize.Level0)
+HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenParamIsNotSupport, TestSize.Level1)
 {
     struct AudioFrameRenderMode *frameRenderMode = new struct AudioFrameRenderMode;
     frameRenderMode->attrs.format = AUDIO_FORMAT_AAC_MAIN;
-    uint64_t bytes = FREAM_DATA;
+    uint64_t bytes = FRAME_DATA;
     uint32_t frameCount = 0;
-    int32_t ret = PcmBytesToFrames((const struct AudioFrameRenderMode *)frameRenderMode, bytes, &frameCount);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT,
+        PcmBytesToFrames((const struct AudioFrameRenderMode *)frameRenderMode, bytes, &frameCount));
     delete(frameRenderMode);
     frameRenderMode = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenChannelCountIsZero, TestSize.Level0)
+HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenChannelCountIsZero, TestSize.Level1)
 {
     struct AudioFrameRenderMode *frameRenderMode = new struct AudioFrameRenderMode;
     frameRenderMode->attrs.format = AUDIO_FORMAT_PCM_8_BIT;
     frameRenderMode->attrs.channelCount = 0;
-    uint64_t bytes = FREAM_DATA;
+    uint64_t bytes = FRAME_DATA;
     uint32_t frameCount = 0;
-    int32_t ret = PcmBytesToFrames((const struct AudioFrameRenderMode *)frameRenderMode, bytes, &frameCount);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(HDF_FAILURE, PcmBytesToFrames((const struct AudioFrameRenderMode *)frameRenderMode, bytes, &frameCount));
     delete(frameRenderMode);
     frameRenderMode = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenParamIsVaild, TestSize.Level1)
 {
     struct AudioFrameRenderMode *frameRenderMode = new struct AudioFrameRenderMode;
     frameRenderMode->attrs.format = AUDIO_FORMAT_PCM_8_BIT;
     frameRenderMode->attrs.channelCount = 1;
-    uint64_t bytes = FREAM_DATA;
+    uint64_t bytes = FRAME_DATA;
     uint32_t frameCount = 0;
-    int32_t ret = PcmBytesToFrames((const struct AudioFrameRenderMode *)frameRenderMode, bytes, &frameCount);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, PcmBytesToFrames((const struct AudioFrameRenderMode *)frameRenderMode, bytes, &frameCount));
     delete(frameRenderMode);
     frameRenderMode = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderStartWhenHandleIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderStartWhenHandleIsNull, TestSize.Level1)
 {
     AudioHwRender *hwRender = nullptr;
     AudioHandle handle = (AudioHandle)hwRender;
-    int32_t ret = AudioRenderStart(handle);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderStart(handle));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderStopWhenHandleIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderStartWhenBufferIsNotNull, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    AudioHandle handle = (AudioHandle)hwRender;
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart(handle));
+    EXPECT_EQ(AUDIO_HAL_ERR_AO_BUSY, AudioRenderStart(handle));
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStop(handle));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderStartWhenDevDataHandleIsNull, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    struct DevHandle *devDataHandle = hwRender->devDataHandle;
+    hwRender->devDataHandle = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderStart(handle));
+    hwRender->devDataHandle = devDataHandle;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderStartWhenDevDataHandleIsError, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    struct DevHandle *devDataHandle = hwRender->devDataHandle;
+    struct HdfIoService *service = new HdfIoService;
+    hwRender->devDataHandle = (struct DevHandle *)service;
+    AudioHandle handle = (AudioHandle)hwRender;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderStart(handle));
+    hwRender->devDataHandle = devDataHandle;
+    delete(service);
+    service = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderStartWhenParamIsVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart(handle));
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStop(handle));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderStopWhenHandleIsNull, TestSize.Level1)
 {
     AudioHwRender *hwRender = nullptr;
     AudioHandle handle = (AudioHandle)hwRender;
-    int32_t ret = AudioRenderStop(handle);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderStop(handle));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderPauseWhenHandleIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderStopWhenBufferIsNull, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    hwRender->renderParam.frameRenderMode.buffer = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, AudioRenderStop(handle));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderStopWhenDevDataHandleIsNull, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    AudioHandle handle = (AudioHandle)hwRender;
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart(handle));
+    struct DevHandle *devDataHandle = hwRender->devDataHandle;
+    hwRender->devDataHandle = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderStop(handle));
+    hwRender->devDataHandle = devDataHandle;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderStopWhenDevDataHandleIsError, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    AudioHandle handle = (AudioHandle)hwRender;
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart(handle));
+    struct DevHandle *devDataHandle = hwRender->devDataHandle;
+    struct HdfIoService *service = new HdfIoService;
+    hwRender->devDataHandle = (struct DevHandle *)service;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderStop(handle));
+    hwRender->devDataHandle = devDataHandle;
+    delete(service);
+    service = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderStopWhenParamIsVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart(handle));
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStop(handle));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderPauseWhenHandleIsNull, TestSize.Level1)
 {
     AudioHwRender *hwRender = nullptr;
     AudioHandle handle = (AudioHandle)hwRender;
-    int32_t ret = AudioRenderPause(handle);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderPause(handle));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderResumeWhenHandleIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderPauseWhenBufferIsNull, TestSize.Level1)
+{
+    AudioHwRender *hwRender = (AudioHwRender *)render;
+    hwRender->renderParam.frameRenderMode.buffer = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderPause(handle));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderPauseWhenPauseIsTrue, TestSize.Level1)
+{
+    AudioHwRender *hwRender = (AudioHwRender *)render;
+    hwRender->renderParam.renderMode.ctlParam.pause = true;
+    AudioHandle handle = (AudioHandle)hwRender;
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart(handle));
+    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, AudioRenderPause(handle));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderPauseWhenDevDataHandleIsNull, TestSize.Level1)
+{
+    AudioHwRender *hwRender = (AudioHwRender *)render;
+    AudioHandle handle = (AudioHandle)hwRender;
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart(handle));
+    struct DevHandle *devDataHandle = hwRender->devDataHandle;
+    hwRender->devDataHandle = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderPause(handle));
+    hwRender->devDataHandle = devDataHandle;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderPauseWhenDevDataHandleIsError, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    AudioHandle handle = (AudioHandle)hwRender;
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart(handle));
+    struct DevHandle *devDataHandle = hwRender->devDataHandle;
+    struct HdfIoService *service = new HdfIoService;
+    hwRender->devDataHandle = (struct DevHandle *)service;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderPause(handle));
+    hwRender->devDataHandle = devDataHandle;
+    delete(service);
+    service = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderPauseWhenParamVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart(handle));
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderPause(handle));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderResumeWhenHandleIsNull, TestSize.Level1)
 {
     AudioHwRender *hwRender = nullptr;
     AudioHandle handle = (AudioHandle)hwRender;
-    int32_t ret = AudioRenderResume(handle);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderResume(handle));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderResumeWhenPauseIsFalse, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderResumeWhenPauseIsFalse, TestSize.Level1)
 {
-    struct AudioHwRender *hwRender = new AudioHwRender;
-    AudioHandle handle = (AudioHandle)hwRender;
+    AudioHandle handle = (AudioHandle)render;
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart(handle));
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     hwRender->renderParam.renderMode.ctlParam.pause = false;
-    int32_t ret = AudioRenderResume(handle);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
-    delete(hwRender);
-    hwRender = nullptr;
+    handle = (AudioHandle)hwRender;
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AudioRenderResume(handle));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderFlushWhenHandleIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderResumeWhenDevDataHandleIsNull, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    AudioHandle handle = (AudioHandle)hwRender;
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart(handle));
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderPause(handle));
+    struct DevHandle *devDataHandle = hwRender->devDataHandle;
+    hwRender->devDataHandle = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderResume(handle));
+    hwRender->devDataHandle = devDataHandle;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderResumeWhenDevDataHandleIsError, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    AudioHandle handle = (AudioHandle)hwRender;
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart(handle));
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderPause(handle));
+    struct DevHandle *devDataHandle = hwRender->devDataHandle;
+    struct HdfIoService *service = new HdfIoService;
+    hwRender->devDataHandle = (struct DevHandle *)service;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderResume(handle));
+    hwRender->devDataHandle = devDataHandle;
+    delete(service);
+    service = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderResumeWhenParamVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart(handle));
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderPause(handle));
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderResume(handle));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderFlushWhenHandleIsNull, TestSize.Level1)
 {
     AudioHwRender *hwRender = nullptr;
     AudioHandle handle = (AudioHandle)hwRender;
-    int32_t ret = AudioRenderFlush(handle);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderFlush(handle));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderFlushWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderFlushWhenParamIsVaild, TestSize.Level1)
 {
     AudioHwRender *hwRender = new AudioHwRender;
     AudioHandle handle = (AudioHandle)hwRender;
-    int32_t ret = AudioRenderFlush(handle);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AudioRenderFlush(handle));
     delete(hwRender);
     hwRender = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetFrameSizeWhenHandleIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetFrameSizeWhenHandleIsNull, TestSize.Level1)
 {
     AudioHwRender *hwRender = nullptr;
     AudioHandle handle = (AudioHandle)hwRender;
-    uint64_t sizeTmp = FREAM_DATA;
-    uint64_t *size = &sizeTmp;
-    int32_t ret = AudioRenderGetFrameSize(handle, size);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    uint64_t size = FRAME_DATA;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetFrameSize(handle, &size));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetFrameSizeWhenSizeIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetFrameSizeWhenSizeIsNull, TestSize.Level1)
 {
-    AudioHwRender *hwRender = new AudioHwRender;
-    AudioHandle handle = (AudioHandle)hwRender;
-    uint64_t *size = nullptr;
-    int32_t ret = AudioRenderGetFrameSize(handle, size);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(hwRender);
-    hwRender = nullptr;
+    AudioHandle handle = (AudioHandle)render;
+    uint64_t *frameSize = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetFrameSize(handle, frameSize));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetFrameSizeWhenParamIsNotSupport, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetFrameSizeWhenParamIsNotSupport, TestSize.Level1)
 {
-    AudioHwRender *hwRender = new AudioHwRender;
+    AudioHwRender *hwRender = (AudioHwRender *)render;
     hwRender->renderParam.frameRenderMode.attrs.format = AUDIO_FORMAT_AAC_MAIN;
     AudioHandle handle = (AudioHandle)hwRender;
-    uint64_t sizeTmp = FREAM_DATA;
-    uint64_t *size = &sizeTmp;
-    int32_t ret = AudioRenderGetFrameSize(handle, size);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
-    delete(hwRender);
-    hwRender = nullptr;
+    uint64_t frameSize = FRAME_DATA;
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AudioRenderGetFrameSize(handle, &frameSize));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetFrameSizeWhenParamVaild, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetFrameSizeWhenParamVaild, TestSize.Level1)
 {
-    AudioHwRender *hwRender = new AudioHwRender;
-    hwRender->renderParam.frameRenderMode.attrs.format = AUDIO_FORMAT_PCM_8_BIT;
-    AudioHandle handle = (AudioHandle)hwRender;
-    uint64_t sizeTmp = FREAM_DATA;
-    uint64_t *size = &sizeTmp;
-    int32_t ret = AudioRenderGetFrameSize(handle, size);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    delete(hwRender);
-    hwRender = nullptr;
+    AudioHandle handle = (AudioHandle)render;
+    uint64_t frameSize = FRAME_DATA;
+    EXPECT_EQ(HDF_SUCCESS, AudioRenderGetFrameSize(handle, &frameSize));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetFrameCountWhenHandleIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetFrameCountWhenHandleIsNull, TestSize.Level1)
 {
     AudioHwRender *hwRender = nullptr;
     AudioHandle handle = (AudioHandle)hwRender;
-    uint64_t countTmp = FREAM_DATA;
-    uint64_t *count = &countTmp;
-    int32_t ret = AudioRenderGetFrameCount(handle, count);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    uint64_t count = FRAME_DATA;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetFrameCount(handle, &count));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetFrameCountWhenCountIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetFrameCountWhenCountIsNull, TestSize.Level1)
 {
-    AudioHwRender *hwRender = new AudioHwRender;
-    AudioHandle handle = (AudioHandle)hwRender;
+    AudioHandle handle = (AudioHandle)render;
     uint64_t *count = nullptr;
-    int32_t ret = AudioRenderGetFrameCount(handle, count);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(hwRender);
-    hwRender = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetFrameCount(handle, count));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetFrameCountWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetFrameCountWhenParamIsVaild, TestSize.Level1)
 {
-    AudioHwRender *hwRender = new AudioHwRender;
-    AudioHandle handle = (AudioHandle)hwRender;
-    uint64_t countTmp = FREAM_DATA;
-    uint64_t *count = &countTmp;
-    int32_t ret = AudioRenderGetFrameCount(handle, count);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    delete(hwRender);
-    hwRender = nullptr;
+    AudioHandle handle = (AudioHandle)render;
+    uint64_t count = FRAME_DATA;
+    EXPECT_EQ(HDF_SUCCESS, AudioRenderGetFrameCount(handle, &count));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderSetSampleAttributesWhenHandleIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderSetSampleAttributesWhenHandleIsNull, TestSize.Level1)
 {
     AudioHwRender *hwRender = nullptr;
     AudioHandle handle = (AudioHandle)hwRender;
     AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    int32_t ret = AudioRenderSetSampleAttributes(handle, attrs);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderSetSampleAttributes(handle, attrs));
     delete(attrs);
     attrs = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderSetSampleAttributesWhenAttrsIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderSetSampleAttributesWhenAttrsIsNull, TestSize.Level1)
 {
-    AudioHwRender *hwRender = new AudioHwRender;
-    AudioHandle handle = (AudioHandle)hwRender;
-    AudioSampleAttributes *attrs = nullptr;
-    int32_t ret = AudioRenderSetSampleAttributes(handle, attrs);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(hwRender);
-    hwRender = nullptr;
+    AudioHandle handle = (AudioHandle)render;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderSetSampleAttributes(handle, nullptr));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetSampleAttributesWhenHandleIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderSetSampleAttributesWhenDevDataHandleIsNull, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    struct DevHandle *devDataHandle = hwRender->devDataHandle;
+    hwRender->devDataHandle = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderSetSampleAttributes(handle, &attrs));
+    hwRender->devDataHandle = devDataHandle;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetSampleAttributesWhenFormatIsError, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    attrs.format = AUDIO_FORMAT_G711A;
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AudioRenderSetSampleAttributes(handle, &attrs));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetSampleAttributesWhenDevDataHandleIsError, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    struct DevHandle *devDataHandle = hwRender->devDataHandle;
+    struct HdfIoService *service = new HdfIoService;
+    hwRender->devDataHandle = (struct DevHandle *)service;
+    AudioHandle handle = (AudioHandle)hwRender;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderSetSampleAttributes(handle, &attrs));
+    hwRender->devDataHandle = devDataHandle;
+    delete(service);
+    service = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetSampleAttributesWhenParamIsVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderSetSampleAttributes(handle, &attrs));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetSampleAttributesWhenHandleIsNull, TestSize.Level1)
 {
     AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    int32_t ret = AudioRenderGetSampleAttributes(nullptr, attrs);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetSampleAttributes(nullptr, attrs));
     delete(attrs);
     attrs = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetSampleAttributesWhenAttrsIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetSampleAttributesWhenAttrsIsNull, TestSize.Level1)
 {
-    AudioHwRender *hwRender = new AudioHwRender;
-    AudioHandle handle = (AudioHandle)hwRender;
-    int32_t ret = AudioRenderGetSampleAttributes(handle, nullptr);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(hwRender);
-    hwRender = nullptr;
+    AudioHandle handle = (AudioHandle)render;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetSampleAttributes(handle, nullptr));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetSampleAttributesWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetSampleAttributesWhenParamIsVaild, TestSize.Level1)
 {
-    AudioHwRender *hwRender = new AudioHwRender;
-    AudioHandle handle = (AudioHandle)hwRender;
-    AudioSampleAttributes *attrs = new AudioSampleAttributes;
-    int32_t ret = AudioRenderGetSampleAttributes(handle, attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    delete(hwRender);
-    hwRender = nullptr;
-    delete(attrs);
-    attrs = nullptr;
+    AudioHandle handle = (AudioHandle)render;
+    EXPECT_EQ(HDF_SUCCESS, AudioRenderGetSampleAttributes(handle, &attrs));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetCurrentChannelIdWhenHandleIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetCurrentChannelIdWhenHandleIsNull, TestSize.Level1)
 {
     AudioHwRender *hwRender = nullptr;
     AudioHandle handle = (AudioHandle)hwRender;
     uint32_t channelIdOne = 1;
     uint32_t *channelId = &channelIdOne;
-    int32_t ret = AudioRenderGetCurrentChannelId(handle, channelId);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetCurrentChannelId(handle, channelId));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetCurrentChannelIdWhenChannelIdIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetCurrentChannelIdWhenChannelIdIsNull, TestSize.Level1)
 {
-    AudioHwRender *hwRender = new AudioHwRender;
-    AudioHandle handle = (AudioHandle)hwRender;
+    AudioHandle handle = (AudioHandle)render;
     uint32_t *channelId = nullptr;
-    int32_t ret = AudioRenderGetCurrentChannelId(handle, channelId);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete hwRender;
-    hwRender = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetCurrentChannelId(handle, channelId));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetCurrentChannelIdWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetCurrentChannelIdWhenParamIsVaild, TestSize.Level1)
 {
-    AudioHwRender *hwRender = new AudioHwRender;
-    AudioHandle handle = (AudioHandle)hwRender;
-    uint32_t channelIdOne = 1;
-    uint32_t *channelId = &channelIdOne;
-    int32_t ret = AudioRenderGetCurrentChannelId(handle, channelId);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    delete hwRender;
-    hwRender = nullptr;
+    AudioHandle handle = (AudioHandle)render;
+    uint32_t channelId = 1;
+    EXPECT_EQ(HDF_SUCCESS, AudioRenderGetCurrentChannelId(handle, &channelId));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderCheckSceneCapabilityWhenHandleIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderCheckSceneCapabilityWhenHandleIsNull, TestSize.Level1)
 {
     AudioHwRender *hwRender = nullptr;
     AudioHandle handle = (AudioHandle)hwRender;
     const struct AudioSceneDescriptor *scene = new struct AudioSceneDescriptor;
     bool supported = false;
-    int32_t ret = AudioRenderCheckSceneCapability(handle, scene, &supported);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderCheckSceneCapability(handle, scene, &supported));
     delete(scene);
     scene = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderCheckSceneCapabilityWhenSceneIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderCheckSceneCapabilityWhenSceneIsNull, TestSize.Level1)
 {
-    AudioHwRender *hwRender = new AudioHwRender;
-    AudioHandle handle = (AudioHandle)hwRender;
+    AudioHandle handle = (AudioHandle)render;
     const struct AudioSceneDescriptor *scene = nullptr;
     bool supported = false;
-    int32_t ret = AudioRenderCheckSceneCapability(handle, scene, &supported);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(hwRender);
-    hwRender = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderCheckSceneCapability(handle, scene, &supported));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderCheckSceneCapabilityWhenSupportedIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderCheckSceneCapabilityWhenSupportedIsNull, TestSize.Level1)
 {
-    AudioHwRender *hwRender = new AudioHwRender;
-    AudioHandle handle = (AudioHandle)hwRender;
+    AudioHandle handle = (AudioHandle)render;
     const struct AudioSceneDescriptor *scene = new struct AudioSceneDescriptor;
     bool *supported = nullptr;
-    int32_t ret = AudioRenderCheckSceneCapability(handle, scene, supported);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(hwRender);
-    hwRender = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderCheckSceneCapability(handle, scene, supported));
     delete(scene);
     scene = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderSelectSceneWhenHandleIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderCheckSceneCapabilityWhenPinsIsError, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = AUDIO_IN_MEDIA;
+    scene.desc.pins = PIN_NONE;
+    bool supported = false;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderCheckSceneCapability(handle, &scene, &supported));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderCheckSceneCapabilityWhenParamVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = AUDIO_IN_MEDIA;
+    scene.desc.pins = PIN_OUT_SPEAKER;
+    bool supported = false;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderCheckSceneCapability(handle, &scene, &supported));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSelectSceneWhenHandleIsNull, TestSize.Level1)
 {
     AudioHwRender *hwRender = nullptr;
     AudioHandle handle = (AudioHandle)hwRender;
     const struct AudioSceneDescriptor *scene = new struct AudioSceneDescriptor;
-    int32_t ret = AudioRenderSelectScene(handle, scene);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderSelectScene(handle, scene));
     delete(scene);
     scene = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderSelectSceneWhenSceneIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderSelectSceneWhenSceneIsNull, TestSize.Level1)
 {
-    AudioHwRender *hwRender = new AudioHwRender;
-    AudioHandle handle = (AudioHandle)hwRender;
+    AudioHandle handle = (AudioHandle)render;
     const struct AudioSceneDescriptor *scene = nullptr;
-    int32_t ret = AudioRenderSelectScene(handle, scene);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(hwRender);
-    hwRender = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderSelectScene(handle, scene));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderSetMuteWhenHandleIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderSelectSceneWhenDevCtlHandleIsNull, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    hwRender->devCtlHandle = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    struct AudioSceneDescriptor *scene = new AudioSceneDescriptor;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderSelectScene(handle, scene));
+    hwRender->devCtlHandle = devCtlHandle;
+    delete(scene);
+    scene = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSelectSceneWhenDevCtlHandleIsError, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    struct HdfIoService *service = new HdfIoService;
+    hwRender->devCtlHandle = (struct DevHandle *)service;
+    AudioHandle handle = (AudioHandle)hwRender;
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = AUDIO_IN_MEDIA;
+    scene.desc.pins = PIN_OUT_SPEAKER;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderSelectScene(handle, &scene));
+    hwRender->devCtlHandle = devCtlHandle;
+    delete(service);
+    service = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSelectSceneWhenParamVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = AUDIO_IN_MEDIA;
+    scene.desc.pins = PIN_OUT_SPEAKER;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderSelectScene(handle, &scene));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetMuteWhenHandleIsNull, TestSize.Level1)
 {
     AudioHwRender *hwRender = nullptr;
     AudioHandle handle = (AudioHandle)hwRender;
     bool mute = true;
-    int32_t ret = AudioRenderSetMute(handle, mute);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderSetMute(handle, mute));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetMuteWhenHandleIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderSetMuteWhenDevCtlHandleIsNull, TestSize.Level1)
+{
+    AudioHwRender *hwRender = (AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    hwRender->devCtlHandle = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    bool mute = true;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderSetMute(handle, mute));
+    hwRender->devCtlHandle = devCtlHandle;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetMuteWhenDevCtlHandleIsError, TestSize.Level1)
+{
+    AudioHwRender *hwRender = (AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    struct HdfIoService *service = new HdfIoService;
+    hwRender->devCtlHandle = (struct DevHandle *)service;
+    AudioHandle handle = (AudioHandle)hwRender;
+    bool mute = true;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderSetMute(handle, mute));
+    hwRender->devCtlHandle = devCtlHandle;
+    delete(service);
+    service = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetMuteWhenParamVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    bool mute = true;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderSetMute(handle, mute));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetMuteWhenHandleIsNull, TestSize.Level1)
 {
     AudioHwRender *hwRender = nullptr;
     AudioHandle handle = (AudioHandle)hwRender;
     bool mute = false;
-    int32_t ret = AudioRenderGetMute(handle, &mute);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetMute(handle, &mute));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetMuteWhenMuteIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetMuteWhenMuteIsNull, TestSize.Level1)
 {
-    AudioHwRender *hwRender = new AudioHwRender;
-    AudioHandle handle = (AudioHandle)hwRender;
+    AudioHandle handle = (AudioHandle)render;
     bool *mute = nullptr;
-    int32_t ret = AudioRenderGetMute(handle, mute);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(hwRender);
-    hwRender = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetMute(handle, mute));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetLatencyWhenRenderIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetMuteWhenDevCtlHandleIsNull, TestSize.Level1)
 {
-    struct AudioRender *render = nullptr;
-    uint32_t msTmp = 96;
-    uint32_t *ms = &msTmp;
-    int32_t ret = AudioRenderGetLatency(render, ms);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    AudioHwRender *hwRender = (AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    hwRender->devCtlHandle = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    bool mute = false;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderGetMute(handle, &mute));
+    hwRender->devCtlHandle = devCtlHandle;
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetLatencyWhenMsIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetMuteWhenDevCtlHandleIsError, TestSize.Level1)
 {
-    struct AudioRender *render = new AudioRender;
+    AudioHwRender *hwRender = (AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    struct HdfIoService *service = new HdfIoService;
+    hwRender->devCtlHandle = (struct DevHandle *)service;
+    AudioHandle handle = (AudioHandle)hwRender;
+    bool mute = true;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderGetMute(handle, &mute));
+    hwRender->devCtlHandle = devCtlHandle;
+    delete(service);
+    service = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetMuteWhenParamVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    bool mute = false;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderGetMute(handle, &mute));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetVolumeWhenHandleIsNull, TestSize.Level1)
+{
+    AudioHwRender *hwRender = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    float volume = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderSetVolume(handle, volume));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetVolumeWhenVolumeLessThanZero, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    float volume = -1;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderSetVolume(handle, volume));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetVolumeWhenDevCtlHandleIsNull, TestSize.Level1)
+{
+    AudioHwRender *hwRender = (AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    hwRender->devCtlHandle = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    float volume = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderSetVolume(handle, volume));
+    hwRender->devCtlHandle = devCtlHandle;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetVolumeWhenHandleIsError, TestSize.Level1)
+{
+    AudioHwRender *hwRender = (AudioHwRender *)render;
+    hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax = 0;
+    hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin = 1;
+    AudioHandle handle = (AudioHandle)render;
+    float volume = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderSetVolume(handle, volume));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetVolumeWhenDevCtlHandleIsError, TestSize.Level1)
+{
+    AudioHwRender *hwRender = (AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    struct HdfIoService *service = new HdfIoService;
+    hwRender->devCtlHandle = (struct DevHandle *)service;
+    AudioHandle handle = (AudioHandle)hwRender;
+    float volume = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderSetVolume(handle, volume));
+    hwRender->devCtlHandle = devCtlHandle;
+    delete(service);
+    service = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetVolumeWhenParamVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    float volume = 0;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderSetVolume(handle, volume));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetVolumeWhenHandleIsNull, TestSize.Level1)
+{
+    AudioHwRender *hwRender = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    float volume = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetVolume(handle, &volume));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetVolumeWhenVolumeIsNull, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    float *volume = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetVolume(handle, volume));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetVolumeWhenDevCtlHandleIsNull, TestSize.Level1)
+{
+    AudioHwRender *hwRender = (AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    hwRender->devCtlHandle = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    float volume = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderGetVolume(handle, &volume));
+    hwRender->devCtlHandle = devCtlHandle;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetVolumeWhenDevCtlHandleIsError, TestSize.Level1)
+{
+    AudioHwRender *hwRender = (AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    struct HdfIoService *service = new HdfIoService;
+    hwRender->devCtlHandle = (struct DevHandle *)service;
+    AudioHandle handle = (AudioHandle)hwRender;
+    float volume = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderGetVolume(handle, &volume));
+    hwRender->devCtlHandle = devCtlHandle;
+    delete(service);
+    service = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetVolumeWhenVolumeIsError, TestSize.Level1)
+{
+    AudioHwRender *hwRender = (AudioHwRender *)render;
+    hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax = 1;
+    hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin = 1;
+    AudioHandle handle = (AudioHandle)render;
+    float volume = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderGetVolume(handle, &volume));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetVolumeWhenParamVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    float volume = 0;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderGetVolume(handle, &volume));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetGainThresholdWhenRenderIsNull, TestSize.Level1)
+{
+    AudioHwRender *hwRender = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    float min = GAIN_MIN;
+    float max = GAIN_MAX;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetGainThreshold(handle, &min, &max));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetGainThresholdWhenMinIsNull, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    float *min = nullptr;
+    float max = GAIN_MAX;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetGainThreshold(handle, min, &max));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetGainThresholdWhenMaxIsNull, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    float min = GAIN_MIN;
+    float *max = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetGainThreshold(handle, &min, max));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetGainThresholdWhenDevCtlHandleIsNull, TestSize.Level1)
+{
+    AudioHwRender *hwRender = (AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    hwRender->devCtlHandle = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    float min = GAIN_MIN;
+    float max = GAIN_MAX;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderGetGainThreshold(handle, &min, &max));
+    hwRender->devCtlHandle = devCtlHandle;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetGainThresholdWhenDevCtlHandleIsError, TestSize.Level1)
+{
+    AudioHwRender *hwRender = (AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    struct HdfIoService *service = new HdfIoService;
+    hwRender->devCtlHandle = (struct DevHandle *)service;
+    AudioHandle handle = (AudioHandle)hwRender;
+    float min = GAIN_MIN;
+    float max = GAIN_MAX;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderGetGainThreshold(handle, &min, &max));
+    hwRender->devCtlHandle = devCtlHandle;
+    delete(service);
+    service = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetGainThresholdWhenParamVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    float min = GAIN_MIN;
+    float max = GAIN_MAX;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderGetGainThreshold(handle, &min, &max));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetGainWhenHandleIsNull, TestSize.Level1)
+{
+    AudioHwRender *hwRender = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    float gain = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetGain(handle, &gain));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetGainWhenGainIsNull, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    float *gain = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetGain(handle, gain));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetGainWhenDevCtlHandleIsNull, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    hwRender->devCtlHandle = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    float gain = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderGetGain(handle, &gain));
+    hwRender->devCtlHandle = devCtlHandle;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetGainWhenDevCtlHandleIsError, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    struct HdfIoService *service = new HdfIoService;
+    hwRender->devCtlHandle = (struct DevHandle *)service;
+    AudioHandle handle = (AudioHandle)hwRender;
+    float gain = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderGetGain(handle, &gain));
+    hwRender->devCtlHandle = devCtlHandle;
+    delete(service);
+    service = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetGainWhenParamVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    float gain = 0;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderGetGain(handle, &gain));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetGainWhenHandleIsNull, TestSize.Level1)
+{
+    AudioHwRender *hwRender = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    float gain = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderSetGain(handle, gain));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetGainWhenGainIsLessThanZero, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    float gain = -1;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderSetGain(handle, gain));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetGainWhenDevCtlHandleIsNull, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    hwRender->devCtlHandle = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    float gain = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderSetGain(handle, gain));
+    hwRender->devCtlHandle = devCtlHandle;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetGainWhenDevCtlHandleIsError, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    struct HdfIoService *service = new HdfIoService;
+    hwRender->devCtlHandle = (struct DevHandle *)service;
+    AudioHandle handle = (AudioHandle)hwRender;
+    float gain = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderSetGain(handle, gain));
+    hwRender->devCtlHandle = devCtlHandle;
+    delete(service);
+    service = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetGainWhenParamVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    float gain = 0;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderSetGain(handle, gain));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetLatencyWhenRenderIsNull, TestSize.Level1)
+{
+    struct AudioRender *utRender = nullptr;
+    uint32_t ms = 96;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetLatency(utRender, &ms));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetLatencyWhenMsIsNull, TestSize.Level1)
+{
     uint32_t *ms = nullptr;
-    int32_t ret = AudioRenderGetLatency(render, ms);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(render);
-    render = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetLatency(render, ms));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderRenderFrameWhenRenderIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetLatencyWhenByteRateIsZero, TestSize.Level1)
 {
-    struct AudioRender *render = nullptr;
-    void *frame = (void *)calloc(1, FREAM_DATA);
-    uint64_t requestBytes = FREAM_DATA;
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    hwRender->renderParam.frameRenderMode.byteRate = 0;
+    uint32_t ms = 96;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderGetLatency((struct AudioRender *)hwRender, &ms));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetLatencyWhenParamVaild, TestSize.Level1)
+{
+    uint32_t ms = 96;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderGetLatency(render, &ms));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderRenderFrameWhenRenderIsNull, TestSize.Level1)
+{
+    struct AudioRender *utRender = nullptr;
+    void *frame = (void *)calloc(1, FRAME_DATA);
+    ASSERT_NE(nullptr, frame);
+    uint64_t requestBytes = FRAME_DATA;
     uint64_t replyBytes;
-    int32_t ret = AudioRenderRenderFrame(render, (const void*)frame, requestBytes, &replyBytes);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM,
+        AudioRenderRenderFrame(utRender, (const void*)frame, requestBytes, &replyBytes));
     free(frame);
     frame = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderRenderFrameWhenFrameIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderRenderFrameWhenFrameIsNull, TestSize.Level1)
 {
-    struct AudioRender *render = new AudioRender;
-    const void *frame = nullptr;
-    uint64_t requestBytes = FREAM_DATA;
+    void *frame = nullptr;
+    uint64_t requestBytes = FRAME_DATA;
     uint64_t replyBytes;
-    int32_t ret = AudioRenderRenderFrame(render, frame, requestBytes, &replyBytes);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(render);
-    render = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM,
+        AudioRenderRenderFrame(render, (const void*)frame, requestBytes, &replyBytes));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderRenderFrameWhenReplyBytesIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderRenderFrameWhenReplyBytesIsNull, TestSize.Level1)
 {
-    struct AudioRender *render = new AudioRender;
-    void *frame = (void *)calloc(1, FREAM_DATA);
-    uint64_t requestBytes = FREAM_DATA;
+    void *frame = (void *)calloc(1, FRAME_DATA);
+    ASSERT_NE(nullptr, frame);
+    uint64_t requestBytes = FRAME_DATA;
     uint64_t *replyBytes = nullptr;
-    int32_t ret = AudioRenderRenderFrame(render, (const void*)frame, requestBytes, replyBytes);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(render);
-    render = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM,
+        AudioRenderRenderFrame(render, (const void*)frame, requestBytes, replyBytes));
     free(frame);
     frame = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetRenderPositionWhenRenderIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderRenderFrameWhenRequestBytesGreaterThan16K, TestSize.Level1)
 {
-    struct AudioRender *render = nullptr;
-    uint64_t frameTmp = 1024;
-    uint64_t *frames = &frameTmp;
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart((AudioHandle)render));
+    void *frame = (void *)calloc(1, FRAME_DATA);
+    ASSERT_NE(nullptr, frame);
+    uint64_t requestBytes = FRAME_DATA + 1;
+    uint64_t replyBytes;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL,
+        AudioRenderRenderFrame(render, (const void*)frame, requestBytes, &replyBytes));
+    free(frame);
+    frame = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderRenderFrameWhenFormatIsNotSupport, TestSize.Level1)
+{
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart((AudioHandle)render));
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    hwRender->renderParam.frameRenderMode.attrs.format = AUDIO_FORMAT_AAC_MAIN;
+    void *frame = (void *)calloc(1, FRAME_DATA);
+    ASSERT_NE(nullptr, frame);
+    uint64_t requestBytes = FRAME_DATA;
+    uint64_t replyBytes;
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT,
+        AudioRenderRenderFrame(render, (const void*)frame, requestBytes, &replyBytes));
+    free(frame);
+    frame = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderRenderFrameWhenDevDataHandleIsNull, TestSize.Level1)
+{
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart((AudioHandle)render));
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    struct DevHandle *devDataHandle = hwRender->devDataHandle;
+    hwRender->devDataHandle = nullptr;
+    void *frame = (void *)calloc(1, FRAME_DATA);
+    ASSERT_NE(nullptr, frame);
+    uint64_t requestBytes = FRAME_DATA;
+    uint64_t replyBytes;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL,
+        AudioRenderRenderFrame(render, (const void*)frame, requestBytes, &replyBytes));
+    hwRender->devDataHandle = devDataHandle;
+    free(frame);
+    frame = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderRenderFrameWhenSampleRateIsZero, TestSize.Level1)
+{
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart((AudioHandle)render));
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    hwRender->renderParam.frameRenderMode.attrs.sampleRate = 0;
+    void *frame = (void *)calloc(1, FRAME_DATA);
+    ASSERT_NE(nullptr, frame);
+    uint64_t requestBytes = FRAME_DATA;
+    uint64_t replyBytes;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderRenderFrame(render, (const void*)frame, requestBytes, &replyBytes));
+    free(frame);
+    frame = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderRenderFrameWhenParamIsVaild, TestSize.Level1)
+{
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart((AudioHandle)render));
+    void *frame = (void *)calloc(1, FRAME_DATA);
+    ASSERT_NE(nullptr, frame);
+    uint64_t requestBytes = FRAME_DATA;
+    uint64_t replyBytes;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderRenderFrame(render, (const void*)frame, requestBytes, &replyBytes));
+    free(frame);
+    frame = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetRenderPositionWhenRenderIsNull, TestSize.Level1)
+{
+    struct AudioRender *utRender = nullptr;
+    uint64_t frames = 1024;
     struct AudioTimeStamp *time = new AudioTimeStamp;
-    int32_t ret = AudioRenderGetRenderPosition(render, frames, time);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetRenderPosition(utRender, &frames, time));
     delete(time);
     time = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetRenderPositionWhenFramesIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetRenderPositionWhenFramesIsNull, TestSize.Level1)
 {
-    struct AudioRender *render = new AudioRender;
     uint64_t *frames = nullptr;
     struct AudioTimeStamp *time = new AudioTimeStamp;
-    int32_t ret = AudioRenderGetRenderPosition(render, frames, time);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(render);
-    render = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetRenderPosition(render, frames, time));
     delete(time);
     time = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetRenderPositionWhenTimeIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetRenderPositionWhenTimeIsNull, TestSize.Level1)
 {
-    struct AudioRender *render = new AudioRender;
-    uint64_t frameTmp = 1024;
-    uint64_t *frames = &frameTmp;
+    uint64_t frames = 1024;
     struct AudioTimeStamp *time = nullptr;
-    int32_t ret = AudioRenderGetRenderPosition(render, frames, time);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(render);
-    render = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetRenderPosition(render, &frames, time));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetRenderPositionWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetRenderPositionWhenParamIsVaild, TestSize.Level1)
 {
-    struct AudioRender *render = new AudioRender;
-    uint64_t frameTmp = 1024;
-    uint64_t *frames = &frameTmp;
+    uint64_t frames = 1024;
     struct AudioTimeStamp *time = new AudioTimeStamp;
-    int32_t ret = AudioRenderGetRenderPosition(render, frames, time);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    delete(render);
-    render = nullptr;
+    EXPECT_EQ(HDF_SUCCESS, AudioRenderGetRenderPosition(render, &frames, time));
     delete(time);
     time = nullptr;
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetRenderSpeedWhenRenderIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderSetRenderSpeedWhenRenderIsNull, TestSize.Level1)
 {
-    struct AudioRender *render = nullptr;
-    float speedTmp = 1.0;
-    float *speed = &speedTmp;
-    int32_t ret = AudioRenderGetRenderSpeed(render, speed);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    struct AudioRender *utRender = nullptr;
+    float speed = 1.0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderSetRenderSpeed(utRender, speed));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetRenderSpeedWhenSpeedIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderSetRenderSpeedWhenParamIsVaild, TestSize.Level1)
 {
-    struct AudioRender *render = new AudioRender;
+    float speed = 1.0;
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AudioRenderSetRenderSpeed(render, speed));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetRenderSpeedWhenRenderIsNull, TestSize.Level1)
+{
+    struct AudioRender *utRender = nullptr;
+    float speed = 1.0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetRenderSpeed(utRender, &speed));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetRenderSpeedWhenSpeedIsNull, TestSize.Level1)
+{
     float *speed = nullptr;
-    int32_t ret = AudioRenderGetRenderSpeed(render, speed);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(render);
-    render = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetRenderSpeed(render, speed));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderGetRenderSpeedWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderGetRenderSpeedWhenParamIsVaild, TestSize.Level1)
 {
-    struct AudioRender *render = new AudioRender;
-    float speedTmp = 1.0;
-    float *speed = &speedTmp;
-    int32_t ret = AudioRenderGetRenderSpeed(render, speed);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
-    delete(render);
-    render = nullptr;
-}
-HWTEST_F(AudioRenderTest, AudioRenderDrainBufferWhenRenderIsNull, TestSize.Level0)
-{
-    AudioRender *render = nullptr;
-    AudioDrainNotifyType *type = new AudioDrainNotifyType;
-    int32_t ret = AudioRenderDrainBuffer(render, type);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(type);
-    type = nullptr;
+    float speed = 1.0;
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AudioRenderGetRenderSpeed(render, &speed));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderDrainBufferWhenTypeIsNull, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderSetChannelModeWhenRenderIsNull, TestSize.Level1)
 {
-    AudioRender *render = new AudioRender;
+    struct AudioRender *utRender = nullptr;
+    enum AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderSetChannelMode(utRender, mode));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetChannelModeWhenDevCtlHandleIsNull, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    hwRender->devCtlHandle = nullptr;
+    enum AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderSetChannelMode((struct AudioRender *)hwRender, mode));
+    hwRender->devCtlHandle = devCtlHandle;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetChannelModeWhenDevCtlHandleIsError, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    struct HdfIoService *service = new HdfIoService;
+    hwRender->devCtlHandle = (struct DevHandle *)service;
+    enum AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderSetChannelMode((struct AudioRender *)hwRender, mode));
+    hwRender->devCtlHandle = devCtlHandle;
+    delete(service);
+    service = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderSetChannelModeWhenParamIsVaild, TestSize.Level1)
+{
+    enum AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderSetChannelMode(render, mode));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetChannelModeWhenRenderIsNull, TestSize.Level1)
+{
+    struct AudioRender *utRender = nullptr;
+    enum AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetChannelMode(utRender, &mode));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetChannelModeWhenModeIsNull, TestSize.Level1)
+{
+    enum AudioChannelMode *mode = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetChannelMode(render, mode));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetChannelModeWhenDevCtlHandleIsNull, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    hwRender->devCtlHandle = nullptr;
+    enum AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderGetChannelMode((struct AudioRender *)hwRender, &mode));
+    hwRender->devCtlHandle = devCtlHandle;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetChannelModeWhenDevCtlHandleIsError, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
+    struct HdfIoService *service = new HdfIoService;
+    hwRender->devCtlHandle = (struct DevHandle *)service;
+    enum AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderGetChannelMode((struct AudioRender *)hwRender, &mode));
+    hwRender->devCtlHandle = devCtlHandle;
+    delete(service);
+    service = nullptr;
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderGetChannelModeWhenParamIsVaild, TestSize.Level1)
+{
+    enum AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderGetChannelMode(render, &mode));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderDrainBufferWhenTypeIsNull, TestSize.Level1)
+{
     AudioDrainNotifyType *type = nullptr;
-    int32_t ret = AudioRenderDrainBuffer(render, type);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    delete(render);
-    render = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderDrainBuffer(render, type));
 }
 
-HWTEST_F(AudioRenderTest, AudioRenderDrainBufferWhenParamIsNotSupport, TestSize.Level0)
+HWTEST_F(AudioRenderTest, AudioRenderDrainBufferWhenParamIsNotSupport, TestSize.Level1)
 {
-    AudioRender *render = new AudioRender;
     AudioDrainNotifyType *type = new AudioDrainNotifyType;
-    int32_t ret = AudioRenderDrainBuffer(render, type);
-    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, ret);
-    delete(render);
-    render = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, AudioRenderDrainBuffer(render, type));
     delete(type);
     type = nullptr;
 }

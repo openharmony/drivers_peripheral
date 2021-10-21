@@ -18,6 +18,13 @@ extern "C" {
 
 int32_t TestAudioPlatformDeviceInit(void);
 int32_t TestPlatformHwParams(void);
+int32_t TestPlatformInvalidChannelsParam(void);
+int32_t TestPlatformInvalidStreamTypeParam(void);
+int32_t TestPlatformInvalidRenderPeriodCountParam(void);
+int32_t TestPlatformInvalidRenderPeriodSizeParam(void);
+int32_t TestPlatformInvalidCaptuerPeriodCountParam(void);
+int32_t TestPlatformInvalidCaptuerPeriodSizeParam(void);
+int32_t TestPlatformInvalidCaptuerSilenceThresholdParam(void);
 int32_t TestPlatformRenderPrepare(void);
 int32_t TestPlatformCapturePrepare(void);
 int32_t TestPlatformWrite(void);

@@ -14,7 +14,10 @@
  */
 
 #include "audio_internal.h"
+#include "audio_hal_log.h"
 #include "osal_time.h"
+
+#define HDF_LOG_TAG hal_audio_common
 
 void AudioDlClose(void **ppHandleSo)
 {
@@ -88,7 +91,7 @@ int32_t CheckAttrFormat(enum AudioFormat param)
 
 int32_t AudioCheckParaAttr(const struct AudioSampleAttributes *attrs)
 {
-    if (NULL == attrs) {
+    if (attrs == NULL) {
         return HDF_FAILURE;
     }
     int32_t ret;
@@ -107,10 +110,10 @@ int32_t AudioCheckParaAttr(const struct AudioSampleAttributes *attrs)
 
 int32_t TimeToAudioTimeStamp(uint64_t bufferFrameSize, struct AudioTimeStamp *time, uint32_t sampleRate)
 {
-    if (time == NULL) {
+    if (time == NULL || sampleRate == 0) {
         return HDF_FAILURE;
     }
-    time->tvSec += (int64_t)bufferFrameSize / (int64_t)sampleRate;
+    time->tvSec += (int64_t)(bufferFrameSize / sampleRate);
     int64_t lastBufFrames = bufferFrameSize % ((int64_t)sampleRate);
     time->tvNSec += (lastBufFrames * SEC_TO_NSEC) / ((int64_t)sampleRate);
     if (time->tvNSec >= SEC_TO_NSEC) {
