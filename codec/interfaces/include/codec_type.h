@@ -502,7 +502,7 @@ enum {
     CODEC_ERR_FRAME_BUF_EMPTY,       /**< Frame buffer queue is empty. */
     CODEC_RECEIVE_EOS,               /**< End of streams */
     CODEC_ERR_INVALID_OP,            /**< Invalid operation */
-    CODEC_ERR_UNKOWN                 /**< unkown error */
+    CODEC_ERR_UNKOWN                 /**< unknown error */
 };
 
 #ifdef __cplusplus

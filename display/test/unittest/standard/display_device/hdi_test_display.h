@@ -15,7 +15,7 @@
 
 #ifndef HDI_TEST_DISPLAY_H
 #define HDI_TEST_DISPLAY_H
-#include <inttypes.h>
+#include <cinttypes>
 #include "display_device.h"
 #include "display_gralloc.h"
 #include "display_type.h"

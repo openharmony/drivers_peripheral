@@ -18,6 +18,7 @@
 #include <memory>
 #include <unordered_map>
 #include "display_type.h"
+
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
@@ -35,4 +36,4 @@ class DrmVsyncWorker;
 } // namespace HDI
 } // namespace DISPLAY
 
-#endif
+#endif // HDI_DEVICE_COMMON_H

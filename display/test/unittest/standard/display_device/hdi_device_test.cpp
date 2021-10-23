@@ -15,7 +15,7 @@
 
 #include "hdi_device_test.h"
 #include <chrono>
-#include <inttypes.h>
+#include <cinttypes>
 #include <algorithm>
 #include "display_device.h"
 #include "display_gralloc.h"
@@ -171,7 +171,7 @@ static const std::vector<std::vector<LayerSettings>> TEST_ALPHA = {
     },
 };
 
-const std::vector<LayerSettings> TEST_ROTATE = {
+static const std::vector<LayerSettings> TEST_ROTATE = {
     {
         .rectRatio = { 0, 0, 1.0f, 1.0f },
         .color = RED,
@@ -190,19 +190,19 @@ const std::vector<LayerSettings> TEST_ROTATE = {
         .rotate = ROTATE_270 },
 };
 
-inline std::shared_ptr<HdiTestDisplay> GetFirstDisplay()
+static inline std::shared_ptr<HdiTestDisplay> GetFirstDisplay()
 {
     return HdiTestDevice::GetInstance().GetFirstDisplay();
 }
 
-int32_t CheckComposition(std::vector<LayerSettings> &layers, BufferHandle *clientBuffer,
-    uint32_t checkType = HdiCompostionCheck::CHECK_VERTEX)
+static int32_t CheckComposition(std::vector<LayerSettings> &layers, BufferHandle *clientBuffer,
+    uint32_t checkType = HdiCompositionCheck::CHECK_VERTEX)
 {
     DISPLAY_TEST_CHK_RETURN((clientBuffer == nullptr), DISPLAY_NULL_PTR, DISPLAY_TEST_LOGE("client buffer is nullptr"));
-    return HdiCompostionCheck::GetInstance().Check(layers, *clientBuffer, checkType);
+    return HdiCompositionCheck::GetInstance().Check(layers, *clientBuffer, checkType);
 }
 
-std::shared_ptr<HdiTestLayer> CreateTestLayer(LayerSettings setting, uint32_t zorder)
+static std::shared_ptr<HdiTestLayer> CreateTestLayer(LayerSettings setting, uint32_t zorder)
 {
     int ret;
     HdiTestDevice::GetInstance();
@@ -234,7 +234,7 @@ std::shared_ptr<HdiTestLayer> CreateTestLayer(LayerSettings setting, uint32_t zo
     return layer;
 }
 
-int PrepareAndPrensent()
+static int PrepareAndPrensent()
 {
     int ret;
     DISPLAY_TEST_LOGD();
@@ -250,7 +250,7 @@ int PrepareAndPrensent()
     return DISPLAY_SUCCESS;
 }
 
-void TestVBlankCallback(unsigned int sequence, uint64_t ns, void *data)
+static void TestVBlankCallback(unsigned int sequence, uint64_t ns, void *data)
 {
     static uint64_t lastns;
     DISPLAY_TEST_LOGD("seq %d  ns %" PRId64 " duration %" PRId64 " ns", sequence, ns, (ns - lastns));
@@ -258,18 +258,7 @@ void TestVBlankCallback(unsigned int sequence, uint64_t ns, void *data)
     VblankCtr::GetInstance().NotifyVblank(sequence, ns, data);
 }
 
-int TestVblankEvent()
-{
-    DISPLAY_TEST_LOGD();
-    std::shared_ptr<HdiTestDisplay> display = HdiTestDevice::GetInstance().GetFirstDisplay();
-    int ret = display->RegDisplayVBlankCallback(TestVBlankCallback, nullptr);
-    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
-        DISPLAY_TEST_LOGE("RegDisplayVBlankCallback failed"));
-    ret = display->SetDisplayVsyncEnabled(true);
-    return ret;
-}
-
-void AdjustLayerSettings(std::vector<LayerSettings> &settings, uint32_t w, uint32_t h)
+static void AdjustLayerSettings(std::vector<LayerSettings> &settings, uint32_t w, uint32_t h)
 {
     DISPLAY_TEST_LOGD();
     for (uint32_t i = 0; i < settings.size(); i++) {
@@ -302,9 +291,9 @@ void AdjustLayerSettings(std::vector<LayerSettings> &settings, uint32_t w, uint3
     }
 }
 
-std::vector<std::shared_ptr<HdiTestLayer>> CreateLayers(std::vector<LayerSettings> &settings)
+static std::vector<std::shared_ptr<HdiTestLayer>> CreateLayers(std::vector<LayerSettings> &settings)
 {
-    DISPLAY_TEST_LOGD("settings %u", settings.size());
+    DISPLAY_TEST_LOGD("settings %zd", settings.size());
     std::vector<std::shared_ptr<HdiTestLayer>> layers;
     DisplayModeInfo mode = GetFirstDisplay()->GetCurrentMode();
     AdjustLayerSettings(settings, mode.width, mode.height);
@@ -318,11 +307,10 @@ std::vector<std::shared_ptr<HdiTestLayer>> CreateLayers(std::vector<LayerSetting
     return layers;
 }
 
-inline void PresentAndCheck(std::vector<LayerSettings> &layerSettings,
-    uint32_t checkType = HdiCompostionCheck::CHECK_VERTEX)
+static inline void PresentAndCheck(std::vector<LayerSettings> &layerSettings,
+    uint32_t checkType = HdiCompositionCheck::CHECK_VERTEX)
 {
-    int ret;
-    ret = PrepareAndPrensent();
+    int ret = PrepareAndPrensent();
     ASSERT_TRUE((ret == DISPLAY_SUCCESS));
     HdiTestDevice::GetInstance().GetGrallocFuncs().InvalidateCache(GetFirstDisplay()->SnapShot());
     ret = CheckComposition(layerSettings, GetFirstDisplay()->SnapShot(), checkType);
@@ -349,6 +337,9 @@ void DeviceLayerDisplay::TearDown()
 void VblankCtr::NotifyVblank(unsigned int sequence, uint64_t ns, void *data)
 {
     DISPLAY_TEST_LOGD();
+    if (data != nullptr) {
+        DISPLAY_TEST_LOGD("sequence = %u, ns = %" PRIu64 "", sequence, ns);
+    }
     std::unique_lock<std::mutex> lg(mVblankMutex);
     mHasVblank = true;
     mVblankCondition.notify_one();
@@ -470,10 +461,10 @@ TEST_P(LayerRotateTest, SplitCheck)
             .color = color });
     }
     ASSERT_TRUE((handle != nullptr));
-    /* for rotation may scale the buffer , Near the edge of rect the color will Smooth gradient,
+    /* for rotation may scale the buffer, Near the edge of rect the color will Smooth gradient,
        so we must use the center to check.
     */
-    PresentAndCheck(layersCheck, HdiCompostionCheck::CHECK_CENTER);
+    PresentAndCheck(layersCheck, HdiCompositionCheck::CHECK_CENTER);
 }
 
 TEST_F(DeviceTest, crop)
@@ -527,8 +518,7 @@ INSTANTIATE_TEST_CASE_P(Rotation, LayerRotateTest, ::testing::ValuesIn(TEST_ROTA
 
 int main(int argc, char **argv)
 {
-    int ret;
-    ret = HdiTestDevice::GetInstance().InitDevice();
+    int ret = HdiTestDevice::GetInstance().InitDevice();
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("Init Device Failed"));
     ::testing::InitGoogleTest(&argc, argv);
     ret = RUN_ALL_TESTS();

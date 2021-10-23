@@ -24,7 +24,6 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
 class IDisplayAllocator: public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Display.Gralloc.IAllocator.V1_0");
@@ -32,7 +31,6 @@ public:
     virtual int32_t AllocMem(const AllocInfo &info, BufferHandle *&handle) = 0;
     static sptr<IDisplayAllocator> Get(const char *serviceName);
 };
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI

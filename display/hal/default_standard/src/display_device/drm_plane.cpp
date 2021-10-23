@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "drm_device.h"
 #include "drm_plane.h"
+#include "drm_device.h"
 
 namespace OHOS {
 namespace HDI {
@@ -51,7 +51,7 @@ int32_t DrmPlane::Init(DrmDevice &drmDevice)
             mType = static_cast<uint32_t>(prop.value);
             break;
         default:
-            DISPLAY_LOGE("unkown type value %{public}llu ", prop.value);
+            DISPLAY_LOGE("unknown type value %{public}" PRIu64 "", prop.value);
             return DISPLAY_FAILURE;
     }
     return DISPLAY_SUCCESS;

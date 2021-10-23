@@ -27,11 +27,11 @@ struct Point {
     int32_t y = 0;
 };
 
-class HdiCompostionCheck {
+class HdiCompositionCheck {
 public:
-    static HdiCompostionCheck &GetInstance()
+    static HdiCompositionCheck &GetInstance()
     {
-        static HdiCompostionCheck instace = HdiCompostionCheck();
+        static HdiCompositionCheck instace = HdiCompositionCheck();
         return instace;
     }
     void Init(uint32_t w, uint32_t h)
@@ -49,8 +49,8 @@ private:
     void GetCheckPoints(Point center, std::vector<Point> &points);
     void SimpleHandleAlpha(const LayerSettings &layers, uint32_t &color);
     std::vector<uint32_t> GetCheckColors(std::vector<LayerSettings> &layers, std::vector<Point> &points);
-    HdiCompostionCheck() {}
-    ~HdiCompostionCheck() {}
+    HdiCompositionCheck() {}
+    ~HdiCompositionCheck() {}
     uint32_t mDispW = 0;
     uint32_t mDispH = 0;
 };

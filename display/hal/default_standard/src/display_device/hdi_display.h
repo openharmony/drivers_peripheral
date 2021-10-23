@@ -20,8 +20,8 @@
 #include <unordered_set>
 #include <memory.h>
 #include "display_device.h"
-#include "hdi_layer.h"
 #include "hdi_composer.h"
+#include "hdi_layer.h"
 
 namespace OHOS {
 namespace HDI {
@@ -33,7 +33,7 @@ class VsyncCallBack {
 public:
     VsyncCallBack(VBlankCallback cb, void *data);
     virtual void Vsync(unsigned int sequence, uint64_t ns);
-    virtual ~VsyncCallBack() {};
+    virtual ~VsyncCallBack() {}
 
 private:
     VBlankCallback mVBlankCb;

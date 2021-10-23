@@ -105,7 +105,8 @@ static uint32_t AdjustStrideFromFormat(uint32_t format, uint32_t height)
     return height;
 }
 
-struct gbm_bo *hdi_gbm_bo_create(struct gbm_device *gbm, uint32_t width, uint32_t height, uint32_t format, uint32_t usage)
+struct gbm_bo *hdi_gbm_bo_create(struct gbm_device *gbm, uint32_t width, uint32_t height, uint32_t format,
+    uint32_t usage)
 {
     DISPLAY_UNUSED(usage);
     int ret;

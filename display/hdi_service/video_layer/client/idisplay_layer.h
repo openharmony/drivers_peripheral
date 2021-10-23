@@ -35,21 +35,32 @@
  * @version 2.0
  */
 
-#ifndef OHOS_HDI_DISPLAY_LAYER_V1_0_INTERFACE_H
-#define OHOS_HDI_DISPLAY_LAYER_V1_0_INTERFACE_H
+#ifndef HDI_IDISPLAY_LAYER_PXY_V1_0_H
+#define HDI_IDISPLAY_LAYER_PXY_V1_0_H
 
-#include "display_type.h"
 #include <iservmgr_hdi.h>
+#include "display_type.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
-class IDisplayLayer {
+class IDisplayLayer : public IRemoteBroker {
 public:
-    explicit IDisplayLayer() {}
+    DECLARE_INTERFACE_DESCRIPTOR(u"HDI.DISPLAY.LAYER.V1_0");
     virtual ~IDisplayLayer() {}
+
+    /**
+     * @brief Get the service object by service name.
+     *
+     * @param serviceName The service name.
+     *
+     * @return Returns the point to display layer service.
+     *
+     * @since 1.0
+     * @version 1.0
+     */
+    static sptr<IDisplayLayer> Get(const char *serviceName);
 
     /**
      * @brief Initializes a display device.
@@ -219,7 +230,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    virtual DispErrCode SetLayerZorder(unsigned int devId, unsigned int layerId, unsigned int zorder) = 0;;
+    virtual DispErrCode SetLayerZorder(unsigned int devId, unsigned int layerId, unsigned int zorder) = 0;
 
     /**
      * @brief Obtains the z-order of a layer.
@@ -272,14 +283,13 @@ public:
      * @since 2.0
      * @version 2.0
      */
-    virtual DispErrCode SetLayerBuffer(unsigned int devId, unsigned int layerId, const BufferHandle &buffer, int fence) = 0;
-
+    virtual DispErrCode SetLayerBuffer(unsigned int devId, unsigned int layerId, const BufferHandle &buffer,
+        int fence) = 0;
 }; // class IDisplayLayer
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI
 } // namespace OHOS
 
-#endif  // OHOS_HDI_DISPLAY_LAYER_V1_0_INTERFACE_H
+#endif  // HDI_IDISPLAY_LAYER_PXY_V1_0_H
 /** @} */

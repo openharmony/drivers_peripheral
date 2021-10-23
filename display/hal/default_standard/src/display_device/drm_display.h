@@ -17,8 +17,8 @@
 #define DRM_DISPLAY_H
 #include <unordered_map>
 #include <memory>
-#include "drm_crtc.h"
 #include "drm_connector.h"
+#include "drm_crtc.h"
 #include "drm_device.h"
 #include "drm_plane.h"
 #include "hdi_composer.h"
@@ -34,25 +34,24 @@ public:
 
     virtual ~DrmDisplay();
 
-    int32_t Init();
-    int32_t GetDisplayCapability(DisplayCapability *info);
-    int32_t GetDisplaySuppportedModes(int *num, DisplayModeInfo *modes);
-    int32_t GetDisplayMode(uint32_t *modeId);
-    int32_t SetDisplayMode(uint32_t modeId);
-    int32_t GetDisplayPowerStatus(DispPowerStatus *status);
-    int32_t SetDisplayPowerStatus(DispPowerStatus status);
-    int32_t GetDisplayBacklight(uint32_t *value);
-    int32_t SetDisplayBacklight(uint32_t value);
+    int32_t Init() override;
+    int32_t GetDisplayCapability(DisplayCapability *info) override;
+    int32_t GetDisplaySuppportedModes(int *num, DisplayModeInfo *modes) override;
+    int32_t GetDisplayMode(uint32_t *modeId) override;
+    int32_t SetDisplayMode(uint32_t modeId) override;
+    int32_t GetDisplayPowerStatus(DispPowerStatus *status) override;
+    int32_t SetDisplayPowerStatus(DispPowerStatus status) override;
+    int32_t GetDisplayBacklight(uint32_t *value) override;
+    int32_t SetDisplayBacklight(uint32_t value) override;
     int32_t ChosePreferenceMode();
-    virtual int32_t RegDisplayVBlankCallback(VBlankCallback cb, void *data);
-    virtual int32_t WaitForVBlank(uint64_t *ns);
-    virtual bool IsConnected();
-    virtual int32_t SetDisplayVsyncEnabled(bool enabled);
-
+    virtual int32_t RegDisplayVBlankCallback(VBlankCallback cb, void *data) override;
+    virtual int32_t WaitForVBlank(uint64_t *ns) override;
+    virtual bool IsConnected() override;
+    virtual int32_t SetDisplayVsyncEnabled(bool enabled) override;
     HdiDrmComposition *GetDrmComposition();
 
 protected:
-    std::unique_ptr<HdiLayer> CreateHdiLayer(LayerType type);
+    std::unique_ptr<HdiLayer> CreateHdiLayer(LayerType type) override;
 
 private:
     int32_t PushFirstFrame();

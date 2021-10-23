@@ -43,4 +43,4 @@ typedef struct {
 } HalFuncs;
 
 HalFuncs *GetHalFuncs(void);
-#endif /* DISP_HAL_H */
+#endif // DISP_HAL_H

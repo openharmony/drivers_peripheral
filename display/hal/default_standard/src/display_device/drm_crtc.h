@@ -17,9 +17,10 @@
 #define DRM_CRTC_H
 #include <string>
 #include <memory>
-#include "hdi_display.h"
-#include "drm_device.h"
+#include <xf86drm.h>
+#include <xf86drmMode.h>
 #include "hdi_device_common.h"
+#include "hdi_display.h"
 
 namespace OHOS {
 namespace HDI {

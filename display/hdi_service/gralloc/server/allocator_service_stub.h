@@ -25,14 +25,7 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
-enum {
-    CMD_ALLOCATOR_ALLOCMEM = 0,
-    CMD_ALLOCATOR_FREE,
-    CMD_ALLOCATOR_MMAP,
-    CMD_ALLOCATOR_UNMAP,
-    CMD_ALLOCATOR_INVALIDDATE,
-};
+const int32_t CMD_ALLOCATOR_ALLOCMEM = 0;
 
 class AllocatorServiceStub {
 public:
@@ -45,7 +38,6 @@ public:
 private:
     GrallocFuncs *grallocFuncs_;
 };
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI

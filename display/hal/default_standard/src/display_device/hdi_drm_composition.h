@@ -66,4 +66,5 @@ private:
 } // OHOS
 } // HDI
 } // DISPLAY
+
 #endif // HDI_DRM_COMPOSITION_H

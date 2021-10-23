@@ -15,8 +15,8 @@ import("//build/ohos.gni")
 
 group("display_group") {
   deps = [
-    ":display_device_drm",
-    ":displaygralloc",
+    ":def_display_device",
+    ":def_display_gralloc",
     ":higbm",
   ]
 }
@@ -40,7 +40,7 @@ ohos_static_library("higbm") {
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }
 
-ohos_shared_library("displaygralloc") {
+ohos_shared_library("def_display_gralloc") {
   sources = [
     "src/display_gralloc/display_gralloc.c",
     "src/display_gralloc/display_gralloc_gbm.c",
@@ -77,7 +77,7 @@ ohos_shared_library("displaygralloc") {
   part_name = "hdf"
 }
 
-ohos_shared_library("display_device_drm") {
+ohos_shared_library("def_display_device") {
   sources = [
     "src/display_device/drm_connector.cpp",
     "src/display_device/drm_crtc.cpp",
@@ -95,7 +95,7 @@ ohos_shared_library("display_device_drm") {
     "src/display_device/hdi_layer.cpp",
     "src/display_device/hdi_session.cpp",
   ]
-  output_name = "display_device_drm"
+  output_name = "display_device"
   include_dirs = [
     "src/display_device",
     "include",
@@ -109,8 +109,7 @@ ohos_shared_library("display_device_drm") {
     "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
   ]
   deps = [
-    ":displaygralloc",
-    "//drivers/peripheral/display/hal:hdi_display_gfx",
+    ":def_display_gralloc",
     "//third_party/libdrm:libdrm",
     "//utils/native/base:utils",
   ]

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "display_layer_proxy.h"
+#include "video_layer_proxy.h"
 #include <buffer_handle_parcel.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
@@ -23,7 +23,6 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
 sptr<IDisplayLayer> IDisplayLayer::Get(const char *serviceName)
 {
     do {
@@ -36,7 +35,7 @@ sptr<IDisplayLayer> IDisplayLayer::Get(const char *serviceName)
 
         auto remote = servMgr->GetService(serviceName);
         if (remote != nullptr) {
-            sptr<DisplayLayerProxy> layerSptr = iface_cast<DisplayLayerProxy>(remote);
+            sptr<VideoLayerProxy> layerSptr = iface_cast<VideoLayerProxy>(remote);
             return layerSptr;
         }
         HDF_LOGE("%{public}s: GetService failed! serviceName = %{public}s", __func__, serviceName);
@@ -45,7 +44,7 @@ sptr<IDisplayLayer> IDisplayLayer::Get(const char *serviceName)
     return nullptr;
 }
 
-DispErrCode DisplayLayerProxy::InitDisplay(unsigned int devId)
+DispErrCode VideoLayerProxy::InitDisplay(unsigned int devId)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -69,7 +68,7 @@ DispErrCode DisplayLayerProxy::InitDisplay(unsigned int devId)
     return retCode;
 }
 
-DispErrCode DisplayLayerProxy::DeinitDisplay(unsigned int devId)
+DispErrCode VideoLayerProxy::DeinitDisplay(unsigned int devId)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -93,7 +92,7 @@ DispErrCode DisplayLayerProxy::DeinitDisplay(unsigned int devId)
     return retCode;
 }
 
-DispErrCode DisplayLayerProxy::GetDisplayInfo(unsigned int devId, std::shared_ptr<DisplayInfo> &dispInfo)
+DispErrCode VideoLayerProxy::GetDisplayInfo(unsigned int devId, std::shared_ptr<DisplayInfo> &dispInfo)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -128,7 +127,7 @@ DispErrCode DisplayLayerProxy::GetDisplayInfo(unsigned int devId, std::shared_pt
     return DISPLAY_SUCCESS;
 }
 
-DispErrCode DisplayLayerProxy::CreateLayer(unsigned int devId, LayerInfo &layerInfo, unsigned int &layerId)
+DispErrCode VideoLayerProxy::CreateLayer(unsigned int devId, LayerInfo &layerInfo, unsigned int &layerId)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -165,7 +164,7 @@ DispErrCode DisplayLayerProxy::CreateLayer(unsigned int devId, LayerInfo &layerI
     return DISPLAY_SUCCESS;
 }
 
-DispErrCode DisplayLayerProxy::CloseLayer(unsigned int devId, unsigned int layerId)
+DispErrCode VideoLayerProxy::CloseLayer(unsigned int devId, unsigned int layerId)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -189,7 +188,7 @@ DispErrCode DisplayLayerProxy::CloseLayer(unsigned int devId, unsigned int layer
     return retCode;
 }
 
-DispErrCode DisplayLayerProxy::SetLayerVisible(unsigned int devId, unsigned int layerId, bool visible)
+DispErrCode VideoLayerProxy::SetLayerVisible(unsigned int devId, unsigned int layerId, bool visible)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -218,7 +217,7 @@ DispErrCode DisplayLayerProxy::SetLayerVisible(unsigned int devId, unsigned int 
     return retCode;
 }
 
-DispErrCode DisplayLayerProxy::GetLayerVisibleState(unsigned int devId, unsigned int layerId, bool &visible)
+DispErrCode VideoLayerProxy::GetLayerVisibleState(unsigned int devId, unsigned int layerId, bool &visible)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -245,7 +244,7 @@ DispErrCode DisplayLayerProxy::GetLayerVisibleState(unsigned int devId, unsigned
     return DISPLAY_SUCCESS;
 }
 
-DispErrCode DisplayLayerProxy::SetLayerRect(unsigned int devId, unsigned int layerId, IRect &rect)
+DispErrCode VideoLayerProxy::SetLayerRect(unsigned int devId, unsigned int layerId, IRect &rect)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -278,7 +277,7 @@ DispErrCode DisplayLayerProxy::SetLayerRect(unsigned int devId, unsigned int lay
     return retCode;
 }
 
-DispErrCode DisplayLayerProxy::GetLayerRect(unsigned int devId, unsigned int layerId, std::shared_ptr<IRect> &rect)
+DispErrCode VideoLayerProxy::GetLayerRect(unsigned int devId, unsigned int layerId, std::shared_ptr<IRect> &rect)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -313,7 +312,7 @@ DispErrCode DisplayLayerProxy::GetLayerRect(unsigned int devId, unsigned int lay
     return DISPLAY_SUCCESS;
 }
 
-DispErrCode DisplayLayerProxy::SetLayerZorder(unsigned int devId, unsigned int layerId, unsigned int zorder)
+DispErrCode VideoLayerProxy::SetLayerZorder(unsigned int devId, unsigned int layerId, unsigned int zorder)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -342,7 +341,7 @@ DispErrCode DisplayLayerProxy::SetLayerZorder(unsigned int devId, unsigned int l
     return retCode;
 }
 
-DispErrCode DisplayLayerProxy::GetLayerZorder(unsigned int devId, unsigned int layerId, unsigned int &zorder)
+DispErrCode VideoLayerProxy::GetLayerZorder(unsigned int devId, unsigned int layerId, unsigned int &zorder)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -368,7 +367,7 @@ DispErrCode DisplayLayerProxy::GetLayerZorder(unsigned int devId, unsigned int l
     return DISPLAY_SUCCESS;
 }
 
-DispErrCode DisplayLayerProxy::SetTransformMode(unsigned int devId, unsigned int layerId, TransformType &type)
+DispErrCode VideoLayerProxy::SetTransformMode(unsigned int devId, unsigned int layerId, TransformType &type)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -397,12 +396,13 @@ DispErrCode DisplayLayerProxy::SetTransformMode(unsigned int devId, unsigned int
     return retCode;
 }
 
-DispErrCode DisplayLayerProxy::SetLayerBuffer(unsigned int devId, unsigned int layerId,
+DispErrCode VideoLayerProxy::SetLayerBuffer(unsigned int devId, unsigned int layerId,
     const BufferHandle &buffer, int fence)
 {
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    (void)fence;
 
     if (!data.WriteUint32(devId) || !data.WriteUint32(layerId)) {
         HDF_LOGE("%{public}s: write devId or layerId failed", __func__);
@@ -426,7 +426,6 @@ DispErrCode DisplayLayerProxy::SetLayerBuffer(unsigned int devId, unsigned int l
     }
     return retCode;
 }
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI

@@ -62,4 +62,4 @@ using FdPtr = std::shared_ptr<HdiFd>;
 } // HDIO
 } // DISPLAY
 
-#endif
+#endif // HDI_SHARED_FD

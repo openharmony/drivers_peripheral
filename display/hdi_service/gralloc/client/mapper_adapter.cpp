@@ -23,7 +23,6 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
 MapperAdapter::MapperAdapter()
 {
     if (GrallocInitialize(&mapperFuncs_) != HDF_SUCCESS) {
@@ -40,7 +39,7 @@ MapperAdapter::~MapperAdapter()
 
 bool MapperAdapter::IsReady()
 {
-    HDF_LOGI("%{public}s(%d): entry.", __func__, __LINE__);
+    HDF_LOGI("%{public}s: entry", __func__);
     return mapperFuncs_ != nullptr;
 }
 
@@ -76,7 +75,6 @@ void MapperAdapter::FreeBuffer(const BufferHandle& handle) const
 {
     mapperFuncs_->FreeMem(const_cast<BufferHandle *>(&handle));
 }
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI
