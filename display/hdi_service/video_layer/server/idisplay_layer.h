@@ -35,8 +35,8 @@
  * @version 2.0
  */
 
-#ifndef OHOS_HDI_DISPLAY_LAYER_V1_0_INTERFACE_H
-#define OHOS_HDI_DISPLAY_LAYER_V1_0_INTERFACE_H
+#ifndef HDI_IDISPLAY_LAYER_STB_V1_0_H
+#define HDI_IDISPLAY_LAYER_STB_V1_0_H
 
 #include <iservmgr_hdi.h>
 #include "display_type.h"
@@ -45,23 +45,10 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
-class IDisplayLayer : public IRemoteBroker {
+class IDisplayLayer {
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"HDI.DISPLAY.LAYER.V1_0");
+    explicit IDisplayLayer() {}
     virtual ~IDisplayLayer() {}
-
-    /**
-     * @brief Get the service object by service name.
-     *
-     * @param serviceName The service name.
-     *
-     * @return Returns the point to display layer service.
-     *
-     * @since 1.0
-     * @version 1.0
-     */
-    static sptr<IDisplayLayer> Get(const char *serviceName);
 
     /**
      * @brief Initializes a display device.
@@ -286,13 +273,11 @@ public:
      */
     virtual DispErrCode SetLayerBuffer(unsigned int devId, unsigned int layerId, const BufferHandle &buffer,
         int fence) = 0;
-
 }; // class IDisplayLayer
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI
 } // namespace OHOS
 
-#endif  // OHOS_HDI_DISPLAY_LAYER_V1_0_INTERFACE_H
+#endif  // HDI_IDISPLAY_LAYER_STB_V1_0_H
 /** @} */

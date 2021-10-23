@@ -21,9 +21,9 @@
 #include <xf86drm.h>
 #include <xf86drmMode.h>
 #include "display_type.h"
-#include "hdi_shared_fd.h"
-#include "drm_device.h"
 #include "drm_encoder.h"
+#include "hdi_device_common.h"
+#include "hdi_shared_fd.h"
 
 namespace OHOS {
 namespace HDI {

@@ -15,7 +15,7 @@
 
 #ifndef DISPLAY_TEST_H
 #define DISPLAY_TEST_H
-#include <string.h>
+#include <cstring>
 #include <stdio.h>
 #include "display_gfx.h"
 #include "display_gralloc.h"

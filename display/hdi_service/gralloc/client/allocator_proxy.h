@@ -23,7 +23,6 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
 class AllocatorProxy : public IRemoteProxy<IDisplayAllocator> {
 public:
     explicit AllocatorProxy(const sptr<IRemoteObject>& impl) : IRemoteProxy<IDisplayAllocator>(impl) {}
@@ -38,7 +37,6 @@ private:
     // static constexpr int CMD_REMOTE_ALLOCATOR_UNMAP = 3;
     // static constexpr int CMD_REMOTE_ALLOCATOR_INVALIDDATE = 4;
 };
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI

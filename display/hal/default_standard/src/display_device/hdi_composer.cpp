@@ -14,6 +14,7 @@
  */
 
 #include "hdi_composer.h"
+
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
@@ -25,8 +26,7 @@ HdiComposer::HdiComposer(std::unique_ptr<HdiComposition> pre, std::unique_ptr<Hd
 
 int32_t HdiComposer::Prepare(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer)
 {
-    int ret;
-    ret = mPreComp->SetLayers(layers, clientLayer);
+    int ret = mPreComp->SetLayers(layers, clientLayer);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("pre composition prepare failed"));
     ret = mPostComp->SetLayers(layers, clientLayer);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("post composition prepare failed"));
@@ -35,8 +35,7 @@ int32_t HdiComposer::Prepare(std::vector<HdiLayer *> &layers, HdiLayer &clientLa
 
 int32_t HdiComposer::Commit(bool modeSet)
 {
-    int ret;
-    ret = mPreComp->Apply(modeSet);
+    int ret = mPreComp->Apply(modeSet);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("pre composition apply failed"));
     ret = mPostComp->Apply(modeSet);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("post composition apply failed"));

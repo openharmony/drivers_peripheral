@@ -137,4 +137,4 @@ struct DispInfo {
     uint32_t maxLevel;
     uint32_t defLevel;
 };
-#endif /* DISP_COMMON_H */
+#endif // DISP_COMMON_H

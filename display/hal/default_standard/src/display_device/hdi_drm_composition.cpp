@@ -14,7 +14,7 @@
  */
 
 #include "hdi_drm_composition.h"
-#include <errno.h>
+#include <cerrno>
 #include "hdi_drm_layer.h"
 
 namespace OHOS {
@@ -140,7 +140,7 @@ int32_t HdiDrmComposition::Apply(bool modeSet)
     DISPLAY_CHK_RETURN((ret < 0), DISPLAY_FAILURE, DISPLAY_LOGE("set the outfence property of crtc failed "));
 
     // set the plane info.
-    DISPLAY_LOGD("mCompLayers size %{public}d", mCompLayers.size());
+    DISPLAY_LOGD("mCompLayers size %{public}zd", mCompLayers.size());
     for (uint32_t i = 0; i < mCompLayers.size(); i++) {
         HdiDrmLayer *layer = static_cast<HdiDrmLayer *>(mCompLayers[i]);
         auto &drmPlane = mPlanes[i];

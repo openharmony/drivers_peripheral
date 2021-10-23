@@ -16,6 +16,7 @@
 #include "hdi_display.h"
 #include <vector>
 #include "display_common.h"
+
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
@@ -69,7 +70,7 @@ int32_t HdiDisplay::SetLayerZorder(uint32_t layerId, uint32_t zorder)
         DISPLAY_LOGE("can not find the layer %{public}d", layerId));
     auto layer = mLayersMap[layerId].get();
     if (layer->GetZorder() == zorder) {
-        DISPLAY_LOGD("zorder no change layerId %d  zorder %d", layerId, zorder);
+        DISPLAY_LOGD("zorder no change layerId %{public}d, zorder %{public}d", layerId, zorder);
         return DISPLAY_SUCCESS;
     }
     // reset to sort

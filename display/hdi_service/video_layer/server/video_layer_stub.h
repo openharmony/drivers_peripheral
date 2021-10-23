@@ -13,20 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef HDI_DISPLAY_LAYER_SERVICE_STUB_V1_0_H
-#define HDI_DISPLAY_LAYER_SERVICE_STUB_V1_0_H
+#ifndef HDI_VIDEO_LAYER_STUB_V1_0_H
+#define HDI_VIDEO_LAYER_STUB_V1_0_H
 
 #include <iremote_stub.h>
 #include <message_parcel.h>
 #include <message_option.h>
 #include "idisplay_layer.h"
-#include "display_layer_service_impl.h"
+#include "video_layer_service.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
 enum {
     CMD_DISPLAY_LAYER_INIT_DISPLAY = 0,
     CMD_DISPLAY_LAYER_DEINIT_DISPLAY,
@@ -43,10 +42,10 @@ enum {
     CMD_DISPLAY_LAYER_SET_LAYER_BUFFER,
 };
 
-class DisplayLayerStub {
+class VideoLayerStub {
 public:
-    DisplayLayerStub();
-    virtual ~DisplayLayerStub() {}
+    VideoLayerStub();
+    virtual ~VideoLayerStub() {}
 
     DispErrCode Init();
     int32_t LayerStubInitDisplay(MessageParcel& data, MessageParcel& reply, MessageOption& option);
@@ -65,18 +64,15 @@ public:
     int32_t LayerStubOnRemoteRequest(int cmdId, MessageParcel& data, MessageParcel& reply, MessageOption& option);
 
 private:
-    std::shared_ptr<DisplayLayerService> layerService_ = nullptr;
+    std::shared_ptr<VideoLayerService> layerService_ = nullptr;
 };
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI
 } // namespace OHOS
 
 void *LayerStubInstance();
-
 void DestroyLayerStub(void *obj);
-
 int32_t LayerServiceOnRemoteRequest(void *stub, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply);
 
-#endif // HDI_DISPLAY_LAYER_SERVICE_STUB_V1_0_H
+#endif // HDI_VIDEO_LAYER_STUB_V1_0_H

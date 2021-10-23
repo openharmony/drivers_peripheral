@@ -27,7 +27,6 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
 AllocatorServiceStub::AllocatorServiceStub()
 {
     if (GrallocInitialize(&grallocFuncs_) != HDF_SUCCESS) {
@@ -85,7 +84,6 @@ int32_t AllocatorServiceStub::OnRemoteRequest(int cmdId,
     }
     return HDF_SUCCESS;
 }
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI

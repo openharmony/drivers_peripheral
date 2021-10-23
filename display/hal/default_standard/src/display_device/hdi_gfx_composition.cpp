@@ -14,34 +14,81 @@
  */
 
 #include "hdi_gfx_composition.h"
+#include <cinttypes>
+#include <dlfcn.h>
 #include <errno.h>
 #include "display_gfx.h"
+
+#define LIB_HDI_GFX_NAME "libdisplay_gfx.z.so"
+#define LIB_GFX_FUNC_INIT "GfxInitialize"
+#define LIB_GFX_FUNC_DEINIT "GfxUninitialize"
 
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-int32_t HdiGfxComposition::Init()
+int32_t HdiGfxComposition::Init(void)
 {
-    int ret;
     DISPLAY_LOGD();
-    ret = GfxInitialize(&mGfxFuncs);
+    int32_t ret = GfxModuleInit();
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS) || (mGfxFuncs == nullptr), DISPLAY_FAILURE,
-        DISPLAY_LOGE("gfx GfxInitialize failed"));
+        DISPLAY_LOGE("GfxModuleInit failed"));
     ret = mGfxFuncs->InitGfx();
-    DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS) || (mGfxFuncs == nullptr), DISPLAY_FAILURE,
-        DISPLAY_LOGE("gfx init failed"));
+    DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("gfx init failed"));
     return DISPLAY_SUCCESS;
+}
+
+int32_t HdiGfxComposition::GfxModuleInit(void)
+{
+    DISPLAY_LOGD();
+    mGfxModule = dlopen(LIB_HDI_GFX_NAME, RTLD_NOW | RTLD_NOLOAD);
+	if (mGfxModule != nullptr) {
+		DISPLAY_LOGI("Module '%{public}s' already loaded", LIB_HDI_GFX_NAME);
+	} else {
+		DISPLAY_LOGI("Loading module '%{public}s'", LIB_HDI_GFX_NAME);
+		mGfxModule = dlopen(LIB_HDI_GFX_NAME, RTLD_NOW);
+		if (mGfxModule == nullptr) {
+			DISPLAY_LOGE("Failed to load module: %{public}s", dlerror());
+			return DISPLAY_FAILURE;
+		}
+	}
+
+    typedef int32_t (*InitFunc)(GfxFuncs **funcs);
+    InitFunc func = reinterpret_cast<InitFunc>(dlsym(mGfxModule, LIB_GFX_FUNC_INIT));
+    if (func == nullptr) {
+		DISPLAY_LOGE("Failed to lookup %{public}s function: %s", LIB_GFX_FUNC_INIT, dlerror());
+		dlclose(mGfxModule);
+		return DISPLAY_FAILURE;
+	}
+    return func(&mGfxFuncs);
+}
+
+int32_t HdiGfxComposition::GfxModuleDeinit(void)
+{
+    DISPLAY_LOGD();
+    int32_t ret = DISPLAY_SUCCESS;
+    if (mGfxModule == nullptr) {
+        typedef int32_t (*DeinitFunc)(GfxFuncs *funcs);
+        DeinitFunc func = reinterpret_cast<DeinitFunc>(dlsym(mGfxModule, LIB_GFX_FUNC_DEINIT));
+        if (func == nullptr) {
+            DISPLAY_LOGE("Failed to lookup %{public}s function: %s", LIB_GFX_FUNC_DEINIT, dlerror());
+        } else {
+            ret = func(mGfxFuncs);
+        }
+        dlclose(mGfxModule);
+    }
+    return ret;
 }
 
 bool HdiGfxComposition::CanHandle(HdiLayer &hdiLayer)
 {
     DISPLAY_LOGD();
+    (void)hdiLayer;
     return true;
 }
 
 int32_t HdiGfxComposition::SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer)
 {
-    DISPLAY_LOGD("layers size %{public}d", layers.size());
+    DISPLAY_LOGD("layers size %{public}zd", layers.size());
     mClientLayer = &clientLayer;
     mCompLayers.clear();
     for (auto &layer : layers) {
@@ -55,7 +102,7 @@ int32_t HdiGfxComposition::SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &
             mCompLayers.push_back(layer);
         }
     }
-    DISPLAY_LOGD("composer layers size %{public}d", mCompLayers.size());
+    DISPLAY_LOGD("composer layers size %{public}zd", mCompLayers.size());
     return DISPLAY_SUCCESS;
 }
 
@@ -70,7 +117,7 @@ void HdiGfxComposition::InitGfxSurface(ISurface &surface, HdiLayerBuffer &buffer
     surface.bAlphaMax255 = true;
     surface.alpha0 = 0XFF;
     surface.alpha1 = 0XFF;
-    DISPLAY_LOGD("surface info  w: %{public}d h: %{public}d addr: %{public}llx fmt %{public}d stride %{public}d",
+    DISPLAY_LOGD("surface info  w: %{public}d h: %{public}d addr: 0x%{public}" PRIx64 " fmt %{public}d stride %{public}d",
         surface.width, surface.height, surface.phyAddr, surface.enColorFmt, surface.stride);
 }
 
@@ -108,6 +155,7 @@ int32_t HdiGfxComposition::BlitLayer(HdiLayer &src, HdiLayer &dst)
     DISPLAY_LOGD("crop x: %{public}d y : %{public}d w : %{public}d h: %{public}d", crop.x, crop.y, crop.w, crop.h);
     DISPLAY_LOGD("displayRect x: %{public}d y : %{public}d w : %{public}d h : %{public}d", displayRect.x, displayRect.y,
         displayRect.w, displayRect.h);
+    DISPLAY_CHK_RETURN(mGfxFuncs == nullptr, DISPLAY_FAILURE, DISPLAY_LOGE("Blit: mGfxFuncs is null"));
     return mGfxFuncs->Blit(&srcSurface, &crop, &dstSurface, &displayRect, &opt);
 }
 
@@ -120,13 +168,14 @@ int32_t HdiGfxComposition::ClearRect(HdiLayer &src, HdiLayer &dst)
     DISPLAY_CHK_RETURN((dstBuffer == nullptr), DISPLAY_FAILURE, DISPLAY_LOGE("can not get client layer buffer"));
     InitGfxSurface(dstSurface, *dstBuffer);
     IRect rect = src.GetLayerDisplayRect();
+    DISPLAY_CHK_RETURN(mGfxFuncs == nullptr, DISPLAY_FAILURE, DISPLAY_LOGE("Rect: mGfxFuncs is null"));
     return mGfxFuncs->FillRect(&dstSurface, &rect, 0, &opt);
 }
 
 int32_t HdiGfxComposition::Apply(bool modeSet)
 {
     int32_t ret;
-    DISPLAY_LOGD("composer layers size %{public}d", mCompLayers.size());
+    DISPLAY_LOGD("composer layers size %{public}zd", mCompLayers.size());
     for (uint32_t i = 0; i < mCompLayers.size(); i++) {
         HdiLayer *layer = mCompLayers[i];
         CompositionType compType = layer->GetCompositionType();

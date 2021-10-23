@@ -478,7 +478,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp002, TestSize.Level1)
     char buffer[BUFFER_LEN] = {0};
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
-    ret = UsbFnGetInterfaceProp(g_acmDevice->ctrlIface.fn, "unkown", buffer);
+    ret = UsbFnGetInterfaceProp(g_acmDevice->ctrlIface.fn, "unknown", buffer);
     EXPECT_TRUE(HDF_SUCCESS != ret);
 }
 
@@ -556,7 +556,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfSetProp002, TestSize.Level1)
     int ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
-    ret = UsbFnSetInterfaceProp(g_acmDevice->ctrlIface.fn, "unkown", "hello");
+    ret = UsbFnSetInterfaceProp(g_acmDevice->ctrlIface.fn, "unknown", "hello");
     EXPECT_TRUE(HDF_SUCCESS != ret);
 }
 

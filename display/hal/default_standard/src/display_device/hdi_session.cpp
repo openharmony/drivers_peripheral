@@ -33,11 +33,9 @@ HdiSession &HdiSession::GetInstance()
 
 void HdiSession::Init()
 {
-    // find all device
     DISPLAY_LOGD();
     mHdiDevices = HdiDeviceInterface::DiscoveryDevice();
-    DISPLAY_LOGD("devices size %{public}d", mHdiDevices.size());
-    // find all display
+    DISPLAY_LOGD("devices size %{public}zd", mHdiDevices.size());
     mHdiDisplays.clear();
     for (auto device : mHdiDevices) {
         auto displays = device->DiscoveryDisplay();
@@ -49,7 +47,6 @@ int32_t HdiSession::RegHotPlugCallback(HotPlugCallback callback, void *data)
 {
     DISPLAY_CHK_RETURN((callback == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("the callback is nullptr"));
     mHotPlugCallBacks.emplace(callback, data);
-    // find all display
     for (auto displayMap : mHdiDisplays) {
         auto display = displayMap.second;
         if (display->IsConnected()) {
@@ -134,6 +131,7 @@ static int32_t SetDisplayBacklight(uint32_t devId, uint32_t value)
 static int32_t GetDisplayProperty(uint32_t devId, uint32_t id, uint64_t *value)
 {
     DISPLAY_LOGD();
+    (void)id;
     DISPLAY_CHK_RETURN((value == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("value is nullptr"));
     return DISPLAY_NOT_SUPPORT;
 }
@@ -141,6 +139,7 @@ static int32_t GetDisplayProperty(uint32_t devId, uint32_t id, uint64_t *value)
 static int32_t SetDisplayProperty(uint32_t devId, uint32_t id, uint64_t value)
 {
     DISPLAY_LOGD();
+    (void)id;
     return DISPLAY_NOT_SUPPORT;
 }
 
@@ -181,6 +180,7 @@ static int32_t SetDisplayClientBuffer(uint32_t devId, const BufferHandle *buffer
 static int32_t SetDisplayClientDamage(uint32_t devId, uint32_t num, IRect *rect)
 {
     DISPLAY_LOGD();
+    (void)num;
     DISPLAY_CHK_RETURN((rect == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("rect is nullptr"));
     return DISPLAY_NOT_SUPPORT;
 }
@@ -204,6 +204,7 @@ static int32_t GetDisplayReleaseFence(uint32_t devId, uint32_t *num, uint32_t *l
         fences);
     return DISPLAY_NOT_SUPPORT;
 }
+
 static int32_t Commit(uint32_t devId, int32_t *fence)
 {
     DISPLAY_LOGD();

@@ -25,7 +25,6 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-
 sptr<IDisplayAllocator> IDisplayAllocator::Get(const char *serviceName)
 {
     do {
@@ -83,7 +82,6 @@ int32_t AllocatorProxy::AllocMem(const AllocInfo &info, BufferHandle *&handle)
     HDF_LOGE("%{public}s: %{public}s(%{public}d) end", __FILE__, __func__, __LINE__);
     return retCode;
 }
-
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI

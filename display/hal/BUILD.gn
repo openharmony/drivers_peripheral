@@ -16,6 +16,7 @@ if (defined(ohos_lite)) {
     public_deps = [ "//device/${device_company}/hardware/display:hdi_display" ]
   }
 } else {
+  import("//build/ohos.gni")
   config("display_hdi_public_config") {
     visibility = [ ":*" ]
     include_dirs = [
@@ -31,31 +32,55 @@ if (defined(ohos_lite)) {
       ":hdi_display_gfx",
       ":hdi_display_gralloc",
       ":hdi_display_layer",
-      "//drivers/peripheral/display/interfaces/hdi_cpp/client:display_client",
+      "//drivers/peripheral/display/hdi_service/gralloc/client:hdi_gralloc_client",
+      "//drivers/peripheral/display/hdi_service/gralloc/server:hdi_gralloc_stub",
+      "//drivers/peripheral/display/hdi_service/video_layer/client:video_layer_client",
     ]
     if (target_cpu == "arm") {
-      deps += [ "//drivers/peripheral/display/interfaces/hdi_cpp/server:display_service" ]
+      deps += [ "//drivers/peripheral/display/hdi_service/video_layer/server:video_layer_service" ]
     }
     public_configs = [ ":display_hdi_public_config" ]
   }
 
-  group("hdi_display_device") {
-    deps = [ "//device/hisilicon/hardware/display:display_device" ]
-    public_configs = [ ":display_hdi_public_config" ]
-  }
+  if (product_name != "ohos-arm64") {
+    group("hdi_display_device") {
+      deps = [ "//device/${device_company}/hardware/display:display_device" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
 
-  group("hdi_display_gralloc") {
-    deps = [ "//device/hisilicon/hardware/display:display_gralloc" ]
-    public_configs = [ ":display_hdi_public_config" ]
-  }
+    group("hdi_display_gralloc") {
+      deps = [ "//device/${device_company}/hardware/display:display_gralloc" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
 
-  group("hdi_display_gfx") {
-    deps = [ "//device/hisilicon/hardware/display:display_gfx" ]
-    public_configs = [ ":display_hdi_public_config" ]
-  }
+    group("hdi_display_gfx") {
+      deps = [ "//device/${device_company}/hardware/display:display_gfx" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
 
-  group("hdi_display_layer") {
-    deps = [ "//device/hisilicon/hardware/display:display_layer" ]
-    public_configs = [ ":display_hdi_public_config" ]
+    group("hdi_display_layer") {
+      deps = [ "//device/${device_company}/hardware/display:display_layer" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
+  } else {
+    group("hdi_display_device") {
+      deps = [ "//device/hisilicon/hardware/display:display_device" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
+
+    group("hdi_display_gralloc") {
+      deps = [ "//device/hisilicon/hardware/display:display_gralloc" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
+
+    group("hdi_display_gfx") {
+      deps = [ "//device/hisilicon/hardware/display:display_gfx" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
+
+    group("hdi_display_layer") {
+      deps = [ "//device/hisilicon/hardware/display:display_layer" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
   }
 }

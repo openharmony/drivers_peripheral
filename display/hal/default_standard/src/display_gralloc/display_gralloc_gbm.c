@@ -66,8 +66,8 @@ static GrallocManager *GetGrallocManager()
 const char *GetPixelFmtStr(PixelFormat format)
 {
     static const ValueStrMap pixelStrMaps[] = {
-        {PIXEL_FMT_CLUT8,  "PIXEL_FMT_CLUT8" }, {PIXEL_FMT_CLUT1, "PIXEL_FMT_CLUT1" },
-        {PIXEL_FMT_CLUT4,   "PIXEL_FMT_CLUT4"}, {PIXEL_FMT_RGB_565, "PIXEL_FMT_RGB_565"},
+        {PIXEL_FMT_CLUT8, "PIXEL_FMT_CLUT8"}, {PIXEL_FMT_CLUT1, "PIXEL_FMT_CLUT1"},
+        {PIXEL_FMT_CLUT4, "PIXEL_FMT_CLUT4"}, {PIXEL_FMT_RGB_565, "PIXEL_FMT_RGB_565"},
         {PIXEL_FMT_RGBA_5658, "IXEL_FMT_RGBA_5658"}, {PIXEL_FMT_RGBX_4444, "PIXEL_FMT_RGBX_4444"},
         {PIXEL_FMT_RGBA_4444, "PIXEL_FMT_RGBA_4444"}, {PIXEL_FMT_RGB_444, "PIXEL_FMT_RGB_444"},
         {PIXEL_FMT_RGBX_5551, "PIXEL_FMT_RGBX_5551"}, {PIXEL_FMT_RGBA_5551, "PIXEL_FMT_RGBA_5551"},
@@ -76,7 +76,7 @@ const char *GetPixelFmtStr(PixelFormat format)
         {PIXEL_FMT_BGR_565, "PIXEL_FMT_BGR_565"}, {PIXEL_FMT_BGRX_4444, "PIXEL_FMT_BGRX_4444"},
         {PIXEL_FMT_BGRA_4444, "PIXEL_FMT_BGRA_4444"}, {PIXEL_FMT_BGRX_5551, "PIXEL_FMT_BGRX_5551"},
         {PIXEL_FMT_BGRA_5551, "PIXEL_FMT_BGRA_5551"}, {PIXEL_FMT_BGRX_8888, "PIXEL_FMT_BGRX_8888"},
-        {PIXEL_FMT_BGRA_8888,  "PIXEL_FMT_BGRA_8888"}, {PIXEL_FMT_YUV_422_I, "PIXEL_FMT_YUV_422_I"},
+        {PIXEL_FMT_BGRA_8888, "PIXEL_FMT_BGRA_8888"}, {PIXEL_FMT_YUV_422_I, "PIXEL_FMT_YUV_422_I"},
         {PIXEL_FMT_YUV_422_I, "PIXEL_FMT_YUV_422_I"}, {PIXEL_FMT_YCBCR_422_SP, "PIXEL_FMT_YCBCR_422_SP"},
         {PIXEL_FMT_YCRCB_422_SP, "PIXEL_FMT_YCRCB_422_SP"}, {PIXEL_FMT_YCBCR_420_SP, "PIXEL_FMT_YCBCR_420_SP"},
         {PIXEL_FMT_YCRCB_420_SP, "PIXEL_FMT_YCRCB_420_SP"}, {PIXEL_FMT_YCBCR_422_P, "PIXEL_FMT_YCBCR_422_P"},
@@ -85,21 +85,21 @@ const char *GetPixelFmtStr(PixelFormat format)
         {PIXEL_FMT_UYVY_422_PKG, "PIXEL_FMT_UYVY_422_PKG"}, {PIXEL_FMT_YVYU_422_PKG, "PIXEL_FMT_YVYU_422_PKG"},
         {PIXEL_FMT_VYUY_422_PKG, "PIXEL_FMT_VYUY_422_PKG"}, {PIXEL_FMT_BUTT, "PIXEL_FMT_BUTT"},
     };
-    static const char *unknown = "unkown format";
+    static const char *unknown = "unknown format";
     for (uint32_t i = 0; i < sizeof(pixelStrMaps) / sizeof(pixelStrMaps[0]); i++) {
         if (pixelStrMaps[i].value == format) {
             return pixelStrMaps[i].str;
         }
     }
-    DISPLAY_LOGE("GetPixelFmtStr unkown format %{public}d", format);
+    DISPLAY_LOGE("GetPixelFmtStr unknown format %{public}d", format);
     return unknown;
 }
 
 const char *GetDrmFmtStr(uint32_t format)
 {
     static const ValueStrMap formatStrMaps[] = {
-        {DRM_FORMAT_C8,  "DRM_FORMAT_C8" }, {DRM_FORMAT_R8, "DRM_FORMAT_R8" },
-        {DRM_FORMAT_R16,  "DRM_FORMAT_R16"}, {DRM_FORMAT_RG88, "DRM_FORMAT_RG88"},
+        {DRM_FORMAT_C8, "DRM_FORMAT_C8" }, {DRM_FORMAT_R8, "DRM_FORMAT_R8" },
+        {DRM_FORMAT_R16, "DRM_FORMAT_R16"}, {DRM_FORMAT_RG88, "DRM_FORMAT_RG88"},
         {DRM_FORMAT_GR88, "DRM_FORMAT_GR88"}, {DRM_FORMAT_RG1616, "DRM_FORMAT_RG1616"},
         {DRM_FORMAT_GR1616, "DRM_FORMAT_GR1616"}, {DRM_FORMAT_RGB332, "DRM_FORMAT_RGB332"},
         {DRM_FORMAT_BGR233, "DRM_FORMAT_BGR233"}, {DRM_FORMAT_XRGB4444, "DRM_FORMAT_XRGB4444"},
@@ -108,7 +108,7 @@ const char *GetDrmFmtStr(uint32_t format)
         {DRM_FORMAT_ABGR4444, "DRM_FORMAT_ABGR4444"}, {DRM_FORMAT_RGBA4444, "DRM_FORMAT_RGBA4444"},
         {DRM_FORMAT_BGRA4444, "DRM_FORMAT_BGRA4444"}, {DRM_FORMAT_XRGB1555, "DRM_FORMAT_XRGB1555"},
         {DRM_FORMAT_XBGR1555, "DRM_FORMAT_XBGR1555"}, {DRM_FORMAT_RGBX5551, "DRM_FORMAT_RGBX5551"},
-        {DRM_FORMAT_BGRX5551,  "DRM_FORMAT_BGRX5551"}, {DRM_FORMAT_ARGB1555, "DRM_FORMAT_ARGB1555"},
+        {DRM_FORMAT_BGRX5551, "DRM_FORMAT_BGRX5551"}, {DRM_FORMAT_ARGB1555, "DRM_FORMAT_ARGB1555"},
         {DRM_FORMAT_ABGR1555, "DRM_FORMAT_ABGR1555"}, {DRM_FORMAT_RGBA5551, "DRM_FORMAT_RGBA5551"},
         {DRM_FORMAT_BGRA5551, "DRM_FORMAT_BGRA5551"}, {DRM_FORMAT_RGB565, "DRM_FORMAT_RGB565"},
         {DRM_FORMAT_BGR565, "DRM_FORMAT_BGR565"}, {DRM_FORMAT_RGB888, "DRM_FORMAT_RGB888"},
@@ -129,36 +129,31 @@ const char *GetDrmFmtStr(uint32_t format)
         {DRM_FORMAT_YUV420, "DRM_FORMAT_YUV420"}, {DRM_FORMAT_YVU420, "DRM_FORMAT_YVU420"},
         {DRM_FORMAT_YUV422, "DRM_FORMAT_YUV422"}, {DRM_FORMAT_YVU422, "DRM_FORMAT_YVU422"},
         {DRM_FORMAT_YUV444, "DRM_FORMAT_YUV444"}, {DRM_FORMAT_YVU444, "DRM_FORMAT_YVU444"},
-
     };
 
-    static const char *unknown = "unkown drm format";
+    static const char *unknown = "unknown drm format";
     for (uint32_t i = 0; i < sizeof(formatStrMaps) / sizeof(formatStrMaps[0]); i++) {
         if (formatStrMaps[i].value == format) {
             return formatStrMaps[i].str;
         }
     }
-    DISPLAY_LOGE("GetDrmFmtStr unkown format %{public}d", format);
+    DISPLAY_LOGE("GetDrmFmtStr unknown format %{public}d", format);
     return unknown;
 }
 
 static uint32_t ConvertFormatToDrm(PixelFormat fmtIn)
 {
-    /*
-    DRM_FORMAT_NV16 - PIXEL_FMT_YCBCR_422_SP  DRM_FORMAT_NV61 - PIXEL_FMT_YCRCB_422_SP
-    DRM_FORMAT_YUV422 - PIXEL_FMT_YCBCR_422_P} DRM_FORMAT_YVU422 - PIXEL_FMT_YCRCB_422_P
-    now gbm can not support YUV 422
-   */
     static const PixelFormatConvertTbl convertTable[] = {
-        {DRM_FORMAT_RGBX8888,  PIXEL_FMT_RGBX_8888 },  {DRM_FORMAT_RGBA8888, PIXEL_FMT_RGBA_8888 },
-        {DRM_FORMAT_RGB888,    PIXEL_FMT_RGB_888   },  {DRM_FORMAT_RGB565,   PIXEL_FMT_BGR_565   },
-        {DRM_FORMAT_BGRX4444,  PIXEL_FMT_BGRX_4444 },  {DRM_FORMAT_BGRA4444, PIXEL_FMT_BGRA_4444 },
-        {DRM_FORMAT_RGBA4444,  PIXEL_FMT_RGBA_4444 },  {DRM_FORMAT_RGBX4444, PIXEL_FMT_RGBX_4444 },
-        {DRM_FORMAT_BGRX5551,  PIXEL_FMT_BGRX_5551 },  {DRM_FORMAT_BGRA5551, PIXEL_FMT_BGRA_5551 },
-        {DRM_FORMAT_BGRX8888,  PIXEL_FMT_BGRX_8888 },  {DRM_FORMAT_BGRA8888, PIXEL_FMT_BGRA_8888 },
-        {DRM_FORMAT_NV12,     PIXEL_FMT_YCBCR_420_SP}, {DRM_FORMAT_NV21, PIXEL_FMT_YCRCB_420_SP  },
-        {DRM_FORMAT_YUV420,   PIXEL_FMT_YCBCR_420_P}, {DRM_FORMAT_YVU420, PIXEL_FMT_YCRCB_420_P  },
-
+        {DRM_FORMAT_RGBX8888, PIXEL_FMT_RGBX_8888}, {DRM_FORMAT_RGBA8888, PIXEL_FMT_RGBA_8888},
+        {DRM_FORMAT_RGB888, PIXEL_FMT_RGB_888}, {DRM_FORMAT_RGB565, PIXEL_FMT_BGR_565},
+        {DRM_FORMAT_BGRX4444, PIXEL_FMT_BGRX_4444}, {DRM_FORMAT_BGRA4444, PIXEL_FMT_BGRA_4444},
+        {DRM_FORMAT_RGBA4444, PIXEL_FMT_RGBA_4444}, {DRM_FORMAT_RGBX4444, PIXEL_FMT_RGBX_4444},
+        {DRM_FORMAT_BGRX5551, PIXEL_FMT_BGRX_5551}, {DRM_FORMAT_BGRA5551, PIXEL_FMT_BGRA_5551},
+        {DRM_FORMAT_BGRX8888, PIXEL_FMT_BGRX_8888}, {DRM_FORMAT_BGRA8888, PIXEL_FMT_BGRA_8888},
+        {DRM_FORMAT_NV12, PIXEL_FMT_YCBCR_420_SP}, {DRM_FORMAT_NV21, PIXEL_FMT_YCRCB_420_SP},
+        {DRM_FORMAT_YUV420, PIXEL_FMT_YCBCR_420_P}, {DRM_FORMAT_YVU420, PIXEL_FMT_YCRCB_420_P},
+        {DRM_FORMAT_NV16, PIXEL_FMT_YCBCR_422_SP}, {DRM_FORMAT_NV61, PIXEL_FMT_YCRCB_422_SP},
+        {DRM_FORMAT_YUV422, PIXEL_FMT_YCBCR_422_P}, {DRM_FORMAT_YVU422, PIXEL_FMT_YCRCB_422_P},
     };
     uint32_t fmtOut = 0;
     for (uint32_t i = 0; i < sizeof(convertTable) / sizeof(convertTable[0]); i++) {
@@ -219,7 +214,6 @@ static int32_t InitGbmDevice(const char *drmFile, GrallocManager *grallocManager
 static void DeInitGbmDevice(GrallocManager *grallocManager)
 {
     DISPLAY_LOGD();
-
     hdi_gbm_device_destroy(grallocManager->gbmDevice);
     if (grallocManager->drmFd > 0) {
         close(grallocManager->drmFd);
@@ -248,7 +242,7 @@ static int32_t DmaBufferSync(const BufferHandle *handle, bool start)
     } else {
         syncPrm.flags |= DMA_BUF_SYNC_END;
     }
-    int retry = 6; // retry 6 times
+    int retry = 6;
     int ret;
     do {
         ret = ioctl(handle->fd, DMA_BUF_IOCTL_SYNC, &syncPrm);
@@ -288,7 +282,7 @@ static uint64_t GetPhysicalAddr(int fd, int primeFd)
     if (ret) {
         DISPLAY_LOGE("DRM_IOCTL_HISILICON_GEM_FD_TO_PHYADDR return failed");
     }
-    DISPLAY_LOGD("DRM_IOCTL_HISILICON_GEM_FD_TO_PHYADDR return %{public}d args.phyaddr %{public}llx", ret,
+    DISPLAY_LOGD("DRM_IOCTL_HISILICON_GEM_FD_TO_PHYADDR return %{public}d, phyaddr %{public}llx", ret,
         args.phyaddr);
     return args.phyaddr;
 }
@@ -416,7 +410,7 @@ int32_t GbmFlushCache(BufferHandle *buffer)
     return DmaBufferSync(buffer, false);
 }
 
-int32_t GbmGrallocUninitialize()
+int32_t GbmGrallocUninitialize(void)
 {
     DISPLAY_LOGD();
     GRALLOC_LOCK();
@@ -433,14 +427,13 @@ int32_t GbmGrallocUninitialize()
     return DISPLAY_SUCCESS;
 }
 
-int32_t GbmGrallocInitialize()
+int32_t GbmGrallocInitialize(void)
 {
     DISPLAY_LOGD();
     GRALLOC_LOCK();
     GrallocManager *grallocManager = GetGrallocManager();
     DISPLAY_CHK_RETURN((grallocManager == NULL), DISPLAY_PARAM_ERR, DISPLAY_LOGE("gralloc manager failed");
         GRALLOC_UNLOCK());
-    // TOD:  need lock
     int ret = InitGbmDevice(g_drmFileNode, grallocManager);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), ret, DISPLAY_LOGE("gralloc manager failed"); GRALLOC_UNLOCK());
     grallocManager->referCount++;

@@ -128,7 +128,11 @@ static inline void BlendAtop(ColorRGBAf &src, ColorRGBAf &dst)
 }
 
 // blend dst
-static inline void BlendDst(ColorRGBAf &src, ColorRGBAf &dst) {}
+static inline void BlendDst(ColorRGBAf &src, ColorRGBAf &dst)
+{
+    (void)src;
+    (void)dst;
+}
 
 // blend dst atop
 static inline void BlendDstAtop(ColorRGBAf &src, ColorRGBAf &dst)
@@ -201,7 +205,7 @@ static BlendFunction GetBlendFunc(BlendType type)
     if (maps.find(type) != maps.end()) {
         return maps[type];
     } else {
-        DISPLAY_TEST_LOGE("has no function for blend type %d maps.size() %d", type, maps.size());
+        DISPLAY_TEST_LOGE("has no function for blend type %d maps.size() %zd", type, maps.size());
         return nullptr;
     }
 }
@@ -295,7 +299,7 @@ bool SoftBlit::RunAndCheck(const BufferHandle &exBuffer)
     if (blendFunc == nullptr) {
         return false;
     }
-    DISPLAY_TEST_LOGE("blend RunAndCheck begin");
+    DISPLAY_TEST_LOGD("blend RunAndCheck begin");
     for (int x = mSrcRect.x; x < mSrcRect.w; x++) {
         for (int y = mSrcRect.y; y < mSrcRect.h; y++) {
             uint32_t srcPixel = GetPixelRGBA32(mSrcBuffer, x, y);
@@ -316,7 +320,7 @@ bool SoftBlit::RunAndCheck(const BufferHandle &exBuffer)
             }
         }
     }
-    DISPLAY_TEST_LOGE("blend RunAndCheck end");
+    DISPLAY_TEST_LOGD("blend RunAndCheck end");
     return true;
 }
 

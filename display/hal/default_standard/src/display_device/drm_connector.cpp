@@ -14,8 +14,9 @@
  */
 
 #include "drm_connector.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include <securec.h>
+#include "drm_device.h"
 
 namespace OHOS {
 namespace HDI {
@@ -65,7 +66,7 @@ void DrmConnector::InitModes(drmModeConnector c)
         }
         mModes.emplace(i, DrmMode { *mode, i });
     }
-    DISPLAY_LOGD("mode count %{public}d", mModes.size());
+    DISPLAY_LOGD("mode count %{public}zd", mModes.size());
 }
 
 int32_t DrmConnector::Init(DrmDevice &drmDevice)
@@ -92,7 +93,7 @@ int32_t DrmConnector::Init(DrmDevice &drmDevice)
     if (ret == DISPLAY_SUCCESS) {
         mPropBrightnessId =  prop.propId;
         mBrightnessLevel = static_cast<uint32_t>(prop.value);
-        DISPLAY_LOGD("the prop of brightness is %d , the level is %d", mPropBrightnessId, mBrightnessLevel);
+        DISPLAY_LOGD("prop brightness is %{public}d, level is %{public}d", mPropBrightnessId, mBrightnessLevel);
     } else {
         DISPLAY_LOGW("can not get the brightness prop, can not set the brightness");
     }
@@ -193,8 +194,7 @@ int32_t DrmConnector::PickIdleCrtcId(IdMapPtr<DrmEncoder> &encoders, IdMapPtr<Dr
 {
     DISPLAY_LOGD();
     DISPLAY_LOGD("encoder_id %{public}d", mEncoderId);
-    int ret;
-    ret = TryPickEncoder(encoders, mEncoderId, crtcs, crtcId);
+    int ret = TryPickEncoder(encoders, mEncoderId, crtcs, crtcId);
     DISPLAY_CHK_RETURN((ret == DISPLAY_SUCCESS), DISPLAY_SUCCESS,
         DISPLAY_LOGD("connector : %{public}d pick endcoder : %{public}d crtcId : %{public}d",
         mId, mEncoderId, crtcId));
@@ -239,7 +239,7 @@ int32_t DrmConnector::GetDisplaySuppportedModes(int *num, DisplayModeInfo *modes
 
 int32_t DrmConnector::SetDpmsState(uint64_t dmps)
 {
-    DISPLAY_LOGD("dmps %{public}llu", dmps);
+    DISPLAY_LOGD("dmps %{public}" PRIu64 "", dmps);
     int ret = drmModeConnectorSetProperty(mDrmFdPtr->GetFd(), mId, mPropDpmsId, dmps);
     DISPLAY_CHK_RETURN((ret != 0), DISPLAY_FAILURE, DISPLAY_LOGE("can not set dpms"));
     mDpmsState = dmps;

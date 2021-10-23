@@ -40,8 +40,7 @@ void HdiTestDevice::HotPlug(uint32_t outputId, bool connected, void *data)
 
 int32_t HdiTestDevice::InitDevice()
 {
-    int ret;
-    ret = DeviceInitialize(&mDeviceFuncs);
+    int ret = DeviceInitialize(&mDeviceFuncs);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("DeviceInitialize Failed"));
     DISPLAY_TEST_CHK_RETURN((mDeviceFuncs == nullptr), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("device funcs is null"));
     ret = LayerInitialize(&mLayerFuncs);

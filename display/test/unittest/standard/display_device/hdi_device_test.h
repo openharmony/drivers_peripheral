@@ -27,7 +27,6 @@ namespace DISPLAY {
 namespace TEST {
 constexpr uint32_t DISPLAY_DEAULT_W = 480;
 constexpr uint32_t DISPLAY_DEAULT_H = 960;
-
 constexpr uint32_t RED = 0xff0000ff;
 constexpr uint32_t GREEN = 0x00ff00ff;
 constexpr uint32_t BLUE = 0x0000ffff;

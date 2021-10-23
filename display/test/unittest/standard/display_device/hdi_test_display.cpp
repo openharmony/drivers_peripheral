@@ -24,8 +24,7 @@ HdiTestDisplay::HdiTestDisplay(uint32_t id, DeviceFuncs &deviceFunc) : mId(id), 
 int32_t HdiTestDisplay::Init()
 {
     DISPLAY_TEST_LOGD();
-    int ret;
-    ret = mDeviceFunc.GetDisplayCapability(mId, &mCap);
+    int ret = mDeviceFunc.GetDisplayCapability(mId, &mCap);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("can not get cap"));
     DISPLAY_TEST_LOGD("the capablility name %s type : %d phyWidth : %d phyHeight : %d", mCap.name, mCap.type,
         mCap.phyWidth, mCap.phyHeight);
@@ -37,7 +36,7 @@ int32_t HdiTestDisplay::Init()
     mModes.resize(num);
     ret = mDeviceFunc.GetDisplaySuppportedModes(mId, &num, mModes.data());
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("can not get modes"));
-    DISPLAY_TEST_LOGD("the modes size() %d", mModes.size());
+    DISPLAY_TEST_LOGD("the modes size() %zd", mModes.size());
 
     ret = mDeviceFunc.GetDisplayMode(mId, &mActiveModeId);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
@@ -79,8 +78,7 @@ std::shared_ptr<HdiTestLayer> HdiTestDisplay::CreateHdiTestLayer(LayerInfo &info
     DISPLAY_TEST_LOGD();
     uint32_t layerId = 0;
     LayerFuncs &layerFuncs = HdiTestDevice::GetInstance().GetLayerFuncs();
-    int ret;
-    ret = layerFuncs.CreateLayer(mId, &info, &layerId);
+    int ret = layerFuncs.CreateLayer(mId, &info, &layerId);
     DISPLAY_TEST_LOGD(" layerId %d", layerId);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), nullptr, DISPLAY_TEST_LOGE("layer creat failed"));
     auto layer = std::make_shared<HdiTestLayer>(info, layerId, mId);
@@ -147,7 +145,7 @@ int32_t HdiTestDisplay::PrepareDisplayLayers()
 {
     int ret;
     mNeedFlushFb = false;
-    DISPLAY_TEST_LOGD("id : %d  layer size %d", mId, mLayerMaps.size());
+    DISPLAY_TEST_LOGD("id : %d  layer size %zd", mId, mLayerMaps.size());
     for (const auto &layerMap : mLayerMaps) {
         ret = layerMap.second->PreparePresent();
         DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
@@ -227,7 +225,7 @@ void HdiTestDisplay::Clear()
         HdiTestDevice::GetInstance().GetLayerFuncs().CloseLayer(mId, layerId);
     }
     mLayerMaps.clear();
-    DISPLAY_TEST_LOGD("mLayerMaps size %u", mLayerMaps.size());
+    DISPLAY_TEST_LOGD("mLayerMaps size %zd", mLayerMaps.size());
 }
 } // OHOS
 } // HDI
