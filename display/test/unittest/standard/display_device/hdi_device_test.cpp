@@ -258,19 +258,6 @@ static void TestVBlankCallback(unsigned int sequence, uint64_t ns, void *data)
     VblankCtr::GetInstance().NotifyVblank(sequence, ns, data);
 }
 
-#if 0
-static int TestVblankEvent()
-{
-    DISPLAY_TEST_LOGD();
-    std::shared_ptr<HdiTestDisplay> display = HdiTestDevice::GetInstance().GetFirstDisplay();
-    int ret = display->RegDisplayVBlankCallback(TestVBlankCallback, nullptr);
-    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
-        DISPLAY_TEST_LOGE("RegDisplayVBlankCallback failed"));
-    ret = display->SetDisplayVsyncEnabled(true);
-    return ret;
-}
-#endif
-
 static void AdjustLayerSettings(std::vector<LayerSettings> &settings, uint32_t w, uint32_t h)
 {
     DISPLAY_TEST_LOGD();
@@ -306,7 +293,7 @@ static void AdjustLayerSettings(std::vector<LayerSettings> &settings, uint32_t w
 
 static std::vector<std::shared_ptr<HdiTestLayer>> CreateLayers(std::vector<LayerSettings> &settings)
 {
-    DISPLAY_TEST_LOGD("settings %u", settings.size());
+    DISPLAY_TEST_LOGD("settings %zd", settings.size());
     std::vector<std::shared_ptr<HdiTestLayer>> layers;
     DisplayModeInfo mode = GetFirstDisplay()->GetCurrentMode();
     AdjustLayerSettings(settings, mode.width, mode.height);
@@ -351,7 +338,7 @@ void VblankCtr::NotifyVblank(unsigned int sequence, uint64_t ns, void *data)
 {
     DISPLAY_TEST_LOGD();
     if (data != nullptr) {
-        DISPLAY_TEST_LOGD("sequence = %u, ns = %llu", sequence, ns);
+        DISPLAY_TEST_LOGD("sequence = %u, ns = %" PRIu64 "", sequence, ns);
     }
     std::unique_lock<std::mutex> lg(mVblankMutex);
     mHasVblank = true;

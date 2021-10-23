@@ -56,7 +56,7 @@ int DrmDevice::GetDrmFd()
     return mDrmFd->GetFd();
 }
 
-using PixelFormatConvertTbl = struct PixFmtConvertTbl{
+using PixelFormatConvertTbl = struct PixFmtConvertTbl {
     uint32_t drmFormat;
     PixelFormat pixFormat;
 };
@@ -180,7 +180,7 @@ void DrmDevice::FindAllEncoder(const drmModeResPtr &res)
         mEncoders.emplace(encoder->encoder_id, std::move(drmEncoder));
         drmModeFreeEncoder(encoder);
     }
-    DISPLAY_LOGD("find encoder count %{public}d", mEncoders.size());
+    DISPLAY_LOGD("find encoder count %{public}zd", mEncoders.size());
 }
 
 void DrmDevice::FindAllConnector(const drmModeResPtr &res)
@@ -203,7 +203,7 @@ void DrmDevice::FindAllConnector(const drmModeResPtr &res)
         int connectorId = drmConnector->GetId();
         mConnectors.emplace(connectorId, std::move(drmConnector));
     }
-    DISPLAY_LOGD("find connector count %{public}d", mConnectors.size());
+    DISPLAY_LOGD("find connector count %{public}zd", mConnectors.size());
 }
 
 void DrmDevice::FindAllPlane()
@@ -230,7 +230,7 @@ void DrmDevice::FindAllPlane()
         }
         mPlanes.emplace_back(std::move(drmPlane));
     }
-    DISPLAY_LOGD("find plane count %{public}d", mPlanes.size());
+    DISPLAY_LOGD("find plane count %{public}zd", mPlanes.size());
 }
 
 std::shared_ptr<DrmEncoder> DrmDevice::GetDrmEncoderFromId(uint32_t id)
@@ -272,7 +272,7 @@ std::vector<std::shared_ptr<DrmPlane>> DrmDevice::GetDrmPlane(uint32_t pipe, uin
             planes.push_back(plane);
         }
     }
-    DISPLAY_LOGD("the planes count %{public}d", planes.size());
+    DISPLAY_LOGD("the planes count %{public}zd", planes.size());
     return planes;
 }
 
@@ -313,7 +313,7 @@ std::unordered_map<uint32_t, std::shared_ptr<HdiDisplay>> DrmDevice::DiscoveryDi
         display->Init();
         mDisplays.emplace(display->GetId(), std::move(display));
     }
-    DISPLAY_LOGD("find display size %{public}d", mDisplays.size());
+    DISPLAY_LOGD("find display size %{public}zd", mDisplays.size());
     return mDisplays;
 }
 } // namespace OHOS

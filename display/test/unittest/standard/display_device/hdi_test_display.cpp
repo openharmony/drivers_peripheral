@@ -36,7 +36,7 @@ int32_t HdiTestDisplay::Init()
     mModes.resize(num);
     ret = mDeviceFunc.GetDisplaySuppportedModes(mId, &num, mModes.data());
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("can not get modes"));
-    DISPLAY_TEST_LOGD("the modes size() %d", mModes.size());
+    DISPLAY_TEST_LOGD("the modes size() %zd", mModes.size());
 
     ret = mDeviceFunc.GetDisplayMode(mId, &mActiveModeId);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
@@ -145,7 +145,7 @@ int32_t HdiTestDisplay::PrepareDisplayLayers()
 {
     int ret;
     mNeedFlushFb = false;
-    DISPLAY_TEST_LOGD("id : %d  layer size %d", mId, mLayerMaps.size());
+    DISPLAY_TEST_LOGD("id : %d  layer size %zd", mId, mLayerMaps.size());
     for (const auto &layerMap : mLayerMaps) {
         ret = layerMap.second->PreparePresent();
         DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
@@ -225,7 +225,7 @@ void HdiTestDisplay::Clear()
         HdiTestDevice::GetInstance().GetLayerFuncs().CloseLayer(mId, layerId);
     }
     mLayerMaps.clear();
-    DISPLAY_TEST_LOGD("mLayerMaps size %u", mLayerMaps.size());
+    DISPLAY_TEST_LOGD("mLayerMaps size %zd", mLayerMaps.size());
 }
 } // OHOS
 } // HDI

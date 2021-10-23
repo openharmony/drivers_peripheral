@@ -85,13 +85,13 @@ const char *GetPixelFmtStr(PixelFormat format)
         {PIXEL_FMT_UYVY_422_PKG, "PIXEL_FMT_UYVY_422_PKG"}, {PIXEL_FMT_YVYU_422_PKG, "PIXEL_FMT_YVYU_422_PKG"},
         {PIXEL_FMT_VYUY_422_PKG, "PIXEL_FMT_VYUY_422_PKG"}, {PIXEL_FMT_BUTT, "PIXEL_FMT_BUTT"},
     };
-    static const char *unknown = "unkown format";
+    static const char *unknown = "unknown format";
     for (uint32_t i = 0; i < sizeof(pixelStrMaps) / sizeof(pixelStrMaps[0]); i++) {
         if (pixelStrMaps[i].value == format) {
             return pixelStrMaps[i].str;
         }
     }
-    DISPLAY_LOGE("GetPixelFmtStr unkown format %{public}d", format);
+    DISPLAY_LOGE("GetPixelFmtStr unknown format %{public}d", format);
     return unknown;
 }
 
@@ -131,33 +131,29 @@ const char *GetDrmFmtStr(uint32_t format)
         {DRM_FORMAT_YUV444, "DRM_FORMAT_YUV444"}, {DRM_FORMAT_YVU444, "DRM_FORMAT_YVU444"},
     };
 
-    static const char *unknown = "unkown drm format";
+    static const char *unknown = "unknown drm format";
     for (uint32_t i = 0; i < sizeof(formatStrMaps) / sizeof(formatStrMaps[0]); i++) {
         if (formatStrMaps[i].value == format) {
             return formatStrMaps[i].str;
         }
     }
-    DISPLAY_LOGE("GetDrmFmtStr unkown format %{public}d", format);
+    DISPLAY_LOGE("GetDrmFmtStr unknown format %{public}d", format);
     return unknown;
 }
 
 static uint32_t ConvertFormatToDrm(PixelFormat fmtIn)
 {
-    /*
-    DRM_FORMAT_NV16 - PIXEL_FMT_YCBCR_422_SP  DRM_FORMAT_NV61 - PIXEL_FMT_YCRCB_422_SP
-    DRM_FORMAT_YUV422 - PIXEL_FMT_YCBCR_422_P} DRM_FORMAT_YVU422 - PIXEL_FMT_YCRCB_422_P
-    now gbm can not support YUV 422
-   */
     static const PixelFormatConvertTbl convertTable[] = {
-        {DRM_FORMAT_RGBX8888,  PIXEL_FMT_RGBX_8888 },  {DRM_FORMAT_RGBA8888, PIXEL_FMT_RGBA_8888 },
-        {DRM_FORMAT_RGB888,    PIXEL_FMT_RGB_888   },  {DRM_FORMAT_RGB565,   PIXEL_FMT_BGR_565   },
-        {DRM_FORMAT_BGRX4444,  PIXEL_FMT_BGRX_4444 },  {DRM_FORMAT_BGRA4444, PIXEL_FMT_BGRA_4444 },
-        {DRM_FORMAT_RGBA4444,  PIXEL_FMT_RGBA_4444 },  {DRM_FORMAT_RGBX4444, PIXEL_FMT_RGBX_4444 },
-        {DRM_FORMAT_BGRX5551,  PIXEL_FMT_BGRX_5551 },  {DRM_FORMAT_BGRA5551, PIXEL_FMT_BGRA_5551 },
-        {DRM_FORMAT_BGRX8888,  PIXEL_FMT_BGRX_8888 },  {DRM_FORMAT_BGRA8888, PIXEL_FMT_BGRA_8888 },
-        {DRM_FORMAT_NV12,     PIXEL_FMT_YCBCR_420_SP}, {DRM_FORMAT_NV21, PIXEL_FMT_YCRCB_420_SP  },
-        {DRM_FORMAT_YUV420,   PIXEL_FMT_YCBCR_420_P}, {DRM_FORMAT_YVU420, PIXEL_FMT_YCRCB_420_P  },
-
+        {DRM_FORMAT_RGBX8888, PIXEL_FMT_RGBX_8888}, {DRM_FORMAT_RGBA8888, PIXEL_FMT_RGBA_8888},
+        {DRM_FORMAT_RGB888, PIXEL_FMT_RGB_888}, {DRM_FORMAT_RGB565, PIXEL_FMT_BGR_565},
+        {DRM_FORMAT_BGRX4444, PIXEL_FMT_BGRX_4444}, {DRM_FORMAT_BGRA4444, PIXEL_FMT_BGRA_4444},
+        {DRM_FORMAT_RGBA4444, PIXEL_FMT_RGBA_4444}, {DRM_FORMAT_RGBX4444, PIXEL_FMT_RGBX_4444},
+        {DRM_FORMAT_BGRX5551, PIXEL_FMT_BGRX_5551}, {DRM_FORMAT_BGRA5551, PIXEL_FMT_BGRA_5551},
+        {DRM_FORMAT_BGRX8888, PIXEL_FMT_BGRX_8888}, {DRM_FORMAT_BGRA8888, PIXEL_FMT_BGRA_8888},
+        {DRM_FORMAT_NV12, PIXEL_FMT_YCBCR_420_SP}, {DRM_FORMAT_NV21, PIXEL_FMT_YCRCB_420_SP},
+        {DRM_FORMAT_YUV420, PIXEL_FMT_YCBCR_420_P}, {DRM_FORMAT_YVU420, PIXEL_FMT_YCRCB_420_P},
+        {DRM_FORMAT_NV16, PIXEL_FMT_YCBCR_422_SP}, {DRM_FORMAT_NV61, PIXEL_FMT_YCRCB_422_SP},
+        {DRM_FORMAT_YUV422, PIXEL_FMT_YCBCR_422_P}, {DRM_FORMAT_YVU422, PIXEL_FMT_YCRCB_422_P},
     };
     uint32_t fmtOut = 0;
     for (uint32_t i = 0; i < sizeof(convertTable) / sizeof(convertTable[0]); i++) {

@@ -106,7 +106,7 @@ int32_t DrmDisplay::SetDisplayPowerStatus(DispPowerStatus status)
     uint32_t drmPowerState = 0;
     int ret = ConvertToDrmPowerState(status, drmPowerState);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_PARAM_ERR,
-        DISPLAY_LOGE("unkown power status %{public}d", status));
+        DISPLAY_LOGE("unknown power status %{public}d", status));
     mConnector->SetDpmsState(drmPowerState);
     return DISPLAY_SUCCESS;
 }

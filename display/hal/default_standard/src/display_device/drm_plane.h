@@ -15,7 +15,11 @@
 
 #ifndef DRM_PLANE_H
 #define DRM_PLANE_H
-#include "drm_device.h"
+#include <cinttypes>
+#include <string>
+#include <vector>
+#include <xf86drm.h>
+#include <xf86drmMode.h>
 
 namespace OHOS {
 namespace HDI {
@@ -24,6 +28,7 @@ const std::string PROP_FBID = "FB_ID";
 const std::string PROP_IN_FENCE_FD = "IN_FENCE_FD";
 const std::string PROP_CRTC_ID = "CRTC_ID";
 const std::string PROP_TYPE = "type";
+class DrmDevice;
 
 class DrmPlane {
 public:

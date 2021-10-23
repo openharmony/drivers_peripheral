@@ -57,7 +57,7 @@ public:
             HDF_LOGE("%{public}s: write AllocInfo usage failed", __func__);
             return DISPLAY_PARAM_ERR;
         }
-        if (!data.WriteUint32(pAllocInfo->format)) { 
+        if (!data.WriteUint32(pAllocInfo->format)) {
             HDF_LOGE("%{public}s: write AllocInfo format failed", __func__);
             return DISPLAY_PARAM_ERR;
         }

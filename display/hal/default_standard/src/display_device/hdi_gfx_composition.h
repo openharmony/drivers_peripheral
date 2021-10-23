@@ -22,16 +22,22 @@ namespace HDI {
 namespace DISPLAY {
 class HdiGfxComposition : public HdiComposition {
 public:
-    int32_t Init();
+    int32_t Init(void);
     int32_t SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer);
     int32_t Apply(bool modeSet);
-    virtual ~HdiGfxComposition() {}
+    virtual ~HdiGfxComposition()
+    {
+        (void)GfxModuleDeinit();
+    }
 
 private:
     bool CanHandle(HdiLayer &hdiLayer);
     void InitGfxSurface(ISurface &surface, HdiLayerBuffer &buffer);
     int32_t BlitLayer(HdiLayer &src, HdiLayer &dst);
     int32_t ClearRect(HdiLayer &src, HdiLayer &dst);
+    int32_t GfxModuleInit(void);
+    int32_t GfxModuleDeinit(void);
+    void *mGfxModule = nullptr;
     GfxFuncs *mGfxFuncs = nullptr;
     HdiLayer *mClientLayer;
 };

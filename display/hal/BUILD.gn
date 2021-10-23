@@ -42,23 +42,45 @@ if (defined(ohos_lite)) {
     public_configs = [ ":display_hdi_public_config" ]
   }
 
-  group("hdi_display_device") {
-    deps = [ "//device/${device_company}/hardware/display:display_device" ]
-    public_configs = [ ":display_hdi_public_config" ]
-  }
+  if (product_name != "ohos-arm64") {
+    group("hdi_display_device") {
+      deps = [ "//device/${device_company}/hardware/display:display_device" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
 
-  group("hdi_display_gralloc") {
-    deps = [ "//device/${device_company}/hardware/display:display_gralloc" ]
-    public_configs = [ ":display_hdi_public_config" ]
-  }
+    group("hdi_display_gralloc") {
+      deps = [ "//device/${device_company}/hardware/display:display_gralloc" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
 
-  group("hdi_display_gfx") {
-    deps = [ "//device/${device_company}/hardware/display:display_gfx" ]
-    public_configs = [ ":display_hdi_public_config" ]
-  }
+    group("hdi_display_gfx") {
+      deps = [ "//device/${device_company}/hardware/display:display_gfx" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
 
-  group("hdi_display_layer") {
-    deps = [ "//device/${device_company}/hardware/display:display_layer" ]
-    public_configs = [ ":display_hdi_public_config" ]
+    group("hdi_display_layer") {
+      deps = [ "//device/${device_company}/hardware/display:display_layer" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
+  } else {
+    group("hdi_display_device") {
+      deps = [ "//device/hisilicon/hardware/display:display_device" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
+
+    group("hdi_display_gralloc") {
+      deps = [ "//device/hisilicon/hardware/display:display_gralloc" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
+
+    group("hdi_display_gfx") {
+      deps = [ "//device/hisilicon/hardware/display:display_gfx" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
+
+    group("hdi_display_layer") {
+      deps = [ "//device/hisilicon/hardware/display:display_layer" ]
+      public_configs = [ ":display_hdi_public_config" ]
+    }
   }
 }
