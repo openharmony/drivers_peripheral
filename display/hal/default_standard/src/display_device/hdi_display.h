@@ -33,7 +33,7 @@ class VsyncCallBack {
 public:
     VsyncCallBack(VBlankCallback cb, void *data);
     virtual void Vsync(unsigned int sequence, uint64_t ns);
-    virtual ~VsyncCallBack() {};
+    virtual ~VsyncCallBack() {}
 
 private:
     VBlankCallback mVBlankCb;

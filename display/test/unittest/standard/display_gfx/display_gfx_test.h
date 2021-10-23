@@ -31,6 +31,8 @@ protected:
     void TestTearDown();
     void DeInitTestBuffer();
     void InitTestBuffer();
+    int32_t GfxTestModuleInit(void);
+    int32_t GfxTestModuleDeinit(void);
     IRect mSrcRect = { 0 };
     IRect mDstRect = { 0 };
     BufferHandle *mSrcBuffer = nullptr;
@@ -38,6 +40,7 @@ protected:
     BufferHandle *mSoftBlendBuffer = nullptr;
     GrallocFuncs *mGrallocFuncs = nullptr;
     GfxFuncs *mGfxFuncs = nullptr;
+    void *mGfxTestModule = nullptr;
 };
 
 struct RotateParam {

@@ -15,11 +15,16 @@
 
 #include "display_gfx_test.h"
 #include <chrono>
+#include <dlfcn.h>
 #include <securec.h>
 #include "display_gfx.h"
 #include "display_gralloc.h"
 #include "display_test.h"
 #include "soft_blit.h"
+
+#define LIB_HDI_GFX_NAME "libdisplay_gfx.z.so"
+#define LIB_GFX_FUNC_INIT "GfxInitialize"
+#define LIB_GFX_FUNC_DEINIT "GfxUninitialize"
 
 namespace {
 const uint32_t DEFAULT_COLOR = 0x11225588;
@@ -213,9 +218,9 @@ void GfxTestBase::TestSetUp()
     int32_t ret = GrallocInitialize(&mGrallocFuncs);
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((ret != DISPLAY_SUCCESS), DISPLAY_TEST_LOGE("gralloc initialize failure");
         ASSERT_TRUE(0));
-    ret = GfxInitialize(&mGfxFuncs);
-    DISPLAY_TEST_CHK_RETURN_NOT_VALUE((ret != DISPLAY_SUCCESS), DISPLAY_TEST_LOGE("gfx initialize failure");
-        ASSERT_TRUE(0));
+    ret = GfxTestModuleInit();
+    DISPLAY_TEST_CHK_RETURN_NOT_VALUE((ret != DISPLAY_SUCCESS) || (mGfxFuncs == nullptr),
+        DISPLAY_TEST_LOGE("gfx initialize failure"); ASSERT_TRUE(0));
     ret = mGfxFuncs->InitGfx();
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((ret != DISPLAY_SUCCESS), DISPLAY_TEST_LOGE("gfx intgfx failure");
         ASSERT_TRUE(0));
@@ -226,6 +231,10 @@ void GfxTestBase::TestTearDown()
 {
     int32_t ret;
     DeInitTestBuffer();
+    if (mGfxFuncs == nullptr) {
+        DISPLAY_TEST_LOGE("mGfxFuncs is null");
+        return;
+    }
     ret = mGfxFuncs->DeinitGfx();
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((ret != DISPLAY_SUCCESS), DISPLAY_TEST_LOGE("gfx intgfx failure");
         ASSERT_TRUE(0));
@@ -234,7 +243,7 @@ void GfxTestBase::TestTearDown()
         DISPLAY_TEST_LOGE("gralloc uninitialize failure");
         ASSERT_TRUE(0);
     }
-    ret = GfxUninitialize(mGfxFuncs);
+    ret = GfxTestModuleDeinit();
     if (ret != DISPLAY_SUCCESS) {
         DISPLAY_TEST_LOGE("gfx uninitialize failure");
         ASSERT_TRUE(0);
@@ -280,6 +289,46 @@ void GfxTestBase::DeInitTestBuffer()
     }
 }
 
+int32_t GfxTestBase::GfxTestModuleInit(void)
+{
+    mGfxTestModule = dlopen(LIB_HDI_GFX_NAME, RTLD_NOW | RTLD_NOLOAD);
+	if (mGfxTestModule != nullptr) {
+		DISPLAY_TEST_LOGD("Module %s already loaded", LIB_HDI_GFX_NAME);
+	} else {
+		DISPLAY_TEST_LOGD("Loading module %s", LIB_HDI_GFX_NAME);
+		mGfxTestModule = dlopen(LIB_HDI_GFX_NAME, RTLD_NOW);
+		if (mGfxTestModule == nullptr) {
+			DISPLAY_TEST_LOGE("Failed to load module: %s", dlerror());
+			return DISPLAY_FAILURE;
+		}
+	}
+
+    typedef int32_t (*InitFunc)(GfxFuncs **funcs);
+    InitFunc func = reinterpret_cast<InitFunc>(dlsym(mGfxTestModule, LIB_GFX_FUNC_INIT));
+    if (func == nullptr) {
+		DISPLAY_TEST_LOGE("Failed to lookup %s function: %s", LIB_GFX_FUNC_INIT, dlerror());
+		dlclose(mGfxTestModule);
+		return DISPLAY_FAILURE;
+	}
+    return func(&mGfxFuncs);
+}
+
+int32_t GfxTestBase::GfxTestModuleDeinit(void)
+{
+    int32_t ret = DISPLAY_SUCCESS;
+    if (mGfxTestModule == nullptr) {
+        typedef int32_t (*DeinitFunc)(GfxFuncs *funcs);
+        DeinitFunc func = reinterpret_cast<DeinitFunc>(dlsym(mGfxTestModule, LIB_GFX_FUNC_DEINIT));
+        if (func == nullptr) {
+            DISPLAY_TEST_LOGE("Failed to lookup %s function: %s", LIB_GFX_FUNC_DEINIT, dlerror());
+        } else {
+            ret = func(mGfxFuncs);
+        }
+        dlclose(mGfxTestModule);
+    }
+    return ret;
+}
+
 void GfxBlendTypeTest::SetUp()
 {
     TestSetUp();
@@ -296,6 +345,10 @@ int32_t GfxBlendTypeTest::GfxBlitBlendTypeTest(BlendType type)
     GfxOpt opt = { 0 };
     opt.blendType = type;
     opt.enPixelAlpha = true;
+    if (mGfxFuncs == nullptr) {
+        DISPLAY_TEST_LOGE("mGfxFuncs is null");
+        return DISPLAY_FAILURE;
+    }
     ret = GfxBlitTest(*mGfxFuncs, *mGrallocFuncs, opt);
     return ret;
 }
@@ -343,6 +396,10 @@ int32_t GfxFillTest::FillRectTest(uint32_t testColor)
     int32_t ret;
     ISurface dstSurface = { 0 };
     GfxOpt opt = { 0 };
+    if (mGfxFuncs == nullptr) {
+        DISPLAY_TEST_LOGE("mGfxFuncs is null");
+        return DISPLAY_FAILURE;
+    }
     SourceSurfaceInit(dstSurface, *mDstBuffer);
     ret = mGfxFuncs->InitGfx();
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), ret, DISPLAY_TEST_LOGE("InitGfx failed ret:%d", ret));
@@ -374,9 +431,9 @@ void GfxRotateTest::SetUp()
     int32_t ret = GrallocInitialize(&mGrallocFuncs);
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((ret != DISPLAY_SUCCESS), DISPLAY_TEST_LOGE("gralloc initialize failure");
         ASSERT_TRUE(0));
-    ret = GfxInitialize(&mGfxFuncs);
-    DISPLAY_TEST_CHK_RETURN_NOT_VALUE((ret != DISPLAY_SUCCESS), DISPLAY_TEST_LOGE("gfx initialize failure");
-        ASSERT_TRUE(0));
+    ret = GfxTestModuleInit();
+    DISPLAY_TEST_CHK_RETURN_NOT_VALUE((ret != DISPLAY_SUCCESS) || (mGfxFuncs == nullptr),
+        DISPLAY_TEST_LOGE("gfx initialize failure"); ASSERT_TRUE(0));
     ret = mGfxFuncs->InitGfx();
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((ret != DISPLAY_SUCCESS), DISPLAY_TEST_LOGE("gfx intgfx failure");
         ASSERT_TRUE(0));
@@ -409,6 +466,11 @@ int32_t GfxRotateTest::RotateTest(RotateParam param)
     opt.blendType = param.blendType;
     int width = 1920;
     int height = 1080;
+
+    if (mGfxFuncs == nullptr) {
+        DISPLAY_TEST_LOGE("mGfxFuncs is null");
+        return DISPLAY_FAILURE;
+    }
     CalculRotateSize(param.transformType, width, height);
     mDstRect = { 0, 0, width, height };
     AllocInfo dstAllocInfo = {

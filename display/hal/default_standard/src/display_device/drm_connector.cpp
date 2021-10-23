@@ -66,7 +66,7 @@ void DrmConnector::InitModes(drmModeConnector c)
         }
         mModes.emplace(i, DrmMode { *mode, i });
     }
-    DISPLAY_LOGD("mode count %{public}d", mModes.size());
+    DISPLAY_LOGD("mode count %{public}zd", mModes.size());
 }
 
 int32_t DrmConnector::Init(DrmDevice &drmDevice)
@@ -239,7 +239,7 @@ int32_t DrmConnector::GetDisplaySuppportedModes(int *num, DisplayModeInfo *modes
 
 int32_t DrmConnector::SetDpmsState(uint64_t dmps)
 {
-    DISPLAY_LOGD("dmps %{public}llu", dmps);
+    DISPLAY_LOGD("dmps %{public}" PRIu64 "", dmps);
     int ret = drmModeConnectorSetProperty(mDrmFdPtr->GetFd(), mId, mPropDpmsId, dmps);
     DISPLAY_CHK_RETURN((ret != 0), DISPLAY_FAILURE, DISPLAY_LOGE("can not set dpms"));
     mDpmsState = dmps;

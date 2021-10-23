@@ -285,7 +285,6 @@ public:
      */
     virtual DispErrCode SetLayerBuffer(unsigned int devId, unsigned int layerId, const BufferHandle &buffer,
         int fence) = 0;
-
 }; // class IDisplayLayer
 } // namespace V1_0
 } // namespace Display

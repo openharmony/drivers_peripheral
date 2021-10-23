@@ -42,10 +42,10 @@ enum {
     CMD_DISPLAY_LAYER_SET_LAYER_BUFFER,
 };
 
-class DisplayLayerStub {
+class VideoLayerStub {
 public:
-    DisplayLayerStub();
-    virtual ~DisplayLayerStub() {}
+    VideoLayerStub();
+    virtual ~VideoLayerStub() {}
 
     DispErrCode Init();
     int32_t LayerStubInitDisplay(MessageParcel& data, MessageParcel& reply, MessageOption& option);

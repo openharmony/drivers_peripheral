@@ -36,9 +36,10 @@ public:
     virtual DispErrCode SetLayerZorder(unsigned int devId, unsigned int layerId, unsigned int zorder) override;
     virtual DispErrCode GetLayerZorder(unsigned int devId, unsigned int layerId, unsigned int &zorder) override;
     virtual DispErrCode SetTransformMode(unsigned int devId, unsigned int layerId, TransformType &type) override;
-    virtual DispErrCode SetLayerBuffer(unsigned int devId, unsigned int layerId, const BufferHandle &buffer, int fence) override;
+    virtual DispErrCode SetLayerBuffer(unsigned int devId, unsigned int layerId, const BufferHandle &buffer,
+        int fence) override;
 };
-} // namespace V1_0 
+} // namespace V1_0
 } // namespace Display
 } // namespace HDI
 } // namespace OHOS

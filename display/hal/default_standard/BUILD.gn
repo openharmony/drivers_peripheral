@@ -110,7 +110,6 @@ ohos_shared_library("def_display_device") {
   ]
   deps = [
     ":def_display_gralloc",
-    "//drivers/peripheral/display/hal:hdi_display_gfx",
     "//third_party/libdrm:libdrm",
     "//utils/native/base:utils",
   ]

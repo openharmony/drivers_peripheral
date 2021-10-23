@@ -35,7 +35,7 @@ void HdiSession::Init()
 {
     DISPLAY_LOGD();
     mHdiDevices = HdiDeviceInterface::DiscoveryDevice();
-    DISPLAY_LOGD("devices size %{public}d", mHdiDevices.size());
+    DISPLAY_LOGD("devices size %{public}zd", mHdiDevices.size());
     mHdiDisplays.clear();
     for (auto device : mHdiDevices) {
         auto displays = device->DiscoveryDisplay();

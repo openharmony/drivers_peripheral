@@ -50,12 +50,12 @@ DispErrCode VideoLayerService::InitDisplay(unsigned int devId)
         return DISPLAY_FAILURE;
     }
 
-    if (g_grallocFuncs == nullptr){
+    if (g_grallocFuncs == nullptr) {
         ret = GrallocInitialize(&g_grallocFuncs);
         if (ret != DISPLAY_SUCCESS || g_grallocFuncs == nullptr) {
             LayerUninitialize(g_layerFuncs);
             g_layerFuncs = nullptr;
-            HDF_LOGE("%{public}s: GrallocInitialize fail, ret=%{public}d",__func__, ret);
+            HDF_LOGE("%{public}s: GrallocInitialize fail, ret=%{public}d", __func__, ret);
             return DISPLAY_FAILURE;
         }
     }
@@ -197,7 +197,8 @@ DispErrCode VideoLayerService::SetTransformMode(unsigned int devId, unsigned int
     return (ret == DISPLAY_SUCCESS) ? DISPLAY_SUCCESS : DISPLAY_FAILURE;
 }
 
-DispErrCode VideoLayerService::SetLayerBuffer(unsigned int devId, unsigned int layerId, const BufferHandle &buffer, int fence)
+DispErrCode VideoLayerService::SetLayerBuffer(unsigned int devId, unsigned int layerId, const BufferHandle &buffer,
+    int fence)
 {
     if (g_layerFuncs == nullptr || g_layerFuncs->SetLayerBuffer == nullptr) {
         HDF_LOGE("may not inited or SetLayerBuffer nullptr");
