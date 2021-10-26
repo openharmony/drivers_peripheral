@@ -106,9 +106,9 @@ int32_t GrallocInitialize(GrallocFuncs **funcs)
     int ret;
     DISPLAY_CHK_RETURN((funcs == NULL), DISPLAY_PARAM_ERR, DISPLAY_LOGE("funcs is null"));
     GrallocFuncs *grallocFuncs = (GrallocFuncs *)malloc(sizeof(GrallocFuncs));
-    DISPLAY_CHK_RETURN((grallocFuncs == NULL), DISPLAY_PARAM_ERR, DISPLAY_LOGE("memset_s failed"));
+    DISPLAY_CHK_RETURN((grallocFuncs == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("memset_s failed"));
     errno_t eok = memset_s(grallocFuncs, sizeof(GrallocFuncs), 0, sizeof(GrallocFuncs));
-    DISPLAY_CHK_RETURN((eok != EOK), DISPLAY_PARAM_ERR, DISPLAY_LOGE("memset_s failed"));
+    DISPLAY_CHK_RETURN((eok != EOK), DISPLAY_FAILURE, DISPLAY_LOGE("memset_s failed"));
     // initialize gbm gralloc
 #ifdef GRALLOC_GBM_SUPPORT
     ret = GbmGrallocInitialize();
