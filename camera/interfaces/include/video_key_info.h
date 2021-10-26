@@ -16,7 +16,7 @@
 /**
  * @file video_key_info.h
  *
- * @brief 声明录像关键信息键值对
+ * @brief Declares the key-value pairs used to record key information of a video frame.
  *
  * @since 1.0
  * @version 1.0
@@ -29,17 +29,18 @@
 
 namespace OHOS::Camera {
 /**
- * @brief 数据长度，值类型为int32_t。
+ * @brief Indicates the data length. The value type is int32_t.
  */
 const std::string dataSize = "dataSize";
 
 /**
- * @brief 时间戳，单位为纳秒，值类型为int64_t。
+ * @brief Indicates the timestamp, in nanoseconds. The value type is int64_t.
  */
 const std::string timeStamp = "timeStamp";
 
 /**
- * @brief 是否关键帧，值类型为int32_t，值为1表示当前帧是关键否，值为0表示当前帧不是关键帧。
+ * @brief Specifies whether the frame is a key frame.
+ * The value type is int32_t. The value <b>1</b> means that the frame is a key frame, and <b>0</b> means the opposite.
  */
 const std::string isKeyFrame = "isKeyFrame";
 } // end namespace OHOS::Camera
