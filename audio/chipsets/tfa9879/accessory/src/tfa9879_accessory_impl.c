@@ -141,7 +141,6 @@ static void ReleaseObject(struct I2cMsg *msgs, int16_t msgSize, DevHandle i2cHan
                 msgs[1].buf = NULL;
             }
         }
-        msgs = NULL;
         AUDIO_DEVICE_LOG_DEBUG("OsalMemFree msgBuf success.\n");
     }
     // close i2c device

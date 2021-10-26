@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
-#include "audio_internal.h"
+#include "audio_adapter_info_common.h"
 #include <ctype.h>
 #include <limits.h>
-#include "audio_adapter_info_common.h"
+#include "audio_hal_log.h"
 #include "cJSON.h"
+
+#define HDF_LOG_TAG hal_audio_adapter_info_common
 
 #ifdef __LITEOS__
 #define AUDIO_ADAPTER_CONFIG    "/etc/adapter_config.json"
@@ -26,19 +28,197 @@
 #endif
 #define ADAPTER_NAME_LEN        32
 #define PORT_NAME_LEN           ADAPTER_NAME_LEN
-#define SUPPORT_ADAPTER_NUM_MAX 8
 #define SUPPORT_PORT_NUM_MAX    3
 #define SUPPORT_PORT_ID_MAX     18
 #define CONFIG_FILE_SIZE_MAX    (SUPPORT_ADAPTER_NUM_MAX * 1024)  // 8KB
 #define CONFIG_CHANNEL_COUNT    2 // two channels
 #define TIME_BASE_YEAR_1900     1900
 #define DECIMAL_SYSTEM          10
+#define MAX_ADDR_RECORD_NUM (SUPPORT_ADAPTER_NUM_MAX*3)
 
 int32_t g_adapterNum = 0;
 struct AudioAdapterDescriptor *g_audioAdapterOut = NULL;
 struct AudioAdapterDescriptor *g_audioAdapterDescs = NULL;
 static const char *g_adaptersName[SUPPORT_ADAPTER_NUM_MAX] = {NULL};
 static const char *g_portsName[SUPPORT_ADAPTER_NUM_MAX][SUPPORT_PORT_NUM_MAX] = {{NULL}};
+
+
+struct AudioAddrDB g_localAudioAddrList[MAX_ADDR_RECORD_NUM];
+bool g_fuzzCheckFlag = true;
+
+void AudioSetFuzzCheckFlag(bool check)
+{
+    g_fuzzCheckFlag = check;
+    return;
+}
+
+void AudioAdapterAddrMgrInit()
+{
+    memset_s(&g_localAudioAddrList, sizeof(g_localAudioAddrList), 0, sizeof(g_localAudioAddrList));
+    for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
+        g_localAudioAddrList[index].addrType = AUDIO_INVALID_ADDR;
+    }
+    return;
+}
+
+int32_t AudioAddAdapterAddrToList(AudioHandle adapter, const struct AudioAdapterDescriptor *desc)
+{
+    int pos = MAX_ADDR_RECORD_NUM;
+    if (adapter == NULL || desc == NULL || desc->adapterName == NULL) {
+        return AUDIO_HAL_ERR_INVALID_OBJECT;
+    }
+    for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
+        if (g_localAudioAddrList[index].adapterName) {
+            if (!strcmp(g_localAudioAddrList[index].adapterName, desc->adapterName)) {
+                LOG_FUN_ERR("The adapter has been loaded. Please reselect the adapter!");
+                return AUDIO_HAL_ERR_NOTREADY;
+            } else {
+                continue;
+            }
+        } else {
+            if (pos == MAX_ADDR_RECORD_NUM && (g_localAudioAddrList[index].addrType == AUDIO_INVALID_ADDR)) {
+                pos = index;
+            }
+        }
+    }
+    if (pos < MAX_ADDR_RECORD_NUM) {
+        g_localAudioAddrList[pos].adapterName = desc->adapterName;
+        g_localAudioAddrList[pos].addrValue = adapter;
+        g_localAudioAddrList[pos].addrType = AUDIO_ADAPTER_ADDR;
+        return AUDIO_HAL_SUCCESS;
+    }
+    return AUDIO_HAL_ERR_INVALID_PARAM;
+}
+
+int32_t AudioCheckAdapterAddr(AudioHandle adapter)
+{
+    if (g_fuzzCheckFlag == false) {
+        return AUDIO_HAL_SUCCESS;
+    }
+    if (adapter != NULL) {
+        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
+            if (g_localAudioAddrList[index].addrValue == adapter &&
+                g_localAudioAddrList[index].addrType == AUDIO_ADAPTER_ADDR) {
+                return AUDIO_HAL_SUCCESS;
+            }
+        }
+        return AUDIO_HAL_ERR_INVALID_OBJECT;
+    }
+    return AUDIO_HAL_ERR_INVALID_PARAM;
+}
+
+int32_t AudioDelAdapterAddrFromList(AudioHandle adapter)
+{
+    if (adapter != NULL) {
+        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
+            if (g_localAudioAddrList[index].addrValue == adapter &&
+                g_localAudioAddrList[index].addrType == AUDIO_ADAPTER_ADDR) {
+                g_localAudioAddrList[index].addrValue = NULL;
+                g_localAudioAddrList[index].adapterName = NULL;
+                g_localAudioAddrList[index].addrType = AUDIO_INVALID_ADDR;
+                return AUDIO_HAL_SUCCESS;
+            }
+        }
+        return AUDIO_HAL_ERR_INVALID_OBJECT;
+    }
+    return AUDIO_HAL_ERR_INVALID_PARAM;
+}
+
+int32_t AudioAddRenderAddrToList(AudioHandle render)
+{
+    if (render != NULL) {
+        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
+            if (g_localAudioAddrList[index].addrValue == NULL) {
+                g_localAudioAddrList[index].addrValue = render;
+                g_localAudioAddrList[index].addrType = AUDIO_RENDER_ADDR;
+                return AUDIO_HAL_SUCCESS;
+            }
+        }
+        return AUDIO_HAL_ERR_INVALID_OBJECT;
+    }
+    return AUDIO_HAL_ERR_INVALID_PARAM;
+}
+
+int32_t AudioCheckRenderAddr(AudioHandle render)
+{
+    if (g_fuzzCheckFlag == false) {
+        return AUDIO_HAL_SUCCESS;
+    }
+    if (render != NULL) {
+        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
+            if (g_localAudioAddrList[index].addrValue == render &&
+                g_localAudioAddrList[index].addrType == AUDIO_RENDER_ADDR) {
+                return AUDIO_HAL_SUCCESS;
+            }
+        }
+        return AUDIO_HAL_ERR_INVALID_OBJECT;
+    }
+    return AUDIO_HAL_ERR_INVALID_PARAM;
+}
+
+int32_t AudioDelRenderAddrFromList(AudioHandle render)
+{
+    if (render != NULL) {
+        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
+            if (g_localAudioAddrList[index].addrValue == render &&
+                g_localAudioAddrList[index].addrType == AUDIO_RENDER_ADDR) {
+                g_localAudioAddrList[index].addrValue = NULL;
+                g_localAudioAddrList[index].addrType = AUDIO_INVALID_ADDR;
+                return AUDIO_HAL_SUCCESS;
+            }
+        }
+        return AUDIO_HAL_ERR_INVALID_OBJECT;
+    }
+    return AUDIO_HAL_ERR_INVALID_PARAM;
+}
+
+int32_t AudioAddCaptureAddrToList(AudioHandle capture)
+{
+    if (capture != NULL) {
+        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
+            if (g_localAudioAddrList[index].addrValue == NULL) {
+                g_localAudioAddrList[index].addrValue = capture;
+                g_localAudioAddrList[index].addrType = AUDIO_CAPTURE_ADDR;
+                return AUDIO_HAL_SUCCESS;
+            }
+        }
+    }
+    return AUDIO_HAL_ERR_INVALID_OBJECT;
+}
+
+int32_t AudioCheckCaptureAddr(AudioHandle capture)
+{
+    if (g_fuzzCheckFlag == false) {
+        return AUDIO_HAL_SUCCESS;
+    }
+    if (capture != NULL) {
+        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
+            if (g_localAudioAddrList[index].addrValue == capture &&
+                g_localAudioAddrList[index].addrType == AUDIO_CAPTURE_ADDR) {
+                return AUDIO_HAL_SUCCESS;
+            }
+        }
+        return AUDIO_HAL_ERR_INVALID_OBJECT;
+    }
+    return AUDIO_HAL_ERR_INVALID_PARAM;
+}
+
+
+int32_t AudioDelCaptureAddrFromList(AudioHandle capture)
+{
+    if (capture != NULL) {
+        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
+            if (g_localAudioAddrList[index].addrValue == capture &&
+                g_localAudioAddrList[index].addrType == AUDIO_CAPTURE_ADDR) {
+                g_localAudioAddrList[index].addrValue = NULL;
+                g_localAudioAddrList[index].addrType = AUDIO_INVALID_ADDR;
+                return AUDIO_HAL_SUCCESS;
+            }
+        }
+        return AUDIO_HAL_ERR_INVALID_OBJECT;
+    }
+    return AUDIO_HAL_ERR_INVALID_PARAM;
+}
 
 static void ClearAdaptersAllName(void)
 {
@@ -489,10 +669,11 @@ static char *AudioAdaptersGetConfig(const char *fpath)
         /* The file path is bad or unreadable */
         return NULL;
     }
-    if (access(fpath, F_OK | R_OK)) {
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(fpath, pathBuf) == NULL) {
         return NULL;
     }
-    FILE *fp = fopen(fpath, "r");
+    FILE *fp = fopen(pathBuf, "r");
     if (fp == NULL) {
         LOG_FUN_ERR("Can not open config file [ %s ].\n", fpath);
         return NULL;
@@ -510,7 +691,7 @@ static char *AudioAdaptersGetConfig(const char *fpath)
         return NULL;
     }
     pJsonStr = (char *)calloc(1, (uint32_t)jsonStrSize);
-    if (NULL == pJsonStr) {
+    if (pJsonStr == NULL) {
         fclose(fp);
         return NULL;
     }
@@ -917,13 +1098,13 @@ int32_t TransferSampleRate(const char *value, uint32_t *sampleRate)
 
 int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamValMap[], int32_t *count)
 {
-    if (NULL == keyValueList || mParamValMap == NULL || NULL == count) {
+    if (keyValueList == NULL || mParamValMap == NULL || count == NULL) {
         return HDF_FAILURE;
     }
     int i = 0;
     char *mParaMap[MAP_MAX];
-    char buffer[ERROR_REASON_DESC_LEN] = {0};
-    int32_t ret = sprintf_s(buffer, ERROR_REASON_DESC_LEN - 1, "%s", keyValueList);
+    char buffer[KEY_VALUE_LIST_LEN] = {0};
+    int32_t ret = sprintf_s(buffer, KEY_VALUE_LIST_LEN - 1, "%s", keyValueList);
     if (ret < 0) {
         LOG_FUN_ERR("sprintf_s failed!");
         return HDF_FAILURE;
@@ -956,7 +1137,7 @@ int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamVal
 
 int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key, void *value)
 {
-    if (NULL == keyValueList || NULL == key || NULL == value) {
+    if (keyValueList == NULL || key == NULL || value == NULL) {
         return HDF_FAILURE;
     }
     int32_t ret = HDF_FAILURE;
@@ -1043,7 +1224,7 @@ int32_t SetExtParam(const char *key, const char *value, struct ExtraParams *mExt
 int32_t GetErrorReason(int reason, char *reasonDesc)
 {
     int32_t ret;
-    if (NULL == reasonDesc) {
+    if (reasonDesc == NULL) {
         return HDF_FAILURE;
     }
     switch (reason) {
@@ -1065,7 +1246,7 @@ int32_t GetErrorReason(int reason, char *reasonDesc)
 }
 int32_t GetCurrentTime(char *currentTime)
 {
-    if (NULL == currentTime) {
+    if (currentTime == NULL) {
         return HDF_FAILURE;
     }
     // Get the current time

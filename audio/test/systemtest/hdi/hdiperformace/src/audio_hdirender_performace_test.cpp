@@ -87,10 +87,11 @@ void AudioHdiRenderPerformaceTest::SetUpTestCase(void)
     }
     SdkInit();
 #endif
-    if (access(RESOLVED_PATH.c_str(), 0)) {
+    char absPath[PATH_MAX] = {0};
+    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
         return;
     }
-    handleSo = dlopen(RESOLVED_PATH.c_str(), RTLD_LAZY);
+    handleSo = dlopen(absPath, RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
     }
@@ -117,6 +118,10 @@ void AudioHdiRenderPerformaceTest::TearDownTestCase(void)
         SdkExit = nullptr;
     }
 #endif
+    if (handleSo != nullptr) {
+        dlclose(handleSo);
+        handleSo = nullptr;
+    }
     if (GetAudioManager != nullptr) {
         GetAudioManager = nullptr;
     }
@@ -185,6 +190,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerLoadAdapter_Per
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+        audiopara.adapter = nullptr;
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
@@ -216,6 +222,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerUnLoadAdapter_P
         gettimeofday(&audiopara.start, NULL);
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
         gettimeofday(&audiopara.end, NULL);
+        audiopara.adapter = nullptr;
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
@@ -240,7 +247,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerInitAllPorts_Pe
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = GetLoadAdapter(*audiopara.manager, audiopara.portType, audiopara.adapterName,
+    ret = GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
@@ -255,6 +262,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerInitAllPorts_Pe
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -273,14 +281,14 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioGetPortCapability_Perf
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = GetLoadAdapter(*audiopara.manager, audiopara.portType, audiopara.adapterName,
+    ret = GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.adapter->InitAllPorts(audiopara.adapter);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.adapter->GetPortCapability(audiopara.adapter, &audiopara.audioPort, &audiopara.capability);
+        ret = audiopara.adapter->GetPortCapability(audiopara.adapter, audiopara.audioPort, &audiopara.capability);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
@@ -290,6 +298,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioGetPortCapability_Perf
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -309,26 +318,27 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioSetPassthroughMode_Per
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = GetLoadAdapter(*audiopara.manager, audiopara.portType, audiopara.adapterName,
+    ret = GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.adapter->InitAllPorts(audiopara.adapter);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.adapter->SetPassthroughMode(audiopara.adapter, &audiopara.audioPort, audiopara.mode);
+        ret = audiopara.adapter->SetPassthroughMode(audiopara.adapter, audiopara.audioPort, audiopara.mode);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
-        ret = audiopara.adapter->GetPassthroughMode(audiopara.adapter, &audiopara.audioPort, &audiopara.mode);
+        ret = audiopara.adapter->GetPassthroughMode(audiopara.adapter, audiopara.audioPort, &audiopara.mode);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(PORT_PASSTHROUGH_LPCM, audiopara.mode);
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -348,16 +358,16 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioGetPassthroughMode_Per
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = GetLoadAdapter(*audiopara.manager, audiopara.portType, audiopara.adapterName,
+    ret = GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.adapter->InitAllPorts(audiopara.adapter);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = audiopara.adapter->SetPassthroughMode(audiopara.adapter, &audiopara.audioPort, audiopara.mode);
+    ret = audiopara.adapter->SetPassthroughMode(audiopara.adapter, audiopara.audioPort, audiopara.mode);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.adapter->GetPassthroughMode(audiopara.adapter, &audiopara.audioPort, &audiopara.mode);
+        ret = audiopara.adapter->GetPassthroughMode(audiopara.adapter, audiopara.audioPort, &audiopara.mode);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(PORT_PASSTHROUGH_LPCM, audiopara.mode);
@@ -368,6 +378,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioGetPassthroughMode_Per
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -392,7 +403,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetLatency_Perfo
     ret = PlayAudioFile(audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
-        if (audiopara.render->GetLatency != nullptr) {
+        if (audiopara.render != nullptr) {
             gettimeofday(&audiopara.start, NULL);
             ret = audiopara.render->GetLatency(audiopara.render, &latencyTime);
             gettimeofday(&audiopara.end, NULL);
@@ -426,11 +437,11 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioCreateRender_Performan
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = GetLoadAdapter(*audiopara.manager, audiopara.portType, audiopara.adapterName,
+    ret = GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     InitAttrs(audiopara.attrs);
-    InitDevDesc(audiopara.devDesc, audiopara.audioPort.portId, audiopara.pins);
+    InitDevDesc(audiopara.devDesc, audiopara.audioPort->portId, audiopara.pins);
 
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
@@ -439,6 +450,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioCreateRender_Performan
         gettimeofday(&audiopara.end, NULL);
         if (ret < 0 || audiopara.render == nullptr) {
             audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+            audiopara.adapter = nullptr;
             ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
         }
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
@@ -449,6 +461,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioCreateRender_Performan
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(HIGHLATENCY, audiopara.averageDelayTime);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -468,16 +481,17 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioDestroyRender_Performa
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = GetLoadAdapter(*audiopara.manager, audiopara.portType, audiopara.adapterName,
+    ret = GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     InitAttrs(audiopara.attrs);
-    InitDevDesc(audiopara.devDesc, audiopara.audioPort.portId, audiopara.pins);
+    InitDevDesc(audiopara.devDesc, audiopara.audioPort->portId, audiopara.pins);
     for (int i = 0; i < COUNT; ++i) {
         ret = audiopara.adapter->CreateRender(audiopara.adapter, &audiopara.devDesc, &audiopara.attrs,
                                               &audiopara.render);
         if (ret < 0 || audiopara.render == nullptr) {
             audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+            audiopara.adapter = nullptr;
             ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
         }
         gettimeofday(&audiopara.start, NULL);
@@ -490,6 +504,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioDestroyRender_Performa
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -512,7 +527,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetRenderPositio
     ret = PlayAudioFile(audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
-        if (audiopara.render->GetRenderPosition != nullptr) {
+        if (audiopara.render != nullptr) {
             gettimeofday(&audiopara.start, NULL);
             ret = audiopara.render->GetRenderPosition(audiopara.render, &audiopara.character.getframes,
                 &audiopara.time);
@@ -547,7 +562,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetRenderSpeed_P
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
@@ -588,7 +603,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetRenderSpeed_P
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
@@ -627,7 +642,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetChannelMode_P
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
@@ -668,7 +683,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetChannelMode_P
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
@@ -709,7 +724,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetFrameCount_Pe
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
@@ -747,7 +762,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetCurrentChanne
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -764,6 +779,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetCurrentChanne
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.render = nullptr;
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -785,7 +802,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderFlush_Performanc
     ASSERT_NE(nullptr, audiopara.manager);
 
     for (int i = 0; i < COUNT; ++i) {
-        ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+        ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                                 &audiopara.render);
         ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
         ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
@@ -822,7 +839,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetFrameSize_Per
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -844,6 +861,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetFrameSize_Per
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.render = nullptr;
+    audiopara.adapter = nullptr;
 }
 
 
@@ -865,7 +884,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderCheckSceneCapabi
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -882,6 +901,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderCheckSceneCapabi
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.render = nullptr;
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -902,7 +923,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSelectScene_Perf
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -919,6 +940,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSelectScene_Perf
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.render = nullptr;
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -938,7 +961,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetMute_Performa
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
@@ -957,6 +980,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetMute_Performa
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.render = nullptr;
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -976,7 +1001,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetMute_Performa
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->volume.SetMute(audiopara.render, false);
@@ -995,6 +1020,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetMute_Performa
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.render = nullptr;
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -1014,7 +1041,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetVolume_Perfor
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -1034,6 +1061,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetVolume_Perfor
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.render = nullptr;
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -1053,7 +1082,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetVolume_Perfor
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -1070,6 +1099,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetVolume_Perfor
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.render = nullptr;
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -1089,7 +1120,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetGainThreshold
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -1107,6 +1138,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetGainThreshold
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.render = nullptr;
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -1126,7 +1159,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetGain_Performa
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
@@ -1142,6 +1175,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetGain_Performa
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.render = nullptr;
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -1161,7 +1196,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetGain_Performa
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -1181,6 +1216,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetGain_Performa
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.render = nullptr;
+    audiopara.adapter = nullptr;
 }
 
 /**
@@ -1200,19 +1237,23 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderFrame_Performanc
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
     if (ret < 0) {
         audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+        audiopara.render = nullptr;
+        audiopara.adapter = nullptr;
         ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
     ret = RenderFramePrepare(audiopara.path, audiopara.frame, audiopara.requestBytes);
     if (ret < 0) {
         audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+        audiopara.render = nullptr;
+        audiopara.adapter = nullptr;
         ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
     for (int i = 0; i < COUNT; ++i) {
@@ -1254,7 +1295,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderStart_Performanc
     ASSERT_NE(nullptr, audiopara.manager);
 
     for (int i = 0; i < COUNT; ++i) {
-        ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+        ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                                 &audiopara.render);
         ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
         gettimeofday(&audiopara.start, NULL);
@@ -1288,7 +1329,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderStop_Performance
     ASSERT_NE(nullptr, audiopara.manager);
 
     for (int i = 0; i < COUNT; ++i) {
-        ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+        ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                                 &audiopara.render);
         ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
         ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
@@ -1302,6 +1343,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderStop_Performance
         audiopara.totalTime += audiopara.delayTime;
         audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+        audiopara.render = nullptr;
+        audiopara.adapter = nullptr;
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
@@ -1322,7 +1365,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetSampleAttribu
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     InitAttrs(audiopara.attrs);
@@ -1339,6 +1382,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetSampleAttribu
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.render = nullptr;
+    audiopara.adapter = nullptr;
 }
 /**
 * @tc.name  the performace of AudioRenderPause
@@ -1357,7 +1402,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderPause_Performanc
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
@@ -1396,7 +1441,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderResume_Performan
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
@@ -1434,7 +1479,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetSampleAttribu
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     InitAttrs(audiopara.attrs);
@@ -1452,6 +1497,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetSampleAttribu
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.render = nullptr;
+    audiopara.adapter = nullptr;
 }
 /**
 * @tc.name  the performace of AudioRenderReqMmapBuffer
@@ -1464,7 +1511,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderReqMmapBuffer_Pe
 {
     int32_t ret = -1;
     bool isRender = true;
-    uint32_t reqSize = 0;
+    int32_t reqSize = 0;
     struct AudioMmapBufferDescripter desc = {};
     struct PrepareAudioPara audiopara = {
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER, .totalTime = 0
@@ -1477,32 +1524,33 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderReqMmapBuffer_Pe
         audiopara.render = nullptr;
         FILE *fp = fopen(LOW_LATENCY_AUDIO_FILE.c_str(), "rb+");
         ASSERT_NE(nullptr, fp);
-        ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+        ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                                 &audiopara.render);
         if (ret < 0 || audiopara.render == nullptr) {
             fclose(fp);
-            ASSERT_EQ(HDF_SUCCESS, ret);
+            ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
             ASSERT_EQ(nullptr, audiopara.render);
         }
         InitAttrs(audiopara.attrs);
         audiopara.attrs.startThreshold = 0;
         ret = audiopara.render->attr.SetSampleAttributes(audiopara.render, &(audiopara.attrs));
         ret = InitMmapDesc(fp, desc, reqSize, isRender);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.render->attr.ReqMmapBuffer((AudioHandle)audiopara.render, reqSize, &desc);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         if (ret == 0) {
             munmap(desc.memoryAddress, reqSize);
         }
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
-        ret = audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        audiopara.render->control.Stop((AudioHandle)audiopara.render);
+        audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+        audiopara.render = nullptr;
         audiopara.adapter = nullptr;
         fclose(fp);
         usleep(500);
@@ -1530,7 +1578,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetMmapPosition_
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateRender(*audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -1538,6 +1586,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetMmapPosition_
     if (ret != 0) {
         audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
         audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+        audiopara.render = nullptr;
+        audiopara.adapter = nullptr;
         ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
     for (int i = 0; i < COUNT; ++i) {
@@ -1553,6 +1603,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetMmapPosition_
     }
     audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.render = nullptr;
+    audiopara.adapter = nullptr;
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
@@ -1574,7 +1626,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetExtraParams_P
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateStartRender(*audiopara.manager, &audiopara.render, &audiopara.adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(audiopara.manager, &audiopara.render, &audiopara.adapter, ADAPTER_NAME_USB);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     for (int i = 0; i < COUNT; ++i) {
@@ -1586,8 +1638,8 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetExtraParams_P
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
     }
-    audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    ret = StopAudio(audiopara);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
@@ -1613,7 +1665,7 @@ attr-sampling-rate=48000";
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
 
-    ret = AudioCreateStartRender(*audiopara.manager, &audiopara.render, &audiopara.adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(audiopara.manager, &audiopara.render, &audiopara.adapter, ADAPTER_NAME_USB);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->attr.SetExtraParams((AudioHandle)audiopara.render, keyValueList);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -1629,8 +1681,8 @@ attr-sampling-rate=48000";
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
     }
-    audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    ret = StopAudio(audiopara);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }

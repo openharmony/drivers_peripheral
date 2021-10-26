@@ -25,21 +25,9 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
       "//utils/native/base/include",
-      "$hdf_framework_path/core/adapter/syscall/include",
-      "$hdf_framework_path/core/adapter/vnode/include",
-      "$hdf_framework_path/core/shared/include",
-      "$hdf_framework_path/include/core/",
-      "$hdf_uhdf_path/osal/include",
-      "$hdf_uhdf_path/include/hdi",
-      "$hdf_uhdf_path/ipc/include",
-      "$hdf_uhdf_path/include/osal",
-      "$hdf_uhdf_path/include/host",
-      "$hdf_uhdf_path/shared/include",
-      "$hdf_uhdf_path/manager/include",
-      "$hdf_uhdf_path/host/include",
-      "$hdf_uhdf_path/include",
-      "$hdf_uhdf_path/common/security/include",
       "//third_party/bounds_checking_function/include",
+      "$hdf_framework_path/include/utils",
+      "//drivers/adapter/khdf/liteos/osal/include",
     ]
 
     sources = [ "framework_render.c" ]
@@ -57,16 +45,9 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
       "//utils/native/base/include",
-      "$hdf_framework_path/core/adapter/syscall/include",
-      "$hdf_framework_path/core/adapter/vnode/include",
-      "$hdf_framework_path/core/shared/include",
-      "$hdf_framework_path/include/core/",
-      "$hdf_uhdf_path/include/host",
-      "$hdf_uhdf_path/shared/include",
-      "$hdf_uhdf_path/manager/include",
-      "$hdf_uhdf_path/host/include",
-      "$hdf_uhdf_path/common/security/include",
       "//third_party/bounds_checking_function/include",
+      "$hdf_framework_path/include/utils",
+      "//drivers/adapter/khdf/liteos/osal/include",
     ]
 
     sources = [ "framework_capture.c" ]

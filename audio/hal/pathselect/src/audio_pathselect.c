@@ -14,6 +14,9 @@
  */
 
 #include "audio_pathselect.h"
+#include "audio_hal_log.h"
+
+#define HDF_LOG_TAG hal_audio_pathselect
 
 #define SPEAKER     "Speaker"
 #define HEADPHONES  "headphones"
@@ -31,15 +34,15 @@ enum AudioCategoryPathSel {
 };
 
 enum AudioPortPinPathSel {
-    PATH_DEV_NONE        = 0x0u,       /**< Invalid pin */
-    PATH_DEV_OUT_SPEAKER = 0x1u,       /**< Speaker output pin */
-    PATH_DEV_OUT_HEADSET = 0x2u,       /**< Wired headset pin for output */
-    PATH_DEV_OUT_LINEOUT = 0x4u,       /**< Line-out pin */
-    PATH_DEV_OUT_HDMI    = 0x8u,       /**< HDMI output pin */
-    PATH_DEV_MID         = 0x8000000u, /**< Microphone input pin */
-    PATH_DEV_IN_MIC      = 0x8000001u, /**< Microphone input pin */
-    PATH_DEV_IN_HS_MIC   = 0x8000002u, /**< Wired headset microphone pin for input */
-    PATH_DEV_IN_LINEIN   = 0x8000004u, /**< Line-in pin */
+    PATH_DEV_NONE        = 0x0u,       /* Invalid pin */
+    PATH_DEV_OUT_SPEAKER = 0x1u,       /* Speaker output pin */
+    PATH_DEV_OUT_HEADSET = 0x2u,       /* Wired headset pin for output */
+    PATH_DEV_OUT_LINEOUT = 0x4u,       /* Line-out pin */
+    PATH_DEV_OUT_HDMI    = 0x8u,       /* HDMI output pin */
+    PATH_DEV_MID         = 0x8000000u, /* Microphone input pin */
+    PATH_DEV_IN_MIC      = 0x8000001u, /* Microphone input pin */
+    PATH_DEV_IN_HS_MIC   = 0x8000002u, /* Wired headset microphone pin for input */
+    PATH_DEV_IN_LINEIN   = 0x8000004u, /* Line-in pin */
     PATH_DEV_MAX,
 };
 
@@ -47,8 +50,11 @@ int32_t AudioPathSelGetConfToJsonObj()
 {
     FILE *fpJson = NULL;
     char *pJsonStr = NULL;
+    if (g_cJsonObj != NULL) {
+        return HDF_SUCCESS;
+    }
     fpJson = fopen(CJSONFILE_CONFIG_PATH, "r");
-    if (NULL == fpJson) {
+    if (fpJson == NULL) {
         LOG_FUN_ERR("parse.json file fail!");
         return HDF_FAILURE;
     }
@@ -64,7 +70,7 @@ int32_t AudioPathSelGetConfToJsonObj()
         return HDF_FAILURE;
     }
     pJsonStr = (char *)calloc(1, jsonStrSize);
-    if (NULL == pJsonStr) {
+    if (pJsonStr == NULL) {
         fclose(fpJson);
         return HDF_FAILURE;
     }
@@ -81,7 +87,7 @@ int32_t AudioPathSelGetConfToJsonObj()
     LOG_PARA_INFO("pJsonStr = %s", pJsonStr);
 #endif
     g_cJsonObj = cJSON_Parse(pJsonStr);
-    if (NULL == g_cJsonObj) {
+    if (g_cJsonObj == NULL) {
         LOG_FUN_ERR("cJSON_GetErrorPtr() = %s", cJSON_GetErrorPtr());
         AudioMemFree((void **)&pJsonStr);
         return HDF_FAILURE;
@@ -556,7 +562,7 @@ static int32_t AudioPathSelGetPlanRender(struct AudioHwRenderParam *renderParam)
     return HDF_SUCCESS;
 }
 
-int32_t AudioPathSelAnalysisJson(const void *adapterParam, enum AudioAdaptType adaptType)
+int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdaptType adaptType)
 {
     LOG_FUN_INFO();
     if (adaptType < 0 || adapterParam == NULL) {

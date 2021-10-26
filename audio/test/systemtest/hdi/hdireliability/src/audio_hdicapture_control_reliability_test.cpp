@@ -26,6 +26,7 @@ const string ADAPTER_NAME_USB = "usb";
 const int PTHREAD_SAMEADA_COUNT = 3;
 const int PTHREAD_DIFFADA_COUNT = 1;
 const int BUFFER_SIZE = 16384;
+mutex testMutex;
 static struct PrepareAudioPara g_para[PTHREAD_DIFFADA_COUNT] = {
     {
         .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC,
@@ -91,10 +92,12 @@ void AudioHdiCaptureControlReliabilityTest::SetUpTestCase(void)
     }
     SdkInit();
 #endif
-    if (access(RESOLVED_PATH.c_str(), 0)) {
+    char absPath[PATH_MAX] = {0};
+    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
         return;
     }
-    handleSo = dlopen(RESOLVED_PATH.c_str(), RTLD_LAZY);
+
+    handleSo = dlopen(absPath, RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
     }
@@ -119,6 +122,10 @@ void AudioHdiCaptureControlReliabilityTest::TearDownTestCase(void)
         SdkExit = nullptr;
     }
 #endif
+    if (handleSo != nullptr) {
+        dlclose(handleSo);
+        handleSo = nullptr;
+    }
     if (GetAudioManager != nullptr) {
         GetAudioManager = nullptr;
     }
@@ -134,7 +141,9 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelGetAllAdapter(struct PrepareAu
     if (ptr.manager == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
+    testMutex.lock();
     int32_t ret = ptr.manager->GetAllAdapters(ptr.manager, &ptr.descs, &size);
+    testMutex.unlock();
     if (ret < 0) {
         return ret;
     }
@@ -157,7 +166,9 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelLoadAdapter(struct PrepareAudi
     if (ptr.desc == nullptr || ptr.manager == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
+    testMutex.lock();
     int32_t ret = ptr.manager->LoadAdapter(ptr.manager, ptr.desc, &ptr.adapter);
+    testMutex.unlock();
     if (ret < 0) {
         return ret;
     }
@@ -174,8 +185,10 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelAudioCreateCapture(struct Prep
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     InitAttrs(ptr.attrs);
-    InitDevDesc(ptr.devDesc, (&ptr.audioPort)->portId, ptr.pins);
+    InitDevDesc(ptr.devDesc, ptr.audioPort->portId, ptr.pins);
+    testMutex.lock();
     ret = ptr.adapter->CreateCapture(ptr.adapter, &ptr.devDesc, &ptr.attrs, &ptr.capture);
+    testMutex.unlock();
     if (ret < 0) {
         ptr.manager->UnloadAdapter(ptr.manager, ptr.adapter);
         return ret;
@@ -193,7 +206,9 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelAudioCaptureStart(struct Prepa
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
+    testMutex.lock();
     ret = ptr.capture->control.Start((AudioHandle)(ptr.capture));
+    testMutex.unlock();
     return ret;
 }
 
@@ -208,7 +223,9 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelAudioCaptureFrame(struct Prepa
         return HDF_ERR_MALLOC_FAIL;
     }
 
+    testMutex.lock();
     ret = ptr.capture->CaptureFrame(ptr.capture, frame, requestBytes, &replyBytes);
+    testMutex.unlock();
     free(frame);
     frame = nullptr;
     return ret;
@@ -238,7 +255,9 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelAudioCaptureStop(struct Prepar
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
+    testMutex.lock();
     ret = ptr.capture->control.Stop((AudioHandle)(ptr.capture));
+    testMutex.unlock();
     return ret;
 }
 
@@ -248,7 +267,9 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelAudioCapturePause(struct Prepa
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
+    testMutex.lock();
     ret = ptr.capture->control.Pause((AudioHandle)(ptr.capture));
+    testMutex.unlock();
     return ret;
 }
 
@@ -258,7 +279,9 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelAudioCaptureResume(struct Prep
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
+    testMutex.lock();
     ret = ptr.capture->control.Resume((AudioHandle)(ptr.capture));
+    testMutex.unlock();
     return ret;
 }
 
@@ -295,7 +318,9 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelAudioAdapterInitAllPorts(struc
     if (ptr.adapter == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
+    testMutex.lock();
     ret = ptr.adapter->InitAllPorts(ptr.adapter);
+    testMutex.unlock();
     return ret;
 }
 
@@ -305,7 +330,9 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelAudioAdapterGetPortCapability(
     if (ptr.adapter == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    ret = ptr.adapter->GetPortCapability(ptr.adapter, &(ptr.audioPort), &(ptr.capability));
+    testMutex.lock();
+    ret = ptr.adapter->GetPortCapability(ptr.adapter, ptr.audioPort, &(ptr.capability));
+    testMutex.unlock();
     return ret;
 }
 
@@ -315,7 +342,9 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelAudioAdapterSetPassthroughMode
     if (ptr.adapter == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    ret = ptr.adapter->SetPassthroughMode(ptr.adapter, &(ptr.audioPort), ptr.mode);
+    testMutex.lock();
+    ret = ptr.adapter->SetPassthroughMode(ptr.adapter, ptr.audioPort, ptr.mode);
+    testMutex.unlock();
     return ret;
 }
 
@@ -325,7 +354,9 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelAudioAdapterGetPassthroughMode
     if (ptr.adapter == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    ret = ptr.adapter->GetPassthroughMode(ptr.adapter, &(ptr.audioPort), &(ptr.mode));
+    testMutex.lock();
+    ret = ptr.adapter->GetPassthroughMode(ptr.adapter, ptr.audioPort, &(ptr.mode));
+    testMutex.unlock();
     return ret;
 }
 
@@ -335,7 +366,9 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelAudioCaptureGetCapturePosition
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
+    testMutex.lock();
     ret = ptr.capture->GetCapturePosition(ptr.capture, &(ptr.character.getframes), &(ptr.time));
+    testMutex.unlock();
     return ret;
 }
 
@@ -363,7 +396,6 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureFrame_
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         ret = pthread_create(&tids[i], NULL, (THREAD_FUNC)RelAudioCaptureFrame, &g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-        usleep(30000);
     }
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         void *result = nullptr;
@@ -400,7 +432,6 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureStart_
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         ret = pthread_create(&tids[i], NULL, (THREAD_FUNC)RelAudioCaptureStart, &g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-        usleep(50000);
     }
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         void *result = nullptr;
@@ -443,7 +474,6 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureStop_R
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         ret = pthread_create(&tids[i], NULL, (THREAD_FUNC)RelAudioCaptureStop, &g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-        usleep(50000);
     }
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         void *result = nullptr;
@@ -474,6 +504,8 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureStop_R
 HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCapturePause_Reliability_0001, TestSize.Level1)
 {
     int32_t ret = -1;
+    int32_t failcount = 0;
+    int32_t succeedcount = 0;
     ASSERT_NE(nullptr, GetAudioManager);
     g_para[0].manager = GetAudioManager();
     ASSERT_NE(nullptr, g_para[0].manager);
@@ -483,19 +515,24 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCapturePause_
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         ret = pthread_create(&tids[i], NULL, (THREAD_FUNC)RelAudioCapturePause, &g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-        usleep(50000);
-        ret = RelAudioCaptureResume(g_para[0]);
-        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
 
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         void *result = nullptr;
         pthread_join(tids[i], &result);
-        EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
+        if ((intptr_t)result == 0) {
+            EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
+            succeedcount = succeedcount + 1;
+        } else {
+            EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, (intptr_t)result);
+            failcount = failcount + 1;
+        }
     }
     if (g_para[0].adapter != nullptr) {
         ret = StopAudio(g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+        EXPECT_EQ(failcount, PTHREAD_SAMEADA_COUNT - 1);
+        EXPECT_EQ(succeedcount, 1);
     }
 }
 
@@ -588,7 +625,7 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioSetPassthroug
         void *result = nullptr;
         pthread_join(tids[i], &result);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
-        ret = g_para[0].adapter->GetPassthroughMode(g_para[0].adapter, &(g_para[0].audioPort), &(g_para[0].mode));
+        ret = g_para[0].adapter->GetPassthroughMode(g_para[0].adapter, g_para[0].audioPort, &(g_para[0].mode));
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(PORT_PASSTHROUGH_LPCM, g_para[0].mode);
     }
@@ -640,30 +677,39 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioGetPassthroug
 HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureResume_Reliability_0001, TestSize.Level1)
 {
     int32_t ret = -1;
+    int32_t failcount = 0;
+    int32_t succeedcount = 0;
     ASSERT_NE(nullptr, GetAudioManager);
     g_para[0].manager = GetAudioManager();
     ASSERT_NE(nullptr, g_para[0].manager);
     ret = RelAudioCaptureProcedure(g_para[0]);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    ret = RelAudioCapturePause(g_para[0]);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         ret = memcpy_s(&g_para[0], sizeof(PrepareAudioPara), &g_para[0], sizeof(PrepareAudioPara));
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-        ret = RelAudioCapturePause(g_para[0]);
-        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         ret = pthread_create(&tids[i], NULL, (THREAD_FUNC)RelAudioCaptureResume, &g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-        usleep(50000);
     }
 
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         void *result = nullptr;
         pthread_join(tids[i], &result);
-        EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
+        if ((intptr_t)result == 0) {
+            EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
+            succeedcount = succeedcount + 1;
+        } else {
+            EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, (intptr_t)result);
+            failcount = failcount + 1;
+        }
     }
     if (g_para[0].adapter != nullptr) {
         ret = StopAudio(g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+        EXPECT_EQ(failcount, PTHREAD_SAMEADA_COUNT - 1);
+        EXPECT_EQ(succeedcount, 1);
     }
 }
 

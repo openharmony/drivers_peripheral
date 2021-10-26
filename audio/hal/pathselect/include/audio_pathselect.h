@@ -28,7 +28,7 @@
 #endif
 
 int32_t AudioPathSelGetConfToJsonObj();
-int32_t AudioPathSelAnalysisJson(const void *adapterParam, enum AudioAdaptType adaptType);
+int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdaptType adaptType);
 
 #endif
 

@@ -17,6 +17,7 @@ if (defined(ohos_lite)) {
   import("//build/ohos.gni")
 }
 import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/peripheral/audio/audio.gni")
 
 config("pathseltct_config") {
   visibility = [ ":*" ]
@@ -59,20 +60,18 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/hal/pathselect/include",
       "//third_party/cJSON",
-      "$hdf_framework_path/include",
-      "$hdf_framework_path/core/sec/include",
-      "$hdf_framework_path/core/shared/include",
-      "$hdf_framework_path/core/host/include",
-      "$hdf_framework_path/core/manager/include",
-      "$hdf_framework_path/core/common/include/host/",
       "//drivers/peripheral/audio/interfaces/include",
       "//third_party/bounds_checking_function/include",
+      "$hdf_framework_path/include/osal",
+      "$hdf_framework_path/include/utils",
       "//drivers/adapter/khdf/liteos/osal/include",
-      "//drivers/adapter/uhdf2/shared/include",
-      "//drivers/adapter/uhdf2/include/hdi/",
     ]
 
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+
+    if (enable_audio_hal_hdf_log) {
+      defines = [ "AUDIO_HAL_HDF_LOG" ]
+    }
 
     public_configs = [ ":pathseltct_config" ]
   }
@@ -99,6 +98,11 @@ if (defined(ohos_lite)) {
       "$hdf_uhdf_path/utils:libhdf_utils",
       "//utils/native/base:utils",
     ]
+
+    defines = []
+    if (enable_audio_hal_hdf_log) {
+      defines += [ "AUDIO_HAL_HDF_LOG" ]
+    }
 
     if (is_standard_system) {
       external_deps = [ "hiviewdfx_hilog_native:libhilog" ]

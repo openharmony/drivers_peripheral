@@ -434,8 +434,6 @@ int AopHalSetBuffWptr(unsigned int chnId, unsigned int value)
     }
 
     unTmp.u32 = AiaoHalReadReg(AopBuffWptrReg(chnId));
-    AUDIO_DEVICE_LOG_DEBUG("@@@ AopHalSetBuffWptr: read = 0x%08x, write = 0x%08x.", unTmp.u32, value);
-
     unTmp.Bits.txBuffWptr = value;
     AiaoHalWriteReg(AopBuffWptrReg(chnId), unTmp.u32);
 
@@ -499,12 +497,16 @@ int AopHalSetTransSize(unsigned int chnId, unsigned int value)
     return HDF_SUCCESS;
 }
 
-bool AopPlayIsCompleted(struct PlatformHost *platformHost, uint32_t totalBufferFrames, uint32_t hold)
+bool AopPlayIsCompleted(const struct PlatformHost *platformHost, uint32_t totalBufferFrames, uint32_t hold)
 {
     unsigned int rptr;
     unsigned int wptr;
     unsigned int temp;
     const int rightShift = 3;
+    if (platformHost == NULL) {
+        AUDIO_DEVICE_LOG_ERR("input param is NULL");
+        return false;
+    }
     unsigned int chnId = platformHost->renderBufInfo.chnId;
     uint32_t cirBufSize = platformHost->renderBufInfo.cirBufSize;
     uint32_t frameSize = platformHost->pcmInfo.channels * (platformHost->pcmInfo.bitWidth >> rightShift);

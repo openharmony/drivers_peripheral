@@ -15,6 +15,7 @@
 
 #include "audio_manager.h"
 #include <dlfcn.h>
+#include <limits.h>
 #include <pthread.h>
 #include <securec.h>
 #include <signal.h>
@@ -50,10 +51,10 @@
 #define EXT_PARAMS_MAXLEN 107
 
 enum AudioPCMBit {
-    PCM_8_BIT  = 8,       /**< 8-bit PCM */
-    PCM_16_BIT = 16,       /**< 16-bit PCM */
-    PCM_24_BIT = 24,       /**< 24-bit PCM */
-    PCM_32_BIT = 32,       /**< 32-bit PCM */
+    PCM_8_BIT  = 8,       /* 8-bit PCM */
+    PCM_16_BIT = 16,       /* 16-bit PCM */
+    PCM_24_BIT = 24,       /* 24-bit PCM */
+    PCM_32_BIT = 32,       /* 32-bit PCM */
 };
 
 enum RenderSoundCardMode {
@@ -94,12 +95,12 @@ struct StrPara {
 struct AudioRender *g_render = NULL;
 struct AudioAdapter *g_adapter = NULL;
 struct AudioManager *g_manager = NULL;
-struct AudioProxyManager *g_proxyManager = NULL;
+static struct AudioProxyManager *g_proxyManager = NULL;
 struct AudioDeviceDescriptor g_devDesc;
 struct AudioSampleAttributes g_attrs;
 struct AudioPort g_audioPort;
 struct AudioHeadInfo g_wavHeadInfo;
-struct StrPara g_str;
+static struct StrPara g_str;
 
 pthread_t g_tids;
 char *g_frame = NULL;
@@ -160,6 +161,7 @@ int32_t CheckInputName(int type, void *val)
     if (val == NULL) {
         return HDF_FAILURE;
     }
+    printf("\n");
     switch (type) {
         case INPUT_INT:
             ret = scanf_s("%d", &inputInt);
@@ -360,7 +362,7 @@ int32_t StopAudioFiles(struct AudioRender **renderS)
     }
     if (!g_closeEnd) {
         g_closeEnd = true;
-        pthread_join(g_tids, NULL);
+        usleep(100000); // sleep 100000us
     }
     struct AudioRender *render = *renderS;
     if (render == NULL) {
@@ -392,7 +394,7 @@ int32_t StopAudioFiles(struct AudioRender **renderS)
     return ret;
 }
 
-int32_t FrameStartMmap(const void *param)
+int32_t FrameStartMmap(const AudioHandle param)
 {
     if (param == NULL) {
         return HDF_FAILURE;
@@ -402,15 +404,20 @@ int32_t FrameStartMmap(const void *param)
     struct AudioMmapBufferDescripter desc;
     signal(SIGINT, StreamClose);
     // get file length
-    if (access(g_path, F_OK | R_OK)) {
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(g_path, pathBuf) == NULL) {
         return HDF_FAILURE;
     }
-    FILE *fp = fopen(g_path, "rb+");
+    FILE *fp = fopen(pathBuf, "rb+");
     if (fp == NULL) {
         printf("Open file failed!\n");
         return HDF_FAILURE;
     }
-    fseek(fp, 0, SEEK_END);
+    int32_t ret = fseek(fp, 0, SEEK_END);
+    if (ret != 0) {
+        fclose(fp);
+        return HDF_FAILURE;
+    }
     int32_t reqSize = ftell(fp);
     // Converts a file pointer to a device descriptor
     int fd = fileno(fp);
@@ -429,8 +436,8 @@ int32_t FrameStartMmap(const void *param)
         fclose(fp);
         return HDF_FAILURE;
     }
-    int32_t ret = render->attr.ReqMmapBuffer(render, reqSize, &desc);
-    if (ret < 0) {
+    ret = render->attr.ReqMmapBuffer(render, reqSize, &desc);
+    if (ret < 0 || reqSize <= 0) {
         printf("Request map fail,please check.\n");
         fclose(fp);
         return HDF_FAILURE;
@@ -440,7 +447,7 @@ int32_t FrameStartMmap(const void *param)
     return HDF_SUCCESS;
 }
 
-int32_t FrameStart(const void *param)
+int32_t FrameStart(const AudioHandle param)
 {
     if (param == NULL) {
         return HDF_FAILURE;
@@ -458,7 +465,7 @@ int32_t FrameStart(const void *param)
     if (g_file == NULL) {
         return HDF_FAILURE;
     }
-    if (render == NULL || render->RenderFrame == NULL) {
+    if (render == NULL || render->RenderFrame == NULL || frame == NULL) {
         return HDF_FAILURE;
     }
     do {
@@ -522,16 +529,17 @@ int32_t PlayingAudioFiles(struct AudioRender **renderS)
     }
     g_closeEnd = false;
     struct AudioRender *render;
-    if (access(g_path, F_OK | R_OK)) {
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(g_path, pathBuf) == NULL) {
         return HDF_FAILURE;
     }
-    g_file = fopen(g_path, "rb");
+    g_file = fopen(pathBuf, "rb");
     if (g_file == NULL) {
         printf("failed to open '%s'\n", g_path);
         return HDF_FAILURE;
     }
     if (WavHeadAnalysis(g_file, &g_attrs) < 0) {
-        LOG_FUN_ERR("fream test is Fail");
+        LOG_FUN_ERR("Frame test is Fail");
         FileClose(&g_file);
         return HDF_FAILURE;
     }
@@ -551,7 +559,10 @@ int32_t PlayingAudioFiles(struct AudioRender **renderS)
         FileClose(&g_file);
         return HDF_FAILURE;
     }
-    if (pthread_create(&g_tids, NULL, (void *)(&FrameStart), &g_str) != 0) {
+    pthread_attr_t g_tidsAttr;
+    pthread_attr_init(&g_tidsAttr);
+    pthread_attr_setdetachstate(&g_tidsAttr, PTHREAD_CREATE_DETACHED);
+    if (pthread_create(&g_tids, &g_tidsAttr, (void *)(&FrameStart), &g_str) != 0) {
         LOG_FUN_ERR("Create Thread Fail");
         FileClose(&g_file);
         return HDF_FAILURE;
@@ -668,11 +679,11 @@ int32_t GetRenderPassthroughManagerFunc(const char *adapterNameCase)
     int32_t index;
     struct AudioManager *(*getAudioManager)() = NULL;
     getAudioManager = (struct AudioManager *(*)())(dlsym(g_handle, "GetAudioManagerFuncs"));
-    manager = getAudioManager();
-    if (manager == NULL) {
+    if (getAudioManager == NULL) {
         LOG_FUN_ERR("Get Audio Manager Funcs Fail");
         return HDF_FAILURE;
     }
+    manager = getAudioManager();
     ret = manager->GetAllAdapters(manager, &descs, &size);
     int32_t check = size > MAX_AUDIO_ADAPTER_NUM_T || size == 0 || descs == NULL || ret < 0;
     if (check) {
@@ -722,10 +733,10 @@ int32_t GetRenderProxyManagerFunc(const char *adapterNameCase)
     int32_t index;
     struct AudioProxyManager *(*getAudioManager)() = NULL;
     getAudioManager = (struct AudioProxyManager *(*)())(dlsym(g_handle, "GetAudioProxyManagerFuncs"));
-    proxyManager = getAudioManager();
-    if (proxyManager == NULL) {
+    if (getAudioManager == NULL) {
         return HDF_FAILURE;
     }
+    proxyManager = getAudioManager();
     ret = proxyManager->GetAllAdapters(proxyManager, &descs, &size);
     int32_t temp = size > MAX_AUDIO_ADAPTER_NUM_T || size == 0 || descs == NULL || ret < 0;
     if (temp) {
@@ -839,7 +850,7 @@ int32_t SetRenderMute()
         SystemInputFail();
         return HDF_FAILURE;
     }
-    if (g_render == NULL) {
+    if (g_render == NULL || g_render->volume.SetMute == NULL) {
         LOG_FUN_ERR("Music already stop!");
         SystemInputFail();
         return HDF_FAILURE;
@@ -871,7 +882,7 @@ int32_t SetRenderVolume()
         SystemInputFail();
         return HDF_FAILURE;
     }
-    if (g_render == NULL) {
+    if (g_render == NULL || g_render->volume.SetVolume == NULL) {
         LOG_FUN_ERR("Music already stop!");
         SystemInputFail();
         return HDF_FAILURE;
@@ -955,11 +966,12 @@ void PrintAttributesFromat()
 int32_t SelectAttributesFomat(uint32_t *fomat)
 {
     if (fomat == NULL) {
+        LOG_FUN_ERR("fomat is null!");
         return HDF_FAILURE;
     }
     PrintAttributesFromat();
     printf("Please select audio format,If not selected, the default is 16bit:");
-    uint32_t ret;
+    int32_t ret;
     int val = 0;
     ret = CheckInputName(INPUT_INT, (void *)&val);
     if (ret < 0) return HDF_FAILURE;
@@ -1020,7 +1032,7 @@ int32_t SetRenderAttributes()
     if (ret < 0) {
         return HDF_FAILURE;
     }
-    if (g_render == NULL) {
+    if (g_render == NULL || g_render->attr.SetSampleAttributes == NULL) {
         LOG_FUN_ERR("Music already complete,Please replay and set the attrbutes!");
         SystemInputFail();
         return HDF_FAILURE;
@@ -1075,7 +1087,7 @@ int32_t GetExtParams()
 {
     char keyValueList[BUFFER_LEN] = {0};
     int32_t ret;
-    if (g_render == NULL) {
+    if (g_render == NULL || g_render->attr.GetExtraParams == NULL) {
         return HDF_FAILURE;
     }
     ret = g_render->attr.GetExtraParams((AudioHandle)g_render, keyValueList, EXT_PARAMS_MAXLEN);
@@ -1091,7 +1103,7 @@ int32_t GetExtParams()
 int32_t GetRenderMmapPosition()
 {
     int32_t ret;
-    if (g_render == NULL) {
+    if (g_render == NULL || g_render->attr.GetMmapPosition == NULL) {
         return HDF_FAILURE;
     }
     uint64_t frames = 0;
@@ -1160,7 +1172,7 @@ void ProcessMenu(int32_t choice)
     }
 }
 
-void Choice()
+void Choice(void)
 {
     int32_t choice = 0;
     int ret;
@@ -1184,7 +1196,7 @@ void Choice()
 
 int32_t main(int32_t argc, char const *argv[])
 {
-    if (argc < 2) { // The parameter number is not greater than 2
+    if (argc < 2 || argv == NULL) { // The parameter number is not greater than 2
         printf("usage:[1]%s [2]%s\n", argv[0], "/test/test.wav");
         return 0;
     }
@@ -1195,11 +1207,11 @@ int32_t main(int32_t argc, char const *argv[])
     if (ret != 0) {
         return HDF_FAILURE;
     }
-    if (access(g_path, F_OK | R_OK)) {
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(g_path, pathBuf) == NULL) {
         return HDF_FAILURE;
     }
-
-    FILE *file = fopen(g_path, "rb");
+    FILE *file = fopen(pathBuf, "rb");
     if (file == NULL) {
         printf("Failed to open '%s',Please enter the correct file name \n", g_path);
         return HDF_FAILURE;
@@ -1216,9 +1228,11 @@ int32_t main(int32_t argc, char const *argv[])
     }
     if (g_manager != NULL) {
         soMode = true;
-        g_manager->UnloadAdapter(g_manager, g_adapter);
+        if (g_manager->UnloadAdapter != NULL) {
+            g_manager->UnloadAdapter(g_manager, g_adapter);
+        }
     } else {
-        if (g_proxyManager != NULL) {
+        if (g_proxyManager != NULL && g_proxyManager->UnloadAdapter != NULL) {
             g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
         }
     }
