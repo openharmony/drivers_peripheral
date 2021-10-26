@@ -292,24 +292,24 @@ void GfxTestBase::DeInitTestBuffer()
 int32_t GfxTestBase::GfxTestModuleInit(void)
 {
     mGfxTestModule = dlopen(LIB_HDI_GFX_NAME, RTLD_NOW | RTLD_NOLOAD);
-	if (mGfxTestModule != nullptr) {
-		DISPLAY_TEST_LOGD("Module %s already loaded", LIB_HDI_GFX_NAME);
-	} else {
-		DISPLAY_TEST_LOGD("Loading module %s", LIB_HDI_GFX_NAME);
-		mGfxTestModule = dlopen(LIB_HDI_GFX_NAME, RTLD_NOW);
-		if (mGfxTestModule == nullptr) {
-			DISPLAY_TEST_LOGE("Failed to load module: %s", dlerror());
-			return DISPLAY_FAILURE;
-		}
-	}
+    if (mGfxTestModule != nullptr) {
+        DISPLAY_TEST_LOGD("Module %s already loaded", LIB_HDI_GFX_NAME);
+    } else {
+        DISPLAY_TEST_LOGD("Loading module %s", LIB_HDI_GFX_NAME);
+        mGfxTestModule = dlopen(LIB_HDI_GFX_NAME, RTLD_NOW);
+        if (mGfxTestModule == nullptr) {
+            DISPLAY_TEST_LOGE("Failed to load module: %s", dlerror());
+            return DISPLAY_FAILURE;
+        }
+    }
 
-    typedef int32_t (*InitFunc)(GfxFuncs **funcs);
+    using InitFunc = int32_t (*)(GfxFuncs **funcs);
     InitFunc func = reinterpret_cast<InitFunc>(dlsym(mGfxTestModule, LIB_GFX_FUNC_INIT));
     if (func == nullptr) {
-		DISPLAY_TEST_LOGE("Failed to lookup %s function: %s", LIB_GFX_FUNC_INIT, dlerror());
-		dlclose(mGfxTestModule);
-		return DISPLAY_FAILURE;
-	}
+        DISPLAY_TEST_LOGE("Failed to lookup %s function: %s", LIB_GFX_FUNC_INIT, dlerror());
+        dlclose(mGfxTestModule);
+        return DISPLAY_FAILURE;
+    }
     return func(&mGfxFuncs);
 }
 
@@ -317,7 +317,7 @@ int32_t GfxTestBase::GfxTestModuleDeinit(void)
 {
     int32_t ret = DISPLAY_SUCCESS;
     if (mGfxTestModule == nullptr) {
-        typedef int32_t (*DeinitFunc)(GfxFuncs *funcs);
+        using DeinitFunc = int32_t (*)(GfxFuncs *funcs);
         DeinitFunc func = reinterpret_cast<DeinitFunc>(dlsym(mGfxTestModule, LIB_GFX_FUNC_DEINIT));
         if (func == nullptr) {
             DISPLAY_TEST_LOGE("Failed to lookup %s function: %s", LIB_GFX_FUNC_DEINIT, dlerror());
