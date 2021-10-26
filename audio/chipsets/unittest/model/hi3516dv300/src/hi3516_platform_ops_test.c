@@ -9,6 +9,7 @@
 #include "hi3516_platform_ops_test.h"
 #include "audio_platform_base.h"
 #include "hdf_base.h"
+#include "hdf_log.h"
 #include "hi3516_common_func.h"
 #include "hi3516_platform_ops.h"
 
@@ -20,27 +21,27 @@ int32_t TestAudioPlatformDeviceInit(void)
     struct AudioCard *card = NULL;
     struct PlatformDevice *platform = NULL;
     AudioType type;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestAudioPlatformDeviceInit: enter");
 
     ret = GetAudioCard(&card, &type);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestAudioPlatformDeviceInit::get card instance failed.");
+        HDF_LOGE("TestAudioPlatformDeviceInit: get card instance failed.");
         return HDF_FAILURE;
     }
 
     if (card == NULL || card->rtd == NULL || card->rtd->platform == NULL) {
-        HDF_LOGE("get card instance failed.");
+        HDF_LOGE("TestAudioPlatformDeviceInit: get card instance failed.");
         return HDF_FAILURE;
     }
 
     platform = card->rtd->platform;
     ret = AudioPlatformDeviceInit(card, platform);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AudioPlatformDeviceInit fail ret = %d", __func__, ret);
+        HDF_LOGE("TestAudioPlatformDeviceInit: AudioPlatformDeviceInit fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestAudioPlatformDeviceInit: success");
     return HDF_SUCCESS;
 }
 
@@ -50,49 +51,317 @@ int32_t TestPlatformHwParams(void)
     struct AudioCard *card = NULL;
     struct AudioPcmHwParams *param = NULL;
     AudioType type;
-    const uint32_t channelNum = 2;
-    const uint32_t sampleRate = 48000;
-    const uint32_t periodSize = 4096;
-    const uint32_t periodCount = 8;
-    const int format = 2;
-    const uint32_t startThreshold = 1024;
-    const uint32_t stopThreshold = 0x7fffffff;
-    const uint32_t silenceThreshold = 1024 * 16;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestPlatformHwParams: enter");
     ret = GetAudioCard(&card, &type);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformHwParams::get card instance failed.");
+        HDF_LOGE("TestPlatformHwParams: get card instance failed.");
         return HDF_FAILURE;
     }
 
     param = (struct AudioPcmHwParams *)OsalMemCalloc(sizeof(*param));
     if (param == NULL) {
-        HDF_LOGE("%s: alloc param memory failed");
+        HDF_LOGE("TestPlatformHwParams: alloc param memory failed");
         return HDF_FAILURE;
     }
 
-    param->channels  = channelNum;
-    param->rate = sampleRate;
-    param->periodSize = periodSize;
-    param->periodCount = periodCount;
-    param->format = format;
-    param->cardServiceName = "hdf_audio_codec_dev0";
-    param->isBigEndian = false;
-    param->isSignedData = true;
-    param->startThreshold = startThreshold;
-    param->stopThreshold = stopThreshold;
-    param->silenceThreshold = silenceThreshold;
-    param->streamType = 0; // AUDIO_RENDER_STREAM
-
+    ret = InitHwParam(param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("PlatformHwParams set hw param is fail");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
     ret = PlatformHwParams(card, param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: PlatformHwParams fail ret = %d", __func__, ret);
+        HDF_LOGE("TestPlatformHwParams: PlatformHwParams fail ret = %d", ret);
         OsalMemFree(param);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestPlatformHwParams: success");
+    OsalMemFree(param);
+    return HDF_SUCCESS;
+}
+
+int32_t TestPlatformInvalidChannelsParam(void)
+{
+    int ret;
+    struct AudioCard *card = NULL;
+    struct AudioPcmHwParams *param = NULL;
+    AudioType type;
+
+    HDF_LOGI("TestPlatformInvalidChannelsParam: enter");
+    ret = GetAudioCard(&card, &type);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidChannelsParam: get card instance failed.");
+        return HDF_FAILURE;
+    }
+
+    param = (struct AudioPcmHwParams *)OsalMemCalloc(sizeof(*param));
+    if (param == NULL) {
+        HDF_LOGE("TestPlatformInvalidChannelsParam: alloc param memory failed");
+        return HDF_FAILURE;
+    }
+
+    ret = InitHwParam(param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidChannelsParam: PlatformHwParams set hw param is fail");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+    param->channels = 0;
+    ret = PlatformHwParams(card, param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidChannelsParam: PlatformHwParams fail ret = %d", ret);
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+
+    HDF_LOGI("TestPlatformInvalidChannelsParam: success");
+    OsalMemFree(param);
+    return HDF_SUCCESS;
+}
+
+int32_t TestPlatformInvalidStreamTypeParam(void)
+{
+    int ret;
+    struct AudioCard *card = NULL;
+    struct AudioPcmHwParams *param = NULL;
+    AudioType type;
+    const int invalidStreamType = 2;
+
+    HDF_LOGI("TestPlatformInvalidStreamTypeParam: enter");
+    ret = GetAudioCard(&card, &type);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidStreamTypeParam: get card instance failed.");
+        return HDF_FAILURE;
+    }
+
+    param = (struct AudioPcmHwParams *)OsalMemCalloc(sizeof(*param));
+    if (param == NULL) {
+        HDF_LOGE("TestPlatformInvalidStreamTypeParam: alloc param memory failed");
+        return HDF_FAILURE;
+    }
+
+    ret = InitHwParam(param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidStreamTypeParam: PlatformHwParams set hw param is fail");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+    param->streamType = invalidStreamType;
+    ret = PlatformHwParams(card, param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidStreamTypeParam: PlatformHwParams fail ret = %d", ret);
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+
+    HDF_LOGI("TestPlatformInvalidStreamTypeParam: success");
+    OsalMemFree(param);
+    return HDF_SUCCESS;
+}
+
+int32_t TestPlatformInvalidRenderPeriodCountParam(void)
+{
+    int ret;
+    struct AudioCard *card = NULL;
+    struct AudioPcmHwParams *param = NULL;
+    const int periodCountValue = 4;
+    AudioType type;
+
+    HDF_LOGI("TestPlatformInvalidRenderPeriodCountParam: enter");
+    ret = GetAudioCard(&card, &type);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidRenderPeriodCountParam: get card instance failed.");
+        return HDF_FAILURE;
+    }
+
+    param = (struct AudioPcmHwParams *)OsalMemCalloc(sizeof(*param));
+    if (param == NULL) {
+        HDF_LOGE("TestPlatformInvalidRenderPeriodCountParam: alloc param memory failed");
+        return HDF_FAILURE;
+    }
+
+    ret = InitHwParam(param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidRenderPeriodCountParam: PlatformHwParams set hw param is fail");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+    param->streamType = 1;
+    param->periodCount = periodCountValue;
+    ret = PlatformHwParams(card, param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidRenderPeriodCountParam: PlatformHwParams fail ret = %d", ret);
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+
+    HDF_LOGI("TestPlatformInvalidRenderPeriodCountParam: success");
+    OsalMemFree(param);
+    return HDF_SUCCESS;
+}
+int32_t TestPlatformInvalidRenderPeriodSizeParam(void)
+{
+    int ret;
+    struct AudioCard *card = NULL;
+    struct AudioPcmHwParams *param = NULL;
+    const int periodSizeValue = 1024;
+    AudioType type;
+
+    HDF_LOGI("TestPlatformInvalidRenderPeriodSizeParam: enter");
+    ret = GetAudioCard(&card, &type);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidRenderPeriodSizeParam: get card instance failed.");
+        return HDF_FAILURE;
+    }
+
+    param = (struct AudioPcmHwParams *)OsalMemCalloc(sizeof(*param));
+    if (param == NULL) {
+        HDF_LOGE("TestPlatformInvalidRenderPeriodSizeParam: alloc param memory failed");
+        return HDF_FAILURE;
+    }
+
+    ret = InitHwParam(param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidRenderPeriodSizeParam: PlatformHwParams set hw param is fail");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+    param->streamType = 1;
+    param->periodSize = periodSizeValue;
+    ret = PlatformHwParams(card, param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidRenderPeriodSizeParam: PlatformHwParams fail ret = %d", ret);
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+
+    HDF_LOGI("TestPlatformInvalidRenderPeriodSizeParam: success");
+    OsalMemFree(param);
+    return HDF_SUCCESS;
+}
+
+int32_t TestPlatformInvalidCaptuerPeriodCountParam(void)
+{
+    int ret;
+    struct AudioCard *card = NULL;
+    struct AudioPcmHwParams *param = NULL;
+    const int periodCountValue = 4;
+    AudioType type;
+
+    HDF_LOGI("TestPlatformInvalidCaptuerPeriodCountParam: enter");
+    ret = GetAudioCard(&card, &type);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidCaptuerPeriodCountParam: get card instance failed.");
+        return HDF_FAILURE;
+    }
+
+    param = (struct AudioPcmHwParams *)OsalMemCalloc(sizeof(*param));
+    if (param == NULL) {
+        HDF_LOGE("TestPlatformInvalidCaptuerPeriodCountParam: alloc param memory failed");
+        return HDF_FAILURE;
+    }
+
+    ret = InitHwParam(param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidCaptuerPeriodCountParam: PlatformHwParams set hw param is fail");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+    param->streamType = 0;
+    param->periodCount = periodCountValue;
+    ret = PlatformHwParams(card, param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidCaptuerPeriodCountParam: PlatformHwParams fail ret = %d", ret);
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+
+    HDF_LOGI("TestPlatformInvalidCaptuerPeriodCountParam: success");
+    OsalMemFree(param);
+    return HDF_SUCCESS;
+}
+
+int32_t TestPlatformInvalidCaptuerPeriodSizeParam(void)
+{
+    int ret;
+    struct AudioCard *card = NULL;
+    struct AudioPcmHwParams *param = NULL;
+    const int periodSizeValue = 1024;
+    AudioType type;
+
+    HDF_LOGI("TestPlatformInvalidCaptuerPeriodSizeParam: enter");
+    ret = GetAudioCard(&card, &type);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidCaptuerPeriodSizeParam: get card instance failed.");
+        return HDF_FAILURE;
+    }
+
+    param = (struct AudioPcmHwParams *)OsalMemCalloc(sizeof(*param));
+    if (param == NULL) {
+        HDF_LOGE("TestPlatformInvalidCaptuerPeriodSizeParam: alloc param memory failed");
+        return HDF_FAILURE;
+    }
+
+    ret = InitHwParam(param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidCaptuerPeriodSizeParam: PlatformHwParams set hw param is fail");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+    param->streamType = 0;
+    param->periodSize = periodSizeValue;
+    ret = PlatformHwParams(card, param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidCaptuerPeriodSizeParam: PlatformHwParams fail ret = %d", ret);
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+
+    HDF_LOGI("TestPlatformInvalidCaptuerPreiodSizeParam: success");
+    OsalMemFree(param);
+    return HDF_SUCCESS;
+}
+
+int32_t TestPlatformInvalidCaptuerSilenceThresholdParam(void)
+{
+    int ret;
+    struct AudioCard *card = NULL;
+    struct AudioPcmHwParams *param = NULL;
+    const int silenceThresholdValue = 1024;
+    AudioType type;
+
+    HDF_LOGI("TestPlatformInvalidCaptuerSilenceThresholdParam: enter");
+    ret = GetAudioCard(&card, &type);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidCaptuerSilenceThresholdParam: get card instance failed.");
+        return HDF_FAILURE;
+    }
+
+    param = (struct AudioPcmHwParams *)OsalMemCalloc(sizeof(*param));
+    if (param == NULL) {
+        HDF_LOGE("TestPlatformInvalidCaptuerSilenceThresholdParam: alloc param memory failed");
+        return HDF_FAILURE;
+    }
+
+    ret = InitHwParam(param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidCaptuerSilenceThresholdParam: PlatformHwParams set hw param is fail");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+    param->streamType = 0;
+    param->silenceThreshold = silenceThresholdValue;
+    ret = PlatformHwParams(card, param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestPlatformInvalidCaptuerSilenceThresholdParam: PlatformHwParams fail ret = %d", ret);
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+
+    HDF_LOGI("TestPlatformInvalidCaptuerSilenceThresholdParam: success");
     OsalMemFree(param);
     return HDF_SUCCESS;
 }
@@ -106,17 +375,17 @@ int32_t TestPlatformRenderPrepare(void)
     HDF_LOGI("%s: enter", __func__);
     ret = GetAudioCard(&card, &type);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformRenderPrepare::get card instance failed.");
+        HDF_LOGE("TestPlatformRenderPrepare: get card instance failed.");
         return HDF_FAILURE;
     }
 
     ret = PlatformRenderPrepare(card);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: PlatformRenderPrepare fail ret = %d", __func__, ret);
+        HDF_LOGE("TestPlatformRenderPrepare: PlatformRenderPrepare fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestPlatformRenderPrepare: success");
     return HDF_SUCCESS;
 }
 
@@ -126,20 +395,20 @@ int32_t TestPlatformCapturePrepare(void)
     struct AudioCard *card = NULL;
     AudioType type;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestPlatformCapturePrepare: enter");
     ret = GetAudioCard(&card, &type);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformCapturePrepare::get card instance failed.");
+        HDF_LOGE("TestPlatformCapturePrepare: get card instance failed.");
         return HDF_FAILURE;
     }
 
     ret = PlatformCapturePrepare(card);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: PlatformCapturePrepare fail ret = %d", __func__, ret);
+        HDF_LOGE("TestPlatformCapturePrepare: PlatformCapturePrepare fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestPlatformCapturePrepare: success");
     return HDF_SUCCESS;
 }
 
@@ -151,11 +420,11 @@ int32_t TestPlatformWrite(void)
     struct PlatformHost *platformHost = NULL;
     AudioType type;
     const unsigned long frameNum = 1000;
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestPlatformWrite: enter");
 
     ret = GetAudioCard(&card, &type);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformWrite::get card instance failed.");
+        HDF_LOGE("TestPlatformWrite: get card instance failed.");
         return HDF_FAILURE;
     }
 
@@ -165,14 +434,14 @@ int32_t TestPlatformWrite(void)
     }
     platformHost = PlatformHostFromDevice(card->rtd->platform->device);
     if (platformHost == NULL) {
-        HDF_LOGE("PlatformHostFromDevice fail.");
+        HDF_LOGE("TestPlatformWrite: PlatformHostFromDevice fail.");
         return HDF_FAILURE;
     }
     OsalMutexInit(&platformHost->renderBufInfo.buffMutex);
 
     txData =  (struct AudioTxData *)OsalMemCalloc(sizeof(*txData));
     if (txData == NULL) {
-        HDF_LOGE("aclloc txData memory fail");
+        HDF_LOGE("TestPlatformWrite: aclloc txData memory fail");
         OsalMutexDestroy(&platformHost->renderBufInfo.buffMutex);
         return HDF_ERR_MALLOC_FAIL;
     }
@@ -183,13 +452,13 @@ int32_t TestPlatformWrite(void)
 
     ret = PlatformWrite(card, txData);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: PlatformWrite fail ret = %d", __func__, ret);
+        HDF_LOGE("TestPlatformWrite: PlatformWrite fail ret = %d", ret);
         OsalMemFree(txData);
         OsalMutexDestroy(&platformHost->renderBufInfo.buffMutex);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestPlatformWrite: success");
     OsalMemFree(txData);
     OsalMutexDestroy(&platformHost->renderBufInfo.buffMutex);
     return HDF_SUCCESS;
@@ -203,40 +472,40 @@ int32_t TestPlatformRead(void)
     struct PlatformHost *platformHost = NULL;
     AudioType type;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestPlatformRead: enter");
     ret = GetAudioCard(&card, &type);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformRead::get card instance failed.");
+        HDF_LOGE("TestPlatformRead: get card instance failed.");
         return HDF_FAILURE;
     }
 
     if (card->rtd == NULL || card->rtd->platform == NULL || card->rtd->platform->device == NULL) {
-        HDF_LOGE("get card params fail.");
+        HDF_LOGE("TestPlatformRead: get card params fail.");
         return HDF_FAILURE;
     }
     platformHost = PlatformHostFromDevice(card->rtd->platform->device);
     if (platformHost == NULL) {
-        HDF_LOGE("PlatformHostFromDevice fail.");
+        HDF_LOGE("TestPlatformRead: PlatformHostFromDevice fail.");
         return HDF_FAILURE;
     }
     OsalMutexInit(&platformHost->captureBufInfo.buffMutex);
 
     rxData =  (struct AudioRxData *)OsalMemCalloc(sizeof(*rxData));
     if (rxData == NULL) {
-        HDF_LOGE("aclloc rxData memory fail");
+        HDF_LOGE("TestPlatformRead: aclloc rxData memory fail");
         OsalMutexDestroy(&platformHost->captureBufInfo.buffMutex);
         return HDF_ERR_MALLOC_FAIL;
     }
 
     ret = PlatformRead(card, rxData);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: PlatformRead fail ret = %d", __func__, ret);
+        HDF_LOGE("TestPlatformRead: PlatformRead fail ret = %d", ret);
         OsalMutexDestroy(&platformHost->captureBufInfo.buffMutex);
         OsalMemFree(rxData);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestPlatformRead: success");
     OsalMutexDestroy(&platformHost->captureBufInfo.buffMutex);
     OsalMemFree(rxData);
     return HDF_SUCCESS;
@@ -247,21 +516,21 @@ int32_t TestPlatformRenderStart(void)
     int ret;
     struct AudioCard *card = NULL;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestPlatformRenderStart: enter");
     AudioType type;
     ret = GetAudioCard(&card, &type);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformRenderStart::get card instance failed.");
+        HDF_LOGE("TestPlatformRenderStart: get card instance failed.");
         return HDF_FAILURE;
     }
 
     ret = PlatformRenderStart(card);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: PlatformRenderStart fail ret = %d", __func__, ret);
+        HDF_LOGE("TestPlatformRenderStart: PlatformRenderStart fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestPlatformRenderStart: success");
     return HDF_SUCCESS;
 }
 
@@ -271,20 +540,20 @@ int32_t TestPlatformCaptureStart(void)
     struct AudioCard *card = NULL;
     AudioType type;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestPlatformCaptureStart: enter");
     ret = GetAudioCard(&card, &type);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformCaptureStart::get card instance failed.");
+        HDF_LOGE("TestPlatformCaptureStart: get card instance failed.");
         return HDF_FAILURE;
     }
 
     ret = PlatformCaptureStart(card);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: PlatformCaptureStart fail ret = %d", __func__, ret);
+        HDF_LOGE("TestPlatformCaptureStart: PlatformCaptureStart fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestPlatformCaptureStart: success");
     return HDF_SUCCESS;
 }
 
@@ -295,10 +564,10 @@ int32_t TestPlatformRenderStop(void)
     struct PlatformHost *platformHost = NULL;
     AudioType type;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestPlatformRenderStop: enter");
     ret = GetAudioCard(&card, &type);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformRenderStop::get card instance failed.");
+        HDF_LOGE("TestPlatformRenderStop: get card instance failed.");
         return HDF_FAILURE;
     }
 
@@ -311,12 +580,12 @@ int32_t TestPlatformRenderStop(void)
 
     ret = PlatformRenderStop(card);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: PlatformRenderStop fail ret = %d", __func__, ret);
+        HDF_LOGE("TestPlatformRenderStop: PlatformRenderStop fail ret = %d", ret);
         OsalMutexDestroy(&platformHost->renderBufInfo.buffMutex);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestPlatformRenderStop: success");
     OsalMutexDestroy(&platformHost->renderBufInfo.buffMutex);
     return HDF_SUCCESS;
 }
@@ -328,10 +597,10 @@ int32_t TestPlatformCaptureStop(void)
     struct PlatformHost *platformHost = NULL;
     AudioType type;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestPlatformCaptureStop: enter");
     ret = GetAudioCard(&card, &type);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformCaptureStop::get card instance failed.");
+        HDF_LOGE("TestPlatformCaptureStop: get card instance failed.");
         return HDF_FAILURE;
     }
 
@@ -344,12 +613,12 @@ int32_t TestPlatformCaptureStop(void)
 
     ret = PlatformCaptureStop(card);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: PlatformRenderStop fail ret = %d", __func__, ret);
+        HDF_LOGE("TestPlatformCaptureStop: PlatformRenderStop fail ret = %d", ret);
         OsalMutexDestroy(&platformHost->captureBufInfo.buffMutex);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestPlatformCaptureStop: success");
     OsalMutexDestroy(&platformHost->captureBufInfo.buffMutex);
     return HDF_SUCCESS;
 }
@@ -360,20 +629,20 @@ int32_t TestPlatformCapturePause(void)
     struct AudioCard *card = NULL;
     AudioType type;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestPlatformCapturePause: enter");
     ret = GetAudioCard(&card, &type);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformCapturePause::get card instance failed.");
+        HDF_LOGE("TestPlatformCapturePause: get card instance failed.");
         return HDF_FAILURE;
     }
 
     ret = PlatformCapturePause(card);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: PlatformCapturePause fail ret = %d", __func__, ret);
+        HDF_LOGE("TestPlatformCapturePause: PlatformCapturePause fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestPlatformCapturePause: success");
     return HDF_SUCCESS;
 }
 
@@ -383,20 +652,20 @@ int32_t TestPlatformRenderPause(void)
     struct AudioCard *card = NULL;
     AudioType type;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestPlatformRenderPause: enter");
     ret = GetAudioCard(&card, &type);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformRenderPause::get card instance failed.");
+        HDF_LOGE("TestPlatformRenderPause: get card instance failed.");
         return HDF_FAILURE;
     }
 
     ret = PlatformRenderPause(card);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: PlatformRenderPause fail ret = %d", __func__, ret);
+        HDF_LOGE("TestPlatformRenderPause: PlatformRenderPause fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestPlatformRenderPause: success");
     return HDF_SUCCESS;
 }
 
@@ -406,20 +675,20 @@ int32_t TestPlatformRenderResume(void)
     struct AudioCard *card = NULL;
     AudioType type;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestPlatformRenderResume: enter");
     ret = GetAudioCard(&card, &type);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformRenderResume::get card instance failed.");
+        HDF_LOGE("TestPlatformRenderResume: get card instance failed.");
         return HDF_FAILURE;
     }
 
     ret = PlatformRenderResume(card);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: PlatformRenderResume fail ret = %d", __func__, ret);
+        HDF_LOGE("TestPlatformRenderResume: PlatformRenderResume fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestPlatformRenderResume: success");
     return HDF_SUCCESS;
 }
 
@@ -429,19 +698,19 @@ int32_t TestPlatformCaptureResume(void)
     struct AudioCard *card = NULL;
     AudioType type;
 
-    HDF_LOGI("%s: enter", __func__);
+    HDF_LOGI("TestPlatformCaptureResume: enter");
     ret = GetAudioCard(&card, &type);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformCaptureResume::get card instance failed.");
+        HDF_LOGE("TestPlatformCaptureResume: get card instance failed.");
         return HDF_FAILURE;
     }
 
     ret = PlatformCaptureResume(card);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: PlatformCaptureResume fail ret = %d", __func__, ret);
+        HDF_LOGE("TestPlatformCaptureResume PlatformCaptureResume fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestPlatformCaptureResume: success");
     return HDF_SUCCESS;
 }

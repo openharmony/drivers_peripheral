@@ -43,8 +43,7 @@ ohos_unittest("hdf_audio_adm_test") {
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//utils/native/base:utils",
   ]
-  resource_config_file =
-      "//drivers/adapter/uhdf2/test/resource/audio/ohos_test.xml"
+
   cflags = [
     "-Wall",
     "-Wextra",

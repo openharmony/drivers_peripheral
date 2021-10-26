@@ -7,43 +7,14 @@
  */
 
 #include "hi3516_dai_adapter_test.h"
-#include "audio_dai_if.h"
 #include "audio_host.h"
+#include "audio_dai_if.h"
+#include "audio_platform_if.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "hi3516_common_func.h"
 
 #define HDF_LOG_TAG hi3516_dai_adapter_test
-
-int32_t SetHwParam(struct AudioPcmHwParams *param)
-{
-    if (param == NULL) {
-        HDF_LOGE("input param is NULL.");
-        return HDF_FAILURE;
-    }
-    const uint32_t channelNum = 2;
-    const uint32_t sampleRate = 48000;
-    const uint32_t periodSize =  4096;
-    const uint32_t periodCount = 8;
-    const uint32_t format = 2;
-    const uint32_t startThreshold = 1024;
-    const uint32_t stopThreshold = 0x7fffffff;
-    const uint32_t silenceThreshold = 16 * 1024;
-
-    param->channels  = channelNum;
-    param->rate = sampleRate;
-    param->periodSize = periodSize;
-    param->periodCount = periodCount;
-    param->format = format;
-    param->cardServiceName = "hdf_audio_codec_dev0";
-    param->isBigEndian = false;
-    param->isSignedData = true;
-    param->startThreshold = startThreshold;
-    param->stopThreshold = stopThreshold;
-    param->silenceThreshold = silenceThreshold;
-    param->streamType = 0; // AUDIO_RENDER_STREAM
-    return HDF_SUCCESS;
-}
 
 int32_t TestDaiHwParams(void)
 {
@@ -58,44 +29,299 @@ int32_t TestDaiHwParams(void)
 
     ret = GetAudioCard(&card, &type);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestDaiHwParams::get card instance failed.");
+        HDF_LOGE("TestDaiHwParams: get card instance failed.");
         return HDF_FAILURE;
     }
 
     param = (struct AudioPcmHwParams *)OsalMemCalloc(sizeof(*param));
     if (param == NULL) {
-        HDF_LOGE("%s: alloc param memory failed");
+        HDF_LOGE("TestDaiHwParams: alloc param memory failed");
         return HDF_FAILURE;
     }
 
-    ret = SetHwParam(param);
+    ret = InitHwParam(param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("set hwparm fail");
+        HDF_LOGE("TestDaiHwParams: set hwparm fail");
         OsalMemFree(param);
         return HDF_FAILURE;
     }
 
     if (card->rtd == NULL) {
-        HDF_LOGE("card rtd is NULL.");
+        HDF_LOGE("TestDaiHwParams: card rtd is NULL.");
         OsalMemFree(param);
         return HDF_FAILURE;
     }
     cpuDai = card->rtd->cpuDai;
     if (cpuDai->devData == NULL || cpuDai->devData->ops == NULL) {
-        HDF_LOGE("cpuDai param is NULL.");
+        HDF_LOGE("TestDaiHwParams: cpuDai param is NULL.");
         OsalMemFree(param);
         return HDF_FAILURE;
     }
     if (cpuDai->devData->ops->HwParams != NULL) {
         ret = cpuDai->devData->ops->HwParams(card, param, cpuDai);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%s: DaiHwParams fail ret = %d", __func__, ret);
+            HDF_LOGE("TestDaiHwParams: DaiHwParams fail ret = %d", ret);
             OsalMemFree(param);
             return HDF_FAILURE;
         }
     }
 
     OsalMemFree(param);
-    HDF_LOGI("%s: success", __func__);
+    HDF_LOGI("TestDaiHwParams: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestDaiInvalidRateParam(void)
+{
+    int ret;
+    struct AudioCard *card = NULL;
+    struct AudioPcmHwParams *param = NULL;
+    struct DaiDevice *cpuDevDai = NULL;
+    AudioType type;
+
+    if (GetAudioCard(&card, &type) != HDF_SUCCESS) {
+        HDF_LOGE("TestDaiInvalidRateParam: get card instance failed.");
+        return HDF_FAILURE;
+    }
+
+    param = (struct AudioPcmHwParams *)OsalMemCalloc(sizeof(*param));
+    if (param == NULL) {
+        HDF_LOGE("TestDaiInvalidRateParam:  alloc param memory failed");
+        return HDF_FAILURE;
+    }
+
+    ret = InitHwParam(param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestDaiInvalidRateParam: set hwparm fail");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+
+    param->rate = 0;
+
+    if (card->rtd == NULL || card->rtd->cpuDai == NULL) {
+        HDF_LOGE("TestDaiInvalidRateParam: card rtd is NULL.");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+    cpuDevDai = card->rtd->cpuDai;
+    if (cpuDevDai->devData == NULL || cpuDevDai->devData->ops == NULL) {
+        HDF_LOGE("TestDaiInvalidRateParam: cpuDevDai param is NULL.");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+    if (cpuDevDai->devData->ops->HwParams != NULL) {
+        ret = cpuDevDai->devData->ops->HwParams(card, param, cpuDevDai);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("TestDaiInvalidRateParam: DaiHwParams fail ret = %d", ret);
+            OsalMemFree(param);
+            return HDF_FAILURE;
+        }
+    }
+
+    OsalMemFree(param);
+    HDF_LOGI("TestDaiInvalidRateParam: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestDaiInvalidRenderBitWidthParam(void)
+{
+    int ret;
+    struct AudioCard *card = NULL;
+    struct AudioPcmHwParams *param = NULL;
+    struct DaiDevice *cpuDai = NULL;
+    AudioType type;
+
+    ret = GetAudioCard(&card, &type);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestDaiInvalidRenerBitWidthParam: get card instance failed.");
+        return HDF_FAILURE;
+    }
+
+    param = (struct AudioPcmHwParams *)OsalMemCalloc(sizeof(*param));
+    if (param == NULL) {
+        HDF_LOGE("TestDaiInvalidRenerBitWidthParam: :alloc param memory failed");
+        return HDF_FAILURE;
+    }
+
+    ret = InitHwParam(param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestDaiInvalidRenerBitWidthParam: set hwparm fail");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+
+    param->streamType = 0;
+    param->format = 1;
+
+    if (card->rtd == NULL || card->rtd->cpuDai == NULL) {
+        HDF_LOGE("TestDaiInvalidRenerBitWidthParam: card rtd is NULL.");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+    cpuDai = card->rtd->cpuDai;
+    if (cpuDai->devData == NULL || cpuDai->devData->ops == NULL) {
+        HDF_LOGE("TestDaiInvalidRenerBitWidthParam: cpuDai param is NULL.");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+    if (cpuDai->devData->ops->HwParams != NULL) {
+        ret = cpuDai->devData->ops->HwParams(card, param, cpuDai);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("TestDaiInvalidRenerBitWidthParam: DaiHwParams fail ret = %d", ret);
+            OsalMemFree(param);
+            return HDF_FAILURE;
+        }
+    }
+
+    OsalMemFree(param);
+    HDF_LOGI("TestDaiInvalidRenerBitWidthParam: success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestDaiInvalidCaptureBitWidthParam(void)
+{
+    int ret;
+    struct AudioCard *card = NULL;
+    struct AudioPcmHwParams *param = NULL;
+    struct DaiDevice *cpuDai = NULL;
+    AudioType type;
+
+    ret = GetAudioCard(&card, &type);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestDailInvalidCaptureBitWidthParam: get card instance failed.");
+        return HDF_FAILURE;
+    }
+
+    param = (struct AudioPcmHwParams *)OsalMemCalloc(sizeof(*param));
+    if (param == NULL) {
+        HDF_LOGE("TestDailInvalidCaptureBitWidthParam: alloc param memory failed");
+        return HDF_FAILURE;
+    }
+
+    ret = InitHwParam(param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestDailInvalidCaptureBitWidthParam: set hwparm failed");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+
+    param->streamType = 1;
+    param->format = 1;
+
+    if (card->rtd == NULL || card->rtd->cpuDai == NULL) {
+        HDF_LOGE("TestDailInvalidCaptureBitWidthParam: card rtd is NULL.");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+    cpuDai = card->rtd->cpuDai;
+    if (cpuDai->devData == NULL || cpuDai->devData->ops == NULL) {
+        HDF_LOGE("TestDailInvalidCaptureBitWidthParam: cpuDai param is NULL.");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+    if (cpuDai->devData->ops->HwParams != NULL) {
+        ret = cpuDai->devData->ops->HwParams(card, param, cpuDai);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("TestDailInvalidCaptureBitWidthParam: DaiHwParams fail ret = %d", ret);
+            OsalMemFree(param);
+            return HDF_FAILURE;
+        }
+    }
+
+    OsalMemFree(param);
+    HDF_LOGI("TestDailInvalidCaptureBitWidthParam: success");
+    return HDF_SUCCESS;
+}
+
+
+int32_t TestDaiInvalidStreamTypeParam(void)
+{
+    int ret;
+    struct AudioCard *card = NULL;
+    struct AudioPcmHwParams *param = NULL;
+    struct DaiDevice *cpuDai = NULL;
+    const int streamTypeDefault = 2;
+    AudioType type;
+
+    ret = GetAudioCard(&card, &type);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestDailInvalidStreamTypeParam: get card instance failed.");
+        return HDF_FAILURE;
+    }
+
+    param = (struct AudioPcmHwParams *)OsalMemCalloc(sizeof(*param));
+    if (param == NULL) {
+        HDF_LOGE("TestDailInvalidStreamTypeParam: alloc param memory failed");
+        return HDF_FAILURE;
+    }
+
+    ret = InitHwParam(param);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestDailInvalidStreamTypeParam: set hwparm failed");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+
+    param->streamType = streamTypeDefault;
+
+    if (card->rtd == NULL || card->rtd->cpuDai == NULL) {
+        HDF_LOGE("TestDailInvalidStreamTypeParam: card rtd is NULL.");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+    cpuDai = card->rtd->cpuDai;
+    if (cpuDai->devData == NULL || cpuDai->devData->ops == NULL) {
+        HDF_LOGE("TestDailInvalidStreamTypeParam: cpuDai param is NULL.");
+        OsalMemFree(param);
+        return HDF_FAILURE;
+    }
+    if (cpuDai->devData->ops->HwParams != NULL) {
+        ret = cpuDai->devData->ops->HwParams(card, param, cpuDai);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("TestDailInvalidStreamTypeParam: DaiHwParams fail ret = %d", ret);
+            OsalMemFree(param);
+            return HDF_FAILURE;
+        }
+    }
+
+    OsalMemFree(param);
+    HDF_LOGI("TestDailInvalidStreamTypeParam:  success");
+    return HDF_SUCCESS;
+}
+
+int32_t TestDaiTrigger(void)
+{
+    int ret;
+    struct AudioCard *card = NULL;
+    int cmd;
+    struct DaiDevice *cpuDai = NULL;
+    AudioType type;
+
+    ret = GetAudioCard(&card, &type);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("TestDaiTrigger: get card instance failed.");
+        return HDF_FAILURE;
+    }
+
+    if (card->rtd == NULL || card->rtd->cpuDai == NULL) {
+        HDF_LOGE("TestDaiTrigger: card rtd is NULL.");
+        return HDF_FAILURE;
+    }
+    cpuDai = card->rtd->cpuDai;
+    if (cpuDai->devData == NULL || cpuDai->devData->ops == NULL) {
+        HDF_LOGE("TestDaiTrigger: cpuDai param is NULL.");
+        return HDF_FAILURE;
+    }
+    cmd = 1;
+    if (cpuDai->devData->ops->Trigger != NULL) {
+        ret = cpuDai->devData->ops->Trigger(card, cmd, cpuDai);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("TestDaiTrigger: Trigger fail ret = %d", ret);
+            return HDF_FAILURE;
+        }
+    }
+
+    HDF_LOGI("TestDaiTrigger: success");
     return HDF_SUCCESS;
 }

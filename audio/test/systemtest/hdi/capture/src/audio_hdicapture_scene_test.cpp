@@ -87,10 +87,11 @@ void AudioHdiCaptureSceneTest::SetUpTestCase(void)
     }
     SdkInit();
 #endif
-    if (access(RESOLVED_PATH.c_str(), 0)) {
+    char absPath[PATH_MAX] = {0};
+    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
         return;
     }
-    handleSo = dlopen(RESOLVED_PATH.c_str(), RTLD_LAZY);
+    handleSo = dlopen(absPath, RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
     }
@@ -115,6 +116,10 @@ void AudioHdiCaptureSceneTest::TearDownTestCase(void)
         SdkExit = nullptr;
     }
 #endif
+    if (handleSo != nullptr) {
+        dlclose(handleSo);
+        handleSo = nullptr;
+    }
     if (GetAudioManager != nullptr) {
         GetAudioManager = nullptr;
     }
@@ -153,7 +158,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     scenes.scene.id = 0;
@@ -163,7 +168,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
     EXPECT_TRUE(supported);
 
     adapter->DestroyCapture(adapter, capture);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 /**
 * @tc.name   Test checking scene's capability where the scene is not configured in the json.
@@ -179,7 +184,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     scenes.scene.id = 5;
@@ -188,7 +193,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 
     adapter->DestroyCapture(adapter, capture);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 /**
 * @tc.name   Test checking scene's capability where the capture is empty
@@ -205,7 +210,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     scenes.scene.id = 0;
@@ -218,7 +223,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
 
     capture->control.Stop((AudioHandle)capture);
     adapter->DestroyCapture(adapter, capture);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 /**
 * @tc.name   Test checking scene's capability where the scene is empty
@@ -234,7 +239,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -246,7 +251,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
 
     capture->control.Stop((AudioHandle)capture);
     adapter->DestroyCapture(adapter, capture);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 /**
 * @tc.name   Test checking scene's capability where the parameter supported is empty.
@@ -261,7 +266,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -271,7 +276,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 /**
 * @tc.name  Test AudioCaptureSelectScene API via legal input
@@ -286,7 +291,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0001, T
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     scenes.scene.id = 0;
@@ -295,7 +300,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0001, T
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     adapter->DestroyCapture(adapter, capture);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 /**
 * @tc.name  Test AudioCaptureSelectScene API after capture start.
@@ -310,7 +315,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0002, T
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -324,7 +329,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0002, T
 
     capture->control.Stop((AudioHandle)capture);
     adapter->DestroyCapture(adapter, capture);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 /**
 * @tc.name  Test AudioCaptureSelectScene API where the parameter handle is empty.
@@ -340,7 +345,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0003, T
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -350,7 +355,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0003, T
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 /**
 * @tc.name  Test AudioCaptureSelectScene API where the parameter scene is empty.
@@ -365,7 +370,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0004, T
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -373,7 +378,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0004, T
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
     adapter->DestroyCapture(adapter, capture);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 /**
 * @tc.name  Test AudioCaptureSelectScene API where the scene is not configured in the json.
@@ -388,7 +393,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0005, T
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_INTERNAL, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -398,6 +403,6 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0005, T
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 
     adapter->DestroyCapture(adapter, capture);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 }

@@ -51,10 +51,11 @@ extern "C" {
 #define FORMAT_ONE "%-5d  %-10d  %-20llu  %-15s  %s\n"
 #define FORMAT_TWO "%-5d  %-10d  %s\n"
 #define ERROR_LOG_MAX_NUM 8
-#define ERROR_REASON_DESC_LEN 128
+#define ERROR_REASON_DESC_LEN 64
 #define RANGE_MAX 5
 #define RANGE_MIN 4
 #define EXTPARAM_LEN 32
+#define KEY_VALUE_LIST_LEN 128
 
 /**
  * @brief Enumerates HAL return value types.
@@ -62,13 +63,13 @@ extern "C" {
 typedef enum {
     AUDIO_HAL_SUCCESS = 0,
     AUDIO_HAL_ERR_INTERNAL = -1,      /* audio system internal errors */
-    AUDIO_HAL_ERR_NOT_SUPPORT = -2,   /* operation is not supported */
+    AUDIO_HAL_ERR_NOT_SUPPORT = -2,     /* operation is not supported */
     AUDIO_HAL_ERR_INVALID_PARAM = -3, /* parameter is invaild */
-    AUDIO_HAL_ERR_INVALID_OBJECT = -4, /**< Invalid object. */
-    AUDIO_HAL_ERR_MALLOC_FAIL = -6, /**< Memory allocation fails. */
+    AUDIO_HAL_ERR_INVALID_OBJECT = -4, /* Invalid object */
+    AUDIO_HAL_ERR_MALLOC_FAIL = -6, /* Memory allocation fails */
 
-    #define HDF_AUDIO_HAL_ERR_START (-7000) /**< Defines the start of the device module error codes. */
-    #define HDF_AUDIO_HAL_ERR_NUM(v) (HDF_AUDIO_HAL_ERR_START + (v)) /**< Defines the device module error codes. */
+    #define HDF_AUDIO_HAL_ERR_START (-7000) /* Defines the start of the device module error codes. */
+    #define HDF_AUDIO_HAL_ERR_NUM(v) (HDF_AUDIO_HAL_ERR_START + (v)) /* Defines the device module error codes. */
     AUDIO_HAL_ERR_NOTREADY = HDF_AUDIO_HAL_ERR_NUM(-1),      /* audio adapter is not ready */
     AUDIO_HAL_ERR_AI_BUSY = HDF_AUDIO_HAL_ERR_NUM(-2),         /* audio capture is busy now */
     AUDIO_HAL_ERR_AO_BUSY = HDF_AUDIO_HAL_ERR_NUM(-3),         /* audio render is busy now */
@@ -151,34 +152,7 @@ typedef enum {
 #define AUDIO_SAMPLE_RATE_24000 24000
 #define AUDIO_SAMPLE_RATE_64000 64000
 #define AUDIO_SAMPLE_RATE_96000 96000
-#define OPEN_AUDIO_LOG_WITH_TIME 1
-#define MAX_TIME_INFO_LEN 64
-
-#ifndef OPEN_AUDIO_LOG_WITH_TIME
-#define LOG_FUN_INFO() do { \
-        printf("%s: [%s]: [%d]\n", __FILE__, __func__, __LINE__); \
-    } while (0)
-
-#define LOG_FUN_ERR(fmt, arg...) do { \
-        printf("%s: [%s]: [%d]:[ERROR]:" fmt"\n", __FILE__, __func__, __LINE__, ##arg); \
-    } while (0)
-
-#define LOG_PARA_INFO(fmt, arg...) do { \
-        printf("%s: [%s]: [%d]:[INFO]:" fmt"\n", __FILE__, __func__, __LINE__, ##arg); \
-    } while (0)
-#else
-#define LOG_FUN_INFO() do { \
-    } while (0)
-
-#define LOG_FUN_ERR(fmt, arg...) do { \
-        char s[MAX_TIME_INFO_LEN] = {0}; \
-        AudioGetSysTime(s, MAX_TIME_INFO_LEN); \
-        printf("%s %s: [%s]: [%d]:[ERROR]:" fmt"\n", s, __FILE__, __func__, __LINE__, ##arg); \
-    } while (0)
-
-#define LOG_PARA_INFO(fmt, arg...) do { \
-    } while (0)
-#endif
+#define SUPPORT_ADAPTER_NUM_MAX 8
 
 struct DevHandleCapture {
     void *object;
@@ -302,8 +276,8 @@ struct ErrorDump {
     int32_t errorCode;
     int32_t count;
     uint64_t frames;
-    char* reason;                       // Specific reasons for failure
-    char* currentTime;
+    char *reason;                       // Specific reasons for failure
+    char *currentTime;
 };
 
 struct ErrorLog {
@@ -370,6 +344,19 @@ struct ExtraParams {
     uint64_t frames;
     uint32_t sampleRate;
     bool flag;
+};
+
+enum AudioAddrType {
+    AUDIO_ADAPTER_ADDR = 0, /** Record the address of the adapter for FUZZ. */
+    AUDIO_RENDER_ADDR,      /** Record the address of the render for FUZZ. */
+    AUDIO_CAPTURE_ADDR,     /** Record the address of the capturef or FUZZ. */
+    AUDIO_INVALID_ADDR,     /** Invalid value. */
+};
+
+struct AudioAddrDB { // Record the address of the adapter Mgr for FUZZ.
+    void *addrValue;
+    const char *adapterName;
+    enum AudioAddrType addrType;
 };
 
 enum ErrorDumpCode {

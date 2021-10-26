@@ -25,7 +25,7 @@ const string ADAPTER_NAME_USB = "usb";
 const string ADAPTER_NAME_INTERNAL = "internal";
 const uint64_t FILESIZE = 1024;
 const uint32_t CHANNELCOUNTEXOECT = 2;
-const uint32_t SAMPLERATEEXOECT = 32000;
+const uint32_t SAMPLERATEEXOECT = 48000;
 
 class AudioServerFunctionTest : public testing::Test {
 public:
@@ -41,7 +41,6 @@ public:
     static void *sdkSo;
 #endif
     static int32_t GetManager(struct PrepareAudioPara& audiopara);
-    uint32_t FrameSizeExpect(const struct AudioSampleAttributes attrs);
 };
 
 TestAudioManager *(*AudioServerFunctionTest::GetAudioManager)() = nullptr;
@@ -71,7 +70,11 @@ void AudioServerFunctionTest::SetUpTestCase(void)
     }
     SdkInit();
 #endif
-    handleSo = dlopen(RESOLVED_PATH.c_str(), RTLD_LAZY);
+    char absPath[PATH_MAX] = {0};
+    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
+        return;
+    }
+    handleSo = dlopen(absPath, RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
     }
@@ -96,6 +99,10 @@ void AudioServerFunctionTest::TearDownTestCase(void)
         SdkExit = nullptr;
     }
 #endif
+    if (handleSo != nullptr) {
+        dlclose(handleSo);
+        handleSo = nullptr;
+    }
     if (GetAudioManager != nullptr) {
         GetAudioManager = nullptr;
     }
@@ -115,15 +122,6 @@ int32_t AudioServerFunctionTest::GetManager(struct PrepareAudioPara& audiopara)
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
-}
-
-uint32_t AudioServerFunctionTest::FrameSizeExpect(const struct AudioSampleAttributes attrs)
-{
-    if (attrs.channelCount < 1 || attrs.channelCount > 2) {
-        return 0;
-    }
-    uint32_t sizeExpect = FRAME_SIZE * (attrs.channelCount) * (PcmFormatToBits(attrs.format) >> MOVE_RIGHT_NUM);
-    return sizeExpect;
 }
 
 /**
@@ -403,6 +401,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0007, TestSize.
         ret = audiopara.render->control.Resume((AudioHandle)(audiopara.render));
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         FrameStatus(1);
+        sleep(1);
         ret = audiopara.render->volume.SetVolume(audiopara.render, volumeMax);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
@@ -469,7 +468,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0009, TestSize.
     if (audiopara.render != nullptr) {
         ret = audiopara.render->attr.GetFrameSize(audiopara.render, &size);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-        sizeExpect = FrameSizeExpect(audiopara.attrs);
+        sizeExpect = PcmFramesToBytes(audiopara.attrs);
         EXPECT_EQ(size, sizeExpect);
     }
     ret = ThreadRelease(audiopara);
@@ -878,7 +877,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0008, TestSize
     if (audiopara.capture != nullptr) {
         ret = audiopara.capture->attr.GetFrameSize(audiopara.capture, &size);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-        sizeExpect = FrameSizeExpect(audiopara.attrs);
+        sizeExpect = PcmFramesToBytes(audiopara.attrs);
         EXPECT_EQ(size, sizeExpect);
     }
     ret = ThreadRelease(audiopara);

@@ -64,6 +64,11 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/kits/",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
+      "$hdf_framework_path/include/utils",
+      "//drivers/adapter/khdf/liteos/osal/include",
+      "$hdf_framework_path/utils/include",
+      "$hdf_framework_path/include/osal",
+      "$hdf_framework_path/include/core",
     ]
 
     deps = [
@@ -92,6 +97,11 @@ if (defined(ohos_lite)) {
       "$hdf_uhdf_path/osal/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/kits/",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
+      "$hdf_framework_path/include/utils",
+      "//drivers/adapter/khdf/liteos/osal/include",
+      "$hdf_framework_path/utils/include",
+      "$hdf_framework_path/include/osal",
+      "$hdf_framework_path/include/core",
     ]
 
     deps = [
@@ -101,6 +111,9 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function:libsec_shared",
     ]
 
+    if (enable_audio_hal_hdf_log) {
+      defines = [ "AUDIO_HAL_HDF_LOG" ]
+    }
     public_configs = [ ":audio_interface_config" ]
   }
 } else {
@@ -126,6 +139,10 @@ if (defined(ohos_lite)) {
       "$hdf_uhdf_path/utils:libhdf_utils",
       "//utils/native/base:utils",
     ]
+
+    if (enable_audio_hal_hdf_log) {
+      defines = [ "AUDIO_HAL_HDF_LOG" ]
+    }
 
     if (is_standard_system) {
       external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
@@ -160,6 +177,10 @@ if (defined(ohos_lite)) {
       "$hdf_uhdf_path/utils:libhdf_utils",
       "//utils/native/base:utils",
     ]
+
+    if (enable_audio_hal_hdf_log) {
+      defines = [ "AUDIO_HAL_HDF_LOG" ]
+    }
 
     if (is_standard_system) {
       external_deps = [ "hiviewdfx_hilog_native:libhilog" ]

@@ -186,7 +186,7 @@ struct PrepareAudioPara {
     enum AudioPortDirection portType;
     const char *adapterName;
     struct AudioAdapter *adapter;
-    struct AudioPort audioPort;
+    struct AudioPort *audioPort;
     void *self;
     void *result;
     pthread_t tids;
@@ -216,28 +216,28 @@ struct PrepareAudioPara {
     struct AudioDeviceDescriptor devDesc;
 };
 
-int32_t InitAttrs(struct AudioSampleAttributes& attrs);
+int32_t InitAttrs(struct AudioSampleAttributes &attrs);
 
-int32_t InitDevDesc(struct AudioDeviceDescriptor& devDesc, const uint32_t portId, enum AudioPortPin pins);
+int32_t InitDevDesc(struct AudioDeviceDescriptor &devDesc, const uint32_t portId, enum AudioPortPin pins);
 
-int32_t SwitchAdapter(struct AudioAdapterDescriptor *descs, const std::string& adapterNameCase,
-    enum AudioPortDirection portFlag, struct AudioPort& audioPort, int size);
+int32_t SwitchAdapter(struct AudioAdapterDescriptor *descs, const std::string &adapterNameCase,
+    enum AudioPortDirection portFlag, struct AudioPort *&audioPort, int size);
 
 uint32_t PcmFormatToBits(enum AudioFormat format);
 
 uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs);
 
-int32_t WavHeadAnalysis(struct AudioHeadInfo& wavHeadInfo, FILE *file, struct AudioSampleAttributes& attrs);
+int32_t WavHeadAnalysis(struct AudioHeadInfo &wavHeadInfo, FILE *file, struct AudioSampleAttributes &attrs);
 
-int32_t GetAdapters(TestAudioManager manager, struct AudioAdapterDescriptor **descs, int &size);
+int32_t GetAdapters(TestAudioManager *manager, struct AudioAdapterDescriptor **descs, int &size);
 
-int32_t GetLoadAdapter(TestAudioManager manager, enum AudioPortDirection portType,
-    const std::string& adapterName, struct AudioAdapter **adapter, struct AudioPort& audioPort);
+int32_t GetLoadAdapter(TestAudioManager *manager, enum AudioPortDirection portType,
+    const std::string &adapterName, struct AudioAdapter **adapter, struct AudioPort *&audioPort);
 
-int32_t AudioCreateRender(TestAudioManager manager, enum AudioPortPin pins, const std::string& adapterName,
+int32_t AudioCreateRender(TestAudioManager *manager, enum AudioPortPin pins, const std::string &adapterName,
     struct AudioAdapter **adapter, struct AudioRender **render);
 
-int32_t AudioCreateCapture(TestAudioManager manager, enum AudioPortPin pins, const std::string& adapterName,
+int32_t AudioCreateCapture(TestAudioManager *manager, enum AudioPortPin pins, const std::string &adapterName,
     struct AudioAdapter **adapter, struct AudioCapture **capture);
 
 int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render, FILE *file,
@@ -245,7 +245,7 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render,
 
 int32_t FrameStartCapture(struct AudioCapture *capture, FILE *file, const struct AudioSampleAttributes attrs);
 
-int32_t RenderFramePrepare(const std::string& path, char *&frame, uint64_t& numRead);
+int32_t RenderFramePrepare(const std::string &path, char *&frame, uint64_t &numRead);
 
 void FrameStatus(int status);
 
@@ -260,38 +260,38 @@ int32_t PowerOff(struct AudioCtlElemValue firstElemValue, struct AudioCtlElemVal
 int32_t CheckRegisterStatus(const struct AudioCtlElemId firstId, const struct AudioCtlElemId secondId,
     const int firstStatus, const int secondStatus);
 
-int32_t AudioCreateStartRender(TestAudioManager manager, struct AudioRender **render, struct AudioAdapter **adapter,
-    const std::string& adapterName);
+int32_t AudioCreateStartRender(TestAudioManager *manager, struct AudioRender **render, struct AudioAdapter **adapter,
+    const std::string &adapterName);
 
 int32_t AudioRenderStartAndOneFrame(struct AudioRender *render);
 
-int32_t StopAudio(struct PrepareAudioPara& audiopara);
+int32_t StopAudio(struct PrepareAudioPara &audiopara);
 
-int32_t ThreadRelease(struct PrepareAudioPara& audiopara);
+int32_t ThreadRelease(struct PrepareAudioPara &audiopara);
 
-int32_t AudioCreateStartCapture(TestAudioManager manager, struct AudioCapture **capture,
-    struct AudioAdapter **adapter, const std::string& adapterName);
+int32_t AudioCreateStartCapture(TestAudioManager *manager, struct AudioCapture **capture,
+    struct AudioAdapter **adapter, const std::string &adapterName);
 
 int32_t AudioCaptureStartAndOneFrame(struct AudioCapture *capture);
 
-int32_t PlayAudioFile(struct PrepareAudioPara& audiopara);
+int32_t PlayAudioFile(struct PrepareAudioPara &audiopara);
 
-int32_t RecordAudio(struct PrepareAudioPara& audiopara);
+int32_t RecordAudio(struct PrepareAudioPara &audiopara);
 
-int32_t InitAttrsUpdate(struct AudioSampleAttributes& attrs, enum AudioFormat format, uint32_t channelCount,
+int32_t InitAttrsUpdate(struct AudioSampleAttributes &attrs, enum AudioFormat format, uint32_t channelCount,
     uint32_t sampleRate);
 
-int32_t AudioRenderSetGetSampleAttributes(struct AudioSampleAttributes attrs, struct AudioSampleAttributes& attrsValue,
+int32_t AudioRenderSetGetSampleAttributes(struct AudioSampleAttributes attrs, struct AudioSampleAttributes &attrsValue,
     struct AudioRender *render);
 
-int32_t AudioCaptureSetGetSampleAttributes(struct AudioSampleAttributes attrs, struct AudioSampleAttributes& attrsValue,
+int32_t AudioCaptureSetGetSampleAttributes(struct AudioSampleAttributes attrs, struct AudioSampleAttributes &attrsValue,
     struct AudioCapture *capture);
 
-int32_t InitMmapDesc(FILE *fp, struct AudioMmapBufferDescripter &desc, uint32_t &reqSize, bool flag);
+int32_t InitMmapDesc(FILE *fp, struct AudioMmapBufferDescripter &desc, int32_t &reqSize, bool flag);
 
-int32_t PlayMapAudioFile(struct PrepareAudioPara& audiopara);
+int32_t PlayMapAudioFile(struct PrepareAudioPara &audiopara);
 
-int32_t RecordMapAudio(struct PrepareAudioPara& audiopara);
+int32_t RecordMapAudio(struct PrepareAudioPara &audiopara);
 }
 }
 #endif // AUDIO_HDI_COMMON_H

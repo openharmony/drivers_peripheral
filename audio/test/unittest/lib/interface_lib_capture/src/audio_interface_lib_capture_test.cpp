@@ -82,14 +82,14 @@ void AudioInterfaceLibCaptureTest::TearDownTestCase()
 {
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, SetHwParamsWhenHandleIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, SetHwParamsWhenHandleIsNull, TestSize.Level1)
 {
     const struct AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = SetHwParamsCapture(handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, SetHwParamsWhenHandleIsVaild, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, SetHwParamsWhenHandleIsVaild, TestSize.Level1)
 {
     struct AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
@@ -99,14 +99,14 @@ HWTEST_F(AudioInterfaceLibCaptureTest, SetHwParamsWhenHandleIsVaild, TestSize.Le
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, ParamsSbufWriteBufferWhenSbufIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, ParamsSbufWriteBufferWhenSbufIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = nullptr;
     int32_t ret = ParamsSbufWriteBuffer(sBuf);
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, ParamsSbufWriteBufferWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, ParamsSbufWriteBufferWhenParamIsVaild, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     int32_t ret = ParamsSbufWriteBuffer(sBuf);
@@ -114,7 +114,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, ParamsSbufWriteBufferWhenParamIsVaild, Te
     HdfSBufRecycle(sBuf);
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetPauseBufWhenSbufIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetPauseBufWhenSbufIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = nullptr;
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -124,7 +124,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetPauseBufWhenSbufIsNull,
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetPauseBufWhenHandleDataIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetPauseBufWhenHandleDataIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = nullptr;
@@ -133,7 +133,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetPauseBufWhenHandleDataI
     HdfSBufRecycle(sBuf);
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetPauseBufWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetPauseBufWhenParamIsVaild, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -145,7 +145,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetPauseBufWhenParamIsVail
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetVolumeSBufWhenSbuffIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetVolumeSBufWhenSbuffIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = nullptr;
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -155,7 +155,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetVolumeSBufWhenSbuffIsNu
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetVolumeSBufWhenHandleDataIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetVolumeSBufWhenHandleDataIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = nullptr;
@@ -164,7 +164,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetVolumeSBufWhenHandleDat
     HdfSBufRecycle(sBuf);
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetVolumeSBufWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetVolumeSBufWhenParamIsVaild, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -176,7 +176,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetVolumeSBufWhenParamIsVa
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetVolumeSBufWhenSbuffIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetVolumeSBufWhenSbuffIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = nullptr;
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -186,7 +186,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetVolumeSBufWhenSbuffIsNu
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetVolumeSBufWhenHandleDataIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetVolumeSBufWhenHandleDataIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = nullptr;
@@ -195,7 +195,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetVolumeSBufWhenHandleDat
     HdfSBufRecycle(sBuf);
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetVolumeSBufWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetVolumeSBufWhenParamIsVaild, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -207,7 +207,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetVolumeSBufWhenParamIsVa
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetMuteBufWhenSbufIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetMuteBufWhenSbufIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = nullptr;
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -217,7 +217,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetMuteBufWhenSbufIsNull, 
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetMuteBufWhenHandleDataIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetMuteBufWhenHandleDataIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = nullptr;
@@ -226,7 +226,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetMuteBufWhenHandleDataIs
     HdfSBufRecycle(sBuf);
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetMuteBufWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetMuteBufWhenParamIsVaild, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -238,7 +238,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetMuteBufWhenParamIsVaild
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetMuteSBufWhenSbufIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetMuteSBufWhenSbufIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = nullptr;
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -248,7 +248,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetMuteSBufWhenSbufIsNull,
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetMuteSBufWhenHandleDataIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetMuteSBufWhenHandleDataIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = nullptr;
@@ -257,7 +257,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetMuteSBufWhenHandleDataI
     HdfSBufRecycle(sBuf);
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetMuteSBufWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetMuteSBufWhenParamIsVaild, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -269,7 +269,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetMuteSBufWhenParamIsVail
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetGainSBufWhenSbufIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetGainSBufWhenSbufIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = nullptr;
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -279,7 +279,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetGainSBufWhenSbufIsNull,
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetGainSBufWhenHandleDataIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetGainSBufWhenHandleDataIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = nullptr;
@@ -288,7 +288,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetGainSBufWhenHandleDataI
     HdfSBufRecycle(sBuf);
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetGainSBufWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetGainSBufWhenParamIsVaild, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -300,7 +300,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetGainSBufWhenParamIsVail
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainSBufWhenSbufIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainSBufWhenSbufIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = nullptr;
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -310,7 +310,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainSBufWhenSbufIsNull,
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainSBufWhenHandleDataIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainSBufWhenHandleDataIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = nullptr;
@@ -319,7 +319,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainSBufWhenHandleDataI
     HdfSBufRecycle(sBuf);
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainSBufWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainSBufWhenParamIsVaild, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -331,7 +331,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainSBufWhenParamIsVail
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSceneSelectSBufWhenSbufIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSceneSelectSBufWhenSbufIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = nullptr;
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -342,7 +342,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSceneSelectSBufWhenSbufIsN
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSceneSelectSBufWhenHandleDataIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSceneSelectSBufWhenHandleDataIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = nullptr;
@@ -352,7 +352,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSceneSelectSBufWhenHandleD
     HdfSBufRecycle(sBuf);
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSceneSelectSBufWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSceneSelectSBufWhenParamIsVaild, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -365,7 +365,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSceneSelectSBufWhenParamIs
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainThresholdSBufWhenSbufIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainThresholdSBufWhenSbufIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = nullptr;
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
@@ -375,7 +375,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainThresholdSBufWhenSb
     handleData = nullptr;
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainThresholdSBufWhenHandleDataIsNull, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainThresholdSBufWhenHandleDataIsNull, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = nullptr;
@@ -384,7 +384,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainThresholdSBufWhenHa
     HdfSBufRecycle(sBuf);
 }
 
-HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainThresholdSBufWhenParamIsVaild, TestSize.Level0)
+HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainThresholdSBufWhenParamIsVaild, TestSize.Level1)
 {
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;

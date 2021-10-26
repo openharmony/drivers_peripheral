@@ -119,13 +119,13 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0001, TestSize.Level1)
     ret = PowerOff(g_elemValues[0], g_elemValues[1]);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateRender(manager, pins, ADAPTER_USB, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = CheckRegisterStatus(g_elemValues[0].id, g_elemValues[1].id, REGISTER_STATUS_ON, REGISTER_STATUS_ON);
     EXPECT_EQ(HDF_SUCCESS, ret);
     adapter->DestroyRender(adapter, render);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 /**
 * @tc.name  Test the audio path route selection function via switching device SPEAKER to HEADSET
@@ -145,7 +145,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0002, TestSize.Level1)
     ret = PowerOff(g_elemValues[0], g_elemValues[1]);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateRender(manager, pins, ADAPTER_USB, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
     struct AudioSceneDescriptor scene = {
@@ -156,7 +156,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0002, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = CheckRegisterStatus(g_elemValues[0].id, g_elemValues[1].id, REGISTER_STATUS_OFF, REGISTER_STATUS_OFF);
     adapter->DestroyRender(adapter, render);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 /**
 * @tc.name  Test the audio path route selection function of playback sence
@@ -174,7 +174,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0003, TestSize.Level1)
     ret = PowerOff(g_elemValues[0], g_elemValues[1]);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_USB, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
     struct AudioSceneDescriptor scene = {
@@ -186,7 +186,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0003, TestSize.Level1)
     ret = CheckRegisterStatus(g_elemValues[0].id, g_elemValues[1].id, REGISTER_STATUS_ON, REGISTER_STATUS_ON);
     EXPECT_EQ(HDF_SUCCESS, ret);
     adapter->DestroyRender(adapter, render);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 /**
 * @tc.name  Test the audio path route selection function of recording scene
@@ -205,13 +205,13 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0004, TestSize.Level1)
     ret = PowerOff(g_elemValues[2], g_elemValues[3]);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateCapture(manager, pins, ADAPTER_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = CheckRegisterStatus(g_elemValues[2].id, g_elemValues[3].id, REGISTER_STATUS_ON, REGISTER_STATUS_OFF);
     EXPECT_EQ(HDF_SUCCESS, ret);
     adapter->DestroyCapture(adapter, capture);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 /**
 * @tc.name  Test the audio path route selection function via switching device MIC to HS_MIC
@@ -231,7 +231,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0005, TestSize.Level1)
     ret = PowerOff(g_elemValues[2], g_elemValues[3]);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateCapture(manager, pins, ADAPTER_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
     struct AudioSceneDescriptor scene = {
@@ -242,7 +242,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0005, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = CheckRegisterStatus(g_elemValues[2].id, g_elemValues[3].id, REGISTER_STATUS_OFF, REGISTER_STATUS_OFF);
     adapter->DestroyCapture(adapter, capture);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 /**
 * @tc.name  Test the audio path route selection function of recording sence
@@ -261,7 +261,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0006, TestSize.Level1)
     ret = PowerOff(g_elemValues[2], g_elemValues[3]);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_INTERNAL, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
     struct AudioSceneDescriptor scene = {
@@ -273,7 +273,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0006, TestSize.Level1)
     ret = CheckRegisterStatus(g_elemValues[2].id, g_elemValues[3].id, REGISTER_STATUS_ON, REGISTER_STATUS_OFF);
     EXPECT_EQ(HDF_SUCCESS, ret);
     adapter->DestroyCapture(adapter, capture);
-    manager.UnloadAdapter(&manager, adapter);
+    manager->UnloadAdapter(manager, adapter);
 }
 /**
 * @tc.name  Test the audio path route selection function via runing multi service scenarios
@@ -292,7 +292,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0007, TestSize.Level1)
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = PowerOff(g_elemValues[2], g_elemValues[3]);
     ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager manager = *GetAudioManager();
+    TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_INTERNAL, &captureAdapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = CheckRegisterStatus(g_elemValues[2].id, g_elemValues[3].id, REGISTER_STATUS_ON, REGISTER_STATUS_OFF);
@@ -300,14 +300,14 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0007, TestSize.Level1)
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_USB, &renderAdapter, &render);
     if (ret < 0) {
         captureAdapter->DestroyCapture(captureAdapter, capture);
-        manager.UnloadAdapter(&manager, captureAdapter);
+        manager->UnloadAdapter(manager, captureAdapter);
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
     ret = CheckRegisterStatus(g_elemValues[0].id, g_elemValues[1].id, REGISTER_STATUS_ON, REGISTER_STATUS_ON);
     EXPECT_EQ(HDF_SUCCESS, ret);
     captureAdapter->DestroyCapture(captureAdapter, capture);
-    manager.UnloadAdapter(&manager, captureAdapter);
+    manager->UnloadAdapter(manager, captureAdapter);
     renderAdapter->DestroyRender(renderAdapter, render);
-    manager.UnloadAdapter(&manager, renderAdapter);
+    manager->UnloadAdapter(manager, renderAdapter);
 }
 }

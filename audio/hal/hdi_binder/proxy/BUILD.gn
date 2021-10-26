@@ -17,6 +17,7 @@ if (defined(ohos_lite)) {
   import("//build/ohos.gni")
 }
 import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/peripheral/audio/audio.gni")
 
 config("hdi_service_proxy_config") {
   visibility = [ ":*" ]
@@ -53,6 +54,12 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
       "//drivers/peripheral/audio/hal/hdi_binder/server/include",
+      "$hdf_framework_path/include/core",
+      "$hdf_framework_path/include/utils",
+      "$hdf_framework_path/include/osal",
+      "$hdf_framework_path/ability/sbuf/include",
+      "$hdf_framework_path/utils/include",
+      "$hdf_framework_path/include",
       "$hdf_framework_path/core/sec/include",
       "$hdf_framework_path/core/shared/include",
       "$hdf_framework_path/core/host/include",
@@ -67,7 +74,7 @@ if (defined(ohos_lite)) {
     ]
 
     sources = [
-      "$hdf_framework_path/utils/src/hdf_sbuf.c",
+      "$hdf_framework_path/ability/sbuf/src/hdf_sbuf.c",
       "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_adapter_info_common.c",
       "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
       "//third_party/cJSON/cJSON.c",
@@ -83,6 +90,10 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function:libsec_shared",
     ]
 
+    if (enable_audio_hal_hdf_log) {
+      defines = [ "AUDIO_HAL_HDF_LOG" ]
+    }
+
     public_configs = [ ":hdi_service_proxy_config" ]
   }
 
@@ -97,7 +108,26 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
       "//drivers/peripheral/audio/hal/hdi_binder/server/include",
       "//third_party/cJSON",
+      "$hdf_framework_path/include/core",
+      "$hdf_framework_path/include/utils",
+      "$hdf_framework_path/include/osal",
+      "$hdf_framework_path/include",
       "//third_party/bounds_checking_function/include",
+      "$hdf_framework_path/ability/sbuf/include",
+      "$hdf_framework_path/utils/include",
+      "$hdf_framework_path/ability/sbuf/include",
+      "$hdf_uhdf_path/osal/include",
+      "$hdf_framework_path/include",
+      "$hdf_framework_path/core/sec/include",
+      "$hdf_framework_path/core/shared/include",
+      "$hdf_framework_path/core/host/include",
+      "$hdf_framework_path/core/manager/include",
+      "$hdf_uhdf_path/include/devhost",
+      "$hdf_uhdf_path/devhost/include",
+      "$hdf_uhdf_path/devmgr/include",
+      "$hdf_uhdf_path/host/include",
+      "$hdf_uhdf_path/manager/include",
+      "$hdf_uhdf_path/include/host",
     ]
 
     sources = [
@@ -124,6 +154,10 @@ if (defined(ohos_lite)) {
       external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
     } else {
       external_deps = [ "hilog:libhilog" ]
+    }
+
+    if (enable_audio_hal_hdf_log) {
+      defines = [ "AUDIO_HAL_HDF_LOG" ]
     }
 
     public_configs = [ ":hdi_service_proxy_config" ]

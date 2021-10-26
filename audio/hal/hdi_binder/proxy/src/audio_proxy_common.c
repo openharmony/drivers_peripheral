@@ -15,11 +15,14 @@
 
 #include "audio_proxy_common.h"
 #include <servmgr_hdi.h>
+#include "audio_hal_log.h"
+
+#define HDF_LOG_TAG hal_audio_proxy_common
 
 #define AUDIO_HDF_SBUF_IPC 1
 #define PROXY_VOLUME_CHANGE 100
 
-struct HdfSBuf *AudioProxyObtainHdfSBuf()
+struct HdfSBuf *AudioProxyObtainHdfSBuf(void)
 {
     enum HdfSbufType bufType;
 #ifdef AUDIO_HDF_SBUF_IPC

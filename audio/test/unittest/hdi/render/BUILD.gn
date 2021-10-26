@@ -24,10 +24,14 @@ if (defined(ohos_lite)) {
   ###########################LITEOS###########################
   ###########################hdf_audio_hdi_render_test###########################
   unittest("hdf_audio_hdi_render_test") {
-    sources = [ "//drivers/peripheral/audio/test/unittest/hdi/render/src/audio_render_test.cpp" ]
+    sources = [
+      "//drivers/peripheral/audio/test/unittest/hdi/common/src/audio_common_test.cpp",
+      "//drivers/peripheral/audio/test/unittest/hdi/render/src/audio_render_test.cpp",
+    ]
 
     include_dirs = [
       "//drivers/peripheral/audio/test/unittest/hdi/render/include",
+      "//drivers/peripheral/audio/test/unittest/hdi/common/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
@@ -67,10 +71,14 @@ if (defined(ohos_lite)) {
   ###########################hdf_audio_hdi_render_test###########################
   ohos_unittest("hdf_audio_hdi_render_test") {
     module_out_path = module_output_path
-    sources = [ "//drivers/peripheral/audio/test/unittest/hdi/render/src/audio_render_test.cpp" ]
+    sources = [
+      "//drivers/peripheral/audio/test/unittest/hdi/common/src/audio_common_test.cpp",
+      "//drivers/peripheral/audio/test/unittest/hdi/render/src/audio_render_test.cpp",
+    ]
 
     include_dirs = [
       "//drivers/peripheral/audio/test/unittest/hdi/render/include",
+      "//drivers/peripheral/audio/test/unittest/hdi/common/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",

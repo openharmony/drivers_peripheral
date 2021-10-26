@@ -17,6 +17,11 @@ extern "C" {
 #endif /* __cplusplus */
 
 int32_t TestDaiHwParams(void);
+int32_t TestDaiInvalidRateParam(void);
+int32_t TestDaiInvalidRenderBitWidthParam(void);
+int32_t TestDaiInvalidCaptureBitWidthParam(void);
+int32_t TestDaiInvalidStreamTypeParam(void);
+int32_t TestDaiTrigger(void);
 
 #ifdef __cplusplus
 #if __cplusplus

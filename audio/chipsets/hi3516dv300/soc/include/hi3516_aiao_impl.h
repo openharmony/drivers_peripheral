@@ -505,6 +505,6 @@ int32_t AipSetAttr(unsigned int chnId, unsigned int channelCnt, unsigned int bit
 void ShowAllAiaoRegister(void);
 int32_t AiaoDeviceInit(unsigned int chnId);
 int32_t I2sCrgCfgInit(unsigned int chnId);
-bool AopPlayIsCompleted(struct PlatformHost *platformHost, uint32_t totalBufferFrames, uint32_t hold);
+bool AopPlayIsCompleted(const struct PlatformHost *platformHost, uint32_t totalBufferFrames, uint32_t hold);
 
 #endif // __HI3516_ACODEC_H__
