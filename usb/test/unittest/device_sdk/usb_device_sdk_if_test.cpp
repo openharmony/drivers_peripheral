@@ -23,8 +23,7 @@ extern "C" {
 using namespace std;
 using namespace testing::ext;
 namespace {
-#define AUTO_NO_SKIP 0
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 static struct AcmDevice *g_acmDevice = nullptr;
 #endif
 class UsbDeviceSdkIfTest : public testing::Test {
@@ -51,7 +50,7 @@ void UsbDeviceSdkIfTest::TearDown()
 {
 }
 
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCreateDevice001, TestSize.Level1)
 {
     g_acmDevice = SetUpAcmDevice();
@@ -70,7 +69,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCreateDevice002, TestSize.Level1)
     EXPECT_EQ(nullptr, fnDev);
 }
 
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCreateDevice003, TestSize.Level1)
 {
     struct UsbFnDevice *fnDev = nullptr;
@@ -92,7 +91,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCreateDevice004, TestSize.Level1)
     EXPECT_EQ(nullptr, fnDev);
 }
 
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCreateDevice005, TestSize.Level1)
 {
     struct UsbFnDevice *fnDev = nullptr;
@@ -115,7 +114,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCreateDevice006, TestSize.Level1)
     EXPECT_EQ(nullptr, fnDev);
 }
 
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfDeviceStatus001, TestSize.Level1)
 {
     int ret;
@@ -136,7 +135,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfDeviceStatus002, TestSize.Level1)
     EXPECT_NE(HDF_SUCCESS, ret);
 }
 
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfDeviceStatus003, TestSize.Level1)
 {
     int ret;
@@ -159,7 +158,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfDeviceStatus004, TestSize.Level1)
     EXPECT_NE(HDF_SUCCESS, ret);
 }
 
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfDeviceStatus005, TestSize.Level1)
 {
     int ret;
@@ -219,7 +218,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetDevice006, TestSize.Level1)
     EXPECT_EQ(nullptr, device);
 }
 
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetInterface001, TestSize.Level1)
 {
     struct UsbFnInterface *fnInterface = nullptr;
@@ -264,7 +263,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetInterface005, TestSize.Level1)
     EXPECT_EQ(nullptr, fnInterface);
 }
 
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetInterface006, TestSize.Level1)
 {
     struct UsbFnInterface *fnInterface = nullptr;
@@ -327,7 +326,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetpipeInfo005, TestSize.Level1)
     EXPECT_TRUE(HDF_SUCCESS != ret);
 }
 
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetpipeInfo006, TestSize.Level1)
 {
     int ret;
@@ -348,7 +347,7 @@ int32_t PropCallBack(const struct UsbFnInterface *intf, const char *name, const 
     return HDF_SUCCESS;
 }
 
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp001, TestSize.Level1)
 {
     int ret;
@@ -432,7 +431,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp006, TestSize.Level1)
     EXPECT_TRUE(HDF_SUCCESS != ret);
 }
 
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp007, TestSize.Level1)
 {
     int ret;
@@ -520,7 +519,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp006, TestSize.Level1)
     EXPECT_TRUE(HDF_SUCCESS != ret);
 }
 
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp007, TestSize.Level1)
 {
     int ret;
@@ -696,7 +695,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocCtrlRequest009, TestSize.Level
     EXPECT_TRUE(nullptr == req);
 }
 
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocRequest001, TestSize.Level1)
 {
     int ret;
@@ -867,7 +866,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfFreeRequest006, TestSize.Level1)
     EXPECT_TRUE(ret != HDF_SUCCESS);
 }
 
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 static void eventCallback(struct UsbFnEvent *event)
 {
     (void)event;
@@ -1069,7 +1068,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRemoveDevice001, TestSize.Level1)
     EXPECT_TRUE(HDF_SUCCESS != ret);
 }
 
-#if AUTO_NO_SKIP
+#ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRemoveDevice002, TestSize.Level1)
 {
     int ret;
