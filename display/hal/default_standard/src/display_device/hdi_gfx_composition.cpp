@@ -41,24 +41,24 @@ int32_t HdiGfxComposition::GfxModuleInit(void)
 {
     DISPLAY_LOGD();
     mGfxModule = dlopen(LIB_HDI_GFX_NAME, RTLD_NOW | RTLD_NOLOAD);
-	if (mGfxModule != nullptr) {
-		DISPLAY_LOGI("Module '%{public}s' already loaded", LIB_HDI_GFX_NAME);
-	} else {
-		DISPLAY_LOGI("Loading module '%{public}s'", LIB_HDI_GFX_NAME);
-		mGfxModule = dlopen(LIB_HDI_GFX_NAME, RTLD_NOW);
-		if (mGfxModule == nullptr) {
-			DISPLAY_LOGE("Failed to load module: %{public}s", dlerror());
-			return DISPLAY_FAILURE;
-		}
-	}
+    if (mGfxModule != nullptr) {
+        DISPLAY_LOGI("Module '%{public}s' already loaded", LIB_HDI_GFX_NAME);
+    } else {
+        DISPLAY_LOGI("Loading module '%{public}s'", LIB_HDI_GFX_NAME);
+        mGfxModule = dlopen(LIB_HDI_GFX_NAME, RTLD_NOW);
+        if (mGfxModule == nullptr) {
+            DISPLAY_LOGE("Failed to load module: %{public}s", dlerror());
+            return DISPLAY_FAILURE;
+        }
+    }
 
-    typedef int32_t (*InitFunc)(GfxFuncs **funcs);
+    using InitFunc = int32_t (*)(GfxFuncs **funcs);
     InitFunc func = reinterpret_cast<InitFunc>(dlsym(mGfxModule, LIB_GFX_FUNC_INIT));
     if (func == nullptr) {
-		DISPLAY_LOGE("Failed to lookup %{public}s function: %s", LIB_GFX_FUNC_INIT, dlerror());
-		dlclose(mGfxModule);
-		return DISPLAY_FAILURE;
-	}
+        DISPLAY_LOGE("Failed to lookup %{public}s function: %s", LIB_GFX_FUNC_INIT, dlerror());
+        dlclose(mGfxModule);
+        return DISPLAY_FAILURE;
+    }
     return func(&mGfxFuncs);
 }
 
@@ -67,7 +67,7 @@ int32_t HdiGfxComposition::GfxModuleDeinit(void)
     DISPLAY_LOGD();
     int32_t ret = DISPLAY_SUCCESS;
     if (mGfxModule == nullptr) {
-        typedef int32_t (*DeinitFunc)(GfxFuncs *funcs);
+        using DeinitFunc = int32_t (*)(GfxFuncs *funcs);
         DeinitFunc func = reinterpret_cast<DeinitFunc>(dlsym(mGfxModule, LIB_GFX_FUNC_DEINIT));
         if (func == nullptr) {
             DISPLAY_LOGE("Failed to lookup %{public}s function: %s", LIB_GFX_FUNC_DEINIT, dlerror());
@@ -117,7 +117,7 @@ void HdiGfxComposition::InitGfxSurface(ISurface &surface, HdiLayerBuffer &buffer
     surface.bAlphaMax255 = true;
     surface.alpha0 = 0XFF;
     surface.alpha1 = 0XFF;
-    DISPLAY_LOGD("surface info  w: %{public}d h: %{public}d addr: 0x%{public}" PRIx64 " fmt %{public}d stride %{public}d",
+    DISPLAY_LOGD("surface w:%{public}d h:%{public}d addr:0x%{public}" PRIx64 " fmt:%{public}d stride:%{public}d",
         surface.width, surface.height, surface.phyAddr, surface.enColorFmt, surface.stride);
 }
 
