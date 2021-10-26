@@ -39,7 +39,8 @@ const std::string dataSize = "dataSize";
 const std::string timeStamp = "timeStamp";
 
 /**
- * @brief Specifies whether the frame is a key frame. The value type is int32_t. The value <b>1</b> means that the frame is a key frame, and <b>0</b> means the opposite.
+ * @brief Specifies whether the frame is a key frame.
+ * The value type is int32_t. The value <b>1</b> means that the frame is a key frame, and <b>0</b> means the opposite.
  */
 const std::string isKeyFrame = "isKeyFrame";
 } // end namespace OHOS::Camera
