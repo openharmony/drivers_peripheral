@@ -16,9 +16,6 @@
 #ifndef HDF_USB_RAW_IO_TEST_H
 #define HDF_USB_RAW_IO_TEST_H
 
-#include "hdf_io_service_if.h"
-#include "hdf_uhdf_test.h"
-
 #define HDF_TEST_NAME "/dev/hdf_test"
 
 #endif

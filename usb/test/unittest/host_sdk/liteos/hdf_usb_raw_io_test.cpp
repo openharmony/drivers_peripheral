@@ -14,6 +14,7 @@
 #include <gtest/gtest.h>
 #include <string>
 #include <unistd.h>
+#include "hdf_uhdf_test.h"
 
 using namespace testing::ext;
 
