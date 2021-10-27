@@ -25,7 +25,7 @@
  */
 
 /**
- * @file usb_interface.h
+ * @file usb_ddk_interface.h
  *
  * @brief Declares the data types and interface functions provided by the host of the USB driver development kit (DDK).
  *
