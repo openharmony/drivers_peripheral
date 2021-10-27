@@ -24,7 +24,7 @@
 #include "osal_mem.h"
 #include "osal_time.h"
 #include "securec.h"
-#include "usb_interface.h"
+#include "usb_ddk_interface.h"
 #include "hdf_usb_pnp_manage.h"
 #include <stdio.h>
 #include <stdlib.h>

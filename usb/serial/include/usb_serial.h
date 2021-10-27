@@ -20,7 +20,7 @@
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "usb_ddk.h"
-#include "usb_interface.h"
+#include "usb_ddk_interface.h"
 
 #define USB_MAX_INTERFACES      32
 #define DATARATE                9600
