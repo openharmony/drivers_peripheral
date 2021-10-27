@@ -48,7 +48,7 @@ static uint64_t g_send_count = 0;
 static uint64_t g_byteTotal = 0;
 static bool g_writeOrRead = TEST_WRITE;
 static bool g_printData = false;
-static struct AcmDevice *acm = NULL;
+static struct AcmDevice *g_acm = NULL;
 static struct OsalSem timeSem;
 static uint32_t sigCnt = 0;
 
@@ -174,7 +174,7 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
         for (unsigned int i = 0; i < req->compInfo.actualLength; i++)
             printf("%c", req->compInfo.buffer[i]);
         fflush(stdout);
-    } else if (g_recv_count % 10000 == 0) {
+    } else if (g_recv_count % TEST_RECV_COUNT == 0) {
         printf("#");
         fflush(stdout);
     }
@@ -286,7 +286,7 @@ static void SpeedPrint()
     if (count >= TEST_TIME) {
         g_speedFlag = true;
     }
-    speed = (g_byteTotal * 1.0) / (sigCnt * TEST_PRINT_TIME  * 1024 * 1024);
+    speed = (g_byteTotal * TEST_FLOAT_COUNT) / (sigCnt * TEST_PRINT_TIME * TEST_BYTE_COUNT * TEST_BYTE_COUNT);
     printf("\nSpeed:%f MB/s\n", speed);
 }
 
@@ -313,11 +313,11 @@ static void UsbGetDevInfo(int *busNum, int *devNum)
     printf("%s:%d busNum=%d devNum=%d!\n", __func__, __LINE__, *busNum, *devNum);
 }
 
-static int32_t UsbSerialOpen()
+static int32_t UsbSerialOpen(void)
 {
     return HDF_SUCCESS;
 }
-static int32_t UsbSerialClose()
+static int32_t UsbSerialClose(void)
 {
     if (!g_speedFlag) {
         g_speedFlag = true;
@@ -343,7 +343,7 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNu
     sigCnt = 0;
 
     UsbGetDevInfo(&busNum, &devAddr);
-    if (input->paramNum == 6) {
+    if (input->paramNum == TEST_SIX_TYPE) {
         busNum = input->busNum;
         devAddr = input->devAddr;
         *ifaceNum = input->ifaceNum;
@@ -351,12 +351,12 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNu
         if (g_writeOrRead == TEST_READ) {
             g_printData = input->printData;
         }
-    } else if (input->paramNum == 5) {
+    } else if (input->paramNum == TEST_FIVE_TYPE) {
         busNum = input->busNum;
         devAddr = input->devAddr;
         *ifaceNum = input->ifaceNum;
         g_writeOrRead = input->writeOrRead;
-    } else if (input->paramNum == 3) {
+    } else if (input->paramNum == TEST_THREE_TYPE) {
         *ifaceNum = input->ifaceNum;
         g_writeOrRead = input->writeOrRead;
     } else {
@@ -366,17 +366,17 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNu
         goto end;
     }
 
-    acm->busNum = busNum;
-    acm->devAddr = devAddr;
-    acm->interfaceCnt = 1;
-    acm->interfaceIndex[0] = *ifaceNum;
+    g_acm->busNum = busNum;
+    g_acm->devAddr = devAddr;
+    g_acm->interfaceCnt = 1;
+    g_acm->interfaceIndex[0] = *ifaceNum;
     OsalSemInit(&timeSem, 0);
 
 end:
     return ret;
 }
 
-static int32_t UsbSpeedDdkInit()
+static int32_t UsbSpeedDdkInit(void)
 {
     int32_t ret;
     int i;
@@ -388,14 +388,14 @@ static int32_t UsbSpeedDdkInit()
         goto end;
     }
 
-    for (i = 0; i < acm->interfaceCnt; i++) {
-        acm->iface[i] = GetUsbInterfaceById((const struct AcmDevice *)acm, acm->interfaceIndex[i]);
+    for (i = 0; i < g_acm->interfaceCnt; i++) {
+        g_acm->iface[i] = GetUsbInterfaceById((const struct AcmDevice *)g_acm, g_acm->interfaceIndex[i]);
     }
 
-    for (i = 0; i < acm->interfaceCnt; i++) {
-        if (acm->iface[i]) {
-            acm->devHandle[i] = UsbOpenInterface(acm->iface[i]);
-            if (acm->devHandle[i] == NULL) {
+    for (i = 0; i < g_acm->interfaceCnt; i++) {
+        if (g_acm->iface[i]) {
+            g_acm->devHandle[i] = UsbOpenInterface(g_acm->iface[i]);
+            if (g_acm->devHandle[i] == NULL) {
                 printf("%s: UsbOpenInterface null", __func__);
             }
         } else {
@@ -404,46 +404,46 @@ static int32_t UsbSpeedDdkInit()
         }
     }
     if (g_writeOrRead == TEST_WRITE) {
-        acm->dataPipe = GetPipe(acm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_OUT);
+        g_acm->dataPipe = GetPipe(g_acm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_OUT);
     } else {
-        acm->dataPipe = GetPipe(acm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_IN);
+        g_acm->dataPipe = GetPipe(g_acm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_IN);
     }
-    if (acm->dataPipe == NULL) {
+    if (g_acm->dataPipe == NULL) {
         printf("dataPipe is NULL\n");
     }
 
-    acm->dataSize = TEST_LENGTH;
-    if (AcmDataBufAlloc(acm) < 0) {
+    g_acm->dataSize = TEST_LENGTH;
+    if (AcmDataBufAlloc(g_acm) < 0) {
         printf("%s:%d AcmDataBufAlloc fail", __func__, __LINE__);
     }
 end:
     return ret;
 }
 
-static int32_t UsbSpeedRequestHandle()
+static int32_t UsbSpeedRequestHandle(void)
 {
     int32_t rc;
     for (int i = 0; i < TEST_CYCLE; i++) {
-        struct AcmDb *snd = &(acm->db[i]);
-        snd->request = UsbAllocRequest(InterfaceIdToHandle(acm, acm->dataPipe->interfaceId), 0, acm->dataSize);
+        struct AcmDb *snd = &(g_acm->db[i]);
+        snd->request = UsbAllocRequest(InterfaceIdToHandle(g_acm, g_acm->dataPipe->interfaceId), 0, g_acm->dataSize);
         if (snd->request == NULL) {
             printf("%s:%d snd request fail", __func__, __LINE__);
         }
-        acm->transmitting++;
+        g_acm->transmitting++;
         struct UsbRequestParams parmas = {};
-        parmas.interfaceId = acm->dataPipe->interfaceId;
-        parmas.pipeAddress = acm->dataPipe->pipeAddress;
-        parmas.pipeId = acm->dataPipe->pipeId;
+        parmas.interfaceId = g_acm->dataPipe->interfaceId;
+        parmas.pipeAddress = g_acm->dataPipe->pipeAddress;
+        parmas.pipeId = g_acm->dataPipe->pipeId;
         parmas.callback = AcmTestBulkCallback;
         parmas.requestType = USB_REQUEST_PARAMS_DATA_TYPE;
         parmas.timeout = USB_CTRL_SET_TIMEOUT;
         parmas.dataReq.numIsoPackets = 0;
         parmas.userData = (void *)snd;
-        parmas.dataReq.length = acm->dataSize;
+        parmas.dataReq.length = g_acm->dataSize;
         parmas.dataReq.buffer = snd->buf;
-        parmas.dataReq.directon = (((uint8_t)acm->dataPipe->pipeDirection) >> USB_PIPE_DIR_OFFSET) & 0x1;
-        snd->dbNum = acm->transmitting;
-        rc = UsbFillRequest(snd->request, InterfaceIdToHandle(acm, acm->dataPipe->interfaceId), &parmas);
+        parmas.dataReq.directon = (((uint8_t)g_acm->dataPipe->pipeDirection) >> USB_PIPE_DIR_OFFSET) & 0x1;
+        snd->dbNum = g_acm->transmitting;
+        rc = UsbFillRequest(snd->request, InterfaceIdToHandle(g_acm, g_acm->dataPipe->interfaceId), &parmas);
         if (rc != HDF_SUCCESS) {
             printf("%s:UsbFillRequest faile,ret=%d \n", __func__, rc);
             goto end;
@@ -454,23 +454,23 @@ end:
     return rc;
 }
 
-static void UsbSpeedDdkExit()
+static void UsbSpeedDdkExit(void)
 {
     int i;
 
     for (i = 0; i < TEST_CYCLE; i++) {
-        struct AcmDb *snd = &(acm->db[i]);
+        struct AcmDb *snd = &(g_acm->db[i]);
         UsbCancelRequest(snd->request);
         UsbFreeRequest(snd->request);
     }
-    AcmDataBufFree(acm);
-    for (i = 0; i < acm->interfaceCnt; i++) {
-        UsbCloseInterface(acm->devHandle[i]);
-        UsbReleaseInterface(acm->iface[i]);
+    AcmDataBufFree(g_acm);
+    for (i = 0; i < g_acm->interfaceCnt; i++) {
+        UsbCloseInterface(g_acm->devHandle[i]);
+        UsbReleaseInterface(g_acm->iface[i]);
     }
     UsbExitHostSdk(NULL);
     OsalSemDestroy(&timeSem);
-    acm->busy = false;
+    g_acm->busy = false;
 }
 
 static int32_t UsbSerialSpeed(struct HdfSBuf *data)
@@ -480,12 +480,12 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     struct UsbSpeedTest *input = NULL;
     uint32_t size = 0;
     int i;
-    if (acm->busy == true) {
+    if (g_acm->busy == true) {
         printf("%s: speed test busy\n", __func__);
         ret = HDF_ERR_IO;
         goto end;
     } else {
-        acm->busy = true;
+        g_acm->busy = true;
     }
 
     (void)HdfSbufReadBuffer(data, (const void **)&input, &size);
@@ -513,13 +513,13 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     printf("test SDK API [%s]\n", g_writeOrRead ? "write" : "read");
 
     for (i = 0; i < TEST_CYCLE; i++) {
-        SerialBegin(acm);
+        SerialBegin(g_acm);
         g_send_count++;
     }
 
     OsalSemWait(&timeSem, TEST_TIME);
     while (!g_speedFlag) {
-        OsalSemWait(&timeSem, TEST_PRINT_TIME * 1000);
+        OsalSemWait(&timeSem, TEST_PRINT_TIME * TEST_PRINT_TIME_UINT);
         SpeedPrint();
     }
 
@@ -550,7 +550,7 @@ static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    acm = (struct AcmDevice *)client->device->service;
+    g_acm = (struct AcmDevice *)client->device->service;
 
     switch (cmd) {
         case USB_SERIAL_OPEN:
@@ -573,16 +573,16 @@ static int32_t AcmDriverBind(struct HdfDeviceObject *device)
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    acm = (struct AcmDevice *)OsalMemCalloc(sizeof(*acm));
-    if (acm == NULL) {
+    g_acm = (struct AcmDevice *)OsalMemCalloc(sizeof(*g_acm));
+    if (g_acm == NULL) {
         HDF_LOGE("%s: Alloc usb acm device failed", __func__);
         return HDF_FAILURE;
     }
 
-    acm->device  = device;
-    device->service = &(acm->service);
-    if (acm->device && acm->device->service) {
-        acm->device->service->Dispatch = AcmDeviceDispatch;
+    g_acm->device  = device;
+    device->service = &(g_acm->service);
+    if (g_acm->device && g_acm->device->service) {
+        g_acm->device->service->Dispatch = AcmDeviceDispatch;
     }
     return HDF_SUCCESS;
 }

@@ -14,6 +14,7 @@
  */
 
 #include "cdc_ether.h"
+#include <unistd.h>
 #include "hdf_base.h"
 #include "hdf_device_info.h"
 #include "hdf_log.h"
@@ -21,7 +22,6 @@
 #include "osal_mem.h"
 #include "osal_time.h"
 #include "securec.h"
-#include <unistd.h>
 #include "usb_ddk_interface.h"
 
 #define HDF_LOG_TAG   USB_HOST_ECM
