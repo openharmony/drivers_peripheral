@@ -49,7 +49,7 @@
 #define USB_RAW_IO_SLEEP_MS_TIME        500
 #define USB_RAW_IO_STOP_WAIT_MAX_TIME   2
 
-static struct AcmDevice *acm = NULL;
+static struct AcmDevice *g_acm = NULL;
 static bool g_stopIoThreadFlag = false;
 static unsigned int g_speedFlag = 0;
 static uint64_t g_send_count = 0;
@@ -147,8 +147,7 @@ static int UsbStartIo(struct AcmDevice *acm)
     threadCfg.name      = "usb io send thread";
     threadCfg.priority  = OSAL_THREAD_PRI_DEFAULT;
     threadCfg.stackSize = USB_IO_THREAD_STACK_SIZE;
-    ret = OsalThreadCreate(&acm->ioSendThread, \
-                               (OsalThreadEntry)UsbIoSendThread, (void *)acm);
+    ret = OsalThreadCreate(&acm->ioSendThread, (OsalThreadEntry)UsbIoSendThread, (void *)acm);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s:%d OsalThreadCreate faile, ret=%d ",
                  __func__, __LINE__, ret);
@@ -239,78 +238,88 @@ static int UsbGetConfigDescriptor(UsbRawHandle *devHandle, struct UsbRawConfigDe
     return HDF_SUCCESS;
 }
 
+static int UsbGetBulkEndpoint(struct AcmDevice *acm, const struct UsbRawEndpointDescriptor *endPoint)
+{
+    if ((endPoint->endpointDescriptor.bEndpointAddress & USB_DDK_ENDPOINT_DIR_MASK) == USB_DDK_DIR_IN) {
+        /* get bulk in endpoint */
+        acm->dataInEp = OsalMemAlloc(sizeof(struct UsbEndpoint));
+        if (acm->dataInEp == NULL) {
+            HDF_LOGE("%s:%d allocate dataInEp failed", __func__, __LINE__);
+            return HDF_FAILURE;
+        }
+        acm->dataInEp->addr = endPoint->endpointDescriptor.bEndpointAddress;
+        acm->dataInEp->interval = endPoint->endpointDescriptor.bInterval;
+        acm->dataInEp->maxPacketSize = endPoint->endpointDescriptor.wMaxPacketSize;
+    } else {
+        /* get bulk out endpoint */
+        acm->dataOutEp = OsalMemAlloc(sizeof(struct UsbEndpoint));
+        if (acm->dataOutEp == NULL) {
+            HDF_LOGE("%s:%d allocate dataOutEp failed", __func__, __LINE__);
+            return HDF_FAILURE;
+        }
+        acm->dataOutEp->addr = endPoint->endpointDescriptor.bEndpointAddress;
+        acm->dataOutEp->interval = endPoint->endpointDescriptor.bInterval;
+        acm->dataOutEp->maxPacketSize = endPoint->endpointDescriptor.wMaxPacketSize;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static void UsbParseConfigDescriptorProcess(struct AcmDevice *acm,
+    const struct UsbRawInterface *interface, uint8_t interfaceIndex)
+{
+    uint8_t ifaceClass = interface->altsetting->interfaceDescriptor.bInterfaceClass;
+    uint8_t numEndpoints = interface->altsetting->interfaceDescriptor.bNumEndpoints;
+
+    switch (ifaceClass) {
+        case USB_DDK_CLASS_COMM:
+            acm->ctrlIface = interfaceIndex;
+            acm->notifyEp = OsalMemAlloc(sizeof(struct UsbEndpoint));
+            if (acm->notifyEp == NULL) {
+                HDF_LOGE("%s:%d allocate endpoint failed", __func__, __LINE__);
+                break;
+            }
+            /* get the first endpoint by default */
+            acm->notifyEp->addr = interface->altsetting->endPoint[0].endpointDescriptor.bEndpointAddress;
+            acm->notifyEp->interval = interface->altsetting->endPoint[0].endpointDescriptor.bInterval;
+            acm->notifyEp->maxPacketSize = interface->altsetting->endPoint[0].endpointDescriptor.wMaxPacketSize;
+            break;
+        case USB_DDK_CLASS_CDC_DATA:
+            acm->dataIface = interfaceIndex;
+            for (uint8_t j = 0; j < numEndpoints; j++) {
+                const struct UsbRawEndpointDescriptor *endPoint = &interface->altsetting->endPoint[j];
+                if (UsbGetBulkEndpoint(acm, endPoint) != HDF_SUCCESS) {
+                    break;
+                }
+            }
+            break;
+        default:
+            HDF_LOGE("%s:%d wrong descriptor type", __func__, __LINE__);
+            break;
+    }
+}
+
 static int UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConfigDescriptor *config)
 {
     uint8_t i;
-    uint8_t j;
     int ret;
 
     if ((acm == NULL) || (config == NULL)) {
-        HDF_LOGE("%s:%d acm or config is NULL",
-                 __func__, __LINE__);
+        HDF_LOGE("%s:%d acm or config is NULL", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     for (i = 0; i < acm->interfaceCnt; i++) {
         uint8_t interfaceIndex = acm->interfaceIndex[i];
         const struct UsbRawInterface *interface = config->interface[interfaceIndex];
-        uint8_t ifaceClass = interface->altsetting->interfaceDescriptor.bInterfaceClass;
-        uint8_t numEndpoints = interface->altsetting->interfaceDescriptor.bNumEndpoints;
 
         ret = UsbRawClaimInterface(acm->devHandle, interfaceIndex);
         if (ret) {
-            HDF_LOGE("%s:%d claim interface %u failed",
-                     __func__, __LINE__, i);
+            HDF_LOGE("%s:%d claim interface %u failed", __func__, __LINE__, i);
             return ret;
         }
 
-        switch (ifaceClass) {
-            case USB_DDK_CLASS_COMM:
-                acm->ctrlIface = interfaceIndex;
-                acm->notifyEp = OsalMemAlloc(sizeof(struct UsbEndpoint));
-                if (acm->notifyEp == NULL) {
-                    HDF_LOGE("%s:%d allocate endpoint failed",
-                             __func__, __LINE__);
-                    break;
-                }
-                /* get the first endpoint by default */
-                acm->notifyEp->addr = interface->altsetting->endPoint[0].endpointDescriptor.bEndpointAddress;
-                acm->notifyEp->interval = interface->altsetting->endPoint[0].endpointDescriptor.bInterval;
-                acm->notifyEp->maxPacketSize = interface->altsetting->endPoint[0].endpointDescriptor.wMaxPacketSize;
-                break;
-            case USB_DDK_CLASS_CDC_DATA:
-                acm->dataIface = interfaceIndex;
-                for (j = 0; j < numEndpoints; j++) {
-                    const struct UsbRawEndpointDescriptor *endPoint = &interface->altsetting->endPoint[j];
-
-                    /* get bulk in endpoint */
-                    if ((endPoint->endpointDescriptor.bEndpointAddress & USB_DDK_ENDPOINT_DIR_MASK) == USB_DDK_DIR_IN) {
-                        acm->dataInEp = OsalMemAlloc(sizeof(struct UsbEndpoint));
-                        if (acm->dataInEp == NULL) {
-                            HDF_LOGE("%s:%d allocate dataInEp failed",
-                                     __func__, __LINE__);
-                            break;
-                        }
-                        acm->dataInEp->addr = endPoint->endpointDescriptor.bEndpointAddress;
-                        acm->dataInEp->interval = endPoint->endpointDescriptor.bInterval;
-                        acm->dataInEp->maxPacketSize = endPoint->endpointDescriptor.wMaxPacketSize;
-                    } else { /* get bulk out endpoint */
-                        acm->dataOutEp = OsalMemAlloc(sizeof(struct UsbEndpoint));
-                        if (acm->dataOutEp == NULL) {
-                            HDF_LOGE("%s:%d allocate dataOutEp failed",
-                                     __func__, __LINE__);
-                            break;
-                        }
-                        acm->dataOutEp->addr = endPoint->endpointDescriptor.bEndpointAddress;
-                        acm->dataOutEp->interval = endPoint->endpointDescriptor.bInterval;
-                        acm->dataOutEp->maxPacketSize = endPoint->endpointDescriptor.wMaxPacketSize;
-                    }
-                }
-                break;
-            default:
-                HDF_LOGE("%s:%d wrong descriptor type", __func__, __LINE__);
-                break;
-        }
+        UsbParseConfigDescriptorProcess(acm, interface, interfaceIndex);
     }
 
     return HDF_SUCCESS;
@@ -470,7 +479,7 @@ static void AcmTestBulkCallback(const void *requestArg)
         for (int i = 0; i < req->actualLength; i++)
             printf("%c", req->buffer[i]);
         fflush(stdout);
-    } else if (g_recv_count % 10000 == 0) {
+    } else if (g_recv_count % TEST_RECV_COUNT == 0) {
         printf("#");
         fflush(stdout);
     }
@@ -533,7 +542,7 @@ void SignalHandler(int signo)
                 break;
             }
 
-            speed = (g_byteTotal * 1.0) / (sigCnt * TEST_PRINT_TIME  * 1024 * 1024);
+            speed = (g_byteTotal * TEST_FLOAT_COUNT) / (sigCnt * TEST_PRINT_TIME * TEST_BYTE_COUNT * TEST_BYTE_COUNT);
             printf("\nSpeed:%f MB/s\n", speed);
             new_value.it_value.tv_sec = TEST_PRINT_TIME;
             new_value.it_value.tv_usec = 0;
@@ -549,135 +558,161 @@ void SignalHandler(int signo)
    }
 }
 
-static void ShowHelp(char *name)
+static void ShowHelp(const char *name)
 {
     printf(">> usage:\n");
     printf(">>      %s [<busNum> <devAddr>]  <ifaceNum> <w>/<r> [printdata]> \n", name);
     printf("\n");
 }
 
-int main(int argc, char *argv[])
+int32_t CheckParam(int argc, const char *argv[])
 {
-    struct UsbSession *session = NULL;
-    UsbRawHandle *devHandle = NULL;
-    int32_t ret = HDF_SUCCESS;
     int busNum = 1;
     int devAddr = 2;
     int ifaceNum = 3;
-    struct timeval time;
-    int i = 0;
-    if (argc == 6) {
-        busNum = atoi(argv[1]);
-        devAddr = atoi(argv[2]);
-        ifaceNum = atoi(argv[3]);
-        g_writeOrRead = (strncmp(argv[4], "r", 1))?TEST_WRITE:TEST_READ;
-        if (g_writeOrRead == TEST_READ)
-        {
-            g_printData = (strncmp(argv[5], "printdata", 1))?false:true;
+    int32_t ret = HDF_SUCCESS;
+
+    if (argc == TEST_SIX_TYPE) {
+        busNum = atoi(argv[TEST_ONE_TYPE]);
+        devAddr = atoi(argv[TEST_TWO_TYPE]);
+        ifaceNum = atoi(argv[TEST_THREE_TYPE]);
+        g_writeOrRead = (strncmp(argv[TEST_FOUR_TYPE], "r", TEST_ONE_TYPE)) ? TEST_WRITE : TEST_READ;
+        if (g_writeOrRead == TEST_READ) {
+            g_printData = (strncmp(argv[TEST_FIVE_TYPE], "printdata", TEST_ONE_TYPE)) ? false : true;
         }
-    } else if (argc == 5) {
-        busNum = atoi(argv[1]);
-        devAddr = atoi(argv[2]);
-        ifaceNum = atoi(argv[3]);
-        g_writeOrRead = (strncmp(argv[4], "r", 1))?TEST_WRITE:TEST_READ;
-    } else if (argc == 3) {
-        ifaceNum = atoi(argv[1]);
-        g_writeOrRead = (strncmp(argv[2], "r", 1))?TEST_WRITE:TEST_READ;
+    } else if (argc == TEST_FIVE_TYPE) {
+        busNum = atoi(argv[TEST_ONE_TYPE]);
+        devAddr = atoi(argv[TEST_TWO_TYPE]);
+        ifaceNum = atoi(argv[TEST_THREE_TYPE]);
+        g_writeOrRead = (strncmp(argv[TEST_FOUR_TYPE], "r", TEST_ONE_TYPE)) ? TEST_WRITE : TEST_READ;
+    } else if (argc == TEST_THREE_TYPE) {
+        ifaceNum = atoi(argv[TEST_ONE_TYPE]);
+        g_writeOrRead = (strncmp(argv[TEST_TWO_TYPE], "r", TEST_ONE_TYPE)) ? TEST_WRITE : TEST_READ;
     } else {
         printf("Error: parameter error!\n\n");
-        ShowHelp(argv[0]);
+        ShowHelp(argv[TEST_ZERO_TYPE]);
         ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
     OsalSemInit(&sem, 0);
 
-    acm = (struct AcmDevice *)OsalMemCalloc(sizeof(*acm));
-    if (acm == NULL) {
+    g_acm = (struct AcmDevice *)OsalMemCalloc(sizeof(*g_acm));
+    if (g_acm == NULL) {
         HDF_LOGE("%s: Alloc usb serial device failed", __func__);
         ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
 
-    acm->busNum = busNum;
-    acm->devAddr = devAddr;
-    acm->interfaceCnt = 1;
-    acm->interfaceIndex[0] = ifaceNum;
+    g_acm->busNum = busNum;
+    g_acm->devAddr = devAddr;
+    g_acm->interfaceCnt = 1;
+    g_acm->interfaceIndex[0] = ifaceNum;
+END:
+    return ret;
+}
+
+int32_t InitUsbDdk(void)
+{
+    int32_t ret;
+    struct UsbSession *session = NULL;
+    UsbRawHandle *devHandle = NULL;
 
     ret = UsbRawInit(&session);
     if (ret) {
         HDF_LOGE("%s: UsbRawInit faild", __func__);
-        return HDF_ERR_IO;
-        goto end;
+        goto END;
     }
 
-    ret = UsbSerialDeviceAlloc(acm);
+    ret = UsbSerialDeviceAlloc(g_acm);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbSerialDeviceAlloc faild", __func__);
-        ret =  HDF_FAILURE;
-        goto end;
+        goto END;
     }
 
-    devHandle = UsbRawOpenDevice(session, acm->busNum, acm->devAddr);
+    devHandle = UsbRawOpenDevice(session, g_acm->busNum, g_acm->devAddr);
     if (devHandle == NULL) {
         HDF_LOGE("%s: UsbRawOpenDevice faild", __func__);
         ret =  HDF_FAILURE;
-        goto end;
+        goto END;
     }
-    acm->devHandle = devHandle;
-    ret = UsbGetConfigDescriptor(devHandle, &acm->config);
+    g_acm->devHandle = devHandle;
+    ret = UsbGetConfigDescriptor(devHandle, &g_acm->config);
     if (ret) {
         HDF_LOGE("%s: UsbGetConfigDescriptor faild", __func__);
-        ret =  HDF_FAILURE;
-        goto end;
+        goto END;
     }
-    ret = UsbParseConfigDescriptor(acm, acm->config);
+    ret = UsbParseConfigDescriptor(g_acm, g_acm->config);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbParseConfigDescriptor faild", __func__);
         ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
-    acm->dataSize = TEST_LENGTH;
-    acm->dataEp = (g_writeOrRead == TEST_WRITE)?acm->dataOutEp:acm->dataInEp;
+    g_acm->dataSize = TEST_LENGTH;
+    g_acm->dataEp = (g_writeOrRead == TEST_WRITE) ? g_acm->dataOutEp : g_acm->dataInEp;
 
-    ret = AcmDataBufAlloc(acm);
+    ret = AcmDataBufAlloc(g_acm);
     if (ret < 0) {
         HDF_LOGE("%s: AcmDataBufAlloc faild", __func__);
-        ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
-    ret = UsbAllocDataRequests(acm);
+    ret = UsbAllocDataRequests(g_acm);
     if (ret < 0) {
         HDF_LOGE("%s: UsbAllocDataRequests faild", __func__);
-        ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
 
-    ret = UsbStartIo(acm);
+END:
+    return ret;
+}
+
+int main(int argc, char *argv[])
+{
+    int32_t ret;
+    struct timeval time;
+    int i = 0;
+
+    ret = CheckParam(argc, (const char **)argv);
+    if (ret != HDF_SUCCESS) {
+        goto END;
+    }
+
+    ret = InitUsbDdk();
+    if (ret != HDF_SUCCESS) {
+        goto END;
+    }
+
+    ret = UsbStartIo(g_acm);
     if (ret) {
         HDF_LOGE("%s: UsbAllocReadRequests faild", __func__);
-        goto end;
+        goto END;
     }
 
-    signal(SIGINT, SignalHandler);
-    signal(SIGALRM, SignalHandler);
+    if (signal(SIGINT, SignalHandler) == SIG_ERR) {
+        HDF_LOGE("signal SIGINT failed");
+        return HDF_FAILURE;
+    }
+    if (signal(SIGALRM, SignalHandler) == SIG_ERR) {
+        HDF_LOGE("signal SIGINT failed");
+        return HDF_FAILURE;
+    }
     gettimeofday(&time, NULL);
 
     printf("test SDK rawAPI [%s]\n", g_writeOrRead?"write":"read");
     printf("Start: sec%ld usec%ld\n", time.tv_sec, time.tv_usec);
 
     for (i = 0; i < TEST_CYCLE; i++) {
-        SerialBegin(acm);
+        SerialBegin(g_acm);
         g_send_count++;
     }
 
     while (!g_speedFlag) {
-        OsalMSleep(10);
+        OsalMSleep(TEST_SLEEP_TIME);
     }
 
-    (void)UsbStopIo(acm);
-end:
+    (void)UsbStopIo(g_acm);
+END:
     if (ret != HDF_SUCCESS) {
-        printf("please check whether usb drv so is existing or not,like acm, ecm, if not, remove it and test again!\n");
+        printf("please check whether usb drv so is existing or not,like acm,ecm,if not, remove it and test again!\n");
     }
     return ret;
 }
