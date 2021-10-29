@@ -20,8 +20,8 @@
 #include "hdf_device_desc.h"
 #include "osal_atomic.h"
 #include "usb_ddk.h"
+#include "usb_ddk_interface.h"
 #include "usb_session.h"
-#include "usb_interface.h"
 #include "data_fifo.h"
 
 #define TEST_LENGTH             512
@@ -29,6 +29,10 @@
 #define TEST_TIME               0xffffffff
 #define TEST_PRINT_TIME         2
 #define TEST_PRINT_TIME_UINT    1000
+#define TEST_RECV_COUNT         10000
+#define TEST_BYTE_COUNT         1024
+#define TEST_FLOAT_COUNT        (1.0)
+#define TEST_SLEEP_TIME         10
 
 #define TEST_WRITE              true
 #define TEST_READ               false
@@ -43,6 +47,16 @@
 #define USB_PIPE_DIR_OFFSET     7
 #define USB_DEVICE_VENDOR_ID 0x12D1
 #define USB_DEVICE_PRODUCT_ID 0x5000
+
+typedef enum {
+    TEST_ZERO_TYPE = 0,
+    TEST_ONE_TYPE,
+    TEST_TWO_TYPE,
+    TEST_THREE_TYPE,
+    TEST_FOUR_TYPE,
+    TEST_FIVE_TYPE,
+    TEST_SIX_TYPE,
+} TestCountType;
 
 enum UsbSerialCmd {
     USB_SERIAL_OPEN = 0,

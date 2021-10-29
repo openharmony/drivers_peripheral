@@ -20,8 +20,8 @@
 #include "hdf_device_desc.h"
 #include "osal_atomic.h"
 #include "usb_ddk.h"
+#include "usb_ddk_interface.h"
 #include "usb_session.h"
-#include "usb_interface.h"
 #include "data_fifo.h"
 
 #define TEST_LENGTH             512

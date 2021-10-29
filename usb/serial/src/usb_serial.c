@@ -19,7 +19,7 @@
 #include "osal_mem.h"
 #include "osal_time.h"
 #include "securec.h"
-#include "usb_interface.h"
+#include "usb_ddk_interface.h"
 #include "hdf_usb_pnp_manage.h"
 
 #define HDF_LOG_TAG USB_HOST_ACM

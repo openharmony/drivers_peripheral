@@ -17,7 +17,7 @@
  * @addtogroup USB
  * @{
  *
- * @brief Declares USB-related APIs, including the custom data types and functions used to obtain descriptors, 
+ * @brief Declares USB-related APIs, including the custom data types and functions used to obtain descriptors,
  *  interface objects, and request objects, and to submit requests.
  *
  * @since 1.0
@@ -25,7 +25,7 @@
  */
 
 /**
- * @file usb_interface.h
+ * @file usb_ddk_interface.h
  *
  * @brief Declares the data types and interface functions provided by the host of the USB driver development kit (DDK).
  *
@@ -303,14 +303,12 @@ int32_t UsbInitHostSdk(struct UsbSession **session);
  * {@link UsbSession}.
  *
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
- * otherwise. 
+ * otherwise.
  */
 int32_t UsbExitHostSdk(const struct UsbSession *session);
 
 /**
  * @brief Obtains a USB interface object based on a specified interface index.
- *
- * 
  *
  * @param session Indicates the pointer to the session context. It can be set to <b>NULL</b> or a value defined in
  * {@link UsbSession}.
@@ -321,7 +319,7 @@ int32_t UsbExitHostSdk(const struct UsbSession *session);
  * The default index of the control interface is <b>0xFF</b>.
  *
  * @return Returns the pointer to the <b>UsbInterface</b> structure if the operation is successful; returns <b>NULL</b>
- * otherwise. 
+ * otherwise.
  */
 const struct UsbInterface *UsbClaimInterface(const struct UsbSession *session, uint8_t busNum,
     uint8_t usbAddr, uint8_t interfaceIndex);
@@ -439,8 +437,6 @@ int UsbSubmitRequestAsync(const struct UsbRequest *request);
 /**
  * @brief Fills an I/O request based on specified parameters.
  *
- * 
- *
  * @param request Indicates the pointer to the USB request.
  * @param interfaceHandle Indicates the pointer to the USB interface handle.
  * @param params Indicates the pointer to a list of parameters to fill. For details, see {@link UsbRequestParams}.
@@ -456,7 +452,7 @@ int32_t UsbFillRequest(const struct UsbRequest *request, const UsbInterfaceHandl
  
  * @param request Indicates the pointer to the USB request.
  *
- * @return Returns <b>UsbInterfaceHandle</b> if the operation is successful; returns <b>NULL</b> otherwise. 
+ * @return Returns <b>UsbInterfaceHandle</b> if the operation is successful; returns <b>NULL</b> otherwise.
  */
 int UsbCancelRequest(const struct UsbRequest *request);
 

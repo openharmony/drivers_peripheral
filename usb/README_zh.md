@@ -60,7 +60,7 @@ Usb Host DDK提供给用户态可直接调用的驱动能力接口，按照功�
 </th>
 </tr>
 </thead>
-<tbody><tr id="row13132357165514"><td class="cellrowborder" rowspan="16" valign="top" width="10.721072107210723%" headers="mcps1.2.4.1.1 "><p id="p15132185775510"><a name="p15132185775510"></a><a name="p15132185775510"></a>usb_interface.h</p>
+<tbody><tr id="row13132357165514"><td class="cellrowborder" rowspan="16" valign="top" width="10.721072107210723%" headers="mcps1.2.4.1.1 "><p id="p15132185775510"><a name="p15132185775510"></a><a name="p15132185775510"></a>usb_ddk_interface.h</p>
 <p id="p18132157175510"><a name="p18132157175510"></a><a name="p18132157175510"></a></p>
 <p id="p2133757135510"><a name="p2133757135510"></a><a name="p2133757135510"></a></p>
 </td>

@@ -20,8 +20,8 @@
 #include "hdf_device_desc.h"
 #include "osal_atomic.h"
 #include "usb_ddk.h"
+#include "usb_ddk_interface.h"
 #include "usb_session.h"
-#include "usb_interface.h"
 #include "data_fifo.h"
 
 #define TEST_LENGTH             512
@@ -29,6 +29,10 @@
 #define TEST_TIME               0xffffffff
 #define TEST_PRINT_TIME         2
 #define TEST_PRINT_TIME_UINT    1000
+#define TEST_RECV_COUNT         10000
+#define TEST_BYTE_COUNT         1024
+#define TEST_FLOAT_COUNT        (1.0)
+#define TEST_SLEEP_TIME         10
 
 #define TEST_WRITE              true
 #define TEST_READ               false
@@ -41,6 +45,16 @@
 #define DIRECTION_MASK          0x1
 #define USB_CTRL_SET_TIMEOUT    0
 #define USB_PIPE_DIR_OFFSET     7
+
+typedef enum {
+    TEST_ZERO_TYPE = 0,
+    TEST_ONE_TYPE,
+    TEST_TWO_TYPE,
+    TEST_THREE_TYPE,
+    TEST_FOUR_TYPE,
+    TEST_FIVE_TYPE,
+    TEST_SIX_TYPE,
+} TestCountType;
 
 typedef enum {
     CMD_OPEN_PARM = 0,
