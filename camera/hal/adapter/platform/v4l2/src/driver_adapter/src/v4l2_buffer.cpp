@@ -58,6 +58,7 @@ RetCode HosV4L2Buffers::V4L2ReqBuffers(int fd, int unsigned buffCont)
 RetCode HosV4L2Buffers::V4L2QueueBuffer(int fd, const std::shared_ptr<FrameSpec>& frameSpec)
 {
     struct v4l2_buffer buf = {};
+    struct v4l2_plane planes[1] = {};
 
     if (frameSpec == nullptr) {
         CAMERA_LOGE("V4L2QueueBuffer: frameSpec is NULL\n");
@@ -68,12 +69,25 @@ RetCode HosV4L2Buffers::V4L2QueueBuffer(int fd, const std::shared_ptr<FrameSpec>
     buf.type = bufferType_;
     buf.memory = memoryType_;
 
-    buf.m.userptr = (unsigned long)frameSpec->buffer_->GetVirAddress();
-    buf.length = frameSpec->buffer_->GetSize();
+    if (bufferType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
+        buf.m.planes = planes;
+        buf.m.planes[0].length = frameSpec->buffer_->GetSize();
+        buf.m.planes[0].m.userptr = (unsigned long)frameSpec->buffer_->GetVirAddress();
+        buf.length = 1;
 
-    CAMERA_LOGD("V4L2QueueBuffer buf.index = %d, buf.length = %d, buf.m.userptr = %p\n",
-        buf.index, buf.length, (void*)buf.m.userptr);
+        CAMERA_LOGD("++++++++++++ V4L2QueueBuffer buf.index = %{public}d, buf.length = \
+            %{public}d, buf.m.userptr = %{public}p\n", \
+            buf.index, buf.m.planes[0].length, (void*)buf.m.planes[0].m.userptr);
+    } else if (bufferType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
+        buf.length = frameSpec->buffer_->GetSize();
+        buf.m.userptr = (unsigned long)frameSpec->buffer_->GetVirAddress();
 
+        CAMERA_LOGD("++++++++++++ V4L2QueueBuffer buf.index = %{public}d, buf.length = \
+            %{public}d, buf.m.userptr = %{public}p\n", \
+            buf.index, buf.length, (void*)buf.m.userptr);
+    }
+
+    std::lock_guard<std::mutex> l(bufferLock_);
     int rc = ioctl(fd, VIDIOC_QBUF, &buf);
     if (rc < 0) {
         CAMERA_LOGE("ioctl VIDIOC_QBUF failed: %s\n", strerror(errno));
@@ -82,33 +96,43 @@ RetCode HosV4L2Buffers::V4L2QueueBuffer(int fd, const std::shared_ptr<FrameSpec>
 
     auto itr = queueBuffers_.find(fd);
     if (itr != queueBuffers_.end()) {
-        std::lock_guard<std::mutex> l(bufferLock_);
         itr->second[buf.index] = frameSpec;
-        CAMERA_LOGD("insert frameMap fd = %d buf.index = %d\n", fd, buf.index);
+        CAMERA_LOGD("insert frameMap fd = %{public}d buf.index = %{public}d\n", fd, buf.index);
     } else {
         FrameMap frameMap;
-        std::lock_guard<std::mutex> l(bufferLock_);
         frameMap.insert(std::make_pair(buf.index, frameSpec));
         queueBuffers_.insert(std::make_pair(fd, frameMap));
-        CAMERA_LOGD("insert fd = %d buf.index = %d\n", fd, buf.index);
+        CAMERA_LOGD("insert fd = %{public}d buf.index = %{public}d\n", fd, buf.index);
     }
 
     return RC_OK;
 }
 
-RetCode HosV4L2Buffers::V4L2DqueueBuffer(int fd)
+RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
 {
     struct v4l2_buffer buf = {};
+    struct v4l2_plane planes[1] = {};
 
     buf.type = bufferType_;
     buf.memory = memoryType_;
 
+    if (bufferType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
+        buf.m.planes = planes;
+        buf.length = 1;
+    }
     int rc = ioctl(fd, VIDIOC_DQBUF, &buf);
     if (rc < 0) {
         CAMERA_LOGE("ioctl VIDIOC_DQBUF failed: %s\n", strerror(errno));
         return RC_ERROR;
     }
-    CAMERA_LOGD("V4L2DqueueBuffer index = %d buf.m.ptr = %u\n", buf.index, buf.m.userptr);
+
+    if (bufferType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
+        CAMERA_LOGD("---------------- V4L2DequeueBuffer index = %{public}d buf.m.ptr = %{public}p len = %{public}d\n",
+            buf.index, (void*)buf.m.planes[0].m.userptr, buf.m.planes[0].length);
+    } else if (bufferType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
+        CAMERA_LOGD("---------------- V4L2DequeueBuffer index = %{public}d buf.m.ptr = %{public}p len = %{public}d\n",
+            buf.index, (void*)buf.m.userptr, buf.length);
+    }
 
     auto IterMap = queueBuffers_.find(fd);
     if (IterMap == queueBuffers_.end()) {
@@ -119,12 +143,12 @@ RetCode HosV4L2Buffers::V4L2DqueueBuffer(int fd)
 
     auto Iter = bufferMap.find(buf.index);
     if (Iter == bufferMap.end()) {
-        CAMERA_LOGE("V4L2DqueueBuffer buf.index == %d is not find in FrameMap\n", buf.index);
+        CAMERA_LOGE("V4L2DequeueBuffer buf.index == %{public}d is not find in FrameMap\n", buf.index);
         return RC_ERROR;
     }
 
     if (dequeueBuffer_ == nullptr) {
-        CAMERA_LOGE("V4L2DqueueBuffer buf.index == %d no callback\n", buf.index);
+        CAMERA_LOGE("V4L2DequeueBuffer buf.index == %{public}d no callback\n", buf.index);
         std::lock_guard<std::mutex> l(bufferLock_);
         bufferMap.erase(Iter);
         return RC_ERROR;
@@ -141,6 +165,7 @@ RetCode HosV4L2Buffers::V4L2DqueueBuffer(int fd)
 RetCode HosV4L2Buffers::V4L2AllocBuffer(int fd, const std::shared_ptr<FrameSpec>& frameSpec)
 {
     struct v4l2_buffer buf = {};
+    struct v4l2_plane planes[1] = {};
     CAMERA_LOGD("V4L2AllocBuffer\n");
 
     if (frameSpec == nullptr) {
@@ -156,14 +181,19 @@ RetCode HosV4L2Buffers::V4L2AllocBuffer(int fd, const std::shared_ptr<FrameSpec>
             buf.type = bufferType_;
             buf.memory = memoryType_;
             buf.index = (uint32_t)frameSpec->buffer_->GetIndex();
-            CAMERA_LOGD("V4L2_MEMORY_USERPTR Print the cnt: %d\n", buf.index);
+
+            if (bufferType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
+                buf.m.planes = planes;
+                buf.length = 1;
+            }
+            CAMERA_LOGD("V4L2_MEMORY_USERPTR Print the cnt: %{public}d\n", buf.index);
 
             if (ioctl(fd, VIDIOC_QUERYBUF, &buf) < 0) {
-                CAMERA_LOGE("error: ioctl VIDIOC_QUERYBUF failed: %s\n", strerror(errno));
+                CAMERA_LOGE("error: ioctl VIDIOC_QUERYBUF failed: %{public}s\n", strerror(errno));
                 return RC_ERROR;
             }
 
-            CAMERA_LOGD("buf.length = %d frameSpec->buffer_->GetSize() = %d\n", buf.length,
+            CAMERA_LOGD("buf.length = %{public}d frameSpec->buffer_->GetSize() = %{public}d\n", buf.length,
                         frameSpec->buffer_->GetSize());
 
             if (buf.length > frameSpec->buffer_->GetSize()) {
@@ -190,6 +220,8 @@ RetCode HosV4L2Buffers::V4L2AllocBuffer(int fd, const std::shared_ptr<FrameSpec>
 
 RetCode HosV4L2Buffers::V4L2ReleaseBuffers(int fd)
 {
+    CAMERA_LOGE("HosV4L2Buffers::V4L2ReleaseBuffers\n");
+
     std::lock_guard<std::mutex> l(bufferLock_);
     queueBuffers_.erase(fd);
 
@@ -200,5 +232,10 @@ void HosV4L2Buffers::SetCallback(BufCallback cb)
 {
     CAMERA_LOGD("HosV4L2Buffers::SetCallback OK.");
     dequeueBuffer_ = cb;
+}
+RetCode HosV4L2Buffers::Flush(int fd)
+{
+    CAMERA_LOGE("HosV4L2Buffers::Flush\n");
+    return RC_OK;
 }
 } // namespace OHOS::Camera

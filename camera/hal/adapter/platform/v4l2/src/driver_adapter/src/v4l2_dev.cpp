@@ -42,7 +42,7 @@ RetCode HosV4L2Dev::start(const std::string& cameraID)
     std::string devName;
     int fd;
 
-    CAMERA_LOGD("HosV4L2Dev::start enter %s\n", cameraID.c_str());
+    CAMERA_LOGD("HosV4L2Dev::start enter %{public}s\n", cameraID.c_str());
 
     if (myFileFormat_ == nullptr) {
         myFileFormat_ = std::make_shared<HosFileFormat>();
@@ -65,6 +65,12 @@ RetCode HosV4L2Dev::start(const std::string& cameraID)
         return RC_ERROR;
     }
 
+    bufferType_ = static_cast<enum v4l2_buf_type>(myFileFormat_->V4L2SearchBufType(fd));
+    if (bufferType_ == V4L2_BUF_TYPE_PRIVATE) {
+        CAMERA_LOGE("error:myFileFormat_->V4L2SearchBufType bufferType_ == 0\n");
+        return RC_ERROR;
+    }
+
     std::lock_guard<std::mutex> l(HosV4L2Dev::deviceFdLock_);
     HosV4L2Dev::fdMatch.insert(std::make_pair(cameraID, fd));
 
@@ -75,7 +81,7 @@ RetCode HosV4L2Dev::stop(const std::string& cameraID)
 {
     int fd;
 
-    CAMERA_LOGD("HosV4L2Dev::stop enter %s\n", cameraID.c_str());
+    CAMERA_LOGD("HosV4L2Dev::stop enter %{public}s\n", cameraID.c_str());
 
     if (myFileFormat_ == nullptr) {
         CAMERA_LOGE("HosV4L2Dev::stop myFileFormat_ == nullptr\n");
@@ -126,7 +132,7 @@ RetCode HosV4L2Dev::ReqBuffers(const std::string& cameraID, unsigned int buffCon
     }
 
     if (myBuffers_ == nullptr) {
-        myBuffers_ = std::make_shared<HosV4L2Buffers>(V4L2_MEMORY_USERPTR, V4L2_BUF_TYPE_VIDEO_CAPTURE);
+        myBuffers_ = std::make_shared<HosV4L2Buffers>(memoryType_, bufferType_);
         if (myBuffers_ == nullptr) {
             CAMERA_LOGE("error: Creatbuffer: myBuffers_ make_shared is NULL\n");
             return RC_ERROR;
@@ -237,14 +243,10 @@ void HosV4L2Dev::loopBuffers()
 
         for (int n = 0; nfds > 0; ++n, --nfds) {
             if ((events[n].events & EPOLLIN) && (events[n].data.fd != eventFd_)) {
-                if (myBuffers_ == nullptr) {
-                    CAMERA_LOGE("loopBuffers: myBuffers_ is not init\n");
-                    break;
-                }
-
-                rc = myBuffers_->V4L2DqueueBuffer(events[n].data.fd);
+                CHECK_IF_PTR_NULL_RETURN_VOID(myBuffers_);
+                rc = myBuffers_->V4L2DequeueBuffer(events[n].data.fd);
                 if (rc == RC_ERROR) {
-                    CAMERA_LOGE("loopBuffers: myBuffers_->V4L2DqueueBuffer return error == %d\n", rc);
+                    CAMERA_LOGE("loopBuffers: myBuffers_->V4L2DequeueBuffer return error == %d\n", rc);
                     continue;
                 }
             } else {
@@ -319,7 +321,7 @@ RetCode HosV4L2Dev::StartStream(const std::string& cameraID)
     }
 
     if (myStreams_ == nullptr) {
-        myStreams_ = std::make_shared<HosV4L2Streams>();
+        myStreams_ = std::make_shared<HosV4L2Streams>(bufferType_);
         if (myStreams_ == nullptr) {
             CAMERA_LOGE("error: StartStream: myStreams_ make_shared is NULL\n");
             return RC_ERROR;
@@ -596,7 +598,7 @@ RetCode HosV4L2Dev::ConfigFps(const int fd, DeviceFormat& format, V4l2FmtCmd com
     RetCode rc = RC_OK;
 
     if (myStreams_ == nullptr) {
-        myStreams_ = std::make_shared<HosV4L2Streams>();
+        myStreams_ = std::make_shared<HosV4L2Streams>(bufferType_);
         if (myStreams_ == nullptr) {
             CAMERA_LOGE("error: ConfigSys: myStreams_ make_shared is nullptr\n");
             return RC_ERROR;
@@ -682,6 +684,29 @@ RetCode HosV4L2Dev::SetCallback(BufCallback cb)
     }
 
     myBuffers_->SetCallback(cb);
+
+    return RC_OK;
+}
+RetCode HosV4L2Dev::Flush(const std::string& cameraID)
+{
+    int rc, fd;
+
+    fd = GetCurrentFd(cameraID);
+    if (fd < 0) {
+        CAMERA_LOGE("HosV4L2Dev::Flush: GetCurrentFd error\n");
+        return RC_ERROR;
+    }
+
+    if (myBuffers_ == nullptr) {
+        CAMERA_LOGE(" HosV4L2Dev::Flush myBuffers_ is NULL\n");
+        return RC_ERROR;
+    }
+
+    rc = myBuffers_->Flush(fd);
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("HosV4L2Dev::Flush: error\n");
+        return RC_ERROR;
+    }
 
     return RC_OK;
 }

@@ -11,94 +11,157 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/test.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
-import("../../camera.gni")
+import("//drivers/peripheral/camera/hal/camera.gni")
 
-need_link_hispark_taurus_lib = true
-if (need_link_hispark_taurus_lib) {
-  if (use_musl) {
+if (defined(ohos_lite)) {
+  import("//build/lite/config/test.gni")
+  import("//drivers/adapter/uhdf2/uhdf.gni")
+
+  config("mpi_device_config") {
+    visibility = [ ":*" ]
+    cflags_cc = [
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-error",
+      "-DGST_DISABLE_DEPRECATED",
+      "-DHAVE_CONFIG_H",
+      "-DCOLORSPACE=\"videoconvert\"",
+      "-fno-strict-aliasing",
+      "-Wno-sign-compare",
+      "-Wno-builtin-requires-header",
+      "-Wno-unused-variable",
+      "-Wno-unused-label",
+      "-Wno-implicit-function-declaration",
+      "-Wno-format",
+      "-Wno-int-conversion",
+      "-Wno-unused-function",
+      "-Wno-thread-safety-attributes",
+      "-Wno-inconsistent-missing-override",
+      "-fno-rtti",
+      "-fno-exceptions",
+      "-ffunction-sections",
+      "-fdata-sections",
+    ]
+    cflags_cc += [ "-std=c++17" ]
+  }
+
+  unittest("device_manager_unittest") {
+    output_extension = "bin"
+    output_dir = "$root_out_dir/test/unittest/hdf"
+    sources = [ "unittest/mpi/utest_mpi_device_manager.cpp" ]
+    include_dirs = [
+      "$camera_path/device_manager",
+      "$camera_path/device_manager/include",
+      "$camera_path/device_manager/include/mpi",
+      "$camera_path/device_manager/src",
+      "$camera_path/device_manager/src/mpi",
+      "$camera_device_name_path/camera/include/driver_adapter",
+      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
+      "$camera_path/include",
+      "$camera_path/device_manager/test/unittest/mpi",
+      "$camera_path/utils/event",
+      "//drivers/adapter/uhdf2/osal/include",
+      "$camera_device_name_path/camera/include/device_manager",
+      "$camera_path/adapter/platform/mpp/src/device_manager/include",
+      "$camera_path/utils/metadata/include",
+      "//drivers/framework/include/config",
+      "//drivers/framework/include/osal",
+      "//drivers/framework/include/utils",
+    ]
+
     hispark_taurus_lib_path =
         "//device/hisilicon/hardware/media/hal/camera/libs/hispark_taurus/"
-  } else {
-    hispark_taurus_lib_path =
-        "//device/hisilicon/hardware/media/hal/camera/libs/hispark_taurus/std"
-  }
-}
-
-module_output_path = "hdf/device_manager_test"
-
-config("mpi_device_config") {
-  visibility = [ ":*" ]
-
-  cflags_cc = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-Wno-error",
-    "-DGST_DISABLE_DEPRECATED",
-    "-DHAVE_CONFIG_H",
-    "-DCOLORSPACE=\"videoconvert\"",
-    "-fno-strict-aliasing",
-    "-Wno-sign-compare",
-    "-Wno-builtin-requires-header",
-    "-Wno-unused-variable",
-    "-Wno-unused-label",
-    "-Wno-implicit-function-declaration",
-    "-Wno-format",
-    "-Wno-int-conversion",
-    "-Wno-unused-function",
-    "-Wno-thread-safety-attributes",
-    "-Wno-inconsistent-missing-override",
-    "-fno-rtti",
-    "-fno-exceptions",
-    "-ffunction-sections",
-    "-fdata-sections",
-  ]
-}
-
-ohos_unittest("device_manager_unittest") {
-  testonly = true
-  module_out_path = module_output_path
-  sources = [ "unittest/mpi/utest_mpi_device_manager.cpp" ]
-
-  include_dirs = [
-    "$camera_path/device_manager",
-    "$camera_path/device_manager/include",
-    "$camera_path/device_manager/include/mpi",
-    "$camera_path/device_manager/src",
-    "$camera_path/device_manager/src/mpi",
-    "//drivers/peripheral/camera/hal/adapter/chipset/hispark_taurus/include/driver_adapter",
-    "//utils/native/base/include",
-    "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
-    "$camera_path/include",
-    "$camera_path/device_manager/test/unittest/mpi",
-    "$camera_path/utils/event",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
-    "//drivers/framework/include/utils",
-    "//drivers/adapter/uhdf2/osal/include",
-    "$camera_path/adapter/chipset/hispark_taurus/include/device_manager",
-  ]
-
-  if (need_link_hispark_taurus_lib) {
     outdir = rebase_path("$hispark_taurus_lib_path")
     ldflags = [ "-L$outdir" ]
-    ldflags += [ "-ldriver_adapter.z" ]
+    ldflags += [ "-ldriver_adapter" ]
+    deps = [
+      "$camera_path/device_manager:camera_device_manager",
+      "$camera_path/utils/metadata:metadata_lite",
+      "$hdf_uhdf_path/utils:libhdf_utils",
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+    ]
   }
-
-  deps = [
-    "$camera_path/device_manager:camera_device_manager",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
-  ]
-
-  if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
+} else {
+  import("//build/test.gni")
+  import("//drivers/adapter/uhdf2/uhdf.gni")
+  need_link_hispark_taurus_lib = true
+  if (need_link_hispark_taurus_lib) {
+    if (use_musl) {
+      hispark_taurus_lib_path =
+          "//device/hisilicon/hardware/media/hal/camera/libs/hispark_taurus/"
+    } else {
+      hispark_taurus_lib_path =
+          "//device/hisilicon/hardware/media/hal/camera/libs/hispark_taurus/std"
+    }
   }
-
-  public_configs = [ ":mpi_device_config" ]
+  module_output_path = "hdf/device_manager_test"
+  config("mpi_device_config") {
+    visibility = [ ":*" ]
+    cflags_cc = [
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-error",
+      "-DGST_DISABLE_DEPRECATED",
+      "-DHAVE_CONFIG_H",
+      "-DCOLORSPACE=\"videoconvert\"",
+      "-fno-strict-aliasing",
+      "-Wno-sign-compare",
+      "-Wno-builtin-requires-header",
+      "-Wno-unused-variable",
+      "-Wno-unused-label",
+      "-Wno-implicit-function-declaration",
+      "-Wno-format",
+      "-Wno-int-conversion",
+      "-Wno-unused-function",
+      "-Wno-thread-safety-attributes",
+      "-Wno-inconsistent-missing-override",
+      "-fno-rtti",
+      "-fno-exceptions",
+      "-ffunction-sections",
+      "-fdata-sections",
+    ]
+  }
+  ohos_unittest("device_manager_unittest") {
+    testonly = true
+    module_out_path = module_output_path
+    sources = [ "unittest/mpi/utest_mpi_device_manager.cpp" ]
+    include_dirs = [
+      "$camera_path/device_manager",
+      "$camera_path/device_manager/include",
+      "$camera_path/device_manager/include/mpi",
+      "$camera_path/device_manager/src",
+      "$camera_path/device_manager/src/mpi",
+      "$camera_device_name_path/camera/include/driver_adapter",
+      "//utils/native/base/include",
+      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
+      "$camera_path/include",
+      "$camera_path/device_manager/test/unittest/mpi",
+      "$camera_path/utils/event",
+      "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
+      "//drivers/framework/include/utils",
+      "//drivers/adapter/uhdf2/osal/include",
+      "$camera_device_name_path/camera/include/device_manager",
+      "$camera_path/adapter/platform/mpp/src/device_manager/include",
+    ]
+    if (need_link_hispark_taurus_lib) {
+      outdir = rebase_path("$hispark_taurus_lib_path")
+      ldflags = [ "-L$outdir" ]
+      ldflags += [ "-ldriver_adapter.z" ]
+    }
+    deps = [
+      "$camera_path/device_manager:camera_device_manager",
+      "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
+      "//third_party/googletest:gmock_main",
+      "//third_party/googletest:gtest_main",
+      "//utils/native/base:utils",
+    ]
+    if (is_standard_system) {
+      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+    public_configs = [ ":mpi_device_config" ]
+  }
 }

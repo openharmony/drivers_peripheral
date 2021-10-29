@@ -40,8 +40,11 @@ bool CameraHdiBaseTest::InitCameraHost()
     if (cameraHost_ != nullptr) {
         return true;
     }
-
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    cameraHost_ = OHOS::Camera::CameraHost::CreateCameraHost();
+#else
     cameraHost_ = ICameraHost::Get(TEST_SERVICE_NAME);
+#endif
     if (cameraHost_ == nullptr) {
         return false;
     }
@@ -59,7 +62,11 @@ bool CameraHdiBaseTest::GetCameraDevice()
     }
 
     std::string cameraId = cameraIds_.front();
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    std::shared_ptr<CameraDeviceCallback> deviceCallback = std::make_shared<CameraDeviceCallback>();
+#else
     OHOS::sptr<CameraDeviceCallback> deviceCallback = new CameraDeviceCallback();
+#endif
     CamRetCode rc = cameraHost_->OpenCamera(cameraId, deviceCallback, cameraDevice_);
     if (cameraDevice_ == nullptr) {
         return false;
@@ -77,7 +84,11 @@ bool CameraHdiBaseTest::GetStreamOperator()
         return false;
     }
 
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    std::shared_ptr<StreamOperatorCallback> streamOperatorCallback = std::make_shared<StreamOperatorCallback>();
+#else
     OHOS::sptr<StreamOperatorCallback> streamOperatorCallback = new StreamOperatorCallback();
+#endif
     (void)cameraDevice_->GetStreamOperator(streamOperatorCallback, streamOperator_);
     if (streamOperator_ == nullptr) {
         return false;

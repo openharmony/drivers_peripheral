@@ -13,11 +13,9 @@
 
 import("camera.gni")
 
-print("product_name : , ${product_name}")
-group("camera_hal") {
-  if (is_standard_system) {
+if (defined(ohos_lite)) {
+  group("camera_hal") {
     deps = [
-      "../interfaces/hdi_cpp/client:libcamera_client",
       "buffer_manager:camera_buffer_manager",
       "device_manager:camera_device_manager",
       "hdi_impl:camera_hdi_impl",
@@ -25,20 +23,44 @@ group("camera_hal") {
       "pipeline_core:camera_pipeline_core",
       "utils:camera_utils",
     ]
-
     deps += [ "${chipset_build_deps}" ]
   }
-}
-
-group("unittest") {
-  if (is_standard_system) {
-    testonly = true
+  group("unittest") {
     deps = [
       "buffer_manager/test:buffer_manager_unittest",
       "device_manager/test:device_manager_unittest",
       "hdi_impl/test:hdi_impl_unittest",
       "pipeline_core/test:pipeline_core_unittest",
-      "test/mpi:camera_case_unittest",
     ]
+  }
+} else {
+  print("product_name : , ${product_name}")
+  group("camera_hal") {
+    if (is_standard_system) {
+      deps = [
+        "$camera_path/../interfaces/hdi_ipc/client:libcamera_client",
+        "buffer_manager:camera_buffer_manager",
+        "device_manager:camera_device_manager",
+        "hdi_impl:camera_hdi_impl",
+        "init:ohos_camera_demo",
+        "pipeline_core:camera_pipeline_core",
+        "utils:camera_utils",
+      ]
+
+      deps += [ "${chipset_build_deps}" ]
+    }
+  }
+
+  group("unittest") {
+    if (is_standard_system) {
+      testonly = true
+      deps = [
+        "buffer_manager/test:buffer_manager_unittest",
+        "device_manager/test:device_manager_unittest",
+        "hdi_impl/test:hdi_impl_unittest",
+        "pipeline_core/test:pipeline_core_unittest",
+        "test/mpi:camera_case_unittest",
+      ]
+    }
   }
 }

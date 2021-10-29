@@ -25,23 +25,29 @@
 #include <display_type.h>
 #include "camera_metadata_info.h"
 #include "ibuffer.h"
-#include "if_system_ability_manager.h"
 #include "ioffline_stream_operator.h"
-#include "iservice_registry.h"
 #include "camera.h"
+#ifndef CAMERA_BUILT_ON_OHOS_LITE
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+#endif
 
 namespace OHOS::Camera {
 class StreamCustomer {
 public:
     StreamCustomer();
     ~StreamCustomer();
-
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    std::shared_ptr<OHOS::Surface> CreateProducer();
+#else
     sptr<OHOS::IBufferProducer> CreateProducer();
+#endif
     void CamFrame(const std::function<void(void*, const uint32_t)> callback);
 
     RetCode ReceiveFrameOn(const std::function<void(void*, const uint32_t)> callback);
     void ReceiveFrameOff();
 
+#ifndef CAMERA_BUILT_ON_OHOS_LITE
     class TestBuffersConsumerListener: public IBufferConsumerListener {
     public:
         TestBuffersConsumerListener()
@@ -56,11 +62,16 @@ public:
         {
         }
     };
+#endif
 
 private:
     unsigned int camFrameExit_ = 1;
 
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    std::shared_ptr<OHOS::Surface> consumer_ = nullptr;
+#else
     sptr<OHOS::Surface> consumer_ = nullptr;
+#endif
     std::thread* previewThreadId_ = nullptr;
 };
 } // namespace OHOS::Camera

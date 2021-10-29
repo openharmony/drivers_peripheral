@@ -111,5 +111,34 @@ enum RetCode {
     RC_OK = 0,
     RC_ERROR,
 };
+
+#define CHECK_IF_NOT_EQUAL_RETURN_VALUE(arg1, arg2, ret)                                                            \
+    if ((arg1) != (arg2)) {                                                                                         \
+        CAMERA_LOGE("%{public}u, %{public}s is not equal to %{public}s, return %{public}s", __LINE__, #arg1, #arg2, \
+                    #ret);                                                                                          \
+        return (ret);                                                                                               \
+    }
+
+#define CHECK_IF_EQUAL_RETURN_VALUE(arg1, arg2, ret)                                                                   \
+    if ((arg1) == (arg2)) {                                                                                            \
+        CAMERA_LOGE("%{public}u, %{public}s is equal to %{public}s, return %{public}s", __LINE__, #arg1, #arg2, #ret); \
+        return (ret);                                                                                                  \
+    }
+
+#define CHECK_IF_PTR_NULL_RETURN_VALUE(ptr, ret) CHECK_IF_EQUAL_RETURN_VALUE(ptr, nullptr, ret)
+
+#define CHECK_IF_NOT_EQUAL_RETURN_VOID(arg1, arg2)                                                        \
+    if ((arg1) != (arg2)) {                                                                               \
+        CAMERA_LOGE("%{public}u, %{public}s is not equal to %{public}s, return", __LINE__, #arg1, #arg2); \
+        return;                                                                                           \
+    }
+
+#define CHECK_IF_EQUAL_RETURN_VOID(arg1, arg2)                                                        \
+    if ((arg1) == (arg2)) {                                                                           \
+        CAMERA_LOGE("%{public}u, %{public}s is equal to %{public}s, return", __LINE__, #arg1, #arg2); \
+        return;                                                                                       \
+    }
+
+#define CHECK_IF_PTR_NULL_RETURN_VOID(ptr) CHECK_IF_EQUAL_RETURN_VOID(ptr, nullptr)
 } // namespace OHOS::Camera
 #endif // HOS_CAMERA_TEMP_H

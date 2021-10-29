@@ -11,55 +11,92 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/test.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
-import("../../camera.gni")
+import("//drivers/peripheral/camera/hal/camera.gni")
 
-module_output_path = "hdf/buffer_manager_test"
+if (defined(ohos_lite)) {
+  import("//build/lite/config/test.gni")
+  import("//drivers/adapter/uhdf2/uhdf.gni")
 
-config("buffer_manager_utest_config") {
-  visibility = [ ":*" ]
+  config("buffer_manager_utest_config") {
+    visibility = [ ":*" ]
 
-  cflags_cc = [ "-Wno-unused-parameter" ]
-
-  ldflags = [ "--coverage" ]
-}
-ohos_unittest("buffer_manager_unittest") {
-  testonly = true
-  module_out_path = module_output_path
-  sources = [ "unittest/buffer_manager_utest.cpp" ]
-
-  include_dirs = [
-    "$camera_path/include",
-    "$camera_path/buffer_manager/include",
-    "//third_party/googletest/googletest/include",
-    "//third_party/googletest/googletest/include",
-    "//utils/native/base/include",
-    "//foundation/communication/interfaces/innerkits/ipc_core/include",
-    "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
-    "//drivers/framework/include/utils",
-    "//drivers/adapter/uhdf2/osal/include",
-  ]
-
-  deps = [
-    "$camera_path/buffer_manager:camera_buffer_manager",
-    "//foundation/graphic/standard:libsurface",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest",
-    "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
-  ]
-
-  if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
+    cflags_cc = [ "-Wno-unused-parameter" ]
+    cflags_cc += [ "-std=c++17" ]
   }
 
-  external_deps += [
-    "ipc:ipc_core",
-    "samgr_standard:samgr_proxy",
-  ]
-  public_configs = [ ":buffer_manager_utest_config" ]
+  unittest("buffer_manager_unittest") {
+    output_extension = "bin"
+    output_dir = "$root_out_dir/test/unittest/hdf"
+    sources = [ "unittest/buffer_manager_utest.cpp" ]
+    include_dirs = [
+      "$camera_path/include",
+      "$camera_path/buffer_manager/include",
+      "$camera_path/buffer_manager/src/buffer_adapter/lite",
+      "//third_party/googletest/googletest/include",
+      "//foundation/communication/ipc_lite/interfaces/kits",
+      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
+      "//drivers/framework/include/utils",
+      "//drivers/adapter/uhdf2/osal/include",
+      "//drivers/peripheral/base",
+      "//drivers/peripheral/display/interfaces/include",
+      "//foundation/graphic/surface/interfaces/kits",
+      "//foundation/graphic/surface/interfaces/innerkits",
+    ]
+    deps = [
+      "$camera_path/buffer_manager:camera_buffer_manager",
+      "//foundation/graphic/surface:surface",
+    ]
+  }
+} else {
+  import("//build/test.gni")
+  import("//drivers/adapter/uhdf2/uhdf.gni")
+
+  module_output_path = "hdf/buffer_manager_test"
+
+  config("buffer_manager_utest_config") {
+    visibility = [ ":*" ]
+
+    cflags_cc = [ "-Wno-unused-parameter" ]
+
+    ldflags = [ "--coverage" ]
+  }
+  ohos_unittest("buffer_manager_unittest") {
+    testonly = true
+    module_out_path = module_output_path
+    sources = [ "unittest/buffer_manager_utest.cpp" ]
+
+    include_dirs = [
+      "$camera_path/include",
+      "$camera_path/buffer_manager/include",
+      "$camera_path/buffer_manager/src/buffer_adapter/standard",
+      "//third_party/googletest/googletest/include",
+      "//utils/native/base/include",
+      "//foundation/communication/interfaces/innerkits/ipc_core/include",
+      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
+      "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
+      "//drivers/framework/include/utils",
+      "//drivers/adapter/uhdf2/osal/include",
+    ]
+
+    deps = [
+      "$camera_path/buffer_manager:camera_buffer_manager",
+      "//foundation/graphic/standard:libsurface",
+      "//third_party/googletest:gmock_main",
+      "//third_party/googletest:gtest",
+      "//third_party/googletest:gtest_main",
+      "//utils/native/base:utils",
+    ]
+
+    if (is_standard_system) {
+      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+
+    external_deps += [
+      "ipc:ipc_core",
+      "samgr_standard:samgr_proxy",
+    ]
+    public_configs = [ ":buffer_manager_utest_config" ]
+  }
 }

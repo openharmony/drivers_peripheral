@@ -57,6 +57,20 @@ void BufferManagerTest::TearDown(void)
 HWTEST_F(BufferManagerTest, TestBufferQueueLoop, TestSize.Level0)
 {
     bool running = true;
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    std::shared_ptr<OHOS::Surface> consumer =
+        std::shared_ptr<OHOS::Surface>(OHOS::Surface::CreateSurface());
+    std::thread consumerThread([&consumer, &running] {
+        while (running) {
+            OHOS::SurfaceBuffer* buffer = consumer->AcquireBuffer();
+            if (buffer != nullptr) {
+                consumer->ReleaseBuffer(buffer);
+                std::cout << "receive a buffer ..." << std::endl;
+            }
+        }
+    });
+    std::shared_ptr<OHOS::Surface> producer = consumer;
+#else
     OHOS::sptr<OHOS::Surface> consumer = Surface::CreateSurfaceAsConsumer();
     sptr<IBufferConsumerListener> listener = new TestBufferConsumerListener();
     consumer->RegisterConsumerListener(listener);
@@ -78,6 +92,7 @@ HWTEST_F(BufferManagerTest, TestBufferQueueLoop, TestSize.Level0)
             }
         }
     });
+#endif
 
     // HDI impl start from here
     auto stream = std::make_shared<BufferManagerTest::Stream>();
@@ -172,6 +187,7 @@ HWTEST_F(BufferManagerTest, TestHeapBuffer, TestSize.Level0)
     EXPECT_EQ(true, buffer->GetVirAddress() == nullptr);
 }
 
+#ifndef CAMERA_BUILT_ON_OHOS_LITE
 HWTEST_F(BufferManagerTest, TestGrallocBuffer, TestSize.Level0)
 {
     Camera::BufferManager* manager = Camera::BufferManager::GetInstance();
@@ -193,6 +209,7 @@ HWTEST_F(BufferManagerTest, TestGrallocBuffer, TestSize.Level0)
         EXPECT_EQ(true, rc == RC_OK);
     }
 }
+#endif
 
 HWTEST_F(BufferManagerTest, TestInternalBufferLoop, TestSize.Level0)
 {
@@ -324,7 +341,11 @@ HWTEST_F(BufferManagerTest, TestExternalBufferLoop, TestSize.Level0)
 
 HWTEST_F(BufferManagerTest, TestTrackingBufferLoop, TestSize.Level0)
 {
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    std::shared_ptr<OHOS::Surface> producer = nullptr;
+#else
     sptr<OHOS::IBufferProducer> producer = nullptr;
+#endif
     // HDI impl start from here
     bool running = true;
     auto stream = std::make_shared<Stream>();
@@ -367,30 +388,63 @@ HWTEST_F(BufferManagerTest, TestTrackingBufferLoop, TestSize.Level0)
 }
 
 namespace OHOS::CameraUtest {
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+bool BufferManagerTest::Stream::Init(std::shared_ptr<OHOS::Surface>& producer)
+{
+    Camera::BufferManager* manager = Camera::BufferManager::GetInstance();
+    if (manager == nullptr) {
+        return false;
+    }
+    bufferPoolId_ = manager->GenerateBufferPoolId();
+    if (bufferPoolId_ == 0) {
+        return false;
+    }
+    bufferPool_ = manager->GetBufferPool(bufferPoolId_);
+    if (bufferPool_ == nullptr) {
+        return false;
+    }
+    RetCode rc = RC_ERROR;
+    if (producer == nullptr) {
+        rc = bufferPool_->Init(width_, height_, usage_, format_, queueSize_, CAMERA_BUFFER_SOURCE_TYPE_HEAP);
+        std::cout << "init inner buffer loop" << std::endl;
+    }
+    if (producer_ != nullptr) {
+        producer_->SetQueueSize(queueSize_);
+        if (producer_->GetQueueSize() != queueSize_) {
+            return false;
+        }
+        producer_->SetWidthAndHeight(width_, height_);
+        producer_->SetFormat(BufferAdapter::CameraFormatToPixelFormat(format_));
+        producer_->SetStrideAlignment(8); // 8:value of strideAlignment
+        rc = bufferPool_->Init(width_, height_, usage_, format_, queueSize_, CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL);
+        std::cout << "init external buffer loop" << std::endl;
+    }
+    if (rc != RC_OK) {
+        return false;
+    }
+
+    return true;
+}
+#else
 bool BufferManagerTest::Stream::Init(sptr<IBufferProducer>& producer)
 {
     Camera::BufferManager* manager = Camera::BufferManager::GetInstance();
     if (manager == nullptr) {
         return false;
     }
-
     bufferPoolId_ = manager->GenerateBufferPoolId();
     if (bufferPoolId_ == 0) {
         return false;
     }
-
     bufferPool_ = manager->GetBufferPool(bufferPoolId_);
     if (bufferPool_ == nullptr) {
         return false;
     }
-
     RetCode rc = RC_ERROR;
-
     if (producer == nullptr) {
         rc = bufferPool_->Init(width_, height_, usage_, format_, queueSize_, CAMERA_BUFFER_SOURCE_TYPE_HEAP);
         std::cout << "init inner buffer loop" << std::endl;
     }
-
     if (producer != nullptr) {
         producer_ = Surface::CreateSurfaceAsProducer(producer);
         producer_->SetQueueSize(queueSize_);
@@ -404,23 +458,21 @@ bool BufferManagerTest::Stream::Init(sptr<IBufferProducer>& producer)
         requestConfig_.format = static_cast<int32_t>(BufferAdapter::CameraFormatToPixelFormat(format_));
         requestConfig_.usage = static_cast<int32_t>(BufferAdapter::CameraUsageToGrallocUsage(usage_));
         requestConfig_.timeout = 0;
-
         flushConfig_.damage.x = 0;
         flushConfig_.damage.y = 0;
         flushConfig_.damage.w = width_;
         flushConfig_.damage.h = height_;
         flushConfig_.timestamp = 0;
-
         rc = bufferPool_->Init(width_, height_, usage_, format_, queueSize_, CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL);
         std::cout << "init external buffer loop" << std::endl;
     }
-
     if (rc != RC_OK) {
         return false;
     }
 
     return true;
 }
+#endif
 
 void BufferManagerTest::Stream::StartInnerStream() const
 {
@@ -438,18 +490,27 @@ void BufferManagerTest::Stream::StartExternalStream()
     }
 
     for (uint32_t i = 0; i < queueSize_; i++) {
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    OHOS::SurfaceBuffer *sb = nullptr;
+    sb = producer_->RequestBuffer();
+#else
         sptr<SurfaceBuffer> sb = nullptr;
         SurfaceError ret = producer_->RequestBuffer(sb, releaseFence_, requestConfig_);
         if (ret != SURFACE_ERROR_OK) {
             continue;
         }
+#endif
         if (sb == nullptr) {
             continue;
         }
         std::cout << "request a buffer ..." << std::endl;
 
         std::shared_ptr<IBuffer> cameraBuffer = std::make_shared<ImageBuffer>(CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL);
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+        RetCode rc = BufferAdapter::SurfaceBufferToCameraBuffer(sb, producer_, cameraBuffer);
+#else
         RetCode rc = BufferAdapter::SurfaceBufferToCameraBuffer(sb, cameraBuffer);
+#endif
         if (rc != RC_OK) {
             continue;
         }
@@ -492,11 +553,16 @@ void BufferManagerTest::Stream::EnqueueBufferNonBlock()
         return;
     }
 
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    OHOS::SurfaceBuffer *sb = nullptr;
+    sb = producer_->RequestBuffer();
+#else
     sptr<SurfaceBuffer> sb = nullptr;
     SurfaceError ret = producer_->RequestBuffer(sb, releaseFence_, requestConfig_);
     if (ret != SURFACE_ERROR_OK) {
         return;
     }
+#endif
     if (sb == nullptr) {
         return;
     }
@@ -536,7 +602,11 @@ void BufferManagerTest::Stream::DequeueBuffer(std::shared_ptr<IBuffer>& buffer)
     bufferPool_->ReturnBuffer(buffer);
 
     if (producer_ != nullptr) {
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+        SurfaceBuffer* surfaceBuffer = nullptr;
+#else
         sptr<SurfaceBuffer> surfaceBuffer = nullptr;
+#endif
         {
             std::lock_guard<std::mutex> l(lock_);
             for (auto& it : bufferVec_) {
@@ -551,10 +621,17 @@ void BufferManagerTest::Stream::DequeueBuffer(std::shared_ptr<IBuffer>& buffer)
             return;
         }
 
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+        int32_t ret = producer_->FlushBuffer(surfaceBuffer);
+        if (ret != 0) {
+            std::cout << "flush buffer failed ..." << std::endl;
+        }
+#else
         SurfaceError ret = producer_->FlushBuffer(surfaceBuffer, -1, flushConfig_);
         if (ret != SURFACE_ERROR_OK) {
             std::cout << "flush buffer failed ..." << std::endl;
         }
+#endif
     }
 
     std::cout << "dequeue buffer ..." << std::endl;

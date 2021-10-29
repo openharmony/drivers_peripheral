@@ -45,7 +45,11 @@ public:
     public:
         Stream() = default;
         ~Stream() = default;
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+        bool Init(std::shared_ptr<OHOS::Surface>& producer);
+#else
         bool Init(OHOS::sptr<OHOS::IBufferProducer>& producer);
+#endif
         void StartStream();
         void StopStream();
         void EnqueueBufferNonBlock();
@@ -62,7 +66,11 @@ public:
 
     private:
         std::mutex lock_;
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+        std::shared_ptr<OHOS::Surface> producer_ = nullptr;
+#else
         OHOS::sptr<OHOS::Surface> producer_ = nullptr;
+#endif
 
         uint32_t width_ = 1920;
         uint32_t height_ = 1080;
@@ -73,13 +81,17 @@ public:
 
         std::shared_ptr<IBufferPool> bufferPool_ = nullptr;
 
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+        std::vector<std::pair<OHOS::SurfaceBuffer*, std::shared_ptr<IBuffer>>> bufferVec_ = {};
+#else
         std::vector<std::pair<OHOS::sptr<OHOS::SurfaceBuffer>, std::shared_ptr<IBuffer>>> bufferVec_ = {};
         int32_t releaseFence_ = 0;
-        std::vector<int32_t> deletingBuffers_ = {};
         OHOS::BufferRequestConfig requestConfig_ = {};
         OHOS::BufferFlushConfig flushConfig_ = {};
+#endif
     };
 
+#ifndef CAMERA_BUILT_ON_OHOS_LITE
     class TestBufferConsumerListener: public IBufferConsumerListener {
         public:
             TestBufferConsumerListener()
@@ -94,6 +106,7 @@ public:
             {
             }
     };
+#endif
 
     class Node {
     public:

@@ -22,12 +22,25 @@ StreamCustomer::~StreamCustomer() {}
 
 void StreamCustomer::CamFrame(const std::function<void(void*, uint32_t)> callback)
 {
+    CAMERA_LOGD("demo test:enter CamFrame thread ++ \n");
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    do {
+        OHOS::SurfaceBuffer* buffer = consumer_->AcquireBuffer();
+        if (buffer != nullptr) {
+            if (callback != nullptr) {
+                void* addr = buffer->GetVirAddr();
+                int32_t size = 0;
+                buffer->GetInt32(VIDEO_KEY_INFO_DATA_SIZE, size);
+                callback(addr, size);
+            }
+            consumer_->ReleaseBuffer(buffer);
+        }
+    } while (camFrameExit_ == 0);
+#else
     OHOS::Rect damage;
     int32_t flushFence = 0;
     int64_t timestamp = 0;
     constexpr uint32_t delayTime = 12000;
-
-    CAMERA_LOGD("demo test:enter CamFrame thread ++ \n");
 
     do {
         OHOS::sptr<OHOS::SurfaceBuffer> buff = nullptr;
@@ -51,12 +64,24 @@ void StreamCustomer::CamFrame(const std::function<void(void*, uint32_t)> callbac
         }
         usleep(delayTime);
     } while (camFrameExit_ == 0);
+#endif
 
     CAMERA_LOGD("demo test:Exiting CamFrame thread -- \n");
 }
 
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+std::shared_ptr<OHOS::Surface> StreamCustomer::CreateProducer()
+#else
 sptr<OHOS::IBufferProducer> StreamCustomer::CreateProducer()
+#endif
 {
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    consumer_ = std::shared_ptr<OHOS::Surface>(OHOS::Surface::CreateSurface());
+    if (consumer_ == nullptr) {
+        return nullptr;
+    }
+    return consumer_;
+#else
     consumer_ = OHOS::Surface::CreateSurfaceAsConsumer();
     if (consumer_ == nullptr) {
         return nullptr;
@@ -71,6 +96,7 @@ sptr<OHOS::IBufferProducer> StreamCustomer::CreateProducer()
 
     CAMERA_LOGI("demo test, create a buffer queue producer %{public}p", producer.GetRefPtr());
     return producer;
+#endif
 }
 
 RetCode StreamCustomer::ReceiveFrameOn(const std::function<void(void*, uint32_t)> callback)
