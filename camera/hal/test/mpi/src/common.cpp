@@ -274,6 +274,7 @@ void Test::StartCapture(int streamId, int captureId, bool shutterCallback, bool 
 
 void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
 {
+    std::shared_ptr<StreamConsumer> consumer_flag = std::make_shared<StreamConsumer>();
     if (captureIds.size() > 0) {
         std::cout << "captureIds.size() = " << captureIds.size() << std::endl;
         for (auto &captureId : captureIds) {
@@ -287,6 +288,7 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
                 std::cout << "captureId = " << captureId << std::endl;
             }
         }
+        consumer_flag->SetFlag();
     }
     SaveVideoFile("video", nullptr, 0, 2); // 2:Operation Mode
     if (streamIds.size() > 0) {
@@ -363,5 +365,10 @@ OHOS::sptr<OHOS::IBufferProducer> Test::StreamConsumer::CreateProducer(std::func
         }
     });
     return producer;
+}
+
+void Test::StreamConsumer::SetFlag()
+{
+    running_ = false;
 }
 }

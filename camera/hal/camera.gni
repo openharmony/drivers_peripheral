@@ -10,9 +10,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//build/ohos.gni")
-import(
-    "//drivers/peripheral/camera/hal/adapter/chipset/gni/camera.${product_name}.gni")
+
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+  import("//device/hisilicon/hi3516dv300/camera/product.gni")
+} else {
+  import("//build/ohos.gni")
+  if ("${product_name}" == "ohos-arm64") {
+    import(
+        "//drivers/peripheral/camera/hal/adapter/chipset/rpi/rpi3/device/camera/product.gni")
+  } else {
+    import("//device/${product_company}/${device_name}/camera/product.gni")
+  }
+}
 
 camera_path = "//drivers/peripheral/camera/hal"
 current_path = "."
@@ -21,4 +31,8 @@ enable_camera_device_utest = false
 use_hitrace = false
 if (use_hitrace) {
   defines += [ "HITRACE_LOG_ENABLED" ]
+}
+
+if (defined(ohos_lite)) {
+  defines += [ "CAMERA_BUILT_ON_OHOS_LITE" ]
 }

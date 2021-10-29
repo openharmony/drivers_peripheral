@@ -29,12 +29,11 @@
 #include <map>
 #include <vector>
 #include <hdf_log.h>
-#include <iremote_broker.h>
 #include "types.h"
-#include "cmd_common.h"
+#include "icamera_interface.h"
 
 namespace OHOS::Camera {
-class ICameraHostCallback : public IRemoteBroker {
+class ICameraHostCallback : public ICameraInterface {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"HDI.Camera.V1_0.HostCallback");
     virtual ~ICameraHostCallback() {}

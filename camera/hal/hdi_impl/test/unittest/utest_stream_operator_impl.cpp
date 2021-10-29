@@ -81,9 +81,11 @@ HWTEST_F(StreamOperatorImplTest, UTestIsStreamsSupported, TestSize.Level0)
     streamInfo->datasapce_ = 10;
     streamInfo->intent_ = PREVIEW;
     streamInfo->tunneledMode_ = 5;
+    std::vector<std::shared_ptr<StreamInfo>> infos;
+    infos.push_back(streamInfo);
     StreamSupportType pType;
     OHOS::Camera::CamRetCode ret = streamOperator_->IsStreamsSupported(
-        mode, modeSetting, streamInfo, pType);
+        mode, modeSetting, infos, pType);
     EXPECT_EQ(true, ret == OHOS::Camera::NO_ERROR);
 }
 
@@ -101,9 +103,15 @@ HWTEST_F(StreamOperatorImplTest, UTestCreateStreams, TestSize.Level0)
     streamInfo->datasapce_ = 8;
     StreamConsumer previewConsumer;
     streamInfo->tunneledMode_ = 5;
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    streamInfo->bufferQueue_ = previewConsumer.CreateProducer(
+        [](OHOS::SurfaceBuffer* buffer) {
+        std::cout << "received a preview buffer ..." << std::endl; });
+#else
     streamInfo->bufferQueue_ = previewConsumer.CreateProducer(
         [](void* addr, uint32_t size) {
         std::cout << "received a preview buffer ..." << std::endl; });
+#endif
     streamInfos.push_back(streamInfo);
 
     std::shared_ptr<StreamInfo> streamInfoSnapshot = std::make_shared<StreamInfo>();
@@ -114,9 +122,15 @@ HWTEST_F(StreamOperatorImplTest, UTestCreateStreams, TestSize.Level0)
     streamInfoSnapshot->datasapce_ = 8;
     streamInfoSnapshot->intent_ = STILL_CAPTURE;
     StreamConsumer snapshotConsumer;
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+  streamInfoSnapshot->bufferQueue_ = snapshotConsumer.CreateProducer(
+            [](OHOS::SurfaceBuffer* buffer) {
+               std::cout << "received a snapshot buffer ..." << std::endl; });
+#else
     streamInfoSnapshot->bufferQueue_ = snapshotConsumer.CreateProducer(
             [](void* addr, uint32_t size) {
                std::cout << "received a snapshot buffer ..." << std::endl; });
+#endif
     streamInfoSnapshot->tunneledMode_ = 5;
     streamInfos.push_back(streamInfoSnapshot);
 
@@ -128,7 +142,60 @@ HWTEST_F(StreamOperatorImplTest, UTestCreateStreams, TestSize.Level0)
     ret = streamOperator_->ReleaseStreams(streamIds);
     EXPECT_EQ(true, ret == OHOS::Camera::NO_ERROR);
 }
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
+{
+    OperationMode operationMode = NORMAL;
+    StreamSupportType supportType;
+    std::vector<std::shared_ptr<StreamInfo>> streamInfos;
+    std::shared_ptr<StreamInfo> streamInfo = std::make_shared<StreamInfo>();
+    streamInfo->streamId_ = 1011;
+    streamInfo->width_ = 720;
+    streamInfo->height_ = 480;
+    streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
+    streamInfo->datasapce_ = 8;
+    streamInfo->intent_ = PREVIEW;
+    StreamConsumer previewConsumer;
+    streamInfo->bufferQueue_ = previewConsumer.CreateProducer(
+        [](OHOS::SurfaceBuffer* buffer) {
+        std::cout << "received a preview buffer ..." << std::endl; });
+    streamInfo->tunneledMode_ = 5;
+    streamInfos.push_back(streamInfo);
 
+    std::shared_ptr<StreamInfo> streamInfoSnapshot = std::make_shared<StreamInfo>();
+    streamInfoSnapshot->streamId_ = 1012;
+    streamInfoSnapshot->width_ = 1920;
+    streamInfoSnapshot->datasapce_ = 8;
+    streamInfoSnapshot->height_ = 960;
+    streamInfoSnapshot->intent_ = STILL_CAPTURE;
+    streamInfoSnapshot->format_ = PIXEL_FMT_YCRCB_420_SP;
+    StreamConsumer snapshotConsumer;
+    streamInfoSnapshot->bufferQueue_ = snapshotConsumer.CreateProducer(
+            [](OHOS::SurfaceBuffer* buffer) {
+               std::cout << "received a snapshot buffer ..." << std::endl; });
+    streamInfoSnapshot->tunneledMode_ = 5;
+    streamInfos.push_back(streamInfoSnapshot);
+
+    OHOS::Camera::CamRetCode ret = streamOperator_->CreateStreams(streamInfos);
+    std::cout << "streamOperator->CreateStreams = " << ret << std::endl;
+    EXPECT_EQ(true, ret == OHOS::Camera::NO_ERROR);
+
+    StreamConsumer preview_consumer;
+    OHOS::sptr<OHOS::IBufferProducer> producer =
+        preview_consumer.CreateProducer([](OHOS::SurfaceBuffer* buffer) {
+        std::cout << "receive a frame..." << std::endl;
+    });
+    ret = streamOperator_->AttachBufferQueue(streamInfo->streamId_, producer);
+    EXPECT_EQ(true, ret == OHOS::Camera::NO_ERROR);
+
+    ret = streamOperator_->DetachBufferQueue(streamInfo->streamId_);
+    EXPECT_EQ(true, ret == OHOS::Camera::NO_ERROR);
+
+    std::vector<int> streamIds = {1011, 1012};
+    ret = streamOperator_->ReleaseStreams(streamIds);
+    EXPECT_EQ(true, ret == OHOS::Camera::NO_ERROR);
+}
+#else
 HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
 {
     OperationMode operationMode = NORMAL;
@@ -181,6 +248,7 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
     ret = streamOperator_->ReleaseStreams(streamIds);
     EXPECT_EQ(true, ret == OHOS::Camera::NO_ERROR);
 }
+#endif
 
 HWTEST_F(StreamOperatorImplTest, UTestCapture, TestSize.Level0)
 {
@@ -195,9 +263,15 @@ HWTEST_F(StreamOperatorImplTest, UTestCapture, TestSize.Level0)
     streamInfo->datasapce_ = 8;
     streamInfo->intent_ = PREVIEW;
     std::shared_ptr<StreamConsumer> previewConsumer = std::make_shared<StreamConsumer>();
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    streamInfo->bufferQueue_ = previewConsumer->CreateProducer(
+        [](OHOS::SurfaceBuffer* buffer) {
+        std::cout << "received a preview buffer ..." << std::endl; });
+#else
     streamInfo->bufferQueue_ = previewConsumer->CreateProducer(
         [](void* addr, uint32_t size) {
         std::cout << "received a preview buffer ..." << std::endl; });
+#endif
     streamInfo->bufferQueue_->SetQueueSize(8);
     streamInfo->tunneledMode_ = 5;
     streamInfos.push_back(streamInfo);

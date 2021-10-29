@@ -129,6 +129,11 @@ public:
         (void)streamId;
         return RC_OK;
     }
+    virtual void SetSendflag(bool flag)
+    {
+        (void)flag;
+        return;
+    }
 };
 } // namespace OHOS::Camera
 #endif

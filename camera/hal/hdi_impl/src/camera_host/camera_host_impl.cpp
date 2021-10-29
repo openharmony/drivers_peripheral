@@ -153,22 +153,17 @@ CamRetCode CameraHostImpl::OpenCamera(const std::string &cameraId,
     }
 
     CamRetCode ret = cameraDevice->SetCallback(callback);
-    if (ret != NO_ERROR) {
-        CAMERA_LOGW("set camera device callback faild.");
-        return ret;
-    }
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(ret, NO_ERROR, ret);
 
     CameraHostConfig *config = CameraHostConfig::GetInstance();
-    if (config == nullptr) {
-        return INVALID_ARGUMENT;
-    }
+    CHECK_IF_PTR_NULL_RETURN_VALUE(config, INVALID_ARGUMENT);
+
     std::vector<std::string> phyCameraIds;
     RetCode rc = config->GetPhysicCameraIds(cameraId, phyCameraIds);
     if (rc != RC_OK) {
         CAMERA_LOGE("get physic cameraId failed.");
         return DEVICE_ERROR;
     }
-
     if (CameraPowerUp(cameraId, phyCameraIds) != RC_OK) {
         CAMERA_LOGE("camera powerup failed.");
         CameraPowerDown(phyCameraIds);
@@ -177,10 +172,13 @@ CamRetCode CameraHostImpl::OpenCamera(const std::string &cameraId,
 
     auto sptrDevice = deviceBackup_.find(cameraId);
     if (sptrDevice == deviceBackup_.end()) {
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+        deviceBackup_[cameraId] = cameraDevice;
+#else
         deviceBackup_[cameraId] = cameraDevice.get();
+#endif
     }
     device = deviceBackup_[cameraId];
-
     cameraDevice->SetStatus(true);
     CAMERA_LOGD("open camera success.");
     DFX_LOCAL_HITRACE_END;

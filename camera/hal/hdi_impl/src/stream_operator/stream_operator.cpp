@@ -500,7 +500,11 @@ CamRetCode StreamOperator::ChangeToOfflineStream(const std::vector<int>& streamI
     CHECK_IF_NOT_EQUAL_RETURN_VALUE(offlineOperator, nullptr, INVALID_ARGUMENT);
     CHECK_IF_EQUAL_RETURN_VALUE(streamIds.empty(), true, INVALID_ARGUMENT);
 
-    oflstor_ = new (std::nothrow) OfflineStreamOperator(callback);
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    oflstor_ = std::make_shared<OfflineStreamOperator>();
+#else
+    oflstor_ = new (std::nothrow) OfflineStreamOperator();
+#endif
     CHECK_IF_PTR_NULL_RETURN_VALUE(oflstor_, INSUFFICIENT_RESOURCES);
 
     for (auto it : streamIds) {

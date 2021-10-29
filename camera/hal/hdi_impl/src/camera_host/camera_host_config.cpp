@@ -17,7 +17,11 @@
 #include "hcs_deal.h"
 
 namespace {
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    const std::string CONFIG_PATH_NAME = "/etc/camera/camera_host_config.hcb";
+#else
     const std::string CONFIG_PATH_NAME = "/system/etc/hdfconfig/camera_host_config.hcb";
+#endif
 }
 
 namespace OHOS::Camera {

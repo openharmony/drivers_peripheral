@@ -22,7 +22,7 @@
 #include "source_node.h"
 
 namespace OHOS::Camera {
-class ForkNode : public SourceNode {
+class ForkNode : public NodeBase {
 public:
     ForkNode(const std::string& name, const std::string& type);
     ~ForkNode() override;
@@ -30,7 +30,11 @@ public:
     RetCode Stop(const int32_t streamId) override;
     void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
     void ForkBuffers();
-
+    virtual RetCode Capture(const int32_t streamId, const int32_t captureId) override;
+    RetCode CancelCapture(const int32_t streamId) override;
+    RetCode Flush(const int32_t streamId);
+private:
+    RetCode CopyBuffer(uint64_t poolId, std::shared_ptr<IBuffer>& buffer);
 private:
     std::mutex                            mtx_;
     std::condition_variable               cv_;
@@ -39,6 +43,8 @@ private:
     std::vector<std::shared_ptr<IPort>>   inPutPorts_;
     std::vector<std::shared_ptr<IPort>>   outPutPorts_;
     std::atomic_bool                    streamRunning_ = false;
+    std::mutex requestLock_;
+    std::unordered_map<int32_t, std::list<int32_t>> captureRequests_ = {};
 };
 }// namespace OHOS::Camera
 #endif

@@ -17,7 +17,6 @@
 #include <unistd.h>
 #include <vector>
 #include <gtest/gtest.h>
-#include "gmock/gmock.h"
 #include "stream_pipeline_strategy.h"
 #include "stream_pipeline_builder.h"
 #include "stream_pipeline_dispatcher.h"

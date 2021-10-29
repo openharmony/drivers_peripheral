@@ -75,6 +75,8 @@ public:
 
     RetCode SetCallback(BufCallback cb);
 
+    RetCode Flush(const std::string& cameraID);
+
     static RetCode Init(std::vector<std::string>& cameraIDs);
 
     static std::map<std::string, std::string> deviceMatch;
@@ -114,6 +116,9 @@ private:
     std::shared_ptr<HosV4L2Streams> myStreams_ = nullptr;
     std::shared_ptr<HosFileFormat> myFileFormat_ = nullptr;
     std::shared_ptr<HosV4L2Control> myControl_ = nullptr;
+
+    enum v4l2_memory memoryType_ = V4L2_MEMORY_USERPTR;
+    enum v4l2_buf_type bufferType_ = V4L2_BUF_TYPE_PRIVATE;
 };
 } // namespace OHOS::Camera
 #endif // HOS_CAMERA_V4L2_DEV_H
