@@ -913,6 +913,7 @@ int32_t WifiCmdSetAp(const char *ifName, WifiApSetting *apsettings)
         isSerializeFailed || !HdfSbufWriteBuffer(data, apsettings->beaconData.tail, apsettings->beaconData.tailLen);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, apsettings->ssid, apsettings->ssidLen);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, apsettings->meshSsid, apsettings->meshSsidLen);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint8(data, apsettings->band);
     if (isSerializeFailed) {
         HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
