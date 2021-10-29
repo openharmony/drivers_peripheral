@@ -269,6 +269,7 @@ typedef struct {
     uint8_t authType;
     size_t meshSsidLen;
     uint8_t *meshSsid;
+    uint8_t band;
 } WifiApSetting;
 
 typedef struct {
