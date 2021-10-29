@@ -18,7 +18,7 @@
 #include "osal_mem.h"
 #include "osal_time.h"
 #include "securec.h"
-#include "usb_interface.h"
+#include "usb_ddk_interface.h"
 #include "hdf_usb_pnp_manage.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -120,8 +120,7 @@ static int AcmDataBufAlloc(struct AcmDevice *acm)
                 db->buf = NULL;
             }
             return -HDF_ERR_MALLOC_FAIL;
-        }
-        else {
+        } else {
             memset_s(db->buf, acm->dataSize, 'a', acm->dataSize);
             db->instance = acm;
         }
@@ -149,17 +148,15 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
         }
         g_recv_count++;
         g_byteTotal += req->compInfo.actualLength;
-    }
-    else {
+    } else {
         printf("error status=%d\r\n", status);
     }
 
-    if (g_printData == true)
-    {
+    if (g_printData == true) {
         for (unsigned int i = 0; i < req->compInfo.actualLength; i++)
             printf("%c", req->compInfo.buffer[i]);
         fflush(stdout);
-    } else if (g_recv_count % 10000 == 0) {
+    } else if (g_recv_count % TEST_RECV_COUNT == 0) {
         printf("#");
         fflush(stdout);
     }
@@ -200,8 +197,8 @@ static struct UsbInterface *GetUsbInterfaceById(const struct AcmDevice *acm,
     uint8_t interfaceIndex)
 {
     struct UsbInterface *tmpIf = NULL;
-    tmpIf = (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum, \
-            acm->devAddr, interfaceIndex);
+    tmpIf = (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum,
+        acm->devAddr, interfaceIndex);
     return tmpIf;
 }
 
@@ -212,13 +209,10 @@ static struct UsbPipeInfo *EnumePipe(const struct AcmDevice *acm,
     int ret;
     struct UsbInterfaceInfo *info = NULL;
     UsbInterfaceHandle *interfaceHandle = NULL;
-    if (USB_PIPE_TYPE_CONTROL == pipeType)
-    {
+    if (USB_PIPE_TYPE_CONTROL == pipeType) {
         info = &acm->ctrIface->info;
         interfaceHandle = acm->ctrDevHandle;
-    }
-    else
-    {
+    } else {
         info = &acm->iface[interfaceIndex]->info;
         interfaceHandle = InterfaceIdToHandle(acm, info->interfaceIndex);
     }
@@ -278,7 +272,7 @@ void SignalHandler(int signo)
                 g_speedFlag = 1;
                 break;
             }
-            speed = (g_byteTotal * 1.0) / (sigCnt * TEST_PRINT_TIME  * 1024 * 1024);
+            speed = (g_byteTotal * TEST_FLOAT_COUNT) / (sigCnt * TEST_PRINT_TIME * TEST_BYTE_COUNT * TEST_BYTE_COUNT);
             printf("\nSpeed:%f MB/s\n", speed);
             new_value.it_value.tv_sec = TEST_PRINT_TIME;
             new_value.it_value.tv_usec = 0;
@@ -291,65 +285,67 @@ void SignalHandler(int signo)
             break;
         default:
             break;
-   }
+    }
 }
 
-static void ShowHelp(char *name)
+static void ShowHelp(const char *name)
 {
     printf(">> usage:\n");
     printf(">>      %s [<busNum> <devAddr>]  <ifaceNum> <w>/<r> [printdata]> \n", name);
     printf("\n");
 }
 
-int main(int argc, char *argv[])
+struct AcmDevice *CheckParam(int argc, const char *argv[])
 {
     int busNum = 1;
     int devAddr = 2;
     int ifaceNum = 3;
-    struct timeval time;
-    int i = 0;
-    int32_t ret = HDF_SUCCESS;
+    struct AcmDevice *acm = NULL;
 
-    if (argc == 6) {
-        busNum = atoi(argv[1]);
-        devAddr = atoi(argv[2]);
-        ifaceNum = atoi(argv[3]);
-        g_writeOrRead = (strncmp(argv[4], "r", 1))?TEST_WRITE:TEST_READ;
-        if (g_writeOrRead == TEST_READ)
-        {
-            g_printData = (strncmp(argv[5], "printdata", 1))?false:true;
+    if (argc == TEST_SIX_TYPE) {
+        busNum = atoi(argv[TEST_ONE_TYPE]);
+        devAddr = atoi(argv[TEST_TWO_TYPE]);
+        ifaceNum = atoi(argv[TEST_THREE_TYPE]);
+        g_writeOrRead = (strncmp(argv[TEST_FOUR_TYPE], "r", TEST_ONE_TYPE)) ? TEST_WRITE : TEST_READ;
+        if (g_writeOrRead == TEST_READ) {
+            g_printData = (strncmp(argv[TEST_FIVE_TYPE], "printdata", TEST_ONE_TYPE)) ? false : true;
         }
-    } else if (argc == 5) {
-        busNum = atoi(argv[1]);
-        devAddr = atoi(argv[2]);
-        ifaceNum = atoi(argv[3]);
-        g_writeOrRead = (strncmp(argv[4], "r", 1))?TEST_WRITE:TEST_READ;
-    } else if (argc == 3) {
-        ifaceNum = atoi(argv[1]);
-        g_writeOrRead = (strncmp(argv[2], "r", 1))?TEST_WRITE:TEST_READ;
+    } else if (argc == TEST_FIVE_TYPE) {
+        busNum = atoi(argv[TEST_ONE_TYPE]);
+        devAddr = atoi(argv[TEST_TWO_TYPE]);
+        ifaceNum = atoi(argv[TEST_THREE_TYPE]);
+        g_writeOrRead = (strncmp(argv[TEST_FOUR_TYPE], "r", TEST_ONE_TYPE)) ? TEST_WRITE : TEST_READ;
+    } else if (argc == TEST_THREE_TYPE) {
+        ifaceNum = atoi(argv[TEST_ONE_TYPE]);
+        g_writeOrRead = (strncmp(argv[TEST_TWO_TYPE], "r", TEST_ONE_TYPE)) ? TEST_WRITE : TEST_READ;
     } else {
         printf("Error: parameter error!\n\n");
         ShowHelp(argv[0]);
-        ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
 
-    struct AcmDevice *acm = (struct AcmDevice *)OsalMemCalloc(sizeof(*acm));
+    acm = (struct AcmDevice *)OsalMemCalloc(sizeof(*acm));
     if (acm == NULL) {
         HDF_LOGE("%s: Alloc usb serial device failed", __func__);
-        ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
     acm->busNum = busNum;
     acm->devAddr = devAddr;
     acm->interfaceCnt = 1;
     acm->interfaceIndex[0] = ifaceNum;
+END:
+    return acm;
+}
+
+int32_t InitUsbDdk(struct AcmDevice *acm)
+{
+    int32_t ret;
 
     ret = UsbInitHostSdk(NULL);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbInitHostSdk faild", __func__);
         ret = HDF_ERR_IO;
-        goto end;
+        goto END;
     }
 
     for (int i = 0; i < acm->interfaceCnt; i++) {
@@ -362,16 +358,14 @@ int main(int argc, char *argv[])
             if (acm->devHandle[i] == NULL) {
                 HDF_LOGE("%s: UsbOpenInterface null", __func__);
             }
-        }
-        else
-        {
+        } else {
             ret = HDF_FAILURE;
-            goto end;
+            goto END;
         }
     }
     if(g_writeOrRead == TEST_WRITE) {
         acm->dataPipe = GetPipe(acm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_OUT);
-    }else {
+    } else {
         acm->dataPipe = GetPipe(acm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_IN);
     }
     if (acm->dataPipe == NULL) {
@@ -382,6 +376,12 @@ int main(int argc, char *argv[])
     if (AcmDataBufAlloc(acm) < 0) {
         HDF_LOGE("%s:%d AcmDataBufAlloc fail", __func__, __LINE__);
     }
+END:
+    return ret;
+}
+
+int32_t FillRequest(struct AcmDevice *acm)
+{
     for (int i = 0; i < TEST_CYCLE; i++) {
         struct AcmDb *snd = &(acm->db[i]);
         snd->request = UsbAllocRequest(InterfaceIdToHandle(acm, acm->dataPipe->interfaceId), 0, acm->dataSize);
@@ -404,14 +404,46 @@ int main(int argc, char *argv[])
         parmas.dataReq.directon = (acm->dataPipe->pipeDirection >> USB_PIPE_DIR_OFFSET) & 0x1;
         snd->dbNum = acm->transmitting;
         rc = UsbFillRequest(snd->request, InterfaceIdToHandle(acm, acm->dataPipe->interfaceId), &parmas);
-        if (HDF_SUCCESS != rc) {
+        if (rc != HDF_SUCCESS) {
             HDF_LOGE("%s:UsbFillRequest faile,ret=%d \n", __func__, rc);
             return rc;
         }
     }
 
-    signal(SIGINT, SignalHandler);
-    signal(SIGALRM, SignalHandler);
+    return HDF_SUCCESS;
+}
+
+int main(int argc, char *argv[])
+{
+    struct timeval time;
+    int i = 0;
+    int32_t ret;
+    struct AcmDevice *acm = NULL;
+
+    acm = CheckParam(argc, (const char **)argv);
+    if (acm == NULL) {
+        ret = HDF_FAILURE;
+        goto END;
+    }
+
+    ret = InitUsbDdk(acm);
+    if (ret != HDF_SUCCESS) {
+        goto END;
+    }
+
+    ret = FillRequest(acm);
+    if (ret != HDF_SUCCESS) {
+        goto END;
+    }
+
+    if (signal(SIGINT, SignalHandler) == SIG_ERR) {
+        HDF_LOGE("signal SIGINT failed");
+        return HDF_FAILURE;
+    }
+    if (signal(SIGALRM, SignalHandler) == SIG_ERR) {
+        HDF_LOGE("signal SIGINT failed");
+        return HDF_FAILURE;
+    }
     gettimeofday(&time, NULL);
 
     printf("test SDK API [%s]\n", g_writeOrRead?"write":"read");
@@ -421,11 +453,12 @@ int main(int argc, char *argv[])
         g_send_count++;
     }
 
-    while (!g_speedFlag)
-        OsalMSleep(10);
-end:
+    while (!g_speedFlag) {
+        OsalMSleep(TEST_SLEEP_TIME);
+    }
+END:
     if (ret != HDF_SUCCESS) {
-        printf("please check whether usb drv so is existing or not,like acm, ecm, if not, remove it and test again!\n");
+        printf("please check whether usb drv so is existing or not,like acm,ecm,if not, remove it and test again!\n");
     }
     return ret;
 }

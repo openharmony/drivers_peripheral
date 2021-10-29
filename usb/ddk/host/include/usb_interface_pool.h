@@ -18,8 +18,8 @@
 
 #include "usb_session.h"
 #include "usb_ddk_device.h"
+#include "usb_ddk_interface.h"
 #include "usb_ddk_request.h"
-#include "usb_interface.h"
 #include "usb_raw_api_library.h"
 
 #define INTERFACE_POOL_ID_MAX   (128)
