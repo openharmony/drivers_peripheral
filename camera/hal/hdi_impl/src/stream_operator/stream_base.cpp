@@ -46,11 +46,11 @@ StreamBase::~StreamBase()
     }
 
     if (hostStreamMgr_ != nullptr) {
-        hostStreamMgr_->DestroyHostStream({streamId_});
+        hostStreamMgr_->DestroyHostStream( {streamId_} );
     }
 
     if (pipeline_ != nullptr) {
-        pipeline_->DestroyPipeline({streamId_});
+        pipeline_->DestroyPipeline( {streamId_} );
     }
 }
 
@@ -243,13 +243,6 @@ RetCode StreamBase::AddRequest(std::shared_ptr<CaptureRequest>& request)
 
     request->SetFirstRequest(false);
     if (isFirstRequest) {
-        uint32_t n = GetBufferCount();
-        if (!request->IsContinous()) {
-            for (uint32_t i = 0; i < n; i++) {
-                DeliverBuffer();
-            }
-        }
-
         RetCode rc = StartStream();
         if (rc != RC_OK) {
             CAMERA_LOGE("start stream [id:%{public}d] failed", streamId_);
@@ -330,13 +323,10 @@ void StreamBase::HandleRequest()
         return;
     }
 
-    {
-        std::unique_lock<std::mutex> l(tsLock_);
-        if (request->NeedCancel()) {
-            return;
-        }
-        inTransitList_.emplace_back(request);
+    if (request->NeedCancel()) {
+        return;
     }
+
     request->Process(streamId_);
 
     return;
@@ -348,6 +338,21 @@ RetCode StreamBase::Capture(const std::shared_ptr<CaptureRequest>& request)
     CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
 
     RetCode rc = RC_ERROR;
+    if (request->IsFirstOne() && !request->IsContinous()) {
+        uint32_t n = GetBufferCount();
+        for (uint32_t i = 0; i < n; i++) {
+            DeliverBuffer();
+        }
+    } else {
+        do {
+            rc = DeliverBuffer();
+        } while (rc != RC_OK && state_ == STREAM_STATE_BUSY);
+    }
+
+    if (request->NeedCancel()) {
+        CAMERA_LOGE("StreamBase::Capture stream [id:%{public}d] request->NeedCancel", streamId_);
+        return RC_OK;
+    }
 
     rc = pipeline_->Config({streamId_}, request->GetCaptureSetting());
     if (rc != RC_OK) {
@@ -361,6 +366,11 @@ RetCode StreamBase::Capture(const std::shared_ptr<CaptureRequest>& request)
         return RC_ERROR;
     }
 
+    {
+        std::unique_lock<std::mutex> l(tsLock_);
+        inTransitList_.emplace_back(request);
+    }
+
     if (request->IsFirstOne()) {
         if (messenger_ == nullptr) {
             CAMERA_LOGE("stream [id:%{public}d] can't send message, messenger_ is null", streamId_);
@@ -371,11 +381,6 @@ RetCode StreamBase::Capture(const std::shared_ptr<CaptureRequest>& request)
         messenger_->SendMessage(startMessage);
         request->SetFirstRequest(false);
     }
-
-    // DeliverBuffer must be called after Capture, or this capture request will miss a buffer.
-    do {
-        rc = DeliverBuffer();
-    } while (rc != RC_OK && state_ == STREAM_STATE_BUSY);
 
     return RC_OK;
 }

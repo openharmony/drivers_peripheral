@@ -31,7 +31,7 @@ RetCode HosFileFormat::V4L2SearchFormat(int fd, std::vector<DeviceFormat>& fmtDe
 
     for (i = 0; i < fmtMax; ++i) {
         enumFmtDesc.index = i;
-        enumFmtDesc.type  = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        enumFmtDesc.type  = bufType_;
         if (ioctl(fd, VIDIOC_ENUM_FMT, &enumFmtDesc) < 0) {
             break;
         }
@@ -93,6 +93,12 @@ RetCode HosFileFormat::V4L2GetFmtDescs(int fd, std::vector<DeviceFormat>& fmtDes
         return RC_ERROR;
     }
 
+    V4L2SearchBufType(fd);
+    if (bufType_ == V4L2_BUF_TYPE_PRIVATE) {
+        CAMERA_LOGE("V4L2GetFmtDescs bufType_ == 0\n");
+        return RC_ERROR;
+    }
+
     rc = V4L2SearchFormat(fd, fmtDesc);
     if (rc != RC_OK) {
         CAMERA_LOGE("V4L2SearchFormat error\n");
@@ -110,7 +116,11 @@ RetCode HosFileFormat::V4L2GetCapability(int fd, const std::string& devName, std
         return RC_ERROR;
     }
 
-    if (!((cap.capabilities & V4L2_CAP_VIDEO_CAPTURE) && (cap.capabilities & V4L2_CAP_STREAMING))) {
+    if (!(cap.capabilities & V4L2_CAP_STREAMING)) {
+        return RC_ERROR;
+    }
+
+    if (!((cap.capabilities & V4L2_CAP_VIDEO_CAPTURE_MPLANE) || (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE))) {
         return RC_ERROR;
     }
 
@@ -121,10 +131,10 @@ RetCode HosFileFormat::V4L2GetCapability(int fd, const std::string& devName, std
     std::lock_guard<std::mutex> l(HosV4L2Dev::deviceFdLock_);
     HosV4L2Dev::deviceMatch.insert(std::make_pair(std::string((char*)cap.driver), devName));
 
-    CAMERA_LOGD("v4l2 driver name = %s\n", cap.driver);
-    CAMERA_LOGD("v4l2 capabilities = 0x%x\n", cap.capabilities);
-    CAMERA_LOGD("v4l2 card: %s\n", cap.card);
-    CAMERA_LOGD("v4l2 bus info: %s\n", cap.bus_info);
+    CAMERA_LOGD("v4l2 driver name = %{public}s\n", cap.driver);
+    CAMERA_LOGD("v4l2 capabilities = 0x%{public}x\n", cap.capabilities);
+    CAMERA_LOGD("v4l2 card: %{public}s\n", cap.card);
+    CAMERA_LOGD("v4l2 bus info: %{public}s\n", cap.bus_info);
 
     return RC_OK;
 }
@@ -132,18 +142,33 @@ RetCode HosFileFormat::V4L2GetCapability(int fd, const std::string& devName, std
 RetCode HosFileFormat::V4L2GetFmt(int fd, DeviceFormat& format)
 {
     struct v4l2_format fmt = {};
-    fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
+    if (bufType_ == 0) {
+        V4L2SearchBufType(fd);
+        if (bufType_ == V4L2_BUF_TYPE_PRIVATE) {
+            CAMERA_LOGE("V4L2GetFmt bufType_ == 0\n");
+            return RC_ERROR;
+        }
+    }
+
+    fmt.type = bufType_;
     int rc = ioctl(fd, VIDIOC_G_FMT, &fmt);
     if (rc < 0) {
         CAMERA_LOGE("error: ioctl VIDIOC_G_FMT failed: %s\n", strerror(errno));
         return RC_ERROR;
     }
 
-    format.fmtdesc.width = fmt.fmt.pix.width;
-    format.fmtdesc.height = fmt.fmt.pix.height;
-    format.fmtdesc.pixelformat = fmt.fmt.pix.pixelformat;
-    format.fmtdesc.sizeimage = fmt.fmt.pix.sizeimage;
+    if (bufType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
+        format.fmtdesc.width = fmt.fmt.pix_mp.width;
+        format.fmtdesc.height = fmt.fmt.pix_mp.height;
+        format.fmtdesc.pixelformat = fmt.fmt.pix_mp.pixelformat;
+        format.fmtdesc.sizeimage = fmt.fmt.pix.sizeimage;
+    } else if (bufType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
+        format.fmtdesc.width = fmt.fmt.pix.width;
+        format.fmtdesc.height = fmt.fmt.pix.height;
+        format.fmtdesc.pixelformat = fmt.fmt.pix.pixelformat;
+        format.fmtdesc.sizeimage = fmt.fmt.pix.sizeimage;
+    }
 
     return RC_OK;
 }
@@ -152,10 +177,26 @@ RetCode HosFileFormat::V4L2SetFmt(int fd, DeviceFormat& format)
 {
     struct v4l2_format fmt = {};
 
-    fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    fmt.fmt.pix.pixelformat = format.fmtdesc.pixelformat;
-    fmt.fmt.pix.width = format.fmtdesc.width;
-    fmt.fmt.pix.height = format.fmtdesc.height;
+    if (bufType_ == 0) {
+        V4L2SearchBufType(fd);
+        if (bufType_ == V4L2_BUF_TYPE_PRIVATE) {
+            CAMERA_LOGE("V4L2GetFmt bufType_ == 0\n");
+            return RC_ERROR;
+        }
+    }
+    fmt.type = bufType_;
+
+    if (bufType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
+        fmt.fmt.pix_mp.pixelformat = format.fmtdesc.pixelformat;
+        fmt.fmt.pix_mp.width = format.fmtdesc.width;
+        fmt.fmt.pix_mp.height = format.fmtdesc.height;
+        fmt.fmt.pix_mp.field = V4L2_FIELD_INTERLACED;
+        fmt.fmt.pix_mp.num_planes = 1;
+    } else if (bufType_ == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
+        fmt.fmt.pix.pixelformat = format.fmtdesc.pixelformat;
+        fmt.fmt.pix.width = format.fmtdesc.width;
+        fmt.fmt.pix.height = format.fmtdesc.height;
+    }
 
     int rc = ioctl(fd, VIDIOC_S_FMT, &fmt);
     if (rc < 0) {
@@ -170,7 +211,15 @@ RetCode HosFileFormat::V4L2GetCrop(int fd, DeviceFormat& format)
 {
     struct v4l2_crop crop = {};
 
-    crop.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    if (bufType_ == 0) {
+        V4L2SearchBufType(fd);
+        if (bufType_ == V4L2_BUF_TYPE_PRIVATE) {
+            CAMERA_LOGE("V4L2GetFmt bufType_ == 0\n");
+            return RC_ERROR;
+        }
+    }
+    crop.type = bufType_;
+
     int rc = ioctl(fd, VIDIOC_G_CROP, &crop);
     if (rc < 0) {
         CAMERA_LOGE("error: ioctl VIDIOC_G_CROP failed: %s\n", strerror(errno));
@@ -189,7 +238,15 @@ RetCode HosFileFormat::V4L2SetCrop(int fd, DeviceFormat& format)
 {
     struct v4l2_crop crop = {};
 
-    crop.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    if (bufType_ == 0) {
+        V4L2SearchBufType(fd);
+        if (bufType_ == V4L2_BUF_TYPE_PRIVATE) {
+            CAMERA_LOGE("V4L2GetFmt bufType_ == 0\n");
+            return RC_ERROR;
+        }
+    }
+
+    crop.type = bufType_;
     crop.c.left = format.crop.left;
     crop.c.top = format.crop.top;
     crop.c.width = format.crop.width;
@@ -208,7 +265,14 @@ RetCode HosFileFormat::V4L2GetCropCap(int fd, DeviceFormat& format)
 {
     struct v4l2_cropcap cropcap = {};
 
-    cropcap.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    if (bufType_ == 0) {
+        V4L2SearchBufType(fd);
+        if (bufType_ == V4L2_BUF_TYPE_PRIVATE) {
+            CAMERA_LOGE("V4L2GetFmt bufType_ == 0\n");
+            return RC_ERROR;
+        }
+    }
+    cropcap.type = bufType_;
 
     int rc = ioctl(fd, VIDIOC_CROPCAP, &cropcap);
     if (rc < 0) {
@@ -296,5 +360,29 @@ void HosFileFormat::V4L2MatchDevice(std::vector<std::string>& cameraIDs)
             break;
         }
     }
+}
+
+int HosFileFormat::V4L2SearchBufType(int fd)
+{
+    struct v4l2_capability cap = {};
+
+    int rc = ioctl(fd, VIDIOC_QUERYCAP, &cap);
+    if (rc < 0) {
+        CAMERA_LOGE("V4L2SearchBufType VIDIOC_QUERYCAP error\n");
+        return static_cast<int>(V4L2_BUF_TYPE_PRIVATE);
+    }
+
+    if (!(cap.capabilities & V4L2_CAP_STREAMING)) {
+        CAMERA_LOGE("V4L2SearchBufType capabilities is not support V4L2_CAP_STREAMING\n");
+        return static_cast<int>(V4L2_BUF_TYPE_PRIVATE);
+    }
+
+    if (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE_MPLANE) {
+        bufType_ = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
+    } else if (cap.capabilities & V4L2_CAP_VIDEO_CAPTURE) {
+        bufType_ = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    }
+
+    return static_cast<int>(bufType_);
 }
 } // namespace OHOS::Camera

@@ -82,6 +82,10 @@ enum CameraBufferUsage : uint64_t {
     CAMERA_USAGE_SW_READ_OFTEN = (1 << 0),
     CAMERA_USAGE_SW_WRITE_OFTEN = (1 << 1),
     CAMERA_USAGE_MEM_DMA = (1 << 2),
+    CAMERA_USAGE_MEM_SHARE = (1 << 3),
+    CAMERA_USAGE_MEM_MMZ = (1 << 4),
+    CAMERA_USAGE_MEM_MMZ_CACHE = (1 << 5),
+    CAMERA_USAGE_MEM_FB = (1 << 6),
 };
 
 enum CameraBufferFormat : uint32_t {

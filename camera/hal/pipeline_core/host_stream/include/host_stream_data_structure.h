@@ -20,7 +20,7 @@
 namespace OHOS::Camera {
 struct HostStreamInfo {
     StreamIntent type_;
-    int streamId_;
+    uint32_t streamId_;
     int32_t width_;
     int32_t height_;
     int32_t format_;

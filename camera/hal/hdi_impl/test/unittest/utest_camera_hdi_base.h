@@ -28,9 +28,7 @@
 #include "camera.h"
 #include "camera_metadata_info.h"
 #include "ibuffer.h"
-#include "if_system_ability_manager.h"
 #include "ioffline_stream_operator.h"
-#include "iservice_registry.h"
 #include <surface.h>
 #include <display_type.h>
 #include <fcntl.h>
@@ -40,12 +38,21 @@
 #include <unistd.h>
 
 #include "icamera_host.h"
-#include "camera_host_proxy.h"
 #include "camera_host_callback.h"
 #include "camera_device_callback.h"
 #include "icamera_device.h"
 #include "stream_operator_callback.h"
 #include "istream_operator_callback.h"
+
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+#include "camera_device.h"
+#include "camera_host.h"
+#include "stream_operator.h"
+#else
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+#include "camera_host_proxy.h"
+#endif
 
 using namespace OHOS;
 using namespace testing::ext;
@@ -68,9 +75,15 @@ protected:
     uint64_t GetCurrentLocalTimeStamp();
 
 protected:
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    std::shared_ptr<CameraHost> cameraHost_ = nullptr;
+    std::shared_ptr<ICameraDevice> cameraDevice_ = nullptr;
+    std::shared_ptr<IStreamOperator> streamOperator_ = nullptr;
+#else
     sptr<ICameraHost> cameraHost_ = nullptr;
     sptr<ICameraDevice> cameraDevice_ = nullptr;
     sptr<IStreamOperator> streamOperator_ = nullptr;
+#endif
 
     std::vector<std::string> cameraIds_;
 };

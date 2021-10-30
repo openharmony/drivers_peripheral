@@ -28,16 +28,16 @@
 #include <list>
 #include <map>
 #include <vector>
-#include <iservmgr_hdi.h>
 #include <hdf_log.h>
 #include "icamera_device_callback.h"
 #include "types.h"
+#include "icamera_interface.h"
 
 namespace OHOS::Camera {
 class ICameraDevice;
 class ICameraHostCallback;
 class ICameraDeviceCallback;
-class ICameraHost : public IRemoteBroker {
+class ICameraHost : public ICameraInterface {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"HDI.Camera.V1_0.Host");
     virtual ~ICameraHost() {}

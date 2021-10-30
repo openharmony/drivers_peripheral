@@ -39,6 +39,8 @@ public:
 protected:
     void GenerateNodeSeq(std::vector<std::shared_ptr<INode>>& nodeVec,
                 const std::shared_ptr<INode>& node);
+
+    void CutUselessBranch(int32_t streamId, std::vector<std::shared_ptr<INode>>& branch);
 protected:
     std::unordered_map<int, std::vector<std::shared_ptr<INode>>> seqNode_;
 };

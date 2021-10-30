@@ -26,13 +26,16 @@
 namespace OHOS::Camera {
 class HosV4L2Streams {
 public:
-    HosV4L2Streams();
+    HosV4L2Streams(enum v4l2_buf_type bufferType);
     ~HosV4L2Streams();
 
     RetCode V4L2StreamOn(int fd);
     RetCode V4L2StreamOff(int fd);
     RetCode V4L2StreamFPSGet(int fd, DeviceFormat& format);
     RetCode V4L2StreamFPSSet(int fd, DeviceFormat& format);
+
+private:
+    enum v4l2_buf_type bufferType_ = V4L2_BUF_TYPE_PRIVATE;
 };
 } // namespace OHOS::Camera
 #endif // HOS_CAMERA_V4L2_STREAM_H

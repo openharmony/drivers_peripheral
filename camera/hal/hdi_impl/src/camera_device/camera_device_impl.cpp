@@ -51,8 +51,12 @@ CamRetCode CameraDeviceImpl::GetStreamOperator(
 
     spCameraDeciceCallback_ = callback;
     if (spStreamOperator_ == nullptr) {
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+        spStreamOperator_ = std::make_shared<StreamOperator>(spCameraDeciceCallback_, shared_from_this());
+#else
         spStreamOperator_ = new(std::nothrow) StreamOperator(spCameraDeciceCallback_, shared_from_this());
-        if (spStreamOperator_ == nullptr) {
+#endif
+		if (spStreamOperator_ == nullptr) {
             CAMERA_LOGW("create stream operator failed.");
             return DEVICE_ERROR;
         }
@@ -90,6 +94,9 @@ CamRetCode CameraDeviceImpl::SetResultMode(const ResultCallbackMode &mode)
     if (mode < PER_FRAME || mode > ON_CHANGED) {
         CAMERA_LOGE("parameter out of range.");
         return INVALID_ARGUMENT;
+    } else if (mode == PER_FRAME) {
+        std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();
+        deviceManager->SetSendflag(true);
     }
 
     metaResultMode_ = mode;
@@ -113,11 +120,11 @@ CamRetCode CameraDeviceImpl::GetEnabledResults(std::vector<MetaType> &results)
         }
     }
 
-    results = deviceMetaTypes_;
     std::unique_lock<std::mutex> l(enabledRstMutex_);
     if (enabledResults_.empty()) {
         enabledResults_ = deviceMetaTypes_;
     }
+    results = enabledResults_;
     DFX_LOCAL_HITRACE_END;
     return NO_ERROR;
 }
@@ -409,7 +416,7 @@ void CameraDeviceImpl::OnMetadataChanged(const std::shared_ptr<CameraStandard::C
         std::unique_lock<std::mutex> lock(metaRstMutex_);
         metadataResults_ = metadata;
     }
-    if (metaResultMode_ == ON_CHANGED) {
+    if (metaResultMode_ == ON_CHANGED || metaResultMode_ == PER_FRAME) {
         ResultMetadata();
     }
 }

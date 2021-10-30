@@ -17,9 +17,8 @@
 #include "watchdog.h"
 
 namespace OHOS::Camera {
-OfflineStreamOperator::OfflineStreamOperator(OHOS::sptr<IStreamOperatorCallback>& callback)
+OfflineStreamOperator::OfflineStreamOperator()
 {
-    callback_ = callback;
     CAMERA_LOGV("ctor, instance = %{public}p", this);
 }
 

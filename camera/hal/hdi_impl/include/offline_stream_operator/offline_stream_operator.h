@@ -25,7 +25,7 @@
 namespace OHOS::Camera {
 class OfflineStreamOperator : public OfflineStreamOperatorStub {
 public:
-    OfflineStreamOperator(OHOS::sptr<IStreamOperatorCallback>& callback);
+    OfflineStreamOperator();
     virtual ~OfflineStreamOperator();
     virtual CamRetCode CancelCapture(int captureId) override;
     virtual CamRetCode ReleaseStreams(const std::vector<int>& streamIds) override;
@@ -39,7 +39,6 @@ private:
 
 private:
     std::mutex lock_;
-    OHOS::wptr<IStreamOperatorCallback> callback_ = nullptr;
     std::map<int, std::shared_ptr<OfflineStream>> offlineStreamMap_ = {};
 };
 } // namespace OHOS::Camera

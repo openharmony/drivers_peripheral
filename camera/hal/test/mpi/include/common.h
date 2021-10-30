@@ -120,6 +120,7 @@ public:
 
     class StreamConsumer {
     public:
+        void SetFlag();
         OHOS::sptr<OHOS::IBufferProducer> CreateProducer(std::function<void(void*, uint32_t)> callback);
         void TakeSnapshot()
         {

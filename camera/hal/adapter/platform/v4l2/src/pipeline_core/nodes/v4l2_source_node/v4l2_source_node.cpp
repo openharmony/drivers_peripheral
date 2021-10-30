@@ -54,7 +54,7 @@ RetCode V4L2SourceNode::Start(const int32_t streamId)
     std::vector<std::shared_ptr<IPort>> outPorts = GetOutPorts();
     for (auto& it : outPorts) {
         DeviceFormat format;
-        format.fmtdesc.pixelformat = V4L2_PIX_FMT_YUYV;
+        format.fmtdesc.pixelformat = V4L2_PIX_FMT_YUV420;
         format.fmtdesc.width = it->format_.w_;
         format.fmtdesc.height = it->format_.h_;
         int bufCnt = it->format_.bufferCount_;
@@ -75,12 +75,19 @@ V4L2SourceNode::~V4L2SourceNode()
 
 RetCode V4L2SourceNode::Flush(const int32_t streamId)
 {
-    return RC_OK;
+    RetCode rc = RC_OK;
+    rc = SourceNode::Flush(streamId);
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
+
+    rc = sensorController_->Flush(streamId);
+    return rc;
 }
 
 RetCode V4L2SourceNode::Stop(const int32_t streamId)
 {
-    return SourceNode::Stop(streamId);
+    SourceNode::Stop(streamId);
+
+    return sensorController_->Stop();
 }
 
 void V4L2SourceNode::SetBufferCallback()

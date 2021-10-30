@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "3516_demo.h"
+#include "hos_camera_demo.h"
 #include <cstdio>
 #include <getopt.h>
 
@@ -60,7 +60,7 @@ static int PutMenuAndGetChr(void)
     return c;
 }
 
-static RetCode PreviewOn(int mode, const std::shared_ptr<Hos3516Demo>& mainDemo)
+static RetCode PreviewOn(int mode, const std::shared_ptr<HosCameraDemo>& mainDemo)
 {
     RetCode rc = RC_OK;
     CAMERA_LOGD("main test: PreviewOn enter");
@@ -95,7 +95,7 @@ static RetCode PreviewOn(int mode, const std::shared_ptr<Hos3516Demo>& mainDemo)
     return RC_OK;
 }
 
-static void PreviewOff(const std::shared_ptr<Hos3516Demo>& mainDemo)
+static void PreviewOff(const std::shared_ptr<HosCameraDemo>& mainDemo)
 {
     CAMERA_LOGD("main test: PreviewOff enter");
 
@@ -105,7 +105,7 @@ static void PreviewOff(const std::shared_ptr<Hos3516Demo>& mainDemo)
     CAMERA_LOGD("main test: PreviewOff exit");
 }
 
-static void FlashLightTest(const std::shared_ptr<Hos3516Demo>& mainDemo)
+static void FlashLightTest(const std::shared_ptr<HosCameraDemo>& mainDemo)
 {
     constexpr size_t delayTime = 5;
 
@@ -119,7 +119,7 @@ static void FlashLightTest(const std::shared_ptr<Hos3516Demo>& mainDemo)
     PreviewOn(0, mainDemo);
 }
 
-static void OfflineTest(const std::shared_ptr<Hos3516Demo>& mainDemo)
+static void OfflineTest(const std::shared_ptr<HosCameraDemo>& mainDemo)
 {
     RetCode rc = RC_OK;
 
@@ -142,7 +142,7 @@ static void OfflineTest(const std::shared_ptr<Hos3516Demo>& mainDemo)
     }
 }
 
-static void CaptureTest(const std::shared_ptr<Hos3516Demo>& mainDemo)
+static void CaptureTest(const std::shared_ptr<HosCameraDemo>& mainDemo)
 {
     RetCode rc = RC_OK;
     constexpr size_t delayTime = 5;
@@ -161,7 +161,7 @@ static void CaptureTest(const std::shared_ptr<Hos3516Demo>& mainDemo)
     }
 }
 
-static void VideoTest(const std::shared_ptr<Hos3516Demo>& mainDemo)
+static void VideoTest(const std::shared_ptr<HosCameraDemo>& mainDemo)
 {
     RetCode rc = RC_OK;
     constexpr size_t delayTime = 5;
@@ -181,7 +181,7 @@ static void VideoTest(const std::shared_ptr<Hos3516Demo>& mainDemo)
     }
 }
 
-static void ManuList(const std::shared_ptr<Hos3516Demo>& mainDemo,
+static void ManuList(const std::shared_ptr<HosCameraDemo>& mainDemo,
     const int argc, char** argv)
 {
     int idx, c;
@@ -247,7 +247,7 @@ int main(int argc, char** argv)
 {
     RetCode rc = RC_OK;
 
-    auto mainDemo = std::make_shared<Hos3516Demo>();
+    auto mainDemo = std::make_shared<HosCameraDemo>();
     rc = mainDemo->InitSensors();
     if (rc == RC_ERROR) {
         CAMERA_LOGE("main test: mainDemo->InitSensors() error\n");
