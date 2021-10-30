@@ -48,9 +48,14 @@ public:
 
 void HdiInputTest::SetUpTestCase()
 {
+    int32_t ret;
     DevDesc sta[MAX_DEVICES];
-    memset(sta, 0, MAX_DEVICES * sizeof(DevDesc));
-    int32_t ret = GetInputInterface(&g_inputInterface);
+    ret = memset_s(sta, MAX_DEVICES * sizeof(DevDesc), 0, MAX_DEVICES * sizeof(DevDesc));
+    if (ret != 0) {
+        HDF_LOGE("memset failed");
+        return;
+    }
+    ret = GetInputInterface(&g_inputInterface);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get input hdi failed, ret %d", __func__, ret);
     }
