@@ -27,12 +27,12 @@
 #define CAMERA_DEVICE_DRIVER_TYPES_H
 
 #include <functional>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
 #include <surface.h>
 #include "camera_metadata_info.h"
+#include "type_common.h"
 
 namespace OHOS::Camera {
 using CameraAbility = CameraStandard::CameraMetadata;
@@ -41,7 +41,7 @@ using CameraSetting = CameraStandard::CameraMetadata;
 /**
  * @brief Enumerates return values of the HDIs.
  */
-using CamRetCode = enum _CamRetCode : int32_t {
+enum CamRetCode : int32_t {
     /**
      * Successful call.
      */
@@ -81,7 +81,7 @@ using CamRetCode = enum _CamRetCode : int32_t {
 /**
  * @brief Enumerates metadata reporting modes.
  */
-using ResultCallbackMode = enum _ResultCallbackMode : int32_t {
+enum ResultCallbackMode : int32_t {
     /**
      * Frame-by-frame reporting
      */
@@ -96,7 +96,7 @@ using ResultCallbackMode = enum _ResultCallbackMode : int32_t {
 /**
  * @brief Enumerates stream operation modes.
  */
-using OperationMode = enum _OperationMode : int32_t {
+enum OperationMode : int32_t {
     /**
      * Normal
      */
@@ -106,7 +106,7 @@ using OperationMode = enum _OperationMode : int32_t {
 /**
  * @brief Enumerates stream types.
  */
-using StreamIntent = enum _StreamIntent : int32_t {
+enum StreamIntent : int32_t {
     /**
      * Preview streams, indicating that stream data is used for preview
      */
@@ -141,7 +141,7 @@ using StreamIntent = enum _StreamIntent : int32_t {
 /**
  * @brief Enumerates encoding types of stream data.
  */
-using EncodeType = enum _EncodeType : int32_t {
+enum EncodeType : int32_t {
     /**
      * Unspecified
      */
@@ -166,7 +166,7 @@ using EncodeType = enum _EncodeType : int32_t {
 /**
  * @brief Defines the stream information, which is used to pass configuration parameters during stream creation.
  */
-using StreamInfo = struct _StreamInfo {
+struct StreamInfo {
     /**
      * Stream ID, which uniquely identifies a stream on a camera device.
      */
@@ -228,7 +228,7 @@ using StreamInfo = struct _StreamInfo {
  * @brief Enumerates the support types of the stream. For details about the application scenario,
  * see {@link IsStreamsSupported}.
  */
-using StreamSupportType = enum _StreamSupportType : int32_t {
+enum StreamSupportType : int32_t {
     /**
      * The stream can be dynamically created, and the corresponding stream parameters take effect directly.
      */
@@ -249,7 +249,7 @@ using StreamSupportType = enum _StreamSupportType : int32_t {
 /**
  * @brief Defines the stream attributes.
  */
-using StreamAttribute = struct _StreamAttribute {
+struct StreamAttribute {
     /**
      * Stream ID, which uniquely identifies a stream on a camera device.
      */
@@ -299,7 +299,7 @@ using StreamAttribute = struct _StreamAttribute {
 /**
  * @brief Defines the information about a capture request.
  */
-using CaptureInfo = struct _CaptureInfo {
+struct CaptureInfo {
     /**
      * IDs of captured streams.
     */
@@ -319,7 +319,7 @@ using CaptureInfo = struct _CaptureInfo {
 /**
  * @brief Enumerates camera device statuses.
  */
-using CameraStatus = enum _CameraStatus {
+enum CameraStatus {
     /**
      * The camera device is not in position or is unavailable.
      */
@@ -334,7 +334,7 @@ using CameraStatus = enum _CameraStatus {
 /**
  * @brief Enumerates flash statuses.
  */
-using FlashlightStatus = enum _FlashlightStatus : uint32_t {
+enum FlashlightStatus : uint32_t {
     /**
      * The flash is off.
      */
@@ -354,7 +354,7 @@ using FlashlightStatus = enum _FlashlightStatus : uint32_t {
 /**
  * @brief Enumerates camera device error types, which are used by {@link OnError}.
  */
-using ErrorType = enum _ErrorTyp : uint32_t {
+enum ErrorType : uint32_t {
     /**
      * A critical error occurs. The camera device needs to be closed.
      */
@@ -369,7 +369,7 @@ using ErrorType = enum _ErrorTyp : uint32_t {
 /**
  * @brief Defines the information about the end of packet capture, which is used by {@link OnCaptureEnded}.
  */
-using CaptureEndedInfo = struct _CaptureEndedInfo {
+struct CaptureEndedInfo {
     /**
      * ID of a captured stream.
      */
@@ -384,7 +384,7 @@ using CaptureEndedInfo = struct _CaptureEndedInfo {
 /**
  * @brief Enumerates stream error types, which are used by {@link CaptureErrorInfo}.
  */
-using StreamError = enum _StreamError {
+enum StreamError {
     /**
      * Unknown error
      */
@@ -399,7 +399,7 @@ using StreamError = enum _StreamError {
 /**
  * @brief Defines the stream error information, which is used by {@link OnCaptureError}.
  */
-using CaptureErrorInfo = struct _CaptureErrorInfo {
+struct CaptureErrorInfo {
     /**
      * Stream ID
      */
@@ -412,7 +412,5 @@ using CaptureErrorInfo = struct _CaptureErrorInfo {
 };
 
 using MetaType = int32_t;
-
-class IBuffer;
 }
 #endif /* CAMERA_DEVICE_DRIVER_TYPES_H */

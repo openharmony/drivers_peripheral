@@ -43,6 +43,8 @@ HarmonyOS 相机驱动框架模型对上实现相机HDI接口，对下实现相�
     │   ├── hdi_cif                 # C实现的HDI接口适配代码
     │   └── include                 # C形式的HDI接口
     └── interfaces                  # camera hal对上层服务提供的驱动能力接口
+        ├── hdi_ipc                 # IPC模式的HDI实现
+        ├── hdi_passthrough         # 直通模式的HDI实现
         └── include                 # camera hal对外提供的HDI定义
 
 
@@ -69,9 +71,9 @@ HarmonyOS 相机驱动框架模型对上实现相机HDI接口，对下实现相�
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span>OperationMode mode,<br>
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::shared_ptr&lt;CameraMetadata&gt; &amp;modeSetting,<br>
+  </span>const std::shared_ptr&lt;CameraStandard::CameraMetadata&gt;&amp; modeSetting,<br>
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::shared_ptr&lt;StreamInfo&gt; &amp;info,<br>
+  </span>const std::vector&lt;std::shared_ptr&ltStreamInfo&gt;&gt &amp;info,<br>
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span>StreamSupportType &amp;type)</td>
   <td>查询是否支持添加参数对应的流</td>
@@ -230,9 +232,9 @@ HarmonyOS 相机驱动框架模型对上实现相机HDI接口，对下实现相�
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span>OperationMode mode,<br>
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::shared_ptr&lt;CameraMetadata&gt; &amp;modeSetting,<br>
+  </span>const std::shared_ptr&lt;CameraStandard::CameraMetadata&gt; &amp;modeSetting,<br>
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::shared_ptr&lt;StreamInfo&gt; &amp;info,<br>
+  </span>const std::vector&ltstd::shared_ptr&ltStreamInfo&gt&gt; &amp;info,<br>
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span>StreamSupportType &amp;type)</td>
   <td>查询是否支持添加参数对应的流</td>
@@ -346,7 +348,6 @@ HarmonyOS 相机驱动框架模型对上实现相机HDI接口，对下实现相�
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span>const std::vector&lt;int32_t&gt; &amp;streamIds, uint64_t timestamp)</td>
   <td>帧捕获回调</td>
-
 </table>
 
 ## 使用方法

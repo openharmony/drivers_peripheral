@@ -120,10 +120,14 @@ void SourceNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 
 void SourceNode::OnPackBuffer(std::shared_ptr<FrameSpec> frameSpec)
 {
+    CAMERA_LOGI("SourceNode::OnPackBuffer enter");
+
     CHECK_IF_PTR_NULL_RETURN_VOID(frameSpec);
     auto buffer = frameSpec->buffer_;
     CHECK_IF_PTR_NULL_RETURN_VOID(buffer);
     handler_[buffer->GetStreamId()]->OnBuffer(buffer);
+
+    CAMERA_LOGI("SourceNode::OnPackBuffer exit");
     return;
 }
 
@@ -170,6 +174,7 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
     pool = BufferManager::GetInstance()->GetBufferPool(format.bufferPoolId_);
     CHECK_IF_PTR_NULL_RETURN_VALUE(pool, RC_ERROR);
     pool->NotifyStart();
+    CAMERA_LOGI("SourceNode::PortHandler::StartCollectBuffers");
 
     cltRun = true;
     collector = std::make_unique<std::thread>([this, &streamId] {
@@ -185,6 +190,7 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
 
 RetCode SourceNode::PortHandler::StopCollectBuffers()
 {
+    CAMERA_LOGI("SourceNode::PortHandler::StopCollectBuffers enter");
     cltRun = false;
     pool->NotifyStop();
     if (collector != nullptr) {
@@ -200,11 +206,13 @@ RetCode SourceNode::PortHandler::StopCollectBuffers()
             node->DeliverBuffer(buffer);
         }
     }
+    CAMERA_LOGI("SourceNode::PortHandler::StopCollectBuffers exit");
     return RC_OK;
 }
 
 void SourceNode::PortHandler::CollectBuffers()
 {
+    CAMERA_LOGV("SourceNode::PortHandler::CollectBuffers");
     CHECK_IF_PTR_NULL_RETURN_VOID(pool);
     std::shared_ptr<IBuffer> buffer = pool->AcquireBuffer(-1);
     CHECK_IF_PTR_NULL_RETURN_VOID(buffer);
@@ -243,20 +251,23 @@ RetCode SourceNode::PortHandler::StartDistributeBuffers()
 
 RetCode SourceNode::PortHandler::StopDistributeBuffers()
 {
+    CAMERA_LOGV("SourceNode::PortHandler::StopDistributeBuffers enter");
     FlushBuffers();
     dbtRun = false;
     rbcv.notify_one();
     if (distributor != nullptr) {
         distributor->join();
     }
-
+    CAMERA_LOGV("SourceNode::PortHandler::StopDistributeBuffers exit");
     return RC_OK;
 }
 
 void SourceNode::PortHandler::DistributeBuffers()
 {
-    std::unique_lock<std::mutex> l(rblock);
-    rbcv.wait(l, [this] { return dbtRun == false || !respondBufferList.empty(); });
+    {
+        std::unique_lock<std::mutex> l(rblock);
+        rbcv.wait(l, [this] { return dbtRun == false || !respondBufferList.empty(); });
+    }
 
     if (!dbtRun) {
         return;
@@ -266,6 +277,8 @@ void SourceNode::PortHandler::DistributeBuffers()
     CHECK_IF_PTR_NULL_RETURN_VOID(node);
     auto buffer = respondBufferList.front();
     node->DeliverBuffer(buffer);
+
+    std::unique_lock<std::mutex> l(rblock);
     respondBufferList.pop_front();
 
     return;
@@ -273,16 +286,22 @@ void SourceNode::PortHandler::DistributeBuffers()
 
 void SourceNode::PortHandler::OnBuffer(std::shared_ptr<IBuffer>& buffer)
 {
-    std::unique_lock<std::mutex> l(rblock);
-    respondBufferList.emplace_back(buffer);
+    CAMERA_LOGV("SourceNode::PortHandler::OnBuffer enter");
+    {
+        std::unique_lock<std::mutex> l(rblock);
+        respondBufferList.emplace_back(buffer);
+    }
     rbcv.notify_one();
+    CAMERA_LOGV("SourceNode::PortHandler::OnBuffer exit");
 
     return;
 }
 
 void SourceNode::PortHandler::FlushBuffers()
 {
+    CAMERA_LOGV("SourceNode::PortHandler::FlushBuffers enter");
     if (respondBufferList.empty()) {
+        CAMERA_LOGV("SourceNode::PortHandler::FlushBuffers respondBufferList is empty");
         return;
     }
 
@@ -294,6 +313,7 @@ void SourceNode::PortHandler::FlushBuffers()
         node->DeliverBuffer(buffer);
         respondBufferList.pop_front();
     }
+    CAMERA_LOGV("SourceNode::PortHandler::FlushBuffers exit");
 
     return;
 }

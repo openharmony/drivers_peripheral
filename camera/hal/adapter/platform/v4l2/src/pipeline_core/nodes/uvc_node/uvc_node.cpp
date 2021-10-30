@@ -45,7 +45,12 @@ RetCode UvcNode::Init(const int32_t streamId)
 
 RetCode UvcNode::Flush(const int32_t streamId)
 {
-    return RC_OK;
+    RetCode rc = RC_OK;
+    rc = SourceNode::Flush(streamId);
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
+
+    rc = sensorController_->Flush(streamId);
+    return rc;
 }
 
 RetCode UvcNode::StartCheck(int64_t &bufferPoolId)

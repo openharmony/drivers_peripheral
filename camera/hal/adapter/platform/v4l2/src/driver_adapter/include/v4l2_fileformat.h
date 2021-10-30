@@ -44,10 +44,12 @@ public:
     int V4L2OpenDevice(const std::string& deviceName);
     void V4L2CloseDevice(int fd);
     void V4L2MatchDevice(std::vector<std::string>& cameraIDs);
+    int V4L2SearchBufType(int fd);
 
 private:
     RetCode V4L2GetCapability(int fd, const std::string& dev_name, std::string& cameraId);
     RetCode V4L2SearchFormat(int fd, std::vector<DeviceFormat>& fmtDesc);
+    enum v4l2_buf_type bufType_ = V4L2_BUF_TYPE_PRIVATE;
 };
 } // namespace OHOS::Camera
 #endif // HOS_CAMERA_V4L2_FILEFORMAT_H

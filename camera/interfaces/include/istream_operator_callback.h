@@ -29,12 +29,11 @@
 #include <map>
 #include <vector>
 #include <hdf_log.h>
-#include <iremote_broker.h>
 #include "types.h"
-#include "cmd_common.h"
+#include "icamera_interface.h"
 
 namespace OHOS::Camera {
-class IStreamOperatorCallback : public IRemoteBroker {
+class IStreamOperatorCallback : public ICameraInterface {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"HDI.Camera.V1_0.StreamOperatorCallback");
     virtual ~IStreamOperatorCallback() {}
@@ -79,7 +78,8 @@ public:
      * @brief Called when a frame is captured.
      *
      * This callback is enabled by using <b>enableShutterCallback_</b> in the {@link CaptureInfo} parameter of {@link Capture}.
-     * When <b>enableShutterCallback_</b> is set to <b>true</b>, this callback is triggered each time a frame is captured.
+     * When <b>enableShutterCallback_</b> is set to <b>true</b>,
+     * this callback is triggered each time a frame is captured.
      *
      * @param captureId Indicates the ID of the capture request corresponding to the callback.
      * @param streamIds Indicates the IDs of the streams corresponding to the callback.

@@ -56,6 +56,10 @@ RetCode StreamPipelineDispatcher::Update(const std::shared_ptr<Pipeline>& p)
         }
     }
 
+    for (auto& [id, pipe] : seqNode) {
+        CutUselessBranch(id, pipe);
+    }
+
     std::swap(seqNode_, seqNode);
     CAMERA_LOGI("------------------------Node Seq(UpStream) Dump Begin-------------\n");
     for (auto [ss, vv] : seqNode_) {
@@ -66,6 +70,27 @@ RetCode StreamPipelineDispatcher::Update(const std::shared_ptr<Pipeline>& p)
     }
     CAMERA_LOGI("------------------------Node Seq(UpStream) Dump End-------------\n");
     return RC_OK;
+}
+
+void StreamPipelineDispatcher::CutUselessBranch(int32_t streamId, std::vector<std::shared_ptr<INode>>& branch)
+{
+    auto it = std::find_if(branch.begin(), branch.end(), [streamId](const std::shared_ptr<INode> node) {
+        auto ports = node->GetOutPorts();
+        bool isSameBranch = true;
+        for (auto port : ports) {
+            if (port->GetStreamId() == streamId) {
+                return false;
+            }
+            isSameBranch = false;
+        }
+        return !isSameBranch;
+    });
+    if (it == branch.end()) {
+        return;
+    }
+    branch.erase(it, branch.end());
+
+    return;
 }
 
 RetCode StreamPipelineDispatcher::Prepare(const int32_t streamId)

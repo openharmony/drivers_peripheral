@@ -28,16 +28,15 @@
 #include <list>
 #include <map>
 #include <vector>
-#include <iservmgr_hdi.h>
 #include <hdf_log.h>
 #include "types.h"
 #include "icamera_device_callback.h"
 #include "istream_operator.h"
 #include "istream_operator_callback.h"
-#include "cmd_common.h"
+#include "icamera_interface.h"
 
 namespace OHOS::Camera {
-class ICameraDevice : public IRemoteBroker {
+class ICameraDevice : public ICameraInterface {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"HDI.Camera.V1_0.Device");
     virtual ~ICameraDevice() {}

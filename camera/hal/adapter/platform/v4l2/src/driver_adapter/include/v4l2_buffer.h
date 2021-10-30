@@ -39,11 +39,13 @@ public:
     RetCode V4L2ReleaseBuffers(int fd);
 
     RetCode V4L2QueueBuffer(int fd, const std::shared_ptr<FrameSpec>& frameSpec);
-    RetCode V4L2DqueueBuffer(int fd);
+    RetCode V4L2DequeueBuffer(int fd);
 
     RetCode V4L2AllocBuffer(int fd, const std::shared_ptr<FrameSpec>& frameSpec);
 
     void SetCallback(BufCallback cb);
+
+    RetCode Flush(int fd);
 
 private:
     BufCallback dequeueBuffer_;

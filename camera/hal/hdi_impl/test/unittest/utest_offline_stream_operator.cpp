@@ -120,9 +120,15 @@ HWTEST_F(OffileStreamOperatorImplTest, UTestPreviewAndSnapshotCombineCapture, Te
     streamInfo->intent_ = PREVIEW;
     streamInfo->tunneledMode_ = 5;
     std::shared_ptr<StreamConsumer> previewConsumer = std::make_shared<StreamConsumer>();
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    streamInfo->bufferQueue_ =
+        previewConsumer->CreateProducer([](OHOS::SurfaceBuffer* buffer) {
+            std::cout << "received a preview buffer ..." << std::endl; });
+#else
     streamInfo->bufferQueue_ =
         previewConsumer->CreateProducer([](void* addr, uint32_t size) {
             std::cout << "received a preview buffer ..." << std::endl; });
+#endif
     streamInfo->bufferQueue_->SetQueueSize(8);
     streamInfos.push_back(streamInfo);
 
@@ -135,9 +141,15 @@ HWTEST_F(OffileStreamOperatorImplTest, UTestPreviewAndSnapshotCombineCapture, Te
     streamInfoSnapshot->intent_ = STILL_CAPTURE;
     streamInfoSnapshot->tunneledMode_ = 5;
     std::shared_ptr<StreamConsumer> snapshotConsumer = std::make_shared<StreamConsumer>();;
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    streamInfoSnapshot->bufferQueue_ = snapshotConsumer->CreateProducer([](OHOS::SurfaceBuffer* buffer) {
+        std::cout << "received a snapshot buffer ..." << std::endl;
+    });
+#else
     streamInfoSnapshot->bufferQueue_ = snapshotConsumer->CreateProducer([](void* addr, uint32_t size) {
         std::cout << "received a snapshot buffer ..." << std::endl;
     });
+#endif
     streamInfoSnapshot->bufferQueue_->SetQueueSize(8);
     streamInfos.push_back(streamInfoSnapshot);
 
@@ -168,9 +180,13 @@ HWTEST_F(OffileStreamOperatorImplTest, UTestPreviewAndSnapshotCombineCapture, Te
     rc = streamOperator_->Capture(captureId, captureInfo, true);
     EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);
     sleep(5);
-
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    std::shared_ptr<IStreamOperatorCallback> streamOperatorCallback = std::make_shared<StreamOperatorCallback>();
+    std::shared_ptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
+#else
     OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = new StreamOperatorCallback();
     OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
+#endif
     rc = streamOperator_->ChangeToOfflineStream({streamInfoSnapshot->streamId_}, streamOperatorCallback,
                                                offlineStreamOperator);
     EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);

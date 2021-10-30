@@ -39,7 +39,50 @@ public:
         {
         }
     };
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    class StreamConsumer {
+    public:
+        std::shared_ptr<OHOS::Surface> CreateProducer(std::function<void(OHOS::SurfaceBuffer*)> callback)
+        {
+            consumer_ = std::shared_ptr<OHOS::Surface>(OHOS::Surface::CreateSurface());
+            if (consumer_ == nullptr) {
+                return nullptr;
+            }
 
+            callback_ = callback;
+
+            consumerThread_ = new std::thread([this] {
+                while (running_ == true) {
+                    OHOS::SurfaceBuffer* buffer = consumer_->AcquireBuffer();
+                    if (buffer != nullptr) {
+                        if (callback_ != nullptr) {
+                            callback_(buffer);
+                        }
+                        consumer_->ReleaseBuffer(buffer);
+                    }
+                }
+            });
+
+            return consumer_;
+        }
+
+        ~StreamConsumer()
+        {
+            running_ = false;
+            if (consumerThread_ != nullptr) {
+                consumerThread_->join();
+                delete consumerThread_;
+            }
+        }
+
+    public:
+        bool running_ = true;
+        std::shared_ptr<OHOS::Surface> consumer_ = nullptr;
+        std::thread* consumerThread_ = nullptr;
+        std::function<void(OHOS::SurfaceBuffer*)> callback_ = nullptr;
+    };
+
+#else
     class StreamConsumer {
     public:
         OHOS::sptr<OHOS::IBufferProducer> CreateProducer(std::function<void(void*, uint32_t)> callback)
@@ -94,6 +137,7 @@ public:
         std::thread* consumerThread_ = nullptr;
         std::function<void(void*, uint32_t)> callback_ = nullptr;
     };
+#endif
 
 private:
     void Init();

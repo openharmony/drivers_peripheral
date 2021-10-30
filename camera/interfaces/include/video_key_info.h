@@ -32,16 +32,19 @@ namespace OHOS::Camera {
  * @brief Indicates the data length. The value type is int32_t.
  */
 const std::string dataSize = "dataSize";
+const int32_t VIDEO_KEY_INFO_DATA_SIZE = 0x01;
 
 /**
  * @brief Indicates the timestamp, in nanoseconds. The value type is int64_t.
  */
 const std::string timeStamp = "timeStamp";
+const int32_t VIDEO_KEY_INFO_TIMESTAMP = 0x02;
 
 /**
  * @brief Specifies whether the frame is a key frame.
  * The value type is int32_t. The value <b>1</b> means that the frame is a key frame, and <b>0</b> means the opposite.
  */
 const std::string isKeyFrame = "isKeyFrame";
+const int32_t VIDEO_KEY_INFO_IS_KEY_FRAME = 0x03;
 } // end namespace OHOS::Camera
 #endif
