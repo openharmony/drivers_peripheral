@@ -180,7 +180,7 @@ static int32_t HalCallbackEvent(uint32_t event, void *respData, const char *ifNa
             printf("HalCallbackEvent WIFI_EVENT_SCAN_DONE Process\n");
             break;
         case WIFI_EVENT_SCAN_RESULT:
-             ParseScanResult((WifiScanResult *)data);
+             ParseScanResult((WifiScanResult *)respData);
             break;
         default:
             break;
@@ -369,7 +369,7 @@ HWTEST_F(WifiHalTest, WifiHalStartScan001, TestSize.Level1)
     const char *ifName = "wlan0";
     WifiScan scan = {0};
 
-    ret = g_wifi->registerEventCallback(HalCallbackEventScanResult, ifName);
+    ret = g_wifi->registerEventCallback(HalCallbackEvent, ifName);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
