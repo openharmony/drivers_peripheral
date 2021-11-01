@@ -121,9 +121,6 @@ CamRetCode CameraDeviceImpl::GetEnabledResults(std::vector<MetaType> &results)
     }
 
     std::unique_lock<std::mutex> l(enabledRstMutex_);
-    if (enabledResults_.empty()) {
-        enabledResults_ = deviceMetaTypes_;
-    }
     results = enabledResults_;
     DFX_LOCAL_HITRACE_END;
     return NO_ERROR;

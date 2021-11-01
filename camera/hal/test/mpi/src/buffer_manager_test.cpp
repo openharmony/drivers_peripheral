@@ -31,7 +31,6 @@ void BufferManagerTest::SetUp(void)
 void BufferManagerTest::TearDown(void)
 {
     Test_->Close();
-
 }
 
 /**
@@ -53,4 +52,5 @@ HWTEST_F(BufferManagerTest, Camera_Buffer_0001, TestSize.Level0)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }

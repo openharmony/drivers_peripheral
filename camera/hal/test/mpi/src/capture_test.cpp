@@ -51,7 +51,8 @@ HWTEST_F(CaptureTest, Camera_Capture_0001, TestSize.Level0)
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
     // post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+    Test_->streamIds.push_back(Test_->streamId_preview);
+    Test_->streamIds.push_back(Test_->streamId_capture);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
 
@@ -85,7 +86,8 @@ HWTEST_F(CaptureTest, Camera_Capture_0002, TestSize.Level2)
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
     // post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+    Test_->streamIds.push_back(Test_->streamId_preview);
+    Test_->streamIds.push_back(Test_->streamId_capture);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
 
@@ -119,7 +121,8 @@ HWTEST_F(CaptureTest, Camera_Capture_0003, TestSize.Level1)
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
     // post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+    Test_->streamIds.push_back(Test_->streamId_preview);
+    Test_->streamIds.push_back(Test_->streamId_capture);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
 
@@ -142,7 +145,8 @@ HWTEST_F(CaptureTest, Camera_Capture_0004, TestSize.Level1)
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
     // post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+    Test_->streamIds.push_back(Test_->streamId_preview);
+    Test_->streamIds.push_back(Test_->streamId_capture);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
     Test_->consumerMap_.clear();
     std::cout << "==========[test log]check Capture: Next, switch to preview + video." << Test_->rc << std::endl;
@@ -155,7 +159,8 @@ HWTEST_F(CaptureTest, Camera_Capture_0004, TestSize.Level1)
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
     // post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
+    Test_->streamIds.push_back(Test_->streamId_preview);
+    Test_->streamIds.push_back(Test_->streamId_video);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
 
@@ -182,15 +187,25 @@ HWTEST_F(CaptureTest, Camera_Capture_0005, TestSize.Level2)
     streamInfo_capture->streamId_ = Test_->streamId_capture;
     streamInfo_capture->width_ = 640;
     streamInfo_capture->height_ = 480;
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    streamInfo_capture->format_ = IMAGE_PIXEL_FORMAT_NV21;
+#else
     streamInfo_capture->format_ = PIXEL_FMT_YCRCB_420_SP;
+#endif
     streamInfo_capture->datasapce_ = 8;
     streamInfo_capture->intent_ = Camera::STILL_CAPTURE;
     streamInfo_capture->tunneledMode_ = 5;
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> capture_consumer =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    streamInfo_capture->bufferQueue_ = capture_consumer->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
+        Test_->SaveYUV("capture", buffer->GetVirAddr(), buffer->GetSize());
+    });
+#else
     streamInfo_capture->bufferQueue_ = capture_consumer->CreateProducer([this](void* addr, uint32_t size) {
         Test_->SaveYUV("capture", addr, size);
     });
+#endif
     streamInfo_capture->bufferQueue_->SetQueueSize(8);
     Test_->consumerMap_[Camera::STILL_CAPTURE] = capture_consumer;
     // Query whether the IsStreamsSupported interface supports
@@ -201,13 +216,16 @@ HWTEST_F(CaptureTest, Camera_Capture_0005, TestSize.Level2)
     modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
     int64_t colorGains[4] = {0};
     modeSetting->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
-    Test_->rc = Test_->streamOperator->IsStreamsSupported(Camera::NORMAL, modeSetting, {streamInfo_capture}, pType);
+    std::vector<std::shared_ptr<Camera::StreamInfo>> stre;
+    stre.push_back(streamInfo_capture);
+    Test_->rc = Test_->streamOperator->IsStreamsSupported(Camera::NORMAL, modeSetting, stre, pType);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     std::cout << "ptype = " << pType << std::endl;
     EXPECT_EQ(true, pType == Camera::RE_CONFIGURED_REQUIRED);
     // post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
+    Test_->streamIds.push_back(Test_->streamId_preview);
+    Test_->streamIds.push_back(Test_->streamId_video);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
 
@@ -230,7 +248,8 @@ HWTEST_F(CaptureTest, Camera_Capture_0006, TestSize.Level0)
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, false);
     // post-processing
     Test_->captureIds = {Test_->captureId_preview};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+    Test_->streamIds.push_back(Test_->streamId_preview);
+    Test_->streamIds.push_back(Test_->streamId_capture);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
 
@@ -258,7 +277,8 @@ HWTEST_F(CaptureTest, Camera_Capture_0007, TestSize.Level0)
     Test_->StartCapture(Test_->streamId_capture, (Test_->captureId_capture) + 2, false, false);
     // post-processing
     Test_->captureIds = {Test_->captureId_preview};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+    Test_->streamIds.push_back(Test_->streamId_preview);
+    Test_->streamIds.push_back(Test_->streamId_capture);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
 
@@ -284,7 +304,8 @@ HWTEST_F(CaptureTest, Camera_Capture_0010, TestSize.Level1)
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
     // release stream
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+    Test_->streamIds.push_back(Test_->streamId_preview);
+    Test_->streamIds.push_back(Test_->streamId_capture);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
 
@@ -307,7 +328,8 @@ HWTEST_F(CaptureTest, Camera_Capture_0030, TestSize.Level2)
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
     // post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+    Test_->streamIds.push_back(Test_->streamId_preview);
+    Test_->streamIds.push_back(Test_->streamId_capture);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
 
@@ -341,6 +363,7 @@ HWTEST_F(CaptureTest, Camera_Capture_0040, TestSize.Level2)
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
     // post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+    Test_->streamIds.push_back(Test_->streamId_preview);
+    Test_->streamIds.push_back(Test_->streamId_capture);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }

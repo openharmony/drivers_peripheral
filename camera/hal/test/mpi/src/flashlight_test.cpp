@@ -30,7 +30,6 @@ void FlashlightTest::SetUp(void)
 void FlashlightTest::TearDown(void)
 {
     Test_->Close();
-
 }
 
 /**
@@ -124,6 +123,7 @@ HWTEST_F(FlashlightTest, Camera_Flashlight_0010, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -156,6 +156,7 @@ HWTEST_F(FlashlightTest, Camera_Flashlight_0011, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**

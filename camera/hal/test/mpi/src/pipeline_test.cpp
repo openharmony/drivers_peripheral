@@ -31,7 +31,6 @@ void PipelineTest::SetUp(void)
 void PipelineTest::TearDown(void)
 {
     Test_->Close();
-
 }
 
 /**
@@ -52,6 +51,7 @@ HWTEST_F(PipelineTest, Camera_Ppl_0001, TestSize.Level0)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -108,7 +108,7 @@ HWTEST_F(PipelineTest, Camera_Ppl_0004, TestSize.Level2)
 {
     std::cout << "==========[test log]Check ppl:Video mode no preview, not support, expected fail." << std::endl;
     EXPECT_EQ(true, Test_->cameraDevice != nullptr);
-    Test_->streamOperatorCallback = new StreamOperatorCallback();
+    Test_->CreateStreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     if (Test_->rc == Camera::NO_ERROR) {
@@ -120,15 +120,21 @@ HWTEST_F(PipelineTest, Camera_Ppl_0004, TestSize.Level2)
     Test_->streamInfo->streamId_ = Test_->streamId_video;
     Test_->streamInfo->width_ = 640;
     Test_->streamInfo->height_ = 480;
-    Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
+    Test_->StreamInfoFormat();
     Test_->streamInfo->datasapce_ = 10;
     Test_->streamInfo->intent_ = Camera::VIDEO;
     Test_->streamInfo->tunneledMode_ = 5;
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    Test_->streamInfo->bufferQueue_ = consumer->CreateProducer([this](void* addr, uint32_t size) {
-        Test_->SaveYUV("video", addr, size);
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    Test_->streamInfo->bufferQueue_ = consumer->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
+        Test_->SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
     });
+#else
+    Test_->streamInfo->bufferQueue_ = consumer->CreateProducer([this](void* addr, uint32_t size) {
+        Test_->SaveYUV("preview", addr, size);
+    });
+#endif
     Test_->streamInfo->bufferQueue_->SetQueueSize(8);
     Test_->consumerMap_[Camera::PREVIEW] = consumer;
     std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
@@ -183,6 +189,7 @@ HWTEST_F(PipelineTest, Camera_Ppl_0006, TestSize.Level1)
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
 
+#ifndef CAMERA_BUILT_ON_OHOS_LITE
 /**
   * @tc.name: Check ppl
   * @tc.desc: double preview streams.
@@ -246,3 +253,4 @@ HWTEST_F(PipelineTest, Camera_Ppl_0007, TestSize.Level1)
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_preview_double};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
 }
+#endif

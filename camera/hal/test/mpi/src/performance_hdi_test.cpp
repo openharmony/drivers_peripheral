@@ -15,8 +15,8 @@
 #include <fstream>
 #include "performance_hdi_test.h"
 namespace {
-    static const int Times = 1000;
-    static const int TimeTransformation_us = 1000000;
+    static const int Times = 1000; // 1000:Cycle 1000 times
+    static const int TimeTransformation_us = 1000000; // 1000000:1000000 microseconds
     std::ofstream writeIntoFile;
 }
 
@@ -24,24 +24,23 @@ using namespace OHOS;
 using namespace std;
 using namespace testing::ext;
 using namespace OHOS::Camera;
-float PerformanceTest::calTime(struct timeval start, struct timeval end)
+float PerformanceHdiTest::calTime(struct timeval start, struct timeval end)
 {
     float time_use = 0;
     time_use = (end.tv_sec - start.tv_sec) * TimeTransformation_us + (end.tv_usec - start.tv_usec);
     return time_use;
     // return time us
 }
-void PerformanceTest::SetUpTestCase(void) {}
-void PerformanceTest::TearDownTestCase(void) {}
-void PerformanceTest::SetUp(void)
+void PerformanceHdiTest::SetUpTestCase(void) {}
+void PerformanceHdiTest::TearDownTestCase(void) {}
+void PerformanceHdiTest::SetUp(void)
 {
     Test_ = std::make_shared<OHOS::Camera::Test>();
     Test_->Init();
 }
-void PerformanceTest::TearDown(void)
+void PerformanceHdiTest::TearDown(void)
 {
     Test_->Close();
-
 }
 
 /**
@@ -50,7 +49,7 @@ void PerformanceTest::TearDown(void)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0010, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0010, TestSize.Level3)
 {
     std::cout << "==========[test log] Performance: HDI_GetCameraIds's time consuming."<< std::endl;
     struct timeval start;
@@ -80,7 +79,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0010, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0020, TestSize.Level0)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0020, TestSize.Level0)
 {
     std::cout << "==========[test log] Performance: GetCameraAbility's average time consuming." << std::endl;
     struct timeval start;
@@ -114,12 +113,12 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0020, TestSize.Level0)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0030, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0030, TestSize.Level3)
 {
     std::cout << "==========[test log] Performance: HDI_OpenCamera's time consuming."<< std::endl;
     Test_->service->GetCameraIds(Test_->cameraIds);
     std::string cameraId = Test_->cameraIds.front();
-    Test_->deviceCallback = new CameraDeviceCallback();
+    Test_->CreateDeviceCallback();
     struct timeval start;
     struct timeval end;
     float time_use;
@@ -148,7 +147,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0030, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0040, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0040, TestSize.Level3)
 {
     std::cout << "==========[test log] Performance: HDI_SetFlashlight's time consuming." << std::endl;
     // Open camera
@@ -190,7 +189,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0040, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0050, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0050, TestSize.Level3)
 {
     std::cout << "==========[test log] Performance: GetStreamOperator success, 1000 times." << std::endl;
     // Get the configured cameraId
@@ -199,7 +198,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0050, TestSize.Level3)
     // Open camera
     Test_->Open();
     // Call the GetStreamOperator function of the device to get the streamOperator
-    Test_->streamOperatorCallback = new StreamOperatorCallback();
+    Test_->CreateStreamOperatorCallback();
     struct timeval start;
     struct timeval end;
     float time_use;
@@ -228,7 +227,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0050, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0060, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0060, TestSize.Level3)
 {
     std::cout << "==========[test log] Check HDI_UpdateSettings's time consuming." << std::endl;
     Test_->Open();
@@ -275,7 +274,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0060, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0070, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0070, TestSize.Level3)
 {
     std::cout << "==========[test log]Check Performance: HDI_cameraDevice->SetResultMode's average time" << std::endl;
     struct timeval start;
@@ -311,7 +310,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0070, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0080, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0080, TestSize.Level3)
 {
     std::cout << "==========[test log]Performance: HDI_cameraDevice->GetEnabledResults's average time." << std::endl;
     struct timeval start;
@@ -344,7 +343,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0080, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0090, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0090, TestSize.Level3)
 {
     std::cout << "==========[test log]Performance: HDI_cameraDevice->EnableResult's average time." << std::endl;
     struct timeval start;
@@ -384,7 +383,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0090, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0100, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0100, TestSize.Level3)
 {
     std::cout << "==========[test log]Performance: HDI_cameraDevice->DisableResult's average time." << std::endl;
     struct timeval start;
@@ -424,7 +423,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0100, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0120, TestSize.Level0)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0120, TestSize.Level0)
 {
     std::cout << "==========[test log]Performance: HDI_IsStreamsSupported's average time." << std::endl;
     struct timeval start;
@@ -436,7 +435,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0120, TestSize.Level0)
     Test_->Open();
     EXPECT_EQ(false, Test_->cameraDevice == nullptr);
     // Get streamOperator
-    Test_->streamOperatorCallback = new StreamOperatorCallback();
+    Test_->CreateStreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     // Configure mode and modeSetting
@@ -454,20 +453,28 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0120, TestSize.Level0)
     Test_->streamInfo->intent_ = Camera::PREVIEW;
     Test_->streamInfo->width_ = 640; // 640:Stream width
     Test_->streamInfo->height_ = 480; // 480:Stream height
-    Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
+    Test_->StreamInfoFormat();
     Test_->streamInfo->tunneledMode_ = 5;
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
       std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    Test_->streamInfo->bufferQueue_ = consumer->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
+        Test_->SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
+    });
+#else
     Test_->streamInfo->bufferQueue_ = consumer->CreateProducer([this](void* addr, uint32_t size) {
         Test_->SaveYUV("preview", addr, size);
     });
+#endif
     Test_->streamInfo->bufferQueue_->SetQueueSize(8);
     Test_->consumerMap_[Test_->streamInfo->intent_] = consumer;
     Camera::StreamSupportType pType;
     for (int i = 0; i < Times; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
-        Test_->rc = Test_->streamOperator->IsStreamsSupported(NORMAL, modeSetting, {Test_->streamInfo}, pType);
+        std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>> stre;
+        stre.push_back(Test_->streamInfo);
+        Test_->rc = Test_->streamOperator->IsStreamsSupported(NORMAL, modeSetting, stre, pType);
         gettimeofday(&end, NULL);
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
@@ -486,7 +493,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0120, TestSize.Level0)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0130, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0130, TestSize.Level3)
 {
     std::cout << "==========[test log] Performance: HDI_CreateStreams's time consuming." << std::endl;
     struct timeval start;
@@ -498,7 +505,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0130, TestSize.Level3)
     for (int i = 0; i < Times; i ++) {
         std::cout << "Running " << i << " time" << std::endl;
         // Create and get streamOperator information
-        Test_->streamOperatorCallback = new StreamOperatorCallback();
+        Test_->CreateStreamOperatorCallback();
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
         EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR || Test_->streamOperator == nullptr);
         // Create data flow
@@ -506,15 +513,21 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0130, TestSize.Level3)
         Test_->streamInfo->streamId_ = 1001;
         Test_->streamInfo->width_ = 1920;
         Test_->streamInfo->height_ = 1080;
-        Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
+        Test_->StreamInfoFormat();
         Test_->streamInfo->datasapce_ = 10;
         Test_->streamInfo->intent_ = Camera::PREVIEW;
         Test_->streamInfo->tunneledMode_ = 5;
         std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
             std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+        Test_->streamInfo->bufferQueue_ = preview_consumer->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
+            Test_->SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
+        });
+#else
         Test_->streamInfo->bufferQueue_ = preview_consumer->CreateProducer([this](void* addr, uint32_t size) {
             Test_->SaveYUV("preview", addr, size);
         });
+#endif
         Test_->streamInfo->bufferQueue_->SetQueueSize(8);
         Test_->consumerMap_[Camera::PREVIEW] = preview_consumer;
         std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
@@ -544,7 +557,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0130, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0160, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0160, TestSize.Level3)
 {
     std::cout << "==========[test log] Performance: HDI_ReleaseStreams's time consuming."<< std::endl;
     struct timeval start;
@@ -580,7 +593,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0160, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0170, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0170, TestSize.Level3)
 {
     std::cout << "==========[test log] Performance: CommitStreams's time consuming." << std::endl;
 
@@ -593,7 +606,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0170, TestSize.Level3)
     for (int i = 0; i < Times; i ++) {
         std::cout << "Running " << i << " time" << std::endl;
         // Create and get streamOperator information
-        Test_->streamOperatorCallback = new StreamOperatorCallback();
+        Test_->CreateStreamOperatorCallback();
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
         EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR || Test_->streamOperator == nullptr);
         // Create data flow
@@ -601,15 +614,21 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0170, TestSize.Level3)
         Test_->streamInfo->streamId_ = 1001;
         Test_->streamInfo->width_ = 1920;
         Test_->streamInfo->height_ = 1080;
-        Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
+        Test_->StreamInfoFormat();
         Test_->streamInfo->datasapce_ = 10;
         Test_->streamInfo->intent_ = Camera::PREVIEW;
         Test_->streamInfo->tunneledMode_ = 5;
         std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+        Test_->streamInfo->bufferQueue_ = preview_consumer->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
+            Test_->SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
+        });
+#else
         Test_->streamInfo->bufferQueue_ = preview_consumer->CreateProducer([this](void* addr, uint32_t size) {
             Test_->SaveYUV("preview", addr, size);
         });
+#endif
         Test_->streamInfo->bufferQueue_->SetQueueSize(8);
         Test_->consumerMap_[Camera::PREVIEW] = preview_consumer;
         std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
@@ -643,7 +662,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0170, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0180, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0180, TestSize.Level3)
 {
     std::cout << "==========[test log]Check Performance: HDI_GetStreamAttributes's average time." << std::endl;
     struct timeval start;
@@ -683,7 +702,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0180, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0190, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0190, TestSize.Level3)
 {
     std::cout << "==========[test log] Performance: HDI_Capture's average time consuming." << std::endl;
     struct timeval start;
@@ -732,7 +751,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0190, TestSize.Level3)
     writeIntoFile << avrg_time << "us. " << std::endl;
     writeIntoFile.close();
     // post-processing
-    Test_->streamIds = {Test_->streamId_preview};
+    Test_->streamIds.push_back(Test_->streamId_preview);
     Test_->rc = Test_->streamOperator->ReleaseStreams(Test_->streamIds);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 }
@@ -743,7 +762,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0190, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0200, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0200, TestSize.Level3)
 {
     std::cout << "==========[test log] Performance: HDI_CancelCapture's average time consuming." << std::endl;
     struct timeval start;
@@ -781,7 +800,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0200, TestSize.Level3)
     writeIntoFile << avrg_time << "us. " << std::endl;
     writeIntoFile.close();
     // post-processing
-    Test_->streamIds = {Test_->streamId_preview};
+    Test_->streamIds.push_back(Test_->streamId_preview);
     Test_->rc = Test_->streamOperator->ReleaseStreams(Test_->streamIds);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 }
@@ -792,7 +811,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0200, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0210, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0210, TestSize.Level3)
 {
     std::cout << "==========[test log] Performance: HDI_AttachBufferQueue's average time consuming." << std::endl;
     struct timeval start;
@@ -802,7 +821,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0210, TestSize.Level3)
     writeIntoFile.open("TimeConsuming.txt", ios::app);
     // Open camera
     Test_->Open();
-    Test_->streamOperatorCallback = new StreamOperatorCallback();
+    Test_->StreamInfoFormat();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     for (int i = 0; i < Times; i++) {
@@ -812,7 +831,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0210, TestSize.Level3)
         Test_->streamInfo->streamId_ = Test_->streamId_preview;
         Test_->streamInfo->width_ = 640;
         Test_->streamInfo->height_ = 480;
-        Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
+        Test_->StreamInfoFormat();
         Test_->streamInfo->intent_ = Camera::PREVIEW;
         Test_->streamInfo->datasapce_ = 8;
         Test_->streamInfo->tunneledMode_ = 5;
@@ -827,9 +846,15 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0210, TestSize.Level3)
         std::cout << "==========[test log]Check hdi: streamOperator->CommitStreams's rc " << Test_->rc << std::endl;
         std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+        std::shared_ptr<OHOS::Surface> producer = consumer->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
+            Test_->SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
+        });
+#else
         OHOS::sptr<OHOS::IBufferProducer> producer = consumer->CreateProducer([this](void* addr, uint32_t size) {
             Test_->SaveYUV("preview", addr, size);
         });
+#endif
         gettimeofday(&start, NULL);
         Test_->rc = Test_->streamOperator->AttachBufferQueue(Test_->streamInfo->streamId_, producer);
         std::cout << "==========[test log]Check hdi: streamOperator->AttachBufferQueue's rc " << Test_->rc << std::endl;
@@ -841,7 +866,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0210, TestSize.Level3)
         std::cout << "==========[test log]Check hdi: streamOperator->DetachBufferQueue's rc " << Test_->rc << std::endl;
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         // Release stream
-        Test_->streamIds = {Test_->streamId_preview};
+        Test_->streamIds.push_back(Test_->streamId_preview);
         Test_->rc = Test_->streamOperator->ReleaseStreams(Test_->streamIds);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
@@ -859,7 +884,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0210, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0220, TestSize.Level3)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0220, TestSize.Level3)
 {
     std::cout << "==========[test log] Performance: HDI_DetachBufferQueue's average time consuming." << std::endl;
     struct timeval start;
@@ -870,7 +895,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0220, TestSize.Level3)
     writeIntoFile.open("TimeConsuming.txt", ios::app);
     for (int i = 0; i < Times; i++) {
         std::cout << "Running " << i << " time" << std::endl;
-        Test_->streamOperatorCallback = new StreamOperatorCallback();
+        Test_->CreateStreamOperatorCallback();
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         // Create data flow
@@ -879,7 +904,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0220, TestSize.Level3)
         Test_->streamInfo->streamId_ = Test_->streamId_preview;
         Test_->streamInfo->width_ = 640;
         Test_->streamInfo->height_ = 480;
-        Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
+        Test_->StreamInfoFormat();
         Test_->streamInfo->datasapce_ = 8;
         Test_->streamInfo->tunneledMode_ = 5;
         std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
@@ -893,9 +918,15 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0220, TestSize.Level3)
         std::cout << "==========[test log]Check hdi: streamOperator->CommitStreams's rc " << Test_->rc << std::endl;
         std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+        std::shared_ptr<OHOS::Surface> producer = consumer->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
+            Test_->SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
+        });
+#else
         OHOS::sptr<OHOS::IBufferProducer> producer = consumer->CreateProducer([this](void* addr, uint32_t size) {
             Test_->SaveYUV("preview", addr, size);
         });
+#endif
         Test_->rc = Test_->streamOperator->AttachBufferQueue(Test_->streamInfo->streamId_, producer);
         std::cout << "==========[test log]Check hdi: streamOperator->AttachBufferQueue's rc ";
         std::cout << Test_->rc << std::endl;
@@ -908,7 +939,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0220, TestSize.Level3)
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
         // Release stream
-        Test_->streamIds = {Test_->streamId_preview};
+        Test_->streamIds.push_back(Test_->streamId_preview);
         Test_->rc = Test_->streamOperator->ReleaseStreams(Test_->streamIds);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
@@ -926,7 +957,7 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0220, TestSize.Level3)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0230, TestSize.Level0)
+HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0230, TestSize.Level0)
 {
     std::cout << "==========[test log] Performance: HDI_ChangeToOfflineStream's average time consuming." << std::endl;
     struct timeval start;
@@ -946,10 +977,12 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0230, TestSize.Level0)
         Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
         sleep(1);
         // 4、Convert to offline stream
-        Test_->offlineStreamOperatorCallback = Test_->streamOperatorCallback;
+        Test_->CreateOfflineStreamOperatorCallback();
         gettimeofday(&start, NULL);
+        std::vector<int> offlineIds;
+        offlineIds.push_back(Test_->streamId_capture);
         Test_->rc = Test_->streamOperator->ChangeToOfflineStream(
-            {Test_->streamId_capture}, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
+            offlineIds, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
         gettimeofday(&end, NULL);
         ASSERT_EQ(Test_->rc, Camera::NO_ERROR);
         time_use = calTime(start, end);
@@ -963,7 +996,8 @@ HWTEST_F(PerformanceTest, Camera_Performance_Hdi_0230, TestSize.Level0)
         }
         // 5、Post-processing of the original stream
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
-        Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+        Test_->streamIds.push_back(Test_->streamId_preview);
+        Test_->streamIds.push_back(Test_->streamId_capture);
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
         // 6、Post-processing of offline streams
         Test_->cameraDevice->Close();

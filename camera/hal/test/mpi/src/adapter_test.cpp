@@ -30,7 +30,6 @@ void AdapterTest::SetUp(void)
 void AdapterTest::TearDown(void)
 {
     Test_->Close();
-
 }
 
 /**
@@ -51,4 +50,5 @@ HWTEST_F(AdapterTest, Camera_Adapter_0001, TestSize.Level0)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }

@@ -107,10 +107,9 @@ HWTEST_F(CameraDeviceImplTest, UTestEnableResult, TestSize.Level0)
     EXPECT_EQ(false, cameraDevice_ == nullptr);
 
     std::vector<MetaType> results;
-    CamRetCode rc = cameraDevice_->GetEnabledResults(results);
-    EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);
-
-    rc = cameraDevice_->EnableResult(results);
+    results.push_back(OHOS_SENSOR_EXPOSURE_TIME);
+    results.push_back(OHOS_SENSOR_COLOR_CORRECTION_GAINS);
+    CamRetCode rc = cameraDevice_->EnableResult(results);
     EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);
 }
 
@@ -120,10 +119,15 @@ HWTEST_F(CameraDeviceImplTest, UTestDisableResult, TestSize.Level0)
     EXPECT_EQ(false, cameraDevice_ == nullptr);
 
     std::vector<MetaType> results;
-    CamRetCode rc = cameraDevice_->GetEnabledResults(results);
+    results.push_back(OHOS_SENSOR_EXPOSURE_TIME);
+    results.push_back(OHOS_SENSOR_COLOR_CORRECTION_GAINS);
+    CamRetCode rc = cameraDevice_->EnableResult(results);
+    EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);
+    std::vector<Camera::MetaType> disable_tag;
+    rc = cameraDevice_->GetEnabledResults(disable_tag);
     EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);
 
-    rc = cameraDevice_->DisableResult(results);
+    rc = cameraDevice_->DisableResult(disable_tag);
     EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);
 }
 

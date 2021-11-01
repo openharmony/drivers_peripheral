@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef VIDEO_TEST_H
+#define VIDEO_TEST_H
+
 #include "common.h"
 
 class VideoTest : public testing::Test {
@@ -22,3 +25,4 @@ public:
     void TearDown(void);
     std::shared_ptr<OHOS::Camera::Test> Test_ = nullptr;
 };
+#endif

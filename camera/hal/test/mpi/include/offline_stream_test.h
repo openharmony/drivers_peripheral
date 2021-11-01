@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef OFFLINE_STREAM_TEST_H
+#define OFFLINE_STREAM_TEST_H
+
 #include "common.h"
 
 class OfflineStreamTest : public testing::Test {
@@ -24,4 +27,4 @@ public:
     void TearDown(void);
     std::shared_ptr<OHOS::Camera::Test> Test_ = nullptr;
 };
-
+#endif

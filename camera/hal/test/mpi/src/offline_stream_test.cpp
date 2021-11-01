@@ -31,7 +31,6 @@ void OfflineStreamTest::SetUp(void)
 void OfflineStreamTest::TearDown(void)
 {
     Test_->Close();
-
 }
 
 /**
@@ -53,9 +52,11 @@ HWTEST_F(OfflineStreamTest, Camera_Offline_0001, TestSize.Level0)
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
     sleep(5);
     // Convert to offline stream
-    Test_->offlineStreamOperatorCallback = Test_->streamOperatorCallback;
+    Test_->CreateOfflineStreamOperatorCallback();
+    std::vector<int> offlineIds;
+    offlineIds.push_back(Test_->streamId_capture);
     Test_->rc = Test_->streamOperator->ChangeToOfflineStream(
-        {Test_->streamId_capture}, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
+        offlineIds, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
     ASSERT_EQ(Test_->rc, Camera::NO_ERROR);
     std::cout << "==========[test log]Check offline: ChangeToOfflineStream rc = " << Test_->rc << std::endl;
     EXPECT_EQ(true, Test_->offlineStreamOperator != nullptr);
@@ -71,7 +72,7 @@ HWTEST_F(OfflineStreamTest, Camera_Offline_0001, TestSize.Level0)
     // Post-processing of offline streams
     Test_->cameraDevice->Close();
     std::cout << "==========[test log]Check offline stream: Pretend to wait 5s for callback..." << std::endl;
-    sleep(5);
+    sleep(2);
     Test_->StopOfflineStream(Test_->captureId_capture);
 }
 
@@ -92,11 +93,13 @@ HWTEST_F(OfflineStreamTest, Camera_Offline_0002, TestSize.Level2)
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     // Capture the photo stream, continuous capture
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-    sleep(5);
+    sleep(2);
     // Convert to offline stream
-    Test_->offlineStreamOperatorCallback = Test_->streamOperatorCallback;
+    Test_->CreateOfflineStreamOperatorCallback();
+    std::vector<int> offlineIds;
+    offlineIds.push_back(Test_->streamId_preview);
     Test_->rc = Test_->streamOperator->ChangeToOfflineStream(
-        {Test_->streamId_preview}, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
+        offlineIds, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
     ASSERT_EQ(Test_->rc, Camera::METHOD_NOT_SUPPORTED);
     std::cout << "==========[test log]Check offline: ChangeToOfflineStream rc = " << Test_->rc << std::endl;
     ASSERT_EQ(true, Test_->offlineStreamOperator == nullptr);
@@ -105,7 +108,6 @@ HWTEST_F(OfflineStreamTest, Camera_Offline_0002, TestSize.Level2)
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
-
 }
 
 /**
@@ -125,11 +127,13 @@ HWTEST_F(OfflineStreamTest, Camera_Offline_0003, TestSize.Level2)
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     // Capture the photo stream, continuous capture
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    sleep(5);
+    sleep(2);
     // Convert to offline stream
-    Test_->offlineStreamOperatorCallback = Test_->streamOperatorCallback;
+    Test_->CreateOfflineStreamOperatorCallback();
+    std::vector<int> offlineIds;
+    offlineIds.push_back(Test_->streamId_video);
     Test_->rc = Test_->streamOperator->ChangeToOfflineStream(
-        {Test_->streamId_video}, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
+        offlineIds, Test_->offlineStreamOperatorCallback, Test_->offlineStreamOperator);
     ASSERT_EQ(Test_->rc, Camera::METHOD_NOT_SUPPORTED);
     std::cout << "==========[test log]Check offline: ChangeToOfflineStream rc = " << Test_->rc << std::endl;
     ASSERT_EQ(Test_->offlineStreamOperator, nullptr);

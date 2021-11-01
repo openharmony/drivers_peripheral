@@ -30,7 +30,6 @@ void HdiDeviceTest::SetUp(void)
 void HdiDeviceTest::TearDown(void)
 {
     Test_->Close();
-
 }
 
 /**
@@ -43,7 +42,7 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0050, TestSize.Level0)
 {
     std::cout << "==========[test log]Check hdi_device: GetStreamOprator, normal callback input." << std::endl;
     Test_->Open();
-    Test_->streamOperatorCallback = new StreamOperatorCallback();
+    Test_->CreateStreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 }
@@ -110,6 +109,7 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0061, TestSize.Level2)
     Test_->streamIds = {Test_->streamId_preview};
     Test_->captureIds = {Test_->captureId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -139,6 +139,7 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0062, TestSize.Level2)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -168,6 +169,7 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0063, TestSize.Level2)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -197,6 +199,7 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0065, TestSize.Level2)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -226,6 +229,7 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0066, TestSize.Level2)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -256,6 +260,7 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0067, TestSize.Level2)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -286,6 +291,7 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0068, TestSize.Level2)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -359,17 +365,15 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0090, TestSize.Level0)
 {
     std::cout << "==========[test log]Check hdi_device: EnableResult one tag, without preview, success." << std::endl;
     Test_->Open();
-    // Get the parameter tag currently supported by the device
     std::cout << "==========[test log]Check hdi_device: 1. Get the tags..." << std::endl;
+    std::vector<Camera::MetaType> enable_tag;
+    enable_tag.push_back(OHOS_SENSOR_EXPOSURE_TIME);
+    std::cout << "==========[test log]Check hdi_device: 2. Enable the tag: " << enable_tag[0] << std::endl;
+    Test_->rc = Test_->cameraDevice->EnableResult(enable_tag);
+    // add this tag
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     std::vector<Camera::MetaType> results_original;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results_original);
-    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-
-    // add this tag
-    std::vector<Camera::MetaType> enable_tag;
-    enable_tag.push_back(results_original[1]);
-    std::cout << "==========[test log]Check hdi_device: 2. Enable the tag: " << results_original[1] << std::endl;
-    Test_->rc = Test_->cameraDevice->EnableResult(enable_tag);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 }
 
@@ -383,7 +387,11 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0091, TestSize.Level2)
 {
     std::cout << "==========[test log]Check hdi_device: EnableResult multiple tags, success." << std::endl;
     Test_->Open();
-    // 1、Get the parameter tag currently supported by the device
+    std::vector<Camera::MetaType> results;
+    results.push_back(OHOS_SENSOR_EXPOSURE_TIME);
+    results.push_back(OHOS_SENSOR_COLOR_CORRECTION_GAINS);
+    Test_->rc = Test_->cameraDevice->EnableResult(results);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     std::vector<Camera::MetaType> results_original;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results_original);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
@@ -394,7 +402,6 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0091, TestSize.Level2)
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 
     // 3、Get the parameter tag currently supported by the device again
-    std::vector<Camera::MetaType> results;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 
@@ -441,7 +448,11 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0100, TestSize.Level0)
 {
     std::cout << "==========[test log]Check hdi_device: DisEnabledReuslts, expected success." << std::endl;
     Test_->Open();
-    // Get the parameter tag currently supported by the device
+    std::vector<Camera::MetaType> results;
+    results.push_back(OHOS_SENSOR_EXPOSURE_TIME);
+    results.push_back(OHOS_SENSOR_COLOR_CORRECTION_GAINS);
+    Test_->rc = Test_->cameraDevice->EnableResult(results);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     std::vector<Camera::MetaType> results_original;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results_original);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
@@ -449,13 +460,12 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0100, TestSize.Level0)
 
     // Disable a tag
     std::vector<Camera::MetaType> disable_tag;
-    disable_tag.push_back(results_original[2]);
+    disable_tag.push_back(results_original[1]);
     Test_->rc = Test_->cameraDevice->DisableResult(disable_tag);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     std::cout << "==========[test log]Check hdi_device: DisableResult the tag:" << results_original[0] << std::endl;
 
     // Get the parameter tag currently supported by the device again
-    std::vector<Camera::MetaType> results;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 }
@@ -470,7 +480,11 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0101, TestSize.Level2)
 {
     std::cout << "==========[test log]Check hdi_device: DisableResult all tag, success." << std::endl;
     Test_->Open();
-    // Get the parameter tag currently supported by the device
+    std::vector<Camera::MetaType> results;
+    results.push_back(OHOS_SENSOR_EXPOSURE_TIME);
+    results.push_back(OHOS_SENSOR_COLOR_CORRECTION_GAINS);
+    Test_->rc = Test_->cameraDevice->EnableResult(results);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     std::vector<Camera::MetaType> results_original;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results_original);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
@@ -481,7 +495,6 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0101, TestSize.Level2)
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 
     // Get the parameter tag currently supported by the device again
-    std::vector<Camera::MetaType> results;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 }
@@ -496,7 +509,11 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0102, TestSize.Level2)
 {
     std::cout << "==========[test log]Check hdi_device: DisableResult error tag, expected success." << std::endl;
     Test_->Open();
-    // Get the parameter tag currently supported by the device
+    std::vector<Camera::MetaType> results;
+    results.push_back(OHOS_SENSOR_EXPOSURE_TIME);
+    results.push_back(OHOS_SENSOR_COLOR_CORRECTION_GAINS);
+    Test_->rc = Test_->cameraDevice->EnableResult(results);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     std::vector<Camera::MetaType> results_original;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results_original);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
@@ -509,7 +526,6 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0102, TestSize.Level2)
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 
     // Get the parameter tag currently supported by the device again
-    std::vector<Camera::MetaType> results;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
 }
