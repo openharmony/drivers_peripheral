@@ -136,4 +136,4 @@ public:
 } // namespace HDI
 } // namespace OHOS
 
-#endif //HDI_IDISPLAY_GRALLOC_V1_0_H
+#endif // HDI_IDISPLAY_GRALLOC_V1_0_H

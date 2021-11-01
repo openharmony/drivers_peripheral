@@ -47,6 +47,7 @@ int32_t DisplayGrallocClient::AllocMem(const AllocInfo &info, BufferHandle *&han
 {
     if (allocatorProxy_ == nullptr) {
         HDF_LOGE("%{public}s: allocatorProxy_ is null", __func__);
+        return DISPLAY_FAILURE;
     }
     auto ret = allocatorProxy_->AllocMem(info, handle);
     return ret;
