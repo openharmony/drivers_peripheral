@@ -12,7 +12,9 @@
 # limitations under the License.
 
 #!/bin/bash
-cd ~/OpenHarmony2.0_20210604/out/ohos-arm-release/packages/phone/images/system/lib;
+script_path=$(cd $(dirname $0);pwd)
+cd ${script_path}
+cd ../../../../../../out/ohos-arm-release/packages/phone/system/lib;
 libcamera_client=`stat -c %s "libcamera_client.z.so"`
 echo "libcamera_client.z.so(B): "$libcamera_client
 

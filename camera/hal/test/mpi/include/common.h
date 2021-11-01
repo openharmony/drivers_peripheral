@@ -39,7 +39,6 @@
 #include "camera_metadata_info.h"
 #include "ibuffer.h"
 #include <display_type.h>
-#include <iservice_registry.h>
 #include <hdf_log.h>
 #include <osal_mem.h>
 #include "securec.h"
@@ -47,10 +46,11 @@
 #include "icamera_device.h"
 #include "istream_operator.h"
 #include "ioffline_stream_operator.h"
-#include "camera_host_proxy.h"
 #include "camera_host_callback.h"
 #include "camera_device_callback.h"
 #include "stream_operator_callback.h"
+#include "video_key_info.h"
+#include "type_common.h"
 
 namespace OHOS::Camera {
 class Test {
@@ -67,6 +67,11 @@ public:
     void StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds);
     void StopOfflineStream(int captureId);
     void GetCameraMetadata();
+    void StopConsumer(std::vector<Camera::StreamIntent> intents);
+    void CreateStreamOperatorCallback();
+    void CreateDeviceCallback();
+    void CreateOfflineStreamOperatorCallback();
+    void StreamInfoFormat();
 
     OHOS::sptr<StreamOperatorCallback> streamOperatorCallback = nullptr;
     OHOS::sptr<CameraHostCallback> hostCallback = nullptr;
@@ -74,6 +79,7 @@ public:
     OHOS::sptr<IStreamOperator> streamOperator = nullptr;
     OHOS::sptr<Camera::IOfflineStreamOperator> offlineStreamOperator = nullptr;
     OHOS::sptr<IStreamOperatorCallback> offlineStreamOperatorCallback = nullptr;
+
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = nullptr;
     std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>> streamInfos;
     std::shared_ptr<OHOS::Camera::StreamInfo> streamInfo = nullptr;
@@ -94,9 +100,16 @@ public:
     std::vector<int> streamIds;
     std::vector<Camera::StreamIntent> intents;
     OHOS::Camera::CamRetCode rc;
+
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    std::shared_ptr<OHOS::Camera::CameraHost> service = nullptr;
+    std::shared_ptr<ICameraDevice> cameraDevice = nullptr;
+#else
     OHOS::sptr<OHOS::Camera::ICameraHost> service = nullptr;
-    std::shared_ptr<CameraAbility> ability = nullptr;
     OHOS::sptr<ICameraDevice> cameraDevice = nullptr;
+#endif
+    std::shared_ptr<CameraAbility> ability = nullptr;
+
     bool status;
     bool onCameraStatusFlag;
     bool onFlashlightStatusFlag;
@@ -120,8 +133,12 @@ public:
 
     class StreamConsumer {
     public:
-        void SetFlag();
+        void StopConsumer();
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+        std::shared_ptr<OHOS::Surface> CreateProducer(std::function<void(OHOS::SurfaceBuffer* buffer)> callback);
+#else
         OHOS::sptr<OHOS::IBufferProducer> CreateProducer(std::function<void(void*, uint32_t)> callback);
+#endif
         void TakeSnapshot()
         {
             shotCount_++;
@@ -145,9 +162,14 @@ public:
         std::mutex l_;
         std::condition_variable cv_;
         bool running_ = true;
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+        std::shared_ptr<OHOS::Surface> consumer_ = nullptr;
+        std::function<void(OHOS::SurfaceBuffer*)> callback_ = nullptr;
+#else
         OHOS::sptr<OHOS::Surface> consumer_ = nullptr;
-        std::thread* consumerThread_ = nullptr;
         std::function<void(void*, uint32_t)> callback_ = nullptr;
+#endif
+        std::thread* consumerThread_ = nullptr;
     };
 };
 

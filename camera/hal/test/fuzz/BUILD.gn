@@ -19,7 +19,7 @@ import("../../camera.gni")
 
 module_output_path = "hdf/fuzz_test"
 
-ohos_fuzztest("IPCCameraDeviceRemote_fuzzer") {
+ohos_fuzztest("IpcCameraDeviceRemote") {
   module_out_path = module_output_path
   cflags = [
     "-g",
@@ -96,7 +96,7 @@ ohos_fuzztest("IPCCameraDeviceRemote_fuzzer") {
   part_name = "hdf"
 }
 
-ohos_fuzztest("IPCCameraHostService_fuzzer") {
+ohos_fuzztest("IpcCameraHostService") {
   module_out_path = module_output_path
   cflags = [
     "-g",
@@ -170,7 +170,7 @@ ohos_fuzztest("IPCCameraHostService_fuzzer") {
   part_name = "hdf"
 }
 
-ohos_fuzztest("IPCOffline_fuzzer") {
+ohos_fuzztest("IpcOffline") {
   module_out_path = module_output_path
   cflags = [
     "-g",
@@ -243,7 +243,7 @@ ohos_fuzztest("IPCOffline_fuzzer") {
   part_name = "hdf"
 }
 
-ohos_fuzztest("IPCStreamOperator_fuzzer") {
+ohos_fuzztest("IpcStreamOperator") {
   module_out_path = module_output_path
   cflags = [
     "-g",
@@ -316,7 +316,7 @@ ohos_fuzztest("IPCStreamOperator_fuzzer") {
   part_name = "hdf"
 }
 
-ohos_fuzztest("IPCCameraDeviceCallback_fuzzer") {
+ohos_fuzztest("IpcCameraDeviceCallback") {
   module_out_path = module_output_path
   cflags = [
     "-g",
@@ -391,7 +391,7 @@ ohos_fuzztest("IPCCameraDeviceCallback_fuzzer") {
   part_name = "hdf"
 }
 
-ohos_fuzztest("IPCCameraHostCallback_fuzzer") {
+ohos_fuzztest("IpcCameraHostCallback") {
   module_out_path = module_output_path
   cflags = [
     "-g",
@@ -466,7 +466,7 @@ ohos_fuzztest("IPCCameraHostCallback_fuzzer") {
   part_name = "hdf"
 }
 
-ohos_fuzztest("IPCStreamOperatorCallback_fuzzer") {
+ohos_fuzztest("IpcStreamOperatorCallback") {
   module_out_path = module_output_path
   cflags = [
     "-g",
@@ -542,12 +542,12 @@ ohos_fuzztest("IPCStreamOperatorCallback_fuzzer") {
 group("fuzztest") {
   testonly = true
   deps = [
-    ":IPCCameraDeviceCallback_fuzzer",
-    ":IPCCameraDeviceRemote_fuzzer",
-    ":IPCCameraHostCallback_fuzzer",
-    ":IPCCameraHostService_fuzzer",
-    ":IPCOffline_fuzzer",
-    ":IPCStreamOperatorCallback_fuzzer",
-    ":IPCStreamOperator_fuzzer",
+    ":IpcCameraDeviceCallback",
+    ":IpcCameraDeviceRemote",
+    ":IpcCameraHostCallback",
+    ":IpcCameraHostService",
+    ":IpcOffline",
+    ":IpcStreamOperator",
+    ":IpcStreamOperatorCallback",
   ]
 }

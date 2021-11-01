@@ -52,6 +52,7 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1001, TestSize.Level0)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
     if (Test_->onCameraStatusFlag) {
         std::cout << "==========[test log]OnCameraStatus" << std::endl;
     }
@@ -101,6 +102,7 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1010, TestSize.Level0)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
     if (Test_->onErrorFlag) {
         std::cout << "==========[test log]OnError" << std::endl;
     }
@@ -118,14 +120,14 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1011, TestSize.Level0)
     Test_->onResultFlag = false;
     Test_->Open();
     EXPECT_EQ(true, Test_->cameraDevice != nullptr);
-    std::cout << "==========[test log]Check hdi_device: SetResultMode is ON_CHANGED." << std::endl;
-    std::vector<Camera::MetaType> enableTypes;
-    Test_->rc = Test_->cameraDevice->GetEnabledResults(enableTypes);
+    std::cout << "==========[test log]Check hdi_device: SetResultMode is PER_FRAME." << std::endl;
+    std::vector<Camera::MetaType> results;
+    results.push_back(OHOS_SENSOR_EXPOSURE_TIME);
+    results.push_back(OHOS_SENSOR_COLOR_CORRECTION_GAINS);
+    Test_->rc = Test_->cameraDevice->EnableResult(results);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    for (auto &type : enableTypes) {
-        std::cout << "==========[test log] hdi_device: type = " << type << std::endl;
-    }
-    Test_->rc = Test_->cameraDevice->SetResultMode(Camera::ON_CHANGED);
+    Test_->rc = Test_->cameraDevice->SetResultMode(Camera::PER_FRAME);
+    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     // Start stream
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
@@ -133,13 +135,13 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1011, TestSize.Level0)
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     // release stream
     Test_->captureIds = {Test_->captureId_preview};
-    Test_->streamIds = {Test_->streamId_preview};
+    Test_->streamIds.push_back(Test_->streamId_preview);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
-    EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
+    Test_->StopConsumer(Test_->intents);
     if (Test_->onResultFlag) {
         std::cout << "==========[test log]OnResult" << std::endl;
     }
-    EXPECT_EQ(Test_->onResultFlag, false);
+    EXPECT_EQ(Test_->onResultFlag, true);
 }
 
 /**
@@ -160,8 +162,9 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1020, TestSize.Level0)
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     // release stream
     Test_->captureIds = {Test_->captureId_preview};
-    Test_->streamIds = {Test_->streamId_preview};
+    Test_->streamIds.push_back(Test_->streamId_preview);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
     if (Test_->captureStartFlag) {
         std::cout << "==========[test log]OnCaptureStarted" << std::endl;
     }
@@ -186,8 +189,9 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1021, TestSize.Level0)
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     // release stream
     Test_->captureIds = {Test_->captureId_preview};
-    Test_->streamIds = {Test_->streamId_preview};
+    Test_->streamIds.push_back(Test_->streamId_preview);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
     if (Test_->captureEndFlag) {
         std::cout << "==========[test log]OnCaptureEnded" << std::endl;
     }
@@ -223,8 +227,9 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1023, TestSize.Level0)
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, true, true);
     // release stream
     Test_->captureIds = {Test_->captureId_preview};
-    Test_->streamIds = {Test_->streamId_preview};
+    Test_->streamIds.push_back(Test_->streamId_preview);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
     if (Test_->frameShutterFlag) {
         std::cout << "==========[test log]OnFrameShutter" << std::endl;
     }
