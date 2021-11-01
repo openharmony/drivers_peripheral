@@ -73,31 +73,13 @@ void WifiHalTest::TearDown()
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
-static void ParseScanResult( WifiScanResult *scanResult)
+static void ParseScanResult(WifiScanResult *scanResult)
 {
     printf("ParseScanResult: flags=%d, caps=%d, freq=%d, beaconInt=%d,\n",
         scanResult->flags, scanResult->caps, scanResult->freq, scanResult->beaconInt);
     printf("ParseScanResult: qual=%d, beaconIeLen=%d, level=%d, age=%d, ieLen=%d,\n",
         scanResult->qual, scanResult->beaconIeLen, scanResult->level, scanResult->age, scanResult->ieLen);
 }
-
-/**
-static int32_t HalCallbackEventScanResult(uint32_t eventId,  void *data, const char *ifName)
-{
-    printf("HalCallbackEventScanResult ifName = %s, eventId = %d\n", ifName, eventId);
-    switch (eventId) {
-        case WIFI_EVENT_SCAN_DONE:
-            printf("HalCallbackEventScanResult WIFI_EVENT_SCAN_DONE Process\n");
-            break;
-        case WIFI_EVENT_SCAN_RESULT:
-            ParseScanResult(( WifiScanResult *)data);
-            break;
-        default:
-            break;
-    }
-    return HDF_SUCCESS;
-}
-*/
 
 /**
  * @tc.name: WifiHalCreateAndDestroyFeature001
@@ -180,12 +162,12 @@ static int32_t HalCallbackEvent(uint32_t event, void *respData, const char *ifNa
             printf("HalCallbackEvent WIFI_EVENT_SCAN_DONE Process\n");
             break;
         case WIFI_EVENT_SCAN_RESULT:
-             ParseScanResult((WifiScanResult *)respData);
+            ParseScanResult((WifiScanResult *)respData);
             break;
         default:
             break;
     }
-  return HDF_SUCCESS;
+    return HDF_SUCCESS;
 
 }
 
