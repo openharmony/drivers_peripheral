@@ -73,28 +73,12 @@ void WifiHalTest::TearDown()
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
-static void ParseScanResult(const WifiScanResult *scanResult)
+static void ParseScanResult(WifiScanResult *scanResult)
 {
     printf("ParseScanResult: flags=%d, caps=%d, freq=%d, beaconInt=%d,\n",
         scanResult->flags, scanResult->caps, scanResult->freq, scanResult->beaconInt);
     printf("ParseScanResult: qual=%d, beaconIeLen=%d, level=%d, age=%d, ieLen=%d,\n",
         scanResult->qual, scanResult->beaconIeLen, scanResult->level, scanResult->age, scanResult->ieLen);
-}
-
-static int32_t HalCallbackEventScanResult(uint32_t eventId, void *data, const char *ifName)
-{
-    printf("HalCallbackEventScanResult ifName = %s, eventId = %d\n", ifName, eventId);
-    switch (eventId) {
-        case WIFI_EVENT_SCAN_DONE:
-            printf("HalCallbackEventScanResult WIFI_EVENT_SCAN_DONE Process\n");
-            break;
-        case WIFI_EVENT_SCAN_RESULT:
-            ParseScanResult((const WifiScanResult *)data);
-            break;
-        default:
-            break;
-    }
-    return HDF_SUCCESS;
 }
 
 /**
@@ -172,7 +156,19 @@ static int32_t HalCallbackEvent(uint32_t event, void *respData, const char *ifNa
     if (respData == nullptr) {
         return HDF_FAILURE;
     }
+    printf("HalCallbackEvent ifName = %s, event = %d\n", ifName, event);
+    switch (event) {
+        case WIFI_EVENT_SCAN_DONE:
+            printf("HalCallbackEvent WIFI_EVENT_SCAN_DONE Process\n");
+            break;
+        case WIFI_EVENT_SCAN_RESULT:
+            ParseScanResult((WifiScanResult *)respData);
+            break;
+        default:
+            break;
+    }
     return HDF_SUCCESS;
+
 }
 
 /**
@@ -355,7 +351,7 @@ HWTEST_F(WifiHalTest, WifiHalStartScan001, TestSize.Level1)
     const char *ifName = "wlan0";
     WifiScan scan = {0};
 
-    ret = g_wifi->registerEventCallback(HalCallbackEventScanResult, ifName);
+    ret = g_wifi->registerEventCallback(HalCallbackEvent, ifName);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
