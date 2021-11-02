@@ -202,7 +202,8 @@ int32_t AudioLibRenderTest::LibStartAndStream(const std::string path, struct Aud
     if (handle == nullptr || hwRender == nullptr) {
         return HDF_FAILURE;
     }
-    if (InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam) ||
+    if (InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN, &hwRender->renderParam) ||
+        InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam) ||
         InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_PREPARE, &hwRender->renderParam) ||
         InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_START, &hwRender->renderParam)) {
         return HDF_FAILURE;
@@ -242,7 +243,8 @@ int32_t AudioLibRenderTest::LibHwOutputRender(struct AudioHwRender *hwRender, st
     if (hwRender == nullptr || handlerender == nullptr) {
         return HDF_FAILURE;
     }
-    if (InterfaceLibOutputRender(handlerender, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam) ||
+    if (InterfaceLibOutputRender(handlerender, AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN, &hwRender->renderParam) ||
+        InterfaceLibOutputRender(handlerender, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam) ||
         InterfaceLibOutputRender(handlerender, AUDIO_DRV_PCM_IOCTL_PREPARE, &hwRender->renderParam) ||
         InterfaceLibOutputRender(handlerender, AUDIO_DRV_PCM_IOCTRL_START, &hwRender->renderParam)) {
         return HDF_FAILURE;
@@ -1054,6 +1056,8 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001,
         EXPECT_EQ(HDF_SUCCESS, ret);
         ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_STOP, &hwRender->renderParam);
         EXPECT_EQ(HDF_SUCCESS, ret);
+        ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, &hwRender->renderParam);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
     CloseServiceRenderSo(handle);
     free(hwRender->renderParam.frameRenderMode.buffer);
@@ -1105,6 +1109,8 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_0001, Test
             ASSERT_EQ(HDF_SUCCESS, ret);
         }
     ret = InterfaceLibOutputRender(handler, AUDIO_DRV_PCM_IOCTRL_STOP, &hwRender->renderParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputRender(handler, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     }
     CloseServiceRenderSo(handler);

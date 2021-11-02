@@ -167,6 +167,21 @@ int32_t WriteFrameToSBuf(struct HdfSBuf *&sBufT, const std::string& path)
     return HDF_SUCCESS;
 }
 
+int32_t WriteToSBuf(struct HdfSBuf *&sBufT)
+{
+    sBufT = HdfSBufObtainDefaultSize();
+    if (sBufT == NULL) {
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufWriteUint32(sBufT, 0)) {
+        free(sBufT);
+        sBufT = nullptr;
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t ObtainBuf(struct HdfSBuf *&readBuf, struct HdfSBuf *&readReply)
 {
     readBuf = HdfSBufObtainDefaultSize();
@@ -247,8 +262,14 @@ int32_t ReadCtrlInfo(struct HdfIoService *service, struct AudioCtlElemId id, int
 int32_t WriteHwParams(string serviceName, struct HdfIoService *&service, struct AudioPcmHwParams hwParams)
 {
     int32_t ret = -1;
+    int32_t cmdid = -1;
     struct HdfSBuf *writeBuf = nullptr;
     struct HdfSBuf *writeReply = nullptr;
+    if (!strcmp(serviceName.c_str(), HDF_CAPTURE_SERVICE.c_str())) {
+        cmdid = AUDIO_DRV_PCM_IOCTRL_CAPTURE_OPEN;
+    } else {
+        cmdid = AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN;
+    }
     service = HdfIoServiceBind(serviceName.c_str());
     if (service == nullptr || service->dispatcher == nullptr) {
         return HDF_FAILURE;
@@ -259,6 +280,19 @@ int32_t WriteHwParams(string serviceName, struct HdfIoService *&service, struct 
         service = nullptr;
         return HDF_FAILURE;
     }
+
+    if (!HdfSbufWriteString(writeBuf, "hdf_audio_codec_dev0")) {
+        HdfIoServiceRecycle(service);
+        return HDF_FAILURE;
+    }
+    ret = service->dispatcher->Dispatch(&service->object, cmdid, writeBuf, writeReply);
+    if (ret < 0) {
+        HdfSBufRecycle(writeBuf);
+        HdfIoServiceRecycle(service);
+        service = nullptr;
+        return HDF_FAILURE;
+    }
+    HdfSbufFlush(writeBuf);
     ret = WriteHwParamsToBuf(writeBuf, hwParams);
     if (ret < 0) {
         HdfSBufRecycle(writeBuf);

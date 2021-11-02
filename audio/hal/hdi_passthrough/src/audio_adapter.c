@@ -71,6 +71,7 @@ int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender)
     hwRender->common.GetChannelMode = AudioRenderGetChannelMode;
     hwRender->common.RegCallback = AudioRenderRegCallback;
     hwRender->common.DrainBuffer = AudioRenderDrainBuffer;
+    hwRender->renderParam.frameRenderMode.callbackProcess = CallbackProcessing;
     return HDF_SUCCESS;
 }
 
@@ -170,6 +171,7 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
         return HDF_FAILURE;
     }
     hwRender->renderParam.renderMode.hwInfo.deviceDescript = *desc;
+    hwRender->renderParam.renderMode.hwInfo.callBackEnable = false;
     hwRender->renderParam.frameRenderMode.attrs = *attrs;
     hwRender->renderParam.renderMode.ctlParam.audioGain.gainMax = GAIN_MAX;  // init gainMax
     hwRender->renderParam.renderMode.ctlParam.audioGain.gainMin = 0;
@@ -186,6 +188,8 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
     hwRender->renderParam.frameRenderMode.attrs.silenceThreshold = attrs->silenceThreshold;
     hwRender->renderParam.frameRenderMode.attrs.isBigEndian = attrs->isBigEndian;
     hwRender->renderParam.frameRenderMode.attrs.isSignedData = attrs->isSignedData;
+    hwRender->renderParam.frameRenderMode.renderhandle = (AudioHandle)hwRender;
+    hwRender->renderParam.renderMode.ctlParam.turnStandbyStatus = AUDIO_TURN_STANDBY_LATER;
     return HDF_SUCCESS;
 }
 
@@ -331,11 +335,9 @@ int32_t AudioSetAcodeModeRender(struct AudioHwRender *hwRender,
         return HDF_FAILURE;
     }
     if (hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId < AUDIO_SERVICE_PORTID_FLAG) {
-        hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
         return(*pInterfaceLibMode)(hwRender->devCtlHandle, &hwRender->renderParam,
                                          AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN);
     } else {
-        hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_OUT;
         return(*pInterfaceLibMode)(hwRender->devCtlHandle, &hwRender->renderParam,
                                          AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT);
     }
@@ -400,6 +402,17 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
         LOG_FUN_ERR("InterfaceLibModeRender not exist");
+        return HDF_FAILURE;
+    }
+    /* render open */
+    if (hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId < AUDIO_SERVICE_PORTID_FLAG) {
+        hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
+    } else {
+        hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_OUT;
+    }
+    ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN);
+    if (ret < 0) {
+        LOG_FUN_ERR("AudioRender render open FAIL");
         return HDF_FAILURE;
     }
 #ifndef AUDIO_HAL_USER
@@ -551,6 +564,16 @@ int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRend
         if (ret < 0) {
             LOG_FUN_ERR("render Stop failed");
         }
+    }
+    InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
+    if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
+        LOG_FUN_ERR("InterfaceLibModeRender not exist");
+        return HDF_FAILURE;
+    }
+    ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam,
+                                     AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE);
+    if (ret < 0) {
+        LOG_FUN_ERR("Audio RENDER_CLOSE FAIL");
     }
     if (AudioDelRenderAddrFromList((AudioHandle)render)) {
         LOG_FUN_ERR("adapter or render not in MgrList");
@@ -730,6 +753,12 @@ int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
         LOG_FUN_ERR("lib capture func not exist");
         return HDF_FAILURE;
     }
+    ret = (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam,
+                                      AUDIO_DRV_PCM_IOCTRL_CAPTURE_OPEN);
+    if (ret < 0) {
+        LOG_FUN_ERR("CAPTURE_OPEN FAIL");
+        return HDF_FAILURE;
+    }
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
     /* Init CapturePathSelect send first */
     ret = (*pInterfaceLibModeCapture)(hwCapture->devCtlHandle, &hwCapture->captureParam,
@@ -866,6 +895,16 @@ int32_t AudioAdapterDestroyCapture(struct AudioAdapter *adapter, struct AudioCap
         if (ret < 0) {
             LOG_FUN_ERR("capture Stop failed");
         }
+    }
+    InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
+    if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
+        LOG_FUN_ERR("lib capture func not exist");
+        return HDF_FAILURE;
+    }
+    ret = (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam,
+                                      AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE);
+    if (ret < 0) {
+        LOG_FUN_ERR("CAPTURE_CLOSE FAIL");
     }
     if (AudioDelCaptureAddrFromList((AudioHandle)capture)) {
         LOG_FUN_ERR("adapter or capture not in MgrList");

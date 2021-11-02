@@ -9,6 +9,7 @@
 #include "hi3516_codec_ops.h"
 #include "audio_codec_base.h"
 #include "audio_core.h"
+#include "audio_driver_log.h"
 
 #define HDF_LOG_TAG hi3516_codec_adapter
 
@@ -16,8 +17,6 @@ struct CodecData g_codecData = {
     .Init = CodecDeviceInit,
     .Read = CodecDeviceReadReg,
     .Write = CodecDeviceWriteReg,
-    .AiaoRead = CodecAiaoDeviceReadReg,
-    .AiaoWrite = CodecAiaoDeviceWriteReg,
 };
 
 struct AudioDaiOps g_codecDaiDeviceOps = {
@@ -33,78 +32,63 @@ struct DaiData g_codecDaiData = {
 /* HdfDriverEntry implementations */
 static int32_t CodecDriverBind(struct HdfDeviceObject *device)
 {
-    struct CodecHost *codecHost = NULL;
-
-    AUDIO_DRIVER_LOG_DEBUG("entry!");
-
     if (device == NULL) {
         AUDIO_DRIVER_LOG_ERR("input para is NULL.");
         return HDF_FAILURE;
     }
 
-    codecHost = (struct CodecHost *)OsalMemCalloc(sizeof(*codecHost));
+    struct CodecHost *codecHost = (struct CodecHost *)OsalMemCalloc(sizeof(*codecHost));
     if (codecHost == NULL) {
         AUDIO_DRIVER_LOG_ERR("malloc codecHost fail!");
         return HDF_FAILURE;
     }
-
     codecHost->device = device;
     device->service = &codecHost->service;
 
-    AUDIO_DRIVER_LOG_INFO("success!");
     return HDF_SUCCESS;
 }
 
 static int32_t CodecDriverInit(struct HdfDeviceObject *device)
 {
-    int32_t ret;
-
-    AUDIO_DRIVER_LOG_DEBUG("entry.");
     if (device == NULL) {
         AUDIO_DRIVER_LOG_ERR("device is NULL.");
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    ret = CodecGetServiceName(device, &g_codecData.drvCodecName);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_DRIVER_LOG_ERR("get codec service name fail.");
-        return ret;
+    if (CodecGetConfigInfo(device, &g_codecData) != HDF_SUCCESS) {
+        return HDF_FAILURE;
     }
 
-    ret = CodecGetDaiName(device, &g_codecDaiData.drvDaiName);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_DRIVER_LOG_ERR("get codec dai name fail.");
-        return ret;
+    if (CodecSetConfigInfo(&g_codecData, &g_codecDaiData) != HDF_SUCCESS) {
+        return HDF_FAILURE;
     }
 
-    ret = AudioRegisterCodec(device, &g_codecData, &g_codecDaiData);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_DRIVER_LOG_ERR("register dai fail.");
-        return ret;
+    if (CodecGetServiceName(device, &g_codecData.drvCodecName) != HDF_SUCCESS) {
+        return HDF_FAILURE;
     }
 
-    AUDIO_DRIVER_LOG_INFO("Success.");
+    if (CodecGetDaiName(device, &g_codecDaiData.drvDaiName) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+
+    if (AudioRegisterCodec(device, &g_codecData, &g_codecDaiData) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+
     return HDF_SUCCESS;
 }
 
 static void CodecDriverRelease(struct HdfDeviceObject *device)
 {
-    struct CodecHost *codecHost = NULL;
-    struct VirtualAddress *virtualAdd = NULL;
-
     if (device == NULL) {
         AUDIO_DRIVER_LOG_ERR("device is NULL");
         return;
     }
 
     if (device->priv != NULL) {
-        virtualAdd = (struct VirtualAddress *)device->priv;
-        OsalIoUnmap((void *)((uintptr_t)(void*)&virtualAdd->acodecVir));
-        OsalIoUnmap((void *)((uintptr_t)(void*)&virtualAdd->aiaoVir));
         OsalMemFree(device->priv);
     }
-
-    codecHost = (struct CodecHost *)device->service;
+    struct CodecHost *codecHost = (struct CodecHost *)device->service;
     if (codecHost == NULL) {
         HDF_LOGE("CodecDriverRelease: codecHost is NULL");
         return;

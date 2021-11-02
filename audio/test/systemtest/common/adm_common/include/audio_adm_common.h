@@ -58,6 +58,8 @@ enum StreamDispMethodCmd {
     AUDIO_DRV_PCM_IOCTRL_CAPTURE_PAUSE,
     AUDIO_DRV_PCM_IOCTRL_RENDER_RESUME,
     AUDIO_DRV_PCM_IOCTRL_CAPTURE_RESUME,
+    AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN = 17,
+    AUDIO_DRV_PCM_IOCTRL_CAPTURE_OPEN = 19,
     AUDIO_DRV_PCM_IOCTRL_BUTT,
 };
 
@@ -97,6 +99,8 @@ int32_t WriteCtrlInfo(struct HdfIoService *service, struct AudioCtlElemValue wri
 int32_t ReadCtrlInfo(struct HdfIoService *service, struct AudioCtlElemId id, int32_t expectValue);
 
 int32_t WriteHwParams(std::string serviceName, struct HdfIoService *&service, struct AudioPcmHwParams hwParams);
+
+int32_t WriteToSBuf(struct HdfSBuf *&sBufT);
 }
 }
 #endif // AUDIO_ADM_COMMON_H

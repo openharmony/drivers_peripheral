@@ -494,13 +494,6 @@ int32_t TestAopHalSetTxStartInvalidChnId(void)
     return HDF_SUCCESS;
 }
 
-int32_t TestShowAllAiaoRegister(void)
-{
-    HDF_LOGI("TestShowAllAiaoRegister: enter");
-    ShowAllAiaoRegister();
-    return HDF_SUCCESS;
-}
-
 int32_t TestAopHalDevEnable(void)
 {
     int ret;
