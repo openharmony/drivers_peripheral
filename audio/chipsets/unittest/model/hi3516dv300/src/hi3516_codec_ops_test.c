@@ -10,6 +10,7 @@
 #include "audio_codec_base.h"
 #include "devsvc_manager_clnt.h"
 #include "hdf_base.h"
+#include "hdf_log.h"
 #include "hi3516_codec_ops.h"
 #include "hi3516_common_func.h"
 
@@ -24,8 +25,6 @@ int32_t InitCodecDataFunc(struct CodecData *codecData)
     codecData->Init = CodecDeviceInit;
     codecData->Read = CodecDeviceReadReg;
     codecData->Write = CodecDeviceWriteReg;
-    codecData->AiaoRead = CodecAiaoDeviceReadReg;
-    codecData->AiaoWrite = CodecAiaoDeviceWriteReg;
     return HDF_SUCCESS;
 }
 

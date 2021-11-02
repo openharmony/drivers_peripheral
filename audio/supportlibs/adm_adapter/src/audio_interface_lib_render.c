@@ -26,6 +26,8 @@
 
 #define AUDIODRV_CTL_ACODEC_ENABLE 1
 #define AUDIODRV_CTL_ACODEC_DISABLE 0
+#define AUDIODRV_CTL_INTERNAL_ACODEC_ENABLE 1
+#define AUDIODRV_CTL_EXTERN_ACODEC_ENABLE 2
 #define AUDIODRV_CTL_EXTERN_CODEC_STR "External Codec Enable"
 #define AUDIODRV_CTL_INTERNAL_CODEC_STR "Internally Codec Enable"
 
@@ -970,14 +972,19 @@ int32_t AudioCtlRenderGetChannelMode(const struct DevHandle *handle, int cmdId, 
     return ret;
 }
 
-int32_t AudioCtlRenderSetAcodecSBuf(struct HdfSBuf *sBuf, const char *codec, int enable)
+int32_t AudioCtlRenderSetAcodecSBuf(struct HdfSBuf *sBuf, const char *codec,
+    int enable, enum AudioServiceNameType serviceNameMode)
 {
     if (sBuf == NULL) {
         LOG_FUN_ERR("handleData or sBuf is NULL!");
         return HDF_FAILURE;
     }
+    if (serviceNameMode >= AUDIO_SERVICE_MAX) {
+        LOG_FUN_ERR("serviceNameMode is fail!");
+        return HDF_FAILURE;
+    }
     struct AudioCtlElemValue elemValue;
-    elemValue.id.cardServiceName = g_audioLibRenderService[0];
+    elemValue.id.cardServiceName = g_audioLibRenderService[serviceNameMode];
     elemValue.id.iface = AUDIODRV_CTL_ELEM_IFACE_ACODEC;
     elemValue.id.itemName = codec;
     elemValue.value[0] = enable;
@@ -1003,11 +1010,17 @@ int32_t AudioCtlRenderSetAcodecSBuf(struct HdfSBuf *sBuf, const char *codec, int
 int32_t AudioCtlRenderChangeInAcodec(struct HdfIoService *service,
     const char *codecName, struct HdfSBuf *sBuf, const int32_t status, int cmdId)
 {
+    enum AudioServiceNameType serviceNameMode;
     if (service == NULL || sBuf == NULL) {
         LOG_FUN_ERR("service or sBuf is NULL!");
         return HDF_FAILURE;
     }
-    if (AudioCtlRenderSetAcodecSBuf(sBuf, codecName, status)) {
+    if (cmdId == AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT) {
+        serviceNameMode = AUDIO_SERVICE_OUT;
+    } else {
+        serviceNameMode = AUDIO_SERVICE_IN;
+    }
+    if (AudioCtlRenderSetAcodecSBuf(sBuf, codecName, status, serviceNameMode)) {
         return HDF_FAILURE;
     }
     cmdId = AUDIODRV_CTL_IOCTL_ELEM_WRITE - CTRL_NUM;
@@ -1030,31 +1043,19 @@ int32_t AudioCtlRenderSetAcodecMode(const struct DevHandle *handle,
     service = (struct HdfIoService *)handle->object;
     if (cmdId == AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN) {
         LOG_PARA_INFO("****Acodec is In****");
-        /* disable  External Codec */
-        if (AudioCtlRenderChangeInAcodec(service, AUDIODRV_CTL_EXTERN_CODEC_STR,
-            sBuf, AUDIODRV_CTL_ACODEC_DISABLE, cmdId)) {
-            AudioBufReplyRecycle(sBuf, NULL);
-            return HDF_FAILURE;
-        }
         /* enable Internally Codec */
         HdfSbufFlush(sBuf);
         if (AudioCtlRenderChangeInAcodec(service, AUDIODRV_CTL_INTERNAL_CODEC_STR,
-            sBuf, AUDIODRV_CTL_ACODEC_ENABLE, cmdId)) {
+            sBuf, AUDIODRV_CTL_INTERNAL_ACODEC_ENABLE, cmdId)) {
             AudioBufReplyRecycle(sBuf, NULL);
             return HDF_FAILURE;
         }
     } else if (cmdId == AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT) {
         LOG_PARA_INFO("****Acodec is Out****");
-        /* disable  Internally   Codec */
-        if (AudioCtlRenderChangeInAcodec(service, AUDIODRV_CTL_INTERNAL_CODEC_STR,
-            sBuf, AUDIODRV_CTL_ACODEC_DISABLE, cmdId)) {
-            AudioBufReplyRecycle(sBuf, NULL);
-            return HDF_FAILURE;
-        }
         /* enable External Codec */
         HdfSbufFlush(sBuf);
         if (AudioCtlRenderChangeInAcodec(service, AUDIODRV_CTL_EXTERN_CODEC_STR,
-            sBuf, AUDIODRV_CTL_ACODEC_ENABLE, cmdId)) {
+            sBuf, AUDIODRV_CTL_EXTERN_ACODEC_ENABLE, cmdId)) {
             AudioBufReplyRecycle(sBuf, NULL);
             return HDF_FAILURE;
         }
@@ -1205,13 +1206,26 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
     return ret;
 }
 
+int32_t AudioCallbackModeStatus(const struct AudioHwRenderParam *handleData,
+    enum AudioCallbackType callbackType)
+{
+    if (handleData == NULL) {
+        return HDF_FAILURE;
+    }
+    bool callBackStatus = handleData->renderMode.hwInfo.callBackEnable;
+    if (callBackStatus) {
+        handleData->frameRenderMode.callbackProcess(handleData->frameRenderMode.renderhandle, callbackType);
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t AudioOutputRenderWriteFrame(struct HdfIoService *service,
-    int cmdId, struct HdfSBuf *sBuf, struct HdfSBuf *reply)
+    int cmdId, struct HdfSBuf *sBuf, struct HdfSBuf *reply, const struct AudioHwRenderParam *handleData)
 {
     int32_t ret;
     int32_t tryNum = 50; // try send sBuf 50 count
     uint32_t buffStatus = 0;
-    if (service == NULL || sBuf == NULL || reply == NULL) {
+    if (service == NULL || sBuf == NULL || reply == NULL || handleData == NULL) {
         return HDF_FAILURE;
     }
     if (service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
@@ -1231,6 +1245,7 @@ int32_t AudioOutputRenderWriteFrame(struct HdfIoService *service,
         }
         if (buffStatus == CIR_BUFF_FULL) {
             LOG_PARA_INFO("Cir buff fulled wait 10ms");
+            (void)AudioCallbackModeStatus(handleData, AUDIO_RENDER_FULL);
             tryNum--;
             usleep(AUDIO_WAIT_DELAY);
             continue;
@@ -1239,8 +1254,10 @@ int32_t AudioOutputRenderWriteFrame(struct HdfIoService *service,
     } while (tryNum > 0);
     AudioBufReplyRecycle(sBuf, reply);
     if (tryNum > 0) {
+        (void)AudioCallbackModeStatus(handleData, AUDIO_NONBLOCK_WRITE_COMPELETED);
         return HDF_SUCCESS;
     } else {
+        (void)AudioCallbackModeStatus(handleData, AUDIO_ERROR_OCCUR);
         LOG_FUN_ERR("Out of tryNum!");
         return HDF_FAILURE;
     }
@@ -1275,7 +1292,7 @@ int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
         AudioBufReplyRecycle(sBuf, reply);
         return HDF_FAILURE;
     }
-    int32_t ret = AudioOutputRenderWriteFrame(service, cmdId, sBuf, reply);
+    int32_t ret = AudioOutputRenderWriteFrame(service, cmdId, sBuf, reply, handleData);
     if (ret != 0) {
         LOG_FUN_ERR("AudioOutputRenderWriteFrame is Fail!");
         return HDF_FAILURE;
@@ -1298,10 +1315,44 @@ int32_t AudioOutputRenderStartPrepare(const struct DevHandle *handle,
     }
     ret = service->dispatcher->Dispatch(&service->object, cmdId, NULL, NULL);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("RenderStartPrepare Failed to send service call!");
+        LOG_FUN_ERR("RenderStartPrepare Failed to send service call cmdId = %d!", cmdId);
         return ret;
     }
     return HDF_SUCCESS;
+}
+
+int32_t AudioOutputRenderOpen(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData)
+{
+    if (handle == NULL || handle->object == NULL || handleData == NULL) {
+        return HDF_FAILURE;
+    }
+    int32_t ret;
+    struct HdfIoService *service = NULL;
+    service = (struct HdfIoService *)handle->object;
+    if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
+        LOG_FUN_ERR("RenderStartPrepare Service is NULL!");
+        return HDF_FAILURE;
+    }
+    uint32_t card = handleData->renderMode.hwInfo.card;
+    if (card >= AUDIO_SERVICE_MAX) {
+        LOG_FUN_ERR("card is Error!");
+        return HDF_FAILURE;
+    }
+    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    if (sBuf == NULL) {
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteString(sBuf, g_audioLibRenderService[card])) {
+        AudioBufReplyRecycle(sBuf, NULL);
+        return HDF_FAILURE;
+    }
+    ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
+    if (ret != HDF_SUCCESS) {
+        LOG_FUN_ERR("RenderStartPrepare Failed to send service call cmdId = %d!", cmdId);
+    }
+    AudioBufReplyRecycle(sBuf, NULL);
+    return ret;
 }
 
 int32_t AudioOutputRenderStop(const struct DevHandle *handle,
@@ -1316,11 +1367,21 @@ int32_t AudioOutputRenderStop(const struct DevHandle *handle,
         LOG_FUN_ERR("RenderStop Service is NULL!");
         return HDF_FAILURE;
     }
-    int32_t ret = service->dispatcher->Dispatch(&service->object, cmdId, NULL, NULL);
+    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    if (sBuf == NULL) {
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteUint32(sBuf, handleData->renderMode.ctlParam.turnStandbyStatus)) {
+        AudioBufReplyRecycle(sBuf, NULL);
+        return HDF_FAILURE;
+    }
+    int32_t ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         LOG_FUN_ERR("RenderStop Failed to send service call!");
+        AudioBufReplyRecycle(sBuf, NULL);
         return ret;
     }
+    AudioBufReplyRecycle(sBuf, NULL);
     return HDF_SUCCESS;
 }
 
@@ -1440,7 +1501,11 @@ int32_t AudioInterfaceLibOutputRender(const struct DevHandle *handle,
             break;
         case AUDIO_DRV_PCM_IOCTRL_START:
         case AUDIO_DRV_PCM_IOCTL_PREPARE:
+        case AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE:
             ret = AudioOutputRenderStartPrepare(handle, cmdId, handleData);
+            break;
+        case AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN:
+            ret = AudioOutputRenderOpen(handle, cmdId, handleData);
             break;
         case AUDIODRV_CTL_IOCTL_PAUSE_WRITE:
             ret = AudioCtlRenderSetPauseStu(handle, cmdId, handleData);
@@ -1538,6 +1603,8 @@ int32_t AudioInterfaceLibModeRender(const struct DevHandle *handle,
         case AUDIODRV_CTL_IOCTL_PAUSE_WRITE:
         case AUDIO_DRV_PCM_IOCTL_MMAP_BUFFER:
         case AUDIO_DRV_PCM_IOCTL_MMAP_POSITION:
+        case AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN:
+        case AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE:
             return (AudioInterfaceLibOutputRender(handle, cmdId, handleData));
         case AUDIODRV_CTL_IOCTL_ELEM_WRITE:
         case AUDIODRV_CTL_IOCTL_ELEM_READ:

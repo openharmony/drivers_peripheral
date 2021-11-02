@@ -44,7 +44,6 @@ int32_t TestAopHalSetTransSize(void);
 int32_t TestAopHalSetTransSizeInvalidChnId(void);
 int32_t TestAopHalSetTxStart(void);
 int32_t TestAopHalSetTxStartInvalidChnId(void);
-int32_t TestShowAllAiaoRegister(void);
 int32_t TestAopHalDevEnable(void);
 int32_t TestAipBuffRptrReg(void);
 int32_t TestAipBuffWptrReg(void);

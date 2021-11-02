@@ -444,6 +444,7 @@ int32_t FrameStartMmap(const AudioHandle param)
     }
     munmap(desc.memoryAddress, reqSize);
     fclose(fp);
+    (void)StopAudioFiles(&render);
     return HDF_SUCCESS;
 }
 
@@ -487,7 +488,7 @@ int32_t FrameStart(const AudioHandle param)
     } while (!g_closeEnd && numRead > 0 && remainingDataSize > 0);
     if (!g_closeEnd) {
         printf("\nPlay complete, please select input again\n");
-        StopAudioFiles(&render);
+        (void)StopAudioFiles(&render);
     }
     return HDF_SUCCESS;
 }
