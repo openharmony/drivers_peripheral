@@ -78,7 +78,8 @@ static int32_t Tfa9879FormatParse(enum AudioFormat format, uint16_t *bitWidth)
     return HDF_SUCCESS;
 }
 
-static int32_t Tfa9879WorkStatusEnable() {
+static int32_t Tfa9879WorkStatusEnable() 
+{
     int ret, i;
     struct AudioMixerControl *daiStartupParamsRegCfgItem;
     uint32_t daiStartupParamsRegCfgItemCount;
