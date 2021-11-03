@@ -30,6 +30,9 @@ struct IWiFi *g_wifi = nullptr;
 const int32_t WLAN_TX_POWER = 160;
 const uint32_t WLAN_MIN_CHIPID = 0;
 const uint32_t WLAN_MAX_CHIPID = 2;
+const uint32_t IFNAME_MIN_NUM = 0;
+const uint32_t IFNAME_MAX_NUM = 32;
+const uint32_t MAX_IF_NAME_LENGTH = 16;
 
 class WifiHalTest : public testing::Test {
 public:
