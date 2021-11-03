@@ -28,6 +28,8 @@ using namespace testing::ext;
 namespace HalTest {
 struct IWiFi *g_wifi = nullptr;
 const int32_t WLAN_TX_POWER = 160;
+const uint32_t WLAN_MIN_CHIPID = 0;
+const uint32_t WLAN_MAX_CHIPID = 2;
 
 class WifiHalTest : public testing::Test {
 public:
