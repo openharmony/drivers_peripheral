@@ -356,5 +356,4 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetChipId001, TestSize.Level1)
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
-
 };
