@@ -28,6 +28,12 @@ using namespace testing::ext;
 namespace HalTest {
 struct IWiFi *g_wifi = nullptr;
 const int32_t WLAN_TX_POWER = 160;
+const uint32_t WLAN_MIN_CHIPID = 0;
+const uint32_t WLAN_MAX_CHIPID = 2;
+const uint32_t IFNAME_MIN_NUM = 0;
+const uint32_t IFNAME_MAX_NUM = 32;
+const uint32_t MAX_IF_NAME_LENGTH = 16;
+const uint32_t SIZE = 4;
 
 class WifiHalTest : public testing::Test {
 public:
@@ -345,6 +351,42 @@ HWTEST_F(WifiHalTest, WifiHalSetCountryCode001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: WifiHalGetIfNamesByChipId001
+ * @tc.desc: Obtain all ifNames and the number of the current chip
+ * @tc.type: FUNC
+ * @tc.require: AR000F869G
+ */
+HWTEST_F(WifiHalTest, WifiHalGetIfNamesByChipId001, TestSize.Level1)
+{
+    int ret;
+    struct IWiFiSta *staFeature = nullptr;
+    char *ifNames = nullptr;
+    unsigned int num = 0;
+    unsigned char chipId = 0;
+    uint8_t i;
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
+    ret = staFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)staFeature, &chipId);
+    ASSERT_TRUE(chipId <= WLAN_MAX_CHIPID && chipId >= WLAN_MIN_CHIPID);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = staFeature->baseFeature.getIfNamesByChipId(chipId, nullptr, nullptr);
+    EXPECT_NE(HDF_SUCCESS, ret);
+    ret = staFeature->baseFeature.getIfNamesByChipId(chipId, &ifNames, &num);
+    EXPECT_NE(nullptr, ifNames);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ASSERT_TRUE(num <= IFNAME_MAX_NUM && num >= IFNAME_MIN_NUM);
+    for (i = 0; i < num; i++) {
+        EXPECT_EQ(0, strncmp("wlan", ifNames + i * MAX_IF_NAME_LENGTH, SIZE));
+    }
+    free(ifNames);
+
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
