@@ -369,7 +369,7 @@ HWTEST_F(WifiHalTest, WifiHalStartScan001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000F869G
  */
-HWTEST_F(HdfWlanPerformanceTest, WifiHalGetIfNamesByChipId001, TestSize.Level1)
+HWTEST_F(WifiHalTest, WifiHalGetIfNamesByChipId001, TestSize.Level1)
 {
     int ret;
     struct IWiFiSta *staFeature = nullptr;
