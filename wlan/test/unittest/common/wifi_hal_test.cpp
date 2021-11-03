@@ -350,23 +350,6 @@ HWTEST_F(WifiHalTest, WifiHalSetCountryCode001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
-HWTEST_F(WifiHalTest, WifiHalStartScan001, TestSize.Level1)
-{
-    int ret;
-    struct IWiFiSta *staFeature = nullptr;
-    const char *ifName = "wlan0";
-    WifiScan scan = {0};
-
-    ret = g_wifi->registerEventCallback(HalCallbackEvent, ifName);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_NE(nullptr, staFeature);
-    ret = staFeature->startScan(ifName, &scan);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sleep(10);
-}
-
 /**
  * @tc.name: WifiHalGetIfNamesByChipId001
  * @tc.desc: Obtain all ifNames and the number of the current chip
@@ -401,5 +384,22 @@ HWTEST_F(WifiHalTest, WifiHalGetIfNamesByChipId001, TestSize.Level1)
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+HWTEST_F(WifiHalTest, WifiHalStartScan001, TestSize.Level1)
+{
+    int ret;
+    struct IWiFiSta *staFeature = nullptr;
+    const char *ifName = "wlan0";
+    WifiScan scan = {0};
+
+    ret = g_wifi->registerEventCallback(HalCallbackEvent, ifName);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
+    ret = staFeature->startScan(ifName, &scan);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    sleep(10);
 }
 };
