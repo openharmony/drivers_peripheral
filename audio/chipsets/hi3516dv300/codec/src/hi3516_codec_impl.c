@@ -6,13 +6,13 @@
  * See the LICENSE file in the root of this repository for complete details.
  */
 
-#include "hi3516_codec_impl.h"
-#include "hi3516_aiao_impl.h"
+#include <asm/io.h>
 #include "audio_control.h"
 #include "audio_core.h"
-#include "audio_platform_base.h"
-#include <asm/io.h>
 #include "audio_driver_log.h"
+#include "audio_platform_base.h"
+#include "hi3516_aiao_impl.h"
+#include "hi3516_codec_impl.h"
 #include "osal_io.h"
 
 #define HDF_LOG_TAG hi3516_codec_impl

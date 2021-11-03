@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ *
+ * HDF is dual licensed: you can use it either under the terms of
+ * the GPL, or the BSD license, at your option.
+ * See the LICENSE file in the root of this repository for complete details.
+ */
 #include "audio_platform_if.h"
 #ifdef __LITEOS__
 #include <los_vm_iomap.h>
@@ -86,12 +93,10 @@ int32_t Hi3516DmaBufAlloc(struct PlatformData *data, enum AudioStreamType stream
         data->renderBufInfo.virtAddr = dma_alloc_wc(&renderDev, data->renderBufInfo.cirBufMax,
             (dma_addr_t *)&data->renderBufInfo.phyAddr, GFP_DMA | GFP_KERNEL);
 #endif
-
     } else {
         AUDIO_DRIVER_LOG_ERR("stream Type is invalude.");
         return HDF_FAILURE;
     }
-
     return HDF_SUCCESS;
 }
 
@@ -111,7 +116,6 @@ int32_t Hi3516DmaBufFree(struct PlatformData *data, enum AudioStreamType streamT
                         data->captureBufInfo.phyAddr);
 #endif
         }
-
     } else if (streamType == AUDIO_RENDER_STREAM) {
         if (data->renderBufInfo.virtAddr != NULL) {
 #ifdef __LITEOS__
@@ -121,14 +125,11 @@ int32_t Hi3516DmaBufFree(struct PlatformData *data, enum AudioStreamType streamT
                         data->renderBufInfo.phyAddr);
 #endif
         }
-
     } else {
         AUDIO_DRIVER_LOG_ERR("stream Type is invalude.");
         return HDF_FAILURE;
     }
-
     return HDF_SUCCESS;
-
 }
 
 int32_t  Hi3516DmaRequestChannel(struct PlatformData *data)
@@ -166,7 +167,6 @@ int32_t Hi3516DmaConfigChannel(struct PlatformData *data)
         if (AopHalSetBuffRptr(0, 0) != HDF_SUCCESS) {
             return HDF_FAILURE;
         }
-
     } else {
         AUDIO_DRIVER_LOG_ERR("stream Type is invalude.");
         return HDF_FAILURE;
@@ -289,5 +289,3 @@ int32_t Hi3516DmaPointer(struct PlatformData *data, uint32_t *pointer)
     }
     return HDF_SUCCESS;
 }
-
-
