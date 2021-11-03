@@ -51,7 +51,7 @@ namespace {
     static struct SensorDevelopmentList g_sensorList[] = {
         {SENSOR_TYPE_NONE, "sensor_test", "default", 1, 1, g_testRange},
         {SENSOR_TYPE_ACCELEROMETER, "accelerometer", "borsh_bmi160", 1, 3, g_accelRange},
-        {SENSOR_TYPE_PROXIMITY, "proximitymeter", "stk3338", 0, 1, g_proximityRange},
+        {SENSOR_TYPE_PROXIMITY, "proximity", "adps9960", 0, 1, g_proximityRange},
         {SENSOR_TYPE_HALL, "hallrometer", "akm_ak8789", 0, 1, g_hallRange},
         {SENSOR_TYPE_BAROMETER, "barometer", "borsh_bmp180", 1, 2, g_barometerRange},
         {SENSOR_TYPE_AMBIENT_LIGHT, "als", "rohm_bh1745", 1, 4, g_alsRange},
