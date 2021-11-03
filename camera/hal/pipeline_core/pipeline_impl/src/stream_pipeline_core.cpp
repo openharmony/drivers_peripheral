@@ -165,16 +165,19 @@ DynamicStreamSwitchMode StreamPipelineCore::CheckStreamsSupported(OperationMode 
     std::vector<int32_t> ids = {};
     context_->streamMgr_->GetStreamIds(ids);
 
-    // no streams are running
-    CHECK_IF_EQUAL_RETURN_VALUE(ids.empty(), true, DYNAMIC_STREAM_SWITCH_SUPPORT);
-
     std::vector<int32_t> types = {};
     for (const auto it : configs) {
         types.emplace_back(static_cast<std::underlying_type<StreamIntent>::type>(it.type));
     }
     std::sort(types.begin(), types.end(), [](const int32_t& f, const int32_t& n) { return f < n; });
-    if (strategy_->CheckPipelineSpecExist(mode, types) == RC_OK) {
+
+    bool isSupport = strategy_->CheckPipelineSpecExist(mode, types) == RC_OK ? true : false;
+    if (isSupport && !ids.empty()) {
         return DYNAMIC_STREAM_SWITCH_NEED_INNER_RESTART;
+    } else if (isSupport && ids.empty()) {
+        return DYNAMIC_STREAM_SWITCH_SUPPORT;
+    } else {
+        return DYNAMIC_STREAM_SWITCH_NOT_SUPPORT;
     }
 
     return DYNAMIC_STREAM_SWITCH_NOT_SUPPORT;

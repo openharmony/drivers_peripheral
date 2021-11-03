@@ -43,7 +43,7 @@ public:
     RetCode SetFlashlight(FlashMode flashMode, bool enable, CameraId cameraId = CAMERA_MAX);
     void Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta);
     void SetMetaDataCallBack(const MetaDataCb cb, CameraId cameraId = CAMERA_MAX);
-    void SetCallBack(UvcMetaDataCb cb);
+    void SetHotplugDevCallBack(HotplugDevCb cb);
 
 private:
     void UvcCallBack(const std::string hardwareName, std::vector<DeviceControl>& deviceControl,
@@ -58,7 +58,7 @@ private:
     CameraId ReturnEnableCameraId(std::string hardwareName);
 
 private:
-    UvcMetaDataCb uvcCb_ = nullptr;
+    HotplugDevCb uvcCb_ = nullptr;
     std::shared_ptr<EnumeratorManager> enumeratorManager_;
     std::vector<HardwareConfiguration> hardwareList_;
     std::vector<std::shared_ptr<IManager>> managerList_;

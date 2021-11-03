@@ -67,7 +67,6 @@ RetCode V4L2DeviceManager::Init()
         CAMERA_LOGE("%s EnumeratorManager Init fail", __FUNCTION__);
         return rc;
     }
-    SetCallBack(nullptr);
     return rc;
 }
 
@@ -283,7 +282,7 @@ std::string V4L2DeviceManager::CameraIdToHardware(CameraId cameraId, ManagerId m
     return nullptr;
 }
 
-void V4L2DeviceManager::SetCallBack(UvcMetaDataCb cb)
+void V4L2DeviceManager::SetHotplugDevCallBack(HotplugDevCb cb)
 {
     uvcCb_ = cb;
     enumeratorManager_->SetCallBack([&](const std::string hardwareName, std::vector<DeviceControl>& deviceControl,
@@ -296,7 +295,11 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
     std::vector<DeviceFormat>& deviceFormat, bool uvcState)
 {
     if (uvcState) {
-        CAMERA_LOGI("UvcCallBack up %s begine", hardwareName.c_str());
+        if (deviceControl.empty() || deviceFormat.empty()) {
+            CAMERA_LOGI("V4L2DeviceManager::UvcCallBack %{public}s is empty", hardwareName.c_str());
+            return;
+        }
+        CAMERA_LOGI("uvc plug in %{public}s begin", hardwareName.c_str());
         CameraId id = ReturnEnableCameraId("");
         CHECK_IF_EQUAL_RETURN_VOID(id, CAMERA_MAX);
 
@@ -320,24 +323,23 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
 
         uvcCb_(meta, uvcState, id);
-        CAMERA_LOGI("UvcCallBack up %s end", hardwareName.c_str());
+        CAMERA_LOGI("uvc plug in %{public}s end", hardwareName.c_str());
     } else {
-        CAMERA_LOGI("UvcCallBack down %s begine", hardwareName.c_str());
+        CAMERA_LOGI("uvc plug out %{public}s begin", hardwareName.c_str());
         CameraId id = ReturnEnableCameraId(hardwareName);
         CHECK_IF_EQUAL_RETURN_VOID(id, CAMERA_MAX);
-        RetCode rc = std::static_pointer_cast<SensorManager>(GetManager(DM_M_SENSOR))->DestroyController(DM_C_SENSOR,
-            hardwareName);
-        CHECK_IF_EQUAL_RETURN_VOID(rc, RC_ERROR);
+        CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
+
         for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend(); iter++) {
             if ((*iter).hardwareName == hardwareName) {
+                std::shared_ptr<CameraStandard::CameraMetadata> meta =
+                    std::make_shared<CameraStandard::CameraMetadata>(30, 2000);
+                uvcCb_(meta, uvcState, id);
                 hardwareList_.erase(iter);
                 break;
             }
         }
-        CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
-        std::shared_ptr<CameraStandard::CameraMetadata> meta = std::make_shared<CameraStandard::CameraMetadata>(30,
-            2000);
-        uvcCb_(meta, uvcState, id);
+        CAMERA_LOGI("uvc plug out %{public}s end", hardwareName.c_str());
     }
 }
 

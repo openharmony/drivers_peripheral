@@ -103,7 +103,7 @@ public:
     };
     virtual RetCode SetFlashlight(FlashMode flashMode, bool enable, CameraId cameraId = CAMERA_MAX) = 0;
     virtual void Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta) = 0;
-    virtual void SetCallBack(UvcMetaDataCb cb)
+    virtual void SetHotplugDevCallBack(HotplugDevCb cb)
     {
         (void)cb;
         return;
