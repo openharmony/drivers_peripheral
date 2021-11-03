@@ -50,18 +50,18 @@ public:
      * The current module supports preview streams, video streams, photographing streams, and the like.
      * For details, see {@link StreamIntent}.
      *
-     * This function is used to check whether a stream can be dynamically created based on the operation mode,
-     * configuration information, and existing streams in the current module.
-     * If the stream can be created without stopping the existing streams or making the upper-layer service or
+     * This function is used to check whether a stream or streams can be dynamically created based on the
+     * operation mode, configuration information, and existing streams in the current module.
+     * If the streams can be created without stopping the existing streams or making the upper-layer service or
      * application unaware of the stopping of the existing streams,
      * <b>type</b> is set to <b>DYNAMIC_SUPPORTED</b> so that the upper-layer service or application
      * can directly add the new stream.
-     * If the stream can be created only after the upper-layer service or application stops capturing all streams,
+     * If the streams can be created only after the upper-layer service or application stops capturing all streams,
      * <b>type</b> is set to <b>RE_CONFIGURED_REQUIRED</b>.
-     * If the stream is not supported, <b>type</b> is set to <b>NOT_SUPPORTED</b>.
+     * If the streams are not supported, <b>type</b> is set to <b>NOT_SUPPORTED</b>.
      * This function must be called prior to {@link CreateStreams}.
      *
-     * @param mode Indicates the operation mode of the stream. For details, see {@link OperationMode}.
+     * @param mode Indicates the operation mode of the streams. For details, see {@link OperationMode}.
      * @param modeSetting Indicates the stream configuration parameters, including the frame rate and 3A.
      * 3A stands for automatic focus (AF), automatic exposure (AE), and automatic white-balance (AWB).
      * @param info Indicates the stream configuration information. For details, see {@link StreamInfo}.
@@ -74,12 +74,6 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    virtual CamRetCode IsStreamsSupported(
-        OperationMode mode,
-        const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
-        const std::shared_ptr<StreamInfo> &info,
-        StreamSupportType &type) = 0;
-
     virtual CamRetCode IsStreamsSupported(
         OperationMode mode,
         const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,

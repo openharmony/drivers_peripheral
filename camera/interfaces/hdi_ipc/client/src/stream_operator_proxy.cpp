@@ -79,16 +79,6 @@ CamRetCode StreamOperatorProxy::IsStreamsSupported(
     return retCode;
 }
 
-CamRetCode StreamOperatorProxy::IsStreamsSupported(
-    OperationMode mode,
-    const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
-    const std::shared_ptr<StreamInfo> &pInfo,
-    StreamSupportType &pType)
-{
-    std::vector<std::shared_ptr<StreamInfo>> infos = {pInfo};
-    return IsStreamsSupported(mode, modeSetting, infos, pType);
-}
-
 CamRetCode StreamOperatorProxy::CreateStreams(
     const std::vector<std::shared_ptr<StreamInfo>> &streamInfos)
 {

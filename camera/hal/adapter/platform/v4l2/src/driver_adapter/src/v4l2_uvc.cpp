@@ -304,10 +304,10 @@ void HosV4L2UVC::loopUvcDevice()
                                 action.c_str(), subsystem.c_str(), devnode.c_str());
                     if (action == "remove") {
                         for (auto &itr : HosV4L2Dev::deviceMatch) {
-                            if (itr.second == devnode) {
+                            std::string devName = {};
+                            devName = "/dev/" + devnode;
+                            if (itr.second == devName) {
                                 CAMERA_LOGD("UVC:loop HosV4L2Dev::deviceMatch %{public}s\n", action.c_str());
-                                std::string devName = {};
-                                devName = "/dev/" + devnode;
                                 V4L2UvcMatchDev(itr.first, devName, false);
                                 break;
                             }

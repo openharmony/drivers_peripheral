@@ -267,7 +267,7 @@ RetCode StreamBase::CancelRequest(const std::shared_ptr<CaptureRequest>& request
 
     {
         // We don't care if this request is continious-capture or single-capture, just erase it.
-        // And those requests in inTransitList_ will be removed in HandleResult.
+        // And those requests in inTransitList_ removed in HandleResult.
         std::unique_lock<std::mutex> wl(wtLock_);
         auto it = std::find(waitingList_.begin(), waitingList_.end(), request);
         if (it != waitingList_.end()) {
@@ -471,7 +471,7 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
     }
 
     {
-        // inTransitList_ may have multiple copies of continious-capture request, we just need erase one of them.
+        // inTransitList_ may has multiple copies of continious-capture request, we just need erase one of them.
         std::unique_lock<std::mutex> l(tsLock_);
         for (auto it = inTransitList_.begin(); it != inTransitList_.end(); it++) {
             if ((*it) == request) {

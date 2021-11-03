@@ -68,14 +68,6 @@ RetCode StreamOperator::Init()
 
 CamRetCode StreamOperator::IsStreamsSupported(OperationMode mode,
                                               const std::shared_ptr<CameraStandard::CameraMetadata>& modeSetting,
-                                              const std::shared_ptr<StreamInfo>& pInfo,
-                                              StreamSupportType& type)
-{
-    return IsStreamsSupported(mode, modeSetting, {pInfo}, type);
-}
-
-CamRetCode StreamOperator::IsStreamsSupported(OperationMode mode,
-                                              const std::shared_ptr<CameraStandard::CameraMetadata>& modeSetting,
                                               const std::vector<std::shared_ptr<StreamInfo>>& pInfo,
                                               StreamSupportType& type)
 {

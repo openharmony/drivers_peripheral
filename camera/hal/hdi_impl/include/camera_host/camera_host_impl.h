@@ -44,8 +44,6 @@ public:
     CameraHostImpl& operator=(CameraHostImpl &&other) = delete;
 
 private:
-    void OnCameraStatusCallBack(const std::shared_ptr<CameraStandard::CameraMetadata> &meta,
-        const bool &status, const CameraId &cameraId);
     RetCode CameraPowerUp(const std::string &cameraId,
         const std::vector<std::string> &phyCameraIds);
     void CameraPowerDown(const std::vector<std::string> &phyCameraIds);

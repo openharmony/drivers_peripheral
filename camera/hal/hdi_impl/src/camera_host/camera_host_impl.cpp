@@ -76,6 +76,11 @@ CamRetCode CameraHostImpl::Init()
         }
     }
 
+    deviceManager->SetHotplugDevCallBack([this](const std::shared_ptr<CameraAbility> &meta,
+        const bool &status, const CameraId &cameraId) {
+            CameraStatus cameraStatus = status ? AVAILABLE : UN_AVAILABLE;
+            OnCameraStatus(cameraId, cameraStatus, meta);
+        });
     return NO_ERROR;
 }
 
@@ -329,18 +334,6 @@ RetCode CameraHostImpl::SetFlashlight(const std::vector<std::string> &phyCameraI
     return rc;
 }
 
-void CameraHostImpl::OnCameraStatusCallBack(const std::shared_ptr<CameraStandard::CameraMetadata> &meta,
-    const bool &status, const CameraId &cameraId)
-{
-    CameraStatus cameraStatus;
-    if (status) {
-        cameraStatus = AVAILABLE;
-    } else {
-        cameraStatus = UN_AVAILABLE;
-    }
-    OnCameraStatus(cameraId, cameraStatus, meta);
-}
-
 void CameraHostImpl::OnCameraStatus(CameraId cameraId,
     CameraStatus status, const std::shared_ptr<CameraAbility> ability)
 {
@@ -354,15 +347,15 @@ void CameraHostImpl::OnCameraStatus(CameraId cameraId,
         return;
     }
     std::vector<std::string> physicalCameraIds;
-    std::string logicalCameraId;
+    std::string physicalCameraId = config->ReturnPhysicalCameraIdToString(cameraId);
+    if (physicalCameraId.size() == 0) {
+        CAMERA_LOGE("config cameraId undefined in device manager.");
+        return;
+    }
+    physicalCameraIds.push_back(physicalCameraId);
+
     if (status == AVAILABLE) {
-        logicalCameraId = config->ReturnEnableLogicalCameraId();
-        std::string physicalCameraId = config->ReturnPhysicalCameraIdToString(cameraId);
-        if (physicalCameraId.size() == 0) {
-            CAMERA_LOGE("config cameraId undefined in device manager.");
-            return;
-        }
-        physicalCameraIds.push_back(physicalCameraId);
+        std::string logicalCameraId = config->ReturnEnableLogicalCameraId();
         RetCode rc = config->AddCameraId(logicalCameraId, physicalCameraIds, ability);
         if (rc == RC_OK && logicalCameraId.size() > 0) {
             CAMERA_LOGI("add physicalCameraIds %{public}d logicalCameraId %{public}s",
@@ -370,29 +363,23 @@ void CameraHostImpl::OnCameraStatus(CameraId cameraId,
             if (cameraHostCallback_ != nullptr) {
                 cameraHostCallback_->OnCameraStatus(logicalCameraId, status);
             }
-        } else {
-            CAMERA_LOGE("add camera id %{public}d Error", static_cast<int>(cameraId));
-            return;
+        }
+        std::shared_ptr<CameraDevice> cameraDevice =
+            CameraDevice::CreateCameraDevice(logicalCameraId);
+        if (cameraDevice != nullptr) {
+            cameraDeviceMap_[logicalCameraId] = cameraDevice;
         }
     } else {
-        std::vector<std::string> physicalCameraIds;
-        std::string physicalCameraId = config->ReturnPhysicalCameraIdToString(cameraId);
-        if (physicalCameraId.size() == 0) {
-            CAMERA_LOGE("config cameraId undefined in device manager.");
-            return;
-        }
-        physicalCameraIds.push_back(physicalCameraId);
-        logicalCameraId = config->SubtractCameraId(physicalCameraIds);
+        std::string logicalCameraId =
+            config->ReturnLogicalCameraIdToString(physicalCameraIds[0]);
         if (logicalCameraId.size() > 0) {
-            CAMERA_LOGI("Subtract physicalCameraIds %{public}d logicalCameraId %{public}s",
+            CAMERA_LOGI("physicalCameraIds %{public}d logicalCameraId %{public}s",
                 static_cast<int>(cameraId), logicalCameraId.c_str());
             if (cameraHostCallback_ != nullptr) {
                 cameraHostCallback_->OnCameraStatus(logicalCameraId, status);
             }
-        } else {
-            CAMERA_LOGE("Subtract camera id %{public}d Error", static_cast<int>(cameraId));
-            return;
         }
+        logicalCameraId = config->SubtractCameraId(physicalCameraIds);
     }
 }
 } // end namespace OHOS::Camera
