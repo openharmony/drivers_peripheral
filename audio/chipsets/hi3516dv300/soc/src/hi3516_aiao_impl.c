@@ -579,7 +579,6 @@ int32_t AudioAiInit(const struct PlatformData *platformData)
 
 int32_t AiaoSysPinMux(void)
 {
-
     void *regIocfg3Base = OsalIoRemap(IOCFG3_BASE_ADDR, BASE_ADDR_REMAP_SIZE);
     if (regIocfg3Base == NULL) {
         AUDIO_DEVICE_LOG_ERR("regIocfg3Base is NULL.");

@@ -12,8 +12,8 @@
 #include "audio_driver_log.h"
 #include "audio_platform_base.h"
 #include "hi3516_aiao_impl.h"
-#include "hi3516_codec_impl.h"
 #include "osal_io.h"
+#include "hi3516_codec_impl.h"
 
 #define HDF_LOG_TAG hi3516_codec_impl
 
@@ -170,7 +170,8 @@ static int32_t CodecGetI2s1DataWidth(unsigned int bitWidth, uint16_t *i2s1DataWi
     return HDF_SUCCESS;
 }
 
-int32_t CodecDaiParamsUpdate(struct AudioRegCfgGroupNode **regCfgGroup, struct CodecDaiParamsVal codecDaiParamsVal) {
+int32_t CodecDaiParamsUpdate(struct AudioRegCfgGroupNode **regCfgGroup, struct CodecDaiParamsVal codecDaiParamsVal)
+{
     int32_t ret;
     const int itemNum = 3; // current only 3 items(frequency, adc_mode_sel, i2s_datawith)
     struct AudioMixerControl *regAttr;
