@@ -362,50 +362,6 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetChipId001, TestSize.Level1)
 }
 
 /**
- * @tc.name: WifiHalGetIfNamesByChipId001
- * @tc.desc: Obtain all ifNames and the number of the current chip
- * @tc.type: FUNC
- * @tc.require: AR000F869G
- */
-HWTEST_F(HdfWlanPerformanceTest, WifiHalGetIfNamesByChipId001, TestSize.Level1)
-{
-    int ret;
-    struct IWiFiSta *staFeature = nullptr;
-    char *ifNames = nullptr;
-    unsigned int num = 0;
-    unsigned char chipId = 0;
-    struct timespec tv1 = (struct timespec){0};
-    struct timespec tv2 = (struct timespec){0};
-    int timeUsed = 0;
-    uint8_t i;
-
-    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_NE(nullptr, staFeature);
-    ret = staFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)staFeature, &chipId);
-    ASSERT_TRUE(chipId <= WLAN_MAX_CHIPID && chipId >= WLAN_MIN_CHIPID);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = staFeature->baseFeature.getIfNamesByChipId(chipId, nullptr, nullptr);
-    EXPECT_NE(HDF_SUCCESS, ret);
-    clock_gettime(CLOCK_REALTIME, &tv1);
-    ret = staFeature->baseFeature.getIfNamesByChipId(chipId, &ifNames, &num);
-    clock_gettime(CLOCK_REALTIME, &tv2);
-    EXPECT_NE(nullptr, ifNames);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
-        (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
-    ASSERT_TRUE(num <= IFNAME_MAX_NUM && num >= IFNAME_MIN_NUM);
-    for (i = 0; i < num; i++) {
-        EXPECT_EQ(0, strncmp("wlan", ifNames + i * MAX_IF_NAME_LENGTH, SIZE));
-    }
-    EXPECT_GE(MEDIUM_TIME, timeUsed);
-    free(ifNames);
-
-    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-}
-
-/**
  * @tc.name: WifiHalRegisterEventCallback001
  * @tc.desc: Wifi hal register callback function test
  * @tc.type: FUNC
