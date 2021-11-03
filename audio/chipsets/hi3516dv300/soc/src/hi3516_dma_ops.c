@@ -81,9 +81,7 @@ int32_t Hi3516DmaBufAlloc(struct PlatformData *data, enum AudioStreamType stream
         data->captureBufInfo.virtAddr = dma_alloc_wc(&captureDev, data->captureBufInfo.cirBufMax,
             (dma_addr_t *)&data->captureBufInfo.phyAddr, GFP_DMA | GFP_KERNEL);
 #endif
-
     } else if (streamType == AUDIO_RENDER_STREAM) {
-
 #ifdef __LITEOS__
         data->renderBufInfo.virtAddr = (uint32_t *)LOS_DmaMemAlloc(&data->renderBufInfo.phyAddr,
             data->renderBufInfo.cirBufMax,

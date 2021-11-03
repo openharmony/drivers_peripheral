@@ -6,12 +6,12 @@
  * See the LICENSE file in the root of this repository for complete details.
  */
 
+#include <linux/slab.h>
 #include "audio_core.h"
 #include "audio_driver_log.h"
 #include "audio_platform_base.h"
 #include "gpio_if.h"
 #include "hi3516_dma_ops.h"
-#include <linux/slab.h>
 #include "osal_io.h"
 #include "osal_mem.h"
 

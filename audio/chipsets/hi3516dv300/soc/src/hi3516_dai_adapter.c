@@ -15,8 +15,6 @@
 #include "audio_dai_base.h"
 #include "audio_driver_log.h"
 
-
-
 #define HDF_LOG_TAG hi3516_dai_adapter
 
 struct AudioDaiOps g_daiDeviceOps = {
