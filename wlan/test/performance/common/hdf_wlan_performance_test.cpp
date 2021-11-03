@@ -339,9 +339,6 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetChipId001, TestSize.Level1)
     int ret;
     struct IWiFiSta *staFeature = nullptr;
     unsigned char chipId = 0;
-    struct timespec tv1 = (struct timespec){0};
-    struct timespec tv2 = (struct timespec){0};
-    int timeUsed = 0;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
