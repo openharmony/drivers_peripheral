@@ -38,10 +38,6 @@ const uint32_t DEFAULT_COMBO_SIZE = 10;
 const uint32_t RESET_TIME = 20;
 const uint32_t WLAN_MIN_CHIPID = 0;
 const uint32_t WLAN_MAX_CHIPID = 2;
-const uint32_t IFNAME_MIN_NUM = 0;
-const uint32_t IFNAME_MAX_NUM = 32;
-const uint32_t MAX_IF_NAME_LENGTH = 16;
-const uint32_t SIZE = 4;
 
 static int32_t g_resetStatus = -1;
 
