@@ -153,6 +153,13 @@ typedef enum {
 #define AUDIO_SAMPLE_RATE_64000 64000
 #define AUDIO_SAMPLE_RATE_96000 96000
 #define SUPPORT_ADAPTER_NUM_MAX 8
+typedef int32_t (*CallbackProcessFunc)(AudioHandle handle, enum AudioCallbackType callBackType);
+
+enum AudioTurnStandbyMode {
+    AUDIO_TURN_STANDBY_LATER = 0,
+    AUDIO_TURN_STANDBY_NOW,
+    AUDIO_TURN_STANDBY_BUTT,
+};
 
 struct DevHandleCapture {
     void *object;
@@ -194,6 +201,8 @@ struct AudioFrameRenderMode {
     uint64_t bufferSize;
     RenderCallback callback;
     void* cookie;
+    CallbackProcessFunc callbackProcess;
+    AudioHandle renderhandle;
     struct AudioMmapBufferDescripter mmapBufDesc;
 };
 
@@ -219,6 +228,7 @@ struct AudioCtlParam {
     pthread_cond_t functionCond;
     struct AudioVol volThreshold;
     struct AudioGain audioGain;
+    enum AudioTurnStandbyMode turnStandbyStatus;
 };
 
 enum PathRoute {
@@ -255,6 +265,7 @@ struct HwInfo {
     uint32_t card;
     uint32_t device;
     int flags;
+    bool callBackEnable;
     char adapterName[NAME_LEN];
     struct AudioPort portDescript;
     struct AudioDeviceDescriptor deviceDescript;
@@ -396,6 +407,10 @@ enum AudioInterfaceLibParaCmdList {
     AUDIO_DRV_PCM_IOCTL_MMAP_BUFFER_CAPTURE,
     AUDIO_DRV_PCM_IOCTL_MMAP_POSITION,
     AUDIO_DRV_PCM_IOCTL_MMAP_POSITION_CAPTURE,
+    AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN,
+    AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE,
+    AUDIO_DRV_PCM_IOCTRL_CAPTURE_OPEN,
+    AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE,
     AUDIO_DRV_PCM_IOCTL_BUTT,
 };
 
@@ -528,6 +543,7 @@ int32_t AudioCaptureReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct Au
 int32_t AudioCaptureGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioCaptureTurnStandbyMode(AudioHandle handle);
 int32_t AudioCaptureAudioDevDump(AudioHandle handle, int32_t range, int32_t fd);
+int32_t CallbackProcessing(AudioHandle handle, enum AudioCallbackType callBackType);
 
 #ifdef __cplusplus
 }

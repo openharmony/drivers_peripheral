@@ -6,11 +6,14 @@
  * See the LICENSE file in the root of this repository for complete details.
  */
 
-#include "hi3516_codec_impl.h"
 #include <asm/io.h>
-#include "audio_device_log.h"
-#include "hdf_base.h"
+#include "audio_control.h"
+#include "audio_core.h"
+#include "audio_driver_log.h"
+#include "audio_platform_base.h"
+#include "hi3516_aiao_impl.h"
 #include "osal_io.h"
+#include "hi3516_codec_impl.h"
 
 #define HDF_LOG_TAG hi3516_codec_impl
 
@@ -31,166 +34,70 @@ int32_t CodecHalSysInit(void)
     return HDF_SUCCESS;
 }
 
-void AcodecHalWriteReg(unsigned int offset, unsigned int value)
+// Read contrl reg bits value
+int32_t CodecRegBitsRead(struct AudioMixerControl *regAttr, uint32_t *regValue)
 {
-    *(volatile unsigned int *)((unsigned char *)(g_regAcodecBase) + (unsigned int)(offset)) = value;
-}
-
-unsigned int AcodecHalReadReg(unsigned int offset)
-{
-    return (*(volatile unsigned int *)((unsigned char *)g_regAcodecBase + (unsigned int)offset));
-}
-
-static int AcodecSoftReset(void)
-{
-    AcodecDigCtrl1 acodecDigctrl1;
-    AcodecDigCtrl2 acodecDigctrl2;
-    AcodecDigCtrl3 acodecDigctrl3;
-    AcodecDigCtrl4 acodecDigctrl4;
-
-    AcodecAnaReg0 acodecAnareg0;
-    AcodecAnaReg1 acodecAnareg1;
-    AcodecAnaReg2 acodecAnareg2;
-    AcodecAnaReg3 acodecAnareg3;
-    AcodecAnaReg4 acodecAnareg4;
-
-    if (g_regAcodecBase == NULL) {
-        AUDIO_DEVICE_LOG_ERR("haven't ioremap acodec regs.");
+    if (g_regAcodecBase == NULL || regAttr == NULL ||
+        regAttr->reg < 0 || regValue == NULL) {
+        AUDIO_DEVICE_LOG_DEBUG("input invalid parameter.");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    regAttr->value = SysReadl((uintptr_t)g_regAcodecBase + regAttr->reg);
+    *regValue = regAttr->value;
+    regAttr->value = (*regValue >> regAttr->shift) & regAttr->mask;
+    if (regAttr->value > regAttr->max || regAttr->value < regAttr->min) {
+        AUDIO_DEVICE_LOG_DEBUG("invalid bitsValue=0x%x", regAttr->value);
         return HDF_FAILURE;
     }
-
-    acodecAnareg0.ul32 = 0x04000002;
-    AcodecHalWriteReg(ACODEC_ANAREG0_ADDR, acodecAnareg0.ul32);
-    acodecAnareg1.ul32 = 0xFD200004;
-    AcodecHalWriteReg(ACODEC_ANAREG1_ADDR, acodecAnareg1.ul32);
-    acodecAnareg2.ul32 = 0x00180018;
-    AcodecHalWriteReg(ACODEC_ANAREG2_ADDR, acodecAnareg2.ul32);
-    acodecAnareg3.ul32 = 0x83830028;
-    AcodecHalWriteReg(ACODEC_ANAREG3_ADDR, acodecAnareg3.ul32);
-    acodecAnareg4.ul32 = 0x00005C5C;
-    AcodecHalWriteReg(ACODEC_ANAREG4_ADDR, acodecAnareg4.ul32);
-    // offset 0x28
-    AcodecHalWriteReg(ACODEC_ANAREG5_ADDR, 0x130000);
-
-    acodecDigctrl1.ul32 = 0xff035a00;
-    AcodecHalWriteReg(ACODEC_DIGCTRL1_ADDR, acodecDigctrl1.ul32);
-    acodecDigctrl2.ul32 = 0x08000001;
-    AcodecHalWriteReg(ACODEC_DIGCTRL2_ADDR, acodecDigctrl2.ul32);
-    acodecDigctrl3.ul32 = 0x06062424;
-    AcodecHalWriteReg(ACODEC_DIGCTRL3_ADDR, acodecDigctrl3.ul32);
-    acodecDigctrl4.ul32 = 0x1e1ec001;
-    AcodecHalWriteReg(ACODEC_DIGCTRL4_ADDR, acodecDigctrl4.ul32);
-
+    if (regAttr->invert) {
+        regAttr->value = regAttr->max - regAttr->value;
+    }
     return HDF_SUCCESS;
 }
 
-/* 0x14, 0x18, 0x1c, 0x20 */
-static void AcodecInitInner(AcodecAnaReg0 *acodecAnareg0, AcodecAnaReg1 *acodecAnareg1,
-                            AcodecAnaReg2 *acodecAnareg2, AcodecAnaReg3 *acodecAnareg3)
+// Update contrl reg bits value
+int32_t CodecRegBitsUpdate(struct AudioMixerControl regAttr)
 {
-    acodecAnareg2->Bits.acodecRst = 0x0;
-    AcodecHalWriteReg(ACODEC_ANAREG2_ADDR, acodecAnareg2->ul32);
-
-    acodecAnareg3->Bits.acodecPopresSel = 0x1;
-    acodecAnareg3->Bits.acodecPoprampclkSel = 0x1;
-    AcodecHalWriteReg(ACODEC_ANAREG3_ADDR, acodecAnareg3->ul32);
-    acodecAnareg2->Bits.acodecVrefSel = 0x0;
-    AcodecHalWriteReg(ACODEC_ANAREG2_ADDR, acodecAnareg2->ul32);
-
-    acodecAnareg0->Bits.acodecPdbCtcmIbias = 0x1;
-    acodecAnareg0->Bits.acodecPdIbias = 0x1;
-    AcodecHalWriteReg(ACODEC_ANAREG0_ADDR, acodecAnareg0->ul32);
-
-    acodecAnareg1->Bits.acodecRxCtcmPd = 0x0;
-    AcodecHalWriteReg(ACODEC_ANAREG1_ADDR, acodecAnareg1->ul32);
-
-    acodecAnareg2->Bits.acodecLdoPd = 0x0;
-    AcodecHalWriteReg(ACODEC_ANAREG2_ADDR, acodecAnareg2->ul32);
-
-    acodecAnareg0->Bits.acodecPdVref = 0x0;
-    AcodecHalWriteReg(ACODEC_ANAREG0_ADDR, acodecAnareg0->ul32);
-
-    acodecAnareg3->Bits.acodecDacrPopDirect = 0x1;
-    acodecAnareg3->Bits.acodecDaclPopDirect = 0x1;
-    AcodecHalWriteReg(ACODEC_ANAREG3_ADDR, acodecAnareg3->ul32);
-
-    OsalMSleep(HALF_MINUTE);
-
-    acodecAnareg0->Bits.acodecPdDacr = 0x0;
-    acodecAnareg0->Bits.acodecPdDacl = 0x0;
-    acodecAnareg0->Bits.acodecMuteDacr = 0x0;
-    acodecAnareg0->Bits.acodecMuteDacl = 0x0;
-    AcodecHalWriteReg(ACODEC_ANAREG0_ADDR, acodecAnareg0->ul32);
-
-    acodecAnareg0->Bits.acodecDacrPopEn = 0x0;
-    acodecAnareg0->Bits.acodecDaclPopEn = 0x0;
-    AcodecHalWriteReg(ACODEC_ANAREG0_ADDR, acodecAnareg0->ul32);
-}
-
-int AcodecDeviceInit(void)
-{
-    int ret;
-    const int tenSeconds = 10;
-    AcodecAnaReg0 acodecAnareg0;
-    AcodecAnaReg1 acodecAnareg1;
-    AcodecAnaReg2 acodecAnareg2;
-    AcodecAnaReg3 acodecAnareg3;
-    AcodecAnaReg4 acodecAnareg4;
-    OsalMSleep(tenSeconds); /* sleep 10 ms */
-    /* 0x14, 0x18, 0x1c, 0x20, 0x24 */
-    acodecAnareg0.ul32 = 0x040578E1;
-    AcodecHalWriteReg(ACODEC_ANAREG0_ADDR, acodecAnareg0.ul32);
-    acodecAnareg1.ul32 = 0xFD220004;
-    AcodecHalWriteReg(ACODEC_ANAREG1_ADDR, acodecAnareg1.ul32);
-    acodecAnareg2.ul32 = 0x4098001B;
-    AcodecHalWriteReg(ACODEC_ANAREG2_ADDR, acodecAnareg2.ul32);
-    acodecAnareg3.ul32 = 0x8383FE00;
-    AcodecHalWriteReg(ACODEC_ANAREG3_ADDR, acodecAnareg3.ul32);
-    acodecAnareg4.ul32 = 0x0000505C;
-    AcodecHalWriteReg(ACODEC_ANAREG4_ADDR, acodecAnareg4.ul32);
-    AcodecHalWriteReg(ACODEC_ANAREG5_ADDR, 0x0);
-    AcodecInitInner(&acodecAnareg0, &acodecAnareg1, &acodecAnareg2, &acodecAnareg3);
-    acodecAnareg2.Bits.acodecLdoBk = 0x0;
-    AcodecHalWriteReg(ACODEC_ANAREG2_ADDR, acodecAnareg2.ul32);
-    acodecAnareg3.Bits.acodecPdAdcTune09 = 0x0;
-    AcodecHalWriteReg(ACODEC_ANAREG3_ADDR, acodecAnareg3.ul32);
-    acodecAnareg4.Bits.acodecAdcTuneSel09 = 0x1;
-    AcodecHalWriteReg(ACODEC_ANAREG4_ADDR, acodecAnareg4.ul32);
-    acodecAnareg4.Bits.acodecAdcTuneEn09 = 0x1;
-    AcodecHalWriteReg(ACODEC_ANAREG4_ADDR, acodecAnareg4.ul32);
-
-    ret = AcodecSoftReset();
+    int32_t ret;
+    uint32_t newValue, newMask, oldValue;
+    if (g_regAcodecBase == NULL || regAttr.reg < 0) {
+        AUDIO_DEVICE_LOG_ERR("input invalid parameter.");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (regAttr.invert) {
+        regAttr.value = regAttr.max - regAttr.value;
+    }
+    newValue = regAttr.value << regAttr.shift;
+    newMask = regAttr.mask << regAttr.shift;
+    ret = CodecRegBitsRead(&regAttr, &oldValue);
     if (ret != HDF_SUCCESS) {
-        AUDIO_DEVICE_LOG_DEBUG("AcodecSoftReset fail");
+        ADM_LOG_ERR("CodecRegBitsRead failed, ret=%d.", ret);
         return HDF_FAILURE;
     }
-
+    regAttr.value = (oldValue & ~newMask) | (newValue & newMask);
+    SysWritel((uintptr_t)g_regAcodecBase + regAttr.reg, regAttr.value);
     return HDF_SUCCESS;
 }
 
-void ShowAllAcodecRegister(void)
+int32_t CodecRegDefaultInit(struct AudioRegCfgGroupNode **regCfgGroup)
 {
-    volatile unsigned int val;
+    int32_t i;
+    struct AudioAddrConfig *regAttr;
+    if (g_regAcodecBase == NULL || regCfgGroup == NULL || regCfgGroup[AUDIO_INIT_GROUP] == NULL ||
+        regCfgGroup[AUDIO_INIT_GROUP]->addrCfgItem == NULL || regCfgGroup[AUDIO_INIT_GROUP]->itemNum <= 0) {
+        AUDIO_DEVICE_LOG_ERR("input invalid parameter.");
+        return HDF_FAILURE;
+    }
+    regAttr = regCfgGroup[AUDIO_INIT_GROUP]->addrCfgItem;
 
-    val = AcodecHalReadReg(ACODEC_ANAREG0_ADDR);
-    AUDIO_DEVICE_LOG_DEBUG("ACODEC REG: ACODEC_ANAREG0_ADDR 0014 = [%08x]", val);
-
-    val = AcodecHalReadReg(ACODEC_ANAREG3_ADDR);
-    AUDIO_DEVICE_LOG_DEBUG("ACODEC REG: ACODEC_ANAREG0_ADDR 0020 = [%08x]", val);
-
-    // ACODEC REG 0030
-    val = AcodecHalReadReg(ACODEC_DIGCTRL1_ADDR);
-    AUDIO_DEVICE_LOG_DEBUG("ACODEC REG: ACODEC_DIGCTRL1_ADDR 0030 = [%08x]", val);
-
-    val = AcodecHalReadReg(ACODEC_DIGCTRL3_ADDR);
-    AUDIO_DEVICE_LOG_DEBUG("ACODEC REG: ACODEC_DIGCTRL3_ADDR 0038 = [%08x]", val);
-
-    // ACODEC REG 0048
-    val = AcodecHalReadReg(AUDIO_CODEC_MASKREG);
-    AUDIO_DEVICE_LOG_DEBUG("ACODEC REG: AUDIO_CODEC_MASKREG 0048 = [%08x]", val);
+    for(i = 0; i < regCfgGroup[AUDIO_INIT_GROUP]->itemNum; i++) {
+        SysWritel((uintptr_t)g_regAcodecBase + regAttr[i].addr, regAttr[i].value);
+    }
+    AUDIO_DEVICE_LOG_DEBUG("success.");
+    return HDF_SUCCESS;
 }
 
-static unsigned int AcodecGetI2sFs(const unsigned int rate)
+static unsigned int CodecGetI2sFs(const unsigned int rate)
 {
     switch (rate) {
         case AUDIO_SAMPLE_RATE_8000:
@@ -214,7 +121,7 @@ static unsigned int AcodecGetI2sFs(const unsigned int rate)
     }
 }
 
-static unsigned int AcodecGetAdcModeSel(const unsigned int rate)
+static unsigned int CodecGetAdcModeSel(const unsigned int rate)
 {
     switch (rate) {
         case AUDIO_SAMPLE_RATE_8000:
@@ -236,64 +143,173 @@ static unsigned int AcodecGetAdcModeSel(const unsigned int rate)
     }
 }
 
-int32_t AcodecSetI2s1Fs(const unsigned int rate)
+static int32_t CodecGetI2s1DataWidth(unsigned int bitWidth, uint16_t *i2s1DataWidth)
 {
-    AcodecDigCtrl1 acodecDigctrl1;
-    AcodecAnaReg2 acodecAnaReg2;
-    AcodecAnaReg4 acodecAnaReg4;
+    if (i2s1DataWidth == NULL) {
+        AUDIO_DEVICE_LOG_DEBUG("input param is NULL");
+        return HDF_FAILURE;
+    }
+    *i2s1DataWidth = AUDIO_CODEC_BIT_WIDTH_16;
+    switch (bitWidth) {
+        case BIT_WIDTH16:
+            *i2s1DataWidth = AUDIO_CODEC_BIT_WIDTH_16;
+            break;
+        case BIT_WIDTH18:
+            *i2s1DataWidth = AUDIO_CODEC_BIT_WIDTH_18;
+            break;
+        case BIT_WIDTH20:
+            *i2s1DataWidth = AUDIO_CODEC_BIT_WIDTH_20;
+            break;
+        case BIT_WIDTH24:
+            *i2s1DataWidth = AUDIO_CODEC_BIT_WIDTH_24;
+            break;
+        default:
+            AUDIO_DEVICE_LOG_ERR("unsupport sample bit width %d.\n", bitWidth);
+            return AUDIO_CODEC_BIT_WIDTH_BUTT;
+    }
+    return HDF_SUCCESS;
+}
 
-    if (rate >= AUDIO_SAMPLE_RATE_BUTT) {
-        AUDIO_DEVICE_LOG_ERR("bad value, please use acodec_fs define\n");
+int32_t CodecDaiParamsUpdate(struct AudioRegCfgGroupNode **regCfgGroup, struct CodecDaiParamsVal codecDaiParamsVal)
+{
+    int32_t ret;
+    const int itemNum = 3; // current only 3 items(frequency, adc_mode_sel, i2s_datawith)
+    struct AudioMixerControl *regAttr;
+    uint16_t codecBitWidth;
+
+    ret = (g_regAcodecBase == NULL || regCfgGroup == NULL
+        || regCfgGroup[AUDIO_DAI_PATAM_GROUP] == NULL
+        || regCfgGroup[AUDIO_DAI_PATAM_GROUP]->regCfgItem == NULL
+        || regCfgGroup[AUDIO_DAI_PATAM_GROUP]->itemNum < itemNum);
+    if (ret) {
+        AUDIO_DEVICE_LOG_ERR("input invalid parameter.");
+        return HDF_FAILURE;
+    }
+    regAttr = regCfgGroup[AUDIO_DAI_PATAM_GROUP]->regCfgItem;
+
+    regAttr[0].value = CodecGetI2sFs(codecDaiParamsVal.frequencyVal);
+    ret = CodecRegBitsUpdate(regAttr[0]);               // i2s_frequency
+    if (ret != HDF_SUCCESS) {
+        AUDIO_DEVICE_LOG_ERR("set i2s_frequency failed.");
+        return HDF_FAILURE;
+    }
+    regAttr[1].value = CodecGetAdcModeSel(codecDaiParamsVal.frequencyVal);
+    ret = CodecRegBitsUpdate(regAttr[1]);           // adc_mode_sel
+    if (ret != HDF_SUCCESS) {
+        AUDIO_DEVICE_LOG_ERR("set adc_mode_sel failed.");
         return HDF_FAILURE;
     }
 
-    acodecDigctrl1.ul32 = AcodecHalReadReg(ACODEC_DIGCTRL1_ADDR);
-    acodecDigctrl1.Bits.i2s1FsSel = AcodecGetI2sFs(rate);
-    AcodecHalWriteReg(ACODEC_DIGCTRL1_ADDR, acodecDigctrl1.ul32);
+    ret = CodecGetI2s1DataWidth(codecDaiParamsVal.formatVal, &codecBitWidth);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_DEVICE_LOG_ERR("I2s1DataWidthSel failed.");
+        return HDF_FAILURE;
+    }
+    regAttr[itemNum - 1].value = codecBitWidth;         // i2s_datawith
+    ret = CodecRegBitsUpdate(regAttr[itemNum - 1]);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_DEVICE_LOG_ERR("set i2s_datawith failed.");
+        return HDF_FAILURE;
+    }
+    AUDIO_DEVICE_LOG_DEBUG("success.");
+    return HDF_SUCCESS;
+}
 
-    acodecAnaReg2.ul32 = AcodecHalReadReg(ACODEC_ANAREG2_ADDR);
-    acodecAnaReg2.Bits.acodecAdcrModeSel = AcodecGetAdcModeSel(rate);
-    acodecAnaReg2.Bits.acodecAdclModeSel = AcodecGetAdcModeSel(rate);
-    AcodecHalWriteReg(ACODEC_ANAREG2_ADDR, acodecAnaReg2.ul32);
+int32_t CodecSetAdcTuneEnable(struct AudioRegCfgGroupNode **regCfgGroup) 
+{
+    int32_t ret;
+    struct AudioMixerControl *regAttr;
+    const int itemNum = 1;
+    ret = (regCfgGroup == NULL || regCfgGroup[AUDIO_DAI_STARTUP_PATAM_GROUP] == NULL
+        || regCfgGroup[AUDIO_DAI_STARTUP_PATAM_GROUP]->regCfgItem == NULL
+        || regCfgGroup[AUDIO_DAI_STARTUP_PATAM_GROUP]->itemNum < itemNum);
+    if (ret) {
+        AUDIO_DEVICE_LOG_ERR("input invalid parameter.");
+        return HDF_FAILURE;
+    }
+    regAttr = regCfgGroup[AUDIO_DAI_STARTUP_PATAM_GROUP]->regCfgItem;
+    ret = CodecRegBitsUpdate(regAttr[0]);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_DEVICE_LOG_ERR("set adc_tune_En09 failed.");
+        return HDF_FAILURE;
+    }
+    AUDIO_DEVICE_LOG_DEBUG("success.");
+    return HDF_SUCCESS;
+}
 
-    /* rctune */
-    acodecAnaReg4.ul32 = AcodecHalReadReg(ACODEC_ANAREG4_ADDR);
-    acodecAnaReg4.Bits.acodecAdcTuneEn09 = 0;
-    AcodecHalWriteReg(ACODEC_ANAREG4_ADDR, acodecAnaReg4.ul32);
+int32_t AudioCodecAiaoGetCtrlOps(const struct AudioKcontrol *kcontrol, struct AudioCtrlElemValue *elemValue)
+{
+    uint32_t curValue;
+    uint32_t rcurValue;
+    unsigned long codecVir;
+    struct AudioMixerControl *mixerCtrl = NULL;
+    if (kcontrol == NULL || kcontrol->privateValue <= 0 || elemValue == NULL) {
+        AUDIO_DEVICE_LOG_ERR("Audio input param is NULL.");
+        return HDF_ERR_INVALID_OBJECT;
+    }
+    mixerCtrl = (struct AudioMixerControl *)((volatile uintptr_t)kcontrol->privateValue);
+    if (mixerCtrl == NULL) {
+        AUDIO_DEVICE_LOG_ERR("mixerCtrl is NULL.");
+        return HDF_FAILURE;
+    }
+    codecVir = (uintptr_t)OsalIoRemap(AIAO_REG_BASE, AIAO_MAX_REG_SIZE);
+    curValue = OSAL_READL((void *)((uintptr_t)(codecVir + mixerCtrl->reg)));
+    rcurValue = OSAL_READL((void *)((uintptr_t)(codecVir + mixerCtrl->rreg)));
+    OsalIoUnmap((void *)codecVir);
 
-    OsalUDelay(HALF_MINUTE); /* wait 30 us. */
-    acodecAnaReg4.ul32 = AcodecHalReadReg(ACODEC_ANAREG4_ADDR);
-    acodecAnaReg4.Bits.acodecAdcTuneEn09 = 1;
-    AcodecHalWriteReg(ACODEC_ANAREG4_ADDR, acodecAnaReg4.ul32);
+    if (AudioGetCtrlOpsReg(elemValue, mixerCtrl, curValue) != HDF_SUCCESS ||
+        AudioGetCtrlOpsRReg(elemValue, mixerCtrl, rcurValue) != HDF_SUCCESS) {
+        AUDIO_DEVICE_LOG_ERR("Audio codec get kcontrol reg and rreg failed.");
+        return HDF_FAILURE;
+    }
 
     return HDF_SUCCESS;
 }
 
-int32_t AcodecSetI2s1DataWidth(const unsigned int bitWidth)
+static void AudioUpdateCodecAiaoRegBits(const struct AudioMixerControl *mixerControl, uint32_t value)
 {
-    AcodecDigCtrl1 acodecDigctrl1;
-    AudioCodecBitWidth codecBitWidth;
-    codecBitWidth = AUDIO_CODEC_BIT_WIDTH_16;
-    switch (bitWidth) {
-        case BIT_WIDTH16:
-            codecBitWidth = AUDIO_CODEC_BIT_WIDTH_16;
-            break;
-        case BIT_WIDTH18:
-            codecBitWidth = AUDIO_CODEC_BIT_WIDTH_18;
-            break;
-        case BIT_WIDTH20:
-            codecBitWidth = AUDIO_CODEC_BIT_WIDTH_20;
-            break;
-        case BIT_WIDTH24:
-            codecBitWidth = AUDIO_CODEC_BIT_WIDTH_24;
-            break;
-        default:
-            return HDF_FAILURE;
-            break;
+    if (mixerControl == NULL) {
+        AUDIO_DEVICE_LOG_ERR("param mixerControl is null.");
+        return;
     }
 
-    acodecDigctrl1.ul32 = AcodecHalReadReg(ACODEC_DIGCTRL1_ADDR);
-    acodecDigctrl1.Bits.i2s1DataBits = codecBitWidth;
-    AcodecHalWriteReg(ACODEC_DIGCTRL1_ADDR, acodecDigctrl1.ul32);
+    uint32_t curValue;
+    unsigned long codecVir;
+    uint32_t mixerControlMask;
+
+    value = value << mixerControl->shift;
+    mixerControlMask = mixerControl->mask << mixerControl->shift;
+    codecVir = (uintptr_t)OsalIoRemap(AIAO_REG_BASE, AIAO_MAX_REG_SIZE);
+    curValue = OSAL_READL((void *)((uintptr_t)(codecVir + mixerControl->reg)));
+    curValue = (curValue & ~mixerControlMask) | (value & mixerControlMask);
+    OSAL_WRITEL(curValue, (void *)((uintptr_t)(codecVir + mixerControl->reg)));
+    OsalIoUnmap((void *)codecVir);
+}
+
+int32_t AudioCodecAiaoSetCtrlOps(const struct AudioKcontrol *kcontrol, const struct AudioCtrlElemValue *elemValue)
+{
+    uint32_t value;
+    uint32_t rvalue;
+    bool updateRReg = false;
+    struct AudioMixerControl *mixerCtrl = NULL;
+    if (kcontrol == NULL || (kcontrol->privateValue <= 0) || elemValue == NULL) {
+        AUDIO_DEVICE_LOG_ERR("Audio input param is NULL.");
+        return HDF_ERR_INVALID_OBJECT;
+    }
+
+    mixerCtrl = (struct AudioMixerControl *)((volatile uintptr_t)kcontrol->privateValue);
+    if (AudioSetCtrlOpsReg(kcontrol, elemValue, mixerCtrl, &value) != HDF_SUCCESS) {
+        AUDIO_DEVICE_LOG_ERR("AudioSetCtrlOpsReg is failed.");
+        return HDF_ERR_INVALID_OBJECT;
+    }
+    AudioUpdateCodecAiaoRegBits(mixerCtrl, value);
+    if (AudioSetCtrlOpsRReg(elemValue, mixerCtrl, &rvalue, &updateRReg) != HDF_SUCCESS) {
+        AUDIO_DEVICE_LOG_ERR("AudioSetCtrlOpsRReg is failed.");
+        return HDF_ERR_INVALID_OBJECT;
+    }
+    if (updateRReg) {
+        AudioUpdateCodecAiaoRegBits(mixerCtrl, rvalue);
+    }
+
     return HDF_SUCCESS;
 }

@@ -66,7 +66,7 @@ HWTEST_F(Hi3516PlatformOpsTest, Hi3516PlatformOpsTest_PlatformInvalidStreamTypeP
 
 HWTEST_F(Hi3516PlatformOpsTest, Hi3516PlatformOpsTest_PlatformInvalidRenderPeriodCountParam, TestSize.Level1)
 {
-    struct HdfTestMsg msg = {G_TEST_HI3516_AUDIO_DRIVER_TYPE, TESTPLATFORMINVALIDRENDERPERIODCOUNT, -1};
+    struct HdfTestMsg msg = {G_TEST_HI3516_AUDIO_DRIVER_TYPE, TESTPLATFORMINVALIDRENDERPERIODCOUNTPARAM, -1};
     EXPECT_EQ(-1, HdfTestSendMsgToService(&msg));
 }
 
@@ -79,7 +79,7 @@ HWTEST_F(Hi3516PlatformOpsTest, Hi3516PlatformOpsTest_PlatformInvalidRenderPerio
 
 HWTEST_F(Hi3516PlatformOpsTest, Hi3516PlatformOpsTest_PlatformInvalidCapturePeriodCountParam, TestSize.Level1)
 {
-    struct HdfTestMsg msg = {G_TEST_HI3516_AUDIO_DRIVER_TYPE, TESTPLATFORMINVALIDCAPTUREPERIODCOUNT, -1};
+    struct HdfTestMsg msg = {G_TEST_HI3516_AUDIO_DRIVER_TYPE, TESTPLATFORMINVALIDCAPTUREPERIODCOUNTPARAM, -1};
     EXPECT_EQ(-1, HdfTestSendMsgToService(&msg));
 }
 

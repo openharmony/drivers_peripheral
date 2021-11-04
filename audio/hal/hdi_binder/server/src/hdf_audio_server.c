@@ -529,19 +529,18 @@ int AudioHdiServerInit(struct HdfDeviceObject *deviceObject)
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 #ifdef AUDIO_HAL_USER
-    g_mpiInitSo = dlopen(SO_INTERFACE_LIB_MPI_PATH, RTLD_LAZY);
-    if (g_mpiInitSo == NULL) {
-        LOG_FUN_ERR("Open so Fail, reason:%s", dlerror());
+    void *sdkHandle;
+    int (*sdkInitSp)() = NULL;
+    char sdkResolvedPath[] = "//system/lib/libhdi_audio_interface_lib_render.z.so";
+    sdkHandle = dlopen(sdkResolvedPath, 1);
+    if (sdkHandle == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    int32_t (*mpiInit)() = dlsym(g_mpiInitSo, "AudioMpiSysInit");
-    if (mpiInit == NULL) {
-        dlclose(g_mpiInitSo);
+    sdkInitSp = (int32_t (*)())(dlsym(sdkHandle, "MpiSdkInit"));
+    if (sdkInitSp == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    if (mpiInit() < 0) {
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
+    sdkInitSp();
 #endif
     return AUDIO_HAL_SUCCESS;
 }

@@ -955,6 +955,41 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
     return ret;
 }
 
+int32_t AudioOutputCaptureOpen(const struct DevHandleCapture *handle,
+    int cmdId, const struct AudioHwCaptureParam *handleData)
+{
+    if (handle == NULL || handle->object == NULL || handleData == NULL) {
+        LOG_FUN_ERR("Function parameter is NULL!");
+        return HDF_FAILURE;
+    }
+    uint32_t card = handleData->captureMode.hwInfo.card;
+    if (card >= AUDIO_SERVICE_MAX) {
+        LOG_FUN_ERR("card is Error!");
+        return HDF_FAILURE;
+    }
+    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    if (sBuf == NULL) {
+        LOG_FUN_ERR("Failed to obtain sBuf");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteString(sBuf, g_audioLibCaptureService[card])) {
+        AudioBufReplyRecycle(sBuf, NULL);
+        return HDF_FAILURE;
+    }
+    struct HdfIoService *service = (struct HdfIoService *)handle->object;
+    if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
+        LOG_FUN_ERR("Function parameter is empty!");
+        AudioBufReplyRecycle(sBuf, NULL);
+        return HDF_FAILURE;
+    }
+    int32_t ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
+    if (ret != HDF_SUCCESS) {
+        LOG_FUN_ERR("Failed to send service call!");
+    }
+    AudioBufReplyRecycle(sBuf, NULL);
+    return ret;
+}
+
 int32_t AudioOutputCaptureReadFrame(struct HdfIoService *service, int cmdId, struct HdfSBuf *reply)
 {
     int32_t ret;
@@ -1085,11 +1120,21 @@ int32_t AudioOutputCaptureStop(const struct DevHandleCapture *handle,
         LOG_FUN_ERR("CaptureStop Service is NULL!");
         return HDF_FAILURE;
     }
-    ret = service->dispatcher->Dispatch(&service->object, cmdId, NULL, NULL);
+    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    if (sBuf == NULL) {
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteUint32(sBuf, AUDIO_TURN_STANDBY_LATER)) {
+        AudioBufReplyRecycle(sBuf, NULL);
+        return HDF_FAILURE;
+    }
+    ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
+        AudioBufReplyRecycle(sBuf, NULL);
         LOG_FUN_ERR("CaptureStop Failed to send service call!");
         return ret;
     }
+    AudioBufReplyRecycle(sBuf, NULL);
     return HDF_SUCCESS;
 }
 
@@ -1208,7 +1253,11 @@ int32_t AudioInterfaceLibOutputCapture(const struct DevHandleCapture *handle, in
             break;
         case AUDIO_DRV_PCM_IOCTRL_START_CAPTURE:
         case AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE:
+        case AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE:
             ret = AudioOutputCaptureStartPrepare(handle, cmdId, handleData);
+            break;
+        case AUDIO_DRV_PCM_IOCTRL_CAPTURE_OPEN:
+            ret = AudioOutputCaptureOpen(handle, cmdId, handleData);
             break;
         case AUDIO_DRV_PCM_IOCTRL_STOP_CAPTURE:
             ret = AudioOutputCaptureStop(handle, cmdId, handleData);
@@ -1317,6 +1366,8 @@ int32_t AudioInterfaceLibModeCapture(const struct DevHandleCapture *handle,
         case AUDIODRV_CTL_IOCTL_PAUSE_WRITE_CAPTURE:
         case AUDIO_DRV_PCM_IOCTL_MMAP_BUFFER_CAPTURE:
         case AUDIO_DRV_PCM_IOCTL_MMAP_POSITION_CAPTURE:
+        case AUDIO_DRV_PCM_IOCTRL_CAPTURE_OPEN:
+        case AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE:
             return (AudioInterfaceLibOutputCapture(handle, cmdId, handleData));
         case AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE:
         case AUDIODRV_CTL_IOCTL_ELEM_READ_CAPTURE:

@@ -141,9 +141,3 @@ int32_t TestAcodecSetI2s1DataWidthInvalidBitWidth(void)
     return HDF_SUCCESS;
 }
 
-int32_t TestShowAllAcodecRegister(void)
-{
-    HDF_LOGI("TestShowAllAcodecRegister: enter");
-    ShowAllAcodecRegister();
-    return HDF_SUCCESS;
-}
