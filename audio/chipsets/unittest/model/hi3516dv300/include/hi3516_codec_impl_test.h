@@ -26,7 +26,6 @@ int32_t TestAcodecSetI2s1Fs(void);
 int32_t TestAcodecSetI2s1FsInvalidRate(void);
 int32_t TestAcodecSetI2s1DataWidth(void);
 int32_t TestAcodecSetI2s1DataWidthInvalidBitWidth(void);
-int32_t TestShowAllAcodecRegister(void);
 #ifdef __cplusplus
 #if __cplusplus
 }

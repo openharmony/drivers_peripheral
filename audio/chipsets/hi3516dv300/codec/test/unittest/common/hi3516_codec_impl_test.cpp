@@ -86,10 +86,4 @@ HWTEST_F(Hi3516CodecImplTest, Hi3516CodecImplTest_AcodecSetI2s1DataWidthInvalidW
     struct HdfTestMsg msg = {G_TEST_HI3516_AUDIO_DRIVER_TYPE, TESTACODECSETI2S1DATAWIDTHINVALIDBITWIDTH, -1};
     EXPECT_EQ(-1, HdfTestSendMsgToService(&msg));
 }
-
-HWTEST_F(Hi3516CodecImplTest, Hi3516CodecImplTest_ShowAllAcodecRegister, TestSize.Level1)
-{
-    struct HdfTestMsg msg = {G_TEST_HI3516_AUDIO_DRIVER_TYPE, TESTSHOWALLACODECREGISTER, -1};
-    EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
-}
 }

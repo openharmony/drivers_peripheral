@@ -123,6 +123,7 @@ int32_t AudioRenderStop(AudioHandle handle)
     }
     ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam,
                                      AUDIO_DRV_PCM_IOCTRL_STOP);
+    hwRender->renderParam.renderMode.ctlParam.turnStandbyStatus = AUDIO_TURN_STANDBY_LATER;
     if (ret < 0) {
         LOG_FUN_ERR("AudioRenderStop SetParams FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
@@ -217,6 +218,10 @@ int32_t AudioRenderFlush(AudioHandle handle)
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    bool callBackStatus = hwRender->renderParam.renderMode.hwInfo.callBackEnable;
+    if (callBackStatus) {
+        return CallbackProcessing(hwRender, AUDIO_FLUSH_COMPLETED);
     }
     return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
@@ -1142,6 +1147,7 @@ int32_t AudioRenderTurnStandbyMode(AudioHandle handle)
     if (render == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
+    render->renderParam.renderMode.ctlParam.turnStandbyStatus = AUDIO_TURN_STANDBY_NOW;
     int32_t ret = AudioRenderStop((AudioHandle)render);
     if (ret < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
@@ -1229,6 +1235,7 @@ int32_t AudioRenderRegCallback(struct AudioRender *render, RenderCallback callba
     }
     pRender->renderParam.frameRenderMode.callback = callback;
     pRender->renderParam.frameRenderMode.cookie = cookie;
+    pRender->renderParam.renderMode.hwInfo.callBackEnable = true;
     return AUDIO_HAL_SUCCESS;
 }
 

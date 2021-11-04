@@ -67,13 +67,13 @@ int32_t TestPlatformHwParams(void)
 
     ret = InitHwParam(param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("PlatformHwParams set hw param is fail");
+        HDF_LOGE("AudioHwParams set hw param is fail");
         OsalMemFree(param);
         return HDF_FAILURE;
     }
-    ret = PlatformHwParams(card, param);
+    ret = AudioHwParams(card, param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformHwParams: PlatformHwParams fail ret = %d", ret);
+        HDF_LOGE("TestPlatformHwParams: AudioHwParams fail ret = %d", ret);
         OsalMemFree(param);
         return HDF_FAILURE;
     }
@@ -105,14 +105,14 @@ int32_t TestPlatformInvalidChannelsParam(void)
 
     ret = InitHwParam(param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformInvalidChannelsParam: PlatformHwParams set hw param is fail");
+        HDF_LOGE("TestPlatformInvalidChannelsParam: AudioHwParams set hw param is fail");
         OsalMemFree(param);
         return HDF_FAILURE;
     }
     param->channels = 0;
-    ret = PlatformHwParams(card, param);
+    ret = AudioHwParams(card, param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformInvalidChannelsParam: PlatformHwParams fail ret = %d", ret);
+        HDF_LOGE("TestPlatformInvalidChannelsParam: AudioHwParams fail ret = %d", ret);
         OsalMemFree(param);
         return HDF_FAILURE;
     }
@@ -145,14 +145,14 @@ int32_t TestPlatformInvalidStreamTypeParam(void)
 
     ret = InitHwParam(param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformInvalidStreamTypeParam: PlatformHwParams set hw param is fail");
+        HDF_LOGE("TestPlatformInvalidStreamTypeParam: AudioHwParams set hw param is fail");
         OsalMemFree(param);
         return HDF_FAILURE;
     }
     param->streamType = invalidStreamType;
-    ret = PlatformHwParams(card, param);
+    ret = AudioHwParams(card, param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformInvalidStreamTypeParam: PlatformHwParams fail ret = %d", ret);
+        HDF_LOGE("TestPlatformInvalidStreamTypeParam: AudioHwParams fail ret = %d", ret);
         OsalMemFree(param);
         return HDF_FAILURE;
     }
@@ -185,15 +185,15 @@ int32_t TestPlatformInvalidRenderPeriodCountParam(void)
 
     ret = InitHwParam(param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformInvalidRenderPeriodCountParam: PlatformHwParams set hw param is fail");
+        HDF_LOGE("TestPlatformInvalidRenderPeriodCountParam: AudioHwParams set hw param is fail");
         OsalMemFree(param);
         return HDF_FAILURE;
     }
     param->streamType = 1;
     param->periodCount = periodCountValue;
-    ret = PlatformHwParams(card, param);
+    ret = AudioHwParams(card, param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformInvalidRenderPeriodCountParam: PlatformHwParams fail ret = %d", ret);
+        HDF_LOGE("TestPlatformInvalidRenderPeriodCountParam: AudioHwParams fail ret = %d", ret);
         OsalMemFree(param);
         return HDF_FAILURE;
     }
@@ -225,15 +225,15 @@ int32_t TestPlatformInvalidRenderPeriodSizeParam(void)
 
     ret = InitHwParam(param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformInvalidRenderPeriodSizeParam: PlatformHwParams set hw param is fail");
+        HDF_LOGE("TestPlatformInvalidRenderPeriodSizeParam: AudioHwParams set hw param is fail");
         OsalMemFree(param);
         return HDF_FAILURE;
     }
     param->streamType = 1;
     param->periodSize = periodSizeValue;
-    ret = PlatformHwParams(card, param);
+    ret = AudioHwParams(card, param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformInvalidRenderPeriodSizeParam: PlatformHwParams fail ret = %d", ret);
+        HDF_LOGE("TestPlatformInvalidRenderPeriodSizeParam: AudioHwParams fail ret = %d", ret);
         OsalMemFree(param);
         return HDF_FAILURE;
     }
@@ -266,15 +266,15 @@ int32_t TestPlatformInvalidCaptuerPeriodCountParam(void)
 
     ret = InitHwParam(param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformInvalidCaptuerPeriodCountParam: PlatformHwParams set hw param is fail");
+        HDF_LOGE("TestPlatformInvalidCaptuerPeriodCountParam: AudioHwParams set hw param is fail");
         OsalMemFree(param);
         return HDF_FAILURE;
     }
     param->streamType = 0;
     param->periodCount = periodCountValue;
-    ret = PlatformHwParams(card, param);
+    ret = AudioHwParams(card, param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformInvalidCaptuerPeriodCountParam: PlatformHwParams fail ret = %d", ret);
+        HDF_LOGE("TestPlatformInvalidCaptuerPeriodCountParam: AudioHwParams fail ret = %d", ret);
         OsalMemFree(param);
         return HDF_FAILURE;
     }
@@ -307,15 +307,15 @@ int32_t TestPlatformInvalidCaptuerPeriodSizeParam(void)
 
     ret = InitHwParam(param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformInvalidCaptuerPeriodSizeParam: PlatformHwParams set hw param is fail");
+        HDF_LOGE("TestPlatformInvalidCaptuerPeriodSizeParam: AudioHwParams set hw param is fail");
         OsalMemFree(param);
         return HDF_FAILURE;
     }
     param->streamType = 0;
     param->periodSize = periodSizeValue;
-    ret = PlatformHwParams(card, param);
+    ret = AudioHwParams(card, param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformInvalidCaptuerPeriodSizeParam: PlatformHwParams fail ret = %d", ret);
+        HDF_LOGE("TestPlatformInvalidCaptuerPeriodSizeParam: AudioHwParams fail ret = %d", ret);
         OsalMemFree(param);
         return HDF_FAILURE;
     }
@@ -348,15 +348,15 @@ int32_t TestPlatformInvalidCaptuerSilenceThresholdParam(void)
 
     ret = InitHwParam(param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformInvalidCaptuerSilenceThresholdParam: PlatformHwParams set hw param is fail");
+        HDF_LOGE("TestPlatformInvalidCaptuerSilenceThresholdParam: AudioHwParams set hw param is fail");
         OsalMemFree(param);
         return HDF_FAILURE;
     }
     param->streamType = 0;
     param->silenceThreshold = silenceThresholdValue;
-    ret = PlatformHwParams(card, param);
+    ret = AudioHwParams(card, param);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformInvalidCaptuerSilenceThresholdParam: PlatformHwParams fail ret = %d", ret);
+        HDF_LOGE("TestPlatformInvalidCaptuerSilenceThresholdParam: AudioHwParams fail ret = %d", ret);
         OsalMemFree(param);
         return HDF_FAILURE;
     }
@@ -379,9 +379,9 @@ int32_t TestPlatformRenderPrepare(void)
         return HDF_FAILURE;
     }
 
-    ret = PlatformRenderPrepare(card);
+    ret = AudioRenderPrepare(card);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformRenderPrepare: PlatformRenderPrepare fail ret = %d", ret);
+        HDF_LOGE("TestPlatformRenderPrepare: AudioRenderPrepare fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
@@ -402,9 +402,9 @@ int32_t TestPlatformCapturePrepare(void)
         return HDF_FAILURE;
     }
 
-    ret = PlatformCapturePrepare(card);
+    ret = AudioCapturePrepare(card);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("TestPlatformCapturePrepare: PlatformCapturePrepare fail ret = %d", ret);
+        HDF_LOGE("TestPlatformCapturePrepare: AudioCapturePrepare fail ret = %d", ret);
         return HDF_FAILURE;
     }
 
