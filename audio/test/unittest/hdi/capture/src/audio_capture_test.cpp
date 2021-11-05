@@ -972,4 +972,24 @@ HWTEST_F(AudioCaptureTest, AudioCaptureGetCapturePositionWhenParamIsVaild, TestS
     delete(time);
     time = nullptr;
 }
+
+HWTEST_F(AudioCaptureTest, AudioCaptureTurnStandbyModeWhenHandleIsNull, TestSize.Level1)
+{
+    AudioHwCapture *hwCapture = nullptr;
+    AudioHandle handle = (AudioHandle)hwCapture;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioCaptureTurnStandbyMode(handle));
+}
+
+HWTEST_F(AudioCaptureTest, AudioCaptureTurnStandbyModeWhenStopIsError, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)capture;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioCaptureTurnStandbyMode(handle));
+}
+
+HWTEST_F(AudioCaptureTest, AudioCaptureTurnStandbyModeWhenParamIsVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)capture;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioCaptureStart(handle));
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioCaptureTurnStandbyMode(handle));
+}
 }

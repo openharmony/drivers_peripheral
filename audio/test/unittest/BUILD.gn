@@ -25,11 +25,16 @@ group("audiotest") {
   }
   deps = []
 
+  # hal ut
+  deps += [
+    "hdi:hdi",
+    "lib:lib",
+  ]
+
+  # adm + driver ut
   deps += [
     "adm:hdf_test_audio",
     "driver:khdf_test_audio_driver",
-    "hdi:hdi",
-    "lib:lib",
   ]
 }
 ############################end############################
