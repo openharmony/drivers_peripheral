@@ -21,11 +21,11 @@
 
 #ifndef _DEFAULT_CONFIG_H_
 #define _DEFAULT_CONFIG_H_
+
+#include "config.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "config.h"
 
 const struct RouteCfgInfo default_speaker_normal_controls[] = {
     {
@@ -34,14 +34,12 @@ const struct RouteCfgInfo default_speaker_normal_controls[] = {
     },
 };
 
-
 const struct RouteCfgInfo default_headphone_normal_controls[] = {
     {
         .controlName = "Playback Path",
         .stringVal = "HP_NO_MIC",
     },
 };
-
 
 const struct RouteCfgInfo default_speaker_headphone_normal_controls[] = {
     {
@@ -63,8 +61,6 @@ const struct RouteCfgInfo default_hands_free_mic_capture_controls[] = {
         .stringVal = "Hands Free Mic",
     },
 };
-
-
 
 const struct RouteCfgInfo default_playback_off_controls[] = {
     {
@@ -143,9 +139,7 @@ const struct PathRouteCfgTable default_config_table = {
         .ctlsNums = 0,
     },
 #endif
-
 };
-
 #ifdef __cplusplus
 }
 #endif

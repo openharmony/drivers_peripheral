@@ -74,7 +74,7 @@ int32_t SetHwParams(const struct AudioHwRenderParam *handleData)
         cardServiceName %s, format %d, period %d, frameSize %d, isBigEndian %d, isSignedData %d, \
         startThreshold %d, stopThreshold %d, silenceThreshold %d",
         g_hwParams.streamType, g_hwParams.channels, g_hwParams.rate, g_hwParams.periodSize,
-        g_hwParams.periodCount, g_hwParams.cardServiceName, g_hwParams.format,g_hwParams.period,
+        g_hwParams.periodCount, g_hwParams.cardServiceName, g_hwParams.format, g_hwParams.period,
         g_hwParams.frameSize, g_hwParams.isBigEndian, g_hwParams.isSignedData, g_hwParams.startThreshold,
         g_hwParams.stopThreshold, g_hwParams.silenceThreshold);
 #endif
@@ -1285,10 +1285,10 @@ int32_t FrameSbufWriteBuffer(struct HdfSBuf *sBuf, const struct AudioHwRenderPar
             bits = TINYALSAPCM_16_BIT;
         }
         ReadOutSoundCard();
-        PlaySample(&pcm, devOut[SND_OUT_SOUND_CARD_SPEAKER].card, devOut[SND_OUT_SOUND_CARD_SPEAKER].device, 
+        PlaySample(&pcm, devOut[SND_OUT_SOUND_CARD_SPEAKER].card, devOut[SND_OUT_SOUND_CARD_SPEAKER].device,
             g_hwParams.channels, g_hwParams.rate, bits,
-            g_hwParams.periodSize / 4,
-            g_hwParams.periodCount / 2);
+            g_hwParams.periodSize / 4,   // Because the data frame size is limited to 16K,periodSize/4.
+            g_hwParams.periodCount / 2); // Because the data frame size is limited to 16K,periodcount/2
         RoutePcmCardOpen(devOut[SND_OUT_SOUND_CARD_SPEAKER].card, DEV_OUT_SPEAKER_HEADPHONE_NORMAL_ROUTE);
     }
     pcm_write(pcm, handleData->frameRenderMode.buffer, handleData->frameRenderMode.bufferSize);
@@ -1348,7 +1348,6 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
 int32_t AudioCallbackModeStatus(const struct AudioHwRenderParam *handleData,
     enum AudioCallbackType callbackType)
 {
-
     if (handleData == NULL) {
         return HDF_FAILURE;
     }

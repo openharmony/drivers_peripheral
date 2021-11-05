@@ -63,7 +63,7 @@ enum RenderPcmPara {
     TINYALSAPCM_32_BIT = 32,
 };
 
-enum AudioRoute{
+enum AudioRoute {
     // out devices route define
     DEV_OUT_SPEAKER_NORMAL_ROUTE = 0,
     DEV_OUT_HEADPHONE_NORMAL_ROUTE,
@@ -117,8 +117,8 @@ int RouteSetCaptureVoiceVolume(float volume);
 int RouteGetVoiceVolume(char *ctlName);
 int RouteGetVoiceMinMaxStep(long long *volMin, long long *volMax, char *ctlName, bool isPlayback);
 int MixerOpenLegacy(bool isPlayback, int card);
-void ReadOutSoundCard();
-void ReadInSoundCard();
+void ReadOutSoundCard(void);
+void ReadInSoundCard(void);
 void RoutePcmCardOpen(int card, uint32_t route);
 int RoutePcmClose(unsigned route);
 void PlaySample(struct pcm **pcm, unsigned int card, unsigned int device, unsigned int channels,
