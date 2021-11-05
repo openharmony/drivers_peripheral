@@ -25,12 +25,12 @@ if (defined(ohos_lite)) {
     ]
     deps += [ "${chipset_build_deps}" ]
   }
-  group("unittest") {
+  group("camera_hal_lite_unittest") {
     deps = [
-      "buffer_manager/test:buffer_manager_unittest",
-      "device_manager/test:device_manager_unittest",
-      "hdi_impl/test:hdi_impl_unittest",
-      "pipeline_core/test:pipeline_core_unittest",
+      "buffer_manager/test:camera_hal_buffer_manager_unittest",
+      "device_manager/test:camera_hal_device_manager_unittest",
+      "hdi_impl/test:camera_hal_hdi_impl_unittest",
+      "pipeline_core/test:camera_hal_pipeline_core_unittest",
       "test/mpi:camera_case_liteos",
     ]
   }
@@ -52,15 +52,15 @@ if (defined(ohos_lite)) {
     }
   }
 
-  group("unittest") {
+  group("camera_hal_standard_unittest") {
     if (is_standard_system) {
       testonly = true
       deps = [
-        "buffer_manager/test:buffer_manager_unittest",
-        "device_manager/test:device_manager_unittest",
-        "hdi_impl/test:hdi_impl_unittest",
-        "pipeline_core/test:pipeline_core_unittest",
-        "test/fuzz:fuzztest",
+        "buffer_manager/test:camera_hal_buffer_manager_unittest",
+        "device_manager/test:camera_hal_device_manager_unittest",
+        "hdi_impl/test:camera_hal_hdi_impl_unittest",
+        "pipeline_core/test:camera_hal_pipeline_core_unittest",
+        "test/fuzz:camera_hal_fuzztest",
         "test/mpi:camera_case_unittest",
       ]
     }
