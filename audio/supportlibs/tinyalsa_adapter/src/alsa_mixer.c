@@ -157,6 +157,32 @@ int mixer_ctl_enumerated_select(struct mixer_ctl *ctl, const char *value)
     return 0;
 }
 
+int GetCtlMinValue(struct snd_ctl_elem_info *elemInfo, long long *min)
+{
+    snd_ctl_elem_type_t type =  elemInfo->type;
+    if (type == SNDRV_CTL_ELEM_TYPE_BOOLEAN || type == SNDRV_CTL_ELEM_TYPE_INTEGER) {
+        *min = elemInfo->value.integer.min;
+    } else if (type == SNDRV_CTL_ELEM_TYPE_INTEGER64) {
+        *min = elemInfo->value.integer64.min;
+    } else {
+        return -1;
+    }
+    return 0;
+}
+
+int GetCtlMaxValue(struct snd_ctl_elem_info *elemInfo, long long *max)
+{
+    snd_ctl_elem_type_t type =  elemInfo->type;
+    if (type == SNDRV_CTL_ELEM_TYPE_BOOLEAN || type == SNDRV_CTL_ELEM_TYPE_INTEGER) {
+        *max = elemInfo->value.integer.max;
+    } else if (type == SNDRV_CTL_ELEM_TYPE_INTEGER64) {
+        *max = elemInfo->value.integer64.max;
+    } else {
+        return -1;
+    }
+    return 0;
+}
+
 int mixer_get_ctl_minmax(struct mixer_ctl *ctl, long long *min, long long *max)
 {
     if (ctl == NULL || ctl->info == NULL) {
@@ -603,32 +629,6 @@ int RoutePcmClose(unsigned route)
 int mixer_ctl_set_int(struct mixer_ctl *ctl, long long value)
 {
     return mixer_ctl_set_int_double(ctl, value, value);
-}
-
-int GetCtlMinValue(struct snd_ctl_elem_info *elemInfo, long long *min)
-{
-    snd_ctl_elem_type_t type =  elemInfo->type;
-    if (type == SNDRV_CTL_ELEM_TYPE_BOOLEAN || type == SNDRV_CTL_ELEM_TYPE_INTEGER) {
-        *min = elemInfo->value.integer.min;
-    } else if (type == SNDRV_CTL_ELEM_TYPE_INTEGER64) {
-        *min = elemInfo->value.integer64.min;
-    } else {
-        return -1;
-    }
-    return 0;
-}
-
-int GetCtlMaxValue(struct snd_ctl_elem_info *elemInfo, long long *max)
-{
-    snd_ctl_elem_type_t type =  elemInfo->type;
-    if (type == SNDRV_CTL_ELEM_TYPE_BOOLEAN || type == SNDRV_CTL_ELEM_TYPE_INTEGER) {
-        *max = elemInfo->value.integer.max;
-    } else if (type == SNDRV_CTL_ELEM_TYPE_INTEGER64) {
-        *max = elemInfo->value.integer64.max;
-    } else {
-        return -1;
-    }
-    return 0;
 }
 
 snd_ctl_elem_type_t mixer_ctl_get_value_prehandler(struct mixer_ctl *ctl,
