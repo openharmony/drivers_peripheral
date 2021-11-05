@@ -119,12 +119,10 @@ static void SetDefaultDevInfo(struct DevInfo *info, int size, int rid)
 static int name_match(const char* dst, const char* src)
 {
     int score = 0;
-    // total equal
     if (!strcmp(dst, src)) {
-        score = 100;
+        score = 100; // match 100%, total equal
     } else  if (strstr(dst, src)) {
-        // part equal
-        score = 50;
+        score = 50; //  match 50%, part equal
     }
 
     return score;
