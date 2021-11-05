@@ -30,12 +30,10 @@ struct PathRouteCfgTable {
     const struct PathRoute headphoneNormal;
     const struct PathRoute HdmiNormal;
     const struct PathRoute speakerHeadphoneNormal;
-
-    const struct PathRoute mainMicCapture; 
-    const struct PathRoute handsFreeMicCapture; 
-
+    const struct PathRoute mainMicCapture;
+    const struct PathRoute handsFreeMicCapture;
     const struct PathRoute playbackOff;
-    const struct PathRoute captureOff; 
+    const struct PathRoute captureOff;
 };
 
 struct TinyalsaSndCardCfg {
