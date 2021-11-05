@@ -46,7 +46,7 @@ HWTEST_F(OpenCameraTest, Camera_Open_0001, TestSize.Level0)
         std::cout << "==========[test log]cameraId = " << cameraId << std::endl;
     }
     std::string cameraId = Test_->cameraIds.front();
-    Test_->deviceCallback = new CameraDeviceCallback();
+    Test_->CreateDeviceCallback();
     Test_->rc = Test_->service->OpenCamera(cameraId, Test_->deviceCallback, Test_->cameraDevice);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     if (Test_->rc== Camera::NO_ERROR) {
@@ -72,7 +72,7 @@ HWTEST_F(OpenCameraTest, Camera_Open_0010, TestSize.Level2)
     Test_->service->GetCameraIds(Test_->cameraIds);
     for (auto &cameraId : Test_->cameraIds) {
         std::cout << "cameraId = " << cameraId << std::endl;
-        Test_->deviceCallback = new CameraDeviceCallback();
+        Test_->CreateDeviceCallback();
         Test_->rc = Test_->service->OpenCamera(cameraId, Test_->deviceCallback, Test_->cameraDevice);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         if (Test_->rc== Camera::NO_ERROR) {

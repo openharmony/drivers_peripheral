@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef PREVIEW_TEST_H
+#define PREVIEW_TEST_H
+
 #include "common.h"
 
 class PreviewTest : public testing::Test {
@@ -23,3 +26,4 @@ public:
     std::shared_ptr<OHOS::Camera::Test> Test_ = nullptr;
     void CheckCommitStreams(std::shared_ptr<OHOS::Camera::Test> Test_);
 };
+#endif

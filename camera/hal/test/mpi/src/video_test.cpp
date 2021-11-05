@@ -31,7 +31,6 @@ void VideoTest::SetUp(void)
 void VideoTest::TearDown(void)
 {
     Test_->Close();
-
 }
 
 /**
@@ -52,9 +51,12 @@ HWTEST_F(VideoTest, Camera_Video_0001, TestSize.Level0)
     // Capture video stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
     // Post-processing
+    sleep(10);
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
-    Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
+    Test_->streamIds.push_back(Test_->streamId_preview);
+    Test_->streamIds.push_back(Test_->streamId_video);
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -89,6 +91,7 @@ HWTEST_F(VideoTest, Camera_Video_0002, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -126,6 +129,7 @@ HWTEST_F(VideoTest, Camera_Video_0003, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -163,6 +167,7 @@ HWTEST_F(VideoTest, Camera_Video_0004, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -185,6 +190,7 @@ HWTEST_F(VideoTest, Camera_Video_0005, TestSize.Level0)
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -210,7 +216,9 @@ HWTEST_F(VideoTest, Camera_Video_0020, TestSize.Level1)
     // Release stream
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
+    Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -244,11 +252,12 @@ HWTEST_F(VideoTest, Camera_Video_0021, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
   * @tc.name: Video
-  * @tc.desc: Preview and video streams + 3A, Commit 2 streams together, capture in order.
+  * @tc.desc: Preview and video streams + 3A, Commit 2 streams together, video in order.
   * @tc.size: MediumTest
   * @tc.type: Function
   */
@@ -259,6 +268,7 @@ HWTEST_F(VideoTest, Camera_Video_0022, TestSize.Level2)
     // Configure two stream information
     Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
     Test_->StartStream(Test_->intents);
+    Test_->StopConsumer({Camera::VIDEO});
     // Capture preview stream
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     // Issue 3A parameters to increase exposure
@@ -273,7 +283,7 @@ HWTEST_F(VideoTest, Camera_Video_0022, TestSize.Level2)
     }
     // Capture video stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    sleep(300);
+    sleep(180);
     // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};

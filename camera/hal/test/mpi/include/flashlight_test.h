@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef FLASHLIGHT_TEST_H
+#define FLASHLIGHT_TEST_H
+
 #include "common.h"
 
 class FlashlightTest : public testing::Test {
@@ -22,3 +26,4 @@ public:
     void TearDown(void);
     std::shared_ptr<OHOS::Camera::Test> Test_ = nullptr;
 };
+#endif
