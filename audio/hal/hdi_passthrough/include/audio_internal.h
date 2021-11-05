@@ -430,17 +430,17 @@ typedef void(*CloseServiceCaptureSo)(struct DevHandleCapture *);
 typedef int32_t (*PathSelGetConfToJsonObj)();
 typedef int32_t (*PathSelAnalysisJson)(void *adapterParam, enum AudioAdaptType adaptType);
 
-BindServiceRenderSo *AudioSoGetBindServiceRender();
-InterfaceLibModeRenderSo *AudioSoGetInterfaceLibModeRender();
-CloseServiceRenderSo *AudioSoGetCloseServiceRender();
+BindServiceRenderSo *AudioSoGetBindServiceRender(void);
+InterfaceLibModeRenderSo *AudioSoGetInterfaceLibModeRender(void);
+CloseServiceRenderSo *AudioSoGetCloseServiceRender(void);
 
-BindServiceCaptureSo *AudioSoGetBindServiceCapture();
-InterfaceLibModeCaptureSo *AudioSoGetInterfaceLibModeCapture();
-CloseServiceCaptureSo *AudioSoGetCloseServiceCapture();
+BindServiceCaptureSo *AudioSoGetBindServiceCapture(void);
+InterfaceLibModeCaptureSo *AudioSoGetInterfaceLibModeCapture(void);
+CloseServiceCaptureSo *AudioSoGetCloseServiceCapture(void);
 
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
-PathSelGetConfToJsonObj *AudioSoGetPathSelGetConfToJsonObj();
-PathSelAnalysisJson *AudioSoGetPathSelAnalysisJson();
+PathSelGetConfToJsonObj *AudioSoGetPathSelGetConfToJsonObj(void);
+PathSelAnalysisJson *AudioSoGetPathSelAnalysisJson(void);
 #endif
 
 int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender);

@@ -40,5 +40,6 @@ int32_t InitAttrs(struct AudioSampleAttributes &attrs);
 int32_t InitDevDesc(struct AudioDeviceDescriptor &devDesc);
 int32_t InitAttrsCapture(struct AudioSampleAttributes &attrs);
 int32_t InitDevDescCapture(struct AudioDeviceDescriptor &devDesc);
+int32_t AudioRenderCallbackUtTest(enum AudioCallbackType type, void *reserved, void *cookie);
 }
 #endif

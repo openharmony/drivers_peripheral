@@ -1220,12 +1220,16 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostWrite_0001, TestSize.Level1)
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_WRITE, sBufT, reply);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    if (ret < 0) {
+        HdfIoServiceRecycle(service);
+        ASSERT_EQ(HDF_SUCCESS, ret);
+    }
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     HdfSBufRecycle(sBufT);
+    HdfSBufRecycle(sBufTStop);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1236,40 +1240,53 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostWrite_0001, TestSize.Level1)
 */
 HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRead_0001, TestSize.Level1)
 {
-    int32_t ret = -1;
-    struct HdfIoService *service = nullptr;
-    struct HdfSBuf *reply = nullptr;
-    struct HdfSBuf *sBufTStop = nullptr;
+    int32_t tryNumReply = 100;
+    uint32_t buffStatus = 0;
     uint32_t readSize = 0;
+    struct HdfIoService *service = nullptr;
+    struct HdfSBuf *sBufTStop = nullptr;
     struct AudioXferi transfer;
     struct AudioPcmHwParams hwParams {
         .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
         .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
-    reply = HdfSBufObtainDefaultSize();
-    if (reply == nullptr) {
-        ASSERT_NE(nullptr, reply);
-    }
-    ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
-    if (ret < 0) {
-        HdfSBufRecycle(reply);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    int32_t ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    struct HdfSBuf *reply = HdfSBufTypedObtainCapacity(SBUF_RAW, (AUDIO_SIZE_FRAME + AUDIO_REPLY_EXTEND));
+    ASSERT_NE(nullptr, reply);
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PREPARE, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_READ, nullptr, reply);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_START, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    do {
+        ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_READ, nullptr, reply);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_GE(HdfSbufReadUint32(reply, &buffStatus), HDF_SUCCESS);
+        if (buffStatus == CIR_BUFF_EMPTY) {
+            tryNumReply--;
+            HdfSbufFlush(reply);
+            usleep(5000);
+            continue;
+        }
+        break;
+    } while (tryNumReply > 0);
+    EXPECT_GE(tryNumReply, 0);
     ret = HdfSbufReadBuffer(reply, (const void **) & (transfer.buf), &readSize);
     EXPECT_NE(transfer.buf, nullptr);
     EXPECT_NE(readSize, (uint32_t)0);
     ret = WriteToSBuf(sBufTStop);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    if (ret < 0) {
+        HdfSBufRecycle(reply);
+        HdfIoServiceRecycle(service);
+        ASSERT_EQ(HDF_SUCCESS, ret);
+    }
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     HdfSBufRecycle(reply);
+    HdfSBufRecycle(sBufTStop);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1293,11 +1310,15 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderPrepare_0001, TestSize
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PREPARE, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    if (ret < 0) {
+        HdfIoServiceRecycle(service);
+        ASSERT_EQ(HDF_SUCCESS, ret);
+    }
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    HdfSBufRecycle(sBufTStop);
     HdfIoServiceRecycle(service);
 }
 
@@ -1323,11 +1344,15 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostCapturePrepare_0001, TestSiz
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PREPARE, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    if (ret < 0) {
+        HdfIoServiceRecycle(service);
+        ASSERT_EQ(HDF_SUCCESS, ret);
+    }
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    HdfSBufRecycle(sBufTStop);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1353,11 +1378,15 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_StreamHostRenderStart_0001, TestSize.Level1)
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_START, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    if (ret < 0) {
+        HdfIoServiceRecycle(service);
+        ASSERT_EQ(HDF_SUCCESS, ret);
+    }
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    HdfSBufRecycle(sBufTStop);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1383,11 +1412,15 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_StreamHostCaptureStart_0001, TestSize.Level1
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_START, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    if (ret < 0) {
+        HdfIoServiceRecycle(service);
+        ASSERT_EQ(HDF_SUCCESS, ret);
+    }
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    HdfSBufRecycle(sBufTStop);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1411,11 +1444,15 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderStop_0001, TestSize.Le
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PREPARE, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    if (ret < 0) {
+        HdfIoServiceRecycle(service);
+        ASSERT_EQ(HDF_SUCCESS, ret);
+    }
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    HdfSBufRecycle(sBufTStop);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1439,9 +1476,13 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostCaptureStop_0001, TestSize.L
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PREPARE, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    if (ret < 0) {
+        HdfIoServiceRecycle(service);
+        ASSERT_EQ(HDF_SUCCESS, ret);
+    }
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    HdfSBufRecycle(sBufTStop);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1469,9 +1510,13 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderPause_0001, TestSize.L
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PAUSE, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    if (ret < 0) {
+        HdfIoServiceRecycle(service);
+        ASSERT_EQ(HDF_SUCCESS, ret);
+    }
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    HdfSBufRecycle(sBufTStop);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1499,9 +1544,13 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostCapturePause_0001, TestSize.
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PAUSE, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    if (ret < 0) {
+        HdfIoServiceRecycle(service);
+        ASSERT_EQ(HDF_SUCCESS, ret);
+    }
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    HdfSBufRecycle(sBufTStop);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1531,9 +1580,13 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderResume_0001, TestSize.
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_RESUME, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    if (ret < 0) {
+        HdfIoServiceRecycle(service);
+        ASSERT_EQ(HDF_SUCCESS, ret);
+    }
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    HdfSBufRecycle(sBufTStop);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1563,11 +1616,15 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostCaptureResume_0001, TestSize
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_RESUME, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    if (ret < 0) {
+        HdfIoServiceRecycle(service);
+        ASSERT_EQ(HDF_SUCCESS, ret);
+    }
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE, nullptr, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    HdfSBufRecycle(sBufTStop);
     HdfIoServiceRecycle(service);
 }
 }

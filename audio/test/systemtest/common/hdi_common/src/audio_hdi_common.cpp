@@ -38,6 +38,9 @@
 using namespace std;
 
 static int g_frameStatus = 1;
+static int g_write_completed = 0;
+static int g_render_full = 0;
+static int g_flush_completed = 0;
 namespace HMOS {
 namespace Audio {
 int32_t InitAttrs(struct AudioSampleAttributes &attrs)
@@ -995,6 +998,45 @@ int32_t RecordMapAudio(struct PrepareAudioPara &audiopara)
         munmap(desc.memoryAddress, reqSize);
     }
     return ret;
+}
+int32_t AudioRenderCallback(enum AudioCallbackType type, void *reserved, void *cookie)
+{
+    switch (type) {
+        case AUDIO_NONBLOCK_WRITE_COMPELETED:
+            g_write_completed = AUDIO_WRITE_COMPELETED_VALUE;
+            return HDF_SUCCESS;
+        case AUDIO_RENDER_FULL:
+            g_render_full = AUDIO_RENDER_FULL_VALUE;
+            return HDF_SUCCESS;
+        case AUDIO_FLUSH_COMPLETED:
+            g_flush_completed = AUDIO_FLUSH_COMPLETED_VALUE;
+            return HDF_SUCCESS;
+        case AUDIO_ERROR_OCCUR:
+            return HDF_FAILURE;
+        case AUDIO_DRAIN_COMPELETED:
+            return HDF_FAILURE;
+    }
+}
+int32_t CheckWriteCompleteValue()
+{
+    if (g_write_completed == AUDIO_WRITE_COMPELETED_VALUE)
+        return HDF_SUCCESS;
+    else
+        return HDF_FAILURE;
+}
+int32_t CheckRenderFullValue()
+{
+    if (g_render_full == AUDIO_RENDER_FULL_VALUE)
+        return HDF_SUCCESS;
+    else
+        return HDF_FAILURE;
+}
+int32_t CheckFlushValue()
+{
+    if (g_flush_completed == AUDIO_FLUSH_COMPLETED_VALUE)
+        return HDF_SUCCESS;
+    else
+       return HDF_FAILURE;
 }
 }
 }

@@ -45,40 +45,16 @@ HWTEST_F(Hi3516CodecOpsTest, Hi3516CodecOpsTestt_CodecDeviceInit, TestSize.Level
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(Hi3516CodecOpsTest, Hi3516CodecOpsTestt_CodecDeviceInitFail, TestSize.Level1)
-{
-    struct HdfTestMsg msg = {G_TEST_HI3516_AUDIO_DRIVER_TYPE, TESTCODECDEVICEINITFAIL, -1};
-    EXPECT_EQ(-1, HdfTestSendMsgToService(&msg));
-}
-
 HWTEST_F(Hi3516CodecOpsTest, Hi3516CodecOpsTest_CodecDaiDeviceInit, TestSize.Level1)
 {
     struct HdfTestMsg msg = {G_TEST_HI3516_AUDIO_DRIVER_TYPE, TESTCODECDAIDEVICEINIT, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
 }
 
-HWTEST_F(Hi3516CodecOpsTest, Hi3516CodecOpsTest_CodecDaiDeviceInitFail, TestSize.Level1)
-{
-    struct HdfTestMsg msg = {G_TEST_HI3516_AUDIO_DRIVER_TYPE, TESTCODECDAIDEVICEINITFAIL, -1};
-    EXPECT_EQ(-1, HdfTestSendMsgToService(&msg));
-}
-
 HWTEST_F(Hi3516CodecOpsTest, Hi3516CodecOpsTest_CodecDaiHwParams, TestSize.Level1)
 {
     struct HdfTestMsg msg = {G_TEST_HI3516_AUDIO_DRIVER_TYPE, TESTCODECDAIHWPARAMS, -1};
     EXPECT_EQ(0, HdfTestSendMsgToService(&msg));
-}
-
-HWTEST_F(Hi3516CodecOpsTest, Hi3516CodecOpsTest_CodecDaiInvalidBitWidthParam, TestSize.Level1)
-{
-    struct HdfTestMsg msg = {G_TEST_HI3516_AUDIO_DRIVER_TYPE, TESTCODECDAIINVALIDBITWIDTHPARAM, -1};
-    EXPECT_EQ(-1, HdfTestSendMsgToService(&msg));
-}
-
-HWTEST_F(Hi3516CodecOpsTest, Hi3516CodecOpsTest_CodecDaiInvalidRateParam, TestSize.Level1)
-{
-    struct HdfTestMsg msg = {G_TEST_HI3516_AUDIO_DRIVER_TYPE, TESTCODECDAIINVALIDRATEPARAM, -1};
-    EXPECT_EQ(-1, HdfTestSendMsgToService(&msg));
 }
 
 HWTEST_F(Hi3516CodecOpsTest, Hi3516CodecOpsTest_CodecDaiStartup, TestSize.Level1)

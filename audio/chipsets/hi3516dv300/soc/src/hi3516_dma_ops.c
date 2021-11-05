@@ -252,7 +252,7 @@ int32_t Hi3516DmaPointer(struct PlatformData *data, uint32_t *pointer)
     uint32_t wPtr;
     uint32_t rPtr;
 
-    if (data == NULL) {
+    if (data == NULL || pointer == NULL) {
         AUDIO_DRIVER_LOG_ERR("data is null");
         return HDF_FAILURE;
     }

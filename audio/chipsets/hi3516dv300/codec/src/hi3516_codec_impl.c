@@ -170,7 +170,8 @@ static int32_t CodecGetI2s1DataWidth(unsigned int bitWidth, uint16_t *i2s1DataWi
     return HDF_SUCCESS;
 }
 
-int32_t CodecDaiParamsUpdate(struct AudioRegCfgGroupNode **regCfgGroup, struct CodecDaiParamsVal codecDaiParamsVal)
+int32_t CodecDaiParamsUpdate(struct AudioRegCfgGroupNode **regCfgGroup,
+    struct CodecDaiParamsVal codecDaiParamsVal)
 {
     int32_t ret;
     const int itemNum = 3; // current only 3 items(frequency, adc_mode_sel, i2s_datawith)
@@ -215,7 +216,7 @@ int32_t CodecDaiParamsUpdate(struct AudioRegCfgGroupNode **regCfgGroup, struct C
     return HDF_SUCCESS;
 }
 
-int32_t CodecSetAdcTuneEnable(struct AudioRegCfgGroupNode **regCfgGroup) 
+int32_t CodecSetAdcTuneEnable(struct AudioRegCfgGroupNode **regCfgGroup)
 {
     int32_t ret;
     struct AudioMixerControl *regAttr;

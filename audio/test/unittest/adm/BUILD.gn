@@ -28,14 +28,20 @@ ohos_unittest("hdf_audio_adm_test") {
     "//drivers/framework/test/unittest/osal",
     "//drivers/framework/test/unittest/model/audio/include",
     "//drivers/framework/model/audio/core/test/unittest/common",
+    "//drivers/framework/model/audio/common/test/unittest/common",
   ]
 
   defines = [ "__USER__" ]
   sources = [
+    "//drivers/framework/model/audio/common/test/unittest/common/audio_accessory_base_test.cpp",
+    "//drivers/framework/model/audio/common/test/unittest/common/audio_codec_base_test.cpp",
+    "//drivers/framework/model/audio/common/test/unittest/common/audio_dai_base_test.cpp",
+    "//drivers/framework/model/audio/common/test/unittest/common/audio_dma_base_test.cpp",
+    "//drivers/framework/model/audio/common/test/unittest/common/audio_dsp_base_test.cpp",
+    "//drivers/framework/model/audio/common/test/unittest/common/audio_platform_base_test.cpp",
     "//drivers/framework/model/audio/core/test/unittest/common/audio_core_test.cpp",
     "//drivers/framework/model/audio/core/test/unittest/common/audio_host_test.cpp",
     "//drivers/framework/model/audio/core/test/unittest/common/audio_parse_test.cpp",
-    "//drivers/framework/model/audio/dispatch/test/unittest/common/audio_stream_dispatch_test.cpp",
     "//drivers/framework/model/audio/sapm/test/unittest/common/audio_sapm_test.cpp",
   ]
   deps = [
@@ -43,8 +49,7 @@ ohos_unittest("hdf_audio_adm_test") {
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//utils/native/base:utils",
   ]
-  resource_config_file =
-      "//drivers/adapter/uhdf2/test/resource/audio/ohos_test.xml"
+
   cflags = [
     "-Wall",
     "-Wextra",

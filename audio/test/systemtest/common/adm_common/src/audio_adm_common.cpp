@@ -175,7 +175,7 @@ int32_t WriteToSBuf(struct HdfSBuf *&sBufT)
     }
 
     if (!HdfSbufWriteUint32(sBufT, 0)) {
-        free(sBufT);
+        HdfSBufRecycle(sBufT);
         sBufT = nullptr;
         return HDF_FAILURE;
     }

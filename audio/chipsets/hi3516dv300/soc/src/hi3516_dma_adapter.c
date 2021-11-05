@@ -101,7 +101,7 @@ static int32_t Hi3516DmaDriverInit(struct HdfDeviceObject *device)
     OsalMutexInit(&g_platformData.renderBufInfo.buffMutex);
     OsalMutexInit(&g_platformData.captureBufInfo.buffMutex);
     g_platformData.platformInitFlag = false;
-    ret = AudioSocDeviceRegister(device, (void *)&g_platformData, AUDIO_PLATFORM_DEVICE);
+    ret = AudioSocRegisterPlatform(device, &g_platformData);
     if (ret !=  HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("register dai fail.");
         return ret;

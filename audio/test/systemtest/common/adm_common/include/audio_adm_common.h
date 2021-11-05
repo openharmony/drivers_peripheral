@@ -43,6 +43,9 @@ namespace HMOS {
 namespace Audio {
 const int REGISTER_STATUS_ON = 0;
 const int REGISTER_STATUS_OFF = 1;
+const int AUDIO_SIZE_FRAME = 16 * 1024;
+const int AUDIO_REPLY_EXTEND = 16;
+const int CIR_BUFF_EMPTY = 3;
 
 enum StreamDispMethodCmd {
     AUDIO_DRV_PCM_IOCTRL_HW_PARAMS,

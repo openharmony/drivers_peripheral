@@ -17,13 +17,9 @@
 extern "C" {
 #endif
 #endif /* __cplusplus */
-typedef enum {
-    INNER = 0,
-    OUTER = 1,
-}AudioType;
 
 int32_t InitHwParam(struct AudioPcmHwParams *codecHwParam);
-int32_t GetAudioCard(struct AudioCard **card, AudioType *type);
+int32_t GetAudioCard(struct AudioCard **card);
 
 #ifdef __cplusplus
 #if __cplusplus

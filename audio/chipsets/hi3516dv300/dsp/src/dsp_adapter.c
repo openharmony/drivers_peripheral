@@ -7,6 +7,7 @@
  */
 
 #include "audio_dsp_base.h"
+#include "dsp_ops.h"
 #include "audio_core.h"
 #include "audio_dsp_if.h"
 #include "osal_io.h"
@@ -23,18 +24,20 @@ struct DspData g_dspData = {
     .Equalizer = DspEqualizerActive,
 };
 
-struct AudioDaiOps g_dspLinkDeviceOps = {
-    .Startup = DspLinkStartup,
-    .HwParams = DspLinkHwParams,
+struct AudioDaiOps g_dspDaiDeviceOps = {
+    .Startup = DspDaiStartup,
+    .HwParams = DspDaiHwParams,
 };
 
 struct DaiData g_dspDaiData = {
-    .DaiInit = DspLinkDeviceInit,
-    .ops = &g_dspLinkDeviceOps,
+    .DaiInit = DspDaiDeviceInit,
+    .ops = &g_dspDaiDeviceOps,
 };
 
 static int32_t DspDriverBind(struct HdfDeviceObject *device)
 {
+    AUDIO_DRIVER_LOG_INFO("entry");
+
     if (device == NULL) {
         AUDIO_DRIVER_LOG_ERR("device is NULL.");
         return HDF_ERR_INVALID_OBJECT;
@@ -45,11 +48,15 @@ static int32_t DspDriverBind(struct HdfDeviceObject *device)
         AUDIO_DRIVER_LOG_ERR("audioHost create failed!");
         return HDF_FAILURE;
     }
+
+    AUDIO_DRIVER_LOG_INFO("success");
     return HDF_SUCCESS;
 }
 
 static int32_t DspDriverInit(struct HdfDeviceObject *device)
 {
+    AUDIO_DRIVER_LOG_INFO("entry");
+
     if (device == NULL) {
         AUDIO_DRIVER_LOG_ERR("device is NULL.");
         return HDF_ERR_INVALID_OBJECT;
@@ -69,12 +76,15 @@ static int32_t DspDriverInit(struct HdfDeviceObject *device)
     if (ret !=  HDF_SUCCESS) {
         return ret;
     }
+
+    AUDIO_DRIVER_LOG_INFO("success");
     return HDF_SUCCESS;
 }
 
 
 static void DspDriverRelease(struct HdfDeviceObject *device)
 {
+    AUDIO_DRIVER_LOG_INFO("entry");
     if (device == NULL) {
         AUDIO_DRIVER_LOG_ERR("device is NULL");
         return;
@@ -88,6 +98,7 @@ static void DspDriverRelease(struct HdfDeviceObject *device)
 
     OsalIoUnmap((void *)((uintptr_t)(void*)&dspHost->priv));
     OsalMemFree(dspHost);
+    AUDIO_DRIVER_LOG_INFO("success");
 }
 
 /* HdfDriverEntry definitions */
