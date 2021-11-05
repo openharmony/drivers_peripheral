@@ -44,7 +44,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0001, TestSize.Level3)
     std::cout << "==========[test log]check Capture: Preview and still_capture streams.";
     std::cout << "which Preview's resolution is 640 * 480";
     std::cout << "and Capture's resolution is 1280 * 960" << std::endl;
-    Test_->streamOperatorCallback = new StreamOperatorCallback();
+    Test_->CreateStreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(true, Test_->rc == Camera::NO_ERROR);
     if (Test_->rc == Camera::NO_ERROR) {
@@ -57,15 +57,25 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0001, TestSize.Level3)
     Test_->streamInfo_pre->streamId_ = Test_->streamId_preview;
     Test_->streamInfo_pre->width_ = 640; // 640:width of stream
     Test_->streamInfo_pre->height_ = 480; // 480: height of stream
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    Test_->streamInfo_pre->format_ = IMAGE_PIXEL_FORMAT_NV21;
+#else
     Test_->streamInfo_pre->format_ = PIXEL_FMT_YCRCB_420_SP;
+#endif
     Test_->streamInfo_pre->datasapce_ = 8; // 8:datasapce of stream
     Test_->streamInfo_pre->intent_ = Camera::PREVIEW;
     Test_->streamInfo_pre->tunneledMode_ = 5; // 5:tunneledMode of stream
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    Test_->streamInfo_pre->bufferQueue_ = preview_consumer->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
+        Test_->SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
+    });
+#else
     Test_->streamInfo_pre->bufferQueue_ = preview_consumer->CreateProducer([this](void* addr, uint32_t size) {
         Test_->SaveYUV("preview", addr, size);
     });
+#endif
     Test_->streamInfo_pre->bufferQueue_->SetQueueSize(8); // 8:size of bufferQueue
     Test_->consumerMap_[Camera::PREVIEW] = preview_consumer;
     Test_->streamInfos.push_back(Test_->streamInfo_pre);
@@ -74,7 +84,11 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0001, TestSize.Level3)
     Test_->streamInfo_capture->streamId_ = Test_->streamId_capture;
     Test_->streamInfo_capture->width_ = 1280; // 1280:width of stream
     Test_->streamInfo_capture->height_ = 960; // 960: height of stream
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    Test_->streamInfo_capture->format_ = IMAGE_PIXEL_FORMAT_NV21;
+#else
     Test_->streamInfo_capture->format_ = PIXEL_FMT_YCRCB_420_SP;
+#endif
     Test_->streamInfo_capture->datasapce_ = 8; // 8:datasapce of stream
     Test_->streamInfo_capture->intent_ = Camera::STILL_CAPTURE;
     Test_->streamInfo_capture->encodeType_ = ENCODE_TYPE_JPEG;
@@ -82,9 +96,15 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0001, TestSize.Level3)
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer_capture =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
     std::cout << "==========[test log]received a capture buffer ... 1" << std::endl;
-    Test_->streamInfo_capture->bufferQueue_ = consumer_capture->CreateProducer([this](void* addr, uint32_t size) {
-        Test_->SaveYUV("capture", addr, size);
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    Test_->streamInfo_capture->bufferQueue_ = consumer_capture->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
+        Test_->SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
     });
+#else
+    Test_->streamInfo_capture->bufferQueue_ = consumer_capture->CreateProducer([this](void* addr, uint32_t size) {
+        Test_->SaveYUV("preview", addr, size);
+    });
+#endif
     Test_->streamInfo_capture->bufferQueue_->SetQueueSize(8); // 8:bufferqueue size
     Test_->consumerMap_[Camera::STILL_CAPTURE] = consumer_capture;
     Test_->streamInfos.push_back(Test_->streamInfo_capture);
@@ -113,6 +133,8 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0001, TestSize.Level3)
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    preview_consumer->StopConsumer();
+    consumer_capture->StopConsumer();
 }
 
 /**
@@ -127,7 +149,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0002, TestSize.Level3)
     std::cout << "==========[test log]check Capture: Preview and Video streams.";
     std::cout << "which Preview's resolution is 853 * 480";
     std::cout << "and Video's resolution is 1280 * 720" << std::endl;
-    Test_->streamOperatorCallback = new StreamOperatorCallback();
+    Test_->CreateStreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(true, Test_->rc == Camera::NO_ERROR);
     if (Test_->rc == Camera::NO_ERROR) {
@@ -140,16 +162,26 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0002, TestSize.Level3)
     Test_->streamInfo_pre->streamId_ = Test_->streamId_preview;
     Test_->streamInfo_pre->width_ = 853; // 853:width of stream
     Test_->streamInfo_pre->height_ = 480; // 480: height of stream
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    Test_->streamInfo_pre->format_ = IMAGE_PIXEL_FORMAT_NV21;
+#else
     Test_->streamInfo_pre->format_ = PIXEL_FMT_YCRCB_420_SP;
+#endif
     Test_->streamInfo_pre->datasapce_ = 8; // 8:datasapce of stream
     Test_->streamInfo_pre->intent_ = Camera::PREVIEW;
     Test_->streamInfo_pre->tunneledMode_ = 5; // 5:tunneledMode of stream
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
     std::cout << "==========[test log]received a preview buffer ... 0" << std::endl;
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    Test_->streamInfo_pre->bufferQueue_ = preview_consumer->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
+        Test_->SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
+    });
+#else
     Test_->streamInfo_pre->bufferQueue_ = preview_consumer->CreateProducer([this](void* addr, uint32_t size) {
         Test_->SaveYUV("preview", addr, size);
     });
+#endif
     Test_->streamInfo_pre->bufferQueue_->SetQueueSize(8); // 8:size of bufferQueue
     Test_->consumerMap_[Camera::PREVIEW] = preview_consumer;
     Test_->streamInfos.push_back(Test_->streamInfo_pre);
@@ -158,7 +190,11 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0002, TestSize.Level3)
     Test_->streamInfo_video->streamId_ = Test_->streamId_video;
     Test_->streamInfo_video->width_ = 1280; // 1280:width of stream
     Test_->streamInfo_video->height_ = 720; // 960: height of stream
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    Test_->streamInfo_video->format_ = IMAGE_PIXEL_FORMAT_NV21;
+#else
     Test_->streamInfo_video->format_ = PIXEL_FMT_YCRCB_420_SP;
+#endif
     Test_->streamInfo_video->datasapce_ = 8; // 8:datasapce of stream
     Test_->streamInfo_video->intent_ = Camera::VIDEO;
     Test_->streamInfo_video->encodeType_ = ENCODE_TYPE_H265;
@@ -167,9 +203,15 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0002, TestSize.Level3)
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
     std::cout << "==========[test log]received a video buffer ... 1" << std::endl;
     Test_->SaveVideoFile("video", nullptr, 0, 0);
-    Test_->streamInfo_video->bufferQueue_ = consumer_video->CreateProducer([this](void* addr, uint32_t size) {
-        Test_->SaveVideoFile("video", addr, size, 1);
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    Test_->streamInfo_video->bufferQueue_ = consumer_video->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
+        Test_->SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
     });
+#else
+    Test_->streamInfo_video->bufferQueue_ = consumer_video->CreateProducer([this](void* addr, uint32_t size) {
+        Test_->SaveYUV("preview", addr, size);
+    });
+#endif
     Test_->streamInfo_video->bufferQueue_->SetQueueSize(8); // 8:bufferqueue size
     Test_->consumerMap_[Camera::VIDEO] = consumer_video;
     Test_->streamInfos.push_back(Test_->streamInfo_video);
@@ -198,6 +240,8 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0002, TestSize.Level3)
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    preview_consumer->StopConsumer();
+    consumer_video->StopConsumer();
 }
 
 /**
@@ -212,7 +256,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0003, TestSize.Level3)
     std::cout << "==========[test log]check Capture: Preview and Video streams.";
     std::cout << "which Preview's resolution is 640 * 360";
     std::cout << "and Video's resolution is 1280 * 720" << std::endl;
-    Test_->streamOperatorCallback = new StreamOperatorCallback();
+    Test_->CreateStreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(true, Test_->rc == Camera::NO_ERROR);
     if (Test_->rc == Camera::NO_ERROR) {
@@ -225,16 +269,26 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0003, TestSize.Level3)
     Test_->streamInfo_pre->streamId_ = Test_->streamId_preview;
     Test_->streamInfo_pre->width_ = 640; // 640:width of stream
     Test_->streamInfo_pre->height_ = 360; // 360: height of stream
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    Test_->streamInfo_pre->format_ = IMAGE_PIXEL_FORMAT_NV21;
+#else
     Test_->streamInfo_pre->format_ = PIXEL_FMT_YCRCB_420_SP;
+#endif
     Test_->streamInfo_pre->datasapce_ = 8; // 8:datasapce of stream
     Test_->streamInfo_pre->intent_ = Camera::PREVIEW;
     Test_->streamInfo_pre->tunneledMode_ = 5; // 5:tunneledMode of stream
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
     std::cout << "==========[test log]received a preview buffer ... 0" << std::endl;
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    Test_->streamInfo_pre->bufferQueue_ = preview_consumer->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
+        Test_->SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
+    });
+#else
     Test_->streamInfo_pre->bufferQueue_ = preview_consumer->CreateProducer([this](void* addr, uint32_t size) {
         Test_->SaveYUV("preview", addr, size);
     });
+#endif
     Test_->streamInfo_pre->bufferQueue_->SetQueueSize(8); // 8:size of bufferQueue
     Test_->consumerMap_[Camera::PREVIEW] = preview_consumer;
     Test_->streamInfos.push_back(Test_->streamInfo_pre);
@@ -243,7 +297,11 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0003, TestSize.Level3)
     Test_->streamInfo_video->streamId_ = Test_->streamId_video;
     Test_->streamInfo_video->width_ = 1280; // 1280:width of stream
     Test_->streamInfo_video->height_ = 720; // 960: height of stream
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    Test_->streamInfo_video->format_ = IMAGE_PIXEL_FORMAT_NV21;
+#else
     Test_->streamInfo_video->format_ = PIXEL_FMT_YCRCB_420_SP;
+#endif
     Test_->streamInfo_video->datasapce_ = 8; // 8:datasapce of stream
     Test_->streamInfo_video->intent_ = Camera::VIDEO;
     Test_->streamInfo_video->encodeType_ = ENCODE_TYPE_H265;
@@ -252,9 +310,15 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0003, TestSize.Level3)
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
     std::cout << "==========[test log]received a video buffer ... 1" << std::endl;
     Test_->SaveVideoFile("video", nullptr, 0, 0);
-    Test_->streamInfo_video->bufferQueue_ = consumer_video->CreateProducer([this](void* addr, uint32_t size) {
-        Test_->SaveVideoFile("video", addr, size, 1);
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    Test_->streamInfo_video->bufferQueue_ = consumer_video->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
+        Test_->SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
     });
+#else
+    Test_->streamInfo_video->bufferQueue_ = consumer_video->CreateProducer([this](void* addr, uint32_t size) {
+        Test_->SaveYUV("preview", addr, size);
+    });
+#endif
     Test_->streamInfo_video->bufferQueue_->SetQueueSize(8); // 8:bufferqueue size
     Test_->consumerMap_[Camera::VIDEO] = consumer_video;
     Test_->streamInfos.push_back(Test_->streamInfo_video);
@@ -283,4 +347,6 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0003, TestSize.Level3)
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    preview_consumer->StopConsumer();
+    consumer_video->StopConsumer();
 }

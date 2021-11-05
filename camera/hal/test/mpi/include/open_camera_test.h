@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef OPEN_CAMERA_TEST_H
+#define OPEN_CAMERA_TEST_H
+
 #include "common.h"
 
 class OpenCameraTest : public testing::Test {
@@ -23,3 +26,4 @@ public:
     void TearDown(void);
     std::shared_ptr<OHOS::Camera::Test> Test_ = nullptr;
 };
+#endif

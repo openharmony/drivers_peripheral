@@ -30,7 +30,6 @@ void StabilityTest::SetUp(void)
 void StabilityTest::TearDown(void)
 {
     Test_->Close();
-
 }
 
 /**
@@ -45,7 +44,7 @@ HWTEST_F(StabilityTest, Camera_Stability_Open_0001, TestSize.Level3)
         std::cout << "==========[test log] Check Performance: OpenCamera, 100 times."<< std::endl;
         std::vector<int> FailTimes;
         Test_->service->GetCameraIds(Test_->cameraIds);
-        Test_->deviceCallback = new CameraDeviceCallback();
+        Test_->CreateDeviceCallback();
         for (int i = 0; i < 100; i++) {
             std::cout << "Running " << i << " time" << std::endl;
             Test_->rc =
@@ -86,6 +85,7 @@ HWTEST_F(StabilityTest, Camera_Stability_Preview_0001, TestSize.Level3)
         Test_->captureIds = {Test_->captureId_preview};
         Test_->streamIds = {Test_->streamId_preview};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
+        Test_->StopConsumer(Test_->intents);
     }
 }
 
@@ -112,8 +112,10 @@ HWTEST_F(StabilityTest, Camera_Stability_Capture_0001, TestSize.Level3)
         Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, false);
         // post-processing
         Test_->captureIds = {Test_->captureId_preview};
-        Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+        Test_->streamIds.push_back(Test_->streamId_preview);
+        Test_->streamIds.push_back(Test_->streamId_capture);
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
+        Test_->StopConsumer(Test_->intents);
     }
 }
 
@@ -144,8 +146,10 @@ HWTEST_F(StabilityTest, Camera_Stability_Capture_0002, TestSize.Level3)
         Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
         // release stream
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_capture};
-        Test_->streamIds = {Test_->streamId_preview, Test_->streamId_capture};
+        Test_->streamIds.push_back(Test_->streamId_preview);
+        Test_->streamIds.push_back(Test_->streamId_capture);
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
+        Test_->StopConsumer({Camera::PREVIEW, Camera::STILL_CAPTURE});
     }
 }
 
@@ -172,8 +176,10 @@ HWTEST_F(StabilityTest, Camera_Stability_Video_0001, TestSize.Level3)
         Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
         // post-processing
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
-        Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
+        Test_->streamIds.push_back(Test_->streamId_preview);
+        Test_->streamIds.push_back(Test_->streamId_video);
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
+        Test_->StopConsumer(Test_->intents);
     }
 }
 
@@ -203,9 +209,11 @@ HWTEST_F(StabilityTest, Camera_Stability_Video_0002, TestSize.Level3)
         Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
         // release stream
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
-        Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
+        Test_->streamIds.push_back(Test_->streamId_preview);
+        Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
-        }
+        Test_->StopConsumer(Test_->intents);
+    }
 }
 
 /**

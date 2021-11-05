@@ -30,7 +30,6 @@ void Camera3ATest::SetUp(void)
 void Camera3ATest::TearDown(void)
 {
     Test_->Close();
-
 }
 
 /**
@@ -60,6 +59,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0001, TestSize.Level0)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -88,6 +88,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0002, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -116,6 +117,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0003, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -144,6 +146,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0004, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -172,6 +175,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0005, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -202,6 +206,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0006, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -232,6 +237,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0007, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -260,6 +266,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0008, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -288,6 +295,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0009, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -316,6 +324,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0010, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -363,6 +372,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0030, TestSize.Level2)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
     // Turn off the device
     Test_->cameraDevice->Close();
     std::cout << "cameraDevice->Close" << std::endl;
@@ -381,6 +391,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0030, TestSize.Level2)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -412,6 +423,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0031, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**

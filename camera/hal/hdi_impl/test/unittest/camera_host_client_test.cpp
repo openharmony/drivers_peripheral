@@ -191,13 +191,16 @@ HWTEST_F(CameraRemoteTest, HostSetCallback, TestSize.Level0)
     std::cout << "cameraDevice->SetResultMode = " << ret << std::endl;
 
     std::vector<OHOS::Camera::MetaType> results;
-    ret = cameraDevice->GetEnabledResults(results);
-    std::cout << "cameraDevice->GetEnabledResults = " << ret << std::endl;
-
+    results.push_back(OHOS_SENSOR_EXPOSURE_TIME);
+    results.push_back(OHOS_SENSOR_COLOR_CORRECTION_GAINS);
     ret = cameraDevice->EnableResult(results);
     std::cout << "cameraDevice->EnableResult = " << ret << std::endl;
 
-    ret = cameraDevice->DisableResult(results);
+    std::vector<Camera::MetaType> disable_tag;
+    ret = cameraDevice->GetEnabledResults(disable_tag);
+    std::cout << "cameraDevice->GetEnabledResults = " << ret << std::endl;
+
+    ret = cameraDevice->DisableResult(disable_tag);
     std::cout << "cameraDevice->DisableResult = " << ret << std::endl;
 
     OHOS::sptr<StreamOperatorCallback> streamOperatorCallback = new StreamOperatorCallback();

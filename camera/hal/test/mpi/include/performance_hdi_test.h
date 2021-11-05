@@ -12,9 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef PERFORMANCE_HDI_TEST_H
+#define PERFORMANCE_HDI_TEST_H
 #include "common.h"
 
-class PerformanceTest : public testing::Test {
+class PerformanceHdiTest : public testing::Test {
 public:
     float calTime(struct timeval start, struct timeval end);
     static void SetUpTestCase(void);
@@ -23,3 +25,4 @@ public:
     void TearDown(void);
     std::shared_ptr<OHOS::Camera::Test> Test_ = nullptr;
 };
+#endif

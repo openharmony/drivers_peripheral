@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef PERFORMANCE_FUNC_TEST_H
+#define PERFORMANCE_FUNC_TEST_H
+
 #include "common.h"
 
 class PerformanceFuncTest : public testing::Test {
@@ -23,3 +26,4 @@ public:
     void TearDown(void);
     std::shared_ptr<OHOS::Camera::Test> Test_ = nullptr;
 };
+#endif

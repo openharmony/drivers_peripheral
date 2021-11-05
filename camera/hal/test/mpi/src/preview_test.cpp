@@ -50,6 +50,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0001, TestSize.Level0)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -63,7 +64,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0004, TestSize.Level2)
     std::cout << "==========[test log]Preview stream, 1280*960, expected success." << std::endl;
 
     // Create and get streamOperator information
-    Test_->streamOperatorCallback = new StreamOperatorCallback();
+    Test_->CreateStreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     // Create data flow
@@ -72,13 +73,19 @@ HWTEST_F(PreviewTest, Camera_Preview_0004, TestSize.Level2)
     Test_->streamInfo->width_ = 1280;
     Test_->streamInfo->height_ = 960;
     Test_->streamInfo->datasapce_ = 8;
-    Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
+    Test_->StreamInfoFormat();
     Test_->streamInfo->intent_ = Camera::PREVIEW;
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    Test_->streamInfo->bufferQueue_ = preview_consumer->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
+        Test_->SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
+    });
+#else
     Test_->streamInfo->bufferQueue_ = preview_consumer->CreateProducer([this](void* addr, uint32_t size) {
         Test_->SaveYUV("preview", addr, size);
     });
+#endif
     Test_->streamInfo->bufferQueue_->SetQueueSize(8);
     Test_->consumerMap_[Camera::PREVIEW] = preview_consumer;
     Test_->streamInfo->tunneledMode_ = 5;
@@ -95,6 +102,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0004, TestSize.Level2)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -107,7 +115,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0010, TestSize.Level0)
 {
     std::cout << "==========[test log]GetStreamOperator success." << std::endl;
     // Create and get streamOperator information
-    Test_->streamOperatorCallback = new StreamOperatorCallback();
+    Test_->CreateStreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR || Test_->streamOperator == nullptr);
 }
@@ -137,7 +145,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0040, TestSize.Level2)
 {
     std::cout << "==========[test log]Preview, CommitStreams Metadata = nullptr." << std::endl;
     // Create and get streamOperator information
-    Test_->streamOperatorCallback = new StreamOperatorCallback();
+    Test_->CreateStreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     // Flow distribution
@@ -155,7 +163,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0050, TestSize.Level2)
 {
     std::cout << "==========[test log]Preview, CommitStreams no CreateStreams, expected fail." << std::endl;
     // Create and get streamOperator information
-    Test_->streamOperatorCallback = new StreamOperatorCallback();
+    Test_->CreateStreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     // Flow distribution
@@ -182,6 +190,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0060, TestSize.Level1)
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
 
 /**
@@ -194,7 +203,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0062, TestSize.Level2)
 {
     std::cout << "==========[test log]ReleaseStreams no exist streamID, expect success." << std::endl;
     // Create and get streamOperator information
-    Test_->streamOperatorCallback = new StreamOperatorCallback();
+    Test_->CreateStreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR || Test_->streamOperator == nullptr);
     Test_->streamInfo = std::make_shared<StreamInfo>();
@@ -343,4 +352,5 @@ HWTEST_F(PreviewTest, Camera_Preview_0093, TestSize.Level2)
     Test_->captureIds = {};
     Test_->streamIds = {Test_->streamId_preview};
     Test_->StopStream(Test_->captureIds, Test_->streamIds);
+    Test_->StopConsumer(Test_->intents);
 }
