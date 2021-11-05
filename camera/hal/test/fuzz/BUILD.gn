@@ -539,7 +539,7 @@ ohos_fuzztest("IpcStreamOperatorCallback") {
   part_name = "hdf"
 }
 
-group("fuzztest") {
+group("camera_hal_fuzztest") {
   testonly = true
   deps = [
     ":IpcCameraDeviceCallback",

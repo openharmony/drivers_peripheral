@@ -210,6 +210,7 @@ HWTEST_F(StabilityTest, Camera_Stability_Video_0002, TestSize.Level3)
         // release stream
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
         Test_->streamIds.push_back(Test_->streamId_preview);
+        Test_->streamIds.push_back(Test_->streamId_video);
         Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
         Test_->StopConsumer(Test_->intents);
