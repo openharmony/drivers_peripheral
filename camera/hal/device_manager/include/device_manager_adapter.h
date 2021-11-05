@@ -79,7 +79,7 @@ using camera_rational_t = struct camera_metadata_rational;
 
 using NodeBufferCb = std::function<void(std::shared_ptr<FrameSpec>)>;
 using MetaDataCb = std::function<void(std::shared_ptr<CameraStandard::CameraMetadata>)>;
-using UvcMetaDataCb = std::function<void(std::shared_ptr<CameraStandard::CameraMetadata>, bool, CameraId)>;
+using HotplugDevCb = std::function<void(std::shared_ptr<CameraStandard::CameraMetadata>, bool, CameraId)>;
 using DeviceStatusCb = std::function<void()>;
 
 } // namespace OHOS::Camera

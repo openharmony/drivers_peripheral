@@ -15,7 +15,7 @@ import("//drivers/peripheral/camera/hal/camera.gni")
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
-  import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/adapter/uhdf/uhdf.gni")
 
   config("camhdi_impl_utest_config") {
     visibility = [ ":*" ]
