@@ -97,22 +97,18 @@ namespace {
             return -1;
         }
 
-        if (event->sensorId == SENSOR_TYPE_HALL || event->sensorId == SENSOR_TYPE_PROXIMITY) {
-            float data = (float)*event->data;
-            for (int i = 0; i < g_listNum; ++i) {
-                if (event->sensorId == g_sensorList[i].sensorTypeId) {
+        for (int i = 0; i < g_listNum; ++i) {
+            if (event->sensorId == g_sensorList[i].sensorTypeId) {
+            
+                if (event->sensorId == SENSOR_TYPE_HALL || event->sensorId == SENSOR_TYPE_PROXIMITY) {
+                    float data = (float)*event->data;
                     SensorDataVerification(data, g_sensorList[i]);
-                }
-            }
-        } else {
-            float *data = (float*)event->data;
-            for (int i = 0; i < g_listNum; ++i) {
-                if (event->sensorId == g_sensorList[i].sensorTypeId) {
+                } else {
+                    float *data = (float*)event->data;
                     SensorDataVerification(*data, g_sensorList[i]);
                 }
             }
         }
-        
         return 0;
     }
 }
