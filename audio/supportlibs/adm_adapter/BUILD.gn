@@ -44,6 +44,9 @@ config("audio_interface_config") {
     "-ffunction-sections",
     "-fdata-sections",
   ]
+  if (enable_audio_alsa_mode) {
+    cflags += [ "-DALSA_MODE" ]
+  }
 
   ldflags = [ "-Wl" ]
 }
@@ -144,6 +147,22 @@ if (defined(ohos_lite)) {
       defines = [ "AUDIO_HAL_HDF_LOG" ]
     }
 
+    if (enable_audio_alsa_mode) {
+      sources += [
+        "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/alsa_mixer.c",
+        "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/audio_hw.c",
+      ]
+      include_dirs += [
+        "//third_party/tinyalsa/include",
+        "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/include",
+      ]
+      deps += [
+        "//third_party/tinyalsa:libtinyalsa",
+        "//third_party/tinyalsa:tinymix",
+        "//third_party/tinyalsa:tinyplay",
+      ]
+    }
+
     if (is_standard_system) {
       external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
     } else {
@@ -180,6 +199,22 @@ if (defined(ohos_lite)) {
 
     if (enable_audio_hal_hdf_log) {
       defines = [ "AUDIO_HAL_HDF_LOG" ]
+    }
+
+    if (enable_audio_alsa_mode) {
+      sources += [
+        "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/alsa_mixer.c",
+        "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/audio_hw.c",
+      ]
+      include_dirs += [
+        "//third_party/tinyalsa/include",
+        "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/include",
+      ]
+      deps += [
+        "//third_party/tinyalsa:libtinyalsa",
+        "//third_party/tinyalsa:tinycap",
+        "//third_party/tinyalsa:tinymix",
+      ]
     }
 
     if (is_standard_system) {

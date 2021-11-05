@@ -30,6 +30,10 @@
 #define AUDIODRV_CTL_EXTERN_ACODEC_ENABLE 2
 #define AUDIODRV_CTL_EXTERN_CODEC_STR "External Codec Enable"
 #define AUDIODRV_CTL_INTERNAL_CODEC_STR "Internally Codec Enable"
+#ifdef ALSA_MODE
+#include "alsa_audio.h"
+struct pcm *pcm;
+#endif
 
 /* Out Put Render */
 static struct AudioPcmHwParams g_hwParams;
@@ -64,11 +68,25 @@ int32_t SetHwParams(const struct AudioHwRenderParam *handleData)
     g_hwParams.startThreshold = handleData->frameRenderMode.attrs.startThreshold;
     g_hwParams.stopThreshold = handleData->frameRenderMode.attrs.stopThreshold;
     g_hwParams.silenceThreshold = handleData->frameRenderMode.attrs.silenceThreshold;
+
+#ifdef ALSA_MODE
+    LOG_PARA_INFO("ALSA_MODE streamType %d, channels %d, rate %d, periodSize %d, periodCount %d, \
+        cardServiceName %s, format %d, period %d, frameSize %d, isBigEndian %d, isSignedData %d, \
+        startThreshold %d, stopThreshold %d, silenceThreshold %d",
+        g_hwParams.streamType, g_hwParams.channels, g_hwParams.rate, g_hwParams.periodSize,
+        g_hwParams.periodCount, g_hwParams.cardServiceName, g_hwParams.format,g_hwParams.period,
+        g_hwParams.frameSize, g_hwParams.isBigEndian, g_hwParams.isSignedData, g_hwParams.startThreshold,
+        g_hwParams.stopThreshold, g_hwParams.silenceThreshold);
+#endif
     return HDF_SUCCESS;
 }
 
 int32_t AudioCtlRenderSetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
+
     if (handleData == NULL || sBuf == NULL) {
         LOG_FUN_ERR("RenderSetVolumeSBuf handleData or sBuf is NULL!");
         return HDF_FAILURE;
@@ -104,6 +122,9 @@ int32_t AudioCtlRenderSetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwRe
 
 int32_t AudioCtlRenderGetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handleData == NULL || sBuf == NULL) {
         LOG_FUN_ERR("RenderGetVolumeSBuf handleData or sBuf is NULL!");
         return HDF_FAILURE;
@@ -135,6 +156,10 @@ int32_t AudioCtlRenderGetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwRe
 int32_t AudioCtlRenderSetVolume(const struct DevHandle *handle, int cmdId,
     const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    RouteSetVoiceVolume(handleData->renderMode.ctlParam.volume);
+    return HDF_SUCCESS;
+#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -166,6 +191,13 @@ int32_t AudioCtlRenderSetVolume(const struct DevHandle *handle, int cmdId,
 
 int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    char *ctlName = "DACL Playback Volume";
+    ReadOutSoundCard();
+    MixerOpenLegacy(true, devOut[SND_OUT_SOUND_CARD_SPEAKER].card);
+    handleData->renderMode.ctlParam.volume = RouteGetVoiceVolume(ctlName);
+    return HDF_SUCCESS;
+#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -213,6 +245,9 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
 
 int32_t AudioCtlRenderSetPauseBuf(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handleData == NULL || sBuf == NULL) {
         LOG_FUN_ERR("RenderSetPauseBuf handleData or sBuf is NULL!");
         return HDF_FAILURE;
@@ -249,6 +284,9 @@ int32_t AudioCtlRenderSetPauseBuf(struct HdfSBuf *sBuf, const struct AudioHwRend
 int32_t AudioCtlRenderSetPauseStu(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -286,6 +324,9 @@ int32_t AudioCtlRenderSetPauseStu(const struct DevHandle *handle,
 
 int32_t AudioCtlRenderSetMuteBuf(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handleData == NULL || sBuf == NULL) {
         LOG_FUN_ERR("RenderSetMuteBuf handleData or sBuf is NULL!");
         return HDF_FAILURE;
@@ -322,6 +363,9 @@ int32_t AudioCtlRenderSetMuteBuf(struct HdfSBuf *sBuf, const struct AudioHwRende
 int32_t AudioCtlRenderSetMuteStu(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -358,6 +402,9 @@ int32_t AudioCtlRenderSetMuteStu(const struct DevHandle *handle,
 
 int32_t AudioCtlRenderGetMuteSBuf(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handleData == NULL || sBuf == NULL) {
         LOG_FUN_ERR("RenderGetMuteSBuf handleData or sBuf is NULL!");
         return HDF_FAILURE;
@@ -388,6 +435,9 @@ int32_t AudioCtlRenderGetMuteSBuf(struct HdfSBuf *sBuf, const struct AudioHwRend
 
 int32_t AudioCtlRenderGetMuteStu(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -435,6 +485,9 @@ int32_t AudioCtlRenderGetMuteStu(const struct DevHandle *handle, int cmdId, stru
 
 int32_t AudioCtlRenderSetGainBuf(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handleData == NULL || sBuf == NULL) {
         LOG_FUN_ERR("RenderSetGainBuf handleData or sBuf is NULL!");
         return HDF_FAILURE;
@@ -471,6 +524,9 @@ int32_t AudioCtlRenderSetGainBuf(struct HdfSBuf *sBuf, const struct AudioHwRende
 int32_t AudioCtlRenderSetGainStu(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -507,6 +563,9 @@ int32_t AudioCtlRenderSetGainStu(const struct DevHandle *handle,
 
 int32_t AudioCtlRenderGetGainSBuf(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handleData == NULL || sBuf == NULL) {
         LOG_FUN_ERR("RenderGetGainSBuf handleData or sBuf is NULL!");
         return HDF_FAILURE;
@@ -537,6 +596,9 @@ int32_t AudioCtlRenderGetGainSBuf(struct HdfSBuf *sBuf, const struct AudioHwRend
 
 int32_t AudioCtlRenderGetGainStu(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -586,6 +648,9 @@ int32_t AudioCtlRenderSceneSelectSBuf(struct HdfSBuf *sBuf,
                                       const struct AudioHwRenderParam *handleData,
                                       const int32_t deviceIndex)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handleData == NULL || sBuf == NULL) {
         LOG_FUN_ERR("RenderSceneSelectSBuf handleData or sBuf is NULL!");
         return HDF_FAILURE;
@@ -628,6 +693,9 @@ int32_t AudioCtlRenderSceneSelectSBuf(struct HdfSBuf *sBuf,
 int32_t AudioCtlRenderSceneSelect(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     int32_t index;
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("RenderSceneSelect paras is NULL!");
@@ -672,6 +740,9 @@ int32_t AudioCtlRenderSceneSelect(const struct DevHandle *handle,
 
 int32_t AudioCtlRenderGetVolThresholdSBuf(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handleData == NULL || sBuf == NULL) {
         LOG_FUN_ERR("RenderGetVolThresholdSBuf paras is NULL!");
         return HDF_FAILURE;
@@ -702,6 +773,9 @@ int32_t AudioCtlRenderGetVolThresholdSBuf(struct HdfSBuf *sBuf, const struct Aud
 
 int32_t AudioCtlRenderSceneGetGainThresholdSBuf(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handleData == NULL || sBuf == NULL) {
         LOG_FUN_ERR("RenderSceneGetGainThresholdSBuf paras is NULL!");
         return HDF_FAILURE;
@@ -733,6 +807,9 @@ int32_t AudioCtlRenderSceneGetGainThresholdSBuf(struct HdfSBuf *sBuf, const stru
 int32_t AudioCtlRenderSceneGetGainThreshold(const struct DevHandle *handle,
     int cmdId, struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -785,6 +862,16 @@ int32_t AudioCtlRenderSceneGetGainThreshold(const struct DevHandle *handle,
 
 int32_t AudioCtlRenderGetVolThreshold(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    long long volMin = 0, volMax = 0;
+    char *ctlName = "DACL Playback Volume";
+    ReadOutSoundCard();
+    MixerOpenLegacy(true, devOut[SND_OUT_SOUND_CARD_SPEAKER].card);
+    RouteGetVoiceMinMaxStep(&volMin, &volMax, ctlName, true);
+    handleData->renderMode.ctlParam.volThreshold.volMax = volMax;
+    handleData->renderMode.ctlParam.volThreshold.volMin = volMin;
+    return HDF_SUCCESS;
+#endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("paras is NULL!");
         return HDF_FAILURE;
@@ -825,6 +912,9 @@ int32_t AudioCtlRenderGetVolThreshold(const struct DevHandle *handle, int cmdId,
 
 int32_t AudioCtlRenderSetChannelModeBuf(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handleData == NULL || sBuf == NULL) {
         LOG_FUN_ERR("RenderSetChannelModeBuf parameter is empty!");
         return HDF_FAILURE;
@@ -861,6 +951,9 @@ int32_t AudioCtlRenderSetChannelModeBuf(struct HdfSBuf *sBuf, const struct Audio
 int32_t AudioCtlRenderSetChannelMode(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -897,6 +990,9 @@ int32_t AudioCtlRenderSetChannelMode(const struct DevHandle *handle,
 
 int32_t AudioCtlRenderGetChannelModeSBuf(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handleData == NULL || sBuf == NULL) {
         LOG_FUN_ERR("RenderGetChannelModeSBuf parameter is empty!");
         return HDF_FAILURE;
@@ -927,6 +1023,9 @@ int32_t AudioCtlRenderGetChannelModeSBuf(struct HdfSBuf *sBuf, const struct Audi
 
 int32_t AudioCtlRenderGetChannelMode(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -975,6 +1074,9 @@ int32_t AudioCtlRenderGetChannelMode(const struct DevHandle *handle, int cmdId, 
 int32_t AudioCtlRenderSetAcodecSBuf(struct HdfSBuf *sBuf, const char *codec,
     int enable, enum AudioServiceNameType serviceNameMode)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (sBuf == NULL) {
         LOG_FUN_ERR("handleData or sBuf is NULL!");
         return HDF_FAILURE;
@@ -1010,6 +1112,9 @@ int32_t AudioCtlRenderSetAcodecSBuf(struct HdfSBuf *sBuf, const char *codec,
 int32_t AudioCtlRenderChangeInAcodec(struct HdfIoService *service,
     const char *codecName, struct HdfSBuf *sBuf, const int32_t status, int cmdId)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     enum AudioServiceNameType serviceNameMode;
     if (service == NULL || sBuf == NULL) {
         LOG_FUN_ERR("service or sBuf is NULL!");
@@ -1030,6 +1135,9 @@ int32_t AudioCtlRenderChangeInAcodec(struct HdfIoService *service,
 int32_t AudioCtlRenderSetAcodecMode(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("paras is NULL!");
         return HDF_FAILURE;
@@ -1112,6 +1220,9 @@ int32_t AudioInterfaceLibCtlRender(const struct DevHandle *handle, int cmdId, st
 
 int32_t ParamsSbufWriteBuffer(struct HdfSBuf *sBuf)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (!HdfSbufWriteUint32(sBuf, (uint32_t)g_hwParams.streamType)) {
         return HDF_FAILURE;
     }
@@ -1159,6 +1270,30 @@ int32_t ParamsSbufWriteBuffer(struct HdfSBuf *sBuf)
 
 int32_t FrameSbufWriteBuffer(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    if (!pcm) {
+        int bits = TINYALSAPCM_16_BIT;
+        if (g_hwParams.format == AUDIO_FORMAT_PCM_8_BIT) {
+            bits = TINYALSAPCM_8_BIT;
+        } else if (g_hwParams.format == AUDIO_FORMAT_PCM_16_BIT) {
+            bits = TINYALSAPCM_16_BIT;
+        } else if (g_hwParams.format == AUDIO_FORMAT_PCM_24_BIT) {
+            bits = TINYALSAPCM_24_BIT;
+        } else if (g_hwParams.format == AUDIO_FORMAT_PCM_32_BIT) {
+            bits = TINYALSAPCM_32_BIT;
+        } else {
+            bits = TINYALSAPCM_16_BIT;
+        }
+        ReadOutSoundCard();
+        PlaySample(&pcm, devOut[SND_OUT_SOUND_CARD_SPEAKER].card, devOut[SND_OUT_SOUND_CARD_SPEAKER].device, 
+            g_hwParams.channels, g_hwParams.rate, bits,
+            g_hwParams.periodSize / 4,
+            g_hwParams.periodCount / 2);
+        RoutePcmCardOpen(devOut[SND_OUT_SOUND_CARD_SPEAKER].card, DEV_OUT_SPEAKER_HEADPHONE_NORMAL_ROUTE);
+    }
+    pcm_write(pcm, handleData->frameRenderMode.buffer, handleData->frameRenderMode.bufferSize);
+    return HDF_SUCCESS;
+#endif
     if (sBuf == NULL || handleData == NULL || handleData->frameRenderMode.buffer == NULL) {
         return HDF_FAILURE;
     }
@@ -1179,7 +1314,7 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
         LOG_FUN_ERR("The parameter is empty");
         return HDF_FAILURE;
     }
-    struct HdfIoService *service = NULL;
+    int32_t ret = 0;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
         return HDF_FAILURE;
@@ -1192,16 +1327,20 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
+
+#ifndef ALSA_MODE
+    struct HdfIoService *service = NULL;
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         LOG_FUN_ERR("The pointer is null!");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
-    int32_t ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
+    ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         LOG_FUN_ERR("Failed to send service call!");
     }
+#endif
     AudioBufReplyRecycle(sBuf, NULL);
     return ret;
 }
@@ -1209,6 +1348,7 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
 int32_t AudioCallbackModeStatus(const struct AudioHwRenderParam *handleData,
     enum AudioCallbackType callbackType)
 {
+
     if (handleData == NULL) {
         return HDF_FAILURE;
     }
@@ -1222,6 +1362,9 @@ int32_t AudioCallbackModeStatus(const struct AudioHwRenderParam *handleData,
 int32_t AudioOutputRenderWriteFrame(struct HdfIoService *service,
     int cmdId, struct HdfSBuf *sBuf, struct HdfSBuf *reply, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     int32_t ret;
     int32_t tryNum = 50; // try send sBuf 50 count
     uint32_t buffStatus = 0;
@@ -1266,6 +1409,27 @@ int32_t AudioOutputRenderWriteFrame(struct HdfIoService *service,
 int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    if (handle == NULL || handle->object == NULL || handleData == NULL) {
+        return HDF_FAILURE;
+    }
+    size_t sbufSize = handleData->frameRenderMode.bufferSize + AUDIO_SBUF_EXTEND;
+    struct HdfSBuf *sBuf = HdfSBufTypedObtainCapacity(SBUF_RAW, sbufSize);
+    if (sBuf == NULL) {
+        LOG_FUN_ERR("Get sBuf Fail");
+        return HDF_FAILURE;
+    }
+    struct HdfSBuf *reply = AudioObtainHdfSBuf();
+    if (reply == NULL) {
+        LOG_FUN_ERR("reply is empty");
+        HdfSBufRecycle(sBuf);
+        return HDF_FAILURE;
+    }
+    if (FrameSbufWriteBuffer(sBuf, handleData)) {
+        AudioBufReplyRecycle(sBuf, reply);
+        return HDF_FAILURE;
+    }
+#else
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         return HDF_FAILURE;
     }
@@ -1297,12 +1461,16 @@ int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
         LOG_FUN_ERR("AudioOutputRenderWriteFrame is Fail!");
         return HDF_FAILURE;
     }
+#endif
     return HDF_SUCCESS;
 }
 
 int32_t AudioOutputRenderStartPrepare(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         return HDF_FAILURE;
     }
@@ -1358,6 +1526,12 @@ int32_t AudioOutputRenderOpen(const struct DevHandle *handle,
 int32_t AudioOutputRenderStop(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    pcm_close(pcm);
+    pcm = NULL;
+    RoutePcmClose(DEV_OFF_PLAYBACK_OFF_ROUTE);
+    return HDF_SUCCESS;
+#endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         return HDF_FAILURE;
     }
@@ -1387,6 +1561,9 @@ int32_t AudioOutputRenderStop(const struct DevHandle *handle,
 
 int32_t MmapDescWriteBuffer(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (sBuf == NULL || handleData == NULL) {
         return HDF_FAILURE;
     }
@@ -1415,6 +1592,9 @@ int32_t MmapDescWriteBuffer(struct HdfSBuf *sBuf, const struct AudioHwRenderPara
 int32_t AudioOutputRenderReqMmapBuffer(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         return HDF_FAILURE;
     }
@@ -1446,6 +1626,9 @@ int32_t AudioOutputRenderReqMmapBuffer(const struct DevHandle *handle,
 int32_t AudioOutputRenderGetMmapPosition(const struct DevHandle *handle,
     int cmdId, struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         return HDF_FAILURE;
     }
@@ -1577,6 +1760,9 @@ struct DevHandle *AudioBindServiceRender(const char *name)
 
 void AudioCloseServiceRender(const struct DevHandle *handle)
 {
+#ifdef ALSA_MODE
+    return;
+#endif
     if (handle == NULL || handle->object == NULL) {
         LOG_FUN_ERR("Render handle or handle->object is NULL");
         return;
