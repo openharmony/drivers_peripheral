@@ -1,5 +1,5 @@
 # Copyright (c) Huawei Technologies Co., Ltd. 2021. All rights reserved.
-import("//build/ohos.gni")
+
 import("//drivers/peripheral/audio/chipsets/gni/audio.${product_name}.gni")
 
 #If set flag is false, the ADM version will be built; if set flag is true, the MPI version will be built.

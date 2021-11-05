@@ -157,6 +157,23 @@ int mixer_ctl_enumerated_select(struct mixer_ctl *ctl, const char *value)
     return 0;
 }
 
+int mixer_get_ctl_minmax(struct mixer_ctl *ctl, long long *min, long long *max)
+{
+    if (ctl == NULL || ctl->info == NULL) {
+        return -EINVAL;
+    }
+    struct snd_ctl_elem_info *elemInfo = ctl->info;
+    int ret = GetCtlMinValue(elemInfo, min);
+    if (ret != 0) {
+        return -EINVAL;
+    }
+    ret = GetCtlMaxValue(elemInfo, max);
+    if (ret != 0) {
+        return -EINVAL;
+    }
+    return 0;
+}
+
 void mixer_ctl_value_check(struct mixer_ctl *ctl, long long *value)
 {
     long long min, max;
@@ -386,7 +403,7 @@ void free_mixer_ctl_ename(struct mixer_ctl *ctl)
 // mixer_ctl.tlv  mixer_ctl.ename
 void FreeMixerCtlObject(struct mixer_ctl *ctl, unsigned int count)
 {
-    int ctlNums = 0;
+    unsigned int ctlNums = 0;
     while (ctlNums < count) {
         if (ctl[ctlNums].tlv) {
             free(ctl[ctlNums].tlv);
@@ -431,8 +448,12 @@ struct mixer *MixerInit(unsigned int count)
         return NULL;
     }
     mixer->ctl = calloc(count, sizeof(struct mixer_ctl));
+    if (mixer->ctl == NULL) {
+        mixer_close_legacy(mixer);
+        return NULL;
+    }
     mixer->info = calloc(count, sizeof(struct snd_ctl_elem_info));
-    if (!mixer->ctl || !mixer->info) {
+    if (mixer->info == NULL) {
         mixer_close_legacy(mixer);
         return NULL;
     }
@@ -479,8 +500,8 @@ int CtleNamesInit(struct snd_ctl_elem_info *elemInfo, struct mixer *mixer, int n
 
 int MixerCtlsInit(struct mixer *mixer, struct snd_ctl_elem_id *elemId)
 {
-    int nums = 0;
-    unsigned count = mixer->count;
+    unsigned int nums = 0;
+    unsigned int count = mixer->count;
     struct snd_ctl_elem_info *elemInfo = NULL;
     while (nums < count) {
         elemInfo = mixer->info + nums;
@@ -497,7 +518,7 @@ int MixerCtlsInit(struct mixer *mixer, struct snd_ctl_elem_id *elemId)
         }
         nums++;
     }
-    return 0; 
+    return 0;
 }
 
 struct mixer *mixer_open_legacy(unsigned card)
@@ -606,23 +627,6 @@ int GetCtlMaxValue(struct snd_ctl_elem_info *elemInfo, long long *max)
         *max = elemInfo->value.integer64.max;
     } else {
         return -1;
-    }
-    return 0;
-}
-
-int mixer_get_ctl_minmax(struct mixer_ctl *ctl, long long *min, long long *max)
-{
-    if (ctl == NULL || ctl->info == NULL) {
-        return -EINVAL;
-    }
-    struct snd_ctl_elem_info *elemInfo = ctl->info;
-    int ret = GetCtlMinValue(elemInfo, min);
-    if (ret != 0) {
-        return -EINVAL;
-    }
-    ret = GetCtlMaxValue(elemInfo, max);
-    if (ret != 0) {
-        return -EINVAL;
     }
     return 0;
 }

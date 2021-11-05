@@ -31,9 +31,9 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <stdbool.h>
-#include <linux/ioctl.h>
 #include <sound/asound.h>
 #include <tinyalsa/asoundlib.h>
+#include <linux/ioctl.h>
 #include "audio_hal_log.h"
 
 #define SNDRV_CARDS 8
