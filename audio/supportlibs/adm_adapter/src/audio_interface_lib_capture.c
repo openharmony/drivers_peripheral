@@ -69,7 +69,7 @@ int32_t SetHwParamsCapture(const struct AudioHwCaptureParam * const handleData)
         startThreshold %d, stopThreshold %d, silenceThreshold %d",
         g_hwParams.streamType, g_hwParams.channels, g_hwParams.rate, g_hwParams.periodSize,
         g_hwParams.periodCount, g_hwParams.cardServiceName, g_hwParams.format, g_hwParams.period,
-        g_hwParams.frameSize, g_hwParams.isBigEndian, g_hwParams.isSignedData, g_hwParams.startThreshold, 
+        g_hwParams.frameSize, g_hwParams.isBigEndian, g_hwParams.isSignedData, g_hwParams.startThreshold,
         g_hwParams.stopThreshold, g_hwParams.silenceThreshold);
 #endif
     return HDF_SUCCESS;
@@ -1159,8 +1159,8 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
 #endif
         CaptureSample(&pcm, devIn[SND_IN_SOUND_CARD_MIC].card, devIn[SND_IN_SOUND_CARD_MIC].device,
             g_hwParams.channels, g_hwParams.rate, format,
-            g_hwParams.periodSize / 4,
-            g_hwParams.periodCount / 2);
+            g_hwParams.periodSize / 4,  // Because the data frame size is limited to 16K,periodSize/4.
+            g_hwParams.periodCount / 2); // Because the data frame size is limited to 16K, periodCount/2.
         RoutePcmCardOpen(devIn[SND_IN_SOUND_CARD_MIC].card, DEV_IN_HANDS_FREE_MIC_CAPTURE_ROUTE);
     }
     dataSize = pcm_frames_to_bytes(pcm, pcm_get_buffer_size(pcm));

@@ -129,7 +129,7 @@ int TinyalsaGetElemInfo(int fd, struct snd_ctl_elem_info *elemInfo)
 }
 int mixer_ctl_enumerated_select(struct mixer_ctl *ctl, const char *value)
 {
-	struct snd_ctl_elem_value ev;
+    struct snd_ctl_elem_value ev;
     memset_s(&ev, sizeof(ev), 0, sizeof(ev));
     if (ctl->info->type != SNDRV_CTL_ELEM_TYPE_ENUMERATED) {
         return -1;
@@ -159,7 +159,7 @@ int mixer_ctl_enumerated_select(struct mixer_ctl *ctl, const char *value)
 
 void mixer_ctl_value_check(struct mixer_ctl *ctl, long long *value)
 {
-    long long max, min;
+    long long min, max;
     mixer_get_ctl_minmax(ctl, &min, &max);
     if (*value > max) {
         *value = max;
@@ -211,7 +211,7 @@ int mixer_ctl_set_int_double(struct mixer_ctl *ctl, long long left, long long ri
         default:
             return -1;
     }
-    return TinyalsaSetElemValue(ctl->mixer->fd, &elemValue);;
+    return TinyalsaSetElemValue(ctl->mixer->fd, &elemValue);
 }
 
 
@@ -274,7 +274,7 @@ char* GetSndCardId(int card, unsigned int *length)
     }
     memset_s(sndCardId, SND_CARD_ID_LEN, 0, SND_CARD_ID_LEN);
     
-    int ret = sprintf_s(path, sizeof(path) - 1,"/proc/asound/card%d/id", card);
+    int ret = sprintf_s(path, sizeof(path) - 1, "/proc/asound/card%d/id", card);
     if (ret < 0) {
         LOG_FUN_ERR("sndCardId path sprintf_s failed");
         free(sndCardId);
@@ -330,7 +330,7 @@ int SndCardRouteTableInit(int card)
     free(sndCardId);
     sndCardId = NULL;
     for (int i = PCM_DEVICE0; i < PCM_MAX; i++) {
-         mPcm[i] = NULL;
+        mPcm[i] = NULL;
     }
     return 0;
 }
@@ -439,7 +439,7 @@ struct mixer *MixerInit(unsigned int count)
     return mixer;
 }
 
-int CtleNamesInit(struct snd_ctl_elem_info *elemInfo, struct mixer *mixer, int nums) 
+int CtleNamesInit(struct snd_ctl_elem_info *elemInfo, struct mixer *mixer, int nums)
 {
     struct snd_ctl_elem_info tempInfo;
     if (elemInfo->type != SNDRV_CTL_ELEM_TYPE_ENUMERATED) {
@@ -497,7 +497,7 @@ int MixerCtlsInit(struct mixer *mixer, struct snd_ctl_elem_id *elemId)
         }
         nums++;
     }
-    return 0;       
+    return 0; 
 }
 
 struct mixer *mixer_open_legacy(unsigned card)
@@ -540,9 +540,9 @@ struct mixer *mixer_open_legacy(unsigned card)
         free(elemId);
         mixer_close_legacy(mixer);
         close(fd);
-        return NULL;    
+        return NULL;
     }
-    ret = MixerCtlsInit(mixer, elemId);    
+    ret = MixerCtlsInit(mixer, elemId);
     if (ret < 0) {
         free(elemId);
         mixer_close_legacy(mixer);
@@ -807,11 +807,8 @@ void RoutePcmCardOpen(int card, uint32_t route)
         return;
     }
 
-
     LOG_PARA_INFO("route_pcm_card_open(card %d, route %d)", card, route);
-
     isPlayback = IsPlaybackRoute(route);
-
     if (!g_tinyalsaRouteTable) {
         SndCardRouteTableInit(card);
     }

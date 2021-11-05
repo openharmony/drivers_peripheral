@@ -23,7 +23,7 @@
 struct DevInfo devIn[SND_IN_SOUND_CARD_MAX];
 struct DevInfo devOut[SND_OUT_SOUND_CARD_MAX];
 
-struct DevProcInfo SPEAKER_OUT_NAME[] = {/* add codes& dai name here */
+struct DevProcInfo SPEAKER_OUT_NAME[] = {
     {"realtekrt5616c", NULL},
     {"realtekrt5651co", "rt5651-aif1"},
     {"realtekrt5670c", NULL},
@@ -108,7 +108,7 @@ struct RenderParamcheckList {
 };
 static void SetDefaultDevInfo(struct DevInfo *info, int size, int rid)
 {
-    for(int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         if (rid) {
             info[i].id = NULL;
         }
@@ -327,7 +327,7 @@ static void dumpdev_info(const char *tag, struct DevInfo  *devInfo, int count)
     }
 }
 
-void ReadInSoundCard()
+void ReadInSoundCard(void)
 {
     char sndCardId[32];
     char CardIdInfo[20];
@@ -367,7 +367,7 @@ void ReadInSoundCard()
     return ;
 }
 
-void ReadOutSoundCard()
+void ReadOutSoundCard(void)
 {
     char sndCardId[32];
     char CardIdInfo[20];
