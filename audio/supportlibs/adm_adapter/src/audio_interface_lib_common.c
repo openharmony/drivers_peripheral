@@ -18,6 +18,10 @@
 
 struct HdfIoService *HdfIoServiceBindName(const char *serviceName)
 {
+#ifdef ALSA_MODE
+    static struct HdfIoService hdfIoService;
+    return &hdfIoService;
+#else
     if (serviceName == NULL) {
         LOG_FUN_ERR("service name NULL!");
         return NULL;
@@ -33,6 +37,7 @@ struct HdfIoService *HdfIoServiceBindName(const char *serviceName)
     }
     LOG_FUN_ERR("service name not support!");
     return NULL;
+#endif
 }
 
 void AudioBufReplyRecycle(struct HdfSBuf *sBuf, struct HdfSBuf *reply)
@@ -48,12 +53,16 @@ void AudioBufReplyRecycle(struct HdfSBuf *sBuf, struct HdfSBuf *reply)
 int32_t AudioServiceDispatch(struct HdfIoService *service,
     int cmdId, struct HdfSBuf *sBuf, struct HdfSBuf *reply)
 {
+#ifdef ALSA_MODE
+	return 0;
+#else
     if (service == NULL || service->dispatcher == NULL ||
         service->dispatcher->Dispatch == NULL || sBuf == NULL) {
         return HDF_FAILURE;
     }
 
     return service->dispatcher->Dispatch(&(service->object), cmdId, sBuf, reply);
+#endif
 }
 
 struct HdfSBuf *AudioObtainHdfSBuf(void)
