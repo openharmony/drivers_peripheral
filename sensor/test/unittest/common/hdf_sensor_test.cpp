@@ -98,7 +98,7 @@ namespace {
         }
 
         if (event->sensorId == SENSOR_TYPE_HALL || event->sensorId == SENSOR_TYPE_PROXIMITY) {
-            float data = (float )*event->data;
+            float data = (float)*event->data;
             for (int i = 0; i < g_listNum; ++i) {
                 if (event->sensorId == g_sensorList[i].sensorTypeId) {
                     SensorDataVerification(data, g_sensorList[i]);
