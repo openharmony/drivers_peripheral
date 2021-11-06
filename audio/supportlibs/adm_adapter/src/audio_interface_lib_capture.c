@@ -1130,10 +1130,10 @@ int32_t AudioOutputCaptureReadFrame(struct HdfIoService *service, int cmdId, str
     return HDF_SUCCESS;
 }
 
-int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
+#ifdef ALSA_MODE
+int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
     uint32_t dataSize = 0;
     char *buffer = NULL;
     if (!pcm) {
@@ -1169,20 +1169,32 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
         fprintf(stderr, "Unable to allocate \n");
         free(buffer);
         pcm_close(pcm);
-        return 0;
+        return HDF_FAILURE;
     }
     if (!pcm_read(pcm, buffer, dataSize)) {
         memcpy_s(handleData->frameCaptureMode.buffer, FRAME_DATA, buffer, dataSize);
 #ifdef DEBUG
         if (fwrite(buffer, 1, dataSize, file) != dataSize) {
             fprintf(stderr, "Error capturing sample\n");
-            return 0;
+            return HDF_FAILURE;
         }
 #endif
     }
     handleData->frameCaptureMode.bufferSize = dataSize;
     handleData->frameCaptureMode.bufferFrameSize = pcm_bytes_to_frames(pcm, dataSize);
     free(buffer);
+    return HDF_SUCCESS;
+}
+#endif
+
+int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
+    int cmdId, struct AudioHwCaptureParam *handleData)
+{
+#ifdef ALSA_MODE
+    int32_t ret = TinyalsaAudioOutputCaptureRead(handle, cmdId, handleData);
+    if (ret == HDF_FAILURE) {
+        return HDF_FAILURE;
+    }
 #else
     uint32_t dataSize = 0;
     uint32_t frameCount = 0;

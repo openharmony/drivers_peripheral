@@ -1,10 +1,11 @@
 # Copyright (c) Huawei Technologies Co., Ltd. 2021. All rights reserved.
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
+  enable_audio_alsa_mode = false
 } else {
   import("//build/ohos.gni")
+  import("//drivers/peripheral/audio/chipsets/gni/audio.${product_name}.gni")
 }
-import("//drivers/peripheral/audio/chipsets/gni/audio.${product_name}.gni")
 
 #If set flag is false, the ADM version will be built; if set flag is true, the MPI version will be built.
 enable_audio_device_mpi = false

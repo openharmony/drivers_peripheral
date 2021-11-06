@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rockchip Electronics Co., Ltd.
+ * Copyright (c) 2015 Rockchip Electronics Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * @file default_config.h
  * @author  RkAudio
@@ -19,8 +20,8 @@
  * @date 2015-08-24
  */
 
-#ifndef _DEFAULT_CONFIG_H_
-#define _DEFAULT_CONFIG_H_
+#ifndef DEFAULT_CONFIG_H_
+#define DEFAULT_CONFIG_H_
 
 #include "config.h"
 #ifdef __cplusplus
