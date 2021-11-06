@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rockchip Electronics Co., Ltd.
+ * Copyright (c) 2015 Rockchip Electronics Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * @file alsa_mixer.c
  * @author  RkAudio
@@ -327,8 +328,9 @@ char* GetSndCardId(int card, unsigned int *length)
     FILE* fp = fopen(path, "rt");
     if (fp) {
         readLen = fread(sndCardId, sizeof(char), SND_CARD_ID_LEN, fp);
-        fclose(fp);
-        fp = NULL;
+        if (fclose(fp)) {
+            LOG_FUN_ERR("fclose(%s) failed", path);
+        }
     }
     sndCardId[readLen - 1] = '\0';
     *length = readLen;
@@ -473,6 +475,10 @@ struct mixer *MixerInit(unsigned int count)
     if (!mixer) {
         return NULL;
     }
+    if (count <= 0) {
+        LOG_FUN_ERR("count <=0, mixer->ctl and mixer->info can not malloc");
+        return NULL;
+    }
     mixer->ctl = calloc(count, sizeof(struct mixer_ctl));
     if (mixer->ctl == NULL) {
         mixer_close_legacy(mixer);
@@ -493,6 +499,10 @@ int CtleNamesInit(struct snd_ctl_elem_info *elemInfo, struct mixer *mixer, int n
         return 0;
     }
     unsigned int items = elemInfo->value.enumerated.items;
+    if (items <= 0) {
+        LOG_FUN_ERR("items <=0, **enames can not malloc");
+        return NULL;
+    }
     char **enames = calloc(items, sizeof(char *));
     if (enames == NULL) {
         LOG_FUN_ERR("enumerated.items name malloc failed");

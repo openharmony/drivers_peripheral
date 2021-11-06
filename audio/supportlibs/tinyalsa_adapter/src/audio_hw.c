@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rockchip Electronics Co., Ltd.
+ * Copyright (c) 2015 Rockchip Electronics Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * @file audio_hw.c
  * @author  RkAudio
@@ -159,19 +160,12 @@ static bool dev_id_match(const char *info, const char *did)
     }
     return false;
 }
-
-static bool GetSpecifiedOutDev(struct DevInfo *devinfo, int card,
+static bool GetSpecifiedDevicesCheck(struct DevInfo *devinfo, int card,
     const char *id, struct DevProcInfo *match)
 {
     int i = 0;
-    int device;
-    char deviceInfoPath[32];
-    char info[256];
-    size_t len;
-    FILE* file = NULL;
     int better = 0;
     int index = -1;
-
     /* parse card id */
     if (!match) {
         return true; /* match any */
@@ -191,7 +185,6 @@ static bool GetSpecifiedOutDev(struct DevInfo *devinfo, int card,
     if (!match[index].cid) {
         return false;
     }
-
     if (!match[index].did) { /* no exist dai info, exit */
         devinfo->card = card;
         devinfo->device = 0;
@@ -199,7 +192,20 @@ static bool GetSpecifiedOutDev(struct DevInfo *devinfo, int card,
             devinfo->card, devinfo->device);
         return true;
     }
+}
 
+static bool GetSpecifiedOutDev(struct DevInfo *devinfo, int card,
+    const char *id, struct DevProcInfo *match)
+{
+    int device;
+    char deviceInfoPath[32];
+    char info[256];
+    size_t len;
+    FILE* file = NULL;
+    bool ret = GetSpecifiedDevicesCheck(devinfo, card, id, match);
+    if (!ret) {
+        return false;
+    }
     /* parse device id */
     for (device = 0; device < SNDRV_DEVICES; device++) {
         int ret = sprintf_s(deviceInfoPath, sizeof(deviceInfoPath) - 1, "proc/asound/card%d/pcm%dp/info", card, device);
@@ -217,15 +223,13 @@ static bool GetSpecifiedOutDev(struct DevInfo *devinfo, int card,
             continue;
         }
         len = fread(info, sizeof(char), sizeof(info) / sizeof(char), file);
-        fclose(file);
-        file = NULL;
+        if (fclose(file)) {
+            LOG_FUN_ERR("fclose(%s) failed", deviceInfoPath);
+        }
         if (len == 0 || len > sizeof(info) / sizeof(char)) {
             continue;
         }
-        if (info[len - 1] == '\n') {
-            len--;
-            info[len] = '\0';
-        }
+        info[len - 1] = '\0';
         /* parse device dai */
         if (dev_id_match(info, match[index].did)) {
             devinfo->card = card;
@@ -241,42 +245,15 @@ static bool GetSpecifiedOutDev(struct DevInfo *devinfo, int card,
 static bool GetSpecifiedInDev(struct DevInfo *devinfo, int card,
     const char *id, struct DevProcInfo *match)
 {
-    int i = 0;
     int device;
     char deviceInfoPath[32];
     char info[256];
     size_t len;
     FILE* file = NULL;
-    int better = 0;
-    int index = -1;
-
-    /* parse card id */
-    if (!match) {
-        return true; /* match any */
-    }
-    while (match[i].cid) {
-        int score = name_match(id, match[i].cid);
-        if (score > better) {
-            better = score;
-            index = i;
-        }
-        i++;
-    }
-
-    if (index < 0) {
+    bool ret = GetSpecifiedDevicesCheck(devinfo, card, id, match);
+    if (!ret) {
         return false;
     }
-    if (!match[index].cid) {
-        return false;
-    }
-    if (!match[index].did) { /* no exist dai info, exit */
-        devinfo->card = card;
-        devinfo->device = 0;
-        LOG_PARA_INFO("%s card, got card=%d,device=%d", devinfo->id,
-            devinfo->card, devinfo->device);
-        return true;
-    }
-
     /* parse device id */
     for (device = 0; device < SNDRV_DEVICES; device++) {
         int ret = sprintf_s(deviceInfoPath, sizeof(deviceInfoPath) - 1, "proc/asound/card%d/pcm%dc/info", card, device);
@@ -294,15 +271,13 @@ static bool GetSpecifiedInDev(struct DevInfo *devinfo, int card,
             continue;
         }
         len = fread(info, sizeof(char), sizeof(info) / sizeof(char), file);
-        fclose(file);
-        file = NULL;
+        if (fclose(file)) {
+            LOG_FUN_ERR("fclose(%s) failed", deviceInfoPath);
+        }
         if (len == 0 || len > sizeof(info) / sizeof(char)) {
             continue;
         }
-        if (info[len - 1] == '\n') {
-            len--;
-            info[len] = '\0';
-        }
+        info[len - 1] = '\0';
         /* parse device dai */
         if (dev_id_match(info, match[i].did)) {
             devinfo->card = card;
@@ -350,8 +325,9 @@ void ReadInSoundCard(void)
             continue;
         }
         cardIdLen = fread(CardIdInfo, sizeof(char), sizeof(CardIdInfo) / sizeof(char), file);
-        fclose(file);
-        file = NULL;
+        if (fclose(file)) {
+            LOG_FUN_ERR("fclose(%s) failed", sndCardId);
+        }
         if (cardIdLen == 0 || cardIdLen > sizeof(CardIdInfo) / sizeof(char)) {
             continue;
         }
@@ -392,8 +368,9 @@ void ReadOutSoundCard(void)
             continue;
         }
         cardIdLen = fread(CardIdInfo, sizeof(char), sizeof(CardIdInfo) / sizeof(char), file);
-        fclose(file);
-        file = NULL;
+        if (fclose(file)) {
+            LOG_FUN_ERR("fclose(%s) failed", sndCardId);
+        }
         if (cardIdLen == 0 || cardIdLen > sizeof(CardIdInfo) / sizeof(char)) {
             continue;
         }

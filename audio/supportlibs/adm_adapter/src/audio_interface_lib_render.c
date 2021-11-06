@@ -1405,10 +1405,10 @@ int32_t AudioOutputRenderWriteFrame(struct HdfIoService *service,
     }
 }
 
-int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
+#ifdef ALSA_MODE
+int32_t TinyAlsaAudioOutputRenderWrite(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
-#ifdef ALSA_MODE
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         return HDF_FAILURE;
     }
@@ -1426,6 +1426,18 @@ int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
     }
     if (FrameSbufWriteBuffer(sBuf, handleData)) {
         AudioBufReplyRecycle(sBuf, reply);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+#endif
+
+int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData)
+{
+#ifdef ALSA_MODE
+    int32_t ret = TinyAlsaAudioOutputRenderWrite(handle, cmdId, handleData);
+    if (ret == HDF_FAILURE) {
         return HDF_FAILURE;
     }
 #else
