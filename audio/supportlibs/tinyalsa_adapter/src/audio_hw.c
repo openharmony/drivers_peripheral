@@ -459,39 +459,37 @@ void TinyAlsaPlayParamInit(unsigned int channels, unsigned int rate,
     return;
 }
 
-void PlaySample(struct pcm **pcm, unsigned int card, unsigned int device, unsigned int channels,
-    unsigned int rate, unsigned int bits, unsigned int periodSize, unsigned int periodCount)
+void RenderSample(struct pcm **pcm, struct PcmRenderParam *param)
 {
-    TinyAlsaPlayParamInit(channels, rate, periodSize, periodCount);
-    initRenderFormat(bits);
-    if (!IsPlayable(card, device, bits)) {
+    TinyAlsaPlayParamInit(param->channels, param->rate, param->periodSize, param->periodCount);
+    initRenderFormat(param->bits);
+    if (!IsPlayable(param->card, param->device, param->bits)) {
         return;
     }
 
-    *pcm = pcm_open(card, device, PCM_OUT, &g_renderPcmCfg);
+    *pcm = pcm_open(param->card, param->device, PCM_OUT, &g_renderPcmCfg);
     if (((*pcm) == NULL) || !pcm_is_ready(*pcm)) {
-        LOG_FUN_ERR("Unable to open PCM device (/dev/snd/pcmC%uD%up):(%s)\n", card, device, pcm_get_error(*pcm));
+        LOG_FUN_ERR("Unable to open PCM device (/dev/snd/pcmC%uD%up):(%s)\n", param->card, param->device, pcm_get_error(*pcm));
         return;
     }
-    LOG_FUN_ERR("Playing sample: %u ch, %u hz, %u\n", channels, rate, bits);
+    LOG_FUN_ERR("Playing sample: %u ch, %u hz, %u\n", param->channels, param->rate, param->bits);
 }
 
-unsigned int CaptureSample(struct pcm **pcm, unsigned int card, unsigned int device, unsigned int channels,
-    unsigned int rate, enum pcm_format format, unsigned int periodSize, unsigned int periodCount)
+unsigned int CaptureSample(struct pcm **pcm, struct PcmCaptureParam *param)
 {
     struct pcm_config config;
     memset_s(&config, sizeof(config), 0, sizeof(config));
-    config.channels = channels;
-    config.rate = rate;
-    config.period_size = periodSize;
-    config.period_count = periodCount;
-    config.format = format;
+    config.channels = param->channels;
+    config.rate = param->rate;
+    config.period_size = param->periodSize;
+    config.period_count = param->periodCount;
+    config.format = param->format;
     config.start_threshold = 0;
     config.stop_threshold = 0;
     config.silence_threshold = 0;
-    *pcm = pcm_open(card, device, PCM_IN, &config);
+    *pcm = pcm_open(param->card, param->device, PCM_IN, &config);
     if (((*pcm) == NULL) || !pcm_is_ready(*pcm)) {
-        LOG_FUN_ERR("Unable to open PCM device (/dev/snd/pcmC%uD%uc):(%s)\n", card, device, pcm_get_error(*pcm));
+        LOG_FUN_ERR("Unable to open PCM device (/dev/snd/pcmC%uD%uc):(%s)\n", param->card, param->device, pcm_get_error(*pcm));
         return -1;
     }
     return 0;
