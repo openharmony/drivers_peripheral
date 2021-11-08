@@ -312,8 +312,6 @@ typedef struct {
  */
 typedef struct {
     uint64_t phyAddr;         /**< Start physical address of an image */
-    void *virAddr;            /**< Start virtual address of an image */
-    int32_t fd;               /**< Image fd */
     int32_t height;           /**< Image height */
     int32_t width;            /**< Image width */
     int32_t stride;           /**< Image stride */
