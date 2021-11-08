@@ -18,14 +18,14 @@ extern "C" {
 #endif /* __cplusplus */
 
 int32_t TestCodecHalSysInit(void);
-int32_t TestAcodecDeviceInit(void);
-int32_t TestAcodecHalReadReg(void);
-int32_t TestAcodecHalWriteReg(void);
-int32_t TestIoctlGetOutputVol(void);
-int32_t TestAcodecSetI2s1Fs(void);
-int32_t TestAcodecSetI2s1FsInvalidRate(void);
-int32_t TestAcodecSetI2s1DataWidth(void);
-int32_t TestAcodecSetI2s1DataWidthInvalidBitWidth(void);
+int32_t TestCodecRegBitsRead(void);
+int32_t TestCodecRegBitsUpdate(void);
+int32_t TestCodecRegDefaultInit(void);
+int32_t TestCodecSetAdcTuneEnable(void);
+int32_t TestCodecDaiParamsUpdate(void);
+int32_t TestAudioCodecAiaoSetCtrlOps(void);
+int32_t TestAudioCodecAiaoGetCtrlOps(void);
+
 #ifdef __cplusplus
 #if __cplusplus
 }

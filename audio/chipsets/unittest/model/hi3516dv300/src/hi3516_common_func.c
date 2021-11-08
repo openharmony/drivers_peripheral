@@ -40,7 +40,7 @@ int32_t InitHwParam(struct AudioPcmHwParams *hwParam)
 }
 
 
-int32_t GetAudioCard(struct AudioCard **card, AudioType *type)
+int32_t GetAudioCard(struct AudioCard **card)
 {
     int i;
     const char *audioServiceName[] = {
@@ -48,7 +48,7 @@ int32_t GetAudioCard(struct AudioCard **card, AudioType *type)
         "hdf_audio_smartpa_dev0",
     };
     HDF_LOGI("%s: enter", __func__);
-    if (card == NULL || type == NULL) {
+    if (card == NULL) {
         HDF_LOGE("input param is NULL");
         return HDF_FAILURE;
     }
@@ -56,11 +56,6 @@ int32_t GetAudioCard(struct AudioCard **card, AudioType *type)
     for (i = 0; i < sizeof(audioServiceName) / sizeof(audioServiceName[0]); ++i) {
         if (GetCardInstance(audioServiceName[i]) != NULL) {
             HDF_LOGI("%s: get %s success!", __func__, audioServiceName[i]);
-            if (i == 0) {
-                *type = INNER;
-            } else if (i == 1) {
-                *type = OUTER;
-            }
             *card = GetCardInstance(audioServiceName[i]);
             break;
         }

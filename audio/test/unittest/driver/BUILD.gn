@@ -34,16 +34,15 @@ ohos_unittest("khdf_audio_driver_test") {
     "//drivers/peripheral/audio/chipsets/hi3516dv300/codec/test/unittest/common/hi3516_codec_impl_test.cpp",
     "//drivers/peripheral/audio/chipsets/hi3516dv300/codec/test/unittest/common/hi3516_codec_ops_test.cpp",
     "//drivers/peripheral/audio/chipsets/hi3516dv300/soc/test/unittest/common/hi3516_aiao_impl_test.cpp",
-    "//drivers/peripheral/audio/chipsets/hi3516dv300/soc/test/unittest/common/hi3516_dai_adapter_test.cpp",
-    "//drivers/peripheral/audio/chipsets/hi3516dv300/soc/test/unittest/common/hi3516_platform_ops_test.cpp",
+    "//drivers/peripheral/audio/chipsets/hi3516dv300/soc/test/unittest/common/hi3516_dai_ops_test.cpp",
+    "//drivers/peripheral/audio/chipsets/hi3516dv300/soc/test/unittest/common/hi3516_dma_ops_test.cpp",
   ]
   deps = [
     "//drivers/adapter/uhdf2/test/unittest/common:libhdf_test_common",
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//utils/native/base:utils",
   ]
-  resource_config_file =
-      "//drivers/adapter/uhdf2/test/resource/audio/ohos_test.xml"
+
   cflags = [
     "-Wall",
     "-Wextra",

@@ -58,7 +58,7 @@ int32_t CodecDeviceInit(struct AudioCard *audioCard, struct CodecDevice *codec)
     }
 
     if (AudioSapmNewComponents(audioCard, codec->devData->sapmComponents,
-                               codec->devData->numSapmComponent) != HDF_SUCCESS) {
+        codec->devData->numSapmComponent) != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("new components failed.");
         return HDF_FAILURE;
     }

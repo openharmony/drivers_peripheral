@@ -1225,4 +1225,76 @@ HWTEST_F(AudioRenderTest, AudioRenderDrainBufferWhenParamIsNotSupport, TestSize.
     delete(type);
     type = nullptr;
 }
+
+HWTEST_F(AudioRenderTest, AudioRenderTurnStandbyModeWhenHandleIsNull, TestSize.Level1)
+{
+    AudioHwRender *hwRender = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderTurnStandbyMode(handle));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderTurnStandbyModeWhenStopIsError, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderTurnStandbyMode(handle));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderTurnStandbyModeWhenParamIsVaild, TestSize.Level1)
+{
+    AudioHandle handle = (AudioHandle)render;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart(handle));
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderTurnStandbyMode(handle));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderRegCallbackWhenRenderIsNull, TestSize.Level1)
+{
+    struct AudioRender *utRender = nullptr;
+    RenderCallback callback = AudioRenderCallbackUtTest;
+    void *cookie = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderRegCallback(utRender, callback, cookie));
+}
+
+HWTEST_F(AudioRenderTest, AudioRenderRegCallbackWhenParamIsVaild, TestSize.Level1)
+{
+    RenderCallback callback = AudioRenderCallbackUtTest;
+    void *cookie = nullptr;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderRegCallback(render, callback, cookie));
+}
+
+HWTEST_F(AudioRenderTest, CallbackProcessingWhenHandleIsNull, TestSize.Level1)
+{
+    AudioHwRender *hwRender = nullptr;
+    AudioHandle handle = (AudioHandle)hwRender;
+    AudioCallbackType callBackType = AUDIO_ERROR_OCCUR;
+    EXPECT_EQ(HDF_FAILURE, CallbackProcessing(handle, callBackType));
+}
+
+HWTEST_F(AudioRenderTest, CallbackProcessingWhenCallbackIsNull, TestSize.Level1)
+{
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
+    hwRender->renderParam.frameRenderMode.callback = NULL;
+    AudioHandle handle = (AudioHandle)hwRender;
+    AudioCallbackType callBackType = AUDIO_ERROR_OCCUR;
+    EXPECT_EQ(HDF_FAILURE, CallbackProcessing(handle, callBackType));
+}
+
+HWTEST_F(AudioRenderTest, CallbackProcessingWhenCallbackIsError, TestSize.Level1)
+{
+    RenderCallback callback = AudioRenderCallbackUtTest;
+    void *cookie = nullptr;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderRegCallback(render, callback, cookie));
+    AudioHandle handle = (AudioHandle)render;
+    int32_t callBackType = AUDIO_ERROR_OCCUR + 1;
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, CallbackProcessing(handle, (enum AudioCallbackType)callBackType));
+}
+
+HWTEST_F(AudioRenderTest, CallbackProcessingWhenParamIsVaild, TestSize.Level1)
+{
+    RenderCallback callback = AudioRenderCallbackUtTest;
+    void *cookie = nullptr;
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderRegCallback(render, callback, cookie));
+    AudioHandle handle = (AudioHandle)render;
+    AudioCallbackType callBackType = AUDIO_ERROR_OCCUR;
+    EXPECT_EQ(HDF_SUCCESS, CallbackProcessing(handle, callBackType));
+}
 }

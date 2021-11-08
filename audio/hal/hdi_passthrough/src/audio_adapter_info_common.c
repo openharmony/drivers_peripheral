@@ -1127,6 +1127,9 @@ int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamVal
                 return HDF_FAILURE;
             }
             tempBuf = NULL;
+        } else {
+            LOG_FUN_ERR("Has no value!");
+            return HDF_FAILURE;
         }
         tempBuf = NULL;
         i++;

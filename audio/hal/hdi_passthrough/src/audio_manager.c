@@ -52,44 +52,44 @@ static void *g_ptrRenderHandle = NULL;
 static void *g_ptrPathSelHandle = NULL;
 #endif
 
-BindServiceRenderSo *AudioSoGetBindServiceRender()
+BindServiceRenderSo *AudioSoGetBindServiceRender(void)
 {
     return &g_bindServiceRender;
 }
 
-InterfaceLibModeRenderSo *AudioSoGetInterfaceLibModeRender()
+InterfaceLibModeRenderSo *AudioSoGetInterfaceLibModeRender(void)
 {
     return &g_interfaceLibModeRender;
 }
 
-CloseServiceRenderSo *AudioSoGetCloseServiceRender()
+CloseServiceRenderSo *AudioSoGetCloseServiceRender(void)
 {
     return &g_closeServiceRender;
 }
 
-BindServiceCaptureSo *AudioSoGetBindServiceCapture()
+BindServiceCaptureSo *AudioSoGetBindServiceCapture(void)
 {
     return &g_bindServiceCapture;
 }
 
-InterfaceLibModeCaptureSo *AudioSoGetInterfaceLibModeCapture()
+InterfaceLibModeCaptureSo *AudioSoGetInterfaceLibModeCapture(void)
 {
     return &g_interfaceLibModeCapture;
 }
 
-CloseServiceCaptureSo *AudioSoGetCloseServiceCapture()
+CloseServiceCaptureSo *AudioSoGetCloseServiceCapture(void)
 {
     return &g_closeServiceCapture;
 }
 
 
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
-PathSelGetConfToJsonObj *AudioSoGetPathSelGetConfToJsonObj()
+PathSelGetConfToJsonObj *AudioSoGetPathSelGetConfToJsonObj(void)
 {
     return &g_pathSelGetConfToJsonObj;
 }
 
-PathSelAnalysisJson *AudioSoGetPathSelAnalysisJson()
+PathSelAnalysisJson *AudioSoGetPathSelAnalysisJson(void)
 {
     return &g_pathSelAnalysisJson;
 }

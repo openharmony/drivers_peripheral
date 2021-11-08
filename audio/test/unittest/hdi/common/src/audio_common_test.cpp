@@ -121,4 +121,21 @@ int32_t InitDevDescCapture(struct AudioDeviceDescriptor &devDesc)
     devDesc.desc = NULL;
     return HDF_SUCCESS;
 }
+
+int32_t AudioRenderCallbackUtTest(enum AudioCallbackType type, void *reserved, void *cookie)
+{
+    switch (type) {
+        case AUDIO_NONBLOCK_WRITE_COMPELETED:
+            return HDF_SUCCESS;
+        case AUDIO_RENDER_FULL:
+            return HDF_SUCCESS;
+        case AUDIO_FLUSH_COMPLETED:
+            return HDF_SUCCESS;
+        case AUDIO_ERROR_OCCUR:
+            return HDF_FAILURE;
+        case AUDIO_DRAIN_COMPELETED:
+            return HDF_FAILURE;
+    }
+    return HDF_FAILURE;
+}
 }

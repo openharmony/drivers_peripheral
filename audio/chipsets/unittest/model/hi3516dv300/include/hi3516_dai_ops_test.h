@@ -6,8 +6,8 @@
  * See the LICENSE file in the root of this repository for complete details.
  */
 
-#ifndef HI3516_DAI_ADAPTER_TEST_H
-#define HI3516_DAI_ADAPTER_TEST_H
+#ifndef HI3516_DAI_OPS_TEST_H
+#define HI3516_DAI_OPS_TEST_H
 
 #include "hdf_types.h"
 #ifdef __cplusplus
@@ -16,6 +16,8 @@ extern "C" {
 #endif
 #endif /* __cplusplus */
 
+int32_t TestDaiDeviceInit(void);
+int32_t TestDaiStartup(void);
 int32_t TestDaiHwParams(void);
 int32_t TestDaiInvalidRateParam(void);
 int32_t TestDaiInvalidRenderBitWidthParam(void);

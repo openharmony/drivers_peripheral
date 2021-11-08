@@ -15,8 +15,8 @@
 
 struct CodecData g_codecData = {
     .Init = CodecDeviceInit,
-    .Read = CodecDeviceReadReg,
-    .Write = CodecDeviceWriteReg,
+    .Read = AudioDeviceReadReg,
+    .Write = AudioDeviceWriteReg,
 };
 
 struct AudioDaiOps g_codecDaiDeviceOps = {

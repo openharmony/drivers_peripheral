@@ -48,38 +48,21 @@ typedef struct {
 // define the union u_rx_dsp_ctrl
 typedef union {
     struct {
-        unsigned int muteEn : 1;          // [0]
-        unsigned int muteFadeEn : 1;     // [1]
-        unsigned int pauseEn : 1;         // [2]
-        unsigned int pauseFadeEn : 1;    // [3]
-        unsigned int reserved3 : 4;       // [7..4]
-        unsigned int volume : 7;           // [14..8]
-        unsigned int reserved2 : 1;       // [15]
-        unsigned int fadeInRate : 4;     // [19..16]
-        unsigned int fadeOutRate : 4;    // [23..20]
-        unsigned int reserved1 : 3;       // [26..24]
-        unsigned int bypassEn : 1;        // [27]
-        unsigned int rxEnable : 1;        // [28]
-        unsigned int rxDisableDone : 1;  // [29]
-        unsigned int reserved0 : 2;       // [31..30]
+        unsigned int reserved0  : 28;      // [27..0]
+        unsigned int rxEnable   : 1;       // [28]
+        unsigned int rxDisableDone : 1;    // [29]
+        unsigned int reserved1  : 2;       // [31..30]
     } Bits;
     unsigned int u32;
 } URxDspCtrl;
 
 typedef union {
     struct {
-        unsigned int muteEn : 1;          // [0]
-        unsigned int muteFadeEn : 1;     // [1]
-        unsigned int reserved3 : 6;       // [7..2]
-        unsigned int volume : 7;           // [14..8]
-        unsigned int reserved2 : 1;       // [15]
-        unsigned int fadeInRate : 4;     // [19..16]
-        unsigned int fadeOutRate : 4;    // [23..20]
-        unsigned int reserved1 : 3;       // [26..24]
-        unsigned int bypassEn : 1;        // [27]
-        unsigned int txEnable : 1;        // [28]
-        unsigned int txDisableDone : 1;  // [29]
-        unsigned int reserved0 : 2;       // [31..30]
+        unsigned int reserved0  : 8;       // [7..0]
+        unsigned int volume     : 7;       // [14..8]
+        unsigned int reserved1  : 13;      // [27..15]
+        unsigned int txEnable   : 1;       // [28]
+        unsigned int reserved2  : 3;       // [31..29]
     } Bits;
     unsigned int u32;
 } UTxDspCtrl;

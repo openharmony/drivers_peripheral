@@ -678,7 +678,7 @@ int32_t GetRenderPassthroughManagerFunc(const char *adapterNameCase)
     int32_t size = 0;
     int32_t ret;
     int32_t index;
-    struct AudioManager *(*getAudioManager)() = NULL;
+    struct AudioManager *(*getAudioManager)(void) = NULL;
     getAudioManager = (struct AudioManager *(*)())(dlsym(g_handle, "GetAudioManagerFuncs"));
     if (getAudioManager == NULL) {
         LOG_FUN_ERR("Get Audio Manager Funcs Fail");
@@ -732,7 +732,7 @@ int32_t GetRenderProxyManagerFunc(const char *adapterNameCase)
     int32_t size = 0;
     int32_t ret;
     int32_t index;
-    struct AudioProxyManager *(*getAudioManager)() = NULL;
+    struct AudioProxyManager *(*getAudioManager)(void) = NULL;
     getAudioManager = (struct AudioProxyManager *(*)())(dlsym(g_handle, "GetAudioProxyManagerFuncs"));
     if (getAudioManager == NULL) {
         return HDF_FAILURE;

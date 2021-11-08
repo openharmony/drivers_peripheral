@@ -9,9 +9,6 @@
 #include "hi3516_dai_ops.h"
 #include "audio_core.h"
 #include "osal_io.h"
-
-#include "audio_codec_base.h"
-
 #include "audio_dai_base.h"
 #include "audio_driver_log.h"
 
@@ -25,8 +22,8 @@ struct AudioDaiOps g_daiDeviceOps = {
 
 struct DaiData g_daiData = {
     .DaiInit = DaiDeviceInit,
-    .Read = CodecDeviceReadReg,
-    .Write = CodecDeviceWriteReg,
+    .Read = AudioDeviceReadReg,
+    .Write = AudioDeviceWriteReg,
     .ops = &g_daiDeviceOps,
 };
 
@@ -85,12 +82,12 @@ static int32_t DaiDriverInit(struct HdfDeviceObject *device)
         AUDIO_DRIVER_LOG_ERR("device is nullptr.");
         return HDF_ERR_INVALID_OBJECT;
     }
-    
+
     if (DaiGetConfigInfo(device, &g_daiData) !=  HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("get dai data fail.");
         return HDF_FAILURE;
     }
-    
+
     if (DaiGetServiceName(device) !=  HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("get service name fail.");
         return HDF_FAILURE;
@@ -98,7 +95,7 @@ static int32_t DaiDriverInit(struct HdfDeviceObject *device)
 
     OsalMutexInit(&g_daiData.mutex);
 
-    int32_t ret = AudioSocDeviceRegister(device, (void *)&g_daiData, AUDIO_DAI_DEVICE);
+    int32_t ret = AudioSocRegisterDai(device, &g_daiData);
     if (ret !=  HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("register dai fail.");
         return ret;

@@ -22,6 +22,8 @@
 #define AUDIODRV_CTL_ELEM_IFACE_SELECT 5
 #define AUDIO_REPLY_EXTEND 16
 #define AUDIO_SIZE_FRAME_16K (16 * 1024)
+#define AUDIO_TRYNUM 2
+#define AUDIO_TRYNUM_TIME 3000
 
 /* Out Put Capture */
 static struct AudioPcmHwParams g_hwParams;
@@ -1019,7 +1021,8 @@ int32_t AudioOutputCaptureReadFrame(struct HdfIoService *service, int cmdId, str
             LOG_PARA_INFO("Cir buff empty wait 50ms");
             tryNumReply--;
             HdfSbufFlush(reply);
-            usleep(AUDIO_CAP_WAIT_DELAY);
+            // wait (5 + tryNum)ms when buff empty
+            usleep(AUDIO_CAP_WAIT_DELAY + (tryNumReply % AUDIO_TRYNUM) * AUDIO_TRYNUM_TIME);
             continue;
         }
         break;
