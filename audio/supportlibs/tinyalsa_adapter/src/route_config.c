@@ -253,5 +253,3 @@ const struct PathRouteCfgTable hdmi_analog_config_table = {
     },
 #endif
 };
-
-
