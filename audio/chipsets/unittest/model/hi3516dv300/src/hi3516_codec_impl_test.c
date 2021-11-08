@@ -20,124 +20,102 @@ int32_t TestCodecHalSysInit(void)
 
     HDF_LOGI("%s: enter", __func__);
     ret = CodecHalSysInit();
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: CodecHalSysInit fail ret = %d", __func__, ret);
-        return HDF_FAILURE;
-    }
 
     HDF_LOGI("%s: success", __func__);
     return HDF_SUCCESS;
 }
 
-int32_t TestAcodecDeviceInit(void)
+int32_t TestCodecRegBitsRead(void)
 {
+    struct AudioMixerControl *regAttr = NULL;
+    uint32_t regValue;
     int ret;
-
     HDF_LOGI("%s: enter", __func__);
-    ret = AcodecDeviceInit();
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AcodecDeviceInit fail ret = %d", __func__, ret);
-        return HDF_FAILURE;
-    }
+
+    ret = CodecRegBitsRead(regAttr, &regValue);
 
     HDF_LOGI("%s: success", __func__);
     return HDF_SUCCESS;
 }
 
-int32_t TestAcodecHalReadReg(void)
+static int32_t CodecRegBitsUpdateMock(struct AudioMixerControl regAttr)
 {
-    unsigned int offset;
-    const int offsetValue = 0x14;
-    HDF_LOGI("%s: enter", __func__);
-
-    offset = offsetValue;
-    (void)AcodecHalReadReg(offset);
-
-    // ret is  value that is storaged in address.
     HDF_LOGI("%s: success", __func__);
     return HDF_SUCCESS;
 }
 
-int32_t TestAcodecHalWriteReg(void)
+int32_t TestCodecRegBitsUpdate(void)
 {
-    uint32_t offset;
-    uint32_t value;
-    const uint32_t offsetValue = 0x14;
-    const uint32_t regValue = 0x04000002;
-    HDF_LOGI("%s: enter", __func__);
-    // wiretreg no return value
-    offset = offsetValue;
-    value = regValue;
-    AcodecHalWriteReg(offset, value);
-
-    HDF_LOGI("%s: success", __func__);
-    return HDF_SUCCESS;
-}
-
-int32_t TestAcodecSetI2s1Fs(void)
-{
+    struct AudioMixerControl regAttr;
     int ret;
-    unsigned int rate;
-    const unsigned int sampleRate = 48000;
     HDF_LOGI("%s: enter", __func__);
-    // rate value is  8000, 12000, 11025, 16000, 22050,
-    // 24000, 32000, 44100, 48000, 64000, 96000
-    rate = sampleRate;
-    ret = AcodecSetI2s1Fs(rate);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AcodecSetI2s1Fs fail ret = %d", __func__, ret);
-        return HDF_FAILURE;
-    }
+    regAttr.reg = -1; // -1 is bad value
+    ret = CodecRegBitsUpdateMock(regAttr);
 
     HDF_LOGI("%s: success", __func__);
     return HDF_SUCCESS;
 }
 
-int32_t TestAcodecSetI2s1FsInvalidRate(void)
+int32_t TestCodecRegDefaultInit(void)
 {
+    struct AudioRegCfgGroupNode **regCfgGroup = NULL;
     int ret;
-    unsigned int rate;
     HDF_LOGI("%s: enter", __func__);
-    rate = AUDIO_SAMPLE_RATE_BUTT;
-    ret = AcodecSetI2s1Fs(rate);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: TestAcodecSetI2s1FsInvalidRate fail ret = %d", __func__, ret);
-        return HDF_FAILURE;
-    }
+
+    ret = CodecRegDefaultInit(regCfgGroup);
+
     HDF_LOGI("%s: success", __func__);
     return HDF_SUCCESS;
 }
 
-int32_t TestAcodecSetI2s1DataWidth(void)
+int32_t TestCodecSetAdcTuneEnable(void)
 {
+    struct AudioRegCfgGroupNode **regCfgGroup = NULL;
     int ret;
-    unsigned int bitWidth;
-    const unsigned int bitValue = 16;
     HDF_LOGI("%s: enter", __func__);
-    // input 8 16 18 20 24 32
-    bitWidth = bitValue;
-    ret = AcodecSetI2s1DataWidth(bitWidth);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: AcodecSetI2s1DataWidth fail ret = %d", __func__, ret);
-        return HDF_FAILURE;
-    }
+
+    ret = CodecSetAdcTuneEnable(regCfgGroup);
 
     HDF_LOGI("%s: success", __func__);
     return HDF_SUCCESS;
 }
 
-int32_t TestAcodecSetI2s1DataWidthInvalidBitWidth(void)
+int32_t TestCodecDaiParamsUpdate(void)
 {
+    struct AudioRegCfgGroupNode **regCfgGroup = NULL;
+    struct CodecDaiParamsVal codecDaiParamsVal;
     int ret;
-    unsigned int bitWidth;
     HDF_LOGI("%s: enter", __func__);
-    bitWidth = BIT_WIDTH32;
-    ret = AcodecSetI2s1DataWidth(bitWidth);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: TestAcodecSetI2s1DataWidthInvalidBitWidth fail ret = %d", __func__, ret);
-        return HDF_FAILURE;
-    }
+
+    codecDaiParamsVal.channelVal = 1; // 1 is dam channel
+    ret = CodecDaiParamsUpdate(regCfgGroup, codecDaiParamsVal);
+
     HDF_LOGI("%s: success", __func__);
     return HDF_SUCCESS;
 }
 
+int32_t TestAudioCodecAiaoSetCtrlOps(void)
+{
+    struct AudioKcontrol *kcontrol = NULL;
+    struct AudioCtrlElemValue *elemValue = NULL;
+    int ret;
+    HDF_LOGI("%s: enter", __func__);
+
+    ret = AudioCodecAiaoSetCtrlOps(kcontrol, elemValue);
+
+    HDF_LOGI("%s: success", __func__);
+    return HDF_SUCCESS;
+}
+
+int32_t TestAudioCodecAiaoGetCtrlOps(void)
+{
+    struct AudioKcontrol *kcontrol = NULL;
+    struct AudioCtrlElemValue *elemValue = NULL;
+    int ret;
+    HDF_LOGI("%s: enter", __func__);
+
+    ret = AudioCodecAiaoGetCtrlOps(kcontrol, elemValue);
+
+    HDF_LOGI("%s: success", __func__);
+    return HDF_SUCCESS;
+}

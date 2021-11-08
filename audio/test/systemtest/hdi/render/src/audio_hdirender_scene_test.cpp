@@ -389,4 +389,85 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0005, Tes
     adapter->DestroyRender(adapter, render);
     manager->UnloadAdapter(manager, adapter);
 }
+#ifdef AUDIO_ADM_SO
+/**
+* @tc.name  Test AudioRenderTurnStandbyMode API via input "AUDIO_FLUSH_COMPLETED"
+* @tc.number  SUB_Audio_HDI_AudioRenderRegCallback_0001
+* @tc.desc  Test AudioRenderTurnStandbyMode interface,return 0 if the interface use correctly.
+* @tc.author: ZHANGHAILIN
+*/
+HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderRegCallback_0001, TestSize.Level1)
+{
+    int32_t ret = -1;
+    struct AudioAdapter *adapter = nullptr;
+    struct AudioRender *render = nullptr;
+
+    ASSERT_NE(GetAudioManager, nullptr);
+    TestAudioManager* manager = GetAudioManager();
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+
+    ret = render->RegCallback(render, AudioRenderCallback, nullptr);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+
+    ret = render->control.Flush((AudioHandle)render);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+
+    ret = CheckFlushValue();
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+
+    adapter->DestroyRender(adapter, render);
+    manager->UnloadAdapter(manager, adapter);
+}
+
+/**
+* @tc.name  Test AudioRenderRegCallback API via input "AUDIO_NONBLOCK_WRITE_COMPELETED"
+* @tc.number  SUB_Audio_HDI_AudioRenderRegCallback_0002
+* @tc.desc  Test AudioRenderRegCallback interface,return 0 if the interface use correctly.
+* @tc.author: ZHANGHAILIN
+*/
+HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderRegCallback_0002, TestSize.Level1)
+{
+    int32_t ret = -1;
+    struct AudioAdapter *adapter = nullptr;
+    struct AudioRender *render = nullptr;
+    struct AudioSampleAttributes attrs;
+    struct AudioHeadInfo headInfo;
+    char absPath[PATH_MAX] = {0};
+    realpath(AUDIO_FILE.c_str(), absPath);
+    ASSERT_NE(realpath(AUDIO_FILE.c_str(), absPath), nullptr);
+
+    FILE *file = fopen(absPath, "rb");
+    ASSERT_NE(file, nullptr);
+    ASSERT_NE(GetAudioManager, nullptr);
+    TestAudioManager* manager = GetAudioManager();
+    ret = WavHeadAnalysis(headInfo, file, attrs);
+    if (ret < 0) {
+        fclose(file);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    }
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+
+    ret = render->RegCallback(render, AudioRenderCallback, nullptr);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+
+    ret = FrameStart(headInfo, render, file, attrs);
+    if (ret < 0) {
+        adapter->DestroyRender(adapter, render);
+        manager->UnloadAdapter(manager, adapter);
+        fclose(file);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    }
+
+    ret = CheckWriteCompleteValue();
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    ret = CheckRenderFullValue();
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+
+    adapter->DestroyRender(adapter, render);
+    manager->UnloadAdapter(manager, adapter);
+    fclose(file);
+}
+#endif
 }

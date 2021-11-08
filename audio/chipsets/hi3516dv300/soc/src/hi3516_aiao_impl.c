@@ -140,41 +140,29 @@ void AiaoHalWriteReg(unsigned int offset, unsigned int value)
     *(volatile  unsigned int *)((unsigned char *)(g_regAiaoBase) + (unsigned int)(offset)) = value;
 }
 
-static void AopSetCtrlReg(unsigned int chnId)
+int32_t AiaoSysPinMux(void)
 {
-    UTxDspCtrl aopCtrlReg;
-    aopCtrlReg.u32 = AiaoHalReadReg(AiopRegCfg(AOP_CTRL_REG, OFFSET_MULTL, chnId));
-
-    AUDIO_DEVICE_LOG_DEBUG("[OHOS] AopSetCtrlReg AopSetAttrReg read = %08x\n", aopCtrlReg.u32);
-
-    aopCtrlReg.Bits.muteEn = 0;
-    aopCtrlReg.Bits.muteFadeEn = 0;
-    aopCtrlReg.Bits.reserved3 = 0;
-    aopCtrlReg.Bits.volume = 0x79; /* 0db */
-    aopCtrlReg.Bits.reserved2 = 0;
-    aopCtrlReg.Bits.fadeInRate = 0;
-    aopCtrlReg.Bits.fadeOutRate = 0;
-    aopCtrlReg.Bits.reserved1 = 0;
-    aopCtrlReg.Bits.bypassEn = 0;
-    aopCtrlReg.Bits.txEnable = 0;
-    aopCtrlReg.Bits.txDisableDone = 0;
-    aopCtrlReg.Bits.reserved0 = 0;
-
-    AiaoHalWriteReg(AiopRegCfg(AOP_CTRL_REG, OFFSET_MULTL, chnId), aopCtrlReg.u32);
-    AUDIO_DEVICE_LOG_DEBUG("[OHOS] AopSetCtrlReg AopSetAttrReg write = %08x\n", aopCtrlReg.u32);
-}
-
-static int32_t AopHalSetBufferAddr(unsigned int chnId, unsigned long long value)
-{
-    unsigned int saddr;
-
-    if (chnId >=  g_wChannelIdMax) {
-        AUDIO_DEVICE_LOG_ERR("ao_dev%d is invalid!\n", chnId);
+    void *regIocfg3Base = OsalIoRemap(IOCFG3_BASE_ADDR, BASE_ADDR_REMAP_SIZE);
+    if (regIocfg3Base == NULL) {
+        AUDIO_DEVICE_LOG_ERR("regIocfg3Base is NULL.");
         return HDF_FAILURE;
     }
 
-    saddr = (unsigned int)(value & 0xffffffff);
-    AiaoHalWriteReg(AiopRegCfg(AOP_BUFF_SADDR_REG, OFFSET_MULTL, chnId), saddr); // buf start
+    void *regGpioBase = OsalIoRemap(GPIO_BASE_ADDR, BASE_ADDR_REMAP_SIZE);
+    if (regGpioBase == NULL) {
+        OsalIoUnmap(regIocfg3Base);
+        AUDIO_DEVICE_LOG_ERR("regGpioBase is NULL.");
+        return HDF_FAILURE;
+    }
+
+    AUDIO_DEVICE_LOG_DEBUG("I2s0PinMuxAmpUnmute AmpUnmute");
+    SysWritel((uintptr_t)regIocfg3Base + I2S_IOCFG3_BASE1, I2S_IOCFG3_BASE1_VAL);
+    SysWritel((uintptr_t)regGpioBase + GPIO_BASE1, GPIO_BASE3_VAL);
+    SysWritel((uintptr_t)regGpioBase + GPIO_BASE2, GPIO_BASE2_VAL);
+    SysWritel((uintptr_t)regGpioBase + GPIO_BASE3, GPIO_BASE3_VAL);
+
+    OsalIoUnmap(regGpioBase);
+    OsalIoUnmap(regIocfg3Base);
 
     return HDF_SUCCESS;
 }
@@ -276,6 +264,34 @@ int32_t AipHalSetRxStart(unsigned int chnId, bool en)
     AiaoHalWriteReg(AiopRegCfg(AIP_CTRL_REG, OFFSET_MULTL, chnId), unTmp.u32);
 
     return 0;
+}
+
+static void AopSetCtrlReg(unsigned int chnId)
+{
+    UTxDspCtrl aopCtrlReg;
+    aopCtrlReg.Bits.reserved0 = 0;
+    aopCtrlReg.Bits.volume = 0x79; /* 0db */
+    aopCtrlReg.Bits.txEnable = 0;
+    aopCtrlReg.Bits.reserved1 = 0;
+    aopCtrlReg.Bits.reserved2 = 0;
+    
+    AiaoHalWriteReg(AiopRegCfg(AOP_CTRL_REG, OFFSET_MULTL, chnId), aopCtrlReg.u32);
+    AUDIO_DEVICE_LOG_DEBUG("[OHOS] AopSetCtrlReg AopSetAttrReg write = %08x\n", aopCtrlReg.u32);
+}
+
+static int32_t AopHalSetBufferAddr(unsigned int chnId, unsigned long long value)
+{
+    unsigned int saddr;
+
+    if (chnId >=  g_wChannelIdMax) {
+        AUDIO_DEVICE_LOG_ERR("ao_dev%d is invalid!\n", chnId);
+        return HDF_FAILURE;
+    }
+
+    saddr = (unsigned int)(value & 0xffffffff);
+    AiaoHalWriteReg(AiopRegCfg(AOP_BUFF_SADDR_REG, OFFSET_MULTL, chnId), saddr); // buf start
+
+    return HDF_SUCCESS;
 }
 
 int32_t AopHalSetBuffWptr(unsigned int chnId, unsigned int value)
@@ -413,6 +429,10 @@ static int32_t AiaoGetBclkFsclk(unsigned int fsBit, unsigned int rate,
 
 int32_t AiaoGetMclk(unsigned int rate, uint32_t *mclkSel)
 {
+    if (mclkSel == NULL) {
+        AUDIO_DEVICE_LOG_ERR("mclkSel is null");
+        return HDF_FAILURE;
+    }
     switch (rate) {
         case AUDIO_SAMPLE_RATE_8000:
         case AUDIO_SAMPLE_RATE_16000:
@@ -460,7 +480,6 @@ static unsigned int AiaoGetBitCnt(unsigned int bitWidth)
 int32_t AiaoSetSysCtlRegValue(uint32_t mclkSel, uint32_t bitWidth, uint32_t rate, uint32_t *clkRegVal)
 {
     int32_t ret;
-    uint32_t fsBit;
     uint32_t bclkSel = 0;
     uint32_t lrClkSel = 0;
     const int dobule = 2;
@@ -469,39 +488,25 @@ int32_t AiaoSetSysCtlRegValue(uint32_t mclkSel, uint32_t bitWidth, uint32_t rate
         AUDIO_DEVICE_LOG_ERR("param is nullptr.");
         return HDF_ERR_INVALID_PARAM;
     }
-    fsBit = AiaoGetBitCnt(bitWidth) * dobule;
-
+    uint32_t fsBit = AiaoGetBitCnt(bitWidth) * dobule;
     ret = AiaoGetBclkFsclk(fsBit, rate, mclkSel, &bclkSel, &lrClkSel);
     if (ret != HDF_SUCCESS) {
         AUDIO_DEVICE_LOG_ERR("AiaoGetBclkFsclk fail");
         return HDF_FAILURE;
     }
 
-    *clkRegVal = bclkSel | lrClkSel << 4;
+    *clkRegVal = bclkSel | (lrClkSel << 4); /* 4:left shift 4 bit */
 
     return HDF_SUCCESS;
 }
 
-
 static void AipSetCtrlReg(unsigned int chnId)
 {
     URxDspCtrl aipCtrlReg;
-
-    aipCtrlReg.u32 = AiaoHalReadReg(AiopRegCfg(AIP_CTRL_REG, OFFSET_MULTL, chnId));
-    aipCtrlReg.Bits.muteEn = 0;
-    aipCtrlReg.Bits.muteFadeEn = 0;
-    aipCtrlReg.Bits.pauseEn = 0;
-    aipCtrlReg.Bits.pauseFadeEn = 0;
-    aipCtrlReg.Bits.reserved3 = 0;
-    aipCtrlReg.Bits.volume = 0;
-    aipCtrlReg.Bits.reserved2 = 0;
-    aipCtrlReg.Bits.fadeInRate = 0;
-    aipCtrlReg.Bits.fadeOutRate = 0;
-    aipCtrlReg.Bits.reserved1 = 0;
-    aipCtrlReg.Bits.bypassEn = 0;
+    aipCtrlReg.Bits.reserved0 = 0;
     aipCtrlReg.Bits.rxEnable = 0;
     aipCtrlReg.Bits.rxDisableDone = 0;
-    aipCtrlReg.Bits.reserved0 = 0;
+    aipCtrlReg.Bits.reserved1 = 0;
     AiaoHalWriteReg(AiopRegCfg(AIP_CTRL_REG, OFFSET_MULTL, chnId), aipCtrlReg.u32);
 }
 
@@ -537,9 +542,7 @@ int32_t AudioAoInit(const struct PlatformData *platformData)
         AUDIO_DEVICE_LOG_ERR("AopHalSetBufferSize: failed.");
         return HDF_FAILURE;
     }
-
-    AUDIO_DEVICE_LOG_DEBUG("AopHalSetBufferSize: %d", platformData->renderBufInfo.cirBufSize);
-
+    
     ret = AopHalSetTransSize(0, platformData->renderBufInfo.trafBufSize);
     if (ret != HDF_SUCCESS) {
         AUDIO_DEVICE_LOG_ERR("AopHalSetTransSize fail");
@@ -574,32 +577,5 @@ int32_t AudioAiInit(const struct PlatformData *platformData)
         AUDIO_DEVICE_LOG_ERR("AipHalSetTransSize fail.");
         return HDF_FAILURE;
     }
-    return HDF_SUCCESS;
-}
-
-int32_t AiaoSysPinMux(void)
-{
-    void *regIocfg3Base = OsalIoRemap(IOCFG3_BASE_ADDR, BASE_ADDR_REMAP_SIZE);
-    if (regIocfg3Base == NULL) {
-        AUDIO_DEVICE_LOG_ERR("regIocfg3Base is NULL.");
-        return HDF_FAILURE;
-    }
-
-    void *regGpioBase = OsalIoRemap(GPIO_BASE_ADDR, BASE_ADDR_REMAP_SIZE);
-    if (regGpioBase == NULL) {
-        OsalIoUnmap(regIocfg3Base);
-        AUDIO_DEVICE_LOG_ERR("regGpioBase is NULL.");
-        return HDF_FAILURE;
-    }
-
-    AUDIO_DEVICE_LOG_DEBUG("I2s0PinMuxAmpUnmute AmpUnmute");
-    SysWritel((uintptr_t)regIocfg3Base + I2S_IOCFG3_BASE1, I2S_IOCFG3_BASE1_VAL);
-    SysWritel((uintptr_t)regGpioBase + GPIO_BASE1, GPIO_BASE3_VAL);
-    SysWritel((uintptr_t)regGpioBase + GPIO_BASE2, GPIO_BASE2_VAL);
-    SysWritel((uintptr_t)regGpioBase + GPIO_BASE3, GPIO_BASE3_VAL);
-
-    OsalIoUnmap(regGpioBase);
-    OsalIoUnmap(regIocfg3Base);
-
     return HDF_SUCCESS;
 }

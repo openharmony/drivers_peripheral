@@ -98,7 +98,7 @@ int32_t DaiDeviceInit(struct AudioCard *audioCard, const struct DaiDevice *dai)
         }
     }
 
-    data->regDaiBase = (uintptr_t)g_regCodecBase;
+    data->regVirtualAddr = (uintptr_t)g_regCodecBase;
 
     if (DaiSetConfigInfo(data) != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("set config info fail.");
@@ -149,7 +149,7 @@ int32_t DaiStartup(const struct AudioCard *card, const struct DaiDevice *device)
     regCfgItem = device->devData->regConfig->audioRegParams[AUDIO_DAI_STARTUP_PATAM_GROUP]->regCfgItem;
     int itemNum = device->devData->regConfig->audioRegParams[AUDIO_DAI_STARTUP_PATAM_GROUP]->itemNum;
 
-    device->devData->regDaiBase = (uintptr_t)g_regDaiBase;
+    device->devData->regVirtualAddr = (uintptr_t)g_regDaiBase;
     for (int i = 0; i < itemNum; i++) {
         int ret = AudioUpdateDaiRegBits(device, &regCfgItem[i], regCfgItem[i].value);
         if (ret != HDF_SUCCESS) {
@@ -157,7 +157,7 @@ int32_t DaiStartup(const struct AudioCard *card, const struct DaiDevice *device)
             return HDF_FAILURE;
         }
     }
-    device->devData->regDaiBase = (uintptr_t)g_regCodecBase;
+    device->devData->regVirtualAddr = (uintptr_t)g_regCodecBase;
     
     if (I2sPinInit() != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("I2sPinInit fail.");
@@ -166,29 +166,23 @@ int32_t DaiStartup(const struct AudioCard *card, const struct DaiDevice *device)
     return HDF_SUCCESS;
 }
 
-int32_t DaiParamsUpdate(struct DaiDevice *device)
+static int32_t SetIISRate(struct DaiDevice *device, struct AudioMixerControl *regCfgItem)
 {
-    uint32_t value;
-    struct AudioMixerControl *regCfgItem = NULL;
     const uint32_t shiftMax = 4;
-    uint32_t shift = 0;
     uint32_t mclkSel;
+    uint32_t shift = 0;
     uint32_t bclkRegVal;
 
-    if (device == NULL || device->devData == NULL || device->devData->regConfig == NULL ||
-        device->devData->regConfig->audioRegParams[AUDIO_DAI_PATAM_GROUP] == NULL ||
-        device->devData->regConfig->audioRegParams[AUDIO_DAI_PATAM_GROUP]->regCfgItem == NULL) {
+    if (device == NULL || device->devData == NULL || regCfgItem == NULL) {
         AUDIO_DRIVER_LOG_ERR("input para is nullptr.");
         return HDF_FAILURE;
     }
-    regCfgItem = device->devData->regConfig->audioRegParams[AUDIO_DAI_PATAM_GROUP]->regCfgItem;
+    uint32_t rate = device->devData->pcmInfo.rate;
+    uint32_t bitWidth = device->devData->pcmInfo.bitWidth;
 
     if (device->devData->pcmInfo.streamType == AUDIO_CAPTURE_STREAM) {
         shift = shiftMax;
     }
-
-    uint32_t rate = device->devData->pcmInfo.rate;
-    uint32_t bitWidth = device->devData->pcmInfo.bitWidth;
 
     if (AiaoGetMclk(rate, &mclkSel) != HDF_SUCCESS) {
         return HDF_FAILURE;
@@ -207,6 +201,36 @@ int32_t DaiParamsUpdate(struct DaiDevice *device)
         AUDIO_DRIVER_LOG_ERR("set frequency fail.");
         return HDF_FAILURE;
     }
+    return HDF_SUCCESS;
+}
+
+int32_t DaiParamsUpdate(struct DaiDevice *device)
+{
+    uint32_t value;
+    struct AudioMixerControl *regCfgItem = NULL;
+    const uint32_t shiftMax = 4;
+    uint32_t shift = 0;
+    const uint32_t index2 = 2;
+    const uint32_t index3 = 3;
+
+    if (device == NULL || device->devData == NULL || device->devData->regConfig == NULL ||
+        device->devData->regConfig->audioRegParams[AUDIO_DAI_PATAM_GROUP] == NULL ||
+        device->devData->regConfig->audioRegParams[AUDIO_DAI_PATAM_GROUP]->regCfgItem == NULL) {
+        AUDIO_DRIVER_LOG_ERR("input para is nullptr.");
+        return HDF_FAILURE;
+    }
+    regCfgItem = device->devData->regConfig->audioRegParams[AUDIO_DAI_PATAM_GROUP]->regCfgItem;
+
+    if (device->devData->pcmInfo.streamType == AUDIO_CAPTURE_STREAM) {
+        shift = shiftMax;
+    }
+
+    if (SetIISRate(device, regCfgItem) != HDF_SUCCESS) {
+        AUDIO_DRIVER_LOG_ERR("set Rate fail.");
+        return HDF_FAILURE;
+    }
+
+    uint32_t bitWidth = device->devData->pcmInfo.bitWidth;
 
     if (bitWidth == BIT_WIDTH16) {
         value = 0x1;
@@ -217,13 +241,13 @@ int32_t DaiParamsUpdate(struct DaiDevice *device)
         return HDF_FAILURE;
     }
 
-    if (AudioUpdateDaiRegBits(device, &regCfgItem[2 + shift], value) != HDF_SUCCESS) {
+    if (AudioUpdateDaiRegBits(device, &regCfgItem[index2 + shift], value) != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("set bitWidth fail.");
         return HDF_FAILURE;
     }
 
     value = device->devData->pcmInfo.channels - 1;
-    if (AudioUpdateDaiRegBits(device, &regCfgItem[3 + shift], value) != HDF_SUCCESS) {
+    if (AudioUpdateDaiRegBits(device, &regCfgItem[index3 + shift], value) != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("set channels fail.");
         return HDF_FAILURE;
     }
@@ -233,7 +257,7 @@ int32_t DaiParamsUpdate(struct DaiDevice *device)
 int32_t DaiHwParams(const struct AudioCard *card, const struct AudioPcmHwParams *param)
 {
     uint32_t bitWidth;
-    
+
     if (card == NULL || card->rtd == NULL || card ->rtd->cpuDai == NULL ||
         param == NULL || param->cardServiceName == NULL) {
         AUDIO_DRIVER_LOG_ERR("input para is nullptr.");
@@ -260,13 +284,13 @@ int32_t DaiHwParams(const struct AudioCard *card, const struct AudioPcmHwParams 
     data->pcmInfo.bitWidth = bitWidth;
     data->pcmInfo.rate = param->rate;
     data->pcmInfo.streamType = param->streamType;
-    data->regDaiBase = (uintptr_t)g_regDaiBase;
+    data->regVirtualAddr = (uintptr_t)g_regDaiBase;
 
     if (DaiParamsUpdate(device) != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("DaiParamsUpdate:  fail.");
         return HDF_FAILURE;
     }
-    data->regDaiBase = (uintptr_t)g_regCodecBase;
+    data->regVirtualAddr = (uintptr_t)g_regCodecBase;
     return HDF_SUCCESS;
 }
 

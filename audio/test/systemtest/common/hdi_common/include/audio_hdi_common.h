@@ -107,6 +107,9 @@ const int FRAME_COUNT = 4;
 const int ADAPTER_COUNT = 32;
 const int TRY_NUM_FRAME = 20;
 const int AUDIO_ADAPTER_MAX_NUM = 3;
+const int AUDIO_WRITE_COMPELETED_VALUE = 1;
+const int AUDIO_RENDER_FULL_VALUE = 2;
+const int AUDIO_FLUSH_COMPLETED_VALUE = 3;
 const int64_t SECTONSEC = 1000000000;
 const int MICROSECOND = 1000000;
 const std::string HDF_CONTROL_SERVICE = "hdf_audio_control";
@@ -292,6 +295,10 @@ int32_t InitMmapDesc(FILE *fp, struct AudioMmapBufferDescripter &desc, int32_t &
 int32_t PlayMapAudioFile(struct PrepareAudioPara &audiopara);
 
 int32_t RecordMapAudio(struct PrepareAudioPara &audiopara);
+int32_t AudioRenderCallback(enum AudioCallbackType type, void *reserved, void *cookie);
+int32_t CheckFlushValue();
+int32_t CheckRenderFullValue();
+int32_t CheckWriteCompleteValue();
 }
 }
 #endif // AUDIO_HDI_COMMON_H
