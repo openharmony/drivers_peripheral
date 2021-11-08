@@ -46,7 +46,7 @@ if (defined(ohos_lite)) {
     cflags_cc += [ "-std=c++17" ]
   }
 
-  unittest("hdi_impl_unittest") {
+  unittest("camera_hal_hdi_impl_unittest") {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hdf"
     sources = [
@@ -166,7 +166,7 @@ if (defined(ohos_lite)) {
     ]
   }
 
-  ohos_unittest("hdi_impl_unittest") {
+  ohos_unittest("camera_hal_hdi_impl_unittest") {
     testonly = true
     module_out_path = module_output_path
     sources = [
