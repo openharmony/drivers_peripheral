@@ -1113,10 +1113,10 @@ static void EcmRelease(struct EcmDevice *ecm)
         return;
     }
 
-    UsbFreeNotifyReqeust(ecm);
-    EcmFreePipes(ecm);
     EcmCloseInterfaces(ecm);
     EcmReleaseInterfaces(ecm);
+    UsbFreeNotifyReqeust(ecm);
+    EcmFreePipes(ecm);
     UsbExitHostSdk(ecm->session);
 
     ecm->initFlag = false;
