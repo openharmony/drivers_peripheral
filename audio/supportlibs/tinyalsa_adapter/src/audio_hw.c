@@ -469,7 +469,8 @@ void RenderSample(struct pcm **pcm, struct PcmRenderParam *param)
 
     *pcm = pcm_open(param->card, param->device, PCM_OUT, &g_renderPcmCfg);
     if (((*pcm) == NULL) || !pcm_is_ready(*pcm)) {
-        LOG_FUN_ERR("Unable to open PCM device (/dev/snd/pcmC%uD%up):(%s)\n", param->card, param->device, pcm_get_error(*pcm));
+        LOG_FUN_ERR("Unable to open PCM device (/dev/snd/pcmC%uD%up):(%s)\n",
+            param->card, param->device, pcm_get_error(*pcm));
         return;
     }
     LOG_FUN_ERR("Playing sample: %u ch, %u hz, %u\n", param->channels, param->rate, param->bits);
@@ -489,7 +490,8 @@ unsigned int CaptureSample(struct pcm **pcm, struct PcmCaptureParam *param)
     config.silence_threshold = 0;
     *pcm = pcm_open(param->card, param->device, PCM_IN, &config);
     if (((*pcm) == NULL) || !pcm_is_ready(*pcm)) {
-        LOG_FUN_ERR("Unable to open PCM device (/dev/snd/pcmC%uD%uc):(%s)\n", param->card, param->device, pcm_get_error(*pcm));
+        LOG_FUN_ERR("Unable to open PCM device (/dev/snd/pcmC%uD%uc):(%s)\n",
+            param->card, param->device, pcm_get_error(*pcm));
         return -1;
     }
     return 0;
