@@ -495,7 +495,8 @@ int CtleNamesInit(struct snd_ctl_elem_info *elemInfo, struct mixer *mixer, int n
         LOG_FUN_ERR("items <=0, **enames can not malloc");
         return NULL;
     }
-    char **enames = calloc(items, sizeof(char *));
+    const int enamesLen = 4; // 32bit pointer length is 4
+    char **enames = calloc(items, enamesLen);
     if (enames == NULL) {
         LOG_FUN_ERR("enumerated.items name malloc failed");
         return -1;
