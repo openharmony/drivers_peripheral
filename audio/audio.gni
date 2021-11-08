@@ -4,7 +4,11 @@ if (defined(ohos_lite)) {
   enable_audio_alsa_mode = false
 } else {
   import("//build/ohos.gni")
-  import("//vendor/${product_company}/${product_name}/hals/audio/product.gni")
+  if (product_name == "ohos-arm64") {
+    enable_audio_alsa_mode = false
+  } else {
+    import("//vendor/${product_company}/${product_name}/hals/audio/product.gni")
+  }
 }
 
 #If set flag is false, the ADM version will be built; if set flag is true, the MPI version will be built.
