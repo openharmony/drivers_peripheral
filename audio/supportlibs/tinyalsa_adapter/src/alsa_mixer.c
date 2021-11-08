@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2015 Rockchip Electronics Co., Ltd.
+ * Copyright 2021 Rockchip Electronics Co. LTD
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,20 +14,11 @@
  * limitations under the License.
  */
 
-/**
- * @file alsa_mixer.c
- * @author  RkAudio
- * @version 1.0.8
- * @date 2015-08-24
- */
-
-const struct PathRouteCfgTable *g_tinyalsaRouteTable;
 #include "config.h"
-#include "default_config.h"
-#include "hdmi_analog_config.h"
 #include "alsa_audio.h"
 
 #define VOLUME_CONTROL_NUMS (9)
+
 char *g_volumeControlsNameTable[VOLUME_CONTROL_NUMS] = {
     "Earpiece Playback Volume",
     "Speaker Playback Volume",
@@ -38,7 +30,7 @@ char *g_volumeControlsNameTable[VOLUME_CONTROL_NUMS] = {
     "PCM Playback Volume",
     "Mic Capture Volume",
 };
-
+const struct PathRouteCfgTable *g_tinyalsaRouteTable;
 struct mixer* mMixerPlayback;
 struct mixer* mMixerCapture;
 #define PCM_DEVICE0   (0)

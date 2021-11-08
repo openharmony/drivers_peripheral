@@ -1,23 +1,17 @@
 /*
- * Copyright (c) 2015 Rockchip Electronics Co., Ltd.
+ * Copyright 2021 Rockchip Electronics Co. LTD
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-/**
- * @file audio_hw.c
- * @author  RkAudio
- * @version 1.0.8
- * @date 2015-08-24
  */
 
 #include "alsa_audio.h"
@@ -160,12 +154,12 @@ static bool dev_id_match(const char *info, const char *did)
     }
     return false;
 }
+
 static bool GetSpecifiedDevicesCheck(struct DevInfo *devinfo, int card,
-    const char *id, struct DevProcInfo *match)
+    const char *id, struct DevProcInfo *match, int *index)
 {
     int i = 0;
     int better = 0;
-    int index = -1;
     /* parse card id */
     if (!match) {
         return true; /* match any */
@@ -174,24 +168,25 @@ static bool GetSpecifiedDevicesCheck(struct DevInfo *devinfo, int card,
         int score = name_match(id, match[i].cid);
         if (score > better) {
             better = score;
-            index = i;
+            *index = i;
         }
         i++;
     }
 
-    if (index < 0) {
+    if (*index < 0) {
         return false;
     }
-    if (!match[index].cid) {
+    if (!match[*index].cid) {
         return false;
     }
-    if (!match[index].did) { /* no exist dai info, exit */
+    if (!match[*index].did) { /* no exist dai info, exit */
         devinfo->card = card;
         devinfo->device = 0;
         LOG_PARA_INFO("%s card, got card=%d,device=%d", devinfo->id,
             devinfo->card, devinfo->device);
         return true;
     }
+    return true;
 }
 
 static bool GetSpecifiedOutDev(struct DevInfo *devinfo, int card,
@@ -202,7 +197,8 @@ static bool GetSpecifiedOutDev(struct DevInfo *devinfo, int card,
     char info[256];
     size_t len;
     FILE* file = NULL;
-    bool ret = GetSpecifiedDevicesCheck(devinfo, card, id, match);
+    int index = -1;
+    bool ret = GetSpecifiedDevicesCheck(devinfo, card, id, match, &index);
     if (!ret) {
         return false;
     }
@@ -250,7 +246,8 @@ static bool GetSpecifiedInDev(struct DevInfo *devinfo, int card,
     char info[256];
     size_t len;
     FILE* file = NULL;
-    bool ret = GetSpecifiedDevicesCheck(devinfo, card, id, match);
+    int index = -1;
+    bool ret = GetSpecifiedDevicesCheck(devinfo, card, id, match, &index);
     if (!ret) {
         return false;
     }
@@ -279,7 +276,7 @@ static bool GetSpecifiedInDev(struct DevInfo *devinfo, int card,
         }
         info[len - 1] = '\0';
         /* parse device dai */
-        if (dev_id_match(info, match[i].did)) {
+        if (dev_id_match(info, match[index].did)) {
             devinfo->card = card;
             devinfo->device = device;
             LOG_PARA_INFO("%s card, got card=%d,device=%d", devinfo->id,
