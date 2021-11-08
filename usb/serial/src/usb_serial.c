@@ -1747,10 +1747,10 @@ static void AcmRelease(struct AcmDevice *acm)
         return;
     }
 
-    AcmFreeRequests(acm);
-    AcmFreePipes(acm);
     AcmCloseInterfaces(acm);
     AcmReleaseInterfaces(acm);
+    AcmFreeRequests(acm);
+    AcmFreePipes(acm);
     UsbExitHostSdk(acm->session);
     acm->session = NULL;
 
