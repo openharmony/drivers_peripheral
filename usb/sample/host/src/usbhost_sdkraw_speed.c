@@ -555,7 +555,7 @@ void SignalHandler(int signo)
             break;
         default:
             break;
-   }
+    }
 }
 
 static void ShowHelp(const char *name)

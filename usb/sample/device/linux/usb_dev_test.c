@@ -15,12 +15,11 @@
 
 #include "usb_dev_test.h"
 #include <stdio.h>
-#include <unistd.h>
 #include <string.h>
 
-#define OPTION_EDN (-1)
+#define OPTION_LENGTH (2)
 
-static void ShowUsage()
+static void ShowUsage(void)
 {
     printf("Usage options:\n");
     printf("-1 : acm_read\n");
@@ -34,7 +33,7 @@ static void ShowUsage()
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2) {
+    if (argc < OPTION_LENGTH) {
         printf("argv too flew\n");
         return -1;
     }
