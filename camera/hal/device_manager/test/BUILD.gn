@@ -46,7 +46,7 @@ if (defined(ohos_lite)) {
     cflags_cc += [ "-std=c++17" ]
   }
 
-  unittest("device_manager_unittest") {
+  unittest("camera_hal_device_manager_unittest") {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hdf"
     sources = [ "unittest/mpi/utest_mpi_device_manager.cpp" ]
@@ -123,7 +123,7 @@ if (defined(ohos_lite)) {
       "-fdata-sections",
     ]
   }
-  ohos_unittest("device_manager_unittest") {
+  ohos_unittest("camera_hal_device_manager_unittest") {
     testonly = true
     module_out_path = module_output_path
     sources = [ "unittest/mpi/utest_mpi_device_manager.cpp" ]

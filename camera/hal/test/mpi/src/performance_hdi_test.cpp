@@ -355,6 +355,8 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0090, TestSize.Level3)
     // Get the parameter tag currently supported by the device
     std::cout << "==========[test log]Check hdi_device: 1. Get the tags..." << std::endl;
     std::vector<Camera::MetaType> results_original;
+    results_original.push_back(OHOS_SENSOR_EXPOSURE_TIME);
+    results_original.push_back(OHOS_SENSOR_COLOR_CORRECTION_GAINS);
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results_original);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     // Add this tag
@@ -395,6 +397,8 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0100, TestSize.Level3)
     // Get the parameter tag currently supported by the device
     std::cout << "==========[test log]Check hdi_device: 1. Get the tags..." << std::endl;
     std::vector<Camera::MetaType> results_original;
+    results_original.push_back(OHOS_SENSOR_EXPOSURE_TIME);
+    results_original.push_back(OHOS_SENSOR_COLOR_CORRECTION_GAINS);
     Test_->rc = Test_->cameraDevice->GetEnabledResults(results_original);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     // Disable this tag
@@ -792,6 +796,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0200, TestSize.Level3)
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
+        captureId++;
     }
     float avrg_time = totle_time_use / Times;
     std::cout << "==========[test log] Performance: HDI_CancelCapture's average time consuming: ";
@@ -821,7 +826,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0210, TestSize.Level3)
     writeIntoFile.open("TimeConsuming.txt", ios::app);
     // Open camera
     Test_->Open();
-    Test_->StreamInfoFormat();
+    Test_->CreateStreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     for (int i = 0; i < Times; i++) {

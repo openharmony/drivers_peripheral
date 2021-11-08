@@ -46,7 +46,7 @@ if (defined(ohos_lite)) {
     cflags_cc += [ "-std=c++17" ]
   }
 
-  unittest("pipeline_core_unittest") {
+  unittest("camera_hal_pipeline_core_unittest") {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hdf"
     sources = [
@@ -154,7 +154,7 @@ if (defined(ohos_lite)) {
       "-fdata-sections",
     ]
   }
-  ohos_unittest("pipeline_core_unittest") {
+  ohos_unittest("camera_hal_pipeline_core_unittest") {
     testonly = true
     module_out_path = module_output_path
     sources = [

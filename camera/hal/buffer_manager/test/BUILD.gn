@@ -24,7 +24,7 @@ if (defined(ohos_lite)) {
     cflags_cc += [ "-std=c++17" ]
   }
 
-  unittest("buffer_manager_unittest") {
+  unittest("camera_hal_buffer_manager_unittest") {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hdf"
     sources = [ "unittest/buffer_manager_utest.cpp" ]
@@ -60,7 +60,7 @@ if (defined(ohos_lite)) {
 
     ldflags = [ "--coverage" ]
   }
-  ohos_unittest("buffer_manager_unittest") {
+  ohos_unittest("camera_hal_buffer_manager_unittest") {
     testonly = true
     module_out_path = module_output_path
     sources = [ "unittest/buffer_manager_utest.cpp" ]
