@@ -18,9 +18,6 @@
 #ifdef ALSA_MODE
 #include "alsa_audio.h"
 struct pcm *pcm;
-#ifdef DEBUG
-FILE *file;
-#endif
 #endif
 
 /* virtual mixer device */
@@ -1150,17 +1147,16 @@ int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
             format = PCM_FORMAT_S16_LE;
         }
         ReadInSoundCard();
-#ifdef DEBUG
-        file = fopen("/etc/a.pcm", "wb");
-        if (!file) {
-            fprintf(stderr, "Unable to create file\n");
-            return 1;
-        }
-#endif
-        CaptureSample(&pcm, devIn[SND_IN_SOUND_CARD_MIC].card, devIn[SND_IN_SOUND_CARD_MIC].device,
-            g_hwParams.channels, g_hwParams.rate, format,
-            g_hwParams.periodSize / 4,  // Because the data frame size is limited to 16K,periodSize/4.
-            g_hwParams.periodCount / 2); // Because the data frame size is limited to 16K, periodCount/2.
+        struct PcmCaptureParam param;
+        memset_s(&param, sizeof(param), 0, sizeof(param));
+        param.card = devIn[SND_IN_SOUND_CARD_MIC].card;
+        param.device = devIn[SND_IN_SOUND_CARD_MIC].device;
+        param.channels = g_hwParams.channels;
+        param.rate = g_hwParams.rate;
+        param.format = format;
+        param.periodSize = g_hwParams.periodSize / 4; // limited to 16K,periodSize/4.
+        param.periodCount = g_hwParams.periodCount / 2; // limited to 16K, periodCount/2.
+        CaptureSample(&pcm, &param);
         RoutePcmCardOpen(devIn[SND_IN_SOUND_CARD_MIC].card, DEV_IN_HANDS_FREE_MIC_CAPTURE_ROUTE);
     }
     dataSize = pcm_frames_to_bytes(pcm, pcm_get_buffer_size(pcm));
@@ -1173,12 +1169,6 @@ int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
     }
     if (!pcm_read(pcm, buffer, dataSize)) {
         memcpy_s(handleData->frameCaptureMode.buffer, FRAME_DATA, buffer, dataSize);
-#ifdef DEBUG
-        if (fwrite(buffer, 1, dataSize, file) != dataSize) {
-            fprintf(stderr, "Error capturing sample\n");
-            return HDF_FAILURE;
-        }
-#endif
     }
     handleData->frameCaptureMode.bufferSize = dataSize;
     handleData->frameCaptureMode.bufferFrameSize = pcm_bytes_to_frames(pcm, dataSize);
@@ -1191,18 +1181,13 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
 #ifdef ALSA_MODE
-    int32_t ret = TinyalsaAudioOutputCaptureRead(handle, cmdId, handleData);
-    if (ret == HDF_FAILURE) {
-        return HDF_FAILURE;
-    }
-#else
-    uint32_t dataSize = 0;
-    uint32_t frameCount = 0;
+    return TinyalsaAudioOutputCaptureRead(handle, cmdId, handleData);
+#endif
+    uint32_t dataSize = 0, frameCount = 0;
     size_t replySize = AUDIO_SIZE_FRAME_16K + AUDIO_REPLY_EXTEND;
     char *frame = NULL;
     struct HdfIoService *service = NULL;
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfSBuf *reply = HdfSBufTypedObtainCapacity(SBUF_RAW, replySize);
@@ -1211,13 +1196,11 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
     }
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("Service is NULL!");
         AudioBufReplyRecycle(NULL, reply);
         return HDF_FAILURE;
     }
     int32_t ret = AudioOutputCaptureReadFrame(service, cmdId, reply);
     if (ret != 0) {
-        LOG_FUN_ERR("AudioOutputCaptureReadFrame is invalid!");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadBuffer(reply, (const void **)&frame, &dataSize)) {
@@ -1242,7 +1225,6 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
     handleData->frameCaptureMode.bufferSize = dataSize;
     handleData->frameCaptureMode.bufferFrameSize = frameCount;
     HdfSBufRecycle(reply);
-#endif
     return HDF_SUCCESS;
 }
 
@@ -1275,9 +1257,6 @@ int32_t AudioOutputCaptureStop(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData)
 {
 #ifdef ALSA_MODE
-#ifdef DEBUG
-    free(file);
-#endif
     pcm_close(pcm);
     pcm = NULL;
     RoutePcmClose(DEV_OFF_CAPTURE_OFF_ROUTE);

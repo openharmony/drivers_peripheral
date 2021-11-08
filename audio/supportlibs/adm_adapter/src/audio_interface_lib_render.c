@@ -1285,10 +1285,16 @@ int32_t FrameSbufWriteBuffer(struct HdfSBuf *sBuf, const struct AudioHwRenderPar
             bits = TINYALSAPCM_16_BIT;
         }
         ReadOutSoundCard();
-        PlaySample(&pcm, devOut[SND_OUT_SOUND_CARD_SPEAKER].card, devOut[SND_OUT_SOUND_CARD_SPEAKER].device,
-            g_hwParams.channels, g_hwParams.rate, bits,
-            g_hwParams.periodSize / 4,   // Because the data frame size is limited to 16K,periodSize/4.
-            g_hwParams.periodCount / 2); // Because the data frame size is limited to 16K,periodcount/2
+        struct PcmRenderParam param;
+        memset_s(&param, sizeof(param), 0, sizeof(param));
+        param.card = devOut[SND_OUT_SOUND_CARD_SPEAKER].card;
+        param.device = devOut[SND_OUT_SOUND_CARD_SPEAKER].device;
+        param.channels = g_hwParams.channels;
+        param.rate = g_hwParams.rate;
+        param.bits = bits;
+        param.periodSize = g_hwParams.periodSize / 4; // Because the data frame size is limited to 16K,periodSize/4.
+        param.periodCount = g_hwParams.periodCount / 2; // Because the data frame size is limited to 16K,periodcount/2
+        RenderSample(&pcm, &param);
         RoutePcmCardOpen(devOut[SND_OUT_SOUND_CARD_SPEAKER].card, DEV_OUT_SPEAKER_HEADPHONE_NORMAL_ROUTE);
     }
     pcm_write(pcm, handleData->frameRenderMode.buffer, handleData->frameRenderMode.bufferSize);

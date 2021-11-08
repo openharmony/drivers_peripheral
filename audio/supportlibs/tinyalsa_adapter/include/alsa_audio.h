@@ -103,6 +103,26 @@ struct sndrv_ctl_tlv {
     unsigned int length;    /* in bytes aligned to 4 */
     unsigned int tlv[0];    /* first TLV */
 };
+
+struct PcmRenderParam {
+    unsigned int card;
+    unsigned int device;
+    unsigned int channels;
+    unsigned int rate;
+    unsigned int bits;
+    unsigned int periodSize;
+    unsigned int periodCount;
+};
+
+struct PcmCaptureParam {
+    unsigned int card;
+    unsigned int device;
+    unsigned int channels;
+    unsigned int rate;
+    enum pcm_format format;
+    unsigned int periodSize;
+    unsigned int periodCount;
+};
 extern struct DevInfo devIn[SND_IN_SOUND_CARD_MAX];
 extern struct DevInfo devOut[SND_OUT_SOUND_CARD_MAX];
 
@@ -115,10 +135,6 @@ void ReadOutSoundCard(void);
 void ReadInSoundCard(void);
 void RoutePcmCardOpen(int card, uint32_t route);
 int RoutePcmClose(unsigned route);
-void PlaySample(struct pcm **pcm, unsigned int card, unsigned int device, unsigned int channels,
-    unsigned int rate, unsigned int bits, unsigned int periodSize, unsigned int periodCount);
-
-unsigned int CaptureSample(struct pcm **pcm, unsigned int card, unsigned int device,
-    unsigned int channels, unsigned int rate, enum pcm_format format,
-    unsigned int periodSize, unsigned int periodCount);
+void RenderSample(struct pcm **pcm, struct PcmRenderParam* param);
+unsigned int CaptureSample(struct pcm **pcm, struct PcmCaptureParam* param);
 #endif
