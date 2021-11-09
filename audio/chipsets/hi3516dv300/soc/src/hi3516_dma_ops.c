@@ -20,8 +20,8 @@
 const int AUDIO_CACHE_ALIGN_SIZE = 64;
 
 #ifndef __LITEOS__
-static struct device renderDev = {0};
-static struct device captureDev = {0};
+static struct device g_renderDev = {0};
+static struct device g_captureDev = {0};
 #endif
 
 
@@ -77,8 +77,8 @@ int32_t Hi3516DmaBufAlloc(struct PlatformData *data, enum AudioStreamType stream
         data->captureBufInfo.virtAddr = (uint32_t *)LOS_DmaMemAlloc(&data->captureBufInfo.phyAddr,
             data->captureBufInfo.cirBufMax, AUDIO_CACHE_ALIGN_SIZE, DMA_NOCACHE);
 #else
-        captureDev.coherent_dma_mask = 0xffffffffUL;
-        data->captureBufInfo.virtAddr = dma_alloc_wc(&captureDev, data->captureBufInfo.cirBufMax,
+        g_captureDev.coherent_dma_mask = 0xffffffffUL;
+        data->captureBufInfo.virtAddr = dma_alloc_wc(&g_captureDev, data->captureBufInfo.cirBufMax,
             (dma_addr_t *)&data->captureBufInfo.phyAddr, GFP_DMA | GFP_KERNEL);
 #endif
     } else if (streamType == AUDIO_RENDER_STREAM) {
@@ -87,8 +87,8 @@ int32_t Hi3516DmaBufAlloc(struct PlatformData *data, enum AudioStreamType stream
             data->renderBufInfo.cirBufMax,
             AUDIO_CACHE_ALIGN_SIZE, DMA_NOCACHE);
 #else
-        renderDev.coherent_dma_mask = 0xffffffffUL;
-        data->renderBufInfo.virtAddr = dma_alloc_wc(&renderDev, data->renderBufInfo.cirBufMax,
+        g_renderDev.coherent_dma_mask = 0xffffffffUL;
+        data->renderBufInfo.virtAddr = dma_alloc_wc(&g_renderDev, data->renderBufInfo.cirBufMax,
             (dma_addr_t *)&data->renderBufInfo.phyAddr, GFP_DMA | GFP_KERNEL);
 #endif
     } else {
@@ -110,7 +110,7 @@ int32_t Hi3516DmaBufFree(struct PlatformData *data, enum AudioStreamType streamT
 #ifdef __LITEOS__
             LOS_DmaMemFree(data->captureBufInfo.virtAddr);
 #else
-            dma_free_wc(&captureDev, data->captureBufInfo.cirBufMax, data->captureBufInfo.virtAddr,
+            dma_free_wc(&g_captureDev, data->captureBufInfo.cirBufMax, data->captureBufInfo.virtAddr,
                         data->captureBufInfo.phyAddr);
 #endif
         }
@@ -119,7 +119,7 @@ int32_t Hi3516DmaBufFree(struct PlatformData *data, enum AudioStreamType streamT
 #ifdef __LITEOS__
             LOS_DmaMemFree(data->renderBufInfo.virtAddr);
 #else
-            dma_free_wc(&renderDev, data->renderBufInfo.cirBufMax, data->renderBufInfo.virtAddr,
+            dma_free_wc(&g_renderDev, data->renderBufInfo.cirBufMax, data->renderBufInfo.virtAddr,
                         data->renderBufInfo.phyAddr);
 #endif
         }

@@ -8,11 +8,8 @@
 
 #include "hi3516_codec_ops.h"
 #include "audio_sapm.h"
-#include "hi3516_aiao_impl.h"
+#include "audio_platform_base.h"
 #include "hi3516_codec_impl.h"
-#include "osal_io.h"
-#include "osal_irq.h"
-#include "audio_parse.h"
 #include "audio_driver_log.h"
 #include "audio_codec_base.h"
 

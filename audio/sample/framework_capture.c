@@ -409,10 +409,10 @@ int32_t StartButtonCapture(struct AudioCapture **captureS)
     g_str.file = g_file;
     g_str.attrs = g_attrs;
     g_str.frame = g_frame;
-    pthread_attr_t g_tidsAttr;
-    pthread_attr_init(&g_tidsAttr);
-    pthread_attr_setdetachstate(&g_tidsAttr, PTHREAD_CREATE_DETACHED);
-    ret = pthread_create(&g_tids, &g_tidsAttr, (void *)(&FrameStartCapture), &g_str);
+    pthread_attr_t tidsAttr;
+    pthread_attr_init(&tidsAttr);
+    pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
+    ret = pthread_create(&g_tids, &tidsAttr, (void *)(&FrameStartCapture), &g_str);
     if (ret != 0) {
         return HDF_FAILURE;
     }

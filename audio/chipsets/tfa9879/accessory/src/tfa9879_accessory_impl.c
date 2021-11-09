@@ -94,7 +94,7 @@ static int32_t Tfa9879WorkStatusEnable()
         g_accessoryTransferData.accessoryRegCfgGroupNode[AUDIO_DAI_STARTUP_PATAM_GROUP]->regCfgItem;
     daiStartupParamsRegCfgItemCount =
         g_accessoryTransferData.accessoryRegCfgGroupNode[AUDIO_DAI_STARTUP_PATAM_GROUP]->itemNum;
-    for(i = 0; i < daiStartupParamsRegCfgItemCount; i++) {
+    for (i = 0; i < daiStartupParamsRegCfgItemCount; i++) {
         ret = AccessoryRegBitsUpdate(daiStartupParamsRegCfgItem[i]);
         if (ret != HDF_SUCCESS) {
             AUDIO_DEVICE_LOG_ERR("AccessoryRegBitsUpdate fail.");

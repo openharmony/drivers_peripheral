@@ -14,13 +14,31 @@
 #include "audio_driver_log.h"
 #include "osal_io.h"
 
+#define HDF_LOG_TAG hi3516_dai_ops
+
 /* Hi35xx IO register address */
 #define HI35XX_I2C_REG_BASE_ADDR  (0x114F0000)
 #define HI35XX_I2S_REG_BASE_ADDR  (0x112F0000)
 #define CODEC_REG_BASE            (0x113C0000)
 #define CODEC_MAX_REG_SIZE        (0x1000)
 
-#define HDF_LOG_TAG hi3516_dai_ops
+#define I2S_IOCFG2_BASE1 0x0020
+#define I2S_IOCFG2_BASE2 0x0024
+#define I2S_IOCFG2_BASE3 0x0028
+#define I2S_IOCFG2_BASE4 0x002C
+#define I2S_IOCFG2_BASE5 0x0030
+
+#define I2S_IOCFG2_BASE1_VAL 0x663
+#define I2S_IOCFG2_BASE2_VAL 0x673
+#define I2S_IOCFG2_BASE3_VAL 0x573
+#define I2S_IOCFG2_BASE4_VAL 0x473
+#define I2S_IOCFG2_BASE5_VAL 0x433
+
+#define I2S_IOCFG2_BASE1_VAL 0x663
+#define I2S_IOCFG2_BASE2_VAL 0x673
+#define I2S_IOCFG2_BASE3_VAL 0x573
+#define I2S_IOCFG2_BASE4_VAL 0x473
+#define I2S_IOCFG2_BASE5_VAL 0x433
 
 void *g_regCodecBase = NULL;
 void *g_regDaiBase = NULL;
@@ -258,7 +276,7 @@ int32_t DaiHwParams(const struct AudioCard *card, const struct AudioPcmHwParams 
 {
     uint32_t bitWidth;
 
-    if (card == NULL || card->rtd == NULL || card ->rtd->cpuDai == NULL ||
+    if (card == NULL || card->rtd == NULL || card->rtd->cpuDai == NULL ||
         param == NULL || param->cardServiceName == NULL) {
         AUDIO_DRIVER_LOG_ERR("input para is nullptr.");
         return HDF_FAILURE;
@@ -293,4 +311,3 @@ int32_t DaiHwParams(const struct AudioCard *card, const struct AudioPcmHwParams 
     data->regVirtualAddr = (uintptr_t)g_regCodecBase;
     return HDF_SUCCESS;
 }
-

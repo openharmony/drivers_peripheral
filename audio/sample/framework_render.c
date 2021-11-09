@@ -444,7 +444,10 @@ int32_t FrameStartMmap(const AudioHandle param)
     }
     munmap(desc.memoryAddress, reqSize);
     fclose(fp);
-    (void)StopAudioFiles(&render);
+    ret = StopAudioFiles(&render);
+    if (ret < 0) {
+        LOG_FUN_ERR("StopAudioFiles File!");
+    }
     return HDF_SUCCESS;
 }
 
@@ -560,10 +563,10 @@ int32_t PlayingAudioFiles(struct AudioRender **renderS)
         FileClose(&g_file);
         return HDF_FAILURE;
     }
-    pthread_attr_t g_tidsAttr;
-    pthread_attr_init(&g_tidsAttr);
-    pthread_attr_setdetachstate(&g_tidsAttr, PTHREAD_CREATE_DETACHED);
-    if (pthread_create(&g_tids, &g_tidsAttr, (void *)(&FrameStart), &g_str) != 0) {
+    pthread_attr_t tidsAttr;
+    pthread_attr_init(&tidsAttr);
+    pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
+    if (pthread_create(&g_tids, &tidsAttr, (void *)(&FrameStart), &g_str) != 0) {
         LOG_FUN_ERR("Create Thread Fail");
         FileClose(&g_file);
         return HDF_FAILURE;
