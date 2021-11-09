@@ -2,3 +2,5 @@
 *.cmd
 debug.log
 .vscode
+config.[hc]
+params.[hc]
