@@ -1514,6 +1514,9 @@ int32_t AudioOutputRenderStartPrepare(const struct DevHandle *handle,
 int32_t AudioOutputRenderOpen(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         return HDF_FAILURE;
     }
