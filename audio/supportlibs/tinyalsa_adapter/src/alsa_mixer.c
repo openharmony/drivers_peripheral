@@ -89,18 +89,20 @@ const struct PathRoute *get_route_config(unsigned route)
     }
 }
 
-struct mixer_ctl *mixer_get_control(struct mixer *mixer,
-    const char *name, unsigned index)
+struct mixer_ctl *mixer_get_control(struct mixer *mixer, const char *name)
 {
-    unsigned n;
-    for (n = 0; n < mixer->count; n++) {
-        if (mixer->info[n].id.index == index) {
-            if (!strcmp(name, (char*) mixer->info[n].id.name)) {
-                return mixer->ctl + n;
-            }
+    int count = mixer->count;
+    int num = 0;
+    while (num < count) {
+        int check = (mixer->info[num].id.index == 0) &&
+            (!strcmp(name, (char*) mixer->info[num].id.name));
+        if (check) {
+	    LOG_FUN_ERR("mixer_get_control  %p, %p, %p", mixer->ctl + num, mixer->ctl[num], &(mixer->ctl[num]));
+            return mixer->ctl + num;
         }
+	num++;
     }
-    return 0;
+    return NULL;
 }
 
 int TinyalsaSetElemValue(int fd, struct snd_ctl_elem_value *elemValue)
@@ -261,7 +263,7 @@ int set_controls(struct mixer *mixer, const struct RouteCfgInfo *ctls, const uns
     }
 
     for (int i = 0; i < ctls_count; i++) {
-        ctl = mixer_get_control(mixer, ctls[i].controlName, 0);
+        ctl = mixer_get_control(mixer, ctls[i].controlName);
         if (!ctl) {
             return -EINVAL;
         }
@@ -693,8 +695,7 @@ int set_voice_volume(const char *ctlName, float volume)
 
     if (mMixer == NULL || ctlName[0] == '\0')
         return 0;
-
-    struct mixer_ctl *ctl = mixer_get_control(mMixer, ctlName, 0);
+    struct mixer_ctl *ctl = mixer_get_control(mMixer, ctlName);
     if (ctl == NULL)
         return 0;
 
@@ -708,7 +709,7 @@ int set_capture_voice_volume(const char *ctlName, float volume)
     long long volMin, volMax;
     if (mMixer == NULL || ctlName[0] == '\0')
         return 0;
-    struct mixer_ctl *ctl = mixer_get_control(mMixer, ctlName, 0);
+    struct mixer_ctl *ctl = mixer_get_control(mMixer, ctlName);
     if (ctl == NULL)
         return 0;
     if (mixer_get_ctl_minmax(ctl, &volMin, &volMax) < 0) {
@@ -753,8 +754,7 @@ int RouteGetVoiceVolume(char *ctlName)
     struct mixer_ctl *ctl = NULL;
     if (mMixer == NULL || ctlName[0] == '\0')
         return 0;
-
-    ctl = mixer_get_control(mMixer, ctlName, 0);
+    ctl = mixer_get_control(mMixer, ctlName);
     if (ctl == NULL) {
         return 0;
     }
@@ -771,7 +771,7 @@ int RouteGetVoiceMinMaxStep(long long *volMin, long long *volMax, char *ctlName,
     }
     if (mMixer == NULL || ctlName[0] == '\0')
         return 0;
-    struct mixer_ctl *ctl = mixer_get_control(mMixer, ctlName, 0);
+    struct mixer_ctl *ctl = mixer_get_control(mMixer, ctlName);
     if (ctl == NULL)
         return 0;
     if (mixer_get_ctl_minmax(ctl, volMin, volMax) < 0) {
