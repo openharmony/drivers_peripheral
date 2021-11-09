@@ -97,10 +97,9 @@ struct mixer_ctl *mixer_get_control(struct mixer *mixer, const char *name)
         int check = (mixer->info[num].id.index == 0) &&
             (!strcmp(name, (char*) mixer->info[num].id.name));
         if (check) {
-	    LOG_FUN_ERR("mixer_get_control  %p, %p, %p", mixer->ctl + num, mixer->ctl[num], &(mixer->ctl[num]));
             return mixer->ctl + num;
         }
-	num++;
+        num++;
     }
     return NULL;
 }
