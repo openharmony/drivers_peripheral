@@ -200,7 +200,7 @@ exit:
     return;
 }
 
-static struct UsbControlRequest EcmUsbControlMsg( uint8_t request,
+static struct UsbControlRequest EcmUsbControlMsg(uint8_t request,
     uint8_t requestType, uint16_t value, uint16_t index, void *data, uint16_t size)
 {
     struct UsbControlRequest dr;
@@ -1113,10 +1113,10 @@ static void EcmRelease(struct EcmDevice *ecm)
         return;
     }
 
-    UsbFreeNotifyReqeust(ecm);
-    EcmFreePipes(ecm);
     EcmCloseInterfaces(ecm);
     EcmReleaseInterfaces(ecm);
+    UsbFreeNotifyReqeust(ecm);
+    EcmFreePipes(ecm);
     UsbExitHostSdk(ecm->session);
 
     ecm->initFlag = false;

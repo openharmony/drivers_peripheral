@@ -25,8 +25,8 @@
 #include "securec.h"
 
 #define HDF_LOG_TAG hcs_prop
-#define OPTION_EDN (-1)
 #define ACM_SERVICE_NAME "usbfn_cdcacm"
+
 enum UsbSerialCmd {
     USB_SERIAL_OPEN = 0,
     USB_SERIAL_CLOSE,

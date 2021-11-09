@@ -24,7 +24,6 @@
 #include "cdcacm.h"
 
 #define HDF_LOG_TAG hcs_prop
-#define OPTION_EDN (-1)
 #define ACM_SERVICE_NAME "usbfn_cdcacm"
 
 static struct HdfSBuf *g_data;

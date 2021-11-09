@@ -14,7 +14,6 @@
  */
 
 #include <stdio.h>
-#include <osal_time.h>
 #include <sys/time.h>
 #include <hdf_log.h>
 #include <hdf_remote_service.h>
@@ -22,6 +21,7 @@
 #include <servmgr_hdi.h>
 #include <signal.h>
 #include <unistd.h>
+#include <osal_time.h>
 #include "cdcacm.h"
 #include "usb_dev_test.h"
 

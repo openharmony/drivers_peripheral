@@ -416,7 +416,7 @@ int32_t FillRequest(struct AcmDevice *acm)
 int main(int argc, char *argv[])
 {
     struct timeval time;
-    int i = 0;
+    int i;
     int32_t ret;
     struct AcmDevice *acm = NULL;
 
