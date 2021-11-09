@@ -59,7 +59,10 @@ Note:If the text contains special characters, please escape them according to th
         <licensefile></licensefile>
         <policylist>
             <policy name="projectPolicy" desc="">
-                <policyitem type="license" name="GPL" path=".*" desc="linux kernel adapter codes"/>
+		<policyitem type="copyright" name="Huawei Technologies Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="华为技术有限公司版权声明"/>
+                <policyitem type="copyright" name="Huawei Device Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="华为终端有限公司版权声明"/>
+                <policyitem type="copyright" name="Rockchip Electronics Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="Rockchip开发代码"/>    
+		<policyitem type="license" name="GPL" path=".*" desc="linux kernel adapter codes"/>
                 <policyitem type="license" name="BSD" path=".*" desc="huawei codes"/>
             </policy>
         </policylist>
