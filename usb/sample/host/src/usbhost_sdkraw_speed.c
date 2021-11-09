@@ -555,7 +555,7 @@ void SignalHandler(int signo)
             break;
         default:
             break;
-   }
+    }
 }
 
 static void ShowHelp(const char *name)
@@ -669,7 +669,7 @@ int main(int argc, char *argv[])
 {
     int32_t ret;
     struct timeval time;
-    int i = 0;
+    int i;
 
     ret = CheckParam(argc, (const char **)argv);
     if (ret != HDF_SUCCESS) {
