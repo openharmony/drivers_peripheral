@@ -18,6 +18,7 @@
 #ifdef ALSA_MODE
 #include "alsa_audio.h"
 struct pcm *pcm;
+struct DevInfo g_inDevInfo;
 #endif
 
 /* virtual mixer device */
@@ -243,17 +244,16 @@ int32_t AudioCtlCaptureGetVolume(const struct DevHandleCapture *handle,
 #ifdef ALSA_MODE
     char *ctlName = "DACL Capture Volume";
     ReadInSoundCard();
-    MixerOpenLegacy(false, devIn[SND_IN_SOUND_CARD_MIC].card);
+    memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
+    GetInDevInfo(SND_IN_SOUND_CARD_MIC, &g_inDevInfo);
+    MixerOpenLegacy(false, g_inDevInfo.card);
     handleData->captureMode.ctlParam.volume = RouteGetVoiceVolume(ctlName);
     return HDF_SUCCESS;
 #endif
-    int32_t ret;
-
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("CaptureGetVolume paras is NULL!");
         return HDF_FAILURE;
     }
-    struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
@@ -266,13 +266,13 @@ int32_t AudioCtlCaptureGetVolume(const struct DevHandleCapture *handle,
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
-    ret = AudioCtlCaptureGetVolumeSBuf(sBuf, handleData);
+    int32_t ret = AudioCtlCaptureGetVolumeSBuf(sBuf, handleData);
     if (ret < 0) {
         LOG_FUN_ERR("Failed to Get Volume sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
         return ret;
     }
-    service = (struct HdfIoService *)handle->object;
+    struct HdfIoService *service = (struct HdfIoService *)handle->object;
     cmdId = AUDIODRV_CTL_IOCTL_ELEM_READ_CAPTURE - CTRL_NUM;
     ret = AudioServiceDispatch(service, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
@@ -915,14 +915,15 @@ int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
     long long volMin = 0, volMax = 0;
     char *ctlName = "DACL Capture Volume";
     ReadInSoundCard();
-    MixerOpenLegacy(false, devIn[SND_IN_SOUND_CARD_MIC].card);
+    memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
+    GetInDevInfo(SND_IN_SOUND_CARD_MIC, &g_inDevInfo);
+    MixerOpenLegacy(false, g_inDevInfo.card);
     RouteGetVoiceMinMaxStep(&volMin, &volMax, ctlName, false);
     handleData->captureMode.ctlParam.volThreshold.volMax = volMax;
     handleData->captureMode.ctlParam.volThreshold.volMin = volMin;
     return HDF_SUCCESS;
 #endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
@@ -1147,17 +1148,19 @@ int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
             format = PCM_FORMAT_S16_LE;
         }
         ReadInSoundCard();
+        memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
+        GetInDevInfo(SND_IN_SOUND_CARD_MIC, &g_inDevInfo);
         struct PcmCaptureParam param;
         memset_s(&param, sizeof(param), 0, sizeof(param));
-        param.card = devIn[SND_IN_SOUND_CARD_MIC].card;
-        param.device = devIn[SND_IN_SOUND_CARD_MIC].device;
+        param.card = g_inDevInfo.card;
+        param.device = g_inDevInfo.device;
         param.channels = g_hwParams.channels;
         param.rate = g_hwParams.rate;
         param.format = format;
         param.periodSize = g_hwParams.periodSize / 4; // limited to 16K,periodSize/4.
         param.periodCount = g_hwParams.periodCount / 2; // limited to 16K, periodCount/2.
         CaptureSample(&pcm, &param);
-        RoutePcmCardOpen(devIn[SND_IN_SOUND_CARD_MIC].card, DEV_IN_HANDS_FREE_MIC_CAPTURE_ROUTE);
+        RoutePcmCardOpen(g_inDevInfo.card, DEV_IN_HANDS_FREE_MIC_CAPTURE_ROUTE);
     }
     dataSize = pcm_frames_to_bytes(pcm, pcm_get_buffer_size(pcm));
     buffer = malloc(dataSize);

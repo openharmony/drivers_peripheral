@@ -33,6 +33,7 @@
 #ifdef ALSA_MODE
 #include "alsa_audio.h"
 struct pcm *pcm;
+struct DevInfo g_outDevInfo;
 #endif
 
 /* Out Put Render */
@@ -194,12 +195,12 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
 #ifdef ALSA_MODE
     char *ctlName = "DACL Playback Volume";
     ReadOutSoundCard();
-    MixerOpenLegacy(true, devOut[SND_OUT_SOUND_CARD_SPEAKER].card);
+    memset_s(&g_outDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
+    GetOutDevInfo(SND_OUT_SOUND_CARD_SPEAKER, &g_outDevInfo);
+    MixerOpenLegacy(true, g_outDevInfo.card);
     handleData->renderMode.ctlParam.volume = RouteGetVoiceVolume(ctlName);
     return HDF_SUCCESS;
 #endif
-    int32_t ret;
-
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("RenderGetVolume parameter is empty!");
         return HDF_FAILURE;
@@ -217,7 +218,7 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
-    ret = AudioCtlRenderGetVolumeSBuf(sBuf, handleData);
+    int32_t ret = AudioCtlRenderGetVolumeSBuf(sBuf, handleData);
     if (ret < 0) {
         LOG_FUN_ERR("RenderGetVolume Failed to Get Volume sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
@@ -866,7 +867,9 @@ int32_t AudioCtlRenderGetVolThreshold(const struct DevHandle *handle, int cmdId,
     long long volMin = 0, volMax = 0;
     char *ctlName = "DACL Playback Volume";
     ReadOutSoundCard();
-    MixerOpenLegacy(true, devOut[SND_OUT_SOUND_CARD_SPEAKER].card);
+    memset_s(&g_outDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
+    GetOutDevInfo(SND_OUT_SOUND_CARD_SPEAKER, &g_outDevInfo);
+    MixerOpenLegacy(true, g_outDevInfo.card);
     RouteGetVoiceMinMaxStep(&volMin, &volMax, ctlName, true);
     handleData->renderMode.ctlParam.volThreshold.volMax = volMax;
     handleData->renderMode.ctlParam.volThreshold.volMin = volMin;
@@ -1285,17 +1288,19 @@ int32_t FrameSbufWriteBuffer(struct HdfSBuf *sBuf, const struct AudioHwRenderPar
             bits = TINYALSAPCM_16_BIT;
         }
         ReadOutSoundCard();
+        memset_s(&g_outDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
+        GetOutDevInfo(SND_OUT_SOUND_CARD_SPEAKER, &g_outDevInfo);
         struct PcmRenderParam param;
         memset_s(&param, sizeof(param), 0, sizeof(param));
-        param.card = devOut[SND_OUT_SOUND_CARD_SPEAKER].card;
-        param.device = devOut[SND_OUT_SOUND_CARD_SPEAKER].device;
+        param.card = g_outDevInfo.card;
+        param.device = g_outDevInfo.device;
         param.channels = g_hwParams.channels;
         param.rate = g_hwParams.rate;
         param.bits = bits;
         param.periodSize = g_hwParams.periodSize / 4; // Because the data frame size is limited to 16K,periodSize/4.
         param.periodCount = g_hwParams.periodCount / 2; // Because the data frame size is limited to 16K,periodcount/2
         RenderSample(&pcm, &param);
-        RoutePcmCardOpen(devOut[SND_OUT_SOUND_CARD_SPEAKER].card, DEV_OUT_SPEAKER_HEADPHONE_NORMAL_ROUTE);
+        RoutePcmCardOpen(g_outDevInfo.card, DEV_OUT_SPEAKER_HEADPHONE_NORMAL_ROUTE);
     }
     pcm_write(pcm, handleData->frameRenderMode.buffer, handleData->frameRenderMode.bufferSize);
     return HDF_SUCCESS;
