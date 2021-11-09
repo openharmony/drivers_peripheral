@@ -1051,6 +1051,9 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
 int32_t AudioOutputCaptureOpen(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData)
 {
+#ifdef ALSA_MODE
+    return HDF_SUCCESS;
+#endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("Function parameter is NULL!");
         return HDF_FAILURE;
