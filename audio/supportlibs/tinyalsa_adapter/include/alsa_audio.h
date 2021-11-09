@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2021 Rockchip Electronics Co., Ltd.
+ * Copyright 2021 Rockchip Electronics Co. LTD
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -122,8 +123,7 @@ struct PcmCaptureParam {
     unsigned int periodSize;
     unsigned int periodCount;
 };
-extern struct DevInfo devIn[SND_IN_SOUND_CARD_MAX];
-extern struct DevInfo devOut[SND_OUT_SOUND_CARD_MAX];
+
 
 int RouteSetVoiceVolume(float volume);
 int RouteSetCaptureVoiceVolume(float volume);
@@ -136,4 +136,6 @@ void RoutePcmCardOpen(int card, uint32_t route);
 int RoutePcmClose(unsigned route);
 void RenderSample(struct pcm **pcm, struct PcmRenderParam* param);
 unsigned int CaptureSample(struct pcm **pcm, struct PcmCaptureParam* param);
+int GetOutDevInfo(int index, struct DevInfo* devInfo);
+int GetInDevInfo(int index, struct DevInfo* devInfo);
 #endif

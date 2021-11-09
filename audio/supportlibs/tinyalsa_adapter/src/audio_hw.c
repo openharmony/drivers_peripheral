@@ -15,8 +15,8 @@
  */
 
 #include "alsa_audio.h"
-struct DevInfo devIn[SND_IN_SOUND_CARD_MAX];
-struct DevInfo devOut[SND_OUT_SOUND_CARD_MAX];
+static struct DevInfo devIn[SND_IN_SOUND_CARD_MAX];
+static struct DevInfo devOut[SND_OUT_SOUND_CARD_MAX];
 
 struct DevProcInfo SPEAKER_OUT_NAME[] = {
     {"realtekrt5616c", NULL},
@@ -380,6 +380,30 @@ void ReadOutSoundCard(void)
     }
     dumpdev_info("out", devOut, SND_OUT_SOUND_CARD_MAX);
     return ;
+}
+
+int GetOutDevInfo(int index, struct DevInfo* devInfo)
+{
+    for (int i = 0; i < SND_OUT_SOUND_CARD_MAX; i++) {
+        if (i == index) {
+            devInfo->card = devOut[i].card;
+            devInfo->device = devOut[i].device;
+            return true;
+        }
+    }
+    return false;
+}
+
+int GetInDevInfo(int index, struct DevInfo* devInfo)
+{
+    for (int i = 0; i < SND_IN_SOUND_CARD_MAX; i++) {
+        if (i == index) {
+            devInfo->card = devIn[i].card;
+            devInfo->device = devIn[i].device;
+            return true;
+        }
+    }
+    return false;
 }
 
 int AudioRenderParamCheck(struct pcm_params *params, unsigned int param, unsigned int value,

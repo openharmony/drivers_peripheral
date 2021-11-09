@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2021 Rockchip Electronics Co., Ltd.
+ * Copyright 2021 Rockchip Electronics Co. LTD
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,10 +44,10 @@ struct PathRouteCfgTable {
 
 struct TinyalsaSndCardCfg {
     const char *sndCardName;
-    const struct PathRouteCfgTable *pathRouteMap;
+    struct PathRouteCfgTable *pathRouteMap;
 };
 
-extern const struct PathRouteCfgTable hdmi_analog_config_table;
-extern const struct PathRouteCfgTable default_config_table;
+struct PathRouteCfgTable* GetHdmiConfigTable(void);
+struct PathRouteCfgTable* GetDefaultConfigTable(void);
 
 #endif // _CONFIG_H_

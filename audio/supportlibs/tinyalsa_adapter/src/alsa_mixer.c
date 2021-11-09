@@ -42,7 +42,6 @@ struct pcm* mPcm[PCM_MAX + 1];
 struct TinyalsaSndCardCfg g_sndCardCfgList[] = {
     {
         .sndCardName = "rockchiphdmi",
-        .pathRouteMap = &hdmi_analog_config_table,
     }
 };
 
@@ -334,20 +333,14 @@ void MatchRouteTableInfo(char *sndCardId, unsigned int *length)
     unsigned int cardIdLength = *length;
     unsigned count = sizeof(g_sndCardCfgList) / sizeof(struct TinyalsaSndCardCfg);
     for (int i = 0; i < count; i++) {
-        int check = !(g_sndCardCfgList + i) ||
-            !g_sndCardCfgList[i].sndCardName ||
-            !g_sndCardCfgList[i].pathRouteMap;
-        if (check) {
-            continue;
-        }
         if (strncmp(g_sndCardCfgList[i].sndCardName, sndCardId, cardIdLength) == 0) {
-            g_tinyalsaRouteTable = g_sndCardCfgList[i].pathRouteMap;
+            g_tinyalsaRouteTable = GetHdmiConfigTable();
             LOG_PARA_INFO("Get route table for sound card0 %s", sndCardId);
         }
     }
 
     if (!g_tinyalsaRouteTable) {
-        g_tinyalsaRouteTable = &default_config_table;
+        g_tinyalsaRouteTable = GetDefaultConfigTable();
         LOG_FUN_ERR("Can not get config table for sound card0 %s, so get default config table.", sndCardId);
     }
     return ;

@@ -64,7 +64,7 @@ static const struct RouteCfgInfo default_capture_off_controls[] = {
     },
 };
 
-const struct PathRouteCfgTable default_config_table = {
+static struct PathRouteCfgTable default_config_table = {
     // speaker
     .speakNormal = {
         .sndCard = 1,
@@ -150,14 +150,12 @@ static const struct RouteCfgInfo hdmi_analog_hdmi_normal_controls[] = {
     },
 };
 
-
 static const struct RouteCfgInfo hdmi_analog_speaker_headphone_normal_controls[] = {
     {
         .controlName = "DAC Playback Volume",
         .intVal = {192, 192},
     },
 };
-
 
 static const struct RouteCfgInfo hdmi_analog_main_mic_capture_controls[] = {
     {
@@ -173,7 +171,6 @@ static const struct RouteCfgInfo hdmi_analog_hands_free_mic_capture_controls[] =
     },
 };
 
-
 static const struct RouteCfgInfo hdmi_analog_playback_off_controls[] = {
     {
         .controlName = "Playback Path",
@@ -188,8 +185,7 @@ static const struct RouteCfgInfo hdmi_analog_capture_off_controls[] = {
     },
 };
 
-
-const struct PathRouteCfgTable hdmi_analog_config_table = {
+static struct PathRouteCfgTable hdmi_analog_config_table = {
     // speaker
     .speakNormal = {
         .sndCard = 0,
@@ -253,3 +249,13 @@ const struct PathRouteCfgTable hdmi_analog_config_table = {
     },
 #endif
 };
+
+struct PathRouteCfgTable* GetHdmiConfigTable(void)
+{
+    return &hdmi_analog_config_table;
+}
+
+struct PathRouteCfgTable* GetDefaultConfigTable(void)
+{
+    return &default_config_table;
+}
