@@ -29,6 +29,21 @@
 #define AIP_INF_ATTRI_REG       0x1000
 #define AIP_CTRL_REG            0x1004
 
+#define GPIO_BASE1 0x2010
+#define GPIO_BASE2 0x2400
+#define GPIO_BASE3 0x2010
+
+#define GPIO_BASE2_VAL 0x000000ff
+#define GPIO_BASE3_VAL 0x00000000
+
+#define IOCFG2_BASE_ADDR 0x112F0000
+#define IOCFG3_BASE_ADDR 0x10FF0000
+#define GPIO_BASE_ADDR 0x120D0000
+#define BASE_ADDR_REMAP_SIZE 0x10000
+
+#define I2S_IOCFG3_BASE1 0x44
+#define I2S_IOCFG3_BASE1_VAL 0x0600
+
 static void     *g_regAiaoBase = NULL;   // AIAO Reg Base Addr
 static const int g_hiAiDevMaxNum = 3;
 static const int g_hiAoDevMaxNum = 3;
@@ -91,17 +106,17 @@ uint32_t AiaoHalReadReg(uint32_t offset)
 static int32_t AiaoGetBclkSel(unsigned int bclkDiv, unsigned int *bclkSel)
 {
     const int bclkDivReg[12][2] = {
-        {1,0x00},{2,0x02},{3,0x01},
-        {4,0x03},{6,0x04},{8,0x05},
-        {12,0x06},{16,0x07},{24,0x08},
-        {32,0x09},{48,0x0a},{64,0x0b},
-    };
+        {1, 0x00}, {2, 0x02}, {3, 0x01},
+        {4, 0x03}, {6, 0x04}, {8, 0x05},
+        {12, 0x06}, {16, 0x07}, {24, 0x08},
+        {32, 0x09}, {48, 0x0a}, {64, 0x0b},
+    };                                          //AIO_MCLK_TO_BCLK
     if (bclkSel == NULL) {
         AUDIO_DEVICE_LOG_ERR("bclkSel is null.");
         return HDF_FAILURE;
     }
 
-    for(int32_t num = 0; num < sizeof(bclkDivReg) / sizeof(bclkDivReg[0]); num++) {
+    for (int32_t num = 0; num < sizeof(bclkDivReg) / sizeof(bclkDivReg[0]); num++) {
         if (bclkDivReg[num][0] == bclkDiv) {
             *bclkSel = bclkDivReg[num][1];
             return HDF_SUCCESS;
@@ -113,15 +128,15 @@ static int32_t AiaoGetBclkSel(unsigned int bclkDiv, unsigned int *bclkSel)
 static int32_t AiaoGetLrclkSel(unsigned int lrclkDiv, unsigned int *lrclkSel)
 {
     const int lrclkDivReg[6][2] = {
-        {16,0x00},{32,0x01},{48,0x02},
-        {64,0x03},{128,0x04},{256,0x05},
-    };
+        {16, 0x00}, {32, 0x01}, {48, 0x02},
+        {64, 0x03}, {128, 0x04},{256, 0x05},
+    }; //AIO_BCLK_TO_FSCLK
     if (lrclkSel == NULL) {
         AUDIO_DEVICE_LOG_ERR("lrclkSel is null.\n");
         return HDF_FAILURE;
     }
 
-    for(int32_t num = 0; num < sizeof(lrclkDivReg) / sizeof(lrclkDivReg[0]); num++) {
+    for (int32_t num = 0; num < sizeof(lrclkDivReg) / sizeof(lrclkDivReg[0]); num++) {
         if (lrclkDivReg[num][0] == lrclkDiv) {
             *lrclkSel = lrclkDivReg[num][1];
             return HDF_SUCCESS;

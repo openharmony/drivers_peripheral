@@ -90,7 +90,7 @@ int32_t CodecRegDefaultInit(struct AudioRegCfgGroupNode **regCfgGroup)
     }
     regAttr = regCfgGroup[AUDIO_INIT_GROUP]->addrCfgItem;
 
-    for(i = 0; i < regCfgGroup[AUDIO_INIT_GROUP]->itemNum; i++) {
+    for (i = 0; i < regCfgGroup[AUDIO_INIT_GROUP]->itemNum; i++) {
         SysWritel((uintptr_t)g_regAcodecBase + regAttr[i].addr, regAttr[i].value);
     }
     AUDIO_DEVICE_LOG_DEBUG("success.");
@@ -174,7 +174,7 @@ int32_t CodecDaiParamsUpdate(struct AudioRegCfgGroupNode **regCfgGroup,
     struct CodecDaiParamsVal codecDaiParamsVal)
 {
     int32_t ret;
-    const int itemNum = 3; // current only 3 items(frequency, adc_mode_sel, i2s_datawith)
+    const int itemNum = 3; // current only 3 items
     struct AudioMixerControl *regAttr;
     uint16_t codecBitWidth;
 
