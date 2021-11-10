@@ -37,9 +37,6 @@ void WifiEventReport(const char *ifName, uint32_t event, void *data)
     uint32_t i;
 
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
-        if (g_callbackEventMap[i] != NULL) {
-            printf("xsxs: g_callbackEventMap[i]->ifName=%s\n", g_callbackEventMap[i]->ifName);
-        }
         if (g_callbackEventMap[i] != NULL && (strcmp(g_callbackEventMap[i]->ifName, ifName) == 0) &&
             (((1 << event) & g_callbackEventMap[i]->eventType) != 0)) {
             HILOG_INFO(LOG_DOMAIN, "%s: WifiEventReport send event = %d, ifName = %s",
