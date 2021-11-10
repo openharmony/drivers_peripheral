@@ -1182,6 +1182,7 @@ int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
         free(buffer);
         return HDF_SUCCESS;
     }
+    return HDF_FAILURE;
 }
 #endif
 
