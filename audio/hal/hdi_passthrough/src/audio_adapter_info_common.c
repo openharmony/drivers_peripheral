@@ -607,7 +607,7 @@ static int32_t AudioAdapterParsePorts(struct AudioAdapterDescriptor *desc, const
     }
     for (i = 0; i < desc->portNum; i++) {
         adapterPort = cJSON_GetArrayItem(adapterPorts, i);
-        if (adapterPort) {
+        if (adapterPort != NULL) {
             ret = AudioAdapterParsePort(&desc->ports[i], adapterPort);
             if (ret != HDF_SUCCESS) {
                 return ret;
@@ -758,7 +758,7 @@ static int32_t AudioAdaptersSetAdapter(struct AudioAdapterDescriptor **descs,
 
     for (i = 0; i < adapterNum; i++) {
         adapterObj = cJSON_GetArrayItem(adaptersObj, i);
-        if (adapterObj) {
+        if (adapterObj != NULL) {
             ret = AudioAdapterParseAdapter(&(*descs)[i], adapterObj);
             if (ret != HDF_SUCCESS) {
                 AudioAdapterReleaseDescs(*descs, adapterNum);

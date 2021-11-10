@@ -200,7 +200,7 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
         LOG_FUN_ERR("sopath is error");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (*descs && size && (*size) > 0) { // Fuzz test
+    if (*descs != NULL && size != NULL && (*size) > 0) { // Fuzz test
         g_localAddrAudioAdapterOut  = *descs;
         g_localAdapterNum = *size;
     } else {

@@ -25,7 +25,7 @@ namespace {
 const string ADAPTER_NAME_USB = "usb";
 const int PTHREAD_SAMEADA_COUNT = 10;
 const int PTHREAD_DIFFADA_COUNT = 1;
-mutex testMutex;
+mutex g_testMutex;
 static struct PrepareAudioPara g_para[PTHREAD_DIFFADA_COUNT] = {
     {
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(),  .pins = PIN_OUT_SPEAKER,
@@ -134,9 +134,9 @@ int32_t AudioHdiRenderControlReliabilityTest::RelGetAllAdapter(struct PrepareAud
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int size = 0;
-    testMutex.lock();
+    g_testMutex.lock();
     int32_t ret = ptr.manager->GetAllAdapters(ptr.manager, &ptr.descs, &size);
-    testMutex.unlock();
+    g_testMutex.unlock();
     if (ret < 0) {
         return ret;
     }
@@ -159,9 +159,9 @@ int32_t AudioHdiRenderControlReliabilityTest::RelLoadAdapter(struct PrepareAudio
     if (ptr.manager == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    testMutex.lock();
+    g_testMutex.lock();
     int32_t ret = ptr.manager->LoadAdapter(ptr.manager, ptr.desc, &ptr.adapter);
-    testMutex.unlock();
+    g_testMutex.unlock();
     if (ret < 0) {
         return ret;
     }
@@ -178,9 +178,9 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderStart(struct Prepare
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.render->control.Start((AudioHandle)(ptr.render));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -198,9 +198,9 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderFrame(struct Prepare
     if (ret < 0) {
         return ret;
     }
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.render->RenderFrame(ptr.render, frame, requestBytes, &replyBytes);
-    testMutex.unlock();
+    g_testMutex.unlock();
     if (frame != nullptr) {
         free(frame);
         frame = nullptr;
@@ -214,9 +214,9 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderStop(struct PrepareA
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.render->control.Stop((AudioHandle)(ptr.render));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -226,9 +226,9 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderPause(struct Prepare
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.render->control.Pause((AudioHandle)(ptr.render));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -238,18 +238,18 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderResume(struct Prepar
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.render->control.Resume((AudioHandle)(ptr.render));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
 int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderProcedure(struct PrepareAudioPara& ptr)
 {
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = AudioCreateRender(ptr.manager, ptr.pins, ptr.adapterName, &ptr.adapter, &ptr.render);
-    testMutex.unlock();
+    g_testMutex.unlock();
     if (ret < 0) {
         return ret;
     }
@@ -263,9 +263,9 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderGetRenderPosition(st
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.render->GetRenderPosition(ptr.render, &(ptr.character.getframes), &(ptr.time));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 

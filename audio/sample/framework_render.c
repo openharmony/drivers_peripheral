@@ -255,9 +255,9 @@ int32_t WavHeadAnalysis(FILE *file, struct AudioSampleAttributes *attrs)
         return HDF_FAILURE;
     }
     uint32_t ret;
-    char *audioRiffIdParam = "RIFF";
-    char *audioFileFmtParam = "WAVE";
-    char *aduioDataIdParam = "data";
+    const char *audioRiffIdParam = "RIFF";
+    const char *audioFileFmtParam = "WAVE";
+    const char *aduioDataIdParam = "data";
     ret = fread(&g_wavHeadInfo, sizeof(g_wavHeadInfo), 1, file);
     if (ret != 1) {
         return HDF_FAILURE;
@@ -1200,7 +1200,7 @@ void Choice(void)
 
 int32_t main(int32_t argc, char const *argv[])
 {
-    if (argc < 2 || argv == NULL) { // The parameter number is not greater than 2
+    if (argc < 2 || argv == NULL || argv[0] == NULL) { // The parameter number is not greater than 2
         printf("usage:[1]%s [2]%s\n", argv[0], "/test/test.wav");
         return 0;
     }

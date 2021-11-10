@@ -397,7 +397,8 @@ int32_t BindServiceRenderOpen(struct AudioHwRender *hwRender,
     InterfaceLibModeRenderSo *pInterfaceLibModeRender)
 {
     if (hwRender == NULL || hwRender->devDataHandle == NULL ||
-        pInterfaceLibModeRender || *pInterfaceLibModeRender) {
+        pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
+        LOG_FUN_ERR("Input para is null!");
         return HDF_FAILURE;
     }
     /* render open */
@@ -427,7 +428,7 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
         return HDF_FAILURE;
     }
     if (BindServiceRenderOpen(hwRender, pInterfaceLibModeRender)) {
-        LOG_FUN_ERR("BindServiceRenderOpen FAIL!");
+        return HDF_FAILURE;
     }
 #ifndef AUDIO_HAL_USER
     /* Select Codec Mode */
