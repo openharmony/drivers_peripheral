@@ -18,15 +18,15 @@ extern "C" {
 #endif /* __cplusplus */
 
 int32_t AudioDmaDeviceInit(const struct AudioCard *card, const struct PlatformDevice *platform);
-int32_t Hi3516DmaBufAlloc(struct PlatformData *data, enum AudioStreamType streamType);
-int32_t Hi3516DmaBufFree(struct PlatformData *data, enum AudioStreamType streamType);
-int32_t Hi3516DmaRequestChannel(struct PlatformData *data);
-int32_t Hi3516DmaConfigChannel(struct PlatformData *data);
-int32_t Hi3516DmaPrep(struct PlatformData *data);
-int32_t Hi3516DmaSubmit(struct PlatformData *data);
+int32_t Hi3516DmaBufAlloc(struct PlatformData *data, const enum AudioStreamType streamType);
+int32_t Hi3516DmaBufFree(struct PlatformData *data, const enum AudioStreamType streamType);
+int32_t Hi3516DmaRequestChannel(const struct PlatformData *data);
+int32_t Hi3516DmaConfigChannel(const struct PlatformData *data);
+int32_t Hi3516DmaPrep(const struct PlatformData *data);
+int32_t Hi3516DmaSubmit(const struct PlatformData *data);
 int32_t Hi3516DmaPending(struct PlatformData *data);
 int32_t Hi3516DmaPause(struct PlatformData *data);
-int32_t Hi3516DmaResume(struct PlatformData *data);
+int32_t Hi3516DmaResume(const struct PlatformData *data);
 int32_t Hi3516DmaPointer(struct PlatformData *data, uint32_t *pointer);
 
 #ifdef __cplusplus

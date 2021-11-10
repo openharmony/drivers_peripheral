@@ -27,7 +27,7 @@ static struct device g_captureDev = {0};
 
 int32_t AudioDmaDeviceInit(const struct AudioCard *card, const struct PlatformDevice *platformDevice)
 {
-    unsigned int chnId = 0;
+    const unsigned int chnId = 0;
 
     if (card == NULL || platformDevice == NULL || platformDevice->devData == NULL) {
         AUDIO_DRIVER_LOG_ERR("platformDevice is NULL.");
@@ -65,7 +65,7 @@ int32_t AudioDmaDeviceInit(const struct AudioCard *card, const struct PlatformDe
     return HDF_SUCCESS;
 }
 
-int32_t Hi3516DmaBufAlloc(struct PlatformData *data, enum AudioStreamType streamType)
+int32_t Hi3516DmaBufAlloc(struct PlatformData *data, const enum AudioStreamType streamType)
 {
     if (data == NULL) {
         AUDIO_DRIVER_LOG_ERR("data is null");
@@ -98,7 +98,7 @@ int32_t Hi3516DmaBufAlloc(struct PlatformData *data, enum AudioStreamType stream
     return HDF_SUCCESS;
 }
 
-int32_t Hi3516DmaBufFree(struct PlatformData *data, enum AudioStreamType streamType)
+int32_t Hi3516DmaBufFree(struct PlatformData *data, const enum AudioStreamType streamType)
 {
     if (data == NULL) {
         AUDIO_DRIVER_LOG_ERR("data is null");
@@ -130,13 +130,13 @@ int32_t Hi3516DmaBufFree(struct PlatformData *data, enum AudioStreamType streamT
     return HDF_SUCCESS;
 }
 
-int32_t  Hi3516DmaRequestChannel(struct PlatformData *data)
+int32_t  Hi3516DmaRequestChannel(const struct PlatformData *data)
 {
     (void)data;
     return HDF_SUCCESS;
 }
 
-int32_t Hi3516DmaConfigChannel(struct PlatformData *data)
+int32_t Hi3516DmaConfigChannel(const struct PlatformData *data)
 {
     if (data == NULL) {
         AUDIO_DRIVER_LOG_ERR("data is null");
@@ -172,13 +172,13 @@ int32_t Hi3516DmaConfigChannel(struct PlatformData *data)
     return HDF_SUCCESS;
 }
 
-int32_t Hi3516DmaPrep(struct PlatformData *data)
+int32_t Hi3516DmaPrep(const struct PlatformData *data)
 {
     (void)data;
     return HDF_SUCCESS;
 }
 
-int32_t Hi3516DmaSubmit(struct PlatformData *data)
+int32_t Hi3516DmaSubmit(const struct PlatformData *data)
 {
     (void)data;
     return HDF_SUCCESS;
@@ -226,7 +226,7 @@ int32_t Hi3516DmaPause(struct PlatformData *data)
     return HDF_SUCCESS;
 }
 
-int32_t Hi3516DmaResume(struct PlatformData *data)
+int32_t Hi3516DmaResume(const struct PlatformData *data)
 {
     if (data == NULL) {
         AUDIO_DRIVER_LOG_ERR("data is null");

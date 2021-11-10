@@ -50,7 +50,7 @@
 #define FILE_CAPTURE_SIZE (1024 * 1024 * 3) // 3M
 #define BUFFER_LEN 256
 #define EXT_PARAMS_MAXLEN 107
-
+#define ONE_MS 1000
 
 struct StrParaCapture {
     struct AudioCapture *capture;
@@ -342,7 +342,8 @@ int32_t FrameStartCapture(const AudioHandle param)
                 LOG_FUN_ERR("Record already stop!");
                 break;
             }
-            if (failCount++ >= 10) { // Frame loss for 10 consecutive times
+            usleep(ONE_MS);
+            if (failCount++ >= 300000) { // Try 300000 times for CaptureFrame fail
                 free(frame);
                 return HDF_FAILURE;
             }
@@ -1059,7 +1060,7 @@ void Choice()
 
 int32_t CheckAndOpenFile(int32_t argc, char const *argv[])
 {
-    if (argc < 2 || argv == NULL) { // The parameter number is not greater than 2
+    if (argc < 2 || argv == NULL || argv[0] == NULL) { // The parameter number is not greater than 2
         printf("usage:[1]%s [2]%s\n", argv[0], "/data/test.wav");
         return HDF_FAILURE;
     }

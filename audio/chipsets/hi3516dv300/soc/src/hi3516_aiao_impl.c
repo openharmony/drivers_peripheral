@@ -103,14 +103,14 @@ uint32_t AiaoHalReadReg(uint32_t offset)
     return (*(volatile uint32_t *)((unsigned char *)g_regAiaoBase + (unsigned int)offset));
 }
 
-static int32_t AiaoGetBclkSel(unsigned int bclkDiv, unsigned int *bclkSel)
+static int32_t AiaoGetBclkSel(const unsigned int bclkDiv, unsigned int *bclkSel)
 {
     const int bclkDivReg[12][2] = {
         {1, 0x00}, {2, 0x02}, {3, 0x01},
         {4, 0x03}, {6, 0x04}, {8, 0x05},
         {12, 0x06}, {16, 0x07}, {24, 0x08},
         {32, 0x09}, {48, 0x0a}, {64, 0x0b},
-    };                                          //AIO_MCLK_TO_BCLK
+    }; // AIO_MCLK_TO_BCLK
     if (bclkSel == NULL) {
         AUDIO_DEVICE_LOG_ERR("bclkSel is null.");
         return HDF_FAILURE;
@@ -125,12 +125,12 @@ static int32_t AiaoGetBclkSel(unsigned int bclkDiv, unsigned int *bclkSel)
     return HDF_FAILURE;
 }
 
-static int32_t AiaoGetLrclkSel(unsigned int lrclkDiv, unsigned int *lrclkSel)
+static int32_t AiaoGetLrclkSel(const unsigned int lrclkDiv, unsigned int *lrclkSel)
 {
     const int lrclkDivReg[6][2] = {
         {16, 0x00}, {32, 0x01}, {48, 0x02},
         {64, 0x03}, {128, 0x04},{256, 0x05},
-    }; //AIO_BCLK_TO_FSCLK
+    }; // AIO_BCLK_TO_FSCLK
     if (lrclkSel == NULL) {
         AUDIO_DEVICE_LOG_ERR("lrclkSel is null.\n");
         return HDF_FAILURE;
@@ -401,8 +401,8 @@ int32_t AopHalDevEnable(unsigned int chnId)
     return HDF_SUCCESS;
 }
 
-static int32_t AiaoGetBclkFsclk(unsigned int fsBit, unsigned int rate,
-                                int32_t mclkSel, int32_t *bclkSel, int32_t *lrclkSel)
+static int32_t AiaoGetBclkFsclk(const unsigned int fsBit, const unsigned int rate,
+    const int32_t mclkSel, int32_t *bclkSel, int32_t *lrclkSel)
 {
     int32_t ret;
     unsigned int mclkRateNum;
@@ -495,15 +495,17 @@ static unsigned int AiaoGetBitCnt(unsigned int bitWidth)
 int32_t AiaoSetSysCtlRegValue(uint32_t mclkSel, uint32_t bitWidth, uint32_t rate, uint32_t *clkRegVal)
 {
     int32_t ret;
-    uint32_t bclkSel = 0;
-    uint32_t lrClkSel = 0;
-    const int dobule = 2;
+    uint32_t fsBit;
+    uint32_t bclkSel;
+    uint32_t lrClkSel;
 
     if (clkRegVal == NULL) {
         AUDIO_DEVICE_LOG_ERR("param is nullptr.");
         return HDF_ERR_INVALID_PARAM;
     }
-    uint32_t fsBit = AiaoGetBitCnt(bitWidth) * dobule;
+    fsBit = AiaoGetBitCnt(bitWidth) * 2; // 2 is bit width
+    memset_s(&bclkSel, sizeof(uint32_t), 0, sizeof(uint32_t));
+    memset_s(&lrClkSel, sizeof(uint32_t), 0, sizeof(uint32_t));
     ret = AiaoGetBclkFsclk(fsBit, rate, mclkSel, &bclkSel, &lrClkSel);
     if (ret != HDF_SUCCESS) {
         AUDIO_DEVICE_LOG_ERR("AiaoGetBclkFsclk fail");

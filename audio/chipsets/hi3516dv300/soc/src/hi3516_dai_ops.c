@@ -93,7 +93,7 @@ int32_t DaiDeviceInit(struct AudioCard *audioCard, const struct DaiDevice *dai)
         return HDF_FAILURE;
     }
     struct DaiData *data = dai->devData;
-    struct AudioRegCfgData *regConfig = data->regConfig;
+    struct AudioRegCfgData *regConfig = dai->devData->regConfig;
     if (regConfig == NULL) {
         AUDIO_DRIVER_LOG_ERR("regConfig is nullptr.");
         return HDF_FAILURE;
@@ -108,8 +108,8 @@ int32_t DaiDeviceInit(struct AudioCard *audioCard, const struct DaiDevice *dai)
     }
 
     if (g_regDaiBase == NULL) {
-        g_regDaiBase = OsalIoRemap(data->regConfig->audioIdInfo.chipIdRegister,
-            data->regConfig->audioIdInfo.chipIdSize);
+        g_regDaiBase = OsalIoRemap(regConfig->audioIdInfo.chipIdRegister,
+            regConfig->audioIdInfo.chipIdSize);
         if (g_regDaiBase == NULL) {
             AUDIO_DRIVER_LOG_ERR("OsalIoRemap fail.");
             return HDF_FAILURE;
@@ -176,7 +176,7 @@ int32_t DaiStartup(const struct AudioCard *card, const struct DaiDevice *device)
         }
     }
     device->devData->regVirtualAddr = (uintptr_t)g_regCodecBase;
-    
+
     if (I2sPinInit() != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("I2sPinInit fail.");
     }
@@ -184,7 +184,7 @@ int32_t DaiStartup(const struct AudioCard *card, const struct DaiDevice *device)
     return HDF_SUCCESS;
 }
 
-static int32_t SetIISRate(struct DaiDevice *device, struct AudioMixerControl *regCfgItem)
+static int32_t SetIISRate(const struct DaiDevice *device, const struct AudioMixerControl *regCfgItem)
 {
     const uint32_t shiftMax = 4;
     uint32_t mclkSel;
@@ -202,6 +202,7 @@ static int32_t SetIISRate(struct DaiDevice *device, struct AudioMixerControl *re
         shift = shiftMax;
     }
 
+    (void)memset_s(&mclkSel, sizeof(uint32_t), 0, sizeof(uint32_t));
     if (AiaoGetMclk(rate, &mclkSel) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
@@ -211,6 +212,7 @@ static int32_t SetIISRate(struct DaiDevice *device, struct AudioMixerControl *re
         return HDF_FAILURE;
     }
 
+    (void)memset_s(&bclkRegVal, sizeof(uint32_t), 0, sizeof(uint32_t));
     if (AiaoSetSysCtlRegValue(mclkSel, bitWidth, rate, &bclkRegVal) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
@@ -222,7 +224,7 @@ static int32_t SetIISRate(struct DaiDevice *device, struct AudioMixerControl *re
     return HDF_SUCCESS;
 }
 
-int32_t DaiParamsUpdate(struct DaiDevice *device)
+int32_t DaiParamsUpdate(const struct DaiDevice *device)
 {
     uint32_t value;
     struct AudioMixerControl *regCfgItem = NULL;
