@@ -1302,8 +1302,12 @@ int32_t FrameSbufWriteBuffer(struct HdfSBuf *sBuf, const struct AudioHwRenderPar
         RenderSample(&pcm, &param);
         RoutePcmCardOpen(g_outDevInfo.card, DEV_OUT_SPEAKER_HEADPHONE_NORMAL_ROUTE);
     }
-    pcm_write(pcm, handleData->frameRenderMode.buffer, handleData->frameRenderMode.bufferSize);
-    return HDF_SUCCESS;
+    if (pcm) {
+        pcm_write(pcm, handleData->frameRenderMode.buffer, handleData->frameRenderMode.bufferSize);
+        return HDF_SUCCESS;
+    } else {
+        return HDF_FAILURE;
+    }
 #endif
     if (sBuf == NULL || handleData == NULL || handleData->frameRenderMode.buffer == NULL) {
         return HDF_FAILURE;
@@ -1552,8 +1556,10 @@ int32_t AudioOutputRenderStop(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
 #ifdef ALSA_MODE
-    pcm_close(pcm);
-    pcm = NULL;
+    if (pcm) {
+        pcm_close(pcm);
+        pcm = NULL;
+    }
     RoutePcmClose(DEV_OFF_PLAYBACK_OFF_ROUTE);
     return HDF_SUCCESS;
 #endif

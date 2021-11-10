@@ -1137,7 +1137,7 @@ int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
 {
     uint32_t dataSize = 0;
     char *buffer = NULL;
-    if (!pcm) {
+    if (!pcm) { // if pcm is num, need create it first
         int format = PCM_FORMAT_S16_LE;
         if (g_hwParams.format == AUDIO_FORMAT_PCM_8_BIT) {
             format = PCM_FORMAT_S8;
@@ -1165,21 +1165,23 @@ int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
         CaptureSample(&pcm, &param);
         RoutePcmCardOpen(g_inDevInfo.card, DEV_IN_HANDS_FREE_MIC_CAPTURE_ROUTE);
     }
-    dataSize = pcm_frames_to_bytes(pcm, pcm_get_buffer_size(pcm));
-    buffer = malloc(dataSize);
-    if (!buffer) {
-        fprintf(stderr, "Unable to allocate \n");
+    if (pcm) {
+        dataSize = pcm_frames_to_bytes(pcm, pcm_get_buffer_size(pcm));
+        buffer = malloc(dataSize);
+        if (!buffer) {
+            fprintf(stderr, "Unable to allocate \n");
+            free(buffer);
+            pcm_close(pcm);
+            return HDF_FAILURE;
+        }
+        if (!pcm_read(pcm, buffer, dataSize)) {
+            memcpy_s(handleData->frameCaptureMode.buffer, FRAME_DATA, buffer, dataSize);
+        }
+        handleData->frameCaptureMode.bufferSize = dataSize;
+        handleData->frameCaptureMode.bufferFrameSize = pcm_bytes_to_frames(pcm, dataSize);
         free(buffer);
-        pcm_close(pcm);
-        return HDF_FAILURE;
+        return HDF_SUCCESS;
     }
-    if (!pcm_read(pcm, buffer, dataSize)) {
-        memcpy_s(handleData->frameCaptureMode.buffer, FRAME_DATA, buffer, dataSize);
-    }
-    handleData->frameCaptureMode.bufferSize = dataSize;
-    handleData->frameCaptureMode.bufferFrameSize = pcm_bytes_to_frames(pcm, dataSize);
-    free(buffer);
-    return HDF_SUCCESS;
 }
 #endif
 
@@ -1263,8 +1265,10 @@ int32_t AudioOutputCaptureStop(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData)
 {
 #ifdef ALSA_MODE
-    pcm_close(pcm);
-    pcm = NULL;
+    if (pcm) {
+        pcm_close(pcm);
+        pcm = NULL;
+    }
     RoutePcmClose(DEV_OFF_CAPTURE_OFF_ROUTE);
     return HDF_SUCCESS;
 #endif
@@ -1506,6 +1510,9 @@ struct DevHandleCapture *AudioBindServiceCapture(const char *name)
 
 void AudioCloseServiceCapture(const struct DevHandleCapture *handle)
 {
+#ifdef ALSA_MODE
+    return;
+#endif
     LOG_FUN_INFO();
     if (handle == NULL || handle->object == NULL) {
         LOG_FUN_ERR("Capture handle or handle->object is NULL");
