@@ -321,22 +321,20 @@ int32_t FrameStartCapture(const AudioHandle param)
     struct StrParaCapture *strParam = (struct StrParaCapture *)param;
     struct AudioCapture *capture = strParam->capture;
     FILE *file = strParam->file;
-    int32_t ret;
     uint32_t bufferSize = AUDIO_BUFF_SIZE;   // 16 * 1024 = 16KB, it needs to be calculated by audio parameters
     uint64_t replyBytes = 0;
     uint64_t totalSize = 0;
     uint64_t requestBytes = AUDIO_BUFF_SIZE; // 16 * 1024 = 16KB
     uint32_t failCount = 0;
+    if (capture == NULL || capture->CaptureFrame == NULL || file == NULL) {
+        return HDF_FAILURE;
+    }
     char *frame = (char *)calloc(1, bufferSize);
     if (frame == NULL) {
         return HDF_FAILURE;
     }
-    if (capture == NULL || capture->CaptureFrame == NULL || file == NULL) {
-        free(frame);
-        return HDF_FAILURE;
-    }
     do {
-        ret = capture->CaptureFrame(capture, frame, requestBytes, &replyBytes);
+        int32_t ret = capture->CaptureFrame(capture, frame, requestBytes, &replyBytes);
         if (ret < 0) {
             if (ret == HDF_ERR_INVALID_OBJECT) {
                 LOG_FUN_ERR("Record already stop!");
@@ -359,7 +357,6 @@ int32_t FrameStartCapture(const AudioHandle param)
     if (frame != NULL) {
         free(frame);
     }
-    printf("Record end\n");
     if (!g_closeEnd) {
         if (StopButtonCapture(&g_capture) < 0) {
             return HDF_FAILURE;
