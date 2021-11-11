@@ -79,7 +79,7 @@ RetCode OfflinePipeline::CancelCapture(int32_t captureId)
     CAMERA_LOGE("cancel capture begin");
     if (bufferCache_.empty()) {
         CAMERA_LOGE("cancel capture failed, capture id = %{public}d doesn't exist", captureId);
-        return RC_ERROR;
+        return RC_OK;
     }
 
     std::vector<std::shared_ptr<IBuffer>> cache = {};

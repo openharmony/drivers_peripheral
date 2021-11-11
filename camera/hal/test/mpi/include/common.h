@@ -94,8 +94,8 @@ public:
     int streamId_video = 1020;
     int captureId_preview = 2000;
     int captureId_preview_double = 2001;
-    int captureId_capture = 2010;
-    int captureId_video = 2020;
+    int captureId_capture = 3000;
+    int captureId_video = 4000;
     std::vector<int> captureIds;
     std::vector<int> streamIds;
     std::vector<Camera::StreamIntent> intents;
