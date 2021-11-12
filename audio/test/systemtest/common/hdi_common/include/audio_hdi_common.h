@@ -112,6 +112,7 @@ const int AUDIO_RENDER_FULL_VALUE = 2;
 const int AUDIO_FLUSH_COMPLETED_VALUE = 3;
 const int64_t SECTONSEC = 1000000000;
 const int MICROSECOND = 1000000;
+const int RANGE = 3;
 const std::string HDF_CONTROL_SERVICE = "hdf_audio_control";
 const std::string HDF_RENDER_SERVICE = "hdf_audio_render";
 const std::string HDF_CAPTURE_SERVICE = "hdf_audio_capture";
