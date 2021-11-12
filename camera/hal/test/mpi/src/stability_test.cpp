@@ -87,6 +87,7 @@ HWTEST_F(StabilityTest, Camera_Stability_Preview_0001, TestSize.Level3)
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
         Test_->StopConsumer(Test_->intents);
     }
+    Test_->Close();
 }
 
 /**
@@ -117,6 +118,7 @@ HWTEST_F(StabilityTest, Camera_Stability_Capture_0001, TestSize.Level3)
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
         Test_->StopConsumer(Test_->intents);
     }
+    Test_->Close();
 }
 
 /**
@@ -151,6 +153,7 @@ HWTEST_F(StabilityTest, Camera_Stability_Capture_0002, TestSize.Level3)
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
         Test_->StopConsumer({Camera::PREVIEW, Camera::STILL_CAPTURE});
     }
+    Test_->Close();
 }
 
 /**
@@ -181,6 +184,7 @@ HWTEST_F(StabilityTest, Camera_Stability_Video_0001, TestSize.Level3)
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
         Test_->StopConsumer(Test_->intents);
     }
+    Test_->Close();
 }
 
 /**
@@ -192,9 +196,9 @@ HWTEST_F(StabilityTest, Camera_Stability_Video_0001, TestSize.Level3)
 HWTEST_F(StabilityTest, Camera_Stability_Video_0002, TestSize.Level3)
 {
     std::cout << "==========[test log]Check video: Dynamic Video start&stop, for 100 times, success." << std::endl;
-    // Turn on the camera
-    Test_->Open();
     for (int i = 0; i < 100; i++) {
+    	// Turn on the camera
+        Test_->Open();
         std::cout << "Running " << i << " time" << std::endl;
         // start preview stream
         Test_->intents = {Camera::PREVIEW};
@@ -204,6 +208,7 @@ HWTEST_F(StabilityTest, Camera_Stability_Video_0002, TestSize.Level3)
         // start stream
         Test_->intents = {Camera::VIDEO};
         Test_->StartStream(Test_->intents);
+        Test_->StopConsumer(Test_->intents);
         // Start capture
         Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
         Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
@@ -211,9 +216,10 @@ HWTEST_F(StabilityTest, Camera_Stability_Video_0002, TestSize.Level3)
         Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
         Test_->streamIds.push_back(Test_->streamId_preview);
         Test_->streamIds.push_back(Test_->streamId_video);
-        Test_->intents = {Camera::PREVIEW, Camera::VIDEO};
+        Test_->intents = {Camera::PREVIEW};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
         Test_->StopConsumer(Test_->intents);
+        Test_->Close();
     }
 }
 
@@ -256,6 +262,7 @@ HWTEST_F(StabilityTest, Camera_Stability_3a_0001, TestSize.Level3)
             sleep(1);
         }
     }
+    Test_->Close();
 }
 
 /**
@@ -285,4 +292,5 @@ HWTEST_F(StabilityTest, Camera_Stability_Flashlight_0001, TestSize.Level3)
         }
         sleep(1);
     }
+    Test_->Close();
 }
