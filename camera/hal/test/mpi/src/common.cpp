@@ -394,6 +394,13 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
                 std::cout << "==========[test log]check Capture: CancelCapture fail, rc = " << rc << std::endl;
                 std::cout << "captureId = " << captureId << std::endl;
             }
+            if (captureId == captureId_preview) {
+                captureId_preview++;
+            } else if (captureId == captureId_capture) {
+                captureId_capture++;
+            } else if (captureId == captureId_video) {
+                captureId_video++;
+            }
         }
     }
     SaveVideoFile("video", nullptr, 0, 2); // 2:Operation Mode
@@ -406,6 +413,7 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
             std::cout << "==========[test log]check Capture: ReleaseStreams fail, rc = " << rc << std::endl;
         }
     }
+    streamIds.clear();
 }
 
 void Test::StopConsumer(std::vector<Camera::StreamIntent> intents)
@@ -417,6 +425,7 @@ void Test::StopConsumer(std::vector<Camera::StreamIntent> intents)
 
 void Test::StopOfflineStream(int captureId)
 {
+    captureId--;
     rc = offlineStreamOperator->CancelCapture(captureId);
     EXPECT_EQ(rc, Camera::NO_ERROR);
     if (rc == Camera::NO_ERROR) {
