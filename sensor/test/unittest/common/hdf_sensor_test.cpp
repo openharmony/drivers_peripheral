@@ -64,8 +64,8 @@ namespace {
     const int32_t SENSOR_POLL_TIME = 1;
     const int32_t SENSOR_WAIT_TIME = 400;
     const struct SensorInterface *g_sensorDev = nullptr;
-    static int32_t count = 0;
-    static struct SensorInformation *sensorInfo = nullptr;
+    static int32_t g_count = 0;
+    static struct SensorInformation *g_sensorInfo = nullptr;
 
     void SensorDataVerification(const float &data, const struct SensorDevelopmentList &sensorNode)
     {
@@ -128,7 +128,7 @@ void HdfSensorTest::SetUpTestCase()
     if (g_sensorDev == nullptr) {
         printf("test sensorHdi get Module instance failed\n\r");
     }
-    int32_t ret = g_sensorDev->GetAllSensors(&sensorInfo, &count);
+    int32_t ret = g_sensorDev->GetAllSensors(&g_sensorInfo, &g_count);
     if (ret == -1) {
         printf("get sensor informations failed\n\r");
     }
@@ -179,7 +179,7 @@ HWTEST_F(HdfSensorTest, RemoveSensorInstance001, TestSize.Level1)
     if (g_sensorDev == nullptr) {
         ASSERT_EQ(0, ret);
     }
-    ret = g_sensorDev->GetAllSensors(&sensorInfo, &count);
+    ret = g_sensorDev->GetAllSensors(&g_sensorInfo, &g_count);
     EXPECT_EQ(0, ret);
 }
 
@@ -222,15 +222,15 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
     struct SensorInformation *info = nullptr;
     int j;
 
-    if (sensorInfo == nullptr) {
-        EXPECT_NE(nullptr, sensorInfo);
+    if (g_sensorInfo == nullptr) {
+        EXPECT_NE(nullptr, g_sensorInfo);
         return;
     }
 
-    printf("get sensor list num[%d]\n\r", count);
-    info = sensorInfo;
+    printf("get sensor list num[%d]\n\r", g_count);
+    info = g_sensorInfo;
 
-    for (int i = 0; i < count; ++i) {
+    for (int i = 0; i < g_count; ++i) {
         printf("get sensoriId[%d], info name[%s], power[%f]\n\r", info->sensorId, info->sensorName, info->power);
         for (j = 0; j < g_listNum; ++j) {
             if (info->sensorId == g_sensorList[j].sensorTypeId) {
@@ -256,12 +256,9 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
   */
 HWTEST_F(HdfSensorTest, GetSensorList002, TestSize.Level1)
 {
-    struct SensorInformation *sensorInfo = nullptr;
-    int32_t count = 0;
-
-    int32_t ret = g_sensorDev->GetAllSensors(nullptr, &count);
+    int32_t ret = g_sensorDev->GetAllSensors(nullptr, &g_count);
     EXPECT_EQ(SENSOR_NULL_PTR, ret);
-    ret = g_sensorDev->GetAllSensors(&sensorInfo, nullptr);
+    ret = g_sensorDev->GetAllSensors(&g_sensorInfo, nullptr);
     EXPECT_EQ(SENSOR_NULL_PTR, ret);
     ret = g_sensorDev->GetAllSensors(nullptr, nullptr);
     EXPECT_EQ(SENSOR_NULL_PTR, ret);
@@ -280,13 +277,13 @@ HWTEST_F(HdfSensorTest, EnableSensor001, TestSize.Level1)
 
     struct SensorInformation *info = nullptr;
 
-    if (sensorInfo == nullptr) {
-        EXPECT_NE(nullptr, sensorInfo);
+    if (g_sensorInfo == nullptr) {
+        EXPECT_NE(nullptr, g_sensorInfo);
         return;
     }
 
-    info = sensorInfo;
-    for (int i = 0; i < count; i++) {
+    info = g_sensorInfo;
+    for (int i = 0; i < g_count; i++) {
         ret = g_sensorDev->SetBatch(info->sensorId, SENSOR_INTERVAL, SENSOR_POLL_TIME);
         EXPECT_EQ(0, ret);
         ret = g_sensorDev->Enable(info->sensorId);
@@ -309,8 +306,8 @@ HWTEST_F(HdfSensorTest, EnableSensor001, TestSize.Level1)
   */
 HWTEST_F(HdfSensorTest, EnableSensor002, TestSize.Level1)
 {
-    if (sensorInfo == nullptr) {
-        EXPECT_NE(nullptr, sensorInfo);
+    if (g_sensorInfo == nullptr) {
+        EXPECT_NE(nullptr, g_sensorInfo);
         return;
     }
 
@@ -333,13 +330,13 @@ HWTEST_F(HdfSensorTest, SetSensorBatch001, TestSize.Level1)
     int32_t ret = g_sensorDev->Register(SensorTestDataCallback);
     EXPECT_EQ(0, ret);
 
-    if (sensorInfo == nullptr) {
-        EXPECT_NE(nullptr, sensorInfo);
+    if (g_sensorInfo == nullptr) {
+        EXPECT_NE(nullptr, g_sensorInfo);
         return;
     }
 
-    info = sensorInfo;
-    for (int i = 0; i < count; i++) {
+    info = g_sensorInfo;
+    for (int i = 0; i < g_count; i++) {
         ret = g_sensorDev->SetBatch(info->sensorId, SENSOR_INTERVAL, SENSOR_POLL_TIME);
         EXPECT_EQ(0, ret);
         ret = g_sensorDev->Enable(info->sensorId);
@@ -378,22 +375,23 @@ HWTEST_F(HdfSensorTest, SetSensorMode001, TestSize.Level1)
     int32_t ret = g_sensorDev->Register(SensorTestDataCallback);
     EXPECT_EQ(0, ret);
 
-    if (sensorInfo == nullptr) {
-        EXPECT_NE(nullptr, sensorInfo);
+    if (g_sensorInfo == nullptr) {
+        EXPECT_NE(nullptr, g_sensorInfo);
         return;
     }
 
-    info = sensorInfo;
-    for (int i = 0; i < count; i++) {
+    info = g_sensorInfo;
+    for (int i = 0; i < g_count; i++) {
         ret = g_sensorDev->SetBatch(info->sensorId, SENSOR_INTERVAL, SENSOR_POLL_TIME);
         EXPECT_EQ(0, ret);
         if (info->sensorId == SENSOR_TYPE_HALL) {
-        ret = g_sensorDev->SetMode(info->sensorId, SENSOR_MODE_ON_CHANGE);
-        EXPECT_EQ(0, ret);
+            ret = g_sensorDev->SetMode(info->sensorId, SENSOR_MODE_ON_CHANGE);
+            EXPECT_EQ(0, ret);
         } else {
-        ret = g_sensorDev->SetMode(info->sensorId, SENSOR_MODE_REALTIME);
-        EXPECT_EQ(0, ret);
+            ret = g_sensorDev->SetMode(info->sensorId, SENSOR_MODE_REALTIME);
+            EXPECT_EQ(0, ret);
         }
+
         ret = g_sensorDev->Enable(info->sensorId);
         EXPECT_EQ(0, ret);
         OsalMSleep(SENSOR_WAIT_TIME);
@@ -420,13 +418,13 @@ HWTEST_F(HdfSensorTest, SetSensorMode002, TestSize.Level1)
     int32_t ret = g_sensorDev->Register(SensorTestDataCallback);
     EXPECT_EQ(0, ret);
 
-    if (sensorInfo == nullptr) {
-        EXPECT_NE(nullptr, sensorInfo);
+    if (g_sensorInfo == nullptr) {
+        EXPECT_NE(nullptr, g_sensorInfo);
         return;
     }
 
-    info = sensorInfo;
-    for (int i = 0; i < count; i++) {
+    info = g_sensorInfo;
+    for (int i = 0; i < g_count; i++) {
         ret = g_sensorDev->SetBatch(info->sensorId, SENSOR_INTERVAL, SENSOR_POLL_TIME);
         EXPECT_EQ(0, ret);
         ret = g_sensorDev->SetMode(info->sensorId, SENSOR_MODE_DEFAULT);
@@ -451,7 +449,11 @@ HWTEST_F(HdfSensorTest, SetSensorMode002, TestSize.Level1)
   */
 HWTEST_F(HdfSensorTest, SetSensorOption001, TestSize.Level1)
 {
+    struct SensorInformation *g_sensorInfo = nullptr;
+
     int32_t ret = g_sensorDev->Register(SensorTestDataCallback);
+    EXPECT_EQ(0, ret);
+    ret = g_sensorDev->GetAllSensors(&g_sensorInfo, &g_count);
     EXPECT_EQ(0, ret);
     ret = g_sensorDev->SetBatch(SENSOR_ID, SENSOR_INTERVAL, SENSOR_POLL_TIME);
     EXPECT_EQ(0, ret);
