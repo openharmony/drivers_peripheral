@@ -159,8 +159,6 @@ if (defined(ohos_lite)) {
       ]
       deps += [
         "//third_party/tinyalsa:libtinyalsa",
-        "//third_party/tinyalsa:tinymix",
-        "//third_party/tinyalsa:tinyplay",
       ]
     }
 
@@ -214,8 +212,6 @@ if (defined(ohos_lite)) {
       ]
       deps += [
         "//third_party/tinyalsa:libtinyalsa",
-        "//third_party/tinyalsa:tinycap",
-        "//third_party/tinyalsa:tinymix",
       ]
     }
 
