@@ -157,11 +157,7 @@ if (defined(ohos_lite)) {
         "//third_party/tinyalsa/include",
         "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/include",
       ]
-      deps += [
-        "//third_party/tinyalsa:libtinyalsa",
-        "//third_party/tinyalsa:tinymix",
-        "//third_party/tinyalsa:tinyplay",
-      ]
+      deps += [ "//third_party/tinyalsa:libtinyalsa" ]
     }
 
     if (is_standard_system) {
@@ -212,11 +208,7 @@ if (defined(ohos_lite)) {
         "//third_party/tinyalsa/include",
         "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/include",
       ]
-      deps += [
-        "//third_party/tinyalsa:libtinyalsa",
-        "//third_party/tinyalsa:tinycap",
-        "//third_party/tinyalsa:tinymix",
-      ]
+      deps += [ "//third_party/tinyalsa:libtinyalsa" ]
     }
 
     if (is_standard_system) {
