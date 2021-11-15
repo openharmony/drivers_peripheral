@@ -157,9 +157,7 @@ if (defined(ohos_lite)) {
         "//third_party/tinyalsa/include",
         "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/include",
       ]
-      deps += [
-        "//third_party/tinyalsa:libtinyalsa",
-      ]
+      deps += [ "//third_party/tinyalsa:libtinyalsa" ]
     }
 
     if (is_standard_system) {
@@ -210,9 +208,7 @@ if (defined(ohos_lite)) {
         "//third_party/tinyalsa/include",
         "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/include",
       ]
-      deps += [
-        "//third_party/tinyalsa:libtinyalsa",
-      ]
+      deps += [ "//third_party/tinyalsa:libtinyalsa" ]
     }
 
     if (is_standard_system) {
