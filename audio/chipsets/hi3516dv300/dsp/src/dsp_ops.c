@@ -214,7 +214,7 @@ void DspSpiClose(DevHandle handle)
     OsalMemFree(handle);
     AUDIO_DRIVER_LOG_DEBUG("DspSpiClose success");
 }
-int32_t DspSpiTransfer(DevHandle handle, uint8_t *msgs, uint32_t count)
+int32_t DspSpiTransfer(DevHandle handle, const uint8_t *msgs, const uint32_t count)
 {
     if (handle == NULL || msgs == NULL || count == 0) {
         AUDIO_DRIVER_LOG_ERR("DspSpiTransfer fail");
@@ -223,7 +223,7 @@ int32_t DspSpiTransfer(DevHandle handle, uint8_t *msgs, uint32_t count)
     AUDIO_DRIVER_LOG_DEBUG("DspSpiTransfer success");
     return HDF_SUCCESS;
 }
-int32_t DspSpiRead(DevHandle handle, uint8_t *buf, uint32_t len)
+int32_t DspSpiRead(DevHandle handle, const uint8_t *buf, const uint32_t len)
 {
     if (handle == NULL || buf == NULL || len == 0) {
         AUDIO_DRIVER_LOG_ERR("DspSpiRead fail");
@@ -306,11 +306,10 @@ int32_t DspDeviceInit(const struct DspDevice *device)
     return HDF_SUCCESS;
 }
 
-int32_t DspDeviceReadReg(const struct DspDevice *device, uint8_t *buf, uint32_t len)
+int32_t DspDeviceReadReg(const struct DspDevice *device, const void *msgs, const uint32_t len)
 {
     int32_t ret;
-
-    if (buf == NULL || len == 0) {
+    if (msgs == NULL || len == 0) {
         AUDIO_DRIVER_LOG_ERR("input param is nullptr.");
         return HDF_FAILURE;
     }
@@ -321,7 +320,7 @@ int32_t DspDeviceReadReg(const struct DspDevice *device, uint8_t *buf, uint32_t 
         return HDF_FAILURE;
     }
 
-    ret = DspSpiRead(devHandle, buf, len);
+    ret = DspSpiRead(devHandle, msgs, len);
     if (ret != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("DspDeviceRead: spi failed!");
         DspSpiClose(devHandle);
@@ -333,11 +332,11 @@ int32_t DspDeviceReadReg(const struct DspDevice *device, uint8_t *buf, uint32_t 
     return HDF_SUCCESS;
 }
 
-int32_t DspDeviceWriteReg(const struct DspDevice *device, uint8_t *buf, uint32_t len)
+int32_t DspDeviceWriteReg(const struct DspDevice *device, const void *msgs, const uint32_t len)
 {
     int32_t ret;
 
-    if (buf == NULL || len == 0) {
+    if (msgs == NULL || len == 0) {
         AUDIO_DRIVER_LOG_ERR("input param is nullptr.");
         return HDF_FAILURE;
     }
@@ -348,7 +347,7 @@ int32_t DspDeviceWriteReg(const struct DspDevice *device, uint8_t *buf, uint32_t
         return HDF_FAILURE;
     }
 
-    ret = DspSpiTransfer(devHandle, buf, len);
+    ret = DspSpiTransfer(devHandle, msgs, len);
     if (ret != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("DspDeviceRead: spi failed!");
         DspSpiClose(devHandle);

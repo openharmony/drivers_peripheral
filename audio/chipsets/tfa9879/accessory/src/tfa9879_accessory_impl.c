@@ -78,11 +78,12 @@ static int32_t Tfa9879FormatParse(enum AudioFormat format, uint16_t *bitWidth)
     return HDF_SUCCESS;
 }
 
-static int32_t Tfa9879WorkStatusEnable() 
+static int32_t Tfa9879WorkStatusEnable()
 {
-    int ret, i;
-    struct AudioMixerControl *daiStartupParamsRegCfgItem;
-    uint32_t daiStartupParamsRegCfgItemCount;
+    int ret;
+    uint8_t i;
+    struct AudioMixerControl *daiStartupParamsRegCfgItem = NULL;
+    uint8_t daiStartupParamsRegCfgItemCount;
     ret = (g_accessoryTransferData.accessoryRegCfgGroupNode == NULL
         || g_accessoryTransferData.accessoryRegCfgGroupNode[AUDIO_DAI_STARTUP_PATAM_GROUP] == NULL
         || g_accessoryTransferData.accessoryRegCfgGroupNode[AUDIO_DAI_STARTUP_PATAM_GROUP]->regCfgItem == NULL);
@@ -94,7 +95,7 @@ static int32_t Tfa9879WorkStatusEnable()
         g_accessoryTransferData.accessoryRegCfgGroupNode[AUDIO_DAI_STARTUP_PATAM_GROUP]->regCfgItem;
     daiStartupParamsRegCfgItemCount =
         g_accessoryTransferData.accessoryRegCfgGroupNode[AUDIO_DAI_STARTUP_PATAM_GROUP]->itemNum;
-    for(i = 0; i < daiStartupParamsRegCfgItemCount; i++) {
+    for (i = 0; i < daiStartupParamsRegCfgItemCount; i++) {
         ret = AccessoryRegBitsUpdate(daiStartupParamsRegCfgItem[i]);
         if (ret != HDF_SUCCESS) {
             AUDIO_DEVICE_LOG_ERR("AccessoryRegBitsUpdate fail.");

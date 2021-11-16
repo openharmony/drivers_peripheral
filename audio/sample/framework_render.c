@@ -255,9 +255,9 @@ int32_t WavHeadAnalysis(FILE *file, struct AudioSampleAttributes *attrs)
         return HDF_FAILURE;
     }
     uint32_t ret;
-    char *audioRiffIdParam = "RIFF";
-    char *audioFileFmtParam = "WAVE";
-    char *aduioDataIdParam = "data";
+    const char *audioRiffIdParam = "RIFF";
+    const char *audioFileFmtParam = "WAVE";
+    const char *aduioDataIdParam = "data";
     ret = fread(&g_wavHeadInfo, sizeof(g_wavHeadInfo), 1, file);
     if (ret != 1) {
         return HDF_FAILURE;
@@ -444,7 +444,10 @@ int32_t FrameStartMmap(const AudioHandle param)
     }
     munmap(desc.memoryAddress, reqSize);
     fclose(fp);
-    (void)StopAudioFiles(&render);
+    ret = StopAudioFiles(&render);
+    if (ret < 0) {
+        LOG_FUN_ERR("StopAudioFiles File!");
+    }
     return HDF_SUCCESS;
 }
 
@@ -560,10 +563,10 @@ int32_t PlayingAudioFiles(struct AudioRender **renderS)
         FileClose(&g_file);
         return HDF_FAILURE;
     }
-    pthread_attr_t g_tidsAttr;
-    pthread_attr_init(&g_tidsAttr);
-    pthread_attr_setdetachstate(&g_tidsAttr, PTHREAD_CREATE_DETACHED);
-    if (pthread_create(&g_tids, &g_tidsAttr, (void *)(&FrameStart), &g_str) != 0) {
+    pthread_attr_t tidsAttr;
+    pthread_attr_init(&tidsAttr);
+    pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
+    if (pthread_create(&g_tids, &tidsAttr, (void *)(&FrameStart), &g_str) != 0) {
         LOG_FUN_ERR("Create Thread Fail");
         FileClose(&g_file);
         return HDF_FAILURE;
@@ -1197,7 +1200,7 @@ void Choice(void)
 
 int32_t main(int32_t argc, char const *argv[])
 {
-    if (argc < 2 || argv == NULL) { // The parameter number is not greater than 2
+    if (argc < 2 || argv == NULL || argv[0] == NULL) { // The parameter number is not greater than 2
         printf("usage:[1]%s [2]%s\n", argv[0], "/test/test.wav");
         return 0;
     }

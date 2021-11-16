@@ -17,7 +17,7 @@ extern "C" {
 #endif
 #endif /* __cplusplus */
 
-int32_t CodecDeviceInit(struct AudioCard *audioCard, struct CodecDevice *codec);
+int32_t CodecDeviceInit(struct AudioCard *audioCard, const struct CodecDevice *codec);
 int32_t CodecDaiDeviceInit(struct AudioCard *card, const struct DaiDevice *device);
 int32_t CodecDaiHwParams(const struct AudioCard *card, const struct AudioPcmHwParams *param);
 int32_t CodecDaiStartup(const struct AudioCard *card, const struct DaiDevice *device);

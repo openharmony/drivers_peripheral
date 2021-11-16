@@ -19,8 +19,8 @@ struct DspData g_dspData = {
     .DspInit = DspDeviceInit,
     .Read = DspDeviceReadReg,
     .Write = DspDeviceWriteReg,
-    .decode = DspDecodeAudioStream,
-    .encode = DspEncodeAudioStream,
+    .Decode = DspDecodeAudioStream,
+    .Encode = DspEncodeAudioStream,
     .Equalizer = DspEqualizerActive,
 };
 

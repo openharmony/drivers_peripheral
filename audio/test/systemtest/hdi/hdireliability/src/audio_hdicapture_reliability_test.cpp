@@ -26,7 +26,7 @@ const string ADAPTER_NAME_USB = "usb";
 const int PTHREAD_SAMEADA_COUNT = 3;
 const int PTHREAD_DIFFADA_COUNT = 1;
 const uint32_t SAMPLERATEVALUE = 48000;
-mutex testMutex;
+mutex g_testMutex;
 struct PrepareAudioPara g_para[PTHREAD_DIFFADA_COUNT] = {
     {
         .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC,
@@ -145,9 +145,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelGetAllAdapter(struct PrepareAudioPara
     if (ptr.manager == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    testMutex.lock();
+    g_testMutex.lock();
     ptr.manager->GetAllAdapters(ptr.manager, &ptr.descs, &size);
-    testMutex.unlock();
+    g_testMutex.unlock();
     if (ptr.descs == nullptr || size == 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     } else {
@@ -166,9 +166,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelLoadAdapter(struct PrepareAudioPara& 
     if (ptr.desc == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    testMutex.lock();
+    g_testMutex.lock();
     ptr.manager->LoadAdapter(ptr.manager, ptr.desc, &ptr.adapter);
-    testMutex.unlock();
+    g_testMutex.unlock();
     if (ptr.adapter == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -185,9 +185,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCreateCapture(struct PrepareAudi
     }
     InitAttrs(attrs);
     InitDevDesc(devDesc, ptr.audioPort->portId, ptr.pins);
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.adapter->CreateCapture(ptr.adapter, &devDesc, &attrs, &ptr.capture);
-    testMutex.unlock();
+    g_testMutex.unlock();
     if (ret < 0) {
         ptr.manager->UnloadAdapter(ptr.manager, ptr.adapter);
         return ret;
@@ -209,9 +209,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureStartAndCaputreFrame(stru
     }
     InitAttrs(attrs);
 
-    testMutex.lock();
+    g_testMutex.lock();
     ret = FrameStartCapture(ptr.capture, file, attrs);
-    testMutex.unlock();
+    g_testMutex.unlock();
     fclose(file);
     return ret;
 }
@@ -222,9 +222,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureSetMute(struct PrepareAud
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.capture->volume.SetMute(ptr.capture, ptr.character.setmute);
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -234,9 +234,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureGetMute(struct PrepareAud
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.capture->volume.GetMute(ptr.capture, &(ptr.character.getmute));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -246,9 +246,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureSetVolume(struct PrepareA
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.capture->volume.SetVolume(ptr.capture, ptr.character.setvolume);
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -258,9 +258,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureGetVolume(struct PrepareA
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.capture->volume.GetVolume(ptr.capture, &(ptr.character.getvolume));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -297,10 +297,10 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureGetGainThreshold(struct P
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.capture->volume.GetGainThreshold(ptr.capture, &(ptr.character.gainthresholdmin),
         &(ptr.character.gainthresholdmax));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -310,9 +310,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureSetGain(struct PrepareAud
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.capture->volume.SetGain(ptr.capture, ptr.character.setgain);
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -322,9 +322,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureGetGain(struct PrepareAud
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.capture->volume.GetGain(ptr.capture, &(ptr.character.getgain));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -334,9 +334,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureGetFrameSize(struct Prepa
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.capture->attr.GetFrameSize(ptr.capture, &(ptr.character.getframesize));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -346,9 +346,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureGetFrameCount(struct Prep
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.capture->attr.GetFrameCount(ptr.capture, &(ptr.character.getframecount));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -358,9 +358,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureGetCurrentChannelId(struc
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.capture->attr.GetCurrentChannelId(ptr.capture, &(ptr.character.getcurrentchannelId));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -370,9 +370,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureSetSampleAttributes(struc
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.capture->attr.SetSampleAttributes(ptr.capture, &(ptr.attrs));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -382,9 +382,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureGetSampleAttributes(struc
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.capture->attr.GetSampleAttributes(ptr.capture, &(ptr.attrsValue));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -394,9 +394,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureSelectScene(struct Prepar
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.capture->scene.SelectScene(ptr.capture, &(ptr.scenes));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 
@@ -406,9 +406,9 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureCheckSceneCapability(stru
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = -1;
-    testMutex.lock();
+    g_testMutex.lock();
     ret = ptr.capture->scene.CheckSceneCapability(ptr.capture, &ptr.scenes, &(ptr.character.supported));
-    testMutex.unlock();
+    g_testMutex.unlock();
     return ret;
 }
 

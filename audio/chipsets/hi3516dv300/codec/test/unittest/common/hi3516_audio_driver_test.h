@@ -9,9 +9,7 @@
 #ifndef HI3516_AUDIO_DRIVER_TEST_H
 #define HI3516_AUDIO_DRIVER_TEST_H
 
-#include "hdf_types.h"
-
-const int32_t G_TEST_HI3516_AUDIO_DRIVER_TYPE    = 702;
+const int G_TEST_HI3516_AUDIO_DRIVER_TYPE    = 702;
 
 typedef enum {
     TESTDAIDEVICEINIT,
@@ -62,6 +60,6 @@ typedef enum {
     TESTHI3516DMAPAUSE,
     TESTHI3516DMARESUME,
     TESTHI3516DMAPOINTER,
-}HdfHi3516AudioDriverTestCmd;
+} HdfHi3516AudioDriverTestCmd;
 
 #endif /* HI3516_AUDIO_DRIVER_TEST_H */
