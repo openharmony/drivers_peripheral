@@ -50,7 +50,7 @@
 #define FILE_CAPTURE_SIZE (1024 * 1024 * 3) // 3M
 #define BUFFER_LEN 256
 #define EXT_PARAMS_MAXLEN 107
-
+#define ONE_MS 1000
 
 struct StrParaCapture {
     struct AudioCapture *capture;
@@ -321,28 +321,27 @@ int32_t FrameStartCapture(const AudioHandle param)
     struct StrParaCapture *strParam = (struct StrParaCapture *)param;
     struct AudioCapture *capture = strParam->capture;
     FILE *file = strParam->file;
-    int32_t ret;
     uint32_t bufferSize = AUDIO_BUFF_SIZE;   // 16 * 1024 = 16KB, it needs to be calculated by audio parameters
     uint64_t replyBytes = 0;
     uint64_t totalSize = 0;
     uint64_t requestBytes = AUDIO_BUFF_SIZE; // 16 * 1024 = 16KB
     uint32_t failCount = 0;
+    if (capture == NULL || capture->CaptureFrame == NULL || file == NULL) {
+        return HDF_FAILURE;
+    }
     char *frame = (char *)calloc(1, bufferSize);
     if (frame == NULL) {
         return HDF_FAILURE;
     }
-    if (capture == NULL || capture->CaptureFrame == NULL || file == NULL) {
-        free(frame);
-        return HDF_FAILURE;
-    }
     do {
-        ret = capture->CaptureFrame(capture, frame, requestBytes, &replyBytes);
+        int32_t ret = capture->CaptureFrame(capture, frame, requestBytes, &replyBytes);
         if (ret < 0) {
             if (ret == HDF_ERR_INVALID_OBJECT) {
                 LOG_FUN_ERR("Record already stop!");
                 break;
             }
-            if (failCount++ >= 10) { // Frame loss for 10 consecutive times
+            usleep(ONE_MS);
+            if (failCount++ >= 300000) { // Try 300000 times for CaptureFrame fail
                 free(frame);
                 return HDF_FAILURE;
             }
@@ -358,7 +357,6 @@ int32_t FrameStartCapture(const AudioHandle param)
     if (frame != NULL) {
         free(frame);
     }
-    printf("Record end\n");
     if (!g_closeEnd) {
         if (StopButtonCapture(&g_capture) < 0) {
             return HDF_FAILURE;
@@ -409,10 +407,10 @@ int32_t StartButtonCapture(struct AudioCapture **captureS)
     g_str.file = g_file;
     g_str.attrs = g_attrs;
     g_str.frame = g_frame;
-    pthread_attr_t g_tidsAttr;
-    pthread_attr_init(&g_tidsAttr);
-    pthread_attr_setdetachstate(&g_tidsAttr, PTHREAD_CREATE_DETACHED);
-    ret = pthread_create(&g_tids, &g_tidsAttr, (void *)(&FrameStartCapture), &g_str);
+    pthread_attr_t tidsAttr;
+    pthread_attr_init(&tidsAttr);
+    pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
+    ret = pthread_create(&g_tids, &tidsAttr, (void *)(&FrameStartCapture), &g_str);
     if (ret != 0) {
         return HDF_FAILURE;
     }
@@ -1059,7 +1057,7 @@ void Choice()
 
 int32_t CheckAndOpenFile(int32_t argc, char const *argv[])
 {
-    if (argc < 2 || argv == NULL) { // The parameter number is not greater than 2
+    if (argc < 2 || argv == NULL || argv[0] == NULL) { // The parameter number is not greater than 2
         printf("usage:[1]%s [2]%s\n", argv[0], "/data/test.wav");
         return HDF_FAILURE;
     }

@@ -82,7 +82,7 @@ int32_t CodecRegBitsUpdate(struct AudioMixerControl regAttr)
 int32_t CodecRegDefaultInit(struct AudioRegCfgGroupNode **regCfgGroup)
 {
     int32_t i;
-    struct AudioAddrConfig *regAttr;
+    struct AudioAddrConfig *regAttr = NULL;
     if (g_regAcodecBase == NULL || regCfgGroup == NULL || regCfgGroup[AUDIO_INIT_GROUP] == NULL ||
         regCfgGroup[AUDIO_INIT_GROUP]->addrCfgItem == NULL || regCfgGroup[AUDIO_INIT_GROUP]->itemNum <= 0) {
         AUDIO_DEVICE_LOG_ERR("input invalid parameter.");
@@ -90,7 +90,7 @@ int32_t CodecRegDefaultInit(struct AudioRegCfgGroupNode **regCfgGroup)
     }
     regAttr = regCfgGroup[AUDIO_INIT_GROUP]->addrCfgItem;
 
-    for(i = 0; i < regCfgGroup[AUDIO_INIT_GROUP]->itemNum; i++) {
+    for (i = 0; i < regCfgGroup[AUDIO_INIT_GROUP]->itemNum; i++) {
         SysWritel((uintptr_t)g_regAcodecBase + regAttr[i].addr, regAttr[i].value);
     }
     AUDIO_DEVICE_LOG_DEBUG("success.");
@@ -174,8 +174,8 @@ int32_t CodecDaiParamsUpdate(struct AudioRegCfgGroupNode **regCfgGroup,
     struct CodecDaiParamsVal codecDaiParamsVal)
 {
     int32_t ret;
-    const int itemNum = 3; // current only 3 items(frequency, adc_mode_sel, i2s_datawith)
-    struct AudioMixerControl *regAttr;
+    const int itemNum = 3; // current only 3 items
+    struct AudioMixerControl *regAttr = NULL;
     uint16_t codecBitWidth;
 
     ret = (g_regAcodecBase == NULL || regCfgGroup == NULL
@@ -219,7 +219,7 @@ int32_t CodecDaiParamsUpdate(struct AudioRegCfgGroupNode **regCfgGroup,
 int32_t CodecSetAdcTuneEnable(struct AudioRegCfgGroupNode **regCfgGroup)
 {
     int32_t ret;
-    struct AudioMixerControl *regAttr;
+    struct AudioMixerControl *regAttr = NULL;
     const int itemNum = 1;
     ret = (regCfgGroup == NULL || regCfgGroup[AUDIO_DAI_STARTUP_PATAM_GROUP] == NULL
         || regCfgGroup[AUDIO_DAI_STARTUP_PATAM_GROUP]->regCfgItem == NULL

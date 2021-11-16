@@ -392,9 +392,32 @@ int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct
     return HDF_SUCCESS;
 }
 
+
+int32_t BindServiceRenderOpen(struct AudioHwRender *hwRender,
+    InterfaceLibModeRenderSo *pInterfaceLibModeRender)
+{
+    if (hwRender == NULL || hwRender->devDataHandle == NULL ||
+        pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
+        LOG_FUN_ERR("Input para is null!");
+        return HDF_FAILURE;
+    }
+    /* render open */
+    if (hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId < AUDIO_SERVICE_PORTID_FLAG) {
+        hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
+    } else {
+        hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_OUT;
+    }
+    int32_t ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle,
+        &hwRender->renderParam, AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN);
+    if (ret < 0) {
+        LOG_FUN_ERR("AudioRender render open FAIL");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
 {
-    LOG_FUN_INFO();
     int32_t ret;
     if (hwRender == NULL || hwRender->devDataHandle == NULL || hwRender->devCtlHandle == NULL) {
         return HDF_FAILURE;
@@ -404,15 +427,7 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
         LOG_FUN_ERR("InterfaceLibModeRender not exist");
         return HDF_FAILURE;
     }
-    /* render open */
-    if (hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId < AUDIO_SERVICE_PORTID_FLAG) {
-        hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
-    } else {
-        hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_OUT;
-    }
-    ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN);
-    if (ret < 0) {
-        LOG_FUN_ERR("AudioRender render open FAIL");
+    if (BindServiceRenderOpen(hwRender, pInterfaceLibModeRender)) {
         return HDF_FAILURE;
     }
 #ifndef AUDIO_HAL_USER
@@ -426,11 +441,9 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
     /* Init RenderPathSelect send first */
     /* portId small than  AUDIO_SERVICE_PORTID_FLAG shoud SceneSelect */
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
-    uint32_t portId = hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId;
-    bool needSceneSelect = (portId < AUDIO_SERVICE_PORTID_FLAG) ? true : false;
-    if (needSceneSelect) {
+    if (hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId < AUDIO_SERVICE_PORTID_FLAG) {
         ret = (*pInterfaceLibModeRender)(hwRender->devCtlHandle, &hwRender->renderParam,
-               AUDIODRV_CTL_IOCTL_SCENESELECT_WRITE);
+            AUDIODRV_CTL_IOCTL_SCENESELECT_WRITE);
         if (ret < 0) {
             LOG_FUN_ERR("SetParams FAIL!");
             return HDF_FAILURE;

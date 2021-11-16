@@ -8,11 +8,8 @@
 
 #include "hi3516_codec_ops.h"
 #include "audio_sapm.h"
-#include "hi3516_aiao_impl.h"
+#include "audio_platform_base.h"
 #include "hi3516_codec_impl.h"
-#include "osal_io.h"
-#include "osal_irq.h"
-#include "audio_parse.h"
 #include "audio_driver_log.h"
 #include "audio_codec_base.h"
 
@@ -29,7 +26,7 @@ static const struct AudioSapmRoute g_audioRoutes[] = {
     { "RPGA", "RPGA MIC Switch", "MIC"},
 };
 
-int32_t CodecDeviceInit(struct AudioCard *audioCard, struct CodecDevice *codec)
+int32_t CodecDeviceInit(struct AudioCard *audioCard, const struct CodecDevice *codec)
 {
     if (audioCard == NULL || codec == NULL || codec->devData == NULL ||
         codec->devData->sapmComponents == NULL || codec->devData->controls == NULL) {
@@ -105,10 +102,14 @@ int32_t CodecDaiHwParams(const struct AudioCard *card, const struct AudioPcmHwPa
         AUDIO_DRIVER_LOG_ERR("input para is NULL.");
         return HDF_FAILURE;
     }
+
+    (void)memset_s(&bitWidth, sizeof(unsigned int), 0, sizeof(unsigned int));
     int ret = AudioFramatToBitWidth(param->format, &bitWidth);
     if (ret != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
+
+    (void)memset_s(&codecDaiParamsVal, sizeof(struct CodecDaiParamsVal), 0, sizeof(struct CodecDaiParamsVal));
     codecDaiParamsVal.frequencyVal = param->rate;
     codecDaiParamsVal.formatVal = bitWidth;
     ret = CodecDaiParamsUpdate(card->rtd->codecDai->devData->regCfgGroup, codecDaiParamsVal);

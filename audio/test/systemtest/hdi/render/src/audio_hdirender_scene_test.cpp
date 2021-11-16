@@ -57,6 +57,7 @@ public:
     static void (*SdkExit)();
     static void *sdkSo;
 #endif
+    static int32_t GetManager(struct PrepareAudioPara& audiopara);
 };
 
 using THREAD_FUNC = void *(*)(void *);
@@ -129,6 +130,17 @@ void AudioHdiRenderSceneTest::SetUp(void) {}
 
 void AudioHdiRenderSceneTest::TearDown(void) {}
 
+int32_t AudioHdiRenderSceneTest::GetManager(struct PrepareAudioPara& audiopara)
+{
+    auto *inst = (AudioHdiRenderSceneTest *)audiopara.self;
+    if (inst != nullptr && inst->GetAudioManager != nullptr) {
+        audiopara.manager = inst->GetAudioManager();
+    }
+    if (audiopara.manager == nullptr) {
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
 /**
 * @tc.name   Test AudioRenderCheckSceneCapability API and check scene's capability
 * @tc.number  SUB_Audio_HDI_RenderCheckSceneCapability_0001
@@ -468,6 +480,74 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderRegCallback_0002, Tes
     adapter->DestroyRender(adapter, render);
     manager->UnloadAdapter(manager, adapter);
     fclose(file);
+}
+/**
+* @tc.name  Test AudioRenderTurnStandbyMode API via
+* @tc.number  SUB_Audio_HDI_AudioRenderTurnStandbyMode_0001
+* @tc.desc  Test AudioRenderTurnStandbyMode interface,return 0 if the interface use correctly.
+* @tc.author: ZHANGHAILIN
+*/
+HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderTurnStandbyMode_0001, TestSize.Level1)
+{
+    int32_t ret = -1;
+    struct AudioAdapter *adapter = nullptr;
+    struct AudioRender *render = nullptr;
+    ASSERT_NE(GetAudioManager, nullptr);
+    TestAudioManager* manager = GetAudioManager();
+    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+
+    ret = render->control.TurnStandbyMode((AudioHandle)render);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+
+    sleep(3);
+
+    ret = render->control.Stop((AudioHandle)render);
+    adapter->DestroyRender(adapter, render);
+    manager->UnloadAdapter(manager, adapter);
+}
+/**
+* @tc.name  Test AudioRenderAudioDevDump API via
+* @tc.number  SUB_Audio_HDI_AudioRenderAudioDevDump_0001
+* @tc.desc  Test AudioRenderAudioDevDump interface,return 0 if the interface use correctly.
+* @tc.author: ZHANGHAILIN
+*/
+HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderAudioDevDump_0001, TestSize.Level1)
+{
+    int32_t ret = -1;
+    char pathBuf[] = "./DevDump.log";
+    FILE *fp = fopen(pathBuf, "wb+");
+    ASSERT_NE(nullptr, fp);
+    int fd = fileno(fp);
+    if (fd == -1) {
+        fclose(fp);
+        ASSERT_NE(fd, -1);
+    }
+    struct PrepareAudioPara audiopara = {
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .path = AUDIO_FILE.c_str()
+    };
+    ret = GetManager(audiopara);
+    if (ret < 0) {
+        fclose(fp);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    }
+    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
+    if (ret < 0) {
+        fclose(fp);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    }
+    sleep(1);
+    ret = audiopara.render->control.Pause((AudioHandle)audiopara.render);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    sleep(1);
+    ret = audiopara.render->control.Resume((AudioHandle)audiopara.render);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    ret = audiopara.render->control.AudioDevDump((AudioHandle)audiopara.render, RANGE, fd);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    fclose(fp);
+    ret = ThreadRelease(audiopara);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 #endif
 }
