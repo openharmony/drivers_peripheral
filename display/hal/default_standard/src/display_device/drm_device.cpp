@@ -102,7 +102,7 @@ int32_t DrmDevice::GetPlaneProperty(const DrmPlane &plane, const std::string &na
     return GetProperty(plane.GetId(), DRM_MODE_OBJECT_PLANE, name, prop);
 }
 
-int32_t DrmDevice::GetProperty(const uint32_t objId, uint32_t objType, const std::string &name, DrmProperty &prop)
+int32_t DrmDevice::GetProperty(uint32_t objId, uint32_t objType, const std::string &name, DrmProperty &prop)
 {
     drmModeObjectPropertiesPtr props = drmModeObjectGetProperties(GetDrmFd(), objId, objType);
     DISPLAY_CHK_RETURN((!props), DISPLAY_FAILURE, DISPLAY_LOGE("can not get properties"));
@@ -235,31 +235,31 @@ void DrmDevice::FindAllPlane()
 
 std::shared_ptr<DrmEncoder> DrmDevice::GetDrmEncoderFromId(uint32_t id)
 {
-    int32_t ret = DISPLAY_FAILURE;
     auto iter = mEncoders.find(id);
     if (iter == mEncoders.end()) {
-        ret = DISPLAY_SUCCESS;
+        return iter->second;
     }
+    DISPLAY_LOGE("get drm encoder fail");
     return nullptr;
 }
 
 std::shared_ptr<DrmConnector> DrmDevice::GetDrmConnectorFromId(uint32_t id)
 {
-    int32_t ret = DISPLAY_FAILURE;
     auto iter = mConnectors.find(id);
     if (iter == mConnectors.end()) {
-        ret = DISPLAY_SUCCESS;
+        return iter->second;
     }
+    DISPLAY_LOGE("get drm connector fail");
     return nullptr;
 }
 
 std::shared_ptr<DrmCrtc> DrmDevice::GetDrmCrtcFromId(uint32_t id)
 {
-    int32_t ret = DISPLAY_FAILURE;
     auto iter = mCrtcs.find(id);
     if (iter == mCrtcs.end()) {
-        ret = DISPLAY_SUCCESS;
+        return iter->second;
     }
+    DISPLAY_LOGE("get drm crtc fail");
     return nullptr;
 }
 

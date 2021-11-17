@@ -202,7 +202,6 @@ static int32_t GetDisplayReleaseFence(uint32_t devId, uint32_t *num, uint32_t *l
     DISPLAY_LOGD();
     return HdiSession::GetInstance().CallDisplayFunction(devId, &HdiDisplay::GetDisplayReleaseFence, num, layers,
         fences);
-    return DISPLAY_NOT_SUPPORT;
 }
 
 static int32_t Commit(uint32_t devId, int32_t *fence)
