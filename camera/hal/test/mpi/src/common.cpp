@@ -104,8 +104,11 @@ int32_t Test::SaveYUV(const char* type, const void* buffer, int32_t size)
         }
     }
 #endif
+    char checkPath[PATH_MAX] = {0};
+    if (::realpath(path, checkPath) == nullptr) {
+        return 0;
+    }
     std::cout << "save yuv to file:" << path << std::endl;
-
     int imgFd = open(path, O_RDWR | O_CREAT | O_APPEND, 00766); // 00766:file jurisdiction
     if (imgFd == -1) {
         std::cout << "open file failed, errno = " << strerror(errno) << std::endl;
@@ -142,6 +145,10 @@ int32_t Test::SaveVideoFile(const char* type, const void* buffer, int32_t size, 
             return 0;
         }
 #endif
+        char checkPath[PATH_MAX] = {0};
+        if (::realpath(path, checkPath) == nullptr) {
+            return 0;
+        }
         CAMERA_LOGI("%{public}s, save yuv to file %{public}s", __FUNCTION__, path);
         videoFd = open(path, O_RDWR | O_CREAT, 00766); // 00766:file jurisdiction
         if (videoFd == -1) {

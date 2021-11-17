@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file expected in compliance with the License.
  * You may obtain a copy of the License at
@@ -197,7 +197,7 @@ HWTEST_F(StabilityTest, Camera_Stability_Video_0002, TestSize.Level3)
 {
     std::cout << "==========[test log]Check video: Dynamic Video start&stop, for 100 times, success." << std::endl;
     for (int i = 0; i < 100; i++) {
-    	// Turn on the camera
+        // Turn on the camera
         Test_->Open();
         std::cout << "Running " << i << " time" << std::endl;
         // start preview stream

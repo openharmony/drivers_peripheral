@@ -29,10 +29,10 @@ public:
     static BufferManager* GetInstance();
 
     // generate a random id for buffer pool.
-    int64_t GenerateBufferPoolId();
+    uint64_t GenerateBufferPoolId();
 
     // get a buffer pool from id.
-    std::shared_ptr<IBufferPool> GetBufferPool(int64_t id);
+    std::shared_ptr<IBufferPool> GetBufferPool(uint64_t id);
 
 private:
     BufferManager() = default;

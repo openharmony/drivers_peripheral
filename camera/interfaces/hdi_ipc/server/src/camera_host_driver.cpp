@@ -21,9 +21,9 @@
 
 #define HDF_LOG_TAG camera_service
 
-using HdfCameraService = struct _HdfCameraService {
+struct HdfCameraService {
     struct IDeviceIoService ioservice;
-    void *instance;
+    void *instance = nullptr;
 };
 
 static int32_t CameraServiceDispatch(struct HdfDeviceIoClient *client, int cmdId,
@@ -65,12 +65,12 @@ int HdfCameraHostDriverBind(HdfDeviceObject *deviceObject)
 void HdfCameraHostDriverRelease(HdfDeviceObject *deviceObject)
 {
     if (deviceObject == nullptr || deviceObject->service == nullptr) {
-        HDF_LOGE("HdfCameraHostDriverRelease： deviceObject or deviceObject->service  is NULL!");
+        HDF_LOGE("%{public}s deviceObject or deviceObject->service  is NULL!", __FUNCTION__);
         return;
     }
     HdfCameraService *hdfCameraService = CONTAINER_OF(deviceObject->service, HdfCameraService, ioservice);
     if (hdfCameraService == nullptr) {
-        HDF_LOGE("HdfCameraHostDriverRelease： hdfCameraService is NULL!");
+        HDF_LOGE("%{public}s hdfCameraService is NULL!", __FUNCTION__);
         return;
     }
     OsalMemFree(hdfCameraService);
