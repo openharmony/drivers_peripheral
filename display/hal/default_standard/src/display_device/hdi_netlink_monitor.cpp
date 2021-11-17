@@ -64,6 +64,8 @@ Void HdiNetLinkMonitor::MonitorThread()
         recv(mScoketFd, &buf, sizeof(buf), 0);
     }
 }
-
+} // DISPLAY
+} // HDI
+} // OHOS
 
 #endif // HDI_NETLINK_NONITOR_H

@@ -328,7 +328,7 @@ int32_t GrallocAllocTest::AllocMemTest(AllocTestPrms &info)
     return DISPLAY_SUCCESS;
 }
 
-TEST(GrallocAllocTestm, NULLPTR)
+TEST(GrallocAllocTest, NULLPTR)
 {
     int ret = GrallocInitialize(nullptr);
     ASSERT_TRUE(ret != DISPLAY_SUCCESS);

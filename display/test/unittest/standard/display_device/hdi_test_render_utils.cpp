@@ -31,8 +31,7 @@ void SetUint32(uint32_t &dst, uint32_t value)
 void SetPixel(const BufferHandle &handle, int x, int y, uint32_t color)
 {
     constexpr int32_t pixelBytes = 4;
-    constexpr int32_t bpp = 32;
-    DISPLAY_TEST_CHK_RETURN_NOT_VALUE((bpp <= 0),
+    DISPLAY_TEST_CHK_RETURN_NOT_VALUE((handle.format <= 0),
         DISPLAY_TEST_LOGE("CheckPixel do not support format %d", handle.format));
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((handle.virAddr == nullptr),
         DISPLAY_TEST_LOGE("CheckPixel viraddr is null must map it"));
