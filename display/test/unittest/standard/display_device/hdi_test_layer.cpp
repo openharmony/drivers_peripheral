@@ -40,12 +40,10 @@ HdiGrallocBuffer::HdiGrallocBuffer(uint32_t w, uint32_t h, PixelFormat fmt)
 
 HdiGrallocBuffer::~HdiGrallocBuffer()
 {
-    int ret;
-
     if (mBufferHandle != nullptr) {
         GrallocFuncs &gralloc = HdiTestDevice::GetInstance().GetGrallocFuncs();
         if (mBufferHandle->virAddr != nullptr) {
-            ret = gralloc.Unmap(mBufferHandle);
+            int ret = gralloc.Unmap(mBufferHandle);
             if (ret != DISPLAY_SUCCESS) {
                 DISPLAY_TEST_LOGE("can not ummap buffer handle");
             }

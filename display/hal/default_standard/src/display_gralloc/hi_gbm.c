@@ -115,8 +115,8 @@ struct gbm_bo *hdi_gbm_bo_create(struct gbm_device *gbm, uint32_t width, uint32_
     const FormatInfo *fmtInfo = GetFormatInfo(format);
     DISPLAY_CHK_RETURN((fmtInfo == NULL), NULL, DISPLAY_LOGE("formt: 0x%{public}x can not get layout info", format));
     bo = (struct gbm_bo *)calloc(1, sizeof(struct gbm_bo));
-    (void)memset_s(bo, sizeof(struct gbm_bo), 0, sizeof(struct gbm_bo));
     DISPLAY_CHK_RETURN((bo == NULL), NULL, DISPLAY_LOGE("gbm bo create fialed no memery"));
+    (void)memset_s(bo, sizeof(struct gbm_bo), 0, sizeof(struct gbm_bo));
     bo->width = width;
     bo->height = height;
     bo->gbm = gbm;
