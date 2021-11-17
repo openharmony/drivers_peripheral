@@ -18,7 +18,6 @@
 #include <queue>
 #include "display_gralloc.h"
 #include "display_layer.h"
-#include "hdi_test_device.h"
 
 namespace OHOS {
 namespace HDI {

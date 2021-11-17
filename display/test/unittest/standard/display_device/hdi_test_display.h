@@ -20,7 +20,6 @@
 #include "display_gralloc.h"
 #include "display_type.h"
 #include "display_test.h"
-#include "hdi_test_device.h"
 #include "hdi_test_device_common.h"
 #include "hdi_test_layer.h"
 

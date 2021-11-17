@@ -97,9 +97,9 @@ int32_t HdiLayer::SetLayerSize(IRect *rect)
 
 int32_t HdiLayer::SetLayerCrop(IRect *rect)
 {
+    DISPLAY_CHK_RETURN((rect == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("in rect is nullptr"));
     DISPLAY_LOGD("id : %{public}d crop x: %{public}d y : %{public}d w : %{public}d h : %{public}d", mId, rect->x,
         rect->y, rect->w, rect->h);
-    DISPLAY_CHK_RETURN((rect == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("in rect is nullptr"));
     mCrop = *rect;
     return DISPLAY_SUCCESS;
 }
