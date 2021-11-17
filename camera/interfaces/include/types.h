@@ -50,32 +50,32 @@ enum CamRetCode : int32_t {
     /**
      * The camera device is busy.
      */
-    CAMERA_BUSY = 1,
+    CAMERA_BUSY = -1,
 
     /**
      * Insufficient resources.
      */
-    INSUFFICIENT_RESOURCES = 2,
+    INSUFFICIENT_RESOURCES = -2,
 
     /**
      * Invalid parameters.
      */
-    INVALID_ARGUMENT = 3,
+    INVALID_ARGUMENT = -3,
 
     /**
      * Unsupported function.
      */
-    METHOD_NOT_SUPPORTED = 4,
+    METHOD_NOT_SUPPORTED = -4,
 
     /**
      * The camera device is closed.
      */
-    CAMERA_CLOSED = 5,
+    CAMERA_CLOSED = -5,
 
     /**
      * A critical error occurs at the driver layer.
      */
-    DEVICE_ERROR = 6,
+    DEVICE_ERROR = -6,
 };
 
 /**
