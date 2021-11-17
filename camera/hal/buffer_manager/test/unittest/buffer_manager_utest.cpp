@@ -678,7 +678,7 @@ bool BufferManagerTest::Pipeline::BuildPipeline()
     if (sourceNode_ == nullptr) {
         return false;
     }
-    BufferTracking::AddTrackingNode(0, sourceNode_->name_);
+    BufferTracking::AddTrackingNode(0, sourceNode_->GetName());
     std::shared_ptr<Node> tmpNode = sourceNode_;
     for (int i = 1; i < 9; i++) { // 9: numbers of node
         std::string name = "node";
@@ -686,7 +686,7 @@ bool BufferManagerTest::Pipeline::BuildPipeline()
         auto n = std::make_shared<Node>(name);
         tmpNode->Connect(n);
         tmpNode = n;
-        BufferTracking::AddTrackingNode(0, tmpNode->name_);
+        BufferTracking::AddTrackingNode(0, tmpNode->GetName());
     }
 
     auto sinkNode = std::make_shared<SinkNode>(std::string("SinkNode"));
@@ -696,7 +696,7 @@ bool BufferManagerTest::Pipeline::BuildPipeline()
     sinkNode->BindCallback([this](std::shared_ptr<IBuffer>& buffer) { localStream_->stream_->DequeueBuffer(buffer); });
     std::shared_ptr<Node> node = sinkNode;
     tmpNode->Connect(node);
-    BufferTracking::AddTrackingNode(0, sinkNode->name_);
+    BufferTracking::AddTrackingNode(0, sinkNode->GetName());
     BufferTracking::AddTrackingStreamEnd(0);
 
     return true;
@@ -786,6 +786,11 @@ void BufferManagerTest::Node::Receive(std::shared_ptr<IBuffer>& buffer)
     PIPELINE_REPORT_BUFFER_LOCATION(0, buffer->GetFrameNumber(), name_);
     Process(buffer);
     return;
+}
+
+std::string BufferManagerTest::Node::GetName() const
+{
+    return name_;
 }
 
 void BufferManagerTest::Node::Process(std::shared_ptr<IBuffer>& buffer)

@@ -46,11 +46,11 @@ StreamBase::~StreamBase()
     }
 
     if (hostStreamMgr_ != nullptr) {
-        hostStreamMgr_->DestroyHostStream( {streamId_} );
+        hostStreamMgr_->DestroyHostStream({streamId_});
     }
 
     if (pipeline_ != nullptr) {
-        pipeline_->DestroyPipeline( {streamId_} );
+        pipeline_->DestroyPipeline({streamId_});
     }
 }
 
@@ -100,7 +100,7 @@ RetCode StreamBase::CommitStream()
         CHECK_IF_PTR_NULL_RETURN_VALUE(mgr, RC_ERROR);
 
         if (bufferPool_ == nullptr) {
-            poolId_ = static_cast<uint64_t>(mgr->GenerateBufferPoolId());
+            poolId_ = mgr->GenerateBufferPoolId();
             CHECK_IF_EQUAL_RETURN_VALUE(poolId_, 0, RC_ERROR);
             bufferPool_ = mgr->GetBufferPool(poolId_);
             if (bufferPool_ == nullptr) {

@@ -17,10 +17,10 @@
 #define CAMERA_TYPE_COMMON_H
 
 namespace OHOS {
-    template <typename T>
+    template<typename T>
     using sptr = std::shared_ptr<T>;
 
-    template <typename T>
+    template<typename T>
     using wptr = std::weak_ptr<T>;
 
     using IBufferProducer = Surface;

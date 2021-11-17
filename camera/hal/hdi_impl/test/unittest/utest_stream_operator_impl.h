@@ -75,7 +75,7 @@ public:
             }
         }
 
-    public:
+    private:
         bool running_ = true;
         std::shared_ptr<OHOS::Surface> consumer_ = nullptr;
         std::thread* consumerThread_ = nullptr;
@@ -131,7 +131,7 @@ public:
             }
         }
 
-    public:
+    private:
         bool running_ = true;
         OHOS::sptr<OHOS::Surface> consumer_ = nullptr;
         std::thread* consumerThread_ = nullptr;

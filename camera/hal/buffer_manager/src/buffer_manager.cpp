@@ -24,13 +24,13 @@ BufferManager* BufferManager::GetInstance()
     return &manager;
 }
 
-int64_t BufferManager::GenerateBufferPoolId()
+uint64_t BufferManager::GenerateBufferPoolId()
 {
     std::lock_guard<std::mutex> l(lock_);
 
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    int64_t id = tv.tv_sec * 1000 * 1000 + tv.tv_usec; // 1000:√ÎªªÀ„≥…Œ¢√Î
+    uint64_t id = static_cast<uint64_t>(tv.tv_sec) * 1000 * 1000 + tv.tv_usec; // 1000:usec
 
     std::shared_ptr<IBufferPool> bufferPool = nullptr;
     bufferPoolMap_[id] = bufferPool;
@@ -38,7 +38,7 @@ int64_t BufferManager::GenerateBufferPoolId()
     return id;
 }
 
-std::shared_ptr<IBufferPool> BufferManager::GetBufferPool(int64_t id)
+std::shared_ptr<IBufferPool> BufferManager::GetBufferPool(uint64_t id)
 {
     std::lock_guard<std::mutex> l(lock_);
 

@@ -22,10 +22,10 @@
 class IPCCameraDeviceRemoteFuzzer : public CameraDeviceStub {
 public:
     virtual CamRetCode GetStreamOperator(const OHOS::sptr<IStreamOperatorCallback> &callback,
-        OHOS::sptr<IStreamOperator> &streamOperator) override
-        {
-            return OHOS::Camera::NO_ERROR;
-        }
+    OHOS::sptr<IStreamOperator> &streamOperator) override
+    {
+        return OHOS::Camera::NO_ERROR;
+    }
     virtual CamRetCode UpdateSettings(const std::shared_ptr<CameraSetting> &settings) override
     {
         return OHOS::Camera::NO_ERROR;

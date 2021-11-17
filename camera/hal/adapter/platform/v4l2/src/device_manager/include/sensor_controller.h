@@ -51,7 +51,7 @@ private:
     RetCode GetSensorMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
     RetCode GetAEMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
     RetCode GetAWBMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
-    template <typename T>
+    template<typename T>
     bool CheckNumequal(T oldnum, T num, int size)
     {
         if (oldnum == nullptr || num == nullptr) {

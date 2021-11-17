@@ -233,7 +233,7 @@ static void ManuList(const std::shared_ptr<HosCameraDemo>& mainDemo,
             case 'q':
                 PreviewOff(mainDemo);
                 mainDemo->QuitDemo();
-                exit(EXIT_SUCCESS);
+                return;
 
             default:
                 CAMERA_LOGE("main test: command error please retry input command");
