@@ -236,7 +236,7 @@ void DrmDevice::FindAllPlane()
 std::shared_ptr<DrmEncoder> DrmDevice::GetDrmEncoderFromId(uint32_t id)
 {
     auto iter = mEncoders.find(id);
-    if (iter == mEncoders.end()) {
+    if (iter != mEncoders.end()) {
         return iter->second;
     }
     DISPLAY_LOGE("get drm encoder fail");
@@ -246,7 +246,7 @@ std::shared_ptr<DrmEncoder> DrmDevice::GetDrmEncoderFromId(uint32_t id)
 std::shared_ptr<DrmConnector> DrmDevice::GetDrmConnectorFromId(uint32_t id)
 {
     auto iter = mConnectors.find(id);
-    if (iter == mConnectors.end()) {
+    if (iter != mConnectors.end()) {
         return iter->second;
     }
     DISPLAY_LOGE("get drm connector fail");
@@ -256,7 +256,7 @@ std::shared_ptr<DrmConnector> DrmDevice::GetDrmConnectorFromId(uint32_t id)
 std::shared_ptr<DrmCrtc> DrmDevice::GetDrmCrtcFromId(uint32_t id)
 {
     auto iter = mCrtcs.find(id);
-    if (iter == mCrtcs.end()) {
+    if (iter != mCrtcs.end()) {
         return iter->second;
     }
     DISPLAY_LOGE("get drm crtc fail");
