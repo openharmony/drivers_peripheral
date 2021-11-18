@@ -26,13 +26,7 @@ if (defined(ohos_lite)) {
     deps += [ "${chipset_build_deps}" ]
   }
   group("camera_hal_lite_unittest") {
-    deps = [
-      "buffer_manager/test:camera_hal_buffer_manager_unittest",
-      "device_manager/test:camera_hal_device_manager_unittest",
-      "hdi_impl/test:camera_hal_hdi_impl_unittest",
-      "pipeline_core/test:camera_hal_pipeline_core_unittest",
-      "test/mpi:camera_case_liteos",
-    ]
+    deps = []
   }
 } else {
   print("product_name : , ${product_name}")
