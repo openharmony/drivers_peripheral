@@ -176,6 +176,7 @@ public:
 class HdiHostCallback : public CameraHostCallback {
 public:
     Test *test_;
+    virtual ~HdiHostCallback() = default;
     HdiHostCallback(Test *test)
     {
         test_ = test;
@@ -192,6 +193,7 @@ public:
 class HdiDeviceCallback : public CameraDeviceCallback {
 public:
     Test *test_;
+    virtual ~HdiDeviceCallback() = default;
     HdiDeviceCallback(Test *test)
     {
         test_ = test;
@@ -208,6 +210,7 @@ public:
 class HdiOperatorCallback : public StreamOperatorCallback {
 public:
     Test *test_;
+    virtual ~HdiOperatorCallback() = default;
     HdiOperatorCallback(Test *test)
     {
         test_ = test;

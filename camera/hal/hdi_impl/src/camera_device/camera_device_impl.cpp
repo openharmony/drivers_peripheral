@@ -56,7 +56,7 @@ CamRetCode CameraDeviceImpl::GetStreamOperator(
 #else
         spStreamOperator_ = new(std::nothrow) StreamOperator(spCameraDeciceCallback_, shared_from_this());
 #endif
-		if (spStreamOperator_ == nullptr) {
+        if (spStreamOperator_ == nullptr) {
             CAMERA_LOGW("create stream operator failed.");
             return DEVICE_ERROR;
         }

@@ -15,8 +15,8 @@
 #include <fstream>
 #include "performance_hdi_test.h"
 namespace {
-    static const int Times = 1000; // 1000:Cycle 1000 times
-    static const int TimeTransformation_us = 1000000; // 1000000:1000000 microseconds
+    const int Times = 1000; // 1000:Cycle 1000 times
+    const int TimeTransformation_us = 1000000; // 1000000:1000000 microseconds
     std::ofstream writeIntoFile;
 }
 

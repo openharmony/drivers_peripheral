@@ -154,7 +154,7 @@ int32_t get_camera_metadata_item_type(uint32_t item, uint32_t *data_type)
 {
     METADATA_DEBUG_LOG("get_camera_metadata_item_type start");
     uint32_t section;
-    int32_t ret = get_metadata_section(item >> 16, &section);
+    int32_t ret = get_metadata_section(item >> 16, &section); // 16:item offset
     if (ret != CAM_META_SUCCESS) {
         METADATA_ERR_LOG("get_camera_metadata_item_type section is not valid");
         return ret;
@@ -171,6 +171,10 @@ int32_t get_camera_metadata_item_type(uint32_t item, uint32_t *data_type)
         return CAM_META_FAILURE;
     }
 
+    if (data_type == NULL) {
+        return CAM_META_FAILURE;
+    }
+
     *data_type = ohos_item_info[section][item_index].item_type;
 
     METADATA_DEBUG_LOG("get_camera_metadata_item_type end");
@@ -182,7 +186,7 @@ const char *get_camera_metadata_item_name(uint32_t item)
     METADATA_DEBUG_LOG("get_camera_metadata_item_name start");
     METADATA_DEBUG_LOG("get_camera_metadata_item_name item: %{public}d", item);
     uint32_t section;
-    int32_t ret = get_metadata_section(item >> 16, &section);
+    int32_t ret = get_metadata_section(item >> 16, &section); // 16:item offset
     if (ret != CAM_META_SUCCESS) {
         METADATA_ERR_LOG("get_camera_metadata_item_name section is not valid");
         return NULL;
@@ -209,7 +213,7 @@ size_t calculate_camera_metadata_item_data_size(uint32_t type, size_t data_count
     size_t data_bytes = data_count * ohos_camera_metadata_type_size[type];
 
     METADATA_DEBUG_LOG("calculate_camera_metadata_item_data_size end");
-    return data_bytes <= 4 ? 0 : ALIGN_TO(data_bytes, DATA_ALIGNMENT); // 4:data bytes
+    return (data_bytes <= 4) ? 0 : ALIGN_TO(data_bytes, DATA_ALIGNMENT); // 4:data bytes
 }
 
 int add_camera_metadata_item(common_metadata_header_t *dst, uint32_t item, const void *data,
@@ -224,7 +228,7 @@ int add_camera_metadata_item(common_metadata_header_t *dst, uint32_t item, const
 
     if (dst->item_count == dst->item_capacity) {
         METADATA_ERR_LOG("add_camera_metadata_item item_capacity limit reached. "
-                         "item_count: %{public}d, item_capacity: %{public}d", dst->item_count, dst->item_capacity);
+            "item_count: %{public}d, item_capacity: %{public}d", dst->item_count, dst->item_capacity);
         return CAM_META_ITEM_CAP_EXCEED;
     }
 
@@ -315,7 +319,7 @@ int find_camera_metadata_item_index(common_metadata_header_t *src, uint32_t item
 {
     METADATA_DEBUG_LOG("find_camera_metadata_item_index start");
     METADATA_DEBUG_LOG("find_camera_metadata_item_index item: %{public}d", item);
-    if (src == NULL) {
+    if (src == NULL || idx == NULL) {
         METADATA_ERR_LOG("find_camera_metadata_item_index src is null");
         return CAM_META_INVALID_PARAM;
     }
@@ -510,6 +514,7 @@ void free_camera_metadata_buffer(common_metadata_header_t *dst)
 {
     if (dst != NULL) {
         free(dst);
+        dst = NULL;
     }
 }
 
