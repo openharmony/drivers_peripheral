@@ -181,7 +181,7 @@ HWTEST_F(StreamOperatorImplTest, UTestCreateStreams, TestSize.Level0)
     streamInfoSnapshot->intent_ = STILL_CAPTURE;
     StreamConsumer snapshotConsumer;
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
-  streamInfoSnapshot->bufferQueue_ = snapshotConsumer.CreateProducer(
+    streamInfoSnapshot->bufferQueue_ = snapshotConsumer.CreateProducer(
             [](OHOS::SurfaceBuffer* buffer) {
                std::cout << "received a snapshot buffer ..." << std::endl; });
 #else

@@ -120,8 +120,9 @@ public:
         virtual void Deliver(std::shared_ptr<IBuffer>& buffer);
         virtual void Receive(std::shared_ptr<IBuffer>& buffer);
         virtual void Process(std::shared_ptr<IBuffer>& buffer);
+        virtual std::string GetName() const;
 
-    public:
+    private:
         std::string name_ = "";
         std::shared_ptr<Node> nextNode_ = nullptr;
 

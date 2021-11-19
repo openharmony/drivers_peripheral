@@ -23,7 +23,7 @@ class IPCOfflineFuzzer : public OfflineStreamOperatorStub {
 public:
     virtual CamRetCode CancelCapture(int captureId)
     {
-        (void)captureId;
+        static_cast<void>(captureId);
         return OHOS::Camera::NO_ERROR;
     }
     virtual CamRetCode ReleaseStreams(const std::vector<int>& streamIds)

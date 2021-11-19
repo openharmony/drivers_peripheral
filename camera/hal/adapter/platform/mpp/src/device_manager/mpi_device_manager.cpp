@@ -274,7 +274,7 @@ RetCode MpiDeviceManager::Connect(std::string controller,
     }
     RetCode rc = RC_ERROR;
     constexpr uint32_t coefficient = 2;
-    switch (controllerId << (coefficient + connectControllerId)) {
+    switch (static_cast<uint32_t>(controllerId) << (coefficient + connectControllerId)) {
         case DM_C_VI << (coefficient + DM_C_VPSS): {
             std::shared_ptr<VpssController> vpss =
                 std::static_pointer_cast<VpssController>(GetController(DM_M_VPSS,
@@ -356,7 +356,7 @@ RetCode MpiDeviceManager::UnConnect(std::string controller,
     }
     RetCode rc = RC_ERROR;
     constexpr uint32_t unCoefficient = 2;
-    switch (unControllerId << (unCoefficient + unConnectControllerId)) {
+    switch (static_cast<uint32_t>(unControllerId) << (unCoefficient + unConnectControllerId)) {
         case DM_C_VI << (unCoefficient + DM_C_VPSS): {
             sysObject_->ViUnBindVpss(unPort, unPort, unConnectPort, unConnectPort);
             rc = RC_OK;

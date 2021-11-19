@@ -176,7 +176,7 @@ RetCode HosCameraDemo::CreatStream(const int streamId, std::shared_ptr<StreamCus
     rc = streamOperator_->CommitStreams(Camera::NORMAL, ability_);
     if (rc != Camera::NO_ERROR) {
         CAMERA_LOGE("demo test: CreatStream CommitStreams error\n");
-        streamOperator_->ReleaseStreams( {streamId} );
+        streamOperator_->ReleaseStreams({streamId});
         return RC_ERROR;
     }
 
@@ -277,7 +277,7 @@ void HosCameraDemo::StoreImage(const void* bufStart, const uint32_t size) const
     int imgFD = 0;
     int ret;
 
-    struct timeval start;
+    struct timeval start = {};
     gettimeofday(&start, nullptr);
     if (sprintf_s(path, sizeof(path), "%spicture_%ld.jpeg", prefix, start.tv_usec) < 0) {
         CAMERA_LOGE("sprintf_s error .....\n");

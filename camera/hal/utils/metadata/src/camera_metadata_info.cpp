@@ -71,8 +71,8 @@ bool CameraMetadata::resize_add_metadata(uint32_t item, const void *data, size_t
     }
     size_t size = calculate_camera_metadata_item_data_size(data_type, data_count);
 
-    common_metadata_header_t *newMetadata = allocate_camera_metadata_buffer((itemCapacity + 1) * 2,
-        ALIGN_TO((data_capacity + size) * 2, DATA_ALIGNMENT));
+    common_metadata_header_t *newMetadata = allocate_camera_metadata_buffer((itemCapacity + 1) * 2, // 2:item capacity
+        ALIGN_TO((data_capacity + size) * 2, DATA_ALIGNMENT)); // 2:data capacity
 
     if (newMetadata == nullptr) {
         METADATA_ERR_LOG("Failed to resize the metadata buffer");
@@ -124,7 +124,7 @@ bool CameraMetadata::updateEntry(uint32_t tag, const void *data, size_t data_cou
     }
 
     ret = update_camera_metadata_item_by_index(metadata_, item.index, data,
-                                       data_count, nullptr);
+        data_count, nullptr);
     if (ret) {
         const char *name = get_camera_metadata_item_name(tag);
         (void)name;

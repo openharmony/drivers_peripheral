@@ -109,6 +109,10 @@ bool CameraHdiBaseTest::GetCameraIds()
 
 int32_t CameraHdiBaseTest::SaveToFile(const std::string path, const void* buffer, int32_t size)
 {
+    char checkPath[PATH_MAX] = {0};
+    if (::realpath(path.c_str(), checkPath) == nullptr) {
+        return -1;
+    }
     int imgFd = open(path.c_str(), O_RDWR | O_CREAT, 00766);
     if (imgFd == -1) {
         std::cout << "open file failed." << std::endl;
