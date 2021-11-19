@@ -39,7 +39,7 @@ int32_t CodecDeviceInit(struct AudioCard *audioCard, const struct CodecDevice *c
         return HDF_FAILURE;
     }
 
-    if (CodecHalSysInit() != HDF_SUCCESS) {
+    if (CodecHalSysInit(codec->devData) != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("CodecHalSysInit failed.");
         return HDF_FAILURE;
     }
