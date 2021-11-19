@@ -201,6 +201,7 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
     handleData->renderMode.ctlParam.volume = RouteGetVoiceVolume(ctlName);
     return HDF_SUCCESS;
 #endif
+    int32_t ret;
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("RenderGetVolume parameter is empty!");
         return HDF_FAILURE;
@@ -218,7 +219,7 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
-    int32_t ret = AudioCtlRenderGetVolumeSBuf(sBuf, handleData);
+    ret = AudioCtlRenderGetVolumeSBuf(sBuf, handleData);
     if (ret < 0) {
         LOG_FUN_ERR("RenderGetVolume Failed to Get Volume sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
@@ -1329,7 +1330,7 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
         LOG_FUN_ERR("The parameter is empty");
         return HDF_FAILURE;
     }
-    int32_t ret = 0;
+    struct HdfIoService *service = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
         return HDF_FAILURE;
@@ -1344,14 +1345,13 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
     }
 
 #ifndef ALSA_MODE
-    struct HdfIoService *service = NULL;
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         LOG_FUN_ERR("The pointer is null!");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
-    ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
+    int32_t ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         LOG_FUN_ERR("Failed to send service call!");
     }

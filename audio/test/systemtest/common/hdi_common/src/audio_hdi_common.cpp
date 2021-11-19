@@ -1015,6 +1015,8 @@ int32_t AudioRenderCallback(enum AudioCallbackType type, void *reserved, void *c
             return HDF_FAILURE;
         case AUDIO_DRAIN_COMPELETED:
             return HDF_FAILURE;
+        default:
+            return HDF_FAILURE;
     }
 }
 int32_t CheckWriteCompleteValue()
@@ -1036,7 +1038,7 @@ int32_t CheckFlushValue()
     if (g_flush_completed == AUDIO_FLUSH_COMPLETED_VALUE)
         return HDF_SUCCESS;
     else
-       return HDF_FAILURE;
+        return HDF_FAILURE;
 }
 }
 }
