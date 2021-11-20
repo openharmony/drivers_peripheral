@@ -19,7 +19,6 @@
 #include <hdf_log.h>
 #include <osal_mem.h>
 #include <osal_thread.h>
-#include <hdf_attribute_manager.h>
 #include <device_resource_if.h>
 #include <hcs_tree_if.h>
 #include "usbfn_dev_mgr.h"
