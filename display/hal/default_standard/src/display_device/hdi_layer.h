@@ -124,10 +124,17 @@ public:
     {
         return mAcquireFence.GetFd();
     }
+
     int GetReleaseFenceFd()
     {
         return mReleaseFence.GetFd();
     }
+
+    bool IsVisible()
+    {
+        return mVisible;
+    }
+
     void SetReleaseFence(int fd)
     {
         mReleaseFence = fd;
@@ -147,6 +154,7 @@ public:
     virtual int32_t SetLayerBuffer(const BufferHandle *buffer, int32_t fence);
     virtual int32_t SetLayerCompositionType(CompositionType type);
     virtual int32_t SetLayerBlendType(BlendType type);
+    virtual int32_t SetLayerVisible(bool visible);
     virtual HdiLayerBuffer *GetCurrentBuffer()
     {
         return mHdiBuffer.get();
@@ -157,7 +165,7 @@ private:
     static uint32_t GetIdleId();
     static uint32_t mIdleId;
     static std::unordered_set<uint32_t> mIdSets;
-
+    bool mVisible = true;
     uint32_t mId = 0;
     HdiFd mAcquireFence;
     HdiFd mReleaseFence;
