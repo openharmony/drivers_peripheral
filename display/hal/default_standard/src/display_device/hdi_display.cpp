@@ -64,7 +64,7 @@ HdiDisplay::~HdiDisplay()
 
 int32_t HdiDisplay::SetLayerZorder(uint32_t layerId, uint32_t zorder)
 {
-    DISPLAY_LOGD("layerId : %{public}d", layerId);
+    DISPLAY_LOGD("layerId:%{public}d zorder:%{public}d size:%{public}d", layerId, zorder, mLayers.size());
     auto iter = mLayersMap.find(layerId);
     DISPLAY_CHK_RETURN((iter == mLayersMap.end()), DISPLAY_FAILURE,
         DISPLAY_LOGE("can not find the layer %{public}d", layerId));
@@ -78,12 +78,14 @@ int32_t HdiDisplay::SetLayerZorder(uint32_t layerId, uint32_t zorder)
     DISPLAY_LOGD("zorder range : zRange.first %{public}p  zRange.second %{public}p", *zRange.first, *zRange.second);
     for (auto c = zRange.first; c != zRange.second; c++) {
         if (*c == layer) {
+            DISPLAY_LOGD("erase layer:%{public}p", layer);
             mLayers.erase(c);
             break;
         }
     }
     layer->SetLayerZorder(zorder);
     mLayers.emplace(layer);
+    DISPLAY_LOGD("SetLayerZorder size:%{public}d", mLayers.size());
     return DISPLAY_SUCCESS;
 }
 
@@ -118,7 +120,16 @@ int32_t HdiDisplay::CloseLayer(uint32_t layerId)
     auto iter = mLayersMap.find(layerId);
     DISPLAY_CHK_RETURN((iter == mLayersMap.end()), DISPLAY_FAILURE,
         DISPLAY_LOGE("can not find the layer id %{public}d", layerId));
-    mLayers.erase(iter->second.get());
+    auto layer = iter->sencod.get();
+    auto zRange = mLayers.equal_range(layer);
+    DISPLAY_LOGD("zorder range:zRange.first %{public}p, zRange.second %{public}p", *zRange.first, *zRange.second);
+    for (auto c = zRange.first; c != zRange.second; c++) {
+        if (*c == layer) {
+            DISPLAY_LOGD("erase layer:%{public}p", layer);
+            mLayers.erase(c);
+            break;
+        }
+    }
     mLayersMap.erase(layerId);
     return DISPLAY_SUCCESS;
 }
@@ -171,7 +182,9 @@ int32_t HdiDisplay::PrepareDisplayLayers(bool *needFlushFb)
     mChangeLayers.clear();
     std::vector<HdiLayer *> layers;
     for (auto c : mLayers) {
-        layers.push_back(c);
+        if (c->IsVisible()) {
+            layers.push_back(c);
+        }
     }
     DISPLAY_LOGD(" mLayers  size %{public}zu layers size %{public}zu", mLayers.size(), layers.size());
 
