@@ -190,9 +190,9 @@ int32_t AudioCtlRenderSetVolume(const struct DevHandle *handle, int cmdId,
     return ret;
 }
 
-int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
-{
 #ifdef ALSA_MODE
+int32_t AudioCtlRenderGetVolumeALSA(struct AudioHwRenderParam *handleData)
+{
     char *ctlName = "DACL Playback Volume";
     ReadOutSoundCard();
     memset_s(&g_outDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
@@ -200,8 +200,14 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
     MixerOpenLegacy(true, g_outDevInfo.card);
     handleData->renderMode.ctlParam.volume = RouteGetVoiceVolume(ctlName);
     return HDF_SUCCESS;
+}
 #endif
-    int32_t ret;
+
+int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
+{
+#ifdef ALSA_MODE
+    return AudioCtlRenderGetVolumeALSA(handleData);
+#endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("RenderGetVolume parameter is empty!");
         return HDF_FAILURE;
@@ -219,7 +225,7 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
-    ret = AudioCtlRenderGetVolumeSBuf(sBuf, handleData);
+    int32_t ret = AudioCtlRenderGetVolumeSBuf(sBuf, handleData);
     if (ret < 0) {
         LOG_FUN_ERR("RenderGetVolume Failed to Get Volume sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
