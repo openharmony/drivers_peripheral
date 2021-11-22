@@ -7,6 +7,7 @@
  */
 
 #include "hi3516_codec_impl_test.h"
+#include "audio_codec_if.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "hdf_types.h"
@@ -17,9 +18,10 @@
 int32_t TestCodecHalSysInit(void)
 {
     int ret;
+    struct CodecData codeData;
 
     HDF_LOGI("%s: enter", __func__);
-    ret = CodecHalSysInit();
+    ret = CodecHalSysInit(&codeData);
 
     HDF_LOGI("%s: success", __func__);
     return HDF_SUCCESS;

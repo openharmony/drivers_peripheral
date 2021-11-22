@@ -53,7 +53,7 @@ struct CodecDaiParamsVal {
     uint32_t channelVal;
 };
 
-int32_t CodecHalSysInit(void);
+int32_t CodecHalSysInit(struct CodecData *codeData);
 int32_t CodecRegBitsRead(struct AudioMixerControl *regAttr, uint32_t *regValue);
 int32_t CodecRegBitsUpdate(struct AudioMixerControl regAttr);
 int32_t CodecRegDefaultInit(struct AudioRegCfgGroupNode **regCfgGroup);

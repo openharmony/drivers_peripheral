@@ -22,12 +22,17 @@ const int HALF_MINUTE = 30;
 const int VOLUME_DB_MAX = 6;
 const int VOLUME_DB_MIN = -121;
 
-int32_t CodecHalSysInit(void)
+int32_t CodecHalSysInit(struct CodecData *codeData)
 {
+    if (codeData == NULL) {
+        AUDIO_DEVICE_LOG_ERR("input invalid parameter.");
+        return HDF_ERR_INVALID_PARAM;
+    }
     // ACODEC REMAP
     if (g_regAcodecBase == NULL) {
-        g_regAcodecBase = OsalIoRemap(ACODEC_REG_BASE, ACODEC_MAX_REG_SIZE); // ACODEC_MAX_REG_SIZE
+        g_regAcodecBase = (void *)codeData->virtualAddress;
         if (g_regAcodecBase == NULL) {
+            AUDIO_DEVICE_LOG_ERR("regAcodecBase is null.");
             return HDF_FAILURE;
         }
     }
@@ -39,7 +44,7 @@ int32_t CodecRegBitsRead(struct AudioMixerControl *regAttr, uint32_t *regValue)
 {
     if (g_regAcodecBase == NULL || regAttr == NULL ||
         regAttr->reg < 0 || regValue == NULL) {
-        AUDIO_DEVICE_LOG_DEBUG("input invalid parameter.");
+        AUDIO_DEVICE_LOG_ERR("input invalid parameter.");
         return HDF_ERR_INVALID_PARAM;
     }
     regAttr->value = SysReadl((uintptr_t)g_regAcodecBase + regAttr->reg);
@@ -146,7 +151,7 @@ static unsigned int CodecGetAdcModeSel(const unsigned int rate)
 static int32_t CodecGetI2s1DataWidth(unsigned int bitWidth, uint16_t *i2s1DataWidth)
 {
     if (i2s1DataWidth == NULL) {
-        AUDIO_DEVICE_LOG_DEBUG("input param is NULL");
+        AUDIO_DEVICE_LOG_ERR("input param is NULL");
         return HDF_FAILURE;
     }
     *i2s1DataWidth = AUDIO_CODEC_BIT_WIDTH_16;
@@ -178,7 +183,7 @@ int32_t CodecDaiParamsUpdate(struct AudioRegCfgGroupNode **regCfgGroup,
     struct AudioMixerControl *regAttr = NULL;
     uint16_t codecBitWidth;
 
-    ret = (g_regAcodecBase == NULL || regCfgGroup == NULL
+    ret = (regCfgGroup == NULL
         || regCfgGroup[AUDIO_DAI_PATAM_GROUP] == NULL
         || regCfgGroup[AUDIO_DAI_PATAM_GROUP]->regCfgItem == NULL
         || regCfgGroup[AUDIO_DAI_PATAM_GROUP]->itemNum < itemNum);
