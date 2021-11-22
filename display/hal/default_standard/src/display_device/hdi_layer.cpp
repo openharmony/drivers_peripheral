@@ -171,6 +171,13 @@ int32_t HdiLayer::SetLayerBlendType(BlendType type)
     return DISPLAY_SUCCESS;
 }
 
+int32_t HdiLayer::SetLayerVisible(bool visible)
+{
+    DISPLAY_LOGD("SetLayerVisible type %{public}d", visible);
+    mVisible = visible;
+    return DISPLAY_SUCCESS;
+}
+
 void HdiLayer::SetPixel(const BufferHandle &handle, int x, int y, uint32_t color)
 {
     const int32_t pixelBytes = 4;
