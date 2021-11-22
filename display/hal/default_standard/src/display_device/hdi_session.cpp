@@ -313,6 +313,11 @@ static int32_t SetLayerBlendType(uint32_t devId, uint32_t layerId, BlendType typ
     return HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerBlendType, type);
 }
 
+static int32_t SetLayerVisible(uint32_t devId, uint32_t layerId, bool visible)
+{
+    DISPLAY_LOGD();
+    return HdiSession::GetInstance().CallLayerFunction(devId, layerId, &HdiLayer::SetLayerVisible, visible);
+}
 
 extern "C" {
 int32_t DeviceInitialize(DeviceFuncs **funcs)
@@ -377,6 +382,7 @@ int32_t LayerInitialize(LayerFuncs **funcs)
     lFuncs->SetLayerBuffer = SetLayerBuffer;
     lFuncs->SetLayerCompositionType = SetLayerCompositionType;
     lFuncs->SetLayerBlendType = SetLayerBlendType;
+    lFuncs->SetLayerVisible = SetLayerVisible;
 
     *funcs = lFuncs;
     DISPLAY_LOGD("%{public}s: layer initialize success", __func__);
