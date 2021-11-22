@@ -120,7 +120,7 @@ int32_t HdiDisplay::CloseLayer(uint32_t layerId)
     auto iter = mLayersMap.find(layerId);
     DISPLAY_CHK_RETURN((iter == mLayersMap.end()), DISPLAY_FAILURE,
         DISPLAY_LOGE("can not find the layer id %{public}d", layerId));
-    auto layer = iter->sencod.get();
+    auto layer = iter->second.get();
     auto zRange = mLayers.equal_range(layer);
     DISPLAY_LOGD("zorder range:zRange.first %{public}p, zRange.second %{public}p", *zRange.first, *zRange.second);
     for (auto c = zRange.first; c != zRange.second; c++) {
