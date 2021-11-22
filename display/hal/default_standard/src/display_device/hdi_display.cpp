@@ -64,7 +64,7 @@ HdiDisplay::~HdiDisplay()
 
 int32_t HdiDisplay::SetLayerZorder(uint32_t layerId, uint32_t zorder)
 {
-    DISPLAY_LOGD("layerId:%{public}d zorder:%{public}d size:%{public}d", layerId, zorder, mLayers.size());
+    DISPLAY_LOGD("layerId:%{public}d zorder:%{public}d size:%{public}lu", layerId, zorder, mLayers.size());
     auto iter = mLayersMap.find(layerId);
     DISPLAY_CHK_RETURN((iter == mLayersMap.end()), DISPLAY_FAILURE,
         DISPLAY_LOGE("can not find the layer %{public}d", layerId));
@@ -85,7 +85,7 @@ int32_t HdiDisplay::SetLayerZorder(uint32_t layerId, uint32_t zorder)
     }
     layer->SetLayerZorder(zorder);
     mLayers.emplace(layer);
-    DISPLAY_LOGD("SetLayerZorder size:%{public}d", mLayers.size());
+    DISPLAY_LOGD("SetLayerZorder size:%{public}lu", mLayers.size());
     return DISPLAY_SUCCESS;
 }
 
