@@ -135,6 +135,8 @@ int32_t AudioRenderCallbackUtTest(enum AudioCallbackType type, void *reserved, v
             return HDF_FAILURE;
         case AUDIO_DRAIN_COMPELETED:
             return HDF_FAILURE;
+        default:
+            return HDF_FAILURE;
     }
     return HDF_FAILURE;
 }

@@ -252,10 +252,12 @@ int32_t AudioCtlCaptureGetVolume(const struct DevHandleCapture *handle,
     handleData->captureMode.ctlParam.volume = RouteGetVoiceVolume(ctlName);
     return HDF_SUCCESS;
 #endif
+    int32_t ret;
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("CaptureGetVolume paras is NULL!");
         return HDF_FAILURE;
     }
+    struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
@@ -268,13 +270,13 @@ int32_t AudioCtlCaptureGetVolume(const struct DevHandleCapture *handle,
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
-    int32_t ret = AudioCtlCaptureGetVolumeSBuf(sBuf, handleData);
+    ret = AudioCtlCaptureGetVolumeSBuf(sBuf, handleData);
     if (ret < 0) {
         LOG_FUN_ERR("Failed to Get Volume sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
         return ret;
     }
-    struct HdfIoService *service = (struct HdfIoService *)handle->object;
+    service = (struct HdfIoService *)handle->object;
     cmdId = AUDIODRV_CTL_IOCTL_ELEM_READ_CAPTURE - CTRL_NUM;
     ret = AudioServiceDispatch(service, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
@@ -926,6 +928,7 @@ int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
     return HDF_SUCCESS;
 #endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
+        LOG_FUN_ERR("paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
@@ -1018,7 +1021,8 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
         LOG_FUN_ERR("Function parameter is NULL!");
         return HDF_FAILURE;
     }
-    int32_t ret = 0;
+    int32_t ret;
+    struct HdfIoService *service = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
         LOG_FUN_ERR("Failed to obtain sBuf");
@@ -1033,8 +1037,6 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
         return HDF_FAILURE;
     }
 #ifndef ALSA_MODE
-    struct HdfIoService *service = NULL;
-
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         LOG_FUN_ERR("Function parameter is empty!");
@@ -1200,6 +1202,7 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
     char *frame = NULL;
     struct HdfIoService *service = NULL;
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
+        LOG_FUN_ERR("paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfSBuf *reply = HdfSBufTypedObtainCapacity(SBUF_RAW, replySize);
@@ -1208,11 +1211,13 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
     }
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
+        LOG_FUN_ERR("Service is NULL!");
         AudioBufReplyRecycle(NULL, reply);
         return HDF_FAILURE;
     }
     int32_t ret = AudioOutputCaptureReadFrame(service, cmdId, reply);
     if (ret != 0) {
+        LOG_FUN_ERR("AudioOutputCaptureReadFrame is invalid!");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadBuffer(reply, (const void **)&frame, &dataSize)) {
