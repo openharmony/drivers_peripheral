@@ -21,8 +21,8 @@
 
 class IPCCameraDeviceCallbackFuzzer : public CameraDeviceCallbackStub {
 public:
-    virtual void OnError(ErrorType type, int32_t errorCode) override {}
-    virtual void OnResult(uint64_t timestamp, const std::shared_ptr<CameraStandard::CameraMetadata> &result) override {}
+    void OnError(ErrorType type, int32_t errorCode) override {}
+    void OnResult(uint64_t timestamp, const std::shared_ptr<CameraStandard::CameraMetadata> &result) override {}
 };
 
 static uint32_t U32_AT(const uint8_t *ptr)

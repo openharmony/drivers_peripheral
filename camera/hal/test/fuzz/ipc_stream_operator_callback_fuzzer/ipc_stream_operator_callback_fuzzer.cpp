@@ -21,12 +21,12 @@
 
 class IPCStreamOperatorCallbackFuzzer : public StreamOperatorCallbackStub {
 public:
-    virtual void OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamIds) override {}
-    virtual void OnCaptureEnded(int32_t captureId,
+    void OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamIds) override {}
+    void OnCaptureEnded(int32_t captureId,
         const std::vector<std::shared_ptr<CaptureEndedInfo>> &infos) override {}
-    virtual void OnCaptureError(int32_t captureId,
+    void OnCaptureError(int32_t captureId,
         const std::vector<std::shared_ptr<CaptureErrorInfo>> &infos) override {}
-    virtual void OnFrameShutter(int32_t captureId,
+    void OnFrameShutter(int32_t captureId,
         const std::vector<int32_t> &streamIds, uint64_t timestamp) override {}
 };
 
