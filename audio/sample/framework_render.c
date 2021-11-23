@@ -532,7 +532,7 @@ int32_t PlayingAudioFiles(struct AudioRender **renderS)
         return HDF_FAILURE;
     }
     g_closeEnd = false;
-    struct AudioRender *render;
+    struct AudioRender *render = NULL;
     char pathBuf[PATH_MAX] = {'\0'};
     if (realpath(g_path, pathBuf) == NULL) {
         return HDF_FAILURE;
@@ -594,7 +594,7 @@ void PrintMenu1()
     printf(" ================================================== \n");
 }
 
-int32_t SwitchInternalOrExternal(char *adapterNameCase)
+int32_t SwitchInternalOrExternal(char *adapterNameCase, int32_t nameLen)
 {
     system("clear");
     int choice = 0;
@@ -604,21 +604,21 @@ int32_t SwitchInternalOrExternal(char *adapterNameCase)
     if (ret < 0) return HDF_FAILURE;
     switch (choice) {
         case ACODEC:
-            snprintf_s(adapterNameCase, PATH_LEN, PATH_LEN - 1, "%s", "usb");
+            snprintf_s(adapterNameCase, nameLen, nameLen - 1, "%s", "usb");
             break;
         case SMARTPA:
-            snprintf_s(adapterNameCase, PATH_LEN, PATH_LEN - 1, "%s", "hdmi");
+            snprintf_s(adapterNameCase, nameLen, nameLen - 1, "%s", "hdmi");
             break;
         default:
             printf("Input error,Switched to Acodec in for you,");
             SystemInputFail();
-            snprintf_s(adapterNameCase, PATH_LEN, PATH_LEN - 1, "%s", "usb");
+            snprintf_s(adapterNameCase, nameLen, nameLen - 1, "%s", "usb");
             break;
     }
     return HDF_SUCCESS;
 }
 
-int32_t SelectLoadingMode(char *resolvedPath, char *func)
+int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen, char *func, int32_t funcpathLen)
 {
     system("clear");
     int choice = 0;
@@ -639,28 +639,28 @@ int32_t SelectLoadingMode(char *resolvedPath, char *func)
     }
     switch (choice) {
         case DIRECT:
-            if (snprintf_s(resolvedPath, PATH_LEN, PATH_LEN - 1, "%s", soPathHdi) < 0) {
+            if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", soPathHdi) < 0) {
                 return HDF_FAILURE;
             }
-            if (snprintf_s(func, PATH_LEN, PATH_LEN - 1, "%s", "GetAudioManagerFuncs") < 0) {
+            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioManagerFuncs") < 0) {
                 return HDF_FAILURE;
             }
             break;
         case SERVICE:
-            if (snprintf_s(resolvedPath, PATH_LEN, PATH_LEN - 1, "%s", soPathProxy) < 0) {
+            if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", soPathProxy) < 0) {
                 return HDF_FAILURE;
             }
-            if (snprintf_s(func, PATH_LEN, PATH_LEN - 1, "%s", "GetAudioProxyManagerFuncs") < 0) {
+            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioProxyManagerFuncs") < 0) {
                 return HDF_FAILURE;
             }
             break;
         default:
             printf("Input error,Switched to direct loading in for you,");
             SystemInputFail();
-            if (snprintf_s(resolvedPath, PATH_LEN, PATH_LEN - 1, "%s", soPathHdi) < 0) {
+            if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", soPathHdi) < 0) {
                 return HDF_FAILURE;
             }
-            if (snprintf_s(func, PATH_LEN, PATH_LEN - 1, "%s", "GetAudioManagerFuncs") < 0) {
+            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioManagerFuncs") < 0) {
                 return HDF_FAILURE;
             }
             break;
@@ -782,12 +782,12 @@ int32_t InitParam()
 {
     /* Internal and external switch,begin */
     char adapterNameCase[PATH_LEN] = {0};
-    if (SwitchInternalOrExternal(adapterNameCase) < 0) {
+    if (SwitchInternalOrExternal(adapterNameCase, PATH_LEN) < 0) {
         return HDF_FAILURE;
     }
     char resolvedPath[PATH_LEN] = {0}; // Select loading mode,begin
     char func[PATH_LEN] = {0};
-    if (SelectLoadingMode(resolvedPath, func) < 0) {
+    if (SelectLoadingMode(resolvedPath, PATH_LEN, func, PATH_LEN) < 0) {
         return HDF_FAILURE;
     }
     /* Select loading mode,end */
@@ -1201,7 +1201,7 @@ void Choice(void)
 int32_t main(int32_t argc, char const *argv[])
 {
     if (argc < 2 || argv == NULL || argv[0] == NULL) { // The parameter number is not greater than 2
-        printf("usage:[1]%s [2]%s\n", argv[0], "/test/test.wav");
+        printf("usage:[1]sample [2]/data/test.wav\n");
         return 0;
     }
     if (argv[1] == NULL || strlen(argv[1]) == 0) {
