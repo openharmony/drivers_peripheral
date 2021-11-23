@@ -375,7 +375,7 @@ int32_t StartButtonCapture(struct AudioCapture **captureS)
         return HDF_FAILURE;
     }
     g_closeEnd = false;
-    struct AudioCapture *capture;
+    struct AudioCapture *capture = NULL;
     int32_t ret = g_adapter->CreateCapture(g_adapter, &g_devDesc, &g_attrs, &capture);
     if (capture == NULL || ret < 0) {
         return HDF_FAILURE;
@@ -460,7 +460,7 @@ void PrintMenu1()
     printf(" =================================================== \n");
 }
 
-int32_t SelectLoadingMode(char *resolvedPath, char *func)
+int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen, char *func, int32_t funcpathLen)
 {
     system("clear");
     int choice = 0;
@@ -480,31 +480,31 @@ int32_t SelectLoadingMode(char *resolvedPath, char *func)
     if (ret < 0) return HDF_FAILURE;
     switch (choice) {
         case 1: // 1. Capture Direct Loading
-            if (snprintf_s(resolvedPath, PATH_LEN, PATH_LEN - 1, "%s", soPathHdi) < 0) {
+            if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", soPathHdi) < 0) {
                 LOG_FUN_ERR("snprintf_s failed!");
                 return HDF_FAILURE;
             }
-            if (snprintf_s(func, PATH_LEN, PATH_LEN - 1, "%s", "GetAudioManagerFuncs") < 0) {
+            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioManagerFuncs") < 0) {
                 LOG_FUN_ERR("snprintf_s failed!");
                 return HDF_FAILURE;
             }
             break;
         case 2: // 2. Capture Service Loading
-            if (snprintf_s(resolvedPath, PATH_LEN, PATH_LEN - 1, "%s", soPathProxy) < 0) {
+            if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", soPathProxy) < 0) {
                 LOG_FUN_ERR("snprintf_s failed!");
                 return HDF_FAILURE;
             }
-            if (snprintf_s(func, PATH_LEN, PATH_LEN - 1, "%s", "GetAudioProxyManagerFuncs") < 0) {
+            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioProxyManagerFuncs") < 0) {
                 return HDF_FAILURE;
             }
             break;
         default:
             printf("Input error,Switched to direct loading in for you,");
             SystemInputFail();
-            if (snprintf_s(resolvedPath, PATH_LEN, PATH_LEN - 1, "%s", soPathHdi) < 0) {
+            if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", soPathHdi) < 0) {
                 return HDF_FAILURE;
             }
-            if (snprintf_s(func, PATH_LEN, PATH_LEN - 1, "%s", "GetAudioManagerFuncs") < 0) {
+            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioManagerFuncs") < 0) {
                 return HDF_FAILURE;
             }
             break;
@@ -626,7 +626,7 @@ int32_t InitParam()
 {
     char resolvedPath[PATH_LEN] = {0};
     char func[PATH_LEN] = {0};
-    if (SelectLoadingMode(resolvedPath, func) < 0) {
+    if (SelectLoadingMode(resolvedPath, PATH_LEN, func, PATH_LEN) < 0) {
         return HDF_FAILURE;
     }
     char pathBuf[PATH_MAX] = {'\0'};
@@ -1058,7 +1058,7 @@ void Choice()
 int32_t CheckAndOpenFile(int32_t argc, char const *argv[])
 {
     if (argc < 2 || argv == NULL || argv[0] == NULL) { // The parameter number is not greater than 2
-        printf("usage:[1]%s [2]%s\n", argv[0], "/data/test.wav");
+        printf("usage:[1]sample [2]/data/test.wav\n");
         return HDF_FAILURE;
     }
     int32_t ret;

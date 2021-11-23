@@ -34,12 +34,6 @@
 #define I2S_IOCFG2_BASE4_VAL 0x473
 #define I2S_IOCFG2_BASE5_VAL 0x433
 
-#define I2S_IOCFG2_BASE1_VAL 0x663
-#define I2S_IOCFG2_BASE2_VAL 0x673
-#define I2S_IOCFG2_BASE3_VAL 0x573
-#define I2S_IOCFG2_BASE4_VAL 0x473
-#define I2S_IOCFG2_BASE5_VAL 0x433
-
 void *g_regCodecBase = NULL;
 void *g_regDaiBase = NULL;
 
