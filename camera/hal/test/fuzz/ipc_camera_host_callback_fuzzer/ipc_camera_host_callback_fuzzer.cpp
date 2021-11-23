@@ -21,8 +21,8 @@
 
 class IPCCameraHostCallbackFuzzer : public CameraHostCallbackStub {
 public:
-    virtual void OnCameraStatus(const std::string &cameraId, CameraStatus status) override {}
-    virtual void OnFlashlightStatus(const std::string &cameraId, FlashlightStatus status) override {}
+    void OnCameraStatus(const std::string &cameraId, CameraStatus status) override {}
+    void OnFlashlightStatus(const std::string &cameraId, FlashlightStatus status) override {}
 };
 
 static uint32_t U32_AT(const uint8_t *ptr)

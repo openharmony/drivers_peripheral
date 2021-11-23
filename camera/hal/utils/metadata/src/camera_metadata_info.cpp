@@ -123,8 +123,7 @@ bool CameraMetadata::updateEntry(uint32_t tag, const void *data, size_t data_cou
         return false;
     }
 
-    ret = update_camera_metadata_item_by_index(metadata_, item.index, data,
-        data_count, nullptr);
+    ret = update_camera_metadata_item_by_index(metadata_, item.index, data, data_count, nullptr);
     if (ret) {
         const char *name = get_camera_metadata_item_name(tag);
         (void)name;

@@ -21,32 +21,32 @@
 
 class IPCCameraDeviceRemoteFuzzer : public CameraDeviceStub {
 public:
-    virtual CamRetCode GetStreamOperator(const OHOS::sptr<IStreamOperatorCallback> &callback,
+    CamRetCode GetStreamOperator(const OHOS::sptr<IStreamOperatorCallback> &callback,
     OHOS::sptr<IStreamOperator> &streamOperator) override
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode UpdateSettings(const std::shared_ptr<CameraSetting> &settings) override
+    CamRetCode UpdateSettings(const std::shared_ptr<CameraSetting> &settings) override
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode SetResultMode(const ResultCallbackMode &mode) override
+    CamRetCode SetResultMode(const ResultCallbackMode &mode) override
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode GetEnabledResults(std::vector<MetaType> &results) override
+    CamRetCode GetEnabledResults(std::vector<MetaType> &results) override
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode EnableResult(const std::vector<MetaType> &results) override
+    CamRetCode EnableResult(const std::vector<MetaType> &results) override
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode DisableResult(const std::vector<MetaType> &results) override
+    CamRetCode DisableResult(const std::vector<MetaType> &results) override
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual void Close() override {}
+    void Close() override {}
 };
 
 static uint32_t U32_AT(const uint8_t *ptr)
