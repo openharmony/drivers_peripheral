@@ -21,7 +21,7 @@
 
 class IPCStreamOperatorFuzzer : public StreamOperatorStub {
 public:
-    virtual CamRetCode IsStreamsSupported(
+    CamRetCode IsStreamsSupported(
         OperationMode mode,
         const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
         const std::vector<std::shared_ptr<StreamInfo>> &info,
@@ -29,7 +29,7 @@ public:
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode IsStreamsSupported(
+    CamRetCode IsStreamsSupported(
         OperationMode mode,
         const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
         const std::shared_ptr<StreamInfo> &info,
@@ -37,41 +37,41 @@ public:
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode CreateStreams(const std::vector<std::shared_ptr<StreamInfo>> &streamInfos) override
+    CamRetCode CreateStreams(const std::vector<std::shared_ptr<StreamInfo>> &streamInfos) override
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode ReleaseStreams(const std::vector<int>& streamIds) override
+    CamRetCode ReleaseStreams(const std::vector<int>& streamIds) override
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode CommitStreams(OperationMode mode,
+    CamRetCode CommitStreams(OperationMode mode,
                                      const std::shared_ptr<CameraStandard::CameraMetadata>& modeSetting) override
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode GetStreamAttributes(std::vector<std::shared_ptr<StreamAttribute>>& attributes) override
+    CamRetCode GetStreamAttributes(std::vector<std::shared_ptr<StreamAttribute>>& attributes) override
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode AttachBufferQueue(int streamId, const OHOS::sptr<OHOS::IBufferProducer>& producer) override
+    CamRetCode AttachBufferQueue(int streamId, const OHOS::sptr<OHOS::IBufferProducer>& producer) override
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode DetachBufferQueue(int streamId) override
+    CamRetCode DetachBufferQueue(int streamId) override
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode Capture(int captureId,
+    CamRetCode Capture(int captureId,
         const std::shared_ptr<CaptureInfo>& captureInfo, bool isStreaming) override {}
         {
             return OHOS::Camera::NO_ERROR;
         }
-    virtual CamRetCode CancelCapture(int captureId) override
+    CamRetCode CancelCapture(int captureId) override
     {
         return OHOS::Camera::NO_ERROR;
     }
-    virtual CamRetCode ChangeToOfflineStream(const std::vector<int>& streamIds,
+    CamRetCode ChangeToOfflineStream(const std::vector<int>& streamIds,
         OHOS::sptr<IStreamOperatorCallback>& callback,
         OHOS::sptr<IOfflineStreamOperator>& offlineOperator) override
         {
