@@ -178,6 +178,7 @@ HWTEST_F(HdfSensorTest, RemoveSensorInstance001, TestSize.Level1)
     g_sensorDev = NewSensorInterfaceInstance();
     if (g_sensorDev == nullptr) {
         ASSERT_EQ(0, ret);
+        return;
     }
     ret = g_sensorDev->GetAllSensors(&g_sensorInfo, &g_count);
     EXPECT_EQ(0, ret);
