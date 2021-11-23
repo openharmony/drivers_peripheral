@@ -142,10 +142,10 @@ struct UsbControlParams {
     UsbRequestTargetType target;
     UsbControlRequestType reqType;
     UsbRequestDirection directon;
-     uint16_t value;
-     uint16_t index;
-     void *data;
-     uint16_t size;
+    uint16_t value;
+    uint16_t index;
+    void *data;
+    uint16_t size;
 };
 
 struct UsbDescriptorParams {
