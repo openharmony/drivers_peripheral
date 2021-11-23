@@ -1257,6 +1257,10 @@ int32_t GetCurrentTime(char *currentTime)
     time_t timeSec;
     time(&timeSec);
     struct tm *specificTime = localtime(&timeSec);
+    if (specificTime == NULL) {
+        LOG_FUN_ERR("localtime failed!");
+        return HDF_FAILURE;
+    }
     int32_t ret = sprintf_s(currentTime, ERROR_REASON_DESC_LEN - 1, "%d/%d/%d %s %d:%d:%d",
         (TIME_BASE_YEAR_1900 + specificTime->tm_year), (1 + specificTime->tm_mon), specificTime->tm_mday,
         week[specificTime->tm_wday], specificTime->tm_hour, specificTime->tm_min, specificTime->tm_sec);
