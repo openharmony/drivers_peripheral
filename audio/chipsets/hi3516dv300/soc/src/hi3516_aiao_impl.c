@@ -129,7 +129,7 @@ static int32_t AiaoGetLrclkSel(const unsigned int lrclkDiv, unsigned int *lrclkS
 {
     const int lrclkDivReg[6][2] = {
         {16, 0x00}, {32, 0x01}, {48, 0x02},
-        {64, 0x03}, {128, 0x04},{256, 0x05},
+        {64, 0x03}, {128, 0x04}, {256, 0x05},
     }; // AIO_BCLK_TO_FSCLK
     if (lrclkSel == NULL) {
         AUDIO_DEVICE_LOG_ERR("lrclkSel is null.\n");
