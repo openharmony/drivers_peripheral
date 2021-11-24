@@ -39,8 +39,6 @@ config("audio_interface_config") {
     "-Wno-thread-safety-attributes",
     "-Wno-missing-field-initializers",
     "-Wno-inconsistent-missing-override",
-    "-Wno-unused-variable",
-    "-Wno-uninitialized",
     "-fno-rtti",
     "-fno-exceptions",
     "-ffunction-sections",
