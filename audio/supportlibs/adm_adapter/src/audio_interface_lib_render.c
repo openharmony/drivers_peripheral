@@ -1336,7 +1336,6 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
         LOG_FUN_ERR("The parameter is empty");
         return HDF_FAILURE;
     }
-    struct HdfIoService *service = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
         return HDF_FAILURE;
@@ -1351,7 +1350,7 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
     }
 
 #ifndef ALSA_MODE
-    service = (struct HdfIoService *)handle->object;
+    struct HdfIoService *service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         LOG_FUN_ERR("The pointer is null!");
         AudioBufReplyRecycle(sBuf, NULL);
@@ -1360,10 +1359,12 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
     int32_t ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         LOG_FUN_ERR("Failed to send service call!");
+        AudioBufReplyRecycle(sBuf, NULL);
+        return ret;
     }
 #endif
     AudioBufReplyRecycle(sBuf, NULL);
-    return ret;
+    return HDF_SUCCESS;
 }
 
 int32_t AudioCallbackModeStatus(const struct AudioHwRenderParam *handleData,
