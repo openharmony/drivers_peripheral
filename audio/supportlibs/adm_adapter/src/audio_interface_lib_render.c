@@ -1360,10 +1360,12 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
     int32_t ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         LOG_FUN_ERR("Failed to send service call!");
+        AudioBufReplyRecycle(sBuf, NULL);
+        return ret;
     }
 #endif
     AudioBufReplyRecycle(sBuf, NULL);
-    return ret;
+    return HDF_SUCCESS;
 }
 
 int32_t AudioCallbackModeStatus(const struct AudioHwRenderParam *handleData,
