@@ -65,13 +65,21 @@ struct EcmWb {
 };
 
 struct EcmRb {
-    uint8_t  *base;
+    uint8_t *base;
     int size;
     int index;
     int use;
     struct EcmDevice *instance;
 };
 
+struct EcmControlParams {
+    uint8_t request;
+    uint8_t requestType;
+    uint16_t value;
+    uint16_t index;
+    void *data;
+    uint16_t size;
+};
 
 struct EcmDevice {
     struct IDeviceIoService service;

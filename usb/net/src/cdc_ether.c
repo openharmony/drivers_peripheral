@@ -200,18 +200,17 @@ exit:
     return;
 }
 
-static struct UsbControlRequest EcmUsbControlMsg(uint8_t request,
-    uint8_t requestType, uint16_t value, uint16_t index, void *data, uint16_t size)
+static struct UsbControlRequest EcmUsbControlMsg(struct EcmControlParams *controlParams)
 {
     struct UsbControlRequest dr;
-    dr.target = requestType & TARGET_MASK;
-    dr.reqType = (requestType >> USB_TYPE_OFFSET) & REQUEST_TYPE_MASK;
-    dr.directon = (requestType >> USB_DIR_OFFSET) & DIRECTION_MASK;
-    dr.request = request;
-    dr.value = CpuToLe16(value);
-    dr.index = CpuToLe16(index);
-    dr.buffer = data;
-    dr.length = CpuToLe16(size);
+    dr.target = controlParams->requestType & TARGET_MASK;
+    dr.reqType = (controlParams->requestType >> USB_TYPE_OFFSET) & REQUEST_TYPE_MASK;
+    dr.directon = (controlParams->requestType >> USB_DIR_OFFSET) & DIRECTION_MASK;
+    dr.request = controlParams->request;
+    dr.value = CpuToLe16(controlParams->value);
+    dr.index = CpuToLe16(controlParams->index);
+    dr.buffer = controlParams->data;
+    dr.length = CpuToLe16(controlParams->size);
     return dr;
 }
 
@@ -221,6 +220,7 @@ static int EcmCtrlMsg(struct EcmDevice *ecm, uint8_t request,
     int ret;
     const uint16_t index = 0;
     struct UsbRequest *usbRequest = NULL;
+    struct EcmControlParams controlParams;
     struct UsbRequestParams parmas = {};
     if (ecm == NULL) {
         HDF_LOGE("%s:invalid param", __func__);
@@ -232,13 +232,20 @@ static int EcmCtrlMsg(struct EcmDevice *ecm, uint8_t request,
         return HDF_ERR_IO;
     }
     ecm->ctrlReq = usbRequest;
+
+    controlParams.request = request;
+    controlParams.requestType = USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE;
+    controlParams.value = value;
+    controlParams.index = index;
+    controlParams.data = buf;
+    controlParams.size = len;
+
     parmas.interfaceId = USB_CTRL_INTERFACE_ID;
     parmas.pipeAddress = ecm->ctrPipe->pipeAddress;
     parmas.pipeId = ecm->ctrPipe->pipeId;
     parmas.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
     parmas.timeout = USB_CTRL_SET_TIMEOUT;
-    parmas.ctrlReq = EcmUsbControlMsg(request,  USB_DDK_TYPE_CLASS |\
-        USB_DDK_RECIP_INTERFACE, value, index, buf, len);
+    parmas.ctrlReq = EcmUsbControlMsg(&controlParams);
 
     ret = UsbFillRequest(ecm->ctrlReq, ecm->ctrDevHandle, &parmas);
     if (ret != HDF_SUCCESS) {
@@ -255,6 +262,7 @@ static int EcmCtrlMsg(struct EcmDevice *ecm, uint8_t request,
     }
     return HDF_SUCCESS;
 }
+
 static int32_t EcmRead(struct EcmDevice *ecm, struct HdfSBuf *reply)
 {
     uint32_t len;

@@ -1386,7 +1386,10 @@ int UsbSubmitRequestSync(const struct UsbRequest *request)
     ret = OsalSemWait(&requestObj->hostRequest->sem, waitTime);
     if (ret == HDF_ERR_TIMEOUT) {
         UsbCancelRequest(&requestObj->request);
-        RawHandleRequestCompletion(requestObj->hostRequest, USB_REQUEST_TIMEOUT);
+        if (OsalSemWait(&requestObj->hostRequest->sem, waitTime) == HDF_ERR_TIMEOUT) {
+            HDF_LOGE("%s:%d UsbCancelRequest sem wait timeout!", __func__, __LINE__);
+        }
+        requestObj->request.compInfo.status = USB_REQUEST_TIMEOUT;
     } else if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s:%d OsalSemWait faile, ret=%d ", __func__, __LINE__, ret);
     }

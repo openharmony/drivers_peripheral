@@ -385,12 +385,14 @@ void UsbIoSetRequestCompletionInfo(const void *requestArg)
     if ((hostRequest->requestType & USB_DDK_ENDPOINT_XFERTYPE_MASK) == USB_DDK_ENDPOINT_XFER_CONTROL) {
         requestObj->request.compInfo.buffer = requestObj->request.compInfo.buffer + USB_RAW_CONTROL_SETUP_SIZE;
     }
-    if (requestObj->isSyncReq) {
-        OsalSemPost(&hostRequest->sem);
-    }
+
     /* Fill in the request completion information. */
     /* Call user callback function. */
     if (hostRequest->userCallback) {
         hostRequest->userCallback(&requestObj->request);
+    }
+
+    if (requestObj->isSyncReq) {
+        OsalSemPost(&hostRequest->sem);
     }
 }
