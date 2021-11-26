@@ -153,6 +153,7 @@ static int AcmStartWbSync(struct AcmDevice *acm,
     parmas.userData = (void *)wb;
     parmas.dataReq.length = wb->len;
     parmas.dataReq.buffer = wb->buf;
+    parmas.callback = NULL;
     rc = UsbFillRequest(wb->request, InterfaceIdToHandle(acm, acm->dataOutPipe->interfaceId), &parmas);
     if (HDF_SUCCESS != rc) {
         HDF_LOGE("%s:UsbFillRequest faile,ret=%d \n", __func__, rc);
@@ -265,6 +266,7 @@ static int UsbGetDescriptor(struct UsbDescriptorParams *descParams)
     parmas.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
     parmas.timeout = USB_CTRL_SET_TIMEOUT;
     parmas.ctrlReq = UsbControlSetUp(&controlParams);
+    parmas.callback = NULL;
     ret = UsbFillRequest(descParams->request, descParams->devHandle, &parmas);
     if (HDF_SUCCESS != ret) {
         HDF_LOGE("%s: faile, ret=%d ", __func__, ret);
@@ -323,6 +325,7 @@ static int UsbGetStatus(UsbInterfaceHandle *devHandle,
     parmas.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
     parmas.timeout = USB_CTRL_SET_TIMEOUT;
     parmas.ctrlReq = UsbControlSetUp(&controlParams);
+    parmas.callback = NULL;
     ret = UsbFillRequest(request, devHandle, &parmas);
     if (HDF_SUCCESS != ret) {
         HDF_LOGE("%s: faile, ret=%d ", __func__, ret);
@@ -370,6 +373,7 @@ static int UsbGetInterface(const UsbInterfaceHandle *devHandle,
     parmas.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
     parmas.timeout = USB_CTRL_SET_TIMEOUT;
     parmas.ctrlReq = UsbControlSetUp(&controlParams);
+    parmas.callback = NULL;
     ret = UsbFillRequest((struct UsbRequest *)request, (UsbInterfaceHandle *)devHandle, &parmas);
     if (HDF_SUCCESS != ret) {
         HDF_LOGE("%s: faile, ret=%d ", __func__, ret);
@@ -409,6 +413,7 @@ static int UsbGetConfig(const UsbInterfaceHandle *devHandle,
     parmas.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
     parmas.timeout = USB_CTRL_SET_TIMEOUT;
     parmas.ctrlReq = UsbControlSetUp(&controlParams);
+    parmas.callback = NULL;
     ret = UsbFillRequest((struct UsbRequest *)request, (UsbInterfaceHandle *)devHandle, &parmas);
     if (HDF_SUCCESS != ret) {
         HDF_LOGE("%s: faile, ret=%d ", __func__, ret);
@@ -458,6 +463,7 @@ static int SerialCtrlMsg(struct AcmDevice *acm, uint8_t request,
     parmas.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
     parmas.timeout = USB_CTRL_SET_TIMEOUT;
     parmas.ctrlReq = UsbControlSetUp(&controlParams);
+    parmas.callback = NULL;
     ret = UsbFillRequest(acm->ctrlReq, acm->ctrDevHandle, &parmas);
     if (HDF_SUCCESS != ret) {
         HDF_LOGE("%s: faile, ret=%d ", __func__, ret);
@@ -684,6 +690,7 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
     readParmas.dataReq.numIsoPackets = 0;
     readParmas.dataReq.directon = (((uint8_t)acm->dataInPipe->pipeDirection) >> USB_DIR_OFFSET) & DIRECTION_MASK;
     readParmas.dataReq.length = acm->readSize;
+    readParmas.callback = NULL;
     ret = UsbFillRequest(g_syncRequest, InterfaceIdToHandle(acm, acm->dataInPipe->interfaceId), &readParmas);
     if (ret != HDF_SUCCESS) {
         return ret;
