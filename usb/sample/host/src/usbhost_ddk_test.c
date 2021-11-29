@@ -16,6 +16,7 @@
 #include "usbhost_ddk_test.h"
 #include <securec.h>
 #include <signal.h>
+#include <inttypes.h>
 
 #define HDF_LOG_TAG     USB_HOST_DDK_TEST
 
@@ -568,8 +569,8 @@ void TestSpeed(void)
     newValue.it_interval.tv_usec = 0;
 
     gettimeofday(&time, NULL);
-    printf("##:sec%ld usec%ld\n", time.tv_sec, time.tv_usec);
-    HDF_LOGD("##:sec%ld usec%ld\n", time.tv_sec, time.tv_usec);
+    printf("##:sec%" PRId64 " usec%" PRId64 "\n", time.tv_sec, time.tv_usec);
+    HDF_LOGD("##:sec%" PRId64 " usec%" PRId64 "\n", time.tv_sec, time.tv_usec);
     setitimer(ITIMER_REAL, &newValue, &oldValue);
     gettimeofday(&time, NULL);
 
@@ -593,8 +594,8 @@ void TestSpeed(void)
     }
 
     gettimeofday(&time, NULL);
-    printf("##:sec%ld usec%ld+cnt:%d\n",   time.tv_sec, time.tv_usec, cnt);
-    HDF_LOGD("##:sec%ld usec%ld+cnt:%d",   time.tv_sec, time.tv_usec, cnt);
+    printf("##:sec%" PRId64 " usec%" PRId64 "+cnt:%d\n",   time.tv_sec, time.tv_usec, cnt);
+    HDF_LOGD("##:sec%" PRId64 " usec%" PRId64 "+cnt:%d",   time.tv_sec, time.tv_usec, cnt);
     printf("Speed:%dKB\n", ((cnt * 512) / (30  * 1024)));
 }
 
