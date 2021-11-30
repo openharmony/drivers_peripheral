@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -268,7 +269,7 @@ static int BeginProcess(unsigned char endPoint)
     signal(SIGALRM, SignalHandler);
 
     printf("test NO SDK endpoint:%d\n", endPoint);
-    printf("Start: sec%ld usec%ld\n", time.tv_sec, time.tv_usec);
+    printf("Start: sec%" PRId64 " usec%" PRId64 "\n", time.tv_sec, time.tv_usec);
 
     for (i = 0; i < TEST_CYCLE; i++) {
         urb[i].inUse = 1;
