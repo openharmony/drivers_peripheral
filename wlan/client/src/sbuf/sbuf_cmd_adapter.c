@@ -1108,7 +1108,7 @@ int32_t WifiCmdGetHwFeature(const char *ifName, WifiHwFeatureData *hwFeatureData
         return RET_CODE_INVALID_PARAM;
     }
     data = HdfSBufObtainDefaultSize();
-    reply = HdfSBufObtainDefaultSize();
+    reply = HdfSBufObtain(sizeof(WifiHwFeatureData) + sizeof(hwFeatureData));
     if (data == NULL || reply == NULL) {
         ret = RET_CODE_FAILURE;
         goto RELEASE_DATA;
