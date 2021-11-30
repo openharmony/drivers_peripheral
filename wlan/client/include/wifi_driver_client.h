@@ -316,7 +316,7 @@ typedef struct {
     uint16_t bitrate[12];
     uint16_t htCapab;
     uint8_t resv[2];
-    WifiIeee80211Channel iee80211Channel[14];
+    WifiIeee80211Channel iee80211Channel[24];
 } WifiHwFeatureData;
 
 typedef struct {
