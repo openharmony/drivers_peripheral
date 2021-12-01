@@ -8,8 +8,8 @@
 
 #include "tfa9879_accessory_impl.h"
 #include "audio_accessory_base.h"
-#include "gpio_if.h"
 #include "audio_driver_log.h"
+#include "gpio_if.h"
 
 #define HDF_LOG_TAG "tfa9879_codec"
 
