@@ -9,11 +9,12 @@
 #ifndef HI3516_CODEC_IMPL_H
 #define HI3516_CODEC_IMPL_H
 
-#include "osal_mem.h"
-#include "osal_time.h"
+#include "audio_codec_if.h"
 #include "securec.h"
 #include "audio_control.h"
 #include "audio_parse.h"
+#include "osal_mem.h"
+#include "osal_time.h"
 
 #define ACODEC_REG_BASE         (0x113c0000)
 #define ACODEC_MAX_REG_SIZE     (0x1000)

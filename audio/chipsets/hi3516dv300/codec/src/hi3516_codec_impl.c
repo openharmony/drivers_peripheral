@@ -6,14 +6,14 @@
  * See the LICENSE file in the root of this repository for complete details.
  */
 
-#include <asm/io.h>
+#include "hi3516_aiao_impl.h"
+#include "hi3516_codec_impl.h"
 #include "audio_control.h"
 #include "audio_core.h"
 #include "audio_driver_log.h"
 #include "audio_platform_base.h"
-#include "hi3516_aiao_impl.h"
 #include "osal_io.h"
-#include "hi3516_codec_impl.h"
+#include <asm/io.h>
 
 #define HDF_LOG_TAG hi3516_codec_impl
 
@@ -247,7 +247,7 @@ int32_t AudioCodecAiaoGetCtrlOps(const struct AudioKcontrol *kcontrol, struct Au
 {
     uint32_t curValue;
     uint32_t rcurValue;
-    unsigned long codecVir;
+    void *codecVir = NULL;
     struct AudioMixerControl *mixerCtrl = NULL;
     if (kcontrol == NULL || kcontrol->privateValue <= 0 || elemValue == NULL) {
         AUDIO_DEVICE_LOG_ERR("Audio input param is NULL.");
@@ -258,10 +258,14 @@ int32_t AudioCodecAiaoGetCtrlOps(const struct AudioKcontrol *kcontrol, struct Au
         AUDIO_DEVICE_LOG_ERR("mixerCtrl is NULL.");
         return HDF_FAILURE;
     }
-    codecVir = (uintptr_t)OsalIoRemap(AIAO_REG_BASE, AIAO_MAX_REG_SIZE);
-    curValue = OSAL_READL((void *)((uintptr_t)(codecVir + mixerCtrl->reg)));
-    rcurValue = OSAL_READL((void *)((uintptr_t)(codecVir + mixerCtrl->rreg)));
-    OsalIoUnmap((void *)codecVir);
+    codecVir = OsalIoRemap(AIAO_REG_BASE, AIAO_MAX_REG_SIZE);
+    if (codecVir == NULL) {
+        AUDIO_DEVICE_LOG_ERR("codecVir is NULL.");
+        return HDF_FAILURE;
+    }
+    curValue = OSAL_READL((void *)((uintptr_t)codecVir + mixerCtrl->reg));
+    rcurValue = OSAL_READL((void *)((uintptr_t)codecVir + mixerCtrl->rreg));
+    OsalIoUnmap(codecVir);
 
     if (AudioGetCtrlOpsReg(elemValue, mixerCtrl, curValue) != HDF_SUCCESS ||
         AudioGetCtrlOpsRReg(elemValue, mixerCtrl, rcurValue) != HDF_SUCCESS) {
@@ -280,16 +284,21 @@ static void AudioUpdateCodecAiaoRegBits(const struct AudioMixerControl *mixerCon
     }
 
     uint32_t curValue;
-    unsigned long codecVir;
+    void *codecVir = NULL;
     uint32_t mixerControlMask;
 
     value = value << mixerControl->shift;
     mixerControlMask = mixerControl->mask << mixerControl->shift;
-    codecVir = (uintptr_t)OsalIoRemap(AIAO_REG_BASE, AIAO_MAX_REG_SIZE);
-    curValue = OSAL_READL((void *)((uintptr_t)(codecVir + mixerControl->reg)));
+    codecVir = OsalIoRemap(AIAO_REG_BASE, AIAO_MAX_REG_SIZE);
+    if (codecVir == NULL) {
+        AUDIO_DEVICE_LOG_ERR("codecVir is NULL.");
+        return;
+    }
+
+    curValue = OSAL_READL((void *)((uintptr_t)codecVir + mixerControl->reg));
     curValue = (curValue & ~mixerControlMask) | (value & mixerControlMask);
-    OSAL_WRITEL(curValue, (void *)((uintptr_t)(codecVir + mixerControl->reg)));
-    OsalIoUnmap((void *)codecVir);
+    OSAL_WRITEL(curValue, (void *)((uintptr_t)codecVir + mixerControl->reg));
+    OsalIoUnmap(codecVir);
 }
 
 int32_t AudioCodecAiaoSetCtrlOps(const struct AudioKcontrol *kcontrol, const struct AudioCtrlElemValue *elemValue)
