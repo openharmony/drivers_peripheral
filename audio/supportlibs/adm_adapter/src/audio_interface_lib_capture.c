@@ -1021,7 +1021,11 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
         LOG_FUN_ERR("Function parameter is NULL!");
         return HDF_FAILURE;
     }
+#ifndef ALSA_MODE
     int32_t ret;
+#else
+    int32_t ret = 0;
+#endif
     struct HdfIoService *service = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
@@ -1197,6 +1201,7 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
 #ifdef ALSA_MODE
     return TinyalsaAudioOutputCaptureRead(handle, cmdId, handleData);
 #endif
+    uint32_t dataSize = 0;
     uint32_t frameCount = 0;
     size_t replySize = AUDIO_SIZE_FRAME_16K + AUDIO_REPLY_EXTEND;
     char *frame = NULL;
