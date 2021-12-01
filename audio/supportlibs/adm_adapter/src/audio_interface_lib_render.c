@@ -1335,6 +1335,7 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
 {
 #ifndef ALSA_MODE
     int32_t ret;
+    struct HdfIoService *service = NULL;
 #else
     int32_t ret = 0;
 #endif
@@ -1342,7 +1343,6 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
         LOG_FUN_ERR("The parameter is empty");
         return HDF_FAILURE;
     }
-    struct HdfIoService *service = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
         return HDF_FAILURE;
