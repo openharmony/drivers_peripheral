@@ -1023,10 +1023,10 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
     }
 #ifndef ALSA_MODE
     int32_t ret;
+    struct HdfIoService *service = NULL;
 #else
     int32_t ret = 0;
 #endif
-    struct HdfIoService *service = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
         LOG_FUN_ERR("Failed to obtain sBuf");
