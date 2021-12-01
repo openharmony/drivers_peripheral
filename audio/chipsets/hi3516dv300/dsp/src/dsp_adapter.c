@@ -7,11 +7,11 @@
  */
 
 #include "audio_dsp_base.h"
-#include "dsp_ops.h"
 #include "audio_core.h"
+#include "dsp_ops.h"
 #include "audio_dsp_if.h"
-#include "osal_io.h"
 #include "audio_driver_log.h"
+#include "osal_io.h"
 
 #define HDF_LOG_TAG dsp_adapter
 
