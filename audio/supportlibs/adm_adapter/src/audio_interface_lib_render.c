@@ -1333,6 +1333,11 @@ int32_t FrameSbufWriteBuffer(struct HdfSBuf *sBuf, const struct AudioHwRenderPar
 int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
+#ifndef ALSA_MODE
+    int32_t ret;
+#else
+    int32_t ret = 0;
+#endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("The parameter is empty");
         return HDF_FAILURE;
@@ -1358,7 +1363,7 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
-    int32_t ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
+    ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         LOG_FUN_ERR("Failed to send service call!");
     }
