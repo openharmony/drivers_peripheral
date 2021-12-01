@@ -82,7 +82,7 @@ ohos_shared_library("libcodec_server") {
 }
 
 group("codec_service") {
-  if (target_cpu == "arm") {
+  if (target_cpu == "arm" && device_company == "hisilicon") {
     deps = [ ":libcodec_server" ]
   }
 }
