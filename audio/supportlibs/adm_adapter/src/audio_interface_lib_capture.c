@@ -1197,7 +1197,7 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
 #ifdef ALSA_MODE
     return TinyalsaAudioOutputCaptureRead(handle, cmdId, handleData);
 #endif
-    uint32_t dataSize = 0, frameCount = 0;
+    uint32_t frameCount = 0;
     size_t replySize = AUDIO_SIZE_FRAME_16K + AUDIO_REPLY_EXTEND;
     char *frame = NULL;
     struct HdfIoService *service = NULL;
