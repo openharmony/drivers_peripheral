@@ -1021,6 +1021,8 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
         LOG_FUN_ERR("Function parameter is NULL!");
         return HDF_FAILURE;
     }
+    int32_t ret;
+    struct HdfIoService *service = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
         LOG_FUN_ERR("Failed to obtain sBuf");
@@ -1035,21 +1037,19 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
         return HDF_FAILURE;
     }
 #ifndef ALSA_MODE
-    struct HdfIoService *service = (struct HdfIoService *)handle->object;
+    service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         LOG_FUN_ERR("Function parameter is empty!");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
-    int32_t ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
+    ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         LOG_FUN_ERR("Failed to send service call!");
-        AudioBufReplyRecycle(sBuf, NULL);
-        return ret;
     }
 #endif
     AudioBufReplyRecycle(sBuf, NULL);
-    return HDF_SUCCESS;
+    return ret;
 }
 
 int32_t AudioOutputCaptureOpen(const struct DevHandleCapture *handle,
