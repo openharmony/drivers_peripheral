@@ -41,7 +41,7 @@ namespace {
 
     static struct SensorValueRange g_testRange[] = {{1e5, 0}};
     static struct SensorValueRange g_accelRange[] = {{78, -78}, {78, -78}, {78, -78}};
-    static struct SensorValueRange g_alsRange[] = {{10000, 0}, {10000, 0}, {10000, 0}, {10000, 0}};
+    static struct SensorValueRange g_alsRange[] = {{10000, 0}};
     static struct SensorValueRange g_proximityRange[] = {{5, 0}};
     static struct SensorValueRange g_hallRange[] = {{1, 0}};
     static struct SensorValueRange g_barometerRange[] = {{1100, -1100}, {1100, -1100}};
@@ -54,7 +54,7 @@ namespace {
         {SENSOR_TYPE_PROXIMITY, "proximity", 0, 1, g_proximityRange},
         {SENSOR_TYPE_HALL, "hallrometer", 0, 1, g_hallRange},
         {SENSOR_TYPE_BAROMETER, "barometer", 1, 2, g_barometerRange},
-        {SENSOR_TYPE_AMBIENT_LIGHT, "als", 1, 4, g_alsRange},
+        {SENSOR_TYPE_AMBIENT_LIGHT, "als", 1, 1, g_alsRange},
         {SENSOR_TYPE_MAGNETIC_FIELD, "magnetometer", 1, 3, g_magneticRange},
         {SENSOR_TYPE_GYROSCOPE, "gyroscope", 1, 3, g_gyroscopeRange}
     };
