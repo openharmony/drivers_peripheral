@@ -577,7 +577,7 @@ HWTEST_F(AudioHdiCaptureReliabilityTest, SUB_Audio_HDI_AudioCaptureGetFrameCount
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
         EXPECT_LT(INITIAL_VALUE, g_para[0].character.getframecount);
     }
-    if (g_para[0].adapter != nullptr){
+    if (g_para[0].adapter != nullptr) {
         ret = StopAudio(g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
