@@ -8,9 +8,9 @@
 
 #include "hi3516_dai_ops.h"
 #include "audio_core.h"
-#include "osal_io.h"
 #include "audio_dai_base.h"
 #include "audio_driver_log.h"
+#include "osal_io.h"
 
 #define HDF_LOG_TAG hi3516_dai_adapter
 

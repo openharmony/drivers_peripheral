@@ -24,7 +24,7 @@ using namespace HMOS::Audio;
 namespace {
 const string ADAPTER_NAME_USB = "usb";
 const int PTHREAD_SAMEADA_COUNT = 3;
-const int PTHREAD_DIFFADA_COUNT = 1;
+const int PTHREAD_DIFFADA_COUNT = 3;
 const uint32_t SAMPLERATEVALUE = 48000;
 mutex g_testMutex;
 struct PrepareAudioPara g_para[PTHREAD_DIFFADA_COUNT] = {
@@ -577,7 +577,7 @@ HWTEST_F(AudioHdiCaptureReliabilityTest, SUB_Audio_HDI_AudioCaptureGetFrameCount
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
         EXPECT_LT(INITIAL_VALUE, g_para[0].character.getframecount);
     }
-    if (g_para[0].adapter != nullptr){
+    if (g_para[0].adapter != nullptr) {
         ret = StopAudio(g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
@@ -600,10 +600,14 @@ HWTEST_F(AudioHdiCaptureReliabilityTest, SUB_Audio_HDI_AudioGetCurrentChannelId_
                              &g_para[0].capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
+    for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
+        g_para[i].capture = g_para[0].capture;
+        g_para[i].character.getcurrentchannelId = 0;
+    }
+
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
-        g_para[0].character.getcurrentchannelId = 0;
-        ret = pthread_create(&tids[i], NULL, (THREAD_FUNC)RelAudioCaptureGetCurrentChannelId, &g_para[0]);
+        ret = pthread_create(&tids[i], NULL, (THREAD_FUNC)RelAudioCaptureGetCurrentChannelId, &g_para[i]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
 
@@ -611,12 +615,15 @@ HWTEST_F(AudioHdiCaptureReliabilityTest, SUB_Audio_HDI_AudioGetCurrentChannelId_
         void *result = nullptr;
         pthread_join(tids[i], &result);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
-        EXPECT_EQ(channelIdValue, g_para[0].character.getcurrentchannelId);
+        EXPECT_EQ(channelIdValue, g_para[i].character.getcurrentchannelId);
     }
     g_para[0].adapter->DestroyCapture(g_para[0].adapter, g_para[0].capture);
     g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
-}
 
+    for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
+        g_para[i].capture = 0;
+    }
+}
 /**
 * @tc.name  AudioCapturesetMute
 * @tc.number  SUB_Audio_HDI_AudioCaptureSetMute_0001
@@ -644,7 +651,10 @@ HWTEST_F(AudioHdiCaptureReliabilityTest, SUB_Audio_HDI_AudioCaptureSetMute_0001,
         }
         ret = pthread_create(&tids[i], NULL, (THREAD_FUNC)RelAudioCaptureSetMute, &g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-        usleep(10000);
+        void *result = nullptr;
+        pthread_join(tids[i], &result);
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
+
         ret = g_para[0].capture->volume.GetMute(g_para[0].capture, &(g_para[0].character.getmute));
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         if (g_para[0].character.setmute == true) {
@@ -654,11 +664,6 @@ HWTEST_F(AudioHdiCaptureReliabilityTest, SUB_Audio_HDI_AudioCaptureSetMute_0001,
         }
     }
 
-    for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
-        void *result = nullptr;
-        pthread_join(tids[i], &result);
-        EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
-    }
     if (g_para[0].adapter != nullptr){
         ret = StopAudio(g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);

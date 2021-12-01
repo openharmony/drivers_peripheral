@@ -205,6 +205,7 @@ int32_t AudioCtlRenderGetVolumeALSA(struct AudioHwRenderParam *handleData)
 
 int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
 {
+    int32_t ret;
 #ifdef ALSA_MODE
     return AudioCtlRenderGetVolumeALSA(handleData);
 #endif
@@ -225,7 +226,7 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
-    int32_t ret = AudioCtlRenderGetVolumeSBuf(sBuf, handleData);
+    ret = AudioCtlRenderGetVolumeSBuf(sBuf, handleData);
     if (ret < 0) {
         LOG_FUN_ERR("RenderGetVolume Failed to Get Volume sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
@@ -1332,6 +1333,12 @@ int32_t FrameSbufWriteBuffer(struct HdfSBuf *sBuf, const struct AudioHwRenderPar
 int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
+#ifndef ALSA_MODE
+    int32_t ret;
+    struct HdfIoService *service = NULL;
+#else
+    int32_t ret = 0;
+#endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("The parameter is empty");
         return HDF_FAILURE;
@@ -1350,21 +1357,19 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
     }
 
 #ifndef ALSA_MODE
-    struct HdfIoService *service = (struct HdfIoService *)handle->object;
+    service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         LOG_FUN_ERR("The pointer is null!");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
-    int32_t ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
+    ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         LOG_FUN_ERR("Failed to send service call!");
-        AudioBufReplyRecycle(sBuf, NULL);
-        return ret;
     }
 #endif
     AudioBufReplyRecycle(sBuf, NULL);
-    return HDF_SUCCESS;
+    return ret;
 }
 
 int32_t AudioCallbackModeStatus(const struct AudioHwRenderParam *handleData,

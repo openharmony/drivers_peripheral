@@ -9,9 +9,9 @@
 #include "hi3516_aiao_impl.h"
 #include <asm/io.h>
 #include "hdf_base.h"
-#include "osal_io.h"
 #include "audio_driver_log.h"
 #include "audio_dai_base.h"
+#include "osal_io.h"
 
 #define HDF_LOG_TAG hi3516_aiao_impl
 
