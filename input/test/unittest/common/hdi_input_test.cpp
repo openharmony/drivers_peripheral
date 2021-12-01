@@ -31,7 +31,7 @@ using namespace testing::ext;
 IInputInterface *g_inputInterface;
 InputEventCb g_callback;
 InputHostCb g_hotplugCb;
-bool g_HasDev = false;
+static bool g_hasDev = false;
 
 static void ReportHotPlugEventPkgCallback(const HotPlugEvent *msg);
 static void ReportEventPkgCallback(const EventPackage **pkgs, uint32_t count, uint32_t devIndex);
@@ -70,7 +70,7 @@ void HdiInputTest::SetUpTestCase()
         if (sta[i].devIndex == 0) {
             break;
         }
-        g_HasDev = true;
+        g_hasDev = true;
     }
 }
 
@@ -254,7 +254,7 @@ HWTEST_F(HdiInputTest, HotPlugCallback, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, OpenInputDev001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] OpenInputDev001 enter", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
@@ -273,7 +273,7 @@ HWTEST_F(HdiInputTest, OpenInputDev001, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, OpenInputDevice002, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] OpenInputDev002 enter", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
@@ -293,7 +293,7 @@ HWTEST_F(HdiInputTest, OpenInputDevice002, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, CloseInputDevice001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] CloseInputDev001 enter", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
@@ -312,7 +312,7 @@ HWTEST_F(HdiInputTest, CloseInputDevice001, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, CloseInputDevice002, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] CloseInputDev002 enter", __func__);
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
@@ -332,7 +332,7 @@ HWTEST_F(HdiInputTest, CloseInputDevice002, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, GetInputDevice001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] GetInputDevice001 enter", __func__);
     DeviceInfo *dev = NULL;
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
@@ -364,7 +364,7 @@ HWTEST_F(HdiInputTest, GetInputDevice001, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, GetInputDeviceList001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] GetInputDeviceList001 enter", __func__);
     int32_t ret;
     uint32_t num = 0;
@@ -398,7 +398,7 @@ HWTEST_F(HdiInputTest, GetInputDeviceList001, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, GetDeviceType001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] GetDeviceType001 enter", __func__);
     int32_t ret;
     uint32_t devType = INIT_DEFAULT_VALUE;
@@ -421,7 +421,7 @@ HWTEST_F(HdiInputTest, GetDeviceType001, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, GetChipInfo001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] GetChipInfo001 enter", __func__);
     int32_t ret;
     char chipInfo[CHIP_INFO_LEN] = {0};
@@ -444,7 +444,7 @@ HWTEST_F(HdiInputTest, GetChipInfo001, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, GetInputDevice002, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] GetInputDevice002 enter", __func__);
     int32_t ret;
     DeviceInfo *dev = NULL;
@@ -472,7 +472,7 @@ HWTEST_F(HdiInputTest, GetInputDevice002, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, RegisterCallback001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] RegisterCallbac001 enter", __func__);
     int32_t ret;
 
@@ -494,7 +494,7 @@ HWTEST_F(HdiInputTest, RegisterCallback001, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, SetPowerStatus001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] SetPowerStatus001 enter", __func__);
     int32_t ret;
     uint32_t setStatus = INPUT_LOW_POWER;
@@ -516,7 +516,7 @@ HWTEST_F(HdiInputTest, SetPowerStatus001, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, SetPowerStatus002, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] SetPowerStatus002 enter", __func__);
     int32_t ret;
     uint32_t setStatus = INPUT_LOW_POWER;
@@ -539,7 +539,7 @@ HWTEST_F(HdiInputTest, SetPowerStatus002, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, GetPowerStatus001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] GetPowerStatus001 enter", __func__);
     int32_t ret;
     uint32_t getStatus = 0;
@@ -562,7 +562,7 @@ HWTEST_F(HdiInputTest, GetPowerStatus001, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, GetPowerStatus002, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] GetPowerStatus002 enter", __func__);
     int32_t ret;
     uint32_t getStatus = 0;
@@ -585,7 +585,7 @@ HWTEST_F(HdiInputTest, GetPowerStatus002, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, GetVendorName001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] GetVendorName001 enter", __func__);
     int32_t ret;
     char vendorName[NAME_MAX_LEN] = {0};
@@ -608,7 +608,7 @@ HWTEST_F(HdiInputTest, GetVendorName001, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, GetVendorName002, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] GetVendorName002 enter", __func__);
     int32_t ret;
     char vendorName[NAME_MAX_LEN] = {0};
@@ -631,7 +631,7 @@ HWTEST_F(HdiInputTest, GetVendorName002, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, GetChipName001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] GetChipName001 enter", __func__);
     int32_t ret;
     char chipName[NAME_MAX_LEN] = {0};
@@ -654,7 +654,7 @@ HWTEST_F(HdiInputTest, GetChipName001, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, GetChipName002, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] GetChipName002 enter", __func__);
     int32_t ret;
     char chipName[NAME_MAX_LEN] = {0};
@@ -677,7 +677,7 @@ HWTEST_F(HdiInputTest, GetChipName002, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, SetGestureMode001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] SetGestureMode001 enter", __func__);
     int32_t ret;
     uint32_t gestureMode = 1;
@@ -699,7 +699,7 @@ HWTEST_F(HdiInputTest, SetGestureMode001, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, SetGestureMode002, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] SetGestureMode001 enter", __func__);
     int32_t ret;
     uint32_t gestureMode = 1;
@@ -722,7 +722,7 @@ HWTEST_F(HdiInputTest, SetGestureMode002, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, RunCapacitanceTest001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] RunCapacitanceTest001 enter", __func__);
     int32_t ret;
     char result[TEST_RESULT_LEN] = {0};
@@ -745,7 +745,7 @@ HWTEST_F(HdiInputTest, RunCapacitanceTest001, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, RunExtraCommand001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] RunExtraCommand001 enter", __func__);
     int32_t ret;
     InputExtraCmd extraCmd = {0};
@@ -769,7 +769,7 @@ HWTEST_F(HdiInputTest, RunExtraCommand001, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] RegisterCallbackAndReportData001 enter", __func__);
     int32_t ret;
 
@@ -794,7 +794,7 @@ HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level1)
   */
 HWTEST_F(HdiInputTest, UnregisterReportCallback001, TestSize.Level1)
 {
-    ASSERT_EQ(g_HasDev, true);
+    ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] UnregisterReportCallback001 enter", __func__);
     int32_t ret;
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
