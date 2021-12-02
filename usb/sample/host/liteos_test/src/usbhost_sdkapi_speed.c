@@ -13,14 +13,7 @@
  * limitations under the License.
  */
 
-#include "hdf_base.h"
-#include "hdf_log.h"
-#include "osal_mem.h"
-#include "osal_time.h"
-#include "securec.h"
-#include "usb_ddk_interface.h"
-#include "hdf_usb_pnp_manage.h"
-#include "usb_pnp_notify.h"
+#include "usbhost_sdkapi_speed.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -36,9 +29,16 @@
 #include <sys/mman.h>
 #include <osal_sem.h>
 #include <osal_thread.h>
-#include "usbhost_sdkapi_speed.h"
+#include "hdf_base.h"
+#include "hdf_log.h"
+#include "hdf_usb_pnp_manage.h"
 #include "implementation/global_implementation.h"
+#include "osal_mem.h"
+#include "osal_time.h"
+#include "securec.h"
 #include "signal.h"
+#include "usb_ddk_interface.h"
+#include "usb_pnp_notify.h"
 
 #define HDF_LOG_TAG   USB_HOST_ACM
 
@@ -183,7 +183,9 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
     }
     db->use = 0;
     if (!g_speedFlag) {
-        SerialBegin(db->instance);
+        if (SerialBegin(db->instance) != HDF_SUCCESS) {
+            HDF_LOGW("%s:%d SerialBegin error!", __func__, __LINE__);
+        }
         g_send_count++;
     }
 }
@@ -363,7 +365,7 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNu
         printf("Error: parameter error! \n\n");
         ShowHelp("speedtest");
         ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
 
     g_acm->busNum = busNum;
@@ -372,7 +374,7 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNu
     g_acm->interfaceIndex[0] = *ifaceNum;
     OsalSemInit(&timeSem, 0);
 
-end:
+END:
     return ret;
 }
 
@@ -383,9 +385,9 @@ static int32_t UsbSpeedDdkInit(void)
 
     ret = UsbInitHostSdk(NULL);
     if (ret != HDF_SUCCESS) {
-        printf("%s: UsbInitHostSdk faild", __func__);
+        printf("%s: UsbInitHostSdk failed", __func__);
         ret = HDF_ERR_IO;
-        goto end;
+        goto END;
     }
 
     for (i = 0; i < g_acm->interfaceCnt; i++) {
@@ -400,7 +402,7 @@ static int32_t UsbSpeedDdkInit(void)
             }
         } else {
             ret = HDF_FAILURE;
-            goto end;
+            goto END;
         }
     }
     if (g_writeOrRead == TEST_WRITE) {
@@ -416,7 +418,7 @@ static int32_t UsbSpeedDdkInit(void)
     if (AcmDataBufAlloc(g_acm) < 0) {
         printf("%s:%d AcmDataBufAlloc fail", __func__, __LINE__);
     }
-end:
+END:
     return ret;
 }
 
@@ -446,11 +448,11 @@ static int32_t UsbSpeedRequestHandle(void)
         rc = UsbFillRequest(snd->request, InterfaceIdToHandle(g_acm, g_acm->dataPipe->interfaceId), &parmas);
         if (rc != HDF_SUCCESS) {
             printf("%s:UsbFillRequest faile,ret=%d \n", __func__, rc);
-            goto end;
+            goto END;
         }
     }
 
-end:
+END:
     return rc;
 }
 
@@ -483,7 +485,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     if (g_acm->busy == true) {
         printf("%s: speed test busy\n", __func__);
         ret = HDF_ERR_IO;
-        goto end;
+        goto END;
     } else {
         g_acm->busy = true;
     }
@@ -492,28 +494,30 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     if ((input == NULL) || (size != sizeof(struct UsbSpeedTest))) {
         printf("%s: sbuf read buffer failed", __func__);
         ret = HDF_ERR_IO;
-        goto end;
+        goto END;
     }
 
     ret = UsbSerialSpeedInit(input, &ifaceNum);
     if (ret != HDF_SUCCESS) {
-        goto end;
+        goto END;
     }
 
     ret = UsbSpeedDdkInit();
     if (ret != HDF_SUCCESS) {
-        goto end;
+        goto END;
     }
 
     ret = UsbSpeedRequestHandle();
     if (ret != HDF_SUCCESS) {
-        goto end;
+        goto END;
     }
 
     printf("test SDK API [%s]\n", g_writeOrRead ? "write" : "read");
 
     for (i = 0; i < TEST_CYCLE; i++) {
-        SerialBegin(g_acm);
+        if (SerialBegin(g_acm) != HDF_SUCCESS) {
+            printf("SerialBegin error!\n");
+        }
         g_send_count++;
     }
 
@@ -525,7 +529,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
 
     UsbSpeedDdkExit();
 
-end:
+END:
     if (ret != HDF_SUCCESS) {
         printf("please check whether usb drv so is existing or not,like acm, ecm, if not, remove it and test again!\n");
     }

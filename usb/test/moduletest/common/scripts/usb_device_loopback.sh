@@ -15,7 +15,7 @@
 set -e
 
 IFS=$'\n'
-read_log_file="/data/acm_read_xts"
+read_log_file="./acm_read_xts"
 pid=$(ps -ef | grep 'usb_dev_test' | grep -v grep | cut -F 2)
 if [ ! "${pid}x" == "x" ];then
     killall usb_dev_test
@@ -30,7 +30,7 @@ do
     do
         data=$(echo $line | grep 'XTSCHECK' | cut -F 4 | cut -d '[|]' -f 2)
         if [ ! "${data}x" == "x" ];then
-            echo "[`date +%s.%N`]" $data
+            echo "[$(date +%s.%N)]" $data
             usb_dev_test -2 $data
         fi
     done

@@ -353,23 +353,23 @@ int main(int argc, char *argv[])
     }
 
     if (UsbHostDdkTestOpen(cmdType) != HDF_SUCCESS) {
-        goto out;
+        goto OUT;
     }
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
     signal(SIGINT, SigHandle);
 #endif
     status = TestCmdLoop(cmdType, argv[ARGV_CMD_PARAM]);
     if(status == HDF_DEV_ERR_NO_DEVICE_SERVICE){
-        goto out;
+        goto OUT;
     }
 
     if ((cmdType != HOST_ACM_ADD_INTERFACE) && (cmdType != HOST_ACM_REMOVE_INTERFACE)) {
         if (UsbHostDdkTestClose(cmdType) != HDF_SUCCESS) {
-            goto out;
+            goto OUT;
         }
     }
 
-out:
+OUT:
     run = 0;
     TestExit();
     HDF_LOGI("%s:%d moduleTest end", __func__, __LINE__);

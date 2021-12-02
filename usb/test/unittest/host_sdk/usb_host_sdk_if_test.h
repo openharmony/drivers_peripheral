@@ -16,13 +16,13 @@
 #ifndef USB_HOST_SDK_IF_TEST_H
 #define USB_HOST_SDK_IF_TEST_H
 
+#include "data_fifo.h"
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "osal_atomic.h"
 #include "usb_ddk.h"
 #include "usb_ddk_interface.h"
 #include "usb_session.h"
-#include "data_fifo.h"
 
 typedef enum {
     CMD_OPEN_PARM = 0,

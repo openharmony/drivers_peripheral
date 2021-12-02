@@ -16,7 +16,7 @@ set -e
 
 pid=$(pidof $1)
 interval=1
-log_file="/data/usb_proclog.txt"
+log_file="./usb_proclog.txt"
 cat /dev/null > $log_file
 while true
 do

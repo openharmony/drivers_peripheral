@@ -194,12 +194,12 @@ static void TestModuleWriteLog(int cmdType, const char *string, struct TestUsbDe
         if (ret < HDF_SUCCESS) {
             printf("%s:%d cmdType=%d snprintf_s failed ret=%d\n", __func__, __LINE__, cmdType, ret);
             HDF_LOGE("%s:%d cmdType=%d snprintf_s failed", __func__, __LINE__, cmdType);
-            goto out;
+            goto OUT;
         }
 
         (void)fwrite(buffer, strlen(buffer), 1, fp);
 
-    out:
+    OUT:
         (void)fclose(fp);
     }
 }

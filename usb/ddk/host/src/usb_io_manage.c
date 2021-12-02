@@ -214,24 +214,24 @@ HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHos
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s:%d OsalSemWait faile, ret=%d\n",
             __func__, __LINE__, ret);
-        goto error;
+        goto ERROR;
     }
     if (DListIsEmpty(&msgQueue->entry)) {
         ret = HDF_SUCCESS;
-        goto error;
+        goto ERROR;
     }
 
     OsalMutexLock((struct OsalMutex *)&msgQueue->mutex);
     if (msgQueue->entry.next == NULL) {
         ret = HDF_ERR_INVALID_OBJECT;
         OsalMutexUnlock((struct OsalMutex *)&msgQueue->mutex);
-        goto error;
+        goto ERROR;
     }
     reqEntry = DLIST_FIRST_ENTRY(&msgQueue->entry, struct UsbHostRequest, list);
     if (reqEntry == NULL) {
         ret = HDF_ERR_INVALID_OBJECT;
         OsalMutexUnlock((struct OsalMutex *)&msgQueue->mutex);
-        goto error;
+        goto ERROR;
     }
     DListRemove(&reqEntry->list);
     *request = (struct UsbHostRequest *)reqEntry;
@@ -239,7 +239,7 @@ HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHos
 
     return HDF_SUCCESS;
 
-error:
+ERROR:
     *request = NULL;
     return ret;
 }

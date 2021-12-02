@@ -21,7 +21,7 @@ usb_dir="/sys/bus/usb/devices/1-${port}"
 
 while true
 do
-    if [ ! -e $device ];then
+    if [ ! -e "$device" ];then
         echo "$device not exists"
         sleep 1
         continue
