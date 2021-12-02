@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define OPTION_LENGTH (2)
+#define OPTION_LENGTH 2
 
 static void ShowUsage(void)
 {

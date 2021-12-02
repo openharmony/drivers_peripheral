@@ -194,9 +194,9 @@ static void EcmWriteBulk(struct UsbRequest *req)
         case -ESHUTDOWN:
             return;
         default:
-            goto exit;
+            goto EXIT;
     }
-exit:
+EXIT:
     return;
 }
 
@@ -228,7 +228,7 @@ static int EcmCtrlMsg(struct EcmDevice *ecm, uint8_t request,
     }
     usbRequest = UsbAllocRequest(ecm->ctrDevHandle, 0, len);
     if (usbRequest == NULL) {
-        HDF_LOGE("%s: UsbAllocRequest faild", __func__);
+        HDF_LOGE("%s: UsbAllocRequest failed", __func__);
         return HDF_ERR_IO;
     }
     ecm->ctrlReq = usbRequest;
@@ -300,7 +300,7 @@ static int32_t EcmRead(struct EcmDevice *ecm, struct HdfSBuf *reply)
         HDF_LOGE("%s: no data", __func__);
         ret = 0;
         OsalMutexUnlock(&ecm->readLock);
-        goto out;
+        goto OUT;
     }
     OsalMutexUnlock(&ecm->readLock);
     bool bufok = HdfSbufWriteBuffer(reply, (const void *)buf, len);
@@ -308,7 +308,7 @@ static int32_t EcmRead(struct EcmDevice *ecm, struct HdfSBuf *reply)
         HDF_LOGE("EcmRead HdfSbufWriteBuffer err");
         ret = HDF_ERR_IO;
     }
-out:
+OUT:
     OsalMemFree(buf);
     return ret;
 }
@@ -354,13 +354,13 @@ static int32_t EcmOpen(struct EcmDevice *ecm, struct HdfSBuf *data)
         ret = UsbSubmitRequestAsync(ecm->readReq[i]);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("UsbRequestSubmitSync  faile, ret=%d ", ret);
-            goto err;
+            goto ERR;
         } else {
             ecm->readReqNum++;
         }
     }
     return HDF_SUCCESS;
-err:
+ERR:
     EcmFreeFifo(&ecm->readFifo);
     return ret;
 }
@@ -645,23 +645,23 @@ static int32_t EcmGetPipes(struct EcmDevice *ecm)
     ecm->dataInPipe = EcmGetPipe(ecm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_IN);
     if (ecm->dataInPipe == NULL) {
         HDF_LOGE("dataInPipe is NULL\n");
-        goto error;
+        goto ERROR;
     }
     ecm->dataOutPipe = EcmGetPipe(ecm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_OUT);
     if (ecm->dataOutPipe == NULL) {
         HDF_LOGE("dataOutPipe is NULL\n");
-        goto error;
+        goto ERROR;
     }
     ecm->ctrPipe = EcmEnumePipe(ecm, ecm->ctrIface->info.interfaceIndex,
                                 USB_PIPE_TYPE_CONTROL, USB_PIPE_DIRECTION_OUT);
     if (ecm->ctrPipe == NULL) {
         HDF_LOGE("ctrPipe is NULL\n");
-        goto error;
+        goto ERROR;
     }
     ecm->intPipe = EcmGetPipe(ecm, USB_PIPE_TYPE_INTERRUPT, USB_PIPE_DIRECTION_IN);
     if (ecm->intPipe == NULL) {
         HDF_LOGE("intPipe is NULL\n");
-        goto error;
+        goto ERROR;
     }
 
     ecm->readSize  = ecm->dataInPipe->maxPacketSize;
@@ -671,7 +671,7 @@ static int32_t EcmGetPipes(struct EcmDevice *ecm)
 
     return HDF_SUCCESS;
 
-error:
+ERROR:
     EcmFreePipes(ecm);
     return HDF_FAILURE;
 }
@@ -703,11 +703,11 @@ static int32_t EcmDriverBind(struct HdfDeviceObject *device)
         if (err != EOK) {
             HDF_LOGE("%s:%d memcpy_s faile err=%d", \
                 __func__, __LINE__, err);
-            goto error;
+            goto ERROR;
         }
     } else {
         HDF_LOGE("%s:%d info is NULL!", __func__, __LINE__);
-        goto error;
+        goto ERROR;
     }
 
     ecm->device  = device;
@@ -716,7 +716,7 @@ static int32_t EcmDriverBind(struct HdfDeviceObject *device)
     HDF_LOGD("EcmDriverBind=========================OK");
     return HDF_SUCCESS;
 
-error:
+ERROR:
     OsalMemFree(ecm);
     ecm = NULL;
     return HDF_FAILURE;
@@ -756,7 +756,7 @@ static void EcmCtrlIrq(struct UsbRequest *req)
         case -ESHUTDOWN:
             return;
         default:
-            goto exit;
+            goto EXIT;
     }
     if (ecm->nbIndex){
         dr = (struct UsbCdcNotification *)ecm->notificationBuffer;
@@ -771,7 +771,7 @@ static void EcmCtrlIrq(struct UsbRequest *req)
             allocSize = expectedSize;
             ecm->notificationBuffer = OsalMemCalloc(allocSize);
             if (!ecm->notificationBuffer){
-                goto exit;
+                goto EXIT;
             }
             ecm->nbSize = allocSize;
         }
@@ -794,7 +794,7 @@ static void EcmCtrlIrq(struct UsbRequest *req)
         HDF_LOGE("%s - usb_submit_urb failed: %d\n", __func__, retval);
     }
 
-exit:
+EXIT:
     HDF_LOGE("%s:%d exit", __func__, __LINE__);
 }
 
@@ -851,11 +851,11 @@ void EcmAllocWriteReq(struct EcmDevice *ecm)
         snd->use = 0;
         if (snd->request == NULL) {
             HDF_LOGE("snd request fail\n");
-            goto err;
+            goto ERR;
         }
     }
     return;
-err:
+ERR:
    EcmWriteBufFree(ecm);
    return;
 }
@@ -909,7 +909,7 @@ void EcmAllocReadReq(struct EcmDevice *ecm)
     for (int i = 0; i < ECM_NR; i++) {
         ecm->readReq[i] = UsbAllocRequest(InterfaceIdToHandle(ecm, ecm->dataInPipe->interfaceId), 0, ecm->readSize);
         if (!ecm->readReq[i]) {
-            HDF_LOGE("readReq request faild\n");
+            HDF_LOGE("readReq request failed\n");
             return;
         }
         readParmas.userData = (void *)ecm;
@@ -936,10 +936,10 @@ void EcmFreeReadReq(struct EcmDevice *ecm)
     for (int i = 0; i < ECM_NR; i++) {
         ret = UsbFreeRequest(ecm->readReq[i]);
         if (ret) {
-            goto err;
+            goto ERR;
         }
     }
-err:
+ERR:
     return;
 }
 
@@ -984,19 +984,19 @@ static int32_t EcmClaimInterfaces(struct EcmDevice *ecm)
         ecm->iface[i] = EcmGetUsbInterfaceById(ecm, ecm->interfaceIndex[i]);
         if (ecm->iface[i] == NULL) {
             HDF_LOGE("interface%d is null", ecm->interfaceIndex[i]);
-            goto error;
+            goto ERROR;
         }
     }
 
     ecm->ctrIface = EcmGetUsbInterfaceById(ecm, USB_CTRL_INTERFACE_ID);
     if (ecm->ctrIface == NULL) {
         HDF_LOGE("%d: UsbClaimInterface null", __LINE__);
-        goto error;
+        goto ERROR;
     }
 
     return HDF_SUCCESS;
 
-error:
+ERROR:
     EcmReleaseInterfaces(ecm);
     return HDF_FAILURE;
 }
@@ -1023,7 +1023,7 @@ static int32_t EcmOpenInterfaces(struct EcmDevice *ecm)
             ecm->devHandle[i] = UsbOpenInterface(ecm->iface[i]);
             if (ecm->devHandle[i] == NULL) {
                 HDF_LOGE("%s: UsbOpenInterface null", __func__);
-                goto error;
+                goto ERROR;
             }
         }
     }
@@ -1031,12 +1031,12 @@ static int32_t EcmOpenInterfaces(struct EcmDevice *ecm)
     ecm->ctrDevHandle = UsbOpenInterface(ecm->ctrIface);
     if (ecm->ctrDevHandle == NULL) {
         HDF_LOGE("%s: ctrDevHandle UsbOpenInterface null", __func__);
-        goto error;
+        goto ERROR;
     }
 
     return HDF_SUCCESS;
 
-error:
+ERROR:
     EcmCloseInterfaces(ecm);
     return HDF_FAILURE;
 }
@@ -1054,21 +1054,21 @@ static int32_t EcmInit(struct EcmDevice *ecm)
 
     ret = UsbInitHostSdk(NULL);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbInitHostSdk faild", __func__);
+        HDF_LOGE("%s: UsbInitHostSdk failed", __func__);
         return HDF_ERR_IO;
     }
     ecm->session = session;
 
     ret = EcmClaimInterfaces(ecm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: EcmClaimInterfaces faild", __func__);
-        goto error_claim_interfaces;
+        HDF_LOGE("%s: EcmClaimInterfaces failed", __func__);
+        goto ERR_CLAIM_INTERFACES;
     }
 
     ret = EcmOpenInterfaces(ecm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: EcmOpenInterfaces faild", __func__);
-        goto error_open_interfaces;
+        HDF_LOGE("%s: EcmOpenInterfaces failed", __func__);
+        goto ERROR_OPEN_INTERFACES;
     }
 
     /* set altsetting */
@@ -1076,19 +1076,19 @@ static int32_t EcmInit(struct EcmDevice *ecm)
         &ecm->iface[ecm->interfaceCnt-1]);
     if (ret) {
         HDF_LOGE("UsbSelectInterfaceSetting fail\n");
-        goto error_select_setting;
+        goto ERROR_SELECT_SETTING;
     }
 
     ret = EcmGetPipes(ecm);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: EcmGetPipes failed", __func__);
-        goto error_get_pipes;
+        goto ERROR_GET_PIPES;
     }
 
     ret = EcmAllocIntReq(ecm);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: EcmAllocIntReq failed", __func__);
-        goto error_alloc_req;
+        goto ERROR_ALLOC_REQ;
     }
     if (0) {
         EcmCtrlMsg(ecm, USB_DDK_CDC_SET_ETHERNET_PACKET_FILTER, USB_DDK_CDC_PACKET_TYPE_DIRECTED
@@ -1101,14 +1101,14 @@ static int32_t EcmInit(struct EcmDevice *ecm)
     ecm->initFlag = true;
     return HDF_SUCCESS;
 
-error_alloc_req:
+ERROR_ALLOC_REQ:
     EcmFreePipes(ecm);
-error_get_pipes:
-error_select_setting:
+ERROR_GET_PIPES:
+ERROR_SELECT_SETTING:
     EcmCloseInterfaces(ecm);
-error_open_interfaces:
+ERROR_OPEN_INTERFACES:
     EcmReleaseInterfaces(ecm);
-error_claim_interfaces:
+ERR_CLAIM_INTERFACES:
     UsbExitHostSdk(ecm->session);
     ecm->session = NULL;
     return ret;

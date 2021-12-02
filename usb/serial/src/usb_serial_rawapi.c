@@ -303,7 +303,7 @@ static int UsbAllocWriteRequests(struct AcmDevice *acm)
         snd->request = UsbRawAllocRequest(acm->devHandle, 0, acm->dataOutEp->maxPacketSize);
         snd->instance = acm;
         if (snd->request == NULL) {
-            HDF_LOGE("%s: UsbRawAllocRequest faild", __func__);
+            HDF_LOGE("%s: UsbRawAllocRequest failed", __func__);
             return HDF_ERR_MALLOC_FAIL;
         }
     }
@@ -484,7 +484,7 @@ static int SerialSendCtrlMsg(struct AcmDevice *acm, uint8_t request,
     if (acm->ctrlReq == NULL) {
         acm->ctrlReq = UsbRawAllocRequest(acm->devHandle, 0, USB_CTRL_REQ_SIZE);
         if (acm->ctrlReq == NULL) {
-            HDF_LOGE("%s: UsbRawAllocRequest faild", __func__);
+            HDF_LOGE("%s: UsbRawAllocRequest failed", __func__);
             return HDF_ERR_MALLOC_FAIL;
         }
     }
@@ -584,7 +584,7 @@ static int32_t UsbSerialRead(struct SerialDevice *port, struct HdfSBuf *reply)
         HDF_LOGE("%s:%d no data", __func__, __LINE__);
         ret = HDF_SUCCESS;
         OsalMutexUnlock(&acm->readLock);
-        goto out;
+        goto OUT;
     }
     OsalMutexUnlock(&acm->readLock);
 
@@ -593,7 +593,7 @@ static int32_t UsbSerialRead(struct SerialDevice *port, struct HdfSBuf *reply)
         ret = HDF_ERR_IO;
     }
 
-out:
+OUT:
     OsalMemFree(buf);
     return ret;
 }
@@ -686,12 +686,12 @@ static int32_t SerialOpen(struct SerialDevice *port, struct HdfSBuf *data)
         ret = UsbRawSubmitRequest(acm->readReq[i]);
         if (ret) {
             HDF_LOGE("%s: UsbRawSubmitRequest failed, ret=%d ", __func__, ret);
-            goto err;
+            goto ERR;
         }
     }
     return HDF_SUCCESS;
 
-err:
+ERR:
     UsbSerialFreeFifo(&port->readFifo);
     return ret;
 }
@@ -868,7 +868,7 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
         HDF_LOGD("%s:%d g_syncRequest:%p \n", __func__, __LINE__, g_syncRequest);
         g_syncRequest = UsbRawAllocRequest(acm->devHandle, 0, acm->dataInEp->maxPacketSize);
         if (g_syncRequest == NULL) {
-            HDF_LOGE("UsbRawAllocRequest g_syncRequest faild\n");
+            HDF_LOGE("UsbRawAllocRequest g_syncRequest failed\n");
             return HDF_ERR_MALLOC_FAIL;
         }
     }
@@ -1007,7 +1007,7 @@ static int32_t UsbSerialDriverBind(struct HdfDeviceObject *device)
     }
     if (OsalMutexInit(&acm->lock) != HDF_SUCCESS) {
         HDF_LOGE("%s:%d OsalMutexInit fail", __func__, __LINE__);
-        goto error;
+        goto ERROR;
     }
 
     info = (struct UsbPnpNotifyServiceInfo *)device->priv;
@@ -1020,11 +1020,11 @@ static int32_t UsbSerialDriverBind(struct HdfDeviceObject *device)
         if (err != EOK) {
             HDF_LOGE("%s:%d memcpy_s faile err=%d", \
                 __func__, __LINE__, err);
-            goto lock_error;
+            goto LOCK_ERROR;
         }
     } else {
         HDF_LOGE("%s:%d info is NULL!", __func__, __LINE__);
-        goto lock_error;
+        goto LOCK_ERROR;
     }
 
     device->service = &(acm->service);
@@ -1033,11 +1033,11 @@ static int32_t UsbSerialDriverBind(struct HdfDeviceObject *device)
     HDF_LOGD("UsbSerialDriverBind=========================OK");
     return HDF_SUCCESS;
 
-lock_error:
+LOCK_ERROR:
     if (OsalMutexDestroy(&acm->lock)) {
         HDF_LOGE("%s:%d OsalMutexDestroy fail", __func__, __LINE__);
     }
-error:
+ERROR:
     OsalMemFree(acm);
     acm = NULL;
     return HDF_FAILURE;
@@ -1113,7 +1113,7 @@ static void AcmNotifyReqCallback(const void *requestArg)
     HDF_LOGD("Irqstatus:%d,actualLength:%u\n", req->status, currentSize);
 
     if (req->status != USB_REQUEST_COMPLETED) {
-        goto exit;
+        goto EXIT;
     }
 
     if (acm->nbIndex) {
@@ -1127,7 +1127,7 @@ static void AcmNotifyReqCallback(const void *requestArg)
     }
     if (currentSize < expectedSize) {
         if (AcmNotificationBufferProcess(req, acm, currentSize, expectedSize) != HDF_SUCCESS) {
-            goto exit;
+            goto EXIT;
         }
         currentSize = acm->nbIndex;
     }
@@ -1140,7 +1140,7 @@ static void AcmNotifyReqCallback(const void *requestArg)
         HDF_LOGE("%s - UsbRawSubmitRequest failed", __func__);
     }
 
-exit:
+EXIT:
     HDF_LOGE("%s:%d exit", __func__, __LINE__);
 }
 
@@ -1196,7 +1196,7 @@ static int UsbAllocReadRequests(struct AcmDevice *acm)
     for (int i = 0; i < ACM_NR; i++) {
         acm->readReq[i] = UsbRawAllocRequest(acm->devHandle, 0, size);
         if (!acm->readReq[i]) {
-            HDF_LOGE("readReq request faild\n");
+            HDF_LOGE("readReq request failed\n");
             return HDF_ERR_MALLOC_FAIL;
         }
 
@@ -1294,57 +1294,57 @@ static int32_t UsbSerialInit(struct AcmDevice *acm)
 
     ret = UsbRawInit(NULL);
     if (ret) {
-        HDF_LOGE("%s:%d UsbRawInit faild", __func__, __LINE__);
+        HDF_LOGE("%s:%d UsbRawInit failed", __func__, __LINE__);
         return HDF_ERR_IO;
     }
     acm->session = session;
 
     devHandle = UsbRawOpenDevice(session, acm->busNum, acm->devAddr);
     if (devHandle == NULL) {
-        HDF_LOGE("%s:%d UsbRawOpenDevice faild", __func__, __LINE__);
+        HDF_LOGE("%s:%d UsbRawOpenDevice failed", __func__, __LINE__);
         ret =  HDF_FAILURE;
-        goto err_open_device;
+        goto ERR_OPEN_DEVICE;
     }
     acm->devHandle = devHandle;
     ret = UsbGetConfigDescriptor(devHandle, &acm->config);
     if (ret) {
-        HDF_LOGE("%s:%d UsbGetConfigDescriptor faild", __func__, __LINE__);
+        HDF_LOGE("%s:%d UsbGetConfigDescriptor failed", __func__, __LINE__);
         ret =  HDF_FAILURE;
-        goto err_get_desc;
+        goto ERR_GET_DESC;
     }
     ret = UsbParseConfigDescriptor(acm, acm->config);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d UsbParseConfigDescriptor faild", __func__, __LINE__);
+        HDF_LOGE("%s:%d UsbParseConfigDescriptor failed", __func__, __LINE__);
         ret = HDF_FAILURE;
-        goto err_parse_desc;
+        goto ERR_PARSE_DESC;
     }
 
     ret = AcmWriteBufAlloc(acm);
     if (ret < 0) {
-        HDF_LOGE("%s:%d AcmWriteBufAlloc faild", __func__, __LINE__);
+        HDF_LOGE("%s:%d AcmWriteBufAlloc failed", __func__, __LINE__);
         ret = HDF_FAILURE;
-        goto err_alloc_write_buf;
+        goto ERR_ALLOC_WRITE_BUF;
     }
     ret = UsbAllocWriteRequests(acm);
     if (ret < 0) {
-        HDF_LOGE("%s:%d UsbAllocWriteRequests faild", __func__, __LINE__);
+        HDF_LOGE("%s:%d UsbAllocWriteRequests failed", __func__, __LINE__);
         ret = HDF_FAILURE;
-        goto err_alloc_write_reqs;
+        goto ERR_ALLOC_WRITE_REQS;
     }
     ret = UsbAllocNotifyRequest(acm);
     if (ret) {
-        HDF_LOGE("%s:%d UsbAllocNotifyRequests faild", __func__, __LINE__);
-        goto err_alloc_notify_req;
+        HDF_LOGE("%s:%d UsbAllocNotifyRequests failed", __func__, __LINE__);
+        goto ERR_ALLOC_NOTIFY_REQ;
     }
     ret = UsbAllocReadRequests(acm);
     if (ret) {
-        HDF_LOGE("%s:%d UsbAllocReadRequests faild", __func__, __LINE__);
-        goto err_alloc_read_reqs;
+        HDF_LOGE("%s:%d UsbAllocReadRequests failed", __func__, __LINE__);
+        goto ERR_ALLOC_READ_REQS;
     }
     ret = UsbStartIo(acm);
     if (ret) {
-        HDF_LOGE("%s:%d UsbAllocReadRequests faild", __func__, __LINE__);
-        goto err_start_io;
+        HDF_LOGE("%s:%d UsbAllocReadRequests failed", __func__, __LINE__);
+        goto ERR_START_IO;
     }
 
     acm->lineCoding.dwDTERate   = CpuToLe32(DATARATE);
@@ -1355,7 +1355,7 @@ static int32_t UsbSerialInit(struct AcmDevice *acm)
     ret = UsbRawSubmitRequest(acm->notifyReq);
     if (ret) {
         HDF_LOGE("%s:%d UsbRawSubmitRequest failed", __func__, __LINE__);
-        goto err_submit_req;
+        goto ERR_SUBMIT_REQ;
     }
 
     acm->initFlag = true;
@@ -1364,24 +1364,24 @@ static int32_t UsbSerialInit(struct AcmDevice *acm)
 
     return HDF_SUCCESS;
 
-err_submit_req:
+ERR_SUBMIT_REQ:
     UsbStopIo(acm);
-err_start_io:
+ERR_START_IO:
     UsbFreeReadRequests(acm);
-err_alloc_read_reqs:
+ERR_ALLOC_READ_REQS:
     UsbFreeNotifyReqeust(acm);
- err_alloc_notify_req:
+ERR_ALLOC_NOTIFY_REQ:
     UsbFreeWriteRequests(acm);
-err_alloc_write_reqs:
+ERR_ALLOC_WRITE_REQS:
     AcmWriteBufFree(acm);
-err_alloc_write_buf:
+ERR_ALLOC_WRITE_BUF:
     UsbReleaseInterfaces(acm);
-err_parse_desc:
+ERR_PARSE_DESC:
     UsbRawFreeConfigDescriptor(acm->config);
     acm->config = NULL;
-err_get_desc:
+ERR_GET_DESC:
     (void)UsbRawCloseDevice(devHandle);
-err_open_device:
+ERR_OPEN_DEVICE:
     UsbRawExit(acm->session);
 
     return ret;
@@ -1431,7 +1431,7 @@ static int32_t UsbSerialDriverInit(struct HdfDeviceObject *device)
 
     ret = UsbSerialDeviceAlloc(acm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d UsbSerialDeviceAlloc faild", __func__, __LINE__);
+        HDF_LOGE("%s:%d UsbSerialDeviceAlloc failed", __func__, __LINE__);
     }
 
     acm->initFlag = false;

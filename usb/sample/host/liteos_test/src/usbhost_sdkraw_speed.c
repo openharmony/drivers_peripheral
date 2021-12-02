@@ -13,19 +13,7 @@
  * limitations under the License.
  */
 
-#include "osal_mem.h"
-#include "osal_time.h"
-#include "securec.h"
-#include "hdf_base.h"
-#include "hdf_log.h"
-#include "hdf_usb_pnp_manage.h"
-#include "hdf_base.h"
-#include "hdf_log.h"
-#include "osal_mem.h"
-#include "osal_time.h"
-#include "securec.h"
-#include "usb_ddk_interface.h"
-#include "hdf_usb_pnp_manage.h"
+#include "usbhost_sdkraw_speed.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -40,9 +28,15 @@
 #include <signal.h>
 #include <sys/mman.h>
 #include <osal_thread.h>
-#include "usbhost_sdkraw_speed.h"
+#include "hdf_base.h"
+#include "hdf_log.h"
+#include "hdf_usb_pnp_manage.h"
 #include "implementation/global_implementation.h"
+#include "osal_mem.h"
+#include "osal_time.h"
+#include "securec.h"
 #include "signal.h"
+#include "usb_ddk_interface.h"
 #include "usb_pnp_notify.h"
 
 #define HDF_LOG_TAG                USB_HOST_ACM_RAW_API
@@ -103,7 +97,7 @@ static int UsbIoThread(void *data)
         }
     }
 
-    HDF_LOGD("%s:%d exit", __func__, __LINE__);
+    HDF_LOGE("%s:%d exit", __func__, __LINE__);
 
     return HDF_SUCCESS;
 }
@@ -115,7 +109,9 @@ static int UsbIoSendThread(void *data)
     while (!g_stopIoThreadFlag) {
         OsalSemWait(&sem, HDF_WAIT_FOREVER);
         if (!g_speedFlag) {
-            SerialBegin(acm);
+            if (SerialBegin(acm) != HDF_SUCCESS) {
+                HDF_LOGW("%s:%d SerialBegin error!", __func__, __LINE__);
+            }
             g_send_count++;
         }
     }
@@ -340,7 +336,7 @@ static int UsbAllocDataRequests(struct AcmDevice *acm)
         snd->request = UsbRawAllocRequest(acm->devHandle, 0, acm->dataEp->maxPacketSize);
         snd->instance = acm;
         if (snd->request == NULL) {
-            printf("%s: UsbRawAllocRequest faild", __func__);
+            printf("%s: UsbRawAllocRequest failed", __func__);
             return HDF_ERR_MALLOC_FAIL;
         }
         struct UsbRawFillRequestData reqData;
@@ -593,7 +589,7 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNu
         printf("Error: parameter error! \n\n");
         ShowHelp("speedtest");
         ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
 
     g_acm->busNum = busNum;
@@ -603,7 +599,7 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNu
     OsalSemInit(&sem, 0);
     OsalSemInit(&timeSem, 0);
 
-end:
+END:
     return ret;
 }
 
@@ -614,53 +610,53 @@ static int32_t UsbSpeedDdkInit(const struct UsbSession *session)
 
     ret = UsbRawInit((struct UsbSession **)&session);
     if (ret) {
-        HDF_LOGE("%s: UsbRawInit faild\n", __func__);
+        HDF_LOGE("%s: UsbRawInit failed\n", __func__);
         return HDF_ERR_IO;
-        goto end;
+        goto END;
     }
 
     devHandle = UsbRawOpenDevice(session, g_acm->busNum, g_acm->devAddr);
     if (devHandle == NULL) {
-        HDF_LOGE("%s: UsbRawOpenDevice faild\n", __func__);
+        HDF_LOGE("%s: UsbRawOpenDevice failed\n", __func__);
         ret =  HDF_FAILURE;
-        goto end;
+        goto END;
     }
     g_acm->devHandle = devHandle;
     ret = UsbGetConfigDescriptor(devHandle, &g_acm->config);
     if (ret) {
-        HDF_LOGE("%s: UsbGetConfigDescriptor faild\n", __func__);
+        HDF_LOGE("%s: UsbGetConfigDescriptor failed\n", __func__);
         ret =  HDF_FAILURE;
-        goto end;
+        goto END;
     }
     ret = UsbParseConfigDescriptor(g_acm, g_acm->config);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbParseConfigDescriptor faild\n", __func__);
+        HDF_LOGE("%s: UsbParseConfigDescriptor failed\n", __func__);
         ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
     g_acm->dataSize = TEST_LENGTH;
     g_acm->dataEp = (g_writeOrRead == TEST_WRITE) ? g_acm->dataOutEp : g_acm->dataInEp;
 
     ret = AcmDataBufAlloc(g_acm);
     if (ret < 0) {
-        HDF_LOGE("%s: AcmDataBufAlloc faild\n", __func__);
+        HDF_LOGE("%s: AcmDataBufAlloc failed\n", __func__);
         ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
     ret = UsbAllocDataRequests(g_acm);
     if (ret < 0) {
-        HDF_LOGE("%s: UsbAllocDataRequests faild\n", __func__);
+        HDF_LOGE("%s: UsbAllocDataRequests failed\n", __func__);
         ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
 
     ret = UsbStartIo(g_acm);
     if (ret) {
-        HDF_LOGE("%s: UsbAllocReadRequests faild\n", __func__);
-        goto end;
+        HDF_LOGE("%s: UsbAllocReadRequests failed\n", __func__);
+        goto END;
     }
 
-end:
+END:
     return ret;
 }
 
@@ -668,8 +664,12 @@ static void UsbSpeedDdkExit(const struct UsbSession *session)
 {
     int i;
 
-    UsbStopIo(g_acm);
-    UsbFreeDataRequests(g_acm);
+    if (UsbStopIo(g_acm) != HDF_SUCCESS) {
+        HDF_LOGE("%s UsbStopIo error!", __func__);
+    }
+    if (UsbFreeDataRequests(g_acm) != HDF_SUCCESS) {
+        HDF_LOGE("%s UsbFreeDataRequests error!", __func__);
+    }
     AcmDataBufFree(g_acm);
     for (i = 0; i < g_acm->interfaceCnt; i++) {
         uint8_t interfaceIndex = g_acm->interfaceIndex[i];
@@ -694,7 +694,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     if (g_acm->busy == true) {
         printf("%s: speed test busy\n", __func__);
         ret = HDF_ERR_IO;
-        goto end;
+        goto END;
     } else {
         g_acm->busy = true;
     }
@@ -703,23 +703,25 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     if ((input == NULL) || (size != sizeof(struct UsbSpeedTest))) {
         printf("%s: sbuf read buffer failed\n", __func__);
         ret = HDF_ERR_IO;
-        goto end;
+        goto END;
     }
 
     ret = UsbSerialSpeedInit(input, &ifaceNum);
     if (ret != HDF_SUCCESS) {
-        goto end;
+        goto END;
     }
 
     ret = UsbSpeedDdkInit(session);
     if (ret != HDF_SUCCESS) {
-        goto end;
+        goto END;
     }
 
     printf("test SDK rawAPI [%s]\n", g_writeOrRead ? "write" : "read");
 
     for (i = 0; i < TEST_CYCLE; i++) {
-        SerialBegin(g_acm);
+        if (SerialBegin(g_acm) != HDF_SUCCESS) {
+            printf("SerialBegin error!\n");
+        }
         g_send_count++;
     }
 
@@ -730,7 +732,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     }
 
     UsbSpeedDdkExit(session);
-end:
+END:
     if (ret != HDF_SUCCESS) {
         printf("please check whether usb drv so is existing or not,like acm,ecm,if not,remove it and test again!\n");
     }

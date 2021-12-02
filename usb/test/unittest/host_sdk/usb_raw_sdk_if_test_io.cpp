@@ -134,7 +134,9 @@ static int UsbStopIo(struct AcmDevice *acm)
 void UsbRawSdkIfTestIo::TearDownTestCase()
 {
     g_acm = &g_deviceService;
-    UsbStopIo(g_acm);
+    if (UsbStopIo(g_acm) != HDF_SUCCESS) {
+        HDF_LOGW("%s:%d UsbStopIo error!", __func__, __LINE__);
+    }
 }
 
 extern "C" {

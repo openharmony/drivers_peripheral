@@ -34,7 +34,7 @@ static void *OsAdapterRealloc(void *ptr, size_t oldSize, size_t newSize)
     mem = RawUsbMemAlloc(newSize);
     if (mem == NULL) {
         HDF_LOGE("%s:%d", __func__, __LINE__);
-        goto out;
+        goto OUT;
     }
 
     if (oldSize > 0) {
@@ -42,12 +42,12 @@ static void *OsAdapterRealloc(void *ptr, size_t oldSize, size_t newSize)
             HDF_LOGE("%s:%d", __func__, __LINE__);
             RawUsbMemFree(mem);
             mem = NULL;
-            goto out;
+            goto OUT;
         }
     }
 
     RawUsbMemFree(ptr);
-out:
+OUT:
     return mem;
 }
 
@@ -262,7 +262,7 @@ static int OsInitDevice(struct UsbDevice *dev, uint8_t busNum, uint8_t devAddr)
 
     ret = ioctl(fd, USBDEVFS_GET_CAPABILITIES, &devHandle->caps);
     if (ret < 0) {
-        HDF_LOGE("%s:%d get capabilities faild, errno=%d",
+        HDF_LOGE("%s:%d get capabilities failed, errno=%d",
             __func__, __LINE__, errno);
         devHandle->caps = USB_ADAPTER_CAP_BULK_CONTINUATION;
     }
@@ -739,7 +739,7 @@ static int OsIsoCompletion(struct UsbHostRequest *request, struct UsbAdapterUrb 
             OsFreeIsoUrbs(request);
             return RawHandleRequestCompletion(request, USB_REQUEST_ERROR);
         }
-        goto out;
+        goto OUT;
     }
 
     if (urb->status == -ESHUTDOWN) {
@@ -755,7 +755,7 @@ static int OsIsoCompletion(struct UsbHostRequest *request, struct UsbAdapterUrb 
         OsFreeIsoUrbs(request);
         return RawHandleRequestCompletion(request, status);
     }
-out:
+OUT:
     return 0;
 }
 
@@ -823,38 +823,38 @@ static int OsBulkCompletion(struct UsbHostRequest * const request, const struct 
     request->numRetired++;
     if (request->reqStatus != USB_REQUEST_COMPLETED) {
         if (OsProcessAbnormalReap(request, urb) == HDF_SUCCESS) {
-            goto completed;
+            goto COMPLETED;
         } else {
-            goto out;
+            goto OUT;
         }
     }
     request->actualLength += urb->actualLength;
 
     ret = OsUrbStatusToRequestStatus(request, urb);
     if (ret == HDF_DEV_ERR_NO_DEVICE) {
-        goto cancel;
+        goto CANCEL;
     } else if (ret == HDF_FAILURE) {
-        goto completed;
+        goto COMPLETED;
     }
 
     if (request->numRetired == request->numUrbs) {
-        goto completed;
+        goto COMPLETED;
     } else if (urb->actualLength < urb->bufferLength) {
         if (request->reqStatus == USB_REQUEST_COMPLETED) {
             request->reqStatus = USB_REQUEST_COMPLETED_SHORT;
         }
     } else {
-        goto out;
+        goto OUT;
     }
 
-cancel:
+CANCEL:
     if (request->numRetired == request->numUrbs) {
-        goto completed;
+        goto COMPLETED;
     }
     OsDiscardUrbs(request, urbIdx + 1, request->numUrbs);
-out:
+OUT:
     return HDF_SUCCESS;
-completed:
+COMPLETED:
     return RawHandleRequestCompletion(request, request->reqStatus);
 }
 
@@ -886,13 +886,13 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
 
     dev = OsAllocDevice(session, handle);
     if (dev == NULL) {
-        goto err;
+        goto ERR;
     }
 
     ret = OsInitDevice(dev, busNum, usbAddr);
     if (ret) {
         RawUsbMemFree(dev);
-        goto err;
+        goto ERR;
     }
 
     OsalAtomicSet(&dev->refcnt, 1);
@@ -903,7 +903,7 @@ static struct UsbDeviceHandle *AdapterOpenDevice(struct UsbSession *session, uin
 
     return handle;
 
-err:
+ERR:
     OsalMutexDestroy(&handle->lock);
     RawUsbMemFree(handle);
     return NULL;

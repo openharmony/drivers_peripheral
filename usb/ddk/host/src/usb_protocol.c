@@ -214,35 +214,35 @@ static int UsbProtocalCreatInterfaceObj(const struct UsbRawConfigDescriptor *con
         itface = UsbGetInterfaceFromConfig(config, i);
         if (itface == NULL) {
             ret = HDF_ERR_INVALID_PARAM;
-            goto error;
+            goto ERROR;
         }
 
         for (j = 0; j < itface->numAltsetting; j++) {
             ifDes = UsbGetInterfaceDesc(itface, j);
             if (ifDes == NULL) {
                 ret = HDF_ERR_INVALID_PARAM;
-                goto error;
+                goto ERROR;
             }
 
             ret = UsbIfCreatInterfaceObj(interfacePool, &interfaceObj);
             if (ret != HDF_SUCCESS) {
-                goto error;
+                goto ERROR;
             }
 
             ret = UsbInterfaceInit(interfaceObj, ifDes, itface);
             if (ret != 0) {
                 ret = HDF_ERR_IO;
-                goto error;
+                goto ERROR;
             }
 
             ret = UsbProtocalCreatePipeObj(ifDes, interfaceObj);
             if (ret != HDF_SUCCESS) {
-                goto error;
+                goto ERROR;
             }
         }
     }
 
-error:
+ERROR:
     return ret;
 }
 
@@ -269,25 +269,25 @@ int UsbProtocalParseDescriptor(struct UsbDeviceHandle *devHandle, uint8_t busNum
 
     ret = CreateCtrPipe(interfacePool);
     if (ret != HDF_SUCCESS) {
-        goto err;
+        goto ERR;
     }
 
     ret = RawGetConfiguration(devHandle, &activeConfig);
     if (ret != HDF_SUCCESS) {
-        goto err;
+        goto ERR;
     }
 
     ret = RawGetConfigDescriptor(devHandle->dev, activeConfig, &config);
     if (ret != HDF_SUCCESS) {
-        goto free_config;
+        goto FREE_CONFIG;
     }
 
     ret = UsbProtocalCreatInterfaceObj(config, interfacePool);
     if (ret != HDF_SUCCESS) {
-        goto free_config;
+        goto FREE_CONFIG;
     }
 
-free_config:
+FREE_CONFIG:
     if (config != NULL) {
         RawClearConfiguration(config);
         RawUsbMemFree(config);
@@ -298,7 +298,7 @@ free_config:
         return ret;
     }
 
-err:
+ERR:
     (void)UsbIfDestroyInterfaceObj(interfacePool, NULL);
     return ret;
 }

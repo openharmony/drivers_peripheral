@@ -13,13 +13,7 @@
  * limitations under the License.
  */
 
-#include "hdf_base.h"
-#include "hdf_log.h"
-#include "osal_mem.h"
-#include "osal_time.h"
-#include "securec.h"
-#include "usb_ddk_interface.h"
-#include "hdf_usb_pnp_manage.h"
+#include "usbhost_sdkapi_speed.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -36,7 +30,13 @@
 #include <osal_sem.h>
 #include <osal_thread.h>
 #include <inttypes.h>
-#include "usbhost_sdkapi_speed.h"
+#include "hdf_base.h"
+#include "hdf_log.h"
+#include "osal_mem.h"
+#include "osal_time.h"
+#include "securec.h"
+#include "usb_ddk_interface.h"
+#include "hdf_usb_pnp_manage.h"
 
 #define HDF_LOG_TAG   USB_HOST_ACM
 
@@ -164,7 +164,9 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
 
     db->use = 0;
     if (!g_speedFlag) {
-        SerialBegin(db->instance);
+        if (SerialBegin(db->instance) != HDF_SUCCESS) {
+            HDF_LOGW("%s:%d SerialBegin error!", __func__, __LINE__);
+        }
         g_send_count++;
     }
 
@@ -344,7 +346,7 @@ int32_t InitUsbDdk(struct AcmDevice *acm)
 
     ret = UsbInitHostSdk(NULL);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbInitHostSdk faild", __func__);
+        HDF_LOGE("%s: UsbInitHostSdk failed", __func__);
         ret = HDF_ERR_IO;
         goto END;
     }
@@ -450,7 +452,9 @@ int main(int argc, char *argv[])
     printf("test SDK API [%s]\n", g_writeOrRead?"write":"read");
     printf("Start: sec%" PRId64 " usec%" PRId64 "\n", time.tv_sec, time.tv_usec);
     for (i = 0; i < TEST_CYCLE; i++) {
-        SerialBegin(acm);
+        if (SerialBegin(acm) != HDF_SUCCESS) {
+            HDF_LOGW("%s:%d SerialBegin error!", __func__, __LINE__);
+        }
         g_send_count++;
     }
 
