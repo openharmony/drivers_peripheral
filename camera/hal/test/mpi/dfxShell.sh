@@ -12,27 +12,28 @@
 # limitations under the License.
 
 #!/bin/bash
+#set -e
 script_path=$(cd $(dirname $0);pwd)
 cd ${script_path}
 cd ../../../../../../out/ohos-arm-release/packages/phone/system/lib;
-libcamera_client=`stat -c %s "libcamera_client.z.so"`
+libcamera_client=$(stat -c %s "libcamera_client.z.so")
 echo "libcamera_client.z.so(B): "$libcamera_client
 
-camera_buffer_manager=`stat -c %s "libcamera_buffer_manager.z.so"`
+camera_buffer_manager=$(stat -c %s "libcamera_buffer_manager.z.so")
 echo "libcamera_buffer_manager.z.so(B): "$camera_buffer_manager
 
-camera_device_manager=`stat -c %s "libcamera_device_manager.z.so"`
+camera_device_manager=$(stat -c %s "libcamera_device_manager.z.so")
 echo "libcamera_device_manager.z.so(B): "$camera_device_manager
 
-camera_hdi_impl=`stat -c %s "libcamera_hdi_impl.z.so"`
+camera_hdi_impl=$(stat -c %s "libcamera_hdi_impl.z.so")
 echo "libcamera_hdi_impl.z.so(B): "$camera_hdi_impl
 
-camera_pipeline_core=`stat -c %s "libcamera_pipeline_core.z.so"`
+camera_pipeline_core=$(stat -c %s "libcamera_pipeline_core.z.so")
 echo "libcamera_pipeline_core.z.so(B): "$camera_pipeline_core
 
-camera_utils=`stat -c %s "libcamera_utils.z.so"`
+camera_utils=$(stat -c %s "libcamera_utils.z.so")
 echo "libcamera_utils.z.so(B): "$camera_utils
 
 total=$[libcamera_client+camera_buffer_manager+camera_device_manager+camera_hdi_impl+camera_pipeline_core+camera_utils]
 
-echo "so package total(KB)："`expr $total / 1024`
+echo "so package total(KB)："$(expr $total / 1024)
