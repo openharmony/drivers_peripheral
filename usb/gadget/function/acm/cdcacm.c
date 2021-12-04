@@ -27,7 +27,6 @@
 #define HDF_LOG_TAG hdf_cdc_acm
 #define UDC_NAME "100e0000.hidwc3_0"
 
-#define PENDING_FLAG            0
 #define CTRL_REQUEST_NUM        2
 #define QUEUE_SIZE              8
 #define WRITE_BUF_SIZE          8192
@@ -972,7 +971,8 @@ static void AcmNotifyComplete(uint8_t pipe, struct UsbFnRequest *req)
     }
 
     OsalMutexLock(&acm->lock);
-    if (req->status == PENDING_FLAG) {
+    /* estimate pending */
+    if (req->status == 0) {
         pending = acm->pending;
     }
     acm->notifyReq = req;

@@ -117,7 +117,7 @@ static void UsbFnChangeDescInfo(uint8_t functionMask, struct UsbFnFunction *func
 }
 
 static void UsbFnChangeFunction(struct UsbFnDeviceDesc *des, struct UsbFnDescriptorData *descriptor)
-{ 
+{
     uint32_t i = 0;
     uint32_t j = 0;
     if (des == NULL || descriptor == NULL) {
