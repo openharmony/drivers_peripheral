@@ -62,8 +62,98 @@ ERR_DES:
     return HDF_ERR_INVALID_PARAM;
 }
 
+static void UsbFnChangeDescriptor(struct UsbDescriptorHeader **descriptors)
+{
+    int8_t iCount;
+    int8_t intfIndex = 0;
+    if (descriptors == NULL) {
+        HDF_LOGE("%s: param is null", __func__);
+        return;
+    }
+    for (iCount = 0; (descriptors[iCount] != NULL); iCount++) {
+        switch (descriptors[iCount]->bDescriptorType) {
+            case USB_DDK_DT_INTERFACE_ASSOCIATION:
+                {
+                    struct UsbInterfaceAssocDescriptor *iadDescriptor = NULL;
+                    iadDescriptor = (struct UsbInterfaceAssocDescriptor *)descriptors[iCount];
+                    iadDescriptor->bFirstInterface = 0;
+                }
+                break;
+            case USB_DDK_DT_INTERFACE:
+                {
+                    struct UsbInterfaceDescriptor *intfDescriptor = NULL;
+                    intfDescriptor = (struct UsbInterfaceDescriptor *)descriptors[iCount];
+                    intfDescriptor->bInterfaceNumber = intfIndex++;
+                }
+                break;
+            case USB_DDK_DT_CS_INTERFACE:
+                {
+                    struct UsbCdcUnionDesc *unionDescriptor = NULL;
+                    if (descriptors[iCount]->bLength == sizeof(struct UsbCdcUnionDesc)) {
+                        unionDescriptor = (struct UsbCdcUnionDesc *)descriptors[iCount];
+                        if (unionDescriptor->bDescriptorSubType == USB_DDK_CDC_UNION_TYPE) {
+                            unionDescriptor->bMasterInterface0 = 0;
+                            unionDescriptor->bSlaveInterface0 = 1;
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+static void UsbFnChangeDescInfo(uint8_t functionMask, struct UsbFnFunction *function)
+{
+    if (FUNCTION_ECM_MASK & functionMask) {
+        HDF_LOGI("%s: not need change", __func__);
+        return;
+    }
+    UsbFnChangeDescriptor(function->fsDescriptors);
+    UsbFnChangeDescriptor(function->hsDescriptors);
+    UsbFnChangeDescriptor(function->ssDescriptors);
+    UsbFnChangeDescriptor(function->sspDescriptors);
+}
+
+static void UsbFnChangeFunction(struct UsbFnDeviceDesc *des, struct UsbFnDescriptorData *descriptor)
+{ 
+    uint32_t i = 0;
+    uint32_t j = 0;
+    if (des == NULL || descriptor == NULL) {
+        HDF_LOGE("%s: param is null", __func__);
+        return;
+    }
+    for (i = 0; des->configs[i] != NULL; i++) {
+        for (j = 0; des->configs[i]->functions[j] != NULL; j++) {
+            des->configs[i]->functions[j]->enable = true;
+            if (strncmp(des->configs[i]->functions[j]->funcName,
+                FUNCTION_GENERIC_ACM, strlen(FUNCTION_GENERIC_ACM)) == 0) {
+                if (descriptor->functionMask & FUNCTION_ACM_MASK) {
+                    UsbFnChangeDescInfo(descriptor->functionMask, des->configs[i]->functions[j]);
+                    HDF_LOGI("%s:  enable function = %s", __func__, FUNCTION_GENERIC_ACM);
+                } else {
+                    des->configs[i]->functions[j]->enable = false;
+                    HDF_LOGI("%s:  disable function = %s", __func__, FUNCTION_GENERIC_ACM);
+                }
+            } else if (strncmp(des->configs[i]->functions[j]->funcName,
+                FUNCTION_GENERIC_ECM, strlen(FUNCTION_GENERIC_ECM)) == 0) {
+                if (descriptor->functionMask & FUNCTION_ECM_MASK) {
+                    des->configs[i]->functions[j]->enable = true;
+                    HDF_LOGI("%s:  enable function = %s", __func__, FUNCTION_GENERIC_ECM);
+                } else {
+                    des->configs[i]->functions[j]->enable = false;
+                    HDF_LOGI("%s:  disable function = %s", __func__, FUNCTION_GENERIC_ECM);
+                }
+            } else {
+                HDF_LOGE("%s: unspport function = %s", __func__,
+                    des->configs[i]->functions[j]->funcName);
+            }
+        }
+    }
+}
 const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName,
-    const struct UsbFnDescriptorData *descriptor)
+    struct UsbFnDescriptorData *descriptor)
 {
     int ret;
     const struct DeviceResourceNode *property = NULL;
@@ -73,9 +163,18 @@ const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName,
         HDF_LOGE("%s: INVALID PARAM", __func__);
         return NULL;
     }
+    if (UsbFnMgrDeviceGet(udcName)) {
+        HDF_LOGE("%s:%s haved create!", __func__, udcName);
+        return NULL;
+    }
     if (descriptor->type == USBFN_DESC_DATA_TYPE_PROP) {
         property = descriptor->property;
         des = UsbFnCfgMgrGetInstanceFromHCS(property);
+        if (des == NULL) {
+            HDF_LOGE("%s:get descriptors from Hcs failed!", __func__);
+            return NULL;
+        }
+        UsbFnChangeFunction(des, descriptor);
     } else {
         des = descriptor->descriptor;
     }

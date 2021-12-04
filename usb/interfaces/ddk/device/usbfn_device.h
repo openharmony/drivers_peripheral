@@ -94,6 +94,7 @@ struct UsbFnFunction {
      * A value does not need to be assigned to the descriptor.
      * You can simply use <b>UsbFnCreateDevice</b> to create a device.
      */
+    bool                       enable;
     const char                 *funcName;
     /** Double pointer to USB strings in a specified language */
     struct UsbFnStrings        **strings;
@@ -147,6 +148,7 @@ struct UsbFnDescriptorData {
     };
         /** Descriptor type */
     UsbFnDescDataType type;
+    uint8_t functionMask;
 };
 
 /**
@@ -160,7 +162,7 @@ struct UsbFnDescriptorData {
  * @return Returns the pointer to the <b>UsbFnDevice</b> if the operation is successful;
  * returns <b>NULL</b> otherwise.
  */
-const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName, const struct UsbFnDescriptorData *descriptor);
+const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName, struct UsbFnDescriptorData *descriptor);
 
 /**
  * @brief Deletes a specified USB device.

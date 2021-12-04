@@ -964,6 +964,9 @@ static int UsbFnAdapterDelDevice(const char *deviceName, const char *udcName,
                 CleanConfigFs(deviceName, des->configs[i]->functions[j]->funcName);
                 continue;
             }
+            if (des->configs[i]->functions[j]->enable == false) {
+                continue;
+            }
             CleanFunction(deviceName, des->configs[i]->functions[j]->funcName);
         }
     }
@@ -1060,6 +1063,9 @@ static int UsbFnAdapterCreateDevice(const char *udcName,
                 FUNCTION_GENERIC, strlen(FUNCTION_GENERIC))) {
                 ret = CreatKernelFunc(devName, descriptor->configs[i]->functions[j], confVal);
             } else {
+                if (descriptor->configs[i]->functions[j]->enable == false) {
+                    continue;
+                }
                 ret = CreatFunc(devName, descriptor->configs[i]->functions[j], confVal);
             }
             if (ret < 0) {
