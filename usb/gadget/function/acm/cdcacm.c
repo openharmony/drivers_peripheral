@@ -27,6 +27,7 @@
 #define HDF_LOG_TAG hdf_cdc_acm
 #define UDC_NAME "100e0000.hidwc3_0"
 
+#define PENDING_FLAG            0
 #define CTRL_REQUEST_NUM        2
 #define QUEUE_SIZE              8
 #define WRITE_BUF_SIZE          8192
@@ -36,6 +37,9 @@
 #define DATA_BIT        8
 static int32_t g_inFifo = 0;
 /* Usb Serial Related Functions */
+
+static int UsbSerialInit(struct UsbAcmDevice *acm);
+static int UsbSerialRelease(struct UsbAcmDevice *acm);
 static int32_t UsbSerialStartTx(struct UsbSerial *port)
 {
     if (port == NULL) {
@@ -845,13 +849,24 @@ static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
     struct UsbAcmDevice *acm = NULL;
     struct UsbSerial *port = NULL;
 
-    if (client == NULL || client->device == NULL || \
-        client->device->service == NULL) {
+    if (client == NULL || client->device == NULL || client->device->service == NULL) {
         HDF_LOGE("%s: client is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     acm = (struct UsbAcmDevice *)client->device->service;
+    if (acm == NULL) {
+        return HDF_ERR_IO;
+    }
+    switch (cmd) {
+        case USB_SERIAL_INIT:
+            return UsbSerialInit(acm);
+        case USB_SERIAL_RELEASE:
+            return UsbSerialRelease(acm);
+        default:
+            HDF_LOGE("%s: unknown cmd %d", __func__, cmd);
+            break;
+    }
     port = acm->port;
     if (port == NULL) {
         return HDF_ERR_IO;
@@ -957,7 +972,7 @@ static void AcmNotifyComplete(uint8_t pipe, struct UsbFnRequest *req)
     }
 
     OsalMutexLock(&acm->lock);
-    if (req->status == 0) {
+    if (req->status == PENDING_FLAG) {
         pending = acm->pending;
     }
     acm->notifyReq = req;
@@ -1493,18 +1508,16 @@ static int32_t AcmDriverBind(struct HdfDeviceObject *device)
     device->service = &(acm->service);
     acm->device->service->Dispatch = AcmDeviceDispatch;
     acm->notify = NULL;
-
+    acm->initFlag = false;
     return HDF_SUCCESS;
 }
 
-static int32_t AcmDriverInit(struct HdfDeviceObject *device)
+static int UsbSerialInit(struct UsbAcmDevice *acm)
 {
-    struct UsbAcmDevice *acm = NULL;
     struct DeviceResourceIface *iface = NULL;
     int32_t ret;
 
-    acm = (struct UsbAcmDevice *)device->service;
-    if (acm == NULL) {
+    if (acm == NULL || acm->initFlag) {
         HDF_LOGE("%s: acm is null", __func__);
         return HDF_FAILURE;
     }
@@ -1545,12 +1558,31 @@ static int32_t AcmDriverInit(struct HdfDeviceObject *device)
     }
 
     acm->notify = &g_acmNotifyMethod;
+    acm->initFlag = true;
     return HDF_SUCCESS;
 
 err:
     UsbSerialFree(acm);
     (void)AcmReleaseFuncDevice(acm);
     return ret;
+}
+
+static int UsbSerialRelease(struct UsbAcmDevice *acm)
+{
+    if (acm == NULL || acm->initFlag == false) {
+        HDF_LOGE("%s: acm is null", __func__);
+        return HDF_FAILURE;
+    }
+    (void)AcmReleaseFuncDevice(acm);
+    UsbSerialFree(acm);
+    acm->initFlag = false;
+    return 0;
+}
+
+static int32_t AcmDriverInit(struct HdfDeviceObject *device)
+{
+    HDF_LOGI("%s: do nothing...", __func__);
+    return 0;
 }
 
 static void AcmDriverRelease(struct HdfDeviceObject *device)
@@ -1566,8 +1598,6 @@ static void AcmDriverRelease(struct HdfDeviceObject *device)
         HDF_LOGE("%s: acm is null", __func__);
         return;
     }
-    UsbSerialFree(acm);
-    (void)AcmReleaseFuncDevice(acm);
     (void)OsalMutexDestroy(&acm->lock);
     AcmDeviceDestroy(acm);
 }

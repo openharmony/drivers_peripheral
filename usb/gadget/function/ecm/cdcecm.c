@@ -33,6 +33,10 @@
 #define READ_BUF_SIZE           8192
 #define ECM_STATUS_BYTECOUNT        16
 #define ECM_BIT 9728000
+
+static int EcmInit(struct HdfDeviceObject *device);
+static int EcmRelease(struct HdfDeviceObject *device);
+
 static inline unsigned EcmBitrate(void)
 {
     return ECM_BIT;
@@ -559,25 +563,22 @@ static int32_t EcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
     struct UsbEcmDevice *ecm = NULL;
     struct UsbEcm *port = NULL;
     int32_t ret;
-    if (client == NULL) {
+    if (client == NULL || client->device == NULL || client->device->service == NULL) {
         HDF_LOGE("%s: client is NULL", __func__);
-        return HDF_ERR_INVALID_OBJECT;
-    }
-
-    if (client->device == NULL) {
-        HDF_LOGE("%s: client->device is NULL", __func__);
-        return HDF_ERR_INVALID_OBJECT;
-    }
-
-    if (client->device->service == NULL) {
-        HDF_LOGE("%s: client->device->service is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%s: data or reply is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
-
+    switch (cmd) {
+        case USB_ECM_INIT:
+            return EcmInit(client->device);
+        case USB_ECM_RELEASE:
+            return EcmRelease(client->device);
+        default:
+            break;
+    }
     ecm = (struct UsbEcmDevice *)client->device->service;
     port = ecm->port;
     if (port == NULL) {
@@ -928,7 +929,7 @@ static int32_t EcmDriverBind(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-static int32_t EcmDriverInit(struct HdfDeviceObject *device)
+static int EcmInit(struct HdfDeviceObject *device)
 {
     struct UsbEcmDevice *ecm = NULL;
     struct DeviceResourceIface *iface = NULL;
@@ -940,7 +941,7 @@ static int32_t EcmDriverInit(struct HdfDeviceObject *device)
     }
 
     ecm = (struct UsbEcmDevice *)device->service;
-    if (ecm == NULL) {
+    if (ecm == NULL || ecm->initFlag) {
         HDF_LOGE("%s: ecm is null", __func__);
         return HDF_FAILURE;
     }
@@ -962,15 +963,48 @@ static int32_t EcmDriverInit(struct HdfDeviceObject *device)
         HDF_LOGE("%s: EcmCreateFuncDevice failed", __func__);
         return HDF_FAILURE;
     }
+    ecm->initFlag = true;
     return ret;
 }
 
-static void EcmDriverRelease(struct HdfDeviceObject *device)
+static int EcmRelease(struct HdfDeviceObject *device)
 {
     struct UsbEcmDevice *ecm = NULL;
 
     if (device == NULL) {
         HDF_LOGE("%s: device is NULL", __func__);
+        return HDF_FAILURE;
+    }
+
+    ecm = (struct UsbEcmDevice *)device->service;
+    if (ecm == NULL) {
+        HDF_LOGE("%s: ecm is null", __func__);
+        return HDF_FAILURE;
+    }
+    if (ecm->initFlag == false) {
+        HDF_LOGE("%s: ecm not init!", __func__);
+        return HDF_FAILURE;
+    }
+    (void)EcmReleaseFuncDevice(ecm);
+    if (ecm->port) {
+        OsalMemFree(ecm->port);
+        ecm->port = NULL;
+    }
+    ecm->initFlag = false;
+    return HDF_SUCCESS;
+}
+
+static int32_t EcmDriverInit(struct HdfDeviceObject *device)
+{
+    HDF_LOGE("%s: usbfn do nothing...", __func__);
+    return 0;
+}
+
+static void EcmDriverRelease(struct HdfDeviceObject *device)
+{
+    struct UsbEcmDevice *ecm = NULL;
+    if (device == NULL) {
+        HDF_LOGE("%{public}s: device is NULL", __func__);
         return;
     }
 
@@ -978,10 +1012,6 @@ static void EcmDriverRelease(struct HdfDeviceObject *device)
     if (ecm == NULL) {
         HDF_LOGE("%s: ecm is null", __func__);
         return;
-    }
-    (void)EcmReleaseFuncDevice(ecm);
-    if (ecm->port) {
-        OsalMemFree(ecm->port);
     }
     (void)OsalMutexDestroy(&ecm->lock);
     OsalMemFree(ecm);

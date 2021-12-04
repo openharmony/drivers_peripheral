@@ -11,18 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
-
-group("libusb_ddk") {
+group("hal_group") {
   deps = [
-    "//drivers/peripheral/usb/ddk:libusb_core",
-    "//drivers/peripheral/usb/gadget/function/acm:libusbfn_cdcacm",
-    "//drivers/peripheral/usb/gadget/function/ecm:libusbfn_cdcecm",
-    "//drivers/peripheral/usb/gadget/function/master:libusbfn_master",
-    "//drivers/peripheral/usb/hal:hal_group",
-    "//drivers/peripheral/usb/net:libusbhost_ecm",
-    "//drivers/peripheral/usb/serial:libusbhost_acm",
-    "//drivers/peripheral/usb/serial:libusbhost_acm_rawapi",
+    "client:usbd_client",
+    "service:usbd",
   ]
 }
