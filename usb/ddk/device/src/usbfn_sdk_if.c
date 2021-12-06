@@ -121,31 +121,30 @@ static void UsbFnChangeDescInfo(uint8_t functionMask, struct UsbFnFunction *func
     UsbFnChangeDescriptor(function->sspDescriptors);
 }
 
-static void DoChangeFunction(struct UsbFnDeviceDesc *des, struct UsbFnDescriptorData *descriptor,
-    uint32_t i, uint32_t j)
+static void DoChangeFunction(struct UsbFnFunction *function, struct UsbFnDescriptorData *descriptor)
 {
-    des->configs[i]->functions[j]->enable = true;
-    if (strncmp(des->configs[i]->functions[j]->funcName,
+    function->enable = true;
+    if (strncmp(function->funcName,
         FUNCTION_GENERIC_ACM, strlen(FUNCTION_GENERIC_ACM)) == 0) {
         if (descriptor->functionMask & FUNCTION_ACM_MASK) {
-            UsbFnChangeDescInfo(descriptor->functionMask, des->configs[i]->functions[j]);
+            UsbFnChangeDescInfo(descriptor->functionMask, function);
             HDF_LOGI("%s:  enable function = %s", __func__, FUNCTION_GENERIC_ACM);
         } else {
-            des->configs[i]->functions[j]->enable = false;
+            function->enable = false;
             HDF_LOGI("%s:  disable function = %s", __func__, FUNCTION_GENERIC_ACM);
         }
-    } else if (strncmp(des->configs[i]->functions[j]->funcName,
+    } else if (strncmp(function->funcName,
         FUNCTION_GENERIC_ECM, strlen(FUNCTION_GENERIC_ECM)) == 0) {
         if (descriptor->functionMask & FUNCTION_ECM_MASK) {
-            des->configs[i]->functions[j]->enable = true;
+            function->enable = true;
             HDF_LOGI("%s:  enable function = %s", __func__, FUNCTION_GENERIC_ECM);
         } else {
-            des->configs[i]->functions[j]->enable = false;
+            function->enable = false;
             HDF_LOGI("%s:  disable function = %s", __func__, FUNCTION_GENERIC_ECM);
         }
     } else {
         HDF_LOGE("%s: unspport function = %s", __func__,
-            des->configs[i]->functions[j]->funcName);
+            function->funcName);
     }
 }
 
@@ -159,7 +158,7 @@ static void UsbFnChangeFunction(struct UsbFnDeviceDesc *des, struct UsbFnDescrip
     }
     for (i = 0; des->configs[i] != NULL; i++) {
         for (j = 0; des->configs[i]->functions[j] != NULL; j++) {
-            DoChangeFunction(des, descriptor, i, j);
+            DoChangeFunction(des->configs[i]->functions[j], descriptor);
         }
     }
 }
