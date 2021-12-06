@@ -1019,6 +1019,21 @@ static int EnableDevice(const char *udcName,
 
 #define FFS_ADB "/config/usb_gadget/g1/functions/ffs.adb"
 #define FFS_CONFIG "/config/usb_gadget/g1/configs/b.1/f1"
+
+static bool CreateFun(struct UsbFnFunction *function, const char *devName, uint8_t *confVal, int *ret)
+{
+    if (strncmp(function->funcName,
+        FUNCTION_GENERIC, strlen(FUNCTION_GENERIC))) {
+        *ret = CreatKernelFunc(devName, function, *confVal);
+    } else {
+        if (function->enable == false) {
+            return false;
+        }
+        *ret = CreatFunc(devName, function, *confVal);
+    }
+    return true;
+}
+
 static int UsbFnAdapterCreateDevice(const char *udcName,
     const char *devName, struct UsbFnDeviceDesc *descriptor)
 {
@@ -1059,14 +1074,8 @@ static int UsbFnAdapterCreateDevice(const char *udcName,
         }
 
         for (j = 0; descriptor->configs[i]->functions[j] != NULL; j++) {
-            if (strncmp(descriptor->configs[i]->functions[j]->funcName,
-                FUNCTION_GENERIC, strlen(FUNCTION_GENERIC))) {
-                ret = CreatKernelFunc(devName, descriptor->configs[i]->functions[j], confVal);
-            } else {
-                if (descriptor->configs[i]->functions[j]->enable == false) {
-                    continue;
-                }
-                ret = CreatFunc(devName, descriptor->configs[i]->functions[j], confVal);
+            if (!CreateFun(descriptor->configs[i]->functions[j], devName, &confVal, &ret)) {
+                continue;
             }
             if (ret < 0) {
                 HDF_LOGE("%s: CreatFunc failure!", __func__);
