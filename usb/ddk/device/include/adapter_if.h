@@ -132,6 +132,10 @@ struct FconfigPollFd {
 #define FUNCTIONFS_ENDPOINT_GET_EP0_EVENT    _IOR('g', 56, struct UsbFnReqEvent)
 
 #define FUNCTION_GENERIC "f_generic"
+#define FUNCTION_GENERIC_ECM "f_generic.e"
+#define FUNCTION_GENERIC_ACM "f_generic.a"
+#define FUNCTION_ACM_MASK 0x1
+#define FUNCTION_ECM_MASK 0x2
 #define CONFIGFS_DIR "/config/usb_gadget"
 #define USBFN_DEV "/dev/usbfn"
 #define MAX_REQUEST         64

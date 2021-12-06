@@ -71,6 +71,9 @@ static void CreateInterface(struct UsbFnDeviceDesc *des, struct UsbFnDeviceMgr *
                 FUNCTION_GENERIC, strlen(FUNCTION_GENERIC))) {
                 continue;
             }
+            if (des->configs[i]->functions[j]->enable == false) {
+                continue;
+            }
             DListHeadInit(&devMgr->funcMgr[fnCnt].reqEntry);
             devMgr->funcMgr[fnCnt].object = &devMgr->fnDev.object;
             ret = snprintf_s(devMgr->funcMgr[fnCnt].name, MAX_NAMELEN, MAX_NAMELEN - 1, \
@@ -169,6 +172,9 @@ static int AllocInterfaceAndFuncMgr(struct UsbFnDeviceMgr *fnDevMgr, struct UsbF
         for (j = 0; des->configs[i]->functions[j] != NULL; j++) {
             if (strncmp(des->configs[i]->functions[j]->funcName,
                 FUNCTION_GENERIC, strlen(FUNCTION_GENERIC))) {
+                continue;
+            }
+            if (des->configs[i]->functions[j]->enable == false) {
                 continue;
             }
             fnDevMgr->numFunc++;

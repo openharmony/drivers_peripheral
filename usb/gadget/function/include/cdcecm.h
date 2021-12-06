@@ -36,6 +36,8 @@ enum UsbEcmCmd {
     USB_ECM_CLOSE,
     USB_ECM_READ,
     USB_ECM_WRITE,
+    USB_ECM_INIT = 100,
+    USB_ECM_RELEASE = 101,
 };
 
 struct UsbEcm {
@@ -88,6 +90,7 @@ struct UsbEcmDevice {
     struct UsbFnRequest         *ep0Req;
     uint8_t              notifyState;
     bool                isOpen;
+    bool                initFlag;
 };
 
 #endif /* U_ECM_H */

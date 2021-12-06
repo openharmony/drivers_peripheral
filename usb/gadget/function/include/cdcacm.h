@@ -45,6 +45,8 @@ enum UsbSerialCmd {
     USB_SERIAL_READ_GET_TEMP_SPEED,
     USB_SERIAL_READ_SPEED_DONE,
     USB_SERIAL_READ_GET_TEMP_SPEED_UINT32,
+    USB_SERIAL_INIT = 100,
+    USB_SERIAL_RELEASE = 101,
 };
 
 struct UsbSerial {
@@ -100,6 +102,7 @@ struct UsbAcmDevice {
     struct UsbFnRequest         *notifyReq;
     struct OsalMutex            lock;
     bool                        pending;
+    bool                        initFlag;
     uint32_t                    enableEvtCnt;
     char                        *udcName;
     struct UsbSerial            *port;
