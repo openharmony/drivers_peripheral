@@ -121,7 +121,8 @@ static void UsbFnChangeDescInfo(uint8_t functionMask, struct UsbFnFunction *func
     UsbFnChangeDescriptor(function->sspDescriptors);
 }
 
-static void DoChangeFunction(struct UsbFnDeviceDesc *des, struct UsbFnDescriptorData *descriptor, uint32_t i, uint32_t j)
+static void DoChangeFunction(struct UsbFnDeviceDesc *des, struct UsbFnDescriptorData *descriptor,
+    uint32_t i, uint32_t j)
 {
     des->configs[i]->functions[j]->enable = true;
     if (strncmp(des->configs[i]->functions[j]->funcName,
