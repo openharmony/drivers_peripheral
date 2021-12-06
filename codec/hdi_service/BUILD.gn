@@ -57,8 +57,7 @@ ohos_shared_library("libcodec_server") {
     "codec_service_stub/codec_stub.c",
     "codec_service_stub/stub_msgproc.c",
   ]
-  CODEC_LIB_PATH =
-      "//device/hisilicon/hardware/media/hal/codec/hi3516dv300/llvm/ext/libs"
+  CODEC_LIB_PATH = "//device/hisilicon/hardware/media/hal/codec/hi3516dv300/llvm/linux_standard/libs"
   CODEC_LIB_REAL_PATH = rebase_path("$CODEC_LIB_PATH")
   ldflags = [ "-L$CODEC_LIB_REAL_PATH" ]
   ldflags += [ "-lcodec" ]
