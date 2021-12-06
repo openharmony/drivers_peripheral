@@ -14,15 +14,31 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-group("libusb_ddk") {
-  deps = [
-    "//drivers/peripheral/usb/ddk:libusb_core",
-    "//drivers/peripheral/usb/gadget/function/acm:libusbfn_cdcacm",
-    "//drivers/peripheral/usb/gadget/function/ecm:libusbfn_cdcecm",
-    "//drivers/peripheral/usb/gadget/function/master:libusbfn_master",
-    "//drivers/peripheral/usb/hal:hal_group",
-    "//drivers/peripheral/usb/net:libusbhost_ecm",
-    "//drivers/peripheral/usb/serial:libusbhost_acm",
-    "//drivers/peripheral/usb/serial:libusbhost_acm_rawapi",
+config("usbd_client_public_config") {
+  include_dirs = [ "include" ]
+}
+
+ohos_shared_library("usbd_client") {
+  sources = [
+    "src/usbd_client.cpp",
+    "src/usbd_subscriber.cpp",
   ]
+
+  configs = []
+
+  public_configs = [ ":usbd_client_public_config" ]
+
+  deps = [
+    "${hdf_uhdf_path}/hdi:libhdi",
+    "${hdf_uhdf_path}/host:libhdf_host",
+    "${hdf_uhdf_path}/utils:libhdf_utils",
+    "//utils/native/base:utils",
+  ]
+
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+
+  subsystem_name = "hdf"
 }
