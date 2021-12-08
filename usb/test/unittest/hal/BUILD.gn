@@ -105,5 +105,5 @@ ohos_unittest("test_function") {
 
 group("hal_test") {
   testonly = true
-  deps = [":test_function"]
+  deps = [ ":test_function" ]
 }
