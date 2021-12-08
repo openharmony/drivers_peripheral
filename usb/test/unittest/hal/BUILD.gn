@@ -106,8 +106,6 @@ ohos_unittest("test_function") {
 group("hal_test") {
   testonly = true
   deps = [
-    ":test_device",
     ":test_function",
-    ":test_transfer",
   ]
 }
