@@ -120,7 +120,7 @@ static int SendProcess(void *argurb)
         sendUrb = urb[i].urb;
         r = usb_setup_endpoint(fd, uhe, 1024);
         if (r) {
-            DPRINTFN(0, "setup faild ret:%d\n", r);
+            DPRINTFN(0, "setup failed ret:%d\n", r);
             return r;
         }
         r = usb_submit_urb(sendUrb, 0);
@@ -230,7 +230,7 @@ static int BeginProcess(unsigned char endPoint)
             sendUrb = urb[i].urb;
             r = usb_setup_endpoint(fd, uhe, 1024);
             if (r) {
-                DPRINTFN(0, "setup faild ret:%d\n", r);
+                DPRINTFN(0, "setup failed ret:%d\n", r);
                 return r;
             }
             r = usb_submit_urb(sendUrb, 0);
@@ -333,11 +333,11 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNu
         printf("Error: parameter error! \n\n");
         ShowHelp("speedtest");
         ret = HDF_FAILURE;
-        goto end;
+        goto END;
     }
     OsalSemInit(&sem, 0);
     OsalSemInit(&timeSem, 0);
-end:
+END:
     return ret;
 }
 
@@ -354,16 +354,16 @@ static int32_t UsbSerialSpeedThreadCreate()
     ret = OsalThreadCreate(&urbSendProcess, (OsalThreadEntry)SendProcess, NULL);
     if (ret != HDF_SUCCESS) {
         printf("OsalThreadCreate fail, ret=%d\n", ret);
-        goto end;
+        goto END;
     }
 
     ret = OsalThreadStart(&urbSendProcess, &threadCfg);
     if (ret != HDF_SUCCESS) {
         printf("OsalThreadStart fail, ret=%d\n", ret);
-        goto end;
+        goto END;
     }
 
-end:
+END:
     return ret;
 }
 
@@ -376,7 +376,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     if (acm->busy == true) {
         printf("%s: speed test busy\n", __func__);
         ret = HDF_ERR_IO;
-        goto end;
+        goto END;
     } else {
         acm->busy = true;
     }
@@ -385,32 +385,32 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     if ((input == NULL) || (size != sizeof(struct UsbSpeedTest))) {
         printf("%s: sbuf read buffer failed\n", __func__);
         ret = HDF_ERR_IO;
-        goto end;
+        goto END;
     }
 
     ret = UsbSerialSpeedInit(input, &ifaceNum);
     if (ret != HDF_SUCCESS) {
-        goto end;
+        goto END;
     }
 
     OpenDevice();
 
     ret = ClaimInterface(ifaceNum);
     if (ret != HDF_SUCCESS) {
-        goto end;
+        goto END;
     }
 
     ret = UsbSerialSpeedThreadCreate();
     if (ret != HDF_SUCCESS) {
-        goto end;
+        goto END;
     }
 
     ret = BeginProcess(endNum);
     if (ret != HDF_SUCCESS) {
-        goto end;
+        goto END;
     }
 
-end:
+END:
     acm->busy = false;
     if (ret != HDF_SUCCESS) {
         printf("please check whether usb drv so is existing or not,like acm, ecm,if not,remove it and test again!\n");

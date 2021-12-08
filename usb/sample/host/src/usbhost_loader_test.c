@@ -89,13 +89,13 @@ int main(int argc, char *argv[])
     ret = serv->dispatcher->Dispatch(&serv->object, USB_PNP_DRIVER_REGISTER_DEVICE, g_data, NULL);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s:%d Dispatch USB_PNP_DRIVER_REGISTER_DEVICE err", __func__, __LINE__);
-        goto out;
+        goto OUT;
     }
     HDF_LOGI("%s:%d", __func__, __LINE__);
     testService = HdfIoServiceBind(USB_TEST_SAMPLE_SERVICE_NAME);
     if (testService == NULL) {
         HDF_LOGE("%s:%d testService USB_PNP_DRIVER_REGISTER_DEVICE err", __func__, __LINE__);
-        goto out;
+        goto OUT;
     }
 
     HDF_LOGI("%s:%d", __func__, __LINE__);
@@ -103,12 +103,12 @@ int main(int argc, char *argv[])
     if (ret != HDF_SUCCESS) {
         HdfIoServiceRecycle(testService);
         HDF_LOGE("%s:%d Dispatch USB_PNP_DRIVER_UNREGISTER_DEVICE err", __func__, __LINE__);
-        goto out;
+        goto OUT;
     }
 
     HDF_LOGI("%s:%d", __func__, __LINE__);
 
-out:
+OUT:
     HdfSBufRecycle(g_data);
     HdfSBufRecycle(g_reply);
 

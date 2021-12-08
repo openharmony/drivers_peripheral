@@ -311,19 +311,19 @@ int32_t UsbEcmOpen(struct UsbEcm *port)
     ret = UsbEcmAllocFifo(&port->writeFifo, WRITE_BUF_SIZE);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbEcmAllocFifo failed", __func__);
-        goto out;
+        goto OUT;
     }
     ret = UsbEcmAllocFifo(&port->readFifo, READ_BUF_SIZE);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbEcmAllocFifo failed", __func__);
-        goto out;
+        goto OUT;
     }
     DataFifoReset(&port->writeFifo);
     DataFifoReset(&port->readFifo);
 
     if (port->refCount++) {
         HDF_LOGE("%s: refCount failed", __func__);
-        goto out;
+        goto OUT;
     }
 
     /* the ecm is enabled, start the io stream */
@@ -331,11 +331,11 @@ int32_t UsbEcmOpen(struct UsbEcm *port)
         HDF_LOGD("%s: start usb io", __func__);
         ret = UsbEcmStartIo(port);
         if (ret != HDF_SUCCESS) {
-            goto out;
+            goto OUT;
         }
     }
 
-out:
+OUT:
     OsalMutexUnlock(&port->lock);
     return HDF_SUCCESS;
 }
@@ -351,7 +351,7 @@ int32_t UsbEcmClose(struct UsbEcm *port)
     OsalMutexLock(&port->lock);
     if (port->refCount != 1) {
         --port->refCount;
-        goto out;
+        goto OUT;
     }
 
     HDF_LOGD("%s: close usb serial", __func__);
@@ -361,7 +361,7 @@ int32_t UsbEcmClose(struct UsbEcm *port)
     DataFifoReset(&port->readFifo);
     port->refCount = 0;
 
-out:
+OUT:
     OsalMutexUnlock(&port->lock);
     return HDF_SUCCESS;
 }
@@ -392,7 +392,7 @@ static int32_t UsbEcmRead(struct UsbEcm *port, struct HdfSBuf *reply)
         HDF_LOGE("%s: no data", __func__);
         ret = HDF_ERR_IO;
         OsalMutexUnlock(&port->lockReadFifo);
-        goto out;
+        goto OUT;
     }
     OsalMutexUnlock(&port->lockReadFifo);
 
@@ -400,10 +400,10 @@ static int32_t UsbEcmRead(struct UsbEcm *port, struct HdfSBuf *reply)
     if (!bufok) {
         HDF_LOGE("UsbEcmRead HdfSbufWriteBuffer error");
         ret = HDF_ERR_IO;
-        goto out;
+        goto OUT;
     }
 
-out:
+OUT:
     if (port->ecm) {
         UsbEcmStartRx(port);
     }
@@ -530,16 +530,15 @@ static int EcmSetup(const struct UsbEcmDevice *ecm, const struct UsbFnCtrlReques
         case ((USB_DDK_DIR_OUT | USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE) << 0x08)
                 | USB_DDK_CDC_SET_ETHERNET_PACKET_FILTER:
             if (length != 0 || index != ecm->ctrlId)
-                goto invalid;
+                goto INVALID;
             HDF_LOGD("packet filter %02x\n", value);
             ret = 0;
             break;
 
         default:
-invalid:
-        HDF_LOGD("invalid control req%02x.%02x v%04x i%04x l%d\n",
-            ctrl->reqType, ctrl->request,
-            value, index, length);
+            INVALID:
+            HDF_LOGD("invalid control req%02x.%02x v%04x i%04x l%d\n",
+                ctrl->reqType, ctrl->request, value, index, length);
     }
 
     if (ret >= 0) {
@@ -821,28 +820,28 @@ static int32_t EcmCreateFuncDevice(struct UsbEcmDevice *ecm,
     ret = EcmParseEachIface(ecm, fnDev);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: get pipes failed", __func__);
-        goto err;
+        goto ERR;
     }
 
     ret = EcmAllocEp0Request(ecm);
     if (ret != HDF_SUCCESS) {
-        goto err;
+        goto ERR;
     }
 
     ret = EcmAllocNotifyRequest(ecm);
     if (ret != HDF_SUCCESS) {
-        goto err;
+        goto ERR;
     }
     ret = UsbFnStartRecvInterfaceEvent(ecm->ctrlIface.fn,
         0xff, UsbEcmEventCallback, ecm);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: register event callback failed", __func__);
-        goto err;
+        goto ERR;
     }
     ecm->fnDev = fnDev;
     return HDF_SUCCESS;
 
-err:
+ERR:
     return ret;
 }
 
@@ -871,22 +870,22 @@ static int32_t UsbEcmAlloc(struct UsbEcmDevice *ecm)
 
     if (OsalMutexInit(&port->lock) != HDF_SUCCESS) {
         HDF_LOGE("%s: init lock fail!", __func__);
-        goto err;
+        goto ERR;
     }
 
     if (OsalMutexInit(&port->lockRW) != HDF_SUCCESS) {
         HDF_LOGE("%s: init lock fail!", __func__);
-        goto err;
+        goto ERR;
     }
 
     if (OsalMutexInit(&port->lockReadFifo) != HDF_SUCCESS) {
         HDF_LOGE("%s: init lock fail!", __func__);
-        goto err;
+        goto ERR;
     }
 
     if (OsalMutexInit(&port->lockWriteFifo) != HDF_SUCCESS) {
         HDF_LOGE("%s: init lock fail!", __func__);
-        goto err;
+        goto ERR;
     }
     DListHeadInit(&port->readPool);
     DListHeadInit(&port->readQueue);
@@ -894,7 +893,7 @@ static int32_t UsbEcmAlloc(struct UsbEcmDevice *ecm)
 
     ecm->port = port;
     return HDF_SUCCESS;
-err:
+ERR:
     OsalMemFree(port);
     return HDF_FAILURE;
 }

@@ -885,7 +885,7 @@ const struct UsbInterface *UsbClaimInterface(
     interfaceQueryPara.interfaceIndex = interfaceIndex;
     interfaceObj = IfFindInterfaceObj(interfacePool, interfaceQueryPara, true, &claimFlag, true);
     if (interfaceObj == NULL) {
-        goto error;
+        goto ERROR;
     }
 
     if ((interfaceIndex != USB_CTRL_INTERFACE_ID) && (claimFlag == true)) {
@@ -896,14 +896,14 @@ const struct UsbInterface *UsbClaimInterface(
             HDF_LOGE("%s:%d RawClaimInterface faile, ret=%d", __func__, __LINE__, ret);
             AdapterAtomicDec(&interfaceObj->refCount);
             OsalMutexUnlock(&interfacePool->interfaceLock);
-            goto error;
+            goto ERROR;
         }
         OsalMutexUnlock(&interfacePool->interfaceLock);
     }
     interfaceObj->session = realSession;
 
     return (const struct UsbInterface *)interfaceObj;
-error:
+ERROR:
     (void)IfDestoryDevice(realSession, interfacePool, devHandle, true);
     return NULL;
 }
@@ -1035,7 +1035,7 @@ UsbInterfaceHandle *UsbOpenInterface(const struct UsbInterface *interfaceObj)
     ifaceHdl = RawUsbMemCalloc(sizeof(struct UsbInterfaceHandleEntity));
     if (ifaceHdl == NULL) {
         HDF_LOGE("%s:%d RawUsbMemAlloc failed", __func__, __LINE__);
-        goto out;
+        goto OUT;
     }
     ifaceHdl->devHandle = interfacePool->device->devHandle;
     ifaceHdl->interfaceIndex = interfaceSdk->interface.info.interfaceIndex;
@@ -1046,7 +1046,7 @@ UsbInterfaceHandle *UsbOpenInterface(const struct UsbInterface *interfaceObj)
             HDF_LOGE("%s:%d UsbIoStart faile, ret=%d ", __func__, __LINE__, ret);
             ifaceHdl->devHandle = NULL;
             RawUsbMemFree(ifaceHdl);
-            goto out;
+            goto OUT;
         }
     }
     AdapterAtomicInc(&interfaceSdk->refCount);
@@ -1055,7 +1055,7 @@ UsbInterfaceHandle *UsbOpenInterface(const struct UsbInterface *interfaceObj)
 
     return (UsbInterfaceHandle *)ifaceHdl;
 
-out:
+OUT:
     OsalMutexUnlock(&interfacePool->interfaceLock);
     return NULL;
 }
@@ -1094,7 +1094,7 @@ int32_t UsbCloseInterface(const UsbInterfaceHandle *interfaceHandle)
         ret = UsbIoStop(interfacePool);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s:%d UsbIoStop failed, ret=%d ", __func__, __LINE__, ret);
-            goto out;
+            goto OUT;
         }
     }
     AdapterAtomicDec(&interfaceObj->refCount);
@@ -1103,7 +1103,7 @@ int32_t UsbCloseInterface(const UsbInterfaceHandle *interfaceHandle)
     OsalMutexUnlock(&interfacePool->interfaceLock);
 
     return HDF_SUCCESS;
-out:
+OUT:
     AdapterAtomicInc(&interfacePool->ioRefCount);
     OsalMutexUnlock(&interfacePool->interfaceLock);
     return ret;
@@ -1380,7 +1380,7 @@ int UsbSubmitRequestSync(const struct UsbRequest *request)
     requestObj->isSyncReq = true;
     ret = IfSubmitRequestToQueue(requestObj);
     if (ret != HDF_SUCCESS) {
-        goto out;
+        goto OUT;
     }
 
     ret = OsalSemWait(&requestObj->hostRequest->sem, waitTime);
@@ -1394,7 +1394,7 @@ int UsbSubmitRequestSync(const struct UsbRequest *request)
         HDF_LOGE("%s:%d OsalSemWait faile, ret=%d ", __func__, __LINE__, ret);
     }
 
-out:
+OUT:
     OsalSemDestroy(&requestObj->hostRequest->sem);
     return ret;
 }
