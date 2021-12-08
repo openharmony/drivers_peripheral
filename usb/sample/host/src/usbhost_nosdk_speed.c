@@ -337,12 +337,12 @@ int main(int argc, char *argv[])
     fd = OpenDevice();
     if (fd < 0) {
         ret = -1;
-        goto err;
+        goto ERR;
     }
 
     ret = ClaimInterface(ifaceNum);
     if (ret != HDF_SUCCESS) {
-        goto err;
+        goto ERR;
     }
 
     struct OsalThread urbReapProcess;
@@ -357,7 +357,7 @@ int main(int argc, char *argv[])
     ret = OsalThreadCreate(&urbReapProcess, (OsalThreadEntry)ReapProcess, NULL);
     if (ret != HDF_SUCCESS) {
         printf("OsalThreadCreate fail, ret=%d\n", ret);
-        goto err;
+        goto ERR;
     }
 
     ret = OsalThreadStart(&urbReapProcess, &threadCfg);
@@ -372,7 +372,7 @@ int main(int argc, char *argv[])
     ret = OsalThreadCreate(&urbSendProcess, (OsalThreadEntry)SendProcess, NULL);
     if (ret != HDF_SUCCESS) {
         printf("OsalThreadCreate fail, ret=%d\n", ret);
-        goto err;
+        goto ERR;
     }
 
     ret = OsalThreadStart(&urbSendProcess, &threadCfg);
@@ -382,10 +382,10 @@ int main(int argc, char *argv[])
 
     ret = BeginProcess(endNum);
     if (ret != HDF_SUCCESS) {
-        goto err;
+        goto ERR;
     }
 
-err:
+ERR:
     if (ret != HDF_SUCCESS) {
         printf("please check whether usb drv so is existing or not,like acm, ecm, if not, remove it and test again!\n");
     }

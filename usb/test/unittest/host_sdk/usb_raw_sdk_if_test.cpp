@@ -144,7 +144,9 @@ void UsbRawSdkIfTest::SetUpTestCase()
 void UsbRawSdkIfTest::TearDownTestCase()
 {
     g_acm = &g_deviceService;
-    UsbStopIo(g_acm);
+    if (UsbStopIo(g_acm) != HDF_SUCCESS) {
+        HDF_LOGW("%s:%d UsbStopIo error!", __func__, __LINE__);
+    }
 }
 
 void UsbRawSdkIfTest::SetUp()
@@ -258,7 +260,7 @@ static void AcmNotifyReqCallback(const void *requestArg)
     unsigned int expectedSize, copySize, allocSize;
     int ret;
     if (req->status != USB_REQUEST_COMPLETED)
-        goto exit;
+        goto EXIT;
     if (acm->nbIndex)
         dr = (struct UsbCdcNotification *)acm->notificationBuffer;
     expectedSize = sizeof(struct UsbCdcNotification) + Le16ToCpu(dr->wLength);
@@ -271,7 +273,7 @@ static void AcmNotifyReqCallback(const void *requestArg)
             allocSize = expectedSize;
             acm->notificationBuffer = (uint8_t *)OsalMemCalloc(allocSize);
             if (!acm->notificationBuffer)
-                goto exit;
+                goto EXIT;
             acm->nbSize = allocSize;
         }
         copySize = MIN(currentSize, expectedSize - acm->nbIndex);
@@ -289,7 +291,7 @@ static void AcmNotifyReqCallback(const void *requestArg)
     }
     if (UsbRawSubmitRequest(req))
         printf("%s - UsbRawSubmitRequest failed", __func__);
-exit:
+EXIT:
     printf("%s:%d exit", __func__, __LINE__);
 }
 

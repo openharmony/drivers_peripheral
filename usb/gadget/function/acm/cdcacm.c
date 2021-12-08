@@ -412,12 +412,12 @@ int32_t UsbSerialOpen(struct UsbSerial *port)
     ret = UsbSerialAllocFifo(&port->writeFifo, WRITE_BUF_SIZE);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbSerialAllocFifo failed", __func__);
-        goto out;
+        goto OUT;
     }
     ret = UsbSerialAllocFifo(&port->readFifo, READ_BUF_SIZE);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbSerialAllocFifo failed", __func__);
-        goto out;
+        goto OUT;
     }
 
     /* the acm is enabled, start the io stream */
@@ -427,7 +427,7 @@ int32_t UsbSerialOpen(struct UsbSerial *port)
             HDF_LOGD("%s: start usb serial", __func__);
             ret = UsbSerialStartIo(port);
             if (ret != HDF_SUCCESS) {
-                goto out;
+                goto OUT;
             }
             if (acm->notify && acm->notify->Connect) {
                 acm->notify->Connect(acm);
@@ -438,7 +438,7 @@ int32_t UsbSerialOpen(struct UsbSerial *port)
         }
     }
 
-out:
+OUT:
     OsalMutexUnlock(&port->lock);
     return HDF_SUCCESS;
 }
@@ -625,11 +625,11 @@ static int32_t UsbSerialRead(struct UsbSerial *port, struct HdfSBuf *reply)
         if (len == 0) {
             HDF_LOGE("%s: no data", __func__);
             ret = HDF_ERR_IO;
-            goto out;
+            goto OUT;
         }
         if (*(buf + i) == 0) {
             if (i == 0) {
-                goto out;
+                goto OUT;
             }
             break;
         }
@@ -639,7 +639,7 @@ static int32_t UsbSerialRead(struct UsbSerial *port, struct HdfSBuf *reply)
         HDF_LOGE("%s: sbuf write buffer failed", __func__);
         ret = HDF_ERR_IO;
     }
-out:
+OUT:
     if (port->acm) {
         UsbSerialStartRx(port);
     }
@@ -895,7 +895,7 @@ static void AcmCtrlComplete(uint8_t pipe, struct UsbFnRequest *req)
     struct UsbAcmDevice *acm = ctrlInfo->acm;
     if (req->status != USB_REQUEST_COMPLETED) {
         HDF_LOGD("%s: ctrl completion error %d", __func__, req->status);
-        goto out;
+        goto OUT;
     }
 
     if (ctrlInfo->request == USB_DDK_CDC_REQ_SET_LINE_CODING) {
@@ -909,7 +909,7 @@ static void AcmCtrlComplete(uint8_t pipe, struct UsbFnRequest *req)
         }
     }
 
-out:
+OUT:
     DListInsertTail(&req->list, &acm->ctrlPool);
 }
 
@@ -927,13 +927,13 @@ static int32_t AcmAllocCtrlRequests(struct UsbAcmDevice *acm, int num)
         ctrlInfo = (struct CtrlInfo *)OsalMemCalloc(sizeof(*ctrlInfo));
         if (ctrlInfo == NULL) {
             HDF_LOGE("%s: Allocate ctrlInfo failed", __func__);
-            goto out;
+            goto OUT;
         }
         ctrlInfo->acm = acm;
         req = UsbFnAllocCtrlRequest(acm->ctrlIface.handle,
             sizeof(struct UsbCdcLineCoding) + sizeof(struct UsbCdcLineCoding));
         if (req == NULL) {
-            goto out;
+            goto OUT;
         }
         req->complete = AcmCtrlComplete;
         req->context  = ctrlInfo;
@@ -942,7 +942,7 @@ static int32_t AcmAllocCtrlRequests(struct UsbAcmDevice *acm, int num)
     }
     return HDF_SUCCESS;
 
-out:
+OUT:
     return DListIsEmpty(head) ? HDF_FAILURE : HDF_SUCCESS;
 }
 
@@ -1101,7 +1101,7 @@ static void AcmSetup(struct UsbAcmDevice *acm, struct UsbFnCtrlRequest *setup)
     switch (setup->request) {
         case USB_DDK_CDC_REQ_SET_LINE_CODING:
             if (length != sizeof(struct UsbCdcLineCoding)) {
-                goto out;
+                goto OUT;
             }
             ret = length;
             break;
@@ -1123,7 +1123,7 @@ static void AcmSetup(struct UsbAcmDevice *acm, struct UsbFnCtrlRequest *setup)
             break;
     }
 
-out:
+OUT:
     ctrlInfo = (struct CtrlInfo *)req->context;
     ctrlInfo->request = setup->request;
     req->length = ret;
@@ -1537,32 +1537,32 @@ static int UsbSerialInit(struct UsbAcmDevice *acm)
     ret = UsbSerialAlloc(acm);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbSerialAlloc failed", __func__);
-        goto err;
+        goto ERR;
     }
 
     ret = AcmAllocCtrlRequests(acm, CTRL_REQUEST_NUM);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: AcmAllocCtrlRequests failed", __func__);
-        goto err;
+        goto ERR;
     }
 
     ret = AcmAllocNotifyRequest(acm);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: AcmAllocNotifyRequest failed", __func__);
-        goto err;
+        goto ERR;
     }
 
     ret = UsbFnStartRecvInterfaceEvent(acm->ctrlIface.fn, 0xff, UsbAcmEventCallback, acm);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: register event callback failed", __func__);
-        goto err;
+        goto ERR;
     }
 
     acm->notify = &g_acmNotifyMethod;
     acm->initFlag = true;
     return HDF_SUCCESS;
 
-err:
+ERR:
     UsbSerialFree(acm);
     (void)AcmReleaseFuncDevice(acm);
     return ret;

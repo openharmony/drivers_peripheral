@@ -56,7 +56,7 @@ static int32_t HandleSyncRequestCompletion(const struct UsbHostRequest *request,
         RawHandleRequestCompletion((struct UsbHostRequest *)request, USB_REQUEST_TIMEOUT);
     } else if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s:%d OsalSemWait faile, ret=%d ", __func__, __LINE__, ret);
-        goto out;
+        goto OUT;
     }
 
     if (requestData->requested) {
@@ -85,7 +85,7 @@ static int32_t HandleSyncRequestCompletion(const struct UsbHostRequest *request,
             break;
     }
 
-out:
+OUT:
     OsalSemDestroy((struct OsalSem *)&request->sem);
     return ret;
 }
@@ -422,16 +422,16 @@ static int ParseInterfaceCopy(struct UsbRawInterfaceDescriptor * const ifp, int 
     ifp->extra = RawUsbMemAlloc((size_t)len);
     if (!ifp->extra) {
         ret = HDF_ERR_MALLOC_FAIL;
-        goto err;
+        goto ERR;
     }
 
     ret = memcpy_s((void *)ifp->extra, len + ifp->extraLength, buffer, len);
     if (ret != EOK) {
         HDF_LOGE("%s:%d memcpy_s fail, ret=%d", __func__, __LINE__, ret);
-        goto err;
+        goto ERR;
     }
     ifp->extraLength = len;
-err:
+ERR:
     return ret;
 }
 
@@ -445,7 +445,7 @@ static int ParseInterfaceEndpoint(struct UsbRawInterfaceDescriptor *ifp, const u
         endPoint = RawUsbMemCalloc(ifp->interfaceDescriptor.bNumEndpoints * sizeof(*endPoint));
         if (endPoint == NULL) {
             ret = HDF_ERR_MALLOC_FAIL;
-            goto err;
+            goto ERR;
         }
 
         ifp->endPoint = endPoint;
@@ -455,7 +455,7 @@ static int ParseInterfaceEndpoint(struct UsbRawInterfaceDescriptor *ifp, const u
                 ifp->interfaceDescriptor.bNumEndpoints = i;
                 break;
             } else if (ret < 0) {
-                goto err;
+                goto ERR;
             }
 
             *buffer += ret;
@@ -463,7 +463,7 @@ static int ParseInterfaceEndpoint(struct UsbRawInterfaceDescriptor *ifp, const u
         }
     }
 
-err:
+ERR:
     return ret;
 }
 
@@ -480,13 +480,13 @@ static int ParseInterface(struct UsbRawInterface *usbInterface, const uint8_t *b
     if (usbInterface == NULL) {
         HDF_LOGD("%s:%d usbInterface is NULL", __func__, __LINE__);
         ret = HDF_DEV_ERR_NORANGE;
-        goto err;
+        goto ERR;
     }
     if (usbInterface->numAltsetting > USB_MAXALTSETTING) {
         HDF_LOGE("%s:%d numAltsetting=%d is error",
             __func__, __LINE__, usbInterface->numAltsetting);
         ret = HDF_DEV_ERR_NORANGE;
-        goto err;
+        goto ERR;
     }
 
     while (size >= USB_DDK_DT_INTERFACE_SIZE) {
@@ -496,7 +496,7 @@ static int ParseInterface(struct UsbRawInterface *usbInterface, const uint8_t *b
             return buffer - buffer0;
         } else if (ret == HDF_ERR_IO) {
             HDF_LOGD("%s:%d ret=%d", __func__, __LINE__, ret);
-            goto err;
+            goto ERR;
         }
 
         usbInterface->numAltsetting++;
@@ -515,7 +515,7 @@ static int ParseInterface(struct UsbRawInterface *usbInterface, const uint8_t *b
         if (len) {
             ret = ParseInterfaceCopy(ifp, len, buffer);
             if (ret != EOK) {
-                goto err;
+                goto ERR;
             }
 
             buffer += len;
@@ -524,7 +524,7 @@ static int ParseInterface(struct UsbRawInterface *usbInterface, const uint8_t *b
 
         ret = ParseInterfaceEndpoint(ifp, &buffer, &size);
         if (ret < HDF_SUCCESS) {
-            goto err;
+            goto ERR;
         }
 
         ifDesc = (const struct UsbiInterfaceDescriptor *)buffer;
@@ -538,7 +538,7 @@ static int ParseInterface(struct UsbRawInterface *usbInterface, const uint8_t *b
 
     return buffer - buffer0;
 
-err:
+ERR:
     return ret;
 }
 
@@ -553,13 +553,13 @@ static int ParseConfigurationDes(struct UsbRawConfigDescriptor *config, const ui
         config->extra = RawUsbMemAlloc(len);
         if (!config->extra) {
             ret = HDF_ERR_MALLOC_FAIL;
-            goto err;
+            goto ERR;
         }
 
         ret = memcpy_s((void *)config->extra, len + config->extraLength, buffer, len);
         if (ret != EOK) {
             HDF_LOGE("%s:%d memcpy_s fail! ret=%d", __func__, __LINE__, ret);
-            goto err;
+            goto ERR;
         }
         config->extraLength = len;
 
@@ -577,7 +577,7 @@ static int ParseConfigurationDes(struct UsbRawConfigDescriptor *config, const ui
         }
         ret = ParseInterface(usbInterface, buffer, size);
         if (ret < 0) {
-            goto err;
+            goto ERR;
         }
 
         buffer += ret;
@@ -586,7 +586,7 @@ static int ParseConfigurationDes(struct UsbRawConfigDescriptor *config, const ui
 
     return size;
 
-err:
+ERR:
     RawClearConfiguration(config);
     return ret;
 }
@@ -684,7 +684,7 @@ static int32_t ControlRequestCompletion(
         RawHandleRequestCompletion((struct UsbHostRequest *)request, USB_REQUEST_TIMEOUT);
     } else if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s:%d OsalSemWait faile, ret=%d ", __func__, __LINE__, ret);
-        goto out;
+        goto OUT;
     }
 
     if ((requestData->requestType & USB_DDK_ENDPOINT_DIR_MASK) == USB_PIPE_DIRECTION_IN) {
@@ -692,7 +692,7 @@ static int32_t ControlRequestCompletion(
             ControlRequestGetData(request), request->actualLength);
         if (ret != EOK) {
             HDF_LOGE("%s:%d memcpy_s fail! ret=%d", __func__, __LINE__, ret);
-            goto out;
+            goto OUT;
         }
     }
 
@@ -718,7 +718,7 @@ static int32_t ControlRequestCompletion(
             break;
     }
 
-out:
+OUT:
     OsalSemDestroy((struct OsalSem *)&request->sem);
     return ret;
 }
@@ -756,11 +756,11 @@ int32_t RawInit(struct UsbSession **session)
         ret = osAdapterOps->init(tempSession);
         if (ret < 0) {
             HDF_LOGE("%s: init error, return %d", __func__, ret);
-            goto err_free_session;
+            goto ERR_FREE_SESSION;
         }
     } else {
         ret = HDF_ERR_NOT_SUPPORT;
-        goto err_free_session;
+        goto ERR_FREE_SESSION;
     }
 
     if (session != NULL) {
@@ -769,7 +769,7 @@ int32_t RawInit(struct UsbSession **session)
 
     return HDF_SUCCESS;
 
-err_free_session:
+ERR_FREE_SESSION:
     if (tempSession == g_usbRawDefaultSession) {
         g_usbRawDefaultSession = NULL;
     }
@@ -848,12 +848,12 @@ int32_t RawClaimInterface(struct UsbDeviceHandle *devHandle, int interfaceNumber
     OsalMutexLock(&devHandle->lock);
     if ((devHandle->claimedInterfaces) & (1U << (uint32_t)interfaceNumber)) {
         ret = HDF_SUCCESS;
-        goto out;
+        goto OUT;
     }
 
     if (!osAdapterOps->claimInterface) {
         ret = HDF_ERR_NOT_SUPPORT;
-        goto out;
+        goto OUT;
     }
 
     ret = osAdapterOps->claimInterface(devHandle, (unsigned int)interfaceNumber);
@@ -861,7 +861,7 @@ int32_t RawClaimInterface(struct UsbDeviceHandle *devHandle, int interfaceNumber
         devHandle->claimedInterfaces |= 1U << (uint32_t)interfaceNumber;
     }
 
-out:
+OUT:
     OsalMutexUnlock(&devHandle->lock);
 
     return ret;
@@ -1268,12 +1268,12 @@ int32_t RawReleaseInterface(struct UsbDeviceHandle *devHandle, int interfaceNumb
     OsalMutexLock(&devHandle->lock);
     if (!(devHandle->claimedInterfaces & (1U << (uint32_t)interfaceNumber))) {
         ret = HDF_ERR_BAD_FD;
-        goto out;
+        goto OUT;
     }
 
     if (!osAdapterOps->releaseInterface) {
         ret = HDF_ERR_NOT_SUPPORT;
-        goto out;
+        goto OUT;
     }
 
     ret = osAdapterOps->releaseInterface(devHandle, (unsigned int)interfaceNumber);
@@ -1281,7 +1281,7 @@ int32_t RawReleaseInterface(struct UsbDeviceHandle *devHandle, int interfaceNumb
         devHandle->claimedInterfaces &= ~(1U << (uint32_t)interfaceNumber);
     }
 
-out:
+OUT:
     OsalMutexUnlock(&devHandle->lock);
 
     return ret;
@@ -1426,36 +1426,36 @@ int RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddRemov
     if (pnpData == NULL || pnpReply == NULL) {
         ret = HDF_FAILURE;
         HDF_LOGE("%s:%d GetService err", __func__, __LINE__);
-        goto error_sbuf;
+        goto ERR_SBUF;
     }
 
     if (!HdfSbufWriteBuffer(pnpData, (const void *)(&infoData), sizeof(struct UsbPnpAddRemoveInfo))) {
         HDF_LOGE("%s: sbuf write infoData failed", __func__);
         ret = HDF_FAILURE;
-        goto out;
+        goto OUT;
     }
 
     ret = serv->dispatcher->Dispatch(&serv->object, cmdType, pnpData, pnpReply);
     if (ret) {
         HDF_LOGE("%s: Dispatch USB_PNP_NOTIFY_REMOVE_TEST failed ret = %d", __func__, ret);
-        goto out;
+        goto OUT;
     }
 
     flag = HdfSbufReadInt32(pnpReply, &replyData);
     if ((flag == false) || (replyData != INT32_MAX)) {
         ret = HDF_FAILURE;
         HDF_LOGE("%s:%d cmdType=%d reply faile.", __func__, __LINE__, cmdType);
-        goto out;
+        goto OUT;
     } else if ((flag == true) && (replyData == INT32_MAX)) {
         HDF_LOGE("%s:%d cmdType=%d reply success.", __func__, __LINE__, cmdType);
     }
 
     ret = HDF_SUCCESS;
 
-out:
+OUT:
     HdfSBufRecycle(pnpData);
     HdfSBufRecycle(pnpReply);
-error_sbuf:
+ERR_SBUF:
     HdfIoServiceRecycle(serv);
 
     return ret;
