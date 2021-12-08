@@ -26,6 +26,7 @@ if (defined(ohos_lite)) {
     deps = [
       "moduletest:hdf_moduletest_usb",
       "unittest/device_sdk:usb_device_sdk_if_test",
+      "unittest/hal:hal_test",
       "//drivers/peripheral/usb/sample:hdf_ddk_sample_usb",
     ]
   }
