@@ -224,7 +224,6 @@ static int32_t WlanServiceStudCreateFeature(struct HdfDeviceIoClient *client, st
         feature->ifName = strdup((g_staFeature->baseFeature).ifName);
     } else {
         HDF_LOGE("%s: wlan type is Invalid", __func__);
-        free(feature->ifName);
         free(feature);
         ret = HDF_FAILURE;
     }
