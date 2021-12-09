@@ -210,7 +210,7 @@ static int32_t CreateFeature(uint8_t wlanType, struct FeatureInfo *feature)
         free(feature);
         ret = HDF_FAILURE;
     }
-     return ret;
+    return ret;
 }
 
 static int32_t WlanServiceStudCreateFeature(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
