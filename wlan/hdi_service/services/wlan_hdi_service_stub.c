@@ -183,27 +183,10 @@ static int32_t WlanServiceStubGetSupportCombo(struct HdfDeviceIoClient *client, 
     return ret;
 }
 
-static int32_t WlanServiceStudCreateFeature(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
-    struct HdfSBuf *reply)
+static int32_t CreateFeature(uint8_t wlanType, struct FeatureInfo *feature)
 {
-    (void)client;
     int32_t ret;
-    uint8_t wlanType;
 
-    if (data == NULL) {
-        HDF_LOGE("%s: Data is NULL", __func__);
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadUint8(data, &wlanType)) {
-        HDF_LOGE("%s: read wlanType failed", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    struct FeatureInfo *feature = (struct FeatureInfo *)malloc(sizeof(struct FeatureInfo));
-    if (feature == NULL) {
-        HDF_LOGE("%s: malloc failed", __func__);
-        return HDF_FAILURE;
-    }
-    (void)memset_s(feature, sizeof(struct FeatureInfo), 0, sizeof(struct FeatureInfo));
     if (wlanType == PROTOCOL_80211_IFTYPE_AP) {
         ret = g_wifi->createFeature(wlanType, (struct IWiFiBaseFeature **)&g_apFeature);
         if (ret != HDF_SUCCESS) {
@@ -227,6 +210,36 @@ static int32_t WlanServiceStudCreateFeature(struct HdfDeviceIoClient *client, st
         free(feature);
         ret = HDF_FAILURE;
     }
+     return ret;
+}
+
+static int32_t WlanServiceStudCreateFeature(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
+    struct HdfSBuf *reply)
+{
+    (void)client;
+    int32_t ret;
+    uint8_t wlanType;
+
+    if (data == NULL) {
+        HDF_LOGE("%s: Data is NULL", __func__);
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufReadUint8(data, &wlanType)) {
+        HDF_LOGE("%s: read wlanType failed", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    struct FeatureInfo *feature = (struct FeatureInfo *)malloc(sizeof(struct FeatureInfo));
+    if (feature == NULL) {
+        HDF_LOGE("%s: malloc failed", __func__);
+        return HDF_FAILURE;
+    }
+    (void)memset_s(feature, sizeof(struct FeatureInfo), 0, sizeof(struct FeatureInfo));
+    
+    ret = CreateFeature(wlanType, feature);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: createFeature failed, error code: %d", __func__, ret);
+    }
+
     if (!HdfSbufWriteString(reply, feature->ifName)) {
         HDF_LOGE("HdfSbufWriteString is failed!");
         free(feature->ifName);
