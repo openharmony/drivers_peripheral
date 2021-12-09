@@ -514,7 +514,6 @@ void free_camera_metadata_buffer(common_metadata_header_t *dst)
 {
     if (dst != NULL) {
         free(dst);
-        dst = NULL;
     }
 }
 

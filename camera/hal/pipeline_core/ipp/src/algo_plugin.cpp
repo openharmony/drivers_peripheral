@@ -126,6 +126,8 @@ RetCode AlgoPlugin::Process(std::shared_ptr<IBuffer>& outBuffer,
             inAlgoBuffers[i] = nullptr;
         }
     }
+    delete inAlgoBuffers;
+    inAlgoBuffers = nullptr;
 
     if (ret != 0) {
         CAMERA_LOGE("process algo failed, ret = %{public}d", ret);
@@ -151,7 +153,8 @@ RetCode AlgoPlugin::Stop()
 
 RetCode AlgoPlugin::CheckLibPath(const char *path)
 {
-    if (path == nullptr && (realpath(path, NULL) == nullptr)) {
+    char absPath[PATH_MAX] = {0};
+    if (path == nullptr || (realpath(path, absPath) == nullptr)) {
         CAMERA_LOGE("path is nullptr.");
         return RC_ERROR;
     }

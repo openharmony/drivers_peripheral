@@ -101,6 +101,7 @@ RetCode HcsDeal::DealCameraAbility(const struct DeviceResourceNode &node)
     int32_t ret = pDevResIns->GetString(&node, "logicCameraId", &cameraId, nullptr);
     if (ret != 0) {
         CAMERA_LOGW("get logic cameraid failed");
+        return RC_ERROR;
     }
     CAMERA_LOGD("logic cameraid is %{public}s", cameraId);
 
@@ -113,10 +114,12 @@ RetCode HcsDeal::DealCameraAbility(const struct DeviceResourceNode &node)
     const struct DeviceResourceNode *metadataNode = pDevResIns->GetChildNode(&node, "metadata");
     if (metadataNode == nullptr || cameraId == nullptr) {
         CAMERA_LOGW("metadataNode is null or cameraId is null");
+        return RC_ERROR;
     }
     RetCode rc = DealMetadata(cameraId, *metadataNode);
     if (rc != RC_OK) {
         CAMERA_LOGW("deal metadata failed");
+        return RC_ERROR;
     }
 
     for (CameraIdMap::iterator itr = cameraIdMap_.begin(); itr != cameraIdMap_.end(); itr++) {
@@ -181,7 +184,7 @@ RetCode HcsDeal::DealAeAvailableAntiBandingModes(
     bool ret = metadata->addEntry(OHOS_CONTROL_AE_AVAILABLE_ANTIBANDING_MODES,
         aeAvailableAntiBandingModeUint8s.data(), aeAvailableAntiBandingModeUint8s.size());
     if (!ret) {
-        CAMERA_LOGD("aeAvailableAntiBandingModes add failed");
+        CAMERA_LOGE("aeAvailableAntiBandingModes add failed");
         return RC_ERROR;
     }
     CAMERA_LOGD("aeAvailableAntiBandingModes add success");
@@ -208,7 +211,7 @@ RetCode HcsDeal::DealAeAvailableModes(
     bool ret = metadata->addEntry(OHOS_CONTROL_AE_AVAILABLE_MODES,
         aeAvailableModesU8.data(), aeAvailableModesU8.size());
     if (!ret) {
-        CAMERA_LOGD("aeAvailableModes add failed");
+        CAMERA_LOGE("aeAvailableModes add failed");
         return RC_ERROR;
     }
     CAMERA_LOGD("aeAvailableModes add success");
@@ -235,7 +238,7 @@ RetCode HcsDeal::DealAvailableAeFpsTargets(
     bool ret = metadata->addEntry(OHOS_CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES,
         availableAeFpsTargets.data(), availableAeFpsTargets.size());
     if (!ret) {
-        CAMERA_LOGD("availableAeFpsTargets add failed");
+        CAMERA_LOGE("availableAeFpsTargets add failed");
         return RC_ERROR;
     }
     CAMERA_LOGD("availableAeFpsTargets add success");
@@ -279,7 +282,7 @@ RetCode HcsDeal::DealAeCompensationSteps(
     bool ret = metadata->addEntry(OHOS_CONTROL_AE_COMPENSATION_STEP,
         aeCompensationSteps.data(), aeCompensationSteps.size());
     if (!ret) {
-        CAMERA_LOGD("aeCompensationSteps add failed");
+        CAMERA_LOGE("aeCompensationSteps add failed");
         return RC_ERROR;
     }
     CAMERA_LOGD("aeCompensationSteps add success");
@@ -305,7 +308,7 @@ RetCode HcsDeal::DealAvailableAwbModes(
     bool ret = metadata->addEntry(OHOS_CONTROL_AWB_AVAILABLE_MODES,
         availableAwbModes.data(), availableAwbModes.size());
     if (!ret) {
-        CAMERA_LOGD("availableAwbModes add failed");
+        CAMERA_LOGE("availableAwbModes add failed");
         return RC_ERROR;
     }
     CAMERA_LOGD("availableAwbModes add success");
