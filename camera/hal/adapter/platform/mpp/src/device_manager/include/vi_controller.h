@@ -66,6 +66,7 @@ private:
     RetCode GetIspMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
     RetCode GetAEMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
     RetCode GetAWBMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
+    RetCode GetColorCorrectionGains(std::shared_ptr<CameraStandard::CameraMetadata> meta);
     template<typename T>
     bool CheckNumequal(T oldnum, T num, int size)
     {
