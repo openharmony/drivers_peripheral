@@ -9,7 +9,6 @@
 #include "tfa9879_accessory_impl.h"
 #include "audio_accessory_base.h"
 #include "audio_accessory_if.h"
-#include "audio_codec_base.h"
 #include "audio_driver_log.h"
 
 #define HDF_LOG_TAG "accessory"
