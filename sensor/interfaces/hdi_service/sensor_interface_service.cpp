@@ -212,5 +212,6 @@ void SensorInterfaceServiceRelease(hdi::sensor::v1_0::ISensorInterface *obj)
     if (obj == nullptr) {
         return;
     }
+    FreeSensorInterfaceInstance();
     delete obj;
 }
