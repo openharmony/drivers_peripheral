@@ -1,0 +1,73 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/ohos.gni")
+import("//drivers/adapter/uhdf2/uhdf.gni")
+
+ohos_shared_library("libsensor_interface_service") {
+  include_dirs = [
+    "//drivers/adapter/uhdf2/include/hdi",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//drivers/peripheral/sensor/interfaces/include/",
+  ]
+  sources = [ "sensor_interface_service.cpp" ]
+
+  deps = [
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
+    "//drivers/peripheral/sensor/hal:hdi_sensor",
+    "//drivers/peripheral/sensor/interfaces/hdi/sensor/v1_0:libsensor_stub",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  subsystem_name = "hdf"
+  part_name = "hdf"
+}
+
+ohos_shared_library("libsensor_driver") {
+  include_dirs = [
+    "//drivers/adapter/uhdf2/include/hdi",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//drivers/peripheral/sensor/interfaces/include/",
+  ]
+  sources = [ "sensor_interface_driver.cpp" ]
+
+  deps = [
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
+    "//drivers/peripheral/sensor/hal:hdi_sensor",
+    "//drivers/peripheral/sensor/interfaces/hdi/sensor/v1_0:libsensor_stub",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  subsystem_name = "hdf"
+  part_name = "hdf"
+}
+
+group("hdf_sensor_service") {
+  if (target_cpu == "arm") {
+    deps = [
+      ":libsensor_driver",
+      ":libsensor_interface_service",
+    ]
+  }
+}
