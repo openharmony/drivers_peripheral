@@ -1025,7 +1025,7 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
     int32_t ret;
     struct HdfIoService *service = NULL;
 #else
-    int32_t ret = 0;
+    int32_t ret = HDF_SUCCESS;
 #endif
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
