@@ -238,6 +238,7 @@ static int32_t WlanServiceStudCreateFeature(struct HdfDeviceIoClient *client, st
     ret = CreateFeature(wlanType, feature);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: createFeature failed, error code: %d", __func__, ret);
+        return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteString(reply, feature->ifName)) {
