@@ -62,7 +62,7 @@ int32_t SensorInterfaceService::GetAllSensorInfo(std::vector<HdfSensorInformatio
     struct SensorInformation *sensorInfo = nullptr;
     struct SensorInformation *tmp = nullptr;
     int32_t count = 0;
-    
+
     int32_t ret = sensorInterface->GetAllSensors(&sensorInfo, &count);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
@@ -210,9 +210,10 @@ hdi::sensor::v1_0::ISensorInterface *SensorInterfaceServiceConstruct()
 
 void SensorInterfaceServiceRelease(hdi::sensor::v1_0::ISensorInterface *obj)
 {
+    FreeSensorInterfaceInstance();
     if (obj == nullptr) {
         return;
     }
-    FreeSensorInterfaceInstance();
+    
     delete obj;
 }
