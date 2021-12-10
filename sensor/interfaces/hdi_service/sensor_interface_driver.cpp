@@ -59,8 +59,9 @@ static int HdfSensorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-static void HdfSensorInterfaceDriverRelease(struct HdfDeviceObject *deviceObject){
-    struct HdfSensorInterfaceHost *hdfSensorInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfSensorInterfaceHost, ioservice);
+static void HdfSensorInterfaceDriverRelease(struct HdfDeviceObject *deviceObject) {
+    struct HdfSensorInterfaceHost *hdfSensorInterfaceHost =
+        CONTAINER_OF(deviceObject->service, struct HdfSensorInterfaceHost, ioservice);
     SensorInterfaceStubRelease(hdfSensorInterfaceHost->instance);
     OsalMemFree(hdfSensorInterfaceHost);
     HDF_LOGI("HdfSensorInterfaceDriverRelease Success");
