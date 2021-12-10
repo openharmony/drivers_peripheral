@@ -14,6 +14,8 @@
  */
 
 #include "sensor_interface_service.h"
+#include <hdf_base.h>
+#include <hdf_log.h>
 #include "sensor_if.h"
 
 namespace hdi {
