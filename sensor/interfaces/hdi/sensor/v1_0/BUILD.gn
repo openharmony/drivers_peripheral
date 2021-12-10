@@ -11,25 +11,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-  import("//build/lite/config/test.gni")
+import("//drivers/adapter/uhdf2/hdi.gni")
 
-  lite_component("hdf_test_sensor") {
-    # add hdf subsystem unittest
-    if (ohos_build_type == "debug") {
-      if (board_name == "hispark_taurus") {
-        deps = [ "unittest:hdf_peripheral_sensor_test" ]
-      }
-    }
-    features = []
-  }
-} else {
-  group("hdf_test_sensor") {
-    testonly = true
-    deps = [
-      "unittest:hdf_unittest_sensor",
-      "unittest/hdi:hdi_unittest_sensor",
-    ]
-  }
+hdi("sensor") {
+  package = "hdi.sensor.v1_0"
+
+  module_name = "sensor_service"
+
+  sources = [
+    "ISensorCallback.idl",
+    "ISensorInterface.idl",
+    "SensorTypes.idl",
+  ]
+
+  language = "cpp"
 }
