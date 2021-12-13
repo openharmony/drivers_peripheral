@@ -29,7 +29,6 @@ namespace {
     struct SensorDevelopmentList {
         int32_t sensorTypeId;
         char sensorName[SENSOR_NAME_MAX_LEN];
-        char vendorName[SENSOR_NAME_MAX_LEN];
         int32_t dataForm;    // 0: fixed, 1: range
         int32_t dataDimension;
         struct SensorValueRange *valueRange;
@@ -42,15 +41,19 @@ namespace {
     static struct SensorValueRange g_hallRange[] = {{1, 0}};
     static struct SensorValueRange g_barometerRange[] = {{1100, -1100}, {1100, -1100}};
     static struct SensorValueRange g_magneticRange[] = {{35, -35}, {35, -35}, {35, -35}};
+    static struct SensorValueRange g_gyroscopeRange[] = {{2000, -2000}, {2000, -2000}, {2000, -2000}};
+    static struct SensorValueRange g_gravityRange[] = {{78, -78}, {78, -78}, {78, -78}};
 
     static struct SensorDevelopmentList g_sensorList[] = {
-        {SENSOR_TYPE_NONE, "sensor_test", "default", 1, 1, g_testRange},
-        {SENSOR_TYPE_ACCELEROMETER, "accelerometer", "borsh_bmi160", 1, 3, g_accelRange},
-        {SENSOR_TYPE_PROXIMITY, "proximity", "adps9960", 0, 1, g_proximityRange},
-        {SENSOR_TYPE_HALL, "hallrometer", "akm_ak8789", 0, 1, g_hallRange},
-        {SENSOR_TYPE_BAROMETER, "barometer", "borsh_bmp180", 1, 2, g_barometerRange},
-        {SENSOR_TYPE_AMBIENT_LIGHT, "als", "rohm_bh1745", 1, 4, g_alsRange},
-        {SENSOR_TYPE_MAGNETIC_FIELD, "magnetometer", "st_lsm303", 1, 3, g_magneticRange},
+        {SENSOR_TYPE_NONE, "sensor_test",  1, 1, g_testRange},
+        {SENSOR_TYPE_ACCELEROMETER, "accelerometer",  1, 3, g_accelRange},
+        {SENSOR_TYPE_PROXIMITY, "proximity",  0, 1, g_proximityRange},
+        {SENSOR_TYPE_HALL, "hallrometer",  0, 1, g_hallRange},
+        {SENSOR_TYPE_BAROMETER, "barometer",  1, 2, g_barometerRange},
+        {SENSOR_TYPE_AMBIENT_LIGHT, "als", 1, 4, g_alsRange},
+        {SENSOR_TYPE_MAGNETIC_FIELD, "magnetometer",  1, 3, g_magneticRange},
+        {SENSOR_TYPE_GYROSCOPE, "gyroscope", 1, 3, g_gyroscopeRange},
+        {SENSOR_TYPE_GRAVITY, "gravity", 1, 3, g_gravityRange}
     };
 
     static int g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
