@@ -232,38 +232,55 @@ RetCode ViController::GetAEMetaData(std::shared_ptr<CameraStandard::CameraMetada
 
 RetCode ViController::GetAWBMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta)
 {
-    static float oldColorGains[4] = {0};
-    float colorGains[4] = {0};
     RetCode rc = RC_ERROR;
     std::lock_guard<std::mutex> l(metaDataSetlock_);
     for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
         switch (*iter) {
             case OHOS_SENSOR_COLOR_CORRECTION_GAINS: {
-                rc = viObject_->QuerySetting(OHOS_SENSOR_COLOR_CORRECTION_GAINS, (char*)colorGains);
-                if (rc == RC_ERROR) {
-                    CAMERA_LOGE("%{public}s CMD_AWB_COLORGAINS QuerySetting fail", __FUNCTION__);
+                rc = GetColorCorrectionGains(meta);
+                if (rc != RC_OK) {
+                    CAMERA_LOGE("%{public}s get sensor color correction gains fail", __FUNCTION__);
                     return rc;
                 }
-                int gainsSize = 4;
-                if (!CheckNumequal(oldColorGains, colorGains, gainsSize)) {
-                    std::lock_guard<std::mutex> l(metaDataFlaglock_);
-                    metaDataFlag_ = true;
-                    (void)memcpy_s(oldColorGains, gainsSize * sizeof(float), colorGains, gainsSize * sizeof(float));
-                }
-                static constexpr int DATA_COUNT = 4;
-                meta->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, DATA_COUNT);
-                CAMERA_LOGD("%{public}s Get CMD_AWB_COLORGAINS [%{public}f,%{public}f,%{public}f,%{public}f]",
-                    __FUNCTION__,
-                    colorGains[0], // 0:Array range
-                    colorGains[1], // 1:Array range
-                    colorGains[2], // 2:Array range
-                    colorGains[3]); // 3:Array range
                 break;
             }
             default:
                 break;
         }
     }
+    return rc;
+}
+
+RetCode ViController::GetColorCorrectionGains(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+{
+    static constexpr int DATA_COUNT = 4;
+    static float oldColorGains[DATA_COUNT] = {0};
+    float colorGains[DATA_COUNT] = {0};
+    RetCode rc = RC_ERROR;
+
+    rc = viObject_->QuerySetting(OHOS_SENSOR_COLOR_CORRECTION_GAINS, (char*)colorGains);
+    if (rc != RC_OK) {
+        CAMERA_LOGE("%{public}s CMD_AWB_COLORGAINS QuerySetting fail", __FUNCTION__);
+        return rc;
+    }
+
+    if (!CheckNumequal(oldColorGains, colorGains, DATA_COUNT)) {
+        std::lock_guard<std::mutex> l(metaDataFlaglock_);
+        metaDataFlag_ = true;
+        rc = memcpy_s(oldColorGains, DATA_COUNT * sizeof(float), colorGains, DATA_COUNT * sizeof(float));
+        if (rc != RC_OK) {
+            CAMERA_LOGE("%{public}s memcpy_s fail", __FUNCTION__);
+            return rc;
+        }
+        meta->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, DATA_COUNT);
+        CAMERA_LOGD("%{public}s Get CMD_AWB_COLORGAINS [%{public}f,%{public}f,%{public}f,%{public}f]",
+            __FUNCTION__,
+            colorGains[0], // 0:Array range
+            colorGains[1], // 1:Array range
+            colorGains[2], // 2:Array range
+            colorGains[3]); // 3:Array range
+    }
+
     return rc;
 }
 
