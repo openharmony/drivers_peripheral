@@ -45,7 +45,6 @@ DisplayGrallocClient::DisplayGrallocClient()
     if (allocatorProxy_ == nullptr) {
         return;
     }
-
     HDF_LOGI("%{public}s instance ok", __func__);
 }
 
