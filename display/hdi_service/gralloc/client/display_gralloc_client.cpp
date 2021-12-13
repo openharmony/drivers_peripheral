@@ -28,6 +28,7 @@ IDisplayGralloc *IDisplayGralloc::Get()
     instance = new DisplayGrallocClient();
     if (instance == nullptr) {
         HDF_LOGE("%{public}s: Can't new a DisplayGrallocClient instance", __func__);
+        return nullptr;
     }
     HDF_LOGI("%{public}s: Get display gralloc client handle succ", __func__);
     return instance;
@@ -36,10 +37,14 @@ IDisplayGralloc *IDisplayGralloc::Get()
 DisplayGrallocClient::DisplayGrallocClient()
 {
     mapperAdapter_ = std::make_shared<MapperAdapter>();
-    if (mapperAdapter_ == nullptr) return;
+    if (mapperAdapter_ == nullptr) {
+        return;
+    }
 
     allocatorProxy_ = IDisplayAllocator::Get("hdi_display_gralloc_service");
-    if (allocatorProxy_ == nullptr) return;
+    if (allocatorProxy_ == nullptr) {
+        return;
+    }
     HDF_LOGI("%{public}s instance ok", __func__);
 }
 
