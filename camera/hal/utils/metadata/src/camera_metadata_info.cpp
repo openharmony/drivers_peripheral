@@ -83,6 +83,7 @@ bool CameraMetadata::resize_add_metadata(uint32_t item, const void *data, size_t
     if (result != CAM_META_SUCCESS) {
         METADATA_ERR_LOG("Failed to copy the old metadata to new metadata");
         free_camera_metadata_buffer(newMetadata);
+        newMetadata = nullptr;
         return false;
     }
 
@@ -90,6 +91,7 @@ bool CameraMetadata::resize_add_metadata(uint32_t item, const void *data, size_t
     if (result != CAM_META_SUCCESS) {
         METADATA_ERR_LOG("Failed to add new entry");
         free_camera_metadata_buffer(newMetadata);
+        newMetadata = nullptr;
         return false;
     }
     replace_metadata(newMetadata);
