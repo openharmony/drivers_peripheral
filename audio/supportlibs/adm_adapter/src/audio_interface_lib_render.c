@@ -1337,7 +1337,7 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
     int32_t ret;
     struct HdfIoService *service = NULL;
 #else
-    int32_t ret = 0;
+    int32_t ret = HDF_SUCCESS;
 #endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("The parameter is empty");

@@ -27,7 +27,7 @@
 
 static struct AudioAdapterDescriptor *g_localAudioProxyAdapterAddrOut = NULL; // add for Fuzz
 int g_localAudioProxyAdapterNum = 0; // add for Fuzz
-static struct AudioProxyManager *g_localAudioProxyMgr = NULL; // serverManager
+static struct AudioProxyManager g_localAudioProxyMgr = {0}; // serverManager
 
 int32_t AudioProxyManagerGetAllAdapters(struct AudioProxyManager *manager,
                                         struct AudioAdapterDescriptor **descs,
@@ -37,7 +37,7 @@ int32_t AudioProxyManagerGetAllAdapters(struct AudioProxyManager *manager,
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     int32_t ret;
-    if (g_localAudioProxyMgr != manager || manager == NULL ||
+    if ((&g_localAudioProxyMgr) != manager || manager == NULL ||
         manager->remote == NULL || descs == NULL || size == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -116,7 +116,7 @@ int32_t AudioProxyManagerLoadAdapter(struct AudioProxyManager *manager, const st
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
 
-    if (g_localAudioProxyMgr != manager || manager == NULL || manager->remote == NULL || desc == NULL ||
+    if ((&g_localAudioProxyMgr) != manager || manager == NULL || manager->remote == NULL || desc == NULL ||
         adapter == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -176,7 +176,7 @@ void AudioProxyManagerUnloadAdapter(const struct AudioProxyManager *manager, con
     int32_t i = 0;
     int32_t portNum;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
-    if (g_localAudioProxyMgr != manager || manager == NULL || manager->remote == NULL || adapter == NULL) {
+    if ((&g_localAudioProxyMgr) != manager || manager == NULL || manager->remote == NULL || adapter == NULL) {
         return;
     }
     if (hwAdapter->portCapabilitys != NULL) {
@@ -216,10 +216,9 @@ static void ProxyMgrConstruct(struct AudioProxyManager *proxyMgr)
 struct AudioProxyManager *GetAudioProxyManagerFuncs(void)
 {
     LOG_FUN_INFO();
-    struct AudioProxyManager *proxyDevMgr = NULL;
     static bool audioProxyAdapterAddrMgrFlag = false;
     if (audioProxyAdapterAddrMgrFlag) {
-        return g_localAudioProxyMgr;
+        return (&g_localAudioProxyMgr);
     }
     struct HDIServiceManager *serviceMgr = HDIServiceManagerGet();
     if (serviceMgr == NULL) {
@@ -233,18 +232,11 @@ struct AudioProxyManager *GetAudioProxyManagerFuncs(void)
         return NULL;
     }
     HDIServiceManagerRelease(serviceMgr);
-    proxyDevMgr =
-        (struct AudioProxyManager *)(intptr_t)OsalMemAlloc(sizeof(struct AudioProxyManager));
-    if (proxyDevMgr == NULL) {
-        LOG_FUN_ERR("malloc failed!");
-        HdfRemoteServiceRecycle(remote);
-        return NULL;
-    }
-    ProxyMgrConstruct(proxyDevMgr);
-    proxyDevMgr->remote = remote;
-    g_localAudioProxyMgr = proxyDevMgr;
+    (void)memset_s(&g_localAudioProxyMgr, sizeof(struct AudioProxyManager), 0, sizeof(struct AudioProxyManager));
+    ProxyMgrConstruct(&g_localAudioProxyMgr);
+    g_localAudioProxyMgr.remote = remote;
     AudioAdapterAddrMgrInit(); // memset for Fuzz
     audioProxyAdapterAddrMgrFlag = true;
-    return g_localAudioProxyMgr;
+    return (&g_localAudioProxyMgr);
 }
 

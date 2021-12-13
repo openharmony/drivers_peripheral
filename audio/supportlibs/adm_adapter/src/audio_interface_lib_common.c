@@ -54,7 +54,7 @@ int32_t AudioServiceDispatch(struct HdfIoService *service,
     int cmdId, struct HdfSBuf *sBuf, struct HdfSBuf *reply)
 {
 #ifdef ALSA_MODE
-	return 0;
+    return 0;
 #else
     if (service == NULL || service->dispatcher == NULL ||
         service->dispatcher->Dispatch == NULL || sBuf == NULL) {
