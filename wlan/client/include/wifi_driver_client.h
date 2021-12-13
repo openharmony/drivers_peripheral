@@ -30,6 +30,11 @@ extern "C" {
 
 #define IFNAMSIZ 16
 #define ETH_ADDR_LEN 6
+#define WIFI_24G_CHANNEL_NUM 14
+#define WIFI_MAX_CHANNEL_NUM 24
+#define IEEE80211G_RATES_NUM 12
+#define IEEE80211B_RATES_NUM 4
+#define IEEE80211A_RATES_NUM 8
 
 /* common related interface */
 enum WifiDriverClientResultCode {
@@ -312,11 +317,16 @@ typedef struct {
 } WifiIeee80211Channel;
 
 typedef struct {
+    int32_t channelNum;          /**< Number of channels */
+    WifiIeee80211Channel iee80211Channel[WIFI_MAX_CHANNEL_NUM]; /**< WLAN channel structures */
+}WlanBands;
+
+typedef struct {
     int32_t channelNum;
     uint16_t bitrate[12];
     uint16_t htCapab;
     uint8_t resv[2];
-    WifiIeee80211Channel iee80211Channel[14];
+    WlanBands bands[IEEE80211_NUM_BANDS];
 } WifiHwFeatureData;
 
 typedef struct {
