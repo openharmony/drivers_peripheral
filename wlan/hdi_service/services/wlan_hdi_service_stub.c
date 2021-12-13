@@ -191,7 +191,6 @@ static int32_t CreateFeature(uint8_t wlanType, struct FeatureInfo *feature)
         ret = g_wifi->createFeature(wlanType, (struct IWiFiBaseFeature **)&g_apFeature);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s: createFeature failed, error code: %d", __func__, ret);
-            free(feature);
             return HDF_FAILURE;
         }
         feature->type = g_apFeature->baseFeature.type;
@@ -200,14 +199,12 @@ static int32_t CreateFeature(uint8_t wlanType, struct FeatureInfo *feature)
         ret = g_wifi->createFeature(wlanType, (struct IWiFiBaseFeature **)&g_staFeature);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s: createFeature failed, error code: %d", __func__, ret);
-            free(feature);
             return HDF_FAILURE;
         }
         feature->type = g_staFeature->baseFeature.type;
         feature->ifName = strdup((g_staFeature->baseFeature).ifName);
     } else {
         HDF_LOGE("%s: wlan type is Invalid", __func__);
-        free(feature);
         ret = HDF_FAILURE;
     }
     return ret;
@@ -238,6 +235,7 @@ static int32_t WlanServiceStudCreateFeature(struct HdfDeviceIoClient *client, st
     ret = CreateFeature(wlanType, feature);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: createFeature failed, error code: %d", __func__, ret);
+        free(feature);
         return HDF_FAILURE;
     }
 
