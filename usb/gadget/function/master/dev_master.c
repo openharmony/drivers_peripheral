@@ -694,7 +694,7 @@ static int UsbFnRegistUsbfnDevice(struct HdfDeviceIoClient *client, struct HdfSB
 
 int32_t MasterDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    int32_t ret = HDF_SUCCESS;
+    int32_t ret;
     if (client == NULL) {
         HDF_LOGE("%s: client is NULL", __func__);
         return HDF_FAILURE;

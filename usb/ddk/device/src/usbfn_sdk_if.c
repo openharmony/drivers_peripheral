@@ -150,8 +150,8 @@ static void DoChangeFunction(struct UsbFnFunction *function, struct UsbFnDescrip
 
 static void UsbFnChangeFunction(struct UsbFnDeviceDesc *des, struct UsbFnDescriptorData *descriptor)
 {
-    uint32_t i = 0;
-    uint32_t j = 0;
+    uint32_t i;
+    uint32_t j;
     if (des == NULL || descriptor == NULL) {
         HDF_LOGE("%s: param is null", __func__);
         return;
