@@ -183,6 +183,33 @@ static int32_t WlanServiceStubGetSupportCombo(struct HdfDeviceIoClient *client, 
     return ret;
 }
 
+static int32_t CreateFeature(uint8_t wlanType, struct FeatureInfo *feature)
+{
+    int32_t ret;
+
+    if (wlanType == PROTOCOL_80211_IFTYPE_AP) {
+        ret = g_wifi->createFeature(wlanType, (struct IWiFiBaseFeature **)&g_apFeature);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%s: createFeature failed, error code: %d", __func__, ret);
+            return HDF_FAILURE;
+        }
+        feature->type = g_apFeature->baseFeature.type;
+        feature->ifName = strdup((g_apFeature->baseFeature).ifName);
+    } else if (wlanType == PROTOCOL_80211_IFTYPE_STATION) {
+        ret = g_wifi->createFeature(wlanType, (struct IWiFiBaseFeature **)&g_staFeature);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%s: createFeature failed, error code: %d", __func__, ret);
+            return HDF_FAILURE;
+        }
+        feature->type = g_staFeature->baseFeature.type;
+        feature->ifName = strdup((g_staFeature->baseFeature).ifName);
+    } else {
+        HDF_LOGE("%s: wlan type is Invalid", __func__);
+        ret = HDF_FAILURE;
+    }
+    return ret;
+}
+
 static int32_t WlanServiceStudCreateFeature(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
@@ -204,30 +231,14 @@ static int32_t WlanServiceStudCreateFeature(struct HdfDeviceIoClient *client, st
         return HDF_FAILURE;
     }
     (void)memset_s(feature, sizeof(struct FeatureInfo), 0, sizeof(struct FeatureInfo));
-    if (wlanType == PROTOCOL_80211_IFTYPE_AP) {
-        ret = g_wifi->createFeature(wlanType, (struct IWiFiBaseFeature **)&g_apFeature);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%s: createFeature failed, error code: %d", __func__, ret);
-            free(feature);
-            return HDF_FAILURE;
-        }
-        feature->type = g_apFeature->baseFeature.type;
-        feature->ifName = strdup((g_apFeature->baseFeature).ifName);
-    } else if (wlanType == PROTOCOL_80211_IFTYPE_STATION) {
-        ret = g_wifi->createFeature(wlanType, (struct IWiFiBaseFeature **)&g_staFeature);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%s: createFeature failed, error code: %d", __func__, ret);
-            free(feature);
-            return HDF_FAILURE;
-        }
-        feature->type = g_staFeature->baseFeature.type;
-        feature->ifName = strdup((g_staFeature->baseFeature).ifName);
-    } else {
-        HDF_LOGE("%s: wlan type is Invalid", __func__);
-        free(feature->ifName);
+    
+    ret = CreateFeature(wlanType, feature);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: createFeature failed, error code: %d", __func__, ret);
         free(feature);
-        ret = HDF_FAILURE;
+        return HDF_FAILURE;
     }
+
     if (!HdfSbufWriteString(reply, feature->ifName)) {
         HDF_LOGE("HdfSbufWriteString is failed!");
         free(feature->ifName);
