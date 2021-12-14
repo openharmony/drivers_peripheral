@@ -196,7 +196,11 @@ int mixer_get_ctl_minmax(struct mixer_ctl *ctl, long long *min, long long *max)
 void mixer_ctl_value_check(struct mixer_ctl *ctl, long long *value)
 {
     long long min, max;
-    mixer_get_ctl_minmax(ctl, &min, &max);
+    int ret = mixer_get_ctl_minmax(ctl, &min, &max);
+    if (ret < 0) {
+        LOG_FUN_ERR("mixer_ctl_value_check() mixer_get_ctl_minmax error");
+        return;
+    }
     if (*value > max) {
         *value = max;
     }
@@ -211,7 +215,7 @@ int mixer_ctl_set_int_double(struct mixer_ctl *ctl, long long left, long long ri
     struct snd_ctl_elem_value elemValue;
     struct snd_ctl_elem_info *elemInfo = ctl->info;
     snd_ctl_elem_type_t type =  elemInfo->type;
-    unsigned int n = 0;
+    unsigned int n;
 
     memset_s(&elemValue, sizeof(elemValue), 0, sizeof(elemValue));
     elemValue.id.numid = elemInfo->id.numid;
@@ -344,7 +348,7 @@ void MatchRouteTableInfo(char *sndCardId, unsigned int *length)
         g_tinyalsaRouteTable = GetDefaultConfigTable();
         LOG_FUN_ERR("Can not get config table for sound card0 %s, so get default config table.", sndCardId);
     }
-    return ;
+    return;
 }
 
 int SndCardRouteTableInit(int card)
@@ -411,7 +415,7 @@ void free_mixer_ctl_ename(struct mixer_ctl *ctl)
         free(ctl->ename);
         ctl->ename = NULL;
     }
-    return ;
+    return;
 }
 
 // mixer_ctl.tlv  mixer_ctl.ename
@@ -426,7 +430,7 @@ void FreeMixerCtlObject(struct mixer_ctl *ctl, unsigned int count)
         free_mixer_ctl_ename(&(ctl[ctlNums]));
         ctlNums++;
     }
-    return ;
+    return;
 }
 
 void mixer_close_legacy(struct mixer *mixer)
@@ -452,7 +456,7 @@ void mixer_close_legacy(struct mixer *mixer)
     // free mixer
     free(mixer);
     mixer = NULL;
-    return ;
+    return;
 }
 
 struct mixer *MixerInit(unsigned int count)
@@ -511,7 +515,7 @@ int CtleNamesInit(struct snd_ctl_elem_info *elemInfo, struct mixer *mixer, int n
             return -1;
         }
         memset_s(enames[i], nameLen, 0, nameLen);
-        int ret = strncpy_s(enames[i], nameLen, tempInfo.value.enumerated.name, nameLen -1);
+        int ret = strncpy_s(enames[i], nameLen, tempInfo.value.enumerated.name, nameLen - 1);
         if (ret != 0) {
             free(enames[i]);
             return -1;
@@ -721,12 +725,12 @@ int set_capture_voice_volume(const char *ctlName, float volume)
 
 int RouteSetVoiceVolume(float volume)
 {
-    int ret = -1, ret_l = 0, ret_r = 0;
+    int ret = -1;
     const char *mixer_l_ctl_name = "DACL Playback Volume";
     const char *mixer_r_ctl_name = "DACR Playback Volume";
     LOG_PARA_INFO("RouteSetVoiceVolume %f", volume);
-    ret_l = set_voice_volume(mixer_l_ctl_name, volume);
-    ret_r = set_voice_volume(mixer_r_ctl_name, volume);
+    int ret_l = set_voice_volume(mixer_l_ctl_name, volume);
+    int ret_r = set_voice_volume(mixer_r_ctl_name, volume);
     if (ret_l && ret_r) {
         ret = 0;
     }
@@ -735,11 +739,11 @@ int RouteSetVoiceVolume(float volume)
 
 int RouteSetCaptureVoiceVolume(float volume)
 {
-    int ret = -1, ret_l = 0, ret_r = 0;
+    int ret = -1;
     const char *mixer_l_ctl_name = "DACL Capture Volume";
     const char *mixer_r_ctl_name = "DACR Capture Volume";
-    ret_l = set_capture_voice_volume(mixer_l_ctl_name, volume);
-    ret_r = set_capture_voice_volume(mixer_r_ctl_name, volume);
+    int ret_l = set_capture_voice_volume(mixer_l_ctl_name, volume);
+    int ret_r = set_capture_voice_volume(mixer_r_ctl_name, volume);
     if (ret_l && ret_r) {
         LOG_FUN_ERR("RouteSetCaptureVoiceVolume fail");
         ret = 0;
