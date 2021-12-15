@@ -60,7 +60,7 @@ int32_t SensorInterfaceService::GetAllSensorInfo(std::vector<HdfSensorInformatio
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
-    
+
     struct SensorInformation *sensorInfo = nullptr;
     struct SensorInformation *tmp = nullptr;
     int32_t count = 0;
@@ -70,12 +70,12 @@ int32_t SensorInterfaceService::GetAllSensorInfo(std::vector<HdfSensorInformatio
         HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
         return ret;
     }
-    
+
     if (count <=0) {
         HDF_LOGE("%{public}s failed, count<=0", __func__);
         return HDF_FAILURE;
     }
-    
+
     tmp = sensorInfo;
     while (count--) {
         HdfSensorInformation hdfSensorInfo;
@@ -175,7 +175,7 @@ int32_t SensorInterfaceService::Register(const sptr<ISensorCallback>& callbackOb
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
-    
+
     g_sensorCallback = callbackObj;
     int32_t ret = sensorInterface->Register(SensorDataCallback);
     if (ret != SENSOR_SUCCESS) {
