@@ -183,7 +183,6 @@ HWTEST_F(HdfSensorHdiTest, EnableSensor0002, TestSize.Level1)
     std::vector<HdfSensorInformation> info;
     int32_t ret = g_sensorInterface->GetAllSensorInfo(info);
     EXPECT_EQ(0, ret);
-    
     ret = g_sensorInterface->Enable(-1);
     EXPECT_EQ(-2, ret);
     ret = g_sensorInterface->Disable(-1);

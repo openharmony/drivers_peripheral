@@ -89,15 +89,22 @@ namespace {
 
 int32_t SensorCallbackService::OnDataEvent(const HdfSensorEvents& event)
 {
-    void *data = OsalMemCalloc(sizeof(uint8_t)*(event.dataLen));
+    void *data = OsalMemCalloc(sizeof(uint8_t) * (event.dataLen));
     uint8_t *tmp = (uint8_t*)data;
+    uint8_t *dataF = tmp;
     for (auto value : event.data) {
        *tmp++ = value;
     }
-    float *dataF = (float*)data;
+
     for (int i = 0; i < g_listNum; ++i) {
         if (event.sensorId == g_sensorList[i].sensorTypeId) {
-            SensorDataVerification(*dataF, g_sensorList[i]);
+            if (event.sensorId == SENSOR_TYPE_HALL || event.sensorId == SENSOR_TYPE_PROXIMITY) {
+                float data = (float)*dataF;
+                SensorDataVerification(data, g_sensorList[i]);
+            } else {
+                float *data = (float*)dataF;
+                SensorDataVerification(*data, g_sensorList[i]);
+            }
         }
     }
     OsalMemFree(data);

@@ -17,22 +17,22 @@ package hdi.sensor.v1_0;
 
 struct HdfSensorInformation {
     String sensorName;
-    String vendorName; 
-    String firmwareVersion; 
+    String vendorName;
+    String firmwareVersion;
     String hardwareVersion;
-    int sensorTypeId; 
-    int sensorId;     
-    float maxRange;       
-    float accuracy;      
-    float power;    
+    int sensorTypeId;
+    int sensorId;
+    float maxRange;
+    float accuracy;
+    float power;
 };
 
 struct HdfSensorEvents {
-    int sensorId;  
-    int version;   
-    int timestamp; 
-    unsigned int option;   
-    int mode;      
-    unsigned char[] data;     
-    unsigned int dataLen;  
+    int sensorId;
+    int version;
+    int timestamp;
+    unsigned int option;
+    int mode;
+    unsigned char[] data;
+    unsigned int dataLen;
 };
