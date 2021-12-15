@@ -912,10 +912,9 @@ int32_t AudioCtlCaptureGetVolThresholdSBuf(struct HdfSBuf *sBuf, const struct Au
     return HDF_SUCCESS;
 }
 
-int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
-    int cmdId, struct AudioHwCaptureParam *handleData)
-{
 #ifdef ALSA_MODE
+int32_t TinyAlsaAudioCtlCaptureGetVolThreshold(struct AudioHwCaptureParam *handleData)
+{
     long long volMin = 0;
     long long volMax = 0;
     char *ctlName = "DACL Capture Volume";
@@ -927,6 +926,14 @@ int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
     handleData->captureMode.ctlParam.volThreshold.volMax = volMax;
     handleData->captureMode.ctlParam.volThreshold.volMin = volMin;
     return HDF_SUCCESS;
+}
+#endif
+
+int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
+    int cmdId, struct AudioHwCaptureParam *handleData)
+{
+#ifdef ALSA_MODE
+    return TinyAlsaAudioCtlCaptureGetVolThreshold(handleData);
 #endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("paras is NULL!");
