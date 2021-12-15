@@ -21,7 +21,7 @@ import hdi.sensor.v1_0.ISensorCallback;
 interface ISensorInterface {
     GetAllSensorInfo([out] struct HdfSensorInformation[] info);
     Enable([in] int sensorId);
-    Disable([in] int sensorId);  
+    Disable([in] int sensorId);
     SetBatch([in] int sensorId,[in] long samplingInterval, [in] long reportInterval);
     SetMode([in] int sensorId, [in] int mode);
     SetOption([in] int sensorId, [in] unsigned int option);
