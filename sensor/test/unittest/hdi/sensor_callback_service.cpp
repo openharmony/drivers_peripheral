@@ -107,7 +107,7 @@ int32_t SensorCallbackService::OnDataEvent(const HdfSensorEvents& event)
             }
         }
     }
-    OsalMemFree(data);
+    OsalMemFree(origin);
     return HDF_SUCCESS;
 }
 } // v1_0
