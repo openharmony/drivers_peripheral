@@ -71,7 +71,7 @@ int32_t SensorInterfaceService::GetAllSensorInfo(std::vector<HdfSensorInformatio
         return ret;
     }
 
-    if (count <=0) {
+    if (count <= 0) {
         HDF_LOGE("%{public}s failed, count<=0", __func__);
         return HDF_FAILURE;
     }
