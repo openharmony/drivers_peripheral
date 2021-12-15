@@ -89,8 +89,8 @@ namespace {
 
 int32_t SensorCallbackService::OnDataEvent(const HdfSensorEvents& event)
 {
-    void *data = OsalMemCalloc(sizeof(uint8_t) * (event.dataLen));
-    uint8_t *tmp = (uint8_t*)data;
+    void *origin = OsalMemCalloc(sizeof(uint8_t) * (event.dataLen));
+    uint8_t *tmp = (uint8_t*)origin;
     uint8_t *dataF = tmp;
     for (auto value : event.data) {
        *tmp++ = value;
