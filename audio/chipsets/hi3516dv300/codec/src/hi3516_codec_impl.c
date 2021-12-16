@@ -30,7 +30,7 @@ int32_t CodecHalSysInit(struct CodecData *codeData)
     }
     // ACODEC REMAP
     if (g_regAcodecBase == NULL) {
-        g_regAcodecBase = (void *)codeData->virtualAddress;
+        g_regAcodecBase = (void *)(uintptr_t)(codeData->virtualAddress);
         if (g_regAcodecBase == NULL) {
             AUDIO_DEVICE_LOG_ERR("regAcodecBase is null.");
             return HDF_FAILURE;

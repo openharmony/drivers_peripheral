@@ -95,8 +95,9 @@ static void DspDriverRelease(struct HdfDeviceObject *device)
         AUDIO_DRIVER_LOG_ERR("DspHost is NULL");
         return;
     }
-
-    OsalIoUnmap((void *)((uintptr_t)(void*)&dspHost->priv));
+    if (dspHost->priv != NULL) {
+        OsalMemFree(dspHost->priv);
+    }
     OsalMemFree(dspHost);
     AUDIO_DRIVER_LOG_INFO("success");
 }
