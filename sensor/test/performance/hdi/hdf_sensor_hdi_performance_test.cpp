@@ -54,7 +54,6 @@ void HdfSensorHdiPerformanceTest::SetUpTestCase()
 
 void HdfSensorHdiPerformanceTest::TearDownTestCase()
 {
-
 }
 
 void HdfSensorHdiPerformanceTest::SetUp()
