@@ -912,11 +912,11 @@ int32_t AudioCtlCaptureGetVolThresholdSBuf(struct HdfSBuf *sBuf, const struct Au
     return HDF_SUCCESS;
 }
 
-int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
-    int cmdId, struct AudioHwCaptureParam *handleData)
-{
 #ifdef ALSA_MODE
-    long long volMin = 0, volMax = 0;
+int32_t TinyAlsaAudioCtlCaptureGetVolThreshold(struct AudioHwCaptureParam *handleData)
+{
+    long long volMin = 0;
+    long long volMax = 0;
     char *ctlName = "DACL Capture Volume";
     ReadInSoundCard();
     memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
@@ -926,6 +926,14 @@ int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
     handleData->captureMode.ctlParam.volThreshold.volMax = volMax;
     handleData->captureMode.ctlParam.volThreshold.volMin = volMin;
     return HDF_SUCCESS;
+}
+#endif
+
+int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
+    int cmdId, struct AudioHwCaptureParam *handleData)
+{
+#ifdef ALSA_MODE
+    return TinyAlsaAudioCtlCaptureGetVolThreshold(handleData);
 #endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         LOG_FUN_ERR("paras is NULL!");
@@ -1144,7 +1152,6 @@ int32_t AudioOutputCaptureReadFrame(struct HdfIoService *service, int cmdId, str
 int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
-    uint32_t dataSize = 0;
     char *buffer = NULL;
     if (!pcm) { // if pcm is num, need create it first
         int format = PCM_FORMAT_S16_LE;
@@ -1175,7 +1182,7 @@ int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
         RoutePcmCardOpen(g_inDevInfo.card, DEV_IN_HANDS_FREE_MIC_CAPTURE_ROUTE);
     }
     if (pcm) {
-        dataSize = pcm_frames_to_bytes(pcm, pcm_get_buffer_size(pcm));
+        uint32_t dataSize = pcm_frames_to_bytes(pcm, pcm_get_buffer_size(pcm));
         buffer = malloc(dataSize);
         if (!buffer) {
             fprintf(stderr, "Unable to allocate \n");
