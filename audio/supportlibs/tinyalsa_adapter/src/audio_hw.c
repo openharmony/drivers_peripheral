@@ -142,11 +142,11 @@ static bool dev_id_match(const char *info, const char *did)
     }
     id += strlen(deli);
     while (id[idx] != '\0') {
-        if (id[idx] == '\r' ||id[idx] == '\n') {
+        if (id[idx] == '\r' || id[idx] == '\n') {
             id[idx] = '\0';
             break;
         }
-        idx ++;
+        idx++;
     }
     if (strstr(id, did)) {
         LOG_PARA_INFO("match dai!!!: %s", id, did);
@@ -335,7 +335,7 @@ void ReadInSoundCard(void)
         GetSpecifiedInDev(&devIn[SND_IN_SOUND_CARD_BT], card, CardIdInfo, BT_IN_NAME);
     }
     dumpdev_info("in", devIn, SND_IN_SOUND_CARD_MAX);
-    return ;
+    return;
 }
 
 void ReadOutSoundCard(void)
@@ -379,7 +379,7 @@ void ReadOutSoundCard(void)
         GetSpecifiedOutDev(&devOut[SND_OUT_SOUND_CARD_BT], card, CardIdInfo, BT_OUT_NAME);
     }
     dumpdev_info("out", devOut, SND_OUT_SOUND_CARD_MAX);
-    return ;
+    return;
 }
 
 int GetOutDevInfo(int index, struct DevInfo* devInfo)
@@ -439,7 +439,7 @@ int IsPlayable(unsigned int card, unsigned int device, unsigned int bits)
         {PCM_PARAM_PERIOD_SIZE, g_renderPcmCfg.period_size, "Period size", "frames"},
         {PCM_PARAM_PERIODS, g_renderPcmCfg.period_count, "Period count", "periods"},
     };
-    int checkNums = sizeof(g_RenderParamcheckList)/sizeof(struct RenderParamcheckList);
+    int checkNums = sizeof(g_RenderParamcheckList) / sizeof(struct RenderParamcheckList);
     for (int i = 0; i < checkNums; i++) {
         paramIsOk &= AudioRenderParamCheck(params, g_RenderParamcheckList[i].param, g_RenderParamcheckList[i].value,
             g_RenderParamcheckList[i].paramName, g_RenderParamcheckList[i].paramUnit);
