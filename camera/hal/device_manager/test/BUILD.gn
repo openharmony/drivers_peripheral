@@ -71,7 +71,7 @@ if (defined(ohos_lite)) {
     ]
 
     hispark_taurus_lib_path =
-        "//device/hisilicon/hardware/media/hal/camera/libs/hispark_taurus/"
+        "//device/soc/hisilicon/common/hi35xx_hal/media/camera/hi3516dv300//linux_standard/libs/"
     outdir = rebase_path("$hispark_taurus_lib_path")
     ldflags = [ "-L$outdir" ]
     ldflags += [ "-ldriver_adapter" ]
@@ -89,10 +89,10 @@ if (defined(ohos_lite)) {
   if (need_link_hispark_taurus_lib) {
     if (use_musl) {
       hispark_taurus_lib_path =
-          "//device/hisilicon/hardware/media/hal/camera/libs/hispark_taurus/"
+          "//device/soc/hisilicon/common/hi35xx_hal/media/camera/hi3516dv300//linux_standard/libs/"
     } else {
       hispark_taurus_lib_path =
-          "//device/hisilicon/hardware/media/hal/camera/libs/hispark_taurus/std"
+          "//device/soc/hisilicon/common/hi35xx_hal/media/camera/hi3516dv300//linux_standard/libs/std"
     }
   }
   module_output_path = "hdf/device_manager_test"
