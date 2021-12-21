@@ -102,7 +102,7 @@ int32_t SensorCallbackService::OnDataEvent(const HdfSensorEvents& event)
                 float data = static_cast<float>(*dataU);
                 SensorDataVerification(data, g_sensorList[i]);
             } else {
-                float *data = reinterpret_cast<float*>(dataU);
+                float *data = (float*)dataU;
                 SensorDataVerification(*data, g_sensorList[i]);
             }
         }
