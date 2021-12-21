@@ -11,9 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+if (device_company == "hisilicon") {
+  device_hal = "soc/${device_company}/common/hal"
+} else if (board_name == "hispark_aries") {
+  device_hal = "${device_company}/hardware"
+}
+
 if (defined(ohos_lite)) {
   group("hdi_display") {
-    public_deps = [ "//device/soc/${device_company}/common/hi35xx_hal/display:hdi_display" ]
+    public_deps = [ "//device/${device_hal}/display:hdi_display" ]
   }
 } else {
   import("//build/ohos.gni")
@@ -44,42 +50,42 @@ if (defined(ohos_lite)) {
 
   if (product_name != "ohos-arm64") {
     group("hdi_display_device") {
-      deps = [ "//device/soc/${device_company}/common/hi35xx_hal/display:display_device" ]
+      deps = [ "//device/${device_hal}/display:display_device" ]
       public_configs = [ ":display_hdi_public_config" ]
     }
 
     group("hdi_display_gralloc") {
-      deps = [ "//device/soc/${device_company}/common/hi35xx_hal/display:display_gralloc" ]
+      deps = [ "//device/${device_hal}/display:display_gralloc" ]
       public_configs = [ ":display_hdi_public_config" ]
     }
 
     group("hdi_display_gfx") {
-      deps = [ "//device/soc/${device_company}/common/hi35xx_hal/display:display_gfx" ]
+      deps = [ "//device/${device_hal}/display:display_gfx" ]
       public_configs = [ ":display_hdi_public_config" ]
     }
 
     group("hdi_display_layer") {
-      deps = [ "//device/soc/${device_company}/common/hi35xx_hal/display:display_layer" ]
+      deps = [ "//device/${device_hal}/display:display_layer" ]
       public_configs = [ ":display_hdi_public_config" ]
     }
   } else {
     group("hdi_display_device") {
-      deps = [ "//device/soc/hisilicon/common/hi35xx_hal/display:display_device" ]
+      deps = [ "//device/soc/hisilicon/common/hal/display:display_device" ]
       public_configs = [ ":display_hdi_public_config" ]
     }
 
     group("hdi_display_gralloc") {
-      deps = [ "//device/soc/hisilicon/common/hi35xx_hal/display:display_gralloc" ]
+      deps = [ "//device/soc/hisilicon/common/hal/display:display_gralloc" ]
       public_configs = [ ":display_hdi_public_config" ]
     }
 
     group("hdi_display_gfx") {
-      deps = [ "//device/soc/hisilicon/common/hi35xx_hal/display:display_gfx" ]
+      deps = [ "//device/soc/hisilicon/common/hal/display:display_gfx" ]
       public_configs = [ ":display_hdi_public_config" ]
     }
 
     group("hdi_display_layer") {
-      deps = [ "//device/soc/hisilicon/common/hi35xx_hal/display:display_layer" ]
+      deps = [ "//device/soc/hisilicon/common/hal/display:display_layer" ]
       public_configs = [ ":display_hdi_public_config" ]
     }
   }
