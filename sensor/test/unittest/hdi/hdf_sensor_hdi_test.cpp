@@ -148,7 +148,7 @@ HWTEST_F(HdfSensorHdiTest, GetSensorList0001, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, EnableSensor0001, TestSize.Level1)
 {
-    int32_t ret = g_sensorInterface->Register(g_callback);
+    int32_t ret = g_sensorInterface->Register(0, g_callback);
     EXPECT_EQ(0, ret);
 
     std::vector<HdfSensorInformation> info;
@@ -168,7 +168,7 @@ HWTEST_F(HdfSensorHdiTest, EnableSensor0001, TestSize.Level1)
         ret = g_sensorInterface->Disable(iter.sensorId);
         EXPECT_EQ(0, ret);
     }
-    ret = g_sensorInterface->Unregister();
+    ret = g_sensorInterface->Unregister(0);
     EXPECT_EQ(0, ret);
 }
 
