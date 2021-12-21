@@ -1019,25 +1019,22 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Start_0001, Test
 */
 HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001, TestSize.Level1)
 {
-    int32_t ret = -1;
     struct DevHandle *handle = nullptr;
     struct AudioHeadInfo wavHeadInfo = {};
     struct AudioHwRender *hwRender = nullptr;
-    ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME_USB, handle);
+    int32_t ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME_USB, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = LibHwOutputRender(hwRender, handle);
     EXPECT_EQ(HDF_SUCCESS, ret);
     char absPath[PATH_MAX] = {0};
     if (realpath(AUDIO_FILE.c_str(), absPath) == nullptr) {
         free(hwRender);
-        hwRender = nullptr;
         CloseServiceRenderSo(handle);
         ASSERT_NE(nullptr, realpath(AUDIO_FILE.c_str(), absPath));
     }
     FILE *file = fopen(absPath, "rb");
     if (file == nullptr) {
         free(hwRender);
-        hwRender = nullptr;
         CloseServiceRenderSo(handle);
         ASSERT_NE(nullptr, file);
     }
@@ -1045,7 +1042,6 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001,
         ret = WavHeadAnalysis(wavHeadInfo, file, hwRender->renderParam.frameRenderMode.attrs);
         if (ret < 0) {
             free(hwRender);
-            hwRender = nullptr;
             fclose(file);
             CloseServiceRenderSo(handle);
             ASSERT_EQ(HDF_SUCCESS, ret);
@@ -1058,12 +1054,12 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001,
         EXPECT_EQ(HDF_SUCCESS, ret);
         ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, &hwRender->renderParam);
         EXPECT_EQ(HDF_SUCCESS, ret);
+        if (hwRender->renderParam.frameRenderMode.buffer != nullptr) {
+            free(hwRender->renderParam.frameRenderMode.buffer);
+        }
+        free(hwRender);
     }
     CloseServiceRenderSo(handle);
-    free(hwRender->renderParam.frameRenderMode.buffer);
-    hwRender->renderParam.frameRenderMode.buffer = nullptr;
-    free(hwRender);
-    hwRender = nullptr;
     fclose(file);
 }
 /**
