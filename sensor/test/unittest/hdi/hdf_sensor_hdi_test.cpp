@@ -302,6 +302,4 @@ HWTEST_F(HdfSensorHdiTest, SetSensorOption0001, TestSize.Level1)
     OsalMSleep(SENSOR_WAIT_TIME);
     ret = g_sensorInterface->Disable(SENSOR_ID);
     EXPECT_EQ(0, ret);
-    ret = g_sensorInterface->Unregister();
-    EXPECT_EQ(0, ret);
 }
