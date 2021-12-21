@@ -120,7 +120,7 @@ HWTEST_F(HdfSensorHdiTest, GetSensorList0001, TestSize.Level1)
     int32_t ret = g_sensorInterface->GetAllSensorInfo(info);
     EXPECT_EQ(0, ret);
 
-    printf("get sensor list num[%d]\n\r", info.size());
+    printf("get sensor list num[%zu]\n\r", info.size());
 
     for (auto iter : info) {
         int j =0;

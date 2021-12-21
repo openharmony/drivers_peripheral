@@ -91,7 +91,7 @@ int32_t SensorCallbackService::OnDataEvent(const HdfSensorEvents& event)
 {
     void *origin = OsalMemCalloc(sizeof(uint8_t) * (event.dataLen));
     uint8_t *tmp = static_cast<uint8_t*>(origin);
-    uint8_t *dataU = tmp;
+    uint8_t *eventData = tmp;
     for (auto value : event.data) {
        *tmp++ = value;
     }
@@ -99,10 +99,10 @@ int32_t SensorCallbackService::OnDataEvent(const HdfSensorEvents& event)
     for (int i = 0; i < g_listNum; ++i) {
         if (event.sensorId == g_sensorList[i].sensorTypeId) {
             if (event.sensorId == SENSOR_TYPE_HALL || event.sensorId == SENSOR_TYPE_PROXIMITY) {
-                float data = static_cast<float>(*dataU);
+                float data = static_cast<float>(*eventData);
                 SensorDataVerification(data, g_sensorList[i]);
             } else {
-                float *data = (float*)dataU;
+                float *data = (float*)eventData;
                 SensorDataVerification(*data, g_sensorList[i]);
             }
         }
