@@ -25,6 +25,6 @@ interface ISensorInterface {
     SetBatch([in] int sensorId,[in] long samplingInterval, [in] long reportInterval);
     SetMode([in] int sensorId, [in] int mode);
     SetOption([in] int sensorId, [in] unsigned int option);
-    Register([in] ISensorCallback callbackObj);
-    Unregister();
+    Register([in] int sensorId, [in] ISensorCallback callbackObj);
+    Unregister([in] int sensorId);
 }
