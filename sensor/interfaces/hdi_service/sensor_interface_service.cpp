@@ -168,7 +168,7 @@ int32_t SensorInterfaceService::SetOption(int32_t sensorId, uint32_t option)
     return ret;
 }
 
-int32_t SensorInterfaceService::Register(const sptr<ISensorCallback>& callbackObj)
+int32_t SensorInterfaceService::Register(int32_t sensorId, const sptr<ISensorCallback>& callbackObj)
 {
     const SensorInterface *sensorInterface = NewSensorInterfaceInstance();
     if (sensorInterface == NULL || sensorInterface->Register == NULL) {
@@ -185,7 +185,7 @@ int32_t SensorInterfaceService::Register(const sptr<ISensorCallback>& callbackOb
     return ret;
 }
 
-int32_t SensorInterfaceService::Unregister()
+int32_t SensorInterfaceService::Unregister(int32_t sensorId)
 {
     const SensorInterface *sensorInterface = NewSensorInterfaceInstance();
     if (sensorInterface == NULL || sensorInterface->Unregister == NULL) {
