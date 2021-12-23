@@ -35,7 +35,6 @@ config("usbd_public_config") {
     "//drivers/framework/core/shared/include",
     "//drivers/framework/core/adapter/syscall/include",
     "//drivers/framework/model/usb/include",
-    "//base/startup/init_lite/services/include/param",
   ]
 }
 
@@ -56,13 +55,15 @@ ohos_shared_library("usbd") {
     "${hdf_uhdf_path}/hdi:libhdi",
     "${hdf_uhdf_path}/ipc:libhdf_ipc_adapter",
     "${hdf_uhdf_path}/utils:libhdf_utils",
-    "//base/startup/init_lite/services/param:param_client",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/peripheral/usb/ddk:libusb_core",
     "//utils/native/base:utils",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "startup_l2:syspara",
+  ]
 
   subsystem_name = "hdf"
 }

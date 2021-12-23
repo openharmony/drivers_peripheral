@@ -25,7 +25,7 @@
 #include "hdf_remote_service.h"
 #include "osal_time.h"
 #include "securec.h"
-#include "sys_param.h"
+#include "parameter.h"
 
 #define DEV_SERVICE_NAME "usbfn_master"
 #define ACM_SERVICE_NAME "usbfn_cdcacm"
@@ -105,12 +105,12 @@ static int32_t RemoveHdc(int funcs)
     if (!(funcs & USB_FUNCTION_HDC)) {
         if (currentFuncs != funcs) {
             HDF_LOGI("%{public}s:%{public}d remove hdc\n", __func__, __LINE__);
-            uint8_t status = SystemSetParameter(SYS_USB_CONFIG, HDC_CONFIG_OFF);
+            uint8_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_OFF);
             if (status) {
                 HDF_LOGE("%{public}s:%{public}d remove hdc config error = %{public}d\n", __func__, __LINE__, status);
                 return HDF_FAILURE;
             }
-            status = SystemSetParameter(SYS_USB_CONFIGFS, HDC_CONFIGFS_OFF);
+            status = SetParameter(SYS_USB_CONFIGFS, HDC_CONFIGFS_OFF);
             if (status) {
                 HDF_LOGE("%{public}s:%{public}d remove hdc configs error = %{public}d\n", __func__, __LINE__, status);
                 return HDF_FAILURE;
@@ -124,12 +124,12 @@ int32_t AddHdc(int funcs)
 {
     if (funcs & USB_FUNCTION_HDC) {
         HDF_LOGI("%{public}s:%{public}d add hdc\n", __func__, __LINE__);
-        uint8_t status = SystemSetParameter(SYS_USB_CONFIGFS, HDC_CONFIGFS_ON);
+        uint8_t status = SetParameter(SYS_USB_CONFIGFS, HDC_CONFIGFS_ON);
         if (status) {
             HDF_LOGE("%{public}s:%{public}d add hdc configfs error = %{public}d\n", __func__, __LINE__, status);
             return HDF_FAILURE;
         }
-        status = SystemSetParameter(SYS_USB_CONFIG, HDC_CONFIG_ON);
+        status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_ON);
         if (status) {
             HDF_LOGE("%{public}s:%{public}d add hdc config error = %{public}d\n", __func__, __LINE__, status);
             return HDF_FAILURE;
