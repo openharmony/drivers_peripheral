@@ -28,7 +28,6 @@
 #include "hdf_log.h"
 #include "osal_time.h"
 #include "securec.h"
-#include "sys_param.h"
 #include "usbd_function.h"
 #include "usbd_publisher.h"
 
