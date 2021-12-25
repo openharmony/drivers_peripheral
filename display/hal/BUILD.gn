@@ -13,7 +13,7 @@
 
 if (device_company == "hisilicon") {
   device_hal = "soc/${device_company}/common/hal"
-} else {
+} else if (product_name != "ohos-arm64") {
   device_hal = "${device_company}/hardware"
 }
 
