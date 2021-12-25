@@ -13,7 +13,7 @@
 
 if (device_company == "hisilicon") {
   device_hal = "soc/${device_company}/common/hal"
-} else if (board_name == "hispark_aries") {
+} else {
   device_hal = "${device_company}/hardware"
 }
 
