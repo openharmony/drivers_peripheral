@@ -156,7 +156,7 @@ static int32_t AddSensorDevServiceGroup(void)
     return SENSOR_SUCCESS;
 }
 
-int32_t Register(RecordDataCallback cb)
+int32_t Register(int32_t sensorId, RecordDataCallback cb)
 {
     struct SensorDevManager *manager = NULL;
     (void)sensorId;
@@ -169,7 +169,7 @@ int32_t Register(RecordDataCallback cb)
     return AddSensorDevServiceGroup();
 }
 
-int32_t Unregister(void)
+int32_t Unregister(int32_t sensorId)
 {
     struct SensorDevManager *manager = GetSensorDevManager();
     CHECK_NULL_PTR_RETURN_VALUE(manager->serviceGroup, SENSOR_SUCCESS);
