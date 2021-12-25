@@ -140,7 +140,7 @@ void SensorSample(void)
         return;
     }
      /* 2. Register a sensor data callback. */
-    ret = sensorDev->Register(SensorDataCallback);
+    ret = sensorDev->Register(0, SensorDataCallback);
     if (ret != 0) {
         return;
     }
@@ -165,7 +165,7 @@ void SensorSample(void)
         return;
     }
     /* 7. Unregister the sensor data callback. */
-    ret = Unregister();
+    ret = Unregister(0);
     if (ret != 0) {
         return;
     }

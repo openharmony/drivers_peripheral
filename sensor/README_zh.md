@@ -140,7 +140,7 @@ void SensorSample(void)
         return;
     }
     /* 2.订阅者注册传感器数据回调处理函数 */
-    ret = sensorDev->Register(SensorDataCallback);
+    ret = sensorDev->Register(0, SensorDataCallback);
     if (ret != 0) {
         return;
     }
@@ -165,7 +165,7 @@ void SensorSample(void)
         return;
     }
     /* 7.取消传感器数据订阅函数 */
-    ret = Unregister();
+    ret = Unregister(0);
     if (ret != 0) {
         return;
     }
