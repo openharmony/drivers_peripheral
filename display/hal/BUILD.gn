@@ -11,18 +11,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (device_company == "hisilicon") {
-  device_hal = "soc/${device_company}/common/hal"
-} else if (product_name != "ohos-arm64") {
-  device_hal = "${device_company}/hardware"
-}
-
 if (defined(ohos_lite)) {
   group("hdi_display") {
-    public_deps = [ "//device/${device_hal}/display:hdi_display" ]
+    if (device_company == "hisilicon") {
+      public_deps = [ "//device/soc/${device_company}/common/hal/display:hdi_display" ]
+    } else {
+      public_deps = [ "//device/${device_company}/hardware/display:hdi_display" ]
+    }
+
   }
 } else {
   import("//build/ohos.gni")
+
+  if (device_company == "hisilicon") {
+    device_hal = "soc/${device_company}/common/hal"
+  } else if (product_name != "ohos-arm64") {
+    device_hal = "${device_company}/hardware"
+  }
+
   config("display_hdi_public_config") {
     visibility = [ ":*" ]
     include_dirs = [
