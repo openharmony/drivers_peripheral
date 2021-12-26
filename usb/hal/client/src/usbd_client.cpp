@@ -45,19 +45,19 @@ const std::string USBD_SERVICE = "usbd";
     } while (0)
 }
 
-void UsbdClient::PrintBuffer(const char *title, const uint8_t *buffer, uint32_t length)
+void UsbdClient::PrintBuffer(const std::string charstr, const std::vector<uint8_t> &buffer, const uint32_t datalength)
 {
     std::ostringstream oss;
-    if (title == NULL || buffer == nullptr || length == 0) {
+    if (datalength == 0) {
         return;
     }
     oss.str("");
-    oss << title << " << 二进制数据流[" << length << "字节] >> :";
-    for (uint32_t i = 0; i < length; ++i) {
+    oss << charstr << " << 二进制数据流[" << datalength << "字节] >> :";
+    for (uint32_t i = 0; i < datalength; ++i) {
         oss << " " << std::hex << (int)buffer[i];
     }
-    oss << "  -->  " << buffer << std::endl;
-    HDF_LOGW("%{public}s", oss.str().c_str());
+    oss << "  -->  " << buffer.data() << std::endl;
+    HDF_LOGI("%{public}s", oss.str().c_str());
 }
 
 sptr<IRemoteObject> UsbdClient::GetUsbdService()
@@ -214,7 +214,7 @@ int32_t UsbdClient::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &de
         HDF_LOGW("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
     } else {
         if (decriptor.size() > 0) {
-            PrintBuffer("UsbdClient::GetStringDescriptor", decriptor.data(), decriptor.size());
+            PrintBuffer("UsbdClient::GetStringDescriptor", decriptor, decriptor.size());
         }
     }
     return ret;
@@ -250,7 +250,7 @@ int32_t UsbdClient::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::
         HDF_LOGW("%{public}s:%{public}d strId:%{public}d failed:%{public}d", __func__, __LINE__, descId, ret);
     }
     if (decriptor.size() > 0) {
-        PrintBuffer("UsbdClient::GetStringDescriptor", decriptor.data(), decriptor.size());
+        PrintBuffer("UsbdClient::GetStringDescriptor", decriptor, decriptor.size());
     }
     return ret;
 }
@@ -271,7 +271,7 @@ int32_t UsbdClient::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::
         HDF_LOGW("%{public}s:%{public}d strId:%{public}d failed:%{public}d", __func__, __LINE__, descId, ret);
     }
     if (decriptor.size() > 0) {
-        PrintBuffer("UsbdClient::GetStringDescriptor", decriptor.data(), decriptor.size());
+        PrintBuffer("UsbdClient::GetStringDescriptor", decriptor, decriptor.size());
     }
     return ret;
 }
@@ -419,7 +419,7 @@ int32_t UsbdClient::ControlTransfer(const UsbDev &dev, const UsbCtrlTransfer &ct
         if (UEC_OK != ret) {
             HDF_LOGW("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
         } else {
-            PrintBuffer("UsbdClient::ControlTransfer", (const uint8_t *)vdata.data(), vdata.size());
+            PrintBuffer("UsbdClient::ControlTransfer", vdata, vdata.size());
         }
     }
     return ret;
@@ -446,7 +446,7 @@ int32_t UsbdClient::InterruptTransferRead(const UsbDev &dev,
     if (UEC_OK != ret) {
         HDF_LOGW("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
     } else {
-        PrintBuffer("UsbdClient::InterruptTransferRead", (const uint8_t *)vdata.data(), vdata.size());
+        PrintBuffer("UsbdClient::InterruptTransferRead", vdata, vdata.size());
     }
     return ret;
 }
@@ -495,7 +495,7 @@ int32_t UsbdClient::IsoTransferRead(const UsbDev &devInfo,
     if (UEC_OK != ret) {
         HDF_LOGW("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
     } else {
-        PrintBuffer("UsbdClient::IsoTransferRead", (const uint8_t *)vdata.data(), vdata.size());
+        PrintBuffer("UsbdClient::IsoTransferRead", vdata, vdata.size());
     }
     return ret;
 }
