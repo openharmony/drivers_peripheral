@@ -177,7 +177,7 @@ int32_t SensorInterfaceService::Register(int32_t sensorId, const sptr<ISensorCal
     }
 
     g_sensorCallback = callbackObj;
-    int32_t ret = sensorInterface->Register(SensorDataCallback);
+    int32_t ret = sensorInterface->Register(0, SensorDataCallback);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
         g_sensorCallback = nullptr;
@@ -192,7 +192,7 @@ int32_t SensorInterfaceService::Unregister(int32_t sensorId)
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
-    int32_t ret = sensorInterface->Unregister();
+    int32_t ret = sensorInterface->Unregister(0);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
     }
