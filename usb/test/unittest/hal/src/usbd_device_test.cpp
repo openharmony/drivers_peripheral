@@ -38,7 +38,6 @@ void UsbdDeviceTest::SetUpTestCase(void)
     std::cout << "请请连接设备，连接完后按回车键继续" << std::endl;
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {
-        ;
     }
     HDF_LOGI("-----------Start UsbdDeviceTest-----------");
 }

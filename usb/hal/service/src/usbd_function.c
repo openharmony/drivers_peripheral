@@ -16,10 +16,6 @@
 
 #include <hdf_sbuf.h>
 #include <servmgr_hdi.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <unistd.h>
 #include "devmgr_hdi.h"
 #include "hdf_log.h"
 #include "hdf_remote_service.h"
@@ -31,7 +27,6 @@
 #define ACM_SERVICE_NAME "usbfn_cdcacm"
 #define ECM_SERVICE_NAME "usbfn_cdcecm"
 
-#define SYS_USB_FFS_READY "sys.usb.ffs.ready"
 #define SYS_USB_CONFIGFS "sys.usb.configfs"
 #define SYS_USB_CONFIG "sys.usb.config"
 #define HDC_CONFIG_OFF "none"
@@ -44,8 +39,6 @@
 
 #define USB_INIT 100
 #define USB_RELEASE 101
-#define USB_ACM_OPEN 0
-#define USB_ACM_CLOSE 1
 
 #define USB_FUNCTION_ACM_ECM 3
 #define FUNCTIONS_MAX 7

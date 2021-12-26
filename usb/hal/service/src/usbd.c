@@ -31,6 +31,10 @@
 
 #define HEX_NUM_09 0x09
 
+const int32_t DEFAULT_PORT_ID = 1;
+const int32_t DEFAULT_POWER_ROLE = 2;
+const int32_t DEFAULT_DATA_ROLE = 2;
+
 int32_t HdfDeviceRegisterEventListener(struct HdfIoService *target, struct HdfDevEventlistener *listener);
 
 static int32_t UsbdDriverBind(struct HdfDeviceObject *device);
@@ -40,6 +44,8 @@ int32_t UsbdRealseDevices(struct UsbdService *service);
 int32_t HostDeviceCreate(struct HostDevice **port);
 
 static int UsbdEventHandle(const struct UsbdService *inst);
+
+int SetPortInit(int portId, int powerRole, int dataRole);
 
 /* HdfDriverEntry implementations */
 static int32_t UsbdDriverBind(struct HdfDeviceObject *device)
@@ -79,7 +85,10 @@ static int32_t UsbdDriverBind(struct HdfDeviceObject *device)
     device->service = &(dev->service);
     device->service->Dispatch = UsbdServiceDispatch;
     dev->device = device;
-    UsbdEventHandle(dev);
+    ret = UsbdEventHandle(dev);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d UsbdEventHandle ret=%{public}d", __func__, __LINE__, ret);
+    }
     return HDF_SUCCESS;
 }
 
@@ -91,7 +100,11 @@ static int32_t UsbdDriverInit(struct HdfDeviceObject *device)
         HDF_LOGE("%{public}s:%{public}d device is null", __func__, __LINE__);
         return HDF_ERR_INVALID_OBJECT;
     }
-
+    ret = SetPortInit(DEFAULT_PORT_ID, DEFAULT_POWER_ROLE, DEFAULT_DATA_ROLE);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGW("%{public}s:%{public}d SetPortInit Error!", __func__, __LINE__);
+        return ret;
+    }
     HDF_LOGW("%{public}s:%{public}d init ok!", __func__, __LINE__);
     return ret;
 }
@@ -130,7 +143,10 @@ int32_t BindUsbSubscriber(struct UsbdService *service, struct UsbdSubscriber *su
         return HDF_ERR_INVALID_PARAM;
     }
     service->subscriber = subscriber;
-    UsbdAddDevicesOnStart(service);
+    int32_t ret = UsbdAddDevicesOnStart(service);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d UsbdAddDevicesOnStart ret=%{public}d", __func__, __LINE__, ret);
+    }
     return HDF_SUCCESS;
 }
 
