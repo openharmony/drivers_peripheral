@@ -88,6 +88,7 @@ static int32_t UsbdDriverBind(struct HdfDeviceObject *device)
     ret = UsbdEventHandle(dev);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbdEventHandle ret=%{public}d", __func__, __LINE__, ret);
+        return ret;
     }
     return HDF_SUCCESS;
 }
@@ -102,7 +103,7 @@ static int32_t UsbdDriverInit(struct HdfDeviceObject *device)
     }
     ret = SetPortInit(DEFAULT_PORT_ID, DEFAULT_POWER_ROLE, DEFAULT_DATA_ROLE);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGW("%{public}s:%{public}d SetPortInit Error!", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d SetPortInit Error!", __func__, __LINE__);
         return ret;
     }
     HDF_LOGW("%{public}s:%{public}d init ok!", __func__, __LINE__);
@@ -146,6 +147,7 @@ int32_t BindUsbSubscriber(struct UsbdService *service, struct UsbdSubscriber *su
     int32_t ret = UsbdAddDevicesOnStart(service);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbdAddDevicesOnStart ret=%{public}d", __func__, __LINE__, ret);
+        return ret;
     }
     return HDF_SUCCESS;
 }
@@ -193,7 +195,7 @@ static int UsbdPnpLoaderEventReceived(void *priv, uint32_t id, struct HdfSBuf *d
         return ret;
     }
     if (infoTable->deviceInfo.deviceClass == HEX_NUM_09) {
-        HDF_LOGI("%{public}s:%{public}d hub device ret:%{public}d", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d hub device ret:%{public}d", __func__, __LINE__, ret);
         return ret;
     }
     if (id == USB_PNP_NOTIFY_ADD_DEVICE) {

@@ -41,8 +41,8 @@
 #define DATA_ROLE_MAX 3
 
 #define PORT_MODE_NONE 0
-#define PORT_MODE_HOST 1
-#define PORT_MODE_DEVICE 2
+#define PORT_MODE_DEVICE 1
+#define PORT_MODE_HOST 2
 
 #define PORT_FILE_PATH "/sys/kernel/debug/usb/100e0000.hidwc3_0/mode"
 
