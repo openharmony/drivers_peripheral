@@ -137,7 +137,7 @@ int SetPort(int portId, int powerRole, int dataRole, const struct UsbdService *s
 {
     int ret = SetPortInit(portId, powerRole, dataRole);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGI("%{public}s: SetPortInit fail! ret:%{public}d", __func__, ret);
+        HDF_LOGE("%{public}s: SetPortInit fail! ret:%{public}d", __func__, ret);
         return ret;
     }
 

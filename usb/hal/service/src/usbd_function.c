@@ -84,7 +84,7 @@ static int SendCmdToService(const char *name, int cmd, unsigned char funcMask)
     }
     status = service->dispatcher->Dispatch(service, cmd, data, reply);
     if (status) {
-        HDF_LOGE("%{public}s:%{public}d serice %{public}s dispatch cmd : %{public}d error\n", __func__, __LINE__, name,
+        HDF_LOGW("%{public}s:%{public}d serice %{public}s dispatch cmd : %{public}d error\n", __func__, __LINE__, name,
                  cmd);
     }
     HdfSBufRecycle(data);
@@ -176,7 +176,7 @@ int UsbdSetFunction(int funcs)
     uint8_t _acm_ecm = funcs & USB_FUNCTION_ACM_ECM;
     uint8_t status;
     if (funcs < 0 || funcs >= FUNCTIONS_MAX) {
-        HDF_LOGI("%{public}s:%{public}d funcs invalid \n", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d funcs invalid \n", __func__, __LINE__);
         return HDF_FAILURE;
     }
     if ((currentFuncs & USB_FUNCTION_HDC) || (funcs == 0)) {
