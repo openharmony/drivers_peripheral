@@ -52,11 +52,12 @@ void UsbdClient::PrintBuffer(const std::string charstr, const std::vector<uint8_
         return;
     }
     oss.str("");
-    oss << charstr << " << 二进制数据流[" << datalength << "字节] >> :";
+    oss << charstr << " << Binary data flow[" << datalength << "byte] >> :";
     for (uint32_t i = 0; i < datalength; ++i) {
         oss << " " << std::hex << (int)buffer[i];
     }
-    oss << "  -->  " << buffer.data() << std::endl;
+    oss << ":" << buffer.data() << std::endl;
+
     HDF_LOGI("%{public}s", oss.str().c_str());
 }
 
