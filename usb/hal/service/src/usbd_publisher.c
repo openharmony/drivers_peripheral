@@ -23,10 +23,10 @@ void NotifySubscriberDevice(const struct UsbdSubscriber *subscriber,
                             int32_t busNum,
                             int32_t devNum)
 {
-    HDF_LOGW("%{public}s: enter subscriber:%{public}s act:%{public}d bus:%{public}d dev:%{public}d", __func__,
+    HDF_LOGI("%{public}s: enter subscriber:%{public}s act:%{public}d bus:%{public}d dev:%{public}d", __func__,
              subscriber ? "OK" : "NULL", act, busNum, devNum);
     if (subscriber == NULL) {
-        HDF_LOGW("%{public}s: subscriber is NULL", __func__);
+        HDF_LOGE("%{public}s: subscriber is NULL", __func__);
         return;
     }
     int ret;
@@ -46,7 +46,7 @@ void NotifySubscriberDevice(const struct UsbdSubscriber *subscriber,
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to notify subscriber, ret: %{public}d", __func__, ret);
     } else {
-        HDF_LOGW("%{public}s: succeed to notify subscriber", __func__);
+        HDF_LOGI("%{public}s: succeed to notify subscriber", __func__);
     }
     HdfSBufRecycle(data);
     HdfSBufRecycle(reply);
@@ -58,9 +58,9 @@ void NotifyUsbPortSubscriber(const struct UsbdSubscriber *subscriber,
                              int32_t dataRole,
                              int32_t mode)
 {
-    HDF_LOGW("%{public}s: enter", __func__);
+    HDF_LOGI("%{public}s: enter", __func__);
     if (subscriber == NULL) {
-        HDF_LOGW("%{public}s: subscriber is NULL", __func__);
+        HDF_LOGE("%{public}s: subscriber is NULL", __func__);
         return;
     }
     int ret;
@@ -82,7 +82,7 @@ void NotifyUsbPortSubscriber(const struct UsbdSubscriber *subscriber,
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to notify subscriber, ret: %{public}d", __func__, ret);
     } else {
-        HDF_LOGW("%{public}s: succeed to notify subscriber", __func__);
+        HDF_LOGI("%{public}s: succeed to notify subscriber", __func__);
     }
     HdfSBufRecycle(data);
     HdfSBufRecycle(reply);
