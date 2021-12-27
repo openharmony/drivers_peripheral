@@ -26,6 +26,12 @@ using namespace std;
 
 const int SLEEP_TIME = 3;
 
+const uint8_t BUS_NUM_1 = 1;
+const uint8_t DEV_ADDR_2 = 2;
+
+const uint8_t BUS_NUM_255 = 255;
+const uint8_t DEV_ADDR_255 = 255;
+
 void UsbdDeviceTest::SetUpTestCase(void)
 {
     auto ret = UsbdClient::SetPortRole(1, 1, 1);
@@ -35,16 +41,14 @@ void UsbdDeviceTest::SetUpTestCase(void)
     if (ret != 0) {
         exit(0);
     }
-    std::cout << "请请连接设备，连接完后按回车键继续" << std::endl;
+    std::cout << "please connect device, press enter to continue" << std::endl;
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {
     }
-    HDF_LOGI("-----------Start UsbdDeviceTest-----------");
 }
 
 void UsbdDeviceTest::TearDownTestCase(void)
 {
-    HDF_LOGI("-----------End UsbdDeviceTest-----------");
 }
 
 void UsbdDeviceTest::SetUp(void) {}
@@ -60,16 +64,16 @@ void UsbdDeviceTest::TearDown(void) {}
  */
 HWTEST_F(UsbdDeviceTest, UsbdOpenDevice001, TestSize.Level1)
 {
-    HDF_LOGI("-----------Case Start : UsbdDevice001 : OpenDevice-----------");
-    uint8_t busNum = 1;
-    uint8_t devAddr = 2;
+    HDF_LOGI("Case Start : UsbdDevice001 : OpenDevice");
+    uint8_t busNum = BUS_NUM_1;
+    uint8_t devAddr = DEV_ADDR_2;
     struct UsbDev dev = {busNum, devAddr};
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice GetBusNum =%{public}d GetDevAddr =%{public}d", __LINE__, 1,
              2);
     auto ret = UsbdClient::OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result =%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
-    HDF_LOGI("-----------Case End : UsbdDevice001 : OpenDevice-----------");
+    HDF_LOGI("Case End : UsbdDevice001 : OpenDevice");
 }
 
 /**
@@ -81,14 +85,14 @@ HWTEST_F(UsbdDeviceTest, UsbdOpenDevice001, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdOpenDevice002, TestSize.Level1)
 {
-    HDF_LOGI("-----------Case Start : UsbdDevice002 : OpenDevice-----------");
-    uint8_t busNum = 255;
-    uint8_t devAddr = 2;
+    HDF_LOGI("Case Start : UsbdDevice002 : OpenDevice");
+    uint8_t busNum = BUS_NUM_255;
+    uint8_t devAddr = DEV_ADDR_2;
     struct UsbDev dev = {busNum, devAddr};
     auto ret = UsbdClient::OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
-    HDF_LOGI("-----------Case End : UsbdDevice002 : OpenDevice-----------");
+    HDF_LOGI("Case End : UsbdDevice002 : OpenDevice");
 }
 
 /**
@@ -100,14 +104,14 @@ HWTEST_F(UsbdDeviceTest, UsbdOpenDevice002, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdOpenDevice003, TestSize.Level1)
 {
-    HDF_LOGI("-----------Case Start : UsbdDevice003 : OpenDevice-----------");
-    uint8_t busNum = 1;
-    uint8_t devAddr = 255;
+    HDF_LOGI("Case Start : UsbdDevice003 : OpenDevice");
+    uint8_t busNum = BUS_NUM_1;
+    uint8_t devAddr = DEV_ADDR_255;
     struct UsbDev dev = {busNum, devAddr};
     auto ret = UsbdClient::OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
-    HDF_LOGI("-----------Case End : UsbdDevice003 : OpenDevice-----------");
+    HDF_LOGI("Case End : UsbdDevice003 : OpenDevice");
 }
 
 /**
@@ -119,14 +123,14 @@ HWTEST_F(UsbdDeviceTest, UsbdOpenDevice003, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdOpenDevice004, TestSize.Level1)
 {
-    HDF_LOGI("-----------Case Start : UsbdDevice004 : OpenDevice-----------");
-    uint8_t busNum = 255;
-    uint8_t devAddr = 255;
+    HDF_LOGI("Case Start : UsbdDevice004 : OpenDevice");
+    uint8_t busNum = BUS_NUM_255;
+    uint8_t devAddr = DEV_ADDR_255;
     struct UsbDev dev = {busNum, devAddr};
     auto ret = UsbdClient::OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
-    HDF_LOGI("-----------Case End : UsbdDevice004 : OpenDevice-----------");
+    HDF_LOGI("Case End : UsbdDevice004 : OpenDevice");
 }
 
 /**********************************************************************************************************/
@@ -140,9 +144,9 @@ HWTEST_F(UsbdDeviceTest, UsbdOpenDevice004, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdCloseDevice001, TestSize.Level1)
 {
-    HDF_LOGI("-----------Case Start : UsbdDevice001 : Close-----------");
-    uint8_t busNum = 1;
-    uint8_t devAddr = 2;
+    HDF_LOGI("Case Start : UsbdDevice001 : Close");
+    uint8_t busNum = BUS_NUM_1;
+    uint8_t devAddr = DEV_ADDR_2;
     struct UsbDev dev = {busNum, devAddr};
     auto ret = UsbdClient::OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
@@ -150,7 +154,7 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice001, TestSize.Level1)
     ret = UsbdClient::CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
-    HDF_LOGI("-----------Case End : UsbdDevice001 : Close-----------");
+    HDF_LOGI("Case End : UsbdDevice001 : Close");
 }
 
 /**
@@ -162,20 +166,20 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice001, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdCloseDevice002, TestSize.Level1)
 {
-    HDF_LOGI("-----------Case Start : UsbdDevice002 : Close-----------");
-    uint8_t busNum = 1;
-    uint8_t devAddr = 2;
+    HDF_LOGI("Case Start : UsbdDevice002 : Close");
+    uint8_t busNum = BUS_NUM_1;
+    uint8_t devAddr = DEV_ADDR_2;
     struct UsbDev dev = {busNum, devAddr};
     auto ret = UsbdClient::OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
-    dev.busNum = 255;
+    dev.busNum = BUS_NUM_255;
     ret = UsbdClient::CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
-    dev.busNum = 1;
+    dev.busNum = BUS_NUM_1;
     UsbdClient::CloseDevice(dev);
-    HDF_LOGI("-----------Case End : UsbdDevice002 : Close-----------");
+    HDF_LOGI("Case End : UsbdDevice002 : Close");
 }
 
 /**
@@ -187,20 +191,20 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice002, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdCloseDevice003, TestSize.Level1)
 {
-    HDF_LOGI("-----------Case Start : UsbdDevice003 : Close-----------");
-    uint8_t busNum = 1;
-    uint8_t devAddr = 2;
+    HDF_LOGI("Case Start : UsbdDevice003 : Close");
+    uint8_t busNum = BUS_NUM_1;
+    uint8_t devAddr = DEV_ADDR_2;
     struct UsbDev dev = {busNum, devAddr};
     auto ret = UsbdClient::OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
-    dev.devAddr = 255;
+    dev.devAddr = DEV_ADDR_255;
     ret = UsbdClient::CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
-    dev.devAddr = 2;
+    dev.devAddr = DEV_ADDR_2;
     UsbdClient::CloseDevice(dev);
-    HDF_LOGI("-----------Case End : UsbdDevice003 : Close-----------");
+    HDF_LOGI("Case End : UsbdDevice003 : Close");
 }
 
 /**
@@ -212,20 +216,20 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice003, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdCloseDevice004, TestSize.Level1)
 {
-    HDF_LOGI("-----------Case Start : UsbdDevice004 : Close-----------");
-    uint8_t busNum = 1;
-    uint8_t devAddr = 2;
+    HDF_LOGI("Case Start : UsbdDevice004 : Close");
+    uint8_t busNum = BUS_NUM_1;
+    uint8_t devAddr = DEV_ADDR_2;
     struct UsbDev dev = {busNum, devAddr};
     auto ret = UsbdClient::OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
-    dev.busNum = 255;
-    dev.devAddr = 255;
+    dev.busNum = BUS_NUM_255;
+    dev.devAddr = DEV_ADDR_255;
     ret = UsbdClient::CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
-    dev.busNum = 1;
-    dev.devAddr = 2;
+    dev.busNum = BUS_NUM_1;
+    dev.devAddr = DEV_ADDR_2;
     UsbdClient::CloseDevice(dev);
-    HDF_LOGI("-----------Case End : UsbdDevice004 : Close-----------");
+    HDF_LOGI("Case End : UsbdDevice004 : Close");
 }

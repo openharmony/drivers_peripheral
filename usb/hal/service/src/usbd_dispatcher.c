@@ -71,40 +71,6 @@ static void RemoveDevFromService(struct UsbdService *service, struct HostDevice 
 static int32_t UsbdInit(struct HostDevice *dev);
 static void UsbdRelease(struct HostDevice *dev);
 
-void PrintBuffer(const char *title, const uint8_t *buffer, uint32_t length)
-{
-    if (title == NULL || buffer == NULL || length == 0) {
-        return;
-    }
-    uint32_t logLength = strlen(title) + length * MULTIPLE + ADD_NUM_50;
-    char *logBuffer = (char *)OsalMemAlloc(logLength);
-    if (logBuffer == NULL) {
-        return;
-    }
-    int ret = memset_s(logBuffer, logLength, 0, logLength);
-    if (ret < ERROR_0) {
-        HDF_LOGE("%{public}s:%{public}d memset_s ret %{public}d", __func__, __LINE__, ret);
-    }
-    ret = sprintf_s(logBuffer, logLength, " %s << 二进制数据流，%u字节 >> :", title, length);
-    if (ret < ERROR_0) {
-        HDF_LOGE("%{public}s:%{public}d sprintf_s ret %{public}d", __func__, __LINE__, ret);
-    }
-    uint32_t pos = strlen(logBuffer);
-    for (uint32_t i = 0; i < length; ++i) {
-        ret = sprintf_s(logBuffer + pos, logLength - pos, " %02x", buffer[i]);
-        if (ret < ERROR_0) {
-            HDF_LOGE("%{public}s:%{public}d sprintf_s ret %{public}d", __func__, __LINE__, ret);
-        }
-        pos += POS_STEP;
-    }
-    ret = sprintf_s(logBuffer + pos, logLength - pos, "  --> %s \n", buffer);
-    if (ret < ERROR_0) {
-        HDF_LOGE("%{public}s:%{public}d  ret %{public}d", __func__, __LINE__, ret);
-    }
-    HDF_LOGE("%{public}s", logBuffer);
-    OsalMemFree(logBuffer);
-}
-
 static bool UsbdHdfWriteBuf(struct HdfSBuf *data, uint8_t *buffer, uint32_t length)
 {
     if ((!data) || ((length > 0) && (!buffer))) {
@@ -652,6 +618,7 @@ static int32_t UsbControlTransferEx(struct HostDevice *dev, struct UsbControlPar
     int ret = UsbControlSetUp(&controlParams, &parmas.ctrlReq);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbControlSetUp, ret=%{public}d ", __func__, __LINE__, ret);
+        return ret;
     }
     ret = UsbFillRequest(request, dev->ctrDevHandle, &parmas);
     if (HDF_SUCCESS != ret) {
@@ -676,7 +643,6 @@ static int32_t UsbControlTransferEx(struct HostDevice *dev, struct UsbControlPar
         if (pCtrParams->size > request->compInfo.actualLength)
             pCtrParams->size = request->compInfo.actualLength;
         controlParams = *pCtrParams;
-        PrintBuffer("UsbControlTransfer", pCtrParams->data, pCtrParams->size);
     }
 
     UsbFreeRequest(request);
@@ -784,6 +750,7 @@ static int32_t FunControlTransfer(struct HostDevice *port, struct HdfSBuf *data,
     int ret = CtrlTransferParamInit(data, &controlParams, &timeout);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d CtrlTransferParamInit fail ret:%{public}d\n", __func__, __LINE__, ret);
+        return ret;
     }
     ret = UsbControlTransferEx(port, &controlParams, timeout);
     if (ret != HDF_SUCCESS) {
@@ -791,7 +758,6 @@ static int32_t FunControlTransfer(struct HostDevice *port, struct HdfSBuf *data,
     }
     HDF_LOGE("%{public}s:%{public}d UsbControlTransfer ok length = %{public}d", __func__, __LINE__, controlParams.size);
     if (controlParams.directon == USB_REQUEST_DIR_FROM_DEVICE) {
-        PrintBuffer("FunControlTransfer 738", controlParams.data, controlParams.size);
         if ((HDF_SUCCESS == ret) && (!UsbdHdfWriteBuf(reply, (uint8_t *)controlParams.data, controlParams.size))) {
             HDF_LOGE("%{public}s:%{public}d sbuf write buffer failed", __func__, __LINE__);
         }
@@ -1015,7 +981,6 @@ static int32_t FunGetDeviceDescriptor(struct HostDevice *port, struct HdfSBuf *r
             OsalMemFree(buffer);
         return ret;
     }
-    PrintBuffer("FunGetDeviceDescriptor", buffer, controlParams.size);
     if (!UsbdHdfWriteBuf(reply, buffer, controlParams.size)) {
         HDF_LOGE("%{public}s:%{public}d WriteBuffer fail ", __func__, __LINE__);
         ret = HDF_ERR_IO;
@@ -1055,7 +1020,6 @@ static int32_t FunGetConfigDescriptor(struct HostDevice *port, struct HdfSBuf *d
             OsalMemFree(buffer);
         return ret;
     }
-    PrintBuffer("FunGetConfigDescriptor", buffer, controlParams.size);
     if (!UsbdHdfWriteBuf(reply, buffer, controlParams.size)) {
         HDF_LOGE("%{public}s:%{public}d WriteBuffer fail ", __func__, __LINE__);
         ret = HDF_ERR_IO;
@@ -1096,7 +1060,6 @@ static int32_t FunGetStringDescriptor(struct HostDevice *port, struct HdfSBuf *d
             OsalMemFree(buffer);
         return ret;
     }
-    PrintBuffer("FunGetStringDescriptor", buffer, controlParams.size);
     if (!UsbdHdfWriteBuf(reply, buffer, controlParams.size)) {
         HDF_LOGE("%{public}s:%{public}d WriteBuffer fail ", __func__, __LINE__);
         ret = HDF_ERR_IO;
