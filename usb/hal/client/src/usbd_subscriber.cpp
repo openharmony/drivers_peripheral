@@ -24,29 +24,21 @@ int UsbdSubscriber::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
     int32_t ret;
     UsbInfo info;
     PortInfo pinfo;
-    HDF_LOGW("%{public}s:%{public}d CMD_NOTIFY_SUBSCRIBER_DEVICE_EVENT entry code:%{public}d", __func__, __LINE__,
-             code);
+    HDF_LOGI("%{public}s:%{public}d subscriber event code:%{public}d", __func__, __LINE__, code);
     switch (code) {
         case CMD_NOTIFY_SUBSCRIBER_DEVICE_EVENT:
-            HDF_LOGW("%{public}s CMD_NOTIFY_SUBSCRIBER_DEVICE_EVENT entry", __func__);
             ret = ParserUsbInfo(data, reply, option, info);
-            HDF_LOGW(
-                "%{public}s CMD_NOTIFY_SUBSCRIBER_DEVICE_EVENT Read devInfo "
-                "status=%{public}d,busNum=%{public}d,devAddr=%{public}d",
-                __func__, info.getDevInfoStatus(), info.getDevInfoBusNum(), info.getDevInfoDevNum());
             if (ret == UEC_OK) {
                 ret = DeviceEvent(info);
             }
             break;
         case CMD_NOTIFY_PORT_CHANGED:
             ret = ParserPortInfo(data, reply, option, pinfo);
-            HDF_LOGW("%{public}s CMD_NOTIFY_PORT_CHANGED parser result = %{public}d", __func__, ret);
             if (ret == UEC_OK) {
                 ret = PortChangedEvent(pinfo.portId, pinfo.powerRole, pinfo.dataRole, pinfo.mode);
             }
             break;
         default:
-            HDF_LOGW("no specific cmd for code: %{public}d", code);
             ret = ERR_INVALID_OPERATION;
             break;
     }
@@ -60,23 +52,20 @@ int32_t UsbdSubscriber::ParserUsbInfo(MessageParcel &data, MessageParcel &reply,
     int32_t devNum;
 
     if (!data.ReadInt32(status)) {
-        HDF_LOGW("Read devInfo status error");
+        HDF_LOGE("Read devInfo status error");
         return UEC_HDF_ERR_INVALID_PARAM;
     }
     if (!data.ReadInt32(busNum)) {
-        HDF_LOGW("Read devInfo busNum error");
+        HDF_LOGE("Read devInfo busNum error");
         return UEC_HDF_ERR_INVALID_PARAM;
     }
     if (!data.ReadInt32(devNum)) {
-        HDF_LOGW("Read devInfo devNum error");
+        HDF_LOGE("Read devInfo devNum error");
         return UEC_HDF_ERR_INVALID_PARAM;
     }
     info.setDevInfoStatus(status);
     info.setDevInfoBusNum(busNum);
     info.setDevInfoDevNum(devNum);
-
-    HDF_LOGW("%{public}s Read devInfo status=%{public}d,busNum=%{public}d,devAddr=%{public}d", __func__, status, busNum,
-             devNum);
     return UEC_OK;
 }
 
@@ -88,19 +77,19 @@ int32_t UsbdSubscriber::ParserPortInfo(MessageParcel &data, MessageParcel &reply
     int32_t mode;
 
     if (!data.ReadInt32(portId)) {
-        HDF_LOGW("Read PortInfo id error");
+        HDF_LOGE("Read PortInfo id error");
         return UEC_HDF_ERR_INVALID_PARAM;
     }
     if (!data.ReadInt32(powerRole)) {
-        HDF_LOGW("Read PortInfo powerRole error");
+        HDF_LOGE("Read PortInfo powerRole error");
         return UEC_HDF_ERR_INVALID_PARAM;
     }
     if (!data.ReadInt32(dataRole)) {
-        HDF_LOGW("Read PortInfo dataRole error");
+        HDF_LOGE("Read PortInfo dataRole error");
         return UEC_HDF_ERR_INVALID_PARAM;
     }
     if (!data.ReadInt32(mode)) {
-        HDF_LOGW("Read PortInfo mode error");
+        HDF_LOGE("Read PortInfo mode error");
         return UEC_HDF_ERR_INVALID_PARAM;
     }
     info.portId = portId;

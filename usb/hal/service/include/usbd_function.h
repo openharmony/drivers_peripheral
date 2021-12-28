@@ -22,7 +22,7 @@
 #define USB_FUNCTION_ECM 2
 #define USB_FUNCTION_HDC 4
 
-int32_t UsbdSetFunction(int funcs);
+int32_t UsbdSetFunction(int32_t funcs);
 int32_t UsbdGetFunction();
 
 #endif
