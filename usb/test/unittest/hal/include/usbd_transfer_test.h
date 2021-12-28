@@ -23,6 +23,5 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
-    void PrintBuffer(const std::string charstr, const std::vector<uint8_t> &buffer, const uint32_t datalength);
 };
 #endif // USBD_TRANSFER_TEST_H
