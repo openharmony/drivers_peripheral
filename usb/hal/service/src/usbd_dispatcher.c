@@ -287,8 +287,9 @@ static int32_t GetInterfacePipe(const struct HostDevice *dev,
     for (uint8_t i = 1; i <= info->pipeNum; ++i) {
         int32_t ret = UsbGetPipeInfo(interfaceHandle, info->curAltSetting, i, &pipeTmp);
         if ((ret == HDF_SUCCESS) && ((pipeTmp.pipeAddress | (uint8_t)pipeTmp.pipeDirection) == pipeAddr)) {
-            if (pipe)
+            if (pipe) {
                 *pipe = pipeTmp;
+            }
             return HDF_SUCCESS;
         }
     }
@@ -1951,7 +1952,6 @@ static int32_t FunRequestCancel(struct HostDevice *port, struct HdfSBuf *data, s
 
 static int32_t FunOpenDevice(struct HostDevice *port, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    int32_t ret;
     if ((port == NULL) || (data == NULL) || (reply == NULL)) {
         HDF_LOGE("%{public}s:%{public}d invalid parma", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -1961,7 +1961,7 @@ static int32_t FunOpenDevice(struct HostDevice *port, struct HdfSBuf *data, stru
                  __LINE__, port->initFlag, port->busNum, port->devAddr);
         return HDF_SUCCESS;
     }
-    ret = UsbdInit(port);
+    int32_t ret = UsbdInit(port);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbInit failed ret:%{public}d", __func__, __LINE__, ret);
         return ReturnOpenDevErrInit(ret, port);

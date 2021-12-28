@@ -27,7 +27,6 @@ void NotifySubscriberDevice(const struct UsbdSubscriber *subscriber,
         HDF_LOGE("%{public}s: subscriber is NULL", __func__);
         return;
     }
-    int32_t ret;
     struct HdfRemoteService *service = subscriber->remoteService;
     struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
     struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
@@ -40,7 +39,7 @@ void NotifySubscriberDevice(const struct UsbdSubscriber *subscriber,
     HdfSbufWriteInt32(data, act);
     HdfSbufWriteInt32(data, busNum);
     HdfSbufWriteInt32(data, devNum);
-    ret = service->dispatcher->Dispatch(service, CMD_NOTIFY_SUBSCRIBER_DEVICE_EVENT, data, reply);
+    int32_t ret = service->dispatcher->Dispatch(service, CMD_NOTIFY_SUBSCRIBER_DEVICE_EVENT, data, reply);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to notify subscriber, ret: %{public}d", __func__, ret);
     }
