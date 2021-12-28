@@ -378,7 +378,6 @@ public:
     static int32_t UnbindUsbdSubscriber();
 
 private:
-    static void PrintBuffer(const std::string charstr, const std::vector<uint8_t> &buffer, const uint32_t datalength);
     static int32_t SetDeviceMessage(MessageParcel &data, const UsbDev &dev);
     static int32_t SetBufferMessage(MessageParcel &data, const std::vector<uint8_t> &tdata);
     static int32_t GetBufferMessage(MessageParcel &data, std::vector<uint8_t> &tdata);
