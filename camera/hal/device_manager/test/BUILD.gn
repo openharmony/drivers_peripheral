@@ -70,7 +70,7 @@ if (defined(ohos_lite)) {
       "//drivers/framework/include/utils",
     ]
 
-    hispark_taurus_lib_path = "//device/soc/hisilicon/common/hal/media/camera/hi3516dv300/linux_standard/libs/"
+    hispark_taurus_lib_path = "//device/soc/hisilicon/common/hal/media/camera/hi3516dv300/liteos_a/libs/"
     outdir = rebase_path("$hispark_taurus_lib_path")
     ldflags = [ "-L$outdir" ]
     ldflags += [ "-ldriver_adapter" ]
