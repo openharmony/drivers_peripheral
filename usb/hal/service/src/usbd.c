@@ -261,7 +261,10 @@ static int32_t HdfReadDevice(struct UsbdService *service, int32_t *count, int32_
     return HDF_SUCCESS;
 }
 
-static int32_t ReturnOnStartOut(int32_t ret, struct HdfSBuf *data, struct HdfSBuf *reply, struct HdfIoService *usbPnpServ)
+static int32_t ReturnOnStartOut(int32_t ret,
+                                struct HdfSBuf *data,
+                                struct HdfSBuf *reply,
+                                struct HdfIoService *usbPnpServ)
 {
     HdfSBufRecycle(data);
     HdfSBufRecycle(reply);
