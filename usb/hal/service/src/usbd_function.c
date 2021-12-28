@@ -47,9 +47,9 @@ static uint8_t currentFuncs = USB_FUNCTION_NONE;
 static uint8_t pre_acm_ecm;
 static uint8_t WAIT_SLEEP_TIME = 10;
 
-static int SendCmdToService(const char *name, int cmd, unsigned char funcMask)
+static int32_t SendCmdToService(const char *name, int32_t cmd, unsigned char funcMask)
 {
-    int status;
+    int32_t status;
     struct HdfRemoteService *service = NULL;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
@@ -93,9 +93,9 @@ static int SendCmdToService(const char *name, int cmd, unsigned char funcMask)
     return status;
 }
 
-static int32_t RemoveHdc(int funcs)
+static int32_t RemoveHdc(int32_t funcs)
 {
-    if (!(funcs & USB_FUNCTION_HDC)) {
+    if ((funcs & USB_FUNCTION_HDC) == 0) {
         if (currentFuncs != funcs) {
             HDF_LOGI("%{public}s:%{public}d remove hdc\n", __func__, __LINE__);
             uint8_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_OFF);
@@ -113,7 +113,7 @@ static int32_t RemoveHdc(int funcs)
     return HDF_SUCCESS;
 }
 
-int32_t AddHdc(int funcs)
+int32_t AddHdc(int32_t funcs)
 {
     if (funcs & USB_FUNCTION_HDC) {
         HDF_LOGI("%{public}s:%{public}d add hdc\n", __func__, __LINE__);
@@ -171,7 +171,7 @@ int32_t RemoveAcmEcm(uint8_t _acm_ecm)
     return HDF_SUCCESS;
 }
 
-int UsbdSetFunction(int funcs)
+int32_t UsbdSetFunction(int32_t funcs)
 {
     uint8_t _acm_ecm = funcs & USB_FUNCTION_ACM_ECM;
     uint8_t status;
@@ -180,7 +180,7 @@ int UsbdSetFunction(int funcs)
         return HDF_FAILURE;
     }
     if ((currentFuncs & USB_FUNCTION_HDC) || (funcs == 0)) {
-        if (!(funcs & USB_FUNCTION_HDC)) {
+        if ((funcs & USB_FUNCTION_HDC) == 0) {
             if (RemoveHdc(funcs)) {
                 return HDF_FAILURE;
             }
@@ -222,6 +222,5 @@ int UsbdSetFunction(int funcs)
 
 int32_t UsbdGetFunction(void)
 {
-    HDF_LOGI("%{public}s:%{public}d currentFuncs:%{public}d\n", __func__, __LINE__, currentFuncs);
     return currentFuncs;
 }
