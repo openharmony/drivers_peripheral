@@ -138,11 +138,11 @@ struct UsbdRequestDataSync {
 struct UsbdRequestDataAsync {
     unsigned char endPoint;
     unsigned char *buffer;
-    int length;
-    int numIsoPackets;
+    int32_t length;
+    int32_t numIsoPackets;
     UsbdRequestCallback callback;
     uint8_t *userData;
-    unsigned int timeout;
+    uint32_t timeout;
 };
 struct UsbdControlRequestSetupData {
     uint8_t requestType;
@@ -156,7 +156,7 @@ struct UsbdControlRequestSetupData {
 struct UsbdDescriptorParam {
     uint8_t descType;
     uint8_t descIndex;
-    int length;
+    int32_t length;
 };
 struct UsbdDescriptorHeader {
     uint8_t bLength;
