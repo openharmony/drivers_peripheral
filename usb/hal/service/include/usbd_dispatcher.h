@@ -18,5 +18,5 @@
 
 #include "core/hdf_device_desc.h"
 
-int32_t UsbdServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t UsbdServiceDispatch(struct HdfDeviceIoClient *client, int32_t cmdId, struct HdfSBuf *data, struct HdfSBuf *reply);
 #endif // USBD_DISPATCHER_H
