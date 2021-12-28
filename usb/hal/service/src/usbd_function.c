@@ -49,7 +49,6 @@ static uint8_t WAIT_SLEEP_TIME = 10;
 
 static int32_t SendCmdToService(const char *name, int32_t cmd, unsigned char funcMask)
 {
-    int32_t status;
     struct HdfRemoteService *service = NULL;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
@@ -70,19 +69,17 @@ static int32_t SendCmdToService(const char *name, int32_t cmd, unsigned char fun
     reply = HdfSBufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s:%{public}d data or reply err\n", __func__, __LINE__);
-        status = HDF_FAILURE;
         HdfRemoteServiceRecycle(service);
-        return status;
+        return HDF_FAILURE;
     }
     if (!HdfSbufWriteInt8(data, funcMask)) {
         HDF_LOGE("%{public}s:%{public}d HdfSbufWriteInt8 error\n", __func__, __LINE__);
-        status = HDF_FAILURE;
         HdfSBufRecycle(data);
         HdfSBufRecycle(reply);
         HdfRemoteServiceRecycle(service);
-        return status;
+        return HDF_FAILURE;
     }
-    status = service->dispatcher->Dispatch(service, cmd, data, reply);
+    int32_t status = service->dispatcher->Dispatch(service, cmd, data, reply);
     if (status) {
         HDF_LOGW("%{public}s:%{public}d serice %{public}s dispatch cmd : %{public}d error\n", __func__, __LINE__, name,
                  cmd);
