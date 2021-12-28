@@ -1151,7 +1151,6 @@ static int32_t FunSetActiveConfig(struct HostDevice *port, struct HdfSBuf *data,
     length = 0;
     MakeSetActiveUsbControlParams(&controlParams, &configId, &length, (int32_t)0 + configId, 0);
     ret = UsbControlTransferEx(port, &controlParams, USB_CTRL_SET_TIMEOUT);
-
     if (HDF_SUCCESS != ret) {
         HDF_LOGE("%{public}s:%{public}d setConfiguration failed ret:%{public}d", __func__, __LINE__, ret);
         return HDF_ERR_IO;
@@ -1159,7 +1158,6 @@ static int32_t FunSetActiveConfig(struct HostDevice *port, struct HdfSBuf *data,
     length = 1;
     MakeGetActiveUsbControlParams(&controlParams, &configIdNew, &length, 0, 0);
     ret = UsbControlTransferEx(port, &controlParams, USB_CTRL_SET_TIMEOUT);
-
     if ((HDF_SUCCESS != ret) || (configId != configIdNew)) {
         HDF_LOGE("%{public}s:%{public}d getConfiguration failed ret:%{public}d", __func__, __LINE__, ret);
         return HDF_ERR_IO;
@@ -2378,7 +2376,7 @@ static void RemoveDevFromService(struct UsbdService *service, struct HostDevice 
 {
     struct HdfSListIterator it;
     struct HostDevice *tport = NULL;
-    if ( (service == NULL) || (port == NULL) ) {
+    if ((service == NULL) || (port == NULL)) {
         return;
     }
 
