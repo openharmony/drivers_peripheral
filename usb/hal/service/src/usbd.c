@@ -36,126 +36,9 @@ const int32_t DEFAULT_POWER_ROLE = 2;
 const int32_t DEFAULT_DATA_ROLE = 2;
 
 int32_t HdfDeviceRegisterEventListener(struct HdfIoService *target, struct HdfDevEventlistener *listener);
-
-static int32_t UsbdDriverBind(struct HdfDeviceObject *device);
-static int32_t UsbdDriverInit(struct HdfDeviceObject *device);
-static void UsbdDriverRelease(struct HdfDeviceObject *device);
 int32_t UsbdRealseDevices(struct UsbdService *service);
 int32_t HostDeviceCreate(struct HostDevice **port);
-
-static int32_t UsbdEventHandle(const struct UsbdService *inst);
-
 int32_t SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRole);
-
-/* HdfDriverEntry implementations */
-static int32_t UsbdDriverBind(struct HdfDeviceObject *device)
-{
-    struct UsbdService *dev = NULL;
-    struct UsbPnpNotifyServiceInfo *info = NULL;
-    int32_t ret;
-    if (device == NULL) {
-        HDF_LOGE("%{public}s:%{public}d device is null", __func__, __LINE__);
-        return HDF_ERR_INVALID_OBJECT;
-    }
-    dev = (struct UsbdService *)OsalMemCalloc(sizeof(struct UsbdService));
-    if (dev == NULL) {
-        HDF_LOGE("%{public}s: Alloc dev device failed", __func__);
-        return HDF_FAILURE;
-    }
-    memset_s(dev, sizeof(struct UsbdService), 0, sizeof(struct UsbdService));
-    if (OsalMutexInit(&dev->lock) != HDF_SUCCESS) {
-        HDF_LOGE(" init lock fail!");
-        return HDF_FAILURE;
-    }
-    info = (struct UsbPnpNotifyServiceInfo *)device->priv;
-    if (info) {
-        struct HostDevice *port = NULL;
-        ret = HostDeviceCreate(&port);
-        if (ret == HDF_SUCCESS) {
-            port->busNum = info->busNum;
-            port->devAddr = info->devNum;
-            port->service = dev;
-            OsalMutexLock(&dev->lock);
-            HdfSListAdd(&dev->devList, &port->node);
-            OsalMutexUnlock(&dev->lock);
-        }
-    }
-    device->service = &(dev->service);
-    device->service->Dispatch = UsbdServiceDispatch;
-    dev->device = device;
-    ret = UsbdEventHandle(dev);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d UsbdEventHandle ret=%{public}d", __func__, __LINE__, ret);
-        return ret;
-    }
-    return HDF_SUCCESS;
-}
-
-static int32_t UsbdDriverInit(struct HdfDeviceObject *device)
-{
-    int32_t ret = HDF_SUCCESS;
-    if (device == NULL) {
-        HDF_LOGE("%{public}s:%{public}d device is null", __func__, __LINE__);
-        return HDF_ERR_INVALID_OBJECT;
-    }
-    ret = SetPortInit(DEFAULT_PORT_ID, DEFAULT_POWER_ROLE, DEFAULT_DATA_ROLE);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d SetPortInit Error!", __func__, __LINE__);
-        return ret;
-    }
-    return ret;
-}
-
-static void UsbdDriverRelease(struct HdfDeviceObject *device)
-{
-    struct UsbdService *dev = NULL;
-    if (device == NULL) {
-        HDF_LOGE("%{public}s: device is NULL", __func__);
-        return;
-    }
-    dev = (struct UsbdService *)device->service;
-    UsbdRealseDevices(dev);
-}
-
-struct HdfDriverEntry g_usbdDriverEntry = {
-    .moduleVersion = 1,
-    .moduleName = "usbd",
-    .Bind = UsbdDriverBind,
-    .Init = UsbdDriverInit,
-    .Release = UsbdDriverRelease,
-};
-HDF_INIT(g_usbdDriverEntry);
-
-static int32_t UsbdAddDevicesOnStart(struct UsbdService *service);
-
-int32_t BindUsbSubscriber(struct UsbdService *service, struct UsbdSubscriber *subscriber)
-{
-    if (service == NULL) {
-        HDF_LOGE("%{public}s  service is NULL", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    service->subscriber = subscriber;
-    int32_t ret = UsbdAddDevicesOnStart(service);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d UsbdAddDevicesOnStart ret=%{public}d", __func__, __LINE__, ret);
-        return ret;
-    }
-    return HDF_SUCCESS;
-}
-
-int32_t UnbindUsbSubscriber(struct UsbdService *service)
-{
-    if (service == NULL) {
-        HDF_LOGE("%{public}s service is NULL", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (service->subscriber != NULL) {
-        HDF_LOGI("%{public}s:%{public}d entry", __func__, __LINE__);
-        OsalMemFree(service->subscriber);
-        service->subscriber = NULL;
-    }
-    return HDF_SUCCESS;
-}
 
 static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, struct HdfSBuf *data)
 {
@@ -211,8 +94,7 @@ static int32_t UsbdEventHandle(const struct UsbdService *inst)
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    int32_t status;
-    status = HdfDeviceRegisterEventListener(usbPnpServ, &usbPnpListener);
+    int32_t status = HdfDeviceRegisterEventListener(usbPnpServ, &usbPnpListener);
     if (status != HDF_SUCCESS) {
         HDF_LOGE("HdfDeviceRegisterEventListener faile status=%{public}d", status);
         return status;
@@ -220,6 +102,87 @@ static int32_t UsbdEventHandle(const struct UsbdService *inst)
 
     return HDF_SUCCESS;
 }
+
+/* HdfDriverEntry implementations */
+static int32_t UsbdDriverBind(struct HdfDeviceObject *device)
+{
+    struct UsbdService *dev = NULL;
+    struct UsbPnpNotifyServiceInfo *info = NULL;
+    int32_t ret;
+    if (device == NULL) {
+        HDF_LOGE("%{public}s:%{public}d device is null", __func__, __LINE__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
+    dev = (struct UsbdService *)OsalMemCalloc(sizeof(struct UsbdService));
+    if (dev == NULL) {
+        HDF_LOGE("%{public}s: Alloc dev device failed", __func__);
+        return HDF_FAILURE;
+    }
+    memset_s(dev, sizeof(struct UsbdService), 0, sizeof(struct UsbdService));
+    if (OsalMutexInit(&dev->lock) != HDF_SUCCESS) {
+        HDF_LOGE(" init lock fail!");
+        OsalMemFree(dev);
+        return HDF_FAILURE;
+    }
+    info = (struct UsbPnpNotifyServiceInfo *)device->priv;
+    if (info) {
+        struct HostDevice *port = NULL;
+        ret = HostDeviceCreate(&port);
+        if (ret == HDF_SUCCESS) {
+            port->busNum = info->busNum;
+            port->devAddr = info->devNum;
+            port->service = dev;
+            OsalMutexLock(&dev->lock);
+            HdfSListAdd(&dev->devList, &port->node);
+            OsalMutexUnlock(&dev->lock);
+        }
+    }
+    device->service = &(dev->service);
+    device->service->Dispatch = UsbdServiceDispatch;
+    dev->device = device;
+    ret = UsbdEventHandle(dev);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d UsbdEventHandle ret=%{public}d", __func__, __LINE__, ret);
+        OsalMemFree(dev);
+        return ret;
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t UsbdDriverInit(struct HdfDeviceObject *device)
+{
+    int32_t ret = HDF_SUCCESS;
+    if (device == NULL) {
+        HDF_LOGE("%{public}s:%{public}d device is null", __func__, __LINE__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
+    ret = SetPortInit(DEFAULT_PORT_ID, DEFAULT_POWER_ROLE, DEFAULT_DATA_ROLE);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d SetPortInit Error!", __func__, __LINE__);
+        return ret;
+    }
+    return ret;
+}
+
+static void UsbdDriverRelease(struct HdfDeviceObject *device)
+{
+    struct UsbdService *dev = NULL;
+    if (device == NULL) {
+        HDF_LOGE("%{public}s: device is NULL", __func__);
+        return;
+    }
+    dev = (struct UsbdService *)device->service;
+    UsbdRealseDevices(dev);
+}
+
+struct HdfDriverEntry g_usbdDriverEntry = {
+    .moduleVersion = 1,
+    .moduleName = "usbd",
+    .Bind = UsbdDriverBind,
+    .Init = UsbdDriverInit,
+    .Release = UsbdDriverRelease,
+};
+HDF_INIT(g_usbdDriverEntry);
 
 static int32_t HdfReadDevice(struct UsbdService *service, int32_t *count, int32_t *size, struct HdfSBuf *reply)
 {
@@ -284,8 +247,7 @@ static int32_t UsbdAddDevicesOnStart(struct UsbdService *service)
     struct HdfSBuf *data = HdfSBufObtainDefaultSize();
     if (data == NULL) {
         HDF_LOGE("%{public}s: fail to obtain sbuf data", __func__);
-        ret = HDF_DEV_ERR_NO_MEMORY;
-        return ret;
+        return HDF_DEV_ERR_NO_MEMORY;
     }
     struct HdfSBuf *reply = HdfSBufObtainDefaultSize();
     if (reply == NULL) {
@@ -313,4 +275,33 @@ static int32_t UsbdAddDevicesOnStart(struct UsbdService *service)
     HdfSBufRecycle(reply);
     HdfIoServiceRecycle(usbPnpServ);
     return ret;
+}
+
+int32_t BindUsbSubscriber(struct UsbdService *service, struct UsbdSubscriber *subscriber)
+{
+    if (service == NULL) {
+        HDF_LOGE("%{public}s  service is NULL", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    service->subscriber = subscriber;
+    int32_t ret = UsbdAddDevicesOnStart(service);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d UsbdAddDevicesOnStart ret=%{public}d", __func__, __LINE__, ret);
+        return ret;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t UnbindUsbSubscriber(struct UsbdService *service)
+{
+    if (service == NULL) {
+        HDF_LOGE("%{public}s service is NULL", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (service->subscriber != NULL) {
+        HDF_LOGI("%{public}s:%{public}d entry", __func__, __LINE__);
+        OsalMemFree(service->subscriber);
+        service->subscriber = NULL;
+    }
+    return HDF_SUCCESS;
 }

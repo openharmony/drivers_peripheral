@@ -176,8 +176,10 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t
-        BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
+    static int32_t BulkTransferRead(const UsbDev &dev,
+                                    const UsbPipe &pipe,
+                                    int32_t timeout,
+                                    std::vector<uint8_t> &data);
 
     /* *
      * @brief 在给定端点上执行批量数据写入， 返回读取的数据和长度，端点方向必须为数据写入
@@ -190,8 +192,10 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t
-        BulkTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, const std::vector<uint8_t> &data);
+    static int32_t BulkTransferWrite(const UsbDev &dev,
+                                     const UsbPipe &pipe,
+                                     int32_t timeout,
+                                     const std::vector<uint8_t> &data);
 
     /* *
      * @brief 对此设备执行端点零的控制事务，传输方向由请求类型决定。 如果requestType＆
@@ -217,8 +221,10 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t
-        InterruptTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
+    static int32_t InterruptTransferRead(const UsbDev &dev,
+                                         const UsbPipe &pipe,
+                                         int32_t timeout,
+                                         std::vector<uint8_t> &data);
 
     /* *
      * @brief 在给定端点上执行中断数据写入， 返回读取的数据和长度，端点方向必须为数据写入
@@ -231,8 +237,10 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t
-        InterruptTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
+    static int32_t InterruptTransferWrite(const UsbDev &dev,
+                                          const UsbPipe &pipe,
+                                          int32_t timeout,
+                                          std::vector<uint8_t> &data);
 
     /* *
      * @brief 在给定端点上执行等时数据读取， 返回读取的数据和长度，端点方向必须为数据读取
@@ -258,8 +266,10 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t
-        IsoTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
+    static int32_t IsoTransferWrite(const UsbDev &dev,
+                                    const UsbPipe &pipe,
+                                    int32_t timeout,
+                                    std::vector<uint8_t> &data);
 
     /* *
      * @brief 将指定的端点进行异步数据发送或者接收请求，数据传输方向由端点方向决定
@@ -288,8 +298,10 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t
-        RequestWait(const UsbDev &dev, std::vector<uint8_t> &clientData, std::vector<uint8_t> &buffer, int32_t timeout);
+    static int32_t RequestWait(const UsbDev &dev,
+                               std::vector<uint8_t> &clientData,
+                               std::vector<uint8_t> &buffer,
+                               int32_t timeout);
 
     /* *
      * @brief 取消待处理的数据请求
@@ -355,7 +367,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static ErrCode BindUsbdSubscriber(const sptr<UsbdSubscriber> &subscriber);
+    static int32_t BindUsbdSubscriber(const sptr<UsbdSubscriber> &subscriber);
 
     /* *
      * @brief 解绑订阅者
@@ -363,7 +375,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static ErrCode UnbindUsbdSubscriber();
+    static int32_t UnbindUsbdSubscriber();
 
 private:
     static void PrintBuffer(const std::string charstr, const std::vector<uint8_t> &buffer, const uint32_t datalength);
@@ -371,7 +383,7 @@ private:
     static int32_t SetBufferMessage(MessageParcel &data, const std::vector<uint8_t> &tdata);
     static int32_t GetBufferMessage(MessageParcel &data, std::vector<uint8_t> &tdata);
     static sptr<IRemoteObject> GetUsbdService();
-    static ErrCode DoDispatch(uint32_t cmd, MessageParcel &data, MessageParcel &reply);
+    static int32_t DoDispatch(uint32_t cmd, MessageParcel &data, MessageParcel &reply);
 };
 } // namespace USB
 } // namespace OHOS

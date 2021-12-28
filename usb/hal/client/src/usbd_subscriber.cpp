@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace USB {
-int UsbdSubscriber::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t UsbdSubscriber::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     int32_t ret;
     UsbInfo info;

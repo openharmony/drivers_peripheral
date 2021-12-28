@@ -23,7 +23,6 @@
 namespace OHOS {
 namespace USB {
 using OHOS::HDI::ServiceManager::V1_0::IServiceManager;
-
 namespace {
 const std::string USBD_SERVICE = "usbd";
 
@@ -59,7 +58,7 @@ sptr<IRemoteObject> UsbdClient::GetUsbdService()
     return usbdService;
 }
 
-ErrCode UsbdClient::BindUsbdSubscriber(const sptr<UsbdSubscriber> &subscriber)
+int32_t UsbdClient::BindUsbdSubscriber(const sptr<UsbdSubscriber> &subscriber)
 {
     if (subscriber == nullptr) {
         HDF_LOGW("subscriber is nullptr");
@@ -72,7 +71,7 @@ ErrCode UsbdClient::BindUsbdSubscriber(const sptr<UsbdSubscriber> &subscriber)
     return DoDispatch(CMD_BIND_USB_SUBSCRIBER, data, reply);
 }
 
-ErrCode UsbdClient::UnbindUsbdSubscriber()
+int32_t UsbdClient::UnbindUsbdSubscriber()
 {
     MessageParcel data;
     MessageParcel reply;
@@ -153,7 +152,7 @@ int32_t UsbdClient::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &data
     return UEC_OK;
 }
 
-ErrCode UsbdClient::DoDispatch(uint32_t cmd, MessageParcel &data, MessageParcel &reply)
+int32_t UsbdClient::DoDispatch(uint32_t cmd, MessageParcel &data, MessageParcel &reply)
 {
     HDF_LOGI("%{public}s:%{public}d cmd:%{public}d", __func__, __LINE__, cmd);
     auto usbd = GetUsbdService();
@@ -176,12 +175,12 @@ int32_t UsbdClient::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &de
     MessageParcel reply;
     UsbdClient::SetDeviceMessage(data, dev);
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_GET_DEVICE_DESCRIPTOR, data, reply);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
         return ret;
     }
     ret = UsbdClient::GetBufferMessage(reply, decriptor);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
     }
     return ret;
@@ -193,7 +192,7 @@ int32_t UsbdClient::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> 
     MessageParcel reply;
     UsbdClient::SetDeviceMessage(data, dev);
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_GET_DEVICE_DESCRIPTOR, data, reply);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s failed, ret is %{public}d", __func__, ret);
         return ret;
     }
@@ -208,12 +207,12 @@ int32_t UsbdClient::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::
     SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, descId, UEC_SERVICE_WRITE_PARCEL_ERROR);
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_GET_STRING_DESCRIPTOR, data, reply);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d strId:%{public}d failed:%{public}d", __func__, __LINE__, descId, ret);
         return ret;
     }
     ret = UsbdClient::GetBufferMessage(reply, decriptor);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d strId:%{public}d failed:%{public}d", __func__, __LINE__, descId, ret);
     }
     return ret;
@@ -226,12 +225,12 @@ int32_t UsbdClient::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::
     SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, descId, UEC_SERVICE_WRITE_PARCEL_ERROR);
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_GET_CONFIG_DESCRIPTOR, data, reply);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d cfgId:%{public}d failed:%{public}d", __func__, __LINE__, descId, ret);
         return ret;
     }
     ret = UsbdClient::GetBufferMessage(reply, decriptor);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d strId:%{public}d failed:%{public}d", __func__, __LINE__, descId, ret);
     }
     return ret;
@@ -258,6 +257,7 @@ int32_t UsbdClient::GetConfig(const UsbDev &dev, uint8_t &configIndex)
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_GET_CONFIG, data, reply);
     if (ret != UEC_OK) {
         HDF_LOGE("%{public}s failed, ret:%{public}d", __func__, ret);
+        return ret;
     }
     READ_PARCEL_WITH_RET(data, Uint8, configIndex, UEC_SERVICE_READ_PARCEL_ERROR);
     return ret;
@@ -283,7 +283,7 @@ int32_t UsbdClient::ReleaseInterface(const UsbDev &dev, uint8_t interfaceIndex)
     SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, interfaceIndex, UEC_SERVICE_WRITE_PARCEL_ERROR);
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_RELEASE_INTERFACE, data, reply);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s failed, ret:%{public}d", __func__, ret);
     }
     return ret;
@@ -299,9 +299,8 @@ int32_t UsbdClient::SetInterface(const UsbDev &dev, uint8_t interfaceIndex, uint
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_SET_INTERFACE, data, reply);
     if (ret != UEC_OK) {
         HDF_LOGE("%{public}s failed, ret:%{public}d", __func__, ret);
-        return ret;
     }
-    return UEC_OK;
+    return ret;
 }
 
 int32_t UsbdClient::BulkTransferRead(const UsbDev &devInfo,
@@ -321,7 +320,7 @@ int32_t UsbdClient::BulkTransferRead(const UsbDev &devInfo,
         return ret;
     }
     ret = UsbdClient::GetBufferMessage(reply, bufferData);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
     }
     return ret;
@@ -339,7 +338,7 @@ int32_t UsbdClient::BulkTransferWrite(const UsbDev &dev,
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.endpointId, UEC_SERVICE_WRITE_PARCEL_ERROR);
     WRITE_PARCEL_WITH_RET(data, Int32, timeout, UEC_SERVICE_WRITE_PARCEL_ERROR);
     int32_t ret = SetBufferMessage(data, bufferData);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
         return ret;
     }
@@ -365,7 +364,7 @@ int32_t UsbdClient::ControlTransfer(const UsbDev &dev, const UsbCtrlTransfer &ct
     bool isWrite = (ctrl.requestType & USB_ENDPOINT_DIR_MASK) == USB_ENDPOINT_DIR_OUT;
     if (isWrite) {
         ret = SetBufferMessage(data, bufferData);
-        if (UEC_OK != ret) {
+        if (ret != UEC_OK) {
             HDF_LOGE("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
             return ret;
         }
@@ -377,7 +376,7 @@ int32_t UsbdClient::ControlTransfer(const UsbDev &dev, const UsbCtrlTransfer &ct
     }
     if (!isWrite) {
         ret = GetBufferMessage(reply, bufferData);
-        if (UEC_OK != ret) {
+        if (ret != UEC_OK) {
             HDF_LOGE("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
         }
     }
@@ -402,7 +401,7 @@ int32_t UsbdClient::InterruptTransferRead(const UsbDev &dev,
     }
 
     ret = GetBufferMessage(reply, bufferData);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
     }
     return ret;
@@ -420,7 +419,7 @@ int32_t UsbdClient::InterruptTransferWrite(const UsbDev &dev,
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.endpointId, UEC_SERVICE_WRITE_PARCEL_ERROR);
     WRITE_PARCEL_WITH_RET(data, Int32, timeout, UEC_SERVICE_WRITE_PARCEL_ERROR);
     int32_t ret = SetBufferMessage(data, bufferData);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
         return ret;
     }
@@ -449,7 +448,7 @@ int32_t UsbdClient::IsoTransferRead(const UsbDev &devInfo,
     }
 
     ret = GetBufferMessage(reply, bufferData);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
     }
     return ret;
@@ -467,7 +466,7 @@ int32_t UsbdClient::IsoTransferWrite(const UsbDev &devInfo,
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.endpointId, UEC_SERVICE_WRITE_PARCEL_ERROR);
     WRITE_PARCEL_WITH_RET(data, Int32, timeout, UEC_SERVICE_WRITE_PARCEL_ERROR);
     int32_t ret = SetBufferMessage(data, bufferData);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
         return ret;
     }
@@ -503,12 +502,12 @@ int32_t UsbdClient::RequestQueue(const UsbDev &dev,
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.endpointId, UEC_SERVICE_WRITE_PARCEL_ERROR);
 
     int32_t ret = UsbdClient::SetBufferMessage(data, clientData);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
         return ret;
     }
     ret = UsbdClient::SetBufferMessage(data, buffer);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
         return ret;
     }
@@ -536,13 +535,13 @@ int32_t UsbdClient::RequestWait(const UsbDev &dev,
     }
 
     ret = UsbdClient::GetBufferMessage(reply, clientData);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
         return ret;
     }
 
     ret = UsbdClient::GetBufferMessage(reply, buffer);
-    if (UEC_OK != ret) {
+    if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d failed:%{public}d", __func__, __LINE__, ret);
     }
 

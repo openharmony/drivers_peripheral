@@ -20,8 +20,8 @@
 #include "hdf_log.h"
 #include "hdf_remote_service.h"
 #include "osal_time.h"
-#include "securec.h"
 #include "parameter.h"
+#include "securec.h"
 
 #define DEV_SERVICE_NAME "usbfn_master"
 #define ACM_SERVICE_NAME "usbfn_cdcacm"
