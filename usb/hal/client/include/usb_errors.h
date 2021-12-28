@@ -34,7 +34,7 @@ enum {
 #define USB_OFFSET 100
 
 // offset of usbmgr error, only be used in this file.
-constexpr ErrCode USBFWK_SERVICE_ERR_OFFSET = ErrCodeOffset(SUBSYS_USB, USB_MODULE_TYPE_SERVICE);
+constexpr int32_t USBFWK_SERVICE_ERR_OFFSET = ErrCodeOffset(SUBSYS_USB, USB_MODULE_TYPE_SERVICE);
 
 enum {
     UEC_OK = 0,

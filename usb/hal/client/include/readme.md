@@ -26,5 +26,5 @@
 | int32_t GetCurrentFunctions(int32_t &funcs);                 | 获取从设备支持的功能列表（按位域表示）（从设备）             |
 | int32_t SetCurrentFunctions(int32_t funcs);                  | 设置从设备支持的功能列表（按位域表示）（从设备）             |
 | int32_t QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode); | 查询端口的当前设置（从设备）                                 |
-| ErrCode BindUsbdSubscriber(const sptr<UsbdSubscriber> &subscriber); | 绑定订阅者                                                   |
-| ErrCode UnbindUsbdSubscriber();                              | 解绑订阅者                                                   |
+| int32_t BindUsbdSubscriber(const sptr<UsbdSubscriber> &subscriber); | 绑定订阅者                                                   |
+| int32_t UnbindUsbdSubscriber();                              | 解绑订阅者                                                   |
