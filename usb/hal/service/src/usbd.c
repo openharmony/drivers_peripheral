@@ -56,29 +56,23 @@ static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, struct HdfSBu
     }
     uint32_t infoSize;
     bool flag = HdfSbufReadBuffer(data, (const void **)(&infoTable), &infoSize);
-    int32_t ret = HDF_SUCCESS;
     if ((flag == false) || (infoTable == NULL)) {
-        ret = HDF_ERR_INVALID_PARAM;
         HDF_LOGE("%{public}s: fail to read infoTable in event data, flag=%{public}d, infoTable=%{public}p", __func__,
                  flag, infoTable);
-        return ret;
+        return HDF_ERR_INVALID_PARAM;
     }
     if (infoTable->deviceInfo.deviceClass == HEX_NUM_09) {
-        HDF_LOGE("%{public}s:%{public}d hub device ret:%{public}d", __func__, __LINE__, ret);
-        return ret;
+        HDF_LOGI("%{public}s:%{public}d hub device", __func__, __LINE__);
+        return HDF_SUCCESS;
     }
     if (id == USB_PNP_NOTIFY_ADD_DEVICE) {
-        ret = HDF_SUCCESS;
-        if (infoTable->deviceInfo.deviceClass != HEX_NUM_09)
-            NotifySubscriberDevice(super->subscriber, ACT_DEVUP, infoTable->busNum, infoTable->devNum);
+        NotifySubscriberDevice(super->subscriber, ACT_DEVUP, infoTable->busNum, infoTable->devNum);
     } else if (id == USB_PNP_NOTIFY_REMOVE_DEVICE) {
-        ret = HDF_SUCCESS;
-        if (infoTable->deviceInfo.deviceClass != HEX_NUM_09)
-            NotifySubscriberDevice(super->subscriber, ACT_DEVDOWN, infoTable->busNum, infoTable->devNum);
+        NotifySubscriberDevice(super->subscriber, ACT_DEVDOWN, infoTable->busNum, infoTable->devNum);
     } else {
-        ret = HDF_SUCCESS;
+        HDF_LOGI("%{public}s:%{public}d other event id:%{public}d", __func__, __LINE__, id);
     }
-    return ret;
+    return HDF_SUCCESS;
 }
 
 static int32_t UsbdEventHandle(const struct UsbdService *inst)

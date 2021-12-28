@@ -1177,8 +1177,10 @@ static int32_t UsbdInit(struct HostDevice *dev)
         HDF_LOGE("%{public}s:%{public}d UsbInitHostSdk faild", __func__, __LINE__);
         return HDF_ERR_IO;
     }
-    if (dev->service)
+    if (dev->service) {
         dev->service->session = session;
+    }
+
     ret = UsbdClaimInterfaces(dev);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbdClaimInterfaces faild ret:%{public}d", __func__, __LINE__, ret);
