@@ -43,7 +43,7 @@
 #define USB_FUNCTION_ACM_ECM 3
 #define FUNCTIONS_MAX 7
 
-static uint8_t currentFuncs = USB_FUNCTION_NONE;
+static uint8_t currentFuncs = USB_FUNCTION_HDC;
 static uint8_t pre_acm_ecm;
 static uint8_t WAIT_SLEEP_TIME = 10;
 

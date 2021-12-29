@@ -38,7 +38,6 @@ const int32_t DEFAULT_DATA_ROLE = 2;
 int32_t HdfDeviceRegisterEventListener(struct HdfIoService *target, struct HdfDevEventlistener *listener);
 int32_t UsbdRealseDevices(struct UsbdService *service);
 int32_t HostDeviceCreate(struct HostDevice **port);
-int32_t SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRole);
 
 static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, struct HdfSBuf *data)
 {
@@ -149,11 +148,6 @@ static int32_t UsbdDriverInit(struct HdfDeviceObject *device)
     if (device == NULL) {
         HDF_LOGE("%{public}s:%{public}d device is null", __func__, __LINE__);
         return HDF_ERR_INVALID_OBJECT;
-    }
-    ret = SetPortInit(DEFAULT_PORT_ID, DEFAULT_POWER_ROLE, DEFAULT_DATA_ROLE);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d SetPortInit Error!", __func__, __LINE__);
-        return ret;
     }
     return ret;
 }
