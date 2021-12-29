@@ -75,8 +75,8 @@ enum AudioRoute {
 
 struct DevInfo {
     const char *id;
-    int card;
-    int device;
+    int32_t card;
+    int32_t device;
 };
 
 struct DevProcInfo {
@@ -92,50 +92,49 @@ struct mixer_ctl {
 };
 
 struct mixer {
-    int fd;
+    int32_t fd;
     struct snd_ctl_elem_info *info;
     struct mixer_ctl *ctl;
     unsigned count;
 };
 
 struct sndrv_ctl_tlv {
-    unsigned int numid;     /* control element numeric identification */
-    unsigned int length;    /* in bytes aligned to 4 */
-    unsigned int tlv[0];    /* first TLV */
+    uint32_t numid;     /* control element numeric identification */
+    uint32_t length;    /* in bytes aligned to 4 */
+    uint32_t tlv[0];    /* first TLV */
 };
 
 struct PcmRenderParam {
-    unsigned int card;
-    unsigned int device;
-    unsigned int channels;
-    unsigned int rate;
-    unsigned int bits;
-    unsigned int periodSize;
-    unsigned int periodCount;
+    uint32_t card;
+    uint32_t device;
+    uint32_t channels;
+    uint32_t rate;
+    uint32_t bits;
+    uint32_t periodSize;
+    uint32_t periodCount;
 };
 
 struct PcmCaptureParam {
-    unsigned int card;
-    unsigned int device;
-    unsigned int channels;
-    unsigned int rate;
+    uint32_t card;
+    uint32_t device;
+    uint32_t channels;
+    uint32_t rate;
     enum pcm_format format;
-    unsigned int periodSize;
-    unsigned int periodCount;
+    uint32_t periodSize;
+    uint32_t periodCount;
 };
 
-
-int RouteSetVoiceVolume(float volume);
-int RouteSetCaptureVoiceVolume(float volume);
-int RouteGetVoiceVolume(char *ctlName);
-int RouteGetVoiceMinMaxStep(long long *volMin, long long *volMax, char *ctlName, bool isPlayback);
-int MixerOpenLegacy(bool isPlayback, int card);
+int32_t RouteSetVoiceVolume(float volume);
+int32_t RouteSetCaptureVoiceVolume(float volume);
+int32_t RouteGetVoiceVolume(char *ctlName, bool isPlayback);
+int32_t RouteGetVoiceMinMaxStep(long long *volMin, long long *volMax, char *ctlName, bool isPlayback);
+int32_t MixerOpenLegacy(bool isPlayback, int32_t card);
 void ReadOutSoundCard(void);
 void ReadInSoundCard(void);
-void RoutePcmCardOpen(int card, uint32_t route);
-int RoutePcmClose(unsigned route);
+void RoutePcmCardOpen(int32_t card, uint32_t route);
+int32_t RoutePcmClose(unsigned route);
 void RenderSample(struct pcm **pcm, struct PcmRenderParam* param);
-unsigned int CaptureSample(struct pcm **pcm, struct PcmCaptureParam* param);
-int GetOutDevInfo(int index, struct DevInfo* devInfo);
-int GetInDevInfo(int index, struct DevInfo* devInfo);
+uint32_t CaptureSample(struct pcm **pcm, struct PcmCaptureParam* param);
+int32_t GetOutDevInfo(int32_t index, struct DevInfo* devInfo);
+int32_t GetInDevInfo(int32_t index, struct DevInfo* devInfo);
 #endif
