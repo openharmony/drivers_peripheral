@@ -198,7 +198,7 @@ int32_t AudioCtlRenderGetVolumeALSA(struct AudioHwRenderParam *handleData)
     memset_s(&g_outDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
     GetOutDevInfo(SND_OUT_SOUND_CARD_SPEAKER, &g_outDevInfo);
     MixerOpenLegacy(true, g_outDevInfo.card);
-    handleData->renderMode.ctlParam.volume = RouteGetVoiceVolume(ctlName);
+    handleData->renderMode.ctlParam.volume = RouteGetVoiceVolume(ctlName, true);
     return HDF_SUCCESS;
 }
 #endif
