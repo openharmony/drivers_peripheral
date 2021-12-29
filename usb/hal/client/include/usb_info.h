@@ -22,35 +22,35 @@
 namespace OHOS {
 namespace USB {
 struct USBDeviceInfo {
-    int status;
-    int busNum;
-    int devNum;
+    int32_t status;
+    int32_t busNum;
+    int32_t devNum;
 };
 
 class UsbInfo {
 public:
-    void setDevInfoStatus(int status)
+    void setDevInfoStatus(int32_t status)
     {
         devInfo.status = status;
     }
-    void setDevInfoBusNum(int busNum)
+    void setDevInfoBusNum(int32_t busNum)
     {
         devInfo.busNum = busNum;
     }
-    void setDevInfoDevNum(int devNum)
+    void setDevInfoDevNum(int32_t devNum)
     {
         devInfo.devNum = devNum;
     }
 
-    int getDevInfoStatus() const
+    int32_t getDevInfoStatus() const
     {
         return devInfo.status;
     }
-    int getDevInfoBusNum() const
+    int32_t getDevInfoBusNum() const
     {
         return devInfo.busNum;
     }
-    int getDevInfoDevNum() const
+    int32_t getDevInfoDevNum() const
     {
         return devInfo.devNum;
     }

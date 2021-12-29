@@ -14,30 +14,17 @@
  */
 
 #include "usbd_port.h"
-#include <errno.h>
 #include <fcntl.h>
 #include <hdf_sbuf.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/ioctl.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
 #include <unistd.h>
 #include "hdf_log.h"
 #include "osal_time.h"
 #include "securec.h"
-#include "sys_param.h"
 #include "usbd_function.h"
 #include "usbd_publisher.h"
 
-/*
- * set default port mode
- */
 #define DEFAULT_PORT_ID 1
-#define DEFAULT_POWER_ROLE 2
-#define DEFAULT_DATA_ROLE 2
 
 #define PORT_MODE_HOST_STR "host"
 #define PORT_MODE_DEVICE_STR "device"
@@ -53,17 +40,19 @@
 #define DATA_ROLE_MAX 3
 
 #define PORT_MODE_NONE 0
-#define PORT_MODE_HOST 1
-#define PORT_MODE_DEVICE 2
+#define PORT_MODE_DEVICE 1
+#define PORT_MODE_HOST 2
 
 #define PORT_FILE_PATH "/sys/kernel/debug/usb/100e0000.hidwc3_0/mode"
 
-static int32_t currentPortId = 0;
-static int32_t currentPowerRole = 0;
-static int32_t currentDataRole = 0;
-static int32_t currentMode = 0;
+static int32_t currentPortId = DEFAULT_PORT_ID;
+static int32_t currentPowerRole = POWER_ROLE_SINK;
+static int32_t currentDataRole = DATA_ROLE_DEVICE;
+static int32_t currentMode = PORT_MODE_DEVICE;
 
-static int IfCanSwitch(int portId, int powerRole, int dataRole)
+int32_t SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRole);
+
+static int32_t IfCanSwitch(int32_t portId, int32_t powerRole, int32_t dataRole)
 {
     if (portId != DEFAULT_PORT_ID) {
         HDF_LOGE("%{public}s: portId error", __func__);
@@ -80,7 +69,7 @@ static int IfCanSwitch(int portId, int powerRole, int dataRole)
     return HDF_SUCCESS;
 }
 
-static int WritePortFile(int powerRole, int dataRole, int mode)
+static int32_t WritePortFile(int32_t powerRole, int32_t dataRole, int32_t mode)
 {
     char *fn = PORT_FILE_PATH;
     char *modeStr = NULL;
@@ -99,17 +88,17 @@ static int WritePortFile(int powerRole, int dataRole, int mode)
                 break;
         }
     }
-    if (!modeStr) {
+    if (modeStr == NULL) {
         HDF_LOGE("%{public}s: modeStr error", __func__);
         return HDF_FAILURE;
     }
-    int len = strlen(modeStr);
-    int fd = open(fn, O_WRONLY | O_TRUNC);
+    int32_t len = strlen(modeStr);
+    int32_t fd = open(fn, O_WRONLY | O_TRUNC);
     if (fd < 0) {
         HDF_LOGE("%{public}s: file open error fd= %{public}d", __func__, fd);
         return HDF_FAILURE;
     }
-    int ret = write(fd, modeStr, len);
+    int32_t ret = write(fd, modeStr, len);
     close(fd);
     if (ret == len) {
         return HDF_SUCCESS;
@@ -117,11 +106,9 @@ static int WritePortFile(int powerRole, int dataRole, int mode)
     return HDF_FAILURE;
 }
 
-int SetPort(int portId, int powerRole, int dataRole, const struct UsbdService *service)
+int32_t SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRole)
 {
-    HDF_LOGI("%{public}s: portId:%{public}d,powerRole:%{public}d,dataRole:%{public}d start", __func__, portId,
-             powerRole, dataRole);
-    int mode;
+    int32_t mode = PORT_MODE_DEVICE;
     if (IfCanSwitch(portId, powerRole, dataRole)) {
         return HDF_FAILURE;
     }
@@ -138,15 +125,25 @@ int SetPort(int portId, int powerRole, int dataRole, const struct UsbdService *s
     currentPowerRole = powerRole;
     currentDataRole = dataRole;
     currentMode = mode;
-    NotifyUsbPortSubscriber(service->subscriber, currentPortId, currentPowerRole, currentDataRole, currentMode);
-    if (mode == PORT_MODE_DEVICE) {
+    if (currentMode == PORT_MODE_DEVICE) {
         UsbdSetFunction(USB_FUNCTION_HDC);
     }
-    HDF_LOGI("%{public}s: set mode success", __func__);
     return HDF_SUCCESS;
 }
 
-int QueryPort(int *portId, int *powerRole, int *dataRole, int *mode, struct UsbdService *service)
+int32_t SetPort(int32_t portId, int32_t powerRole, int32_t dataRole, const struct UsbdService *service)
+{
+    int32_t ret = SetPortInit(portId, powerRole, dataRole);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: SetPortInit fail! ret:%{public}d", __func__, ret);
+        return ret;
+    }
+
+    NotifyUsbPortSubscriber(service->subscriber, currentPortId, currentPowerRole, currentDataRole, currentMode);
+    return HDF_SUCCESS;
+}
+
+int32_t QueryPort(int32_t *portId, int32_t *powerRole, int32_t *dataRole, int32_t *mode, struct UsbdService *service)
 {
     *portId = currentPortId;
     *powerRole = currentPowerRole;

@@ -28,7 +28,7 @@ public:
     virtual ~UsbdSubscriber() = default;
     virtual int32_t DeviceEvent(const UsbInfo &info) = 0;
     virtual int32_t PortChangedEvent(int32_t portId, int32_t powerRole, int32_t dataRole, int32_t mode) = 0;
-    int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
     static int32_t ParserUsbInfo(MessageParcel &data, MessageParcel &reply, MessageOption &option, UsbInfo &info);
