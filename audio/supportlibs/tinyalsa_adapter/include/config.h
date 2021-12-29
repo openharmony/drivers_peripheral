@@ -17,16 +17,18 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
+#include "alsa_audio.h"
+
 #define DEVICES_0 0
 struct RouteCfgInfo {
     const char *controlName;   // name of control.
     const char *stringVal;  // value of control, which type is stream.
-    const int intVal[2];    // left and right value of control, which type are int.
+    const int32_t intVal[2];    // left and right value of control, which type are int32_t.
 };
 
 struct PathRoute {
-    const int sndCard;
-    const int devices;
+    const int32_t sndCard;
+    const int32_t devices;
     const struct RouteCfgInfo *controls;
     const unsigned ctlsNums;
 };
