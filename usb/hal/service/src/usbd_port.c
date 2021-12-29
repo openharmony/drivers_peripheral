@@ -45,10 +45,10 @@
 
 #define PORT_FILE_PATH "/sys/kernel/debug/usb/100e0000.hidwc3_0/mode"
 
-static int32_t currentPortId = 0;
-static int32_t currentPowerRole = 0;
-static int32_t currentDataRole = 0;
-static int32_t currentMode = 0;
+static int32_t currentPortId = DEFAULT_PORT_ID;
+static int32_t currentPowerRole = POWER_ROLE_SINK;
+static int32_t currentDataRole = DATA_ROLE_DEVICE;
+static int32_t currentMode = PORT_MODE_DEVICE;
 
 int32_t SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRole);
 
