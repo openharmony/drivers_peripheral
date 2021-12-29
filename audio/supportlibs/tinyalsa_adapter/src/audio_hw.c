@@ -97,23 +97,23 @@ static struct pcm_config g_renderPcmCfg;
 
 struct RenderParamcheckList {
     enum pcm_param param;
-    unsigned int value;
+    uint32_t value;
     char *paramName;
     char *paramUnit;
 };
-static void SetDefaultDevInfo(struct DevInfo *info, int size, int rid)
+static void SetDefaultDevInfo(struct DevInfo *info, int32_t size, int32_t rid)
 {
-    for (int i = 0; i < size; i++) {
+    for (int32_t i = 0; i < size; i++) {
         if (rid) {
             info[i].id = NULL;
         }
-        info[i].card = (int)SND_OUT_SOUND_CARD_UNKNOWN;
+        info[i].card = (int32_t)SND_OUT_SOUND_CARD_UNKNOWN;
     }
 }
 
-static int name_match(const char* dst, const char* src)
+static int32_t name_match(const char* dst, const char* src)
 {
-    int score = 0;
+    int32_t score = 0;
     if (!strcmp(dst, src)) {
         score = 100; // match 100%, total equal
     } else  if (strstr(dst, src)) {
@@ -127,7 +127,7 @@ static bool dev_id_match(const char *info, const char *did)
 {
     const char *deli = "id:";
     char *id;
-    int idx = 0;
+    int32_t idx = 0;
 
     if (!did) {
         return true;
@@ -155,17 +155,17 @@ static bool dev_id_match(const char *info, const char *did)
     return false;
 }
 
-static bool GetSpecifiedDevicesCheck(struct DevInfo *devinfo, int card,
-    const char *id, struct DevProcInfo *match, int *index)
+static bool GetSpecifiedDevicesCheck(struct DevInfo *devinfo, int32_t card,
+    const char *id, struct DevProcInfo *match, int32_t *index)
 {
-    int i = 0;
-    int better = 0;
+    int32_t i = 0;
+    int32_t better = 0;
     /* parse card id */
     if (!match) {
         return true; /* match any */
     }
     while (match[i].cid) {
-        int score = name_match(id, match[i].cid);
+        int32_t score = name_match(id, match[i].cid);
         if (score > better) {
             better = score;
             *index = i;
@@ -189,22 +189,23 @@ static bool GetSpecifiedDevicesCheck(struct DevInfo *devinfo, int card,
     return true;
 }
 
-static bool GetSpecifiedOutDev(struct DevInfo *devinfo, int card,
+static bool GetSpecifiedOutDev(struct DevInfo *devinfo, int32_t card,
     const char *id, struct DevProcInfo *match)
 {
-    int device;
+    int32_t device;
     char deviceInfoPath[32];
     char info[256];
     size_t len;
     FILE* file = NULL;
-    int index = -1;
+    int32_t index = -1;
     bool ret = GetSpecifiedDevicesCheck(devinfo, card, id, match, &index);
     if (!ret) {
         return false;
     }
     /* parse device id */
     for (device = 0; device < SNDRV_DEVICES; device++) {
-        int ret = sprintf_s(deviceInfoPath, sizeof(deviceInfoPath) - 1, "proc/asound/card%d/pcm%dp/info", card, device);
+        int32_t ret = sprintf_s(deviceInfoPath, sizeof(deviceInfoPath) - 1,
+            "proc/asound/card%d/pcm%dp/info", card, device);
         if (ret < 0) {
             LOG_PARA_INFO("out card %d devices %d info path sprintf failed", card, device);
             break;
@@ -238,22 +239,23 @@ static bool GetSpecifiedOutDev(struct DevInfo *devinfo, int card,
     return false;
 }
 
-static bool GetSpecifiedInDev(struct DevInfo *devinfo, int card,
+static bool GetSpecifiedInDev(struct DevInfo *devinfo, int32_t card,
     const char *id, struct DevProcInfo *match)
 {
-    int device;
+    int32_t device;
     char deviceInfoPath[32];
     char info[256];
     size_t len;
     FILE* file = NULL;
-    int index = -1;
+    int32_t index = -1;
     bool ret = GetSpecifiedDevicesCheck(devinfo, card, id, match, &index);
     if (!ret) {
         return false;
     }
     /* parse device id */
     for (device = 0; device < SNDRV_DEVICES; device++) {
-        int ret = sprintf_s(deviceInfoPath, sizeof(deviceInfoPath) - 1, "proc/asound/card%d/pcm%dc/info", card, device);
+        int32_t ret = sprintf_s(deviceInfoPath, sizeof(deviceInfoPath) - 1,
+            "proc/asound/card%d/pcm%dc/info", card, device);
         if (ret < 0) {
             LOG_PARA_INFO("in card %d devices %d info path sprintf failed", card, device);
             break;
@@ -287,10 +289,10 @@ static bool GetSpecifiedInDev(struct DevInfo *devinfo, int card,
     return false;
 }
 
-static void dumpdev_info(const char *tag, struct DevInfo  *devInfo, int count)
+static void dumpdev_info(const char *tag, struct DevInfo  *devInfo, int32_t count)
 {
     LOG_PARA_INFO("dump %s device info", tag);
-    for (int i = 0; i < count; i++) {
+    for (int32_t i = 0; i < count; i++) {
         if (devInfo[i].id && devInfo[i].card != SND_OUT_SOUND_CARD_UNKNOWN)
             LOG_PARA_INFO("dev_info %s  card=%d, device:%d",
                 devInfo[i].id, devInfo[i].card, devInfo[i].device);
@@ -306,8 +308,8 @@ void ReadInSoundCard(void)
     devIn[SND_IN_SOUND_CARD_MIC].id = "MIC";
     devIn[SND_IN_SOUND_CARD_BT].id = "BT";
     SetDefaultDevInfo(devIn, SND_IN_SOUND_CARD_UNKNOWN, 0);
-    for (int card = 0; card < SNDRV_CARDS; card++) {
-        int ret = sprintf_s(sndCardId, sizeof(sndCardId) - 1, "proc/asound/card%d/id", card);
+    for (int32_t card = 0; card < SNDRV_CARDS; card++) {
+        int32_t ret = sprintf_s(sndCardId, sizeof(sndCardId) - 1, "proc/asound/card%d/id", card);
         if (ret < 0) {
             LOG_PARA_INFO("in card %d idinfo path sprintf failed", card);
             break;
@@ -349,8 +351,8 @@ void ReadOutSoundCard(void)
     devOut[SND_OUT_SOUND_CARD_SPDIF].id = "SPDIF";
     devOut[SND_OUT_SOUND_CARD_BT].id = "BT";
     SetDefaultDevInfo(devOut, SND_OUT_SOUND_CARD_UNKNOWN, 0);
-    for (int card = 0; card < SNDRV_CARDS; card++) {
-        int ret = sprintf_s(sndCardId, sizeof(sndCardId) - 1, "proc/asound/card%d/id", card);
+    for (int32_t card = 0; card < SNDRV_CARDS; card++) {
+        int32_t ret = sprintf_s(sndCardId, sizeof(sndCardId) - 1, "proc/asound/card%d/id", card);
         if (ret < 0) {
             LOG_PARA_INFO("out card %d idinfo path sprintf failed", card);
             break;
@@ -382,9 +384,9 @@ void ReadOutSoundCard(void)
     return;
 }
 
-int GetOutDevInfo(int index, struct DevInfo* devInfo)
+int32_t GetOutDevInfo(int32_t index, struct DevInfo* devInfo)
 {
-    for (int i = 0; i < SND_OUT_SOUND_CARD_MAX; i++) {
+    for (int32_t i = 0; i < SND_OUT_SOUND_CARD_MAX; i++) {
         if (i == index) {
             devInfo->card = devOut[i].card;
             devInfo->device = devOut[i].device;
@@ -394,9 +396,9 @@ int GetOutDevInfo(int index, struct DevInfo* devInfo)
     return false;
 }
 
-int GetInDevInfo(int index, struct DevInfo* devInfo)
+int32_t GetInDevInfo(int32_t index, struct DevInfo* devInfo)
 {
-    for (int i = 0; i < SND_IN_SOUND_CARD_MAX; i++) {
+    for (int32_t i = 0; i < SND_IN_SOUND_CARD_MAX; i++) {
         if (i == index) {
             devInfo->card = devIn[i].card;
             devInfo->device = devIn[i].device;
@@ -406,13 +408,13 @@ int GetInDevInfo(int index, struct DevInfo* devInfo)
     return false;
 }
 
-int AudioRenderParamCheck(struct pcm_params *params, unsigned int param, unsigned int value,
+int32_t AudioRenderParamCheck(struct pcm_params *params, uint32_t param, uint32_t value,
     char *paramName, char *paramUnit)
 {
-    int paramIsOk = true;
+    int32_t paramIsOk = true;
 
-    unsigned int min = pcm_params_get_min(params, param);
-    unsigned int max = pcm_params_get_max(params, param);
+    uint32_t min = pcm_params_get_min(params, param);
+    uint32_t max = pcm_params_get_max(params, param);
     if ((value < min) || (value > max))  {
         LOG_FUN_ERR("device supports %s\t min=%u%s \t max=%u%s, pls check it.\n", paramName,
             min, paramUnit, max, paramUnit);
@@ -422,10 +424,10 @@ int AudioRenderParamCheck(struct pcm_params *params, unsigned int param, unsigne
     return paramIsOk;
 }
 
-int IsPlayable(unsigned int card, unsigned int device, unsigned int bits)
+int32_t IsPlayable(uint32_t card, uint32_t device, uint32_t bits)
 {
     struct pcm_params *params;
-    int paramIsOk = true;
+    int32_t paramIsOk = true;
 
     params = pcm_params_get(card, device, PCM_OUT);
     if (params == NULL) {
@@ -439,8 +441,8 @@ int IsPlayable(unsigned int card, unsigned int device, unsigned int bits)
         {PCM_PARAM_PERIOD_SIZE, g_renderPcmCfg.period_size, "Period size", "frames"},
         {PCM_PARAM_PERIODS, g_renderPcmCfg.period_count, "Period count", "periods"},
     };
-    int checkNums = sizeof(g_RenderParamcheckList) / sizeof(struct RenderParamcheckList);
-    for (int i = 0; i < checkNums; i++) {
+    int32_t checkNums = sizeof(g_RenderParamcheckList) / sizeof(struct RenderParamcheckList);
+    for (int32_t i = 0; i < checkNums; i++) {
         paramIsOk &= AudioRenderParamCheck(params, g_RenderParamcheckList[i].param, g_RenderParamcheckList[i].value,
             g_RenderParamcheckList[i].paramName, g_RenderParamcheckList[i].paramUnit);
     }
@@ -449,7 +451,7 @@ int IsPlayable(unsigned int card, unsigned int device, unsigned int bits)
     return paramIsOk;
 }
 
-void initRenderFormat(unsigned int bits)
+void initRenderFormat(uint32_t bits)
 {
     switch (bits) {
         case TINYALSAPCM_32_BIT:
@@ -468,8 +470,8 @@ void initRenderFormat(unsigned int bits)
     }
 }
 
-void TinyAlsaPlayParamInit(unsigned int channels, unsigned int rate,
-    unsigned int periodSize, unsigned int periodCount)
+void TinyAlsaPlayParamInit(uint32_t channels, uint32_t rate,
+    uint32_t periodSize, uint32_t periodCount)
 {
     memset_s(&g_renderPcmCfg, sizeof(struct pcm_config), 0, sizeof(struct pcm_config));
     g_renderPcmCfg.channels = channels;
@@ -500,7 +502,7 @@ void RenderSample(struct pcm **pcm, struct PcmRenderParam *param)
     LOG_FUN_ERR("Playing sample: %u ch, %u hz, %u\n", param->channels, param->rate, param->bits);
 }
 
-unsigned int CaptureSample(struct pcm **pcm, struct PcmCaptureParam *param)
+uint32_t CaptureSample(struct pcm **pcm, struct PcmCaptureParam *param)
 {
     struct pcm_config config;
     memset_s(&config, sizeof(config), 0, sizeof(config));
