@@ -18,7 +18,7 @@
 
 #include "usbd.h"
 
-int SetPort(int portId, int powerRole, int dataRole, const struct UsbdService *service);
-int QueryPort(int *portId, int *powerRole, int *dataRole, int *mode, struct UsbdService *service);
+int32_t SetPort(int32_t portId, int32_t powerRole, int32_t dataRole, const struct UsbdService *service);
+int32_t QueryPort(int32_t *portId, int32_t *powerRole, int32_t *dataRole, int32_t *mode, struct UsbdService *service);
 
 #endif

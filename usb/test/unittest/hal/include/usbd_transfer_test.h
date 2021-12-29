@@ -23,6 +23,5 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
-    void PrintBuffer(const char *title, const uint8_t *buffer, uint32_t length);
 };
 #endif // USBD_TRANSFER_TEST_H
