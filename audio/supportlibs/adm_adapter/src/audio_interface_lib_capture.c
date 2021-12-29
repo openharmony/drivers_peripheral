@@ -249,7 +249,7 @@ int32_t AudioCtlCaptureGetVolume(const struct DevHandleCapture *handle,
     memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
     GetInDevInfo(SND_IN_SOUND_CARD_MIC, &g_inDevInfo);
     MixerOpenLegacy(false, g_inDevInfo.card);
-    handleData->captureMode.ctlParam.volume = RouteGetVoiceVolume(ctlName);
+    handleData->captureMode.ctlParam.volume = RouteGetVoiceVolume(ctlName, false);
     return HDF_SUCCESS;
 #endif
     int32_t ret;
