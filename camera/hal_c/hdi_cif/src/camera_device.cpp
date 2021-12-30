@@ -96,6 +96,9 @@ CamRetCode CameraDevice::EnableResult(const std::vector<MetaType>& results)
     }
 
     int count = results.size();
+    if (count <= 0) {
+        return DEVICE_ERROR;
+    }
     MetaTypeCIF* meta = new MetaTypeCIF[count];
     if (meta == nullptr) {
         return INSUFFICIENT_RESOURCES;
@@ -114,6 +117,9 @@ CamRetCode CameraDevice::DisableResult(const std::vector<MetaType>& results)
     }
 
     int count = results.size();
+    if (count <= 0) {
+        return DEVICE_ERROR;
+    }
     MetaTypeCIF* meta = new MetaTypeCIF[count];
     if (meta == nullptr) {
         return INSUFFICIENT_RESOURCES;
