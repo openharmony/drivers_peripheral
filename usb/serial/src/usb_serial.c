@@ -483,7 +483,6 @@ static int SerialCtrlMsg(struct AcmDevice *acm, uint8_t request,
 static int SerialCtrlAsyncMsg(UsbInterfaceHandle *devHandle,
     struct UsbRequest *request, void *buf, uint16_t size)
 {
-    int ret;
     const int offset = 8;
     struct UsbControlParams controlParams = {};
     struct UsbRequestParams parmas = {};
@@ -507,8 +506,8 @@ static int SerialCtrlAsyncMsg(UsbInterfaceHandle *devHandle,
     parmas.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
     parmas.timeout = USB_CTRL_SET_TIMEOUT;
     parmas.ctrlReq = UsbControlSetUp(&controlParams);
-    ret = UsbFillRequest(request, devHandle, &parmas);
-    if (HDF_SUCCESS != ret) {
+    int32_t ret = UsbFillRequest(request, devHandle, &parmas);
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: faile, ret=%d ", __func__, ret);
         return ret;
     }
@@ -522,7 +521,7 @@ static int SerialCtrlAsyncMsg(UsbInterfaceHandle *devHandle,
     for (unsigned int i = 0; i < request->compInfo.actualLength; i++)
         HDF_LOGE("0x%02x", ((uint8_t *)(request->compInfo.buffer))[i]);
     ret = memcpy_s(buf, size, request->compInfo.buffer, request->compInfo.actualLength);
-    if (ret) {
+    if (ret != EOK) {
         HDF_LOGE("memcpy_s fail\n");
     }
     return HDF_SUCCESS;
@@ -672,7 +671,6 @@ static int SerialGetBaudrate(struct SerialDevice *port, struct HdfSBuf *reply)
 
 static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct HdfSBuf *reply)
 {
-    int ret;
     struct AcmDevice *acm = port->acm;
     uint8_t *data = NULL;
     struct UsbRequestParams readParmas = {};
@@ -691,7 +689,7 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
     readParmas.dataReq.directon = (((uint8_t)acm->dataInPipe->pipeDirection) >> USB_DIR_OFFSET) & DIRECTION_MASK;
     readParmas.dataReq.length = acm->readSize;
     readParmas.callback = NULL;
-    ret = UsbFillRequest(g_syncRequest, InterfaceIdToHandle(acm, acm->dataInPipe->interfaceId), &readParmas);
+    int32_t ret = UsbFillRequest(g_syncRequest, InterfaceIdToHandle(acm, acm->dataInPipe->interfaceId), &readParmas);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
@@ -706,10 +704,13 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
     }
     HDF_LOGD("buffer:%p-%s-actualLength:%d", \
         g_syncRequest->compInfo.buffer, (uint8_t *)g_syncRequest->compInfo.buffer, count);
+
     ret = memcpy_s(data, g_syncRequest->compInfo.actualLength, g_syncRequest->compInfo.buffer, count);
-    if (ret) {
-        HDF_LOGE("memcpy_s error");
+    if (ret != EOK) {
+        HDF_LOGE("memcpy_s error %s, %d", __func__, __LINE__);
+        return HDF_FAILURE;
     }
+
     if (!HdfSbufWriteString((struct HdfSBuf *)reply, (const char *)data)) {
         HDF_LOGE("%s:%d sbuf write buffer failed", __func__, __LINE__);
     }
@@ -717,6 +718,7 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
         OsalMemFree(data);
         data = NULL;
     }
+
     return HDF_SUCCESS;
 }
 
