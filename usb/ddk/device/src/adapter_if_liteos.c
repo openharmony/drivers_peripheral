@@ -63,26 +63,26 @@ static int UsbFnAdapterClosefn(int fd)
 static int UsbFnAdapterCreateFconfigString(struct FconfigString *configString,
     const char *name)
 {
-    int strLen;
-    int ret;
-
     if (configString == NULL || name == NULL) {
         HDF_LOGE("%s: configName is NULL", __func__);
         return HDF_ERR_IO;
     }
-    strLen = strlen(name);
+
+    int32_t strLen = strlen(name);
     configString->len = strLen;
     configString->s = UsbFnMemCalloc(strLen + 1);
     if (configString->s == NULL) {
         HDF_LOGE("%s: UsbFnMemCalloc failure!", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
-    ret = memcpy_s(configString->s, (strLen + 1), name, strLen);
-    if (ret) {
+
+    int32_t ret = memcpy_s(configString->s, (strLen + 1), name, strLen);
+    if (ret != EOK) {
         HDF_LOGE("%s: memcpy_s failure!", __func__);
         UsbFnMemFree(configString->s);
         return HDF_ERR_MALLOC_FAIL;
     }
+
     *(configString->s + configString->len) = '\0';
     return 0;
 }
@@ -107,26 +107,28 @@ static int UsbFnAdapterWriteGadget(int fd, int cmd,
 static int UsbFnAdapterWriteDevDesc(int fd, struct FconfigString *gadgetName,
     const struct UsbFnDeviceDesc *descriptor)
 {
-    int ret;
     struct FconfigDevDesc devDesc;
 
     if (gadgetName == NULL || descriptor == NULL) {
         HDF_LOGE("%s: udcName is NULL", __func__);
         return HDF_ERR_IO;
     }
+
     devDesc.gadgetName.len = gadgetName->len;
     devDesc.gadgetName.s = gadgetName->s;
-    ret = memcpy_s(&devDesc.devDesc, sizeof(devDesc.devDesc), descriptor->deviceDesc,
+    int32_t ret = memcpy_s(&devDesc.devDesc, sizeof(devDesc.devDesc), descriptor->deviceDesc,
         sizeof(devDesc.devDesc));
-    if (ret) {
+    if (ret != EOK) {
         HDF_LOGE("%s: memcpy_s failure!", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
+
     ret = handle_ioctl(fd, FCONFIG_CMD_WRITE_DEV_DESC, &devDesc);
     if (ret) {
         HDF_LOGE("%s: ioctl failure!", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
+
     return 0;
 }
 
