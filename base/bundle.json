@@ -1,0 +1,54 @@
+{
+    "name": "@ohos/peripheral_base",
+    "version": "",
+    "description": "外设驱动基础框架",
+    "homePage": "https://gitee.com/openharmony/drivers_peripheral/tree/master/base",
+    "license": "Apache V2",
+    "repository": "",
+    "domain": "os",
+    "language": "",
+    "publishAs": "code-segment",
+    "private": false,
+    "scripts": {},
+    "tags": ["drivers"],
+    "keywords": ["peripheral", "base"],
+    "envs": [],
+    "dirs": [],
+    "author": {
+        "name": "",
+        "email": "",
+        "url": ""
+    },
+    "contributors": [
+        {
+            "name": "",
+            "email": "",
+            "url": ""
+        }
+    ],
+    "segment": {
+        "destPath": "drivers/peripheral/base"
+    },
+    "component": {
+        "name": "peripheral_base",
+        "subsystem": "hdf",
+        "syscap": [],
+        "features": [],
+        "adapted_system_type": [
+            "mini",
+            "small",
+            "standard"
+        ],
+        "rom": "",
+        "ram": "",
+        "deps": {
+            "components": [],
+            "third_party": []
+        },
+        "build": {
+            "sub_component": [],
+            "inner_kits": [],
+            "test": []
+        }
+    }
+}
