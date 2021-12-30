@@ -68,6 +68,7 @@ static void CloseDevice()
 {
     if (fd > 0) {
         close(fd);
+        fd = 0;
     }
     return;
 }
