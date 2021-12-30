@@ -73,6 +73,9 @@ CamRetCode StreamOperator::CreateStreams(const std::vector<std::shared_ptr<Strea
     }
 
     int count = streamInfos.size();
+    if (count <= 0) {
+        return DEVICE_ERROR;
+    }
     StreamInfoCIF* sis = new StreamInfoCIF[count];
     if (sis == nullptr) {
         return INSUFFICIENT_RESOURCES;
@@ -113,6 +116,9 @@ CamRetCode StreamOperator::ReleaseStreams(const std::vector<int>& streamIds)
     }
 
     int count = streamIds.size();
+    if (count <= 0) {
+        return DEVICE_ERROR;
+    }
     int* ids = new int[count];
     if (ids == nullptr) {
         return INSUFFICIENT_RESOURCES;
@@ -217,6 +223,9 @@ CamRetCode StreamOperator::Capture(int captureId, const std::shared_ptr<CaptureI
     }
 
     int count = pInfo->streamIds_.size();
+    if (count <= 0) {
+        return DEVICE_ERROR;
+    }
     int* ids = new int[count];
     if (ids == nullptr) {
         return INSUFFICIENT_RESOURCES;
@@ -261,6 +270,9 @@ CamRetCode StreamOperator::ChangeToOfflineStream(const std::vector<int>& streamI
     cb.OnFrameShutter = StreamCBOnFrameShutter;
 
     int count = streamIds.size();
+    if (count <= 0) {
+        return DEVICE_ERROR;
+    }
     int* ids = new int[count];
     if (ids == nullptr) {
         return INSUFFICIENT_RESOURCES;
