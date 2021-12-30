@@ -35,6 +35,7 @@
 #include <sys/mman.h>
 #include <osal_sem.h>
 #include <osal_thread.h>
+#include <inttypes.h>
 #include "usbhost_sdkapi_speed.h"
 
 #define HDF_LOG_TAG   USB_HOST_ACM
@@ -415,7 +416,7 @@ int main(int argc, char *argv[])
     gettimeofday(&time, NULL);
 
     printf("test SDK API [%s]\n", g_writeOrRead?"write":"read");
-    printf("Start: sec%ld usec%ld\n", time.tv_sec, time.tv_usec);
+    printf("Start: sec%" PRId64 " usec%" PRId64 "\n", time.tv_sec, time.tv_usec);
 
     for (i = 0; i < TEST_CYCLE; i++) {
         SerialBegin(acm);
