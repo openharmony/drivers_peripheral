@@ -661,7 +661,7 @@ int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
         HILOG_ERROR(LOG_DOMAIN, "%s: open socket failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    strncpy_s(req.ifr_name, IFNAMSIZ, ifName, sizeof(ifName));
+    strncpy_s(req.ifr_name, IFNAMSIZ, ifName, strlen(ifName));
     req.ifr_addr.sa_family = ARPHRD_ETHER;
     memcpy_s(req.ifr_hwaddr.sa_data, len, mac, len);
     ret = ioctl(fd, SIOCSIFHWADDR, &req);
@@ -721,7 +721,7 @@ int32_t GetDevMacAddr(const char *ifName,
         return RET_CODE_FAILURE;
     }
     req.ifr_addr.sa_family = AF_INET;
-    strncpy_s(req.ifr_name, IFNAMSIZ, ifName, sizeof(ifName));
+    strncpy_s(req.ifr_name, IFNAMSIZ, ifName, strlen(ifName));
     ret = ioctl(fd, SIOCGIFHWADDR, &req);
     if (ret != 0) {
         HILOG_ERROR(LOG_DOMAIN, "%s: ioctl failed", __FUNCTION__);
