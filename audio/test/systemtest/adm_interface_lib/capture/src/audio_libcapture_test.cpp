@@ -835,8 +835,6 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_0001, TestSize
     struct DevHandle *handle2 = BindServiceCaptureSo(BIND_CAPTURE.c_str());
     if (handle2 == nullptr) {
         CloseServiceCaptureSo(handle1);
-        free(hwCapture->captureParam.frameCaptureMode.buffer);
-        hwCapture->captureParam.frameCaptureMode.buffer = nullptr;
         free(hwCapture);
         ASSERT_NE(nullptr, handle2);
     }
@@ -868,12 +866,13 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_0001, TestSize
         EXPECT_EQ(HDF_SUCCESS, ret);
         ret = InterfaceLibOutputCapture(handle2, AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE, &hwCapture->captureParam);
         EXPECT_EQ(HDF_SUCCESS, ret);
+        if (hwCapture->captureParam.frameCaptureMode.buffer != nullptr) {
+            free(hwCapture->captureParam.frameCaptureMode.buffer);
+        }
+        free(hwCapture);
     }
     CloseServiceCaptureSo(handle1);
     CloseServiceCaptureSo(handle2);
-    free(hwCapture->captureParam.frameCaptureMode.buffer);
-    hwCapture->captureParam.frameCaptureMode.buffer = nullptr;
-    free(hwCapture);
 }
 /**
 * @tc.name  test InterfaceLibOutputCapture API via pause.
