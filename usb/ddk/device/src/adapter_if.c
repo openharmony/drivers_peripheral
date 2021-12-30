@@ -59,19 +59,22 @@ static bool IsDir(const char *path)
 
 static void GetFilePath(const char *path, const char *fileName, char *filePath)
 {
-    int ret;
-    ret = strcpy_s(filePath, MAX_PATHLEN - 1, path);
-    if (ret) {
-            HDF_LOGE("%s: strcpy_s failure!", __func__);
+    int32_t ret = strcpy_s(filePath, MAX_PATHLEN - 1, path);
+    if (ret != EOK) {
+        HDF_LOGE("%s: strcpy_s failure!", __func__);
+        return;
     }
+
     if (filePath[strlen(path) - 1] != '/') {
         ret = strcat_s(filePath, MAX_PATHLEN - 1, "/");
-        if (ret) {
+        if (ret != EOK) {
             HDF_LOGE("%s: strcat_s failure!", __func__);
+            return;
         }
     }
+
     ret = strcat_s(filePath, MAX_PATHLEN - 1, fileName);
-    if (ret) {
+    if (ret != EOK) {
         HDF_LOGE("%s: strcat_s failure!", __func__);
     }
 }
@@ -388,21 +391,19 @@ static int UsbFnAdapterDelInterface(const char *interfaceName, int nameLen)
 
 static int UsbFnAdapterOpenPipe(const char *interfaceName, int epIndex)
 {
-    int ret;
-    char epName[MAX_NAMELEN];
-    int i;
-    int ep = -1;
     if (interfaceName == NULL || epIndex < 0) {
         return HDF_ERR_INVALID_PARAM;
     }
 
-    ret = snprintf_s(epName, MAX_NAMELEN, MAX_NAMELEN - 1, "/dev/functionfs/%s.ep%u", interfaceName, epIndex);
+    char epName[MAX_NAMELEN];
+    int32_t ret = snprintf_s(epName, MAX_NAMELEN, MAX_NAMELEN - 1, "/dev/functionfs/%s.ep%d", interfaceName, epIndex);
     if (ret < 0) {
         HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_ERR_IO;
     }
 
-    for (i = 0; i < OPEN_CNT; i++) {
+    int ep = -1;
+    for (int32_t i = 0; i < OPEN_CNT; i++) {
         ep = open(epName, O_RDWR);
         if (ep > 0) {
             break;
