@@ -1,0 +1,53 @@
+{
+    "name": "@ohos/peripheral_display",
+    "version": "",
+    "description": "针对显示模块，提供基于HDF驱动框架的HDI及显示驱动",
+    "homePage": "https://gitee.com/openharmony",
+    "license": "Apache V2",
+    "repository": "https://gitee.com/openharmony/drivers_peripheral/tree/master/display",
+    "domain": "os",
+    "language": "",
+    "publishAs": "code-segment",
+    "private": false,
+    "scripts": {},
+    "tags": ["drivers"],
+    "keywords": ["peripheral", "display"],
+    "envs": [],
+    "dirs": [],
+    "author": {
+        "name": "",
+        "email": "",
+        "url": ""
+    },
+    "contributors": [
+        {
+            "name": "",
+            "email": "",
+            "url": ""
+        }
+    ],
+    "segment": {
+        "destPath": "drivers/peripheral/display"
+    },
+    "component": {
+        "name": "peripheral_display",
+        "subsystem": "hdf",
+        "syscap": [],
+        "features": [],
+        "adapted_system_type": [
+            "small",
+            "standard"
+        ],
+        "rom": "",
+        "ram": "",
+        "deps": {
+            "components": [],
+            "third_party": []
+        },
+        "build": {
+            "sub_component": [],
+            "inner_kits": [],
+            "test": []
+        }
+    }
+}
