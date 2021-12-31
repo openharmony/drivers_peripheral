@@ -665,11 +665,14 @@ static int32_t UsbSerialWrite(struct UsbSerial *port, struct HdfSBuf *data)
         HDF_LOGE("%s: OsalMemCalloc failed", __func__);
         return HDF_ERR_IO;
     }
-    if (strcpy_s(buf, strlen(tmp) + 1, tmp)) {
+
+    int32_t ret = strcpy_s(buf, strlen(tmp) + 1, tmp);
+    if (ret != EOK) {
         HDF_LOGE("%s: strcpy_s failed", __func__);
         OsalMemFree(buf);
         return HDF_ERR_IO;
     }
+
     size = DataFifoWrite(&port->writeFifo, (uint8_t *)buf, strlen(buf));
 
     if (port->acm) {
