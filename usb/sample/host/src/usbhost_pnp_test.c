@@ -47,8 +47,13 @@ static void TestPnpWriteLog(char *string)
 
     fp = fopen("/data/usbhost_pnp_xts", "a+");
 
-    (void)snprintf_s(str, STR_LEN, STR_LEN - 1, "[XTSCHECK] %d.%06d, %s\n",
+    int32_t ret = snprintf_s(str, STR_LEN, STR_LEN - 1, "[XTSCHECK] %d.%06d, %s\n",
         time.tv_sec, time.tv_usec, string);
+    if (ret < 0) {
+        HDF_LOGE("%s: sbuf write failed", __func__);
+        (void)fclose(fp);
+        return;
+    }
 
     (void)fwrite(str, strlen(str), 1, fp);
     (void)fclose(fp);
