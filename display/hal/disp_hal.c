@@ -47,7 +47,6 @@ EXIT:
 
 static int32_t GetInfo(uint32_t devId, struct DispInfo *info)
 {
-    int32_t ret;
     struct DispInfo *tmpInfo = NULL;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
@@ -71,8 +70,7 @@ static int32_t GetInfo(uint32_t devId, struct DispInfo *info)
         HDF_LOGE("HdfSbufWriteUint32 failure");
         goto EXIT;
     }
-    ret = DispCmdSend(DISP_CMD_GET_PANELINFO, data, reply);
-    if (ret != DISPLAY_SUCCESS) {
+    if (DispCmdSend(DISP_CMD_GET_PANELINFO, data, reply) != DISPLAY_SUCCESS) {
         HDF_LOGE("cmd:DISP_CMD_GET_PANEL_INFO failure");
         goto EXIT;
     }
@@ -81,7 +79,10 @@ static int32_t GetInfo(uint32_t devId, struct DispInfo *info)
         HDF_LOGE("HdfSbufReadBuffer failure");
         goto EXIT;
     }
-    (void)memcpy_s(info, sizeof(struct DispInfo), tmpInfo, dataSize);
+    if (memcpy_s(info, sizeof(struct DispInfo), tmpInfo, dataSize) != EOK) {
+        HDF_LOGE("memcpy_s failure");
+        goto EXIT;
+    }
     HDF_LOGI("tmpInfo->width = %u, tmpInfo->height = %u", tmpInfo->width, tmpInfo->height);
     HDF_LOGI("tmpInfo->hbp = %u, tmpInfo->hfp = %u", tmpInfo->hbp, tmpInfo->hfp);
     HDF_LOGI("tmpInfo->frameRate = %u", tmpInfo->frameRate);
