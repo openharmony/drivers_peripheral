@@ -28,7 +28,7 @@ namespace HalTest {
 struct IWiFi *g_wifi = nullptr;
 const int32_t USEC_TIME = 1000000;
 const int32_t MSEC_TIME = 1000;
-const int32_t COMMON_TIME = 3000;
+const int32_t COMMON_TIME = 18000;
 const int32_t MEDIUM_TIME = 20000;
 const int32_t LONG_TIME = 200000;
 const int32_t WLAN_BAND_2G = 0;
