@@ -165,7 +165,13 @@ static enum speedServer checkServer(const char* input)
         out = SDKAPI_SERVER;
         return out;
     }
-    strncpy_s(middle, sizeof(middle), input, strlen(input));
+
+    int32_t ret = strncpy_s(middle, sizeof(middle), input, strlen(input));
+    if (ret != EOK) {
+        HDF_LOGE("%s:%d strncpy_s failed", __func__, __LINE__);
+        return out;
+    }
+
     if (!strcmp(middle, "-SDK")) {
         out = SDKAPI_SERVER;
     } else if (!strcmp(middle, "-RAW")) {
