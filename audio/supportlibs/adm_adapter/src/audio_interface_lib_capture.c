@@ -1153,6 +1153,7 @@ int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
     char *buffer = NULL;
+    uint32_t dataSize;
     if (!pcm) { // if pcm is num, need create it first
         int format = PCM_FORMAT_S16_LE;
         if (g_hwParams.format == AUDIO_FORMAT_PCM_8_BIT) {
@@ -1182,11 +1183,13 @@ int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
         RoutePcmCardOpen(g_inDevInfo.card, DEV_IN_HANDS_FREE_MIC_CAPTURE_ROUTE);
     }
     if (pcm) {
-        uint32_t dataSize = pcm_frames_to_bytes(pcm, pcm_get_buffer_size(pcm));
+        dataSize = pcm_frames_to_bytes(pcm, pcm_get_buffer_size(pcm));
+        if (dataSize < 1) {
+            return HDF_FAILURE;
+        }
         buffer = malloc(dataSize);
         if (!buffer) {
             fprintf(stderr, "Unable to allocate \n");
-            free(buffer);
             pcm_close(pcm);
             return HDF_FAILURE;
         }
