@@ -31,8 +31,13 @@ uint64_t TestDisplay::GetCurrentLocalTimeStamp()
 
 int32_t TestDisplay::SaveYUV(char* type, unsigned char* buffer, int32_t size)
 {
+    int ret;
     char path[PATH_MAX] = {0};
-    sprintf_s(path, sizeof(path) / sizeof(path[0]), "/mnt/yuv/%s_%lld.yuv", type, GetCurrentLocalTimeStamp());
+    ret = sprintf_s(path, sizeof(path) / sizeof(path[0]), "/mnt/yuv/%s_%lld.yuv", type, GetCurrentLocalTimeStamp());
+    if (ret < 0) {
+        CAMERA_LOGE("%s, sprintf_s failed, errno = %s.", __FUNCTION__, strerror(errno));
+        return -1;
+    }
     CAMERA_LOGI("%s, save yuv to file %s", __FUNCTION__, path);
     system("mkdir -p /mnt/yuv");
     int imgFd = open(path, O_RDWR | O_CREAT, 00766); // 00766: file permissions
