@@ -47,6 +47,9 @@ CamRetCode OfflineStreamOperator::ReleaseStreams(const std::vector<int>& streamI
     }
 
     int count = streamIds.size();
+    if (count <= 0) {
+        return DEVICE_ERROR;
+    }
     int* ids = new int[count];
     if (ids == nullptr) {
         return INSUFFICIENT_RESOURCES;
