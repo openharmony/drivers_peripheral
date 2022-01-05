@@ -16,8 +16,11 @@
 #include "allocator_proxy.h"
 #include <message_parcel.h>
 #include "buffer_handle_parcel.h"
+#include "iremote_object.h"
 #include "iservmgr_hdi.h"
 #include "parcel_utils.h"
+#include "refbase.h"
+#include "unistd.h"
 
 #define HDF_LOG_TAG HDI_DISP_PROXY
 
@@ -29,12 +32,23 @@ sptr<IDisplayAllocator> IDisplayAllocator::Get(const char *serviceName)
 {
     do {
         using namespace OHOS::HDI::ServiceManager::V1_0;
-        static sptr<IServiceManager> servMgr = IServiceManager::Get();
-        if (servMgr == nullptr) {
-            HDF_LOGE("%{public}s: IServiceManager failed", __func__);
-            break;
-        }
-        auto remote = servMgr->GetService(serviceName);
+
+        static sptr<IServiceManager> servMgr = nullptr;
+        uint32_t cnt = 0;
+        do {
+            servMgr = IServiceManager::Get();
+            HDF_LOGE("%{public}s: IServiceManager cnt:%{public}d", __func__, ++cnt);
+            usleep(10000);  // 10 ms
+        } while (servMgr == nullptr);
+
+        cnt = 0;
+        sptr<IRemoteObject> remote = nullptr;
+        do {
+            remote = servMgr->GetService(serviceName);
+            HDF_LOGE("%{public}s: get IServiceManager IDisplayAllocator cnt:%{public}d", __func__, ++cnt);
+            usleep(10000);  // 10 ms
+        } while (remote == nullptr);
+
         if (remote != nullptr) {
             sptr<AllocatorProxy> hostSptr = iface_cast<AllocatorProxy>(remote);
             if (hostSptr == nullptr) {
