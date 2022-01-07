@@ -111,6 +111,10 @@ std::shared_ptr<AlgoPlugin> IppAlgoParser::ConstructPlugin(const DeviceResourceN
         CAMERA_LOGE("get algo path failed");
         return nullptr;
     }
+    std::string nodeName = std::string(path);
+    if (path[0] != '/') {
+        nodeName = nodeName.insert(0, HDF_LIBRARY_PATH_DIR "/");
+    }
 
     const char* mode = nullptr;
     ret = devResInstance_->GetString(node, "mode", &mode, nullptr);

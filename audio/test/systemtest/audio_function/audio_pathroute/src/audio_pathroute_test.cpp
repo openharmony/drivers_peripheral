@@ -73,11 +73,7 @@ void *AudioPathRouteTest::handleSo = nullptr;
 
 void AudioPathRouteTest::SetUpTestCase(void)
 {
-#ifdef __LITEOS__
-    char resolvedPath[] = "/usr/lib/libhdi_audio.so";
-#else
-    char resolvedPath[] = "//system/lib/libhdi_audio.z.so";
-#endif
+    char resolvedPath[] = HDF_LIBRARY_PATH_DIR"/libhdi_audio"HDF_LIBRARY_SUFFIX;
     handleSo = dlopen(resolvedPath, RTLD_LAZY);
     if (handleSo == nullptr) {
         return;
