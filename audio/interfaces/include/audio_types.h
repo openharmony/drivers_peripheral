@@ -220,6 +220,42 @@ struct AudioSubPortCapability {
 };
 
 /**
+ * @brief Defines formats of raw audio samples.
+ */
+enum AudioSampleFormat {
+    /* 8 bits */
+    AUDIO_SAMPLE_FORMAT_S8,   /**< signed 8 bit sample */
+    AUDIO_SAMPLE_FORMAT_S8P,  /**< signed 8 bit planar sample */
+    AUDIO_SAMPLE_FORMAT_U8,   /**< unsigned 8 bit sample */
+    AUDIO_SAMPLE_FORMAT_U8P,  /**< unsigned 8 bit planar sample */
+    /* 16 bits */
+    AUDIO_SAMPLE_FORMAT_S16,  /**< signed 16 bit sample */
+    AUDIO_SAMPLE_FORMAT_S16P, /**< signed 16 bit planar sample */
+    AUDIO_SAMPLE_FORMAT_U16,  /**< unsigned 16 bit sample */
+    AUDIO_SAMPLE_FORMAT_U16P, /**< unsigned 16 bit planar sample */
+    /* 24 bits */
+    AUDIO_SAMPLE_FORMAT_S24,  /**< signed 24 bit sample */
+    AUDIO_SAMPLE_FORMAT_S24P, /**< signed 24 bit planar sample */
+    AUDIO_SAMPLE_FORMAT_U24,  /**< unsigned 24 bit sample */
+    AUDIO_SAMPLE_FORMAT_U24P, /**< unsigned 24 bit planar sample */
+    /* 32 bits */
+    AUDIO_SAMPLE_FORMAT_S32,  /**< signed 32 bit sample */
+    AUDIO_SAMPLE_FORMAT_S32P, /**< signed 32 bit planar sample */
+    AUDIO_SAMPLE_FORMAT_U32,  /**< unsigned 32 bit sample */
+    AUDIO_SAMPLE_FORMAT_U32P, /**< unsigned 32 bit planar sample */
+    /* 64 bits */
+    AUDIO_SAMPLE_FORMAT_S64,  /**< signed 64 bit sample */
+    AUDIO_SAMPLE_FORMAT_S64P, /**< signed 64 bit planar sample */
+    AUDIO_SAMPLE_FORMAT_U64,  /**< unsigned 64 bit sample */
+    AUDIO_SAMPLE_FORMAT_U64P, /**< unsigned 64 bit planar sample */
+    /* float double */
+    AUDIO_SAMPLE_FORMAT_F32,  /**< float 32 bit sample */
+    AUDIO_SAMPLE_FORMAT_F32P, /**< float 32 bit planar sample */
+    AUDIO_SAMPLE_FORMAT_F64,  /**< double 64 bit sample */
+    AUDIO_SAMPLE_FORMAT_F64P, /**< double 64 bit planar sample */
+};
+
+/**
  * @brief Defines the audio port capability.
  */
 struct AudioPortCapability {
@@ -235,6 +271,10 @@ struct AudioPortCapability {
     uint32_t channelCount;                   /**< Supported maximum number of audio channels */
     uint32_t subPortsNum;                    /**< Number of supported sub-ports (for output devices only) */
     struct AudioSubPortCapability *subPorts; /**< List of supported sub-ports */
+    uint32_t supportSampleFormatNum;         /**< Number of the supported audio sample format enum. */
+    enum AudioSampleFormat *supportSampleFormats; /**< Supported audio sample formats. For details,
+                                                   * see {@link AudioSampleFormat}.
+                                                   */
 };
 
 /**
