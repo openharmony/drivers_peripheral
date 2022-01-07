@@ -18,6 +18,7 @@
 #include <csignal>
 #include <unistd.h>
 #include <gtest/gtest.h>
+#include "hdf_base.h"
 #include "usb_utils.h"
 
 using namespace std;
@@ -45,7 +46,7 @@ protected:
 HWTEST_F(UsbDevicePerformanceTest, CheckDeviceSdkRom, TestSize.Level1)
 {
     printf("------start CheckDeviceSdkRom------\n");
-    const char *hostSdkPath = "/system/lib/libusb_ddk_device.z.so";
+    const char *hostSdkPath = HDF_LIBRARY_PATH_DIR"/libusb_ddk_device.z.so";
     long size = 0;
     FILE *fp = fopen(hostSdkPath, "rb");
     fseek(fp, 0, SEEK_END);
