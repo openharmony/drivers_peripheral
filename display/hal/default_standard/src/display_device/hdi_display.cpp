@@ -231,7 +231,6 @@ VsyncCallBack::VsyncCallBack(VBlankCallback cb, void *data) : mVBlankCb(cb), mDa
 
 void VsyncCallBack::Vsync(unsigned int sequence, uint64_t ns)
 {
-    DISPLAY_LOGD();
     DISPLAY_CHK_RETURN_NOT_VALUE((mVBlankCb == nullptr), DISPLAY_LOGE("the callback is nullptr"));
     mVBlankCb(sequence, ns, mData);
 }
