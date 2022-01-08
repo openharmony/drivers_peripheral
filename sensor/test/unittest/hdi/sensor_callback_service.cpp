@@ -89,25 +89,18 @@ namespace {
 
 int32_t SensorCallbackService::OnDataEvent(const HdfSensorEvents& event)
 {
-    void *origin = OsalMemCalloc(sizeof(uint8_t) * (event.dataLen));
-    uint8_t *tmp = static_cast<uint8_t*>(origin);
-    uint8_t *eventData = tmp;
-    for (auto value : event.data) {
-       *tmp++ = value;
-    }
-
     for (int i = 0; i < g_listNum; ++i) {
         if (event.sensorId == g_sensorList[i].sensorTypeId) {
             if (event.sensorId == SENSOR_TYPE_HALL || event.sensorId == SENSOR_TYPE_PROXIMITY) {
-                float data = static_cast<float>(*eventData);
+                float data = static_cast<float>(event.data[0]);
                 SensorDataVerification(data, g_sensorList[i]);
             } else {
-                float *data = (float*)eventData;
+                float *data = (float*)(&event.data[0]);
                 SensorDataVerification(*data, g_sensorList[i]);
             }
         }
     }
-    OsalMemFree(origin);
+
     return HDF_SUCCESS;
 }
 } // v1_0
