@@ -178,9 +178,6 @@ int32_t InputDeviceManager::GetInputDeviceInfo(int fd, DeviceInfo* detailInfo)
     detailInfo->attrSet.id.product = inputId.product;
     detailInfo->attrSet.id.vendor = inputId.vendor;
     detailInfo->attrSet.id.version = inputId.version;
-    HDF_LOGI("get the busType: %{public}d product: %{public}d vendor: %{public}d version: %{public}d",
-            detailInfo->attrSet.id.busType, detailInfo->attrSet.id.product,
-            detailInfo->attrSet.id.vendor, detailInfo->attrSet.id.version);
     // ABS Info
     for (int i = 0; i < ABS_CNT; i++) {
         if (detailInfo->abilitySet.absCode[i] > 0) {
@@ -265,18 +262,18 @@ int32_t InputDeviceManager::DoInputDeviceAction(void)
         result = epoll_wait(mEpollId_, epollEventList_, EPOLL_MAX_EVENTS, EPOLL_WAIT_TIMEOUT);
         if (result <= 0) {
             HDF_LOGE("no atction happened !!!");
-        } else {
-            HDF_LOGD("file event happen result is %{public}d", result);
-            int i = 0;
-            for (i = 0; i < result; i++) {
-                if (epollEventList_[i].data.fd != mInotifyId_) {
-                    DoRead(epollEventList_[i].data.fd, evtBuffer, EVENT_BUFFER_SIZE);
-                    continue;
-                }
-                if (INPUT_FAILURE == InotifyEventHandler(mEpollId_, mInotifyId_)) {
-                    HDF_LOGE("inotify handler failed!!!");
-                    return INPUT_FAILURE;
-                }
+            continue;
+        }
+        HDF_LOGD("file event happen result is %{public}d", result);
+        int i = 0;
+        for (i = 0; i < result; i++) {
+            if (epollEventList_[i].data.fd != mInotifyId_) {
+                DoRead(epollEventList_[i].data.fd, evtBuffer, EVENT_BUFFER_SIZE);
+                continue;
+            }
+            if (INPUT_FAILURE == InotifyEventHandler(mEpollId_, mInotifyId_)) {
+                HDF_LOGE("inotify handler failed!!!");
+                return INPUT_FAILURE;
             }
         }
     }

@@ -230,8 +230,8 @@ void InputDeviceManager::GetInputDeviceInfoList(int32_t epollFd)
                 inputDevList.fd = fd;
                 detailInfo->devIndex = devIndex_;
                 detailInfo->devType = type;
-                (void)memcpy_s(&inputDevList.devPathNode,
-                                devPathNode.length(), devPathNode.c_str(), devPathNode.length());
+                (void)memcpy_s(&inputDevList.devPathNode, devPathNode.length(),
+                                devPathNode.c_str(), devPathNode.length());
                 (void)memcpy_s(&inputDevList.detailInfo, sizeof(DeviceInfo), detailInfo.get(), sizeof(DeviceInfo));
                 inputDevList_.insert_or_assign(devIndex_, inputDevList);
                 devIndex_ += 1;
