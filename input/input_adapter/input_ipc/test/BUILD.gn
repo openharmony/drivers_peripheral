@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
-hdi_input_base_path="//drivers/peripheral/hidl_adapter/input_ipc"
+hdi_input_base_path = "//drivers/peripheral/hidl_adapter/input_ipc"
 module_output_path = "hidl_adapter/input_ipc"
 config("camhdi_impl_utest_config") {
   visibility = [ ":*" ]
@@ -43,7 +43,7 @@ config("camhdi_impl_utest_config") {
   ]
 }
 
-ohos_unittest ("hdi_input_unittest_neu_ipc") {
+ohos_unittest("hdi_input_unittest_neu_ipc") {
   testonly = true
   module_out_path = module_output_path
   install_enable = true
@@ -76,6 +76,7 @@ ohos_unittest ("hdi_input_unittest_neu_ipc") {
     "//foundation/graphic/standard/utils/include",
     "//foundation/communication/ipc/ipc/native/src/core/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+
     # HCS
     "//drivers/framework/include/config",
     "//drivers/framework/include/osal",
@@ -108,8 +109,8 @@ ohos_unittest ("hdi_input_unittest_neu_ipc") {
 
   if (is_standard_system) {
     external_deps = [
-      "ipc:ipc_core",
       "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -117,5 +118,4 @@ ohos_unittest ("hdi_input_unittest_neu_ipc") {
 
   external_deps += [ "samgr_L2:samgr_proxy" ]
   public_configs = [ ":camhdi_impl_utest_config" ]
-
 }
