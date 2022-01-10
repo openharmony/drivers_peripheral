@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,13 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <array>
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include "input_server_stub.h"
 #include "securec.h"
+
 #define HDF_LOG_TAG InputServerStub
+
 namespace OHOS {
 namespace Input {
 int32_t InputServerStub::InputServerStubScanInputDevice(MessageParcel &data,
@@ -430,7 +433,7 @@ void InputStubRelease(void *obj)
     delete reinterpret_cast<InputServerStub *>(obj);
 }
 
-int32_t InputServiceOnRemoteRequest(void *stub, int cmdId, struct HdfSBuf& data, struct HdfSBuf& reply)
+int32_t InputServiceOnRemoteRequest(void *stub, int32_t cmdId, struct HdfSBuf& data, struct HdfSBuf& reply)
 {
     HDF_LOGI("%{public}s: line%{public}d!", __func__, __LINE__);
     using namespace OHOS::Input;

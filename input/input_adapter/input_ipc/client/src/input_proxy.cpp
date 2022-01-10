@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,9 @@
 #include <hdf_base.h>
 #include <message_parcel.h>
 #include "securec.h"
+
 #define HDF_LOG_TAG InputProxy
+
 namespace OHOS {
 namespace Input {
 int32_t InputProxy::SetPowerStatus(uint32_t devIndex, uint32_t status)
@@ -25,6 +27,7 @@ int32_t InputProxy::SetPowerStatus(uint32_t devIndex, uint32_t status)
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
+
     if (!data.WriteUint32(devIndex)) {
         HDF_LOGE("%{public}s: write devIndex failed.", __func__);
         return INPUT_INVALID_PARAM;
@@ -46,6 +49,7 @@ int32_t InputProxy::GetPowerStatus(uint32_t devIndex, uint32_t *status)
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
+
     if (!data.WriteUint32(devIndex)) {
         HDF_LOGE("InputProxy %{public}s: write devIndex failed.", __func__);
         return INPUT_FAILURE;
@@ -62,10 +66,10 @@ int32_t InputProxy::GetPowerStatus(uint32_t devIndex, uint32_t *status)
 
 int32_t InputProxy::GetDeviceType(uint32_t devIndex, uint32_t *status)
 {
-    HDF_LOGE("InputProxy %{public}s: called", __func__);
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
+
     if (!data.WriteUint32(devIndex)) {
         HDF_LOGE("InputProxy %{public}s: write devIndex failed.", __func__);
         return INPUT_FAILURE;
@@ -84,7 +88,7 @@ int32_t InputProxy::GetChipInfo(uint32_t devIndex, char *chipInfo, uint32_t leng
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
-    HDF_LOGE("InputProxy::%{public}s", __func__);
+
     if (!data.WriteUint32(devIndex)) {
         HDF_LOGE("InputProxy %{public}s: write devIndex failed.", __func__);
         return INPUT_INVALID_PARAM;
@@ -103,13 +107,13 @@ int32_t InputProxy::GetChipInfo(uint32_t devIndex, char *chipInfo, uint32_t leng
         return INPUT_FAILURE;
     }
     uint32_t retValueLen = reply.ReadUint32();
-    HDF_LOGE("InputProxy %{public}s: called retValueLen:%{public}d", __func__, retValueLen);
+    HDF_LOGD("InputProxy %{public}s: called retValueLen:%{public}d", __func__, retValueLen);
     ret = memcpy_s(chipInfo, retValueLen, reply.ReadBuffer(retValueLen), retValueLen);
     if (ret != 0) {
         HDF_LOGE("InputProxy %{public}s: memcpy_s failed.", __func__);
         return INPUT_FAILURE;
     }
-    HDF_LOGE("InputProxy %{public}s: called chipName:%{public}s", __func__, chipInfo);
+    HDF_LOGI("InputProxy %{public}s: called chipName:%{public}s", __func__, chipInfo);
     return INPUT_SUCCESS;
 }
 
@@ -118,6 +122,7 @@ int32_t InputProxy::GetVendorName(uint32_t devIndex, char *vendorName, uint32_t 
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
+
     if (!data.WriteUint32(devIndex)) {
         HDF_LOGE("InputProxy %{public}s: write devIndex failed.", __func__);
         return INPUT_INVALID_PARAM;
@@ -136,13 +141,13 @@ int32_t InputProxy::GetVendorName(uint32_t devIndex, char *vendorName, uint32_t 
         return INPUT_FAILURE;
     }
     uint32_t retValueLen = reply.ReadUint32();
-    HDF_LOGE("InputProxy %{public}s: called retValueLen:%{public}d", __func__, retValueLen);
+    HDF_LOGI("InputProxy %{public}s: called retValueLen:%{public}d", __func__, retValueLen);
     ret = memcpy_s(vendorName, retValueLen, reply.ReadBuffer(retValueLen), retValueLen);
     if (ret != 0) {
         HDF_LOGE("InputProxy %{public}s: memcpy_s failed.", __func__);
         return INPUT_FAILURE;
     }
-    HDF_LOGE("InputProxy %{public}s: called vendorName:%{public}s", __func__, vendorName);
+    HDF_LOGI("InputProxy %{public}s: called vendorName:%{public}s", __func__, vendorName);
     return INPUT_SUCCESS;
 }
 
@@ -151,6 +156,7 @@ int32_t InputProxy::GetChipName(uint32_t devIndex, char *chipName, uint32_t leng
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
+
     if (!data.WriteUint32(devIndex)) {
         HDF_LOGE("InputProxy %{public}s: write devIndex failed.", __func__);
         return INPUT_INVALID_PARAM;
@@ -169,13 +175,13 @@ int32_t InputProxy::GetChipName(uint32_t devIndex, char *chipName, uint32_t leng
         return INPUT_FAILURE;
     }
     uint32_t retValueLen = reply.ReadUint32();
-    HDF_LOGE("InputProxy %{public}s: called retValueLen:%{public}d", __func__, retValueLen);
+    HDF_LOGI("InputProxy %{public}s: called retValueLen:%{public}d", __func__, retValueLen);
     ret = memcpy_s(chipName, retValueLen, reply.ReadBuffer(retValueLen), retValueLen);
     if (ret != 0) {
         HDF_LOGE("%{public}s: memcpy_s failed.", __func__);
         return INPUT_FAILURE;
     }
-    HDF_LOGE("InputProxy %{public}s: called chipName:%{public}s", __func__, chipName);
+    HDF_LOGI("InputProxy %{public}s: called chipName:%{public}s", __func__, chipName);
     return INPUT_SUCCESS;
 }
 
@@ -184,6 +190,7 @@ int32_t InputProxy::SetGestureMode(uint32_t devIndex, uint32_t gestureMode)
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
+
     if (!data.WriteUint32(devIndex)) {
         HDF_LOGE("InputProxy %{public}s: write devIndex failed.", __func__);
         return INPUT_INVALID_PARAM;
@@ -205,6 +212,7 @@ int32_t InputProxy::RunCapacitanceTest(uint32_t devIndex, uint32_t testType, cha
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
+
     if (!data.WriteUint32(devIndex)) {
         HDF_LOGE("%{public}s: write devIndex failed.", __func__);
         return INPUT_INVALID_PARAM;
@@ -239,6 +247,7 @@ int32_t InputProxy::RunExtraCommand(uint32_t devIndex, InputExtraCmd *cmd)
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
+
     if (!data.WriteUint32(devIndex)) {
         HDF_LOGE("InputProxy %{public}s: write devIndex failed.", __func__);
         return INPUT_INVALID_PARAM;
@@ -267,7 +276,7 @@ int32_t InputProxy::ScanInputDevice(DevDesc *staArr, uint32_t arrLen)
         return INPUT_INVALID_PARAM;
     }
     uint32_t readValLen = reply.ReadUint32();
-    HDF_LOGE("InputProxy %{public}s: called line:%{public}d readValLen:%{public}d cnt:%{public}d",
+    HDF_LOGD("InputProxy %{public}s: called line:%{public}d readValLen:%{public}d cnt:%{public}d",
              __func__, __LINE__, readValLen, readValLen/sizeof(DevDesc));
     DevDesc* tmpStaArr = (DevDesc*)reply.ReadBuffer(readValLen);
     if (tmpStaArr != nullptr) {
@@ -285,6 +294,7 @@ int32_t InputProxy::OpenInputDevice(uint32_t devIndex)
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
+
     if (!data.WriteUint32(devIndex)) {
         HDF_LOGE("InputProxy %{public}s: write devIndex failed.", __func__);
         return INPUT_INVALID_PARAM;
@@ -319,6 +329,7 @@ int32_t InputProxy::GetInputDevice(uint32_t devIndex, DeviceInfo **devInfo)
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
+
     if (!data.WriteUint32(devIndex)) {
         HDF_LOGE("InputProxy %{public}s: write devIndex failed.", __func__);
         return INPUT_FAILURE;
@@ -330,7 +341,7 @@ int32_t InputProxy::GetInputDevice(uint32_t devIndex, DeviceInfo **devInfo)
     }
     uint32_t readLen = reply.ReadUint32();
     DeviceInfo* tmpDevInfo = (DeviceInfo*) new DeviceInfo();
-    memcpy_s(tmpDevInfo, readLen, (DeviceInfo*)(reply.ReadBuffer(readLen)), readLen);
+    (void)memcpy_s(tmpDevInfo, readLen, (DeviceInfo*)(reply.ReadBuffer(readLen)), readLen);
     if (tmpDevInfo == nullptr) {
         HDF_LOGE("InputProxy %{public}s: called line:%{public}d tmpDevInfo:%{public}p",
                  __func__, __LINE__, tmpDevInfo);
@@ -346,6 +357,7 @@ int32_t InputProxy::GetInputDeviceList(uint32_t *devNum, DeviceInfo **devList, u
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
+
     if (!data.WriteUint32(size)) {
         HDF_LOGE("InputProxy %{public}s: write devIndex failed.", __func__);
         return INPUT_FAILURE;
@@ -361,7 +373,7 @@ int32_t InputProxy::GetInputDeviceList(uint32_t *devNum, DeviceInfo **devList, u
         return INPUT_FAILURE;
     }
     uint32_t readLen = reply.ReadUint32();
-    memcpy_s(*devList, readLen, (DeviceInfo*)(reply.ReadBuffer(readLen)), readLen);
+    (void)memcpy_s(*devList, readLen, (DeviceInfo*)(reply.ReadBuffer(readLen)), readLen);
     HDF_LOGI("devNum:%{public}d devList:%{public}p", *devNum, *devList);
     return INPUT_SUCCESS;
 }
@@ -371,6 +383,7 @@ int32_t InputProxy::RegisterReportCallback(uint32_t devIndex, OHOS::sptr<InputRe
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
+
     if (!data.WriteUint32(devIndex)) {
         HDF_LOGE("InputProxy %{public}s: write devIndex failed.", __func__);
         return INPUT_FAILURE;
@@ -401,6 +414,7 @@ int32_t InputProxy::UnregisterReportCallback(uint32_t devIndex)
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
+
     if (!data.WriteUint32(devIndex)) {
         HDF_LOGE("%{public}s: write devIndex failed.", __func__);
         return INPUT_FAILURE;
@@ -419,6 +433,7 @@ int32_t InputProxy::RegisterHotPlugCallback(OHOS::sptr<InputReportHostCb> callba
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
+
     if (callback == nullptr) {
         HDF_LOGE("InputProxy %{public}s: called line:%{public}d", __func__, __LINE__);
         return INPUT_FAILURE;
@@ -446,6 +461,7 @@ int32_t InputProxy::UnregisterHotPlugCallback(void)
     MessageParcel data = {};
     MessageParcel reply = {};
     MessageOption option = {};
+
     int32_t ret = Remote()->SendRequest(CMD_INPUT_UNREGISTER_HOT_PLAUS_DEVICE_PROXY, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("InputProxy%{public}s: SendRequest failed, error code is %{public}d line %{public}d",

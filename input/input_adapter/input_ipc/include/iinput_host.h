@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,12 +14,14 @@
  */
 #ifndef IINPUT_HOST_H
 #define IINPUT_HOST_H
+
 #include <list>
 #include <map>
 #include <vector>
 #include <hdf_log.h>
 #include <iservmgr_hdi.h>
 #include "iinput_host_callbck.h"
+
 namespace OHOS {
 namespace Input {
 enum {

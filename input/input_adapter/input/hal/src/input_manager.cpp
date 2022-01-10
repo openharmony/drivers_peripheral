@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -122,22 +122,25 @@ static int32_t UnregisterHotPlugCallback(void)
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 int32_t InstanceReporterHdi(InputReporter **hdi);
 int32_t InstanceControllerHdi(InputController **hdi);
 static int32_t InstanceManagerHdi(InputManager **manager)
 {
-    InputManager *managerHdi = (InputManager *)malloc(sizeof(InputManager));
+    InputManager *managerHdi = (InputManager *)OsalMemAlloc(sizeof(InputManager));
     if (managerHdi == nullptr) {
-        HDF_LOGE("%s: malloc fail", __func__);
+        HDF_LOGE("%s: OsalMemAlloc fail", __func__);
         return INPUT_NOMEM;
     }
+    (void)memset_s(managerHdi, sizeof(InputManager), 0, sizeof(InputManager));
     gInputDeviceManager_ = std::make_shared<InputDeviceManager>();
     if (!gInputDeviceManager_) {
         HDF_LOGE("input_manager %{public}s: failed !!!", __func__);
+        OsalMemFree(managerHdi);
+        managerHdi = nullptr;
         return INPUT_NOMEM;
     }
     gInputDeviceManager_->Init();
-    (void)memset_s(managerHdi, sizeof(InputManager), 0, sizeof(InputManager));
     managerHdi->ScanInputDevice = &ScanInputDevice;
     managerHdi->OpenInputDevice = &OpenInputDevice;
     managerHdi->CloseInputDevice = &CloseInputDevice;
@@ -149,19 +152,20 @@ static int32_t InstanceManagerHdi(InputManager **manager)
 
 int32_t InstanceControllerHdi(InputController **controller)
 {
-    InputController *controllerHdi = (InputController *)malloc(sizeof(InputController));
+    InputController *controllerHdi = (InputController *)OsalMemAlloc(sizeof(InputController));
     if (controllerHdi == nullptr) {
-        HDF_LOGE("%{public}s: malloc fail", __func__);
+        HDF_LOGE("%{public}s: OsalMemAlloc fail", __func__);
         return INPUT_NOMEM;
     }
+    (void)memset_s(controllerHdi, sizeof(InputController), 0, sizeof(InputController));
     return INPUT_SUCCESS;
 }
 
 int32_t InstanceReporterHdi(InputReporter **reporter)
 {
-    InputReporter *reporterHdi = (InputReporter *)malloc(sizeof(InputReporter));
+    InputReporter *reporterHdi = (InputReporter *)OsalMemAlloc(sizeof(InputReporter));
     if (reporterHdi == nullptr) {
-        HDF_LOGE("%s: malloc fail", __func__);
+        HDF_LOGE("%s: OsalMemAlloc fail", __func__);
         return INPUT_NOMEM;
     }
     (void)memset_s(reporterHdi, sizeof(InputReporter), 0, sizeof(InputReporter));
@@ -176,26 +180,26 @@ int32_t InstanceReporterHdi(InputReporter **reporter)
 static void FreeInputHdi(IInputInterface *hdi)
 {
     if (hdi->iInputManager != nullptr) {
-        free(hdi->iInputManager);
+        OsalMemFree(hdi->iInputManager);
         hdi->iInputManager = nullptr;
     }
     if (hdi->iInputController != nullptr) {
-        free(hdi->iInputController);
+        OsalMemFree(hdi->iInputController);
         hdi->iInputController = nullptr;
     }
     if (hdi->iInputReporter != nullptr) {
-        free(hdi->iInputReporter);
+        OsalMemFree(hdi->iInputReporter);
         hdi->iInputReporter = nullptr;
     }
-    free(hdi);
+    OsalMemFree(hdi);
 }
 
 static IInputInterface *InstanceInputHdi(void)
 {
     int32_t ret;
-    IInputInterface *hdi = (IInputInterface *)malloc(sizeof(IInputInterface));
+    IInputInterface *hdi = (IInputInterface *)OsalMemAlloc(sizeof(IInputInterface));
     if (hdi == nullptr) {
-        HDF_LOGE("%s: malloc fail", __func__);
+        HDF_LOGE("%s: OsalMemAlloc fail", __func__);
         return nullptr;
     }
     (void)memset_s(hdi, sizeof(IInputInterface), 0, sizeof(IInputInterface));

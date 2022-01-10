@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,11 +28,11 @@ using namespace testing::ext;
 static IInputInterface *g_inputInterface;
 static InputEventCb g_callback;
 static InputHostCb g_hotplugCb;
-static const int KEEP_ALIVE_TIME_MS = 100000;
-static const int TOUCH_INDEX = 1;
-static const int INVALID_INDEX = 15;
-static const int INVALID_INDEX1 = -1;
-static const int MAX_DEVICES = 32;
+static const int32_t KEEP_ALIVE_TIME_MS = 100000;
+static const int32_t TOUCH_INDEX = 1;
+static const int32_t INVALID_INDEX = 15;
+static const int32_t INVALID_INDEX1 = -1;
+static const int32_t MAX_DEVICES = 32;
 class HdiInputTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -52,7 +52,7 @@ void HdiInputTest::SetUpTestCase()
 void HdiInputTest::TearDownTestCase()
 {
     if (g_inputInterface != NULL) {
-        free(g_inputInterface);
+        OsalMemFree(g_inputInterface);
         g_inputInterface = NULL;
     }
 }

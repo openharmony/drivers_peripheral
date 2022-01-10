@@ -29,6 +29,7 @@
 #include <unistd.h>
 #include "securec.h"
 #include "iservice_registry.h"
+
 class InputHdiBaseTest : public testing::Test {
 public:
     static void SetUpTestCase(void);

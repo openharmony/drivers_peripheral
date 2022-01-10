@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,6 +48,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 #define MAX_INPUT_DEV_NUM 32
 #define MAX_NODE_PATH_LEN 64
 #define CHIP_INFO_LEN 10
@@ -63,6 +64,7 @@ extern "C" {
 #define BYTE_HAS_BITS 8
 #define BITS_TO_UINT64(count)    DIV_ROUND_UP(count, BYTE_HAS_BITS * sizeof(unsigned long))
 #define HDF_FF_CNT    (0x7f + 1)
+
 /**
  * @brief Enumerates return values.
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,24 +45,24 @@ public:
     virtual int32_t RegisterHotPlugCallback(OHOS::sptr<InputReportHostCb> callback) override;
     virtual int32_t UnregisterHotPlugCallback(void) override;
 private:
-    static constexpr int CMD_INPUT_SCAN_DEVICE_PROXY = 0;
-    static constexpr int CMD_INPUT_OPNE_DEVICE_PROXY = 1;
-    static constexpr int CMD_INPUT_CLOSE_DEVICE_PROXY = 2;
-    static constexpr int CMD_INPUT_GET_DEVICE_PROXY = 3;
-    static constexpr int CMD_INPUT_GET_DEVICE_LIST_PROXY = 4;
-    static constexpr int CMD_INPUT_SET_POWER_STATUS_PROXY = 5;
-    static constexpr int CMD_INPUT_GET_POWER_STATUS_PROXY = 6;
-    static constexpr int CMD_INPUT_GET_DEVICE_TYPE_PROXY = 7;
-    static constexpr int CMD_INPUT_GET_CHIP_INFO_PROXY = 8;
-    static constexpr int CMD_INPUT_GET_VENDOR_NAME_PROXY = 9;
-    static constexpr int CMD_INPUT_GET_CHIP_NAME_PROXY = 10;
-    static constexpr int CMD_INPUT_SET_GESTURE_MODE_PROXY = 11;
-    static constexpr int CMD_INPUT_RUN_CAPACITANCE_TEST_PROXY = 12;
-    static constexpr int CMD_INPUT_RUN_EXTRA_COMMAND_PROXY = 13;
-    static constexpr int CMD_INPUT_REGISTER_DEVICE_PROXY = 14;
-    static constexpr int CMD_INPUT_UNREGISTER_DEVICE_PROXY = 15;
-    static constexpr int CMD_INPUT_REGISTER_HOT_PLAUS_DEVICE_PROXY = 16;
-    static constexpr int CMD_INPUT_UNREGISTER_HOT_PLAUS_DEVICE_PROXY = 17;
+    static constexpr int32_t CMD_INPUT_SCAN_DEVICE_PROXY = 0;
+    static constexpr int32_t CMD_INPUT_OPNE_DEVICE_PROXY = 1;
+    static constexpr int32_t CMD_INPUT_CLOSE_DEVICE_PROXY = 2;
+    static constexpr int32_t CMD_INPUT_GET_DEVICE_PROXY = 3;
+    static constexpr int32_t CMD_INPUT_GET_DEVICE_LIST_PROXY = 4;
+    static constexpr int32_t CMD_INPUT_SET_POWER_STATUS_PROXY = 5;
+    static constexpr int32_t CMD_INPUT_GET_POWER_STATUS_PROXY = 6;
+    static constexpr int32_t CMD_INPUT_GET_DEVICE_TYPE_PROXY = 7;
+    static constexpr int32_t CMD_INPUT_GET_CHIP_INFO_PROXY = 8;
+    static constexpr int32_t CMD_INPUT_GET_VENDOR_NAME_PROXY = 9;
+    static constexpr int32_t CMD_INPUT_GET_CHIP_NAME_PROXY = 10;
+    static constexpr int32_t CMD_INPUT_SET_GESTURE_MODE_PROXY = 11;
+    static constexpr int32_t CMD_INPUT_RUN_CAPACITANCE_TEST_PROXY = 12;
+    static constexpr int32_t CMD_INPUT_RUN_EXTRA_COMMAND_PROXY = 13;
+    static constexpr int32_t CMD_INPUT_REGISTER_DEVICE_PROXY = 14;
+    static constexpr int32_t CMD_INPUT_UNREGISTER_DEVICE_PROXY = 15;
+    static constexpr int32_t CMD_INPUT_REGISTER_HOT_PLAUS_DEVICE_PROXY = 16;
+    static constexpr int32_t CMD_INPUT_UNREGISTER_HOT_PLAUS_DEVICE_PROXY = 17;
     static inline BrokerDelegator<InputProxy> delegator_;
     std::thread thread_;
 };

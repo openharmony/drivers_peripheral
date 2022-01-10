@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,9 @@
 #include <hdf_sbuf_ipc.h>
 #include "input_host_callback.h"
 #include "securec.h"
+
 #define HDF_LOG_TAG InputReportEventCallbackStub
+
 namespace OHOS {
 namespace Input {
 int32_t InputReportEventCallbackStub::OnRemoteRequest(uint32_t code,
@@ -36,7 +38,11 @@ int32_t InputReportEventCallbackStub::OnRemoteRequest(uint32_t code,
                 HDF_LOGE("rev EventPackage data readLen failed");
                 return 0;
             }
-            EventPackage* datatmp = (EventPackage*)malloc(readLen);
+            EventPackage* datatmp = (EventPackage*)OsalMemAlloc(readLen);
+            if (datatmp == nullptr) {
+                HDF_LOGE("%{public}s: OsalMemAlloc failed", __func__);
+                return 0;
+            }
             (void)memset_s(datatmp, readLen, 0, readLen);
             const EventPackage* pkgs = (const EventPackage*)(data.ReadRawData(readLen));
             (void)memcpy_s(datatmp, readLen, pkgs, readLen);
@@ -64,7 +70,11 @@ int32_t InputReportHostEventCallbackStub::OnRemoteRequest(uint32_t code,
                 HDF_LOGE("rev hotplug data readLen failed");
                 return 0;
             }
-            HotPlugEvent* datatmp = (HotPlugEvent*)malloc(readLen);
+            HotPlugEvent* datatmp = (HotPlugEvent*)OsalMemAlloc(readLen);
+            if (datatmp == nullptr) {
+                HDF_LOGE("%{public}s: OsalMemAlloc failed", __func__);
+                return 0;
+            }
             int32_t ret = memset_s(datatmp, readLen, 0, readLen);
             if (ret != 0) {
                 HDF_LOGE("memset_s faild : %{public}s", __func__);
