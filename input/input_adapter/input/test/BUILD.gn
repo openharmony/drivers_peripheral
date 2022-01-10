@@ -11,10 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import("//build/test.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
-hdi_input_base_path="//drivers/peripheral/hidl_adapter/input"
+hdi_input_base_path = "//drivers/peripheral/hidl_adapter/input"
 module_output_path = "hidl_adapter/input_c"
 config("camhdi_impl_utest_config") {
   visibility = [ ":*" ]
@@ -44,13 +43,11 @@ config("camhdi_impl_utest_config") {
   ]
 }
 
-ohos_unittest ("hdi_input_unittest_neu") {
+ohos_unittest("hdi_input_unittest_neu") {
   testonly = true
   module_out_path = module_output_path
   install_enable = true
-  sources = [
-    "./common/hdi_input_test.cpp"
-  ]
+  sources = [ "./common/hdi_input_test.cpp" ]
 
   include_dirs = [
     "$hdi_input_base_path/include",
@@ -74,6 +71,7 @@ ohos_unittest ("hdi_input_unittest_neu") {
     "//foundation/graphic/standard/utils/include",
     "//foundation/communication/ipc/ipc/native/src/core/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+
     # HCS
     "//drivers/framework/include/config",
     "//drivers/framework/include/osal",
@@ -91,12 +89,12 @@ ohos_unittest ("hdi_input_unittest_neu") {
   ]
 
   deps = [
-    "//drivers/peripheral/hidl_adapter/input/hal:hdi_input",
     "//drivers/adapter/uhdf2//config:libhdf_hcs",
     "//drivers/adapter/uhdf2//hdi:libhdi",
     "//drivers/adapter/uhdf2//osal:libhdf_utils",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+    "//drivers/peripheral/hidl_adapter/input/hal:hdi_input",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest",
@@ -106,8 +104,8 @@ ohos_unittest ("hdi_input_unittest_neu") {
 
   if (is_standard_system) {
     external_deps = [
-      "ipc:ipc_core",
       "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -115,5 +113,4 @@ ohos_unittest ("hdi_input_unittest_neu") {
 
   external_deps += [ "samgr_L2:samgr_proxy" ]
   public_configs = [ ":camhdi_impl_utest_config" ]
-
 }
