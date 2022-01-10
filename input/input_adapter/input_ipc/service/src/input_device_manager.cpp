@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "input_device_manager.h"
 #include <iostream>
 #include <dirent.h>
@@ -33,7 +34,9 @@
 #include <functional>
 #include <future>
 #include "securec.h"
+
 #define HDF_LOG_TAG InputDeviceManager
+
 namespace OHOS {
 namespace Input {
 using namespace std;
@@ -56,6 +59,7 @@ void InputDeviceManager::Init()
 vector<string> InputDeviceManager::GetFiles(string path)
 {
     vector<string> fileList {};
+
     DIR* dir = opendir(path.c_str());
     if (dir == nullptr) {
         cout<<"no files"<<endl;
@@ -79,22 +83,25 @@ vector<string> InputDeviceManager::GetFiles(string path)
 }
 
 // read action
-void InputDeviceManager::DoRead(int fd, struct input_event* event, size_t size)
+void InputDeviceManager::DoRead(int32_t fd, struct input_event* event, size_t size)
 {
-    printf("fd: %d size: %d\n", fd, size);
     int32_t readLen = read(fd, event, sizeof(struct input_event) * size);
     if (readLen == 0 || (readLen < 0 && errno == ENODEV)) {
         return;
     } else if (readLen < 0) {
         if (errno != EAGAIN && errno != EINTR) {
-            HDF_LOGD("could not get event (errno=%{public}d)", errno);
+            HDF_LOGE("could not get event (errno=%{public}d)", errno);
         }
     } else if ((readLen % sizeof(struct input_event)) != 0) {
         HDF_LOGD("could not get one event size %{public}u  readLen size: %{public}d",
                  sizeof(struct input_event), readLen);
     } else {
         size_t count = size_t(readLen) / sizeof(struct input_event);
-        EventPackage* evtPkg = (EventPackage*)malloc(sizeof(EventPackage) * count);
+        EventPackage* evtPkg = (EventPackage*)OsalMemAlloc(sizeof(EventPackage) * count);
+        if (evtPkg == nullptr) {
+            HDF_LOGE("%{public}s: OsalMemAlloc failed", __func__);
+            return;
+        }
         for (size_t i = 0; i < count; i++) {
             struct input_event& iEvent = event[i];
             // device action events happend
@@ -106,16 +113,16 @@ void InputDeviceManager::DoRead(int fd, struct input_event* event, size_t size)
                      "type%{public}d code%{public}d value%{public}d", __func__,
                      count, (evtPkg + i)->type, (evtPkg + i)->code, (evtPkg + i)->value);
         }
-        for (auto &e : reportEventPkgCallback_) {
+        for (auto &callbackFunc : reportEventPkgCallback_) {
             uint32_t index {0};
             auto ret = FindIndexFromFd(fd, &index);
             printf("fd: %d index: %d\n ", fd, index);
-            if (e.second != nullptr &&  ret != INPUT_FAILURE) {
+            if (callbackFunc.second != nullptr &&  ret != INPUT_FAILURE) {
                 HDF_LOGI("report the device action data !!!!!");
-                e.second->ReportEventPkgCallback(const_cast<const EventPackage*>(evtPkg), count, index);
+                callbackFunc.second->ReportEventPkgCallback(const_cast<const EventPackage*>(evtPkg), count, index);
             }
         }
-        free(evtPkg);
+        OsalMemFree(evtPkg);
         evtPkg = nullptr;
     }
 }
@@ -124,7 +131,7 @@ void InputDeviceManager::DoRead(int fd, struct input_event* event, size_t size)
 int32_t InputDeviceManager::OpenInputDevice(string devPath)
 {
     HDF_LOGI("%{public}s %{public}d  devPath is %{public}s", __func__, __LINE__, devPath.c_str());
-    int nodeFd = open(devPath.c_str(), O_RDWR | O_CLOEXEC | O_NONBLOCK);
+    int32_t nodeFd = open(devPath.c_str(), O_RDWR | O_CLOEXEC | O_NONBLOCK);
     if (nodeFd < 0) {
         HDF_LOGE("could not open %{public}s, %{public}d %{public}s", devPath.c_str(), errno, strerror(errno));
         return INPUT_FAILURE;
@@ -137,7 +144,7 @@ RetStatus InputDeviceManager::CloseInputDevice(string devPath)
 {
     for (auto &e : inputDevList_) {
         if (string(e.second.devPathNode) == devPath) {
-            int fd = e.second.fd;
+            int32_t fd = e.second.fd;
             if (fd > 0) {
                 RemoveEpoll(mEpollId_, fd);
                 close(fd);
@@ -150,19 +157,19 @@ RetStatus InputDeviceManager::CloseInputDevice(string devPath)
     return INPUT_FAILURE;
 }
 
-int32_t InputDeviceManager::GetInputDeviceInfo(int fd, DeviceInfo* detailInfo)
+int32_t InputDeviceManager::GetInputDeviceInfo(int32_t fd, DeviceInfo* detailInfo)
 {
     char buffer[DEVICE_INFO_SIZE] {};
     struct input_id inputId {};
     // get the abilitys.
-    ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(detailInfo->abilitySet.keyCode)), &detailInfo->abilitySet.keyCode);
-    ioctl(fd, EVIOCGBIT(EV_REL, sizeof(detailInfo->abilitySet.relCode)), &detailInfo->abilitySet.relCode);
-    ioctl(fd, EVIOCGBIT(EV_ABS, sizeof(detailInfo->abilitySet.absCode)), &detailInfo->abilitySet.absCode);
-    ioctl(fd, EVIOCGBIT(EV_MSC, sizeof(detailInfo->abilitySet.miscCode)), &detailInfo->abilitySet.miscCode);
-    ioctl(fd, EVIOCGBIT(EV_SW, sizeof(detailInfo->abilitySet.switchCode)), &detailInfo->abilitySet.switchCode);
-    ioctl(fd, EVIOCGBIT(EV_LED, sizeof(detailInfo->abilitySet.ledType)), &detailInfo->abilitySet.ledType);
-    ioctl(fd, EVIOCGBIT(EV_SND, sizeof(detailInfo->abilitySet.soundCode)), &detailInfo->abilitySet.soundCode);
-    ioctl(fd, EVIOCGBIT(EV_FF, sizeof(detailInfo->abilitySet.forceCode)), &detailInfo->abilitySet.forceCode);
+    (void)ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(detailInfo->abilitySet.keyCode)), &detailInfo->abilitySet.keyCode);
+    (void)ioctl(fd, EVIOCGBIT(EV_REL, sizeof(detailInfo->abilitySet.relCode)), &detailInfo->abilitySet.relCode);
+    (void)ioctl(fd, EVIOCGBIT(EV_ABS, sizeof(detailInfo->abilitySet.absCode)), &detailInfo->abilitySet.absCode);
+    (void)ioctl(fd, EVIOCGBIT(EV_MSC, sizeof(detailInfo->abilitySet.miscCode)), &detailInfo->abilitySet.miscCode);
+    (void)ioctl(fd, EVIOCGBIT(EV_SW, sizeof(detailInfo->abilitySet.switchCode)), &detailInfo->abilitySet.switchCode);
+    (void)ioctl(fd, EVIOCGBIT(EV_LED, sizeof(detailInfo->abilitySet.ledType)), &detailInfo->abilitySet.ledType);
+    (void)ioctl(fd, EVIOCGBIT(EV_SND, sizeof(detailInfo->abilitySet.soundCode)), &detailInfo->abilitySet.soundCode);
+    (void)ioctl(fd, EVIOCGBIT(EV_FF, sizeof(detailInfo->abilitySet.forceCode)), &detailInfo->abilitySet.forceCode);
     // device name.
     if (ioctl(fd, EVIOCGNAME(sizeof(buffer) - 1), &buffer) < 1) {
         HDF_LOGD("get device name failed errormsg %{public}s", strerror(errno));
@@ -180,7 +187,7 @@ int32_t InputDeviceManager::GetInputDeviceInfo(int fd, DeviceInfo* detailInfo)
     detailInfo->attrSet.id.vendor = inputId.vendor;
     detailInfo->attrSet.id.version = inputId.version;
     // ABS Info
-    for (int i = 0; i < ABS_CNT; i++) {
+    for (int32_t i = 0; i < ABS_CNT; i++) {
         if (detailInfo->abilitySet.absCode[i] > 0) {
             if (ioctl(fd, EVIOCGABS(i), &detailInfo->attrSet.axisInfo[i])) {
                 HDF_LOGD("reading absolute  get axis info failed fd= %{public}d name=%{public}s errormsg=%{public}s",
@@ -230,8 +237,8 @@ void InputDeviceManager::GetInputDeviceInfoList(int32_t epollFd)
                 inputDevList.fd = fd;
                 detailInfo->devIndex = devIndex_;
                 detailInfo->devType = type;
-                (void)memcpy_s(&inputDevList.devPathNode, devPathNode.length(),
-                                devPathNode.c_str(), devPathNode.length());
+                (void)memcpy_s(&inputDevList.devPathNode, devPathNode.length(), devPathNode.c_str(),
+                                devPathNode.length());
                 (void)memcpy_s(&inputDevList.detailInfo, sizeof(DeviceInfo), detailInfo.get(), sizeof(DeviceInfo));
                 inputDevList_.insert_or_assign(devIndex_, inputDevList);
                 devIndex_ += 1;
@@ -246,7 +253,7 @@ void InputDeviceManager::GetInputDeviceInfoList(int32_t epollFd)
 int32_t InputDeviceManager::DoInputDeviceAction(void)
 {
     struct input_event evtBuffer[EVENT_BUFFER_SIZE] {};
-    int result {0};
+    int32_t result {0};
     mEpollId_ = epoll_create1(EPOLL_CLOEXEC);
     if (mEpollId_ == INPUT_FAILURE) {
         HDF_LOGE("epoll create failed");
@@ -266,7 +273,7 @@ int32_t InputDeviceManager::DoInputDeviceAction(void)
             continue;
         }
         HDF_LOGD("file event happen result is %{public}d", result);
-        int i = 0;
+        int32_t i = 0;
         for (i = 0; i < result; i++) {
             if (epollEventList_[i].data.fd != mInotifyId_) {
                 DoRead(epollEventList_[i].data.fd, evtBuffer, EVENT_BUFFER_SIZE);
@@ -284,12 +291,12 @@ int32_t InputDeviceManager::DoInputDeviceAction(void)
 void InputDeviceManager::DoWithEventDeviceAdd(int32_t& epollFd, int32_t& fd, string devPath)
 {
     std::shared_ptr<DeviceInfo> detailInfo = std::make_shared<DeviceInfo>();
-    memset_s(detailInfo.get(), sizeof(DeviceInfo), 0, sizeof(DeviceInfo));
+    (void)memset_s(detailInfo.get(), sizeof(DeviceInfo), 0, sizeof(DeviceInfo));
     bool findDeviceFlag = false;
     uint32_t type {};
     uint32_t index {};
     uint32_t status {};
-    memset_s(detailInfo.get(), sizeof(DeviceInfo), 0, sizeof(DeviceInfo));
+    (void)memset_s(detailInfo.get(), sizeof(DeviceInfo), 0, sizeof(DeviceInfo));
     (void)GetInputDeviceInfo(fd, detailInfo.get());
     auto sDevName = string(detailInfo->attrSet.devName);
     for (auto it = inputDevList_.begin(); it != inputDevList_.end();) {
@@ -317,8 +324,8 @@ void InputDeviceManager::DoWithEventDeviceAdd(int32_t& epollFd, int32_t& fd, str
         inputDevList.status = INPUT_DEVICE_STATIS_OPENED;
         inputDevList.fd = fd;
         detailInfo->devIndex = devIndex_;
-        memcpy_s(inputDevList.devPathNode, devPath.length(), devPath.c_str(), devPath.length());
-        memcpy_s(&inputDevList.detailInfo, sizeof(DeviceInfo), detailInfo.get(), sizeof(DeviceInfo));
+        (void)memcpy_s(inputDevList.devPathNode, devPath.length(), devPath.c_str(), devPath.length());
+        (void)memcpy_s(&inputDevList.detailInfo, sizeof(DeviceInfo), detailInfo.get(), sizeof(DeviceInfo));
         inputDevList_.insert_or_assign(devIndex_, inputDevList);
     }
     HDF_LOGD("InputDeviceManager::%{public}s index: %{public}d fd: %{public}d devName: %{public}s",
@@ -333,9 +340,9 @@ void InputDeviceManager::DoWithEventDeviceAdd(int32_t& epollFd, int32_t& fd, str
 void InputDeviceManager::SendHotPlugEvent(uint32_t& type, uint32_t& index, uint32_t status)
 {
     // hot plug evnets happend
-    HotPlugEvent* evtPlusPkg = (HotPlugEvent*)malloc(sizeof(HotPlugEvent));
+    HotPlugEvent* evtPlusPkg = (HotPlugEvent*)OsalMemAlloc(sizeof(HotPlugEvent));
     if (evtPlusPkg == nullptr) {
-        HDF_LOGE("malloc failed !!!!");
+        HDF_LOGE("OsalMemAlloc failed !");
         return;
     }
     evtPlusPkg->devType = type;
@@ -346,7 +353,7 @@ void InputDeviceManager::SendHotPlugEvent(uint32_t& type, uint32_t& index, uint3
                  type, index, status);
         reportHotPlugEventCallback_->ReportHotPlugEventCallback(evtPlusPkg);
     }
-    free(evtPlusPkg);
+    OsalMemFree(evtPlusPkg);
     evtPlusPkg = nullptr;
 }
 
@@ -385,14 +392,14 @@ void InputDeviceManager::DoWithEventDeviceDel(int32_t& epollFd, uint32_t& index)
     }
 }
 
-int32_t InputDeviceManager::InotifyEventHandler(int epollFd, int notifyFd)
+int32_t InputDeviceManager::InotifyEventHandler(int32_t epollFd, int32_t notifyFd)
 {
     char InfoBuf[BUFFER_SIZE];
     struct inotify_event *event {};
     char* p {};
-    int tmpFd {};
-    memset_s(InfoBuf, BUFFER_SIZE, 0, BUFFER_SIZE);
-    int result = read(notifyFd, InfoBuf, BUFFER_SIZE);
+    int32_t tmpFd {};
+    (void)memset_s(InfoBuf, BUFFER_SIZE, 0, BUFFER_SIZE);
+    int32_t result = read(notifyFd, InfoBuf, BUFFER_SIZE);
     for (p = InfoBuf; p < InfoBuf + result;) {
         event = (struct inotify_event *)(p);
         HDF_LOGD("add file to epoll %{public}s", event->name);
@@ -423,9 +430,9 @@ int32_t InputDeviceManager::InotifyEventHandler(int epollFd, int notifyFd)
     return 0;
 }
 
-int32_t InputDeviceManager::AddToEpoll(int epollFd, int fileFd)
+int32_t InputDeviceManager::AddToEpoll(int32_t epollFd, int32_t fileFd)
 {
-    int result {0};
+    int32_t result {0};
     struct epoll_event eventItem {};
     (void)memset_s(&eventItem, sizeof(eventItem), 0, sizeof(eventItem));
     eventItem.events = EPOLLIN;
@@ -433,7 +440,7 @@ int32_t InputDeviceManager::AddToEpoll(int epollFd, int fileFd)
     result = epoll_ctl(epollFd, EPOLL_CTL_ADD, fileFd, &eventItem);
     return result;
 }
-void InputDeviceManager::RemoveEpoll(int epollFd, int fileFd)
+void InputDeviceManager::RemoveEpoll(int32_t epollFd, int32_t fileFd)
 {
     epoll_ctl(epollFd, EPOLL_CTL_DEL, fileFd, nullptr);
 }

@@ -12,22 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "utest_input_manager_impl.h"
 #include <osal_mem.h>
 #include "input_proxy.h"
 #include "input_host_callback.h"
-const int INIT_DEFAULT_VALUE = (255);
-const int GET_EVENT_TRY_NUM = (20);
-const int PREPARE_TIME_MS = (5000);
-const int ONE_PERIOD_TIME_MS = (500);
-const int KEEP_ALIVE_TIME_S = (100);
-const int TOUCH_INDEX = (1);
-const int DEV_INDEX2 = (2);
-const int DEV_INDEX3 = (3);
-const int INVALID_INDEX = (15);
-const int NAME_MAX_LEN = (10);
-const int TEST_RESULT_LEN = (32);
-const int MAX_DEVICES = 32;
+
+const int32_t INIT_DEFAULT_VALUE = (255);
+const int32_t GET_EVENT_TRY_NUM = (20);
+const int32_t PREPARE_TIME_MS = (5000);
+const int32_t ONE_PERIOD_TIME_MS = (500);
+const int32_t KEEP_ALIVE_TIME_S = (100);
+const int32_t TOUCH_INDEX = (1);
+const int32_t DEV_INDEX2 = (2);
+const int32_t DEV_INDEX3 = (3);
+const int32_t INVALID_INDEX = (15);
+const int32_t NAME_MAX_LEN = (10);
+const int32_t TEST_RESULT_LEN = (32);
+const int32_t MAX_DEVICES = 32;
 using namespace OHOS;
 using namespace testing::ext;
 using namespace OHOS::Input;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,13 +15,14 @@
 #include "input_host_callback.h"
 #include <iostream>
 #include "hdf_log.h"
+
 #define HDF_LOG_TAG InputReportEventCallback
+
 namespace OHOS {
 namespace Input {
 void InputReportEventCallback::ReportEventPkgCallback(const EventPackage *pkgs, uint32_t count, uint32_t devIndex)
 {
     HDF_LOGD("device action pkgs[%{public}p] = count:%{public}d", pkgs, count);
-    printf("device action pkgs[%p] = count:%d\n", pkgs, count);
     if (pkgs == NULL) {
         HDF_LOGI("pkgs nulll,");
         return;
@@ -39,8 +40,6 @@ void InputHostReportEventCallback::ReportHotPlugEventCallback(const HotPlugEvent
     }
     HDF_LOGD("hogplug action status =%{public}d devId=%{public}d type =%{public}d",
              msg->status, msg->devIndex, msg->devType);
-    printf(" hogplug action status =%d devId=%d type =%d\n",
-           msg->status, msg->devIndex, msg->devType);
 }
 }  // namespace Input
 }  // namespace OHOS

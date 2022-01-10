@@ -14,7 +14,9 @@
  */
 #ifndef UTEST_INPUT_MANAGER_IMPL_TEST_H
 #define UTEST_INPUT_MANAGER_IMPL_TEST_H
+
 #include "utest_input_hdi_base.h"
+
 class InputManagerImplTetst : public InputHdiBaseTest {
 public:
     static void SetUpTestCase(void);

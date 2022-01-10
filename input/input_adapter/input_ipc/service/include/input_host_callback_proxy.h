@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,11 @@
  */
 #ifndef INPUT_HOST_CALLBACK_PROXY_H
 #define INPUT_HOST_CALLBACK_PROXY_H
+
 #include <hdf_log.h>
 #include <iremote_proxy.h>
 #include "iinput_host_callbck.h"
+
 namespace OHOS {
 namespace Input {
 class InputCallbackProxy : public IRemoteProxy<InputReportEventCb> {
@@ -26,7 +28,7 @@ public:
     virtual void ReportEventPkgCallback(const EventPackage *pkgs, uint32_t count, uint32_t devIndex);
 
 private:
-    static constexpr int CMD_INPUT_CALLBACK_REMOTE_REPROT_EVENT_PROXY = 100;
+    static constexpr int32_t CMD_INPUT_CALLBACK_REMOTE_REPROT_EVENT_PROXY = 100;
     static inline BrokerDelegator<InputCallbackProxy> delegator_;
 };
 
@@ -37,7 +39,7 @@ public:
     virtual void ReportHotPlugEventCallback(const HotPlugEvent *event);
 
 private:
-    static constexpr int CMD_INPUT_CALLBACK_REMOTE_REPROT_HOT_PLUG_EVENT_PROXY = 101;
+    static constexpr int32_t CMD_INPUT_CALLBACK_REMOTE_REPROT_HOT_PLUG_EVENT_PROXY = 101;
     static inline BrokerDelegator<InputHotCallbackProxy> delegator_;
 };
 }  // namespace Input

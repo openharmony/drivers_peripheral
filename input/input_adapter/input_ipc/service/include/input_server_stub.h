@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
  */
 #ifndef INPUT_SERVICE_STUB_H
 #define INPUT_SERVICE_STUB_H
+
 #include <functional>
 #include <message_parcel.h>
 #include <message_option.h>
@@ -22,6 +23,7 @@
 #include "iinput_host.h"
 #include "input_server.h"
 #include "input_type.h"
+
 namespace OHOS {
 namespace Input {
 class InputServerStub {
@@ -70,5 +72,5 @@ private:
 
 void *InputStubInstance();
 void InputStubRelease(void *obj);
-int32_t InputServiceOnRemoteRequest(void *stub, int cmdId, struct HdfSBuf& data, struct HdfSBuf& reply);
+int32_t InputServiceOnRemoteRequest(void *stub, int32_t cmdId, struct HdfSBuf& data, struct HdfSBuf& reply);
 #endif // INPUT_SERVICE_STUB_H

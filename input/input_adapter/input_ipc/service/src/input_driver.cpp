@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,14 +17,16 @@
 #include <hdf_device_desc.h>
 #include <osal_mem.h>
 #include "input_server_stub.h"
+
 #define HDF_LOG_TAG InputServer
+
 using namespace OHOS::Input;
 struct HdfInputService {
     struct IDeviceIoService ioservice;
     void *instance;
 };
 
-static int32_t InputServiceDispatch(struct HdfDeviceIoClient *client, int cmdId,
+static int32_t InputServiceDispatch(struct HdfDeviceIoClient *client, int32_t cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     HDF_LOGE("%{public}s: line%{public}d!", __func__, __LINE__);
@@ -33,13 +35,13 @@ static int32_t InputServiceDispatch(struct HdfDeviceIoClient *client, int cmdId,
     return InputServiceOnRemoteRequest(hdfInputService->instance, cmdId, *data, *reply);
 }
 
-static int HdfInputDriverInit(struct HdfDeviceObject *deviceObject)
+static int32_t HdfInputDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGE("HdfInputDriverInit enter, new hdi impl");
     return HDF_SUCCESS;
 }
 
-static int HdfInputDriverBind(struct HdfDeviceObject *deviceObject)
+static int32_t HdfInputDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfInputDriverBind enter! line: %{public}d", __LINE__);
     struct HdfInputService *hdfInputService = (struct HdfInputService *)OsalMemAlloc(

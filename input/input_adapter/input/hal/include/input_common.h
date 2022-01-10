@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,17 +15,21 @@
 
 #ifndef INPUT_COMMON_H
 #define INPUT_COMMON_H
+
 #include <pthread.h>
 #include <poll.h>
 #include "hdf_dlist.h"
 #include "hdf_log.h"
 #include "input_type.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 #define SERVICE_NAME_LEN 24
 #define MAX_POLLFD_NUM 10
 #define SCAN_DEV 0
+
 #define GET_MANAGER_CHECK_RETURN(manager) do { \
     manager = GetDevManager(); \
     if ((manager) == NULL) { \
@@ -33,12 +37,14 @@ extern "C" {
         return INPUT_FAILURE; \
     } \
 } while (0)
+
 #define INPUT_CHECK_RETURN(ret) do { \
     if ((ret) != INPUT_SUCCESS) { \
         HDF_LOGE("%s: failed, line:%d", __func__, __LINE__); \
         return ret; \
     } \
 } while (0)
+
 /**
  * @brief Describes the information nodes of input devices.
  */

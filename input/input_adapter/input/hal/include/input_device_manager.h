@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei InputDevice Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -70,15 +70,15 @@ public:
     InputDeviceManager &operator=(InputDeviceManager &&other) = delete;
     void Init(void);
     vector<string> GetFiles(string path);
-    void DoRead(int fd, struct input_event* event, size_t size);
+    void DoRead(int32_t fd, struct input_event* event, size_t size);
     int32_t OpenInputDevice(string devPath);
     RetStatus CloseInputDevice(string devPath);
-    int32_t GetInputDeviceInfo(int fd, DeviceInfo* detailInfo);
+    int32_t GetInputDeviceInfo(int32_t fd, DeviceInfo* detailInfo);
     void GetInputDeviceInfoList(int32_t epollFd = 0);
     int32_t DoInputDeviceAction(void);
-    int32_t InotifyEventHandler(int epollFd, int notifyFd);
-    void RemoveEpoll(int epollFd, int fileFd);
-    int32_t AddToEpoll(int epollFd, int fileFd);
+    int32_t InotifyEventHandler(int32_t epollFd, int32_t notifyFd);
+    void RemoveEpoll(int32_t epollFd, int32_t fileFd);
+    int32_t AddToEpoll(int32_t epollFd, int32_t fileFd);
     void WorkerThread();
     int32_t FindIndexFromFd(int32_t& fd, uint32_t* index);
     int32_t FindIndexFromDevName(string devName, uint32_t* index);
@@ -119,7 +119,7 @@ public:
                  in.detailInfo.chipName, in.detailInfo.attrSet.devName,
                  in.detailInfo.attrSet.id.busType, in.detailInfo.attrSet.id.vendor,
                  in.detailInfo.attrSet.id.product, in.detailInfo.attrSet.id.version);
-        for (int i = 0; i < ABS_CNT; i++) {
+        for (int32_t i = 0; i < ABS_CNT; i++) {
             HDF_LOGD("attrSet.axisInfo.axis: %{public}d attrSet.axisInfo.min: %{public}d "
                      "attrSet.axisInfo.max: %{public}d attrSet.axisInfo.fuzz: %{public}d "
                      "attrSet.axisInfo.flat: %{public}d attrSet.axisInfo.range: %{public}d ",
@@ -137,8 +137,8 @@ private:
     std::map<int32_t, InputEventCb*> reportEventPkgCallback_;
     InputHostCb* reportHotPlugEventCallback_ = nullptr;
     std::thread thread_ {};
-    int mEpollId_ {0};
-    int mInotifyId_ {0};
+    int32_t mEpollId_ {0};
+    int32_t mInotifyId_ {0};
 };
 }
 }
