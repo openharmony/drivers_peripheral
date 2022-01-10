@@ -48,7 +48,7 @@ extern "C" {
 #endif
 #endif /* __cplusplus */
 
-#define SENSOR_NAME_MAX_LEN       16 /**< Maximum length of the sensor name */
+#define SENSOR_NAME_MAX_LEN       32 /**< Maximum length of the sensor name */
 #define SENSOR_VERSION_MAX_LEN    16 /**< Maximum length of the sensor version */
 
 /**
