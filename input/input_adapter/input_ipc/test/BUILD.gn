@@ -1,0 +1,121 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//drivers/adapter/uhdf2/uhdf.gni")
+hdi_input_base_path = "//drivers/peripheral/hidl_adapter/input_ipc"
+module_output_path = "hidl_adapter/input_ipc"
+config("camhdi_impl_utest_config") {
+  visibility = [ ":*" ]
+  cflags_cc = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wno-error",
+    "-DGST_DISABLE_DEPRECATED",
+    "-DHAVE_CONFIG_H",
+    "-DCOLORSPACE=\"videoconvert\"",
+    "-fno-strict-aliasing",
+    "-Wno-sign-compare",
+    "-Wno-builtin-requires-header",
+    "-Wno-unused-variable",
+    "-Wno-unused-label",
+    "-Wno-implicit-function-declaration",
+    "-Wno-format",
+    "-Wno-int32_t-conversion",
+    "-Wno-unused-function",
+    "-Wno-thread-safety-attributes",
+    "-Wno-inconsistent-missing-override",
+    "-fno-rtti",
+    "-fno-exceptions",
+    "-ffunction-sections",
+    "-fdata-sections",
+  ]
+}
+
+ohos_unittest("hdi_input_unittest_neu_ipc") {
+  testonly = true
+  module_out_path = module_output_path
+  install_enable = true
+  sources = [
+    "unittest/utest_input_hdi_base.cpp",
+    "unittest/utest_input_manager_impl.cpp",
+  ]
+
+  include_dirs = [
+    "$hdi_input_base_path/include",
+    "$hdi_input_base_path/client/include",
+    "//drivers/framework/include/utils",
+    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/adapter/uhdf2/osal/include",
+    "//utils/native/base/include",
+    "$hdi_input_base_path/service/include",
+    "$hdi_input_base_path/client/include",
+    "$hdi_input_base_path/test/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//drivers/framework/core/adapter/syscall/include",
+    "//third_party/libevdev/include/linux/linux",
+    "//drivers/framework/include/osal",
+    "//base/hiviewdfx/hilog_lite/interfaces/native/kits",
+    "//drivers/adapter/uhdf2/ipc/include",
+
+    #producer
+    "//utils/native/base/include",
+    "//foundation/graphic/standard/frameworks/surface/include",
+    "//foundation/graphic/standard/interfaces/kits/surface",
+    "//foundation/graphic/standard/utils/include",
+    "//foundation/communication/ipc/ipc/native/src/core/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+
+    # HCS
+    "//drivers/framework/include/config",
+    "//drivers/framework/include/osal",
+    "//drivers/framework/include/utils",
+    "//drivers/adapter/uhdf2/include/config",
+    "//drivers/framework/ability/config/hcs_parser/include",
+    "//system/core/include/cutils",
+    "$hdf_framework_path/ability/sbuf/include",
+    "//drivers/adapter/uhdf2//manager/include",
+    "//drivers/adapter/uhdf2//include/hdi",
+
+    "//drivers/adapter/uhdf2//devhost/include",
+    "//drivers/adapter/uhdf2//devmgr/include",
+    "//drivers/adapter/uhdf2//host/include",
+  ]
+
+  deps = [
+    "../client:libinput_client",
+    "//drivers/adapter/uhdf2//config:libhdf_hcs",
+    "//drivers/adapter/uhdf2//hdi:libhdi",
+    "//drivers/adapter/uhdf2//osal:libhdf_utils",
+    "//drivers/adapter/uhdf2/host:libhdf_host",
+    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest",
+    "//third_party/googletest:gtest_main",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  external_deps += [ "samgr_L2:samgr_proxy" ]
+  public_configs = [ ":camhdi_impl_utest_config" ]
+}

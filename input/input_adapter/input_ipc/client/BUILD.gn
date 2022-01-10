@@ -1,0 +1,55 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//drivers/adapter/uhdf2/uhdf.gni")
+
+hdi_input_base_path = "//drivers/peripheral/hidl_adapter/input_ipc"
+ohos_shared_library("libinput_client") {
+  include_dirs = [
+    "$hdf_framework_path/ability/sbuf/include",
+    "$hdf_uhdf_path/manager/include",
+    "$hdf_uhdf_path/include/hdi",
+    "include",
+    "../include",
+    "//drivers/adapter/uhdf2/include/hdi",
+    "//third_party/libevdev/include/linux/linux",
+    "$hdi_input_base_path/adapter/prebuilt/include/system/core/libutils/include/utils",
+  ]
+
+  sources = [
+    "src/input_host_callback.cpp",
+    "src/input_host_callback_stub.cpp",
+    "src/input_proxy.cpp",
+  ]
+
+  deps = [
+    "$hdf_uhdf_path/hdi:libhdi",
+    "//drivers/adapter/uhdf2/host:libhdf_host",
+    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+    "//drivers/adapter/uhdf2/osal:libhdf_utils",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  install_images = [ "vendor" ]
+  install_enable = true
+  subsystem_name = "hidl_adapter"
+  part_name = "hidl_adapter"
+}
