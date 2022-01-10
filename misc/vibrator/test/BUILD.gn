@@ -30,6 +30,9 @@ if (defined(ohos_lite)) {
 } else {
   group("hdf_test_vibrator") {
     testonly = true
-    deps = [ "unittest:hdf_unittest_vibrator" ]
+    deps = [
+      "unittest:hdf_unittest_vibrator",
+      "unittest/hdi:hdf_unittest_hdi_vibrator",
+    ]
   }
 }
