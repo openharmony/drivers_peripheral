@@ -27,12 +27,12 @@ bool UtilsDataStub::EncodeCameraMetadata(const std::shared_ptr<CameraStandard::C
     uint32_t tagCount = 0;
     common_metadata_header_t *meta = metadata->get();
     if (meta != nullptr) {
-        tagCount = get_camera_metadata_item_count(meta);
+        tagCount = CameraStandard::GetCameraMetadataItemCount(meta);
         bRet = (bRet && data.WriteInt32(static_cast<int32_t>(tagCount)));
-        camera_metadata_item_entry_t *item = get_metadata_items(meta);
+        camera_metadata_item_entry_t *item = CameraStandard::GetMetadataItems(meta);
         for (uint32_t i = 0; i < tagCount; i++, item++) {
             camera_metadata_item_t entry;
-            int ret = find_camera_metadata_item(meta, item->item, &entry);
+            int ret = CameraStandard::FindCameraMetadataItem(meta, item->item, &entry);
             if (ret == -ENOENT) {
                 return false;
             }
@@ -76,7 +76,7 @@ void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<Ca
         void *buffer = nullptr;
         UtilsDataStub::EntryDataToBuffer(entry, &buffer);
         if (buffer != nullptr) {
-            (void)add_camera_metadata_item(meta, entry.item, buffer, entry.count);
+            (void)CameraStandard::AddCameraMetadataItem(meta, entry.item, buffer, entry.count);
         }
     }
 }

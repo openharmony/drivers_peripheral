@@ -153,10 +153,10 @@ RetCode CameraDeviceImpl::GetEnabledFromCfg()
     }
 
     camera_metadata_item_t entry;
-    int ret = find_camera_metadata_item(metadata,
+    int ret = CameraStandard::FindCameraMetadataItem(metadata,
         OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, &entry);
     if (ret == 0) {
-        CAMERA_LOGD("find_camera_metadata_item tags = %{public}d. type = %{public}d", entry.count, entry.data_type);
+        CAMERA_LOGD("FindCameraMetadataIte tags = %{public}d. type = %{public}d", entry.count, entry.data_type);
         for (int i = 0; i < entry.count; i++) {
             deviceMetaTypes_.push_back(*(entry.data.i32 + i));
         }
@@ -254,13 +254,13 @@ RetCode CameraDeviceImpl::UpdataMetadataResultsBase()
 
     for (auto &metaType : enabledResults_) {
         camera_metadata_item_t baseEntry;
-        int ret = find_camera_metadata_item(metadataBase, metaType, &baseEntry);
+        int ret = CameraStandard::FindCameraMetadataItem(metadataBase, metaType, &baseEntry);
         if (ret == -ENOENT) {
             CAMERA_LOGE("metadata base not found tag.[metaType = %{public}d]", metaType);
             continue;
         }
         camera_metadata_item_t newEntry;
-        ret = find_camera_metadata_item(metadataNew, metaType, &newEntry);
+        ret = CameraStandard::FindCameraMetadataItem(metadataNew, metaType, &newEntry);
         if (ret == -ENOENT) {
             CAMERA_LOGE("metadata result not found tag.[metaType = %{public}d]", metaType);
             continue;
