@@ -54,7 +54,9 @@ typedef enum {
                                          * The value type is <b>cstring</b>.
                                          */
     KEY_TYPE_PRE_CACHE    = 0x70726361,  /**< Precapture cache size. The value type is <b>int</b> */
-    KEY_TYPE_SET_SYNC_BUFFER_MSEC = 0x73796e62 /**< Set sync buffer size, uint ms. The value type is <b>int</b> */
+    KEY_TYPE_SET_SYNC_BUFFER_MSEC = 0x73796e62, /**< Set sync buffer size, uint ms. The value type is <b>int</b> */
+    KEY_TYPE_EXTRADATA = 0x65787472, /**< Extra data. The value type is <b>pointer</b> */
+    KEY_TYPE_THUMBNAIL = 0x74686e6c /**< Thumbnail. The value type is <b>pointer<b>. */
 } KeyType;
 
 /**
