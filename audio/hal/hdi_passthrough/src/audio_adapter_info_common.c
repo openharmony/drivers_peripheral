@@ -24,7 +24,7 @@
 #ifdef __LITEOS__
 #define AUDIO_ADAPTER_CONFIG    "/etc/adapter_config.json"
 #else
-#define AUDIO_ADAPTER_CONFIG    "/system/etc/hdfconfig/adapter_config.json"
+#define AUDIO_ADAPTER_CONFIG    HDF_ETC_PATH_DIR "/hdfconfig/adapter_config.json"
 #endif
 #define ADAPTER_NAME_LEN        32
 #define PORT_NAME_LEN           ADAPTER_NAME_LEN

@@ -24,7 +24,7 @@
 #ifdef __LITEOS__
 #define CJSONFILE_CONFIG_PATH "/etc/parse.json"
 #else
-#define CJSONFILE_CONFIG_PATH "/system/etc/hdfconfig/parse.json"
+#define CJSONFILE_CONFIG_PATH HDF_ETC_PATH_DIR "/hdfconfig/parse.json"
 #endif
 
 int32_t AudioPathSelGetConfToJsonObj();
