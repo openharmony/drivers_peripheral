@@ -82,11 +82,7 @@ void *AudioLibRenderTest::PtrHandle = nullptr;
 
 void AudioLibRenderTest::SetUpTestCase(void)
 {
-#ifdef __LITEOS__
-    char resolvedPath[] = "/usr/lib/libhdi_audio_interface_lib_render.so";
-#else
-    char resolvedPath[] = "//system/lib/libhdi_audio_interface_lib_render.z.so";
-#endif
+    char resolvedPath[] = HDF_LIBRARY_PATH_DIR"/libhdi_audio_interface_lib_render"HDF_LIBRARY_SUFFIX;
     PtrHandle = dlopen(resolvedPath, RTLD_LAZY);
     if (PtrHandle == nullptr) {
         return;
