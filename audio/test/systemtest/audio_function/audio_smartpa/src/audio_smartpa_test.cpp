@@ -69,7 +69,11 @@ void AudioSmartPaTest::SetUpTestCase(void)
     if (GetAudioManager == nullptr) {
         return;
     }
-    string resolvedPathOne = HDF_LIBRARY_PATH_DIR"/libhdi_audio_interface_lib_render" HDF_LIBRARY_SUFFIX;
+#ifdef __LITEOS__
+    string resolvedPathOne = "/usr/lib/libhdi_audio_interface_lib_render.so";
+#else
+    string resolvedPathOne = "//system/lib/libhdi_audio_interface_lib_render.z.so";
+#endif
     PtrHandle = dlopen(resolvedPathOne.c_str(), RTLD_LAZY);
     if (PtrHandle == nullptr) {
         return;

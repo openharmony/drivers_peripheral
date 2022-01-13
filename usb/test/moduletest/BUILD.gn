@@ -262,8 +262,6 @@ if (defined(ohos_lite)) {
   ohos_moduletest("usb_device_performance_test") {
     module_out_path = module_output_path
     include_dirs = [
-      "//drivers/adapter/uhdf2/osal/include",
-      "//drivers/framework/include/utils",
       "//third_party/googletest/googletest/include",
       "common",
     ]
@@ -337,8 +335,6 @@ if (defined(ohos_lite)) {
   ohos_moduletest("usb_host_performance_test") {
     module_out_path = module_output_path
     include_dirs = [
-      "//drivers/adapter/uhdf2/osal/include",
-      "//drivers/framework/include/utils",
       "//third_party/googletest/googletest/include",
       "common",
     ]

@@ -110,14 +110,19 @@ typedef enum {
     #define STATIC_T
 #endif
 
-#define SO_INTERFACE_LIB_RENDER_PATH HDF_LIBRARY_PATH_DIR"/libhdi_audio_interface_lib_render" HDF_LIBRARY_SUFFIX
-#define SO_INTERFACE_LIB_CAPTURE_PATH HDF_LIBRARY_PATH_DIR"/libhdi_audio_interface_lib_capture" HDF_LIBRARY_SUFFIX
+#ifdef __LITEOS__
+#define SO_INTERFACE_LIB_RENDER_PATH "/usr/lib/libhdi_audio_interface_lib_render.so"
+#define SO_INTERFACE_LIB_CAPTURE_PATH "/usr/lib/libhdi_audio_interface_lib_capture.so"
+#else
+#define SO_INTERFACE_LIB_RENDER_PATH "/system/lib/libhdi_audio_interface_lib_render.z.so"
+#define SO_INTERFACE_LIB_CAPTURE_PATH "/system/lib/libhdi_audio_interface_lib_capture.z.so"
+#endif
 
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
 #ifdef __LITEOS__
 #define SO_CJSON_LIB_PATHSELECT_PATH "/usr/lib/libhdi_audio_path_select.so"
 #else
-#define SO_CJSON_LIB_PATHSELECT_PATH HDF_LIBRARY_PATH_DIR"/libhdi_audio_path_select.z.so"
+#define SO_CJSON_LIB_PATHSELECT_PATH "/system/lib/libhdi_audio_path_select.z.so"
 #endif
 #endif
 
