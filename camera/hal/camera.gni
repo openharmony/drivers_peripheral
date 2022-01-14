@@ -23,6 +23,9 @@ if (defined(ohos_lite)) {
   } else if ("${product_name}" == "Hi3516DV300") {
     import(
         "//device/soc/hisilicon/common/hal/media/camera/hi3516dv300/linux_standard/camera/product.gni")
+  } else if ("${product_name}" == "watchos") {
+    import(
+        "//device/soc/hisilicon/common/hal/media/camera/hi3516dv300/linux_standard/camera/product.gni")
   } else {
     import("//device/${product_company}/${device_name}/camera/product.gni")
   }
