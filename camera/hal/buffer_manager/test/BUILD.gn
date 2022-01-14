@@ -71,11 +71,8 @@ if (defined(ohos_lite)) {
       "$camera_path/buffer_manager/src/buffer_adapter/standard",
       "//third_party/googletest/googletest/include",
       "//utils/native/base/include",
-      "//foundation/communication/interfaces/innerkits/ipc_core/include",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
-      "//drivers/framework/include/utils",
-      "//drivers/adapter/uhdf2/osal/include",
     ]
 
     deps = [
@@ -88,7 +85,10 @@ if (defined(ohos_lite)) {
     ]
 
     if (is_standard_system) {
-      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+      external_deps = [
+        "device_driver_framework:libhdf_utils",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
     } else {
       external_deps = [ "hilog:libhilog" ]
     }

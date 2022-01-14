@@ -18,6 +18,21 @@ group("camera_client") {
   deps = [ ":libcamera_client" ]
 }
 
+config("libcamera_client_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "//drivers/peripheral/camera/interfaces/include",
+    "//drivers/peripheral/camera/interfaces/hdi_ipc",
+    "//drivers/peripheral/camera/interfaces/hdi_ipc/utils/include",
+    "//drivers/peripheral/camera/interfaces/hdi_ipc/server/include",
+    "//drivers/peripheral/camera/interfaces/hdi_ipc/callback/device/include",
+    "//drivers/peripheral/camera/interfaces/hdi_ipc/callback/operator/include",
+    "//drivers/peripheral/camera/interfaces/hdi_ipc/callback/host/include",
+    "//drivers/peripheral/display/interfaces/include",
+  ]
+}
+
 ohos_shared_library("libcamera_client") {
   include_dirs = [
     "../",
@@ -28,15 +43,12 @@ ohos_shared_library("libcamera_client") {
     "../callback/device/include",
     "../callback/host/include",
     "../callback/operator/include",
-    "$hdf_uhdf_path/manager/include",
-    "$hdf_uhdf_path/include/hdi",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
 
     #producer
     "//utils/native/base/include",
-    "//foundation/communication/ipc/ipc/native/src/core/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
+  public_configs = [ ":libcamera_client_config" ]
 
   sources = [
     "../callback/device/src/camera_device_callback.cpp",
@@ -53,11 +65,6 @@ ohos_shared_library("libcamera_client") {
   ]
 
   deps = [
-    "$hdf_uhdf_path/hdi:libhdi",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
     "//utils/native/base:utils",
@@ -65,6 +72,10 @@ ohos_shared_library("libcamera_client") {
 
   if (is_standard_system) {
     external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
     ]
@@ -74,5 +85,5 @@ ohos_shared_library("libcamera_client") {
 
   # install_images = [ "vendor" ]
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "camera_device_driver"
 }

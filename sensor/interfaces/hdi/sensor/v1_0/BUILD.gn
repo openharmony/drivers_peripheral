@@ -25,4 +25,7 @@ hdi("sensor") {
   ]
 
   language = "cpp"
+
+  subsystem_name = "hdf"
+  part_name = "sensor_device_driver"
 }

@@ -15,6 +15,7 @@
 
 #include "stream_operator_proxy.h"
 #include <hdf_base.h>
+#include <hdf_log.h>
 #include <message_parcel.h>
 #include "istream_operator_callback.h"
 #include "ioffline_stream_operator.h"

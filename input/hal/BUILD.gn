@@ -82,10 +82,7 @@ if (defined(ohos_lite)) {
 
     public_configs = [ ":input_hdi_public_config" ]
     include_dirs = [ "$INPUT_ROOT_DIR/hal/include" ]
-    deps = [
-      "//drivers/adapter/uhdf2/utils:libhdf_utils",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//utils/native/base:utils" ]
 
     defines = [ "__OHOS__USER__" ]
 
@@ -100,7 +97,10 @@ if (defined(ohos_lite)) {
 
     subsystem_name = "hdf"
     if (is_standard_system) {
-      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+      external_deps = [
+        "device_driver_framework:libhdf_utils",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
@@ -108,6 +108,6 @@ if (defined(ohos_lite)) {
       "system",
       "updater",
     ]
-    part_name = "multimodalinput_base"
+    part_name = "input_device_driver"
   }
 }

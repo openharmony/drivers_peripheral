@@ -17,17 +17,7 @@ module_output_path = "hdf/audio/unittest/driver"
 ohos_unittest("khdf_audio_driver_test") {
   module_out_path = module_output_path
 
-  include_dirs = [
-    "//drivers/framework/include/platform",
-    "//drivers/framework/include/core",
-    "//drivers/framework/include/osal",
-    "//drivers/adapter/uhdf/posix/include",
-    "//drivers/framework/include/utils",
-    "//drivers/framework/include",
-    "//drivers/framework/test/unittest/include",
-    "//drivers/framework/test/unittest/osal",
-    "//drivers/peripheral/audio/chipsets/hi3516dv300/codec/test/unittest/common",
-  ]
+  include_dirs = [ "//drivers/peripheral/audio/chipsets/hi3516dv300/codec/test/unittest/common" ]
 
   defines = [ "__USER__" ]
   sources = [
@@ -37,11 +27,7 @@ ohos_unittest("khdf_audio_driver_test") {
     "//drivers/peripheral/audio/chipsets/hi3516dv300/soc/test/unittest/common/hi3516_dai_ops_test.cpp",
     "//drivers/peripheral/audio/chipsets/hi3516dv300/soc/test/unittest/common/hi3516_dma_ops_test.cpp",
   ]
-  deps = [
-    "//drivers/adapter/uhdf2/test/unittest/common:libhdf_test_common",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//utils/native/base:utils" ]
 
   cflags = [
     "-Wall",
@@ -52,7 +38,11 @@ ohos_unittest("khdf_audio_driver_test") {
     "-fno-strict-aliasing",
   ]
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_test_common",
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

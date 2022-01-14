@@ -24,26 +24,21 @@ group("bluetooth_hdi") {
 }
 
 ohos_shared_library("bluetooth_hdi_client") {
-  include_dirs = [
-    "//drivers/adapter/uhdf2/include/hdi",
-    "$root_path",
-  ]
+  include_dirs = [ "$root_path" ]
 
   sources = [
     "$root_path/ohos/hardware/bt/v1_0/bt_hci_callbacks_stub.cpp",
     "$root_path/ohos/hardware/bt/v1_0/client/bt_hci_proxy.cpp",
   ]
 
-  deps = [
-    "//drivers/adapter/uhdf2/hdi:libhdi",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//utils/native/base:utils" ]
 
   if (is_standard_system) {
     external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
     ]
@@ -55,12 +50,11 @@ ohos_shared_library("bluetooth_hdi_client") {
   }
 
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "bluetooth_device_driver"
 }
 
 ohos_shared_library("bluetooth_hdi_server") {
   include_dirs = [
-    "//drivers/adapter/uhdf2/include/hdi",
     "$root_path",
     "$root_path/ohos/hardware/bt/v1_0",
     "$root_path/ohos/hardware/bt/v1_0/server/implement",
@@ -79,16 +73,14 @@ ohos_shared_library("bluetooth_hdi_server") {
     "$root_path/ohos/hardware/bt/v1_0/server/implement/vendor_interface.cpp",
   ]
 
-  deps = [
-    "//drivers/adapter/uhdf2/hdi:libhdi",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//utils/native/base:utils" ]
 
   if (is_standard_system) {
     external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
     ]
@@ -100,5 +92,5 @@ ohos_shared_library("bluetooth_hdi_server") {
   }
 
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "bluetooth_device_driver"
 }

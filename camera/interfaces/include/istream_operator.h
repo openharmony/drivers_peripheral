@@ -28,7 +28,6 @@
 #include <list>
 #include <map>
 #include <vector>
-#include <hdf_log.h>
 #include "istream_operator_callback.h"
 #include "ioffline_stream_operator.h"
 #include "types.h"

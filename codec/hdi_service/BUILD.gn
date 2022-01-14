@@ -24,21 +24,20 @@ ohos_shared_library("libcodec_client") {
     "codec_proxy/proxy_msgproc.c",
   ]
 
-  deps = [
-    "//drivers/adapter/uhdf2/hdi:libhdi",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
-  ]
-
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
 
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "codec_device_driver"
 }
 
 group("codec_client") {
@@ -62,22 +61,22 @@ ohos_shared_library("libcodec_server") {
   ldflags = [ "-L$CODEC_LIB_REAL_PATH" ]
   ldflags += [ "-lcodec" ]
 
-  deps = [
-    "//drivers/adapter/uhdf2/hdi:libhdi",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
-    "//drivers/peripheral/codec/hdi_service:codec_client",
-  ]
+  deps = [ "//drivers/peripheral/codec/hdi_service:codec_client" ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
 
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "codec_device_driver"
 }
 
 group("codec_service") {
