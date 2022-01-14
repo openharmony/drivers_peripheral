@@ -225,10 +225,8 @@ if (defined(ohos_lite)) {
       "./common/usb_device_serial_func_test.cpp",
       "./common/usb_utils.cpp",
     ]
-    deps = [
-      "$hdf_uhdf_path/utils:libhdf_utils",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//utils/native/base:utils" ]
+    external_deps = [ "device_driver_framework:libhdf_utils" ]
   }
 
   ohos_moduletest("usb_device_net_func_test") {
@@ -282,10 +280,8 @@ if (defined(ohos_lite)) {
       "./common/usb_host_serial_func_test.cpp",
       "./common/usb_utils.cpp",
     ]
-    deps = [
-      "$hdf_uhdf_path/utils:libhdf_utils",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//utils/native/base:utils" ]
+    external_deps = [ "device_driver_framework:libhdf_utils" ]
   }
 
   ohos_moduletest("usb_host_raw_api_func_test") {
@@ -298,10 +294,8 @@ if (defined(ohos_lite)) {
       "./common/usb_host_raw_api_func_test.cpp",
       "./common/usb_utils.cpp",
     ]
-    deps = [
-      "$hdf_uhdf_path/utils:libhdf_utils",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//utils/native/base:utils" ]
+    external_deps = [ "device_driver_framework:libhdf_utils" ]
   }
 
   ohos_moduletest("usb_host_net_func_test") {

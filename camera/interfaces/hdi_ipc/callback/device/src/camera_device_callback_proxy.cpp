@@ -15,6 +15,7 @@
 
 #include "camera_device_callback_proxy.h"
 #include <hdf_base.h>
+#include <hdf_log.h>
 #include <message_parcel.h>
 #include "utils_data_stub.h"
 

@@ -71,5 +71,5 @@ ohos_shared_library("camera_v4l2_adapter") {
 
   public_configs = [ ":v4l2_config" ]
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "camera_device_driver"
 }

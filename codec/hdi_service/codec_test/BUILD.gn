@@ -34,10 +34,13 @@ ohos_unittest("codec_test") {
   ]
 
   deps = [
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/codec/hdi_service:codec_client",
     "//drivers/peripheral/codec/hdi_service:codec_service",
     "//third_party/googletest:gtest_main",
+  ]
+  external_deps = [
+    "device_driver_framework:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
   ]
 }
 

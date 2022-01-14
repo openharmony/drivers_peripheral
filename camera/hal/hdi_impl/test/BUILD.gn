@@ -202,8 +202,6 @@ if (defined(ohos_lite)) {
 
       #producer
       "//utils/native/base/include",
-      "//foundation/communication/ipc/ipc/native/src/core/include",
-      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
       "$camera_path/pipeline_core/utils",
       "$camera_path/pipeline_core/include",
       "$camera_path/pipeline_core/host_stream/include",
@@ -220,16 +218,7 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/ipp/include",
 
       # HCS
-      "//drivers/framework/include/osal",
-      "//drivers/framework/include/utils",
       "//system/core/include/cutils",
-      "//drivers/adapter/uhdf2/osal/include",
-      "$hdf_uhdf_path/manager/include",
-      "$hdf_uhdf_path/include/hdi",
-
-      "$hdf_uhdf_path/devhost/include",
-      "$hdf_uhdf_path/devmgr/include",
-      "$hdf_uhdf_path/host/include",
     ]
 
     deps = [
@@ -238,11 +227,6 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/hdi_impl:camera_hdi_impl",
       "$camera_path/pipeline_core:camera_pipeline_core",
-      "$hdf_uhdf_path/hdi:libhdi",
-      "$hdf_uhdf_path/utils:libhdf_utils",
-      "//drivers/adapter/uhdf2/host:libhdf_host",
-      "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-      "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
       "//foundation/graphic/standard:libsurface",
       "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
       "//third_party/googletest:gmock_main",
@@ -253,6 +237,10 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
+        "device_driver_framework:libhdf_host",
+        "device_driver_framework:libhdf_ipc_adapter",
+        "device_driver_framework:libhdf_utils",
+        "device_driver_framework:libhdi",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_core",
       ]

@@ -35,7 +35,7 @@ ohos_shared_library("libvibrator_interface_service") {
   }
 
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "vibrator_device_driver"
 }
 
 ohos_shared_library("libvibrator_driver") {
@@ -60,7 +60,7 @@ ohos_shared_library("libvibrator_driver") {
   }
 
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "vibrator_device_driver"
 }
 
 group("hdf_vibrator_service") {
