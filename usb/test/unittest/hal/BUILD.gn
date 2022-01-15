@@ -31,7 +31,6 @@ ohos_unittest("test_transfer") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/usb/ddk:libusb_core",
     "//drivers/peripheral/usb/hal/client:usbd_client",
     "//third_party/googletest:gtest_main",
@@ -44,6 +43,7 @@ ohos_unittest("test_transfer") {
     "appexecfwk_standard:appexecfwk_base",
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
+    "device_driver_framework:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
@@ -57,7 +57,6 @@ ohos_unittest("test_device") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/usb/hal/client:usbd_client",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
@@ -69,6 +68,7 @@ ohos_unittest("test_device") {
     "appexecfwk_standard:appexecfwk_base",
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
+    "device_driver_framework:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
@@ -83,7 +83,6 @@ ohos_unittest("test_function") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/usb/hal/client:usbd_client",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
@@ -95,6 +94,7 @@ ohos_unittest("test_function") {
     "appexecfwk_standard:appexecfwk_base",
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
+    "device_driver_framework:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

@@ -69,19 +69,21 @@ ohos_fuzztest("IpcCameraDeviceRemote") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
     "$camera_path/pipeline_core:camera_pipeline_core",
-    "$hdf_uhdf_path/hdi:libhdi",
-    "$hdf_uhdf_path/utils:libhdf_utils",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/peripheral/display/hal:hdi_display_gralloc",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -93,7 +95,7 @@ ohos_fuzztest("IpcCameraDeviceRemote") {
 
   install_enable = true
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "camera_device_driver"
 }
 
 ohos_fuzztest("IpcCameraHostService") {
@@ -143,19 +145,21 @@ ohos_fuzztest("IpcCameraHostService") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
     "$camera_path/pipeline_core:camera_pipeline_core",
-    "$hdf_uhdf_path/hdi:libhdi",
-    "$hdf_uhdf_path/utils:libhdf_utils",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/peripheral/display/hal:hdi_display_gralloc",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -167,7 +171,7 @@ ohos_fuzztest("IpcCameraHostService") {
 
   install_enable = true
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "camera_device_driver"
 }
 
 ohos_fuzztest("IpcOffline") {
@@ -216,19 +220,20 @@ ohos_fuzztest("IpcOffline") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
     "$camera_path/pipeline_core:camera_pipeline_core",
-    "$hdf_uhdf_path/hdi:libhdi",
-    "$hdf_uhdf_path/utils:libhdf_utils",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/peripheral/display/hal:hdi_display_gralloc",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -240,7 +245,7 @@ ohos_fuzztest("IpcOffline") {
 
   install_enable = true
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "camera_device_driver"
 }
 
 ohos_fuzztest("IpcStreamOperator") {
@@ -289,19 +294,20 @@ ohos_fuzztest("IpcStreamOperator") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
     "$camera_path/pipeline_core:camera_pipeline_core",
-    "$hdf_uhdf_path/hdi:libhdi",
-    "$hdf_uhdf_path/utils:libhdf_utils",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/peripheral/display/hal:hdi_display_gralloc",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -313,7 +319,7 @@ ohos_fuzztest("IpcStreamOperator") {
 
   install_enable = true
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "camera_device_driver"
 }
 
 ohos_fuzztest("IpcCameraDeviceCallback") {
@@ -364,19 +370,20 @@ ohos_fuzztest("IpcCameraDeviceCallback") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
     "$camera_path/pipeline_core:camera_pipeline_core",
-    "$hdf_uhdf_path/hdi:libhdi",
-    "$hdf_uhdf_path/utils:libhdf_utils",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/peripheral/display/hal:hdi_display_gralloc",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -388,7 +395,7 @@ ohos_fuzztest("IpcCameraDeviceCallback") {
 
   install_enable = true
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "camera_device_driver"
 }
 
 ohos_fuzztest("IpcCameraHostCallback") {
@@ -439,19 +446,20 @@ ohos_fuzztest("IpcCameraHostCallback") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
     "$camera_path/pipeline_core:camera_pipeline_core",
-    "$hdf_uhdf_path/hdi:libhdi",
-    "$hdf_uhdf_path/utils:libhdf_utils",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/peripheral/display/hal:hdi_display_gralloc",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -463,7 +471,7 @@ ohos_fuzztest("IpcCameraHostCallback") {
 
   install_enable = true
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "camera_device_driver"
 }
 
 ohos_fuzztest("IpcStreamOperatorCallback") {
@@ -512,19 +520,20 @@ ohos_fuzztest("IpcStreamOperatorCallback") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
     "$camera_path/pipeline_core:camera_pipeline_core",
-    "$hdf_uhdf_path/hdi:libhdi",
-    "$hdf_uhdf_path/utils:libhdf_utils",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/peripheral/display/hal:hdi_display_gralloc",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -536,7 +545,7 @@ ohos_fuzztest("IpcStreamOperatorCallback") {
 
   install_enable = true
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "camera_device_driver"
 }
 
 group("camera_hal_fuzztest") {

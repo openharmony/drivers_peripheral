@@ -80,12 +80,11 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     ]
 
-    deps = [
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-      "//drivers/adapter/uhdf2/utils:libhdf_utils",
-      "//utils/native/base:utils",
+    deps = [ "//utils/native/base:utils" ]
+    external_deps = [
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
     ]
-
     defines = [ "__OHOS__USER__" ]
 
     cflags = [
@@ -98,6 +97,7 @@ if (defined(ohos_lite)) {
     ]
 
     subsystem_name = "hdf"
+    part_name = "wlan_device_driver"
     install_images = [ "system" ]
   }
 }

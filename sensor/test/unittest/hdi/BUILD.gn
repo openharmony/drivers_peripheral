@@ -23,8 +23,6 @@ ohos_unittest("hdi_unittest_sensor") {
   include_dirs = [
     "//drivers/peripheral/sensor/interfaces",
     "//drivers/peripheral/sensor/interfaces/include",
-    "//drivers/adapter/uhdf2/include/hdi",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
   sources = [
@@ -41,14 +39,16 @@ ohos_unittest("hdi_unittest_sensor") {
   ]
 
   deps = [
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/sensor/interfaces/hdi/sensor/v1_0:libsensor_proxy",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

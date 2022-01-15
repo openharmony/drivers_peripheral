@@ -24,4 +24,6 @@ hdi("vibrator") {
   ]
 
   language = "cpp"
+  subsystem_name = "hdf"
+  part_name = "vibrator_device_driver"
 }

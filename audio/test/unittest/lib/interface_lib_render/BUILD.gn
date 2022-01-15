@@ -77,24 +77,15 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
-      "//drivers/adapter/uhdf2/include/hdi",
-      "//drivers/adapter/uhdf2/shared/include",
-      "//drivers/framework/include/core",
-      "//drivers/framework/include/utils",
-      "//drivers/framework/include/osal",
-      "//drivers/framework/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/framework/utils/include",
-      "//drivers/adapter/uhdf2/osal/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
 
     deps = [
-      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
-
+    external_deps = [ "device_driver_framework:libhdf_utils" ]
     if (!enable_audio_device_mpi) {
       deps += [ "//drivers/peripheral/audio/supportlibs/adm_adapter:hdi_audio_interface_lib_render" ]
     }

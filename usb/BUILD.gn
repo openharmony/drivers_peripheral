@@ -11,18 +11,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+if (defined(ohos_lite)) {
+  group("usb_entry") {
+    deps = [ "//drivers/peripheral/usb/sample/device/liteos:usbfn_sample" ]
+  }
+  group("usb_test_entry") {
+    deps = [
+      "//drivers/peripheral/usb/sample/host:usbhost_ddk_test",
+      "//drivers/peripheral/usb/sample/host/liteos_test:liteos_host_speed_test",
+      "//drivers/peripheral/usb/test:hdf_test_usb_device",
+    ]
+  }
+} else {
+  import("//build/ohos.gni")
+  import("//drivers/adapter/uhdf2/uhdf.gni")
 
-group("libusb_ddk") {
-  deps = [
-    "//drivers/peripheral/usb/ddk:libusb_core",
-    "//drivers/peripheral/usb/gadget/function/acm:libusbfn_cdcacm",
-    "//drivers/peripheral/usb/gadget/function/ecm:libusbfn_cdcecm",
-    "//drivers/peripheral/usb/gadget/function/master:libusbfn_master",
-    "//drivers/peripheral/usb/hal:hal_group",
-    "//drivers/peripheral/usb/net:libusbhost_ecm",
-    "//drivers/peripheral/usb/serial:libusbhost_acm",
-    "//drivers/peripheral/usb/serial:libusbhost_acm_rawapi",
-  ]
+  group("usb_entry") {
+    deps = [
+      "//drivers/peripheral/usb/ddk:libusb_core",
+      "//drivers/peripheral/usb/gadget/function/acm:libusbfn_cdcacm",
+      "//drivers/peripheral/usb/gadget/function/ecm:libusbfn_cdcecm",
+      "//drivers/peripheral/usb/gadget/function/master:libusbfn_master",
+      "//drivers/peripheral/usb/hal:hal_group",
+      "//drivers/peripheral/usb/net:libusbhost_ecm",
+      "//drivers/peripheral/usb/serial:libusbhost_acm",
+      "//drivers/peripheral/usb/serial:libusbhost_acm_rawapi",
+    ]
+  }
+  group("usb_test_entry") {
+    testonly = true
+    deps = [ "test:hdf_test_usb" ]
+  }
 }

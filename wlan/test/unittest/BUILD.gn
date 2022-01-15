@@ -71,7 +71,6 @@ if (defined(ohos_lite)) {
   ohos_unittest("hdf_unittest_wifi") {
     module_out_path = module_output_path
     include_dirs = [
-      "//drivers/framework/test/unittest/include",
       "//drivers/peripheral/wlan/client/include",
       "//drivers/peripheral/wlan/hal/include",
       "//drivers/peripheral/wlan/interfaces/include",
@@ -96,14 +95,16 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
     deps = [
-      "$hdf_uhdf_path/test/unittest/common:libhdf_test_common",
-      "$hdf_uhdf_path/utils:libhdf_utils",
       "//drivers/peripheral/wlan/client:wifi_driver_client",
       "//drivers/peripheral/wlan/hal:wifi_hal",
       "//utils/native/base:utils",
     ]
     if (is_standard_system) {
-      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+      external_deps = [
+        "device_driver_framework:libhdf_test_common",
+        "device_driver_framework:libhdf_utils",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
