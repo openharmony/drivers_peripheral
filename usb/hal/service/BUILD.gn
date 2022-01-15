@@ -52,18 +52,19 @@ ohos_shared_library("usbd") {
   public_configs = [ ":usbd_public_config" ]
 
   deps = [
-    "${hdf_uhdf_path}/hdi:libhdi",
-    "${hdf_uhdf_path}/ipc:libhdf_ipc_adapter",
-    "${hdf_uhdf_path}/utils:libhdf_utils",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/peripheral/usb/ddk:libusb_core",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "device_driver_framework:libhdf_host",
+    "device_driver_framework:libhdf_ipc_adapter",
+    "device_driver_framework:libhdf_utils",
+    "device_driver_framework:libhdi",
     "hiviewdfx_hilog_native:libhilog",
     "startup_l2:syspara",
   ]
 
   subsystem_name = "hdf"
+  part_name = "usb_device_driver"
 }

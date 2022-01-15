@@ -74,7 +74,7 @@ ohos_shared_library("def_display_gralloc") {
 
   install_enable = true
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "display_device_driver"
 }
 
 ohos_shared_library("def_display_device") {
@@ -118,5 +118,5 @@ ohos_shared_library("def_display_device") {
 
   install_enable = true
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "display_device_driver"
 }

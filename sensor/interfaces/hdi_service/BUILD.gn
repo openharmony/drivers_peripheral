@@ -16,51 +16,51 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 ohos_shared_library("libsensor_interface_service") {
   include_dirs = [
     "//drivers/adapter/uhdf2/include/hdi",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//drivers/peripheral/sensor/interfaces/include/",
   ]
   sources = [ "sensor_interface_service.cpp" ]
 
   deps = [
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
     "//drivers/peripheral/sensor/interfaces/hdi/sensor/v1_0:libsensor_stub",
     "//utils/native/base:utils",
   ]
 
-  if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
-  }
+  external_deps = [
+    "device_driver_framework:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
 
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "sensor_device_driver"
 }
 
 ohos_shared_library("libsensor_driver") {
   include_dirs = [
     "//drivers/adapter/uhdf2/include/hdi",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//drivers/peripheral/sensor/interfaces/include/",
   ]
   sources = [ "sensor_interface_driver.cpp" ]
 
   deps = [
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
     "//drivers/peripheral/sensor/interfaces/hdi/sensor/v1_0:libsensor_stub",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
 
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "sensor_device_driver"
 }
 
 group("hdf_sensor_service") {

@@ -197,8 +197,6 @@ if (defined(ohos_lite)) {
       "$camera_path/interfaces/hdi",
       "$camera_path/utils/event",
       "//utils/native/base/include",
-      "//foundation/communication/ipc/ipc/native/src/core/include",
-      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
       "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
 
       # hcs parser
@@ -227,8 +225,6 @@ if (defined(ohos_lite)) {
       "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
 
       # hcs parser
-      "$hdf_uhdf_path/utils:libhdf_utils",
-      "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
       "//foundation/graphic/standard:libsurface",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
@@ -236,7 +232,10 @@ if (defined(ohos_lite)) {
     ]
 
     if (is_standard_system) {
-      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+      external_deps = [
+        "device_driver_framework:libhdf_utils",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
