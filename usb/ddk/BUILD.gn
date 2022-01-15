@@ -39,19 +39,20 @@ ohos_shared_library("libusb_ddk_host") {
     "host/src/usb_raw_api_library.c",
   ]
 
-  deps = [
-    "$hdf_uhdf_path/host:libhdf_host",
-    "$hdf_uhdf_path/utils:libhdf_utils",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//utils/native/base:utils" ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
 
   subsystem_name = "hdf"
+  part_name = "usb_device_driver"
 }
 
 ohos_shared_library("libusb_pnp_manager") {
@@ -61,19 +62,20 @@ ohos_shared_library("libusb_pnp_manager") {
     "host/src/usb_pnp_manager.c",
   ]
 
-  deps = [
-    "$hdf_uhdf_path/host:libhdf_host",
-    "$hdf_uhdf_path/utils:libhdf_utils",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//utils/native/base:utils" ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
 
   subsystem_name = "hdf"
+  part_name = "usb_device_driver"
 }
 
 ohos_shared_library("libusb_ddk_device") {
@@ -92,17 +94,18 @@ ohos_shared_library("libusb_ddk_device") {
     "device/src/usbfn_sdk_if.c",
   ]
 
-  deps = [
-    "$hdf_uhdf_path/host:libhdf_host",
-    "$hdf_uhdf_path/utils:libhdf_utils",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//utils/native/base:utils" ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
 
   subsystem_name = "hdf"
+  part_name = "usb_device_driver"
 }

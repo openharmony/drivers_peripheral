@@ -142,16 +142,18 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$hdf_uhdf_path/hdi:libhdi",
-      "$hdf_uhdf_path/host:libhdf_host",
-      "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
-      "$hdf_uhdf_path/utils:libhdf_utils",
       "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
       "//utils/native/base:utils",
     ]
 
     if (is_standard_system) {
-      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+      external_deps = [
+        "device_driver_framework:libhdf_host",
+        "device_driver_framework:libhdf_ipc_adapter",
+        "device_driver_framework:libhdf_utils",
+        "device_driver_framework:libhdi",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
@@ -163,5 +165,6 @@ if (defined(ohos_lite)) {
     public_configs = [ ":hdi_service_proxy_config" ]
 
     subsystem_name = "hdf"
+    part_name = "audio_device_driver"
   }
 }

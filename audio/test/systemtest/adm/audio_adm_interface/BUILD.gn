@@ -84,14 +84,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
-      "//drivers/adapter/uhdf2/include/hdi",
-      "//drivers/adapter/uhdf2/shared/include",
-      "//drivers/framework/include/core",
-      "//drivers/framework/include/utils",
-      "//drivers/framework/include/osal",
-      "//drivers/framework/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/framework/utils/include",
       "//drivers/peripheral/audio/test/systemtest/common/adm_common/include",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
@@ -106,13 +99,15 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
     deps = [
-      "//drivers/adapter/uhdf2/hdi:libhdi",
-      "//drivers/adapter/uhdf2/host:libhdf_host",
-      "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
       "//utils/native/base:utils",
+    ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
     ]
     defines = []
     if (enable_audio_adm_so) {

@@ -28,7 +28,6 @@
 #include <list>
 #include <map>
 #include <vector>
-#include <hdf_log.h>
 #include "icamera_device_callback.h"
 #include "types.h"
 #include "icamera_interface.h"

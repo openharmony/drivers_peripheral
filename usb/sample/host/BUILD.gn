@@ -75,22 +75,23 @@ if (defined(ohos_lite)) {
       "src/usbhost_test.c",
     ]
 
-    deps = [
-      "$hdf_uhdf_path/hdi:libhdi",
-      "$hdf_uhdf_path/host:libhdf_host",
-      "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
-      "$hdf_uhdf_path/utils:libhdf_utils",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//utils/native/base:utils" ]
 
     if (is_standard_system) {
-      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+      external_deps = [
+        "device_driver_framework:libhdf_host",
+        "device_driver_framework:libhdf_ipc_adapter",
+        "device_driver_framework:libhdf_utils",
+        "device_driver_framework:libhdi",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
 
     install_enable = false
     subsystem_name = "hdf"
+    part_name = "usb_device_driver"
   }
 
   group("usb_pnp_sample_driver") {
@@ -110,20 +111,23 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "//drivers/adapter/uhdf2/host:libhdf_host",
-      "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//drivers/peripheral/usb/ddk:libusb_core",
       "//utils/native/base:utils",
     ]
 
     if (is_standard_system) {
-      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+      external_deps = [
+        "device_driver_framework:libhdf_host",
+        "device_driver_framework:libhdf_ipc_adapter",
+        "device_driver_framework:libhdf_utils",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
 
     subsystem_name = "hdf"
+    part_name = "usb_device_driver"
   }
 
   ohos_executable("usbhost_pnp_test") {
@@ -135,22 +139,23 @@ if (defined(ohos_lite)) {
 
     sources = [ "src/usbhost_pnp_test.c" ]
 
-    deps = [
-      "$hdf_uhdf_path/hdi:libhdi",
-      "$hdf_uhdf_path/host:libhdf_host",
-      "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
-      "$hdf_uhdf_path/utils:libhdf_utils",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//utils/native/base:utils" ]
 
     if (is_standard_system) {
-      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+      external_deps = [
+        "device_driver_framework:libhdf_host",
+        "device_driver_framework:libhdf_ipc_adapter",
+        "device_driver_framework:libhdf_utils",
+        "device_driver_framework:libhdi",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
 
     install_enable = false
     subsystem_name = "hdf"
+    part_name = "usb_device_driver"
   }
 
   ohos_executable("usbhost_sdkapi_speed_test") {
@@ -167,21 +172,24 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "//drivers/adapter/uhdf2/host:libhdf_host",
-      "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//drivers/peripheral/usb/ddk:libusb_core",
       "//utils/native/base:utils",
     ]
 
     if (is_standard_system) {
-      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+      external_deps = [
+        "device_driver_framework:libhdf_host",
+        "device_driver_framework:libhdf_ipc_adapter",
+        "device_driver_framework:libhdf_utils",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
 
     install_enable = false
     subsystem_name = "hdf"
+    part_name = "usb_device_driver"
   }
 
   ohos_executable("usbhost_sdkraw_speed_test") {
@@ -198,21 +206,24 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "//drivers/adapter/uhdf2/host:libhdf_host",
-      "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-      "//drivers/adapter/uhdf2/utils:libhdf_utils",
       "//drivers/peripheral/usb/ddk:libusb_core",
       "//utils/native/base:utils",
     ]
 
     if (is_standard_system) {
-      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+      external_deps = [
+        "device_driver_framework:libhdf_host",
+        "device_driver_framework:libhdf_ipc_adapter",
+        "device_driver_framework:libhdf_utils",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
 
     install_enable = false
     subsystem_name = "hdf"
+    part_name = "usb_device_driver"
   }
 
   ohos_executable("usbhost_nosdk_speed_test") {
@@ -230,20 +241,21 @@ if (defined(ohos_lite)) {
 
     sources = [ "src/usbhost_nosdk_speed.c" ]
 
-    deps = [
-      "$hdf_uhdf_path/hdi:libhdi",
-      "$hdf_uhdf_path/host:libhdf_host",
-      "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
-      "$hdf_uhdf_path/utils:libhdf_utils",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//utils/native/base:utils" ]
 
     if (is_standard_system) {
-      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+      external_deps = [
+        "device_driver_framework:libhdf_host",
+        "device_driver_framework:libhdf_ipc_adapter",
+        "device_driver_framework:libhdf_utils",
+        "device_driver_framework:libhdi",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
     install_enable = false
     subsystem_name = "hdf"
+    part_name = "usb_device_driver"
   }
 }

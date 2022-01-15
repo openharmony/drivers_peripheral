@@ -122,8 +122,6 @@ if (defined(ohos_lite)) {
       #producer
       "//utils/native/base/include",
       "//foundation/graphic/standard/prebuilts/librarys/display_gralloc/include",
-      "//foundation/communication/ipc/ipc/native/src/core/include",
-      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
       "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
       "$camera_path/pipeline_core/utils",
       "$camera_path/pipeline_core/include",
@@ -158,19 +156,20 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/hdi_impl:camera_hdi_impl",
       "$camera_path/pipeline_core:camera_pipeline_core",
-      "$hdf_uhdf_path/hdi:libhdi",
-      "$hdf_uhdf_path/utils:libhdf_utils",
-      "//drivers/adapter/uhdf2/host:libhdf_host",
-      "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
       "//drivers/peripheral/display/hal:hdi_display_gralloc",
-      "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
       "//foundation/graphic/standard:libsurface",
       "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
       "//utils/native/base:utils",
     ]
 
     if (is_standard_system) {
-      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+      external_deps = [
+        "device_driver_framework:libhdf_host",
+        "device_driver_framework:libhdf_ipc_adapter",
+        "device_driver_framework:libhdf_utils",
+        "device_driver_framework:libhdi",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
@@ -183,6 +182,6 @@ if (defined(ohos_lite)) {
     public_configs = [ ":ohos_camera_demo_config" ]
     install_enable = true
     subsystem_name = "hdf"
-    part_name = "hdf"
+    part_name = "camera_device_driver"
   }
 }
