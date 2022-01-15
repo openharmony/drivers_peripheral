@@ -64,31 +64,29 @@ ohos_shared_library("hdi_cif") {
     "$camera_path/hdi_cif/src/include",
     "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
     "//utils/native/base/include",
-    "//foundation/communication/ipc/ipc/native/src/core/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//drivers/adapter/uhdf2/osal/include",
-    "//drivers/framework/include/utils",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
   ]
 
   deps = [
-    "$hdf_uhdf_path/hdi:libhdi",
-    "$hdf_uhdf_path/utils:libhdf_utils",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
 
   public_configs = [ ":hdi_cif_config" ]
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "camera_device_driver"
 }

@@ -1,0 +1,44 @@
+{
+  "name": "hdf",
+  "description": "drivers adapter",
+  "component": {
+    "name": "vibrator_device_driver",
+    "subsystem": "hdf",
+    "syscap": [""],
+    "adapter_system_type": ["standard"],
+    "rom": "1000KB",
+    "ram": "1000KB",
+    "deps": {
+      "components": [
+        "developer_test",
+        "hilog",
+        "utils_base"
+      ],
+      "third_part": [
+        "bounds_checking_function"
+      ]
+    },
+    "build": {
+      "sub_component": [
+        "//drivers/peripheral/misc/vibrator/hal:hdi_vibrator",
+        "//drivers/peripheral/misc/vibrator/interfaces/vibrator/v1_0:vibrator",
+        "//drivers/peripheral/misc/vibrator/interfaces/hdi_service:hdf_vibrator_service"
+      ],
+      "test": [
+        "//drivers/peripheral/misc/vibrator/test:hdf_test_vibrator"
+      ],
+      "inner_kits": [
+        {
+          "name": "//drivers/peripheral/misc/vibrator/hal:hdi_vibrator",
+          "header": {
+            "header_files": [
+              "vibrator_if.h",
+              "vibrator_type.h"
+            ],
+            "header_base": "//drivers/peripheral/misc/vibrator/interfaces/include"
+          }
+        }
+      ]
+    }
+  }
+}

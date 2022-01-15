@@ -72,10 +72,7 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
     ]
 
-    deps = [
-      "//drivers/adapter/uhdf2/utils:libhdf_utils",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//utils/native/base:utils" ]
 
     cflags = [
       "-Wall",
@@ -86,8 +83,12 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
     subsystem_name = "hdf"
+    part_name = "vibrator_device_driver"
     if (is_standard_system) {
-      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+      external_deps = [
+        "device_driver_framework:libhdf_utils",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
     } else {
       external_deps = [ "hilog:libhilog" ]
     }

@@ -179,8 +179,6 @@ if (defined(ohos_lite)) {
 
       #producer
       "//utils/native/base/include",
-      "//foundation/communication/ipc/ipc/native/src/core/include",
-      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
       "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
       "$camera_path/pipeline_core/utils",
       "$camera_path/pipeline_core/include",
@@ -198,12 +196,7 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/ipp/include",
 
       # hcs parser
-      "//drivers/framework/include/osal",
-      "//drivers/framework/include/utils",
-      "//drivers/adapter/uhdf2/osal/include",
       "//system/core/include/cutils",
-      "$hdf_uhdf_path/manager/include",
-      "$hdf_uhdf_path/include/hdi",
     ]
 
     deps = [
@@ -212,9 +205,6 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/hdi_impl:camera_hdi_impl",
       "$camera_path/pipeline_core:camera_pipeline_core",
-      "$hdf_uhdf_path/hdi:libhdi",
-      "$hdf_uhdf_path/utils:libhdf_utils",
-      "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
       "//foundation/graphic/standard:libsurface",
       "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
       "//third_party/googletest:gmock",
@@ -226,6 +216,8 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
+        "device_driver_framework:libhdf_utils",
+        "device_driver_framework:libhdi",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_core",
       ]

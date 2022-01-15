@@ -15,6 +15,7 @@
 
 #include "camera_host_callback_proxy.h"
 #include <hdf_base.h>
+#include <hdf_log.h>
 #include <message_parcel.h>
 
 namespace OHOS::Camera {

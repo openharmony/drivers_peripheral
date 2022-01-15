@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <hdf_log.h>
 #include "camera_host_callback.h"
 
 namespace OHOS::Camera {

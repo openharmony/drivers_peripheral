@@ -61,5 +61,5 @@ ohos_executable("v4l2_main") {
   install_enable = true
   public_configs = [ ":v4l2_maintest" ]
   subsystem_name = "hdf"
-  part_name = "hdf"
+  part_name = "camera_device_driver"
 }
