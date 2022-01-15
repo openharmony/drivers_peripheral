@@ -469,10 +469,10 @@ int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen, char *func, int32
     int32_t ret;
 #ifdef __LITEOS__
     soPathHdi = "/usr/lib/libhdi_audio.so";
-    soPathProxy = "/usr/lib/libaudio_hdi_proxy_server.so";
+    soPathProxy = "/usr/lib/libhdi_audio_client.so";
 #else
     soPathHdi = "/system/lib/libhdi_audio.z.so";
-    soPathProxy = "/system/lib/libaudio_hdi_proxy_server.z.so";
+    soPathProxy = "/system/lib/libhdi_audio_client.z.so";
 #endif
     PrintMenu1();
     printf("Please enter your choice:");
