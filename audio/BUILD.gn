@@ -27,8 +27,8 @@ group("hdi_audio") {
   } else {
     deps += [
       "config/linux:hdf_audio_json",
-      "hal/hdi_binder/proxy:audio_hdi_proxy_server",
-      "hal/hdi_binder/server:audio_hdi_adapter_server",
+      "hal/hdi_binder/proxy:hdi_audio_client",
+      "hal/hdi_binder/server:hdi_audio_server",
     ]
   }
 
