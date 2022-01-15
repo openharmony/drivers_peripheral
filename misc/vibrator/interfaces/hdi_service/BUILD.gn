@@ -13,7 +13,7 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libvibrator_interface_service") {
+ohos_shared_library("libvibrator_interface_service_1.0") {
   include_dirs = [
     "//drivers/adapter/uhdf2/include/hdi",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
@@ -21,17 +21,23 @@ ohos_shared_library("libvibrator_interface_service") {
   ]
   sources = [ "vibrator_interface_service.cpp" ]
 
-  deps = [
+  public_deps = [
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/misc/vibrator/hal:hdi_vibrator",
-    "//drivers/peripheral/misc/vibrator/interfaces/vibrator/v1_0:libvibrator_stub",
+    "//drivers/peripheral/misc/vibrator/interfaces/vibrator/v1_0:libvibrator_stub_1.0",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
   } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_core",
+    ]
   }
 
   subsystem_name = "hdf"
@@ -40,6 +46,8 @@ ohos_shared_library("libvibrator_interface_service") {
 
 ohos_shared_library("libvibrator_driver") {
   include_dirs = [
+    "//drivers/adapter/uhdf2/ipc/include",
+    "//drivers/adapter/uhdf2/include/host",
     "//drivers/adapter/uhdf2/include/hdi",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//drivers/peripheral/misc/vibrator/interfaces/include/",
@@ -47,16 +55,22 @@ ohos_shared_library("libvibrator_driver") {
   sources = [ "vibrator_interface_driver.cpp" ]
 
   deps = [
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
+    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/peripheral/misc/vibrator/hal:hdi_vibrator",
-    "//drivers/peripheral/misc/vibrator/interfaces/vibrator/v1_0:libvibrator_stub",
+    "//drivers/peripheral/misc/vibrator/interfaces/hdi_service:libvibrator_interface_service_1.0",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
   } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_core",
+    ]
   }
 
   subsystem_name = "hdf"
@@ -67,7 +81,7 @@ group("hdf_vibrator_service") {
   if (target_cpu == "arm") {
     deps = [
       ":libvibrator_driver",
-      ":libvibrator_interface_service",
+      ":libvibrator_interface_service_1.0",
     ]
   }
 }

@@ -13,25 +13,37 @@
  * limitations under the License.
  */
 
-#include <hdf_log.h>
 #include <hdf_base.h>
-#include <osal_mem.h>
 #include <hdf_device_desc.h>
-#include "vibrator_interface_stub.h"
+#include <hdf_sbuf_ipc.h>
+#include <hdf_log.h>
+#include <osal_mem.h>
+#include "vibrator_interface_service.h"
 
 using namespace vibrator::v1_0;
 
 struct HdfVibratorInterfaceHost {
     struct IDeviceIoService ioservice;
-    void *instance;
+    VibratorInterfaceService *service;
 };
 
-static int32_t VibratorInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t VibratorInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
+    struct HdfSBuf *reply)
 {
     struct HdfVibratorInterfaceHost *hdfVibratorInterfaceHost = CONTAINER_OF(
         client->device->service, struct HdfVibratorInterfaceHost, ioservice);
-    return VibratorInterfaceServiceOnRemoteRequest(hdfVibratorInterfaceHost->instance, cmdId, data, reply);
+
+    OHOS::MessageParcel *dataParcel = nullptr;
+    OHOS::MessageParcel *replyParcel = nullptr;
+    OHOS::MessageOption option;
+
+    (void)SbufToParcel(reply, &replyParcel);
+    if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    return hdfVibratorInterfaceHost->service->OnRemoteRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
 static int HdfVibratorInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
@@ -52,21 +64,21 @@ static int HdfVibratorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfVibratorInterfaceHost->ioservice.Dispatch = VibratorInterfaceDriverDispatch;
     hdfVibratorInterfaceHost->ioservice.Open = NULL;
     hdfVibratorInterfaceHost->ioservice.Release = NULL;
-    hdfVibratorInterfaceHost->instance = VibratorInterfaceStubInstance();
+    hdfVibratorInterfaceHost->service = new VibratorInterfaceService();
 
     deviceObject->service = &hdfVibratorInterfaceHost->ioservice;
-
     HDF_LOGI("HdfVibratorInterfaceDriverBind Success");
     return HDF_SUCCESS;
 }
 
 static void HdfVibratorInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    struct HdfVibratorInterfaceHost *hdfVibratorInterfaceHost =
-        CONTAINER_OF(deviceObject->service, struct HdfVibratorInterfaceHost, ioservice);
-    VibratorInterfaceStubRelease(hdfVibratorInterfaceHost->instance);
+    HDF_LOGI("HdfVibratorInterfaceDriverRelease enter");
+
+    struct HdfVibratorInterfaceHost *hdfVibratorInterfaceHost = CONTAINER_OF(
+        deviceObject->service, struct HdfVibratorInterfaceHost, ioservice);
+    delete hdfVibratorInterfaceHost->service;
     OsalMemFree(hdfVibratorInterfaceHost);
-    HDF_LOGI("HdfSensorInterfaceDriverRelease Success");
 }
 
 struct HdfDriverEntry g_vibratorInterfaceDriverEntry = {

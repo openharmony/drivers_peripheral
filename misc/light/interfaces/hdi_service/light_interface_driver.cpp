@@ -16,22 +16,34 @@
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
+#include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
-#include "light_interface_stub.h"
+#include "light_interface_service.h"
 
 using namespace light::v1_0;
 
 struct HdfLightInterfaceHost {
     struct IDeviceIoService ioservice;
-    void *instance;
+    LightInterfaceService *service;
 };
 
-static int32_t LightInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t LightInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
+    struct HdfSBuf *reply)
 {
     struct HdfLightInterfaceHost *hdfLightInterfaceHost = CONTAINER_OF(
         client->device->service, struct HdfLightInterfaceHost, ioservice);
-    return LightInterfaceServiceOnRemoteRequest(hdfLightInterfaceHost->instance, cmdId, data, reply);
+
+    OHOS::MessageParcel *dataParcel = nullptr;
+    OHOS::MessageParcel *replyParcel = nullptr;
+    OHOS::MessageOption option;
+
+    (void)SbufToParcel(reply, &replyParcel);
+    if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    return hdfLightInterfaceHost->service->OnRemoteRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
 static int HdfLightInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
@@ -52,7 +64,7 @@ static int HdfLightInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfLightInterfaceHost->ioservice.Dispatch = LightInterfaceDriverDispatch;
     hdfLightInterfaceHost->ioservice.Open = nullptr;
     hdfLightInterfaceHost->ioservice.Release = nullptr;
-    hdfLightInterfaceHost->instance = LightInterfaceStubInstance();
+    hdfLightInterfaceHost->service = new LightInterfaceService();
 
     deviceObject->service = &hdfLightInterfaceHost->ioservice;
     HDF_LOGI("HdfLightInterfaceDriverBind success");
@@ -61,12 +73,12 @@ static int HdfLightInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
 static void HdfLightInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    struct HdfLightInterfaceHost *hdfLightInterfaceHost =
-        CONTAINER_OF(deviceObject->service, struct HdfLightInterfaceHost, ioservice);
-    LightInterfaceStubRelease(hdfLightInterfaceHost->instance);
+    HDF_LOGI("HdfLightInterfaceDriverRelease enter");
+
+    struct HdfLightInterfaceHost *hdfLightInterfaceHost = CONTAINER_OF(
+        deviceObject->service, struct HdfLightInterfaceHost, ioservice);
+    delete hdfLightInterfaceHost->service;
     OsalMemFree(hdfLightInterfaceHost);
-    hdfLightInterfaceHost = nullptr;
-    HDF_LOGI("HdfLightInterfaceDriverRelease success");
 }
 
 struct HdfDriverEntry g_lightinterfaceDriverEntry = {
