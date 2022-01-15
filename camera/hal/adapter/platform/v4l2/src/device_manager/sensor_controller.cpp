@@ -221,16 +221,18 @@ RetCode SensorController::GetAWBMetaData(std::shared_ptr<CameraStandard::CameraM
 {
     static float oldColorGains[4] = {0};
     float colorGains[4] = {0};
+    int value = 0;
     RetCode rc = RC_ERROR;
     std::lock_guard<std::mutex> l(metaDataSetlock_);
     for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
         switch (*iter) {
             case OHOS_SENSOR_COLOR_CORRECTION_GAINS: {
-                rc = sensorVideo_->QuerySetting(GetName(), CMD_AWB_COLORGAINS, (int*)colorGains);
+                rc = sensorVideo_->QuerySetting(GetName(), CMD_AWB_COLORGAINS, &value);
                 if (rc == RC_ERROR) {
                     CAMERA_LOGE("%s CMD_AWB_COLORGAINS QuerySetting fail", __FUNCTION__);
                     return rc;
                 }
+                colorGains[0] = (float)value;
                 int gainsSize = 4;
                 if (!CheckNumequal(oldColorGains, colorGains, gainsSize)) {
                     std::lock_guard<std::mutex> l(metaDataFlaglock_);
