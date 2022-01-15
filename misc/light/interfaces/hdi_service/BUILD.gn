@@ -1,0 +1,73 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/ohos.gni")
+import("//drivers/adapter/uhdf2/uhdf.gni")
+
+ohos_shared_library("liblight_interface_service") {
+  include_dirs = [
+    "//drivers/adapter/uhdf2/include/hdi",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//drivers/peripheral/misc/light/interfaces/include/",
+  ]
+  sources = [ "light_interface_service.cpp" ]
+
+  deps = [
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
+    "//drivers/peripheral/misc/light/hal:hdi_light",
+    "//drivers/peripheral/misc/light/interfaces/light/v1_0:liblight_stub",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  subsystem_name = "hdf"
+  part_name = "hdf"
+}
+
+ohos_shared_library("liblight_driver") {
+  include_dirs = [
+    "//drivers/adapter/uhdf2/include/hdi",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//drivers/peripheral/misc/light/interfaces/include/",
+  ]
+  sources = [ "light_interface_driver.cpp" ]
+
+  deps = [
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
+    "//drivers/peripheral/misc/light/hal:hdi_light",
+    "//drivers/peripheral/misc/light/interfaces/light/v1_0:liblight_stub",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  subsystem_name = "hdf"
+  part_name = "hdf"
+}
+
+group("hdf_light_service") {
+  if (target_cpu == "arm") {
+    deps = [
+      ":liblight_driver",
+      ":liblight_interface_service",
+    ]
+  }
+}
