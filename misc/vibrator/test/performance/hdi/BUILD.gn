@@ -33,14 +33,16 @@ ohos_unittest("hdf_vibrator_hdi_test_performance") {
   ]
 
   deps = [
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
-    "//drivers/peripheral/misc/vibrator/interfaces/vibrator/v1_0:libvibrator_proxy",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
+    "//drivers/peripheral/misc/vibrator/interfaces/vibrator/v1_0:libvibrator_proxy_1.0",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
