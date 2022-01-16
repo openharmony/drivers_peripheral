@@ -162,7 +162,7 @@ struct SensorInterface {
      * @since 2.2
      * @version 1.0
      */
-    int32_t (*Unregister)(int32_t sensorId);
+    int32_t (*Unregister)(int32_t sensorId, RecordDataCallback cb);
 };
 
 /**
