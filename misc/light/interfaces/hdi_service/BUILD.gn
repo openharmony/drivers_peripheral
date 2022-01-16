@@ -13,7 +13,7 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("liblight_interface_service") {
+ohos_shared_library("liblight_interface_service_1.0") {
   include_dirs = [
     "//drivers/adapter/uhdf2/include/hdi",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
@@ -24,14 +24,20 @@ ohos_shared_library("liblight_interface_service") {
   deps = [
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/misc/light/hal:hdi_light",
-    "//drivers/peripheral/misc/light/interfaces/light/v1_0:liblight_stub",
+    "//drivers/peripheral/misc/light/interfaces/light/v1_0:liblight_stub_1.0",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
   } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_core",
+    ]
   }
 
   subsystem_name = "hdf"
@@ -40,6 +46,8 @@ ohos_shared_library("liblight_interface_service") {
 
 ohos_shared_library("liblight_driver") {
   include_dirs = [
+    "//drivers/adapter/uhdf2/ipc/include",
+    "//drivers/adapter/uhdf2/include/host",
     "//drivers/adapter/uhdf2/include/hdi",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//drivers/peripheral/misc/light/interfaces/include/",
@@ -47,6 +55,7 @@ ohos_shared_library("liblight_driver") {
   sources = [ "light_interface_driver.cpp" ]
 
   deps = [
+    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/misc/light/hal:hdi_light",
     "//drivers/peripheral/misc/light/interfaces/light/v1_0:liblight_stub",
@@ -54,9 +63,15 @@ ohos_shared_library("liblight_driver") {
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
   } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_core",
+    ]
   }
 
   subsystem_name = "hdf"
@@ -67,7 +82,7 @@ group("hdf_light_service") {
   if (target_cpu == "arm") {
     deps = [
       ":liblight_driver",
-      ":liblight_interface_service",
+      ":liblight_interface_service_1.0",
     ]
   }
 }

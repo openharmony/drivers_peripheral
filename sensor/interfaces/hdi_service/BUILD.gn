@@ -13,39 +13,17 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libsensor_interface_service") {
+ohos_shared_library("libsensor_interface_service_1.0") {
   include_dirs = [
     "//drivers/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/sensor/interfaces/include/",
   ]
   sources = [ "sensor_interface_service.cpp" ]
 
-  deps = [
+  public_deps = [
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
-    "//drivers/peripheral/sensor/interfaces/hdi/sensor/v1_0:libsensor_stub",
-    "//utils/native/base:utils",
-  ]
-
-  external_deps = [
-    "device_driver_framework:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
-  ]
-
-  subsystem_name = "hdf"
-  part_name = "sensor_device_driver"
-}
-
-ohos_shared_library("libsensor_driver") {
-  include_dirs = [
-    "//drivers/adapter/uhdf2/include/hdi",
-    "//drivers/peripheral/sensor/interfaces/include/",
-  ]
-  sources = [ "sensor_interface_driver.cpp" ]
-
-  deps = [
-    "//drivers/peripheral/sensor/hal:hdi_sensor",
-    "//drivers/peripheral/sensor/interfaces/hdi/sensor/v1_0:libsensor_stub",
+    "//drivers/peripheral/sensor/interfaces/hdi/sensor/v1_0:libsensor_stub_1.0",
     "//utils/native/base:utils",
   ]
 
@@ -56,7 +34,44 @@ ohos_shared_library("libsensor_driver") {
       "ipc:ipc_core",
     ]
   } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_core",
+    ]
+  }
+
+  subsystem_name = "hdf"
+  part_name = "sensor_device_driver"
+}
+
+ohos_shared_library("libsensor_driver") {
+  include_dirs = [
+    "$hdf_uhdf_path/ipc/include",
+    "$hdf_uhdf_path/include/host",
+    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/peripheral/sensor/interfaces/include/",
+  ]
+
+  sources = [ "sensor_interface_driver.cpp" ]
+
+  deps = [
+    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+    "//drivers/peripheral/sensor/hal:hdi_sensor",
+    "//drivers/peripheral/sensor/interfaces/hdi_service:libsensor_interface_service_1.0",
+    "//utils/native/base:utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
+  } else {
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_core",
+    ]
   }
 
   subsystem_name = "hdf"
@@ -67,7 +82,7 @@ group("hdf_sensor_service") {
   if (target_cpu == "arm") {
     deps = [
       ":libsensor_driver",
-      ":libsensor_interface_service",
+      ":libsensor_interface_service_1.0",
     ]
   }
 }

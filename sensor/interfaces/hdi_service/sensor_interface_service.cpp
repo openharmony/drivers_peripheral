@@ -202,18 +202,3 @@ int32_t SensorInterfaceService::Unregister(int32_t sensorId)
 } // v1_0
 } // sensor
 } // hdi
-
-hdi::sensor::v1_0::ISensorInterface *SensorInterfaceServiceConstruct()
-{
-    using hdi::sensor::v1_0::SensorInterfaceService;
-    return new SensorInterfaceService();
-}
-
-void SensorInterfaceServiceRelease(hdi::sensor::v1_0::ISensorInterface *obj)
-{
-    FreeSensorInterfaceInstance();
-    if (obj == nullptr) {
-        return;
-    }
-    delete obj;
-}
