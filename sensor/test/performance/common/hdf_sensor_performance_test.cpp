@@ -249,7 +249,7 @@ HWTEST_F(HdfSensorPerformanceTest, SensorHdiUnregister001, TestSize.Level1)
     struct timespec tv2 = (struct timespec){0};
 
     clock_gettime(CLOCK_REALTIME, &tv1);
-    int ret = g_sensorPerformanceDev->Unregister(0);
+    int ret = g_sensorPerformanceDev->Unregister(0, SensorTestDataCallback);
     clock_gettime(CLOCK_REALTIME, &tv2);
     timeUsed = ((tv2.tv_sec * SENSOR_USEC_TIME + tv2.tv_nsec / SENSOR_MSEC_TIME) -
         (tv1.tv_sec * SENSOR_USEC_TIME + tv1.tv_nsec / SENSOR_MSEC_TIME));

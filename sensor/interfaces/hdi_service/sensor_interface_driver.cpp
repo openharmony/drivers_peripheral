@@ -19,6 +19,7 @@
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
 #include "sensor_interface_service.h"
+#include "sensor_if.h"
 
 using namespace hdi::sensor::v1_0;
 
@@ -77,6 +78,7 @@ static void HdfSensorInterfaceDriverRelease(struct HdfDeviceObject *deviceObject
         CONTAINER_OF(deviceObject->service, struct HdfSensorInterfaceHost, ioservice);
     delete hdfSensorInterfaceHost->service;
     OsalMemFree(hdfSensorInterfaceHost);
+    FreeSensorInterfaceInstance();
     HDF_LOGI("HdfSensorInterfaceDriverRelease Success");
 }
 

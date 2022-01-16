@@ -168,7 +168,7 @@ HWTEST_F(HdfSensorHdiTest, EnableSensor0001, TestSize.Level1)
         ret = g_sensorInterface->Disable(iter.sensorId);
         EXPECT_EQ(0, ret);
     }
-    ret = g_sensorInterface->Unregister(0);
+    ret = g_sensorInterface->Unregister(0, g_callback);
     EXPECT_EQ(0, ret);
 }
 
