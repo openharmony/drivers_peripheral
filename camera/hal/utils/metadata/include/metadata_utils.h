@@ -16,11 +16,13 @@
 #ifndef OHOS_CAMERA_METADATA_UTILS_H
 #define OHOS_CAMERA_METADATA_UTILS_H
 
+#include <iostream>
 #include <list>
 #include <map>
 #include <vector>
-#include <iostream>
+
 #include "camera_metadata_info.h"
+#include "message_parcel.h"
 
 namespace OHOS {
 namespace CameraStandard {
