@@ -37,7 +37,7 @@
           }
         },
         {
-          "name": "//drivers/peripheral/sensor/interfaces/hdi/sensor/v1_0:libsensor_proxy",
+          "name": "//drivers/peripheral/sensor/interfaces/hdi/sensor/v1_0:libsensor_proxy_1.0",
           "header": {
             "header_files": [
               "sensor_if.h",

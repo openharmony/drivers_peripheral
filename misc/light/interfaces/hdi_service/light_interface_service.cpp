@@ -83,18 +83,3 @@ int32_t LightInterfaceService::TurnOffLight(int32_t LightId)
 }
 } // v1_0
 } // light
-
-light::v1_0::ILightInterface *LightInterfaceServiceConstruct()
-{
-    using light::v1_0::LightInterfaceService;
-    return new LightInterfaceService();
-}
-
-void LightInterfaceServiceRelease(light::v1_0::ILightInterface *obj)
-{
-    FreeLightInterfaceInstance();
-    if (obj == nullptr) {
-        return;
-    }
-    delete obj;
-}

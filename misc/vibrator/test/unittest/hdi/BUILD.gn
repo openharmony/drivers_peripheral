@@ -31,7 +31,7 @@ ohos_unittest("hdf_unittest_hdi_vibrator") {
   ]
   deps = [
     "$hdf_uhdf_path/utils:libhdf_utils",
-    "//drivers/peripheral/misc/vibrator/interfaces/vibrator/v1_0:libvibrator_proxy",
+    "//drivers/peripheral/misc/vibrator/interfaces/vibrator/v1_0:libvibrator_proxy_1.0",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//utils/native/base:utils",
   ]

@@ -76,18 +76,3 @@ int32_t VibratorInterfaceService::Stop(HdfVibratorMode mode)
 }
 } // v1_0
 } // vibrator
-
-vibrator::v1_0::IVibratorInterface *VibratorInterfaceServiceConstruct()
-{
-    using vibrator::v1_0::VibratorInterfaceService;
-    return new VibratorInterfaceService();
-}
-
-void VibratorInterfaceServiceRelease(vibrator::v1_0::IVibratorInterface *obj)
-{
-    FreeVibratorInterfaceInstance();
-    if (obj == nullptr) {
-        return;
-    }
-    delete obj;
-}

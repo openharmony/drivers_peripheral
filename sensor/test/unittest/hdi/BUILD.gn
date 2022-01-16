@@ -39,7 +39,7 @@ ohos_unittest("hdi_unittest_sensor") {
   ]
 
   deps = [
-    "//drivers/peripheral/sensor/interfaces/hdi/sensor/v1_0:libsensor_proxy",
+    "//drivers/peripheral/sensor/interfaces/hdi/sensor/v1_0:libsensor_proxy_1.0",
     "//utils/native/base:utils",
   ]
 
