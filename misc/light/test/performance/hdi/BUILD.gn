@@ -33,14 +33,16 @@ ohos_unittest("hdf_light_hdi_test_performance") {
   ]
 
   deps = [
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
-    "//drivers/peripheral/misc/light/interfaces/light/v1_0:liblight_proxy",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
+    "//drivers/peripheral/misc/light/interfaces/light/v1_0:liblight_proxy_1.0",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
