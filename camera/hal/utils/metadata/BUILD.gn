@@ -19,7 +19,7 @@ if (defined(ohos_lite)) {
   shared_library("metadata_lite") {
     sources = [
       "src/camera_metadata_info.cpp",
-      "src/camera_metadata_operator.c",
+      "src/camera_metadata_operator.cpp",
     ]
     cflags = [
       "-fPIC",

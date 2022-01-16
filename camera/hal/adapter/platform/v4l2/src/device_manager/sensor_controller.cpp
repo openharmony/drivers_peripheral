@@ -272,7 +272,7 @@ RetCode SensorController::SendAEMetaData(common_metadata_header_t *data)
     int32_t expo = 0;
     RetCode rc = RC_OK;
     camera_metadata_item_t entry;
-    int ret = find_camera_metadata_item(data, OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &entry);
+    int ret = CameraStandard::FindCameraMetadataItem(data, OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &entry);
     if (ret == 0) {
         expo = *(entry.data.i32);
         if (expo != 0) {
@@ -298,7 +298,7 @@ RetCode SensorController::SendAWBMetaData(common_metadata_header_t *data)
     uint8_t awbMode = 0;
     RetCode rc = RC_OK;
     camera_metadata_item_t entry;
-    int ret = find_camera_metadata_item(data, OHOS_CONTROL_AWB_MODE, &entry);
+    int ret = CameraStandard::FindCameraMetadataItem(data, OHOS_CONTROL_AWB_MODE, &entry);
     if (ret == 0) {
         awbMode = *(entry.data.u8);
         rc = sensorVideo_->UpdateSetting(GetName(), CMD_AWB_MODE, (int*)&awbMode);
