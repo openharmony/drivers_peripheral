@@ -3,6 +3,7 @@ if (is_standard_system) {
   ohos_prebuilt_etc("hdf_audio_json") {
     source = "//drivers/peripheral/audio/config/adapter_config.json"
     relative_install_dir = "hdfconfig"
+    install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "audio_device_driver"
   }
@@ -10,6 +11,7 @@ if (is_standard_system) {
   ohos_prebuilt_etc("hdf_audio_path_json") {
     source = "//drivers/peripheral/audio/config/parse.json"
     relative_install_dir = "hdfconfig"
+    install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "audio_device_driver"
   }

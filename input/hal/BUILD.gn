@@ -105,7 +105,7 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
     install_images = [
-      "system",
+      chipset_base_dir,
       "updater",
     ]
     part_name = "input_device_driver"
