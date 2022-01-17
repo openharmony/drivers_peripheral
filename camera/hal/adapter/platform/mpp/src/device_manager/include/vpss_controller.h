@@ -37,9 +37,14 @@ public:
     RetCode ConfigVpss();
     RetCode StartVpss();
     RetCode StopVpss();
-    void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag) {};
+    void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag)
+    {
+        (void)abilityMetaDataTag;
+        return;
+    }
     RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
     {
+        (void)meta;
         return RC_OK;
     };
     bool GetMetaDataFlag()
@@ -48,9 +53,14 @@ public:
     };
     RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> camMeta)
     {
+        (void)camMeta;
         return RC_OK;
     };
-    void SetMetaDataFlag(bool metaDataFlag) {};
+    void SetMetaDataFlag(bool metaDataFlag)
+    {
+        (void)metaDataFlag;
+        return;
+    }
 
 private:
     std::shared_ptr<IVpssObject> vpssObject_ = nullptr;

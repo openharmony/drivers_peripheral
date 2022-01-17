@@ -107,6 +107,7 @@ PortFormat StreamPipelineStrategy::SetPortFormat(G_PIPELINE_SPEC_DATA_TYPE &pipe
         .needAllocation_ = pipeSpecPtr->nodeSpec[j].portSpec[k].need_allocation,
         .bufferCount_ = hostStreamInfo.bufferCount_
     };
+    (void)typeId;
     CAMERA_LOGI("buffercount = %{public}d", f.bufferCount_);
     return f;
 }
@@ -234,6 +235,7 @@ RetCode StreamPipelineStrategy::CombineSpecs(PipelineSpec& pipe)
 RetCode StreamPipelineStrategy::Destroy(const int& streamId)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(pipelineSpec_, RC_ERROR);
+    (void)streamId;
     pipelineSpec_->nodeSpecSet_.clear();
     return RC_OK;
 }

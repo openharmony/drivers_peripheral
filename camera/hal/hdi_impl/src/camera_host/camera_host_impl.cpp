@@ -317,6 +317,7 @@ RetCode CameraHostImpl::SetFlashlight(const std::vector<std::string> &phyCameraI
     bool isEnable, FlashlightStatus &flashlightStatus)
 {
     std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();
+    (void)phyCameraIds;
     if (deviceManager == nullptr) {
         CAMERA_LOGW("device manager is null [dm name MpiDeviceManager].");
         return RC_ERROR;

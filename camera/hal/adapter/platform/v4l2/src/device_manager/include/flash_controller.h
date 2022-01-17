@@ -30,6 +30,7 @@ public:
     RetCode PowerDown();
     RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
     {
+        (void)meta;
         return RC_OK;
     };
     RetCode SetFlashlight(FlashMode flashMode, bool enable);

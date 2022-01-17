@@ -22,11 +22,13 @@ SinkNode::SinkNode(const std::string& name, const std::string& type)
 
 RetCode SinkNode::Start(const int32_t streamId)
 {
+    (void)streamId;
     return RC_OK;
 }
 
 RetCode SinkNode::Stop(const int32_t streamId)
 {
+    (void)streamId;
     return RC_OK;
 }
 

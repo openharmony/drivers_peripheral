@@ -31,7 +31,12 @@ public:
     RetCode PowerUp(std::string hardwareName);
     RetCode PowerDown(std::string hardwareName);
     void Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta);
-    void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag, std::string hardwareName) {};
+    void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag, std::string hardwareName)
+    {
+        (void)abilityMetaDataTag;
+        (void)hardwareName;
+        return;
+    }
     RetCode SetFlashlight(FlashMode flashMode, bool enable, std::string hardwareName);
 private:
     bool CheckCameraIdList(std::string hardwareName);

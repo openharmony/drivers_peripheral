@@ -35,6 +35,7 @@ AlgoPlugin::~AlgoPlugin()
 
 RetCode AlgoPlugin::Init(std::shared_ptr<CameraStandard::CameraMetadata> meta)
 {
+    (void)meta;
     if (algoHandler_->func.Init == nullptr) {
         CAMERA_LOGE("unsupport operation.");
         return RC_ERROR;
@@ -83,6 +84,7 @@ RetCode AlgoPlugin::Process(std::shared_ptr<IBuffer>& outBuffer,
                             std::vector<std::shared_ptr<IBuffer>>& inBuffers,
                             std::shared_ptr<CameraStandard::CameraMetadata>& meta)
 {
+    (void)meta;
     if (algoHandler_->func.Process == nullptr) {
         CAMERA_LOGE("unsupport operation.");
         return RC_ERROR;
@@ -126,7 +128,7 @@ RetCode AlgoPlugin::Process(std::shared_ptr<IBuffer>& outBuffer,
             inAlgoBuffers[i] = nullptr;
         }
     }
-    delete inAlgoBuffers;
+    delete[] inAlgoBuffers;
     inAlgoBuffers = nullptr;
 
     if (ret != 0) {

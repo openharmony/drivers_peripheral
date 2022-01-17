@@ -24,6 +24,7 @@ ViManager::~ViManager() {}
 
 RetCode ViManager::CreateController(ControllerId controllerId, std::string hardwareName)
 {
+    (void)controllerId;
     if (vi_ == nullptr) {
         vi_ = std::make_shared<ViController>(hardwareName);
         if (vi_ == nullptr) {
@@ -62,6 +63,7 @@ RetCode ViManager::PowerDown(CameraId cameraId)
 
 CameraStandard::CameraMetadata ViManager::GetSensorInfo(CameraId cameraId)
 {
+    (void)cameraId;
     CameraStandard::CameraMetadata meta(0, 0);
     return meta;
 }

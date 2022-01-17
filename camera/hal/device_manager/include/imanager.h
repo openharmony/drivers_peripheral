@@ -32,51 +32,77 @@ public:
     };
     virtual std::shared_ptr<IController> GetController(ControllerId controllerId, std::string hardwareName)
     {
+        (void)controllerId;
+        (void)hardwareName;
         return nullptr;
     };
     virtual std::shared_ptr<IController> GetController(ControllerId controllerId)
     {
+        (void)controllerId;
         return nullptr;
     };
     virtual RetCode CreateController(CameraId cameraId, ControllerId controllerId, std::string hardwareName)
     {
+        (void)cameraId;
+        (void)controllerId;
+        (void)hardwareName;
         return RC_OK;
     };
     virtual RetCode CreateController(ControllerId controllerId, std::string hardwareName)
     {
+        (void)controllerId;
+        (void)hardwareName;
         return RC_OK;
     };
     virtual RetCode PowerUp(CameraId cameraId)
     {
+        (void)cameraId;
         return RC_OK;
     };
     virtual RetCode PowerDown(CameraId cameraId)
     {
+        (void)cameraId;
         return RC_OK;
     };
     virtual RetCode PowerUp(std::string hardwareName)
     {
+        (void)hardwareName;
         return RC_OK;
     };
     virtual RetCode PowerDown(std::string hardwareName)
     {
+        (void)hardwareName;
         return RC_OK;
     };
-    virtual void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag) {};
-    virtual void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag, std::string hardwareName) {};
+    virtual void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag)
+    {
+        (void)abilityMetaDataTag;
+    }
+    virtual void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag, std::string hardwareName)
+    {
+        (void)abilityMetaDataTag;
+        (void)hardwareName;
+    }
     virtual RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta)
     {
+        (void)meta;
         return RC_OK;
     };
     virtual RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta, std::string hardwareName)
     {
+        (void)meta;
+        (void)hardwareName;
         return RC_OK;
     };
     virtual bool GetMetaDataFlag()
     {
         return false;
     };
-    virtual void SetMetaDataFlag(bool metaDataFlag) {};
+    virtual void SetMetaDataFlag(bool metaDataFlag)
+    {
+        (void)metaDataFlag;
+        return;
+    }
 
 private:
     ManagerId managerID_;

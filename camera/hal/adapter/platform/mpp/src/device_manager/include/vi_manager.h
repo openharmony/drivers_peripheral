@@ -47,11 +47,14 @@ public:
     };
     RetCode GetFrameRateBySensor(int32_t CameraId, int32_t* pu32FrameRate)
     {
+        (void)CameraId;
+        (void)pu32FrameRate;
         return RC_OK;
     };
     CameraStandard::CameraMetadata GetSensorInfo(CameraId cameraIdt);
     RetCode StartCapture(int32_t snapCnt)
     {
+        (void)snapCnt;
         return RC_OK;
     };
     RetCode PowerUp(CameraId cameraId);

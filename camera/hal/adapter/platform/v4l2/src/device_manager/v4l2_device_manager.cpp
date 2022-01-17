@@ -181,6 +181,7 @@ std::shared_ptr<IController> V4L2DeviceManager::GetController(CameraId cameraId,
 RetCode V4L2DeviceManager::CreateController(CameraId cameraId, std::shared_ptr<IManager> manager, ManagerId managerId)
 {
     RetCode rc = RC_OK;
+    (void)cameraId;
     for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend(); iter++) {
         if ((*iter).managerId == managerId) {
             switch (managerId) {

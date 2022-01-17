@@ -43,6 +43,7 @@ RetCode SensorManager::CreateController(ControllerId controllerId, std::string h
 
 std::shared_ptr<IController> SensorManager::GetController(ControllerId controllerId, std::string hardwareName)
 {
+    (void)controllerId;
     if (sensorList_.size() == 0) {
         return nullptr;
     }

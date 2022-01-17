@@ -80,6 +80,7 @@ std::shared_ptr<Pipeline> StreamPipelineBuilder::Build(const std::shared_ptr<Pip
 RetCode StreamPipelineBuilder::Destroy(int streamId)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
+    (void)streamId;
     pipeline_->nodes_.clear();
     return RC_OK;
 }
