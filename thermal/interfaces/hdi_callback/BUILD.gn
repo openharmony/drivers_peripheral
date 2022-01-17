@@ -27,7 +27,7 @@ ohos_shared_library("libthermal_callback") {
     "$hdf_uhdf_path/host:libhdf_host",
     "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
     "$hdf_uhdf_path/utils:libhdf_utils",
-    "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_proxy",
+    "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_proxy_1.0",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//utils/native/base:utils",
   ]

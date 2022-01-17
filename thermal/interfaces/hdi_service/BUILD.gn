@@ -13,13 +13,16 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libthermal_interface_service") {
+ohos_shared_library("libthermal_interface_service_1.0") {
   include_dirs = [
+    "$hdf_uhdf_path/hdi:libhdi",
+    "$hdf_uhdf_path/host:libhdf_host",
+    "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
     "//drivers/adapter/uhdf2/include/hdi",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//drivers/peripheral/sensor/interfaces/include/",
-    "include",
+    "//drivers/adapter/uhdf2/shared/include",
+    "//drivers/peripheral/thermal/interfaces/include",
     "//third_party/libxml2/include",
+    "include",
   ]
   sources = [
     "src/base_info_config.cpp",
@@ -33,19 +36,23 @@ ohos_shared_library("libthermal_interface_service") {
   ]
 
   deps = [
-    "$hdf_uhdf_path/hdi:libhdi",
-    "$hdf_uhdf_path/host:libhdf_host",
-    "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
-    "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_stub",
+    "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_stub_1.0",
     "//third_party/libxml2:xml2",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
   } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_core",
+    ]
   }
 
   subsystem_name = "hdf"
@@ -56,22 +63,33 @@ ohos_shared_library("libthermal_interface_service") {
 
 ohos_shared_library("libthermal_driver") {
   include_dirs = [
+    "$hdf_uhdf_path/ipc/include",
+    "$hdf_uhdf_path/include/host",
     "//drivers/adapter/uhdf2/include/hdi",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//drivers/peripheral/sensor/interfaces/include/",
+    "//drivers/peripheral/thermal/interfaces/include/",
+    "include",
   ]
   sources = [ "src/thermal_interface_driver.cpp" ]
 
   deps = [
+    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
-    "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_stub",
+    "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_stub_1.0",
+    "//drivers/peripheral/thermal/interfaces/hdi_service:libthermal_interface_service_1.0",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
   } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_core",
+    ]
   }
 
   subsystem_name = "hdf"
@@ -82,7 +100,7 @@ group("hdf_thermal") {
   if (target_cpu == "arm") {
     deps = [
       ":libthermal_driver",
-      ":libthermal_interface_service",
+      ":libthermal_interface_service_1.0",
       "profile:thermal_hdf_config",
     ]
   }

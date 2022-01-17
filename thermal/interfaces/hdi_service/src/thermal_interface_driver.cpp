@@ -13,34 +13,46 @@
  * limitations under the License.
  */
 
-#include <hdf_log.h>
 #include <hdf_base.h>
-#include <osal_mem.h>
 #include <hdf_device_desc.h>
-#include "thermal_interface_stub.h"
+#include <hdf_log.h>
+#include <hdf_sbuf_ipc.h>
+#include <osal_mem.h>
+#include "thermal_interface_service.h"
 
 using namespace hdi::thermal::v1_0;
 
 struct HdfThermalInterfaceHost {
     struct IDeviceIoService ioservice;
-    void *instance;
+    ThermalInterfaceService *service;
 };
 
-static int32_t ThermalInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t ThermalInterfaceDriverDispatch(struct HdfDeviceIoClient *client,int cmdId, struct HdfSBuf *data,
+    struct HdfSBuf *reply)
 {
-    struct HdfThermalInterfaceHost *hdfThermalInterfaceHost = CONTAINER_OF(
-        client->device->service, struct HdfThermalInterfaceHost, ioservice);
-    return ThermalInterfaceServiceOnRemoteRequest(hdfThermalInterfaceHost->instance, cmdId, data, reply);
+    struct HdfThermalInterfaceHost *hdfThermalInterfaceHost =
+        CONTAINER_OF(client->device->service, struct HdfThermalInterfaceHost, ioservice);
+
+    OHOS::MessageParcel *dataParcel = nullptr;
+    OHOS::MessageParcel *replyParcel = nullptr;
+    OHOS::MessageOption option;
+
+    (void)SbufToParcel(reply, &replyParcel);
+    if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    return hdfThermalInterfaceHost->service->OnRemoteRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-static int HdfThermalInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
+int HdfThermalInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfThermalInterfaceDriverInit enter");
     return HDF_SUCCESS;
 }
 
-static int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
+int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfThermalInterfaceDriverBind enter");
 
@@ -54,19 +66,18 @@ static int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfThermalInterfaceHost->ioservice.Dispatch = ThermalInterfaceDriverDispatch;
     hdfThermalInterfaceHost->ioservice.Open = NULL;
     hdfThermalInterfaceHost->ioservice.Release = NULL;
-    hdfThermalInterfaceHost->instance = ThermalInterfaceStubInstance();
+    hdfThermalInterfaceHost->service = new ThermalInterfaceService();
 
     deviceObject->service = &hdfThermalInterfaceHost->ioservice;
     return HDF_SUCCESS;
 }
 
-static void HdfThermalInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
+void HdfThermalInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfThermalInterfaceDriverRelease enter");
-
     struct HdfThermalInterfaceHost *hdfThermalInterfaceHost =
         CONTAINER_OF(deviceObject->service, struct HdfThermalInterfaceHost, ioservice);
-    ThermalInterfaceStubRelease(hdfThermalInterfaceHost->instance);
+    delete hdfThermalInterfaceHost->service;
     OsalMemFree(hdfThermalInterfaceHost);
 }
 
