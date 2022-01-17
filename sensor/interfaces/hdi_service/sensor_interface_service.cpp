@@ -26,10 +26,10 @@ namespace {
         TRADITIONAL_SENSOR_INDEX = 0,
         MEDICAL_SENSOR_INDEX = 1
     };
-    constexpr int32_t g_medicalSensorIdMin = 128;
-    constexpr int32_t g_medicalSensorIdMax = 160;
-    constexpr int32_t g_traditionalSensorIdMin = 0;
-    constexpr int32_t g_remoteObjectCountThreshold = 1;
+    constexpr int32_t MEDICALSENSOR_ID_MIN = 128;
+    constexpr int32_t MEDICALSENSOR_ID_MAX = 160;
+    constexpr int32_t TRADITIONAL_SENSOR_ID_MIN = 0;
+    constexpr int32_t REMOTE_OBJE_CTOUNT_THRESHOLD = 1;
     using RemoteObjectCallBackMap = std::unordered_map<IRemoteObject*, sptr<ISensorCallback>>;
     using RemoteObjectIndexMap = std::unordered_map<IRemoteObject*, int32_t>;
     using IndexRemoteObjectMap = std::unordered_map<int32_t, std::vector<IRemoteObject*>>;
@@ -49,7 +49,7 @@ int SensorDataCallback(const struct SensorEvents *event)
     std::lock_guard<std::mutex> lock(g_mutex);
     auto indexRemoteIter = g_IndexRemoteObjectMap.find(TRADITIONAL_SENSOR_INDEX);
     if (indexRemoteIter == g_IndexRemoteObjectMap.end()) {
-        return 0;
+        return SENSOR_SUCCESS;
     }
 
     HdfSensorEvents hdfSensorEvents;
@@ -73,7 +73,6 @@ int SensorDataCallback(const struct SensorEvents *event)
             continue;
         }
         remoteCallBack->second->OnDataEvent(hdfSensorEvents);
-        HDF_LOGE(" vector IRemoteObject* tmp [%{public}p]", remoteObj);
     }
     return 0;
 }
@@ -200,19 +199,17 @@ int32_t SensorInterfaceService::Register(int32_t sensorId, const sptr<ISensorCal
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
-    ISensorCallback* tmp0 = callbackObj.GetRefPtr();
-    IRemoteObject* tmp = callbackObj->AsObject().GetRefPtr();
-    HDF_LOGE(" Register IRemoteObject* tmp [%{public}p], tmp0 [%{public}p]", tmp, tmp0);
+    IRemoteObject* obj = callbackObj->AsObject().GetRefPtr();
     std::lock_guard<std::mutex> lock(g_mutex);
-    auto remoteIter = g_remoteObjectCallBackMap.find(tmp);
+    auto remoteIter = g_remoteObjectCallBackMap.find(obj);
     if (remoteIter != g_remoteObjectCallBackMap.end()) {
         return SENSOR_FAILURE;
     }
     SensorIndex sensorIndex;
-    if (sensorId < g_traditionalSensorIdMin) {
+    if (sensorId < TRADITIONAL_SENSOR_ID_MIN) {
         return SENSOR_FAILURE;
     }
-    if (sensorId >= g_medicalSensorIdMin && sensorId <= g_medicalSensorIdMax) {
+    if (sensorId >= MEDICALSENSOR_ID_MIN && sensorId <= MEDICALSENSOR_ID_MAX) {
         sensorIndex = MEDICAL_SENSOR_INDEX;
         return SENSOR_FAILURE;
     } else {
@@ -222,24 +219,23 @@ int32_t SensorInterfaceService::Register(int32_t sensorId, const sptr<ISensorCal
     auto indexRemoteIter = g_IndexRemoteObjectMap.find(sensorIndex);
     if (indexRemoteIter != g_IndexRemoteObjectMap.end()) {
         auto remoteObjectIter =
-            find(g_IndexRemoteObjectMap[sensorIndex].begin(), g_IndexRemoteObjectMap[sensorIndex].end(), tmp);
+            find(g_IndexRemoteObjectMap[sensorIndex].begin(), g_IndexRemoteObjectMap[sensorIndex].end(), obj);
         if (remoteObjectIter == g_IndexRemoteObjectMap[sensorIndex].end()) {
-            g_IndexRemoteObjectMap[sensorIndex].push_back(tmp);
-            g_remoteObjectCallBackMap[tmp] = callbackObj;
-            g_remoteObjectIndexMap[tmp] = sensorIndex;
+            g_IndexRemoteObjectMap[sensorIndex].push_back(obj);
+            g_remoteObjectCallBackMap[obj] = callbackObj;
+            g_remoteObjectIndexMap[obj] = sensorIndex;
         }
         return SENSOR_SUCCESS;
     }
     int32_t ret = sensorInterface->Register(sensorIndex, SensorDataCallback);
-    HDF_LOGE("Register ret[%{public}d] ", ret);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, ret[%{public}d]", __func__, ret);
         return ret;
     }
     std::vector<IRemoteObject*> remoteVec;
-    remoteVec.push_back(tmp);
-    g_remoteObjectCallBackMap[tmp] = callbackObj;
-    g_remoteObjectIndexMap[tmp] = sensorIndex;
+    remoteVec.push_back(obj);
+    g_remoteObjectCallBackMap[obj] = callbackObj;
+    g_remoteObjectIndexMap[obj] = sensorIndex;
     g_IndexRemoteObjectMap[sensorIndex] = remoteVec;
     return ret;
 }
@@ -251,12 +247,10 @@ int32_t SensorInterfaceService::Unregister(int32_t sensorId,  const sptr<ISensor
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
-    ISensorCallback* tmp0 = callbackObj.GetRefPtr();
-    IRemoteObject* tmp = callbackObj->AsObject().GetRefPtr();
-    HDF_LOGE(" Unregister IRemoteObject* tmp [%{public}p], tmp0 [%{public}p]", tmp, tmp0);
+    IRemoteObject* obj = callbackObj->AsObject().GetRefPtr();
     
     std::lock_guard<std::mutex> lock(g_mutex);
-    auto remoteIndexIter = g_remoteObjectIndexMap.find(tmp);
+    auto remoteIndexIter = g_remoteObjectIndexMap.find(obj);
     if (remoteIndexIter == g_remoteObjectIndexMap.end()) {
         return HDF_FAILURE;
     }
@@ -272,15 +266,15 @@ int32_t SensorInterfaceService::Unregister(int32_t sensorId,  const sptr<ISensor
         return HDF_FAILURE;
     }
     auto remoteObjectIter =
-        find(g_IndexRemoteObjectMap[sensorIndex].begin(), g_IndexRemoteObjectMap[sensorIndex].end(), tmp);
+        find(g_IndexRemoteObjectMap[sensorIndex].begin(), g_IndexRemoteObjectMap[sensorIndex].end(), obj);
     if (remoteObjectIter == g_IndexRemoteObjectMap[sensorIndex].end()) {
         return HDF_FAILURE;
     }
 
-    if (g_IndexRemoteObjectMap[sensorIndex].size() > g_remoteObjectCountThreshold) {
+    if (g_IndexRemoteObjectMap[sensorIndex].size() > REMOTE_OBJE_CTOUNT_THRESHOLD) {
         g_IndexRemoteObjectMap[sensorIndex].erase(remoteObjectIter);
         g_remoteObjectIndexMap.erase(remoteIndexIter);
-        g_remoteObjectCallBackMap.erase(tmp);
+        g_remoteObjectCallBackMap.erase(obj);
         return SENSOR_SUCCESS;
     }
 
@@ -289,7 +283,7 @@ int32_t SensorInterfaceService::Unregister(int32_t sensorId,  const sptr<ISensor
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
     g_remoteObjectIndexMap.erase(remoteIndexIter);
-    g_remoteObjectCallBackMap.erase(tmp);
+    g_remoteObjectCallBackMap.erase(obj);
     g_IndexRemoteObjectMap.erase(sensorIndex);
 
     return ret;
