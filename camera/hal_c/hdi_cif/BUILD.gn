@@ -87,6 +87,7 @@ ohos_shared_library("hdi_cif") {
   }
 
   public_configs = [ ":hdi_cif_config" ]
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "camera_device_driver"
 }

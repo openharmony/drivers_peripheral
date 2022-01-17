@@ -59,6 +59,7 @@ ohos_shared_library("libhdi_display_gralloc_client") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "display_device_driver"
 }
@@ -87,6 +88,7 @@ ohos_shared_library("libhdi_display_gralloc_proxy") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "display_device_driver"
 }
@@ -108,6 +110,7 @@ ohos_shared_library("libhdi_mapper_adapter") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "display_device_driver"
 }

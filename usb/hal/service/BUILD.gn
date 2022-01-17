@@ -65,6 +65,7 @@ ohos_shared_library("usbd") {
     "startup_l2:syspara",
   ]
 
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "usb_device_driver"
 }

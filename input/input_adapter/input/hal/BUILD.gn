@@ -55,7 +55,7 @@ ohos_shared_library("hdi_input") {
     ]
   }
 
-  install_images = [ "vendor" ]
+  install_images = [ vendor_base_dir ]
   install_enable = true
   subsystem_name = "hidl_adapter"
   part_name = "hidl_adapter"

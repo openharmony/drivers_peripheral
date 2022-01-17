@@ -168,6 +168,7 @@ if (defined(ohos_lite)) {
 
     public_configs = [ ":audio_interface_config" ]
 
+    install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "audio_device_driver"
   }
@@ -220,6 +221,7 @@ if (defined(ohos_lite)) {
 
     public_configs = [ ":audio_interface_config" ]
 
+    install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "audio_device_driver"
   }

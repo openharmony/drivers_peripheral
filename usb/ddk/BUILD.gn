@@ -51,6 +51,7 @@ ohos_shared_library("libusb_ddk_host") {
     external_deps = [ "hilog:libhilog" ]
   }
 
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "usb_device_driver"
 }
@@ -74,6 +75,7 @@ ohos_shared_library("libusb_pnp_manager") {
     external_deps = [ "hilog:libhilog" ]
   }
 
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "usb_device_driver"
 }
@@ -106,6 +108,7 @@ ohos_shared_library("libusb_ddk_device") {
     external_deps = [ "hilog:libhilog" ]
   }
 
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "usb_device_driver"
 }

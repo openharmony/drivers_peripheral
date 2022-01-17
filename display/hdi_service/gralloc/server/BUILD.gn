@@ -48,8 +48,8 @@ ohos_shared_library("libhdi_display_gralloc_stub") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  # install_images = [ "system" ]
   # install_enable = true
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "display_device_driver"
 }
