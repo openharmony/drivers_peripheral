@@ -30,13 +30,15 @@ ohos_unittest("hdf_unittest_hdi_vibrator") {
     "-fno-strict-aliasing",
   ]
   deps = [
-    "$hdf_uhdf_path/utils:libhdf_utils",
     "//drivers/peripheral/misc/vibrator/interfaces/vibrator/v1_0:libvibrator_proxy_1.0",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//utils/native/base:utils",
   ]
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
