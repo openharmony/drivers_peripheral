@@ -46,7 +46,7 @@ struct SensorCovertCoff {
 };
 
 int32_t Register(int32_t sensorId, RecordDataCallback cb);
-int32_t Unregister(int32_t sensorId);
+int32_t Unregister(int32_t sensorId, RecordDataCallback cb);
 struct HdfDevEventlistener *GetSensorListener();
 void SetSensorIdBySensorType(enum SensorTypeTag type, int32_t sensorId);
 

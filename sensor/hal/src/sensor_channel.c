@@ -169,11 +169,12 @@ int32_t Register(int32_t sensorId, RecordDataCallback cb)
     return AddSensorDevServiceGroup();
 }
 
-int32_t Unregister(int32_t sensorId)
+int32_t Unregister(int32_t sensorId, RecordDataCallback cb)
 {
     struct SensorDevManager *manager = GetSensorDevManager();
     CHECK_NULL_PTR_RETURN_VALUE(manager->serviceGroup, SENSOR_SUCCESS);
     (void)sensorId;
+    (void)cb;
     int32_t ret = HdfIoServiceGroupUnregisterListener(manager->serviceGroup, &g_listener);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s: Sensor unregister listener failed", __func__);

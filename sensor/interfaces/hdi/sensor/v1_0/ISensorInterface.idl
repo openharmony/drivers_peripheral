@@ -26,5 +26,5 @@ interface ISensorInterface {
     SetMode([in] int sensorId, [in] int mode);
     SetOption([in] int sensorId, [in] unsigned int option);
     Register([in] int sensorId, [in] ISensorCallback callbackObj);
-    Unregister([in] int sensorId);
+    Unregister([in] int sensorId, [in] ISensorCallback callbackObj);
 }
