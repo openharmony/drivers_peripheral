@@ -547,7 +547,7 @@ int AudioHdiServerInit(struct HdfDeviceObject *deviceObject)
 
 struct HdfDriverEntry g_hdiServerEntry = {
     .moduleVersion = 1,
-    .moduleName = "audio_hdi_adapter_server",
+    .moduleName = "hdi_audio_server",
     .Bind = AudioHdiServerBind,
     .Init = AudioHdiServerInit,
     .Release = AudioHdiServerRelease,
