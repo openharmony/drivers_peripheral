@@ -11,4 +11,6 @@ hdi("light") {
   ]
 
   language = "cpp"
+  subsystem_name = "hdf"
+  part_name = "light_device_driver"
 }
