@@ -47,92 +47,97 @@ config("hdi_service_config") {
   ldflags = [ "-Wl" ]
 }
 
-if (defined(ohos_lite)) {
-  shared_library("audio_hdi_adapter_server") {
-    include_dirs = [
-      "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
-      "//drivers/peripheral/audio/hal/hdi_binder/server/include",
-      "$hdf_framework_path/core/sec/include",
-      "$hdf_framework_path/core/shared/include",
-      "$hdf_framework_path/core/host/include",
-      "$hdf_framework_path/core/manager/include",
-      "$hdf_framework_path/core/common/include/host/",
-      "//third_party/bounds_checking_function/include",
-      "//drivers/adapter/khdf/liteos/osal/include",
-      "//drivers/adapter/uhdf2/shared/include",
-      "//drivers/adapter/uhdf2/include/hdi/",
-    ]
-
-    sources = [
-      "$hdf_framework_path/support/posix/src/osal_mem.c",
-      "$hdf_framework_path/utils/src/hdf_sbuf.c",
-      "src/hdf_audio_server.c",
-      "src/hdf_audio_server_capture.c",
-      "src/hdf_audio_server_common.c",
-      "src/hdf_audio_server_render.c",
-    ]
-
-    deps = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
-      "//third_party/bounds_checking_function:libsec_shared",
-    ]
-
-    if (enable_audio_hal_hdf_log) {
-      defines = [ "AUDIO_HAL_HDF_LOG" ]
-    }
-
-    public_configs = [ ":hdi_service_config" ]
-  }
-
-  lite_component("hdi") {
-    features = [ ":audio_hdi_adapter_server" ]
-  }
-} else {
-  ohos_shared_library("audio_hdi_adapter_server") {
-    include_dirs = [
-      "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/hal/hdi_binder/server/include",
-      "//third_party/bounds_checking_function/include",
-    ]
-
-    sources = [
-      "src/hdf_audio_server.c",
-      "src/hdf_audio_server_capture.c",
-      "src/hdf_audio_server_common.c",
-      "src/hdf_audio_server_render.c",
-    ]
-
-    deps = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
-      "//utils/native/base:utils",
-    ]
-
-    defines = []
-    if (enable_audio_device_mpi) {
-      defines += [ "AUDIO_HAL_USER" ]
-    }
-    if (is_standard_system) {
-      external_deps = [
-        "device_driver_framework:libhdf_host",
-        "device_driver_framework:libhdf_ipc_adapter",
-        "device_driver_framework:libhdf_utils",
-        "device_driver_framework:libhdi",
-        "hiviewdfx_hilog_native:libhilog",
+if ("$product_name" != "ohos-arm64") {
+  import("//vendor/$product_company/$product_name/hals/audio/product.gni")
+}
+if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
+  if (defined(ohos_lite)) {
+    shared_library("hdi_audio_server") {
+      include_dirs = [
+        "//drivers/peripheral/audio/interfaces/include",
+        "//drivers/peripheral/audio/hal/hdi_passthrough/include",
+        "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
+        "//drivers/peripheral/audio/hal/hdi_binder/server/include",
+        "$hdf_framework_path/core/sec/include",
+        "$hdf_framework_path/core/shared/include",
+        "$hdf_framework_path/core/host/include",
+        "$hdf_framework_path/core/manager/include",
+        "$hdf_framework_path/core/common/include/host/",
+        "//third_party/bounds_checking_function/include",
+        "//drivers/adapter/khdf/liteos/osal/include",
+        "//drivers/adapter/uhdf2/shared/include",
+        "//drivers/adapter/uhdf2/include/hdi/",
       ]
-    } else {
-      external_deps = [ "hilog:libhilog" ]
+
+      sources = [
+        "$hdf_framework_path/support/posix/src/osal_mem.c",
+        "$hdf_framework_path/utils/src/hdf_sbuf.c",
+        "src/hdf_audio_server.c",
+        "src/hdf_audio_server_capture.c",
+        "src/hdf_audio_server_common.c",
+        "src/hdf_audio_server_render.c",
+      ]
+
+      deps = [
+        "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
+        "//third_party/bounds_checking_function:libsec_shared",
+      ]
+
+      if (enable_audio_hal_hdf_log) {
+        defines = [ "AUDIO_HAL_HDF_LOG" ]
+      }
+
+      public_configs = [ ":hdi_service_config" ]
     }
 
-    if (enable_audio_hal_hdf_log) {
-      defines += [ "AUDIO_HAL_HDF_LOG" ]
+    lite_component("hdi") {
+      features = [ ":hdi_audio_server" ]
     }
+  } else {
+    ohos_shared_library("hdi_audio_server") {
+      include_dirs = [
+        "//drivers/peripheral/audio/interfaces/include",
+        "//drivers/peripheral/audio/hal/hdi_passthrough/include",
+        "//drivers/peripheral/audio/hal/hdi_binder/server/include",
+        "//third_party/bounds_checking_function/include",
+      ]
 
-    public_configs = [ ":hdi_service_config" ]
+      sources = [
+        "src/hdf_audio_server.c",
+        "src/hdf_audio_server_capture.c",
+        "src/hdf_audio_server_common.c",
+        "src/hdf_audio_server_render.c",
+      ]
 
-    subsystem_name = "hdf"
-    part_name = "audio_device_driver"
+      deps = [
+        "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
+        "//utils/native/base:utils",
+      ]
+
+      defines = []
+      if (enable_audio_device_mpi) {
+        defines += [ "AUDIO_HAL_USER" ]
+      }
+      if (is_standard_system) {
+        external_deps = [
+          "device_driver_framework:libhdf_host",
+          "device_driver_framework:libhdf_ipc_adapter",
+          "device_driver_framework:libhdf_utils",
+          "device_driver_framework:libhdi",
+          "hiviewdfx_hilog_native:libhilog",
+        ]
+      } else {
+        external_deps = [ "hilog:libhilog" ]
+      }
+
+      if (enable_audio_hal_hdf_log) {
+        defines += [ "AUDIO_HAL_HDF_LOG" ]
+      }
+
+      public_configs = [ ":hdi_service_config" ]
+
+      subsystem_name = "hdf"
+      part_name = "audio_device_driver"
+    }
   }
 }

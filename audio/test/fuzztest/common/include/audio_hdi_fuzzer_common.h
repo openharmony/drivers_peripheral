@@ -53,7 +53,7 @@ using namespace std;
 #endif
 #ifdef AUDIO_ADM_SERVICE
     const std::string FUNCTION_NAME = "GetAudioProxyManagerFuncs";
-    const std::string RESOLVED_PATH = "//system/lib/libaudio_hdi_proxy_server.z.so";
+    const std::string RESOLVED_PATH = "//system/lib/libhdi_audio_client.z.so";
     using TestAudioManager = struct AudioProxyManager;
 #endif
 const uint32_t INT_32_MAX = 0x7fffffff;
