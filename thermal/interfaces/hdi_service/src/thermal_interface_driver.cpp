@@ -27,7 +27,7 @@ struct HdfThermalInterfaceHost {
     ThermalInterfaceService *service;
 };
 
-static int32_t ThermalInterfaceDriverDispatch(struct HdfDeviceIoClient *client,int cmdId, struct HdfSBuf *data,
+static int32_t ThermalInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
     struct HdfThermalInterfaceHost *hdfThermalInterfaceHost =
