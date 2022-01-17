@@ -36,7 +36,12 @@ static std::shared_ptr<ThermalHdfTimer> hdfTimer_ = nullptr;
 static std::shared_ptr<ThermalSimulationNode> simulation_ = nullptr;
 static std::shared_ptr<ThermalDeviceMitigation> mitigation_ = nullptr;
 
-static int32_t Init()
+ThermalInterfaceService::ThermalInterfaceService()
+{
+    Init();
+}
+
+int32_t ThermalInterfaceService::Init()
 {
     int32_t ret = -1;
     if (simulation_ == nullptr) {
@@ -127,18 +132,3 @@ int32_t ThermalInterfaceService::Unregister()
 } // v1_0
 } // thermal
 } // hdi
-
-hdi::thermal::v1_0::IThermalInterface *ThermalInterfaceServiceConstruct()
-{
-    using namespace hdi::thermal::v1_0;
-    Init();
-    return new ThermalInterfaceService();
-}
-
-void ThermalInterfaceServiceRelease(hdi::thermal::v1_0::IThermalInterface *obj)
-{
-    if (obj == nullptr) {
-        return;
-    }
-    delete obj;
-}

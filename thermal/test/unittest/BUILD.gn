@@ -40,7 +40,7 @@ ohos_unittest("hdi_unittest_thermal") {
 
   deps = [
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
-    "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_proxy",
+    "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_proxy_1.0",
     "//drivers/peripheral/thermal/interfaces/hdi_callback:libthermal_callback",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//utils/native/base:utils",
