@@ -52,6 +52,7 @@ public:
         std::vector<XMLThermalNodeInfo> &tnInfoList);
     std::map<std::string, uint32_t> GetIntervalMap();
     ThermalTypeMap GetSensorTypeMap();
+    void GetThermalZoneNodeInfo(XMLThermalZoneInfo &tz, const xmlNode* node);
 private:
     std::shared_ptr<BaseInfoConfig> vbaseConfig_;
     std::map<std::string, uint32_t> intervalMap_;

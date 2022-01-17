@@ -116,12 +116,7 @@ void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
         for (auto subNode = cur->children; subNode; subNode = subNode->next) {
             if (!xmlStrcmp(subNode->name, BAD_CAST"thermal_zone")) {
                 XMLThermalZoneInfo tz;
-                tz.type = (char*)xmlGetProp(subNode, BAD_CAST"type");
-                auto replace = xmlGetProp(subNode, BAD_CAST("replace"));
-                if (replace != NULL) {
-                    tz.replace = (char*)replace;
-                    tz.isReplace = true;
-                }
+                GetThermalZoneNodeInfo(tz, subNode);
                 HDF_LOGI("%{public}s: ParsePollingNode ParsePollingNodetztype: %{public}s, replace: %{public}s",
                     __func__, tz.type.c_str(), tz.replace.c_str());
                 vXtz.push_back(tz);
@@ -138,6 +133,16 @@ void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
         sensorInfo->SetXMLThermalNodeInfo(vXtn);
         typesMap_.emplace(std::pair(groupName, sensorInfo));
         cur = cur->next;
+    }
+}
+
+void ThermalHdfConfig::GetThermalZoneNodeInfo(XMLThermalZoneInfo &tz, const xmlNode* node)
+{
+    tz.type = (char*)xmlGetProp(node, BAD_CAST"type");
+    auto replace = xmlGetProp(node, BAD_CAST("replace"));
+    if (replace != NULL) {
+        tz.replace = (char*)replace;
+        tz.isReplace = true;
     }
 }
 } // v1_0
