@@ -21,7 +21,23 @@
 namespace hdi {
 namespace sensor {
 namespace v1_0 {
-static sptr<ISensorCallback> g_sensorCallback = nullptr;
+namespace {
+    enum SensorIndex {
+        TRADITIONAL_SENSOR_INDEX = 0,
+        MEDICAL_SENSOR_INDEX = 1
+    };
+    constexpr int32_t MEDICALSENSOR_ID_MIN = 128;
+    constexpr int32_t MEDICALSENSOR_ID_MAX = 160;
+    constexpr int32_t TRADITIONAL_SENSOR_ID_MIN = 0;
+    constexpr int32_t REMOTE_OBJE_CTOUNT_THRESHOLD = 1;
+    using RemoteObjectCallBackMap = std::unordered_map<IRemoteObject*, sptr<ISensorCallback>>;
+    using RemoteObjectIndexMap = std::unordered_map<IRemoteObject*, int32_t>;
+    using IndexRemoteObjectMap = std::unordered_map<int32_t, std::vector<IRemoteObject*>>;
+    RemoteObjectCallBackMap g_remoteObjectCallBackMap;
+    IndexRemoteObjectMap g_IndexRemoteObjectMap;
+    RemoteObjectIndexMap g_remoteObjectIndexMap;
+    std::mutex g_mutex;
+}
 
 int SensorDataCallback(const struct SensorEvents *event)
 {
@@ -30,9 +46,10 @@ int SensorDataCallback(const struct SensorEvents *event)
         return SENSOR_FAILURE;
     }
 
-    if (g_sensorCallback == nullptr) {
-        HDF_LOGE("%{public}s failed, g_sensorCallback is nullptr", __func__);
-        return SENSOR_FAILURE;
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto indexRemoteIter = g_IndexRemoteObjectMap.find(TRADITIONAL_SENSOR_INDEX);
+    if (indexRemoteIter == g_IndexRemoteObjectMap.end()) {
+        return SENSOR_SUCCESS;
     }
 
     HdfSensorEvents hdfSensorEvents;
@@ -49,7 +66,14 @@ int SensorDataCallback(const struct SensorEvents *event)
         hdfSensorEvents.data.push_back(*tmp);
         tmp++;
     }
-    g_sensorCallback->OnDataEvent(hdfSensorEvents);
+
+    for (auto remoteObj : g_IndexRemoteObjectMap[TRADITIONAL_SENSOR_INDEX]) {
+        auto remoteCallBack = g_remoteObjectCallBackMap.find(remoteObj);
+        if (remoteCallBack == g_remoteObjectCallBackMap.end()) {
+            continue;
+        }
+        remoteCallBack->second->OnDataEvent(hdfSensorEvents);
+    }
     return 0;
 }
 
@@ -67,7 +91,7 @@ int32_t SensorInterfaceService::GetAllSensorInfo(std::vector<HdfSensorInformatio
 
     int32_t ret = sensorInterface->GetAllSensors(&sensorInfo, &count);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
         return ret;
     }
 
@@ -107,7 +131,7 @@ int32_t SensorInterfaceService::Enable(int32_t sensorId)
     }
     int32_t ret = sensorInterface->Enable(sensorId);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
     return ret;
 }
@@ -121,7 +145,7 @@ int32_t SensorInterfaceService::Disable(int32_t sensorId)
     }
     int32_t ret = sensorInterface->Disable(sensorId);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
     return ret;
 }
@@ -135,7 +159,7 @@ int32_t SensorInterfaceService::SetBatch(int32_t sensorId, int64_t samplingInter
     }
     int32_t ret = sensorInterface->SetBatch(sensorId, samplingInterval, reportInterval);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
     return ret;
 }
@@ -149,7 +173,7 @@ int32_t SensorInterfaceService::SetMode(int32_t sensorId, int32_t mode)
     }
     int32_t ret = sensorInterface->SetMode(sensorId, mode);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
     return ret;
 }
@@ -163,7 +187,7 @@ int32_t SensorInterfaceService::SetOption(int32_t sensorId, uint32_t option)
     }
     int32_t ret = sensorInterface->SetOption(sensorId, option);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
     return ret;
 }
@@ -175,28 +199,93 @@ int32_t SensorInterfaceService::Register(int32_t sensorId, const sptr<ISensorCal
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
-
-    g_sensorCallback = callbackObj;
-    int32_t ret = sensorInterface->Register(0, SensorDataCallback);
-    if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
-        g_sensorCallback = nullptr;
+    IRemoteObject* obj = callbackObj->AsObject().GetRefPtr();
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto remoteIter = g_remoteObjectCallBackMap.find(obj);
+    if (remoteIter != g_remoteObjectCallBackMap.end()) {
+        return SENSOR_FAILURE;
     }
+    SensorIndex sensorIndex;
+    if (sensorId < TRADITIONAL_SENSOR_ID_MIN) {
+        return SENSOR_FAILURE;
+    }
+    if (sensorId >= MEDICALSENSOR_ID_MIN && sensorId <= MEDICALSENSOR_ID_MAX) {
+        sensorIndex = MEDICAL_SENSOR_INDEX;
+        return SENSOR_FAILURE;
+    } else {
+        sensorIndex = TRADITIONAL_SENSOR_INDEX;
+    }
+
+    auto indexRemoteIter = g_IndexRemoteObjectMap.find(sensorIndex);
+    if (indexRemoteIter != g_IndexRemoteObjectMap.end()) {
+        auto remoteObjectIter =
+            find(g_IndexRemoteObjectMap[sensorIndex].begin(), g_IndexRemoteObjectMap[sensorIndex].end(), obj);
+        if (remoteObjectIter == g_IndexRemoteObjectMap[sensorIndex].end()) {
+            g_IndexRemoteObjectMap[sensorIndex].push_back(obj);
+            g_remoteObjectCallBackMap[obj] = callbackObj;
+            g_remoteObjectIndexMap[obj] = sensorIndex;
+        }
+        return SENSOR_SUCCESS;
+    }
+    int32_t ret = sensorInterface->Register(sensorIndex, SensorDataCallback);
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s failed, ret[%{public}d]", __func__, ret);
+        return ret;
+    }
+    std::vector<IRemoteObject*> remoteVec;
+    remoteVec.push_back(obj);
+    g_remoteObjectCallBackMap[obj] = callbackObj;
+    g_remoteObjectIndexMap[obj] = sensorIndex;
+    g_IndexRemoteObjectMap[sensorIndex] = remoteVec;
     return ret;
 }
 
-int32_t SensorInterfaceService::Unregister(int32_t sensorId)
+int32_t SensorInterfaceService::Unregister(int32_t sensorId,  const sptr<ISensorCallback>& callbackObj)
 {
     const SensorInterface *sensorInterface = NewSensorInterfaceInstance();
     if (sensorInterface == NULL || sensorInterface->Unregister == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
-    int32_t ret = sensorInterface->Unregister(0);
-    if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
+    IRemoteObject* obj = callbackObj->AsObject().GetRefPtr();
+    
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto remoteIndexIter = g_remoteObjectIndexMap.find(obj);
+    if (remoteIndexIter == g_remoteObjectIndexMap.end()) {
+        return HDF_FAILURE;
     }
-    g_sensorCallback = nullptr;
+    SensorIndex sensorIndex;
+    if (remoteIndexIter->second == TRADITIONAL_SENSOR_INDEX) {
+        sensorIndex = TRADITIONAL_SENSOR_INDEX;
+    } else {
+        sensorIndex = MEDICAL_SENSOR_INDEX;
+    }
+    
+    auto indexRemoteIter = g_IndexRemoteObjectMap.find(sensorIndex);
+    if (indexRemoteIter == g_IndexRemoteObjectMap.end()) {
+        return HDF_FAILURE;
+    }
+    auto remoteObjectIter =
+        find(g_IndexRemoteObjectMap[sensorIndex].begin(), g_IndexRemoteObjectMap[sensorIndex].end(), obj);
+    if (remoteObjectIter == g_IndexRemoteObjectMap[sensorIndex].end()) {
+        return HDF_FAILURE;
+    }
+
+    if (g_IndexRemoteObjectMap[sensorIndex].size() > REMOTE_OBJE_CTOUNT_THRESHOLD) {
+        g_IndexRemoteObjectMap[sensorIndex].erase(remoteObjectIter);
+        g_remoteObjectIndexMap.erase(remoteIndexIter);
+        g_remoteObjectCallBackMap.erase(obj);
+        return SENSOR_SUCCESS;
+    }
+
+    int32_t ret = sensorInterface->Unregister(sensorIndex, SensorDataCallback);
+    if (ret != SENSOR_SUCCESS) {
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+    }
+    g_remoteObjectIndexMap.erase(remoteIndexIter);
+    g_remoteObjectCallBackMap.erase(obj);
+    g_IndexRemoteObjectMap.erase(sensorIndex);
+
     return ret;
 }
 } // v1_0
