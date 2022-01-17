@@ -95,6 +95,18 @@ void PortBase::DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers)
     return;
 }
 
+void PortBase::DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec)
+{
+    (void)frameSpec;
+    return;
+}
+
+void PortBase::DeliverBuffers(std::vector<std::shared_ptr<FrameSpec>> mergeVec)
+{
+    (void)mergeVec;
+    return;
+}
+
 std::string NodeBase::GetName() const
 {
     return name_;
@@ -119,27 +131,33 @@ std::shared_ptr<IPort> NodeBase::GetPort(const std::string& name)
 
 RetCode NodeBase::Init(const int32_t streamId)
 {
+    (void)streamId;
     return RC_OK;
 }
 
 RetCode NodeBase::Start(const int32_t streamId)
 {
+    (void)streamId;
     CAMERA_LOGI("name:%{public}s start enter\n", name_.c_str());
     return RC_OK;
 }
 
 RetCode NodeBase::Flush(const int32_t streamId)
 {
+    (void)streamId;
     return RC_OK;
 }
 
 RetCode NodeBase::Stop(const int32_t streamId)
 {
+    (void)streamId;
     return RC_OK;
 }
 
 RetCode NodeBase::Config(const int32_t streamId, const CaptureMeta& meta)
 {
+    (void)streamId;
+    (void)meta;
     return RC_OK;
 }
 
@@ -196,13 +214,22 @@ std::shared_ptr<IPort> NodeBase::GetOutPortById(const int32_t id)
     return ports[id];
 }
 
+void NodeBase::SetCallBack(BufferCb c)
+{
+    (void)c;
+    return;
+}
+
 RetCode NodeBase::Capture(const int32_t streamId, const int32_t captureId)
 {
+    (void)streamId;
+    (void)captureId;
     return RC_OK;
 }
 
 RetCode NodeBase::CancelCapture(const int32_t streamId)
 {
+    (void)streamId;
     return RC_OK;
 }
 
@@ -230,6 +257,24 @@ void NodeBase::DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers)
             return;
         }
     }
+    return;
+}
+
+RetCode NodeBase::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)
+{
+    (void)frameSpec;
+    return RC_OK;
+}
+
+void NodeBase::DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec)
+{
+    (void)frameSpec;
+    return;
+}
+
+void NodeBase::DeliverBuffers(std::vector<std::shared_ptr<FrameSpec>> mergeVec)
+{
+    (void)mergeVec;
     return;
 }
 } // namespace OHOS::Camera

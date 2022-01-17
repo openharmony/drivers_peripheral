@@ -47,6 +47,7 @@ public:
     };
     RetCode StartGetStream(int32_t s32Cnt)
     {
+        (void)s32Cnt;
         return RC_OK;
     };
     RetCode StopGetStream()
@@ -55,6 +56,9 @@ public:
     };
     RetCode SnapProcess(int32_t SnapCnt, bool bSaveJpg, bool bSaveThm)
     {
+        (void)SnapCnt;
+        (void)bSaveJpg;
+        (void)bSaveThm;
         return RC_OK;
     };
     RetCode PowerUp(CameraId cameraId);

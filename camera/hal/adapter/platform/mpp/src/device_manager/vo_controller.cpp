@@ -35,6 +35,7 @@ RetCode VoController::Init()
 RetCode VoController::PowerUp(CameraId cameraId)
 {
     RetCode rc = RC_OK;
+    (void)cameraId;
     if (GetPowerOnState() == false) {
         SetPowerOnState(true);
         CAMERA_LOGI("%{public}s Vo Powerup", __FUNCTION__);
@@ -46,6 +47,7 @@ RetCode VoController::PowerUp(CameraId cameraId)
 RetCode VoController::PowerDown(CameraId cameraId)
 {
     RetCode rc = RC_OK;
+    (void)cameraId;
     if (GetPowerOnState() == true) {
         SetPowerOnState(false);
         CAMERA_LOGI("%{public}s Vo PowerDown", __FUNCTION__);

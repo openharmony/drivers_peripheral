@@ -61,7 +61,6 @@ private:
     std::condition_variable cv_;
     std::atomic<bool> running_ = false;
     std::thread* processThread_ = nullptr;
-    uint64_t frameCount_ = 0;
 };
 } // namespace OHOS::Camera
 #endif

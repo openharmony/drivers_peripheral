@@ -24,6 +24,7 @@ VencManager::~VencManager() {}
 
 RetCode VencManager::CreateController(ControllerId controllerId, std::string hardwareName)
 {
+    (void)controllerId;
     if (venc_ == nullptr) {
         venc_ = std::make_shared<VencController>(hardwareName);
         if (venc_ == nullptr) {

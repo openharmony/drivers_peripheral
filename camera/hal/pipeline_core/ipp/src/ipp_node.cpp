@@ -25,6 +25,7 @@ IppNode::~IppNode() {}
 
 RetCode IppNode::Init(const int32_t streamId)
 {
+    (void)streamId;
     // initialize algo plugin
     if (offlineMode_.load()) {
         return RC_OK;
@@ -80,6 +81,8 @@ RetCode IppNode::Stop(const int32_t streamId)
 
 RetCode IppNode::Config(const int32_t streamId, const CaptureMeta& meta)
 {
+    (void)streamId;
+    (void)meta;
     // configure algo
     // NodeBase::Configure
     if (offlineMode_.load()) {

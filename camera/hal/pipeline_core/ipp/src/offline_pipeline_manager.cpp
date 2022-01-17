@@ -33,6 +33,7 @@ RetCode OfflinePipelineManager::SwitchToOfflinePipeline(int32_t streamId,
                                                         const std::shared_ptr<IStreamPipelineCore>& pipeline,
                                                         std::function<void(std::shared_ptr<IBuffer>&)> callback)
 {
+    (void)streamType;
     auto op = GetOfflinePipeline(streamId, pipeline);
     if (op == nullptr) {
         CAMERA_LOGW("can't get offlinepipeline, abort switch.");

@@ -29,6 +29,7 @@ SourceNode::~SourceNode()
 
 RetCode SourceNode::Init(const int32_t streamId)
 {
+    (void)streamId;
     return RC_OK;
 }
 
@@ -97,6 +98,7 @@ RetCode SourceNode::Stop(const int32_t streamId)
 RetCode SourceNode::Config(const int32_t streamId, const CaptureMeta& meta)
 {
     CHECK_IF_NOT_EQUAL_RETURN_VALUE(handler_.count(streamId) > 0, true, RC_ERROR);
+    (void)meta;
     return RC_OK;
 }
 
@@ -140,6 +142,7 @@ void SourceNode::SetBufferCallback()
 
 RetCode SourceNode::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)
 {
+    (void)frameSpec;
     return RC_OK;
 }
 
@@ -158,12 +161,12 @@ RetCode SourceNode::Capture(const int32_t streamId, const int32_t captureId)
 
 RetCode SourceNode::CancelCapture(const int32_t streamId)
 {
+    (void)streamId;
     return RC_OK;
 }
 
-SourceNode::PortHandler::PortHandler(std::shared_ptr<IPort>& p)
+SourceNode::PortHandler::PortHandler(std::shared_ptr<IPort>& p) : port(p)
 {
-    port = p;
 }
 
 RetCode SourceNode::PortHandler::StartCollectBuffers()

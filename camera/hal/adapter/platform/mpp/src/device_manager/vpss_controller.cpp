@@ -35,6 +35,7 @@ RetCode VpssController::Init()
 RetCode VpssController::PowerUp(CameraId cameraId)
 {
     RetCode rc = RC_OK;
+    (void)cameraId;
     if (GetPowerOnState() == false) {
         SetPowerOnState(true);
         CAMERA_LOGI("%{public}s Vpss Powerup", __FUNCTION__);
@@ -46,6 +47,7 @@ RetCode VpssController::PowerUp(CameraId cameraId)
 RetCode VpssController::PowerDown(CameraId cameraId)
 {
     RetCode rc = RC_OK;
+    (void)cameraId;
     if (GetPowerOnState() == true) {
         SetPowerOnState(false);
         CAMERA_LOGI("%{public}s Vpss PowerDown", __FUNCTION__);

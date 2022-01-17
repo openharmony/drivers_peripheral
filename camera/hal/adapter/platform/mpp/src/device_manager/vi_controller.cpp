@@ -43,6 +43,7 @@ std::shared_ptr<ISensor> ViController::GetSensor(std::string sensorName)
 RetCode ViController::PowerUp(CameraId cameraId)
 {
     RetCode rc = RC_OK;
+    (void)cameraId;
     if (GetPowerOnState() == false) {
         SetPowerOnState(true);
         CAMERA_LOGI("%{public}s Vi Powerup", __FUNCTION__);
@@ -54,6 +55,7 @@ RetCode ViController::PowerUp(CameraId cameraId)
 RetCode ViController::PowerDown(CameraId cameraId)
 {
     RetCode rc = RC_OK;
+    (void)cameraId;
     if (GetPowerOnState() == true) {
         SetPowerOnState(false);
         CAMERA_LOGI("%{public}s Vi PowerDown", __FUNCTION__);

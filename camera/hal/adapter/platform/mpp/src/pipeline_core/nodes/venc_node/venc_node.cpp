@@ -14,7 +14,7 @@
 
 namespace OHOS::Camera {
 VencNode::VencNode(const std::string& name, const std::string& type)
-    : MpiNode(name, type), SinkNode(name, type), NodeBase(name, type)
+    : NodeBase(name, type), MpiNode(name, type), SinkNode(name, type)
 {
     CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
@@ -26,10 +26,12 @@ RetCode VencNode::GetDeviceController() const
 
 RetCode VencNode::Start(const int32_t streamId)
 {
+    (void)streamId;
     return RC_OK;
 }
 RetCode VencNode::Stop(const int32_t streamId)
 {
+    (void)streamId;
     return RC_OK;
 }
 

@@ -42,6 +42,7 @@ RetCode FlashManager::CreateController(ControllerId controllerId, std::string ha
 
 std::shared_ptr<IController> FlashManager::GetController(ControllerId controllerId, std::string hardwareName)
 {
+    (void)controllerId;
     if (flashList_.size() == 0) {
         return nullptr;
     }
