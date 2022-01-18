@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,13 +14,11 @@
  */
 
 #include "hdi_service_test.h"
-
 #include <csignal>
 #include <iostream>
 #include <chrono>
 #include <condition_variable>
 #include <fstream>
-#include <iostream>
 #include <memory>
 #include <mutex>
 #include <streambuf>
@@ -30,13 +28,14 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <dirent.h>
-
 #include "utils/hdf_log.h"
 #include "hdf_base.h"
 #include "power_supply_provider.h"
 #include "battery_thread_test.h"
 #include "battery_vibrate.h"
 #include "battery_service.h"
+
+#define HDF_LOG_TAG HdiServiceTest
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -270,14 +269,14 @@ static int32_t ReadTemperatureSysfs()
     int fd = open(sysBattTemPath.c_str(), O_RDONLY);
     if (fd < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattTemPath.c_str());
-        return -1;
+        return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattTemPath.c_str());
         close(fd);
-        return -1;
+        return HDF_FAILURE;
     }
 
     buf[readSize] = '\0';
@@ -311,14 +310,14 @@ static int32_t ReadVoltageSysfs()
     int fd = open(sysBattVolPath.c_str(), O_RDONLY);
     if (fd < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattVolPath.c_str());
-        return -1;
+        return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattVolPath.c_str());
         close(fd);
-        return -1;
+        return HDF_FAILURE;
     }
 
     buf[readSize] = '\0';
@@ -352,14 +351,14 @@ static int32_t ReadCapacitySysfs()
     int fd = open(sysBattCapPath.c_str(), O_RDONLY);
     if (fd < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattCapPath.c_str());
-        return -1;
+        return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattCapPath.c_str());
         close(fd);
-        return -1;
+        return HDF_FAILURE;
     }
 
     buf[readSize] = '\0';
@@ -389,17 +388,17 @@ static int32_t HealthStateEnumConverter(const char* str)
 {
     HDF_LOGI("%{public}s enter", __func__);
     struct StringEnumMap healthStateEnumMap[] = {
-        {"Good", PowerSupplyProvider::BATTERY_HEALTH_GOOD},
-        {"Cold", PowerSupplyProvider::BATTERY_HEALTH_COLD},
-        {"Warm", PowerSupplyProvider::BATTERY_HEALTH_GOOD}, // JEITA specification
-        {"Cool", PowerSupplyProvider::BATTERY_HEALTH_GOOD}, // JEITA specification
-        {"Hot", PowerSupplyProvider::BATTERY_HEALTH_OVERHEAT}, // JEITA specification
-        {"Overheat", PowerSupplyProvider::BATTERY_HEALTH_OVERHEAT},
-        {"Over voltage", PowerSupplyProvider::BATTERY_HEALTH_OVERVOLTAGE},
-        {"Dead", PowerSupplyProvider::BATTERY_HEALTH_DEAD},
-        {"Unknown", PowerSupplyProvider::BATTERY_HEALTH_UNKNOWN},
-        {"Unspecified failure", PowerSupplyProvider::BATTERY_HEALTH_UNKNOWN},
-        {NULL, PowerSupplyProvider::BATTERY_HEALTH_UNKNOWN},
+        { "Good", PowerSupplyProvider::BATTERY_HEALTH_GOOD },
+        { "Cold", PowerSupplyProvider::BATTERY_HEALTH_COLD },
+        { "Warm", PowerSupplyProvider::BATTERY_HEALTH_GOOD }, // JEITA specification
+        { "Cool", PowerSupplyProvider::BATTERY_HEALTH_GOOD }, // JEITA specification
+        { "Hot", PowerSupplyProvider::BATTERY_HEALTH_OVERHEAT }, // JEITA specification
+        { "Overheat", PowerSupplyProvider::BATTERY_HEALTH_OVERHEAT },
+        { "Over voltage", PowerSupplyProvider::BATTERY_HEALTH_OVERVOLTAGE },
+        { "Dead", PowerSupplyProvider::BATTERY_HEALTH_DEAD },
+        { "Unknown", PowerSupplyProvider::BATTERY_HEALTH_UNKNOWN },
+        { "Unspecified failure", PowerSupplyProvider::BATTERY_HEALTH_UNKNOWN },
+        { NULL, PowerSupplyProvider::BATTERY_HEALTH_UNKNOWN },
     };
 
     for (int i = 0; healthStateEnumMap[i].str; ++i) {
@@ -429,14 +428,14 @@ static int32_t ReadHealthStateSysfs()
     int fd = open(sysHealthStatePath.c_str(), O_RDONLY);
     if (fd < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysHealthStatePath.c_str());
-        return -1;
+        return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysHealthStatePath.c_str());
         close(fd);
-        return -1;
+        return HDF_FAILURE;
     }
 
     Trim(buf);
@@ -453,19 +452,19 @@ static int32_t PluggedTypeEnumConverter(const char* str)
 {
     HDF_LOGI("%{public}s enter", __func__);
     struct StringEnumMap pluggedTypeEnumMap[] = {
-        {"USB", PowerSupplyProvider::PLUGGED_TYPE_USB},
-        {"USB_PD_DRP", PowerSupplyProvider::PLUGGED_TYPE_USB},
-        {"Wireless", PowerSupplyProvider::PLUGGED_TYPE_WIRELESS},
-        {"Mains", PowerSupplyProvider::PLUGGED_TYPE_AC},
-        {"UPS", PowerSupplyProvider::PLUGGED_TYPE_AC},
-        {"USB_ACA", PowerSupplyProvider::PLUGGED_TYPE_AC},
-        {"USB_C", PowerSupplyProvider::PLUGGED_TYPE_AC},
-        {"USB_CDP", PowerSupplyProvider::PLUGGED_TYPE_AC},
-        {"USB_DCP", PowerSupplyProvider::PLUGGED_TYPE_AC},
-        {"USB_HVDCP", PowerSupplyProvider::PLUGGED_TYPE_AC},
-        {"USB_PD", PowerSupplyProvider::PLUGGED_TYPE_AC},
-        {"Unknown", PowerSupplyProvider::PLUGGED_TYPE_BUTT},
-        {NULL, PowerSupplyProvider::PLUGGED_TYPE_BUTT},
+        { "USB", PowerSupplyProvider::PLUGGED_TYPE_USB },
+        { "USB_PD_DRP", PowerSupplyProvider::PLUGGED_TYPE_USB },
+        { "Wireless", PowerSupplyProvider::PLUGGED_TYPE_WIRELESS },
+        { "Mains", PowerSupplyProvider::PLUGGED_TYPE_AC },
+        { "UPS", PowerSupplyProvider::PLUGGED_TYPE_AC },
+        { "USB_ACA", PowerSupplyProvider::PLUGGED_TYPE_AC },
+        { "USB_C", PowerSupplyProvider::PLUGGED_TYPE_AC },
+        { "USB_CDP", PowerSupplyProvider::PLUGGED_TYPE_AC },
+        { "USB_DCP", PowerSupplyProvider::PLUGGED_TYPE_AC },
+        { "USB_HVDCP", PowerSupplyProvider::PLUGGED_TYPE_AC },
+        { "USB_PD", PowerSupplyProvider::PLUGGED_TYPE_AC },
+        { "Unknown", PowerSupplyProvider::PLUGGED_TYPE_BUTT },
+        { NULL, PowerSupplyProvider::PLUGGED_TYPE_BUTT },
     };
 
     for (int i = 0; pluggedTypeEnumMap[i].str; ++i) {
@@ -497,14 +496,14 @@ static int32_t GetPluggedTypeName()
     int fd = open(sysOnlinePath.c_str(), O_RDONLY);
     if (fd < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysOnlinePath.c_str());
-        return -1;
+        return HDF_FAILURE;
     }
 
     int32_t readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysOnlinePath.c_str());
         close(fd);
-        return -1;
+        return HDF_FAILURE;
     }
     buf[readSize] = '\0';
     Trim(buf);
@@ -536,14 +535,14 @@ static int32_t ReadPluggedTypeSysfs()
     int fd = open(sysPluggedTypePath.c_str(), O_RDONLY);
     if (fd < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysPluggedTypePath.c_str());
-        return -1;
+        return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysPluggedTypePath.c_str());
         close(fd);
-        return -1;
+        return HDF_FAILURE;
     }
     buf[readSize] = '\0';
     Trim(buf);
@@ -564,12 +563,12 @@ int32_t ChargeStateEnumConverter(const char* str)
 {
     HDF_LOGI("%{public}s enter", __func__);
     struct StringEnumMap chargeStateEnumMap[] = {
-        {"Discharging", PowerSupplyProvider::CHARGE_STATE_NONE},
-        {"Charging", PowerSupplyProvider::CHARGE_STATE_ENABLE},
-        {"Full", PowerSupplyProvider::CHARGE_STATE_FULL},
-        {"Not charging", PowerSupplyProvider::CHARGE_STATE_DISABLE},
-        {"Unknown", PowerSupplyProvider::CHARGE_STATE_RESERVED},
-        {NULL, PowerSupplyProvider::CHARGE_STATE_RESERVED},
+        { "Discharging", PowerSupplyProvider::CHARGE_STATE_NONE },
+        { "Charging", PowerSupplyProvider::CHARGE_STATE_ENABLE },
+        { "Full", PowerSupplyProvider::CHARGE_STATE_FULL },
+        { "Not charging", PowerSupplyProvider::CHARGE_STATE_DISABLE },
+        { "Unknown", PowerSupplyProvider::CHARGE_STATE_RESERVED },
+        { NULL, PowerSupplyProvider::CHARGE_STATE_RESERVED },
     };
 
     for (int i = 0; chargeStateEnumMap[i].str; ++i) {
@@ -599,14 +598,14 @@ static int32_t ReadChargeStateSysfs()
     int fd = open(sysChargeStatePath.c_str(), O_RDONLY);
     if (fd < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysChargeStatePath.c_str());
-        return -1;
+        return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysChargeStatePath.c_str());
         close(fd);
-        return -1;
+        return HDF_FAILURE;
     }
 
     Trim(buf);
@@ -637,14 +636,14 @@ static int32_t ReadChargeCounterSysfs()
     int fd = open(sysChargeCounterPath.c_str(), O_RDONLY);
     if (fd < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysChargeCounterPath.c_str());
-        return -1;
+        return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysChargeCounterPath.c_str());
         close(fd);
-        return -1;
+        return HDF_FAILURE;
     }
 
     buf[readSize] = '\0';
@@ -678,14 +677,14 @@ static int32_t ReadPresentSysfs()
     int fd = open(sysPresentPath.c_str(), O_RDONLY);
     if (fd < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysPresentPath.c_str());
-        return -1;
+        return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysPresentPath.c_str());
         close(fd);
-        return -1;
+        return HDF_FAILURE;
     }
 
     buf[readSize] = '\0';

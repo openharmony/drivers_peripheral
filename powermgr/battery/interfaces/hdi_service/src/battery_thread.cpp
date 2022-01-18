@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,6 @@
  */
 
 #include "battery_thread.h"
-
 #include <unistd.h>
 #include <cerrno>
 #include <sys/socket.h>
@@ -22,10 +21,9 @@
 #include <sys/timerfd.h>
 #include <linux/netlink.h>
 #include "core/hdf_device_desc.h"
-
 #include "utils/hdf_log.h"
 
-#define HDF_LOG_TAG batteryd
+#define HDF_LOG_TAG BatteryThread
 
 using namespace hdi::battery::v1_0;
 
@@ -100,11 +98,11 @@ int BatteryThread::RegisterCallback(const int fd, const EventType et)
     ev.data.fd = fd;
     if (epoll_ctl(epFd_, EPOLL_CTL_ADD, fd, &ev) == -1) {
         HDF_LOGE("%{public}s: epoll_ctl failed, error num =%{public}d", __func__, errno);
-        return -1;
+        return HDF_FAILURE;
     }
 
     HDF_LOGI("%{public}s exit", __func__);
-    return 0;
+    return HDF_SUCCESS;
 }
 
 void BatteryThread::SetTimerInterval(int interval)
@@ -197,13 +195,13 @@ int32_t BatteryThread::Init(void* service)
     InitUevent();
 
     HDF_LOGI("%{public}s exit", __func__);
-    return 0;
+    return HDF_SUCCESS;
 }
 
 int BatteryThread::UpdateWaitInterval()
 {
     HDF_LOGI("%{public}s enter", __func__);
-    return -1;
+    return HDF_FAILURE;
 }
 
 int32_t BatteryThread::InitTimer()

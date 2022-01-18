@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -35,10 +35,6 @@ ohos_shared_library("libbattery_interface_service_1.0") {
   ]
 
   deps = [
-    "$hdf_uhdf_path/hdi:libhdi",
-    "$hdf_uhdf_path/host:libhdf_host",
-    "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/powermgr/battery/interfaces/hdi/battery/v1_0:libbattery_stub_1.0",
     "//third_party/jsoncpp:jsoncpp",
     "//third_party/libxml2:xml2",
@@ -47,7 +43,10 @@ ohos_shared_library("libbattery_interface_service_1.0") {
 
   if (is_standard_system) {
     external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
       "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
     ]
@@ -78,8 +77,6 @@ ohos_shared_library("libbattery_driver") {
   sources = [ "src/battery_interface_driver.cpp" ]
 
   deps = [
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/powermgr/battery/interfaces/hdi/battery/v1_0:libbattery_stub_1.0",
     "//drivers/peripheral/powermgr/battery/interfaces/hdi_service:libbattery_interface_service_1.0",
     "//third_party/jsoncpp:jsoncpp",
@@ -88,6 +85,7 @@ ohos_shared_library("libbattery_driver") {
 
   if (is_standard_system) {
     external_deps = [
+      "device_driver_framework:libhdf_ipc_adapter",
       "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
