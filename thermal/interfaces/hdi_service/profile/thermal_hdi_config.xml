@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thermal version="0.01" product="lya">
+
+    <base>
+        <item tag="xxx" value="3"/>
+    </base>
+
+    <polling>
+        <group name="v1" interval="5000">
+            <thermal_zone type="skin" replace="shell"/>
+            <thermal_node type="cluster3" path="/sys/module/thermal/param/chg_thermal"/>
+        </group>
+        <group name="v2" interval="10000">
+            <thermal_zone type="soc"/>
+            <thermal_zone type="cpu"/>
+            <thermal_zone type="ap"/>
+            <thermal_zone type="pa"/>
+            <thermal_zone type="ambient"/>
+            <thermal_zone type="charger"/>
+            <thermal_zone type="battery"/>
+            <thermal_zone type="shell"/>
+        </group>
+    </polling>
+</thermal>
