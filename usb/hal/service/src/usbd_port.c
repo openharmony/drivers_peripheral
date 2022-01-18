@@ -23,6 +23,7 @@
 #include "securec.h"
 #include "usbd_function.h"
 #include "usbd_publisher.h"
+#include "default_config.h"
 
 #define DEFAULT_PORT_ID 1
 
@@ -42,8 +43,6 @@
 #define PORT_MODE_NONE 0
 #define PORT_MODE_DEVICE 1
 #define PORT_MODE_HOST 2
-
-#define PORT_FILE_PATH "/sys/kernel/debug/usb/100e0000.hidwc3_0/mode"
 
 static int32_t currentPortId = DEFAULT_PORT_ID;
 static int32_t currentPowerRole = POWER_ROLE_SINK;
