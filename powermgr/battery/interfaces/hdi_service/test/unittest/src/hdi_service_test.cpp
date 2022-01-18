@@ -110,7 +110,6 @@ void MockFileInit()
 
 static void CheckSubfolderNode(const std::string& path)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     DIR *dir = nullptr;
     struct dirent* entry = nullptr;
     std::string batteryPath = SYSTEM_BATTERY_PATH + "/" + path;
@@ -165,7 +164,6 @@ static void CheckSubfolderNode(const std::string& path)
         }
     }
     closedir(dir);
-    HDF_LOGI("%{public}s exit", __func__);
 }
 
 static void TraversalBaseNode()

@@ -192,7 +192,6 @@ int32_t BatteryInterfaceService::GetTechnology(std::string& technology)
 
     return HDF_SUCCESS;
 }
-
 } // v1_0
 } // battery
 } // hdi

@@ -610,7 +610,6 @@ void PowerSupplyProvider::TraversalNode()
 
 void PowerSupplyProvider::CheckSubfolderNode(const std::string& path)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     DIR *dir = nullptr;
     struct dirent* entry = nullptr;
     std::string batteryPath = path_ + "/" + path;
@@ -665,7 +664,6 @@ void PowerSupplyProvider::CheckSubfolderNode(const std::string& path)
         }
     }
     closedir(dir);
-    HDF_LOGI("%{public}s exit", __func__);
 }
 
 int32_t PowerSupplyProvider::ParseCapacity(int32_t* capacity) const
