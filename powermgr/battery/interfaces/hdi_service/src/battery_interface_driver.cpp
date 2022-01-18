@@ -72,7 +72,8 @@ int HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-void HdfBatteryInterfaceDriverRelease(struct HdfDeviceObject *deviceObject){
+void HdfBatteryInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
+{
     HDF_LOGI("HdfBatteryInterfaceDriverRelease enter");
 
     struct HdfBatteryInterfaceHost *hdfBatteryInterfaceHost = CONTAINER_OF(deviceObject->service,
