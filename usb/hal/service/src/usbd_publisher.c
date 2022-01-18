@@ -18,10 +18,8 @@
 
 #define HDF_LOG_TAG usbd_publisher
 
-void NotifySubscriberDevice(const struct UsbdSubscriber *subscriber,
-                            enum UsbdDeviceAction act,
-                            int32_t busNum,
-                            int32_t devNum)
+void NotifySubscriberDevice(const struct UsbdSubscriber *subscriber, enum UsbdDeviceAction act, int32_t busNum,
+    int32_t devNum)
 {
     if (subscriber == NULL) {
         HDF_LOGE("%{public}s: subscriber is NULL", __func__);
@@ -47,11 +45,8 @@ void NotifySubscriberDevice(const struct UsbdSubscriber *subscriber,
     HdfSBufRecycle(reply);
 }
 
-void NotifyUsbPortSubscriber(const struct UsbdSubscriber *subscriber,
-                             int32_t portId,
-                             int32_t powerRole,
-                             int32_t dataRole,
-                             int32_t mode)
+void NotifyUsbPortSubscriber(const struct UsbdSubscriber *subscriber, int32_t portId, int32_t powerRole,
+    int32_t dataRole, int32_t mode)
 {
     if (subscriber == NULL) {
         HDF_LOGE("%{public}s: subscriber is NULL", __func__);
