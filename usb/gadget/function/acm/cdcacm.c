@@ -23,9 +23,9 @@
 #include "usbfn_device.h"
 #include "usbfn_interface.h"
 #include "usbfn_request.h"
+#include "default_config.h"
 
 #define HDF_LOG_TAG hdf_cdc_acm
-#define UDC_NAME "100e0000.hidwc3_0"
 
 #define PENDING_FLAG            0
 #define CTRL_REQUEST_NUM        2

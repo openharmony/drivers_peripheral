@@ -24,9 +24,9 @@
 #include "usbfn_device.h"
 #include "usbfn_interface.h"
 #include "usbfn_request.h"
+#include "default_config.h"
 
 #define HDF_LOG_TAG    cdc_ecm
-#define UDC_NAME "100e0000.hidwc3_0"
 
 #define QUEUE_SIZE              8
 #define WRITE_BUF_SIZE          8192
