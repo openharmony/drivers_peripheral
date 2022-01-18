@@ -20,7 +20,7 @@
 #include "camera_device_c_if.h"
 #include "camera_metadata_c_if.h"
 
-#define CAMERA_C_HAL_LIB_PATH "/system/lib/libcamera_c_hal.z.so"
+#define CAMERA_C_HAL_LIB_PATH HDF_LIBRARY_FULL_PATH("libcamera_c_hal")
 
 #ifdef __cplusplus
 extern "C" {

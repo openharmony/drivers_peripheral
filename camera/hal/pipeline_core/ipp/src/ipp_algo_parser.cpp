@@ -124,7 +124,11 @@ std::shared_ptr<AlgoPlugin> IppAlgoParser::ConstructPlugin(const DeviceResourceN
         return nullptr;
     }
 
-    std::shared_ptr<AlgoPlugin> plugin = std::make_shared<AlgoPlugin>(name, description, algoModeMap_[mode], path);
+    std::string nodeName = std::string(path);
+    if (path[0] != '/') {
+        nodeName = nodeName.insert(0, HDF_LIBRARY_DIR "/");
+    }
+    std::shared_ptr<AlgoPlugin> plugin = std::make_shared<AlgoPlugin>(name, description, algoModeMap_[mode], nodeName);
     if (plugin == nullptr) {
         CAMERA_LOGE("create plugin failed");
         return nullptr;

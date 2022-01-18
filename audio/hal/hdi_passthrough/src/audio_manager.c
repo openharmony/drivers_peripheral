@@ -38,11 +38,11 @@ PathSelGetConfToJsonObj g_pathSelGetConfToJsonObj = NULL;
 PathSelAnalysisJson g_pathSelAnalysisJson = NULL;
 #endif
 
-static char *g_captureSoPath = SO_INTERFACE_LIB_CAPTURE_PATH;
-static char *g_renderSoPath = SO_INTERFACE_LIB_RENDER_PATH;
+static const char *g_captureSoPath = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
+static const char *g_renderSoPath = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
 
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
-static char *g_pathSelectSoPath = SO_CJSON_LIB_PATHSELECT_PATH;
+static const char *g_pathSelectSoPath = HDF_LIBRARY_FULL_PATH("libhdi_audio_path_select");
 #endif
 
 static void *g_ptrCaptureHandle = NULL;

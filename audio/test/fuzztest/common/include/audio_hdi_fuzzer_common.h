@@ -48,12 +48,12 @@ using namespace std;
 
 #ifdef AUDIO_ADM_SO
     const std::string FUNCTION_NAME = "GetAudioManagerFuncs";
-    const std::string RESOLVED_PATH = "//system/lib/libhdi_audio.z.so";
+    const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio");
     using TestAudioManager = struct AudioManager;
 #endif
 #ifdef AUDIO_ADM_SERVICE
     const std::string FUNCTION_NAME = "GetAudioProxyManagerFuncs";
-    const std::string RESOLVED_PATH = "//system/lib/libhdi_audio_client.z.so";
+    const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio_client");
     using TestAudioManager = struct AudioProxyManager;
 #endif
 const uint32_t INT_32_MAX = 0x7fffffff;

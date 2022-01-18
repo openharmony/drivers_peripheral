@@ -467,13 +467,8 @@ int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen, char *func, int32
     char *soPathHdi = NULL;
     char *soPathProxy = NULL;
     int32_t ret;
-#ifdef __LITEOS__
-    soPathHdi = "/usr/lib/libhdi_audio.so";
-    soPathProxy = "/usr/lib/libhdi_audio_client.so";
-#else
-    soPathHdi = "/system/lib/libhdi_audio.z.so";
-    soPathProxy = "/system/lib/libhdi_audio_client.z.so";
-#endif
+    soPathHdi = HDF_LIBRARY_FULL_PATH("libhdi_audio");
+    soPathProxy = HDF_LIBRARY_FULL_PATH("libhdi_audio_client");
     PrintMenu1();
     printf("Please enter your choice:");
     ret = CheckInputName(INPUT_INT, (void *)&choice);
@@ -649,7 +644,7 @@ int32_t InitParam()
             return HDF_FAILURE;
         }
 #ifdef AUDIO_HAL_USER
-        char sdkResolvedPath[] = "//system/lib/libhdi_audio_interface_lib_capture.z.so";
+        char sdkResolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
         g_sdkHandle = dlopen(sdkResolvedPath, 1);
         if (g_sdkHandle == NULL) {
             LOG_FUN_ERR("Open so Invalid, reason:%s", dlerror());

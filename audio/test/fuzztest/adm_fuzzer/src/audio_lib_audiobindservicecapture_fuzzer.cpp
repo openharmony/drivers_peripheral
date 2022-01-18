@@ -20,7 +20,7 @@ using namespace HMOS::Audio;
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     struct DevHandle *(*BindServiceCapture)(const char *) = nullptr;
-    char resolvedPath[] = "//system/lib/libhdi_audio_interface_lib_capture.z.so";
+    char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
     void *PtrHandle = dlopen(resolvedPath, RTLD_LAZY);
     if (PtrHandle == nullptr) {
         return HDF_FAILURE;

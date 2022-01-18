@@ -26,7 +26,7 @@ struct AudioAdapterDescriptor *g_descs = NULL;
 struct AudioManager *g_serverManager = NULL;
 #ifdef AUDIO_HAL_USER
 static void *g_mpiInitSo = NULL;
-#define SO_INTERFACE_LIB_MPI_PATH "/system/lib/libhdi_audio_interface_lib_mpi.z.so"
+#define SO_INTERFACE_LIB_MPI_PATH HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_mpi")
 #endif
 /**************************public************************/
 int32_t HdiServiceGetFuncs()
@@ -531,7 +531,7 @@ int AudioHdiServerInit(struct HdfDeviceObject *deviceObject)
 #ifdef AUDIO_HAL_USER
     void *sdkHandle;
     int (*sdkInitSp)() = NULL;
-    char sdkResolvedPath[] = "//system/lib/libhdi_audio_interface_lib_render.z.so";
+    char sdkResolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
     sdkHandle = dlopen(sdkResolvedPath, 1);
     if (sdkHandle == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
