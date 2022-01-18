@@ -19,6 +19,11 @@ config("usbd_private_config") {
 }
 
 config("usbd_public_config") {
+  default_config_path = "//vendor/hisilicon/Hi3516DV300/usb/"
+  if (product_name == "rk3568") {
+    default_config_path = "//vendor/$product_company/$product_name/usb"
+  }
+
   include_dirs = [
     "include",
     "//drivers/peripheral/usb/hal/client/include",
@@ -35,6 +40,7 @@ config("usbd_public_config") {
     "//drivers/framework/core/shared/include",
     "//drivers/framework/core/adapter/syscall/include",
     "//drivers/framework/model/usb/include",
+    default_config_path,
   ]
 }
 
