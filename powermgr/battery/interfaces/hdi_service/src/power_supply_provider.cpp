@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,6 @@
  */
 
 #include "power_supply_provider.h"
-
 #include <iostream>
 #include <fstream>
 #include <dirent.h>
@@ -24,10 +23,9 @@
 #include <securec.h>
 #include <unistd.h>
 #include "osal/osal_mem.h"
-
 #include "utils/hdf_log.h"
 
-#define HDF_LOG_TAG power_supply_provider
+#define HDF_LOG_TAG PowerSupplyProvider
 
 namespace OHOS {
 namespace HDI {
@@ -108,17 +106,17 @@ int32_t PowerSupplyProvider::HealthStateEnumConverter(const char* str)
 {
     HDF_LOGI("%{public}s enter", __func__);
     struct StringEnumMap healthStateEnumMap[] = {
-        {"Good", BATTERY_HEALTH_GOOD},
-        {"Cold", BATTERY_HEALTH_COLD},
-        {"Warm", BATTERY_HEALTH_GOOD}, // JEITA specification
-        {"Cool", BATTERY_HEALTH_GOOD}, // JEITA specification
-        {"Hot", BATTERY_HEALTH_OVERHEAT}, // JEITA specification
-        {"Overheat", BATTERY_HEALTH_OVERHEAT},
-        {"Over voltage", BATTERY_HEALTH_OVERVOLTAGE},
-        {"Dead", BATTERY_HEALTH_DEAD},
-        {"Unknown", BATTERY_HEALTH_UNKNOWN},
-        {"Unspecified failure", BATTERY_HEALTH_UNKNOWN},
-        {NULL, BATTERY_HEALTH_UNKNOWN},
+        { "Good", BATTERY_HEALTH_GOOD },
+        { "Cold", BATTERY_HEALTH_COLD },
+        { "Warm", BATTERY_HEALTH_GOOD }, // JEITA specification
+        { "Cool", BATTERY_HEALTH_GOOD }, // JEITA specification
+        { "Hot", BATTERY_HEALTH_OVERHEAT }, // JEITA specification
+        { "Overheat", BATTERY_HEALTH_OVERHEAT },
+        { "Over voltage", BATTERY_HEALTH_OVERVOLTAGE },
+        { "Dead", BATTERY_HEALTH_DEAD },
+        { "Unknown", BATTERY_HEALTH_UNKNOWN },
+        { "Unspecified failure", BATTERY_HEALTH_UNKNOWN },
+        { NULL, BATTERY_HEALTH_UNKNOWN },
     };
 
     for (int i = 0; healthStateEnumMap[i].str; ++i) {
@@ -140,12 +138,12 @@ int32_t PowerSupplyProvider::ChargeStateEnumConverter(const char* str)
 {
     HDF_LOGI("%{public}s enter", __func__);
     struct StringEnumMap chargeStateEnumMap[] = {
-        {"Discharging", CHARGE_STATE_NONE},
-        {"Charging", CHARGE_STATE_ENABLE},
-        {"Full", CHARGE_STATE_FULL},
-        {"Not charging", CHARGE_STATE_DISABLE},
-        {"Unknown", CHARGE_STATE_RESERVED},
-        {NULL, CHARGE_STATE_RESERVED},
+        { "Discharging", CHARGE_STATE_NONE },
+        { "Charging", CHARGE_STATE_ENABLE },
+        { "Full", CHARGE_STATE_FULL },
+        { "Not charging", CHARGE_STATE_DISABLE },
+        { "Unknown", CHARGE_STATE_RESERVED },
+        { NULL, CHARGE_STATE_RESERVED },
     };
 
     for (int i = 0; chargeStateEnumMap[i].str; ++i) {
@@ -330,19 +328,19 @@ int32_t PowerSupplyProvider::PluggedTypeEnumConverter(const char* str) const
 {
     HDF_LOGI("%{public}s enter", __func__);
     struct StringEnumMap pluggedTypeEnumMap[] = {
-        {"USB", PLUGGED_TYPE_USB},
-        {"USB_PD_DRP", PLUGGED_TYPE_USB},
-        {"Wireless", PLUGGED_TYPE_WIRELESS},
-        {"Mains", PLUGGED_TYPE_AC},
-        {"UPS", PLUGGED_TYPE_AC},
-        {"USB_ACA", PLUGGED_TYPE_AC},
-        {"USB_C", PLUGGED_TYPE_AC},
-        {"USB_CDP", PLUGGED_TYPE_AC},
-        {"USB_DCP", PLUGGED_TYPE_AC},
-        {"USB_HVDCP", PLUGGED_TYPE_AC},
-        {"USB_PD", PLUGGED_TYPE_AC},
-        {"Unknown", PLUGGED_TYPE_BUTT},
-        {NULL, PLUGGED_TYPE_BUTT},
+        { "USB", PLUGGED_TYPE_USB },
+        { "USB_PD_DRP", PLUGGED_TYPE_USB },
+        { "Wireless", PLUGGED_TYPE_WIRELESS },
+        { "Mains", PLUGGED_TYPE_AC },
+        { "UPS", PLUGGED_TYPE_AC },
+        { "USB_ACA", PLUGGED_TYPE_AC },
+        { "USB_C", PLUGGED_TYPE_AC },
+        { "USB_CDP", PLUGGED_TYPE_AC },
+        { "USB_DCP", PLUGGED_TYPE_AC },
+        { "USB_HVDCP", PLUGGED_TYPE_AC },
+        { "USB_PD", PLUGGED_TYPE_AC },
+        { "Unknown", PLUGGED_TYPE_BUTT },
+        { NULL, PLUGGED_TYPE_BUTT },
     };
 
     for (int i = 0; pluggedTypeEnumMap[i].str; ++i) {
@@ -439,15 +437,15 @@ void PowerSupplyProvider::ParseUeventToBatterydInfo(const char* msg, struct Batt
 {
     HDF_LOGI("%{public}s enter", __func__);
     static struct BatteryAssigner batteryAssigners[] = {
-        {BATTERY_KEY_CAPACITY.c_str(), BATTERY_KEY_CAPACITY.length(), CapacityAssigner},
-        {BATTERY_KEY_VOLTAGE.c_str(), BATTERY_KEY_VOLTAGE.length(), VoltageAssigner},
-        {BATTERY_KEY_TEMPERATURE.c_str(), BATTERY_KEY_TEMPERATURE.length(), TemperatureAssigner},
-        {BATTERY_KEY_HEALTH.c_str(), BATTERY_KEY_HEALTH.length(), HealthStateAssigner},
-        {BATTERY_KEY_CHARGE_STATUS.c_str(), BATTERY_KEY_CHARGE_STATUS.length(), ChargeStateAssigner},
-        {BATTERY_KEY_PRESENT.c_str(), BATTERY_KEY_PRESENT.length(), PresentAssigner},
-        {BATTERY_KEY_TECHNOLOGY.c_str(), BATTERY_KEY_TECHNOLOGY.length(), TechnologyAssigner},
-        {BATTERY_KEY_CHARGE_COUNTER.c_str(), BATTERY_KEY_CHARGE_COUNTER.length(), ChargeCounterAssigner},
-        {NULL, 0, NULL} // end of the array
+        { BATTERY_KEY_CAPACITY.c_str(), BATTERY_KEY_CAPACITY.length(), CapacityAssigner },
+        { BATTERY_KEY_VOLTAGE.c_str(), BATTERY_KEY_VOLTAGE.length(), VoltageAssigner },
+        { BATTERY_KEY_TEMPERATURE.c_str(), BATTERY_KEY_TEMPERATURE.length(), TemperatureAssigner },
+        { BATTERY_KEY_HEALTH.c_str(), BATTERY_KEY_HEALTH.length(), HealthStateAssigner },
+        { BATTERY_KEY_CHARGE_STATUS.c_str(), BATTERY_KEY_CHARGE_STATUS.length(), ChargeStateAssigner },
+        { BATTERY_KEY_PRESENT.c_str(), BATTERY_KEY_PRESENT.length(), PresentAssigner },
+        { BATTERY_KEY_TECHNOLOGY.c_str(), BATTERY_KEY_TECHNOLOGY.length(), TechnologyAssigner },
+        { BATTERY_KEY_CHARGE_COUNTER.c_str(), BATTERY_KEY_CHARGE_COUNTER.length(), ChargeCounterAssigner },
+        { NULL, 0, NULL } // end of the array
     };
 
     while (*msg) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,13 +14,13 @@
  */
 
 #include "capacity_shutdown_test.h"
-
 #include <csignal>
 #include <iostream>
 #include "utils/hdf_log.h"
-
 #include "power_supply_provider.h"
 #include "battery_thread_test.h"
+
+#define HDF_LOG_TAG CapacityShutdownTest
 
 using namespace testing::ext;
 using namespace OHOS::HDI::Battery::V1_0;
