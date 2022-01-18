@@ -23,14 +23,9 @@ struct UsbdSubscriber {
     struct HdfRemoteService *remoteService;
 };
 
-void NotifyUsbPortSubscriber(const struct UsbdSubscriber *subscriber,
-                             int32_t portId,
-                             int32_t powerRole,
-                             int32_t dataRole,
-                             int32_t mode);
-void NotifySubscriberDevice(const struct UsbdSubscriber *subscriber,
-                            enum UsbdDeviceAction act,
-                            int32_t busNum,
-                            int32_t devNum);
+void NotifyUsbPortSubscriber(const struct UsbdSubscriber *subscriber, int32_t portId, int32_t powerRole,
+    int32_t dataRole, int32_t mode);
+void NotifySubscriberDevice(const struct UsbdSubscriber *subscriber, enum UsbdDeviceAction act, int32_t busNum,
+    int32_t devNum);
 
 #endif // USBD_PUBLISHER_H

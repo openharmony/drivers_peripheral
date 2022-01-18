@@ -294,7 +294,7 @@ static struct UsbSdkInterface *IfFindInterfaceObj(const struct UsbInterfacePool 
         switch (queryPara.type) {
             case USB_INTERFACE_INTERFACE_INDEX_TYPE:
                 if ((interfacePos->interface.info.interfaceIndex == queryPara.interfaceIndex)
-                && (interfacePos->interface.info.curAltSetting == interfacePos->altSettingId)){
+                && (interfacePos->interface.info.curAltSetting == interfacePos->altSettingId)) {
                     found = true;
                 }
                 break;
@@ -853,6 +853,27 @@ int32_t UsbExitHostSdk(const struct UsbSession *session)
     return RawExit(session);
 }
 
+const struct UsbInterface *UsbClaimInterfaceUnforce(
+    const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr, uint8_t interfaceIndex)
+{
+    int ret;
+    const struct UsbInterface *interfaceObj = NULL;
+    struct UsbSdkInterface *interfaceSdk = NULL;
+
+    interfaceObj = UsbClaimInterface(session, busNum, usbAddr, interfaceIndex);
+
+    interfaceSdk = (struct UsbSdkInterface *)interfaceObj;
+    if (OsalAtomicRead((OsalAtomic *)&interfaceSdk->refCount) > INTERFACE_REFCOUNT_UNFORCE) {
+        ret = UsbReleaseInterface(interfaceObj);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%s:%d UsbReleaseInterface failed!", __func__, __LINE__);
+        }
+        return NULL;
+    }
+
+    return interfaceObj;
+}
+
 const struct UsbInterface *UsbClaimInterface(
     const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr, uint8_t interfaceIndex)
 {
@@ -1288,6 +1309,10 @@ int UsbSubmitRequestAsync(const struct UsbRequest *request)
 
     struct UsbIfRequest *requestObj = (struct UsbIfRequest *)request;
     requestObj->isSyncReq = false;
+    if (memset_s((void *)&request->compInfo, sizeof(request->compInfo), 0, sizeof(request->compInfo)) != EOK) {
+        HDF_LOGE("%s:%d memset_s faild ", __func__, __LINE__);
+        return HDF_FAILURE;
+    }
     return IfSubmitRequestToQueue(requestObj);
 }
 
