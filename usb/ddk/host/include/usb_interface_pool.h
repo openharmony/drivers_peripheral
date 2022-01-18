@@ -23,6 +23,7 @@
 #include "usb_raw_api_library.h"
 
 #define INTERFACE_POOL_ID_MAX   (128)
+#define INTERFACE_REFCOUNT_UNFORCE  (1)
 
 typedef enum {
     USB_PIPE_INDEX_TYPE,
