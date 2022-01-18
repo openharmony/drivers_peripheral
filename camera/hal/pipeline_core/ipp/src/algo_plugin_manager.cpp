@@ -13,11 +13,12 @@
  * limitations under the License.
  */
 
+#include "hdf_base.h"
 #include "algo_plugin_manager.h"
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
-#define IPP_ALGO_PATH "/etc/camera/ipp_algo_config.hcb"
+#define IPP_ALGO_PATH HDF_ETC_DIR"/camera/ipp_algo_config.hcb"
 #else
-#define IPP_ALGO_PATH "/system/etc/hdfconfig/ipp_algo_config.hcb"
+#define IPP_ALGO_PATH HDF_CONFIG_DIR"/ipp_algo_config.hcb"
 #endif
 
 namespace OHOS::Camera {

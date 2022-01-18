@@ -77,11 +77,7 @@ void *AudioLibCaptureTest::PtrHandle = nullptr;
 
 void AudioLibCaptureTest::SetUpTestCase(void)
 {
-#ifdef __LITEOS__
-    char resolvedPath[] = "/usr/lib/libhdi_audio_interface_lib_capture.so";
-#else
-    char resolvedPath[] = "//system/lib/libhdi_audio_interface_lib_capture.z.so";
-#endif
+    char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
     PtrHandle = dlopen(resolvedPath, RTLD_LAZY);
     if (PtrHandle == nullptr) {
         return;
