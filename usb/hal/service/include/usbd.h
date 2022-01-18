@@ -33,6 +33,52 @@
 #define USB_PIPE_DIR_OFFSET 7
 
 struct UsbdService;
+
+#define USBD_BULKASYNCREQ_NUM_MAX 64
+
+struct UsbdBulkASyncReqList;
+struct UsbdBulkASyncList;
+
+struct UsbdBufferHandle {
+    int32_t fd;   /**< buffer fd, -1 if not supported */
+    int32_t size; /* < size of memory */
+    uint8_t *starAddr;
+    int32_t cur;
+    int32_t rcur;
+    uint8_t cbflg;
+    struct OsalMutex lock;
+};
+
+struct UsbdBulkASyncReqNode {
+    struct DListHead node;
+    struct UsbRequest *request;
+    struct UsbdBulkASyncReqList *list;
+    int32_t use;
+    int32_t id;
+};
+
+struct UsbdBulkASyncReqList {
+    struct UsbdBulkASyncReqNode node[USBD_BULKASYNCREQ_NUM_MAX];
+    struct UsbdBulkASyncList *pList;
+    struct DListHead eList;
+    struct DListHead uList;
+    struct OsalMutex elock;
+    struct OsalMutex ulock;
+};
+
+struct UsbdBulkASyncList {
+    struct HostDevice *instance;
+    struct UsbdBulkASyncList *next;
+    UsbInterfaceHandle *ifHandle;
+    struct HdfRemoteService *cb;
+    struct UsbdBulkASyncReqList rList;
+    struct UsbPipeInfo pipe;
+    struct UsbRequestParams params;
+    struct UsbdBufferHandle asmHandle;
+    uint8_t ifId;
+    uint8_t epId;
+};
+
 struct HostDevice {
     struct HdfSListNode node;
     struct UsbdService *service;
@@ -53,13 +99,19 @@ struct HostDevice {
     uint8_t busNum;
     uint8_t devAddr;
     bool initFlag;
+    struct HdfSList reqSyncList;
+    struct OsalMutex reqSyncLock;
+    struct HdfSList reqASyncList;
+    struct OsalMutex reqASyncLock;
+    struct UsbdBulkASyncList *bulkASyncList;
 };
 
 struct RequestMsg {
-    struct HdfSListNode node;
     struct UsbRequest *request;
     void *clientData;
     uint32_t clientLength;
+    void *buffer;
+    uint32_t length;
 };
 
 struct UsbControlParams {
@@ -89,6 +141,28 @@ struct UsbdService {
     struct UsbSession *session;
     struct HdfSList devList;
     struct OsalMutex lock;
+};
+
+struct UsbdRequestSync {
+    struct HdfSListNode node;
+    struct UsbRequest *request;
+    UsbInterfaceHandle *ifHandle;
+    struct OsalMutex lock;
+    struct UsbPipeInfo pipe;
+    struct UsbRequestParams params;
+    uint8_t endPointAddr;
+};
+
+struct UsbdRequestASync {
+    struct HdfSListNode node;
+    struct HdfSListNode qNode;
+    UsbInterfaceHandle *ifHandle;
+    struct RequestMsg reqMsg;
+    struct OsalMutex lock;
+    struct UsbPipeInfo pipe;
+    struct UsbRequestParams params;
+    uint8_t endPointAddr;
+    uint8_t status;
 };
 
 struct UsbdSubscriber;
