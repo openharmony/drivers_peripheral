@@ -97,9 +97,9 @@ private:
         const int streamId, const StreamIntent intent);
     void GetStreamOpt();
 
-    RetCode CreatStream(const int streamId, std::shared_ptr<StreamCustomer>& streamCustomer,
+    RetCode CreateStream(const int streamId, std::shared_ptr<StreamCustomer>& streamCustomer,
         StreamIntent intent);
-    RetCode CreatStreams(const int streamIdSecond, StreamIntent intent);
+    RetCode CreateStreams(const int streamIdSecond, StreamIntent intent);
 
     void StoreImage(const void* bufStart, const uint32_t size) const;
     void StoreVideo(const void* bufStart, const uint32_t size) const;
