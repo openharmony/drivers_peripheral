@@ -79,20 +79,20 @@ if (defined(ohos_lite)) {
   if (enable_HDF_NL80211) {
     CLIENT_ROOT_DIR = "//drivers/peripheral/wlan"
 
-  ohos_shared_library("wifi_driver_client") {
-    sources = [ "$CLIENT_ROOT_DIR/client/src/wifi_driver_client.c" ]
+    ohos_shared_library("wifi_driver_client") {
+      sources = [ "$CLIENT_ROOT_DIR/client/src/wifi_driver_client.c" ]
 
-    sources += [
-      "$CLIENT_ROOT_DIR/client/src/sbuf/sbuf_cmd_adapter.c",
-      "$CLIENT_ROOT_DIR/client/src/sbuf/sbuf_event_adapter.c",
-    ]
+      sources += [
+        "$CLIENT_ROOT_DIR/client/src/sbuf/sbuf_cmd_adapter.c",
+        "$CLIENT_ROOT_DIR/client/src/sbuf/sbuf_event_adapter.c",
+      ]
 
-    include_dirs = [
-      "$CLIENT_ROOT_DIR/client/include",
-      "$CLIENT_ROOT_DIR/interfaces/include",
-      "//third_party/bounds_checking_function/include",
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    ]
+      include_dirs = [
+        "$CLIENT_ROOT_DIR/client/include",
+        "$CLIENT_ROOT_DIR/interfaces/include",
+        "//third_party/bounds_checking_function/include",
+        "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+      ]
 
       deps = [
         "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
