@@ -83,7 +83,7 @@ ohos_shared_library("libcamera_client") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  # install_images = [ "vendor" ]
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "camera_device_driver"
 }

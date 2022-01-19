@@ -89,6 +89,7 @@ if (defined(ohos_lite)) {
       defines += [ "CAMERA_DEVICE_UTEST" ]
     }
     public_configs = [ ":utils_config" ]
+    install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "camera_device_driver"
   }

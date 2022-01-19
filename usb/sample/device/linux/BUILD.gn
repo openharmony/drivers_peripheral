@@ -47,6 +47,7 @@ ohos_executable("usb_dev_test") {
   }
 
   install_enable = false
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "usb_device_driver"
 }

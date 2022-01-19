@@ -20,6 +20,7 @@ ohos_prebuilt_etc("hdf_peripheral.rc") {
     source = "hdf_peripheral.rc"
   }
   relative_install_dir = "init"
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "device_driver_framework"
 }

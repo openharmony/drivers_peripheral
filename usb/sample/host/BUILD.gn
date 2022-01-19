@@ -90,6 +90,7 @@ if (defined(ohos_lite)) {
     }
 
     install_enable = false
+    install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "usb_device_driver"
   }
@@ -126,6 +127,7 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
 
+    install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "usb_device_driver"
   }
@@ -154,6 +156,7 @@ if (defined(ohos_lite)) {
     }
 
     install_enable = false
+    install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "usb_device_driver"
   }
@@ -188,6 +191,7 @@ if (defined(ohos_lite)) {
     }
 
     install_enable = false
+    install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "usb_device_driver"
   }
@@ -222,6 +226,7 @@ if (defined(ohos_lite)) {
     }
 
     install_enable = false
+    install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "usb_device_driver"
   }
@@ -255,6 +260,7 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
     install_enable = false
+    install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "usb_device_driver"
   }

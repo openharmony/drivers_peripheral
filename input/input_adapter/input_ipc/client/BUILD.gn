@@ -48,7 +48,7 @@ ohos_shared_library("libinput_client") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  install_images = [ "vendor" ]
+  install_images = [ vendor_base_dir ]
   install_enable = true
   subsystem_name = "hidl_adapter"
   part_name = "hidl_adapter"

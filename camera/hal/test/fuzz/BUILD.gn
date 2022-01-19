@@ -94,6 +94,7 @@ ohos_fuzztest("IpcCameraDeviceRemote") {
   ]
 
   install_enable = true
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "camera_device_driver"
 }
@@ -170,6 +171,7 @@ ohos_fuzztest("IpcCameraHostService") {
   ]
 
   install_enable = true
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "camera_device_driver"
 }
@@ -244,6 +246,7 @@ ohos_fuzztest("IpcOffline") {
   ]
 
   install_enable = true
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "camera_device_driver"
 }
@@ -318,6 +321,7 @@ ohos_fuzztest("IpcStreamOperator") {
   ]
 
   install_enable = true
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "camera_device_driver"
 }
@@ -394,6 +398,7 @@ ohos_fuzztest("IpcCameraDeviceCallback") {
   ]
 
   install_enable = true
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "camera_device_driver"
 }
@@ -470,6 +475,7 @@ ohos_fuzztest("IpcCameraHostCallback") {
   ]
 
   install_enable = true
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "camera_device_driver"
 }
@@ -544,6 +550,7 @@ ohos_fuzztest("IpcStreamOperatorCallback") {
   ]
 
   install_enable = true
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "camera_device_driver"
 }
