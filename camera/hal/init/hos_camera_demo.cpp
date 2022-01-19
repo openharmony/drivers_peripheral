@@ -139,15 +139,15 @@ RetCode HosCameraDemo::CaptureOff(const int captureId, const CaptureMode mode)
     return RC_OK;
 }
 
-RetCode HosCameraDemo::CreatStream(const int streamId, std::shared_ptr<StreamCustomer>& streamCustomer,
+RetCode HosCameraDemo::CreateStream(const int streamId, std::shared_ptr<StreamCustomer>& streamCustomer,
     StreamIntent intent)
 {
     int rc = 0;
-    CAMERA_LOGD("demo test: CreatStream enter");
+    CAMERA_LOGD("demo test: CreateStream enter");
 
     GetStreamOpt();
     if (streamOperator_ == nullptr) {
-        CAMERA_LOGE("demo test: CreatStream GetStreamOpt() is nullptr\n");
+        CAMERA_LOGE("demo test: CreateStream GetStreamOpt() is nullptr\n");
         return RC_ERROR;
     }
 
@@ -159,7 +159,7 @@ RetCode HosCameraDemo::CreatStream(const int streamId, std::shared_ptr<StreamCus
 
     SetStreamInfo(streamInfo, streamCustomer, streamId, intent);
     if (streamInfo->bufferQueue_ == nullptr) {
-        CAMERA_LOGE("demo test: CreatStream CreateProducer(); is nullptr\n");
+        CAMERA_LOGE("demo test: CreateStream CreateProducer(); is nullptr\n");
         return RC_ERROR;
     }
 
@@ -169,18 +169,18 @@ RetCode HosCameraDemo::CreatStream(const int streamId, std::shared_ptr<StreamCus
 
     rc = streamOperator_->CreateStreams(streamInfos);
     if (rc != Camera::NO_ERROR) {
-        CAMERA_LOGE("demo test: CreatStream CreateStreams error\n");
+        CAMERA_LOGE("demo test: CreateStream CreateStreams error\n");
         return RC_ERROR;
     }
 
     rc = streamOperator_->CommitStreams(Camera::NORMAL, ability_);
     if (rc != Camera::NO_ERROR) {
-        CAMERA_LOGE("demo test: CreatStream CommitStreams error\n");
+        CAMERA_LOGE("demo test: CreateStream CommitStreams error\n");
         streamOperator_->ReleaseStreams({streamId});
         return RC_ERROR;
     }
 
-    CAMERA_LOGD("demo test: CreatStream exit");
+    CAMERA_LOGD("demo test: CreateStream exit");
 
     return RC_OK;
 }
@@ -331,35 +331,35 @@ void HosCameraDemo::OpenVideoFile()
     }
 }
 
-RetCode HosCameraDemo::CreatStreams(const int streamIdSecond, StreamIntent intent)
+RetCode HosCameraDemo::CreateStreams(const int streamIdSecond, StreamIntent intent)
 {
     int rc = 0;
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
     std::vector<std::shared_ptr<StreamInfo>>().swap(streamInfos);
 
-    CAMERA_LOGD("demo test: CreatStreams streamIdSecond = %{public}d", streamIdSecond);
+    CAMERA_LOGD("demo test: CreateStreams streamIdSecond = %{public}d", streamIdSecond);
     GetStreamOpt();
     if (streamOperator_ == nullptr) {
-        CAMERA_LOGE("demo test: CreatStreams GetStreamOpt() is nullptr\n");
+        CAMERA_LOGE("demo test: CreateStreams GetStreamOpt() is nullptr\n");
         return RC_ERROR;
     }
 
     std::shared_ptr<StreamInfo> previewStreamInfo = std::make_shared<StreamInfo>();
     if (previewStreamInfo == nullptr) {
-        CAMERA_LOGE("demo test: CreatStreams previewStreamInfo is nullptr\n");
+        CAMERA_LOGE("demo test: CreateStreams previewStreamInfo is nullptr\n");
         return RC_ERROR;
     }
 
     SetStreamInfo(previewStreamInfo, streamCustomerPreview_, STREAM_ID_PREVIEW, PREVIEW);
     if (previewStreamInfo->bufferQueue_ == nullptr) {
-        CAMERA_LOGE("demo test: CreatStream CreateProducer(); is nullptr\n");
+        CAMERA_LOGE("demo test: CreateStream CreateProducer(); is nullptr\n");
         return RC_ERROR;
     }
     streamInfos.push_back(previewStreamInfo);
 
     std::shared_ptr<StreamInfo> secondStreamInfo = std::make_shared<StreamInfo>();
     if (secondStreamInfo == nullptr) {
-        CAMERA_LOGE("demo test: CreatStreams previewStreamInfo is nullptr\n");
+        CAMERA_LOGE("demo test: CreateStreams previewStreamInfo is nullptr\n");
         return RC_ERROR;
     }
 
@@ -370,20 +370,20 @@ RetCode HosCameraDemo::CreatStreams(const int streamIdSecond, StreamIntent inten
     }
 
     if (secondStreamInfo->bufferQueue_ == nullptr) {
-        CAMERA_LOGE("demo test: CreatStreams CreateProducer() secondStreamInfo is nullptr\n");
+        CAMERA_LOGE("demo test: CreateStreams CreateProducer() secondStreamInfo is nullptr\n");
         return RC_ERROR;
     }
     streamInfos.push_back(secondStreamInfo);
 
     rc = streamOperator_->CreateStreams(streamInfos);
     if (rc != Camera::NO_ERROR) {
-        CAMERA_LOGE("demo test: CreatStream CreateStreams error\n");
+        CAMERA_LOGE("demo test: CreateStream CreateStreams error\n");
         return RC_ERROR;
     }
 
     rc = streamOperator_->CommitStreams(Camera::NORMAL, ability_);
     if (rc != Camera::NO_ERROR) {
-        CAMERA_LOGE("demo test: CreatStream CommitStreams error\n");
+        CAMERA_LOGE("demo test: CreateStream CommitStreams error\n");
         std::vector<int> streamIds = {STREAM_ID_PREVIEW, streamIdSecond};
         streamOperator_->ReleaseStreams(streamIds);
         return RC_ERROR;
@@ -465,9 +465,9 @@ RetCode HosCameraDemo::StartDualStreams(const int streamIdSecond)
 
         if (isCaptureOn_ == 0) {
             isCaptureOn_ = 1;
-            rc = CreatStreams(streamIdSecond, STILL_CAPTURE);
+            rc = CreateStreams(streamIdSecond, STILL_CAPTURE);
             if (rc != RC_OK) {
-                CAMERA_LOGE("demo test:StartPreviewStream CreatStreams error");
+                CAMERA_LOGE("demo test:StartPreviewStream CreateStreams error");
                 return RC_ERROR;
             }
         }
@@ -478,9 +478,9 @@ RetCode HosCameraDemo::StartDualStreams(const int streamIdSecond)
 
         if (isVideoOn_ == 0) {
             isVideoOn_ = 1;
-            rc = CreatStreams(streamIdSecond, VIDEO);
+            rc = CreateStreams(streamIdSecond, VIDEO);
             if (rc != RC_OK) {
-                CAMERA_LOGE("demo test:StartPreviewStream CreatStreams error");
+                CAMERA_LOGE("demo test:StartPreviewStream CreateStreams error");
                 return RC_ERROR;
             }
         }
@@ -503,9 +503,9 @@ RetCode HosCameraDemo::StartCaptureStream()
     if (isCaptureOn_ == 0) {
         isCaptureOn_ = 1;
 
-        rc = CreatStream(STREAM_ID_CAPTURE, streamCustomerCapture_, STILL_CAPTURE);
+        rc = CreateStream(STREAM_ID_CAPTURE, streamCustomerCapture_, STILL_CAPTURE);
         if (rc != RC_OK) {
-            CAMERA_LOGE("demo test:StartCaptureStream CreatStream error");
+            CAMERA_LOGE("demo test:StartCaptureStream CreateStream error");
             return RC_ERROR;
         }
     }
@@ -527,9 +527,9 @@ RetCode HosCameraDemo::StartVideoStream()
     if (isVideoOn_ == 0) {
         isVideoOn_ = 1;
 
-        rc = CreatStream(STREAM_ID_VIDEO, streamCustomerVideo_, VIDEO);
+        rc = CreateStream(STREAM_ID_VIDEO, streamCustomerVideo_, VIDEO);
         if (rc != RC_OK) {
-            CAMERA_LOGE("demo test:StartVideoStream CreatStream error");
+            CAMERA_LOGE("demo test:StartVideoStream CreateStream error");
             return RC_ERROR;
         }
     }
@@ -552,9 +552,9 @@ RetCode HosCameraDemo::StartPreviewStream()
     if (isPreviewOn_ == 0) {
         isPreviewOn_ = 1;
 
-        rc = CreatStream(STREAM_ID_PREVIEW, streamCustomerPreview_, PREVIEW);
+        rc = CreateStream(STREAM_ID_PREVIEW, streamCustomerPreview_, PREVIEW);
         if (rc != RC_OK) {
-            CAMERA_LOGE("demo test:StartPreviewStream CreatStream error");
+            CAMERA_LOGE("demo test:StartPreviewStream CreateStream error");
             return RC_ERROR;
         }
     }
