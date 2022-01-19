@@ -36,6 +36,7 @@ ohos_shared_library("libcodec_client") {
     external_deps = [ "hilog:libhilog" ]
   }
 
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "codec_device_driver"
 }
@@ -75,6 +76,7 @@ ohos_shared_library("libcodec_server") {
     external_deps = [ "hilog:libhilog" ]
   }
 
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "codec_device_driver"
 }

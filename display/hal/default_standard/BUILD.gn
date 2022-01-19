@@ -73,6 +73,7 @@ ohos_shared_library("def_display_gralloc") {
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
   install_enable = true
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "display_device_driver"
 }
@@ -117,6 +118,7 @@ ohos_shared_library("def_display_device") {
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
   install_enable = true
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "display_device_driver"
 }
