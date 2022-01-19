@@ -157,6 +157,7 @@ struct SensorInterface {
      * It only needs to cancel the subscription once successfully, and there is no need to
      * cancel the subscription repeatedly. The sensorId enumeration value range is not within 128-160,
      * which means that the traditional sensor is subscribed. You can cancel the subscription once successfully.
+     * @param cb Indicates the callback to register. For details, see {@link RecordDataCallback}.
      * @return Returns <b>0</b> if the callback is successfully deregistered; returns a negative value otherwise.
      *
      * @since 2.2
@@ -167,10 +168,12 @@ struct SensorInterface {
 
 /**
  * @brief Creates a <b>SensorInterface</b> instance.
+ *
+ * @param sensorId Indicates the sensor ID. For details, see {@link SensorTypeTag}.
  * You can use the instance to obtain sensor information, subscribe to or unsubscribe from sensor data,
  * enable or disable a sensor, set the sensor data reporting mode, and set the sensor options such as the accuracy and
  * measurement range.
- *
+ * @param cb Indicates the callback to register. For details, see {@link RecordDataCallback}.
  * @return Returns a non-zero value if the instance is successfully created; returns <b>0</b> otherwise.
  *
  * @since 2.2
