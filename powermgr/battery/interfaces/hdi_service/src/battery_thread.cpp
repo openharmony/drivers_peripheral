@@ -133,13 +133,13 @@ void BatteryThread::SetTimerInterval(int interval)
     return;
 }
 
-void BatteryThread::UpdateEpollInterval(const int32_t chargestate)
+void BatteryThread::UpdateEpollInterval(const int32_t chargeState)
 {
     HDF_LOGI("%{public}s enter", __func__);
     int interval;
 
-    if ((chargestate != PowerSupplyProvider::CHARGE_STATE_NONE) &&
-        (chargestate != PowerSupplyProvider::CHARGE_STATE_RESERVED)) {
+    if ((chargeState != PowerSupplyProvider::CHARGE_STATE_NONE) &&
+        (chargeState != PowerSupplyProvider::CHARGE_STATE_RESERVED)) {
         interval = TIMER_FAST_SEC;
         epollInterval_ = interval * SEC_TO_MSEC;
     } else {

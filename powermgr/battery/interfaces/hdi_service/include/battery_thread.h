@@ -45,7 +45,7 @@ protected:
     virtual void UpdateBatteryInfo(void* service);
     virtual void HandleStates() {}
     virtual int UpdateWaitInterval();
-    void UpdateEpollInterval(const int32_t chargestate);
+    void UpdateEpollInterval(const int32_t chargeState);
     virtual void CycleMatters() {}
 private:
     int32_t OpenUeventSocket(void) const;

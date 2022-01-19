@@ -37,9 +37,9 @@ public:
     int32_t GetCapacity(int32_t& capacity) override;
     int32_t GetVoltage(int32_t& voltage) override;
     int32_t GetTemperature(int32_t& temperature) override;
-    int32_t GetHealthState(BatteryHealthState& healthstate) override;
-    int32_t GetPluggedType(BatteryPluggedType& pluggedtype) override;
-    int32_t GetChargeState(BatteryChargeState& chargestate) override;
+    int32_t GetHealthState(BatteryHealthState& healthState) override;
+    int32_t GetPluggedType(BatteryPluggedType& pluggedType) override;
+    int32_t GetChargeState(BatteryChargeState& chargeState) override;
     int32_t GetPresent(bool& present) override;
     int32_t GetTechnology(std::string& technology) override;
 };

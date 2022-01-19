@@ -14,8 +14,8 @@
  */
 
 #include "battery_config.h"
-#include <hdf_log.h>
-#include <hdf_base.h>
+#include "hdf_log.h"
+#include "hdf_base.h"
 
 #define HDF_LOG_TAG BatteryConfig
 
@@ -145,17 +145,17 @@ int32_t BatteryConfig::ParseConfig(const std::string filename)
     if (parseFromStream(readerBuilder, ledConfig, &root, &errs)) {
         int32_t ret = ParseLedConf(root);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGI("%{public}s: parse led config fail. ", __func__);
+            HDF_LOGI("%{public}s: parse led config fail.", __func__);
         }
 
         ret = ParseTempConf(root);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGI("%{public}s: parse temperature config fail. ", __func__);
+            HDF_LOGI("%{public}s: parse temperature config fail.", __func__);
         }
 
         ret = ParseCapacityConf(root);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGI("%{public}s: parse soc config fail. ", __func__);
+            HDF_LOGI("%{public}s: parse soc config fail.", __func__);
         }
     }
 

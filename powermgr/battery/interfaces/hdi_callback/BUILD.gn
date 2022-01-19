@@ -14,19 +14,10 @@ import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libbattery_callback") {
-  include_dirs = [
-    "//drivers/adapter/uhdf2/include/hdi",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//drivers/peripheral/sensor/interfaces/include/",
-    "../include",
-  ]
+  include_dirs = [ "../include" ]
   sources = [ "./battery_callback_service.cpp" ]
 
-  deps = [
-    "//drivers/peripheral/powermgr/battery/interfaces/hdi/battery/v1_0:libbattery_proxy_1.0",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "../hdi/battery/v1_0:libbattery_proxy_1.0" ]
 
   if (is_standard_system) {
     external_deps = [
@@ -35,6 +26,9 @@ ohos_shared_library("libbattery_callback") {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+      "sensor_device_driver:hdi_sensor",
+      "//utils/native/base:utils",
     ]
   } else {
     external_deps = [
@@ -43,6 +37,9 @@ ohos_shared_library("libbattery_callback") {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hilog:libhilog",
+      "ipc:ipc_core",
+      "sensor_device_driver:hdi_sensor",
+      "//utils/native/base:utils",
     ]
   }
 

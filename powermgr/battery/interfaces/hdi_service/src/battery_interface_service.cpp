@@ -14,7 +14,7 @@
  */
 
 #include "battery_interface_service.h"
-#include <hdf_base.h>
+#include "hdf_base.h"
 #include "hdf_log.h"
 
 #define HDF_LOG_TAG BatteryInterfaceService
@@ -137,7 +137,7 @@ int32_t BatteryInterfaceService::GetTemperature(int32_t& temperature)
     return HDF_SUCCESS;
 }
 
-int32_t BatteryInterfaceService::GetHealthState(BatteryHealthState& healthstate)
+int32_t BatteryInterfaceService::GetHealthState(BatteryHealthState& healthState)
 {
     int32_t state = 0;
     int32_t ret = giver_->ParseHealthState(&state);
@@ -145,11 +145,11 @@ int32_t BatteryInterfaceService::GetHealthState(BatteryHealthState& healthstate)
         return ret;
     }
 
-    healthstate = BatteryHealthState(state);
+    healthState = BatteryHealthState(state);
     return HDF_SUCCESS;
 }
 
-int32_t BatteryInterfaceService::GetPluggedType(BatteryPluggedType& pluggedtype)
+int32_t BatteryInterfaceService::GetPluggedType(BatteryPluggedType& pluggedType)
 {
     int32_t type = 0;
     int32_t ret = giver_->ParsePluggedType(&type);
@@ -157,11 +157,11 @@ int32_t BatteryInterfaceService::GetPluggedType(BatteryPluggedType& pluggedtype)
         return ret;
     }
 
-    pluggedtype = BatteryPluggedType(type);
+    pluggedType = BatteryPluggedType(type);
     return HDF_SUCCESS;
 }
 
-int32_t BatteryInterfaceService::GetChargeState(BatteryChargeState& chargestate)
+int32_t BatteryInterfaceService::GetChargeState(BatteryChargeState& chargeState)
 {
     int32_t state = 0;
     int32_t ret = giver_->ParseChargeState(&state);
@@ -169,7 +169,7 @@ int32_t BatteryInterfaceService::GetChargeState(BatteryChargeState& chargestate)
         return ret;
     }
 
-    chargestate =BatteryChargeState(state);
+    chargeState = BatteryChargeState(state);
     return HDF_SUCCESS;
 }
 

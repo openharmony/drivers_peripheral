@@ -49,6 +49,7 @@ const std::string POWER_SUPPLY_SUB_PATH = "/sys/class/power_supply/battery";
 static std::vector<std::string> g_filenodeName;
 static std::map<std::string, std::string> g_nodeInfo;
 const int STR_TO_LONG_LEN = 10;
+const int NUM_ZERO = 0;
 static sptr<BatteryService> g_service;
 
 void HdiServiceTest::SetUpTestCase(void)
@@ -267,13 +268,13 @@ static int32_t ReadTemperatureSysfs()
     HDF_LOGE("%{public}s: sysBattTemPath is %{public}s", __func__, sysBattTemPath.c_str());
 
     int fd = open(sysBattTemPath.c_str(), O_RDONLY);
-    if (fd < HDF_SUCCESS) {
+    if (fd < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattTemPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
-    if (readSize < HDF_SUCCESS) {
+    if (readSize < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattTemPath.c_str());
         close(fd);
         return HDF_FAILURE;
@@ -281,7 +282,7 @@ static int32_t ReadTemperatureSysfs()
 
     buf[readSize] = '\0';
     int32_t battTemperature = strtol(buf, nullptr, strlen);
-    if (battTemperature < 0) {
+    if (battTemperature < NUM_ZERO) {
         HDF_LOGE("%{public}s: read system file temperature is %{public}d", __func__, battTemperature);
     }
     HDF_LOGE("%{public}s: read system file temperature is %{public}d", __func__, battTemperature);
@@ -308,7 +309,7 @@ static int32_t ReadVoltageSysfs()
     HDF_LOGE("%{public}s: sysBattVolPath is %{public}s", __func__, sysBattVolPath.c_str());
 
     int fd = open(sysBattVolPath.c_str(), O_RDONLY);
-    if (fd < HDF_SUCCESS) {
+    if (fd < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattVolPath.c_str());
         return HDF_FAILURE;
     }
@@ -322,7 +323,7 @@ static int32_t ReadVoltageSysfs()
 
     buf[readSize] = '\0';
     int32_t battVoltage = strtol(buf, nullptr, strlen);
-    if (battVoltage < 0) {
+    if (battVoltage < NUM_ZERO) {
         HDF_LOGE("%{public}s: read system file voltage is %{public}d", __func__, battVoltage);
     }
     HDF_LOGE("%{public}s: read system file voltage is %{public}d", __func__, battVoltage);
@@ -349,13 +350,13 @@ static int32_t ReadCapacitySysfs()
     HDF_LOGE("%{public}s: sysBattCapPath is %{public}s", __func__, sysBattCapPath.c_str());
 
     int fd = open(sysBattCapPath.c_str(), O_RDONLY);
-    if (fd < HDF_SUCCESS) {
+    if (fd < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattCapPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
-    if (readSize < HDF_SUCCESS) {
+    if (readSize < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattCapPath.c_str());
         close(fd);
         return HDF_FAILURE;
@@ -363,7 +364,7 @@ static int32_t ReadCapacitySysfs()
 
     buf[readSize] = '\0';
     int32_t battCapacity = strtol(buf, nullptr, strlen);
-    if (battCapacity < 0) {
+    if (battCapacity < NUM_ZERO) {
         HDF_LOGE("%{public}s: read system file capacity is %{public}d", __func__, battCapacity);
     }
     HDF_LOGE("%{public}s: read system file capacity is %{public}d", __func__, battCapacity);
@@ -426,13 +427,13 @@ static int32_t ReadHealthStateSysfs()
     HDF_LOGE("%{public}s: sysHealthStatePath is %{public}s", __func__, sysHealthStatePath.c_str());
 
     int fd = open(sysHealthStatePath.c_str(), O_RDONLY);
-    if (fd < HDF_SUCCESS) {
+    if (fd < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysHealthStatePath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
-    if (readSize < HDF_SUCCESS) {
+    if (readSize < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysHealthStatePath.c_str());
         close(fd);
         return HDF_FAILURE;
@@ -441,7 +442,7 @@ static int32_t ReadHealthStateSysfs()
     Trim(buf);
 
     int32_t battHealthState = HealthStateEnumConverter(buf);
-    HDF_LOGE("%{public}s: read system file healthstate is %{public}d", __func__, battHealthState);
+    HDF_LOGE("%{public}s: read system file healthState is %{public}d", __func__, battHealthState);
     close(fd);
 
     HDF_LOGI("%{public}s: exit.", __func__);
@@ -494,13 +495,13 @@ static int32_t GetPluggedTypeName()
     HDF_LOGE("%{public}s: sysOnlinePath is %{public}s", __func__, sysOnlinePath.c_str());
 
     int fd = open(sysOnlinePath.c_str(), O_RDONLY);
-    if (fd < HDF_SUCCESS) {
+    if (fd < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysOnlinePath.c_str());
         return HDF_FAILURE;
     }
 
     int32_t readSize = read(fd, buf, sizeof(buf) - 1);
-    if (readSize < HDF_SUCCESS) {
+    if (readSize < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysOnlinePath.c_str());
         close(fd);
         return HDF_FAILURE;
@@ -533,13 +534,13 @@ static int32_t ReadPluggedTypeSysfs()
     HDF_LOGE("%{public}s: sysPluggedTypePath is %{public}s", __func__, sysPluggedTypePath.c_str());
 
     int fd = open(sysPluggedTypePath.c_str(), O_RDONLY);
-    if (fd < HDF_SUCCESS) {
+    if (fd < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysPluggedTypePath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
-    if (readSize < HDF_SUCCESS) {
+    if (readSize < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysPluggedTypePath.c_str());
         close(fd);
         return HDF_FAILURE;
@@ -552,7 +553,7 @@ static int32_t ReadPluggedTypeSysfs()
         battPlugType = PowerSupplyProvider::PLUGGED_TYPE_NONE;
     }
 
-    HDF_LOGE("%{public}s: read system file pluggedtype is %{public}d", __func__, battPlugType);
+    HDF_LOGE("%{public}s: read system file pluggedType is %{public}d", __func__, battPlugType);
     close(fd);
 
     HDF_LOGI("%{public}s: exit.", __func__);
@@ -596,13 +597,13 @@ static int32_t ReadChargeStateSysfs()
     HDF_LOGE("%{public}s: sysChargeStatePath is %{public}s", __func__, sysChargeStatePath.c_str());
 
     int fd = open(sysChargeStatePath.c_str(), O_RDONLY);
-    if (fd < HDF_SUCCESS) {
+    if (fd < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysChargeStatePath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
-    if (readSize < HDF_SUCCESS) {
+    if (readSize < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysChargeStatePath.c_str());
         close(fd);
         return HDF_FAILURE;
@@ -610,7 +611,7 @@ static int32_t ReadChargeStateSysfs()
 
     Trim(buf);
     int32_t battChargeState = ChargeStateEnumConverter(buf);
-    HDF_LOGE("%{public}s: read system file chargestate is %{public}d", __func__, battChargeState);
+    HDF_LOGE("%{public}s: read system file chargeState is %{public}d", __func__, battChargeState);
     close(fd);
 
     HDF_LOGI("%{public}s: exit.", __func__);
@@ -634,13 +635,13 @@ static int32_t ReadChargeCounterSysfs()
     HDF_LOGE("%{public}s: sysChargeCounterPath is %{public}s", __func__, sysChargeCounterPath.c_str());
 
     int fd = open(sysChargeCounterPath.c_str(), O_RDONLY);
-    if (fd < HDF_SUCCESS) {
+    if (fd < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysChargeCounterPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
-    if (readSize < HDF_SUCCESS) {
+    if (readSize < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysChargeCounterPath.c_str());
         close(fd);
         return HDF_FAILURE;
@@ -649,9 +650,9 @@ static int32_t ReadChargeCounterSysfs()
     buf[readSize] = '\0';
     int32_t battChargeCounter = strtol(buf, nullptr, strlen);
     if (battChargeCounter < 0) {
-        HDF_LOGE("%{public}s: read system file chargestate is %{public}d", __func__, battChargeCounter);
+        HDF_LOGE("%{public}s: read system file chargeState is %{public}d", __func__, battChargeCounter);
     }
-    HDF_LOGE("%{public}s: read system file chargestate is %{public}d", __func__, battChargeCounter);
+    HDF_LOGE("%{public}s: read system file chargeState is %{public}d", __func__, battChargeCounter);
     close(fd);
 
     HDF_LOGI("%{public}s: exit.", __func__);
@@ -675,13 +676,13 @@ static int32_t ReadPresentSysfs()
     HDF_LOGE("%{public}s: sysPresentPath is %{public}s", __func__, sysPresentPath.c_str());
 
     int fd = open(sysPresentPath.c_str(), O_RDONLY);
-    if (fd < HDF_SUCCESS) {
+    if (fd < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysPresentPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
-    if (readSize < HDF_SUCCESS) {
+    if (readSize < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysPresentPath.c_str());
         close(fd);
         return HDF_FAILURE;
@@ -690,9 +691,9 @@ static int32_t ReadPresentSysfs()
     buf[readSize] = '\0';
     int32_t battPresent = strtol(buf, nullptr, strlen);
     if (battPresent < 0) {
-        HDF_LOGE("%{public}s: read system file chargestate is %{public}d", __func__, battPresent);
+        HDF_LOGE("%{public}s: read system file chargeState is %{public}d", __func__, battPresent);
     }
-    HDF_LOGE("%{public}s: read system file chargestate is %{public}d", __func__, battPresent);
+    HDF_LOGE("%{public}s: read system file chargeState is %{public}d", __func__, battPresent);
     close(fd);
 
     HDF_LOGI("%{public}s: exit.", __func__);
@@ -715,13 +716,13 @@ static std::string ReadTechnologySysfs(std::string& battTechnology)
     HDF_LOGE("%{public}s: sysTechnologyPath is %{public}s", __func__, sysTechnologyPath.c_str());
 
     int fd = open(sysTechnologyPath.c_str(), O_RDONLY);
-    if (fd < HDF_SUCCESS) {
+    if (fd < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysTechnologyPath.c_str());
         return "";
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
-    if (readSize < HDF_SUCCESS) {
+    if (readSize < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysTechnologyPath.c_str());
         close(fd);
         return "";
