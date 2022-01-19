@@ -25,9 +25,9 @@ interface IBatteryInterface {
     GetCapacity([out] int capacity);
     GetVoltage([out] int voltage);
     GetTemperature([out] int temperature);
-    GetHealthState([out] enum BatteryHealthState healthstate);
-    GetPluggedType([out] enum BatteryPluggedType pluggedtype);
-    GetChargeState([out] enum BatteryChargeState chargestate);
+    GetHealthState([out] enum BatteryHealthState healthState);
+    GetPluggedType([out] enum BatteryPluggedType pluggedType);
+    GetChargeState([out] enum BatteryChargeState chargeState);
     GetPresent([out] boolean present);
     GetTechnology([out] String technology);
 }

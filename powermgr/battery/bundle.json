@@ -10,27 +10,24 @@
     "ram": "1000KB",
     "deps": {
       "components": [
-        "batteryservice",
-        "batterysrv_client",
+        "appexecfwk_base",
+        "base",
+        "cesfwk_core",
+        "cesfwk_innerkits",
+        "libeventhandler",
+        "device_driver_framework",
+        "libhilog",
+        "ipc_core",
+        "want",
+        "samgr_proxy",
+        "system_ability_fwk"
+      ],
+      "third_part": [
         "gmock_main",
         "gtest_main",
-        "hilog",
         "jsoncpp",
-        "ipc_core",
-        "libbattery_callback",
-        "libbattery_interface_service_1.0",
-        "libbattery_proxy_1.0",
-        "libbattery_stub_1.0",
-        "libhdf_ipc_adapter",
-        "libhdf_utils",
-        "libminui",
-        "powermgr_client",
-        "syspara",
-        "utils",
-        "utils_base",
         "xml2"
-      ],
-      "third_part": []
+      ]
     },
     "build": {
       "sub_component": [

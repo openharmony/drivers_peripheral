@@ -14,8 +14,8 @@
  */
 
 #include "battery_callback_service.h"
-#include <hdf_base.h>
-#include <hdf_log.h>
+#include "hdf_base.h"
+#include "hdf_log.h"
 
 #define HDF_LOG_TAG BatteryCallbackService
 

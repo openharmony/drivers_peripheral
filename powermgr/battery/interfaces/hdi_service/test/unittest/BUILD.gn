@@ -13,7 +13,7 @@
 
 import("//base/powermgr/battery_manager/batterymgr.gni")
 import("//build/test.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/adapter/uhdf/uhdf.gni")
 
 module_output_path = "battery_manager_native/batterysrv"
 
@@ -28,19 +28,19 @@ config("module_private_config") {
     "//drivers/peripheral/powermgr/battery/interfaces/include",
     "//third_party/jsoncpp/include",
     "//base/startup/syspara_lite/adapter/native/syspara/include",
-    "//base/powermgr/battery_manager/charger/ui/include",
+    "${battery_manager_path}/charger/ui/include",
     "//drivers/peripheral/powermgr/battery/interfaces/hdi_service/include",
     "//drivers/peripheral/input/interfaces/include",
     "//third_party/libpng",
     "//drivers/ability/sbuf/include",
     "//drivers/framework/include",
     "//drivers/framework/include/core",
-    "//base/powermgr/battery_manager/charger/led",
-    "//base/powermgr/battery_manager/charger/backlight",
-    "//base/powermgr/battery_manager/charger/vibrate",
-    "//base/powermgr/battery_manager/charger/include",
-    "//base/powermgr/battery_manager/services/native/include",
-    "//base/powermgr/power_manager/interfaces/innerkits/native/include",
+    "${battery_manager_path}/charger/led",
+    "${battery_manager_path}/charger/backlight",
+    "${battery_manager_path}/charger/vibrate",
+    "${battery_manager_path}/charger/include",
+    "${battery_manager_path}/services/native/include",
+    "${battery_manager_path}/interfaces/innerkits/native/include",
     "//drivers/peripheral/powermgr/battery/interfaces/include",
     "//drivers/peripheral/powermgr/battery/include",
     "//drivers/peripheral/powermgr/battery/interfaces/hdi_service/include",
@@ -158,20 +158,20 @@ ohos_unittest("test_input_event") {
   include_dirs = [
     "//third_party/googletest/googletest/include",
     "//third_party/bounds_checking_function/include",
-    "//drivers/framework/ability/sbuf/include",
-    "//drivers/framework/include/platform",
-    "//drivers/framework/include/core",
-    "//drivers/framework/include/osal",
-    "//drivers/adapter/uhdf/posix/include",
-    "//drivers/framework/include/utils",
-    "//drivers/framework/include/config",
-    "//drivers/framework/include",
-    "//drivers/framework/test/unittest/include",
+    "${hdf_framework_path}/ability/sbuf/include",
+    "${hdf_framework_path}/include/platform",
+    "${hdf_framework_path}/include/core",
+    "${hdf_framework_path}/include/osal",
+    "${hdf_uhdf_path}/posix/include",
+    "${hdf_framework_path}/include/utils",
+    "${hdf_framework_path}/include/config",
+    "${hdf_framework_path}/include",
+    "${hdf_framework_path}/test/unittest/include",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
     "//drivers/peripheral/input/hal/include",
     "//drivers/peripheral/input/interfaces/include",
     "//third_party/FreeBSD/sys/dev/evdev",
-    "//base/powermgr/power_manager/interfaces/innerkits/native/include",
+    "${battery_manager_path}/interfaces/innerkits/native/include",
   ]
 
   sources = [ "src/hdi_input_test.cpp" ]

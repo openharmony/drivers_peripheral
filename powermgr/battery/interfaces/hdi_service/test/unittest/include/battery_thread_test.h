@@ -30,7 +30,7 @@ namespace {
 }
 
 int32_t OpenUeventSocketTest(BatteryThread& bthread);
-void UpdateEpollIntervalTest(const int32_t chargestate, BatteryThread& bthread);
+void UpdateEpollIntervalTest(const int32_t chargeState, BatteryThread& bthread);
 int GetEpollIntervalTest(BatteryThread& bthread);
 int32_t InitTest(void* service, BatteryThread& bthread);
 int32_t GetEpollFdTest(BatteryThread& bthread);
@@ -60,9 +60,9 @@ class OpenUeventSocketImplement {
 
 template<typename Tag, typename PrivateFun, PrivateFun privateFun>
 class UpdateEpollIntervalImplement {
-    friend void UpdateEpollIntervalTest(const int32_t chargestate, BatteryThread& bthread)
+    friend void UpdateEpollIntervalTest(const int32_t chargeState, BatteryThread& bthread)
     {
-        (bthread.*privateFun)(chargestate);
+        (bthread.*privateFun)(chargeState);
     }
 };
 

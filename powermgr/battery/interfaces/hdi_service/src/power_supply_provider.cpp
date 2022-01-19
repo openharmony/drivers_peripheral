@@ -36,6 +36,7 @@ const int INVALID_BATT_INT_VALUE = -1;
 const int STR_TO_LONG_LEN = 10;
 const int UVOL_TO_MVOL = 1000;
 const int MKDIR_WAIT_TIME = 1;
+const int NUM_ZERO = 0;
 const std::string POWER_SUPPLY_BASE_PATH = "/sys/class/power_supply";
 const std::string POWER_SUPPLY_BATTERY = "Battery";
 const std::string BATTERY_KEY_CAPACITY = "POWER_SUPPLY_CAPACITY=";
@@ -239,13 +240,13 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
     HDF_LOGI("%{public}s enter", __func__);
     int32_t readSize;
     int fd = open(path, O_RDONLY);
-    if (fd < HDF_SUCCESS) {
+    if (fd < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, path);
         return HDF_ERR_IO;
     }
 
     readSize = read(fd, buf, size - 1);
-    if (readSize < HDF_SUCCESS) {
+    if (readSize < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to read %{public}s", __func__, path);
         close(fd);
         return HDF_ERR_IO;
@@ -506,11 +507,17 @@ std::string PowerSupplyProvider::CreateFile(std::string path, std::string conten
 void PowerSupplyProvider::InitBatteryPath()
 {
     HDF_LOGI("%{public}s enter", __func__);
-    std::string sysBatteryPath = "/sys/class/power_supply/battery";
-    if (access(sysBatteryPath.c_str(), F_OK) == 0) {
+    std::string sysLowercaseBatteryPath = "/sys/class/power_supply/battery";
+    std::string sysCapitalBatteryPath = "/sys/class/power_supply/Battery";
+
+    if (access(sysLowercaseBatteryPath.c_str(), F_OK) == 0) {
         HDF_LOGI("%{public}s: system battery path is exist", __func__);
         return;
     } else {
+        if (access(sysCapitalBatteryPath.c_str(), F_OK) == 0) {
+            HDF_LOGI("%{public}s: system Battery path is exist", __func__);
+            return;
+        }
         HDF_LOGI("%{public}s: create mock battery path", __func__);
         InitDefaultSysfs();
     }
