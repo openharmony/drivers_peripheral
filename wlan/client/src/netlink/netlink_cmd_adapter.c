@@ -14,6 +14,9 @@
  */
 
 #include <dirent.h>
+#include "../wifi_common_cmd.h"
+#include <net/if.h>
+#include <linux/sockios.h>
 #include <linux/if.h>
 #include <linux/if_arp.h>
 #include <linux/nl80211.h>
@@ -21,7 +24,6 @@
 #include <netlink/genl/genl.h>
 #include <netlink/msg.h>
 #include <netlink/socket.h>
-#include <net/if.h>
 #include <poll.h>
 #include <pthread.h>
 #include <securec.h>
@@ -44,6 +46,7 @@
 
 // vendor subcmd
 #define WIFI_SUBCMD_SET_COUNTRY_CODE 0x100E
+#define WIFI_SUBCMD_SET_RANDOM_MAC_OUI 0x100C
 
 // vendor attr
 enum AndrWifiAttr {
@@ -93,67 +96,6 @@ static void CloseNetlinkSocket(struct nl_sock *sock)
     }
 }
 
-static void *EventThread(void *para)
-{
-    struct pollfd pollFds[LISTEN_FD_NUMS];
-    int32_t rc;
-
-    (void)para;
-
-    memset_s(pollFds, sizeof(pollFds), 0, sizeof(pollFds));
-    pollFds[EVENT_SOCKET_INDEX].fd = nl_socket_get_fd(g_wifiHalInfo.cmdSock);
-    pollFds[EVENT_SOCKET_INDEX].events = POLLIN | POLLERR;
-    rc = socketpair(AF_UNIX, SOCK_STREAM, 0, g_wifiHalInfo.ctrlSocks);
-    if (rc != 0) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail socketpair", __FUNCTION__);
-        return NULL;
-    }
-    pollFds[CTRL_SOCKET_INDEX].fd = g_wifiHalInfo.ctrlSocks[CTRL_SOCKET_READ_SIDE];
-    pollFds[CTRL_SOCKET_INDEX].events = POLLIN | POLLERR;
-
-    g_wifiHalInfo.running = 1;
-    while (1) {
-        rc = TEMP_FAILURE_RETRY(poll(pollFds, 2, -1));
-        if (rc < 0) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: fail poll", __FUNCTION__);
-            break;
-        } else if (pollFds[EVENT_SOCKET_INDEX].revents & POLLERR) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: event socket get POLLERR event", __FUNCTION__);
-            break;
-        } else if (pollFds[EVENT_SOCKET_INDEX].revents & POLLIN) {
-            if (HandleEvent(handle) != RET_CODE_SUCCESS) {
-                break;
-            }
-        } else if (pollFds[CTRL_SOCKET_INDEX].revents & POLLERR) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: ctrl socket get POLLERR event", __FUNCTION__);
-            break;
-        } else if (pollFds[CTRL_SOCKET_INDEX].revents & POLLIN) {
-            HILOG_ERROR(LOG_DOMAIN, buf, 0, sizeof(buf));
-            ssize_t result2 = TEMP_FAILURE_RETRY(read(pfd[1].fd, buf, sizeof(buf)));
-            HILOG_ERROR(LOG_DOMAIN, "%s: Read after POLL returned %zd, error no = %d (%s)",
-                __FUNCTION__, result2, errno, strerror(errno));
-            if (HandleCtrlEvent() != RET_CODE_SUCCESS) {
-                break;
-            }
-        }
-    }
-
-    g_wifiHalInfo.running = 0;
-    return NULL;
-}
-
-static int32_t SetupEventThread()
-{
-    int32_t rc;
-
-    rc = pthread_create(&g_wifiHalInfo.thread, NULL, EventThread, NULL);
-    if (rc != 0) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: failed create event thread", __FUNCTION__);
-        return RET_CODE_FAILURE;
-    }
-    return RET_CODE_SUCCESS;
-}
-
 static int32_t ConnectCmdSocket()
 {
     g_wifiHalInfo.cmdSock = OpenNetlinkSocket();
@@ -185,37 +127,18 @@ int32_t WifiDriverClientInit(void)
 {
     if (g_wifiHalInfo.cmdSock != NULL) {
         HILOG_ERROR(LOG_DOMAIN, "%s: already create cmd socket", __FUNCTION__);
-        return RET_CODE_MISUSE;
+        return RET_CODE_FAILURE;
     }
     return ConnectCmdSocket();
 }
 
-int32_t WifiDriverClientDeinit(void)
+void WifiDriverClientDeinit(void)
 {
     if (g_wifiHalInfo.cmdSock == NULL) {
         HILOG_ERROR(LOG_DOMAIN, "%s: cmd socket not inited", __FUNCTION__);
-        return RET_CODE_MISUSE;
+        return;
     }
     DisconnectCmdSocket();
-    return RET_CODE_SUCCESS;
-}
-
-int32_t WifiMsgRegisterEventListener(struct HdfDevEventlistener *listener)
-{
-    if (listener == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: listener must not null", __FUNCTION__);
-        return RET_CODE_INVALID_PARAM;
-    }
-    if (g_wifiHalInfo.cmdSock == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: not inited", __FUNCTION__);
-        return RET_CODE_MISUSE;
-    }
-    if (g_wifiHalInfo.running > 0) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: thread already started", __FUNCTION__);
-        return RET_CODE_MISUSE;
-    }
-
-    return SetupEventThread();
 }
 
 static int32_t CmdSocketErrorHandler(struct sockaddr_nl *nla,
@@ -327,7 +250,6 @@ static int32_t ParserSupportComboInfo(struct nl_msg *msg, void *arg)
     struct nlattr *nl_combi, *nl_limit, *nl_mode;
     struct nlattr *tb_comb[NUM_NL80211_IFACE_COMB];
     struct nlattr *tb_limit[NUM_NL80211_IFACE_LIMIT];
-    // uint64_t *comboInfo = (uint64_t *)arg;
     int32_t ret, i, j, k, type;
     static struct nla_policy
     iface_combination_policy[NUM_NL80211_IFACE_COMB] = {
@@ -385,24 +307,6 @@ struct PrivDevMac {
     uint8_t *mac;
     uint8_t len;
 };
-
-static int32_t ParserDevMac(struct nl_msg *msg, void *arg)
-{
-    struct nlattr *tb[NL80211_ATTR_MAX + 1];
-    struct genlmsghdr *gnlh = nlmsg_data(nlmsg_hdr(msg));
-    struct PrivDevMac *info = (struct PrivDevMac *)arg;
-    uint8_t *getmac = NULL;
-
-    nla_parse(tb, NL80211_ATTR_MAX, genlmsg_attrdata(gnlh, 0),
-        genlmsg_attrlen(gnlh, 0), NULL);
-    if (tb[NL80211_ATTR_MAC]) {
-        getmac = nla_data(tb[NL80211_ATTR_MAC]);
-    }
-    HILOG_ERROR(LOG_DOMAIN, "%s: has parse a tb_mac[%2x:%2x:%2x:%2x:%2x:%2x]", __FUNCTION__,
-        getmac[0], getmac[1], getmac[2], getmac[3], getmac[4], getmac[5]);
-    memcpy_s(info->mac, info->len, getmac, info->len);
-    return NL_SKIP;
-}
 
 static int32_t ParserValidFreq(struct nl_msg *msg, void *arg)
 {
@@ -682,7 +586,7 @@ static int GetFactoryMac()
 {
     int fd, ret;
     struct ifreq req;
-    struct ethtool_perm_addr *epaddr;
+    struct ethtool_perm_addr *epaddr = NULL;
 
     fd = socket(PF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
     if (fd < 0) {
@@ -690,9 +594,13 @@ static int GetFactoryMac()
         return RET_CODE_FAILURE;
     }
     epaddr = (struct ethtool_perm_addr *) malloc(sizeof(struct ethtool_perm_addr) + 6);
+    if (epaddr == NULL) {
+        HILOG_ERROR(LOG_DOMAIN, "epaddr malloc failed");
+        return RET_CODE_FAILURE;
+    }
     epaddr->cmd = 0x00000020;   // 0x00000020 ETHTOOL_GPERMADDR
     epaddr->size = ETH_ADDR_LEN;
-    req.ifr_data = epaddr;
+    req.ifr_data = (char *)epaddr;
     req.ifr_addr.sa_family = AF_INET;
     ret = ioctl(fd, SIOCETHTOOL, &req);
     if (ret != 0) {
@@ -702,9 +610,8 @@ static int GetFactoryMac()
     HILOG_INFO(LOG_DOMAIN, "%s: get factory wlan0 mac is %2x:%2x:%2x:%2x:%2x:%2x", __FUNCTION__,
         epaddr->data[0], epaddr->data[1], epaddr->data[2], epaddr->data[3], epaddr->data[4], epaddr->data[5]);
     close(fd);
-    if (epaddr != NULL) {
-        free(epaddr);
-    }
+    free(epaddr);
+
     return ret;
 }
 
@@ -895,8 +802,22 @@ int32_t GetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num)
     return RET_CODE_SUCCESS;
 }
 
-int32_t SetResetDriver(const uint8_t chipId)
+int32_t SetResetDriver(const uint8_t chipId, const char *ifName)
 {
     (void)chipId;
+    (void)ifName;
+    return RET_CODE_SUCCESS;
+}
+
+int32_t WifiCmdScan(const char *ifName, WifiScan *scan)
+{
+    (void)ifName;
+    (void)scan;
+    return RET_CODE_SUCCESS;
+}
+
+int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
+{
+    (void)netDeviceInfoResult;
     return RET_CODE_SUCCESS;
 }
