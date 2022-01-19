@@ -43,6 +43,8 @@ namespace OHOS {
 namespace USB {
 class UsbdClient {
 public:
+    static UsbdClient &GetInstance();
+
     /* *
      * @brief 打开设备，建立连接
      *
@@ -51,7 +53,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t OpenDevice(const UsbDev &dev);
+    int32_t OpenDevice(const UsbDev &dev);
 
     /* *
      * @brief 关闭设备，释放与设备相关的所有系统资源
@@ -61,7 +63,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t CloseDevice(const UsbDev &dev);
+    int32_t CloseDevice(const UsbDev &dev);
 
     /* *
      * @brief 获取设备描述符device
@@ -72,7 +74,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+    int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
 
     /* *
      * @brief 根据String ID获取设备的字符串描述符string
@@ -84,7 +86,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+    int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
 
     /* *
      * @brief 根据config ID获取设备的配置描述符config
@@ -96,7 +98,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+    int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
 
     /* *
      * @brief 获取原始描述符
@@ -107,7 +109,18 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+    int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+    
+    /* *
+     * @brief 获取文件描述符
+     *
+     * @param dev usb设备地址信息
+     * @param fd usb设备文件描述符
+     *
+     * @return 0 表示成功，其他返回值表示失败
+     * @since 3.0
+     */
+    int32_t GetFileDescriptor(const UsbDev &dev, int32_t &fd);
 
     /* *
      * @brief 设置当前的config信息
@@ -118,7 +131,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t SetConfig(const UsbDev &dev, uint8_t configIndex);
+    int32_t SetConfig(const UsbDev &dev, uint8_t configIndex);
 
     /* *
      * @brief 获取当前的config信息
@@ -129,18 +142,19 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t GetConfig(const UsbDev &dev, uint8_t &configIndex);
+    int32_t GetConfig(const UsbDev &dev, uint8_t &configIndex);
 
     /* *
      * @brief 打开接口，并申明独占接口，必须在数据传输前执行
      *
      * @param dev usb设备地址信息
      * @param interfaceid usb设备interface ID
+     * @param force 是否强制: 1,强制 0不强制
      *
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t ClaimInterface(const UsbDev &dev, uint8_t interfaceid);
+    int32_t ClaimInterface(const UsbDev &dev, uint8_t interfaceid, uint8_t force);
 
     /* *
      * @brief 关闭接口，释放接口的占用，在停止数据传输后执行
@@ -151,7 +165,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t ReleaseInterface(const UsbDev &dev, uint8_t interfaceid);
+    int32_t ReleaseInterface(const UsbDev &dev, uint8_t interfaceid);
 
     /* *
      * @brief 设置指定接口的备选设置，用于在具有相同ID但不同备用设置的两个接口之间进行选择
@@ -163,7 +177,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t SetInterface(const UsbDev &dev, uint8_t interfaceid, uint8_t altIndex);
+    int32_t SetInterface(const UsbDev &dev, uint8_t interfaceid, uint8_t altIndex);
 
     /* *
      * @brief 在给定端点上执行批量数据读取，返回读取的数据和长度，端点方向必须为数据读取可以设置超时时间
@@ -176,10 +190,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t BulkTransferRead(const UsbDev &dev,
-                                    const UsbPipe &pipe,
-                                    int32_t timeout,
-                                    std::vector<uint8_t> &data);
+    int32_t BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
 
     /* *
      * @brief 在给定端点上执行批量数据写入， 返回读取的数据和长度，端点方向必须为数据写入
@@ -192,10 +203,8 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t BulkTransferWrite(const UsbDev &dev,
-                                     const UsbPipe &pipe,
-                                     int32_t timeout,
-                                     const std::vector<uint8_t> &data);
+    int32_t BulkTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
+        const std::vector<uint8_t> &data);
 
     /* *
      * @brief 对此设备执行端点零的控制事务，传输方向由请求类型决定。 如果requestType＆
@@ -208,7 +217,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t ControlTransfer(const UsbDev &dev, const UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+    int32_t ControlTransfer(const UsbDev &dev, const UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
 
     /* *
      * @brief 在给定端点上执行中断数据读取， 返回读取的数据和长度，端点方向必须为数据读取
@@ -221,10 +230,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t InterruptTransferRead(const UsbDev &dev,
-                                         const UsbPipe &pipe,
-                                         int32_t timeout,
-                                         std::vector<uint8_t> &data);
+    int32_t InterruptTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
 
     /* *
      * @brief 在给定端点上执行中断数据写入， 返回读取的数据和长度，端点方向必须为数据写入
@@ -237,10 +243,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t InterruptTransferWrite(const UsbDev &dev,
-                                          const UsbPipe &pipe,
-                                          int32_t timeout,
-                                          std::vector<uint8_t> &data);
+    int32_t InterruptTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
 
     /* *
      * @brief 在给定端点上执行等时数据读取， 返回读取的数据和长度，端点方向必须为数据读取
@@ -253,7 +256,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t IsoTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
+    int32_t IsoTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
 
     /* *
      * @brief 在给定端点上执行等时数据写入， 返回读取的数据和长度，端点方向必须为数据写入
@@ -266,10 +269,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t IsoTransferWrite(const UsbDev &dev,
-                                    const UsbPipe &pipe,
-                                    int32_t timeout,
-                                    std::vector<uint8_t> &data);
+    int32_t IsoTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
 
     /* *
      * @brief 将指定的端点进行异步数据发送或者接收请求，数据传输方向由端点方向决定
@@ -282,10 +282,8 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t RequestQueue(const UsbDev &dev,
-                                const UsbPipe &pipe,
-                                const std::vector<uint8_t> &clientData,
-                                const std::vector<uint8_t> &buffer);
+    int32_t RequestQueue(const UsbDev &dev, const UsbPipe &pipe, const std::vector<uint8_t> &clientData,
+        const std::vector<uint8_t> &buffer);
 
     /* *
      * @brief 等待RequestQueue异步请求的操作结果
@@ -298,10 +296,8 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t RequestWait(const UsbDev &dev,
-                               std::vector<uint8_t> &clientData,
-                               std::vector<uint8_t> &buffer,
-                               int32_t timeout);
+    int32_t RequestWait(const UsbDev &dev, std::vector<uint8_t> &clientData, std::vector<uint8_t> &buffer,
+        int32_t timeout);
 
     /* *
      * @brief 取消待处理的数据请求
@@ -312,7 +308,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t RequestCancel(const UsbDev &dev, const UsbPipe &pipe);
+    int32_t RequestCancel(const UsbDev &dev, const UsbPipe &pipe);
 
     /* *
      * @brief 获取从设备支持的功能列表（按位域表示）（从设备）
@@ -322,7 +318,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t GetCurrentFunctions(int32_t &funcs);
+    int32_t GetCurrentFunctions(int32_t &funcs);
 
     /* *
      * @brief 设置从设备支持的功能列表（按位域表示）（从设备）
@@ -332,7 +328,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t SetCurrentFunctions(int32_t funcs);
+    int32_t SetCurrentFunctions(int32_t funcs);
 
     /* *
      * @brief 关闭设备，释放与设备相关的所有系统资源
@@ -344,7 +340,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t SetPortRole(int32_t portId, int32_t powerRole, int32_t dataRole);
+    int32_t SetPortRole(int32_t portId, int32_t powerRole, int32_t dataRole);
 
     /* *
      * @brief 查询port端口的当前设置
@@ -357,7 +353,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode);
+    int32_t QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode);
 
     /* *
      * @brief 绑定订阅者
@@ -367,7 +363,7 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t BindUsbdSubscriber(const sptr<UsbdSubscriber> &subscriber);
+    int32_t BindUsbdSubscriber(const sptr<UsbdSubscriber> &subscriber);
 
     /* *
      * @brief 解绑订阅者
@@ -375,14 +371,71 @@ public:
      * @return 0 表示成功，其他返回值表示失败
      * @since 3.0
      */
-    static int32_t UnbindUsbdSubscriber();
+    int32_t UnbindUsbdSubscriber(const sptr<UsbdSubscriber> &subscriber);
+
+    /* *
+     * @brief 注册批量传输异步回调函数
+     *
+     * @param dev usb设备地址信息
+     * @param pipe usb设备pipe信息
+     *
+     * @return 0 表示成功，其他返回值表示失败
+     * @since 3.0
+     */
+    int32_t RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const sptr<IRemoteObject> &cb);
+
+    /* *
+     * @brief 注销批量传输异步回调函数
+     *
+     * @param dev usb设备地址信息
+     * @param pipe usb设备pipe信息
+     *
+     * @return 0 表示成功，其他返回值表示失败
+     * @since 3.0
+     */
+    int32_t UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe);
+
+    /* *
+     * @brief 批量传输异步读数据
+     *
+     * @param dev usb设备地址信息
+     * @param pipe usb设备pipe信息
+     * @param ashmem 为共享内存，用于存放读取的数据
+     *
+     * @return 0 表示成功，其他返回值表示失败
+     * @since 3.0
+     */
+    int32_t BulkRead(const UsbDev &dev, const UsbPipe &pipe, sptr<Ashmem> &ashmem);
+
+    /* *
+     * @brief 批量传输异步写数据
+     *
+     * @param dev usb设备地址信息
+     * @param pipe usb设备pipe信息
+     * @param ashmem 为共享内存，用于存放需要写入的数据
+     *
+     * @return 0 表示成功，其他返回值表示失败
+     * @since 3.0
+     */
+    int32_t BulkWrite(const UsbDev &dev, const UsbPipe &pipe, sptr<Ashmem> &ashmem);
+
+    /* *
+     * @brief 批量传输异步取消接口，用于取消当前接口的异步批量读写操作
+     *
+     * @param dev usb设备地址信息
+     * @param pipe usb设备pipe信息
+     *
+     * @return 0 表示成功，其他返回值表示失败
+     * @since 3.0
+     */
+    int32_t BulkCancel(const UsbDev &dev, const UsbPipe &pipe);
 
 private:
-    static int32_t SetDeviceMessage(MessageParcel &data, const UsbDev &dev);
-    static int32_t SetBufferMessage(MessageParcel &data, const std::vector<uint8_t> &tdata);
-    static int32_t GetBufferMessage(MessageParcel &data, std::vector<uint8_t> &tdata);
-    static sptr<IRemoteObject> GetUsbdService();
-    static int32_t DoDispatch(uint32_t cmd, MessageParcel &data, MessageParcel &reply);
+    int32_t SetDeviceMessage(MessageParcel &data, const UsbDev &dev);
+    int32_t SetBufferMessage(MessageParcel &data, const std::vector<uint8_t> &bufferData);
+    int32_t GetBufferMessage(MessageParcel &data, std::vector<uint8_t> &bufferData);
+    sptr<IRemoteObject> GetUsbdService();
+    int32_t DoDispatch(uint32_t cmd, MessageParcel &data, MessageParcel &reply);
 };
 } // namespace USB
 } // namespace OHOS
