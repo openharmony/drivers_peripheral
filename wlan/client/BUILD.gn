@@ -76,10 +76,9 @@ if (defined(ohos_lite)) {
     features = [ ":wifi_driver_client" ]
   }
 } else {
-  if (enable_HDF_NL80211) {
-    CLIENT_ROOT_DIR = "//drivers/peripheral/wlan"
-
-    ohos_shared_library("wifi_driver_client") {
+  CLIENT_ROOT_DIR = "//drivers/peripheral/wlan"
+  ohos_shared_library("wifi_driver_client") {
+    if (enable_HDF_NL80211) {
       sources = [ "$CLIENT_ROOT_DIR/client/src/wifi_driver_client.c" ]
 
       sources += [
@@ -90,16 +89,13 @@ if (defined(ohos_lite)) {
       include_dirs = [
         "$CLIENT_ROOT_DIR/client/include",
         "$CLIENT_ROOT_DIR/interfaces/include",
-        "//third_party/bounds_checking_function/include",
-        "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
       ]
 
-      deps = [
-        "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-        "//drivers/adapter/uhdf2/utils:libhdf_utils",
-        "//utils/native/base:utils",
+      deps = [ "//utils/native/base:utils" ]
+      external_deps = [
+        "device_driver_framework:libhdf_utils",
+        "hiviewdfx_hilog_native:libhilog",
       ]
-
       defines = [ "__OHOS__USER__" ]
 
       cflags = [
@@ -114,11 +110,7 @@ if (defined(ohos_lite)) {
       install_images = [ chipset_base_dir ]
       subsystem_name = "hdf"
       part_name = "wlan_device_driver"
-    }
-  } else {
-    CLIENT_ROOT_DIR = "//drivers/peripheral/wlan"
-
-    ohos_shared_library("wifi_driver_client") {
+    } else {
       sources = [ "$CLIENT_ROOT_DIR/client/src/wifi_driver_client.c" ]
 
       sources += [ "$CLIENT_ROOT_DIR/client/src/netlink/netlink_cmd_adapter.c" ]
@@ -126,15 +118,13 @@ if (defined(ohos_lite)) {
       include_dirs = [
         "$CLIENT_ROOT_DIR/client/include",
         "$CLIENT_ROOT_DIR/interfaces/include",
-        "//third_party/bounds_checking_function/include",
-        "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
       ]
 
       deps = [
-        "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
         "//third_party/third_party_libnl:libnl_share",
         "//utils/native/base:utils",
       ]
+      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
       defines = [ "__OHOS__USER__" ]
 

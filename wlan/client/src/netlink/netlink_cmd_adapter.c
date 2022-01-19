@@ -14,7 +14,7 @@
  */
 
 #include <dirent.h>
-#include "../wifi_common_cmd.h"
+#include "wifi_driver_client.h"
 #include <net/if.h>
 #include <linux/sockios.h>
 #include <linux/if.h>
@@ -706,14 +706,6 @@ int32_t SetTxPower(const char *ifName, int32_t power)
     return RET_CODE_SUCCESS;
 }
 
-int32_t GetAssociatedStas(const char *ifName,
-    struct AssocStaInfoResult *result)
-{
-    (void)ifName;
-    (void)result;
-    return RET_CODE_SUCCESS;
-}
-
 int32_t WifiSetCountryCode(const char *ifName, const char *code, uint32_t len)
 {
     uint32_t ifaceId = if_nametoindex(ifName);
@@ -787,37 +779,3 @@ int32_t SetScanMacAddr(const char *ifName, uint8_t *scanMac, uint8_t len)
     return ret;
 }
 
-int32_t AcquireChipId(const char *ifName, uint8_t *chipId)
-{
-    (void)ifName;
-    (void)chipId;
-    return RET_CODE_SUCCESS;
-}
-
-int32_t GetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num)
-{
-    (void)chipId;
-    (void)ifNames;
-    (void)num;
-    return RET_CODE_SUCCESS;
-}
-
-int32_t SetResetDriver(const uint8_t chipId, const char *ifName)
-{
-    (void)chipId;
-    (void)ifName;
-    return RET_CODE_SUCCESS;
-}
-
-int32_t WifiCmdScan(const char *ifName, WifiScan *scan)
-{
-    (void)ifName;
-    (void)scan;
-    return RET_CODE_SUCCESS;
-}
-
-int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
-{
-    (void)netDeviceInfoResult;
-    return RET_CODE_SUCCESS;
-}
