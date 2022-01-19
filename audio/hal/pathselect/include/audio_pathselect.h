@@ -21,11 +21,7 @@
 #include "audio_internal.h"
 #include "cJSON.h"
 
-#ifdef __LITEOS__
-#define CJSONFILE_CONFIG_PATH "/etc/parse.json"
-#else
-#define CJSONFILE_CONFIG_PATH "/system/etc/hdfconfig/parse.json"
-#endif
+#define CJSONFILE_CONFIG_PATH HDF_CONFIG_DIR"/parse.json"
 
 int32_t AudioPathSelGetConfToJsonObj();
 int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdaptType adaptType);

@@ -78,7 +78,7 @@ void *AudioHdiCaptureTest::handleSo = nullptr;
 void AudioHdiCaptureTest::SetUpTestCase(void)
 {
 #ifdef AUDIO_MPI_SO
-    char sdkResolvedPath[] = "//system/lib/libhdi_audio_interface_lib_render.z.so";
+    char sdkResolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
     sdkSo = dlopen(sdkResolvedPath, RTLD_LAZY);
     if (sdkSo == nullptr) {
         return;
