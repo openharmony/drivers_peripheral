@@ -17,7 +17,10 @@ ohos_shared_library("libbattery_callback") {
   include_dirs = [ "../include" ]
   sources = [ "./battery_callback_service.cpp" ]
 
-  deps = [ "../hdi/battery/v1_0:libbattery_proxy_1.0" ]
+  deps = [
+    "../hdi/battery/v1_0:libbattery_proxy_1.0",
+    "//utils/native/base:utils",
+  ]
 
   if (is_standard_system) {
     external_deps = [
@@ -28,7 +31,6 @@ ohos_shared_library("libbattery_callback") {
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
       "sensor_device_driver:hdi_sensor",
-      "//utils/native/base:utils",
     ]
   } else {
     external_deps = [
@@ -39,7 +41,6 @@ ohos_shared_library("libbattery_callback") {
       "hilog:libhilog",
       "ipc:ipc_core",
       "sensor_device_driver:hdi_sensor",
-      "//utils/native/base:utils",
     ]
   }
 
