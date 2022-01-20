@@ -18,6 +18,7 @@ ohos_shared_library("libbattery_interface_service_1.0") {
   include_dirs = [
     "include",
     "../include/",
+    "//base/powermgr/battery_manager/charger/led",
   ]
   sources = [
     "//base/powermgr/battery_manager/charger/led/battery_led.cpp",
@@ -27,11 +28,15 @@ ohos_shared_library("libbattery_interface_service_1.0") {
     "src/power_supply_provider.cpp",
   ]
 
-  deps = [ "../hdi/battery/v1_0:libbattery_stub_1.0" ]
+  deps = [
+    "../hdi/battery/v1_0:libbattery_stub_1.0",
+    "//third_party/jsoncpp:jsoncpp",
+    "//third_party/libxml2:xml2",
+    "//utils/native/base:utils",
+  ]
 
   if (is_standard_system) {
     external_deps = [
-      "battery_manager_native:charger",
       "device_driver_framework:libhdf_host",
       "device_driver_framework:libhdf_ipc_adapter",
       "device_driver_framework:libhdf_utils",
@@ -39,9 +44,6 @@ ohos_shared_library("libbattery_interface_service_1.0") {
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
       "sensor_device_driver:hdi_sensor",
-      "//third_party/jsoncpp:jsoncpp",
-      "//third_party/libxml2:xml2",
-      "//utils/native/base:utils",
     ]
   } else {
     external_deps = [
@@ -60,17 +62,19 @@ ohos_shared_library("libbattery_driver") {
   include_dirs = [
     "include",
     "../include/",
+    "//base/powermgr/battery_manager/charger/led",
   ]
   sources = [ "src/battery_interface_driver.cpp" ]
 
   deps = [
     ":libbattery_interface_service_1.0",
     "../hdi/battery/v1_0:libbattery_stub_1.0",
+    "//third_party/jsoncpp:jsoncpp",
+    "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
     external_deps = [
-      "battery_manager_native:charger",
       "device_driver_framework:libhdf_host",
       "device_driver_framework:libhdf_ipc_adapter",
       "device_driver_framework:libhdf_utils",
@@ -78,8 +82,6 @@ ohos_shared_library("libbattery_driver") {
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
       "sensor_device_driver:hdi_sensor",
-      "//third_party/jsoncpp:jsoncpp",
-      "//utils/native/base:utils",
     ]
   } else {
     external_deps = [
