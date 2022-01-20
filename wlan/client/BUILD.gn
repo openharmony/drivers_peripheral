@@ -15,6 +15,18 @@ if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
 } else {
   import("//build/ohos.gni")
+  WLAN_HAL_PATH =
+      rebase_path("//vendor/${product_company}/${product_name}/hals/wlan")
+
+  cmd = "if [ -f $WLAN_HAL_PATH/product.gni ]; then echo true; else echo false; fi"
+  HAVE_WLAN_HAL_PATH =
+      exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
+
+  if (HAVE_WLAN_HAL_PATH) {
+    import("$WLAN_HAL_PATH/product.gni")
+  } else {
+    enable_HDF_NL80211 = true
+  }
 }
 
 if (defined(ohos_lite)) {
@@ -35,6 +47,7 @@ if (defined(ohos_lite)) {
       "$FWK_ROOT_DIR/include",
       "$FWK_ROOT_DIR/include/utils",
       "$FWK_ROOT_DIR/core/shared/include",
+      "$FWK_ROOT_DIR/ability/sbuf/include",
       "$FWK_ROOT_DIR/include/core",
       "//drivers/adapter/uhdf/posix/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
@@ -64,40 +77,69 @@ if (defined(ohos_lite)) {
   }
 } else {
   CLIENT_ROOT_DIR = "//drivers/peripheral/wlan"
-
   ohos_shared_library("wifi_driver_client") {
-    sources = [ "$CLIENT_ROOT_DIR/client/src/wifi_driver_client.c" ]
+    if (enable_HDF_NL80211) {
+      sources = [ "$CLIENT_ROOT_DIR/client/src/wifi_driver_client.c" ]
 
-    sources += [
-      "$CLIENT_ROOT_DIR/client/src/sbuf/sbuf_cmd_adapter.c",
-      "$CLIENT_ROOT_DIR/client/src/sbuf/sbuf_event_adapter.c",
-    ]
+      sources += [
+        "$CLIENT_ROOT_DIR/client/src/sbuf/sbuf_cmd_adapter.c",
+        "$CLIENT_ROOT_DIR/client/src/sbuf/sbuf_event_adapter.c",
+      ]
 
-    include_dirs = [
-      "$CLIENT_ROOT_DIR/client/include",
-      "$CLIENT_ROOT_DIR/interfaces/include",
-      "//third_party/bounds_checking_function/include",
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    ]
+      include_dirs = [
+        "$CLIENT_ROOT_DIR/client/include",
+        "$CLIENT_ROOT_DIR/interfaces/include",
+      ]
 
-    deps = [ "//utils/native/base:utils" ]
-    external_deps = [
-      "device_driver_framework:libhdf_utils",
-      "hiviewdfx_hilog_native:libhilog",
-    ]
-    defines = [ "__OHOS__USER__" ]
+      deps = [ "//utils/native/base:utils" ]
+      external_deps = [
+        "device_driver_framework:libhdf_utils",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
+      defines = [ "__OHOS__USER__" ]
 
-    cflags = [
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-fsigned-char",
-      "-fno-common",
-      "-fno-strict-aliasing",
-    ]
+      cflags = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsigned-char",
+        "-fno-common",
+        "-fno-strict-aliasing",
+      ]
 
-    install_images = [ chipset_base_dir ]
-    subsystem_name = "hdf"
-    part_name = "wlan_device_driver"
+      install_images = [ chipset_base_dir ]
+      subsystem_name = "hdf"
+      part_name = "wlan_device_driver"
+    } else {
+      sources = [ "$CLIENT_ROOT_DIR/client/src/wifi_driver_client.c" ]
+
+      sources += [ "$CLIENT_ROOT_DIR/client/src/netlink/netlink_cmd_adapter.c" ]
+
+      include_dirs = [
+        "$CLIENT_ROOT_DIR/client/include",
+        "$CLIENT_ROOT_DIR/interfaces/include",
+      ]
+
+      deps = [
+        "//third_party/third_party_libnl:libnl_share",
+        "//utils/native/base:utils",
+      ]
+      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+
+      defines = [ "__OHOS__USER__" ]
+
+      cflags = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsigned-char",
+        "-fno-common",
+        "-fno-strict-aliasing",
+      ]
+
+      install_images = [ chipset_base_dir ]
+      subsystem_name = "hdf"
+      part_name = "wlan_device_driver"
+    }
   }
 }
