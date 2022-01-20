@@ -21,8 +21,8 @@
     "build": {
       "sub_component": [
         "//drivers/peripheral/misc/light/hal:hdi_light",
-        "//drivers/peripheral/misc/light/interfaces/light/v1_0:light",
-        "//drivers/peripheral/misc/light/interfaces/hdi_service:hdf_light_service"
+        "//drivers/interface/light/v1_0:light",
+        "//drivers/peripheral/misc/light/hdi_service:hdf_light_service"
       ],
       "test": [
         "//drivers/peripheral/misc/light/test:hdf_test_light"
