@@ -35,6 +35,7 @@ RetCode VencController::Init()
 RetCode VencController::PowerUp(CameraId cameraId)
 {
     RetCode rc = RC_OK;
+    (void)cameraId;
     if (GetPowerOnState() == false) {
         SetPowerOnState(true);
         CAMERA_LOGI("%{public}s Venc Powerup", __FUNCTION__);
@@ -46,6 +47,7 @@ RetCode VencController::PowerUp(CameraId cameraId)
 RetCode VencController::PowerDown(CameraId cameraId)
 {
     RetCode rc = RC_OK;
+    (void)cameraId;
     if (GetPowerOnState() == true) {
         SetPowerOnState(false);
         CAMERA_LOGI("%{public}s Venc PowerDown", __FUNCTION__);

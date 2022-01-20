@@ -16,7 +16,7 @@
 
 namespace OHOS::Camera {
 VoNode::VoNode(const std::string& name, const std::string& type)
-    : MpiNode(name, type), SinkNode(name, type), NodeBase(name, type)
+    : NodeBase(name, type), MpiNode(name, type), SinkNode(name, type)
 {
     CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
@@ -36,6 +36,7 @@ RetCode VoNode::GetDeviceController()
 RetCode VoNode::Start(const int32_t streamId)
 {
     RetCode rc = RC_OK;
+    (void)streamId;
     rc = GetDeviceController();
     if (rc == RC_ERROR) {
         CAMERA_LOGE("GetDeviceController failed.");

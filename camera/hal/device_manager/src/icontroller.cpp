@@ -33,4 +33,10 @@ void IController::SetPowerOnState(bool powerOnState)
     std::lock_guard<std::mutex> l(powerOnStatelock_);
     powerOnState_ = powerOnState;
 }
+
+void IController::SetMetaDataFlag(bool metaDataFlag)
+{
+    (void)metaDataFlag;
+    return;
+}
 } // namespace OHOS::Camera

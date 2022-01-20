@@ -39,7 +39,7 @@ public:
     {
         return false;
     };
-    virtual void SetMetaDataFlag(bool metaDataFlag) {};
+    virtual void SetMetaDataFlag(bool metaDataFlag);
     virtual RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta) = 0;
 
 private:

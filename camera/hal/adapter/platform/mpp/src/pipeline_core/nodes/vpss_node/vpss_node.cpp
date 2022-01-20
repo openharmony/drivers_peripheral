@@ -16,7 +16,7 @@
 
 namespace OHOS::Camera {
 VpssNode::VpssNode(const std::string& name, const std::string& type)
-    : MpiNode(name, type), SourceNode(name, type), NodeBase(name, type)
+    : NodeBase(name, type), MpiNode(name, type), SourceNode(name, type)
 {
     CAMERA_LOGV("%{public}s enter, type(%{public}s)\n", name_.c_str(), type_.c_str());
 }
@@ -40,6 +40,7 @@ RetCode VpssNode::GetDeviceController()
 
 RetCode VpssNode::Init(const int32_t streamId)
 {
+    (void)streamId;
     return RC_OK;
 }
 

@@ -24,6 +24,7 @@ VoManager::~VoManager() {}
 
 RetCode VoManager::CreateController(ControllerId controllerId, std::string hardwareName)
 {
+    (void)controllerId;
     if (vo_ == nullptr) {
         vo_ = std::make_shared<VoController>(hardwareName);
         if (vo_ == nullptr) {

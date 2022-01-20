@@ -32,9 +32,14 @@ public:
     RetCode PowerDown();
     RetCode Stop();
     RetCode Start();
-    void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag) {};
+    void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag)
+    {
+        (void)abilityMetaDataTag;
+        return;
+    }
     RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta)
     {
+        (void)meta;
         return RC_OK;
     };
 private:

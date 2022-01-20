@@ -549,6 +549,7 @@ RetCode StreamBase::DetachStreamTunnel()
 
 RetCode StreamBase::ChangeToOfflineStream(std::shared_ptr<OfflineStream> offlineStream)
 {
+    (void)offlineStream;
     return RC_OK;
 }
 

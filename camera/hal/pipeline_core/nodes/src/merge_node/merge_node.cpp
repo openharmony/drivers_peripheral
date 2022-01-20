@@ -32,6 +32,7 @@ MergeNode::~MergeNode()
 
 RetCode MergeNode::Start(const int32_t streamId)
 {
+    (void)streamId;
     GetOutPorts();
     if (streamRunning_ == false) {
         CAMERA_LOGI("streamrunning = false");
@@ -44,6 +45,7 @@ RetCode MergeNode::Start(const int32_t streamId)
 RetCode MergeNode::Stop(const int32_t streamId)
 {
     streamRunning_ = false;
+    (void)streamId;
     cv_.notify_all();
     if (mergeThread_ != nullptr) {
         CAMERA_LOGI("mergeThread need join");

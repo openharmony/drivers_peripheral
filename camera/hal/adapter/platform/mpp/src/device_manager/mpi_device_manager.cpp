@@ -513,12 +513,14 @@ void MpiDeviceManager::BufferCallback(std::shared_ptr<FrameSpec> buffer)
 
 RetCode MpiDeviceManager::SendFrameBuffer(std::shared_ptr<FrameSpec> buffer, CameraId cameraId)
 {
+    (void)cameraId;
     return sysObject_->RequestBuffer(buffer);
 }
 
 void MpiDeviceManager::SetNodeCallBack(const NodeBufferCb cb, CameraId cameraId)
 {
     CAMERA_LOGI("entry");
+    (void)cameraId;
     nodeBufferCb_ = cb;
     sysObject_->SetCallback([&](std::shared_ptr<FrameSpec> buffer) {
         BufferCallback(buffer);
@@ -539,6 +541,7 @@ void MpiDeviceManager::Configure(std::shared_ptr<CameraStandard::CameraMetadata>
 
 void MpiDeviceManager::SetMetaDataCallBack(const MetaDataCb cb, CameraId cameraId)
 {
+    (void)cameraId;
     metaDataCb_ = cb;
 }
 
@@ -549,6 +552,7 @@ void MpiDeviceManager::SetDevStatusCallBack(const DeviceStatusCb cb)
 
 RetCode MpiDeviceManager::SetFlashlight(FlashMode flashMode, bool enable, CameraId cameraId)
 {
+    (void)cameraId;
     return std::static_pointer_cast<ViController>(GetController(DM_M_VI, DM_C_VI))->SetFlashlight(flashMode, enable);
 }
 
