@@ -23,18 +23,7 @@ config("module_private_config") {
 
   include_dirs = [
     "include",
-    "//utils/system/safwk/native/include",
-    "//third_party/googletest/googletest/include",
-    "//drivers/peripheral/powermgr/battery/interfaces/include",
-    "//third_party/jsoncpp/include",
-    "//base/startup/syspara_lite/adapter/native/syspara/include",
     "${battery_manager_path}/charger/ui/include",
-    "//drivers/peripheral/powermgr/battery/interfaces/hdi_service/include",
-    "//drivers/peripheral/input/interfaces/include",
-    "//third_party/libpng",
-    "//drivers/ability/sbuf/include",
-    "//drivers/framework/include",
-    "//drivers/framework/include/core",
     "${battery_manager_path}/charger/led",
     "${battery_manager_path}/charger/backlight",
     "${battery_manager_path}/charger/vibrate",
@@ -79,6 +68,7 @@ ohos_unittest("test_hdisrv") {
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
+    "//third_party/libpng:libpng",
     "//utils/native/base:utils",
   ]
 
@@ -93,6 +83,7 @@ ohos_unittest("test_hdisrv") {
     "device_driver_framework:libhdf_ipc_adapter",
     "device_driver_framework:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
+    "input_device_driver:hdi_input",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
@@ -131,23 +122,17 @@ ohos_unittest("test_capacity_shutdown") {
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
+    "//third_party/libpng:libpng",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "ability_runtime:base",
-    "ability_runtime:want",
-    "appexecfwk_standard:appexecfwk_base",
-    "appexecfwk_standard:libeventhandler",
-    "ces_standard:cesfwk_core",
-    "ces_standard:cesfwk_innerkits",
     "device_driver_framework:libhdf_host",
     "device_driver_framework:libhdf_ipc_adapter",
     "device_driver_framework:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
+    "input_device_driver:hdi_input",
     "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
   ]
 }
 
@@ -155,24 +140,8 @@ ohos_unittest("test_capacity_shutdown") {
 ohos_unittest("test_input_event") {
   module_out_path = module_output_path
 
-  include_dirs = [
-    "//third_party/googletest/googletest/include",
-    "//third_party/bounds_checking_function/include",
-    "${hdf_framework_path}/ability/sbuf/include",
-    "${hdf_framework_path}/include/platform",
-    "${hdf_framework_path}/include/core",
-    "${hdf_framework_path}/include/osal",
-    "${hdf_uhdf_path}/posix/include",
-    "${hdf_framework_path}/include/utils",
-    "${hdf_framework_path}/include/config",
-    "${hdf_framework_path}/include",
-    "${hdf_framework_path}/test/unittest/include",
-    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-    "//drivers/peripheral/input/hal/include",
-    "//drivers/peripheral/input/interfaces/include",
-    "//third_party/FreeBSD/sys/dev/evdev",
-    "${battery_manager_path}/interfaces/innerkits/native/include",
-  ]
+  include_dirs =
+      [ "${battery_manager_path}/interfaces/innerkits/native/include" ]
 
   sources = [ "src/hdi_input_test.cpp" ]
 
@@ -197,19 +166,12 @@ ohos_unittest("test_input_event") {
   ]
 
   external_deps = [
-    "ability_runtime:base",
-    "ability_runtime:want",
-    "appexecfwk_standard:appexecfwk_base",
-    "appexecfwk_standard:libeventhandler",
-    "ces_standard:cesfwk_core",
-    "ces_standard:cesfwk_innerkits",
     "device_driver_framework:libhdf_host",
     "device_driver_framework:libhdf_ipc_adapter",
     "device_driver_framework:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
+    "input_device_driver:hdi_input",
     "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
   ]
 }
 

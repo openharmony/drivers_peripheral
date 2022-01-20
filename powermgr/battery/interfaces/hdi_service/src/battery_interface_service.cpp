@@ -32,13 +32,11 @@ static sptr<IBatteryCallback> g_cbEvent;
 
 BatteryInterfaceService::BatteryInterfaceService()
 {
-    HDF_LOGI("%{public}s enter", __func__);
     Init();
 }
 
 int32_t BatteryInterfaceService::Init()
 {
-    HDF_LOGI("%{public}s enter", __func__);
     giver_ = std::make_unique<PowerSupplyProvider>();
     if (giver_ == nullptr) {
         HDF_LOGE("%{public}s: instantiate PowerSupplyProvider error", __func__);
@@ -74,13 +72,11 @@ int32_t BatteryInterfaceService::Init()
     }
     loop_->StartThread(this);
 
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t BatteryInterfaceService::Register(const sptr<IBatteryCallback>& event)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     HDF_LOGI("%{public}s subcriber is %{public}p", __func__, event.GetRefPtr());
     g_cbEvent = event;
 

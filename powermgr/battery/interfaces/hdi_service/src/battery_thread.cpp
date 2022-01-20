@@ -14,11 +14,11 @@
  */
 
 #include "battery_thread.h"
-#include <unistd.h>
 #include <cerrno>
-#include <sys/socket.h>
 #include <sys/epoll.h>
+#include <sys/socket.h>
 #include <sys/timerfd.h>
+#include <unistd.h>
 #include <linux/netlink.h>
 #include "core/hdf_device_desc.h"
 #include "utils/hdf_log.h"
@@ -45,14 +45,12 @@ static sptr<IBatteryCallback> g_callback;
 
 void BatteryThread::InitCallback(const sptr<IBatteryCallback>& event)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     g_callback = event;
     HDF_LOGI("%{public}s: g_callback is %{public}p", __func__, event.GetRefPtr());
 }
 
 int32_t BatteryThread::OpenUeventSocket(void) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     int32_t bufferSize = UEVENT_BUFF_SIZE;
     struct sockaddr_nl address = {
         .nl_pid = getpid(),
@@ -79,14 +77,11 @@ int32_t BatteryThread::OpenUeventSocket(void) const
         close(fd);
         return ERR_INVALID_FD;
     }
-
-    HDF_LOGI("%{public}s exit", __func__);
     return fd;
 }
 
 int BatteryThread::RegisterCallback(const int fd, const EventType et)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     struct epoll_event ev;
 
     ev.events = EPOLLIN;
@@ -100,14 +95,11 @@ int BatteryThread::RegisterCallback(const int fd, const EventType et)
         HDF_LOGE("%{public}s: epoll_ctl failed, error num =%{public}d", __func__, errno);
         return HDF_FAILURE;
     }
-
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 void BatteryThread::SetTimerInterval(int interval)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     struct itimerspec itval;
 
     if (timerFd_ == ERR_INVALID_FD) {
@@ -115,7 +107,6 @@ void BatteryThread::SetTimerInterval(int interval)
     }
 
     timerInterval_ = interval;
-
     if (interval < 0) {
         interval = 0;
     }
@@ -128,16 +119,12 @@ void BatteryThread::SetTimerInterval(int interval)
     if (timerfd_settime(timerFd_, 0, &itval, nullptr) == -1) {
         HDF_LOGE("%{public}s: timer failed\n", __func__);
     }
-
-    HDF_LOGI("%{public}s exit", __func__);
     return;
 }
 
 void BatteryThread::UpdateEpollInterval(const int32_t chargeState)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     int interval;
-
     if ((chargeState != PowerSupplyProvider::CHARGE_STATE_NONE) &&
         (chargeState != PowerSupplyProvider::CHARGE_STATE_RESERVED)) {
         interval = TIMER_FAST_SEC;
@@ -150,14 +137,11 @@ void BatteryThread::UpdateEpollInterval(const int32_t chargeState)
     if ((interval != timerInterval_) && (timerInterval_ > 0)) {
         SetTimerInterval(interval);
     }
-
-    HDF_LOGI("%{public}s exit", __func__);
     return;
 }
 
 int32_t BatteryThread::InitUevent()
 {
-    HDF_LOGI("%{public}s enter", __func__);
     ueventFd_ = OpenUeventSocket();
     if (ueventFd_ == ERR_INVALID_FD) {
         HDF_LOGE("%{public}s: open uevent socket failed, fd is invalid", __func__);
@@ -171,14 +155,11 @@ int32_t BatteryThread::InitUevent()
         HDF_LOGE("%{public}s: register Uevent event failed", __func__);
         return HDF_ERR_BAD_FD;
     }
-
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t BatteryThread::Init(void* service)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     giver_ = std::make_unique<PowerSupplyProvider>();
     if (giver_ != nullptr) {
         giver_->InitBatteryPath();
@@ -194,19 +175,16 @@ int32_t BatteryThread::Init(void* service)
     InitTimer();
     InitUevent();
 
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int BatteryThread::UpdateWaitInterval()
 {
-    HDF_LOGI("%{public}s enter", __func__);
     return HDF_FAILURE;
 }
 
 int32_t BatteryThread::InitTimer()
 {
-    HDF_LOGI("%{public}s enter", __func__);
     timerFd_ = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
     if (timerFd_ == ERR_INVALID_FD) {
         HDF_LOGE("%{public}s: epoll create failed, timerFd_ is invalid", __func__);
@@ -221,13 +199,11 @@ int32_t BatteryThread::InitTimer()
         HDF_LOGE("%{public}s: register Timer event failed", __func__);
     }
 
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 void BatteryThread::TimerCallback(void* service)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     unsigned long long timers;
 
     if (read(timerFd_, &timers, sizeof(timers)) == -1) {
@@ -237,13 +213,11 @@ void BatteryThread::TimerCallback(void* service)
 
     UpdateBatteryInfo(service);
 
-    HDF_LOGI("%{public}s exit", __func__);
     return;
 }
 
 void BatteryThread::UeventCallback(void* service)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     char msg[UEVENT_MSG_LEN + UEVENT_RESERVED_SIZE] = { 0 };
 
     int32_t len = recv(ueventFd_, msg, UEVENT_MSG_LEN, 0);
@@ -259,14 +233,11 @@ void BatteryThread::UeventCallback(void* service)
         return;
     }
     UpdateBatteryInfo(service, msg);
-
-    HDF_LOGI("%{public}s exit", __func__);
     return;
 }
 
 void BatteryThread::UpdateBatteryInfo(void* service, char* msg)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     CallbackInfo event;
     std::unique_ptr<BatterydInfo> batteryInfo = std::make_unique<BatterydInfo>();
     if (batteryInfo == nullptr) {
@@ -301,14 +272,11 @@ void BatteryThread::UpdateBatteryInfo(void* service, char* msg)
     } else {
         HDF_LOGI("%{public}s g_callback is nullptr", __func__);
     }
-
-    HDF_LOGI("%{public}s exit", __func__);
     return;
 }
 
 void BatteryThread::UpdateBatteryInfo(void* service)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     CallbackInfo event;
     std::unique_ptr<BatterydInfo> batteryInfo = std::make_unique<BatterydInfo>();
     if (batteryInfo == nullptr) {
@@ -344,13 +312,11 @@ void BatteryThread::UpdateBatteryInfo(void* service)
         HDF_LOGI("%{public}s g_callback is nullptr", __func__);
     }
 
-    HDF_LOGI("%{public}s exit", __func__);
     return;
 }
 
 bool BatteryThread::IsPowerSupplyEvent(const char* msg) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     while (*msg) {
         if (!strcmp(msg, POWER_SUPPLY.c_str())) {
             return true;
@@ -358,13 +324,11 @@ bool BatteryThread::IsPowerSupplyEvent(const char* msg) const
         while (*msg++) {} // move to next
     }
 
-    HDF_LOGI("%{public}s exit", __func__);
     return false;
 }
 
 int BatteryThread::LoopingThreadEntry(void* arg)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     int nevents = 0;
     size_t cbct = callbacks_.size();
     struct epoll_event events[cbct];
@@ -400,17 +364,14 @@ int BatteryThread::LoopingThreadEntry(void* arg)
 
 void BatteryThread::StartThread(void* service)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     Init(service);
     Run(service);
 
-    HDF_LOGI("%{public}s exit", __func__);
     return;
 }
 
 void BatteryThread::Run(void* service)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     std::make_unique<std::thread>(&BatteryThread::LoopingThreadEntry, this, service)->detach();
 }
 }  // namespace V1_0

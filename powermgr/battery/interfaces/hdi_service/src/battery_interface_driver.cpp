@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#include "battery_interface_service.h"
 #include <osal_mem.h>
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "hdf_log.h"
 #include "hdf_sbuf_ipc.h"
+#include "battery_interface_service.h"
 
 #define HDF_LOG_TAG BatteryInterfaceDriver
 
@@ -50,14 +50,11 @@ static int32_t BatteryInterfaceDriverDispatch(struct HdfDeviceIoClient *client, 
 
 int HdfBatteryInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfBatteryInterfaceDriverInit enter");
     return HDF_SUCCESS;
 }
 
 int HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfBatteryInterfaceDriverBind enter");
-
     struct HdfBatteryInterfaceHost *hdfBatteryInterfaceHost = (struct HdfBatteryInterfaceHost *)OsalMemAlloc(
         sizeof(struct HdfBatteryInterfaceHost));
     if (hdfBatteryInterfaceHost == nullptr) {
@@ -76,8 +73,6 @@ int HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
 void HdfBatteryInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfBatteryInterfaceDriverRelease enter");
-
     struct HdfBatteryInterfaceHost *hdfBatteryInterfaceHost = CONTAINER_OF(deviceObject->service,
         struct HdfBatteryInterfaceHost, ioservice);
     delete hdfBatteryInterfaceHost->service;

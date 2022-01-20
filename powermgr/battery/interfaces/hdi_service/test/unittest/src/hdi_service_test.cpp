@@ -14,26 +14,26 @@
  */
 
 #include "hdi_service_test.h"
-#include <csignal>
-#include <iostream>
 #include <chrono>
 #include <condition_variable>
+#include <csignal>
+#include <cstring>
+#include <dirent.h>
+#include <fcntl.h>
 #include <fstream>
+#include <iostream>
 #include <memory>
 #include <mutex>
 #include <streambuf>
-#include <cstring>
+#include <sys/stat.h>
 #include <thread>
 #include <vector>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <dirent.h>
-#include "utils/hdf_log.h"
-#include "hdf_base.h"
-#include "power_supply_provider.h"
+#include "battery_service.h"
 #include "battery_thread_test.h"
 #include "battery_vibrate.h"
-#include "battery_service.h"
+#include "hdf_base.h"
+#include "power_supply_provider.h"
+#include "utils/hdf_log.h"
 
 #define HDF_LOG_TAG HdiServiceTest
 
@@ -91,12 +91,10 @@ std::string CreateFile(std::string path, std::string content)
 
 void MockFileInit()
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
     std::string path = "/data/local/tmp";
     mkdir("/data/local/tmp/battery", S_IRWXU);
     mkdir("/data/local/tmp/ohos_charger", S_IRWXU);
     mkdir("/data/local/tmp/ohos-fgu", S_IRWXU);
-    HDF_LOGI("%{public}s: enter.", __func__);
 
     sleep(1);
     CreateFile("/data/local/tmp/battery/online", "1");
@@ -104,8 +102,6 @@ void MockFileInit()
     CreateFile("/data/local/tmp/ohos_charger/health", "Unknown");
     CreateFile("/data/local/tmp/ohos-fgu/temp", "345");
     g_service->ChangePath(path);
-
-    HDF_LOGI("%{public}s: enter.", __func__);
 }
 
 static void CheckSubfolderNode(const std::string& path)
@@ -168,7 +164,6 @@ static void CheckSubfolderNode(const std::string& path)
 
 static void TraversalBaseNode()
 {
-    HDF_LOGI("%{public}s enter", __func__);
     g_nodeInfo.insert(std::make_pair("type", ""));
     g_nodeInfo.insert(std::make_pair("online", ""));
     g_nodeInfo.insert(std::make_pair("current_max", ""));
@@ -205,12 +200,10 @@ static void TraversalBaseNode()
     for (auto it = g_filenodeName.begin(); it != g_filenodeName.end(); ++it) {
         CheckSubfolderNode(*it);
     }
-    HDF_LOGI("%{public}s exit", __func__);
 }
 
 static int32_t InitBaseSysfs(void)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     DIR* dir = nullptr;
     struct dirent* entry = nullptr;
     int32_t index = 0;
@@ -246,13 +239,11 @@ static int32_t InitBaseSysfs(void)
     HDF_LOGI("%{public}s: index is %{public}d", __func__, index);
     closedir(dir);
 
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 static int32_t ReadTemperatureSysfs()
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
     int strlen = 10;
     char buf[128] = {0};
     int32_t readSize;
@@ -287,14 +278,11 @@ static int32_t ReadTemperatureSysfs()
     }
     HDF_LOGE("%{public}s: read system file temperature is %{public}d", __func__, battTemperature);
     close(fd);
-
-    HDF_LOGI("%{public}s: exit.", __func__);
     return battTemperature;
 }
 
 static int32_t ReadVoltageSysfs()
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
     int strlen = 10;
     char buf[128] = {0};
     int32_t readSize;
@@ -328,14 +316,11 @@ static int32_t ReadVoltageSysfs()
     }
     HDF_LOGE("%{public}s: read system file voltage is %{public}d", __func__, battVoltage);
     close(fd);
-
-    HDF_LOGI("%{public}s: exit.", __func__);
     return battVoltage;
 }
 
 static int32_t ReadCapacitySysfs()
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
     int strlen = 10;
     char buf[128] = {0};
     int32_t readSize;
@@ -369,25 +354,19 @@ static int32_t ReadCapacitySysfs()
     }
     HDF_LOGE("%{public}s: read system file capacity is %{public}d", __func__, battCapacity);
     close(fd);
-
-    HDF_LOGI("%{public}s: exit.", __func__);
     return battCapacity;
 }
 
 static void Trim(char* str)
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
     if (str == nullptr) {
         return;
     }
-
     str[strcspn(str, "\n")] = 0;
-    HDF_LOGI("%{public}s: exit", __func__);
 }
 
 static int32_t HealthStateEnumConverter(const char* str)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     struct StringEnumMap healthStateEnumMap[] = {
         { "Good", PowerSupplyProvider::BATTERY_HEALTH_GOOD },
         { "Cold", PowerSupplyProvider::BATTERY_HEALTH_COLD },
@@ -413,7 +392,6 @@ static int32_t HealthStateEnumConverter(const char* str)
 
 static int32_t ReadHealthStateSysfs()
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
     char buf[128] = {0};
     int32_t readSize;
     std::string healthNode = "battery";
@@ -444,14 +422,11 @@ static int32_t ReadHealthStateSysfs()
     int32_t battHealthState = HealthStateEnumConverter(buf);
     HDF_LOGE("%{public}s: read system file healthState is %{public}d", __func__, battHealthState);
     close(fd);
-
-    HDF_LOGI("%{public}s: exit.", __func__);
     return battHealthState;
 }
 
 static int32_t PluggedTypeEnumConverter(const char* str)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     struct StringEnumMap pluggedTypeEnumMap[] = {
         { "USB", PowerSupplyProvider::PLUGGED_TYPE_USB },
         { "USB_PD_DRP", PowerSupplyProvider::PLUGGED_TYPE_USB },
@@ -474,16 +449,13 @@ static int32_t PluggedTypeEnumConverter(const char* str)
         }
     }
 
-    HDF_LOGI("%{public}s exit", __func__);
     return PowerSupplyProvider::PLUGGED_TYPE_BUTT;
 }
 
 
 static int32_t GetPluggedTypeName()
 {
-    HDF_LOGI("%{public}s enter", __func__);
     char buf[128] = {0};
-
     std::string onlineNode = "battery";
     for (auto iter = g_nodeInfo.begin(); iter != g_nodeInfo.end(); ++iter) {
         if (iter->first == "online") {
@@ -515,7 +487,6 @@ static int32_t GetPluggedTypeName()
 
 static int32_t ReadPluggedTypeSysfs()
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
     char buf[128] = {0};
     int32_t readSize;
     int32_t online = GetPluggedTypeName();
@@ -555,14 +526,11 @@ static int32_t ReadPluggedTypeSysfs()
 
     HDF_LOGE("%{public}s: read system file pluggedType is %{public}d", __func__, battPlugType);
     close(fd);
-
-    HDF_LOGI("%{public}s: exit.", __func__);
     return battPlugType;
 }
 
 int32_t ChargeStateEnumConverter(const char* str)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     struct StringEnumMap chargeStateEnumMap[] = {
         { "Discharging", PowerSupplyProvider::CHARGE_STATE_NONE },
         { "Charging", PowerSupplyProvider::CHARGE_STATE_ENABLE },
@@ -577,13 +545,11 @@ int32_t ChargeStateEnumConverter(const char* str)
             return chargeStateEnumMap[i].enumVal;
         }
     }
-
     return PowerSupplyProvider::CHARGE_STATE_RESERVED;
 }
 
 static int32_t ReadChargeStateSysfs()
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
     char buf[128] = {0};
     int32_t readSize;
     std::string statusNode = "battery";
@@ -614,13 +580,11 @@ static int32_t ReadChargeStateSysfs()
     HDF_LOGE("%{public}s: read system file chargeState is %{public}d", __func__, battChargeState);
     close(fd);
 
-    HDF_LOGI("%{public}s: exit.", __func__);
     return battChargeState;
 }
 
 static int32_t ReadChargeCounterSysfs()
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
     int strlen = 10;
     char buf[128] = {0};
     int32_t readSize;
@@ -655,13 +619,11 @@ static int32_t ReadChargeCounterSysfs()
     HDF_LOGE("%{public}s: read system file chargeState is %{public}d", __func__, battChargeCounter);
     close(fd);
 
-    HDF_LOGI("%{public}s: exit.", __func__);
     return battChargeCounter;
 }
 
 static int32_t ReadPresentSysfs()
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
     int strlen = 10;
     char buf[128] = {0};
     int32_t readSize;
@@ -695,14 +657,11 @@ static int32_t ReadPresentSysfs()
     }
     HDF_LOGE("%{public}s: read system file chargeState is %{public}d", __func__, battPresent);
     close(fd);
-
-    HDF_LOGI("%{public}s: exit.", __func__);
     return battPresent;
 }
 
 static std::string ReadTechnologySysfs(std::string& battTechnology)
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
     char buf[128] = {0};
     int32_t readSize;
     std::string technologyNode = "battery";
@@ -733,8 +692,6 @@ static std::string ReadTechnologySysfs(std::string& battTechnology)
     battTechnology.assign(buf, strlen(buf));
     HDF_LOGE("%{public}s: read system file technology is %{public}s.", __func__, battTechnology.c_str());
     close(fd);
-
-    HDF_LOGI("%{public}s: exit.", __func__);
     return battTechnology;
 }
 
@@ -745,7 +702,6 @@ static std::string ReadTechnologySysfs(std::string& battTechnology)
  */
 HWTEST_F (HdiServiceTest, HdiService001, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService001 start.", __func__);
     std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
     if (provider == nullptr) {
         HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
@@ -776,7 +732,6 @@ HWTEST_F (HdiServiceTest, HdiService001, TestSize.Level1)
     } else {
         ASSERT_TRUE(temperature == 567);
     }
-    HDF_LOGI("%{public}s: HdiService001 end.", __func__);
 }
 
 /**
@@ -786,7 +741,6 @@ HWTEST_F (HdiServiceTest, HdiService001, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService002, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService002 start.", __func__);
     std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
     if (provider == nullptr) {
         HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
@@ -816,7 +770,6 @@ HWTEST_F (HdiServiceTest, HdiService002, TestSize.Level1)
     } else {
         ASSERT_TRUE(voltage == 4123456);
     }
-    HDF_LOGI("%{public}s: HdiService002 end.", __func__);
 }
 
 /**
@@ -826,7 +779,6 @@ HWTEST_F (HdiServiceTest, HdiService002, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService003, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService003 start.", __func__);
     std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
     if (provider == nullptr) {
         HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
@@ -855,8 +807,6 @@ HWTEST_F (HdiServiceTest, HdiService003, TestSize.Level1)
     } else {
         ASSERT_TRUE(capacity == 11);
     }
-
-    HDF_LOGI("%{public}s: HdiService003 end.", __func__);
 }
 
 /**
@@ -866,7 +816,6 @@ HWTEST_F (HdiServiceTest, HdiService003, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService004, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService004 start.", __func__);
     std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
     if (provider == nullptr) {
         HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
@@ -895,8 +844,6 @@ HWTEST_F (HdiServiceTest, HdiService004, TestSize.Level1)
     } else {
         ASSERT_TRUE(healthState == 1);
     }
-
-    HDF_LOGI("%{public}s: HdiService004 end.", __func__);
 }
 
 /**
@@ -906,7 +853,6 @@ HWTEST_F (HdiServiceTest, HdiService004, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService005, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService005 start.", __func__);
     std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
     if (provider == nullptr) {
         HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
@@ -938,8 +884,6 @@ HWTEST_F (HdiServiceTest, HdiService005, TestSize.Level1)
     } else {
         ASSERT_TRUE(pluggedType == PowerSupplyProvider::PLUGGED_TYPE_WIRELESS);
     }
-
-    HDF_LOGI("%{public}s: HdiService005 end.", __func__);
 }
 
 /**
@@ -949,7 +893,6 @@ HWTEST_F (HdiServiceTest, HdiService005, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService006, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService006 start.", __func__);
     std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
     if (provider == nullptr) {
         HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
@@ -978,8 +921,6 @@ HWTEST_F (HdiServiceTest, HdiService006, TestSize.Level1)
     } else {
         ASSERT_TRUE(chargeState == PowerSupplyProvider::CHARGE_STATE_DISABLE);
     }
-
-    HDF_LOGI("%{public}s: HdiService006 end.", __func__);
 }
 
 /**
@@ -989,7 +930,6 @@ HWTEST_F (HdiServiceTest, HdiService006, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService007, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService007 start.", __func__);
     std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
     if (provider == nullptr) {
         HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
@@ -1018,8 +958,6 @@ HWTEST_F (HdiServiceTest, HdiService007, TestSize.Level1)
     } else {
         ASSERT_TRUE(chargeCounter == 12345);
     }
-
-    HDF_LOGI("%{public}s: HdiService007 end.", __func__);
 }
 
 /**
@@ -1029,7 +967,6 @@ HWTEST_F (HdiServiceTest, HdiService007, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService008, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService008 start.", __func__);
     std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
     if (provider == nullptr) {
         HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
@@ -1058,8 +995,6 @@ HWTEST_F (HdiServiceTest, HdiService008, TestSize.Level1)
     } else {
         ASSERT_TRUE(present == 1);
     }
-
-    HDF_LOGI("%{public}s: HdiService008 end.", __func__);
 }
 
 /**
@@ -1069,7 +1004,6 @@ HWTEST_F (HdiServiceTest, HdiService008, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService009, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService009 start.", __func__);
     std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
     if (provider == nullptr) {
         HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
@@ -1101,8 +1035,6 @@ HWTEST_F (HdiServiceTest, HdiService009, TestSize.Level1)
     } else {
         ASSERT_TRUE(technology == "Li");
     }
-
-    HDF_LOGI("%{public}s: HdiService009 end.", __func__);
 }
 
 /**
@@ -1113,7 +1045,6 @@ HWTEST_F (HdiServiceTest, HdiService009, TestSize.Level1)
 HWTEST_F (HdiServiceTest, HdiService010, TestSize.Level1)
 {
     using namespace OHOS::HDI::Battery::V1_0;
-    HDF_LOGI("%{public}s: HdiService010 start.", __func__);
 
     BatteryThread bt;
     auto fd = OpenUeventSocketTest(bt);
@@ -1121,7 +1052,6 @@ HWTEST_F (HdiServiceTest, HdiService010, TestSize.Level1)
 
     ASSERT_TRUE(fd > 0);
     close(fd);
-    HDF_LOGI("%{public}s: HdiService010 end.", __func__);
 }
 
 /**
@@ -1131,7 +1061,6 @@ HWTEST_F (HdiServiceTest, HdiService010, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService011, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService011 start.", __func__);
     const int32_t CHARGE_STATE_ENABLE = 1;
     BatteryThread bt;
 
@@ -1140,7 +1069,6 @@ HWTEST_F (HdiServiceTest, HdiService011, TestSize.Level1)
     HDF_LOGI("%{public}s: HdiService011::epollInterval=%{public}d.", __func__, epollInterval);
 
     ASSERT_TRUE(epollInterval == 2000);
-    HDF_LOGI("%{public}s: HdiService011 end.", __func__);
 }
 
 /**
@@ -1150,7 +1078,6 @@ HWTEST_F (HdiServiceTest, HdiService011, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService012, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService012 start.", __func__);
     const int32_t CHARGE_STATE_NONE = 0;
     BatteryThread bt;
 
@@ -1159,7 +1086,6 @@ HWTEST_F (HdiServiceTest, HdiService012, TestSize.Level1)
     HDF_LOGI("%{public}s: HdiService012::epollInterval=%{public}d.", __func__, epollInterval);
 
     ASSERT_TRUE(epollInterval == -1);
-    HDF_LOGI("%{public}s: HdiService012 end.", __func__);
 }
 
 /**
@@ -1169,7 +1095,6 @@ HWTEST_F (HdiServiceTest, HdiService012, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService013, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService013 start.", __func__);
     void* service = nullptr;
     BatteryThread bt;
 
@@ -1178,7 +1103,6 @@ HWTEST_F (HdiServiceTest, HdiService013, TestSize.Level1)
     HDF_LOGI("%{public}s: HdiService013::epollFd=%{public}d", __func__, epollFd);
 
     ASSERT_TRUE(epollFd > 0);
-    HDF_LOGI("%{public}s: HdiService013 end.", __func__);
 }
 
 /**
@@ -1188,7 +1112,6 @@ HWTEST_F (HdiServiceTest, HdiService013, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService014, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService014 start.", __func__);
     BatteryThread bt;
 
     InitTimerTest(bt);
@@ -1196,7 +1119,6 @@ HWTEST_F (HdiServiceTest, HdiService014, TestSize.Level1)
     HDF_LOGI("%{public}s: HdiService014::timerFd==%{public}d", __func__, timerFd);
 
     ASSERT_TRUE(timerFd > 0);
-    HDF_LOGI("%{public}s: HdiService014 end.", __func__);
 }
 
 /**
@@ -1206,7 +1128,6 @@ HWTEST_F (HdiServiceTest, HdiService014, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService015, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService01 start.", __func__);
     std::unique_ptr<BatteryConfig> conf = std::make_unique<BatteryConfig>();
     conf->Init();
     std::vector<BatteryConfig::LedConf> ledConf = conf->GetLedConf();
@@ -1223,7 +1144,6 @@ HWTEST_F (HdiServiceTest, HdiService015, TestSize.Level1)
     ASSERT_TRUE(ledConf[2].capacityEnd == 100);
     ASSERT_TRUE(ledConf[2].color == 2);
     ASSERT_TRUE(ledConf[2].brightness == 255);
-    HDF_LOGI("%{public}s: HdiService015 end.", __func__);
 }
 
 /**
@@ -1233,14 +1153,12 @@ HWTEST_F (HdiServiceTest, HdiService015, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService016, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService016 start.", __func__);
     std::unique_ptr<BatteryConfig> conf = std::make_unique<BatteryConfig>();
     conf->Init();
     auto tempConf = conf->GetTempConf();
 
     ASSERT_TRUE(tempConf.lower == -100);
     ASSERT_TRUE(tempConf.upper == 600);
-    HDF_LOGI("%{public}s: HdiService016 end.", __func__);
 }
 
 /**
@@ -1250,13 +1168,11 @@ HWTEST_F (HdiServiceTest, HdiService016, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService017, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService017 start.", __func__);
     std::unique_ptr<BatteryConfig> conf = std::make_unique<BatteryConfig>();
     conf->Init();
     auto capacityConf = conf->GetCapacityConf();
 
     ASSERT_TRUE(capacityConf == 3);
-    HDF_LOGI("%{public}s: HdiService017 end.", __func__);
 }
 
 /**
@@ -1266,7 +1182,6 @@ HWTEST_F (HdiServiceTest, HdiService017, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService018, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService018 start.", __func__);
     std::string filename = "error_path/system/etc/ledconfig/led_config.json";
     BatteryConfig bc;
 
@@ -1274,7 +1189,6 @@ HWTEST_F (HdiServiceTest, HdiService018, TestSize.Level1)
     std::unique_ptr<BatteryConfig> conf = std::make_unique<BatteryConfig>();
     auto ledConf = conf->GetLedConf();
     ASSERT_TRUE(ledConf.empty());
-    HDF_LOGI("%{public}s: HdiService018 end.", __func__);
 }
 
 /**
@@ -1284,7 +1198,6 @@ HWTEST_F (HdiServiceTest, HdiService018, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService019, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService019 start.", __func__);
     std::string filename = "error_path/system/etc/ledconfig/led_config.json";
     BatteryConfig bc;
 
@@ -1294,7 +1207,6 @@ HWTEST_F (HdiServiceTest, HdiService019, TestSize.Level1)
 
     ASSERT_TRUE(tempConf.lower != -100);
     ASSERT_TRUE(tempConf.upper != 600);
-    HDF_LOGI("%{public}s: HdiService019 end.", __func__);
 }
 
 /**
@@ -1304,7 +1216,6 @@ HWTEST_F (HdiServiceTest, HdiService019, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService020, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService01 start.", __func__);
     std::string filename = "error_path/system/etc/ledconfig/led_config.json";
     BatteryConfig bc;
 
@@ -1313,7 +1224,6 @@ HWTEST_F (HdiServiceTest, HdiService020, TestSize.Level1)
     auto capacityConf = conf->GetCapacityConf();
 
     ASSERT_TRUE(capacityConf != 3);
-    HDF_LOGI("%{public}s: HdiService020 end.", __func__);
 }
 
 /**
@@ -1323,13 +1233,9 @@ HWTEST_F (HdiServiceTest, HdiService020, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService021, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService021 start.", __func__);
-
     std::unique_ptr<BatteryVibrate> vibrate = std::make_unique<BatteryVibrate>();
     auto ret = vibrate->VibrateInit();
     ASSERT_TRUE(ret == -1);
-
-    HDF_LOGI("%{public}s: HdiService021 end.", __func__);
 }
 
 /**
@@ -1339,7 +1245,6 @@ HWTEST_F (HdiServiceTest, HdiService021, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService022, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService022 start.", __func__);
     ChargerThread ct;
 
     ChargerThreadInitTest(ct);
@@ -1347,7 +1252,6 @@ HWTEST_F (HdiServiceTest, HdiService022, TestSize.Level1)
     auto getBatteryInfo = GetBatteryInfoTest(ct);
 
     ASSERT_TRUE(getBatteryInfo);
-    HDF_LOGI("%{public}s: HdiService022 end.", __func__);
 }
 
 /**
@@ -1357,16 +1261,13 @@ HWTEST_F (HdiServiceTest, HdiService022, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService024, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService024 start.", __func__);
     BatteryThread bt;
 
     SetTimerFdTest(2, bt);
     SetTimerIntervalTest(5, bt);
     int interval = GetTimerIntervalTest(bt);
-    HDF_LOGI("%{public}s: HdiService024::interval==%{public}d", __func__, interval);
 
     ASSERT_TRUE(interval == 5);
-    HDF_LOGI("%{public}s: HdiService024 end.", __func__);
 }
 
 /**
@@ -1376,7 +1277,6 @@ HWTEST_F (HdiServiceTest, HdiService024, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService025, TestSize.Level1)
 {
-    HDF_LOGI("%{public}s: HdiService025 start.", __func__);
     std::unique_ptr<BatteryBacklight> backlight = std::make_unique<BatteryBacklight>();
     backlight->InitBacklightSysfs();
     auto ret = backlight->HandleBacklight(0);
@@ -1384,6 +1284,5 @@ HWTEST_F (HdiServiceTest, HdiService025, TestSize.Level1)
     backlight->TurnOnScreen();
 
     ASSERT_TRUE(ret != -1);
-    HDF_LOGI("%{public}s: HdiService024 end.", __func__);
 }
 }

@@ -30,7 +30,6 @@ ohos_shared_library("libbattery_callback") {
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
-      "sensor_device_driver:hdi_sensor",
     ]
   } else {
     external_deps = [
@@ -40,7 +39,6 @@ ohos_shared_library("libbattery_callback") {
       "device_driver_framework:libhdi",
       "hilog:libhilog",
       "ipc:ipc_core",
-      "sensor_device_driver:hdi_sensor",
     ]
   }
 

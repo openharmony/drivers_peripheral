@@ -16,11 +16,11 @@
 #ifndef POWER_SUPPLY_PROVIDER_H
 #define POWER_SUPPLY_PROVIDER_H
 
-#include <limits.h>
 #include <cstdio>
 #include <cstring>
-#include <vector>
+#include <limits.h>
 #include <map>
+#include <vector>
 #include "batteryd_api.h"
 
 namespace OHOS {

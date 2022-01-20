@@ -14,8 +14,8 @@
  */
 
 #include "battery_config.h"
-#include "hdf_log.h"
 #include "hdf_base.h"
+#include "hdf_log.h"
 
 #define HDF_LOG_TAG BatteryConfig
 
@@ -34,35 +34,26 @@ const int DEFAULT_BRIGHTNESS_CONF = 255;
 
 int32_t BatteryConfig::Init()
 {
-    HDF_LOGI("%{public}s enter", __func__);
-
     return ParseConfig(CONFIG_FILE);
 }
 
 std::vector<BatteryConfig::LedConf> BatteryConfig::GetLedConf()
 {
-    HDF_LOGI("%{public}s enter", __func__);
-
     return ledConf_;
 }
 
 BatteryConfig::TempConf BatteryConfig::GetTempConf()
 {
-    HDF_LOGI("%{public}s enter", __func__);
-
     return tempConf_;
 }
 
 int BatteryConfig::GetCapacityConf()
 {
-    HDF_LOGI("%{public}s enter", __func__);
-
     return capacityConf_;
 }
 
 int32_t BatteryConfig::ParseLedConf(Json::Value& root)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     struct LedConf ledConf;
     int size = root["led"]["table"].size();
     HDF_LOGI("%{public}s: size = %{public}d", __func__, size);
@@ -87,14 +78,11 @@ int32_t BatteryConfig::ParseLedConf(Json::Value& root)
             ledConf.brightness);
         ledConf_.emplace_back(ledConf);
     }
-
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t BatteryConfig::ParseTempConf(Json::Value& root)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     int size = root["temperature"]["table"].size();
     if (size == 0) {
         HDF_LOGI("%{public}s parse temperature config file fail.", __func__);
@@ -108,13 +96,11 @@ int32_t BatteryConfig::ParseTempConf(Json::Value& root)
     HDF_LOGI("%{public}s: tempConf_.lower=%{public}d, tempConf_.upper=%{public}d", __func__, \
         tempConf_.lower, tempConf_.upper);
 
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t BatteryConfig::ParseCapacityConf(Json::Value& root)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     int size = root["soc"]["table"].size();
     if (size == 0) {
         HDF_LOGI("%{public}s parse capacity config file fail.", __func__);
@@ -124,14 +110,11 @@ int32_t BatteryConfig::ParseCapacityConf(Json::Value& root)
 
     capacityConf_ = root["soc"]["table"][INDEX_ZERO].asInt();
     HDF_LOGI("%{public}s: capacityConf_ = %{public}d", __func__, capacityConf_);
-
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t BatteryConfig::ParseConfig(const std::string filename)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     Json::Value root;
     Json::CharReaderBuilder readerBuilder;
 
@@ -158,10 +141,7 @@ int32_t BatteryConfig::ParseConfig(const std::string filename)
             HDF_LOGI("%{public}s: parse soc config fail.", __func__);
         }
     }
-
     ledConfig.close();
-
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 }  // namespace V1_0

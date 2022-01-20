@@ -26,7 +26,6 @@ BatteryCallbackService::BatteryEventCallback BatteryCallbackService::eventCb_ = 
 
 int32_t BatteryCallbackService::Update(const CallbackInfo& event)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     HDF_LOGI("%{public}s: CallbackInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
         "healthState=%{public}d, pluggedType=%{public}d, pluggedMaxCurrent=%{public}d, " \
         "pluggedMaxVoltage=%{public}d, chargeState=%{public}d, chargeCounter=%{public}d, present=%{public}d, " \
@@ -43,7 +42,6 @@ int32_t BatteryCallbackService::Update(const CallbackInfo& event)
 
 int32_t BatteryCallbackService::RegisterBatteryEvent(const BatteryEventCallback& eventCb)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     eventCb_ = eventCb;
     return HDF_SUCCESS;
 }

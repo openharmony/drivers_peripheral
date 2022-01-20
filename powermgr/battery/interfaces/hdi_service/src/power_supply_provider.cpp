@@ -14,13 +14,13 @@
  */
 
 #include "power_supply_provider.h"
-#include <iostream>
-#include <fstream>
 #include <dirent.h>
 #include <fcntl.h>
+#include <fstream>
+#include <iostream>
+#include <securec.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <securec.h>
 #include <unistd.h>
 #include "osal/osal_mem.h"
 #include "utils/hdf_log.h"
@@ -65,19 +65,16 @@ struct BatteryAssigner {
 
 PowerSupplyProvider::PowerSupplyProvider()
 {
-    HDF_LOGI("%{public}s enter", __func__);
     path_ = POWER_SUPPLY_BASE_PATH;
 }
 
 inline int32_t PowerSupplyProvider::ParseInt(const char* str)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     return strtol(str, nullptr, STR_TO_LONG_LEN);
 }
 
 inline void PowerSupplyProvider::Trim(char* str) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     if (str == nullptr) {
         return;
     }
@@ -87,25 +84,21 @@ inline void PowerSupplyProvider::Trim(char* str) const
 
 inline void PowerSupplyProvider::CapacityAssigner(const char* str, struct BatterydInfo* info)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     info->capacity_ = ParseInt(str); // default in percent format
 }
 
 inline void PowerSupplyProvider::VoltageAssigner(const char* str, struct BatterydInfo* info)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     info->voltage_ = ParseInt(str) / UVOL_TO_MVOL; // convert to millivolt(mV) format
 }
 
 inline void PowerSupplyProvider::TemperatureAssigner(const char* str, struct BatterydInfo* info)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     info->temperature_ = ParseInt(str);
 }
 
 int32_t PowerSupplyProvider::HealthStateEnumConverter(const char* str)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     struct StringEnumMap healthStateEnumMap[] = {
         { "Good", BATTERY_HEALTH_GOOD },
         { "Cold", BATTERY_HEALTH_COLD },
@@ -131,13 +124,11 @@ int32_t PowerSupplyProvider::HealthStateEnumConverter(const char* str)
 
 inline void PowerSupplyProvider::HealthStateAssigner(const char* str, struct BatterydInfo* info)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     info->healthState_ = HealthStateEnumConverter(str);
 }
 
 int32_t PowerSupplyProvider::ChargeStateEnumConverter(const char* str)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     struct StringEnumMap chargeStateEnumMap[] = {
         { "Discharging", CHARGE_STATE_NONE },
         { "Charging", CHARGE_STATE_ENABLE },
@@ -158,32 +149,27 @@ int32_t PowerSupplyProvider::ChargeStateEnumConverter(const char* str)
 
 inline void PowerSupplyProvider::ChargeStateAssigner(const char* str, struct BatterydInfo* info)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     info->chargeState_ = ChargeStateEnumConverter(str);
 }
 
 inline void PowerSupplyProvider::PresentAssigner(const char* str, struct BatterydInfo* info)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     info->present_ = ParseInt(str);
 }
 
 inline void PowerSupplyProvider::TechnologyAssigner(const char* str, struct BatterydInfo* info)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     info->technology_ = str;
 }
 
 inline void PowerSupplyProvider::ChargeCounterAssigner(const char* str, struct BatterydInfo* info)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     info->chargeCounter_ = ParseInt(str);
 }
 
 void PowerSupplyProvider::FormatPath(std::string& path,
     size_t size, const char* format, const char* basePath, const char* name) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     char buff[PATH_MAX] = {0};
     if (strcpy_s(buff, PATH_MAX, path.c_str()) != EOK) {
         HDF_LOGW("%{public}s: failed to copy path of %{public}s", __func__, name);
@@ -196,14 +182,12 @@ void PowerSupplyProvider::FormatPath(std::string& path,
     }
     path.assign(buff, strlen(buff));
     HDF_LOGI("%{public}s: path is %{public}s", __func__, path.c_str());
-
-    HDF_LOGI("%{public}s exit", __func__);
+    
     return;
 }
 
 void PowerSupplyProvider::FormatSysfsPaths(struct PowerSupplySysfsInfo* info)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     // Format paths for power supply types
     FormatPath(info->typePath, PATH_MAX, "%s/%s/type",
         path_.c_str(), nodeInfo_["type"].c_str());
@@ -231,13 +215,11 @@ void PowerSupplyProvider::FormatSysfsPaths(struct PowerSupplySysfsInfo* info)
     FormatPath(batterySysfsInfo_.technologyPath, PATH_MAX,
         "%s/%s/technology", path_.c_str(), nodeInfo_["technology"].c_str());
 
-    HDF_LOGI("%{public}s exit", __func__);
     return;
 }
 
 int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t size) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     int32_t readSize;
     int fd = open(path, O_RDONLY);
     if (fd < NUM_ZERO) {
@@ -256,28 +238,22 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
     Trim(buf);
     close(fd);
 
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t PowerSupplyProvider::ReadBatterySysfsToBuff(const char* path, char* buf, size_t size) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
-    int32_t ret;
-
-    ret = ReadSysfsFile(path, buf, size);
+    int32_t ret = ReadSysfsFile(path, buf, size);
     if (ret != HDF_SUCCESS) {
         HDF_LOGW("%{public}s: read path %{private}s failed, ret: %{public}d", __func__, path, ret);
         return ret;
     }
 
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     std::string onlineNode = "USB";
     int32_t ret;
     int32_t online;
@@ -321,13 +297,11 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
     }
     Trim(buf);
 
-    HDF_LOGI("%{public}s exit", __func__);
     return;
 }
 
 int32_t PowerSupplyProvider::PluggedTypeEnumConverter(const char* str) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     struct StringEnumMap pluggedTypeEnumMap[] = {
         { "USB", PLUGGED_TYPE_USB },
         { "USB_PD_DRP", PLUGGED_TYPE_USB },
@@ -349,16 +323,12 @@ int32_t PowerSupplyProvider::PluggedTypeEnumConverter(const char* str) const
             return pluggedTypeEnumMap[i].enumVal;
         }
     }
-
-    HDF_LOGI("%{public}s exit", __func__);
     return PLUGGED_TYPE_BUTT;
 }
 
 int32_t PowerSupplyProvider::ParsePluggedMaxCurrent(int32_t* maxCurrent) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     char buf[MAX_BUFF_SIZE] = {0};
-
     GetPluggedTypeName(buf, sizeof(buf));
     HDF_LOGI("%{public}s buf is: %{public}s", __func__, buf);
     std::string currentMaxNode = "Battery";
@@ -377,15 +347,12 @@ int32_t PowerSupplyProvider::ParsePluggedMaxCurrent(int32_t* maxCurrent) const
     HDF_LOGI("%{public}s: maxCurrent is %{public}d", __func__, value);
     *maxCurrent = value;
 
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t PowerSupplyProvider::ParsePluggedMaxVoltage(int32_t* maxVoltage) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     char buf[MAX_BUFF_SIZE] = {0};
-
     GetPluggedTypeName(buf, sizeof(buf));
     std::string voltageMaxNode = "Battery";
     for (auto iter = nodeInfo_.begin(); iter != nodeInfo_.end(); ++iter) {
@@ -403,13 +370,11 @@ int32_t PowerSupplyProvider::ParsePluggedMaxVoltage(int32_t* maxVoltage) const
     HDF_LOGI("%{public}s: maxCurrent is %{public}d", __func__, value);
     *maxVoltage = value;
 
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 void PowerSupplyProvider::UpdateInfoByReadSysFile(struct BatterydInfo* info) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     ParseCapacity(&info->capacity_);
     ParseVoltage(&info->voltage_);
     ParseTemperature(&info->temperature_);
@@ -429,14 +394,11 @@ void PowerSupplyProvider::UpdateInfoByReadSysFile(struct BatterydInfo* info) con
 
     info->technology_ = INVALID_STRING_VALUE;
     ParseTechnology(info->technology_);
-
-    HDF_LOGI("%{public}s exit", __func__);
     return;
 }
 
 void PowerSupplyProvider::ParseUeventToBatterydInfo(const char* msg, struct BatterydInfo* info) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     static struct BatteryAssigner batteryAssigners[] = {
         { BATTERY_KEY_CAPACITY.c_str(), BATTERY_KEY_CAPACITY.length(), CapacityAssigner },
         { BATTERY_KEY_VOLTAGE.c_str(), BATTERY_KEY_VOLTAGE.length(), VoltageAssigner },
@@ -473,13 +435,11 @@ void PowerSupplyProvider::ParseUeventToBatterydInfo(const char* msg, struct Batt
     info->technology_ = INVALID_STRING_VALUE;
     ParseTechnology(info->technology_);
 
-    HDF_LOGI("%{public}s exit", __func__);
     return;
 }
 
 void PowerSupplyProvider::SetSysFilePath(const std::string& path)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     if (path == "") {
         HDF_LOGI("%{public}s path is empty", __func__);
         path_ = "/data/local/tmp";
@@ -493,7 +453,6 @@ void PowerSupplyProvider::SetSysFilePath(const std::string& path)
 
 std::string PowerSupplyProvider::CreateFile(std::string path, std::string content)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
         HDF_LOGI("%{public}s: Cannot create file %{public}s", __func__, path.c_str());
@@ -506,7 +465,6 @@ std::string PowerSupplyProvider::CreateFile(std::string path, std::string conten
 
 void PowerSupplyProvider::InitBatteryPath()
 {
-    HDF_LOGI("%{public}s enter", __func__);
     std::string sysLowercaseBatteryPath = "/sys/class/power_supply/battery";
     std::string sysCapitalBatteryPath = "/sys/class/power_supply/Battery";
 
@@ -521,14 +479,11 @@ void PowerSupplyProvider::InitBatteryPath()
         HDF_LOGI("%{public}s: create mock battery path", __func__);
         InitDefaultSysfs();
     }
-
     return;
-    HDF_LOGI("%{public}s exit", __func__);
 }
 
 int32_t PowerSupplyProvider::InitPowerSupplySysfs(void)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     DIR* dir = nullptr;
     struct dirent* entry = nullptr;
     index_ = 0;
@@ -561,19 +516,16 @@ int32_t PowerSupplyProvider::InitPowerSupplySysfs(void)
         }
     }
     struct PowerSupplySysfsInfo sysfsInfo = {0};
-
     TraversalNode();
     FormatSysfsPaths(&sysfsInfo);
     HDF_LOGI("%{public}s: index_ is %{public}d", __func__, index_);
     closedir(dir);
 
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 void PowerSupplyProvider::TraversalNode()
 {
-    HDF_LOGI("%{public}s enter", __func__);
     nodeInfo_.insert(std::make_pair("type", ""));
     nodeInfo_.insert(std::make_pair("online", ""));
     nodeInfo_.insert(std::make_pair("current_max", ""));
@@ -610,7 +562,6 @@ void PowerSupplyProvider::TraversalNode()
     for (auto it = filenodeName_.begin(); it != filenodeName_.end(); ++it) {
         CheckSubfolderNode(*it);
     }
-    HDF_LOGI("%{public}s exit", __func__);
 }
 
 void PowerSupplyProvider::CheckSubfolderNode(const std::string& path)
@@ -673,7 +624,6 @@ void PowerSupplyProvider::CheckSubfolderNode(const std::string& path)
 
 int32_t PowerSupplyProvider::ParseCapacity(int32_t* capacity) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     char buf[MAX_BUFF_SIZE] = {0};
 
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.capacityPath.c_str(), buf, sizeof(buf));
@@ -685,15 +635,12 @@ int32_t PowerSupplyProvider::ParseCapacity(int32_t* capacity) const
     HDF_LOGI("%{public}s: capacity is %{public}d", __func__, value);
     *capacity = value;
 
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t PowerSupplyProvider::ParseVoltage(int32_t* voltage) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     char buf[MAX_BUFF_SIZE] = {0};
-
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.voltagePath.c_str(), buf, sizeof(buf));
     if (ret != HDF_SUCCESS) {
         return ret;
@@ -703,15 +650,12 @@ int32_t PowerSupplyProvider::ParseVoltage(int32_t* voltage) const
     HDF_LOGI("%{public}s: voltage is %{public}d", __func__, value);
     *voltage = value;
 
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t PowerSupplyProvider::ParseTemperature(int32_t* temperature) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     char buf[MAX_BUFF_SIZE] = {0};
-
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.temperaturePath.c_str(), buf, sizeof(buf));
     if (ret != HDF_SUCCESS) {
         return ret;
@@ -721,15 +665,12 @@ int32_t PowerSupplyProvider::ParseTemperature(int32_t* temperature) const
     HDF_LOGI("%{public}s: temperature is %{public}d", __func__, value);
     *temperature = value;
 
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t PowerSupplyProvider::ParseHealthState(int32_t* healthState) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     char buf[MAX_BUFF_SIZE] = {0};
-
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.healthStatePath.c_str(), buf, sizeof(buf));
     if (ret != HDF_SUCCESS) {
         return ret;
@@ -738,16 +679,12 @@ int32_t PowerSupplyProvider::ParseHealthState(int32_t* healthState) const
     Trim(buf);
     *healthState = HealthStateEnumConverter(buf);
     HDF_LOGI("%{public}s: healthState is %{public}d", __func__, *healthState);
-
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t PowerSupplyProvider::ParsePluggedType(int32_t* pluggedType) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     char buf[MAX_BUFF_SIZE] = {0};
-
     GetPluggedTypeName(buf, sizeof(buf));
     int32_t type = PluggedTypeEnumConverter(buf);
     if (type == PLUGGED_TYPE_BUTT) {
@@ -757,14 +694,11 @@ int32_t PowerSupplyProvider::ParsePluggedType(int32_t* pluggedType) const
 
     HDF_LOGI("%{public}s: return online plugged type %{public}d", __func__, type);
     *pluggedType = type;
-
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t PowerSupplyProvider::ParseChargeState(int32_t* chargeState) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     char buf[MAX_BUFF_SIZE] = {0};
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.chargeStatePath.c_str(), buf, sizeof(buf));
     if (ret != HDF_SUCCESS) {
@@ -774,14 +708,11 @@ int32_t PowerSupplyProvider::ParseChargeState(int32_t* chargeState) const
     Trim(buf);
     *chargeState = ChargeStateEnumConverter(buf);
     HDF_LOGI("%{public}s: chargeState is %{public}d", __func__, *chargeState);
-
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t PowerSupplyProvider::ParsePresent(int8_t* present) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     char buf[MAX_BUFF_SIZE] = {0};
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.presentPath.c_str(), buf, sizeof(buf));
     if (ret != HDF_SUCCESS) {
@@ -791,16 +722,12 @@ int32_t PowerSupplyProvider::ParsePresent(int8_t* present) const
     int8_t value = (int8_t)ParseInt(buf);
     HDF_LOGI("%{public}s: present is %{public}d", __func__, value);
     *present = value;
-
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t PowerSupplyProvider::ParseChargeCounter(int32_t* chargeCounter) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     char buf[MAX_BUFF_SIZE] = {0};
-
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.chargeCounterPath.c_str(), buf, sizeof(buf));
     if (ret != HDF_SUCCESS) {
         return ret;
@@ -810,13 +737,11 @@ int32_t PowerSupplyProvider::ParseChargeCounter(int32_t* chargeCounter) const
     HDF_LOGI("%{public}s: temperature is %{public}d", __func__, value);
     *chargeCounter = value;
 
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t PowerSupplyProvider::ParseTechnology(std::string& technology) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     char buf[MAX_BUFF_SIZE] = {0};
     HDF_LOGI("%{public}s: technology path is %{public}s", __func__, batterySysfsInfo_.technologyPath.c_str());
 
@@ -827,14 +752,11 @@ int32_t PowerSupplyProvider::ParseTechnology(std::string& technology) const
 
     technology.assign(buf, strlen(buf));
     HDF_LOGI("%{public}s: technology is %{public}s", __func__, technology.c_str());
-
-    HDF_LOGI("%{public}s exit", __func__);
     return HDF_SUCCESS;
 }
 
 void PowerSupplyProvider::InitDefaultSysfs(void)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     std::string mockBatteryPath = "/data/local/tmp/battery";
     std::string mockChargerPath = "/data/local/tmp/ohos_charger";
     std::string mockTechPath = "/data/local/tmp/ohos-fgu";

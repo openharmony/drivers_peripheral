@@ -16,12 +16,12 @@
 #ifndef HDI_BATTERY_V1_0_BATTERYINTERFACESERVICE_H
 #define HDI_BATTERY_V1_0_BATTERYINTERFACESERVICE_H
 
-#include "battery_interface_stub.h"
 #include "batteryd_api.h"
-#include "power_supply_provider.h"
-#include "battery_thread.h"
 #include "battery_config.h"
+#include "battery_interface_stub.h"
 #include "battery_led.h"
+#include "battery_thread.h"
+#include "power_supply_provider.h"
 
 namespace hdi {
 namespace battery {
