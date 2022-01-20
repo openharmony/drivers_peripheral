@@ -13,17 +13,17 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libvibrator_interface_service_1.0") {
+ohos_shared_library("liblight_interface_service_1.0") {
   include_dirs = [
     "//drivers/adapter/uhdf2/include/hdi",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//drivers/peripheral/misc/vibrator/interfaces/include/",
+    "//drivers/peripheral/misc/light/interfaces/include/",
   ]
-  sources = [ "vibrator_interface_service.cpp" ]
+  sources = [ "light_interface_service.cpp" ]
 
   public_deps = [
-    "//drivers/peripheral/misc/vibrator/hal:hdi_vibrator",
-    "//drivers/peripheral/misc/vibrator/interfaces/vibrator/v1_0:libvibrator_stub_1.0",
+    "//drivers/peripheral/misc/light/hal:hdi_light",
+    "//drivers/interface/light/v1_0:liblight_stub_1.0",
     "//utils/native/base:utils",
   ]
 
@@ -40,25 +40,24 @@ ohos_shared_library("libvibrator_interface_service_1.0") {
     ]
   }
 
-  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "vibrator_device_driver"
+  part_name = "light_device_driver"
 }
 
-ohos_shared_library("libvibrator_driver") {
+ohos_shared_library("liblight_driver") {
   include_dirs = [
     "//drivers/adapter/uhdf2/ipc/include",
     "//drivers/adapter/uhdf2/include/host",
     "//drivers/adapter/uhdf2/include/hdi",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//drivers/peripheral/misc/vibrator/interfaces/include/",
+    "//drivers/peripheral/misc/light/interfaces/include/",
   ]
-  sources = [ "vibrator_interface_driver.cpp" ]
+  sources = [ "light_interface_driver.cpp" ]
 
   deps = [
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/peripheral/misc/vibrator/hal:hdi_vibrator",
-    "//drivers/peripheral/misc/vibrator/interfaces/hdi_service:libvibrator_interface_service_1.0",
+    "//drivers/peripheral/misc/light/hal:hdi_light",
+    "//drivers/peripheral/misc/light/hdi_service:liblight_interface_service_1.0",
     "//utils/native/base:utils",
   ]
 
@@ -75,16 +74,15 @@ ohos_shared_library("libvibrator_driver") {
     ]
   }
 
-  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "vibrator_device_driver"
+  part_name = "light_device_driver"
 }
 
-group("hdf_vibrator_service") {
+group("hdf_light_service") {
   if (target_cpu == "arm") {
     deps = [
-      ":libvibrator_driver",
-      ":libvibrator_interface_service_1.0",
+      ":liblight_driver",
+      ":liblight_interface_service_1.0",
     ]
   }
 }
