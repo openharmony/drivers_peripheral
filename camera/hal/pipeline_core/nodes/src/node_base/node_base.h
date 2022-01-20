@@ -39,8 +39,8 @@ public:
     std::shared_ptr<IPort> Peer() const override;
     virtual void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
     virtual void DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
-    void DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec) override {};
-    void DeliverBuffers(std::vector<std::shared_ptr<FrameSpec>> mergeVec) override {};
+    void DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
+    void DeliverBuffers(std::vector<std::shared_ptr<FrameSpec>> mergeVec) override;
 protected:
     std::string name_;
     std::shared_ptr<IPort> peer_ = nullptr;
@@ -77,13 +77,13 @@ public:
     std::vector<std::shared_ptr<IPort>> GetInPorts() const override;
     std::vector<std::shared_ptr<IPort>> GetOutPorts() override;
     std::shared_ptr<IPort> GetOutPortById(const int32_t id) override;
-    void SetCallBack(BufferCb c) override {};
+    void SetCallBack(BufferCb c) override;
     void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
     void DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
 
-    virtual RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec){};
-    void DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec) override {};
-    void DeliverBuffers(std::vector<std::shared_ptr<FrameSpec>> mergeVec) override {};
+    virtual RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec);
+    void DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
+    void DeliverBuffers(std::vector<std::shared_ptr<FrameSpec>> mergeVec) override;
 
 protected:
     std::string name_;

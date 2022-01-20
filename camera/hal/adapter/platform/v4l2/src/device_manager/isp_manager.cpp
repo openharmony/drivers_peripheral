@@ -42,6 +42,7 @@ RetCode IspManager::CreateController(ControllerId controllerId, std::string hard
 
 std::shared_ptr<IController> IspManager::GetController(ControllerId controllerId, std::string hardwareName)
 {
+    (void)controllerId;
     if (ispList_.size() == 0) {
         return nullptr;
     }

@@ -51,18 +51,26 @@ public:
     RetCode ConfigVenc();
     RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> camMeta)
     {
+        (void)camMeta;
         return RC_OK;
     };
-    void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag) {};
+    void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag)
+    {
+        (void)abilityMetaDataTag;
+    }
     RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta)
     {
+        (void)meta;
         return RC_OK;
     };
     bool GetMetaDataFlag()
     {
         return false;
     };
-    void SetMetaDataFlag(bool dataFlag) {};
+    void SetMetaDataFlag(bool dataFlag)
+    {
+        (void)dataFlag;
+    }
 private:
     std::mutex startVenclock_;
     bool startVencState_ = false;

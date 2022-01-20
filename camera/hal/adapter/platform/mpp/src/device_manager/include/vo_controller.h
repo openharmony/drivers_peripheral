@@ -35,22 +35,31 @@ public:
     RetCode ConfigVo();
     RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> metadata)
     {
+        (void)metadata;
         return RC_OK;
     };
     bool GetStartVoState()
     {
         return startVoState_;
     };
-    void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag) {};
+    void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag)
+    {
+        (void)abilityMetaDataTag;
+        return;
+    }
     RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> cameraMeta)
     {
+        (void)cameraMeta;
         return RC_OK;
     };
     bool GetMetaDataFlag()
     {
         return false;
     };
-    void SetMetaDataFlag(bool metaDataFlag) {};
+    void SetMetaDataFlag(bool metaDataFlag)
+    {
+        (void)metaDataFlag;
+    }
 
 private:
     std::mutex startVolock_;

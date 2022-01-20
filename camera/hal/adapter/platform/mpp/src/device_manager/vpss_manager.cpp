@@ -24,6 +24,7 @@ VpssManager::~VpssManager() {}
 
 RetCode VpssManager::CreateController(ControllerId controllerId, std::string hardwareName)
 {
+    (void)controllerId;
     if (vpss_ == nullptr) {
         vpss_ = std::make_shared<VpssController>(hardwareName);
         if (vpss_ == nullptr) {

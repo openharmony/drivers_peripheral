@@ -115,6 +115,7 @@ int32_t HostStreamMgrImpl::DesignateStreamIdForType(const int32_t streamType)
             }
         }
     }
+    return -1;
 }
 
 std::shared_ptr<HostStreamMgr> HostStreamMgr::Create()
