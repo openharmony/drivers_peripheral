@@ -40,6 +40,7 @@ ohos_shared_library("liblight_interface_service_1.0") {
     ]
   }
 
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "light_device_driver"
 }
@@ -74,6 +75,7 @@ ohos_shared_library("liblight_driver") {
     ]
   }
 
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "light_device_driver"
 }
