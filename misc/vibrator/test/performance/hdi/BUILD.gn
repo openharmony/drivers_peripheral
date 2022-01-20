@@ -33,7 +33,7 @@ ohos_unittest("hdf_vibrator_hdi_test_performance") {
   ]
 
   deps = [
-    "//drivers/peripheral/misc/vibrator/interfaces/vibrator/v1_0:libvibrator_proxy_1.0",
+    "//drivers/interface/vibrator/v1_0:libvibrator_proxy_1.0",
     "//utils/native/base:utils",
   ]
 

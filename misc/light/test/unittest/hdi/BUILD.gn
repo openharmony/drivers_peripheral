@@ -30,7 +30,7 @@ ohos_unittest("hdf_unittest_hdi_light") {
     "-fno-strict-aliasing",
   ]
   deps = [
-    "//drivers/peripheral/misc/light/interfaces/light/v1_0:liblight_proxy_1.0",
+    "//drivers/interface/light/v1_0:liblight_proxy_1.0",
     "//utils/native/base:utils",
   ]
   if (is_standard_system) {
