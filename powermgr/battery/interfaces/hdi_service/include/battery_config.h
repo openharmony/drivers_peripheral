@@ -16,9 +16,9 @@
 #ifndef BATTERY_CONFIG_H
 #define BATTERY_CONFIG_H
 
+#include <fstream>
 #include <string>
 #include <vector>
-#include <fstream>
 #include <json/json.h>
 
 namespace OHOS {

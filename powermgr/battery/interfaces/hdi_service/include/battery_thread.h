@@ -16,10 +16,10 @@
 #ifndef BATTERY_THREAD_H
 #define BATTERY_THREAD_H
 
+#include <map>
+#include <memory>
 #include <thread>
 #include <vector>
-#include <memory>
-#include <map>
 #include "battery_callback_service.h"
 #include "power_supply_provider.h"
 

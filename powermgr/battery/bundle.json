@@ -10,17 +10,14 @@
     "ram": "1000KB",
     "deps": {
       "components": [
-        "appexecfwk_base",
         "base",
         "cesfwk_core",
         "cesfwk_innerkits",
-        "libeventhandler",
         "device_driver_framework",
         "libhilog",
         "ipc_core",
         "want",
-        "samgr_proxy",
-        "system_ability_fwk"
+        "samgr_proxy"
       ],
       "third_part": [
         "gmock_main",
