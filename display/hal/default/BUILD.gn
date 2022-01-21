@@ -11,9 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/lite/config/component/lite_component.gni")
+import("//build/ohos.gni")
 
-shared_library("def_display_layer") {
+ohos_static_library("def_display_layer") {
   output_name = "display_layer"
   sources = [
     "//drivers/peripheral/display/hal/disp_hal.c",
@@ -46,7 +46,7 @@ shared_library("def_display_layer") {
   ]
 }
 
-shared_library("def_display_gralloc") {
+ohos_shared_library("def_display_gralloc") {
   output_name = "display_gralloc"
   sources = [ "display_gralloc.c" ]
   include_dirs = [
@@ -74,7 +74,7 @@ shared_library("def_display_gralloc") {
   ]
 }
 
-shared_library("def_display_gfx") {
+ohos_shared_library("def_display_gfx") {
   output_name = "display_gfx"
   sources = [ "display_gfx.c" ]
   include_dirs = [

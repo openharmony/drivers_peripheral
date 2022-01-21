@@ -13,17 +13,13 @@
 #limitations under the License.
 #
 
-if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-} else {
-  import("//build/ohos.gni")
-}
+import("//build/ohos.gni")
 
 LIGHT_ROOT_DIR = "//drivers/peripheral/misc/light"
 
 if (defined(ohos_lite)) {
   FWK_ROOT_DIR = "//drivers/framework"
-  shared_library("hdi_light") {
+  ohos_shared_library("hdi_light") {
     sources = [ "$LIGHT_ROOT_DIR/hal/src/light_controller.c" ]
 
     include_dirs = [
@@ -53,10 +49,8 @@ if (defined(ohos_lite)) {
       "-fno-common",
       "-fno-strict-aliasing",
     ]
-  }
-
-  lite_component("hdi") {
-    features = [ ":hdi_light" ]
+    subsystem_name = "hdf"
+    part_name = "light_device_driver"
   }
 } else {
   config("libhdi_light_pub_config") {

@@ -21,6 +21,10 @@ if (defined(ohos_lite)) {
           [ "//device/${device_company}/hardware/display:hdi_display" ]
     }
   }
+  group("hdi_display_device") {
+    deps = []
+    public_configs = []
+  }
 } else {
   import("//build/ohos.gni")
 

@@ -1,6 +1,8 @@
 {
-  "name": "hdf",
-  "description": "drivers adapter",
+  "name": "vibrator_device_driver",
+  "description": "vibrator device driver",
+  "version": "3.1",
+  "license": "Apache License 2.0",
   "component": {
     "name": "vibrator_device_driver",
     "subsystem": "hdf",
@@ -10,8 +12,9 @@
     "ram": "1000KB",
     "deps": {
       "components": [
-        "developer_test",
-        "hilog",
+        "ipc",
+        "device_driver_framework",
+        "hiviewdfx_hilog_native",
         "utils_base"
       ],
       "third_part": [

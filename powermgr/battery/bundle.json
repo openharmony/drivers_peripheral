@@ -1,6 +1,8 @@
 {
   "name": "battery_device_driver",
   "description": "battery hdf",
+  "version": "3.1",
+  "license": "Apache License 2.0",
   "component": {
     "name": "battery_device_driver",
     "subsystem": "hdf",

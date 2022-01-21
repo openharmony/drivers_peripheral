@@ -11,17 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/lite/config/component/lite_component.gni")
+import("//build/ohos.gni")
 
-HDF_FRAMEWORKS = "//drivers/framework"
-USB_OUTPUT_DIR = "$root_out_dir/test/unittest/usb"
+ohos_executable("usb_dev_test") {
+  include_dirs = [
+    "//third_party/bounds_checking_function/include",
+    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+  ]
 
-lite_component("usbfn_sample") {
-  features = [ ":usb_dev_test" ]
-}
-
-executable("usb_dev_test") {
-  output_dir = "$USB_OUTPUT_DIR"
   sources = [
     "acm_speed_read.c",
     "acm_speed_write.c",
@@ -30,25 +27,12 @@ executable("usb_dev_test") {
     "usb_dev_test.c",
   ]
 
-  include_dirs = [
-    "$HDF_FRAMEWORKS/core/shared/include",
-    "$HDF_FRAMEWORKS/core/host/include",
-    "$HDF_FRAMEWORKS/core/master/include",
-    "$HDF_FRAMEWORKS/include/core",
-    "$HDF_FRAMEWORKS/include/utils",
-    "$HDF_FRAMEWORKS/utils/include",
-    "$HDF_FRAMEWORKS/include/osal",
-    "//drivers/adapter/uhdf/posix/include",
-    "//third_party/bounds_checking_function/include",
-    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-  ]
-
   deps = [
     "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
     "//drivers/adapter/uhdf/manager:hdf_core",
     "//drivers/adapter/uhdf/posix:hdf_posix_osal",
   ]
-
+  external_deps = [ "device_driver_framework:libhdf_utils" ]
   public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
   defines = [ "__USER__" ]
 
@@ -65,4 +49,8 @@ executable("usb_dev_test") {
     "-lstdc++",
     "-lpthread",
   ]
+
+  install_enable = true
+  subsystem_name = "hdf"
+  part_name = "usb_device_driver"
 }

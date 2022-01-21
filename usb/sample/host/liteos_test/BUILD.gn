@@ -11,23 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/lite/config/component/lite_component.gni")
+import("//build/ohos.gni")
 
-HDF_FWKS = "//drivers/framework"
-USB_OUTPUT_DIR = "$root_out_dir/test/unittest/usb"
-
-executable("liteos_host_speed_test") {
-  output_dir = "$USB_OUTPUT_DIR"
+ohos_executable("liteos_host_speed_test") {
   sources = [ "src/usbhost_speed_test.c" ]
   include_dirs = [
-    "$HDF_FWKS/core/shared/include",
-    "$HDF_FWKS/core/host/include",
-    "$HDF_FWKS/core/master/include",
-    "$HDF_FWKS/include/core",
-    "$HDF_FWKS/include/utils",
-    "$HDF_FWKS/utils/include",
-    "$HDF_FWKS/include/osal",
-    "//drivers/adapter/uhdf/posix/include",
     "//third_party/bounds_checking_function/include",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
     "include",
@@ -40,6 +28,7 @@ executable("liteos_host_speed_test") {
   ]
 
   public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+  external_deps = [ "device_driver_framework:libhdf_utils" ]
   defines = [ "__USER__" ]
 
   cflags = [
@@ -56,4 +45,8 @@ executable("liteos_host_speed_test") {
     "-lstdc++",
     "-lpthread",
   ]
+
+  install_enable = false
+  subsystem_name = "hdf"
+  part_name = "usb_device_driver"
 }
