@@ -20,6 +20,7 @@
 #include "hdf_base.h"
 #include "osal_time.h"
 #include "light_interface_proxy.h"
+#include "light_type.h"
 
 using namespace light::v1_0;
 using namespace testing::ext;
@@ -103,7 +104,7 @@ HWTEST_F(HdfLightHdiTest, TurnOnLight001, TestSize.Level1)
 
     std::vector<HdfLightInfo> info;
     int32_t ret = g_lightInterface->GetLightInfo(info);
-    EXPECT_EQ(0, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     printf("get light list num[%zu]\n\r", info.size());
 
     for (auto iter : info)
@@ -115,10 +116,10 @@ HWTEST_F(HdfLightHdiTest, TurnOnLight001, TestSize.Level1)
         effect.lightBrightness = 0xFFFF0000;
         effect.flashEffect.flashMode = HDF_LIGHT_FLASH_NONE;
         int32_t ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
-        EXPECT_EQ(ret, HDF_SUCCESS);
+        EXPECT_EQ(HDF_SUCCESS, ret);
         OsalSleep(g_sleepTime);
         ret = g_lightInterface->TurnOffLight(iter.lightId);
-        EXPECT_EQ(ret, HDF_SUCCESS);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -146,7 +147,7 @@ HWTEST_F(HdfLightHdiTest, TurnOnLight002, TestSize.Level1)
         effect.lightBrightness = 0xFFFF0000;
         effect.flashEffect.flashMode = HDF_LIGHT_FLASH_BUTT;
         int32_t ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
-        EXPECT_EQ(ret, -1);
+        EXPECT_EQ(LIGHT_NOT_FLASH, ret);
     }
 }
 
@@ -176,9 +177,26 @@ HWTEST_F(HdfLightHdiTest, TurnOnLight003, TestSize.Level1)
         effect.flashEffect.onTime = g_onTime;
         effect.flashEffect.offTime = g_offTime;
         int32_t ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
-        EXPECT_EQ(ret, HDF_SUCCESS);
+        EXPECT_EQ(HDF_SUCCESS, ret);
         OsalSleep(g_sleepTime);
         ret = g_lightInterface->TurnOffLight(iter.lightId);
-        EXPECT_EQ(ret, HDF_SUCCESS);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
+}
+
+/**
+  * @tc.name: DisableLight001
+  * @tc.desc: DisableLight.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfLightHdiTest, DisableLight001, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    HdfLightEffect effect;
+    int32_t ret  = g_lightInterface->TurnOnLight(HDF_LIGHT_ID_BUTT, effect);
+    EXPECT_EQ(LIGHT_NOT_SUPPORT, ret);
+    ret  = g_lightInterface->TurnOffLight(HDF_LIGHT_ID_BUTT);
+    EXPECT_EQ(LIGHT_NOT_SUPPORT, ret);
 }
