@@ -228,7 +228,6 @@ void HosCameraDemo::ReleaseCameraDevice()
     }
 }
 
-constexpr const char *DEMO_SERVICE_NAME = "camera_service";
 RetCode HosCameraDemo::InitSensors()
 {
     int rc = 0;
@@ -241,6 +240,7 @@ RetCode HosCameraDemo::InitSensors()
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     demoCameraHost_ = OHOS::Camera::CameraHost::CreateCameraHost();
 #else
+    constexpr const char *DEMO_SERVICE_NAME = "camera_service";
     demoCameraHost_ = ICameraHost::Get(DEMO_SERVICE_NAME);
 #endif
     if (demoCameraHost_ == nullptr) {
@@ -641,7 +641,6 @@ void HosCameraDemo::SetAeExpo()
 
 void HosCameraDemo::FlashlightOnOff(bool onOff)
 {
-    int rc = 0;
     CAMERA_LOGD("demo test: FlashlightOnOff enter\n");
 
     if (demoCameraHost_ == nullptr) {

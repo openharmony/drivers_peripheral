@@ -20,7 +20,8 @@
 #include "camera_metadata_info.h"
 #include <memory>
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 using ModeMeta = std::shared_ptr<OHOS::CameraStandard::CameraMetadata>;
 using CaptureMeta = std::shared_ptr<OHOS::CameraStandard::CameraMetadata>;
 
@@ -62,5 +63,6 @@ struct FrameSpec {
     uint32_t   bufferCount_;
     std::shared_ptr<IBuffer>    buffer_;
 };
-}
+} // namespace Camera
+} // namespace OHOS
 #endif

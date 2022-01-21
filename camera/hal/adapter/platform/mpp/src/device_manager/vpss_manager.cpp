@@ -15,7 +15,8 @@
 
 #include "vpss_manager.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 VpssManager::VpssManager() {}
 
 VpssManager::VpssManager(ManagerId managerId) : IManager(managerId) {}
@@ -52,4 +53,5 @@ RetCode VpssManager::PowerDown(CameraId cameraId)
 {
     return vpss_->PowerDown(cameraId);
 }
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS

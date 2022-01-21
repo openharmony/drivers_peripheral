@@ -21,7 +21,8 @@
 #include "device_manager_adapter.h"
 #include "mpi_adapter.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 class VoController : public IController {
 public:
     VoController();
@@ -66,5 +67,6 @@ private:
     bool startVoState_ = false;
     std::shared_ptr<IVoObject> voObject_ = nullptr;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif

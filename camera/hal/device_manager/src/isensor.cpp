@@ -15,7 +15,8 @@
 
 #include "isensor.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 ISensor::ISensor() {}
 
 ISensor::ISensor(std::string sensorName) : sensorName_(sensorName) {}
@@ -88,4 +89,5 @@ void ISensor::InitSensitivityRange(CameraStandard::CameraMetadata& camera_meta_d
         &sensitivityRange,
         sizeof(sensitivityRange) / sizeof(int32_t));
 }
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS

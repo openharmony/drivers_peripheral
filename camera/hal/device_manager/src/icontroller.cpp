@@ -15,7 +15,8 @@
 
 #include "icontroller.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 IController::IController() {}
 
 IController::IController(std::string hardwareName) : hardwareName_(hardwareName) {}
@@ -39,4 +40,5 @@ void IController::SetMetaDataFlag(bool metaDataFlag)
     (void)metaDataFlag;
     return;
 }
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS

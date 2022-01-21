@@ -26,7 +26,8 @@
 #include "isys_object.h"
 #include "device_manager_adapter.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 class MpiDeviceManager : public IDeviceManager {
     DECLARE_DEVICEMANAGER(MpiDeviceManager)
 public:
@@ -83,5 +84,6 @@ private:
     bool sysInitFlag;
     bool metaSendflag_ = false;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif
