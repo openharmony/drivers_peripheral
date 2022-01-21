@@ -26,14 +26,14 @@
 using namespace testing::ext;
 
 namespace {
-    const uint32_t type = 1;
     const struct LightInterface *g_lightDev = nullptr;
     static struct LightInfo *g_lightInfo = nullptr;
     static uint32_t g_count = 0;
     const int32_t g_onTime = 500;
     const int32_t g_offTime = 500;
     const int32_t LIGHT_WAIT_TIME = 30;
-    struct LightEffect *g_effect = nullptr;
+    const int32_t g_minLightType = LIGHT_TYPE_NONE;
+    const int32_t g_maxLightType = LIGHT_TYPE_BUTT;
 }
 
 class HdfLightTest : public testing::Test {
@@ -46,27 +46,18 @@ public:
 
 void HdfLightTest::SetUpTestCase()
 {
-    g_effect = (struct LightEffect *)OsalMemCalloc(sizeof(*g_effect));
-    if (g_effect == nullptr) {
-        printf("malloc failed\n\r");
-    }
     g_lightDev = NewLightInterfaceInstance();
     if (g_lightDev == nullptr) {
-        printf("test lightHdi get Module instance failed\n\r");
+        printf("test light get Module instance failed\n\r");
     }
     int32_t ret = g_lightDev->GetLightInfo(&g_lightInfo, &g_count);
-    if (ret == -1) {
+    if (ret == HDF_FAILURE) {
         printf("get light informations failed\n\r");
     }
 }
 
 void HdfLightTest::TearDownTestCase()
 {
-    if (g_effect != nullptr) {
-        OsalMemFree(g_effect);
-        g_effect = nullptr;
-    }
-
     if (g_lightDev != nullptr) {
         FreeLightInterfaceInstance();
         g_lightDev = nullptr;
@@ -79,6 +70,17 @@ void HdfLightTest::SetUp()
 
 void HdfLightTest::TearDown()
 {
+}
+
+/**
+  * @tc.name: CheckLightInstanceIsEmpty
+  * @tc.desc: Creat a light instance. The instance is not empty.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfLightTest, CheckLightInstanceIsEmpty, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_lightDev);
 }
 
 /**
@@ -101,8 +103,26 @@ HWTEST_F(HdfLightTest, GetLightList001, TestSize.Level1)
 
     for (int i = 0; i < g_count; ++i) {
         printf("get lightId[%d]\n\r", info->lightType);
+        EXPECT_GE(info->lightType, g_minLightType);
+        EXPECT_LE(info->lightType, g_maxLightType);
         info++;
     }
+}
+
+/**
+  * @tc.name: GetLightList002
+  * @tc.desc: Obtains information about all lights in the system. Validity check of input parameters.
+  * @tc.type: FUNC
+  * @tc.require: SR000F869M, AR000F869Q
+  */
+HWTEST_F(HdfLightTest, GetLightList002, TestSize.Level1)
+{
+    int32_t ret = g_lightDev->GetLightInfo(nullptr, &g_count);
+    EXPECT_EQ(HDF_FAILURE, ret);
+    ret = g_lightDev->GetLightInfo(&g_lightInfo, nullptr);
+    EXPECT_EQ(HDF_FAILURE, ret);
+    ret = g_lightDev->GetLightInfo(nullptr, nullptr);
+    EXPECT_EQ(HDF_FAILURE, ret);
 }
 
 /**
@@ -113,17 +133,24 @@ HWTEST_F(HdfLightTest, GetLightList001, TestSize.Level1)
   */
 HWTEST_F(HdfLightTest, EnableLight001, TestSize.Level1)
 {
-    g_effect->lightBrightness = 0xFFFF0000;
-    g_effect->flashEffect.flashMode = LIGHT_FLASH_NONE;
-    g_effect->flashEffect.onTime = 0;
-    g_effect->flashEffect.offTime = 0;
-    int32_t ret = g_lightDev->TurnOnLight(type, g_effect);
-    EXPECT_EQ(0, ret);
+    int32_t i;
+    int32_t ret;
+    struct LightEffect effect;
+    effect.lightBrightness = 0x80000000;
+    effect.flashEffect.flashMode = LIGHT_FLASH_NONE;
+    effect.flashEffect.onTime = 0;
+    effect.flashEffect.offTime = 0;
 
-    OsalSleep(LIGHT_WAIT_TIME);
+    for (i = 0; i < g_count; ++i) {
 
-    ret = g_lightDev->TurnOffLight(type);
-    EXPECT_EQ(0, ret);
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightType, &effect);
+        EXPECT_EQ(0, ret);
+
+        OsalSleep(LIGHT_WAIT_TIME);
+
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightType);
+        EXPECT_EQ(0, ret);
+    }
 }
 
 /**
@@ -134,15 +161,72 @@ HWTEST_F(HdfLightTest, EnableLight001, TestSize.Level1)
   */
 HWTEST_F(HdfLightTest, EnableLight002, TestSize.Level1)
 {
-    g_effect->lightBrightness = 0xFFFF0000;
-    g_effect->flashEffect.flashMode = LIGHT_FLASH_TIMED;
-    g_effect->flashEffect.onTime = g_onTime;
-    g_effect->flashEffect.offTime = g_offTime;
-    int32_t ret = g_lightDev->TurnOnLight(type, g_effect);
-    EXPECT_EQ(0, ret);
+    int32_t i;
+    int32_t ret;
+    struct LightEffect effect;
+    effect.lightBrightness = 0x80000000;
+    effect.flashEffect.flashMode = LIGHT_FLASH_TIMED;
+    effect.flashEffect.onTime = g_onTime;
+    effect.flashEffect.offTime = g_offTime;
 
-    OsalSleep(LIGHT_WAIT_TIME);
+    for (i = 0; i < g_count; ++i) {
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightType, &effect);
+        EXPECT_EQ(0, ret);
 
-    ret = g_lightDev->TurnOffLight(type);
-    EXPECT_EQ(0, ret);
+        OsalSleep(LIGHT_WAIT_TIME);
+
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightType);
+        EXPECT_EQ(0, ret);
+    }
+}
+
+/**
+  * @tc.name: EnableLight003
+  * @tc.desc: Enables the light available in the light list based on the specified light type.
+  * @tc.type: FUNC
+  * @tc.require: SR000F869M, AR000F869R, AR000F8QNL
+  */
+HWTEST_F(HdfLightTest, EnableLight003, TestSize.Level1)
+{
+    int32_t i;
+    int32_t ret;
+    uint32_t lightType = LIGHT_TYPE_BUTT;
+    struct LightEffect effect;
+
+    ret = g_lightDev->TurnOnLight(lightType, &effect);
+    EXPECT_EQ(LIGHT_NOT_SUPPORT, ret);
+
+    for (i = 0; i < g_count; ++i) {
+        effect.lightBrightness = 0x80000000;
+        effect.flashEffect.flashMode = LIGHT_FLASH_BUTT;
+        effect.flashEffect.onTime = g_onTime;
+        effect.flashEffect.offTime = g_offTime;
+
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightType, &effect);
+        EXPECT_EQ(LIGHT_NOT_FLASH, ret);
+
+        effect.flashEffect.flashMode = LIGHT_FLASH_TIMED;
+        effect.flashEffect.onTime = 0;
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightType, &effect);
+        EXPECT_EQ(LIGHT_NOT_FLASH, ret);
+
+        effect.flashEffect.onTime = g_onTime;
+        effect.flashEffect.offTime = 0;
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightType, &effect);
+        EXPECT_EQ(LIGHT_NOT_FLASH, ret);
+    }
+}
+
+/**
+  * @tc.name: DisableLight001
+  * @tc.desc: Disable the light available in the light list based on the specified light type.
+  * @tc.type: FUNC
+  * @tc.require: SR000F869M, AR000F869R, AR000F8QNL
+  */
+HWTEST_F(HdfLightTest, DisableLight001, TestSize.Level1)
+{
+    uint32_t lightType = LIGHT_TYPE_BUTT;
+
+    int32_t ret = g_lightDev->TurnOffLight(lightType);
+    EXPECT_EQ(HDF_FAILURE, ret);
 }
