@@ -20,7 +20,8 @@
 #include "device_manager_adapter.h"
 #include <map>
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 typedef std::shared_ptr<IDeviceManager> (*createClass)(void);
 class CreateDeviceManagerFactory {
 public:
@@ -75,5 +76,6 @@ public:                                                                         
         new DeviceManagerDynamicClass(#className, &className::createInstance);
 
 #define GetDeviceManagerFactory CreateDeviceManagerFactory::SharedDeviceManagerFactory()
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif

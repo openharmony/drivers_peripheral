@@ -20,7 +20,8 @@
 #include <mutex>
 #include <string>
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 class IController {
 public:
     IController();
@@ -47,5 +48,6 @@ private:
     std::string hardwareName_;
     bool powerOnState_ = false;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif

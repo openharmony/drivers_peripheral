@@ -18,7 +18,8 @@
 
 #include "camera.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 enum CameraBufferStatus {
     CAMERA_BUFFER_STATUS_OK = 0,
     CAMERA_BUFFER_STATUS_DROP,
@@ -79,6 +80,7 @@ public:
 
     virtual bool operator==(const IBuffer& u) = 0;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif
 

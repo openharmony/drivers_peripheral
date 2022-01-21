@@ -15,7 +15,8 @@
 
 #include "vi_manager.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 ViManager::ViManager() {}
 
 ViManager::ViManager(ManagerId managerId) : IManager(managerId) {}
@@ -67,4 +68,5 @@ CameraStandard::CameraMetadata ViManager::GetSensorInfo(CameraId cameraId)
     CameraStandard::CameraMetadata meta(0, 0);
     return meta;
 }
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS

@@ -15,7 +15,8 @@
 
 #include "venc_controller.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 VencController::VencController() {}
 
 VencController::VencController(std::string hardwareName) : IController(hardwareName) {}
@@ -88,4 +89,5 @@ RetCode VencController::StopVenc()
     }
     return rc;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS

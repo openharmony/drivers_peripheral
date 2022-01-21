@@ -17,7 +17,8 @@
 #include "camera_metadata_info.h"
 #include "create_sensor_factory.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 ViController::ViController() {}
 
 ViController::ViController(std::string hardwareName) : IController(hardwareName) {}
@@ -302,4 +303,5 @@ RetCode ViController::SetFlashlight(FlashMode flashMode, bool enable)
 {
     return viObject_->SetFlashlight(flashMode, enable);
 }
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS

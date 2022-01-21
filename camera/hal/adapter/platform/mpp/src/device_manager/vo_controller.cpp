@@ -15,7 +15,8 @@
 
 #include "vo_controller.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 VoController::VoController() {}
 
 VoController::VoController(std::string hardwareName) : IController(hardwareName) {}
@@ -87,4 +88,5 @@ RetCode VoController::StopVo()
     }
     return rc;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS

@@ -15,7 +15,8 @@
 
 #include "vpss_controller.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 VpssController::VpssController() {}
 
 VpssController::VpssController(std::string hardwareName) : IController(hardwareName) {}
@@ -89,4 +90,5 @@ RetCode VpssController::StopVpss()
     CAMERA_LOGI("%{public}s Vpss Stop Vpss exit", __FUNCTION__);
     return rc;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS

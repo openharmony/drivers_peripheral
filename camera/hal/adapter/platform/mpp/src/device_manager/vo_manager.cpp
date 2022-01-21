@@ -15,7 +15,8 @@
 
 #include "vo_manager.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 VoManager::VoManager() {}
 
 VoManager::VoManager(ManagerId managerId) : IManager(managerId) {}
@@ -52,4 +53,5 @@ RetCode VoManager::PowerDown(CameraId cameraId)
 {
     return vo_->PowerDown(cameraId);
 }
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS

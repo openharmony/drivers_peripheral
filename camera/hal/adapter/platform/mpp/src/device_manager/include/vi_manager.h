@@ -20,7 +20,8 @@
 #include "device_manager_adapter.h"
 #include "vi_controller.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 class ViManager : public IManager {
 public:
     ViManager();
@@ -83,5 +84,6 @@ public:
 private:
     std::shared_ptr<ViController> vi_ = nullptr;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif

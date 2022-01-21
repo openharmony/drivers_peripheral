@@ -19,7 +19,8 @@
 #include "icontroller.h"
 #include "device_manager_adapter.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 class IManager {
 public:
     IManager();
@@ -107,5 +108,6 @@ public:
 private:
     ManagerId managerID_;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif

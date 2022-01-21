@@ -40,7 +40,8 @@
 #define DFX_LOCAL_HITRACE_END
 #endif // HITRACE_LOG_ENABLED
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 #define HDF_LOG_TAG camera_host
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
@@ -178,5 +179,6 @@ using EsFrameInfo = struct EsFrameInfo {
     }
 
 #define CHECK_IF_PTR_NULL_RETURN_VOID(ptr) CHECK_IF_EQUAL_RETURN_VOID(ptr, nullptr)
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif

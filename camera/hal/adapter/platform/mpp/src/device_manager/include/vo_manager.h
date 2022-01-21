@@ -20,7 +20,8 @@
 #include "device_manager_adapter.h"
 #include "vo_controller.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 class VoManager : public IManager {
 public:
     VoManager();
@@ -67,5 +68,6 @@ public:
 private:
     std::shared_ptr<VoController> vo_ = nullptr;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif

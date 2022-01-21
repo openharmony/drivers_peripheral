@@ -20,7 +20,8 @@
 #include "device_manager_adapter.h"
 #include <map>
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 typedef std::shared_ptr<ISensor> (*createClass) (void);
 class CreateSensorFactory {
 public:
@@ -74,5 +75,6 @@ public:                                                                         
     SensorDynamicClass* className::className##_ = new SensorDynamicClass(#className, &className::createInstance);
 
 #define GetSensorFactory CreateSensorFactory::SharedSensorFactory()
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif

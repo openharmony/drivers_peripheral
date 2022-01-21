@@ -22,7 +22,8 @@
 #include "isensor.h"
 #include <vector>
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 class IDeviceManager {
 public:
     IDeviceManager();
@@ -135,5 +136,6 @@ public:
         return;
     }
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif
