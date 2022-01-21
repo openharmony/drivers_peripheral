@@ -1,6 +1,8 @@
 {
   "name": "audio_device_driver",
-  "description": "drivers adapter",
+  "description": "audio device driver",
+  "version": "3.1",
+  "license": "Apache License 2.0",
   "component": {
     "name": "audio_device_driver",
     "subsystem": "hdf",
@@ -10,12 +12,14 @@
     "ram": "1000KB",
     "deps": {
       "components": [
-        "developer_test",
-        "hilog",
+        "hiviewdfx_hilog_native",
+        "device_driver_framework",
         "utils_base"
       ],
       "third_part": [
-        "bounds_checking_function"
+        "bounds_checking_function",
+        "googletest",
+        "tinyalsa"
       ]
     },
     "build": {

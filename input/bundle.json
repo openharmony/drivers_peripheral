@@ -1,6 +1,8 @@
 {
   "name": "input_device_driver",
-  "description": "drivers adapter",
+  "description": "input device driver",
+  "version": "3.1",
+  "license": "Apache License 2.0",
   "component": {
     "name": "input_device_driver",
     "subsystem": "hdf",
@@ -10,12 +12,15 @@
     "ram": "1000KB",
     "deps": {
       "components": [
-        "developer_test",
-        "hilog",
+        "ipc",
+        "device_driver_framework",
+        "hiviewdfx_hilog_native",
+        "graphic_standard",
         "utils_base"
       ],
       "third_part": [
-        "bounds_checking_function"
+        "bounds_checking_function",
+        "googletest"
       ]
     },
     "build": {

@@ -12,28 +12,10 @@
 # limitations under the License.
 
 if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
+  import("//build/ohos.gni")
 
-  USB_OUTPUT_DIR = "$root_out_dir/test/unittest/usb"
-  executable("usbhost_ddk_test") {
-    output_dir = "$USB_OUTPUT_DIR"
-    sources = [
-      "src/usbhost_ddk_test.c",
-      "src/usbhost_test.c",
-    ]
-
+  ohos_executable("usbhost_ddk_test") {
     include_dirs = [
-      "//drivers/adapter/uhdf/posix/include",
-      "//drivers/adapter/khdf/liteos/osal/include",
-      "//drivers/adapter/khdf/liteos/model/usb/host/include",
-      "//drivers/framework/include/utils",
-      "//drivers/framework/include/osal",
-      "//drivers/framework/core/adapter/syscall/include",
-      "//drivers/framework/include/core",
-      "//drivers/framework/core/shared/include",
-      "//drivers/framework/core/common/include/host",
-      "//drivers/framework/utils/include",
-      "//drivers/framework/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//drivers/peripheral/usb/sample/host/include",
@@ -45,13 +27,18 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/usb/gadget/function/include",
     ]
 
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/adapter/uhdf/manager:hdf_core",
-      "//drivers/adapter/uhdf/posix:hdf_posix_osal",
+    sources = [
+      "src/usbhost_ddk_test.c",
+      "src/usbhost_test.c",
     ]
 
+    deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
+    external_deps = [ "device_driver_framework:libhdf_utils" ]
     defines = [ "__LITEOS_USB_HOST_DDK_TEST__" ]
+
+    install_enable = false
+    subsystem_name = "hdf"
+    part_name = "usb_device_driver"
   }
 } else {
   import("//build/ohos.gni")

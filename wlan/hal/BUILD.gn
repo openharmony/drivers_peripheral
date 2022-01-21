@@ -11,16 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-} else {
-  import("//build/ohos.gni")
-}
+import("//build/ohos.gni")
 
 if (defined(ohos_lite)) {
-  FWK_ROOT_DIR = "//drivers/framework"
-  shared_library("wifi_hal") {
-    output_name = "wifi_hal"
+  ohos_shared_library("wifi_hal") {
     sources = [
       "src/wifi_hal.c",
       "src/wifi_hal_ap_feature.c",
@@ -34,12 +28,6 @@ if (defined(ohos_lite)) {
       "include",
       "//drivers/peripheral/wlan/interfaces/include",
       "//drivers/peripheral/wlan/client/include",
-      "$FWK_ROOT_DIR/core/shared/include",
-      "$FWK_ROOT_DIR/include/core",
-      "$FWK_ROOT_DIR/include",
-      "$FWK_ROOT_DIR/include/wifi",
-      "$FWK_ROOT_DIR/include/utils",
-      "//drivers/adapter/uhdf/posix/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
     ]
@@ -48,7 +36,7 @@ if (defined(ohos_lite)) {
       "//drivers/adapter/uhdf/posix:hdf_posix_osal",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
-
+    external_deps = [ "device_driver_framework:libhdf_utils" ]
     defines = [ "__USER__" ]
 
     cflags = [
@@ -61,10 +49,8 @@ if (defined(ohos_lite)) {
       "-Wno-format",
       "-Wno-format-extra-args",
     ]
-  }
-
-  lite_component("wifi_hal_interface") {
-    features = [ ":wifi_hal" ]
+    subsystem_name = "hdf"
+    part_name = "wlan_device_driver"
   }
 } else {
   HAL_ROOT_DIR = "//drivers/peripheral/wlan"

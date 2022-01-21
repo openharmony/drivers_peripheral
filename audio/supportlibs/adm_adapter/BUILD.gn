@@ -11,11 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-} else {
-  import("//build/ohos.gni")
-}
+import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
@@ -52,9 +48,8 @@ config("audio_interface_config") {
 }
 
 if (defined(ohos_lite)) {
-  shared_library("hdi_audio_interface_lib_capture") {
+  ohos_shared_library("hdi_audio_interface_lib_capture") {
     sources = [
-      "$hdf_framework_path/utils/src/hdf_sbuf.c",
       "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
       "src/audio_interface_lib_capture.c",
       "src/audio_interface_lib_common.c",
@@ -67,26 +62,20 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/kits/",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
-      "$hdf_framework_path/include/utils",
-      "$hdf_framework_path/include/osal",
-      "$hdf_framework_path/include/core",
-      "$hdf_framework_path/utils/include",
-      "//drivers/adapter/khdf/liteos/osal/include",
     ]
 
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/adapter/uhdf/manager:hdf_core",
-      "//drivers/adapter/uhdf/posix:hdf_posix_osal",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
-
+    external_deps = [ "device_driver_framework:libhdf_utils" ]
     public_configs = [ ":audio_interface_config" ]
+    subsystem_name = "hdf"
+    part_name = "audio_device_driver"
   }
 
-  shared_library("hdi_audio_interface_lib_render") {
+  ohos_shared_library("hdi_audio_interface_lib_render") {
     sources = [
-      "$hdf_framework_path/utils/src/hdf_sbuf.c",
       "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
       "src/audio_interface_lib_common.c",
       "src/audio_interface_lib_render.c",
@@ -97,27 +86,21 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
       "//drivers/peripheral/audio/interfaces/include",
       "//third_party/bounds_checking_function/include",
-      "$hdf_uhdf_path/osal/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/kits/",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
-      "$hdf_framework_path/include/utils",
-      "$hdf_framework_path/include/osal",
-      "$hdf_framework_path/include/core",
-      "$hdf_framework_path/utils/include",
-      "//drivers/adapter/khdf/liteos/osal/include",
     ]
 
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/adapter/uhdf/manager:hdf_core",
-      "//drivers/adapter/uhdf/posix:hdf_posix_osal",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
-
+    external_deps = [ "device_driver_framework:libhdf_utils" ]
     if (enable_audio_hal_hdf_log) {
       defines = [ "AUDIO_HAL_HDF_LOG" ]
     }
     public_configs = [ ":audio_interface_config" ]
+    subsystem_name = "hdf"
+    part_name = "audio_device_driver"
   }
 } else {
   ohos_shared_library("hdi_audio_interface_lib_capture") {

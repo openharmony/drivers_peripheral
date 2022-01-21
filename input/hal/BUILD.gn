@@ -11,43 +11,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-} else {
-  import("//build/ohos.gni")
-}
+import("//build/ohos.gni")
 
 if (defined(ohos_lite)) {
-  HDF_FWKS = "//drivers/framework"
+  config("input_hdi_public_config") {
+    visibility = [ ":*" ]
+    include_dirs = [
+      "include",
+      "//drivers/peripheral/input/interfaces/include",
+      "//third_party/bounds_checking_function/include",
+      "//third_party/FreeBSD/sys/dev/evdev",
+    ]
+  }
 
-  shared_library("hdi_input") {
+  ohos_shared_library("hdi_input") {
+    output_extension = "z.so"
     sources = [
       "src/input_controller.c",
       "src/input_manager.c",
       "src/input_reporter.c",
     ]
 
-    include_dirs = [
-      "include",
-      "//drivers/peripheral/input/interfaces/include",
-      "//drivers/adapter/uhdf/posix/include",
-      "$HDF_FWKS/include/utils",
-      "$HDF_FWKS/include/osal",
-      "$HDF_FWKS/core/adapter/syscall/include",
-      "$HDF_FWKS/include/core",
-      "$HDF_FWKS/core/shared/include",
-      "$HDF_FWKS/utils/include",
-      "//third_party/bounds_checking_function/include",
-      "//third_party/FreeBSD/sys/dev/evdev",
-    ]
+    public_configs = [ ":input_hdi_public_config" ]
+    include_dirs = []
 
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/adapter/uhdf/manager:hdf_core",
-      "//drivers/adapter/uhdf/posix:hdf_posix_osal",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
-
+    external_deps = [ "device_driver_framework:libhdf_utils" ]
     defines = [ "__USER__" ]
 
     cflags = [
@@ -58,10 +50,14 @@ if (defined(ohos_lite)) {
       "-fno-common",
       "-fno-strict-aliasing",
     ]
-  }
 
-  lite_component("hdi") {
-    features = [ ":hdi_input" ]
+    subsystem_name = "hdf"
+
+    install_images = [
+      chipset_base_dir,
+      "updater",
+    ]
+    part_name = "input_device_driver"
   }
 } else {
   INPUT_ROOT_DIR = "//drivers/peripheral/input"

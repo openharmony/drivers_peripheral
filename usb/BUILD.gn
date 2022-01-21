@@ -13,7 +13,7 @@
 
 if (defined(ohos_lite)) {
   group("usb_entry") {
-    deps = [ "//drivers/peripheral/usb/sample/device/liteos:usbfn_sample" ]
+    deps = [ "//drivers/peripheral/usb/sample/device/liteos:usb_dev_test" ]
   }
   group("usb_test_entry") {
     deps = [

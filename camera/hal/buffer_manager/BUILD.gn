@@ -3,9 +3,7 @@
 import("../camera.gni")
 
 if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-  import("//drivers/adapter/uhdf/uhdf.gni")
-
+  import("//build/ohos.gni")
   config("buffer_manager_config") {
     visibility = [ ":*" ]
     cflags = [
@@ -34,7 +32,7 @@ if (defined(ohos_lite)) {
     ldflags += [ "--coverage" ]
   }
 
-  shared_library("camera_buffer_manager") {
+  ohos_shared_library("camera_buffer_manager") {
     sources = [
       "src/buffer_adapter/lite/buffer_adapter.cpp",
       "src/buffer_allocator.cpp",
@@ -54,8 +52,6 @@ if (defined(ohos_lite)) {
       "src/buffer_adapter/lite",
       "//utils/native/base/include",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
-      "//drivers/framework/include/utils",
-      "//drivers/adapter/uhdf2/osal/include",
       "//drivers/peripheral/display/interfaces/include",
       "//drivers/peripheral/base",
     ]
@@ -67,7 +63,11 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/display/hal:hdi_display",
       "//foundation/graphic/surface:surface",
     ]
+    external_deps = [ "device_driver_framework:libhdf_utils" ]
+
     public_configs = [ ":buffer_manager_config" ]
+    subsystem_name = "hdf"
+    part_name = "camera_device_driver"
   }
 } else {
   import("//build/ohos.gni")
