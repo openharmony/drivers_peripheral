@@ -45,9 +45,6 @@ extern "C" {
 #endif
 #endif /* __cplusplus */
 
-#define LIGHT_FLASH_NONE    0
-#define LIGHT_FLASH_TIMED   1
-
 /**
  * @brief Enumerates return values of the light module.
  *
@@ -71,15 +68,21 @@ enum LightType {
     LIGHT_TYPE_BUTT
 };
 
+enum LightFlashMode {
+    LIGHT_FLASH_NONE = 0,
+    LIGHT_FLASH_TIMED = 1,
+    LIGHT_FLASH_BUTT = 2,
+};
+
 struct LightFlashEffect {
-int32_t flashMode; // Flashing mode
-int32_t onTime; // enable duration unit: millisecond
-int32_t offTime; // enable duration unit: millisecond
+    int32_t flashMode; // Flashing mode @enum LightFlashMode
+    int32_t onTime; // enable duration unit: millisecond
+    int32_t offTime; // enable duration unit: millisecond
 };
 
 struct LightEffect {
-int32_t lightBrightness; // Brightness value, RGB highest bit represents the color RGB: R:16-31bit、G:8-15bit、B：0-7bit
-struct LightFlashEffect flashEffect; // @struct LightFlashEffect
+    int32_t lightBrightness; // Brightness value, RGB highest bit represents the color: R:16-31bit、G:8-15bit、B：0-7bit
+    struct LightFlashEffect flashEffect; // @struct LightFlashEffect
 };
 
 /**
