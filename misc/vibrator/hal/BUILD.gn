@@ -13,36 +13,31 @@
 #limitations under the License.
 #
 
-if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-} else {
-  import("//build/ohos.gni")
-}
+import("//build/ohos.gni")
 
 VIBRATRO_ROOT_DIR = "//drivers/peripheral/misc/vibrator"
 
 if (defined(ohos_lite)) {
-  FWK_ROOT_DIR = "//drivers/framework"
-  shared_library("hdi_vibrator") {
+  config("libhdi_vibrator_pub_config") {
+    visibility = [ ":*" ]
+    include_dirs = []
+  }
+  ohos_shared_library("hdi_vibrator") {
+    output_extension = "z.so"
+    public_configs = [ ":libhdi_vibrator_pub_config" ]
     sources = [ "$VIBRATRO_ROOT_DIR/hal/src/vibrator_controller.c" ]
 
     include_dirs = [
       "$VIBRATRO_ROOT_DIR/hal/include",
       "$VIBRATRO_ROOT_DIR/interfaces/include",
-      "$FWK_ROOT_DIR/include",
-      "$FWK_ROOT_DIR/include/utils",
-      "$FWK_ROOT_DIR/include/osal",
-      "$FWK_ROOT_DIR/include/core",
-      "//drivers/adapter/uhdf/posix/include",
       "//third_party/bounds_checking_function/include",
     ]
 
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/adapter/uhdf/manager:hdf_core",
-      "//drivers/adapter/uhdf/posix:hdf_posix_osal",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
+    external_deps = [ "device_driver_framework:libhdf_utils" ]
     public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
     cflags = [
@@ -53,10 +48,8 @@ if (defined(ohos_lite)) {
       "-fno-common",
       "-fno-strict-aliasing",
     ]
-  }
-
-  lite_component("hdi") {
-    features = [ ":hdi_vibrator" ]
+    subsystem_name = "hdf"
+    part_name = "vibrator_device_driver"
   }
 } else {
   config("libhdi_vibrator_pub_config") {

@@ -11,53 +11,51 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-} else {
-  import("//build/ohos.gni")
-}
+import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
 if (defined(ohos_lite)) {
-  executable("audio_sample_render") {
+  ohos_executable("audio_sample_render") {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
       "//utils/native/base/include",
       "//third_party/bounds_checking_function/include",
-      "$hdf_framework_path/include/utils",
-      "//drivers/adapter/khdf/liteos/osal/include",
     ]
 
     sources = [ "framework_render.c" ]
 
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-
+    external_deps = [ "device_driver_framework:libhdf_utils" ]
     defines = []
     if (enable_audio_device_mpi) {
       defines += [ "AUDIO_HAL_USER" ]
     }
+    install_enable = true
+    subsystem_name = "hdf"
+    part_name = "audio_device_driver"
   }
 
-  executable("audio_sample_capture") {
+  ohos_executable("audio_sample_capture") {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
       "//utils/native/base/include",
       "//third_party/bounds_checking_function/include",
-      "$hdf_framework_path/include/utils",
-      "//drivers/adapter/khdf/liteos/osal/include",
     ]
 
     sources = [ "framework_capture.c" ]
 
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-
+    external_deps = [ "device_driver_framework:libhdf_utils" ]
     defines = []
     if (enable_audio_device_mpi) {
       defines += [ "AUDIO_HAL_USER" ]
     }
+    install_enable = true
+    subsystem_name = "hdf"
+    part_name = "audio_device_driver"
   }
 } else {
   ohos_executable("audio_sample_render") {

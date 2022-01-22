@@ -3,7 +3,7 @@
 import("../camera.gni")
 
 if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
+  import("//build/ohos.gni")
   import("//drivers/adapter/uhdf/uhdf.gni")
 
   config("ohos_camera_demo_config") {
@@ -11,7 +11,7 @@ if (defined(ohos_lite)) {
     cflags_cc = [ "-std=c++17" ]
   }
 
-  executable("ohos_camera_demo") {
+  ohos_executable("ohos_camera_demo") {
     output_extension = "bin"
     sources = [
       "$camera_path/../interfaces/hdi_passthrough/callback/src/camera_device_callback.cpp",
@@ -60,24 +60,20 @@ if (defined(ohos_lite)) {
       "$camera_device_name_path/camera/camera_demo",
 
       # hcs parser
-      "//drivers/framework/include/osal",
-      "//drivers/framework/include/utils",
-      "//drivers/adapter/uhdf2/osal/include",
       "//system/core/include/cutils",
-      "$hdf_uhdf_path/manager/include",
-      "$hdf_uhdf_path/include/hdi",
-      "$hdf_uhdf_path/devhost/include",
-      "$hdf_uhdf_path/devmgr/include",
-      "$hdf_uhdf_path/host/include",
     ]
 
     deps = [
       "$camera_path/hdi_impl:camera_hdi_impl",
       "$camera_path/utils/metadata:metadata_lite",
-      "$hdf_uhdf_path/utils:libhdf_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//foundation/graphic/surface:surface",
     ]
+    external_deps = [ "device_driver_framework:libhdf_utils" ]
+    public_configs = [ ":ohos_camera_demo_config" ]
+    install_enable = true
+    subsystem_name = "hdf"
+    part_name = "camera_device_driver"
   }
 } else {
   import("//build/ohos.gni")

@@ -12,20 +12,26 @@
 # limitations under the License.
 
 import("//drivers/adapter/uhdf2/hdi.gni")
+if (defined(ohos_lite)) {
+  group("libsensor_proxy_1.0") {
+    deps = []
+    public_configs = []
+  }
+} else {
+  hdi("sensor") {
+    package = "hdi.sensor.v1_0"
 
-hdi("sensor") {
-  package = "hdi.sensor.v1_0"
+    module_name = "sensor_service"
 
-  module_name = "sensor_service"
+    sources = [
+      "ISensorCallback.idl",
+      "ISensorInterface.idl",
+      "SensorTypes.idl",
+    ]
 
-  sources = [
-    "ISensorCallback.idl",
-    "ISensorInterface.idl",
-    "SensorTypes.idl",
-  ]
+    language = "cpp"
 
-  language = "cpp"
-
-  subsystem_name = "hdf"
-  part_name = "sensor_device_driver"
+    subsystem_name = "hdf"
+    part_name = "sensor_device_driver"
+  }
 }

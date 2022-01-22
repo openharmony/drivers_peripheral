@@ -24,93 +24,99 @@ config("gralloc_client_public_config") {
     #    "//third_party/bounds_checking_function/include",
   ]
 }
-
-group("hdi_gralloc_client") {
-  deps = [
-    ":libhdi_display_gralloc_client",
-    ":libhdi_display_gralloc_proxy",
-    ":libhdi_mapper_adapter",
-  ]
-  public_configs = [ ":gralloc_client_public_config" ]
-}
-
-ohos_shared_library("libhdi_display_gralloc_client") {
-  include_dirs = [
-    "//drivers/peripheral/base",
-    "//drivers/peripheral/display/interfaces/include",
-    "//drivers/peripheral/display/hdi_service/gralloc/include",
-  ]
-  sources = [ "display_gralloc_client.cpp" ]
-  deps = [
-    ":libhdi_display_gralloc_proxy",
-    ":libhdi_mapper_adapter",
-    "//utils/native/base:utils",
-  ]
-
-  if (is_standard_system) {
-    external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_ipc_adapter",
-      "device_driver_framework:libhdf_utils",
-      "device_driver_framework:libhdi",
-      "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
-    ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
+if (defined(ohos_lite)) {
+  group("hdi_gralloc_client") {
+    deps = []
+    public_configs = []
   }
-  install_images = [ chipset_base_dir ]
-  subsystem_name = "hdf"
-  part_name = "display_device_driver"
-}
-
-ohos_shared_library("libhdi_display_gralloc_proxy") {
-  include_dirs = [
-    "//drivers/peripheral/base",
-    "//drivers/peripheral/display/interfaces/include",
-    "//drivers/peripheral/display/hdi_service/gralloc/include",
-  ]
-  sources = [ "allocator_proxy.cpp" ]
-  deps = [
-    "//foundation/graphic/standard/utils:buffer_handle",
-    "//utils/native/base:utils",
-  ]
-
-  if (is_standard_system) {
-    external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_ipc_adapter",
-      "device_driver_framework:libhdf_utils",
-      "device_driver_framework:libhdi",
-      "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+} else {
+  group("hdi_gralloc_client") {
+    deps = [
+      ":libhdi_display_gralloc_client",
+      ":libhdi_display_gralloc_proxy",
+      ":libhdi_mapper_adapter",
     ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
+    public_configs = [ ":gralloc_client_public_config" ]
   }
-  install_images = [ chipset_base_dir ]
-  subsystem_name = "hdf"
-  part_name = "display_device_driver"
-}
 
-ohos_shared_library("libhdi_mapper_adapter") {
-  include_dirs = [
-    "//drivers/peripheral/base",
-    "//drivers/peripheral/display/interfaces/include",
-  ]
-
-  sources = [ "mapper_adapter.cpp" ]
-  deps = [ "//drivers/peripheral/display/hal:hdi_display_gralloc" ]
-
-  if (is_standard_system) {
-    external_deps = [
-      "device_driver_framework:libhdf_utils",
-      "hiviewdfx_hilog_native:libhilog",
+  ohos_shared_library("libhdi_display_gralloc_client") {
+    include_dirs = [
+      "//drivers/peripheral/base",
+      "//drivers/peripheral/display/interfaces/include",
+      "//drivers/peripheral/display/hdi_service/gralloc/include",
     ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
+    sources = [ "display_gralloc_client.cpp" ]
+    deps = [
+      ":libhdi_display_gralloc_proxy",
+      ":libhdi_mapper_adapter",
+      "//utils/native/base:utils",
+    ]
+
+    if (is_standard_system) {
+      external_deps = [
+        "device_driver_framework:libhdf_host",
+        "device_driver_framework:libhdf_ipc_adapter",
+        "device_driver_framework:libhdf_utils",
+        "device_driver_framework:libhdi",
+        "hiviewdfx_hilog_native:libhilog",
+        "ipc:ipc_core",
+      ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "display_device_driver"
   }
-  install_images = [ chipset_base_dir ]
-  subsystem_name = "hdf"
-  part_name = "display_device_driver"
+
+  ohos_shared_library("libhdi_display_gralloc_proxy") {
+    include_dirs = [
+      "//drivers/peripheral/base",
+      "//drivers/peripheral/display/interfaces/include",
+      "//drivers/peripheral/display/hdi_service/gralloc/include",
+    ]
+    sources = [ "allocator_proxy.cpp" ]
+    deps = [
+      "//foundation/graphic/standard/utils:buffer_handle",
+      "//utils/native/base:utils",
+    ]
+
+    if (is_standard_system) {
+      external_deps = [
+        "device_driver_framework:libhdf_host",
+        "device_driver_framework:libhdf_ipc_adapter",
+        "device_driver_framework:libhdf_utils",
+        "device_driver_framework:libhdi",
+        "hiviewdfx_hilog_native:libhilog",
+        "ipc:ipc_core",
+      ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "display_device_driver"
+  }
+
+  ohos_shared_library("libhdi_mapper_adapter") {
+    include_dirs = [
+      "//drivers/peripheral/base",
+      "//drivers/peripheral/display/interfaces/include",
+    ]
+
+    sources = [ "mapper_adapter.cpp" ]
+    deps = [ "//drivers/peripheral/display/hal:hdi_display_gralloc" ]
+
+    if (is_standard_system) {
+      external_deps = [
+        "device_driver_framework:libhdf_utils",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "display_device_driver"
+  }
 }

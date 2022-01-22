@@ -1,7 +1,7 @@
 # Copyright (c) Huawei Technologies Co., Ltd. 2021. All rights reserved.
 
 if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
+  import("//build/ohos.gni")
   import("//drivers/adapter/uhdf/uhdf.gni")
   import("//drivers/peripheral/camera/hal/camera.gni")
   config("utils_config") {
@@ -33,17 +33,15 @@ if (defined(ohos_lite)) {
     cflags_cc = [ "-std=c++17" ]
   }
 
-  shared_library("camera_utils") {
+  ohos_shared_library("camera_utils") {
     sources = [ "watchdog/watchdog.cpp" ]
-    include_dirs = [
-      "watchdog",
-      "//drivers/framework/include/utils",
-      "//drivers/adapter/uhdf2/osal/include",
-    ]
+    include_dirs = [ "watchdog" ]
     libs = []
     defines = []
     deps = []
     public_configs = [ ":utils_config" ]
+    subsystem_name = "hdf"
+    part_name = "camera_device_driver"
   }
 } else {
   import("//build/ohos.gni")
@@ -77,11 +75,7 @@ if (defined(ohos_lite)) {
   }
   ohos_shared_library("camera_utils") {
     sources = [ "watchdog/watchdog.cpp" ]
-    include_dirs = [
-      "watchdog",
-      "//drivers/framework/include/utils",
-      "//drivers/adapter/uhdf2/osal/include",
-    ]
+    include_dirs = [ "watchdog" ]
     libs = []
     defines = []
     deps = []

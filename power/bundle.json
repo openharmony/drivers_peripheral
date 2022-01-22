@@ -1,6 +1,8 @@
 {
     "name": "power_device_driver",
     "description": "power_hdf",
+    "version": "3.1",
+    "license": "Apache License 2.0",
     "component": {
       "name": "power_device_driver",
       "subsystem": "hdf",
@@ -10,9 +12,9 @@
       "ram": "1000KB",
       "deps": {
         "components": [
-          "libhdf_utils",
-          "libhilog",
-          "ipc_core"
+          "device_driver_framework",
+          "hiviewdfx_hilog_native",
+          "ipc"
         ],
         "third_part": [
           "xml2"
