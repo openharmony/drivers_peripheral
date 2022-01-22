@@ -12,11 +12,11 @@
 # limitations under the License.
 
 if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
+  import("//build/ohos.gni")
   import("//drivers/adapter/uhdf/uhdf.gni")
   import("//drivers/peripheral/camera/hal/camera.gni")
 
-  shared_library("metadata_lite") {
+  ohos_shared_library("metadata_lite") {
     sources = [
       "src/camera_metadata_info.cpp",
       "src/camera_metadata_operator.cpp",
@@ -28,5 +28,7 @@ if (defined(ohos_lite)) {
     cflags_cc = cflags
     include_dirs = [ "include" ]
     deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
+    subsystem_name = "hdf"
+    part_name = "camera_device_driver"
   }
 }

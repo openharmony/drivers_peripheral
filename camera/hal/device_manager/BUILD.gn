@@ -2,7 +2,13 @@
 import("//drivers/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/camera/hal/camera.gni")
 
-group("camera_device_manager") {
-  public_deps = []
-  public_deps += [ "${camera_device_manager_deps}" ]
+if (defined(ohos_lite)) {
+  group("camera_device_manager") {
+    public_deps = []
+  }
+} else {
+  group("camera_device_manager") {
+    public_deps = []
+    public_deps += [ "${camera_device_manager_deps}" ]
+  }
 }

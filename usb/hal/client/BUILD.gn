@@ -17,28 +17,34 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 config("usbd_client_public_config") {
   include_dirs = [ "include" ]
 }
+if (defined(ohos_lite)) {
+  group("usbd_client") {
+    deps = []
+    public_configs = []
+  }
+} else {
+  ohos_shared_library("usbd_client") {
+    sources = [
+      "src/usbd_client.cpp",
+      "src/usbd_subscriber.cpp",
+    ]
 
-ohos_shared_library("usbd_client") {
-  sources = [
-    "src/usbd_client.cpp",
-    "src/usbd_subscriber.cpp",
-  ]
+    configs = []
 
-  configs = []
+    public_configs = [ ":usbd_client_public_config" ]
 
-  public_configs = [ ":usbd_client_public_config" ]
+    deps = [ "//utils/native/base:utils" ]
 
-  deps = [ "//utils/native/base:utils" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+    ]
 
-  external_deps = [
-    "device_driver_framework:libhdf_host",
-    "device_driver_framework:libhdf_utils",
-    "device_driver_framework:libhdi",
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
-  ]
-
-  install_images = [ chipset_base_dir ]
-  subsystem_name = "hdf"
-  part_name = "usb_device_driver"
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "usb_device_driver"
+  }
 }
