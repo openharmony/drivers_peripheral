@@ -58,15 +58,7 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
         "//drivers/peripheral/audio/hal/hdi_passthrough/include",
         "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
         "//drivers/peripheral/audio/hal/hdi_binder/server/include",
-        "$hdf_framework_path/core/sec/include",
-        "$hdf_framework_path/core/shared/include",
-        "$hdf_framework_path/core/host/include",
-        "$hdf_framework_path/core/manager/include",
-        "$hdf_framework_path/core/common/include/host/",
         "//third_party/bounds_checking_function/include",
-        "//drivers/adapter/khdf/liteos/osal/include",
-        "//drivers/adapter/uhdf2/shared/include",
-        "//drivers/adapter/uhdf2/include/hdi/",
       ]
 
       sources = [
@@ -109,10 +101,7 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
         "src/hdf_audio_server_render.c",
       ]
 
-      deps = [
-        "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
-        "//utils/native/base:utils",
-      ]
+      deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
 
       defines = []
       if (enable_audio_device_mpi) {
@@ -125,6 +114,7 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
           "device_driver_framework:libhdf_utils",
           "device_driver_framework:libhdi",
           "hiviewdfx_hilog_native:libhilog",
+          "utils_base:utils",
         ]
       } else {
         external_deps = [ "hilog:libhilog" ]

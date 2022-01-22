@@ -41,7 +41,6 @@ ohos_unittest("hdf_sensor_hdi_test_performance") {
 
   deps = [
     "//drivers/peripheral/sensor/interfaces/hdi/sensor/v1_0:libsensor_proxy",
-    "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
@@ -49,6 +48,7 @@ ohos_unittest("hdf_sensor_hdi_test_performance") {
       "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

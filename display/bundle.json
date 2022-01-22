@@ -48,6 +48,20 @@
           }
         },
         {
+          "name": "//drivers/peripheral/display/hal:hdi_display_gralloc",
+            "header": {
+              "header_files": [
+                "display_device.h",
+                "display_gfx.h",
+                "display_gralloc.h",
+                "display_layer.h",
+                "display_type.h",
+                "display_vgu.h"
+              ],
+              "header_base": "//drivers/peripheral/display/interfaces/include"
+          }
+        },
+        {
           "name": "//drivers/peripheral/display/hal:hdi_display",
             "header": {
               "header_files": [

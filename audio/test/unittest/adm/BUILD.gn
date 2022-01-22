@@ -36,7 +36,7 @@ ohos_unittest("hdf_audio_adm_test") {
     "//drivers/framework/model/audio/core/test/unittest/common/audio_parse_test.cpp",
     "//drivers/framework/model/audio/sapm/test/unittest/common/audio_sapm_test.cpp",
   ]
-  deps = [ "//utils/native/base:utils" ]
+
   cflags = [
     "-Wall",
     "-Wextra",
@@ -50,6 +50,7 @@ ohos_unittest("hdf_audio_adm_test") {
       "device_driver_framework:libhdf_test_common",
       "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

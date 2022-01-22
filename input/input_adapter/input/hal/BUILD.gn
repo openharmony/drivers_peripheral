@@ -31,10 +31,6 @@ ohos_shared_library("hdi_input") {
     "//third_party/FreeBSD/sys/dev/evdev",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
-  deps = [
-    "//drivers/adapter/uhdf2/osal:libhdf_utils",
-    "//utils/native/base:utils",
-  ]
 
   cflags = [
     "-Wall",
@@ -45,8 +41,10 @@ ohos_shared_library("hdi_input") {
 
   if (is_standard_system) {
     external_deps = [
+      "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [

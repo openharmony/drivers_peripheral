@@ -32,8 +32,6 @@ ohos_static_library("disp_hdi_test_common") {
   sources = [ "common/display_test_utils.cpp" ]
   include_dirs = [
     "include",
-    "//utils/native/base/include",
-    "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
     "//drivers/peripheral/display/interfaces/include",
     "//drivers/peripheral/base",
   ]
@@ -42,8 +40,11 @@ ohos_static_library("disp_hdi_test_common") {
     "-DGRALLOC_GBM_SUPPORT",
     "-Wno-macro-redefined",
   ]
-  deps = [ "//utils/native/base:utils" ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "utils_base:utils",
+  ]
 }
 
 ohos_unittest("gralloctest") {
@@ -52,19 +53,19 @@ ohos_unittest("gralloctest") {
   deps = [
     "//drivers/peripheral/display/hal/default_standard:def_display_gralloc",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
   include_dirs = [
     "common",
     "//drivers/peripheral/display/hal/default_standard/include",
     "//drivers/peripheral/display/hal/default_standard/src/display_gralloc",
     "//drivers/peripheral/display/interfaces/include",
-    "//drivers/framework/include/utils",
-    "//utils/native/base/include",
     "//drivers/peripheral/base",
     "//drivers/peripheral/display/interfaces/include",
-    "//drivers/framework/include/utils",
     "//foundation/graphic/standard/utils/include",
+  ]
+  external_deps = [
+    "device_driver_framework:libhdf_utils",
+    "utils_base:utils",
   ]
 }
 
@@ -77,16 +78,17 @@ ohos_unittest("gfxtest") {
   deps = [
     "//drivers/peripheral/display/hal/default_standard:def_display_gralloc",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
   include_dirs = [
     "common",
     "//foundation/graphic/standard/utils/include",
     "//drivers/hdf/interfaces/display/include",
-    "//utils/native/base/include",
     "//drivers/peripheral/display/interfaces/include",
-    "//drivers/framework/include/utils",
     "//drivers/peripheral/base",
+  ]
+  external_deps = [
+    "device_driver_framework:libhdf_utils",
+    "utils_base:utils",
   ]
 }
 
@@ -104,18 +106,17 @@ ohos_unittest("devicetest") {
     "//drivers/peripheral/display/hal/default_standard:def_display_device",
     "//drivers/peripheral/display/hal/default_standard:def_display_gralloc",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
   include_dirs = [
     "common",
     "//drivers/peripheral/display/interfaces/include",
     "//drivers/peripheral/base",
-    "//drivers/framework/include/utils",
-    "//drivers/adapter/uhdf2/osal/include",
-    "//utils/native/base/include",
-    "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
     ".",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "device_driver_framework:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "utils_base:utils",
+  ]
   cflags = [ "-Wno-unused-function" ]
 }

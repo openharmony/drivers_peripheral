@@ -19,9 +19,6 @@ config("gralloc_client_public_config") {
     "//drivers/peripheral/base",
     "//drivers/peripheral/display/interfaces/include",
     "//drivers/peripheral/display/hdi_service/gralloc/include",
-
-    #    "//drivers/adapter/uhdf2/include/hdi",
-    #    "//third_party/bounds_checking_function/include",
   ]
 }
 if (defined(ohos_lite)) {
@@ -49,7 +46,6 @@ if (defined(ohos_lite)) {
     deps = [
       ":libhdi_display_gralloc_proxy",
       ":libhdi_mapper_adapter",
-      "//utils/native/base:utils",
     ]
 
     if (is_standard_system) {
@@ -60,6 +56,7 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdi",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_core",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -76,10 +73,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/display/hdi_service/gralloc/include",
     ]
     sources = [ "allocator_proxy.cpp" ]
-    deps = [
-      "//foundation/graphic/standard/utils:buffer_handle",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//foundation/graphic/standard/utils:buffer_handle" ]
 
     if (is_standard_system) {
       external_deps = [
@@ -89,6 +83,7 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdi",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_core",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

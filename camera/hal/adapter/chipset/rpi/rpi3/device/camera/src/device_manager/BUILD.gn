@@ -49,27 +49,26 @@ ohos_shared_library("camera_device_manager") {
   ]
 
   include_dirs = [
-    "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
     "$camera_path/include",
     "$camera_path/utils/event",
     "$camera_path/device_manager/include",
     "$camera_device_name_path/camera/include/device_manager",
     "$camera_path/adapter/platform/v4l2/src/device_manager/include",
     "$camera_path/adapter/platform/v4l2/src/driver_adapter/include/",
-    "//utils/native/base/include",
-    "//drivers/framework/include/utils",
-    "//drivers/adapter/uhdf2/osal/include",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
   ]
 
   deps = [
     "$camera_path/adapter/platform/v4l2/src/driver_adapter:camera_v4l2_adapter",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
-    "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "utils_base:utils",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

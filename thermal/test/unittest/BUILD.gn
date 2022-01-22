@@ -22,8 +22,6 @@ ohos_unittest("hdi_unittest_thermal") {
 
   include_dirs = [
     "//drivers/peripheral/thermal/interfaces",
-    "//drivers/adapter/uhdf2/include/hdi",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//drivers/peripheral/thermal/interfaces/include/",
   ]
 
@@ -39,15 +37,17 @@ ohos_unittest("hdi_unittest_thermal") {
   ]
 
   deps = [
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_proxy_1.0",
     "//drivers/peripheral/thermal/interfaces/hdi_callback:libthermal_callback",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+      "utils_base:utils",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

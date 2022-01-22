@@ -31,8 +31,6 @@ ohos_shared_library("bluetooth_hdi_client") {
     "$root_path/ohos/hardware/bt/v1_0/client/bt_hci_proxy.cpp",
   ]
 
-  deps = [ "//utils/native/base:utils" ]
-
   if (is_standard_system) {
     external_deps = [
       "device_driver_framework:libhdf_host",
@@ -41,6 +39,7 @@ ohos_shared_library("bluetooth_hdi_client") {
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [
@@ -74,8 +73,6 @@ ohos_shared_library("bluetooth_hdi_server") {
     "$root_path/ohos/hardware/bt/v1_0/server/implement/vendor_interface.cpp",
   ]
 
-  deps = [ "//utils/native/base:utils" ]
-
   if (is_standard_system) {
     external_deps = [
       "device_driver_framework:libhdf_host",
@@ -84,6 +81,7 @@ ohos_shared_library("bluetooth_hdi_server") {
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [

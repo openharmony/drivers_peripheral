@@ -22,17 +22,10 @@ ohos_static_library("def_display_layer") {
   include_dirs = [
     "//drivers/peripheral/display/hal",
     "//drivers/peripheral/display/interfaces/include",
-    "//drivers/adapter/uhdf/posix/include",
-    "//drivers/framework/include/utils",
-    "//drivers/framework/utils/include",
-    "//drivers/framework/include/core",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
   ]
-  deps = [
-    "//drivers/adapter/uhdf/manager:hdf_core",
-    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
-    "//third_party/bounds_checking_function:libsec_shared",
-  ]
+  deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+  external_deps = [ "device_driver_framework:libhdf_utils" ]
   defines = [ "__USER__" ]
   cflags = [
     "-Wall",
@@ -53,15 +46,11 @@ ohos_shared_library("def_display_gralloc") {
     "//drivers/peripheral/display/hal",
     "//drivers/drivers/peripheral/display/hal",
     "//drivers/peripheral/display/interfaces/include",
-    "//drivers/framework/include/utils",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-    "//drivers/adapter/uhdf/posix/include",
   ]
 
-  deps = [
-    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
-    "//third_party/bounds_checking_function:libsec_shared",
-  ]
+  deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+  external_deps = [ "device_driver_framework:libhdf_utils" ]
   cflags = [
     "-Wall",
     "-Wextra",
@@ -80,15 +69,11 @@ ohos_shared_library("def_display_gfx") {
   include_dirs = [
     "//drivers/peripheral/display/hal",
     "//drivers/peripheral/display/interfaces/include",
-    "//drivers/framework/include/utils",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-    "//drivers/adapter/uhdf/posix/include",
   ]
 
-  deps = [
-    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
-    "//third_party/bounds_checking_function:libsec_shared",
-  ]
+  deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+  external_deps = [ "device_driver_framework:libhdf_utils" ]
   cflags = [
     "-Wall",
     "-Wextra",

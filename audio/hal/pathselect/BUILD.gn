@@ -85,8 +85,6 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
     ]
 
-    deps = [ "//utils/native/base:utils" ]
-
     defines = []
     if (enable_audio_hal_hdf_log) {
       defines += [ "AUDIO_HAL_HDF_LOG" ]
@@ -99,6 +97,7 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdf_utils",
         "device_driver_framework:libhdi",
         "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
