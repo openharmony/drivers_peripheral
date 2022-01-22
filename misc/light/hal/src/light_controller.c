@@ -86,7 +86,7 @@ static int32_t ReadLightInfo(struct HdfSBuf *reply, struct LightDevice *priv)
 
     pos = priv->lightInfoEntry;
 
-    for (int i = 0; i < priv->lightNum; ++i) {
+    for (uint32_t i = 0; i < priv->lightNum; ++i) {
         if (!HdfSbufReadBuffer(reply, (const void **)&buf, &len)) {
             return HDF_FAILURE;
         }
@@ -168,14 +168,17 @@ static int32_t ValidityJudgment(uint32_t type, struct LightEffect *effect)
 
 static int32_t OnLight(uint32_t type, struct LightEffect *effect)
 {
+    int32_t ret;
+
     if (effect == NULL) {
         HDF_LOGE("%{public}s: effect is NULL", __func__);
         return HDF_FAILURE;
     }
 
-    if (ValidityJudgment(type, effect)) {
+    ret = ValidityJudgment(type, effect);
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: effect is false", __func__);
-        return HDF_FAILURE;
+        return ret;
     }
 
     struct LightDevice *priv = GetLightDevicePriv();
@@ -209,7 +212,7 @@ static int32_t OnLight(uint32_t type, struct LightEffect *effect)
         return HDF_FAILURE;
     }
 
-    int32_t ret = SendLightMsg(LIGHT_IO_CMD_OPS, msg, NULL);
+    ret = SendLightMsg(LIGHT_IO_CMD_OPS, msg, NULL);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Light enable failed, ret[%{public}d]", __func__, ret);
     }

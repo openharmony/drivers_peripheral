@@ -18,7 +18,7 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 module_output_path = "hdf/misc"
 ohos_unittest("hdf_unittest_hdi_light") {
   module_out_path = module_output_path
-  include_dirs = []
+  include_dirs = [ "//drivers/peripheral/misc/light/interfaces/include" ]
 
   sources = [ "hdf_light_hdi_test.cpp" ]
   cflags = [
