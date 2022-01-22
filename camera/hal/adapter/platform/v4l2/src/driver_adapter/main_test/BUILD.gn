@@ -47,15 +47,14 @@ ohos_executable("v4l2_main") {
   include_dirs = [
     "$camera_device_name_path/camera/src/driver_adapter/main_test",
     "$camera_path/include",
-    "//drivers/adapter/uhdf2/osal/include",
-    "//drivers/framework/include/utils",
     "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter/include",
-    "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
-    "//utils/native/base/include",
   ]
 
-  deps = [ "//utils/native/base:utils" ]
-
+  external_deps = [
+    "device_driver_framework:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "utils_base:utils",
+  ]
   defines += [ "V4L2_MAIN_TEST" ]
 
   install_enable = true

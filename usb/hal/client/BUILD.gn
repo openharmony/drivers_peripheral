@@ -33,14 +33,13 @@ if (defined(ohos_lite)) {
 
     public_configs = [ ":usbd_client_public_config" ]
 
-    deps = [ "//utils/native/base:utils" ]
-
     external_deps = [
       "device_driver_framework:libhdf_host",
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "utils_base:utils",
     ]
 
     install_images = [ chipset_base_dir ]

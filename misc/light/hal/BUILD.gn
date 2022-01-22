@@ -29,44 +29,11 @@ if (defined(ohos_lite)) {
       "$FWK_ROOT_DIR/include/utils",
       "$FWK_ROOT_DIR/include/osal",
       "$FWK_ROOT_DIR/include/core",
-      "//drivers/adapter/uhdf/posix/include",
       "//third_party/bounds_checking_function/include",
     ]
 
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/adapter/uhdf/manager:hdf_core",
-      "//drivers/adapter/uhdf/posix:hdf_posix_osal",
-      "//third_party/bounds_checking_function:libsec_shared",
-    ]
+    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-
-    cflags = [
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-fsigned-char",
-      "-fno-common",
-      "-fno-strict-aliasing",
-    ]
-    subsystem_name = "hdf"
-    part_name = "light_device_driver"
-  }
-} else {
-  config("libhdi_light_pub_config") {
-    visibility = [ ":*" ]
-    include_dirs = [ "$LIGHT_ROOT_DIR/interfaces/include" ]
-  }
-  ohos_shared_library("hdi_light") {
-    public_configs = [ ":libhdi_light_pub_config" ]
-    sources = [ "$LIGHT_ROOT_DIR/hal/src/light_controller.c" ]
-
-    include_dirs = [
-      "$LIGHT_ROOT_DIR/hal/include",
-      "//third_party/bounds_checking_function/include",
-    ]
-
-    deps = [ "//utils/native/base:utils" ]
 
     cflags = [
       "-Wall",
@@ -82,6 +49,41 @@ if (defined(ohos_lite)) {
       external_deps = [
         "device_driver_framework:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
+      ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+  }
+} else {
+  config("libhdi_light_pub_config") {
+    visibility = [ ":*" ]
+    include_dirs = [ "$LIGHT_ROOT_DIR/interfaces/include" ]
+  }
+  ohos_shared_library("hdi_light") {
+    public_configs = [ ":libhdi_light_pub_config" ]
+    sources = [ "$LIGHT_ROOT_DIR/hal/src/light_controller.c" ]
+
+    include_dirs = [
+      "$LIGHT_ROOT_DIR/hal/include",
+      "//third_party/bounds_checking_function/include",
+    ]
+
+    cflags = [
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fsigned-char",
+      "-fno-common",
+      "-fno-strict-aliasing",
+    ]
+    subsystem_name = "hdf"
+    part_name = "light_device_driver"
+    if (is_standard_system) {
+      external_deps = [
+        "device_driver_framework:libhdf_utils",
+        "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

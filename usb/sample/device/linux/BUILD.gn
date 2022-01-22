@@ -32,8 +32,6 @@ ohos_executable("usb_dev_test") {
     "usb_dev_test.c",
   ]
 
-  deps = [ "//utils/native/base:utils" ]
-
   if (is_standard_system) {
     external_deps = [
       "device_driver_framework:libhdf_host",
@@ -41,6 +39,7 @@ ohos_executable("usb_dev_test") {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

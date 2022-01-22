@@ -39,13 +39,12 @@ ohos_shared_library("libusb_ddk_host") {
     "host/src/usb_raw_api_library.c",
   ]
 
-  deps = [ "//utils/native/base:utils" ]
-
   if (is_standard_system) {
     external_deps = [
       "device_driver_framework:libhdf_host",
       "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -63,13 +62,12 @@ ohos_shared_library("libusb_pnp_manager") {
     "host/src/usb_pnp_manager.c",
   ]
 
-  deps = [ "//utils/native/base:utils" ]
-
   if (is_standard_system) {
     external_deps = [
       "device_driver_framework:libhdf_host",
       "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -96,13 +94,12 @@ ohos_shared_library("libusb_ddk_device") {
     "device/src/usbfn_sdk_if.c",
   ]
 
-  deps = [ "//utils/native/base:utils" ]
-
   if (is_standard_system) {
     external_deps = [
       "device_driver_framework:libhdf_host",
       "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

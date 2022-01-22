@@ -60,10 +60,12 @@ if (defined(ohos_lite)) {
     defines = []
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/peripheral/display/hal:hdi_display",
       "//foundation/graphic/surface:surface",
     ]
-    external_deps = [ "device_driver_framework:libhdf_utils" ]
+    external_deps = [
+      "device_driver_framework:libhdf_utils",
+      "display_device_driver:hdi_display",
+    ]
 
     public_configs = [ ":buffer_manager_config" ]
     subsystem_name = "hdf"
@@ -133,12 +135,6 @@ if (defined(ohos_lite)) {
 
     defines = []
 
-    deps = [
-      "//drivers/peripheral/display/hal:hdi_display_gralloc",
-      "//foundation/graphic/standard:libsurface",
-      "//utils/native/base:utils",
-    ]
-
     if (enable_camera_device_utest) {
       defines += [ "CAMERA_DEVICE_UTEST" ]
     }
@@ -146,7 +142,10 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "device_driver_framework:libhdf_utils",
+        "display_device_driver:hdi_display_gralloc",
+        "graphic_standard:surface",
         "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

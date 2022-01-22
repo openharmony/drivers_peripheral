@@ -196,7 +196,6 @@ if (defined(ohos_lite)) {
       "$camera_path/hdi_impl/include/offline_stream_operator",
       "$camera_path/device_manager/include/",
       "$camera_path/device_manager/include/mpi",
-      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/utils/event",
       "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
 
@@ -227,12 +226,10 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/hdi_impl:camera_hdi_impl",
       "$camera_path/pipeline_core:camera_pipeline_core",
-      "//foundation/graphic/standard:libsurface",
       "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest",
       "//third_party/googletest:gtest_main",
-      "//utils/native/base:utils",
     ]
 
     if (is_standard_system) {
@@ -241,8 +238,10 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdf_ipc_adapter",
         "device_driver_framework:libhdf_utils",
         "device_driver_framework:libhdi",
+        "graphic_standard:surface",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_core",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

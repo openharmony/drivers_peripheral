@@ -29,10 +29,7 @@ ohos_shared_library("libusbhost_ecm") {
     "include",
   ]
 
-  deps = [
-    "//drivers/peripheral/usb/ddk:libusb_core",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//drivers/peripheral/usb/ddk:libusb_core" ]
 
   if (is_standard_system) {
     external_deps = [
@@ -40,6 +37,7 @@ ohos_shared_library("libusbhost_ecm") {
       "device_driver_framework:libhdf_ipc_adapter",
       "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

@@ -82,16 +82,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
-      "//drivers/adapter/uhdf2/include/hdi",
-      "//drivers/adapter/uhdf2/shared/include",
-      "//drivers/framework/include/core",
-      "//drivers/framework/include/utils",
-      "//utils/native/base/include",
-      "//drivers/framework/include/osal",
-      "//drivers/framework/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/framework/utils/include",
-      "//drivers/adapter/uhdf2/osal/include",
       "//drivers/peripheral/audio/test/systemtest/common/lib_common/include",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//drivers/peripheral/audio/test/systemtest/adm_interface_lib/render/include",
@@ -108,7 +99,10 @@ if (defined(ohos_lite)) {
     deps = [
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
-      "//utils/native/base:utils",
+    ]
+    external_deps = [
+      "device_driver_framework:libhdf_utils",
+      "utils_base:utils",
     ]
     defines = []
     if (enable_audio_adm_so) {

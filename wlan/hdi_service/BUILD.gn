@@ -34,7 +34,6 @@ ohos_shared_library("wifi_hdi_device") {
   deps = [
     "//drivers/peripheral/wlan/client:wifi_driver_client",
     "//drivers/peripheral/wlan/hal:wifi_hal",
-    "//utils/native/base:utils",
   ]
 
   defines = [ "__OHOS__USER__" ]
@@ -59,6 +58,7 @@ ohos_shared_library("wifi_hdi_device") {
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -85,7 +85,6 @@ ohos_shared_library("wifi_hdi_c_device") {
   deps = [
     "//drivers/peripheral/wlan/client:wifi_driver_client",
     "//drivers/peripheral/wlan/hal:wifi_hal",
-    "//utils/native/base:utils",
   ]
 
   defines = [ "__OHOS__USER__" ]
@@ -110,6 +109,7 @@ ohos_shared_library("wifi_hdi_c_device") {
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

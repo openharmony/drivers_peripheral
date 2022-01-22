@@ -23,13 +23,12 @@ ohos_shared_library("libhdf_input_hotplug") {
   ]
   sources = [ "hotplug.c" ]
 
-  deps = [ "//utils/native/base:utils" ]
-
   if (is_standard_system) {
     external_deps = [
       "device_driver_framework:libhdf_host",
       "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

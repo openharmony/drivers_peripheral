@@ -97,7 +97,6 @@ ohos_shared_library("camera_pipeline_core") {
     "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/v4l2_source_node",
     "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/uvc_node",
     "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter/include/",
-    "//utils/native/base/include",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
 
     # hcs parser
@@ -108,16 +107,15 @@ ohos_shared_library("camera_pipeline_core") {
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
-
-    # hcs parser
-    "//foundation/graphic/standard:libsurface",
   ]
 
   if (is_standard_system) {
     external_deps = [
       "device_driver_framework:libhdf_utils",
+      "graphic_standard:surface",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -142,11 +140,8 @@ config("example_config") {
 ohos_shared_library("camera_ipp_algo_example") {
   sources = [ "$camera_device_name_path/camera/src/pipeline_core/ipp_algo_example/ipp_algo_example.c" ]
 
-  include_dirs = [
-    "$camera_path/pipeline_core/ipp/include",
-    "//utils/native/base/include",
-  ]
-  deps = [ "//utils/native/base:utils" ]
+  include_dirs = [ "$camera_path/pipeline_core/ipp/include" ]
+  external_deps = [ "utils_base:utils" ]
   public_configs = [ ":example_config" ]
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"

@@ -18,7 +18,6 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 ohos_unittest("codec_config_test") {
   module_out_path = "hdf/codec"
   include_dirs = [
-    "//drivers/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/config/capability_config/include",
     "//drivers/peripheral/codec/hal/config/common/include",
@@ -38,16 +37,16 @@ ohos_unittest("codec_config_test") {
     "-fno-strict-aliasing",
   ]
 
-  deps = [
-    "//drivers/adapter/uhdf2/hdi:libhdi",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "//third_party/googletest:gtest_main" ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

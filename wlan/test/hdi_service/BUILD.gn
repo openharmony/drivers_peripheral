@@ -28,7 +28,6 @@ ohos_unittest("WlanHdiServiceTest") {
     "//drivers/peripheral/wlan/hdi_service:wifi_hdi_device",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
 
   include_dirs = [
@@ -48,6 +47,7 @@ ohos_unittest("WlanHdiServiceTest") {
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -64,7 +64,6 @@ ohos_unittest("WlanHdiServiceTestC") {
     "//drivers/peripheral/wlan/hdi_service:wifi_hdi_c_device",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
 
   include_dirs = [
@@ -84,6 +83,7 @@ ohos_unittest("WlanHdiServiceTestC") {
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

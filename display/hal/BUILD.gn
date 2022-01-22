@@ -25,6 +25,10 @@ if (defined(ohos_lite)) {
     deps = []
     public_configs = []
   }
+  group("hdi_display_gralloc") {
+    deps = []
+    public_configs = []
+  }
 } else {
   import("//build/ohos.gni")
 
