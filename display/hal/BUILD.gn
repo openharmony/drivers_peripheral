@@ -53,6 +53,7 @@ if (defined(ohos_lite)) {
       ":hdi_display_gfx",
       ":hdi_display_gralloc",
       ":hdi_display_layer",
+      "//drivers/peripheral/display/hdi_service/device:display_device_service",
       "//drivers/peripheral/display/hdi_service/gralloc/client:hdi_gralloc_client",
       "//drivers/peripheral/display/hdi_service/gralloc/server:hdi_gralloc_stub",
       "//drivers/peripheral/display/hdi_service/video_layer/client:video_layer_client",

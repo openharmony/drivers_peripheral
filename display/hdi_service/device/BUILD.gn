@@ -11,13 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  group("display_test_entry") {
-    deps = [ "test:hdf_test_display" ]
-  }
-} else {
-  group("display_test_entry") {
-    testonly = true
-    deps = [ "test:hdf_test_display" ]
-  }
+import("//build/ohos.gni")
+
+group("display_device_service") {
+  deps = [
+    "src/proxy:display_device_proxy",
+    "src/server:display_device_server",
+  ]
 }
