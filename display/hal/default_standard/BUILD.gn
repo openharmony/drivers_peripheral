@@ -73,6 +73,17 @@ ohos_shared_library("def_display_gralloc") {
   part_name = "display_device_driver"
 }
 
+config("def_display_device_pub_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "//drivers/peripheral/display/interfaces/include",
+    "//drivers/peripheral/base",
+    "//drivers/peripheral/display/hal/default_standard/src/display_device",
+    "//drivers/peripheral/display/hal/default_standard/include",
+  ]
+}
+
 ohos_shared_library("def_display_device") {
   sources = [
     "src/display_device/drm_connector.cpp",
@@ -91,6 +102,8 @@ ohos_shared_library("def_display_device") {
     "src/display_device/hdi_layer.cpp",
     "src/display_device/hdi_session.cpp",
   ]
+  public_configs = [ ":def_display_device_pub_config" ]
+
   output_name = "display_device"
   include_dirs = [
     "src/display_device",

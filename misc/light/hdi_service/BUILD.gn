@@ -22,8 +22,8 @@ ohos_shared_library("liblight_interface_service_1.0") {
   sources = [ "light_interface_service.cpp" ]
 
   public_deps = [
-    "//drivers/peripheral/misc/light/hal:hdi_light",
     "//drivers/interface/light/v1_0:liblight_stub_1.0",
+    "//drivers/peripheral/misc/light/hal:hdi_light",
     "//utils/native/base:utils",
   ]
 
