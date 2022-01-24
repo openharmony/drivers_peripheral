@@ -17,12 +17,8 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 hdi_input_base_path = "//drivers/peripheral/hidl_adapter/input_ipc"
 ohos_shared_library("libinput_client") {
   include_dirs = [
-    "$hdf_framework_path/ability/sbuf/include",
-    "$hdf_uhdf_path/manager/include",
-    "$hdf_uhdf_path/include/hdi",
     "include",
     "../include",
-    "//drivers/adapter/uhdf2/include/hdi",
     "//third_party/libevdev/include/linux/linux",
     "$hdi_input_base_path/adapter/prebuilt/include/system/core/libutils/include/utils",
   ]
@@ -33,17 +29,16 @@ ohos_shared_library("libinput_client") {
     "src/input_proxy.cpp",
   ]
 
-  deps = [
-    "$hdf_uhdf_path/hdi:libhdi",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/osal:libhdf_utils",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//utils/native/base:utils",
-  ]
-
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+      "utils_base:utils",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

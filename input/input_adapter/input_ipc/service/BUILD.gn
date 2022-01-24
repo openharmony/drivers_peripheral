@@ -19,10 +19,6 @@ ohos_shared_library("libinput_service") {
     "include",
     "../adapter/include",
     "$hdi_input_base_path/include",
-    "//drivers/framework/include/utils",
-    "//drivers/adapter/uhdf2/include/hdi",
-    "//drivers/adapter/uhdf2/osal/include",
-    "//utils/native/base/include",
     "include",
     "../include",
     "$hdi_input_base_path/adapter/include",
@@ -39,16 +35,15 @@ ohos_shared_library("libinput_service") {
     "src/input_service_stub.cpp",
   ]
 
-  deps = [
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/osal:libhdf_utils",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//utils/native/base:utils",
-  ]
-
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+      "utils_base:utils",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

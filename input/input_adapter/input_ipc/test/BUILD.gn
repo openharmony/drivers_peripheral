@@ -55,62 +55,32 @@ ohos_unittest("hdi_input_unittest_neu_ipc") {
   include_dirs = [
     "$hdi_input_base_path/include",
     "$hdi_input_base_path/client/include",
-    "//drivers/framework/include/utils",
-    "//drivers/adapter/uhdf2/include/hdi",
-    "//drivers/adapter/uhdf2/osal/include",
-    "//utils/native/base/include",
     "$hdi_input_base_path/service/include",
     "$hdi_input_base_path/client/include",
     "$hdi_input_base_path/test/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//drivers/framework/core/adapter/syscall/include",
     "//third_party/libevdev/include/linux/linux",
-    "//drivers/framework/include/osal",
-    "//base/hiviewdfx/hilog_lite/interfaces/native/kits",
-    "//drivers/adapter/uhdf2/ipc/include",
-
-    #producer
-    "//utils/native/base/include",
-    "//foundation/graphic/standard/frameworks/surface/include",
-    "//foundation/graphic/standard/interfaces/kits/surface",
-    "//foundation/graphic/standard/utils/include",
-    "//foundation/communication/ipc/ipc/native/src/core/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
 
     # HCS
-    "//drivers/framework/include/config",
-    "//drivers/framework/include/osal",
-    "//drivers/framework/include/utils",
-    "//drivers/adapter/uhdf2/include/config",
-    "//drivers/framework/ability/config/hcs_parser/include",
     "//system/core/include/cutils",
-    "$hdf_framework_path/ability/sbuf/include",
-    "//drivers/adapter/uhdf2//manager/include",
-    "//drivers/adapter/uhdf2//include/hdi",
-
-    "//drivers/adapter/uhdf2//devhost/include",
-    "//drivers/adapter/uhdf2//devmgr/include",
-    "//drivers/adapter/uhdf2//host/include",
   ]
 
   deps = [
     "../client:libinput_client",
-    "//drivers/adapter/uhdf2//config:libhdf_hcs",
-    "//drivers/adapter/uhdf2//hdi:libhdi",
-    "//drivers/adapter/uhdf2//osal:libhdf_utils",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
     external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "graphic_standard:surface",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

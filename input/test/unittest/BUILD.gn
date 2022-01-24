@@ -82,15 +82,13 @@ if (defined(ohos_lite)) {
       "-fno-common",
       "-fno-strict-aliasing",
     ]
-    deps = [
-      "//drivers/peripheral/input/hal:hdi_input",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//drivers/peripheral/input/hal:hdi_input" ]
     if (is_standard_system) {
       external_deps = [
         "device_driver_framework:libhdf_test_common",
         "device_driver_framework:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

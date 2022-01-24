@@ -27,18 +27,12 @@ config("usbd_public_config") {
   include_dirs = [
     "include",
     "//drivers/peripheral/usb/hal/client/include",
-    "//drivers/adapter/uhdf2/include/hdi",
-    "//drivers/framework/include/utils",
-    "//drivers/adapter/uhdf2/shared/include",
-    "//drivers/framework/include/core",
     "//drivers/peripheral/usb/ddk/common/include",
     "//drivers/peripheral/usb/ddk/host/include",
     "//drivers/peripheral/usb/interfaces/ddk/common",
     "//drivers/peripheral/usb/interfaces/ddk/host",
     "//drivers/peripheral/usb/interfaces/ddk/device",
     "//drivers/peripheral/usb/gadget/function/include",
-    "//drivers/framework/core/shared/include",
-    "//drivers/framework/core/adapter/syscall/include",
     "//drivers/framework/model/usb/include",
     default_config_path,
   ]
@@ -57,10 +51,7 @@ ohos_shared_library("usbd") {
 
   public_configs = [ ":usbd_public_config" ]
 
-  deps = [
-    "//drivers/peripheral/usb/ddk:libusb_core",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//drivers/peripheral/usb/ddk:libusb_core" ]
 
   external_deps = [
     "device_driver_framework:libhdf_host",
@@ -69,6 +60,7 @@ ohos_shared_library("usbd") {
     "device_driver_framework:libhdi",
     "hiviewdfx_hilog_native:libhilog",
     "startup_l2:syspara",
+    "utils_base:utils",
   ]
 
   install_images = [ chipset_base_dir ]

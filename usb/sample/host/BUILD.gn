@@ -62,8 +62,6 @@ if (defined(ohos_lite)) {
       "src/usbhost_test.c",
     ]
 
-    deps = [ "//utils/native/base:utils" ]
-
     if (is_standard_system) {
       external_deps = [
         "device_driver_framework:libhdf_host",
@@ -71,6 +69,7 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdf_utils",
         "device_driver_framework:libhdi",
         "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -98,10 +97,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/usb/serial/include",
     ]
 
-    deps = [
-      "//drivers/peripheral/usb/ddk:libusb_core",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//drivers/peripheral/usb/ddk:libusb_core" ]
 
     if (is_standard_system) {
       external_deps = [
@@ -109,6 +105,7 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdf_ipc_adapter",
         "device_driver_framework:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -128,8 +125,6 @@ if (defined(ohos_lite)) {
 
     sources = [ "src/usbhost_pnp_test.c" ]
 
-    deps = [ "//utils/native/base:utils" ]
-
     if (is_standard_system) {
       external_deps = [
         "device_driver_framework:libhdf_host",
@@ -137,6 +132,7 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdf_utils",
         "device_driver_framework:libhdi",
         "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -161,10 +157,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/usb/serial/include",
     ]
 
-    deps = [
-      "//drivers/peripheral/usb/ddk:libusb_core",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//drivers/peripheral/usb/ddk:libusb_core" ]
 
     if (is_standard_system) {
       external_deps = [
@@ -172,6 +165,7 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdf_ipc_adapter",
         "device_driver_framework:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -196,10 +190,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/usb/serial/include",
     ]
 
-    deps = [
-      "//drivers/peripheral/usb/ddk:libusb_core",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//drivers/peripheral/usb/ddk:libusb_core" ]
 
     if (is_standard_system) {
       external_deps = [
@@ -207,6 +198,7 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdf_ipc_adapter",
         "device_driver_framework:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -233,8 +225,6 @@ if (defined(ohos_lite)) {
 
     sources = [ "src/usbhost_nosdk_speed.c" ]
 
-    deps = [ "//utils/native/base:utils" ]
-
     if (is_standard_system) {
       external_deps = [
         "device_driver_framework:libhdf_host",
@@ -242,6 +232,7 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdf_utils",
         "device_driver_framework:libhdi",
         "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

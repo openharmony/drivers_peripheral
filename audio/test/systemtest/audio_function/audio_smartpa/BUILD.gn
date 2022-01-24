@@ -107,14 +107,13 @@ if (defined(ohos_lite)) {
     deps = [
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
-      "//utils/native/base:utils",
-      "//utils/native/base:utils",
     ]
     external_deps = [
       "device_driver_framework:libhdf_host",
       "device_driver_framework:libhdf_ipc_adapter",
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
+      "utils_base:utils",
     ]
     defines = []
     if (enable_audio_adm_so) {

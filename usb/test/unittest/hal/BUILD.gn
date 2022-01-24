@@ -34,7 +34,6 @@ ohos_unittest("test_transfer") {
     "//drivers/peripheral/usb/ddk:libusb_core",
     "//drivers/peripheral/usb/hal/client:usbd_client",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
@@ -48,6 +47,7 @@ ohos_unittest("test_transfer") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "utils_base:utils",
   ]
   module_out_path = module_output_path
 }
@@ -59,7 +59,6 @@ ohos_unittest("test_device") {
   deps = [
     "//drivers/peripheral/usb/hal/client:usbd_client",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
@@ -73,6 +72,7 @@ ohos_unittest("test_device") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "utils_base:utils",
   ]
   module_out_path = module_output_path
 }
@@ -85,7 +85,6 @@ ohos_unittest("test_function") {
   deps = [
     "//drivers/peripheral/usb/hal/client:usbd_client",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
@@ -99,6 +98,7 @@ ohos_unittest("test_function") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "utils_base:utils",
   ]
   module_out_path = module_output_path
 }

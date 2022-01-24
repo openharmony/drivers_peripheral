@@ -67,17 +67,13 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/usb/interfaces/ddk/device",
       "//third_party/googletest/googletest/include",
       "//drivers/peripheral/usb/test/unittest/device_sdk",
-      "//utils/native/base/include",
     ]
 
     sources = [
       "//drivers/peripheral/usb/test/unittest/device_sdk/usb_device_cdcacm_test.cpp",
       "//drivers/peripheral/usb/test/unittest/device_sdk/usb_device_sdk_if_test.cpp",
     ]
-    deps = [
-      "//drivers/peripheral/usb/ddk:libusb_core",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//drivers/peripheral/usb/ddk:libusb_core" ]
 
     if (is_standard_system) {
       external_deps = [
@@ -86,6 +82,7 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdf_utils",
         "device_driver_framework:libhdi",
         "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

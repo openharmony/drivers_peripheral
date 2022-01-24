@@ -69,12 +69,8 @@ if (defined(ohos_lite)) {
       "$HAL_ROOT_DIR/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//drivers/peripheral/wlan/client/include",
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     ]
-    deps = [
-      "//drivers/peripheral/wlan/client:wifi_driver_client",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//drivers/peripheral/wlan/client:wifi_driver_client" ]
     defines = [ "__OHOS__USER__" ]
     cflags = [
       "-Wall",
@@ -91,6 +87,7 @@ if (defined(ohos_lite)) {
       external_deps = [
         "device_driver_framework:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

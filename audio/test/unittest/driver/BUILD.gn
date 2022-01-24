@@ -27,7 +27,6 @@ ohos_unittest("khdf_audio_driver_test") {
     "//drivers/peripheral/audio/chipsets/hi3516dv300/soc/test/unittest/common/hi3516_dai_ops_test.cpp",
     "//drivers/peripheral/audio/chipsets/hi3516dv300/soc/test/unittest/common/hi3516_dma_ops_test.cpp",
   ]
-  deps = [ "//utils/native/base:utils" ]
 
   cflags = [
     "-Wall",
@@ -42,6 +41,7 @@ ohos_unittest("khdf_audio_driver_test") {
       "device_driver_framework:libhdf_test_common",
       "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
