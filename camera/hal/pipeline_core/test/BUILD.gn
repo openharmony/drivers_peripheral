@@ -165,8 +165,6 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
-      "//utils/native/base/include",
-      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/../interfaces/include",
       "$camera_path/../interfaces/hdi_ipc",
       "$camera_path/include",
@@ -196,15 +194,10 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/ipp/include",
       "$camera_path/interfaces/hdi",
       "$camera_path/utils/event",
-      "//utils/native/base/include",
       "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
 
       # hcs parser
-      "//drivers/framework/include/osal",
-      "//drivers/framework/include/utils",
       "//system/core/include/cutils",
-      "//drivers/framework/utils/include",
-      "//drivers/adapter/uhdf2/osal/include",
     ]
     if (is_support_mpi) {
       include_dirs += [
@@ -225,16 +218,16 @@ if (defined(ohos_lite)) {
       "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
 
       # hcs parser
-      "//foundation/graphic/standard:libsurface",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
-      "//utils/native/base:utils",
     ]
 
     if (is_standard_system) {
       external_deps = [
         "device_driver_framework:libhdf_utils",
+        "graphic_standard:surface",
         "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

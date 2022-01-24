@@ -50,9 +50,6 @@ if (defined(ohos_lite)) {
       "../callback/host/include",
       "../callback/operator/include",
       "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
-
-      #producer
-      "//utils/native/base/include",
     ]
     public_configs = [ ":libcamera_client_config" ]
 
@@ -70,11 +67,7 @@ if (defined(ohos_lite)) {
       "./src/stream_operator_proxy.cpp",
     ]
 
-    deps = [
-      "//foundation/graphic/standard:libsurface",
-      "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
-      "//utils/native/base:utils",
-    ]
+    deps = [ "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata" ]
 
     if (is_standard_system) {
       external_deps = [
@@ -82,8 +75,10 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdf_ipc_adapter",
         "device_driver_framework:libhdf_utils",
         "device_driver_framework:libhdi",
+        "graphic_standard:surface",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_core",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

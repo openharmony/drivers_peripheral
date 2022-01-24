@@ -224,27 +224,14 @@ if (defined(ohos_lite)) {
       "//system/core/include/cutils",
     ]
 
-    if (use_hitrace) {
-      include_dirs += [
-        #trace log
-        "//base/hiviewdfx/hitrace/frameworks/native",
-        "//base/hiviewdfx/hilog/frameworks/native/include",
-        "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include",
-        "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace",
-      ]
-    }
     deps = [
       "$camera_path/buffer_manager:camera_buffer_manager",
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",
       "$camera_path/utils:camera_utils",
-      "//foundation/graphic/standard:libsurface",
       "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
-      "//utils/native/base:utils",
     ]
-    if (use_hitrace) {
-      deps += [ "//base/hiviewdfx/hitrace/frameworks/native:libhitrace_source" ]
-    }
+
     defines = []
     if (enable_camera_device_utest) {
       defines += [ "CAMERA_DEVICE_UTEST" ]
@@ -259,9 +246,14 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdf_ipc_adapter",
         "device_driver_framework:libhdf_utils",
         "device_driver_framework:libhdi",
+        "graphic_standard:surface",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_core",
+        "utils_base:utils",
       ]
+      if (use_hitrace) {
+        external_deps += [ "hitrace_native:libhitrace" ]
+      }
     } else {
       external_deps = [ "hilog:libhilog" ]
     }

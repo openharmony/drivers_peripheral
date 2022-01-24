@@ -62,12 +62,9 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
-      "//utils/native/base/include",
     ]
 
     sources = [ "framework_render.c" ]
-
-    deps = [ "//utils/native/base:utils" ]
 
     defines = []
     if (enable_audio_device_mpi) {
@@ -81,6 +78,7 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdf_utils",
         "device_driver_framework:libhdi",
         "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -96,12 +94,9 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
-      "//utils/native/base/include",
     ]
 
     sources = [ "framework_capture.c" ]
-
-    deps = [ "//utils/native/base:utils" ]
 
     defines = []
     if (enable_audio_device_mpi) {
@@ -115,6 +110,7 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdf_utils",
         "device_driver_framework:libhdi",
         "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

@@ -18,7 +18,8 @@
         "utils_base"
       ],
       "third_part": [
-        "bounds_checking_function"
+        "bounds_checking_function",
+        "third_party_libnl"
       ]
     },
     "build": {
