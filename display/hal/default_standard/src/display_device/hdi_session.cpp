@@ -46,7 +46,7 @@ void HdiSession::Init()
 int32_t HdiSession::RegHotPlugCallback(HotPlugCallback callback, void *data)
 {
     DISPLAY_CHK_RETURN((callback == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("the callback is nullptr"));
-    mHotPlugCallBacks.emplace(callback, data);
+    mHotPlugCallBacks[callback] = data;
     for (auto displayMap : mHdiDisplays) {
         auto display = displayMap.second;
         if (display->IsConnected()) {

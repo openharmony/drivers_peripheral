@@ -164,7 +164,7 @@ int32_t HdiTestLayer::PreparePresent()
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("set display crop failed"));
 
     ret = HdiTestDevice::GetInstance().GetLayerFuncs().SetLayerZorder(mDisplayID, mId, mZorder);
-    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("set display crop failed"));
+    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("set display zorder failed"));
 
     ret = HdiTestDevice::GetInstance().GetLayerFuncs().SetLayerCompositionType(mDisplayID, mId, mCompType);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
