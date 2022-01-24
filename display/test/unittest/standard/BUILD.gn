@@ -51,7 +51,7 @@ ohos_unittest("gralloctest") {
   module_out_path = module_output_path
   sources = [ "display_gralloc/display_gralloc_test.cpp" ]
   deps = [
-    "//drivers/peripheral/display/hal/default_standard:def_display_gralloc",
+    "//drivers/peripheral/display/hal:hdi_display_gralloc",
     "//third_party/googletest:gtest_main",
   ]
   include_dirs = [
@@ -76,7 +76,7 @@ ohos_unittest("gfxtest") {
     "display_gfx/soft_blit.cpp",
   ]
   deps = [
-    "//drivers/peripheral/display/hal/default_standard:def_display_gralloc",
+    "//drivers/peripheral/display/hal:hdi_display_gralloc",
     "//third_party/googletest:gtest_main",
   ]
   include_dirs = [
@@ -103,8 +103,8 @@ ohos_unittest("devicetest") {
   ]
   deps = [
     ":disp_hdi_test_common",
-    "//drivers/peripheral/display/hal/default_standard:def_display_device",
-    "//drivers/peripheral/display/hal/default_standard:def_display_gralloc",
+    "//drivers/peripheral/display/hal:hdi_display_device",
+    "//drivers/peripheral/display/hal:hdi_display_gralloc",
     "//third_party/googletest:gtest_main",
   ]
   include_dirs = [

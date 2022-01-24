@@ -15,6 +15,7 @@
 
 #include "hdi_test_display.h"
 #include "display_test_utils.h"
+#include "hdi_test_device.h"
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
