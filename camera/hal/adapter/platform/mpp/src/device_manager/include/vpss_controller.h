@@ -21,7 +21,8 @@
 #include "device_manager_adapter.h"
 #include "mpi_adapter.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 class VpssController : public IController {
 public:
     VpssController();
@@ -67,5 +68,6 @@ private:
     std::mutex startVpsslock_;
     bool startVpssState_ = false;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif

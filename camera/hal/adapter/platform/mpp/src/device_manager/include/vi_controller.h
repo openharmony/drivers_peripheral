@@ -23,7 +23,8 @@
 #include "device_manager_adapter.h"
 #include "mpi_adapter.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 class ViController : public IController {
 public:
     ViController();
@@ -89,5 +90,6 @@ private:
     std::shared_ptr<IViObject> viObject_ = nullptr;
     std::vector<int32_t> abilityMetaData_;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif

@@ -28,7 +28,8 @@
 #include "stream.h"
 #include <functional>
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 enum ManagerId {
     DM_M_ISP,
     DM_M_SENSOR,
@@ -82,5 +83,6 @@ using MetaDataCb = std::function<void(std::shared_ptr<CameraStandard::CameraMeta
 using HotplugDevCb = std::function<void(std::shared_ptr<CameraStandard::CameraMetadata>, bool, CameraId)>;
 using DeviceStatusCb = std::function<void()>;
 
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif

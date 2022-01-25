@@ -20,7 +20,8 @@
 #include "device_manager_adapter.h"
 #include "vpss_controller.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 class VpssManager : public IManager {
 public:
     VpssManager();
@@ -66,5 +67,6 @@ public:
 private:
     std::shared_ptr<VpssController> vpss_ = nullptr;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif

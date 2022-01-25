@@ -15,7 +15,8 @@
 
 #include "venc_manager.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 VencManager::VencManager() {}
 
 VencManager::VencManager(ManagerId managerId) : IManager(managerId) {}
@@ -51,4 +52,5 @@ RetCode VencManager::PowerDown(CameraId cameraId)
 {
     return venc_->PowerDown(cameraId);
 }
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS

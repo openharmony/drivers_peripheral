@@ -16,7 +16,8 @@
 #include "create_devicemanager_factory.h"
 
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
     std::string deviceName = "MpiDeviceManager";
 IDeviceManager::IDeviceManager() {}
 
@@ -31,4 +32,5 @@ std::shared_ptr<IDeviceManager> IDeviceManager::GetInstance()
     }
     return deviceManger;
 }
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS

@@ -19,7 +19,8 @@
 #include "device_manager_adapter.h"
 #include <string>
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 class ISensor {
 public:
     ISensor();
@@ -40,5 +41,6 @@ public:
 private:
     std::string sensorName_;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif

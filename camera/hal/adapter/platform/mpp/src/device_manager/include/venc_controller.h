@@ -21,7 +21,8 @@
 #include "device_manager_adapter.h"
 #include "mpi_adapter.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 class VencController : public IController {
 public:
     VencController();
@@ -76,5 +77,6 @@ private:
     bool startVencState_ = false;
     std::shared_ptr<IVencObject> vencObject_ = nullptr;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif

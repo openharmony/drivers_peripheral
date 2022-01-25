@@ -15,7 +15,8 @@
 
 #include "imanager.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 IManager::IManager()
 {
     managerID_ = DM_M_MAX;
@@ -24,4 +25,5 @@ IManager::IManager()
 IManager::IManager(ManagerId managerId) : managerID_(managerId) {}
 
 IManager::~IManager() {}
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
