@@ -49,7 +49,7 @@ if (defined(ohos_lite)) {
       "../callback/device/include",
       "../callback/host/include",
       "../callback/operator/include",
-      "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
+      "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
     ]
     public_configs = [ ":libcamera_client_config" ]
 
@@ -67,7 +67,7 @@ if (defined(ohos_lite)) {
       "./src/stream_operator_proxy.cpp",
     ]
 
-    deps = [ "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata" ]
+    deps = [ "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata" ]
 
     if (is_standard_system) {
       external_deps = [
