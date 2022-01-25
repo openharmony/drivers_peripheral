@@ -20,7 +20,8 @@
 #include "device_manager_adapter.h"
 #include "venc_controller.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 class VencManager : public IManager {
 public:
     VencManager();
@@ -83,5 +84,6 @@ public:
 private:
     std::shared_ptr<VencController> venc_ = nullptr;
 };
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
 #endif

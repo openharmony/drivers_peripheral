@@ -20,7 +20,8 @@
 #include "vpss_manager.h"
 #include "project_hardware.h"
 
-namespace OHOS::Camera {
+namespace OHOS {
+namespace Camera {
 IMPLEMENT_DEVICEMANAGER(MpiDeviceManager)
 MpiDeviceManager::MpiDeviceManager()
     :sysInitFlag(false)
@@ -575,4 +576,5 @@ RetCode MpiDeviceManager::StopRecvFrame(int32_t streamId)
 {
     return sysObject_->StopRecvFrame(streamId);
 }
-} // namespace OHOS::Camera
+} // namespace Camera
+} // namespace OHOS
