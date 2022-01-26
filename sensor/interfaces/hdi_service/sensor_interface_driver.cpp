@@ -21,6 +21,8 @@
 #include "sensor_if.h"
 #include "sensor_interface_service.h"
 
+#define HDF_LOG_TAG    hdf_sensor_if_driver
+
 using namespace hdi::sensor::v1_0;
 
 struct HdfSensorInterfaceHost {

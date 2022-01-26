@@ -20,6 +20,8 @@
 #include <osal_mem.h>
 #include "vibrator_interface_service.h"
 
+#define HDF_LOG_TAG              hdf_vibrator_if_driver
+
 using namespace vibrator::v1_0;
 
 struct HdfVibratorInterfaceHost {
