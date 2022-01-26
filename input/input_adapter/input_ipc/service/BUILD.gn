@@ -41,12 +41,13 @@ ohos_shared_library("libinput_service") {
       "device_driver_framework:libhdf_ipc_adapter",
       "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
       "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "ipc:ipc_single" ]
 
   install_images = [ vendor_base_dir ]
   install_enable = true

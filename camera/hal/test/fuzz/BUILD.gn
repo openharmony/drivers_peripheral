@@ -80,7 +80,7 @@ ohos_fuzztest("IpcCameraDeviceRemote") {
       "display_device_driver:hdi_display_gralloc",
       "graphic_standard:surface",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
       "utils_base:utils",
     ]
   } else {
@@ -88,7 +88,7 @@ ohos_fuzztest("IpcCameraDeviceRemote") {
   }
 
   external_deps += [
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "samgr_standard:samgr_proxy",
   ]
 
@@ -156,7 +156,7 @@ ohos_fuzztest("IpcCameraHostService") {
       "display_device_driver:hdi_display_gralloc",
       "graphic_standard:surface",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
       "utils_base:utils",
     ]
   } else {
@@ -164,7 +164,7 @@ ohos_fuzztest("IpcCameraHostService") {
   }
 
   external_deps += [
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "samgr_standard:samgr_proxy",
   ]
 
@@ -238,7 +238,7 @@ ohos_fuzztest("IpcOffline") {
   }
 
   external_deps += [
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "samgr_standard:samgr_proxy",
   ]
 
@@ -312,7 +312,7 @@ ohos_fuzztest("IpcStreamOperator") {
   }
 
   external_deps += [
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "samgr_standard:samgr_proxy",
   ]
 
@@ -388,7 +388,7 @@ ohos_fuzztest("IpcCameraDeviceCallback") {
   }
 
   external_deps += [
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "samgr_standard:samgr_proxy",
   ]
 
@@ -464,7 +464,7 @@ ohos_fuzztest("IpcCameraHostCallback") {
   }
 
   external_deps += [
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "samgr_standard:samgr_proxy",
   ]
 
@@ -538,7 +538,7 @@ ohos_fuzztest("IpcStreamOperatorCallback") {
   }
 
   external_deps += [
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "samgr_standard:samgr_proxy",
   ]
 

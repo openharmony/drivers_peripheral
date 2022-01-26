@@ -38,13 +38,13 @@ ohos_shared_library("bluetooth_hdi_client") {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
       "utils_base:utils",
     ]
   } else {
     external_deps = [
       "hilog:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
     ]
   }
 
@@ -80,13 +80,13 @@ ohos_shared_library("bluetooth_hdi_server") {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
       "utils_base:utils",
     ]
   } else {
     external_deps = [
       "hilog:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
     ]
   }
 

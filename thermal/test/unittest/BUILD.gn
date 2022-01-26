@@ -45,7 +45,7 @@ ohos_unittest("hdi_unittest_thermal") {
     external_deps = [
       "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
       "utils_base:utils",
     ]
   } else {

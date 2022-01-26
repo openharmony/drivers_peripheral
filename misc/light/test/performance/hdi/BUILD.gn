@@ -38,10 +38,11 @@ ohos_unittest("hdf_light_hdi_test_performance") {
     external_deps = [
       "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
       "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "ipc:ipc_single" ]
 }

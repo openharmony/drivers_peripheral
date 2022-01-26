@@ -29,7 +29,6 @@ ohos_shared_library("hdi_input") {
     "$INPUT_ROOT_DIR/adapter/include",
     "$INPUT_ROOT_DIR/service/include",
     "//third_party/FreeBSD/sys/dev/evdev",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
   cflags = [
@@ -43,13 +42,13 @@ ohos_shared_library("hdi_input") {
     external_deps = [
       "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
       "utils_base:utils",
     ]
   } else {
     external_deps = [
       "hilog:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
     ]
   }
 
