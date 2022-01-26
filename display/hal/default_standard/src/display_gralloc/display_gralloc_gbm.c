@@ -266,7 +266,11 @@ static void InitBufferHandle(struct gbm_bo *bo, int fd, const AllocInfo *info, P
     bufferHandle->width = hdi_gbm_bo_get_width(bo);
     bufferHandle->height = hdi_gbm_bo_get_height(bo);
     bufferHandle->usage = info->usage;
-    bufferHandle->format = info->format;
+    if ((info->usage & HBM_USE_MEM_FB) != 0) {
+        bufferHandle->format = PIXEL_FMT_BGRA_8888;
+    } else {
+        bufferHandle->format = info->format;
+    }
     bufferHandle->virAddr = NULL;
     bufferHandle->size = hdi_gbm_bo_get_stride(bo) * hdi_gbm_bo_get_height(bo);
 }
