@@ -18,7 +18,7 @@
 #include "hdf_log.h"
 #include "vibrator_if.h"
 
-#define HDF_LOG_TAG vibrator_controller_c
+#define HDF_LOG_TAG              hdf_vibrator_dal
 #define EFFECT_SUN 64
 #define VIBRATOR_SERVICE_NAME    "hdf_misc_vibrator"
 

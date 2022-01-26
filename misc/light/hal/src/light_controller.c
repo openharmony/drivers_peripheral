@@ -25,7 +25,7 @@
 #include "light_type.h"
 #include "osal_mem.h"
 
-#define HDF_LOG_TAG           light_controller_c
+#define HDF_LOG_TAG           hdf_light_dal
 #define LIGHT_SERVICE_NAME    "hdf_light"
 
 static struct LightDevice *GetLightDevicePriv(void)

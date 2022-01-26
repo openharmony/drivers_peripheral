@@ -23,7 +23,7 @@
 #include "sensor_controller.h"
 #include "sensor_if.h"
 
-#define HDF_LOG_TAG    sensor_manager_c
+#define HDF_LOG_TAG    hdf_sensor_dal
 
 struct SensorDevManager *GetSensorDevManager(void)
 {

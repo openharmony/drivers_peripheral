@@ -18,6 +18,8 @@
 #include <hdf_log.h>
 #include "vibrator_if.h"
 
+#define HDF_LOG_TAG              hdf_vibrator_dal
+
 namespace vibrator {
 namespace v1_0 {
 int32_t VibratorInterfaceService::StartOnce(uint32_t duration)
