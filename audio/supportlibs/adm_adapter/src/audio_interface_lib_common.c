@@ -43,10 +43,10 @@ struct HdfIoService *HdfIoServiceBindName(const char *serviceName)
 void AudioBufReplyRecycle(struct HdfSBuf *sBuf, struct HdfSBuf *reply)
 {
     if (sBuf != NULL) {
-        HdfSBufRecycle(sBuf);
+        HdfSbufRecycle(sBuf);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
 }
 
@@ -68,9 +68,9 @@ int32_t AudioServiceDispatch(struct HdfIoService *service,
 struct HdfSBuf *AudioObtainHdfSBuf(void)
 {
 #ifdef AUDIO_HDF_SBUF_IPC
-    return HdfSBufTypedObtain(SBUF_IPC);
+    return HdfSbufTypedObtain(SBUF_IPC);
 #else
-    return HdfSBufTypedObtain(SBUF_RAW);
+    return HdfSbufTypedObtain(SBUF_RAW);
 #endif
 }
 

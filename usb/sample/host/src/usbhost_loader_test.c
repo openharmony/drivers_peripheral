@@ -75,8 +75,8 @@ int main(int argc, char *argv[])
         return HDF_FAILURE;
     }
 
-    g_data = HdfSBufObtainDefaultSize();
-    g_reply = HdfSBufObtainDefaultSize();
+    g_data = HdfSbufObtainDefaultSize();
+    g_reply = HdfSbufObtainDefaultSize();
     if (g_data == NULL || g_reply == NULL) {
         HdfIoServiceRecycle(serv);
         HDF_LOGE("%s:%d GetService err", __func__, __LINE__);
@@ -109,8 +109,8 @@ int main(int argc, char *argv[])
     HDF_LOGI("%s:%d", __func__, __LINE__);
 
 OUT:
-    HdfSBufRecycle(g_data);
-    HdfSBufRecycle(g_reply);
+    HdfSbufRecycle(g_data);
+    HdfSbufRecycle(g_reply);
 
     HdfIoServiceRecycle(serv);
 

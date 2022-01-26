@@ -673,24 +673,24 @@ int32_t ChangeRegisterStatus(struct AudioCtlElemValue elemValue)
     if (service == nullptr || service->dispatcher == nullptr) {
         return HDF_FAILURE;
     }
-    sBuf = HdfSBufObtainDefaultSize();
+    sBuf = HdfSbufObtainDefaultSize();
     if (sBuf == nullptr) {
         HdfIoServiceRecycle(service);
         return HDF_FAILURE;
     }
     ret = WriteEleValueToBuf(sBuf, elemValue);
     if (ret < 0) {
-        HdfSBufRecycle(sBuf);
+        HdfSbufRecycle(sBuf);
         HdfIoServiceRecycle(service);
         return HDF_FAILURE;
     }
     ret = service->dispatcher->Dispatch(&service->object, AUDIODRV_CTRL_IOCTRL_ELEM_WRITE, sBuf, reply);
     if (ret < 0) {
-        HdfSBufRecycle(sBuf);
+        HdfSbufRecycle(sBuf);
         HdfIoServiceRecycle(service);
         return ret;
     }
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     HdfIoServiceRecycle(service);
     return HDF_SUCCESS;
 }
@@ -705,38 +705,38 @@ int32_t QueryRegisterStatus(struct AudioCtlElemId id, struct AudioCtlElemValue &
     if (service == nullptr || service->dispatcher == nullptr) {
         return HDF_FAILURE;
     }
-    sBuf = HdfSBufObtainDefaultSize();
+    sBuf = HdfSbufObtainDefaultSize();
     if (sBuf == nullptr) {
         HdfIoServiceRecycle(service);
         return HDF_FAILURE;
     }
     ret = WriteIdToBuf(sBuf, id);
     if (ret < 0) {
-        HdfSBufRecycle(sBuf);
+        HdfSbufRecycle(sBuf);
         HdfIoServiceRecycle(service);
         return HDF_FAILURE;
     }
-    reply = HdfSBufObtainDefaultSize();
+    reply = HdfSbufObtainDefaultSize();
     if (reply == nullptr) {
-        HdfSBufRecycle(sBuf);
+        HdfSbufRecycle(sBuf);
         HdfIoServiceRecycle(service);
         return HDF_FAILURE;
     }
     ret = service->dispatcher->Dispatch(&service->object, AUDIODRV_CTRL_IOCTRL_ELEM_READ, sBuf, reply);
     if (ret < 0) {
-        HdfSBufRecycle(sBuf);
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(sBuf);
+        HdfSbufRecycle(reply);
         HdfIoServiceRecycle(service);
         return ret;
     }
     if (!HdfSbufReadInt32(reply, &elemValue.value[0])) {
-        HdfSBufRecycle(sBuf);
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(sBuf);
+        HdfSbufRecycle(reply);
         HdfIoServiceRecycle(service);
         return HDF_FAILURE;
     }
-    HdfSBufRecycle(sBuf);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(sBuf);
+    HdfSbufRecycle(reply);
     HdfIoServiceRecycle(service);
     return HDF_SUCCESS;
 }

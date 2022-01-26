@@ -139,7 +139,7 @@ int32_t AdmRenderFramePrepare(const std::string& path, char *&frame, uint32_t& r
 int32_t WriteFrameToSBuf(struct HdfSBuf *&sBufT, const std::string& path)
 {
     int32_t ret = -1;
-    sBufT = HdfSBufObtainDefaultSize();
+    sBufT = HdfSbufObtainDefaultSize();
     char *buf = nullptr;
     uint32_t bufsize = 0;
     uint32_t frameSize = 0;
@@ -169,13 +169,13 @@ int32_t WriteFrameToSBuf(struct HdfSBuf *&sBufT, const std::string& path)
 
 int32_t WriteToSBuf(struct HdfSBuf *&sBufT)
 {
-    sBufT = HdfSBufObtainDefaultSize();
+    sBufT = HdfSbufObtainDefaultSize();
     if (sBufT == NULL) {
         return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteUint32(sBufT, 0)) {
-        HdfSBufRecycle(sBufT);
+        HdfSbufRecycle(sBufT);
         sBufT = nullptr;
         return HDF_FAILURE;
     }
@@ -184,13 +184,13 @@ int32_t WriteToSBuf(struct HdfSBuf *&sBufT)
 
 int32_t ObtainBuf(struct HdfSBuf *&readBuf, struct HdfSBuf *&readReply)
 {
-    readBuf = HdfSBufObtainDefaultSize();
+    readBuf = HdfSbufObtainDefaultSize();
     if (readBuf == nullptr) {
         return HDF_FAILURE;
     }
-    readReply = HdfSBufObtainDefaultSize();
+    readReply = HdfSbufObtainDefaultSize();
     if (readReply == nullptr) {
-        HdfSBufRecycle(readBuf);
+        HdfSbufRecycle(readBuf);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -198,8 +198,8 @@ int32_t ObtainBuf(struct HdfSBuf *&readBuf, struct HdfSBuf *&readReply)
 
 void RecycleBuf(struct HdfSBuf *&readBuf, struct HdfSBuf *&readReply)
 {
-    HdfSBufRecycle(readBuf);
-    HdfSBufRecycle(readReply);
+    HdfSbufRecycle(readBuf);
+    HdfSbufRecycle(readReply);
 }
 
 int32_t WriteCtrlInfo(struct HdfIoService *service, struct AudioCtlElemValue writeElemValue)
@@ -210,21 +210,21 @@ int32_t WriteCtrlInfo(struct HdfIoService *service, struct AudioCtlElemValue wri
         return HDF_FAILURE;
     }
 
-    writeBuf = HdfSBufObtainDefaultSize();
+    writeBuf = HdfSbufObtainDefaultSize();
     if (writeBuf == nullptr) {
         return HDF_FAILURE;
     }
     ret = WriteEleValueToBuf(writeBuf, writeElemValue);
     if (ret < 0) {
-        HdfSBufRecycle(writeBuf);
+        HdfSbufRecycle(writeBuf);
         return HDF_FAILURE;
     }
     ret = service->dispatcher->Dispatch(&service->object, AUDIODRV_CTRL_IOCTRL_ELEM_WRITE, writeBuf, nullptr);
     if (ret < 0) {
-        HdfSBufRecycle(writeBuf);
+        HdfSbufRecycle(writeBuf);
         return HDF_FAILURE;
     }
-    HdfSBufRecycle(writeBuf);
+    HdfSbufRecycle(writeBuf);
     return HDF_SUCCESS;
 }
 
@@ -274,7 +274,7 @@ int32_t WriteHwParams(string serviceName, struct HdfIoService *&service, struct 
     if (service == nullptr || service->dispatcher == nullptr) {
         return HDF_FAILURE;
     }
-    writeBuf = HdfSBufObtainDefaultSize();
+    writeBuf = HdfSbufObtainDefaultSize();
     if (writeBuf == nullptr) {
         HdfIoServiceRecycle(service);
         service = nullptr;
@@ -287,7 +287,7 @@ int32_t WriteHwParams(string serviceName, struct HdfIoService *&service, struct 
     }
     ret = service->dispatcher->Dispatch(&service->object, cmdid, writeBuf, writeReply);
     if (ret < 0) {
-        HdfSBufRecycle(writeBuf);
+        HdfSbufRecycle(writeBuf);
         HdfIoServiceRecycle(service);
         service = nullptr;
         return HDF_FAILURE;
@@ -295,19 +295,19 @@ int32_t WriteHwParams(string serviceName, struct HdfIoService *&service, struct 
     HdfSbufFlush(writeBuf);
     ret = WriteHwParamsToBuf(writeBuf, hwParams);
     if (ret < 0) {
-        HdfSBufRecycle(writeBuf);
+        HdfSbufRecycle(writeBuf);
         HdfIoServiceRecycle(service);
         service = nullptr;
         return HDF_FAILURE;
     }
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_HW_PARAMS, writeBuf, writeReply);
     if (ret < 0) {
-        HdfSBufRecycle(writeBuf);
+        HdfSbufRecycle(writeBuf);
         HdfIoServiceRecycle(service);
         service = nullptr;
         return HDF_FAILURE;
     }
-    HdfSBufRecycle(writeBuf);
+    HdfSbufRecycle(writeBuf);
     return HDF_SUCCESS;
 }
 }

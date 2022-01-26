@@ -1441,7 +1441,7 @@ int32_t TinyAlsaAudioOutputRenderWrite(const struct DevHandle *handle,
         return HDF_FAILURE;
     }
     size_t sbufSize = handleData->frameRenderMode.bufferSize + AUDIO_SBUF_EXTEND;
-    struct HdfSBuf *sBuf = HdfSBufTypedObtainCapacity(SBUF_RAW, sbufSize);
+    struct HdfSBuf *sBuf = HdfSbufTypedObtainCapacity(SBUF_RAW, sbufSize);
     if (sBuf == NULL) {
         LOG_FUN_ERR("Get sBuf Fail");
         return HDF_FAILURE;
@@ -1449,7 +1449,7 @@ int32_t TinyAlsaAudioOutputRenderWrite(const struct DevHandle *handle,
     struct HdfSBuf *reply = AudioObtainHdfSBuf();
     if (reply == NULL) {
         LOG_FUN_ERR("reply is empty");
-        HdfSBufRecycle(sBuf);
+        HdfSbufRecycle(sBuf);
         return HDF_FAILURE;
     }
     if (FrameSbufWriteBuffer(sBuf, handleData)) {
@@ -1474,7 +1474,7 @@ int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
     }
     struct HdfIoService *service = NULL;
     size_t sbufSize = (size_t)handleData->frameRenderMode.bufferSize + AUDIO_SBUF_EXTEND;
-    struct HdfSBuf *sBuf = HdfSBufTypedObtainCapacity(SBUF_RAW, sbufSize);
+    struct HdfSBuf *sBuf = HdfSbufTypedObtainCapacity(SBUF_RAW, sbufSize);
     if (sBuf == NULL) {
         LOG_FUN_ERR("Get sBuf Fail");
         return HDF_FAILURE;
@@ -1482,7 +1482,7 @@ int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
     struct HdfSBuf *reply = AudioObtainHdfSBuf();
     if (reply == NULL) {
         LOG_FUN_ERR("reply is empty");
-        HdfSBufRecycle(sBuf);
+        HdfSbufRecycle(sBuf);
         return HDF_FAILURE;
     }
     if (FrameSbufWriteBuffer(sBuf, handleData)) {

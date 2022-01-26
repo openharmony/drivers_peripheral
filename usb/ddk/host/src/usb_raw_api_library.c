@@ -1421,8 +1421,8 @@ int RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddRemov
         return ret;
     }
 
-    pnpData = HdfSBufObtainDefaultSize();
-    pnpReply = HdfSBufObtainDefaultSize();
+    pnpData = HdfSbufObtainDefaultSize();
+    pnpReply = HdfSbufObtainDefaultSize();
     if (pnpData == NULL || pnpReply == NULL) {
         ret = HDF_FAILURE;
         HDF_LOGE("%s:%d GetService err", __func__, __LINE__);
@@ -1453,8 +1453,8 @@ int RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddRemov
     ret = HDF_SUCCESS;
 
 OUT:
-    HdfSBufRecycle(pnpData);
-    HdfSBufRecycle(pnpReply);
+    HdfSbufRecycle(pnpData);
+    HdfSbufRecycle(pnpReply);
 ERR_SBUF:
     HdfIoServiceRecycle(serv);
 

@@ -111,7 +111,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, ParamsSbufWriteBufferWhenParamIsVaild, Te
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     int32_t ret = ParamsSbufWriteBuffer(sBuf);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetPauseBufWhenSbufIsNull, TestSize.Level1)
@@ -130,7 +130,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetPauseBufWhenHandleDataI
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureSetPauseBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetPauseBufWhenParamIsVaild, TestSize.Level1)
@@ -140,7 +140,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetPauseBufWhenParamIsVail
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureSetPauseBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -161,7 +161,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetVolumeSBufWhenHandleDat
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureGetVolumeSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetVolumeSBufWhenParamIsVaild, TestSize.Level1)
@@ -171,7 +171,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetVolumeSBufWhenParamIsVa
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureGetVolumeSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -192,7 +192,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetVolumeSBufWhenHandleDat
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureSetVolumeSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetVolumeSBufWhenParamIsVaild, TestSize.Level1)
@@ -202,7 +202,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetVolumeSBufWhenParamIsVa
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureSetVolumeSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -223,7 +223,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetMuteBufWhenHandleDataIs
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureSetMuteSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetMuteBufWhenParamIsVaild, TestSize.Level1)
@@ -233,7 +233,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetMuteBufWhenParamIsVaild
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureSetMuteSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -254,7 +254,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetMuteSBufWhenHandleDataI
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureGetMuteSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetMuteSBufWhenParamIsVaild, TestSize.Level1)
@@ -264,7 +264,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetMuteSBufWhenParamIsVail
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureGetMuteSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -285,7 +285,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetGainSBufWhenHandleDataI
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureSetGainSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetGainSBufWhenParamIsVaild, TestSize.Level1)
@@ -295,7 +295,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSetGainSBufWhenParamIsVail
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureSetGainSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -316,7 +316,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainSBufWhenHandleDataI
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureGetGainSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainSBufWhenParamIsVaild, TestSize.Level1)
@@ -326,7 +326,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainSBufWhenParamIsVail
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureGetGainSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -349,7 +349,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSceneSelectSBufWhenHandleD
     int32_t deviceIndex = 0;
     int32_t ret = AudioCtlCaptureSceneSelectSBuf(sBuf, handleData, deviceIndex);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSceneSelectSBufWhenParamIsVaild, TestSize.Level1)
@@ -360,7 +360,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureSceneSelectSBufWhenParamIs
     int32_t deviceIndex = 0;
     int32_t ret = AudioCtlCaptureSceneSelectSBuf(sBuf, handleData, deviceIndex);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -381,7 +381,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainThresholdSBufWhenHa
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureGetGainThresholdSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainThresholdSBufWhenParamIsVaild, TestSize.Level1)
@@ -391,7 +391,7 @@ HWTEST_F(AudioInterfaceLibCaptureTest, AudioCtlCaptureGetGainThresholdSBufWhenPa
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureGetGainThresholdSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }

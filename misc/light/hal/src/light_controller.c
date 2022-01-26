@@ -115,7 +115,7 @@ static int32_t GetLightInfo(struct LightInfo **lightInfo, uint32_t *count)
     }
 
     (void)OsalMutexLock(&priv->mutex);
-    struct HdfSBuf *reply = HdfSBufObtainDefaultSize();
+    struct HdfSBuf *reply = HdfSbufObtainDefaultSize();
     if (reply == NULL) {
         HDF_LOGE("%s: get sbuf failed", __func__);
         (void)OsalMutexUnlock(&priv->mutex);
@@ -125,18 +125,18 @@ static int32_t GetLightInfo(struct LightInfo **lightInfo, uint32_t *count)
     int32_t ret = SendLightMsg(LIGHT_IO_CMD_GET_INFO_LIST, NULL, reply);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Light get light type failed, ret[%{public}d]", __func__, ret);
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
         (void)OsalMutexUnlock(&priv->mutex);
         return ret;
     }
 
     if (ReadLightInfo(reply, priv) != HDF_SUCCESS) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
         (void)OsalMutexUnlock(&priv->mutex);
         return HDF_FAILURE;
     }
 
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(reply);
     (void)OsalMutexUnlock(&priv->mutex);
 
     *count = priv->lightNum;
@@ -184,7 +184,7 @@ static int32_t OnLight(uint32_t type, struct LightEffect *effect)
     struct LightDevice *priv = GetLightDevicePriv();
     (void)OsalMutexLock(&priv->mutex);
 
-    struct HdfSBuf *msg = HdfSBufObtainDefaultSize();
+    struct HdfSBuf *msg = HdfSbufObtainDefaultSize();
     if (msg == NULL) {
         HDF_LOGE("%{public}s: Failed to obtain sBuf size", __func__);
         (void)OsalMutexUnlock(&priv->mutex);
@@ -193,21 +193,21 @@ static int32_t OnLight(uint32_t type, struct LightEffect *effect)
 
     if (!HdfSbufWriteInt32(msg, type)) {
         HDF_LOGE("%{public}s: Light write id failed", __func__);
-        HdfSBufRecycle(msg);
+        HdfSbufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);
         return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteInt32(msg, LIGHT_OPS_IO_CMD_ENABLE)) {
         HDF_LOGE("%{public}s: Light write enable failed", __func__);
-        HdfSBufRecycle(msg);
+        HdfSbufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);
         return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteBuffer(msg, effect, sizeof(*effect))) {
         HDF_LOGE("%{public}s: Light write enable failed", __func__);
-        HdfSBufRecycle(msg);
+        HdfSbufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);
         return HDF_FAILURE;
     }
@@ -216,7 +216,7 @@ static int32_t OnLight(uint32_t type, struct LightEffect *effect)
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Light enable failed, ret[%{public}d]", __func__, ret);
     }
-    HdfSBufRecycle(msg);
+    HdfSbufRecycle(msg);
     (void)OsalMutexUnlock(&priv->mutex);
 
     return ret;
@@ -232,7 +232,7 @@ static int32_t OffLight(uint32_t type)
     struct LightDevice *priv = GetLightDevicePriv();
     (void)OsalMutexLock(&priv->mutex);
 
-    struct HdfSBuf *msg = HdfSBufObtainDefaultSize();
+    struct HdfSBuf *msg = HdfSbufObtainDefaultSize();
     if (msg == NULL) {
         HDF_LOGE("%{public}s: Failed to obtain sBuf", __func__);
         (void)OsalMutexUnlock(&priv->mutex);
@@ -241,14 +241,14 @@ static int32_t OffLight(uint32_t type)
 
     if (!HdfSbufWriteInt32(msg, type)) {
         HDF_LOGE("%{public}s: Light write id failed", __func__);
-        HdfSBufRecycle(msg);
+        HdfSbufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);
         return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteInt32(msg, LIGHT_OPS_IO_CMD_DISABLE)) {
         HDF_LOGE("%{public}s: Light write disable failed", __func__);
-        HdfSBufRecycle(msg);
+        HdfSbufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);
         return HDF_FAILURE;
     }
@@ -257,7 +257,7 @@ static int32_t OffLight(uint32_t type)
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Light disable failed, ret[%{public}d]", __func__, ret);
     }
-    HdfSBufRecycle(msg);
+    HdfSbufRecycle(msg);
     (void)OsalMutexUnlock(&priv->mutex);
 
     return ret;
