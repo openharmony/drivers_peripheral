@@ -42,14 +42,14 @@ static int32_t GetSensorServiceList(void)
 {
     struct SensorManagerNode *managerNode = NULL;
     struct SensorDevManager *manager = GetSensorDevManager();
-    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
+    struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     const char *svcName = NULL;
 
     CHECK_NULL_PTR_RETURN_VALUE(data, SENSOR_NULL_PTR);
     int32_t ret = HdfGetServiceNameByDeviceClass(DEVICE_CLASS_SENSOR, data);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s :sensor manager get service class failed", __func__);
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
         return SENSOR_INVALID_SERVICE;
     }
 
@@ -78,7 +78,7 @@ static int32_t GetSensorServiceList(void)
     }
     (void)OsalMutexUnlock(&manager->mutex);
 
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     data = NULL;
 
     if (DListIsEmpty(&manager->managerHead)) {

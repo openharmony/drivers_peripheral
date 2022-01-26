@@ -136,16 +136,16 @@ static int32_t InstanceCmdSbuf(struct HdfSBuf **data, struct HdfSBuf **reply, in
 {
     switch (cmd) {
         case GET_DEV_ATTR:
-            *data = HdfSBufObtainDefaultSize();
-            *reply = HdfSBufTypedObtainCapacity(SBUF_RAW, ATTR_SBUF_LEN);
+            *data = HdfSbufObtainDefaultSize();
+            *reply = HdfSbufTypedObtainCapacity(SBUF_RAW, ATTR_SBUF_LEN);
             break;
         case GET_DEV_ABILITY:
-            *data = HdfSBufObtainDefaultSize();
-            *reply = HdfSBufTypedObtainCapacity(SBUF_RAW, ABILITY_SBUF_LEN);
+            *data = HdfSbufObtainDefaultSize();
+            *reply = HdfSbufTypedObtainCapacity(SBUF_RAW, ABILITY_SBUF_LEN);
             break;
         default:
-            *data = HdfSBufObtainDefaultSize();
-            *reply = HdfSBufObtainDefaultSize();
+            *data = HdfSbufObtainDefaultSize();
+            *reply = HdfSbufObtainDefaultSize();
             break;
     }
 
@@ -156,8 +156,8 @@ static int32_t InstanceCmdSbuf(struct HdfSBuf **data, struct HdfSBuf **reply, in
     return INPUT_SUCCESS;
 
 EXIT:
-    HdfSBufRecycle(*data);
-    HdfSBufRecycle(*reply);
+    HdfSbufRecycle(*data);
+    HdfSbufRecycle(*reply);
     *data = NULL;
     *reply = NULL;
     return INPUT_FAILURE;
@@ -192,8 +192,8 @@ static int32_t IoServiceOps(struct HdfIoService *service, int32_t cmd, const voi
     }
 
 EXIT:
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 

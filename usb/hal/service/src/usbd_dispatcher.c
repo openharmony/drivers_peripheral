@@ -2077,7 +2077,7 @@ static int32_t DispatchBindUsbSubscriber(struct UsbdService *service, struct Hdf
         HDF_LOGE("%{public}s:%{public}d param is NULL", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfRemoteService *remoteService = HdfSBufReadRemoteService(data);
+    struct HdfRemoteService *remoteService = HdfSbufReadRemoteService(data);
     if (remoteService == NULL) {
         HDF_LOGE("%{public}s: remoteService is NULL", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -2582,8 +2582,8 @@ static int32_t UsbdBulkReadRemoteCallback(struct HdfRemoteService *service, int3
     if (flg) {
         return HDF_SUCCESS;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     do {
         if (data == NULL || reply == NULL) {
             HDF_LOGE("%{public}s:%{public}d failed to obtain hdf sbuf", __func__, __LINE__);
@@ -2603,8 +2603,8 @@ static int32_t UsbdBulkReadRemoteCallback(struct HdfRemoteService *service, int3
         ret = service->dispatcher->Dispatch(service, CMD_USBD_BULK_CALLBACK_READ, data, reply);
     } while (0);
 
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -2626,8 +2626,8 @@ static int32_t UsbdBulkWriteRemoteCallback(struct HdfRemoteService *service, int
     if (flg) {
         return HDF_SUCCESS;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     do {
         if (data == NULL || reply == NULL) {
             HDF_LOGE("%{public}s:%{public}d failed to obtain hdf sbuf", __func__, __LINE__);
@@ -2647,8 +2647,8 @@ static int32_t UsbdBulkWriteRemoteCallback(struct HdfRemoteService *service, int
         ret = service->dispatcher->Dispatch(service, CMD_USBD_BULK_CALLBACK_WRITE, data, reply);
     } while (0);
 
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -3010,7 +3010,7 @@ static int32_t FunRegBulkCallback(struct HostDevice *port, struct HdfSBuf *data,
         HDF_LOGE("%{public}s:%{public}d fail ifId:%{public}d epId:%{public}d", __func__, __LINE__, interfaceId, pipeId);
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
-    list->cb = HdfSBufReadRemoteService(data);
+    list->cb = HdfSbufReadRemoteService(data);
     if (!list->cb) {
         HDF_LOGE("%{public}s:%{public}d get callback error", __func__, __LINE__);
         return HDF_ERR_IO;

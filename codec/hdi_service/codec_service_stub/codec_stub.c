@@ -512,7 +512,7 @@ static int32_t SerCodecSetCallback(struct HdfDeviceIoClient *client, struct HdfS
         HDF_LOGE("%{public}s: read handle data failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfRemoteService *cbRemote = HdfSBufReadRemoteService(data);
+    struct HdfRemoteService *cbRemote = HdfSbufReadRemoteService(data);
     if (cbRemote == NULL) {
         HDF_LOGE("%{public}s: read cbRemote failed!", __func__);
         return HDF_ERR_INVALID_PARAM;

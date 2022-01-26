@@ -236,7 +236,7 @@ static int32_t ScanInputDevice(DevDesc *staArr, uint32_t arrLen)
         HDF_LOGE("%s: HdfIoServiceBind failed", __func__);
         return INPUT_FAILURE;
     }
-    reply = HdfSBufObtainDefaultSize();
+    reply = HdfSbufObtainDefaultSize();
     if (reply == NULL) {
         HDF_LOGE("%s: fail to obtain sbuf data", __func__);
         return INPUT_FAILURE;
@@ -245,7 +245,7 @@ static int32_t ScanInputDevice(DevDesc *staArr, uint32_t arrLen)
     ret = service->dispatcher->Dispatch(&service->object, 0, NULL, reply);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: dispatch fail", __func__);
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
         return INPUT_FAILURE;
     }
 
@@ -257,13 +257,13 @@ static int32_t ScanInputDevice(DevDesc *staArr, uint32_t arrLen)
         }
         if (memcpy_s(&staArr[count], sizeof(DevDesc), data, replayDataSize) != EOK) {
             HDF_LOGE("%s: memcpy failed, line: %d", __func__, __LINE__);
-            HdfSBufRecycle(reply);
+            HdfSbufRecycle(reply);
             return INPUT_FAILURE;
         }
         HDF_LOGI("%s: type = %d, id =%d", __func__, staArr[count].devType, staArr[count].devIndex);
         count++;
     }
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(reply);
     return INPUT_SUCCESS;
 }
 

@@ -56,12 +56,12 @@ static int32_t GetInfo(uint32_t devId, struct DispInfo *info)
         return DISPLAY_FAILURE;
     }
 
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         HDF_LOGE("%s: obtain data sbuf fail", __func__);
         return DISPLAY_FAILURE;
     }
-    reply = HdfSBufObtainDefaultSize();
+    reply = HdfSbufObtainDefaultSize();
     if (reply == NULL) {
         HDF_LOGE("%s: obtain reply sbuf fail", __func__);
         goto EXIT;
@@ -87,13 +87,13 @@ static int32_t GetInfo(uint32_t devId, struct DispInfo *info)
     HDF_LOGI("tmpInfo->hbp = %u, tmpInfo->hfp = %u", tmpInfo->hbp, tmpInfo->hfp);
     HDF_LOGI("tmpInfo->frameRate = %u", tmpInfo->frameRate);
     HDF_LOGI("tmpInfo->intfSync = %d", tmpInfo->intfSync);
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return DISPLAY_SUCCESS;
 
 EXIT:
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return DISPLAY_FAILURE;
 }
 
@@ -108,12 +108,12 @@ static int32_t DispGetParaProcess(uint32_t devId, const uint32_t cmd, uint32_t *
         return DISPLAY_FAILURE;
     }
 
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         HDF_LOGE("%s: obtain data sbuf fail", __func__);
         return DISPLAY_FAILURE;
     }
-    reply = HdfSBufObtainDefaultSize();
+    reply = HdfSbufObtainDefaultSize();
     if (reply == NULL) {
         HDF_LOGE("%s: obtain reply sbuf fail", __func__);
         goto EXIT;
@@ -131,13 +131,13 @@ static int32_t DispGetParaProcess(uint32_t devId, const uint32_t cmd, uint32_t *
         HDF_LOGE("HdfSbufReadUint32 failure");
         goto EXIT;
     }
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return DISPLAY_SUCCESS;
 
 EXIT:
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return DISPLAY_FAILURE;
 }
 
@@ -145,7 +145,7 @@ static int32_t DispEventProcess(uint32_t devId, const uint32_t cmd, uint32_t val
 {
     int32_t ret;
 
-    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
+    struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         HDF_LOGE("%s: obtain data sbuf fail", __func__);
         return DISPLAY_FAILURE;
@@ -160,11 +160,11 @@ static int32_t DispEventProcess(uint32_t devId, const uint32_t cmd, uint32_t val
         HDF_LOGE("cmd:DISP_CMD_SET_%s failure\n", (cmd == DISP_CMD_SET_POWERSTATUS) ? "POWERMODE" : "BACKLIGHT");
         goto EXIT;
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return DISPLAY_SUCCESS;
 
 EXIT:
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return DISPLAY_FAILURE;
 }
 

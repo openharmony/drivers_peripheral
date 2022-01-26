@@ -192,10 +192,10 @@ int IPCObjectStubWlan::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data,
     int32_t status = -1;
 
     HDF_LOGI("IPCObjectStubWlan::OnRemoteRequest called, code = %d", code);
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (dataSbuf == NULL) {
         HDF_LOGE("%s: dataSbuf malloc failed!", __func__);
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     const char *name = data.ReadCString();
     HDF_LOGI("IPCObjectStubWlan::OnRemoteRequest called, ifName = %{public}s", name);
@@ -213,7 +213,7 @@ int IPCObjectStubWlan::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data,
             ret = HDF_FAILURE;
             break;
     }
-    HdfSBufRecycle(dataSbuf);
+    HdfSbufRecycle(dataSbuf);
     return ret;
 }
 
