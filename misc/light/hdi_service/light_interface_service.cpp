@@ -18,6 +18,8 @@
 #include <hdf_log.h>
 #include "light_if.h"
 
+#define HDF_LOG_TAG           hdf_light_dal
+
 namespace light {
 namespace v1_0 {
 int32_t LightInterfaceService::GetLightInfo(std::vector<HdfLightInfo>& info)

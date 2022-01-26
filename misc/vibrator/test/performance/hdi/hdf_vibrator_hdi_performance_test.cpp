@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include <cmath>
 #include <cstdio>
 #include <gtest/gtest.h>
@@ -79,7 +79,7 @@ HWTEST_F(HdfVibratorHdiPerformanceTest, VibratorStartOnce001, TestSize.Level1)
     int ret = g_vibratorInterface->StartOnce(VIBRATOR_DURATION);
     int endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_ONCE);
     clock_gettime(CLOCK_REALTIME, &tv2);
-    
+
     timeUsed = ((tv2.tv_sec * VIBRATOR_USEC_TIME + tv2.tv_nsec / VIBRATOR_MSEC_TIME) -
         (tv1.tv_sec * VIBRATOR_USEC_TIME + tv1.tv_nsec / VIBRATOR_MSEC_TIME));
     EXPECT_GT(VIBRATOR_COMMON_TIME, timeUsed);
@@ -103,7 +103,7 @@ HWTEST_F(HdfVibratorHdiPerformanceTest, VibratorHapticDefaultTime001, TestSize.L
     int ret = g_vibratorInterface->Start(g_timeSequence);
     int endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_PRESET);
     clock_gettime(CLOCK_REALTIME, &tv2);
-    
+
     timeUsed = ((tv2.tv_sec * VIBRATOR_USEC_TIME + tv2.tv_nsec / VIBRATOR_MSEC_TIME) -
         (tv1.tv_sec * VIBRATOR_USEC_TIME + tv1.tv_nsec / VIBRATOR_MSEC_TIME));
     EXPECT_GT(VIBRATOR_COMMON_TIME, timeUsed);
@@ -127,7 +127,7 @@ HWTEST_F(HdfVibratorHdiPerformanceTest, VibratorHapticDefaultEffect001, TestSize
     int ret = g_vibratorInterface->Start(g_builtIn);
     int endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_PRESET);
     clock_gettime(CLOCK_REALTIME, &tv2);
-    
+
     timeUsed = ((tv2.tv_sec * VIBRATOR_USEC_TIME + tv2.tv_nsec / VIBRATOR_MSEC_TIME) -
         (tv1.tv_sec * VIBRATOR_USEC_TIME + tv1.tv_nsec / VIBRATOR_MSEC_TIME));
     EXPECT_GT(VIBRATOR_COMMON_TIME, timeUsed);
