@@ -17,7 +17,7 @@
         "cesfwk_innerkits",
         "device_driver_framework",
         "libhilog",
-        "ipc_core",
+        "ipc_single",
         "want",
         "samgr_proxy"
       ],

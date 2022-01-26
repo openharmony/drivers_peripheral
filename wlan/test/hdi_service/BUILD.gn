@@ -46,12 +46,12 @@ ohos_unittest("WlanHdiServiceTest") {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
       "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "ipc:ipc_single" ]
 }
 
 ohos_unittest("WlanHdiServiceTestC") {
@@ -82,12 +82,12 @@ ohos_unittest("WlanHdiServiceTestC") {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
       "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "ipc:ipc_single" ]
 }
 
 ###########################end###########################

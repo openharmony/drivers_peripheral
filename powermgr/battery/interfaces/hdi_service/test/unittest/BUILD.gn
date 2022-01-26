@@ -84,7 +84,7 @@ ohos_unittest("test_hdisrv") {
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
@@ -132,7 +132,7 @@ ohos_unittest("test_capacity_shutdown") {
     "device_driver_framework:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
   ]
 }
 
@@ -171,7 +171,7 @@ ohos_unittest("test_input_event") {
     "device_driver_framework:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
   ]
 }
 

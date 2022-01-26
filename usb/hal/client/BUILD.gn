@@ -38,7 +38,7 @@ if (defined(ohos_lite)) {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
       "utils_base:utils",
     ]
 
