@@ -28,7 +28,7 @@ namespace hdi {
 namespace thermal {
 namespace v1_0 {
 namespace {
-const std::string FILE_NAME = "/system/etc/thermal_config/hdf/thermal_hdi_config.xml";
+const std::string FILE_NAME = HDF_ETC_DIR "/thermal_config/hdf/thermal_hdi_config.xml";
 }
 static sptr<IThermalCallback> theramalCb_ = nullptr;
 static std::shared_ptr<HdfThermalCallbackInfo> callbackInfo_ = nullptr;
