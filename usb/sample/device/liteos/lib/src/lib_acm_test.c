@@ -60,8 +60,8 @@ void acm_open()
     if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
         HDF_LOGE("%s: GetService err", __func__);
     }
-    g_data = HdfSBufObtainDefaultSize();
-    g_reply = HdfSBufObtainDefaultSize();
+    g_data = HdfSbufObtainDefaultSize();
+    g_reply = HdfSbufObtainDefaultSize();
     if (g_data == NULL || g_reply == NULL) {
         HDF_LOGE("%s: GetService err", __func__);
     }
@@ -82,8 +82,8 @@ void acm_close()
     if (status) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_CLOSE err", __func__);
     }
-    HdfSBufRecycle(g_data);
-    HdfSBufRecycle(g_reply);
+    HdfSbufRecycle(g_data);
+    HdfSbufRecycle(g_reply);
     HdfIoServiceRecycle(g_acmService);
 }
 

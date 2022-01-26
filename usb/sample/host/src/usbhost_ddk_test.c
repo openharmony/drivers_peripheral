@@ -74,14 +74,14 @@ int UsbObtainSbuf()
     }
 
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
-    g_data = HdfSBufObtainDefaultSize();
-    g_reply = HdfSBufObtainDefaultSize();
+    g_data = HdfSbufObtainDefaultSize();
+    g_reply = HdfSbufObtainDefaultSize();
 #else
-    g_data = HdfSBufTypedObtain(SBUF_IPC);
-    g_reply = HdfSBufTypedObtain(SBUF_IPC);
+    g_data = HdfSbufTypedObtain(SBUF_IPC);
+    g_reply = HdfSbufTypedObtain(SBUF_IPC);
 #endif
     if (g_data == NULL || g_reply == NULL) {
-        HDF_LOGE("%s:%d HdfSBufTypedObtain err", __func__, __LINE__);
+        HDF_LOGE("%s:%d HdfSbufTypedObtain err", __func__, __LINE__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -773,8 +773,8 @@ void TestExit(void)
 #else
     HdfRemoteServiceRecycle(g_acmService);
 #endif
-    HdfSBufRecycle(g_data);
-    HdfSBufRecycle(g_reply);
+    HdfSbufRecycle(g_data);
+    HdfSbufRecycle(g_reply);
 }
 
 bool TestGetExitFlag(void)

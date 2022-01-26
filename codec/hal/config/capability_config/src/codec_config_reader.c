@@ -152,24 +152,24 @@ struct HdfRemoteService *GetConfigService(void)
 static void ReleaseSbuf(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
 }
 
 int32_t EnumrateCapability(struct HdfRemoteService *remote, int index, CodecCapbility *cap)
 {
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL) {
         HDF_LOGE("%{public}s: Failed to obtain", __func__);
         return HDF_FAILURE;
     }
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (reply == NULL) {
         HDF_LOGE("%{public}s: Failed to obtain reply", __func__);
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
         return HDF_FAILURE;
     }
 
@@ -198,15 +198,15 @@ int32_t EnumrateCapability(struct HdfRemoteService *remote, int index, CodecCapb
 int32_t GetCapability(struct HdfRemoteService *remote,
     AvCodecMime mime, CodecType type, uint32_t flags, CodecCapbility *cap)
 {
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL) {
         HDF_LOGE("%{public}s: Failed to obtain", __func__);
         return HDF_FAILURE;
     }
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (reply == NULL) {
         HDF_LOGE("%{public}s: Failed to obtain reply", __func__);
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
         return HDF_FAILURE;
     }
 

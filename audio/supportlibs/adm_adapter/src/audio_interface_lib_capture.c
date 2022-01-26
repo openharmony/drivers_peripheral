@@ -1122,12 +1122,12 @@ int32_t AudioOutputCaptureReadFrame(struct HdfIoService *service, int cmdId, str
         ret = service->dispatcher->Dispatch(&service->object, cmdId, NULL, reply);
         if (ret != HDF_SUCCESS) {
             LOG_FUN_ERR("Failed to send service call!");
-            HdfSBufRecycle(reply);
+            HdfSbufRecycle(reply);
             return ret;
         }
         if (!HdfSbufReadUint32(reply, &buffStatus)) {
             LOG_FUN_ERR("Failed to Get buffStatus!");
-            HdfSBufRecycle(reply);
+            HdfSbufRecycle(reply);
             return HDF_FAILURE;
         }
         if (buffStatus == CIR_BUFF_EMPTY) {
@@ -1141,7 +1141,7 @@ int32_t AudioOutputCaptureReadFrame(struct HdfIoService *service, int cmdId, str
         break;
     } while (tryNumReply > 0);
     if (tryNumReply <= 0) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
         LOG_FUN_ERR("Out of tryNumReply!");
         return HDF_FAILURE;
     }
@@ -1220,7 +1220,7 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
         LOG_FUN_ERR("paras is NULL!");
         return HDF_FAILURE;
     }
-    struct HdfSBuf *reply = HdfSBufTypedObtainCapacity(SBUF_RAW, replySize);
+    struct HdfSBuf *reply = HdfSbufTypedObtainCapacity(SBUF_RAW, replySize);
     if (reply == NULL) {
         return HDF_FAILURE;
     }
@@ -1236,27 +1236,27 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
         return HDF_FAILURE;
     }
     if (!HdfSbufReadBuffer(reply, (const void **)&frame, &dataSize)) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
         return HDF_FAILURE;
     }
     if (dataSize > FRAME_DATA || handleData->frameCaptureMode.buffer == NULL) {
         LOG_FUN_ERR("Buffer is NULL or DataSize overflow!");
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(reply, &frameCount)) {
         LOG_FUN_ERR("Failed to Get buffStatus!");
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
         return HDF_FAILURE;
     }
     ret = memcpy_s(handleData->frameCaptureMode.buffer, FRAME_DATA, frame, dataSize);
     if (ret != 0) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
         return HDF_FAILURE;
     }
     handleData->frameCaptureMode.bufferSize = dataSize;
     handleData->frameCaptureMode.bufferFrameSize = frameCount;
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(reply);
     return HDF_SUCCESS;
 }
 

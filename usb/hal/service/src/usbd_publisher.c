@@ -26,12 +26,12 @@ void NotifySubscriberDevice(const struct UsbdSubscriber *subscriber, enum UsbdDe
         return;
     }
     struct HdfRemoteService *service = subscriber->remoteService;
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s failed to obtain hdf sbuf", __func__);
-        HdfSBufRecycle(data);
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(data);
+        HdfSbufRecycle(reply);
         return;
     }
     HdfSbufWriteInt32(data, act);
@@ -41,8 +41,8 @@ void NotifySubscriberDevice(const struct UsbdSubscriber *subscriber, enum UsbdDe
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to notify subscriber, ret: %{public}d", __func__, ret);
     }
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
 }
 
 void NotifyUsbPortSubscriber(const struct UsbdSubscriber *subscriber, int32_t portId, int32_t powerRole,
@@ -54,12 +54,12 @@ void NotifyUsbPortSubscriber(const struct UsbdSubscriber *subscriber, int32_t po
     }
     int32_t ret;
     struct HdfRemoteService *service = subscriber->remoteService;
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s failed to obtain hdf sbuf", __func__);
-        HdfSBufRecycle(data);
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(data);
+        HdfSbufRecycle(reply);
         return;
     }
     HdfSbufWriteInt32(data, portId);
@@ -73,6 +73,6 @@ void NotifyUsbPortSubscriber(const struct UsbdSubscriber *subscriber, int32_t po
     } else {
         HDF_LOGI("%{public}s: succeed to notify subscriber", __func__);
     }
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
 }

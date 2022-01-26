@@ -36,15 +36,15 @@ static int32_t CodecProxyCall(struct ICodec *self,
 
 int32_t CodecProxyReqSBuf(struct HdfSBuf **data, struct HdfSBuf **reply)
 {
-    *data = HdfSBufTypedObtain(SBUF_IPC);
+    *data = HdfSbufTypedObtain(SBUF_IPC);
     if (*data == NULL) {
         HDF_LOGE("%{public}s: Failed to obtain", __func__);
         return HDF_FAILURE;
     }
-    *reply = HdfSBufTypedObtain(SBUF_IPC);
+    *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (*reply == NULL) {
         HDF_LOGE("%{public}s: Failed to obtain reply", __func__);
-        HdfSBufRecycle(*data);
+        HdfSbufRecycle(*data);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -52,10 +52,10 @@ int32_t CodecProxyReqSBuf(struct HdfSBuf **data, struct HdfSBuf **reply)
 void CodecProxySBufRecycle(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return;
 }
@@ -640,7 +640,7 @@ int32_t CodecProxySetCallback(struct ICodec *self, CODEC_HANDLETYPE handle, stru
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (HdfSBufWriteRemoteService(data, cb->remote) != HDF_SUCCESS) {
+    if (HdfSbufWriteRemoteService(data, cb->remote) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: write cb failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;

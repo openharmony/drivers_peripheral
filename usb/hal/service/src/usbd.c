@@ -240,24 +240,24 @@ static int32_t UsbdAddDevicesOnStart(struct UsbdService *service)
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL) {
         HDF_LOGE("%{public}s: fail to obtain sbuf data", __func__);
         return HDF_DEV_ERR_NO_MEMORY;
     }
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (reply == NULL) {
         HDF_LOGE("%{public}s: fail to obtain sbuf reply", __func__);
-        HdfSBufRecycle(data);
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(data);
+        HdfSbufRecycle(reply);
         HdfIoServiceRecycle(usbPnpServ);
         return HDF_DEV_ERR_NO_MEMORY;
     }
     int32_t ret = usbPnpServ->dispatcher->Dispatch(&usbPnpServ->object, USB_PNP_DRIVER_GETDEVICES, data, reply);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: fail to send serivice call, ret=%{public}d", __func__, ret);
-        HdfSBufRecycle(data);
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(data);
+        HdfSbufRecycle(reply);
         HdfIoServiceRecycle(usbPnpServ);
         return ret;
     }
@@ -268,8 +268,8 @@ static int32_t UsbdAddDevicesOnStart(struct UsbdService *service)
         ret = HdfReadDevice(service, &count, &size, reply);
     } while (ret == HDF_SUCCESS);
 
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     HdfIoServiceRecycle(usbPnpServ);
     return ret;
 }

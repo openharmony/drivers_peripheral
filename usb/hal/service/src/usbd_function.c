@@ -65,8 +65,8 @@ static int32_t SendCmdToService(const char *name, int32_t cmd, unsigned char fun
         return HDF_FAILURE;
     }
 
-    data = HdfSBufTypedObtain(SBUF_IPC);
-    reply = HdfSBufTypedObtain(SBUF_IPC);
+    data = HdfSbufTypedObtain(SBUF_IPC);
+    reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s:%{public}d data or reply err\n", __func__, __LINE__);
         HdfRemoteServiceRecycle(service);
@@ -74,8 +74,8 @@ static int32_t SendCmdToService(const char *name, int32_t cmd, unsigned char fun
     }
     if (!HdfSbufWriteInt8(data, funcMask)) {
         HDF_LOGE("%{public}s:%{public}d HdfSbufWriteInt8 error\n", __func__, __LINE__);
-        HdfSBufRecycle(data);
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(data);
+        HdfSbufRecycle(reply);
         HdfRemoteServiceRecycle(service);
         return HDF_FAILURE;
     }
@@ -84,8 +84,8 @@ static int32_t SendCmdToService(const char *name, int32_t cmd, unsigned char fun
         HDF_LOGW("%{public}s:%{public}d serice %{public}s dispatch cmd : %{public}d error\n", __func__, __LINE__, name,
                  cmd);
     }
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     HdfRemoteServiceRecycle(service);
     return status;
 }

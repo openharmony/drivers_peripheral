@@ -229,15 +229,15 @@ void WifiDriverClientDeinit(void)
     g_wifiService = NULL;
 }
 
-static int32_t HdfSBufObtainDefault(struct HdfSBuf **data, struct HdfSBuf **reply)
+static int32_t HdfSbufObtainDefault(struct HdfSBuf **data, struct HdfSBuf **reply)
 {
-    *data = HdfSBufObtainDefaultSize();
+    *data = HdfSbufObtainDefaultSize();
     if (*data == NULL) {
         return RET_CODE_FAILURE;
     }
-    *reply = HdfSBufObtainDefaultSize();
+    *reply = HdfSbufObtainDefaultSize();
     if (*reply == NULL) {
-        HdfSBufRecycle(*data);
+        HdfSbufRecycle(*data);
         return RET_CODE_FAILURE;
     }
     return RET_CODE_SUCCESS;
@@ -253,7 +253,7 @@ int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    if (HdfSBufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
     ret = SendCmdSync(WIFI_HAL_CMD_GET_NETWORK_INFO, data, reply);
@@ -262,8 +262,8 @@ int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result)
     } else {
         ret = RET_CODE_FAILURE;
     }
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -277,7 +277,7 @@ int32_t IsSupportCombo(uint8_t *isSupportCombo)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    if (HdfSBufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
     ret = SendCmdSync(WIFI_HAL_CMD_IS_SUPPORT_COMBO, data, reply);
@@ -292,8 +292,8 @@ int32_t IsSupportCombo(uint8_t *isSupportCombo)
             ret = RET_CODE_SUCCESS;
         }
     } while(0);
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -310,7 +310,7 @@ int32_t GetComboInfo(uint64_t *comboInfo, uint32_t size)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    if (HdfSBufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
     ret = SendCmdSync(WIFI_HAL_CMD_GET_SUPPORT_COMBO, data, reply);
@@ -340,8 +340,8 @@ int32_t GetComboInfo(uint64_t *comboInfo, uint32_t size)
             break;
         }
     } while (0);
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -355,7 +355,7 @@ int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    if (HdfSBufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
     do {
@@ -371,8 +371,8 @@ int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
         }
         ret = SendCmdSync(WIFI_HAL_CMD_SET_MAC_ADDR, data, reply);
     } while (0);
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -386,7 +386,7 @@ int32_t GetDevMacAddr(const char *ifName, int32_t type, uint8_t *mac, uint8_t le
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    if (HdfSBufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
     do {
@@ -407,8 +407,8 @@ int32_t GetDevMacAddr(const char *ifName, int32_t type, uint8_t *mac, uint8_t le
         }
         ret = ParserDeviceMacAddr(reply, mac, len);
     } while (0);
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -422,7 +422,7 @@ int32_t GetValidFreqByBand(const char *ifName, int32_t band, struct FreqInfoResu
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    if (HdfSBufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
     do {
@@ -443,8 +443,8 @@ int32_t GetValidFreqByBand(const char *ifName, int32_t band, struct FreqInfoResu
         }
         ret = ParserFreqInfo(reply, result);
     } while (0);
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -458,7 +458,7 @@ int32_t SetTxPower(const char *ifName, int32_t power)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    if (HdfSBufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
     do {
@@ -474,8 +474,8 @@ int32_t SetTxPower(const char *ifName, int32_t power)
         }
         ret = SendCmdSync(WIFI_HAL_CMD_SET_TX_POWER, data, reply);
     } while (0);
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -489,7 +489,7 @@ int32_t GetAssociatedStas(const char *ifName, struct AssocStaInfoResult *result)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    if (HdfSBufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
     do {
@@ -505,8 +505,8 @@ int32_t GetAssociatedStas(const char *ifName, struct AssocStaInfoResult *result)
         }
         ret = ParserAssociatedStas(reply, result);
     } while (0);
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -520,7 +520,7 @@ int32_t WifiSetCountryCode(const char *ifName, const char *code, uint32_t len)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    if (HdfSBufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
     do {
@@ -536,8 +536,8 @@ int32_t WifiSetCountryCode(const char *ifName, const char *code, uint32_t len)
         }
         ret = SendCmdSync(WIFI_HAL_CMD_SET_COUNTRY_CODE, data, reply);
     } while (0);
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -552,7 +552,7 @@ int32_t SetScanMacAddr(const char *ifName, uint8_t *scanMac, uint8_t len)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    if (HdfSBufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
     do {
@@ -581,8 +581,8 @@ int32_t SetScanMacAddr(const char *ifName, uint8_t *scanMac, uint8_t len)
             break;
         }
     } while (0);
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -596,7 +596,7 @@ int32_t AcquireChipId(const char *ifName, uint8_t *chipId)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    if (HdfSBufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
     do {
@@ -615,8 +615,8 @@ int32_t AcquireChipId(const char *ifName, uint8_t *chipId)
             break;
         }
     } while (0);
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -666,7 +666,7 @@ int32_t GetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num)
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    if (HdfSBufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
     do {
@@ -681,8 +681,8 @@ int32_t GetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num)
         }
         ret = GetIfNames(reply, ifNames, num);
     } while (0);
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -692,7 +692,7 @@ int32_t SetResetDriver(const uint8_t chipId, const char *ifName)
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
 
-    if (HdfSBufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
     do{
@@ -708,8 +708,8 @@ int32_t SetResetDriver(const uint8_t chipId, const char *ifName)
         }
         ret = SendCmdSync(WIFI_HAL_CMD_RESET_DRIVER, data, reply);
     } while (0);
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -728,7 +728,7 @@ int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
     if (netDeviceInfoResult == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    if (HdfSBufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
     do{
@@ -759,8 +759,8 @@ int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
             }
         }
     } while (0);
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 
@@ -775,7 +775,7 @@ int32_t WifiEapolPacketSend(const char *ifName, const uint8_t *srcAddr, const ui
     if (ifName == NULL || buf == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         HILOG_ERROR(LOG_DOMAIN, "%s: Init HdfSBuf failed", __FUNCTION__);
         return RET_CODE_FAILURE;
@@ -789,7 +789,7 @@ int32_t WifiEapolPacketSend(const char *ifName, const uint8_t *srcAddr, const ui
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SEND_EAPOL, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -805,8 +805,8 @@ int32_t WifiEapolPacketReceive(const char *ifName, WifiRxEapol *rxEapol)
     if (ifName == NULL || rxEapol == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
-    respData = HdfSBufObtain(DEFAULT_EAPOL_PACKAGE_SIZE);
+    data = HdfSbufObtainDefaultSize();
+    respData = HdfSbufObtain(DEFAULT_EAPOL_PACKAGE_SIZE);
     if (data == NULL || respData == NULL) {
         HILOG_ERROR(LOG_DOMAIN, "%s: Init HdfSBuf failed", __FUNCTION__);
         ret = RET_CODE_FAILURE;
@@ -842,8 +842,8 @@ int32_t WifiEapolPacketReceive(const char *ifName, WifiRxEapol *rxEapol)
     }
 
 RELEASE_DATA:
-    HdfSBufRecycle(respData);
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(respData);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -855,7 +855,7 @@ int32_t WifiEapolEnable(const char *ifName)
     if (ifName == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -865,7 +865,7 @@ int32_t WifiEapolEnable(const char *ifName)
         HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
 
     return ret;
 }
@@ -878,7 +878,7 @@ int32_t WifiEapolDisable(const char *ifName)
     if (ifName == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -888,7 +888,7 @@ int32_t WifiEapolDisable(const char *ifName)
         HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -900,7 +900,7 @@ int32_t WifiCmdSetAp(const char *ifName, WifiApSetting *apsettings)
     if (ifName == NULL || apsettings == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -919,7 +919,7 @@ int32_t WifiCmdSetAp(const char *ifName, WifiApSetting *apsettings)
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SET_AP, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -931,7 +931,7 @@ int32_t WifiCmdChangeBeacon(const char *ifName, WifiApSetting *apsettings)
     if (ifName == NULL || apsettings == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -950,7 +950,7 @@ int32_t WifiCmdChangeBeacon(const char *ifName, WifiApSetting *apsettings)
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_CHANGE_BEACON, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -962,7 +962,7 @@ int32_t WifiCmdSendMlme(const char *ifName, WifiMlmeData *mlme)
     if (ifName == NULL || mlme == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -977,7 +977,7 @@ int32_t WifiCmdSendMlme(const char *ifName, WifiMlmeData *mlme)
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SEND_MLME, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -989,7 +989,7 @@ static int32_t WifiCmdOperKey(const char *ifName, uint32_t cmd, WifiKeyExt *keyE
     if (ifName == NULL || keyExt == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -1010,7 +1010,7 @@ static int32_t WifiCmdOperKey(const char *ifName, uint32_t cmd, WifiKeyExt *keyE
     } else {
         ret = SendCmdSync(cmd, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1037,7 +1037,7 @@ int32_t WifiCmdSetMode(const char *ifName, WifiSetMode *setMode)
     if (ifName == NULL || setMode == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -1050,7 +1050,7 @@ int32_t WifiCmdSetMode(const char *ifName, WifiSetMode *setMode)
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SET_MODE, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1064,8 +1064,8 @@ int32_t WifiCmdGetOwnMac(const char *ifName, void *buf, uint32_t len)
     if (ifName == NULL || buf == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
-    reply = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
+    reply = HdfSbufObtainDefaultSize();
     if (data == NULL || reply == NULL) {
         ret = RET_CODE_FAILURE;
         goto RELEASE_DATA;
@@ -1093,8 +1093,8 @@ int32_t WifiCmdGetOwnMac(const char *ifName, void *buf, uint32_t len)
     }
 
 RELEASE_DATA:
-    HdfSBufRecycle(reply);
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(reply);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1107,8 +1107,8 @@ int32_t WifiCmdGetHwFeature(const char *ifName, WifiHwFeatureData *hwFeatureData
     if (ifName == NULL || hwFeatureData == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
-    reply = HdfSBufObtain(sizeof(WifiHwFeatureData) + sizeof(uint64_t));
+    data = HdfSbufObtainDefaultSize();
+    reply = HdfSbufObtain(sizeof(WifiHwFeatureData) + sizeof(uint64_t));
     if (data == NULL || reply == NULL) {
         ret = RET_CODE_FAILURE;
         goto RELEASE_DATA;
@@ -1135,8 +1135,8 @@ int32_t WifiCmdGetHwFeature(const char *ifName, WifiHwFeatureData *hwFeatureData
         goto RELEASE_DATA;
     }
 RELEASE_DATA:
-    HdfSBufRecycle(reply);
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(reply);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1148,7 +1148,7 @@ int32_t WifiCmdScan(const char *ifName, WifiScan *scan)
     if (ifName == NULL || scan == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -1172,7 +1172,7 @@ int32_t WifiCmdScan(const char *ifName, WifiScan *scan)
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SCAN, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1184,7 +1184,7 @@ int32_t WifiCmdDisconnet(const char *ifName, int32_t reasonCode)
     if (ifName == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -1197,7 +1197,7 @@ int32_t WifiCmdDisconnet(const char *ifName, int32_t reasonCode)
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_DISCONNECT, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1209,7 +1209,7 @@ int32_t WifiCmdAssoc(const char *ifName, WifiAssociateParams *assocParams)
     if (ifName == NULL || assocParams == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -1236,7 +1236,7 @@ int32_t WifiCmdAssoc(const char *ifName, WifiAssociateParams *assocParams)
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_ASSOC, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1248,7 +1248,7 @@ int32_t WifiCmdSetNetdev(const char *ifName, WifiSetNewDev *info)
     if (ifName == NULL || info == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -1261,7 +1261,7 @@ int32_t WifiCmdSetNetdev(const char *ifName, WifiSetNewDev *info)
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SET_NETDEV, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1273,7 +1273,7 @@ int32_t WifiCmdStaRemove(const char *ifName, const uint8_t *addr, uint32_t addrL
     if (ifName == NULL || addr == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -1286,7 +1286,7 @@ int32_t WifiCmdStaRemove(const char *ifName, const uint8_t *addr, uint32_t addrL
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_STA_REMOVE, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1298,7 +1298,7 @@ int32_t WifiCmdSendAction(const char *ifName, WifiActionData *actionData)
     if (ifName == NULL || actionData == NULL) {
         return RET_CODE_INVALID_PARAM;
     }
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -1315,7 +1315,7 @@ int32_t WifiCmdSendAction(const char *ifName, WifiActionData *actionData)
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SEND_ACTION, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1324,7 +1324,7 @@ int32_t WifiCmdSetClient(uint32_t clientNum)
     int32_t ret;
     struct HdfSBuf *data = NULL;
 
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -1334,7 +1334,7 @@ int32_t WifiCmdSetClient(uint32_t clientNum)
     } else {
         ret = SendCmdSync(WIFI_CLIENT_CMD_SET_CLIENT, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1343,7 +1343,7 @@ int32_t WifiCmdProbeReqReport(const char* ifName, const int32_t *report)
     if (ifName == NULL || report == NULL) {
         return RET_CODE_FAILURE;
     }
-    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
+    struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -1356,10 +1356,10 @@ int32_t WifiCmdProbeReqReport(const char* ifName, const int32_t *report)
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_PROBE_REQ_REPORT, data, NULL);
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
         return ret;
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1368,7 +1368,7 @@ int32_t WifiCmdRemainOnChannel(const char* ifName, const WifiOnChannel *onChanne
     if (ifName == NULL || onChannel == NULL) {
         return RET_CODE_FAILURE;
     }
-    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
+    struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -1382,10 +1382,10 @@ int32_t WifiCmdRemainOnChannel(const char* ifName, const WifiOnChannel *onChanne
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_REMAIN_ON_CHANNEL, data, NULL);
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
         return ret;
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1394,7 +1394,7 @@ int32_t WifiCmdCancelRemainOnChannel(const char* ifName)
     if (ifName == NULL) {
         return RET_CODE_FAILURE;
     }
-    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
+    struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -1406,10 +1406,10 @@ int32_t WifiCmdCancelRemainOnChannel(const char* ifName)
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_CANCEL_REMAIN_ON_CHANNEL, data, NULL);
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
         return ret;
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1418,7 +1418,7 @@ int32_t WifiCmdAddIf(const char *ifname, const WifiIfAdd *ifAdd)
     if (ifname == NULL || ifAdd == NULL) {
         return RET_CODE_FAILURE;
     }
-    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
+    struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -1432,7 +1432,7 @@ int32_t WifiCmdAddIf(const char *ifname, const WifiIfAdd *ifAdd)
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_ADD_IF, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1441,7 +1441,7 @@ int32_t WifiCmdRemoveIf(const char *ifname, const WifiIfRemove *ifRemove)
     if (ifname == NULL || ifRemove == NULL) {
         return RET_CODE_FAILURE;
     }
-    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
+    struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -1455,7 +1455,7 @@ int32_t WifiCmdRemoveIf(const char *ifname, const WifiIfRemove *ifRemove)
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_REMOVE_IF, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1464,7 +1464,7 @@ int32_t WifiCmdSetApWpsP2pIe(const char *ifname, const WifiAppIe *appIe)
     if (ifname == NULL || appIe == NULL) {
         return RET_CODE_FAILURE;
     }
-    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
+    struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         return RET_CODE_FAILURE;
     }
@@ -1484,7 +1484,7 @@ int32_t WifiCmdSetApWpsP2pIe(const char *ifname, const WifiAppIe *appIe)
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SET_AP_WPS_P2P_IE, data, NULL);
     }
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(data);
     return ret;
 }
 
@@ -1495,8 +1495,8 @@ int32_t WifiCmdGetDrvFlags(const char *ifname, WifiGetDrvFlags *params)
     if (ifname == NULL || params == NULL) {
         return RET_CODE_FAILURE;
     }
-    struct HdfSBuf *data = HdfSBufObtainDefaultSize();
-    struct HdfSBuf *reply = HdfSBufObtainDefaultSize();
+    struct HdfSBuf *data = HdfSbufObtainDefaultSize();
+    struct HdfSBuf *reply = HdfSbufObtainDefaultSize();
     if (ifname == NULL || reply == NULL) {
         ret = RET_CODE_FAILURE;
         goto RELEASE_DATA;
@@ -1518,8 +1518,8 @@ int32_t WifiCmdGetDrvFlags(const char *ifname, WifiGetDrvFlags *params)
         goto RELEASE_DATA;
     }
 RELEASE_DATA:
-    HdfSBufRecycle(reply);
-    HdfSBufRecycle(data);
+    HdfSbufRecycle(reply);
+    HdfSbufRecycle(data);
     return ret;
 }
 

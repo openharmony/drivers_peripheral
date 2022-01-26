@@ -30,7 +30,7 @@ struct HdfSBuf *AudioProxyObtainHdfSBuf(void)
 #else
     bufType = SBUF_RAW;
 #endif
-    return HdfSBufTypedObtain(bufType);
+    return HdfSbufTypedObtain(bufType);
 }
 
 int32_t AudioProxyDispatchCall(struct HdfRemoteService *self,
@@ -50,10 +50,10 @@ int32_t AudioProxyDispatchCall(struct HdfRemoteService *self,
 void AudioProxyBufReplyRecycle(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return;
 }
@@ -71,7 +71,7 @@ int32_t AudioProxyPreprocessSBuf(struct HdfSBuf **data, struct HdfSBuf **reply)
     *reply = AudioProxyObtainHdfSBuf();
     if (*reply == NULL) {
         LOG_FUN_ERR("Failed to obtain reply");
-        HdfSBufRecycle(*data);
+        HdfSbufRecycle(*data);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;

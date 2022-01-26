@@ -144,8 +144,8 @@ int acm_speed_write(int argc, const char *argv[])
         return HDF_FAILURE;
     }
 
-    g_data = HdfSBufObtainDefaultSize();
-    g_reply = HdfSBufObtainDefaultSize();
+    g_data = HdfSbufObtainDefaultSize();
+    g_reply = HdfSbufObtainDefaultSize();
     if (g_data == NULL || g_reply == NULL) {
         HDF_LOGE("%s: GetService err", __func__);
         return HDF_FAILURE;
@@ -172,8 +172,8 @@ int acm_speed_write(int argc, const char *argv[])
         return HDF_FAILURE;
     }
 
-    HdfSBufRecycle(g_data);
-    HdfSBufRecycle(g_reply);
+    HdfSbufRecycle(g_data);
+    HdfSbufRecycle(g_reply);
     HdfIoServiceRecycle(g_acmService);
     return 0;
 }

@@ -120,7 +120,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSetVolumeSBufWhenHandleDataI
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderSetVolumeSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSetVolumeSBufWhenParamIsVaild, TestSize.Level1)
@@ -130,7 +130,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSetVolumeSBufWhenParamIsVail
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderSetVolumeSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -151,7 +151,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderGetVolumeSBufWhenHandleDataI
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderGetVolumeSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderGetVolumeSBufWhenParamIsVaild, TestSize.Level1)
@@ -161,7 +161,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderGetVolumeSBufWhenParamIsVail
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderGetVolumeSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -182,7 +182,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSetPauseBufWhenHandleDataIsN
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderSetPauseBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSetPauseBufWhenParamIsVaild, TestSize.Level1)
@@ -192,7 +192,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSetPauseBufWhenParamIsVaild,
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderSetPauseBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -213,7 +213,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSetMuteBufWhenHandleDataIsNu
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderSetMuteBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSetMuteBufWhenParamIsVaild, TestSize.Level1)
@@ -223,7 +223,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSetMuteBufWhenParamIsVaild, 
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderSetMuteBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -244,7 +244,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderGetMuteSBufWhenHandleDataIsN
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderGetMuteSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderGetMuteSBufWhenParamIsVaild, TestSize.Level1)
@@ -254,7 +254,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderGetMuteSBufWhenParamIsVaild,
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderGetMuteSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -275,7 +275,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSetGainBufWhenHandleDataIsNu
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderSetGainBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSetGainBufWhenParamIsVaild, TestSize.Level1)
@@ -285,7 +285,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSetGainBufWhenParamIsVaild, 
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderSetGainBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -306,7 +306,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderGetGainSBufWhenHandleDataIsN
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderGetGainSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderGetGainSBufWhenParamIsVaild, TestSize.Level1)
@@ -316,7 +316,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderGetGainSBufWhenParamIsVaild,
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderGetGainSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -339,7 +339,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSceneSelectSBufWhenHandleDat
     int32_t deviceIndex = 0;
     int32_t ret = AudioCtlRenderSceneSelectSBuf(sBuf, handleData, deviceIndex);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSceneSelectSBufWhenParamIsVaild, TestSize.Level1)
@@ -350,7 +350,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSceneSelectSBufWhenParamIsVa
     int32_t deviceIndex = 0;
     int32_t ret = AudioCtlRenderSceneSelectSBuf(sBuf, handleData, deviceIndex);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -371,7 +371,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSceneGetGainThresholdSBufWhe
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderSceneGetGainThresholdSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSceneGetGainThresholdSBufWhenParamIsVaild, TestSize.Level1)
@@ -381,7 +381,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSceneGetGainThresholdSBufWhe
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderSceneGetGainThresholdSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -402,7 +402,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSetChannelModeBufWhenHandleD
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderSetChannelModeBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSetChannelModeBufWhenParamIsVaild, TestSize.Level1)
@@ -412,7 +412,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderSetChannelModeBufWhenParamIs
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderSetChannelModeBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -433,7 +433,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderGetChannelModeSBufWhenHandle
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderGetChannelModeSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 
 HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderGetChannelModeSBufWhenParamIsVaild, TestSize.Level1)
@@ -443,7 +443,7 @@ HWTEST_F(AudioInterfaceLibRenderTest, AudioCtlRenderGetChannelModeSBufWhenParamI
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderGetChannelModeSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
     delete(handleData);
     handleData = nullptr;
 }
@@ -460,6 +460,6 @@ HWTEST_F(AudioInterfaceLibRenderTest, ParamsSbufWriteBufferWhenParamIsVaild, Tes
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     int32_t ret = ParamsSbufWriteBuffer(sBuf);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    HdfSBufRecycle(sBuf);
+    HdfSbufRecycle(sBuf);
 }
 }

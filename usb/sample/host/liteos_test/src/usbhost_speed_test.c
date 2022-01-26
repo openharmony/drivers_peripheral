@@ -94,10 +94,10 @@ void speedInit()
         return;
     }
 
-    g_data = HdfSBufObtain(2000);
-    g_reply = HdfSBufObtain(2000);
+    g_data = HdfSbufObtain(2000);
+    g_reply = HdfSbufObtain(2000);
     if (g_data == NULL || g_reply == NULL) {
-        printf("%s: HdfSBufTypedObtain err", __func__);
+        printf("%s: HdfSbufTypedObtain err", __func__);
         return;
     }
 
@@ -124,8 +124,8 @@ void speedExit()
         HdfIoServiceRecycle(g_service);
         g_service = NULL;
     }
-    HdfSBufRecycle(g_data);
-    HdfSBufRecycle(g_reply);
+    HdfSbufRecycle(g_data);
+    HdfSbufRecycle(g_reply);
 }
 
 static void ShowHelp(const char *name)
