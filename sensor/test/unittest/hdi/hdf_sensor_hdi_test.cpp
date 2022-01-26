@@ -24,7 +24,7 @@
 #include "sensor_type.h"
 #include "sensor_callback_service.h"
 
-using namespace hdi::sensor::v1_0;
+using namespace sensor::v1_0;
 using namespace testing::ext;
 
 namespace {

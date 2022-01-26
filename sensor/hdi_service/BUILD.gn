@@ -18,8 +18,8 @@ ohos_shared_library("libsensor_interface_service_1.0") {
   sources = [ "sensor_interface_service.cpp" ]
 
   public_deps = [
+    "//drivers/interface/sensor/v1_0:libsensor_stub_1.0",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
-    "//drivers/peripheral/sensor/interfaces/hdi/sensor/v1_0:libsensor_stub_1.0",
   ]
 
   if (is_standard_system) {
@@ -49,7 +49,7 @@ ohos_shared_library("libsensor_driver") {
 
   deps = [
     "//drivers/peripheral/sensor/hal:hdi_sensor",
-    "//drivers/peripheral/sensor/interfaces/hdi_service:libsensor_interface_service_1.0",
+    "//drivers/peripheral/sensor/hdi_service:libsensor_interface_service_1.0",
   ]
 
   if (is_standard_system) {
@@ -74,7 +74,7 @@ ohos_shared_library("libsensor_driver") {
   part_name = "sensor_device_driver"
 }
 
-group("hdf_sensor_service") {
+group("hdi_sensor_service") {
   if (target_cpu == "arm") {
     deps = [
       ":libsensor_driver",

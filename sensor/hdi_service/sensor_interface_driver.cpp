@@ -23,7 +23,7 @@
 
 #define HDF_LOG_TAG    hdf_sensor_if_driver
 
-using namespace hdi::sensor::v1_0;
+using namespace sensor::v1_0;
 
 struct HdfSensorInterfaceHost {
     struct IDeviceIoService ioservice;
