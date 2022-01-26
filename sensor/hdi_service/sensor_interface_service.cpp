@@ -20,7 +20,6 @@
 
 #define HDF_LOG_TAG    hdf_sensor_dal
 
-namespace hdi {
 namespace sensor {
 namespace v1_0 {
 namespace {
@@ -301,6 +300,7 @@ int32_t SensorInterfaceService::Unregister(int32_t sensorId, const sptr<ISensorC
     int32_t ret = sensorInterface->Unregister(sensorIndex, SensorDataCallback);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+        return ret;
     }
     g_remoteObjectIndexMap.erase(remoteIndexIter);
     g_remoteObjectCallBackMap.erase(obj);
@@ -310,4 +310,3 @@ int32_t SensorInterfaceService::Unregister(int32_t sensorId, const sptr<ISensorC
 }
 } // v1_0
 } // sensor
-} // hdi

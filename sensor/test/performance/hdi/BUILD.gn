@@ -39,9 +39,7 @@ ohos_unittest("hdf_sensor_hdi_test_performance") {
     "-fno-strict-aliasing",
   ]
 
-  deps = [
-    "//drivers/peripheral/sensor/interfaces/hdi/sensor/v1_0:libsensor_proxy",
-  ]
+  deps = [ "//drivers/interface/sensor/v1_0:libsensor_proxy_1.0" ]
 
   if (is_standard_system) {
     external_deps = [

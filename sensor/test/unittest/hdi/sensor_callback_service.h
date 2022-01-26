@@ -19,7 +19,6 @@
 #include <hdf_base.h>
 #include "sensor_callback_stub.h"
 
-namespace hdi {
 namespace sensor {
 namespace v1_0 {
 class SensorCallbackService : public SensorCallbackStub {
@@ -30,7 +29,6 @@ public:
 };
 } // v1_0
 } // sensor
-} // hdi
 
 #endif // HDI_SENSOR_V1_0_SENSORCALLBACKSERVICE_H
 

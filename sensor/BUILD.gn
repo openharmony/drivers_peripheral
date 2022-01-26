@@ -19,8 +19,8 @@ if (defined(ohos_lite)) {
   group("sensor_entry") {
     deps = [
       "hal:hdi_sensor",
-      "interfaces/hdi/sensor/v1_0:sensor",
-      "interfaces/hdi_service:hdf_sensor_service",
+      "//drivers/interface/sensor/v1_0:sensor",
+      "//drivers/peripheral/sensor/hdi_service:hdi_sensor_service",
     ]
   }
 }
