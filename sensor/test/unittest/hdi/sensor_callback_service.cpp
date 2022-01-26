@@ -17,7 +17,6 @@
 #include "sensor_type.h"
 #include "osal_mem.h"
 
-namespace hdi {
 namespace sensor {
 namespace v1_0 {
 namespace {
@@ -112,4 +111,3 @@ int32_t SensorCallbackService::OnDataEvent(const HdfSensorEvents& event)
 }
 } // v1_0
 } // sensor
-} // hdi

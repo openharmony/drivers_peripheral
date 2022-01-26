@@ -23,7 +23,7 @@
 #include "sensor_callback_service.h"
 
 using namespace testing::ext;
-using namespace hdi::sensor::v1_0;
+using namespace sensor::v1_0;
 
 namespace {
     const int32_t SENSOR_ID = 0;
