@@ -26,7 +26,7 @@ ohos_shared_library("libthermal_callback") {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
       "sensor_device_driver:hdi_sensor",
       "utils_base:utils",
     ]

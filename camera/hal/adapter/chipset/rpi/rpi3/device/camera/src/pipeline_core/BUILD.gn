@@ -114,12 +114,13 @@ ohos_shared_library("camera_pipeline_core") {
       "device_driver_framework:libhdf_utils",
       "graphic_standard:surface",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
       "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "ipc:ipc_single" ]
 
   public_configs = [ ":pipe_config" ]
   install_images = [ chipset_base_dir ]
