@@ -43,6 +43,7 @@ if (defined(ohos_lite)) {
       "-fno-common",
       "-fno-strict-aliasing",
     ]
+    install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "light_device_driver"
     if (is_standard_system) {
@@ -77,6 +78,7 @@ if (defined(ohos_lite)) {
       "-fno-common",
       "-fno-strict-aliasing",
     ]
+    install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "light_device_driver"
     if (is_standard_system) {
