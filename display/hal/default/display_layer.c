@@ -177,15 +177,15 @@ static int32_t GetInfo(uint32_t devId, struct DispInfo *info)
         HDF_LOGE("%s: invalid param", __func__);
         return DISPLAY_FAILURE;
     }
-    data = HdfSBufObtainDefaultSize();
+    data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
         HDF_LOGE("%s: obtain data sbuf fail", __func__);
         return DISPLAY_FAILURE;
     }
-    reply = HdfSBufObtainDefaultSize();
+    reply = HdfSbufObtainDefaultSize();
     if (reply == NULL) {
         HDF_LOGE("%s: obtain reply sbuf fail", __func__);
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
         return DISPLAY_FAILURE;
     }
     if (!HdfSbufWriteUint32(data, devId)) {
@@ -205,13 +205,13 @@ static int32_t GetInfo(uint32_t devId, struct DispInfo *info)
         HDF_LOGE("memcpy_s failure");
         goto ERR;
     }
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return DISPLAY_SUCCESS;
 
 ERR:
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return DISPLAY_FAILURE;
 }
 

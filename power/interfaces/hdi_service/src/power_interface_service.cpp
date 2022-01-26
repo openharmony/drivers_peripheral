@@ -109,16 +109,16 @@ void NotifyCallback(int code)
         return;
     }
 
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == nullptr || reply == nullptr) {
         return;
     }
 
     std::shared_ptr<PowerInterfaceService> powerInterfaceService = std::make_shared<PowerInterfaceService>();
     powerInterfaceService->RegisterCallback(callback_);
-    HdfSBufRecycle(data);
-    HdfSBufRecycle(reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
 }
 
 int32_t PowerInterfaceService::StopSuspend()

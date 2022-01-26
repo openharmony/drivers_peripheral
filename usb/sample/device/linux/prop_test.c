@@ -53,8 +53,8 @@ static int DispatcherInit(void)
         return HDF_FAILURE;
     }
 
-    g_data = HdfSBufTypedObtain(SBUF_IPC);
-    g_reply = HdfSBufTypedObtain(SBUF_IPC);
+    g_data = HdfSbufTypedObtain(SBUF_IPC);
+    g_reply = HdfSbufTypedObtain(SBUF_IPC);
     if (g_data == NULL || g_reply == NULL) {
         HDF_LOGE("%s: GetService err", __func__);
         return HDF_FAILURE;
@@ -64,8 +64,8 @@ static int DispatcherInit(void)
 
 static void DispatcherDeInit(void)
 {
-    HdfSBufRecycle(g_data);
-    HdfSBufRecycle(g_reply);
+    HdfSbufRecycle(g_data);
+    HdfSbufRecycle(g_reply);
 }
 
 static int TestPropGet(const char *propName)

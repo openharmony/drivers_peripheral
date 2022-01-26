@@ -44,8 +44,8 @@ static int32_t WlanConstruct(struct IWifiInterface *self)
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -58,10 +58,10 @@ static int32_t WlanConstruct(struct IWifiInterface *self)
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -73,8 +73,8 @@ static int32_t WlanDestruct(struct IWifiInterface *self)
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -87,10 +87,10 @@ static int32_t WlanDestruct(struct IWifiInterface *self)
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -102,8 +102,8 @@ static int32_t WlanStart(struct IWifiInterface *self)
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -116,10 +116,10 @@ static int32_t WlanStart(struct IWifiInterface *self)
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -131,8 +131,8 @@ static int32_t WlanStop(struct IWifiInterface *self)
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -145,10 +145,10 @@ static int32_t WlanStop(struct IWifiInterface *self)
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -161,8 +161,8 @@ static int32_t WlanCreateFeature(struct IWifiInterface *self, const int32_t type
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -186,10 +186,10 @@ static int32_t WlanCreateFeature(struct IWifiInterface *self, const int32_t type
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -201,8 +201,8 @@ static int32_t WlanDestroyFeature(struct IWifiInterface *self, struct WlanFeatur
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -227,10 +227,10 @@ finished:
     OsalMemFree(ifeature->ifName);
     OsalMemFree(ifeature);
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -243,8 +243,8 @@ static int32_t WlanGetAsscociatedStas(struct IWifiInterface *self, const struct 
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -272,10 +272,10 @@ static int32_t WlanGetAsscociatedStas(struct IWifiInterface *self, const struct 
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -287,8 +287,8 @@ static int32_t WlanGetChipId(struct IWifiInterface *self, const struct WlanFeatu
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -316,10 +316,10 @@ static int32_t WlanGetChipId(struct IWifiInterface *self, const struct WlanFeatu
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -332,8 +332,8 @@ static int32_t WlanGetDeviceMacAddress(struct IWifiInterface *self, const struct
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -358,10 +358,10 @@ static int32_t WlanGetDeviceMacAddress(struct IWifiInterface *self, const struct
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -375,8 +375,8 @@ static int32_t WlanGetFeatureByIfName(struct IWifiInterface *self,  const char *
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -401,10 +401,10 @@ static int32_t WlanGetFeatureByIfName(struct IWifiInterface *self,  const char *
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -417,8 +417,8 @@ static int32_t WlanGetFeatureType(struct IWifiInterface *self, struct WlanFeatur
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -443,10 +443,10 @@ static int32_t WlanGetFeatureType(struct IWifiInterface *self, struct WlanFeatur
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -459,8 +459,8 @@ static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct Wl
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     freqs = (int32_t *)OsalMemCalloc(sizeof(int32_t));
     if (freqs == NULL) {
         return HDF_ERR_MALLOC_FAIL;
@@ -500,10 +500,10 @@ static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct Wl
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -515,8 +515,8 @@ static int32_t WlanGetIfNamesByChipId(struct IWifiInterface *self, const uint8_t
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -541,10 +541,10 @@ static int32_t WlanGetIfNamesByChipId(struct IWifiInterface *self, const uint8_t
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -556,8 +556,8 @@ static int32_t WlanGetNetworkIfaceName(struct IWifiInterface *self, struct WlanF
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -579,10 +579,10 @@ static int32_t WlanGetNetworkIfaceName(struct IWifiInterface *self, struct WlanF
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -594,8 +594,8 @@ static int32_t WlanGetSupportCombo(struct IWifiInterface *self, uint64_t *combo)
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -617,10 +617,10 @@ static int32_t WlanGetSupportCombo(struct IWifiInterface *self, uint64_t *combo)
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -633,8 +633,8 @@ static int32_t WlanGetSupportFeature(struct IWifiInterface *self, uint8_t *supTy
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -650,10 +650,10 @@ static int32_t WlanGetSupportFeature(struct IWifiInterface *self, uint8_t *supTy
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -679,14 +679,14 @@ static int32_t WlanRegisterEventCallback(struct IWifiInterface *self, CallbackFu
         return HDF_ERR_INVALID_PARAM;
     }
     struct HdfRemoteService *callback = HdfRemoteServiceObtain(NULL, &g_callbackDispatcher);
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    HdfSBufWriteRemoteService(data, callback);
+    HdfSbufWriteRemoteService(data, callback);
     ec = WlanProxyCall(self, WLAN_SERVICE_REGISTER_CALLBACK, data, reply);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
@@ -696,10 +696,10 @@ static int32_t WlanRegisterEventCallback(struct IWifiInterface *self, CallbackFu
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -711,8 +711,8 @@ static int32_t WlanUnregisterEventCallback(struct IWifiInterface *self)
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -725,10 +725,10 @@ static int32_t WlanUnregisterEventCallback(struct IWifiInterface *self)
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -740,8 +740,8 @@ static int32_t WlanResetDriver(struct IWifiInterface *self, const uint8_t chipId
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -759,10 +759,10 @@ static int32_t WlanResetDriver(struct IWifiInterface *self, const uint8_t chipId
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -775,8 +775,8 @@ static int32_t WlanSetCountryCode(struct IWifiInterface *self, const struct Wlan
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -799,10 +799,10 @@ static int32_t WlanSetCountryCode(struct IWifiInterface *self, const struct Wlan
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -815,8 +815,8 @@ static int32_t WlanSetMacAddress(struct IWifiInterface *self, const struct WlanF
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -841,10 +841,10 @@ static int32_t WlanSetMacAddress(struct IWifiInterface *self, const struct WlanF
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -857,8 +857,8 @@ static int32_t WlanSetScanningMacAddress(struct IWifiInterface *self, const stru
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -888,10 +888,10 @@ static int32_t WlanSetScanningMacAddress(struct IWifiInterface *self, const stru
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -903,8 +903,8 @@ static int32_t WlanSetTxPower(struct IWifiInterface *self, const struct WlanFeat
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -927,10 +927,10 @@ static int32_t WlanSetTxPower(struct IWifiInterface *self, const struct WlanFeat
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -944,8 +944,8 @@ static int32_t WlanGetNetDevInfo(struct IWifiInterface *self, struct NetDeviceIn
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -968,10 +968,10 @@ static int32_t WlanGetNetDevInfo(struct IWifiInterface *self, struct NetDeviceIn
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }
@@ -983,8 +983,8 @@ static int32_t WlanStartScan(struct IWifiInterface *self, const struct WlanFeatu
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = HdfSBufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -1007,10 +1007,10 @@ static int32_t WlanStartScan(struct IWifiInterface *self, const struct WlanFeatu
 
 finished:
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return ec;
 }

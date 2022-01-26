@@ -37,7 +37,7 @@ static int32_t WifiServiceCallback(struct HdfDeviceObject *device, struct HdfRem
     WifiScanResult *scanResult;
 
     HDF_LOGI("WifiServiceCallback enter , eventId = %{public}d", eventId);
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (dataSbuf == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
@@ -70,7 +70,7 @@ static int32_t WifiServiceCallback(struct HdfDeviceObject *device, struct HdfRem
     }
 
 finished:
-    HdfSBufRecycle(dataSbuf);
+    HdfSbufRecycle(dataSbuf);
     return ret;
 }
 
@@ -343,7 +343,7 @@ static int32_t WlanServiceStudRegCallback(struct HdfDeviceIoClient *client, stru
         HDF_LOGE("%s: Data is NULL", __func__);
         return HDF_FAILURE;
     }
-    struct HdfRemoteService *callback = HdfSBufReadRemoteService(data);
+    struct HdfRemoteService *callback = HdfSbufReadRemoteService(data);
     if (callback == NULL) {
         HDF_LOGE("%s: obtain callback failed!", __func__);
         return HDF_ERR_INVALID_PARAM;

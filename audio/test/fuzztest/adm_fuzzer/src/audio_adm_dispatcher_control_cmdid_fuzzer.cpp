@@ -36,7 +36,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    writeBuf = HdfSBufObtainDefaultSize();
+    writeBuf = HdfSbufObtainDefaultSize();
     if (writeBuf == nullptr) {
         HdfIoServiceRecycle(service);
         return 0;
@@ -47,7 +47,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     }
 
     service->dispatcher->Dispatch(&service->object, size, writeBuf, writeReply);
-    HdfSBufRecycle(writeBuf);
+    HdfSbufRecycle(writeBuf);
     HdfIoServiceRecycle(service);
     return 0;
 }

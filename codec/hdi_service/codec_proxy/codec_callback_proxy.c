@@ -36,15 +36,15 @@ static int32_t CodecCallbackProxyCall(int32_t id, struct HdfSBuf *data, struct H
 
 int32_t CodecCallbackProxyReqSBuf(struct HdfSBuf **data, struct HdfSBuf **reply)
 {
-    *data = HdfSBufTypedObtain(SBUF_IPC);
+    *data = HdfSbufTypedObtain(SBUF_IPC);
     if (*data == NULL) {
         HDF_LOGE("%{public}s: Failed to obtain", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
-    *reply = HdfSBufTypedObtain(SBUF_IPC);
+    *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (*reply == NULL) {
         HDF_LOGE("%{public}s: Failed to obtain reply", __func__);
-        HdfSBufRecycle(*data);
+        HdfSbufRecycle(*data);
         return HDF_ERR_MALLOC_FAIL;
     }
     return HDF_SUCCESS;
@@ -53,10 +53,10 @@ int32_t CodecCallbackProxyReqSBuf(struct HdfSBuf **data, struct HdfSBuf **reply)
 void CodecCallbackProxySBufRecycle(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (data != NULL) {
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
     }
     if (reply != NULL) {
-        HdfSBufRecycle(reply);
+        HdfSbufRecycle(reply);
     }
     return;
 }
