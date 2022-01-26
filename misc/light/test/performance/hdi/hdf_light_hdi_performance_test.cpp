@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include <cmath>
 #include <cstdio>
 #include <gtest/gtest.h>
@@ -80,7 +80,7 @@ HWTEST_F(HdfLightHdiPerformanceTest, GetLightInfo001, TestSize.Level1)
     clock_gettime(CLOCK_REALTIME, &tv1);
     int32_t ret = g_lightInterface->GetLightInfo(info);
     clock_gettime(CLOCK_REALTIME, &tv2);
-    
+
     timeUsed = ((tv2.tv_sec * LIGHT_USEC_TIME + tv2.tv_nsec / LIGHT_MSEC_TIME) -
         (tv1.tv_sec * LIGHT_USEC_TIME + tv1.tv_nsec / LIGHT_MSEC_TIME));
     EXPECT_GT(LIGHT_COMMON_TIME, timeUsed);

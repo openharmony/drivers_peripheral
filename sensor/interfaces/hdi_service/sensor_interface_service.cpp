@@ -18,6 +18,8 @@
 #include <hdf_log.h>
 #include "sensor_if.h"
 
+#define HDF_LOG_TAG    hdf_sensor_dal
+
 namespace hdi {
 namespace sensor {
 namespace v1_0 {
@@ -74,6 +76,7 @@ int SensorDataCallback(const struct SensorEvents *event)
         }
         remoteCallBack->second->OnDataEvent(hdfSensorEvents);
     }
+
     return 0;
 }
 
@@ -119,6 +122,7 @@ int32_t SensorInterfaceService::GetAllSensorInfo(std::vector<HdfSensorInformatio
         info.push_back(std::move(hdfSensorInfo));
         tmp++;
     }
+
     return HDF_SUCCESS;
 }
 
@@ -129,10 +133,12 @@ int32_t SensorInterfaceService::Enable(int32_t sensorId)
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
+
     int32_t ret = sensorInterface->Enable(sensorId);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
+
     return ret;
 }
 
@@ -143,10 +149,12 @@ int32_t SensorInterfaceService::Disable(int32_t sensorId)
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
+
     int32_t ret = sensorInterface->Disable(sensorId);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
+
     return ret;
 }
 
@@ -157,10 +165,12 @@ int32_t SensorInterfaceService::SetBatch(int32_t sensorId, int64_t samplingInter
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
+
     int32_t ret = sensorInterface->SetBatch(sensorId, samplingInterval, reportInterval);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
+
     return ret;
 }
 
@@ -171,10 +181,12 @@ int32_t SensorInterfaceService::SetMode(int32_t sensorId, int32_t mode)
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
+
     int32_t ret = sensorInterface->SetMode(sensorId, mode);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
+
     return ret;
 }
 
@@ -185,10 +197,12 @@ int32_t SensorInterfaceService::SetOption(int32_t sensorId, uint32_t option)
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
+
     int32_t ret = sensorInterface->SetOption(sensorId, option);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
+
     return ret;
 }
 
@@ -199,16 +213,19 @@ int32_t SensorInterfaceService::Register(int32_t sensorId, const sptr<ISensorCal
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
+
     IRemoteObject* obj = callbackObj->AsObject().GetRefPtr();
     std::lock_guard<std::mutex> lock(g_mutex);
     auto remoteIter = g_remoteObjectCallBackMap.find(obj);
     if (remoteIter != g_remoteObjectCallBackMap.end()) {
         return SENSOR_FAILURE;
     }
+
     SensorIndex sensorIndex;
     if (sensorId < TRADITIONAL_SENSOR_ID_MIN) {
         return SENSOR_FAILURE;
     }
+
     if (sensorId >= MEDICALSENSOR_ID_MIN && sensorId <= MEDICALSENSOR_ID_MAX) {
         sensorIndex = MEDICAL_SENSOR_INDEX;
         return SENSOR_FAILURE;
@@ -227,20 +244,23 @@ int32_t SensorInterfaceService::Register(int32_t sensorId, const sptr<ISensorCal
         }
         return SENSOR_SUCCESS;
     }
+
     int32_t ret = sensorInterface->Register(sensorIndex, SensorDataCallback);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, ret[%{public}d]", __func__, ret);
         return ret;
     }
+
     std::vector<IRemoteObject*> remoteVec;
     remoteVec.push_back(obj);
     g_remoteObjectCallBackMap[obj] = callbackObj;
     g_remoteObjectIndexMap[obj] = sensorIndex;
     g_IndexRemoteObjectMap[sensorIndex] = remoteVec;
+
     return ret;
 }
 
-int32_t SensorInterfaceService::Unregister(int32_t sensorId,  const sptr<ISensorCallback>& callbackObj)
+int32_t SensorInterfaceService::Unregister(int32_t sensorId, const sptr<ISensorCallback>& callbackObj)
 {
     const SensorInterface *sensorInterface = NewSensorInterfaceInstance();
     if (sensorInterface == NULL || sensorInterface->Unregister == NULL) {
@@ -248,7 +268,7 @@ int32_t SensorInterfaceService::Unregister(int32_t sensorId,  const sptr<ISensor
         return HDF_FAILURE;
     }
     IRemoteObject* obj = callbackObj->AsObject().GetRefPtr();
-    
+
     std::lock_guard<std::mutex> lock(g_mutex);
     auto remoteIndexIter = g_remoteObjectIndexMap.find(obj);
     if (remoteIndexIter == g_remoteObjectIndexMap.end()) {
@@ -260,7 +280,7 @@ int32_t SensorInterfaceService::Unregister(int32_t sensorId,  const sptr<ISensor
     } else {
         sensorIndex = MEDICAL_SENSOR_INDEX;
     }
-    
+
     auto indexRemoteIter = g_IndexRemoteObjectMap.find(sensorIndex);
     if (indexRemoteIter == g_IndexRemoteObjectMap.end()) {
         return HDF_FAILURE;

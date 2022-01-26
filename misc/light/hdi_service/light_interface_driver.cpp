@@ -20,6 +20,8 @@
 #include <osal_mem.h>
 #include "light_interface_service.h"
 
+#define HDF_LOG_TAG           hdf_light_if_driver
+
 using namespace light::v1_0;
 
 struct HdfLightInterfaceHost {

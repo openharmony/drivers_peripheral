@@ -102,7 +102,7 @@ enum SensorTypeTag {
     SENSOR_TYPE_DEVICE_ORIENTATION          = 279,   /**< Device orientation sensor */
     SENSOR_TYPE_WEAR_DETECTION              = 280,   /**< Wear detection sensor */
     SENSOR_TYPE_ACCELEROMETER_UNCALIBRATED  = 281,   /**< Uncalibrated acceleration sensor */
-    SENSOR_TYPE_MAX                         = 0xFFF, /**< Maximum number of sensor types */
+    SENSOR_TYPE_MAX,                                 /**< Maximum number of sensor types */
 };
 
 /**
