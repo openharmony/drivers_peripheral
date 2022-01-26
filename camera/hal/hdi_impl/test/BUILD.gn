@@ -240,7 +240,7 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdi",
         "graphic_standard:surface",
         "hiviewdfx_hilog_native:libhilog",
-        "ipc:ipc_core",
+        "ipc:ipc_single",
         "utils_base:utils",
       ]
     } else {

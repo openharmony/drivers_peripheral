@@ -234,7 +234,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps += [
-      "ipc:ipc_core",
+      "ipc:ipc_single",
       "samgr_standard:samgr_proxy",
     ]
     public_configs = [ ":pipe_config" ]

@@ -21,7 +21,6 @@ if (defined(ohos_lite)) {
   ohos_shared_library("libvibrator_interface_service_1.0") {
     include_dirs = [
       "//drivers/adapter/uhdf2/include/hdi",
-      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
       "//drivers/peripheral/misc/vibrator/interfaces/include/",
     ]
     sources = [ "vibrator_interface_service.cpp" ]
@@ -36,12 +35,12 @@ if (defined(ohos_lite)) {
       external_deps = [
         "device_driver_framework:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
-        "ipc:ipc_core",
+        "ipc:ipc_single",
       ]
     } else {
       external_deps = [
         "hilog:libhilog",
-        "ipc:ipc_core",
+        "ipc:ipc_single",
       ]
     }
 
@@ -55,7 +54,6 @@ if (defined(ohos_lite)) {
       "//drivers/adapter/uhdf2/ipc/include",
       "//drivers/adapter/uhdf2/include/host",
       "//drivers/adapter/uhdf2/include/hdi",
-      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
       "//drivers/peripheral/misc/vibrator/interfaces/include/",
     ]
     sources = [ "vibrator_interface_driver.cpp" ]
@@ -71,12 +69,12 @@ if (defined(ohos_lite)) {
       external_deps = [
         "device_driver_framework:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
-        "ipc:ipc_core",
+        "ipc:ipc_single",
       ]
     } else {
       external_deps = [
         "hilog:libhilog",
-        "ipc:ipc_core",
+        "ipc:ipc_single",
       ]
     }
 

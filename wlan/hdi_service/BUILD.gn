@@ -57,12 +57,13 @@ ohos_shared_library("wifi_hdi_device") {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
       "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "ipc:ipc_single" ]
 }
 
 ohos_shared_library("wifi_hdi_c_device") {
@@ -108,10 +109,11 @@ ohos_shared_library("wifi_hdi_c_device") {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
       "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "ipc:ipc_single" ]
 }

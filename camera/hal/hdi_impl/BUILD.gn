@@ -248,7 +248,7 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdi",
         "graphic_standard:surface",
         "hiviewdfx_hilog_native:libhilog",
-        "ipc:ipc_core",
+        "ipc:ipc_single",
         "utils_base:utils",
       ]
       if (use_hitrace) {
@@ -257,6 +257,7 @@ if (defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
+    external_deps += [ "ipc:ipc_single" ]
 
     public_configs = [ ":camhdi_impl_config" ]
     install_images = [ chipset_base_dir ]

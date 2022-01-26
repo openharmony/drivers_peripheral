@@ -29,7 +29,7 @@ ohos_shared_library("libpower_callback") {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
     ]
   } else {
     external_deps = [
@@ -38,7 +38,7 @@ ohos_shared_library("libpower_callback") {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hilog:libhilog",
-      "ipc:ipc_core",
+      "ipc:ipc_single",
     ]
   }
 
