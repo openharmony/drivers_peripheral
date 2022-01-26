@@ -16,14 +16,13 @@
 #include "audio_stream_dispatch.h"
 #include "audio_driver_log.h"
 
-#define HDF_LOG_TAG hi3516_platform_ops
+#define HDF_LOG_TAG hi3516_dma_ops
 const int AUDIO_CACHE_ALIGN_SIZE = 64;
 
 #ifndef __LITEOS__
 static struct device g_renderDev = {0};
 static struct device g_captureDev = {0};
 #endif
-
 
 int32_t AudioDmaDeviceInit(const struct AudioCard *card, const struct PlatformDevice *platformDevice)
 {
@@ -130,20 +129,20 @@ int32_t Hi3516DmaBufFree(struct PlatformData *data, const enum AudioStreamType s
     return HDF_SUCCESS;
 }
 
-int32_t  Hi3516DmaRequestChannel(const struct PlatformData *data)
+int32_t  Hi3516DmaRequestChannel(const struct PlatformData *data, const enum AudioStreamType streamType)
 {
     (void)data;
     return HDF_SUCCESS;
 }
 
-int32_t Hi3516DmaConfigChannel(const struct PlatformData *data)
+int32_t Hi3516DmaConfigChannel(const struct PlatformData *data, const enum AudioStreamType streamType)
 {
     if (data == NULL) {
         AUDIO_DRIVER_LOG_ERR("data is null");
         return HDF_FAILURE;
     }
 
-    if (data->pcmInfo.streamType == AUDIO_CAPTURE_STREAM) {
+    if (streamType == AUDIO_CAPTURE_STREAM) {
         if (AudioAiInit(data) != HDF_SUCCESS) {
             AUDIO_DRIVER_LOG_ERR("AudioAiInit: fail.");
             return HDF_FAILURE;
@@ -154,7 +153,7 @@ int32_t Hi3516DmaConfigChannel(const struct PlatformData *data)
         if (AipHalSetBuffRptr(0, 0) != HDF_SUCCESS) {
             return HDF_FAILURE;
         }
-    } else if (data->pcmInfo.streamType == AUDIO_RENDER_STREAM) {
+    } else if (streamType == AUDIO_RENDER_STREAM) {
         if (AudioAoInit(data) != HDF_SUCCESS) {
             AUDIO_DRIVER_LOG_ERR("AudioAoInit: fail.");
             return HDF_FAILURE;
@@ -172,30 +171,30 @@ int32_t Hi3516DmaConfigChannel(const struct PlatformData *data)
     return HDF_SUCCESS;
 }
 
-int32_t Hi3516DmaPrep(const struct PlatformData *data)
+int32_t Hi3516DmaPrep(const struct PlatformData *data, const enum AudioStreamType streamType)
 {
     (void)data;
     return HDF_SUCCESS;
 }
 
-int32_t Hi3516DmaSubmit(const struct PlatformData *data)
+int32_t Hi3516DmaSubmit(const struct PlatformData *data, const enum AudioStreamType streamType)
 {
     (void)data;
     return HDF_SUCCESS;
 }
 
-int32_t Hi3516DmaPending(struct PlatformData *data)
+int32_t Hi3516DmaPending(struct PlatformData *data, const enum AudioStreamType streamType)
 {
     if (data == NULL) {
         AUDIO_DRIVER_LOG_ERR("data is null");
         return HDF_FAILURE;
     }
 
-    if (data->pcmInfo.streamType == AUDIO_CAPTURE_STREAM) {
+    if (streamType == AUDIO_CAPTURE_STREAM) {
         OsalMutexLock(&data->captureBufInfo.buffMutex);
         AipHalSetRxStart(data->captureBufInfo.chnId, HI_TRUE);
         OsalMutexUnlock(&data->captureBufInfo.buffMutex);
-    } else if (data->pcmInfo.streamType == AUDIO_RENDER_STREAM) {
+    } else if (streamType == AUDIO_RENDER_STREAM) {
         AopHalDevEnable(data->renderBufInfo.chnId);
     } else {
         AUDIO_DRIVER_LOG_ERR("stream Type is invalude.");
@@ -204,18 +203,18 @@ int32_t Hi3516DmaPending(struct PlatformData *data)
     return HDF_SUCCESS;
 }
 
-int32_t Hi3516DmaPause(struct PlatformData *data)
+int32_t Hi3516DmaPause(struct PlatformData *data, const enum AudioStreamType streamType)
 {
     if (data == NULL) {
         AUDIO_DRIVER_LOG_ERR("data is null");
         return HDF_FAILURE;
     }
 
-    if (data->pcmInfo.streamType == AUDIO_CAPTURE_STREAM) {
+    if (streamType == AUDIO_CAPTURE_STREAM) {
         OsalMutexLock(&data->captureBufInfo.buffMutex);
         AipHalSetRxStart(data->captureBufInfo.chnId, HI_FALSE);
         OsalMutexUnlock(&data->captureBufInfo.buffMutex);
-    } else if (data->pcmInfo.streamType == AUDIO_RENDER_STREAM) {
+    } else if (streamType == AUDIO_RENDER_STREAM) {
         OsalMutexLock(&data->renderBufInfo.buffMutex);
         AopHalSetTxStart(data->renderBufInfo.chnId, HI_FALSE);
         OsalMutexUnlock(&data->renderBufInfo.buffMutex);
@@ -226,16 +225,16 @@ int32_t Hi3516DmaPause(struct PlatformData *data)
     return HDF_SUCCESS;
 }
 
-int32_t Hi3516DmaResume(const struct PlatformData *data)
+int32_t Hi3516DmaResume(const struct PlatformData *data, const enum AudioStreamType streamType)
 {
     if (data == NULL) {
         AUDIO_DRIVER_LOG_ERR("data is null");
         return HDF_FAILURE;
     }
 
-    if (data->pcmInfo.streamType == AUDIO_CAPTURE_STREAM) {
+    if (streamType == AUDIO_CAPTURE_STREAM) {
         AipHalSetRxStart(data->captureBufInfo.chnId, HI_TRUE);
-    } else if (data->pcmInfo.streamType == AUDIO_RENDER_STREAM) {
+    } else if (streamType == AUDIO_RENDER_STREAM) {
         AopHalDevEnable(data->renderBufInfo.chnId);
     } else {
         AUDIO_DRIVER_LOG_ERR("stream Type is invalude.");
@@ -244,7 +243,7 @@ int32_t Hi3516DmaResume(const struct PlatformData *data)
     return HDF_SUCCESS;
 }
 
-int32_t Hi3516DmaPointer(struct PlatformData *data, uint32_t *pointer)
+int32_t Hi3516DmaPointer(struct PlatformData *data, const enum AudioStreamType streamType, uint32_t *pointer)
 {
     int devId;
     uint32_t bytesOfPointer;
@@ -257,10 +256,10 @@ int32_t Hi3516DmaPointer(struct PlatformData *data, uint32_t *pointer)
         return HDF_FAILURE;
     }
 
-    if (data->pcmInfo.streamType == AUDIO_RENDER_STREAM) {
+    if (streamType == AUDIO_RENDER_STREAM) {
         OsalMutexLock(&data->renderBufInfo.buffMutex);
         devId = data->renderBufInfo.chnId;
-        frameSize = data->pcmInfo.frameSize;
+        frameSize = data->renderPcmInfo.frameSize;
         bytesOfPointer = AiaoHalReadReg(AiopRegCfg(AOP_BUFF_RPTR_REG, OFFSET_MULTL, devId));
         *pointer = AudioBytesToFrames(bytesOfPointer, frameSize);
         wPtr = data->renderBufInfo.wptrOffSet;
@@ -269,10 +268,10 @@ int32_t Hi3516DmaPointer(struct PlatformData *data, uint32_t *pointer)
             AUDIO_DRIVER_LOG_ERR("AopHalSetBuffWptr failed.");
             return HDF_FAILURE;
         }
-    } else if (data->pcmInfo.streamType == AUDIO_CAPTURE_STREAM) {
+    } else if (streamType == AUDIO_CAPTURE_STREAM) {
         OsalMutexLock(&data->captureBufInfo.buffMutex);
         devId = data->captureBufInfo.chnId;
-        frameSize = data->pcmInfo.frameSize;
+        frameSize = data->capturePcmInfo.frameSize;
         bytesOfPointer = AiaoHalReadReg(AiopRegCfg(AIP_BUFF_WPTR_REG, OFFSET_MULTL, devId));
         *pointer = AudioBytesToFrames(bytesOfPointer, frameSize);
         rPtr = data->captureBufInfo.rptrOffSet;
