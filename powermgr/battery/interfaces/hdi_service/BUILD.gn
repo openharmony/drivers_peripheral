@@ -51,6 +51,7 @@ ohos_shared_library("libbattery_interface_service_1.0") {
     ]
   }
 
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "battery_device_driver"
 }
@@ -88,6 +89,7 @@ ohos_shared_library("libbattery_driver") {
     ]
   }
 
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "battery_device_driver"
 }
