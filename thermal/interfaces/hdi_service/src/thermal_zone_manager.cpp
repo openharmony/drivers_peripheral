@@ -170,7 +170,7 @@ int32_t ThermalZoneManager::ParseThermalZoneInfo()
     ClearThermalZoneInfo();
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        HDF_LOGI("%{public}s: Enter %{public}d", __func__, GetLTZPathInfo().size());
+        HDF_LOGI("%{public}s: tzInfo.size=%{public}zu", __func__, GetLTZPathInfo().size());
         for (auto it : GetLTZPathInfo()) {
             ret = ReadThermalSysfsToBuff(it.typePath, bufType, sizeof(bufType));
             if (ret != HDF_SUCCESS) {
