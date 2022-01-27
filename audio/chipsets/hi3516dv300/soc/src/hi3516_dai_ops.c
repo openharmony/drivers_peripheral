@@ -163,7 +163,8 @@ int32_t DaiStartup(const struct AudioCard *card, const struct DaiDevice *device)
 
     device->devData->regVirtualAddr = (uintptr_t)g_regDaiBase;
     for (int i = 0; i < itemNum; i++) {
-        int ret = AudioUpdateDaiRegBits(device, &regCfgItem[i], regCfgItem[i].value);
+        int ret = AudioUpdateDaiRegBits(device, regCfgItem[i].reg, regCfgItem[i].mask,
+            regCfgItem[i].shift, regCfgItem[i].value);
         if (ret != HDF_SUCCESS) {
             AUDIO_DRIVER_LOG_ERR("set frequency fail.");
             return HDF_FAILURE;
@@ -201,7 +202,8 @@ static int32_t SetIISRate(const struct DaiDevice *device, const struct AudioMixe
         return HDF_FAILURE;
     }
 
-    if (AudioUpdateDaiRegBits(device, &regCfgItem[0 + shift], mclkSel) != HDF_SUCCESS) {
+    if (AudioUpdateDaiRegBits(device, regCfgItem[0 + shift].reg, regCfgItem[0 + shift].mask,
+        regCfgItem[0 + shift].shift, mclkSel) != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("set frequency fail.");
         return HDF_FAILURE;
     }
@@ -211,7 +213,8 @@ static int32_t SetIISRate(const struct DaiDevice *device, const struct AudioMixe
         return HDF_FAILURE;
     }
 
-    if (AudioUpdateDaiRegBits(device, &regCfgItem[1 + shift], bclkRegVal) != HDF_SUCCESS) {
+    if (AudioUpdateDaiRegBits(device, regCfgItem[1 + shift].reg, regCfgItem[1 + shift].mask,
+        regCfgItem[1 + shift].shift, bclkRegVal) != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("set frequency fail.");
         return HDF_FAILURE;
     }
@@ -255,13 +258,15 @@ int32_t DaiParamsUpdate(const struct DaiDevice *device)
         return HDF_FAILURE;
     }
 
-    if (AudioUpdateDaiRegBits(device, &regCfgItem[index2 + shift], value) != HDF_SUCCESS) {
+    if (AudioUpdateDaiRegBits(device, regCfgItem[index2 + shift].reg, regCfgItem[index2 + shift].mask,
+        regCfgItem[index2 + shift].shift, value) != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("set bitWidth fail.");
         return HDF_FAILURE;
     }
 
     value = device->devData->pcmInfo.channels - 1;
-    if (AudioUpdateDaiRegBits(device, &regCfgItem[index3 + shift], value) != HDF_SUCCESS) {
+    if (AudioUpdateDaiRegBits(device, regCfgItem[index3 + shift].reg, regCfgItem[index3 + shift].mask,
+        regCfgItem[index3 + shift].shift, value) != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("set channels fail.");
         return HDF_FAILURE;
     }

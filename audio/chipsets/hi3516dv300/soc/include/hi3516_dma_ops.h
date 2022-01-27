@@ -20,14 +20,14 @@ extern "C" {
 int32_t AudioDmaDeviceInit(const struct AudioCard *card, const struct PlatformDevice *platform);
 int32_t Hi3516DmaBufAlloc(struct PlatformData *data, const enum AudioStreamType streamType);
 int32_t Hi3516DmaBufFree(struct PlatformData *data, const enum AudioStreamType streamType);
-int32_t Hi3516DmaRequestChannel(const struct PlatformData *data);
-int32_t Hi3516DmaConfigChannel(const struct PlatformData *data);
-int32_t Hi3516DmaPrep(const struct PlatformData *data);
-int32_t Hi3516DmaSubmit(const struct PlatformData *data);
-int32_t Hi3516DmaPending(struct PlatformData *data);
-int32_t Hi3516DmaPause(struct PlatformData *data);
-int32_t Hi3516DmaResume(const struct PlatformData *data);
-int32_t Hi3516DmaPointer(struct PlatformData *data, uint32_t *pointer);
+int32_t Hi3516DmaRequestChannel(const struct PlatformData *data, const enum AudioStreamType streamType);
+int32_t Hi3516DmaConfigChannel(const struct PlatformData *data, const enum AudioStreamType streamType);
+int32_t Hi3516DmaPrep(const struct PlatformData *data, const enum AudioStreamType streamType);
+int32_t Hi3516DmaSubmit(const struct PlatformData *data, const enum AudioStreamType streamType);
+int32_t Hi3516DmaPending(struct PlatformData *data, const enum AudioStreamType streamType);
+int32_t Hi3516DmaPause(struct PlatformData *data, const enum AudioStreamType streamType);
+int32_t Hi3516DmaResume(const struct PlatformData *data, const enum AudioStreamType streamType);
+int32_t Hi3516DmaPointer(struct PlatformData *data, const enum AudioStreamType streamType, uint32_t *pointer);
 
 #ifdef __cplusplus
 #if __cplusplus

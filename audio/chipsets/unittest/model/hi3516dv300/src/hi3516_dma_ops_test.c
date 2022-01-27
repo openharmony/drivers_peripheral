@@ -64,7 +64,7 @@ int32_t TestHi3516DmaBufFree(void)
 int32_t TestHi3516DmaRequestChannel(void)
 {
     HDF_LOGI("%s: success", __func__);
-    return Hi3516DmaRequestChannel(NULL);
+    return Hi3516DmaRequestChannel(NULL, AUDIO_CAPTURE_STREAM);
 }
 
 int32_t TestHi3516DmaConfigChannel(void)
@@ -73,7 +73,7 @@ int32_t TestHi3516DmaConfigChannel(void)
     int ret;
 
     HDF_LOGI("%s: enter", __func__);
-    ret = Hi3516DmaConfigChannel(data);
+    ret = Hi3516DmaConfigChannel(data, AUDIO_CAPTURE_STREAM);
     if (ret == HDF_SUCCESS) {
         HDF_LOGE("%s: Hi3516DmaConfigChannel fail ret = %d", __func__, ret);
         return HDF_FAILURE;
@@ -85,13 +85,13 @@ int32_t TestHi3516DmaConfigChannel(void)
 int32_t TestHi3516DmaPrep(void)
 {
     HDF_LOGI("%s: success", __func__);
-    return Hi3516DmaPrep(NULL);
+    return Hi3516DmaPrep(NULL, AUDIO_CAPTURE_STREAM);
 }
 
 int32_t TestHi3516DmaSubmit(void)
 {
     HDF_LOGI("%s: success", __func__);
-    return Hi3516DmaSubmit(NULL);
+    return Hi3516DmaSubmit(NULL, AUDIO_CAPTURE_STREAM);
 }
 
 int32_t TestHi3516DmaPending(void)
@@ -100,7 +100,7 @@ int32_t TestHi3516DmaPending(void)
     int ret;
 
     HDF_LOGI("%s: enter", __func__);
-    ret = Hi3516DmaPending(data);
+    ret = Hi3516DmaPending(data, AUDIO_CAPTURE_STREAM);
     if (ret == HDF_SUCCESS) {
         HDF_LOGE("%s: Hi3516DmaPending fail ret = %d", __func__, ret);
         return HDF_FAILURE;
@@ -115,7 +115,7 @@ int32_t TestHi3516DmaPause(void)
     int ret;
 
     HDF_LOGI("%s: enter", __func__);
-    ret = Hi3516DmaPause(data);
+    ret = Hi3516DmaPause(data, AUDIO_CAPTURE_STREAM);
     if (ret == HDF_SUCCESS) {
         HDF_LOGE("%s: Hi3516DmaPause fail ret = %d", __func__, ret);
         return HDF_FAILURE;
@@ -130,7 +130,7 @@ int32_t TestHi3516DmaResume(void)
     int ret;
 
     HDF_LOGI("%s: enter", __func__);
-    ret = Hi3516DmaResume(data);
+    ret = Hi3516DmaResume(data, AUDIO_CAPTURE_STREAM);
     if (ret == HDF_SUCCESS) {
         HDF_LOGE("%s: Hi3516DmaResume fail ret = %d", __func__, ret);
         return HDF_FAILURE;
@@ -146,7 +146,7 @@ int32_t TestHi3516DmaPointer(void)
     int ret;
 
     HDF_LOGI("%s: enter", __func__);
-    ret = Hi3516DmaPointer(data, pointer);
+    ret = Hi3516DmaPointer(data, AUDIO_CAPTURE_STREAM, pointer);
     if (ret == HDF_SUCCESS) {
         HDF_LOGE("%s: Hi3516DmaPointer fail ret = %d", __func__, ret);
         return HDF_FAILURE;
