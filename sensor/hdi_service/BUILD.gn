@@ -48,7 +48,6 @@ ohos_shared_library("libsensor_driver") {
   sources = [ "sensor_interface_driver.cpp" ]
 
   deps = [
-    "//drivers/peripheral/sensor/hal:hdi_sensor",
     "//drivers/peripheral/sensor/hdi_service:libsensor_interface_service_1.0",
   ]
 
