@@ -144,7 +144,7 @@ int32_t ThermalHdfTimer::LoopingThreadEntry(void *arg, int32_t epfd)
     int nevents = 0;
     size_t eventct = callbackHandler_.size();
     struct epoll_event events[eventct];
-    HDF_LOGI("%{public}s: %{public}d, %{public}d", __func__, epfd, eventct);
+    HDF_LOGI("%{public}s: %{public}d, %{public}zu", __func__, epfd, eventct);
     while (true) {
         nevents = epoll_wait(epfd, events, eventct, -1);
         if (nevents == -1) {
@@ -207,7 +207,7 @@ void ThermalHdfTimer::UpdateTzInfo(const std::string &pollingName, HdfThermalCal
     HDF_LOGI("%{public}s: pollingName: %{public}s", __func__, pollingName.c_str());
     HdfThermalCallbackInfo tzInfoEvent;
     tzInfoEvent.info = node_->GetTzInfoList();
-    HDF_LOGI("%{public}s: size: %{public}d", __func__, tzInfoEvent.info.size());
+    HDF_LOGI("%{public}s: thermal zone event size:%{public}zu", __func__, tzInfoEvent.info.size());
     ThermalHdfConfig::ThermalTypeMap sensorTypeMap = ThermalHdfConfig::GetInsance().GetSensorTypeMap();
     auto pollingIter = sensorTypeMap.find(pollingName);
     if (pollingIter != sensorTypeMap.end()) {
