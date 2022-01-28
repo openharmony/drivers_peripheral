@@ -82,7 +82,10 @@ int32_t DispGetInfo(uint32_t devId, struct DispInfo *info)
         HDF_LOGE("HdfSbufReadBuffer failure");
         goto EXIT;
     }
-    (void)memcpy_s(info, sizeof(struct DispInfo), tmpInfo, dataSize);
+    if (memcpy_s(info, sizeof(struct DispInfo), tmpInfo, dataSize) != 0){
+        HDF_LOGE("memcpy_s failure");
+        goto EXIT;
+    };
     HDF_LOGI("tmpInfo->width = %d, tmpInfo->height = %d", tmpInfo->width, tmpInfo->height);
     HDF_LOGI("tmpInfo->hbp = %d, tmpInfo->hfp = %d", tmpInfo->hbp, tmpInfo->hfp);
     HDF_LOGI("tmpInfo->frameRate = %d", tmpInfo->frameRate);
