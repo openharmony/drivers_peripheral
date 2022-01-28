@@ -27,7 +27,7 @@
 /**
  * @file usbd_client.h
  *
- * @brief Defines the usbd Interface.
+ * @brief Defines usbd APIs.
  *
  * @since 3.0
  * @version 1.0
@@ -46,386 +46,389 @@ public:
     static UsbdClient &GetInstance();
 
     /* *
-     * @brief 打开设备，建立连接
+     * @brief Opens a USB device to set up a connection.
      *
-     * @param dev usb设备地址信息
+     * @param dev Indicates the USB device address.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t OpenDevice(const UsbDev &dev);
 
     /* *
-     * @brief 关闭设备，释放与设备相关的所有系统资源
+     * @brief Closes a USB device to release all system resources related to the device.
      *
-     * @param dev usb设备地址信息
+     * @param dev Indicates the USB device address.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t CloseDevice(const UsbDev &dev);
 
     /* *
-     * @brief 获取设备描述符device
+     * @brief Obtains the USB device descriptor.
      *
-     * @param dev usb设备地址信息
-     * @param decriptor usb设备描述符信息
+     * @param dev Indicates the USB device address.
+     * @param descriptor Indicates the USB device descriptor.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
 
     /* *
-     * @brief 根据String ID获取设备的字符串描述符string
+     * @brief Obtains the string descriptor of a USB device based on the specified string ID.
      *
-     * @param dev usb设备地址信息
-     * @param descId usb的string ID
-     * @param decriptor 获取usb设备config信息
+     * @param dev Indicates the USB device address.
+     * @param descId Indicates string descriptor ID.
+     * @param descriptor Indicates the configuration descriptor of the USB device.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
 
     /* *
-     * @brief 根据config ID获取设备的配置描述符config
+     * @brief Obtains the configuration descriptor of a USB device based on the specified config ID.
      *
-     * @param dev usb设备地址信息
-     * @param descId usb的config ID
-     * @param decriptor 获取usb设备config信息
+     * @param dev Indicates the USB device address.
+     * @param descId Indicates configuration descriptor ID.
+     * @param descriptor Indicates the configuration descriptor of the USB device.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
 
     /* *
-     * @brief 获取原始描述符
+     * @brief Obtains the raw descriptor.
      *
-     * @param dev usb设备地址信息
-     * @param decriptor usb设备原始描述符
+     * @param dev Indicates the USB device address.
+     * @param descriptor Indicates the raw descriptor of the USB device.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
     
     /* *
-     * @brief 获取文件描述符
+     * @brief Obtains the file descriptor.
      *
-     * @param dev usb设备地址信息
-     * @param fd usb设备文件描述符
+     * @param dev Indicates the USB device address.
+     * @param fd USB device file descriptor
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t GetFileDescriptor(const UsbDev &dev, int32_t &fd);
 
     /* *
-     * @brief 设置当前的config信息
+     * @brief Sets the configuration information of a USB device.
      *
-     * @param dev usb设备地址信息
-     * @param configIndex usb设备config信息
+     * @param dev Indicates the USB device address.
+     * @param configIndex Indicates the configuration information of the USB device.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t SetConfig(const UsbDev &dev, uint8_t configIndex);
 
     /* *
-     * @brief 获取当前的config信息
+     * @brief Obtains the configuration information of a USB device.
      *
-     * @param dev usb设备地址信息
-     * @param configIndex usb设备config信息
+     * @param dev Indicates the USB device address.
+     * @param configIndex Indicates the configuration information of the USB device.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t GetConfig(const UsbDev &dev, uint8_t &configIndex);
 
     /* *
-     * @brief 打开接口，并申明独占接口，必须在数据传输前执行
+     * @brief Claims a USB interface exclusively. This must be done before data transfer.
      *
-     * @param dev usb设备地址信息
-     * @param interfaceid usb设备interface ID
-     * @param force 是否强制: 1,强制 0不强制
+     * @param dev Indicates the USB device address.
+     * @param interfaceid Indicates the interface ID of the USB device.
+     * @param force Indicates whether to enable the force mode. The value <b>1</b> indicates that the force mode is enabled, and value <b>0</b> indicates the opposite.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t ClaimInterface(const UsbDev &dev, uint8_t interfaceid, uint8_t force);
 
     /* *
-     * @brief 关闭接口，释放接口的占用，在停止数据传输后执行
+     * @brief Releases a USB interface. This is usually done after data transfer.
      *
-     * @param dev usb设备地址信息
-     * @param interfaceid usb设备interface ID
+     * @param dev Indicates the USB device address.
+     * @param interfaceid Indicates the interface ID of the USB device.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t ReleaseInterface(const UsbDev &dev, uint8_t interfaceid);
 
     /* *
-     * @brief 设置指定接口的备选设置，用于在具有相同ID但不同备用设置的两个接口之间进行选择
+     * @brief Sets the alternate settings for the specified USB interface. This allows you to switch between two interfaces with the same ID but different alternate settings.
      *
-     * @param dev usb设备地址信息
-     * @param interfaceid usb设备interface ID
-     * @param altIndex interface 的 AlternateSetting 信息
+     * @param dev Indicates the USB device address.
+     * @param interfaceid Indicates the interface ID of the USB device.
+     * @param altIndex Indicates the alternate settings of the USB interface.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t SetInterface(const UsbDev &dev, uint8_t interfaceid, uint8_t altIndex);
 
     /* *
-     * @brief 在给定端点上执行批量数据读取，返回读取的数据和长度，端点方向必须为数据读取可以设置超时时间
+     * @brief Reads data on a specified endpoint during bulk transfer. The endpoint must be in the data reading direction. You can specify a timeout duration if needed.
      *
-     * @param dev usb设备地址信息
-     * @param pipe usb设备pipe信息
-     * @param timeout 超时时间
-     * @param data 获取写入的数据
+     * @param dev Indicates the USB device address.
+     * @param pipe Indicates the pipe of the USB device.
+     * @param timeout Indicates the timeout duration.
+     * @param data Indicates the read data.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
 
     /* *
-     * @brief 在给定端点上执行批量数据写入， 返回读取的数据和长度，端点方向必须为数据写入
+     * @brief Writes data on a specified endpoint during bulk transfer. The endpoint must be in the data writing direction.
      *
-     * @param dev usb设备地址信息
-     * @param pipe usb设备pipe信息
-     * @param timeout 超时时间
-     * @param data 写入的数据
+     * @param dev Indicates the USB device address.
+     * @param pipe Indicates the pipe of the USB device.
+     * @param timeout Indicates the timeout duration.
+     * @param data Indicates the written data.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t BulkTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
         const std::vector<uint8_t> &data);
 
     /* *
-     * @brief 对此设备执行端点零的控制事务，传输方向由请求类型决定。 如果requestType＆
-     * USB_ENDPOINT_DIR_MASK是USB_DIR_OUT ，则传输是写入，如果是USB_DIR_IN ，则传输是读取。
+     * @brief Performs control transfer for endpoint 0 of the device. The data transfer direction is determined by the request type. If the result of <b>requestType</b>&
+     * <b>USB_ENDPOINT_DIR_MASK</b> is <b>USB_DIR_OUT</b>, the endpoint is in the data writing direction; if the result is <b>USB_DIR_IN</b>, the endpoint is in the data reading direction.
      *
-     * @param dev usb设备地址信息
-     * @param ctrl usb设备控制数据包结构
-     * @param data 读取/写入 的数据
+     * @param dev Indicates the USB device address.
+     * @param ctrl Indicates the control data packet structure.
+     * @param data Indicates the read or written data.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t ControlTransfer(const UsbDev &dev, const UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
 
     /* *
-     * @brief 在给定端点上执行中断数据读取， 返回读取的数据和长度，端点方向必须为数据读取
+     * @brief Reads data on a specified endpoint during interrupt transfer. The endpoint must be in the data reading direction.
      *
-     * @param dev usb设备地址信息
-     * @param pipe usb设备pipe信息
-     * @param timeout 超时时间
-     * @param data 读取的数据
+     * @param dev Indicates the USB device address.
+     * @param pipe Indicates the pipe of the USB device.
+     * @param timeout Indicates the timeout duration.
+     * @param data Indicates the read data.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t InterruptTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
 
     /* *
-     * @brief 在给定端点上执行中断数据写入， 返回读取的数据和长度，端点方向必须为数据写入
+     * @brief Writes data on a specified endpoint during interrupt transfer. The endpoint must be in the data writing direction.
      *
-     * @param dev usb设备地址信息
-     * @param pipe usb设备pipe信息
-     * @param timeout 超时时间
-     * @param data 读取的数据
+     * @param dev Indicates the USB device address.
+     * @param pipe Indicates the pipe of the USB device.
+     * @param timeout Indicates the timeout duration.
+     * @param data Indicates the read data.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t InterruptTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
 
     /* *
-     * @brief 在给定端点上执行等时数据读取， 返回读取的数据和长度，端点方向必须为数据读取
+     * @brief Reads data on a specified endpoint during isochronous transfer. The endpoint must be in the data reading direction.
      *
-     * @param dev usb设备地址信息
-     * @param pipe usb设备pipe信息
-     * @param timeout 超时时间
-     * @param data 读取的数据
+     * @param dev Indicates the USB device address.
+     * @param pipe Indicates the pipe of the USB device.
+     * @param timeout Indicates the timeout duration.
+     * @param data Indicates the read data.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t IsoTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
 
     /* *
-     * @brief 在给定端点上执行等时数据写入， 返回读取的数据和长度，端点方向必须为数据写入
+     * @brief Writes data on a specified endpoint during isochronous transfer. The endpoint must be in the data writing direction.
      *
-     * @param dev usb设备地址信息
-     * @param pipe usb设备pipe信息
-     * @param timeout 超时时间
-     * @param data 读取的数据
+     * @param dev Indicates the USB device address.
+     * @param pipe Indicates the pipe of the USB device.
+     * @param timeout Indicates the timeout duration.
+     * @param data Indicates the read data.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t IsoTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
 
     /* *
-     * @brief 将指定的端点进行异步数据发送或者接收请求，数据传输方向由端点方向决定
+     * @brief Sends or receives requests for isochronous transfer on a specified endpoint. The data transfer direction is determined by the endpoint direction.
      *
-     * @param dev usb设备地址信息
-     * @param pipe usb设备pipe信息
-     * @param clientData 用户数据
-     * @param buffer 传输数据
+     * @param dev Indicates the USB device address.
+     * @param pipe Indicates the pipe of the USB device.
+     * @param clientData Indicates the client data.
+     * @param buffer Indicates the transferred data.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t RequestQueue(const UsbDev &dev, const UsbPipe &pipe, const std::vector<uint8_t> &clientData,
         const std::vector<uint8_t> &buffer);
 
     /* *
-     * @brief 等待RequestQueue异步请求的操作结果
+     * @brief Waits for the operation result of the isochronous transfer request in <b>RequestQueue</b>.
      *
-     * @param dev usb设备地址信息
-     * @param clientData 用户数据
-     * @param buffer 传输数据
-     * @param timeout 超时时间
+     * @param dev Indicates the USB device address.
+     * @param clientData Indicates the client data.
+     * @param buffer Indicates the transferred data.
+     * @param timeout Indicates the timeout duration.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t RequestWait(const UsbDev &dev, std::vector<uint8_t> &clientData, std::vector<uint8_t> &buffer,
         int32_t timeout);
 
     /* *
-     * @brief 取消待处理的数据请求
+     * @brief Cancels the data transfer requests to be processed.
      *
-     * @param dev usb设备地址信息
-     * @param pipe usb设备pipe信息
+     * @param dev Indicates the USB device address.
+     * @param pipe Indicates the pipe of the USB device.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t RequestCancel(const UsbDev &dev, const UsbPipe &pipe);
 
     /* *
-     * @brief 获取从设备支持的功能列表（按位域表示）（从设备）
+     * @brief Obtains the list of functions (represented by bit field) supported by the current device.
      *
-     * @param funcs 获取当前设备的function的值
+     * @param funcs Indicates the list of functions supported by the current device.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t GetCurrentFunctions(int32_t &funcs);
 
     /* *
-     * @brief 设置从设备支持的功能列表（按位域表示）（从设备）
+     * @brief Sets the list of functions (represented by bit field) supported by the current device.
      *
-     * @param funcs 传入设备支持的function的值
+     * @param funcs Indicates the list of functions supported by the current device.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t SetCurrentFunctions(int32_t funcs);
 
     /* *
-     * @brief 关闭设备，释放与设备相关的所有系统资源
+     * @brief Closes a USB device to release all system resources related to the device.
      *
-     * @param portId port接口 ID
-     * @param powerRole 电源角色的值
-     * @param dataRole 数据角色的值
+     * @param portId Indicates the port ID of the USB interface.
+     * @param powerRole Indicates the power role.
+     * @param dataRole Indicates the data role.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t SetPortRole(int32_t portId, int32_t powerRole, int32_t dataRole);
 
     /* *
-     * @brief 查询port端口的当前设置
+     * @brief Queries the current settings of a port.
      *
-     * @param portId port接口 ID
-     * @param powerRole 电源角色的值
-     * @param dataRole 数据角色的值
-     * @param mode 模式的值
+     * @param portId Indicates the port ID of the USB interface.
+     * @param powerRole Indicates the power role.
+     * @param dataRole Indicates the data role.
+     * @param mode Indicates the mode.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode);
 
     /* *
-     * @brief 绑定订阅者
+     * @brief Binds a subscriber.
      *
-     * @param subscriber 订阅者信息
+     * @param subscriber Indicates the subscriber.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t BindUsbdSubscriber(const sptr<UsbdSubscriber> &subscriber);
 
     /* *
-     * @brief 解绑订阅者
+     * @brief Unbinds a subscriber.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @param subscriber Indicates the subscriber.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t UnbindUsbdSubscriber(const sptr<UsbdSubscriber> &subscriber);
 
     /* *
-     * @brief 注册批量传输异步回调函数
+     * @brief Registers a callback for isochronous bulk transfer.
      *
-     * @param dev usb设备地址信息
-     * @param pipe usb设备pipe信息
+     * @param dev Indicates the USB device address.
+     * @param pipe Indicates the pipe of the USB device.
+     * @param cb Indicates the reference to the callback.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const sptr<IRemoteObject> &cb);
 
     /* *
-     * @brief 注销批量传输异步回调函数
+     * @brief Unregisters the callback for isochronous bulk transfer.
      *
-     * @param dev usb设备地址信息
-     * @param pipe usb设备pipe信息
+     * @param dev Indicates the USB device address.
+     * @param pipe Indicates the pipe of the USB device.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe);
 
     /* *
-     * @brief 批量传输异步读数据
+     * @brief Reads data during isochronous bulk transfer.
      *
-     * @param dev usb设备地址信息
-     * @param pipe usb设备pipe信息
-     * @param ashmem 为共享内存，用于存放读取的数据
+     * @param dev Indicates the USB device address.
+     * @param pipe Indicates the pipe of the USB device.
+     * @param ashmem Indicates the shared memory, which is used to store the read data.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t BulkRead(const UsbDev &dev, const UsbPipe &pipe, sptr<Ashmem> &ashmem);
 
     /* *
-     * @brief 批量传输异步写数据
+     * @brief Writes data during isochronous bulk transfer.
      *
-     * @param dev usb设备地址信息
-     * @param pipe usb设备pipe信息
-     * @param ashmem 为共享内存，用于存放需要写入的数据
+     * @param dev Indicates the USB device address.
+     * @param pipe Indicates the pipe of the USB device.
+     * @param ashmem Indicates the shared memory, which is used to store the written data.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t BulkWrite(const UsbDev &dev, const UsbPipe &pipe, sptr<Ashmem> &ashmem);
 
     /* *
-     * @brief 批量传输异步取消接口，用于取消当前接口的异步批量读写操作
+     * @brief Cancels the isochronous bulk transfer. The read and write operations on the current USB interface will be cancelled.
      *
-     * @param dev usb设备地址信息
-     * @param pipe usb设备pipe信息
+     * @param dev Indicates the USB device address.
+     * @param pipe Indicates the pipe of the USB device.
      *
-     * @return 0 表示成功，其他返回值表示失败
+     * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
     int32_t BulkCancel(const UsbDev &dev, const UsbPipe &pipe);
