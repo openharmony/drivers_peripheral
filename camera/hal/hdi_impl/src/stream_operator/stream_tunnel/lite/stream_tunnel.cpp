@@ -18,7 +18,6 @@
 #include "video_key_info.h"
 
 namespace {
-constexpr uint32_t REQUEST_TIMEOUT = 0;
 constexpr uint32_t STRIDE_ALIGNMENT = 8;
 } // namespace
 
@@ -153,7 +152,7 @@ RetCode StreamTunnel::SetBufferCount(const int32_t n)
     return RC_OK;
 }
 
-RetCode StreamTunnel::Config(const TunnelConfig config)
+RetCode StreamTunnel::Config(const TunnelConfig& config)
 {
     bufferQueue_->SetWidthAndHeight(config.width, config.height);
     bufferQueue_->SetFormat(BufferAdapter::CameraFormatToPixelFormat(config.format));

@@ -78,7 +78,6 @@ CamRetCode StreamOperator::IsStreamsSupported(OperationMode mode,
 
     std::set<int32_t> inputIDSet = {};
     std::vector<int32_t> checkStreamIdVec = {};
-    int32_t checkStreamId = -1;
     for (auto it : pInfo) {
         CHECK_IF_PTR_NULL_RETURN_VALUE(it, INVALID_ARGUMENT);
         CHECK_IF_NOT_EQUAL_RETURN_VALUE(CheckStreamInfo(it), true, INVALID_ARGUMENT);
