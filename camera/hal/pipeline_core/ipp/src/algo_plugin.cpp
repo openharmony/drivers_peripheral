@@ -151,7 +151,8 @@ RetCode AlgoPlugin::Stop()
 
 RetCode AlgoPlugin::CheckLibPath(const char *path)
 {
-    if (path == nullptr && (realpath(path, NULL) == nullptr)) {
+    char absPath[PATH_MAX] = {0};
+    if (path == nullptr && (realpath(path, absPath) == nullptr)) {
         CAMERA_LOGE("path is nullptr.");
         return RC_ERROR;
     }

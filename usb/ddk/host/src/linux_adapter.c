@@ -619,7 +619,7 @@ static int OsSubmitIsoRequest(struct UsbHostRequest *request)
         return HDF_ERR_INVALID_PARAM;
     }
     numUrbs = (request->numIsoPackets + (MAX_ISO_PACKETS_PER_URB - 1)) / MAX_ISO_PACKETS_PER_URB;
-    pUrbs = RawUsbMemCalloc(numUrbs * sizeof(*pUrbs));
+    pUrbs = RawUsbMemCalloc(numUrbs * sizeof(struct UsbAdapterUrb*)));
     if (pUrbs == NULL) {
         HDF_LOGE("%s:%d RawUsbMemCalloc pUrbs failed", __func__, __LINE__);
         return HDF_ERR_MALLOC_FAIL;

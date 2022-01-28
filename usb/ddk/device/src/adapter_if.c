@@ -397,7 +397,7 @@ static int UsbFnAdapterOpenPipe(const char *interfaceName, int epIndex)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    ret = snprintf_s(epName, MAX_NAMELEN, MAX_NAMELEN - 1, "/dev/functionfs/%s.ep%u", interfaceName, epIndex);
+    ret = snprintf_s(epName, MAX_NAMELEN, MAX_NAMELEN - 1, "/dev/functionfs/%s.ep%d", interfaceName, epIndex);
     if (ret < 0) {
         HDF_LOGE("%s: snprintf_s failed", __func__);
         return HDF_ERR_IO;

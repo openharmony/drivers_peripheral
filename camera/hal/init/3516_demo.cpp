@@ -122,6 +122,7 @@ RetCode Hos3516Demo::CaptureOff(const int captureId, const CaptureMode mode) con
         streamCustomerVideo_->ReceiveFrameOff();
         rc = streamOperator_->CancelCapture(captureId);
         close(videoFd_);
+        videoFd_ = -1;
     }
 
     if (rc != Camera::NO_ERROR) {
