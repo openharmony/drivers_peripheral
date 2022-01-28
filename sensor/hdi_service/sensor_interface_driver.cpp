@@ -19,7 +19,7 @@
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
 #include "sensor_if.h"
-#include "sensor_interface_service.h"
+#include "sensor_if_service.h"
 
 #define HDF_LOG_TAG    hdf_sensor_if_driver
 
@@ -27,7 +27,7 @@ using namespace sensor::v1_0;
 
 struct HdfSensorInterfaceHost {
     struct IDeviceIoService ioservice;
-    SensorInterfaceService *service;
+    SensorIfService *service;
 };
 
 static int32_t SensorInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
@@ -52,6 +52,12 @@ static int32_t SensorInterfaceDriverDispatch(struct HdfDeviceIoClient *client, i
 static int HdfSensorInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfSensorInterfaceDriverInit enter");
+    struct HdfSensorInterfaceHost *hdfSensorInterfaceHost =
+        CONTAINER_OF(deviceObject->service, struct HdfSensorInterfaceHost, ioservice);
+    if (hdfSensorInterfaceHost != nullptr && hdfSensorInterfaceHost->service != nullptr) {
+        hdfSensorInterfaceHost->service->Init();
+    }
+    
     return HDF_SUCCESS;
 }
 
@@ -67,7 +73,7 @@ static int HdfSensorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfSensorInterfaceHost->ioservice.Dispatch = SensorInterfaceDriverDispatch;
     hdfSensorInterfaceHost->ioservice.Open = NULL;
     hdfSensorInterfaceHost->ioservice.Release = NULL;
-    hdfSensorInterfaceHost->service = new SensorInterfaceService();
+    hdfSensorInterfaceHost->service = new SensorIfService();
 
     deviceObject->service = &hdfSensorInterfaceHost->ioservice;
     HDF_LOGI("HdfSensorInterfaceDriverBind Success");
@@ -80,7 +86,6 @@ static void HdfSensorInterfaceDriverRelease(struct HdfDeviceObject *deviceObject
         CONTAINER_OF(deviceObject->service, struct HdfSensorInterfaceHost, ioservice);
     delete hdfSensorInterfaceHost->service;
     OsalMemFree(hdfSensorInterfaceHost);
-    FreeSensorInterfaceInstance();
     HDF_LOGI("HdfSensorInterfaceDriverRelease Success");
 }
 

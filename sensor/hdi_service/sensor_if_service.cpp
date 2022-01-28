@@ -13,10 +13,9 @@
  * limitations under the License.
  */
 
-#include "sensor_interface_service.h"
+#include "sensor_if_service.h"
 #include <hdf_base.h>
 #include <hdf_log.h>
-#include "sensor_if.h"
 
 #define HDF_LOG_TAG    hdf_sensor_dal
 
@@ -79,9 +78,16 @@ int SensorDataCallback(const struct SensorEvents *event)
     return 0;
 }
 
-int32_t SensorInterfaceService::GetAllSensorInfo(std::vector<HdfSensorInformation>& info)
+void SensorIfService::Init()
 {
-    const SensorInterface *sensorInterface = NewSensorInterfaceInstance();
+    sensorInterface = NewSensorInterfaceInstance();
+    if (sensorInterface == NULL) {
+        HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
+    }
+}
+
+int32_t SensorIfService::GetAllSensorInfo(std::vector<HdfSensorInformation>& info)
+{
     if (sensorInterface == NULL || sensorInterface->GetAllSensors == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
@@ -125,9 +131,8 @@ int32_t SensorInterfaceService::GetAllSensorInfo(std::vector<HdfSensorInformatio
     return HDF_SUCCESS;
 }
 
-int32_t SensorInterfaceService::Enable(int32_t sensorId)
+int32_t SensorIfService::Enable(int32_t sensorId)
 {
-    const SensorInterface *sensorInterface = NewSensorInterfaceInstance();
     if (sensorInterface == NULL || sensorInterface->Enable == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
@@ -141,9 +146,8 @@ int32_t SensorInterfaceService::Enable(int32_t sensorId)
     return ret;
 }
 
-int32_t SensorInterfaceService::Disable(int32_t sensorId)
+int32_t SensorIfService::Disable(int32_t sensorId)
 {
-    const SensorInterface *sensorInterface = NewSensorInterfaceInstance();
     if (sensorInterface == NULL || sensorInterface->Disable == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
@@ -157,9 +161,8 @@ int32_t SensorInterfaceService::Disable(int32_t sensorId)
     return ret;
 }
 
-int32_t SensorInterfaceService::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
+int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
-    const SensorInterface *sensorInterface = NewSensorInterfaceInstance();
     if (sensorInterface == NULL || sensorInterface->SetBatch == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
@@ -173,9 +176,8 @@ int32_t SensorInterfaceService::SetBatch(int32_t sensorId, int64_t samplingInter
     return ret;
 }
 
-int32_t SensorInterfaceService::SetMode(int32_t sensorId, int32_t mode)
+int32_t SensorIfService::SetMode(int32_t sensorId, int32_t mode)
 {
-    const SensorInterface *sensorInterface = NewSensorInterfaceInstance();
     if (sensorInterface == NULL || sensorInterface->SetMode == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
@@ -189,9 +191,8 @@ int32_t SensorInterfaceService::SetMode(int32_t sensorId, int32_t mode)
     return ret;
 }
 
-int32_t SensorInterfaceService::SetOption(int32_t sensorId, uint32_t option)
+int32_t SensorIfService::SetOption(int32_t sensorId, uint32_t option)
 {
-    const SensorInterface *sensorInterface = NewSensorInterfaceInstance();
     if (sensorInterface == NULL || sensorInterface->SetOption == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
@@ -205,9 +206,8 @@ int32_t SensorInterfaceService::SetOption(int32_t sensorId, uint32_t option)
     return ret;
 }
 
-int32_t SensorInterfaceService::Register(int32_t sensorId, const sptr<ISensorCallback>& callbackObj)
+int32_t SensorIfService::Register(int32_t sensorId, const sptr<ISensorCallback>& callbackObj)
 {
-    const SensorInterface *sensorInterface = NewSensorInterfaceInstance();
     if (sensorInterface == NULL || sensorInterface->Register == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
@@ -259,9 +259,8 @@ int32_t SensorInterfaceService::Register(int32_t sensorId, const sptr<ISensorCal
     return ret;
 }
 
-int32_t SensorInterfaceService::Unregister(int32_t sensorId, const sptr<ISensorCallback>& callbackObj)
+int32_t SensorIfService::Unregister(int32_t sensorId, const sptr<ISensorCallback>& callbackObj)
 {
-    const SensorInterface *sensorInterface = NewSensorInterfaceInstance();
     if (sensorInterface == NULL || sensorInterface->Unregister == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
