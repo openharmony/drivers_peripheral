@@ -200,7 +200,7 @@ static int BeginProcess(unsigned char endPoint)
         urb[i].urb->transfer_buffer_length = TEST_LENGTH;
     }
 
-    printf("test NO SDK endpoint:%d\n", endPoint);
+    printf("test NO SDK endpoint:%u\n", endPoint);
 
     for (i = 0; i < TEST_CYCLE; i++) {
         if (urb[i].inUse == 0) {

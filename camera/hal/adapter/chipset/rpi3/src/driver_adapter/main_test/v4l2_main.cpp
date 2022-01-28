@@ -212,7 +212,7 @@ RetCode FBInit()
         close(g_fbFd);
         return RC_ERROR;
     }
-
+    g_fbFd = -1;
     return RC_OK;
 }
 
