@@ -388,6 +388,7 @@ struct PrivDevMac {
 
 static int32_t ParserDevMac(struct nl_msg *msg, void *arg)
 {
+    int ret;
     struct nlattr *tb[NL80211_ATTR_MAX + 1];
     struct genlmsghdr *gnlh = nlmsg_data(nlmsg_hdr(msg));
     struct PrivDevMac *info = (struct PrivDevMac *)arg;
@@ -400,7 +401,10 @@ static int32_t ParserDevMac(struct nl_msg *msg, void *arg)
     }
     HILOG_ERROR(LOG_DOMAIN, "%s: has parse a tb_mac[%2x:%2x:%2x:%2x:%2x:%2x]", __FUNCTION__,
         getmac[0], getmac[1], getmac[2], getmac[3], getmac[4], getmac[5]);
-    memcpy_s(info->mac, info->len, getmac, info->len);
+    ret = memcpy_s(info->mac, info->len, getmac, info->len);
+    if (ret != 0) {
+        printf("memcpy_s failed.");
+    }
     return NL_SKIP;
 }
 
