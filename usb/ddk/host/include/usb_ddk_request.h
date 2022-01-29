@@ -57,14 +57,14 @@ struct UsbIsoPacketDesc {
 struct UsbAdapterUrb {
     unsigned char type;
     unsigned char endPoint;
-    int status;
+    int32_t status;
     unsigned int flags;
     void *buffer;
-    int bufferLength;
-    int actualLength;
-    int startFrame;
-    int numberOfPackets;
-    int errorCount;
+    int32_t bufferLength;
+    int32_t actualLength;
+    int32_t startFrame;
+    int32_t numberOfPackets;
+    int32_t errorCount;
     unsigned int signr;
     void *userContext;
     struct UsbIsoPacketDesc isoFrameDesc[0];
@@ -75,9 +75,9 @@ struct UsbHostRequest {
     /* the address of data buffer */
     unsigned char *buffer;
     /* the length of data buffer */
-    int length;
+    uint32_t length;
     /* the actual length of the requested data */
-    int actualLength;
+    int32_t actualLength;
     /* the status of the request */
     UsbRequestStatus status;
     /* private user data */
@@ -90,7 +90,7 @@ struct UsbHostRequest {
     UsbRawRequestCallback callback;
     UsbRequestCallback userCallback;
     /* the length of data buffer */
-    int bufLen;
+    int32_t bufLen;
     struct OsalSem sem;
     unsigned char endPoint;
     unsigned int timeout;
@@ -100,13 +100,13 @@ struct UsbHostRequest {
         void *urbs;
         void **isoUrbs;
     };
-    int numUrbs;
-    int numRetired;
+    int32_t numUrbs;
+    int32_t numRetired;
     UsbRequestStatus reqStatus;
-    int isoPacketOffset;
+    int32_t isoPacketOffset;
     struct OsalMutex lock;
     void *privateObj;
-    int numIsoPackets;
+    int32_t numIsoPackets;
     /* isopacketdesc ptr */
     struct UsbIsoPacketDesc isoPacketDesc[0];
 }__attribute__((aligned(4)));
@@ -117,8 +117,8 @@ struct UsbHostRequest {
 struct UsbFillRequestData {
     unsigned char endPoint;
     unsigned char *buffer;
-    int length;
-    int numIsoPackets;
+    uint32_t length;
+    int32_t numIsoPackets;
     UsbRawRequestCallback callback;
     void *userData;
     unsigned int timeout;

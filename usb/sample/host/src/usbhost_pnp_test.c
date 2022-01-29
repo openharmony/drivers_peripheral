@@ -99,14 +99,14 @@ static void TestInitPnpInfo(enum UsbPnpNotifyServiceCmd cmdType)
 
 static void TestPnpAdd(struct HdfIoService *serv)
 {
-    int replyData = 0;
+    int32_t replyData = 0;
     bool flag = false;
 
     TestPnpWriteLog("usb pnp sample device driver test add start");
 
     TestInitPnpInfo(USB_PNP_NOTIFY_ADD_TEST);
 
-    int status = serv->dispatcher->Dispatch(&serv->object, USB_PNP_NOTIFY_ADD_TEST, g_data, g_reply);
+    int32_t status = serv->dispatcher->Dispatch(&serv->object, USB_PNP_NOTIFY_ADD_TEST, g_data, g_reply);
     if (status) {
         HDF_LOGE("%s: Dispatch USB_PNP_NOTIFY_ADD_TEST failed status = %d", __func__, status);
         return;
@@ -122,14 +122,14 @@ static void TestPnpAdd(struct HdfIoService *serv)
 
 static void TestPnpRemove(struct HdfIoService *serv)
 {
-    int replyData = 0;
+    int32_t replyData = 0;
     bool flag = false;
 
     TestPnpWriteLog("usb pnp sample device driver test remove start");
 
     TestInitPnpInfo(USB_PNP_NOTIFY_REMOVE_TEST);
 
-    int status = serv->dispatcher->Dispatch(&serv->object, USB_PNP_NOTIFY_REMOVE_TEST, g_data, g_reply);
+    int32_t status = serv->dispatcher->Dispatch(&serv->object, USB_PNP_NOTIFY_REMOVE_TEST, g_data, g_reply);
     if (status) {
         HDF_LOGE("%s: Dispatch USB_PNP_NOTIFY_REMOVE_TEST failed status = %d", __func__, status);
         return;
@@ -143,12 +143,12 @@ static void TestPnpRemove(struct HdfIoService *serv)
     }
 }
 #endif
-int main(int argc, char *argv[])
+int32_t main(int32_t argc, char *argv[])
 {
 #if USB_PNP_NOTIFY_TEST_MODE == true
     HDF_LOGI("%s:%d usbhost pnp test start", __func__, __LINE__);
     char cmd;
-    int argNum = 2;
+    int32_t argNum = 2;
     if (argc != argNum) {
         HDF_LOGE("%s:%d invalid parma", __func__, __LINE__);
         return HDF_FAILURE;

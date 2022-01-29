@@ -23,12 +23,12 @@ struct ProcInfo {
     double ramAvg;
     double cpuPeak;
     double cpuAvg;
-    int threadPeak;
+    int32_t threadPeak;
 };
 
 extern bool HasLog(const std::string &target, double startTs, const std::string &file = "/data/acm_write_xts");
 extern double GetNowTs(void);
-extern char *ParseSysCmdResult(FILE &result, int line, int word);
+extern char *ParseSysCmdResult(FILE &result, int32_t line, int32_t word);
 extern void CalcProcInfoFromFile(struct ProcInfo &info, const std::string &file);
 extern double GetTsFromLog(const std::string &target, double startTs, const std::string &file);
 

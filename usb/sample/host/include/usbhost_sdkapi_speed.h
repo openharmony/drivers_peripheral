@@ -77,12 +77,12 @@ typedef enum {
 
 struct AcmDevice;
 struct AcmDb {
-    int dbNum;
+    int32_t dbNum;
     struct UsbRequest *request;
     struct AcmDevice *instance;
     uint8_t *buf;
-    int len;
-    int use;
+    int32_t len;
+    int32_t use;
 };
 
 struct SerialDevice {
@@ -117,7 +117,7 @@ struct AcmDevice {
     struct SerialDevice *port;
     uint32_t nbIndex;
     uint32_t nbSize;
-    int transmitting;
+    int32_t transmitting;
     int32_t ctrlReqNum;
     uint8_t busNum;
     uint8_t devAddr;

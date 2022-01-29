@@ -30,7 +30,7 @@ struct ReqList {
     struct UsbFnRequest req;
     struct DListHead    entry;
     uint8_t             pipe;
-    int                 fd;
+    int32_t                 fd;
     uintptr_t           buf;
     uint32_t            bufLen;
     struct UsbHandleMgr *handle;
@@ -38,7 +38,7 @@ struct ReqList {
 
 struct UsbHandleMgr {
     uint32_t                 numFd;
-    int                      fds[MAX_EP];
+    int32_t                      fds[MAX_EP];
     struct UsbFnInterfaceMgr *intfMgr;
     struct DListHead         reqEntry;
     struct UsbFnReqEvent     *reqEvent[MAX_EP];
@@ -46,7 +46,7 @@ struct UsbHandleMgr {
 
 struct UsbFnFuncMgr {
     const struct UsbObject *object;
-    int                    fd;
+    int32_t                    fd;
     char                   name[MAX_NAMELEN];
     UsbFnEventCallback     callback;
     uint32_t               eventMask;
@@ -63,14 +63,14 @@ struct UsbFnInterfaceMgr {
 };
 
 struct UsbFnRequest *UsbFnIoMgrRequestAlloc(struct UsbHandleMgr *handle, uint8_t pipe, uint32_t len);
-int UsbFnIoMgrRequestFree(struct UsbFnRequest *req);
-int UsbFnIoMgrRequestGetStatus(struct UsbFnRequest *req, UsbRequestStatus *status);
-int UsbFnIoMgrRequestSubmitAsync(struct UsbFnRequest *req);
-int UsbFnIoMgrRequestSubmitSync(struct UsbFnRequest *req, uint32_t timeout);
-int UsbFnIoMgrRequestCancel(struct UsbFnRequest *req);
+int32_t UsbFnIoMgrRequestFree(struct UsbFnRequest *req);
+int32_t UsbFnIoMgrRequestGetStatus(struct UsbFnRequest *req, UsbRequestStatus *status);
+int32_t UsbFnIoMgrRequestSubmitAsync(struct UsbFnRequest *req);
+int32_t UsbFnIoMgrRequestSubmitSync(struct UsbFnRequest *req, uint32_t timeout);
+int32_t UsbFnIoMgrRequestCancel(struct UsbFnRequest *req);
 struct UsbHandleMgr *UsbFnIoMgrInterfaceOpen(struct UsbFnInterface *interface);
-int UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle);
-int UsbFnIoMgrInterfaceGetPipeInfo(struct UsbFnInterface *interface, uint8_t pipeId, struct UsbFnPipeInfo *info);
-int OpenEp0AndMapAddr(struct UsbFnFuncMgr *funcMgr);
+int32_t UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle);
+int32_t UsbFnIoMgrInterfaceGetPipeInfo(struct UsbFnInterface *interface, uint8_t pipeId, struct UsbFnPipeInfo *info);
+int32_t OpenEp0AndMapAddr(struct UsbFnFuncMgr *funcMgr);
 #endif /* USBFN_IO_MGR_H */
 

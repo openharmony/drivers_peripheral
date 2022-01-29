@@ -659,7 +659,7 @@ static int32_t MasterReleaseFuncDevice()
     return ret;
 }
 
-static int UsbFnRegistUsbfnDevice(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t UsbFnRegistUsbfnDevice(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     struct HdfDeviceObject *device = client->device;
     struct DevMasterMgr *devMgr = NULL;
@@ -693,7 +693,7 @@ static int UsbFnRegistUsbfnDevice(struct HdfDeviceIoClient *client, struct HdfSB
     return 0;
 }
 
-int32_t MasterDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
+int32_t MasterDispatch(struct HdfDeviceIoClient *client, int32_t cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
     if (client == NULL) {

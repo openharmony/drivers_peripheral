@@ -42,9 +42,9 @@
 #define USB_DEV_FS_PATH "/dev/bus/usb"
 #define URB_COMPLETE_PROCESS_STACK_SIZE 8196
 #define ENDPOINT_IN_OFFSET 7
-static int g_speedFlag = 0;
-static int g_busNum = 1;
-static int g_devAddr = 2;
+static int32_t g_speedFlag = 0;
+static int32_t g_busNum = 1;
+static int32_t g_devAddr = 2;
 static struct OsalSem sem;
 static struct OsalSem timeSem;
 
@@ -67,12 +67,12 @@ static void CloseDevice()
     return;
 }
 
-static int OpenDevice()
+static int32_t OpenDevice()
 {
     struct UsbGetDevicePara paraData;
     paraData.type = USB_PNP_DEVICE_ADDRESS_TYPE;
-    paraData.busNum = g_busNum;
-    paraData.devNum = g_devAddr;
+    paraData.busNum = (uint8_t)g_busNum;
+    paraData.devNum = (uint8_t)g_devAddr;
     fd = UsbPnpNotifyGetUsbDevice(paraData);
     if (fd == NULL) {
         printf("err fd\n");
@@ -81,7 +81,7 @@ static int OpenDevice()
     return 0;
 }
 
-static int ClaimInterface(unsigned int iface)
+static int32_t ClaimInterface(unsigned int iface)
 {
     printf("claim success: iface=%u\n", iface);
     return HDF_SUCCESS;
@@ -101,10 +101,10 @@ void SpeedPrint()
     printf("\nSpeed:%f MB/s\n", speed);
 }
 
-static int SendProcess(void *argurb)
+static int32_t SendProcess(void *argurb)
 {
-    int i;
-    int r;
+    int32_t i;
+    int32_t r;
     while (!g_speedFlag) {
         OsalSemWait(&sem, HDF_WAIT_FOREVER);
         for (i = 0; i < TEST_CYCLE; i++) {
@@ -137,7 +137,7 @@ static int SendProcess(void *argurb)
 static void UrbCompleteHandle(const struct urb *curUrb)
 {
     if (g_printData == true) {
-        for (int i = 0; i < curUrb->actual_length; i++) {
+        for (int32_t i = 0; i < curUrb->actual_length; i++) {
             printf("%c", *(((char*)curUrb->transfer_buffer) + i));
         }
         fflush(stdout);
@@ -149,7 +149,7 @@ static void UrbCompleteHandle(const struct urb *curUrb)
 
 static void UrbComplete(struct urb *curUrb)
 {
-    int i;
+    int32_t i;
     for (i = 0; i < TEST_CYCLE; i++) {
         if (urb[i].urb == curUrb) {
             if (g_byteTotal == 0) {
@@ -165,10 +165,10 @@ static void UrbComplete(struct urb *curUrb)
     }
 }
 
-static int BeginProcessHandleFirst()
+static int32_t BeginProcessHandleFirst()
 {
     char *data = NULL;
-    int i;
+    int32_t i;
 
     for (i = 0; i < TEST_CYCLE; i++) {
         if (urb[i].urb == NULL) {
@@ -200,11 +200,11 @@ static int BeginProcessHandleFirst()
     return HDF_SUCCESS;
 }
 
-static int BeginProcess(unsigned char endPoint)
+static int32_t BeginProcess(unsigned char endPoint)
 {
-    int r;
-    const int transNum = 0;
-    int i;
+    int32_t r;
+    const int32_t transNum = 0;
+    int32_t i;
 
     if (endPoint <= 0) {
         printf("parameter error\n");
@@ -263,7 +263,7 @@ static void ShowHelp(const char *name)
     printf("\n");
 }
 
-static void UsbGetDevInfo(int *busNum, int *devNum)
+static void UsbGetDevInfo(int32_t *busNum, int32_t *devNum)
 {
     struct UsbGetDevicePara paraData;
     struct usb_device *usbPnpDevice = NULL;
@@ -292,7 +292,7 @@ static int32_t UsbSerialClose()
     return HDF_SUCCESS;
 }
 
-static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNum)
+static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int32_t *ifaceNum)
 {
     int32_t ret = HDF_SUCCESS;
     if (input == NULL) {
@@ -369,7 +369,7 @@ END:
 
 static int32_t UsbSerialSpeed(struct HdfSBuf *data)
 {
-    int ifaceNum = 3;
+    int32_t ifaceNum = 3;
     int32_t ret;
     struct UsbSpeedTest *input = NULL;
     uint32_t size = 0;
@@ -419,7 +419,7 @@ END:
     return ret;
 }
 
-static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
+static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int32_t cmd,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL) {

@@ -70,13 +70,13 @@ struct Serial {
 
     bool                        suspended;
     bool                        startDelayed;
-    int                         refCount;
+    int32_t                         refCount;
 };
 
 struct AcmNotifyMethod {
     void (*Connect)(struct AcmDevice *acm);
     void (*Disconnect)(struct AcmDevice *acm);
-    int (*SendBreak)(struct AcmDevice *acm, int duration);
+    int32_t (*SendBreak)(struct AcmDevice *acm, int32_t duration);
 };
 
 struct AcmPipe {

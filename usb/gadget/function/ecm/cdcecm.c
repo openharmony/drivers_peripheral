@@ -34,8 +34,8 @@
 #define ECM_STATUS_BYTECOUNT        16
 #define ECM_BIT 9728000
 
-static int EcmInit(struct HdfDeviceObject *device);
-static int EcmRelease(struct HdfDeviceObject *device);
+static int32_t EcmInit(struct HdfDeviceObject *device);
+static int32_t EcmRelease(struct HdfDeviceObject *device);
 
 static inline unsigned EcmBitrate(void)
 {
@@ -53,7 +53,7 @@ static int32_t UsbEcmStartTx(struct UsbEcm *port)
 
     while (!port->writeBusy && !DListIsEmpty(pool)) {
         struct UsbFnRequest *req = NULL;
-        int len;
+        uint32_t len;
         if (port->writeStarted >= QUEUE_SIZE) {
             break;
         }
@@ -90,7 +90,7 @@ static uint32_t UsbEcmStartRx(struct UsbEcm *port)
 
     while (!DListIsEmpty(pool)) {
         struct UsbFnRequest *req = NULL;
-        int ret;
+        int32_t ret;
 
         if (port->readStarted >= QUEUE_SIZE) {
             break;
@@ -159,7 +159,7 @@ static void UsbEcmRxPush(struct UsbEcm *port)
     }
 }
 
-static void UsbEcmFreeRequests(const struct DListHead *head, int *allocated)
+static void UsbEcmFreeRequests(const struct DListHead *head, int32_t *allocated)
 {
     struct UsbFnRequest *req = NULL;
     while (!DListIsEmpty(head)) {
@@ -202,12 +202,12 @@ static void UsbEcmWriteComplete(uint8_t pipe, struct UsbFnRequest *req)
     OsalMutexUnlock(&port->lock);
 }
 
-static int32_t UsbEcmAllocReadRequests(struct UsbEcm *port, int num)
+static int32_t UsbEcmAllocReadRequests(struct UsbEcm *port, int32_t num)
 {
     struct UsbEcmDevice *ecm = port->ecm;
     struct DListHead *head = &port->readPool;
     struct UsbFnRequest *req = NULL;
-    int  i;
+    int32_t  i;
 
     for (i = 0; i < num; i++) {
         req = UsbFnAllocRequest(ecm->dataIface.handle, ecm->dataOutPipe.id,
@@ -224,12 +224,12 @@ static int32_t UsbEcmAllocReadRequests(struct UsbEcm *port, int num)
     return HDF_SUCCESS;
 }
 
-static int32_t UsbEcmAllocWriteRequests(struct UsbEcm *port, int num)
+static int32_t UsbEcmAllocWriteRequests(struct UsbEcm *port, int32_t num)
 {
     struct UsbEcmDevice *ecm = port->ecm;
     struct DListHead *head = &port->writePool;
     struct UsbFnRequest  *req = NULL;
-    int i;
+    int32_t i;
 
     for (i = 0; i < num; i++) {
         req = UsbFnAllocRequest(ecm->dataIface.handle, ecm->dataInPipe.id,
@@ -440,7 +440,7 @@ static void EcmDoNotify(struct UsbEcmDevice *ecm)
     struct UsbFnRequest *req = ecm->notifyReq;
     struct UsbCdcNotification *event = NULL;
     uint32_t *data = NULL;
-    int status;
+    int32_t status;
 
     if (!req) {
         return;
@@ -518,10 +518,10 @@ static void EcmNotifyComplete(uint8_t pipe, struct UsbFnRequest *req)
     }
 }
 
-static int EcmSetup(const struct UsbEcmDevice *ecm, const struct UsbFnCtrlRequest *ctrl)
+static int32_t EcmSetup(const struct UsbEcmDevice *ecm, const struct UsbFnCtrlRequest *ctrl)
 {
     struct UsbFnRequest *req = ecm->ep0Req;
-    int ret = -1;
+    int32_t ret = -1;
     uint16_t index = Le16ToCpu(ctrl->index);
     uint16_t value = Le16ToCpu(ctrl->value);
     uint16_t length = Le16ToCpu(ctrl->length);
@@ -545,7 +545,7 @@ static int EcmSetup(const struct UsbEcmDevice *ecm, const struct UsbFnCtrlReques
         HDF_LOGD("ecm req%02x.%02x v%04x i%04x l%d\n",
             ctrl->reqType, ctrl->request,
             value, index, length);
-        req->length = ret;
+        req->length = (uint32_t)ret;
         ret = UsbFnSubmitRequestSync(req, 0);
         if (ret < 0) {
             HDF_LOGD("ecm req %02x.%02x response err %d\n",
@@ -556,7 +556,7 @@ static int EcmSetup(const struct UsbEcmDevice *ecm, const struct UsbFnCtrlReques
     return value;
 }
 
-static int32_t EcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
+static int32_t EcmDeviceDispatch(struct HdfDeviceIoClient *client, int32_t cmd,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     struct UsbEcmDevice *ecm = NULL;
@@ -605,9 +605,9 @@ static int32_t EcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
     return ret;
 }
 
-static int EcmEnable(struct UsbEcmDevice *ecm)
+static int32_t EcmEnable(struct UsbEcmDevice *ecm)
 {
-    int ret;
+    int32_t ret;
     struct UsbEcm *port = ecm->port;
 
     if (port == NULL) {
@@ -718,7 +718,7 @@ static int32_t EcmParseEachPipe(struct UsbEcmDevice *ecm, struct UsbEcmInterface
 {
     struct UsbFnInterface *fnIface = iface->fn;
     uint32_t i;
-    int ret;
+    int32_t ret;
     for (i = 0; i < fnIface->info.numPipes; i++) {
         struct UsbFnPipeInfo pipeInfo;
         (void)memset_s(&pipeInfo, sizeof(pipeInfo), 0, sizeof(pipeInfo));
@@ -928,7 +928,7 @@ static int32_t EcmDriverBind(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-static int EcmInit(struct HdfDeviceObject *device)
+static int32_t EcmInit(struct HdfDeviceObject *device)
 {
     struct UsbEcmDevice *ecm = NULL;
     struct DeviceResourceIface *iface = NULL;
@@ -966,7 +966,7 @@ static int EcmInit(struct HdfDeviceObject *device)
     return ret;
 }
 
-static int EcmRelease(struct HdfDeviceObject *device)
+static int32_t EcmRelease(struct HdfDeviceObject *device)
 {
     struct UsbEcmDevice *ecm = NULL;
 

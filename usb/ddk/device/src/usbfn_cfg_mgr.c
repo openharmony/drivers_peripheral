@@ -1165,7 +1165,7 @@ static const char *UsbFnCfgFindPropFromHcs(const struct UsbFnInterface *intf, co
 static int32_t UsbFnCfgChangeUdcName(const struct UsbFnDeviceMgr *fnDevMgr,
     struct UsbFnAdapterOps *fnOps)
 {
-    int ret;
+    int32_t ret;
 
     if (fnDevMgr == NULL || fnOps == NULL) {
         return HDF_FAILURE;
@@ -1261,7 +1261,7 @@ int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf,
 {
     struct UsbFnCfgPropMgr *fnCfgPropMgr = NULL;
     uint8_t isDevProp;
-    uint8_t isRegist;
+    int32_t isRegist;
     int32_t ret;
     if (intf == NULL || registInfo == NULL || registInfo->name == NULL) {
         return HDF_FAILURE;
@@ -1269,7 +1269,7 @@ int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf,
     if (g_cfgEntry.next == 0) {
         DListHeadInit(&g_cfgEntry);
     }
-    isDevProp = IsDevDescProp(registInfo->name);
+    isDevProp = (uint8_t)IsDevDescProp(registInfo->name);
     isRegist = IsPropRegisted(intf, registInfo->name);
     if (isRegist) {
         if (isDevProp == 0) {
@@ -1320,7 +1320,7 @@ int32_t UsbFnCfgMgrGetProp(const struct UsbFnInterface *intf, const char *name, 
 {
     struct UsbFnCfgPropMgr *fnCfgPropMgr = NULL;
     uint16_t val;
-    int ret;
+    int32_t ret;
     char tmp[MAX_LEN];
     const char *propValue = NULL;
 
@@ -1372,7 +1372,7 @@ int32_t UsbFnCfgMgrSetProp(const struct UsbFnInterface *intf, const char *name, 
 {
     struct UsbFnCfgPropMgr *fnCfgPropMgr = NULL;
     uint8_t deviceProp;
-    uint8_t isRegist;
+    int32_t isRegist;
     int32_t ret;
     const char *propValue = NULL;
     struct UsbFnRegistInfo registInfo;

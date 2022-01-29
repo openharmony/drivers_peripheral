@@ -548,7 +548,7 @@ struct UsbCdcEtherDesc {
  *
  * @return Returns <b>1</b> if the specified endpoint is in the input direction; returns <b>0</b> otherwise.
  */
-static inline int UsbEndpointDirIn(uint8_t ep)
+static inline int32_t UsbEndpointDirIn(uint8_t ep)
 {
     return ((ep & USB_DDK_ENDPOINT_DIR_MASK) == USB_DDK_DIR_IN);
 }
@@ -561,7 +561,7 @@ static inline int UsbEndpointDirIn(uint8_t ep)
  *
  * @return Returns <b>1</b> if the specified endpoint is in the output direction; returns <b>0</b> otherwise.
  */
-static inline int UsbEndpointDirOut(uint8_t ep)
+static inline int32_t UsbEndpointDirOut(uint8_t ep)
 {
     return ((ep & USB_DDK_ENDPOINT_DIR_MASK) == USB_DDK_DIR_OUT);
 }
