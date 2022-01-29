@@ -37,7 +37,6 @@ ohos_unittest("test_transfer") {
   ]
 
   external_deps = [
-    "ability_runtime:base",
     "ability_runtime:want",
     "bundle_framework:appexecfwk_base",
     "ces_standard:cesfwk_innerkits",
@@ -62,7 +61,6 @@ ohos_unittest("test_device") {
   ]
 
   external_deps = [
-    "ability_runtime:base",
     "ability_runtime:want",
     "bundle_framework:appexecfwk_base",
     "ces_standard:cesfwk_innerkits",
@@ -88,7 +86,32 @@ ohos_unittest("test_function") {
   ]
 
   external_deps = [
-    "ability_runtime:base",
+    "ability_runtime:want",
+    "bundle_framework:appexecfwk_base",
+    "ces_standard:cesfwk_innerkits",
+    "device_driver_framework:libhdf_utils",
+    "eventhandler:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "safwk:system_ability_fwk",
+    "samgr_standard:samgr_proxy",
+    "utils_base:utils",
+  ]
+  module_out_path = module_output_path
+}
+
+ohos_unittest("test_request") {
+  sources = [ "src/usbd_request_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//drivers/peripheral/usb/ddk:libusb_core",
+    "//drivers/peripheral/usb/hal/client:usbd_client",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
     "ability_runtime:want",
     "bundle_framework:appexecfwk_base",
     "ces_standard:cesfwk_innerkits",
