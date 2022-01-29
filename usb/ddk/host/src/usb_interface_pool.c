@@ -859,7 +859,7 @@ const struct UsbInterface *UsbClaimInterfaceUnforce(
 {
     int ret;
     const struct UsbInterface *interfaceObj = NULL;
-    struct UsbSdkInterface *interfaceSdk = NULL;
+    const struct UsbSdkInterface *interfaceSdk = NULL;
 
     interfaceObj = UsbClaimInterface(session, busNum, usbAddr, interfaceIndex);
 
