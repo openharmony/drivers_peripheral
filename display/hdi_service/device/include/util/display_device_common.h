@@ -176,7 +176,6 @@ bool DisplayDeviceReadFileDescriptorArray(int *fd, OHOS::MessageParcel *parcel, 
 template <typename T>
 bool DisplayDeviceWriteData(OHOS::MessageParcel *parcel, const T *data, uint32_t num = 1)
 {
-    DISPLAY_START;
     if (nullptr == parcel || nullptr == data || num == 0) {
         DISPLAY_LOG("error: OHOS::MessageParcel %{public}s nullptr, data %{public}s nullptr, num %{public}s 0",
             nullptr == parcel ? "is" : "is not", nullptr == data ? "is" : "is not", 0 == num ? "is" : "is not");
@@ -192,15 +191,11 @@ bool DisplayDeviceWriteData(OHOS::MessageParcel *parcel, const T *data, uint32_t
         DISPLAY_LOG("error: write data into parcel failed");
         return false;
     }
-
-    DISPLAY_LOG("write buffer data successed!");
-    DISPLAY_END;
     return true;
 }
 template <typename T>
 bool DisplayDeviceReadData(T *data, OHOS::MessageParcel *parcel, uint32_t num = 1)
 {
-    DISPLAY_START;
     if (nullptr == parcel || nullptr == data || num == 0) {
         DISPLAY_LOG("error: OHOS::MessageParcel %{public}s nullptr, data %{public}s nullptr, num %{public}s 0",
             nullptr == parcel ? "is" : "is not", nullptr == data ? "is" : "is not", 0 == num ? "is" : "is not");
@@ -222,9 +217,6 @@ bool DisplayDeviceReadData(T *data, OHOS::MessageParcel *parcel, uint32_t num = 
     if (memcpy_s(data, num * sizeof(T), dataTmp, retValueLen) != EOK) {
         return HDF_ERR_INVALID_PARAM;
     }
-    DISPLAY_LOG("read buffer data successed!");
-
-    DISPLAY_END;
     return true;
 }
 

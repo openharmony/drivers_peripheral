@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "display_device_service.h"
 #include <hdf_base.h>
+#include "display_device_service.h"
+
 namespace OHOS {
 namespace Display {
 namespace Device {
