@@ -81,7 +81,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_002, TestSize.Level1)
     };
     double startTs = GetNowTs();
     string wlog, rlog;
-    for (int i = 0; data[i].size() > 0; i++) {
+    for (int32_t i = 0; data[i].size() > 0; i++) {
         ASSERT_EQ(system(("usb_dev_test -2 '" + data[i] + "'").c_str()), 0);
         wlog = "send data[" + data[i] + "] to host";
         rlog = "recv data[" + data[i] + "] from host";
@@ -101,7 +101,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_002, TestSize.Level1)
 HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_003, TestSize.Level2)
 {
     printf("------start DeviceIOTest_003------\n");
-    for (int i = 0; i < 30; i++) {
+    for (int32_t i = 0; i < 30; i++) {
         system("usb_dev_test -2 `date +%s%N | md5sum | cut -c 1-32`");
     }
     sleep(1);
@@ -130,7 +130,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsConfigTest_001, TestSize.Level1)
     const char *idPorduct = "5000";
     const char *bcdDevice = "0223";
     const char *configurationValue = "1";
-    const int logMaxLen = 100;
+    const int32_t logMaxLen = 100;
     char targetLog[logMaxLen] = {0};
     const char *fmt = "recv data[%s %s %s %s] from host";
     snprintf_s(targetLog, logMaxLen, logMaxLen -1, fmt, idVendor, \

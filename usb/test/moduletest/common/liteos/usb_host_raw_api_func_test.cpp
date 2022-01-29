@@ -24,7 +24,7 @@ using namespace std;
 using namespace testing::ext;
 
 namespace {
-const int TEST_COUNT = 3;
+const int32_t TEST_COUNT = 3;
 class UsbHostRawApiFuncTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -109,7 +109,7 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadSync_003, TestSize.Level1)
         ""
     };
     char readBuf[512] = {0};
-    for (int i = 0; strlen(data[i]) > 0 > 0; i++) {
+    for (int32_t i = 0; strlen(data[i]) > 0 > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_SYNC_WRITE);
         UsbHostDdkTestSyncWrite(const_cast<char *>(data[i]));
@@ -139,7 +139,7 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadSync_004, TestSize.Level1)
         ""
     };
     char readBuf[512] = {0};
-    for (int i = 0; strlen(data[i]) > 0 > 0; i++) {
+    for (int32_t i = 0; strlen(data[i]) > 0 > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_ASYNC_WRITE);
         UsbHostDdkTestAsyncWrite(const_cast<char *>(data[i]));
@@ -164,8 +164,8 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadSync_005, TestSize.Level2)
     printf("------start UsbSerialReadSync_005------\n");
     const string s = "0123456789abcdef";
     string data;
-    int totalSize = 1024;
-    int writeCnt = 8;
+    unsigned int totalSize = 1024;
+    unsigned int writeCnt = 8;
     unsigned int n = 0;
     while (n < totalSize / writeCnt / s.size()) {
         data += s;
@@ -174,7 +174,7 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadSync_005, TestSize.Level2)
     char readBuf[512] = {0};
     char writeBuf[512] = {0};
     strcpy_s(writeBuf, sizeof(writeBuf), data.c_str());
-    for (int i = 0; i < writeCnt; i++) {
+    for (unsigned int i = 0; i < writeCnt; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_SYNC_WRITE);
         UsbHostDdkTestSyncWrite(writeBuf);
@@ -187,7 +187,7 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadSync_005, TestSize.Level2)
     printf("------end UsbSerialReadSync_005------\n");
 }
 
-static void TestAsyncRead(char *readBuf, int timeout)
+static void TestAsyncRead(char *readBuf, int32_t timeout)
 {
     printf("------TestAsyncRead start-----");
     if (strlen(readBuf) > 0) {
@@ -263,7 +263,7 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadAsync_003, TestSize.Level1)
         ""
     };
     char readBuf[512] = {0};
-    for (int i = 0; strlen(data[i]) > 0; i++) {
+    for (int32_t i = 0; strlen(data[i]) > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_ASYNC_WRITE);
         UsbHostDdkTestAsyncWrite(const_cast<char *>(data[i]));
@@ -291,7 +291,7 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadAsync_004, TestSize.Level1)
         ""
     };
     char readBuf[512] = {0};
-    for (int i = 0; strlen(data[i]) > 0; i++) {
+    for (int32_t i = 0; strlen(data[i]) > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_SYNC_WRITE);
         UsbHostDdkTestSyncWrite(const_cast<char *>(data[i]));
@@ -314,8 +314,8 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadAsync_005, TestSize.Level2)
     printf("------start UsbSerialReadAsync_005------\n");
     const string s = "0123456789abcdef";
     string data;
-    int totalSize = 1024;
-    int writeCnt = 8;
+    int32_t totalSize = 1024;
+    int32_t writeCnt = 8;
     unsigned int n = 0;
     while (n < totalSize / writeCnt / s.size()) {
         data += s;
@@ -324,7 +324,7 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadAsync_005, TestSize.Level2)
     char readBuf[512] = {0};
     char writeBuf[512] = {0};
     strcpy_s(writeBuf, sizeof(writeBuf), data.c_str());
-    for (int i = 0; i < writeCnt; i++) {
+    for (int32_t i = 0; i < writeCnt; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_ASYNC_WRITE);
         UsbHostDdkTestAsyncWrite(writeBuf);

@@ -22,9 +22,9 @@
 
 #define HDF_LOG_TAG usbfn_sdk_if
 
-static int IsDescriptorOk(struct UsbFnDeviceDesc *des)
+static int32_t IsDescriptorOk(struct UsbFnDeviceDesc *des)
 {
-    int i, j;
+    int32_t i, j;
     struct UsbFnStrings **strings = NULL;
     struct UsbFnFunction *functions = NULL;
     if (des == NULL) {
@@ -165,7 +165,7 @@ static void UsbFnChangeFunction(struct UsbFnDeviceDesc *des, struct UsbFnDescrip
 const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName,
     struct UsbFnDescriptorData *descriptor)
 {
-    int ret;
+    int32_t ret;
     const struct DeviceResourceNode *property = NULL;
     struct UsbFnDeviceDesc *des = NULL;
 
@@ -196,7 +196,7 @@ const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName,
     return (struct UsbFnDevice *)UsbFnMgrDeviceCreate(udcName, des, property);
 }
 
-int UsbFnRemoveDevice(struct UsbFnDevice *fnDevice)
+int32_t UsbFnRemoveDevice(struct UsbFnDevice *fnDevice)
 {
     if (fnDevice == NULL) {
         HDF_LOGE("%s: INVALID PARAM", __func__);
@@ -214,7 +214,7 @@ const struct UsbFnDevice *UsbFnGetDevice(const char *udcName)
     return (struct UsbFnDevice *)UsbFnMgrDeviceGet((const char *)udcName);
 }
 
-int UsbFnGetDeviceState(struct UsbFnDevice *fnDevice, UsbFnDeviceState *devState)
+int32_t UsbFnGetDeviceState(struct UsbFnDevice *fnDevice, UsbFnDeviceState *devState)
 {
     if (fnDevice == NULL || devState == NULL) {
         HDF_LOGE("%s: INVALID PARAM", __func__);
@@ -233,7 +233,7 @@ const struct UsbFnInterface *UsbFnGetInterface(struct UsbFnDevice *fnDevice,
     return (struct UsbFnInterface *)UsbFnMgrDeviceGetInterface(fnDevice, interfaceIndex);
 }
 
-int UsbFnStartRecvInterfaceEvent(struct UsbFnInterface *interface,
+int32_t UsbFnStartRecvInterfaceEvent(struct UsbFnInterface *interface,
     uint32_t eventMask, UsbFnEventCallback callback, void *context)
 {
     if (interface == NULL || eventMask == 0 || callback == NULL) {
@@ -243,7 +243,7 @@ int UsbFnStartRecvInterfaceEvent(struct UsbFnInterface *interface,
     return UsbFnMgrStartRecvEvent(interface, eventMask, callback, context);
 }
 
-int UsbFnStopRecvInterfaceEvent(struct UsbFnInterface *interface)
+int32_t UsbFnStopRecvInterfaceEvent(struct UsbFnInterface *interface)
 {
     if (interface == NULL) {
         HDF_LOGE("%s: INVALID PARAM", __func__);
@@ -261,7 +261,7 @@ UsbFnInterfaceHandle UsbFnOpenInterface(struct UsbFnInterface *interface)
     return (UsbFnInterfaceHandle)UsbFnIoMgrInterfaceOpen(interface);
 }
 
-int UsbFnCloseInterface(UsbFnInterfaceHandle handle)
+int32_t UsbFnCloseInterface(UsbFnInterfaceHandle handle)
 {
     if (handle == NULL) {
         HDF_LOGE("%s: INVALID PARAM", __func__);
@@ -270,7 +270,7 @@ int UsbFnCloseInterface(UsbFnInterfaceHandle handle)
     return UsbFnIoMgrInterfaceClose((struct UsbHandleMgr *)handle);
 }
 
-int UsbFnGetInterfacePipeInfo(struct UsbFnInterface *interface,
+int32_t UsbFnGetInterfacePipeInfo(struct UsbFnInterface *interface,
     uint8_t pipeId, struct UsbFnPipeInfo *info)
 {
     if (info == NULL || interface == NULL) {
@@ -280,7 +280,7 @@ int UsbFnGetInterfacePipeInfo(struct UsbFnInterface *interface,
     return UsbFnIoMgrInterfaceGetPipeInfo(interface, pipeId, info);
 }
 
-int UsbFnRegistInterfaceProp(const struct UsbFnInterface *interface,
+int32_t UsbFnRegistInterfaceProp(const struct UsbFnInterface *interface,
     const struct UsbFnRegistInfo *registInfo)
 {
     if (registInfo == NULL || interface == NULL) {
@@ -290,7 +290,7 @@ int UsbFnRegistInterfaceProp(const struct UsbFnInterface *interface,
     return UsbFnCfgMgrRegisterProp(interface, registInfo);
 }
 
-int UsbFnGetInterfaceProp(const struct UsbFnInterface *interface,
+int32_t UsbFnGetInterfaceProp(const struct UsbFnInterface *interface,
     const char *name, char *value)
 {
     if (name == NULL || interface == NULL || value == NULL) {
@@ -300,7 +300,7 @@ int UsbFnGetInterfaceProp(const struct UsbFnInterface *interface,
     return UsbFnCfgMgrGetProp(interface, name, value);
 }
 
-int UsbFnSetInterfaceProp(const struct UsbFnInterface *interface,
+int32_t UsbFnSetInterfaceProp(const struct UsbFnInterface *interface,
     const char *name, const char *value)
 {
     if (name == NULL || interface == NULL) {
@@ -330,7 +330,7 @@ struct UsbFnRequest *UsbFnAllocCtrlRequest(UsbFnInterfaceHandle handle, uint32_t
     return UsbFnIoMgrRequestAlloc(handleMgr, 0, len);
 }
 
-int UsbFnFreeRequest(struct UsbFnRequest *req)
+int32_t UsbFnFreeRequest(struct UsbFnRequest *req)
 {
     if (req == NULL) {
         HDF_LOGE("%s: INVALID PARAM", __func__);
@@ -339,7 +339,7 @@ int UsbFnFreeRequest(struct UsbFnRequest *req)
     return  UsbFnIoMgrRequestFree(req);
 }
 
-int UsbFnGetRequestStatus(struct UsbFnRequest *req, UsbRequestStatus *status)
+int32_t UsbFnGetRequestStatus(struct UsbFnRequest *req, UsbRequestStatus *status)
 {
     if (req == NULL || status == NULL) {
         HDF_LOGE("%s: INVALID PARAM", __func__);
@@ -348,7 +348,7 @@ int UsbFnGetRequestStatus(struct UsbFnRequest *req, UsbRequestStatus *status)
     return UsbFnIoMgrRequestGetStatus(req, status);
 }
 
-int UsbFnSubmitRequestAsync(struct UsbFnRequest *req)
+int32_t UsbFnSubmitRequestAsync(struct UsbFnRequest *req)
 {
     if (req == NULL) {
         HDF_LOGE("%s: INVALID PARAM", __func__);
@@ -357,7 +357,7 @@ int UsbFnSubmitRequestAsync(struct UsbFnRequest *req)
     return UsbFnIoMgrRequestSubmitAsync(req);
 }
 
-int UsbFnCancelRequest(struct UsbFnRequest *req)
+int32_t UsbFnCancelRequest(struct UsbFnRequest *req)
 {
     if (req == NULL) {
         HDF_LOGE("%s: INVALID PARAM", __func__);
@@ -366,7 +366,7 @@ int UsbFnCancelRequest(struct UsbFnRequest *req)
     return UsbFnIoMgrRequestCancel(req);
 }
 
-int UsbFnSubmitRequestSync(struct UsbFnRequest *req, uint32_t timeout)
+int32_t UsbFnSubmitRequestSync(struct UsbFnRequest *req, uint32_t timeout)
 {
     if (req == NULL) {
         HDF_LOGE("%s: INVALID PARAM", __func__);
@@ -375,7 +375,7 @@ int UsbFnSubmitRequestSync(struct UsbFnRequest *req, uint32_t timeout)
     return UsbFnIoMgrRequestSubmitSync(req, timeout);
 }
 
-int UsbFnMemTestTrigger(bool enable)
+int32_t UsbFnMemTestTrigger(bool enable)
 {
     return UsbFnAdpMemTestTrigger(enable);
 }
