@@ -166,7 +166,6 @@ static HDF_STATUS IfFreeInterfacePool(struct UsbInterfacePool *interfacePool)
     interfacePool->devAddr = 0;
 
     RawUsbMemFree(interfacePool);
-    interfacePool = NULL;
 
     return ret;
 }
@@ -858,7 +857,7 @@ const struct UsbInterface *UsbClaimInterfaceUnforce(
 {
     int ret;
     const struct UsbInterface *interfaceObj = NULL;
-    struct UsbSdkInterface *interfaceSdk = NULL;
+    const struct UsbSdkInterface *interfaceSdk = NULL;
 
     interfaceObj = UsbClaimInterface(session, busNum, usbAddr, interfaceIndex);
 
@@ -1037,10 +1036,8 @@ UsbInterfaceHandle *UsbOpenInterface(const struct UsbInterface *interfaceObj)
     }
 
     struct UsbSdkInterface *interfaceSdk = (struct UsbSdkInterface *)interfaceObj;
-    if ((interfaceSdk == NULL) || (interfaceSdk->session == NULL)
-        || (interfaceSdk->status == USB_INTERFACE_STATUS_REMOVE)) {
-        HDF_LOGE("%s:%d interfaceSdk->status=%d is error",
-            __func__, __LINE__, interfaceSdk->status);
+    if ((interfaceSdk->session == NULL) || (interfaceSdk->status == USB_INTERFACE_STATUS_REMOVE)) {
+        HDF_LOGE("%s:%d interfaceSdk->status=%d is error", __func__, __LINE__, interfaceSdk->status);
         return NULL;
     }
 
