@@ -35,7 +35,7 @@ AlgoPlugin::~AlgoPlugin()
 
 RetCode AlgoPlugin::Init(std::shared_ptr<CameraStandard::CameraMetadata> meta)
 {
-    (void)meta
+    (void)meta;
     if (algoHandler_->func.Init == nullptr) {
         CAMERA_LOGE("unsupport operation.");
         return RC_ERROR;
