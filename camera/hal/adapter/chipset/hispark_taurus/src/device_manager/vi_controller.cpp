@@ -246,7 +246,7 @@ RetCode ViController::GetAWBMetaData(std::shared_ptr<CameraStandard::CameraMetad
                 if (!CheckNumequal(oldColorGains, colorGains, gainsSize)) {
                     std::lock_guard<std::mutex> l(metaDataFlaglock_);
                     metaDataFlag_ = true;
-                    ret = memcpy_s(oldColorGains, gainsSize*sizeof(float), colorGains, gainsSize*sizeof(float)) != 0)
+                    ret = memcpy_s(oldColorGains, gainsSize*sizeof(float), colorGains, gainsSize*sizeof(float));
                     if (ret != 0) {
                         printf("memcpy_s failed.");
                     };
