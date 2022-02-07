@@ -150,6 +150,27 @@ struct AudioAdapter {
      */
     int32_t (*GetPassthroughMode)(struct AudioAdapter *adapter, const struct AudioPort *port,
                                   enum AudioPortPassthroughMode *mode);
+
+    /**
+     * @brief Update audio route on several source and sink ports.
+     *
+     * @param adapter Indicates the pointer to the audio adapter to operate.
+     * @param route Indicates route information.
+     * @param routeHandle Indicates route handle.
+     * @return Returns <b>0</b> if the mode is successfully obtained; returns a negative value otherwise.
+     * @see SetPassthroughMode
+     */
+    int32_t (*UpdateAudioRoute)(struct AudioAdapter *adapter, const struct AudioRoute *route, int32_t *routeHandle);
+
+    /**
+     * @brief Release an audio route.
+     *
+     * @param adapter Indicates the pointer to the audio adapter to operate.
+     * @param routeHandle Indicates route handle.
+     * @return Returns <b>0</b> if the mode is successfully obtained; returns a negative value otherwise.
+     * @see SetPassthroughMode
+     */
+    int32_t (*ReleaseAudioRoute)(struct AudioAdapter *adapter, int32_t routeHandle);
 };
 
 #endif /* AUDIO_ADAPTER_H */
