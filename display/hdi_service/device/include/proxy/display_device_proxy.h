@@ -36,7 +36,7 @@ public:
     DisplayDeviceProxy(const DisplayDeviceProxy &) = delete;
     DisplayDeviceProxy &operator=(const DisplayDeviceProxy &) = delete;
     /* device proxy */
-    int32_t RegHotPlugCallback(HotPlugCallback callback, void *data) override;
+    int32_t RegHotPlugCallback(HotPlugCallback callback, void *callbackData) override;
     int32_t GetDisplayCapability(uint32_t devId, DisplayCapability &info) override;
     int32_t GetDisplaySuppportedModes(uint32_t devId, int &num, DisplayModeInfo *modes) override;
     int32_t GetDisplayMode(uint32_t devId, uint32_t &modeId) override;
@@ -54,14 +54,14 @@ public:
     int32_t SetDisplayClientBuffer(uint32_t devId, const BufferHandle &buffer, int32_t fence) override;
     int32_t SetDisplayClientDamage(uint32_t devId, uint32_t num, const IRect &rect) override;
     int32_t SetDisplayVsyncEnabled(uint32_t devId, bool enabled) override;
-    int32_t RegDisplayVBlankCallback(uint32_t devId, VBlankCallback callback, void *data) override;
+    int32_t RegDisplayVBlankCallback(uint32_t devId, VBlankCallback callback, void *callbackData) override;
     int32_t GetDisplayReleaseFence(uint32_t devId, uint32_t *num, uint32_t *layers, int32_t *fences) override;
     int32_t Commit(uint32_t devId, int32_t &fence) override;
     int32_t InvokeDisplayCmd(uint32_t devId, ...) override;
     int32_t CreateVirtualDisplay(uint32_t width, uint32_t height, int32_t &format, uint32_t &devId) override;
     int32_t DestroyVirtualDisplay(uint32_t devId) override;
     int32_t SetVirtualDisplayBuffer(uint32_t devId, const BufferHandle *bufhandle, int32_t fence) override;
-    int32_t RegDisplayRefreshCallback(uint32_t devId, RefreshCallback callback, void *data) override;
+    int32_t RegDisplayRefreshCallback(uint32_t devId, RefreshCallback callback, void *callbackData) override;
     int32_t GetWriteBackFrame(uint32_t devId, BufferHandle &buffer, int32_t &fence) override;
     int32_t CreateWriteBack(uint32_t &devId, uint32_t width, uint32_t height, int32_t &format) override;
     int32_t DestroyWriteBack(uint32_t devId) override;
