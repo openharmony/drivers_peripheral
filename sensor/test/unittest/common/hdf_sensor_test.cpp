@@ -42,6 +42,7 @@ namespace {
     static struct SensorValueRange g_testRange[] = {{1e5, 0}};
     static struct SensorValueRange g_accelRange[] = {{78, -78}, {78, -78}, {78, -78}};
     static struct SensorValueRange g_alsRange[] = {{10000, 0}};
+    static struct SensorValueRange g_pedometerRange[] = {{10000, 0}};
     static struct SensorValueRange g_proximityRange[] = {{5, 0}};
     static struct SensorValueRange g_hallRange[] = {{1, 0}};
     static struct SensorValueRange g_barometerRange[] = {{1100, -1100}, {1100, -1100}};
@@ -52,6 +53,7 @@ namespace {
     static struct SensorDevelopmentList g_sensorList[] = {
         {SENSOR_TYPE_NONE, "sensor_test", 1, 1, g_testRange},
         {SENSOR_TYPE_ACCELEROMETER, "accelerometer", 1, 3, g_accelRange},
+        {SENSOR_TYPE_PEDOMETER, "pedometer", 1, 1, g_pedometerRange},
         {SENSOR_TYPE_PROXIMITY, "proximity", 0, 1, g_proximityRange},
         {SENSOR_TYPE_HALL, "hallrometer", 0, 1, g_hallRange},
         {SENSOR_TYPE_BAROMETER, "barometer", 1, 2, g_barometerRange},
