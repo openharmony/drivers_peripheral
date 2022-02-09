@@ -22,6 +22,15 @@ ohos_shared_library("libsensor_if_service_1.0") {
     "//drivers/peripheral/sensor/hal:hdi_sensor",
   ]
 
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+
   if (is_standard_system) {
     external_deps = [
       "device_driver_framework:libhdf_ipc_adapter",
@@ -48,6 +57,15 @@ ohos_shared_library("libsensor_driver") {
   sources = [ "sensor_interface_driver.cpp" ]
 
   deps = [ "//drivers/peripheral/sensor/hdi_service:libsensor_if_service_1.0" ]
+
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
 
   if (is_standard_system) {
     external_deps = [
