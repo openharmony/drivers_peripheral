@@ -403,7 +403,7 @@ static int32_t ParserDevMac(struct nl_msg *msg, void *arg)
         getmac[0], getmac[1], getmac[2], getmac[3], getmac[4], getmac[5]);
     ret = memcpy_s(info->mac, info->len, getmac, info->len);
     if (ret != 0) {
-        printf("memcpy_s failed.");
+        HILOG_ERROR(LOG_DOMAIN, "%s: memcpy_s failed.", __FUNCTION__);
     }
     return NL_SKIP;
 }
