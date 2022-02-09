@@ -31,6 +31,15 @@ if (defined(ohos_lite)) {
       "//utils/native/base:utils",
     ]
 
+    cflags = [
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fsigned-char",
+      "-fno-common",
+      "-fno-strict-aliasing",
+    ]
+
     if (is_standard_system) {
       external_deps = [
         "device_driver_framework:libhdf_utils",
@@ -63,6 +72,15 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/misc/vibrator/hal:hdi_vibrator",
       "//drivers/peripheral/misc/vibrator/hdi_service:libvibrator_interface_service_1.0",
       "//utils/native/base:utils",
+    ]
+
+    cflags = [
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fsigned-char",
+      "-fno-common",
+      "-fno-strict-aliasing",
     ]
 
     if (is_standard_system) {
