@@ -149,7 +149,8 @@ public:
      *
      * @param dev Indicates the USB device address.
      * @param interfaceid Indicates the interface ID of the USB device.
-     * @param force Indicates whether to enable the force mode. The value <b>1</b> indicates that the force mode is enabled, and value <b>0</b> indicates the opposite.
+     * @param force Indicates whether to enable the force mode. The value <b>1</b> indicates that the force mode is
+     * enabled, and value <b>0</b> indicates the opposite.
      *
      * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
@@ -168,7 +169,8 @@ public:
     int32_t ReleaseInterface(const UsbDev &dev, uint8_t interfaceid);
 
     /* *
-     * @brief Sets the alternate settings for the specified USB interface. This allows you to switch between two interfaces with the same ID but different alternate settings.
+     * @brief Sets the alternate settings for the specified USB interface. This allows you to switch between two
+     * interfaces with the same ID but different alternate settings.
      *
      * @param dev Indicates the USB device address.
      * @param interfaceid Indicates the interface ID of the USB device.
@@ -180,7 +182,8 @@ public:
     int32_t SetInterface(const UsbDev &dev, uint8_t interfaceid, uint8_t altIndex);
 
     /* *
-     * @brief Reads data on a specified endpoint during bulk transfer. The endpoint must be in the data reading direction. You can specify a timeout duration if needed.
+     * @brief Reads data on a specified endpoint during bulk transfer. The endpoint must be in the data reading
+     * direction. You can specify a timeout duration if needed.
      *
      * @param dev Indicates the USB device address.
      * @param pipe Indicates the pipe of the USB device.
@@ -193,7 +196,8 @@ public:
     int32_t BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
 
     /* *
-     * @brief Writes data on a specified endpoint during bulk transfer. The endpoint must be in the data writing direction.
+     * @brief Writes data on a specified endpoint during bulk transfer. The endpoint must be in the data writing
+     * direction.
      *
      * @param dev Indicates the USB device address.
      * @param pipe Indicates the pipe of the USB device.
@@ -207,8 +211,10 @@ public:
         const std::vector<uint8_t> &data);
 
     /* *
-     * @brief Performs control transfer for endpoint 0 of the device. The data transfer direction is determined by the request type. If the result of <b>requestType</b>&
-     * <b>USB_ENDPOINT_DIR_MASK</b> is <b>USB_DIR_OUT</b>, the endpoint is in the data writing direction; if the result is <b>USB_DIR_IN</b>, the endpoint is in the data reading direction.
+     * @brief Performs control transfer for endpoint 0 of the device. The data transfer direction is determined by the
+     * request type. If the result of <b>requestType</b>&
+     * <b>USB_ENDPOINT_DIR_MASK</b> is <b>USB_DIR_OUT</b>, the endpoint is in the data writing direction; if the result
+     * is <b>USB_DIR_IN</b>, the endpoint is in the data reading direction.
      *
      * @param dev Indicates the USB device address.
      * @param ctrl Indicates the control data packet structure.
@@ -220,7 +226,8 @@ public:
     int32_t ControlTransfer(const UsbDev &dev, const UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
 
     /* *
-     * @brief Reads data on a specified endpoint during interrupt transfer. The endpoint must be in the data reading direction.
+     * @brief Reads data on a specified endpoint during interrupt transfer. The endpoint must be in the data reading
+     * direction.
      *
      * @param dev Indicates the USB device address.
      * @param pipe Indicates the pipe of the USB device.
@@ -233,7 +240,8 @@ public:
     int32_t InterruptTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
 
     /* *
-     * @brief Writes data on a specified endpoint during interrupt transfer. The endpoint must be in the data writing direction.
+     * @brief Writes data on a specified endpoint during interrupt transfer. The endpoint must be in the data writing
+     * direction.
      *
      * @param dev Indicates the USB device address.
      * @param pipe Indicates the pipe of the USB device.
@@ -246,7 +254,8 @@ public:
     int32_t InterruptTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
 
     /* *
-     * @brief Reads data on a specified endpoint during isochronous transfer. The endpoint must be in the data reading direction.
+     * @brief Reads data on a specified endpoint during isochronous transfer. The endpoint must be in the data reading
+     * direction.
      *
      * @param dev Indicates the USB device address.
      * @param pipe Indicates the pipe of the USB device.
@@ -259,7 +268,8 @@ public:
     int32_t IsoTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
 
     /* *
-     * @brief Writes data on a specified endpoint during isochronous transfer. The endpoint must be in the data writing direction.
+     * @brief Writes data on a specified endpoint during isochronous transfer. The endpoint must be in the data writing
+     * direction.
      *
      * @param dev Indicates the USB device address.
      * @param pipe Indicates the pipe of the USB device.
@@ -272,7 +282,8 @@ public:
     int32_t IsoTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout, std::vector<uint8_t> &data);
 
     /* *
-     * @brief Sends or receives requests for isochronous transfer on a specified endpoint. The data transfer direction is determined by the endpoint direction.
+     * @brief Sends or receives requests for isochronous transfer on a specified endpoint. The data transfer direction
+     * is determined by the endpoint direction.
      *
      * @param dev Indicates the USB device address.
      * @param pipe Indicates the pipe of the USB device.
@@ -423,7 +434,8 @@ public:
     int32_t BulkWrite(const UsbDev &dev, const UsbPipe &pipe, sptr<Ashmem> &ashmem);
 
     /* *
-     * @brief Cancels the isochronous bulk transfer. The read and write operations on the current USB interface will be cancelled.
+     * @brief Cancels the isochronous bulk transfer. The read and write operations on the current USB interface will
+     * be cancelled.
      *
      * @param dev Indicates the USB device address.
      * @param pipe Indicates the pipe of the USB device.
