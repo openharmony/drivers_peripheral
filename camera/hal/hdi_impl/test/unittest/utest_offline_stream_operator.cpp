@@ -47,8 +47,13 @@ uint64_t GetCurrentLocalTimeStampOFL()
 
 int32_t SaveToFile(const char* type, const void* buffer, int32_t size)
 {
+    int ret;
     char path[PATH_MAX] = {0};
-    sprintf_s(path, PATH_MAX, "/mnt/%s_%lld.yuv", type, GetCurrentLocalTimeStampOFL());
+    ret = sprintf_s(path, PATH_MAX, "/mnt/%s_%lld.yuv", type, GetCurrentLocalTimeStampOFL());
+    if (ret < 0) {
+        std::cout << "sprintf_s failed, errno = " << strerror(errno) << std::endl;
+        return -1;
+    }
     int imgFd = open(path, O_RDWR | O_CREAT, 00766);
     if (imgFd == -1) {
         std::cout << "open file failed, errno = " << strerror(errno) << std::endl;

@@ -74,7 +74,7 @@ public:
 
     RetCode CaptureOnDualStreams(const int streamIdSecond);
     RetCode CaptureON(const int streamId, const int captureId, CaptureMode mode);
-    RetCode CaptureOff(const int captureId, const CaptureMode mode) const;
+    RetCode CaptureOff(const int captureId, const CaptureMode mode);
 
     void SetAwbMode(const int mode) const;
     void SetAeExpo();

@@ -102,7 +102,7 @@ RetCode Hos3516Demo::CaptureON(const int streamId, const int captureId, CaptureM
     return RC_OK;
 }
 
-RetCode Hos3516Demo::CaptureOff(const int captureId, const CaptureMode mode) const
+RetCode Hos3516Demo::CaptureOff(const int captureId, const CaptureMode mode)
 {
     int rc = 0;
     CAMERA_LOGD("demo test: CaptureOff enter mode == %{public}d", mode);
@@ -122,6 +122,7 @@ RetCode Hos3516Demo::CaptureOff(const int captureId, const CaptureMode mode) con
         streamCustomerVideo_->ReceiveFrameOff();
         rc = streamOperator_->CancelCapture(captureId);
         close(videoFd_);
+        videoFd_ = -1;
     }
 
     if (rc != Camera::NO_ERROR) {
