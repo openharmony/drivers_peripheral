@@ -68,7 +68,9 @@ int Process(const IppAlgoBuffer *inBuffer[], int inBufferCount, const IppAlgoBuf
         }
         char *in = (char*)(inBuffer[0]->addr);
         char *out = (char*)(outBuffer->addr);
-        memcpy_s(out, outBuffer->size, in, outBuffer->size);
+        if (memcpy_s(out, outBuffer->size, in, outBuffer->size) != 0) {
+            printf("memcpy_s failed.");
+        }
         return 0;
     }
 
@@ -80,8 +82,10 @@ int Process(const IppAlgoBuffer *inBuffer[], int inBufferCount, const IppAlgoBuf
         // format is yuv422
         char *startBuffer1 = (char*)(inBuffer[0]->addr) + inBuffer[0]->stride * inBuffer[0]->height;
         char *startBuffer2 = (char*)(inBuffer[1]->addr) + inBuffer[1]->stride * inBuffer[1]->height;
-        memcpy_s(startBuffer1, inBuffer[0]->size - inBuffer[0]->stride * inBuffer[0]->height,
-            startBuffer2, inBuffer[0]->stride * inBuffer[0]->height);
+        if (memcpy_s(startBuffer1, inBuffer[0]->size - inBuffer[0]->stride * inBuffer[0]->height,
+            startBuffer2, inBuffer[0]->stride * inBuffer[0]->height) != 0) {
+                printf("memcpy_s failed.");
+            }
         return 0;
     }
     return 0;

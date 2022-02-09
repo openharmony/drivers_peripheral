@@ -388,6 +388,7 @@ struct PrivDevMac {
 
 static int32_t ParserDevMac(struct nl_msg *msg, void *arg)
 {
+    int ret;
     struct nlattr *tb[NL80211_ATTR_MAX + 1];
     struct genlmsghdr *gnlh = nlmsg_data(nlmsg_hdr(msg));
     struct PrivDevMac *info = (struct PrivDevMac *)arg;
@@ -400,7 +401,10 @@ static int32_t ParserDevMac(struct nl_msg *msg, void *arg)
     }
     HILOG_ERROR(LOG_DOMAIN, "%s: has parse a tb_mac[%2x:%2x:%2x:%2x:%2x:%2x]", __FUNCTION__,
         getmac[0], getmac[1], getmac[2], getmac[3], getmac[4], getmac[5]);
-    memcpy_s(info->mac, info->len, getmac, info->len);
+    ret = memcpy_s(info->mac, info->len, getmac, info->len);
+    if (ret != 0) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: memcpy_s failed.", __FUNCTION__);
+    }
     return NL_SKIP;
 }
 
@@ -661,7 +665,7 @@ int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
         HILOG_ERROR(LOG_DOMAIN, "%s: open socket failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    strncpy_s(req.ifr_name, IFNAMSIZ, ifName, sizeof(ifName));
+    strncpy_s(req.ifr_name, IFNAMSIZ, ifName, strlen(ifName));
     req.ifr_addr.sa_family = ARPHRD_ETHER;
     memcpy_s(req.ifr_hwaddr.sa_data, len, mac, len);
     ret = ioctl(fd, SIOCSIFHWADDR, &req);
@@ -721,7 +725,7 @@ int32_t GetDevMacAddr(const char *ifName,
         return RET_CODE_FAILURE;
     }
     req.ifr_addr.sa_family = AF_INET;
-    strncpy_s(req.ifr_name, IFNAMSIZ, ifName, sizeof(ifName));
+    strncpy_s(req.ifr_name, IFNAMSIZ, ifName, strlen(ifName));
     ret = ioctl(fd, SIOCGIFHWADDR, &req);
     if (ret != 0) {
         HILOG_ERROR(LOG_DOMAIN, "%s: ioctl failed", __FUNCTION__);

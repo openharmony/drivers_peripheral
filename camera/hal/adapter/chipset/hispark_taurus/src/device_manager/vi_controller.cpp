@@ -229,6 +229,7 @@ RetCode ViController::GetAEMetaData(std::shared_ptr<CameraStandard::CameraMetada
 
 RetCode ViController::GetAWBMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta)
 {
+    int ret;
     static float oldColorGains[4] = {0};
     float colorGains[4] = {0};
     RetCode rc = RC_ERROR;
@@ -245,7 +246,10 @@ RetCode ViController::GetAWBMetaData(std::shared_ptr<CameraStandard::CameraMetad
                 if (!CheckNumequal(oldColorGains, colorGains, gainsSize)) {
                     std::lock_guard<std::mutex> l(metaDataFlaglock_);
                     metaDataFlag_ = true;
-                    memcpy_s(oldColorGains, gainsSize*sizeof(float), colorGains, gainsSize*sizeof(float));
+                    ret = memcpy_s(oldColorGains, gainsSize*sizeof(float), colorGains, gainsSize*sizeof(float));
+                    if (ret != 0) {
+                        printf("memcpy_s failed.");
+                    };
                 }
                 static constexpr int DATA_COUNT = 4;
                 meta->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, DATA_COUNT);

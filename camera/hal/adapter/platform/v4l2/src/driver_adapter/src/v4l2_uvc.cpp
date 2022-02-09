@@ -34,8 +34,9 @@ void HosV4L2UVC::V4L2UvcSearchCapability(const std::string devName, const std::s
 
     if (inOut) {
         char *name = nullptr;
+        char absPath[PATH_MAX] = {0};
 
-        name = realpath(v4l2Device.c_str(), nullptr);
+        name = realpath(v4l2Device.c_str(), absPath);
         if (name == nullptr) {
             CAMERA_LOGE("UVC:V4L2UvcMatchDev realpath error\n");
             return;
@@ -116,8 +117,9 @@ RetCode HosV4L2UVC::V4L2UvcGetCap(const std::string v4l2Device, struct v4l2_capa
 {
     int fd, rc;
     char *devName = nullptr;
+    char absPath[PATH_MAX] = {0};
 
-    devName = realpath(v4l2Device.c_str(), nullptr);
+    devName = realpath(v4l2Device.c_str(), absPath);
     if (devName == nullptr) {
         CAMERA_LOGE("UVC:V4L2UvcGetCap realpath error\n");
         return RC_ERROR;

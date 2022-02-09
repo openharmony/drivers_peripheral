@@ -240,8 +240,9 @@ int HosFileFormat::V4L2OpenDevice(const std::string& deviceName)
 
     int rc = 0;
     char* devName = nullptr;
+    char absPath[PATH_MAX] = {0};
 
-    devName = realpath(deviceName.c_str(), nullptr);
+    devName = realpath(deviceName.c_str(), absPath);
     if (devName == nullptr) {
         CAMERA_LOGE("V4L2OpenDevice realpath error\n");
         return RCERRORFD;
