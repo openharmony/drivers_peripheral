@@ -73,7 +73,7 @@ static int OpenDevice()
     char path[24];
     int ret;
 
-    ret = snprintf_s(path, 24, sizeof(path), USB_DEV_FS_PATH "/%03u/%03u", g_busNum, g_devAddr);
+    ret = snprintf_s(path, 24, sizeof(path) - 1, USB_DEV_FS_PATH "/%03u/%03u", g_busNum, g_devAddr);
     if (ret < 0) {
         printf("path error\n");
         return ret;
@@ -227,7 +227,7 @@ static int ReapProcess(void *argurb)
     return 0;
 }
 
-static int BeginProcess(unsigned char endPoint)
+static int BeginProcess(uint8_t endPoint)
 {
     int r;
     char *data = NULL;

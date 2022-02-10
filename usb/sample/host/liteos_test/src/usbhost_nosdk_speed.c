@@ -156,7 +156,7 @@ static void UrbComplete(struct urb *curUrb)
     }
 }
 
-static int BeginProcess(unsigned char endPoint)
+static int BeginProcess(uint8_t endPoint)
 {
     int r;
     char *data = NULL;
