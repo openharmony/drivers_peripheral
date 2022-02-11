@@ -73,8 +73,8 @@ ohos_unittest("test_hdisrv") {
   ]
 
   external_deps = [
-    "ability_runtime:base",
-    "ability_runtime:want",
+    "ability_base:base",
+    "ability_base:want",
     "bundle_framework:appexecfwk_base",
     "ces_standard:cesfwk_core",
     "ces_standard:cesfwk_innerkits",
