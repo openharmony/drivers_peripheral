@@ -1,8 +1,7 @@
 # Copyright (c) Huawei Technologies Co., Ltd. 2021. All rights reserved.
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
-  enable_audio_alsa_mode = false
-  enable_audio_hal_notsupport_pathselect = false
+  import("//vendor/${product_company}/${product_name}/hals/audio/product.gni")
 } else {
   import("//build/ohos.gni")
   if (product_name == "ohos-arm64") {
