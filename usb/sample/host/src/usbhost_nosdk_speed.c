@@ -39,6 +39,8 @@
 #define USB_DEV_FS_PATH "/dev/bus/usb"
 #define URB_COMPLETE_PROCESS_STACK_SIZE 8196
 
+#define PATH_SIZE 24
+
 #define TEST_LENGTH     512
 #define TEST_CYCLE      30
 #define TEST_TIME       0xffffffff
@@ -70,10 +72,10 @@ static void CloseDevice()
 
 static int OpenDevice()
 {
-    char path[24];
+    char path[PATH_SIZE];
     int ret;
 
-    ret = snprintf_s(path, 24, sizeof(path) - 1, USB_DEV_FS_PATH "/%03u/%03u", g_busNum, g_devAddr);
+    ret = snprintf_s(path, PATH_SIZE, sizeof(path) - 1, USB_DEV_FS_PATH "/%03u/%03u", g_busNum, g_devAddr);
     if (ret < 0) {
         printf("path error\n");
         return ret;
