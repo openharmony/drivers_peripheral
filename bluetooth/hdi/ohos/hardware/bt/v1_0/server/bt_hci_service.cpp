@@ -25,6 +25,20 @@ namespace v1_0 {
 using VendorInterface = OHOS::HDI::BT::V1_0::VendorInterface;
 using HciPacketType = OHOS::HDI::BT::HCI::HciPacketType;
 
+BtHciService::BtHciService()
+{
+    remoteDeathRecipient_ =
+        new RemoteDeathRecipient(std::bind(&BtHciService::OnRemoteDied, this, std::placeholders::_1));
+}
+
+BtHciService::~BtHciService()
+{
+    if (callbacks_ != nullptr) {
+        callbacks_->AsObject()->RemoveDeathRecipient(remoteDeathRecipient_);
+        callbacks_ = nullptr;
+    }
+}
+
 int32_t BtHciService::Init(const sptr<IBtHciCallbacks> &callbacks)
 {
     HDF_LOGI("%{public}s, ", __func__);
@@ -35,22 +49,23 @@ int32_t BtHciService::Init(const sptr<IBtHciCallbacks> &callbacks)
 
     VendorInterface::ReceiveCallback callback = {
         .onAclReceive =
-            [&](const std::vector<uint8_t> &packet) {
-                callbacks->OnReceivedHciPacket(BtType::ACL_DATA, packet);
-            },
+            [callbacks](
+                const std::vector<uint8_t> &packet) { callbacks->OnReceivedHciPacket(BtType::ACL_DATA, packet); },
         .onScoReceive =
-            [&](const std::vector<uint8_t> &packet) {
-                callbacks->OnReceivedHciPacket(BtType::SCO_DATA, packet);
-            },
+            [callbacks](
+                const std::vector<uint8_t> &packet) { callbacks->OnReceivedHciPacket(BtType::SCO_DATA, packet); },
         .onEventReceive =
-            [&](const std::vector<uint8_t> &packet) {
-                callbacks->OnReceivedHciPacket(BtType::HCI_EVENT, packet);
-            },
+            [callbacks](
+                const std::vector<uint8_t> &packet) { callbacks->OnReceivedHciPacket(BtType::HCI_EVENT, packet); },
     };
 
     bool result = VendorInterface::GetInstance()->Initialize(
-        [&](bool status) { callbacks->OnInited(status ? BtStatus::SUCCESS : BtStatus::INITIAL_ERROR); }, callback);
-
+        [callbacks](bool status) { callbacks->OnInited(status ? BtStatus::SUCCESS : BtStatus::INITIAL_ERROR); },
+        callback);
+    if (result) {
+        callbacks_ = callbacks;
+        callbacks_->AsObject()->AddDeathRecipient(remoteDeathRecipient_);
+    }
     return result ? HDF_SUCCESS : HDF_FAILURE;
 }
 
@@ -61,18 +76,27 @@ int32_t BtHciService::SendHciPacket(BtType type, const std::vector<uint8_t> &dat
         return HDF_FAILURE;
     }
 
-    size_t result =
-        VendorInterface::GetInstance()->SendPacket(static_cast<HciPacketType>(type), data);
+    size_t result = VendorInterface::GetInstance()->SendPacket(static_cast<HciPacketType>(type), data);
     return result ? HDF_SUCCESS : HDF_FAILURE;
 }
 
 int32_t BtHciService::Close()
 {
+    if (callbacks_ != nullptr) {
+        callbacks_->AsObject()->RemoveDeathRecipient(remoteDeathRecipient_);
+        callbacks_ = nullptr;
+    }
     VendorInterface::GetInstance()->CleanUp();
     VendorInterface::DestroyInstance();
     return HDF_SUCCESS;
 }
 
+void BtHciService::OnRemoteDied(const wptr<IRemoteObject> &object)
+{
+    callbacks_ = nullptr;
+    VendorInterface::GetInstance()->CleanUp();
+    VendorInterface::DestroyInstance();
+}
 }  // namespace v1_0
 }  // namespace bt
 }  // namespace hardware

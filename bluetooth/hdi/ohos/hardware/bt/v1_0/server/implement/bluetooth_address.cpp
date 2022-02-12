@@ -24,6 +24,8 @@
 
 #include <hdf_log.h>
 
+#include "securec.h"
+
 namespace OHOS {
 namespace HDI {
 namespace BT {
@@ -45,7 +47,7 @@ int BluetoothAddress::ParseAddressFromString(const std::string &string)
     int readCount = 0;
     for (bytesIndex = 0; bytesIndex < ADDRESS_SIZE && offset < string.size(); bytesIndex++) {
         readCount = 0;
-        if (sscanf(&string[offset], "%02hhx:%n", &address_[bytesIndex], &readCount) > 0) {
+        if (sscanf_s(&string[offset], "%02hhx:%n", &address_[bytesIndex], &readCount) > 0) {
             if (readCount == 0 && bytesIndex != ADDRESS_SIZE - 1) {
                 return bytesIndex;
             }
@@ -116,11 +118,16 @@ void BluetoothAddress::ReadAddress(std::vector<uint8_t> &address) const
 
 void BluetoothAddress::ReadAddress(std::string &address) const
 {
-    address.resize(ADDRESS_STR_LEN);
+    address.resize(ADDRESS_STR_LEN + 1);
 
     int offset = 0;
     for(int ii = 0; ii < ADDRESS_SIZE; ii++) {
-        snprintf(&address[offset], ADDRESS_STR_LEN - offset, "%02x:", address_[ii]);
+        int ret = snprintf_s(
+            &address[offset], (ADDRESS_STR_LEN + 1) - offset, (ADDRESS_STR_LEN + 1) - offset, "%02x:", address_[ii]);
+        if (ret < 0) {
+            break;
+        }
+        offset += ret;
     }
 }
 }  // namespace V1_0
