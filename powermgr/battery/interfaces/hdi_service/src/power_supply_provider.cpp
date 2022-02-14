@@ -516,6 +516,7 @@ int32_t PowerSupplyProvider::InitPowerSupplySysfs(void)
         }
     }
     struct PowerSupplySysfsInfo sysfsInfo = {0};
+    nodeInfo_.clear();
     TraversalNode();
     FormatSysfsPaths(&sysfsInfo);
     HDF_LOGI("%{public}s: index_ is %{public}d", __func__, index_);
