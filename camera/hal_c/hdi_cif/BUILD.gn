@@ -62,10 +62,10 @@ ohos_shared_library("hdi_cif") {
     "$camera_path/include",
     "$camera_path/hdi_cif/include",
     "$camera_path/hdi_cif/src/include",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
+    "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
   ]
 
-  deps = [ "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata" ]
+  deps = [ "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata" ]
 
   if (is_standard_system) {
     external_deps = [

@@ -112,7 +112,7 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager/include/mpi",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/utils/event",
-      "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
+      "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
       "$camera_device_name_path/camera/camera_demo",
 
       #producer
@@ -142,7 +142,7 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/hdi_impl:camera_hdi_impl",
       "$camera_path/pipeline_core:camera_pipeline_core",
-      "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
+      "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
     ]
 
     if (is_standard_system) {
