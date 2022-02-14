@@ -257,13 +257,13 @@ static int BeginProcess(uint8_t endPoint)
     char *data = NULL;
     struct timeval time;
     int transNum = 0;
-    int i;
+    int i = 0;
 
     if (fd < 0 || endPoint <= 0) {
         printf("parameter error\n");
         return -1;
     }
-    for (int i = 0; i < TEST_CYCLE; i++) {
+    for (i = 0; i < TEST_CYCLE; i++) {
         urb[i].urb = calloc(1, sizeof(struct UsbAdapterUrb));
         if (urb[i].urb == NULL) {
             return -1;
@@ -304,7 +304,7 @@ static int BeginProcess(uint8_t endPoint)
     while (exitOk != true) {
         OsalMSleep(SLEEP_TIME);
     }
-    for (int i = 0; i < TEST_CYCLE; i++) {
+    for (i = 0; i < TEST_CYCLE; i++) {
         munmap(urb[i].urb->buffer, TEST_LENGTH);
         free(urb[i].urb);
     }
@@ -345,49 +345,49 @@ static bool OptionParse(int argc, char *argv[])
 }
 
 static int OsalThreadOperate(void)
-    {
-        int ret;
-        struct OsalThread urbReapProcess;
-        struct OsalThread urbSendProcess;
-        struct OsalThreadParam threadCfg;
+{
+    int ret;
+    struct OsalThread urbReapProcess;
+    struct OsalThread urbSendProcess;
+    struct OsalThreadParam threadCfg;
 
-        (void)memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
-        threadCfg.name = "urb reap process";
-        threadCfg.priority = OSAL_THREAD_PRI_DEFAULT;
-        threadCfg.stackSize = URB_COMPLETE_PROCESS_STACK_SIZE;
+    (void)memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
+    threadCfg.name = "urb reap process";
+    threadCfg.priority = OSAL_THREAD_PRI_DEFAULT;
+    threadCfg.stackSize = URB_COMPLETE_PROCESS_STACK_SIZE;
 
-        ret = OsalThreadCreate(&urbReapProcess, (OsalThreadEntry)ReapProcess, NULL);
-        if (ret != HDF_SUCCESS) {
-            printf("OsalThreadCreate fail, ret=%d\n", ret);
-            return HDF_FAILURE;
-        }
-
-        ret = OsalThreadStart(&urbReapProcess, &threadCfg);
-        if (ret != HDF_SUCCESS) {
-            printf("OsalThreadStart fail, ret=%d\n", ret);
-        }
-
-        threadCfg.name = "urb send process";
-        threadCfg.priority = OSAL_THREAD_PRI_DEFAULT;
-        threadCfg.stackSize = URB_COMPLETE_PROCESS_STACK_SIZE;
-
-        ret = OsalThreadCreate(&urbSendProcess, (OsalThreadEntry)SendProcess, NULL);
-        if (ret != HDF_SUCCESS) {
-            printf("OsalThreadCreate fail, ret=%d\n", ret);
-            return HDF_FAILURE;
-        }
-
-        ret = OsalThreadStart(&urbSendProcess, &threadCfg);
-        if (ret != HDF_SUCCESS) {
-            printf("OsalThreadStart fail, ret=%d\n", ret);
-        }
-
-        ret = BeginProcess(endNum);
-        if (ret != HDF_SUCCESS) {
-            return HDF_FAILURE;
-        }
-
+    ret = OsalThreadCreate(&urbReapProcess, (OsalThreadEntry)ReapProcess, NULL);
+    if (ret != HDF_SUCCESS) {
+        printf("OsalThreadCreate fail, ret=%d\n", ret);
+        return HDF_FAILURE;
     }
+
+    ret = OsalThreadStart(&urbReapProcess, &threadCfg);
+    if (ret != HDF_SUCCESS) {
+        printf("OsalThreadStart fail, ret=%d\n", ret);
+    }
+
+    threadCfg.name = "urb send process";
+    threadCfg.priority = OSAL_THREAD_PRI_DEFAULT;
+    threadCfg.stackSize = URB_COMPLETE_PROCESS_STACK_SIZE;
+
+    ret = OsalThreadCreate(&urbSendProcess, (OsalThreadEntry)SendProcess, NULL);
+    if (ret != HDF_SUCCESS) {
+        printf("OsalThreadCreate fail, ret=%d\n", ret);
+        return HDF_FAILURE;
+    }
+
+    ret = OsalThreadStart(&urbSendProcess, &threadCfg);
+    if (ret != HDF_SUCCESS) {
+        printf("OsalThreadStart fail, ret=%d\n", ret);
+    }
+
+    ret = BeginProcess(endNum);
+    if (ret != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
 
 int main(int argc, char *argv[])
 {

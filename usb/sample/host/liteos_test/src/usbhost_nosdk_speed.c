@@ -161,7 +161,7 @@ static void UrbComplete(struct urb *curUrb)
     }
 }
 
-static int BeginProcessHandleFirst()
+static int BeginProcessHandleFirst(void)
 {
     char *data = NULL;
     int i;
@@ -198,6 +198,8 @@ static int BeginProcessHandleFirst()
 
 static int BeginProcessSubmitBulkRequest(uint32_t transNum)
 {
+    int r;
+    int i;
     for (i = 0; i < TEST_CYCLE; i++) {
         if (urb[i].inUse == 0) {
             urb[i].inUse = 1;
