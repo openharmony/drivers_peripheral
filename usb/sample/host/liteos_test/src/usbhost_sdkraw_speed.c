@@ -460,7 +460,7 @@ static void AcmTestBulkCallback(const void *requestArg)
             OsalSemPost(&timeSem);
         }
         g_recv_count++;
-        g_byteTotal += req->actualLength;
+        g_byteTotal += (uint64_t)req->actualLength;
     } else {
         printf("status error\n");
     }
@@ -554,8 +554,8 @@ static int32_t UsbSerialClose(void)
 static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNum)
 {
     int32_t ret = HDF_SUCCESS;
-    int busNum = 1;
-    int devAddr = 2;
+    uint8_t busNum = 1;
+    uint8_t devAddr = 2;
     if (input == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }

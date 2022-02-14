@@ -369,7 +369,7 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNu
     }
 
     g_acm->busNum = busNum;
-    g_acm->devAddr = devAddr;
+    g_acm->devAddr = (uint8_t)devAddr;
     g_acm->interfaceCnt = 1;
     g_acm->interfaceIndex[0] = *ifaceNum;
     OsalSemInit(&timeSem, 0);

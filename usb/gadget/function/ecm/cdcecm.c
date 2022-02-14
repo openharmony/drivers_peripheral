@@ -53,7 +53,7 @@ static int32_t UsbEcmStartTx(struct UsbEcm *port)
 
     while (!port->writeBusy && !DListIsEmpty(pool)) {
         struct UsbFnRequest *req = NULL;
-        int len;
+        uint32_t len;
         if (port->writeStarted >= QUEUE_SIZE) {
             break;
         }

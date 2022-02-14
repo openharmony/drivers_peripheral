@@ -554,7 +554,7 @@ void TestSpeed(void)
     struct itimerval oldValue;
     const time_t second = 30;
 
-    data = OsalMemAlloc(DATA_MAX_LEN);
+    data = (uint8_t *)OsalMemAlloc(DATA_MAX_LEN);
     if (data == NULL) {
         return;
     }
