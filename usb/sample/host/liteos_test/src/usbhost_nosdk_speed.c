@@ -160,23 +160,11 @@ static void UrbComplete(struct urb *curUrb)
     }
 }
 
-static int BeginProcess(uint8_t endPoint)
+static int BeginProcessHandleFirst()
 {
-    int r;
     char *data = NULL;
-    const int transNum = 0;
     int i;
 
-    if (endPoint <= 0) {
-        printf("parameter error\n");
-        return -1;
-    }
-
-    uhe = usb_find_host_endpoint(fd, USB_REQUEST_TYPE_BULK, endPoint);
-    if (uhe == NULL) {
-        printf("usb_find_host_endpoint error\n");
-        return -1;
-    }
     for (i = 0; i < TEST_CYCLE; i++) {
         if (urb[i].urb == NULL) {
             urb[i].urb = OsalMemCalloc(sizeof(struct urb));
@@ -204,8 +192,11 @@ static int BeginProcess(uint8_t endPoint)
         urb[i].urb->transfer_buffer_length = TEST_LENGTH;
     }
 
-    printf("test NO SDK endpoint:%u\n", endPoint);
+    return HDF_SUCCESS;
+}
 
+static int BeginProcessSubmitBulkRequest(uint32_t transNum)
+{
     for (i = 0; i < TEST_CYCLE; i++) {
         if (urb[i].inUse == 0) {
             urb[i].inUse = 1;
@@ -225,7 +216,35 @@ static int BeginProcess(uint8_t endPoint)
             g_send_count++;
         }
     }
+}
+static int BeginProcess(uint8_t endPoint)
+{
+    int r;
+    const int transNum = 0;
+    int i;
 
+    if (endPoint <= 0) {
+        printf("parameter error\n");
+        return -1;
+    }
+
+    uhe = usb_find_host_endpoint(fd, USB_REQUEST_TYPE_BULK, endPoint);
+    if (uhe == NULL) {
+        printf("usb_find_host_endpoint error\n");
+        return -1;
+    }
+    r = BeginProcessHandleFirst();
+    if (r != HDF_SUCCESS) {
+        return r;
+    }
+
+    printf("test NO SDK endpoint:%u\n", endPoint);
+
+    r = BeginProcessSubmitBulkRequest(transNum);
+    if (r != HDF_SUCCESS) {
+        return r;
+    }
+    
     OsalSemWait(&timeSem, TEST_TIME);
     while (!g_speedFlag) {
         OsalSemWait(&timeSem, TEST_PRINT_TIME * TEST_PRINT_TIME_UINT);

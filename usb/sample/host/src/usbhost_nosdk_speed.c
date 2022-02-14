@@ -274,7 +274,7 @@ static int BeginProcess(uint8_t endPoint)
         urb[i].urb->streamId = 0;
         urb[i].urb->endPoint = endPoint;
 
-        data = OsalMemCalloc(TEST_LENGTH);//AllocMemTest(TEST_LENGTH)
+        data = OsalMemCalloc(TEST_LENGTH);
         if (data == NULL) {
             return -1;
         }
