@@ -43,7 +43,7 @@
 #define URB_COMPLETE_PROCESS_STACK_SIZE 8196
 #define ENDPOINT_IN_OFFSET 7
 static int g_speedFlag = 0;
-static int g_busNum = 1;
+static uint32_t g_busNum = 1;
 static int g_devAddr = 2;
 static struct OsalSem sem;
 static struct OsalSem timeSem;
