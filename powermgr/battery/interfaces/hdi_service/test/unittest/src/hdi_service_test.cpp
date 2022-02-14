@@ -869,6 +869,7 @@ HWTEST_F (HdiServiceTest, HdiService005, TestSize.Level1)
         provider->InitPowerSupplySysfs();
         CreateFile("/data/local/tmp/battery/online", "1");
         CreateFile("/data/local/tmp/battery/type", "Wireless");
+        CreateFile("/data/local/tmp/ohos_charger/online", "1");
         CreateFile("/data/local/tmp/ohos_charger/type", "Wireless");
         CreateFile("/data/local/tmp/ohos-fgu/type", "Wireless");
     }
@@ -1099,6 +1100,7 @@ HWTEST_F (HdiServiceTest, HdiService013, TestSize.Level1)
     BatteryThread bt;
 
     InitTest(service, bt);
+    HDF_LOGI("%{public}s: HdiService013::InitTest success", __func__);
     auto epollFd = GetEpollFdTest(bt);
     HDF_LOGI("%{public}s: HdiService013::epollFd=%{public}d", __func__, epollFd);
 
@@ -1132,18 +1134,20 @@ HWTEST_F (HdiServiceTest, HdiService015, TestSize.Level1)
     conf->Init();
     std::vector<BatteryConfig::LedConf> ledConf = conf->GetLedConf();
 
-    ASSERT_TRUE(ledConf[0].capacityBegin == 0);
-    ASSERT_TRUE(ledConf[0].capacityEnd == 10);
-    ASSERT_TRUE(ledConf[0].color == 4);
-    ASSERT_TRUE(ledConf[0].brightness == 255);
-    ASSERT_TRUE(ledConf[1].capacityBegin == 10);
-    ASSERT_TRUE(ledConf[1].capacityEnd == 90);
-    ASSERT_TRUE(ledConf[1].color == 6);
-    ASSERT_TRUE(ledConf[1].brightness == 255);
-    ASSERT_TRUE(ledConf[2].capacityBegin == 90);
-    ASSERT_TRUE(ledConf[2].capacityEnd == 100);
-    ASSERT_TRUE(ledConf[2].color == 2);
-    ASSERT_TRUE(ledConf[2].brightness == 255);
+    if (!ledConf.empty()) {
+        ASSERT_TRUE(ledConf[0].capacityBegin == 0);
+        ASSERT_TRUE(ledConf[0].capacityEnd == 10);
+        ASSERT_TRUE(ledConf[0].color == 4);
+        ASSERT_TRUE(ledConf[0].brightness == 255);
+        ASSERT_TRUE(ledConf[1].capacityBegin == 10);
+        ASSERT_TRUE(ledConf[1].capacityEnd == 90);
+        ASSERT_TRUE(ledConf[1].color == 6);
+        ASSERT_TRUE(ledConf[1].brightness == 255);
+        ASSERT_TRUE(ledConf[2].capacityBegin == 90);
+        ASSERT_TRUE(ledConf[2].capacityEnd == 100);
+        ASSERT_TRUE(ledConf[2].color == 2);
+        ASSERT_TRUE(ledConf[2].brightness == 255);
+    }
 }
 
 /**
@@ -1234,8 +1238,15 @@ HWTEST_F (HdiServiceTest, HdiService020, TestSize.Level1)
 HWTEST_F (HdiServiceTest, HdiService021, TestSize.Level1)
 {
     std::unique_ptr<BatteryVibrate> vibrate = std::make_unique<BatteryVibrate>();
+    const std::string VIBRATOR_PLAYMODE_PATH = "/sys/class/leds/vibrator/play_mode";
+    const std::string VIBRATOR_DURATIONMODE_PATH = "/sys/class/leds/vibrator/duration";
     auto ret = vibrate->VibrateInit();
-    ASSERT_TRUE(ret == -1);
+    if ((access(VIBRATOR_PLAYMODE_PATH.c_str(), F_OK) == 0) ||
+        (access(VIBRATOR_DURATIONMODE_PATH.c_str(), F_OK) == 0)) {
+        ASSERT_TRUE(ret == 0);
+    } else {
+        ASSERT_TRUE(ret == -1);
+    }
 }
 
 /**
