@@ -45,6 +45,7 @@
 #define TIME_SCALE 1024
 #define TEST_PRINT_TIME_UINT 1000
 #define RECV_COUNT_SIZE 10000
+#define ENDPOINT_IN_OFFSET 7
 
 static int g_speedFlag = 0;
 static int g_busNum = 1;
@@ -244,7 +245,7 @@ static int BeginProcess(uint8_t endPoint)
     if (r != HDF_SUCCESS) {
         return r;
     }
-    
+
     OsalSemWait(&timeSem, TEST_TIME);
     while (!g_speedFlag) {
         OsalSemWait(&timeSem, TEST_PRINT_TIME * TEST_PRINT_TIME_UINT);
