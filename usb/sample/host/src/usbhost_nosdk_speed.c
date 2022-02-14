@@ -157,6 +157,7 @@ void SignalHandler(int signo)
 void SubmitRequest(uint32_t transNum)
 {
     int i;
+    int r;
     for (i = 0; i < TEST_CYCLE; i++) {
         urb[i].inUse = 1;
         urb[i].urbNum = transNum;
@@ -253,7 +254,6 @@ static int ReapProcess(void *argurb)
 
 static int BeginProcess(uint8_t endPoint)
 {
-    int r;
     char *data = NULL;
     struct timeval time;
     int transNum = 0;
@@ -318,7 +318,7 @@ static void ShowHelp(char *name)
     printf("\n");
 }
 
-static bool OptionParse(int argc,char *argv[])
+static bool OptionParse(int argc, char *argv[])
 {
     if (argc == 6) {
         g_busNum = atoi(argv[1]);
@@ -392,7 +392,7 @@ static int OsalThreadOperate(void)
 int main(int argc, char *argv[])
 {
     int ret;
-    if (!OptionParse(argc,argv))
+    if (!OptionParse(argc, argv))
     {
         return -1;
     }
@@ -409,8 +409,8 @@ int main(int argc, char *argv[])
         goto ERR;
     }
 
-    ret = OsalThreadOperate(void);
-    if (ret != HDF_SUCCES) {
+    ret = OsalThreadOperate();
+    if (ret != HDF_SUCCESS) {
         goto ERR;
     }
 ERR:
