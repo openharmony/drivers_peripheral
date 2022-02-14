@@ -554,8 +554,8 @@ static int32_t UsbSerialClose(void)
 static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNum)
 {
     int32_t ret = HDF_SUCCESS;
-    uint8_t busNum = 1;
-    uint8_t devAddr = 2;
+    int32_t busNum = 1;
+    int32_t devAddr = 2;
     if (input == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
