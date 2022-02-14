@@ -886,7 +886,7 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
         return ret;
     }
 
-    count = g_syncRequest->actualLength;
+    count = (uint32_t)g_syncRequest->actualLength;
     data = (uint8_t *)OsalMemCalloc(count + 1);
     if (data == NULL) {
         HDF_LOGE("%s: OsalMemCalloc error", __func__);
@@ -1107,7 +1107,7 @@ static void AcmNotifyReqCallback(const void *requestArg)
         HDF_LOGE("%s:%d req->buffer(dr) is NULL!", __func__, __LINE__);
         return;
     }
-    unsigned int currentSize = req->actualLength;
+    unsigned int currentSize = (uint32_t)req->actualLength;
     unsigned int expectedSize = 0;
 
     HDF_LOGD("Irqstatus:%d,actualLength:%u\n", req->status, currentSize);

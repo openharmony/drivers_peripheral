@@ -131,7 +131,7 @@ static int32_t HandleSyncRequest(struct UsbHostRequest *request, const struct Us
 static void GetInterfaceNumberDes(
     const struct UsbiDescriptorHeader *header, uint8_t nIntf[], uint8_t nAlts[], int *num)
 {
-    int inum;
+    uint8_t inum;
     int i;
     struct UsbiInterfaceDescriptor *desc = NULL;
 
@@ -635,7 +635,7 @@ static int ParseConfiguration(struct UsbRawConfigDescriptor *config, const uint8
     }
 
     buffer += config->configDescriptor.bLength;
-    size -= config->configDescriptor.bLength;
+    size -= (int32_t)config->configDescriptor.bLength;
 
     return ParseConfigurationDes(config, buffer, size, usbInterface, nIntf);
 }

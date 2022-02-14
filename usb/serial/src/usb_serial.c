@@ -958,7 +958,7 @@ static int32_t SerialClose(const struct SerialDevice *port, struct HdfSBuf *data
 
 static int32_t SerialWrite(const struct SerialDevice *port, struct HdfSBuf *data)
 {
-    uint32_t size;
+    int32_t size;
     int32_t ret;
     const char *tmp = NULL;
 
