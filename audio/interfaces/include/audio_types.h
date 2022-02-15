@@ -105,6 +105,8 @@ struct AudioDeviceDescriptor {
 enum AudioCategory {
     AUDIO_IN_MEDIA = 0,     /**< Media */
     AUDIO_IN_COMMUNICATION, /**< Communications */
+    AUDIO_IN_RINGTONE,      /**< Ringtone */
+    AUDIO_IN_CALL,          /**< Call */
 };
 
 /**
@@ -188,6 +190,7 @@ struct AudioSampleAttributes {
     uint32_t startThreshold;   /**< Audio render start threshold. */
     uint32_t stopThreshold;    /**< Audio render stop threshold. */
     uint32_t silenceThreshold; /**< Audio capture buffer threshold. */
+    int32_t streamId;          /**< Audio Identifier of render or capture */
 };
 
 /**
@@ -326,6 +329,83 @@ struct AudioMmapBufferDescripter {
     int32_t transferFrameSize;           /**< Transfer size (unit: frame) */
     int32_t isShareable;                 /**< Whether the mmap buffer can be shared among processes */
     uint32_t offset;
+};
+
+/**
+ * @brief Describes AudioPortRole.
+ */
+enum AudioPortRole {
+    AUDIO_PORT_UNASSIGNED_ROLE = 0, /**< Unassigned port role */
+    AUDIO_PORT_SOURCE_ROLE = 1,     /**< Assigned source role */
+    AUDIO_PORT_SINK_ROLE = 2,       /**< Assigned sink role */
+};
+
+/**
+ * @brief Describes AudioPortType.
+ */
+enum AudioPortType {
+    AUDIO_PORT_UNASSIGNED_TYPE = 0, /**< Unassigned port type */
+    AUDIO_PORT_DEVICE_TYPE = 1,     /**< Assigned device type */
+    AUDIO_PORT_MIX_TYPE = 2,        /**< Assigned mix type */
+    AUDIO_PORT_SESSION_TYPE = 3,    /**< Assigned session type */
+};
+
+/**
+ * @brief Describes AudioDevExtInfo.
+ */
+struct AudioDevExtInfo {
+    int32_t moduleId;       /**< Identifier of the module stream is attached to */
+    enum AudioPortPin type; /**< Device type For details, see {@link AudioPortPin}. */
+    const char *desc;       /**< Address  */
+};
+
+/**
+ * @brief Describes AudioMixInfo.
+ */
+struct AudioMixExtInfo {
+    int32_t moduleId;     /**< Identifier of the module stream is attached to */
+    int32_t streamId;     /**< Identifier of the capture or render passed by caller */
+};
+
+/**
+ * @brief Describes AudioSessionType.
+ */
+enum AudioSessionType {
+    AUDIO_OUTPUT_STAGE_SESSION = 0,
+    AUDIO_OUTPUT_MIX_SESSION,
+    AUDIO_ALLOCATE_SESSION,
+    AUDIO_INVALID_SESSION,
+};
+
+/**
+ * @brief Describes AudioSessionExtInfo.
+ */
+struct AudioSessionExtInfo {
+    enum AudioSessionType sessionType;
+};
+
+/**
+ * @brief Describes AudioRouteNode.
+ */
+struct AudioRouteNode {
+    int32_t portId;                      /**< Audio port ID */
+    enum AudioPortRole role;             /**< Audio port as a sink or a source */
+    enum AudioPortType type;             /**< device, mix ... */
+    union {
+        struct AudioDevExtInfo device;   /* Specific Device Ext info */
+        struct AudioMixExtInfo mix;      /* Specific mix info */
+        struct AudioSessionExtInfo session; /* session specific info */
+    } ext;
+};
+
+/**
+ * @brief Describes AudioRoute.
+ */
+struct AudioRoute {
+    uint32_t sourcesNum;
+    const struct AudioRouteNode *sources;
+    uint32_t sinksNum;
+    const struct AudioRouteNode *sinks;
 };
 
 /**

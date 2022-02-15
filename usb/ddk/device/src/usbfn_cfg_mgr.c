@@ -1371,7 +1371,7 @@ int32_t UsbFnCfgMgrGetProp(const struct UsbFnInterface *intf, const char *name, 
 int32_t UsbFnCfgMgrSetProp(const struct UsbFnInterface *intf, const char *name, const char *value)
 {
     struct UsbFnCfgPropMgr *fnCfgPropMgr = NULL;
-    uint8_t deviceProp;
+    int32_t deviceProp;
     int32_t isRegist;
     int32_t ret;
     const char *propValue = NULL;

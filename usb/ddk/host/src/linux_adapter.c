@@ -26,7 +26,7 @@
 #define PATH_LEN            24
 #define DESC_READ_LEN       256
 #define EP_NUM_MAX          30
-
+#define SLEEP_TIME          500000
 static void *OsAdapterRealloc(void *ptr, size_t oldSize, size_t newSize)
 {
     void *mem;
@@ -143,6 +143,7 @@ static int32_t OsGetUsbFd(struct UsbDevice *dev, mode_t mode)
         return fd;
     }
 
+    usleep(SLEEP_TIME);
     switch (errno) {
         case ENOENT:
             fd = open(path, mode | O_CLOEXEC);

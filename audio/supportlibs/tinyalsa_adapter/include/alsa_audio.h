@@ -57,7 +57,7 @@ enum RenderPcmPara {
     TINYALSAPCM_32_BIT = 32,
 };
 
-enum AudioRoute {
+enum AudioDevRoute {
     // out devices route define
     DEV_OUT_SPEAKER_NORMAL_ROUTE = 0,
     DEV_OUT_HEADPHONE_NORMAL_ROUTE,

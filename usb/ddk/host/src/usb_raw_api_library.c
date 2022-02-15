@@ -635,7 +635,7 @@ static int32_t ParseConfiguration(struct UsbRawConfigDescriptor *config, const u
     }
 
     buffer += config->configDescriptor.bLength;
-    size -= config->configDescriptor.bLength;
+    size -= (int32_t)config->configDescriptor.bLength;
 
     return ParseConfigurationDes(config, buffer, size, usbInterface, nIntf);
 }
