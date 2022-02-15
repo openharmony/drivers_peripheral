@@ -46,6 +46,11 @@
 #define TEST_PRINT_TIME_UINT 1000
 #define RECV_COUNT_SIZE 10000
 #define ENDPOINT_IN_OFFSET 7
+#define DEFAULE_DEV_ADDR 2
+
+#define INPUT_PARA_NUM_THREE 3
+#define INPUT_PARA_NUM_FIVE 5
+#define INPUT_PARA_NUM_SIX 6
 
 static int g_speedFlag = 0;
 static int g_busNum = 1;
@@ -67,12 +72,12 @@ static struct UsbAdapterHostEndpoint *uhe = NULL;
 static bool g_writeOrRead = TEST_WRITE;
 static struct AcmDevice *acm = NULL;
 
-static void CloseDevice()
+static void CloseDevice(void)
 {
     return;
 }
 
-static int OpenDevice()
+static int OpenDevice(void)
 {
     struct UsbGetDevicePara paraData;
     paraData.type = USB_PNP_DEVICE_ADDRESS_TYPE;
@@ -92,7 +97,7 @@ static int ClaimInterface(unsigned int iface)
     return HDF_SUCCESS;
 }
 
-void SpeedPrint()
+void SpeedPrint(void)
 {
     double speed = 0;
 
@@ -106,7 +111,7 @@ void SpeedPrint()
 
 static int SendProcess(void *argurb)
 {
-    int i, r;
+    int i, ret;
     while (!g_speedFlag) {
         OsalSemWait(&sem, HDF_WAIT_FOREVER);
         for (i = 0; i < TEST_CYCLE; i++) {
@@ -120,14 +125,14 @@ static int SendProcess(void *argurb)
             i=TEST_CYCLE-1;
         }
         sendUrb = urb[i].urb;
-        r = usb_setup_endpoint(fd, uhe, TIME_SCALE);
-        if (r) {
-            DPRINTFN(0, "setup faild ret:%d\n", r);
-            return r;
+        ret = usb_setup_endpoint(fd, uhe, TIME_SCALE);
+        if (ret) {
+            DPRINTFN(0, "setup faild ret:%d\n", ret);
+            return ret;
         }
-        r = usb_submit_urb(sendUrb, 0);
-        if (r < 0) {
-            printf("SubmitBulkRequest: ret:%d\n", r);
+        ret = usb_submit_urb(sendUrb, 0);
+        if (ret < 0) {
+            printf("SubmitBulkRequest: ret:%d\n", ret);
             urb[i].inUse = 0;
             continue;
         }
@@ -198,21 +203,21 @@ static int BeginProcessHandleFirst(void)
 
 static int BeginProcessSubmitBulkRequest(uint32_t transNum)
 {
-    int r;
+    int ret;
     int i;
     for (i = 0; i < TEST_CYCLE; i++) {
         if (urb[i].inUse == 0) {
             urb[i].inUse = 1;
             urb[i].urbNum = transNum;
             sendUrb = urb[i].urb;
-            r = usb_setup_endpoint(fd, uhe, TIME_SCALE);
-            if (r) {
-                DPRINTFN(0, "setup faild ret:%d\n", r);
-                return r;
+            ret = usb_setup_endpoint(fd, uhe, TIME_SCALE);
+            if (ret) {
+                DPRINTFN(0, "setup faild ret:%d\n", ret);
+                return ret;
             }
-            r = usb_submit_urb(sendUrb, 0);
-            if (r < 0) {
-                printf("SubmitBulkRequest: ret:%d\n", r);
+            ret = usb_submit_urb(sendUrb, 0);
+            if (ret < 0) {
+                printf("SubmitBulkRequest: ret:%d\n", ret);
                 urb[i].inUse = 0;
                 continue;
             }
@@ -223,7 +228,7 @@ static int BeginProcessSubmitBulkRequest(uint32_t transNum)
 }
 static int BeginProcess(uint8_t endPoint)
 {
-    int r;
+    int ret;
     const int transNum = 0;
     int i;
 
@@ -237,16 +242,16 @@ static int BeginProcess(uint8_t endPoint)
         printf("usb_find_host_endpoint error\n");
         return -1;
     }
-    r = BeginProcessHandleFirst();
-    if (r != HDF_SUCCESS) {
-        return r;
+    ret = BeginProcessHandleFirst();
+    if (ret != HDF_SUCCESS) {
+        return ret;
     }
 
     printf("test NO SDK endpoint:%u\n", endPoint);
 
-    r = BeginProcessSubmitBulkRequest(transNum);
-    if (r != HDF_SUCCESS) {
-        return r;
+    ret = BeginProcessSubmitBulkRequest(transNum);
+    if (ret != HDF_SUCCESS) {
+        return ret;
     }
 
     OsalSemWait(&timeSem, TEST_TIME);
@@ -340,10 +345,10 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNu
     g_writeOrRead = TEST_WRITE;
     sigCnt = 0;
     g_busNum = 1;
-    g_devAddr = 2;
+    g_devAddr = DEFAULE_DEV_ADDR;
 
     UsbGetDevInfo(&g_busNum, &g_devAddr);
-    if (input->paramNum == 6) {
+    if (input->paramNum == INPUT_PARA_NUM_SIX) {
         g_busNum = input->busNum;
         g_devAddr = input->devAddr;
         *ifaceNum = input->ifaceNum;
@@ -352,13 +357,13 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int *ifaceNu
         if (g_writeOrRead == TEST_READ) {
             g_printData = input->printData;
         }
-    } else if (input->paramNum == 5) {
+    } else if (input->paramNum == INPUT_PARA_NUM_FIVE) {
         g_busNum = input->busNum;
         g_devAddr = input->devAddr;
         *ifaceNum = input->ifaceNum;
         endNum = input->writeOrRead;
         g_writeOrRead = ((endNum >> ENDPOINT_IN_OFFSET) == 0) ? TEST_WRITE : TEST_READ;
-    } else if (input->paramNum == 3) {
+    } else if (input->paramNum == INPUT_PARA_NUM_THREE) {
         *ifaceNum = input->ifaceNum;
         endNum = input->writeOrRead;
         g_writeOrRead = ((endNum >> ENDPOINT_IN_OFFSET) == 0) ? TEST_WRITE : TEST_READ;
