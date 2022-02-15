@@ -64,7 +64,7 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
     int32_t fence = 0;
     OHOS::SurfaceError sfError = OHOS::SURFACE_ERROR_OK;
     do {
-        sfError = bufferQueue_->RequestBufferWithFence(sb, fence, requestConfig_);
+        sfError = bufferQueue_->RequestBuffer(sb, fence, requestConfig_);
         if (sfError == OHOS::SURFACE_ERROR_NO_BUFFER) {
             std::unique_lock<std::mutex> l(waitLock_);
             waitCV_.wait(l, [this] { return wakeup_ == true; });

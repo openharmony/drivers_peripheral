@@ -626,6 +626,91 @@ typedef struct {
      * @version 2.0
      */
     int32_t (*SetLayerBlendType)(uint32_t devId, uint32_t layerId, BlendType type);
+
+    /**
+     * @brief set the 4x4 color transform matrix
+     *
+     *
+     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * display device and 4 indicates the last display device.
+     * @param layerId Indicates the layer ID, which identifies a unique layer. You can perform operations on the layer
+     * with the specified layer ID.
+     * @param matrix Indicates 4x4 color transform matrix.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
+     * otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*SetLayerColorTransform)(uint32_t devId, uint32_t layerId, const float *matrix);
+
+    /**
+     * @brief Sets the color data space value for a layer.
+     *
+     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * display device and 4 indicates the last display device.
+     * @param layerId Indicates the layer ID, which identifies a unique layer. You can perform operations on the layer
+     * with the specified layer ID.
+     * @param colorSpace Indicates the color data space value to set.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
+     * otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*SetLayerColorDataSpace)(uint32_t devId, uint32_t layerId, ColorDataSpace colorSpace);
+
+    /**
+     * @brief Obtains the color data space value of a layer.
+     *
+     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * display device and 4 indicates the last display device.
+     * @param layerId Indicates the layer ID, which identifies a unique layer. You can perform operations on the layer
+     * with the specified layer ID.
+     * @param colorSpace Indicates the pointer to the obtained color data space value.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
+     * otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*GetLayerColorDataSpace)(uint32_t devId, uint32_t layerId, ColorDataSpace *colorSpace);
+
+    /**
+     * @brief Sets the meta data for a layer.
+     *
+     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * display device and 4 indicates the last display device.
+     * @param layerId Indicates the layer ID, which identifies a unique layer. You can perform operations on the layer
+     * with the specified layer ID.
+     * @param num Indiactes the count of metaData.
+     * @param metaData Indicates the pointer of meta data value to set.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
+     * otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*SetLayerMetaData)(uint32_t devId, uint32_t layerId, uint32_t num, const HDRMetaData *metaData);
+
+    /**
+     * @brief Sets the meta data set for a layer.
+     *
+     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * display device and 4 indicates the last display device.
+     * @param layerId Indicates the layer ID, which identifies a unique layer. You can perform operations on the layer
+     * with the specified layer ID.
+     * @param key Indicates the meta data key value.
+     * @param num Indiactes the count of metaData.
+     * @param metaData Indicates the pointer of uint8_t type meta data value to set.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
+     * otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*SetLayerMetaDataSet)(uint32_t devId, uint32_t layerId, HDRMetadataKey key, uint32_t num,
+                                   const uint8_t *metaData);
 } LayerFuncs;
 
 /**

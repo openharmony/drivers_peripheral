@@ -413,6 +413,115 @@ typedef struct {
     int32_t (*GetDisplayReleaseFence)(uint32_t devId, uint32_t *num, uint32_t *layers, int32_t *fences);
 
     /* *
+     * @brief Obtains the color gamuts supported by a display device.
+     *
+     * @param devId Indicates the ID of the display device.
+     * @param num Indicates the pointer to the number of color gamuts supported by the display device.
+     * @param gamuts Indicates the point to the information about all color gamut supported by the display device,
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * in {@link DispErrCode} otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*GetDisplaySuppportedColorGamuts)(uint32_t devId, uint32_t *num, ColorGamut *gamuts);
+
+    /* *
+     * @brief Obtains the color gamut of a display device.
+     *
+     * @param devId Indicates the ID of the display device.
+     * @param gamut Indicates the pointer to the color gamut of the device. The color gamut is written
+     * by this interface.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * in {@link DispErrCode} otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*GetDisplayColorGamut)(uint32_t devId, ColorGamut *gamut);
+
+    /* *
+     * @brief Sets the color gamut for a display device.
+     *
+     * @param devId Indicates the ID of the display device.
+     * @param gamut Indicates the color gamut to set.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * in {@link DispErrCode} otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*SetDisplayColorGamut)(uint32_t devId, ColorGamut gamut);
+
+    /* *
+     * @brief Obtains the gamut map of a display device.
+     *
+     * @param devId Indicates the ID of the display device.
+     * @param gamutMap Indicates the pointer to the gamut map of the device. The gamut map is written
+     * by this interface.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * in {@link DispErrCode} otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*GetDisplayGamutMap)(uint32_t devId, GamutMap *gamutMap);
+
+    /* *
+     * @brief Sets the gamut map for a display device.
+     *
+     * @param devId Indicates the ID of the display device.
+     * @param gamutMap Indicates the gamut map to set.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * in {@link DispErrCode} otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*SetDisplayGamutMap)(uint32_t devId, GamutMap gamutMap);
+
+    /* *
+     * @brief Sets the 4x4 color transform matrix for a display device.
+     *
+     * @param devId Indicates the ID of the display device.
+     * @param matrix Indicates the 4x4 color transform matrix to set.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * in {@link DispErrCode} otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*SetDisplayColorTransform)(uint32_t devId, const float *matrix);
+
+    /* *
+     * @brief Obtains the HDR capability of a display device.
+     *
+     * @param devId Indicates the ID of the display device.
+     * @param info Indicates the pointer to the HDRCapability of the device. The info is written
+     * by this interface.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * in {@link DispErrCode} otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*GetHDRCapabilityInfos)(uint32_t devId, HDRCapability *info);
+
+    /* *
+     * @brief Obtains the HDRMetadataKey supported by a display device.
+     *
+     * @param devId Indicates the ID of the display device.
+     * @param num Indicates the pointer to the number of keys by the display device.
+     * @param keys Indicates the pointer to the information about all HDRMetadataKey of the display device.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * in {@link DispErrCode} otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*GetSupportedMetadataKey)(uint32_t devId, uint32_t *num, HDRMetadataKey *keys);
+
+    /* *
      * @brief Commits the request for composition and display.
      *
      * If there is a hardware composition layer, the composition is performed and the composition result is sent to
