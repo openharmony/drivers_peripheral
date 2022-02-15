@@ -244,7 +244,7 @@ static int ReapProcess(void *argurb)
             fflush(stdout);
         }
 
-        struct UsbAdapterUrbs * urbs = urbrecv->userContext;
+        struct UsbAdapterUrbs *urbs = urbrecv->userContext;
         urbs->inUse = 0;
         OsalSemPost(&sem);
     }
@@ -392,8 +392,7 @@ static int OsalThreadOperate(void)
 int main(int argc, char *argv[])
 {
     int ret;
-    if (!OptionParse(argc, argv))
-    {
+    if (!OptionParse(argc, argv)) {
         return -1;
     }
     OsalSemInit(&sem, 0);

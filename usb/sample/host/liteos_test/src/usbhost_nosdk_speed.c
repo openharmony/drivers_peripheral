@@ -219,6 +219,7 @@ static int BeginProcessSubmitBulkRequest(uint32_t transNum)
             g_send_count++;
         }
     }
+    return HDF_SUCCESS;
 }
 static int BeginProcess(uint8_t endPoint)
 {
