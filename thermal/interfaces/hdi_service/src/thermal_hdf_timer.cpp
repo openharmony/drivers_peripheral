@@ -25,9 +25,10 @@
 #include <sys/timerfd.h>
 #include <linux/netlink.h>
 
-namespace hdi {
-namespace thermal {
-namespace v1_0 {
+namespace OHOS {
+namespace HDI {
+namespace Thermal {
+namespace V1_0 {
 namespace {
 const int ERR_INVALID_FD = -1;
 const int32_t MS_PER_SECOND = 1000;
@@ -277,6 +278,7 @@ void ThermalHdfTimer::UpdatePollingInfo()
     UpdateTzInfo(POLLING_V1, tzInfoEventV1_);
     UpdateTzInfo(POLLING_V2, tzInfoEventV2_);
 }
-} // v1_0
-} // thermal
-} // hdi
+} // V1_0
+} // Thermal
+} // HDI
+} // OHOS

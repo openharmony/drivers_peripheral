@@ -21,7 +21,7 @@
 #include "osal_time.h"
 #include "vibrator_interface_proxy.h"
 
-using namespace vibrator::v1_0;
+using namespace OHOS::HDI::Vibrator::V1_0;
 using namespace testing::ext;
 
 namespace {

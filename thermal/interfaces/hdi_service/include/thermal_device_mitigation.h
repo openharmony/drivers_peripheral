@@ -18,9 +18,10 @@
 
 #include <string>
 
-namespace hdi {
-namespace thermal {
-namespace v1_0 {
+namespace OHOS {
+namespace HDI {
+namespace Thermal {
+namespace V1_0 {
 class ThermalDeviceMitigation {
 public:
     ThermalDeviceMitigation() {};
@@ -37,7 +38,8 @@ public:
 private:
     bool flag_ {false};
 };
-} // v1_0
-} // thermal
-} // hdi
+} // V1_0
+} // Thermal
+} // HDI
+} // OHOS
 #endif // THERMAL_DEVICE_MITIGATION_H

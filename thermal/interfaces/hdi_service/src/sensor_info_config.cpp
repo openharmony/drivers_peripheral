@@ -14,9 +14,10 @@
  */
 #include "sensor_info_config.h"
 
-namespace hdi {
-namespace thermal {
-namespace v1_0 {
+namespace OHOS {
+namespace HDI {
+namespace Thermal {
+namespace V1_0 {
 void SensorInfoConfig::SetXMLThermalZoneInfo(std::vector<XMLThermalZoneInfo> &vXmlTz)
 {
     vXmlTz_ = vXmlTz;
@@ -36,6 +37,7 @@ std::vector<XMLThermalNodeInfo> SensorInfoConfig::GetXMLThermalNodeInfo()
 {
     return vXmlTn_;
 }
-} // v1_0
-} // thermal
-} // hdi
+} // V1_0
+} // Thermal
+} // HDI
+} // OHOS

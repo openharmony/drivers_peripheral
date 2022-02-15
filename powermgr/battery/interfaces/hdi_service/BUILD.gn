@@ -23,13 +23,13 @@ ohos_shared_library("libbattery_interface_service_1.0") {
   sources = [
     "//base/powermgr/battery_manager/charger/led/battery_led.cpp",
     "src/battery_config.cpp",
-    "src/battery_interface_service.cpp",
+    "src/battery_interface_impl.cpp",
     "src/battery_thread.cpp",
     "src/power_supply_provider.cpp",
   ]
 
   deps = [
-    "../hdi/battery/v1_0:libbattery_stub_1.0",
+    "//drivers/interface/battery/v1_0:libbattery_stub_1.0",
     "//third_party/jsoncpp:jsoncpp",
     "//third_party/libxml2:xml2",
     "//utils/native/base:utils",
@@ -68,7 +68,7 @@ ohos_shared_library("libbattery_driver") {
 
   deps = [
     ":libbattery_interface_service_1.0",
-    "../hdi/battery/v1_0:libbattery_stub_1.0",
+    "//drivers/interface/battery/v1_0:libbattery_stub_1.0",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]

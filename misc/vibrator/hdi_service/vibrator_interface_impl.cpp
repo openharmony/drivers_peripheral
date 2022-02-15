@@ -13,16 +13,18 @@
  * limitations under the License.
  */
 
-#include "vibrator_interface_service.h"
+#include "vibrator_interface_impl.h"
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include "vibrator_if.h"
 
 #define HDF_LOG_TAG              hdf_vibrator_dal
 
-namespace vibrator {
-namespace v1_0 {
-int32_t VibratorInterfaceService::StartOnce(uint32_t duration)
+namespace OHOS {
+namespace HDI {
+namespace Vibrator {
+namespace V1_0 {
+int32_t VibratorInterfaceImpl::StartOnce(uint32_t duration)
 {
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
     if (vibratorInterface == NULL || vibratorInterface->StartOnce == NULL) {
@@ -36,7 +38,7 @@ int32_t VibratorInterfaceService::StartOnce(uint32_t duration)
     return ret;
 }
 
-int32_t VibratorInterfaceService::Start(const std::string& effectType)
+int32_t VibratorInterfaceImpl::Start(const std::string& effectType)
 {
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
     if (vibratorInterface == NULL || vibratorInterface->Start == NULL) {
@@ -50,7 +52,7 @@ int32_t VibratorInterfaceService::Start(const std::string& effectType)
     return ret;
 }
 
-int32_t VibratorInterfaceService::Stop(HdfVibratorMode mode)
+int32_t VibratorInterfaceImpl::Stop(HdfVibratorMode mode)
 {
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
     if (vibratorInterface == NULL || vibratorInterface->Stop == NULL) {
@@ -76,5 +78,7 @@ int32_t VibratorInterfaceService::Stop(HdfVibratorMode mode)
     }
     return ret;
 }
-} // v1_0
-} // vibrator
+} // V1_0
+} // Vibrator
+} // HDI
+} // OHOS

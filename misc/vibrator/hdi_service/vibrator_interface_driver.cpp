@@ -18,15 +18,15 @@
 #include <hdf_sbuf_ipc.h>
 #include <hdf_log.h>
 #include <osal_mem.h>
-#include "vibrator_interface_service.h"
+#include "vibrator_interface_impl.h"
 
 #define HDF_LOG_TAG              hdf_vibrator_if_driver
 
-using namespace vibrator::v1_0;
+using namespace OHOS::HDI::Vibrator::V1_0;
 
 struct HdfVibratorInterfaceHost {
     struct IDeviceIoService ioservice;
-    VibratorInterfaceService *service;
+    VibratorInterfaceImpl *service;
 };
 
 static int32_t VibratorInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
@@ -66,7 +66,7 @@ static int HdfVibratorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfVibratorInterfaceHost->ioservice.Dispatch = VibratorInterfaceDriverDispatch;
     hdfVibratorInterfaceHost->ioservice.Open = NULL;
     hdfVibratorInterfaceHost->ioservice.Release = NULL;
-    hdfVibratorInterfaceHost->service = new VibratorInterfaceService();
+    hdfVibratorInterfaceHost->service = new VibratorInterfaceImpl();
 
     deviceObject->service = &hdfVibratorInterfaceHost->ioservice;
     HDF_LOGI("HdfVibratorInterfaceDriverBind Success");
