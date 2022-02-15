@@ -13,16 +13,26 @@
  * limitations under the License.
  */
 
-package hdi.power.v1_0;
-import hdi.power.v1_0.IPowerHdiCallback;
-import hdi.power.v1_0.PowerTypes;
+#ifndef OHOS_HDI_POWER_V1_0_POWERHDICALLBACKIMPL_H
+#define OHOS_HDI_POWER_V1_0_POWERHDICALLBACKIMPL_H
 
-interface IPowerInterface {
-    RegisterCallback([in] IPowerHdiCallback ipowerHdiCallback);
-    StartSuspend();
-    StopSuspend();
-    ForceSuspend();
-    SuspendBlock([in] String name);
-    SuspendUnblock([in] String name);
-    PowerDump([out] String info);
-}
+#include "power_hdi_callback_stub.h"
+
+namespace OHOS {
+namespace HDI {
+namespace Power {
+namespace V1_0 {
+class PowerHdiCallbackImpl : public PowerHdiCallbackStub {
+public:
+    virtual ~PowerHdiCallbackImpl() {}
+
+    int32_t OnSuspend() override;
+
+    int32_t OnWakeup() override;
+};
+} // V1_0
+} // Power
+} // HDI
+} // OHOS
+
+#endif // OHOS_HDI_POWER_V1_0_POWERHDICALLBACKIMPL_H

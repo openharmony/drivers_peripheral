@@ -37,11 +37,10 @@
       ],
       "inner_kits": [
         {
-          "name": "//drivers/peripheral/powermgr/battery/interfaces/hdi/battery/v1_0:libbattery_proxy_1.0",
+          "name": "//drivers/interface/battery/v1_0:libbattery_proxy_1.0",
           "header": {
             "header_files": [
-                "battery_callback_service.h",
-                "types.h"
+                "battery_callback_impl.h"
             ],
             "header_base": "//drivers/peripheral/powermgr/battery/interfaces/include"
           }

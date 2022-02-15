@@ -13,8 +13,8 @@
 
 group("battery_entry") {
   deps = [
-    "interfaces/hdi/battery/v1_0:battery",
     "interfaces/hdi_callback:libbattery_callback",
     "interfaces/hdi_service:hdf_battery",
+    "//drivers/interface/battery/v1_0:battery",
   ]
 }

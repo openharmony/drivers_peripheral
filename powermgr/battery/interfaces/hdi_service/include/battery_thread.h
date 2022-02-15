@@ -20,7 +20,7 @@
 #include <memory>
 #include <thread>
 #include <vector>
-#include "battery_callback_service.h"
+#include "battery_callback_impl.h"
 #include "power_supply_provider.h"
 
 namespace OHOS {
@@ -37,7 +37,7 @@ public:
     virtual ~BatteryThread() {}
 
     void StartThread(void* service);
-    void InitCallback(const sptr<hdi::battery::v1_0::IBatteryCallback>& event);
+    void InitCallback(const sptr<OHOS::HDI::Battery::V1_0::IBatteryCallback>& event);
 protected:
     int LoopingThreadEntry(void* arg);
     virtual void Run(void* service);

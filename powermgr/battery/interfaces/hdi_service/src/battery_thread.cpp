@@ -25,7 +25,7 @@
 
 #define HDF_LOG_TAG BatteryThread
 
-using namespace hdi::battery::v1_0;
+using namespace OHOS::HDI::Battery::V1_0;
 
 namespace OHOS {
 namespace HDI {

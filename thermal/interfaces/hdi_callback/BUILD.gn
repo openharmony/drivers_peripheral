@@ -15,9 +15,9 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libthermal_callback") {
   include_dirs = [ "../include" ]
-  sources = [ "./thermal_callback_service.cpp" ]
+  sources = [ "./thermal_callback_impl.cpp" ]
 
-  deps = [ "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_proxy_1.0" ]
+  deps = [ "//drivers/interface/thermal/v1_0:libthermal_proxy_1.0" ]
 
   if (is_standard_system) {
     external_deps = [

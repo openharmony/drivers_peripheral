@@ -22,9 +22,10 @@
 #include "thermal_hdf_config.h"
 #include "thermal_simulation_node.h"
 
-namespace hdi {
-namespace thermal {
-namespace v1_0 {
+namespace OHOS {
+namespace HDI {
+namespace Thermal {
+namespace V1_0 {
 enum EventType {
     EVENT_UEVENT_FD,
     EVENT_TIMER_FD,
@@ -64,7 +65,8 @@ private:
     HdfThermalCallbackInfo tzInfoEventV2_;
     sptr<IThermalCallback> theramalCb_;
 };
-} // v1_0
-} // thermal
-} // hdi
+} // V1_0
+} // Thermal
+} // HDI
+} // OHOS
 #endif // THERMAL_HDF_TIMER_H

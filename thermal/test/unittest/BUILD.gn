@@ -37,7 +37,7 @@ ohos_unittest("hdi_unittest_thermal") {
   ]
 
   deps = [
-    "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_proxy_1.0",
+    "//drivers/interface/thermal/v1_0:libthermal_proxy_1.0",
     "//drivers/peripheral/thermal/interfaces/hdi_callback:libthermal_callback",
   ]
 

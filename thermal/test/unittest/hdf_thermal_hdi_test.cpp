@@ -25,14 +25,14 @@
 #include "osal_time.h"
 #include "thermal_interface_proxy.h"
 #include "thermal_types.h"
-#include "thermal_callback_service.h"
+#include "thermal_callback_impl.h"
 
-using namespace hdi::thermal::v1_0;
+using namespace OHOS::HDI::Thermal::V1_0;
 using namespace testing::ext;
 
 namespace {
     sptr<IThermalInterface> g_thermalInterface = nullptr;
-    sptr<IThermalCallback> g_callback = new ThermalCallbackService();
+    sptr<IThermalCallback> g_callback = new ThermalCallbackImpl();
     std::mutex g_mutex;
     const uint32_t MAX_PATH = 256;
     const uint32_t WAIT_TIME = 1;

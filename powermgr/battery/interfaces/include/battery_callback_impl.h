@@ -13,27 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef HDI_BATTERY_V1_0_BATTERYCALLBACKSERVICE_H
-#define HDI_BATTERY_V1_0_BATTERYCALLBACKSERVICE_H
+#ifndef OHOS_HDI_BATTERY_V1_0_BATTERYCALLBACKIMPL_H
+#define OHOS_HDI_BATTERY_V1_0_BATTERYCALLBACKIMPL_H
 
 #include <functional>
 #include "battery_callback_stub.h"
 
-namespace hdi {
-namespace battery {
-namespace v1_0 {
-class BatteryCallbackService : public BatteryCallbackStub {
+namespace OHOS {
+namespace HDI {
+namespace Battery {
+namespace V1_0 {
+class BatteryCallbackImpl : public BatteryCallbackStub {
 public:
-    virtual ~BatteryCallbackService() {}
+    virtual ~BatteryCallbackImpl() {}
     using BatteryEventCallback = std::function<int32_t(const CallbackInfo& event)>;
     static int32_t RegisterBatteryEvent(const BatteryEventCallback& eventCb);
     int32_t Update(const CallbackInfo& event) override;
 private:
     static BatteryEventCallback eventCb_;
 };
-} // v1_0
-} // battery
-} // hdi
+} // V1_0
+} // Battery
+} // HDI
+} // OHOS
 
-#endif // HDI_BATTERY_V1_0_BATTERYCALLBACKSERVICE_H
+#endif // OHOS_HDI_BATTERY_V1_0_BATTERYCALLBACKIMPL_H
 

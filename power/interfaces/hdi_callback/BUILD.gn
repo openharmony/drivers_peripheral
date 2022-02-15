@@ -15,10 +15,10 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libpower_callback") {
   include_dirs = [ "../include" ]
-  sources = [ "./power_hdi_callback_service.cpp" ]
+  sources = [ "./power_hdi_callback_impl.cpp" ]
 
   deps = [
-    "../hdi/power/v1_0:libpower_proxy_1.0",
+    "//drivers/interface/power/v1_0:libpower_proxy_1.0",
     "//utils/native/base:utils",
   ]
 
