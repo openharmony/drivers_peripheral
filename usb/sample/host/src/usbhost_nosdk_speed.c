@@ -103,8 +103,8 @@ static int ClaimInterface(unsigned int iface)
         return -1;
     }
 
-    int r = ioctl(fd, USBDEVFS_CLAIMINTERFACE, &iface);
-    if (r < 0) {
+    int ret = ioctl(fd, USBDEVFS_CLAIMINTERFACE, &iface);
+    if (ret < 0) {
         printf("claim failed: iface=%u, errno=%2d(%s)\n", iface, errno, strerror(errno));
         return HDF_FAILURE;
     }
@@ -157,15 +157,15 @@ void SignalHandler(int signo)
 void SubmitRequest(uint32_t transNum)
 {
     int i;
-    int r;
+    int ret;
     for (i = 0; i < TEST_CYCLE; i++) {
         urb[i].inUse = 1;
         urb[i].urbNum = transNum;
         urb[i].urb->userContext = (void*)(&urb[i]);
         sendUrb = urb[i].urb;
-        r = ioctl(fd, USBDEVFS_SUBMITURB, sendUrb);
-        if (r < 0) {
-            printf("SubmitBulkRequest: ret:%d errno=%d\n", r, errno);
+        ret = ioctl(fd, USBDEVFS_SUBMITURB, sendUrb);
+        if (ret < 0) {
+            printf("SubmitBulkRequest: ret:%d errno=%d\n", ret, errno);
             urb[i].inUse = 0;
             continue;
         }
@@ -176,7 +176,7 @@ void SubmitRequest(uint32_t transNum)
 static int SendProcess(void *argurb)
 {
     int i;
-    int r;
+    int ret;
     while (!g_speedFlag) {
         OsalSemWait(&sem, HDF_WAIT_FOREVER);
         for (i = 0; i < TEST_CYCLE; i++) {
@@ -192,9 +192,9 @@ static int SendProcess(void *argurb)
         }
         sendUrb = urb[i].urb;
         FillUrb(sendUrb, TEST_LENGTH);
-        r = ioctl(fd, USBDEVFS_SUBMITURB, sendUrb);
-        if (r < 0) {
-            printf("SubmitBulkRequest: ret:%d errno=%d\n", r, errno);
+        ret = ioctl(fd, USBDEVFS_SUBMITURB, sendUrb);
+        if (ret < 0) {
+            printf("SubmitBulkRequest: ret:%d errno=%d\n", ret, errno);
             urb[i].inUse = 0;
             continue;
         }
@@ -205,7 +205,7 @@ static int SendProcess(void *argurb)
 
 static int ReapProcess(void *argurb)
 {
-    int r;
+    int ret;
     struct UsbAdapterUrb *urbrecv = NULL;
     struct itimerval new_value, old_value;
     if (signal(SIGUSR1, SignalHandler) == SIG_ERR) {
@@ -215,8 +215,8 @@ static int ReapProcess(void *argurb)
     tid = syscall(SYS_gettid);
 
     while (!g_speedFlag) {
-        r = ioctl(fd, USBDEVFS_REAPURB, &urbrecv);
-        if (r < 0) {
+        ret = ioctl(fd, USBDEVFS_REAPURB, &urbrecv);
+        if (ret < 0) {
             continue;
         }
         if (urbrecv == NULL) {
@@ -393,7 +393,8 @@ int main(int argc, char *argv[])
 {
     int ret;
     if (!OptionParse(argc, argv)) {
-        return -1;
+        ret = -1;
+        goto ERR;
     }
     OsalSemInit(&sem, 0);
 
