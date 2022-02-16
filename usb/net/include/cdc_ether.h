@@ -59,8 +59,8 @@ struct EcmWb {
     struct UsbRequest *request;
     struct EcmDevice *instance;
     uint8_t *buf;
-    int    len;
-    int    use;
+    uint32_t len;
+    int32_t use;
     struct EcmDevice *ecm;
 };
 

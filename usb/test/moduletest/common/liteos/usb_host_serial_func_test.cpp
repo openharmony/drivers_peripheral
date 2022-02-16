@@ -492,10 +492,12 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialGetDeviceInfo_001, TestSize.Level1)
     const char *bDeviceSubClass = "0x00";
     const char *bDeviceProtocol = "0x00";
     const int logMaxLen = 256;
+    int ret = 0;
     char targetLog[logMaxLen] = {0};
     const char *fmt = "device descriptor info:[%s %s %s %s %s]\n";
     snprintf_s(targetLog, logMaxLen, logMaxLen -1, fmt, \
         idVendor, idProduct, bDeviceClass, bDeviceSubClass, bDeviceProtocol);
+
     printf("targetLog==>%s-%d\n", targetLog, strlen(targetLog));
     char readBuf[DATA_MAX_LEN] = {0};
     UsbHostDdkTestOpen(HOST_ACM_CTRL_SYNC_DESCRIPTOR);

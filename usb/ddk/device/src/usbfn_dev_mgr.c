@@ -39,6 +39,10 @@ static void GetInterfaceInfo(const struct UsbInterfaceDescriptor *intf,
     }
     struct UsbFnInterfaceInfo *info = NULL;
     if (intf->bDescriptorType == USB_DDK_DT_INTERFACE && intf->bNumEndpoints > 0) {
+        if (g_intfCnt >= devMgr->fnDev.numInterfaces) {
+            HDF_LOGE("%s: GetInterfaceInfo failed", __func__);
+            return;
+        }
         info = &devMgr->interfaceMgr[g_intfCnt].interface.info;
         info->index = intf->bInterfaceNumber;
         info->interfaceClass = intf->bInterfaceClass;

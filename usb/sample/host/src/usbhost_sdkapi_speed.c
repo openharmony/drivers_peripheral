@@ -114,7 +114,7 @@ static int AcmDataBufAlloc(struct AcmDevice *acm)
     for (db = &acm->db[0], i = 0; i < TEST_CYCLE; i++, db++) {
         db->buf = OsalMemCalloc(acm->dataSize);
         if (!db->buf) {
-            while (i != 0) {
+            while (i > 0) {
                 --i;
                 --db;
                 OsalMemFree(db->buf);

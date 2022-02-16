@@ -1093,7 +1093,7 @@ static void AcmSetup(struct UsbAcmDevice *acm, struct UsbFnCtrlRequest *setup)
     struct CtrlInfo *ctrlInfo = NULL;
     uint16_t value  = Le16ToCpu(setup->value);
     uint16_t length = Le16ToCpu(setup->length);
-    int ret = 0;
+    uint16_t ret = 0;
 
     req = AcmGetCtrlReq(acm);
     if (req == NULL) {

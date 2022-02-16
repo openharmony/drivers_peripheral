@@ -204,9 +204,6 @@ static void TestCmdLoopOther(int cmdType, const char *param)
         case HOST_ACM_CTRL_GET_INTERFACE:
             TestStdGetInterface();
             break;
-        case HOST_ACM_SPEED_TEST:
-            TestSpeed();
-            break;
         case HOST_ACM_SET_BAUDRATE:
             UsbHostDdkTestSetBaudrate(atoi(param));
             break;

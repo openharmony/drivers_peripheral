@@ -88,7 +88,7 @@ static void GetTempSpeed()
 
 static void ReadSpeedDone()
 {
-    int status = g_acmService->dispatcher->Dispatch(g_acmService,
+    int status = g_acmService->dispatcher->Dispatch(&g_acmService->object,
         USB_SERIAL_READ_SPEED_DONE, g_data, g_reply);
     if (status) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE_SPEED_DONE failed status = %d",

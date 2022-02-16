@@ -877,7 +877,7 @@ static int OsControlCompletion(struct UsbHostRequest *request, struct Async *as)
 
 static void OsIsoRequestDesStatus(struct UsbHostRequest *request, struct UsbAdapterUrb *urb)
 {
-    int i;
+    uint32_t i;
     struct UsbAdapterIsoPacketDescriptor *urbDesc = NULL;
     struct UsbIsoPacketDesc *requestDesc = NULL;
 
@@ -1334,7 +1334,6 @@ static int AdapterFreeRequest(struct UsbHostRequest *request)
         request->urbs = NULL;
     }
     RawUsbMemFree((void *)request);
-    request = NULL;
     return HDF_SUCCESS;
 }
 

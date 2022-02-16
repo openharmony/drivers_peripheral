@@ -250,7 +250,7 @@ struct UsbRequestParamsData {
     /** Pointer to the request data */
     unsigned char *buffer;
     /** Length of the request data */
-    int length;
+    uint32_t length;
 };
 
 /**

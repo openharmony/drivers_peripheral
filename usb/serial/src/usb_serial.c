@@ -702,8 +702,8 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
     if ((data == NULL) || (!g_syncRequest)) {
         return HDF_FAILURE;
     }
-    HDF_LOGD("buffer:%p-%s-actualLength:%d", \
-        g_syncRequest->compInfo.buffer, (uint8_t *)g_syncRequest->compInfo.buffer, count);
+    HDF_LOGD("buffer:%s-actualLength:%d", \
+        (uint8_t *)g_syncRequest->compInfo.buffer, count);
 
     ret = memcpy_s(data, g_syncRequest->compInfo.actualLength, g_syncRequest->compInfo.buffer, count);
     if (ret != EOK) {

@@ -102,13 +102,19 @@ static int IoSendProcess(const void *interfacePoolArg)
 
 static int IoAsyncReceiveProcess(const void *interfacePoolArg)
 {
+    int ret;
     if (interfacePoolArg == NULL) {
         HDF_LOGE("%s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     struct UsbInterfacePool *interfacePool = (struct UsbInterfacePool *)interfacePoolArg;
-    int ret;
+    if (interfacePool == NULL) {
+        HDF_LOGE("%s:%d ioProcessTid is NULL", __func__, __LINE__);
+        OsalMSleep(USB_IO_SLEEP_MS_TIME);
+        return HDF_FAILURE;
+    }
+    
 
     if (RawRegisterSignal() != HDF_SUCCESS) {
         HDF_LOGE("%s:%d RawRegisterSignal error", __func__, __LINE__);
@@ -116,12 +122,6 @@ static int IoAsyncReceiveProcess(const void *interfacePoolArg)
     interfacePool->ioProcessTid = RawGetTid();
 
     while (true) {
-        if (interfacePool == NULL) {
-            HDF_LOGE("%s:%d interfacePool is NULL", __func__, __LINE__);
-            OsalMSleep(USB_IO_SLEEP_MS_TIME);
-            return HDF_FAILURE;
-        }
-
         if (interfacePool->device == NULL) {
             HDF_LOGE("%s:%d interfacePool->device is NULL!", __func__, __LINE__);
             OsalMSleep(USB_IO_SLEEP_MS_TIME);

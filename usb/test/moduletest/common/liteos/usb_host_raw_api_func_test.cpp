@@ -166,7 +166,7 @@ HWTEST_F(UsbHostRawApiFuncTest, UsbSerialReadSync_005, TestSize.Level2)
     string data;
     int totalSize = 1024;
     int writeCnt = 8;
-    unsigned int n = 0;
+    int n = 0;
     while (n < totalSize / writeCnt / s.size()) {
         data += s;
         n++;
