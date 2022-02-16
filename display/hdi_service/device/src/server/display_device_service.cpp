@@ -51,9 +51,9 @@ int32_t DisplayDeviceService::GetDisplayCapability(uint32_t devId, DisplayCapabi
     return displayDevice_->GetDisplayCapability(devId, &info);
 }
 
-int32_t DisplayDeviceService::GetDisplaySuppportedModes(uint32_t devId, int &num, DisplayModeInfo *modes)
+int32_t DisplayDeviceService::GetDisplaySupportedModes(uint32_t devId, int &num, DisplayModeInfo *modes)
 {
-    return displayDevice_->GetDisplaySuppportedModes(devId, &num, modes);
+    return displayDevice_->GetDisplaySupportedModes(devId, &num, modes);
 }
 
 int32_t DisplayDeviceService::GetDisplayMode(uint32_t devId, uint32_t &modeId)
