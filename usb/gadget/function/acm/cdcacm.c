@@ -740,6 +740,7 @@ static int32_t UsbSerialSetProp(struct UsbAcmDevice *acmDevice, struct HdfSBuf *
     if (propValue == NULL) {
         return HDF_ERR_IO;
     }
+    (void)memset_s(&tmp, sizeof(tmp), 0, sizeof(tmp));
     ret = snprintf_s(tmp, USB_MAX_PACKET_SIZE, USB_MAX_PACKET_SIZE - 1, "%s", propValue);
     if (ret < 0) {
         HDF_LOGE("%s: snprintf_s failed", __func__);
