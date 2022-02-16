@@ -167,7 +167,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*GetDisplaySuppportedModes)(uint32_t devId, int *num, DisplayModeInfo *modes);
+    int32_t (*GetDisplaySupportedModes)(uint32_t devId, int *num, DisplayModeInfo *modes);
 
     /* *
      * @brief Obtains the current display mode of a display device.
@@ -424,7 +424,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*GetDisplaySuppportedColorGamuts)(uint32_t devId, uint32_t *num, ColorGamut *gamuts);
+    int32_t (*GetDisplaySupportedColorGamuts)(uint32_t devId, uint32_t *num, ColorGamut *gamuts);
 
     /* *
      * @brief Obtains the color gamut of a display device.
