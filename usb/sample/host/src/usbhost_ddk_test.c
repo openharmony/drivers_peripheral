@@ -63,7 +63,6 @@ static struct HdfIoService *g_acmService = NULL;
 #else
 struct HdfRemoteService *g_acmService = NULL;
 #endif
-static bool g_speedFlag = false;
 static bool g_exitFlag = false;
 
 int UsbObtainSbuf()
@@ -342,7 +341,7 @@ void UsbHostDdkTestCtrlClass(char *readSbuf)
             __func__, __LINE__, status);
     } else {
         if (readSbuf != NULL) {
-            const char tmp[DATA_MAX_LEN] = "CMD_CLASS_CTRL";
+            const char tmp[] = "CMD_CLASS_CTRL";
             errno_t err = memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
             if (err != EOK) {
                 HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
@@ -509,96 +508,6 @@ void TestStdGetInterface(void)
     }
 }
 
-static int TestSpeedWrite(const char *buf)
-{
-    HdfSbufFlush(g_data);
-
-    if (!HdfSbufWriteString(g_data, (char *)buf)) {
-        printf("%s:%d HdfSbufWriteString error\n", __func__, __LINE__);
-        HDF_LOGE("%s:%d HdfSbufWriteString error", __func__, __LINE__);
-        return HDF_FAILURE;
-    }
-
-#ifdef __LITEOS_USB_HOST_DDK_TEST__
-    int status = g_acmService->dispatcher->Dispatch(&g_acmService->object, CMD_WRITE_PARM, g_data, g_reply);
-#else
-    int status = g_acmService->dispatcher->Dispatch(g_acmService, CMD_WRITE_PARM, g_data, g_reply);
-#endif
-    if (status <= HDF_SUCCESS) {
-        g_exitFlag = true;
-        return HDF_FAILURE;
-    }
-
-    return HDF_SUCCESS;
-}
-
-static void TestSpeedTimerFun(int signo)
-{
-    switch (signo) {
-        case SIGALRM:
-            g_speedFlag = true;
-            break;
-        default:
-            break;
-    }
-}
-
-void TestSpeed(void)
-{
-    char str[BUFFER_MAX_LEN] = {0};
-    char *data = NULL;
-    FILE *fp = NULL;
-    struct timeval time;
-    int cnt = 0;
-    struct itimerval newValue;
-    struct itimerval oldValue;
-    const time_t second = 30;
-
-    data = OsalMemAlloc(DATA_MAX_LEN);
-    if (data == NULL) {
-        return;
-    }
-    memset_s(data, DATA_MAX_LEN, 0x38, DATA_MAX_LEN);
-    data[DATA_MAX_LEN - 1] = '\0';
-
-    signal(SIGALRM, TestSpeedTimerFun);
-
-    newValue.it_value.tv_sec = second;
-    newValue.it_value.tv_usec = 0;
-    newValue.it_interval.tv_sec = second;
-    newValue.it_interval.tv_usec = 0;
-
-    gettimeofday(&time, NULL);
-    printf("##:sec%" PRId64 " usec%" PRId64 "\n", time.tv_sec, time.tv_usec);
-    HDF_LOGD("##:sec%" PRId64 " usec%" PRId64 "\n", time.tv_sec, time.tv_usec);
-    setitimer(ITIMER_REAL, &newValue, &oldValue);
-    gettimeofday(&time, NULL);
-
-#ifdef __LITEOS_USB_HOST_DDK_TEST__
-    fp = fopen("/userdata/acm_write_xts", "a+");
-#else
-    fp = fopen("/data/acm_write_xts", "a+");
-#endif
-    (void)snprintf_s(str, BUFFER_MAX_LEN, BUFFER_MAX_LEN - 1, "[XTSCHECK] %d.%06d, send data to device\n",
-        time.tv_sec, time.tv_usec);
-    if (fp != NULL) {
-        (void)fwrite(str, strlen(str), 1, fp);
-        (void)fclose(fp);
-    }
-    while (!g_speedFlag) {
-        if (TestSpeedWrite(data) < HDF_SUCCESS) {
-            OsalMSleep(SPEED_SLEEP_TIME);
-            continue;
-        }
-        cnt++;
-    }
-
-    gettimeofday(&time, NULL);
-    printf("##:sec%" PRId64 " usec%" PRId64 "+cnt:%d\n",   time.tv_sec, time.tv_usec, cnt);
-    HDF_LOGD("##:sec%" PRId64 " usec%" PRId64 "+cnt:%d",   time.tv_sec, time.tv_usec, cnt);
-    printf("Speed:%dKB\n", ((cnt * 512) / (30  * 1024)));
-}
-
 void UsbHostDdkTestSetBaudrate(uint32_t value)
 {
     HdfSbufFlush(g_data);
@@ -647,13 +556,13 @@ void UsbHostDdkTestGetBaudrate(char *readSbuf)
 
     if (HdfSbufReadUint32(g_reply, &value)) {
         if (readSbuf != NULL) {
-            const char tmp[DATA_MAX_LEN] = "CMD_GET_BAUDRATE";
+            const char tmp[] = "CMD_GET_BAUDRATE";
             errno_t err = memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
             if (err != EOK) {
                 HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
             }
         }
-        printf("%s:%d baudrate=%d usb serial control CMD_GET_BAUDRATE command done\n", __func__, __LINE__, value);
+        printf("%s:%d baudrate=%u usb serial control CMD_GET_BAUDRATE command done\n", __func__, __LINE__, value);
         TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_GET_BAUDRATE", NULL);
     } else {
         printf("%s:%d HdfSbufReadUint32 failed!\n", __func__, __LINE__);

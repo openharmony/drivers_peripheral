@@ -170,7 +170,6 @@ static int TestProp(const char *propName, const char *propValue,
 int prop_test(int argc, const char *argv[])
 {
     int ch;
-    const char *serviceName = NULL;
     const char *propName = NULL;
     const char *propValue = NULL;
     bool setProp = false;

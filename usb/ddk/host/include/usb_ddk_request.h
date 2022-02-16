@@ -75,9 +75,9 @@ struct UsbHostRequest {
     /* the address of data buffer */
     unsigned char *buffer;
     /* the length of data buffer */
-    int length;
+    uint32_t length;
     /* the actual length of the requested data */
-    int actualLength;
+    uint32_t actualLength;
     /* the status of the request */
     UsbRequestStatus status;
     /* private user data */
@@ -90,7 +90,7 @@ struct UsbHostRequest {
     UsbRawRequestCallback callback;
     UsbRequestCallback userCallback;
     /* the length of data buffer */
-    int bufLen;
+    uint32_t bufLen;
     struct OsalSem sem;
     unsigned char endPoint;
     unsigned int timeout;

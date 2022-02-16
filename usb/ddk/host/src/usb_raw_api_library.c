@@ -642,10 +642,11 @@ static int ParseConfiguration(struct UsbRawConfigDescriptor *config, const uint8
 
 static int32_t DescToConfig(const uint8_t *buf, int size, struct UsbRawConfigDescriptor **config)
 {
-    struct UsbRawConfigDescriptor *tempConfig = RawUsbMemCalloc(sizeof(*tempConfig));
+    struct UsbRawConfigDescriptor *tempConfig = RawUsbMemCalloc(sizeof(struct UsbRawConfigDescriptor));
     int32_t ret;
 
     if (tempConfig == NULL) {
+        HDF_LOGE("%s: RawUsbMemCalloc failed", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
 
@@ -653,8 +654,8 @@ static int32_t DescToConfig(const uint8_t *buf, int size, struct UsbRawConfigDes
     if (ret < 0) {
         HDF_LOGE("%s: ParseConfiguration failed with error = %d", __func__, ret);
         if (tempConfig != NULL) {
-            RawUsbMemFree(tempConfig);
-            tempConfig = NULL;
+        RawUsbMemFree(tempConfig);
+        tempConfig = NULL;
         }
         return ret;
     } else if (ret > 0) {
@@ -1491,6 +1492,11 @@ void *RawUsbMemCalloc(size_t size)
     struct RawUsbRamTestList *pos = NULL;
     uint32_t totalSize = 0;
 
+    if (size == 0) {
+        HDF_LOGE("%s:%d size is 0", __func__, __LINE__);
+        return NULL;
+    }
+    
     buf = OsalMemAlloc(size);
     if (buf != NULL) {
         (void)memset_s(buf, size, 0, size);

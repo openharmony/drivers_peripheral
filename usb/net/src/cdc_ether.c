@@ -1071,6 +1071,11 @@ static int32_t EcmInit(struct EcmDevice *ecm)
         goto ERROR_OPEN_INTERFACES;
     }
 
+    if (ecm->interfaceCnt > USB_MAX_INTERFACES) {
+        HDF_LOGE("interfaceCnt invalid : %u\n", ecm->interfaceCnt);
+        goto ERROR_OPEN_INTERFACES;
+    }
+    
     /* set altsetting */
     ret = UsbSelectInterfaceSetting(ecm->devHandle[ecm->interfaceCnt-1], altsetting,
         &ecm->iface[ecm->interfaceCnt-1]);

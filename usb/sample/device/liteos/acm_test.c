@@ -42,7 +42,6 @@ enum UsbSerialCmd {
 static struct HdfSBuf *g_data;
 static struct HdfSBuf *g_reply;
 static struct HdfIoService *g_acmService;
-static struct OsalThread      g_thread;
 static struct OsalMutex       g_lock;
 
 static void TestWrite(const char *buf)
@@ -73,7 +72,7 @@ static void TestRead()
 
 static bool g_readRuning = false;
 #define SLEEP_READ 100
-static int ReadThread(void *arg)
+static void ReadThread(void *arg)
 {
     while (g_readRuning) {
         OsalMutexLock(&g_lock);
@@ -81,7 +80,6 @@ static int ReadThread(void *arg)
         OsalMutexUnlock(&g_lock);
         OsalMDelay(SLEEP_READ);
     }
-    return 0;
 }
 
 pthread_t g_tid;
