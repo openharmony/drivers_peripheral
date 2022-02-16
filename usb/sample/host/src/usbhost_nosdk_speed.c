@@ -39,10 +39,17 @@
 #define USB_DEV_FS_PATH "/dev/bus/usb"
 #define URB_COMPLETE_PROCESS_STACK_SIZE 8196
 
+#define PATH_SIZE 24
+#define TIME_SCALE 1024
+#define RECV_COUNT_SIZE 10000
+#define SLEEP_TIME 10
+
 #define TEST_LENGTH     512
 #define TEST_CYCLE      30
 #define TEST_TIME       0xffffffff
 #define TEST_PRINT_TIME 2
+#define TEST_PRINT_TIME_UINT    1000
+#define ENDPOINT_IN_OFFSET 7
 
 static pid_t tid;
 static int exitOk = false;
@@ -60,20 +67,21 @@ static bool g_printData = false;
 static unsigned int ifaceNum;
 static unsigned char endNum;
 
-static void CloseDevice()
+static void CloseDevice(void)
 {
     if (fd > 0) {
         close(fd);
+        fd = 0;
     }
     return;
 }
 
-static int OpenDevice()
+static int OpenDevice(void)
 {
-    char path[24];
+    char path[PATH_SIZE];
     int ret;
 
-    ret = snprintf_s(path, 24, sizeof(path), USB_DEV_FS_PATH "/%03u/%03u", g_busNum, g_devAddr);
+    ret = snprintf_s(path, PATH_SIZE, sizeof(path) - 1, USB_DEV_FS_PATH "/%03u/%03u", g_busNum, g_devAddr);
     if (ret < 0) {
         printf("path error\n");
         return ret;
@@ -81,7 +89,6 @@ static int OpenDevice()
 
     printf("open: %s\n", path);
     fd = open(path, O_RDWR);
-
     if (fd < 0) {
         printf("open device failed! errno=%2d(%s)\n", errno, strerror(errno));
     }
@@ -96,8 +103,8 @@ static int ClaimInterface(unsigned int iface)
         return -1;
     }
 
-    int r = ioctl(fd, USBDEVFS_CLAIMINTERFACE, &iface);
-    if (r < 0) {
+    int ret = ioctl(fd, USBDEVFS_CLAIMINTERFACE, &iface);
+    if (ret < 0) {
         printf("claim failed: iface=%u, errno=%2d(%s)\n", iface, errno, strerror(errno));
         return HDF_FAILURE;
     }
@@ -107,15 +114,14 @@ static int ClaimInterface(unsigned int iface)
 
 static void FillUrb(struct UsbAdapterUrb *urb, int len)
 {
-    if (urb == NULL)
-    {
+    if (urb == NULL) {
         urb = OsalMemCalloc(sizeof(*urb));
         urb->userContext = (void *)(urb);
         urb->type = USB_ADAPTER_URB_TYPE_BULK;
         urb->streamId = 0;
         urb->endPoint = endNum;
     }
-    if (endNum >> 7 == 0) {
+    if ((endNum >> ENDPOINT_IN_OFFSET) == 0) {
         memset_s(urb->buffer, len, 'c', len);
     }
 }
@@ -132,7 +138,7 @@ void SignalHandler(int signo)
                 g_speedFlag = 1;
                 break;
             }
-            speed = (g_byteTotal * 1.0) / (sigCnt * TEST_PRINT_TIME  * 1024 * 1024);
+            speed = (g_byteTotal * 1.0) / (sigCnt * TEST_PRINT_TIME  * TIME_SCALE * TIME_SCALE);
             printf("\nSpeed:%f MB/s\n", speed);
             new_value.it_value.tv_sec = TEST_PRINT_TIME;
             new_value.it_value.tv_usec = 0;
@@ -145,13 +151,32 @@ void SignalHandler(int signo)
             break;
         default:
             break;
-   }
+    }
+}
+
+void SubmitRequest(uint32_t transNum)
+{
+    int i;
+    int ret;
+    for (i = 0; i < TEST_CYCLE; i++) {
+        urb[i].inUse = 1;
+        urb[i].urbNum = transNum;
+        urb[i].urb->userContext = (void*)(&urb[i]);
+        sendUrb = urb[i].urb;
+        ret = ioctl(fd, USBDEVFS_SUBMITURB, sendUrb);
+        if (ret < 0) {
+            printf("SubmitBulkRequest: ret:%d errno=%d\n", ret, errno);
+            urb[i].inUse = 0;
+            continue;
+        }
+        g_send_count++;
+    }
 }
 
 static int SendProcess(void *argurb)
 {
     int i;
-    int r;
+    int ret;
     while (!g_speedFlag) {
         OsalSemWait(&sem, HDF_WAIT_FOREVER);
         for (i = 0; i < TEST_CYCLE; i++) {
@@ -167,9 +192,9 @@ static int SendProcess(void *argurb)
         }
         sendUrb = urb[i].urb;
         FillUrb(sendUrb, TEST_LENGTH);
-        r = ioctl(fd, USBDEVFS_SUBMITURB, sendUrb);
-        if (r < 0) {
-            printf("SubmitBulkRequest: ret:%d errno=%d\n", r, errno);
+        ret = ioctl(fd, USBDEVFS_SUBMITURB, sendUrb);
+        if (ret < 0) {
+            printf("SubmitBulkRequest: ret:%d errno=%d\n", ret, errno);
             urb[i].inUse = 0;
             continue;
         }
@@ -180,7 +205,7 @@ static int SendProcess(void *argurb)
 
 static int ReapProcess(void *argurb)
 {
-    int r;
+    int ret;
     struct UsbAdapterUrb *urbrecv = NULL;
     struct itimerval new_value, old_value;
     if (signal(SIGUSR1, SignalHandler) == SIG_ERR) {
@@ -190,8 +215,8 @@ static int ReapProcess(void *argurb)
     tid = syscall(SYS_gettid);
 
     while (!g_speedFlag) {
-        r = ioctl(fd, USBDEVFS_REAPURB, &urbrecv);
-        if (r < 0) {
+        ret = ioctl(fd, USBDEVFS_REAPURB, &urbrecv);
+        if (ret < 0) {
             continue;
         }
         if (urbrecv == NULL) {
@@ -214,12 +239,12 @@ static int ReapProcess(void *argurb)
             for (int i = 0; i < urbrecv->actualLength; i++)
                 printf("%c", recvBuf[i]);
             fflush(stdout);
-        } else if (g_recv_count % 10000 == 0) {
+        } else if (g_recv_count % RECV_COUNT_SIZE == 0) {
             printf("#");
             fflush(stdout);
         }
 
-        struct UsbAdapterUrbs * urbs = urbrecv->userContext;
+        struct UsbAdapterUrbs *urbs = urbrecv->userContext;
         urbs->inUse = 0;
         OsalSemPost(&sem);
     }
@@ -227,19 +252,18 @@ static int ReapProcess(void *argurb)
     return 0;
 }
 
-static int BeginProcess(unsigned char endPoint)
+static int BeginProcess(uint8_t endPoint)
 {
-    int r;
     char *data = NULL;
     struct timeval time;
     int transNum = 0;
-    int i;
+    int i = 0;
 
     if (fd < 0 || endPoint <= 0) {
         printf("parameter error\n");
         return -1;
     }
-    for (int i = 0; i < TEST_CYCLE; i++) {
+    for (i = 0; i < TEST_CYCLE; i++) {
         urb[i].urb = calloc(1, sizeof(struct UsbAdapterUrb));
         if (urb[i].urb == NULL) {
             return -1;
@@ -250,7 +274,7 @@ static int BeginProcess(unsigned char endPoint)
         urb[i].urb->streamId = 0;
         urb[i].urb->endPoint = endPoint;
 
-        data = OsalMemCalloc(TEST_LENGTH);//AllocMemTest(TEST_LENGTH)
+        data = OsalMemCalloc(TEST_LENGTH);
         if (data == NULL) {
             return -1;
         }
@@ -261,35 +285,26 @@ static int BeginProcess(unsigned char endPoint)
     }
 
     gettimeofday(&time, NULL);
-    signal(SIGINT, SignalHandler);
+    if (signal(SIGINT, SignalHandler) == SIG_ERR) {
+        printf("signal SIGINT failed");
+        return HDF_ERR_IO;
+    }
     signal(SIGALRM, SignalHandler);
 
     printf("test NO SDK endpoint:%d\n", endPoint);
     printf("Start: sec%ld usec%ld\n", time.tv_sec, time.tv_usec);
 
-    for (i = 0; i < TEST_CYCLE; i++) {
-        urb[i].inUse = 1;
-        urb[i].urbNum = transNum;
-        urb[i].urb->userContext = (void*)(&urb[i]);
-        sendUrb = urb[i].urb;
-        r = ioctl(fd, USBDEVFS_SUBMITURB, sendUrb);
-        if (r < 0) {
-            printf("SubmitBulkRequest: ret:%d errno=%d\n", r, errno);
-            urb[i].inUse = 0;
-            continue;
-        }
-        g_send_count++;
-    }
+    SubmitRequest(transNum);
 
     while (!g_speedFlag) {
-        OsalMSleep(10);
+        OsalMSleep(SLEEP_TIME);
     }
 
     kill(tid, SIGUSR1);
     while (exitOk != true) {
-        OsalMSleep(10);
+        OsalMSleep(SLEEP_TIME);
     }
-    for (int i = 0; i < TEST_CYCLE; i++) {
+    for (i = 0; i < TEST_CYCLE; i++) {
         munmap(urb[i].urb->buffer, TEST_LENGTH);
         free(urb[i].urb);
     }
@@ -303,16 +318,14 @@ static void ShowHelp(char *name)
     printf("\n");
 }
 
-int main(int argc, char *argv[])
+static bool OptionParse(int argc, char *argv[])
 {
-    int ret;
     if (argc == 6) {
         g_busNum = atoi(argv[1]);
         g_devAddr = atoi(argv[2]);
         ifaceNum = atoi(argv[3]);
         endNum = atoi(argv[4]);
-        if (endNum >> 7 != 0)
-        {
+        if ((endNum >> ENDPOINT_IN_OFFSET) != 0) {
             g_printData = (strncmp(argv[5], "printdata", 1))?false:true;
         }
     } else if (argc == 5) {
@@ -326,21 +339,14 @@ int main(int argc, char *argv[])
     } else {
         printf("Error: parameter error!\n\n");
         ShowHelp(argv[0]);
-        return -1;
+        return false;
     }
-    OsalSemInit(&sem, 0);
+    return true;
+}
 
-    fd = OpenDevice();
-    if (fd < 0) {
-        ret = -1;
-        goto err;
-    }
-
-    ret = ClaimInterface(ifaceNum);
-    if (ret != HDF_SUCCESS) {
-        goto err;
-    }
-
+static int OsalThreadOperate(void)
+{
+    int ret;
     struct OsalThread urbReapProcess;
     struct OsalThread urbSendProcess;
     struct OsalThreadParam threadCfg;
@@ -353,7 +359,7 @@ int main(int argc, char *argv[])
     ret = OsalThreadCreate(&urbReapProcess, (OsalThreadEntry)ReapProcess, NULL);
     if (ret != HDF_SUCCESS) {
         printf("OsalThreadCreate fail, ret=%d\n", ret);
-        goto err;
+        return HDF_FAILURE;
     }
 
     ret = OsalThreadStart(&urbReapProcess, &threadCfg);
@@ -368,7 +374,7 @@ int main(int argc, char *argv[])
     ret = OsalThreadCreate(&urbSendProcess, (OsalThreadEntry)SendProcess, NULL);
     if (ret != HDF_SUCCESS) {
         printf("OsalThreadCreate fail, ret=%d\n", ret);
-        goto err;
+        return HDF_FAILURE;
     }
 
     ret = OsalThreadStart(&urbSendProcess, &threadCfg);
@@ -378,10 +384,36 @@ int main(int argc, char *argv[])
 
     ret = BeginProcess(endNum);
     if (ret != HDF_SUCCESS) {
-        goto err;
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int main(int argc, char *argv[])
+{
+    int ret;
+    if (!OptionParse(argc, argv)) {
+        ret = -1;
+        goto ERR;
+    }
+    OsalSemInit(&sem, 0);
+
+    fd = OpenDevice();
+    if (fd < 0) {
+        ret = -1;
+        goto ERR;
     }
 
-err:
+    ret = ClaimInterface(ifaceNum);
+    if (ret != HDF_SUCCESS) {
+        goto ERR;
+    }
+
+    ret = OsalThreadOperate();
+    if (ret != HDF_SUCCESS) {
+        goto ERR;
+    }
+ERR:
     if (ret != HDF_SUCCESS) {
         printf("please check whether usb drv so is existing or not,like acm, ecm, if not, remove it and test again!\n");
     }
