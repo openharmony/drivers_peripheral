@@ -31,11 +31,11 @@ int32_t HdiTestDisplay::Init()
         mCap.phyWidth, mCap.phyHeight);
     // get the modes
     int num = 0;
-    ret = mDeviceFunc.GetDisplaySuppportedModes(mId, &num, nullptr);
+    ret = mDeviceFunc.GetDisplaySupportedModes(mId, &num, nullptr);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("can not get modes num"));
     DISPLAY_TEST_CHK_RETURN((num <= 0), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("the mode num is %d", num));
     mModes.resize(num);
-    ret = mDeviceFunc.GetDisplaySuppportedModes(mId, &num, mModes.data());
+    ret = mDeviceFunc.GetDisplaySupportedModes(mId, &num, mModes.data());
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("can not get modes"));
     DISPLAY_TEST_LOGD("the modes size() %zd", mModes.size());
 
