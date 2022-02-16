@@ -527,7 +527,8 @@ RetCode StreamBase::AttachStreamTunnel(std::shared_ptr<StreamTunnel>& tunnel)
     tunnel_ = tunnel;
     CHECK_IF_PTR_NULL_RETURN_VALUE(tunnel_, RC_ERROR);
     tunnel_->SetBufferCount(GetBufferCount());
-    TunnelConfig config = {streamConfig_.width, streamConfig_.height, streamConfig_.format, streamConfig_.usage};
+    TunnelConfig config = {(uint32_t)streamConfig_.width, (uint32_t)streamConfig_.height,
+        (uint32_t)streamConfig_.format, streamConfig_.usage};
     tunnel_->Config(config);
 
     streamConfig_.tunnelMode = true;

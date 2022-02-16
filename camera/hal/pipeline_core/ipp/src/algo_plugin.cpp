@@ -102,7 +102,7 @@ RetCode AlgoPlugin::Process(std::shared_ptr<IBuffer>& outBuffer,
     }
 
     IppAlgoBuffer** inAlgoBuffers = new IppAlgoBuffer* [inBuffers.size()];
-    for (int i = 0; i < inBuffers.size(); i++) {
+    for (uint32_t i = 0; i < inBuffers.size(); i++) {
         if (inBuffers[i] == nullptr) {
             inAlgoBuffers[i] = nullptr;
         } else {

@@ -186,7 +186,7 @@ static void ManuList(const std::shared_ptr<HosCameraDemo>& mainDemo,
 {
     int idx, c;
     int awb = 1;
-    constexpr char shortOptions[] = "h:cwvaqof:";
+    const char *shortOptions = "h:cwvaqof:";
 
     c = getopt_long(argc, argv, shortOptions, longOptions, &idx);
     while(1) {
