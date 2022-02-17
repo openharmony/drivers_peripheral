@@ -67,7 +67,6 @@ int32_t ThermalSimulationNode::NodeInit()
 
 int32_t ThermalSimulationNode::CreateNodeDir(std::string dir)
 {
-    HDF_LOGI("%{public}s: Enter", __func__);
     if (access(dir.c_str(), 0) != HDF_SUCCESS) {
         int32_t flag = mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH| S_IXOTH);
         if (flag == HDF_SUCCESS) {
@@ -135,13 +134,13 @@ int32_t ThermalSimulationNode::AddSensorTypeTemp()
         if (ret < HDF_SUCCESS) {
             return HDF_FAILURE;
         }
-        std::string type = dir.first + "\n";
+        std::string type = dir.first;
         WriteFile(typeBuf, type, type.length());
         ret = snprintf_s(tempBuf, PATH_MAX, sizeof(tempBuf) - ARG_1, thermalTempDir.c_str(), dir.first.c_str());
         if (ret < HDF_SUCCESS) {
             return HDF_FAILURE;
         }
-        std::string temp = std::to_string(dir.second) + "\n";
+        std::string temp = std::to_string(dir.second);
         WriteFile(tempBuf, temp, temp.length());
     }
     return HDF_SUCCESS;
@@ -199,13 +198,11 @@ int32_t ThermalSimulationNode::AddMitigationDevice()
 
 int32_t ThermalSimulationNode::WriteFile(std::string path, std::string buf, size_t size)
 {
-    mutex_.lock();
     int32_t fd = open(path.c_str(), O_RDWR);
     if (fd < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: open failed to file.", __func__);
     }
     write(fd, buf.c_str(), size);
-    mutex_.unlock();
     close(fd);
     return HDF_SUCCESS;
 }

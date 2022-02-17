@@ -78,7 +78,6 @@ int32_t ThermalHdfTimer::GetSimluationFlag()
 
 int32_t ThermalHdfTimer::CreateProviderFd()
 {
-    HDF_LOGI("%{public}s enter", __func__);
     timerFd_ = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
     if (timerFd_ == ERR_INVALID_FD) {
         HDF_LOGE("%{public}s epoll create failed, epFd_ is invalid", __func__);
@@ -99,7 +98,6 @@ int32_t ThermalHdfTimer::CreateProviderFd()
 
 int32_t ThermalHdfTimer::RegisterCallback(const int32_t fd, const EventType et, int32_t epfd)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     struct epoll_event ev;
 
     ev.events = EPOLLIN;
@@ -120,7 +118,6 @@ int32_t ThermalHdfTimer::RegisterCallback(const int32_t fd, const EventType et, 
 
 void ThermalHdfTimer::TimerProviderCallback(void *service)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     unsigned long long timers;
 
     if (read(timerFd_, &timers, sizeof(timers)) == -1) {
@@ -128,7 +125,6 @@ void ThermalHdfTimer::TimerProviderCallback(void *service)
         return;
     }
 
-    HDF_LOGI("%{public}s: reportTime:%{public}d", __func__, reportTime_);
     reportTime_ = reportTime_ + 1;
     ReportThermalData();
     ResetCount();
@@ -137,7 +133,6 @@ void ThermalHdfTimer::TimerProviderCallback(void *service)
 
 void ThermalHdfTimer::SetTimerInterval(int32_t interval, int32_t timerfd)
 {
-    HDF_LOGI("%{public}s enter, start SetTimerInterval: %{public}d", __func__, timerfd);
     struct itimerspec itval;
 
     if (timerfd == ERR_INVALID_FD) {
@@ -162,7 +157,6 @@ void ThermalHdfTimer::SetTimerInterval(int32_t interval, int32_t timerfd)
 
 int32_t ThermalHdfTimer::InitProviderTimer()
 {
-    HDF_LOGI("%{public}s:  Enter", __func__);
     int32_t ret;
     epFd_ = epoll_create1(EPOLL_CLOEXEC);
 
@@ -201,27 +195,22 @@ void ThermalHdfTimer::Run(void *service, int32_t epfd)
 
 void ThermalHdfTimer::StartThread(void *service)
 {
-    HDF_LOGI("%{public}s: Enter", __func__);
     int32_t ret = InitProviderTimer();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s init Timer failed, ret: %{public}d", __func__, ret);
         return;
     }
     Run(service, epFd_);
-    HDF_LOGI("return");
 }
 
 int32_t ThermalHdfTimer::Init()
 {
-    HDF_LOGI("%{public}s: Enter", __func__);
     StartThread(this);
     return HDF_SUCCESS;
 }
 
 void ThermalHdfTimer::ReportThermalData()
 {
-    HDF_LOGI("%{public}s: Enter", __func__);
-
     if (thermalCb_ == nullptr) {
         HDF_LOGE("%{public}s: check thermalCb_ failed", __func__);
         return;
