@@ -1100,10 +1100,7 @@ static int32_t UsbSerialDeviceDispatch(struct HdfDeviceIoClient *client, int cmd
 static struct UsbInterface *GetUsbInterfaceById(const struct AcmDevice *acm,
     uint8_t interfaceIndex)
 {
-    struct UsbInterface *tmpIf = NULL;
-    tmpIf = (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum, \
-            acm->devAddr, interfaceIndex);
-    return tmpIf;
+    return UsbClaimInterface(acm->session, acm->busNum, acm->devAddr, interfaceIndex);
 }
 
 static void AcmFreePipes(struct AcmDevice *acm)

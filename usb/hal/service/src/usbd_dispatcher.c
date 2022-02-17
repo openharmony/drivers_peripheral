@@ -187,8 +187,7 @@ static struct UsbInterface *GetUsbInterfaceById(const struct HostDevice *dev, ui
         HDF_LOGE("%{public}s:%{public}d idx:%{public}d service is null", __func__, __LINE__, interfaceIndex);
         return NULL;
     }
-    struct UsbInterface *tmpIf =
-        (struct UsbInterface *)UsbClaimInterface(dev->service->session, dev->busNum, dev->devAddr, interfaceIndex);
+    struct UsbInterface *tmpIf = UsbClaimInterface(dev->service->session, dev->busNum, dev->devAddr, interfaceIndex);
     return tmpIf;
 }
 
@@ -949,8 +948,8 @@ static int32_t FunClaimInterface(struct HostDevice *port, struct HdfSBuf *data)
     }
     if (port->iface[interfaceId] == NULL) {
         if (force) {
-            port->iface[interfaceId] = (struct UsbInterface *)UsbClaimInterface(port->service->session, port->busNum,
-                                                                                port->devAddr, interfaceId);
+            port->iface[interfaceId] = UsbClaimInterface(
+                port->service->session, port->busNum, port->devAddr, interfaceId);
         } else {
             port->iface[interfaceId] = (struct UsbInterface *)UsbClaimInterfaceUnforce(
                 port->service->session, port->busNum, port->devAddr, interfaceId);
@@ -1558,14 +1557,14 @@ static bool UsbdHdfReadBufAndMalloc(struct HdfSBuf *data, uint8_t **ptr, uint32_
         *ptr = (uint8_t *)OsalMemAlloc(*length);
         if (!(*ptr)) {
             HDF_LOGE("%{public}s:%{public}d OsalMemAlloc fail size:%{public}d", __func__, __LINE__, *length);
-            return HDF_ERR_MALLOC_FAIL;
+            return false;
         }
         int32_t err = memcpy_s(*ptr, *length, tclientData, *length);
         if (err != EOK) {
             HDF_LOGE("%{public}s:%{public}d memcpy_s fail size:%{public}d", __func__, __LINE__, *length);
             OsalMemFree(*ptr);
             *ptr = NULL;
-            return HDF_ERR_MALLOC_FAIL;
+            return false;
         }
     } else {
         *ptr = NULL;

@@ -555,9 +555,7 @@ static int32_t EcmDeviceDispatch(struct HdfDeviceIoClient *client, int cmd,
 
 static struct UsbInterface *EcmGetUsbInterfaceById(struct EcmDevice *ecm, uint8_t interfaceIndex)
 {
-    struct UsbInterface *tmpIf = NULL;
-    tmpIf =  (struct UsbInterface *)UsbClaimInterface(ecm->session, ecm->busNum, ecm->devAddr, interfaceIndex);
-    return tmpIf;
+    return UsbClaimInterface(ecm->session, ecm->busNum, ecm->devAddr, interfaceIndex);
 }
 
 static void EcmFreePipes(struct EcmDevice *ecm)
