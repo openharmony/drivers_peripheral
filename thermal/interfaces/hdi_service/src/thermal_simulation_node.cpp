@@ -15,6 +15,7 @@
 
 #include "thermal_simulation_node.h"
 
+#include <algorithm>
 #include <iostream>
 #include <cstring>
 #include <cstdio>
@@ -28,17 +29,18 @@
 #include "hdf_log.h"
 #include "securec.h"
 
+#define HDF_LOG_TAG ThermalSimulationNode
+
 namespace hdi {
 namespace thermal {
 namespace v1_0 {
 namespace {
-const int32_t MAX_BUFF_SIZE = 128;
-const int MAX_PATH = 256;
-const int ARG_0 = 0;
-const int ARG_1 = 1;
-const int ARG_2 = 2;
-const int ARG_3 = 3;
-const int ARG_4 = 4;
+const int32_t MAX_PATH = 256;
+const int32_t ARG_0 = 0;
+const int32_t ARG_1 = 1;
+const int32_t ARG_2 = 2;
+const int32_t ARG_3 = 3;
+const int32_t ARG_4 = 4;
 const std::string SIMULATION_TYPE_DIR = "/data/sensor/%s/type";
 const std::string SIMULATION_TEMP_DIR = "/data/sensor/%s/temp";
 std::string thermalDir = "/data/sensor/";
@@ -52,8 +54,7 @@ std::string mitigationNodeFileDir = "%s/%s";
 }
 int32_t ThermalSimulationNode::NodeInit()
 {
-    int32_t ret = -1;
-    ret = AddSensorTypeTemp();
+    int32_t ret = AddSensorTypeTemp();
     if (ret != HDF_SUCCESS) {
         return ret;
     }
@@ -66,9 +67,8 @@ int32_t ThermalSimulationNode::NodeInit()
 
 int32_t ThermalSimulationNode::CreateNodeDir(std::string dir)
 {
-    HDF_LOGI("%{public}s: Enter", __func__);
     if (access(dir.c_str(), 0) != HDF_SUCCESS) {
-        int flag = mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH| S_IXOTH);
+        int32_t flag = mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH| S_IXOTH);
         if (flag == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: Create directory successfully.", __func__);
         } else {
@@ -98,7 +98,7 @@ int32_t ThermalSimulationNode::CreateNodeFile(std::string filePath)
 
 int32_t ThermalSimulationNode::AddSensorTypeTemp()
 {
-    int32_t ret = -1;
+    int32_t ret;
     std::string file[] = {"type", "temp"};
     std::vector<std::string> vFile(file, file + ARG_2);
     std::map<std::string, int32_t> sensor;
@@ -134,13 +134,13 @@ int32_t ThermalSimulationNode::AddSensorTypeTemp()
         if (ret < HDF_SUCCESS) {
             return HDF_FAILURE;
         }
-        std::string type = dir.first + "\n";
+        std::string type = dir.first;
         WriteFile(typeBuf, type, type.length());
         ret = snprintf_s(tempBuf, PATH_MAX, sizeof(tempBuf) - ARG_1, thermalTempDir.c_str(), dir.first.c_str());
         if (ret < HDF_SUCCESS) {
             return HDF_FAILURE;
         }
-        std::string temp = std::to_string(dir.second) + "\n";
+        std::string temp = std::to_string(dir.second);
         WriteFile(tempBuf, temp, temp.length());
     }
     return HDF_SUCCESS;
@@ -148,7 +148,7 @@ int32_t ThermalSimulationNode::AddSensorTypeTemp()
 
 int32_t ThermalSimulationNode::AddMitigationDevice()
 {
-    int32_t ret = -1;
+    int32_t ret;
     std::string sensor[] = {"cpu", "charger", "gpu", "battery"};
     std::vector<std::string> vSensor(sensor, sensor + ARG_4);
     std::string cpu = "freq";
@@ -198,117 +198,13 @@ int32_t ThermalSimulationNode::AddMitigationDevice()
 
 int32_t ThermalSimulationNode::WriteFile(std::string path, std::string buf, size_t size)
 {
-    mutex_.lock();
     int32_t fd = open(path.c_str(), O_RDWR);
     if (fd < HDF_SUCCESS) {
         HDF_LOGE("%{public}s: open failed to file.", __func__);
     }
     write(fd, buf.c_str(), size);
-    mutex_.unlock();
     close(fd);
     return HDF_SUCCESS;
-}
-
-int32_t ThermalSimulationNode::SetTempRequest(std::string type, int32_t temp)
-{
-    HDF_LOGI("%{public}s: enter", __func__);
-    char tempBuf[MAX_PATH] = {0};
-    int32_t ret = -1;
-    ret = snprintf_s(tempBuf, PATH_MAX, sizeof(tempBuf) - ARG_1, thermalTempDir.c_str(), type.c_str());
-    if (ret < HDF_SUCCESS) {
-        return HDF_FAILURE;
-    }
-    std::string sTemp = std::to_string(temp);
-    WriteFile(tempBuf, sTemp, sTemp.length());
-    return HDF_SUCCESS;
-}
-
-int32_t ThermalSimulationNode::ReadFile(const char *path, char *buf, size_t size)
-{
-    std::lock_guard<std::mutex> lck(mutex_);
-    int32_t ret = -1;
-
-    int32_t fd = open(path, O_RDONLY);
-    if (fd < HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: open failed to file.", __func__);
-        return HDF_FAILURE;
-    }
-
-    ret = read(fd, buf, size);
-    if (ret < HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: failed to read file.", __func__);
-        close(fd);
-        return HDF_FAILURE;
-    }
-
-    close(fd);
-    buf[size - 1] = '\0';
-    return HDF_SUCCESS;
-}
-
-int32_t ThermalSimulationNode::ConvertInt(const std::string &value)
-{
-    return std::stoi(value);
-}
-
-int32_t ThermalSimulationNode::ParserSimulationNode()
-{
-    HDF_LOGI("%{public}s: Enter", __func__);
-    int32_t ret = -1;
-    int32_t value = -1;
-    char bufType[MAX_BUFF_SIZE] = {0};
-    char bufTemp[MAX_BUFF_SIZE] = {0};
-    char typeValue[MAX_BUFF_SIZE] = {0};
-    char tempValue[MAX_BUFF_SIZE] = {0};
-    std::vector<std::string> typeList;
-    typeList.push_back("battery");
-    typeList.push_back("charger");
-    typeList.push_back("pa");
-    typeList.push_back("ambient");
-    typeList.push_back("ap");
-    typeList.push_back("cpu");
-    typeList.push_back("soc");
-    typeList.push_back("shell");
-
-    ClearThermalZoneInfo();
-    for (auto type : typeList) {
-        ThermalZoneInfo thermalZoneInfo;
-        ret = snprintf_s(bufType, PATH_MAX, sizeof(bufType) - 1, SIMULATION_TYPE_DIR.c_str(), type.c_str());
-        if (ret < HDF_SUCCESS) {
-            return HDF_FAILURE;
-        }
-        ret = snprintf_s(bufTemp, PATH_MAX, sizeof(bufTemp) - 1, SIMULATION_TEMP_DIR.c_str(), type.c_str());
-        if (ret < HDF_SUCCESS) {
-            return HDF_FAILURE;
-        }
-        ret = ReadFile(bufType, typeValue, sizeof(typeValue));
-        if (ret != HDF_SUCCESS) {
-            return ret;
-        }
-        std::string sensorType = typeValue;
-        thermalZoneInfo.type = sensorType;
-        HDF_LOGI("%{public}s: parse type: %{public}s", __func__, sensorType.c_str());
-
-        ret = ReadFile(bufTemp, tempValue, sizeof(tempValue));
-        if (ret != HDF_SUCCESS) {
-            return ret;
-        }
-        std::string temp = tempValue;
-        value = ConvertInt(temp);
-        HDF_LOGI("%{public}s: parse temp: %{public}d", __func__, value);
-        thermalZoneInfo.temp = value;
-        tzInfoList_.push_back(thermalZoneInfo);
-    }
-    return HDF_SUCCESS;
-}
-
-void ThermalSimulationNode::ClearThermalZoneInfo()
-{
-    if (!tzInfoList_.empty()) {
-        tzInfoList_.clear();
-    } else {
-        return;
-    }
 }
 } // v1_0
 } // thermal

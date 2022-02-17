@@ -19,6 +19,8 @@
 #include "osal/osal_mem.h"
 #include "utils/hdf_log.h"
 
+#define HDF_LOG_TAG ThermalHdfConfig
+
 namespace hdi {
 namespace thermal {
 namespace v1_0 {
@@ -30,16 +32,10 @@ ThermalHdfConfig &ThermalHdfConfig::GetInsance()
 
 int32_t ThermalHdfConfig::ThermalHDIConfigInit(const std::string &path)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
-    if (!vbaseConfig_) {
-        vbaseConfig_ = std::make_shared<BaseInfoConfig>();
+    if (!baseConfig_) {
+        baseConfig_ = std::make_shared<BaseInfoConfig>();
     }
     return ParseThermalHdiXMLConfig(path);
-}
-
-std::map<std::string, uint32_t> ThermalHdfConfig::GetIntervalMap()
-{
-    return intervalMap_;
 }
 
 ThermalHdfConfig::ThermalTypeMap ThermalHdfConfig::GetSensorTypeMap()
@@ -49,7 +45,6 @@ ThermalHdfConfig::ThermalTypeMap ThermalHdfConfig::GetSensorTypeMap()
 
 int32_t ThermalHdfConfig::ParseThermalHdiXMLConfig(const std::string &path)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
     std::unique_ptr<xmlDoc, decltype(&xmlFreeDoc)> docPtr(
         xmlReadFile(path.c_str(), nullptr, XML_PARSE_NOBLANKS), xmlFreeDoc);
     if (docPtr == nullptr) {
@@ -85,63 +80,62 @@ int32_t ThermalHdfConfig::ParseThermalHdiXMLConfig(const std::string &path)
 
 void ThermalHdfConfig::ParseBaseNode(xmlNodePtr node)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
     auto cur = node->xmlChildrenNode;
     std::vector<BaseItem> vBase;
     while (cur != nullptr) {
         BaseItem item;
-        item.tag = (char*)xmlGetProp(cur, BAD_CAST"tag");
-        item.value = atoi((char *)xmlGetProp(cur, BAD_CAST"value"));
+        item.tag = (char *)xmlGetProp(cur, BAD_CAST"tag");
+        item.value = (char *)xmlGetProp(cur, BAD_CAST"value");
         HDF_LOGI("%{public}s: ParseBaseNode tag: %{public}s, value: %{public}s",
             __func__, item.tag.c_str(), item.value.c_str());
         vBase.push_back(item);
         cur = cur->next;
     }
-    vbaseConfig_->SetBase(vBase);
+    baseConfig_->SetBase(vBase);
 }
 
 void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
     auto cur  = node->xmlChildrenNode;
     while (cur != nullptr) {
+        std::shared_ptr<SensorInfoConfig> sensorInfo = std::make_shared<SensorInfoConfig>();
         std::string groupName = (char*)xmlGetProp(cur, BAD_CAST"name");
+        sensorInfo->SetGroupName(groupName);
         uint32_t interval = atoi((char*)xmlGetProp(cur, BAD_CAST"interval"));
         HDF_LOGI("%{public}s: ParsePollingNode groupName: %{public}s, interval: %{public}d",
             __func__, groupName.c_str(), interval);
-        intervalMap_.emplace(std::pair(groupName, interval));
-        std::shared_ptr<SensorInfoConfig> sensorInfo = std::make_shared<SensorInfoConfig>();
-        std::vector<XMLThermalZoneInfo> vXtz;
-        std::vector<XMLThermalNodeInfo> vXtn;
+        sensorInfo->SetGroupInterval(interval);
+        std::vector<XMLThermalZoneInfo> xmlTzInfoList;
+        std::vector<XMLThermalNodeInfo> xmlTnInfoList;
         for (auto subNode = cur->children; subNode; subNode = subNode->next) {
             if (!xmlStrcmp(subNode->name, BAD_CAST"thermal_zone")) {
                 XMLThermalZoneInfo tz;
                 GetThermalZoneNodeInfo(tz, subNode);
                 HDF_LOGI("%{public}s: ParsePollingNode ParsePollingNodetztype: %{public}s, replace: %{public}s",
                     __func__, tz.type.c_str(), tz.replace.c_str());
-                vXtz.push_back(tz);
+                xmlTzInfoList.push_back(tz);
             } else if (!xmlStrcmp(subNode->name, BAD_CAST"thermal_node")) {
                 XMLThermalNodeInfo tn;
-                tn.type = (char*)xmlGetProp(subNode, BAD_CAST"type");
-                tn.path = (char*)xmlGetProp(subNode, BAD_CAST"path");
+                tn.type = (char *)xmlGetProp(subNode, BAD_CAST"type");
+                tn.path = (char *)xmlGetProp(subNode, BAD_CAST"path");
                 HDF_LOGI("%{public}s: ParsePollingNode tntype: %{public}s, path: %{public}s",
                     __func__, tn.type.c_str(), tn.path.c_str());
-                vXtn.push_back(tn);
+                xmlTnInfoList.push_back(tn);
             }
         }
-        sensorInfo->SetXMLThermalZoneInfo(vXtz);
-        sensorInfo->SetXMLThermalNodeInfo(vXtn);
-        typesMap_.emplace(std::pair(groupName, sensorInfo));
+        sensorInfo->SetXMLThermalZoneInfo(xmlTzInfoList);
+        sensorInfo->SetXMLThermalNodeInfo(xmlTnInfoList);
+        typesMap_.insert(std::make_pair(groupName, sensorInfo));
         cur = cur->next;
     }
 }
 
 void ThermalHdfConfig::GetThermalZoneNodeInfo(XMLThermalZoneInfo &tz, const xmlNode* node)
 {
-    tz.type = (char*)xmlGetProp(node, BAD_CAST"type");
+    tz.type = (char *)xmlGetProp(node, BAD_CAST"type");
     auto replace = xmlGetProp(node, BAD_CAST("replace"));
-    if (replace != NULL) {
-        tz.replace = (char*)replace;
+    if (replace != nullptr) {
+        tz.replace = (char *)replace;
         tz.isReplace = true;
     }
 }

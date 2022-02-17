@@ -50,12 +50,18 @@ public:
     void ParsePollingNode(xmlNodePtr node);
     void ParseConfigInfo(const xmlNode *cur, std::vector<XMLThermalZoneInfo> &tzInfoList,
         std::vector<XMLThermalNodeInfo> &tnInfoList);
-    std::map<std::string, uint32_t> GetIntervalMap();
     ThermalTypeMap GetSensorTypeMap();
+    void SetSensorTypeMap(const ThermalTypeMap& typesMap)
+    {
+        typesMap_ = typesMap;
+    }
     void GetThermalZoneNodeInfo(XMLThermalZoneInfo &tz, const xmlNode* node);
+    std::shared_ptr<BaseInfoConfig> GetBaseConfig()
+    {
+        return baseConfig_;
+    }
 private:
-    std::shared_ptr<BaseInfoConfig> vbaseConfig_;
-    std::map<std::string, uint32_t> intervalMap_;
+    std::shared_ptr<BaseInfoConfig> baseConfig_;
     ThermalTypeMap typesMap_;
     XMLThermal thermal_;
 };
