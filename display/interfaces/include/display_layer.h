@@ -50,7 +50,7 @@ typedef struct {
     /**
      * @brief Initializes a display device.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
@@ -64,7 +64,7 @@ typedef struct {
     /**
      * @brief Deinitializes a display device.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
@@ -78,7 +78,7 @@ typedef struct {
     /**
      * @brief Obtains information about a display device.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param dispInfo Indicates the pointer to the display device information obtained.
      *
@@ -95,7 +95,7 @@ typedef struct {
      * Before using a layer on the GUI, you must open the layer based on the layer information. After the layer is
      * opened, you can obtain the layer ID and then use other functions based on the layer ID.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerInfo Indicates the pointer to the layer information passed to open a layer, including the layer
      * type, layer size, and pixel format.
@@ -113,7 +113,7 @@ typedef struct {
     /**
      * @brief Closes a layer that is no longer required on a specified display device.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -131,7 +131,7 @@ typedef struct {
      *
      * A visible layer is displayed on the screen, whereas an invisible layer is not displayed on the screen.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -149,7 +149,7 @@ typedef struct {
     /**
      * @brief Checks whether a layer is visible.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -167,7 +167,7 @@ typedef struct {
     /**
      * @brief Sets the size of a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -184,7 +184,7 @@ typedef struct {
     /**
      * @brief Obtains the size of a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -201,7 +201,7 @@ typedef struct {
     /**
      * @brief Sets the rectangular area to crop for a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -219,7 +219,7 @@ typedef struct {
      *
      * A larger z-order value indicates a higher layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -236,7 +236,7 @@ typedef struct {
     /**
      * @brief Obtains the z-order of a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -254,7 +254,7 @@ typedef struct {
     /**
      * @brief Sets layer premultiplication.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -272,7 +272,7 @@ typedef struct {
     /**
      * @brief Obtains the premultiplication flag of a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -289,7 +289,7 @@ typedef struct {
     /**
      * @brief Sets the alpha value for a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -306,7 +306,7 @@ typedef struct {
     /**
      * @brief Obtains the alpha value of a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -323,7 +323,7 @@ typedef struct {
     /**
      * @brief Sets the color key for a layer. The color key is used during layer overlay.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -341,7 +341,7 @@ typedef struct {
     /**
      * @brief Obtains the color key of a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -359,7 +359,7 @@ typedef struct {
     /**
      * @brief Sets the palette for a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -377,7 +377,7 @@ typedef struct {
     /**
      * @brief Obtains the palette of a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -395,7 +395,7 @@ typedef struct {
     /**
      * @brief Sets the transform mode for rotating, scaling, or moving a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -413,7 +413,7 @@ typedef struct {
      *
      * In specific scenarios, images need to be compressed. You can set whether to enable layer compression.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -431,7 +431,7 @@ typedef struct {
     /**
      * @brief Checks whether the compression feature is enabled for a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -451,7 +451,7 @@ typedef struct {
      * After the GUI draws an image, you must set the layer flushing area before calling the {@link Flush} function to
      * flush the screen.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -470,7 +470,7 @@ typedef struct {
      * After drawing a picture in the buffer, the application calls the {@link Flush} function to display the picture
      * on the screen.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -489,7 +489,7 @@ typedef struct {
      *
      * Display data in the buffer is flushed to a specified layer so that the image data is displayed on the screen.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -508,7 +508,7 @@ typedef struct {
      * This function blocks the process until vertical blanking arrives, implementing the synchronization between
      * software and hardware.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -527,7 +527,7 @@ typedef struct {
      * This function saves the screenshot of image data on the display device to the buffer for debugging or as
      * requested by applications.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param buffer Indicates the pointer to the buffer for saving screenshots.
      *
@@ -542,7 +542,7 @@ typedef struct {
      * @brief Set the visible region for a layer
      *
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -561,7 +561,7 @@ typedef struct {
      * @brief Set the buffer for a layer.
      *
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -580,7 +580,7 @@ typedef struct {
      * @brief Extension interface
      *
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -597,7 +597,7 @@ typedef struct {
      * @brief set the composition type which the client expect
      *
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -614,7 +614,7 @@ typedef struct {
      * @brief set the blend type
      *
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -628,10 +628,10 @@ typedef struct {
     int32_t (*SetLayerBlendType)(uint32_t devId, uint32_t layerId, BlendType type);
 
     /**
-     * @brief Sets the 4x4 color transformation matrix.
+     * @brief Sets a 4x4 color transformation matrix.
      *
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -645,9 +645,9 @@ typedef struct {
     int32_t (*SetLayerColorTransform)(uint32_t devId, uint32_t layerId, const float *matrix);
 
     /**
-     * @brief Sets the color data space for a layer.
+     * @brief Sets a color data space for a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -661,9 +661,9 @@ typedef struct {
     int32_t (*SetLayerColorDataSpace)(uint32_t devId, uint32_t layerId, ColorDataSpace colorSpace);
 
     /**
-     * @brief Obtains the color data space value of a layer.
+     * @brief Obtains the color data space of a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -677,9 +677,9 @@ typedef struct {
     int32_t (*GetLayerColorDataSpace)(uint32_t devId, uint32_t layerId, ColorDataSpace *colorSpace);
 
     /**
-     * @brief Sets the metadata for a layer.
+     * @brief Sets metadata for a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
@@ -694,9 +694,9 @@ typedef struct {
     int32_t (*SetLayerMetaData)(uint32_t devId, uint32_t layerId, uint32_t num, const HDRMetaData *metaData);
 
     /**
-     * @brief Sets the metadata set for a layer.
+     * @brief Sets a metadata set for a layer.
      *
-     * @param devId Indicates the ID of a display device. The value ranges from 0 to 4, where 0 indicates the first
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
