@@ -21,6 +21,7 @@
 #include "ithermal_callback.h"
 #include "thermal_hdf_config.h"
 #include "thermal_simulation_node.h"
+#include "thermal_zone_manager.h"
 
 namespace hdi {
 namespace thermal {
@@ -33,36 +34,41 @@ class ThermalHdfTimer {
 public:
     using Callback = std::function<void(ThermalHdfTimer*, void*)>;
 
-    ThermalHdfTimer(const std::shared_ptr<ThermalSimulationNode> &node, const sptr<IThermalCallback> &theramalCb);
-    ~ThermalHdfTimer() {};
+    ThermalHdfTimer(const std::shared_ptr<ThermalSimulationNode> &node,
+        const std::shared_ptr<ThermalZoneManager> &thermalZoneMgr);
+    ~ThermalHdfTimer() {}
 
-    void UpdateTzInfo(const std::string &pollingName,
-        HdfThermalCallbackInfo &infoEvent);
-    void UpdatePollingInfo();
     int32_t Init();
-    void Notify();
+    void ReportThermalData();
     int32_t LoopingThreadEntry(void *arg, int32_t epfd);
     void Run(void *service, int32_t epfd);
     void StartThread(void *service);
-    int32_t RegisterCallback(const int fd, const EventType et, int32_t epfd);
-    void SetTimerInterval(int interval, int32_t timerfd);
-    void CompareTzInfo(const std::vector<XMLThermalZoneInfo> &tzInfoList, const ThermalZoneInfo &tzInfo,
-        HdfThermalCallbackInfo& infoEvent);
-    void CompareTnInfo(const std::vector<XMLThermalNodeInfo> &tnInfoList, const ThermalZoneInfo &tzInfo,
-      HdfThermalCallbackInfo& infoEvent);
+    int32_t RegisterCallback(const int32_t fd, const EventType et, int32_t epfd);
+    void SetTimerInterval(int32_t interval, int32_t timerfd);
+    void ResetCount();
+    void SetSimluationFlag();
+    int32_t GetSimluationFlag();
+    void SetSimFlag(int32_t flag);
+    void SetThermalEventCb(const sptr<IThermalCallback> &thermalCb);
+    void DumpSensorConfigInfo();
 private:
     int32_t InitProviderTimer();
     void TimerProviderCallback(void *service);
     int32_t CreateProviderFd();
-private:
+
     int32_t epFd_ {-1};
     int32_t timerFd_ {-1};
     int32_t timerInterval_ {-1};
     std::map<int32_t, Callback> callbackHandler_;
     std::shared_ptr<ThermalSimulationNode> node_;
+    std::shared_ptr<ThermalZoneManager> thermalZoneMgr_;
     HdfThermalCallbackInfo tzInfoEventV1_;
     HdfThermalCallbackInfo tzInfoEventV2_;
-    sptr<IThermalCallback> theramalCb_;
+    HdfThermalCallbackInfo tzInfoEvent_;
+    sptr<IThermalCallback> thermalCb_;
+    std::vector<int32_t> multipleList_;
+    int32_t reportTime_;
+    int32_t isSim_;
 };
 } // v1_0
 } // thermal

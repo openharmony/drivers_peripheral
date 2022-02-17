@@ -31,14 +31,14 @@ using namespace hdi::thermal::v1_0;
 using namespace testing::ext;
 
 namespace {
-    sptr<IThermalInterface> g_thermalInterface = nullptr;
-    sptr<IThermalCallback> g_callback = new ThermalCallbackService();
-    std::mutex g_mutex;
-    const uint32_t MAX_PATH = 256;
-    const uint32_t WAIT_TIME = 1;
-    const std::string CPU_FREQ_PATH = "/data/cooling/cpu/freq";
-    const std::string GPU_FREQ_PATH = "/data/cooling/gpu/freq";
-    const std::string BATTERY_CHARGER_CURRENT_PATH = "/data/cooling/charger/current";
+sptr<IThermalInterface> g_thermalInterface = nullptr;
+sptr<IThermalCallback> g_callback = new ThermalCallbackService();
+std::mutex g_mutex;
+const uint32_t MAX_PATH = 256;
+const uint32_t WAIT_TIME = 1;
+const std::string CPU_FREQ_PATH = "/data/cooling/cpu/freq";
+const std::string GPU_FREQ_PATH = "/data/cooling/gpu/freq";
+const std::string BATTERY_CHARGER_CURRENT_PATH = "/data/cooling/battery/current";
 }
 
 class HdfThermalHdiTest : public testing::Test {

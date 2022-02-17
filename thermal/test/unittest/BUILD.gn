@@ -37,7 +37,6 @@ ohos_unittest("hdi_unittest_thermal") {
   ]
 
   deps = [
-    "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_proxy_1.0",
     "//drivers/peripheral/thermal/interfaces/hdi_callback:libthermal_callback",
   ]
 
@@ -46,6 +45,7 @@ ohos_unittest("hdi_unittest_thermal") {
       "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
+      "thermal_device_driver:libthermal_proxy_1.0",
       "utils_base:utils",
     ]
   } else {
