@@ -13,14 +13,16 @@
  * limitations under the License.
  */
 
-#include "sensor_if_service.h"
+#include "sensor_impl.h"
 #include <hdf_base.h>
 #include <hdf_log.h>
 
 #define HDF_LOG_TAG    hdf_sensor_dal
 
-namespace sensor {
-namespace v1_0 {
+namespace OHOS {
+namespace HDI {
+namespace Sensor {
+namespace V1_0 {
 namespace {
     enum SensorIndex {
         TRADITIONAL_SENSOR_INDEX = 0,
@@ -78,7 +80,7 @@ int SensorDataCallback(const struct SensorEvents *event)
     return 0;
 }
 
-void SensorIfService::Init()
+void SensorImpl::Init()
 {
     sensorInterface = NewSensorInterfaceInstance();
     if (sensorInterface == NULL) {
@@ -86,7 +88,7 @@ void SensorIfService::Init()
     }
 }
 
-int32_t SensorIfService::GetAllSensorInfo(std::vector<HdfSensorInformation>& info)
+int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformation>& info)
 {
     if (sensorInterface == NULL || sensorInterface->GetAllSensors == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
@@ -131,7 +133,7 @@ int32_t SensorIfService::GetAllSensorInfo(std::vector<HdfSensorInformation>& inf
     return HDF_SUCCESS;
 }
 
-int32_t SensorIfService::Enable(int32_t sensorId)
+int32_t SensorImpl::Enable(int32_t sensorId)
 {
     if (sensorInterface == NULL || sensorInterface->Enable == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
@@ -146,7 +148,7 @@ int32_t SensorIfService::Enable(int32_t sensorId)
     return ret;
 }
 
-int32_t SensorIfService::Disable(int32_t sensorId)
+int32_t SensorImpl::Disable(int32_t sensorId)
 {
     if (sensorInterface == NULL || sensorInterface->Disable == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
@@ -161,7 +163,7 @@ int32_t SensorIfService::Disable(int32_t sensorId)
     return ret;
 }
 
-int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
+int32_t SensorImpl::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
     if (sensorInterface == NULL || sensorInterface->SetBatch == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
@@ -176,7 +178,7 @@ int32_t SensorIfService::SetBatch(int32_t sensorId, int64_t samplingInterval, in
     return ret;
 }
 
-int32_t SensorIfService::SetMode(int32_t sensorId, int32_t mode)
+int32_t SensorImpl::SetMode(int32_t sensorId, int32_t mode)
 {
     if (sensorInterface == NULL || sensorInterface->SetMode == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
@@ -191,7 +193,7 @@ int32_t SensorIfService::SetMode(int32_t sensorId, int32_t mode)
     return ret;
 }
 
-int32_t SensorIfService::SetOption(int32_t sensorId, uint32_t option)
+int32_t SensorImpl::SetOption(int32_t sensorId, uint32_t option)
 {
     if (sensorInterface == NULL || sensorInterface->SetOption == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
@@ -206,7 +208,7 @@ int32_t SensorIfService::SetOption(int32_t sensorId, uint32_t option)
     return ret;
 }
 
-int32_t SensorIfService::Register(int32_t sensorId, const sptr<ISensorCallback>& callbackObj)
+int32_t SensorImpl::Register(int32_t sensorId, const sptr<ISensorCallback>& callbackObj)
 {
     if (sensorInterface == NULL || sensorInterface->Register == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
@@ -259,7 +261,7 @@ int32_t SensorIfService::Register(int32_t sensorId, const sptr<ISensorCallback>&
     return ret;
 }
 
-int32_t SensorIfService::Unregister(int32_t sensorId, const sptr<ISensorCallback>& callbackObj)
+int32_t SensorImpl::Unregister(int32_t sensorId, const sptr<ISensorCallback>& callbackObj)
 {
     if (sensorInterface == NULL || sensorInterface->Unregister == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
@@ -307,5 +309,7 @@ int32_t SensorIfService::Unregister(int32_t sensorId, const sptr<ISensorCallback
 
     return ret;
 }
-} // v1_0
-} // sensor
+} // V1_0
+} // Sensor
+} // HDI
+} // OHOS

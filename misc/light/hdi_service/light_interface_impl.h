@@ -13,21 +13,28 @@
  * limitations under the License.
  */
 
-#include "power_hdi_callback_service.h"
-#include <hdf_base.h>
+#ifndef OHOS_HDI_LIGHT_V1_0_LIGHTINTERFACEIMPL_H
+#define OHOS_HDI_LIGHT_V1_0_LIGHTINTERFACEIMPL_H
 
-namespace hdi {
-namespace power {
-namespace v1_0 {
-int32_t PowerHdiCallbackService::OnSuspend()
-{
-    return HDF_SUCCESS;
-}
+#include "light_interface_stub.h"
 
-int32_t PowerHdiCallbackService::OnWakeup()
-{
-    return HDF_SUCCESS;
-}
-} // v1_0
-} // power
-} // hdi
+namespace OHOS {
+namespace HDI {
+namespace Light {
+namespace V1_0 {
+class LightInterfaceImpl : public LightInterfaceStub {
+public:
+    virtual ~LightInterfaceImpl() {}
+
+    int32_t GetLightInfo(std::vector<HdfLightInfo>& info) override;
+
+    int32_t TurnOnLight(int32_t lightId, const HdfLightEffect& effect) override;
+
+    int32_t TurnOffLight(int32_t LightId) override;
+};
+} // V1_0
+} // Light
+} // HDI
+} // OHOS
+
+#endif // OHOS_HDI_LIGHT_V1_0_LIGHTINTERFACEIMPL_H

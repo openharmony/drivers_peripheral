@@ -31,11 +31,10 @@
       ],
       "inner_kits": [
         {
-          "name": "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_proxy_1.0",
+          "name": "//drivers/interface/thermal/v1_0:libthermal_proxy_1.0",
           "header": {
             "header_files": [
-                "thermal_callback_service.h",
-                "thermal_types.h"
+                "thermal_callback_impl.h"
             ],
             "header_base": "//drivers/peripheral/thermal/interfaces/include"
           }

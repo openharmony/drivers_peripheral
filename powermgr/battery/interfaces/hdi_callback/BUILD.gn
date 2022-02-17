@@ -15,10 +15,10 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libbattery_callback") {
   include_dirs = [ "../include" ]
-  sources = [ "./battery_callback_service.cpp" ]
+  sources = [ "./battery_callback_impl.cpp" ]
 
   deps = [
-    "../hdi/battery/v1_0:libbattery_proxy_1.0",
+    "//drivers/interface/battery/v1_0:libbattery_proxy_1.0",
     "//utils/native/base:utils",
   ]
 

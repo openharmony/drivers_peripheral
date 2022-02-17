@@ -19,15 +19,15 @@
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
 #include "sensor_if.h"
-#include "sensor_if_service.h"
+#include "sensor_impl.h"
 
 #define HDF_LOG_TAG    hdf_sensor_if_driver
 
-using namespace sensor::v1_0;
+using namespace OHOS::HDI::Sensor::V1_0;
 
 struct HdfSensorInterfaceHost {
     struct IDeviceIoService ioservice;
-    SensorIfService *service;
+    SensorImpl *service;
 };
 
 static int32_t SensorInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
@@ -73,7 +73,7 @@ static int HdfSensorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfSensorInterfaceHost->ioservice.Dispatch = SensorInterfaceDriverDispatch;
     hdfSensorInterfaceHost->ioservice.Open = NULL;
     hdfSensorInterfaceHost->ioservice.Release = NULL;
-    hdfSensorInterfaceHost->service = new SensorIfService();
+    hdfSensorInterfaceHost->service = new SensorImpl();
 
     deviceObject->service = &hdfSensorInterfaceHost->ioservice;
     HDF_LOGI("HdfSensorInterfaceDriverBind Success");

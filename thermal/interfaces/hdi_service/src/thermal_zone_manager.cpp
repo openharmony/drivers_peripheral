@@ -30,9 +30,10 @@
 #include "osal/osal_mem.h"
 
 using namespace std;
-namespace hdi {
-namespace thermal {
-namespace v1_0 {
+namespace OHOS {
+namespace HDI {
+namespace Thermal {
+namespace V1_0 {
 namespace {
 const int32_t MAX_BUFF_SIZE = 128;
 const int32_t MAX_SYSFS_SIZE = 128;
@@ -202,6 +203,7 @@ void ThermalZoneManager::ClearThermalZoneInfo()
         return;
     }
 }
-} // v1_0
-} // thermal
-} // hdi
+} // V1_0
+} // Thermal
+} // HDI
+} // OHOS

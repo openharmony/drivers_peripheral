@@ -26,11 +26,10 @@
         ],
         "inner_kits": [
           {
-            "name": "//drivers/peripheral/power/interfaces/hdi/power/v1_0:libpower_proxy_1.0",
+            "name": "//drivers/interface/power/v1_0:libpower_proxy_1.0",
             "header": {
               "header_files": [
-                  "power_hdi_callback_service.h",
-                  "power_types.h"
+                  "power_hdi_callback_impl.h"
               ],
               "header_base": "//drivers/peripheral/power/interfaces/include"
             }

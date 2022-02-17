@@ -13,15 +13,16 @@
  * limitations under the License.
  */
 
-#include "thermal_callback_service.h"
+#include "thermal_callback_impl.h"
 #include <hdf_base.h>
 #include <hdf_log.h>
 
-namespace hdi {
-namespace thermal {
-namespace v1_0 {
-ThermalCallbackService::ThermalEventCallback ThermalCallbackService::eventCb_ = nullptr;
-int32_t ThermalCallbackService::OnThermalDataEvent(const HdfThermalCallbackInfo& event)
+namespace OHOS {
+namespace HDI {
+namespace Thermal {
+namespace V1_0 {
+ThermalCallbackImpl::ThermalEventCallback ThermalCallbackImpl::eventCb_ = nullptr;
+int32_t ThermalCallbackImpl::OnThermalDataEvent(const HdfThermalCallbackInfo& event)
 {
     int size = static_cast<int>(event.info.size());
     HDF_LOGI("%{public}s event.info.size=%{public}d", __func__, size);
@@ -37,11 +38,12 @@ int32_t ThermalCallbackService::OnThermalDataEvent(const HdfThermalCallbackInfo&
     return eventCb_(event);
 }
 
-int32_t ThermalCallbackService::RegisterThermalEvent(const ThermalEventCallback &eventCb)
+int32_t ThermalCallbackImpl::RegisterThermalEvent(const ThermalEventCallback &eventCb)
 {
     eventCb_ = eventCb;
     return HDF_SUCCESS;
 }
-} // v1_0
-} // thermal
-} // hdi
+} // V1_0
+} // Thermal
+} // HDI
+} // OHOS

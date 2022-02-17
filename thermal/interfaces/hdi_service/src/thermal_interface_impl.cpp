@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "thermal_interface_service.h"
+#include "thermal_interface_impl.h"
 
 #include <thread>
 #include <memory>
@@ -24,9 +24,10 @@
 #include "thermal_simulation_node.h"
 #include "thermal_device_mitigation.h"
 
-namespace hdi {
-namespace thermal {
-namespace v1_0 {
+namespace OHOS {
+namespace HDI {
+namespace Thermal {
+namespace V1_0 {
 namespace {
 const std::string FILE_NAME = HDF_ETC_DIR "/thermal_config/hdf/thermal_hdi_config.xml";
 }
@@ -36,12 +37,12 @@ static std::shared_ptr<ThermalHdfTimer> hdfTimer_ = nullptr;
 static std::shared_ptr<ThermalSimulationNode> simulation_ = nullptr;
 static std::shared_ptr<ThermalDeviceMitigation> mitigation_ = nullptr;
 
-ThermalInterfaceService::ThermalInterfaceService()
+ThermalInterfaceImpl::ThermalInterfaceImpl()
 {
     Init();
 }
 
-int32_t ThermalInterfaceService::Init()
+int32_t ThermalInterfaceImpl::Init()
 {
     int32_t ret = -1;
     if (simulation_ == nullptr) {
@@ -64,7 +65,7 @@ int32_t ThermalInterfaceService::Init()
     return HDF_SUCCESS;
 }
 
-int32_t ThermalInterfaceService::SetCpuFreq(int32_t freq)
+int32_t ThermalInterfaceImpl::SetCpuFreq(int32_t freq)
 {
     HDF_LOGI("%{public}s: service get cpu freq=%{public}d", __func__, freq);
     if (mitigation_ != nullptr) {
@@ -77,7 +78,7 @@ int32_t ThermalInterfaceService::SetCpuFreq(int32_t freq)
     return HDF_SUCCESS;
 }
 
-int32_t ThermalInterfaceService::SetGpuFreq(int32_t freq)
+int32_t ThermalInterfaceImpl::SetGpuFreq(int32_t freq)
 {
     int32_t ret = mitigation_->GpuRequest(freq);
     if (mitigation_ != nullptr) {
@@ -89,7 +90,7 @@ int32_t ThermalInterfaceService::SetGpuFreq(int32_t freq)
     return HDF_SUCCESS;
 }
 
-int32_t ThermalInterfaceService::SetBatteryCurrent(int32_t current)
+int32_t ThermalInterfaceImpl::SetBatteryCurrent(int32_t current)
 {
     if (mitigation_ != nullptr) {
         int32_t ret = mitigation_->ChargerRequest(current);
@@ -101,7 +102,7 @@ int32_t ThermalInterfaceService::SetBatteryCurrent(int32_t current)
     return HDF_SUCCESS;
 }
 
-int32_t ThermalInterfaceService::GetThermalZoneInfo(HdfThermalCallbackInfo& event)
+int32_t ThermalInterfaceImpl::GetThermalZoneInfo(HdfThermalCallbackInfo& event)
 {
     if (simulation_ != nullptr) {
         event.info = simulation_->GetTzInfoList();
@@ -109,7 +110,7 @@ int32_t ThermalInterfaceService::GetThermalZoneInfo(HdfThermalCallbackInfo& even
     return HDF_SUCCESS;
 }
 
-int32_t ThermalInterfaceService::Register(const sptr<IThermalCallback>& callbackObj)
+int32_t ThermalInterfaceImpl::Register(const sptr<IThermalCallback>& callbackObj)
 {
     HDF_LOGI("%{public}s: service register callback", __func__);
     int32_t ret = -1;
@@ -124,11 +125,12 @@ int32_t ThermalInterfaceService::Register(const sptr<IThermalCallback>& callback
     return HDF_SUCCESS;
 }
 
-int32_t ThermalInterfaceService::Unregister()
+int32_t ThermalInterfaceImpl::Unregister()
 {
     theramalCb_ = nullptr;
     return HDF_SUCCESS;
 }
-} // v1_0
-} // thermal
-} // hdi
+} // V1_0
+} // Thermal
+} // HDI
+} // OHOS
