@@ -23,6 +23,9 @@
 #include "thermal_hdf_timer.h"
 #include "thermal_simulation_node.h"
 #include "thermal_device_mitigation.h"
+#include "thermal_zone_manager.h"
+
+#define HDF_LOG_TAG ThermalInterfaceService
 
 namespace hdi {
 namespace thermal {
@@ -35,6 +38,7 @@ static std::shared_ptr<HdfThermalCallbackInfo> callbackInfo_ = nullptr;
 static std::shared_ptr<ThermalHdfTimer> hdfTimer_ = nullptr;
 static std::shared_ptr<ThermalSimulationNode> simulation_ = nullptr;
 static std::shared_ptr<ThermalDeviceMitigation> mitigation_ = nullptr;
+static std::shared_ptr<ThermalZoneManager> thermalZoneMgr_ = nullptr;
 
 ThermalInterfaceService::ThermalInterfaceService()
 {
@@ -43,30 +47,50 @@ ThermalInterfaceService::ThermalInterfaceService()
 
 int32_t ThermalInterfaceService::Init()
 {
-    int32_t ret = -1;
+    int32_t ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(FILE_NAME);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: failed to init XML, ret: %{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+
     if (simulation_ == nullptr) {
         simulation_ = std::make_shared<ThermalSimulationNode>();
+    }
+
+    if (thermalZoneMgr_ == nullptr) {
+        thermalZoneMgr_ = std::make_shared<ThermalZoneManager>();
+    }
+
+    if (mitigation_ == nullptr) {
+        mitigation_ = std::make_shared<ThermalDeviceMitigation>();
+    }
+
+    if (hdfTimer_ == nullptr) {
+        hdfTimer_ = std::make_shared<ThermalHdfTimer>(simulation_, thermalZoneMgr_);
+        hdfTimer_->SetSimluationFlag();
+    }
+
+    if (hdfTimer_->GetSimluationFlag()) {
         ret = simulation_->NodeInit();
         if (ret != HDF_SUCCESS) {
             return HDF_FAILURE;
         }
     }
 
-    ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(FILE_NAME);
+    thermalZoneMgr_->CalculateMaxCd();
+    thermalZoneMgr_->SetMultiples();
+    ret = thermalZoneMgr_->ParseThermalZoneInfo();
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: failed to init XML, ret: %{public}d", __func__, ret);
-        return HDF_FAILURE;
+        return ret;
     }
 
-    if (mitigation_ == nullptr) {
-        mitigation_ = std::make_shared<ThermalDeviceMitigation>();
-    }
+    hdfTimer_->DumpSensorConfigInfo();
+    mitigation_->SetFlag(static_cast<bool>(hdfTimer_->GetSimluationFlag()));
     return HDF_SUCCESS;
 }
 
 int32_t ThermalInterfaceService::SetCpuFreq(int32_t freq)
 {
-    HDF_LOGI("%{public}s: service get cpu freq=%{public}d", __func__, freq);
     if (mitigation_ != nullptr) {
         int32_t ret = mitigation_->CpuRequest(freq);
         if (ret != HDF_SUCCESS) {
@@ -79,8 +103,8 @@ int32_t ThermalInterfaceService::SetCpuFreq(int32_t freq)
 
 int32_t ThermalInterfaceService::SetGpuFreq(int32_t freq)
 {
-    int32_t ret = mitigation_->GpuRequest(freq);
     if (mitigation_ != nullptr) {
+        int32_t ret = mitigation_->GpuRequest(freq);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: failed to set freq %{public}d", __func__, ret);
             return ret;
@@ -94,7 +118,7 @@ int32_t ThermalInterfaceService::SetBatteryCurrent(int32_t current)
     if (mitigation_ != nullptr) {
         int32_t ret = mitigation_->ChargerRequest(current);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: failed to set freq %{public}d", __func__, ret);
+            HDF_LOGE("%{public}s: failed to set current %{public}d", __func__, ret);
             return ret;
         }
     }
@@ -103,23 +127,22 @@ int32_t ThermalInterfaceService::SetBatteryCurrent(int32_t current)
 
 int32_t ThermalInterfaceService::GetThermalZoneInfo(HdfThermalCallbackInfo& event)
 {
-    if (simulation_ != nullptr) {
-        event.info = simulation_->GetTzInfoList();
+    if (thermalZoneMgr_ != nullptr) {
+        event.info = thermalZoneMgr_->tzInfoAcaualEvent_.info;
     }
     return HDF_SUCCESS;
 }
 
 int32_t ThermalInterfaceService::Register(const sptr<IThermalCallback>& callbackObj)
 {
-    HDF_LOGI("%{public}s: service register callback", __func__);
-    int32_t ret = -1;
+    int32_t ret;
     theramalCb_ = callbackObj;
-    if (hdfTimer_ == nullptr) {
-        hdfTimer_ = std::make_shared<ThermalHdfTimer>(simulation_, theramalCb_);
-        ret = hdfTimer_->Init();
-        if (ret != HDF_SUCCESS) {
-            return ret;
-        }
+    if (hdfTimer_ == nullptr) return HDF_FAILURE;
+    hdfTimer_->SetThermalEventCb(theramalCb_);
+
+    ret = hdfTimer_->Init();
+    if (ret != HDF_SUCCESS) {
+        return ret;
     }
     return HDF_SUCCESS;
 }

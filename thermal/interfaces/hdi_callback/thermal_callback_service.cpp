@@ -17,6 +17,8 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 
+#define HDF_LOG_TAG ThermalCallbackService
+
 namespace hdi {
 namespace thermal {
 namespace v1_0 {

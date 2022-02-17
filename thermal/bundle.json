@@ -34,12 +34,20 @@
           "name": "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_proxy_1.0",
           "header": {
             "header_files": [
-                "thermal_callback_service.h",
                 "thermal_types.h"
             ],
             "header_base": "//drivers/peripheral/thermal/interfaces/include"
           }
-        }
+        },
+        {
+            "name": "//drivers/peripheral/thermal/interfaces/hdi_callback:libthermal_callback",
+            "header": {
+              "header_files": [
+                  "thermal_callback_service.h"
+              ],
+              "header_base": "//drivers/peripheral/thermal/interfaces/include"
+            }
+          }
       ]
     }
   }

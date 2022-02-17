@@ -17,6 +17,7 @@
 #define SENSOR_INFO_CONFIG_H
 
 #include <string>
+#include <list>
 #include <vector>
 
 namespace hdi {
@@ -26,25 +27,45 @@ struct XMLThermalZoneInfo {
     std::string type;
     std::string replace;
     bool isReplace = false;
+    bool operator == (const std::string &sensorType)
+    {
+        return (this->type == sensorType);
+    }
 };
 
 struct XMLThermalNodeInfo {
     std::string type;
     std::string path;
+    bool operator == (const std::string &sensorType)
+    {
+        return (this->type == sensorType);
+    }
+};
+
+struct ReportedThermalData {
+    std::string type;
+    std::string tempPath;
 };
 
 class SensorInfoConfig {
 public:
     SensorInfoConfig() = default;
     ~SensorInfoConfig() = default;
-    void UpdateSensorInfo();
     void SetXMLThermalZoneInfo(std::vector<XMLThermalZoneInfo> &vXmlTz);
     void SetXMLThermalNodeInfo(std::vector<XMLThermalNodeInfo> &vXmlTn);
+    void SetGroupName(const std::string &groupName);
+    void SetGroupInterval(int32_t interval);
     std::vector<XMLThermalZoneInfo> GetXMLThermalZoneInfo();
     std::vector<XMLThermalNodeInfo> GetXMLThermalNodeInfo();
+    int32_t GetInterval();
+    std::string GetGroupName();
+    int32_t multiple_;
+    std::list<ReportedThermalData> thermalDataList_;
 private:
-    std::vector<XMLThermalZoneInfo> vXmlTz_;
-    std::vector<XMLThermalNodeInfo> vXmlTn_;
+    std::string groupName_;
+    std::int32_t interval_;
+    std::vector<XMLThermalZoneInfo> xmlTzInfoList_;
+    std::vector<XMLThermalNodeInfo> xmlTnInfoList_;
 };
 } // v1_0
 } // thermal
