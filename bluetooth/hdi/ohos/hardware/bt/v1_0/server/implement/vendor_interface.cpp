@@ -31,7 +31,7 @@ namespace OHOS {
 namespace HDI {
 namespace BT {
 namespace V1_0 {
-
+constexpr int MAX_BUFFER_SIZE = 1024;
 bt_vendor_callbacks_t VendorInterface::vendorCallbacks_ = {
     .size = sizeof(bt_vendor_callbacks_t),
     .init_cb = VendorInterface::OnInitCallback,
@@ -188,7 +188,8 @@ void VendorInterface::OnInitCallback(bt_op_result_t result)
 
 void *VendorInterface::OnMallocCallback(int size)
 {
-    if (size == 0) {
+    if (size <= 0 || size > MAX_BUFFER_SIZE) {
+        HDF_LOGE("%{public}s, size is invalid", __func__);
         return nullptr;
     }
     return malloc(size);
