@@ -19,9 +19,10 @@
 #include <string>
 #include <vector>
 
-namespace hdi {
-namespace thermal {
-namespace v1_0 {
+namespace OHOS {
+namespace HDI {
+namespace Thermal {
+namespace V1_0 {
 struct BaseItem {
     std::string tag;
     std::string value;
@@ -36,7 +37,9 @@ public:
 private:
     std::vector<BaseItem> vBase_;
 };
-} // v1_0
-} // thermal
-} // hdi
+} // V1_0
+} // Thermal
+} // HDI
+} // OHOS
+
 #endif // BASE_INFO_CONFIG_H

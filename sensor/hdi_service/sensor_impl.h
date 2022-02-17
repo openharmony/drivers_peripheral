@@ -13,20 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef SENSOR_V1_0_SENSORIFSERVICE_H
-#define SENSOR_V1_0_SENSORIFSERVICE_H
+#ifndef OHOS_HDI_SENSOR_V1_0_SENSORIMPL_H
+#define OHOS_HDI_SENSOR_V1_0_SENSORIMPL_H
 
 #include "sensor_if.h"
 #include "sensor_interface_stub.h"
 
-namespace sensor {
-namespace v1_0 {
-class SensorIfService : public SensorInterfaceStub {
+namespace OHOS {
+namespace HDI {
+namespace Sensor {
+namespace V1_0 {
+class SensorImpl : public SensorInterfaceStub {
 public:
-    SensorIfService(): sensorInterface(NULL)
+    SensorImpl(): sensorInterface(NULL)
     {}
 
-    virtual ~SensorIfService()
+    virtual ~SensorImpl()
     {
         FreeSensorInterfaceInstance();
     }
@@ -51,7 +53,9 @@ public:
 private:
     const SensorInterface *sensorInterface;
 };
-} // v1_0
-} // sensor
+} // V1_0
+} // Sensor
+} // HDI
+} // OHOS
 
-#endif // SENSOR_V1_0_SENSORIFSERVICE_H
+#endif // OHOS_HDI_SENSOR_V1_0_SENSORIMPL_H

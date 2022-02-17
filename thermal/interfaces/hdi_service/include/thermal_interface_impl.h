@@ -13,18 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef HDI_THERMAL_V1_0_THERMALINTERFACESERVICE_H
-#define HDI_THERMAL_V1_0_THERMALINTERFACESERVICE_H
+#ifndef HDI_THERMAL_V1_0_THERMALINTERFACEIMPL_H
+#define HDI_THERMAL_V1_0_THERMALINTERFACEIMPL_H
 
 #include "thermal_interface_stub.h"
 
-namespace hdi {
-namespace thermal {
-namespace v1_0 {
-class ThermalInterfaceService : public ThermalInterfaceStub {
+namespace OHOS {
+namespace HDI {
+namespace Thermal {
+namespace V1_0 {
+class ThermalInterfaceImpl : public ThermalInterfaceStub {
 public:
-    ThermalInterfaceService();
-    virtual ~ThermalInterfaceService() {}
+    ThermalInterfaceImpl();
+    virtual ~ThermalInterfaceImpl() {}
 
     int32_t SetCpuFreq(int32_t freq) override;
 
@@ -39,8 +40,9 @@ public:
     int32_t Unregister() override;
     int32_t Init();
 };
-} // v1_0
-} // thermal
-} // hdi
+} // V1_0
+} // Thermal
+} // HDI
+} // OHOS
 
-#endif // HDI_THERMAL_V1_0_THERMALINTERFACESERVICE_H
+#endif // HDI_THERMAL_V1_0_THERMALINTERFACEIMPL_H

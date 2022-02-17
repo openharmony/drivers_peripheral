@@ -22,7 +22,7 @@
 #include "osal_time.h"
 #include "light_interface_proxy.h"
 
-using namespace light::v1_0;
+using namespace OHOS::HDI::Light::V1_0;
 using namespace testing::ext;
 
 namespace {

@@ -13,41 +13,36 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_POWER_V1_0_POWERTYPES_H
-#define OHOS_HDI_POWER_V1_0_POWERTYPES_H
+#ifndef OHOS_HDI_POWER_V1_0_POWERINTERFACEIMPL_H
+#define OHOS_HDI_POWER_V1_0_POWERINTERFACEIMPL_H
 
-#include <string>
-#include <message_parcel.h>
+#include "power_interface_stub.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
 namespace V1_0 {
-using namespace OHOS;
+class PowerInterfaceImpl : public PowerInterfaceStub {
+public:
+    virtual ~PowerInterfaceImpl() {}
 
-enum PowerHdfCmd {
-    CMD_REGISTER_CALLBCK = 0,
-    CMD_START_SUSPEND,
-    CMD_STOP_SUSPEND,
-    CMD_FORCE_SUSPEND,
-    CMD_SUSPEND_BLOCK,
-    CMD_SUSPEND_UNBLOCK,
-    CMD_DUMP,
-};
+    int32_t RegisterCallback(const sptr<IPowerHdiCallback>& ipowerHdiCallback) override;
 
-enum PowerHdfCallbackCmd {
-    CMD_ON_SUSPEND = 0,
-    CMD_ON_WAKEUP,
-};
+    int32_t StartSuspend() override;
 
-enum PowerHdfState {
-    AWAKE = 0,
-    INACTIVE,
-    SLEEP,
+    int32_t StopSuspend() override;
+
+    int32_t ForceSuspend() override;
+
+    int32_t SuspendBlock(const std::string& name) override;
+
+    int32_t SuspendUnblock(const std::string& name) override;
+
+    int32_t PowerDump(std::string& info) override;
 };
 } // V1_0
 } // Power
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_POWER_V1_0_POWERTYPES_H
+#endif // OHOS_HDI_POWER_V1_0_POWERINTERFACEIMPL_H

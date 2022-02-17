@@ -13,16 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef HDI_THERMAL_V1_0_THERMALTYPES_H
-#define HDI_THERMAL_V1_0_THERMALTYPES_H
+#ifndef OHOS_HDI_THERMAL_V1_0_THERMALTYPES_H
+#define OHOS_HDI_THERMAL_V1_0_THERMALTYPES_H
 
 #include <string>
 #include <vector>
 #include <message_parcel.h>
 
-namespace hdi {
-namespace thermal {
-namespace v1_0 {
+namespace OHOS {
+namespace HDI {
+namespace Thermal {
+namespace V1_0 {
 using namespace OHOS;
 
 struct ThermalZoneInfo {
@@ -41,9 +42,9 @@ bool ThermalZoneInfoBlockUnmarshalling(OHOS::MessageParcel &data, ThermalZoneInf
 bool HdfThermalCallbackInfoBlockMarshalling(OHOS::MessageParcel &data, const HdfThermalCallbackInfo& dataBlock);
 
 bool HdfThermalCallbackInfoBlockUnmarshalling(OHOS::MessageParcel &data, HdfThermalCallbackInfo& dataBlock);
-} // v1_0
-} // thermal
-} // hdi
+} // V1_0
+} // Thermal
+} // HDI
+} // OHOS
 
-#endif // HDI_THERMAL_V1_0_THERMALTYPES_H
-
+#endif // OHOS_HDI_THERMAL_V1_0_THERMALTYPES_H

@@ -13,10 +13,28 @@
  * limitations under the License.
  */
 
-package hdi.battery.v1_0;
+#ifndef OHOS_HDI_VIBRATOR_V1_0_VIBRATORINTERFACEIMPL_H
+#define OHOS_HDI_VIBRATOR_V1_0_VIBRATORINTERFACEIMPL_H
 
-import hdi.battery.v1_0.Types;
+#include "vibrator_interface_stub.h"
 
-[callback] interface IBatteryCallback {
-    Update([in] struct CallbackInfo event);
-}
+namespace OHOS {
+namespace HDI {
+namespace Vibrator {
+namespace V1_0 {
+class VibratorInterfaceImpl : public VibratorInterfaceStub {
+public:
+    virtual ~VibratorInterfaceImpl() {}
+
+    int32_t StartOnce(uint32_t duration) override;
+
+    int32_t Start(const std::string& effectType) override;
+
+    int32_t Stop(HdfVibratorMode mode) override;
+};
+} // V1_0
+} // Vibrator
+} // HDI
+} // OHOS
+
+#endif // OHOS_HDI_VIBRATOR_V1_0_VIBRATORINTERFACEIMPL_H

@@ -22,14 +22,14 @@
 #include "osal_time.h"
 #include "sensor_interface_proxy.h"
 #include "sensor_type.h"
-#include "sensor_callback_service.h"
+#include "sensor_callback_impl.h"
 
-using namespace sensor::v1_0;
+using namespace OHOS::HDI::Sensor::V1_0;
 using namespace testing::ext;
 
 namespace {
     sptr<ISensorInterface>  g_sensorInterface = nullptr;
-    sptr<ISensorCallback> g_callback = new SensorCallbackService();
+    sptr<ISensorCallback> g_callback = new SensorCallbackImpl();
     struct SensorValueRange {
         float highThreshold;
         float lowThreshold;
