@@ -20,7 +20,7 @@
 #include <map>
 #include <string>
 #include <mutex>
-
+#include "thermal_hdf_config.h"
 #include "thermal_types.h"
 
 namespace hdi {
@@ -30,18 +30,20 @@ struct ThermalZoneSysfsPathInfo {
     char* name;
     char temperturePath[PATH_MAX];
     char typePath[PATH_MAX];
+    int32_t fd;
 };
 
 struct ThermalSysfsPathInfo {
     char* name;
     char thermalZonePath[PATH_MAX];
     char coolingDevicePath[PATH_MAX];
+    int32_t fd;
 };
 
 class ThermalZoneManager {
 public:
-    ThermalZoneManager() {}
-    ~ThermalZoneManager() {}
+    ThermalZoneManager() = default;
+    ~ThermalZoneManager() = default;
 
     ThermalZoneSysfsPathInfo GetTzPathInfo()
     {
@@ -63,27 +65,30 @@ public:
         return tzInfoList_;
     }
 
-    inline int32_t ConvertInt(std::string value)
+    int32_t ConvertInt(std::string value)
     {
         return std::stoi(value.c_str());
     }
 
     int32_t InitThermalZoneSysfs();
     int32_t ParseThermalZoneInfo();
-    int32_t ReadThermalSysfsToBuff(const char *path, char *buf, size_t size);
-    int32_t ReadThermalSysfsPath(const char *path, char *buf, size_t size);
+    void Trim(char* str) const;
+    int32_t ReadThermalSysfsToBuff(const char* path, char* buf, size_t size) const;
+    int32_t ReadSysfsFile(const char* path, char* buf, size_t size) const;
     void FormatThermalSysfsPaths(struct ThermalSysfsPathInfo *pTSysPathInfo);
     void FormatThermalPaths(char *path, size_t size, const char *format, const char* name);
     void ClearThermalZoneInfo();
-    void SetFlag(bool flag)
-    {
-        flag_ = flag;
-    }
-    bool GetFlag()
-    {
-        return flag_;
-    }
+    int32_t GetMaxCommonDivisor(int32_t a, int32_t b);
+    int32_t GetIntervalCommonDivisor(std::vector<int32_t> intervalList);
+    void SetMultiples();
+    void CalculateMaxCd();
+    int32_t ReadFile(const char *path, char *buf, size_t size);
+    void ReportThermalZoneData(int32_t reportTime, std::vector<int32_t> &multipleList);
+    HdfThermalCallbackInfo tzInfoAcaualEvent_;
+    int32_t maxCd_;
 private:
+    int32_t UpdateThermalZoneData(std::map<std::string, std::string> &tzPathMap);
+    ThermalHdfConfig::ThermalTypeMap sensorTypeMap_;
     struct ThermalZoneSysfsPathInfo tzSysPathInfo_;
     std::list<ThermalZoneSysfsPathInfo> lTzSysPathInfo_;
     std::vector<ThermalZoneInfo> tzInfoList_;

@@ -14,27 +14,49 @@
  */
 #include "sensor_info_config.h"
 
+#define HDF_LOG_TAG SensorInfoConfig
+
 namespace hdi {
 namespace thermal {
 namespace v1_0 {
 void SensorInfoConfig::SetXMLThermalZoneInfo(std::vector<XMLThermalZoneInfo> &vXmlTz)
 {
-    vXmlTz_ = vXmlTz;
+    xmlTzInfoList_ = vXmlTz;
 }
 
 void SensorInfoConfig::SetXMLThermalNodeInfo(std::vector<XMLThermalNodeInfo> &vXmlTn)
 {
-    vXmlTn_ = vXmlTn;
+    xmlTnInfoList_ = vXmlTn;
 }
 
 std::vector<XMLThermalZoneInfo> SensorInfoConfig::GetXMLThermalZoneInfo()
 {
-    return vXmlTz_;
+    return xmlTzInfoList_;
 }
 
 std::vector<XMLThermalNodeInfo> SensorInfoConfig::GetXMLThermalNodeInfo()
 {
-    return vXmlTn_;
+    return xmlTnInfoList_;
+}
+
+void SensorInfoConfig::SetGroupName(const std::string &groupName)
+{
+    groupName_ = groupName;
+}
+
+void SensorInfoConfig::SetGroupInterval(int32_t interval)
+{
+    interval_ = interval;
+}
+
+int32_t SensorInfoConfig::GetInterval()
+{
+    return interval_;
+}
+
+std::string SensorInfoConfig::GetGroupName()
+{
+    return groupName_;
 }
 } // v1_0
 } // thermal

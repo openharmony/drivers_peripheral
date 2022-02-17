@@ -25,16 +25,20 @@ namespace v1_0 {
 struct BaseItem {
     std::string tag;
     std::string value;
+    bool operator == (const std::string &tag)
+    {
+        return (this->tag == tag);
+    }
 };
 
 class BaseInfoConfig {
 public:
     BaseInfoConfig() = default;
     ~BaseInfoConfig() = default;
-    void SetBase(std::vector<BaseItem> &vBase);
-    void Dump();
+    void SetBase(std::vector<BaseItem> &bastList);
+    std::vector<BaseItem> GetBaseItem();
 private:
-    std::vector<BaseItem> vBase_;
+    std::vector<BaseItem> bastList_;
 };
 } // v1_0
 } // thermal
