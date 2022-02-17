@@ -93,26 +93,25 @@ int32_t ThermalDeviceMitigation::SetFlag(bool flag)
 
 int32_t ThermalDeviceMitigation::ExecuteCpuRequest(uint32_t freq, const std::string &path)
 {
-    HDF_LOGI("CpuRequest %{public}s: the freq is %{public}d", __func__, freq);
-    int32_t ret = -1;
+    int32_t ret = HDF_FAILURE;
     char freqBuf[MAX_PATH] = {0};
     char nodeBuf[MAX_BUF_PATH] = {0};
     if (access(path.c_str(), 0) != HDF_SUCCESS) {
-        return HDF_FAILURE;
+        return ret;
     }
     std::lock_guard<std::mutex> lock(mutex_);
     if (snprintf_s(nodeBuf, PATH_MAX, sizeof(nodeBuf) - 1, "%s", path.c_str()) < HDF_SUCCESS) {
-        return HDF_FAILURE;
+        return ret;
     }
     if (snprintf_s(freqBuf, PATH_MAX, sizeof(freqBuf) - 1, "%d", freq) < HDF_SUCCESS) {
-        return HDF_FAILURE;
+        return ret;
     }
     if (WriteSysfsFile(nodeBuf, freqBuf, strlen(freqBuf)) > HDF_SUCCESS) {
         HDF_LOGI("%{public}s: Set freq to %{public}d", __func__, freq);
-        ret = 0;
+        ret = HDF_SUCCESS;
     } else {
         HDF_LOGE("%{public}s: failed to set freq", __func__);
-        ret = -1;
+        ret = HDF_FAILURE;
     }
     return ret;
 }
@@ -145,106 +144,105 @@ int32_t ThermalDeviceMitigation::ChargerRequest(uint32_t current)
 
 int32_t ThermalDeviceMitigation::GpuRequest(uint32_t freq)
 {
-    HDF_LOGI("GpuRequest %{public}s: the freq is %{public}d", __func__, freq);
-    int32_t ret;
+    int32_t ret = HDF_FAILURE;
     char freqBuf[MAX_PATH] = {0};
     char nodeBuf[MAX_BUF_PATH] = {0};
 
     std::lock_guard<std::mutex> lock(mutex_);
     ret = snprintf_s(nodeBuf, PATH_MAX, sizeof(nodeBuf) - 1, "%s", GPU_FREQ_PATH.c_str());
     if (ret < HDF_SUCCESS) {
-        return HDF_FAILURE;
+        return ret;
     }
     ret = snprintf_s(freqBuf, PATH_MAX, sizeof(freqBuf) - 1, "%d", freq);
     if (ret < HDF_SUCCESS) {
-        return HDF_FAILURE;
+        return ret;
     }
     if (WriteSysfsFile(nodeBuf, freqBuf, strlen(freqBuf)) > HDF_SUCCESS) {
         HDF_LOGI("%{public}s: Set freq to %{public}d", __func__, freq);
-        ret = 0;
+        ret = HDF_SUCCESS;
     } else {
         HDF_LOGE("%{public}s: failed to set freq", __func__);
+        ret = HDF_FAILURE;
     }
     return ret;
 }
 
 int32_t ThermalDeviceMitigation::ExecuteChargerRequest(uint32_t current, const std::string &path)
 {
-    HDF_LOGI("%{public}s: the current is %{public}d", __func__, current);
-    int32_t ret = -1;
+    int32_t ret = HDF_FAILURE;
     char currentBuf[MAX_PATH] = {0};
     char nodeBuf[MAX_BUF_PATH] = {0};
     static uint32_t previous;
     if (access(path.c_str(), 0) != HDF_SUCCESS) {
-        return HDF_FAILURE;
+        return ret;
     }
 
     std::lock_guard<std::mutex> lock(mutex_);
     ret = snprintf_s(nodeBuf, PATH_MAX, sizeof(nodeBuf) - 1, "%s", path.c_str());
     if (ret < HDF_SUCCESS) {
-        return HDF_FAILURE;
+        return ret;
     }
     ret = snprintf_s(currentBuf, PATH_MAX, sizeof(currentBuf) - 1, "%d%s", current, "\n");
     if (ret < HDF_SUCCESS) {
-        return HDF_FAILURE;
+        return ret;
     }
     if (WriteSysfsFile(nodeBuf, currentBuf, strlen(currentBuf)) > HDF_SUCCESS) {
         HDF_LOGI("%{public}s: Set current to %{public}d", __func__, current);
         previous = current;
-        ret = 0;
+        ret = HDF_SUCCESS;
     } else {
         HDF_LOGE("%{public}s: failed to set current", __func__);
-        ret = -1;
+        ret = HDF_FAILURE;
     }
     return ret;
 }
 
 int32_t ThermalDeviceMitigation::BatteryCurrentRequest(uint32_t current)
 {
-    HDF_LOGI("%{public}s: current %{public}d", __func__, current);
-    int32_t ret;
+    int32_t ret = HDF_FAILURE;
     char currentBuf[MAX_PATH] = {0};
     char nodeBuf[MAX_BUF_PATH] = {0};
 
     std::lock_guard<std::mutex> lock(mutex_);
     ret = snprintf_s(nodeBuf, PATH_MAX, sizeof(nodeBuf) - 1, "%s", SIM_BATTERY_CURRENT_PATH.c_str());
     if (ret < HDF_SUCCESS) {
-        return HDF_FAILURE;
+        return ret;
     }
     ret = snprintf_s(currentBuf, PATH_MAX, sizeof(currentBuf) - 1, "%d", current);
     if (ret < HDF_SUCCESS) {
-        return HDF_FAILURE;
+        return ret;
     }
     if (WriteSysfsFile(nodeBuf, currentBuf, strlen(currentBuf)) > HDF_SUCCESS) {
         HDF_LOGI("%{public}s: Set current to %{public}d", __func__, current);
-        ret = 0;
+        ret = HDF_SUCCESS;
     } else {
         HDF_LOGE("%{public}s: failed to set current", __func__);
+        ret = HDF_FAILURE;
     }
     return ret;
 }
 
 int32_t ThermalDeviceMitigation::BatteryVoltageRequest(uint32_t voltage)
 {
-    HDF_LOGI("%{public}s: current %{public}d", __func__, voltage);
-    int32_t ret;
+    int32_t ret = HDF_FAILURE;
     char voltageBuf[MAX_PATH] = {0};
     char voltageNode[MAX_BUF_PATH] = {0};
 
     std::lock_guard<std::mutex> lock(mutex_);
     ret = snprintf_s(voltageNode, PATH_MAX, sizeof(voltageNode) - 1, "%s", BATTERY_VOLTAGE_PATH.c_str());
     if (ret < HDF_SUCCESS) {
-        return HDF_FAILURE;
+        return ret;
     }
     ret = snprintf_s(voltageBuf, PATH_MAX, sizeof(voltageBuf) - 1, "%d", voltage);
     if (ret < HDF_SUCCESS) {
-        return HDF_FAILURE;
+        return ret;
     }
     if (WriteSysfsFile(voltageNode, voltageBuf, strlen(voltageBuf)) > HDF_SUCCESS) {
         HDF_LOGI("%{public}s: Set current to %{public}d", __func__, voltage);
-        ret = 0;
+        ret = HDF_SUCCESS;
     } else {
         HDF_LOGE("%{public}s: failed to set current", __func__);
+        ret = HDF_FAILURE;
     }
     return ret;
 }

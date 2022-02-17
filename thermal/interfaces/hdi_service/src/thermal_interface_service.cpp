@@ -47,7 +47,6 @@ ThermalInterfaceService::ThermalInterfaceService()
 
 int32_t ThermalInterfaceService::Init()
 {
-    HDF_LOGI("%{public}s enter", __func__);
     int32_t ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(FILE_NAME);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: failed to init XML, ret: %{public}d", __func__, ret);
@@ -92,7 +91,6 @@ int32_t ThermalInterfaceService::Init()
 
 int32_t ThermalInterfaceService::SetCpuFreq(int32_t freq)
 {
-    HDF_LOGI("%{public}s: service get cpu freq=%{public}d", __func__, freq);
     if (mitigation_ != nullptr) {
         int32_t ret = mitigation_->CpuRequest(freq);
         if (ret != HDF_SUCCESS) {
@@ -117,7 +115,6 @@ int32_t ThermalInterfaceService::SetGpuFreq(int32_t freq)
 
 int32_t ThermalInterfaceService::SetBatteryCurrent(int32_t current)
 {
-    HDF_LOGI("%{public}s: service set battery current=%{public}d", __func__, current);
     if (mitigation_ != nullptr) {
         int32_t ret = mitigation_->ChargerRequest(current);
         if (ret != HDF_SUCCESS) {
@@ -138,7 +135,6 @@ int32_t ThermalInterfaceService::GetThermalZoneInfo(HdfThermalCallbackInfo& even
 
 int32_t ThermalInterfaceService::Register(const sptr<IThermalCallback>& callbackObj)
 {
-    HDF_LOGI("%{public}s: service register callback", __func__);
     int32_t ret;
     theramalCb_ = callbackObj;
     if (hdfTimer_ == nullptr) return HDF_FAILURE;

@@ -65,7 +65,7 @@ public:
         return tzInfoList_;
     }
 
-    int32_t ConvertInt(std::string value)
+    int32_t ConvertInt(const std::string &value)
     {
         return std::stoi(value.c_str());
     }

@@ -32,7 +32,6 @@ ThermalHdfConfig &ThermalHdfConfig::GetInsance()
 
 int32_t ThermalHdfConfig::ThermalHDIConfigInit(const std::string &path)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
     if (!baseConfig_) {
         baseConfig_ = std::make_shared<BaseInfoConfig>();
     }
@@ -46,7 +45,6 @@ ThermalHdfConfig::ThermalTypeMap ThermalHdfConfig::GetSensorTypeMap()
 
 int32_t ThermalHdfConfig::ParseThermalHdiXMLConfig(const std::string &path)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
     std::unique_ptr<xmlDoc, decltype(&xmlFreeDoc)> docPtr(
         xmlReadFile(path.c_str(), nullptr, XML_PARSE_NOBLANKS), xmlFreeDoc);
     if (docPtr == nullptr) {
@@ -82,7 +80,6 @@ int32_t ThermalHdfConfig::ParseThermalHdiXMLConfig(const std::string &path)
 
 void ThermalHdfConfig::ParseBaseNode(xmlNodePtr node)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
     auto cur = node->xmlChildrenNode;
     std::vector<BaseItem> vBase;
     while (cur != nullptr) {
@@ -99,7 +96,6 @@ void ThermalHdfConfig::ParseBaseNode(xmlNodePtr node)
 
 void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
     auto cur  = node->xmlChildrenNode;
     while (cur != nullptr) {
         std::shared_ptr<SensorInfoConfig> sensorInfo = std::make_shared<SensorInfoConfig>();
