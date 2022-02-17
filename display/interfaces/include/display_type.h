@@ -81,7 +81,7 @@ typedef enum {
 } LayerType;
 
 /* *
- * @brief Defines the buffer usage
+ * @brief Defines the buffer usage.
  *
  */
 enum {
@@ -467,14 +467,14 @@ typedef enum {
 } CompositionType;
 
 /**
- * @brief Enumerates Color Gamut of display.
+ * @brief Enumerates the color gamuts.
  *
  */
 typedef enum {
-    COLOR_GAMUT_INVALID = -1,            /**< invalid */
-    COLOR_GAMUT_NATIVE = 0,              /**< native or default */
-    COLOR_GAMUT_SATNDARD_BT601 = 1,      /**< standard BT601 */
-    COLOR_GAMUT_STANDARD_BT709 = 2,      /**< standard BT709 */
+    COLOR_GAMUT_INVALID = -1,            /**< Invalid */
+    COLOR_GAMUT_NATIVE = 0,              /**< Native or default */
+    COLOR_GAMUT_SATNDARD_BT601 = 1,      /**< Standard BT601 */
+    COLOR_GAMUT_STANDARD_BT709 = 2,      /**< Standard BT709 */
     COLOR_GAMUT_DCI_P3 = 3,              /**< DCI P3 */
     COLOR_GAMUT_SRGB = 4,                /**< SRGB */
     COLOR_GAMUT_ADOBE_RGB = 5,           /**< Adobe RGB */
@@ -482,11 +482,11 @@ typedef enum {
     COLOR_GAMUT_BT2020 = 7,              /**< BT2020 */
     COLOR_GAMUT_BT2100_PQ = 8,           /**< BT2100 PQ */
     COLOR_GAMUT_BT2100_HLG = 9,          /**< BT2100 HLG */
-    COLOR_GAMUT_DISPLAY_BT2020 = 10,     /**< display BT2020 */
+    COLOR_GAMUT_DISPLAY_BT2020 = 10,     /**< Display BT2020 */
 } ColorGamut;
 
 /**
- * @brief Enumerates Color Gamut Map.
+ * @brief Enumerates the color gamut maps.
  *
  */
 typedef enum {
@@ -497,7 +497,7 @@ typedef enum {
 } GamutMap;
 
 /**
- * @brief Enumerates Color Data Space.
+ * @brief Enumerates the color data spaces.
  *
  */
 
@@ -547,7 +547,7 @@ typedef enum {
 } ColorDataSpace;
 
 /**
- * @brief Enumerates HDR format.
+ * @brief Enumerates the HDR formats.
  *
  */
 typedef enum {
@@ -560,7 +560,7 @@ typedef enum {
 } HDRFormat;
 
 /**
- * @brief Defines Display HDR capability.
+ * @brief Defines the HDR capability.
  *
  */
 typedef struct {
@@ -572,7 +572,7 @@ typedef struct {
 } HDRCapability;
 
 /**
- * @brief Enumerates HDR metadatakey.
+ * @brief Enumerates the HDR metadata keys.
  *
  */
 typedef enum {
@@ -593,7 +593,7 @@ typedef enum {
 } HDRMetadataKey;
 
 /**
- * @brief Defines HDR MetaData.
+ * @brief Defines the HDR metadata.
  *
  */
 typedef struct {
