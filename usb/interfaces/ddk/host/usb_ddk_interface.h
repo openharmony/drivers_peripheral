@@ -321,7 +321,7 @@ int32_t UsbExitHostSdk(const struct UsbSession *session);
  * @return Returns the pointer to the <b>UsbInterface</b> structure if the operation is successful; returns <b>NULL</b>
  * otherwise.
  */
-const struct UsbInterface *UsbClaimInterfaceUnforce(const struct UsbSession *session, uint8_t busNum,
+struct UsbInterface *UsbClaimInterfaceUnforce(const struct UsbSession *session, uint8_t busNum,
     uint8_t usbAddr, uint8_t interfaceIndex);
 
 /**
@@ -338,7 +338,7 @@ const struct UsbInterface *UsbClaimInterfaceUnforce(const struct UsbSession *ses
  * @return Returns the pointer to the <b>UsbInterface</b> structure if the operation is successful; returns <b>NULL</b>
  * otherwise.
  */
-const struct UsbInterface *UsbClaimInterface(const struct UsbSession *session, uint8_t busNum,
+struct UsbInterface *UsbClaimInterface(const struct UsbSession *session, uint8_t busNum,
     uint8_t usbAddr, uint8_t interfaceIndex);
 
 /**
@@ -349,7 +349,7 @@ const struct UsbInterface *UsbClaimInterface(const struct UsbSession *session, u
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
  * otherwise.
  */
-int UsbReleaseInterface(const struct UsbInterface *interfaceObj);
+int UsbReleaseInterface(struct UsbInterface *interfaceObj);
 
 /**
  * @brief Adds or removes an interface.
