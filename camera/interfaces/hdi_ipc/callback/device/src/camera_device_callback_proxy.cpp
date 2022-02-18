@@ -17,7 +17,7 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <message_parcel.h>
-#include "utils_data_stub.h"
+#include "metadata_utils.h"
 
 namespace OHOS::Camera {
 void CameraDeviceCallbackProxy::OnError(ErrorType type, int32_t errorMsg)
@@ -59,7 +59,7 @@ void CameraDeviceCallbackProxy::OnResult(uint64_t timestamp,
         return;
     }
 
-    if (!UtilsDataStub::EncodeCameraMetadata(result, data)) {
+    if (!CameraStandard::MetadataUtils::EncodeCameraMetadata(result, data)) {
         HDF_LOGE("%s: write metadata failed", __func__);
         return;
     }

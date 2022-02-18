@@ -18,6 +18,7 @@
 #include <hdf_log.h>
 #include <message_parcel.h>
 #include "utils_data_stub.h"
+#include "metadata_utils.h"
 #include "icamera_device.h"
 #include "icamera_host_callback.h"
 #include "icamera_device_callback.h"
@@ -113,7 +114,7 @@ CamRetCode CameraHostProxy::GetCameraAbility(const std::string &cameraId,
     }
 
     CamRetCode retCode = static_cast<CamRetCode>(reply.ReadInt32());
-    UtilsDataStub::DecodeCameraMetadata(reply, ability);
+    CameraStandard::MetadataUtils::DecodeCameraMetadata(reply, ability);
 
     return retCode;
 }
