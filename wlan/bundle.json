@@ -8,8 +8,8 @@
     "subsystem": "hdf",
     "syscap": [ "" ],
     "adapter_system_type": ["standard", "small"],
-    "rom": "1000KB",
-    "ram": "1000KB",
+    "rom": "660KB",
+    "ram": "7600KB",
     "deps": {
       "components": [
         "ipc",
