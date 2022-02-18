@@ -174,7 +174,7 @@ RetCode SourceNode::PortHandler::StartCollectBuffers()
     CHECK_IF_PTR_NULL_RETURN_VALUE(port, RC_ERROR);
     PortFormat format = {};
     port->GetFormat(format);
-    int streamId = format.streamId_;
+    uint32_t streamId = format.streamId_;
 
     pool = BufferManager::GetInstance()->GetBufferPool(format.bufferPoolId_);
     CHECK_IF_PTR_NULL_RETURN_VALUE(pool, RC_ERROR);
