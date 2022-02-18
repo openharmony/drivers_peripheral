@@ -61,7 +61,7 @@ void SetSensorIdBySensorType(enum SensorTypeTag type, int32_t sensorId)
 static void ConvertSensorData(struct SensorEvents *event)
 {
     uint32_t dataLen;
-    int32_t axis;
+    uint32_t axis;
     int32_t *data = NULL;
     float *value = NULL;
 
