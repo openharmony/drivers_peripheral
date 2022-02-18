@@ -41,6 +41,7 @@ const int32_t ARG_1 = 1;
 const int32_t ARG_2 = 2;
 const int32_t ARG_3 = 3;
 const int32_t ARG_4 = 4;
+const int32_t NUM_ZERO = 0;
 const std::string SIMULATION_TYPE_DIR = "/data/sensor/%s/type";
 const std::string SIMULATION_TEMP_DIR = "/data/sensor/%s/temp";
 std::string thermalDir = "/data/sensor/";
@@ -67,9 +68,9 @@ int32_t ThermalSimulationNode::NodeInit()
 
 int32_t ThermalSimulationNode::CreateNodeDir(std::string dir)
 {
-    if (access(dir.c_str(), 0) != HDF_SUCCESS) {
+    if (access(dir.c_str(), 0) != NUM_ZERO) {
         int32_t flag = mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH| S_IXOTH);
-        if (flag == HDF_SUCCESS) {
+        if (flag == NUM_ZERO) {
             HDF_LOGI("%{public}s: Create directory successfully.", __func__);
         } else {
             HDF_LOGE("%{public}s: Fail to create directory, flag: %{public}d", __func__, flag);
@@ -86,7 +87,7 @@ int32_t ThermalSimulationNode::CreateNodeFile(std::string filePath)
     int32_t fd = -1;
     if (access(filePath.c_str(), 0) != 0) {
         fd = open(filePath.c_str(), O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP| S_IROTH);
-        if (fd < HDF_SUCCESS) {
+        if (fd < NUM_ZERO) {
             HDF_LOGE("%{public}s: open failed to file.", __func__);
             return fd;
         }
@@ -117,27 +118,27 @@ int32_t ThermalSimulationNode::AddSensorTypeTemp()
     CreateNodeDir(thermalDir);
     for (auto dir : sensor) {
         ret = snprintf_s(nodeBuf, PATH_MAX, sizeof(nodeBuf) - ARG_1, thermalNodeDir.c_str(), dir.first.c_str());
-        if (ret < HDF_SUCCESS) {
+        if (ret < NUM_ZERO) {
             return HDF_FAILURE;
         }
         HDF_LOGI("%{public}s: node name: %{public}s", __func__, nodeBuf);
         CreateNodeDir(static_cast<std::string>(nodeBuf));
         for (auto file : vFile) {
             ret = snprintf_s(fileBuf, PATH_MAX, sizeof(fileBuf) - ARG_1, thermalFileDir.c_str(), nodeBuf, file.c_str());
-            if (ret < HDF_SUCCESS) {
+            if (ret < NUM_ZERO) {
                 return HDF_FAILURE;
             }
             HDF_LOGI("%{public}s: file name: %{public}s", __func__, fileBuf);
             CreateNodeFile(static_cast<std::string>(fileBuf));
         }
         ret = snprintf_s(typeBuf, PATH_MAX, sizeof(typeBuf) - ARG_1, thermalTypeDir.c_str(), dir.first.c_str());
-        if (ret < HDF_SUCCESS) {
+        if (ret < NUM_ZERO) {
             return HDF_FAILURE;
         }
         std::string type = dir.first;
         WriteFile(typeBuf, type, type.length());
         ret = snprintf_s(tempBuf, PATH_MAX, sizeof(tempBuf) - ARG_1, thermalTempDir.c_str(), dir.first.c_str());
-        if (ret < HDF_SUCCESS) {
+        if (ret < NUM_ZERO) {
             return HDF_FAILURE;
         }
         std::string temp = std::to_string(dir.second);
@@ -163,23 +164,23 @@ int32_t ThermalSimulationNode::AddMitigationDevice()
     CreateNodeDir(mitigationDir);
     for (auto dir : vSensor) {
         ret = snprintf_s(nodeBuf, PATH_MAX, sizeof(nodeBuf) - ARG_1, mitigationNodeDir.c_str(), dir.c_str());
-        if (ret < HDF_SUCCESS) return HDF_FAILURE;
+        if (ret < NUM_ZERO) return HDF_FAILURE;
         CreateNodeDir(static_cast<std::string>(nodeBuf));
         vFile.push_back(nodeBuf);
     }
     ret = snprintf_s(fileBuf, PATH_MAX, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(), vFile[ARG_0].c_str(),
         cpu.c_str());
-    if (ret < HDF_SUCCESS) return HDF_FAILURE;
+    if (ret < NUM_ZERO) return HDF_FAILURE;
     CreateNodeFile(static_cast<std::string>(fileBuf));
     WriteFile(fileBuf, sTemp, sTemp.length());
     ret = snprintf_s(fileBuf, PATH_MAX, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(), vFile[ARG_1].c_str(),
         charger.c_str());
-    if (ret < HDF_SUCCESS) return HDF_FAILURE;
+    if (ret < NUM_ZERO) return HDF_FAILURE;
     CreateNodeFile(static_cast<std::string>(fileBuf));
     WriteFile(fileBuf, sTemp, sTemp.length());
     ret = snprintf_s(fileBuf, PATH_MAX, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(), vFile[ARG_2].c_str(),
         gpu.c_str());
-    if (ret < HDF_SUCCESS) {
+    if (ret < NUM_ZERO) {
         return HDF_FAILURE;
     }
     CreateNodeFile(static_cast<std::string>(fileBuf));
@@ -187,7 +188,7 @@ int32_t ThermalSimulationNode::AddMitigationDevice()
     for (auto b : vBattery) {
         ret = snprintf_s(fileBuf, PATH_MAX, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(),
             vFile[ARG_3].c_str(), b.c_str());
-        if (ret < HDF_SUCCESS) {
+        if (ret < NUM_ZERO) {
             return HDF_FAILURE;
         }
         CreateNodeFile(static_cast<std::string>(fileBuf));
@@ -199,7 +200,7 @@ int32_t ThermalSimulationNode::AddMitigationDevice()
 int32_t ThermalSimulationNode::WriteFile(std::string path, std::string buf, size_t size)
 {
     int32_t fd = open(path.c_str(), O_RDWR);
-    if (fd < HDF_SUCCESS) {
+    if (fd < NUM_ZERO) {
         HDF_LOGE("%{public}s: open failed to file.", __func__);
     }
     write(fd, buf.c_str(), size);

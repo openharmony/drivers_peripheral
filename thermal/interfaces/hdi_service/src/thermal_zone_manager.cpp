@@ -269,9 +269,6 @@ int32_t ThermalZoneManager::GetMaxCommonDivisor(int32_t a, int32_t b)
     if (a % b == 0) {
         return b;
     } else {
-        if (b == 0) {
-            return NUM_ZERO;
-        }
         return GetMaxCommonDivisor(b, a % b);
     }
 }
@@ -292,10 +289,10 @@ int32_t ThermalZoneManager::GetIntervalCommonDivisor(std::vector<int32_t> interv
 
 void ThermalZoneManager::SetMultiples()
 {
+    if (maxCd_ == NUM_ZERO) {
+        return;
+    }
     for (auto sensorIter : sensorTypeMap_) {
-        if (maxCd_ == NUM_ZERO) {
-            return;
-        }
         sensorIter.second->multiple_ = (sensorIter.second->GetInterval()) / maxCd_;
     }
     ThermalHdfConfig::GetInsance().SetSensorTypeMap(sensorTypeMap_);
