@@ -28,28 +28,17 @@ namespace Thermal {
 namespace V1_0 {
 class ThermalSimulationNode {
 public:
-    ThermalSimulationNode() {}
-    ~ThermalSimulationNode() {}
+    ThermalSimulationNode() = default;
+    ~ThermalSimulationNode() = default;
 
     int32_t NodeInit();
+private:
     int32_t CreateNodeDir(std::string dir);
     int32_t CreateNodeFile(std::string filePath);
     int32_t AddSensorTypeTemp();
     int32_t AddMitigationDevice();
     int32_t WriteFile(std::string path, std::string buf, size_t size);
-    int32_t SetTempRequest(std::string type, int32_t temp);
-    int32_t ReadFile(const char *path, char *buf, size_t size);
-    int32_t ConvertInt(const std::string &value);
-    int32_t ParserSimulationNode();
-    void ClearThermalZoneInfo();
-    std::vector<ThermalZoneInfo> GetTzInfoList()
-    {
-        return tzInfoList_;
-    }
-private:
     std::mutex mutex_;
-    std::vector<std::string> tempPath_;
-    std::vector<ThermalZoneInfo> tzInfoList_;
 };
 } // V1_0
 } // Thermal

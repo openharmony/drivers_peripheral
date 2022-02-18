@@ -20,6 +20,8 @@
 #include <osal_mem.h>
 #include "thermal_interface_impl.h"
 
+#define HDF_LOG_TAG ThermalInterfaceDriver
+
 using namespace OHOS::HDI::Thermal::V1_0;
 
 struct HdfThermalInterfaceHost {
