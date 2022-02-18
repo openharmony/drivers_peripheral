@@ -17,6 +17,8 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 
+#define HDF_LOG_TAG ThermalCallbackImpl
+
 namespace OHOS {
 namespace HDI {
 namespace Thermal {

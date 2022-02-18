@@ -38,7 +38,7 @@ namespace {
     const uint32_t WAIT_TIME = 1;
     const std::string CPU_FREQ_PATH = "/data/cooling/cpu/freq";
     const std::string GPU_FREQ_PATH = "/data/cooling/gpu/freq";
-    const std::string BATTERY_CHARGER_CURRENT_PATH = "/data/cooling/charger/current";
+    const std::string BATTERY_CHARGER_CURRENT_PATH = "/data/cooling/battery/current";
 }
 
 class HdfThermalHdiTest : public testing::Test {
