@@ -215,7 +215,7 @@ HWTEST_F(HdfSensorTest, RegisterSensorDataCb002, TestSize.Level1)
     int32_t ret = g_sensorDev->Register(0, nullptr);
     EXPECT_EQ(SENSOR_NULL_PTR, ret);
     ret = g_sensorDev->Unregister(0, nullptr);
-    EXPECT_EQ(0, ret);
+    EXPECT_EQ(SENSOR_NULL_PTR, ret);
 }
 
 /**
