@@ -60,10 +60,11 @@ if (defined(ohos_lite)) {
   }
 } else {
   module_output_path = "hdf/wlan"
-  ohos_unittest("hdf_performance_wifi") {
+  ohos_unittest("hdf_peripheral_wlan_test_performance") {
     module_out_path = module_output_path
     include_dirs = [
       "//drivers/peripheral/wlan/client/include",
+      "//drivers/peripheral/wlan/hal/include",
       "//drivers/peripheral/wlan/interfaces/include",
     ]
     sources = [ "./common/hdf_wlan_performance_test.cpp" ]
