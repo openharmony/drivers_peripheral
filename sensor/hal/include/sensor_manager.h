@@ -21,6 +21,13 @@
 #include "osal_mutex.h"
 #include "sensor_type.h"
 
+#define CALLBACK_TYPE_COUNT 2
+
+enum SensorTypeIndex {
+    TRADITIONAL_SENSOR_TYPE_INDEX = 0,
+    MEDICAL_SENSOR_TYPE_INDEX = 1
+};
+
 struct SensorIdListNode {
     int32_t sensorId;
     struct HdfIoService *ioService;
@@ -36,7 +43,7 @@ struct SensorManagerNode {
 struct SensorDevManager {
     bool initState;
     bool hasSensorListener;
-    RecordDataCallback recordDataCb;
+    RecordDataCallback recordDataCb[CALLBACK_TYPE_COUNT];
     struct DListHead managerHead;
     struct DListHead sensorIdListHead;
     struct HdfIoServiceGroup *serviceGroup;

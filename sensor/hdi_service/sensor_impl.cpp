@@ -28,10 +28,8 @@ namespace {
         TRADITIONAL_SENSOR_INDEX = 0,
         MEDICAL_SENSOR_INDEX = 1
     };
-    constexpr int32_t MEDICALSENSOR_ID_MIN = 128;
-    constexpr int32_t MEDICALSENSOR_ID_MAX = 160;
-    constexpr int32_t TRADITIONAL_SENSOR_ID_MIN = 0;
     constexpr int32_t REMOTE_OBJE_CTOUNT_THRESHOLD = 1;
+    constexpr int32_t TRADITIONAL_SENSOR_ID_MIN = 0;
     using RemoteObjectCallBackMap = std::unordered_map<IRemoteObject*, sptr<ISensorCallback>>;
     using RemoteObjectIndexMap = std::unordered_map<IRemoteObject*, int32_t>;
     using IndexRemoteObjectMap = std::unordered_map<int32_t, std::vector<IRemoteObject*>>;
@@ -41,7 +39,7 @@ namespace {
     std::mutex g_mutex;
 }
 
-int SensorDataCallback(const struct SensorEvents *event)
+int TradtionalSensorDataCallback(const struct SensorEvents *event)
 {
     if (event == nullptr || event->data == nullptr) {
         HDF_LOGE("%{public}s failed, event or event.data is nullptr", __func__);
@@ -77,7 +75,46 @@ int SensorDataCallback(const struct SensorEvents *event)
         remoteCallBack->second->OnDataEvent(hdfSensorEvents);
     }
 
-    return 0;
+    return SENSOR_SUCCESS;
+}
+
+int MedicalSensorDataCallback(const struct SensorEvents *event)
+{
+    if (event == nullptr || event->data == nullptr) {
+        HDF_LOGE("%{public}s failed, event or event.data is nullptr", __func__);
+        return SENSOR_FAILURE;
+    }
+
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto indexRemoteIter = g_IndexRemoteObjectMap.find(MEDICAL_SENSOR_INDEX);
+    if (indexRemoteIter == g_IndexRemoteObjectMap.end()) {
+        return SENSOR_SUCCESS;
+    }
+
+    HdfSensorEvents hdfSensorEvents;
+    hdfSensorEvents.sensorId = event->sensorId;
+    hdfSensorEvents.version = event->version;
+    hdfSensorEvents.timestamp = event->timestamp;
+    hdfSensorEvents.option = event->option;
+    hdfSensorEvents.mode = event->mode;
+    hdfSensorEvents.dataLen = event->dataLen;
+    uint32_t len = event->dataLen;
+    uint8_t *tmp = event->data;
+
+    while (len--) {
+        hdfSensorEvents.data.push_back(*tmp);
+        tmp++;
+    }
+
+    for (auto remoteObj : g_IndexRemoteObjectMap[MEDICAL_SENSOR_INDEX]) {
+        auto remoteCallBack = g_remoteObjectCallBackMap.find(remoteObj);
+        if (remoteCallBack == g_remoteObjectCallBackMap.end()) {
+            continue;
+        }
+        remoteCallBack->second->OnDataEvent(hdfSensorEvents);
+    }
+
+    return SENSOR_SUCCESS;
 }
 
 void SensorImpl::Init()
@@ -227,9 +264,8 @@ int32_t SensorImpl::Register(int32_t sensorId, const sptr<ISensorCallback>& call
         return SENSOR_FAILURE;
     }
 
-    if (sensorId >= MEDICALSENSOR_ID_MIN && sensorId <= MEDICALSENSOR_ID_MAX) {
+    if (sensorId >= SENSOR_TYPE_MEDICAL_BEGIN && sensorId < SENSOR_TYPE_MEDICAL_END) {
         sensorIndex = MEDICAL_SENSOR_INDEX;
-        return SENSOR_FAILURE;
     } else {
         sensorIndex = TRADITIONAL_SENSOR_INDEX;
     }
@@ -246,7 +282,13 @@ int32_t SensorImpl::Register(int32_t sensorId, const sptr<ISensorCallback>& call
         return SENSOR_SUCCESS;
     }
 
-    int32_t ret = sensorInterface->Register(sensorIndex, SensorDataCallback);
+    int32_t ret;
+    if (sensorIndex == TRADITIONAL_SENSOR_INDEX) {
+        ret = sensorInterface->Register(sensorIndex, TradtionalSensorDataCallback);
+    } else {
+        ret = sensorInterface->Register(sensorIndex, MedicalSensorDataCallback);
+    }
+
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, ret[%{public}d]", __func__, ret);
         return ret;
@@ -298,7 +340,13 @@ int32_t SensorImpl::Unregister(int32_t sensorId, const sptr<ISensorCallback>& ca
         return SENSOR_SUCCESS;
     }
 
-    int32_t ret = sensorInterface->Unregister(sensorIndex, SensorDataCallback);
+    int32_t ret;
+    if (sensorIndex == TRADITIONAL_SENSOR_INDEX) {
+        ret = sensorInterface->Unregister(sensorIndex, TradtionalSensorDataCallback);
+    } else {
+        ret = sensorInterface->Unregister(sensorIndex, MedicalSensorDataCallback);
+    }
+
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
         return ret;
