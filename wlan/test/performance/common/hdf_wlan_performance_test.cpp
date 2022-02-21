@@ -318,7 +318,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalSetScanningMacAddress001, TestSize.Level
     timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
         (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));
     EXPECT_GE(LONG_TIME, timeUsed);
-    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
+    EXPECT_NE(HDF_FAILURE, ret);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
