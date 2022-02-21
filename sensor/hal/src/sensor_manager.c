@@ -31,7 +31,6 @@ struct SensorDevManager *GetSensorDevManager(void)
         .initState = false,
         .hasSensorListener = false,
         .sensorSum = 0,
-        .recordDataCb = NULL,
         .sensorInfoEntry = NULL,
     };
 
@@ -107,6 +106,7 @@ static void ReleaseSensorServiceList()
         pos = NULL;
     }
 
+    (void)OsalMutexLock(&manager->eventMutex);
     if (manager->serviceGroup != NULL) {
         if (manager->hasSensorListener) {
             struct HdfDevEventlistener *listener = GetSensorListener();
@@ -117,13 +117,15 @@ static void ReleaseSensorServiceList()
         }
         HdfIoServiceGroupRecycle(manager->serviceGroup);
     }
+    (void)OsalMutexUnlock(&manager->eventMutex);
     (void)OsalMutexUnlock(&manager->mutex);
 }
 
 static int32_t InitSensorManager(void)
 {
     struct SensorDevManager *manager = GetSensorDevManager();
-
+    manager->recordDataCb[TRADITIONAL_SENSOR_TYPE_INDEX] = NULL;
+    manager->recordDataCb[MEDICAL_SENSOR_TYPE_INDEX] = NULL;
     DListHeadInit(&manager->managerHead);
     DListHeadInit(&manager->sensorIdListHead);
     OsalMutexInit(&manager->mutex);
@@ -172,6 +174,8 @@ int32_t FreeSensorInterfaceInstance(void)
 
     ReleaseAllSensorInfo();
     ReleaseSensorServiceList();
+    manager->recordDataCb[TRADITIONAL_SENSOR_TYPE_INDEX] = NULL;
+    manager->recordDataCb[MEDICAL_SENSOR_TYPE_INDEX] = NULL;
 
     OsalMutexDestroy(&manager->mutex);
     OsalMutexDestroy(&manager->eventMutex);
