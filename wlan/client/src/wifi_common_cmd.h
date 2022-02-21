@@ -143,4 +143,3 @@ struct CallbackEvent {
 void WifiEventReport(const char *ifName, uint32_t event, void *data);
 
 #endif /* end of wifi_common_cmd.h */
-

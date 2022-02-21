@@ -100,14 +100,20 @@ if (defined(ohos_lite)) {
     } else {
       sources = [ "$CLIENT_ROOT_DIR/client/src/wifi_driver_client.c" ]
 
-      sources += [ "$CLIENT_ROOT_DIR/client/src/netlink/netlink_cmd_adapter.c" ]
+      sources += [
+        "$CLIENT_ROOT_DIR/client/src/netlink/netlink_cmd_adapter.c",
+        "$CLIENT_ROOT_DIR/client/src/netlink/netlink_event_adapter.c",
+      ]
 
       include_dirs = [
         "$CLIENT_ROOT_DIR/client/include",
         "$CLIENT_ROOT_DIR/interfaces/include",
+        "//third_party/libnl/include",
+        "$root_out_dir/include",
+        "$root_out_dir/lib",
       ]
 
-      deps = [ "//third_party/third_party_libnl:libnl_share" ]
+      deps = [ "//third_party/libnl:libnl_share" ]
       external_deps = [
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
