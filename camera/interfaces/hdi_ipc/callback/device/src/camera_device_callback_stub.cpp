@@ -18,7 +18,7 @@
 #include <hdf_base.h>
 #include <hdf_sbuf_ipc.h>
 #include "camera_device_callback.h"
-#include "utils_data_stub.h"
+#include "metadata_utils.h"
 #include "cmd_common.h"
 
 namespace OHOS::Camera {
@@ -36,7 +36,7 @@ int32_t CameraDeviceCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &
         case CMD_CAMERA_DEVICE_CALLBACK_ON_RESULT: {
             uint64_t timestamp = data.ReadUint64();
             std::shared_ptr<CameraStandard::CameraMetadata> result = nullptr;
-            UtilsDataStub::DecodeCameraMetadata(data, result);
+            CameraStandard::MetadataUtils::DecodeCameraMetadata(data, result);
             OnResult(timestamp, result);
             break;
         }

@@ -17,7 +17,7 @@
 #include <hdf_log.h>
 #include <hdf_base.h>
 #include <hdf_sbuf_ipc.h>
-#include "utils_data_stub.h"
+#include "metadata_utils.h"
 #include "istream_operator.h"
 #include "istream_operator_callback.h"
 #include "cmd_common.h"
@@ -103,7 +103,7 @@ int32_t CameraDeviceStub::CameraDeviceStubUpdateSettings(
     MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
     std::shared_ptr<CameraStandard::CameraMetadata> metadata = nullptr;
-    UtilsDataStub::DecodeCameraMetadata(data, metadata);
+    CameraStandard::MetadataUtils::DecodeCameraMetadata(data, metadata);
 
     CamRetCode ret = UpdateSettings(metadata);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
