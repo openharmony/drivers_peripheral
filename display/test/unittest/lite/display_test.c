@@ -61,8 +61,8 @@ static int32_t LoadBmp(const int8_t *fileName, BufferHandle **buffer)
 
 static void GetLayerInfo(LayerInfo *layInfo)
 {
-    layInfo->width = g_displayTest.displayInfo.width;
-    layInfo->height = g_displayTest.displayInfo.height;
+    layInfo->width = (uint32_t)g_displayTest.displayInfo.width;
+    layInfo->height = (uint32_t)g_displayTest.displayInfo.height;
     layInfo->bpp = LAYER_BPP;
     layInfo->pixFormat = PIXEL_FMT_RGBA_5551;
     layInfo->type = LAYER_TYPE_GRAPHIC;
@@ -100,8 +100,8 @@ static void PicSourceSurfaceInit(ISurface *surface, uint64_t phyAddr, int32_t bp
 
 static void DestSurfaceInit(ISurface *surface, uint64_t phyAddr, int32_t bpp)
 {
-    surface->width = g_displayTest.displayInfo.width;
-    surface->height = g_displayTest.displayInfo.height;
+    surface->width = (uint32_t)g_displayTest.displayInfo.width;
+    surface->height = (uint32_t)g_displayTest.displayInfo.height;
     surface->phyAddr = phyAddr;
     surface->enColorFmt = PIXEL_FMT_RGBA_5551;
     surface->stride = g_displayTest.displayInfo.width * bpp / BITS_PER_BYTE;
@@ -323,7 +323,7 @@ int32_t BlitTest(void)
     ISurface srcSurface = {0};
     ISurface dstSurface = {0};
     BufferHandle* pictureBuf = NULL;
-    int32_t layerBufSize = g_displayTest.displayInfo.width * g_displayTest.displayInfo.height * PIXEL_BYTE;
+    uint32_t layerBufSize = g_displayTest.displayInfo.width * g_displayTest.displayInfo.height * PIXEL_BYTE;
 
     // clean the layer buffer
     (void)memset_s(g_displayTest.buffer.data.virAddr, layerBufSize, 0, layerBufSize);
@@ -363,7 +363,7 @@ int32_t FillRectTest(void)
     ISurface dstSurface = {0};
     GfxOpt opt = {0};
     IRect rect = {0, 0, SAMPLE_RECT_WIDTH, SAMPLE_RECT_HEIGHT};
-    int32_t layerBufSize = g_displayTest.displayInfo.width * g_displayTest.displayInfo.height * PIXEL_BYTE;
+    uint32_t layerBufSize = g_displayTest.displayInfo.width * g_displayTest.displayInfo.height * PIXEL_BYTE;
 
     opt.enGlobalAlpha = true;
     opt.globalAlpha = MAX_GLOBLE_ALPHA;
