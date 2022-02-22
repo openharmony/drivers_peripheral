@@ -85,6 +85,8 @@ enum AudioPortPin {
     PIN_OUT_HEADSET = 0x2u,       /**< Wired headset pin for output */
     PIN_OUT_LINEOUT = 0x4u,       /**< Line-out pin */
     PIN_OUT_HDMI    = 0x8u,       /**< HDMI output pin */
+    PIN_OUT_USB     = 0x10u,      /**< USB device output */
+    PIN_OUT_USB_EXT = 0x20u,      /**< Extended USB device output */
     PIN_IN_MIC      = 0x8000001u, /**< Microphone input pin */
     PIN_IN_HS_MIC   = 0x8000002u, /**< Wired headset microphone pin for input */
     PIN_IN_LINEIN   = 0x8000004u, /**< Line-in pin */
