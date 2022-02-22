@@ -59,16 +59,16 @@ struct EcmWb {
     struct UsbRequest *request;
     struct EcmDevice *instance;
     uint8_t *buf;
-    int    len;
-    int    use;
+    int32_t    len;
+    int32_t    use;
     struct EcmDevice *ecm;
 };
 
 struct EcmRb {
     uint8_t *base;
-    int size;
-    int index;
-    int use;
+    int32_t size;
+    int32_t index;
+    int32_t use;
     struct EcmDevice *instance;
 };
 
@@ -105,7 +105,7 @@ struct EcmDevice {
     struct DataFifo readFifo;
     uint32_t nbIndex;
     uint32_t nbSize;
-    int transmitting;
+    int32_t transmitting;
     int32_t ctrlReqNum;
     uint8_t busNum;
     uint8_t devAddr;

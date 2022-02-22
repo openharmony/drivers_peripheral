@@ -37,7 +37,7 @@ bool UsbPnpManagerWriteModuleName(struct HdfSBuf *sbuf, const char *moduleName)
     return HdfSbufWriteString(sbuf, modName);
 }
 
-static int32_t UsbPnpManagerDispatch(struct HdfDeviceIoClient *client, int cmd,
+static int32_t UsbPnpManagerDispatch(struct HdfDeviceIoClient *client, int32_t cmd,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     (void)client;
@@ -67,7 +67,7 @@ static int32_t UsbPnpManagerBind(struct HdfDeviceObject *device)
 
 static int32_t UsbPnpManagerInit(struct HdfDeviceObject *device)
 {
-    int status;
+    int32_t status;
     struct HdfIoService *usbPnpServ = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
     static struct HdfDevEventlistener usbPnpListener = {
         .callBack = UsbDdkPnpLoaderEventReceived,

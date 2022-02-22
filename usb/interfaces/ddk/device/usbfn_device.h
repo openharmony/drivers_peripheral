@@ -174,9 +174,9 @@ const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName, struct UsbFnDes
  * @return Returns <b>0</b> if the operation is successful; returns a negative value
  * defined in {@link UsbErrorType} otherwise.
  */
-int UsbFnRemoveDevice(struct UsbFnDevice *fnDevice);
+int32_t UsbFnRemoveDevice(struct UsbFnDevice *fnDevice);
 const struct UsbFnDevice *UsbFnGetDevice(const char *udcName);
-int UsbFnGetDeviceState(struct UsbFnDevice *fnDevice, UsbFnDeviceState *devState);
+int32_t UsbFnGetDeviceState(struct UsbFnDevice *fnDevice, UsbFnDeviceState *devState);
 
 /**
  * @brief Obtains a USB interface based on the specified interface index.
@@ -190,6 +190,6 @@ int UsbFnGetDeviceState(struct UsbFnDevice *fnDevice, UsbFnDeviceState *devState
  * returns <b>NULL</b> otherwise.
  */
 const struct UsbFnInterface *UsbFnGetInterface(struct UsbFnDevice *fnDevice, uint8_t interfaceIndex);
-int UsbFnMemTestTrigger(bool enable);
+int32_t UsbFnMemTestTrigger(bool enable);
 
 #endif /* USBFN_DEVICE_H */

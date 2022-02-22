@@ -35,12 +35,12 @@ enum UsbSerialCmd {
     USB_SERIAL_SPEED,
 };
 struct UsbSpeedTest {
-    int busNum;
-    int devAddr;
-    int ifaceNum;
-    int writeOrRead;
+    int32_t busNum;
+    int32_t devAddr;
+    int32_t ifaceNum;
+    int32_t writeOrRead;
     bool printData;
-    int paramNum;
+    int32_t paramNum;
 };
 enum speedServer {
     SDKAPI_SERVER = 0,
@@ -66,7 +66,7 @@ void speedTest(struct UsbSpeedTest test)
         printf("HdfSbufWriteBuffer err");
         goto RET;
     }
-    int status = g_service->dispatcher->Dispatch(&g_service->object, USB_SERIAL_SPEED, g_data, g_reply);
+    int32_t status = g_service->dispatcher->Dispatch(&g_service->object, USB_SERIAL_SPEED, g_data, g_reply);
     if (status < 0) {
         printf("%s: Dispatch USB_SERIAL_SPEED failed status = %d\n", __func__, status);
     }
@@ -76,7 +76,7 @@ RET:
 
 void speedInit()
 {
-    int status;
+    int32_t status;
 
     switch (spdserver) {
         case SDKAPI_SERVER:
@@ -115,7 +115,7 @@ void speedInit()
 
 void speedExit()
 {
-    int status = g_service->dispatcher->Dispatch(&g_service->object, USB_SERIAL_CLOSE, g_data, g_reply);
+    int32_t status = g_service->dispatcher->Dispatch(&g_service->object, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status) {
         printf("%s: Dispatch USB_SERIAL_CLOSE err status = %d\n", __func__, status);
     }
@@ -137,7 +137,7 @@ static void ShowHelp(const char *name)
 
 static void *StopHandler(void)
 {
-    int err, signo;
+    int32_t err, signo;
     stopHandlerTid = getpid();
 
     while (true) {
@@ -166,7 +166,7 @@ static enum speedServer checkServer(const char* input)
         return out;
     }
 
-    int32_t ret = strncpy_s(middle, sizeof(middle), input, strlen(input));
+    int32_t ret = strncpy_s(middle, sizeof(middle), input, (uint32_t)strlen(input));
     if (ret != EOK) {
         HDF_LOGE("%s:%d strncpy_s failed", __func__, __LINE__);
         return out;
@@ -184,9 +184,9 @@ static enum speedServer checkServer(const char* input)
     return out;
 }
 
-static int GetWriteOrReadFlag(const char *buffer)
+static int32_t GetWriteOrReadFlag(const char *buffer)
 {
-    int writeOrRead;
+    int32_t writeOrRead;
 
     if (!strncmp(buffer, "r", 1)) {
         writeOrRead = TEST_READ;
@@ -199,11 +199,11 @@ static int GetWriteOrReadFlag(const char *buffer)
     return writeOrRead;
 }
 
-static int CheckParam(int argc, const char *argv[], struct UsbSpeedTest *speedTest)
+static int32_t CheckParam(int32_t argc, const char *argv[], struct UsbSpeedTest *speedTest)
 {
-    int ret = HDF_SUCCESS;
+    int32_t ret = HDF_SUCCESS;
     bool printData = false;
-    int paramNum;
+    int32_t paramNum;
 
     if ((argv == NULL) || (speedTest == NULL) || (argc <= 0)) {
         return HDF_ERR_INVALID_PARAM;
@@ -242,9 +242,9 @@ static int CheckParam(int argc, const char *argv[], struct UsbSpeedTest *speedTe
     return ret;
 }
 
-int main(int argc, char *argv[])
+int32_t main(int32_t argc, char *argv[])
 {
-    int ret;
+    int32_t ret;
     struct UsbSpeedTest test;
 
     ret = CheckParam(argc, argv, &test);

@@ -117,7 +117,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCreateDevice006, TestSize.Level1)
 #ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfDeviceStatus001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     UsbFnDeviceState devState;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->fnDev);
@@ -129,7 +129,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfDeviceStatus001, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfDeviceStatus002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     UsbFnDeviceState devState;
     ret = UsbFnGetDeviceState(nullptr, &devState);
     EXPECT_NE(HDF_SUCCESS, ret);
@@ -138,8 +138,8 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfDeviceStatus002, TestSize.Level1)
 #ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfDeviceStatus003, TestSize.Level1)
 {
-    int ret;
-    int count = 0;
+    int32_t ret;
+    int32_t count = 0;
     UsbFnDeviceState devState;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->fnDev);
@@ -153,7 +153,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfDeviceStatus003, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfDeviceStatus004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     ret = UsbFnGetDeviceState(nullptr, nullptr);
     EXPECT_NE(HDF_SUCCESS, ret);
 }
@@ -161,7 +161,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfDeviceStatus004, TestSize.Level1)
 #ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfDeviceStatus005, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     UsbFnDeviceState *devState = NULL;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->fnDev);
@@ -267,7 +267,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetInterface005, TestSize.Level1)
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetInterface006, TestSize.Level1)
 {
     struct UsbFnInterface *fnInterface = nullptr;
-    int cnt;
+    int32_t cnt;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->fnDev);
     for (cnt = 0; cnt < 0x2; cnt++) {
@@ -278,7 +278,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetInterface006, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetpipeInfo001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnPipeInfo info;
     EXPECT_TRUE((nullptr != g_acmDevice));
     EXPECT_TRUE(nullptr != g_acmDevice->dataIface.fn);
@@ -289,7 +289,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetpipeInfo001, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetpipeInfo002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnPipeInfo info;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.fn);
@@ -300,7 +300,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetpipeInfo002, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetpipeInfo003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnPipeInfo info;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.fn);
@@ -310,7 +310,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetpipeInfo003, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetpipeInfo004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.fn);
     ret = UsbFnGetInterfacePipeInfo(g_acmDevice->dataIface.fn, 0, nullptr);
@@ -320,7 +320,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetpipeInfo004, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetpipeInfo005, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnPipeInfo info;
     ret = UsbFnGetInterfacePipeInfo(nullptr, 1, &info);
     EXPECT_TRUE(HDF_SUCCESS != ret);
@@ -329,7 +329,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetpipeInfo005, TestSize.Level1)
 #ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetpipeInfo006, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnPipeInfo info;
     EXPECT_TRUE((nullptr != g_acmDevice));
     EXPECT_TRUE(nullptr != g_acmDevice->ctrlIface.fn);
@@ -350,7 +350,7 @@ int32_t PropCallBack(const struct UsbFnInterface *intf, const char *name, const 
 #ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRegistInfo info;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
@@ -364,7 +364,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp001, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRegistInfo info;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
@@ -378,7 +378,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp002, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRegistInfo info;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
@@ -392,7 +392,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp003, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRegistInfo info;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
@@ -406,7 +406,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp004, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp005, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRegistInfo info;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
@@ -421,7 +421,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp005, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp006, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRegistInfo info;
     info.name = "name_test5";
     info.value = "test_value";
@@ -434,7 +434,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp006, TestSize.Level1)
 #ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp007, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRegistInfo info;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.fn);
@@ -448,7 +448,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp007, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp008, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRegistInfo info;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.fn);
@@ -462,7 +462,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRegistProp008, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     char buffer[BUFFER_LEN] = {0};
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
@@ -473,7 +473,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp001, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     char buffer[BUFFER_LEN] = {0};
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
@@ -483,7 +483,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp002, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     char buffer[BUFFER_LEN] = {0};
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
@@ -493,7 +493,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp003, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     char buffer[BUFFER_LEN] = {0};
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
@@ -503,7 +503,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp004, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp005, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
     ret = UsbFnGetInterfaceProp(g_acmDevice->ctrlIface.fn, "idProduct", nullptr);
@@ -513,7 +513,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp005, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp006, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     char buffer[BUFFER_LEN] = {0};
     ret = UsbFnGetInterfaceProp(nullptr, "idProduct", buffer);
     EXPECT_TRUE(HDF_SUCCESS != ret);
@@ -522,7 +522,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp006, TestSize.Level1)
 #ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp007, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     char buffer[BUFFER_LEN] = {0};
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.fn);
@@ -533,7 +533,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp007, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp008, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     char buffer[BUFFER_LEN] = {0};
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.fn);
@@ -543,7 +543,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetProp008, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfSetProp001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
     ret = UsbFnSetInterfaceProp(g_acmDevice->ctrlIface.fn, "name_test", "hello");
@@ -552,7 +552,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfSetProp001, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfSetProp002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
     ret = UsbFnSetInterfaceProp(g_acmDevice->ctrlIface.fn, "unknown", "hello");
@@ -561,7 +561,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfSetProp002, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfSetProp003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
     ret = UsbFnSetInterfaceProp(nullptr, "name_test", "hello");
@@ -570,7 +570,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfSetProp003, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfSetProp004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
     ret = UsbFnSetInterfaceProp(g_acmDevice->ctrlIface.fn, nullptr, "hello");
@@ -579,7 +579,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfSetProp004, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfSetProp005, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
     ret = UsbFnSetInterfaceProp(g_acmDevice->ctrlIface.fn, "idVendor", "0x625");
@@ -588,7 +588,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfSetProp005, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfSetProp006, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
     ret = UsbFnSetInterfaceProp(g_acmDevice->ctrlIface.fn, "bLength", "0x14");
@@ -597,7 +597,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfSetProp006, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfSetProp007, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.fn);
     ret = UsbFnSetInterfaceProp(g_acmDevice->dataIface.fn, "name_test", "hello");
@@ -606,7 +606,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfSetProp007, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocCtrlRequest001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
@@ -618,7 +618,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocCtrlRequest001, TestSize.Level
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocCtrlRequest002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.handle);
@@ -640,7 +640,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocCtrlRequest003, TestSize.Level
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocCtrlRequest004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.handle);
@@ -698,7 +698,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocCtrlRequest009, TestSize.Level
 #ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocRequest001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.handle);
@@ -720,7 +720,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocRequest002, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocRequest003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.handle);
@@ -759,7 +759,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocRequest006, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocRequest007, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
@@ -799,7 +799,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocRequest010, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfFreeRequest001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataInPipe.id,
@@ -811,7 +811,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfFreeRequest001, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfFreeRequest002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id,
@@ -823,7 +823,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfFreeRequest002, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfFreeRequest003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     req = UsbFnAllocRequest(g_acmDevice->ctrlIface.handle, g_acmDevice->notifyPipe.id,
@@ -835,7 +835,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfFreeRequest003, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfFreeRequest004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     req = UsbFnAllocCtrlRequest(g_acmDevice->ctrlIface.handle, g_acmDevice->notifyPipe.maxPacketSize);
@@ -846,8 +846,8 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfFreeRequest004, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfFreeRequest005, TestSize.Level1)
 {
-    int ret;
-    int count;
+    int32_t ret;
+    int32_t count;
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     for (count = 0; count < TEST_TIMES; count++) {
@@ -861,7 +861,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfFreeRequest005, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfFreeRequest006, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     ret = UsbFnFreeRequest(nullptr);
     EXPECT_TRUE(ret != HDF_SUCCESS);
 }
@@ -874,7 +874,7 @@ static void eventCallback(struct UsbFnEvent *event)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStartRecvEvent001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
     ret = UsbFnStartRecvInterfaceEvent(g_acmDevice->ctrlIface.fn, 0xff, nullptr, g_acmDevice);
@@ -883,7 +883,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStartRecvEvent001, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStartRecvEvent002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
     ret = UsbFnStartRecvInterfaceEvent(g_acmDevice->ctrlIface.fn, 0x0, eventCallback, g_acmDevice);
@@ -892,7 +892,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStartRecvEvent002, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStartRecvEvent003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
     ret = UsbFnStartRecvInterfaceEvent(nullptr, 0xff, eventCallback, g_acmDevice);
@@ -901,7 +901,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStartRecvEvent003, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStartRecvEvent004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
     ret = UsbFnStopRecvInterfaceEvent(g_acmDevice->ctrlIface.fn);
@@ -912,8 +912,8 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStartRecvEvent004, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStartRecvEvent005, TestSize.Level1)
 {
-    int ret;
-    int count = 0;
+    int32_t ret;
+    int32_t count = 0;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
     for (count = 0; count < TEST_TIMES; count++) {
@@ -926,7 +926,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStartRecvEvent005, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStartRecvEvent006, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
     ret = UsbFnStartRecvInterfaceEvent(g_acmDevice->ctrlIface.fn, 0xff, eventCallback, g_acmDevice);
@@ -935,7 +935,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStartRecvEvent006, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStartRecvEvent007, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.fn);
     ret = UsbFnStartRecvInterfaceEvent(g_acmDevice->dataIface.fn, 0xff, eventCallback, g_acmDevice);
@@ -944,7 +944,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStartRecvEvent007, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStopRecvEvent001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     ret = UsbFnStopRecvInterfaceEvent(nullptr);
     EXPECT_TRUE(HDF_SUCCESS != ret);
@@ -952,7 +952,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStopRecvEvent001, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStopRecvEvent002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
     ret = UsbFnStopRecvInterfaceEvent(g_acmDevice->ctrlIface.fn);
@@ -961,7 +961,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStopRecvEvent002, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStopRecvEvent003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.fn);
     ret = UsbFnStopRecvInterfaceEvent(g_acmDevice->ctrlIface.fn);
@@ -970,7 +970,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStopRecvEvent003, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStopRecvEvent004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.fn);
     ret = UsbFnStopRecvInterfaceEvent(g_acmDevice->dataIface.fn);
@@ -979,7 +979,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfStopRecvEvent004, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCloseInterface001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.handle);
     ret = UsbFnCloseInterface(g_acmDevice->ctrlIface.handle);
@@ -989,7 +989,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCloseInterface001, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCloseInterface002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
     ret = UsbFnCloseInterface(g_acmDevice->dataIface.handle);
@@ -999,7 +999,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCloseInterface002, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCloseInterface003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     ret = UsbFnCloseInterface(g_acmDevice->ctrlIface.handle);
     EXPECT_TRUE(HDF_SUCCESS != ret);
@@ -1007,7 +1007,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCloseInterface003, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfCloseInterface004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     ret = UsbFnCloseInterface(g_acmDevice->dataIface.handle);
     EXPECT_TRUE(HDF_SUCCESS != ret);
@@ -1063,7 +1063,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfOpenInterface005, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRemoveDevice001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     ret = UsbFnRemoveDevice(nullptr);
     EXPECT_TRUE(HDF_SUCCESS != ret);
 }
@@ -1071,7 +1071,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRemoveDevice001, TestSize.Level1)
 #ifdef AUTO_NO_SKIP
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfRemoveDevice002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     EXPECT_NE(nullptr, g_acmDevice);
     ReleaseAcmDevice(g_acmDevice);

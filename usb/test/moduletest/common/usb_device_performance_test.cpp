@@ -69,7 +69,7 @@ HWTEST_F(UsbDevicePerformanceTest, CheckDeviceSdkProcInfo, TestSize.Level1)
     printf("------start CheckDeviceSdkProcInfo------\n");
     const string logFile = "/data/usb_proclog.txt";
     const string script = "usb_watch_process.sh";
-    int processCount;
+    int32_t processCount;
     pid_t watchPid = 0;
     char *pch = nullptr;
     FILE *res = nullptr;
@@ -81,7 +81,7 @@ HWTEST_F(UsbDevicePerformanceTest, CheckDeviceSdkProcInfo, TestSize.Level1)
     printf("try to start usb_watch_process.sh...\n");
     ASSERT_EQ(system(("nohup sh " + script + " usbfnMaster_host > /data/nohup.out &").c_str()), 0);
     printf("usb_watch_process.sh is running...\n");
-    for (int i = 0; i < 1000; i++) {
+    for (int32_t i = 0; i < 1000; i++) {
         system("usb_dev_test -2 $RANDOM");
         printf("Write data %d times\n", i);
         usleep(100 * 1000);

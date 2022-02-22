@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "usb_dev_test.h"
 #include <hdf_log.h>
 #include <hdf_remote_service.h>
 #include <hdf_sbuf.h>
@@ -26,10 +25,11 @@
 #include "cdcacm.h"
 #include "osal_time.h"
 #include <signal.h>
+#include "usb_dev_test.h"
 
 #define HDF_LOG_TAG   cdc_acm_test
 
-static int running = 1;
+static int32_t running = 1;
 static struct termios g_orgOpts, g_newOpts;
 static struct HdfSBuf *g_data;
 static struct HdfSBuf *g_reply;
@@ -40,7 +40,7 @@ static void TestWrite(char *buf)
 {
     HdfSbufFlush(g_data);
     (void)HdfSbufWriteString(g_data, buf);
-    int status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_WRITE, g_data, g_reply);
+    int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_WRITE, g_data, g_reply);
     if (status <= 0) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE failed status = %d", __func__, status);
     }
@@ -50,7 +50,7 @@ static void TestRead()
 {
     size_t i;
     HdfSbufFlush(g_reply);
-    int status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_READ, g_data, g_reply);
+    int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_READ, g_data, g_reply);
     if (status) {
         printf("%s: Dispatch USB_SERIAL_READ failed status = %d", __func__, status);
         return;
@@ -69,7 +69,7 @@ static void TestRead()
 }
 
 #define SLEEP_100MS 100000
-static int ReadThread(void *arg)
+static int32_t ReadThread(void *arg)
 {
     while (running) {
         TestRead();
@@ -78,9 +78,9 @@ static int ReadThread(void *arg)
     return 0;
 }
 #define HDF_PROCESS_STACK_SIZE 10000
-static int StartThreadRead()
+static int32_t StartThreadRead()
 {
-    int ret;
+    int32_t ret;
     struct OsalThreadParam threadCfg;
     memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
     threadCfg.name = "Read process";
@@ -121,9 +121,9 @@ static void WriteThread()
     }
 }
 
-void StopAcmTest(int signo)
+void StopAcmTest(int32_t signo)
 {
-    int status;
+    int32_t status;
     running = 0;
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status) {
@@ -133,9 +133,9 @@ void StopAcmTest(int signo)
     printf("acm_test exit.\n");
 }
 
-int acm_test(int argc, const char *argv[])
+int32_t acm_test(int32_t argc, const char *argv[])
 {
-    int status;
+    int32_t status;
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();
     if (servmgr == NULL) {
         HDF_LOGE("%s: HDIServiceManagerGet err", __func__);
