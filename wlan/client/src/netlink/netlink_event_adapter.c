@@ -175,17 +175,15 @@ static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
     const char *ifName = (const char *)arg;
     struct nlattr *attr[NL80211_ATTR_MAX + 1], *bssAttr[NL80211_BSS_MAX + 1];
     static struct nla_policy bssPolicy[NL80211_BSS_MAX + 1];
-    bssPolicy[NL80211_BSS_BSSID] = { };
+    memset_s(bssPolicy, sizeof(bssPolicy), 0, sizeof(bssPolicy));
     bssPolicy[NL80211_BSS_FREQUENCY].type = NLA_U32;
     bssPolicy[NL80211_BSS_TSF].type = NLA_U64;
     bssPolicy[NL80211_BSS_BEACON_INTERVAL].type = NLA_U16;
     bssPolicy[NL80211_BSS_CAPABILITY].type = NLA_U16;
-    bssPolicy[NL80211_BSS_INFORMATION_ELEMENTS].type = { };
     bssPolicy[NL80211_BSS_SIGNAL_MBM].type = NLA_U32;
     bssPolicy[NL80211_BSS_SIGNAL_UNSPEC].type = NLA_U8;
     bssPolicy[NL80211_BSS_STATUS].type = NLA_U32;
     bssPolicy[NL80211_BSS_SEEN_MS_AGO].type = NLA_U32;
-    bssPolicy[NL80211_BSS_BEACON_IES] = { };
 
     if (ifName == NULL) {
         HILOG_ERROR(LOG_DOMAIN, "%s: ifName is null", __func__);

@@ -526,13 +526,12 @@ static int32_t ParserSupportComboInfo(struct nl_msg *msg, void *arg)
     struct nlattr *attrComb[NUM_NL80211_IFACE_COMB];
     struct nlattr *attrLimit[NUM_NL80211_IFACE_LIMIT];
     int32_t ret, i, j, k, type;
-    static struct nla_policy
-    ifaceCombPolicy[NUM_NL80211_IFACE_COMB];
+    static struct nla_policy ifaceCombPolicy[NUM_NL80211_IFACE_COMB];
     ifaceCombPolicy[NL80211_IFACE_COMB_LIMITS].type  = NLA_NESTED;
     ifaceCombPolicy[NL80211_IFACE_COMB_MAXNUM].type  = NLA_U32;
     ifaceCombPolicy[NL80211_IFACE_COMB_NUM_CHANNELS].type  = NLA_U32;
-    
-    ifaceLimitPolicy[NUM_NL80211_IFACE_LIMIT];
+
+    static struct nla_policy ifaceLimitPolicy[NUM_NL80211_IFACE_LIMIT];
     ifaceLimitPolicy[NL80211_IFACE_LIMIT_MAX].type  = NLA_U32;
     ifaceLimitPolicy[NL80211_IFACE_LIMIT_TYPES].type  = NLA_NESTED;
     
