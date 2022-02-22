@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "usb_dev_test.h"
 #include <hdf_log.h>
 #include <hdf_remote_service.h>
 #include <hdf_sbuf.h>
@@ -23,6 +22,7 @@
 #include <stdio.h>
 #include "cdcacm.h"
 #include "osal_time.h"
+#include "usb_dev_test.h"
 
 #define HDF_LOG_TAG   cdc_acm_read
 
@@ -34,11 +34,11 @@ static struct HdfRemoteService *g_acmService;
 #define SLEEP_READ 100000
 static void TestRead(FILE *fp)
 {
-    int ret;
+    int32_t ret;
     char str[STR_LEN] = {0};
     struct timeval time;
     HdfSbufFlush(g_reply);
-    int status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_READ, g_data, g_reply);
+    int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_READ, g_data, g_reply);
     if (status) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_READ failed status = %d", __func__, status);
         return;
@@ -58,9 +58,9 @@ static void TestRead(FILE *fp)
     usleep(SLEEP_READ);
 }
 
-int acm_read(int argc, const char *argv[])
+int32_t acm_read(int32_t argc, const char *argv[])
 {
-    int status;
+    int32_t status;
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();
     if (servmgr == NULL) {
         HDF_LOGE("%s: HDIServiceManagerGet err", __func__);

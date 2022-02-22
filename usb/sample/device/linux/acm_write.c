@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "usb_dev_test.h"
 #include <hdf_log.h>
 #include <hdf_remote_service.h>
 #include <hdf_sbuf.h>
@@ -22,6 +21,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include "cdcacm.h"
+#include "usb_dev_test.h"
 
 #define HDF_LOG_TAG   cdc_acm_write
 
@@ -33,7 +33,7 @@ static void TestWrite(char *buf)
 {
     HdfSbufFlush(g_data);
     (void)HdfSbufWriteString(g_data, buf);
-    int status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_WRITE, g_data, g_reply);
+    int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_WRITE, g_data, g_reply);
     if (status <= 0) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE failed status = %d", __func__, status);
     }
@@ -41,10 +41,10 @@ static void TestWrite(char *buf)
 
 #define STR_LEN 1024
 #define NUM_INPUT 2
-int acm_write(int argc, const char *argv[])
+int32_t acm_write(int32_t argc, const char *argv[])
 {
     char str[STR_LEN] = {0};
-    int status;
+    int32_t status;
     FILE *fp = NULL;
     struct timeval time;
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();
@@ -73,13 +73,13 @@ int acm_write(int argc, const char *argv[])
     }
     if (argc >= NUM_INPUT) {
         gettimeofday(&time, NULL);
-        fp = fopen("/data/acm_write_xts", "a+");
         status = snprintf_s(str, STR_LEN, STR_LEN - 1, "[XTSCHECK] %d.%06d, send data[%s] to host\n",
             time.tv_sec, time.tv_usec, argv[1]);
         if (status < 0) {
             HDF_LOGE("%s: snprintf_s failed", __func__);
             return HDF_FAILURE;
         }
+        fp = fopen("/data/acm_write_xts", "a+");
         (void)fwrite(str, strlen(str), 1, fp);
         (void)fclose(fp);
         TestWrite((char *)argv[1]);

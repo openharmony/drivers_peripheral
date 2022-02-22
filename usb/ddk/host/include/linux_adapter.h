@@ -87,30 +87,31 @@ struct UsbAdapterStreams {
 };
 
 struct UsbOsAdapterOps {
-    int (*init)(const struct UsbSession *session);
+    int32_t (*init)(const struct UsbSession *session);
     void (*exit)(const struct UsbSession *session);
     struct UsbDeviceHandle *(*openDevice)(struct UsbSession *session, uint8_t busNum, uint8_t usbAddr);
     void (*closeDevice)(struct UsbDeviceHandle *devHandle);
-    int (*getConfigDescriptor)(const struct UsbDevice *device, uint8_t configIndex, void *buffer, size_t len);
-    int (*getConfiguration)(const struct UsbDeviceHandle *devHandle, uint8_t *activeConfig);
-    int (*setConfiguration)(struct UsbDeviceHandle *devHandle, int activeConfig);
-    int (*claimInterface)(const struct UsbDeviceHandle *devHandle, unsigned int interfaceNumber);
-    int (*releaseInterface)(const struct UsbDeviceHandle *devHandle, unsigned int interfaceNumber);
-    int (*setInterfaceAltsetting)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber, uint8_t altsetting);
-    int (*clearHalt)(const struct UsbDeviceHandle *devHandle, unsigned int endpoint);
-    int (*resetDevice)(const struct UsbDeviceHandle *devHandle);
-    struct UsbHostRequest *(*allocRequest)(const struct UsbDeviceHandle *handle, int isoPackets, size_t len);
-    int (*freeRequest)(struct UsbHostRequest *request);
-    int (*submitRequest)(struct UsbHostRequest *request);
-    int (*cancelRequest)(struct UsbHostRequest *request);
-    int (*urbCompleteHandle)(const struct UsbDeviceHandle *devHandle);
+    int32_t (*getConfigDescriptor)(const struct UsbDevice *device, uint8_t configIndex, void *buffer, size_t len);
+    int32_t (*getConfiguration)(const struct UsbDeviceHandle *devHandle, uint8_t *activeConfig);
+    int32_t (*setConfiguration)(struct UsbDeviceHandle *devHandle, int32_t activeConfig);
+    int32_t (*claimInterface)(const struct UsbDeviceHandle *devHandle, unsigned int interfaceNumber);
+    int32_t (*releaseInterface)(const struct UsbDeviceHandle *devHandle, unsigned int interfaceNumber);
+    int32_t (*setInterfaceAltsetting)(const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber,
+        uint8_t altsetting);
+    int32_t (*clearHalt)(const struct UsbDeviceHandle *devHandle, unsigned int endpoint);
+    int32_t (*resetDevice)(const struct UsbDeviceHandle *devHandle);
+    struct UsbHostRequest *(*allocRequest)(const struct UsbDeviceHandle *handle, int32_t isoPackets, size_t len);
+    int32_t (*freeRequest)(struct UsbHostRequest *request);
+    int32_t (*submitRequest)(struct UsbHostRequest *request);
+    int32_t (*cancelRequest)(struct UsbHostRequest *request);
+    int32_t (*urbCompleteHandle)(const struct UsbDeviceHandle *devHandle);
 };
 
 struct UsbOsAdapterOps *UsbAdapterGetOps(void);
 UsbRawTidType UsbAdapterGetTid(void);
-int UsbAdapterRegisterSignal(void);
-int UsbAdapterKillSignal(struct UsbDeviceHandle *devHandle, UsbRawTidType tid);
-int AdapterAtomicInc(OsalAtomic *v);
-int AdapterAtomicDec(OsalAtomic *v);
+int32_t UsbAdapterRegisterSignal(void);
+int32_t UsbAdapterKillSignal(struct UsbDeviceHandle *devHandle, UsbRawTidType tid);
+int32_t AdapterAtomicInc(OsalAtomic *v);
+int32_t AdapterAtomicDec(OsalAtomic *v);
 
 #endif /* USB_HOST_LINUX_ADAPTER_H */

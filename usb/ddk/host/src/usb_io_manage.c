@@ -40,7 +40,7 @@ static bool IoCancelRequest(struct UsbInterfacePool *interfacePool, const struct
     return (requestObj->request.compInfo.status == USB_REQUEST_CANCELLED);
 }
 
-static int IoSendProcess(const void *interfacePoolArg)
+static int32_t IoSendProcess(const void *interfacePoolArg)
 {
     if (interfacePoolArg == NULL) {
         HDF_LOGE("%s: invalid param", __func__);
@@ -49,8 +49,8 @@ static int IoSendProcess(const void *interfacePoolArg)
 
     struct UsbInterfacePool *interfacePool = (struct UsbInterfacePool *)interfacePoolArg;
     struct UsbHostRequest *submitRequest = NULL;
-    int ret;
-    int i;
+    int32_t ret;
+    int32_t i;
 
     while (true) {
         if (interfacePool == NULL) {
@@ -100,7 +100,7 @@ static int IoSendProcess(const void *interfacePoolArg)
     return 0;
 }
 
-static int IoAsyncReceiveProcess(const void *interfacePoolArg)
+static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
 {
     if (interfacePoolArg == NULL) {
         HDF_LOGE("%s: invalid param", __func__);
@@ -108,18 +108,21 @@ static int IoAsyncReceiveProcess(const void *interfacePoolArg)
     }
 
     struct UsbInterfacePool *interfacePool = (struct UsbInterfacePool *)interfacePoolArg;
-    int ret;
+    int32_t ret;
 
     if (RawRegisterSignal() != HDF_SUCCESS) {
         HDF_LOGE("%s:%d RawRegisterSignal error", __func__, __LINE__);
     }
-    interfacePool->ioProcessTid = RawGetTid();
 
     while (true) {
         if (interfacePool == NULL) {
             HDF_LOGE("%s:%d interfacePool is NULL", __func__, __LINE__);
             OsalMSleep(USB_IO_SLEEP_MS_TIME);
             return HDF_FAILURE;
+        }
+
+        if (!interfacePool->ioProcessTid) {
+            interfacePool->ioProcessTid = RawGetTid();
         }
 
         if (interfacePool->device == NULL) {
@@ -379,7 +382,7 @@ void UsbIoSetRequestCompletionInfo(const void *requestArg)
     }
     requestObj->request.compInfo.buffer = hostRequest->buffer;
     requestObj->request.compInfo.length = hostRequest->length;
-    requestObj->request.compInfo.actualLength = hostRequest->actualLength;
+    requestObj->request.compInfo.actualLength = (uint32_t)hostRequest->actualLength;
     requestObj->request.compInfo.status = hostRequest->status;
     requestObj->request.compInfo.userData = hostRequest->userData;
     if ((hostRequest->requestType & USB_DDK_ENDPOINT_XFERTYPE_MASK) == USB_DDK_ENDPOINT_XFER_CONTROL) {

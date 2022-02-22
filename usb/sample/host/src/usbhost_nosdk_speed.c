@@ -49,11 +49,11 @@
 
 
 static pid_t tid;
-static int exitOk = false;
-static int g_speedFlag = 0;
+static int32_t exitOk = false;
+static int32_t g_speedFlag = 0;
 static unsigned int g_busNum = 1;
 static unsigned int g_devAddr = 2;
-static int fd;
+static int32_t fd;
 static struct OsalSem sem;
 static uint64_t g_send_count = 0;
 static uint64_t g_recv_count = 0;
@@ -73,10 +73,10 @@ static void CloseDevice()
     return;
 }
 
-static int OpenDevice()
+static int32_t OpenDevice()
 {
     char path[24];
-    int ret;
+    int32_t ret;
 
     ret = snprintf_s(path, 24, sizeof(path), USB_DEV_FS_PATH "/%03u/%03u", g_busNum, g_devAddr);
     if (ret < 0) {
@@ -94,14 +94,14 @@ static int OpenDevice()
     return fd;
 }
 
-static int ClaimInterface(unsigned int iface)
+static int32_t ClaimInterface(unsigned int iface)
 {
     if (fd < 0 || iface < 0) {
         printf("parameter error\n");
         return -1;
     }
 
-    int r = ioctl(fd, USBDEVFS_CLAIMINTERFACE, &iface);
+    int32_t r = ioctl(fd, USBDEVFS_CLAIMINTERFACE, &iface);
     if (r < 0) {
         printf("claim failed: iface=%u, errno=%2d(%s)\n", iface, errno, strerror(errno));
         return HDF_FAILURE;
@@ -110,7 +110,7 @@ static int ClaimInterface(unsigned int iface)
     return HDF_SUCCESS;
 }
 
-static void FillUrb(struct UsbAdapterUrb *urb, int len)
+static void FillUrb(struct UsbAdapterUrb *urb, int32_t len)
 {
     if (urb == NULL)
     {
@@ -125,7 +125,7 @@ static void FillUrb(struct UsbAdapterUrb *urb, int len)
     }
 }
 
-void SignalHandler(int signo)
+void SignalHandler(int32_t signo)
 {
     static uint32_t sigCnt = 0;
     struct itimerval new_value, old_value;
@@ -153,10 +153,10 @@ void SignalHandler(int signo)
    }
 }
 
-static int SendProcess(void *argurb)
+static int32_t SendProcess(void *argurb)
 {
-    int i;
-    int r;
+    int32_t i;
+    int32_t r;
     while (!g_speedFlag) {
         OsalSemWait(&sem, HDF_WAIT_FOREVER);
         for (i = 0; i < TEST_CYCLE; i++) {
@@ -183,9 +183,9 @@ static int SendProcess(void *argurb)
     return 0;
 }
 
-static int ReapProcess(void *argurb)
+static int32_t ReapProcess(void *argurb)
 {
-    int r;
+    int32_t r;
     struct UsbAdapterUrb *urbrecv = NULL;
     struct itimerval new_value, old_value;
     if (signal(SIGUSR1, SignalHandler) == SIG_ERR) {
@@ -216,7 +216,7 @@ static int ReapProcess(void *argurb)
         unsigned char *recvBuf = (unsigned char*)urbrecv->buffer;
 
         if (g_printData == true) {
-            for (int i = 0; i < urbrecv->actualLength; i++)
+            for (int32_t i = 0; i < urbrecv->actualLength; i++)
                 printf("%c", recvBuf[i]);
             fflush(stdout);
         } else if (g_recv_count % 10000 == 0) {
@@ -232,19 +232,19 @@ static int ReapProcess(void *argurb)
     return 0;
 }
 
-static int BeginProcess(unsigned char endPoint)
+static int32_t BeginProcess(unsigned char endPoint)
 {
-    int r;
+    int32_t r;
     char *data = NULL;
     struct timeval time;
-    int transNum = 0;
-    int i;
+    int32_t transNum = 0;
+    int32_t i;
 
     if (fd < 0 || endPoint <= 0) {
         printf("parameter error\n");
         return -1;
     }
-    for (int i = 0; i < TEST_CYCLE; i++) {
+    for (int32_t i = 0; i < TEST_CYCLE; i++) {
         urb[i].urb = calloc(1, sizeof(struct UsbAdapterUrb));
         if (urb[i].urb == NULL) {
             return -1;
@@ -294,7 +294,7 @@ static int BeginProcess(unsigned char endPoint)
     while (exitOk != true) {
         OsalMSleep(10);
     }
-    for (int i = 0; i < TEST_CYCLE; i++) {
+    for (int32_t i = 0; i < TEST_CYCLE; i++) {
         munmap(urb[i].urb->buffer, TEST_LENGTH);
         free(urb[i].urb);
     }
@@ -308,9 +308,9 @@ static void ShowHelp(char *name)
     printf("\n");
 }
 
-int main(int argc, char *argv[])
+int32_t main(int32_t argc, char *argv[])
 {
-    int ret;
+    int32_t ret;
     if (argc == 6) {
         g_busNum = atoi(argv[1]);
         g_devAddr = atoi(argv[2]);

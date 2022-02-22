@@ -56,17 +56,17 @@ struct UsbIsoPacketDesc {
 struct UsbAdapterUrb {
     unsigned char type;
     unsigned char endPoint;
-    int status;
+    int32_t status;
     unsigned int flags;
     void *buffer;
-    int bufferLength;
-    int actualLength;
-    int startFrame;
+    int32_t bufferLength;
+    int32_t actualLength;
+    int32_t startFrame;
     union {
-        int numberOfPackets;
+        int32_t numberOfPackets;
         unsigned int streamId;
     };
-    int error_count;
+    int32_t error_count;
     unsigned int signr;
     void *userContext;
     struct UsbIsoPacketDesc isoFrameDesc[0];
@@ -74,8 +74,8 @@ struct UsbAdapterUrb {
 
 struct UsbAdapterUrbs {
     struct UsbAdapterUrb *urb;
-    int inUse;
-    int urbNum;
+    int32_t inUse;
+    int32_t urbNum;
 };
 
 #endif  /* USB_HOST_NO_SDK_SPEED_H */
