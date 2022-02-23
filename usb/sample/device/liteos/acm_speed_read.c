@@ -58,7 +58,7 @@ static sigset_t g_mask;
 static void TestSpeed()
 {
     HdfSbufFlush(g_reply);
-    int status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_READ_SPEED, g_data, g_reply);
+    int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_READ_SPEED, g_data, g_reply);
     if (status) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_READ_SPEED err", __func__);
         return;
@@ -70,7 +70,7 @@ static void GetTempSpeed()
     const float calc = 10000;
     uint32_t speed = 0;
     HdfSbufFlush(g_reply);
-    int status = g_acmService->dispatcher->Dispatch(&g_acmService->object,
+    int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object,
         USB_SERIAL_READ_GET_TEMP_SPEED_UINT32, g_data, g_reply);
     if (status) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE_GET_TEMP_SPEED failed status = %d",
@@ -88,7 +88,7 @@ static void GetTempSpeed()
 
 static void ReadSpeedDone()
 {
-    int status = g_acmService->dispatcher->Dispatch(&g_acmService->object,
+    int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object,
         USB_SERIAL_READ_SPEED_DONE, g_data, g_reply);
     if (status) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE_SPEED_DONE failed status = %d",
@@ -99,7 +99,7 @@ static void ReadSpeedDone()
 
 static void *StopHandler(void *arg)
 {
-    int err, signo;
+    int32_t err, signo;
     while (1) {
         err = sigwait(&g_mask, &signo);
         if (err != 0) {
@@ -135,9 +135,9 @@ static void StartStopHandler()
     }
 }
 
-int acm_speed_read(int argc, const char *argv[])
+int32_t acm_speed_read(int32_t argc, const char *argv[])
 {
-    int status;
+    int32_t status;
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");
     if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
         HDF_LOGE("%s: GetService err", __func__);

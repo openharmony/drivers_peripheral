@@ -18,16 +18,20 @@
 
 #include <string>
 
-namespace hdi {
-namespace thermal {
-namespace v1_0 {
+namespace OHOS {
+namespace HDI {
+namespace Thermal {
+namespace V1_0 {
 class ThermalDeviceMitigation {
 public:
     ThermalDeviceMitigation() {};
     ~ThermalDeviceMitigation() {};
+    int32_t ExecuteCpuRequest(uint32_t freq, const std::string &path);
     int32_t CpuRequest(uint32_t freq);
     int32_t GpuRequest(uint32_t freq);
+
     int32_t ChargerRequest(uint32_t current);
+    int32_t ExecuteChargerRequest(uint32_t current, const std::string &path);
     int32_t BatteryCurrentRequest(uint32_t current);
     int32_t BatteryVoltageRequest(uint32_t voltage);
     int32_t WriteSysfsFd(int32_t fd, std::string buf, size_t bytesSize);
@@ -37,7 +41,8 @@ public:
 private:
     bool flag_ {false};
 };
-} // v1_0
-} // thermal
-} // hdi
+} // V1_0
+} // Thermal
+} // HDI
+} // OHOS
 #endif // THERMAL_DEVICE_MITIGATION_H

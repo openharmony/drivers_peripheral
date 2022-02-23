@@ -83,7 +83,7 @@ void MergeNode::MergeBuffers()
                     if (tmpVec_.size() == 0) {
                     {
                         std::unique_lock<std::mutex> lck(mtx_);
-                        cv_.wait(lck);
+                        cv_.wait(lck, [this] { return !mergeVec_.empty(); });
                         auto tmpFrame = std::find_if(mergeVec_.begin(), mergeVec_.end(),
                             [it](std::shared_ptr<FrameSpec> fs) {
                             return it->format_.bufferPoolId_ == fs->bufferPoolId_;

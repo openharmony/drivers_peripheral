@@ -27,7 +27,7 @@ ohos_unittest("hdf_sensor_hdi_test_performance") {
   ]
 
   sources = [
-    "//drivers/peripheral/sensor/test/unittest/hdi/sensor_callback_service.cpp",
+    "//drivers/peripheral/sensor/test/unittest/hdi/sensor_callback_impl.cpp",
     "hdf_sensor_hdi_performance_test.cpp",
   ]
   cflags = [

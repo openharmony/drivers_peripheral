@@ -15,9 +15,7 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libthermal_callback") {
   include_dirs = [ "../include" ]
-  sources = [ "./thermal_callback_service.cpp" ]
-
-  deps = [ "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_proxy_1.0" ]
+  sources = [ "./thermal_callback_impl.cpp" ]
 
   if (is_standard_system) {
     external_deps = [
@@ -28,6 +26,7 @@ ohos_shared_library("libthermal_callback") {
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
       "sensor_device_driver:hdi_sensor",
+      "thermal_device_driver:libthermal_proxy_1.0",
       "utils_base:utils",
     ]
   } else {

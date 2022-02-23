@@ -26,13 +26,13 @@ ohos_shared_library("libthermal_interface_service_1.0") {
     "src/thermal_device_mitigation.cpp",
     "src/thermal_hdf_config.cpp",
     "src/thermal_hdf_timer.cpp",
-    "src/thermal_interface_service.cpp",
+    "src/thermal_interface_impl.cpp",
     "src/thermal_simulation_node.cpp",
     "src/thermal_zone_manager.cpp",
   ]
 
   deps = [
-    "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_stub_1.0",
+    "//drivers/interface/thermal/v1_0:libthermal_stub_1.0",
     "//third_party/libxml2:xml2",
   ]
 
@@ -65,7 +65,7 @@ ohos_shared_library("libthermal_driver") {
   sources = [ "src/thermal_interface_driver.cpp" ]
 
   deps = [
-    "//drivers/peripheral/thermal/interfaces/hdi/thermal/v1_0:libthermal_stub_1.0",
+    "//drivers/interface/thermal/v1_0:libthermal_stub_1.0",
     "//drivers/peripheral/thermal/interfaces/hdi_service:libthermal_interface_service_1.0",
   ]
 

@@ -67,13 +67,13 @@ struct UsbSerial {
 
     bool                        suspended;
     bool                        startDelayed;
-    int                         refCount;
+    int32_t                         refCount;
 };
 
 struct AcmNotifyMethod {
     void (*Connect)(struct UsbAcmDevice *acm);
     void (*Disconnect)(struct UsbAcmDevice *acm);
-    int (*SendBreak)(struct UsbAcmDevice *acm, int duration);
+    int32_t (*SendBreak)(struct UsbAcmDevice *acm, int32_t duration);
 };
 
 struct UsbAcmPipe {

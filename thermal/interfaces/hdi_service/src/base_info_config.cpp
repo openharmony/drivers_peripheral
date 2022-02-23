@@ -14,17 +14,22 @@
  */
 #include "base_info_config.h"
 
-namespace hdi {
-namespace thermal {
-namespace v1_0 {
-void BaseInfoConfig::SetBase(std::vector<BaseItem> &vBase)
+#define HDF_LOG_TAG BaseInfoConfig
+
+namespace OHOS {
+namespace HDI {
+namespace Thermal {
+namespace V1_0 {
+void BaseInfoConfig::SetBase(std::vector<BaseItem> &bastList)
 {
-    vBase_ = vBase;
+    bastList_ = bastList;
 }
 
-void BaseInfoConfig::Dump()
+std::vector<BaseItem> BaseInfoConfig::GetBaseItem()
 {
+    return bastList_;
 }
-} // v1_0
-} // thermal
-} // hdi
+} // V1_0
+} // Thermal
+} // HDI
+} // OHOS

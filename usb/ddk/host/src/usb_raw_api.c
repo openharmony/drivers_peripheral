@@ -18,12 +18,12 @@
 
 #define HDF_LOG_TAG USB_RAW_API
 
-int UsbRawInit(struct UsbSession **session)
+int32_t UsbRawInit(struct UsbSession **session)
 {
     return RawInit(session);
 }
 
-int UsbRawExit(const struct UsbSession *session)
+int32_t UsbRawExit(const struct UsbSession *session)
 {
     return RawExit(session);
 }
@@ -33,7 +33,7 @@ UsbRawHandle *UsbRawOpenDevice(const struct UsbSession *session, uint8_t busNum,
     return (UsbRawHandle *)RawOpenDevice(session, busNum, usbAddr);
 }
 
-int UsbRawCloseDevice(const UsbRawHandle *devHandle)
+int32_t UsbRawCloseDevice(const UsbRawHandle *devHandle)
 {
     if (devHandle == NULL) {
         HDF_LOGE("%s:%d devHandle is NULL", __func__, __LINE__);
@@ -43,7 +43,7 @@ int UsbRawCloseDevice(const UsbRawHandle *devHandle)
     return RawCloseDevice((const struct UsbDeviceHandle *)devHandle);
 }
 
-int UsbRawSendControlRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+int32_t UsbRawSendControlRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbControlRequestData *requestData)
 {
     if ((request == NULL) || (devHandle == NULL) || (requestData == NULL)) {
@@ -55,7 +55,7 @@ int UsbRawSendControlRequest(const struct UsbRawRequest *request, const UsbRawHa
         requestData);
 }
 
-int UsbRawSendBulkRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+int32_t UsbRawSendBulkRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbRequestData *requestData)
 {
     if ((request == NULL) || (devHandle == NULL) || (requestData == NULL)) {
@@ -67,7 +67,7 @@ int UsbRawSendBulkRequest(const struct UsbRawRequest *request, const UsbRawHandl
         requestData);
 }
 
-int UsbRawSendInterruptRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+int32_t UsbRawSendInterruptRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbRequestData *requestData)
 {
     if ((request == NULL) || (devHandle == NULL) || (requestData == NULL)) {
@@ -79,7 +79,7 @@ int UsbRawSendInterruptRequest(const struct UsbRawRequest *request, const UsbRaw
         requestData);
 }
 
-int UsbRawGetConfigDescriptor(const UsbRawDevice *rawDev, uint8_t configIndex,
+int32_t UsbRawGetConfigDescriptor(const UsbRawDevice *rawDev, uint8_t configIndex,
     struct UsbRawConfigDescriptor **config)
 {
     if ((rawDev == NULL) || (config == NULL)) {
@@ -99,10 +99,9 @@ void UsbRawFreeConfigDescriptor(const struct UsbRawConfigDescriptor *config)
 
     RawClearConfiguration((struct UsbRawConfigDescriptor *)config);
     RawUsbMemFree((void *)config);
-    config = NULL;
 }
 
-int UsbRawGetConfiguration(const UsbRawHandle *devHandle, int *config)
+int32_t UsbRawGetConfiguration(const UsbRawHandle *devHandle, int32_t *config)
 {
     if ((devHandle == NULL) || (config == NULL)) {
         HDF_LOGE("%s:%d dev or config is NULL", __func__, __LINE__);
@@ -112,7 +111,7 @@ int UsbRawGetConfiguration(const UsbRawHandle *devHandle, int *config)
     return RawGetConfiguration((const struct UsbDeviceHandle *)devHandle, config);
 }
 
-int UsbRawSetConfiguration(const UsbRawHandle *devHandle, int config)
+int32_t UsbRawSetConfiguration(const UsbRawHandle *devHandle, int32_t config)
 {
     if (devHandle == NULL) {
         HDF_LOGE("%s:%d dev is NULL", __func__, __LINE__);
@@ -122,7 +121,7 @@ int UsbRawSetConfiguration(const UsbRawHandle *devHandle, int config)
     return RawSetConfiguration((const struct UsbDeviceHandle *)devHandle, config);
 }
 
-int UsbRawGetDescriptor(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+int32_t UsbRawGetDescriptor(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbRawDescriptorParam *param, const unsigned char *data)
 {
     if ((request == NULL) || (devHandle == NULL) || (param == NULL) || (data == NULL)) {
@@ -144,7 +143,7 @@ UsbRawDevice *UsbRawGetDevice(const UsbRawHandle *devHandle)
     return (UsbRawDevice *)RawGetDevice((const struct UsbDeviceHandle *)devHandle);
 }
 
-int UsbRawGetDeviceDescriptor(const UsbRawDevice *rawDev, struct UsbDeviceDescriptor *desc)
+int32_t UsbRawGetDeviceDescriptor(const UsbRawDevice *rawDev, struct UsbDeviceDescriptor *desc)
 {
     if ((rawDev == NULL) || (desc == NULL)) {
         HDF_LOGE("%s:%d rawDev or desc is NULL", __func__, __LINE__);
@@ -154,7 +153,7 @@ int UsbRawGetDeviceDescriptor(const UsbRawDevice *rawDev, struct UsbDeviceDescri
     return RawGetDeviceDescriptor((const struct UsbDevice *)rawDev, desc);
 }
 
-int UsbRawClaimInterface(const UsbRawHandle *devHandle, int interfaceNumber)
+int32_t UsbRawClaimInterface(const UsbRawHandle *devHandle, int32_t interfaceNumber)
 {
     if (devHandle == NULL) {
         HDF_LOGE("%s:%d devHandle is NULL", __func__, __LINE__);
@@ -164,7 +163,7 @@ int UsbRawClaimInterface(const UsbRawHandle *devHandle, int interfaceNumber)
     return RawClaimInterface((struct UsbDeviceHandle *)devHandle, interfaceNumber);
 }
 
-int UsbRawReleaseInterface(const UsbRawHandle *devHandle, int interfaceNumber)
+int32_t UsbRawReleaseInterface(const UsbRawHandle *devHandle, int32_t interfaceNumber)
 {
     if (devHandle == NULL) {
         HDF_LOGE("%s:%d devHandle is NULL", __func__, __LINE__);
@@ -174,7 +173,7 @@ int UsbRawReleaseInterface(const UsbRawHandle *devHandle, int interfaceNumber)
     return RawReleaseInterface((struct UsbDeviceHandle *)devHandle, interfaceNumber);
 }
 
-int UsbRawResetDevice(const UsbRawHandle *devHandle)
+int32_t UsbRawResetDevice(const UsbRawHandle *devHandle)
 {
     if (devHandle == NULL) {
         HDF_LOGE("%s:%d devHandle is NULL", __func__, __LINE__);
@@ -184,7 +183,7 @@ int UsbRawResetDevice(const UsbRawHandle *devHandle)
     return RawResetDevice((const struct UsbDeviceHandle *)devHandle);
 }
 
-struct UsbRawRequest *UsbRawAllocRequest(const UsbRawHandle *devHandle, int isoPackets, int length)
+struct UsbRawRequest *UsbRawAllocRequest(const UsbRawHandle *devHandle, int32_t isoPackets, int32_t length)
 {
     if (devHandle == NULL) {
         HDF_LOGE("%s:%d devHandle is NULL", __func__, __LINE__);
@@ -194,7 +193,7 @@ struct UsbRawRequest *UsbRawAllocRequest(const UsbRawHandle *devHandle, int isoP
     return (struct UsbRawRequest *)RawAllocRequest((const struct UsbDeviceHandle *)devHandle, isoPackets, length);
 }
 
-int UsbRawFreeRequest(const struct UsbRawRequest *request)
+int32_t UsbRawFreeRequest(const struct UsbRawRequest *request)
 {
     if (request == NULL) {
         HDF_LOGE("%s:%d request is NULL", __func__, __LINE__);
@@ -204,7 +203,7 @@ int UsbRawFreeRequest(const struct UsbRawRequest *request)
     return RawFreeRequest((const struct UsbHostRequest *)request);
 }
 
-int UsbRawFillBulkRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+int32_t UsbRawFillBulkRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbRawFillRequestData *fillData)
 {
     if ((request == NULL) || (devHandle == NULL) || (fillData == NULL)) {
@@ -216,7 +215,7 @@ int UsbRawFillBulkRequest(const struct UsbRawRequest *request, const UsbRawHandl
         (const struct UsbFillRequestData *)fillData);
 }
 
-int UsbRawFillControlSetup(const unsigned char *setup, const struct UsbControlRequestData *requestData)
+int32_t UsbRawFillControlSetup(const unsigned char *setup, const struct UsbControlRequestData *requestData)
 {
     if ((setup == NULL) || (requestData == NULL)) {
         HDF_LOGE("%s:%d setup or requestData is NULL", __func__, __LINE__);
@@ -226,7 +225,7 @@ int UsbRawFillControlSetup(const unsigned char *setup, const struct UsbControlRe
     return RawFillControlSetup(setup, requestData);
 }
 
-int UsbRawFillControlRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+int32_t UsbRawFillControlRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbRawFillRequestData *fillData)
 {
     if ((request == NULL) || (devHandle == NULL) || (fillData == NULL)) {
@@ -238,7 +237,7 @@ int UsbRawFillControlRequest(const struct UsbRawRequest *request, const UsbRawHa
         (const struct UsbFillRequestData *)fillData);
 }
 
-int UsbRawFillInterruptRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+int32_t UsbRawFillInterruptRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbRawFillRequestData *fillData)
 {
     if ((request == NULL) || (devHandle == NULL) || (fillData == NULL)) {
@@ -250,7 +249,7 @@ int UsbRawFillInterruptRequest(const struct UsbRawRequest *request, const UsbRaw
         (const struct UsbFillRequestData *)fillData);
 }
 
-int UsbRawFillIsoRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
+int32_t UsbRawFillIsoRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
     const struct UsbRawFillRequestData *fillData)
 {
     if ((request == NULL) || (devHandle == NULL) || (fillData == NULL)) {
@@ -262,7 +261,7 @@ int UsbRawFillIsoRequest(const struct UsbRawRequest *request, const UsbRawHandle
         (const struct UsbFillRequestData *)fillData);
 }
 
-int UsbRawSubmitRequest(const struct UsbRawRequest *request)
+int32_t UsbRawSubmitRequest(const struct UsbRawRequest *request)
 {
     if (request == NULL) {
         HDF_LOGE("%s:%d request is NULL", __func__, __LINE__);
@@ -272,7 +271,7 @@ int UsbRawSubmitRequest(const struct UsbRawRequest *request)
     return RawSubmitRequest((const struct UsbHostRequest *)request);
 }
 
-int UsbRawCancelRequest(const struct UsbRawRequest *request)
+int32_t UsbRawCancelRequest(const struct UsbRawRequest *request)
 {
     if (request == NULL) {
         HDF_LOGE("%s:%d request is NULL", __func__, __LINE__);
@@ -282,7 +281,7 @@ int UsbRawCancelRequest(const struct UsbRawRequest *request)
     return RawCancelRequest((const struct UsbHostRequest *)request);
 }
 
-int UsbRawHandleRequests(const UsbRawHandle *devHandle)
+int32_t UsbRawHandleRequests(const UsbRawHandle *devHandle)
 {
     if (devHandle == NULL) {
         HDF_LOGE("%s:%d devHandle is NULL", __func__, __LINE__);

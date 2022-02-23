@@ -91,7 +91,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialInsertPullOut20, TestSize.Level2)
     const string loadLog = "usb pnp sample device driver test add start";
     const string unloadLog = "usb pnp sample device driver test remove start";
     double startTs = GetNowTs();
-    for (int i = 0; i < 20; i++) {
+    for (int32_t i = 0; i < 20; i++) {
         startTs = GetNowTs();
         ASSERT_EQ(system("usbhost_pnp_test -add"), 0);
         sleep(1);
@@ -115,7 +115,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialInsertPullOutQuickly20, TestSize.Level2
     printf("------start UsbSerialInsertPullOutQuickly20------\n");
     const string loadLog = "usb pnp sample device driver test add start";
     const string unloadLog = "usb pnp sample device driver test remove start";
-    for (int i = 0; i < 20; i++) {
+    for (int32_t i = 0; i < 20; i++) {
         ASSERT_EQ(system("usbhost_pnp_test -add"), 0);
         usleep(100 * 1000);
         ASSERT_EQ(system("usbhost_pnp_test -remove"), 0);
@@ -171,7 +171,7 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteSync_002, TestSize.Level1)
     };
     double startTs = GetNowTs();
     string wlog, rlog;
-    for (int i = 0; data[i].size() > 0; i++) {
+    for (int32_t i = 0; data[i].size() > 0; i++) {
         wlog = "send data[" + data[i] + "] to device";
         rlog = "recv data[" + data[i] + "] from device";
         ASSERT_EQ(system("usbhost_ddk_test -AR &"), 0);
@@ -195,8 +195,8 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteSync_003, TestSize.Level2)
     printf("------start CheckUsbSerialIoWriteSync_003------\n");
     const string s = "0123456789abcdef";
     string data;
-    int totalSize = 1024;
-    int writeCnt = 8;
+    int32_t totalSize = 1024;
+    int32_t writeCnt = 8;
     unsigned int n = 0;
     while (n < totalSize / writeCnt / s.size()) {
         data += s;
@@ -205,7 +205,7 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteSync_003, TestSize.Level2)
     const string wlog = "send data[" + data + "] to device";
     const string rlog = "recv data[" + data + "] from device";
     double startTs;
-    for (int i = 0; i < writeCnt; i++) {
+    for (int32_t i = 0; i < writeCnt; i++) {
         startTs = GetNowTs();
         ASSERT_EQ(system("usbhost_ddk_test -AR &"), 0);
         ASSERT_EQ(system(("usbhost_ddk_test -AW '" + data + "'").c_str()), 0);
@@ -259,7 +259,7 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteAsync_002, TestSize.Level1)
     };
     double startTs = GetNowTs();
     string wlog, rlog;
-    for (int i = 0; data[i].size() > 0; i++) {
+    for (int32_t i = 0; data[i].size() > 0; i++) {
         wlog = "send data[" + data[i] + "] to device";
         rlog = "recv data[" + data[i] + "] from device";
         ASSERT_EQ(system(("usbhost_ddk_test -Aw '" + data[i] + "'").c_str()), 0);
@@ -282,8 +282,8 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteAsync_003, TestSize.Level2)
     printf("------start CheckUsbSerialIoWriteAsync_003------\n");
     const string s = "0123456789abcdef";
     string data;
-    int totalSize = 1024;
-    int writeCnt = 8;
+    int32_t totalSize = 1024;
+    int32_t writeCnt = 8;
     unsigned int n = 0;
     while (n < totalSize / writeCnt / s.size()) {
         data += s;
@@ -292,7 +292,7 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteAsync_003, TestSize.Level2)
     const string wlog = "send data[" + data + "] to device";
     const string rlog = "recv data[" + data + "] from device";
     double startTs;
-    for (int i = 0; i < writeCnt; i++) {
+    for (int32_t i = 0; i < writeCnt; i++) {
         startTs = GetNowTs();
         ASSERT_EQ(system(("usbhost_ddk_test -Aw '" + data + "'").c_str()), 0);
         sleep(3);
@@ -399,7 +399,7 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialDeviceInfo, TestSize.Level1)
     const char *bDeviceClass = "0x00";
     const char *bDeviceSubClass = "0x00";
     const char *bDeviceProtocol = "0x00";
-    const int logMaxLen = 1000;
+    const int32_t logMaxLen = 1000;
     char targetLog[logMaxLen] = {0};
     const char *fmt = "device descriptor info:[%s %s %s %s %s]";
     snprintf_s(targetLog, logMaxLen, logMaxLen -1, fmt, \

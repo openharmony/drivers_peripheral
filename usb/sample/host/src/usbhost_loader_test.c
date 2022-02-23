@@ -37,9 +37,9 @@
 struct HdfSBuf *g_data;
 struct HdfSBuf *g_reply;
 
-static int UsbPnpTestEventReceived(void *priv, uint32_t id, struct HdfSBuf *data)
+static int32_t UsbPnpTestEventReceived(void *priv, uint32_t id, struct HdfSBuf *data)
 {
-    int ret;
+    int32_t ret;
 
     switch (id) {
         default:
@@ -52,10 +52,10 @@ static int UsbPnpTestEventReceived(void *priv, uint32_t id, struct HdfSBuf *data
     return ret;
 }
 
-int main(int argc, char *argv[])
+int32_t main(int32_t argc, char *argv[])
 {
     HDF_LOGI("%s:%d usbhost pnp test start", __func__, __LINE__);
-    int ret;
+    int32_t ret;
     struct HdfIoService *testService = NULL;
     static struct HdfDevEventlistener usbPnpTestListener = {
         .callBack = UsbPnpTestEventReceived,

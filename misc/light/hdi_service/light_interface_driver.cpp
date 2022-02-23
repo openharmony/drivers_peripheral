@@ -18,15 +18,15 @@
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
-#include "light_interface_service.h"
+#include "light_interface_impl.h"
 
 #define HDF_LOG_TAG           hdf_light_if_driver
 
-using namespace light::v1_0;
+using namespace OHOS::HDI::Light::V1_0;
 
 struct HdfLightInterfaceHost {
     struct IDeviceIoService ioservice;
-    LightInterfaceService *service;
+    LightInterfaceImpl *service;
 };
 
 static int32_t LightInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
@@ -66,7 +66,7 @@ static int HdfLightInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfLightInterfaceHost->ioservice.Dispatch = LightInterfaceDriverDispatch;
     hdfLightInterfaceHost->ioservice.Open = nullptr;
     hdfLightInterfaceHost->ioservice.Release = nullptr;
-    hdfLightInterfaceHost->service = new LightInterfaceService();
+    hdfLightInterfaceHost->service = new LightInterfaceImpl();
 
     deviceObject->service = &hdfLightInterfaceHost->ioservice;
     HDF_LOGI("HdfLightInterfaceDriverBind success");

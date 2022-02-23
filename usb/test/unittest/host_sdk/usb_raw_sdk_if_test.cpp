@@ -47,12 +47,12 @@ static struct AcmDevice *g_acm = NULL;
 static struct AcmDevice g_deviceService;
 static UsbRawHandle *g_devHandle = NULL;
 static UsbRawDevice *g_dev = NULL;
-static int g_activeConfig;
+static int32_t g_activeConfig;
 static bool g_stopIoThreadFlag = false;
 
-static int UsbIoThread(void *data)
+static int32_t UsbIoThread(void *data)
 {
-    int ret;
+    int32_t ret;
     struct AcmDevice *acm = (struct AcmDevice *)data;
 
     for (;;) {
@@ -88,10 +88,10 @@ static int UsbIoThread(void *data)
 }
 
 
-static int UsbStartIo(struct AcmDevice *acm)
+static int32_t UsbStartIo(struct AcmDevice *acm)
 {
     struct OsalThreadParam threadCfg;
-    int ret;
+    int32_t ret;
 
     printf("%s start\n", __func__);
 
@@ -117,9 +117,9 @@ static int UsbStartIo(struct AcmDevice *acm)
     return HDF_SUCCESS;
 }
 
-static int UsbStopIo(struct AcmDevice *acm)
+static int32_t UsbStopIo(struct AcmDevice *acm)
 {
-    int ret;
+    int32_t ret;
 
     HDF_LOGD("%{public}s:%{public}d", __func__, __LINE__);
     if (g_stopIoThreadFlag == false) {
@@ -258,7 +258,7 @@ static void AcmNotifyReqCallback(const void *requestArg)
     }
     unsigned int currentSize = req->actualLength;
     unsigned int expectedSize, copySize, allocSize;
-    int ret;
+    int32_t ret;
     if (req->status != USB_REQUEST_COMPLETED)
         goto EXIT;
     if (acm->nbIndex)
@@ -295,10 +295,10 @@ EXIT:
     printf("%s:%d exit", __func__, __LINE__);
 }
 
-static int AcmWriteBufAlloc(struct AcmDevice *acm)
+static int32_t AcmWriteBufAlloc(struct AcmDevice *acm)
 {
     struct AcmWb *wb = &acm->wb[0];
-    int i;
+    int32_t i;
 
     for (i = 0; i < ACM_NW; i++, wb++) {
         wb->buf = (uint8_t *)OsalMemCalloc(acm->dataOutEp->maxPacketSize);
@@ -320,12 +320,12 @@ static void AcmCtrlReqCallback(const void *requestArg)
     printf("%s:%d entry!", __func__, __LINE__);
 }
 
-static int UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConfigDescriptor *config)
+static int32_t UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConfigDescriptor *config)
 {
     uint8_t numInterfaces;
     uint8_t i;
     uint8_t j;
-    int ret;
+    int32_t ret;
     uint8_t ifaceClass;
     uint8_t numEndpoints;
     const struct UsbRawInterface *interface = NULL;
@@ -458,8 +458,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfExit002, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfInit003, TestSize.Level1)
 {
-    int ret;
-    int i;
+    int32_t ret;
+    int32_t i;
 
     for (i = 0; i < 100; i++)
     {
@@ -479,8 +479,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfInit003, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfInit004, TestSize.Level1)
 {
-    int ret;
-    int i;
+    int32_t ret;
+    int32_t i;
 
     for (i = 0; i < 100; i++)
     {
@@ -822,7 +822,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetConfigDescriptor004, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration001, TestSize.Level1)
 {
     int32_t ret;
-    int config = 0;
+    int32_t config = 0;
 
     ret = UsbRawSetConfiguration(NULL, config);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -837,7 +837,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration001, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration002, TestSize.Level1)
 {
     int32_t ret;
-    int config = 0;
+    int32_t config = 0;
 
     ret = UsbRawSetConfiguration(g_acm->devHandle, config);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -852,7 +852,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration002, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration003, TestSize.Level1)
 {
     int32_t ret;
-    int config = 1;
+    int32_t config = 1;
 
     ret = UsbRawSetConfiguration(g_acm->devHandle, config);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -867,7 +867,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration003, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration004, TestSize.Level1)
 {
     int32_t ret;
-    int config = 10;
+    int32_t config = 10;
 
     ret = UsbRawSetConfiguration(g_acm->devHandle, config);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -882,7 +882,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration004, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration005, TestSize.Level1)
 {
     int32_t ret;
-    int config = 100;
+    int32_t config = 100;
 
     ret = UsbRawSetConfiguration(g_acm->devHandle, config);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -897,7 +897,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration005, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration006, TestSize.Level1)
 {
     int32_t ret;
-    int config = 200;
+    int32_t config = 200;
 
     ret = UsbRawSetConfiguration(g_acm->devHandle, config);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -912,7 +912,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration006, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration007, TestSize.Level1)
 {
     int32_t ret;
-    int config = 255;
+    int32_t config = 255;
 
     ret = UsbRawSetConfiguration(g_acm->devHandle, config);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -927,7 +927,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration007, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration008, TestSize.Level1)
 {
     int32_t ret;
-    int config = 1;
+    int32_t config = 1;
 
     ret = UsbRawSetConfiguration(g_acm->devHandle, config);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -942,7 +942,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfSetConfiguration008, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDeviceDescriptor001, TestSize.Level1)
 {
     struct UsbDeviceDescriptor desc;
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDeviceDescriptor(NULL, &desc);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -956,7 +956,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDeviceDescriptor001, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDeviceDescriptor002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDeviceDescriptor(g_dev, NULL);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -970,7 +970,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDeviceDescriptor002, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDeviceDescriptor003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDeviceDescriptor(NULL, NULL);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -985,7 +985,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDeviceDescriptor003, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDeviceDescriptor004, TestSize.Level1)
 {
     struct UsbDeviceDescriptor desc;
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDeviceDescriptor(g_dev, &desc);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1015,7 +1015,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetConfigDescriptor005, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDeviceDescriptor005, TestSize.Level1)
 {
     struct UsbDeviceDescriptor desc;
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDeviceDescriptor(g_dev, &desc);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1029,8 +1029,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDeviceDescriptor005, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfClaimInterface001, TestSize.Level1)
 {
-    int ret;
-    int interfaceNumber = 1;
+    int32_t ret;
+    int32_t interfaceNumber = 1;
 
     ret = UsbRawClaimInterface(NULL, interfaceNumber);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1044,8 +1044,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfClaimInterface001, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfClaimInterface002, TestSize.Level1)
 {
-    int ret;
-    int interfaceNumber = 1;
+    int32_t ret;
+    int32_t interfaceNumber = 1;
 
     ret = UsbRawClaimInterface(g_devHandle, interfaceNumber);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1059,8 +1059,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfClaimInterface002, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfClaimInterface003, TestSize.Level1)
 {
-    int ret;
-    int interfaceNumber = 0;
+    int32_t ret;
+    int32_t interfaceNumber = 0;
 
     ret = UsbRawClaimInterface(g_devHandle, interfaceNumber);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1074,8 +1074,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfClaimInterface003, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfClaimInterface004, TestSize.Level1)
 {
-    int ret;
-    int interfaceNumber = 255;
+    int32_t ret;
+    int32_t interfaceNumber = 255;
 
     ret = UsbRawClaimInterface(g_devHandle, interfaceNumber);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1089,7 +1089,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfClaimInterface004, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfClaimInterface005, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbParseConfigDescriptor(g_acm, g_acm->config);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1103,7 +1103,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfClaimInterface005, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfReleaseInterface001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbRawReleaseInterface(NULL, g_acm->ctrlIface);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1117,7 +1117,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfReleaseInterface001, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfReleaseInterface002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbRawReleaseInterface(g_acm->devHandle, g_acm->ctrlIface);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1131,7 +1131,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfReleaseInterface002, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfReleaseInterface003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbRawReleaseInterface(NULL, g_acm->dataIface);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1145,7 +1145,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfReleaseInterface003, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfReleaseInterface004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbRawReleaseInterface(g_acm->devHandle, g_acm->dataIface);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1159,7 +1159,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfReleaseInterface004, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfClaimInterface006, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbParseConfigDescriptor(g_acm, g_acm->config);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1173,8 +1173,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfClaimInterface006, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfAllocRequest001, TestSize.Level1)
 {
-    int i;
-    int ret;
+    int32_t i;
+    int32_t ret;
 
     ret = AcmWriteBufAlloc(g_acm);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1194,8 +1194,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfAllocRequest001, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfAllocRequest002, TestSize.Level1)
 {
-    int i;
-    int ret;
+    int32_t i;
+    int32_t ret;
 
     ret = AcmWriteBufAlloc(g_acm);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1216,7 +1216,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfAllocRequest002, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfAllocRequest003, TestSize.Level1)
 {
-    int i;
+    int32_t i;
 
     for (i = 0; i < ACM_NR; i++) {
         g_acm->readReq[i] = UsbRawAllocRequest(NULL, 0, g_acm->dataInEp->maxPacketSize);
@@ -1232,7 +1232,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfAllocRequest003, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfAllocRequest004, TestSize.Level1)
 {
-    int i;
+    int32_t i;
 
     for (i = 0; i < ACM_NR; i++) {
         g_acm->readReq[i] = UsbRawAllocRequest(g_acm->devHandle, 0, g_acm->dataInEp->maxPacketSize);
@@ -1300,7 +1300,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfAllocRequest008, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFreeRequest001, TestSize.Level1)
 {
     int32_t ret;
-    int i;
+    int32_t i;
 
     for (i = 0; i < ACM_NW; i++) {
         ret = UsbRawFreeRequest(g_acm->wb[i].request);
@@ -1317,7 +1317,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFreeRequest001, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFreeRequest002, TestSize.Level1)
 {
     int32_t ret;
-    int i;
+    int32_t i;
 
     for (i = 0; i < ACM_NW; i++) {
         ret = UsbRawFreeRequest(g_acm->readReq[i]);
@@ -1375,7 +1375,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFreeRequest005, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfAllocRequest009, TestSize.Level1)
 {
-    int i;
+    int32_t i;
 
     for (i = 0; i < ACM_NW; i++) {
         g_acm->wb[i].request = UsbRawAllocRequest(g_acm->devHandle, 0, g_acm->dataOutEp->maxPacketSize);
@@ -1405,7 +1405,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor001, TestSize.Level1)
 {
     UsbRawDescriptorParam param;
     unsigned char data[100];
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDescriptor(NULL, g_acm->devHandle, &param, data);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1421,7 +1421,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor002, TestSize.Level1)
 {
     UsbRawDescriptorParam param;
     unsigned char data[100];
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDescriptor(g_acm->ctrlReq, NULL, &param, data);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1437,7 +1437,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor003, TestSize.Level1)
 {
     UsbRawDescriptorParam param;
     unsigned char data[100];
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDescriptor(NULL, NULL, &param, data);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1452,7 +1452,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor003, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor004, TestSize.Level1)
 {
     unsigned char data[100];
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDescriptor(g_acm->ctrlReq, g_acm->devHandle, NULL, data);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1467,7 +1467,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor004, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor005, TestSize.Level1)
 {
     UsbRawDescriptorParam param;
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDescriptor(g_acm->ctrlReq, g_acm->devHandle, &param, NULL);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1483,7 +1483,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor006, TestSize.Level1)
 {
     UsbRawDescriptorParam param;
     unsigned char data[100];
-    int ret;
+    int32_t ret;
 
     param.descType = 0;
     param.descIndex = 0;
@@ -1502,7 +1502,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor006, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor007, TestSize.Level1)
 {
     unsigned char data[100];
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDescriptor(g_acm->ctrlReq, NULL, NULL, data);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1516,7 +1516,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor007, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor008, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDescriptor(g_acm->ctrlReq, g_acm->devHandle, NULL, NULL);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1531,7 +1531,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor008, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor009, TestSize.Level1)
 {
     unsigned char data[100];
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDescriptor(NULL, g_acm->devHandle, NULL, data);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1547,7 +1547,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor010, TestSize.Level1)
 {
     UsbRawDescriptorParam param;
     unsigned char data[100];
-    int ret;
+    int32_t ret;
 
     param.descType = 0;
     param.descIndex = 0;
@@ -1567,7 +1567,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor011, TestSize.Level1)
 {
     UsbRawDescriptorParam param;
     unsigned char data[100];
-    int ret;
+    int32_t ret;
 
     param.descType = 0;
     param.descIndex = 0;
@@ -1586,7 +1586,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor011, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor012, TestSize.Level1)
 {
     unsigned char data[100];
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDescriptor(NULL, NULL, NULL, data);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1602,7 +1602,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor013, TestSize.Level1)
 {
     UsbRawDescriptorParam param;
     unsigned char data[100];
-    int ret;
+    int32_t ret;
 
     param.descType = 0;
     param.descIndex = 0;
@@ -1620,7 +1620,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor013, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor014, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDescriptor(NULL, g_acm->devHandle, NULL, NULL);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1634,7 +1634,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor014, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor015, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDescriptor(g_acm->ctrlReq, NULL, NULL, NULL);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1648,7 +1648,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor015, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetDescriptor016, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbRawGetDescriptor(NULL, NULL, NULL, NULL);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -1668,7 +1668,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillBulkRequest001, TestSize.Level1)
 {
     struct UsbRawFillRequestData reqData;
     int32_t ret;
-    int i;
+    int32_t i;
     uint32_t size;
     char sendData[] = {"abcde\0"};
 
@@ -1708,8 +1708,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillBulkRequest002, TestSize.Level1)
 {
     struct UsbRawFillRequestData reqData;
     int32_t ret;
-    int i;
-    int size = g_acm->dataInEp->maxPacketSize;
+    int32_t i;
+    uint32_t size = g_acm->dataInEp->maxPacketSize;
 
     for (i = 0; i < 1; i++) {
         reqData.endPoint      = g_acm->dataInEp->addr;
@@ -1734,7 +1734,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillInterruptRequest001, TestSize.Level1)
 {
     struct UsbRawFillRequestData fillRequestData;
     int32_t ret;
-    int size = g_acm->notifyEp->maxPacketSize;
+    uint32_t size = g_acm->notifyEp->maxPacketSize;
 
     fillRequestData.endPoint = g_acm->notifyEp->addr;
     fillRequestData.length = size;
@@ -1757,7 +1757,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillInterruptRequest002, TestSize.Level1)
 {
     struct UsbRawFillRequestData fillRequestData;
     int32_t ret;
-    int size = g_acm->notifyEp->maxPacketSize;
+    uint32_t size = g_acm->notifyEp->maxPacketSize;
 
     fillRequestData.endPoint = g_acm->notifyEp->addr;
     fillRequestData.length = size;
@@ -1780,7 +1780,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillInterruptRequest003, TestSize.Level1)
 {
     struct UsbRawFillRequestData fillRequestData;
     int32_t ret;
-    int size = g_acm->notifyEp->maxPacketSize;
+    uint32_t size = g_acm->notifyEp->maxPacketSize;
 
     fillRequestData.endPoint = g_acm->notifyEp->addr;
     fillRequestData.length = size;
@@ -1803,7 +1803,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillInterruptRequest004, TestSize.Level1)
 {
     struct UsbRawFillRequestData fillRequestData;
     int32_t ret;
-    int size = g_acm->notifyEp->maxPacketSize;
+    uint32_t size = g_acm->notifyEp->maxPacketSize;
 
     fillRequestData.endPoint = g_acm->notifyEp->addr;
     fillRequestData.length = size;
@@ -1826,8 +1826,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillInterruptRequest004, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest001, TestSize.Level1)
 {
     struct UsbRawFillRequestData fillRequestData;
-    int ret;
-    int completed = 0;
+    int32_t ret;
+    int32_t completed = 0;
 
     fillRequestData.callback  = AcmCtrlReqCallback;
     fillRequestData.userData  = &completed;
@@ -1846,8 +1846,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest001, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest002, TestSize.Level1)
 {
     struct UsbRawFillRequestData fillRequestData;
-    int ret;
-    int completed = 0;
+    int32_t ret;
+    int32_t completed = 0;
 
     fillRequestData.callback  = AcmCtrlReqCallback;
     fillRequestData.userData  = &completed;
@@ -1866,8 +1866,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest002, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest003, TestSize.Level1)
 {
     struct UsbRawFillRequestData fillRequestData;
-    int ret;
-    int completed = 0;
+    int32_t ret;
+    int32_t completed = 0;
 
     fillRequestData.callback  = AcmCtrlReqCallback;
     fillRequestData.userData  = &completed;
@@ -1886,8 +1886,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest003, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest004, TestSize.Level1)
 {
     struct UsbRawFillRequestData fillRequestData;
-    int ret;
-    int completed = 0;
+    int32_t ret;
+    int32_t completed = 0;
 
     fillRequestData.callback  = AcmCtrlReqCallback;
     fillRequestData.userData  = &completed;
@@ -1906,8 +1906,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest004, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest005, TestSize.Level1)
 {
     struct UsbRawFillRequestData fillRequestData;
-    int ret;
-    int completed = 0;
+    int32_t ret;
+    int32_t completed = 0;
 
     fillRequestData.callback  = AcmCtrlReqCallback;
     fillRequestData.userData  = &completed;
@@ -1926,8 +1926,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest005, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest006, TestSize.Level1)
 {
     struct UsbRawFillRequestData fillRequestData;
-    int ret;
-    int completed = 0;
+    int32_t ret;
+    int32_t completed = 0;
 
     fillRequestData.callback  = AcmCtrlReqCallback;
     fillRequestData.userData  = &completed;
@@ -1946,8 +1946,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest006, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest007, TestSize.Level1)
 {
     struct UsbRawFillRequestData fillRequestData;
-    int ret;
-    int completed = 0;
+    int32_t ret;
+    int32_t completed = 0;
 
     fillRequestData.callback  = AcmCtrlReqCallback;
     fillRequestData.userData  = &completed;
@@ -1966,8 +1966,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest007, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlRequest008, TestSize.Level1)
 {
     struct UsbRawFillRequestData fillRequestData;
-    int ret;
-    int completed = 0;
+    int32_t ret;
+    int32_t completed = 0;
 
     fillRequestData.callback  = AcmCtrlReqCallback;
     fillRequestData.userData  = &completed;
@@ -1997,7 +1997,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillIsoRequest001, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlSetup001, TestSize.Level1)
 {
     struct UsbControlRequestData ctrlReq;
-    int ret;
+    int32_t ret;
 
     g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
     g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
@@ -2025,7 +2025,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlSetup001, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlSetup002, TestSize.Level1)
 {
     unsigned char setup[100] = {0};
-    int ret;
+    int32_t ret;
 
     ret = UsbRawFillControlSetup(setup, NULL);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -2039,7 +2039,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlSetup002, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlSetup003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbRawFillControlSetup(NULL, NULL);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -2055,7 +2055,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlSetup004, TestSize.Level1)
 {
     struct UsbControlRequestData ctrlReq;
     unsigned char setup[100] = {0};
-    int ret;
+    int32_t ret;
 
     g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
     g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
@@ -2084,8 +2084,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillBulkRequest004, TestSize.Level1)
 {
     struct UsbRawFillRequestData reqData;
     int32_t ret;
-    int i;
-    int size = g_acm->dataInEp->maxPacketSize;
+    int32_t i;
+    uint32_t size = g_acm->dataInEp->maxPacketSize;
 
     for (i = 0; i < ACM_NW; i++) {
         reqData.endPoint      = g_acm->dataInEp->addr;
@@ -2110,7 +2110,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillInterruptRequest005, TestSize.Level1)
 {
     struct UsbRawFillRequestData fillRequestData;
     int32_t ret;
-    int size = g_acm->notifyEp->maxPacketSize;
+    uint32_t size = g_acm->notifyEp->maxPacketSize;
 
     fillRequestData.endPoint = g_acm->notifyEp->addr;
     fillRequestData.length = size;
@@ -2143,5 +2143,6 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFreeConfigDescriptor001, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFreeConfigDescriptor002, TestSize.Level1)
 {
     UsbRawFreeConfigDescriptor(g_acm->config);
+    g_acm->config = nullptr;
 }
 }

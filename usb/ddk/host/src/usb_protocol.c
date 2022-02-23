@@ -54,9 +54,9 @@ int32_t UsbProtocalFillControlSetup(const unsigned char *setup, const struct Usb
     return ret;
 }
 
-static int CreateCtrPipe(const struct UsbInterfacePool *pool)
+static int32_t CreateCtrPipe(const struct UsbInterfacePool *pool)
 {
-    int ret = 0;
+    int32_t ret = 0;
     struct UsbSdkInterface *interfaceObj = NULL;
     struct UsbPipe *pipe = NULL;
 
@@ -86,7 +86,7 @@ static int CreateCtrPipe(const struct UsbInterfacePool *pool)
     return ret;
 }
 
-static int UsbInterfaceInit(struct UsbSdkInterface *interfaceObj,
+static int32_t UsbInterfaceInit(struct UsbSdkInterface *interfaceObj,
     const struct UsbRawInterfaceDescriptor *iface, const struct UsbRawInterface *altsettings)
 {
     struct UsbInterfaceInfo *ptr = NULL;
@@ -109,7 +109,7 @@ static int UsbInterfaceInit(struct UsbSdkInterface *interfaceObj,
     return HDF_SUCCESS;
 }
 
-static int UsbPipeInit(struct UsbPipe *pipe, const struct UsbRawEndpointDescriptor *ep, uint8_t id)
+static int32_t UsbPipeInit(struct UsbPipe *pipe, const struct UsbRawEndpointDescriptor *ep, uint8_t id)
 {
     if ((pipe == NULL) || (ep == NULL)) {
         HDF_LOGE("%s: invalid parameter", __func__);
@@ -168,15 +168,15 @@ static const struct UsbRawEndpointDescriptor *UsbGetEpDesc(
     return &ifDes->endPoint[idx];
 }
 
-static int UsbProtocalCreatePipeObj(
+static int32_t UsbProtocalCreatePipeObj(
     const struct UsbRawInterfaceDescriptor *ifDes, const struct UsbSdkInterface *interfaceObj)
 {
-    int ret;
+    int32_t ret;
     uint8_t id = 0;
     const struct UsbRawEndpointDescriptor *ep = NULL;
     struct UsbPipe *pipe = NULL;
 
-    for (int cnep = 0; cnep < ifDes->interfaceDescriptor.bNumEndpoints; cnep++) {
+    for (int32_t cnep = 0; cnep < ifDes->interfaceDescriptor.bNumEndpoints; cnep++) {
         if (ifDes->interfaceDescriptor.bNumEndpoints > USB_MAXENDPOINTS) {
             HDF_LOGE("%s:%d bNumEndpoints=%d is error",
                 __func__, __LINE__, ifDes->interfaceDescriptor.bNumEndpoints);
@@ -201,16 +201,16 @@ static int UsbProtocalCreatePipeObj(
     return ret;
 }
 
-static int UsbProtocalCreatInterfaceObj(const struct UsbRawConfigDescriptor *config,
+static int32_t UsbProtocalCreatInterfaceObj(const struct UsbRawConfigDescriptor *config,
     const struct UsbInterfacePool *interfacePool)
 {
     uint8_t j;
-    int ret;
+    int32_t ret;
     const struct UsbRawInterface *itface = NULL;
     const struct UsbRawInterfaceDescriptor *ifDes = NULL;
     struct UsbSdkInterface *interfaceObj = NULL;
 
-    for (int i = 0; i < config->configDescriptor.bNumInterfaces; i++) {
+    for (int32_t i = 0; i < config->configDescriptor.bNumInterfaces; i++) {
         itface = UsbGetInterfaceFromConfig(config, i);
         if (itface == NULL) {
             ret = HDF_ERR_INVALID_PARAM;
@@ -246,10 +246,10 @@ ERROR:
     return ret;
 }
 
-int UsbProtocalParseDescriptor(struct UsbDeviceHandle *devHandle, uint8_t busNum, uint8_t devAddr)
+int32_t UsbProtocalParseDescriptor(struct UsbDeviceHandle *devHandle, uint8_t busNum, uint8_t devAddr)
 {
-    int ret;
-    int activeConfig = -1;
+    int32_t ret;
+    int32_t activeConfig = -1;
     struct UsbInterfacePool *interfacePool = NULL;
     struct UsbRawConfigDescriptor *config = NULL;
 

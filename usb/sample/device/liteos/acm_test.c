@@ -48,7 +48,7 @@ static void TestWrite(const char *buf)
 {
     HdfSbufFlush(g_data);
     (void)HdfSbufWriteString(g_data, buf);
-    int status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_WRITE, g_data, g_reply);
+    int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_WRITE, g_data, g_reply);
     if (status <= 0) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE failed status = %d", __func__, status);
     }
@@ -57,7 +57,7 @@ static void TestWrite(const char *buf)
 static void TestRead()
 {
     HdfSbufFlush(g_reply);
-    int status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_READ, g_data, g_reply);
+    int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_READ, g_data, g_reply);
     if (status) {
         printf("%s: Dispatch USB_SERIAL_READ failed status = %d", __func__, status);
         return;
@@ -127,9 +127,9 @@ static void Test02()
     }
 }
 
-int acm_test(int argc, const char *argv[])
+int32_t acm_test(int32_t argc, const char *argv[])
 {
-    int status;
+    int32_t status;
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");
     if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
         HDF_LOGE("%s: GetService err", __func__);

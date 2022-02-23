@@ -208,7 +208,7 @@ void OfflineStream::HandleMessage(MessageGroup& message)
                 CHECK_IF_PTR_NULL_RETURN_VOID(m);
                 auto edi = std::make_shared<CaptureEndedInfo>();
                 edi->streamId_ = m->GetStreamId();
-                edi->frameCount_ = m->GetFrameCount();
+                edi->frameCount_ = (int32_t)(m->GetFrameCount());
                 info.push_back(edi);
             }
             OnCaptureEnded(message[0]->GetCaptureId(), info);

@@ -13,12 +13,14 @@
  * limitations under the License.
  */
 
-#include "sensor_callback_service.h"
+#include "sensor_callback_impl.h"
 #include "sensor_type.h"
 #include "osal_mem.h"
 
-namespace sensor {
-namespace v1_0 {
+namespace OHOS {
+namespace HDI {
+namespace Sensor {
+namespace V1_0 {
 namespace {
     struct SensorValueRange {
         float highThreshold;
@@ -88,7 +90,7 @@ namespace {
     }
 }
 
-int32_t SensorCallbackService::OnDataEvent(const HdfSensorEvents& event)
+int32_t SensorCallbackImpl::OnDataEvent(const HdfSensorEvents& event)
 {
     void *origin = OsalMemCalloc(sizeof(uint8_t) * (event.dataLen));
     uint8_t *tmp = static_cast<uint8_t*>(origin);
@@ -111,5 +113,7 @@ int32_t SensorCallbackService::OnDataEvent(const HdfSensorEvents& event)
     OsalMemFree(origin);
     return HDF_SUCCESS;
 }
-} // v1_0
-} // sensor
+} // V1_0
+} // Sensor
+} // HDI
+} // OHOS

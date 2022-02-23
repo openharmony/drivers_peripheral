@@ -51,6 +51,7 @@ extern "C" {
 #define SENSOR_NAME_MAX_LEN       32 /**< Maximum length of the sensor name */
 #define SENSOR_VERSION_MAX_LEN    16 /**< Maximum length of the sensor version */
 
+
 /**
  * @brief Enumerates return values of the sensor module.
  *
@@ -85,6 +86,8 @@ enum SensorTypeTag {
     SENSOR_TYPE_GESTURE             = 11,  /**< Gesture sensor */
     SENSOR_TYPE_PROXIMITY           = 12,  /**< Proximity sensor */
     SENSOR_TYPE_HUMIDITY            = 13,  /**< Humidity sensor */
+    SENSOR_TYPE_MEDICAL_BEGIN       = 128, /**< The begin of medical sensorId enumeration value range */
+    SENSOR_TYPE_MEDICAL_END         = 160, /**< The end of medical sensorId enumeration value range */
     SENSOR_TYPE_PHYSICAL_MAX        = 255, /**< Maximum type of a physical sensor */
     SENSOR_TYPE_ORIENTATION         = 256, /**< Orientation sensor */
     SENSOR_TYPE_GRAVITY             = 257, /**< Gravity sensor */

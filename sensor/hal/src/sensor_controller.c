@@ -131,7 +131,7 @@ ERROR:
 static int32_t GetSensorNumByManagerType(struct HdfSBuf *reply)
 {
     struct SensorDevManager *manager = GetSensorDevManager();
-    int32_t count = HdfSbufGetDataSize(reply) / sizeof(struct SensorBasicInformation);
+    int32_t count = (int32_t)(HdfSbufGetDataSize(reply) / sizeof(struct SensorBasicInformation));
 
     return ((count > manager->sensorSum) ? (count - manager->sensorSum) : 0);
 }

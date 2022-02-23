@@ -57,7 +57,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCreateDevice001, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     ret = UsbFnSubmitRequestAsync(nullptr);
     EXPECT_TRUE(ret != HDF_SUCCESS);
 }
@@ -80,8 +80,8 @@ static void ReadComplete(uint8_t pipe, struct UsbFnRequest *req)
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync002, TestSize.Level1)
 {
     struct UsbFnRequest *req = nullptr;
-    int ret;
-    int waitMs = 1000;
+    int32_t ret;
+    int32_t waitMs = 1000;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
     printf("wait receiving data form host, please connect\n");
@@ -112,8 +112,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync002, TestSize.Level1)
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync003, TestSize.Level1)
 {
     struct UsbFnRequest *req = nullptr;
-    int ret;
-    int waitMs = WAIT_10MS;
+    int32_t ret;
+    int32_t waitMs = WAIT_10MS;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
     printf("recv data until 'q' exit\n");
@@ -146,7 +146,7 @@ static void WriteComplete(uint8_t pipe, struct UsbFnRequest *req)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest  *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
@@ -171,8 +171,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync004, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync005, TestSize.Level1)
 {
-    int ret;
-    int loopTime = TEST_TIMES;
+    int32_t ret;
+    int32_t loopTime = TEST_TIMES;
     struct UsbFnRequest  *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
@@ -199,7 +199,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync005, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     ret = UsbFnSubmitRequestSync(nullptr, 0);
     EXPECT_TRUE(ret != HDF_SUCCESS);
 }
@@ -207,7 +207,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync001, TestSize.Level1)
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync002, TestSize.Level1)
 {
     struct UsbFnRequest *req = nullptr;
-    int ret;
+    int32_t ret;
     uint8_t *data = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
@@ -228,8 +228,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync002, TestSize.Level1)
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync003, TestSize.Level1)
 {
     struct UsbFnRequest *req = nullptr;
-    int ret;
-    int submitExit = 0;
+    int32_t ret;
+    int32_t submitExit = 0;
     uint8_t *data;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
@@ -256,7 +256,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync003, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest  *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
@@ -276,8 +276,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync004, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync005, TestSize.Level1)
 {
-    int ret;
-    int loopTime = TEST_TIMES;
+    int32_t ret;
+    int32_t loopTime = TEST_TIMES;
     struct UsbFnRequest  *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
@@ -300,7 +300,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync005, TestSize.Level1)
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync006, TestSize.Level1)
 {
     struct UsbFnRequest *req = nullptr;
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
     printf("test sync timeout 5s:\n");
@@ -316,14 +316,14 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync006, TestSize.Level1)
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync007, TestSize.Level1)
 {
     struct UsbFnRequest *req = nullptr;
-    int ret;
+    int32_t ret;
     ret = UsbFnSubmitRequestSync(req, SYNC_5000MS);
     EXPECT_TRUE(ret != 0);
 }
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     UsbRequestStatus status;
     struct UsbFnRequest *notifyReq = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
@@ -340,7 +340,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus001, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     UsbRequestStatus status;
     struct UsbFnRequest *notifyReq = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
@@ -356,7 +356,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus002, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *notifyReq = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.handle);
@@ -371,7 +371,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus003, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     UsbRequestStatus status;
     struct UsbFnRequest *notifyReq = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
@@ -392,7 +392,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus004, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus005, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     UsbRequestStatus status;
     EXPECT_NE(nullptr, g_acmDevice);
     ret = UsbFnGetRequestStatus(nullptr, &status);
@@ -401,7 +401,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus005, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     EXPECT_NE(nullptr, g_acmDevice);
     ret = UsbFnCancelRequest(nullptr);
     EXPECT_TRUE(ret != HDF_SUCCESS);
@@ -409,7 +409,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq001, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *notifyReq = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.handle);
@@ -426,7 +426,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq002, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest  *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
@@ -453,7 +453,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq003, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
@@ -470,7 +470,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq004, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq005, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
@@ -485,7 +485,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq005, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq006, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
@@ -500,7 +500,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq006, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq007, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnRequest *ctrlReq = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.handle);
@@ -515,8 +515,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq007, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq008, TestSize.Level1)
 {
-    int ret;
-    int count = 0;
+    int32_t ret;
+    int32_t count = 0;
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
@@ -535,7 +535,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq008, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRemoveDevice002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     EXPECT_NE(nullptr, g_acmDevice);
     ReleaseAcmDevice(g_acmDevice);

@@ -13,15 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef HDI_POWER_V1_0_POWERTYPES_H
-#define HDI_POWER_V1_0_POWERTYPES_H
+#ifndef OHOS_HDI_POWER_V1_0_POWERTYPES_H
+#define OHOS_HDI_POWER_V1_0_POWERTYPES_H
 
 #include <string>
 #include <message_parcel.h>
 
-namespace hdi {
-namespace power {
-namespace v1_0 {
+namespace OHOS {
+namespace HDI {
+namespace Power {
+namespace V1_0 {
 using namespace OHOS;
 
 enum PowerHdfCmd {
@@ -44,8 +45,9 @@ enum PowerHdfState {
     INACTIVE,
     SLEEP,
 };
-} // v1_
-} // power
-} // hdi
+} // V1_0
+} // Power
+} // HDI
+} // OHOS
 
-#endif // HDI_POWER_V1_0_POWERTYPES_H
+#endif // OHOS_HDI_POWER_V1_0_POWERTYPES_H

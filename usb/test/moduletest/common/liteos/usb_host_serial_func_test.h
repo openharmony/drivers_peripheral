@@ -16,6 +16,8 @@
 #ifndef USB_HOST_SERIAL_FUNC_TEST_H
 #define USB_HOST_SERIAL_FUNC_TEST_H
 
-const int TEST_COUNT = 3;
+#include <linux/types.h>
+
+const int32_t TEST_COUNT = 3;
 
 #endif
