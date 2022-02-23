@@ -854,12 +854,12 @@ int32_t UsbExitHostSdk(const struct UsbSession *session)
     return RawExit(session);
 }
 
-const struct UsbInterface *UsbClaimInterfaceUnforce(
+struct UsbInterface *UsbClaimInterfaceUnforce(
     const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr, uint8_t interfaceIndex)
 {
     int ret;
-    const struct UsbInterface *interfaceObj = NULL;
-    const struct UsbSdkInterface *interfaceSdk = NULL;
+    struct UsbInterface *interfaceObj = NULL;
+    struct UsbSdkInterface *interfaceSdk = NULL;
 
     interfaceObj = UsbClaimInterface(session, busNum, usbAddr, interfaceIndex);
 
@@ -875,7 +875,7 @@ const struct UsbInterface *UsbClaimInterfaceUnforce(
     return interfaceObj;
 }
 
-const struct UsbInterface *UsbClaimInterface(
+struct UsbInterface *UsbClaimInterface(
     const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr, uint8_t interfaceIndex)
 {
     struct UsbPoolQueryPara poolQueryPara = {0};
@@ -924,7 +924,7 @@ const struct UsbInterface *UsbClaimInterface(
     }
     interfaceObj->session = realSession;
 
-    return (const struct UsbInterface *)interfaceObj;
+    return (struct UsbInterface *)interfaceObj;
 ERROR:
     (void)IfDestoryDevice(realSession, interfacePool, devHandle, true);
     return NULL;

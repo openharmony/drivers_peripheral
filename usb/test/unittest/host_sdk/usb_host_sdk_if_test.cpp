@@ -372,8 +372,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface001, TestSize.Level1)
     g_acm->devAddr = 2U;
     g_acm->interfaceIndex = 1U;
 
-    g_acm->dataIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_acm->dataIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_NE(nullptr,  g_acm->dataIface);
 }
 
@@ -403,8 +402,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface002, TestSize.Level1)
     g_acm->devAddr = 2U;
     g_acm->interfaceIndex = 0U;
 
-    g_acm->intIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_acm->intIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_NE(nullptr,  g_acm->intIface);
 }
 
@@ -434,8 +432,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface003, TestSize.Level1)
     g_acm->devAddr = 2U;
     g_acm->interfaceIndex = 255U;
 
-    g_acm->ctrIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_acm->ctrIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_NE(nullptr,  g_acm->ctrIface);
 }
 
@@ -480,8 +477,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface004, TestSize.Level1)
     g_acm->devAddr = 2U;
     g_acm->interfaceIndex = 2U;
 
-    g_acm->dataIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_acm->dataIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_NE(nullptr,  g_acm->dataIface);
 }
 
@@ -497,8 +493,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface005, TestSize.Level1)
     g_acm->devAddr = 2U;
     g_acm->interfaceIndex = 3U;
 
-    g_acm->dataIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_acm->dataIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_NE(nullptr,  g_acm->dataIface);
 }
 
@@ -515,28 +510,23 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface006, TestSize.Level1)
     g_acm->devAddr = 2U;
 
     g_acm->interfaceIndex = 3U;
-    g_acm->dataIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_acm->dataIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_NE(nullptr,  g_acm->dataIface);
 
     g_acm->interfaceIndex = 2U;
-    g_acm->intIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_acm->intIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_NE(nullptr,  g_acm->intIface);
 
     g_acm->interfaceIndex = 0U;
-    g_ecmIntIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_ecmIntIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_NE(nullptr,  g_ecmIntIface);
 
     g_acm->interfaceIndex = 1U;
-    g_ecmDataIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_ecmDataIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_NE(nullptr,  g_ecmDataIface);
 
     g_acm->interfaceIndex = 255U;
-    g_acm->ctrIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_acm->ctrIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_NE(nullptr,  g_acm->ctrIface);
 }
 
@@ -783,8 +773,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface007, TestSize.Level1)
     g_acm->devAddr = 2U;
     g_acm->interfaceIndex = 0U;
 
-    g_ecmIntIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_ecmIntIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_NE(nullptr,  g_ecmIntIface);
 }
 
@@ -800,8 +789,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface008, TestSize.Level1)
     g_acm->devAddr = 200U;
     g_acm->interfaceIndex = 100U;
 
-    g_ecmDataIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_ecmDataIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_EQ(nullptr,  g_ecmDataIface);
 }
 
@@ -817,8 +805,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface009, TestSize.Level1)
     g_acm->devAddr = 2U;
     g_acm->interfaceIndex = 1U;
 
-    g_ecmDataIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_ecmDataIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_NE(nullptr,  g_ecmDataIface);
 }
 

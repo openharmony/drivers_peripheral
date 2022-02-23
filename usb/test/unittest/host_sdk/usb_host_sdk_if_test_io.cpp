@@ -355,18 +355,15 @@ static void AcmInit()
     g_acm->busNum = 1U;
     g_acm->devAddr = 2U;
     g_acm->interfaceIndex = 3U;
-    g_acm->dataIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_acm->dataIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_NE(nullptr,  g_acm->dataIface);
 
     g_acm->interfaceIndex = 2U;
-    g_acm->intIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_acm->intIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_NE(nullptr,  g_acm->intIface);
 
     g_acm->interfaceIndex = 255U;
-    g_acm->ctrIface =  (struct UsbInterface *)UsbClaimInterface(g_acm->session, g_acm->busNum,
-        g_acm->devAddr, g_acm->interfaceIndex);
+    g_acm->ctrIface =  UsbClaimInterface(g_acm->session, g_acm->busNum, g_acm->devAddr, g_acm->interfaceIndex);
     EXPECT_NE(nullptr,  g_acm->ctrIface);
 
     g_acm->data_devHandle = UsbOpenInterface(g_acm->dataIface);

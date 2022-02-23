@@ -216,10 +216,7 @@ static int32_t SerialBegin(struct AcmDevice *acm)
 static struct UsbInterface *GetUsbInterfaceById(const struct AcmDevice *acm,
     uint8_t interfaceIndex)
 {
-    struct UsbInterface *tmpIf = NULL;
-    tmpIf = (struct UsbInterface *)UsbClaimInterface(NULL, acm->busNum, \
-        acm->devAddr, interfaceIndex);
-    return tmpIf;
+    return UsbClaimInterface(NULL, acm->busNum, acm->devAddr, interfaceIndex);
 }
 
 static struct UsbPipeInfo *EnumePipe(const struct AcmDevice *acm,
