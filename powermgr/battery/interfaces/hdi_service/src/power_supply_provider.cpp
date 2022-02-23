@@ -605,7 +605,7 @@ void PowerSupplyProvider::CheckSubfolderNode(const std::string& path)
         } else if ((strcmp(entry->d_name, "voltage_now") == 0) && (nodeInfo_["voltage_now"] == "")) {
             nodeInfo_["voltage_now"] = path;
         } else if ((strcmp(entry->d_name, "temp") == 0) && (nodeInfo_["temp"] == "")) {
-            nodeInfo_["temp"] = "battery";
+            nodeInfo_["temp"] = path;
         } else if ((strcmp(entry->d_name, "health") == 0) && (nodeInfo_["health"] == "")) {
             nodeInfo_["health"] = path;
         } else if ((strcmp(entry->d_name, "status") == 0) && (nodeInfo_["status"] == "")) {
