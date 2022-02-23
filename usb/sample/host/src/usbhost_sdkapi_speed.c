@@ -200,10 +200,7 @@ static int32_t SerialBegin(struct AcmDevice *acm)
 static struct UsbInterface *GetUsbInterfaceById(const struct AcmDevice *acm,
     uint8_t interfaceIndex)
 {
-    struct UsbInterface *tmpIf = NULL;
-    tmpIf = (struct UsbInterface *)UsbClaimInterface(acm->session, acm->busNum,
-        acm->devAddr, interfaceIndex);
-    return tmpIf;
+    return UsbClaimInterface(acm->session, acm->busNum, acm->devAddr, interfaceIndex);
 }
 
 static struct UsbPipeInfo *EnumePipe(const struct AcmDevice *acm,
@@ -367,7 +364,7 @@ int32_t InitUsbDdk(struct AcmDevice *acm)
             goto END;
         }
     }
-    if(g_writeOrRead == TEST_WRITE) {
+    if (g_writeOrRead == TEST_WRITE) {
         acm->dataPipe = GetPipe(acm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_OUT);
     } else {
         acm->dataPipe = GetPipe(acm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_IN);
