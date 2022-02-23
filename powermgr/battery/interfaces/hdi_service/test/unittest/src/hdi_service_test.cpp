@@ -45,23 +45,22 @@ using namespace std;
 
 namespace HdiServiceTest {
 const std::string SYSTEM_BATTERY_PATH = "/sys/class/power_supply";
-const std::string POWER_SUPPLY_SUB_PATH = "/sys/class/power_supply/battery";
 static std::vector<std::string> g_filenodeName;
 static std::map<std::string, std::string> g_nodeInfo;
 const int STR_TO_LONG_LEN = 10;
 const int NUM_ZERO = 0;
-static sptr<BatteryService> g_service;
+std::unique_ptr<PowerSupplyProvider> giver_ = nullptr;
 
 void HdiServiceTest::SetUpTestCase(void)
 {
-    g_service = DelayedSpSingleton<BatteryService>::GetInstance();
-    g_service->OnStart();
+    giver_ = std::make_unique<PowerSupplyProvider>();
+    if (giver_ == nullptr) {
+        HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
+    }
 }
 
 void HdiServiceTest::TearDownTestCase(void)
 {
-    g_service->OnStop();
-    DelayedSpSingleton<BatteryService>::DestroyInstance();
 }
 
 void HdiServiceTest::SetUp(void)
@@ -87,21 +86,6 @@ std::string CreateFile(std::string path, std::string content)
     stream << content.c_str() << std::endl;
     stream.close();
     return path;
-}
-
-void MockFileInit()
-{
-    std::string path = "/data/local/tmp";
-    mkdir("/data/local/tmp/battery", S_IRWXU);
-    mkdir("/data/local/tmp/ohos_charger", S_IRWXU);
-    mkdir("/data/local/tmp/ohos-fgu", S_IRWXU);
-
-    sleep(1);
-    CreateFile("/data/local/tmp/battery/online", "1");
-    CreateFile("/data/local/tmp/battery/type", "Battery");
-    CreateFile("/data/local/tmp/ohos_charger/health", "Unknown");
-    CreateFile("/data/local/tmp/ohos-fgu/temp", "345");
-    g_service->ChangePath(path);
 }
 
 static void CheckSubfolderNode(const std::string& path)
@@ -144,7 +128,7 @@ static void CheckSubfolderNode(const std::string& path)
         } else if ((strcmp(entry->d_name, "voltage_now") == 0) && (g_nodeInfo["voltage_now"] == "")) {
             g_nodeInfo["voltage_now"] = path;
         } else if ((strcmp(entry->d_name, "temp") == 0) && (g_nodeInfo["temp"] == "")) {
-            g_nodeInfo["temp"] = "battery";
+            g_nodeInfo["temp"] = path;
         } else if ((strcmp(entry->d_name, "health") == 0) && (g_nodeInfo["health"] == "")) {
             g_nodeInfo["health"] = path;
         } else if ((strcmp(entry->d_name, "status") == 0) && (g_nodeInfo["status"] == "")) {
@@ -695,6 +679,30 @@ static std::string ReadTechnologySysfs(std::string& battTechnology)
     return battTechnology;
 }
 
+static bool IsNotMock()
+{
+    bool rootExist = access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0;
+    bool lowerExist = access((SYSTEM_BATTERY_PATH + "/battery").c_str(), F_OK) == 0;
+    bool upperExist = access((SYSTEM_BATTERY_PATH + "/Battery").c_str(), F_OK) == 0;
+    return rootExist && (lowerExist || upperExist);
+}
+
+/**
+ * @tc.name: ProviderIsNotNull
+ * @tc.desc: Test functions of PowerSupplyProvider
+ * @tc.type: FUNC
+ */
+HWTEST_F (HdiServiceTest, ProviderIsNotNull, TestSize.Level1)
+{
+    ASSERT_TRUE(giver_ != nullptr);
+    if (!IsNotMock()) {
+        std::string path = "/data/local/tmp";
+        giver_->SetSysFilePath(path);
+        HDF_LOGI("%{public}s: Is mock test", __func__);
+    }
+    giver_->InitPowerSupplySysfs();
+}
+
 /**
  * @tc.name: HdiService001
  * @tc.desc: Test functions of ParseTemperature
@@ -702,34 +710,17 @@ static std::string ReadTechnologySysfs(std::string& battTechnology)
  */
 HWTEST_F (HdiServiceTest, HdiService001, TestSize.Level1)
 {
-    std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
-    if (provider == nullptr) {
-        HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
-        return;
-    }
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
-        HDF_LOGI("%{public}s: system battery file node exist", __func__);
-        provider->InitPowerSupplySysfs();
-    } else {
-        HDF_LOGI("%{public}s: battery not exist", __func__);
-        MockFileInit();
-
-        std::string path = "/data/local/tmp";
-        provider->SetSysFilePath(path);
-        provider->InitPowerSupplySysfs();
-        CreateFile("/data/local/tmp/battery/temp", "567");
-    }
-
     int32_t temperature = 0;
-    provider->ParseTemperature(&temperature);
-    HDF_LOGI("%{public}s: HdiService001::temperature=%{public}d.", __func__, temperature);
-    int32_t sysfsTemperature = ReadTemperatureSysfs();
-    HDF_LOGI("%{public}s: HdiService001::sysfsTemperature=%{public}d.", __func__, sysfsTemperature);
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
-        ASSERT_TRUE(temperature == sysfsTemperature);
+    if (IsNotMock()) {
+        giver_->ParseTemperature(&temperature);
+        int32_t sysfsTemp = ReadTemperatureSysfs();
+        HDF_LOGI("%{public}s: Not Mock HdiService001::temperature=%{public}d, t=%{public}d",
+            __func__, temperature, sysfsTemp);
+        ASSERT_TRUE(temperature == sysfsTemp);
     } else {
+        CreateFile("/data/local/tmp/battery/temp", "567");
+        giver_->ParseTemperature(&temperature);
+        HDF_LOGI("%{public}s: HdiService001::temperature=%{public}d.", __func__, temperature);
         ASSERT_TRUE(temperature == 567);
     }
 }
@@ -741,33 +732,18 @@ HWTEST_F (HdiServiceTest, HdiService001, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService002, TestSize.Level1)
 {
-    std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
-    if (provider == nullptr) {
-        HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
-        return;
-    }
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
-        HDF_LOGI("%{public}s: system battery file node exist", __func__);
-        provider->InitPowerSupplySysfs();
-    } else {
-        HDF_LOGI("%{public}s: battery not exist", __func__);
-        std::string path = "/data/local/tmp";
-        provider->SetSysFilePath(path);
-        provider->InitPowerSupplySysfs();
-        CreateFile("/data/local/tmp/battery/voltage_avg", "4123456");
-        CreateFile("/data/local/tmp/battery/voltage_now", "4123456");
-    }
-
     int32_t voltage = 0;
-    provider->ParseVoltage(&voltage);
-    HDF_LOGI("%{public}s: HdiService002::voltage=%{public}d.", __func__, voltage);
-    int32_t sysfsVoltage = ReadVoltageSysfs();
-    HDF_LOGI("%{public}s: HdiService002::sysfsVoltage=%{public}d.", __func__, sysfsVoltage);
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
+    if (IsNotMock()) {
+        giver_->ParseVoltage(&voltage);
+        int32_t sysfsVoltage = ReadVoltageSysfs();
+        HDF_LOGI("%{public}s: Not Mock HdiService002::voltage=%{public}d, v=%{public}d",
+            __func__, voltage, sysfsVoltage);
         ASSERT_TRUE(voltage == sysfsVoltage);
     } else {
+        CreateFile("/data/local/tmp/battery/voltage_avg", "4123456");
+        CreateFile("/data/local/tmp/battery/voltage_now", "4123456");
+        giver_->ParseVoltage(&voltage);
+        HDF_LOGI("%{public}s: Not Mock HdiService002::voltage=%{public}d", __func__, voltage);
         ASSERT_TRUE(voltage == 4123456);
     }
 }
@@ -779,32 +755,17 @@ HWTEST_F (HdiServiceTest, HdiService002, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService003, TestSize.Level1)
 {
-    std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
-    if (provider == nullptr) {
-        HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
-        return;
-    }
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
-        HDF_LOGI("%{public}s: system battery file node exist", __func__);
-        provider->InitPowerSupplySysfs();
-    } else {
-        HDF_LOGI("%{public}s: battery not exist", __func__);
-        std::string path = "/data/local/tmp";
-        provider->SetSysFilePath(path);
-        provider->InitPowerSupplySysfs();
-        CreateFile("/data/local/tmp/battery/capacity", "11");
-    }
-
     int32_t capacity = -1;
-    provider->ParseCapacity(&capacity);
-    HDF_LOGI("%{public}s: HdiService003::capacity=%{public}d.", __func__, capacity);
-    int32_t sysfsCapacity = ReadCapacitySysfs();
-    HDF_LOGI("%{public}s: HdiService003::sysfsCapacity=%{public}d.", __func__, sysfsCapacity);
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
+    if (IsNotMock()) {
+        giver_->ParseCapacity(&capacity);
+        int32_t sysfsCapacity = ReadCapacitySysfs();
+        HDF_LOGI("%{public}s: Not Mcok HdiService003::capacity=%{public}d, l=%{public}d",
+            __func__, capacity, sysfsCapacity);
         ASSERT_TRUE(capacity == sysfsCapacity);
     } else {
+        CreateFile("/data/local/tmp/battery/capacity", "11");
+        giver_->ParseCapacity(&capacity);
+        HDF_LOGI("%{public}s: HdiService003::capacity=%{public}d", __func__, capacity);
         ASSERT_TRUE(capacity == 11);
     }
 }
@@ -816,33 +777,19 @@ HWTEST_F (HdiServiceTest, HdiService003, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService004, TestSize.Level1)
 {
-    std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
-    if (provider == nullptr) {
-        HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
-        return;
-    }
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
-        HDF_LOGI("%{public}s: system battery file node exist", __func__);
-        provider->InitPowerSupplySysfs();
-    } else {
-        HDF_LOGI("%{public}s: battery not exist", __func__);
-        std::string path = "/data/local/tmp";
-        provider->SetSysFilePath(path);
-        provider->InitPowerSupplySysfs();
-        CreateFile("/data/local/tmp/battery/health", "Good");
-    }
-
     int32_t healthState = -1;
-    provider->ParseHealthState(&healthState);
-    HDF_LOGI("%{public}s: HdiService004::healthState=%{public}d.", __func__, healthState);
-    int32_t sysfsHealthState = ReadHealthStateSysfs();
-    HDF_LOGI("%{public}s: HdiService004::sysfsHealthState=%{public}d.", __func__, sysfsHealthState);
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
+    if (IsNotMock()) {
+        giver_->ParseHealthState(&healthState);
+        int32_t sysfsHealthState = ReadHealthStateSysfs();
+        HDF_LOGI("%{public}s: Not Mock HdiService004::healthState=%{public}d, h=%{public}d",
+            __func__, healthState, sysfsHealthState);
         ASSERT_TRUE(healthState == sysfsHealthState);
     } else {
-        ASSERT_TRUE(healthState == 1);
+        CreateFile("/data/local/tmp/battery/health", "Good");
+        giver_->ParseHealthState(&healthState);
+        HDF_LOGI("%{public}s: HdiService004::healthState=%{public}d.", __func__, healthState);
+        ASSERT_TRUE(PowerSupplyProvider::BatteryHealthState(healthState) ==
+            PowerSupplyProvider::BatteryHealthState::BATTERY_HEALTH_GOOD);
     }
 }
 
@@ -853,37 +800,20 @@ HWTEST_F (HdiServiceTest, HdiService004, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService005, TestSize.Level1)
 {
-    std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
-    if (provider == nullptr) {
-        HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
-        return;
-    }
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
-        HDF_LOGI("%{public}s: system battery file node exist", __func__);
-        provider->InitPowerSupplySysfs();
-    } else {
-        HDF_LOGI("%{public}s: battery not exist", __func__);
-        std::string path = "/data/local/tmp";
-        provider->SetSysFilePath(path);
-        provider->InitPowerSupplySysfs();
-        CreateFile("/data/local/tmp/battery/online", "1");
-        CreateFile("/data/local/tmp/battery/type", "Wireless");
-        CreateFile("/data/local/tmp/ohos_charger/online", "1");
-        CreateFile("/data/local/tmp/ohos_charger/type", "Wireless");
-        CreateFile("/data/local/tmp/ohos-fgu/type", "Wireless");
-    }
-
     int32_t pluggedType = PowerSupplyProvider::PLUGGED_TYPE_NONE;
-    provider->ParsePluggedType(&pluggedType);
-    HDF_LOGI("%{public}s: HdiService005::pluggedType=%{public}d.", __func__, pluggedType);
-    int32_t sysfsPluggedType = ReadPluggedTypeSysfs();
-    HDF_LOGI("%{public}s: HdiService005::sysfsPluggedType=%{public}d.", __func__, sysfsPluggedType);
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
+    if (IsNotMock()) {
+        giver_->ParsePluggedType(&pluggedType);
+        int32_t sysfsPluggedType = ReadPluggedTypeSysfs();
+        HDF_LOGI("%{public}s: Not Mock HdiService005::pluggedType=%{public}d, p=%{public}d",
+            __func__, pluggedType, sysfsPluggedType);
         ASSERT_TRUE(pluggedType == sysfsPluggedType);
     } else {
-        ASSERT_TRUE(pluggedType == PowerSupplyProvider::PLUGGED_TYPE_WIRELESS);
+        CreateFile("/data/local/tmp/ohos_charger/online", "1");
+        CreateFile("/data/local/tmp/ohos_charger/type", "Wireless");
+        giver_->ParsePluggedType(&pluggedType);
+        HDF_LOGI("%{public}s: HdiService005::pluggedType=%{public}d.", __func__, pluggedType);
+        ASSERT_TRUE(PowerSupplyProvider::BatteryPluggedType(pluggedType) ==
+            PowerSupplyProvider::BatteryPluggedType::PLUGGED_TYPE_WIRELESS);
     }
 }
 
@@ -894,33 +824,19 @@ HWTEST_F (HdiServiceTest, HdiService005, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService006, TestSize.Level1)
 {
-    std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
-    if (provider == nullptr) {
-        HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
-        return;
-    }
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
-        HDF_LOGI("%{public}s: system battery file node exist", __func__);
-        provider->InitPowerSupplySysfs();
-    } else {
-        HDF_LOGI("%{public}s: battery not exist", __func__);
-        std::string path = "/data/local/tmp";
-        provider->SetSysFilePath(path);
-        provider->InitPowerSupplySysfs();
-        CreateFile("/data/local/tmp/battery/status", "Not charging");
-    }
-
     int32_t chargeState = PowerSupplyProvider::CHARGE_STATE_RESERVED;
-    provider->ParseChargeState(&chargeState);
-    HDF_LOGI("%{public}s: HdiService006::chargeState=%{public}d.", __func__, chargeState);
-    int32_t sysfsChargeState = ReadChargeStateSysfs();
-    HDF_LOGI("%{public}s: HdiService006::sysfsPluggedType=%{public}d.", __func__, sysfsChargeState);
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
+    if (IsNotMock()) {
+        giver_->ParseChargeState(&chargeState);
+        int32_t sysfsChargeState = ReadChargeStateSysfs();
+        HDF_LOGI("%{public}s: Not Mock HdiService006::chargeState=%{public}d, cs=%{public}d",
+            __func__, chargeState, sysfsChargeState);
         ASSERT_TRUE(chargeState == sysfsChargeState);
     } else {
-        ASSERT_TRUE(chargeState == PowerSupplyProvider::CHARGE_STATE_DISABLE);
+        CreateFile("/data/local/tmp/battery/status", "Not charging");
+        giver_->ParseChargeState(&chargeState);
+        HDF_LOGI("%{public}s: HdiService006::chargeState=%{public}d.", __func__, chargeState);
+        ASSERT_TRUE(PowerSupplyProvider::BatteryChargeState(chargeState) ==
+            PowerSupplyProvider::BatteryChargeState::CHARGE_STATE_DISABLE);
     }
 }
 
@@ -931,32 +847,17 @@ HWTEST_F (HdiServiceTest, HdiService006, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService007, TestSize.Level1)
 {
-    std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
-    if (provider == nullptr) {
-        HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
-        return;
-    }
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
-        HDF_LOGI("%{public}s: system battery file node exist", __func__);
-        provider->InitPowerSupplySysfs();
-    } else {
-        HDF_LOGI("%{public}s: battery not exist", __func__);
-        std::string path = "/data/local/tmp";
-        provider->SetSysFilePath(path);
-        provider->InitPowerSupplySysfs();
-        CreateFile("/data/local/tmp/battery/charge_counter", "12345");
-    }
-
     int32_t chargeCounter = -1;
-    provider->ParseChargeCounter(&chargeCounter);
-    HDF_LOGI("%{public}s: HdiService007::chargeCounter=%{public}d.", __func__, chargeCounter);
-    int32_t sysfsChargeCounter = ReadChargeCounterSysfs();
-    HDF_LOGI("%{public}s: HdiService007::sysfsChargeCounter=%{public}d.", __func__, sysfsChargeCounter);
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
+    if (IsNotMock()) {
+        giver_->ParseChargeCounter(&chargeCounter);
+        int32_t sysfsChargeCounter = ReadChargeCounterSysfs();
+        HDF_LOGI("%{public}s: Not Mcok HdiService007::chargeCounter=%{public}d, cc=%{public}d",
+            __func__, chargeCounter, sysfsChargeCounter);
         ASSERT_TRUE(chargeCounter == sysfsChargeCounter);
     } else {
+        CreateFile("/data/local/tmp/battery/charge_counter", "12345");
+        giver_->ParseChargeCounter(&chargeCounter);
+        HDF_LOGI("%{public}s: HdiService007::chargeCounter=%{public}d.", __func__, chargeCounter);
         ASSERT_TRUE(chargeCounter == 12345);
     }
 }
@@ -968,32 +869,17 @@ HWTEST_F (HdiServiceTest, HdiService007, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService008, TestSize.Level1)
 {
-    std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
-    if (provider == nullptr) {
-        HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
-        return;
-    }
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
-        HDF_LOGI("%{public}s: system battery file node exist", __func__);
-        provider->InitPowerSupplySysfs();
-    } else {
-        HDF_LOGI("%{public}s: battery not exist", __func__);
-        std::string path = "/data/local/tmp";
-        provider->SetSysFilePath(path);
-        provider->InitPowerSupplySysfs();
-        CreateFile("/data/local/tmp/battery/present", "1");
-    }
-
     int8_t present = -1;
-    provider->ParsePresent(&present);
-    HDF_LOGI("%{public}s: HdiService008::present=%{public}d.", __func__, present);
-    int32_t sysfsPresent = ReadPresentSysfs();
-    HDF_LOGI("%{public}s: HdiService008::sysfsPresent=%{public}d.", __func__, sysfsPresent);
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
+    if (IsNotMock()) {
+        giver_->ParsePresent(&present);
+        int32_t sysfsPresent = ReadPresentSysfs();
+        HDF_LOGI("%{public}s: Not Mock HdiService008::present=%{public}d, p=%{public}d",
+            __func__, present, sysfsPresent);
         ASSERT_TRUE(present == sysfsPresent);
     } else {
+        CreateFile("/data/local/tmp/battery/present", "1");
+        giver_->ParsePresent(&present);
+        HDF_LOGI("%{public}s: HdiService008::present=%{public}d.", __func__, present);
         ASSERT_TRUE(present == 1);
     }
 }
@@ -1005,35 +891,18 @@ HWTEST_F (HdiServiceTest, HdiService008, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService009, TestSize.Level1)
 {
-    std::unique_ptr<PowerSupplyProvider> provider = std::make_unique<PowerSupplyProvider>();
-    if (provider == nullptr) {
-        HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
-        return;
-    }
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
-        HDF_LOGI("%{public}s: system battery file node exist", __func__);
-        provider->InitPowerSupplySysfs();
-    } else {
-        HDF_LOGI("%{public}s: battery not exist", __func__);
-        std::string path = "/data/local/tmp";
-        provider->SetSysFilePath(path);
-        provider->InitPowerSupplySysfs();
-        CreateFile("/data/local/tmp/ohos-fgu/technology", "Li");
-    }
-
     std::string technology = "invalid";
-    provider->ParseTechnology(technology);
-    HDF_LOGI("%{public}s: HdiService009::technology=%{public}s.", __func__, technology.c_str());
-    std::string sysfsTechnology = "invalid";
-    ReadTechnologySysfs(sysfsTechnology);
-    HDF_LOGI("Read from test file sysfsTechnology=%{public}s.", sysfsTechnology.c_str());
-
-    if ((access(SYSTEM_BATTERY_PATH.c_str(), F_OK) == 0) && (access(POWER_SUPPLY_SUB_PATH.c_str(), F_OK) == 0)) {
-        HDF_LOGI("battery path exist. technology length=%{public}d.", technology.size());
-        HDF_LOGI("battery path exist. sysfsTechnology length =%{public}d.", sysfsTechnology.size());
-        ASSERT_TRUE(strcmp(technology.c_str(), sysfsTechnology.c_str()) == 0);
+    if (IsNotMock()) {
+        giver_->ParseTechnology(technology);
+        std::string sysfsTechnology = "";
+        ReadTechnologySysfs(sysfsTechnology);
+        HDF_LOGI("%{public}s: HdiService009::technology=%{public}s, ty=%{public}s",
+            __func__, technology.c_str(), sysfsTechnology.c_str());
+        ASSERT_TRUE(technology == sysfsTechnology);
     } else {
+        CreateFile("/data/local/tmp/ohos-fgu/technology", "Li");
+        giver_->ParseTechnology(technology);
+        HDF_LOGI("%{public}s: HdiService009::technology=%{public}s.", __func__, technology.c_str());
         ASSERT_TRUE(technology == "Li");
     }
 }
