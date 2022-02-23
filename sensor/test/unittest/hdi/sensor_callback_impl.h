@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,25 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef HDI_POWER_V1_0_POWERHDICALLBACKSERVICE_H
-#define HDI_POWER_V1_0_POWERHDICALLBACKSERVICE_H
+#ifndef OHOS_HDI_SENSOR_V1_0_SENSORCALLBACKIMPL_H
+#define OHOS_HDI_SENSOR_V1_0_SENSORCALLBACKIMPL_H
 
-#include "power_hdi_callback_stub.h"
+#include <hdf_base.h>
+#include "sensor_callback_stub.h"
 
-namespace hdi {
-namespace power {
-namespace v1_0 {
-class PowerHdiCallbackService : public PowerHdiCallbackStub {
+namespace OHOS {
+namespace HDI {
+namespace Sensor {
+namespace V1_0 {
+class SensorCallbackImpl : public SensorCallbackStub {
 public:
-    virtual ~PowerHdiCallbackService() {}
+    virtual ~SensorCallbackImpl() {}
 
-    int32_t OnSuspend() override;
-
-    int32_t OnWakeup() override;
+    int32_t OnDataEvent(const HdfSensorEvents& event) override;
 };
-} // v1_0
-} // power
-} // hdi
+} // V1_0
+} // Sensor
+} // HDI
+} // OHOS
 
-#endif // HDI_POWER_V1_0_POWERHDICALLBACKSERVICE_H
-
+#endif // OHOS_HDI_SENSOR_V1_0_SENSORCALLBACKIMPL_H

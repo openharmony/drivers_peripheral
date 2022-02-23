@@ -111,7 +111,7 @@ struct UsbFnRequest *UsbFnAllocRequest(UsbFnInterfaceHandle handle, uint8_t pipe
  * @return Returns <b>0</b> if the operation is successful;
  * returns a negative value defined in {@link UsbErrorType} otherwise.
  */
-int UsbFnFreeRequest(struct UsbFnRequest *req);
+int32_t UsbFnFreeRequest(struct UsbFnRequest *req);
 
 /**
  * Obtains the status of a specified USB request.
@@ -122,7 +122,7 @@ int UsbFnFreeRequest(struct UsbFnRequest *req);
  * @return Returns <b>0</b> if the operation is successful;
  * returns a negative value defined in {@link UsbErrorType} otherwise.
  */
-int UsbFnGetRequestStatus(struct UsbFnRequest *req, UsbRequestStatus *status);
+int32_t UsbFnGetRequestStatus(struct UsbFnRequest *req, UsbRequestStatus *status);
 
 /**
  * @brief Sends a non-isochronous USB request based on the passed request.
@@ -132,7 +132,7 @@ int UsbFnGetRequestStatus(struct UsbFnRequest *req, UsbRequestStatus *status);
  * @return Returns <b>0</b> if the operation is successful;
  * returns a negative value defined in {@link UsbErrorType} otherwise.
  */
-int UsbFnSubmitRequestAsync(struct UsbFnRequest *req);
+int32_t UsbFnSubmitRequestAsync(struct UsbFnRequest *req);
 
 /**
  * @brief Cancels a USB request based on the passed request.
@@ -144,7 +144,7 @@ int UsbFnSubmitRequestAsync(struct UsbFnRequest *req);
  * @return Returns <b>0</b> if the operation is successful;
  * returns a negative value defined in {@link UsbErrorType} otherwise.
  */
-int UsbFnCancelRequest(struct UsbFnRequest *req);
+int32_t UsbFnCancelRequest(struct UsbFnRequest *req);
 
 /**
  * @brief Sends an isochronous USB request with a timeout interval based on the passed request.
@@ -156,6 +156,6 @@ int UsbFnCancelRequest(struct UsbFnRequest *req);
  * @return Returns <b>0</b> if the operation is successful;
  * returns a negative value defined in {@link UsbErrorType} otherwise.
  */
-int UsbFnSubmitRequestSync(struct UsbFnRequest *req, uint32_t timeout);
+int32_t UsbFnSubmitRequestSync(struct UsbFnRequest *req, uint32_t timeout);
 
 #endif /* USBFN_REQUEST_H */

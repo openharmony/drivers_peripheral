@@ -18,10 +18,10 @@ ohos_shared_library("libpower_interface_service_1.0") {
     "include",
     "../include",
   ]
-  sources = [ "src/power_interface_service.cpp" ]
+  sources = [ "src/power_interface_impl.cpp" ]
 
   deps = [
-    "../hdi/power/v1_0:libpower_stub_1.0",
+    "//drivers/interface/power/v1_0:libpower_stub_1.0",
     "//third_party/libxml2:xml2",
     "//utils/native/base:utils",
   ]
@@ -60,7 +60,7 @@ ohos_shared_library("libpower_driver") {
 
   deps = [
     ":libpower_interface_service_1.0",
-    "../hdi/power/v1_0:libpower_stub_1.0",
+    "//drivers/interface/power/v1_0:libpower_stub_1.0",
     "//utils/native/base:utils",
   ]
 

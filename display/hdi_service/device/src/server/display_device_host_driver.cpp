@@ -41,7 +41,7 @@ static const DisplayDeviceServerStubFunc g_displayDeviceServerFuncTbl[HDF_DISPLA
           {},
           /* DEVICE */
           { nullptr, nullptr, nullptr, DDSS::RegHotPlugCallback, DDSS::GetDisplayCapability,
-              DDSS::GetDisplaySuppportedModes, DDSS::GetDisplayMode, DDSS::SetDisplayMode, DDSS::GetDisplayPowerStatus,
+              DDSS::GetDisplaySupportedModes, DDSS::GetDisplayMode, DDSS::SetDisplayMode, DDSS::GetDisplayPowerStatus,
               DDSS::SetDisplayPowerStatus, DDSS::GetDisplayBackLight, DDSS::SetDisplayBackLight,
               DDSS::GetDisplayProperty, DDSS::SetDisplayProperty, DDSS::PrepareDisplayLayers, nullptr,
               DDSS::GetDisplayCompChange, nullptr, DDSS::SetDisplayClientCrop, DDSS::SetDisplayClientDestRect,
@@ -217,7 +217,7 @@ int32_t DisplayDeviceServerStub::GetDisplayCapability(MessageParcel *data, Messa
     return DISPLAY_SUCCESS;
 }
 
-int32_t DisplayDeviceServerStub::GetDisplaySuppportedModes(MessageParcel *data, MessageParcel *reply)
+int32_t DisplayDeviceServerStub::GetDisplaySupportedModes(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
 
@@ -234,7 +234,7 @@ int32_t DisplayDeviceServerStub::GetDisplaySuppportedModes(MessageParcel *data, 
     DisplayModeInfo modesTmp[COMPOSER_SERVER_ARRAY_NUMBER_MAX];
     (void)memset_s(&modesTmp, sizeof(modesTmp), 0, sizeof(modesTmp));
 
-    int32_t ret = device_->GetDisplaySuppportedModes(devId, modesNum, modesTmp);
+    int32_t ret = device_->GetDisplaySupportedModes(devId, modesNum, modesTmp);
     DISPLAY_LOG("call impl ret = %{public}d", ret);
     if (ret != HDF_SUCCESS) {
         return ret;

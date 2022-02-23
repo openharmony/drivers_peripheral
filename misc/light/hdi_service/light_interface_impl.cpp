@@ -13,16 +13,18 @@
  * limitations under the License.
  */
 
-#include "light_interface_service.h"
+#include "light_interface_impl.h"
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include "light_if.h"
 
 #define HDF_LOG_TAG           hdf_light_dal
 
-namespace light {
-namespace v1_0 {
-int32_t LightInterfaceService::GetLightInfo(std::vector<HdfLightInfo>& info)
+namespace OHOS {
+namespace HDI {
+namespace Light {
+namespace V1_0 {
+int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfo>& info)
 {
     const struct LightInterface *lightInterface = NewLightInterfaceInstance();
     if (lightInterface == NULL || lightInterface->GetLightInfo == NULL) {
@@ -48,7 +50,7 @@ int32_t LightInterfaceService::GetLightInfo(std::vector<HdfLightInfo>& info)
     return HDF_SUCCESS;
 }
 
-int32_t LightInterfaceService::TurnOnLight(int32_t lightId, const HdfLightEffect& effect)
+int32_t LightInterfaceImpl::TurnOnLight(int32_t lightId, const HdfLightEffect& effect)
 {
     const struct LightInterface *lightInterface = NewLightInterfaceInstance();
     if (lightInterface == NULL || lightInterface->TurnOnLight == NULL) {
@@ -69,7 +71,7 @@ int32_t LightInterfaceService::TurnOnLight(int32_t lightId, const HdfLightEffect
     return ret;
 }
 
-int32_t LightInterfaceService::TurnOffLight(int32_t LightId)
+int32_t LightInterfaceImpl::TurnOffLight(int32_t LightId)
 {
     const struct LightInterface *lightInterface = NewLightInterfaceInstance();
     if (lightInterface == NULL || lightInterface->TurnOffLight == NULL) {
@@ -83,5 +85,7 @@ int32_t LightInterfaceService::TurnOffLight(int32_t LightId)
 
     return ret;
 }
-} // v1_0
-} // light
+} // V1_0
+} // Light
+} // HDI
+} // OHOS

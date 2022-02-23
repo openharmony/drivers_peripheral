@@ -113,9 +113,9 @@ struct FconfigDevDescString {
 };
 
 struct FconfigPollFd {
-    int fd;
+    int32_t fd;
     uint32_t revents;
-    int events;
+    int32_t events;
 };
 
 #define FUNCTIONFS_ENDPOINT_DESC             _IOR('g', 130, struct UsbEndpointDescriptor)
@@ -182,7 +182,7 @@ struct GenericMemory {
 struct UsbFnReqEvent {
     uintptr_t buf;
     uint32_t actual;
-    int      status;
+    int32_t      status;
 };
 
 struct UsbEp0Event {
@@ -194,36 +194,36 @@ struct UsbEp0Event {
 };
 #define MAX_EP0_NUM 5
 struct UsbFnEventAll {
-    int ep0[MAX_EP0_NUM];
+    int32_t ep0[MAX_EP0_NUM];
     uint8_t ep0Num;
     struct UsbEp0Event ep0Event[MAX_EP0_NUM];
-    int epx[MAX_EP];
+    int32_t epx[MAX_EP];
     uint8_t epNum;
     struct UsbFnReqEvent *reqEvent[MAX_EP];
     uint8_t numEvent[MAX_EP];
 };
 
 struct UsbFnAdapterOps {
-    int (*createDevice)(const char *udcName, const char *devName, struct UsbFnDeviceDesc *descriptor);
-    int (*delDevice)(const char *devName, const char *udcName, struct UsbFnDeviceDesc *descriptor);
+    int32_t (*createDevice)(const char *udcName, const char *devName, struct UsbFnDeviceDesc *descriptor);
+    int32_t (*delDevice)(const char *devName, const char *udcName, struct UsbFnDeviceDesc *descriptor);
 
-    int (*openPipe)(const char *interfaceName, int epIndex);
-    int (*closePipe)(int ep);
-    int (*getPipeInfo)(int ep, struct UsbFnPipeInfo *pipeInfo);
+    int32_t (*openPipe)(const char *interfaceName, int32_t epIndex);
+    int32_t (*closePipe)(int32_t ep);
+    int32_t (*getPipeInfo)(int32_t ep, struct UsbFnPipeInfo *pipeInfo);
 
-    int (*queueInit)(int ep);
-    int (*queueDel)(int ep);
-    int (*releaseBuf)(int ep, const struct GenericMemory *mem);
-    int (*pipeIo)(int ep, struct IoData *ioData);
-    int (*cancelIo)(int ep, const struct IoData *ioData);
-    int (*getReqStatus)(int ep, const struct IoData *ioData);
-    uint8_t *(*mapAddr)(int ep, uint32_t len);
-    int (*unmapAddr)(uint8_t *mapAddr, uint32_t len);
-    int (*pollEvent)(struct UsbFnEventAll *event, int timeout);
+    int32_t (*queueInit)(int32_t ep);
+    int32_t (*queueDel)(int32_t ep);
+    int32_t (*releaseBuf)(int32_t ep, const struct GenericMemory *mem);
+    int32_t (*pipeIo)(int32_t ep, struct IoData *ioData);
+    int32_t (*cancelIo)(int32_t ep, const struct IoData *ioData);
+    int32_t (*getReqStatus)(int32_t ep, const struct IoData *ioData);
+    uint8_t *(*mapAddr)(int32_t ep, uint32_t len);
+    int32_t (*unmapAddr)(uint8_t *mapAddr, uint32_t len);
+    int32_t (*pollEvent)(struct UsbFnEventAll *event, int32_t timeout);
 
-    int (*writeUDC)(const char *deviceName, const char *udcName, int enable);
-    int (*writeProp)(const char *deviceName, const char *propName, uint32_t propValue);
-    int (*writeDesString)(const char *deviceName,
+    int32_t (*writeUDC)(const char *deviceName, const char *udcName, int32_t enable);
+    int32_t (*writeProp)(const char *deviceName, const char *propName, uint32_t propValue);
+    int32_t (*writeDesString)(const char *deviceName,
         uint16_t lang, const char *stringName, const char *stringValue);
 };
 
@@ -238,6 +238,6 @@ struct UsbFnAdapterOps *UsbFnAdapterGetOps(void);
 void *UsbFnMemAlloc(size_t size);
 void *UsbFnMemCalloc(size_t size);
 void UsbFnMemFree(const void *mem);
-int UsbFnAdpMemTestTrigger(bool enable);
+int32_t UsbFnAdpMemTestTrigger(bool enable);
 
 #endif /* USBFN_ADAPTER_H */

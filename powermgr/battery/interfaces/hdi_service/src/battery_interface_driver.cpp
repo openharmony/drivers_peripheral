@@ -18,15 +18,15 @@
 #include "hdf_device_desc.h"
 #include "hdf_log.h"
 #include "hdf_sbuf_ipc.h"
-#include "battery_interface_service.h"
+#include "battery_interface_impl.h"
 
 #define HDF_LOG_TAG BatteryInterfaceDriver
 
-using namespace hdi::battery::v1_0;
+using namespace OHOS::HDI::Battery::V1_0;
 
 struct HdfBatteryInterfaceHost {
     struct IDeviceIoService ioservice;
-    BatteryInterfaceService *service;
+    BatteryInterfaceImpl *service;
 };
 
 static int32_t BatteryInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
@@ -65,7 +65,7 @@ int HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfBatteryInterfaceHost->ioservice.Dispatch = BatteryInterfaceDriverDispatch;
     hdfBatteryInterfaceHost->ioservice.Open = NULL;
     hdfBatteryInterfaceHost->ioservice.Release = NULL;
-    hdfBatteryInterfaceHost->service = new BatteryInterfaceService();
+    hdfBatteryInterfaceHost->service = new BatteryInterfaceImpl();
 
     deviceObject->service = &hdfBatteryInterfaceHost->ioservice;
     return HDF_SUCCESS;

@@ -68,7 +68,7 @@ void UsbHostSdkIfTest::TearDown()
 static void AcmReadBulk(struct UsbRequest *req)
 {
     uint32_t size;
-    int status = req->compInfo.status;
+    int32_t status = req->compInfo.status;
     size = req->compInfo.actualLength;
     printf("Bulk status:%d,actualLength:%d\n", status, size);
     return;
@@ -76,7 +76,7 @@ static void AcmReadBulk(struct UsbRequest *req)
 
 static void AcmWriteBulk(struct UsbRequest *req)
 {
-    int status;
+    int32_t status;
 
     if (req == NULL) {
         printf("%s:%d req is NULL!", __func__, __LINE__);
@@ -101,9 +101,9 @@ static void AcmWriteBulk(struct UsbRequest *req)
     return;
 }
 
-static int AcmWriteBufAlloc(struct AcmDevice *acm)
+static int32_t AcmWriteBufAlloc(struct AcmDevice *acm)
 {
-    int i;
+    int32_t i;
     struct AcmWb *wb;
     for (wb = &acm->wb[0],i = 0; i < ACM_NW; i++,wb++) {
         wb->buf = (uint8_t *)OsalMemCalloc(acm->writeSize);
@@ -144,10 +144,10 @@ static void AcmCtrlIrq(struct UsbRequest *req)
         printf("%s:%d req is NULL!", __func__, __LINE__);
         return;
     }
-    int retval, ret;
+    int32_t retval, ret;
     struct AcmDevice *acm = (struct AcmDevice *)req->compInfo.userData;
     unsigned int expectedSize, copySize, allocSize;
-    int status = req->compInfo.status;
+    int32_t status = req->compInfo.status;
     struct UsbCdcNotification *dr = (struct UsbCdcNotification *)req->compInfo.buffer;
     unsigned int currentSize = req->compInfo.actualLength;
     printf("Irqstatus:%d,actualLength:%u\n", status, currentSize);
@@ -219,7 +219,7 @@ static struct UsbControlRequest UsbControlMsg(struct TestControlMsgData msgData)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfInit001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbInitHostSdk(&g_session);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -234,7 +234,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfInit001, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfExit001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbExitHostSdk(g_acm->session);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -248,7 +248,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfExit001, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfInit002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbInitHostSdk(NULL);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -262,7 +262,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfInit002, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfExit002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbExitHostSdk(NULL);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -276,8 +276,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfExit002, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfInit003, TestSize.Level1)
 {
-    int ret;
-    int i;
+    int32_t ret;
+    int32_t i;
 
     for (i = 0; i < 100; i++)
     {
@@ -297,8 +297,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfInit003, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfInit004, TestSize.Level1)
 {
-    int ret;
-    int i;
+    int32_t ret;
+    int32_t i;
 
     for (i = 0; i < 100; i++)
     {
@@ -317,8 +317,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfInit004, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfInit005, TestSize.Level1)
 {
-    int ret;
-    int i;
+    int32_t ret;
+    int32_t i;
 
     for (i = 0; i < 100; i++)
     {
@@ -335,8 +335,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfInit005, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfExit003, TestSize.Level1)
 {
-    int ret;
-    int i;
+    int32_t ret;
+    int32_t i;
     for (i = 0; i < 100; i++)
     {
         ret = UsbExitHostSdk(NULL);
@@ -353,7 +353,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfExit003, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfInit006, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbInitHostSdk(&g_session);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -384,7 +384,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface001, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfReleaseInterface001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbReleaseInterface(g_acm->dataIface);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -414,7 +414,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface002, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfReleaseInterface002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbReleaseInterface(g_acm->intIface);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -444,7 +444,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface003, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfReleaseInterface003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbReleaseInterface(g_acm->ctrIface);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -458,7 +458,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfReleaseInterface003, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfReleaseInterface004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbReleaseInterface(NULL);
     EXPECT_NE(HDF_SUCCESS, ret);
@@ -550,7 +550,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfOpenInterface001, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbCloseInterface(g_acm->data_devHandle);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -576,7 +576,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfOpenInterface002, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbCloseInterface(g_acm->int_devHandle);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -602,7 +602,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfOpenInterface003, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbCloseInterface(NULL);
     EXPECT_NE(HDF_SUCCESS, ret);
@@ -616,7 +616,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface003, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfCloseInterface004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbCloseInterface(g_acm->ctrl_devHandle);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -642,7 +642,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfOpenInterface004, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfOpenInterface005, TestSize.Level1)
 {
-    int i;
+    int32_t i;
 
     for (i = 0; i < 100; i++)
     {
@@ -679,8 +679,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfOpenInterface006, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting001, TestSize.Level1)
 {
-    int ret;
-    int settingIndex = 0;
+    int32_t ret;
+    int32_t settingIndex = 0;
 
     ret = UsbSelectInterfaceSetting(g_ecmDataDevHandle, settingIndex, &g_ecmDataIface);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -694,8 +694,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting001, TestSize.Lev
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting002, TestSize.Level1)
 {
-    int ret;
-    int settingIndex = 10;
+    int32_t ret;
+    int32_t settingIndex = 10;
 
     ret = UsbSelectInterfaceSetting(g_ecmDataDevHandle, settingIndex, &g_ecmDataIface);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -709,8 +709,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting002, TestSize.Lev
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting003, TestSize.Level1)
 {
-    int ret;
-    int settingIndex = 100;
+    int32_t ret;
+    int32_t settingIndex = 100;
 
     ret = UsbSelectInterfaceSetting(g_ecmDataDevHandle, settingIndex, &g_ecmDataIface);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -724,8 +724,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting003, TestSize.Lev
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting004, TestSize.Level1)
 {
-    int ret;
-    int settingIndex = 200;
+    int32_t ret;
+    int32_t settingIndex = 200;
 
     ret = UsbSelectInterfaceSetting(g_ecmDataDevHandle, settingIndex, &g_ecmDataIface);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -739,8 +739,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting004, TestSize.Lev
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting005, TestSize.Level1)
 {
-    int ret;
-    int settingIndex = 255;
+    int32_t ret;
+    int32_t settingIndex = 255;
 
     ret = UsbSelectInterfaceSetting(g_ecmDataDevHandle, settingIndex, &g_ecmDataIface);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -754,8 +754,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting005, TestSize.Lev
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfSelectInterfaceSetting006, TestSize.Level1)
 {
-    int ret;
-    int settingIndex = 1;
+    int32_t ret;
+    int32_t settingIndex = 1;
 
     ret = UsbSelectInterfaceSetting(g_ecmDataDevHandle, settingIndex, &g_ecmDataIface);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -817,9 +817,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClaimInterface009, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbPipeInfo p;
-    int i;
+    int32_t i;
 
     for (i = 0;  i <= g_acm->dataIface->info.pipeNum; i++) {
         ret = UsbGetPipeInfo(NULL, g_acm->dataIface->info.curAltSetting, i, &p);
@@ -846,9 +846,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe001, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbPipeInfo p;
-    int i;
+    int32_t i;
 
     for (i = 0;  i <= g_acm->dataIface->info.pipeNum; i++) {
         ret = UsbGetPipeInfo(g_acm->data_devHandle, g_acm->dataIface->info.curAltSetting, i, &p);
@@ -875,9 +875,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe002, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbPipeInfo p;
-    int i;
+    int32_t i;
 
     for (i = 0;  i <= g_acm->dataIface->info.pipeNum; i++) {
         ret = UsbGetPipeInfo(NULL, g_acm->dataIface->info.curAltSetting, i, &p);
@@ -904,9 +904,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe003, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbPipeInfo p;
-    int i;
+    int32_t i;
 
     for (i = 0;  i <= g_acm->dataIface->info.pipeNum; i++) {
         ret = UsbGetPipeInfo(g_acm->data_devHandle, g_acm->dataIface->info.curAltSetting, i, &p);
@@ -933,9 +933,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe004, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe005, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbPipeInfo p;
-    int i;
+    int32_t i;
 
     for (i = 0;  i <= g_acm->intIface->info.pipeNum; i++) {
         ret = UsbGetPipeInfo(NULL, g_acm->intIface->info.curAltSetting, i, &p);
@@ -961,9 +961,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe005, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe006, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbPipeInfo p;
-    int i;
+    int32_t i;
 
     for (i = 0;  i <= g_acm->intIface->info.pipeNum; i++) {
         ret = UsbGetPipeInfo(g_acm->int_devHandle, g_acm->intIface->info.curAltSetting, i, &p);
@@ -989,9 +989,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe006, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe007, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbPipeInfo p;
-    int i;
+    int32_t i;
 
     g_acm->interfaceIndex = 255;
 
@@ -1019,9 +1019,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe007, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe008, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbPipeInfo p;
-    int i;
+    int32_t i;
 
     g_acm->interfaceIndex = 255;
 
@@ -1049,7 +1049,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe008, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe009, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbPipeInfo p;
 
     ret = UsbGetPipeInfo(NULL, 0, 0, &p);
@@ -1064,7 +1064,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe009, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe010, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbGetPipeInfo(g_acm->ctrl_devHandle, 0, 0, NULL);
     EXPECT_NE(HDF_SUCCESS,  ret);
@@ -1079,7 +1079,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe010, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe011, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbPipeInfo p;
 
     ret = UsbGetPipeInfo(g_acm->ctrl_devHandle, 0, 0, &p);
@@ -1094,7 +1094,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfGetPipe011, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest001, TestSize.Level1)
 {
-    int i;
+    int32_t i;
 
     g_acm->readSize = g_acm->dataInPipe->maxPacketSize;
     printf("------readSize = [%d]------\n", g_acm->readSize);
@@ -1112,7 +1112,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest001, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest002, TestSize.Level1)
 {
-    int i;
+    int32_t i;
 
     g_acm->readSize = g_acm->dataInPipe->maxPacketSize;
     printf("------readSize = [%d]------\n", g_acm->readSize);
@@ -1130,8 +1130,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest002, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFreeRequest001, TestSize.Level1)
 {
-    int ret;
-    int i;
+    int32_t ret;
+    int32_t i;
 
     for (i = 0; i < ACM_NR; i++) {
         ret = UsbFreeRequest(g_acm->readReq[i]);
@@ -1147,8 +1147,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFreeRequest001, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest003, TestSize.Level1)
 {
-    int i;
-    int ret;
+    int32_t i;
+    int32_t ret;
 
     g_acm->writeSize = g_acm->dataOutPipe->maxPacketSize;
     ret = AcmWriteBufAlloc(g_acm);
@@ -1169,8 +1169,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest003, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest004, TestSize.Level1)
 {
-    int i;
-    int ret;
+    int32_t i;
+    int32_t ret;
 
     g_acm->writeSize = g_acm->dataOutPipe->maxPacketSize;
     ret = AcmWriteBufAlloc(g_acm);
@@ -1191,8 +1191,8 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest004, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFreeRequest002, TestSize.Level1)
 {
-    int ret;
-    int i;
+    int32_t ret;
+    int32_t i;
 
     for (i = 0; i < ACM_NR; i++) {
         ret = UsbFreeRequest(g_acm->wb[i].request);
@@ -1234,7 +1234,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest006, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFreeRequest003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbFreeRequest(g_acm->notifyReq);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1274,7 +1274,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest008, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFreeRequest004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbFreeRequest(g_acm->ctrlReq);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1288,7 +1288,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFreeRequest004, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFreeRequest005, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbFreeRequest(NULL);
     EXPECT_NE(HDF_SUCCESS, ret);
@@ -1302,7 +1302,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFreeRequest005, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest009, TestSize.Level1)
 {
-    int i;
+    int32_t i;
 
     g_acm->readSize = g_acm->dataInPipe->maxPacketSize;
     for (i = 0; i < ACM_NR; i++) {
@@ -1311,7 +1311,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest009, TestSize.Level1)
     }
 
     g_acm->writeSize = g_acm->dataOutPipe->maxPacketSize;
-    for (int i = 0; i < ACM_NW; i++) {
+    for (int32_t i = 0; i < ACM_NW; i++) {
         g_acm->wb[i].request = UsbAllocRequest(g_acm->data_devHandle, 0, g_acm->writeSize);
         g_acm->wb[i].instance = g_acm;
         EXPECT_NE(nullptr,  g_acm->wb[i].request);
@@ -1345,9 +1345,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAllocRequest010, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbRequestParams readParmas;
-    int i;
+    int32_t i;
 
     for (i = 0; i < 1; i++) {
         readParmas.userData = (void *)g_acm;
@@ -1374,9 +1374,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest001, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbRequestParams parmas;
-    int i;
+    int32_t i;
     char sendData[] = {"abcde\0"};
     uint32_t size = strlen(sendData) + 1;
 
@@ -1413,7 +1413,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest002, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbRequestParams intParmas;
 
     intParmas.userData = (void *)g_acm;
@@ -1439,7 +1439,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest003, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbRequestParams parmas;
     uint16_t index = 0;
     uint16_t value = 0;
@@ -1477,9 +1477,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest004, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest005, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbRequestParams readParmas;
-    int i;
+    int32_t i;
 
     for (i = 0; i < ACM_NR; i++) {
         readParmas.userData = (void *)g_acm;
@@ -1506,9 +1506,9 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest005, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest006, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbRequestParams parmas;
-    int i;
+    int32_t i;
     char sendData[] = {"abcde\0"};
     uint32_t size = strlen(sendData) + 1;
 
@@ -1545,7 +1545,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest006, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest007, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbRequestParams intParmas;
 
     intParmas.userData = (void *)g_acm;
@@ -1571,7 +1571,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest007, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest008, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbRequestParams parmas;
     uint16_t index = 0;
     uint16_t value = 0;
@@ -1608,7 +1608,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest008, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest009, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbFillRequest(NULL, NULL, NULL);
     EXPECT_NE(HDF_SUCCESS, ret);
@@ -1622,7 +1622,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest009, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest010, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbRequestParams params;
 
     ret = UsbFillRequest(NULL, NULL, &params);
@@ -1637,7 +1637,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest010, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest011, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     UsbInterfaceHandle interfaceHandle;
 
     ret = UsbFillRequest(NULL, &interfaceHandle, NULL);
@@ -1652,7 +1652,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest011, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest012, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbRequest request;
 
     ret = UsbFillRequest(&request, NULL, NULL);
@@ -1667,7 +1667,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest012, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest013, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbRequestParams params;
     UsbInterfaceHandle interfaceHandle;
 
@@ -1683,7 +1683,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest013, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest014, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     UsbInterfaceHandle interfaceHandle;
     struct UsbRequest request;
 
@@ -1699,7 +1699,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest014, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest015, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     struct UsbRequestParams params;
     struct UsbRequest request;
 
@@ -1717,7 +1717,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfFillRequest015, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClearInterfaceHalt001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbClearInterfaceHalt(g_acm->data_devHandle, g_acm->dataInPipe->pipeAddress);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1731,7 +1731,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClearInterfaceHalt001, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClearInterfaceHalt002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbClearInterfaceHalt(g_acm->data_devHandle, g_acm->dataOutPipe->pipeAddress);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1745,7 +1745,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClearInterfaceHalt002, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClearInterfaceHalt003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbClearInterfaceHalt(g_acm->int_devHandle, g_acm->intPipe->pipeAddress);
     EXPECT_NE(HDF_SUCCESS, ret);
@@ -1759,7 +1759,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClearInterfaceHalt003, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClearInterfaceHalt004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbClearInterfaceHalt(g_acm->ctrl_devHandle, g_acm->ctrPipe->pipeAddress);
     EXPECT_NE(HDF_SUCCESS, ret);
@@ -1773,7 +1773,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClearInterfaceHalt004, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClearInterfaceHalt005, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbClearInterfaceHalt(NULL, 0);
     EXPECT_NE(HDF_SUCCESS, ret);
@@ -1787,7 +1787,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfClearInterfaceHalt005, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfRemoveInterface001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     UsbInterfaceStatus status = USB_INTERFACE_STATUS_REMOVE;
 
     ret = UsbAddOrRemoveInterface(g_acm->session, g_acm->busNum, g_acm->devAddr,
@@ -1803,7 +1803,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfRemoveInterface001, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAddInterface001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     UsbInterfaceStatus status = USB_INTERFACE_STATUS_ADD;
 
     sleep(1);
@@ -1821,7 +1821,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAddInterface001, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfRemoveInterface002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     UsbInterfaceStatus status = USB_INTERFACE_STATUS_REMOVE;
 
     sleep(1);
@@ -1839,7 +1839,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfRemoveInterface002, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAddInterface002, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     UsbInterfaceStatus status = USB_INTERFACE_STATUS_ADD;
 
     sleep(1);
@@ -1857,7 +1857,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAddInterface002, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfRemoveInterface003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     UsbInterfaceStatus status = USB_INTERFACE_STATUS_REMOVE;
 
     ret = UsbAddOrRemoveInterface(g_acm->session, g_acm->busNum, g_acm->devAddr,
@@ -1873,7 +1873,7 @@ HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfRemoveInterface003, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTest, CheckHostSdkIfAddInterface003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     UsbInterfaceStatus status = USB_INTERFACE_STATUS_ADD;
 
     ret = UsbAddOrRemoveInterface(g_acm->session, g_acm->busNum, g_acm->devAddr,

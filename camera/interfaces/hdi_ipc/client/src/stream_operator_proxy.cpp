@@ -21,6 +21,7 @@
 #include "ioffline_stream_operator.h"
 #include "camera_metadata_info.h"
 #include "utils_data_stub.h"
+#include "metadata_utils.h"
 
 namespace OHOS::Camera {
 CamRetCode StreamOperatorProxy::IsStreamsSupported(
@@ -46,7 +47,7 @@ CamRetCode StreamOperatorProxy::IsStreamsSupported(
     }
 
     // stub metadata
-    if (nullFlag && !UtilsDataStub::EncodeCameraMetadata(modeSetting, data)) {
+    if (nullFlag && !CameraStandard::MetadataUtils::EncodeCameraMetadata(modeSetting, data)) {
         HDF_LOGE("%s: write metadata failed", __func__);
         return INVALID_ARGUMENT;
     }
@@ -147,7 +148,7 @@ CamRetCode StreamOperatorProxy::CommitStreams(OperationMode mode,
         return INVALID_ARGUMENT;
     }
 
-    bool bRet = UtilsDataStub::EncodeCameraMetadata(modeSetting, data);
+    bool bRet = CameraStandard::MetadataUtils::EncodeCameraMetadata(modeSetting, data);
     if (!bRet) {
         HDF_LOGE("%s: write metadata failed", __func__);
         return INVALID_ARGUMENT;
@@ -267,7 +268,7 @@ CamRetCode StreamOperatorProxy::Capture(int captureId,
         return INVALID_ARGUMENT;
     }
 
-    bool bRet = UtilsDataStub::EncodeCameraMetadata(pInfo->captureSetting_, data);
+    bool bRet = CameraStandard::MetadataUtils::EncodeCameraMetadata(pInfo->captureSetting_, data);
     if (!bRet) {
         HDF_LOGE("%s: write metadata failed", __func__);
         return INVALID_ARGUMENT;

@@ -59,12 +59,12 @@ enum UsbSerialCmd {
     USB_SERIAL_SPEED,
 };
 struct UsbSpeedTest {
-    int busNum;
-    int devAddr;
-    int ifaceNum;
-    int writeOrRead;
+    int32_t busNum;
+    int32_t devAddr;
+    int32_t ifaceNum;
+    int32_t writeOrRead;
     bool printData;
-    int paramNum;
+    int32_t paramNum;
 };
 
 struct AcmDevice;
@@ -72,8 +72,8 @@ struct AcmDb {
     struct UsbRawRequest *request;
     struct AcmDevice *instance;
     uint8_t *buf;
-    int len;
-    int use;
+    int32_t len;
+    int32_t use;
 };
 
 struct SerialDevice {
@@ -106,14 +106,14 @@ struct AcmDevice {
     struct UsbRawRequest *readReq[ACM_NR];
     struct UsbRawRequest *writeReq;
     struct UsbRawRequest *ctrlReq;
-    int dataSize;
+    uint32_t dataSize;
     struct OsalMutex lock;
     UsbRawHandle *devHandle;
     struct UsbSession *session;
     struct SerialDevice *port;
     uint32_t nbIndex;
     uint32_t nbSize;
-    int transmitting;
+    int32_t transmitting;
     uint8_t busNum;
     uint8_t devAddr;
     uint8_t interfaceCnt;

@@ -18,13 +18,15 @@
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
-#include "thermal_interface_service.h"
+#include "thermal_interface_impl.h"
 
-using namespace hdi::thermal::v1_0;
+#define HDF_LOG_TAG ThermalInterfaceDriver
+
+using namespace OHOS::HDI::Thermal::V1_0;
 
 struct HdfThermalInterfaceHost {
     struct IDeviceIoService ioservice;
-    ThermalInterfaceService *service;
+    ThermalInterfaceImpl *service;
 };
 
 static int32_t ThermalInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
@@ -66,7 +68,7 @@ int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfThermalInterfaceHost->ioservice.Dispatch = ThermalInterfaceDriverDispatch;
     hdfThermalInterfaceHost->ioservice.Open = NULL;
     hdfThermalInterfaceHost->ioservice.Release = NULL;
-    hdfThermalInterfaceHost->service = new ThermalInterfaceService();
+    hdfThermalInterfaceHost->service = new ThermalInterfaceImpl();
 
     deviceObject->service = &hdfThermalInterfaceHost->ioservice;
     return HDF_SUCCESS;

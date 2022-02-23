@@ -34,7 +34,7 @@ static bool g_readRuning = false;
 static void TestSpeed(void)
 {
     HdfSbufFlush(g_reply);
-    int status = g_acmService->dispatcher->Dispatch(g_acmService,
+    int32_t status = g_acmService->dispatcher->Dispatch(g_acmService,
         USB_SERIAL_WRITE_SPEED, g_data, g_reply);
     if (status) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE_SPEED failed status = %d",
@@ -47,7 +47,7 @@ static void GetTempSpeed(void)
 {
     float speed;
     HdfSbufFlush(g_reply);
-    int status = g_acmService->dispatcher->Dispatch(g_acmService,
+    int32_t status = g_acmService->dispatcher->Dispatch(g_acmService,
         USB_SERIAL_WRITE_GET_TEMP_SPEED, g_data, g_reply);
     if (status) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE_GET_TEMP_SPEED failed status = %d",
@@ -65,7 +65,7 @@ static void GetTempSpeed(void)
 
 static void WriteSpeedDone(void)
 {
-    int status = g_acmService->dispatcher->Dispatch(g_acmService,
+    int32_t status = g_acmService->dispatcher->Dispatch(g_acmService,
         USB_SERIAL_WRITE_SPEED_DONE, g_data, g_reply);
     if (status) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE_SPEED_DONE failed status = %d",
@@ -74,16 +74,16 @@ static void WriteSpeedDone(void)
     }
 }
 
-void StopWriteSpeedTest(int signo)
+void StopWriteSpeedTest(int32_t signo)
 {
     WriteSpeedDone();
     g_readRuning = false;
     printf("acm_speed_write exit.\n");
 }
 
-int acm_speed_write(int argc, const char *argv[])
+int32_t acm_speed_write(int32_t argc, const char *argv[])
 {
-    int status;
+    int32_t status;
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();
     if (servmgr == NULL) {
         HDF_LOGE("%s: HDIServiceManagerGet err", __func__);

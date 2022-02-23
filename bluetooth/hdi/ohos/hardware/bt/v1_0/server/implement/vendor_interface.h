@@ -51,6 +51,7 @@ private:
     static uint8_t OnCmdXmitCallback(uint16_t opcode, void* buf);
 
     void OnEventReceived(const std::vector<uint8_t> &data);
+    bool WatchHciChannel(const ReceiveCallback &receiveCallback);
     void WatcherTimeout();
 
 private:

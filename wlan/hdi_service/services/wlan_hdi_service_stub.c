@@ -183,31 +183,13 @@ static int32_t WlanServiceStubGetSupportCombo(struct HdfDeviceIoClient *client, 
     return ret;
 }
 
-static int32_t CreateFeature(uint8_t wlanType, struct FeatureInfo *feature)
+static void FreeFeature(struct FeatureInfo *feature)
 {
-    int32_t ret;
-
-    if (wlanType == PROTOCOL_80211_IFTYPE_AP) {
-        ret = g_wifi->createFeature(wlanType, (struct IWiFiBaseFeature **)&g_apFeature);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%s: createFeature failed, error code: %d", __func__, ret);
-            return HDF_FAILURE;
-        }
-        feature->type = g_apFeature->baseFeature.type;
-        feature->ifName = strdup((g_apFeature->baseFeature).ifName);
-    } else if (wlanType == PROTOCOL_80211_IFTYPE_STATION) {
-        ret = g_wifi->createFeature(wlanType, (struct IWiFiBaseFeature **)&g_staFeature);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%s: createFeature failed, error code: %d", __func__, ret);
-            return HDF_FAILURE;
-        }
-        feature->type = g_staFeature->baseFeature.type;
-        feature->ifName = strdup((g_staFeature->baseFeature).ifName);
-    } else {
-        HDF_LOGE("%s: wlan type is Invalid", __func__);
-        ret = HDF_FAILURE;
+    if (feature->ifName != NULL) {
+        free(feature->ifName);
+        feature->ifName = NULL;
     }
-    return ret;
+    OsalMemFree(feature);
 }
 
 static int32_t WlanServiceStudCreateFeature(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
@@ -225,34 +207,45 @@ static int32_t WlanServiceStudCreateFeature(struct HdfDeviceIoClient *client, st
         HDF_LOGE("%s: read wlanType failed", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    struct FeatureInfo *feature = (struct FeatureInfo *)malloc(sizeof(struct FeatureInfo));
+    struct FeatureInfo *feature = (struct FeatureInfo *)OsalMemCalloc(sizeof(struct FeatureInfo));
     if (feature == NULL) {
-        HDF_LOGE("%s: malloc failed", __func__);
+        HDF_LOGE("%s: OsalMemCalloc failed", __func__);
         return HDF_FAILURE;
     }
-    (void)memset_s(feature, sizeof(struct FeatureInfo), 0, sizeof(struct FeatureInfo));
-    
-    ret = CreateFeature(wlanType, feature);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: createFeature failed, error code: %d", __func__, ret);
-        free(feature);
-        return HDF_FAILURE;
+    if (wlanType == PROTOCOL_80211_IFTYPE_AP) {
+        ret = g_wifi->createFeature(wlanType, (struct IWiFiBaseFeature **)&g_apFeature);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%s: createFeature failed, error code: %d", __func__, ret);
+            OsalMemFree(feature);
+            return HDF_FAILURE;
+        }
+        feature->type = g_apFeature->baseFeature.type;
+        feature->ifName = strdup((g_apFeature->baseFeature).ifName);
+    } else if (wlanType == PROTOCOL_80211_IFTYPE_STATION) {
+        ret = g_wifi->createFeature(wlanType, (struct IWiFiBaseFeature **)&g_staFeature);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%s: createFeature failed, error code: %d", __func__, ret);
+            OsalMemFree(feature);
+            return HDF_FAILURE;
+        }
+        feature->type = g_staFeature->baseFeature.type;
+        feature->ifName = strdup((g_staFeature->baseFeature).ifName);
+    } else {
+        HDF_LOGE("%s: wlan type is Invalid", __func__);
+        FreeFeature(feature);
+        ret = HDF_FAILURE;
     }
-
     if (!HdfSbufWriteString(reply, feature->ifName)) {
         HDF_LOGE("HdfSbufWriteString is failed!");
-        free(feature->ifName);
-        free(feature);
+        FreeFeature(feature);
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteInt32(reply, feature->type)) {
         HDF_LOGE("%s: feature->type write failed!", __func__);
-        free(feature->ifName);
-        free(feature);
+        FreeFeature(feature);
         return HDF_FAILURE;
     }
-    free(feature->ifName);
-    free(feature);
+    FreeFeature(feature);
     return ret;
 }
 
@@ -299,7 +292,7 @@ static int32_t HdfWlanAddRemoteObj(struct HdfDeviceIoClient *client, struct HdfR
         }
     }
     struct HdfWlanRemoteNode *newRemoteNode =
-        (struct HdfWlanRemoteNode*)OsalMemAlloc(sizeof(struct HdfWlanRemoteNode));
+        (struct HdfWlanRemoteNode*)OsalMemCalloc(sizeof(struct HdfWlanRemoteNode));
     if (newRemoteNode == NULL) {
         HDF_LOGE("%s:newRemoteNode == NULL", __func__);
         return HDF_FAILURE;
@@ -325,7 +318,7 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
             return HDF_FAILURE;
         }
         int32_t ret = WifiHdiImplInstance()->callback(pos->client->device, pos->callbackObj, event, data, ifName);
-        if(ret != HDF_SUCCESS) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s: dispatch code fialed, error code: %d", __func__, ret);
             return ret;
         }
@@ -872,10 +865,7 @@ static int32_t WlanServiceStubSetScanMacAddr(struct HdfDeviceIoClient *client, s
         return HDF_FAILURE;
     }
     ret = g_staFeature->setScanningMacAddress(g_staFeature, (unsigned char *)scanMac, length);
-    if (ret != HDF_ERR_NOT_SUPPORT) {
-        HDF_LOGE("%s set scanning mac address failed!, error code: %d", __func__, ret);
-        return HDF_FAILURE;
-    }
+
     return ret;
 }
 
@@ -886,18 +876,22 @@ static int32_t WlanServiceStubGetNetdevInfo(struct HdfDeviceIoClient *client, st
     (void)data;
     int32_t ret;
     struct NetDeviceInfoResult *netDeviceInfoResult =
-        (struct NetDeviceInfoResult *)calloc(1, sizeof(struct NetDeviceInfoResult));
-
+        (struct NetDeviceInfoResult *)OsalMemCalloc(sizeof(struct NetDeviceInfoResult));
+    if (netDeviceInfoResult == NULL) {
+        HDF_LOGE("%s: mem calloc fail!", __func__);
+        return HDF_FAILURE;
+    }
     ret = g_wifi->getNetDevInfo(netDeviceInfoResult);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s get netdev info failed!, error code: %d", __func__, ret);
+        HDF_LOGE("%s: get netdev info failed!, error code: %d", __func__, ret);
+        OsalMemFree(netDeviceInfoResult);
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteBuffer(reply, netDeviceInfoResult, sizeof(struct NetDeviceInfoResult))) {
         HDF_LOGE("%s: write buffer fail!", __func__);
         ret = HDF_ERR_IO;
     }
-    free(netDeviceInfoResult);
+    OsalMemFree(netDeviceInfoResult);
     return ret;
 }
 

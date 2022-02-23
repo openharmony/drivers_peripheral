@@ -49,7 +49,7 @@ static void GetInterfaceInfo(const struct UsbInterfaceDescriptor *intf,
 
         devMgr->interfaceMgr[g_intfCnt].interface.object = &devMgr->fnDev.object;
         devMgr->interfaceMgr[g_intfCnt].funcMgr = &devMgr->funcMgr[fnCnt];
-        devMgr->interfaceMgr[g_intfCnt].startEpId = g_epCnt;
+        devMgr->interfaceMgr[g_intfCnt].startEpId = (uint8_t)g_epCnt;
         g_epCnt += intf->bNumEndpoints;
         g_intfCnt++;
     }
@@ -59,7 +59,7 @@ static void CreateInterface(struct UsbFnDeviceDesc *des, struct UsbFnDeviceMgr *
 {
     uint32_t i, j, k;
     uint32_t fnCnt = 0;
-    int ret;
+    int32_t ret;
     struct UsbInterfaceDescriptor *intf = NULL;
 
     g_intfCnt = 0;
@@ -94,11 +94,11 @@ static void CreateInterface(struct UsbFnDeviceDesc *des, struct UsbFnDeviceMgr *
 }
 
 #define MAX_LIST 32
-static int FindEmptyId(void)
+static int32_t FindEmptyId(void)
 {
     int32_t i;
-    int devCnt = 1;
-    int isUse;
+    int32_t devCnt = 1;
+    int32_t isUse;
     struct UsbObject *obj = NULL;
     struct UsbObject *temp = NULL;
     if (g_devEntry.next != 0 && !DListIsEmpty(&g_devEntry)) {
@@ -124,9 +124,9 @@ static int FindEmptyId(void)
     return devCnt;
 }
 
-static int CreatDev(const char *udcName, struct UsbFnDeviceDesc *des, struct UsbFnDeviceMgr *fnDevMgr)
+static int32_t CreatDev(const char *udcName, struct UsbFnDeviceDesc *des, struct UsbFnDeviceMgr *fnDevMgr)
 {
-    int ret, devCnt;
+    int32_t ret, devCnt;
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
     devCnt = FindEmptyId();
     if (devCnt < 0) {
@@ -165,7 +165,7 @@ static uint32_t GetInterfaceNum(struct UsbDescriptorHeader **intf)
     return num;
 }
 
-static int AllocInterfaceAndFuncMgr(struct UsbFnDeviceMgr *fnDevMgr, struct UsbFnDeviceDesc *des)
+static int32_t AllocInterfaceAndFuncMgr(struct UsbFnDeviceMgr *fnDevMgr, struct UsbFnDeviceDesc *des)
 {
     uint32_t i, j;
     for (i = 0; des->configs[i] != NULL; i++) {
@@ -201,11 +201,11 @@ static int AllocInterfaceAndFuncMgr(struct UsbFnDeviceMgr *fnDevMgr, struct UsbF
     return 0;
 }
 
-static int StartThreadIo(struct UsbFnDeviceMgr *fnDevMgr);
+static int32_t StartThreadIo(struct UsbFnDeviceMgr *fnDevMgr);
 const struct UsbFnDeviceMgr *UsbFnMgrDeviceCreate(const char *udcName,
     struct UsbFnDeviceDesc *des, const struct DeviceResourceNode *node)
 {
-    int ret;
+    int32_t ret;
 
     struct UsbFnDeviceMgr *fnDevMgr = NULL;
     if (udcName == NULL || des == NULL) {
@@ -254,10 +254,10 @@ FREE_DEVMGR:
     return NULL;
 }
 
-int UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
+int32_t UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
 {
-    int ret;
-    int i = 0;
+    int32_t ret;
+    int32_t i = 0;
     if (fnDevice == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
@@ -307,7 +307,7 @@ int UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
 
 const struct UsbFnDeviceMgr *UsbFnMgrDeviceGet(const char *udcName)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnDeviceMgr *fnDevMgr = NULL;
     struct UsbObject *obj = NULL;
     struct UsbObject *temp = NULL;
@@ -331,7 +331,7 @@ const struct UsbFnDeviceMgr *UsbFnMgrDeviceGet(const char *udcName)
     return NULL;
 }
 
-int UsbFnMgrDeviceGetState(struct UsbFnDevice *fnDevice, UsbFnDeviceState *devState)
+int32_t UsbFnMgrDeviceGetState(struct UsbFnDevice *fnDevice, UsbFnDeviceState *devState)
 {
     if (fnDevice == NULL || devState == NULL) {
         HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
@@ -450,7 +450,7 @@ static void HandleEpsIoEvent(const struct UsbFnReqEvent *reqEvent,
     }
 }
 
-static struct UsbFnFuncMgr *GetFuncMgr(const struct UsbFnDeviceMgr *devMgr, int ep0)
+static struct UsbFnFuncMgr *GetFuncMgr(const struct UsbFnDeviceMgr *devMgr, int32_t ep0)
 {
     uint8_t i;
 
@@ -467,7 +467,7 @@ static struct UsbFnFuncMgr *GetFuncMgr(const struct UsbFnDeviceMgr *devMgr, int 
     return funcMgr;
 }
 
-static struct UsbHandleMgr *GetHandleMgr(const struct UsbFnDeviceMgr *devMgr, int epx)
+static struct UsbHandleMgr *GetHandleMgr(const struct UsbFnDeviceMgr *devMgr, int32_t epx)
 {
     uint8_t i, j;
     struct UsbHandleMgr      *handle  = NULL;
@@ -508,9 +508,9 @@ static void HandleEp0Event(const struct UsbFnDeviceMgr *devMgr, struct UsbFnEven
     }
 }
 
-static int UsbFnEventProcess(void *arg)
+static int32_t UsbFnEventProcess(void *arg)
 {
-    int ret;
+    int32_t ret;
     uint8_t i, j;
     struct UsbFnDeviceMgr *devMgr = (struct UsbFnDeviceMgr *)arg;
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
@@ -553,9 +553,9 @@ static int UsbFnEventProcess(void *arg)
     return 0;
 }
 
-static int StartThreadIo(struct UsbFnDeviceMgr *fnDevMgr)
+static int32_t StartThreadIo(struct UsbFnDeviceMgr *fnDevMgr)
 {
-    int ret;
+    int32_t ret;
     struct OsalThreadParam threadCfg;
     memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
     threadCfg.name = "usbfn process";
@@ -576,10 +576,10 @@ static int StartThreadIo(struct UsbFnDeviceMgr *fnDevMgr)
     return 0;
 }
 
-int UsbFnMgrStartRecvEvent(struct UsbFnInterface *interface,
+int32_t UsbFnMgrStartRecvEvent(struct UsbFnInterface *interface,
     uint32_t eventMask, UsbFnEventCallback callback, void *context)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnInterfaceMgr *interfaceMgr = (struct UsbFnInterfaceMgr *) interface;
     struct UsbFnFuncMgr *funcMgr = interfaceMgr->funcMgr;
     if (funcMgr->callback != NULL) {
@@ -599,9 +599,9 @@ int UsbFnMgrStartRecvEvent(struct UsbFnInterface *interface,
     return 0;
 }
 
-int UsbFnStopRecvEvent(struct UsbFnInterface *interface)
+int32_t UsbFnStopRecvEvent(struct UsbFnInterface *interface)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
     struct UsbFnInterfaceMgr *interfaceMgr = (struct UsbFnInterfaceMgr *) interface;
     struct UsbFnFuncMgr *funcMgr = interfaceMgr->funcMgr;

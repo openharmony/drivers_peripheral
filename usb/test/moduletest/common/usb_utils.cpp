@@ -29,8 +29,8 @@ bool HasLog(const string &target, double startTs, const string &file)
     string::size_type pos;
     string lineStr;
     const string flagStr = "[XTSCHECK]";
-    const int tsStartPos = 11;
-    const int tsLength = 17;
+    const int32_t tsStartPos = 11;
+    const int32_t tsLength = 17;
     while (getline(logFile, lineStr)) {
         double logTs;
         pos = lineStr.find(flagStr);
@@ -56,12 +56,12 @@ double GetNowTs(void)
     return (tv.tv_sec + tv.tv_usec / transUsecNum);
 }
 
-char *ParseSysCmdResult(FILE &result, int line, int word)
+char *ParseSysCmdResult(FILE &result, int32_t line, int32_t word)
 {
     char s[1024];
     char *pch = nullptr;
-    int lineCnt = 1;
-    int wordCnt = 1;
+    int32_t lineCnt = 1;
+    int32_t wordCnt = 1;
     while (1) {
         if (fgets(s, sizeof(s), &result) == nullptr) {
             break;
@@ -82,11 +82,8 @@ char *ParseSysCmdResult(FILE &result, int line, int word)
 
 void CalcProcInfoFromFile(struct ProcInfo &info, const string &file)
 {
-    const char *ramFlag = "VmRSS";
-    const char *cpuFlag = "Cpu";
-    const char *threadFlag = "Threads";
     static double ramTotal, ramPeak, ramCur, cpuTotal, cpuPeak, cpuCur;
-    static int ramCount, cpuCount, threadPeak, threadCur;
+    static int32_t ramCount, cpuCount, threadPeak, threadCur;
     char s[100];
     char *pch;
     FILE *f = fopen(file.c_str(), "r");
@@ -96,7 +93,7 @@ void CalcProcInfoFromFile(struct ProcInfo &info, const string &file)
         }
         pch = strtok(s, " \t");
         while (pch != nullptr) {
-            if (strstr(pch, ramFlag)) {
+            if (strstr(pch, "VmRSS")) {
                 pch = strtok(nullptr, " ");
                 ramCur = atof(pch);
                 ramCount += 1;
@@ -106,7 +103,7 @@ void CalcProcInfoFromFile(struct ProcInfo &info, const string &file)
                 }
                 break;
             }
-            if (strstr(pch, cpuFlag)) {
+            if (strstr(pch, "Cpu")) {
                 pch = strtok(nullptr, " ");
                 cpuCur = atof(pch);
                 cpuCount += 1;
@@ -116,7 +113,7 @@ void CalcProcInfoFromFile(struct ProcInfo &info, const string &file)
                 }
                 break;
             }
-            if (strstr(pch, threadFlag)) {
+            if (strstr(pch, "Threads")) {
                 pch = strtok(nullptr, " ");
                 threadCur = atoi(pch);
                 if (threadCur > threadPeak) {
@@ -132,6 +129,10 @@ void CalcProcInfoFromFile(struct ProcInfo &info, const string &file)
     info.cpuPeak = cpuPeak;
     info.cpuAvg = cpuTotal / cpuCount;
     info.threadPeak = threadPeak;
+
+    if (fclose(f)) {
+        return;
+    }
 }
 
 double GetTsFromLog(const string &target, double startTs, const string &file)
@@ -139,8 +140,8 @@ double GetTsFromLog(const string &target, double startTs, const string &file)
     double logTs;
     ifstream logFile(file);
     string lineStr;
-    const int tsStartPos = 11;
-    const int tsLength = 17;
+    const int32_t tsStartPos = 11;
+    const int32_t tsLength = 17;
     while (getline(logFile, lineStr)) {
         if (lineStr.find(target) != string::npos) {
             logTs = atof(lineStr.substr(tsStartPos, tsLength).c_str());

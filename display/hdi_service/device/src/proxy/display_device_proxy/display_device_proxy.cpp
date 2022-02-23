@@ -192,7 +192,7 @@ int32_t DisplayDeviceProxy::GetDisplayCapability(uint32_t devId, DisplayCapabili
     return ret;
 }
 
-int32_t DisplayDeviceProxy::GetDisplaySuppportedModes(uint32_t devId, int &num, DisplayModeInfo *modes)
+int32_t DisplayDeviceProxy::GetDisplaySupportedModes(uint32_t devId, int &num, DisplayModeInfo *modes)
 {
     DISPLAY_LOG("interface start");
     if (devId > MAX_DEVID) {
@@ -211,7 +211,7 @@ int32_t DisplayDeviceProxy::GetDisplaySuppportedModes(uint32_t devId, int &num, 
         return DISPLAY_FAILURE;
     }
 
-    int32_t ret = Remote()->SendRequest(DSP_CMD_GETDISPLAYSUPPPORTEDMODES, data, reply, option);
+    int32_t ret = Remote()->SendRequest(DSP_CMD_GETDISPLAYSUPPORTEDMODES, data, reply, option);
     if (ret != 0) {
         DISPLAY_LOG("error: failed %{public}d", ret);
         return ret;

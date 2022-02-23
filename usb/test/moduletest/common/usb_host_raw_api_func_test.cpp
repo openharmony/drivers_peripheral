@@ -81,7 +81,7 @@ HWTEST_F(UsbHostRawApiFuncTest, CheckRawApiWriteSync_002, TestSize.Level1)
     };
     double startTs = GetNowTs();
     string wlog, rlog;
-    for (int i = 0; data[i].size() > 0; i++) {
+    for (int32_t i = 0; data[i].size() > 0; i++) {
         wlog = "send data[" + data[i] + "] to device";
         rlog = "recv data[" + data[i] + "] from device";
         ASSERT_EQ(system("usbhost_ddk_test -aR &"), 0);
@@ -105,8 +105,8 @@ HWTEST_F(UsbHostRawApiFuncTest, CheckRawApiWriteSync_003, TestSize.Level2)
     printf("------start CheckRawApiWriteSync_003------\n");
     const string s = "0123456789abcdef";
     string data;
-    int totalSize = 1024;
-    int writeCnt = 8;
+    int32_t totalSize = 1024;
+    int32_t writeCnt = 8;
     unsigned int n = 0;
     while (n < totalSize / writeCnt / s.size()) {
         data += s;
@@ -115,7 +115,7 @@ HWTEST_F(UsbHostRawApiFuncTest, CheckRawApiWriteSync_003, TestSize.Level2)
     const string wlog = "send data[" + data + "] to device";
     const string rlog = "recv data[" + data + "] from device";
     double startTs;
-    for (int i = 0; i < writeCnt; i++) {
+    for (int32_t i = 0; i < writeCnt; i++) {
         startTs = GetNowTs();
         ASSERT_EQ(system("usbhost_ddk_test -aR &"), 0);
         ASSERT_EQ(system(("usbhost_ddk_test -aW '" + data + "'").c_str()), 0);
@@ -169,7 +169,7 @@ HWTEST_F(UsbHostRawApiFuncTest, CheckRawApiWriteAsync_002, TestSize.Level1)
     };
     double startTs = GetNowTs();
     string wlog, rlog;
-    for (int i = 0; data[i].size() > 0; i++) {
+    for (int32_t i = 0; data[i].size() > 0; i++) {
         wlog = "send data[" + data[i] + "] to device";
         rlog = "recv data[" + data[i] + "] from device";
         ASSERT_EQ(system(("usbhost_ddk_test -aw '" + data[i] + "'").c_str()), 0);
@@ -192,8 +192,8 @@ HWTEST_F(UsbHostRawApiFuncTest, CheckRawApiWriteAsync_003, TestSize.Level2)
     printf("------start CheckRawApiWriteAsync_003------\n");
     const string s = "0123456789abcdef";
     string data;
-    int totalSize = 1024;
-    int writeCnt = 8;
+    int32_t totalSize = 1024;
+    int32_t writeCnt = 8;
     unsigned int n = 0;
     while (n < totalSize / writeCnt / s.size()) {
         data += s;
@@ -202,7 +202,7 @@ HWTEST_F(UsbHostRawApiFuncTest, CheckRawApiWriteAsync_003, TestSize.Level2)
     const string wlog = "send data[" + data + "] to device";
     const string rlog = "recv data[" + data + "] from device";
     double startTs;
-    for (int i = 0; i < writeCnt; i++) {
+    for (int32_t i = 0; i < writeCnt; i++) {
         startTs = GetNowTs();
         ASSERT_EQ(system(("usbhost_ddk_test -aw '" + data + "'").c_str()), 0);
         sleep(3);

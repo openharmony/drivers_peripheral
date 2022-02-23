@@ -18,6 +18,7 @@
 #include <hdf_base.h>
 #include <hdf_sbuf_ipc.h>
 #include "utils_data_stub.h"
+#include "metadata_utils.h"
 #include "istream_operator_callback.h"
 #include "ioffline_stream_operator.h"
 #include "cmd_common.h"
@@ -84,7 +85,7 @@ int32_t StreamOperatorStub::StreamOperatorStubIsStreamsSupported(
     std::shared_ptr<CameraStandard::CameraMetadata> metadata = nullptr;
     bool nullFlag = data.ReadBool();
     if (nullFlag) {
-        UtilsDataStub::DecodeCameraMetadata(data, metadata);
+        CameraStandard::MetadataUtils::DecodeCameraMetadata(data, metadata);
     }
 
     int32_t count = data.ReadInt32();
@@ -154,7 +155,7 @@ int32_t StreamOperatorStub::StreamOperatorStubCommitStreams(
     OperationMode mode = static_cast<OperationMode>(data.ReadInt32());
 
     std::shared_ptr<CameraStandard::CameraMetadata> metadata = nullptr;
-    UtilsDataStub::DecodeCameraMetadata(data, metadata);
+    CameraStandard::MetadataUtils::DecodeCameraMetadata(data, metadata);
 
     CamRetCode ret = CommitStreams(mode, metadata);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
@@ -233,7 +234,7 @@ int32_t StreamOperatorStub::StreamOperatorStubCapture(
     }
 
     std::shared_ptr<CameraStandard::CameraMetadata> metadata = nullptr;
-    UtilsDataStub::DecodeCameraMetadata(data, metadata);
+    CameraStandard::MetadataUtils::DecodeCameraMetadata(data, metadata);
 
     bool enableShutterCallback = data.ReadBool();
     std::shared_ptr<CaptureInfo> pInfo = std::make_shared<CaptureInfo>();

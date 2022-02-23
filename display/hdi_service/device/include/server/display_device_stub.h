@@ -37,7 +37,7 @@ public:
     // device
     int32_t RegHotPlugCallback(MessageParcel *data, MessageParcel *reply);
     int32_t GetDisplayCapability(MessageParcel *data, MessageParcel *reply);
-    int32_t GetDisplaySuppportedModes(MessageParcel *data, MessageParcel *reply);
+    int32_t GetDisplaySupportedModes(MessageParcel *data, MessageParcel *reply);
     int32_t GetDisplayMode(MessageParcel *data, MessageParcel *reply);
     int32_t SetDisplayMode(MessageParcel *data, MessageParcel *reply);
     int32_t GetDisplayPowerStatus(MessageParcel *data, MessageParcel *reply);

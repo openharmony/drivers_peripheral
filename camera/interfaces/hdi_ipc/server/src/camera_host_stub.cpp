@@ -17,7 +17,7 @@
 #include <hdf_log.h>
 #include <hdf_base.h>
 #include <hdf_sbuf_ipc.h>
-#include "utils_data_stub.h"
+#include "metadata_utils.h"
 #include "icamera_device.h"
 #include "icamera_host_callback.h"
 #include "cmd_common.h"
@@ -93,7 +93,7 @@ int32_t CameraHostStub::CameraHostStubGetCameraAbility(
         return HDF_FAILURE;
     }
 
-    bool bRet = UtilsDataStub::EncodeCameraMetadata(ability, reply);
+    bool bRet = CameraStandard::MetadataUtils::EncodeCameraMetadata(ability, reply);
     if (!bRet) {
         HDF_LOGE("%s: write ability failed", __func__);
         return HDF_FAILURE;
@@ -208,7 +208,6 @@ void *CameraHostStubInstance()
 void DestroyCameraHostStub(void *stubObj)
 {
     delete reinterpret_cast<OHOS::Camera::CameraHostStub *>(stubObj);
-    stubObj = nullptr;
 }
 
 int32_t CameraHostServiceOnRemoteRequest(void *stub, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)

@@ -15,8 +15,8 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 
 group("power_entry") {
   deps = [
-    "interfaces/hdi/power/v1_0:power",
     "interfaces/hdi_callback:libpower_callback",
     "interfaces/hdi_service:hdf_power",
+    "//drivers/interface/power/v1_0:power",
   ]
 }

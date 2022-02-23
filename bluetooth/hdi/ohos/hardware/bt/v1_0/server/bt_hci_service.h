@@ -19,22 +19,30 @@
 #include "ibt_hci.h"
 #include <hdf_base.h>
 
+#include "remote_death_recipient.h"
+
 namespace ohos {
 namespace hardware {
 namespace bt {
 namespace v1_0 {
-
 class BtHciService : public IBtHci {
 public:
-    virtual ~BtHciService() {}
+    BtHciService();
+    ~BtHciService() override;
 
     int32_t Init(const sptr<IBtHciCallbacks>& callbacks) override;
 
     int32_t SendHciPacket(BtType type, const std::vector<uint8_t>& data) override;
 
     int32_t Close() override;
-};
 
+private:
+    void OnRemoteDied(const wptr<IRemoteObject> &object);
+
+private:
+    sptr<IBtHciCallbacks> callbacks_ = nullptr;
+    sptr<RemoteDeathRecipient> remoteDeathRecipient_ = nullptr;
+};
 } // v1_0
 } // bt
 } // hardware

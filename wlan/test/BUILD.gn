@@ -28,7 +28,8 @@ if (defined(ohos_lite)) {
   group("hdf_test_wifi") {
     testonly = true
     deps = [
-      "performance:hdf_performance_wifi",
+      "hdi_service:WlanHdiServiceTestC",
+      "performance:hdf_peripheral_wlan_test_performance",
       "unittest:hdf_unittest_wifi",
     ]
   }

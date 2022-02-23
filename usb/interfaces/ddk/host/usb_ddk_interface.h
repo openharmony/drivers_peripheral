@@ -244,13 +244,13 @@ struct UsbControlRequest {
  */
 struct UsbRequestParamsData {
     /** Number of transmitted data packets in isochronous transfer */
-    int numIsoPackets;
+    int32_t numIsoPackets;
     /** Request data direction. For details, see {@link UsbRequestDirection}. */
     UsbRequestDirection directon;
     /** Pointer to the request data */
     unsigned char *buffer;
     /** Length of the request data */
-    int length;
+    uint32_t length;
 };
 
 /**
@@ -349,7 +349,7 @@ struct UsbInterface *UsbClaimInterface(const struct UsbSession *session, uint8_t
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
  * otherwise.
  */
-int UsbReleaseInterface(struct UsbInterface *interfaceObj);
+int32_t UsbReleaseInterface(const struct UsbInterface *interfaceObj);
 
 /**
  * @brief Adds or removes an interface.
@@ -360,7 +360,7 @@ int UsbReleaseInterface(struct UsbInterface *interfaceObj);
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
  * otherwise.
  */
-int UsbAddOrRemoveInterface(const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr,
+int32_t UsbAddOrRemoveInterface(const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr,
     uint8_t interfaceIndex, UsbInterfaceStatus status);
 
 /**
@@ -429,7 +429,7 @@ int32_t UsbClearInterfaceHalt(const UsbInterfaceHandle *interfaceHandle, uint8_t
  * @return Returns the pointer to the <b>UsbRequest</b> structure if the operation is successful; returns <b>NULL</b>
  * otherwise.
  */
-struct UsbRequest *UsbAllocRequest(const UsbInterfaceHandle *interfaceHandle, int isoPackets, int length);
+struct UsbRequest *UsbAllocRequest(const UsbInterfaceHandle *interfaceHandle, int32_t isoPackets, int32_t length);
 
 /**
  * @brief Releases a request object.
@@ -439,7 +439,7 @@ struct UsbRequest *UsbAllocRequest(const UsbInterfaceHandle *interfaceHandle, in
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
  * otherwise.
  */
-int UsbFreeRequest(const struct UsbRequest *request);
+int32_t UsbFreeRequest(const struct UsbRequest *request);
 
 /**
  * @brief Sends an asynchronous request.
@@ -449,7 +449,7 @@ int UsbFreeRequest(const struct UsbRequest *request);
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
  * otherwise.
  */
-int UsbSubmitRequestAsync(const struct UsbRequest *request);
+int32_t UsbSubmitRequestAsync(const struct UsbRequest *request);
 
 /**
  * @brief Fills an I/O request based on specified parameters.
@@ -471,7 +471,7 @@ int32_t UsbFillRequest(const struct UsbRequest *request, const UsbInterfaceHandl
  *
  * @return Returns <b>UsbInterfaceHandle</b> if the operation is successful; returns <b>NULL</b> otherwise.
  */
-int UsbCancelRequest(const struct UsbRequest *request);
+int32_t UsbCancelRequest(const struct UsbRequest *request);
 
 /**
  * @brief Sends a synchronous USB request.
@@ -481,8 +481,8 @@ int UsbCancelRequest(const struct UsbRequest *request);
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
  * otherwise.
  */
-int UsbSubmitRequestSync(const struct UsbRequest *request);
-int UsbMemTestTrigger(bool enable);
+int32_t UsbSubmitRequestSync(const struct UsbRequest *request);
+int32_t UsbMemTestTrigger(bool enable);
 
 #endif /* USB_INTERFACE_H */
 /** @} */

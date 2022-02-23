@@ -59,7 +59,7 @@ ohos_fuzztest("IpcCameraDeviceRemote") {
     "$camera_path/pipeline_core/ipp/include",
     "$camera_path/pipeline_core/nodes/include",
     "$camera_path/utils/event",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
+    "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
   ]
 
   deps = [
@@ -68,7 +68,7 @@ ohos_fuzztest("IpcCameraDeviceRemote") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
     "$camera_path/pipeline_core:camera_pipeline_core",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
+    "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
   ]
 
   if (is_standard_system) {
@@ -135,7 +135,7 @@ ohos_fuzztest("IpcCameraHostService") {
     "$camera_path/pipeline_core/ipp/include",
     "$camera_path/pipeline_core/nodes/include",
     "$camera_path/utils/event",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
+    "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
   ]
 
   deps = [
@@ -144,7 +144,7 @@ ohos_fuzztest("IpcCameraHostService") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
     "$camera_path/pipeline_core:camera_pipeline_core",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
+    "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
   ]
 
   if (is_standard_system) {
@@ -210,7 +210,7 @@ ohos_fuzztest("IpcOffline") {
     "$camera_path/pipeline_core/ipp/include",
     "$camera_path/pipeline_core/nodes/include",
     "$camera_path/utils/event",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
+    "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
   ]
 
   deps = [
@@ -219,7 +219,7 @@ ohos_fuzztest("IpcOffline") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
     "$camera_path/pipeline_core:camera_pipeline_core",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
+    "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
   ]
 
   if (is_standard_system) {
@@ -284,7 +284,7 @@ ohos_fuzztest("IpcStreamOperator") {
     "$camera_path/pipeline_core/ipp/include",
     "$camera_path/pipeline_core/nodes/include",
     "$camera_path/utils/event",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
+    "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
   ]
 
   deps = [
@@ -293,7 +293,7 @@ ohos_fuzztest("IpcStreamOperator") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
     "$camera_path/pipeline_core:camera_pipeline_core",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
+    "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
   ]
 
   if (is_standard_system) {
@@ -360,7 +360,7 @@ ohos_fuzztest("IpcCameraDeviceCallback") {
     "$camera_path/pipeline_core/ipp/include",
     "$camera_path/pipeline_core/nodes/include",
     "$camera_path/utils/event",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
+    "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
   ]
 
   deps = [
@@ -369,7 +369,7 @@ ohos_fuzztest("IpcCameraDeviceCallback") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
     "$camera_path/pipeline_core:camera_pipeline_core",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
+    "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
   ]
 
   if (is_standard_system) {
@@ -436,7 +436,7 @@ ohos_fuzztest("IpcCameraHostCallback") {
     "$camera_path/pipeline_core/ipp/include",
     "$camera_path/pipeline_core/nodes/include",
     "$camera_path/utils/event",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
+    "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
   ]
 
   deps = [
@@ -445,7 +445,7 @@ ohos_fuzztest("IpcCameraHostCallback") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
     "$camera_path/pipeline_core:camera_pipeline_core",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
+    "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
   ]
 
   if (is_standard_system) {
@@ -510,7 +510,7 @@ ohos_fuzztest("IpcStreamOperatorCallback") {
     "$camera_path/pipeline_core/ipp/include",
     "$camera_path/pipeline_core/nodes/include",
     "$camera_path/utils/event",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
+    "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
   ]
 
   deps = [
@@ -519,7 +519,7 @@ ohos_fuzztest("IpcStreamOperatorCallback") {
     "$camera_path/device_manager:camera_device_manager",
     "$camera_path/hdi_impl:camera_hdi_impl",
     "$camera_path/pipeline_core:camera_pipeline_core",
-    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
+    "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
   ]
 
   if (is_standard_system) {
