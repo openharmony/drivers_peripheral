@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "power_interface_service.h"
+#include "power_interface_impl.h"
 #include <hdf_base.h>
 #include <file_ex.h>
 #include <sys/eventfd.h>
@@ -28,11 +28,11 @@
 #include "hdf_device_desc.h"
 #include "hdf_remote_service.h"
 #include "unique_fd.h"
-#include "power_types.h"
 
-namespace hdi {
-namespace power {
-namespace v1_0 {
+namespace OHOS {
+namespace HDI {
+namespace Power {
+namespace V1_0 {
 static constexpr const char * const SUSPEND_STATE = "mem";
 static constexpr const char * const SUSPEND_STATE_PATH = "/sys/power/state";
 static constexpr const char * const LOCK_PATH = "/sys/power/wake_lock";
@@ -50,14 +50,14 @@ static std::string ReadWakeCount();
 static bool WriteWakeCount(const std::string& count);
 static void NotifyCallback(int code);
 
-int32_t PowerInterfaceService::RegisterCallback(const sptr<IPowerHdiCallback>& ipowerHdiCallback)
+int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback>& ipowerHdiCallback)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     callback_ = ipowerHdiCallback;
     return HDF_SUCCESS;
 }
 
-int32_t PowerInterfaceService::StartSuspend()
+int32_t PowerInterfaceImpl::StartSuspend()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (suspending_) {
@@ -115,13 +115,13 @@ void NotifyCallback(int code)
         return;
     }
 
-    std::shared_ptr<PowerInterfaceService> powerInterfaceService = std::make_shared<PowerInterfaceService>();
-    powerInterfaceService->RegisterCallback(callback_);
+    std::shared_ptr<PowerInterfaceImpl> powerInterfaceImpl = std::make_shared<PowerInterfaceImpl>();
+    powerInterfaceImpl->RegisterCallback(callback_);
     HdfSbufRecycle(data);
     HdfSbufRecycle(reply);
 }
 
-int32_t PowerInterfaceService::StopSuspend()
+int32_t PowerInterfaceImpl::StopSuspend()
 {
     if (suspending_) {
         suspending_ = false;
@@ -130,7 +130,7 @@ int32_t PowerInterfaceService::StopSuspend()
     return HDF_SUCCESS;
 }
 
-int32_t PowerInterfaceService::ForceSuspend()
+int32_t PowerInterfaceImpl::ForceSuspend()
 {
     if (suspending_) {
         suspending_ = false;
@@ -142,7 +142,7 @@ int32_t PowerInterfaceService::ForceSuspend()
     return HDF_SUCCESS;
 }
 
-int32_t PowerInterfaceService::SuspendBlock(const std::string& name)
+int32_t PowerInterfaceImpl::SuspendBlock(const std::string& name)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (name.empty()) {
@@ -156,7 +156,7 @@ int32_t PowerInterfaceService::SuspendBlock(const std::string& name)
     return HDF_SUCCESS;
 }
 
-int32_t PowerInterfaceService::SuspendUnblock(const std::string& name)
+int32_t PowerInterfaceImpl::SuspendUnblock(const std::string& name)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (name.empty()) {
@@ -208,7 +208,7 @@ static void LoadSystemInfo(const std::string& path, std::string& info)
     info.append(": " + str + "\n");
 }
 
-int32_t PowerInterfaceService::PowerDump(std::string& info)
+int32_t PowerInterfaceImpl::PowerDump(std::string& info)
 {
     std::string dumpInfo("");
     LoadSystemInfo(SUSPEND_STATE_PATH, dumpInfo);
@@ -219,6 +219,7 @@ int32_t PowerInterfaceService::PowerDump(std::string& info)
 
     return HDF_SUCCESS;
 }
-} // v1_0
-} // power
-} // hdi
+} // V1_0
+} // Power
+} // HDI
+} // OHOS

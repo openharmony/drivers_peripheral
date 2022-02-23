@@ -27,7 +27,7 @@
 #define ARGV_CMD_TYPE       (PARAM_GET_CMD_LEN - ARGV_CMD_API_TYPE)
 #define ARGV_CMD_PARAM      (PARAM_SET_CMD_LEN - ARGV_CMD_API_TYPE)
 #define READ_SLEEP_TIME     500
-int run;
+int32_t run;
 
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
 static struct OsalThread      g_Getchar;
@@ -63,7 +63,7 @@ void TestHelp(void)
     printf("  usbhost_ddk_test -aw 123  : test async write 123 for acm by host raw api function\n");
 }
 
-static int32_t TestParaseCommand(int paramNum, const char *cmdParam, int *cmdType, char *apiType)
+static int32_t TestParaseCommand(int32_t paramNum, const char *cmdParam, int32_t *cmdType, char *apiType)
 {
     if ((cmdParam == NULL) || (cmdType == NULL) || (apiType == NULL) || (strlen(cmdParam) < PARAM_CMD_LENGTH)) {
         HDF_LOGE("%s:%d command or cmdType is NULL or cmdParam length is error",
@@ -182,7 +182,7 @@ static int32_t TestParaseCommand(int paramNum, const char *cmdParam, int *cmdTyp
     return HDF_SUCCESS;
 }
 
-static void TestCmdLoopOther(int cmdType, const char *param)
+static void TestCmdLoopOther(int32_t cmdType, const char *param)
 {
     switch (cmdType) {
         case HOST_ACM_CTRL_CLASS_SYNC:
@@ -221,11 +221,11 @@ static void TestCmdLoopOther(int cmdType, const char *param)
     }
 }
 
-static int TestCmdLoop(int cmdType, const char *param)
+static int32_t TestCmdLoop(int32_t cmdType, const char *param)
 {
     bool loopFlag = true;
     bool asyncFlag = false;
-    int cnt = 0;
+    int32_t cnt = 0;
 
     if (TestGetExitFlag() == true) {
         HDF_LOGD("%s:%d g_exitFlag is true!", __func__, __LINE__);
@@ -277,7 +277,7 @@ static void *SigHandle(void *arg)
     run = 0;
 }
 
-static int GetCharThread(void *arg)
+static int32_t GetCharThread(void *arg)
 {
     char str[STR_LEN] = {0};
     while (run) {
@@ -288,10 +288,10 @@ static int GetCharThread(void *arg)
 #endif
 
 #define HDF_PROCESS_STACK_SIZE 10000
-static int StartThreadGetChar()
+static int32_t StartThreadGetChar()
 {
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
-    int ret;
+    int32_t ret;
     struct OsalThreadParam threadCfg;
     memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
     threadCfg.name = "get char process";
@@ -313,10 +313,10 @@ static int StartThreadGetChar()
     return 0;
 }
 
-int main(int argc, char *argv[])
+int32_t main(int32_t argc, char *argv[])
 {
-    int status;
-    int cmdType;
+    int32_t status;
+    int32_t cmdType;
     char apiType[DATA_MAX_LEN];
 
     if ((argc < ARGV_CMD_TYPE) || (argc < PARAM_GET_CMD_LEN) || (argv[ARGV_CMD_TYPE] == NULL)) {

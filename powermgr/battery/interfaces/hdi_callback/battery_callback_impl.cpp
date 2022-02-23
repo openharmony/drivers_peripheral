@@ -13,18 +13,19 @@
  * limitations under the License.
  */
 
-#include "battery_callback_service.h"
+#include "battery_callback_impl.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
 
-#define HDF_LOG_TAG BatteryCallbackService
+#define HDF_LOG_TAG BatteryCallbackImpl
 
-namespace hdi {
-namespace battery {
-namespace v1_0 {
-BatteryCallbackService::BatteryEventCallback BatteryCallbackService::eventCb_ = nullptr;
+namespace OHOS {
+namespace HDI {
+namespace Battery {
+namespace V1_0 {
+BatteryCallbackImpl::BatteryEventCallback BatteryCallbackImpl::eventCb_ = nullptr;
 
-int32_t BatteryCallbackService::Update(const CallbackInfo& event)
+int32_t BatteryCallbackImpl::Update(const CallbackInfo& event)
 {
     HDF_LOGI("%{public}s: CallbackInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
         "healthState=%{public}d, pluggedType=%{public}d, pluggedMaxCurrent=%{public}d, " \
@@ -40,11 +41,12 @@ int32_t BatteryCallbackService::Update(const CallbackInfo& event)
     return eventCb_(event);
 }
 
-int32_t BatteryCallbackService::RegisterBatteryEvent(const BatteryEventCallback& eventCb)
+int32_t BatteryCallbackImpl::RegisterBatteryEvent(const BatteryEventCallback& eventCb)
 {
     eventCb_ = eventCb;
     return HDF_SUCCESS;
 }
-} // v1_0
-} // battery
-} // hdi
+} // V1_0
+} // Battery
+} // HDI
+} // OHOS

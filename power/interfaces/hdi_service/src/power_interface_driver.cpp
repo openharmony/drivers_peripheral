@@ -18,15 +18,15 @@
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
-#include "power_interface_service.h"
+#include "power_interface_impl.h"
 
 #define HDF_LOG_TAG PowerInterfaceDriver
 
-using namespace hdi::power::v1_0;
+using namespace OHOS::HDI::Power::V1_0;
 
 struct HdfPowerInterfaceHost {
     struct IDeviceIoService ioservice;
-    PowerInterfaceService *service;
+    PowerInterfaceImpl *service;
 };
 
 static int32_t PowerInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
@@ -68,7 +68,7 @@ static int HdfPowerInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfPowerInterfaceHost->ioservice.Dispatch = PowerInterfaceDriverDispatch;
     hdfPowerInterfaceHost->ioservice.Open = NULL;
     hdfPowerInterfaceHost->ioservice.Release = NULL;
-    hdfPowerInterfaceHost->service = new PowerInterfaceService();
+    hdfPowerInterfaceHost->service = new PowerInterfaceImpl();
 
     deviceObject->service = &hdfPowerInterfaceHost->ioservice;
     return HDF_SUCCESS;

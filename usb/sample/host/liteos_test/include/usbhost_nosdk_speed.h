@@ -47,8 +47,8 @@
 
 struct UsbAdapterUrbs {
     struct urb *urb;
-    int inUse;
-    int urbNum;
+    int32_t inUse;
+    int32_t urbNum;
 };
 
 enum UsbSerialCmd {
@@ -57,22 +57,22 @@ enum UsbSerialCmd {
     USB_SERIAL_SPEED,
 };
 struct UsbSpeedTest {
-    int busNum;
-    int devAddr;
-    int ifaceNum;
-    int writeOrRead;
+    int32_t busNum;
+    int32_t devAddr;
+    int32_t ifaceNum;
+    int32_t writeOrRead;
     bool printData;
-    int paramNum;
+    int32_t paramNum;
 };
 
 struct AcmDevice;
 struct AcmDb {
-    int dbNum;
+    int32_t dbNum;
     struct UsbRequest *request;
     struct AcmDevice *instance;
     uint8_t *buf;
-    int len;
-    int use;
+    int32_t len;
+    int32_t use;
 };
 
 struct SerialDevice {
@@ -107,7 +107,7 @@ struct AcmDevice {
     struct SerialDevice *port;
     uint32_t nbIndex;
     uint32_t nbSize;
-    int transmitting;
+    int32_t transmitting;
     int32_t ctrlReqNum;
     uint8_t busNum;
     uint8_t devAddr;

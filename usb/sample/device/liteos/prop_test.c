@@ -52,7 +52,7 @@ static void ShowUsage()
     HDF_LOGE("h : show this help message");
 }
 
-static int DispatcherInit(void)
+static int32_t DispatcherInit(void)
 {
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");
     if (g_acmService == NULL) {
@@ -75,9 +75,9 @@ static void DispatcherDeInit(void)
     HdfSbufRecycle(g_reply);
 }
 
-static int TestPropGet(const char *propName)
+static int32_t TestPropGet(const char *propName)
 {
-    int status = -1;
+    int32_t status = -1;
     const char *propVal = NULL;
     if (!HdfSbufWriteString(g_data, propName)) {
         HDF_LOGE("%s:failed to write result", __func__);
@@ -99,9 +99,9 @@ FAIL:
     return status;
 }
 
-static int TestPropSet(const char *propName, const char *propValue)
+static int32_t TestPropSet(const char *propName, const char *propValue)
 {
-    int status = -1;
+    int32_t status = -1;
     if (!HdfSbufWriteString(g_data, propName)) {
         HDF_LOGE("%s:failed to write propName : %s", __func__, propName);
         goto FAIL;
@@ -118,9 +118,9 @@ static int TestPropSet(const char *propName, const char *propValue)
     return status;
 }
 
-static int TestPropRegist(const char *propName, const char *propValue)
+static int32_t TestPropRegist(const char *propName, const char *propValue)
 {
-    int status;
+    int32_t status;
 
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_OPEN, g_data, g_reply);
     if (status) {
@@ -149,10 +149,10 @@ static int TestPropRegist(const char *propName, const char *propValue)
     return status;
 }
 
-static int TestProp(const char *propName, const char *propValue,
+static int32_t TestProp(const char *propName, const char *propValue,
     bool setProp, bool getProp, bool registProp)
 {
-    int ret = HDF_SUCCESS;
+    int32_t ret = HDF_SUCCESS;
     if (DispatcherInit() != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
@@ -167,9 +167,9 @@ static int TestProp(const char *propName, const char *propValue,
     return ret;
 }
 
-int prop_test(int argc, const char *argv[])
+int32_t prop_test(int32_t argc, const char *argv[])
 {
-    int ch;
+    int32_t ch;
     const char *propName = NULL;
     const char *propValue = NULL;
     bool setProp = false;

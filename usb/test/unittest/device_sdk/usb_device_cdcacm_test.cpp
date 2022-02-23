@@ -341,13 +341,13 @@ static struct Serial *SerialAlloc(void)
     return port;
 }
 
-static int ParseInterfaces(struct AcmDevice *acmDevice)
+static int32_t ParseInterfaces(struct AcmDevice *acmDevice)
 {
     uint32_t i;
     uint32_t j;
     struct UsbFnInterface *fnIface = nullptr;
     UsbFnInterfaceHandle handle = nullptr;
-    int ret;
+    int32_t ret;
     for (i = 0; i < acmDevice->fnDev->numInterfaces; i++) {
         fnIface = (struct UsbFnInterface *)UsbFnGetInterface(acmDevice->fnDev, i);
         if (fnIface == nullptr) {
@@ -408,12 +408,12 @@ OUT:
     DListInsertTail(&req->list, &acm->ctrlPool);
 }
 
-static int AllocCtrlRequests(struct AcmDevice *acmDevice)
+static int32_t AllocCtrlRequests(struct AcmDevice *acmDevice)
 {
     struct DListHead *head = &acmDevice->ctrlPool;
     struct UsbFnRequest *req = nullptr;
     struct CtrlInfo *ctrlInfo = nullptr;
-    int i;
+    int32_t i;
 
     DListHeadInit(&acmDevice->ctrlPool);
     acmDevice->ctrlReqNum = 0;
@@ -441,10 +441,14 @@ static int AllocCtrlRequests(struct AcmDevice *acmDevice)
 static int32_t SendNotifyRequest(struct AcmDevice *acm, uint8_t type,
     uint16_t value, void *data, uint32_t length)
 {
-    struct UsbFnRequest *req = acm->notifyReq;
+    struct UsbFnRequest *req = nullptr;
     struct UsbCdcNotification *notify = nullptr;
-    int ret;
-    if (acm == nullptr || req->buf) {
+    int32_t ret;
+    if (acm == nullptr) {
+        return -1;
+    }
+    req = acm->notifyReq;
+    if ((req == nullptr) || ((req != nullptr) && (req->buf == nullptr))) {
         return -1;
     }
     acm->notifyReq = nullptr;
@@ -532,7 +536,7 @@ static void Disconnect(struct AcmDevice *acm)
     NotifySerialState(acm);
 }
 
-static int32_t SendBreak(struct AcmDevice *acm, int duration)
+static int32_t SendBreak(struct AcmDevice *acm, int32_t duration)
 {
     uint16_t state;
 
@@ -596,7 +600,7 @@ static void Setup(struct AcmDevice *acm, struct UsbFnCtrlRequest *setup)
     struct CtrlInfo *ctrlInfo = nullptr;
     uint16_t value  = Le16ToCpu(setup->value);
     uint16_t length = Le16ToCpu(setup->length);
-    int ret = 0;
+    int32_t ret = 0;
     req = GetCtrlReq(acm);
     if (req == nullptr) {
         return;
@@ -728,7 +732,7 @@ struct AcmDevice * SetUpAcmDevice(void)
 
 static int32_t FreeNotifyRequest(struct AcmDevice *acmDevice)
 {
-    int ret;
+    int32_t ret;
 
     /* allocate notification request */
     if (acmDevice->notifyReq == nullptr) {
@@ -745,7 +749,7 @@ static int32_t FreeNotifyRequest(struct AcmDevice *acmDevice)
     return HDF_SUCCESS;
 }
 
-static int FreeCtrlRequests(struct AcmDevice *acmDevice)
+static int32_t FreeCtrlRequests(struct AcmDevice *acmDevice)
 {
     struct DListHead *head = &acmDevice->ctrlPool;
     struct UsbFnRequest *req = nullptr;

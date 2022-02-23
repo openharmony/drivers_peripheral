@@ -73,7 +73,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_002, TestSize.Level1)
         ""
     };
     char readBuf[256] = {0};
-    for (int i = 0; strlen(data[i]) > 0; i++) {
+    for (int32_t i = 0; strlen(data[i]) > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         acm_write(const_cast<char *>(data[i]));
         acm_read(readBuf);
@@ -93,7 +93,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_003, TestSize.Level2)
     printf("------start DeviceIOTest_003------\n");
     char wdata[256] = "AAA1234567890";
     char rdata[256] = {0};
-    for (int i = 0; i < 30; i++) {
+    for (int32_t i = 0; i < 30; i++) {
         acm_write(wdata);
         acm_read(rdata);
         memset_s(rdata, sizeof(rdata), 0, sizeof(rdata));
@@ -117,8 +117,8 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_004, TestSize.Level2)
     printf("------start DeviceIOTest_004------\n");
     const string s = "0123456789abcdef";
     string data;
-    int totalSize = 1024;
-    int writeCnt = 8;
+    int32_t totalSize = 1024;
+    int32_t writeCnt = 8;
     unsigned int n = 0;
     while (n < totalSize / writeCnt / s.size()) {
         data += s;
@@ -127,7 +127,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_004, TestSize.Level2)
     char readBuf[256] = {0};
     char writeBuf[256] = {0};
     strcpy_s(writeBuf, sizeof(writeBuf), data.c_str());
-    for (int i = 0; i < writeCnt; i++) {
+    for (int32_t i = 0; i < writeCnt; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         acm_write(writeBuf);
         acm_read(readBuf);

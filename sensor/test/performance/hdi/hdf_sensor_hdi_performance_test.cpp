@@ -20,10 +20,10 @@
 #include "hdf_base.h"
 #include "osal_time.h"
 #include "sensor_interface_proxy.h"
-#include "sensor_callback_service.h"
+#include "sensor_callback_impl.h"
 
 using namespace testing::ext;
-using namespace sensor::v1_0;
+using namespace OHOS::HDI::Sensor::V1_0;
 
 namespace {
     const int32_t SENSOR_ID = 0;
@@ -33,7 +33,7 @@ namespace {
     const int32_t SENSOR_MSEC_TIME = 1000;
     const int32_t SENSOR_COMMON_TIME = 2000;
     sptr<ISensorInterface>  g_sensorInterface = nullptr;
-    sptr<ISensorCallback> g_callback = new SensorCallbackService();
+    sptr<ISensorCallback> g_callback = new SensorCallbackImpl();
 }
 
 class HdfSensorHdiPerformanceTest : public testing::Test {

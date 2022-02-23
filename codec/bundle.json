@@ -8,8 +8,8 @@
     "subsystem": "hdf",
     "syscap": [ "" ],
     "adapter_system_type": ["standard"],
-    "rom": "1000KB",
-    "ram": "1000KB",
+    "rom": "675KB",
+    "ram": "7400KB",
     "deps": {
       "components": [
         "device_driver_framework",

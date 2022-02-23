@@ -112,7 +112,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialReadSync_003, TestSize.Level1)
         ""
     };
     char readBuf[DATA_MAX_LEN] = {0};
-    for (int i = 0; strlen(data[i]) > 0 > 0; i++) {
+    for (int32_t i = 0; strlen(data[i]) > 0 > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_SYNC_WRITE);
         UsbHostDdkTestSyncWrite(const_cast<char *>(data[i]));
@@ -142,7 +142,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialReadSync_004, TestSize.Level1)
         ""
     };
     char readBuf[DATA_MAX_LEN] = {0};
-    for (int i = 0; strlen(data[i]) > 0 > 0; i++) {
+    for (int32_t i = 0; strlen(data[i]) > 0 > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_ASYNC_WRITE);
         UsbHostDdkTestAsyncWrite(const_cast<char *>(data[i]));
@@ -167,8 +167,8 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialReadSync_005, TestSize.Level2)
     printf("------start UsbSerialReadSync_005------\n");
     const string s = "0123456789abcdef";
     string data;
-    int totalSize = 1024;
-    int writeCnt = 8;
+    int32_t totalSize = 1024;
+    int32_t writeCnt = 8;
     unsigned int n = 0;
     while (n < totalSize / writeCnt / s.size()) {
         data += s;
@@ -177,7 +177,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialReadSync_005, TestSize.Level2)
     char readBuf[DATA_MAX_LEN] = {0};
     char writeBuf[DATA_MAX_LEN] = {0};
     strcpy_s(writeBuf, sizeof(writeBuf), data.c_str());
-    for (int i = 0; i < writeCnt; i++) {
+    for (int32_t i = 0; i < writeCnt; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_SYNC_WRITE);
         UsbHostDdkTestSyncWrite(writeBuf);
@@ -191,7 +191,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialReadSync_005, TestSize.Level2)
 }
 
 extern "C" {
-static void TestAsyncRead(char *readBuf, int timeout)
+static void TestAsyncRead(char *readBuf, int32_t timeout)
 {
     printf("------TestAsyncRead start-----\n");
     if (strlen(readBuf) > 0) {
@@ -267,7 +267,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialReadAsync_003, TestSize.Level1)
         ""
     };
     char readBuf[DATA_MAX_LEN] = {0};
-    for (int i = 0; strlen(data[i]) > 0; i++) {
+    for (int32_t i = 0; strlen(data[i]) > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_ASYNC_WRITE);
         UsbHostDdkTestAsyncWrite(const_cast<char *>(data[i]));
@@ -295,7 +295,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialReadAsync_004, TestSize.Level1)
         ""
     };
     char readBuf[DATA_MAX_LEN] = {0};
-    for (int i = 0; strlen(data[i]) > 0; i++) {
+    for (int32_t i = 0; strlen(data[i]) > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_SYNC_WRITE);
         UsbHostDdkTestSyncWrite(const_cast<char *>(data[i]));
@@ -318,8 +318,8 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialReadAsync_005, TestSize.Level2)
     printf("------start UsbSerialReadAsync_005------\n");
     const string s = "0123456789abcdef";
     string data;
-    int totalSize = 1024;
-    int writeCnt = 8;
+    unsigned int totalSize = 1024;
+    unsigned int writeCnt = 8;
     unsigned int n = 0;
     while (n < totalSize / writeCnt / s.size()) {
         data += s;
@@ -328,7 +328,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialReadAsync_005, TestSize.Level2)
     char readBuf[DATA_MAX_LEN] = {0};
     char writeBuf[DATA_MAX_LEN] = {0};
     strcpy_s(writeBuf, sizeof(writeBuf), data.c_str());
-    for (int i = 0; i < writeCnt; i++) {
+    for (unsigned int i = 0; i < writeCnt; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_ASYNC_WRITE);
         UsbHostDdkTestAsyncWrite(writeBuf);
@@ -387,7 +387,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialStdCtrlCmdSync_003, TestSize.Level2)
 {
     printf("------start UsbSerialStdCtrlCmdSync_003------\n");
     char readBuf[DATA_MAX_LEN] = {0};
-    for (int i=0; i < TEST_COUNT; i++) {
+    for (int32_t i=0; i < TEST_COUNT; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_CTRL_SYNC_DESCRIPTOR);
         UsbHostDdkTestStdGetDes(readBuf);
@@ -426,7 +426,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialClsCtrlCmdSync_002, TestSize.Level2)
 {
     printf("------start UsbSerialClsCtrlCmdSync_002------\n");
     char readBuf[DATA_MAX_LEN] = {0};
-    for (int i=0; i < TEST_COUNT; i++) {
+    for (int32_t i=0; i < TEST_COUNT; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_CTRL_CLASS_SYNC);
         UsbHostDdkTestCtrlClass(readBuf);
@@ -466,7 +466,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialCtrlCmdAsync_002, TestSize.Level2)
 {
     printf("------start UsbSerialCtrlCmdAsync_002------\n");
     char readBuf[DATA_MAX_LEN] = {0};
-    for (int i=0; i < TEST_COUNT; i++) {
+    for (int32_t i=0; i < TEST_COUNT; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_CTRL_ASYNC_DESCRIPTOR);
         UsbHostDdkTestStdGetDesAsync(readBuf);
@@ -491,13 +491,13 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialGetDeviceInfo_001, TestSize.Level1)
     const char *bDeviceClass = "0x00";
     const char *bDeviceSubClass = "0x00";
     const char *bDeviceProtocol = "0x00";
-    const int logMaxLen = 256;
-    int ret = 0;
+    const int32_t logMaxLen = 256;
     char targetLog[logMaxLen] = {0};
     const char *fmt = "device descriptor info:[%s %s %s %s %s]\n";
-    snprintf_s(targetLog, logMaxLen, logMaxLen -1, fmt, \
-        idVendor, idProduct, bDeviceClass, bDeviceSubClass, bDeviceProtocol);
-
+    if (snprintf_s(targetLog, logMaxLen, logMaxLen -1, fmt, \
+        idVendor, idProduct, bDeviceClass, bDeviceSubClass, bDeviceProtocol) < 0) {
+        printf("UsbSerialGetDeviceInfo_001 snprintf_s failed\n");
+    }
     printf("targetLog==>%s-%d\n", targetLog, strlen(targetLog));
     char readBuf[DATA_MAX_LEN] = {0};
     UsbHostDdkTestOpen(HOST_ACM_CTRL_SYNC_DESCRIPTOR);
@@ -522,12 +522,12 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialAddOrRemoveInterface_001, TestSize.Leve
     const char *acmApiType = "-SDK";
     TestExit();
     UsbHostDdkTestInit(const_cast<char*>(ecmApiType));
-    int acmInterface = 2;
+    int32_t acmInterface = 2;
     UsbHostDdkTestOpen(HOST_ACM_REMOVE_INTERFACE);
     UsbHostDdkTestRemoveInterface(acmInterface);
     TestExit();
     sleep(2);
-    int status = 0;
+    int32_t status = 0;
     status = UsbHostDdkTestInit(const_cast<char*>(acmApiType));
     printf("acm init status=>%d\n", status);
     EXPECT_NE(status, 0);
@@ -546,13 +546,13 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialAddOrRemoveInterface_002, TestSize.Leve
     printf("------start UsbSerialAddOrRemoveInterface_002------\n");
     const char *ecmApiType = "-ECM";
     const char *acmApiType = "-SDK";
-    int acmInterface = 2;
+    int32_t acmInterface = 2;
     UsbHostDdkTestInit(const_cast<char*>(ecmApiType));
     UsbHostDdkTestOpen(HOST_ACM_ADD_INTERFACE);
     UsbHostDdkTestAddInterface(acmInterface);
     TestExit();
     sleep(2);
-    int status = 0;
+    int32_t status = 0;
     status = UsbHostDdkTestInit(const_cast<char*>(acmApiType));
     printf("acm init status=>%d\n", status);
     EXPECT_EQ(status, 0);
@@ -572,13 +572,13 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialAddOrRemoveInterface_003, TestSize.Leve
     printf("------start UsbSerialAddOrRemoveInterface_003------\n");
     const char *ecmApiType = "-ECM";
     const char *acmApiType = "-SDK";
-    int acmInterface = 3;
+    int32_t acmInterface = 3;
     UsbHostDdkTestInit(const_cast<char*>(ecmApiType));
     UsbHostDdkTestOpen(HOST_ACM_REMOVE_INTERFACE);
     UsbHostDdkTestRemoveInterface(acmInterface);
     TestExit();
     sleep(2);
-    int status = 0;
+    int32_t status = 0;
     status = UsbHostDdkTestInit(const_cast<char*>(acmApiType));
     printf("acm init status=>%d\n", status);
     EXPECT_NE(status, 0);
@@ -597,13 +597,13 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialAddOrRemoveInterface_004, TestSize.Leve
     printf("------start UsbSerialAddOrRemoveInterface_004------\n");
     const char *ecmApiType = "-ECM";
     const char *acmApiType = "-SDK";
-    int acmInterface = 3;
+    int32_t acmInterface = 3;
     UsbHostDdkTestInit(const_cast<char*>(ecmApiType));
     UsbHostDdkTestOpen(HOST_ACM_ADD_INTERFACE);
     UsbHostDdkTestAddInterface(acmInterface);
     TestExit();
     sleep(2);
-    int status = 0;
+    int32_t status = 0;
     status = UsbHostDdkTestInit(const_cast<char*>(acmApiType));
     printf("acm init status=>%d\n", status);
     EXPECT_EQ(status, 0);
@@ -623,13 +623,13 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialAddOrRemoveInterface_005, TestSize.Leve
     printf("------start UsbSerialAddOrRemoveInterface_005------\n");
     const char *ecmApiType = "-ECM";
     const char *acmApiType = "-SDK";
-    int ecmInterface = 0;
+    int32_t ecmInterface = 0;
     UsbHostDdkTestInit(const_cast<char*>(acmApiType));
     UsbHostDdkTestOpen(HOST_ACM_REMOVE_INTERFACE);
     UsbHostDdkTestRemoveInterface(ecmInterface);
     TestExit();
     sleep(2);
-    int status = 0;
+    int32_t status = 0;
     status = UsbHostDdkTestInit(const_cast<char*>(ecmApiType));
     printf("ecm init status=>%d\n", status);
     EXPECT_NE(status, 0);
@@ -648,13 +648,13 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialAddOrRemoveInterface_006, TestSize.Leve
     printf("------start UsbSerialAddOrRemoveInterface_006------\n");
     const char *ecmApiType = "-ECM";
     const char *acmApiType = "-SDK";
-    int ecmInterface = 0;
+    int32_t ecmInterface = 0;
     UsbHostDdkTestInit(const_cast<char*>(acmApiType));
     UsbHostDdkTestOpen(HOST_ACM_ADD_INTERFACE);
     UsbHostDdkTestAddInterface(ecmInterface);
     TestExit();
     sleep(2);
-    int status = 0;
+    int32_t status = 0;
     status = UsbHostDdkTestInit(const_cast<char*>(ecmApiType));
     printf("ecm init status=>%d\n", status);
     EXPECT_EQ(status, 0);

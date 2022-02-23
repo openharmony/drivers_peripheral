@@ -134,7 +134,7 @@ if (defined(ohos_lite)) {
       "$camera_path/include",
       "$camera_path/device_manager/test/unittest/mpi",
       "$camera_path/utils/event",
-      "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
+      "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
       "$camera_device_name_path/camera/include/device_manager",
       "$camera_path/adapter/platform/mpp/src/device_manager/include",
     ]
@@ -145,7 +145,7 @@ if (defined(ohos_lite)) {
     }
     deps = [
       "$camera_path/device_manager:camera_device_manager",
-      "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
+      "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]

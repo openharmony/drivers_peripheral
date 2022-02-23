@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef HDI_BATTERY_V1_0_BATTERYINTERFACESERVICE_H
-#define HDI_BATTERY_V1_0_BATTERYINTERFACESERVICE_H
+#ifndef OHOS_HDI_BATTERY_V1_0_BATTERYINTERFACEIMPL_H
+#define OHOS_HDI_BATTERY_V1_0_BATTERYINTERFACEIMPL_H
 
 #include "batteryd_api.h"
 #include "battery_config.h"
@@ -23,13 +23,14 @@
 #include "battery_thread.h"
 #include "power_supply_provider.h"
 
-namespace hdi {
-namespace battery {
-namespace v1_0 {
-class BatteryInterfaceService : public BatteryInterfaceStub {
+namespace OHOS {
+namespace HDI {
+namespace Battery {
+namespace V1_0 {
+class BatteryInterfaceImpl : public BatteryInterfaceStub {
 public:
-    BatteryInterfaceService();
-    virtual ~BatteryInterfaceService() {}
+    BatteryInterfaceImpl();
+    virtual ~BatteryInterfaceImpl() {}
     int32_t Init();
     int32_t Register(const sptr<IBatteryCallback>& event) override;
     int32_t UnRegister() override;
@@ -43,8 +44,9 @@ public:
     int32_t GetPresent(bool& present) override;
     int32_t GetTechnology(std::string& technology) override;
 };
-} // v1_0
-} // battery
-} // hdi
+} // V1_0
+} // Battery
+} // HDI
+} // OHOS
 
-#endif // HDI_BATTERY_V1_0_BATTERYINTERFACESERVICE_H
+#endif // OHOS_HDI_BATTERY_V1_0_BATTERYINTERFACEIMPL_H

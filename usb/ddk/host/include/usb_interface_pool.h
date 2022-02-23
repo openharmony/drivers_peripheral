@@ -115,7 +115,7 @@ int32_t UsbIfCreatPipeObj(const struct UsbSdkInterface *interfaceObj, struct Usb
 int32_t UsbIfCreatInterfaceObj(const struct UsbInterfacePool *interfacePool, struct UsbSdkInterface **interfaceObj);
 HDF_STATUS UsbIfDestroyInterfaceObj(
     const struct UsbInterfacePool *interfacePool, const struct UsbSdkInterface *interfaceObj);
-int UsbIfCreatInterfacePool(const struct UsbSession *session, uint8_t busNum, uint8_t devAddr,
+int32_t UsbIfCreatInterfacePool(const struct UsbSession *session, uint8_t busNum, uint8_t devAddr,
     struct UsbInterfacePool **interfacePool);
 
 #endif /* USB_INTERFACE_POOL_H */

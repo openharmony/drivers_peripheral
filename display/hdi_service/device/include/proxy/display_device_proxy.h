@@ -38,7 +38,7 @@ public:
     /* device proxy */
     int32_t RegHotPlugCallback(HotPlugCallback callback, void *callbackData) override;
     int32_t GetDisplayCapability(uint32_t devId, DisplayCapability &info) override;
-    int32_t GetDisplaySuppportedModes(uint32_t devId, int &num, DisplayModeInfo *modes) override;
+    int32_t GetDisplaySupportedModes(uint32_t devId, int &num, DisplayModeInfo *modes) override;
     int32_t GetDisplayMode(uint32_t devId, uint32_t &modeId) override;
     int32_t SetDisplayMode(uint32_t devId, uint32_t modeId) override;
     int32_t GetDisplayPowerStatus(uint32_t devId, DispPowerStatus &status) override;

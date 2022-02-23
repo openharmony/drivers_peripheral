@@ -13,15 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef HDI_BATTERY_V1_0_TYPES_H
-#define HDI_BATTERY_V1_0_TYPES_H
+#ifndef OHOS_HDI_BATTERY_V1_0_TYPES_H
+#define OHOS_HDI_BATTERY_V1_0_TYPES_H
 
 #include <string>
 #include <message_parcel.h>
 
-namespace hdi {
-namespace battery {
-namespace v1_0 {
+namespace OHOS {
+namespace HDI {
+namespace Battery {
+namespace V1_0 {
 using namespace OHOS;
 
 enum BatteryHealthState {
@@ -67,9 +68,9 @@ struct CallbackInfo {
 bool CallbackInfoBlockMarshalling(OHOS::MessageParcel &data, const CallbackInfo& dataBlock);
 
 bool CallbackInfoBlockUnmarshalling(OHOS::MessageParcel &data, CallbackInfo& dataBlock);
-} // v1_
-} // battery
-} // hdi
+} // V1_0
+} // Battery
+} // HDI
+} // OHOS
 
-#endif // HDI_BATTERY_V1_0_TYPES_H
-
+#endif // OHOS_HDI_BATTERY_V1_0_TYPES_H

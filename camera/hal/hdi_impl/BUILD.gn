@@ -200,7 +200,7 @@ if (defined(ohos_lite)) {
       "$camera_path/buffer_manager/src/buffer_adapter/standard",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/utils/event",
-      "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
+      "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
       "//drivers/peripheral/display/interfaces/include",
 
       #producer
@@ -229,7 +229,7 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",
       "$camera_path/utils:camera_utils",
-      "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
+      "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
     ]
 
     defines = []
