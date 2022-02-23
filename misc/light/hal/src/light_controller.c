@@ -15,7 +15,6 @@
 
 #include "light_controller.h"
 #include <fcntl.h>
-#include <securec.h>
 #include <stdio.h>
 #include "hdf_base.h"
 #include "hdf_dlist.h"
