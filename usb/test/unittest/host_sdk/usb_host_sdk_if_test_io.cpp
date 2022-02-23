@@ -63,7 +63,7 @@ void UsbHostSdkIfTestIo::TearDown()
 static void AcmReadBulk(struct UsbRequest *req)
 {
     uint32_t size;
-    int status = req->compInfo.status;
+    int32_t status = req->compInfo.status;
     size = req->compInfo.actualLength;
     printf("Bulk status:%d,actualLength:%d\n", status, size);
     return;
@@ -71,7 +71,7 @@ static void AcmReadBulk(struct UsbRequest *req)
 
 static void AcmWriteBulk(struct UsbRequest *req)
 {
-    int status;
+    int32_t status;
 
     if (req == NULL) {
         printf("%s:%d req is NULL!", __func__, __LINE__);
@@ -95,9 +95,9 @@ static void AcmWriteBulk(struct UsbRequest *req)
     return;
 }
 
-static int AcmWriteBufAlloc(struct AcmDevice *acm)
+static int32_t AcmWriteBufAlloc(struct AcmDevice *acm)
 {
-    int i;
+    int32_t i;
     struct AcmWb *wb;
     for (wb = &acm->wb[0],i = 0; i < ACM_NW; i++,wb++) {
         wb->buf = (uint8_t *)OsalMemCalloc(acm->writeSize);
@@ -120,7 +120,7 @@ static void AcmCtrlIrq(struct UsbRequest *req)
         printf("%s:%d req is NULL!", __func__, __LINE__);
         return;
     }
-    int status = req->compInfo.status;
+    int32_t status = req->compInfo.status;
     unsigned int currentSize = req->compInfo.actualLength;
     printf("Irqstatus:%d,actualLength:%u\n", status, currentSize);
     switch (status) {
@@ -148,9 +148,9 @@ static struct UsbControlRequest UsbControlMsg(struct TestControlMsgData msgData)
 }
 static void AcmGetPipe()
 {
-    int ret;
+    int32_t ret;
     struct UsbPipeInfo p;
-    int i;
+    int32_t i;
 
     for (i = 0;  i <= g_acm->dataIface->info.pipeNum; i++) {
         ret = UsbGetPipeInfo(g_acm->data_devHandle, g_acm->dataIface->info.curAltSetting, i, &p);
@@ -206,8 +206,8 @@ static void AcmGetPipe()
 
 static void AcmGetRequest()
 {
-    int ret;
-    int i;
+    int32_t ret;
+    int32_t i;
     g_acm->readSize = g_acm->dataInPipe->maxPacketSize;
     for (i = 0; i < ACM_NR; i++) {
         g_acm->readReq[i] = UsbAllocRequest(g_acm->data_devHandle, 0, g_acm->readSize);
@@ -235,9 +235,9 @@ static void AcmGetRequest()
 
 static void AcmFillReadRequest()
 {
-    int i;
+    int32_t i;
     struct UsbRequestParams readParmas;
-    int ret;
+    int32_t ret;
     for (i = 0; i < ACM_NR; i++) {
         readParmas.userData = (void *)g_acm;
         readParmas.pipeAddress = g_acm->dataInPipe->pipeAddress;
@@ -260,8 +260,8 @@ static void AcmFillWriteRequest()
     struct UsbRequestParams parmas;
     char sendData[] = {"abcde\0"};
     uint32_t size = strlen(sendData) + 1;
-    int i;
-    int ret;
+    int32_t i;
+    int32_t ret;
 
     g_acm->writeSize = g_acm->dataOutPipe->maxPacketSize;
     size = (size > g_acm->writeSize) ? g_acm->writeSize : size;
@@ -294,7 +294,7 @@ static void AcmFillWriteRequest()
 
 static void AcmFillIntRequest()
 {
-    int ret;
+    int32_t ret;
     struct UsbRequestParams intParmas;
 
     intParmas.userData = (void *)g_acm;
@@ -314,7 +314,7 @@ static void AcmFillIntRequest()
 
 static void AcmFillCtrlRequest()
 {
-    int ret;
+    int32_t ret;
     struct UsbRequestParams parmas;
     uint16_t index = 2;
     uint16_t value = 0;
@@ -345,7 +345,7 @@ static void AcmFillCtrlRequest()
 
 static void AcmInit()
 {
-    int ret;
+    int32_t ret;
     struct UsbSession *session = NULL;
 
     ret = UsbInitHostSdk(&session);
@@ -389,8 +389,8 @@ static void AcmInit()
  */
 HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestSync001, TestSize.Level1)
 {
-    int ret;
-    int i;
+    int32_t ret;
+    int32_t i;
     AcmInit();
 
     for (i = 0; i < 1; i++) {
@@ -408,8 +408,8 @@ HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestSync001, TestSize.Level1
  */
 HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestSync002, TestSize.Level1)
 {
-    int ret;
-    int i;
+    int32_t ret;
+    int32_t i;
 
     for (i = 0; i < 1; i++) {
         printf("------UsbSubmitRequestSync i = [%d]------\n", i);
@@ -426,7 +426,7 @@ HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestSync002, TestSize.Level1
  */
 HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestSync003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbSubmitRequestSync(g_acm->notifyReq);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -440,7 +440,7 @@ HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestSync003, TestSize.Level1
  */
 HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestSync004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbSubmitRequestSync(g_acm->notifyReq);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -454,8 +454,8 @@ HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestSync004, TestSize.Level1
  */
 HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestAsync001, TestSize.Level1)
 {
-    int ret;
-    int i;
+    int32_t ret;
+    int32_t i;
 
     for (i = 0; i < ACM_NR; i++) {
         ret = UsbSubmitRequestAsync(g_acm->readReq[i]);
@@ -471,8 +471,8 @@ HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestAsync001, TestSize.Level
  */
 HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfCancelRequest001, TestSize.Level1)
 {
-    int ret;
-    int i = 0;
+    int32_t ret;
+    int32_t i = 0;
 
     ret = UsbCancelRequest(g_acm->readReq[i]);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -486,8 +486,8 @@ HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfCancelRequest001, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestAsync002, TestSize.Level1)
 {
-    int ret;
-    int i;
+    int32_t ret;
+    int32_t i;
 
     for (i = 0; i < ACM_NR; i++) {
         ret = UsbSubmitRequestAsync(g_acm->wb[i].request);
@@ -503,8 +503,8 @@ HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestAsync002, TestSize.Level
  */
 HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfCancelRequest002, TestSize.Level1)
 {
-    int ret;
-    int i = 0;
+    int32_t ret;
+    int32_t i = 0;
 
     i = ACM_NR-1;
     ret = UsbCancelRequest(g_acm->wb[i].request);
@@ -519,7 +519,7 @@ HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfCancelRequest002, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestAsync003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbSubmitRequestAsync(g_acm->notifyReq);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -533,7 +533,7 @@ HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestAsync003, TestSize.Level
  */
 HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfCancelRequest003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbCancelRequest(g_acm->notifyReq);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -547,7 +547,7 @@ HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfCancelRequest003, TestSize.Level1)
  */
 HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestAsync004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbSubmitRequestAsync(g_acm->readReq[0]);
 
@@ -562,7 +562,7 @@ HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestAsync004, TestSize.Level
  */
 HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfCancelRequest004, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbSubmitRequestAsync(g_acm->readReq[0]);
     EXPECT_EQ(HDF_SUCCESS, ret);

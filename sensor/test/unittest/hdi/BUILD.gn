@@ -27,7 +27,7 @@ ohos_unittest("hdi_unittest_sensor") {
 
   sources = [
     "hdf_sensor_hdi_test.cpp",
-    "sensor_callback_service.cpp",
+    "sensor_callback_impl.cpp",
   ]
   cflags = [
     "-Wall",

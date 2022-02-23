@@ -19,24 +19,31 @@
 #include <string>
 #include <vector>
 
-namespace hdi {
-namespace thermal {
-namespace v1_0 {
+namespace OHOS {
+namespace HDI {
+namespace Thermal {
+namespace V1_0 {
 struct BaseItem {
     std::string tag;
     std::string value;
+    bool operator == (const std::string &tag)
+    {
+        return (this->tag == tag);
+    }
 };
 
 class BaseInfoConfig {
 public:
     BaseInfoConfig() = default;
     ~BaseInfoConfig() = default;
-    void SetBase(std::vector<BaseItem> &vBase);
-    void Dump();
+    void SetBase(std::vector<BaseItem> &bastList);
+    std::vector<BaseItem> GetBaseItem();
 private:
-    std::vector<BaseItem> vBase_;
+    std::vector<BaseItem> bastList_;
 };
-} // v1_0
-} // thermal
-} // hdi
+} // V1_0
+} // Thermal
+} // HDI
+} // OHOS
+
 #endif // BASE_INFO_CONFIG_H

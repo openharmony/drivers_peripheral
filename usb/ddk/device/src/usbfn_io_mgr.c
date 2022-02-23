@@ -17,7 +17,7 @@
 
 #define HDF_LOG_TAG usbfn_io_mgr
 
-static int ReqToIoData(struct UsbFnRequest *req, struct IoData *ioData,
+static int32_t ReqToIoData(struct UsbFnRequest *req, struct IoData *ioData,
     uint32_t aio, uint32_t timeout)
 {
     if (req == NULL || ioData == NULL) {
@@ -38,9 +38,9 @@ static int ReqToIoData(struct UsbFnRequest *req, struct IoData *ioData,
     return 0;
 }
 
-int OpenEp0AndMapAddr(struct UsbFnFuncMgr *funcMgr)
+int32_t OpenEp0AndMapAddr(struct UsbFnFuncMgr *funcMgr)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
     funcMgr->fd = fnOps->openPipe(funcMgr->name, 0);
     if (funcMgr->fd <= 0) {
@@ -58,7 +58,7 @@ int OpenEp0AndMapAddr(struct UsbFnFuncMgr *funcMgr)
 
 static UsbFnRequestType GetReqType(struct UsbHandleMgr *handle, uint8_t pipe)
 {
-    int ret;
+    int32_t ret;
     struct UsbFnPipeInfo info = {0};
     UsbFnRequestType type = USB_REQUEST_TYPE_INVALID;
     if (pipe > 0) {
@@ -78,8 +78,8 @@ static UsbFnRequestType GetReqType(struct UsbHandleMgr *handle, uint8_t pipe)
 
 struct UsbFnRequest *UsbFnIoMgrRequestAlloc(struct UsbHandleMgr *handle, uint8_t pipe, uint32_t len)
 {
-    int ret;
-    int ep;
+    int32_t ret;
+    int32_t ep;
     uint8_t *mapAddr = NULL;
     struct UsbFnRequest *req = NULL;
     struct ReqList *reqList = NULL;
@@ -130,10 +130,10 @@ struct UsbFnRequest *UsbFnIoMgrRequestAlloc(struct UsbHandleMgr *handle, uint8_t
     return req;
 }
 
-int UsbFnIoMgrRequestFree(struct UsbFnRequest *req)
+int32_t UsbFnIoMgrRequestFree(struct UsbFnRequest *req)
 {
     struct GenericMemory mem;
-    int ret;
+    int32_t ret;
     if (req == NULL) {
         HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -160,9 +160,9 @@ int UsbFnIoMgrRequestFree(struct UsbFnRequest *req)
     return 0;
 }
 
-int UsbFnIoMgrRequestSubmitAsync(struct UsbFnRequest *req)
+int32_t UsbFnIoMgrRequestSubmitAsync(struct UsbFnRequest *req)
 {
-    int ret;
+    int32_t ret;
     struct IoData ioData = {0};
     struct ReqList *reqList = NULL;
     if (req == NULL) {
@@ -179,9 +179,9 @@ int UsbFnIoMgrRequestSubmitAsync(struct UsbFnRequest *req)
     return ret;
 }
 
-int UsbFnIoMgrRequestCancel(struct UsbFnRequest *req)
+int32_t UsbFnIoMgrRequestCancel(struct UsbFnRequest *req)
 {
-    int ret;
+    int32_t ret;
     struct IoData ioData = {0};
     struct ReqList *reqList = NULL;
     if (req == NULL) {
@@ -198,7 +198,7 @@ int UsbFnIoMgrRequestCancel(struct UsbFnRequest *req)
     return ret;
 }
 
-int UsbFnIoMgrRequestGetStatus(struct UsbFnRequest *req, UsbRequestStatus *status)
+int32_t UsbFnIoMgrRequestGetStatus(struct UsbFnRequest *req, UsbRequestStatus *status)
 {
     struct IoData ioData = {0};
     struct ReqList *reqList;
@@ -216,9 +216,9 @@ int UsbFnIoMgrRequestGetStatus(struct UsbFnRequest *req, UsbRequestStatus *statu
     return 0;
 }
 
-int UsbFnIoMgrRequestSubmitSync(struct UsbFnRequest *req, uint32_t timeout)
+int32_t UsbFnIoMgrRequestSubmitSync(struct UsbFnRequest *req, uint32_t timeout)
 {
-    int ret;
+    int32_t ret;
     struct IoData ioData = {0};
     struct ReqList *reqList;
 
@@ -234,16 +234,16 @@ int UsbFnIoMgrRequestSubmitSync(struct UsbFnRequest *req, uint32_t timeout)
     ret = fnOps->pipeIo(reqList->fd, &ioData);
     if (ret > 0) {
         req->status = USB_REQUEST_COMPLETED;
-        req->actual = ret;
+        req->actual = (uint32_t)ret;
         return 0;
     }
 
     return ret;
 }
 
-static int HandleInit(struct UsbHandleMgr *handle, struct UsbFnInterfaceMgr *interfaceMgr)
+static int32_t HandleInit(struct UsbHandleMgr *handle, struct UsbFnInterfaceMgr *interfaceMgr)
 {
-    int ret;
+    int32_t ret;
     uint32_t i, j;
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
 
@@ -279,7 +279,7 @@ FREE_EVENT:
 
 struct UsbHandleMgr *UsbFnIoMgrInterfaceOpen(struct UsbFnInterface *interface)
 {
-    int ret;
+    int32_t ret;
     if (interface == NULL) {
         return NULL;
     }
@@ -305,9 +305,9 @@ struct UsbHandleMgr *UsbFnIoMgrInterfaceOpen(struct UsbFnInterface *interface)
     return handle;
 }
 
-int UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle)
+int32_t UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle)
 {
-    int ret;
+    int32_t ret;
     uint32_t i;
     if (handle == NULL) {
         HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
@@ -342,11 +342,11 @@ int UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle)
     return 0;
 }
 
-int UsbFnIoMgrInterfaceGetPipeInfo(struct UsbFnInterface *interface,
+int32_t UsbFnIoMgrInterfaceGetPipeInfo(struct UsbFnInterface *interface,
     uint8_t pipeId, struct UsbFnPipeInfo *info)
 {
-    int ret;
-    int fd;
+    int32_t ret;
+    int32_t fd;
     if (info == NULL || interface == NULL || pipeId >= interface->info.numPipes) {
         HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;

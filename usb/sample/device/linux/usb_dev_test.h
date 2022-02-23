@@ -16,11 +16,11 @@
 #ifndef USB_DEV_TEST_H
 #define USB_DEV_TEST_H
 
-int acm_read(int argc, const char *argv[]);
-int acm_speed_read(int argc, const char *argv[]);
-int acm_speed_write(int argc, const char *argv[]);
-int acm_test(int argc, const char *argv[]);
-int acm_write(int argc, const char *argv[]);
-int prop_test(int argc, const char *argv[]);
+int32_t acm_read(int32_t argc, const char *argv[]);
+int32_t acm_speed_read(int32_t argc, const char *argv[]);
+int32_t acm_speed_write(int32_t argc, const char *argv[]);
+int32_t acm_test(int32_t argc, const char *argv[]);
+int32_t acm_write(int32_t argc, const char *argv[]);
+int32_t prop_test(int32_t argc, const char *argv[]);
 
 #endif /* USB_DEV_TEST_H */

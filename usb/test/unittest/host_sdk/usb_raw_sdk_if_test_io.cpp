@@ -44,12 +44,12 @@ static struct AcmDevice *g_acm = NULL;
 static struct AcmDevice g_deviceService;
 static UsbRawHandle *g_devHandle = NULL;
 static UsbRawDevice *g_dev = NULL;
-static int g_activeConfig;
+static int32_t g_activeConfig;
 static bool g_stopIoThreadFlag = false;
 
-static int UsbIoThread(void *data)
+static int32_t UsbIoThread(void *data)
 {
-    int ret;
+    int32_t ret;
     struct AcmDevice *acm = (struct AcmDevice *)data;
 
     for (;;) {
@@ -84,10 +84,10 @@ static int UsbIoThread(void *data)
 }
 
 
-static int UsbStartIo(struct AcmDevice *acm)
+static int32_t UsbStartIo(struct AcmDevice *acm)
 {
     struct OsalThreadParam threadCfg;
-    int ret;
+    int32_t ret;
 
     printf("%s start\n", __func__);
 
@@ -113,9 +113,9 @@ static int UsbStartIo(struct AcmDevice *acm)
     return HDF_SUCCESS;
 }
 
-static int UsbStopIo(struct AcmDevice *acm)
+static int32_t UsbStopIo(struct AcmDevice *acm)
 {
-    int ret;
+    int32_t ret;
 
     HDF_LOGD("%{public}s:%{public}d", __func__, __LINE__);
     if (g_stopIoThreadFlag == false) {
@@ -229,10 +229,10 @@ static void AcmNotifyReqCallback(const void *requestArg)
     printf("Irqstatus:%d,actualLength:%u\n", req->status, currentSize);
 }
 }
-static int AcmWriteBufAlloc(struct AcmDevice *acm)
+static int32_t AcmWriteBufAlloc(struct AcmDevice *acm)
 {
     struct AcmWb *wb = &acm->wb[0];
-    int i;
+    int32_t i;
 
     for (i = 0; i < ACM_NW; i++, wb++) {
         wb->buf = (uint8_t *)OsalMemCalloc(acm->dataOutEp->maxPacketSize);
@@ -249,11 +249,11 @@ static int AcmWriteBufAlloc(struct AcmDevice *acm)
     return HDF_SUCCESS;
 }
 
-static int UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConfigDescriptor *config)
+static int32_t UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConfigDescriptor *config)
 {
     uint8_t i;
     uint8_t j;
-    int ret;
+    int32_t ret;
 
     if ((acm == NULL) || (config == NULL)) {
         HDF_LOGE("%{public}s:%{public}d acm or config is NULL",
@@ -332,7 +332,7 @@ static int UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConfigDe
 
 static void AcmRawAllocRequest()
 {
-    int i;
+    int32_t i;
 
     for (i = 0; i < ACM_NW; i++) {
         g_acm->wb[i].request = UsbRawAllocRequest(g_acm->devHandle, 0, g_acm->dataOutEp->maxPacketSize);
@@ -355,7 +355,7 @@ static void AcmRawFillWriteReq()
 {
     struct UsbRawFillRequestData reqData;
     int32_t ret;
-    int i;
+    int32_t i;
     uint32_t size;
     char sendData[] = {"abcde\0"};
 
@@ -392,8 +392,8 @@ static void AcmRawFillReadReq()
 {
     struct UsbRawFillRequestData reqData;
     int32_t ret;
-    int i;
-    int size = g_acm->dataInEp->maxPacketSize;
+    int32_t i;
+    uint32_t size = g_acm->dataInEp->maxPacketSize;
 
     for (i = 0; i < 1; i++) {
         reqData.endPoint      = g_acm->dataInEp->addr;
@@ -413,7 +413,7 @@ static void AcmRawFillIntReq()
 {
     struct UsbRawFillRequestData fillRequestData;
     int32_t ret;
-    int size = g_acm->notifyEp->maxPacketSize;
+    uint32_t size = g_acm->notifyEp->maxPacketSize;
 
     fillRequestData.endPoint = g_acm->notifyEp->addr;
     fillRequestData.length = size;
@@ -431,7 +431,7 @@ static void AcmRawFillCtrlReq()
 {
     struct UsbControlRequestData ctrlReq;
     unsigned char setup[100] = {0};
-    int ret;
+    int32_t ret;
 
     g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
     g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
@@ -500,7 +500,7 @@ void UsbRawSdkIfTestIo::SetUpTestCase()
 HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest001, TestSize.Level1)
 {
     struct UsbControlRequestData ctrlReq;
-    int ret;
+    int32_t ret;
 
     g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
     g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
@@ -528,7 +528,7 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest001, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest002, TestSize.Level1)
 {
     struct UsbControlRequestData ctrlReq;
-    int ret;
+    int32_t ret;
 
     g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
     g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
@@ -555,7 +555,7 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest002, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest003, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbRawSendControlRequest(g_acm->ctrlReq, g_acm->devHandle, NULL);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -570,7 +570,7 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest003, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest004, TestSize.Level1)
 {
     struct UsbControlRequestData ctrlReq;
-    int ret;
+    int32_t ret;
 
     g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
     g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
@@ -598,7 +598,7 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest004, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest005, TestSize.Level1)
 {
     struct UsbControlRequestData ctrlReq;
-    int ret;
+    int32_t ret;
 
     g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
     g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
@@ -625,7 +625,7 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest005, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest006, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbRawSendControlRequest(NULL, g_acm->devHandle, NULL);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -639,7 +639,7 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest006, TestSize.Level1)
  */
 HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest007, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
 
     ret = UsbRawSendControlRequest(g_acm->ctrlReq, NULL, NULL);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -655,7 +655,7 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendBulkRequest001, TestSize.Level1)
 {
     struct UsbRequestData reqData;
     int32_t ret;
-    int i;
+    int32_t i;
     uint32_t size;
     char sendData[] = {"abcd\0"};
 
@@ -674,7 +674,7 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendBulkRequest001, TestSize.Level1)
         reqData.timeout       = USB_CTRL_SET_TIMEOUT;
         reqData.data        = snd->buf;
         reqData.length        = snd->len;
-        reqData.requested   = (int *)&size;
+        reqData.requested   = (int32_t *)&size;
     }
 
     for (i = 0; i < 1; i++) {
@@ -695,15 +695,15 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendBulkRequest002, TestSize.Level1)
 {
     struct UsbRequestData reqData;
     int32_t ret;
-    int i;
-    int size = g_acm->dataInEp->maxPacketSize;
+    int32_t i;
+    uint32_t size = g_acm->dataInEp->maxPacketSize;
 
     for (i = 0; i < 1; i++) {
         reqData.endPoint      = g_acm->dataInEp->addr;
         reqData.timeout       = USB_CTRL_SET_TIMEOUT;
         reqData.length        = size;
         reqData.data        = ((UsbRawRequest *)g_acm->readReq[i])->buffer;
-        reqData.requested      = (int *)&size;
+        reqData.requested      = (int32_t *)&size;
     }
 
     for (i = 0; i < 1; i++) {
@@ -723,15 +723,15 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendBulkRequest003, TestSize.Level1)
 {
     struct UsbRequestData reqData;
     int32_t ret;
-    int i;
-    int size = g_acm->dataInEp->maxPacketSize;
+    int32_t i;
+    uint32_t size = g_acm->dataInEp->maxPacketSize;
 
     for (i = 0; i < 1; i++) {
         reqData.endPoint      = g_acm->dataInEp->addr;
         reqData.timeout       = USB_CTRL_SET_TIMEOUT;
         reqData.length        = size;
         reqData.data        = ((UsbRawRequest *)g_acm->readReq[i])->buffer;
-        reqData.requested      = (int *)&size;
+        reqData.requested      = (int32_t *)&size;
     }
 
     for (i = 0; i < 1; i++) {
@@ -751,15 +751,15 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendBulkRequest004, TestSize.Level1)
 {
     struct UsbRequestData reqData;
     int32_t ret;
-    int i;
-    int size = g_acm->dataInEp->maxPacketSize;
+    int32_t i;
+    uint32_t size = g_acm->dataInEp->maxPacketSize;
 
     for (i = 0; i < 1; i++) {
         reqData.endPoint      = g_acm->dataInEp->addr;
         reqData.timeout       = USB_CTRL_SET_TIMEOUT;
         reqData.length        = size;
         reqData.data        = ((UsbRawRequest *)g_acm->readReq[i])->buffer;
-        reqData.requested      = (int *)&size;
+        reqData.requested      = (int32_t *)&size;
     }
 
     for (i = 0; i < 1; i++) {
@@ -778,7 +778,7 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendBulkRequest004, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendBulkRequest005, TestSize.Level1)
 {
     int32_t ret;
-    int i;
+    int32_t i;
 
     for (i = 0; i < 1; i++) {
         printf("UsbRawSendBulkRequest i = [%d]\n", i);
@@ -797,13 +797,13 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendInterruptRequest001, TestSize.Level
 {
     struct UsbRequestData reqData;
     int32_t ret;
-    int size = g_acm->notifyEp->maxPacketSize;
+    uint32_t size = g_acm->notifyEp->maxPacketSize;
 
     reqData.endPoint = g_acm->notifyEp->addr;
     reqData.length = size;
     reqData.timeout = USB_CTRL_SET_TIMEOUT;
     reqData.data        = ((UsbRawRequest *)g_acm->notifyReq)->buffer;
-    reqData.requested      = (int *)&size;
+    reqData.requested      = (int32_t *)&size;
 
     ret = UsbRawSendInterruptRequest(g_acm->notifyReq, g_acm->devHandle, &reqData);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -819,13 +819,13 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendInterruptRequest002, TestSize.Level
 {
     struct UsbRequestData reqData;
     int32_t ret;
-    int size = g_acm->notifyEp->maxPacketSize;
+    uint32_t size = g_acm->notifyEp->maxPacketSize;
 
     reqData.endPoint = g_acm->notifyEp->addr;
     reqData.length = size;
     reqData.timeout = USB_CTRL_SET_TIMEOUT;
     reqData.data        = ((UsbRawRequest *)g_acm->notifyReq)->buffer;
-    reqData.requested      = (int *)&size;
+    reqData.requested      = (int32_t *)&size;
 
     ret = UsbRawSendInterruptRequest(NULL, g_acm->devHandle, &reqData);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -841,13 +841,13 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendInterruptRequest003, TestSize.Level
 {
     struct UsbRequestData reqData;
     int32_t ret;
-    int size = g_acm->notifyEp->maxPacketSize;
+    uint32_t size = g_acm->notifyEp->maxPacketSize;
 
     reqData.endPoint = g_acm->notifyEp->addr;
     reqData.length = size;
     reqData.timeout = USB_CTRL_SET_TIMEOUT;
     reqData.data        = ((UsbRawRequest *)g_acm->notifyReq)->buffer;
-    reqData.requested      = (int *)&size;
+    reqData.requested      = (int32_t *)&size;
 
     ret = UsbRawSendInterruptRequest(g_acm->notifyReq, NULL, &reqData);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
@@ -877,7 +877,7 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfFillBulkRequest003, TestSize.Level1)
 {
     struct UsbRawFillRequestData reqData;
     int32_t ret;
-    int i;
+    int32_t i;
     uint32_t size;
     char sendData[] = {"abcde\0"};
 
@@ -917,8 +917,8 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfFillBulkRequest004, TestSize.Level1)
 {
     struct UsbRawFillRequestData reqData;
     int32_t ret;
-    int i;
-    int size = g_acm->dataInEp->maxPacketSize;
+    int32_t i;
+    uint32_t size = g_acm->dataInEp->maxPacketSize;
 
     for (i = 0; i < ACM_NR; i++) {
         reqData.endPoint      = g_acm->dataInEp->addr;
@@ -943,7 +943,7 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfFillInterruptRequest005, TestSize.Level
 {
     struct UsbRawFillRequestData fillRequestData;
     int32_t ret;
-    int size = g_acm->notifyEp->maxPacketSize;
+    uint32_t size = g_acm->notifyEp->maxPacketSize;
 
     fillRequestData.endPoint = g_acm->notifyEp->addr;
     fillRequestData.length = size;
@@ -966,7 +966,7 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfFillInterruptRequest005, TestSize.Level
 HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSubmitRequest001, TestSize.Level1)
 {
     int32_t ret;
-    int i;
+    int32_t i;
 
     for (i = 0; i < 1; i++) {
         AcmWb *snd = &g_acm->wb[i];
@@ -985,7 +985,7 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSubmitRequest001, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSubmitRequest002, TestSize.Level1)
 {
     int32_t ret;
-    int i;
+    int32_t i;
 
     for (i = 0; i < 1; i++) {
         printf("UsbRawSubmitRequest i = [%d]\n", i);
@@ -1031,7 +1031,7 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSubmitRequest004, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfCancelRequest001, TestSize.Level1)
 {
     int32_t ret;
-    int i;
+    int32_t i;
 
     for (i = 0; i < ACM_NW; i++) {
         AcmWb *snd = &g_acm->wb[i];
@@ -1049,7 +1049,7 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfCancelRequest001, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfCancelRequest002, TestSize.Level1)
 {
     int32_t ret;
-    int i;
+    int32_t i;
 
     for (i = 0; i < 1; i++) {
         ret = UsbRawCancelRequest(g_acm->readReq[i]);

@@ -328,6 +328,7 @@ static int32_t WlanGetDeviceMacAddress(struct IWifiInterface *self, const struct
     unsigned char *mac, uint8_t len)
 {
     int32_t ec = HDF_FAILURE;
+    unsigned char *macaddr = NULL;
 
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -354,7 +355,10 @@ static int32_t WlanGetDeviceMacAddress(struct IWifiInterface *self, const struct
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
         goto finished;
     }
-    mac = (unsigned char *)HdfSbufReadUnpadBuffer(reply, len);
+    macaddr = (unsigned char *)HdfSbufReadUnpadBuffer(reply, len);
+    for (uint8_t i = 0; i < len; i++) {
+        *(mac + i) = *(macaddr + i);
+    }
 
 finished:
     if (data != NULL) {
@@ -452,7 +456,7 @@ finished:
 }
 
 static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature,
-    int32_t band, int32_t *freqs, uint32_t *num)
+    int32_t band, int32_t *freqs, uint32_t count, uint32_t *num)
 {
     int32_t ec = HDF_FAILURE;
 
@@ -461,10 +465,7 @@ static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct Wl
     }
     struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
     struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
-    freqs = (int32_t *)OsalMemCalloc(sizeof(int32_t));
-    if (freqs == NULL) {
-        return HDF_ERR_MALLOC_FAIL;
-    }
+
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
@@ -491,7 +492,7 @@ static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct Wl
         goto finished;
     }
     for (uint32_t i = 0; i < (*num); i++) {
-        if (!HdfSbufReadInt32(reply, freqs)) {
+        if (!HdfSbufReadInt32(reply, &freqs[i])) {
             HDF_LOGE("%s: write freq failed", __func__);
             ec = HDF_FAILURE;
             goto finished;
@@ -629,6 +630,7 @@ static int32_t WlanGetSupportFeature(struct IWifiInterface *self, uint8_t *supTy
 {
     int32_t ec = HDF_FAILURE;
     uint32_t size = 0;
+    uint8_t *isSupType = NULL;
 
     if (self == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -646,7 +648,10 @@ static int32_t WlanGetSupportFeature(struct IWifiInterface *self, uint8_t *supTy
         goto finished;
     }
     HdfSbufReadUint32(reply, &size);
-    supType = (uint8_t *)HdfSbufReadUnpadBuffer(reply, size);
+    isSupType = (uint8_t *)HdfSbufReadUnpadBuffer(reply, size);
+    for (uint32_t i = 0; i < size; i++) {
+       *(supType + i) = *(isSupType + i);
+    }
 
 finished:
     if (data != NULL) {

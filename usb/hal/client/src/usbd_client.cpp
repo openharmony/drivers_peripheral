@@ -54,12 +54,12 @@ UsbdClient &UsbdClient::GetInstance()
 
 sptr<IRemoteObject> UsbdClient::GetUsbdService()
 {
-    static auto serviceManager = IServiceManager::Get();
+    auto serviceManager = IServiceManager::Get();
     if (serviceManager == nullptr) {
         HDF_LOGE("service manager is nullptr");
         return nullptr;
     }
-    static auto usbdService = serviceManager->GetService(USBD_SERVICE.c_str());
+    auto usbdService = serviceManager->GetService(USBD_SERVICE.c_str());
     if (usbdService == nullptr) {
         HDF_LOGE("Usbd service is nullptr");
         return nullptr;
@@ -168,7 +168,7 @@ int32_t UsbdClient::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &data
 
 int32_t UsbdClient::DoDispatch(uint32_t cmd, MessageParcel &data, MessageParcel &reply)
 {
-    static auto usbd = GetUsbdService();
+    auto usbd = GetUsbdService();
     if (usbd == nullptr) {
         HDF_LOGE(" get usbd service failed.");
         return UEC_SERVICE_NO_INIT;

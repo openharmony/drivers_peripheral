@@ -13,27 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef HDI_THERMAL_V1_0_THERMALCALLBACKSERVICE_H
-#define HDI_THERMAL_V1_0_THERMALCALLBACKSERVICE_H
+#ifndef OHOS_HDI_THERMAL_V1_0_THERMALCALLBACKIMPL_H
+#define OHOS_HDI_THERMAL_V1_0_THERMALCALLBACKIMPL_H
 
 #include <functional>
 #include "thermal_callback_stub.h"
 
-namespace hdi {
-namespace thermal {
-namespace v1_0 {
-class ThermalCallbackService : public ThermalCallbackStub {
+namespace OHOS {
+namespace HDI {
+namespace Thermal {
+namespace V1_0 {
+class ThermalCallbackImpl : public ThermalCallbackStub {
 public:
-    virtual ~ThermalCallbackService() {}
+    virtual ~ThermalCallbackImpl() {}
     using ThermalEventCallback = std::function<int32_t(const HdfThermalCallbackInfo& event)>;
     static int32_t RegisterThermalEvent(const ThermalEventCallback &eventCb);
     int32_t OnThermalDataEvent(const HdfThermalCallbackInfo& event) override;
 private:
     static ThermalEventCallback eventCb_;
 };
-} // v1_0
-} // thermal
-} // hdi
+} // V1_0
+} // Thermal
+} // HDI
+} // OHOS
 
-#endif // HDI_THERMAL_V1_0_THERMALCALLBACKSERVICE_H
-
+#endif // OHOS_HDI_THERMAL_V1_0_THERMALCALLBACKIMPL_H

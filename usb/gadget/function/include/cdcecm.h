@@ -57,7 +57,7 @@ struct UsbEcm {
     struct OsalMutex            lockRW;
     struct OsalMutex            lockReadFifo;
     struct OsalMutex            lockWriteFifo;
-    int                         refCount;
+    int32_t                         refCount;
 };
 
 struct UsbEcmPipe {

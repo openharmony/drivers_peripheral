@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
-#include "usb_dev_test.h"
 #include <stdio.h>
 #include <string.h>
+#include "hdf_base.h"
+#include "hdf_log.h"
+#include "usb_dev_test.h"
 
 #define OPTION_LENGTH 2
 
@@ -31,10 +33,11 @@ static void ShowUsage(void)
     printf("-h : show usage\n");
 }
 
-int main(int argc, char *argv[])
+int32_t main(int32_t argc, char *argv[])
 {
     if (argc < OPTION_LENGTH) {
         printf("argv too flew\n");
+        HDF_LOGE("%s:%d argc=%d is too flew!", __func__, __LINE__, argc);
         return -1;
     }
     const char **arg = (const char **)&argv[1];

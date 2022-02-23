@@ -23,7 +23,7 @@ if (defined(ohos_lite)) {
       "//drivers/adapter/uhdf2/include/hdi",
       "//drivers/peripheral/misc/vibrator/interfaces/include/",
     ]
-    sources = [ "vibrator_interface_service.cpp" ]
+    sources = [ "vibrator_interface_impl.cpp" ]
 
     public_deps = [
       "//drivers/interface/vibrator/v1_0:libvibrator_stub_1.0",

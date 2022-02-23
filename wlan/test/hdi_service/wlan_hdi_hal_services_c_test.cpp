@@ -22,6 +22,7 @@
 using namespace testing::ext;
 
 namespace HdiTest {
+const int32_t WLAN_FREQ_MAX_NUM = 14;
 const int32_t WLAN_TX_POWER = 160;
 const int32_t DEFAULT_COMBO_SIZE = 6;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
@@ -67,13 +68,12 @@ void HdfWifiServiceCTest::TearDown()
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
 
-static void HdiProcessScanResult(const struct HdfSBuf *dataBuf)
+static void HdiProcessScanResult(struct HdfSBuf *dataBuf)
 {
     WifiScanResult *scanResult = nullptr;
     uint32_t dataSize = 0;
 
-    if (!HdfSbufReadBuffer((struct HdfSBuf *)dataBuf, (const void **)(&scanResult), &dataSize)
-        || dataSize != sizeof(WifiScanResult)) {
+    if (!HdfSbufReadBuffer(dataBuf, (const void **)(&scanResult), &dataSize) || dataSize != sizeof(WifiScanResult)) {
         HDF_LOGE("%s: HdfSbufReadBuffer scanResult failed!", __func__);
         return;
     }
@@ -96,7 +96,7 @@ static int32_t HalResetCallbackEvent(uint32_t eventId, void *data, const char *i
             printf("HalResetCallbackEvent: receive resetStatus=%d \n", g_resetStatus);
             break;
         case WIFI_EVENT_SCAN_RESULT:
-            HdiProcessScanResult((const struct HdfSBuf *)dataBuf);
+            HdiProcessScanResult(dataBuf);
             break;
         default:
             break;
@@ -118,7 +118,7 @@ HWTEST_F(HdfWifiServiceCTest, GetSupportFeatureComboTest_001, TestSize.Level1)
     int32_t rc = g_wlanObj->getSupportFeature(g_wlanObj, supType);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->getSupportCombo(g_wlanObj, combo);
-    ASSERT_EQ(rc, HDF_ERR_NOT_SUPPORT);
+    ASSERT_NE(rc, HDF_FAILURE);
 }
 
 /**
@@ -148,13 +148,12 @@ HWTEST_F(HdfWifiServiceCTest, CreateFeatureTest_002, TestSize.Level1)
  */
 HWTEST_F(HdfWifiServiceCTest, GetFeatureByIfNameTest_003, TestSize.Level1)
 {
-    const char *ifName = "wlan0";
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     struct WlanFeatureInfo *ifeature = nullptr;
 
     int32_t rc = g_wlanObj->createFeature(g_wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->getFeatureByIfName(g_wlanObj, ifName, (struct WlanFeatureInfo **)&ifeature);
+    rc = g_wlanObj->getFeatureByIfName(g_wlanObj, ifeature->ifName, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
@@ -289,16 +288,14 @@ HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_010, TestSize.Level1)
 {
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     struct WlanFeatureInfo *ifeature = nullptr;
-    int32_t *freqs = NULL;
+    int32_t freq[WLAN_FREQ_MAX_NUM] = {0};
     int32_t wlanBand = 0;
     uint32_t count = 0;
 
     int32_t rc = g_wlanObj->createFeature(g_wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->getFreqsWithBand(g_wlanObj, (struct WlanFeatureInfo *)ifeature, wlanBand, freqs, &count);
-    if (freqs != NULL) {
-        OsalMemFree(freqs);
-    }
+    rc = g_wlanObj->getFreqsWithBand(g_wlanObj, (struct WlanFeatureInfo *)ifeature, wlanBand, freq,
+        WLAN_FREQ_MAX_NUM, &count);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
@@ -364,7 +361,7 @@ HWTEST_F(HdfWifiServiceCTest, SetScanningMacAddressTest_013, TestSize.Level1)
     int32_t rc = g_wlanObj->createFeature(g_wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->setScanningMacAddress(g_wlanObj, (struct WlanFeatureInfo *)ifeature, scanMac, ETH_ADDR_LEN);
-    ASSERT_EQ(rc, HDF_ERR_NOT_SUPPORT);
+    ASSERT_NE(rc, HDF_FAILURE);
     rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
@@ -418,7 +415,6 @@ HWTEST_F(HdfWifiServiceCTest, ResetDriverTest_016, TestSize.Level1)
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->resetDriver(g_wlanObj, chipId);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    EXPECT_EQ(HDF_SUCCESS, g_resetStatus);
     sleep(RESET_TIME);
 }
 

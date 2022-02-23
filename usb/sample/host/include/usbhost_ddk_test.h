@@ -61,8 +61,8 @@ typedef enum {
 } AcmModuleTestCmdType;
 #endif
 
-int UsbHostDdkTestInit(const char *apiType);
-int UsbHostDdkTestAsyncRead(char *readSbuf);
+int32_t UsbHostDdkTestInit(const char *apiType);
+int32_t UsbHostDdkTestAsyncRead(char *readSbuf);
 void UsbHostDdkTestAsyncWrite(const char *buf);
 void UsbHostDdkTestSyncRead(char *readSbuf);
 void UsbHostDdkTestSyncWrite(const char *buf);
@@ -74,8 +74,8 @@ void UsbHostDdkTestSetBaudrate(uint32_t value);
 void UsbHostDdkTestGetBaudrate(char *readSbuf);
 void UsbHostDdkTestAddInterface(uint32_t value);
 void UsbHostDdkTestRemoveInterface(uint32_t value);
-int UsbHostDdkTestOpen(int cmdType);
-int UsbHostDdkTestClose(int cmdType);
+int32_t UsbHostDdkTestOpen(int32_t cmdType);
+int32_t UsbHostDdkTestClose(int32_t cmdType);
 
 void TestStdGetConf(void);
 void TestStdGetInterface(void);

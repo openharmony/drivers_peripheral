@@ -87,7 +87,7 @@ CamRetCode StreamOperator::IsStreamsSupported(OperationMode mode,
     CHECK_IF_EQUAL_RETURN_VALUE(inputIDSet.empty(), true, INVALID_ARGUMENT);
 
     auto uniqueIt = std::unique(checkStreamIdVec.begin(), checkStreamIdVec.end());
-    if (checkStreamIdVec.size() != std::distance(checkStreamIdVec.begin(), uniqueIt)) {
+    if (checkStreamIdVec.size() != (uint32_t)(std::distance(checkStreamIdVec.begin(), uniqueIt))) {
         CAMERA_LOGE("stream id must be unique");
         return INVALID_ARGUMENT;
     }
@@ -339,7 +339,7 @@ CamRetCode StreamOperator::GetStreamAttributes(std::vector<std::shared_ptr<Strea
         attribute->streamId_ = it.first;
         attribute->width_ = configuration.width;
         attribute->height_ = configuration.height;
-        attribute->overrideFormat_ = BufferAdapter::CameraFormatToPixelFormat(configuration.format);
+        attribute->overrideFormat_ = (int32_t)BufferAdapter::CameraFormatToPixelFormat(configuration.format);
         attribute->overrideDatasapce_ = configuration.dataspace;
         attribute->producerUsage_ = BufferAdapter::CameraUsageToGrallocUsage(configuration.usage);
         attribute->producerBufferCount_ = configuration.bufferCount;

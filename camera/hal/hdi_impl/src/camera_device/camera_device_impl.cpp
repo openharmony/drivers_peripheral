@@ -157,7 +157,7 @@ RetCode CameraDeviceImpl::GetEnabledFromCfg()
         OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, &entry);
     if (ret == 0) {
         CAMERA_LOGD("FindCameraMetadataIte tags = %{public}d. type = %{public}d", entry.count, entry.data_type);
-        for (int i = 0; i < entry.count; i++) {
+        for (uint32_t i = 0; i < entry.count; i++) {
             deviceMetaTypes_.push_back(*(entry.data.i32 + i));
         }
     }

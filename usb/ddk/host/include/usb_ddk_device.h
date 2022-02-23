@@ -54,7 +54,7 @@ struct UsbDeviceHandle {
     struct UsbDevice *dev;
     struct UsbSession *session;
     uint32_t caps;
-    int fd;
+    int32_t fd;
 };
 
 #endif /* USB_DDK_DEVICE_H */

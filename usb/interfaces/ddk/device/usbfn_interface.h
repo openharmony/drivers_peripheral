@@ -270,7 +270,7 @@ struct UsbFnRegistInfo {
  * @return Returns <b>0</b> if the operation is successful; returns a negative value
  * defined in {@link UsbErrorType} otherwise.
  */
-int UsbFnStartRecvInterfaceEvent(struct UsbFnInterface *interface, uint32_t eventMask,
+int32_t UsbFnStartRecvInterfaceEvent(struct UsbFnInterface *interface, uint32_t eventMask,
     UsbFnEventCallback callback, void *context);
 
 /**
@@ -281,7 +281,7 @@ int UsbFnStartRecvInterfaceEvent(struct UsbFnInterface *interface, uint32_t even
  * @return Returns <b>0</b> if the operation is successful; returns a negative
  * value defined in {@link UsbErrorType} otherwise.
  */
-int UsbFnStopRecvInterfaceEvent(struct UsbFnInterface *interface);
+int32_t UsbFnStopRecvInterfaceEvent(struct UsbFnInterface *interface);
 
 /**
  * @brief Enables a USB interface.
@@ -305,7 +305,7 @@ UsbFnInterfaceHandle UsbFnOpenInterface(struct UsbFnInterface *interface);
  * @return Returns <b>0</b> if the operation is successful; returns a negative value
  * defined in {@link UsbErrorType} otherwise.
  */
-int UsbFnCloseInterface(UsbFnInterfaceHandle handle);
+int32_t UsbFnCloseInterface(UsbFnInterfaceHandle handle);
 
 /**
  * @brief Obtains USB pipe information based on the specified pipe ID.
@@ -317,7 +317,7 @@ int UsbFnCloseInterface(UsbFnInterfaceHandle handle);
  * @return Returns <b>0</b> if the operation is successful; returns a negative
  * value defined in {@link UsbErrorType} otherwise.
  */
-int UsbFnGetInterfacePipeInfo(struct UsbFnInterface *interface, uint8_t pipeId, struct UsbFnPipeInfo *info);
+int32_t UsbFnGetInterfacePipeInfo(struct UsbFnInterface *interface, uint8_t pipeId, struct UsbFnPipeInfo *info);
 
 /**
  * @brief Registers custom attributes for a USB interface.
@@ -331,7 +331,7 @@ int UsbFnGetInterfacePipeInfo(struct UsbFnInterface *interface, uint8_t pipeId, 
  * @return Returns <b>0</b> if the operation is successful; returns a negative
  * value defined in {@link UsbErrorType} otherwise.
  */
-int UsbFnRegistInterfaceProp(const struct UsbFnInterface *interface,
+int32_t UsbFnRegistInterfaceProp(const struct UsbFnInterface *interface,
     const struct UsbFnRegistInfo *registInfo);
 
 /**
@@ -351,7 +351,7 @@ int UsbFnRegistInterfaceProp(const struct UsbFnInterface *interface,
  * @return Returns <b>0</b> if the operation is successful; returns a negative
  * value defined in {@link UsbErrorType} otherwise.
  */
-int UsbFnGetInterfaceProp(const struct UsbFnInterface *interface,
+int32_t UsbFnGetInterfaceProp(const struct UsbFnInterface *interface,
     const char *name, char *value);
 
 /**
@@ -371,7 +371,7 @@ int UsbFnGetInterfaceProp(const struct UsbFnInterface *interface,
  * @return Returns <b>0</b> if the operation is successful; returns a negative
  * value defined in {@link UsbErrorType} otherwise.
  */
-int UsbFnSetInterfaceProp(const struct UsbFnInterface *interface,
+int32_t UsbFnSetInterfaceProp(const struct UsbFnInterface *interface,
     const char *name, const char *value);
 
 #endif /* USBFN_INTERFACE_H */

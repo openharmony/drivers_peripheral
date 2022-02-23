@@ -8,8 +8,8 @@
       "subsystem": "hdf",
       "syscap": [ "" ],
       "adapter_system_type": ["standard", "small"],
-      "rom": "1000KB",
-      "ram": "1000KB",
+      "rom": "981KB",
+      "ram": "6000KB",
       "deps": {
         "components": [
           "device_driver_framework",
@@ -26,11 +26,10 @@
         ],
         "inner_kits": [
           {
-            "name": "//drivers/peripheral/power/interfaces/hdi/power/v1_0:libpower_proxy_1.0",
+            "name": "//drivers/interface/power/v1_0:libpower_proxy_1.0",
             "header": {
               "header_files": [
-                  "power_hdi_callback_service.h",
-                  "power_types.h"
+                  "power_hdi_callback_impl.h"
               ],
               "header_base": "//drivers/peripheral/power/interfaces/include"
             }

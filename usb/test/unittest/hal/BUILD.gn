@@ -37,7 +37,7 @@ ohos_unittest("test_transfer") {
   ]
 
   external_deps = [
-    "ability_runtime:want",
+    "ability_base:want",
     "bundle_framework:appexecfwk_base",
     "ces_standard:cesfwk_innerkits",
     "device_driver_framework:libhdf_utils",
@@ -61,7 +61,7 @@ ohos_unittest("test_device") {
   ]
 
   external_deps = [
-    "ability_runtime:want",
+    "ability_base:want",
     "bundle_framework:appexecfwk_base",
     "ces_standard:cesfwk_innerkits",
     "device_driver_framework:libhdf_utils",
@@ -86,7 +86,7 @@ ohos_unittest("test_function") {
   ]
 
   external_deps = [
-    "ability_runtime:want",
+    "ability_base:want",
     "bundle_framework:appexecfwk_base",
     "ces_standard:cesfwk_innerkits",
     "device_driver_framework:libhdf_utils",
@@ -112,7 +112,7 @@ ohos_unittest("test_request") {
   ]
 
   external_deps = [
-    "ability_runtime:want",
+    "ability_base:want",
     "bundle_framework:appexecfwk_base",
     "ces_standard:cesfwk_innerkits",
     "device_driver_framework:libhdf_utils",

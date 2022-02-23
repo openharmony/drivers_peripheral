@@ -82,8 +82,8 @@ int32_t RawInit(struct UsbSession **session);
 int32_t RawExit(const struct UsbSession *session);
 struct UsbDeviceHandle *RawOpenDevice(const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr);
 int32_t RawCloseDevice(const struct UsbDeviceHandle *devHandle);
-int32_t RawClaimInterface(struct UsbDeviceHandle *devHandle, int interfaceNumber);
-struct UsbHostRequest *AllocRequest(const struct UsbDeviceHandle *devHandle,  int isoPackets, size_t length);
+int32_t RawClaimInterface(struct UsbDeviceHandle *devHandle, int32_t interfaceNumber);
+struct UsbHostRequest *AllocRequest(const struct UsbDeviceHandle *devHandle,  int32_t isoPackets, size_t length);
 int32_t FreeRequest(const struct UsbHostRequest *request);
 int32_t RawFillBulkRequest(struct UsbHostRequest *request, const struct UsbDeviceHandle *devHandle,
     const struct UsbFillRequestData *fillRequestData);
@@ -100,34 +100,34 @@ int32_t RawSendBulkRequest(const struct UsbHostRequest *request, const struct Us
     const struct UsbRequestData *requestData);
 int32_t RawSendInterruptRequest(const struct UsbHostRequest *request, const struct UsbDeviceHandle *devHandle,
     const struct UsbRequestData *requestData);
-struct UsbHostRequest *RawAllocRequest(const struct UsbDeviceHandle *devHandle, int isoPackets, int length);
+struct UsbHostRequest *RawAllocRequest(const struct UsbDeviceHandle *devHandle, int32_t isoPackets, int32_t length);
 int32_t RawFreeRequest(const struct UsbHostRequest *request);
 int32_t RawGetConfigDescriptor(const struct UsbDevice *dev, uint8_t configIndex,
     struct UsbRawConfigDescriptor **config);
 void RawClearConfiguration(struct UsbRawConfigDescriptor *config);
-int32_t RawGetConfiguration(const struct UsbDeviceHandle *devHandle, int *config);
-int32_t RawSetConfiguration(const struct UsbDeviceHandle *devHandle, int configuration);
+int32_t RawGetConfiguration(const struct UsbDeviceHandle *devHandle, int32_t *config);
+int32_t RawSetConfiguration(const struct UsbDeviceHandle *devHandle, int32_t configuration);
 int32_t RawGetDescriptor(const struct UsbHostRequest *request, const struct UsbDeviceHandle *devHandle,
     const struct UsbRawDescriptorParam *param, const unsigned char *data);
 struct UsbDevice *RawGetDevice(const struct UsbDeviceHandle *devHandle);
 int32_t RawGetDeviceDescriptor(const struct UsbDevice *dev, struct UsbDeviceDescriptor *desc);
-int32_t RawReleaseInterface(struct UsbDeviceHandle *devHandle, int interfaceNumber);
+int32_t RawReleaseInterface(struct UsbDeviceHandle *devHandle, int32_t interfaceNumber);
 int32_t RawResetDevice(const struct UsbDeviceHandle *devHandle);
 int32_t RawSubmitRequest(const struct UsbHostRequest *request);
 int32_t RawCancelRequest(const struct UsbHostRequest *request);
 int32_t RawHandleRequest(const struct UsbDeviceHandle *devHandle);
 int32_t RawClearHalt(const struct UsbDeviceHandle *devHandle, uint8_t pipeAddress);
-int RawHandleRequestCompletion(struct UsbHostRequest *request, UsbRequestStatus status);
+int32_t RawHandleRequestCompletion(struct UsbHostRequest *request, UsbRequestStatus status);
 int32_t RawSetInterfaceAltsetting(
     const struct UsbDeviceHandle *devHandle, uint8_t interfaceNumber, uint8_t settingIndex);
 UsbRawTidType RawGetTid(void);
 int32_t RawRegisterSignal(void);
 int32_t RawKillSignal(struct UsbDeviceHandle *devHandle, UsbRawTidType tid);
-int RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddRemoveInfo infoData);
+int32_t RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddRemoveInfo infoData);
 void RawRequestListInit(struct UsbDevice *deviceObj);
 void *RawUsbMemAlloc(size_t size);
 void *RawUsbMemCalloc(size_t size);
 void RawUsbMemFree(void *mem);
-int RawUsbMemTestTrigger(bool enable);
+int32_t RawUsbMemTestTrigger(bool enable);
 
 #endif /* USB_RAW_API_LIBRARY_H */

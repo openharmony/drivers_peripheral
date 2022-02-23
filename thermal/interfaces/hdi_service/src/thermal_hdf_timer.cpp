@@ -25,49 +25,78 @@
 #include <sys/timerfd.h>
 #include <linux/netlink.h>
 
-namespace hdi {
-namespace thermal {
-namespace v1_0 {
+#define HDF_LOG_TAG ThermalHdfTimer
+
+namespace OHOS {
+namespace HDI {
+namespace Thermal {
+namespace V1_0 {
 namespace {
-const int ERR_INVALID_FD = -1;
+const int32_t ERR_INVALID_FD = -1;
 const int32_t MS_PER_SECOND = 1000;
-const std::string POLLING_V1 = "v1";
-const std::string POLLING_V2 = "v2";
+const std::string THERMAL_SIMULATION_TAG = "sim_tz";
 }
 ThermalHdfTimer::ThermalHdfTimer(const std::shared_ptr<ThermalSimulationNode> &node,
-    const sptr<IThermalCallback> &theramalCb) : node_(node), theramalCb_(theramalCb)
+    const std::shared_ptr<ThermalZoneManager> &thermalZoneMgr)
 {
+    node_ = node;
+    thermalZoneMgr_ = thermalZoneMgr;
+    reportTime_ = 0;
+}
+
+void ThermalHdfTimer::SetThermalEventCb(const sptr<IThermalCallback> &thermalCb)
+{
+    thermalCb_ = thermalCb;
+}
+
+void ThermalHdfTimer::SetSimluationFlag()
+{
+    auto baseConfigList = ThermalHdfConfig::GetInsance().GetBaseConfig()->GetBaseItem();
+    if (baseConfigList.empty()) {
+        HDF_LOGE("%{public}s: baseConfigList is empty", __func__);
+        return;
+    }
+    auto baseIter = std::find(baseConfigList.begin(), baseConfigList.end(), THERMAL_SIMULATION_TAG);
+    if (baseIter != baseConfigList.end()) {
+        isSim_ = atoi(baseIter->value.c_str());
+        HDF_LOGI("%{public}s: isSim value:%{public}d", __func__, isSim_);
+    } else {
+        HDF_LOGI("%{public}s: not found", __func__);
+    }
+}
+
+void ThermalHdfTimer::SetSimFlag(int32_t flag)
+{
+    isSim_ = flag;
+}
+
+int32_t ThermalHdfTimer::GetSimluationFlag()
+{
+    return isSim_;
 }
 
 int32_t ThermalHdfTimer::CreateProviderFd()
 {
-    HDF_LOGI("%{public}s enter", __func__);
     timerFd_ = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
     if (timerFd_ == ERR_INVALID_FD) {
         HDF_LOGE("%{public}s epoll create failed, epFd_ is invalid", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    auto intervalMap = ThermalHdfConfig::GetInsance().GetIntervalMap();
-    auto v2 = intervalMap.find(POLLING_V2);
-    if (v2 != intervalMap.end()) {
-        int thermalPollingV2 = v2->second;
-        HDF_LOGI("%{public}s: %{public}d", __func__, thermalPollingV2);
-        SetTimerInterval(thermalPollingV2, timerFd_);
-        fcntl(timerFd_, F_SETFL, O_NONBLOCK);
-        callbackHandler_.insert(std::make_pair(timerFd_, &ThermalHdfTimer::TimerProviderCallback));
-        if (RegisterCallback(timerFd_, EVENT_TIMER_FD, epFd_)) {
-            HDF_LOGI("%{public}s register Timer event failed", __func__);
-        }
+    HDF_LOGI("%{public}s: interval %{public}d", __func__, thermalZoneMgr_->maxCd_);
+    SetTimerInterval(thermalZoneMgr_->maxCd_, timerFd_);
+    fcntl(timerFd_, F_SETFL, O_NONBLOCK);
+    callbackHandler_.insert(std::make_pair(timerFd_, &ThermalHdfTimer::TimerProviderCallback));
+    if (RegisterCallback(timerFd_, EVENT_TIMER_FD, epFd_)) {
+        HDF_LOGI("%{public}s register Timer event failed", __func__);
     }
 
     HDF_LOGI("%{public}s return", __func__);
     return HDF_SUCCESS;
 }
 
-int32_t ThermalHdfTimer::RegisterCallback(const int fd, const EventType et, int32_t epfd)
+int32_t ThermalHdfTimer::RegisterCallback(const int32_t fd, const EventType et, int32_t epfd)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     struct epoll_event ev;
 
     ev.events = EPOLLIN;
@@ -88,7 +117,6 @@ int32_t ThermalHdfTimer::RegisterCallback(const int fd, const EventType et, int3
 
 void ThermalHdfTimer::TimerProviderCallback(void *service)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     unsigned long long timers;
 
     if (read(timerFd_, &timers, sizeof(timers)) == -1) {
@@ -96,13 +124,14 @@ void ThermalHdfTimer::TimerProviderCallback(void *service)
         return;
     }
 
-    Notify();
+    reportTime_ = reportTime_ + 1;
+    ReportThermalData();
+    ResetCount();
     return;
 }
 
-void ThermalHdfTimer::SetTimerInterval(int interval, int32_t timerfd)
+void ThermalHdfTimer::SetTimerInterval(int32_t interval, int32_t timerfd)
 {
-    HDF_LOGI("%{public}s enter, start SetTimerInterval: %{public}d", __func__, timerfd);
     struct itimerspec itval;
 
     if (timerfd == ERR_INVALID_FD) {
@@ -127,8 +156,7 @@ void ThermalHdfTimer::SetTimerInterval(int interval, int32_t timerfd)
 
 int32_t ThermalHdfTimer::InitProviderTimer()
 {
-    HDF_LOGI("%{public}s:  Enter", __func__);
-    int32_t ret = -1;
+    int32_t ret;
     epFd_ = epoll_create1(EPOLL_CLOEXEC);
 
     ret = CreateProviderFd();
@@ -141,7 +169,7 @@ int32_t ThermalHdfTimer::InitProviderTimer()
 
 int32_t ThermalHdfTimer::LoopingThreadEntry(void *arg, int32_t epfd)
 {
-    int nevents = 0;
+    int32_t nevents = 0;
     size_t eventct = callbackHandler_.size();
     struct epoll_event events[eventct];
     HDF_LOGI("%{public}s: %{public}d, %{public}zu", __func__, epfd, eventct);
@@ -150,7 +178,7 @@ int32_t ThermalHdfTimer::LoopingThreadEntry(void *arg, int32_t epfd)
         if (nevents == -1) {
             continue;
         }
-        for (int n = 0; n < nevents; ++n) {
+        for (int32_t n = 0; n < nevents; ++n) {
             if (events[n].data.ptr) {
                 ThermalHdfTimer *func = const_cast<ThermalHdfTimer *>(this);
                 (callbackHandler_.find(events[n].data.fd)->second)(func, arg);
@@ -166,117 +194,68 @@ void ThermalHdfTimer::Run(void *service, int32_t epfd)
 
 void ThermalHdfTimer::StartThread(void *service)
 {
-    HDF_LOGI("%{public}s: Enter", __func__);
-    int ret = -1;
-    ret = InitProviderTimer();
+    int32_t ret = InitProviderTimer();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s init Timer failed, ret: %{public}d", __func__, ret);
         return;
     }
     Run(service, epFd_);
-    HDF_LOGI("return");
 }
 
 int32_t ThermalHdfTimer::Init()
 {
-    HDF_LOGI("%{public}s: Enter", __func__);
     StartThread(this);
     return HDF_SUCCESS;
 }
 
-void ThermalHdfTimer::Notify()
+void ThermalHdfTimer::ReportThermalData()
 {
-    UpdatePollingInfo();
-    if (theramalCb_ == nullptr) {
-        HDF_LOGE("%{public}s: check theramalCb_ failed", __func__);
-        return;
-    } else {
-        HDF_LOGI("%{public}s: enter", __func__);
-        for (auto item = tzInfoEventV2_.info.begin(); item != tzInfoEventV2_.info.end(); item++) {
-            HDF_LOGI("%{public}s: type: %{public}s", __func__, item->type.c_str());
-            HDF_LOGI("%{public}s: temp: %{public}d", __func__, item->temp);
-        }
-        theramalCb_->OnThermalDataEvent(tzInfoEventV2_);
-    }
-    tzInfoEventV2_.info.clear();
-    tzInfoEventV2_.info.clear();
-}
-
-void ThermalHdfTimer::UpdateTzInfo(const std::string &pollingName, HdfThermalCallbackInfo& infoEvent)
-{
-    HDF_LOGI("%{public}s: pollingName: %{public}s", __func__, pollingName.c_str());
-    HdfThermalCallbackInfo tzInfoEvent;
-    tzInfoEvent.info = node_->GetTzInfoList();
-    HDF_LOGI("%{public}s: thermal zone event size:%{public}zu", __func__, tzInfoEvent.info.size());
-    ThermalHdfConfig::ThermalTypeMap sensorTypeMap = ThermalHdfConfig::GetInsance().GetSensorTypeMap();
-    auto pollingIter = sensorTypeMap.find(pollingName);
-    if (pollingIter != sensorTypeMap.end()) {
-        auto tzInfo = pollingIter->second->GetXMLThermalZoneInfo();
-        auto tnInfo = pollingIter->second->GetXMLThermalNodeInfo();
-        for (auto item = tzInfoEvent.info.begin(); item != tzInfoEvent.info.end(); item++) {
-            HDF_LOGI("%{public}s: type: %{public}s", __func__, item->type.c_str());
-            HDF_LOGI("%{public}s: temp: %{public}d", __func__, item->temp);
-            CompareTzInfo(tzInfo, *item, infoEvent);
-            CompareTnInfo(tnInfo, *item, infoEvent);
-        }
-    }
-}
-
-void ThermalHdfTimer::CompareTzInfo(const std::vector<XMLThermalZoneInfo> &tzInfoList, const ThermalZoneInfo &tzInfo,
-    HdfThermalCallbackInfo& infoEvent)
-{
-    HDF_LOGI("%{public}s: enter", __func__);
-    if (tzInfoList.empty()) {
+    if (thermalCb_ == nullptr) {
+        HDF_LOGE("%{public}s: check thermalCb_ failed", __func__);
         return;
     }
-    ThermalZoneInfo info;
-    for (auto iter = tzInfoList.begin(); iter != tzInfoList.end(); iter++) {
-        HDF_LOGI("%{public}s: type: %{public}s", __func__, tzInfo.type.c_str());
-        if (iter->isReplace) {
-            if (tzInfo.type.find(iter->type) != std::string::npos) {
-                info.temp = tzInfo.temp;
-                info.type = iter->replace;
-                infoEvent.info.push_back(info);
-            }
-        } else {
-            if (tzInfo.type.find(iter->type) != std::string::npos) {
-                info.temp = tzInfo.temp;
-                info.type = iter->type;
-                infoEvent.info.push_back(info);
-            }
+
+    thermalZoneMgr_->ReportThermalZoneData(reportTime_, multipleList_);
+    tzInfoEvent_ = thermalZoneMgr_->tzInfoAcaualEvent_;
+    // callback thermal event
+    thermalCb_->OnThermalDataEvent(tzInfoEvent_);
+}
+
+void ThermalHdfTimer::ResetCount()
+{
+    HDF_LOGI("%{public}s: multipleList_:%{public}zu", __func__, multipleList_.size());
+    if (multipleList_.empty()) return;
+
+    int32_t maxValue = *(std::max_element(multipleList_.begin(), multipleList_.end()));
+    if (reportTime_ == maxValue) {
+        HDF_LOGI("%{public}s: reportTime:%{public}d", __func__, reportTime_);
+        reportTime_ = 0;
+    }
+    tzInfoEvent_.info.clear();
+}
+
+void ThermalHdfTimer::DumpSensorConfigInfo()
+{
+    auto sensorTypeMap = ThermalHdfConfig::GetInsance().GetSensorTypeMap();
+    for (auto sensorIter : sensorTypeMap) {
+        HDF_LOGI("%{public}s: groupName %{public}s", __func__, sensorIter.first.c_str());
+        HDF_LOGI("%{public}s: interval %{public}d", __func__, sensorIter.second->GetInterval());
+        HDF_LOGI("%{public}s: multiple %{public}d", __func__, sensorIter.second->multiple_);
+        for (auto tzIter : sensorIter.second->GetXMLThermalZoneInfo()) {
+            HDF_LOGI("%{public}s: type %{public}s", __func__, tzIter.type.c_str());
+            HDF_LOGI("%{public}s: replace %{public}s", __func__, tzIter.replace.c_str());
+        }
+        for (auto tnIter : sensorIter.second->GetXMLThermalNodeInfo()) {
+            HDF_LOGI("%{public}s: type %{public}s", __func__, tnIter.type.c_str());
+            HDF_LOGI("%{public}s: path %{public}s", __func__, tnIter.path.c_str());
+        }
+        for (auto dataIter : sensorIter.second->thermalDataList_) {
+            HDF_LOGI("%{public}s: data type %{public}s", __func__, dataIter.type.c_str());
+            HDF_LOGI("%{public}s: data temp path %{public}s", __func__, dataIter.tempPath.c_str());
         }
     }
 }
-
-void ThermalHdfTimer::CompareTnInfo(const std::vector<XMLThermalNodeInfo> &tnInfoList, const ThermalZoneInfo &tzInfo,
-    HdfThermalCallbackInfo& infoEvent)
-{
-    HDF_LOGI("%{public}s: enter", __func__);
-    if (tnInfoList.empty()) {
-        return;
-    }
-    ThermalZoneInfo info;
-    for (auto iter = tnInfoList.begin(); iter != tnInfoList.end(); iter++) {
-        HDF_LOGI("%{public}s: type: %{public}s", __func__, tzInfo.type.c_str());
-        if (tzInfo.type.find(iter->type) != std::string::npos) {
-            info.temp = tzInfo.temp;
-            info.type = iter->type;
-            infoEvent.info.push_back(info);
-        }
-    }
-}
-
-void ThermalHdfTimer::UpdatePollingInfo()
-{
-    int32_t ret = -1;
-    ret = node_->ParserSimulationNode();
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: failed to parser simulation thermal zone info. ret: %{public}d", __func__, ret);
-        return;
-    }
-    UpdateTzInfo(POLLING_V1, tzInfoEventV1_);
-    UpdateTzInfo(POLLING_V2, tzInfoEventV2_);
-}
-} // v1_0
-} // thermal
-} // hdi
+} // V1_0
+} // Thermal
+} // HDI
+} // OHOS

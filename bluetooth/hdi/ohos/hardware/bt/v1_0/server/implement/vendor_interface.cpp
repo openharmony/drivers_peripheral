@@ -31,7 +31,7 @@ namespace OHOS {
 namespace HDI {
 namespace BT {
 namespace V1_0 {
-
+constexpr int MAX_BUFFER_SIZE = 1024;
 bt_vendor_callbacks_t VendorInterface::vendorCallbacks_ = {
     .size = sizeof(bt_vendor_callbacks_t),
     .init_cb = VendorInterface::OnInitCallback,
@@ -46,6 +46,37 @@ VendorInterface::VendorInterface()
 VendorInterface::~VendorInterface()
 {
     CleanUp();
+}
+
+bool VendorInterface::WatchHciChannel(const ReceiveCallback &receiveCallback)
+{
+    int channel[HCI_MAX_CHANNEL] = {0};
+    int channelCount = vendorInterface_->op(bt_opcode_t::BT_OP_HCI_CHANNEL_OPEN, channel);
+    if (channelCount < 1 || channelCount > HCI_MAX_CHANNEL) {
+        HDF_LOGE("vendorInterface_->op BT_OP_HCI_CHANNEL_OPEN failed ret:%d.", channelCount);
+        return false;
+    }
+
+    if (channelCount == 1) {
+        auto h4 = std::make_shared<HCI::H4Protocol>(channel[0],
+            receiveCallback.onAclReceive,
+            receiveCallback.onScoReceive,
+            std::bind(&VendorInterface::OnEventReceived, this, std::placeholders::_1));
+        watcher_.AddFdToWatcher(channel[0], std::bind(&HCI::H4Protocol::ReadData, h4, std::placeholders::_1));
+        hci_ = h4;
+    } else {
+        auto mct = std::make_shared<HCI::MctProtocol>(channel,
+            receiveCallback.onAclReceive,
+            receiveCallback.onScoReceive,
+            std::bind(&VendorInterface::OnEventReceived, this, std::placeholders::_1));
+        watcher_.AddFdToWatcher(
+            channel[hci_channels_t::HCI_ACL_IN], std::bind(&HCI::MctProtocol::ReadAclData, mct, std::placeholders::_1));
+        watcher_.AddFdToWatcher(
+            channel[hci_channels_t::HCI_EVT], std::bind(&HCI::MctProtocol::ReadEventData, mct, std::placeholders::_1));
+        hci_ = mct;
+    }
+
+    return true;
 }
 
 bool VendorInterface::Initialize(
@@ -69,8 +100,10 @@ bool VendorInterface::Initialize(
     }
 
     auto bluetoothAddress = BluetoothAddress::GetDeviceAddress();
-    std::vector<uint8_t> address;
-    bluetoothAddress->ReadAddress(address);
+    std::vector<uint8_t> address = { 0, 0, 0, 0, 0, 0 };
+    if (bluetoothAddress != nullptr) {
+        bluetoothAddress->ReadAddress(address);
+    }
 
     int result = vendorInterface_->init(&vendorCallbacks_, address.data());
     if (result != 0) {
@@ -84,30 +117,8 @@ bool VendorInterface::Initialize(
         return false;
     }
 
-    int channel[HCI_MAX_CHANNEL] = {0};
-    int channelCount = vendorInterface_->op(bt_opcode_t::BT_OP_HCI_CHANNEL_OPEN, channel);
-    if (channelCount < 1 || channelCount > HCI_MAX_CHANNEL) {
-        HDF_LOGE("vendorInterface_->op BT_OP_HCI_CHANNEL_OPEN failed ret:%d.", channelCount);
+    if (!WatchHciChannel(receiveCallback)) {
         return false;
-    }
-    HDF_LOGI("%{public}s, channelCount: %{public}d", __func__, channelCount);
-    if (channelCount == 1) {
-        auto h4 = std::make_shared<HCI::H4Protocol>(channel[0],
-            receiveCallback.onAclReceive,
-            receiveCallback.onScoReceive,
-            std::bind(&VendorInterface::OnEventReceived, this, std::placeholders::_1));
-        watcher_.AddFdToWatcher(channel[0], std::bind(&HCI::H4Protocol::ReadData, h4, std::placeholders::_1));
-        hci_ = h4;
-    } else {
-        auto mct = std::make_shared<HCI::MctProtocol>(channel,
-            receiveCallback.onAclReceive,
-            receiveCallback.onScoReceive,
-            std::bind(&VendorInterface::OnEventReceived, this, std::placeholders::_1));
-        watcher_.AddFdToWatcher(
-            channel[hci_channels_t::HCI_ACL_IN], std::bind(&HCI::MctProtocol::ReadAclData, mct, std::placeholders::_1));
-        watcher_.AddFdToWatcher(
-            channel[hci_channels_t::HCI_EVT], std::bind(&HCI::MctProtocol::ReadEventData, mct, std::placeholders::_1));
-        hci_ = mct;
     }
 
     if (!watcher_.Start()) {
@@ -177,12 +188,18 @@ void VendorInterface::OnInitCallback(bt_op_result_t result)
 
 void *VendorInterface::OnMallocCallback(int size)
 {
+    if (size <= 0 || size > MAX_BUFFER_SIZE) {
+        HDF_LOGE("%{public}s, size is invalid", __func__);
+        return nullptr;
+    }
     return malloc(size);
 }
 
 void VendorInterface::OnFreeCallback(void *buf)
 {
-    free(buf);
+    if (buf != nullptr) {
+        free(buf);
+    }
 }
 
 uint8_t VendorInterface::OnCmdXmitCallback(uint16_t opcode, void *buf)

@@ -13,9 +13,23 @@
  * limitations under the License.
  */
 
-package hdi.power.v1_0;
+#include "power_hdi_callback_impl.h"
+#include <hdf_base.h>
 
-[callback] interface IPowerHdiCallback {
-    OnSuspend();
-    OnWakeup();
+namespace OHOS {
+namespace HDI {
+namespace Power {
+namespace V1_0 {
+int32_t PowerHdiCallbackImpl::OnSuspend()
+{
+    return HDF_SUCCESS;
 }
+
+int32_t PowerHdiCallbackImpl::OnWakeup()
+{
+    return HDF_SUCCESS;
+}
+} // V1_0
+} // Power
+} // HDI
+} // OHOS

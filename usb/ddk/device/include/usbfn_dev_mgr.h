@@ -40,12 +40,12 @@ struct UsbFnDeviceMgr {
 
 const struct UsbFnDeviceMgr *UsbFnMgrDeviceCreate(const char *udcName,
     struct UsbFnDeviceDesc *des, const struct DeviceResourceNode *node);
-int UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice);
+int32_t UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice);
 const struct UsbFnDeviceMgr *UsbFnMgrDeviceGet(const char *udcName);
-int UsbFnMgrDeviceGetState(struct UsbFnDevice *fnDevice, UsbFnDeviceState *devState);
+int32_t UsbFnMgrDeviceGetState(struct UsbFnDevice *fnDevice, UsbFnDeviceState *devState);
 const struct UsbFnInterfaceMgr *UsbFnMgrDeviceGetInterface(struct UsbFnDevice *fnDevice, uint8_t interfaceIndex);
-int UsbFnMgrStartRecvEvent(struct UsbFnInterface *interface, uint32_t eventMask,
+int32_t UsbFnMgrStartRecvEvent(struct UsbFnInterface *interface, uint32_t eventMask,
     UsbFnEventCallback callback, void *context);
-int UsbFnStopRecvEvent(struct UsbFnInterface *interface);
+int32_t UsbFnStopRecvEvent(struct UsbFnInterface *interface);
 
 #endif /* USBFN_DEV_MGR_H */

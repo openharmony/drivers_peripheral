@@ -22,7 +22,7 @@ ohos_unittest("hdf_vibrator_hdi_test_performance") {
 
   include_dirs = []
 
-  sources = [ "hdf_vibrator_hdi_test_performance.cpp" ]
+  sources = [ "hdf_vibrator_hdi_performance_test.cpp" ]
   cflags = [
     "-Wall",
     "-Wextra",

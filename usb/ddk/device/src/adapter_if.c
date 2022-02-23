@@ -117,16 +117,16 @@ static bool IsDeviceDirExist(const char *deviceName)
     return IsDirExist(tmp);
 }
 
-static int UsbFnWriteFile(const char *path, const char *str)
+static int32_t UsbFnWriteFile(const char *path, const char *str)
 {
-    int ret;
+    int32_t ret;
+    if (strlen(str) == 0) {
+        return 0;
+    }
     FILE *fp = fopen(path, "w");
     if (fp == NULL) {
         HDF_LOGE("%s: UsbFnWriteFile failure!", __func__);
         return HDF_ERR_BAD_FD;
-    }
-    if (strlen(str) == 0) {
-        return 0;
     }
     ret = fwrite(str, strlen(str), 1, fp);
     if (ret != 1) {
@@ -141,7 +141,7 @@ static int UsbFnWriteFile(const char *path, const char *str)
     return 0;
 }
 
-static int UsbFnWriteProp(const char *deviceName, const char *propName, uint32_t propValue)
+static int32_t UsbFnWriteProp(const char *deviceName, const char *propName, uint32_t propValue)
 {
     char tmp[MAX_PATHLEN] = {0};
     char tmpVal[MAX_NAMELEN] = {0};
@@ -166,10 +166,10 @@ static int UsbFnWriteProp(const char *deviceName, const char *propName, uint32_t
     return UsbFnWriteFile(tmp, tmpVal);
 }
 
-static int UsbFnWriteConfString(const char *deviceName,
-    int configVal, uint16_t lang, const char *stringValue)
+static int32_t UsbFnWriteConfString(const char *deviceName,
+    int32_t configVal, uint16_t lang, const char *stringValue)
 {
-    int ret;
+    int32_t ret;
     char tmp[MAX_PATHLEN] = {0};
     char tmpPath[MAX_PATHLEN] = {0};
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/configs/b.%d/strings/0x%x",
@@ -197,10 +197,10 @@ static int UsbFnWriteConfString(const char *deviceName,
     return ret;
 }
 
-static int UsbFnWriteDesString(const char *deviceName,
+static int32_t UsbFnWriteDesString(const char *deviceName,
     uint16_t lang, const char *stringName, const char *stringValue)
 {
-    int ret;
+    int32_t ret;
     char tmp[MAX_PATHLEN] = {0};
     char tmpPath[MAX_PATHLEN] = {0};
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/strings/0x%x",
@@ -227,9 +227,9 @@ static int UsbFnWriteDesString(const char *deviceName,
     return ret;
 }
 
-static int UsbFnAdapterCreateFunc(const char *configPath, const char *funcPath)
+static int32_t UsbFnAdapterCreateFunc(const char *configPath, const char *funcPath)
 {
-    int ret;
+    int32_t ret;
 
     ret = mkdir(funcPath, S_IREAD | S_IWRITE);
     if (ret) {
@@ -246,9 +246,9 @@ static int UsbFnAdapterCreateFunc(const char *configPath, const char *funcPath)
     return 0;
 }
 
-static int UsbFnReadFile(const char *path, char *str, uint16_t len)
+static int32_t UsbFnReadFile(const char *path, char *str, uint16_t len)
 {
-    int ret;
+    int32_t ret;
     FILE *fp = fopen(path, "r");
     if (fp == NULL) {
         HDF_LOGE("%s: fopen failure!", __func__);
@@ -267,9 +267,9 @@ static int UsbFnReadFile(const char *path, char *str, uint16_t len)
     return 0;
 }
 
-static int UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName, int enable)
+static int32_t UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName, int32_t enable)
 {
-    int ret, i;
+    int32_t ret, i;
     char tmp[MAX_PATHLEN] = {0};
     char udcTmp[MAX_NAMELEN] = {0};
     char tmpCmd[MAX_PATHLEN] = {0};
@@ -306,10 +306,10 @@ static int UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName, int
     return 0;
 }
 
-static int UsbFnAdapterOpenFn(void)
+static int32_t UsbFnAdapterOpenFn(void)
 {
-    int i;
-    int ep = -1;
+    int32_t i;
+    int32_t ep = -1;
     for (i = 0; i < OPEN_CNT; i++) {
         ep = open(USBFN_DEV, O_RDWR);
         if (ep > 0) {
@@ -323,7 +323,7 @@ static int UsbFnAdapterOpenFn(void)
     return ep;
 }
 
-static int UsbFnAdapterClosefn(int fd)
+static int32_t UsbFnAdapterClosefn(int32_t fd)
 {
     if (fd <= 0) {
         return HDF_ERR_INVALID_PARAM;
@@ -331,10 +331,10 @@ static int UsbFnAdapterClosefn(int fd)
     return close(fd);
 }
 
-static int UsbFnAdapterCreatInterface(const char *interfaceName, int nameLen)
+static int32_t UsbFnAdapterCreatInterface(const char *interfaceName, int32_t nameLen)
 {
-    int ret;
-    int fd;
+    int32_t ret;
+    int32_t fd;
     struct FuncNew fnnew;
     if (interfaceName == NULL || nameLen <= 0) {
         return HDF_ERR_INVALID_PARAM;
@@ -361,15 +361,15 @@ static int UsbFnAdapterCreatInterface(const char *interfaceName, int nameLen)
     return ret;
 }
 
-static int UsbFnAdapterDelInterface(const char *interfaceName, int nameLen)
+static int32_t UsbFnAdapterDelInterface(const char *interfaceName, int32_t nameLen)
 {
-    int ret;
+    int32_t ret;
     struct FuncNew fnnew;
     if (interfaceName == NULL || nameLen <= 0) {
         return HDF_ERR_INVALID_PARAM;
     }
 
-    int fd = UsbFnAdapterOpenFn();
+    int32_t fd = UsbFnAdapterOpenFn();
     if (fd <= 0) {
         return HDF_ERR_IO;
     }
@@ -389,7 +389,7 @@ static int UsbFnAdapterDelInterface(const char *interfaceName, int nameLen)
     return ret;
 }
 
-static int UsbFnAdapterOpenPipe(const char *interfaceName, int epIndex)
+static int32_t UsbFnAdapterOpenPipe(const char *interfaceName, int32_t epIndex)
 {
     if (interfaceName == NULL || epIndex < 0) {
         return HDF_ERR_INVALID_PARAM;
@@ -402,7 +402,7 @@ static int UsbFnAdapterOpenPipe(const char *interfaceName, int epIndex)
         return HDF_ERR_IO;
     }
 
-    int ep = -1;
+    int32_t ep = -1;
     for (int32_t i = 0; i < OPEN_CNT; i++) {
         ep = open(epName, O_RDWR);
         if (ep > 0) {
@@ -417,7 +417,7 @@ static int UsbFnAdapterOpenPipe(const char *interfaceName, int epIndex)
     return ep;
 }
 
-static int UsbFnAdapterClosePipe(int ep)
+static int32_t UsbFnAdapterClosePipe(int32_t ep)
 {
     if (ep <= 0) {
         return HDF_ERR_INVALID_PARAM;
@@ -447,12 +447,12 @@ static void GetHeaderStr(struct UsbFnStrings **strings,
     headerStr->lang_count = langCount;
 }
 
-static int UsbFnWriteStrings(int ep0, struct UsbFnStrings **strings)
+static int32_t UsbFnWriteStrings(int32_t ep0, struct UsbFnStrings **strings)
 {
     uint8_t *str = NULL;
     uint8_t *whereDec = NULL;
     uint32_t i, j;
-    int ret;
+    int32_t ret;
     struct UsbFunctionfsStringsHead headerStr = {0};
 
     GetHeaderStr(strings, &headerStr);
@@ -500,9 +500,9 @@ ERR:
     return HDF_FAILURE;
 }
 
-static int CopyCount(uint8_t **whereDec, uint32_t fsCount, uint32_t hsCount, uint32_t ssCount)
+static int32_t CopyCount(uint8_t **whereDec, uint32_t fsCount, uint32_t hsCount, uint32_t ssCount)
 {
-    int ret;
+    int32_t ret;
     if (fsCount) {
         ret = memcpy_s(*whereDec, sizeof(uint32_t), &fsCount, sizeof(uint32_t));
         if (ret != EOK) {
@@ -528,10 +528,10 @@ static int CopyCount(uint8_t **whereDec, uint32_t fsCount, uint32_t hsCount, uin
     return 0;
 }
 
-static int WriteFuncDescriptors(uint8_t **whereDec, struct UsbDescriptorHeader **headDes)
+static int32_t WriteFuncDescriptors(uint8_t **whereDec, struct UsbDescriptorHeader **headDes)
 {
-    int ret;
-    int i;
+    int32_t ret;
+    int32_t i;
 
     for (i = 0; headDes[i] != NULL; i++) {
         ret = memcpy_s(*whereDec, headDes[i]->bLength, headDes[i], headDes[i]->bLength);
@@ -547,7 +547,7 @@ static int WriteFuncDescriptors(uint8_t **whereDec, struct UsbDescriptorHeader *
 void GetCountAndHead(struct UsbFunctionfsDescsHeadV2 *header, uint32_t *fsCount,
     uint32_t *hsCount, uint32_t *ssCount, const struct UsbFnFunction *func)
 {
-    int i;
+    int32_t i;
     uint32_t lenCount = 0;
     uint32_t lenDes = 0;
     *fsCount = 0;
@@ -584,11 +584,11 @@ void GetCountAndHead(struct UsbFunctionfsDescsHeadV2 *header, uint32_t *fsCount,
     header->length = htole32(sizeof(struct UsbFunctionfsDescsHeadV2) + lenCount + lenDes);
 }
 
-static int UsbFnAdapterCreatPipes(int ep0, const struct UsbFnFunction *func)
+static int32_t UsbFnAdapterCreatPipes(int32_t ep0, const struct UsbFnFunction *func)
 {
     uint8_t *dec = NULL;
     uint8_t *whereDec = NULL;
-    int ret;
+    int32_t ret;
     uint32_t fsCount;
     uint32_t hsCount;
     uint32_t ssCount;
@@ -643,9 +643,9 @@ static int UsbFnAdapterCreatPipes(int ep0, const struct UsbFnFunction *func)
     return ret;
 }
 
-static int WriteDeviceId(const char *devName, const struct UsbDeviceDescriptor *desc)
+static int32_t WriteDeviceId(const char *devName, const struct UsbDeviceDescriptor *desc)
 {
-    int ret;
+    int32_t ret;
     ret = UsbFnWriteProp(devName, "idVendor", desc->idVendor);
     if (ret) {
         return HDF_ERR_INVALID_PARAM;
@@ -681,10 +681,10 @@ static int WriteDeviceId(const char *devName, const struct UsbDeviceDescriptor *
     return 0;
 }
 
-static int WriteDeviceDescriptor(const char *devName,
+static int32_t WriteDeviceDescriptor(const char *devName,
     const struct UsbDeviceDescriptor *desc, struct UsbFnStrings **strings)
 {
-    int i, ret;
+    int32_t i, ret;
     ret = WriteDeviceId(devName, desc);
     if (ret) {
         return HDF_ERR_INVALID_PARAM;
@@ -710,9 +710,9 @@ static int WriteDeviceDescriptor(const char *devName,
     return 0;
 }
 
-static int CreatDeviceDir(const char *devName)
+static int32_t CreatDeviceDir(const char *devName)
 {
-    int ret;
+    int32_t ret;
     char tmp[MAX_PATHLEN];
     memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s", CONFIGFS_DIR, devName);
@@ -729,10 +729,10 @@ static int CreatDeviceDir(const char *devName)
     return 0;
 }
 
-static int WriteConfPowerAttributes(const char *devName,
+static int32_t WriteConfPowerAttributes(const char *devName,
     struct UsbFnConfiguration *config, uint8_t confVal)
 {
-    int ret;
+    int32_t ret;
     char configName[MAX_PATHLEN];
     char tmp[MAX_PATHLEN], val[MAX_NAMELEN];
     memset_s(configName, MAX_PATHLEN, 0, MAX_PATHLEN);
@@ -779,10 +779,10 @@ static int WriteConfPowerAttributes(const char *devName,
     return 0;
 }
 
-static int CreatKernelFunc(const char *devName, const struct UsbFnFunction *functions,
+static int32_t CreatKernelFunc(const char *devName, const struct UsbFnFunction *functions,
     uint8_t confVal)
 {
-    int ret;
+    int32_t ret;
     char configPath[MAX_PATHLEN];
     char funcPath[MAX_PATHLEN];
 
@@ -808,10 +808,10 @@ static int CreatKernelFunc(const char *devName, const struct UsbFnFunction *func
 }
 
 static void CleanConfigFs(const char *devName, const char *funcName);
-static int CreatFunc(const char *devName, const struct UsbFnFunction *functions,
+static int32_t CreatFunc(const char *devName, const struct UsbFnFunction *functions,
     uint8_t confVal)
 {
-    int fd, ret;
+    int32_t fd, ret;
     char interfaceName[MAX_NAMELEN];
 
     ret = CreatKernelFunc(devName, functions, confVal);
@@ -852,7 +852,7 @@ static int CreatFunc(const char *devName, const struct UsbFnFunction *functions,
 
 static void DelConfigDevice(const char *deviceName)
 {
-    int ret;
+    int32_t ret;
     char tmp[MAX_PATHLEN];
     memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1,
@@ -889,7 +889,7 @@ static void DelConfigDevice(const char *deviceName)
 
 static void CleanConfigFs(const char *devName, const char *funcName)
 {
-    int ret;
+    int32_t ret;
     char tmp[MAX_PATHLEN];
 
     memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
@@ -911,7 +911,7 @@ static void CleanConfigFs(const char *devName, const char *funcName)
 
 static void CleanFunction(const char *devName, const char *funcName)
 {
-    int ret;
+    int32_t ret;
     ret = UsbFnAdapterDelInterface(funcName, strlen(funcName));
     if (ret) {
         HDF_LOGE("%s: UsbFnAdapterDelInterface failure!", __func__);
@@ -922,7 +922,7 @@ static void CleanFunction(const char *devName, const char *funcName)
 
 static void UsbFnAdapterCleanDevice(const char *devName)
 {
-    int ret;
+    int32_t ret;
     char tmp[MAX_PATHLEN];
     DIR *dir = NULL;
     struct dirent *ptr = NULL;
@@ -946,11 +946,11 @@ static void UsbFnAdapterCleanDevice(const char *devName)
     closedir(dir);
 }
 
-static int UsbFnAdapterDelDevice(const char *deviceName, const char *udcName,
+static int32_t UsbFnAdapterDelDevice(const char *deviceName, const char *udcName,
     struct UsbFnDeviceDesc *des)
 {
     uint32_t i, j;
-    int ret;
+    int32_t ret;
     if (deviceName == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
@@ -978,9 +978,9 @@ static int UsbFnAdapterDelDevice(const char *deviceName, const char *udcName,
     return 0;
 }
 
-static int UsbFnAdapterWaitUDC(const char *deviceName, const char *udcName)
+static int32_t UsbFnAdapterWaitUDC(const char *deviceName, const char *udcName)
 {
-    int ret, i;
+    int32_t ret, i;
     char tmp[MAX_PATHLEN] = {0};
     char udcTmp[MAX_NAMELEN] = {0};
     if (deviceName == NULL || udcName == NULL || IsDeviceDirExist(deviceName) == false) {
@@ -1003,10 +1003,10 @@ static int UsbFnAdapterWaitUDC(const char *deviceName, const char *udcName)
     return HDF_ERR_IO;
 }
 
-static int EnableDevice(const char *udcName,
+static int32_t EnableDevice(const char *udcName,
     const char *devName, struct UsbFnDeviceDesc *descriptor)
 {
-    int ret;
+    int32_t ret;
     (void)UsbFnAdapterWriteUDC(devName, "none", 0);
     if (!UsbFnAdapterWaitUDC(devName, udcName)) {
         return 0;
@@ -1021,7 +1021,7 @@ static int EnableDevice(const char *udcName,
 #define FFS_ADB "/config/usb_gadget/g1/functions/ffs.adb"
 #define FFS_CONFIG "/config/usb_gadget/g1/configs/b.1/f1"
 
-static bool CreateFun(struct UsbFnFunction *function, const char *devName, uint8_t *confVal, int *ret)
+static bool CreateFun(struct UsbFnFunction *function, const char *devName, uint8_t *confVal, int32_t *ret)
 {
     if (strncmp(function->funcName,
         FUNCTION_GENERIC, strlen(FUNCTION_GENERIC))) {
@@ -1035,11 +1035,11 @@ static bool CreateFun(struct UsbFnFunction *function, const char *devName, uint8
     return true;
 }
 
-static int UsbFnAdapterCreateDevice(const char *udcName,
+static int32_t UsbFnAdapterCreateDevice(const char *udcName,
     const char *devName, struct UsbFnDeviceDesc *descriptor)
 {
     uint32_t i, j;
-    int ret;
+    int32_t ret;
     uint8_t confVal;
 
     (void)symlink(FFS_ADB, FFS_CONFIG);
@@ -1090,9 +1090,9 @@ static int UsbFnAdapterCreateDevice(const char *udcName,
     return EnableDevice(udcName, devName, descriptor);
 }
 
-static int UsbFnAdapterGetPipeInfo(int ep, struct UsbFnPipeInfo *pipeInfo)
+static int32_t UsbFnAdapterGetPipeInfo(int32_t ep, struct UsbFnPipeInfo *pipeInfo)
 {
-    int ret;
+    int32_t ret;
     if (ep <= 0 || pipeInfo == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
@@ -1116,7 +1116,7 @@ static int UsbFnAdapterGetPipeInfo(int ep, struct UsbFnPipeInfo *pipeInfo)
     return ret;
 }
 
-int UsbFnAdapterQueueInit(int ep)
+int32_t UsbFnAdapterQueueInit(int32_t ep)
 {
     if (ep <= 0) {
         return HDF_ERR_INVALID_PARAM;
@@ -1124,7 +1124,7 @@ int UsbFnAdapterQueueInit(int ep)
     return ioctl(ep, FUNCTIONFS_ENDPOINT_QUEUE_INIT, 0);
 }
 
-static int UsbFnAdapterQueueDel(int ep)
+static int32_t UsbFnAdapterQueueDel(int32_t ep)
 {
     if (ep <= 0) {
         return HDF_ERR_INVALID_PARAM;
@@ -1133,7 +1133,7 @@ static int UsbFnAdapterQueueDel(int ep)
     return ioctl(ep, FUNCTIONFS_ENDPOINT_QUEUE_DEL, 0);
 }
 
-static int UsbFnAdapterReleaseBuf(int ep, const struct GenericMemory *mem)
+static int32_t UsbFnAdapterReleaseBuf(int32_t ep, const struct GenericMemory *mem)
 {
     if (ep <= 0 || mem == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -1142,9 +1142,9 @@ static int UsbFnAdapterReleaseBuf(int ep, const struct GenericMemory *mem)
     return ioctl(ep, FUNCTIONFS_ENDPOINT_RELEASE_BUF, mem);
 }
 
-static int UsbFnAdapterPipeIo(int ep, struct IoData *ioData)
+static int32_t UsbFnAdapterPipeIo(int32_t ep, struct IoData *ioData)
 {
-    int ret;
+    int32_t ret;
     if (ep <= 0 || ioData == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
@@ -1158,7 +1158,7 @@ static int UsbFnAdapterPipeIo(int ep, struct IoData *ioData)
     return ret;
 }
 
-static int UsbFnAdapterCancelIo(int ep, const struct IoData *ioData)
+static int32_t UsbFnAdapterCancelIo(int32_t ep, const struct IoData *ioData)
 {
     if (ep <= 0 || ioData == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -1166,7 +1166,7 @@ static int UsbFnAdapterCancelIo(int ep, const struct IoData *ioData)
     return ioctl(ep, FUNCTIONFS_ENDPOINT_RW_CANCEL, ioData);
 }
 
-static uint8_t *UsbFnAdapterMapAddr(int ep, uint32_t len)
+static uint8_t *UsbFnAdapterMapAddr(int32_t ep, uint32_t len)
 {
     if (ep <= 0) {
         return NULL;
@@ -1175,7 +1175,7 @@ static uint8_t *UsbFnAdapterMapAddr(int ep, uint32_t len)
     return mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, ep, 0);
 }
 
-static int UsbFnAdapterUnmapAddr(uint8_t *mapAddr, uint32_t len)
+static int32_t UsbFnAdapterUnmapAddr(uint8_t *mapAddr, uint32_t len)
 {
     if (mapAddr == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -1186,7 +1186,7 @@ static int UsbFnAdapterUnmapAddr(uint8_t *mapAddr, uint32_t len)
 
 static void Ep0Event(struct UsbFnEventAll *event, struct pollfd *pfds)
 {
-    int ret;
+    int32_t ret;
     uint8_t i;
     for (i = 0; i < event->ep0Num; i++) {
         if ((uint32_t)pfds[i].revents & POLLIN) {
@@ -1219,9 +1219,9 @@ static void EpEvent(struct UsbFnEventAll *event, struct pollfd *pfds)
     }
 }
 
-static int UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int timeout)
+static int32_t UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int32_t timeout)
 {
-    int ret;
+    int32_t ret;
     uint8_t i;
     struct pollfd *pfds = NULL;
 
@@ -1268,7 +1268,7 @@ static int UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int timeout)
     return 0;
 }
 
-static int UsbFnAdapterRequestGetStatus(int ep, const struct IoData *ioData)
+static int32_t UsbFnAdapterRequestGetStatus(int32_t ep, const struct IoData *ioData)
 {
     if (ep <= 0 || ioData == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -1345,7 +1345,7 @@ void UsbFnMemFree(const void *mem)
     }
 }
 
-int UsbFnAdpMemTestTrigger(bool enable)
+int32_t UsbFnAdpMemTestTrigger(bool enable)
 {
     g_usbRamTestFlag = enable;
     return HDF_SUCCESS;

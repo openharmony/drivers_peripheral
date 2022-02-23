@@ -167,7 +167,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*GetDisplaySuppportedModes)(uint32_t devId, int *num, DisplayModeInfo *modes);
+    int32_t (*GetDisplaySupportedModes)(uint32_t devId, int *num, DisplayModeInfo *modes);
 
     /* *
      * @brief Obtains the current display mode of a display device.
@@ -417,14 +417,14 @@ typedef struct {
      *
      * @param devId Indicates the ID of the display device.
      * @param num Indicates the pointer to the number of color gamuts supported by the display device.
-     * @param gamuts Indicates the point to the information about all color gamut supported by the display device,
+     * @param gamuts Indicates the pointer to the information about all color gamuts supported by the display device.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined
      * in {@link DispErrCode} otherwise.
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*GetDisplaySuppportedColorGamuts)(uint32_t devId, uint32_t *num, ColorGamut *gamuts);
+    int32_t (*GetDisplaySupportedColorGamuts)(uint32_t devId, uint32_t *num, ColorGamut *gamuts);
 
     /* *
      * @brief Obtains the color gamut of a display device.
@@ -481,10 +481,10 @@ typedef struct {
     int32_t (*SetDisplayGamutMap)(uint32_t devId, GamutMap gamutMap);
 
     /* *
-     * @brief Sets the 4x4 color transform matrix for a display device.
+     * @brief Sets a 4x4 color transformation matrix for a display device.
      *
      * @param devId Indicates the ID of the display device.
-     * @param matrix Indicates the 4x4 color transform matrix to set.
+     * @param matrix Indicates the pointer to the 4x4 color transformation matrix to set.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined
      * in {@link DispErrCode} otherwise.
@@ -497,7 +497,7 @@ typedef struct {
      * @brief Obtains the HDR capability of a display device.
      *
      * @param devId Indicates the ID of the display device.
-     * @param info Indicates the pointer to the HDRCapability of the device. The info is written
+     * @param info Indicates the pointer to the HDR capability of the device. The <b>info</b> is written
      * by this interface.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined
@@ -508,11 +508,11 @@ typedef struct {
     int32_t (*GetHDRCapabilityInfos)(uint32_t devId, HDRCapability *info);
 
     /* *
-     * @brief Obtains the HDRMetadataKey supported by a display device.
+     * @brief Obtains the HDR metadata keys supported by a display device.
      *
      * @param devId Indicates the ID of the display device.
-     * @param num Indicates the pointer to the number of keys by the display device.
-     * @param keys Indicates the pointer to the information about all HDRMetadataKey of the display device.
+     * @param num Indicates the pointer to the number of metadata keys supported by the display device.
+     * @param keys Indicates the pointer to the information about all HDR metadata keys supported by the display device.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined
      * in {@link DispErrCode} otherwise.
