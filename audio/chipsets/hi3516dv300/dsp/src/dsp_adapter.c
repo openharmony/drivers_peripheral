@@ -43,12 +43,6 @@ static int32_t DspDriverBind(struct HdfDeviceObject *device)
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    struct AudioHost *audioHost = AudioHostCreateAndBind(device);
-    if (audioHost == NULL) {
-        AUDIO_DRIVER_LOG_ERR("audioHost create failed!");
-        return HDF_FAILURE;
-    }
-
     AUDIO_DRIVER_LOG_INFO("success");
     return HDF_SUCCESS;
 }

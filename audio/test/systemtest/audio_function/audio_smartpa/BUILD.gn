@@ -69,7 +69,7 @@ if (defined(ohos_lite)) {
     ]
   }
 } else {
-  module_output_path = "hdf/audio"
+  module_output_path = "audio_device_driver/audio"
 
   ###########################systemtest##############################
   ###########################hdf_audio_smartpa_test###########################

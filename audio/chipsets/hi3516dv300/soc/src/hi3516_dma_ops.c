@@ -5,7 +5,9 @@
  * the GPL, or the BSD license, at your option.
  * See the LICENSE file in the root of this repository for complete details.
  */
+
 #include "audio_platform_if.h"
+#include <linux/interrupt.h>
 #ifdef __LITEOS__
 #include <los_vm_iomap.h>
 #else
@@ -15,26 +17,67 @@
 #include "hi3516_aiao_impl.h"
 #include "audio_stream_dispatch.h"
 #include "audio_driver_log.h"
+#include "osal_irq.h"
+#include "osal_time.h"
 
 #define HDF_LOG_TAG hi3516_dma_ops
 const int AUDIO_CACHE_ALIGN_SIZE = 64;
+const int DMA_VIRTUAL_IRQ_NUM = 71;
 
 #ifndef __LITEOS__
 static struct device g_renderDev = {0};
 static struct device g_captureDev = {0};
 #endif
 
+static uint32_t DmacIsrCallBack(int irq, void *data)
+{
+    uint32_t chanlID = 0;
+    int ret;
+    struct HdfDeviceObject *device = NULL;
+    struct PnpReportMsg reportMsg;
+
+    AiaoRxIntClr(chanlID);
+
+    device = (struct HdfDeviceObject *)data;
+    if (device == NULL) {
+        AUDIO_DRIVER_LOG_ERR("device is null.");
+        return HDF_FAILURE;
+    }
+
+    reportMsg.reportType = EVENT_REPORT;
+    reportMsg.eventMsg.eventType = EVENT_REPORT;
+    reportMsg.eventMsg.eventId = THRESHOLD_REPORT;
+    reportMsg.eventMsg.deviceType = PRIMARY_DEVICE;
+    reportMsg.eventMsg.eventValue = 1;
+    ret = AudioCapSilenceThresholdEvent(device, &reportMsg);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_DRIVER_LOG_ERR("AudioCapSilenceThresholdEvent failed.");
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
 int32_t AudioDmaDeviceInit(const struct AudioCard *card, const struct PlatformDevice *platformDevice)
 {
     const unsigned int chnId = 0;
+    int ret;
+    struct HdfDeviceObject *device = NULL;
 
-    if (card == NULL || platformDevice == NULL || platformDevice->devData == NULL) {
+    if (card == NULL || card->device == NULL || platformDevice == NULL || platformDevice->devData == NULL) {
         AUDIO_DRIVER_LOG_ERR("platformDevice is NULL.");
         return HDF_FAILURE;
     }
+
     if (platformDevice->devData->platformInitFlag == true) {
         AUDIO_DRIVER_LOG_DEBUG("platform init complete!");
         return HDF_SUCCESS;
+    }
+
+    device = card->device;
+    if (device == NULL) {
+        ADM_LOG_ERR("device is NULL.");
+        return HDF_FAILURE;
     }
 
     if (AiaoHalSysInit() != HDF_SUCCESS) {
@@ -57,6 +100,12 @@ int32_t AudioDmaDeviceInit(const struct AudioCard *card, const struct PlatformDe
     /* aiao init */
     if (AiaoDeviceInit(chnId) != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("AiaoClockReset:  fail");
+        return HDF_FAILURE;
+    }
+
+    ret = OsalRegisterIrq(DMA_VIRTUAL_IRQ_NUM, IRQF_SHARED, (OsalIRQHandle)DmacIsrCallBack, "AIO_interrupt", device);
+    if (ret < 0) {
+        AUDIO_DRIVER_LOG_ERR("OsalRegisterIrq: fail 0x%x", ret);
         return HDF_FAILURE;
     }
 

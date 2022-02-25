@@ -221,7 +221,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   ###########################systemtest##############################
-  module_output_path = "hdf/audio"
+  module_output_path = "audio_device_driver/audio"
 
   ###########################hdf_audio_hdi_capture_attr_test#####################
   ohos_systemtest("hdf_audio_hdi_capture_attr_test") {

@@ -68,6 +68,7 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
         "src/hdf_audio_server_capture.c",
         "src/hdf_audio_server_common.c",
         "src/hdf_audio_server_render.c",
+        "src/pnp_message_report.c",
       ]
 
       deps = [
@@ -99,6 +100,7 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
         "src/hdf_audio_server_capture.c",
         "src/hdf_audio_server_common.c",
         "src/hdf_audio_server_render.c",
+        "src/pnp_message_report.c",
       ]
 
       deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
