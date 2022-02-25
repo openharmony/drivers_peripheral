@@ -11,16 +11,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  group("sensor_entry") {
-    deps = [ "hal:hdi_sensor" ]
-  }
-} else {
-  group("sensor_entry") {
-    deps = [
-      "hal:hdi_sensor",
-      "//drivers/interface/sensor/v1_0:sensor",
-      "//drivers/peripheral/sensor/hdi_service:hdi_sensor_service",
-    ]
+group("sensor_entry") {
+  deps = []
+  if (defined(ohos_lite)) {
+    deps += [ "hal:hdi_sensor" ]
+  } else {
+    deps += [ "//drivers/interface/sensor/v1_0:sensor" ]
+    HDI_SENSOR_SERVICE_PATH =
+        rebase_path("//device/${device_company}/hardware/sensor")
+    cmd = "if [ -f ${HDI_SENSOR_SERVICE_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
+    HAVE_SENSOR_DAL_SERVICE =
+        exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
+
+    if (HAVE_SENSOR_DAL_SERVICE) {
+      deps += [ "${HDI_SENSOR_SERVICE_PATH}:dal_serivce" ]
+    } else {
+      deps += [
+        "hal:hdi_sensor",
+        "//drivers/peripheral/sensor/hdi_service:hdi_sensor_service",
+      ]
+    }
   }
 }
