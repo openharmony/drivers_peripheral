@@ -19,7 +19,7 @@
 #include <securec.h>
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "sensor_interface_proxy.h"
+#include "v1_0/sensor_interface_proxy.h"
 #include "sensor_callback_impl.h"
 
 using namespace testing::ext;

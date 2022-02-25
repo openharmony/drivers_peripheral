@@ -16,7 +16,7 @@
 #ifndef OHOS_HDI_VIBRATOR_V1_0_VIBRATORINTERFACEIMPL_H
 #define OHOS_HDI_VIBRATOR_V1_0_VIBRATORINTERFACEIMPL_H
 
-#include "vibrator_interface_stub.h"
+#include "v1_0/vibrator_interface_stub.h"
 
 namespace OHOS {
 namespace HDI {
