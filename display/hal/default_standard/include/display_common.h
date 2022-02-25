@@ -104,7 +104,7 @@ extern "C" {
 #endif
 
 #ifndef DISPLAY_CHK_RETURN_NOT_VALUE
-#define DISPLAY_CHK_RETURN_NOT_VALUE(val, ret, ...) \
+#define DISPLAY_CHK_RETURN_NOT_VALUE(val, ...) \
     do {                                            \
         if (val) {                                  \
             __VA_ARGS__;                            \
