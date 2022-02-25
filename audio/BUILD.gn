@@ -35,11 +35,13 @@ group("hdi_audio") {
   if (defined(ohos_lite)) {
     deps += [ "config/lite:hdf_audio_json" ]
   } else {
-    deps += [
-      "config/linux:hdf_audio_json",
-      "hal/hdi_binder/proxy:hdi_audio_client",
-      "hal/hdi_binder/server:hdi_audio_server",
-    ]
+    if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
+      deps += [
+        "config/linux:hdf_audio_json",
+        "hal/hdi_binder/proxy:hdi_audio_client",
+        "hal/hdi_binder/server:hdi_audio_server",
+      ]
+    }
   }
 
   if (enable_audio_device_mpi) {
