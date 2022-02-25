@@ -17,7 +17,7 @@
 #define OHOS_HDI_BATTERY_V1_0_BATTERYCALLBACKIMPL_H
 
 #include <functional>
-#include "battery_callback_stub.h"
+#include "v1_0/battery_callback_stub.h"
 
 namespace OHOS {
 namespace HDI {

@@ -18,10 +18,10 @@
 
 #include "batteryd_api.h"
 #include "battery_config.h"
-#include "battery_interface_stub.h"
 #include "battery_led.h"
 #include "battery_thread.h"
 #include "power_supply_provider.h"
+#include "v1_0/battery_interface_stub.h"
 
 namespace OHOS {
 namespace HDI {
