@@ -54,6 +54,7 @@ public:
 
 private:
     std::unique_ptr<DrmGemBuffer> mCurrentBuffer;
+    std::unique_ptr<DrmGemBuffer> lastBuffer_;
 };
 } // namespace OHOS
 } // namespace HDI
