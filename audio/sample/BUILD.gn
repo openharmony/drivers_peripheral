@@ -106,7 +106,9 @@ if (defined(ohos_lite)) {
     }
 
     if (is_standard_system) {
-      deps = [ "//drivers/peripheral/audio/hal/hdi_binder/server:hdi_audio_server" ]
+      deps = [
+        "//drivers/peripheral/audio/hal/hdi_binder/server:hdi_audio_server",
+      ]
       external_deps = [
         "device_driver_framework:libhdf_host",
         "device_driver_framework:libhdf_ipc_adapter",
