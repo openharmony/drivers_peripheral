@@ -6,8 +6,8 @@
  * See the LICENSE file in the root of this repository for complete details.
  */
 
-#include "audio_platform_if.h"
 #include <linux/interrupt.h>
+#include "audio_platform_if.h"
 #ifdef __LITEOS__
 #include <los_vm_iomap.h>
 #else
