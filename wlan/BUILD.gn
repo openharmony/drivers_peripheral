@@ -12,6 +12,24 @@
 # limitations under the License.
 
 if (defined(ohos_lite)) {
+  import("//build/ohos.gni")
+} else {
+  import("//build/ohos.gni")
+  WLAN_HALUT_PATH =
+    rebase_path("//vendor/${product_company}/${product_name}/hals/wlan")
+
+  cmd = "if [ -f $WLAN_HALUT_PATH/product.gni ]; then echo true; else echo false; fi"
+  HAVE_WLAN_HALUT_PATH =
+    exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
+
+  if (HAVE_WLAN_HALUT_PATH) {
+    import("$WLAN_HALUT_PATH/product.gni")
+  } else {
+    enable_HDF_UTRK = true
+  }
+}
+
+if (defined(ohos_lite)) {
   group("wlan_entry") {
     deps = [
       "client:wifi_driver_client",
@@ -33,9 +51,11 @@ if (defined(ohos_lite)) {
   }
   group("wlan_test_entry") {
     testonly = true
-    deps = [
-      "test:hdf_test_wifi",
-      "test/hdi_service:unittest",
-    ]
+    if (!enable_HDF_UTRK) {
+      deps = [
+        "test:hdf_test_wifi",
+        "test/hdi_service:unittest",
+      ]
+    }
   }
 }
