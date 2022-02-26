@@ -226,7 +226,7 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect007, TestSize.Level1)
     ASSERT_NE(nullptr, g_vibratorInterface);
 
     int32_t startRet = g_vibratorInterface->Start(g_arbitraryStr);
-    EXPECT_EQ(startRet, HDF_FAILURE);
+    EXPECT_EQ(startRet, HDF_ERR_INVALID_PARAM);
 
     int32_t endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_ONCE);
     EXPECT_EQ(endRet, HDF_SUCCESS);
