@@ -1162,7 +1162,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0020, TestSize.Leve
     struct AudioPcmHwParams hwParams {
         .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 4096, .rate = 11025,
         .periodCount = 4, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 8191
+        .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 4095
     };
     ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -1303,7 +1303,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderPrepare_0001, TestSize
     struct AudioPcmHwParams hwParams {
         .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 4096, .rate = 11025,
         .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16385
+        .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
     ASSERT_EQ(HDF_SUCCESS, ret);

@@ -364,6 +364,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0006, TestSize.Level1
         audiopara.attrs.sampleRate = 48000;
         audiopara.attrs.channelCount = 1;
         audiopara.attrs.stopThreshold = INT_32_MAX;
+        audiopara.attrs.period = 4096;
 
         ret = audiopara.render->attr.SetSampleAttributes(audiopara.render, &(audiopara.attrs));
         EXPECT_EQ(HDF_SUCCESS, ret);
