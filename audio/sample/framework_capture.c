@@ -327,7 +327,7 @@ int RegisterListen(struct StrParaCapture *capture)
 
     g_servmgr = SvcMgrIoserviceGet(); // kernel
     g_listener = IoServiceStatusListenerNewInstance(); // kernel
-    if (g_servmgr == NULL || g_listener == NULL ) {
+    if (g_servmgr == NULL || g_listener == NULL) {
         printf("g_servmgr status g_listener is null .\n");
         return -1;
     }
@@ -345,7 +345,7 @@ int RegisterListen(struct StrParaCapture *capture)
     return 0;
 }
 
-int UnRegisterListen()
+int UnRegisterListen(void)
 {
     if (g_servmgr == NULL || g_listener == NULL) {
         printf("UnRegisterListen: input para is null!\n");
@@ -397,12 +397,12 @@ int32_t StopButtonCapture(struct AudioCapture **captureS)
         g_file = NULL;
     }
     if (g_CaptureModeFlag == CAPTURE_INTERUPT) {
-        #ifndef __LITEOS__
-            ret = UnRegisterListen();
-            if (ret < 0) {
-                LOG_FUN_ERR("UnRegisterListen failed!");
-            }
-        #endif
+#ifndef __LITEOS__
+        ret = UnRegisterListen();
+        if (ret < 0) {
+            LOG_FUN_ERR("UnRegisterListen failed!");
+        }
+#endif
     }
     printf("Stop Successful\n");
     return HDF_SUCCESS;
@@ -523,17 +523,16 @@ int32_t CaptureChoiceModeAndRecording(struct StrParaCapture *StrParam, struct Au
     StrParam->attrs = g_attrs;
     StrParam->frame = g_frame;
     if (g_CaptureModeFlag == CAPTURE_INTERUPT) {
-        #ifndef __LITEOS__
-            ret = RegisterListen(&g_str);
-            if (ret != 0) {
-                printf("---RegisterListen faile--- \n");
-                return HDF_FAILURE;
-            }
-        #else
-            printf("not suport liteos!");
+#ifndef __LITEOS__
+        ret = RegisterListen(&g_str);
+        if (ret != 0) {
+            printf("---RegisterListen faile--- \n");
             return HDF_FAILURE;
-        #endif
-
+        }
+#else
+        printf("not suport liteos!");
+        return HDF_FAILURE;
+#endif
     } else {
         pthread_attr_t tidsAttr;
         pthread_attr_init(&tidsAttr);
@@ -1202,7 +1201,7 @@ void ProcessMenu(int32_t choice)
     }
 }
 
-void PrintMenu0()
+void PrintMenu0(void)
 {
     printf(" ============== Play Capture select ===========\n");
     printf("| 1. Capture Poll                             |\n");
@@ -1210,14 +1209,16 @@ void PrintMenu0()
     printf(" ==============================================\n");
 }
 
-void Choice0()
+void Choice0(void)
 {
     system("clear");
     int choice = 0;
     PrintMenu0();
     printf("Please enter your choice:");
     int32_t ret = CheckInputName(INPUT_INT, (void *)&choice);
-    if (ret < 0) return;
+    if (ret < 0) {
+        return;
+    }
     switch (choice) {
         case CAPTURE_POLL:
             g_CaptureModeFlag = CAPTURE_POLL;
@@ -1234,7 +1235,7 @@ void Choice0()
 }
 
 
-void Choice()
+void Choice(void)
 {
     int32_t option = 0;
     while (option < GET_CAPTURE_POSITION + 1 && option >= 0) {

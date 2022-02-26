@@ -70,7 +70,7 @@ struct PnpReportEventMsg {
     uint8_t eventId;
     uint8_t eventValue;
     uint8_t deviceType;
-    uint8_t reserve;      /* Reserved fields are not used for the time being*/
+    uint8_t reserve;      /* Reserved fields are not used for the time being */
 };
 
 struct PnpReportMsg {

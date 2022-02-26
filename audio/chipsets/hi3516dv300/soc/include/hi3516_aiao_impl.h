@@ -117,6 +117,6 @@ int32_t AudioAiInit(const struct PlatformData *platformData);
 int32_t AiaoSysPinMux(void);
 int32_t AiaoRxIntClr(unsigned int chnId);
 int32_t AiaoGetMclk(unsigned int rate, uint32_t *mclkSel);
-int32_t AiaoSetSysCtlRegValue(uint32_t mclkSel, uint32_t bitWidth, 
+int32_t AiaoSetSysCtlRegValue(uint32_t mclkSel, uint32_t bitWidth,
     uint32_t rate, uint32_t *clkRegVal);
 #endif // __HI3516_ACODEC_H__

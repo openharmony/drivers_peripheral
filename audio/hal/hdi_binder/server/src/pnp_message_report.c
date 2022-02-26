@@ -18,10 +18,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <inttypes.h>
-#include "pnp_message_report.h"
 #include "audio_internal.h"
 #include "hdf_log.h"
-
+#include "pnp_message_report.h"
 
 #define PNP_REPORT_MSG_FIELD_NUM 5
 
@@ -58,8 +57,8 @@ static int32_t AudioPnpDevPlugMsgDeSerialize(uint8_t *msgStr, struct PnpReportDe
     }
     devPlugMsg->state = buf[0];
     devPlugMsg->deviceType = buf[1];
-    devPlugMsg->deviceCap = buf[2];
-    devPlugMsg->id = buf[3];
+    devPlugMsg->deviceCap = buf[2]; // 2 is deviceCap
+    devPlugMsg->id = buf[3]; // 3 is id
 
     return AUDIO_HAL_SUCCESS;
 }
@@ -97,13 +96,13 @@ static int32_t AudioPnpDevEventMsgDeSerialize(uint8_t *msgStr, struct PnpReportE
 
     eventMsg->eventId = buf[0];
     eventMsg->eventValue = buf[1];
-    eventMsg->deviceType = buf[2];
-    eventMsg->reserve = buf[3];
+    eventMsg->deviceType = buf[2]; // 2 is deviceType
+    eventMsg->reserve = buf[3]; // 3 is reserve
     
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t PnpReportMsgDeSerialize(uint8_t *msgStr, enum PnpReportType msgType, 
+int32_t PnpReportMsgDeSerialize(uint8_t *msgStr, enum PnpReportType msgType,
     struct PnpReportMsg *pnpReportMsg)
 {
     int32_t ret;
@@ -152,7 +151,7 @@ uint8_t *PnpReportMsgSerialize(struct PnpReportMsg *pnpReportMsg)
         return NULL;
     }
     
-    msgBuf = (uint8_t *)calloc(1, PNP_REPORT_MSG_LEN_MAX);
+    msgBuf = (uint8_t *)OsalMemAlloc(PNP_REPORT_MSG_LEN_MAX);
     if (msgBuf == NULL) {
         HDF_LOGE("[%s]: Malloc memory failed!\n", __func__);
         return NULL;
@@ -162,19 +161,19 @@ uint8_t *PnpReportMsgSerialize(struct PnpReportMsg *pnpReportMsg)
     switch (pnpReportMsg->reportType) {
         case DEVICE_PULG:
             (void)snprintf_s((char *)msgBuf, PNP_REPORT_MSG_LEN_MAX, PNP_REPORT_MSG_LEN_MAX - 1, "%d;%d;%d;%d;%d",
-                    pnpReportMsg->devPlugMsg.eventType, pnpReportMsg->devPlugMsg.state,
-                    pnpReportMsg->devPlugMsg.deviceType, pnpReportMsg->devPlugMsg.deviceCap,
-                    pnpReportMsg->devPlugMsg.id);
+                pnpReportMsg->devPlugMsg.eventType, pnpReportMsg->devPlugMsg.state,
+                pnpReportMsg->devPlugMsg.deviceType, pnpReportMsg->devPlugMsg.deviceCap,
+                pnpReportMsg->devPlugMsg.id);
             break;
         case EVENT_REPORT:
             (void)snprintf_s((char *)msgBuf, PNP_REPORT_MSG_LEN_MAX, PNP_REPORT_MSG_LEN_MAX - 1, "%d;%d;%d;%d;%d",
-                    pnpReportMsg->eventMsg.eventType, pnpReportMsg->eventMsg.eventId,
-                    pnpReportMsg->eventMsg.eventValue, pnpReportMsg->eventMsg.deviceType,
-                    pnpReportMsg->eventMsg.reserve);
+                pnpReportMsg->eventMsg.eventType, pnpReportMsg->eventMsg.eventId,
+                pnpReportMsg->eventMsg.eventValue, pnpReportMsg->eventMsg.deviceType,
+                pnpReportMsg->eventMsg.reserve);
             break;
         default:
             HDF_LOGE("[%s]: Unknown message type!\n", __func__);
-            AudioMemFree((void **)&msgBuf);
+            OsalMemFree(msgBuf);
             return NULL;
     }
 
