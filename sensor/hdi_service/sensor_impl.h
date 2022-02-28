@@ -17,7 +17,7 @@
 #define OHOS_HDI_SENSOR_V1_0_SENSORIMPL_H
 
 #include "sensor_if.h"
-#include "sensor_interface_stub.h"
+#include "v1_0/sensor_interface_stub.h"
 
 namespace OHOS {
 namespace HDI {

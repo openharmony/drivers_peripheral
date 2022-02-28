@@ -23,7 +23,7 @@
 
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "thermal_interface_proxy.h"
+#include "v1_0/thermal_interface_proxy.h"
 #include "thermal_types.h"
 #include "thermal_callback_impl.h"
 

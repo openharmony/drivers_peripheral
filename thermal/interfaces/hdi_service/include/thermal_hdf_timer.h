@@ -17,10 +17,10 @@
 #define THERMAL_HDF_TIMER_H
 
 #include <map>
-#include "ithermal_callback.h"
 #include "thermal_hdf_config.h"
 #include "thermal_simulation_node.h"
 #include "thermal_zone_manager.h"
+#include "v1_0/ithermal_callback.h"
 
 namespace OHOS {
 namespace HDI {

@@ -17,7 +17,7 @@
 #define OHOS_HDI_SENSOR_V1_0_SENSORCALLBACKIMPL_H
 
 #include <hdf_base.h>
-#include "sensor_callback_stub.h"
+#include "v1_0/sensor_callback_stub.h"
 
 namespace OHOS {
 namespace HDI {

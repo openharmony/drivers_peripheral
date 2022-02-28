@@ -16,7 +16,7 @@
 #ifndef OHOS_HDI_POWER_V1_0_POWERINTERFACEIMPL_H
 #define OHOS_HDI_POWER_V1_0_POWERINTERFACEIMPL_H
 
-#include "power_interface_stub.h"
+#include "v1_0/power_interface_stub.h"
 
 namespace OHOS {
 namespace HDI {
