@@ -16,7 +16,7 @@
 #ifndef OHOS_HDI_POWER_V1_0_POWERHDICALLBACKIMPL_H
 #define OHOS_HDI_POWER_V1_0_POWERHDICALLBACKIMPL_H
 
-#include "power_hdi_callback_stub.h"
+#include "v1_0/power_hdi_callback_stub.h"
 
 namespace OHOS {
 namespace HDI {

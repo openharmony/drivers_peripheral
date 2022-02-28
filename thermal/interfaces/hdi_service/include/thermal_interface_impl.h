@@ -16,7 +16,7 @@
 #ifndef HDI_THERMAL_V1_0_THERMALINTERFACEIMPL_H
 #define HDI_THERMAL_V1_0_THERMALINTERFACEIMPL_H
 
-#include "thermal_interface_stub.h"
+#include "v1_0/thermal_interface_stub.h"
 
 namespace OHOS {
 namespace HDI {

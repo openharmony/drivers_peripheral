@@ -17,7 +17,7 @@
 #define OHOS_HDI_THERMAL_V1_0_THERMALCALLBACKIMPL_H
 
 #include <functional>
-#include "thermal_callback_stub.h"
+#include "v1_0/thermal_callback_stub.h"
 
 namespace OHOS {
 namespace HDI {
