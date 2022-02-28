@@ -192,7 +192,7 @@ int32_t DisplayDeviceProxy::GetDisplayCapability(uint32_t devId, DisplayCapabili
     return ret;
 }
 
-int32_t DisplayDeviceProxy::GetDisplaySupportedModes(uint32_t devId, int &num, DisplayModeInfo *modes)
+int32_t DisplayDeviceProxy::GetDisplaySupportedModes(uint32_t devId, uint32_t &num, DisplayModeInfo *modes)
 {
     DISPLAY_LOG("interface start");
     if (devId > MAX_DEVID) {

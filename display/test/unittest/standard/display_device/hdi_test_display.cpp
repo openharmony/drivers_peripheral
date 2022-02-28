@@ -30,7 +30,7 @@ int32_t HdiTestDisplay::Init()
     DISPLAY_TEST_LOGD("the capablility name %s type : %d phyWidth : %d phyHeight : %d", mCap.name, mCap.type,
         mCap.phyWidth, mCap.phyHeight);
     // get the modes
-    int num = 0;
+    uint32_t num = 0;
     ret = mDeviceFunc.GetDisplaySupportedModes(mId, &num, nullptr);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("can not get modes num"));
     DISPLAY_TEST_CHK_RETURN((num <= 0), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("the mode num is %d", num));

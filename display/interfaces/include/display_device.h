@@ -167,7 +167,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*GetDisplaySupportedModes)(uint32_t devId, int *num, DisplayModeInfo *modes);
+    int32_t (*GetDisplaySupportedModes)(uint32_t devId, uint32_t *num, DisplayModeInfo *modes);
 
     /* *
      * @brief Obtains the current display mode of a display device.
