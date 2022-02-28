@@ -17,9 +17,9 @@
 #define CODEC_CALLBACK_TYPE_H
 
 #include <stdint.h>
+#include <netinet/in.h>
 #include "codec_types.h"
 #include "codec_component_type.h"
-#include <netinet/in.h>
 
 #ifdef __cplusplus
 extern "C" {

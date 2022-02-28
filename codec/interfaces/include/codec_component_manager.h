@@ -26,11 +26,11 @@ extern "C" {
 #endif /* __cplusplus */
 
 struct CodecComponentManager {
-    int32_t (*GetComponentNum)(); //返回num
-    int32_t (*GetComponentCapabilityList)(CodecCompCapability *capList, int count); //获取到能力集List，capList由使用者释放
+    int32_t (*GetComponentNum)();
+    int32_t (*GetComponentCapabilityList)(CodecCompCapability *capList, int count);
     int32_t (*CreateComponent)(struct CodecComponentType **component, char *compName, void *appData,
-        int32_t appDataSize, struct CodecCallbackType *callbacks);  //调用OMX_GetHandle
-    int32_t (*DestoryComponent)(struct CodecComponentType *component);  //调用OMX_FreeHandle
+        int32_t appDataSize, struct CodecCallbackType *callbacks);
+    int32_t (*DestoryComponent)(struct CodecComponentType *component);
 };
 
 struct CodecComponentManager *GetCodecComponentManager(void);

@@ -159,7 +159,8 @@ typedef struct {
     RangeValue blockCount;
     RangeValue blocksPerSecond;
     Rect blockSize;
-    int32_t supportPixFmts[PIX_FORMAT_NUM]; /**< Supported pixel formats, array is terminated by <b> OMX_COLOR_FORMATTYPE</b> */
+    int32_t supportPixFmts[PIX_FORMAT_NUM];    /**< Supported pixel formats, array is terminated by
+                                                    <b> OMX_COLOR_FORMATTYPE</b> */
 } VideoPortCap;
 
 /**
@@ -173,7 +174,8 @@ typedef struct {
                                                 <b> AUDIO_SAMPLE_FMT_INVALID</b> */
     int32_t sampleRate[SAMPLE_RATE_NUM];   /**< Supported audio sample rate, array is terminated by
                                                 <b> AUD_SAMPLE_RATE_INVALID</b> */
-    int32_t channelLayouts[CHANNEL_NUM];   /**< Supported count of audio channel layouts, array is terminated by <b> -1</b> */
+    int32_t channelLayouts[CHANNEL_NUM];   /**< Supported count of audio channel layouts,
+                                                array is terminated by <b> -1</b> */
 
     int32_t channelCount[CHANNEL_NUM];     /**< Supported audio channel count, array is terminated by <b> -1</b> */
 } AudioPortCap;
@@ -215,7 +217,7 @@ enum BufferType {
     BUFFER_TYPE_INVALID = 0,
     BUFFER_TYPE_VIRTUAL_ADDR = 0x1,
     BUFFER_TYPE_AVSHARE_MEM_FD = 0x2,
-    BUFFER_TYPE_HANDLE = 0x4, //surface
+    BUFFER_TYPE_HANDLE = 0x4,
     BUFFER_TYPE_DYNAMIC_HANDLE = 0x8,
 };
 
@@ -229,23 +231,14 @@ struct OmxCodecBuffer {
 	uint32_t size;                   /**< size of the structure in bytes */
     union OMX_VERSIONTYPE version;   /**< OMX specification version information */
     enum BufferType bufferType;
-    uint8_t *buffer;            /**< Pointer to actual block of memory 
-                                     that is acting as the buffer */
+    uint8_t *buffer;            /**< Pointer to actual block of memory that is acting as the buffer */
     uint32_t bufferLen;         /**< size of buffer */
     uint32_t allocLen;          /**< size of the buffer allocated, in bytes */
-    uint32_t filledLen;         /**< number of bytes currently in the 
-                                     buffer */
-    uint32_t offset;            /**< start offset of valid data in bytes from
-                                     the start of the buffer */
+    uint32_t filledLen;         /**< number of bytes currently in the buffer */
+    uint32_t offset;            /**< start offset of valid data in bytes from the start of the buffer */
     int32_t fenceFd;
     enum ShareMemTypes type;
-    int64_t pts;                /**< Timestamp corresponding to the sample 
-                                     starting at the first logical sample 
-                                     boundary in the buffer. Timestamps of 
-                                     successive samples within the buffer may
-                                     be inferred by adding the duration of the 
-                                     of the preceding buffer to the timestamp
-                                     of the preceding buffer.*/
+    int64_t pts;
     uint32_t flag;
 };
 
@@ -270,7 +263,7 @@ struct UseBufferType {
     uint32_t bufferType;
 } ;
 
-struct GetBufferHandleUsageParams{
+struct GetBufferHandleUsageParams {
     uint32_t size;
     union OMX_VERSIONTYPE version;
     uint32_t portIndex;
