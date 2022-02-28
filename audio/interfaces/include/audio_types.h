@@ -90,6 +90,7 @@ enum AudioPortPin {
     PIN_IN_MIC      = 0x8000001u, /**< Microphone input pin */
     PIN_IN_HS_MIC   = 0x8000002u, /**< Wired headset microphone pin for input */
     PIN_IN_LINEIN   = 0x8000004u, /**< Line-in pin */
+    PIN_IN_USB_EXT  = 0x8000008u, /**< Extended USB device input */
 };
 
 /**
