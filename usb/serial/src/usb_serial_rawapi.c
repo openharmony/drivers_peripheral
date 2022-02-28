@@ -425,7 +425,7 @@ static int32_t AcmWriteBufAlloc(const struct AcmDevice *acm)
     for (i = 0; i < ACM_NW; i++, wb++) {
         wb->buf = OsalMemCalloc(acm->dataOutEp->maxPacketSize);
         if (!wb->buf) {
-            while (i != 0) {
+            while (i > 0) {
                 --i;
                 --wb;
                 OsalMemFree(wb->buf);
@@ -871,7 +871,7 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
             return HDF_ERR_MALLOC_FAIL;
         }
     }
-    HDF_LOGD("%s:%d g_syncRequest:%p \n", __func__, __LINE__, g_syncRequest);
+    HDF_LOGD("%s:%d g_syncRequest \n", __func__, __LINE__);
 
     requestData.endPoint    = acm->dataInEp->addr;
     requestData.data        = g_syncRequest->buffer;

@@ -965,7 +965,7 @@ void UsbFnCfgMgrFreeUsbFnDeviceDesc(struct UsbFnDeviceDesc *fnDevDesc)
     UsbFnMemFree(fnDevDesc);
 }
 
-static int32_t IsPropRegisted(const struct UsbFnInterface *intf, const char *name)
+static uint8_t IsPropRegisted(const struct UsbFnInterface *intf, const char *name)
 {
     struct UsbFnCfgPropMgr *obj = NULL;
     struct UsbFnCfgPropMgr *temp = NULL;

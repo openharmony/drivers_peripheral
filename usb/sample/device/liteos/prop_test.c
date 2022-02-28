@@ -170,7 +170,6 @@ static int32_t TestProp(const char *propName, const char *propValue,
 int32_t prop_test(int32_t argc, const char *argv[])
 {
     int32_t ch;
-    const char *serviceName = NULL;
     const char *propName = NULL;
     const char *propValue = NULL;
     bool setProp = false;

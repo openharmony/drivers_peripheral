@@ -102,25 +102,23 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
 
 static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
 {
+    int32_t ret;
     if (interfacePoolArg == NULL) {
         HDF_LOGE("%s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     struct UsbInterfacePool *interfacePool = (struct UsbInterfacePool *)interfacePoolArg;
-    int32_t ret;
-
+    if (interfacePool == NULL) {
+        HDF_LOGE("%s:%d interfacePool is NULL", __func__, __LINE__);
+        return HDF_FAILURE;
+    }
+    
     if (RawRegisterSignal() != HDF_SUCCESS) {
         HDF_LOGE("%s:%d RawRegisterSignal error", __func__, __LINE__);
     }
 
     while (true) {
-        if (interfacePool == NULL) {
-            HDF_LOGE("%s:%d interfacePool is NULL", __func__, __LINE__);
-            OsalMSleep(USB_IO_SLEEP_MS_TIME);
-            return HDF_FAILURE;
-        }
-
         if (!interfacePool->ioProcessTid) {
             interfacePool->ioProcessTid = RawGetTid();
         }
