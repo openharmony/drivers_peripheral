@@ -122,7 +122,7 @@ void acm_read(char *str, int32_t timeout)
         if (str && tmp && strlen(tmp) > 0) {
             ret = memcpy_s(str, maxLen, tmp, strlen(tmp));
             if (ret != EOK) {
-                HDF_LOGE("%s:%d ret=%d memcpy_s error", ret);
+                HDF_LOGE("%s:%d ret=%d memcpy_s error", __func__, __LINE__, ret);
             }
             printf("acm_read:%s\n", tmp);
             return;
@@ -181,14 +181,14 @@ void acm_prop_read(const char *propName, char *propValue)
     (void)HdfSbufWriteString(g_data, propName);
     int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_GET_PROP, g_data, g_reply);
     if (status) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_GET_PROP failed status = %d", __func__, status);
+        HDF_LOGE("%s:%d Dispatch USB_SERIAL_GET_PROP failed status = %d", __func__, __LINE__, status);
         return;
     }
     const char *tmp = HdfSbufReadString(g_reply);
     if (propValue && tmp && strlen(tmp) > 0) {
         errno_t err = memcpy_s(propValue, maxLen, tmp, strlen(tmp));
         if (err != EOK) {
-            HDF_LOGE("%s:%d err=%d memcpy_s error", err);
+            HDF_LOGE("%s:%d err=%d memcpy_s error", __func__, __LINE__, err);
         }
         printf("prop_read:%s\n", tmp);
         return;

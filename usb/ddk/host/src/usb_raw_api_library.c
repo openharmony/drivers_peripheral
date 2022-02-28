@@ -642,26 +642,25 @@ static int32_t ParseConfiguration(struct UsbRawConfigDescriptor *config, const u
 
 static int32_t DescToConfig(const uint8_t *buf, int32_t size, struct UsbRawConfigDescriptor **config)
 {
-    struct UsbRawConfigDescriptor *tempConfig = RawUsbMemCalloc(sizeof(*tempConfig));
+    struct UsbRawConfigDescriptor *tmpConfig = RawUsbMemCalloc(sizeof(struct UsbRawConfigDescriptor));
     int32_t ret;
 
-    if (tempConfig == NULL) {
+    if (tmpConfig == NULL) {
+        HDF_LOGE("%s: RawUsbMemCalloc failed", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    ret = ParseConfiguration(tempConfig, buf, size);
-    if (ret < 0) {
+    ret = ParseConfiguration(tmpConfig, buf, size);
+    if (ret < 0 && tmpConfig != NULL) {
         HDF_LOGE("%s: ParseConfiguration failed with error = %d", __func__, ret);
-        if (tempConfig != NULL) {
-            RawUsbMemFree(tempConfig);
-            tempConfig = NULL;
-        }
+        RawUsbMemFree(tmpConfig);
+        tmpConfig = NULL;
         return ret;
     } else if (ret > 0) {
         HDF_LOGW("%s: still %d bytes of descriptor data left", __func__, ret);
     }
 
-    *config = tempConfig;
+    *config = tmpConfig;
 
     return ret;
 }
@@ -1117,7 +1116,7 @@ int32_t RawGetConfigDescriptor(const struct UsbDevice *dev, uint8_t configIndex,
     struct UsbRawConfigDescriptor **config)
 {
     int32_t ret;
-    union UsbiConfigDescBuf tempConfig;
+    union UsbiConfigDescBuf tmpConfig;
     uint16_t configLen;
     uint8_t *buf = NULL;
 
@@ -1131,12 +1130,12 @@ int32_t RawGetConfigDescriptor(const struct UsbDevice *dev, uint8_t configIndex,
         return HDF_ERR_BAD_FD;
     }
 
-    ret = GetConfigDescriptor(dev, configIndex, tempConfig.buf, sizeof(tempConfig.buf));
+    ret = GetConfigDescriptor(dev, configIndex, tmpConfig.buf, sizeof(tmpConfig.buf));
     if (ret < HDF_SUCCESS) {
         HDF_LOGE("%s:%d ret=%d", __func__, __LINE__, ret);
         return ret;
     }
-    configLen = Le16ToCpu(tempConfig.desc.wTotalLength);
+    configLen = Le16ToCpu(tmpConfig.desc.wTotalLength);
     buf = RawUsbMemAlloc(configLen);
     if (buf == NULL) {
         HDF_LOGE("%s:%d RawUsbMemAlloc failed", __func__, __LINE__);
@@ -1491,6 +1490,11 @@ void *RawUsbMemCalloc(size_t size)
     struct RawUsbRamTestList *pos = NULL;
     uint32_t totalSize = 0;
 
+    if (size == 0) {
+        HDF_LOGE("%s:%d size is 0", __func__, __LINE__);
+        return NULL;
+    }
+    
     buf = OsalMemAlloc(size);
     if (buf != NULL) {
         (void)memset_s(buf, size, 0, size);
