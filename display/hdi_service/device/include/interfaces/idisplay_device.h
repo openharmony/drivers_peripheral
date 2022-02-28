@@ -44,7 +44,7 @@ public:
     /* device proxy */
     virtual int32_t RegHotPlugCallback(HotPlugCallback callback, void *data) = 0;
     virtual int32_t GetDisplayCapability(uint32_t devId, DisplayCapability &info) = 0;
-    virtual int32_t GetDisplaySupportedModes(uint32_t devId, int &num, DisplayModeInfo *modes) = 0;
+    virtual int32_t GetDisplaySupportedModes(uint32_t devId, uint32_t &num, DisplayModeInfo *modes) = 0;
     virtual int32_t GetDisplayMode(uint32_t devId, uint32_t &modeId) = 0;
     virtual int32_t SetDisplayMode(uint32_t devId, uint32_t modeId) = 0;
     virtual int32_t GetDisplayPowerStatus(uint32_t devId, DispPowerStatus &status) = 0;

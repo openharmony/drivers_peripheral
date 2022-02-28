@@ -17,6 +17,7 @@
 #define HDI_LAYER_H
 #include <unordered_set>
 #include <memory>
+#include <vector>
 #include "buffer_handle.h"
 #include "display_common.h"
 #include "hdi_device_common.h"
@@ -31,9 +32,13 @@ public:
     explicit HdiLayerBuffer(const BufferHandle &hdl);
     virtual ~HdiLayerBuffer();
     HdiLayerBuffer &operator = (const BufferHandle &right);
-    uint64_t GetPhysicalAddr() const
+    uint64_t GetMemHandle() const
     {
-        return mPhyAddr;
+        if (mPhyAddr == 0) {
+            return static_cast<uint64_t>(mFd);
+        } else {
+            return mPhyAddr;
+        }
     }
     int32_t GetHeight() const
     {
