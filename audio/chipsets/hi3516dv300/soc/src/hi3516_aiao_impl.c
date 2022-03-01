@@ -28,6 +28,9 @@
 #define AIP_TRANS_SIZE_REG      0x1094
 #define AIP_INF_ATTRI_REG       0x1000
 #define AIP_CTRL_REG            0x1004
+#define RX_INT_ENA              0x10a0
+#define AIAO_INT_ENA            0x0000
+#define RX_INT_CLR              0x10AC
 
 #define GPIO_BASE1 0x2010
 #define GPIO_BASE2 0x2400
@@ -527,15 +530,28 @@ static void AipSetCtrlReg(unsigned int chnId)
     AiaoHalWriteReg(AiopRegCfg(AIP_CTRL_REG, OFFSET_MULTL, chnId), aipCtrlReg.u32);
 }
 
+int32_t AiaoRxIntClr(unsigned int chnId)
+{
+    const unsigned int rxTransIntClear = 0x1;
+    AiaoHalWriteReg(AiopRegCfg(RX_INT_CLR, OFFSET_MULTL, chnId), rxTransIntClear);
+    return HDF_SUCCESS;
+}
+
 int32_t AiaoDeviceInit(unsigned int chnId)
 {
     const unsigned int aipAttrVal = 0xe4880014;
     const unsigned int aopAttrVal = 0xe4000054;
 
+    const unsigned int rxIntEnaVal = 0x1;
+    const unsigned int rxCh0IntEna = 0x1;
+
     AiaoHalWriteReg(AiopRegCfg(AIP_INF_ATTRI_REG, OFFSET_MULTL, chnId), aipAttrVal);
     AiaoHalWriteReg(AiopRegCfg(AOP_INF_ATTRI_REG, OFFSET_MULTL, chnId),  aopAttrVal);
     AopSetCtrlReg(chnId);
     AipSetCtrlReg(chnId);
+
+    AiaoHalWriteReg(AiopRegCfg(AIAO_INT_ENA, OFFSET_MULTL, chnId), rxCh0IntEna);
+    AiaoHalWriteReg(AiopRegCfg(RX_INT_ENA, OFFSET_MULTL, chnId), rxIntEnaVal);
     return HDF_SUCCESS;
 }
 
@@ -571,13 +587,13 @@ int32_t AudioAoInit(const struct PlatformData *platformData)
 
 int32_t AudioAiInit(const struct PlatformData *platformData)
 {
-    const int aiaoBuffPoint = 1024; // 1024 is buff point
+    int ret;
     if (platformData == NULL || platformData->captureBufInfo.phyAddr == 0) {
         AUDIO_DEVICE_LOG_ERR("input param is NULL.");
         return HDF_FAILURE;
     }
     
-    int ret = AipHalSetBufferAddr(0, platformData->captureBufInfo.phyAddr);
+    ret = AipHalSetBufferAddr(0, platformData->captureBufInfo.phyAddr);
     if (ret != HDF_SUCCESS) {
         AUDIO_DEVICE_LOG_ERR("AipHalSetBufferAddr: failed.");
         return HDF_FAILURE;
@@ -589,7 +605,9 @@ int32_t AudioAiInit(const struct PlatformData *platformData)
         return HDF_FAILURE;
     }
 
-    ret = AipHalSetTransSize(0, aiaoBuffPoint);
+    AUDIO_DEVICE_LOG_DEBUG("trafBufSize = 0x%x", platformData->captureBufInfo.trafBufSize);
+
+    ret = AipHalSetTransSize(0, platformData->captureBufInfo.trafBufSize);
     if (ret != HDF_SUCCESS) {
         AUDIO_DEVICE_LOG_ERR("AipHalSetTransSize fail.");
         return HDF_FAILURE;

@@ -28,6 +28,11 @@
 #include "audio_types.h"
 #include "hdf_base.h"
 #include "inttypes.h"
+#include "hdf_io_service_if.h"
+#include "hdf_service_status.h"
+#include "ioservstat_listener.h"
+#include "svcmgr_ioservice.h"
+#include "pnp_message_report.h"
 
 #define LOG_FUN_ERR(fmt, arg...) do { \
         printf("%s: [%s]: [%d]:[ERROR]:" fmt"\n", __FILE__, __func__, __LINE__, ##arg); \
@@ -37,6 +42,7 @@
 #define AUDIO_SAMPLE_RATE_48K 48000
 #define PATH_LEN 256
 
+#define BUFFER_PERIOD_SIZE (4 * 1024)
 #define DEEP_BUFFER_RENDER_PERIOD_SIZE 4096
 #define DEEP_BUFFER_RENDER_PERIOD_COUNT 8
 #define INT_32_MAX 0x7fffffff
@@ -78,6 +84,20 @@ char g_path[256];
 void *g_sdkHandle;
 int (*g_sdkInitSp)() = NULL;
 void (*g_sdkExitSp)() = NULL;
+#endif
+
+enum AudioCaptureMode {
+    CAPTURE_POLL   = 1,
+    CAPTURE_INTERUPT,
+};
+
+int g_CaptureModeFlag = CAPTURE_POLL;
+
+#ifndef __LITEOS__
+int g_receiveFrameCount = 0;
+uint64_t g_totalSize = 0;
+struct ISvcMgrIoservice *g_servmgr = NULL;
+struct ServiceStatusListener *g_listener = NULL;
 #endif
 
 enum CaptureMenuId {
@@ -178,7 +198,7 @@ int32_t InitAttrsCapture(struct AudioSampleAttributes *attrs)
     attrs->sampleRate = AUDIO_SAMPLE_RATE_48K;
     attrs->interleaved = 0;
     attrs->type = AUDIO_IN_MEDIA;
-    attrs->period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    attrs->period = BUFFER_PERIOD_SIZE;
     attrs->frameSize = PCM_16_BIT * attrs->channelCount / PCM_8_BIT;
     attrs->isBigEndian = false;
     attrs->isSignedData = true;
@@ -225,6 +245,123 @@ uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)
     return DEEP_BUFFER_RENDER_PERIOD_SIZE * attrs.channelCount * (PcmFormatToBits(attrs.format) >> 3);
 }
 
+#ifndef __LITEOS__
+static int AudioPnpSvcThresholdMsgCheck(struct ServiceStatus *svcStatus, struct PnpReportMsg *pnpReportMsg)
+{
+    int ret;
+    if (svcStatus == NULL || pnpReportMsg == NULL) {
+        printf("input param is null!\n");
+        return HDF_FAILURE;
+    }
+
+    ret = PnpReportMsgDeSerialize((uint8_t *)svcStatus->info, EVENT_REPORT, pnpReportMsg);
+    if (ret != HDF_SUCCESS) {
+        printf("PnpReportMsgParse fail \n");
+        return HDF_FAILURE;
+    }
+    if (pnpReportMsg->eventMsg.eventType != EVENT_REPORT || pnpReportMsg->eventMsg.eventId != CAPTURE_THRESHOLD) {
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static void AudioPnpSvcEvenReceived(struct ServiceStatusListener *listener, struct ServiceStatus *svcStatus)
+{
+    struct StrParaCapture *strParam = NULL;
+    struct AudioCapture *capture = NULL;
+    uint32_t bufferSize = AUDIO_BUFF_SIZE;   // 16 * 1024 = 16KB, it needs to be calculated by audio parameters
+    uint64_t replyBytes = 0;
+    uint64_t requestBytes = AUDIO_BUFF_SIZE; // 16 * 1024 = 16KB
+    int32_t index = 0;
+    struct PnpReportMsg pnpReportMsg = {0};
+    char *frame = NULL;
+
+    if ((svcStatus == NULL) || (listener == NULL)) {
+        printf("input param is null!\n");
+        return ;
+    }
+    if (AudioPnpSvcThresholdMsgCheck(svcStatus, &pnpReportMsg) != HDF_SUCCESS) {
+        printf("This event is not a threshold report event  \n");
+        return ;
+    }
+    strParam = (struct StrParaCapture *)listener->priv;
+    if (strParam == NULL) {
+        printf("strParam is null \n");
+        return ;
+    }
+    capture = strParam->capture;
+    if (capture == NULL || capture->CaptureFrame == NULL || strParam->file == NULL) {
+        printf("capture is null \n");
+        return ;
+    }
+    frame = (char *)calloc(1, bufferSize);
+    if (frame == NULL) {
+        printf("calloc frame failed!\n");
+        return ;
+    }
+    g_receiveFrameCount++;
+    for (index = g_receiveFrameCount; index > 0; index--) {
+        if (capture->CaptureFrame(capture, frame, requestBytes, &replyBytes) != HDF_SUCCESS) {
+            printf("\nCaptureFrame fail\n");
+        } else {
+            fwrite(frame, (size_t)replyBytes, 1, strParam->file);
+            g_receiveFrameCount--;
+            g_totalSize += (replyBytes / PERIOD_SIZE); // 1024 = 1Kb
+            if (g_totalSize % AUDIO_RECORD_INTERVAL_512KB == 0) { // 512KB
+                printf("\nRecording,the audio file size is %"PRIu64"Kb\n", g_totalSize);
+            }
+        }
+    }
+    free(frame);
+}
+
+int RegisterListen(struct StrParaCapture *capture)
+{
+    int status;
+    if (capture == NULL) {
+        return -1;
+    }
+    g_totalSize = 0;
+    g_receiveFrameCount = 0;
+
+    g_servmgr = SvcMgrIoserviceGet(); // kernel
+    g_listener = IoServiceStatusListenerNewInstance(); // kernel
+    if (g_servmgr == NULL || g_listener == NULL) {
+        printf("g_servmgr status g_listener is null .\n");
+        return -1;
+    }
+
+    g_listener->callback = AudioPnpSvcEvenReceived;
+    g_listener->priv = (void *)capture;
+
+    status = g_servmgr->RegisterServiceStatusListener(g_servmgr, g_listener, DEVICE_CLASS_AUDIO);
+    if (status != HDF_SUCCESS) {
+        printf("RegisterServiceStatusListener file ret = %d.\n", status);
+        return -1;
+    }
+
+    printf("RegisterListen success \n");
+    return 0;
+}
+
+int UnRegisterListen(void)
+{
+    if (g_servmgr == NULL || g_listener == NULL) {
+        printf("UnRegisterListen: input para is null!\n");
+        return -1;
+    }
+    int32_t ret = g_servmgr->UnregisterServiceStatusListener(g_servmgr, g_listener);
+    if (ret != HDF_SUCCESS) {
+        printf("UnregisterServiceStatusListener file ret = %d.\n", ret);
+        return -1;
+    }
+
+    printf("UnregisterServiceStatusListener success \n");
+    return 0;
+}
+#endif
+
 int32_t StopButtonCapture(struct AudioCapture **captureS)
 {
     if (captureS == NULL) {
@@ -258,6 +395,14 @@ int32_t StopButtonCapture(struct AudioCapture **captureS)
     if (g_file != NULL) {
         fclose(g_file);
         g_file = NULL;
+    }
+    if (g_CaptureModeFlag == CAPTURE_INTERUPT) {
+#ifndef __LITEOS__
+        ret = UnRegisterListen();
+        if (ret < 0) {
+            LOG_FUN_ERR("UnRegisterListen failed!");
+        }
+#endif
     }
     printf("Stop Successful\n");
     return HDF_SUCCESS;
@@ -365,6 +510,41 @@ int32_t FrameStartCapture(const AudioHandle param)
     return HDF_SUCCESS;
 }
 
+int32_t CaptureChoiceModeAndRecording(struct StrParaCapture *StrParam, struct AudioCapture *capture)
+{
+    if (StrParam == NULL || capture == NULL) {
+        LOG_FUN_ERR("InitCaptureStrParam is NULL");
+        return HDF_FAILURE;
+    }
+    int32_t ret;
+    memset_s(StrParam, sizeof(struct StrParaCapture), 0, sizeof(struct StrParaCapture));
+    StrParam->capture = capture;
+    StrParam->file = g_file;
+    StrParam->attrs = g_attrs;
+    StrParam->frame = g_frame;
+    if (g_CaptureModeFlag == CAPTURE_INTERUPT) {
+#ifndef __LITEOS__
+        ret = RegisterListen(&g_str);
+        if (ret != 0) {
+            printf("---RegisterListen faile--- \n");
+            return HDF_FAILURE;
+        }
+#else
+        printf("not suport liteos!");
+        return HDF_FAILURE;
+#endif
+    } else {
+        pthread_attr_t tidsAttr;
+        pthread_attr_init(&tidsAttr);
+        pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
+        ret = pthread_create(&g_tids, &tidsAttr, (void *)(&FrameStartCapture), &g_str);
+        if (ret != 0) {
+            return HDF_FAILURE;
+        }
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t StartButtonCapture(struct AudioCapture **captureS)
 {
     if (captureS == NULL || g_adapter == NULL || g_adapter->CreateCapture == NULL) {
@@ -402,16 +582,8 @@ int32_t StartButtonCapture(struct AudioCapture **captureS)
     if (g_frame == NULL) {
         return HDF_FAILURE;
     }
-    memset_s(&g_str, sizeof(struct StrParaCapture), 0, sizeof(struct StrParaCapture));
-    g_str.capture = capture;
-    g_str.file = g_file;
-    g_str.attrs = g_attrs;
-    g_str.frame = g_frame;
-    pthread_attr_t tidsAttr;
-    pthread_attr_init(&tidsAttr);
-    pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
-    ret = pthread_create(&g_tids, &tidsAttr, (void *)(&FrameStartCapture), &g_str);
-    if (ret != 0) {
+    if (CaptureChoiceModeAndRecording(&g_str, capture) < 0) {
+        LOG_FUN_ERR("CaptureChoiceModeAndRecording failed");
         return HDF_FAILURE;
     }
     *captureS = capture;
@@ -1029,7 +1201,41 @@ void ProcessMenu(int32_t choice)
     }
 }
 
-void Choice()
+void PrintMenu0(void)
+{
+    printf(" ============== Play Capture select ===========\n");
+    printf("| 1. Capture Poll                             |\n");
+    printf("| 2. Capture Interupt                         |\n");
+    printf(" ==============================================\n");
+}
+
+void Choice0(void)
+{
+    system("clear");
+    int choice = 0;
+    PrintMenu0();
+    printf("Please enter your choice:");
+    int32_t ret = CheckInputName(INPUT_INT, (void *)&choice);
+    if (ret < 0) {
+        return;
+    }
+    switch (choice) {
+        case CAPTURE_POLL:
+            g_CaptureModeFlag = CAPTURE_POLL;
+            break;
+        case CAPTURE_INTERUPT:
+            g_CaptureModeFlag = CAPTURE_INTERUPT;
+            break;
+        default:
+            printf("Input error,Switched to Poll mode in for you,");
+            SystemInputFail();
+            break;
+    }
+    return;
+}
+
+
+void Choice(void)
 {
     int32_t option = 0;
     while (option < GET_CAPTURE_POSITION + 1 && option >= 0) {
@@ -1089,6 +1295,8 @@ int32_t main(int32_t argc, char const *argv[])
         LOG_FUN_ERR("InitParam Fail");
         return HDF_FAILURE;
     }
+    Choice0();
+
     Choice();
     if (g_capture != NULL && g_adapter != NULL) {
         StopButtonCapture(&g_capture);

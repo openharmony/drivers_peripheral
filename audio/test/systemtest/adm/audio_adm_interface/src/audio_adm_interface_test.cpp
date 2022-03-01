@@ -67,7 +67,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlDispatch_0001, TestSize.Level1)
     struct HdfSBuf *writeReply = nullptr;
 
     struct AudioCtlElemValue writeElemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_GAIN,
         .id.itemName = "Mic Left Gain",
         .value[0] = 5,
@@ -104,7 +104,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlDispatch_0002, TestSize.Level1)
     struct HdfSBuf *writeReply = nullptr;
     struct HdfObject *objectNull = nullptr;
     struct AudioCtlElemValue writeElemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_GAIN,
         .id.itemName = "Mic Left Gain",
         .value[0] = 6,
@@ -141,8 +141,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamDispatch_0001, TestSize.Level1)
     struct HdfSBuf *sBuf = nullptr;
     struct HdfSBuf *reply = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
-        .periodCount = 32, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 2048, .rate = 11025,
+        .periodCount = 32, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16385
     };
 
@@ -177,8 +177,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamDispatch_0002, TestSize.Level1)
     struct HdfSBuf *reply = nullptr;
     struct HdfObject *objectNull = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
-        .periodCount = 32, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 2048, .rate = 11025,
+        .periodCount = 32, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16385
     };
 
@@ -214,7 +214,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0001, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_GAIN,
         .id.itemName = "Mic Left Gain",
         .value[0] = 5,
@@ -240,7 +240,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0002, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_GAIN,
         .id.itemName = "Mic Left Gain",
         .value[0] = MIN_GAIN_VALUE,
@@ -266,7 +266,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0003, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_GAIN,
         .id.itemName = "Mic Left Gain",
         .value[0] = MAX_GAIN_VALUE,
@@ -291,7 +291,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0004, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_GAIN,
         .id.itemName = "Mic Left Gain",
         .value[0] = ERROR_GAIN_VALUE,
@@ -315,7 +315,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0005, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_NORMAL,
@@ -341,7 +341,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0006, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_BOTH_LEFT,
@@ -367,7 +367,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0007, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_BOTH_RIGHT,
@@ -393,7 +393,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0008, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_EXCHANGE,
@@ -419,7 +419,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0009, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_MIX,
@@ -445,7 +445,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0010, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_LEFT_MUTE,
@@ -471,7 +471,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0011, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_RIGHT_MUTE,
@@ -497,7 +497,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0012, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_BOTH_MUTE,
@@ -519,7 +519,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0013, TestSi
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
         .id.itemName = "Render Channel Mode",
         .value[0] = CHANEL_MODE_ILLEGAL,
@@ -546,7 +546,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0014, TestSi
     struct HdfSBuf *readBuf = nullptr;
     struct HdfSBuf *readReply = nullptr;
     struct AudioCtlElemId id = {
-        .cardServiceName = "hdf_audio_codec_dev0",
+        .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .iface = AUDIODRV_CTL_ELEM_IFACE_GAIN,
         .itemName = "Mic Left Gain",
     };
@@ -595,7 +595,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0015, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
         .id.itemName = "Main Playback Volume",
         .value[0] = 100,
@@ -622,7 +622,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0016, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
         .id.itemName = "Main Playback Volume",
         .value[0] = 40,
@@ -648,7 +648,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0017, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
         .id.itemName = "Main Playback Volume",
         .value[0] = 127,
@@ -670,7 +670,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0018, TestSi
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
         .id.itemName = "Main Playback Volume",
         .value[0] = 128,
@@ -693,7 +693,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0019, TestSi
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
         .id.itemName = "Main Playback Volume",
         .value[0] = 39,
@@ -720,7 +720,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0020, TestSi
     ASSERT_NE(nullptr, service);
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
         .id.itemName = "Playback Mute",
         .value[0] = 0,
@@ -742,7 +742,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0021, TestSi
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioCtlElemValue elemValue = {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
         .id.itemName = "Playback Mute",
         .value[0] = 2,
@@ -767,8 +767,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0001, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 4096, .rate = 11025,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_8_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 2048, .rate = 11025,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_8_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 8190
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -788,8 +788,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0002, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 4096, .rate = 22050,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_16_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 2048, .rate = 22050,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_16_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 8190
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -809,8 +809,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0003, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 16384, .rate = 24000,
-        .periodCount = 4, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 4096, .rate = 24000,
+        .periodCount = 4, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 162140
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -830,8 +830,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0004, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 4096, .rate = 48190,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_32_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 2048, .rate = 48190,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_32_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 8190
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -851,8 +851,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0005, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 4096, .rate = 44100,
-        .periodCount = 8, .format = AUDIO_FORMAT_AAC_MAIN, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 2048, .rate = 44100,
+        .periodCount = 8, .format = AUDIO_FORMAT_AAC_MAIN, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 8190
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -872,8 +872,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0006, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 4096, .rate = 8190,
-        .periodCount = 8, .format = AUDIO_FORMAT_AAC_LC, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 2048, .rate = 8190,
+        .periodCount = 8, .format = AUDIO_FORMAT_AAC_LC, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 8190
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -893,8 +893,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0007, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 4096, .rate = 32000,
-        .periodCount = 8, .format = AUDIO_FORMAT_AAC_LD, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 2048, .rate = 32000,
+        .periodCount = 8, .format = AUDIO_FORMAT_AAC_LD, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 8190
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -914,8 +914,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0008, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 4096, .rate = 50000,
-        .periodCount = 8, .format = AUDIO_FORMAT_AAC_ELD, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 2048, .rate = 50000,
+        .periodCount = 8, .format = AUDIO_FORMAT_AAC_ELD, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 8190
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -935,8 +935,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0009, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 4096, .rate = 47250,
-        .periodCount = 8, .format = AUDIO_FORMAT_AAC_HE_V1, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 2048, .rate = 47250,
+        .periodCount = 8, .format = AUDIO_FORMAT_AAC_HE_V1, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 8190
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -956,8 +956,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0010, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 4096, .rate = 47250,
-        .periodCount = 8, .format = AUDIO_FORMAT_AAC_HE_V2, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 2048, .rate = 47250,
+        .periodCount = 8, .format = AUDIO_FORMAT_AAC_HE_V2, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 8190
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -977,8 +977,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0011, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
-        .periodCount = 4, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 4096, .rate = 11025,
+        .periodCount = 4, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
     ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
@@ -998,8 +998,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0012, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 1, .periodSize = 4096, .rate = 24000,
-        .periodCount = 4, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 1, .period = 2048, .rate = 24000,
+        .periodCount = 4, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 16384
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -1018,8 +1018,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0013, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 8, .periodSize = 4096, .rate = 48000,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_8_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 8, .period = 2048, .rate = 48000,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_8_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 32766
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -1038,8 +1038,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0014, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 4095, .rate = 48000,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_8_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 2047, .rate = 48000,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_8_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 32766
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -1059,8 +1059,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0015, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 16384, .rate = 48000,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_8_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 8192, .rate = 48000,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_8_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 32766
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -1079,8 +1079,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0016, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 8, .periodSize = 4096, .rate = 24000,
-        .periodCount = 7, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 8, .period = 2048, .rate = 24000,
+        .periodCount = 7, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 16384
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -1099,8 +1099,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0017, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 4096, .rate = 24000,
-        .periodCount = 33, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 8193, .rate = 24000,
+        .periodCount = 33, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 16384
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -1119,8 +1119,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0018, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 4096, .rate = 24000,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 2048, .rate = 24000,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 8193
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -1139,8 +1139,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0019, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 4096, .rate = 24000,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 2048, .rate = 24000,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 0
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -1160,12 +1160,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0020, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
-        .periodCount = 4, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
-        .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 8191
+        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 4096, .rate = 11025,
+        .periodCount = 4, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
+        .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 4095
     };
     ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_FAILURE, ret);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1181,8 +1181,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0021, TestSize.Leve
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
-        .periodCount = 32, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 4096, .rate = 11025,
+        .periodCount = 32, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16385
     };
     ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
@@ -1203,8 +1203,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostWrite_0001, TestSize.Level1)
     struct HdfSBuf *sBufTStop = nullptr;
     struct HdfSBuf *reply = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
-        .periodCount = 4, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 4096, .rate = 11025,
+        .periodCount = 4, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
 
@@ -1247,8 +1247,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRead_0001, TestSize.Level1)
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioXferi transfer;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 4096, .rate = 11025,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
     int32_t ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
@@ -1301,9 +1301,9 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderPrepare_0001, TestSize
     struct HdfIoService *service = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
-        .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16385
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 4096, .rate = 11025,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
+        .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
     ASSERT_EQ(HDF_SUCCESS, ret);
@@ -1334,8 +1334,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostCapturePrepare_0001, TestSiz
     struct HdfIoService *service = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 4096, .rate = 11025,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
     ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
@@ -1367,8 +1367,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_StreamHostRenderStart_0001, TestSize.Level1)
     struct HdfIoService *service = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 4096, .rate = 11025,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -1401,8 +1401,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_StreamHostCaptureStart_0001, TestSize.Level1
     struct HdfIoService *service = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 4096, .rate = 11025,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
     ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
@@ -1435,8 +1435,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderStop_0001, TestSize.Le
     struct HdfIoService *service = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 8192, .rate = 44100,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 4096, .rate = 44100,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -1467,8 +1467,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostCaptureStop_0001, TestSize.L
     struct HdfIoService *service = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .periodSize = 8192, .rate = 44100,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 4096, .rate = 44100,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
     ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
@@ -1497,8 +1497,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderPause_0001, TestSize.L
     struct HdfIoService *service = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 4096, .rate = 11025,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -1531,8 +1531,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostCapturePause_0001, TestSize.
     struct HdfIoService *service = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 4096, .rate = 11025,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
     ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
@@ -1565,8 +1565,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderResume_0001, TestSize.
     struct HdfIoService *service = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 4096, .rate = 11025,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
@@ -1601,8 +1601,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostCaptureResume_0001, TestSize
     struct HdfIoService *service = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
-        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .periodSize = 8192, .rate = 11025,
-        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = "hdf_audio_codec_dev0",
+        .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 4096, .rate = 11025,
+        .periodCount = 8, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
     ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
