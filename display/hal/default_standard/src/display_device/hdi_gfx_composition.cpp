@@ -110,7 +110,7 @@ void HdiGfxComposition::InitGfxSurface(ISurface &surface, HdiLayerBuffer &buffer
 {
     surface.width = buffer.GetWight();
     surface.height = buffer.GetHeight();
-    surface.phyAddr = buffer.GetPhysicalAddr();
+    surface.phyAddr = buffer.GetMemHandle();
     surface.enColorFmt = (PixelFormat)buffer.GetFormat();
     surface.stride = buffer.GetStride();
     surface.bAlphaExt1555 = true;
