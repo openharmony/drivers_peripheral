@@ -163,7 +163,7 @@ int32_t AudioProxyManagerLoadAdapter(struct AudioProxyManager *manager, const st
     return AUDIO_HAL_SUCCESS;
 }
 
-void AudioProxyManagerUnloadAdapter(const struct AudioProxyManager *manager, const struct AudioAdapter *adapter)
+void AudioProxyManagerUnloadAdapter(struct AudioProxyManager *manager, struct AudioAdapter *adapter)
 {
     int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
     if (ret < 0) {
