@@ -122,7 +122,7 @@ RetCode HcsDeal::DealCameraAbility(const struct DeviceResourceNode &node)
         return RC_ERROR;
     }
 
-    for (CameraIdMap::iterator itr = cameraIdMap_.begin(); itr != cameraIdMap_.end(); itr++) {
+    for (CameraIdMap::iterator itr = cameraIdMap_.begin(); itr != cameraIdMap_.end(); ++itr) {
         CAMERA_LOGD("cameraId = %{public}s", itr->first.c_str());
         for (auto &str : itr->second) {
             CAMERA_LOGD("phyCameraId = %{public}s", str.c_str());
@@ -224,7 +224,7 @@ RetCode HcsDeal::DealAvailableAeFpsTargets(
 {
     int32_t hcbRet = -1;
     uint32_t nodeValue;
-    std::vector<uint8_t> availableAeFpsTargets;
+    std::vector<int32_t> availableAeFpsTargets;
     int32_t elemNum = pDevResIns->GetElemNum(&metadataNode, "availableAeFpsTargets");
     for (int i = 0; i < elemNum; i++) {
         hcbRet = pDevResIns->GetUint32ArrayElem(&metadataNode, "availableAeFpsTargets", i, &nodeValue, -1);
