@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,12 +17,12 @@
 #define BT_HAL_HCI_WATCHER_H
 
 #include <atomic>
-#include <sys/time.h>
-#include <thread>
-#include <time.h>
+#include <ctime>
 #include <functional>
 #include <map>
 #include <mutex>
+#include <sys/time.h>
+#include <thread>
 
 namespace OHOS {
 namespace HDI {
