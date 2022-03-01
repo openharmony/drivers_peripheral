@@ -19,9 +19,10 @@ group("usbfn_cdcecm") {
 }
 
 ohos_shared_library("libusbfn_cdcecm") {
-  default_config_path = "//vendor/hisilicon/Hi3516DV300/usb/"
-  if (product_name == "rk3568") {
-    default_config_path = "//vendor/$product_company/$product_name/usb"
+  default_config_path =
+      "//device/soc/$device_company/common/hal/usb/$device_name/include"
+  if (device_company == "hihope") {
+    default_config_path = "//device/$device_company/$device_name/usb/include"
   }
 
   include_dirs = [
