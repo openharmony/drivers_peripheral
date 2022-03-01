@@ -16,9 +16,9 @@
 #ifndef BT_HAL_HCI_PROTOCOL_H
 #define BT_HAL_HCI_PROTOCOL_H
 
-#include <cerrno>
 #include <cstdio>
 #include <vector>
+
 #include "hci_internal.h"
 
 namespace OHOS {
