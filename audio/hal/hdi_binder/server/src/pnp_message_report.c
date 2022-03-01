@@ -28,10 +28,10 @@ static int32_t AudioPnpDevPlugMsgDeSerialize(uint8_t *msgStr, struct PnpReportDe
 {
     int i;
     char *stringTepm = NULL;
-    uint8_t buf[PNP_REPORT_MSG_FIELD_NUM -1] = {0};
+    uint8_t buf[PNP_REPORT_MSG_FIELD_NUM - 1] = {0};
 
     if (msgStr == NULL) {
-        HDF_LOGE("[%{public}s]: Parameter error!\n", __func__);
+        HDF_LOGE("[%{public}s]: Parameter error!", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     char strTemp[PNP_REPORT_MSG_LEN_MAX] = {0};
@@ -41,7 +41,7 @@ static int32_t AudioPnpDevPlugMsgDeSerialize(uint8_t *msgStr, struct PnpReportDe
     if (stringTepm != NULL) {
         devPlugMsg->eventType = (uint8_t)atoi(stringTepm);
         if (devPlugMsg->eventType != DEVICE_PULG) {
-            HDF_LOGE("[%{public}s]: PnpReportType error!\n", __func__);
+            HDF_LOGE("[%{public}s]: PnpReportType error!", __func__);
 
             return AUDIO_HAL_ERR_INVALID_PARAM;
         }
@@ -51,7 +51,7 @@ static int32_t AudioPnpDevPlugMsgDeSerialize(uint8_t *msgStr, struct PnpReportDe
         if (stringTepm != NULL) {
             buf[i - 1] = (uint8_t)atoi(stringTepm);
         } else {
-            HDF_LOGE("[%{public}s]: Parse error!\n", __func__);
+            HDF_LOGE("[%{public}s]: Parse error!", __func__);
             return AUDIO_HAL_ERR_NOT_SUPPORT;
         }
     }
@@ -67,10 +67,10 @@ static int32_t AudioPnpDevEventMsgDeSerialize(uint8_t *msgStr, struct PnpReportE
 {
     int i;
     char *stringTepm = NULL;
-    uint8_t buf[PNP_REPORT_MSG_FIELD_NUM -1] = {0};
+    uint8_t buf[PNP_REPORT_MSG_FIELD_NUM - 1] = {0};
 
     if (msgStr == NULL || eventMsg == NULL) {
-        HDF_LOGE("[%{public}s]: Parameter error!\n", __func__);
+        HDF_LOGE("[%{public}s]: Parameter error!", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     char strTemp[PNP_REPORT_MSG_LEN_MAX] = {0};
@@ -80,7 +80,7 @@ static int32_t AudioPnpDevEventMsgDeSerialize(uint8_t *msgStr, struct PnpReportE
     if (stringTepm != NULL) {
         eventMsg->eventType = (uint8_t)atoi(stringTepm);
         if (eventMsg->eventType != EVENT_REPORT) {
-            HDF_LOGE("[%{public}s]: PnpReportType error!\n", __func__);
+            HDF_LOGE("[%{public}s]: PnpReportType error!", __func__);
             return AUDIO_HAL_ERR_INVALID_PARAM;
         }
     }
@@ -89,7 +89,7 @@ static int32_t AudioPnpDevEventMsgDeSerialize(uint8_t *msgStr, struct PnpReportE
         if (stringTepm != NULL) {
             buf[i - 1] = (uint8_t)atoi(stringTepm);
         } else {
-            HDF_LOGE("[%{public}s]: Parse error!\n", __func__);
+            HDF_LOGE("[%{public}s]: Parse error!", __func__);
             return AUDIO_HAL_ERR_NOT_SUPPORT;
         }
     }
@@ -108,13 +108,13 @@ int32_t PnpReportMsgDeSerialize(uint8_t *msgStr, enum PnpReportType msgType,
     int32_t ret;
     int len;
     if (pnpReportMsg == NULL || msgStr == NULL) {
-        HDF_LOGE("[%s]: Parameter error!\n", __func__);
+        HDF_LOGE("[%{public}s]: Parameter error!", __func__);
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 
     len = strlen((const char *)msgStr);
     if (len == 0 || len > PNP_REPORT_MSG_LEN_MAX) {
-        HDF_LOGE("[%s]: Parameter error!\n", __func__);
+        HDF_LOGE("[%{public}s]: Parameter error!", __func__);
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 
@@ -123,7 +123,7 @@ int32_t PnpReportMsgDeSerialize(uint8_t *msgStr, enum PnpReportType msgType,
             pnpReportMsg->reportType = DEVICE_PULG;
             ret = AudioPnpDevPlugMsgDeSerialize(msgStr, &pnpReportMsg->devPlugMsg);
             if (ret != 0) {
-                HDF_LOGE("[%s]: PnpDevPlugMsgPrase error!\n", __func__);
+                HDF_LOGE("[%{public}s]: PnpDevPlugMsgPrase error!", __func__);
                 return AUDIO_HAL_ERR_INTERNAL;
             }
             break;
@@ -131,12 +131,12 @@ int32_t PnpReportMsgDeSerialize(uint8_t *msgStr, enum PnpReportType msgType,
             pnpReportMsg->reportType = EVENT_REPORT;
             ret = AudioPnpDevEventMsgDeSerialize(msgStr, &pnpReportMsg->eventMsg);
             if (ret != 0) {
-                HDF_LOGE("[%s]: PnpDevEventMsgPrase error!\n", __func__);
+                HDF_LOGE("[%{public}s]: PnpDevEventMsgPrase error!", __func__);
                 return AUDIO_HAL_ERR_INTERNAL;
             }
             break;
         default:
-            HDF_LOGE("[%s]: Unknown message type!\n", __func__);
+            HDF_LOGE("[%{public}s]: Unknown message type!", __func__);
             return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
     return AUDIO_HAL_SUCCESS;
@@ -144,39 +144,42 @@ int32_t PnpReportMsgDeSerialize(uint8_t *msgStr, enum PnpReportType msgType,
 
 uint8_t *PnpReportMsgSerialize(struct PnpReportMsg *pnpReportMsg)
 {
+    int ret = 0;
     uint8_t *msgBuf = NULL;
 
     if (pnpReportMsg == NULL) {
-        HDF_LOGE("[%s]: Parameter error!\n", __func__);
+        HDF_LOGE("[%{public}s]: Parameter error!", __func__);
         return NULL;
     }
-    
-    msgBuf = (uint8_t *)OsalMemAlloc(PNP_REPORT_MSG_LEN_MAX);
+    msgBuf = (uint8_t *)OsalMemCalloc(PNP_REPORT_MSG_LEN_MAX);
     if (msgBuf == NULL) {
-        HDF_LOGE("[%s]: Malloc memory failed!\n", __func__);
+        HDF_LOGE("[%{public}s]: Malloc memory failed!", __func__);
         return NULL;
     }
-    memset_s(msgBuf, PNP_REPORT_MSG_LEN_MAX, 0, PNP_REPORT_MSG_LEN_MAX);
     
     switch (pnpReportMsg->reportType) {
         case DEVICE_PULG:
-            (void)snprintf_s((char *)msgBuf, PNP_REPORT_MSG_LEN_MAX, PNP_REPORT_MSG_LEN_MAX - 1, "%d;%d;%d;%d;%d",
+            ret = snprintf_s((char *)msgBuf, PNP_REPORT_MSG_LEN_MAX, PNP_REPORT_MSG_LEN_MAX - 1, "%d;%d;%d;%d;%d",
                 pnpReportMsg->devPlugMsg.eventType, pnpReportMsg->devPlugMsg.state,
                 pnpReportMsg->devPlugMsg.deviceType, pnpReportMsg->devPlugMsg.deviceCap,
                 pnpReportMsg->devPlugMsg.id);
             break;
         case EVENT_REPORT:
-            (void)snprintf_s((char *)msgBuf, PNP_REPORT_MSG_LEN_MAX, PNP_REPORT_MSG_LEN_MAX - 1, "%d;%d;%d;%d;%d",
+            ret = snprintf_s((char *)msgBuf, PNP_REPORT_MSG_LEN_MAX, PNP_REPORT_MSG_LEN_MAX - 1, "%d;%d;%d;%d;%d",
                 pnpReportMsg->eventMsg.eventType, pnpReportMsg->eventMsg.eventId,
                 pnpReportMsg->eventMsg.eventValue, pnpReportMsg->eventMsg.deviceType,
                 pnpReportMsg->eventMsg.reserve);
             break;
         default:
-            HDF_LOGE("[%s]: Unknown message type!\n", __func__);
+            HDF_LOGE("[%{public}s]: Unknown message type!", __func__);
             OsalMemFree(msgBuf);
             return NULL;
     }
-
+    if (ret < 0) {
+        HDF_LOGE("[%{public}s]: snprintf_s failed!", __func__);
+        OsalMemFree(msgBuf);
+        return NULL;
+    }
     return msgBuf;
 }
 
