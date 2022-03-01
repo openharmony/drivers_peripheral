@@ -281,7 +281,7 @@ int32_t WriteHwParams(string serviceName, struct HdfIoService *&service, struct 
         return HDF_FAILURE;
     }
 
-    if (!HdfSbufWriteString(writeBuf, "hdf_audio_codec_dev0")) {
+    if (!HdfSbufWriteString(writeBuf, CARD_SEVICE_NAME.c_str())) {
         HdfIoServiceRecycle(service);
         return HDF_FAILURE;
     }

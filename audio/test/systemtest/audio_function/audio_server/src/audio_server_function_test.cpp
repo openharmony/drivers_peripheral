@@ -598,6 +598,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0013, TestSize.
         audiopara.attrs.format = AUDIO_FORMAT_PCM_16_BIT;
         audiopara.attrs.sampleRate = 48000;
         audiopara.attrs.channelCount = 2;
+        audiopara.attrs.period = 4096;
 
         ret = audiopara.render->attr.SetSampleAttributes(audiopara.render, &(audiopara.attrs));
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
