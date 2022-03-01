@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,16 +23,15 @@ namespace ohos {
 namespace hardware {
 namespace bt {
 namespace v1_0 {
-
 int32_t BtHciStub::BtHciStubOnRemoteRequest(int cmdId,
     MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
     switch (cmdId) {
-        case CMD_INIT:
+        case static_cast<int>(HciCmd::CMD_INIT):
             return BtHciStubInit(data, reply, option);
-        case CMD_SEND_HCI_PACKET:
+        case static_cast<int>(HciCmd::CMD_SEND_HCI_PACKET):
             return BtHciStubSendHciPacket(data, reply, option);
-        case CMD_CLOSE:
+        case static_cast<int>(HciCmd::CMD_CLOSE):
             return BtHciStubClose(data, reply, option);
         default: {
             HDF_LOGE("%s: not support cmd %d", __func__, cmdId);
@@ -82,7 +81,6 @@ int32_t BtHciStub::BtHciStubClose(MessageParcel& data, MessageParcel& reply, Mes
 
     return HDF_SUCCESS;
 }
-
 } // v1_0
 } // bt
 } // hardware

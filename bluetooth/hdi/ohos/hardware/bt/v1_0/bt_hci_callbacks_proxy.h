@@ -16,14 +16,13 @@
 #ifndef OHOS_HARDWARE_BT_V1_0_BTHCICALLBACKSPROXY_H
 #define OHOS_HARDWARE_BT_V1_0_BTHCICALLBACKSPROXY_H
 
-#include "ibt_hci_callbacks.h"
 #include <iremote_proxy.h>
+#include "ibt_hci_callbacks.h"
 
 namespace ohos {
 namespace hardware {
 namespace bt {
 namespace v1_0 {
-
 class BtHciCallbacksProxy : public IRemoteProxy<IBtHciCallbacks> {
 public:
     explicit BtHciCallbacksProxy(
@@ -40,7 +39,6 @@ public:
 private:
     static inline BrokerDelegator<BtHciCallbacksProxy> delegator_;
 };
-
 } // v1_0
 } // bt
 } // hardware

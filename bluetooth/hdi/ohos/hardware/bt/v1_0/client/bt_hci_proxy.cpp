@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,6 @@ namespace ohos {
 namespace hardware {
 namespace bt {
 namespace v1_0 {
-
 sptr<IBtHci> IBtHci::Get()
 {
     do {
@@ -53,7 +52,7 @@ int32_t BtHciProxy::Init(const sptr<IBtHciCallbacks> &callbacks)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    int32_t ec = Remote()->SendRequest(CMD_INIT, data, reply, option);
+    int32_t ec = Remote()->SendRequest((uint32_t)HciCmd::CMD_INIT, data, reply, option);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("Init failed, error code is %d", ec);
         return ec;
@@ -77,7 +76,7 @@ int32_t BtHciProxy::SendHciPacket(BtType type, const std::vector<uint8_t> &raw)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    int32_t ec = Remote()->SendRequest(CMD_SEND_HCI_PACKET, data, reply, option);
+    int32_t ec = Remote()->SendRequest((uint32_t)HciCmd::CMD_SEND_HCI_PACKET, data, reply, option);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("SendHciPacket failed, error code is %d", ec);
         return ec;
@@ -92,7 +91,7 @@ int32_t BtHciProxy::Close()
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
 
-    int32_t ec = Remote()->SendRequest(CMD_CLOSE, data, reply, option);
+    int32_t ec = Remote()->SendRequest((uint32_t)HciCmd::CMD_CLOSE, data, reply, option);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("Close failed, error code is %d", ec);
         return ec;
@@ -100,7 +99,6 @@ int32_t BtHciProxy::Close()
 
     return HDF_SUCCESS;
 }
-
 }  // namespace v1_0
 }  // namespace bt
 }  // namespace hardware
