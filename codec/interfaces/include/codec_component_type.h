@@ -47,7 +47,6 @@ typedef enum {
     MEDIA_ROLETYPE_IMAGE_JPEG = 0,        /**< JPEG image */
     MEDIA_ROLETYPE_VIDEO_AVC,             /**< H.264 video */
     MEDIA_ROLETYPE_VIDEO_HEVC,            /**< H.265 video */
-
     MEDIA_ROLETYPE_AUDIO_FIRST = 0x10000, /**< Dummy id pointing at the start of audio codecs */
     MEDIA_ROLETYPE_AUDIO_AAC = 0x10000,   /**< AAC audio */
     MEDIA_ROLETYPE_AUDIO_G711A,           /**< G711A audio */
@@ -80,8 +79,8 @@ typedef enum {
 * @brief Defines the alignment.
  */
 typedef struct {
-    int widthAlginment;  /**< Value to align with the width */
-    int heightAlginment; /**< Value to align with the height */
+    int32_t widthAlginment;  /**< Value to align with the width */
+    int32_t heightAlginment; /**< Value to align with the height */
 } Alginment;
 
 /**
@@ -107,7 +106,6 @@ typedef enum {
     CODEC_CAP_ADAPTIVE_PLAYBACK = 0x1, /**< Adaptive playback */
     CODEC_CAP_SECURE_PLAYBACK   = 0x2, /**< Secure playback */
     CODEC_CAP_TUNNEL_PLAYBACK   = 0x4, /**< Tunnel playback */
-
     CODEC_CAP_MULTI_PLANE = 0x10000,    /**< Video picture planes/audio channel planar */
 } CodecCapsMask;
 
@@ -176,7 +174,6 @@ typedef struct {
                                                 <b> AUD_SAMPLE_RATE_INVALID</b> */
     int32_t channelLayouts[CHANNEL_NUM];   /**< Supported count of audio channel layouts,
                                                 array is terminated by <b> -1</b> */
-
     int32_t channelCount[CHANNEL_NUM];     /**< Supported audio channel count, array is terminated by <b> -1</b> */
 } AudioPortCap;
 
@@ -189,7 +186,6 @@ typedef enum {
     PROCESS_BLOCKING_INPUT_BUFFER       = 0X1,
     PROCESS_BLOCKING_OUTPUT_BUFFER      = 0X2,
     PROCESS_BLOCKING_CONTROL_FLOW       = 0X4,
-
     PROCESS_NONBLOCKING_INPUT_BUFFER    = 0X100,
     PROCESS_NONBLOCKING_OUTPUT_BUFFER   = 0X200,
     PROCESS_NONBLOCKING_CONTROL_FLOW    = 0X400,
@@ -242,7 +238,7 @@ struct OmxCodecBuffer {
     uint32_t flag;
 };
 
-enum OMX_INDEXCODECEXTYPE {
+enum OmxIndexCodecExType {
     OMX_IndexExtBufferTypeStartUnused = OMX_IndexKhronosExtensions + 0x00a00000,
     OMX_IndexParamSupportBufferType,
     OMX_IndexParamUseBufferType,

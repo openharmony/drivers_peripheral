@@ -18,18 +18,11 @@
 
 #include <stdint.h>
 #include <netinet/in.h>
-#include "codec_types.h"
 #include "codec_component_type.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-
-enum {
-    CMD_EVENT_HANDLER,
-    CMD_EMPTY_BUFFER_DONE,
-    CMD_FILL_BUFFER_DONE,
-};
 
 struct CodecCallbackType {
     struct HdfRemoteService *remote;

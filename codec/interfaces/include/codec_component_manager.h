@@ -16,8 +16,7 @@
 #ifndef CODEC_COMPONENT_MANAGER_H
 #define CODEC_COMPONENT_MANAGER_H
 
-#include "codec_component.h"
-#include "codec_component_type.h"
+#include "codec_component_if.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -27,7 +26,7 @@ extern "C" {
 
 struct CodecComponentManager {
     int32_t (*GetComponentNum)();
-    int32_t (*GetComponentCapabilityList)(CodecCompCapability *capList, int count);
+    int32_t (*GetComponentCapabilityList)(CodecCompCapability *capList, int32_t count);
     int32_t (*CreateComponent)(struct CodecComponentType **component, char *compName, void *appData,
         int32_t appDataSize, struct CodecCallbackType *callbacks);
     int32_t (*DestoryComponent)(struct CodecComponentType *component);
