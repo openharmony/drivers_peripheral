@@ -48,7 +48,7 @@ HdiLayerBuffer &HdiLayerBuffer::operator = (const BufferHandle &right)
     if (mFd >= 0) {
         close(mFd);
     }
-    mFd = right.fd;
+    mFd = dup(right.fd);
     mPhyAddr = right.phyAddr;
     mWidth = right.width;
     mHeight = right.height;
@@ -153,7 +153,9 @@ int32_t HdiLayer::SetLayerBuffer(const BufferHandle *buffer, int32_t fence)
     DISPLAY_CHK_RETURN((buffer == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("buffer is nullptr"));
     std::unique_ptr<HdiLayerBuffer> layerbuffer = std::make_unique<HdiLayerBuffer>(*buffer);
     mHdiBuffer = std::move(layerbuffer);
-    mAcquireFence = fence;
+    if (fence > -1) {
+        mAcquireFence = dup(fence);
+    }
     return DISPLAY_SUCCESS;
 }
 

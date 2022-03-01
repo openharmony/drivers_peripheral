@@ -222,12 +222,12 @@ int32_t DisplayDeviceServerStub::GetDisplaySupportedModes(MessageParcel *data, M
     DISPLAY_START;
 
     uint32_t devId = 0;
-    int32_t modesNum = 1;
+    uint32_t modesNum = 1;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
         return DISPLAY_FAILURE;
     }
-    if (!data->ReadInt32(modesNum) || modesNum > COMPOSER_SERVER_ARRAY_NUMBER_MAX) {
+    if (!data->ReadUint32(modesNum) || modesNum > COMPOSER_SERVER_ARRAY_NUMBER_MAX) {
         DISPLAY_LOG("modesNum invlid");
         return DISPLAY_FAILURE;
     }
