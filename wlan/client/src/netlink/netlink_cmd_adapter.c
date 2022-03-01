@@ -48,6 +48,15 @@
 #define WAITFORTHREAD 100000
 #define RETRIES 30
 
+#define STR_WLAN0 "wlan0"
+#define STR_WLAN1 "wlan1"
+#define STR_P2P0 "p2p0"
+#define STR_P2P0_X "p2p0-"
+#define STRLEN_WLAN0 5
+#define STRLEN_WLAN1 5
+#define STRLEN_P2P0 4
+#define STRLEN_P2P0_X 5
+
 // vendor attr
 enum AndrWifiAttr {
     ANDR_WIFI_ATTRIBUTE_NUM_FEATURE_SET,
@@ -640,8 +649,7 @@ static int32_t ParserValidFreq(struct nl_msg *msg, void *arg)
 
 static bool IsWifiIface(const char *name)
 {
-    if (strncmp(name, "wlan", 4) != 0 && strncmp(name, "p2p", 3) != 0 &&
-        strncmp(name, "nan", 3) != 0) {
+    if (strncmp(name, "wlan", 4) != 0 && strncmp(name, "p2p", 3) != 0) {
         /* not a wifi interface; ignore it */
         return false;
     } else {
@@ -678,8 +686,6 @@ int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result)
 {
     int32_t ret;
     uint32_t i;
-    uint32_t ifaceId;
-    struct nl_msg *msg = NULL;
 
     ret = GetAllIfaceInfo(result);
     if (ret != RET_CODE_SUCCESS) {
@@ -689,32 +695,19 @@ int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result)
 
     HILOG_INFO(LOG_DOMAIN, "%s: wifi iface num %d", __FUNCTION__, result->nums);
     for (i = 0; i < result->nums; ++i) {
-        // NL80211_CMD_GET_WIPHY
-        ifaceId = if_nametoindex(result->infos[i].name);
-        if (ifaceId == 0) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: get iface id(%d) failed", __FUNCTION__, ifaceId);
-            return RET_CODE_FAILURE;
-        }
-
-        msg = nlmsg_alloc();
-        if (msg == NULL) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: nlmsg alloc failed", __FUNCTION__);
-            return RET_CODE_NOMEM;
-        }
-        genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_DUMP,
-            NL80211_CMD_GET_WIPHY, 0);
-        nla_put_flag(msg, NL80211_ATTR_SPLIT_WIPHY_DUMP);
-        nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
         memset_s(result->infos[i].supportMode, sizeof(result->infos[i].supportMode),
             0, sizeof(result->infos[i].supportMode));
-        HILOG_INFO(LOG_DOMAIN, "%s: get networinfo of %s, %d", __FUNCTION__, result->infos[i].name, ifaceId);
-        ret = SendCmdSync(msg, ParserSupportIfType, &result->infos[i].supportMode);
-        if (ret != RET_CODE_SUCCESS) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed", __FUNCTION__);
-            nlmsg_free(msg);
-            return RET_CODE_FAILURE;
+        if (strncmp(result->infos[i].name, STR_WLAN0, STRLEN_WLAN0) == 0) {
+            result->infos[i].supportMode[WIFI_IFTYPE_STATION] = 1;
+            result->infos[i].supportMode[WIFI_IFTYPE_AP] = 1;
+        } else if (strncmp(result->infos[i].name, STR_WLAN1, STRLEN_WLAN1) == 0) {
+            result->infos[i].supportMode[WIFI_IFTYPE_STATION] = 1;
+        } else if (strncmp(result->infos[i].name, STR_P2P0, STRLEN_P2P0) == 0) {
+            result->infos[i].supportMode[WIFI_IFTYPE_P2P_DEVICE] = 1;
+        } else if (strncmp(result->infos[i].name, STR_P2P0_X, STRLEN_P2P0_X) == 0) {
+            result->infos[i].supportMode[WIFI_IFTYPE_P2P_CLIENT] = 1;
+            result->infos[i].supportMode[WIFI_IFTYPE_P2P_GO] = 1;
         }
-        nlmsg_free(msg);
     }
     return RET_CODE_SUCCESS;
 }
