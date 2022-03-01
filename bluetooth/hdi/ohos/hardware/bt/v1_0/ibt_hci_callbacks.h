@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@
 
 #include <vector>
 #include <string>
-#include <stdint.h>
+#include <cstdint>
 #include <hdf_log.h>
 #include <iservmgr_hdi.h>
 #include "ohos/hardware/bt/v1_0/types.h"
@@ -27,7 +27,6 @@ namespace ohos {
 namespace hardware {
 namespace bt {
 namespace v1_0 {
-
 using namespace OHOS;
 
 enum {
@@ -45,8 +44,6 @@ public:
 
     virtual int32_t OnReceivedHciPacket(BtType type, const std::vector<uint8_t>& data) = 0;
 };
-
-
 } // v1_0
 } // bt
 } // hardware

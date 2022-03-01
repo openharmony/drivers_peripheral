@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,16 +14,12 @@
  */
 
 #include "bluetooth_address.h"
-
+#include <cerrno>
 #include <cstdio>
 #include <cstring>
-
-#include <errno.h>
 #include <fcntl.h>
-#include <unistd.h>
-
 #include <hdf_log.h>
-
+#include <unistd.h>
 #include "securec.h"
 
 namespace OHOS {
@@ -121,7 +117,7 @@ void BluetoothAddress::ReadAddress(std::string &address) const
     address.resize(ADDRESS_STR_LEN + 1);
 
     int offset = 0;
-    for(int ii = 0; ii < ADDRESS_SIZE; ii++) {
+    for (int ii = 0; ii < ADDRESS_SIZE; ii++) {
         int ret = snprintf_s(
             &address[offset], (ADDRESS_STR_LEN + 1) - offset, (ADDRESS_STR_LEN + 1) - offset, "%02x:", address_[ii]);
         if (ret < 0) {
