@@ -15,6 +15,7 @@
 
 #include "h4_protocol.h"
 
+#include <cerrno>
 #include <cstring>
 
 #include <hdf_log.h>
