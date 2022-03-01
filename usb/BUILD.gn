@@ -13,14 +13,7 @@
 
 if (defined(ohos_lite)) {
   group("usb_entry") {
-    deps = [ "//drivers/peripheral/usb/sample/device/liteos:usb_dev_test" ]
-  }
-  group("usb_test_entry") {
-    deps = [
-      "//drivers/peripheral/usb/sample/host:usbhost_ddk_test",
-      "//drivers/peripheral/usb/sample/host/liteos_test:liteos_host_speed_test",
-      "//drivers/peripheral/usb/test:hdf_test_usb_device",
-    ]
+    deps = []
   }
 } else {
   import("//build/ohos.gni")
@@ -37,9 +30,5 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/usb/serial:libusbhost_acm",
       "//drivers/peripheral/usb/serial:libusbhost_acm_rawapi",
     ]
-  }
-  group("usb_test_entry") {
-    testonly = true
-    deps = [ "test:hdf_test_usb" ]
   }
 }
