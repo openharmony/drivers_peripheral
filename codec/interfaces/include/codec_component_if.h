@@ -17,47 +17,19 @@
 #define CODEC_COMPONENT_H
 
 #include <stdint.h>
-#include "codec_types.h"
-#include "codec_callback_type.h"
+#include "codec_callback_if.h"
 #include "codec_component_type.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-#define CODEC_HDI_OMX_SERVICE_NAME  "codec_hdi_omx_service"
-
-enum {
-    CMD_CODEC_GET_COMPONENT_NUM,
-    CMD_CODEC_GET_COMPONENT_CAPABILITY_LIST,
-    CMD_CREATE_COMPONENT,
-    CMD_DESTROY_COMPONENT,
-    CMD_GET_COMPONENT_VERSION,
-    CMD_SEND_COMMAND,
-    CMD_GET_PARAMETER,
-    CMD_SET_PARAMETER,
-    CMD_GET_CONFIG,
-    CMD_SET_CONFIG,
-    CMD_GET_EXTENSION_INDEX,
-    CMD_GET_STATE,
-    CMD_COMPONENT_TUNNEL_REQUEST,
-    CMD_USE_BUFFER,
-    CMD_ALLOCATE_BUFFER,
-    CMD_FREE_BUFFER,
-    CMD_EMPTY_THIS_BUFFER,
-    CMD_FILL_THIS_BUFFER,
-    CMD_SET_CALLBACKS,
-    CMD_COMPONENT_DE_INIT,
-    CMD_USE_EGL_IMAGE,
-    CMD_COMPONENT_ROLE_ENUM,
-};
-
 struct CodecComponentType {
     int32_t (*GetComponentVersion)(struct CodecComponentType *self, char *compName,
         union OMX_VERSIONTYPE *compVersion, union OMX_VERSIONTYPE *specVersion,
         uint8_t *compUUID, uint32_t compUUIDLen);
 
-    int32_t (*SendCommand)(struct CodecComponentType *self, enum OMX_COMMANDTYPE cmd, uint32_t param1,
+    int32_t (*SendCommand)(struct CodecComponentType *self, enum OMX_COMMANDTYPE cmd, uint32_t param,
         int8_t *cmdData, uint32_t cmdDataLen);
 
     int32_t (*GetParameter)(struct CodecComponentType *self, uint32_t paramIndex, int8_t *paramStruct,
