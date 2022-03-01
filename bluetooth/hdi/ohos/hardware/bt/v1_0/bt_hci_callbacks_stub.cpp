@@ -22,7 +22,6 @@ namespace ohos {
 namespace hardware {
 namespace bt {
 namespace v1_0 {
-
 int32_t BtHciCallbacksStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -70,7 +69,6 @@ int32_t BtHciCallbacksStub::BtHciCallbacksStubOnReceivedHciPacket(
 
     return HDF_SUCCESS;
 }
-
 }  // namespace v1_0
 }  // namespace bt
 }  // namespace hardware
