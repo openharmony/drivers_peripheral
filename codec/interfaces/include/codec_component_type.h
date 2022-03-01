@@ -228,7 +228,7 @@ enum ShareMemTypes {
 
 struct OmxCodecBuffer {
     uint32_t bufferId;
-	uint32_t size;                   /**< size of the structure in bytes */
+    uint32_t size;                   /**< size of the structure in bytes */
     union OMX_VERSIONTYPE version;   /**< OMX specification version information */
     enum BufferType bufferType;
     uint8_t *buffer;            /**< Pointer to actual block of memory that is acting as the buffer */
