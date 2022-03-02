@@ -125,7 +125,6 @@ int32_t PowerInterfaceImpl::StopSuspend()
 {
     if (suspending_) {
         suspending_ = false;
-        daemon_->join();
     }
     return HDF_SUCCESS;
 }
@@ -134,7 +133,6 @@ int32_t PowerInterfaceImpl::ForceSuspend()
 {
     if (suspending_) {
         suspending_ = false;
-        daemon_->join();
     }
     NotifyCallback(CMD_ON_SUSPEND);
     DoSuspend();
