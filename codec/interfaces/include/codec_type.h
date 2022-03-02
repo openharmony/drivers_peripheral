@@ -314,6 +314,7 @@ typedef enum {
     MEDIA_MIMETYPE_AUDIO_G726,     /**< G726 audio */
     MEDIA_MIMETYPE_AUDIO_PCM,      /**< PCM audio */
     MEDIA_MIMETYPE_AUDIO_MP3,      /**< MP3 audio */
+    MEDIA_MIMETYPE_VIDEO_MJPEG,    /**< JPEG video */
     MEDIA_MIMETYPE_INVALID,        /**< Invalid MIME type */
 } AvCodecMime;
 
