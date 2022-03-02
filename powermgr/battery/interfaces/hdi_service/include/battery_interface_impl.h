@@ -36,6 +36,11 @@ public:
     int32_t UnRegister() override;
     int32_t ChangePath(const std::string& path) override;
     int32_t GetCapacity(int32_t& capacity) override;
+    int32_t GetTotalEnergy(int32_t& totalEnergy) override;
+    int32_t GetCurrentAverage(int32_t& curAverage) override;
+    int32_t GetCurrentNow(int32_t& curNow) override;
+    int32_t GetRemainEnergy(int32_t& remainEnergy) override;
+    int32_t GetBatteryInfo(BatteryInfo& info) override;
     int32_t GetVoltage(int32_t& voltage) override;
     int32_t GetTemperature(int32_t& temperature) override;
     int32_t GetHealthState(BatteryHealthState& healthState) override;

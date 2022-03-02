@@ -47,10 +47,15 @@ const std::string BATTERY_KEY_CHARGE_STATUS = "POWER_SUPPLY_STATUS=";
 const std::string BATTERY_KEY_PRESENT = "POWER_SUPPLY_PRESENT=";
 const std::string BATTERY_KEY_TECHNOLOGY = "POWER_SUPPLY_TECHNOLOGY=";
 const std::string BATTERY_KEY_CHARGE_COUNTER = "POWER_SUPPLY_CHARGE_COUNTER=";
+const std::string BATTERY_KEY_TOTAL_ENERGY = "POWER_SUPPLY_TOTAL_ENERGY=";
+const std::string BATTERY_KEY_REMAIN_ENERGY = "POWER_SUPPLY_REMAIN_ENERGY=";
+const std::string BATTERY_KEY_CURRENT_AVERAGE = "POWER_SUPPLY_CURRENT_AVERAGE=";
+const std::string BATTERY_KEY_CURRENT_NOW = "POWER_SUPPLY_CURRENT_NOW=";
 const std::string INVALID_STRING_VALUE = "invalid";
 const std::string BATTERY_NODE_PATH = "battery";
 const std::string CHARGER_NODE_PATH = "ohos_charger";
 const std::string FGU_NODE_PATH = "ohos-fgu";
+BatterydInfo g_batteryInfo;
 
 struct StringEnumMap {
     const char* str;
@@ -85,6 +90,16 @@ inline void PowerSupplyProvider::Trim(char* str) const
 inline void PowerSupplyProvider::CapacityAssigner(const char* str, struct BatterydInfo* info)
 {
     info->capacity_ = ParseInt(str); // default in percent format
+}
+
+inline void PowerSupplyProvider::TotalEnergyAssigner(const char* str, struct BatterydInfo* info)
+{
+    info->totalEnergy_ = ParseInt(str);
+}
+
+inline void PowerSupplyProvider::RemainEnergyAssigner(const char* str, struct BatterydInfo* info)
+{
+    info->remainEnergy_ = ParseInt(str);
 }
 
 inline void PowerSupplyProvider::VoltageAssigner(const char* str, struct BatterydInfo* info)
@@ -167,6 +182,16 @@ inline void PowerSupplyProvider::ChargeCounterAssigner(const char* str, struct B
     info->chargeCounter_ = ParseInt(str);
 }
 
+inline void PowerSupplyProvider::CurrentAverageAssigner(const char* str, struct BatterydInfo* info)
+{
+    info->curAverage_ = ParseInt(str);
+}
+
+inline void PowerSupplyProvider::CurrentNowAssigner(const char* str, struct BatterydInfo* info)
+{
+    info->curNow_ = ParseInt(str);
+}
+
 void PowerSupplyProvider::FormatPath(std::string& path,
     size_t size, const char* format, const char* basePath, const char* name) const
 {
@@ -182,7 +207,7 @@ void PowerSupplyProvider::FormatPath(std::string& path,
     }
     path.assign(buff, strlen(buff));
     HDF_LOGI("%{public}s: path is %{public}s", __func__, path.c_str());
-    
+
     return;
 }
 
@@ -214,6 +239,14 @@ void PowerSupplyProvider::FormatSysfsPaths(struct PowerSupplySysfsInfo* info)
         "%s/%s/charge_counter", path_.c_str(), nodeInfo_["charge_counter"].c_str());
     FormatPath(batterySysfsInfo_.technologyPath, PATH_MAX,
         "%s/%s/technology", path_.c_str(), nodeInfo_["technology"].c_str());
+    FormatPath(batterySysfsInfo_.totalEnergyPath, PATH_MAX,
+        "%s/%s/charge_full", path_.c_str(), nodeInfo_["charge_full"].c_str());
+    FormatPath(batterySysfsInfo_.curAveragePath, PATH_MAX,
+        "%s/%s/current_avg", path_.c_str(), nodeInfo_["current_avg"].c_str());
+    FormatPath(batterySysfsInfo_.curNowPath, PATH_MAX,
+        "%s/%s/current_now", path_.c_str(), nodeInfo_["current_now"].c_str());
+    FormatPath(batterySysfsInfo_.remainEnergyPath, PATH_MAX,
+        "%s/%s/charge_now", path_.c_str(), nodeInfo_["charge_now"].c_str());
 
     return;
 }
@@ -394,6 +427,8 @@ void PowerSupplyProvider::UpdateInfoByReadSysFile(struct BatterydInfo* info) con
 
     info->technology_ = INVALID_STRING_VALUE;
     ParseTechnology(info->technology_);
+
+    CopyBatteryInfo(info);
     return;
 }
 
@@ -401,6 +436,8 @@ void PowerSupplyProvider::ParseUeventToBatterydInfo(const char* msg, struct Batt
 {
     static struct BatteryAssigner batteryAssigners[] = {
         { BATTERY_KEY_CAPACITY.c_str(), BATTERY_KEY_CAPACITY.length(), CapacityAssigner },
+        { BATTERY_KEY_TOTAL_ENERGY.c_str(), BATTERY_KEY_TOTAL_ENERGY.length(), TotalEnergyAssigner },
+        { BATTERY_KEY_REMAIN_ENERGY.c_str(), BATTERY_KEY_REMAIN_ENERGY.length(), RemainEnergyAssigner },
         { BATTERY_KEY_VOLTAGE.c_str(), BATTERY_KEY_VOLTAGE.length(), VoltageAssigner },
         { BATTERY_KEY_TEMPERATURE.c_str(), BATTERY_KEY_TEMPERATURE.length(), TemperatureAssigner },
         { BATTERY_KEY_HEALTH.c_str(), BATTERY_KEY_HEALTH.length(), HealthStateAssigner },
@@ -408,6 +445,8 @@ void PowerSupplyProvider::ParseUeventToBatterydInfo(const char* msg, struct Batt
         { BATTERY_KEY_PRESENT.c_str(), BATTERY_KEY_PRESENT.length(), PresentAssigner },
         { BATTERY_KEY_TECHNOLOGY.c_str(), BATTERY_KEY_TECHNOLOGY.length(), TechnologyAssigner },
         { BATTERY_KEY_CHARGE_COUNTER.c_str(), BATTERY_KEY_CHARGE_COUNTER.length(), ChargeCounterAssigner },
+        { BATTERY_KEY_CURRENT_AVERAGE.c_str(), BATTERY_KEY_CURRENT_AVERAGE.length(), CurrentAverageAssigner },
+        { BATTERY_KEY_CURRENT_NOW.c_str(), BATTERY_KEY_CURRENT_NOW.length(), CurrentNowAssigner },
         { NULL, 0, NULL } // end of the array
     };
 
@@ -435,7 +474,23 @@ void PowerSupplyProvider::ParseUeventToBatterydInfo(const char* msg, struct Batt
     info->technology_ = INVALID_STRING_VALUE;
     ParseTechnology(info->technology_);
 
+    CopyBatteryInfo(info);
     return;
+}
+
+void PowerSupplyProvider::CopyBatteryInfo(const struct BatterydInfo* info) const
+{
+    g_batteryInfo.capacity_ = info->capacity_;
+    g_batteryInfo.voltage_ = info->voltage_;
+    g_batteryInfo.temperature_ = info->temperature_;
+    g_batteryInfo.healthState_ = info->healthState_;
+    g_batteryInfo.pluggedType_ = info->pluggedType_;
+    g_batteryInfo.pluggedMaxCurrent_ = info->pluggedMaxCurrent_;
+    g_batteryInfo.pluggedMaxVoltage_ = info->pluggedMaxVoltage_;
+    g_batteryInfo.chargeState_ = info->chargeState_;
+    g_batteryInfo.chargeCounter_ = info->chargeCounter_;
+    g_batteryInfo.present_ = info->present_;
+    g_batteryInfo.technology_ = info->technology_;
 }
 
 void PowerSupplyProvider::SetSysFilePath(const std::string& path)
@@ -539,6 +594,10 @@ void PowerSupplyProvider::TraversalNode()
     nodeInfo_.insert(std::make_pair("present", ""));
     nodeInfo_.insert(std::make_pair("charge_counter", ""));
     nodeInfo_.insert(std::make_pair("technology", ""));
+    nodeInfo_.insert(std::make_pair("charge_full", ""));
+    nodeInfo_.insert(std::make_pair("current_avg", ""));
+    nodeInfo_.insert(std::make_pair("current_now", ""));
+    nodeInfo_.insert(std::make_pair("charge_now", ""));
 
     auto iter = filenodeName_.begin();
     while (iter != filenodeName_.end()) {
@@ -591,33 +650,16 @@ void PowerSupplyProvider::CheckSubfolderNode(const std::string& path)
         if (entry->d_type == DT_DIR || entry->d_type == DT_LNK) {
             continue;
         }
+
         if ((strcmp(entry->d_name, "type") == 0) && (nodeInfo_["type"] == "") &&
             (strcasecmp(path.c_str(), BATTERY_NODE_PATH.c_str()) != 0)) {
             nodeInfo_["type"] = path;
-        } else if ((strcmp(entry->d_name, "online") == 0) && (nodeInfo_["online"] == "")) {
-            nodeInfo_["online"] = path;
-        } else if ((strcmp(entry->d_name, "current_max") == 0) && (nodeInfo_["current_max"] == "")) {
-            nodeInfo_["current_max"] = path;
-        } else if ((strcmp(entry->d_name, "voltage_max") == 0) && (nodeInfo_["voltage_max"] == "")) {
-            nodeInfo_["voltage_max"] = path;
-        } else if ((strcmp(entry->d_name, "capacity") == 0) && (nodeInfo_["capacity"] == "")) {
-            nodeInfo_["capacity"] = path;
-        } else if ((strcmp(entry->d_name, "voltage_now") == 0) && (nodeInfo_["voltage_now"] == "")) {
-            nodeInfo_["voltage_now"] = path;
-        } else if ((strcmp(entry->d_name, "temp") == 0) && (nodeInfo_["temp"] == "")) {
-            nodeInfo_["temp"] = path;
-        } else if ((strcmp(entry->d_name, "health") == 0) && (nodeInfo_["health"] == "")) {
-            nodeInfo_["health"] = path;
-        } else if ((strcmp(entry->d_name, "status") == 0) && (nodeInfo_["status"] == "")) {
-            nodeInfo_["status"] = path;
-        } else if ((strcmp(entry->d_name, "present") == 0) && (nodeInfo_["present"] == "")) {
-            nodeInfo_["present"] = path;
-        } else if ((strcmp(entry->d_name, "charge_counter") == 0) && (nodeInfo_["charge_counter"] == "")) {
-            nodeInfo_["charge_counter"] = path;
-        } else if ((strcmp(entry->d_name, "technology") == 0) && (nodeInfo_["technology"] == "")) {
-            nodeInfo_["technology"] = path;
-        } else {
-            HDF_LOGI("%{public}s: battery node other branch is excute.", __func__);
+        }
+
+        for (auto iter = nodeInfo_.begin(); iter != nodeInfo_.end(); ++iter) {
+            if ((strcmp(entry->d_name, iter->first.c_str()) == 0) && (nodeInfo_[iter->first] == "")) {
+                nodeInfo_[iter->first] = path;
+            }
         }
     }
     closedir(dir);
@@ -635,6 +677,70 @@ int32_t PowerSupplyProvider::ParseCapacity(int32_t* capacity) const
     int32_t value = ParseInt(buf);
     HDF_LOGI("%{public}s: capacity is %{public}d", __func__, value);
     *capacity = value;
+
+    return HDF_SUCCESS;
+}
+
+int32_t PowerSupplyProvider::ParseTotalEnergy(int32_t* totalEnergy) const
+{
+    char buf[MAX_BUFF_SIZE] = {0};
+
+    int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.totalEnergyPath.c_str(), buf, sizeof(buf));
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
+
+    int32_t value = ParseInt(buf);
+    HDF_LOGI("%{public}s: totalEnergy is %{public}d", __func__, value);
+    *totalEnergy = value;
+
+    return HDF_SUCCESS;
+}
+
+int32_t PowerSupplyProvider::ParseCurrentAverage(int32_t* curAverage) const
+{
+    char buf[MAX_BUFF_SIZE] = {0};
+
+    int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.curAveragePath.c_str(), buf, sizeof(buf));
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
+
+    int32_t value = ParseInt(buf);
+    HDF_LOGI("%{public}s: curAverage is %{public}d", __func__, value);
+    *curAverage = value;
+
+    return HDF_SUCCESS;
+}
+
+int32_t PowerSupplyProvider::ParseCurrentNow(int32_t* curNow) const
+{
+    char buf[MAX_BUFF_SIZE] = {0};
+
+    int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.curNowPath.c_str(), buf, sizeof(buf));
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
+
+    int32_t value = ParseInt(buf);
+    HDF_LOGI("%{public}s: curNow is %{public}d", __func__, value);
+    *curNow = value;
+
+    return HDF_SUCCESS;
+}
+
+int32_t PowerSupplyProvider::ParseRemainEnergy(int32_t* remainEnergy) const
+{
+    char buf[MAX_BUFF_SIZE] = {0};
+
+    int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.remainEnergyPath.c_str(), buf, sizeof(buf));
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
+
+    int32_t value = ParseInt(buf);
+    HDF_LOGI("%{public}s: remainEnergy is %{public}d", __func__, value);
+    *remainEnergy = value;
 
     return HDF_SUCCESS;
 }
@@ -756,6 +862,11 @@ int32_t PowerSupplyProvider::ParseTechnology(std::string& technology) const
     return HDF_SUCCESS;
 }
 
+BatterydInfo PowerSupplyProvider::GetBatteryInfo() const
+{
+    return g_batteryInfo;
+}
+
 void PowerSupplyProvider::InitDefaultSysfs(void)
 {
     std::string mockBatteryPath = "/data/local/tmp/battery";
@@ -796,7 +907,7 @@ void PowerSupplyProvider::InitDefaultSysfs(void)
     CreateFile("/data/local/tmp/battery/charge_control_limit", "0");
     CreateFile("/data/local/tmp/battery/charge_counter", "4000000");
     CreateFile("/data/local/tmp/battery/charge_full", "4000000");
-    CreateFile("/data/local/tmp/battery/charge_full_design", "4000000");
+    CreateFile("/data/local/tmp/battery/charge_now", "4000000");
     CreateFile("/data/local/tmp/battery/constant_charge_current", "0");
     CreateFile("/data/local/tmp/battery/current_avg", "1000");
     CreateFile("/data/local/tmp/battery/current_now", "1000");
