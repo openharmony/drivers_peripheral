@@ -106,16 +106,16 @@ static int OnSensorEventReceived(struct HdfDevEventlistener *listener,
         event->dataLen = len;
     }
 
-    enum SensorTypeIndex index;
+    enum SensorGroupType groupType;
     if (event->sensorId >= SENSOR_TYPE_MEDICAL_BEGIN && event->sensorId < SENSOR_TYPE_MEDICAL_END) {
-        index = MEDICAL_SENSOR_TYPE_INDEX;
+        groupType = MEDICAL_SENSOR_TYPE;
     } else {
-        index = TRADITIONAL_SENSOR_TYPE_INDEX;
+        groupType = TRADITIONAL_SENSOR_TYPE;
     }
 
     ConvertSensorData(event);
-    if (manager->recordDataCb[index] != NULL) {
-        manager->recordDataCb[index](event);
+    if (manager->recordDataCb[groupType] != NULL) {
+        manager->recordDataCb[groupType](event);
     }
 
     (void)OsalMutexUnlock(&manager->eventMutex);
@@ -162,54 +162,54 @@ static int32_t AddSensorDevServiceGroup(void)
     return SENSOR_SUCCESS;
 }
 
-int32_t Register(int32_t sensorId, RecordDataCallback cb)
+int32_t Register(int32_t groupId, RecordDataCallback cb)
 {
-    if (sensorId < TRADITIONAL_SENSOR_TYPE_INDEX || sensorId > MEDICAL_SENSOR_TYPE_INDEX) {
-        HDF_LOGE("%{public}s: Sensor id [%{public}d] error", __func__, sensorId);
+    if (groupId < TRADITIONAL_SENSOR_TYPE || groupId > MEDICAL_SENSOR_TYPE) {
+        HDF_LOGE("%{public}s: groupId [%{public}d] out of range", __func__, groupId);
         return SENSOR_FAILURE;
     }
     struct SensorDevManager *manager = NULL;
     CHECK_NULL_PTR_RETURN_VALUE(cb, SENSOR_NULL_PTR);
     manager = GetSensorDevManager();
     (void)OsalMutexLock(&manager->eventMutex);
-    if (manager->recordDataCb[sensorId] != NULL) {
-        HDF_LOGE("%{public}s: Sensor id [%{public}d] callback already exists", __func__, sensorId);
+    if (manager->recordDataCb[groupId] != NULL) {
+        HDF_LOGE("%{public}s: groupId [%{public}d] callback already exists", __func__, groupId);
         (void)OsalMutexUnlock(&manager->eventMutex);
         return SENSOR_FAILURE;
     }
 
     if (manager->serviceGroup != NULL) {
-        manager->recordDataCb[sensorId] = cb;
+        manager->recordDataCb[groupId] = cb;
         (void)OsalMutexUnlock(&manager->eventMutex);
         return SENSOR_SUCCESS;
     }
     int32_t ret = AddSensorDevServiceGroup();
     if (ret == SENSOR_SUCCESS) {
-        manager->recordDataCb[sensorId] = cb;
+        manager->recordDataCb[groupId] = cb;
     }
     (void)OsalMutexUnlock(&manager->eventMutex);
     return ret;
 }
 
-int32_t Unregister(int32_t sensorId, RecordDataCallback cb)
+int32_t Unregister(int32_t groupId, RecordDataCallback cb)
 {
-    if (sensorId < TRADITIONAL_SENSOR_TYPE_INDEX || sensorId > MEDICAL_SENSOR_TYPE_INDEX) {
-        HDF_LOGE("%{public}s: Sensor id [%{public}d] error", __func__, sensorId);
+    if (groupId < TRADITIONAL_SENSOR_TYPE || groupId > MEDICAL_SENSOR_TYPE) {
+        HDF_LOGE("%{public}s: groupId [%{public}d] out of range", __func__, groupId);
         return SENSOR_FAILURE;
     }
     CHECK_NULL_PTR_RETURN_VALUE(cb, SENSOR_NULL_PTR);
     struct SensorDevManager *manager = GetSensorDevManager();
 
     (void)OsalMutexLock(&manager->eventMutex);
-    if (manager->recordDataCb[sensorId] != cb) {
-        HDF_LOGE("%{public}s: Sensor id [%{public}d] cb not same with registered", __func__, sensorId);
+    if (manager->recordDataCb[groupId] != cb) {
+        HDF_LOGE("%{public}s: groupId [%{public}d] cb not same with registered", __func__, groupId);
         (void)OsalMutexUnlock(&manager->eventMutex);
         return SENSOR_FAILURE;
     }
 
-    if (manager->recordDataCb[TRADITIONAL_SENSOR_TYPE_INDEX] != NULL &&
-        manager->recordDataCb[MEDICAL_SENSOR_TYPE_INDEX] != NULL) {
-        manager->recordDataCb[sensorId] = NULL;
+    if (manager->recordDataCb[TRADITIONAL_SENSOR_TYPE] != NULL &&
+        manager->recordDataCb[MEDICAL_SENSOR_TYPE] != NULL) {
+        manager->recordDataCb[groupId] = NULL;
         (void)OsalMutexUnlock(&manager->eventMutex);
         return SENSOR_SUCCESS;
     }
@@ -224,7 +224,7 @@ int32_t Unregister(int32_t sensorId, RecordDataCallback cb)
     manager->hasSensorListener = false;
     HdfIoServiceGroupRecycle(manager->serviceGroup);
     manager->serviceGroup = NULL;
-    manager->recordDataCb[sensorId] = NULL;
+    manager->recordDataCb[groupId] = NULL;
     (void)OsalMutexUnlock(&manager->eventMutex);
 
     return SENSOR_SUCCESS;

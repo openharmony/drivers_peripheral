@@ -47,9 +47,9 @@ public:
 
     int32_t SetOption(int32_t sensorId, uint32_t option) override;
 
-    int32_t Register(int32_t sensorId, const sptr<ISensorCallback>& callbackObj) override;
+    int32_t Register(int32_t groupId, const sptr<ISensorCallback>& callbackObj) override;
 
-    int32_t Unregister(int32_t sensorId, const sptr<ISensorCallback>& callbackObj) override;
+    int32_t Unregister(int32_t groupId, const sptr<ISensorCallback>& callbackObj) override;
 private:
     const SensorInterface *sensorInterface;
 };
