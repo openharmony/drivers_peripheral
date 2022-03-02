@@ -24,22 +24,13 @@ namespace HDI {
 namespace Sensor {
 namespace V1_0 {
 namespace {
-    enum SensorIndex {
-        TRADITIONAL_SENSOR_INDEX = 0,
-        MEDICAL_SENSOR_INDEX = 1
-    };
-    constexpr int32_t REMOTE_OBJE_CTOUNT_THRESHOLD = 1;
-    constexpr int32_t TRADITIONAL_SENSOR_ID_MIN = 0;
-    using RemoteObjectCallBackMap = std::unordered_map<IRemoteObject*, sptr<ISensorCallback>>;
-    using RemoteObjectIndexMap = std::unordered_map<IRemoteObject*, int32_t>;
-    using IndexRemoteObjectMap = std::unordered_map<int32_t, std::vector<IRemoteObject*>>;
-    RemoteObjectCallBackMap g_remoteObjectCallBackMap;
-    IndexRemoteObjectMap g_IndexRemoteObjectMap;
-    RemoteObjectIndexMap g_remoteObjectIndexMap;
+    constexpr int32_t CALLBACK_CTOUNT_THRESHOLD = 1;
+    using GroupIdCallBackMap = std::unordered_map<int32_t, std::vector<sptr<ISensorCallback>>>;
+    GroupIdCallBackMap g_groupIdCallBackMap;
     std::mutex g_mutex;
 }
 
-int TradtionalSensorDataCallback(const struct SensorEvents *event)
+int32_t TradtionalSensorDataCallback(const struct SensorEvents *event)
 {
     if (event == nullptr || event->data == nullptr) {
         HDF_LOGE("%{public}s failed, event or event.data is nullptr", __func__);
@@ -47,8 +38,8 @@ int TradtionalSensorDataCallback(const struct SensorEvents *event)
     }
 
     std::lock_guard<std::mutex> lock(g_mutex);
-    auto indexRemoteIter = g_IndexRemoteObjectMap.find(TRADITIONAL_SENSOR_INDEX);
-    if (indexRemoteIter == g_IndexRemoteObjectMap.end()) {
+    auto groupCallBackIter = g_groupIdCallBackMap.find(TRADITIONAL_SENSOR_TYPE);
+    if (groupCallBackIter == g_groupIdCallBackMap.end()) {
         return SENSOR_SUCCESS;
     }
 
@@ -67,18 +58,14 @@ int TradtionalSensorDataCallback(const struct SensorEvents *event)
         tmp++;
     }
 
-    for (auto remoteObj : g_IndexRemoteObjectMap[TRADITIONAL_SENSOR_INDEX]) {
-        auto remoteCallBack = g_remoteObjectCallBackMap.find(remoteObj);
-        if (remoteCallBack == g_remoteObjectCallBackMap.end()) {
-            continue;
-        }
-        remoteCallBack->second->OnDataEvent(hdfSensorEvents);
+    for (auto callBack : g_groupIdCallBackMap[TRADITIONAL_SENSOR_TYPE]) {
+        callBack->OnDataEvent(hdfSensorEvents);
     }
 
     return SENSOR_SUCCESS;
 }
 
-int MedicalSensorDataCallback(const struct SensorEvents *event)
+int32_t MedicalSensorDataCallback(const struct SensorEvents *event)
 {
     if (event == nullptr || event->data == nullptr) {
         HDF_LOGE("%{public}s failed, event or event.data is nullptr", __func__);
@@ -86,8 +73,8 @@ int MedicalSensorDataCallback(const struct SensorEvents *event)
     }
 
     std::lock_guard<std::mutex> lock(g_mutex);
-    auto indexRemoteIter = g_IndexRemoteObjectMap.find(MEDICAL_SENSOR_INDEX);
-    if (indexRemoteIter == g_IndexRemoteObjectMap.end()) {
+    auto groupCallBackIter = g_groupIdCallBackMap.find(MEDICAL_SENSOR_TYPE);
+    if (groupCallBackIter == g_groupIdCallBackMap.end()) {
         return SENSOR_SUCCESS;
     }
 
@@ -106,12 +93,8 @@ int MedicalSensorDataCallback(const struct SensorEvents *event)
         tmp++;
     }
 
-    for (auto remoteObj : g_IndexRemoteObjectMap[MEDICAL_SENSOR_INDEX]) {
-        auto remoteCallBack = g_remoteObjectCallBackMap.find(remoteObj);
-        if (remoteCallBack == g_remoteObjectCallBackMap.end()) {
-            continue;
-        }
-        remoteCallBack->second->OnDataEvent(hdfSensorEvents);
+    for (auto callBack : g_groupIdCallBackMap[MEDICAL_SENSOR_TYPE]) {
+        callBack->OnDataEvent(hdfSensorEvents);
     }
 
     return SENSOR_SUCCESS;
@@ -224,7 +207,7 @@ int32_t SensorImpl::SetMode(int32_t sensorId, int32_t mode)
 
     int32_t ret = sensorInterface->SetMode(sensorId, mode);
     if (ret != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s SetMode failed, error code is %{public}d", __func__, ret);
     }
 
     return ret;
@@ -245,48 +228,37 @@ int32_t SensorImpl::SetOption(int32_t sensorId, uint32_t option)
     return ret;
 }
 
-int32_t SensorImpl::Register(int32_t sensorId, const sptr<ISensorCallback>& callbackObj)
+int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallback>& callbackObj)
 {
     if (sensorInterface == NULL || sensorInterface->Register == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
 
-    IRemoteObject* obj = callbackObj->AsObject().GetRefPtr();
+    if (groupId < TRADITIONAL_SENSOR_TYPE || groupId > MEDICAL_SENSOR_TYPE) {
+        HDF_LOGE("%{public}s: groupId [%{public}d] out of range", __func__, groupId);
+        return HDF_FAILURE;
+    }
+
     std::lock_guard<std::mutex> lock(g_mutex);
-    auto remoteIter = g_remoteObjectCallBackMap.find(obj);
-    if (remoteIter != g_remoteObjectCallBackMap.end()) {
-        return SENSOR_FAILURE;
-    }
-
-    SensorIndex sensorIndex;
-    if (sensorId < TRADITIONAL_SENSOR_ID_MIN) {
-        return SENSOR_FAILURE;
-    }
-
-    if (sensorId >= SENSOR_TYPE_MEDICAL_BEGIN && sensorId < SENSOR_TYPE_MEDICAL_END) {
-        sensorIndex = MEDICAL_SENSOR_INDEX;
-    } else {
-        sensorIndex = TRADITIONAL_SENSOR_INDEX;
-    }
-
-    auto indexRemoteIter = g_IndexRemoteObjectMap.find(sensorIndex);
-    if (indexRemoteIter != g_IndexRemoteObjectMap.end()) {
-        auto remoteObjectIter =
-            find(g_IndexRemoteObjectMap[sensorIndex].begin(), g_IndexRemoteObjectMap[sensorIndex].end(), obj);
-        if (remoteObjectIter == g_IndexRemoteObjectMap[sensorIndex].end()) {
-            g_IndexRemoteObjectMap[sensorIndex].push_back(obj);
-            g_remoteObjectCallBackMap[obj] = callbackObj;
-            g_remoteObjectIndexMap[obj] = sensorIndex;
+    auto groupCallBackIter = g_groupIdCallBackMap.find(groupId);
+    if (groupCallBackIter != g_groupIdCallBackMap.end()) {
+        auto callBackIter =
+            find_if(g_groupIdCallBackMap[groupId].begin(), g_groupIdCallBackMap[groupId].end(),
+            [callbackObj](const sptr<ISensorCallback> &callbackRegistered) {
+                return callbackObj->AsObject().GetRefPtr() == callbackRegistered->AsObject().GetRefPtr();
+            });
+        if (callBackIter == g_groupIdCallBackMap[groupId].end()) {
+            g_groupIdCallBackMap[groupId].push_back(callbackObj);
         }
         return SENSOR_SUCCESS;
     }
 
-    int32_t ret;
-    if (sensorIndex == TRADITIONAL_SENSOR_INDEX) {
-        ret = sensorInterface->Register(sensorIndex, TradtionalSensorDataCallback);
-    } else {
-        ret = sensorInterface->Register(sensorIndex, MedicalSensorDataCallback);
+    int32_t ret = HDF_FAILURE;
+    if (groupId == TRADITIONAL_SENSOR_TYPE) {
+        ret = sensorInterface->Register(groupId, TradtionalSensorDataCallback);
+    } else if (groupId == MEDICAL_SENSOR_TYPE) {
+        ret = sensorInterface->Register(groupId, MedicalSensorDataCallback);
     }
 
     if (ret != SENSOR_SUCCESS) {
@@ -294,66 +266,64 @@ int32_t SensorImpl::Register(int32_t sensorId, const sptr<ISensorCallback>& call
         return ret;
     }
 
-    std::vector<IRemoteObject*> remoteVec;
-    remoteVec.push_back(obj);
-    g_remoteObjectCallBackMap[obj] = callbackObj;
-    g_remoteObjectIndexMap[obj] = sensorIndex;
-    g_IndexRemoteObjectMap[sensorIndex] = remoteVec;
+    std::vector<sptr<ISensorCallback>> remoteVec;
+    remoteVec.push_back(callbackObj);
+    g_groupIdCallBackMap[groupId] = remoteVec;
 
     return ret;
 }
 
-int32_t SensorImpl::Unregister(int32_t sensorId, const sptr<ISensorCallback>& callbackObj)
+int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallback>& callbackObj)
 {
     if (sensorInterface == NULL || sensorInterface->Unregister == NULL) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
     }
-    IRemoteObject* obj = callbackObj->AsObject().GetRefPtr();
+
+    if (groupId < TRADITIONAL_SENSOR_TYPE || groupId > MEDICAL_SENSOR_TYPE) {
+        HDF_LOGE("%{public}s: groupId [%{public}d] out of range", __func__, groupId);
+        return HDF_FAILURE;
+    }
 
     std::lock_guard<std::mutex> lock(g_mutex);
-    auto remoteIndexIter = g_remoteObjectIndexMap.find(obj);
-    if (remoteIndexIter == g_remoteObjectIndexMap.end()) {
-        return HDF_FAILURE;
-    }
-    SensorIndex sensorIndex;
-    if (remoteIndexIter->second == TRADITIONAL_SENSOR_INDEX) {
-        sensorIndex = TRADITIONAL_SENSOR_INDEX;
-    } else {
-        sensorIndex = MEDICAL_SENSOR_INDEX;
-    }
-
-    auto indexRemoteIter = g_IndexRemoteObjectMap.find(sensorIndex);
-    if (indexRemoteIter == g_IndexRemoteObjectMap.end()) {
-        return HDF_FAILURE;
-    }
-    auto remoteObjectIter =
-        find(g_IndexRemoteObjectMap[sensorIndex].begin(), g_IndexRemoteObjectMap[sensorIndex].end(), obj);
-    if (remoteObjectIter == g_IndexRemoteObjectMap[sensorIndex].end()) {
+    auto groupIdCallBackIter = g_groupIdCallBackMap.find(groupId);
+    if (groupIdCallBackIter == g_groupIdCallBackMap.end()) {
+        HDF_LOGE("%{public}s: groupId [%{public}d] callbackObj not registered", __func__, groupId);
         return HDF_FAILURE;
     }
 
-    if (g_IndexRemoteObjectMap[sensorIndex].size() > REMOTE_OBJE_CTOUNT_THRESHOLD) {
-        g_IndexRemoteObjectMap[sensorIndex].erase(remoteObjectIter);
-        g_remoteObjectIndexMap.erase(remoteIndexIter);
-        g_remoteObjectCallBackMap.erase(obj);
+    auto callBackIter =
+        find_if(g_groupIdCallBackMap[groupId].begin(), g_groupIdCallBackMap[groupId].end(),
+        [callbackObj](const sptr<ISensorCallback> &callbackRegistered) {
+            return callbackObj->AsObject().GetRefPtr() == callbackRegistered->AsObject().GetRefPtr();
+        });
+    if (callBackIter == g_groupIdCallBackMap[groupId].end()) {
+        HDF_LOGE("%{public}s: groupId [%{public}d] callbackObj not registered", __func__, groupId);
+        return HDF_FAILURE;
+    }
+
+    /**
+     * when there is only one item in the vector,can call the Unregister function.
+     * when there is more than one item in the vector, only need to remove the  callbackObj
+     * from the vector
+     */
+    if (g_groupIdCallBackMap[groupId].size() > CALLBACK_CTOUNT_THRESHOLD) {
+        g_groupIdCallBackMap[groupId].erase(callBackIter);
         return SENSOR_SUCCESS;
     }
 
-    int32_t ret;
-    if (sensorIndex == TRADITIONAL_SENSOR_INDEX) {
-        ret = sensorInterface->Unregister(sensorIndex, TradtionalSensorDataCallback);
-    } else {
-        ret = sensorInterface->Unregister(sensorIndex, MedicalSensorDataCallback);
+    int32_t ret = HDF_FAILURE;
+    if (groupId == TRADITIONAL_SENSOR_TYPE) {
+        ret = sensorInterface->Unregister(groupId, TradtionalSensorDataCallback);
+    } else if (groupId == MEDICAL_SENSOR_TYPE) {
+        ret = sensorInterface->Unregister(groupId, MedicalSensorDataCallback);
     }
 
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
         return ret;
     }
-    g_remoteObjectIndexMap.erase(remoteIndexIter);
-    g_remoteObjectCallBackMap.erase(obj);
-    g_IndexRemoteObjectMap.erase(sensorIndex);
+    g_groupIdCallBackMap.erase(groupId);
 
     return ret;
 }
