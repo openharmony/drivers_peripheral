@@ -69,7 +69,7 @@ int32_t AudioPathSelGetConfToJsonObj()
         fclose(fpJson);
         return HDF_FAILURE;
     }
-    pJsonStr = (char *)calloc(1, jsonStrSize);
+    pJsonStr = (char *)calloc(1, jsonStrSize + 1);
     if (pJsonStr == NULL) {
         fclose(fpJson);
         return HDF_FAILURE;
