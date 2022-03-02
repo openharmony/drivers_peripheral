@@ -24,17 +24,30 @@ int32_t OfflineStreamOperatorStub::OnRemoteRequest(uint32_t code, MessageParcel 
     MessageOption &option)
 {
     HDF_LOGE("%s: CameraDeviceStub::OnRemoteRequest entry!", __func__);
+    (void)option;
     int32_t ret = HDF_SUCCESS;
     switch (code) {
         case CMD_OFFLINE_STREAM_OPERATOR_CANCEL_CAPTURE: {
+            if (data.ReadInterfaceToken() != OfflineStreamOperatorStub::GetDescriptor()) {
+                ret = HDF_ERR_INVALID_PARAM;
+                break;
+            }
             ret = OfflineStreamOperatorStubCancelCapture(data, reply, option);
             break;
         }
         case CMD_OFFLINE_STREAM_OPERATOR_RELEASE_STREAMS: {
+            if (data.ReadInterfaceToken() != OfflineStreamOperatorStub::GetDescriptor()) {
+                ret = HDF_ERR_INVALID_PARAM;
+                break;
+            }
             ret = OfflineStreamOperatorStubReleaseStreams(data, reply, option);
             break;
         }
         case CMD_OFFLINE_STREAM_OPERATOR_RELEASE: {
+            if (data.ReadInterfaceToken() != OfflineStreamOperatorStub::GetDescriptor()) {
+                ret = HDF_ERR_INVALID_PARAM;
+                break;
+            }
             ret = OfflineStreamOperatorStubRelease(data, reply, option);
             break;
         }

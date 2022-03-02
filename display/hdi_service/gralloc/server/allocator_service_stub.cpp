@@ -27,30 +27,19 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-AllocatorServiceStub::AllocatorServiceStub()
+int32_t AllocatorServiceStub::AllocaltorStubAllocMem(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    if (GrallocInitialize(&grallocFuncs_) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: gralloc init failed", __func__);
+    if (data.ReadInterfaceToken() != AllocatorServiceStub::GetDescriptor()) {
+        HDF_LOGE("AllocMem: failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
     }
-}
-
-AllocatorServiceStub::~AllocatorServiceStub()
-{
-    if (GrallocUninitialize(grallocFuncs_) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: gralloc uninit failed", __func__);
-    }
-}
-
-int32_t AllocatorServiceStub::AllocMem(MessageParcel &data,
-    MessageParcel &reply, MessageOption &option) const
-{
     AllocInfo info;
     if (ParcelUtils::UnpackAllocInfo(data, &info) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UnpackAllocInfo failed", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     BufferHandle *buffer = nullptr;
-    int32_t errCode = grallocFuncs_->AllocMem(&info, &buffer);
+    int32_t errCode = AllocMem(info, buffer);
 
     if (!reply.WriteInt32(errCode)) {
         HDF_LOGE("AllocMem: write reply failed!");
@@ -71,12 +60,12 @@ int32_t AllocatorServiceStub::AllocMem(MessageParcel &data,
     return HDF_SUCCESS;
 }
 
-int32_t AllocatorServiceStub::OnRemoteRequest(int cmdId,
-    MessageParcel &data, MessageParcel &reply, MessageOption &option) const
+int32_t AllocatorServiceStub::OnRemoteRequest(
+    uint32_t cmdId, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     switch (cmdId) {
         case CMD_ALLOCATOR_ALLOCMEM:
-            return AllocMem(data, reply, option);
+            return AllocaltorStubAllocMem(data, reply, option);
         default: {
             HDF_LOGE("%{public}s: not support cmd", __func__);
             return HDF_ERR_INVALID_PARAM;
@@ -88,41 +77,3 @@ int32_t AllocatorServiceStub::OnRemoteRequest(int cmdId,
 } // namespace Display
 } // namespace HDI
 } // namespace OHOS
-
-using namespace OHOS::HDI::Display::V1_0;
-
-void *AllocatorServiceStubInstance()
-{
-    return reinterpret_cast<void *>(new AllocatorServiceStub());
-}
-
-void AllocatorServiceStubRelease(void *stubObj)
-{
-    delete reinterpret_cast<AllocatorServiceStub *>(stubObj);
-    stubObj = nullptr;
-}
-
-int32_t AllocatorServiceOnRemoteRequest(void *stub, int cmdId, struct HdfSBuf &data, struct HdfSBuf &reply)
-{
-    if (stub == nullptr) {
-        HDF_LOGE("%{public}s: stub is nullptr", __func__);
-        return HDF_FAILURE;
-    }
-
-    AllocatorServiceStub *AllocatorStub = reinterpret_cast<AllocatorServiceStub *>(stub);
-    OHOS::MessageParcel *dataParcel = nullptr;
-    OHOS::MessageParcel *replyParcel = nullptr;
-
-    if (SbufToParcel(&reply, &replyParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: invalid reply sbuf object to dispatch", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    if (SbufToParcel(&data, &dataParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: invalid data sbuf object to dispatch", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    OHOS::MessageOption option;
-    return AllocatorStub->OnRemoteRequest(cmdId, *dataParcel, *replyParcel, option);
-}
