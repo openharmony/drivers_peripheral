@@ -25,7 +25,7 @@ if (defined(ohos_lite)) {
   if (HAVE_WLAN_HALUT_PATH) {
     import("$WLAN_HALUT_PATH/product.gni")
   } else {
-    enable_HDF_UTRK = true
+    enable_HDF_UT = true
   }
 }
 
@@ -51,7 +51,7 @@ if (defined(ohos_lite)) {
   }
   group("wlan_test_entry") {
     testonly = true
-    if (!enable_HDF_UTRK) {
+    if (enable_HDF_UT) {
       deps = [
         "test:hdf_test_wifi",
         "test/hdi_service:unittest",
