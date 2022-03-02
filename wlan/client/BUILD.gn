@@ -10,10 +10,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build/ohos.gni")
 
-if (defined(ohos_lite)) {
-  import("//build/ohos.gni")
-} else {
+if (!defined(ohos_lite)) {
   import("//build/ohos.gni")
   WLAN_HAL_PATH =
       rebase_path("//vendor/${product_company}/${product_name}/hals/wlan")
