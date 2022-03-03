@@ -18,7 +18,7 @@
 
 #include <cstdio>
 #include <cstring>
-#include <limits.h>
+#include <climits>
 #include <map>
 #include <vector>
 #include "batteryd_api.h"
@@ -27,7 +27,6 @@ namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_0 {
-const int MAX_SYSFS_SIZE = 64;
 
 class PowerSupplyProvider {
 public:
@@ -61,10 +60,10 @@ public:
     };
 
     PowerSupplyProvider();
-    virtual ~PowerSupplyProvider() {}
+    virtual ~PowerSupplyProvider() = default;
 
-    int32_t InitPowerSupplySysfs(void);
-    void InitDefaultSysfs(void);
+    int32_t InitPowerSupplySysfs();
+    void InitDefaultSysfs();
     int32_t ParseCapacity(int32_t* capacity) const;
     int32_t ParseTotalEnergy(int32_t* capacity) const;
     int32_t ParseCurrentAverage(int32_t* curAverage) const;
@@ -91,7 +90,7 @@ private:
         std::string onlinePath;
         std::string currentMaxPath;
         std::string voltageMaxPath;
-    } powerSupplySysfsInfos_; // [MAX_SYSFS_SIZE];
+    } powerSupplySysfsInfos_;
 
     struct BatterySysfsInfo {
         char* name;
@@ -110,7 +109,7 @@ private:
     } batterySysfsInfo_;
 
     static inline int32_t ParseInt(const char* str);
-    inline void Trim(char* str) const;
+    static inline void Trim(char* str);
     static inline void CapacityAssigner(const char* str, struct BatterydInfo* info);
     static inline void TotalEnergyAssigner(const char* str, struct BatterydInfo* info);
     static inline void CurrentAverageAssigner(const char* str, struct BatterydInfo* info);
@@ -137,9 +136,9 @@ private:
     int32_t ParsePluggedMaxCurrent(int32_t* maxCurrent) const;
     int32_t ParsePluggedMaxVoltage(int32_t* maxVoltage) const;
     void CopyBatteryInfo(const struct BatterydInfo* info) const;
-    std::string CreateFile(std::string path, std::string content);
-    std::vector<std::string> filenodeName_;
-    std::map<std::string, std::string> nodeInfo_;
+    void CreateFile(const std::string& path, const std::string& content);
+    std::vector<std::string> nodeNames_;
+    std::map<std::string, std::string> nodeNamePathMap_;
     std::string path_;
     int32_t index_;
 };
