@@ -36,6 +36,7 @@ int32_t BatteryCallbackImpl::Update(const BatteryInfo& event)
         event.chargeCounter, event.present, event.technology.c_str());
 
     if (eventCb_ == nullptr) {
+        HDF_LOGE("%{public}s: eventCb_ is nullptr, cannot update battery info", __func__);
         return HDF_FAILURE;
     }
     return eventCb_(event);
@@ -44,6 +45,7 @@ int32_t BatteryCallbackImpl::Update(const BatteryInfo& event)
 int32_t BatteryCallbackImpl::RegisterBatteryEvent(const BatteryEventCallback& eventCb)
 {
     eventCb_ = eventCb;
+    HDF_LOGE("%{public}s: eventCb_ is registered", __func__);
     return HDF_SUCCESS;
 }
 } // V1_0

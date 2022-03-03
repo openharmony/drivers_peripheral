@@ -23,18 +23,20 @@ namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_0 {
+namespace {
 const std::string CONFIG_FILE = "/system/etc/ledconfig/led_config.json";
-const int DEFAULT_CAPACITY_CONF = 3;
-const int DEFAULT_UPPER_TEMP_CONF = 600;
-const int DEFAULT_LOWER_TEMP_CONF = -100;
-const int DEFAULT_CAPACITY_BEGIN_CONF = 0;
-const int DEFAULT_CAPACITY_END_CONF = 100;
-const int DEFAULT_LED_COLOR_CONF = 4;
-const int DEFAULT_BRIGHTNESS_CONF = 255;
+constexpr int32_t DEFAULT_CAPACITY_CONF = 3;
+constexpr int32_t DEFAULT_UPPER_TEMP_CONF = 600;
+constexpr int32_t DEFAULT_LOWER_TEMP_CONF = -100;
+constexpr int32_t DEFAULT_CAPACITY_BEGIN_CONF = 0;
+constexpr int32_t DEFAULT_CAPACITY_END_CONF = 100;
+constexpr int32_t DEFAULT_LED_COLOR_CONF = 4;
+constexpr int32_t DEFAULT_BRIGHTNESS_CONF = 255;
+}
 
-int32_t BatteryConfig::Init()
+void BatteryConfig::Init()
 {
-    return ParseConfig(CONFIG_FILE);
+    ParseConfig(CONFIG_FILE);
 }
 
 std::vector<BatteryConfig::LedConf> BatteryConfig::GetLedConf()
@@ -47,18 +49,18 @@ BatteryConfig::TempConf BatteryConfig::GetTempConf()
     return tempConf_;
 }
 
-int BatteryConfig::GetCapacityConf()
+int32_t BatteryConfig::GetCapacityConf()
 {
     return capacityConf_;
 }
 
 int32_t BatteryConfig::ParseLedConf(Json::Value& root)
 {
-    struct LedConf ledConf;
-    int size = root["led"]["table"].size();
-    HDF_LOGI("%{public}s: size = %{public}d", __func__, size);
+    struct LedConf ledConf = {0};
+    size_t size = root["led"]["table"].size();
+    HDF_LOGI("%{public}s: size = %{public}zu", __func__, size);
     if (size == 0) {
-        HDF_LOGI("%{public}s: read json file fail.", __func__);
+        HDF_LOGW("%{public}s: read json file fail, use default led config", __func__);
         ledConf.capacityBegin = DEFAULT_CAPACITY_BEGIN_CONF;
         ledConf.capacityEnd = DEFAULT_CAPACITY_END_CONF;
         ledConf.color = DEFAULT_LED_COLOR_CONF;
@@ -68,7 +70,13 @@ int32_t BatteryConfig::ParseLedConf(Json::Value& root)
     }
     ledConf_.clear();
 
-    for (int i = 0; i < size; ++i) {
+    const size_t COLOR_SIZE = 4;
+    for (int32_t i = 0; i < size; ++i) {
+        size_t colorSize = root["led"]["table"][i].size();
+        if (colorSize != COLOR_SIZE) {
+            HDF_LOGW("%{public}s: read json file fail, color size error, size=%{public}zu", __func__, colorSize);
+            return HDF_ERR_INVALID_OBJECT;
+        }
         ledConf.capacityBegin = root["led"]["table"][i][INDEX_ZERO].asInt();
         ledConf.capacityEnd = root["led"]["table"][i][INDEX_ONE].asInt();
         ledConf.color = root["led"]["table"][i][INDEX_TWO].asInt();
@@ -81,16 +89,17 @@ int32_t BatteryConfig::ParseLedConf(Json::Value& root)
     return HDF_SUCCESS;
 }
 
-int32_t BatteryConfig::ParseTempConf(Json::Value& root)
+int32_t BatteryConfig::ParseTemperatureConf(Json::Value& root)
 {
-    int size = root["temperature"]["table"].size();
-    if (size == 0) {
-        HDF_LOGI("%{public}s parse temperature config file fail.", __func__);
+    const size_t TABLE_SIZE = 2;
+    size_t size = root["temperature"]["table"].size();
+    if (size != TABLE_SIZE) {
+        HDF_LOGW("%{public}s parse temperature config file fail, use default temperature config, size=%{public}zu",
+                 __func__, size);
         tempConf_.lower = DEFAULT_LOWER_TEMP_CONF;
         tempConf_.upper = DEFAULT_UPPER_TEMP_CONF;
         return HDF_ERR_INVALID_OBJECT;
     }
-
     tempConf_.lower = root["temperature"]["table"][INDEX_ZERO].asInt();
     tempConf_.upper = root["temperature"]["table"][INDEX_ONE].asInt();
     HDF_LOGI("%{public}s: tempConf_.lower=%{public}d, tempConf_.upper=%{public}d", __func__, \
@@ -101,19 +110,20 @@ int32_t BatteryConfig::ParseTempConf(Json::Value& root)
 
 int32_t BatteryConfig::ParseCapacityConf(Json::Value& root)
 {
-    int size = root["soc"]["table"].size();
-    if (size == 0) {
-        HDF_LOGI("%{public}s parse capacity config file fail.", __func__);
+    const size_t TABLE_SIZE = 1;
+    size_t size = root["soc"]["table"].size();
+    if (size != TABLE_SIZE) {
+        HDF_LOGW("%{public}s parse capacity config file fail, use default capacity config, size=%{public}zu",
+                 __func__, size);
         capacityConf_ = DEFAULT_CAPACITY_CONF;
         return HDF_ERR_INVALID_OBJECT;
     }
-
     capacityConf_ = root["soc"]["table"][INDEX_ZERO].asInt();
     HDF_LOGI("%{public}s: capacityConf_ = %{public}d", __func__, capacityConf_);
     return HDF_SUCCESS;
 }
 
-int32_t BatteryConfig::ParseConfig(const std::string filename)
+void BatteryConfig::ParseConfig(const std::string& filename)
 {
     Json::Value root;
     Json::CharReaderBuilder readerBuilder;
@@ -128,21 +138,20 @@ int32_t BatteryConfig::ParseConfig(const std::string filename)
     if (parseFromStream(readerBuilder, ledConfig, &root, &errs)) {
         int32_t ret = ParseLedConf(root);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGI("%{public}s: parse led config fail.", __func__);
+            HDF_LOGW("%{public}s: parse led config fail.", __func__);
         }
 
-        ret = ParseTempConf(root);
+        ret = ParseTemperatureConf(root);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGI("%{public}s: parse temperature config fail.", __func__);
+            HDF_LOGW("%{public}s: parse temperature config fail.", __func__);
         }
 
         ret = ParseCapacityConf(root);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGI("%{public}s: parse soc config fail.", __func__);
+            HDF_LOGW("%{public}s: parse soc config fail.", __func__);
         }
     }
     ledConfig.close();
-    return HDF_SUCCESS;
 }
 }  // namespace V1_0
 }  // namespace Battery

@@ -31,12 +31,14 @@ namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_0 {
-const int MAX_BUFF_SIZE = 128;
-const int INVALID_BATT_INT_VALUE = -1;
-const int STR_TO_LONG_LEN = 10;
-const int UVOL_TO_MVOL = 1000;
-const int MKDIR_WAIT_TIME = 1;
-const int NUM_ZERO = 0;
+namespace {
+constexpr int32_t MAX_SYSFS_SIZE = 64;
+constexpr int32_t MAX_BUFF_SIZE = 128;
+constexpr int32_t INVALID_BATT_INT_VALUE = -1;
+constexpr int32_t STR_TO_LONG_LEN = 10;
+constexpr int32_t UVOL_TO_MVOL = 1000;
+constexpr int32_t MKDIR_WAIT_TIME = 1;
+constexpr int32_t NUM_ZERO = 0;
 const std::string POWER_SUPPLY_BASE_PATH = "/sys/class/power_supply";
 const std::string POWER_SUPPLY_BATTERY = "Battery";
 const std::string BATTERY_KEY_CAPACITY = "POWER_SUPPLY_CAPACITY=";
@@ -53,8 +55,8 @@ const std::string BATTERY_KEY_CURRENT_AVERAGE = "POWER_SUPPLY_CURRENT_AVERAGE=";
 const std::string BATTERY_KEY_CURRENT_NOW = "POWER_SUPPLY_CURRENT_NOW=";
 const std::string INVALID_STRING_VALUE = "invalid";
 const std::string BATTERY_NODE_PATH = "battery";
-const std::string CHARGER_NODE_PATH = "ohos_charger";
-const std::string FGU_NODE_PATH = "ohos-fgu";
+}
+
 BatterydInfo g_batteryInfo;
 
 struct StringEnumMap {
@@ -71,14 +73,15 @@ struct BatteryAssigner {
 PowerSupplyProvider::PowerSupplyProvider()
 {
     path_ = POWER_SUPPLY_BASE_PATH;
+    index_ = 0;
 }
 
 inline int32_t PowerSupplyProvider::ParseInt(const char* str)
 {
-    return strtol(str, nullptr, STR_TO_LONG_LEN);
+    return static_cast<int32_t>(strtol(str, nullptr, STR_TO_LONG_LEN));
 }
 
-inline void PowerSupplyProvider::Trim(char* str) const
+inline void PowerSupplyProvider::Trim(char* str)
 {
     if (str == nullptr) {
         return;
@@ -125,10 +128,10 @@ int32_t PowerSupplyProvider::HealthStateEnumConverter(const char* str)
         { "Dead", BATTERY_HEALTH_DEAD },
         { "Unknown", BATTERY_HEALTH_UNKNOWN },
         { "Unspecified failure", BATTERY_HEALTH_UNKNOWN },
-        { NULL, BATTERY_HEALTH_UNKNOWN },
+        { nullptr, BATTERY_HEALTH_UNKNOWN },
     };
 
-    for (int i = 0; healthStateEnumMap[i].str; ++i) {
+    for (int32_t i = 0; healthStateEnumMap[i].str; ++i) {
         if (strcmp(str, healthStateEnumMap[i].str) == 0) {
             return healthStateEnumMap[i].enumVal;
         }
@@ -150,10 +153,10 @@ int32_t PowerSupplyProvider::ChargeStateEnumConverter(const char* str)
         { "Full", CHARGE_STATE_FULL },
         { "Not charging", CHARGE_STATE_DISABLE },
         { "Unknown", CHARGE_STATE_RESERVED },
-        { NULL, CHARGE_STATE_RESERVED },
+        { nullptr, CHARGE_STATE_RESERVED },
     };
 
-    for (int i = 0; chargeStateEnumMap[i].str; ++i) {
+    for (int32_t i = 0; chargeStateEnumMap[i].str; ++i) {
         if (strcmp(str, chargeStateEnumMap[i].str) == 0) {
             return chargeStateEnumMap[i].enumVal;
         }
@@ -207,54 +210,46 @@ void PowerSupplyProvider::FormatPath(std::string& path,
     }
     path.assign(buff, strlen(buff));
     HDF_LOGI("%{public}s: path is %{public}s", __func__, path.c_str());
-
-    return;
 }
 
-void PowerSupplyProvider::FormatSysfsPaths(struct PowerSupplySysfsInfo* info)
-{
+void PowerSupplyProvider::FormatSysfsPaths(struct PowerSupplySysfsInfo *info) {
     // Format paths for power supply types
-    FormatPath(info->typePath, PATH_MAX, "%s/%s/type",
-        path_.c_str(), nodeInfo_["type"].c_str());
-    FormatPath(info->onlinePath, PATH_MAX, "%s/%s/online",
-        path_.c_str(), nodeInfo_["online"].c_str());
-    FormatPath(info->currentMaxPath, PATH_MAX, "%s/%s/current_max",
-        path_.c_str(), nodeInfo_["current_max"].c_str());
-    FormatPath(info->voltageMaxPath, PATH_MAX, "%s/%s/voltage_max",
-        path_.c_str(), nodeInfo_["voltage_max"].c_str());
-
-    FormatPath(batterySysfsInfo_.capacityPath, PATH_MAX,
-        "%s/%s/capacity", path_.c_str(), nodeInfo_["capacity"].c_str());
-    FormatPath(batterySysfsInfo_.voltagePath, PATH_MAX,
-        "%s/%s/voltage_now", path_.c_str(), nodeInfo_["voltage_now"].c_str());
-    FormatPath(batterySysfsInfo_.temperaturePath, PATH_MAX,
-        "%s/%s/temp", path_.c_str(), nodeInfo_["temp"].c_str());
-    FormatPath(batterySysfsInfo_.healthStatePath, PATH_MAX,
-        "%s/%s/health", path_.c_str(), nodeInfo_["health"].c_str());
-    FormatPath(batterySysfsInfo_.chargeStatePath, PATH_MAX,
-        "%s/%s/status", path_.c_str(), nodeInfo_["status"].c_str());
-    FormatPath(batterySysfsInfo_.presentPath, PATH_MAX,
-        "%s/%s/present", path_.c_str(), nodeInfo_["present"].c_str());
-    FormatPath(batterySysfsInfo_.chargeCounterPath, PATH_MAX,
-        "%s/%s/charge_counter", path_.c_str(), nodeInfo_["charge_counter"].c_str());
-    FormatPath(batterySysfsInfo_.technologyPath, PATH_MAX,
-        "%s/%s/technology", path_.c_str(), nodeInfo_["technology"].c_str());
-    FormatPath(batterySysfsInfo_.totalEnergyPath, PATH_MAX,
-        "%s/%s/charge_full", path_.c_str(), nodeInfo_["charge_full"].c_str());
-    FormatPath(batterySysfsInfo_.curAveragePath, PATH_MAX,
-        "%s/%s/current_avg", path_.c_str(), nodeInfo_["current_avg"].c_str());
-    FormatPath(batterySysfsInfo_.curNowPath, PATH_MAX,
-        "%s/%s/current_now", path_.c_str(), nodeInfo_["current_now"].c_str());
-    FormatPath(batterySysfsInfo_.remainEnergyPath, PATH_MAX,
-        "%s/%s/charge_now", path_.c_str(), nodeInfo_["charge_now"].c_str());
-
-    return;
+    FormatPath(info->typePath, PATH_MAX, "%s/%s/type", path_.c_str(), nodeNamePathMap_["type"].c_str());
+    FormatPath(info->onlinePath, PATH_MAX, "%s/%s/online", path_.c_str(), nodeNamePathMap_["online"].c_str());
+    FormatPath(info->currentMaxPath, PATH_MAX, "%s/%s/current_max", path_.c_str(),
+               nodeNamePathMap_["current_max"].c_str());
+    FormatPath(info->voltageMaxPath, PATH_MAX, "%s/%s/voltage_max", path_.c_str(),
+               nodeNamePathMap_["voltage_max"].c_str());
+    FormatPath(batterySysfsInfo_.capacityPath, PATH_MAX, "%s/%s/capacity", path_.c_str(),
+               nodeNamePathMap_["capacity"].c_str());
+    FormatPath(batterySysfsInfo_.voltagePath, PATH_MAX, "%s/%s/voltage_now", path_.c_str(),
+               nodeNamePathMap_["voltage_now"].c_str());
+    FormatPath(batterySysfsInfo_.temperaturePath, PATH_MAX, "%s/%s/temp", path_.c_str(),
+               nodeNamePathMap_["temp"].c_str());
+    FormatPath(batterySysfsInfo_.healthStatePath, PATH_MAX, "%s/%s/health", path_.c_str(),
+               nodeNamePathMap_["health"].c_str());
+    FormatPath(batterySysfsInfo_.chargeStatePath, PATH_MAX, "%s/%s/status", path_.c_str(),
+               nodeNamePathMap_["status"].c_str());
+    FormatPath(batterySysfsInfo_.presentPath, PATH_MAX, "%s/%s/present", path_.c_str(),
+               nodeNamePathMap_["present"].c_str());
+    FormatPath(batterySysfsInfo_.chargeCounterPath, PATH_MAX, "%s/%s/charge_counter", path_.c_str(),
+               nodeNamePathMap_["charge_counter"].c_str());
+    FormatPath(batterySysfsInfo_.technologyPath, PATH_MAX, "%s/%s/technology", path_.c_str(),
+               nodeNamePathMap_["technology"].c_str());
+    FormatPath(batterySysfsInfo_.totalEnergyPath, PATH_MAX, "%s/%s/charge_full", path_.c_str(),
+               nodeNamePathMap_["charge_full"].c_str());
+    FormatPath(batterySysfsInfo_.curAveragePath, PATH_MAX, "%s/%s/current_avg", path_.c_str(),
+               nodeNamePathMap_["current_avg"].c_str());
+    FormatPath(batterySysfsInfo_.curNowPath, PATH_MAX, "%s/%s/current_now", path_.c_str(),
+               nodeNamePathMap_["current_now"].c_str());
+    FormatPath(batterySysfsInfo_.remainEnergyPath, PATH_MAX, "%s/%s/charge_now", path_.c_str(),
+               nodeNamePathMap_["charge_now"].c_str());
 }
 
 int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t size) const
 {
     int32_t readSize;
-    int fd = open(path, O_RDONLY);
+    int32_t fd = open(path, O_RDONLY);
     if (fd < NUM_ZERO) {
         HDF_LOGE("%{public}s: failed to open %{public}s", __func__, path);
         return HDF_ERR_IO;
@@ -292,8 +287,8 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
     int32_t online;
     std::string onlinePath;
 
-    auto iter = filenodeName_.begin();
-    while (iter != filenodeName_.end()) {
+    auto iter = nodeNames_.begin();
+    while (iter != nodeNames_.end()) {
         onlinePath = path_ + "/" + *iter + "/" + "online";
         ret = ReadSysfsFile(onlinePath.c_str(), buf, size);
         if (ret != HDF_SUCCESS) {
@@ -329,8 +324,6 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
         return;
     }
     Trim(buf);
-
-    return;
 }
 
 int32_t PowerSupplyProvider::PluggedTypeEnumConverter(const char* str) const
@@ -348,10 +341,10 @@ int32_t PowerSupplyProvider::PluggedTypeEnumConverter(const char* str) const
         { "USB_HVDCP", PLUGGED_TYPE_AC },
         { "USB_PD", PLUGGED_TYPE_AC },
         { "Unknown", PLUGGED_TYPE_BUTT },
-        { NULL, PLUGGED_TYPE_BUTT },
+        { nullptr, PLUGGED_TYPE_BUTT },
     };
 
-    for (int i = 0; pluggedTypeEnumMap[i].str; ++i) {
+    for (int32_t i = 0; pluggedTypeEnumMap[i].str; ++i) {
         if (strcmp(str, pluggedTypeEnumMap[i].str) == 0) {
             return pluggedTypeEnumMap[i].enumVal;
         }
@@ -364,10 +357,10 @@ int32_t PowerSupplyProvider::ParsePluggedMaxCurrent(int32_t* maxCurrent) const
     char buf[MAX_BUFF_SIZE] = {0};
     GetPluggedTypeName(buf, sizeof(buf));
     HDF_LOGI("%{public}s buf is: %{public}s", __func__, buf);
-    std::string currentMaxNode = "Battery";
-    for (auto iter = nodeInfo_.begin(); iter != nodeInfo_.end(); ++iter) {
-        if (iter->first == "current_max") {
-            currentMaxNode = iter->second;
+    std::string currentMaxNode = POWER_SUPPLY_BATTERY;
+    for (const auto& iter : nodeNamePathMap_) {
+        if (iter.first == "current_max") {
+            currentMaxNode = iter.second;
             break;
         }
     }
@@ -387,10 +380,10 @@ int32_t PowerSupplyProvider::ParsePluggedMaxVoltage(int32_t* maxVoltage) const
 {
     char buf[MAX_BUFF_SIZE] = {0};
     GetPluggedTypeName(buf, sizeof(buf));
-    std::string voltageMaxNode = "Battery";
-    for (auto iter = nodeInfo_.begin(); iter != nodeInfo_.end(); ++iter) {
-        if (iter->first == "voltage_max") {
-            voltageMaxNode = iter->second;
+    std::string voltageMaxNode = POWER_SUPPLY_BATTERY;
+    for (const auto& iter : nodeNamePathMap_) {
+        if (iter.first == "voltage_max") {
+            voltageMaxNode = iter.second;
             break;
         }
     }
@@ -429,7 +422,6 @@ void PowerSupplyProvider::UpdateInfoByReadSysFile(struct BatterydInfo* info) con
     ParseTechnology(info->technology_);
 
     CopyBatteryInfo(info);
-    return;
 }
 
 void PowerSupplyProvider::ParseUeventToBatterydInfo(const char* msg, struct BatterydInfo* info) const
@@ -447,11 +439,11 @@ void PowerSupplyProvider::ParseUeventToBatterydInfo(const char* msg, struct Batt
         { BATTERY_KEY_CHARGE_COUNTER.c_str(), BATTERY_KEY_CHARGE_COUNTER.length(), ChargeCounterAssigner },
         { BATTERY_KEY_CURRENT_AVERAGE.c_str(), BATTERY_KEY_CURRENT_AVERAGE.length(), CurrentAverageAssigner },
         { BATTERY_KEY_CURRENT_NOW.c_str(), BATTERY_KEY_CURRENT_NOW.length(), CurrentNowAssigner },
-        { NULL, 0, NULL } // end of the array
+        { nullptr, 0, nullptr } // end of the array
     };
 
     while (*msg) {
-        for (int i = 0; batteryAssigners[i].prefix; ++i) {
+        for (int32_t i = 0; batteryAssigners[i].prefix; ++i) {
             if (!strncmp(msg, batteryAssigners[i].prefix, batteryAssigners[i].prefixLen)) {
                 HDF_LOGI("%{public}s: msg: %{public}s", __func__, msg);
                 msg += batteryAssigners[i].prefixLen;
@@ -475,7 +467,6 @@ void PowerSupplyProvider::ParseUeventToBatterydInfo(const char* msg, struct Batt
     ParseTechnology(info->technology_);
 
     CopyBatteryInfo(info);
-    return;
 }
 
 void PowerSupplyProvider::CopyBatteryInfo(const struct BatterydInfo* info) const
@@ -495,7 +486,7 @@ void PowerSupplyProvider::CopyBatteryInfo(const struct BatterydInfo* info) const
 
 void PowerSupplyProvider::SetSysFilePath(const std::string& path)
 {
-    if (path == "") {
+    if (path.empty()) {
         HDF_LOGI("%{public}s path is empty", __func__);
         path_ = "/data/local/tmp";
         return;
@@ -506,16 +497,15 @@ void PowerSupplyProvider::SetSysFilePath(const std::string& path)
     HDF_LOGI("%{public}s: path is %{public}s", __func__, path.c_str());
 }
 
-std::string PowerSupplyProvider::CreateFile(std::string path, std::string content)
+void PowerSupplyProvider::CreateFile(const std::string& path, const std::string& content)
 {
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
         HDF_LOGI("%{public}s: Cannot create file %{public}s", __func__, path.c_str());
-        return nullptr;
+        return;
     }
     stream << content.c_str() << std::endl;
     stream.close();
-    return path;
 }
 
 void PowerSupplyProvider::InitBatteryPath()
@@ -534,10 +524,9 @@ void PowerSupplyProvider::InitBatteryPath()
         HDF_LOGI("%{public}s: create mock battery path", __func__);
         InitDefaultSysfs();
     }
-    return;
 }
 
-int32_t PowerSupplyProvider::InitPowerSupplySysfs(void)
+int32_t PowerSupplyProvider::InitPowerSupplySysfs()
 {
     DIR* dir = nullptr;
     struct dirent* entry = nullptr;
@@ -546,7 +535,7 @@ int32_t PowerSupplyProvider::InitPowerSupplySysfs(void)
     HDF_LOGI("%{public}s: path_ is %{public}s", __func__, path_.c_str());
     dir = opendir(path_.c_str());
     if (dir == nullptr) {
-        HDF_LOGE("%{public}s: cannot open POWER_SUPPLY_BASE_PATH", __func__);
+        HDF_LOGE("%{public}s: cannot open path_ %{public}s", __func__, path_.c_str());
         return HDF_ERR_IO;
     }
 
@@ -563,18 +552,18 @@ int32_t PowerSupplyProvider::InitPowerSupplySysfs(void)
         if (entry->d_type == DT_DIR || entry->d_type == DT_LNK) {
             HDF_LOGI("%{public}s: init sysfs info of %{public}s", __func__, entry->d_name);
             if (index_ >= MAX_SYSFS_SIZE) {
-                HDF_LOGE("%{public}s: too many plugged types", __func__);
+                HDF_LOGW("%{public}s: too many power supply types", __func__);
                 break;
             }
-            filenodeName_.emplace_back(entry->d_name);
+            nodeNames_.emplace_back(entry->d_name);
             index_++;
         }
     }
     struct PowerSupplySysfsInfo sysfsInfo = {0};
-    nodeInfo_.clear();
+    nodeNamePathMap_.clear();
     TraversalNode();
     FormatSysfsPaths(&sysfsInfo);
-    HDF_LOGI("%{public}s: index_ is %{public}d", __func__, index_);
+    HDF_LOGI("%{public}s: init power supply sysfs nodes, total count %{public}d", __func__, index_);
     closedir(dir);
 
     return HDF_SUCCESS;
@@ -582,45 +571,45 @@ int32_t PowerSupplyProvider::InitPowerSupplySysfs(void)
 
 void PowerSupplyProvider::TraversalNode()
 {
-    nodeInfo_.insert(std::make_pair("type", ""));
-    nodeInfo_.insert(std::make_pair("online", ""));
-    nodeInfo_.insert(std::make_pair("current_max", ""));
-    nodeInfo_.insert(std::make_pair("voltage_max", ""));
-    nodeInfo_.insert(std::make_pair("capacity", ""));
-    nodeInfo_.insert(std::make_pair("voltage_now", ""));
-    nodeInfo_.insert(std::make_pair("temp", ""));
-    nodeInfo_.insert(std::make_pair("health", ""));
-    nodeInfo_.insert(std::make_pair("status", ""));
-    nodeInfo_.insert(std::make_pair("present", ""));
-    nodeInfo_.insert(std::make_pair("charge_counter", ""));
-    nodeInfo_.insert(std::make_pair("technology", ""));
-    nodeInfo_.insert(std::make_pair("charge_full", ""));
-    nodeInfo_.insert(std::make_pair("current_avg", ""));
-    nodeInfo_.insert(std::make_pair("current_now", ""));
-    nodeInfo_.insert(std::make_pair("charge_now", ""));
+    nodeNamePathMap_.insert(std::make_pair("type", ""));
+    nodeNamePathMap_.insert(std::make_pair("online", ""));
+    nodeNamePathMap_.insert(std::make_pair("current_max", ""));
+    nodeNamePathMap_.insert(std::make_pair("voltage_max", ""));
+    nodeNamePathMap_.insert(std::make_pair("capacity", ""));
+    nodeNamePathMap_.insert(std::make_pair("voltage_now", ""));
+    nodeNamePathMap_.insert(std::make_pair("temp", ""));
+    nodeNamePathMap_.insert(std::make_pair("health", ""));
+    nodeNamePathMap_.insert(std::make_pair("status", ""));
+    nodeNamePathMap_.insert(std::make_pair("present", ""));
+    nodeNamePathMap_.insert(std::make_pair("charge_counter", ""));
+    nodeNamePathMap_.insert(std::make_pair("technology", ""));
+    nodeNamePathMap_.insert(std::make_pair("charge_full", ""));
+    nodeNamePathMap_.insert(std::make_pair("current_avg", ""));
+    nodeNamePathMap_.insert(std::make_pair("current_now", ""));
+    nodeNamePathMap_.insert(std::make_pair("charge_now", ""));
 
-    auto iter = filenodeName_.begin();
-    while (iter != filenodeName_.end()) {
+    auto iter = nodeNames_.begin();
+    while (iter != nodeNames_.end()) {
         if (*iter == "battery") {
             CheckSubfolderNode(*iter);
-            iter = filenodeName_.erase(iter);
+            iter = nodeNames_.erase(iter);
         } else {
             iter++;
         }
     }
 
-    iter = filenodeName_.begin();
-    while (iter != filenodeName_.end()) {
-        if (*iter == "Battery") {
+    iter = nodeNames_.begin();
+    while (iter != nodeNames_.end()) {
+        if (*iter == POWER_SUPPLY_BATTERY) {
             CheckSubfolderNode(*iter);
-            iter = filenodeName_.erase(iter);
+            iter = nodeNames_.erase(iter);
         } else {
             iter++;
         }
     }
 
-    for (auto it = filenodeName_.begin(); it != filenodeName_.end(); ++it) {
-        CheckSubfolderNode(*it);
+    for (auto& nodeName : nodeNames_) {
+        CheckSubfolderNode(nodeName);
     }
 }
 
@@ -651,14 +640,14 @@ void PowerSupplyProvider::CheckSubfolderNode(const std::string& path)
             continue;
         }
 
-        if ((strcmp(entry->d_name, "type") == 0) && (nodeInfo_["type"] == "") &&
+        if ((strcmp(entry->d_name, "type") == 0) && (nodeNamePathMap_["type"].empty()) &&
             (strcasecmp(path.c_str(), BATTERY_NODE_PATH.c_str()) != 0)) {
-            nodeInfo_["type"] = path;
+            nodeNamePathMap_["type"] = path;
         }
 
-        for (auto iter = nodeInfo_.begin(); iter != nodeInfo_.end(); ++iter) {
-            if ((strcmp(entry->d_name, iter->first.c_str()) == 0) && (nodeInfo_[iter->first] == "")) {
-                nodeInfo_[iter->first] = path;
+        for (auto & iter : nodeNamePathMap_) {
+            if ((strcmp(entry->d_name, iter.first.c_str()) == 0) && (nodeNamePathMap_[iter.first].empty())) {
+                nodeNamePathMap_[iter.first] = path;
             }
         }
     }
@@ -826,7 +815,7 @@ int32_t PowerSupplyProvider::ParsePresent(int8_t* present) const
         return ret;
     }
 
-    int8_t value = (int8_t)ParseInt(buf);
+    auto value = static_cast<int8_t>(ParseInt(buf));
     HDF_LOGI("%{public}s: present is %{public}d", __func__, value);
     *present = value;
     return HDF_SUCCESS;
@@ -867,7 +856,7 @@ BatterydInfo PowerSupplyProvider::GetBatteryInfo() const
     return g_batteryInfo;
 }
 
-void PowerSupplyProvider::InitDefaultSysfs(void)
+void PowerSupplyProvider::InitDefaultSysfs()
 {
     std::string mockBatteryPath = "/data/local/tmp/battery";
     std::string mockChargerPath = "/data/local/tmp/ohos_charger";
@@ -887,7 +876,7 @@ void PowerSupplyProvider::InitDefaultSysfs(void)
         sleep(MKDIR_WAIT_TIME);
     }
 
-    HDF_LOGI("%{public}s: create mock path for Hi3516DV300", __func__);
+    HDF_LOGI("%{public}s: create mock path", __func__);
     CreateFile("/data/local/tmp/ohos-fgu/capacity", "1000");
     CreateFile("/data/local/tmp/ohos-fgu/current_avg", "1000");
     CreateFile("/data/local/tmp/ohos-fgu/current_now", "1000");

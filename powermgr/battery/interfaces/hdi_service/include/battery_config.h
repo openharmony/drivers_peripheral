@@ -28,21 +28,21 @@ namespace V1_0 {
 class BatteryConfig {
 public:
     struct LedConf {
-        int capacityBegin;
-        int capacityEnd;
-        int color;
-        int brightness;
+        int32_t capacityBegin;
+        int32_t capacityEnd;
+        int32_t color;
+        int32_t brightness;
     };
 
     struct TempConf {
-        int lower;
-        int upper;
+        int32_t lower;
+        int32_t upper;
     };
 
-    int32_t Init();
+    void Init();
     std::vector<LedConf> GetLedConf();
     BatteryConfig::TempConf GetTempConf();
-    int GetCapacityConf();
+    int32_t GetCapacityConf();
 
 private:
     enum JsonConfIndex {
@@ -53,12 +53,12 @@ private:
     };
 
     int32_t ParseLedConf(Json::Value& root);
-    int32_t ParseTempConf(Json::Value& root);
+    int32_t ParseTemperatureConf(Json::Value& root);
     int32_t ParseCapacityConf(Json::Value& root);
-    int32_t ParseConfig(const std::string filename);
+    void ParseConfig(const std::string& filename);
     std::vector<BatteryConfig::LedConf> ledConf_;
     struct TempConf tempConf_;
-    int capacityConf_ = -1;
+    int32_t capacityConf_ = -1;
 };
 }  // namespace V1_0
 }  // namespace Battery
