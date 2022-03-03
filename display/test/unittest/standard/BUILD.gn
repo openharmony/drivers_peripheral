@@ -45,6 +45,8 @@ ohos_static_library("disp_hdi_test_common") {
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
   ]
+  subsystem_name = "hdf"
+  part_name = "display_device_driver"
 }
 
 ohos_unittest("gralloctest") {
