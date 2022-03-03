@@ -63,7 +63,7 @@ static void ConvertSensorData(struct SensorEvents *event)
         if ((g_sensorCovertCoff[i].sensorId == event->sensorId) && (g_sensorCovertCoff[i].dim != 0)) {
             dataLen = event->dataLen / sizeof(int32_t);
             for (uint32_t j = 0; j < dataLen; ++j) {
-                axis = j % g_sensorCovertCoff[i].dim;
+                axis = (int32_t)(j % g_sensorCovertCoff[i].dim);
                 value[j] = (float)(data[j] * g_sensorCovertCoff[i].coff[axis]);
             }
         }
