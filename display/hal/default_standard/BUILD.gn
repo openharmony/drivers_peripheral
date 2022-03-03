@@ -34,6 +34,8 @@ ohos_static_library("higbm") {
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
   ]
+  subsystem_name = "hdf"
+  part_name = "display_device_driver"
 }
 
 ohos_shared_library("def_display_gralloc") {
