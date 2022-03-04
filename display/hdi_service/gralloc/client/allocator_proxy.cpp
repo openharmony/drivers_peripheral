@@ -69,7 +69,9 @@ int32_t AllocatorProxy::AllocMem(const AllocInfo &info, BufferHandle *&handle)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-
+    if (!data.WriteInterfaceToken(AllocatorProxy::GetDescriptor())) {
+        return HDF_FAILURE;
+    }
     auto ret = ParcelUtils::PackAllocInfo(data, &info);
     if (ret != DISPLAY_SUCCESS) {
         return ret;
