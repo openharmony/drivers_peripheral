@@ -119,7 +119,7 @@ Codec驱动提供给framework层可直接调用的能力接口，主要功能有
 </tr>
 <tr id="row131131754172718"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p14132257567"><a name="p14132257567"></a><a name="p14132257567"></a>int32_t CodecStart(CODEC_HANDLETYPE handle);</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p1741382510566"><a name="p1741382510566"></a><a name="p1741382510566"></a>启动工作。</p>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p1741382510566"><a name="p1741382510566"></a><a name="p1741382510566"></a>启动工作</p>
 </td>
 </tr>
 <tr id="row133541652202712"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p11413125185617"><a name="p11413125185617"></a><a name="p11413125185617"></a>int32_t CodecStop(CODEC_HANDLETYPE handle);</p>
