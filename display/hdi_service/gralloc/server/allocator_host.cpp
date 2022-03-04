@@ -50,7 +50,7 @@ int HdfAllocatorDriverBind(struct HdfDeviceObject *deviceObject)
     allocatorService->ioservice.Dispatch = AllocatorServiceDispatch;
     allocatorService->ioservice.Open = NULL;
     allocatorService->ioservice.Release = NULL;
-    allocatorService->instance = AllocatorServiceStubInstance();
+    allocatorService->instance = AllocatorServiceInstance();
 
     deviceObject->service = &allocatorService->ioservice;
     HDF_LOGI("%{public}s: exit succ", __func__);
@@ -60,7 +60,7 @@ int HdfAllocatorDriverBind(struct HdfDeviceObject *deviceObject)
 void HdfAllocatorDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HdfAllocatorService *allocatorService = CONTAINER_OF(deviceObject->service, HdfAllocatorService, ioservice);
-    AllocatorServiceStubRelease(allocatorService->instance);
+    AllocatorServiceRelease(allocatorService->instance);
     OsalMemFree(allocatorService);
 }
 

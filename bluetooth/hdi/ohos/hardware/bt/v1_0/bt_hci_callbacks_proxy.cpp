@@ -28,7 +28,8 @@ int32_t BtHciCallbacksProxy::OnInited(BtStatus status)
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
 
-    if (!data.WriteUint32((uint32_t)status)) {
+    if (!data.WriteInterfaceToken(BtHciCallbacksProxy::GetDescriptor()) ||
+        !data.WriteUint32((uint32_t)status)) {
         HDF_LOGE("%{public}s: write status failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -48,6 +49,10 @@ int32_t BtHciCallbacksProxy::OnReceivedHciPacket(BtType type, const std::vector<
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
 
+    if (!localData.WriteInterfaceToken(BtHciCallbacksProxy::GetDescriptor())) {
+        HDF_LOGE("%s: write interface token failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (!localData.WriteUint32((uint32_t)type)) {
         HDF_LOGE("%s: write type failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
