@@ -68,8 +68,10 @@ group("hdi_audio") {
 }
 
 group("audio_sample_client") {
-  deps = [
-    "sample:audio_sample_capture",
-    "sample:audio_sample_render",
-  ]
+  if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
+    deps = [
+      "sample:audio_sample_capture",
+      "sample:audio_sample_render",
+    ]
+  }
 }
