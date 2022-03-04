@@ -47,15 +47,7 @@ Vibraor驱动下源代码目录结构如下所示：
 
 ### 使用说明
 
-触发马达按照指定持续时间振动。
-
-按照指定的振动模式停止震动。
-
-触发按照指定振动效果字符串振动。
-
-按照指定的振动模式停止震动。
-
-下述的代码示例中，提供了马达振动使用的完整流程。
+代码示例
 
 ```
 #include "vibrator_if.h"
@@ -65,7 +57,7 @@ enum VibratorMode {
     VIBRATOR_MODE_PRESET = 1,    // 指定预置效果的周期性振动
 };
 
-void SensorSample(void)
+void VibratorSample(void)
 {
 	int32_t startRet;
 	int32_t endRet;
@@ -73,27 +65,46 @@ void SensorSample(void)
 	uint32_t g_sleepTime1 = 2000;
 	uint32_t g_sleepTime2 = 5000;
 	const char *g_timeSequence = "haptic.clock.timer";
-	
+	/* 创建传感器接口实例 */
+    struct VibratorInterface *g_vibratorDev = NewVibratorInterfaceInstance();
+    if (g_vibratorDev == NULL) {
+        return;
+    }
 	/* 按照指定持续时间触发震动*/
 	startRet = g_vibratorDev->StartOnce(g_duration);
-    if (startRet != HDF_SUCCESS) {
+    if (startRet != 0) {
         return;
     }
     OsalMSleep(g_sleepTime1);
     /* 按照指定的振动模式停止震动 */
     endRet = g_vibratorDev->Stop(VIBRATOR_MODE_ONCE);
-    if (endRet != HDF_SUCCESS) {
+    if (endRet != 0) {
+        return;
+    }
+    /* 释放传感器接口实例 */
+    ret = FreeVibratorInterfaceInstance();
+    if (ret != 0) {
+        return;
+    }
+    /* 创建传感器接口实例 */
+    struct VibratorInterface *g_vibratorDev = NewVibratorInterfaceInstance();
+    if (g_vibratorDev == NULL) {
         return;
     }
     /* 按照指定预置效果启动马达 */
     startRet = g_vibratorDev->Start(g_timeSequence);
-    if (endRet != HDF_SUCCESS) {
+    if (endRet != 0) {
         return;
     }
     OsalMSleep(g_sleepTime2);
 	/* 按照指定的振动模式停止震动 */ 
     endRet = g_vibratorDev->Stop(VIBRATOR_MODE_PRESET);
-    if (endRet != HDF_SUCCESS) {
+    if (endRet != 0) {
+        return;
+    }
+    /* 释放传感器接口实例 */
+    ret = FreeVibratorInterfaceInstance();
+    if (ret != 0) {
         return;
     }
 }
