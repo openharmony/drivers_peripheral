@@ -26,7 +26,7 @@
         "//drivers/peripheral/usb:usb_entry"
       ],
       "test": [
-        "//drivers/peripheral/usb:usb_test_entry"
+        "//drivers/peripheral/usb/test:hdf_test_usb"
       ],
       "inner_kits": [
         {

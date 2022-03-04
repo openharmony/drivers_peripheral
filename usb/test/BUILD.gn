@@ -14,11 +14,14 @@
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
-  lite_component("hdf_test_usb_device") {
-    if (ohos_build_type == "debug") {
-      deps = [ "moduletest:hdf_peripheral_usb_test_module" ]
-    }
-    features = []
+  group("hdf_test_usb") {
+    testonly = true
+    deps = [
+      "moduletest:hdf_peripheral_usb_test_module",
+      "//drivers/peripheral/usb/sample/device/liteos:usb_dev_test",
+      "//drivers/peripheral/usb/sample/host:usbhost_ddk_test",
+      "//drivers/peripheral/usb/sample/host/liteos_test:liteos_host_speed_test",
+    ]
   }
 } else {
   group("hdf_test_usb") {

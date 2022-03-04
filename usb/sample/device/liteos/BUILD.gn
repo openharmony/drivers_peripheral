@@ -50,7 +50,7 @@ ohos_executable("usb_dev_test") {
     "-lpthread",
   ]
 
-  install_enable = true
+  install_enable = false
   subsystem_name = "hdf"
   part_name = "usb_device_driver"
 }
