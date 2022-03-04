@@ -20,7 +20,8 @@
     },
     "build": {
       "sub_component": [
-        "//drivers/peripheral/bluetooth/hdi:bluetooth_hdi"
+        "//drivers/peripheral/bluetooth/hdi:bluetooth_hdi",
+        "//drivers/peripheral/bluetooth/audio:hdi_audio_bluetooth"
       ]
     }
   }
