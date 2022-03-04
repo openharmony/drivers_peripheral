@@ -64,101 +64,51 @@ OHOS相机驱动框架模型对上实现相机HDI接口，对下实现相机Pipe
   <td width=363 style='width:272pt'><a name=p18132205755516>功能描述</a>
 </td>
  </tr>
- <tr height=93 style='height:70.0pt'>
-  <td rowspan=10 height=728 class=xl66 style='height:546.0pt'>icamera_device.h</td>
+ <tr height=37 style='height:28.0pt'>
+  <td rowspan=7 height=160 class=xl66 style='height:112.0pt'>icamera_device.h</td>
   <td class=xl65 width=568 style='width:426pt'>CamRetCode
-  IsStreamsSupported(<br>
+  GetStreamOperator(<br>
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>OperationMode mode,<br>
+  </span>const OHOS::sptr&lt;IStreamOperatorCallback&gt; &amp;callback,<br>
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::shared_ptr&lt;CameraStandard::CameraMetadata&gt;&amp; modeSetting,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::vector&lt;std::shared_ptr&ltStreamInfo&gt;&gt &amp;info,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>StreamSupportType &amp;type)</td>
-  <td>查询是否支持添加参数对应的流</td>
+  </span>OHOS::sptr&lt;IStreamOperator&gt; &amp;streamOperator)</td>
+  <td>获取流控制器</td>
  </tr>
- <tr height=75 style='height:56.0pt'>
-  <td height=75 style='height:56.0pt'>CamRetCode CreateStreams(const
-  std::vector&lt;std::shared_ptr&lt;StreamInfo&gt;&gt; &amp;streamInfo<span
+ <tr height=37 style='height:28.0pt'>
+  <td height=37 style='height:28.0pt'>CamRetCode UpdateSettings(const
+      std::shared_ptr&lt;CameraSetting&gt; &amp;settings<span
   style='display:none'>s)</span></td>
-  <td class=xl65 width=363 style='width:272pt'>创建流<br>
-    <span style='mso-spacerun:yes'>&nbsp;</span>此函数接口依据输入的流信息创建流，调用该接口之前需先通过
-  {@link IsStreamsSupported} 查询HAL是否支持要创建的流</td>
+ <td>更新设备控制参数</td
  </tr>
  <tr height=19 style='height:14.0pt'>
-  <td height=19 style='height:14.0pt'>CamRetCode ReleaseStreams(const
-  std::vector&lt;int&gt; &amp;streamIds)</td>
-  <td>释放流</td>
- </tr>
- <tr height=37 style='height:28.0pt'>
-  <td height=37 class=xl65 width=568 style='height:28.0pt;width:426pt'>CamRetCode
-  CommitStreams(OperationMode mode,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::shared_ptr&lt;CameraMetadata&gt; &amp;modeSetting)</td>
-  <td class=xl65 width=363 style='width:272pt'>配置流<br>
-    本接口需在调用{@link CreateStreams}创建流之后调用</td>
- </tr>
- <tr height=37 style='height:28.0pt'>
-  <td height=37 class=xl65 width=568 style='height:28.0pt;width:426pt'>CamRetCode
-  GetStreamAttributes(<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>std::vector&lt;std::shared_ptr&lt;StreamAttribute&gt;&gt;
-  &amp;attributes)</td>
-  <td>获取流的属性</td>
- </tr>
- <tr height=168 style='height:126.0pt'>
-  <td height=168 class=xl65 width=568 style='height:126.0pt;width:426pt'>CamRetCode
-  AttachBufferQueue(int streamId, const OHOS::sptr&lt;OHOS::IBufferProducer&gt;
-  &amp;producer)</td>
-  <td class=xl65 width=363 style='width:272pt'>绑定生产者句柄和指定流<br>
-    <br>
-    如果在{@link CreateStreams}创建流时已经指定了生产者句柄，则不需要调用该接口。如果需要重新绑定，<br>
-    <span
-  style='mso-spacerun:yes'>&nbsp;</span>对于一些IOT设备，可能不需要或者不支持预览流的图像数据缓存流转，那么不需要绑定生产者句柄，<br>
-    此时在创建流时{@link CreateStreams} 的 {@link StreamInfo} 参数的生产者句柄bufferQueue_为空，而<br>
-    <span style='mso-spacerun:yes'>&nbsp;</span>tunneledMode_需设置为false。</td>
+  <td height=19 style='height:14.0pt'>CamRetCode SetResultMode(const ResultCallbackMode &amp;mode)</td>
+  <td>设置Result回调模式和回调函数</td>
  </tr>
  <tr height=19 style='height:14.0pt'>
   <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>CamRetCode
-  DetachBufferQueue(int streamId)</td>
-  <td>解除生产者句柄和指定流的绑定关系</td>
- </tr>
- <tr height=205 style='height:154.0pt'>
-  <td height=205 class=xl65 width=568 style='height:154.0pt;width:426pt'>CamRetCode
-  Capture(int captureId,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::shared_ptr&lt;CaptureInfo&gt; &amp;info,<span
-  style='mso-spacerun:yes'>&nbsp; </span>bool isStreaming)</td>
-  <td class=xl65 width=363 style='width:272pt'>捕获图像<br>
-    <span style='mso-spacerun:yes'>&nbsp;</span>本接口必须在调用 {@link CommitStreams}
-  配置流之后调用。<br>
-    <span
-  style='mso-spacerun:yes'>&nbsp;</span>图像捕获有两种模式，分别是连续捕获和单次捕获。连续捕获即触发之后模块内部进行连续的捕获，<br>
-    消费者可以连续收到图像数据，不需要多次调用本接口，若再次调用了本接口，<br>
-    <span
-  style='mso-spacerun:yes'>&nbsp;</span>则停止当前捕获，更新捕获信息，再进行一次新的捕获，多用于预览、录像或者连拍场景。<br>
-    <span style='mso-spacerun:yes'>&nbsp;</span>单次捕获即触发之后只捕获一帧图像数据，用于单次拍照场景</td>
+  GetEnabledResults(std::vector&lt;MetaType&gt; &amp;results)</td>
+ <td>获取使能的ResultMeta</td>
  </tr>
  <tr height=19 style='height:14.0pt'>
   <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>CamRetCode
-  CancelCapture(int captureId)</td>
-  <td>取消捕获</td>
+  EnableResult(const std::vector&lt;MetaType&gt; &amp;results)</td>
+  <td>使能具体的ResultMeta</td>
  </tr>
- <tr height=56 style='height:42.0pt'>
-  <td height=56 class=xl65 width=568 style='height:42.0pt;width:426pt'>CamRetCode
-  ChangeToOfflineStream(const std::vector&lt;int&gt; &amp;streamIds,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>OHOS::sptr&lt;IStreamOperatorCallback&gt; &amp;callback,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>OHOS::sptr&lt;IOfflineStreamOperator&gt; &amp;offlineOperator)</td>
-  <td class=xl65 width=363 style='width:272pt'>将指定流转换成离线流</td>
+ <tr height=19 style='height:14.0pt'>
+  <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>CamRetCode
+  DisableResult(const std::vector&lt;MetaType&gt; &amp;results)</td>
+  <td>禁止具体的ResultMeta</td>
+ </tr>
+ <tr height=19 style='height:14.0pt'>
+  <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>void
+  Close()</td>
+  <td>关闭Camera设备</td>
  </tr>
  <tr height=19 style='height:14.0pt'>
   <td rowspan=2 height=38 class=xl66 style='height:28.0pt'>icamera_device_callback.h</td>
   <td class=xl65 width=568 style='width:426pt'>void OnError(ErrorType type,
   int32_t errorCode)</td>
-  <td colspan=2 style='mso-ignore:colspan'>设备发生错误时调用，由调用者实现，用于返回错误信息给调用者</td>
+  <td>设备发生错误时调用，由调用者实现，用于返回错误信息给调用者</td>
  </tr>
  <tr height=19 style='height:14.0pt'>
   <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>void
