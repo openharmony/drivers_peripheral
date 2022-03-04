@@ -12,7 +12,7 @@
 
 该仓代码目录为 /drivers/peripheral，其中包含的各子目录简介如下。
 
--   audio：Audio HDI接口的定义，用于管理声卡驱动的加载和卸载、创建音频播放对象3及录音对象、选择音频场景、设置音频属性及音量、控制音频播放及录音的启停等，详见audio目录下的[readme](audio/README_zh.md)文档。
+-   audio：Audio HDI接口的定义，用于管理声卡驱动的加载和卸载、创建音频播放对象及录音对象、选择音频场景、设置音频属性及音量、控制音频播放及录音的启停等，详见audio目录下的[readme](audio/README_zh.md)文档。
 -   codec：Codec HDI接口的定义，这些接口对上层服务提供媒体编解码的驱动能力，详见codec目录下的[readme](codec/README_zh.md)文档。
 -   display：Display HDI 接口定义及其默认实现，对上层图形服务提供显示驱动能力，包括显示图层的管理、显示内存的管理及硬件图形加速，详见display目录下的[readme](display/README_zh.md)文档。
 
