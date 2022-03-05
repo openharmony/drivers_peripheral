@@ -98,6 +98,9 @@ int32_t DisplayDeviceProxy::RegHotPlugCallback(HotPlugCallback callback, void *c
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor())) {
+        return HDF_FAILURE;
+    }
     int32_t ret = Remote()->SendRequest(DSP_CMD_REGHOTPLUGCALLBACK, data, reply, option);
     if (ret != 0) {
         DISPLAY_LOG("error: failed %{public}d", ret);
@@ -121,7 +124,7 @@ int32_t DisplayDeviceProxy::RegDisplayVBlankCallback(uint32_t devId, VBlankCallb
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: write devId into parcel failed");
         return false;
     }
@@ -150,7 +153,7 @@ int32_t DisplayDeviceProxy::RegDisplayRefreshCallback(uint32_t devId, RefreshCal
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: write devId into data failed");
         return DISPLAY_FAILURE;
     }
@@ -174,7 +177,7 @@ int32_t DisplayDeviceProxy::GetDisplayCapability(uint32_t devId, DisplayCapabili
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -202,7 +205,7 @@ int32_t DisplayDeviceProxy::GetDisplaySupportedModes(uint32_t devId, uint32_t &n
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -236,7 +239,7 @@ int32_t DisplayDeviceProxy::GetDisplayMode(uint32_t devId, uint32_t &modeId)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: write devId into data failed");
         return DISPLAY_FAILURE;
     }
@@ -261,7 +264,7 @@ int32_t DisplayDeviceProxy::SetDisplayMode(uint32_t devId, uint32_t modeId)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -289,7 +292,7 @@ int32_t DisplayDeviceProxy::GetDisplayPowerStatus(uint32_t devId, DispPowerStatu
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -313,7 +316,7 @@ int32_t DisplayDeviceProxy::SetDisplayPowerStatus(uint32_t devId, DispPowerStatu
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -342,7 +345,7 @@ int32_t DisplayDeviceProxy::GetDisplayBacklight(uint32_t devId, uint32_t &level)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -367,7 +370,7 @@ int32_t DisplayDeviceProxy::SetDisplayBacklight(uint32_t devId, uint32_t level)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -396,7 +399,7 @@ int32_t DisplayDeviceProxy::GetDisplayProperty(uint32_t devId, uint32_t property
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -425,7 +428,7 @@ int32_t DisplayDeviceProxy::SetDisplayProperty(uint32_t devId, uint32_t property
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -458,7 +461,7 @@ int32_t DisplayDeviceProxy::PrepareDisplayLayers(uint32_t devId, bool &needFlush
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -488,7 +491,7 @@ int32_t DisplayDeviceProxy::GetDisplayCompChange(uint32_t devId, uint32_t &num, 
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -530,7 +533,7 @@ int32_t DisplayDeviceProxy::SetDisplayClientCrop(uint32_t devId, const IRect *re
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -558,7 +561,7 @@ int32_t DisplayDeviceProxy::SetDisplayClientDestRect(uint32_t devId, const IRect
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -586,7 +589,7 @@ int32_t DisplayDeviceProxy::SetDisplayClientBuffer(uint32_t devId, const BufferH
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -623,7 +626,7 @@ int32_t DisplayDeviceProxy::SetDisplayClientDamage(uint32_t devId, uint32_t num,
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -655,7 +658,7 @@ int32_t DisplayDeviceProxy::SetDisplayVsyncEnabled(uint32_t devId, bool enabled)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -690,7 +693,7 @@ int32_t DisplayDeviceProxy::GetDisplayReleaseFence(uint32_t devId, uint32_t *num
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -729,7 +732,7 @@ int32_t DisplayDeviceProxy::Commit(uint32_t devId, int32_t &fence)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -758,7 +761,7 @@ int32_t DisplayDeviceProxy::CreateVirtualDisplay(uint32_t width, uint32_t height
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -792,7 +795,7 @@ int32_t DisplayDeviceProxy::DestroyVirtualDisplay(uint32_t devId)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -822,7 +825,7 @@ int32_t DisplayDeviceProxy::SetVirtualDisplayBuffer(uint32_t devId, const Buffer
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -860,7 +863,7 @@ int32_t DisplayDeviceProxy::CreateWriteBack(uint32_t &devId, uint32_t width, uin
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(width)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(width)) {
         DISPLAY_LOG("error: %{public}s write width into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -890,7 +893,7 @@ int32_t DisplayDeviceProxy::DestroyWriteBack(uint32_t devId)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -909,7 +912,8 @@ int32_t DisplayDeviceProxy::SetProxyRemoteCallback(const OHOS::sptr<DisplayRegis
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteRemoteObject(callback->AsObject())) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) ||
+        !data.WriteRemoteObject(callback->AsObject())) {
         DISPLAY_LOG("error: write callback into data failed");
         return DISPLAY_FAILURE;
     }
@@ -933,7 +937,7 @@ int32_t DisplayDeviceProxy::InitDisplay(uint32_t devId)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -957,7 +961,7 @@ int32_t DisplayDeviceProxy::DeinitDisplay(uint32_t devId)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -981,7 +985,7 @@ int32_t DisplayDeviceProxy::GetDisplayInfo(uint32_t devId, DisplayInfo &dispInfo
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1008,7 +1012,7 @@ int32_t DisplayDeviceProxy::CreateLayer(uint32_t devId, const LayerInfo &layerIn
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1037,7 +1041,7 @@ int32_t DisplayDeviceProxy::CloseLayer(uint32_t devId, uint32_t layerId)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1065,7 +1069,7 @@ int32_t DisplayDeviceProxy::SetLayerVisible(uint32_t devId, uint32_t layerId, bo
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1097,7 +1101,7 @@ int32_t DisplayDeviceProxy::GetLayerVisibleState(uint32_t devId, uint32_t layerI
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1129,7 +1133,7 @@ int32_t DisplayDeviceProxy::SetLayerSize(uint32_t devId, uint32_t layerId, const
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1161,7 +1165,7 @@ int32_t DisplayDeviceProxy::GetLayerSize(uint32_t devId, uint32_t layerId, IRect
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1197,7 +1201,7 @@ int32_t DisplayDeviceProxy::SetLayerCrop(uint32_t devId, uint32_t layerId, const
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1229,7 +1233,7 @@ int32_t DisplayDeviceProxy::SetLayerZorder(uint32_t devId, uint32_t layerId, uin
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1261,7 +1265,7 @@ int32_t DisplayDeviceProxy::GetLayerZorder(uint32_t devId, uint32_t layerId, uin
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1290,7 +1294,7 @@ int32_t DisplayDeviceProxy::SetLayerPreMulti(uint32_t devId, uint32_t layerId, b
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1322,7 +1326,7 @@ int32_t DisplayDeviceProxy::GetLayerPreMulti(uint32_t devId, uint32_t layerId, b
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1350,7 +1354,7 @@ int32_t DisplayDeviceProxy::SetLayerAlpha(uint32_t devId, uint32_t layerId, cons
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1381,7 +1385,7 @@ int32_t DisplayDeviceProxy::GetLayerAlpha(uint32_t devId, uint32_t layerId, Laye
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1413,7 +1417,7 @@ int32_t DisplayDeviceProxy::SetLayerColorKey(uint32_t devId, uint32_t layerId, b
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1448,7 +1452,7 @@ int32_t DisplayDeviceProxy::GetLayerColorKey(uint32_t devId, uint32_t layerId, b
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1483,7 +1487,7 @@ int32_t DisplayDeviceProxy::SetLayerPalette(uint32_t devId, uint32_t layerId, co
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1518,7 +1522,7 @@ int32_t DisplayDeviceProxy::GetLayerPalette(uint32_t devId, uint32_t layerId, ui
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1551,7 +1555,7 @@ int32_t DisplayDeviceProxy::SetTransformMode(uint32_t devId, uint32_t layerId, T
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: %{public}s write devId into data failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -1582,7 +1586,7 @@ int32_t DisplayDeviceProxy::SetLayerCompression(uint32_t devId, uint32_t layerId
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: write devId into data failed");
         return DISPLAY_FAILURE;
     }
@@ -1613,7 +1617,7 @@ int32_t DisplayDeviceProxy::GetLayerCompression(uint32_t devId, uint32_t layerId
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: write devId into data failed");
         return DISPLAY_FAILURE;
     }
@@ -1641,7 +1645,7 @@ int32_t DisplayDeviceProxy::SetLayerDirtyRegion(uint32_t devId, uint32_t layerId
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: write devId into data failed");
         return DISPLAY_FAILURE;
     }
@@ -1683,7 +1687,7 @@ int32_t DisplayDeviceProxy::GetLayerBuffer(uint32_t devId, uint32_t layerId, Lay
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: write devId into data failed");
         return DISPLAY_FAILURE;
     }
@@ -1718,7 +1722,7 @@ int32_t DisplayDeviceProxy::Flush(uint32_t devId, uint32_t layerId, LayerBuffer 
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: write devId into data failed");
         return DISPLAY_FAILURE;
     }
@@ -1753,7 +1757,7 @@ int32_t DisplayDeviceProxy::WaitForVBlank(uint32_t devId, uint32_t layerId, int3
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: write devId into data failed");
         return DISPLAY_FAILURE;
     }
@@ -1784,7 +1788,7 @@ int32_t DisplayDeviceProxy::SnapShot(uint32_t devId, LayerBuffer &buffer)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: write devId into data failed");
         return DISPLAY_FAILURE;
     }
@@ -1817,7 +1821,7 @@ int32_t DisplayDeviceProxy::SetLayerVisibleRegion(uint32_t devId, uint32_t layer
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: write devId into data failed");
         return DISPLAY_FAILURE;
     }
@@ -1852,7 +1856,7 @@ int32_t DisplayDeviceProxy::SetLayerBuffer(uint32_t devId, uint32_t layerId, con
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: write devId into data failed");
         return DISPLAY_FAILURE;
     }
@@ -1896,7 +1900,7 @@ int32_t DisplayDeviceProxy::SetLayerCompositionType(uint32_t devId, uint32_t lay
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: write devId into data failed");
         return DISPLAY_FAILURE;
     }
@@ -1927,7 +1931,7 @@ int32_t DisplayDeviceProxy::SetLayerBlendType(uint32_t devId, uint32_t layerId, 
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         DISPLAY_LOG("error: write devId into data failed");
         return DISPLAY_FAILURE;
     }
