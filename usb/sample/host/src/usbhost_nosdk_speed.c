@@ -36,6 +36,7 @@
 #include "osal_time.h"
 #include "osal_mem.h"
 #include "securec.h"
+#include "hdf_log.h"
 
 #define USB_DEV_FS_PATH "/dev/bus/usb"
 #define URB_COMPLETE_PROCESS_STACK_SIZE 8196
@@ -270,7 +271,7 @@ static int32_t BeginProcess(unsigned char endPoint)
     signal(SIGALRM, SignalHandler);
 
     printf("test NO SDK endpoint:%d\n", endPoint);
-    printf("Start: sec%" PRId64 " usec%" PRId64 "\n", time.tv_sec, time.tv_usec);
+    HDF_LOGI("Start: sec%" PRId64 " usec%" PRId64 "\n", time.tv_sec, time.tv_usec);
 
     for (i = 0; i < TEST_CYCLE; i++) {
         urb[i].inUse = 1;
