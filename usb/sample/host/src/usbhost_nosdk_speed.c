@@ -271,7 +271,6 @@ static int32_t BeginProcess(unsigned char endPoint)
     signal(SIGALRM, SignalHandler);
 
     printf("test NO SDK endpoint:%d\n", endPoint);
-    HDF_LOGI("Start: sec%" PRId64 " usec%" PRId64 "\n", time.tv_sec, time.tv_usec);
 
     for (i = 0; i < TEST_CYCLE; i++) {
         urb[i].inUse = 1;
