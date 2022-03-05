@@ -20,6 +20,9 @@ if (defined(ohos_lite)) {
   if ("${product_name}" == "ohos-arm64") {
     import(
         "//drivers/peripheral/camera/hal/adapter/chipset/rpi/rpi3/device/camera/product.gni")
+  } else if ("${product_name}" == "Hi3751V350") {
+    import(
+        "//device/soc/hisilicon/common/hal/media/camera/hi3516dv300/linux_standard/camera/product.gni")
   } else if ("${product_name}" == "Hi3516DV300") {
     import(
         "//device/soc/hisilicon/common/hal/media/camera/hi3516dv300/linux_standard/camera/product.gni")
