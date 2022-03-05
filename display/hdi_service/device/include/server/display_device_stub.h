@@ -19,6 +19,8 @@
 #include <hdf_device_desc.h>
 #include <memory>
 #include <message_parcel.h>
+#include <string>
+
 #include "display_device.h"
 #include "display_device_callback_proxy.h"
 #include "display_device_common.h"
@@ -100,8 +102,13 @@ public:
     int32_t WaitForVBlank(MessageParcel *data, MessageParcel *reply);
     int32_t SnapShot(MessageParcel *data, MessageParcel *reply);
     int32_t SetLayerBlendType(MessageParcel *data, MessageParcel *reply);
+    static inline const std::u16string &GetDescriptor()
+    {
+        return metaDescriptor_;
+    }
 
 private:
+    static inline const std::u16string metaDescriptor_ = IDisplayDevice::GetDescriptor();
     int32_t SetCallBackObject(sptr<IRemoteObject> callbackRemote);
     sptr<DisplayDeviceCallbackProxy> callbackRemote_;
     std::unique_ptr<DisplayDeviceService> device_;
