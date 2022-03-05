@@ -24,11 +24,11 @@
     },
     "build": {
       "sub_component": [
-        "//drivers/peripheral/audio:hdi_audio",
-        "//drivers/peripheral/audio:audio_sample_client"
+        "//drivers/peripheral/audio:hdi_audio"
       ],
       "test": [
-        "//drivers/peripheral/audio:audio_test_entry"
+        "//drivers/peripheral/audio:audio_test_entry",
+        "//drivers/peripheral/audio:audio_sample_client"
       ]
     }
   }
