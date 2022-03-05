@@ -679,6 +679,10 @@ int32_t UsbdClient::BulkRead(const UsbDev &dev, const UsbPipe &pipe, sptr<Ashmem
 {
     MessageParcel data;
     MessageParcel reply;
+    if (ashmem == nullptr) {
+        HDF_LOGE("%{public}s:%{public}d BulkRead error ashmem", __func__, __LINE__);
+        return UEC_HDF_ERR_INVALID_PARAM;
+    }
 
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.interfaceId, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -696,6 +700,10 @@ int32_t UsbdClient::BulkWrite(const UsbDev &dev, const UsbPipe &pipe, sptr<Ashme
 {
     MessageParcel data;
     MessageParcel reply;
+    if (ashmem == nullptr) {
+        HDF_LOGE("%{public}s:%{public}d BulkWrite error ashmem", __func__, __LINE__);
+        return UEC_HDF_ERR_INVALID_PARAM;
+    }
 
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.interfaceId, UEC_SERVICE_WRITE_PARCEL_ERROR);
