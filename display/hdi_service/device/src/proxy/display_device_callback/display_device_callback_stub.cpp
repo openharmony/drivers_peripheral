@@ -22,6 +22,9 @@ int32_t DisplayDeviceCallbackStub::OnRemoteRequest(
     DISPLAY_LOG("OnRemoteRequest receive code = %{public}u", code);
     switch (code) {
         case DSP_CMD_REGHOTPLUGCALLBACK: {
+            if (data.ReadInterfaceToken() != DisplayDeviceCallbackStub::GetDescriptor()) {
+                return HDF_ERR_INVALID_PARAM;
+            }
             uint32_t outputId = data.ReadInt32();
             bool connected = data.ReadBool();
             DISPLAY_LOG("call OnHotplugIn id : %{public}d; connected : %{public}d", outputId, connected);
@@ -29,6 +32,9 @@ int32_t DisplayDeviceCallbackStub::OnRemoteRequest(
             break;
         }
         case DSP_CMD_REGDISPLAYVBLANKCALLBACK: {
+            if (data.ReadInterfaceToken() != DisplayDeviceCallbackStub::GetDescriptor()) {
+                return HDF_ERR_INVALID_PARAM;
+            }
             unsigned int sequence = data.ReadUint32();
             uint64_t ns = data.ReadUint64();
             DISPLAY_LOG(" call VBlankCallback id : %{public}u connected", sequence);
@@ -36,6 +42,9 @@ int32_t DisplayDeviceCallbackStub::OnRemoteRequest(
             break;
         }
         case DSP_CMD_REGDISPLAYREFRESHCALLBACK: {
+            if (data.ReadInterfaceToken() != DisplayDeviceCallbackStub::GetDescriptor()) {
+                return HDF_ERR_INVALID_PARAM;
+            }
             uint32_t devId = data.ReadUint32();
             DISPLAY_LOG(" call VBlankCallback devId : %{public}d", devId);
             OnRefreshCallback(devId);
