@@ -166,7 +166,7 @@ int32_t Register(int32_t groupId, RecordDataCallback cb)
 {
     if (groupId < TRADITIONAL_SENSOR_TYPE || groupId > MEDICAL_SENSOR_TYPE) {
         HDF_LOGE("%{public}s: groupId [%{public}d] out of range", __func__, groupId);
-        return SENSOR_FAILURE;
+        return SENSOR_INVALID_PARAM;
     }
     struct SensorDevManager *manager = NULL;
     CHECK_NULL_PTR_RETURN_VALUE(cb, SENSOR_NULL_PTR);
@@ -195,7 +195,7 @@ int32_t Unregister(int32_t groupId, RecordDataCallback cb)
 {
     if (groupId < TRADITIONAL_SENSOR_TYPE || groupId > MEDICAL_SENSOR_TYPE) {
         HDF_LOGE("%{public}s: groupId [%{public}d] out of range", __func__, groupId);
-        return SENSOR_FAILURE;
+        return SENSOR_INVALID_PARAM;
     }
     CHECK_NULL_PTR_RETURN_VALUE(cb, SENSOR_NULL_PTR);
     struct SensorDevManager *manager = GetSensorDevManager();
