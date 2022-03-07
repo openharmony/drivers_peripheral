@@ -910,8 +910,10 @@ int32_t WifiCmdSetAp(const char *ifName, WifiApSetting *apsettings)
     }
     bool isSerializeFailed = false;
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
-    isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, &(apsettings->freqParams), sizeof(WifiFreqParams));
-    isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, &(apsettings->beaconData), sizeof(WifiBeaconData));
+    isSerializeFailed =
+        isSerializeFailed || !HdfSbufWriteBuffer(data, &(apsettings->freqParams), sizeof(WifiFreqParams));
+    isSerializeFailed =
+        isSerializeFailed || !HdfSbufWriteBuffer(data, &(apsettings->beaconData), sizeof(WifiBeaconData));
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, apsettings->beaconInterval);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, apsettings->dtimPeriod);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint8(data, apsettings->hiddenSsid);
