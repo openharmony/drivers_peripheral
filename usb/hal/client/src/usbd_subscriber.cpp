@@ -27,12 +27,20 @@ int32_t UsbdSubscriber::OnRemoteRequest(uint32_t code, MessageParcel &data, Mess
     HDF_LOGI("%{public}s:%{public}d subscriber event code:%{public}d", __func__, __LINE__, code);
     switch (code) {
         case CMD_NOTIFY_SUBSCRIBER_DEVICE_EVENT:
+            if (data.ReadInterfaceToken() != GetDescriptor()) {
+                HDF_LOGE("%{public}s:%{public}d token check failed\n", __func__, __LINE__);
+                return UEC_HDF_ERR_INVALID_PARAM;
+            }
             ret = ParserUsbInfo(data, reply, option, info);
             if (ret == UEC_OK) {
                 ret = DeviceEvent(info);
             }
             break;
         case CMD_NOTIFY_PORT_CHANGED:
+            if (data.ReadInterfaceToken() != GetDescriptor()) {
+                HDF_LOGE("%{public}s:%{public}d token check failed\n", __func__, __LINE__);
+                return UEC_HDF_ERR_INVALID_PARAM;
+            }
             ret = ParserPortInfo(data, reply, option, pinfo);
             if (ret == UEC_OK) {
                 ret = PortChangedEvent(pinfo.portId, pinfo.powerRole, pinfo.dataRole, pinfo.mode);

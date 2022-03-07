@@ -451,6 +451,11 @@ private:
     int32_t GetBufferMessage(MessageParcel &data, std::vector<uint8_t> &bufferData);
     sptr<IRemoteObject> GetUsbdService();
     int32_t DoDispatch(uint32_t cmd, MessageParcel &data, MessageParcel &reply);
+    static inline const std::u16string metaDescriptor_ = u"hdf.usb.usbd";
+    static inline const std::u16string &GetDescriptor()
+    {
+        return metaDescriptor_;
+    }
 };
 } // namespace USB
 } // namespace OHOS

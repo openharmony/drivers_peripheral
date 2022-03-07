@@ -15,6 +15,7 @@
 
 #include "../include/cdcacm.h"
 #include "hdf_base.h"
+#include "hdf_device_object.h"
 #include "device_resource_if.h"
 #include "hdf_log.h"
 #include "osal_mem.h"
@@ -861,6 +862,12 @@ static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int32_t cmd,
     if (acm == NULL) {
         return HDF_ERR_IO;
     }
+
+    if (HdfDeviceObjectCheckInterfaceDesc(client->device, data) == false) {
+        HDF_LOGE("%{public}s:%{public}d check interface desc fail", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    
     switch (cmd) {
         case USB_SERIAL_INIT:
             return UsbSerialInit(acm);
@@ -1505,6 +1512,13 @@ static int32_t AcmDriverBind(struct HdfDeviceObject *device)
 
     if (OsalMutexInit(&acm->lock) != HDF_SUCCESS) {
         HDF_LOGE("%s: init lock fail!", __func__);
+        OsalMemFree(acm);
+        return HDF_FAILURE;
+    }
+
+    if (HdfDeviceObjectSetInterfaceDesc(device, "hdf.usb.usbfn") != HDF_SUCCESS) {
+        HDF_LOGE(" Set Desc fail!");
+        OsalMemFree(acm);
         return HDF_FAILURE;
     }
 

@@ -33,6 +33,11 @@ public:
 private:
     static int32_t ParserUsbInfo(MessageParcel &data, MessageParcel &reply, MessageOption &option, UsbInfo &info);
     static int32_t ParserPortInfo(MessageParcel &data, MessageParcel &reply, MessageOption &option, PortInfo &info);
+    static inline const std::u16string metaDescriptor_ = u"hdf.usb.usbdsubscriber";
+    static inline const std::u16string &GetDescriptor()
+    {
+        return metaDescriptor_;
+    }
 };
 } // namespace USB
 } // namespace OHOS
