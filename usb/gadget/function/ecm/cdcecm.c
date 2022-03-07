@@ -17,6 +17,7 @@
 #include "device_resource_if.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
+#include "hdf_device_object.h"
 #include "osal_mem.h"
 #include "osal_sem.h"
 #include "osal_time.h"
@@ -570,6 +571,12 @@ static int32_t EcmDeviceDispatch(struct HdfDeviceIoClient *client, int32_t cmd,
         HDF_LOGE("%s: data or reply is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
+
+    if (HdfDeviceObjectCheckInterfaceDesc(client->device, data) == false) {
+        HDF_LOGE("%{public}s:%{public}d check interface desc fail", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
     switch (cmd) {
         case USB_ECM_INIT:
             return EcmInit(client->device);
@@ -917,6 +924,13 @@ static int32_t EcmDriverBind(struct HdfDeviceObject *device)
     ecm->dataId = 1;
     if (OsalMutexInit(&ecm->lock) != HDF_SUCCESS) {
         HDF_LOGE("%s: init lock fail!", __func__);
+        OsalMemFree(ecm);
+        return HDF_FAILURE;
+    }
+
+    if (HdfDeviceObjectSetInterfaceDesc(device, "hdf.usb.usbfn") != HDF_SUCCESS) {
+        HDF_LOGE(" Set Desc fail!");
+        OsalMemFree(ecm);
         return HDF_FAILURE;
     }
 
