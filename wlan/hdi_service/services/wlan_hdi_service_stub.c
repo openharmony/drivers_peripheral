@@ -12,11 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "wlan_hdi_service_stub.h"
 #include <osal_time.h>
 #include <osal_mem.h>
 #include <securec.h>
+#include "hdf_device_object.h"
 
 struct IWiFi *g_wifi = NULL;
 struct IWiFiAp *g_apFeature = NULL;
@@ -42,12 +42,12 @@ static int32_t WifiServiceCallback(struct HdfDeviceObject *device, struct HdfRem
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteString(dataSbuf, ifName)) {
-        HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
-        goto finished;
-    }
     switch (eventId) {
         case WIFI_EVENT_RESET_DRIVER:
+            if (!HdfSbufWriteString(dataSbuf, ifName)) {
+                HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
+                goto finished;
+            }
             code = (int32_t *)data;
             if (!HdfSbufWriteInt32(dataSbuf, *code)) {
                 HDF_LOGE("%s: code write failed!", __func__);
@@ -55,6 +55,10 @@ static int32_t WifiServiceCallback(struct HdfDeviceObject *device, struct HdfRem
             }
             break;
         case WIFI_EVENT_SCAN_RESULT:
+            if (!HdfSbufWriteString(dataSbuf, ifName)) {
+                HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
+                goto finished;
+            }
             scanResult = (WifiScanResult *)data;
             if (!HdfSbufWriteBuffer(dataSbuf, (const void *)scanResult, sizeof(WifiScanResult))) {
                 HDF_LOGE("%{public}s:write ifeature->ifName failed!", __func__);
@@ -85,10 +89,11 @@ const struct WifiHdi *WifiHdiImplInstance()
 
 static int32_t HdiWifiConstruct(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    (void)client;
-    (void)data;
     (void)reply;
 
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = WifiConstruct(&g_wifi);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s contruct WiFi failed! error code: %d", __func__, ret);
@@ -99,10 +104,11 @@ static int32_t HdiWifiConstruct(struct HdfDeviceIoClient *client, struct HdfSBuf
 
 static int32_t HdiWifiDeConstruct(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    (void)client;
-    (void)data;
     (void)reply;
 
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = WifiDestruct(&g_wifi);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s destruct WiFi failed! error code: %d", __func__, ret);
@@ -113,11 +119,12 @@ static int32_t HdiWifiDeConstruct(struct HdfDeviceIoClient *client, struct HdfSB
 
 static int32_t WlanServiceStubStart(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    (void)client;
-    (void)data;
     (void)reply;
     int32_t ret;
 
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     ret = g_wifi->start(g_wifi);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s start WiFi failed! error code: %d", __func__, ret);
@@ -128,11 +135,12 @@ static int32_t WlanServiceStubStart(struct HdfDeviceIoClient *client, struct Hdf
 
 static int32_t WlanServiceStubStop(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    (void)client;
-    (void)data;
     (void)reply;
     int32_t ret;
 
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     ret = g_wifi->stop(g_wifi);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s stop WiFi failed! error code: %d", __func__, ret);
@@ -144,12 +152,13 @@ static int32_t WlanServiceStubStop(struct HdfDeviceIoClient *client, struct HdfS
 static int32_t WlanServiceStubGetSupportFeature(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    (void)client;
-    (void)data;
     int32_t ret;
     uint32_t len = PROTOCOL_80211_IFTYPE_NUM + 1;
     uint8_t support[PROTOCOL_80211_IFTYPE_NUM + 1] = {0};
 
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     ret = g_wifi->getSupportFeature(support, len);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s g_wifi->getSupportFeature get support feature failed! error code: %d", __func__, ret);
@@ -163,11 +172,12 @@ static int32_t WlanServiceStubGetSupportFeature(struct HdfDeviceIoClient *client
 static int32_t WlanServiceStubGetSupportCombo(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    (void)client;
-    (void)data;
     int32_t ret;
     uint64_t combo[DEFAULT_COMBO_SIZE] = {0};
 
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     ret = g_wifi->getSupportCombo(combo, DEFAULT_COMBO_SIZE);
     if (ret == HDF_ERR_NOT_SUPPORT) {
         HDF_LOGW("%s: not support to getting combo!, error code: %d", __func__, ret);
@@ -195,13 +205,15 @@ static void FreeFeature(struct FeatureInfo *feature)
 static int32_t WlanServiceStudCreateFeature(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    (void)client;
     int32_t ret;
     uint8_t wlanType;
 
     if (data == NULL) {
         HDF_LOGE("%s: Data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufReadUint8(data, &wlanType)) {
         HDF_LOGE("%s: read wlanType failed", __func__);
@@ -252,13 +264,15 @@ static int32_t WlanServiceStudCreateFeature(struct HdfDeviceIoClient *client, st
 static int32_t WlanServiceStudGetFeatureByIfName(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    (void)client;
     int32_t ret;
     struct IWiFiBaseFeature *baseFeature = NULL;
 
     if (data == NULL) {
         HDF_LOGE("%s: Data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     const char *ifName = HdfSbufReadString(data);
     ret = g_wifi->getFeatureByIfName(ifName, (struct IWiFiBaseFeature **)&baseFeature);
@@ -328,13 +342,15 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
 
 static int32_t WlanServiceStudRegCallback(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    (void)client;
     (void)reply;
     int32_t ret;
 
     if (data == NULL) {
         HDF_LOGE("%s: Data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     struct HdfRemoteService *callback = HdfSbufReadRemoteService(data);
     if (callback == NULL) {
@@ -394,13 +410,15 @@ static int32_t WlanServiceStubUnRegCallback(struct HdfDeviceIoClient *client, st
 static int32_t WlanServiceStubDestoryFeature(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    (void)client;
     int32_t ret;
     int32_t wlanType;
 
     if (data == NULL) {
         HDF_LOGE("%s: data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     const char *name = HdfSbufReadString(data);
     if (name == NULL) {
@@ -438,7 +456,6 @@ static int32_t WlanServiceStubDestoryFeature(struct HdfDeviceIoClient *client, s
 
 static int32_t WlanServiceStubResetDriver(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    (void)client;
     (void)reply;
     int32_t ret;
     const uint8_t chipId = 0;
@@ -446,6 +463,9 @@ static int32_t WlanServiceStubResetDriver(struct HdfDeviceIoClient *client, stru
     if (data == NULL) {
         HDF_LOGE("%s: data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufReadUint8(data, (uint8_t *)&chipId)) {
         HDF_LOGE(" %s: read chipid failed", __func__);
@@ -463,7 +483,6 @@ static int32_t WlanServiceStubResetDriver(struct HdfDeviceIoClient *client, stru
 static int32_t WlanServiceStubGetAsscociateSta(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    (void)client;
     int32_t ret;
     struct StaInfo staInfo[WLAN_MAX_NUM_STA_WITH_AP] = {{0}};
     uint32_t len = 0;
@@ -471,6 +490,9 @@ static int32_t WlanServiceStubGetAsscociateSta(struct HdfDeviceIoClient *client,
     if (data == NULL) {
         HDF_LOGE("%s: data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     const char *name = HdfSbufReadString(data);
     if (name == NULL) {
@@ -498,13 +520,15 @@ static int32_t WlanServiceStubGetAsscociateSta(struct HdfDeviceIoClient *client,
 static int32_t WlanServiceStubSetCountryCode(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    (void)client;
     (void)reply;
     int32_t ret;
 
     if (data == NULL) {
         HDF_LOGE("%s: data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     const char *name = HdfSbufReadString(data);
     if (name == NULL) {
@@ -532,11 +556,12 @@ static int32_t WlanServiceStubSetCountryCode(struct HdfDeviceIoClient *client, s
 static int32_t WlanServiceStubGetNetworkName(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    (void)client;
-
     if (data == NULL) {
         HDF_LOGE("%s: data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     const char *name = HdfSbufReadString(data);
     if (name == NULL) {
@@ -560,13 +585,15 @@ static int32_t WlanServiceStubGetNetworkName(struct HdfDeviceIoClient *client, s
 static int32_t WlanServiceStubGetFeatureType(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    (void)client;
     int32_t type;
     int32_t feature_type = 0;
 
     if (data == NULL) {
         HDF_LOGE("%s: data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     HdfSbufReadInt32(data, &feature_type);
     g_apFeature->baseFeature.type = feature_type;
@@ -577,7 +604,6 @@ static int32_t WlanServiceStubGetFeatureType(struct HdfDeviceIoClient *client, s
 
 static int32_t WlanServcieStubSetMacAddr(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    (void)client;
     (void)reply;
     int32_t ret;
     uint8_t mac[ETH_ADDR_LEN] = {0};
@@ -586,6 +612,9 @@ static int32_t WlanServcieStubSetMacAddr(struct HdfDeviceIoClient *client, struc
     if (data == NULL) {
         HDF_LOGE("%s: data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     const char *name = HdfSbufReadString(data);
     if (name == NULL) {
@@ -627,7 +656,6 @@ static int32_t WlanServcieStubSetMacAddr(struct HdfDeviceIoClient *client, struc
 
 static int32_t WlanServiceGetMacAddr(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    (void)client;
     int32_t ret;
     uint8_t mac[ETH_ADDR_LEN] = {0};
     int32_t wlanType;
@@ -635,6 +663,9 @@ static int32_t WlanServiceGetMacAddr(struct HdfDeviceIoClient *client, struct Hd
     if (data == NULL) {
         HDF_LOGE("%s: data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     const char *name = HdfSbufReadString(data);
     if (name == NULL) {
@@ -676,7 +707,6 @@ static int32_t WlanServiceGetMacAddr(struct HdfDeviceIoClient *client, struct Hd
 static int32_t WlanServiceStubGetFreqWithband(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    (void)client;
     int32_t ret;
     int32_t freq[WLAN_FREQ_MAX_NUM] = {0};
     int32_t wlanBand = 0;
@@ -685,6 +715,9 @@ static int32_t WlanServiceStubGetFreqWithband(struct HdfDeviceIoClient *client, 
     if (data == NULL) {
         HDF_LOGE("%s: data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     const char *name = HdfSbufReadString(data);
     if (name == NULL) {
@@ -718,7 +751,6 @@ static int32_t WlanServiceStubGetFreqWithband(struct HdfDeviceIoClient *client, 
 
 static int32_t WlanServiceStubSetTxPowr(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    (void)client;
     (void)reply;
     int32_t ret;
     int32_t power;
@@ -726,6 +758,9 @@ static int32_t WlanServiceStubSetTxPowr(struct HdfDeviceIoClient *client, struct
     if (data == NULL) {
         HDF_LOGE("%s: data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     const char *name = HdfSbufReadString(data);
     if (name == NULL) {
@@ -751,7 +786,6 @@ static int32_t WlanServiceStubSetTxPowr(struct HdfDeviceIoClient *client, struct
 
 static int32_t WlanServiceStubGetChipId(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    (void)client;
     int32_t ret;
     uint8_t chipId = 0;
     int32_t wlanType;
@@ -759,6 +793,9 @@ static int32_t WlanServiceStubGetChipId(struct HdfDeviceIoClient *client, struct
     if (data == NULL) {
         HDF_LOGE("%s: data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     const char *name = HdfSbufReadString(data);
     if (name == NULL) {
@@ -801,7 +838,6 @@ static int32_t WlanServiceStubGetChipId(struct HdfDeviceIoClient *client, struct
 static int32_t WlanServiceStubGetNameByChipId(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    (void)client;
     int32_t ret;
     uint32_t num = 0;
     uint8_t chipId = 10;
@@ -810,6 +846,9 @@ static int32_t WlanServiceStubGetNameByChipId(struct HdfDeviceIoClient *client, 
     if (data == NULL) {
         HDF_LOGE("%s: data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufReadUint8(data, &chipId)) {
         HDF_LOGE("%s: read chipid failed", __func__);
@@ -834,7 +873,6 @@ static int32_t WlanServiceStubGetNameByChipId(struct HdfDeviceIoClient *client, 
 static int32_t WlanServiceStubSetScanMacAddr(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    (void)client;
     (void)reply;
     int32_t ret;
     uint8_t scanMac[ETH_ADDR_LEN] = {0};
@@ -843,6 +881,9 @@ static int32_t WlanServiceStubSetScanMacAddr(struct HdfDeviceIoClient *client, s
     if (data == NULL) {
         HDF_LOGE("%s: data is NULL", __func__);
         return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
     }
     const char *name = HdfSbufReadString(data);
     if (name == NULL) {
@@ -872,9 +913,11 @@ static int32_t WlanServiceStubSetScanMacAddr(struct HdfDeviceIoClient *client, s
 static int32_t WlanServiceStubGetNetdevInfo(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    (void)client;
-    (void)data;
     int32_t ret;
+
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     struct NetDeviceInfoResult *netDeviceInfoResult =
         (struct NetDeviceInfoResult *)OsalMemCalloc(sizeof(struct NetDeviceInfoResult));
     if (netDeviceInfoResult == NULL) {
@@ -898,12 +941,14 @@ static int32_t WlanServiceStubGetNetdevInfo(struct HdfDeviceIoClient *client, st
 static int32_t WlanServiceStubStartScan(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    (void)client;
     (void)reply;
     int32_t ret;
     uint32_t dataSize = 0;
     WifiScan *scan;
 
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     const char *ifName = HdfSbufReadString(data);
     if (ifName == NULL) {
         HDF_LOGE("%s: name is NULL", __func__);

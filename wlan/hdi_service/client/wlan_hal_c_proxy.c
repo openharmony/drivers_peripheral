@@ -51,6 +51,10 @@ static int32_t WlanConstruct(struct IWifiInterface *self)
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
     ec = WlanProxyCall(self, WLAN_SERVICE_CONSTRUCT, data, reply);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
@@ -77,6 +81,10 @@ static int32_t WlanDestruct(struct IWifiInterface *self)
     struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
@@ -109,6 +117,10 @@ static int32_t WlanStart(struct IWifiInterface *self)
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
     ec = WlanProxyCall(self, WLAN_SERVICE_START, data, reply);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
@@ -135,6 +147,10 @@ static int32_t WlanStop(struct IWifiInterface *self)
     struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
@@ -168,7 +184,8 @@ static int32_t WlanCreateFeature(struct IWifiInterface *self, const int32_t type
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteInt32(data, type)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteInt32(data, type)) {
         HDF_LOGE("%{public}s: write type failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -208,7 +225,8 @@ static int32_t WlanDestroyFeature(struct IWifiInterface *self, struct WlanFeatur
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteString(data, ifeature->ifName)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteString(data, ifeature->ifName)) {
         HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -250,7 +268,8 @@ static int32_t WlanGetAsscociatedStas(struct IWifiInterface *self, const struct 
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteString(data, ifeature->ifName)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteString(data, ifeature->ifName)) {
         HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -294,7 +313,8 @@ static int32_t WlanGetChipId(struct IWifiInterface *self, const struct WlanFeatu
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteString(data, ifeature->ifName)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteString(data, ifeature->ifName)) {
         HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -340,7 +360,8 @@ static int32_t WlanGetDeviceMacAddress(struct IWifiInterface *self, const struct
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteString(data, ifeature->ifName)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteString(data, ifeature->ifName)) {
         HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -386,7 +407,8 @@ static int32_t WlanGetFeatureByIfName(struct IWifiInterface *self,  const char *
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteString(data, ifName)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteString(data, ifName)) {
         HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -428,7 +450,8 @@ static int32_t WlanGetFeatureType(struct IWifiInterface *self, struct WlanFeatur
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteInt32(data, ifeature->wlanType)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteInt32(data, ifeature->wlanType)) {
         HDF_LOGE("%{public}s: write wlanType failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -471,7 +494,8 @@ static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct Wl
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteString(data, ifeature->ifName)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteString(data, ifeature->ifName)) {
         HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -523,7 +547,8 @@ static int32_t WlanGetIfNamesByChipId(struct IWifiInterface *self, const uint8_t
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteUint8(data, chipId)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteUint8(data, chipId)) {
         HDF_LOGE("%{public}s: write wlanType failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -564,7 +589,8 @@ static int32_t WlanGetNetworkIfaceName(struct IWifiInterface *self, struct WlanF
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteString(data, ifeature->ifName)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteString(data, ifeature->ifName)) {
         HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -599,6 +625,10 @@ static int32_t WlanGetSupportCombo(struct IWifiInterface *self, uint64_t *combo)
     struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
@@ -639,6 +669,10 @@ static int32_t WlanGetSupportFeature(struct IWifiInterface *self, uint8_t *supTy
     struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
@@ -691,6 +725,10 @@ static int32_t WlanRegisterEventCallback(struct IWifiInterface *self, CallbackFu
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
     HdfSbufWriteRemoteService(data, callback);
     ec = WlanProxyCall(self, WLAN_SERVICE_REGISTER_CALLBACK, data, reply);
     if (ec != HDF_SUCCESS) {
@@ -723,6 +761,10 @@ static int32_t WlanUnregisterEventCallback(struct IWifiInterface *self)
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
     ec = WlanProxyCall(self, WLAN_SERVICE_UNREGISTER_CALLBACK, data, reply);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
@@ -752,7 +794,8 @@ static int32_t WlanResetDriver(struct IWifiInterface *self, const uint8_t chipId
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteUint8(data, chipId)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteUint8(data, chipId)) {
         HDF_LOGE("%{public}s: write wlanType failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -787,7 +830,8 @@ static int32_t WlanSetCountryCode(struct IWifiInterface *self, const struct Wlan
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteString(data, ifeature->ifName)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteString(data, ifeature->ifName)) {
         HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -827,7 +871,8 @@ static int32_t WlanSetMacAddress(struct IWifiInterface *self, const struct WlanF
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteString(data, ifeature->ifName)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteString(data, ifeature->ifName)) {
         HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -869,7 +914,8 @@ static int32_t WlanSetScanningMacAddress(struct IWifiInterface *self, const stru
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteString(data, ifeature->ifName)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteString(data, ifeature->ifName)) {
         HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -915,7 +961,8 @@ static int32_t WlanSetTxPower(struct IWifiInterface *self, const struct WlanFeat
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteString(data, ifeature->ifName)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteString(data, ifeature->ifName)) {
         HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -953,6 +1000,10 @@ static int32_t WlanGetNetDevInfo(struct IWifiInterface *self, struct NetDeviceIn
     struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        ec = HDF_ERR_MALLOC_FAIL;
+        goto finished;
+    }
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
@@ -995,7 +1046,8 @@ static int32_t WlanStartScan(struct IWifiInterface *self, const struct WlanFeatu
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteString(data, ifeature->ifName)) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+        !HdfSbufWriteString(data, ifeature->ifName)) {
         HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
@@ -1068,7 +1120,13 @@ struct IWifiInterface *HdIWifiInterfaceGet(const char *serviceName)
         HdfRemoteServiceRecycle(remote);
         return NULL;
     }
+    if (!HdfRemoteServiceSetInterfaceDesc(remote, "HDI.WLAN.V1_0")) {
+        HDF_LOGE("%{public}s: failed to init interface desc", __func__);
+        HdfRemoteServiceRecycle(remote);
+        return NULL;
+    }
     wlanClient->remote = remote;
+
     IwifiConstruct(wlanClient);
     return wlanClient;
 }
