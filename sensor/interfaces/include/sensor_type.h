@@ -153,7 +153,8 @@ enum SensorModeType {
  */
 enum SensorGroupType {
     TRADITIONAL_SENSOR_TYPE = 0, /**< traditional sensor type, the sensorId enumeration value range is 128-160 */
-    MEDICAL_SENSOR_TYPE = 1  /**< medical sensor type, the sensorId enumeration value range is not within 128-160 */
+    MEDICAL_SENSOR_TYPE = 1,  /**< medical sensor type, the sensorId enumeration value range is not within 128-160 */
+    SENSOR_GROUP_TYPE_MAX,          /**< Maximum sensor type*/
 };
 
 /**
