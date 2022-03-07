@@ -237,7 +237,7 @@ int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallback>& callb
 
     if (groupId < TRADITIONAL_SENSOR_TYPE || groupId > MEDICAL_SENSOR_TYPE) {
         HDF_LOGE("%{public}s: groupId [%{public}d] out of range", __func__, groupId);
-        return HDF_FAILURE;
+        return SENSOR_INVALID_PARAM;
     }
 
     std::lock_guard<std::mutex> lock(g_mutex);
@@ -282,7 +282,7 @@ int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallback>& cal
 
     if (groupId < TRADITIONAL_SENSOR_TYPE || groupId > MEDICAL_SENSOR_TYPE) {
         HDF_LOGE("%{public}s: groupId [%{public}d] out of range", __func__, groupId);
-        return HDF_FAILURE;
+        return SENSOR_INVALID_PARAM;
     }
 
     std::lock_guard<std::mutex> lock(g_mutex);

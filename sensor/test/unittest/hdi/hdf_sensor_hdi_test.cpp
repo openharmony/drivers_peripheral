@@ -29,7 +29,9 @@ using namespace testing::ext;
 
 namespace {
     sptr<ISensorInterface>  g_sensorInterface = nullptr;
-    sptr<ISensorCallback> g_callback = new SensorCallbackImpl();
+    sptr<ISensorCallback> g_traditionalCallback = new SensorCallbackImpl();
+    sptr<ISensorCallback> g_medicalCallback = new SensorCallbackImpl();
+    std::vector<HdfSensorInformation> g_info;
     struct SensorValueRange {
         float highThreshold;
         float lowThreshold;
@@ -43,18 +45,18 @@ namespace {
         struct SensorValueRange *valueRange;
     };
 
-    static struct SensorValueRange g_testRange[] = {{1e5, 0}};
-    static struct SensorValueRange g_accelRange[] = {{78, -78}, {78, -78}, {78, -78}};
-    static struct SensorValueRange g_alsRange[] = {{10000, 0}, {10000, 0}, {10000, 0}, {10000, 0}};
-    static struct SensorValueRange g_pedometerRange[] = {{10000, 0}};
-    static struct SensorValueRange g_proximityRange[] = {{5, 0}};
-    static struct SensorValueRange g_hallRange[] = {{1, 0}};
-    static struct SensorValueRange g_barometerRange[] = {{1100, -1100}, {1100, -1100}};
-    static struct SensorValueRange g_magneticRange[] = {{35, -35}, {35, -35}, {35, -35}};
-    static struct SensorValueRange g_gyroscopeRange[] = {{2000, -2000}, {2000, -2000}, {2000, -2000}};
-    static struct SensorValueRange g_gravityRange[] = {{78, -78}, {78, -78}, {78, -78}};
+    struct SensorValueRange g_testRange[] = {{1e5, 0}};
+    struct SensorValueRange g_accelRange[] = {{78, -78}, {78, -78}, {78, -78}};
+    struct SensorValueRange g_alsRange[] = {{10000, 0}, {10000, 0}, {10000, 0}, {10000, 0}};
+    struct SensorValueRange g_pedometerRange[] = {{10000, 0}};
+    struct SensorValueRange g_proximityRange[] = {{5, 0}};
+    struct SensorValueRange g_hallRange[] = {{1, 0}};
+    struct SensorValueRange g_barometerRange[] = {{1100, -1100}, {1100, -1100}};
+    struct SensorValueRange g_magneticRange[] = {{35, -35}, {35, -35}, {35, -35}};
+    struct SensorValueRange g_gyroscopeRange[] = {{2000, -2000}, {2000, -2000}, {2000, -2000}};
+    struct SensorValueRange g_gravityRange[] = {{78, -78}, {78, -78}, {78, -78}};
 
-    static struct SensorDevelopmentList g_sensorList[] = {
+    struct SensorDevelopmentList g_sensorList[] = {
         {SENSOR_TYPE_NONE, "sensor_test",  1, 1, g_testRange},
         {SENSOR_TYPE_ACCELEROMETER, "accelerometer",  1, 3, g_accelRange},
         {SENSOR_TYPE_PEDOMETER, "pedometer", 1, 1, g_pedometerRange},
@@ -67,11 +69,12 @@ namespace {
         {SENSOR_TYPE_GRAVITY, "gravity", 1, 3, g_gravityRange}
     };
 
-    static int g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
-    const int32_t SENSOR_ID = 0;
-    const int32_t SENSOR_INTERVAL = 200000000;
-    const int32_t SENSOR_POLL_TIME = 1;
-    const int32_t SENSOR_WAIT_TIME = 400;
+    constexpr int g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
+    constexpr int32_t SENSOR_INTERVAL1 = 200000000;
+    constexpr int32_t SENSOR_INTERVAL2 = 20000000;
+    constexpr int32_t SENSOR_POLL_TIME = 1;
+    constexpr int32_t SENSOR_WAIT_TIME = 100;
+    constexpr int32_t ABNORMAL_SENSORID = -1;
 }
 
 class HdfSensorHdiTest : public testing::Test {
@@ -118,28 +121,62 @@ HWTEST_F(HdfSensorHdiTest, GetSensorClient0001, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, GetSensorList0001, TestSize.Level1)
 {
-    std::vector<HdfSensorInformation> info;
-    int32_t ret = g_sensorInterface->GetAllSensorInfo(info);
-    EXPECT_EQ(0, ret);
+    int32_t ret = g_sensorInterface->GetAllSensorInfo(g_info);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    EXPECT_GT(g_info.size(), 0);
+    printf("get sensor list num[%zu]\n\r", g_info.size());
 
-    printf("get sensor list num[%zu]\n\r", info.size());
-
-    for (auto iter : info) {
-        int j =0;
+    for (auto iter : g_info) {
         printf("get sensoriId[%d], info name[%s], power[%f]\n\r", iter.sensorId, iter.sensorName.c_str(), iter.power);
-        for (; j < g_listNum; ++j) {
+        for (int j =0; j < g_listNum; ++j) {
             if (iter.sensorId == g_sensorList[j].sensorTypeId) {
-                EXPECT_STREQ(g_sensorList[j].sensorName, iter.sensorName.c_str());
+                EXPECT_GT(iter.sensorName.size(), 0);
                 break;
             }
         }
-
-        if (j == g_listNum) {
-            EXPECT_NE(g_listNum, j);
-            printf("%s: The sensor ID[%d] does not match. Please check the use case or the reported sensor ID",
-            __func__, iter.sensorId);
-        }
     }
+}
+
+/**
+  * @tc.name: RegisterSensorDataCb0001
+  * @tc.desc: Returns 0 if the callback is successfully registered; returns a negative value otherwise.
+  * @tc.type: FUNC
+  * @tc.require: SR000F869M, AR000F869P, AR000F8QNL
+  */
+HWTEST_F(HdfSensorHdiTest, RegisterSensorDataCb0001, TestSize.Level1)
+{
+    int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_medicalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_medicalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: RegisterSensorDataCb0002
+  * @tc.desc: Returns 0 if the callback is successfully registered; returns a negative value otherwise.
+  * @tc.type: FUNC
+  * @tc.require: SR000F869M, AR000F869P, AR000F8QNL
+  */
+HWTEST_F(HdfSensorHdiTest, RegisterSensorDataCb0002, TestSize.Level1)
+{
+    int32_t ret = g_sensorInterface->Register(MEDICAL_SENSOR_TYPE, g_medicalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    ret = g_sensorInterface->Unregister(MEDICAL_SENSOR_TYPE, g_medicalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+}
+
+/**
+  * @tc.name: RegisterDataCb001
+  * @tc.desc: Returns 0 if the callback is successfully registered; returns a negative value otherwise.
+  * @tc.type: FUNC
+  * @tc.require: SR000F869M, AR000F869P, AR000F8QNL
+  */
+HWTEST_F(HdfSensorHdiTest, RegisterSensorDataCb0003, TestSize.Level1)
+{
+    int32_t ret = g_sensorInterface->Register(SENSOR_GROUP_TYPE_MAX, g_medicalCallback);
+    EXPECT_EQ(SENSOR_INVALID_PARAM, ret);
+    ret = g_sensorInterface->Unregister(SENSOR_GROUP_TYPE_MAX, g_medicalCallback);
+    EXPECT_EQ(SENSOR_INVALID_PARAM, ret);
 }
 
 /**
@@ -150,28 +187,24 @@ HWTEST_F(HdfSensorHdiTest, GetSensorList0001, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, EnableSensor0001, TestSize.Level1)
 {
-    int32_t ret = g_sensorInterface->Register(0, g_callback);
-    EXPECT_EQ(0, ret);
+    int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
 
-    std::vector<HdfSensorInformation> info;
-    ret = g_sensorInterface->GetAllSensorInfo(info);
-    EXPECT_EQ(0, ret);
+    EXPECT_GT(g_info.size(), 0);
 
-    if (info.size()==0) {
-        return;
-    }
-
-    for (auto iter : info) {
-        ret = g_sensorInterface->SetBatch(iter.sensorId, SENSOR_INTERVAL, SENSOR_POLL_TIME);
-        EXPECT_EQ(0, ret);
+    for (auto iter : g_info) {
+        ret = g_sensorInterface->SetBatch(iter.sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
         ret = g_sensorInterface->Enable(iter.sensorId);
-        EXPECT_EQ(0, ret);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalSleep(SENSOR_POLL_TIME);
         ret = g_sensorInterface->Disable(iter.sensorId);
-        EXPECT_EQ(0, ret);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
-    ret = g_sensorInterface->Unregister(0, g_callback);
+    ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
     EXPECT_EQ(0, ret);
+    EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
+    SensorCallbackImpl::sensorDataFlag = 1;
 }
 
 /**
@@ -182,13 +215,10 @@ HWTEST_F(HdfSensorHdiTest, EnableSensor0001, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, EnableSensor0002, TestSize.Level1)
 {
-    std::vector<HdfSensorInformation> info;
-    int32_t ret = g_sensorInterface->GetAllSensorInfo(info);
-    EXPECT_EQ(0, ret);
-    ret = g_sensorInterface->Enable(-1);
-    EXPECT_EQ(-2, ret);
-    ret = g_sensorInterface->Disable(-1);
-    EXPECT_EQ(-2, ret);
+    int32_t ret = g_sensorInterface->Enable(ABNORMAL_SENSORID);
+    EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
+    ret = g_sensorInterface->Disable(ABNORMAL_SENSORID);
+    EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
 }
 
 /**
@@ -199,19 +229,23 @@ HWTEST_F(HdfSensorHdiTest, EnableSensor0002, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, SetSensorBatch0001, TestSize.Level1)
 {
-    std::vector<HdfSensorInformation> info;
-    int32_t ret = g_sensorInterface->GetAllSensorInfo(info);
-    EXPECT_EQ(0, ret);
+    int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
 
-    for (auto iter : info) {
-        ret = g_sensorInterface->SetBatch(iter.sensorId, SENSOR_INTERVAL, SENSOR_POLL_TIME);
-        EXPECT_EQ(0, ret);
+    for (auto iter : g_info) {
+        ret = g_sensorInterface->SetBatch(iter.sensorId, SENSOR_INTERVAL2, SENSOR_POLL_TIME);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
         ret = g_sensorInterface->Enable(iter.sensorId);
-        EXPECT_EQ(0, ret);
-        OsalSleep(SENSOR_POLL_TIME);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+        OsalMSleep(SENSOR_WAIT_TIME);
         ret = g_sensorInterface->Disable(iter.sensorId);
-        EXPECT_EQ(0, ret);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
+
+    ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+    EXPECT_EQ(SENSOR_SUCCESS, ret);
+    EXPECT_EQ(SensorCallbackImpl::sensorDataFlag, 1);
+    SensorCallbackImpl::sensorDataFlag = 1;
 }
 
 /** @tc.name: SetSensorBatch0002
@@ -221,11 +255,22 @@ HWTEST_F(HdfSensorHdiTest, SetSensorBatch0001, TestSize.Level1)
     */
 HWTEST_F(HdfSensorHdiTest, SetSensorBatch0002, TestSize.Level1)
 {
-    std::vector<HdfSensorInformation> info;
-    int32_t ret = g_sensorInterface->GetAllSensorInfo(info);
-    EXPECT_EQ(0, ret);
-    ret = g_sensorInterface->SetBatch(-1, 0, 0);
-    EXPECT_EQ(-2, ret);
+    int32_t ret = g_sensorInterface->SetBatch(ABNORMAL_SENSORID, 0, 0);
+    EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
+}
+
+/**
+  * @tc.name: SetSensorBatch0003
+  * @tc.desc: Sets the sampling time and data report interval for sensors in batches.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorHdiTest, SetSensorBatch0003, TestSize.Level1)
+{
+    for (auto iter : g_info) {
+        int32_t ret = g_sensorInterface->SetBatch(iter.sensorId, -1, SENSOR_POLL_TIME);
+        EXPECT_EQ(SENSOR_INVALID_PARAM, ret);
+    }
 }
 
 /**
@@ -236,25 +281,23 @@ HWTEST_F(HdfSensorHdiTest, SetSensorBatch0002, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, SetSensorMode0001, TestSize.Level1)
 {
-    std::vector<HdfSensorInformation> info;
-    int32_t ret = g_sensorInterface->GetAllSensorInfo(info);
-    EXPECT_EQ(0, ret);
-    for (auto iter : info)
+    EXPECT_GT(g_info.size(), 0);
+    for (auto iter : g_info)
     {
-        ret = g_sensorInterface->SetBatch(iter.sensorId, SENSOR_INTERVAL, SENSOR_POLL_TIME);
-        EXPECT_EQ(0, ret);
+        int32_t ret = g_sensorInterface->SetBatch(iter.sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
         if (iter.sensorId == SENSOR_TYPE_HALL) {
             ret = g_sensorInterface->SetMode(iter.sensorId, SENSOR_MODE_ON_CHANGE);
-            EXPECT_EQ(0, ret);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
         } else {
             ret = g_sensorInterface->SetMode(iter.sensorId, SENSOR_MODE_REALTIME);
-            EXPECT_EQ(0, ret);
+            EXPECT_EQ(SENSOR_SUCCESS, ret);
         }
         ret = g_sensorInterface->Enable(iter.sensorId);
-        EXPECT_EQ(0, ret);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(SENSOR_WAIT_TIME);
         ret = g_sensorInterface->Disable(iter.sensorId);
-        EXPECT_EQ(0, ret);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }
 
@@ -267,20 +310,31 @@ HWTEST_F(HdfSensorHdiTest, SetSensorMode0001, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, SetSensorMode0002, TestSize.Level1)
 {
-    std::vector<HdfSensorInformation> info;
-    int32_t ret = g_sensorInterface->GetAllSensorInfo(info);
-    EXPECT_EQ(0, ret);
-    for (auto iter : info)
+    int32_t ret = g_sensorInterface->SetMode(ABNORMAL_SENSORID, SENSOR_MODE_REALTIME);
+    EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
+}
+
+/**
+  * @tc.name: SetSensorMode0003
+  * @tc.desc: Sets the data reporting mode for the specified sensor.The current real-time polling mode is valid.
+  * Other values are invalid.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorHdiTest, SetSensorMode0003, TestSize.Level1)
+{
+    EXPECT_GT(g_info.size(), 0);
+    for (auto iter : g_info)
     {
-        ret = g_sensorInterface->SetBatch(iter.sensorId, SENSOR_INTERVAL, SENSOR_POLL_TIME);
-        EXPECT_EQ(0, ret);
+        int32_t ret = g_sensorInterface->SetBatch(iter.sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
         ret = g_sensorInterface->SetMode(iter.sensorId, SENSOR_MODE_DEFAULT);
-        EXPECT_EQ(-1, ret);
+        EXPECT_EQ(SENSOR_FAILURE, ret);
         ret = g_sensorInterface->Enable(iter.sensorId);
-        EXPECT_EQ(0, ret);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
         OsalMSleep(SENSOR_WAIT_TIME);
         ret = g_sensorInterface->Disable(iter.sensorId);
-        EXPECT_EQ(0, ret);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
 }
 
@@ -292,16 +346,22 @@ HWTEST_F(HdfSensorHdiTest, SetSensorMode0002, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, SetSensorOption0001, TestSize.Level1)
 {
-    std::vector<HdfSensorInformation> info;
-    int32_t ret = g_sensorInterface->GetAllSensorInfo(info);
-    EXPECT_EQ(0, ret);
-    ret = g_sensorInterface->SetBatch(SENSOR_ID, SENSOR_INTERVAL, SENSOR_POLL_TIME);
-    EXPECT_EQ(0, ret);
-    ret = g_sensorInterface->SetOption(SENSOR_ID, 0);
-    EXPECT_EQ(0, ret);
-    ret = g_sensorInterface->Enable(SENSOR_ID);
-    EXPECT_EQ(0, ret);
-    OsalMSleep(SENSOR_WAIT_TIME);
-    ret = g_sensorInterface->Disable(SENSOR_ID);
-    EXPECT_EQ(0, ret);
+    EXPECT_GT(g_info.size(), 0);
+    for (auto iter : g_info)
+    {
+        int32_t ret = g_sensorInterface->SetOption(iter.sensorId, 0);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
+    }
+}
+
+/**
+  * @tc.name: SetSensorOption0002
+  * @tc.desc: Sets options for the specified sensor, including its measurement range and accuracy.
+  * @tc.type: FUNC
+  * @tc.require: #I4L3LF
+  */
+HWTEST_F(HdfSensorHdiTest, SetSensorOption0002, TestSize.Level1)
+{
+    int32_t ret = g_sensorInterface->SetOption(ABNORMAL_SENSORID, 0);
+    EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
 }
