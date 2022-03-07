@@ -44,6 +44,11 @@ int32_t AudioProxyManagerGetAllAdapters(struct AudioProxyManager *manager,
     if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
+    if (!HdfRemoteServiceWriteInterfaceToken(manager->remote, data)) {
+        LOG_FUN_ERR("write interface token failed");
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = AudioAdaptersForUser(descs, size);
     if (ret < 0) {
         AudioProxyBufReplyRecycle(data, reply);
@@ -69,7 +74,7 @@ int32_t AudioProxyManagerGetAllAdapters(struct AudioProxyManager *manager,
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t LoadAdapterPrepareParameters(const struct AudioAdapterDescriptor *desc,
+int32_t LoadAdapterPrepareParameters(struct HdfRemoteService * remoteObj, const struct AudioAdapterDescriptor *desc,
     struct HdfSBuf **data, struct HdfSBuf **reply)
 {
     if (desc == NULL || desc->adapterName == NULL || desc->ports == NULL || data == NULL || reply == NULL) {
@@ -97,6 +102,10 @@ int32_t LoadAdapterPrepareParameters(const struct AudioAdapterDescriptor *desc,
     if (AudioProxyPreprocessSBuf(data, reply) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
+    if (!HdfRemoteServiceWriteInterfaceToken(remoteObj, *data)) {
+        LOG_FUN_ERR("write interface token failed");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     // adapterName
     if (!HdfSbufWriteString(*data, desc->adapterName)) {
         return AUDIO_HAL_ERR_INTERNAL;
@@ -120,7 +129,7 @@ int32_t AudioProxyManagerLoadAdapter(struct AudioProxyManager *manager, const st
         adapter == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    int32_t ret = LoadAdapterPrepareParameters(desc, &data, &reply);
+    int32_t ret = LoadAdapterPrepareParameters(manager->remote, desc, &data, &reply);
     if (ret < 0) {
         LOG_FUN_ERR("LoadAdapterPrepareParameters Fail");
         AudioProxyBufReplyRecycle(data, reply);
@@ -190,6 +199,11 @@ void AudioProxyManagerUnloadAdapter(struct AudioProxyManager *manager, struct Au
         AudioMemFree((void **)&hwAdapter->portCapabilitys);
     }
     if (AudioProxyPreprocessSBuf(&data, &reply) == AUDIO_HAL_SUCCESS) {
+        if (!HdfRemoteServiceWriteInterfaceToken(manager->remote, data)) {
+            LOG_FUN_ERR("write interface token failed");
+            AudioProxyBufReplyRecycle(data, reply);
+            return;
+        }
         adapterName = hwAdapter->adapterDescriptor.adapterName;
         if (HdfSbufWriteString(data, adapterName)) {
             int32_t ret = AudioProxyDispatchCall(manager->remote, AUDIO_HDI_MGR_UNLOAD_ADAPTER, data, reply);
@@ -225,12 +239,20 @@ struct AudioProxyManager *GetAudioProxyManagerFuncs(void)
         LOG_FUN_ERR("HDIServiceManagerGet failed!");
         return NULL;
     }
+
     struct HdfRemoteService *remote = serviceMgr->GetService(serviceMgr, HDI_SERVER_NAME);
     if (remote == NULL) {
         LOG_FUN_ERR("Remote GetService failed!");
         HDIServiceManagerRelease(serviceMgr);
         return NULL;
     }
+
+    if (!HdfRemoteServiceSetInterfaceDesc(remote, "ohos.hdi.audio_service")) {
+        HDF_LOGE("%{public}s: failed to init interface desc", __func__);
+        HdfRemoteServiceRecycle(remote);
+        return NULL;
+    }
+
     HDIServiceManagerRelease(serviceMgr);
     (void)memset_s(&g_localAudioProxyMgr, sizeof(struct AudioProxyManager), 0, sizeof(struct AudioProxyManager));
     ProxyMgrConstruct(&g_localAudioProxyMgr);
