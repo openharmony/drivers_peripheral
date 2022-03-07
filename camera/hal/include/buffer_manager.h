@@ -18,7 +18,6 @@
 
 #include "ibuffer_pool.h"
 #include <map>
-#include <memory>
 #include <mutex>
 
 namespace OHOS::Camera {
