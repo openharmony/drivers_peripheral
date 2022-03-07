@@ -17,7 +17,6 @@
 #define HOS_BUFFER_TRACKING_H
 
 #include "buffer_trace.h"
-#include <memory>
 
 #define PIPELINE_REPORT_BUFFER_LOCATION(I, F, N) TRACKING_REPORT_BUFFER_LOCATION(I, F, N, false);
 
