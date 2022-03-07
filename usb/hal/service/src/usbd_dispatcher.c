@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "hdf_log.h"
+#include "hdf_device_object.h"
 #include "osal_mem.h"
 #include "osal_time.h"
 #include "securec.h"
@@ -3404,6 +3405,12 @@ int32_t UsbdServiceDispatch(struct HdfDeviceIoClient *client, int32_t cmd, struc
     if (DispatchCheckParam(client) != HDF_SUCCESS) {
         return HDF_ERR_INVALID_OBJECT;
     }
+
+    if (HdfDeviceObjectCheckInterfaceDesc(client->device, data) == false) {
+        HDF_LOGE("%{public}s:%{public}d check interface desc fail", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    
     service = (struct UsbdService *)client->device->service;
     if (FilterCmd(cmd)) {
         uint8_t busNum = 0;
