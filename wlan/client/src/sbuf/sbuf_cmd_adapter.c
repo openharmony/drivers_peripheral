@@ -910,7 +910,12 @@ int32_t WifiCmdSetAp(const char *ifName, WifiApSetting *apsettings)
     }
     bool isSerializeFailed = false;
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
-    isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, apsettings, sizeof(WifiApSetting));
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, apsettings->freqParams, sizeof(WifiFreqParams));
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, apsettings->beaconData, sizeof(WifiBeaconData));
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, apsettings->beaconInterval);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, apsettings->dtimPeriod);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint8(apsettings->hiddenSsid);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint8(apsettings->authType);
     isSerializeFailed =
         isSerializeFailed || !HdfSbufWriteBuffer(data, apsettings->beaconData.head, apsettings->beaconData.headLen);
     isSerializeFailed =
@@ -999,7 +1004,13 @@ static int32_t WifiCmdOperKey(const char *ifName, uint32_t cmd, WifiKeyExt *keyE
     }
     bool isSerializeFailed = false;
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
-    isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, keyExt, sizeof(WifiKeyExt));
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, keyExt->type);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint32(data, keyExt->keyIdx);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint32(data, keyExt->cipher);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint8(data, keyExt->def);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint8(data, keyExt->defMgmt);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint8(data, keyExt->defaultTypes);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint8(data, keyExt->resv);
     if (keyExt->addr == NULL) {
         isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, keyExt->addr, 0);
     } else {
