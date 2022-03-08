@@ -13,20 +13,19 @@
  * limitations under the License.
  */
 
-#include "video_layer_stub.h"
 #include <buffer_handle_parcel.h>
 #include <buffer_handle_utils.h>
-#include <hdf_log.h>
 #include <hdf_base.h>
+#include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
+
+#include "video_layer_stub.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-VideoLayerStub::VideoLayerStub()
-{
-}
+VideoLayerStub::VideoLayerStub() {}
 
 DispErrCode VideoLayerStub::Init()
 {
@@ -38,9 +37,11 @@ DispErrCode VideoLayerStub::Init()
     return DISPLAY_SUCCESS;
 }
 
-int32_t VideoLayerStub::LayerStubInitDisplay(
-    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t VideoLayerStub::LayerStubInitDisplay(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != VideoLayerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = data.ReadUint32();
 
     DispErrCode retCode = layerService_->InitDisplay(devId);
@@ -51,9 +52,11 @@ int32_t VideoLayerStub::LayerStubInitDisplay(
     return HDF_SUCCESS;
 }
 
-int32_t VideoLayerStub::LayerStubDeinitDisplay(
-    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t VideoLayerStub::LayerStubDeinitDisplay(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != VideoLayerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = data.ReadUint32();
 
     DispErrCode retCode = layerService_->DeinitDisplay(devId);
@@ -64,9 +67,11 @@ int32_t VideoLayerStub::LayerStubDeinitDisplay(
     return HDF_SUCCESS;
 }
 
-int32_t VideoLayerStub::LayerStubGetDisplayInfo(
-    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t VideoLayerStub::LayerStubGetDisplayInfo(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != VideoLayerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = data.ReadUint32();
     std::shared_ptr<DisplayInfo> dispInfo = std::make_shared<DisplayInfo>();
 
@@ -86,9 +91,11 @@ int32_t VideoLayerStub::LayerStubGetDisplayInfo(
     return HDF_SUCCESS;
 }
 
-int32_t VideoLayerStub::LayerStubCreateLayer(
-    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t VideoLayerStub::LayerStubCreateLayer(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != VideoLayerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = data.ReadUint32();
     uint32_t layerId = 0;
     LayerInfo pLayerInfo;
@@ -112,9 +119,11 @@ int32_t VideoLayerStub::LayerStubCreateLayer(
     return HDF_SUCCESS;
 }
 
-int32_t VideoLayerStub::LayerStubCloseLayer(
-    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t VideoLayerStub::LayerStubCloseLayer(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != VideoLayerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = data.ReadUint32();
     uint32_t layerId = data.ReadUint32();
 
@@ -126,9 +135,11 @@ int32_t VideoLayerStub::LayerStubCloseLayer(
     return HDF_SUCCESS;
 }
 
-int32_t VideoLayerStub::LayerStubSetLayerVisible(
-    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t VideoLayerStub::LayerStubSetLayerVisible(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != VideoLayerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = data.ReadUint32();
     uint32_t layerId = data.ReadUint32();
     bool visible = data.ReadBool();
@@ -141,9 +152,11 @@ int32_t VideoLayerStub::LayerStubSetLayerVisible(
     return HDF_SUCCESS;
 }
 
-int32_t VideoLayerStub::LayerStubGetLayerVisibleState(
-    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t VideoLayerStub::LayerStubGetLayerVisibleState(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != VideoLayerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = data.ReadUint32();
     uint32_t layerId = data.ReadUint32();
     bool visible = false;
@@ -161,9 +174,11 @@ int32_t VideoLayerStub::LayerStubGetLayerVisibleState(
     return HDF_SUCCESS;
 }
 
-int32_t VideoLayerStub::LayerStubSetLayerRect(
-    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t VideoLayerStub::LayerStubSetLayerRect(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != VideoLayerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = data.ReadUint32();
     uint32_t layerId = data.ReadUint32();
     IRect rect;
@@ -181,9 +196,11 @@ int32_t VideoLayerStub::LayerStubSetLayerRect(
     return HDF_SUCCESS;
 }
 
-int32_t VideoLayerStub::LayerStubGetLayerRect(
-    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t VideoLayerStub::LayerStubGetLayerRect(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != VideoLayerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = data.ReadUint32();
     uint32_t layerId = data.ReadUint32();
     std::shared_ptr<IRect> rect = std::make_shared<IRect>();
@@ -205,9 +222,11 @@ int32_t VideoLayerStub::LayerStubGetLayerRect(
     return HDF_SUCCESS;
 }
 
-int32_t VideoLayerStub::LayerStubSetLayerZorder(
-    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t VideoLayerStub::LayerStubSetLayerZorder(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != VideoLayerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = data.ReadUint32();
     uint32_t layerId = data.ReadUint32();
     uint32_t zorder = data.ReadUint32();
@@ -220,9 +239,11 @@ int32_t VideoLayerStub::LayerStubSetLayerZorder(
     return HDF_SUCCESS;
 }
 
-int32_t VideoLayerStub::LayerStubGetLayerZorder(
-    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t VideoLayerStub::LayerStubGetLayerZorder(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != VideoLayerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = data.ReadUint32();
     uint32_t layerId = data.ReadUint32();
     uint32_t zorder = 0;
@@ -240,9 +261,11 @@ int32_t VideoLayerStub::LayerStubGetLayerZorder(
     return HDF_SUCCESS;
 }
 
-int32_t VideoLayerStub::LayerStubSetLayerTransformMode(
-    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t VideoLayerStub::LayerStubSetLayerTransformMode(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != VideoLayerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = data.ReadUint32();
     uint32_t layerId = data.ReadUint32();
     TransformType transForm = static_cast<TransformType>(data.ReadUint32());
@@ -255,9 +278,11 @@ int32_t VideoLayerStub::LayerStubSetLayerTransformMode(
     return HDF_SUCCESS;
 }
 
-int32_t VideoLayerStub::LayerStubSetLayerBuffer(
-    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t VideoLayerStub::LayerStubSetLayerBuffer(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != VideoLayerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = data.ReadUint32();
     uint32_t layerId = data.ReadUint32();
     BufferHandle *buffer = nullptr;
@@ -279,8 +304,8 @@ int32_t VideoLayerStub::LayerStubSetLayerBuffer(
     return HDF_SUCCESS;
 }
 
-int32_t VideoLayerStub::LayerStubOnRemoteRequest(int cmdId, MessageParcel &data,
-    MessageParcel &reply, MessageOption &option)
+int32_t VideoLayerStub::LayerStubOnRemoteRequest(
+    int cmdId, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     switch (cmdId) {
         case CMD_DISPLAY_LAYER_INIT_DISPLAY: {
@@ -338,8 +363,7 @@ using namespace OHOS::HDI::Display::V1_0;
 
 void *LayerStubInstance()
 {
-    VideoLayerStub *stub =
-        new (std::nothrow) VideoLayerStub();
+    VideoLayerStub *stub = new (std::nothrow) VideoLayerStub();
     if (stub == nullptr) {
         HDF_LOGE("%{public}s: display layer stub create failed", __func__);
         return nullptr;
@@ -351,7 +375,7 @@ void *LayerStubInstance()
         stub = nullptr;
         return nullptr;
     }
-    return reinterpret_cast<void*>(stub);
+    return reinterpret_cast<void *>(stub);
 }
 
 void DestroyLayerStub(void *obj)
