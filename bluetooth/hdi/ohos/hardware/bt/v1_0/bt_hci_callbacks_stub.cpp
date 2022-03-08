@@ -29,8 +29,14 @@ int32_t BtHciCallbacksStub::OnRemoteRequest(
     HDF_LOGI("%{public}s, code = %{public}d", __func__, code);
     switch (code) {
         case CMD_ON_INITED:
+            if (data.ReadInterfaceToken() != BtHciCallbacksStub::GetDescriptor()) {
+                return HDF_ERR_INVALID_PARAM;
+            }
             return BtHciCallbacksStubOnInited(data, reply, option);
         case CMD_ON_RECEIVED_HCI_PACKET:
+            if (data.ReadInterfaceToken() != BtHciCallbacksStub::GetDescriptor()) {
+                return HDF_ERR_INVALID_PARAM;
+            }
             return BtHciCallbacksStubOnReceivedHciPacket(data, reply, option);
         default: {
             HDF_LOGE("%s: not support cmd %d", __func__, code);

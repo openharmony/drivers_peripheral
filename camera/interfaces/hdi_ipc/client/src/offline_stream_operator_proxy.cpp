@@ -25,7 +25,8 @@ CamRetCode OfflineStreamOperatorProxy::CancelCapture(int captureId)
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteInt32(static_cast<int32_t>(captureId))) {
+    if (!data.WriteInterfaceToken(OfflineStreamOperatorProxy::GetDescriptor()) ||
+        !data.WriteInt32(static_cast<int32_t>(captureId))) {
         HDF_LOGE("%s: write captureId obj failed!", __func__);
         return INVALID_ARGUMENT;
     }
@@ -49,7 +50,8 @@ CamRetCode OfflineStreamOperatorProxy::ReleaseStreams(const std::vector<int> &st
     MessageOption option;
 
     std::vector<int32_t> pxyStreamIds = streamIds;
-    if (!data.WriteInt32Vector(pxyStreamIds)) {
+    if (!data.WriteInterfaceToken(OfflineStreamOperatorProxy::GetDescriptor()) ||
+        !data.WriteInt32Vector(pxyStreamIds)) {
         HDF_LOGE("%s: write streamIds obj failed!", __func__);
         return INVALID_ARGUMENT;
     }
@@ -71,7 +73,9 @@ CamRetCode OfflineStreamOperatorProxy::Release()
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-
+    if (!data.WriteInterfaceToken(OfflineStreamOperatorProxy::GetDescriptor())) {
+        return INVALID_ARGUMENT;
+    }
     int32_t ret = Remote()->SendRequest(CMD_OFFLINE_STREAM_OPERATOR_RELEASE, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
