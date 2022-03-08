@@ -15,6 +15,7 @@
 
 #include <hdf_remote_service.h>
 #include <hdf_sbuf_ipc.h>
+
 #include "display_device_common.h"
 #include "display_device_service.h"
 #include "display_device_stub.h"
@@ -188,6 +189,10 @@ int32_t DisplayDeviceServerStub::RegHotPlugCallback(MessageParcel *data, Message
         DISPLAY_LOG("callback remote object is invalid");
         return HDF_ERR_INVALID_OBJECT;
     }
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = device_->RegHotPlugCallback(HotPlugCallbackFunc, callbackRemote_.GetRefPtr());
     DISPLAY_LOG("call impl ret = %{public}d", ret);
     DISPLAY_END;
@@ -197,7 +202,10 @@ int32_t DisplayDeviceServerStub::RegHotPlugCallback(MessageParcel *data, Message
 int32_t DisplayDeviceServerStub::GetDisplayCapability(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
-
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -220,7 +228,10 @@ int32_t DisplayDeviceServerStub::GetDisplayCapability(MessageParcel *data, Messa
 int32_t DisplayDeviceServerStub::GetDisplaySupportedModes(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
-
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     uint32_t modesNum = 1;
     if (!data->ReadUint32(devId)) {
@@ -254,6 +265,10 @@ int32_t DisplayDeviceServerStub::GetDisplaySupportedModes(MessageParcel *data, M
 int32_t DisplayDeviceServerStub::GetDisplayMode(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -277,6 +292,10 @@ int32_t DisplayDeviceServerStub::GetDisplayMode(MessageParcel *data, MessageParc
 int32_t DisplayDeviceServerStub::SetDisplayMode(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -297,6 +316,10 @@ int32_t DisplayDeviceServerStub::SetDisplayMode(MessageParcel *data, MessageParc
 int32_t DisplayDeviceServerStub::GetDisplayPowerStatus(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -321,6 +344,10 @@ int32_t DisplayDeviceServerStub::SetDisplayPowerStatus(MessageParcel *data, Mess
 {
     DISPLAY_START;
     uint32_t devId = 0;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
         return DISPLAY_FAILURE;
@@ -341,6 +368,10 @@ int32_t DisplayDeviceServerStub::SetDisplayPowerStatus(MessageParcel *data, Mess
 int32_t DisplayDeviceServerStub::GetDisplayBackLight(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -364,6 +395,10 @@ int32_t DisplayDeviceServerStub::GetDisplayBackLight(MessageParcel *data, Messag
 int32_t DisplayDeviceServerStub::SetDisplayBackLight(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -383,6 +418,10 @@ int32_t DisplayDeviceServerStub::SetDisplayBackLight(MessageParcel *data, Messag
 int32_t DisplayDeviceServerStub::GetDisplayProperty(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -409,6 +448,10 @@ int32_t DisplayDeviceServerStub::GetDisplayProperty(MessageParcel *data, Message
 int32_t DisplayDeviceServerStub::SetDisplayProperty(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -433,6 +476,10 @@ int32_t DisplayDeviceServerStub::SetDisplayProperty(MessageParcel *data, Message
 int32_t DisplayDeviceServerStub::PrepareDisplayLayers(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -456,6 +503,10 @@ int32_t DisplayDeviceServerStub::PrepareDisplayLayers(MessageParcel *data, Messa
 int32_t DisplayDeviceServerStub::GetDisplayCompChange(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -493,6 +544,10 @@ int32_t DisplayDeviceServerStub::GetDisplayCompChange(MessageParcel *data, Messa
 int32_t DisplayDeviceServerStub::SetDisplayClientCrop(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -514,6 +569,10 @@ int32_t DisplayDeviceServerStub::SetDisplayClientCrop(MessageParcel *data, Messa
 int32_t DisplayDeviceServerStub::SetDisplayClientDestRect(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -536,6 +595,10 @@ int32_t DisplayDeviceServerStub::SetDisplayClientDestRect(MessageParcel *data, M
 int32_t DisplayDeviceServerStub::SetDisplayClientBuffer(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -565,6 +628,10 @@ int32_t DisplayDeviceServerStub::SetDisplayClientBuffer(MessageParcel *data, Mes
 int32_t DisplayDeviceServerStub::SetDisplayClientDamage(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -592,6 +659,10 @@ int32_t DisplayDeviceServerStub::SetDisplayClientDamage(MessageParcel *data, Mes
 int32_t DisplayDeviceServerStub::SetDisplayVsyncEnabled(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -628,6 +699,10 @@ static void VBlankCallbackFunc(unsigned int sequence, uint64_t ns, void *data)
 int32_t DisplayDeviceServerStub::RegDisplayVBlankCallback(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (callbackRemote_ == nullptr) {
         DISPLAY_LOG("callback remote object is invalid");
         return HDF_ERR_INVALID_OBJECT;
@@ -646,6 +721,10 @@ int32_t DisplayDeviceServerStub::RegDisplayVBlankCallback(MessageParcel *data, M
 int32_t DisplayDeviceServerStub::GetDisplayReleaseFence(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -680,6 +759,10 @@ int32_t DisplayDeviceServerStub::GetDisplayReleaseFence(MessageParcel *data, Mes
 int32_t DisplayDeviceServerStub::Commit(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -710,6 +793,10 @@ int32_t DisplayDeviceServerStub::InvokeDisplayCmd(MessageParcel *data, MessagePa
 int32_t DisplayDeviceServerStub::CreateVirtualDisplay(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t widthTmp = 0;
     if (!data->ReadUint32(widthTmp)) {
         DISPLAY_LOG("read width from data failed!");
@@ -741,6 +828,10 @@ int32_t DisplayDeviceServerStub::CreateVirtualDisplay(MessageParcel *data, Messa
 int32_t DisplayDeviceServerStub::DestroyVirtualDisplay(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -755,6 +846,10 @@ int32_t DisplayDeviceServerStub::DestroyVirtualDisplay(MessageParcel *data, Mess
 int32_t DisplayDeviceServerStub::SetVirtualDisplayBuffer(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -795,6 +890,10 @@ static void RefreshCallbackFunc(uint32_t devId, void *data)
 int32_t DisplayDeviceServerStub::RegDisplayRefreshCallback(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (callbackRemote_ == nullptr) {
         DISPLAY_LOG("callback remote object is invalid");
         return HDF_ERR_INVALID_OBJECT;
@@ -834,6 +933,10 @@ int32_t DisplayDeviceServerStub::DestroyWriteBack(MessageParcel *data, MessagePa
 int32_t DisplayDeviceServerStub::FileTest(MessageParcel *data, MessageParcel *reply)
 {
     HDF_LOGD("testIF 04");
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     bool receiveData = data->ReadBool();
     if (receiveData) {
         HDF_LOGD("stub receive true");
@@ -860,6 +963,10 @@ int32_t DisplayDeviceServerStub::SetCallBackObject(sptr<IRemoteObject> callbackR
 int32_t DisplayDeviceServerStub::SetProxyRemoteCallback(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     sptr<IRemoteObject> remoteObj = data->ReadRemoteObject();
     if (remoteObj == nullptr) {
         DISPLAY_LOG("read Remote Object from data failed!");
@@ -873,6 +980,10 @@ int32_t DisplayDeviceServerStub::SetProxyRemoteCallback(MessageParcel *data, Mes
 int32_t DisplayDeviceServerStub::CreateLayer(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -903,6 +1014,10 @@ int32_t DisplayDeviceServerStub::CreateLayer(MessageParcel *data, MessageParcel 
 int32_t DisplayDeviceServerStub::SetLayerVisible(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -929,6 +1044,10 @@ int32_t DisplayDeviceServerStub::SetLayerVisible(MessageParcel *data, MessagePar
 int32_t DisplayDeviceServerStub::GetLayerVisibleState(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -958,6 +1077,10 @@ int32_t DisplayDeviceServerStub::GetLayerVisibleState(MessageParcel *data, Messa
 int32_t DisplayDeviceServerStub::SetLayerCrop(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -984,6 +1107,10 @@ int32_t DisplayDeviceServerStub::SetLayerCrop(MessageParcel *data, MessageParcel
 int32_t DisplayDeviceServerStub::SetLayerZorder(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1009,6 +1136,10 @@ int32_t DisplayDeviceServerStub::SetLayerZorder(MessageParcel *data, MessageParc
 int32_t DisplayDeviceServerStub::GetLayerZorder(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1038,6 +1169,10 @@ int32_t DisplayDeviceServerStub::GetLayerZorder(MessageParcel *data, MessageParc
 int32_t DisplayDeviceServerStub::SetLayerPreMulti(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1063,6 +1198,10 @@ int32_t DisplayDeviceServerStub::SetLayerPreMulti(MessageParcel *data, MessagePa
 int32_t DisplayDeviceServerStub::GetLayerPreMulti(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1091,6 +1230,10 @@ int32_t DisplayDeviceServerStub::GetLayerPreMulti(MessageParcel *data, MessagePa
 int32_t DisplayDeviceServerStub::SetLayerAlpha(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1117,6 +1260,10 @@ int32_t DisplayDeviceServerStub::SetLayerAlpha(MessageParcel *data, MessageParce
 int32_t DisplayDeviceServerStub::GetLayerAlpha(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1145,6 +1292,10 @@ int32_t DisplayDeviceServerStub::GetLayerAlpha(MessageParcel *data, MessageParce
 int32_t DisplayDeviceServerStub::SetLayerColorKey(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1175,6 +1326,10 @@ int32_t DisplayDeviceServerStub::SetLayerColorKey(MessageParcel *data, MessagePa
 int32_t DisplayDeviceServerStub::GetLayerColorKey(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1208,6 +1363,10 @@ int32_t DisplayDeviceServerStub::GetLayerColorKey(MessageParcel *data, MessagePa
 int32_t DisplayDeviceServerStub::SetLayerPalette(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1240,6 +1399,10 @@ int32_t DisplayDeviceServerStub::SetLayerPalette(MessageParcel *data, MessagePar
 int32_t DisplayDeviceServerStub::GetLayerPalette(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1279,6 +1442,10 @@ int32_t DisplayDeviceServerStub::GetLayerPalette(MessageParcel *data, MessagePar
 int32_t DisplayDeviceServerStub::SetLayerCompression(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1304,6 +1471,10 @@ int32_t DisplayDeviceServerStub::SetLayerCompression(MessageParcel *data, Messag
 int32_t DisplayDeviceServerStub::GetLayerCompression(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1332,6 +1503,10 @@ int32_t DisplayDeviceServerStub::GetLayerCompression(MessageParcel *data, Messag
 int32_t DisplayDeviceServerStub::Flush(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1362,6 +1537,10 @@ int32_t DisplayDeviceServerStub::Flush(MessageParcel *data, MessageParcel *reply
 int32_t DisplayDeviceServerStub::SetLayerVisibleRegion(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1395,6 +1574,10 @@ int32_t DisplayDeviceServerStub::SetLayerVisibleRegion(MessageParcel *data, Mess
 int32_t DisplayDeviceServerStub::SetLayerDirtyRegion(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1427,6 +1610,10 @@ int32_t DisplayDeviceServerStub::SetLayerDirtyRegion(MessageParcel *data, Messag
 int32_t DisplayDeviceServerStub::GetLayerBuffer(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1459,6 +1646,10 @@ int32_t DisplayDeviceServerStub::GetLayerBuffer(MessageParcel *data, MessageParc
 int32_t DisplayDeviceServerStub::SetLayerBuffer(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1496,6 +1687,10 @@ int32_t DisplayDeviceServerStub::InvokeLayerCmd(MessageParcel *data, MessageParc
 int32_t DisplayDeviceServerStub::SetLayerCompositionType(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1521,6 +1716,10 @@ int32_t DisplayDeviceServerStub::SetLayerCompositionType(MessageParcel *data, Me
 int32_t DisplayDeviceServerStub::InitDisplay(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1551,6 +1750,10 @@ int32_t DisplayDeviceServerStub::DeinitDisplay(MessageParcel *data, MessageParce
 int32_t DisplayDeviceServerStub::GetDisplayInfo(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1576,6 +1779,10 @@ int32_t DisplayDeviceServerStub::GetDisplayInfo(MessageParcel *data, MessageParc
 int32_t DisplayDeviceServerStub::CloseLayer(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1597,6 +1804,10 @@ int32_t DisplayDeviceServerStub::CloseLayer(MessageParcel *data, MessageParcel *
 int32_t DisplayDeviceServerStub::SetLayerSize(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1626,6 +1837,10 @@ int32_t DisplayDeviceServerStub::SetLayerSize(MessageParcel *data, MessageParcel
 int32_t DisplayDeviceServerStub::GetLayerSize(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1657,6 +1872,10 @@ int32_t DisplayDeviceServerStub::GetLayerSize(MessageParcel *data, MessageParcel
 int32_t DisplayDeviceServerStub::SetTransformMode(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1685,6 +1904,10 @@ int32_t DisplayDeviceServerStub::SetTransformMode(MessageParcel *data, MessagePa
 int32_t DisplayDeviceServerStub::WaitForVBlank(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1713,6 +1936,10 @@ int32_t DisplayDeviceServerStub::WaitForVBlank(MessageParcel *data, MessageParce
 int32_t DisplayDeviceServerStub::SnapShot(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");
@@ -1747,6 +1974,10 @@ int32_t DisplayDeviceServerStub::SnapShot(MessageParcel *data, MessageParcel *re
 int32_t DisplayDeviceServerStub::SetLayerBlendType(MessageParcel *data, MessageParcel *reply)
 {
     DISPLAY_START;
+    if (data->ReadInterfaceToken() != DisplayDeviceServerStub::GetDescriptor()) {
+        HDF_LOGE("failed to check interface token");
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t devId = 0;
     if (!data->ReadUint32(devId)) {
         DISPLAY_LOG("read devId from data failed!");

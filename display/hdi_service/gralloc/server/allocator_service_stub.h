@@ -16,10 +16,12 @@
 #ifndef HDI_ALLOCATOR_SERVICE_STUB_V1_0_H
 #define HDI_ALLOCATOR_SERVICE_STUB_V1_0_H
 
+#include "display_gralloc.h"
+#include "idisplay_allocator.h"
+
 #include <iremote_stub.h>
 #include <message_option.h>
 #include <message_parcel.h>
-#include "display_gralloc.h"
 
 namespace OHOS {
 namespace HDI {
@@ -27,26 +29,24 @@ namespace Display {
 namespace V1_0 {
 const int32_t CMD_ALLOCATOR_ALLOCMEM = 0;
 
-class AllocatorServiceStub {
+class AllocatorServiceStub : public IRemoteStub<IDisplayAllocator> {
 public:
-    AllocatorServiceStub();
-    virtual ~AllocatorServiceStub();
-    int32_t AllocMem(MessageParcel &data, MessageParcel &reply, MessageOption &option) const;
-
-    int32_t OnRemoteRequest(int cmdId, MessageParcel &data, MessageParcel &reply, MessageOption &option) const;
+    AllocatorServiceStub() = default;
+    virtual ~AllocatorServiceStub() = default;
+    int32_t OnRemoteRequest(uint32_t cmdId, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    GrallocFuncs *grallocFuncs_;
+    int32_t AllocaltorStubAllocMem(MessageParcel &data, MessageParcel &reply, MessageOption &option);
 };
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI
 } // namespace OHOS
 
-void *AllocatorServiceStubInstance();
+void *AllocatorServiceInstance(void);
 
-void AllocatorServiceStubRelease(void *obj);
+void AllocatorServiceRelease(void *servObj);
 
-int32_t AllocatorServiceOnRemoteRequest(void *stub, int cmdId, struct HdfSBuf &data, struct HdfSBuf &reply);
+int32_t AllocatorServiceOnRemoteRequest(void *service, int cmdId, struct HdfSBuf &data, struct HdfSBuf &reply);
 
 #endif // HDI_ALLOCATOR_SERVICE_STUB_V1_0_H

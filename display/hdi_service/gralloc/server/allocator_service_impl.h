@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,27 +13,33 @@
  * limitations under the License.
  */
 
-#ifndef HDI_IDISPLAY_ALLOCATOR_V1_0_H 
-#define HDI_IDISPLAY_ALLOCATOR_V1_0_H
+#ifndef HDI_ALLOCATOR_SERVICE_IMPL_V1_0_H
+#define HDI_ALLOCATOR_SERVICE_IMPL_V1_0_H
 
-#include "iservmgr_hdi.h"
-#include "hdf_log.h"
-#include "display_type.h"
+#include <iremote_stub.h>
+#include <message_option.h>
+#include <message_parcel.h>
+
+#include "allocator_service_stub.h"
+#include "display_gralloc.h"
+#include "idisplay_allocator.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
-class IDisplayAllocator: public IRemoteBroker {
+class AllocatorService : public AllocatorServiceStub {
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Display.Gralloc.IAllocator.V1_0");
-    virtual ~IDisplayAllocator() {}
-    virtual int32_t AllocMem(const AllocInfo &info, BufferHandle *&handle) = 0;
-    static sptr<IDisplayAllocator> Get(const char *serviceName);
+    AllocatorService();
+    virtual ~AllocatorService() override;
+    int32_t AllocMem(const AllocInfo &info, BufferHandle *&handle) override;
+
+private:
+    GrallocFuncs *grallocFuncs_;
 };
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI
 } // namespace OHOS
 
-#endif // HDI_IDISPLAY_ALLOCATOR_V1_0_H
+#endif // HDI_ALLOCATOR_SERVICE_IMPL_V1_0_H
