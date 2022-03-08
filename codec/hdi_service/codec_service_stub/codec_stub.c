@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "codec_stub.h"
+#include <hdf_device_object.h>
 #include <hdf_log.h>
 #include <osal_mem.h>
 #include "codec_callback_proxy.h"
@@ -518,11 +519,6 @@ static int32_t SerCodecSetCallback(struct HdfDeviceIoClient *client, struct HdfS
         return HDF_ERR_INVALID_PARAM;
     }
     cb = CodecProxyCallbackObtain(cbRemote);
-    if (!HdfRemoteServiceSetInterfaceDesc(cbRemote, "ohos.hdi.codec_service")) {
-        HDF_LOGE("%{public}s: failed to init interface desc", __func__);
-        HdfRemoteServiceRecycle(cbRemote);
-        return HDF_ERR_INVALID_PARAM;
-    }
     if (!HdfSbufReadUint32(data, (uint32_t *)&instance)) {
         HDF_LOGE("%{public}s: read instance data failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
