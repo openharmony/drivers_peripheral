@@ -142,16 +142,15 @@ int32_t PnpReportMsgDeSerialize(uint8_t *msgStr, enum PnpReportType msgType,
     return AUDIO_HAL_SUCCESS;
 }
 
-uint8_t *PnpReportMsgSerialize(struct PnpReportMsg *pnpReportMsg)
+char *PnpReportMsgSerialize(struct PnpReportMsg *pnpReportMsg)
 {
     int ret = 0;
-    uint8_t *msgBuf = NULL;
-
+    char *msgBuf = NULL;
     if (pnpReportMsg == NULL) {
         HDF_LOGE("[%{public}s]: Parameter error!", __func__);
         return NULL;
     }
-    msgBuf = (uint8_t *)OsalMemCalloc(PNP_REPORT_MSG_LEN_MAX);
+    msgBuf = OsalMemCalloc(PNP_REPORT_MSG_LEN_MAX);
     if (msgBuf == NULL) {
         HDF_LOGE("[%{public}s]: Malloc memory failed!", __func__);
         return NULL;
@@ -159,16 +158,16 @@ uint8_t *PnpReportMsgSerialize(struct PnpReportMsg *pnpReportMsg)
     
     switch (pnpReportMsg->reportType) {
         case DEVICE_PULG:
-            ret = snprintf_s((char *)msgBuf, PNP_REPORT_MSG_LEN_MAX, PNP_REPORT_MSG_LEN_MAX - 1, "%d;%d;%d;%d;%d",
-                pnpReportMsg->devPlugMsg.eventType, pnpReportMsg->devPlugMsg.state,
-                pnpReportMsg->devPlugMsg.deviceType, pnpReportMsg->devPlugMsg.deviceCap,
-                pnpReportMsg->devPlugMsg.id);
+            ret = snprintf_s(msgBuf, PNP_REPORT_MSG_LEN_MAX, PNP_REPORT_MSG_LEN_MAX - 1, "%d;%d;%d;%d;%d",
+                             pnpReportMsg->devPlugMsg.eventType, pnpReportMsg->devPlugMsg.state,
+                             pnpReportMsg->devPlugMsg.deviceType, pnpReportMsg->devPlugMsg.deviceCap,
+                             pnpReportMsg->devPlugMsg.id);
             break;
         case EVENT_REPORT:
-            ret = snprintf_s((char *)msgBuf, PNP_REPORT_MSG_LEN_MAX, PNP_REPORT_MSG_LEN_MAX - 1, "%d;%d;%d;%d;%d",
-                pnpReportMsg->eventMsg.eventType, pnpReportMsg->eventMsg.eventId,
-                pnpReportMsg->eventMsg.eventValue, pnpReportMsg->eventMsg.deviceType,
-                pnpReportMsg->eventMsg.reserve);
+            ret = snprintf_s(msgBuf, PNP_REPORT_MSG_LEN_MAX, PNP_REPORT_MSG_LEN_MAX - 1, "%d;%d;%d;%d;%d",
+                             pnpReportMsg->eventMsg.eventType, pnpReportMsg->eventMsg.eventId,
+                             pnpReportMsg->eventMsg.eventValue, pnpReportMsg->eventMsg.deviceType,
+                             pnpReportMsg->eventMsg.reserve);
             break;
         default:
             HDF_LOGE("[%{public}s]: Unknown message type!", __func__);
