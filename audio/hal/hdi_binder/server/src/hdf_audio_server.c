@@ -454,6 +454,10 @@ static int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, s
     }
     HDF_LOGE("ControlDispatch: valid cmdId = %{public}d", cmdId);
 
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        HDF_LOGE("check interface token failed");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
     if (cmdId > AUDIO_HDI_CAPTURE_DEV_DUMP || cmdId < 0) {
         HDF_LOGE("ControlDispatch: invalid cmdId = %{public}d", cmdId);
         return AUDIO_HAL_ERR_INTERNAL;
@@ -516,6 +520,11 @@ int AudioHdiServerBind(struct HdfDeviceObject *deviceObject)
     };
     if (HdiServiceGetFuncs()) {
         return AUDIO_HAL_ERR_INTERNAL;
+    }
+    int ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, "ohos.hdi.audio_service");
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("failed to set interface desc");
+        return ret;
     }
     deviceObject->service = &hdiService;
     return AUDIO_HAL_SUCCESS;
