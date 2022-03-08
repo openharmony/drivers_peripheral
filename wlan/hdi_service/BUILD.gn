@@ -81,6 +81,7 @@ ohos_shared_library("wifi_hdi_c_device") {
     "//drivers/peripheral/wlan/hal/include",
     "//drivers/peripheral/wlan/hdi_service/include",
     "//drivers/peripheral/wlan/hdi_service/services",
+    "//framework/core/host/include",
   ]
 
   deps = [
