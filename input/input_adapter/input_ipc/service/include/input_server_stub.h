@@ -20,6 +20,8 @@
 #include <message_option.h>
 #include <map>
 #include <refbase.h>
+#include <string>
+
 #include "iinput_host.h"
 #include "input_server.h"
 #include "input_type.h"
@@ -64,7 +66,12 @@ public:
     int32_t InputServerStubUnregisterHotPlugCallback(MessageParcel &data,
                                                      MessageParcel &reply,
                                                      MessageOption &option) const;
+    static inline const std::u16string &GetDescriptor()
+    {
+        return metaDescriptor_;
+    }
 private:
+    static inline const std::u16string metaDescriptor_ = u"HDI.INPUT.V1_0";
     std::shared_ptr<InputServer> mService_ = std::make_shared<InputServer>();
 };
 }  // namespace Input
