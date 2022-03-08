@@ -910,10 +910,17 @@ int32_t WifiCmdSetAp(const char *ifName, WifiApSetting *apsettings)
     }
     bool isSerializeFailed = false;
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
-    isSerializeFailed =
-        isSerializeFailed || !HdfSbufWriteBuffer(data, &(apsettings->freqParams), sizeof(WifiFreqParams));
-    isSerializeFailed =
-        isSerializeFailed || !HdfSbufWriteBuffer(data, &(apsettings->beaconData), sizeof(WifiBeaconData));
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, apsettings->freqParams.mode);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, apsettings->freqParams.freq);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, apsettings->freqParams.channel);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, apsettings->freqParams.htEnabled);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, apsettings->freqParams.secChannelOffset);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, apsettings->freqParams.vhtEnabled);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, apsettings->freqParams.centerFreq1);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, apsettings->freqParams.centerFreq2);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, apsettings->freqParams.bandwidth);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint8(data, apsettings->freqParams.band);
+
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, apsettings->beaconInterval);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, apsettings->dtimPeriod);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint8(data, apsettings->hiddenSsid);
