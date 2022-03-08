@@ -177,8 +177,7 @@ typedef struct {
     void (*close)(void);
 } bt_vendor_interface_t;
 
-typedef struct
-{
+typedef struct {
     uint16_t event;
     uint16_t len;
     uint16_t offset;
