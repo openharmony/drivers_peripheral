@@ -19,6 +19,8 @@
 #include <iremote_stub.h>
 #include <message_parcel.h>
 #include <message_option.h>
+#include <string>
+
 #include "idisplay_layer.h"
 #include "video_layer_service.h"
 
@@ -62,8 +64,13 @@ public:
     int32_t LayerStubSetLayerTransformMode(MessageParcel& data, MessageParcel& reply, MessageOption& option);
     int32_t LayerStubSetLayerBuffer(MessageParcel& data, MessageParcel& reply, MessageOption& option);
     int32_t LayerStubOnRemoteRequest(int cmdId, MessageParcel& data, MessageParcel& reply, MessageOption& option);
+    static inline const std::u16string &GetDescriptor()
+    {
+        return metaDescriptor_;
+    }
 
 private:
+    static inline const std::u16string metaDescriptor_ = u"HDI.DISPLAY.LAYER.V1_0";
     std::shared_ptr<VideoLayerService> layerService_ = nullptr;
 };
 } // namespace V1_0
