@@ -53,6 +53,9 @@ int32_t WlanInterfaceProxy::wifiConstruct()
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor())) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = Remote()->SendRequest(WLAN_SERVICE_CONSTRUCT, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: SendRequest failed, error code is %d", __func__, ret);
@@ -66,6 +69,9 @@ int32_t WlanInterfaceProxy::wifiDestruct()
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor())) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = Remote()->SendRequest(WLAN_SERVICE_DECONSTRUCT, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: SendRequest failed, error code is %d", __func__, ret);
@@ -79,6 +85,9 @@ int32_t WlanInterfaceProxy::start()
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor())) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = Remote()->SendRequest(WLAN_SERVICE_START, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: SendRequest failed, error code is %d", __func__, ret);
@@ -92,6 +101,9 @@ int32_t WlanInterfaceProxy::stop()
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor())) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = Remote()->SendRequest(WLAN_SERVICE_STOP, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: SendRequest failed, error code is %d", __func__, ret);
@@ -105,7 +117,8 @@ int32_t WlanInterfaceProxy::createFeature(int32_t type, std::shared_ptr<WifiFeat
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteInt32(type)) {
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+        !data.WriteInt32(type)) {
         HDF_LOGE("%s: write type failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -127,6 +140,9 @@ int32_t WlanInterfaceProxy::getSupportFeature(std::vector<uint8_t>& supType)
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor())) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = Remote()->SendRequest(WLAN_SERVICE_GET_SUPPORT_FEATURE, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: SendRequest failed, error code is %d", __func__, ret);
@@ -143,6 +159,9 @@ int32_t WlanInterfaceProxy::getSupportCombo(std::vector<uint64_t>& combo)
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor())) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = Remote()->SendRequest(WLAN_SERVICE_GET_SUPPORT_COMBO, data, reply, option);
     if (ret == HDF_ERR_NOT_SUPPORT) {
         HDF_LOGW("%s: not support to getting combo!", __func__);
@@ -161,7 +180,8 @@ int32_t WlanInterfaceProxy::getFeatureByIfName(std::string& ifName, std::shared_
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteCString(ifName.c_str())) {
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+        !data.WriteCString(ifName.c_str())) {
         HDF_LOGE("%s: write ifname failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -197,17 +217,21 @@ int IPCObjectStubWlan::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data,
         HDF_LOGE("%s: dataSbuf malloc failed!", __func__);
         HdfSbufRecycle(dataSbuf);
     }
-    const char *name = data.ReadCString();
-    HDF_LOGI("IPCObjectStubWlan::OnRemoteRequest called, ifName = %{public}s", name);
-    status = data.ReadInt32();
-    HdfSbufWriteInt32(dataSbuf, status);
     switch (code) {
-        case WIFI_EVENT_RESET_DRIVER:
+        case WIFI_EVENT_RESET_DRIVER: {
+            const char *name = data.ReadCString();
+            HDF_LOGI("IPCObjectStubWlan::OnRemoteRequest called, ifName = %{public}s", name);
+            status = data.ReadInt32();
+            if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+                !data.WriteInt32(status)) {
+                HDF_LOGE("%s: write status failed!", __func__);
+            }
             ret = WlanInterfaceProxy::CallbackWlanProxy((int32_t)code, dataSbuf);
             if (ret != 0) {
                 HDF_LOGE("%s:  failed, error code is %d", __func__, ret);
             }
             break;
+        }
         default:
             HDF_LOGE("%s: unknown code:%d", __func__, code);
             ret = HDF_FAILURE;
@@ -224,6 +248,9 @@ int32_t WlanInterfaceProxy::registerEventCallback(std::function<int32_t(int32_t 
     OHOS::MessageParcel reply;
     OHOS::MessageOption option;
 
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor())) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = data.WriteRemoteObject(callback);
     if (!ret) {
         HDF_LOGE("%s: set callback write remote obj failed!", __func__);
@@ -243,6 +270,9 @@ int32_t WlanInterfaceProxy::unregisterEventCallback()
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor())) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = Remote()->SendRequest(WLAN_SERVICE_UNREGISTER_CALLBACK, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: SendRequest failed, error code is %d", __func__, ret);
@@ -256,7 +286,8 @@ int32_t WlanInterfaceProxy::destroyFeature(std::shared_ptr<WifiFeatureInfo> ifea
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteCString(ifeature->ifName)) {
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+        !data.WriteCString(ifeature->ifName)) {
         HDF_LOGE("%s: write ifname failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -280,7 +311,8 @@ int32_t WlanInterfaceProxy::resetDriver(const uint8_t chipId)
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteUint8(chipId)) {
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+        !data.WriteUint8(chipId)) {
         HDF_LOGE("%s: write chipid failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -299,7 +331,8 @@ int32_t WlanInterfaceProxy::getAsscociatedStas(std::shared_ptr<WifiFeatureInfo> 
     MessageOption option;
 
     HDF_LOGI("%s: enter GetAsscociatedStas", __func__);
-    if (!data.WriteCString(ifeature->ifName)) {
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+        !data.WriteCString(ifeature->ifName)) {
         HDF_LOGE("%s: write ifname failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -317,7 +350,8 @@ int32_t WlanInterfaceProxy::setCountryCode(std::shared_ptr<WifiFeatureInfo> ifea
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteCString(ifeature->ifName)) {
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+        !data.WriteCString(ifeature->ifName)) {
         HDF_LOGE("%s: write ifname failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -338,7 +372,8 @@ int32_t WlanInterfaceProxy::getNetworkIfaceName(std::shared_ptr<WifiFeatureInfo>
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteCString(ifeature->ifName)) {
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+        !data.WriteCString(ifeature->ifName)) {
         HDF_LOGE("%s: write ifname failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -357,7 +392,8 @@ int32_t WlanInterfaceProxy::getFeatureType(std::shared_ptr<WifiFeatureInfo> ifea
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteInt32(ifeature->type)) {
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+        !data.WriteInt32(ifeature->type)) {
         HDF_LOGE("%s: write type failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -376,13 +412,15 @@ int32_t WlanInterfaceProxy::setMacAddress(std::shared_ptr<WifiFeatureInfo> ifeat
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteCString(ifeature->ifName)) {
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+        !data.WriteCString(ifeature->ifName)) {
         HDF_LOGE("%s: write ifname failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     for (uint8_t i = 0; i < mac.size(); i++) {
-        data.WriteUint8(mac[i]);
-        HDF_LOGE("%s: mac addr is %d!", __func__, mac[i]);
+        if (!data.WriteUint8(mac[i])) {
+            HDF_LOGE("%s: write mac failed!", __func__);
+        }
     }
     int32_t ret = Remote()->SendRequest(WLAN_SERVICE_SET_MAC_ADDR, data, reply, option);
     if (ret != HDF_SUCCESS) {
@@ -398,7 +436,8 @@ int32_t WlanInterfaceProxy::getDeviceMacAddress(std::shared_ptr<WifiFeatureInfo>
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteCString(ifeature->ifName)) {
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+        !data.WriteCString(ifeature->ifName)) {
         HDF_LOGE("%s: write ifname failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -422,7 +461,8 @@ int32_t WlanInterfaceProxy::getFreqsWithBand(std::shared_ptr<WifiFeatureInfo> if
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteCString(ifeature->ifName)) {
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+        !data.WriteCString(ifeature->ifName)) {
         HDF_LOGE("%s: write ifname failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -448,7 +488,8 @@ int32_t WlanInterfaceProxy::setTxPower(std::shared_ptr<WifiFeatureInfo> ifeature
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteCString(ifeature->ifName)) {
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+        !data.WriteCString(ifeature->ifName)) {
         HDF_LOGE("%s: write ifname failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -469,7 +510,8 @@ int32_t WlanInterfaceProxy::getChipId(std::shared_ptr<WifiFeatureInfo> ifeature,
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteCString(ifeature->ifName)) {
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+        !data.WriteCString(ifeature->ifName)) {
         HDF_LOGE("%s: write ifname failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -492,7 +534,8 @@ int32_t WlanInterfaceProxy::getIfNamesByChipId(const uint8_t chipId, std::string
     MessageOption option;
     char *name = NULL;
 
-    if (!data.WriteUint8(chipId)) {
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+        !data.WriteUint8(chipId)) {
         HDF_LOGE("%s: write chipid failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -513,13 +556,19 @@ int32_t WlanInterfaceProxy::setScanningMacAddress(std::shared_ptr<WifiFeatureInf
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteCString(ifeature->ifName)) {
+    if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
+        !data.WriteCString(ifeature->ifName)) {
         HDF_LOGE("%s: write ifname failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    data.WriteUint8(len);
+    if (!data.WriteUint8(len)) {
+        HDF_LOGE("%s: write len failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     for (int i = 0; i < ETH_ADDR_LEN; i++) {
-        data.WriteUint8(scanMac[i]);
+        if (!data.WriteUint8(scanMac[i])) {
+            HDF_LOGE("%s: write scanMac failed!", __func__);
+        }
         HDF_LOGE("%s: mac addr is %x!", __func__, scanMac[i]);
     }
     int32_t ret = Remote()->SendRequest(WLAN_SERVICE_SET_SACN_MACADDR, data, reply, option);
