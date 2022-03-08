@@ -50,7 +50,7 @@ DispErrCode VideoLayerProxy::InitDisplay(unsigned int devId)
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(VideoLayerProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         HDF_LOGE("%{public}s: write devId failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -74,7 +74,7 @@ DispErrCode VideoLayerProxy::DeinitDisplay(unsigned int devId)
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(VideoLayerProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         HDF_LOGE("%{public}s: write devId failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -98,7 +98,7 @@ DispErrCode VideoLayerProxy::GetDisplayInfo(unsigned int devId, std::shared_ptr<
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(VideoLayerProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         HDF_LOGE("%{public}s: write devId failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -133,7 +133,7 @@ DispErrCode VideoLayerProxy::CreateLayer(unsigned int devId, LayerInfo &layerInf
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteUint32(devId)) {
+    if (!data.WriteInterfaceToken(VideoLayerProxy::GetDescriptor()) || !data.WriteUint32(devId)) {
         HDF_LOGE("%{public}s: write devId failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -170,7 +170,8 @@ DispErrCode VideoLayerProxy::CloseLayer(unsigned int devId, unsigned int layerId
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteUint32(devId) || !data.WriteUint32(layerId)) {
+    if (!data.WriteInterfaceToken(VideoLayerProxy::GetDescriptor()) || !data.WriteUint32(devId) ||
+        !data.WriteUint32(layerId)) {
         HDF_LOGE("%{public}s: write devId or layerId failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -194,7 +195,8 @@ DispErrCode VideoLayerProxy::SetLayerVisible(unsigned int devId, unsigned int la
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteUint32(devId) || !data.WriteUint32(layerId)) {
+    if (!data.WriteInterfaceToken(VideoLayerProxy::GetDescriptor()) || !data.WriteUint32(devId) ||
+        !data.WriteUint32(layerId)) {
         HDF_LOGE("%{public}s: write devId or layerId failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -223,7 +225,8 @@ DispErrCode VideoLayerProxy::GetLayerVisibleState(unsigned int devId, unsigned i
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteUint32(devId) || !data.WriteUint32(layerId)) {
+    if (!data.WriteInterfaceToken(VideoLayerProxy::GetDescriptor()) || !data.WriteUint32(devId) ||
+        !data.WriteUint32(layerId)) {
         HDF_LOGE("%{public}s: write devId or layerId failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -250,7 +253,8 @@ DispErrCode VideoLayerProxy::SetLayerRect(unsigned int devId, unsigned int layer
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteUint32(devId) || !data.WriteUint32(layerId)) {
+    if (!data.WriteInterfaceToken(VideoLayerProxy::GetDescriptor()) || !data.WriteUint32(devId) ||
+        !data.WriteUint32(layerId)) {
         HDF_LOGE("%{public}s: write devId or layerId failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -283,7 +287,8 @@ DispErrCode VideoLayerProxy::GetLayerRect(unsigned int devId, unsigned int layer
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteUint32(devId) || !data.WriteUint32(layerId)) {
+    if (!data.WriteInterfaceToken(VideoLayerProxy::GetDescriptor()) || !data.WriteUint32(devId) ||
+        !data.WriteUint32(layerId)) {
         HDF_LOGE("%{public}s: write devId or layerId failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -318,7 +323,8 @@ DispErrCode VideoLayerProxy::SetLayerZorder(unsigned int devId, unsigned int lay
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteUint32(devId) || !data.WriteUint32(layerId)) {
+    if (!data.WriteInterfaceToken(VideoLayerProxy::GetDescriptor()) || !data.WriteUint32(devId) ||
+        !data.WriteUint32(layerId)) {
         HDF_LOGE("%{public}s: write devId or layerId failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -347,7 +353,8 @@ DispErrCode VideoLayerProxy::GetLayerZorder(unsigned int devId, unsigned int lay
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteUint32(devId) || !data.WriteUint32(layerId)) {
+    if (!data.WriteInterfaceToken(VideoLayerProxy::GetDescriptor()) || !data.WriteUint32(devId) ||
+        !data.WriteUint32(layerId)) {
         HDF_LOGE("%{public}s: write devId or layerId failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -373,7 +380,8 @@ DispErrCode VideoLayerProxy::SetTransformMode(unsigned int devId, unsigned int l
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteUint32(devId) || !data.WriteUint32(layerId)) {
+    if (!data.WriteInterfaceToken(VideoLayerProxy::GetDescriptor()) || !data.WriteUint32(devId) ||
+        !data.WriteUint32(layerId)) {
         HDF_LOGE("%{public}s: write devId or layerId failed", __func__);
         return DISPLAY_FAILURE;
     }
@@ -404,7 +412,8 @@ DispErrCode VideoLayerProxy::SetLayerBuffer(unsigned int devId, unsigned int lay
     MessageOption option;
     (void)fence;
 
-    if (!data.WriteUint32(devId) || !data.WriteUint32(layerId)) {
+    if (!data.WriteInterfaceToken(VideoLayerProxy::GetDescriptor()) || !data.WriteUint32(devId) ||
+        !data.WriteUint32(layerId)) {
         HDF_LOGE("%{public}s: write devId or layerId failed", __func__);
         return DISPLAY_FAILURE;
     }
