@@ -19,6 +19,7 @@
 #include <stdint.h>
 #include <netinet/in.h>
 #include "codec_component_type.h"
+#include "OMX_Core.h"
 
 #ifdef __cplusplus
 extern "C" {
