@@ -14,6 +14,7 @@
  */
 
 #include "codec_stub.h"
+#include <hdf_device_object.h>
 #include <hdf_log.h>
 #include <osal_mem.h>
 
