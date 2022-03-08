@@ -23,11 +23,6 @@
 
 #define CALLBACK_TYPE_COUNT 2
 
-enum SensorTypeIndex {
-    TRADITIONAL_SENSOR_TYPE_INDEX = 0,
-    MEDICAL_SENSOR_TYPE_INDEX = 1
-};
-
 struct SensorIdListNode {
     int32_t sensorId;
     struct HdfIoService *ioService;

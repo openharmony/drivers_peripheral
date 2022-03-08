@@ -51,7 +51,6 @@ extern "C" {
 #define SENSOR_NAME_MAX_LEN       32 /**< Maximum length of the sensor name */
 #define SENSOR_VERSION_MAX_LEN    16 /**< Maximum length of the sensor version */
 
-
 /**
  * @brief Enumerates return values of the sensor module.
  *
@@ -145,6 +144,17 @@ enum SensorModeType {
     SENSOR_MODE_ONE_SHOT  = 3, /**< Real-time data reporting mode to report data only once */
     SENSOR_MODE_FIFO_MODE = 4, /**< FIFO-based data reporting mode to report data based on the configured cache size */
     SENSOR_MODE_MAX,           /**< Maximum sensor data reporting mode */
+};
+
+/**
+ * @brief Enumerates hardware service group for sensors
+ *
+ * @since 2.2
+ */
+enum SensorGroupType {
+    TRADITIONAL_SENSOR_TYPE = 0, /**< traditional sensor type, the sensorId enumeration value range is 128-160 */
+    MEDICAL_SENSOR_TYPE = 1,  /**< medical sensor type, the sensorId enumeration value range is not within 128-160 */
+    SENSOR_GROUP_TYPE_MAX,          /**< Maximum sensor type*/
 };
 
 /**
