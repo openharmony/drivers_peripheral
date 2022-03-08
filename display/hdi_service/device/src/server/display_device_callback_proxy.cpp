@@ -21,10 +21,8 @@ int32_t DisplayDeviceCallbackProxy::OnHotplugIn(uint32_t outputId, bool connecte
     OHOS::MessageParcel data;
     OHOS::MessageParcel reply;
     OHOS::MessageOption option;
-    if (!data.WriteInt32(outputId)) {
-        return HDF_FAILURE;
-    }
-    if (!data.WriteBool(connected)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceCallbackProxy::GetDescriptor()) || !data.WriteInt32(outputId) ||
+        !data.WriteBool(connected)) {
         return HDF_FAILURE;
     }
 
@@ -39,10 +37,8 @@ int32_t DisplayDeviceCallbackProxy::OnVBlankCallback(unsigned int sequence, uint
     OHOS::MessageParcel data;
     OHOS::MessageParcel reply;
     OHOS::MessageOption option;
-    if (!data.WriteInt32(sequence)) {
-        return HDF_FAILURE;
-    }
-    if (!data.WriteUint64(ns)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceCallbackProxy::GetDescriptor()) || !data.WriteInt32(sequence) ||
+        !data.WriteUint64(ns)) {
         return HDF_FAILURE;
     }
 
@@ -57,7 +53,7 @@ int32_t DisplayDeviceCallbackProxy::OnRefreshCallback(uint32_t devId)
     OHOS::MessageParcel data;
     OHOS::MessageParcel reply;
     OHOS::MessageOption option;
-    if (!data.WriteInt32(devId)) {
+    if (!data.WriteInterfaceToken(DisplayDeviceCallbackProxy::GetDescriptor()) || !data.WriteInt32(devId)) {
         return HDF_FAILURE;
     }
 

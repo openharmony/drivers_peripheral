@@ -27,6 +27,7 @@ ohos_shared_library("libhdi_display_gralloc_stub") {
 
   sources = [
     "allocator_host.cpp",
+    "allocator_service_impl.cpp",
     "allocator_service_stub.cpp",
   ]
 
