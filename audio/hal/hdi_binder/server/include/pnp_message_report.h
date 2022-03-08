@@ -82,7 +82,7 @@ struct PnpReportMsg {
 };
 
 int32_t PnpReportMsgDeSerialize(uint8_t *msgStr, enum PnpReportType msgType, struct PnpReportMsg *pnpReportMsg);
-uint8_t *PnpReportMsgSerialize(struct PnpReportMsg *pnpReportMsg);
+char *PnpReportMsgSerialize(struct PnpReportMsg *pnpReportMsg);
 
 #ifdef __cplusplus
     }
