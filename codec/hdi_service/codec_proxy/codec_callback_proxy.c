@@ -71,8 +71,8 @@ static int CodecCallbackProxyOnEvent(UINTPTR comp, UINTPTR appData, EventType ev
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)comp)) {
-        HDF_LOGE("%{public}s: write input comp failed!", __func__);
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) || !HdfSbufWriteUint32(data, (uint32_t)comp)) {
+        HDF_LOGE("%{public}s: write interface token or input comp failed!", __func__);
         CodecCallbackProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -123,6 +123,11 @@ static int CodecCallbackProxyInputBufferAvailable(UINTPTR comp, UINTPTR appData,
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
+        HDF_LOGE("write interface token failed");
+        CodecCallbackProxySBufRecycle(data, reply);
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (!HdfSbufWriteUint32(data, (uint32_t)comp)) {
         HDF_LOGE("%{public}s: write input comp failed!", __func__);
         CodecCallbackProxySBufRecycle(data, reply);
@@ -158,6 +163,11 @@ static int CodecCallbackProxyOutputBufferAvailable(UINTPTR comp, UINTPTR appData
     }
     if (CodecCallbackProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
+        HDF_LOGE("write interface token failed");
+        CodecCallbackProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(data, (uint32_t)comp)) {
