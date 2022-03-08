@@ -92,6 +92,11 @@ int32_t AudioProxyPreprocessRender(struct AudioHwRender *render, struct HdfSBuf 
     if (AudioProxyPreprocessSBuf(data, reply) < 0) {
         return HDF_FAILURE;
     }
+    if (!HdfRemoteServiceWriteInterfaceToken(render->proxyRemoteHandle, *data)) {
+        LOG_FUN_ERR("write interface token failed");
+        AudioProxyBufReplyRecycle(*data, *reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     if (!HdfSbufWriteString(*data, adapterName)) {
         AudioProxyBufReplyRecycle(*data, *reply);
         return HDF_FAILURE;
@@ -117,6 +122,11 @@ int32_t AudioProxyPreprocessCapture(struct AudioHwCapture *capture, struct HdfSB
     }
     if (AudioProxyPreprocessSBuf(data, reply) < 0) {
         return HDF_FAILURE;
+    }
+    if (!HdfRemoteServiceWriteInterfaceToken(capture->proxyRemoteHandle, *data)) {
+        LOG_FUN_ERR("write interface token failed");
+        AudioProxyBufReplyRecycle(*data, *reply);
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     if (!HdfSbufWriteString(*data, adapterName)) {
         AudioProxyBufReplyRecycle(*data, *reply);
