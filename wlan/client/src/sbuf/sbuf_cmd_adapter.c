@@ -955,7 +955,6 @@ int32_t WifiCmdChangeBeacon(const char *ifName, WifiApSetting *apsettings)
     }
     bool isSerializeFailed = false;
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
-    isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, apsettings, sizeof(WifiApSetting));
     isSerializeFailed =
         isSerializeFailed || !HdfSbufWriteBuffer(data, apsettings->beaconData.head, apsettings->beaconData.headLen);
     isSerializeFailed =
