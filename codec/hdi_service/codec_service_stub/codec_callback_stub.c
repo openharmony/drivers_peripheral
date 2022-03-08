@@ -145,6 +145,10 @@ int32_t CodecCallbackServiceOnRemoteRequest(struct HdfRemoteService *service, in
                                             struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     struct ICodecCallback *serviceImpl = (struct ICodecCallback *)service;
+    if (!HdfRemoteServiceCheckInterfaceToken(serviceImpl->remote, data)) {
+        HDF_LOGE("failed to check interface");
+        return HDF_ERR_INVALID_PARAM;
+    }
     switch (cmdId) {
         case CMD_CODEC_ON_EVENT:
             return SerCodecOnEvent(serviceImpl, data, reply);
