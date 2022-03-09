@@ -34,6 +34,11 @@ CamRetCode StreamOperatorProxy::IsStreamsSupported(
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(StreamOperatorProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     // stub operation mode
     if (!data.WriteInt32(mode)) {
         HDF_LOGE("%s: write operation mode failed", __func__);
@@ -88,6 +93,11 @@ CamRetCode StreamOperatorProxy::CreateStreams(
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(StreamOperatorProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     size_t count = streamInfos.size();
     if (!data.WriteInt32(static_cast<int32_t>(count))) {
         HDF_LOGE("%s: write streamInfos count failed", __func__);
@@ -120,6 +130,11 @@ CamRetCode StreamOperatorProxy::ReleaseStreams(const std::vector<int> &streamIds
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(StreamOperatorProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     std::vector<int32_t> pxyStreamIds = streamIds;
     if (!data.WriteInt32Vector(pxyStreamIds)) {
         HDF_LOGE("%s: write streamIds failed", __func__);
@@ -142,6 +157,11 @@ CamRetCode StreamOperatorProxy::CommitStreams(OperationMode mode,
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+
+    if (!data.WriteInterfaceToken(StreamOperatorProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
 
     if (!data.WriteInt32(mode)) {
         HDF_LOGE("%s: write operation mode failed", __func__);
@@ -171,6 +191,11 @@ CamRetCode StreamOperatorProxy::GetStreamAttributes(
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(StreamOperatorProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     int32_t ret = Remote()->SendRequest(
         CMD_STREAM_OPERATOR_GET_STREAM_ATTRIBUTES, data, reply, option);
     if (ret != HDF_SUCCESS) {
@@ -197,6 +222,11 @@ CamRetCode StreamOperatorProxy::AttachBufferQueue(int streamId, const OHOS::sptr
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+
+    if (!data.WriteInterfaceToken(StreamOperatorProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
 
     if (producer == nullptr) {
         HDF_LOGE("%s: producer is NULL", __func__);
@@ -229,6 +259,11 @@ CamRetCode StreamOperatorProxy::DetachBufferQueue(int streamId)
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(StreamOperatorProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     if (!data.WriteInt32(static_cast<int32_t>(streamId))) {
         HDF_LOGE("%s: write streamId failed", __func__);
         return INVALID_ARGUMENT;
@@ -250,6 +285,11 @@ CamRetCode StreamOperatorProxy::Capture(int captureId,
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+
+    if (!data.WriteInterfaceToken(StreamOperatorProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
 
     if (pInfo == nullptr) {
         return INVALID_ARGUMENT;
@@ -301,6 +341,11 @@ CamRetCode StreamOperatorProxy::CancelCapture(int captureId)
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(StreamOperatorProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     if (!data.WriteInt32(static_cast<int32_t>(captureId))) {
         HDF_LOGE("%s: write captureId failed", __func__);
         return INVALID_ARGUMENT;
@@ -324,6 +369,11 @@ CamRetCode StreamOperatorProxy::ChangeToOfflineStream(
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+
+    if (!data.WriteInterfaceToken(StreamOperatorProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
 
     if (callback == nullptr) {
         return INVALID_ARGUMENT;
