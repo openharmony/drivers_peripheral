@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,12 +16,8 @@
 #ifndef BT_HAL_HCI_PROTOCOL_H
 #define BT_HAL_HCI_PROTOCOL_H
 
-#include <cstdint>
-#include <stdio.h>
-#include <functional>
+#include <cstdio>
 #include <vector>
-
-#include <errno.h>
 
 #include "hci_internal.h"
 
@@ -29,7 +25,6 @@ namespace OHOS {
 namespace HDI {
 namespace BT {
 namespace HCI {
-
 class HciProtocol {
 public:
     using HciDataCallback = std::function<void(const std::vector<uint8_t> &data)>;
