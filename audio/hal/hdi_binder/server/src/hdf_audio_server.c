@@ -528,6 +528,9 @@ int AudioHdiServerInit(struct HdfDeviceObject *deviceObject)
         HDF_LOGE("%{public}s: deviceObject is null!", __func__);
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
+    if (HdfDeviceSetClass(deviceObject, DEVICE_CLASS_AUDIO) != true) {
+        HDF_LOGE("%{public}s: HdfDeviceSetClass is fail!", __func__);
+    }
 #ifdef AUDIO_HAL_USER
     void *sdkHandle;
     int (*sdkInitSp)() = NULL;

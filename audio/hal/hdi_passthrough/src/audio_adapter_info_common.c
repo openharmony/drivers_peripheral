@@ -686,7 +686,7 @@ static char *AudioAdaptersGetConfig(const char *fpath)
         fclose(fp);
         return NULL;
     }
-    pJsonStr = (char *)calloc(1, (uint32_t)jsonStrSize);
+    pJsonStr = (char *)calloc(1, (uint32_t)jsonStrSize + 1);
     if (pJsonStr == NULL) {
         fclose(fp);
         return NULL;
