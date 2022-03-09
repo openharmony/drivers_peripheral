@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,14 +14,13 @@
  */
 
 #include "bt_hci_service.h"
-#include "vendor_interface.h"
 #include <hdf_log.h>
+#include "vendor_interface.h"
 
 namespace ohos {
 namespace hardware {
 namespace bt {
 namespace v1_0 {
-
 using VendorInterface = OHOS::HDI::BT::V1_0::VendorInterface;
 using HciPacketType = OHOS::HDI::BT::HCI::HciPacketType;
 
