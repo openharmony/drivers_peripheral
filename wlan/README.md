@@ -255,5 +255,5 @@ static void *hal_main()
 
 [drivers\_adapter\_khdf\_linux](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README.md)
 
-drivers\_peripheral
+[drivers\_peripheral](https://gitee.com/openharmony/drivers_peripheral)
 
