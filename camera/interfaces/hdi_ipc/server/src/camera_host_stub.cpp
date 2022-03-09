@@ -40,6 +40,11 @@ RetCode CameraHostStub::Init()
 int32_t CameraHostStub::CameraHostStubSetCallback(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != CameraHostStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     bool flag = data.ReadBool();
     sptr<ICameraHostCallback> hostCallback = nullptr;
     if (flag) {
@@ -62,6 +67,10 @@ int32_t CameraHostStub::CameraHostStubGetCameraIds(
         return HDF_FAILURE;
     }
 
+    if (data.ReadInterfaceToken() != CameraHostStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
     std::vector<std::string> cameraIds;
     CamRetCode ret = cameraHost_->GetCameraIds(cameraIds);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
@@ -80,6 +89,11 @@ int32_t CameraHostStub::CameraHostStubGetCameraIds(
 int32_t CameraHostStub::CameraHostStubGetCameraAbility(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != CameraHostStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     const std::string cameraId = data.ReadString();
     if (cameraId.empty()) {
         HDF_LOGE("%s: read input param is empty", __func__);
@@ -105,6 +119,11 @@ int32_t CameraHostStub::CameraHostStubGetCameraAbility(
 int32_t CameraHostStub::CameraHostStubOpenCamera(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != CameraHostStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     const std::string cameraId = data.ReadString();
     if (cameraId.empty()) {
         HDF_LOGE("%s: read input param is empty", __func__);
@@ -142,6 +161,11 @@ int32_t CameraHostStub::CameraHostStubOpenCamera(
 int32_t CameraHostStub::CameraHostStubSetFlashlight(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != CameraHostStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     if (cameraHost_ == nullptr) {
         HDF_LOGE("%s: camera host is null", __func__);
         return HDF_FAILURE;

@@ -67,6 +67,11 @@ int32_t CameraDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Me
 int32_t CameraDeviceStub::CameraDeviceStubGetStreamOperator(
     MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
+    if (data.ReadInterfaceToken() != CameraDeviceStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     sptr<IStreamOperatorCallback> spStreamOperatorCallback = nullptr;
     bool flag = data.ReadBool();
     if (flag) {
@@ -102,6 +107,11 @@ int32_t CameraDeviceStub::CameraDeviceStubGetStreamOperator(
 int32_t CameraDeviceStub::CameraDeviceStubUpdateSettings(
     MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
+    if (data.ReadInterfaceToken() != CameraDeviceStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     std::shared_ptr<CameraStandard::CameraMetadata> metadata = nullptr;
     CameraStandard::MetadataUtils::DecodeCameraMetadata(data, metadata);
 
@@ -117,6 +127,11 @@ int32_t CameraDeviceStub::CameraDeviceStubUpdateSettings(
 int32_t CameraDeviceStub::CameraDeviceStubSetResultMode(
     MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
+    if (data.ReadInterfaceToken() != CameraDeviceStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     ResultCallbackMode mode = static_cast<ResultCallbackMode>(data.ReadInt32());
     CamRetCode ret = SetResultMode(mode);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
@@ -130,6 +145,11 @@ int32_t CameraDeviceStub::CameraDeviceStubSetResultMode(
 int32_t CameraDeviceStub::CameraDeviceStubGetEnabledReuslts(
     MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
+    if (data.ReadInterfaceToken() != CameraDeviceStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     std::vector<int32_t> results;
     CamRetCode ret = GetEnabledResults(results);
     if (!reply.WriteInt32(static_cast<CamRetCode>(ret))) {
@@ -148,6 +168,11 @@ int32_t CameraDeviceStub::CameraDeviceStubGetEnabledReuslts(
 int32_t CameraDeviceStub::CameraDeviceStubEnableResult(
     MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
+    if (data.ReadInterfaceToken() != CameraDeviceStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     std::vector<int32_t> results;
     if (!data.ReadInt32Vector(&results)) {
         HDF_LOGE("%s: read results failed", __func__);
@@ -171,6 +196,11 @@ int32_t CameraDeviceStub::CameraDeviceStubEnableResult(
 int32_t CameraDeviceStub::CameraDeviceStubDisableResult(
     MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
+    if (data.ReadInterfaceToken() != CameraDeviceStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     std::vector<int32_t> results;
     if (!data.ReadInt32Vector(&results)) {
         HDF_LOGE("%s: read results failed", __func__);
@@ -194,6 +224,11 @@ int32_t CameraDeviceStub::CameraDeviceStubDisableResult(
 int32_t CameraDeviceStub::CameraDeviceStubClose(
     MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
+    if (data.ReadInterfaceToken() != CameraDeviceStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     Close();
     return HDF_SUCCESS;
 }
