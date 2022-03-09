@@ -27,7 +27,8 @@ if (defined(ohos_lite)) {
     import(
         "//device/soc/hisilicon/common/hal/media/camera/hi3516dv300/linux_standard/camera/product.gni")
   } else {
-    import("//device/${product_company}/${device_name}/camera/product.gni")
+    import(
+        "//device/board/${product_company}/${device_name}/camera/product.gni")
   }
 }
 
