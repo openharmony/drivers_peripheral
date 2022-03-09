@@ -25,6 +25,11 @@ void CameraHostCallbackProxy::OnCameraStatus(const std::string &cameraId, Camera
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(CameraHostCallbackProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return;
+    }
+
     if (!data.WriteString(cameraId)) {
         HDF_LOGE("%{public}s: write cameraId failed.", __func__);
         return;
@@ -47,6 +52,11 @@ void CameraHostCallbackProxy::OnFlashlightStatus(const std::string &cameraId, Fl
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+
+    if (!data.WriteInterfaceToken(CameraHostCallbackProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return;
+    }
 
     if (!data.WriteString(cameraId)) {
         HDF_LOGE("%{public}s: write cameraId failed.", __func__);
