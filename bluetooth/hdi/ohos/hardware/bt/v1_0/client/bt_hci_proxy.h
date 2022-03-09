@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,14 +16,13 @@
 #ifndef OHOS_HARDWARE_BT_V1_0_BTHCIPROXY_H
 #define OHOS_HARDWARE_BT_V1_0_BTHCIPROXY_H
 
-#include "ibt_hci.h"
 #include <iremote_proxy.h>
+#include "ibt_hci.h"
 
 namespace ohos {
 namespace hardware {
 namespace bt {
 namespace v1_0 {
-
 class BtHciProxy : public IRemoteProxy<IBtHci> {
 public:
     explicit BtHciProxy(const sptr<IRemoteObject> &remote) : IRemoteProxy<IBtHci>(remote)
@@ -41,7 +40,6 @@ public:
 private:
     static inline BrokerDelegator<BtHciProxy> delegator_;
 };
-
 }  // namespace v1_0
 }  // namespace bt
 }  // namespace hardware

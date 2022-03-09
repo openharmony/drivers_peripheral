@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include "h4_protocol.h"
 
+#include <cerrno>
 #include <cstring>
 
 #include <hdf_log.h>
@@ -80,7 +81,7 @@ void H4Protocol::ReadData(int fd)
         if (readLength_ == hciPacket_.size()) {
             size_t dataLen = 0;
             for (int ii = 0; ii < header_[packetType_].dataLengthSize; ii++) {
-                dataLen += hciPacket_[header_[packetType_].dataLengthOffset + ii] << ii * 8;
+                dataLen += (hciPacket_[header_[packetType_].dataLengthOffset + ii] << (ii * 0x08));
             }
             hciPacket_.resize(hciPacket_.size() + dataLen);
         }
