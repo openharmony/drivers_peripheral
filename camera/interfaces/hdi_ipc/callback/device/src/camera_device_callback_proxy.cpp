@@ -26,6 +26,11 @@ void CameraDeviceCallbackProxy::OnError(ErrorType type, int32_t errorMsg)
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(CameraDeviceCallbackProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return;
+    }
+
     if (!data.WriteUint32(type)) {
         HDF_LOGE("%{public}s: write error type failed.", __func__);
         return;
@@ -51,6 +56,11 @@ void CameraDeviceCallbackProxy::OnResult(uint64_t timestamp,
     MessageOption option;
 
     if (result == nullptr) {
+        return;
+    }
+
+    if (!data.WriteInterfaceToken(CameraDeviceCallbackProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
         return;
     }
 
