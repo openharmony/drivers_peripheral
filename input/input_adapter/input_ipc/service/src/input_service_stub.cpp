@@ -24,10 +24,15 @@
 
 namespace OHOS {
 namespace Input {
+InputServerStub::InputServerStub() {}
+
 int32_t InputServerStub::InputServerStubScanInputDevice(MessageParcel &data,
                                                         MessageParcel &reply,
                                                         MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     uint32_t arrLen = data.ReadUint32();
     if (arrLen > 32) {  // 32:max devices num
         HDF_LOGE("InputServerStub %{public}s: ScanInputDevice failed line %{public}d", __func__, __LINE__);
@@ -55,6 +60,9 @@ int32_t InputServerStub::InputServerStubOpenInputDevice(MessageParcel &data,
                                                         MessageParcel &reply,
                                                         MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     HDF_LOGE("InputHostStub:: %{public}s:called", __func__);
     int32_t index = data.ReadUint32();
     int32_t ret = mService_->OpenInputDevice(index);
@@ -73,6 +81,9 @@ int32_t InputServerStub::InputServerStubCloseInputDevice(MessageParcel &data,
                                                          MessageParcel &reply,
                                                          MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     HDF_LOGE("InputServerStub:: %{public}s:called", __func__);
     int32_t index = data.ReadUint32();
     int32_t ret = mService_->CloseInputDevice(index);
@@ -91,6 +102,9 @@ int32_t InputServerStub::InputServerStubGetInputDevice(MessageParcel &data,
                                                        MessageParcel &reply,
                                                        MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t index = data.ReadUint32();
     HDF_LOGE("InputServerStub:: %{public}s:called line%{public}d index:%{public}d", __func__, __LINE__, index);
     DeviceInfo* devInfo = (DeviceInfo*)new DeviceInfo();
@@ -119,6 +133,9 @@ int32_t InputServerStub::InputServerStubGetInputDeviceList(MessageParcel &data,
                                                            MessageParcel &reply,
                                                            MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     HDF_LOGE("InputServerStub:: %{public}s:called line%{public}d", __func__, __LINE__);
     uint32_t devNum = MAX_INPUT_DEV_NUM;
     uint32_t size = data.ReadUint32();
@@ -153,6 +170,9 @@ int32_t InputServerStub::InputServerStubSetPowerStatus(MessageParcel &data,
                                                        MessageParcel &reply,
                                                        MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     HDF_LOGE("InputServerStub::%{public}s start", __func__);
     int32_t index = data.ReadUint32();
     uint32_t status = data.ReadUint32();
@@ -169,6 +189,9 @@ int32_t InputServerStub::InputServerStubGetPowerStatus(MessageParcel &data,
                                                        MessageParcel &reply,
                                                        MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     HDF_LOGE("InputServerStub::%{public}s start", __func__);
     int32_t index = data.ReadInt32();
     uint32_t status {};
@@ -189,6 +212,9 @@ int32_t InputServerStub::InputServerStubGetDeviceType(MessageParcel &data,
                                                       MessageParcel &reply,
                                                       MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     HDF_LOGE("InputServerStub::%{public}s", __func__);
     int32_t index = data.ReadInt32();
     uint32_t deviceType {};
@@ -208,6 +234,9 @@ int32_t InputServerStub::InputServerStubGetChipInfo(MessageParcel &data,
                                                     MessageParcel &reply,
                                                     MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t index = data.ReadInt32();
     uint32_t length = data.ReadUint32();
     char* chipInfo = new char[MAX_NODE_PATH_LEN];
@@ -231,6 +260,9 @@ int32_t InputServerStub::InputServerStubGetVendorName(MessageParcel &data,
                                                       MessageParcel &reply,
                                                       MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     HDF_LOGE("InputServerStub::%{public}s", __func__);
     int32_t index = data.ReadInt32();
     uint32_t length = data.ReadUint32();
@@ -257,6 +289,9 @@ int32_t InputServerStub::InputServerStubGetChipName(MessageParcel &data,
                                                     MessageParcel &reply,
                                                     MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     HDF_LOGE("InputServerStub::%{public}s", __func__);
     int32_t index = data.ReadInt32();
     uint32_t length = data.ReadUint32();
@@ -281,6 +316,9 @@ int32_t InputServerStub::InputServerStubSetGestureMode(MessageParcel &data,
                                                        MessageParcel &reply,
                                                        MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     HDF_LOGI("InputServerStub::%{public}s", __func__);
     return HDF_SUCCESS;
 }
@@ -288,6 +326,9 @@ int32_t InputServerStub::InputServerStubRunCapacitanceTest(MessageParcel &data,
                                                            MessageParcel &reply,
                                                            MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     HDF_LOGI("InputServerStub::%{public}s", __func__);
     return HDF_SUCCESS;
 }
@@ -296,6 +337,9 @@ int32_t InputServerStub::InputServerStubRunExtraCommand(MessageParcel &data,
                                                         MessageParcel &reply,
                                                         MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     HDF_LOGI("InputServerStub::%{public}s", __func__);
     return HDF_SUCCESS;
 }
@@ -304,6 +348,9 @@ int32_t InputServerStub::InputServerStubRegisterReportCallback(MessageParcel &da
                                                                MessageParcel &reply,
                                                                MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t index = data.ReadInt32();
     bool flag = data.ReadBool();
     HDF_LOGI("InputServerStub:: send flag:%{public}d", flag);
@@ -325,6 +372,9 @@ int32_t InputServerStub::InputServerStubUnregisterReportCallback(MessageParcel &
                                                                  MessageParcel &reply,
                                                                  MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t index = data.ReadInt32();
     int32_t ret = mService_->UnregisterReportCallback(index);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
@@ -338,6 +388,9 @@ int32_t InputServerStub::InputServerStubRegisterHotPlugCallback(MessageParcel &d
                                                                 MessageParcel &reply,
                                                                 MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     bool flag = data.ReadBool();
     HDF_LOGE("InputServerStub::%{public}s send flag:%{public}d", __func__, flag);
     sptr<IRemoteObject> remote = data.ReadRemoteObject();
@@ -358,6 +411,9 @@ int32_t InputServerStub::InputServerStubUnregisterHotPlugCallback(MessageParcel 
                                                                   MessageParcel &reply,
                                                                   MessageOption &option) const
 {
+    if (data.ReadInterfaceToken() != InputServerStub::GetDescriptor()) {
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = mService_->UnregisterHotPlugCallback();
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
         HDF_LOGE("InputServerStub %{public}s: UnregisterHotPlugCallback failed", __func__);
@@ -412,10 +468,6 @@ int32_t InputServerStub::InputServerStubOnRemoteRequest(int32_t cmdId,
             return HDF_ERR_INVALID_PARAM;
         }
     }
-}
-
-InputServerStub::InputServerStub()
-{
 }
 }  // namespace Input
 }  // namespace OHOS
