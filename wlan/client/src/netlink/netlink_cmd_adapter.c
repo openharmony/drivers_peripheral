@@ -454,34 +454,6 @@ void WifiDriverClientDeinit(void)
     pthread_mutex_destroy(&g_wifiHalInfo.mutex);
 }
 
-static int32_t ParserSupportIfType(struct nl_msg *msg, void *arg)
-{
-    struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
-    struct nlattr *attr[NL80211_ATTR_MAX + 1];
-    uint8_t *mode = (uint8_t *)arg;
-    int32_t ret, i;
-    struct nlattr *nlMode = NULL;
-    int32_t type;
-
-    ret = nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0),
-        genlmsg_attrlen(hdr, 0), NULL);
-    if (ret != 0) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: nla_parse failed", __FUNCTION__);
-        return NL_SKIP;
-    }
-
-    if (attr[NL80211_ATTR_SUPPORTED_IFTYPES] != NULL) {
-        nla_for_each_nested(nlMode, attr[NL80211_ATTR_SUPPORTED_IFTYPES], i) {
-            type = nla_type(nlMode);
-            if (type > WIFI_IFTYPE_UNSPECIFIED && type < WIFI_IFTYPE_MAX) {
-                mode[type] = 1;
-                HILOG_INFO(LOG_DOMAIN, "%s: mode: %d", __FUNCTION__, type);
-            }
-        }
-    }
-    return NL_SKIP;
-}
-
 static int32_t ParserIsSupportCombo(struct nl_msg *msg, void *arg)
 {
     struct nlattr *attr[NL80211_ATTR_MAX + 1];
