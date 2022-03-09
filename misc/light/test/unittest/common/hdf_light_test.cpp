@@ -49,6 +49,7 @@ void HdfLightTest::SetUpTestCase()
     g_lightDev = NewLightInterfaceInstance();
     if (g_lightDev == nullptr) {
         printf("test light get Module instance failed\n\r");
+        return;
     }
     int32_t ret = g_lightDev->GetLightInfo(&g_lightInfo, &g_count);
     if (ret == HDF_FAILURE) {
