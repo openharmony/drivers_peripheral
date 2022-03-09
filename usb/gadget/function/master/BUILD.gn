@@ -22,9 +22,10 @@ ohos_shared_library("libusbfn_master") {
   default_config_path =
       "//device/soc/$device_company/common/hal/usb/$device_name/include"
   if (device_company == "hihope") {
-    default_config_path = "//device/$device_company/$device_name/usb/include"
+    default_config_path =
+        "//device/board/$product_company/$device_name/usb/include"
   } else if (device_company == "openharmony") {
-    default_config_path = "//device/hihope/rk3568/usb/include"
+    default_config_path = "//device/board/hihope/rk3568/usb/include"
   }
 
   include_dirs = [
