@@ -14,9 +14,6 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-group("hdf_media_codec") {
-  deps = [
-    "hal:codec_hdi_omx",
-    "hal/config:codec_capability_config",
-  ]
+group("hdf_mediacodec") {
+  deps = [ "//drivers/peripheral/codec/hal/config:codec_capability_config" ]
 }

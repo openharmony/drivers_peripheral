@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("hdf_test_media_codec") {
+group("hdf_test_mediacodec") {
   testonly = true
   deps = [ "unittest:hdf_unittest_codec" ]
 }
