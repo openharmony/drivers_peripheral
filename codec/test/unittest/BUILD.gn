@@ -13,8 +13,5 @@
 
 group("hdf_unittest_codec") {
   testonly = true
-  deps = [
-    "config:codec_config_test",
-    "hdi_omx:codec_hdi_omx_test",
-  ]
+  deps = [ "config:codec_config_test" ]
 }

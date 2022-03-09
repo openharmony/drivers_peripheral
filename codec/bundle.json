@@ -22,8 +22,7 @@
     "build": {
       "sub_component": [
         "//drivers/peripheral/codec/hdi_service:codec_client",
-        "//drivers/peripheral/codec/hdi_service:codec_service",
-        "//drivers/peripheral/codec:hdf_media_codec"
+        "//drivers/peripheral/codec/hdi_service:codec_service"
       ]
     }
   }
