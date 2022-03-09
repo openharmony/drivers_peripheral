@@ -119,4 +119,5 @@ void VibratorSample(void)
 [drivers_adapter](https://gitee.com/openharmony/drivers_adapter/blob/master/README_zh.md)
 
 [drivers_adapter_khdf_linuk](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README_zh.md)
-drivers_peripheral
+
+[drivers_peripheral](https://gitee.com/openharmony/drivers_peripheral)
