@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -157,7 +157,7 @@ size_t VendorInterface::SendPacket(HCI::HciPacketType type, const std::vector<ui
         std::lock_guard<std::mutex> lock(wakeupMutex_);
         activity_ = true;
         watcher_.SetTimeout(std::chrono::milliseconds(lpmTimer_), std::bind(&VendorInterface::WatcherTimeout, this));
-        if (wakeupLock_ == false) {
+        if (!wakeupLock_) {
             vendorInterface_->op(bt_opcode_t::BT_OP_WAKEUP_LOCK, nullptr);
             wakeupLock_ = true;
         }
@@ -202,7 +202,7 @@ void VendorInterface::OnFreeCallback(void *buf)
     }
 }
 
-uint8_t VendorInterface::OnCmdXmitCallback(uint16_t opcode, void *buf)
+size_t VendorInterface::OnCmdXmitCallback(uint16_t opcode, void *buf)
 {
     HC_BT_HDR *hdr = reinterpret_cast<HC_BT_HDR *>(buf);
 
@@ -226,7 +226,7 @@ void VendorInterface::OnEventReceived(const std::vector<uint8_t> &data)
         delete[] buff;
     } else if (vendorSentOpcode_ != 0 && data[0] == HCI::HCI_EVENT_CODE_COMMAND_COMPLETE) {
         uint8_t opcodeOffset = hci_->GetPacketHeaderInfo(HCI::HCI_PACKET_TYPE_EVENT).headerSize + 1;
-        uint16_t opcode = data[opcodeOffset] + (data[opcodeOffset + 1] << 8);
+        uint16_t opcode = data[opcodeOffset] + (data[opcodeOffset + 1] << 0x08);
         if (opcode == vendorSentOpcode_) {
             size_t buffSize = sizeof(HC_BT_HDR) + data.size();
             HC_BT_HDR *buff = reinterpret_cast<HC_BT_HDR *>(new uint8_t[buffSize]);
@@ -235,9 +235,9 @@ void VendorInterface::OnEventReceived(const std::vector<uint8_t> &data)
             buff->offset = 0;
             buff->layer_specific = 0;
             (void)memcpy_s(buff->data, buffSize - sizeof(HC_BT_HDR), data.data(), data.size());
+            vendorSentOpcode_ = 0;
             vendorInterface_->op(bt_opcode_t::BT_OP_EVENT_CALLBACK, buff);
             delete[] buff;
-            vendorSentOpcode_ = 0;
         }
     }
 
