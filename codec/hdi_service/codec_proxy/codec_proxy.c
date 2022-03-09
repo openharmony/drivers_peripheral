@@ -72,11 +72,7 @@ int32_t CodecPorxyInit(struct ICodec *self)
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
     }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
-        HDF_LOGE("write interface token failed");
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
+
     ret = CodecProxyCall(self, CMD_CODEC_INIT, data, reply);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
@@ -96,11 +92,6 @@ int32_t CodecProxyDeinit(struct ICodec *self)
     if (CodecProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
-    }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
-        HDF_LOGE("write interface token failed");
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
     }
     ret = CodecProxyCall(self, CMD_CODEC_DEINIT, data, reply);
     if (ret != HDF_SUCCESS) {
@@ -123,11 +114,6 @@ int32_t CodecProxyEnumerateCapbility(struct ICodec *self, uint32_t index, CodecC
     if (CodecProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
-    }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
-        HDF_LOGE("write interface token failed");
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(data, index)) {
         HDF_LOGE("%{public}s: write input index failed!", __func__);
@@ -161,11 +147,6 @@ int32_t CodecProxyGetCapbility(struct ICodec *self, AvCodecMime mime, CodecType 
     if (CodecProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
-    }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
-        HDF_LOGE("write interface token failed");
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(data, (uint32_t)mime)) {
         HDF_LOGE("%{public}s: write input mime failed!", __func__);
@@ -209,7 +190,7 @@ int32_t CodecProxyCreate(struct ICodec *self, const char* name, const Param *att
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
     }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) || !HdfSbufWriteString(data, name)) {
+    if (!HdfSbufWriteString(data, name)) {
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -260,11 +241,6 @@ int32_t CodecProxyDestroy(struct ICodec *self, CODEC_HANDLETYPE handle)
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
-        HDF_LOGE("write interface token failed");
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
     if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: Write handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
@@ -289,11 +265,6 @@ int32_t CodecProxySetPortMode(struct ICodec *self, CODEC_HANDLETYPE handle, Dire
     if (CodecProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
-    }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
-        HDF_LOGE("write interface token failed");
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: Read size failed!", __func__);
@@ -330,11 +301,6 @@ int32_t CodecProxySetParameter(struct ICodec *self, CODEC_HANDLETYPE handle, con
     if (CodecProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
-    }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
-        HDF_LOGE("write interface token failed");
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write size failed!", __func__);
@@ -375,9 +341,8 @@ int32_t CodecProxyGetParameter(struct ICodec *self, CODEC_HANDLETYPE handle, Par
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
     }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
-        !HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
-        HDF_LOGE("%{public}s: write interface token or size failed!", __func__);
+    if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
+        HDF_LOGE("%{public}s: write size failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -422,11 +387,6 @@ int32_t CodecProxyStart(struct ICodec *self, CODEC_HANDLETYPE handle)
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
     }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
-        HDF_LOGE("write interface token failed");
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
     if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
@@ -452,11 +412,6 @@ int32_t CodecProxyStop(struct ICodec *self, CODEC_HANDLETYPE handle)
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
     }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
-        HDF_LOGE("write interface token failed");
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
     if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write input handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
@@ -481,11 +436,6 @@ int32_t CodecProxyFlush(struct ICodec *self, CODEC_HANDLETYPE handle, DirectionT
     if (CodecProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
-    }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
-        HDF_LOGE("write interface token failed");
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write input handle failed!", __func__);
@@ -517,11 +467,6 @@ int32_t CodecPorxyQueueInput(struct ICodec *self, CODEC_HANDLETYPE handle,
     if (CodecProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
-    }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
-        HDF_LOGE("write interface token failed");
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write input handle failed!", __func__);
@@ -557,11 +502,6 @@ int32_t CodecProxyDequeInput(struct ICodec *self, CODEC_HANDLETYPE handle, uint3
     if (CodecProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
-    }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
-        HDF_LOGE("write interface token failed");
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write input handle failed!", __func__);
@@ -606,11 +546,6 @@ int32_t CodecProxyQueueOutput(struct ICodec *self, CODEC_HANDLETYPE handle, Outp
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
     }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
-        HDF_LOGE("write interface token failed");
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
     if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write input handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
@@ -652,9 +587,8 @@ int32_t CodecProxyDequeueOutput(struct ICodec *self, CODEC_HANDLETYPE handle, ui
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
     }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
-        !HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
-        HDF_LOGE("%{public}s: write interface token or input handle failed!", __func__);
+    if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
+        HDF_LOGE("%{public}s: write input handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -700,11 +634,6 @@ int32_t CodecProxySetCallback(struct ICodec *self, CODEC_HANDLETYPE handle, stru
     if (CodecProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_FAILURE;
-    }
-    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
-        HDF_LOGE("write interface token failed");
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write input handle failed!", __func__);
@@ -764,12 +693,6 @@ struct ICodec *HdiCodecGet(const char *serviceName)
     struct HdfRemoteService *remote = serviceMgr->GetService(serviceMgr, serviceName);
     if (remote == NULL) {
         HDF_LOGE("%{public}s: HdfRemoteService not found!", __func__);
-        return NULL;
-    }
-
-    if (!HdfRemoteServiceSetInterfaceDesc(remote, "ohos.hdi.codec_service")) {
-        HDF_LOGE("%{public}s: failed to init interface desc", __func__);
-        HdfRemoteServiceRecycle(remote);
         return NULL;
     }
 
