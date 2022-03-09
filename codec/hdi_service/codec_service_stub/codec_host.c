@@ -14,7 +14,6 @@
  */
 
 #include "codec_stub.h"
-#include <hdf_device_object.h>
 #include <hdf_log.h>
 #include <osal_mem.h>
 
@@ -43,11 +42,7 @@ int HdfCodecDriverBind(struct HdfDeviceObject *deviceObject)
     ioService->Dispatch = CodecServiceDispatch;
     ioService->Open = NULL;
     ioService->Release = NULL;
-    int ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, "ohos.hdi.codec_service");
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("failed to set interface desc");
-        return ret;
-    }
+
     deviceObject->service = ioService;
     return HDF_SUCCESS;
 }

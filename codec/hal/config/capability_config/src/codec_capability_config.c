@@ -263,10 +263,7 @@ static int32_t CodecCapabilityDispatch(struct HdfDeviceIoClient *client, int id,
         HDF_LOGE("%{public}s: params NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
-        HDF_LOGE("check interface token failed");
-        return HDF_ERR_INVALID_PARAM;
-    }
+
     if (!codecCapabilites.inited) {
         ReloadCapabilities();
     }
