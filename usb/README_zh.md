@@ -421,5 +421,5 @@ Usb Deivce DDK提供设备管理、IO管理、配置管理，主要功能有：�
 
 [drivers\_adapter\_khdf\_linux](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README_zh.md)
 
-drivers\_peripheral
+[drivers\_peripheral](https://gitee.com/openharmony/drivers_peripheral)
 

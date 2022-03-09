@@ -334,5 +334,5 @@ int DisplayServiceSample(void)
 
 [drivers\_adapter\_khdf\_linux](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README_zh.md)
 
-drivers\_peripheral
+[drivers\_peripheral](https://gitee.com/openharmony/drivers_peripheral)
 
