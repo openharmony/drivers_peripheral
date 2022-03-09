@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "hdf_device_object.h"
 #include "wlan_hdi_service_stub.h"
 #include <sys/stat.h>
 #include <sys/ioctl.h>
@@ -53,6 +54,11 @@ int HdfWlanHdiDriverBind(struct HdfDeviceObject *deviceObject)
     ioService->Dispatch = WlanHdiServiceDispatch;
     ioService->Open = NULL;
     ioService->Release = NULL;
+    int ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, "HDI.WLAN.V1_0");
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("failed to set interface desc");
+        return ret;
+    }
     deviceObject->service = ioService;
     return HDF_SUCCESS;
 }
