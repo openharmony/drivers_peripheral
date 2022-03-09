@@ -145,11 +145,6 @@ struct HdfRemoteService *GetConfigService(void)
         HDF_LOGE("%{public}s: HdfRemoteService not found!", __func__);
         return NULL;
     }
-    if (!HdfRemoteServiceSetInterfaceDesc(remote, "ohos.hdi.codec_service")) {
-        HDF_LOGE("%{public}s: failed to init interface desc", __func__);
-        HdfRemoteServiceRecycle(remote);
-        return NULL;
-    }
 
     return remote;
 }
@@ -177,11 +172,7 @@ int32_t EnumrateCapability(struct HdfRemoteService *remote, int index, CodecCapb
         HdfSbufRecycle(data);
         return HDF_FAILURE;
     }
-    if (!HdfRemoteServiceWriteInterfaceToken(remote, data)) {
-        HDF_LOGE("write interface token failed");
-        ReleaseSbuf(data, reply);
-        return HDF_FAILURE;
-    }
+
     if (!HdfSbufWriteUint32(data, index)) {
         HDF_LOGE("%{public}s: write input index failed!", __func__);
         ReleaseSbuf(data, reply);
@@ -218,11 +209,7 @@ int32_t GetCapability(struct HdfRemoteService *remote,
         HdfSbufRecycle(data);
         return HDF_FAILURE;
     }
-    if (!HdfRemoteServiceWriteInterfaceToken(remote, data)) {
-        HDF_LOGE("write interface token failed");
-        ReleaseSbuf(data, reply);
-        return HDF_FAILURE;
-    }
+
     if (!HdfSbufWriteUint32(data, (uint32_t)mime)) {
         HDF_LOGE("%{public}s: write input mime failed!", __func__);
         ReleaseSbuf(data, reply);
