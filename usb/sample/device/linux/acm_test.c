@@ -39,6 +39,12 @@ static struct OsalThread      g_thread;
 static void TestWrite(char *buf)
 {
     HdfSbufFlush(g_data);
+
+    if (HdfRemoteServiceWriteInterfaceToken(g_acmService, g_data) == false) {
+        HDF_LOGE("%{public}s:%{public}d write interface token fail\n", __func__, __LINE__);
+        return;
+    }
+    
     (void)HdfSbufWriteString(g_data, buf);
     int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_WRITE, g_data, g_reply);
     if (status <= 0) {
@@ -50,6 +56,12 @@ static void TestRead()
 {
     size_t i;
     HdfSbufFlush(g_reply);
+
+    if (HdfRemoteServiceWriteInterfaceToken(g_acmService, g_data) == false) {
+        HDF_LOGE("%{public}s:%{public}d write interface token fail\n", __func__, __LINE__);
+        return;
+    }
+
     int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_READ, g_data, g_reply);
     if (status) {
         printf("%s: Dispatch USB_SERIAL_READ failed status = %d", __func__, status);
@@ -148,10 +160,20 @@ int32_t acm_test(int32_t argc, const char *argv[])
         return HDF_FAILURE;
     }
 
+    if (HdfRemoteServiceSetInterfaceDesc(g_acmService, "hdf.usb.usbfn") == false) {
+        HDF_LOGE("%{public}s:%{public}d set desc fail\n", __func__, __LINE__);
+        return HDF_FAILURE;
+    }
+
     g_data = HdfSbufTypedObtain(SBUF_IPC);
     g_reply = HdfSbufTypedObtain(SBUF_IPC);
     if (g_data == NULL || g_reply == NULL) {
         HDF_LOGE("%s: GetService err", __func__);
+        return HDF_FAILURE;
+    }
+
+    if (HdfRemoteServiceWriteInterfaceToken(g_acmService, g_data) == false) {
+        HDF_LOGE("%{public}s:%{public}d write interface token fail\n", __func__, __LINE__);
         return HDF_FAILURE;
     }
 

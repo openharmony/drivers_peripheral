@@ -15,6 +15,7 @@
 
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
+#include "hdf_device_object.h"
 #include "device_resource_if.h"
 #include "hdf_log.h"
 #include "osal_mem.h"
@@ -700,6 +701,12 @@ int32_t MasterDispatch(struct HdfDeviceIoClient *client, int32_t cmdId, struct H
         HDF_LOGE("%s: client is NULL", __func__);
         return HDF_FAILURE;
     }
+
+    if (HdfDeviceObjectCheckInterfaceDesc(client->device, data) == false) {
+        HDF_LOGE("%{public}s:%{public}d check interface desc fail", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
     switch (cmdId) {
         case DEV_MASTER_INIT:
             ret = UsbFnRegistUsbfnDevice(client, data, reply);
@@ -731,6 +738,13 @@ static int32_t MasterDriverBind(struct HdfDeviceObject *device)
         HDF_LOGE("%s: usbfn Alloc usb devMgr failed", __func__);
         return HDF_FAILURE;
     }
+
+    if (HdfDeviceObjectSetInterfaceDesc(device, "hdf.usb.usbfn") != HDF_SUCCESS) {
+        HDF_LOGE(" Set Desc fail!");
+        OsalMemFree(devMgr);
+        return HDF_FAILURE;
+    }
+
     devMgr->device  = device;
     device->service = &(devMgr->service);
     devMgr->device->service->Dispatch = MasterDispatch;
