@@ -17,7 +17,6 @@
 #define WIFI_DRIVER_CLIENT_H
 
 #include <stdint.h>
-#include <stddef.h>
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -258,8 +257,8 @@ typedef struct {
 } WifiFreqParams;
 
 typedef struct {
-    size_t headLen;
-    size_t tailLen;
+    uint32_t headLen;
+    uint32_t tailLen;
     uint8_t *head;
     uint8_t *tail;
 } WifiBeaconData;
@@ -267,13 +266,13 @@ typedef struct {
 typedef struct {
     WifiFreqParams freqParams;
     WifiBeaconData beaconData;
-    size_t ssidLen;
+    uint32_t ssidLen;
     int32_t beaconInterval;
     int32_t dtimPeriod;
     uint8_t *ssid;
     uint8_t hiddenSsid;
     uint8_t authType;
-    size_t meshSsidLen;
+    uint32_t meshSsidLen;
     uint8_t *meshSsid;
 } WifiApSetting;
 
@@ -284,7 +283,7 @@ typedef struct {
 
 typedef struct {
     uint32_t freq;
-    size_t dataLen;
+    uint32_t dataLen;
     uint8_t *data;
     uint64_t *cookie;
 } WifiMlmeData;
@@ -331,7 +330,7 @@ typedef struct {
 
 typedef struct {
     uint8_t ssid[MAX_SSID_LEN];
-    size_t ssidLen;
+    uint32_t ssidLen;
 } WifiDriverScanSsid;
 
 typedef struct {
@@ -390,7 +389,7 @@ typedef struct {
     uint8_t src[ETH_ADDR_LEN];
     uint8_t bssid[ETH_ADDR_LEN];
     uint8_t *data;
-    size_t dataLen;
+    uint32_t dataLen;
 } WifiActionData;
 
 typedef struct {
