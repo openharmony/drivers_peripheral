@@ -103,7 +103,7 @@ static int32_t SerCodecGetCapbility(struct HdfDeviceIoClient *client, struct Hdf
     }
     return errNum;
 }
-// todo handle+buffer
+
 static int32_t SerCodecCreate(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t len = 0;
@@ -165,7 +165,6 @@ static int32_t SerCodecDestroy(struct HdfDeviceIoClient *client, struct HdfSBuf 
     return errNum;
 }
 
-// todo handle
 static int32_t SerCodecSetPortMode(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t errNum;
@@ -192,7 +191,7 @@ static int32_t SerCodecSetPortMode(struct HdfDeviceIoClient *client, struct HdfS
     }
     return errNum;
 }
-// todo handle
+
 static int32_t SerCodecSetParameter(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t errNum;
