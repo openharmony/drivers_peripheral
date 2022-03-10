@@ -136,45 +136,6 @@ ohos_unittest("test_capacity_shutdown") {
   ]
 }
 
-##############################unittest##########################################
-ohos_unittest("test_input_event") {
-  module_out_path = module_output_path
-
-  include_dirs =
-      [ "${battery_manager_path}/interfaces/innerkits/native/include" ]
-
-  sources = [ "src/hdi_input_test.cpp" ]
-
-  configs = [
-    "${utils_path}:utils_config",
-    ":module_private_config",
-  ]
-
-  deps = [
-    "${battery_manager_path}/interfaces/innerkits:batterysrv_client",
-    "//base/powermgr/battery_manager/charger/ui:libminui",
-    "//base/powermgr/battery_manager/services:batteryservice",
-    "//base/powermgr/power_manager/interfaces/innerkits:powermgr_client",
-    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
-    "//drivers/interface/battery/v1_0:libbattery_proxy_1.0",
-    "//drivers/interface/battery/v1_0:libbattery_stub_1.0",
-    "//drivers/peripheral/powermgr/battery/interfaces/hdi_callback:libbattery_callback",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-    "//third_party/jsoncpp:jsoncpp",
-    "//utils/native/base:utils",
-  ]
-
-  external_deps = [
-    "device_driver_framework:libhdf_host",
-    "device_driver_framework:libhdf_ipc_adapter",
-    "device_driver_framework:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver:hdi_input",
-    "ipc:ipc_single",
-  ]
-}
-
 group("unittest") {
   testonly = true
   deps = []
@@ -182,6 +143,5 @@ group("unittest") {
   deps += [
     ":test_capacity_shutdown",
     ":test_hdisrv",
-    ":test_input_event",
   ]
 }
