@@ -197,7 +197,6 @@ int32_t CodecProxyGetCapbility(struct ICodec *self, AvCodecMime mime, CodecType 
     return ret;
 }
 
-// todo handle
 int32_t CodecProxyCreate(struct ICodec *self, const char* name, const Param *attr, int len, CODEC_HANDLETYPE *handle)
 {
     struct HdfSBuf *data = NULL;
@@ -246,7 +245,6 @@ int32_t CodecProxyCreate(struct ICodec *self, const char* name, const Param *att
     return ret;
 }
 
-// todo handle
 int32_t CodecProxyDestroy(struct ICodec *self, CODEC_HANDLETYPE handle)
 {
     int32_t ret;
