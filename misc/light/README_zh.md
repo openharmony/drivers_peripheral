@@ -73,11 +73,10 @@ void LightSample(void)
  	ret = g_lightDev->GetLightInfo(&g_lightInfo, &g_count);
 
     /* 按照指定的灯颜色，常亮模式打开灯列表中可用的灯 */
-    effect.lightBrightness = 0x80000000;
+    effect.lightBrightness = 0x80000000; // 亮度值，RGB最高位表示颜色：R:16-31位、G:8-15位、B:0-7位
     effect.flashEffect.flashMode = LIGHT_FLASH_NONE;
 
     for (i = 0; i < g_count; ++i) {
-
         ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightType, &effect);
         EXPECT_EQ(0, ret);
 
@@ -89,8 +88,8 @@ void LightSample(void)
     /* 按照指定的灯颜色，闪烁模式打开灯列表中可用的灯 */
     effect.lightBrightness = 0x80000000;
     effect.flashEffect.flashMode = LIGHT_FLASH_TIMED;
-    effect.flashEffect.onTime = g_onTime;    /*  一个闪烁周期内亮灯时长（ms） */
-    effect.flashEffect.offTime = g_offTime;    /* 一个闪烁周期内熄灯时长（ms） */
+    effect.flashEffect.onTime = g_onTime;    // 一个闪烁周期内亮灯时长（ms）
+    effect.flashEffect.offTime = g_offTime;    // 一个闪烁周期内熄灯时长（ms）
     
     for (i = 0; i < g_count; ++i) {
         ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightType, &effect);
@@ -123,4 +122,7 @@ void LightSample(void)
 [drivers_adapter](https://gitee.com/openharmony/drivers_adapter/blob/master/README_zh.md)
 
 [drivers_adapter_khdf_linuk](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README_zh.md)
-drivers_peripheral
+[drivers_peripheral](https://gitee.com/openharmony/drivers_peripheral)
+
+[drivers_interface](https://gitee.com/openharmony/drivers_interface)
+
