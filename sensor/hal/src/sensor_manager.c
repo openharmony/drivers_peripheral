@@ -124,8 +124,8 @@ static void ReleaseSensorServiceList()
 static int32_t InitSensorManager(void)
 {
     struct SensorDevManager *manager = GetSensorDevManager();
-    manager->recordDataCb[TRADITIONAL_SENSOR_TYPE_INDEX] = NULL;
-    manager->recordDataCb[MEDICAL_SENSOR_TYPE_INDEX] = NULL;
+    manager->recordDataCb[TRADITIONAL_SENSOR_TYPE] = NULL;
+    manager->recordDataCb[MEDICAL_SENSOR_TYPE] = NULL;
     DListHeadInit(&manager->managerHead);
     DListHeadInit(&manager->sensorIdListHead);
     OsalMutexInit(&manager->mutex);
@@ -174,8 +174,8 @@ int32_t FreeSensorInterfaceInstance(void)
 
     ReleaseAllSensorInfo();
     ReleaseSensorServiceList();
-    manager->recordDataCb[TRADITIONAL_SENSOR_TYPE_INDEX] = NULL;
-    manager->recordDataCb[MEDICAL_SENSOR_TYPE_INDEX] = NULL;
+    manager->recordDataCb[TRADITIONAL_SENSOR_TYPE] = NULL;
+    manager->recordDataCb[MEDICAL_SENSOR_TYPE] = NULL;
 
     OsalMutexDestroy(&manager->mutex);
     OsalMutexDestroy(&manager->eventMutex);

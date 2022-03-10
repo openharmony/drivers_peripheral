@@ -136,7 +136,7 @@ struct SensorInterface {
     /**
      * @brief Registers the callback for reporting sensor data to the subscriber.
      *
-     * @param sensorId Indicates the sensor ID. For details, see {@link SensorTypeTag}.
+     * @param groupId Indicates the sensor group ID.
      * The sensorId enumeration value range is 128-160, which means that the medical sensor service is subscribed.
      * It only needs to be subscribed once successfully, and there is no need to subscribe repeatedly.
      * The sensorId enumeration value range is not within 128-160, which means that the traditional sensor
@@ -147,12 +147,12 @@ struct SensorInterface {
      * @since 2.2
      * @version 1.0
      */
-    int32_t (*Register)(int32_t sensorId, RecordDataCallback cb);
+    int32_t (*Register)(int32_t groupId, RecordDataCallback cb);
 
     /**
      * @brief Deregisters the callback for reporting sensor data.
      *
-     * @param sensorId Indicates the sensor ID. For details, see {@link SensorTypeTag}.
+     * @param groupId Indicates the sensor group ID.
      * The sensorId enumeration value range is 128-160, which means that the medical sensor service is subscribed.
      * It only needs to cancel the subscription once successfully, and there is no need to
      * cancel the subscription repeatedly. The sensorId enumeration value range is not within 128-160,
@@ -163,7 +163,7 @@ struct SensorInterface {
      * @since 2.2
      * @version 1.0
      */
-    int32_t (*Unregister)(int32_t sensorId, RecordDataCallback cb);
+    int32_t (*Unregister)(int32_t groupId, RecordDataCallback cb);
 };
 
 /**

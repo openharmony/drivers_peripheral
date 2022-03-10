@@ -24,7 +24,7 @@ group("sensor_entry") {
         exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
 
     if (HAVE_SENSOR_DAL_SERVICE) {
-      deps += [ "${HDI_SENSOR_SERVICE_PATH}:dal_serivce" ]
+      deps += [ "${HDI_SENSOR_SERVICE_PATH}:dal_service" ]
     } else {
       deps += [
         "hal:hdi_sensor",
