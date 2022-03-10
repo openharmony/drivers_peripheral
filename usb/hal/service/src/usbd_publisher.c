@@ -26,6 +26,12 @@ void NotifySubscriberDevice(const struct UsbdSubscriber *subscriber, enum UsbdDe
         return;
     }
     struct HdfRemoteService *service = subscriber->remoteService;
+
+    if (HdfRemoteServiceSetInterfaceDesc(service, "hdf.usb.usbdsubscriber") == false) {
+        HDF_LOGE("%{public}s:%{public}d set desc fail\n", __func__, __LINE__);
+        return;
+    }
+
     struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
     struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
@@ -34,6 +40,14 @@ void NotifySubscriberDevice(const struct UsbdSubscriber *subscriber, enum UsbdDe
         HdfSbufRecycle(reply);
         return;
     }
+
+    if (HdfRemoteServiceWriteInterfaceToken(service, data) == false) {
+        HDF_LOGE("%{public}s:%{public}d write interface token fail\n", __func__, __LINE__);
+        HdfSbufRecycle(data);
+        HdfSbufRecycle(reply);
+        return;
+    }
+
     HdfSbufWriteInt32(data, act);
     HdfSbufWriteInt32(data, busNum);
     HdfSbufWriteInt32(data, devNum);

@@ -21,6 +21,9 @@
 
 #define USB_MAX_INTERFACES 32
 
+#define HDF_USB_USBD_DESC "hdf.usb.usbd"
+#define HDF_USB_USBFN_DESC "hdf.usb.usbfn"
+
 /**
  * Bitmask used for extracting the USBEndpoint direction from it's address
  */
