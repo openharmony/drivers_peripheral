@@ -64,6 +64,7 @@
 static const int32_t CMD_OFFSET_5 = 5;
 static const int32_t DIRECTION_OFFSET_7 = 7;
 static const int32_t TYPE_OFFSET_8 = 8;
+static const char* USB_TOKEN_VALUE = "UsbdBulkCallback.V1_0";
 
 enum UsbdReqNodeStatus {
     USBD_REQNODE_INIT,
@@ -2590,6 +2591,11 @@ static int32_t UsbdBulkReadRemoteCallback(struct HdfRemoteService *service, int3
             ret = HDF_ERR_IO;
             break;
         }
+        if (!HdfRemoteServiceWriteInterfaceToken(service, data)) {
+            HDF_LOGE("%{public}s:%{public}d write interface token failed", __func__, __LINE__);
+            ret = HDF_ERR_IO;
+            break;
+        }
         if (!HdfSbufWriteInt32(data, status)) {
             HDF_LOGE("%{public}s:%{public}d write status error status:%{public}d", __func__, __LINE__, status);
             ret = HDF_ERR_IO;
@@ -2631,6 +2637,11 @@ static int32_t UsbdBulkWriteRemoteCallback(struct HdfRemoteService *service, int
     do {
         if (data == NULL || reply == NULL) {
             HDF_LOGE("%{public}s:%{public}d failed to obtain hdf sbuf", __func__, __LINE__);
+            ret = HDF_ERR_IO;
+            break;
+        }
+        if (!HdfRemoteServiceWriteInterfaceToken(service, data)) {
+            HDF_LOGE("%{public}s:%{public}d write interface token failed", __func__, __LINE__);
             ret = HDF_ERR_IO;
             break;
         }
@@ -3013,6 +3024,11 @@ static int32_t FunRegBulkCallback(struct HostDevice *port, struct HdfSBuf *data,
     list->cb = HdfSbufReadRemoteService(data);
     if (!list->cb) {
         HDF_LOGE("%{public}s:%{public}d get callback error", __func__, __LINE__);
+        return HDF_ERR_IO;
+    }
+    if (!HdfRemoteServiceSetInterfaceDesc(list->cb, USB_TOKEN_VALUE)) {
+        HDF_LOGE("%{public}s: failed to init interface desc", __func__);
+        HdfRemoteServiceRecycle(list->cb);
         return HDF_ERR_IO;
     }
     return HDF_SUCCESS;
