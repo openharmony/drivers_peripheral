@@ -66,10 +66,23 @@ static int32_t SendCmdToService(const char *name, int32_t cmd, unsigned char fun
         return HDF_FAILURE;
     }
 
+    if (HdfRemoteServiceSetInterfaceDesc(service, HDF_USB_USBFN_DESC) == false) {
+        HDF_LOGE("%{public}s:%{public}d set desc fail\n", __func__, __LINE__);
+        return HDF_FAILURE;
+    }
+
     data = HdfSbufTypedObtain(SBUF_IPC);
     reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s:%{public}d data or reply err\n", __func__, __LINE__);
+        HdfRemoteServiceRecycle(service);
+        return HDF_FAILURE;
+    }
+
+    if (HdfRemoteServiceWriteInterfaceToken(service, data) == false) {
+        HDF_LOGE("%{public}s:%{public}d write interface token fail\n", __func__, __LINE__);
+        HdfSbufRecycle(data);
+        HdfSbufRecycle(reply);
         HdfRemoteServiceRecycle(service);
         return HDF_FAILURE;
     }

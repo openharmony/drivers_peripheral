@@ -16,6 +16,7 @@
 #include "usbd.h"
 #include "hdf_log.h"
 #include "securec.h"
+#include "hdf_device_object.h"
 #include "usb_ddk_pnp_loader.h"
 #include "usbd_dispatcher.h"
 
@@ -126,6 +127,13 @@ static int32_t UsbdDriverBind(struct HdfDeviceObject *device)
     if (info != NULL) {
         UsbdDeviceCreateAndAttach(dev, info->busNum, info->devNum);
     }
+
+    if (HdfDeviceObjectSetInterfaceDesc(device, HDF_USB_USBD_DESC) != HDF_SUCCESS) {
+        HDF_LOGE(" Set Desc fail!");
+        OsalMemFree(dev);
+        return HDF_FAILURE;
+    }
+
     device->service = &(dev->service);
     device->service->Dispatch = UsbdServiceDispatch;
     dev->device = device;
