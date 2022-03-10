@@ -77,6 +77,11 @@ int32_t UsbdClient::BindUsbdSubscriber(const sptr<UsbdSubscriber> &subscriber)
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     data.WriteRemoteObject(subscriber);
     return DoDispatch(CMD_BIND_USB_SUBSCRIBER, data, reply);
 }
@@ -86,6 +91,11 @@ int32_t UsbdClient::UnbindUsbdSubscriber(const sptr<UsbdSubscriber> &subscriber)
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     data.WriteRemoteObject(subscriber);
     return DoDispatch(CMD_UNBIND_USB_SUBSCRIBER, data, reply);
 }
@@ -94,6 +104,11 @@ int32_t UsbdClient::OpenDevice(const UsbDev &dev)
 {
     MessageParcel data;
     MessageParcel reply;
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
 
     UsbdClient::SetDeviceMessage(data, dev);
     int32_t ret = DoDispatch(CMD_FUN_OPEN_DEVICE, data, reply);
@@ -109,6 +124,11 @@ int32_t UsbdClient::GetCurrentFunctions(int32_t &funcs)
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     int32_t ret = DoDispatch(CMD_FUN_GET_CURRENT_FUNCTIONS, data, reply);
     if (FAILED(ret)) {
         HDF_LOGE("CMD_FUN_GET_CURRENT_FUNCTIONS failed, return INVALID_USB_INT_VALUE");
@@ -123,6 +143,11 @@ int32_t UsbdClient::SetCurrentFunctions(int32_t funcs)
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     WRITE_PARCEL_WITH_RET(data, Int32, funcs, UEC_SERVICE_WRITE_PARCEL_ERROR);
     int32_t ret = DoDispatch(CMD_FUN_SET_CURRENT_FUNCTIONS, data, reply);
     if (FAILED(ret)) {
@@ -136,6 +161,11 @@ int32_t UsbdClient::SetPortRole(int32_t portId, int32_t powerRole, int32_t dataR
 {
     MessageParcel data;
     MessageParcel reply;
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
 
     WRITE_PARCEL_WITH_RET(data, Int32, portId, UEC_SERVICE_WRITE_PARCEL_ERROR);
     WRITE_PARCEL_WITH_RET(data, Int32, powerRole, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -153,6 +183,11 @@ int32_t UsbdClient::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &data
 {
     MessageParcel data;
     MessageParcel reply;
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
 
     int32_t ret = DoDispatch(CMD_QUERY_PORT, data, reply);
     READ_PARCEL_WITH_RET(reply, Int32, portId, UEC_SERVICE_READ_PARCEL_ERROR);
@@ -173,6 +208,7 @@ int32_t UsbdClient::DoDispatch(uint32_t cmd, MessageParcel &data, MessageParcel 
         HDF_LOGE(" get usbd service failed.");
         return UEC_SERVICE_NO_INIT;
     }
+
     MessageOption option;
     auto ret = usbd->SendRequest(cmd, data, reply, option);
     if (ret != UEC_OK) {
@@ -186,6 +222,11 @@ int32_t UsbdClient::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &de
 {
     MessageParcel data;
     MessageParcel reply;
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
 
     UsbdClient::SetDeviceMessage(data, dev);
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_GET_DESCRIPTOR, data, reply);
@@ -205,6 +246,11 @@ int32_t UsbdClient::GetFileDescriptor(const UsbDev &dev, int32_t &fd)
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     UsbdClient::SetDeviceMessage(data, dev);
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_GET_FILEDESCRIPTOR, data, reply);
     if (ret != UEC_OK) {
@@ -220,6 +266,11 @@ int32_t UsbdClient::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> 
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     UsbdClient::SetDeviceMessage(data, dev);
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_GET_DEVICE_DESCRIPTOR, data, reply);
     if (ret != UEC_OK) {
@@ -234,6 +285,11 @@ int32_t UsbdClient::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::
 {
     MessageParcel data;
     MessageParcel reply;
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
 
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, descId, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -254,6 +310,11 @@ int32_t UsbdClient::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, descId, UEC_SERVICE_WRITE_PARCEL_ERROR);
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_GET_CONFIG_DESCRIPTOR, data, reply);
@@ -273,6 +334,11 @@ int32_t UsbdClient::SetConfig(const UsbDev &dev, uint8_t configIndex)
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, configIndex, UEC_SERVICE_WRITE_PARCEL_ERROR);
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_SET_CONFIG, data, reply);
@@ -286,6 +352,11 @@ int32_t UsbdClient::GetConfig(const UsbDev &dev, uint8_t &configIndex)
 {
     MessageParcel data;
     MessageParcel reply;
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
 
     UsbdClient::SetDeviceMessage(data, dev);
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_GET_CONFIG, data, reply);
@@ -302,6 +373,11 @@ int32_t UsbdClient::ClaimInterface(const UsbDev &dev, uint8_t interfaceIndex, ui
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, interfaceIndex, UEC_SERVICE_WRITE_PARCEL_ERROR);
     WRITE_PARCEL_WITH_RET(data, Uint8, force, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -317,6 +393,11 @@ int32_t UsbdClient::ReleaseInterface(const UsbDev &dev, uint8_t interfaceIndex)
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, interfaceIndex, UEC_SERVICE_WRITE_PARCEL_ERROR);
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_RELEASE_INTERFACE, data, reply);
@@ -330,6 +411,11 @@ int32_t UsbdClient::SetInterface(const UsbDev &dev, uint8_t interfaceIndex, uint
 {
     MessageParcel data;
     MessageParcel reply;
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
 
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, interfaceIndex, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -346,6 +432,11 @@ int32_t UsbdClient::BulkTransferRead(const UsbDev &devInfo, const UsbPipe &pipe,
 {
     MessageParcel data;
     MessageParcel reply;
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
 
     SetDeviceMessage(data, devInfo);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.interfaceId, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -369,6 +460,11 @@ int32_t UsbdClient::BulkTransferWrite(const UsbDev &dev, const UsbPipe &pipe, in
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.interfaceId, UEC_SERVICE_WRITE_PARCEL_ERROR);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.endpointId, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -390,6 +486,11 @@ int32_t UsbdClient::ControlTransfer(const UsbDev &dev, const UsbCtrlTransfer &ct
     int32_t ret;
     MessageParcel data;
     MessageParcel reply;
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
 
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Int32, ctrl.requestType, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -425,6 +526,11 @@ int32_t UsbdClient::InterruptTransferRead(const UsbDev &dev, const UsbPipe &pipe
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.interfaceId, UEC_SERVICE_WRITE_PARCEL_ERROR);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.endpointId, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -448,6 +554,11 @@ int32_t UsbdClient::InterruptTransferWrite(const UsbDev &dev, const UsbPipe &pip
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.interfaceId, UEC_SERVICE_WRITE_PARCEL_ERROR);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.endpointId, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -469,6 +580,11 @@ int32_t UsbdClient::IsoTransferRead(const UsbDev &devInfo, const UsbPipe &pipe, 
 {
     MessageParcel data;
     MessageParcel reply;
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
 
     SetDeviceMessage(data, devInfo);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.interfaceId, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -493,6 +609,11 @@ int32_t UsbdClient::IsoTransferWrite(const UsbDev &devInfo, const UsbPipe &pipe,
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     SetDeviceMessage(data, devInfo);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.interfaceId, UEC_SERVICE_WRITE_PARCEL_ERROR);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.endpointId, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -514,6 +635,11 @@ int32_t UsbdClient::CloseDevice(const UsbDev &dev)
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     UsbdClient::SetDeviceMessage(data, dev);
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_CLOSE_DEVICE, data, reply);
     if (ret != UEC_OK) {
@@ -528,6 +654,11 @@ int32_t UsbdClient::RequestQueue(const UsbDev &dev, const UsbPipe &pipe, const s
 {
     MessageParcel data;
     MessageParcel reply;
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
 
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.interfaceId, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -556,6 +687,12 @@ int32_t UsbdClient::RequestWait(const UsbDev &dev, std::vector<uint8_t> &clientD
 {
     MessageParcel data;
     MessageParcel reply;
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Int32, timeout, UEC_SERVICE_WRITE_PARCEL_ERROR);
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_REQUEST_WAIT, data, reply);
@@ -582,6 +719,11 @@ int32_t UsbdClient::RequestCancel(const UsbDev &dev, const UsbPipe &pipe)
 {
     MessageParcel data;
     MessageParcel reply;
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
 
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.interfaceId, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -648,6 +790,11 @@ int32_t UsbdClient::RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, cons
     MessageParcel data;
     MessageParcel reply;
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.interfaceId, UEC_SERVICE_WRITE_PARCEL_ERROR);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.endpointId, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -663,6 +810,11 @@ int32_t UsbdClient::UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
 {
     MessageParcel data;
     MessageParcel reply;
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
 
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.interfaceId, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -682,6 +834,11 @@ int32_t UsbdClient::BulkRead(const UsbDev &dev, const UsbPipe &pipe, sptr<Ashmem
     if (ashmem == nullptr) {
         HDF_LOGE("%{public}s:%{public}d BulkRead error ashmem", __func__, __LINE__);
         return UEC_HDF_ERR_INVALID_PARAM;
+    }
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
     }
 
     UsbdClient::SetDeviceMessage(data, dev);
@@ -705,6 +862,11 @@ int32_t UsbdClient::BulkWrite(const UsbDev &dev, const UsbPipe &pipe, sptr<Ashme
         return UEC_HDF_ERR_INVALID_PARAM;
     }
 
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
+
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.interfaceId, UEC_SERVICE_WRITE_PARCEL_ERROR);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.endpointId, UEC_SERVICE_WRITE_PARCEL_ERROR);
@@ -721,6 +883,11 @@ int32_t UsbdClient::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
 {
     MessageParcel data;
     MessageParcel reply;
+
+    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+        HDF_LOGE(" WriteInterfaceToken failed.");
+        return UEC_HDF_FAILURE;
+    }
 
     UsbdClient::SetDeviceMessage(data, dev);
     WRITE_PARCEL_WITH_RET(data, Uint8, pipe.interfaceId, UEC_SERVICE_WRITE_PARCEL_ERROR);
