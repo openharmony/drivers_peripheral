@@ -264,5 +264,5 @@ Format驱动提供给framework层可直接调用的能力接口，主要功能�
 
 [drivers\_adapter\_khdf\_linux](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README_zh.md)
 
-drivers\_peripheral
+[drivers\_peripheral](https://gitee.com/openharmony/drivers_peripheral)
 
