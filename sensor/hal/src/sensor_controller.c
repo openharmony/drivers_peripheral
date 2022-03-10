@@ -288,6 +288,10 @@ static int32_t DisableSensor(int32_t sensorId)
 
 static int32_t SetSensorBatch(int32_t sensorId, int64_t samplingInterval, int64_t interval)
 {
+    if (samplingInterval < 0) {
+        HDF_LOGE("%{public}s: invalide param , samplingInterval is [%{public}lld]", __func__, samplingInterval);
+        return SENSOR_INVALID_PARAM;
+    }
     struct HdfSBuf *msg = HdfSbufObtainDefaultSize();
     if (msg == NULL) {
         HDF_LOGE("%{public}s: Msg failed to obtain sBuf", __func__);

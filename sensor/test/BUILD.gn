@@ -27,9 +27,6 @@ if (defined(ohos_lite)) {
 } else {
   group("hdf_test_sensor") {
     testonly = true
-    deps = [
-      "unittest:hdf_unittest_sensor",
-      "unittest/hdi:hdi_unittest_sensor",
-    ]
+    deps = [ "unittest/hdi:hdi_unittest_sensor" ]
   }
 }

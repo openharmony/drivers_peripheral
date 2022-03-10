@@ -28,6 +28,7 @@ public:
     virtual ~SensorCallbackImpl() {}
 
     int32_t OnDataEvent(const HdfSensorEvents& event) override;
+    static uint32_t sensorDataFlag;
 };
 } // V1_0
 } // Sensor
