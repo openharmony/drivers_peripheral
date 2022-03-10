@@ -16,8 +16,8 @@
 #include "hci_watcher.h"
 #include <thread>
 #include <unistd.h>
+#include <sys/select.h>
 #include <sys/syscall.h>
-#include "sys/select.h"
 #include <hdf_log.h>
 #include "bt_hal_constant.h"
 
