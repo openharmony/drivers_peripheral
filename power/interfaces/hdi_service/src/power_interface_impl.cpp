@@ -38,10 +38,11 @@ static constexpr const char * const SUSPEND_STATE_PATH = "/sys/power/state";
 static constexpr const char * const LOCK_PATH = "/sys/power/wake_lock";
 static constexpr const char * const UNLOCK_PATH = "/sys/power/wake_unlock";
 static constexpr const char * const WAKEUP_COUNT_PATH = "/sys/power/wakeup_count";
-static std::chrono::milliseconds waitTime_; // {100ms};
+static std::chrono::milliseconds waitTime_(100); // {100ms};
 static std::mutex mutex_;
 static std::unique_ptr<std::thread> daemon_;
 static bool suspending_;
+static bool suspendRetry_;
 static sptr<IPowerHdiCallback> callback_;
 static UniqueFd wakeupCountFd;
 static void AutoSuspendLoop();
@@ -64,6 +65,7 @@ int32_t PowerInterfaceImpl::StartSuspend()
         return HDF_SUCCESS;
     }
     suspending_ = true;
+    suspendRetry_ = true;
     daemon_ = std::make_unique<std::thread>(&AutoSuspendLoop);
     daemon_->detach();
     return HDF_SUCCESS;
@@ -71,7 +73,7 @@ int32_t PowerInterfaceImpl::StartSuspend()
 
 void AutoSuspendLoop()
 {
-    while (suspending_) {
+    while (suspendRetry_) {
         std::this_thread::sleep_for(waitTime_);
 
         const std::string wakeupCount = ReadWakeCount();
@@ -81,12 +83,16 @@ void AutoSuspendLoop()
         if (!WriteWakeCount(wakeupCount)) {
             continue;
         }
-        NotifyCallback(CMD_ON_SUSPEND);
-        DoSuspend();
-        NotifyCallback(CMD_ON_WAKEUP);
-        break;
+        // suspendRetry_ could be changed while read wakeup count
+        if (suspendRetry_) {
+            NotifyCallback(CMD_ON_SUSPEND);
+            DoSuspend();
+            NotifyCallback(CMD_ON_WAKEUP);
+            break;
+        }
     }
     suspending_ = false;
+    suspendRetry_ = false;
 }
 
 int32_t DoSuspend()
@@ -108,31 +114,30 @@ void NotifyCallback(int code)
     if (callback_ == nullptr) {
         return;
     }
-
-    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
-    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
-    if (data == nullptr || reply == nullptr) {
-        return;
+    switch (code) {
+        case CMD_ON_SUSPEND:
+            callback_->OnSuspend();
+            break;
+        case CMD_ON_WAKEUP:
+            callback_->OnWakeup();
+            break;
+        default:
+            break;
     }
-
-    std::shared_ptr<PowerInterfaceImpl> powerInterfaceImpl = std::make_shared<PowerInterfaceImpl>();
-    powerInterfaceImpl->RegisterCallback(callback_);
-    HdfSbufRecycle(data);
-    HdfSbufRecycle(reply);
 }
 
 int32_t PowerInterfaceImpl::StopSuspend()
 {
-    if (suspending_) {
-        suspending_ = false;
+    if (suspendRetry_) {
+        suspendRetry_ = false;
     }
     return HDF_SUCCESS;
 }
 
 int32_t PowerInterfaceImpl::ForceSuspend()
 {
-    if (suspending_) {
-        suspending_ = false;
+    if (suspendRetry_) {
+        suspendRetry_ = false;
     }
     NotifyCallback(CMD_ON_SUSPEND);
     DoSuspend();
