@@ -53,6 +53,11 @@ int32_t StreamOperatorCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel
 int32_t StreamOperatorCallbackStub::OnCaptureStartedStub(MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != StreamOperatorCallbackStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     int32_t captureId = data.ReadInt32();
     std::vector<int32_t> streamIds;
     if (!data.ReadInt32Vector(&streamIds)) {
@@ -67,6 +72,11 @@ int32_t StreamOperatorCallbackStub::OnCaptureStartedStub(MessageParcel &data, Me
 int32_t StreamOperatorCallbackStub::OnCaptureEndedStub(MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != StreamOperatorCallbackStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     int32_t captureId = data.ReadInt32();
     int32_t count = data.ReadInt32();
     std::vector<std::shared_ptr<CaptureEndedInfo>> info;
@@ -91,6 +101,11 @@ int32_t StreamOperatorCallbackStub::OnCaptureEndedStub(MessageParcel &data, Mess
 int32_t StreamOperatorCallbackStub::OnCaptureErrorStub(MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != StreamOperatorCallbackStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     int32_t captureId = data.ReadInt32();
     int32_t count = data.ReadInt32();
     std::vector<std::shared_ptr<CaptureErrorInfo>> info;
@@ -115,6 +130,11 @@ int32_t StreamOperatorCallbackStub::OnCaptureErrorStub(MessageParcel &data, Mess
 int32_t StreamOperatorCallbackStub::OnFrameShutterStub(MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != StreamOperatorCallbackStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     int32_t captureId = data.ReadInt32();
     std::vector<int32_t> streamIds;
     if (!data.ReadInt32Vector(&streamIds)) {

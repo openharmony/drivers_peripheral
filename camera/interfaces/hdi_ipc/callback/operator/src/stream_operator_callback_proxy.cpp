@@ -25,6 +25,11 @@ void StreamOperatorCallbackProxy::OnCaptureStarted(int32_t captureId, const std:
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(StreamOperatorCallbackProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return;
+    }
+
     if (!data.WriteInt32(captureId)) {
         HDF_LOGE("%{public}s: write captureId failed.", __func__);
         return;
@@ -49,6 +54,11 @@ void StreamOperatorCallbackProxy::OnCaptureEnded(int32_t captureId,
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+
+    if (!data.WriteInterfaceToken(StreamOperatorCallbackProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return;
+    }
 
     if (!data.WriteInt32(captureId)) {
         HDF_LOGE("%{public}s: write captureId failed.", __func__);
@@ -84,6 +94,11 @@ void StreamOperatorCallbackProxy::OnCaptureError(int32_t captureId,
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(StreamOperatorCallbackProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return;
+    }
+
     if (!data.WriteInt32(captureId)) {
         HDF_LOGE("%{public}s: write captureId failed.", __func__);
         return;
@@ -118,6 +133,12 @@ void StreamOperatorCallbackProxy::OnFrameShutter(int32_t captureId,
     MessageParcel reply;
     MessageOption option;
     HDF_LOGV("%{public}s: enter OnFrameShutter Callback", __func__);
+
+    if (!data.WriteInterfaceToken(StreamOperatorCallbackProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return;
+    }
+
     if (!data.WriteInt32(captureId)) {
         HDF_LOGE("%{public}s: write captureId failed.", __func__);
         return;
