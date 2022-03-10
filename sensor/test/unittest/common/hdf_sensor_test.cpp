@@ -133,6 +133,7 @@ void HdfSensorTest::SetUpTestCase()
     g_sensorDev = NewSensorInterfaceInstance();
     if (g_sensorDev == nullptr) {
         printf("test sensorHdi get Module instance failed\n\r");
+        return;
     }
     int32_t ret = g_sensorDev->GetAllSensors(&g_sensorInfo, &g_count);
     if (ret == -1) {
