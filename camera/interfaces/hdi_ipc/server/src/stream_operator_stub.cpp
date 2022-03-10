@@ -80,6 +80,11 @@ int32_t StreamOperatorStub::OnRemoteRequest(uint32_t code, MessageParcel &data, 
 int32_t StreamOperatorStub::StreamOperatorStubIsStreamsSupported(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     OperationMode operationMode = static_cast<OperationMode>(data.ReadInt32());
 
     std::shared_ptr<CameraStandard::CameraMetadata> metadata = nullptr;
@@ -114,6 +119,11 @@ int32_t StreamOperatorStub::StreamOperatorStubIsStreamsSupported(
 int32_t StreamOperatorStub::StreamOperatorStubCreateStreams(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     int32_t count = data.ReadInt32();
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
     for (int i = 0; i < count; i++) {
@@ -134,6 +144,11 @@ int32_t StreamOperatorStub::StreamOperatorStubCreateStreams(
 int32_t StreamOperatorStub::StreamOperatorStubReleaseStreams(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     std::vector<int32_t> streamIds;
     if (!data.ReadInt32Vector(&streamIds)) {
         HDF_LOGE("%s: read streamIds failed", __func__);
@@ -152,6 +167,11 @@ int32_t StreamOperatorStub::StreamOperatorStubReleaseStreams(
 int32_t StreamOperatorStub::StreamOperatorStubCommitStreams(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     OperationMode mode = static_cast<OperationMode>(data.ReadInt32());
 
     std::shared_ptr<CameraStandard::CameraMetadata> metadata = nullptr;
@@ -169,6 +189,11 @@ int32_t StreamOperatorStub::StreamOperatorStubCommitStreams(
 int32_t StreamOperatorStub::StreamOperatorStubGetStreamAttributes(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     std::vector<std::shared_ptr<StreamAttribute>> attributes;
     CamRetCode ret = GetStreamAttributes(attributes);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
@@ -195,6 +220,11 @@ int32_t StreamOperatorStub::StreamOperatorStubGetStreamAttributes(
 int32_t StreamOperatorStub::StreamOperatorStubAttachBufferQueue(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     int32_t streamId = data.ReadInt32();
     sptr<IRemoteObject> remoteObj = data.ReadRemoteObject();
     const sptr<OHOS::IBufferProducer> bufferProducer =
@@ -212,6 +242,11 @@ int32_t StreamOperatorStub::StreamOperatorStubAttachBufferQueue(
 int32_t StreamOperatorStub::StreamOperatorStubDetachBufferQueue(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     int32_t streamId = data.ReadInt32();
     CamRetCode ret = DetachBufferQueue(streamId);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
@@ -225,6 +260,11 @@ int32_t StreamOperatorStub::StreamOperatorStubDetachBufferQueue(
 int32_t StreamOperatorStub::StreamOperatorStubCapture(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     int captureId = static_cast<int>(data.ReadInt32());
 
     std::vector<int32_t> streamIds;
@@ -256,6 +296,11 @@ int32_t StreamOperatorStub::StreamOperatorStubCapture(
 int32_t StreamOperatorStub::StreamOperatorStubCancelCapture(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     int32_t captureId = data.ReadInt32();
     CamRetCode ret = CancelCapture(captureId);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
@@ -269,6 +314,11 @@ int32_t StreamOperatorStub::StreamOperatorStubCancelCapture(
 int32_t StreamOperatorStub::StreamOperatorStubChangeToOfflineStream(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
+        HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     std::vector<int32_t> streamIds;
     if (!data.ReadInt32Vector(&streamIds)) {
         HDF_LOGE("%s: read streamIds failed", __func__);

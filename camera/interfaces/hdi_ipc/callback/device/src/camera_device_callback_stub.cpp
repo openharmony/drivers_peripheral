@@ -28,12 +28,22 @@ int32_t CameraDeviceCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &
     HDF_LOGE("%s: CameraDeviceCallbackStub::OnRemoteRequest entry!", __func__);
     switch (code) {
         case CMD_CAMERA_DEVICE_CALLBACK_ON_ERROR: {
+            if (data.ReadInterfaceToken() != CameraDeviceCallbackStub::GetDescriptor()) {
+                HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+                return INVALID_ARGUMENT;
+            }
+
             ErrorType type = static_cast<ErrorType>(data.ReadUint32());
             int32_t errorMsg = data.ReadInt32();
             OnError(type, errorMsg);
             break;
         }
         case CMD_CAMERA_DEVICE_CALLBACK_ON_RESULT: {
+            if (data.ReadInterfaceToken() != CameraDeviceCallbackStub::GetDescriptor()) {
+                HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+                return INVALID_ARGUMENT;
+            }
+
             uint64_t timestamp = data.ReadUint64();
             std::shared_ptr<CameraStandard::CameraMetadata> result = nullptr;
             CameraStandard::MetadataUtils::DecodeCameraMetadata(data, result);
