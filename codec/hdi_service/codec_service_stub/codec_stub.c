@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "codec_stub.h"
+#include <hdf_device_object.h>
 #include <hdf_log.h>
 #include <osal_mem.h>
 #include "codec_callback_proxy.h"
@@ -533,6 +534,10 @@ static int32_t SerCodecSetCallback(struct HdfDeviceIoClient *client, struct HdfS
 int32_t CodecServiceOnRemoteRequest(struct HdfDeviceIoClient *client, int cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        HDF_LOGE("check interface token failed");
+        return HDF_ERR_INVALID_PARAM;
+    }
     switch (cmdId) {
         case CMD_CODEC_INIT:
             return SerCodecInit(client, data, reply);
