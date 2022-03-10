@@ -28,7 +28,6 @@ OHOS相机驱动框架模型对上实现相机HDI接口，对下实现相机Pipe
 
 ```
 /drivers/peripheral/input
-    .
     ├── hal                         # camera模块的hal层代码
     │   ├── adapter                 # camera hal平台适配层的实现
     │   ├── buffer_manager          # camera hal统一的Buffer管理
