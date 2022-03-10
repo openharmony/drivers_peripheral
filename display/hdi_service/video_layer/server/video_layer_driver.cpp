@@ -43,7 +43,7 @@ static int32_t HdfDisplayHostDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HdfDisplayHdiService *displayHdiService =
         reinterpret_cast<HdfDisplayHdiService *>(OsalMemAlloc(sizeof(HdfDisplayHdiService)));
-    if (displayHdiService == NULL) {
+    if (displayHdiService == nullptr) {
         HDF_LOGE("%{public}s: OsalMemAlloc HdfDisplayHdiService failed", __func__);
         return HDF_FAILURE;
     }
