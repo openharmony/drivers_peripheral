@@ -37,6 +37,11 @@ public:
     int32_t CameraHostStubGetCameraAbility(MessageParcel& data, MessageParcel& reply, MessageOption& option);
     int32_t CameraHostStubOpenCamera(MessageParcel& data, MessageParcel& reply, MessageOption& option);
     int32_t CameraHostStubSetFlashlight(MessageParcel& data, MessageParcel& reply, MessageOption& option);
+    static inline const std::u16string metaDescriptor_ = u"HDI.Camera.V1_0.Host";
+    static inline const std::u16string &GetDescriptor()
+    {
+        return metaDescriptor_;
+    }
 
     int32_t CameraHostServiceStubOnRemoteRequest(int cmdId,
         MessageParcel& data, MessageParcel& reply, MessageOption& option);

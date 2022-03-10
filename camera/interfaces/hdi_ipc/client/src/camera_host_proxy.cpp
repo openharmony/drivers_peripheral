@@ -52,6 +52,11 @@ CamRetCode CameraHostProxy::SetCallback(const OHOS::sptr<ICameraHostCallback> &c
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(CameraHostProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     bool callbackFlag = (callback != nullptr);
     if (!data.WriteBool(callbackFlag)) {
         HDF_LOGE("%s: set callback flag failed!", __func__);
@@ -78,6 +83,11 @@ CamRetCode CameraHostProxy::GetCameraIds(std::vector<std::string> &cameraIds)
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(CameraHostProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     int32_t ret = Remote()->SendRequest(CMD_CAMERA_HOST_GET_CAMERAID, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
@@ -100,6 +110,11 @@ CamRetCode CameraHostProxy::GetCameraAbility(const std::string &cameraId,
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+
+    if (!data.WriteInterfaceToken(CameraHostProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
 
     if (!data.WriteString(cameraId)) {
         HDF_LOGE("%{public}s: write cameraId failed!", __func__);
@@ -126,6 +141,11 @@ CamRetCode CameraHostProxy::OpenCamera(const std::string &cameraId,
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+
+    if (!data.WriteInterfaceToken(CameraHostProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
 
     if (!data.WriteString(cameraId)) {
         HDF_LOGE("%{public}s: write cameraId failed!", __func__);
@@ -167,6 +187,11 @@ CamRetCode CameraHostProxy::SetFlashlight(const std::string &cameraId, bool &isE
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+
+    if (!data.WriteInterfaceToken(CameraHostProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
 
     if (!data.WriteString(cameraId)) {
         HDF_LOGE("%{public}s: write cameraId failed!", __func__);

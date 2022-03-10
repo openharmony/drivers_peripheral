@@ -30,6 +30,11 @@ CamRetCode CameraDeviceProxy::GetStreamOperator(
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(CameraDeviceProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     bool nullFlag = (callback != nullptr);
     if (!data.WriteBool(nullFlag)) {
         HDF_LOGE("%s: stream operator callback flag write failed!", __func__);
@@ -64,6 +69,11 @@ CamRetCode CameraDeviceProxy::UpdateSettings(const std::shared_ptr<CameraSetting
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(CameraDeviceProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     bool bRet = CameraStandard::MetadataUtils::EncodeCameraMetadata(settings, data);
     if (!bRet) {
         HDF_LOGE("%s: write metadata failed", __func__);
@@ -86,6 +96,11 @@ CamRetCode CameraDeviceProxy::SetResultMode(const ResultCallbackMode &mode)
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(CameraDeviceProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     if (!data.WriteInt32(static_cast<int32_t>(mode))) {
         HDF_LOGE("%s: write result callback mode failed", __func__);
         return INVALID_ARGUMENT;
@@ -106,6 +121,11 @@ CamRetCode CameraDeviceProxy::GetEnabledResults(std::vector<MetaType> &results)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+
+    if (!data.WriteInterfaceToken(CameraDeviceProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
 
     int32_t ret = Remote()->SendRequest(
         CMD_CAMERA_DEVICE_GET_ENABLED_RESULTS, data, reply, option);
@@ -129,6 +149,11 @@ CamRetCode CameraDeviceProxy::EnableResult(const std::vector<MetaType> &results)
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(CameraDeviceProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     if (!data.WriteInt32Vector(results)) {
         HDF_LOGE("%s: write results failed", __func__);
         return INVALID_ARGUMENT;
@@ -150,6 +175,11 @@ CamRetCode CameraDeviceProxy::DisableResult(const std::vector<MetaType> &results
     MessageParcel reply;
     MessageOption option;
 
+    if (!data.WriteInterfaceToken(CameraDeviceProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return INVALID_ARGUMENT;
+    }
+
     if (!data.WriteInt32Vector(results)) {
         HDF_LOGE("%s: write results failed", __func__);
         return INVALID_ARGUMENT;
@@ -170,6 +200,11 @@ void CameraDeviceProxy::Close()
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
+
+    if (!data.WriteInterfaceToken(CameraDeviceProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return;
+    }
 
     int32_t ret = Remote()->SendRequest(
         CMD_CAMERA_DEVICE_CLOSE, data, reply, option);

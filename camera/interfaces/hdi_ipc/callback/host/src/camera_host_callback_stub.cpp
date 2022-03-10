@@ -27,12 +27,22 @@ int32_t CameraHostCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &da
     HDF_LOGE("%s: CameraHostCallbackStub::OnRemoteRequest entry!", __func__);
     switch (code) {
         case CMD_CAMERA_HOST_CALLBACK_ON_STATUS: {
+            if (data.ReadInterfaceToken() != CameraHostCallbackStub::GetDescriptor()) {
+                HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+                return INVALID_ARGUMENT;
+            }
+
             std::string cameraId = data.ReadString();
             CameraStatus status = static_cast<CameraStatus>(data.ReadInt32());
             OnCameraStatus(cameraId, status);
             break;
         }
         case CMD_CAMERA_HOST_CALLBACK_ON_FLASHLIGHT_STATUS: {
+            if (data.ReadInterfaceToken() != CameraHostCallbackStub::GetDescriptor()) {
+                HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+                return INVALID_ARGUMENT;
+            }
+
             std::string cameraId = data.ReadString();
             FlashlightStatus status =  static_cast<FlashlightStatus>(data.ReadInt32());
             OnFlashlightStatus(cameraId, status);
