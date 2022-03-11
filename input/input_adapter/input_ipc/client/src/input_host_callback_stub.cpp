@@ -31,6 +31,10 @@ int32_t InputReportEventCallbackStub::OnRemoteRequest(uint32_t code,
 {
     switch (code) {
         case CMD_INPUT_CALLBACK_REMOTE_REPROT_EVENT: {
+            if (data.ReadInterfaceToken() != InputReportEventCallbackStub::GetDescriptor()) {
+                HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+                return INPUT_INVALID_PARAM;
+            }
             uint32_t count = data.ReadUint32();
             uint32_t devIndex = data.ReadUint32();
             uint32_t readLen =  data.ReadUint32();
@@ -65,6 +69,10 @@ int32_t InputReportHostEventCallbackStub::OnRemoteRequest(uint32_t code,
 {
     switch (code) {
         case CMD_INPUT_CALLBACK_REMOTE_REPROT_HOT_PLUG_EVENT: {
+            if (data.ReadInterfaceToken() != InputReportHostEventCallbackStub::GetDescriptor()) {
+                HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+                return INPUT_INVALID_PARAM;
+            }
             uint32_t readLen =  data.ReadUint32();
             if (readLen > sizeof(HotPlugEvent)) {
                 HDF_LOGE("rev hotplug data readLen failed");
