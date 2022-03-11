@@ -789,7 +789,7 @@ int32_t StopAudio(struct PrepareAudioPara &audiopara)
             audiopara.adapter = nullptr;
             return ret;
         }
-        if (audiopara.adapter != nullptr){
+        if (audiopara.adapter != nullptr) {
             audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
         }
         audiopara.capture = nullptr;
