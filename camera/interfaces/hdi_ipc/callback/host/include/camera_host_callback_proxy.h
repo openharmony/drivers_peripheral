@@ -31,7 +31,7 @@ public:
 
     virtual void OnCameraStatus(const std::string &cameraId, CameraStatus status);
     virtual void OnFlashlightStatus(const std::string &cameraId, FlashlightStatus status);
-
+    virtual void OnCameraEvent(const std::string &cameraId, CameraEvent event);
 private:
     static inline BrokerDelegator<CameraHostCallbackProxy> delegator_;
 };
