@@ -238,7 +238,7 @@ void BatteryThread::UeventCallback(void* service)
 
 void BatteryThread::UpdateBatteryInfo(void* service, char* msg)
 {
-    CallbackInfo event;
+    BatteryInfo event;
     std::unique_ptr<BatterydInfo> batteryInfo = std::make_unique<BatterydInfo>();
     if (batteryInfo == nullptr) {
         HDF_LOGE("%{public}s instantiate batteryInfo error", __func__);
@@ -277,7 +277,7 @@ void BatteryThread::UpdateBatteryInfo(void* service, char* msg)
 
 void BatteryThread::UpdateBatteryInfo(void* service)
 {
-    CallbackInfo event;
+    BatteryInfo event;
     std::unique_ptr<BatterydInfo> batteryInfo = std::make_unique<BatterydInfo>();
     if (batteryInfo == nullptr) {
         HDF_LOGE("%{public}s instantiate batteryInfo error", __func__);

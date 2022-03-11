@@ -106,32 +106,17 @@ int32_t BatteryInterfaceImpl::ChangePath(const std::string& path)
 
 int32_t BatteryInterfaceImpl::GetCapacity(int32_t& capacity)
 {
-    int32_t ret = giver_->ParseCapacity(&capacity);
-    if (ret != HDF_SUCCESS) {
-        return ret;
-    }
-
-    return HDF_SUCCESS;
+    return giver_->ParseCapacity(&capacity);
 }
 
 int32_t BatteryInterfaceImpl::GetVoltage(int32_t& voltage)
 {
-    int32_t ret = giver_->ParseVoltage(&voltage);
-    if (ret != HDF_SUCCESS) {
-        return ret;
-    }
-
-    return HDF_SUCCESS;
+    return giver_->ParseVoltage(&voltage);
 }
 
 int32_t BatteryInterfaceImpl::GetTemperature(int32_t& temperature)
 {
-    int32_t ret = giver_->ParseTemperature(&temperature);
-    if (ret != HDF_SUCCESS) {
-        return ret;
-    }
-
-    return HDF_SUCCESS;
+    return giver_->ParseTemperature(&temperature);
 }
 
 int32_t BatteryInterfaceImpl::GetHealthState(BatteryHealthState& healthState)
@@ -184,10 +169,47 @@ int32_t BatteryInterfaceImpl::GetPresent(bool& present)
 
 int32_t BatteryInterfaceImpl::GetTechnology(std::string& technology)
 {
-    int32_t ret = giver_->ParseTechnology(technology);
-    if (ret != HDF_SUCCESS) {
-        return ret;
+    return giver_->ParseTechnology(technology);
+}
+
+int32_t BatteryInterfaceImpl::GetTotalEnergy(int32_t& totalEnergy)
+{
+    return giver_->ParseTotalEnergy(&totalEnergy);
+}
+
+int32_t BatteryInterfaceImpl::GetCurrentAverage(int32_t& curAverage)
+{
+    return giver_->ParseCurrentAverage(&curAverage);
+}
+
+int32_t BatteryInterfaceImpl::GetCurrentNow(int32_t& curNow)
+{
+    return giver_->ParseCurrentNow(&curNow);
+}
+
+int32_t BatteryInterfaceImpl::GetRemainEnergy(int32_t& remainEnergy)
+{
+    return giver_->ParseRemainEnergy(&remainEnergy);
+}
+
+int32_t BatteryInterfaceImpl::GetBatteryInfo(BatteryInfo& info)
+{
+    if (giver_ == nullptr) {
+        return HDF_FAILURE;
     }
+
+    BatterydInfo batteryInfo = giver_->GetBatteryInfo();
+    info.capacity = batteryInfo.capacity_;
+    info.voltage = batteryInfo.voltage_;
+    info.temperature = batteryInfo.temperature_;
+    info.healthState = batteryInfo.healthState_;
+    info.pluggedType = batteryInfo.pluggedType_;
+    info.pluggedMaxCurrent = batteryInfo.pluggedMaxCurrent_;
+    info.pluggedMaxVoltage = batteryInfo.pluggedMaxVoltage_;
+    info.chargeState = batteryInfo.chargeState_;
+    info.chargeCounter = batteryInfo.chargeCounter_;
+    info.present = batteryInfo.present_;
+    info.technology = batteryInfo.technology_;
 
     return HDF_SUCCESS;
 }

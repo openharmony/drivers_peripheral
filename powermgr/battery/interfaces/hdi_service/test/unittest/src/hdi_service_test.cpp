@@ -114,33 +114,16 @@ static void CheckSubfolderNode(const std::string& path)
         if (entry->d_type == DT_DIR || entry->d_type == DT_LNK) {
             continue;
         }
+
         if ((strcmp(entry->d_name, "type") == 0) && (g_nodeInfo["type"] == "") &&
             (strcasecmp(path.c_str(), "battery") != 0)) {
             g_nodeInfo["type"] = path;
-        } else if ((strcmp(entry->d_name, "online") == 0) && (g_nodeInfo["online"] == "")) {
-            g_nodeInfo["online"] = path;
-        } else if ((strcmp(entry->d_name, "current_max") == 0) && (g_nodeInfo["current_max"] == "")) {
-            g_nodeInfo["current_max"] = path;
-        } else if ((strcmp(entry->d_name, "voltage_max") == 0) && (g_nodeInfo["voltage_max"] == "")) {
-            g_nodeInfo["voltage_max"] = path;
-        } else if ((strcmp(entry->d_name, "capacity") == 0) && (g_nodeInfo["capacity"] == "")) {
-            g_nodeInfo["capacity"] = path;
-        } else if ((strcmp(entry->d_name, "voltage_now") == 0) && (g_nodeInfo["voltage_now"] == "")) {
-            g_nodeInfo["voltage_now"] = path;
-        } else if ((strcmp(entry->d_name, "temp") == 0) && (g_nodeInfo["temp"] == "")) {
-            g_nodeInfo["temp"] = path;
-        } else if ((strcmp(entry->d_name, "health") == 0) && (g_nodeInfo["health"] == "")) {
-            g_nodeInfo["health"] = path;
-        } else if ((strcmp(entry->d_name, "status") == 0) && (g_nodeInfo["status"] == "")) {
-            g_nodeInfo["status"] = path;
-        } else if ((strcmp(entry->d_name, "present") == 0) && (g_nodeInfo["present"] == "")) {
-            g_nodeInfo["present"] = path;
-        } else if ((strcmp(entry->d_name, "charge_counter") == 0) && (g_nodeInfo["charge_counter"] == "")) {
-            g_nodeInfo["charge_counter"] = path;
-        } else if ((strcmp(entry->d_name, "technology") == 0) && (g_nodeInfo["technology"] == "")) {
-            g_nodeInfo["technology"] = path;
-        } else {
-            HDF_LOGI("%{public}s: battery node other branch is excute.", __func__);
+        }
+
+        for (auto iter = g_nodeInfo.begin(); iter != g_nodeInfo.end(); ++iter) {
+            if ((strcmp(entry->d_name, iter->first.c_str()) == 0) && (g_nodeInfo[iter->first] == "")) {
+                g_nodeInfo[iter->first] = path;
+            }
         }
     }
     closedir(dir);
@@ -160,6 +143,10 @@ static void TraversalBaseNode()
     g_nodeInfo.insert(std::make_pair("present", ""));
     g_nodeInfo.insert(std::make_pair("charge_counter", ""));
     g_nodeInfo.insert(std::make_pair("technology", ""));
+    g_nodeInfo.insert(std::make_pair("charge_full", ""));
+    g_nodeInfo.insert(std::make_pair("current_avg", ""));
+    g_nodeInfo.insert(std::make_pair("current_now", ""));
+    g_nodeInfo.insert(std::make_pair("charge_now", ""));
 
     auto iter = g_filenodeName.begin();
     while (iter != g_filenodeName.end()) {
@@ -339,6 +326,162 @@ static int32_t ReadCapacitySysfs()
     HDF_LOGE("%{public}s: read system file capacity is %{public}d", __func__, battCapacity);
     close(fd);
     return battCapacity;
+}
+
+static int32_t ReadTotalEnergySysfs()
+{
+    int strlen = 10;
+    char buf[128] = {0};
+    int32_t readSize;
+    InitBaseSysfs();
+    std::string totalEnergyNode = "battery";
+    for (auto iter = g_nodeInfo.begin(); iter != g_nodeInfo.end(); ++iter) {
+        if (iter->first == "charge_full") {
+            totalEnergyNode = iter->second;
+            break;
+        }
+    }
+    std::string sysBattTotalEnergyPath = SYSTEM_BATTERY_PATH + "/" + totalEnergyNode + "/" + "charge_full";
+    HDF_LOGE("%{public}s: sysBattTotalEnergyPath is %{public}s", __func__, sysBattTotalEnergyPath.c_str());
+
+    int fd = open(sysBattTotalEnergyPath.c_str(), O_RDONLY);
+    if (fd < NUM_ZERO) {
+        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattTotalEnergyPath.c_str());
+        return HDF_FAILURE;
+    }
+
+    readSize = read(fd, buf, sizeof(buf) - 1);
+    if (readSize < NUM_ZERO) {
+        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattTotalEnergyPath.c_str());
+        close(fd);
+        return HDF_FAILURE;
+    }
+
+    buf[readSize] = '\0';
+    int32_t totalEnergy = strtol(buf, nullptr, strlen);
+    if (totalEnergy < NUM_ZERO) {
+        HDF_LOGE("%{public}s: read system file totalEnergy is %{public}d", __func__, totalEnergy);
+    }
+    HDF_LOGE("%{public}s: read system file totalEnergy is %{public}d", __func__, totalEnergy);
+    close(fd);
+    return totalEnergy;
+}
+
+static int32_t ReadCurrentAverageSysfs()
+{
+    int strlen = 10;
+    char buf[128] = {0};
+    int32_t readSize;
+    InitBaseSysfs();
+    std::string currentAvgNode = "battery";
+    for (auto iter = g_nodeInfo.begin(); iter != g_nodeInfo.end(); ++iter) {
+        if (iter->first == "current_avg") {
+            currentAvgNode = iter->second;
+            break;
+        }
+    }
+    std::string sysBattCurrentAvgPath = SYSTEM_BATTERY_PATH + "/" + currentAvgNode + "/" + "current_avg";
+    HDF_LOGE("%{public}s: sysBattCurrentAvgPath is %{public}s", __func__, sysBattCurrentAvgPath.c_str());
+
+    int fd = open(sysBattCurrentAvgPath.c_str(), O_RDONLY);
+    if (fd < NUM_ZERO) {
+        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattCurrentAvgPath.c_str());
+        return HDF_FAILURE;
+    }
+
+    readSize = read(fd, buf, sizeof(buf) - 1);
+    if (readSize < NUM_ZERO) {
+        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattCurrentAvgPath.c_str());
+        close(fd);
+        return HDF_FAILURE;
+    }
+
+    buf[readSize] = '\0';
+    int32_t currentAvg = strtol(buf, nullptr, strlen);
+    if (currentAvg < NUM_ZERO) {
+        HDF_LOGE("%{public}s: read system file currentAvg is %{public}d", __func__, currentAvg);
+    }
+    HDF_LOGE("%{public}s: read system file currentAvg is %{public}d", __func__, currentAvg);
+    close(fd);
+    return currentAvg;
+}
+
+static int32_t ReadCurrentNowSysfs()
+{
+    int strlen = 10;
+    char buf[128] = {0};
+    int32_t readSize;
+    InitBaseSysfs();
+    std::string currentNowNode = "battery";
+    for (auto iter = g_nodeInfo.begin(); iter != g_nodeInfo.end(); ++iter) {
+        if (iter->first == "current_now") {
+            currentNowNode = iter->second;
+            break;
+        }
+    }
+    std::string sysBattCurrentNowPath = SYSTEM_BATTERY_PATH + "/" + currentNowNode + "/" + "current_now";
+    HDF_LOGE("%{public}s: sysBattCurrentNowPath is %{public}s", __func__, sysBattCurrentNowPath.c_str());
+
+    int fd = open(sysBattCurrentNowPath.c_str(), O_RDONLY);
+    if (fd < NUM_ZERO) {
+        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattCurrentNowPath.c_str());
+        return HDF_FAILURE;
+    }
+
+    readSize = read(fd, buf, sizeof(buf) - 1);
+    if (readSize < NUM_ZERO) {
+        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattCurrentNowPath.c_str());
+        close(fd);
+        return HDF_FAILURE;
+    }
+
+    buf[readSize] = '\0';
+    int32_t currentNow = strtol(buf, nullptr, strlen);
+    if (currentNow < NUM_ZERO) {
+        HDF_LOGE("%{public}s: read system file currentNow is %{public}d", __func__, currentNow);
+    }
+    HDF_LOGE("%{public}s: read system file currentNow is %{public}d", __func__, currentNow);
+    close(fd);
+    return currentNow;
+}
+
+static int32_t ReadRemainEnergySysfs()
+{
+    int strlen = 10;
+    char buf[128] = {0};
+    int32_t readSize;
+    InitBaseSysfs();
+    std::string chargeNowNode = "battery";
+    for (auto iter = g_nodeInfo.begin(); iter != g_nodeInfo.end(); ++iter) {
+        if (iter->first == "charge_now") {
+            chargeNowNode = iter->second;
+            break;
+        }
+    }
+    std::string sysBattChargeNowPath = SYSTEM_BATTERY_PATH + "/" + chargeNowNode + "/" + "charge_now";
+    HDF_LOGE("%{public}s: sysBattChargeNowPath is %{public}s", __func__, sysBattChargeNowPath.c_str());
+
+    int fd = open(sysBattChargeNowPath.c_str(), O_RDONLY);
+    if (fd < NUM_ZERO) {
+        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattChargeNowPath.c_str());
+        return HDF_FAILURE;
+    }
+
+    readSize = read(fd, buf, sizeof(buf) - 1);
+    if (readSize < NUM_ZERO) {
+        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattChargeNowPath.c_str());
+        close(fd);
+        return HDF_FAILURE;
+    }
+
+    buf[readSize] = '\0';
+    int32_t chargeNow = strtol(buf, nullptr, strlen);
+    if (chargeNow < NUM_ZERO) {
+        HDF_LOGE("%{public}s: read system file chargeNow is %{public}d", __func__, chargeNow);
+    }
+    HDF_LOGE("%{public}s: read system file chargeNow is %{public}d", __func__, chargeNow);
+    close(fd);
+    return chargeNow;
 }
 
 static void Trim(char* str)
@@ -1164,5 +1307,93 @@ HWTEST_F (HdiServiceTest, HdiService025, TestSize.Level1)
     backlight->TurnOnScreen();
 
     ASSERT_TRUE(ret != -1);
+}
+
+/**
+ * @tc.name: HdiService026
+ * @tc.desc: Test functions of ParseTotalEnergy
+ * @tc.type: FUNC
+ */
+HWTEST_F (HdiServiceTest, HdiService026, TestSize.Level1)
+{
+    int32_t totalEnergy = 0;
+    if (IsNotMock()) {
+        giver_->ParseTotalEnergy(&totalEnergy);
+        int32_t sysfsTotalEnergy = ReadTotalEnergySysfs();
+        HDF_LOGI("%{public}s: Not Mock HdiService026::totalEnergy=%{public}d, t=%{public}d",
+            __func__, totalEnergy, sysfsTotalEnergy);
+        ASSERT_TRUE(totalEnergy == sysfsTotalEnergy);
+    } else {
+        CreateFile("/data/local/tmp/battery/charge_full", "4000000");
+        giver_->ParseTotalEnergy(&totalEnergy);
+        HDF_LOGI("%{public}s: HdiService026::totalEnergy=%{public}d.", __func__, totalEnergy);
+        ASSERT_TRUE(totalEnergy == 4000000);
+    }
+}
+
+/**
+ * @tc.name: HdiService027
+ * @tc.desc: Test functions of ParseCurrentAverage
+ * @tc.type: FUNC
+ */
+HWTEST_F (HdiServiceTest, HdiService027, TestSize.Level1)
+{
+    int32_t currentAvg = 0;
+    if (IsNotMock()) {
+        giver_->ParseCurrentAverage(&currentAvg);
+        int32_t sysfsCurrentAvg = ReadCurrentAverageSysfs();
+        HDF_LOGI("%{public}s: Not Mock HdiService027::currentAvg=%{public}d, t=%{public}d",
+            __func__, currentAvg, sysfsCurrentAvg);
+        ASSERT_TRUE(currentAvg == sysfsCurrentAvg);
+    } else {
+        CreateFile("/data/local/tmp/battery/current_avg", "1000");
+        giver_->ParseCurrentAverage(&currentAvg);
+        HDF_LOGI("%{public}s: HdiService027::currentAvg=%{public}d.", __func__, currentAvg);
+        ASSERT_TRUE(currentAvg == 1000);
+    }
+}
+
+/**
+ * @tc.name: HdiService028
+ * @tc.desc: Test functions of ParseCurrentNow
+ * @tc.type: FUNC
+ */
+HWTEST_F (HdiServiceTest, HdiService028, TestSize.Level1)
+{
+    int32_t currentNow = 0;
+    if (IsNotMock()) {
+        giver_->ParseCurrentNow(&currentNow);
+        int32_t sysfsCurrentNow = ReadCurrentNowSysfs();
+        HDF_LOGI("%{public}s: Not Mock HdiService028::currentNow=%{public}d, t=%{public}d",
+            __func__, currentNow, sysfsCurrentNow);
+        ASSERT_TRUE(currentNow == sysfsCurrentNow);
+    } else {
+        CreateFile("/data/local/tmp/battery/current_now", "1000");
+        giver_->ParseCurrentNow(&currentNow);
+        HDF_LOGI("%{public}s: HdiService028::currentNow=%{public}d.", __func__, currentNow);
+        ASSERT_TRUE(currentNow == 1000);
+    }
+}
+
+/**
+ * @tc.name: HdiService029
+ * @tc.desc: Test functions of ParseChargeNow
+ * @tc.type: FUNC
+ */
+HWTEST_F (HdiServiceTest, HdiService029, TestSize.Level1)
+{
+    int32_t chargeNow = 0;
+    if (IsNotMock()) {
+        giver_->ParseRemainEnergy(&chargeNow);
+        int32_t sysfsChargeNow = ReadRemainEnergySysfs();
+        HDF_LOGI("%{public}s: Not Mock HdiService029::chargeNow=%{public}d, t=%{public}d",
+            __func__, chargeNow, sysfsChargeNow);
+        ASSERT_TRUE(chargeNow == sysfsChargeNow);
+    } else {
+        CreateFile("/data/local/tmp/battery/charge_now", "1000");
+        giver_->ParseRemainEnergy(&chargeNow);
+        HDF_LOGI("%{public}s: HdiService029::chargeNow=%{public}d.", __func__, chargeNow);
+        ASSERT_TRUE(chargeNow == 1000);
+    }
 }
 }
