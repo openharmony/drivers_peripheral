@@ -1,5 +1,5 @@
 {
-    "adapterNum": 3,
+    "adapterNum": 4,
     "adapters": [{
         "name": "internal",
         "portnum": 2,
@@ -39,6 +39,15 @@
         "port": [{
             "dir": "PORT_OUT",
             "id": 12,
+            "name": "AOP"
+        }]
+    },
+    {
+        "name": "bt_a2dp",
+        "portnum": 1,
+        "port": [{
+            "dir": "PORT_OUT",
+            "id": 0,
             "name": "AOP"
         }]
     }]
