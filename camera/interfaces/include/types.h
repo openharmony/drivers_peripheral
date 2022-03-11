@@ -352,6 +352,21 @@ enum FlashlightStatus : uint32_t {
 };
 
 /**
+ * @brief Camera event.
+ */
+enum CameraEvent : uint32_t {
+    /**
+     * Camera device add event.
+     */
+    CAMERA_EVENT_DEVICE_ADD = 0,
+
+    /**
+     * Camera device remove event.
+     */
+    CAMERA_EVENT_DEVICE_RMV = 1,
+};
+
+/**
  * @brief Enumerates camera device error types, which are used by {@link OnError}.
  */
 enum ErrorType : uint32_t {
