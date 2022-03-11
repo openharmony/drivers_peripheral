@@ -26,9 +26,9 @@ namespace V1_0 {
 class BatteryCallbackImpl : public BatteryCallbackStub {
 public:
     virtual ~BatteryCallbackImpl() {}
-    using BatteryEventCallback = std::function<int32_t(const CallbackInfo& event)>;
+    using BatteryEventCallback = std::function<int32_t(const BatteryInfo& event)>;
     static int32_t RegisterBatteryEvent(const BatteryEventCallback& eventCb);
-    int32_t Update(const CallbackInfo& event) override;
+    int32_t Update(const BatteryInfo& event) override;
 private:
     static BatteryEventCallback eventCb_;
 };
