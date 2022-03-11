@@ -123,7 +123,6 @@ int32_t CodecProxyParseGottenCapbility(struct HdfSBuf *reply, CodecCapbility *ca
     return HDF_SUCCESS;
 }
 
-// todo val 类型，决定read类型
 int32_t CodecProxyPackParam(struct HdfSBuf *data, const Param *param)
 {
     if (data == NULL || param == NULL) {
@@ -144,7 +143,7 @@ int32_t CodecProxyPackParam(struct HdfSBuf *data, const Param *param)
     }
     return HDF_SUCCESS;
 }
-// todo val 类型，决定read类型
+
 int32_t CodecProxyParseParam(struct HdfSBuf *reply, Param *param)
 {
     uint32_t tempKey = 0;

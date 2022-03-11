@@ -120,8 +120,6 @@ int32_t CodecSerPackCapbility(struct HdfSBuf *reply, CodecCapbility *cap)
     return HDF_SUCCESS;
 }
 
-
-// todo val 类型，决定read类型
 int32_t CodecSerParseParam(struct HdfSBuf *data, Param *param)
 {
     if (data == NULL || param == NULL) {
@@ -143,7 +141,6 @@ int32_t CodecSerParseParam(struct HdfSBuf *data, Param *param)
     return HDF_SUCCESS;
 }
 
-// todo val 类型，决定read类型
 int32_t CodecSerPackParam(struct HdfSBuf *reply, Param *param)
 {
     if (reply == NULL || param == NULL) {
