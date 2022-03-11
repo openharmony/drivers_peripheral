@@ -59,6 +59,17 @@ public:
      * @version 1.0
      */
     virtual void OnFlashlightStatus(const std::string &cameraId, FlashlightStatus status) = 0;
+
+    /**
+     * @brief Called when the camera event occurs.
+     *
+     * @param cameraId Indicates the ID of the camera to which the camera event is bound.
+     * @param event Indicates the camera event type.
+     *
+     * @since 1.0
+     * @version 1.0
+     */
+    virtual void OnCameraEvent(const std::string &cameraId, CameraEvent event) = 0;
 };
 }
 #endif // HDI_CAMERA_HOST_CALLBACK_SERVER_H

@@ -48,6 +48,17 @@ int32_t CameraHostCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &da
             OnFlashlightStatus(cameraId, status);
             break;
         }
+        case CMD_CAMERA_HOST_CALLBACK_ON_CAMERA_EVENT: {
+            if (data.ReadInterfaceToken() != CameraHostCallbackStub::GetDescriptor()) {
+                HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
+                return INVALID_ARGUMENT;
+            }
+
+            std::string cameraId = data.ReadString();
+            CameraEvent event =  static_cast<CameraEvent>(data.ReadInt32());
+            OnCameraEvent(cameraId, event);
+            break;
+        }
         default: {
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
