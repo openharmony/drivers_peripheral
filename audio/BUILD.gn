@@ -41,6 +41,8 @@ group("hdi_audio") {
         "hal/hdi_binder/proxy:hdi_audio_client",
         "hal/hdi_binder/server:hdi_audio_server",
       ]
+    } else {
+      deps += [ "config/lite:hdf_audio_json" ]
     }
   }
 
