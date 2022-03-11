@@ -30,6 +30,10 @@ void InputCallbackProxy::ReportEventPkgCallback(const EventPackage *pkgs, uint32
         HDF_LOGE("%{public}s: pkgs is null failed.", __func__);
         return;
     }
+    if (!data.WriteInterfaceToken(InputCallbackProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return;
+    }
     if (!data.WriteUint32(count)) {
         HDF_LOGE("%{public}s: write error count failed.", __func__);
         return;
@@ -58,6 +62,10 @@ void InputHotCallbackProxy::ReportHotPlugEventCallback(const HotPlugEvent *event
     MessageParcel data {};
     MessageParcel reply {};
     MessageOption option {};
+    if (!data.WriteInterfaceToken(InputHotCallbackProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return;
+    }
     if (!data.WriteUint32(sizeof(HotPlugEvent))) {
         HDF_LOGE("%{public}s: write error length failed line %{public}d", __func__, __LINE__);
         return;
