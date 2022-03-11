@@ -51,7 +51,7 @@ enum BatteryPluggedType {
     PLUGGED_TYPE_BUTT,
 };
 
-struct CallbackInfo {
+struct BatteryInfo {
     int32_t capacity;
     int32_t voltage;
     int32_t temperature;
@@ -61,13 +61,17 @@ struct CallbackInfo {
     int32_t pluggedMaxVoltage;
     int32_t chargeState;
     int32_t chargeCounter;
+    int32_t totalEnergy;
+    int32_t curAverage;
+    int32_t curNow;
+    int32_t remainEnergy;
     int8_t present;
     std::string technology;
 };
 
-bool CallbackInfoBlockMarshalling(OHOS::MessageParcel &data, const CallbackInfo& dataBlock);
+bool BatteryInfoBlockMarshalling(OHOS::MessageParcel &data, const BatteryInfo& dataBlock);
 
-bool CallbackInfoBlockUnmarshalling(OHOS::MessageParcel &data, CallbackInfo& dataBlock);
+bool BatteryInfoBlockUnmarshalling(OHOS::MessageParcel &data, BatteryInfo& dataBlock);
 } // V1_0
 } // Battery
 } // HDI
