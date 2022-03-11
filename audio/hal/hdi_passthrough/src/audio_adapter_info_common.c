@@ -1164,7 +1164,7 @@ int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key,
         return HDF_FAILURE;
     }
     ret = strncat_s(keyValueList, listLenth, strValue, strlen(strValue));
-    if (ret < 0) {
+    if (ret != EOK) {
         LOG_FUN_ERR("strcat_s failed!");
         return HDF_FAILURE;
     }
