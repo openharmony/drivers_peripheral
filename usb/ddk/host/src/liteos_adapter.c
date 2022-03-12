@@ -296,7 +296,12 @@ static int32_t OsReadDescriptors(struct UsbDevice *dev)
             ret = HDF_ERR_INVALID_PARAM;
             return ret;
         }
-        memset_s(ptr, DESC_READ_LEN, 0, DESC_READ_LEN);
+        ret = memset_s(ptr, DESC_READ_LEN, 0, DESC_READ_LEN);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+            return HDF_FAILURE;
+        }
+
         count = UGETW(osDev->adapterDevice->cdesc->wTotalLength);
         if ((count < 0) || (count > DESC_READ_LEN)) {
             ret = HDF_ERR_IO;
@@ -521,7 +526,12 @@ static int32_t OsSubmitControlMsg(
     as->dev = (struct UsbDevice *)dev;
     as->state = URB_SUBMIT_STATE;
     urb = &as->urb;
-    memset_s(urb, sizeof(*urb), 0, sizeof(*urb));
+    ret = memset_s(urb, sizeof(*urb), 0, sizeof(*urb));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+        return HDF_FAILURE;
+    }
+
     urb->dev = (struct UsbAdapterDevice *)adapterDevice;
     urb->endpoint = uhe;
     urb->timeout = 500;
@@ -615,7 +625,12 @@ static int32_t OsSubmitBulkRequestHandle(
 
     for (i = 0, pas = as; i < numUrbs; i++, pas++) {
         urb = &pas->urb;
-        memset_s(urb, sizeof(*urb), 0, sizeof(*urb));
+        ret = memset_s(urb, sizeof(*urb), 0, sizeof(*urb));
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+            return HDF_FAILURE;
+        }
+
         ret = OsSubmitBulkRequestHandleUrb(pas, request, bulkBufferLen, i);
         if (ret != HDF_SUCCESS) {
             return ret;

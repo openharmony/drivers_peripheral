@@ -112,7 +112,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialReadSync_003, TestSize.Level1)
         ""
     };
     char readBuf[DATA_MAX_LEN] = {0};
-    for (int32_t i = 0; strlen(data[i]) > 0 > 0; i++) {
+    for (int32_t i = 0; strlen(data[i]) > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_SYNC_WRITE);
         UsbHostDdkTestSyncWrite(const_cast<char *>(data[i]));
@@ -142,7 +142,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialReadSync_004, TestSize.Level1)
         ""
     };
     char readBuf[DATA_MAX_LEN] = {0};
-    for (int32_t i = 0; strlen(data[i]) > 0 > 0; i++) {
+    for (int32_t i = 0; strlen(data[i]) > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_ASYNC_WRITE);
         UsbHostDdkTestAsyncWrite(const_cast<char *>(data[i]));
