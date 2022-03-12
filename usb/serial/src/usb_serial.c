@@ -586,7 +586,12 @@ static int32_t UsbSerialRead(struct SerialDevice *port, struct HdfSBuf *reply)
         HDF_LOGE("%s:%d g_acmReadBuffer is NULL", __func__, __LINE__);
         return HDF_ERR_MALLOC_FAIL;
     }
-    memset_s(g_acmReadBuffer, READ_BUF_SIZE, 0, READ_BUF_SIZE);
+
+    ret = memset_s(g_acmReadBuffer, READ_BUF_SIZE, 0, READ_BUF_SIZE);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+        return ret;
+    }
 
     if (DataFifoIsEmpty(&port->readFifo)) {
         ret = HDF_SUCCESS;

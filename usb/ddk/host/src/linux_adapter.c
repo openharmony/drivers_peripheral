@@ -169,6 +169,7 @@ static int32_t OsReadDescriptors(struct UsbDevice *dev)
     size_t allocLen = 0;
     uint8_t *ptr = NULL;
     int32_t len;
+    int32_t ret;
 
     do {
         size_t oldLen = allocLen;
@@ -179,7 +180,11 @@ static int32_t OsReadDescriptors(struct UsbDevice *dev)
             return HDF_ERR_MALLOC_FAIL;
         }
         ptr = (uint8_t *)dev->descriptors + dev->descriptorsLength;
-        memset_s(ptr, DESC_READ_LEN, 0, DESC_READ_LEN);
+        ret = memset_s(ptr, DESC_READ_LEN, 0, DESC_READ_LEN);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+            return ret;
+        }
 
         len = read(fd, ptr, DESC_READ_LEN);
         if (len < 0) {
@@ -950,8 +955,7 @@ static int32_t AdapterGetConfigDescriptor(const struct UsbDevice *dev,
 
     if ((dev == NULL) || (buffer == NULL) ||
         ((dev != NULL) && (configIndex > dev->deviceDescriptor.bNumConfigurations))) {
-        HDF_LOGE("%s:%d configIndex=%d-%d",
-            __func__, __LINE__, configIndex, dev->deviceDescriptor.bNumConfigurations);
+        HDF_LOGE("%{public}s:%{public}d Invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
