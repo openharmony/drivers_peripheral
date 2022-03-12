@@ -831,6 +831,10 @@ int32_t UsbdClient::BulkRead(const UsbDev &dev, const UsbPipe &pipe, sptr<Ashmem
 {
     MessageParcel data;
     MessageParcel reply;
+    if (ashmem == nullptr) {
+        HDF_LOGE("%{public}s:%{public}d BulkRead error ashmem", __func__, __LINE__);
+        return UEC_HDF_ERR_INVALID_PARAM;
+    }
 
     if (data.WriteInterfaceToken(GetDescriptor()) == false) {
         HDF_LOGE(" WriteInterfaceToken failed.");
@@ -853,6 +857,10 @@ int32_t UsbdClient::BulkWrite(const UsbDev &dev, const UsbPipe &pipe, sptr<Ashme
 {
     MessageParcel data;
     MessageParcel reply;
+    if (ashmem == nullptr) {
+        HDF_LOGE("%{public}s:%{public}d BulkWrite error ashmem", __func__, __LINE__);
+        return UEC_HDF_ERR_INVALID_PARAM;
+    }
 
     if (data.WriteInterfaceToken(GetDescriptor()) == false) {
         HDF_LOGE(" WriteInterfaceToken failed.");
