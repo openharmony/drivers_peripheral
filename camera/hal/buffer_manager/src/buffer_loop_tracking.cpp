@@ -175,7 +175,7 @@ void TrackingStream::MoveBuffer(std::shared_ptr<TrackingBuffer>& buffer, std::sh
     }
     auto dest = FindTrackingNode(node->GetNodeName());
     if (dest == nullptr) {
-        CAMERA_LOGE("node %{public}s doesn't being tracked", dest->GetNodeName().c_str());
+        CAMERA_LOGE("node %{public}s doesn't being tracked", node->GetNodeName().c_str());
         return;
     }
 
