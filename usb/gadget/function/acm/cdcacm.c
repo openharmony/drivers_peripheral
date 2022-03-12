@@ -229,7 +229,12 @@ static int32_t StartThreadReadSpeed(struct UsbSerial *port)
 {
     int32_t ret;
     struct OsalThreadParam threadCfg;
-    memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
+    ret = memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+        return ret;
+    }
+   
     threadCfg.name = "speed read process";
     threadCfg.priority = OSAL_THREAD_PRI_LOW;
     threadCfg.stackSize = HDF_PROCESS_STACK_SIZE;
@@ -478,6 +483,7 @@ static float g_speed = 0;
 static bool isGetWriteTimeStart = false;
 static void UsbSerialWriteSpeedComplete(uint8_t pipe, struct UsbFnRequest *req)
 {
+    int32_t ret;
     switch (req->status) {
         case USB_REQUEST_COMPLETED:
             g_writeCnt += req->actual;
@@ -488,7 +494,11 @@ static void UsbSerialWriteSpeedComplete(uint8_t pipe, struct UsbFnRequest *req)
             if (g_isWriteDone) {
                 UsbFnFreeRequest(req);
             } else {
-                memset_s(req->buf, req->length, 'a', req->length);
+                ret = memset_s(req->buf, req->length, 'a', req->length);
+                if (ret != HDF_SUCCESS) {
+                    HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+                    return;
+                }
                 UsbFnSubmitRequestAsync(req);
             }
             break;
@@ -504,6 +514,7 @@ static void UsbSerialWriteSpeedComplete(uint8_t pipe, struct UsbFnRequest *req)
 static int32_t SpeedThread(void *arg)
 {
     int32_t i;
+    int32_t ret;
     g_writeCnt = 0;
     g_isWriteDone = false;
     isGetWriteTimeStart = false;
@@ -523,7 +534,11 @@ static int32_t SpeedThread(void *arg)
         g_req[i]->complete = UsbSerialWriteSpeedComplete;
         g_req[i]->context = port;
         g_req[i]->length = port->acm->dataInPipe.maxPacketSize;
-        memset_s(g_req[i]->buf, port->acm->dataInPipe.maxPacketSize, 'a', port->acm->dataInPipe.maxPacketSize);
+        ret = memset_s(g_req[i]->buf, port->acm->dataInPipe.maxPacketSize, 'a', port->acm->dataInPipe.maxPacketSize);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+            return ret;
+        }
         UsbFnSubmitRequestAsync(g_req[i]);
     }
     while (!g_isWriteDone) {
@@ -552,7 +567,11 @@ static int32_t StartThreadSpeed(struct UsbSerial *port)
     int32_t ret;
 
     struct OsalThreadParam threadCfg;
-    memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
+    ret = memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+        return ret;
+    }
     threadCfg.name = "speed test process";
     threadCfg.priority = OSAL_THREAD_PRI_LOW;
     threadCfg.stackSize = HDF_PROCESS_STACK_SIZE;

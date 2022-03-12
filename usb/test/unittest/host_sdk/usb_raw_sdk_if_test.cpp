@@ -349,6 +349,7 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConf
                 acm->notifyEp = (UsbEndpoint *)OsalMemAlloc(sizeof(struct UsbEndpoint));
                 if (acm->notifyEp == NULL) {
                     printf("%s:%d allocate endpoint failed\n", __func__, __LINE__);
+                    return;
                 }
                 /* get the first endpoint by default */
                 acm->notifyEp->addr = interface->altsetting->endPoint[0].endpointDescriptor.bEndpointAddress;
