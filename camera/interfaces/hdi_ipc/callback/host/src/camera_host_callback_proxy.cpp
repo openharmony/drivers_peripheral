@@ -74,4 +74,32 @@ void CameraHostCallbackProxy::OnFlashlightStatus(const std::string &cameraId, Fl
         return;
     }
 }
+
+void CameraHostCallbackProxy::OnCameraEvent(const std::string &cameraId, CameraEvent event)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(CameraHostCallbackProxy::GetDescriptor())) {
+        HDF_LOGE("%{public}s: write interface descriptor failed.", __func__);
+        return;
+    }
+
+    if (!data.WriteString(cameraId)) {
+        HDF_LOGE("%{public}s: write cameraId failed.", __func__);
+        return;
+    }
+
+    if (!data.WriteUint32(event)) {
+        HDF_LOGE("%{public}s: write event failed.", __func__);
+        return;
+    }
+
+    int32_t ret = Remote()->SendRequest(CMD_CAMERA_HOST_CALLBACK_ON_CAMERA_EVENT, data, reply, option);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: SendRequest failed, error code is %{public}d", __func__, ret);
+        return;
+    }
+}
 }
