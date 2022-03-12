@@ -42,9 +42,6 @@ config("hdi_audio_config") {
     "-ffunction-sections",
     "-fdata-sections",
   ]
-  if (device_name == "baltimore") {
-    cflags += [ "-DDEVICE_BALTIMORE" ]
-  }
 
   ldflags = [ "-Wl" ]
 }
@@ -86,7 +83,6 @@ ohos_shared_library("hdi_audio_bluetooth") {
     "${samgr_dir}/interfaces/innerkits/lsamgr:lsamgr",
     "${samgr_dir}/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//foundation/communication/bluetooth/services/bluetooth_standard/ipc:btipc_static",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//utils/native/base:utils",
   ]
 
@@ -95,6 +91,7 @@ ohos_shared_library("hdi_audio_bluetooth") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "ipc:ipc_single" ]
 
   public_configs = [ ":hdi_audio_config" ]
 
