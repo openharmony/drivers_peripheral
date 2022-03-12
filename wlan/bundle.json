@@ -12,7 +12,6 @@
     "ram": "7600KB",
     "deps": {
       "components": [
-        "ipc",
         "device_driver_framework",
         "hiviewdfx_hilog_native",
         "utils_base"
