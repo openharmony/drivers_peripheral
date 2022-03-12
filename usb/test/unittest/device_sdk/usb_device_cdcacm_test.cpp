@@ -388,12 +388,14 @@ static int32_t ParseInterfaces(struct AcmDevice *acmDevice)
 
 static void CtrlComplete(uint8_t pipe, struct UsbFnRequest *req)
 {
+    if (req == nullptr) {
+        HDF_LOGE("%{public}s:%{public}d req is nullptr", __func__, __LINE__);
+        return;
+    }
+
     struct CtrlInfo *ctrlInfo = (struct CtrlInfo *)req->context;
     struct AcmDevice *acm = ctrlInfo->acm;
 
-    if (req == nullptr) {
-        return;
-    }
     if (USB_REQUEST_COMPLETED != req->status) {
         goto OUT;
     }
@@ -441,12 +443,15 @@ static int32_t AllocCtrlRequests(struct AcmDevice *acmDevice)
 static int32_t SendNotifyRequest(struct AcmDevice *acm, uint8_t type,
     uint16_t value, void *data, uint32_t length)
 {
+    if (acm == nullptr) {
+        HDF_LOGE("%{public}s:%{public}d req is nullptr", __func__, __LINE__);
+        return -1;
+    }
+
     struct UsbFnRequest *req = nullptr;
     struct UsbCdcNotification *notify = nullptr;
     int32_t ret;
-    if (acm == nullptr) {
-        return -1;
-    }
+
     req = acm->notifyReq;
     if ((req == nullptr) || ((req != nullptr) && (req->buf == nullptr))) {
         return -1;
