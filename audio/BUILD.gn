@@ -42,7 +42,7 @@ group("hdi_audio") {
         "hal/hdi_binder/server:hdi_audio_server",
       ]
     } else {
-      deps += [ "config/lite:hdf_audio_json" ]
+      deps += [ "config/linux:hdf_audio_json" ]
     }
   }
 
