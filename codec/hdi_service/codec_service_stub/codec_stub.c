@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "codec_stub.h"
+#include <hdf_device_object.h>
 #include <hdf_log.h>
 #include <osal_mem.h>
 #include "codec_callback_proxy.h"
@@ -102,7 +103,7 @@ static int32_t SerCodecGetCapbility(struct HdfDeviceIoClient *client, struct Hdf
     }
     return errNum;
 }
-// todo handle+buffer
+
 static int32_t SerCodecCreate(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t len = 0;
@@ -164,7 +165,6 @@ static int32_t SerCodecDestroy(struct HdfDeviceIoClient *client, struct HdfSBuf 
     return errNum;
 }
 
-// todo handle
 static int32_t SerCodecSetPortMode(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t errNum;
@@ -191,7 +191,7 @@ static int32_t SerCodecSetPortMode(struct HdfDeviceIoClient *client, struct HdfS
     }
     return errNum;
 }
-// todo handle
+
 static int32_t SerCodecSetParameter(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t errNum;
@@ -533,6 +533,10 @@ static int32_t SerCodecSetCallback(struct HdfDeviceIoClient *client, struct HdfS
 int32_t CodecServiceOnRemoteRequest(struct HdfDeviceIoClient *client, int cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        HDF_LOGE("check interface token failed");
+        return HDF_ERR_INVALID_PARAM;
+    }
     switch (cmdId) {
         case CMD_CODEC_INIT:
             return SerCodecInit(client, data, reply);
