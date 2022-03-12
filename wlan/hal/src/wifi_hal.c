@@ -29,7 +29,8 @@ extern "C" {
 #endif
 #endif
 
-#define MAX_AUTH_NUM 1000
+#define WIFI_HOST 3026
+#define WIFI_C_HOST 3036
 static bool g_wifiIsStarted = false;
 
 static int32_t StartInner(struct IWiFi *iwifi)
@@ -206,7 +207,6 @@ static int32_t DestroyFeatureInner(struct IWiFiBaseFeature *ifeature)
     DLIST_FOR_EACH_ENTRY(networkNode, networkHead, struct IWiFiList, entry) {
         if (strcmp(networkNode->ifName, ifeature->ifName) == HDF_SUCCESS) {
             free(ifeature);
-            ifeature = NULL;
             networkNode->ifeature = NULL;
             return HDF_SUCCESS;
         }
@@ -326,7 +326,7 @@ static int32_t HalUnregisterEventCallback(OnReceiveFunc onRecFunc, const char *i
 
 static int32_t ResetDriver(const uint8_t chipId, const char *ifName)
 {
-    if (getuid() >= MAX_AUTH_NUM) {
+    if ((getuid() != WIFI_HOST) && (getuid() != WIFI_C_HOST)) {
         HDF_LOGE("%s: don't have authorized access, line: %d", __FUNCTION__, __LINE__);
         return ERR_UNAUTH_ACCESS;
     }
