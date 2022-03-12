@@ -27,4 +27,10 @@ void CameraHostCallback::OnFlashlightStatus(const std::string &cameraId, Flashli
     HDF_LOGV("%{public}s, enter. cameraId = %s, status = %d",
         __func__, cameraId.c_str(), static_cast<int>(status));
 }
+
+void CameraHostCallback::OnCameraEvent(const std::string &cameraId, CameraEvent event)
+{
+    HDF_LOGV("%{public}s, enter. cameraId = %s, event = %d",
+        __func__, cameraId.c_str(), static_cast<int>(event));
+}
 }
