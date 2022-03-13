@@ -144,7 +144,7 @@ int32_t TinyalsaGetElemInfo(int32_t fd, struct snd_ctl_elem_info *elemInfo)
 int32_t mixer_ctl_enumerated_select(struct mixer_ctl *ctl, const char *value)
 {
     struct snd_ctl_elem_value ev;
-    memset_s(&ev, sizeof(ev), 0, sizeof(ev));
+    (void)memset_s(&ev, sizeof(ev), 0, sizeof(ev));
     if (ctl->info->type != SNDRV_CTL_ELEM_TYPE_ENUMERATED) {
         return -1;
     }
@@ -239,7 +239,7 @@ int32_t mixer_ctl_set_int_double(struct mixer_ctl *ctl, long long left, long lon
     snd_ctl_elem_type_t type =  elemInfo->type;
     uint32_t n;
 
-    memset_s(&elemValue, sizeof(elemValue), 0, sizeof(elemValue));
+    (void)memset_s(&elemValue, sizeof(elemValue), 0, sizeof(elemValue));
     elemValue.id.numid = elemInfo->id.numid;
     mixer_ctl_value_check(ctl, &left);
     long long value = left;
@@ -332,7 +332,7 @@ char* GetSndCardId(int32_t card, uint32_t *length)
         LOG_FUN_ERR("sndCardId malloc failed");
         return NULL;
     }
-    memset_s(sndCardId, SND_CARD_ID_LEN, 0, SND_CARD_ID_LEN);
+    (void)memset_s(sndCardId, SND_CARD_ID_LEN, 0, SND_CARD_ID_LEN);
     
     int32_t ret = sprintf_s(path, sizeof(path) - 1, "/proc/asound/card%d/id", card);
     if (ret < 0) {
@@ -523,7 +523,7 @@ int32_t CtleNamesInit(struct snd_ctl_elem_info *elemInfo, struct mixer *mixer, i
     mixer->ctl[nums].ename = enames;
     uint32_t i = 0;
     while (i < items) {
-        memset_s(&tempInfo, sizeof(tempInfo), 0, sizeof(tempInfo));
+        (void)memset_s(&tempInfo, sizeof(tempInfo), 0, sizeof(tempInfo));
         tempInfo.id.numid = elemInfo->id.numid;
         tempInfo.value.enumerated.item = i;
         TinyalsaGetElemInfo(mixer->fd, &tempInfo);
@@ -534,7 +534,7 @@ int32_t CtleNamesInit(struct snd_ctl_elem_info *elemInfo, struct mixer *mixer, i
             LOG_FUN_ERR("enumerated.items enames malloc failed");
             return -1;
         }
-        memset_s(enames[i], nameLen, 0, nameLen);
+        (void)memset_s(enames[i], nameLen, 0, nameLen);
         int32_t ret = strncpy_s(enames[i], nameLen, tempInfo.value.enumerated.name, nameLen - 1);
         if (ret != 0) {
             free(enames[i]);
@@ -582,7 +582,7 @@ struct mixer *mixer_open_legacy(int32_t card)
         return NULL;
     }
     struct snd_ctl_elem_list elemList;
-    memset_s(&elemList, sizeof(elemList), 0, sizeof(elemList));
+    (void)memset_s(&elemList, sizeof(elemList), 0, sizeof(elemList));
     if (ioctl(fd, SNDRV_CTL_IOCTL_ELEM_LIST, &elemList) < 0) {
         close(fd);
         return NULL;

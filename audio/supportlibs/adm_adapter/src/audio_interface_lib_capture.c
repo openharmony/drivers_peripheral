@@ -48,7 +48,7 @@ int32_t SetHwParamsCapture(const struct AudioHwCaptureParam * const handleData)
         LOG_FUN_ERR("card is Error!");
         return HDF_FAILURE;
     }
-    memset_s(&g_hwParams, sizeof(struct AudioPcmHwParams), 0, sizeof(struct AudioPcmHwParams));
+    (void)memset_s(&g_hwParams, sizeof(struct AudioPcmHwParams), 0, sizeof(struct AudioPcmHwParams));
     g_hwParams.streamType = AUDIO_CAPTURE_STREAM;
     g_hwParams.channels = handleData->frameCaptureMode.attrs.channelCount;
     g_hwParams.rate = handleData->frameCaptureMode.attrs.sampleRate;
@@ -246,7 +246,7 @@ int32_t AudioCtlCaptureGetVolume(const struct DevHandleCapture *handle,
 #ifdef ALSA_MODE
     char *ctlName = "DACL Capture Volume";
     ReadInSoundCard();
-    memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
+    (void)memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
     GetInDevInfo(SND_IN_SOUND_CARD_MIC, &g_inDevInfo);
     MixerOpenLegacy(false, g_inDevInfo.card);
     handleData->captureMode.ctlParam.volume = RouteGetVoiceVolume(ctlName, false);
@@ -862,7 +862,7 @@ int32_t AudioCtlCaptureGetGainThreshold(const struct DevHandleCapture *handle,
         return HDF_FAILURE;
     }
     struct AudioCtrlElemInfo gainThreshold;
-    memset_s(&gainThreshold, sizeof(struct AudioCtrlElemInfo), 0, sizeof(struct AudioCtrlElemInfo));
+    (void)memset_s(&gainThreshold, sizeof(struct AudioCtrlElemInfo), 0, sizeof(struct AudioCtrlElemInfo));
     if (!HdfSbufReadInt32(reply, &gainThreshold.type)) {
         LOG_FUN_ERR("CaptureGetGainThreshold Failed to HdfSbufReadBuffer!");
         AudioBufReplyRecycle(sBuf, reply);
@@ -919,7 +919,7 @@ int32_t TinyAlsaAudioCtlCaptureGetVolThreshold(struct AudioHwCaptureParam *handl
     long long volMax = 0;
     char *ctlName = "DACL Capture Volume";
     ReadInSoundCard();
-    memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
+    (void)memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
     GetInDevInfo(SND_IN_SOUND_CARD_MIC, &g_inDevInfo);
     MixerOpenLegacy(false, g_inDevInfo.card);
     RouteGetVoiceMinMaxStep(&volMin, &volMax, ctlName, false);
@@ -1168,10 +1168,10 @@ int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
             format = PCM_FORMAT_S16_LE;
         }
         ReadInSoundCard();
-        memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
+        (void)memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
         GetInDevInfo(SND_IN_SOUND_CARD_MIC, &g_inDevInfo);
         struct PcmCaptureParam param;
-        memset_s(&param, sizeof(param), 0, sizeof(param));
+        (void)memset_s(&param, sizeof(param), 0, sizeof(param));
         param.card = g_inDevInfo.card;
         param.device = g_inDevInfo.device;
         param.channels = g_hwParams.channels;

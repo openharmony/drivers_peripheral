@@ -698,9 +698,9 @@ static int32_t LogErrorGetRensonAndTime(struct AudioHwCapture *hwCapture, int er
             return AUDIO_HAL_ERR_MALLOC_FAIL;
         }
     }
-    memset_s(hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].reason,
+    (void)memset_s(hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].reason,
         ERROR_REASON_DESC_LEN, 0, ERROR_REASON_DESC_LEN);
-    memset_s(hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].currentTime,
+    (void)memset_s(hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].currentTime,
         ERROR_REASON_DESC_LEN, 0, ERROR_REASON_DESC_LEN);
     int32_t ret = GetErrorReason(errorReason, hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].reason);
     if (ret < 0) {
