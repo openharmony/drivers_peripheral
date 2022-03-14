@@ -54,7 +54,7 @@ int32_t SetHwParams(const struct AudioHwRenderParam *handleData)
         LOG_FUN_ERR("card is Error!");
         return HDF_FAILURE;
     }
-    memset_s(&g_hwParams, sizeof(struct AudioPcmHwParams), 0, sizeof(struct AudioPcmHwParams));
+    (void)memset_s(&g_hwParams, sizeof(struct AudioPcmHwParams), 0, sizeof(struct AudioPcmHwParams));
     g_hwParams.streamType = AUDIO_RENDER_STREAM;
     g_hwParams.channels = handleData->frameRenderMode.attrs.channelCount;
     g_hwParams.rate = handleData->frameRenderMode.attrs.sampleRate;
@@ -195,7 +195,7 @@ int32_t AudioCtlRenderGetVolumeALSA(struct AudioHwRenderParam *handleData)
 {
     char *ctlName = "DACL Playback Volume";
     ReadOutSoundCard();
-    memset_s(&g_outDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
+    (void)memset_s(&g_outDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
     GetOutDevInfo(SND_OUT_SOUND_CARD_SPEAKER, &g_outDevInfo);
     MixerOpenLegacy(true, g_outDevInfo.card);
     handleData->renderMode.ctlParam.volume = RouteGetVoiceVolume(ctlName, true);
@@ -241,7 +241,7 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue elemValue;
-    memset_s(&elemValue, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
+    (void)memset_s(&elemValue, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
     if (!HdfSbufReadInt32(reply, &elemValue.value[0])) {
         LOG_FUN_ERR("RenderGetVolume Failed to Get Volume sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
@@ -481,7 +481,7 @@ int32_t AudioCtlRenderGetMuteStu(const struct DevHandle *handle, int cmdId, stru
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue muteValueStu;
-    memset_s(&muteValueStu, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
+    (void)memset_s(&muteValueStu, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
     if (!HdfSbufReadInt32(reply, &muteValueStu.value[0])) {
         LOG_FUN_ERR("RenderGetMuteStu Failed to Get Volume sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
@@ -642,7 +642,7 @@ int32_t AudioCtlRenderGetGainStu(const struct DevHandle *handle, int cmdId, stru
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue gainValueStu;
-    memset_s(&gainValueStu, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
+    (void)memset_s(&gainValueStu, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
     if (!HdfSbufReadInt32(reply, &gainValueStu.value[0])) {
         LOG_FUN_ERR("Failed to Get Gain sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
@@ -852,7 +852,7 @@ int32_t AudioCtlRenderSceneGetGainThreshold(const struct DevHandle *handle,
         return HDF_FAILURE;
     }
     struct AudioCtrlElemInfo gainThreshold;
-    memset_s(&gainThreshold, sizeof(struct AudioCtrlElemInfo), 0, sizeof(struct AudioCtrlElemInfo));
+    (void)memset_s(&gainThreshold, sizeof(struct AudioCtrlElemInfo), 0, sizeof(struct AudioCtrlElemInfo));
     if (!HdfSbufReadInt32(reply, &gainThreshold.type)) {
         LOG_FUN_ERR("RenderSceneGetGainThreshold Failed to Get Volume sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
@@ -876,7 +876,7 @@ int32_t AudioCtlRenderGetVolThreshold(const struct DevHandle *handle, int cmdId,
     long long volMax = 0;
     char *ctlName = "DACL Playback Volume";
     ReadOutSoundCard();
-    memset_s(&g_outDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
+    (void)memset_s(&g_outDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
     GetOutDevInfo(SND_OUT_SOUND_CARD_SPEAKER, &g_outDevInfo);
     MixerOpenLegacy(true, g_outDevInfo.card);
     RouteGetVoiceMinMaxStep(&volMin, &volMax, ctlName, true);
@@ -1072,7 +1072,7 @@ int32_t AudioCtlRenderGetChannelMode(const struct DevHandle *handle, int cmdId, 
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue elemValue;
-    memset_s(&elemValue, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
+    (void)memset_s(&elemValue, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
     if (!HdfSbufReadInt32(reply, &elemValue.value[0])) {
         LOG_FUN_ERR("Failed to Get ChannelMode sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
@@ -1297,10 +1297,10 @@ int32_t FrameSbufWriteBuffer(struct HdfSBuf *sBuf, const struct AudioHwRenderPar
             bits = TINYALSAPCM_16_BIT;
         }
         ReadOutSoundCard();
-        memset_s(&g_outDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
+        (void)memset_s(&g_outDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
         GetOutDevInfo(SND_OUT_SOUND_CARD_SPEAKER, &g_outDevInfo);
         struct PcmRenderParam param;
-        memset_s(&param, sizeof(param), 0, sizeof(param));
+        (void)memset_s(&param, sizeof(param), 0, sizeof(param));
         param.card = g_outDevInfo.card;
         param.device = g_outDevInfo.device;
         param.channels = g_hwParams.channels;
