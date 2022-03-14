@@ -46,8 +46,8 @@ namespace {
     struct SensorValueRange g_proximityRange[] = {{5.0, 0.0}};
     struct SensorValueRange g_hallRange[] = {{1.0, 0.0}};
     struct SensorValueRange g_barometerRange[] = {{1100.0, -1100.0}, {1100.0, -1100.0}};
-    struct SensorValueRange g_magneticRange[] = {{35.0, -35.0}, {35.0, -35.0}, {35.0, -35.0}};
-    struct SensorValueRange g_gyroscopeRange[] = {{2000.0, -2000.0}, {2000.0, -2000.0}, {2000.0, -2000.0}};
+    struct SensorValueRange g_magneticRange[] = {{2000.0, -2000.0}, {2000.0, -2000.0}, {2000.0, -2000.0}};
+    struct SensorValueRange g_gyroscopeRange[] = {{35.0, -35.0}, {35.0, -35.0}, {35.0, -35.0}};
     struct SensorValueRange g_gravityRange[] = {{78.0, -78.0}, {78.0, -78.0}, {78.0, -78.0}};
 
     struct SensorDevelopmentList g_sensorList[] = {
@@ -109,13 +109,8 @@ namespace {
 
         for (int32_t i = 0; i < g_listNum; ++i) {
             if (event->sensorId == g_sensorList[i].sensorTypeId) {
-                if (event->sensorId == SENSOR_TYPE_HALL || event->sensorId == SENSOR_TYPE_PROXIMITY) {
-                    float data = (float)*event->data;
-                    SensorDataVerification(data, g_sensorList[i]);
-                } else {
-                    float *data = (float*)event->data;
-                    SensorDataVerification(*data, g_sensorList[i]);
-                }
+                float *data = (float*)event->data;
+                SensorDataVerification(*data, g_sensorList[i]);
             }
         }
         return 0;
