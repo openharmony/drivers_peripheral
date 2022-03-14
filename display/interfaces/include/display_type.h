@@ -229,9 +229,9 @@ typedef enum {
  *
  */
 typedef enum {
-    INVALID = 0,         /**< Invalid connection */
-    CONNECTED,           /**< Connected */
-    DISCONNECTED         /**< Disconnected */
+    CON_INVALID = 0,            /**< Invalid connection */
+    CONNECTED,                  /**< Connected */
+    DISCONNECTED                /**< Disconnected */
 } Connection;
 
 /**
