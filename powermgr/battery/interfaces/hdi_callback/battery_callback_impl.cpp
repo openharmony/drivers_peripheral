@@ -25,9 +25,9 @@ namespace Battery {
 namespace V1_0 {
 BatteryCallbackImpl::BatteryEventCallback BatteryCallbackImpl::eventCb_ = nullptr;
 
-int32_t BatteryCallbackImpl::Update(const CallbackInfo& event)
+int32_t BatteryCallbackImpl::Update(const BatteryInfo& event)
 {
-    HDF_LOGI("%{public}s: CallbackInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
+    HDF_LOGI("%{public}s: BatteryInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
         "healthState=%{public}d, pluggedType=%{public}d, pluggedMaxCurrent=%{public}d, " \
         "pluggedMaxVoltage=%{public}d, chargeState=%{public}d, chargeCounter=%{public}d, present=%{public}d, " \
         "technology=%{public}s", __func__, event.capacity, event.voltage,
