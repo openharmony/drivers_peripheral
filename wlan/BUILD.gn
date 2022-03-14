@@ -10,22 +10,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//build/ohos.gni")
-
-if (!defined(ohos_lite)) {
-  WLAN_HALUT_PATH =
-      rebase_path("//vendor/${product_company}/${product_name}/hals/wlan")
-
-  cmd = "if [ -f $WLAN_HALUT_PATH/product.gni ]; then echo true; else echo false; fi"
-  HAVE_WLAN_HALUT_PATH =
-      exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
-
-  if (HAVE_WLAN_HALUT_PATH) {
-    import("$WLAN_HALUT_PATH/product.gni")
-  } else {
-    enable_HDF_UT = true
-  }
-}
 
 if (defined(ohos_lite)) {
   group("wlan_entry") {
@@ -35,9 +19,6 @@ if (defined(ohos_lite)) {
       "//device/soc/hisilicon/common/platform/wifi/hi3881v100/firmware:wifi_firmware",
     ]
   }
-  group("wlan_test_entry") {
-    deps = [ "test:hdf_test_wlan" ]
-  }
 } else {
   group("wlan_entry") {
     deps = [
@@ -46,14 +27,5 @@ if (defined(ohos_lite)) {
       "hdi_service:wifi_hdi_c_device",
       "hdi_service:wifi_hdi_device",
     ]
-  }
-  group("wlan_test_entry") {
-    testonly = true
-    if (enable_HDF_UT) {
-      deps = [
-        "test:hdf_test_wifi",
-        "test/hdi_service:unittest",
-      ]
-    }
   }
 }
