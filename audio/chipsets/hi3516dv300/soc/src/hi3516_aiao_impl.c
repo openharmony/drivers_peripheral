@@ -507,8 +507,8 @@ int32_t AiaoSetSysCtlRegValue(uint32_t mclkSel, uint32_t bitWidth, uint32_t rate
         return HDF_ERR_INVALID_PARAM;
     }
     fsBit = AiaoGetBitCnt(bitWidth) * 2; // 2 is bit width
-    memset_s(&bclkSel, sizeof(uint32_t), 0, sizeof(uint32_t));
-    memset_s(&lrClkSel, sizeof(uint32_t), 0, sizeof(uint32_t));
+    (void)memset_s(&bclkSel, sizeof(uint32_t), 0, sizeof(uint32_t));
+    (void)memset_s(&lrClkSel, sizeof(uint32_t), 0, sizeof(uint32_t));
     ret = AiaoGetBclkFsclk(fsBit, rate, mclkSel, &bclkSel, &lrClkSel);
     if (ret != HDF_SUCCESS) {
         AUDIO_DEVICE_LOG_ERR("AiaoGetBclkFsclk fail");

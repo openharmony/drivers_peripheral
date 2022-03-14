@@ -515,7 +515,7 @@ int32_t InitPlayingAudioParam(struct AudioRender *render)
     if (g_frame == NULL) {
         return HDF_FAILURE;
     }
-    memset_s(&g_str, sizeof(struct StrPara), 0, sizeof(struct StrPara));
+    (void)memset_s(&g_str, sizeof(struct StrPara), 0, sizeof(struct StrPara));
     g_str.render = render;
     g_str.bufferSize = bufferSize;
     g_str.frame = g_frame;

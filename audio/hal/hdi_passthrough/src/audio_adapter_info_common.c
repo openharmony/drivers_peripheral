@@ -50,7 +50,7 @@ void AudioSetFuzzCheckFlag(bool check)
 
 void AudioAdapterAddrMgrInit()
 {
-    memset_s(&g_localAudioAddrList, sizeof(g_localAudioAddrList), 0, sizeof(g_localAudioAddrList));
+    (void)memset_s(&g_localAudioAddrList, sizeof(g_localAudioAddrList), 0, sizeof(g_localAudioAddrList));
     for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
         g_localAudioAddrList[index].addrType = AUDIO_INVALID_ADDR;
     }
