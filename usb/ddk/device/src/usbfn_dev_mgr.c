@@ -526,7 +526,12 @@ static int32_t UsbFnEventProcess(void *arg)
         if (devMgr == NULL || devMgr->running == false) {
             break;
         }
-        memset_s(&event, sizeof(event), 0, sizeof(event));
+        ret = memset_s(&event, sizeof(event), 0, sizeof(event));
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+            return ret;
+        }
+   
         CollectEventHandle(&event, devMgr);
         if (event.ep0Num + event.epNum == 0) {
             continue;
@@ -561,7 +566,11 @@ static int32_t StartThreadIo(struct UsbFnDeviceMgr *fnDevMgr)
 {
     int32_t ret;
     struct OsalThreadParam threadCfg;
-    memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
+    ret = memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+        return ret;
+    }
     threadCfg.name = "usbfn process";
     threadCfg.priority = OSAL_THREAD_PRI_LOW;
     threadCfg.stackSize = HDF_PROCESS_STACK_SIZE;

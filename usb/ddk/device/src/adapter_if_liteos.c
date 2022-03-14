@@ -491,7 +491,12 @@ static int32_t UsbFnAdapterWriteFunctions(int32_t fd, struct UsbFnConfiguration 
     funcInfo.configName.len = configName->len;
     funcInfo.configName.s = configName->s;
     for (iCount = 0; UsbFnConfig->functions[iCount] != NULL; iCount++) {
-        memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+        ret = memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+            return ret;
+        }
+   
         ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1,
             "generic.%s", UsbFnConfig->functions[iCount]->funcName);
         if (ret < 0) {
@@ -551,7 +556,11 @@ static int32_t UsbFnAdapterWriteConfigs(int32_t fd, struct FconfigString *gadget
         configDesc.gadgetName.len = gadgetName->len;
         configDesc.gadgetName.s = gadgetName->s;
         confVal = descriptor->configs[iCount]->configurationValue;
-        memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+        ret = memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+            return ret;
+        }
         ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1,
             "b.%u", confVal);
         if (ret < 0) {
@@ -761,7 +770,12 @@ static int32_t UsbFnAdapterGetPipeInfo(int32_t ep, struct UsbFnPipeInfo *pipeInf
     }
 
     struct usb_endpoint_descriptor desc;
-    (void)memset_s(&desc, sizeof(desc), 0, sizeof(desc));
+    ret = memset_s(&desc, sizeof(desc), 0, sizeof(desc));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+        return ret;
+    }
+   
     ret = handle_ioctl(ep, GENERIC_CMD_GET_PIPE_INFO, &desc);
     if (ret) {
         HDF_LOGE("%s: FUNCTIONFS_ENDPOINT_DESC failure!", __func__);
@@ -884,6 +898,7 @@ static int32_t EpEvent(struct UsbFnEventAll *event, struct FconfigPollFd *pfds)
 static int32_t UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int32_t timeout)
 {
     uint8_t i;
+    int32_t ret;
     struct FconfigPollFd pfds[16] = {0};
     struct FconfigPollFd *pfd = &pfds[0];
     if (event == NULL) {
@@ -892,7 +907,12 @@ static int32_t UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int32_t timeou
     if ((event->ep0Num + event->epNum) == 0) {
         return HDF_ERR_INVALID_PARAM;
     }
-    memset_s(&pfds, sizeof(pfds), 0, sizeof(pfds));
+    ret = memset_s(&pfds, sizeof(pfds), 0, sizeof(pfds));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+        return ret;
+    }
+
     for (i = 0; i < event->ep0Num; i++) {
         if (event->ep0[i] <= 0) {
             HDF_LOGE("%s: ep[%d] = %d", __func__, i, event->ep0[i]);
@@ -1042,10 +1062,16 @@ void *UsbFnMemCalloc(size_t size)
     struct RawUsbRamTestList *testEntry = NULL;
     struct RawUsbRamTestList *pos = NULL;
     uint32_t totalSize = 0;
+    int32_t ret;
 
     buf = OsalMemAlloc(size);
     if (buf != NULL) {
-        (void)memset_s(buf, size, 0, size);
+        ret = memset_s(buf, size, 0, size);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+            OsalMemFree(buf);
+            return NULL;
+        }
     }
     if (g_usbRamTestFlag) {
         if (g_usbRamTestHead == NULL) {

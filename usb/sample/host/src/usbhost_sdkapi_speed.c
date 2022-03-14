@@ -134,6 +134,7 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
 {
     if (req == NULL) {
         printf("req is null\r\n");
+        return;
     }
     int32_t status = req->compInfo.status;
     struct AcmDb *db  = (struct AcmDb *)req->compInfo.userData;
