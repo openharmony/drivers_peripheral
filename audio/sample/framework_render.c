@@ -33,7 +33,7 @@
         printf("%s: [%s]: [%d]:[ERROR]:" fmt"\n", __FILE__, __func__, __LINE__, ##arg); \
     } while (0)
 
-#define MAX_AUDIO_ADAPTER_NUM_T  3  // Number of sound cards supported
+#define MAX_SUPPORT_ADAPTER_NUM  8  // Number of sound cards supported
 #define BUFFER_LEN 256
 #define ID_RIFF 0x46464952
 #define ID_WAVE 0x45564157
@@ -684,7 +684,7 @@ int32_t GetRenderPassthroughManagerFunc(const char *adapterNameCase)
     }
     manager = getAudioManager();
     ret = manager->GetAllAdapters(manager, &descs, &size);
-    int32_t check = size > MAX_AUDIO_ADAPTER_NUM_T || size == 0 || descs == NULL || ret < 0;
+    int32_t check = size > MAX_SUPPORT_ADAPTER_NUM || size == 0 || descs == NULL || ret < 0;
     if (check) {
         LOG_FUN_ERR("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
@@ -737,7 +737,7 @@ int32_t GetRenderProxyManagerFunc(const char *adapterNameCase)
     }
     proxyManager = getAudioManager();
     ret = proxyManager->GetAllAdapters(proxyManager, &descs, &size);
-    int32_t temp = size > MAX_AUDIO_ADAPTER_NUM_T || size == 0 || descs == NULL || ret < 0;
+    int32_t temp = size > MAX_SUPPORT_ADAPTER_NUM || size == 0 || descs == NULL || ret < 0;
     if (temp) {
         LOG_FUN_ERR("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
