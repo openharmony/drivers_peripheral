@@ -474,7 +474,7 @@ void initRenderFormat(uint32_t bits)
 void TinyAlsaPlayParamInit(uint32_t channels, uint32_t rate,
     uint32_t periodSize, uint32_t periodCount)
 {
-    memset_s(&g_renderPcmCfg, sizeof(struct pcm_config), 0, sizeof(struct pcm_config));
+    (void)memset_s(&g_renderPcmCfg, sizeof(struct pcm_config), 0, sizeof(struct pcm_config));
     g_renderPcmCfg.channels = channels;
     g_renderPcmCfg.rate = rate;
     g_renderPcmCfg.period_size = periodSize;
@@ -506,7 +506,7 @@ void RenderSample(struct pcm **pcm, struct PcmRenderParam *param)
 uint32_t CaptureSample(struct pcm **pcm, struct PcmCaptureParam *param)
 {
     struct pcm_config config;
-    memset_s(&config, sizeof(config), 0, sizeof(config));
+    (void)memset_s(&config, sizeof(config), 0, sizeof(config));
     config.channels = param->channels;
     config.rate = param->rate;
     config.period_size = param->periodSize;

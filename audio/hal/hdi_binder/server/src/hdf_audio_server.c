@@ -327,7 +327,7 @@ static int32_t HdiServiceGetPassthroughMode(const struct HdfDeviceIoClient *clie
     struct AudioAdapter *adapter = NULL;
     const char *adapterName = NULL;
     struct AudioPort port;
-    memset_s(&port, sizeof(struct AudioPort), 0, sizeof(struct AudioPort));
+    (void)memset_s(&port, sizeof(struct AudioPort), 0, sizeof(struct AudioPort));
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
         HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
         return AUDIO_HAL_ERR_INVALID_PARAM;

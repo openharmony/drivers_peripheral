@@ -734,9 +734,9 @@ static int32_t LogErrorGetRensonAndTime(struct AudioHwRender *hwRender, int erro
             return AUDIO_HAL_ERR_MALLOC_FAIL;
         }
     }
-    memset_s(hwRender->errorLog.errorDump[hwRender->errorLog.iter].reason,
+    (void)memset_s(hwRender->errorLog.errorDump[hwRender->errorLog.iter].reason,
         ERROR_REASON_DESC_LEN, 0, ERROR_REASON_DESC_LEN);
-    memset_s(hwRender->errorLog.errorDump[hwRender->errorLog.iter].currentTime,
+    (void)memset_s(hwRender->errorLog.errorDump[hwRender->errorLog.iter].currentTime,
         ERROR_REASON_DESC_LEN, 0, ERROR_REASON_DESC_LEN);
     int32_t ret = GetErrorReason(errorReason, hwRender->errorLog.errorDump[hwRender->errorLog.iter].reason);
     if (ret < 0) {

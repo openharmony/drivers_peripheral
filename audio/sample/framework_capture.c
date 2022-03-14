@@ -517,7 +517,7 @@ int32_t CaptureChoiceModeAndRecording(struct StrParaCapture *StrParam, struct Au
         return HDF_FAILURE;
     }
     int32_t ret;
-    memset_s(StrParam, sizeof(struct StrParaCapture), 0, sizeof(struct StrParaCapture));
+    (void)memset_s(StrParam, sizeof(struct StrParaCapture), 0, sizeof(struct StrParaCapture));
     StrParam->capture = capture;
     StrParam->file = g_file;
     StrParam->attrs = g_attrs;
