@@ -42,12 +42,12 @@ Light驱动模型支持获取系统中所有灯的信息，动态配置闪烁模
 | 接口名                                                       | 功能描述                                                     |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | int32_t (*GetLightInfo)(struct LightInfo **lightInfo, uint32_t *count) | 获取系统中所有灯的信息，lightInfo表示灯设备的基本信息，count表示获取灯的个数。 |
-| int32_t (*TurnOnLight)(uint32_t type, struct LightEffect *effect) | 根据指定的灯类型打开灯列表中可用的灯，type表示灯类型，effect表示要设置的效果信息。 |
-| int32_t (*TurnOffLight)(uint32_t type)                       | 根据指定的灯类型关闭灯列表中可用的灯。                       |
+| int32_t (*TurnOnLight)(uint32_t type, struct LightEffect *effect) | 打开指定类型的灯，type表示灯类型，effect表示要设置的效果信息。 |
+| int32_t (*TurnOffLight)(uint32_t type)                       | 关闭指定类型的灯。                                           |
 
 ### 使用说明
 
-代码示例
+代码示例，以小型系统为例。
 
 ```c++
 #include "light_if.h"
