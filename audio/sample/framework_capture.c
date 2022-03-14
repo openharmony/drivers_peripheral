@@ -52,7 +52,7 @@
 #define PCM_16_BIT 16
 #define AUDIO_TOTALSIZE_15M (1024 * 15)
 #define AUDIO_RECORD_INTERVAL_512KB 512
-#define MAX_AUDIO_ADAPTER_NUM_T 3
+#define MAX_SUPPORT_ADAPTER_NUM 8
 #define FILE_CAPTURE_SIZE (1024 * 1024 * 3) // 3M
 #define BUFFER_LEN 256
 #define EXT_PARAMS_MAXLEN 107
@@ -700,7 +700,7 @@ int32_t GetCapturePassthroughManagerFunc(const char *adapterNameCase)
     }
     manager = getAudioManager();
     ret = manager->GetAllAdapters(manager, &descs, &size);
-    int32_t param = size > MAX_AUDIO_ADAPTER_NUM_T || size == 0 || descs == NULL || ret < 0;
+    int32_t param = size > MAX_SUPPORT_ADAPTER_NUM || size == 0 || descs == NULL || ret < 0;
     if (param) {
         LOG_FUN_ERR("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
@@ -753,7 +753,7 @@ int32_t GetCaptureProxyManagerFunc(const char *adapterNameCase)
     }
     proxyManager = getAudioManager();
     ret = proxyManager->GetAllAdapters(proxyManager, &descs, &size);
-    int32_t check = size > MAX_AUDIO_ADAPTER_NUM_T || size == 0 || descs == NULL || ret < 0;
+    int32_t check = size > MAX_SUPPORT_ADAPTER_NUM || size == 0 || descs == NULL || ret < 0;
     if (check) {
         LOG_FUN_ERR("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
