@@ -17,22 +17,20 @@
  * @addtogroup Light
  * @{
  *
- * @brief Provides a driver for upper-layer Light services.
+ * @brief Provides APIs for the light service.
  *
- * After obtaining a driver object or agent, a Light service starts or stops the Light
- * using the functions provided by the driver object or agent.
- *
- * @since 2.2
+ * The light module provides a unified interface for the light service to access the light driver.
+ * After obtaining the driver object or proxy, the light service distinguishes light devices by type
+ * and call related APIs to obtain light information, turn on or off a light, or set the blinking mode.
+ * @since 3.1
  */
 
 /**
  * @file Light_if.h
  *
- * @brief Declare the generic API in the light module. These APIs can be used to control
- *  light enable, de enable, brightness, and blink modes.
+ * @brief Declares common APIs of the light module. These APIs can be used to obtain the light type, turn on or off a light, and set the light brightness and blinking mode.
  *
- * @since 2.2
- * @version 1.0
+ * @since 3.1
  */
 
 #ifndef LIGHT_IF_H
@@ -48,71 +46,73 @@ extern "C" {
 #endif /* __cplusplus */
 
 /**
- * @brief Defines the function of performing basic operations on the light.
+ * @brief Defines the basic operations that can be performed on lights.
  *
- * The operations include obtaining light information, enabling or disabling light,
- * setting light brightness, setting light flicker mode.
+ * The operations include obtaining light information, turning on or off a light, setting the light brightness or blinking mode.
  */
 
 struct LightInterface {
     /**
-     * @brief Obtains information about all Lights in the system.
+     * @brief Obtains information about all the lights in the system.
      *
-     * @param lightInfo basic light information. For details, see {@link LightInfo}.
+     * @param lightInfo Indicates the double pointer to the light information. For details, see {@link LightInfo}.
+     * @param count Indicates the pointer to the number of lights.
      *
-     * @return Returns <b>0</b> if the information is obtained; returns a negative value otherwise.
+     * @return Returns <b>0</b> if the operation is successful.
+     * @return Returns a negative value if the operation fails.
      *
-     * @since 2.2
-     * @version 1.0
+     * @since 3.1
      */
     int32_t (*GetLightInfo)(struct LightInfo **lightInfo, uint32_t *count);
 
     /**
-     * @brief Enables the light available in the light list based on the specified slight type.
+     * @brief Turns on available lights in the list based on the specified light type.
      *
-     * @param type Indicates the light type. For details, see {@link LightTypeTag}.
-     * @param effect Sets the information for the light. For details, see {@link LightEffect}.
+     * @param type Indicates the light type. For details, see {@link LightType}.
      *
-     * @return Command execution result: 0 succeeded, - 1 logic lamp does not support,
-     * - 2 logic lamp does not support flashing setting, - 3 logic lamp does not support brightness setting
+     * @param effect Indicates the pointer to the lighting effect. For details, see {@link LightEffect}.
      *
-     * @since 2.2
-     * @version 1.0
+     * @return Returns <b>0</b> if the operation is successful.
+     * @return Returns <b>-1</b> if the light type is not supported.
+     * @return Returns <b>-2</b> if the blinking setting is not supported.
+     * @return Returns <b>-3</b> if the brightness setting is not supported.
+     *
+     * @since 3.1
      */
     int32_t (*TurnOnLight)(uint32_t type, struct LightEffect *effect);
 
     /**
-     * @brief Disables the lights available in the light list according to the specified light type.
+     * @brief Turns off available lights in the list based on the specified light type.
      *
-     * @param type Indicates the light type. For details, see {@link LightTypeTag}.
+     * @param type Indicates the light type. For details, see {@link LightType}.
      *
-     * @return Returns <b>0</b> if the sensor is successfully disabled; returns a negative value otherwise.
+     * @return Returns <b>0</b> if the operation is successful.
+     * @return Returns a negative value if the operation fails.
      *
-     * @since 2.2
-     * @version 1.0
+     * @since 3.1
      */
     int32_t (*TurnOffLight)(uint32_t type);
 };
 
 /**
  * @brief Creates a <b>LightInterface</b> instance.
- * You can use this instance to obtain light information and perform operations of turning on, turning off,
- * brightness setting and flashing mode setting for the specified type of light.
  *
- * @return the successfully created instance. Returns a non-zero value; Otherwise, return < b > 0 < / b >.
+ * The <b>LightInterface</b> instance created can be used to perform related light control operations.
  *
- * @since 2.2
- * @version 1.0
+ * @return Returns <b>0</b> if the operation fails.
+ * @return Returns a non-zero value if the operation is successful.
+ *
+ * @since 3.1
  */
 const struct LightInterface *NewLightInterfaceInstance(void);
 
 /**
- * @brief Releases this <b>LightInterface</b> instance to free up related resources.
+ * @brief Releases the <b>LightInterface</b> instance and related resources.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+ * @return Returns <b>0</b> if the operation is successful.
+ * @return Returns a negative value if the operation fails.
  *
- * @since 2.2
- * @version 1.0
+ * @since 3.1
  */
 int32_t FreeLightInterfaceInstance(void);
 
