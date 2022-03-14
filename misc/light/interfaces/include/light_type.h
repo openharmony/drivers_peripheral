@@ -17,21 +17,20 @@
  * @addtogroup Light
  * @{
  *
- * @brief Provides unified APIs for light services to access the light driver.
+ * @brief Provides APIs for the light service.
  *
- * After obtaining a driver object or agent, a light service starts or stops the light
- * using the functions provided by the driver object or agent.
+ * The light module provides a unified interface for the light service to access the light driver.
+ * After obtaining the light driver object or proxy, the service can call related APIs to obtain light information, turn on or off a light, and set the light blinking mode based on the light type.
  *
- * @version 1.0
+ * @since 3.1
  */
 
 /**
  * @file light_type.h
  *
- * @brief Defines the light data structure, including the vibration mode and effect type.
+ * @brief Defines the light data structure, including the light type, lighting mode, blinking mode and duration, return values, and lighting effect.
  *
- * @since 2.2
- * @version 1.0
+ * @since 3.1
  */
 
 #ifndef LIGHT_TYPE_H
@@ -46,54 +45,88 @@ extern "C" {
 #endif /* __cplusplus */
 
 /**
- * @brief Enumerates return values of the light module.
+ * @brief Enumerates the return values of the light module.
  *
+ * @since 3.1
  */
 enum LightStatus {
-    LIGHT_SUCCESS            = 0,    /**< The operation is successful. */
-    LIGHT_NOT_SUPPORT        = -1,   /**< The logical not supported. */
-    LIGHT_NOT_FLASH          = -2,   /**< The flashing settings are not supported. */
-    LIGHT_NOT_BRIGHTNESS     = -3,   /**< The brightness settings are not supported. */
+    /** The operation is successful. */
+    LIGHT_SUCCESS            = 0,
+    /** The light type is not supported. */
+    LIGHT_NOT_SUPPORT        = -1,
+    /** Blinking setting is not supported. */
+    LIGHT_NOT_FLASH          = -2,
+    /** Brightness setting is not supported. */
+    LIGHT_NOT_BRIGHTNESS     = -3,
 };
 
 /**
- * @brief Enumerates light types.
+ * @brief Enumerates the light types.
  *
+ * @since 3.1
  */
 enum LightType {
+    /** Unknown type */
     LIGHT_TYPE_NONE                = 0,
+    /** Power light */
     LIGHT_TYPE_BATTERY             = 1,
+    /** Notification light */
     LIGHT_TYPE_NOTIFICATIONS       = 2,
+    /** Alarm light */
     LIGHT_TYPE_ATTENTION           = 3,
-    LIGHT_TYPE_BUTT
-};
-
-enum LightFlashMode {
-    LIGHT_FLASH_NONE = 0,
-    LIGHT_FLASH_TIMED = 1,
-    LIGHT_FLASH_BUTT = 2,
-};
-
-struct LightFlashEffect {
-    int32_t flashMode; // Flashing mode @enum LightFlashMode
-    int32_t onTime; // enable duration unit: millisecond
-    int32_t offTime; // enable duration unit: millisecond
-};
-
-struct LightEffect {
-    int32_t lightBrightness; // Brightness value, RGB highest bit represents the color: R:16-31bit、G:8-15bit、B：0-7bit
-    struct LightFlashEffect flashEffect; // @struct LightFlashEffect
+    /** Invalid type */
+    LIGHT_TYPE_BUTT                = 4,
 };
 
 /**
- * @brief Defines basic light information.
+ * @brief Enumerates the lighting modes.
  *
- * Information about a light includes the light type,  User defined extension information
+ * @since 3.1
+ */
+enum LightFlashMode {
+    /** Steady on */
+    LIGHT_FLASH_NONE     = 0,
+    /** Blinking */
+    LIGHT_FLASH_TIMED    = 1,
+    /** Invalid mode */
+    LIGHT_FLASH_BUTT     = 2,
+};
+
+/**
+ * @brief Defines the blinking parameters.
  *
+ * The parameters include the blinking mode and the on and off time for the light in a blinking period.
+ *
+ * @since 3.1
+ */
+struct LightFlashEffect {
+    int32_t flashMode; /** Blinking mode. For details, see {@link LightFlashMode}. */
+    int32_t onTime;      /** Duration (in ms) for which the light is on in a blinking period. */
+    int32_t offTime;     /** Duration (in ms) for which the light is off in a blinking period. */
+};
+
+/**
+ * @brief Defines the lighting effect parameters.
+ *
+ * The parameters include the brightness and blinking mode.
+ *
+ * @since 3.1
+ */
+struct LightEffect {
+    int32_t lightBrightness;                /** Brightness value. The value 1 of the most significant bit indicates a color. Bits16–31 for red, bits 8–15 for green, and bits 0–7 for blue. */
+    struct LightFlashEffect flashEffect;    /** Blinking mode. For details, see {@link LightFlashEffect}. */
+};
+
+/**
+ * @brief Defines the basic light information.
+ *
+ * Basic light information includes the light type and custom extended information.
+ *
+ * @since 3.1
  */
 struct LightInfo {
-    uint32_t lightType;    // Light type obtained @enum LightType
-    int32_t reserved;    // User defined extension information
+    uint32_t lightType; /** Light type. For details, see {@link LightType}. */
+    int32_t reserved;     /** Custom extended information. */
 };
 
 #ifdef __cplusplus
