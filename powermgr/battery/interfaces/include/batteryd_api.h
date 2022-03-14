@@ -53,6 +53,10 @@ struct BatterydInfo {
     int32_t pluggedMaxVoltage_;
     int32_t chargeState_;
     int32_t chargeCounter_;
+    int32_t totalEnergy_;
+    int32_t curAverage_;
+    int32_t curNow_;
+    int32_t remainEnergy_;
     int8_t present_;
     std::string technology_;
 };
