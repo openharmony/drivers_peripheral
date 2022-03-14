@@ -19,7 +19,6 @@
 #include "camera.h"
 #include "ibuffer.h"
 #include "ibuffer_allocator.h"
-#include <memory>
 
 namespace OHOS::Camera {
 class BufferAllocatorUtils {

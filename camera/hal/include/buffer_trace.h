@@ -18,7 +18,6 @@
 
 #include "camera.h"
 #include <list>
-#include <map>
 #include <string>
 
 namespace OHOS::Camera {
