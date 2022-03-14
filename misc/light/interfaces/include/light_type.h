@@ -20,16 +20,16 @@
  * @brief Provides APIs for the light service.
  *
  * The light module provides a unified interface for the light service to access the light driver.
- * After obtaining the light driver object or proxy, the service can call related APIs to obtain light information, turn on or off a light, and set the light blinking mode based on the light type.
- *
+ * After obtaining the light driver object or proxy, the service can call related APIs to obtain light information, 
+ * turn on or off a light, and set the light blinking mode based on the light type.
  * @since 3.1
  */
 
 /**
  * @file light_type.h
  *
- * @brief Defines the light data structure, including the light type, lighting mode, blinking mode and duration, return values, and lighting effect.
- *
+ * @brief Defines the light data structure, including the light type, lighting mode, 
+ * blinking mode and duration, return values, and lighting effect.
  * @since 3.1
  */
 
@@ -113,7 +113,7 @@ struct LightFlashEffect {
  * @since 3.1
  */
 struct LightEffect {
-    int32_t lightBrightness;                /** Brightness value. The value 1 of the most significant bit indicates a color. Bits16–31 for red, bits 8–15 for green, and bits 0–7 for blue. */
+    int32_t lightBrightness;                /** Brightness value. The value 1 of the most significant bit indicates a color. \nBits16–31 for red, bits 8–15 for green, and bits 0–7 for blue. */
     struct LightFlashEffect flashEffect;    /** Blinking mode. For details, see {@link LightFlashEffect}. */
 };
 

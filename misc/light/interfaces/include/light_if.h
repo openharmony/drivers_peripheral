@@ -28,8 +28,8 @@
 /**
  * @file Light_if.h
  *
- * @brief Declares common APIs of the light module. These APIs can be used to obtain the light type, turn on or off a light, and set the light brightness and blinking mode.
- *
+ * @brief Declares common APIs of the light module. These APIs can be used to obtain the light type, 
+ * turn on or off a light, and set the light brightness and blinking mode.
  * @since 3.1
  */
 
@@ -48,7 +48,8 @@ extern "C" {
 /**
  * @brief Defines the basic operations that can be performed on lights.
  *
- * The operations include obtaining light information, turning on or off a light, setting the light brightness or blinking mode.
+ * The operations include obtaining light information, turning on or off a light,
+ * and setting the light brightness or blinking mode.
  */
 
 struct LightInterface {
