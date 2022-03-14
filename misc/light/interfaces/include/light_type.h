@@ -113,8 +113,8 @@ struct LightFlashEffect {
  * @since 3.1
  */
 struct LightEffect {
-    int32_t lightBrightness;                /** Brightness value. The value 1 of the most significant bit indicates a color.  */
-                                                      /** Bits 16–31 for red, bits 8–15 for green, and bits 0–7 for blue. */
+    int32_t lightBrightness;                /** Brightness value. The value 1 of the most significant bit indicates a color.
+    Bits 16–31 for red, bits 8–15 for green, and bits 0–7 for blue. */
     struct LightFlashEffect flashEffect;    /** Blinking mode. For details, see {@link LightFlashEffect}. */
 };
 
