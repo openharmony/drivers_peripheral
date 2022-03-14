@@ -32,9 +32,11 @@ group("audiotest") {
   ]
 
   # adm + driver ut
-  deps += [
-    "adm:hdf_test_audio",
-    "driver:khdf_test_audio_driver",
-  ]
+  if (defined(enable_hdf_audio_full_test_suite)) {
+    deps += [
+      "adm:hdf_test_audio",
+      "driver:khdf_test_audio_driver",
+    ]
+  }
 }
 ############################end############################
