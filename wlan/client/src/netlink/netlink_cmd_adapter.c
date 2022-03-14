@@ -643,8 +643,11 @@ static int32_t GetAllIfaceInfo(struct NetworkInfoResult *infoResult)
             continue;
         }
         if (IsWifiIface(de->d_name)) {
-            strncpy_s(infoResult->infos[infoResult->nums].name, IFNAMSIZ,
-                de->d_name, sizeof(de->d_name));
+            if (strncpy_s(infoResult->infos[infoResult->nums].name, IFNAMSIZ,
+                de->d_name, sizeof(de->d_name)) != EOK) {
+                HILOG_ERROR(LOG_DOMAIN, "%s: strncpy_s infoResult->infos failed", __FUNCTION__);
+                return RET_CODE_FAILURE;
+            }
             infoResult->nums++;
         }
     }
@@ -667,8 +670,12 @@ int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result)
 
     HILOG_INFO(LOG_DOMAIN, "%s: wifi iface num %d", __FUNCTION__, result->nums);
     for (i = 0; i < result->nums; ++i) {
-        memset_s(result->infos[i].supportMode, sizeof(result->infos[i].supportMode),
+        ret = memset_s(result->infos[i].supportMode, sizeof(result->infos[i].supportMode),
             0, sizeof(result->infos[i].supportMode));
+        if (ret != EOK) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: memset_s esult->infos failed", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
         if (strncmp(result->infos[i].name, STR_WLAN0, STRLEN_WLAN0) == 0) {
             result->infos[i].supportMode[WIFI_IFTYPE_STATION] = 1;
             result->infos[i].supportMode[WIFI_IFTYPE_AP] = 1;
@@ -806,7 +813,7 @@ static int32_t ParserChipId(struct nl_msg *msg, void *arg)
 
     if (attr[NL80211_ATTR_MAX]) {
         getChipId = nla_data(attr[NL80211_ATTR_MAX]);
-        memcpy_s(chipId, sizeof(uint8_t), getChipId, sizeof(uint8_t));
+        *chipId = *getChipId;
     }
 
     return NL_SKIP;
@@ -860,7 +867,11 @@ int32_t GetValidFreqByBand(const char *ifName, int32_t band,
         NL80211_CMD_GET_WIPHY, 0);
     nla_put_flag(msg, NL80211_ATTR_SPLIT_WIPHY_DUMP);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
-    memset_s(result->freqs, sizeof(result->freqs), 0, sizeof(result->freqs));
+    ret = memset_s(result->freqs, sizeof(result->freqs), 0, sizeof(result->freqs));
+    if (ret != EOK) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: memset_s result->freqs  failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
     result->nums = 0;
     result->band = band;
     ret = SendCmdSync(msg, ParserValidFreq, result);
