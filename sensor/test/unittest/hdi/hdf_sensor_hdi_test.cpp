@@ -47,13 +47,13 @@ namespace {
 
     struct SensorValueRange g_testRange[] = {{1e5, 0}};
     struct SensorValueRange g_accelRange[] = {{78, -78}, {78, -78}, {78, -78}};
-    struct SensorValueRange g_alsRange[] = {{10000, 0}, {10000, 0}, {10000, 0}, {10000, 0}};
+    struct SensorValueRange g_alsRange[] = {{10000, 0}};
     struct SensorValueRange g_pedometerRange[] = {{10000, 0}};
     struct SensorValueRange g_proximityRange[] = {{5, 0}};
     struct SensorValueRange g_hallRange[] = {{1, 0}};
     struct SensorValueRange g_barometerRange[] = {{1100, -1100}, {1100, -1100}};
-    struct SensorValueRange g_magneticRange[] = {{35, -35}, {35, -35}, {35, -35}};
-    struct SensorValueRange g_gyroscopeRange[] = {{2000, -2000}, {2000, -2000}, {2000, -2000}};
+    struct SensorValueRange g_magneticRange[] = {{2000, -2000}, {2000, -2000}, {2000, -2000}};
+    struct SensorValueRange g_gyroscopeRange[] = {{35, -35}, {35, -35}, {35, -35}};
     struct SensorValueRange g_gravityRange[] = {{78, -78}, {78, -78}, {78, -78}};
 
     struct SensorDevelopmentList g_sensorList[] = {
@@ -63,7 +63,7 @@ namespace {
         {SENSOR_TYPE_PROXIMITY, "proximity",  0, 1, g_proximityRange},
         {SENSOR_TYPE_HALL, "hallrometer",  0, 1, g_hallRange},
         {SENSOR_TYPE_BAROMETER, "barometer",  1, 2, g_barometerRange},
-        {SENSOR_TYPE_AMBIENT_LIGHT, "als", 1, 4, g_alsRange},
+        {SENSOR_TYPE_AMBIENT_LIGHT, "als", 1, 1, g_alsRange},
         {SENSOR_TYPE_MAGNETIC_FIELD, "magnetometer",  1, 3, g_magneticRange},
         {SENSOR_TYPE_GYROSCOPE, "gyroscope", 1, 3, g_gyroscopeRange},
         {SENSOR_TYPE_GRAVITY, "gravity", 1, 3, g_gravityRange}
@@ -121,6 +121,10 @@ HWTEST_F(HdfSensorHdiTest, GetSensorClient0001, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, GetSensorList0001, TestSize.Level1)
 {
+    if (g_sensorInterface == nullptr) {
+        ASSERT_NE(nullptr, g_sensorInterface);
+        return;
+    }
     int32_t ret = g_sensorInterface->GetAllSensorInfo(g_info);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
     EXPECT_GT(g_info.size(), 0);
@@ -145,6 +149,10 @@ HWTEST_F(HdfSensorHdiTest, GetSensorList0001, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, RegisterSensorDataCb0001, TestSize.Level1)
 {
+    if (g_sensorInterface == nullptr) {
+        ASSERT_NE(nullptr, g_sensorInterface);
+        return;
+    }
     int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_medicalCallback);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
     ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_medicalCallback);
@@ -159,6 +167,10 @@ HWTEST_F(HdfSensorHdiTest, RegisterSensorDataCb0001, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, RegisterSensorDataCb0002, TestSize.Level1)
 {
+    if (g_sensorInterface == nullptr) {
+        ASSERT_NE(nullptr, g_sensorInterface);
+        return;
+    }
     int32_t ret = g_sensorInterface->Register(MEDICAL_SENSOR_TYPE, g_medicalCallback);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
     ret = g_sensorInterface->Unregister(MEDICAL_SENSOR_TYPE, g_medicalCallback);
@@ -173,6 +185,10 @@ HWTEST_F(HdfSensorHdiTest, RegisterSensorDataCb0002, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, RegisterSensorDataCb0003, TestSize.Level1)
 {
+    if (g_sensorInterface == nullptr) {
+        ASSERT_NE(nullptr, g_sensorInterface);
+        return;
+    }
     int32_t ret = g_sensorInterface->Register(SENSOR_GROUP_TYPE_MAX, g_medicalCallback);
     EXPECT_EQ(SENSOR_INVALID_PARAM, ret);
     ret = g_sensorInterface->Unregister(SENSOR_GROUP_TYPE_MAX, g_medicalCallback);
@@ -187,6 +203,10 @@ HWTEST_F(HdfSensorHdiTest, RegisterSensorDataCb0003, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, EnableSensor0001, TestSize.Level1)
 {
+    if (g_sensorInterface == nullptr) {
+        ASSERT_NE(nullptr, g_sensorInterface);
+        return;
+    }
     int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 
@@ -215,6 +235,10 @@ HWTEST_F(HdfSensorHdiTest, EnableSensor0001, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, EnableSensor0002, TestSize.Level1)
 {
+    if (g_sensorInterface == nullptr) {
+        ASSERT_NE(nullptr, g_sensorInterface);
+        return;
+    }
     int32_t ret = g_sensorInterface->Enable(ABNORMAL_SENSORID);
     EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
     ret = g_sensorInterface->Disable(ABNORMAL_SENSORID);
@@ -229,6 +253,10 @@ HWTEST_F(HdfSensorHdiTest, EnableSensor0002, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, SetSensorBatch0001, TestSize.Level1)
 {
+    if (g_sensorInterface == nullptr) {
+        ASSERT_NE(nullptr, g_sensorInterface);
+        return;
+    }
     int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 
@@ -255,6 +283,10 @@ HWTEST_F(HdfSensorHdiTest, SetSensorBatch0001, TestSize.Level1)
     */
 HWTEST_F(HdfSensorHdiTest, SetSensorBatch0002, TestSize.Level1)
 {
+    if (g_sensorInterface == nullptr) {
+        ASSERT_NE(nullptr, g_sensorInterface);
+        return;
+    }
     int32_t ret = g_sensorInterface->SetBatch(ABNORMAL_SENSORID, 0, 0);
     EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
 }
@@ -267,6 +299,10 @@ HWTEST_F(HdfSensorHdiTest, SetSensorBatch0002, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, SetSensorBatch0003, TestSize.Level1)
 {
+    if (g_sensorInterface == nullptr) {
+        ASSERT_NE(nullptr, g_sensorInterface);
+        return;
+    }
     for (auto iter : g_info) {
         int32_t ret = g_sensorInterface->SetBatch(iter.sensorId, -1, SENSOR_POLL_TIME);
         EXPECT_EQ(SENSOR_INVALID_PARAM, ret);
@@ -281,9 +317,12 @@ HWTEST_F(HdfSensorHdiTest, SetSensorBatch0003, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, SetSensorMode0001, TestSize.Level1)
 {
+    if (g_sensorInterface == nullptr) {
+        ASSERT_NE(nullptr, g_sensorInterface);
+        return;
+    }
     EXPECT_GT(g_info.size(), 0);
-    for (auto iter : g_info)
-    {
+    for (auto iter : g_info) {
         int32_t ret = g_sensorInterface->SetBatch(iter.sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         if (iter.sensorId == SENSOR_TYPE_HALL) {
@@ -310,6 +349,10 @@ HWTEST_F(HdfSensorHdiTest, SetSensorMode0001, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, SetSensorMode0002, TestSize.Level1)
 {
+    if (g_sensorInterface == nullptr) {
+        ASSERT_NE(nullptr, g_sensorInterface);
+        return;
+    }
     int32_t ret = g_sensorInterface->SetMode(ABNORMAL_SENSORID, SENSOR_MODE_REALTIME);
     EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
 }
@@ -323,9 +366,12 @@ HWTEST_F(HdfSensorHdiTest, SetSensorMode0002, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, SetSensorMode0003, TestSize.Level1)
 {
+    if (g_sensorInterface == nullptr) {
+        ASSERT_NE(nullptr, g_sensorInterface);
+        return;
+    }
     EXPECT_GT(g_info.size(), 0);
-    for (auto iter : g_info)
-    {
+    for (auto iter : g_info) {
         int32_t ret = g_sensorInterface->SetBatch(iter.sensorId, SENSOR_INTERVAL1, SENSOR_POLL_TIME);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         ret = g_sensorInterface->SetMode(iter.sensorId, SENSOR_MODE_DEFAULT);
@@ -346,9 +392,12 @@ HWTEST_F(HdfSensorHdiTest, SetSensorMode0003, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, SetSensorOption0001, TestSize.Level1)
 {
+    if (g_sensorInterface == nullptr) {
+        ASSERT_NE(nullptr, g_sensorInterface);
+        return;
+    }
     EXPECT_GT(g_info.size(), 0);
-    for (auto iter : g_info)
-    {
+    for (auto iter : g_info) {
         int32_t ret = g_sensorInterface->SetOption(iter.sensorId, 0);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
@@ -362,6 +411,10 @@ HWTEST_F(HdfSensorHdiTest, SetSensorOption0001, TestSize.Level1)
   */
 HWTEST_F(HdfSensorHdiTest, SetSensorOption0002, TestSize.Level1)
 {
+    if (g_sensorInterface == nullptr) {
+        ASSERT_NE(nullptr, g_sensorInterface);
+        return;
+    }
     int32_t ret = g_sensorInterface->SetOption(ABNORMAL_SENSORID, 0);
     EXPECT_EQ(SENSOR_NOT_SUPPORT, ret);
 }
