@@ -17,7 +17,6 @@
 #define HOS_CAMERA_IBUFFER_POOL_H
 
 #include "ibuffer.h"
-#include <memory>
 
 namespace OHOS::Camera {
 class IBufferPool {
