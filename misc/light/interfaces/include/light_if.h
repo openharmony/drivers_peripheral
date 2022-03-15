@@ -28,7 +28,7 @@
 /**
  * @file Light_if.h
  *
- * @brief Declares common APIs of the light module. These APIs can be used to obtain the light type, 
+ * @brief Declares common APIs of the light module. These APIs can be used to obtain the light type,
  * turn on or off a light, and set the light brightness and blinking mode.
  * @since 3.1
  */
