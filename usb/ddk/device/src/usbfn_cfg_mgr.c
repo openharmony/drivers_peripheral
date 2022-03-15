@@ -1348,7 +1348,7 @@ int32_t UsbFnCfgMgrGetProp(const struct UsbFnInterface *intf, const char *name, 
             }
             ret = memcpy_s(value, strlen(propValue), propValue, strlen(propValue));
             if (ret != 0) {
-                HDF_LOGE("%s: snprintf_s failed", __func__);
+                HDF_LOGE("%s: memcpy_s failed", __func__);
                 return HDF_FAILURE;
             }
             return HDF_SUCCESS;
