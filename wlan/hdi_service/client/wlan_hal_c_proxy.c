@@ -500,8 +500,8 @@ static int32_t WlanGetFreqsWithBand(struct IWifiInterface *self, const struct Wl
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
-    if (!HdfSbufWriteInt32(data, band)) {
-        HDF_LOGE("%{public}s: write band failed!", __func__);
+    if (!HdfSbufWriteInt32(data, band) || !HdfSbufWriteInt32(data, count)) {
+        HDF_LOGE("%{public}s: write sbuf failed!", __func__);
         ec = HDF_ERR_MALLOC_FAIL;
         goto finished;
     }
