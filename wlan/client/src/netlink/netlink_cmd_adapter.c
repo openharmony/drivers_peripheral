@@ -844,12 +844,16 @@ int32_t GetDevMacAddr(const char *ifName,
     return ret;
 }
 
-int32_t GetValidFreqByBand(const char *ifName, int32_t band,
-    struct FreqInfoResult *result)
+int32_t GetValidFreqByBand(const char *ifName, int32_t band, struct FreqInfoResult *result, uint32_t size)
 {
     uint32_t ifaceId;
     struct nl_msg *msg = NULL;
     int32_t ret;
+
+    if (result == NULL || result->freqs == NULL || result->txPower == NULL) {
+        HILOG_ERROR(LOG_DOMAIN, "%s:  Invalid input parameter", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
+    }
 
     ifaceId = if_nametoindex(ifName);
     if (ifaceId == 0) {
@@ -867,7 +871,7 @@ int32_t GetValidFreqByBand(const char *ifName, int32_t band,
         NL80211_CMD_GET_WIPHY, 0);
     nla_put_flag(msg, NL80211_ATTR_SPLIT_WIPHY_DUMP);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
-    ret = memset_s(result->freqs, sizeof(result->freqs), 0, sizeof(result->freqs));
+    ret = memset_s(result->freqs, size * sizeof(int32_t), 0, sizeof(result->freqs));
     if (ret != EOK) {
         HILOG_ERROR(LOG_DOMAIN, "%s: memset_s result->freqs  failed", __FUNCTION__);
         return RET_CODE_FAILURE;

@@ -69,7 +69,7 @@ static int32_t GetValidFreqsWithBandInner(const struct IWiFiBaseFeature *baseFea
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    return HalCmdGetValidFreqWithBand(baseFeature->ifName, band, freqs, num);
+    return HalCmdGetValidFreqWithBand(baseFeature->ifName, band, freqs, size, num);
 }
 
 static int32_t SetTxPowerInner(const struct IWiFiBaseFeature *baseFeature, int32_t power)
