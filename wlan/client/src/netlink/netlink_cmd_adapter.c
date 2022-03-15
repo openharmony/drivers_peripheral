@@ -837,6 +837,7 @@ int32_t GetDevMacAddr(const char *ifName,
     if (ret != 0) {
         HILOG_ERROR(LOG_DOMAIN, "%s: ioctl failed, errno = %d, (%s)\n",
             __FUNCTION__, errno, strerror(errno));
+        close(fd);
         return RET_CODE_FAILURE;
     }
     memcpy_s(mac, len, (unsigned char *)req.ifr_hwaddr.sa_data, len);
