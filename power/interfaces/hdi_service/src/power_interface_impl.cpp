@@ -102,7 +102,11 @@ int32_t DoSuspend()
     if (suspendStateFd < 0) {
         return HDF_FAILURE;
     }
-    bool ret = SaveStringToFd(suspendStateFd, SUSPEND_STATE);
+    bool ret = false;
+    do {
+        ret = SaveStringToFd(suspendStateFd, SUSPEND_STATE);
+    } while (!ret && (errno == EINTR || errno == EBUSY));
+
     if (!ret) {
         return HDF_FAILURE;
     }
@@ -179,10 +183,8 @@ std::string ReadWakeCount()
         wakeupCountFd = UniqueFd(TEMP_FAILURE_RETRY(open(WAKEUP_COUNT_PATH, O_RDWR | O_CLOEXEC)));
     }
     std::string wakeupCount;
-    bool ret = LoadStringFromFd(wakeupCountFd, wakeupCount);
-    if (!ret) {
-        return std::string();
-    }
+    LoadStringFromFd(wakeupCountFd, wakeupCount);
+
     return wakeupCount;
 }
 
