@@ -24,7 +24,7 @@ struct IWiFiSta *g_staFeature = NULL;
 struct IWiFiBaseFeature *g_baseFeature = NULL;
 const uint32_t DEFAULT_COMBO_SIZE = 10;
 const uint32_t RESET_TIME = 20;
-const int32_t WLAN_FREQ_MAX_NUM = 14;
+const int32_t WLAN_FREQ_MAX_NUM = 35;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
 #define ETH_ADDR_LEN 6
 
@@ -710,6 +710,7 @@ static int32_t WlanServiceStubGetFreqWithband(struct HdfDeviceIoClient *client, 
     int32_t ret;
     int32_t freq[WLAN_FREQ_MAX_NUM] = {0};
     int32_t wlanBand = 0;
+    uint32_t size = 0;
     uint32_t count = 0;
 
     if (data == NULL) {
@@ -728,13 +729,17 @@ static int32_t WlanServiceStubGetFreqWithband(struct HdfDeviceIoClient *client, 
         HDF_LOGE(" %s: read wlan_band failed", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    if (!HdfSbufReadUint32(data, &size)) {
+        HDF_LOGE(" %s: read size failed", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     ret = strcpy_s((g_apFeature->baseFeature).ifName, (strlen(name) + 1), name);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: strcpy_s is failed!, error code: %d", __func__, ret);
         return HDF_FAILURE;
     }
     ret = g_apFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)g_apFeature,
-                                                         wlanBand, freq, WLAN_FREQ_MAX_NUM, &count);
+                                                         wlanBand, freq, size, &count);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s get valid freqs failed!, error code: %d", __func__, ret);
         return HDF_FAILURE;

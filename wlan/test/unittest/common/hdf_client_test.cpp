@@ -15,6 +15,7 @@
 
 #include "hdf_wifi_test.h"
 #include <gtest/gtest.h>
+#include <osal_mem.h>
 #include "hdf_uhdf_test.h"
 #include "wifi_driver_client.h"
 
@@ -149,9 +150,33 @@ HWTEST_F(WifiClientTest, WifiClientGetValidFreqByBand001, TestSize.Level1)
     int ret;
     int32_t band = IEEE80211_BAND_2GHZ;
     struct FreqInfoResult result;
+    uint32_t size = 14;
+    int i;
 
-    ret = GetValidFreqByBand("wlan0", band, &result);
+    result.freqs = (int32_t *)OsalMemCalloc(35 * sizeof(int32_t));
+    if (result.freqs == NULL) {
+        printf("%s: OsalMemCalloc failed", __FUNCTION__);
+        return;
+    }
+
+    result.txPower = (int32_t *)OsalMemCalloc(35 * sizeof(int32_t));
+    if (result.txPower == NULL) {
+        printf("%s: OsalMemCalloc failed", __FUNCTION__);
+        OsalMemFree(result.freqs);
+        return;
+    }
+
+    ret = GetValidFreqByBand("wlan0", band, &result, size);
     EXPECT_EQ(RET_CODE_SUCCESS, ret);
+    if (ret == RET_CODE_SUCCESS) {
+        printf("%s: num = %u\n", __func__, result.nums);
+        for (i = 0; i < result.nums; i++) {
+            printf("%s: freq[%d] = %d\n", __func__, i, result.freqs[i]);
+        }
+    }
+
+    OsalMemFree(result.txPower);
+    OsalMemFree(result.freqs);
 }
 
 /**
