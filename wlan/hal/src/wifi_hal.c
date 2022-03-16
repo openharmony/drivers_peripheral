@@ -31,6 +31,7 @@ extern "C" {
 
 #define WIFI_HOST 3026
 #define WIFI_C_HOST 3036
+#define MAX_AUTH_NUM 1000
 static bool g_wifiIsStarted = false;
 
 static int32_t StartInner(struct IWiFi *iwifi)
@@ -326,7 +327,7 @@ static int32_t HalUnregisterEventCallback(OnReceiveFunc onRecFunc, const char *i
 
 static int32_t ResetDriver(const uint8_t chipId, const char *ifName)
 {
-    if ((getuid() != WIFI_HOST) && (getuid() != WIFI_C_HOST)) {
+    if ((getuid() != WIFI_HOST) && (getuid() != WIFI_C_HOST) && (getuid() > MAX_AUTH_NUM)) {
         HDF_LOGE("%s: don't have authorized access, line: %d", __FUNCTION__, __LINE__);
         return ERR_UNAUTH_ACCESS;
     }

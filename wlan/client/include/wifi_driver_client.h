@@ -151,7 +151,6 @@ int32_t WifiRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, c
 void WifiUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
 
 /* hal related interface */
-#define MAX_2GHZ_CHANNEL_NUM 14
 
 enum Ieee80211Band {
     IEEE80211_BAND_2GHZ,  /**< 2.4 GHz */
@@ -174,8 +173,8 @@ struct NetworkInfoResult {
 struct FreqInfoResult {
     int32_t band;
     uint32_t nums;
-    int32_t freqs[MAX_2GHZ_CHANNEL_NUM];
-    int32_t txPower[MAX_2GHZ_CHANNEL_NUM];
+    int32_t *freqs;
+    int32_t *txPower;
 };
 
 #define MAX_ASSOC_STA_NUM 8
@@ -212,7 +211,7 @@ int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len);
 int32_t GetDevMacAddr(const char *ifName,
     int32_t type, uint8_t *mac, uint8_t len);
 int32_t GetValidFreqByBand(const char *ifName, int32_t band,
-    struct FreqInfoResult *result);
+    struct FreqInfoResult *result, uint32_t size);
 int32_t SetTxPower(const char *ifName, int32_t power);
 int32_t GetAssociatedStas(const char *ifName, struct AssocStaInfoResult *result);
 int32_t WifiSetCountryCode(const char *ifName, const char *code, uint32_t len);

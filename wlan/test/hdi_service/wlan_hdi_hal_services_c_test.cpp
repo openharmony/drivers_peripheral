@@ -22,7 +22,7 @@
 using namespace testing::ext;
 
 namespace HdiTest {
-const int32_t WLAN_FREQ_MAX_NUM = 14;
+const int32_t WLAN_FREQ_MAX_NUM = 35;
 const int32_t WLAN_TX_POWER = 160;
 const int32_t DEFAULT_COMBO_SIZE = 6;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
@@ -289,14 +289,22 @@ HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_010, TestSize.Level1)
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_AP;
     struct WlanFeatureInfo *ifeature = nullptr;
     int32_t freq[WLAN_FREQ_MAX_NUM] = {0};
-    int32_t wlanBand = 0;
+    int32_t wlanBand = IEEE80211_BAND_2GHZ;
     uint32_t count = 0;
+    int i;
 
     int32_t rc = g_wlanObj->createFeature(g_wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->getFreqsWithBand(g_wlanObj, (struct WlanFeatureInfo *)ifeature, wlanBand, freq,
         WLAN_FREQ_MAX_NUM, &count);
     ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        printf("%s: count = %u\n", __func__, count);
+        for (i = 0; i < count; i++) {
+            printf("%s: freq[%d] = %d\n", __func__, i, freq[i]);
+        }
+    }
+
     rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }

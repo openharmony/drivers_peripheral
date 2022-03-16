@@ -112,16 +112,21 @@ static int32_t ParserDeviceMacAddr(struct HdfSBuf *reply,
     return RET_CODE_SUCCESS;
 }
 
-static int32_t ParserFreqInfo(struct HdfSBuf *reply, struct FreqInfoResult *result)
+static int32_t ParserFreqInfo(struct HdfSBuf *reply, struct FreqInfoResult *result, uint32_t size)
 {
     uint32_t replayDataSize = 0;
     const uint8_t *replayData = 0;
+
+    if (result == NULL || result->freqs == NULL || result->txPower == NULL) {
+        HILOG_ERROR(LOG_DOMAIN, "%s:  Invalid input parameter", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
+    }
 
     if (!HdfSbufReadUint32(reply, &result->nums)) {
         HILOG_ERROR(LOG_DOMAIN, "%s: read num failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    if (result->nums > MAX_2GHZ_CHANNEL_NUM) {
+    if (result->nums > size) {
         HILOG_ERROR(LOG_DOMAIN, "%s: num valid", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
@@ -129,8 +134,7 @@ static int32_t ParserFreqInfo(struct HdfSBuf *reply, struct FreqInfoResult *resu
         HILOG_ERROR(LOG_DOMAIN, "%s: read freqs failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    if (memcpy_s(result->freqs, MAX_2GHZ_CHANNEL_NUM * sizeof(int32_t),
-        replayData, replayDataSize) != EOK) {
+    if (memcpy_s(result->freqs, size * sizeof(int32_t), replayData, replayDataSize) != EOK) {
         HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
@@ -291,7 +295,7 @@ int32_t IsSupportCombo(uint8_t *isSupportCombo)
         } else {
             ret = RET_CODE_SUCCESS;
         }
-    } while(0);
+    } while (0);
     HdfSbufRecycle(data);
     HdfSbufRecycle(reply);
     return ret;
@@ -412,7 +416,7 @@ int32_t GetDevMacAddr(const char *ifName, int32_t type, uint8_t *mac, uint8_t le
     return ret;
 }
 
-int32_t GetValidFreqByBand(const char *ifName, int32_t band, struct FreqInfoResult *result)
+int32_t GetValidFreqByBand(const char *ifName, int32_t band, struct FreqInfoResult *result, uint32_t size)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -441,7 +445,7 @@ int32_t GetValidFreqByBand(const char *ifName, int32_t band, struct FreqInfoResu
             ret = RET_CODE_FAILURE;
             break;
         }
-        ret = ParserFreqInfo(reply, result);
+        ret = ParserFreqInfo(reply, result, size);
     } while (0);
     HdfSbufRecycle(data);
     HdfSbufRecycle(reply);

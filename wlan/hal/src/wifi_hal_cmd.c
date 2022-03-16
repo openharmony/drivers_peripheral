@@ -14,6 +14,7 @@
  */
 
 #include "wifi_hal_cmd.h"
+#include <osal_mem.h>
 #include "hdf_log.h"
 #include "securec.h"
 #include "wifi_hal_sta_feature.h"
@@ -134,21 +135,42 @@ int32_t HalCmdSetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
     return ret;
 }
 
-int32_t HalCmdGetValidFreqWithBand(const char *ifName, int32_t band, int32_t *freqs, uint32_t *num)
+int32_t HalCmdGetValidFreqWithBand(const char *ifName, int32_t band, int32_t *freqs,
+    uint32_t size, uint32_t *num)
 {
     int32_t ret;
     struct FreqInfoResult result;
-    ret = GetValidFreqByBand(ifName, band, &result);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: GetValidFreqByBand failed", __FUNCTION__);
-        return ret;
-    }
-    if (memcpy_s(freqs, MAX_CHANNEL_NUM * sizeof(int32_t), result.freqs,
-        result.nums * sizeof(int32_t)) != EOK) {
-        HDF_LOGE("%s: memcpy failed, line: %d", __FUNCTION__, __LINE__);
+
+    result.freqs = OsalMemCalloc(size * sizeof(int32_t));
+    if (result.freqs == NULL) {
+        HDF_LOGE("%s: OsalMemCalloc failed", __FUNCTION__);
         return HDF_FAILURE;
     }
-    *num = result.nums;
+
+    result.txPower = OsalMemCalloc(size * sizeof(int32_t));
+    if (result.txPower == NULL) {
+        HDF_LOGE("%s: OsalMemCalloc failed", __FUNCTION__);
+        OsalMemFree(result.freqs);
+        return HDF_FAILURE;
+    }
+
+    do {
+        ret = GetValidFreqByBand(ifName, band, &result, size);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%s: GetValidFreqByBand failed", __FUNCTION__);
+            break;
+        }
+        if (memcpy_s(freqs, size * sizeof(int32_t), result.freqs, result.nums * sizeof(int32_t)) != EOK) {
+            HDF_LOGE("%s: memcpy failed, line: %d, size_in = %u, size_out = %u", __FUNCTION__, __LINE__,
+                result.nums * sizeof(int32_t), size * sizeof(int32_t));
+            ret = HDF_FAILURE;
+            break;
+        }
+        *num = result.nums;
+    } while (0);
+
+    OsalMemFree(result.txPower);
+    OsalMemFree(result.freqs);
     return ret;
 }
 
