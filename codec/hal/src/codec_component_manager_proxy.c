@@ -54,6 +54,11 @@ static int32_t GetComponentNum()
         return HDF_FAILURE;
     }
 
+    if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        return HDF_FAILURE;
+    }
+
     if (g_codecComponentManagerProxy.remoteOmx->dispatcher->Dispatch(g_codecComponentManagerProxy.remoteOmx,
         CMD_CODEC_GET_COMPONENT_NUM, data, reply) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: dispatch request failed!", __func__);
@@ -82,6 +87,11 @@ static int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t 
     if (reply == NULL) {
         HDF_LOGE("%{public}s: Failed to obtain reply", __func__);
         HdfSbufRecycle(data);
+        return HDF_FAILURE;
+    }
+
+    if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
         return HDF_FAILURE;
     }
 
@@ -120,6 +130,11 @@ static int32_t CreateComponent(struct CodecComponentType **component, char *comp
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ReleaseSbuf(data, reply);
         return HDF_ERR_MALLOC_FAIL;
+    }
+
+    if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteString(data, compName)) {
@@ -173,6 +188,11 @@ static int32_t DestoryComponent(struct CodecComponentType *component)
         return HDF_ERR_MALLOC_FAIL;
     }
 
+    if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        return HDF_FAILURE;
+    }
+
     ret = g_codecComponentManagerProxy.remoteOmx->dispatcher->Dispatch(g_codecComponentManagerProxy.remoteOmx,
         CMD_DESTROY_COMPONENT, data, reply);
     if (ret != HDF_SUCCESS) {
@@ -204,8 +224,12 @@ static int32_t InitCodecComponentManagerProxy(void)
         HDF_LOGE("%{public}s: CodecComponentTypeService not found!", __func__);
         return HDF_FAILURE;
     }
+    if (!HdfRemoteServiceSetInterfaceDesc(remoteOmx, "ohos.hdi.codec_service")) {
+        HDF_LOGE("%{public}s: failed to init interface desc", __func__);
+        HdfRemoteServiceRecycle(remoteOmx);
+        return HDF_FAILURE;
+    }
 
-    // remoteConfig
     g_codecComponentManagerProxy.remoteOmx = remoteOmx;
     g_codecComponentManagerProxy.instance.GetComponentNum = GetComponentNum;
     g_codecComponentManagerProxy.instance.GetComponentCapabilityList = GetComponentCapabilityList;
