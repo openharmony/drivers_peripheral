@@ -39,6 +39,20 @@ static void ReleaseSbuf(struct HdfSBuf *data, struct HdfSBuf *reply)
     }
 }
 
+static int32_t WriteInterfaceToken(struct CodecComponentType *self, struct HdfSBuf *data)
+{
+    struct CodecComponentTypeProxy *proxy = CONTAINER_OF(self, struct CodecComponentTypeProxy, instance);
+    if (proxy == NULL) {
+        HDF_LOGE("%{public}s: proxy is null", __func__);
+        return HDF_FAILURE;
+    }
+    if (!HdfRemoteServiceWriteInterfaceToken(proxy->remote, data)) {
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
 static int32_t CodecComponentTypeProxyCall(struct CodecComponentType *self, int32_t id, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
@@ -116,6 +130,12 @@ static int32_t CodecComponentTypeProxyGetComponentVersion(struct CodecComponentT
         return HDF_ERR_MALLOC_FAIL;
     }
 
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
+    }
+
     if (!HdfSbufWriteUint32(data, compUUIDLen)) {
         HDF_LOGE("%{public}s: write compUUIDLen failed!", __func__);
         ReleaseSbuf(data, reply);
@@ -145,6 +165,12 @@ static int32_t CodecComponentTypeProxySendCommand(struct CodecComponentType *sel
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ReleaseSbuf(data, reply);
         return HDF_ERR_MALLOC_FAIL;
+    }
+
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteUint32(data, (uint32_t)cmd)) {
@@ -194,6 +220,12 @@ static int32_t CodecComponentTypeProxyGetParameter(struct CodecComponentType *se
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ReleaseSbuf(data, reply);
         return HDF_ERR_MALLOC_FAIL;
+    }
+
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteUint32(data, paramIndex)) {
@@ -248,6 +280,12 @@ static int32_t CodecComponentTypeProxySetParameter(struct CodecComponentType *se
         return HDF_ERR_MALLOC_FAIL;
     }
 
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
+    }
+
     if (!HdfSbufWriteUint32(data, index)) {
         HDF_LOGE("%{public}s: write index failed!", __func__);
         ReleaseSbuf(data, reply);
@@ -289,6 +327,12 @@ static int32_t CodecComponentTypeProxyGetConfig(struct CodecComponentType *self,
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ReleaseSbuf(data, reply);
         return HDF_ERR_MALLOC_FAIL;
+    }
+
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteUint32(data, index)) {
@@ -343,6 +387,12 @@ static int32_t CodecComponentTypeProxySetConfig(struct CodecComponentType *self,
         return HDF_ERR_MALLOC_FAIL;
     }
 
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
+    }
+
     if (!HdfSbufWriteUint32(data, index)) {
         HDF_LOGE("%{public}s: write index failed!", __func__);
         ReleaseSbuf(data, reply);
@@ -386,6 +436,12 @@ static int32_t CodecComponentTypeProxyGetExtensionIndex(struct CodecComponentTyp
         return HDF_ERR_MALLOC_FAIL;
     }
 
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
+    }
+
     if (!HdfSbufWriteString(data, paramName)) {
         HDF_LOGE("%{public}s: write paramName failed!", __func__);
         ReleaseSbuf(data, reply);
@@ -422,6 +478,12 @@ static int32_t CodecComponentTypeProxyGetState(struct CodecComponentType *self,
         return HDF_ERR_MALLOC_FAIL;
     }
 
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
+    }
+
     ret = CodecComponentTypeProxyCall(self, CMD_GET_STATE, data, reply);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
@@ -450,6 +512,12 @@ static int32_t CodecComponentTypeProxyComponentTunnelRequest(struct CodecCompone
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ReleaseSbuf(data, reply);
         return HDF_ERR_MALLOC_FAIL;
+    }
+
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteUint32(data, port)) {
@@ -506,6 +574,12 @@ static int32_t CodecComponentTypeProxyUseBuffer(struct CodecComponentType *self,
         return HDF_ERR_MALLOC_FAIL;
     }
 
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
+    }
+
     if (!HdfSbufWriteUint32(data, portIndex)) {
         HDF_LOGE("%{public}s: write portIndex failed!", __func__);
         ReleaseSbuf(data, reply);
@@ -546,6 +620,12 @@ static int32_t CodecComponentTypeProxyAllocateBuffer(struct CodecComponentType *
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ReleaseSbuf(data, reply);
         return HDF_ERR_MALLOC_FAIL;
+    }
+
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
     }
 
     if (!OmxCodecBufferBlockMarshalling(data, buffer)) {
@@ -590,6 +670,12 @@ static int32_t CodecComponentTypeProxyFreeBuffer(struct CodecComponentType *self
         return HDF_ERR_MALLOC_FAIL;
     }
 
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
+    }
+
     if (!HdfSbufWriteUint32(data, portIndex)) {
         HDF_LOGE("%{public}s: write portIndex failed!", __func__);
         ReleaseSbuf(data, reply);
@@ -626,6 +712,12 @@ static int32_t CodecComponentTypeProxyEmptyThisBuffer(struct CodecComponentType 
         return HDF_ERR_MALLOC_FAIL;
     }
 
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
+    }
+
     if (!OmxCodecBufferBlockMarshalling(data, buffer)) {
         HDF_LOGE("%{public}s: write buffer failed!", __func__);
         ReleaseSbuf(data, reply);
@@ -656,6 +748,12 @@ static int32_t CodecComponentTypeProxyFillThisBuffer(struct CodecComponentType *
         return HDF_ERR_MALLOC_FAIL;
     }
 
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
+    }
+
     if (!OmxCodecBufferBlockMarshalling(data, buffer)) {
         HDF_LOGE("%{public}s: write buffer failed!", __func__);
         ReleaseSbuf(data, reply);
@@ -684,6 +782,12 @@ static int32_t CodecComponentTypeProxySetCallbacks(struct CodecComponentType *se
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ReleaseSbuf(data, reply);
         return HDF_ERR_MALLOC_FAIL;
+    }
+
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
     }
 
     if (HdfSbufWriteRemoteService(data, callback->remote) != 0) {
@@ -728,6 +832,12 @@ static int32_t CodecComponentTypeProxyComponentDeInit(struct CodecComponentType 
         return HDF_ERR_MALLOC_FAIL;
     }
 
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
+    }
+
     ret = CodecComponentTypeProxyCall(self, CMD_COMPONENT_DE_INIT, data, reply);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
@@ -750,6 +860,12 @@ static int32_t CodecComponentTypeProxyUseEglImage(struct CodecComponentType *sel
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ReleaseSbuf(data, reply);
         return HDF_ERR_MALLOC_FAIL;
+    }
+
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
     }
 
     if (!OmxCodecBufferBlockMarshalling(data, buffer)) {
@@ -805,6 +921,12 @@ static int32_t CodecComponentTypeProxyComponentRoleEnum(struct CodecComponentTyp
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         ReleaseSbuf(data, reply);
         return HDF_ERR_MALLOC_FAIL;
+    }
+
+    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteUint32(data, roleLen)) {
