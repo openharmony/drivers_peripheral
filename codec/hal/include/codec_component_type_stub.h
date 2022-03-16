@@ -27,6 +27,7 @@ extern "C" {
 struct CodecComponentTypeStub {
     struct CodecComponentType service;
     struct OmxComponentManager managerService;
+    struct HdfDeviceObject *device;
     void *dlHandler;
     OMX_HANDLETYPE componentHandle;
 };
