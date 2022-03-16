@@ -46,6 +46,10 @@ int32_t ConnectedTagProxy::Init()
     MessageParcel data;
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        HDF_LOGE("%s: write interface token failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ec = Remote()->SendRequest(CMD_INIT, data, reply, option);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("CMD_INIT failed, error code is = %{public}d", ec);
@@ -60,6 +64,10 @@ int32_t ConnectedTagProxy::Uninit()
     MessageParcel data;
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        HDF_LOGE("%s: write interface token failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ec = Remote()->SendRequest(CMD_UNINIT, data, reply, option);
     if (ec != HDF_SUCCESS) {
         HDF_LOGE("CMD_UNINIT failed, error code is = %{public}d", ec);
@@ -74,6 +82,10 @@ std::string ConnectedTagProxy::ReadNdefTag()
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
     std::string ndefData = "";
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        HDF_LOGE("%s: write interface token failed!", __func__);
+        return "";
+    }
     int32_t ec = Remote()->SendRequest(CMD_READ_NDEF, data, reply, option);
     int exception = reply.ReadInt32();
     if (ec != HDF_SUCCESS || exception != HDF_SUCCESS) {
@@ -90,6 +102,10 @@ int32_t ConnectedTagProxy::WriteNdefTag(std::string ndefData)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        HDF_LOGE("%s: write interface token failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     data.WriteInt32(HDF_SUCCESS);
     data.WriteString(ndefData);
     HDF_LOGE("CMD_WRITE_NDEF ndefData = %{public}s, len = %{public}d", ndefData.c_str(), ndefData.length());

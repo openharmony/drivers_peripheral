@@ -45,16 +45,28 @@ int32_t ConnectedTagServerStub::StubOnRemoteRequest(int cmdId,
 
 int32_t ConnectedTagServerStub::StubInit(MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    return service_.Init();
+    if (data.ReadInterfaceToken() != GetDescriptor()) {
+        HDF_LOGE("%{public}s: interface token check failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return Init();
 }
 
 int32_t ConnectedTagServerStub::StubUninit(MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    return service_.Uninit();
+    if (data.ReadInterfaceToken() != GetDescriptor()) {
+        HDF_LOGE("%{public}s: interface token check failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return Uninit();
 }
 int32_t ConnectedTagServerStub::StubReadNdef(MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    std::string respNdef = service_.ReadNdefTag();
+    if (data.ReadInterfaceToken() != GetDescriptor()) {
+        HDF_LOGE("%{public}s: interface token check failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    std::string respNdef = ReadNdefTag();
     reply.WriteInt32(HDF_SUCCESS);
     reply.WriteString(respNdef);
     return HDF_SUCCESS;
@@ -62,6 +74,10 @@ int32_t ConnectedTagServerStub::StubReadNdef(MessageParcel& data, MessageParcel&
 
 int32_t ConnectedTagServerStub::StubWriteNdef(MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
+    if (data.ReadInterfaceToken() != GetDescriptor()) {
+        HDF_LOGE("%{public}s: interface token check failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t status = data.ReadInt32();
     if (status != HDF_SUCCESS) {
         return status;
@@ -69,10 +85,32 @@ int32_t ConnectedTagServerStub::StubWriteNdef(MessageParcel& data, MessageParcel
     std::string ndefData = data.ReadString();
     HDF_LOGE("StubWriteNdef status = %{public}d, len = %{public}d, data = %{public}s",
         status, ndefData.length(), ndefData.c_str());
-    int32_t ret = service_.WriteNdefTag(ndefData);
+    int32_t ret = WriteNdefTag(ndefData);
     reply.WriteInt32(HDF_SUCCESS);
     reply.WriteInt32(ret);
     return ret;
+}
+int32_t ConnectedTagServerStub::OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
+    MessageOption& option)
+{
+    return HDF_SUCCESS;
+}
+int32_t ConnectedTagServerStub::Init()
+{
+    return service_.Init();
+}
+
+int32_t ConnectedTagServerStub::Uninit()
+{
+    return service_.Uninit();
+}
+std::string ConnectedTagServerStub::ReadNdefTag()
+{
+    return service_.ReadNdefTag();
+}
+int32_t ConnectedTagServerStub::WriteNdefTag(std::string ndefData)
+{
+    return service_.WriteNdefTag(ndefData);
 }
 }  // namespace V1_0
 }  // namespace NFC
@@ -111,4 +149,3 @@ int32_t DispatchStubOnRemoteRequest(void *stub, int cmdId, struct HdfSBuf *data,
     OHOS::MessageOption option;
     return nfcHdiStub->StubOnRemoteRequest(cmdId, *dataParcel, *replyParcel, option);
 }
-
