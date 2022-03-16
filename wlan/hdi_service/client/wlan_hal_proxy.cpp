@@ -42,7 +42,7 @@ sptr<IWlan> IWlan::Get(const std::string& serviceName)
         if (remote != nullptr) {
             return iface_cast<IWlan>(remote);
         }
-    } while(false);
+    } while (false);
     HDF_LOGE("%s: get DataWlanService failed!", __func__);
     return nullptr;
 }
