@@ -15,24 +15,25 @@
 
 #ifndef OHOS_HARDWARE_NFC_V1_0_CONNECTED_TAG_SERVICE_H
 #define OHOS_HARDWARE_NFC_V1_0_CONNECTED_TAG_SERVICE_H
+#include <cstdint>
 #include <hdf_base.h>
-#include "iconnected_tag_hdi_server.h"
+#include <string>
 
 namespace OHOS {
 namespace HDI {
 namespace NFC {
 namespace V1_0 {
-class ConnectedTagService : public IConnectedTagHdiServer {
+class ConnectedTagService {
 public:
     ~ConnectedTagService() = default;
 
-    int32_t Init() override;
+    int32_t Init();
 
-    int32_t Uninit() override;
+    int32_t Uninit();
 
-    std::string ReadNdefTag() override;
+    std::string ReadNdefTag();
 
-    int32_t WriteNdefTag(std::string ndefData) override;
+    int32_t WriteNdefTag(std::string ndefData);
 };
 }  // namespace V1_0
 }  // namespace NFC

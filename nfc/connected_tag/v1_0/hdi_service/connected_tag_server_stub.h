@@ -25,10 +25,24 @@ namespace HDI {
 namespace NFC {
 namespace V1_0 {
 using namespace OHOS;
-class ConnectedTagServerStub {
+class ConnectedTagServerStub : public IRemoteStub<IConnectedTagHdi> {
 public:
     virtual ~ConnectedTagServerStub() {}
 
+    int32_t StubOnRemoteRequest(int cmdId, MessageParcel& data, MessageParcel& reply,
+        MessageOption& option);
+
+    int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
+        MessageOption& option) override;
+
+    int32_t Init() override;
+
+    int32_t Uninit() override;
+
+    std::string ReadNdefTag() override;
+
+    int32_t WriteNdefTag(std::string ndefData) override;
+private:
     int32_t StubInit(MessageParcel& data, MessageParcel& reply, MessageOption& option);
 
     int32_t StubUninit(MessageParcel& data, MessageParcel& reply, MessageOption& option);
@@ -37,9 +51,6 @@ public:
 
     int32_t StubWriteNdef(MessageParcel& data, MessageParcel& reply, MessageOption& option);
 
-    int32_t StubOnRemoteRequest(int cmdId, MessageParcel& data, MessageParcel& reply,
-        MessageOption& option);
-private:
     ConnectedTagService service_;
 };
 }  // namespace V1_0
