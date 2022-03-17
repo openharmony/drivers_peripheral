@@ -19,7 +19,7 @@
 #include <message_option.h>
 #include <message_parcel.h>
 #include "connected_tag_service.h"
-
+#include "iconnected_tag_hdi.h"
 namespace OHOS {
 namespace HDI {
 namespace NFC {
