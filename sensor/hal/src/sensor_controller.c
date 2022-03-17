@@ -15,6 +15,7 @@
 
 #include "sensor_controller.h"
 #include <fcntl.h>
+#include <inttypes.h>
 #include <securec.h>
 #include "osal_mem.h"
 #include "osal_mutex.h"
@@ -289,7 +290,7 @@ static int32_t DisableSensor(int32_t sensorId)
 static int32_t SetSensorBatch(int32_t sensorId, int64_t samplingInterval, int64_t interval)
 {
     if (samplingInterval < 0) {
-        HDF_LOGE("%{public}s: invalide param , samplingInterval is [%{public}lld]", __func__, samplingInterval);
+        HDF_LOGE("%{public}s: invalide param , samplingInterval is [%{public}" PRId64 "]", __func__, samplingInterval);
         return SENSOR_INVALID_PARAM;
     }
     struct HdfSBuf *msg = HdfSbufObtainDefaultSize();
