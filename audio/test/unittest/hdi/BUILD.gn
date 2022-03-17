@@ -32,5 +32,9 @@ group("hdi") {
     "manager:hdf_audio_hdi_manager_test",
     "render:hdf_audio_hdi_render_test",
   ]
+  if (defined(enable_audio_analog_headset) &&
+      enable_audio_analog_headset == true) {
+    deps += [ "jack:hdf_audio_hdi_headset_test" ]
+  }
 }
 ############################end############################
