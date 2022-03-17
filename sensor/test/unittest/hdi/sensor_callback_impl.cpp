@@ -38,13 +38,13 @@ namespace {
 
     struct SensorValueRange g_testRange[] = {{1e5, 0.0}};
     struct SensorValueRange g_accelRange[] = {{78.0, -78.0}, {78.0, -78.0}, {78.0, -78.0}};
-    struct SensorValueRange g_alsRange[] = {{10000.0, 0.0}, {10000.0, 0.0}, {10000.0, 0.0}, {10000.0, 0.0}};
+    struct SensorValueRange g_alsRange[] = {{10000.0, 0.0}};
     struct SensorValueRange g_pedometerRange[] = {{10000.0, 0.0}};
     struct SensorValueRange g_proximityRange[] = {{5.0, 0.0}};
     struct SensorValueRange g_hallRange[] = {{1.0, 0.0}};
     struct SensorValueRange g_barometerRange[] = {{1100.0, -1100.0}, {1100.0, -1100.0}};
-    struct SensorValueRange g_magneticRange[] = {{35.0, -35.0}, {35.0, -35.0}, {35.0, -35.0}};
-    struct SensorValueRange g_gyroscopeRange[] = {{2000.0, -2000.0}, {2000.0, -2000.0}, {2000.0, -2000.0}};
+    struct SensorValueRange g_magneticRange[] = {{2000.0, -2000.0}, {2000.0, -2000.0}, {2000.0, -2000.0}};
+    struct SensorValueRange g_gyroscopeRange[] = {{35.0, -35.0}, {35.0, -35.0}, {35.0, -35.0}};
     struct SensorValueRange g_gravityRange[] = {{78.0, -78.0}, {78.0, -78.0}, {78.0, -78.0}};
 
     struct SensorDevelopmentList g_sensorList[] = {
@@ -102,13 +102,8 @@ int32_t SensorCallbackImpl::OnDataEvent(const HdfSensorEvents& event)
 
     for (int i = 0; i < g_listNum; ++i) {
         if (event.sensorId == g_sensorList[i].sensorTypeId) {
-            if (event.sensorId == SENSOR_TYPE_HALL || event.sensorId == SENSOR_TYPE_PROXIMITY) {
-                float data = static_cast<float>(*eventData);
-                SensorDataVerification(data, g_sensorList[i]);
-            } else {
-                float *data = (float*)eventData;
-                SensorDataVerification(*data, g_sensorList[i]);
-            }
+            float *data = (float*)eventData;
+            SensorDataVerification(*data, g_sensorList[i]);
         }
     }
     OsalMemFree(origin);
