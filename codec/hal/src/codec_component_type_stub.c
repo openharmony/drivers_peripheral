@@ -16,6 +16,7 @@
 #include "codec_component_type_stub.h"
 #include <dlfcn.h>
 #include <hdf_device_desc.h>
+#include <hdf_device_object.h>
 #include <hdf_log.h>
 #include <osal_mem.h>
 #include <securec.h>
@@ -885,6 +886,11 @@ static int32_t HandleComponentCmd(struct CodecComponentTypeStub *stub,
 int32_t CodecComponentTypeServiceOnRemoteRequest(struct CodecComponentTypeStub *service,
     int32_t cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    if (!HdfDeviceObjectCheckInterfaceDesc(service->device, data)) {
+        HDF_LOGE("%{public}s: check interface token failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    
     switch (cmdId) {
         case CMD_CODEC_GET_COMPONENT_NUM:
         case CMD_CODEC_GET_COMPONENT_CAPABILITY_LIST:
