@@ -229,6 +229,11 @@ int32_t CodecCallbackTypeServiceOnRemoteRequest(struct HdfRemoteService *service
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     struct CodecCallbackType *serviceImpl = (struct CodecCallbackType*)service;
+    if (!HdfRemoteServiceCheckInterfaceToken(serviceImpl->remote, data)) {
+        HDF_LOGE("%{public}s: check interface token failed", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    
     switch (code) {
         case CMD_EVENT_HANDLER:
             return SerStubEventHandler(serviceImpl, data, reply);
@@ -276,6 +281,11 @@ struct CodecCallbackType *CodecCallbackTypeStubGetInstance(void)
         return NULL;
     }
 
+    if (!HdfRemoteServiceSetInterfaceDesc(stub->service.remote, "ohos.hdi.codec_service")) {
+        HDF_LOGE("%{public}s: failed to init interface desc", __func__);
+        return NULL;
+    }
+
     stub->dlHandler = LoadServiceHandler();
     if (stub->dlHandler == NULL) {
         HDF_LOGE("%{public}s: stub->dlHanlder is null", __func__);
@@ -298,6 +308,7 @@ struct CodecCallbackType *CodecCallbackTypeStubGetInstance(void)
 void CodecCallbackTypeStubRelease(struct CodecCallbackType *instance)
 {
     if (instance == NULL) {
+        HDF_LOGE("%{public}s: instance is null", __func__);
         return;
     }
     struct CodecCallbackTypeStub *stub = CONTAINER_OF(instance, struct CodecCallbackTypeStub, service);

@@ -14,6 +14,7 @@
  */
 
 #include <hdf_log.h>
+#include <hdf_remote_service.h>
 #include <osal_mem.h>
 #include <servmgr_hdi.h>
 #include "codec_callback_if.h"
@@ -98,6 +99,12 @@ static int32_t CodecCallbackTypeProxyEventHandler(struct CodecCallbackType *self
         return HDF_ERR_MALLOC_FAIL;
     }
 
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
+    }
+
     ret = WriteArray(data, appData, appDataLen);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: write appData failed!", __func__);
@@ -150,6 +157,12 @@ static int32_t CodecCallbackTypeProxyEmptyBufferDone(struct CodecCallbackType *s
         return HDF_ERR_MALLOC_FAIL;
     }
 
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
+    }
+
     if (!HdfSbufWriteUint32(data, appDataLen)) {
         HDF_LOGE("%{public}s: write appData failed!", __func__);
         ReleaseSbuf(data, reply);
@@ -193,6 +206,12 @@ static int32_t CodecCallbackTypeProxyFillBufferDone(struct CodecCallbackType *se
         return HDF_ERR_MALLOC_FAIL;
     }
 
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
+        HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_FAILURE;
+    }
+
     if (!HdfSbufWriteUint32(data, appDataLen)) {
         HDF_LOGE("%{public}s: write appData failed!", __func__);
         ReleaseSbuf(data, reply);
@@ -232,9 +251,19 @@ static void CodecCallbackTypeProxyConstruct(struct CodecCallbackType *instance)
 
 struct CodecCallbackType *CodecCallbackTypeGet(struct HdfRemoteService *remote)
 {
+    if (remote == NULL) {
+        HDF_LOGE("%{public}s: remote is null", __func__);
+        return NULL;
+    }
+
     struct CodecCallbackType *instance = (struct CodecCallbackType*)OsalMemAlloc(sizeof(struct CodecCallbackType));
     if (instance == NULL) {
         HDF_LOGE("%{public}s: OsalMemAlloc failed!", __func__);
+        return NULL;
+    }
+
+    if (!HdfRemoteServiceSetInterfaceDesc(remote, "ohos.hdi.codec_service")) {
+        HDF_LOGE("%{public}s: failed to init interface desc", __func__);
         return NULL;
     }
 
@@ -246,6 +275,7 @@ struct CodecCallbackType *CodecCallbackTypeGet(struct HdfRemoteService *remote)
 void CodecCallbackTypeRelease(struct CodecCallbackType *instance)
 {
     if (instance == NULL) {
+        HDF_LOGE("%{public}s: instance is null", __func__);
         return;
     }
     OsalMemFree(instance);
