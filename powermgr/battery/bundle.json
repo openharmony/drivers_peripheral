@@ -13,19 +13,14 @@
     "deps": {
       "components": [
         "base",
-        "cesfwk_core",
-        "cesfwk_innerkits",
         "device_driver_framework",
         "libhilog",
-        "ipc_single",
-        "want",
-        "samgr_proxy"
+        "ipc_single"
       ],
       "third_part": [
         "gmock_main",
         "gtest_main",
-        "jsoncpp",
-        "xml2"
+        "jsoncpp"
       ]
     },
     "build": {

@@ -28,8 +28,6 @@ config("module_private_config") {
     "${battery_manager_path}/charger/backlight",
     "${battery_manager_path}/charger/vibrate",
     "${battery_manager_path}/charger/include",
-    "${battery_manager_path}/services/native/include",
-    "${battery_manager_path}/interfaces/innerkits/native/include",
     "//drivers/peripheral/powermgr/battery/interfaces/include",
     "//drivers/peripheral/powermgr/battery/include",
     "//drivers/peripheral/powermgr/battery/interfaces/hdi_service/include",
@@ -73,20 +71,12 @@ ohos_unittest("test_hdisrv") {
   ]
 
   external_deps = [
-    "ability_base:base",
-    "ability_base:want",
-    "bundle_framework:appexecfwk_base",
-    "ces_standard:cesfwk_core",
-    "ces_standard:cesfwk_innerkits",
     "device_driver_framework:libhdf_host",
     "device_driver_framework:libhdf_ipc_adapter",
     "device_driver_framework:libhdf_utils",
-    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
     "ipc:ipc_single",
-    "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
   ]
 }
 

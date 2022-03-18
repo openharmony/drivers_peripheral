@@ -28,7 +28,6 @@
 #include <sys/stat.h>
 #include <thread>
 #include <vector>
-#include "battery_service.h"
 #include "battery_thread_test.h"
 #include "battery_vibrate.h"
 #include "hdf_base.h"
@@ -40,7 +39,6 @@
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::HDI::Battery::V1_0;
-using namespace OHOS::PowerMgr;
 using namespace std;
 
 namespace HdiServiceTest {
@@ -49,8 +47,9 @@ static std::vector<std::string> g_filenodeName;
 static std::map<std::string, std::string> g_nodeInfo;
 const int STR_TO_LONG_LEN = 10;
 const int NUM_ZERO = 0;
-const int32_t ERROR = -1;
-const int MAX_BUFF_SIZE = 128;
+constexpr int32_t ERROR = -1;
+constexpr int32_t MAX_BUFF_SIZE = 128;
+constexpr int32_t MAX_SYSFS_SIZE = 64;
 std::unique_ptr<PowerSupplyProvider> giver_ = nullptr;
 
 void HdiServiceTest::SetUpTestCase(void)
