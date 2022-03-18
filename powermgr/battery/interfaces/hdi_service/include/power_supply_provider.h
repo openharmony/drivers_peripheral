@@ -27,7 +27,6 @@ namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_0 {
-
 class PowerSupplyProvider {
 public:
     // Keep it same as the BatteryHealthState in battery_info.h

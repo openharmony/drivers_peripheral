@@ -37,7 +37,7 @@ public:
     virtual ~BatteryThread() = default;
 
     void StartThread(void* service);
-    void InitCallback(const sptr<OHOS::HDI::Battery::V1_0::IBatteryCallback>& event);
+    void InitCallback(const sptr<OHOS::HDI::Battery::V1_0::IBatteryCallback>& callback);
 protected:
     int32_t LoopingThreadEntry(void* arg);
     virtual void Run(void* service);

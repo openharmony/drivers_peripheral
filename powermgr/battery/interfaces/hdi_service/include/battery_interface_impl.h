@@ -32,7 +32,7 @@ public:
     BatteryInterfaceImpl() = default;
     virtual ~BatteryInterfaceImpl() = default;
     int32_t Init();
-    int32_t Register(const sptr<IBatteryCallback>& event) override;
+    int32_t Register(const sptr<IBatteryCallback>& callback) override;
     int32_t UnRegister() override;
     int32_t ChangePath(const std::string& path) override;
     int32_t GetCapacity(int32_t& capacity) override;
@@ -53,7 +53,7 @@ private:
     std::unique_ptr<OHOS::HDI::Battery::V1_0::BatteryThread> loop_ = nullptr;
     std::unique_ptr<OHOS::HDI::Battery::V1_0::BatteryConfig> batteryConfig_ = nullptr;
     std::unique_ptr<OHOS::HDI::Battery::V1_0::BatteryLed> batteryLed_ = nullptr;
-    sptr<IBatteryCallback> g_cbEvent = nullptr;
+    sptr<IBatteryCallback> batteryCallback_ = nullptr;
 };
 } // V1_0
 } // Battery

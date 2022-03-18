@@ -23,9 +23,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "osal/osal_mem.h"
-#include "utils/hdf_log.h"
-
-#define HDF_LOG_TAG PowerSupplyProvider
+#include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -172,7 +170,7 @@ inline void PowerSupplyProvider::ChargeStateAssigner(const char* str, struct Bat
 
 inline void PowerSupplyProvider::PresentAssigner(const char* str, struct BatterydInfo* info)
 {
-    info->present_ = ParseInt(str);
+    info->present_ = static_cast<int8_t>(ParseInt(str));
 }
 
 inline void PowerSupplyProvider::TechnologyAssigner(const char* str, struct BatterydInfo* info)
@@ -200,19 +198,20 @@ void PowerSupplyProvider::FormatPath(std::string& path,
 {
     char buff[PATH_MAX] = {0};
     if (strcpy_s(buff, PATH_MAX, path.c_str()) != EOK) {
-        HDF_LOGW("%{public}s: failed to copy path of %{public}s", __func__, name);
+        BATTERY_HILOGW(FEATURE_BATT_INFO, "failed to copy path of %{public}s", name);
         return;
     }
 
     if (snprintf_s(buff, PATH_MAX, size - 1, format, basePath, name) == -1) {
-        HDF_LOGW("%{public}s: failed to format path of %{public}s", __func__, name);
+        BATTERY_HILOGW(FEATURE_BATT_INFO, "failed to format path of %{public}s", name);
         return;
     }
     path.assign(buff, strlen(buff));
-    HDF_LOGI("%{public}s: path is %{public}s", __func__, path.c_str());
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "path is %{public}s", path.c_str());
 }
 
-void PowerSupplyProvider::FormatSysfsPaths(struct PowerSupplySysfsInfo *info) {
+void PowerSupplyProvider::FormatSysfsPaths(struct PowerSupplySysfsInfo *info)
+{
     // Format paths for power supply types
     FormatPath(info->typePath, PATH_MAX, "%s/%s/type", path_.c_str(), nodeNamePathMap_["type"].c_str());
     FormatPath(info->onlinePath, PATH_MAX, "%s/%s/online", path_.c_str(), nodeNamePathMap_["online"].c_str());
@@ -248,16 +247,16 @@ void PowerSupplyProvider::FormatSysfsPaths(struct PowerSupplySysfsInfo *info) {
 
 int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t size) const
 {
-    int32_t readSize;
+    size_t readSize;
     int32_t fd = open(path, O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, path);
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to open %{public}s", path);
         return HDF_ERR_IO;
     }
 
     readSize = read(fd, buf, size - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, path);
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to read %{public}s", path);
         close(fd);
         return HDF_ERR_IO;
     }
@@ -273,7 +272,7 @@ int32_t PowerSupplyProvider::ReadBatterySysfsToBuff(const char* path, char* buf,
 {
     int32_t ret = ReadSysfsFile(path, buf, size);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGW("%{public}s: read path %{private}s failed, ret: %{public}d", __func__, path, ret);
+        BATTERY_HILOGW(FEATURE_BATT_INFO, "read path %{private}s failed, ret: %{public}d", path, ret);
         return ret;
     }
 
@@ -292,7 +291,7 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
         onlinePath = path_ + "/" + *iter + "/" + "online";
         ret = ReadSysfsFile(onlinePath.c_str(), buf, size);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGW("%{public}s: read online path failed in loop, ret: %{public}d", __func__, ret);
+            BATTERY_HILOGW(FEATURE_BATT_INFO, "read online path failed in loop, ret: %{public}d", ret);
         }
         online = ParseInt(buf);
         if (online) {
@@ -302,25 +301,25 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
         iter++;
     }
 
-    HDF_LOGI("%{public}s: online path is: %{public}s", __func__, onlinePath.c_str());
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "online path is: %{public}s", onlinePath.c_str());
     ret = ReadSysfsFile(onlinePath.c_str(), buf, size);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGW("%{public}s: read online path failed, ret: %{public}d", __func__, ret);
+        BATTERY_HILOGW(FEATURE_BATT_INFO, "read online path failed, ret: %{public}d", ret);
         return;
     }
 
     online = ParseInt(buf);
     if (!online) {
-        HDF_LOGW("%{public}s: charger is not online, so no type return.", __func__);
+        BATTERY_HILOGW(FEATURE_BATT_INFO, "charger is not online, so no type return");
         return;
     }
 
     std::string typeNode = onlineNode;
     std::string typePath = path_ + "/" + typeNode + "/" + "type";
-    HDF_LOGI("%{public}s: type path is: %{public}s", __func__, typePath.c_str());
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "type path is: %{public}s", typePath.c_str());
     ret = ReadSysfsFile(typePath.c_str(), buf, size);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGW("%{public}s: read type path failed, ret: %{public}d", __func__, ret);
+        BATTERY_HILOGW(FEATURE_BATT_INFO, "read type path failed, ret: %{public}d", ret);
         return;
     }
     Trim(buf);
@@ -356,7 +355,7 @@ int32_t PowerSupplyProvider::ParsePluggedMaxCurrent(int32_t* maxCurrent) const
 {
     char buf[MAX_BUFF_SIZE] = {0};
     GetPluggedTypeName(buf, sizeof(buf));
-    HDF_LOGI("%{public}s buf is: %{public}s", __func__, buf);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "buf is: %{public}s", buf);
     std::string currentMaxNode = POWER_SUPPLY_BATTERY;
     for (const auto& iter : nodeNamePathMap_) {
         if (iter.first == "current_max") {
@@ -370,7 +369,7 @@ int32_t PowerSupplyProvider::ParsePluggedMaxCurrent(int32_t* maxCurrent) const
         return ret;
     }
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: maxCurrent is %{public}d", __func__, value);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "maxCurrent is %{public}d", value);
     *maxCurrent = value;
 
     return HDF_SUCCESS;
@@ -393,7 +392,7 @@ int32_t PowerSupplyProvider::ParsePluggedMaxVoltage(int32_t* maxVoltage) const
         return ret;
     }
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: maxCurrent is %{public}d", __func__, value);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "maxCurrent is %{public}d", value);
     *maxVoltage = value;
 
     return HDF_SUCCESS;
@@ -445,7 +444,7 @@ void PowerSupplyProvider::ParseUeventToBatterydInfo(const char* msg, struct Batt
     while (*msg) {
         for (int32_t i = 0; batteryAssigners[i].prefix; ++i) {
             if (!strncmp(msg, batteryAssigners[i].prefix, batteryAssigners[i].prefixLen)) {
-                HDF_LOGI("%{public}s: msg: %{public}s", __func__, msg);
+                BATTERY_HILOGD(FEATURE_BATT_INFO, "msg: %{public}s", msg);
                 msg += batteryAssigners[i].prefixLen;
                 batteryAssigners[i].Assigner(msg, info);
                 break;
@@ -487,21 +486,19 @@ void PowerSupplyProvider::CopyBatteryInfo(const struct BatterydInfo* info) const
 void PowerSupplyProvider::SetSysFilePath(const std::string& path)
 {
     if (path.empty()) {
-        HDF_LOGI("%{public}s path is empty", __func__);
+        BATTERY_HILOGI(FEATURE_BATT_INFO, "path is empty");
         path_ = "/data/local/tmp";
         return;
-    } else {
-        HDF_LOGI("%{public}s path is not empty", __func__);
     }
     path_ = path;
-    HDF_LOGI("%{public}s: path is %{public}s", __func__, path.c_str());
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "path is %{public}s", path.c_str());
 }
 
 void PowerSupplyProvider::CreateFile(const std::string& path, const std::string& content)
 {
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
-        HDF_LOGI("%{public}s: Cannot create file %{public}s", __func__, path.c_str());
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "cannot create file %{public}s", path.c_str());
         return;
     }
     stream << content.c_str() << std::endl;
@@ -514,14 +511,14 @@ void PowerSupplyProvider::InitBatteryPath()
     std::string sysCapitalBatteryPath = "/sys/class/power_supply/Battery";
 
     if (access(sysLowercaseBatteryPath.c_str(), F_OK) == 0) {
-        HDF_LOGI("%{public}s: system battery path is exist", __func__);
+        BATTERY_HILOGI(FEATURE_BATT_INFO, "system battery path is exist");
         return;
     } else {
         if (access(sysCapitalBatteryPath.c_str(), F_OK) == 0) {
-            HDF_LOGI("%{public}s: system Battery path is exist", __func__);
+            BATTERY_HILOGI(FEATURE_BATT_INFO, "system Battery path is exist");
             return;
         }
-        HDF_LOGI("%{public}s: create mock battery path", __func__);
+        BATTERY_HILOGI(FEATURE_BATT_INFO, "create mock battery path");
         InitDefaultSysfs();
     }
 }
@@ -532,10 +529,10 @@ int32_t PowerSupplyProvider::InitPowerSupplySysfs()
     struct dirent* entry = nullptr;
     index_ = 0;
 
-    HDF_LOGI("%{public}s: path_ is %{public}s", __func__, path_.c_str());
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "path_ is %{public}s", path_.c_str());
     dir = opendir(path_.c_str());
     if (dir == nullptr) {
-        HDF_LOGE("%{public}s: cannot open path_ %{public}s", __func__, path_.c_str());
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "cannot open path_ %{public}s", path_.c_str());
         return HDF_ERR_IO;
     }
 
@@ -550,20 +547,20 @@ int32_t PowerSupplyProvider::InitPowerSupplySysfs()
         }
 
         if (entry->d_type == DT_DIR || entry->d_type == DT_LNK) {
-            HDF_LOGI("%{public}s: init sysfs info of %{public}s", __func__, entry->d_name);
+            BATTERY_HILOGI(FEATURE_BATT_INFO, "init sysfs info of %{public}s", entry->d_name);
             if (index_ >= MAX_SYSFS_SIZE) {
-                HDF_LOGW("%{public}s: too many power supply types", __func__);
+                BATTERY_HILOGW(FEATURE_BATT_INFO, "too many power supply types");
                 break;
             }
             nodeNames_.emplace_back(entry->d_name);
             index_++;
         }
     }
-    struct PowerSupplySysfsInfo sysfsInfo = {0};
+    struct PowerSupplySysfsInfo sysfsInfo = {};
     nodeNamePathMap_.clear();
     TraversalNode();
     FormatSysfsPaths(&sysfsInfo);
-    HDF_LOGI("%{public}s: init power supply sysfs nodes, total count %{public}d", __func__, index_);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "init power supply sysfs nodes, total count %{public}d", index_);
     closedir(dir);
 
     return HDF_SUCCESS;
@@ -618,11 +615,11 @@ void PowerSupplyProvider::CheckSubfolderNode(const std::string& path)
     DIR *dir = nullptr;
     struct dirent* entry = nullptr;
     std::string batteryPath = path_ + "/" + path;
-    HDF_LOGI("%{public}s: subfolder path is:%{public}s", __func__, batteryPath.c_str());
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "subfolder path is:%{public}s", batteryPath.c_str());
 
     dir = opendir(batteryPath.c_str());
     if (dir == nullptr) {
-        HDF_LOGI("%{public}s: subfolder file is not exist.", __func__);
+        BATTERY_HILOGI(FEATURE_BATT_INFO, "subfolder file is not exist.");
         return;
     }
 
@@ -664,7 +661,7 @@ int32_t PowerSupplyProvider::ParseCapacity(int32_t* capacity) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: capacity is %{public}d", __func__, value);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "capacity is %{public}d", value);
     *capacity = value;
 
     return HDF_SUCCESS;
@@ -680,7 +677,7 @@ int32_t PowerSupplyProvider::ParseTotalEnergy(int32_t* totalEnergy) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: totalEnergy is %{public}d", __func__, value);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "totalEnergy is %{public}d", value);
     *totalEnergy = value;
 
     return HDF_SUCCESS;
@@ -696,7 +693,7 @@ int32_t PowerSupplyProvider::ParseCurrentAverage(int32_t* curAverage) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: curAverage is %{public}d", __func__, value);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "curAverage is %{public}d", value);
     *curAverage = value;
 
     return HDF_SUCCESS;
@@ -712,7 +709,7 @@ int32_t PowerSupplyProvider::ParseCurrentNow(int32_t* curNow) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: curNow is %{public}d", __func__, value);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "curNow is %{public}d", value);
     *curNow = value;
 
     return HDF_SUCCESS;
@@ -728,7 +725,7 @@ int32_t PowerSupplyProvider::ParseRemainEnergy(int32_t* remainEnergy) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: remainEnergy is %{public}d", __func__, value);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "remainEnergy is %{public}d", value);
     *remainEnergy = value;
 
     return HDF_SUCCESS;
@@ -743,7 +740,7 @@ int32_t PowerSupplyProvider::ParseVoltage(int32_t* voltage) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: voltage is %{public}d", __func__, value);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "voltage is %{public}d", value);
     *voltage = value;
 
     return HDF_SUCCESS;
@@ -758,7 +755,7 @@ int32_t PowerSupplyProvider::ParseTemperature(int32_t* temperature) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: temperature is %{public}d", __func__, value);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "temperature is %{public}d", value);
     *temperature = value;
 
     return HDF_SUCCESS;
@@ -774,7 +771,7 @@ int32_t PowerSupplyProvider::ParseHealthState(int32_t* healthState) const
 
     Trim(buf);
     *healthState = HealthStateEnumConverter(buf);
-    HDF_LOGI("%{public}s: healthState is %{public}d", __func__, *healthState);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "healthState is %{public}d", *healthState);
     return HDF_SUCCESS;
 }
 
@@ -784,11 +781,11 @@ int32_t PowerSupplyProvider::ParsePluggedType(int32_t* pluggedType) const
     GetPluggedTypeName(buf, sizeof(buf));
     int32_t type = PluggedTypeEnumConverter(buf);
     if (type == PLUGGED_TYPE_BUTT) {
-        HDF_LOGW("%{public}s: not support the online type %{public}s", __func__, buf);
+        BATTERY_HILOGW(FEATURE_BATT_INFO, "not support the online type %{public}s", buf);
         return HDF_ERR_NOT_SUPPORT;
     }
 
-    HDF_LOGI("%{public}s: return online plugged type %{public}d", __func__, type);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "return online plugged type %{public}d", type);
     *pluggedType = type;
     return HDF_SUCCESS;
 }
@@ -803,7 +800,7 @@ int32_t PowerSupplyProvider::ParseChargeState(int32_t* chargeState) const
 
     Trim(buf);
     *chargeState = ChargeStateEnumConverter(buf);
-    HDF_LOGI("%{public}s: chargeState is %{public}d", __func__, *chargeState);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "chargeState is %{public}d", *chargeState);
     return HDF_SUCCESS;
 }
 
@@ -816,7 +813,7 @@ int32_t PowerSupplyProvider::ParsePresent(int8_t* present) const
     }
 
     auto value = static_cast<int8_t>(ParseInt(buf));
-    HDF_LOGI("%{public}s: present is %{public}d", __func__, value);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "present is %{public}d", value);
     *present = value;
     return HDF_SUCCESS;
 }
@@ -830,7 +827,7 @@ int32_t PowerSupplyProvider::ParseChargeCounter(int32_t* chargeCounter) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: temperature is %{public}d", __func__, value);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "temperature is %{public}d", value);
     *chargeCounter = value;
 
     return HDF_SUCCESS;
@@ -839,15 +836,13 @@ int32_t PowerSupplyProvider::ParseChargeCounter(int32_t* chargeCounter) const
 int32_t PowerSupplyProvider::ParseTechnology(std::string& technology) const
 {
     char buf[MAX_BUFF_SIZE] = {0};
-    HDF_LOGI("%{public}s: technology path is %{public}s", __func__, batterySysfsInfo_.technologyPath.c_str());
-
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.technologyPath.c_str(), buf, sizeof(buf));
     if (ret != HDF_SUCCESS) {
         return ret;
     }
 
     technology.assign(buf, strlen(buf));
-    HDF_LOGI("%{public}s: technology is %{public}s", __func__, technology.c_str());
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "technology is %{public}s", technology.c_str());
     return HDF_SUCCESS;
 }
 
@@ -876,7 +871,7 @@ void PowerSupplyProvider::InitDefaultSysfs()
         sleep(MKDIR_WAIT_TIME);
     }
 
-    HDF_LOGI("%{public}s: create mock path", __func__);
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "create mock path");
     CreateFile("/data/local/tmp/ohos-fgu/capacity", "1000");
     CreateFile("/data/local/tmp/ohos-fgu/current_avg", "1000");
     CreateFile("/data/local/tmp/ohos-fgu/current_now", "1000");

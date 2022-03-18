@@ -10,14 +10,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//base/powermgr/battery_manager/batterymgr.gni")
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libbattery_interface_service_1.0") {
   include_dirs = [
     "include",
-    "../include/",
+    "../include",
+    "../../utils/include",
     "//base/powermgr/battery_manager/charger/led",
   ]
   sources = [
@@ -60,7 +60,8 @@ ohos_shared_library("libbattery_interface_service_1.0") {
 ohos_shared_library("libbattery_driver") {
   include_dirs = [
     "include",
-    "../include/",
+    "../include",
+    "../../utils/include",
     "//base/powermgr/battery_manager/charger/led",
   ]
   sources = [ "src/battery_interface_driver.cpp" ]
