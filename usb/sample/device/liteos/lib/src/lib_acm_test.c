@@ -59,6 +59,7 @@ void acm_open()
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");
     if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
         HDF_LOGE("%s: GetService err", __func__);
+        return;
     }
     g_data = HdfSbufObtainDefaultSize();
     g_reply = HdfSbufObtainDefaultSize();
@@ -160,6 +161,7 @@ void acm_prop_write(const char *propName, const char *propValue)
     (void)HdfSbufWriteString(g_data, propValue);
     if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
         HDF_LOGE("%s: GetService err", __func__);
+        return;
     }
     int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_SET_PROP, g_data, g_reply);
     if (status) {
