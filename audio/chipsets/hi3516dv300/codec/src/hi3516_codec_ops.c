@@ -104,7 +104,7 @@ int32_t CodecDaiHwParams(const struct AudioCard *card, const struct AudioPcmHwPa
     }
 
     (void)memset_s(&bitWidth, sizeof(unsigned int), 0, sizeof(unsigned int));
-    int ret = AudioFramatToBitWidth(param->format, &bitWidth);
+    int ret = AudioFormatToBitWidth(param->format, &bitWidth);
     if (ret != HDF_SUCCESS) {
         return HDF_FAILURE;
     }

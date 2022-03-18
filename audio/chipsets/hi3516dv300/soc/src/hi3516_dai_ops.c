@@ -212,7 +212,7 @@ static int32_t SetIISRate(const struct DaiDevice *device, const struct AudioMixe
     if (AiaoSetSysCtlRegValue(mclkSel, bitWidth, rate, &bclkRegVal) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-
+    //Index of HCS configuration file register information
     if (AudioUpdateDaiRegBits(device, regCfgItem[1 + shift].reg, regCfgItem[1 + shift].mask,
         regCfgItem[1 + shift].shift, bclkRegVal) != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("set frequency fail.");
@@ -296,7 +296,7 @@ int32_t DaiHwParams(const struct AudioCard *card, const struct AudioPcmHwParams 
 
     data->pcmInfo.channels = param->channels;
 
-    if (AudioFramatToBitWidth(param->format, &bitWidth) != HDF_SUCCESS) {
+    if (AudioFormatToBitWidth(param->format, &bitWidth) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
 
