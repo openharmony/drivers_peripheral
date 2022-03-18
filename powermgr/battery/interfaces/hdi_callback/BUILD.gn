@@ -14,7 +14,10 @@ import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libbattery_callback") {
-  include_dirs = [ "../include" ]
+  include_dirs = [
+    "../include",
+    "../../utils/include",
+  ]
   sources = [ "./battery_callback_impl.cpp" ]
 
   deps = [

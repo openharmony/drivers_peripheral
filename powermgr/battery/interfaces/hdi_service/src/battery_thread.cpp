@@ -21,11 +21,7 @@
 #include <unistd.h>
 #include <linux/netlink.h>
 #include "core/hdf_device_desc.h"
-#include "utils/hdf_log.h"
-
-#define HDF_LOG_TAG BatteryThread
-
-using namespace OHOS::HDI::Battery::V1_0;
+#include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -43,10 +39,10 @@ const std::string POWER_SUPPLY = "SUBSYSTEM=power_supply";
 }
 static sptr<IBatteryCallback> g_callback;
 
-void BatteryThread::InitCallback(const sptr<IBatteryCallback>& event)
+void BatteryThread::InitCallback(const sptr<IBatteryCallback>& callback)
 {
-    g_callback = event;
-    HDF_LOGI("%{public}s: g_callback is %{public}p", __func__, event.GetRefPtr());
+    g_callback = callback;
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "g_callback is %{public}p", callback.GetRefPtr());
 }
 
 int32_t BatteryThread::OpenUeventSocket()
@@ -60,20 +56,20 @@ int32_t BatteryThread::OpenUeventSocket()
 
     int32_t fd = socket(PF_NETLINK, SOCK_DGRAM | SOCK_CLOEXEC, NETLINK_KOBJECT_UEVENT);
     if (fd == INVALID_FD) {
-        HDF_LOGE("%{public}s: open uevent socket failed, fd is invalid", __func__);
+        BATTERY_HILOGE(COMP_HDI, "open uevent socket failed, fd is invalid");
         return INVALID_FD;
     }
 
     int32_t ret = setsockopt(fd, SOL_SOCKET, SO_RCVBUFFORCE, &bufferSize, sizeof(bufferSize));
     if (ret < 0) {
-        HDF_LOGE("%{public}s: set socket opt failed, ret: %{public}d", __func__, ret);
+        BATTERY_HILOGE(COMP_HDI, "set socket opt failed, ret: %{public}d", ret);
         close(fd);
         return INVALID_FD;
     }
 
     ret = bind(fd, reinterpret_cast<const struct sockaddr*>(&address), sizeof(struct sockaddr_nl));
     if (ret < 0) {
-        HDF_LOGE("%{public}s: bind socket address failed, ret: %{public}d", __func__, ret);
+        BATTERY_HILOGE(COMP_HDI, "bind socket address failed, ret: %{public}d", ret);
         close(fd);
         return INVALID_FD;
     }
@@ -92,7 +88,7 @@ int32_t BatteryThread::RegisterCallback(int32_t fd, EventType et)
     ev.data.ptr = reinterpret_cast<void*>(this);
     ev.data.fd = fd;
     if (epoll_ctl(epFd_, EPOLL_CTL_ADD, fd, &ev) == -1) {
-        HDF_LOGE("%{public}s: epoll_ctl failed, error num =%{public}d", __func__, errno);
+        BATTERY_HILOGE(COMP_HDI, "epoll_ctl failed, error num =%{public}d", errno);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -103,7 +99,7 @@ void BatteryThread::SetTimerInterval(int32_t interval)
     struct itimerspec itval = {};
 
     if (timerFd_ == INVALID_FD) {
-        HDF_LOGW("%{public}s: invalid timer fd", __func__);
+        BATTERY_HILOGW(COMP_HDI, "invalid timer fd");
         return;
     }
 
@@ -118,7 +114,7 @@ void BatteryThread::SetTimerInterval(int32_t interval)
     itval.it_value.tv_nsec = 0;
 
     if (timerfd_settime(timerFd_, 0, &itval, nullptr) == -1) {
-        HDF_LOGE("%{public}s: timer failed\n", __func__);
+        BATTERY_HILOGE(COMP_HDI, "timerfd_settime failed");
     }
 }
 
@@ -143,7 +139,7 @@ int32_t BatteryThread::InitUevent()
 {
     ueventFd_ = OpenUeventSocket();
     if (ueventFd_ == INVALID_FD) {
-        HDF_LOGE("%{public}s: open uevent socket failed, fd is invalid", __func__);
+        BATTERY_HILOGE(COMP_HDI, "open uevent socket failed, fd is invalid");
         return HDF_ERR_BAD_FD;
     }
 
@@ -151,7 +147,7 @@ int32_t BatteryThread::InitUevent()
     callbacks_.insert(std::make_pair(ueventFd_, &BatteryThread::UeventCallback));
 
     if (RegisterCallback(ueventFd_, EVENT_UEVENT_FD)) {
-        HDF_LOGE("%{public}s: register Uevent event failed", __func__);
+        BATTERY_HILOGE(COMP_HDI, "register Uevent event failed");
         return HDF_ERR_BAD_FD;
     }
     return HDF_SUCCESS;
@@ -167,7 +163,7 @@ int32_t BatteryThread::Init([[maybe_unused]] void* service)
 
     epFd_ = epoll_create1(EPOLL_CLOEXEC);
     if (epFd_ == INVALID_FD) {
-        HDF_LOGE("%{public}s: epoll create failed, timerFd_ is invalid", __func__);
+        BATTERY_HILOGE(COMP_HDI, "epoll create failed, epFd_ is invalid");
         return HDF_ERR_BAD_FD;
     }
 
@@ -186,7 +182,7 @@ int32_t BatteryThread::InitTimer()
 {
     timerFd_ = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
     if (timerFd_ == INVALID_FD) {
-        HDF_LOGE("%{public}s: epoll create failed, timerFd_ is invalid", __func__);
+        BATTERY_HILOGE(COMP_HDI, "epoll create failed, timerFd_ is invalid");
         return HDF_ERR_BAD_FD;
     }
 
@@ -195,7 +191,7 @@ int32_t BatteryThread::InitTimer()
     callbacks_.insert(std::make_pair(timerFd_, &BatteryThread::TimerCallback));
 
     if (RegisterCallback(timerFd_, EVENT_TIMER_FD)) {
-        HDF_LOGE("%{public}s: register Timer event failed", __func__);
+        BATTERY_HILOGE(COMP_HDI, "register Timer event failed");
     }
 
     return HDF_SUCCESS;
@@ -206,7 +202,7 @@ void BatteryThread::TimerCallback(void* service)
     uint64_t timers;
 
     if (read(timerFd_, &timers, sizeof(timers)) == -1) {
-        HDF_LOGE("%{public}s: read timerFd_ failed", __func__);
+        BATTERY_HILOGE(COMP_HDI, "read timerFd_ failed");
         return;
     }
 
@@ -219,7 +215,7 @@ void BatteryThread::UeventCallback(void* service)
 
     ssize_t len = recv(ueventFd_, msg, UEVENT_MSG_LEN, 0);
     if (len < 0 || len >= UEVENT_MSG_LEN) {
-        HDF_LOGI("%{public}s: recv return msg is invalid, len: %{public}zd", __func__, len);
+        BATTERY_HILOGI(COMP_HDI, "recv return msg is invalid, len: %{public}zd", len);
         return;
     }
 
@@ -237,7 +233,7 @@ void BatteryThread::UpdateBatteryInfo(void* service, char* msg)
     BatteryInfo event = {};
     std::unique_ptr<BatterydInfo> batteryInfo = std::make_unique<BatterydInfo>();
     if (batteryInfo == nullptr) {
-        HDF_LOGE("%{public}s instantiate batteryInfo error", __func__);
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "make_unique BatterydInfo error");
         return;
     }
 
@@ -254,19 +250,18 @@ void BatteryThread::UpdateBatteryInfo(void* service, char* msg)
     event.present = batteryInfo->present_;
     event.technology = batteryInfo->technology_;
 
-    HDF_LOGI("%{public}s: BatteryInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "BatteryInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
         "healthState=%{public}d, pluggedType=%{public}d, pluggedMaxCurrent=%{public}d, " \
         "pluggedMaxVoltage=%{public}d, chargeState=%{public}d, chargeCounter=%{public}d, present=%{public}d, " \
-        "technology=%{public}s", __func__, batteryInfo->capacity_, batteryInfo->voltage_,
+        "technology=%{public}s", batteryInfo->capacity_, batteryInfo->voltage_,
         batteryInfo->temperature_, batteryInfo->healthState_, batteryInfo->pluggedType_,
         batteryInfo->pluggedMaxCurrent_, batteryInfo->pluggedMaxVoltage_, batteryInfo->chargeState_,
         batteryInfo->chargeCounter_, batteryInfo->present_, batteryInfo->technology_.c_str());
 
     if (g_callback != nullptr) {
-        HDF_LOGI("%{public}s g_callback is not nullptr", __func__);
         g_callback->Update(event);
     } else {
-        HDF_LOGI("%{public}s g_callback is nullptr", __func__);
+        BATTERY_HILOGW(FEATURE_BATT_INFO, "g_callback is nullptr");
     }
 }
 
@@ -275,7 +270,7 @@ void BatteryThread::UpdateBatteryInfo(void* service)
     BatteryInfo event = {};
     std::unique_ptr<BatterydInfo> batteryInfo = std::make_unique<BatterydInfo>();
     if (batteryInfo == nullptr) {
-        HDF_LOGE("%{public}s instantiate batteryInfo error", __func__);
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "make_unique BatterydInfo error");
         return;
     }
 
@@ -292,19 +287,18 @@ void BatteryThread::UpdateBatteryInfo(void* service)
     event.present = batteryInfo->present_;
     event.technology = batteryInfo->technology_;
 
-    HDF_LOGI("%{public}s: BatteryInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "BatteryInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
         "healthState=%{public}d, pluggedType=%{public}d, pluggedMaxCurrent=%{public}d, " \
         "pluggedMaxVoltage=%{public}d, chargeState=%{public}d, chargeCounter=%{public}d, present=%{public}d, " \
-        "technology=%{public}s", __func__, batteryInfo->capacity_, batteryInfo->voltage_,
+        "technology=%{public}s", batteryInfo->capacity_, batteryInfo->voltage_,
         batteryInfo->temperature_, batteryInfo->healthState_, batteryInfo->pluggedType_,
         batteryInfo->pluggedMaxCurrent_, batteryInfo->pluggedMaxVoltage_, batteryInfo->chargeState_,
         batteryInfo->chargeCounter_, batteryInfo->present_, batteryInfo->technology_.c_str());
 
     if (g_callback != nullptr) {
-        HDF_LOGI("%{public}s g_callback is not nullptr", __func__);
         g_callback->Update(event);
     } else {
-        HDF_LOGI("%{public}s g_callback is nullptr", __func__);
+        BATTERY_HILOGI(FEATURE_BATT_INFO, "g_callback is nullptr");
     }
 }
 
@@ -326,7 +320,7 @@ int32_t BatteryThread::LoopingThreadEntry(void* arg)
     size_t size = callbacks_.size();
     struct epoll_event events[size];
 
-    HDF_LOGI("%{public}s: start batteryd looping", __func__);
+    BATTERY_HILOGI(COMP_HDI, "start battery thread looping");
     while (true) {
         if (!nevents) {
             CycleMatters();
@@ -339,7 +333,7 @@ int32_t BatteryThread::LoopingThreadEntry(void* arg)
         if ((timeout < 0) || (waitTimeout > 0 && waitTimeout < timeout)) {
             timeout = waitTimeout;
         }
-        HDF_LOGI("%{public}s: timeout=%{public}d, nevents=%{public}d", __func__, timeout, nevents);
+        BATTERY_HILOGD(COMP_HDI, "timeout=%{public}d, nevents=%{public}d", timeout, nevents);
 
         nevents = epoll_wait(epFd_, events, static_cast<int32_t>(size), timeout);
         if (nevents <= 0) {

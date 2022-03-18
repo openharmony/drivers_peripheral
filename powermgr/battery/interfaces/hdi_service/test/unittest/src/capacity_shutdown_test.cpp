@@ -18,9 +18,6 @@
 #include <iostream>
 #include "battery_thread_test.h"
 #include "power_supply_provider.h"
-#include "utils/hdf_log.h"
-
-#define HDF_LOG_TAG CapacityShutdownTest
 
 using namespace testing::ext;
 using namespace OHOS::HDI::Battery::V1_0;

@@ -15,11 +15,7 @@
 
 #include "battery_interface_impl.h"
 #include "hdf_base.h"
-#include "hdf_log.h"
-
-#define HDF_LOG_TAG BatteryInterfaceImpl
-
-using namespace OHOS::HDI::Battery::V1_0;
+#include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -29,7 +25,7 @@ int32_t BatteryInterfaceImpl::Init()
 {
     provider_ = std::make_unique<OHOS::HDI::Battery::V1_0::PowerSupplyProvider>();
     if (provider_ == nullptr) {
-        HDF_LOGE("%{public}s: instantiate PowerSupplyProvider error", __func__);
+        BATTERY_HILOGE(COMP_HDI, "make_unique PowerSupplyProvider error");
         return HDF_ERR_MALLOC_FAIL;
     }
     provider_->InitBatteryPath();
@@ -37,57 +33,55 @@ int32_t BatteryInterfaceImpl::Init()
 
     batteryConfig_ = std::make_unique<OHOS::HDI::Battery::V1_0::BatteryConfig>();
     if (batteryConfig_ == nullptr) {
-        HDF_LOGI("%{public}s: instantiate batteryconfig error.", __func__);
+        BATTERY_HILOGE(COMP_HDI, "make_unique BatteryConfig error");
         return HDF_ERR_MALLOC_FAIL;
     }
     batteryConfig_->Init();
 
     batteryLed_ = std::make_unique<OHOS::HDI::Battery::V1_0::BatteryLed>();
     if (batteryLed_ == nullptr) {
-        HDF_LOGE("%{public}s: instantiate BatteryLed error", __func__);
+        BATTERY_HILOGE(COMP_HDI, "make_unique BatteryLed error");
         return HDF_ERR_MALLOC_FAIL;
     }
     batteryLed_->InitLedsSysfs();
 
     loop_ = std::make_unique<OHOS::HDI::Battery::V1_0::BatteryThread>();
     if (loop_ == nullptr) {
-        HDF_LOGE("%{public}s: Instantiate BatteryThread error", __func__);
+        BATTERY_HILOGE(COMP_HDI, "make_unique BatteryThread error");
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (g_cbEvent != nullptr) {
-        loop_->InitCallback(g_cbEvent);
+    if (batteryCallback_ != nullptr) {
+        loop_->InitCallback(batteryCallback_);
     } else {
-        HDF_LOGE("%{public}s: g_cbEvent is nullptr.", __func__);
+        BATTERY_HILOGW(COMP_HDI, "batteryCallback_ is nullptr");
     }
     loop_->StartThread(this);
 
     return HDF_SUCCESS;
 }
 
-int32_t BatteryInterfaceImpl::Register(const sptr<IBatteryCallback>& event)
+int32_t BatteryInterfaceImpl::Register(const sptr<IBatteryCallback>& callback)
 {
-    HDF_LOGI("%{public}s subcriber is %{public}p", __func__, event.GetRefPtr());
-    g_cbEvent = event;
-
-    if (g_cbEvent != nullptr) {
-        loop_->InitCallback(g_cbEvent);
-    } else {
-        HDF_LOGE("%{public}s: g_cbEvent is nullptr.", __func__);
+    if (callback == nullptr) {
+        BATTERY_HILOGD(FEATURE_BATT_INFO, "callback is nullptr");
+        return HDF_ERR_INVALID_PARAM;
     }
-
+    batteryCallback_ = callback;
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "IBatteryCallback registered, ref is %{public}p", callback.GetRefPtr());
+    loop_->InitCallback(batteryCallback_);
     return HDF_SUCCESS;
 }
 
 int32_t BatteryInterfaceImpl::UnRegister()
 {
-    g_cbEvent = nullptr;
+    batteryCallback_ = nullptr;
     return HDF_SUCCESS;
 }
 
 int32_t BatteryInterfaceImpl::ChangePath(const std::string& path)
 {
-    HDF_LOGI("%{public}s enter, path is %{public}s", __func__, path.c_str());
+    BATTERY_HILOGD(COMP_HDI, "path is %{public}s", path.c_str());
     provider_->SetSysFilePath(path);
     provider_->InitPowerSupplySysfs();
     return HDF_SUCCESS;

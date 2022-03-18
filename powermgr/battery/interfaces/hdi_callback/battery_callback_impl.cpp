@@ -15,9 +15,7 @@
 
 #include "battery_callback_impl.h"
 #include "hdf_base.h"
-#include "hdf_log.h"
-
-#define HDF_LOG_TAG BatteryCallbackImpl
+#include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -27,16 +25,16 @@ BatteryCallbackImpl::BatteryEventCallback BatteryCallbackImpl::eventCb_ = nullpt
 
 int32_t BatteryCallbackImpl::Update(const BatteryInfo& event)
 {
-    HDF_LOGI("%{public}s: BatteryInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "BatteryInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
         "healthState=%{public}d, pluggedType=%{public}d, pluggedMaxCurrent=%{public}d, " \
         "pluggedMaxVoltage=%{public}d, chargeState=%{public}d, chargeCounter=%{public}d, present=%{public}d, " \
-        "technology=%{public}s", __func__, event.capacity, event.voltage,
+        "technology=%{public}s", event.capacity, event.voltage,
         event.temperature, event.healthState, event.pluggedType,
         event.pluggedMaxCurrent, event.pluggedMaxVoltage, event.chargeState,
         event.chargeCounter, event.present, event.technology.c_str());
 
     if (eventCb_ == nullptr) {
-        HDF_LOGE("%{public}s: eventCb_ is nullptr, cannot update battery info", __func__);
+        BATTERY_HILOGW(FEATURE_BATT_INFO, "eventCb_ is nullptr, cannot update battery info");
         return HDF_FAILURE;
     }
     return eventCb_(event);
@@ -45,7 +43,7 @@ int32_t BatteryCallbackImpl::Update(const BatteryInfo& event)
 int32_t BatteryCallbackImpl::RegisterBatteryEvent(const BatteryEventCallback& eventCb)
 {
     eventCb_ = eventCb;
-    HDF_LOGE("%{public}s: eventCb_ is registered", __func__);
+    BATTERY_HILOGD(COMP_HDI, "eventCb_ is registered");
     return HDF_SUCCESS;
 }
 } // V1_0

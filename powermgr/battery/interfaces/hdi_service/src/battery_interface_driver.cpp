@@ -16,12 +16,11 @@
 #include <osal_mem.h>
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
-#include "hdf_log.h"
 #include "hdf_sbuf_ipc.h"
+#include "battery_log.h"
 #include "battery_interface_impl.h"
 
-#define HDF_LOG_TAG BatteryInterfaceDriver
-
+using namespace OHOS::HDI::Battery;
 using namespace OHOS::HDI::Battery::V1_0;
 
 struct HdfBatteryInterfaceHost {
@@ -39,29 +38,29 @@ static int32_t BatteryInterfaceDriverDispatch(struct HdfDeviceIoClient *client, 
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
+        BATTERY_HILOGE(COMP_HDI, "invalid data sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        BATTERY_HILOGE(COMP_HDI, "invalid reply sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
 
     return hdfBatteryInterfaceHost->service->OnRemoteRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-int32_t HdfBatteryInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
+static int32_t HdfBatteryInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
     auto *hdfBatteryInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfBatteryInterfaceHost, ioService);
     return hdfBatteryInterfaceHost->service->Init();
 }
 
-int32_t HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
+static int32_t HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
     auto *hdfBatteryInterfaceHost =
         (struct HdfBatteryInterfaceHost *)OsalMemAlloc(sizeof(struct HdfBatteryInterfaceHost));
     if (hdfBatteryInterfaceHost == nullptr) {
-        HDF_LOGE("HdfBatteryInterfaceDriverBind OsalMemAlloc HdfBatteryInterfaceHost failed!");
+        BATTERY_HILOGE(COMP_HDI, "OsalMemAlloc HdfBatteryInterfaceHost failed");
         return HDF_FAILURE;
     }
 
@@ -74,14 +73,14 @@ int32_t HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-void HdfBatteryInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
+static void HdfBatteryInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     auto *hdfBatteryInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfBatteryInterfaceHost, ioService);
     delete hdfBatteryInterfaceHost->service;
     OsalMemFree(hdfBatteryInterfaceHost);
 }
 
-struct HdfDriverEntry g_batteryInterfaceDriverEntry = {
+static struct HdfDriverEntry g_batteryInterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "battery_interface_service",
     .Bind = HdfBatteryInterfaceDriverBind,
