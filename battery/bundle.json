@@ -25,10 +25,10 @@
     },
     "build": {
       "sub_component": [
-        "//drivers/peripheral/powermgr/battery:battery_entry"
+        "//drivers/peripheral/battery:battery_entry"
       ],
       "test": [
-        "//drivers/peripheral/powermgr/battery/interfaces/hdi_service/test:unittest"
+        "//drivers/peripheral/battery/interfaces/hdi_service/test:unittest"
       ],
       "inner_kits": [
         {
@@ -37,7 +37,7 @@
             "header_files": [
                 "battery_callback_impl.h"
             ],
-            "header_base": "//drivers/peripheral/powermgr/battery/interfaces/include"
+            "header_base": "//drivers/peripheral/battery/interfaces/include"
           }
         }
       ]
