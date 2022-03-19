@@ -161,8 +161,7 @@ int32_t HalCmdGetValidFreqWithBand(const char *ifName, int32_t band, int32_t *fr
             break;
         }
         if (memcpy_s(freqs, size * sizeof(int32_t), result.freqs, result.nums * sizeof(int32_t)) != EOK) {
-            HDF_LOGE("%s: memcpy failed, line: %d, size_in = %u, size_out = %u", __FUNCTION__, __LINE__,
-                result.nums * sizeof(int32_t), size * sizeof(int32_t));
+            HDF_LOGE("%s: memcpy failed, line: %d", __FUNCTION__, __LINE__);
             ret = HDF_FAILURE;
             break;
         }
