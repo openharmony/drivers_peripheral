@@ -432,7 +432,14 @@ void StopRenderBySig(int32_t sig)
     }
 #endif
 
-    signal(sig, SIG_DFL);
+    (void)signal(sig, SIG_DFL);
+    return;
+}
+static inline void ProcessCommonSig(void)
+{
+    (void)signal(SIGKILL, StopRenderBySig);
+    (void)signal(SIGINT, StopRenderBySig);
+    (void)signal(SIGTERM, StopRenderBySig);
     return;
 }
 
@@ -444,9 +451,7 @@ int32_t FrameStartMmap(const AudioHandle param)
     struct StrPara *strParam = (struct StrPara *)param;
     struct AudioRender *render = strParam->render;
     struct AudioMmapBufferDescripter desc;
-    signal(SIGKILL, StopRenderBySig);
-    signal(SIGINT, StopRenderBySig);
-    signal(SIGTERM, StopRenderBySig);
+    ProcessCommonSig();
     // get file length
     char pathBuf[PATH_MAX] = {'\0'};
     if (realpath(g_path, pathBuf) == NULL) {
@@ -508,9 +513,7 @@ int32_t FrameStart(const AudioHandle param)
     int32_t readSize;
     int32_t remainingDataSize = g_wavHeadInfo.testFileRiffSize;
     uint32_t numRead;
-    signal(SIGKILL, StopRenderBySig);
-    signal(SIGINT, StopRenderBySig);
-    signal(SIGTERM, StopRenderBySig);
+    ProcessCommonSig();
     uint64_t replyBytes;
     if (g_file == NULL) {
         return HDF_FAILURE;
