@@ -147,11 +147,11 @@ HWTEST_F(WifiClientTest, WifiClientGetDevMacAddr001, TestSize.Level1)
  */
 HWTEST_F(WifiClientTest, WifiClientGetValidFreqByBand001, TestSize.Level1)
 {
-    int ret;
+    int32_t ret;
     int32_t band = IEEE80211_BAND_2GHZ;
     struct FreqInfoResult result;
     uint32_t size = 14;
-    int i;
+    uint32_t i;
 
     result.freqs = (int32_t *)OsalMemCalloc(35 * sizeof(int32_t));
     if (result.freqs == NULL) {
