@@ -325,13 +325,6 @@ int32_t SwitchAdapter(struct AudioAdapterDescriptor *descs,
     return HDF_ERR_NOT_SUPPORT;
 }
 
-void StreamClose(int32_t sig)
-{
-    /* allow the stream to be closed gracefully */
-    signal(sig, SIG_IGN);
-    g_closeEnd = 1;
-}
-
 uint32_t PcmFormatToBits(enum AudioFormat formatBit)
 {
     switch (formatBit) {
@@ -347,6 +340,15 @@ uint32_t PcmFormatToBits(enum AudioFormat formatBit)
 uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)
 {
     return DEEP_BUFFER_RENDER_PERIOD_SIZE * attrs.channelCount * (PcmFormatToBits(attrs.format) >> 3);
+}
+
+static inline void FileClose(FILE **file)
+{
+    if ((file != NULL) && ((*file) != NULL)) {
+        fclose(*file);
+        *file = NULL;
+    }
+    return;
 }
 
 int32_t StopAudioFiles(struct AudioRender **renderS)
@@ -386,12 +388,59 @@ int32_t StopAudioFiles(struct AudioRender **renderS)
         free(g_frame);
         g_frame = NULL;
     }
-    if (g_file != NULL) {
-        fclose(g_file);
-        g_file = NULL;
-    }
+    FileClose(&g_file);
     printf("Stop Successful\n");
     return ret;
+}
+
+bool PrepareStopAndUloadAdapter(void)
+{
+    bool soMode = false;
+
+    if (g_render != NULL && g_adapter != NULL) {
+        StopAudioFiles(&g_render);
+    }
+
+    if (g_manager != NULL) {
+        soMode = true;
+        if (g_manager->UnloadAdapter != NULL) {
+            g_manager->UnloadAdapter(g_manager, g_adapter);
+        }
+    } else {
+        if (g_proxyManager != NULL && g_proxyManager->UnloadAdapter != NULL) {
+            g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
+        }
+    }
+
+    return soMode;
+}
+
+void StopRenderBySig(int32_t sig)
+{
+    bool soMode = false;
+
+    soMode = PrepareStopAndUloadAdapter();
+    dlclose(g_handle);
+    g_closeEnd = 1;
+
+#ifdef AUDIO_HAL_USER
+    if (soMode) {
+        g_sdkExitSp();
+        if (g_sdkHandle != NULL) {
+            dlclose(g_sdkHandle);
+        }
+    }
+#endif
+
+    (void)signal(sig, SIG_DFL);
+    return;
+}
+static inline void ProcessCommonSig(void)
+{
+    (void)signal(SIGKILL, StopRenderBySig);
+    (void)signal(SIGINT, StopRenderBySig);
+    (void)signal(SIGTERM, StopRenderBySig);
+    return;
 }
 
 int32_t FrameStartMmap(const AudioHandle param)
@@ -402,7 +451,7 @@ int32_t FrameStartMmap(const AudioHandle param)
     struct StrPara *strParam = (struct StrPara *)param;
     struct AudioRender *render = strParam->render;
     struct AudioMmapBufferDescripter desc;
-    signal(SIGINT, StreamClose);
+    ProcessCommonSig();
     // get file length
     char pathBuf[PATH_MAX] = {'\0'};
     if (realpath(g_path, pathBuf) == NULL) {
@@ -464,7 +513,7 @@ int32_t FrameStart(const AudioHandle param)
     int32_t readSize;
     int32_t remainingDataSize = g_wavHeadInfo.testFileRiffSize;
     uint32_t numRead;
-    signal(SIGINT, StreamClose);
+    ProcessCommonSig();
     uint64_t replyBytes;
     if (g_file == NULL) {
         return HDF_FAILURE;
@@ -494,15 +543,6 @@ int32_t FrameStart(const AudioHandle param)
         (void)StopAudioFiles(&render);
     }
     return HDF_SUCCESS;
-}
-
-void FileClose(FILE **file)
-{
-    if ((file != NULL) && ((*file) != NULL)) {
-        fclose(*file);
-        *file = NULL;
-    }
-    return;
 }
 
 int32_t InitPlayingAudioParam(struct AudioRender *render)
@@ -1221,20 +1261,9 @@ int32_t main(int32_t argc, char const *argv[])
         LOG_FUN_ERR("InitParam Fail!");
         return HDF_FAILURE;
     }
+
     Choice();
-    if (g_render != NULL && g_adapter != NULL) {
-        StopAudioFiles(&g_render);
-    }
-    if (g_manager != NULL) {
-        soMode = true;
-        if (g_manager->UnloadAdapter != NULL) {
-            g_manager->UnloadAdapter(g_manager, g_adapter);
-        }
-    } else {
-        if (g_proxyManager != NULL && g_proxyManager->UnloadAdapter != NULL) {
-            g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
-        }
-    }
+    soMode = PrepareStopAndUloadAdapter();
 #ifdef AUDIO_HAL_USER
     if (soMode) {
         g_sdkExitSp();
