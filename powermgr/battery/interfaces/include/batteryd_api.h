@@ -16,23 +16,8 @@
 #ifndef BATTERYD_API_H
 #define BATTERYD_API_H
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
-
-enum BatterydCmd {
-    CMD_BIND_BATTERY_SUBSCRIBER = 0,
-    CMD_UNBIND_BATTERY_SUBSCRIBER,
-    CMD_NOTIFY_SUBSCRIBER,
-    CMD_GET_CAPACITY,
-    CMD_GET_VOLTAGE,
-    CMD_GET_TEMPERATURE,
-    CMD_GET_HEALTH_STATE,
-    CMD_GET_PLUGGED_TYPE,
-    CMD_GET_CHARGE_STATE,
-    CMD_GET_PRESENT,
-    CMD_GET_TECHNOLOGY,
-    CMD_CHANGE_PATH
-};
 
 enum BatterydPluggedType {
     PLUGGED_TYPE_NONE = 0,

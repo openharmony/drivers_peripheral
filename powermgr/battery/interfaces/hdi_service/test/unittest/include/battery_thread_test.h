@@ -41,7 +41,7 @@ void SetTimerIntervalTest(const int interval, BatteryThread& bthread);
 int32_t GetTimerIntervalTest(BatteryThread& bthread);
 int32_t InitUeventTest(BatteryThread& bthread);
 int32_t GetUeventFdTest(BatteryThread& bthread);
-int32_t ParseConfigTest(const std::string filename, BatteryConfig& bconfig);
+void ParseConfigTest(const std::string filename, BatteryConfig& bconfig);
 void ChargerThreadInitTest(ChargerThread& cthread);
 void CycleMattersTest(ChargerThread& cthread);
 bool GetBatteryInfoTest(ChargerThread& cthread);
@@ -156,7 +156,7 @@ class GetUeventFdImplement {
 
 template<typename Tag, typename PrivateFun, PrivateFun privateFun>
 class ParseConfigImplement {
-    friend int32_t ParseConfigTest(const std::string filename, BatteryConfig& bconfig)
+    friend void ParseConfigTest(const std::string filename, BatteryConfig& bconfig)
     {
         return (bconfig.*privateFun)(filename);
     }

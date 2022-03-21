@@ -28,19 +28,16 @@
 #include <sys/stat.h>
 #include <thread>
 #include <vector>
-#include "battery_service.h"
 #include "battery_thread_test.h"
 #include "battery_vibrate.h"
 #include "hdf_base.h"
 #include "power_supply_provider.h"
-#include "utils/hdf_log.h"
-
-#define HDF_LOG_TAG HdiServiceTest
+#include "battery_log.h"
 
 using namespace testing::ext;
 using namespace OHOS;
+using namespace OHOS::HDI::Battery;
 using namespace OHOS::HDI::Battery::V1_0;
-using namespace OHOS::PowerMgr;
 using namespace std;
 
 namespace HdiServiceTest {
@@ -49,15 +46,16 @@ static std::vector<std::string> g_filenodeName;
 static std::map<std::string, std::string> g_nodeInfo;
 const int STR_TO_LONG_LEN = 10;
 const int NUM_ZERO = 0;
-const int32_t ERROR = -1;
-const int MAX_BUFF_SIZE = 128;
+constexpr int32_t ERROR = -1;
+constexpr int32_t MAX_BUFF_SIZE = 128;
+constexpr int32_t MAX_SYSFS_SIZE = 64;
 std::unique_ptr<PowerSupplyProvider> giver_ = nullptr;
 
 void HdiServiceTest::SetUpTestCase(void)
 {
     giver_ = std::make_unique<PowerSupplyProvider>();
     if (giver_ == nullptr) {
-        HDF_LOGI("%{public}s: Failed to get PowerSupplyProvider", __func__);
+        BATTERY_HILOGI(LABEL_TEST, "Failed to get PowerSupplyProvider");
     }
 }
 
@@ -82,7 +80,7 @@ std::string CreateFile(std::string path, std::string content)
 {
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
-        HDF_LOGI("%{public}s: Cannot create file %{public}s", __func__, path.c_str());
+        BATTERY_HILOGI(LABEL_TEST, "Cannot create file %{public}s", path.c_str());
         return nullptr;
     }
     stream << content.c_str() << std::endl;
@@ -95,11 +93,11 @@ static void CheckSubfolderNode(const std::string& path)
     DIR *dir = nullptr;
     struct dirent* entry = nullptr;
     std::string batteryPath = SYSTEM_BATTERY_PATH + "/" + path;
-    HDF_LOGI("%{public}s: subfolder path is:%{public}s", __func__, batteryPath.c_str());
+    BATTERY_HILOGI(LABEL_TEST, "subfolder path is:%{public}s", batteryPath.c_str());
 
     dir = opendir(batteryPath.c_str());
     if (dir == nullptr) {
-        HDF_LOGI("%{public}s: subfolder file is not exist.", __func__);
+        BATTERY_HILOGI(LABEL_TEST, "subfolder file is not exist.");
         return;
     }
 
@@ -183,7 +181,7 @@ static int32_t InitBaseSysfs(void)
 
     dir = opendir(SYSTEM_BATTERY_PATH.c_str());
     if (dir == nullptr) {
-        HDF_LOGE("%{public}s: cannot open POWER_SUPPLY_BASE_PATH", __func__);
+        BATTERY_HILOGE(LABEL_TEST, "cannot open POWER_SUPPLY_BASE_PATH");
         return HDF_ERR_IO;
     }
 
@@ -198,9 +196,9 @@ static int32_t InitBaseSysfs(void)
         }
 
         if (entry->d_type == DT_DIR || entry->d_type == DT_LNK) {
-            HDF_LOGI("%{public}s: init sysfs info of %{public}s", __func__, entry->d_name);
+            BATTERY_HILOGI(LABEL_TEST, "init sysfs info of %{public}s", entry->d_name);
             if (index >= MAX_SYSFS_SIZE) {
-                HDF_LOGE("%{public}s: too many plugged types", __func__);
+                BATTERY_HILOGE(LABEL_TEST, "too many plugged types");
                 break;
             }
             g_filenodeName.emplace_back(entry->d_name);
@@ -209,7 +207,7 @@ static int32_t InitBaseSysfs(void)
     }
 
     TraversalBaseNode();
-    HDF_LOGI("%{public}s: index is %{public}d", __func__, index);
+    BATTERY_HILOGI(LABEL_TEST, "index is %{public}d", index);
     closedir(dir);
 
     return HDF_SUCCESS;
@@ -229,17 +227,17 @@ static int32_t ReadTemperatureSysfs()
         }
     }
     std::string sysBattTemPath = SYSTEM_BATTERY_PATH + "/" + tempNode + "/" + "temp";
-    HDF_LOGE("%{public}s: sysBattTemPath is %{public}s", __func__, sysBattTemPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysBattTemPath is %{public}s", sysBattTemPath.c_str());
 
     int fd = open(sysBattTemPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattTemPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysBattTemPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattTemPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysBattTemPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -247,9 +245,9 @@ static int32_t ReadTemperatureSysfs()
     buf[readSize] = '\0';
     int32_t battTemperature = strtol(buf, nullptr, strlen);
     if (battTemperature < NUM_ZERO) {
-        HDF_LOGE("%{public}s: read system file temperature is %{public}d", __func__, battTemperature);
+        BATTERY_HILOGE(LABEL_TEST, "read system file temperature is %{public}d", battTemperature);
     }
-    HDF_LOGE("%{public}s: read system file temperature is %{public}d", __func__, battTemperature);
+    BATTERY_HILOGE(LABEL_TEST, "read system file temperature is %{public}d", battTemperature);
     close(fd);
     return battTemperature;
 }
@@ -267,17 +265,17 @@ static int32_t ReadVoltageSysfs()
         }
     }
     std::string sysBattVolPath = SYSTEM_BATTERY_PATH + "/" + voltageNode + "/" + "voltage_now";
-    HDF_LOGE("%{public}s: sysBattVolPath is %{public}s", __func__, sysBattVolPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysBattVolPath is %{public}s", sysBattVolPath.c_str());
 
     int fd = open(sysBattVolPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattVolPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysBattVolPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattVolPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysBattVolPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -285,9 +283,9 @@ static int32_t ReadVoltageSysfs()
     buf[readSize] = '\0';
     int32_t battVoltage = strtol(buf, nullptr, strlen);
     if (battVoltage < NUM_ZERO) {
-        HDF_LOGE("%{public}s: read system file voltage is %{public}d", __func__, battVoltage);
+        BATTERY_HILOGE(LABEL_TEST, "read system file voltage is %{public}d", battVoltage);
     }
-    HDF_LOGE("%{public}s: read system file voltage is %{public}d", __func__, battVoltage);
+    BATTERY_HILOGE(LABEL_TEST, "read system file voltage is %{public}d", battVoltage);
     close(fd);
     return battVoltage;
 }
@@ -305,17 +303,17 @@ static int32_t ReadCapacitySysfs()
         }
     }
     std::string sysBattCapPath = SYSTEM_BATTERY_PATH + "/" + capacityNode + "/" + "capacity";
-    HDF_LOGE("%{public}s: sysBattCapPath is %{public}s", __func__, sysBattCapPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysBattCapPath is %{public}s", sysBattCapPath.c_str());
 
     int fd = open(sysBattCapPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattCapPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysBattCapPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattCapPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysBattCapPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -323,9 +321,9 @@ static int32_t ReadCapacitySysfs()
     buf[readSize] = '\0';
     int32_t battCapacity = strtol(buf, nullptr, strlen);
     if (battCapacity < NUM_ZERO) {
-        HDF_LOGE("%{public}s: read system file capacity is %{public}d", __func__, battCapacity);
+        BATTERY_HILOGE(LABEL_TEST, "read system file capacity is %{public}d", battCapacity);
     }
-    HDF_LOGE("%{public}s: read system file capacity is %{public}d", __func__, battCapacity);
+    BATTERY_HILOGE(LABEL_TEST, "read system file capacity is %{public}d", battCapacity);
     close(fd);
     return battCapacity;
 }
@@ -344,17 +342,17 @@ static int32_t ReadTotalEnergySysfs()
         }
     }
     std::string sysBattTotalEnergyPath = SYSTEM_BATTERY_PATH + "/" + totalEnergyNode + "/" + "charge_full";
-    HDF_LOGE("%{public}s: sysBattTotalEnergyPath is %{public}s", __func__, sysBattTotalEnergyPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysBattTotalEnergyPath is %{public}s", sysBattTotalEnergyPath.c_str());
 
     int fd = open(sysBattTotalEnergyPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattTotalEnergyPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysBattTotalEnergyPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattTotalEnergyPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysBattTotalEnergyPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -362,9 +360,9 @@ static int32_t ReadTotalEnergySysfs()
     buf[readSize] = '\0';
     int32_t totalEnergy = strtol(buf, nullptr, strlen);
     if (totalEnergy < NUM_ZERO) {
-        HDF_LOGE("%{public}s: read system file totalEnergy is %{public}d", __func__, totalEnergy);
+        BATTERY_HILOGE(LABEL_TEST, "read system file totalEnergy is %{public}d", totalEnergy);
     }
-    HDF_LOGE("%{public}s: read system file totalEnergy is %{public}d", __func__, totalEnergy);
+    BATTERY_HILOGE(LABEL_TEST, "read system file totalEnergy is %{public}d", totalEnergy);
     close(fd);
     return totalEnergy;
 }
@@ -383,17 +381,17 @@ static int32_t ReadCurrentAverageSysfs()
         }
     }
     std::string sysBattCurrentAvgPath = SYSTEM_BATTERY_PATH + "/" + currentAvgNode + "/" + "current_avg";
-    HDF_LOGE("%{public}s: sysBattCurrentAvgPath is %{public}s", __func__, sysBattCurrentAvgPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysBattCurrentAvgPath is %{public}s", sysBattCurrentAvgPath.c_str());
 
     int fd = open(sysBattCurrentAvgPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattCurrentAvgPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysBattCurrentAvgPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattCurrentAvgPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysBattCurrentAvgPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -401,9 +399,9 @@ static int32_t ReadCurrentAverageSysfs()
     buf[readSize] = '\0';
     int32_t currentAvg = strtol(buf, nullptr, strlen);
     if (currentAvg < NUM_ZERO) {
-        HDF_LOGE("%{public}s: read system file currentAvg is %{public}d", __func__, currentAvg);
+        BATTERY_HILOGE(LABEL_TEST, "read system file currentAvg is %{public}d", currentAvg);
     }
-    HDF_LOGE("%{public}s: read system file currentAvg is %{public}d", __func__, currentAvg);
+    BATTERY_HILOGE(LABEL_TEST, "read system file currentAvg is %{public}d", currentAvg);
     close(fd);
     return currentAvg;
 }
@@ -422,17 +420,17 @@ static int32_t ReadCurrentNowSysfs()
         }
     }
     std::string sysBattCurrentNowPath = SYSTEM_BATTERY_PATH + "/" + currentNowNode + "/" + "current_now";
-    HDF_LOGE("%{public}s: sysBattCurrentNowPath is %{public}s", __func__, sysBattCurrentNowPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysBattCurrentNowPath is %{public}s", sysBattCurrentNowPath.c_str());
 
     int fd = open(sysBattCurrentNowPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattCurrentNowPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysBattCurrentNowPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattCurrentNowPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysBattCurrentNowPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -440,9 +438,9 @@ static int32_t ReadCurrentNowSysfs()
     buf[readSize] = '\0';
     int32_t currentNow = strtol(buf, nullptr, strlen);
     if (currentNow < NUM_ZERO) {
-        HDF_LOGE("%{public}s: read system file currentNow is %{public}d", __func__, currentNow);
+        BATTERY_HILOGE(LABEL_TEST, "read system file currentNow is %{public}d", currentNow);
     }
-    HDF_LOGE("%{public}s: read system file currentNow is %{public}d", __func__, currentNow);
+    BATTERY_HILOGE(LABEL_TEST, "read system file currentNow is %{public}d", currentNow);
     close(fd);
     return currentNow;
 }
@@ -461,17 +459,17 @@ static int32_t ReadRemainEnergySysfs()
         }
     }
     std::string sysBattChargeNowPath = SYSTEM_BATTERY_PATH + "/" + chargeNowNode + "/" + "charge_now";
-    HDF_LOGE("%{public}s: sysBattChargeNowPath is %{public}s", __func__, sysBattChargeNowPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysBattChargeNowPath is %{public}s", sysBattChargeNowPath.c_str());
 
     int fd = open(sysBattChargeNowPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattChargeNowPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysBattChargeNowPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattChargeNowPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysBattChargeNowPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -479,9 +477,9 @@ static int32_t ReadRemainEnergySysfs()
     buf[readSize] = '\0';
     int32_t chargeNow = strtol(buf, nullptr, strlen);
     if (chargeNow < NUM_ZERO) {
-        HDF_LOGE("%{public}s: read system file chargeNow is %{public}d", __func__, chargeNow);
+        BATTERY_HILOGE(LABEL_TEST, "read system file chargeNow is %{public}d", chargeNow);
     }
-    HDF_LOGE("%{public}s: read system file chargeNow is %{public}d", __func__, chargeNow);
+    BATTERY_HILOGE(LABEL_TEST, "read system file chargeNow is %{public}d", chargeNow);
     close(fd);
     return chargeNow;
 }
@@ -531,17 +529,17 @@ static int32_t ReadHealthStateSysfs()
         }
     }
     std::string sysHealthStatePath = SYSTEM_BATTERY_PATH + "/" + healthNode + "/" + "health";
-    HDF_LOGE("%{public}s: sysHealthStatePath is %{public}s", __func__, sysHealthStatePath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysHealthStatePath is %{public}s", sysHealthStatePath.c_str());
 
     int fd = open(sysHealthStatePath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysHealthStatePath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysHealthStatePath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysHealthStatePath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysHealthStatePath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -549,7 +547,7 @@ static int32_t ReadHealthStateSysfs()
     Trim(buf);
 
     int32_t battHealthState = HealthStateEnumConverter(buf);
-    HDF_LOGE("%{public}s: read system file healthState is %{public}d", __func__, battHealthState);
+    BATTERY_HILOGE(LABEL_TEST, "read system file healthState is %{public}d", battHealthState);
     close(fd);
     return battHealthState;
 }
@@ -585,13 +583,13 @@ int32_t ReadSysfsFile(const char* path, char* buf, size_t size)
 {
     int fd = open(path, O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, path);
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", path);
         return HDF_ERR_IO;
     }
 
     int32_t readSize = read(fd, buf, size - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, path);
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", path);
         close(fd);
         return HDF_ERR_IO;
     }
@@ -616,7 +614,7 @@ static int32_t ReadPluggedTypeSysfs()
         }
         std::string onlinePath = SYSTEM_BATTERY_PATH + "/" + *iter + "/" + "online";
         if (ReadSysfsFile(onlinePath.c_str(), buf, MAX_BUFF_SIZE) != HDF_SUCCESS) {
-            HDF_LOGW("%{public}s: read online path failed in loop", __func__);
+            BATTERY_HILOGW(LABEL_TEST, "read online path failed in loop");
         }
         online = strtol(buf, nullptr, STR_TO_LONG_LEN);
         if (online) {
@@ -629,9 +627,9 @@ static int32_t ReadPluggedTypeSysfs()
         return ERROR;
     }
     std::string typePath = SYSTEM_BATTERY_PATH + "/" + node + "/" + "type";
-    HDF_LOGI("%{public}s: type path is: %{public}s", __func__, typePath.c_str());
+    BATTERY_HILOGI(LABEL_TEST, "type path is: %{public}s", typePath.c_str());
     if (ReadSysfsFile(typePath.c_str(), buf, MAX_BUFF_SIZE) != HDF_SUCCESS) {
-        HDF_LOGW("%{public}s: read type path failed", __func__);
+        BATTERY_HILOGI(LABEL_TEST, "read type path failed");
         return ERROR;
     }
     Trim(buf);
@@ -669,24 +667,24 @@ static int32_t ReadChargeStateSysfs()
         }
     }
     std::string sysChargeStatePath = SYSTEM_BATTERY_PATH + "/" + statusNode + "/" + "status";
-    HDF_LOGE("%{public}s: sysChargeStatePath is %{public}s", __func__, sysChargeStatePath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysChargeStatePath is %{public}s", sysChargeStatePath.c_str());
 
     int fd = open(sysChargeStatePath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysChargeStatePath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysChargeStatePath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysChargeStatePath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysChargeStatePath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
 
     Trim(buf);
     int32_t battChargeState = ChargeStateEnumConverter(buf);
-    HDF_LOGE("%{public}s: read system file chargeState is %{public}d", __func__, battChargeState);
+    BATTERY_HILOGE(LABEL_TEST, "read system file chargeState is %{public}d", battChargeState);
     close(fd);
 
     return battChargeState;
@@ -705,17 +703,17 @@ static int32_t ReadChargeCounterSysfs()
         }
     }
     std::string sysChargeCounterPath = SYSTEM_BATTERY_PATH + "/" + counterNode + "/" + "charge_counter";
-    HDF_LOGE("%{public}s: sysChargeCounterPath is %{public}s", __func__, sysChargeCounterPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysChargeCounterPath is %{public}s", sysChargeCounterPath.c_str());
 
     int fd = open(sysChargeCounterPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysChargeCounterPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysChargeCounterPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysChargeCounterPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysChargeCounterPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -723,9 +721,9 @@ static int32_t ReadChargeCounterSysfs()
     buf[readSize] = '\0';
     int32_t battChargeCounter = strtol(buf, nullptr, strlen);
     if (battChargeCounter < 0) {
-        HDF_LOGE("%{public}s: read system file chargeState is %{public}d", __func__, battChargeCounter);
+        BATTERY_HILOGE(LABEL_TEST, "read system file chargeState is %{public}d", battChargeCounter);
     }
-    HDF_LOGE("%{public}s: read system file chargeState is %{public}d", __func__, battChargeCounter);
+    BATTERY_HILOGE(LABEL_TEST, "read system file chargeState is %{public}d", battChargeCounter);
     close(fd);
 
     return battChargeCounter;
@@ -744,17 +742,17 @@ static int32_t ReadPresentSysfs()
         }
     }
     std::string sysPresentPath = SYSTEM_BATTERY_PATH + "/" + presentNode + "/" + "present";
-    HDF_LOGE("%{public}s: sysPresentPath is %{public}s", __func__, sysPresentPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysPresentPath is %{public}s", sysPresentPath.c_str());
 
     int fd = open(sysPresentPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysPresentPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysPresentPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysPresentPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysPresentPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -762,9 +760,9 @@ static int32_t ReadPresentSysfs()
     buf[readSize] = '\0';
     int32_t battPresent = strtol(buf, nullptr, strlen);
     if (battPresent < 0) {
-        HDF_LOGE("%{public}s: read system file chargeState is %{public}d", __func__, battPresent);
+        BATTERY_HILOGE(LABEL_TEST, "read system file chargeState is %{public}d", battPresent);
     }
-    HDF_LOGE("%{public}s: read system file chargeState is %{public}d", __func__, battPresent);
+    BATTERY_HILOGE(LABEL_TEST, "read system file chargeState is %{public}d", battPresent);
     close(fd);
     return battPresent;
 }
@@ -781,17 +779,17 @@ static std::string ReadTechnologySysfs(std::string& battTechnology)
         }
     }
     std::string sysTechnologyPath = SYSTEM_BATTERY_PATH + "/" + technologyNode + "/" + "technology";
-    HDF_LOGE("%{public}s: sysTechnologyPath is %{public}s", __func__, sysTechnologyPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysTechnologyPath is %{public}s", sysTechnologyPath.c_str());
 
     int fd = open(sysTechnologyPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysTechnologyPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysTechnologyPath.c_str());
         return "";
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysTechnologyPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysTechnologyPath.c_str());
         close(fd);
         return "";
     }
@@ -799,7 +797,7 @@ static std::string ReadTechnologySysfs(std::string& battTechnology)
     Trim(buf);
 
     battTechnology.assign(buf, strlen(buf));
-    HDF_LOGE("%{public}s: read system file technology is %{public}s.", __func__, battTechnology.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "read system file technology is %{public}s.", battTechnology.c_str());
     close(fd);
     return battTechnology;
 }
@@ -823,7 +821,7 @@ HWTEST_F (HdiServiceTest, ProviderIsNotNull, TestSize.Level1)
     if (!IsNotMock()) {
         std::string path = "/data/local/tmp";
         giver_->SetSysFilePath(path);
-        HDF_LOGI("%{public}s: Is mock test", __func__);
+        BATTERY_HILOGI(LABEL_TEST, "Is mock test");
     }
     giver_->InitPowerSupplySysfs();
 }
@@ -839,13 +837,13 @@ HWTEST_F (HdiServiceTest, HdiService001, TestSize.Level1)
     if (IsNotMock()) {
         giver_->ParseTemperature(&temperature);
         int32_t sysfsTemp = ReadTemperatureSysfs();
-        HDF_LOGI("%{public}s: Not Mock HdiService001::temperature=%{public}d, t=%{public}d",
-            __func__, temperature, sysfsTemp);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService001::temperature=%{public}d, t=%{public}d",
+            temperature, sysfsTemp);
         ASSERT_TRUE(temperature == sysfsTemp);
     } else {
         CreateFile("/data/local/tmp/battery/temp", "567");
         giver_->ParseTemperature(&temperature);
-        HDF_LOGI("%{public}s: HdiService001::temperature=%{public}d.", __func__, temperature);
+        BATTERY_HILOGI(LABEL_TEST, "HdiService001::temperature=%{public}d.", temperature);
         ASSERT_TRUE(temperature == 567);
     }
 }
@@ -861,14 +859,14 @@ HWTEST_F (HdiServiceTest, HdiService002, TestSize.Level1)
     if (IsNotMock()) {
         giver_->ParseVoltage(&voltage);
         int32_t sysfsVoltage = ReadVoltageSysfs();
-        HDF_LOGI("%{public}s: Not Mock HdiService002::voltage=%{public}d, v=%{public}d",
-            __func__, voltage, sysfsVoltage);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService002::voltage=%{public}d, v=%{public}d",
+            voltage, sysfsVoltage);
         ASSERT_TRUE(voltage == sysfsVoltage);
     } else {
         CreateFile("/data/local/tmp/battery/voltage_avg", "4123456");
         CreateFile("/data/local/tmp/battery/voltage_now", "4123456");
         giver_->ParseVoltage(&voltage);
-        HDF_LOGI("%{public}s: Not Mock HdiService002::voltage=%{public}d", __func__, voltage);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService002::voltage=%{public}d", voltage);
         ASSERT_TRUE(voltage == 4123456);
     }
 }
@@ -884,13 +882,13 @@ HWTEST_F (HdiServiceTest, HdiService003, TestSize.Level1)
     if (IsNotMock()) {
         giver_->ParseCapacity(&capacity);
         int32_t sysfsCapacity = ReadCapacitySysfs();
-        HDF_LOGI("%{public}s: Not Mcok HdiService003::capacity=%{public}d, l=%{public}d",
-            __func__, capacity, sysfsCapacity);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mcok HdiService003::capacity=%{public}d, l=%{public}d",
+            capacity, sysfsCapacity);
         ASSERT_TRUE(capacity == sysfsCapacity);
     } else {
         CreateFile("/data/local/tmp/battery/capacity", "11");
         giver_->ParseCapacity(&capacity);
-        HDF_LOGI("%{public}s: HdiService003::capacity=%{public}d", __func__, capacity);
+        BATTERY_HILOGI(LABEL_TEST, "HdiService003::capacity=%{public}d", capacity);
         ASSERT_TRUE(capacity == 11);
     }
 }
@@ -906,13 +904,13 @@ HWTEST_F (HdiServiceTest, HdiService004, TestSize.Level1)
     if (IsNotMock()) {
         giver_->ParseHealthState(&healthState);
         int32_t sysfsHealthState = ReadHealthStateSysfs();
-        HDF_LOGI("%{public}s: Not Mock HdiService004::healthState=%{public}d, h=%{public}d",
-            __func__, healthState, sysfsHealthState);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService004::healthState=%{public}d, h=%{public}d",
+            healthState, sysfsHealthState);
         ASSERT_TRUE(healthState == sysfsHealthState);
     } else {
         CreateFile("/data/local/tmp/battery/health", "Good");
         giver_->ParseHealthState(&healthState);
-        HDF_LOGI("%{public}s: HdiService004::healthState=%{public}d.", __func__, healthState);
+        BATTERY_HILOGI(LABEL_TEST, "HdiService004::healthState=%{public}d.", healthState);
         ASSERT_TRUE(PowerSupplyProvider::BatteryHealthState(healthState) ==
             PowerSupplyProvider::BatteryHealthState::BATTERY_HEALTH_GOOD);
     }
@@ -929,14 +927,14 @@ HWTEST_F (HdiServiceTest, HdiService005, TestSize.Level1)
     if (IsNotMock()) {
         giver_->ParsePluggedType(&pluggedType);
         int32_t sysfsPluggedType = ReadPluggedTypeSysfs();
-        HDF_LOGI("%{public}s: Not Mock HdiService005::pluggedType=%{public}d, p=%{public}d",
-            __func__, pluggedType, sysfsPluggedType);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService005::pluggedType=%{public}d, p=%{public}d",
+            pluggedType, sysfsPluggedType);
         ASSERT_TRUE(pluggedType == sysfsPluggedType);
     } else {
         CreateFile("/data/local/tmp/ohos_charger/online", "1");
         CreateFile("/data/local/tmp/ohos_charger/type", "Wireless");
         giver_->ParsePluggedType(&pluggedType);
-        HDF_LOGI("%{public}s: HdiService005::pluggedType=%{public}d.", __func__, pluggedType);
+        BATTERY_HILOGI(LABEL_TEST, "HdiService005::pluggedType=%{public}d.", pluggedType);
         ASSERT_TRUE(PowerSupplyProvider::BatteryPluggedType(pluggedType) ==
             PowerSupplyProvider::BatteryPluggedType::PLUGGED_TYPE_WIRELESS);
     }
@@ -953,13 +951,13 @@ HWTEST_F (HdiServiceTest, HdiService006, TestSize.Level1)
     if (IsNotMock()) {
         giver_->ParseChargeState(&chargeState);
         int32_t sysfsChargeState = ReadChargeStateSysfs();
-        HDF_LOGI("%{public}s: Not Mock HdiService006::chargeState=%{public}d, cs=%{public}d",
-            __func__, chargeState, sysfsChargeState);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService006::chargeState=%{public}d, cs=%{public}d",
+            chargeState, sysfsChargeState);
         ASSERT_TRUE(chargeState == sysfsChargeState);
     } else {
         CreateFile("/data/local/tmp/battery/status", "Not charging");
         giver_->ParseChargeState(&chargeState);
-        HDF_LOGI("%{public}s: HdiService006::chargeState=%{public}d.", __func__, chargeState);
+        BATTERY_HILOGI(LABEL_TEST, "HdiService006::chargeState=%{public}d.", chargeState);
         ASSERT_TRUE(PowerSupplyProvider::BatteryChargeState(chargeState) ==
             PowerSupplyProvider::BatteryChargeState::CHARGE_STATE_DISABLE);
     }
@@ -976,13 +974,13 @@ HWTEST_F (HdiServiceTest, HdiService007, TestSize.Level1)
     if (IsNotMock()) {
         giver_->ParseChargeCounter(&chargeCounter);
         int32_t sysfsChargeCounter = ReadChargeCounterSysfs();
-        HDF_LOGI("%{public}s: Not Mcok HdiService007::chargeCounter=%{public}d, cc=%{public}d",
-            __func__, chargeCounter, sysfsChargeCounter);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mcok HdiService007::chargeCounter=%{public}d, cc=%{public}d",
+            chargeCounter, sysfsChargeCounter);
         ASSERT_TRUE(chargeCounter == sysfsChargeCounter);
     } else {
         CreateFile("/data/local/tmp/battery/charge_counter", "12345");
         giver_->ParseChargeCounter(&chargeCounter);
-        HDF_LOGI("%{public}s: HdiService007::chargeCounter=%{public}d.", __func__, chargeCounter);
+        BATTERY_HILOGI(LABEL_TEST, "HdiService007::chargeCounter=%{public}d.", chargeCounter);
         ASSERT_TRUE(chargeCounter == 12345);
     }
 }
@@ -998,13 +996,13 @@ HWTEST_F (HdiServiceTest, HdiService008, TestSize.Level1)
     if (IsNotMock()) {
         giver_->ParsePresent(&present);
         int32_t sysfsPresent = ReadPresentSysfs();
-        HDF_LOGI("%{public}s: Not Mock HdiService008::present=%{public}d, p=%{public}d",
-            __func__, present, sysfsPresent);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService008::present=%{public}d, p=%{public}d",
+            present, sysfsPresent);
         ASSERT_TRUE(present == sysfsPresent);
     } else {
         CreateFile("/data/local/tmp/battery/present", "1");
         giver_->ParsePresent(&present);
-        HDF_LOGI("%{public}s: HdiService008::present=%{public}d.", __func__, present);
+        BATTERY_HILOGI(LABEL_TEST, "HdiService008::present=%{public}d.", present);
         ASSERT_TRUE(present == 1);
     }
 }
@@ -1021,13 +1019,13 @@ HWTEST_F (HdiServiceTest, HdiService009, TestSize.Level1)
         giver_->ParseTechnology(technology);
         std::string sysfsTechnology = "";
         ReadTechnologySysfs(sysfsTechnology);
-        HDF_LOGI("%{public}s: HdiService009::technology=%{public}s, ty=%{public}s",
-            __func__, technology.c_str(), sysfsTechnology.c_str());
+        BATTERY_HILOGI(LABEL_TEST, "HdiService009::technology=%{public}s, ty=%{public}s",
+            technology.c_str(), sysfsTechnology.c_str());
         ASSERT_TRUE(technology == sysfsTechnology);
     } else {
         CreateFile("/data/local/tmp/ohos-fgu/technology", "Li");
         giver_->ParseTechnology(technology);
-        HDF_LOGI("%{public}s: HdiService009::technology=%{public}s.", __func__, technology.c_str());
+        BATTERY_HILOGI(LABEL_TEST, "HdiService009::technology=%{public}s.", technology.c_str());
         ASSERT_TRUE(technology == "Li");
     }
 }
@@ -1043,7 +1041,7 @@ HWTEST_F (HdiServiceTest, HdiService010, TestSize.Level1)
 
     BatteryThread bt;
     auto fd = OpenUeventSocketTest(bt);
-    HDF_LOGI("%{public}s: HdiService010::fd=%{public}d.", __func__, fd);
+    BATTERY_HILOGI(LABEL_TEST, "HdiService010::fd=%{public}d.", fd);
 
     ASSERT_TRUE(fd > 0);
     close(fd);
@@ -1061,7 +1059,7 @@ HWTEST_F (HdiServiceTest, HdiService011, TestSize.Level1)
 
     UpdateEpollIntervalTest(CHARGE_STATE_ENABLE, bt);
     auto epollInterval = GetEpollIntervalTest(bt);
-    HDF_LOGI("%{public}s: HdiService011::epollInterval=%{public}d.", __func__, epollInterval);
+    BATTERY_HILOGI(LABEL_TEST, "HdiService011::epollInterval=%{public}d.", epollInterval);
 
     ASSERT_TRUE(epollInterval == 2000);
 }
@@ -1078,7 +1076,7 @@ HWTEST_F (HdiServiceTest, HdiService012, TestSize.Level1)
 
     UpdateEpollIntervalTest(CHARGE_STATE_NONE, bt);
     auto epollInterval = GetEpollIntervalTest(bt);
-    HDF_LOGI("%{public}s: HdiService012::epollInterval=%{public}d.", __func__, epollInterval);
+    BATTERY_HILOGI(LABEL_TEST, "HdiService012::epollInterval=%{public}d.", epollInterval);
 
     ASSERT_TRUE(epollInterval == -1);
 }
@@ -1094,9 +1092,9 @@ HWTEST_F (HdiServiceTest, HdiService013, TestSize.Level1)
     BatteryThread bt;
 
     InitTest(service, bt);
-    HDF_LOGI("%{public}s: HdiService013::InitTest success", __func__);
+    BATTERY_HILOGI(LABEL_TEST, "HdiService013::InitTest success");
     auto epollFd = GetEpollFdTest(bt);
-    HDF_LOGI("%{public}s: HdiService013::epollFd=%{public}d", __func__, epollFd);
+    BATTERY_HILOGI(LABEL_TEST, "HdiService013::epollFd=%{public}d", epollFd);
 
     ASSERT_TRUE(epollFd > 0);
 }
@@ -1112,7 +1110,7 @@ HWTEST_F (HdiServiceTest, HdiService014, TestSize.Level1)
 
     InitTimerTest(bt);
     auto timerFd = GetTimerFdTest(bt);
-    HDF_LOGI("%{public}s: HdiService014::timerFd==%{public}d", __func__, timerFd);
+    BATTERY_HILOGI(LABEL_TEST, "HdiService014::timerFd==%{public}d", timerFd);
 
     ASSERT_TRUE(timerFd > 0);
 }
@@ -1285,7 +1283,7 @@ HWTEST_F (HdiServiceTest, HdiService025, TestSize.Level1)
     std::unique_ptr<BatteryBacklight> backlight = std::make_unique<BatteryBacklight>();
     backlight->InitBacklightSysfs();
     auto ret = backlight->HandleBacklight(0);
-    HDF_LOGI("%{public}s: HdiService025::ret==%{public}d", __func__, ret);
+    BATTERY_HILOGI(LABEL_TEST, "HdiService025::ret==%{public}d", ret);
     backlight->TurnOnScreen();
 
     ASSERT_TRUE(ret != -1);
@@ -1302,13 +1300,13 @@ HWTEST_F (HdiServiceTest, HdiService026, TestSize.Level1)
     if (IsNotMock()) {
         giver_->ParseTotalEnergy(&totalEnergy);
         int32_t sysfsTotalEnergy = ReadTotalEnergySysfs();
-        HDF_LOGI("%{public}s: Not Mock HdiService026::totalEnergy=%{public}d, t=%{public}d",
-            __func__, totalEnergy, sysfsTotalEnergy);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService026::totalEnergy=%{public}d, t=%{public}d",
+            totalEnergy, sysfsTotalEnergy);
         ASSERT_TRUE(totalEnergy == sysfsTotalEnergy);
     } else {
         CreateFile("/data/local/tmp/battery/charge_full", "4000000");
         giver_->ParseTotalEnergy(&totalEnergy);
-        HDF_LOGI("%{public}s: HdiService026::totalEnergy=%{public}d.", __func__, totalEnergy);
+        BATTERY_HILOGI(LABEL_TEST, "HdiService026::totalEnergy=%{public}d.", totalEnergy);
         ASSERT_TRUE(totalEnergy == 4000000);
     }
 }
@@ -1324,13 +1322,13 @@ HWTEST_F (HdiServiceTest, HdiService027, TestSize.Level1)
     if (IsNotMock()) {
         giver_->ParseCurrentAverage(&currentAvg);
         int32_t sysfsCurrentAvg = ReadCurrentAverageSysfs();
-        HDF_LOGI("%{public}s: Not Mock HdiService027::currentAvg=%{public}d, t=%{public}d",
-            __func__, currentAvg, sysfsCurrentAvg);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService027::currentAvg=%{public}d, t=%{public}d",
+            currentAvg, sysfsCurrentAvg);
         ASSERT_TRUE(currentAvg == sysfsCurrentAvg);
     } else {
         CreateFile("/data/local/tmp/battery/current_avg", "1000");
         giver_->ParseCurrentAverage(&currentAvg);
-        HDF_LOGI("%{public}s: HdiService027::currentAvg=%{public}d.", __func__, currentAvg);
+        BATTERY_HILOGI(LABEL_TEST, "HdiService027::currentAvg=%{public}d.", currentAvg);
         ASSERT_TRUE(currentAvg == 1000);
     }
 }
@@ -1346,13 +1344,13 @@ HWTEST_F (HdiServiceTest, HdiService028, TestSize.Level1)
     if (IsNotMock()) {
         giver_->ParseCurrentNow(&currentNow);
         int32_t sysfsCurrentNow = ReadCurrentNowSysfs();
-        HDF_LOGI("%{public}s: Not Mock HdiService028::currentNow=%{public}d, t=%{public}d",
-            __func__, currentNow, sysfsCurrentNow);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService028::currentNow=%{public}d, t=%{public}d",
+            currentNow, sysfsCurrentNow);
         ASSERT_TRUE(currentNow == sysfsCurrentNow);
     } else {
         CreateFile("/data/local/tmp/battery/current_now", "1000");
         giver_->ParseCurrentNow(&currentNow);
-        HDF_LOGI("%{public}s: HdiService028::currentNow=%{public}d.", __func__, currentNow);
+        BATTERY_HILOGI(LABEL_TEST, "HdiService028::currentNow=%{public}d.", currentNow);
         ASSERT_TRUE(currentNow == 1000);
     }
 }
@@ -1368,13 +1366,13 @@ HWTEST_F (HdiServiceTest, HdiService029, TestSize.Level1)
     if (IsNotMock()) {
         giver_->ParseRemainEnergy(&chargeNow);
         int32_t sysfsChargeNow = ReadRemainEnergySysfs();
-        HDF_LOGI("%{public}s: Not Mock HdiService029::chargeNow=%{public}d, t=%{public}d",
-            __func__, chargeNow, sysfsChargeNow);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService029::chargeNow=%{public}d, t=%{public}d",
+            chargeNow, sysfsChargeNow);
         ASSERT_TRUE(chargeNow == sysfsChargeNow);
     } else {
         CreateFile("/data/local/tmp/battery/charge_now", "1000");
         giver_->ParseRemainEnergy(&chargeNow);
-        HDF_LOGI("%{public}s: HdiService029::chargeNow=%{public}d.", __func__, chargeNow);
+        BATTERY_HILOGI(LABEL_TEST, "HdiService029::chargeNow=%{public}d.", chargeNow);
         ASSERT_TRUE(chargeNow == 1000);
     }
 }
