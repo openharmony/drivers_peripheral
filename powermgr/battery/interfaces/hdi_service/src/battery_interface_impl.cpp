@@ -15,114 +15,97 @@
 
 #include "battery_interface_impl.h"
 #include "hdf_base.h"
-#include "hdf_log.h"
-
-#define HDF_LOG_TAG BatteryInterfaceImpl
-
-using namespace OHOS::HDI::Battery::V1_0;
+#include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_0 {
-static std::unique_ptr<OHOS::HDI::Battery::V1_0::PowerSupplyProvider> giver_ = nullptr;
-static std::unique_ptr<OHOS::HDI::Battery::V1_0::BatteryThread> loop_ = nullptr;
-static std::unique_ptr<OHOS::HDI::Battery::V1_0::BatteryConfig> batteryConfig_ = nullptr;
-static std::unique_ptr<OHOS::HDI::Battery::V1_0::BatteryLed> batteryLed_ = nullptr;
-static sptr<IBatteryCallback> g_cbEvent;
-
-BatteryInterfaceImpl::BatteryInterfaceImpl()
-{
-    Init();
-}
-
 int32_t BatteryInterfaceImpl::Init()
 {
-    giver_ = std::make_unique<OHOS::HDI::Battery::V1_0::PowerSupplyProvider>();
-    if (giver_ == nullptr) {
-        HDF_LOGE("%{public}s: instantiate PowerSupplyProvider error", __func__);
+    provider_ = std::make_unique<OHOS::HDI::Battery::V1_0::PowerSupplyProvider>();
+    if (provider_ == nullptr) {
+        BATTERY_HILOGE(COMP_HDI, "make_unique PowerSupplyProvider error");
         return HDF_ERR_MALLOC_FAIL;
     }
-    giver_->InitBatteryPath();
-    giver_->InitPowerSupplySysfs();
+    provider_->InitBatteryPath();
+    provider_->InitPowerSupplySysfs();
 
     batteryConfig_ = std::make_unique<OHOS::HDI::Battery::V1_0::BatteryConfig>();
     if (batteryConfig_ == nullptr) {
-        HDF_LOGI("%{public}s: instantiate batteryconfig error.", __func__);
+        BATTERY_HILOGE(COMP_HDI, "make_unique BatteryConfig error");
         return HDF_ERR_MALLOC_FAIL;
     }
     batteryConfig_->Init();
 
     batteryLed_ = std::make_unique<OHOS::HDI::Battery::V1_0::BatteryLed>();
     if (batteryLed_ == nullptr) {
-        HDF_LOGE("%{public}s: instantiate BatteryLed error", __func__);
+        BATTERY_HILOGE(COMP_HDI, "make_unique BatteryLed error");
         return HDF_ERR_MALLOC_FAIL;
     }
     batteryLed_->InitLedsSysfs();
 
     loop_ = std::make_unique<OHOS::HDI::Battery::V1_0::BatteryThread>();
     if (loop_ == nullptr) {
-        HDF_LOGE("%{public}s: Instantiate BatteryThread error", __func__);
+        BATTERY_HILOGE(COMP_HDI, "make_unique BatteryThread error");
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (g_cbEvent != nullptr) {
-        loop_->InitCallback(g_cbEvent);
+    if (batteryCallback_ != nullptr) {
+        loop_->InitCallback(batteryCallback_);
     } else {
-        HDF_LOGE("%{public}s: g_cbEvent is nullptr.", __func__);
+        BATTERY_HILOGW(COMP_HDI, "batteryCallback_ is nullptr");
     }
     loop_->StartThread(this);
 
     return HDF_SUCCESS;
 }
 
-int32_t BatteryInterfaceImpl::Register(const sptr<IBatteryCallback>& event)
+int32_t BatteryInterfaceImpl::Register(const sptr<IBatteryCallback>& callback)
 {
-    HDF_LOGI("%{public}s subcriber is %{public}p", __func__, event.GetRefPtr());
-    g_cbEvent = event;
-
-    if (g_cbEvent != nullptr) {
-        loop_->InitCallback(g_cbEvent);
-    } else {
-        HDF_LOGE("%{public}s: g_cbEvent is nullptr.", __func__);
+    if (callback == nullptr) {
+        BATTERY_HILOGD(FEATURE_BATT_INFO, "callback is nullptr");
+        return HDF_ERR_INVALID_PARAM;
     }
-
+    batteryCallback_ = callback;
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "IBatteryCallback registered, ref is %{public}p", callback.GetRefPtr());
+    loop_->InitCallback(batteryCallback_);
     return HDF_SUCCESS;
 }
 
 int32_t BatteryInterfaceImpl::UnRegister()
 {
-    g_cbEvent = nullptr;
+    batteryCallback_ = nullptr;
     return HDF_SUCCESS;
 }
 
 int32_t BatteryInterfaceImpl::ChangePath(const std::string& path)
 {
-    HDF_LOGI("%{public}s enter, path is %{public}s", __func__, path.c_str());
-    giver_->SetSysFilePath(path);
-    giver_->InitPowerSupplySysfs();
+    BATTERY_HILOGD(COMP_HDI, "path is %{public}s", path.c_str());
+    provider_->SetSysFilePath(path);
+    provider_->InitPowerSupplySysfs();
     return HDF_SUCCESS;
 }
 
 int32_t BatteryInterfaceImpl::GetCapacity(int32_t& capacity)
 {
-    return giver_->ParseCapacity(&capacity);
+    return provider_->ParseCapacity(&capacity);
 }
 
 int32_t BatteryInterfaceImpl::GetVoltage(int32_t& voltage)
 {
-    return giver_->ParseVoltage(&voltage);
+    return provider_->ParseVoltage(&voltage);
 }
 
 int32_t BatteryInterfaceImpl::GetTemperature(int32_t& temperature)
 {
-    return giver_->ParseTemperature(&temperature);
+    return provider_->ParseTemperature(&temperature);
 }
 
 int32_t BatteryInterfaceImpl::GetHealthState(BatteryHealthState& healthState)
 {
     int32_t state = 0;
-    int32_t ret = giver_->ParseHealthState(&state);
+    int32_t ret = provider_->ParseHealthState(&state);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
@@ -134,7 +117,7 @@ int32_t BatteryInterfaceImpl::GetHealthState(BatteryHealthState& healthState)
 int32_t BatteryInterfaceImpl::GetPluggedType(BatteryPluggedType& pluggedType)
 {
     int32_t type = 0;
-    int32_t ret = giver_->ParsePluggedType(&type);
+    int32_t ret = provider_->ParsePluggedType(&type);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
@@ -146,7 +129,7 @@ int32_t BatteryInterfaceImpl::GetPluggedType(BatteryPluggedType& pluggedType)
 int32_t BatteryInterfaceImpl::GetChargeState(BatteryChargeState& chargeState)
 {
     int32_t state = 0;
-    int32_t ret = giver_->ParseChargeState(&state);
+    int32_t ret = provider_->ParseChargeState(&state);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
@@ -158,7 +141,7 @@ int32_t BatteryInterfaceImpl::GetChargeState(BatteryChargeState& chargeState)
 int32_t BatteryInterfaceImpl::GetPresent(bool& present)
 {
     int8_t isPresent = 0;
-    int32_t ret = giver_->ParsePresent(&isPresent);
+    int32_t ret = provider_->ParsePresent(&isPresent);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
@@ -169,36 +152,36 @@ int32_t BatteryInterfaceImpl::GetPresent(bool& present)
 
 int32_t BatteryInterfaceImpl::GetTechnology(std::string& technology)
 {
-    return giver_->ParseTechnology(technology);
+    return provider_->ParseTechnology(technology);
 }
 
 int32_t BatteryInterfaceImpl::GetTotalEnergy(int32_t& totalEnergy)
 {
-    return giver_->ParseTotalEnergy(&totalEnergy);
+    return provider_->ParseTotalEnergy(&totalEnergy);
 }
 
 int32_t BatteryInterfaceImpl::GetCurrentAverage(int32_t& curAverage)
 {
-    return giver_->ParseCurrentAverage(&curAverage);
+    return provider_->ParseCurrentAverage(&curAverage);
 }
 
 int32_t BatteryInterfaceImpl::GetCurrentNow(int32_t& curNow)
 {
-    return giver_->ParseCurrentNow(&curNow);
+    return provider_->ParseCurrentNow(&curNow);
 }
 
 int32_t BatteryInterfaceImpl::GetRemainEnergy(int32_t& remainEnergy)
 {
-    return giver_->ParseRemainEnergy(&remainEnergy);
+    return provider_->ParseRemainEnergy(&remainEnergy);
 }
 
 int32_t BatteryInterfaceImpl::GetBatteryInfo(BatteryInfo& info)
 {
-    if (giver_ == nullptr) {
+    if (provider_ == nullptr) {
         return HDF_FAILURE;
     }
 
-    BatterydInfo batteryInfo = giver_->GetBatteryInfo();
+    BatterydInfo batteryInfo = provider_->GetBatteryInfo();
     info.capacity = batteryInfo.capacity_;
     info.voltage = batteryInfo.voltage_;
     info.temperature = batteryInfo.temperature_;
@@ -213,7 +196,7 @@ int32_t BatteryInterfaceImpl::GetBatteryInfo(BatteryInfo& info)
 
     return HDF_SUCCESS;
 }
-} // V1_0
-} // Battery
-} // Hdi
-} // OHOS
+}  // namespace V1_0
+}  // namespace Battery
+}  // namespace Hdi
+}  // namespace OHOS

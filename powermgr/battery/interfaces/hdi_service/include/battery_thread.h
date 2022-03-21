@@ -34,38 +34,38 @@ enum EventType {
 
 class BatteryThread {
 public:
-    virtual ~BatteryThread() {}
+    virtual ~BatteryThread() = default;
 
     void StartThread(void* service);
-    void InitCallback(const sptr<OHOS::HDI::Battery::V1_0::IBatteryCallback>& event);
+    void InitCallback(const sptr<OHOS::HDI::Battery::V1_0::IBatteryCallback>& callback);
 protected:
-    int LoopingThreadEntry(void* arg);
+    int32_t LoopingThreadEntry(void* arg);
     virtual void Run(void* service);
     virtual void UpdateBatteryInfo(void* service, char* msg);
     virtual void UpdateBatteryInfo(void* service);
     virtual void HandleStates() {}
     virtual int UpdateWaitInterval();
-    void UpdateEpollInterval(const int32_t chargeState);
+    void UpdateEpollInterval(int32_t chargeState);
     virtual void CycleMatters() {}
 private:
-    int32_t OpenUeventSocket(void) const;
-    bool IsPowerSupplyEvent(const char* msg) const;
-    int32_t Init(void* service);
+    int32_t OpenUeventSocket();
+    bool IsPowerSupplyEvent(const char* msg);
+    int32_t Init([[maybe_unused]]void* service);
     int32_t InitUevent();
     int32_t InitTimer();
-    int32_t InitBacklightTimer();
     void TimerCallback(void* service);
     void UeventCallback(void* service);
-    void SetTimerInterval(int interval);
-    int RegisterCallback(const int fd, const EventType et);
-    int timerInterval_ = -1;
-    int32_t ueventFd_ = -1;
-    int32_t timerFd_ = -1;
-    int32_t epFd_ = -1;
-    int epollInterval_ = -1;
+    void SetTimerInterval(int32_t interval);
+    int32_t RegisterCallback(int32_t fd, EventType et);
+    static constexpr int32_t INVALID_FD = -1;
+    int32_t ueventFd_ = INVALID_FD;
+    int32_t timerFd_ = INVALID_FD;
+    int32_t epFd_ = INVALID_FD;
+    int32_t timerInterval_ = -1;
+    int32_t epollInterval_ = -1;
     using Callback = std::function<void(BatteryThread*, void*)>;
     std::map<int32_t, Callback> callbacks_;
-    std::unique_ptr<PowerSupplyProvider> giver_ = nullptr;
+    std::unique_ptr<PowerSupplyProvider> provider_ = nullptr;
 };
 }  // namespace V1_0
 }  // namespace Battery

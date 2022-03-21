@@ -16,70 +16,71 @@
 #include <osal_mem.h>
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
-#include "hdf_log.h"
 #include "hdf_sbuf_ipc.h"
+#include "battery_log.h"
 #include "battery_interface_impl.h"
 
-#define HDF_LOG_TAG BatteryInterfaceDriver
-
+using namespace OHOS::HDI::Battery;
 using namespace OHOS::HDI::Battery::V1_0;
 
 struct HdfBatteryInterfaceHost {
-    struct IDeviceIoService ioservice;
+    struct IDeviceIoService ioService;
     BatteryInterfaceImpl *service;
 };
 
 static int32_t BatteryInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    struct HdfBatteryInterfaceHost *hdfBatteryInterfaceHost =
-        CONTAINER_OF(client->device->service, struct HdfBatteryInterfaceHost, ioservice);
+    auto *hdfBatteryInterfaceHost = CONTAINER_OF(client->device->service, struct HdfBatteryInterfaceHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
     OHOS::MessageOption option;
 
-    (void)SbufToParcel(reply, &replyParcel);
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
+        BATTERY_HILOGE(COMP_HDI, "invalid data sbuf object to dispatch");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
+        BATTERY_HILOGE(COMP_HDI, "invalid reply sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
 
     return hdfBatteryInterfaceHost->service->OnRemoteRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-int HdfBatteryInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
+static int32_t HdfBatteryInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
-    return HDF_SUCCESS;
+    auto *hdfBatteryInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfBatteryInterfaceHost, ioService);
+    return hdfBatteryInterfaceHost->service->Init();
 }
 
-int HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
+static int32_t HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    struct HdfBatteryInterfaceHost *hdfBatteryInterfaceHost = (struct HdfBatteryInterfaceHost *)OsalMemAlloc(
-        sizeof(struct HdfBatteryInterfaceHost));
+    auto *hdfBatteryInterfaceHost =
+        (struct HdfBatteryInterfaceHost *)OsalMemAlloc(sizeof(struct HdfBatteryInterfaceHost));
     if (hdfBatteryInterfaceHost == nullptr) {
-        HDF_LOGE("HdfBatteryInterfaceDriverBind OsalMemAlloc HdfBatteryInterfaceHost failed!");
+        BATTERY_HILOGE(COMP_HDI, "OsalMemAlloc HdfBatteryInterfaceHost failed");
         return HDF_FAILURE;
     }
 
-    hdfBatteryInterfaceHost->ioservice.Dispatch = BatteryInterfaceDriverDispatch;
-    hdfBatteryInterfaceHost->ioservice.Open = NULL;
-    hdfBatteryInterfaceHost->ioservice.Release = NULL;
+    hdfBatteryInterfaceHost->ioService.Dispatch = BatteryInterfaceDriverDispatch;
+    hdfBatteryInterfaceHost->ioService.Open = nullptr;
+    hdfBatteryInterfaceHost->ioService.Release = nullptr;
     hdfBatteryInterfaceHost->service = new BatteryInterfaceImpl();
 
-    deviceObject->service = &hdfBatteryInterfaceHost->ioservice;
+    deviceObject->service = &hdfBatteryInterfaceHost->ioService;
     return HDF_SUCCESS;
 }
 
-void HdfBatteryInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
+static void HdfBatteryInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    struct HdfBatteryInterfaceHost *hdfBatteryInterfaceHost = CONTAINER_OF(deviceObject->service,
-        struct HdfBatteryInterfaceHost, ioservice);
+    auto *hdfBatteryInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfBatteryInterfaceHost, ioService);
     delete hdfBatteryInterfaceHost->service;
     OsalMemFree(hdfBatteryInterfaceHost);
 }
 
-struct HdfDriverEntry g_batteryinterfaceDriverEntry = {
+static struct HdfDriverEntry g_batteryInterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "battery_interface_service",
     .Bind = HdfBatteryInterfaceDriverBind,
@@ -90,7 +91,7 @@ struct HdfDriverEntry g_batteryinterfaceDriverEntry = {
 #ifndef __cplusplus
 extern "C" {
 #endif
-HDF_INIT(g_batteryinterfaceDriverEntry);
+HDF_INIT(g_batteryInterfaceDriverEntry);
 #ifndef __cplusplus
 }
 #endif

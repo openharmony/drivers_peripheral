@@ -29,10 +29,10 @@ namespace Battery {
 namespace V1_0 {
 class BatteryInterfaceImpl : public BatteryInterfaceStub {
 public:
-    BatteryInterfaceImpl();
-    virtual ~BatteryInterfaceImpl() {}
+    BatteryInterfaceImpl() = default;
+    virtual ~BatteryInterfaceImpl() = default;
     int32_t Init();
-    int32_t Register(const sptr<IBatteryCallback>& event) override;
+    int32_t Register(const sptr<IBatteryCallback>& callback) override;
     int32_t UnRegister() override;
     int32_t ChangePath(const std::string& path) override;
     int32_t GetCapacity(int32_t& capacity) override;
@@ -48,6 +48,12 @@ public:
     int32_t GetChargeState(BatteryChargeState& chargeState) override;
     int32_t GetPresent(bool& present) override;
     int32_t GetTechnology(std::string& technology) override;
+private:
+    std::unique_ptr<OHOS::HDI::Battery::V1_0::PowerSupplyProvider> provider_ = nullptr;
+    std::unique_ptr<OHOS::HDI::Battery::V1_0::BatteryThread> loop_ = nullptr;
+    std::unique_ptr<OHOS::HDI::Battery::V1_0::BatteryConfig> batteryConfig_ = nullptr;
+    std::unique_ptr<OHOS::HDI::Battery::V1_0::BatteryLed> batteryLed_ = nullptr;
+    sptr<IBatteryCallback> batteryCallback_ = nullptr;
 };
 } // V1_0
 } // Battery
