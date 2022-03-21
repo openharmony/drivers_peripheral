@@ -269,16 +269,12 @@ RetCode SourceNode::PortHandler::StopDistributeBuffers()
 
 void SourceNode::PortHandler::DistributeBuffers()
 {
-    {
-        std::unique_lock<std::mutex> l(rblock);
-        rbcv.wait(l, [this] { return dbtRun == false || !respondBufferList.empty(); });
-    }
-
+    std::unique_lock<std::mutex> l(rblock);
+    rbcv.wait(l, [this] { return dbtRun == false || !respondBufferList.empty(); });
     if (!dbtRun) {
         return;
     }
 
-    std::unique_lock<std::mutex> l(rblock);
     auto node = port->GetNode();
     CHECK_IF_PTR_NULL_RETURN_VOID(node);
     auto buffer = respondBufferList.front();
