@@ -470,6 +470,10 @@ int32_t WlanInterfaceProxy::getFreqsWithBand(std::shared_ptr<WifiFeatureInfo> if
         HDF_LOGE("%s: write ifname failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    if (!data.WriteInt32(count)) {
+        HDF_LOGE("%s: write ifname failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t ret = Remote()->SendRequest(WLAN_SERVICE_GET_FREQ_WITHBAND, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: SendRequest failed, error code is %d", __func__, ret);
