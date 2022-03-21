@@ -278,12 +278,12 @@ void SourceNode::PortHandler::DistributeBuffers()
         return;
     }
 
+    std::unique_lock<std::mutex> l(rblock);
     auto node = port->GetNode();
     CHECK_IF_PTR_NULL_RETURN_VOID(node);
     auto buffer = respondBufferList.front();
     node->DeliverBuffer(buffer);
 
-    std::unique_lock<std::mutex> l(rblock);
     respondBufferList.pop_front();
 
     return;
