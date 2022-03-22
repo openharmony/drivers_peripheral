@@ -14,10 +14,13 @@
  */
 
 #include "power_interface_impl.h"
+
+#include <atomic>
 #include <hdf_base.h>
 #include <file_ex.h>
 #include <sys/eventfd.h>
 #include <chrono>
+#include <condition_variable>
 #include <mutex>
 #include <cstdlib>
 #include <thread>
@@ -40,9 +43,11 @@ static constexpr const char * const UNLOCK_PATH = "/sys/power/wake_unlock";
 static constexpr const char * const WAKEUP_COUNT_PATH = "/sys/power/wakeup_count";
 static std::chrono::milliseconds waitTime_(100); // {100ms};
 static std::mutex mutex_;
+static std::mutex suspendMutex_;
+static std::condition_variable suspendCv_;
 static std::unique_ptr<std::thread> daemon_;
-static bool suspending_;
-static bool suspendRetry_;
+static std::atomic_bool suspending_;
+static std::atomic_bool suspendRetry_;
 static sptr<IPowerHdiCallback> callback_;
 static UniqueFd wakeupCountFd;
 static void AutoSuspendLoop();
@@ -61,11 +66,12 @@ int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback>& ipow
 int32_t PowerInterfaceImpl::StartSuspend()
 {
     std::lock_guard<std::mutex> lock(mutex_);
+    suspendRetry_ = true;
     if (suspending_) {
+        suspendCv_.notify_one();
         return HDF_SUCCESS;
     }
     suspending_ = true;
-    suspendRetry_ = true;
     daemon_ = std::make_unique<std::thread>(&AutoSuspendLoop);
     daemon_->detach();
     return HDF_SUCCESS;
@@ -73,23 +79,24 @@ int32_t PowerInterfaceImpl::StartSuspend()
 
 void AutoSuspendLoop()
 {
-    while (suspendRetry_) {
+    auto suspendLock = std::unique_lock(suspendMutex_);
+    while (true) {
         std::this_thread::sleep_for(waitTime_);
 
         const std::string wakeupCount = ReadWakeCount();
         if (wakeupCount.empty()) {
             continue;
         }
+        if (!suspendRetry_) {
+            suspendCv_.wait(suspendLock);
+        }
         if (!WriteWakeCount(wakeupCount)) {
             continue;
         }
-        // suspendRetry_ could be changed while read wakeup count
-        if (suspendRetry_) {
-            NotifyCallback(CMD_ON_SUSPEND);
-            DoSuspend();
-            NotifyCallback(CMD_ON_WAKEUP);
-            break;
-        }
+
+        NotifyCallback(CMD_ON_SUSPEND);
+        DoSuspend();
+        NotifyCallback(CMD_ON_WAKEUP);
     }
     suspending_ = false;
     suspendRetry_ = false;
@@ -132,17 +139,15 @@ void NotifyCallback(int code)
 
 int32_t PowerInterfaceImpl::StopSuspend()
 {
-    if (suspendRetry_) {
-        suspendRetry_ = false;
-    }
+    suspendRetry_ = false;
+
     return HDF_SUCCESS;
 }
 
 int32_t PowerInterfaceImpl::ForceSuspend()
 {
-    if (suspendRetry_) {
-        suspendRetry_ = false;
-    }
+    suspendRetry_ = false;
+
     NotifyCallback(CMD_ON_SUSPEND);
     DoSuspend();
     NotifyCallback(CMD_ON_WAKEUP);
