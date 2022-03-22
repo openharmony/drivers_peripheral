@@ -49,6 +49,8 @@ static std::vector<std::string> g_filenodeName;
 static std::map<std::string, std::string> g_nodeInfo;
 const int STR_TO_LONG_LEN = 10;
 const int NUM_ZERO = 0;
+const int32_t ERROR = -1;
+const int MAX_BUFF_SIZE = 128;
 std::unique_ptr<PowerSupplyProvider> giver_ = nullptr;
 
 void HdiServiceTest::SetUpTestCase(void)
@@ -579,81 +581,61 @@ static int32_t PluggedTypeEnumConverter(const char* str)
     return PowerSupplyProvider::PLUGGED_TYPE_BUTT;
 }
 
-
-static int32_t GetPluggedTypeName()
+int32_t ReadSysfsFile(const char* path, char* buf, size_t size)
 {
-    char buf[128] = {0};
-    std::string onlineNode = "battery";
-    for (auto iter = g_nodeInfo.begin(); iter != g_nodeInfo.end(); ++iter) {
-        if (iter->first == "online") {
-            onlineNode = iter->second;
-            break;
-        }
-    }
-    std::string sysOnlinePath = SYSTEM_BATTERY_PATH + "/" + onlineNode + "/" + "online";
-    HDF_LOGE("%{public}s: sysOnlinePath is %{public}s", __func__, sysOnlinePath.c_str());
-
-    int fd = open(sysOnlinePath.c_str(), O_RDONLY);
+    int fd = open(path, O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysOnlinePath.c_str());
-        return HDF_FAILURE;
+        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, path);
+        return HDF_ERR_IO;
     }
 
-    int32_t readSize = read(fd, buf, sizeof(buf) - 1);
+    int32_t readSize = read(fd, buf, size - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysOnlinePath.c_str());
+        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, path);
         close(fd);
-        return HDF_FAILURE;
+        return HDF_ERR_IO;
     }
+
     buf[readSize] = '\0';
     Trim(buf);
+    close(fd);
 
-    int32_t online = strtol(buf, nullptr, STR_TO_LONG_LEN);
-    return online;
+    return HDF_SUCCESS;
 }
 
 static int32_t ReadPluggedTypeSysfs()
 {
-    char buf[128] = {0};
-    int32_t readSize;
-    int32_t online = GetPluggedTypeName();
-    if (online != 1) {
-        return PowerSupplyProvider::PLUGGED_TYPE_NONE;
-    }
+    std::string node = "USB";
+    int32_t online = ERROR;
+    char buf[MAX_BUFF_SIZE] = {0};
 
-    std::string typeNode = "battery";
-    for (auto iter = g_nodeInfo.begin(); iter != g_nodeInfo.end(); ++iter) {
-        if (iter->first == "type") {
-            typeNode = iter->second;
+    auto iter = g_filenodeName.begin();
+    while (iter != g_filenodeName.end()) {
+        if (strcasecmp(iter->c_str(), "battery") == 0) {
+            continue;
+        }
+        std::string onlinePath = SYSTEM_BATTERY_PATH + "/" + *iter + "/" + "online";
+        if (ReadSysfsFile(onlinePath.c_str(), buf, MAX_BUFF_SIZE) != HDF_SUCCESS) {
+            HDF_LOGW("%{public}s: read online path failed in loop", __func__);
+        }
+        online = strtol(buf, nullptr, STR_TO_LONG_LEN);
+        if (online) {
+            node = *iter;
             break;
         }
+        iter++;
     }
-    std::string sysPluggedTypePath = SYSTEM_BATTERY_PATH + "/" + typeNode + "/" + "type";
-    HDF_LOGE("%{public}s: sysPluggedTypePath is %{public}s", __func__, sysPluggedTypePath.c_str());
-
-    int fd = open(sysPluggedTypePath.c_str(), O_RDONLY);
-    if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysPluggedTypePath.c_str());
-        return HDF_FAILURE;
+    if (online == ERROR) {
+        return ERROR;
     }
-
-    readSize = read(fd, buf, sizeof(buf) - 1);
-    if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysPluggedTypePath.c_str());
-        close(fd);
-        return HDF_FAILURE;
+    std::string typePath = SYSTEM_BATTERY_PATH + "/" + node + "/" + "type";
+    HDF_LOGI("%{public}s: type path is: %{public}s", __func__, typePath.c_str());
+    if (ReadSysfsFile(typePath.c_str(), buf, MAX_BUFF_SIZE) != HDF_SUCCESS) {
+        HDF_LOGW("%{public}s: read type path failed", __func__);
+        return ERROR;
     }
-    buf[readSize] = '\0';
     Trim(buf);
-    int32_t battPlugType = PluggedTypeEnumConverter(buf);
-    if (battPlugType == PowerSupplyProvider::PLUGGED_TYPE_BUTT) {
-        HDF_LOGW("%{public}s: not support the online type %{public}s", __func__, buf);
-        battPlugType = PowerSupplyProvider::PLUGGED_TYPE_NONE;
-    }
-
-    HDF_LOGE("%{public}s: read system file pluggedType is %{public}d", __func__, battPlugType);
-    close(fd);
-    return battPlugType;
+    return PluggedTypeEnumConverter(buf);
 }
 
 int32_t ChargeStateEnumConverter(const char* str)
@@ -1338,7 +1320,7 @@ HWTEST_F (HdiServiceTest, HdiService026, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService027, TestSize.Level1)
 {
-    int32_t currentAvg = 0;
+    int32_t currentAvg = HDF_FAILURE;
     if (IsNotMock()) {
         giver_->ParseCurrentAverage(&currentAvg);
         int32_t sysfsCurrentAvg = ReadCurrentAverageSysfs();
