@@ -225,7 +225,7 @@ int32_t GetAdapters(TestAudioManager *manager, struct AudioAdapterDescriptor **d
     if (ret < 0) {
         return ret;
     }
-    if (*descs == nullptr || size != AUDIO_ADAPTER_MAX_NUM) {
+    if (*descs == nullptr) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
