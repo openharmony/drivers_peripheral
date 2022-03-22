@@ -26,7 +26,11 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
 
-  device_hal = "$ohos_board_adapter_dir"
+  if (device_company == "hisilicon") {
+    device_hal = "soc/${device_company}/common/hal"
+  } else if (product_name != "ohos-arm64") {
+    device_hal = "${device_company}/hardware"
+  }
 
   config("display_hdi_public_config") {
     visibility = [ ":*" ]
