@@ -15,9 +15,8 @@
 
 #include "view.h"
 
-#include "log.h"
 #include "securec.h"
-#include "utils/hdf_log.h"
+#include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -26,33 +25,31 @@ namespace V1_0 {
 constexpr int RGBA_PIXEL_SIZE = 4;
 void* View::CreateBuffer(int w, int h, View::PixelFormat pixelFormat)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     int pixelSize = -1;
     switch (int(pixelFormat)) {
         case int(View::PixelFormat::BGRA888):
             pixelSize = RGBA_PIXEL_SIZE;
             break;
         default:
-            HDF_LOGD("%{public}s, Unsupported pixel_format: %{public}d", __func__, int(pixelFormat));
-            HDF_LOGD("%{public}s, Use default BGRA888.", __func__);
+            BATTERY_HILOGD(FEATURE_CHARGING, "Unsupported pixel_format=%{public}d, Use default BGRA888", int(pixelFormat));
             pixelSize = RGBA_PIXEL_SIZE;
             break;
     }
     bufferSize_ = w * h * pixelSize;
     viewBuffer_ = static_cast<char*>(malloc(bufferSize_));
     if (viewBuffer_ == nullptr) {
-        HDF_LOGE("%{public}s, Allocate memory for view failed: %{public}d", __func__, errno);
+        BATTERY_HILOGE(FEATURE_CHARGING, "Allocate memory for view failed: %{public}d", errno);
         return nullptr;
     }
     shadowBuffer_ = static_cast<char*>(malloc(bufferSize_));
     if (shadowBuffer_ == nullptr) {
-        HDF_LOGE("%{public}s, Allocate memory for shadow failed: %{public}d", __func__, errno);
+        BATTERY_HILOGE(FEATURE_CHARGING, "Allocate memory for shadow failed: %{public}d", errno);
         free(viewBuffer_);
         viewBuffer_ = nullptr;
         return nullptr;
     }
     if (memset_s(viewBuffer_, bufferSize_, 0, bufferSize_) != EOK) {
-        HDF_LOGE("%{public}s, Clean view buffer failed.", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "Clean view buffer failed.");
         free(viewBuffer_);
         viewBuffer_ = nullptr;
         return nullptr;
@@ -64,7 +61,6 @@ void* View::CreateBuffer(int w, int h, View::PixelFormat pixelFormat)
 
 void View::SetBackgroundColor(BRGA888Pixel* color)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     BRGA888Pixel pixelBuffer[viewWidth_];
     for (int w = 0; w < viewWidth_; w++) {
         pixelBuffer[w].r = color->r;
@@ -80,17 +76,16 @@ void View::SetBackgroundColor(BRGA888Pixel* color)
     }
     if (isVisiable_) {
         OnDraw();
-        HDF_LOGD("%{public}s, view---visable", __func__);
+        BATTERY_HILOGD(FEATURE_CHARGING, "view---visible");
     }
 }
 
 void View::DrawSubView(int x, int y, int w, int h, char* buf)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     int minWidth = ((x + w) <= viewWidth_) ? w : (viewWidth_ - x);
     int minHeight = ((y + h) <= viewHeight_) ? h : (viewHeight_ - y);
-    HDF_LOGD("%{public}s, x = %{public}d, y = %{public}d, w = %{public}d, h = %{public}d", __func__, x, y, w, h);
-    HDF_LOGD("%{public}s, minWidth = %{public}d, minHeight = %{public}d", __func__, minWidth, minHeight);
+    BATTERY_HILOGD(FEATURE_CHARGING, "x = %{public}d, y = %{public}d, w = %{public}d, h = %{public}d", x, y, w, h);
+    BATTERY_HILOGD(FEATURE_CHARGING, "minWidth = %{public}d, minHeight = %{public}d", minWidth, minHeight);
     for (int i = 0; i < minHeight; i++) {
         char* src = buf + i * w * static_cast<int32_t>(sizeof(BRGA888Pixel));
         char* dst = shadowBuffer_ + (i + y) * viewWidth_ * static_cast<int32_t>(sizeof(BRGA888Pixel)) +
@@ -104,14 +99,12 @@ void View::DrawSubView(int x, int y, int w, int h, char* buf)
 
 void View::OnDraw()
 {
-    HDF_LOGD("%{public}s enter", __func__);
     std::unique_lock<std::mutex> locker(mutex_);
     SyncBuffer();
 }
 
 void View::Hide()
 {
-    HDF_LOGD("%{public}s enter", __func__);
     if (isVisiable_) {
         isVisiable_ = false;
         OnDraw();
@@ -120,7 +113,6 @@ void View::Hide()
 
 void View::Show()
 {
-    HDF_LOGD("%{public}s enter", __func__);
     if (!isVisiable_) {
         isVisiable_ = true;
         OnDraw();
@@ -129,46 +121,39 @@ void View::Show()
 
 void View::SyncBuffer()
 {
-    HDF_LOGD("%{public}s enter", __func__);
     if (memcpy_s(shadowBuffer_, bufferSize_, viewBuffer_, bufferSize_) != EOK) {
-        HDF_LOGD("%{public}s, Sync buffer failed.", __func__);
+        BATTERY_HILOGD(FEATURE_CHARGING, "Sync buffer failed.");
     }
 }
 
 char* View::GetBuffer() const
 {
-    HDF_LOGD("%{public}s enter", __func__);
     return shadowBuffer_;
 }
 
 void* View::GetRawBuffer() const
 {
-    HDF_LOGD("%{public}s enter", __func__);
     return viewBuffer_;
 }
 
 void View::OnFocus(bool foucsed)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     isFocused_ = foucsed;
     OnDraw();
 }
 
 void View::SetViewId(int id)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     viewId_ = id;
 }
 
 int View::GetViewId() const
 {
-    HDF_LOGD("%{public}s enter", __func__);
     return viewId_;
 }
 
 void View::FreeBuffer()
 {
-    HDF_LOGD("%{public}s enter", __func__);
     free(viewBuffer_);
     free(shadowBuffer_);
     viewBuffer_ = nullptr;
@@ -177,25 +162,21 @@ void View::FreeBuffer()
 
 bool View::IsVisiable() const
 {
-    HDF_LOGD("%{public}s enter", __func__);
     return isVisiable_;
 }
 
 bool View::IsSelected() const
 {
-    HDF_LOGD("%{public}s enter", __func__);
     return isFocused_;
 }
 
 bool View::IsFocusAble() const
 {
-    HDF_LOGD("%{public}s enter", __func__);
     return focusable_;
 }
 
 void View::SetFocusAble(bool focusable)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     focusable_ = focusable;
 }
 }  // namespace V1_0

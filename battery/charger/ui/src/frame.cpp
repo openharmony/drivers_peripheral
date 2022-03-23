@@ -15,8 +15,7 @@
 
 #include "frame.h"
 #include <thread>
-#include "log.h"
-#include "utils/hdf_log.h"
+#include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -44,7 +43,6 @@ Frame::~Frame()
 
 void Frame::FlushThreadLoop()
 {
-    HDF_LOGD("%{public}s enter", __func__);
     while (!needStop_) {
         std::unique_lock<std::mutex> locker(mutex_);
         if (!flushFlag_) {
@@ -58,7 +56,7 @@ void Frame::FlushThreadLoop()
         std::map<View*, int>::iterator iter;
         for (iter = viewMapList_.begin(); iter != viewMapList_.end(); ++iter) {
             View* tmpView = (*iter).first;
-            HDF_LOGD("%{public}s enter, tmpView->IsVisiable()=%{public}d", __func__, tmpView->IsVisiable());
+            BATTERY_HILOGD(FEATURE_CHARGING, "enter, tmpView->IsVisiable()=%{public}d", tmpView->IsVisiable());
             if (tmpView->IsVisiable()) {
                 char* bufTmp = static_cast<char*>(tmpView->GetBuffer());
                 DrawSubView(tmpView->startX_, tmpView->startY_, tmpView->viewWidth_, tmpView->viewHeight_, bufTmp);
@@ -72,20 +70,18 @@ void Frame::FlushThreadLoop()
 
 void Frame::ViewRegister(View* view)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     std::unique_lock<std::mutex> locker(frameMutex_);
     view->SetViewId(frameViewId + listIndex_);
     viewMapList_.insert(std::make_pair(view, frameViewId + listIndex_));
     if (view->IsFocusAble()) {
         maxActionIndex_++;
-        HDF_LOGD("%{public}s enter, maxActionIndex_=%{public}d", __func__, maxActionIndex_);
+        BATTERY_HILOGD(FEATURE_CHARGING, "maxActionIndex_=%{public}d", maxActionIndex_);
     }
     listIndex_++;
 }
 
 void Frame::OnDraw()
 {
-    HDF_LOGD("%{public}s enter", __func__);
     std::unique_lock<std::mutex> locker(mutex_);
     flushFlag_ = true;
     mCondFlush_.notify_all();

@@ -19,11 +19,10 @@
 #include <string>
 #include <sys/epoll.h>
 #include "frame.h"
-#include "log.h"
 #include "png.h"
 #include "securec.h"
 #include "view.h"
-#include "utils/hdf_log.h"
+#include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -71,7 +70,6 @@ void AnimationLabel::SetIsVisible(const bool visible)
 
 void AnimationLabel::SetPlayMode(AnimationLabel::PlayMode mode)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     if (mode == AnimationLabel::PlayMode::ANIMATION_MODE) {
         showStatic_ = false;
     } else if (mode == AnimationLabel::PlayMode::STATIC_MODE) {
@@ -81,7 +79,7 @@ void AnimationLabel::SetPlayMode(AnimationLabel::PlayMode mode)
 
 void AnimationLabel::UpdateLoop()
 {
-    HDF_LOGD("%{public}s enter", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "start update animation loop");
     unsigned int index = 0;
 
     while (!needStop_) {
@@ -94,7 +92,7 @@ void AnimationLabel::UpdateLoop()
             continue;
         }
 
-        HDF_LOGD("%{public}s, isVisible_ = %{public}d", __func__, isVisible_);
+        BATTERY_HILOGD(FEATURE_CHARGING, "isVisible_ = %{public}d", isVisible_);
         if (!isVisible_) {
             continue;
         }
@@ -119,12 +117,12 @@ void AnimationLabel::UpdateLoop()
         }
         index++;
     }
-    HDF_LOGD("%{public}s loop end.", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "finish update animation loop");
 }
 
 void AnimationLabel::AddImg(const std::string& imgFileName)
 {
-    HDF_LOGD("%{public}s enter", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "add img, name=%{public}s", imgFileName.c_str());
     mutex_.lock();
     char* buf = static_cast<char*>(LoadPng(imgFileName));
     imgList_.push_back(buf);
@@ -133,7 +131,7 @@ void AnimationLabel::AddImg(const std::string& imgFileName)
 
 int AnimationLabel::AddStaticImg(const std::string& imgFileName)
 {
-    HDF_LOGD("%{public}s enter", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "add static img, name=%{public}s", imgFileName.c_str());
     int id = staticImgSize_;
     mutex_.lock();
     staticImgList_[id] = static_cast<char*>(LoadPng(imgFileName));
@@ -145,30 +143,29 @@ int AnimationLabel::AddStaticImg(const std::string& imgFileName)
 int AnimationLabel::LoadPngInternalWithFile(FILE* fp, png_structpp pngPtr, png_infopp pngInfoPtr,
     struct PictureAttr& attr)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     if (fp == nullptr) {
         return -1;
     }
     uint8_t header[PNG_HEADER_SIZE];
     size_t bytesRead = fread(header, 1, sizeof(header), fp);
     if (bytesRead != sizeof(header)) {
-        HDF_LOGE("%{public}s, read header from file failed, errno=%{public}d", __func__, errno);
+        BATTERY_HILOGE(FEATURE_CHARGING, "read header from file failed, errno=%{public}d", errno);
         return -1;
     }
     if (png_sig_cmp(header, 0, sizeof(header))) {
-        HDF_LOGE("%{public}s, png file header is not valid.", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "png file header is not valid.");
         return -1;
     }
 
     *pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
     if (*pngPtr == nullptr) {
-        HDF_LOGE("%{public}s, creat png struct failed.", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "create png struct failed.");
         return -1;
     }
 
     *pngInfoPtr = png_create_info_struct(*pngPtr);
     if (*pngInfoPtr == nullptr) {
-        HDF_LOGE("%{public}s, creat png info failed.", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "create png info failed.");
         return -1;
     }
     png_init_io(*pngPtr, fp);
@@ -187,7 +184,7 @@ int AnimationLabel::LoadPngInternalWithFile(FILE* fp, png_structpp pngPtr, png_i
     }
 
     if (attr.pictureChannels < MAX_PICTURE_CHANNELS) {
-        HDF_LOGE("%{public}s, need rgb format pic.", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "need rgb format pic.");
         return -1;
     }
     return 0;
@@ -196,7 +193,6 @@ int AnimationLabel::LoadPngInternalWithFile(FILE* fp, png_structpp pngPtr, png_i
 void AnimationLabel::CopyPictureBuffer(struct PictureAttr& attr, char* pictureBufferTmp,
     BRGA888Pixel* pictureBuffer) const
 {
-    HDF_LOGD("%{public}s enter", __func__);
     int copyHeight = (viewHeight_ < static_cast<int>(attr.pictureHeight)) ? viewHeight_ :
         static_cast<int>(attr.pictureHeight);
     int copyWidth = (viewWidth_ < static_cast<int>(attr.pictureWidth)) ? viewWidth_ :
@@ -218,7 +214,6 @@ void AnimationLabel::CopyPictureBuffer(struct PictureAttr& attr, char* pictureBu
 
 void* AnimationLabel::LoadPng(const std::string& imgFileName)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     png_structp pngPtr = nullptr;
     png_infop pngInfoPtr = nullptr;
     struct PictureAttr attr {};
@@ -227,7 +222,7 @@ void* AnimationLabel::LoadPng(const std::string& imgFileName)
 
     FILE* fp = fopen(imgFileName.c_str(), "rb");
     if (fp == nullptr) {
-        HDF_LOGD("%{public}s: open font file failed.", __func__);
+        BATTERY_HILOGD(FEATURE_CHARGING, "open img file failed.");
         return nullptr;
     }
     if (LoadPngInternalWithFile(fp, &pngPtr, &pngInfoPtr, attr) < 0) {
@@ -239,7 +234,7 @@ void* AnimationLabel::LoadPng(const std::string& imgFileName)
     unsigned int pictureRowSize = attr.pictureWidth * attr.pictureChannels;
     pictureBufferTmp = static_cast<char*>(malloc(pictureRowSize * attr.pictureHeight));
     if (pictureBufferTmp == nullptr) {
-        HDF_LOGD("%{public}s: Allocate memory failed.", __func__);
+        BATTERY_HILOGD(FEATURE_CHARGING, "malloc memory failed.");
         if (fp != nullptr) {
             fclose(fp);
             fp = nullptr;
@@ -258,14 +253,13 @@ void* AnimationLabel::LoadPng(const std::string& imgFileName)
 
 View::BRGA888Pixel* AnimationLabel::HandleLoadPng(FILE** fp, char** pictureBufferTmp, struct PictureAttr& attr)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     int pictureBufferSize = viewHeight_ * viewWidth_ * sizeof(BRGA888Pixel);
     BRGA888Pixel* pictureBuffer = nullptr;
     char* backgroundBuffer = static_cast<char*>(GetRawBuffer());
 
     pictureBuffer = static_cast<BRGA888Pixel*>(malloc(pictureBufferSize));
     if (pictureBuffer == nullptr) {
-        HDF_LOGD("%{public}s: Allocate memory failed.", __func__);
+        BATTERY_HILOGD(FEATURE_CHARGING, "malloc memory failed.");
         if (*pictureBufferTmp != nullptr) {
             free(*pictureBufferTmp);
             *pictureBufferTmp = nullptr;
@@ -298,7 +292,7 @@ View::BRGA888Pixel* AnimationLabel::HandleLoadPng(FILE** fp, char** pictureBuffe
     *pictureBufferTmp = nullptr;
     int ret = fclose(*fp);
     if (ret < 0) {
-        HDF_LOGD("%{public}s: fp file close failed.", __func__);
+        BATTERY_HILOGD(FEATURE_CHARGING, "fp file close failed.");
         return nullptr;
     }
     *fp = nullptr;
@@ -307,7 +301,6 @@ View::BRGA888Pixel* AnimationLabel::HandleLoadPng(FILE** fp, char** pictureBuffe
 
 void AnimationLabel::SetInterval(int ms)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     intervalMs_ = static_cast<uint32_t>(ms);
 }
 }  // namespace V1_0

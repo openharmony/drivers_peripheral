@@ -19,12 +19,12 @@
 #include <fstream>
 #include <vector>
 #include <unistd.h>
-#include <hdf_log.h>
 #include <hdf_base.h>
 #include <dirent.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -46,25 +46,22 @@ BatteryBacklight::BatteryBacklight()
 
 void BatteryBacklight::TraversalBacklightNode()
 {
-    HDF_LOGD("%{public}s: enter", __func__);
     std::string::size_type idx;
 
     for (auto iter = g_backlightNodeName.begin(); iter != g_backlightNodeName.end(); ++iter) {
         idx = iter->find(g_backlightNode);
         if (idx == std::string::npos) {
-            HDF_LOGD("%{public}s: not found backlight node", __func__);
+            BATTERY_HILOGW(FEATURE_CHARGING, "not found backlight node");
         } else {
             g_backlightNode = *iter;
-            HDF_LOGD("%{public}s: backlight node is %{public}s", __func__, iter->c_str());
+            BATTERY_HILOGD(FEATURE_CHARGING, "backlight node is %{public}s", iter->c_str());
         }
     }
-
-    HDF_LOGD("%{public}s: exit", __func__);
 }
 
 int32_t BatteryBacklight::InitBacklightSysfs()
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "start init backlight sysfs");
     DIR* dir = nullptr;
     struct dirent* entry = nullptr;
     int32_t index = 0;
@@ -72,7 +69,7 @@ int32_t BatteryBacklight::InitBacklightSysfs()
 
     dir = opendir(BACKLIGHT_BASE_PATH.c_str());
     if (dir == nullptr) {
-        HDF_LOGE("%{public}s: backlight base path is not exist", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "backlight base path is not exist");
         return HDF_ERR_IO;
     }
 
@@ -87,9 +84,9 @@ int32_t BatteryBacklight::InitBacklightSysfs()
         }
 
         if (entry->d_type == DT_DIR || entry->d_type == DT_LNK) {
-            HDF_LOGD("%{public}s: init backlight info of %{public}s", __func__, entry->d_name);
+            BATTERY_HILOGI(FEATURE_CHARGING, "init backlight info of %{public}s", entry->d_name);
             if (index >= maxSize) {
-                HDF_LOGE("%{public}s: too many backlight types", __func__);
+                BATTERY_HILOGE(FEATURE_CHARGING, "too many backlight types");
                 break;
             }
             g_backlightNodeName.emplace_back(entry->d_name);
@@ -98,39 +95,38 @@ int32_t BatteryBacklight::InitBacklightSysfs()
     }
 
     TraversalBacklightNode();
-    HDF_LOGD("%{public}s: index is %{public}d", __func__, index);
+    BATTERY_HILOGD(FEATURE_CHARGING, "backlight index is %{public}d", index);
     closedir(dir);
-
-    HDF_LOGI("%{public}s exit", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "finish init backlight sysfs");
     return HDF_SUCCESS;
 }
 
 void BatteryBacklight::TurnOnScreen()
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "start turn on screen");
     HandleBacklight(BACKLIGHT_ON);
     screenOn_ = true;
 }
 
 void BatteryBacklight::TurnOffScreen()
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    BATTERY_HILOGI(FEATURE_CHARGING, "start turn off screen");
     HandleBacklight(BACKLIGHT_OFF);
     screenOn_ = false;
 }
 
 bool BatteryBacklight::GetScreenState() const
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    BATTERY_HILOGI(FEATURE_CHARGING, "screen state: %{public}d", screenOn_);
     return screenOn_;
 }
 
 std::string BatteryBacklight::CreateFile(std::string path, std::string content) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
-        HDF_LOGD("%{public}s: Cannot create file %{public}s", __func__, path.c_str());
+        BATTERY_HILOGD(FEATURE_CHARGING, "Cannot create file %{public}s", path.c_str());
         return nullptr;
     }
     stream << content.c_str() << std::endl;
@@ -140,49 +136,48 @@ std::string BatteryBacklight::CreateFile(std::string path, std::string content) 
 
 void BatteryBacklight::InitDefaultSysfs(void) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
     std::string brightnessPath = "/data";
     if (access(brightnessPath.c_str(), 0) == -1) {
         mkdir("/data", S_IRWXU);
         sleep(MKDIR_WAIT_TIME);
     }
 
-    HDF_LOGE("%{public}s: create default brightness path for Hi3516DV300", __func__);
+    BATTERY_HILOGE(FEATURE_CHARGING, "create default brightness path for Hi3516DV300");
     CreateFile("/data/brightness", "127");
 }
 
 void BatteryBacklight::InitDevicePah(std::string& path) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
     if (access(path.c_str(), F_OK) == 0) {
-        HDF_LOGI("%{public}s: system backlight path exist", __func__);
+        BATTERY_HILOGI(FEATURE_CHARGING, "system backlight path exist");
         return;
     } else {
-        HDF_LOGI("%{public}s: create mock backlight path", __func__);
+        BATTERY_HILOGI(FEATURE_CHARGING, "create mock backlight path");
         path = "/data/brightness";
         return;
     }
 
-    HDF_LOGI("%{public}s exit", __func__);
+    BATTERY_HILOGI(FEATURE_CHARGING, "exit");
 }
 
 int BatteryBacklight::HandleBacklight(const unsigned int backlight) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
     FILE* fp = nullptr;
     int writeFile = -1;
     char* path = nullptr;
     char* pathGroup = nullptr;
     unsigned int bufferLen;
     std::string devicePath = BACKLIGHT_BASE_PATH + "/" + g_backlightNode + "/" + "brightness";
-    HDF_LOGI("%{public}s: backlight devicepath is %{public}s", __func__, devicePath.c_str());
+    BATTERY_HILOGD(FEATURE_CHARGING, "backlight devicePath is %{public}s", devicePath.c_str());
     InitDevicePah(devicePath);
 
-    HDF_LOGI("%{public}s: backlight value is %{public}d", __func__, backlight);
+    BATTERY_HILOGD(FEATURE_CHARGING, "backlight value is %{public}d", backlight);
     bufferLen = strnlen(devicePath.c_str(), MAX_STR) + 1;
     pathGroup = (char*)malloc(bufferLen);
     if (pathGroup == nullptr) {
-        HDF_LOGD("%{public}s: malloc error.", __func__);
+        BATTERY_HILOGD(FEATURE_CHARGING, "malloc error");
         return writeFile;
     }
 
@@ -196,13 +191,11 @@ int BatteryBacklight::HandleBacklight(const unsigned int backlight) const
             fclose(fp);
         }
         if (writeFile <= 0) {
-            HDF_LOGD("%{public}s: failed to set backlight path=%{pusblic}s.", __func__, path);
+            BATTERY_HILOGD(FEATURE_CHARGING, "failed to set backlight path=%{public}s.", path);
         }
         path = nullptr;
     }
     free(pathGroup);
-
-    HDF_LOGI("%{public}s exit", __func__);
     return writeFile;
 }
 }  // namespace V1_0

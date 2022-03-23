@@ -23,9 +23,8 @@
 #include <xf86drm.h>
 #include <xf86drmMode.h>
 #include <linux/fb.h>
-#include "log.h"
 #include "securec.h"
-#include "utils/hdf_log.h"
+#include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -45,20 +44,18 @@ struct BufferObject g_buff;
 
 void SurfaceDev::Flip(char* buf)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     if (!buf) {
-        HDF_LOGE("%{public}s, buf is null.", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "buf is null.");
         return;
     }
     if (memcpy_s(g_buff.vaddr, g_buff.size, static_cast<void*>(buf), g_buff.size) != EOK) {
-        HDF_LOGE("%{public}s, memcpy_s fail.", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "memcpy_s fail.");
         return;
     }
 }
 
 static int ModesetCreateFb(int fd, struct BufferObject* bo)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     struct drm_mode_create_dumb create = {};
     struct drm_mode_map_dumb map = {};
     const int offsetNumber = 4;
@@ -84,7 +81,7 @@ static int ModesetCreateFb(int fd, struct BufferObject* bo)
     offsets[0] = 0;
     ret = drmModeAddFB2(fd, bo->width, bo->height, DRM_FORMAT_ARGB8888, handles, pitches, offsets, &bo->fbId, 0);
     if (ret) {
-        HDF_LOGD("%{public}s, [fbtest]failed to add fb %{public}d x %{public}d: errno %{public}s", __func__, \
+        BATTERY_HILOGD(FEATURE_CHARGING, "[fbtest]failed to add fb %{public}d x %{public}d: errno %{public}s", \
             bo->width, bo->height, strerror(errno));
         return -1;
     }
@@ -98,7 +95,7 @@ static int ModesetCreateFb(int fd, struct BufferObject* bo)
     uint32_t color = newColor;
     while (i < bo->size) {
         if (memcpy_s(&bo->vaddr[i], bo->size, &color, sizeof(color)) != EOK) {
-            HDF_LOGE("%{public}s, memcpy_s fail.", __func__);
+            BATTERY_HILOGE(FEATURE_CHARGING, "memcpy_s fail.");
             return -1;
         }
         i += sizeof(color);
@@ -108,20 +105,20 @@ static int ModesetCreateFb(int fd, struct BufferObject* bo)
 
 int DrmInit(void)
 {
-    HDF_LOGD("%{public}s enter", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "start init drm");
     int fd = -1;
     drmModeConnector* conn;
     uint32_t connId;
     uint32_t crtcId;
     fd = open("/dev/dri/card0", O_RDWR | O_CLOEXEC);
     if (fd < 0) {
-        HDF_LOGE("%{public}s, open failed.", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "open failed.");
         return -1;
     }
 
     drmModeRes* res = drmModeGetResources(fd);
     if (res == nullptr) {
-        HDF_LOGE("%{public}s, drmModeGetResources.", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "res is nullptr");
         return -1;
     }
 
@@ -129,7 +126,7 @@ int DrmInit(void)
     connId = res->connectors[1];
     conn = drmModeGetConnector(fd, connId);
     if (conn == nullptr) {
-        HDF_LOGE("%{public}s, drmModeGetConnector.", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "conn is nullptr");
         return -1;
     }
     g_buff.width = conn->modes[0].hdisplay;
@@ -137,23 +134,21 @@ int DrmInit(void)
 
     ModesetCreateFb(fd, &g_buff);
     drmModeSetCrtc(fd, crtcId, g_buff.fbId, 0, 0, &connId, 1, &conn->modes[0]);
-    HDF_LOGD("%{public}s, drm init succcess.", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "drm init success");
     return 0;
 }
 
 SurfaceDev::SurfaceDev(SurfaceDev::DevType devType)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     if (devType == SurfaceDev::DevType::DRM_DEVICE) {
         DrmInit();
     } else {
-        HDF_LOGE("%{public}s, Only Support drm driver.", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "only support drm driver.");
     }
 }
 
 void SurfaceDev::GetScreenSize(int& w, int& h)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     const int screenSizeW = 480;
     const int screenSizeH = 960;
     w = screenSizeW;
