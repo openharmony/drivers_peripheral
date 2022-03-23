@@ -783,7 +783,11 @@ int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
     }
     strncpy_s(req.ifr_name, IFNAMSIZ, ifName, strlen(ifName));
     req.ifr_addr.sa_family = ARPHRD_ETHER;
-    memcpy_s(req.ifr_hwaddr.sa_data, len, mac, len);
+    if (memcpy_s(req.ifr_hwaddr.sa_data, len, mac, len) != EOK) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: memcpy_s req.ifr_hwaddr.sa_data failed", __FUNCTION__);
+        close(fd);
+        return RET_CODE_FAILURE;
+    }
 
     ret = ioctl(fd, SIOCSIFHWADDR, &req);
     if (ret != 0) {
@@ -840,7 +844,10 @@ int32_t GetDevMacAddr(const char *ifName,
         close(fd);
         return RET_CODE_FAILURE;
     }
-    memcpy_s(mac, len, (unsigned char *)req.ifr_hwaddr.sa_data, len);
+    if (memcpy_s(mac, len, (unsigned char *)req.ifr_hwaddr.sa_data, len) != EOK) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: memcpy_s mac failed", __FUNCTION__);
+        ret = RET_CODE_FAILURE;
+    }
     close(fd);
     return ret;
 }

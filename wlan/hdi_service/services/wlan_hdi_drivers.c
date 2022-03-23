@@ -33,6 +33,7 @@ void HdfWlanHdiDriverRelease(struct HdfDeviceObject *deviceObject)
     struct HdfWlanStubData *stubData = HdfStubDriver();
     if (stubData == NULL) {
         HDF_LOGE("%s: stubData is NUll!", __func__);
+        return;
     }
 
     DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &stubData->remoteListHead, struct HdfWlanRemoteNode, node) {
