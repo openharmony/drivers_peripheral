@@ -22,11 +22,11 @@ config("module_private_config") {
 
   include_dirs = [
     "include",
-    "//base/powermgr/battery_manager/charger/ui/include",
-    "//base/powermgr/battery_manager/charger/led",
-    "//base/powermgr/battery_manager/charger/backlight",
-    "//base/powermgr/battery_manager/charger/vibrate",
-    "//base/powermgr/battery_manager/charger/include",
+    "//drivers/peripheral/battery/charger/ui/include",
+    "//drivers/peripheral/battery/charger/led",
+    "//drivers/peripheral/battery/charger/backlight",
+    "//drivers/peripheral/battery/charger/vibrate",
+    "//drivers/peripheral/battery/charger/include",
     "//drivers/peripheral/battery/interfaces/include",
     "//drivers/peripheral/battery/include",
     "//drivers/peripheral/battery/interfaces/hdi_service/include",
@@ -39,10 +39,10 @@ ohos_unittest("test_hdisrv") {
   module_out_path = module_output_path
 
   sources = [
-    "//base/powermgr/battery_manager/charger/backlight/battery_backlight.cpp",
-    "//base/powermgr/battery_manager/charger/led/battery_led.cpp",
-    "//base/powermgr/battery_manager/charger/src/charger_thread.cpp",
-    "//base/powermgr/battery_manager/charger/vibrate/battery_vibrate.cpp",
+    "//drivers/peripheral/battery/charger/backlight/battery_backlight.cpp",
+    "//drivers/peripheral/battery/charger/led/battery_led.cpp",
+    "//drivers/peripheral/battery/charger/src/charger_thread.cpp",
+    "//drivers/peripheral/battery/charger/vibrate/battery_vibrate.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_config.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_thread.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/power_supply_provider.cpp",
@@ -52,7 +52,7 @@ ohos_unittest("test_hdisrv") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "//base/powermgr/battery_manager/charger/ui:libminui",
+    "//drivers/peripheral/battery/charger/ui:libminui",
     "//base/powermgr/power_manager/interfaces/innerkits:powermgr_client",
     "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//drivers/interface/battery/v1_0:libbattery_proxy_1.0",
@@ -80,10 +80,10 @@ ohos_unittest("test_capacity_shutdown") {
   module_out_path = module_output_path
 
   sources = [
-    "//base/powermgr/battery_manager/charger/backlight/battery_backlight.cpp",
-    "//base/powermgr/battery_manager/charger/led/battery_led.cpp",
-    "//base/powermgr/battery_manager/charger/src/charger_thread.cpp",
-    "//base/powermgr/battery_manager/charger/vibrate/battery_vibrate.cpp",
+    "//drivers/peripheral/battery/charger/backlight/battery_backlight.cpp",
+    "//drivers/peripheral/battery/charger/led/battery_led.cpp",
+    "//drivers/peripheral/battery/charger/src/charger_thread.cpp",
+    "//drivers/peripheral/battery/charger/vibrate/battery_vibrate.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_config.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_thread.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/power_supply_provider.cpp",
@@ -93,7 +93,7 @@ ohos_unittest("test_capacity_shutdown") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "//base/powermgr/battery_manager/charger/ui:libminui",
+    "//drivers/peripheral/battery/charger/ui:libminui",
     "//base/powermgr/power_manager/interfaces/innerkits:powermgr_client",
     "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//drivers/interface/battery/v1_0:libbattery_proxy_1.0",
