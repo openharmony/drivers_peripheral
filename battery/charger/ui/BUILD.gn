@@ -50,6 +50,7 @@ ohos_static_library("libminui") {
     "//drivers/peripheral/battery/charger/led",
     "//drivers/peripheral/battery/charger/include",
     "//drivers/peripheral/battery/charger/ui/include",
+    "//drivers/peripheral/battery/utils/include",
   ]
 
   deps = [

@@ -15,7 +15,6 @@
 
 #include "battery_led.h"
 
-#include <hdf_log.h>
 #include <hdf_base.h>
 #include <fstream>
 #include <memory>
@@ -24,6 +23,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -42,41 +42,41 @@ std::string g_blueLedsNode = "blue";
 
 void BatteryLed::TraversalNode()
 {
-    HDF_LOGD("%{public}s: enter", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "enter");
     std::string::size_type idx;
 
     for (auto iter = g_ledsNodeName.begin(); iter != g_ledsNodeName.end(); ++iter) {
         idx = iter->find(g_redLedsNode);
         if (idx == std::string::npos) {
-            HDF_LOGD("%{public}s: not found red leds node", __func__);
+            BATTERY_HILOGD(FEATURE_CHARGING, "not found red leds node");
         } else {
             g_redLedsNode = *iter;
-            HDF_LOGD("%{public}s: red leds node is %{public}s", __func__, iter->c_str());
+            BATTERY_HILOGD(FEATURE_CHARGING, "red leds node is %{public}s", iter->c_str());
         }
 
         idx = iter->find(g_greenLedsNode);
         if (idx == std::string::npos) {
-            HDF_LOGD("%{public}s: not found green leds node", __func__);
+            BATTERY_HILOGD(FEATURE_CHARGING, "not found green leds node");
         } else {
             g_greenLedsNode = *iter;
-            HDF_LOGD("%{public}s: green leds node is %{public}s", __func__, iter->c_str());
+            BATTERY_HILOGD(FEATURE_CHARGING, "green leds node is %{public}s", iter->c_str());
         }
 
         idx = iter->find(g_blueLedsNode);
         if (idx == std::string::npos) {
-            HDF_LOGD("%{public}s: not found blue leds node", __func__);
+            BATTERY_HILOGD(FEATURE_CHARGING, "not found blue leds node");
         } else {
             g_blueLedsNode = *iter;
-            HDF_LOGD("%{public}s: blue leds node is %{public}s", __func__, iter->c_str());
+            BATTERY_HILOGD(FEATURE_CHARGING, "blue leds node is %{public}s", iter->c_str());
         }
     }
 
-    HDF_LOGD("%{public}s: exit", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "exit");
 }
 
 int32_t BatteryLed::InitLedsSysfs()
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "start init leds sysfs");
     DIR* dir = nullptr;
     struct dirent* entry = nullptr;
     int32_t index = 0;
@@ -84,7 +84,7 @@ int32_t BatteryLed::InitLedsSysfs()
 
     dir = opendir(LEDS_BASE_PATH.c_str());
     if (dir == nullptr) {
-        HDF_LOGE("%{public}s: leds base path is not exist", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "leds base path is not exist");
         return HDF_ERR_IO;
     }
 
@@ -99,9 +99,9 @@ int32_t BatteryLed::InitLedsSysfs()
         }
 
         if (entry->d_type == DT_DIR || entry->d_type == DT_LNK) {
-            HDF_LOGD("%{public}s: init leds info of %{public}s", __func__, entry->d_name);
+            BATTERY_HILOGI(FEATURE_CHARGING, "init leds info of %{public}s", entry->d_name);
             if (index >= maxSize) {
-                HDF_LOGE("%{public}s: too many leds types", __func__);
+                BATTERY_HILOGE(FEATURE_CHARGING, "too many leds types");
                 break;
             }
             g_ledsNodeName.emplace_back(entry->d_name);
@@ -110,62 +110,61 @@ int32_t BatteryLed::InitLedsSysfs()
     }
 
     TraversalNode();
-    HDF_LOGD("%{public}s: index is %{public}d", __func__, index);
+    BATTERY_HILOGD(FEATURE_CHARGING, "leds index is %{public}d", index);
     closedir(dir);
 
-    HDF_LOGI("%{public}s exit", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "finish init leds sysfs");
     return HDF_SUCCESS;
 }
 
 void BatteryLed::TurnOffLed()
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "start turn off led");
     WriteLedInfoToSys(0, 0, 0);
 
-    HDF_LOGI("%{public}s exit", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "finish turn off led");
     return;
 }
 
 void BatteryLed::UpdateLedColor(const int32_t& chargestate, const int32_t& capacity)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     if ((chargestate == PowerSupplyProvider::CHARGE_STATE_NONE) ||
         (chargestate == PowerSupplyProvider::CHARGE_STATE_RESERVED)) {
         TurnOffLed();
-        HDF_LOGD("%{public}s: reset led color.", __func__);
+        BATTERY_HILOGD(FEATURE_CHARGING, "not in charging state, turn off led");
         return;
     }
 
     std::unique_ptr<BatteryConfig> batteryConfig = std::make_unique<BatteryConfig>();
     if (batteryConfig == nullptr) {
-        HDF_LOGD("%{public}s: batteryConfig is nullptr", __func__);
+        BATTERY_HILOGW(FEATURE_CHARGING, "make_unique BatteryConfig return nullptr");
         return;
     }
     batteryConfig->Init();
 
     auto ledConf = batteryConfig->GetLedConf();
     for (auto it = ledConf.begin(); it != ledConf.end(); ++it) {
-        HDF_LOGD("%{public}s: ledConf.begin()=%{public}d, ledConf.end()=%{public}d", __func__, \
-            it->capacityBegin, it->capacityEnd);
+        BATTERY_HILOGD(FEATURE_CHARGING, "capacity=%{public}d, ledConf.begin()=%{public}d, ledConf.end()=%{public}d",
+            capacity, it->capacityBegin, it->capacityEnd);
         if ((capacity >= it->capacityBegin) && (capacity < it->capacityEnd)) {
             switch (it->color) {
                 case (LED_COLOR_GREEN): {
-                    HDF_LOGD("%{public}s: led color display green.", __func__);
+                    BATTERY_HILOGD(FEATURE_CHARGING, "led color display green");
                     WriteLedInfoToSys(0, it->brightness, 0);
                     break;
                 }
                 case (LED_COLOR_RED): {
-                    HDF_LOGD("%{public}s: led color display red.", __func__);
+                    BATTERY_HILOGD(FEATURE_CHARGING, "led color display red");
                     WriteLedInfoToSys(it->brightness, 0, 0);
                     break;
                 }
                 case (LED_COLOR_YELLOW): {
-                    HDF_LOGD("%{public}s: led color display yellow.", __func__);
+                    BATTERY_HILOGD(FEATURE_CHARGING, "led color display yellow");
                     WriteLedInfoToSys(it->brightness, it->brightness, 0);
                     break;
                 }
                 default: {
-                    HDF_LOGD("%{public}s: led color display error.", __func__);
+                    BATTERY_HILOGD(FEATURE_CHARGING, "led color display error.");
                     break;
                 }
             }
@@ -173,79 +172,78 @@ void BatteryLed::UpdateLedColor(const int32_t& chargestate, const int32_t& capac
         }
 
         if (capacity == CAPACITY_FULL) {
-            HDF_LOGD("%{public}s: led color display green.", __func__);
+            BATTERY_HILOGD(FEATURE_CHARGING, "led color display green");
             WriteLedInfoToSys(0, it->brightness, 0);
             break;
         }
     }
 
-    HDF_LOGI("%{public}s exit", __func__);
     return;
 }
 
 void BatteryLed::WriteLedInfoToSys(const int redbrightness, const int greenbrightness, const int bluebrightness)
 {
-    HDF_LOGI("%{public}s enter", __func__);
     FILE* file = nullptr;
     std::string redLedPath = LEDS_BASE_PATH + "/" + g_redLedsNode + "/" + "brightness";
     std::string greenLedPath = LEDS_BASE_PATH + "/" + g_greenLedsNode + "/" + "brightness";
     std::string blueLedPath = LEDS_BASE_PATH + "/" + g_blueLedsNode + "/" + "brightness";
-    HDF_LOGD("%{public}s: redLedPath is %{public}s, greenLedPath is %{public}s, blueLedPath is %{public}s", __func__,
+    BATTERY_HILOGD(FEATURE_CHARGING, "redLedPath is %{public}s, greenLedPath is %{public}s, blueLedPath is %{public}s",
         redLedPath.c_str(), greenLedPath.c_str(), blueLedPath.c_str());
     InitMockLedFile(redLedPath, greenLedPath, blueLedPath);
 
     file = fopen(redLedPath.c_str(), "w");
     if (file == nullptr) {
-        HDF_LOGD("%{public}s: red led file open failed. redLedPath is %{public}s", __func__, redLedPath.c_str());
+        BATTERY_HILOGW(FEATURE_CHARGING, "red led file open failed");
         return;
     }
     int ret = fprintf(file, "%d\n", redbrightness);
     if (ret < 0) {
-        HDF_LOGD("%{public}s: red led file fprintf failed.", __func__);
+        BATTERY_HILOGW(FEATURE_CHARGING, "red led file fprintf failed");
     }
     ret = fclose(file);
     if (ret < 0) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "red led file close failed");
         return;
     }
 
     file = fopen(greenLedPath.c_str(), "w");
     if (file == nullptr) {
-        HDF_LOGD("%{public}s: green led file open failed. greenLedPath is %{public}s", __func__, greenLedPath.c_str());
+        BATTERY_HILOGW(FEATURE_CHARGING, "green led file open failed");
         return;
     }
     ret = fprintf(file, "%d\n", greenbrightness);
     if (ret < 0) {
-        HDF_LOGD("%{public}s: green led file fprintf failed.", __func__);
+        BATTERY_HILOGW(FEATURE_CHARGING, "green led file fprintf failed.");
     }
     ret = fclose(file);
     if (ret < 0) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "green led file close failed");
         return;
     }
 
     file = fopen(blueLedPath.c_str(), "w");
     if (file == nullptr) {
-        HDF_LOGD("%{public}s: blue led file open failed.", __func__);
+        BATTERY_HILOGW(FEATURE_CHARGING, "blue led file open failed");
         return;
     }
     ret = fprintf(file, "%d\n", bluebrightness);
     if (ret < 0) {
-        HDF_LOGD("%{public}s: blue led file fprintf failed. blueLedPath is %{public}s", __func__, blueLedPath.c_str());
+        BATTERY_HILOGW(FEATURE_CHARGING, "blue led file fprintf failed");
     }
     ret = fclose(file);
     if (ret < 0) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "blue led file close failed");
         return;
     }
-
-    HDF_LOGI("%{public}s exit", __func__);
     return;
 }
 
 std::string BatteryLed::CreateFile(std::string path, std::string content) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
-        HDF_LOGD("%{public}s: Cannot create file %{public}s", __func__, path.c_str());
+        BATTERY_HILOGD(FEATURE_CHARGING, "Cannot create file %{public}s", path.c_str());
         return nullptr;
     }
     stream << content.c_str() << std::endl;
@@ -255,7 +253,7 @@ std::string BatteryLed::CreateFile(std::string path, std::string content) const
 
 void BatteryLed::InitMockLedFile(std::string& redPath, std::string& greenPath, std::string& bluePath) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
     std::string mockLedsPath = "/data/local/tmp/leds";
     std::string sysLedsPath = "/sys/class/leds";
     std::string redLedPath = "/data/local/tmp/leds/sc27xx:red";
@@ -263,7 +261,7 @@ void BatteryLed::InitMockLedFile(std::string& redPath, std::string& greenPath, s
     std::string blueLedPath = "/data/local/tmp/leds/sc27xx:blue";
 
     if (access(sysLedsPath.c_str(), F_OK) == 0) {
-        HDF_LOGD("%{public}s: system leds path exist.", __func__);
+        BATTERY_HILOGD(FEATURE_CHARGING, "system leds path exist.");
         return;
     } else {
         redPath = "/data/local/tmp/leds/sc27xx:red/brightness";
@@ -274,7 +272,7 @@ void BatteryLed::InitMockLedFile(std::string& redPath, std::string& greenPath, s
     if (access(mockLedsPath.c_str(), 0) == -1) {
         int ret = mkdir("/data/local/tmp/leds", S_IRWXU);
         if (ret == -1) {
-            HDF_LOGD("%{public}s: create leds path fail.", __func__);
+            BATTERY_HILOGD(FEATURE_CHARGING, "create leds path fail.");
             return;
         }
         sleep(MKDIR_WAIT_TIME);
@@ -284,7 +282,7 @@ void BatteryLed::InitMockLedFile(std::string& redPath, std::string& greenPath, s
     InitGreenLedPath(greenLedPath);
     InitBlueLedPath(blueLedPath);
 
-    HDF_LOGE("%{public}s: create mock path for Hi3516DV300", __func__);
+    BATTERY_HILOGE(FEATURE_CHARGING, "create mock path for Hi3516DV300");
     CreateFile("/data/local/tmp/leds/sc27xx:red/brightness", "0");
     CreateFile("/data/local/tmp/leds/sc27xx:green/brightness", "0");
     CreateFile("/data/local/tmp/leds/sc27xx:blue/brightness", "0");
@@ -292,47 +290,47 @@ void BatteryLed::InitMockLedFile(std::string& redPath, std::string& greenPath, s
 
 void BatteryLed::InitRedLedPath(std::string& redLedPath) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
     if (access(redLedPath.c_str(), 0) == -1) {
         int ret = mkdir("/data/local/tmp/leds/sc27xx:red", S_IRWXU);
         if (ret == -1) {
-            HDF_LOGD("%{public}s: create red led path fail.", __func__);
+            BATTERY_HILOGD(FEATURE_CHARGING, "create red led path fail.");
             return;
         }
         sleep(MKDIR_WAIT_TIME);
     }
 
-    HDF_LOGI("%{public}s exit", __func__);
+    BATTERY_HILOGI(FEATURE_CHARGING, "exit");
 }
 
 void BatteryLed::InitGreenLedPath(std::string& greenLedPath) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
     if (access(greenLedPath.c_str(), 0) == -1) {
         int ret = mkdir("/data/local/tmp/leds/sc27xx:green", S_IRWXU);
         if (ret == -1) {
-            HDF_LOGD("%{public}s: create green led path fail.", __func__);
+            BATTERY_HILOGD(FEATURE_CHARGING, "create green led path fail.");
             return;
         }
         sleep(MKDIR_WAIT_TIME);
     }
 
-    HDF_LOGI("%{public}s exit", __func__);
+    BATTERY_HILOGI(FEATURE_CHARGING, "exit");
 }
 
 void BatteryLed::InitBlueLedPath(std::string& blueLedPath) const
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
     if (access(blueLedPath.c_str(), 0) == -1) {
         int ret = mkdir("/data/local/tmp/leds/sc27xx:blue", S_IRWXU);
         if (ret == -1) {
-            HDF_LOGD("%{public}s: create blue led path fail.", __func__);
+            BATTERY_HILOGD(FEATURE_CHARGING, "create blue led path fail.");
             return;
         }
         sleep(MKDIR_WAIT_TIME);
     }
 
-    HDF_LOGI("%{public}s exit", __func__);
+    BATTERY_HILOGI(FEATURE_CHARGING, "exit");
 }
 }  // namespace V1_0
 }  // namespace Battery

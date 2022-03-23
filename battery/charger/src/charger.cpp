@@ -15,20 +15,21 @@
 
 #include "charger_thread.h"
 
-#include "hdf_log.h"
 #include "hdf_base.h"
+#include "battery_log.h"
 
 int main(int argc, char** argv)
 {
-    HDF_LOGI("%{public}s enter", __func__);
+    using namespace OHOS::HDI::Battery;
     using namespace OHOS::HDI::Battery::V1_0;
+    BATTERY_HILOGD(FEATURE_CHARGING, "starting battery charger");
     std::unique_ptr<ChargerThread> chargerThread = std::make_unique<ChargerThread>();
     if (chargerThread == nullptr) {
-        HDF_LOGE("%{public}s: instantiate loop error", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "make_unique ChargerThread return nullptr");
         return HDF_ERR_MALLOC_FAIL;
     }
     chargerThread->StartThread(nullptr);
 
-    HDF_LOGI("%{public}s exit", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "battery charger thread started");
     return 0;
 }

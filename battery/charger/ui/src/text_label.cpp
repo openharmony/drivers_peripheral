@@ -18,10 +18,9 @@
 #include <iostream>
 #include <string>
 #include <linux/input.h>
-#include "log.h"
 #include "png.h"
 #include "securec.h"
-#include "utils/hdf_log.h"
+#include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -66,7 +65,7 @@ TextLabel::TextLabel(int mStartX, int mStartY, int w, int h, Frame* mparent)
     textColor_.a = maxLevel;
 
     if (memset_s(textBuf_, MAX_TEXT_SIZE + 1, 0, MAX_TEXT_SIZE) != 0) {
-        HDF_LOGE("%{public}s, memset_s failed!", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "memset_s failed!");
         return;
     }
     InitFont();
@@ -74,7 +73,6 @@ TextLabel::TextLabel(int mStartX, int mStartY, int w, int h, Frame* mparent)
 
 void TextLabel::SetFont(FontType fType)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     fontType_ = fType;
     InitFont();
     OnDraw();
@@ -82,7 +80,6 @@ void TextLabel::SetFont(FontType fType)
 
 static void PngInitSet(png_structp fontPngPtr, FILE* fp, int size, png_infop fontInfoPtr)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     png_init_io(fontPngPtr, fp);
     png_set_sig_bytes(fontPngPtr, size);
     png_read_info(fontPngPtr, fontInfoPtr);
@@ -91,9 +88,8 @@ static void PngInitSet(png_structp fontPngPtr, FILE* fp, int size, png_infop fon
 
 static void PNGReadRow(png_uint_32 fontWidth, png_uint_32 fontHeight, png_structp fontPngPtr, char* fontBuf)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     if ((fontWidth > MAX_FONT_BUFFER_SIZE_HW) || (fontHeight > MAX_FONT_BUFFER_SIZE_HW)) {
-        HDF_LOGE("%{public}s, font file size is too big!", __func__);
+        BATTERY_HILOGE(FEATURE_CHARGING, "font file size is too big!");
         return;
     }
     for (unsigned int y = 0; y < fontHeight; y++) {
@@ -105,7 +101,6 @@ static void PNGReadRow(png_uint_32 fontWidth, png_uint_32 fontHeight, png_struct
 
 static void CheckInitFont(png_structp fontPngPtr, FILE **fp, png_infop fontInfoPtr)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     png_destroy_read_struct(&fontPngPtr, &fontInfoPtr, 0);
     if (*fp != nullptr) {
         fclose(*fp);
@@ -115,7 +110,7 @@ static void CheckInitFont(png_structp fontPngPtr, FILE **fp, png_infop fontInfoP
 
 void TextLabel::InitFont()
 {
-    HDF_LOGD("%{public}s enter", __func__);
+    BATTERY_HILOGD(FEATURE_CHARGING, "start init font");
     png_infop fontInfoPtr = nullptr;
     png_uint_32 fontWidth = 0;
     png_uint_32 fontHeight = 0;
@@ -134,19 +129,21 @@ void TextLabel::InitFont()
         case FontType::DEFAULT_FONT:
             if (snprintf_s(resPath, sizeof(resPath), sizeof(resPath) - 1,
                 "/system/etc/resources/%s.png", DEFAULT_FONT_NAME.c_str()) == -1) {
+                BATTERY_HILOGW(FEATURE_CHARGING, "snprintf_s font failed.");
                 return;
             }
             break;
         default:
             if (snprintf_s(resPath, sizeof(resPath), sizeof(resPath) - 1,
                 "/system/etc/resources/%s.png", DEFAULT_FONT_NAME.c_str()) == -1) {
+                BATTERY_HILOGW(FEATURE_CHARGING, "snprintf_s font failed.");
                 return;
             }
             break;
     }
     FILE* fp = fopen(resPath, "rb");
     if (fp == nullptr) {
-        HDF_LOGD("%{public}s: open font failed.", __func__);
+        BATTERY_HILOGW(FEATURE_CHARGING, "open font failed.");
         return;
     }
 
@@ -154,18 +151,18 @@ void TextLabel::InitFont()
     uint8_t header[headerNumber];
     size_t bytesRead = fread(header, 1, sizeof(header), fp);
     if (!(bytesRead == sizeof(header))) {
-        HDF_LOGE("%{public}s, read header failed!", __func__);
+        BATTERY_HILOGW(FEATURE_CHARGING, "read header failed!");
         fclose(fp);
         return;
     }
     if (png_sig_cmp(header, 0, sizeof(header))) {
-        HDF_LOGE("%{public}s, cmp header failed!", __func__);
+        BATTERY_HILOGW(FEATURE_CHARGING, "cmp header failed!");
         fclose(fp);
         return;
     }
     fontPngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
     if (!fontPngPtr) {
-        HDF_LOGE("%{public}s, creat font ptr_ failed!", __func__);
+        BATTERY_HILOGW(FEATURE_CHARGING, "creat font ptr failed!");
         fclose(fp);
         return;
     }
@@ -192,7 +189,6 @@ void TextLabel::InitFont()
 
 FILE* TextLabel::InitFontType()
 {
-    HDF_LOGD("%{public}s enter", __func__);
     char resPath[MAX_TEXT_SIZE + 1];
     uint32_t offset = 2;
 
@@ -203,19 +199,21 @@ FILE* TextLabel::InitFontType()
         case FontType::DEFAULT_FONT:
             if (snprintf_s(resPath, sizeof(resPath), sizeof(resPath) - 1,
                 "/system/etc/resources/%s.png", DEFAULT_FONT_NAME.c_str()) == -1) {
+                BATTERY_HILOGW(FEATURE_CHARGING, "snprintf_s font fail.");
                 return nullptr;
             }
             break;
         default:
             if (snprintf_s(resPath, sizeof(resPath), sizeof(resPath) - 1,
                 "/system/etc/resources/%s.png", DEFAULT_FONT_NAME.c_str()) == -1) {
+                BATTERY_HILOGW(FEATURE_CHARGING, "snprintf_s font fail.");
                 return nullptr;
             }
             break;
     }
     FILE* fp = fopen(resPath, "rb");
     if (fp == nullptr) {
-        HDF_LOGD("%{public}s: open font failed.", __func__);
+        BATTERY_HILOGD(FEATURE_CHARGING, "open font failed.");
         return nullptr;
     }
     return fp;
@@ -223,14 +221,13 @@ FILE* TextLabel::InitFontType()
 
 void TextLabel::SetText(const char* str)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     if (memset_s(textBuf_, MAX_TEXT_SIZE + 1, 0, MAX_TEXT_SIZE) != EOK) {
-        HDF_LOGD("%{public}s: memset_s fail.", __func__);
+        BATTERY_HILOGD(FEATURE_CHARGING, "memset_s fail.");
         return;
     }
     OnDraw();
     if (memcpy_s(textBuf_, MAX_TEXT_SIZE + 1, str, strlen(const_cast<char*>(str))) != EOK) {
-        HDF_LOGD("%{public}s: mmecpy_s fail.", __func__);
+        BATTERY_HILOGD(FEATURE_CHARGING, "memset_s fail.");
         return;
     }
     OnDraw();
@@ -238,7 +235,6 @@ void TextLabel::SetText(const char* str)
 
 void TextLabel::OnDraw()
 {
-    HDF_LOGD("%{public}s enter", __func__);
     std::unique_lock<std::mutex> locker(mutex_);
     SyncBuffer();
     if (IsSelected()) {
@@ -253,7 +249,6 @@ void TextLabel::OnDraw()
 
 void TextLabel::SetOutLineBold(bool topBold, bool bottomBold)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     boldTopLine_ = topBold;
     boldBottomLine_ = bottomBold;
     OnDraw();
@@ -261,7 +256,6 @@ void TextLabel::SetOutLineBold(bool topBold, bool bottomBold)
 
 void TextLabel::DrawOutline()
 {
-    HDF_LOGD("%{public}s enter", __func__);
     void* tmpBuf = GetBuffer();
     auto* pixelBuf = static_cast<BRGA888Pixel*>(tmpBuf);
     for (int i = 0; i < viewWidth_; i++) {
@@ -293,7 +287,6 @@ void TextLabel::DrawOutline()
 
 void TextLabel::SetTextColor(BRGA888Pixel color)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     textColor_.r = color.r;
     textColor_.g = color.g;
     textColor_.b = color.b;
@@ -302,14 +295,12 @@ void TextLabel::SetTextColor(BRGA888Pixel color)
 
 void TextLabel::SetTextAlignmentMethod(AlignmentMethod methodH, AlignmentMethod methodV)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     fontAligMethodLevel_ = methodH;
     fontAligMethodUpright_ = methodV;
 }
 
 void TextLabel::DrawText()
 {
-    HDF_LOGD("%{public}s enter", __func__);
     void* tmpBuf = GetBuffer();
     uint32_t textSx = 0;
     uint32_t textSy = 0;
@@ -352,7 +343,6 @@ void TextLabel::DrawText()
 
 void TextLabel::DrawTextLoop(unsigned char ch, char* tmpBuf, int textSx, int textSy)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     auto* srcP = reinterpret_cast<uint8_t*>(static_cast<char*>(fontBuf_) + ((ch - ' ') * fontWidth_));
     auto* dstP = reinterpret_cast<BRGA888Pixel*>(tmpBuf + (textSy * viewWidth_ + textSx) * sizeof(BRGA888Pixel));
     for (unsigned int j = 0; j < fontHeight_; j++) {
@@ -372,7 +362,6 @@ void TextLabel::DrawTextLoop(unsigned char ch, char* tmpBuf, int textSx, int tex
 
 void TextLabel::DrawFocus()
 {
-    HDF_LOGD("%{public}s enter", __func__);
     BRGA888Pixel pixBuf[viewWidth_];
     for (int a = 0; a < viewWidth_; a++) {
         pixBuf[a].r = actionBgColor_.r;
@@ -385,7 +374,7 @@ void TextLabel::DrawFocus()
         if (memcpy_s(static_cast<char*>(static_cast<char*>(viewBgBuf) + i * viewWidth_ * sizeof(BRGA888Pixel)),
             viewWidth_ * sizeof(BRGA888Pixel) + 1, reinterpret_cast<char*>(pixBuf),
             viewWidth_ * sizeof(BRGA888Pixel)) != EOK) {
-            HDF_LOGD("%{public}s: memcpy_s failed.", __func__);
+            BATTERY_HILOGD(FEATURE_CHARGING, "memcpy_s failed.");
             return;
         }
     }

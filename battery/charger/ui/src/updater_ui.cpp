@@ -21,10 +21,9 @@
 #include <termio.h>
 #endif
 
-#include "log.h"
 #include "securec.h"
 #include "surface_dev.h"
-#include "utils/hdf_log.h"
+#include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -37,7 +36,6 @@ constexpr int LABEL2_OFFSET = 1;
 void TextLabelInit(TextLabel* t, const std::string& text, struct Bold bold,
     struct FocusInfo focus, View::BRGA888Pixel color)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     if (t != nullptr) {
         t->SetText(text.c_str());
         t->SetOutLineBold(bold.top, bold.bottom);
@@ -49,12 +47,11 @@ void TextLabelInit(TextLabel* t, const std::string& text, struct Bold bold,
 
 void MenuItemInit(int height, int width, View::BRGA888Pixel bgColor, Frame* gHosFrame)
 {
-    HDF_LOGD("%{public}s enter", __func__);
     TextLabel* gTextLabel0 = nullptr;
     TextLabel* gTextLabel2 = nullptr;
 
     if (gHosFrame == nullptr) {
-        HDF_LOGD("%{public}s enter, Frame is null.", __func__);
+        BATTERY_HILOGD(FEATURE_CHARGING, "Frame is nullptr.");
         return;
     }
     gTextLabel0 = new TextLabel(0, height * LABEL0_OFFSET / LABEL_HEIGHT, width, height /
@@ -63,7 +60,7 @@ void MenuItemInit(int height, int width, View::BRGA888Pixel bgColor, Frame* gHos
     struct Bold bold {true, false};
     TextLabelInit(gTextLabel0, "Reboot to normal system", bold, info, bgColor);
     if (!gTextLabel0) {
-        HDF_LOGD("%{public}s enter, gTextLabel0 is null.", __func__);
+        BATTERY_HILOGD(FEATURE_CHARGING, "gTextLabel0 is nullptr.");
         return;
     }
 
@@ -73,7 +70,7 @@ void MenuItemInit(int height, int width, View::BRGA888Pixel bgColor, Frame* gHos
     bold = {false, false};
     TextLabelInit(gTextLabel2, "Userdata reset", bold, info, bgColor);
     if (!gTextLabel2) {
-        HDF_LOGD("%{public}s enter, gTextLabel2 is null.", __func__);
+        BATTERY_HILOGD(FEATURE_CHARGING, "gTextLabel2 is nullptr.");
         return;
     }
 }
