@@ -143,7 +143,7 @@ static int32_t OsControlMsg(struct UsbAdapterUrb *urb)
     struct UsbAdapterDeviceRequest req;
 
     err = memcpy_s(&req, sizeof(struct UsbAdapterDeviceRequest), buffer, sizeof(req));
-    if (err != HDF_SUCCESS) {
+    if (err != EOK) {
         DPRINTFN(0, "%s:%d err=%d\n", __func__, __LINE__, err);
         err = HDF_ERR_IO;
         return err;
@@ -303,12 +303,12 @@ static int32_t OsReadDescriptors(struct UsbDevice *dev)
         }
 
         count = UGETW(osDev->adapterDevice->cdesc->wTotalLength);
-        if ((count < 0) || (count > DESC_READ_LEN)) {
+        if (count > DESC_READ_LEN) {
             ret = HDF_ERR_IO;
             return ret;
         }
         ret = memcpy_s(ptr, DESC_READ_LEN, osDev->adapterDevice->cdesc, count);
-        if (ret != HDF_SUCCESS) {
+        if (ret != EOK) {
             DPRINTFN(0, "%s:%d ret=%d\n", __func__, __LINE__, ret);
             ret = HDF_ERR_IO;
             return ret;
@@ -1218,7 +1218,7 @@ static int32_t AdapterGetConfigDescriptor(const struct UsbDevice *dev,
         return HDF_ERR_INVALID_PARAM;
     }
     count = UGETW(adapterDevice->cdesc->wTotalLength);
-    if ((count < 0) || (count > len)) {
+    if (count > len) {
         DPRINTFN(0, "count length is error");
         return HDF_ERR_IO;
     }
