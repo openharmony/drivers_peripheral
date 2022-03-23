@@ -28,12 +28,17 @@ if (defined(ohos_lite)) {
   }
 } else {
   group("hdi_gralloc_client") {
-    deps = [
-      ":libhdi_display_gralloc_client",
-      ":libhdi_display_gralloc_proxy",
-      ":libhdi_mapper_adapter",
-    ]
-    public_configs = [ ":gralloc_client_public_config" ]
+    if (use_musl) {
+      deps = [
+        ":libhdi_display_gralloc_client",
+        ":libhdi_display_gralloc_proxy",
+        ":libhdi_mapper_adapter",
+      ]
+      public_configs = [ ":gralloc_client_public_config" ]
+    } else {
+      deps = [ "//drivers/peripheral/adapter/gralloc/src/impl:libgralloc_impl" ]
+      public_configs = [ ":gralloc_client_public_config" ]
+    }
   }
 
   ohos_shared_library("libhdi_display_gralloc_client") {
