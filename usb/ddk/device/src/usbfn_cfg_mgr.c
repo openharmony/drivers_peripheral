@@ -1031,12 +1031,10 @@ static int32_t IsDevDescProp(const char *name)
     if ((strcmp(USBDEV_SUBCLASS, name) == 0) || (strcmp(DESC_TYPE, name) == 0) ||
         (strcmp(USBDEV_CLASS, name) == 0) || (strcmp(USBDEV_PROTOCOL, name) == 0) ||
         (strcmp(USBDEV_MAXSIZE, name) == 0) || (strcmp(USBDEV_MANUFACTURER, name) == 0) ||
-        (strcmp(USBDEV_MANUFACTURER, name) == 0) || (strcmp(USBDEV_PRODUCT, name) == 0) ||
-        (strcmp(USBDEV_SERIALNUM, name) == 0) || (strcmp(USBDEV_SERIALNUM, name) == 0) ||
+        (strcmp(USBDEV_PRODUCT, name) == 0) || (strcmp(USBDEV_SERIALNUM, name) == 0) ||
         (strcmp(USBDEV_NUMCFG, name) == 0) || (strcmp(USBDEV_BCD, name) == 0) ||
-        (strcmp(USBDEV_BCD, name) == 0) || (strcmp(USBDEV_BCD, name) == 0) ||
-        (strcmp(USBDEV_VENDOR, name) == 0) || (strcmp(USBDEV_VENDOR, name) == 0) ||
-        (strcmp(USBDEV_IDPRODUCT, name) == 0) || (strcmp(USBDEV_BCDDEVICE, name) == 0)) {
+        (strcmp(USBDEV_VENDOR, name) == 0) || (strcmp(USBDEV_IDPRODUCT, name) == 0) ||
+        (strcmp(USBDEV_BCDDEVICE, name) == 0)) {
         return 1;
     }
     return 0;

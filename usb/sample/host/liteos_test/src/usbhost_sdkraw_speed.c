@@ -611,28 +611,24 @@ static int32_t UsbSpeedDdkInit(const struct UsbSession *session)
     ret = UsbRawInit((struct UsbSession **)&session);
     if (ret) {
         HDF_LOGE("%s: UsbRawInit failed\n", __func__);
-        return HDF_ERR_IO;
-        goto END;
+        return HDF_FAILURE;
     }
 
     devHandle = UsbRawOpenDevice(session, g_acm->busNum, g_acm->devAddr);
     if (devHandle == NULL) {
         HDF_LOGE("%s: UsbRawOpenDevice failed\n", __func__);
-        ret =  HDF_FAILURE;
-        goto END;
+        return HDF_FAILURE;
     }
     g_acm->devHandle = devHandle;
     ret = UsbGetConfigDescriptor(devHandle, &g_acm->config);
     if (ret) {
         HDF_LOGE("%s: UsbGetConfigDescriptor failed\n", __func__);
-        ret =  HDF_FAILURE;
-        goto END;
+        return HDF_FAILURE;
     }
     ret = UsbParseConfigDescriptor(g_acm, g_acm->config);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbParseConfigDescriptor failed\n", __func__);
-        ret = HDF_FAILURE;
-        goto END;
+        return HDF_FAILURE;
     }
     g_acm->dataSize = TEST_LENGTH;
     g_acm->dataEp = (g_writeOrRead == TEST_WRITE) ? g_acm->dataOutEp : g_acm->dataInEp;
@@ -640,23 +636,22 @@ static int32_t UsbSpeedDdkInit(const struct UsbSession *session)
     ret = AcmDataBufAlloc(g_acm);
     if (ret < 0) {
         HDF_LOGE("%s: AcmDataBufAlloc failed\n", __func__);
-        ret = HDF_FAILURE;
-        goto END;
+        AcmDataBufFree(g_acm);
+        return HDF_FAILURE;
     }
     ret = UsbAllocDataRequests(g_acm);
     if (ret < 0) {
         HDF_LOGE("%s: UsbAllocDataRequests failed\n", __func__);
-        ret = HDF_FAILURE;
-        goto END;
+        UsbFreeDataRequests(g_acm);
+        return HDF_FAILURE;
     }
 
     ret = UsbStartIo(g_acm);
     if (ret) {
         HDF_LOGE("%s: UsbAllocReadRequests failed\n", __func__);
-        goto END;
+        return HDF_FAILURE;
     }
 
-END:
     return ret;
 }
 

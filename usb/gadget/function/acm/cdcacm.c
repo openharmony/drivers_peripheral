@@ -1269,7 +1269,9 @@ static int32_t AcmSendNotifyRequest(struct UsbAcmDevice *acm, uint8_t type,
     notify->wValue = CpuToLe16(value);
     notify->wIndex = CpuToLe16(acm->ctrlIface.fn->info.index);
     notify->wLength = CpuToLe16(length);
-    if (memcpy_s((void *)(notify + 1), length, data, length)  != EOK) {
+    ret = memcpy_s((void *)(notify + 1), length, data, length);
+    if (ret != EOK) {
+        HDF_LOGE("%s: memcpy_s failed", __func__);
         return HDF_FAILURE;
     }
 
