@@ -13,13 +13,7 @@
 
 if (defined(ohos_lite)) {
   group("hdi_display") {
-    if (device_company == "hisilicon") {
-      public_deps =
-          [ "//device/soc/${device_company}/common/hal/display:hdi_display" ]
-    } else {
-      public_deps =
-          [ "//device/${device_company}/hardware/display:hdi_display" ]
-    }
+    public_deps = [ "$ohos_board_adapter_dir/display:hdi_display" ]
   }
   group("hdi_display_device") {
     deps = []
