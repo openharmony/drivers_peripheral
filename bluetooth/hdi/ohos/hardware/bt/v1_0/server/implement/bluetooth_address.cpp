@@ -60,7 +60,7 @@ std::shared_ptr<BluetoothAddress> BluetoothAddress::GetDeviceAddress(const std::
 {
     int addr_fd = open(path.c_str(), O_RDONLY);
     if (addr_fd < 0) {
-        HDF_LOGE("open %{public}s failed err:%{public}s.", path.c_str(), strerror(errno));
+        HDF_LOGI("open %{public}s failed err:%{public}s.", path.c_str(), strerror(errno));
         char addressStr[ADDRESS_STR_LEN + 1] = {"00:11:22:33:44:55"};
         auto ptr = std::make_shared<BluetoothAddress>();
         if (ptr->ParseAddressFromString(addressStr) != ADDRESS_SIZE) {
@@ -119,7 +119,7 @@ void BluetoothAddress::ReadAddress(std::string &address) const
     int offset = 0;
     for (int ii = 0; ii < ADDRESS_SIZE; ii++) {
         int ret = snprintf_s(
-            &address[offset], (ADDRESS_STR_LEN + 1) - offset, (ADDRESS_STR_LEN + 1) - offset, "%02x:", address_[ii]);
+            &address[offset], (ADDRESS_STR_LEN + 1) - offset, ADDRESS_STR_LEN - offset, "%02x:", address_[ii]);
         if (ret < 0) {
             break;
         }
