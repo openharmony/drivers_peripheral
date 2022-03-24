@@ -15,7 +15,7 @@
 
 #include "charger_thread.h"
 
-#include "hdf_base.h"
+#include "errors.h"
 #include "battery_log.h"
 
 int main(int argc, char** argv)
@@ -26,10 +26,10 @@ int main(int argc, char** argv)
     std::unique_ptr<ChargerThread> chargerThread = std::make_unique<ChargerThread>();
     if (chargerThread == nullptr) {
         BATTERY_HILOGE(FEATURE_CHARGING, "make_unique ChargerThread return nullptr");
-        return HDF_ERR_MALLOC_FAIL;
+        return ERR_NO_MEMORY;
     }
     chargerThread->StartThread(nullptr);
 
     BATTERY_HILOGD(FEATURE_CHARGING, "battery charger thread started");
-    return 0;
+    return ERR_OK;
 }

@@ -15,7 +15,6 @@
 
 #include "battery_led.h"
 
-#include <hdf_base.h>
 #include <fstream>
 #include <memory>
 #include <cstring>
@@ -23,6 +22,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include "errors.h"
 #include "battery_log.h"
 
 namespace OHOS {
@@ -85,7 +85,7 @@ int32_t BatteryLed::InitLedsSysfs()
     dir = opendir(LEDS_BASE_PATH.c_str());
     if (dir == nullptr) {
         BATTERY_HILOGE(FEATURE_CHARGING, "leds base path is not exist");
-        return HDF_ERR_IO;
+        return ERR_INVALID_VALUE;
     }
 
     while (true) {
@@ -114,7 +114,7 @@ int32_t BatteryLed::InitLedsSysfs()
     closedir(dir);
 
     BATTERY_HILOGD(FEATURE_CHARGING, "finish init leds sysfs");
-    return HDF_SUCCESS;
+    return ERR_OK;
 }
 
 void BatteryLed::TurnOffLed()

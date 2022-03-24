@@ -19,11 +19,12 @@
 #include <fstream>
 #include <vector>
 #include <unistd.h>
-#include <hdf_base.h>
+#include <cstring>
 #include <dirent.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include "errors.h"
 #include "battery_log.h"
 
 namespace OHOS {
@@ -70,7 +71,7 @@ int32_t BatteryBacklight::InitBacklightSysfs()
     dir = opendir(BACKLIGHT_BASE_PATH.c_str());
     if (dir == nullptr) {
         BATTERY_HILOGE(FEATURE_CHARGING, "backlight base path is not exist");
-        return HDF_ERR_IO;
+        return ERR_INVALID_VALUE;
     }
 
     while (true) {
@@ -98,7 +99,7 @@ int32_t BatteryBacklight::InitBacklightSysfs()
     BATTERY_HILOGD(FEATURE_CHARGING, "backlight index is %{public}d", index);
     closedir(dir);
     BATTERY_HILOGD(FEATURE_CHARGING, "finish init backlight sysfs");
-    return HDF_SUCCESS;
+    return ERR_OK;
 }
 
 void BatteryBacklight::TurnOnScreen()
