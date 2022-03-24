@@ -80,6 +80,10 @@ int32_t acm_write(int32_t argc, const char *argv[])
             return HDF_FAILURE;
         }
         fp = fopen("/data/acm_write_xts", "a+");
+        if (!fp) {
+            HDF_LOGE("%s: fopen failed", __func__);
+            return HDF_FAILURE;
+        }
         (void)fwrite(str, strlen(str), 1, fp);
         (void)fclose(fp);
         TestWrite((char *)argv[1]);
