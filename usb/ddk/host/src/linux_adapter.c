@@ -286,7 +286,7 @@ static int32_t OsInitDevice(struct UsbDevice *dev, uint8_t busNum, uint8_t devAd
     }
     ret = memcpy_s(&dev->deviceDescriptor, sizeof(struct UsbDeviceDescriptor),
         dev->descriptors, USB_DDK_DT_DEVICE_SIZE);
-    if (ret != HDF_SUCCESS) {
+    if (ret != EOK) {
         HDF_LOGE("%s:%d ret=%d", __func__, __LINE__, ret);
         ret = HDF_ERR_IO;
     }
@@ -952,6 +952,7 @@ static int32_t AdapterGetConfigDescriptor(const struct UsbDevice *dev,
 {
     struct UsbDeviceConfigDescriptor *config = NULL;
     uint8_t i;
+    int32_t ret;
 
     if ((dev == NULL) || (buffer == NULL) ||
         ((dev != NULL) && (configIndex > dev->deviceDescriptor.bNumConfigurations))) {
@@ -972,7 +973,8 @@ static int32_t AdapterGetConfigDescriptor(const struct UsbDevice *dev,
     }
 
     len = MIN(len, config->actualLen);
-    if (memcpy_s(buffer, len, config->desc, len) != EOK) {
+    ret = memcpy_s(buffer, len, config->desc, len);
+    if (ret != EOK) {
         HDF_LOGE("%s:%d memcpy_s fail", __func__, __LINE__);
         return HDF_ERR_IO;
     }
