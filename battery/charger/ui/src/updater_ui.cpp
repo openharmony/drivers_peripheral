@@ -29,9 +29,9 @@ namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_0 {
-constexpr int LABEL_HEIGHT = 15;
-constexpr int LABEL0_OFFSET = 0;
-constexpr int LABEL2_OFFSET = 1;
+constexpr int32_t LABEL_HEIGHT = 15;
+constexpr int32_t LABEL0_OFFSET = 0;
+constexpr int32_t LABEL2_OFFSET = 1;
 
 void TextLabelInit(TextLabel* t, const std::string& text, struct Bold bold,
     struct FocusInfo focus, View::BRGA888Pixel color)
@@ -45,7 +45,7 @@ void TextLabelInit(TextLabel* t, const std::string& text, struct Bold bold,
     }
 }
 
-void MenuItemInit(int height, int width, View::BRGA888Pixel bgColor, Frame* gHosFrame)
+void MenuItemInit(int32_t height, int32_t width, View::BRGA888Pixel bgColor, Frame* gHosFrame)
 {
     TextLabel* gTextLabel0 = nullptr;
     TextLabel* gTextLabel2 = nullptr;

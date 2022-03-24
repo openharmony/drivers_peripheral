@@ -22,16 +22,17 @@ namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_0 {
-constexpr int RGBA_PIXEL_SIZE = 4;
-void* View::CreateBuffer(int w, int h, View::PixelFormat pixelFormat)
+constexpr int32_t RGBA_PIXEL_SIZE = 4;
+void* View::CreateBuffer(int32_t w, int32_t h, View::PixelFormat pixelFormat)
 {
-    int pixelSize = -1;
-    switch (int(pixelFormat)) {
-        case int(View::PixelFormat::BGRA888):
+    int32_t pixelSize = -1;
+    switch (static_cast<int32_t>(pixelFormat)) {
+        case int32_t(View::PixelFormat::BGRA888):
             pixelSize = RGBA_PIXEL_SIZE;
             break;
         default:
-            BATTERY_HILOGD(FEATURE_CHARGING, "Unsupported pixel_format=%{public}d, Use default BGRA888", int(pixelFormat));
+            BATTERY_HILOGD(FEATURE_CHARGING, "Unsupported pixel_format=%{public}d, Use default BGRA888",
+                           static_cast<int32_t>(pixelFormat));
             pixelSize = RGBA_PIXEL_SIZE;
             break;
     }
@@ -62,13 +63,13 @@ void* View::CreateBuffer(int w, int h, View::PixelFormat pixelFormat)
 void View::SetBackgroundColor(BRGA888Pixel* color)
 {
     BRGA888Pixel pixelBuffer[viewWidth_];
-    for (int w = 0; w < viewWidth_; w++) {
+    for (int32_t w = 0; w < viewWidth_; w++) {
         pixelBuffer[w].r = color->r;
         pixelBuffer[w].g = color->g;
         pixelBuffer[w].b = color->b;
         pixelBuffer[w].a = color->a;
     }
-    for (int h = 0; h < viewHeight_; h++) {
+    for (int32_t h = 0; h < viewHeight_; h++) {
         if (memcpy_s(viewBuffer_ + h * viewWidth_ * sizeof(BRGA888Pixel), viewWidth_ * sizeof(BRGA888Pixel) + 1,
             reinterpret_cast<char*>(pixelBuffer), viewWidth_ * sizeof(BRGA888Pixel)) != EOK) {
             return;
@@ -80,13 +81,13 @@ void View::SetBackgroundColor(BRGA888Pixel* color)
     }
 }
 
-void View::DrawSubView(int x, int y, int w, int h, char* buf)
+void View::DrawSubView(int32_t x, int32_t y, int32_t w, int32_t h, char* buf)
 {
-    int minWidth = ((x + w) <= viewWidth_) ? w : (viewWidth_ - x);
-    int minHeight = ((y + h) <= viewHeight_) ? h : (viewHeight_ - y);
+    int32_t minWidth = ((x + w) <= viewWidth_) ? w : (viewWidth_ - x);
+    int32_t minHeight = ((y + h) <= viewHeight_) ? h : (viewHeight_ - y);
     BATTERY_HILOGD(FEATURE_CHARGING, "x = %{public}d, y = %{public}d, w = %{public}d, h = %{public}d", x, y, w, h);
     BATTERY_HILOGD(FEATURE_CHARGING, "minWidth = %{public}d, minHeight = %{public}d", minWidth, minHeight);
-    for (int i = 0; i < minHeight; i++) {
+    for (int32_t i = 0; i < minHeight; i++) {
         char* src = buf + i * w * static_cast<int32_t>(sizeof(BRGA888Pixel));
         char* dst = shadowBuffer_ + (i + y) * viewWidth_ * static_cast<int32_t>(sizeof(BRGA888Pixel)) +
             x * static_cast<int32_t>(sizeof(BRGA888Pixel));
@@ -142,12 +143,12 @@ void View::OnFocus(bool foucsed)
     OnDraw();
 }
 
-void View::SetViewId(int id)
+void View::SetViewId(int32_t id)
 {
     viewId_ = id;
 }
 
-int View::GetViewId() const
+int32_t View::GetViewId() const
 {
     return viewId_;
 }

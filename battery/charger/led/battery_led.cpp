@@ -22,30 +22,33 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include "file_ex.h"
 #include "errors.h"
+#include "power_supply_provider.h"
 #include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_0 {
-const int CAPACITY_FULL = 100;
-const int MKDIR_WAIT_TIME = 1;
-const int LED_COLOR_GREEN = 2;
-const int LED_COLOR_RED = 4;
-const int LED_COLOR_YELLOW = 6;
-std::vector<std::string> g_ledsNodeName;
+namespace {
+constexpr int32_t CAPACITY_FULL = 100;
+constexpr int32_t MKDIR_WAIT_TIME = 1;
+constexpr int32_t LED_COLOR_GREEN = 2;
+constexpr int32_t LED_COLOR_RED = 4;
+constexpr int32_t LED_COLOR_YELLOW = 6;
+std::vector<std::string> g_ledsNodeNames;
 const std::string LEDS_BASE_PATH = "/sys/class/leds";
 std::string g_redLedsNode = "red";
 std::string g_greenLedsNode = "green";
 std::string g_blueLedsNode = "blue";
+}
 
 void BatteryLed::TraversalNode()
 {
-    BATTERY_HILOGD(FEATURE_CHARGING, "enter");
     std::string::size_type idx;
 
-    for (auto iter = g_ledsNodeName.begin(); iter != g_ledsNodeName.end(); ++iter) {
+    for (auto iter = g_ledsNodeNames.begin(); iter != g_ledsNodeNames.end(); ++iter) {
         idx = iter->find(g_redLedsNode);
         if (idx == std::string::npos) {
             BATTERY_HILOGD(FEATURE_CHARGING, "not found red leds node");
@@ -70,8 +73,6 @@ void BatteryLed::TraversalNode()
             BATTERY_HILOGD(FEATURE_CHARGING, "blue leds node is %{public}s", iter->c_str());
         }
     }
-
-    BATTERY_HILOGD(FEATURE_CHARGING, "exit");
 }
 
 int32_t BatteryLed::InitLedsSysfs()
@@ -80,7 +81,7 @@ int32_t BatteryLed::InitLedsSysfs()
     DIR* dir = nullptr;
     struct dirent* entry = nullptr;
     int32_t index = 0;
-    int maxSize = 64;
+    const int32_t MAX_SIZE = 64;
 
     dir = opendir(LEDS_BASE_PATH.c_str());
     if (dir == nullptr) {
@@ -100,11 +101,11 @@ int32_t BatteryLed::InitLedsSysfs()
 
         if (entry->d_type == DT_DIR || entry->d_type == DT_LNK) {
             BATTERY_HILOGI(FEATURE_CHARGING, "init leds info of %{public}s", entry->d_name);
-            if (index >= maxSize) {
+            if (index >= MAX_SIZE) {
                 BATTERY_HILOGE(FEATURE_CHARGING, "too many leds types");
                 break;
             }
-            g_ledsNodeName.emplace_back(entry->d_name);
+            g_ledsNodeNames.emplace_back(entry->d_name);
             index++;
         }
     }
@@ -121,17 +122,14 @@ void BatteryLed::TurnOffLed()
 {
     BATTERY_HILOGD(FEATURE_CHARGING, "start turn off led");
     WriteLedInfoToSys(0, 0, 0);
-
-    BATTERY_HILOGD(FEATURE_CHARGING, "finish turn off led");
-    return;
 }
 
-void BatteryLed::UpdateLedColor(const int32_t& chargestate, const int32_t& capacity)
+void BatteryLed::UpdateLedColor(int32_t chargeState, int32_t capacity)
 {
-    if ((chargestate == PowerSupplyProvider::CHARGE_STATE_NONE) ||
-        (chargestate == PowerSupplyProvider::CHARGE_STATE_RESERVED)) {
-        TurnOffLed();
+    if ((chargeState == PowerSupplyProvider::CHARGE_STATE_NONE) ||
+        (chargeState == PowerSupplyProvider::CHARGE_STATE_RESERVED)) {
         BATTERY_HILOGD(FEATURE_CHARGING, "not in charging state, turn off led");
+        TurnOffLed();
         return;
     }
 
@@ -177,160 +175,97 @@ void BatteryLed::UpdateLedColor(const int32_t& chargestate, const int32_t& capac
             break;
         }
     }
-
-    return;
 }
 
-void BatteryLed::WriteLedInfoToSys(const int redbrightness, const int greenbrightness, const int bluebrightness)
+void BatteryLed::WriteLedInfoToSys(int32_t redBrightness, int32_t greenBrightness, int32_t blueBrightness)
 {
-    FILE* file = nullptr;
     std::string redLedPath = LEDS_BASE_PATH + "/" + g_redLedsNode + "/" + "brightness";
     std::string greenLedPath = LEDS_BASE_PATH + "/" + g_greenLedsNode + "/" + "brightness";
     std::string blueLedPath = LEDS_BASE_PATH + "/" + g_blueLedsNode + "/" + "brightness";
+    if (!FileExists(LEDS_BASE_PATH)) {
+        InitMockLedFile(redLedPath, greenLedPath, blueLedPath);
+    }
     BATTERY_HILOGD(FEATURE_CHARGING, "redLedPath is %{public}s, greenLedPath is %{public}s, blueLedPath is %{public}s",
         redLedPath.c_str(), greenLedPath.c_str(), blueLedPath.c_str());
-    InitMockLedFile(redLedPath, greenLedPath, blueLedPath);
 
-    file = fopen(redLedPath.c_str(), "w");
-    if (file == nullptr) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "red led file open failed");
-        return;
-    }
-    int ret = fprintf(file, "%d\n", redbrightness);
-    if (ret < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "red led file fprintf failed");
-    }
-    ret = fclose(file);
-    if (ret < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "red led file close failed");
-        return;
-    }
-
-    file = fopen(greenLedPath.c_str(), "w");
-    if (file == nullptr) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "green led file open failed");
-        return;
-    }
-    ret = fprintf(file, "%d\n", greenbrightness);
-    if (ret < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "green led file fprintf failed.");
-    }
-    ret = fclose(file);
-    if (ret < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "green led file close failed");
-        return;
-    }
-
-    file = fopen(blueLedPath.c_str(), "w");
-    if (file == nullptr) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "blue led file open failed");
-        return;
-    }
-    ret = fprintf(file, "%d\n", bluebrightness);
-    if (ret < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "blue led file fprintf failed");
-    }
-    ret = fclose(file);
-    if (ret < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "blue led file close failed");
-        return;
-    }
-    return;
+    WriteLedNode(redLedPath, redBrightness);
+    WriteLedNode(greenLedPath, greenBrightness);
+    WriteLedNode(blueLedPath, blueBrightness);
 }
 
-std::string BatteryLed::CreateFile(std::string path, std::string content) const
+void BatteryLed::CreateMockLedFile(const std::string &path, const std::string& content)
 {
-    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "Cannot create file %{public}s", path.c_str());
-        return nullptr;
+        BATTERY_HILOGD(FEATURE_CHARGING, "cannot create file %{public}s", path.c_str());
+        return;
     }
     stream << content.c_str() << std::endl;
     stream.close();
-    return path;
 }
 
-void BatteryLed::InitMockLedFile(std::string& redPath, std::string& greenPath, std::string& bluePath) const
+void BatteryLed::InitMockLedFile(std::string& redPath, std::string& greenPath, std::string& bluePath)
 {
-    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
-    std::string mockLedsPath = "/data/local/tmp/leds";
-    std::string sysLedsPath = "/sys/class/leds";
-    std::string redLedPath = "/data/local/tmp/leds/sc27xx:red";
-    std::string greenLedPath = "/data/local/tmp/leds/sc27xx:green";
-    std::string blueLedPath = "/data/local/tmp/leds/sc27xx:blue";
+    BATTERY_HILOGD(FEATURE_CHARGING, "start init mock led files");
+    const std::string MOCK_LEDS_PATH = "/data/local/tmp/leds";
+    const std::string RED_LED_PATH = "/data/local/tmp/leds/mock_led:red";
+    const std::string RED_LED_BRIGHTNESS_PATH = "/data/local/tmp/leds/mock_led:red/brightness";
+    const std::string GREEN_LED_PATH = "/data/local/tmp/leds/mock_led:green";
+    const std::string GREEN_LED_BRIGHTNESS_PATH = "/data/local/tmp/leds/mock_led:green/brightness";
+    const std::string BLUE_LED_PATH = "/data/local/tmp/leds/mock_led:blue";
+    const std::string BLUE_LED_BRIGHTNESS_PATH = "/data/local/tmp/leds/mock_led:blue/brightness";
 
-    if (access(sysLedsPath.c_str(), F_OK) == 0) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "system leds path exist.");
-        return;
-    } else {
-        redPath = "/data/local/tmp/leds/sc27xx:red/brightness";
-        greenPath = "/data/local/tmp/leds/sc27xx:green/brightness";
-        bluePath = "/data/local/tmp/leds/sc27xx:blue/brightness";
-    }
-
-    if (access(mockLedsPath.c_str(), 0) == -1) {
-        int ret = mkdir("/data/local/tmp/leds", S_IRWXU);
-        if (ret == -1) {
+    if (!FileExists(MOCK_LEDS_PATH)) {
+        int32_t ret = mkdir(MOCK_LEDS_PATH.c_str(), S_IRWXU);
+        if (ret < 0) {
             BATTERY_HILOGD(FEATURE_CHARGING, "create leds path fail.");
             return;
         }
         sleep(MKDIR_WAIT_TIME);
     }
 
-    InitRedLedPath(redLedPath);
-    InitGreenLedPath(greenLedPath);
-    InitBlueLedPath(blueLedPath);
+    BATTERY_HILOGE(FEATURE_CHARGING, "create mock led path and file");
+    CreateMockLedPath(RED_LED_PATH);
+    CreateMockLedPath(GREEN_LED_PATH);
+    CreateMockLedPath(BLUE_LED_PATH);
 
-    BATTERY_HILOGE(FEATURE_CHARGING, "create mock path for Hi3516DV300");
-    CreateFile("/data/local/tmp/leds/sc27xx:red/brightness", "0");
-    CreateFile("/data/local/tmp/leds/sc27xx:green/brightness", "0");
-    CreateFile("/data/local/tmp/leds/sc27xx:blue/brightness", "0");
+    CreateMockLedFile(RED_LED_BRIGHTNESS_PATH, "0");
+    CreateMockLedFile(GREEN_LED_BRIGHTNESS_PATH, "0");
+    CreateMockLedFile(BLUE_LED_BRIGHTNESS_PATH, "0");
+    redPath = RED_LED_BRIGHTNESS_PATH;
+    greenPath = GREEN_LED_BRIGHTNESS_PATH;
+    bluePath = BLUE_LED_BRIGHTNESS_PATH;
 }
 
-void BatteryLed::InitRedLedPath(std::string& redLedPath) const
+void BatteryLed::CreateMockLedPath(const std::string& mockPath)
 {
-    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
-    if (access(redLedPath.c_str(), 0) == -1) {
-        int ret = mkdir("/data/local/tmp/leds/sc27xx:red", S_IRWXU);
-        if (ret == -1) {
-            BATTERY_HILOGD(FEATURE_CHARGING, "create red led path fail.");
-            return;
-        }
-        sleep(MKDIR_WAIT_TIME);
+    if (FileExists(mockPath)) {
+        BATTERY_HILOGD(FEATURE_CHARGING, "mock led path exists, mockPath=%{public}s", mockPath.c_str());
+        return;
     }
-
-    BATTERY_HILOGI(FEATURE_CHARGING, "exit");
+    int32_t ret = mkdir(mockPath.c_str(), S_IRWXU);
+    if (ret < 0) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "create led mock path fail");
+        return;
+    }
+    sleep(MKDIR_WAIT_TIME);
 }
 
-void BatteryLed::InitGreenLedPath(std::string& greenLedPath) const
+void BatteryLed::WriteLedNode(std::string& ledPath, int32_t brightness)
 {
-    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
-    if (access(greenLedPath.c_str(), 0) == -1) {
-        int ret = mkdir("/data/local/tmp/leds/sc27xx:green", S_IRWXU);
-        if (ret == -1) {
-            BATTERY_HILOGD(FEATURE_CHARGING, "create green led path fail.");
-            return;
-        }
-        sleep(MKDIR_WAIT_TIME);
+    FILE* file = fopen(ledPath.c_str(), "w");
+    if (file == nullptr) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "led file open failed, path=%{public}s", ledPath.c_str());
+        return;
     }
-
-    BATTERY_HILOGI(FEATURE_CHARGING, "exit");
-}
-
-void BatteryLed::InitBlueLedPath(std::string& blueLedPath) const
-{
-    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
-    if (access(blueLedPath.c_str(), 0) == -1) {
-        int ret = mkdir("/data/local/tmp/leds/sc27xx:blue", S_IRWXU);
-        if (ret == -1) {
-            BATTERY_HILOGD(FEATURE_CHARGING, "create blue led path fail.");
-            return;
-        }
-        sleep(MKDIR_WAIT_TIME);
+    int32_t ret = fprintf(file, "%d\n", brightness);
+    if (ret < 0) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "led file fprintf failed, path=%{public}s", ledPath.c_str());
     }
-
-    BATTERY_HILOGI(FEATURE_CHARGING, "exit");
+    ret = fclose(file);
+    if (ret < 0) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "led file close failed, path=%{public}s", ledPath.c_str());
+    }
 }
 }  // namespace V1_0
 }  // namespace Battery

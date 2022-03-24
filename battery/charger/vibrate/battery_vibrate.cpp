@@ -16,158 +16,65 @@
 #include "battery_vibrate.h"
 
 #include <unistd.h>
-#include "sys/stat.h"
+#include "file_ex.h"
 #include "battery_log.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_0 {
+namespace {
 const std::string VIBRATOR_PLAYMODE_PATH = "/sys/class/leds/vibrator/play_mode";
 const std::string VIBRATOR_DURATIONMODE_PATH = "/sys/class/leds/vibrator/duration";
 const std::string VIBRATOR_ACTIVATEMODE_PATH = "/sys/class/leds/vibrator/activate";
-const int VIBRATION_PLAYMODE = 0;
-const int VIBRATION_DURATIONMODE = 1;
-const int VIBRATE_DELAY_MS = 5;
-const int USEC_TO_MSEC = 1000;
+const std::string DURATION_MODE_DERECT = "direct";
+const std::string DURATION_MODE_AUDIO = "audio";
+constexpr int32_t VIBRATION_PLAYMODE = 0;
+constexpr int32_t VIBRATION_DURATIONMODE = 1;
+constexpr int32_t ACTIVE = 1;
+constexpr int32_t DEACTIVE = 0;
+constexpr int32_t VIBRATE_DELAY_MS = 5;
+constexpr int32_t USEC_TO_MSEC = 1000;
+}
 
-int BatteryVibrate::VibrateInit()
+bool BatteryVibrate::InitVibration()
 {
     BATTERY_HILOGD(FEATURE_CHARGING, "start init vibrate");
-    struct stat st {};
 
-    if (!stat(VIBRATOR_PLAYMODE_PATH.c_str(), &st)) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "vibrate path is play mode path");
+    if (FileExists(VIBRATOR_PLAYMODE_PATH)) {
+        BATTERY_HILOGI(FEATURE_CHARGING, "vibrate path is play mode path");
         vibrateMode_ = VIBRATION_PLAYMODE;
-        return 0;
+        return true;
     }
 
-    if (!stat(VIBRATOR_DURATIONMODE_PATH.c_str(), &st)) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "vibrate path is duration path");
+    if (FileExists(VIBRATOR_DURATIONMODE_PATH)) {
+        BATTERY_HILOGI(FEATURE_CHARGING, "vibrate path is duration path");
         vibrateMode_ = VIBRATION_DURATIONMODE;
-        return 0;
+        return true;
     }
 
     BATTERY_HILOGI(FEATURE_CHARGING, "not support vibrate path");
-    return -1;
+    return false;
 }
 
-FILE* BatteryVibrate::HandlePlayModePath() const
+void BatteryVibrate::HandlePlayMode(int32_t time)
 {
-    FILE* file = nullptr;
-
-    file = fopen(VIBRATOR_PLAYMODE_PATH.c_str(), "w");
-    if (file == nullptr) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "play mode path open failed.");
-        return nullptr;
-    }
-    if (fprintf(file, "%s\n", "direct") < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "fprintf direct failed.");
-    }
-    if (fclose(file) < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "fclose failed.");
-        return nullptr;
-    }
-
-    return file;
-}
-
-void BatteryVibrate::HandlePlayMode(const int time) const
-{
-    FILE* file = nullptr;
-
-    file = HandlePlayModePath();
-    if (file == nullptr) {
-        return;
-    }
-
-    file = fopen(VIBRATOR_DURATIONMODE_PATH.c_str(), "w");
-    if (file == nullptr) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "duration mode path open failed.");
-        return;
-    }
-    if (fprintf(file, "%d\n", time) < 0) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "duration mode fprintf time failed.");
-    }
-    if (fclose(file) < 0) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "duration mode fclose failed.");
-        return;
-    }
-
-    file = fopen(VIBRATOR_ACTIVATEMODE_PATH.c_str(), "w");
-    if (file == nullptr) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "activate mode path open failed.");
-        return;
-    }
-    if (fprintf(file, "%d\n", 1) < 0) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "activate mode fprintf 1 failed.");
-    }
-    if (fclose(file) < 0) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "activate mode fclose failed.");
-        return;
-    }
-
+    SetPlayMode(DURATION_MODE_DERECT);
+    SetDuration(time);
+    ActivateVibration(true);
     usleep((time + VIBRATE_DELAY_MS) * USEC_TO_MSEC);
-    file = fopen(VIBRATOR_PLAYMODE_PATH.c_str(), "w");
-    if (file == nullptr) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "play mode path open failed.");
-        return;
-    }
-    if (fprintf(file, "%s\n", "audio") < 0) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "play mode fprintf audio failed.");
-    }
-    if (fclose(file) < 0) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "play mode fclose failed.");
-        return;
-    }
+    SetPlayMode(DURATION_MODE_AUDIO);
 }
 
-void BatteryVibrate::HandleDurationMode(const int time) const
+void BatteryVibrate::HandleDurationMode(int32_t time)
 {
-    FILE* file = nullptr;
-
-    file = fopen(VIBRATOR_DURATIONMODE_PATH.c_str(), "w");
-    if (file == nullptr) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "duration mode path open failed.");
-        return;
-    }
-    if (fprintf(file, "%d\n", time) < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "duration mode fprintf time failed.");
-    }
-    if (fclose(file) < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "duration mode fclose failed.");
-        return;
-    }
-
-    file = fopen(VIBRATOR_ACTIVATEMODE_PATH.c_str(), "w");
-    if (file == nullptr) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "activate mode path open failed.");
-        return;
-    }
-    if (fprintf(file, "%d\n", 1) < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "activate mode fprintf 1 failed.");
-    }
-    if (fclose(file) < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "activate mode fclose failed.");
-        return;
-    }
-
+    SetDuration(time);
+    ActivateVibration(true);
     usleep((time + VIBRATE_DELAY_MS) * USEC_TO_MSEC);
-    file = fopen(VIBRATOR_ACTIVATEMODE_PATH.c_str(), "w");
-    if (file == nullptr) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "activate mode path open failed.");
-        return;
-    }
-    if (fprintf(file, "%d\n", 0) < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "activate mode fprintf 0 failed.");
-    }
-    if (fclose(file) < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "activate mode fclose failed.");
-        return;
-    }
+    ActivateVibration(false);
 }
 
-void BatteryVibrate::HandleVibrate(const int time)
+void BatteryVibrate::HandleVibration(int32_t time) const
 {
     switch (vibrateMode_) {
         case VIBRATION_PLAYMODE: {
@@ -185,8 +92,52 @@ void BatteryVibrate::HandleVibrate(const int time)
             break;
         }
     }
+}
 
-    return;
+void BatteryVibrate::SetPlayMode(const std::string& modeName)
+{
+    FILE* file = fopen(VIBRATOR_PLAYMODE_PATH.c_str(), "w");
+    if (file == nullptr) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "play mode path open failed.");
+        return;
+    }
+    if (fprintf(file, "%s\n", modeName.c_str()) < 0) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "play mode fprintf direct failed.");
+    }
+    if (fclose(file) < 0) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "play mode fclose failed.");
+    }
+}
+
+void BatteryVibrate::ActivateVibration(bool isActive)
+{
+    int32_t value = isActive ? ACTIVE : DEACTIVE;
+    FILE* file = fopen(VIBRATOR_ACTIVATEMODE_PATH.c_str(), "w");
+    if (file == nullptr) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "activate mode path open failed");
+        return;
+    }
+    if (fprintf(file, "%d\n", value) < 0) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "activate mode fprintf failed, value=%{public}d", value);
+    }
+    if (fclose(file) < 0) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "activate mode fclose failed");
+    }
+}
+
+void BatteryVibrate::SetDuration(int32_t time)
+{
+    FILE* file = fopen(VIBRATOR_DURATIONMODE_PATH.c_str(), "w");
+    if (file == nullptr) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "duration mode path open failed");
+        return;
+    }
+    if (fprintf(file, "%d\n", time) < 0) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "duration mode fprintf time failed, time=%{public}d", time);
+    }
+    if (fclose(file) < 0) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "duration mode fclose failed.");
+    }
 }
 }  // namespace V1_0
 }  // namespace Battery

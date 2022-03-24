@@ -34,7 +34,7 @@ struct CmpByStartY {
 
 class Frame : public View {
 public:
-    Frame(unsigned int w, unsigned int h, View::PixelFormat pixType, SurfaceDev* sfDev);
+    Frame(uint32_t w, uint32_t h, View::PixelFormat pixType, SurfaceDev* sfDev);
 
     ~Frame() override;
 
@@ -45,18 +45,15 @@ public:
 private:
     void FlushThreadLoop();
 
-    int currentActionIndex_ = 0;
-    int maxActionIndex_ = 0;
-    int listIndex_ = 0;
-    int frameViewId = 0;
+    int32_t maxActionIndex_ = 0;
+    int32_t listIndex_ = 0;
+    int32_t frameViewId = 0;
     bool flushFlag_ = false;
     bool needStop_ = false;
     SurfaceDev* sfDev_ = nullptr;
     std::mutex frameMutex_;
-    std::mutex keyMutex_;
     std::condition_variable_any mCondFlush_;
-    std::condition_variable_any mCondKey_;
-    std::map<View*, int, CmpByStartY> viewMapList_;
+    std::map<View*, int32_t, CmpByStartY> viewMapList_;
 };
 }  // namespace V1_0
 }  // namespace Battery

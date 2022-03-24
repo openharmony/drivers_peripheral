@@ -40,40 +40,40 @@ public:
     enum class PixelFormat {
         BGRA888,
     };
-    View() {};
-    virtual ~View() {};
-    void* CreateBuffer(int w, int h, View::PixelFormat pixelFormat);
+    View() = default;;
+    virtual ~View() = default;;
+    void* CreateBuffer(int32_t w, int32_t h, View::PixelFormat pixelFormat);
     virtual void SetBackgroundColor(BRGA888Pixel* color);
-    virtual void DrawSubView(int x, int y, int w, int h, char* buf);
+    virtual void DrawSubView(int32_t x, int32_t y, int32_t w, int32_t h, char* buf);
     virtual void OnDraw();
     virtual void Hide();
     virtual void Show();
     virtual void OnFocus(bool foucsed);
     char* GetBuffer() const;
     void* GetRawBuffer() const;
-    int GetBufferSize() const
+    int32_t GetBufferSize() const
     {
         return bufferSize_;
     }
     void SyncBuffer();
-    void SetViewId(int id);
-    int GetViewId() const;
+    void SetViewId(int32_t id);
+    int32_t GetViewId() const;
     void FreeBuffer();
     bool IsVisiable() const;
     bool IsSelected() const;
     bool IsFocusAble() const;
     void SetFocusAble(bool focusable);
-    int startX_ = 0;
-    int startY_ = 0;
-    int viewWidth_ = 0;
-    int viewHeight_ = 0;
+    int32_t startX_ = 0;
+    int32_t startY_ = 0;
+    int32_t viewWidth_ = 0;
+    int32_t viewHeight_ = 0;
     std::mutex mutex_;
 private:
     char* viewBuffer_ = nullptr;
     char* shadowBuffer_ = nullptr;
-    int bufferSize_ = 0;
+    int32_t bufferSize_ = 0;
     bool isVisiable_ = true;
-    int viewId_ = 0;
+    int32_t viewId_ = 0;
     bool focusable_ = false;
     bool isFocused_ = false;
 };

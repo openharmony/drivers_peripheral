@@ -15,7 +15,6 @@
 
 #include "text_label.h"
 #include <cstdio>
-#include <iostream>
 #include <string>
 #include <linux/input.h>
 #include "png.h"
@@ -27,10 +26,10 @@ namespace HDI {
 namespace Battery {
 namespace V1_0 {
 const std::string DEFAULT_FONT_NAME = "font";
-constexpr int MAX_TEXT_SIZE = 512;
-constexpr int MAX_FONT_BUFFER_SIZE_HW  = 4096;
+constexpr int32_t MAX_TEXT_SIZE = 512;
+constexpr int32_t MAX_FONT_BUFFER_SIZE_HW  = 4096;
 
-TextLabel::TextLabel(int mStartX, int mStartY, int w, int h, Frame* mparent)
+TextLabel::TextLabel(int32_t mStartX, int32_t mStartY, int32_t w, int32_t h, Frame* mparent)
 {
     startX_ = mStartX;
     startY_ = mStartY;
@@ -78,12 +77,11 @@ void TextLabel::SetFont(FontType fType)
     OnDraw();
 }
 
-static void PngInitSet(png_structp fontPngPtr, FILE* fp, int size, png_infop fontInfoPtr)
+static void PngInitSet(png_structp fontPngPtr, FILE* fp, int32_t size, png_infop fontInfoPtr)
 {
     png_init_io(fontPngPtr, fp);
     png_set_sig_bytes(fontPngPtr, size);
     png_read_info(fontPngPtr, fontInfoPtr);
-    return;
 }
 
 static void PNGReadRow(png_uint_32 fontWidth, png_uint_32 fontHeight, png_structp fontPngPtr, char* fontBuf)
@@ -92,11 +90,10 @@ static void PNGReadRow(png_uint_32 fontWidth, png_uint_32 fontHeight, png_struct
         BATTERY_HILOGE(FEATURE_CHARGING, "font file size is too big!");
         return;
     }
-    for (unsigned int y = 0; y < fontHeight; y++) {
-        uint8_t* pRow = reinterpret_cast<uint8_t*>((fontBuf) + y * MAX_FONT_BUFFER_SIZE_HW);
+    for (uint32_t y = 0; y < fontHeight; y++) {
+        auto* pRow = reinterpret_cast<uint8_t*>((fontBuf) + y * MAX_FONT_BUFFER_SIZE_HW);
         png_read_row(fontPngPtr, pRow, nullptr);
     }
-    return;
 }
 
 static void CheckInitFont(png_structp fontPngPtr, FILE **fp, png_infop fontInfoPtr)
@@ -116,13 +113,14 @@ void TextLabel::InitFont()
     png_uint_32 fontHeight = 0;
     png_byte fontChannels = 0;
     png_structp fontPngPtr = nullptr;
-    int fontBitDepth = 0;
-    int fontColorType = 0;
+    int32_t fontBitDepth = 0;
+    int32_t fontColorType = 0;
 
     char resPath[MAX_TEXT_SIZE + 1];
     uint32_t offset = 2;
 
-    if (memset_s(resPath, MAX_TEXT_SIZE + offset, 0, MAX_TEXT_SIZE + 1)) {
+    if (memset_s(resPath, MAX_TEXT_SIZE + offset, 0, MAX_TEXT_SIZE + 1) != EOK) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "memset_s failed");
         return;
     }
     switch (fontType_) {
@@ -147,10 +145,10 @@ void TextLabel::InitFont()
         return;
     }
 
-    const int headerNumber = 8;
+    const int32_t headerNumber = 8;
     uint8_t header[headerNumber];
     size_t bytesRead = fread(header, 1, sizeof(header), fp);
-    if (!(bytesRead == sizeof(header))) {
+    if (bytesRead != sizeof(header)) {
         BATTERY_HILOGW(FEATURE_CHARGING, "read header failed!");
         fclose(fp);
         return;
@@ -176,11 +174,11 @@ void TextLabel::InitFont()
     png_get_IHDR(fontPngPtr, fontInfoPtr, &fontWidth, &fontHeight, &fontBitDepth, &fontColorType,
         nullptr, nullptr, nullptr);
     fontChannels = png_get_channels(fontPngPtr, fontInfoPtr);
-    const int defaultFontBitDepth = 8;
+    const int32_t defaultFontBitDepth = 8;
     if (fontBitDepth <= defaultFontBitDepth && fontChannels == 1 && fontColorType == PNG_COLOR_TYPE_GRAY) {
         png_set_expand_gray_1_2_4_to_8(fontPngPtr);
     }
-    const int defaultFontWidth = 96;
+    const int32_t defaultFontWidth = 96;
     fontWidth_ = fontWidth / defaultFontWidth;
     fontHeight_ = fontHeight >> 1;
     PNGReadRow(fontWidth_, fontHeight_, fontPngPtr, fontBuf_);
@@ -258,7 +256,7 @@ void TextLabel::DrawOutline()
 {
     void* tmpBuf = GetBuffer();
     auto* pixelBuf = static_cast<BRGA888Pixel*>(tmpBuf);
-    for (int i = 0; i < viewWidth_; i++) {
+    for (int32_t i = 0; i < viewWidth_; i++) {
         if (boldTopLine_) {
             pixelBuf[i].r = outlineColor_.r;
             pixelBuf[i].g = outlineColor_.g;
@@ -271,7 +269,7 @@ void TextLabel::DrawOutline()
             pixelBuf[viewWidth_ + i].a = outlineColor_.a;
         }
 
-        const int lines = 2;
+        const int32_t lines = 2;
         if (boldBottomLine_) {
             pixelBuf[(viewHeight_ - lines) * viewWidth_ + i].r = outlineColor_.r;
             pixelBuf[(viewHeight_ - lines) * viewWidth_ + i].g = outlineColor_.g;
@@ -341,12 +339,12 @@ void TextLabel::DrawText()
     }
 }
 
-void TextLabel::DrawTextLoop(unsigned char ch, char* tmpBuf, int textSx, int textSy)
+void TextLabel::DrawTextLoop(unsigned char ch, char* tmpBuf, int32_t textSx, int32_t textSy)
 {
     auto* srcP = reinterpret_cast<uint8_t*>(static_cast<char*>(fontBuf_) + ((ch - ' ') * fontWidth_));
     auto* dstP = reinterpret_cast<BRGA888Pixel*>(tmpBuf + (textSy * viewWidth_ + textSx) * sizeof(BRGA888Pixel));
-    for (unsigned int j = 0; j < fontHeight_; j++) {
-        for (unsigned int i = 0; i < fontWidth_; i++) {
+    for (uint32_t j = 0; j < fontHeight_; j++) {
+        for (uint32_t i = 0; i < fontWidth_; i++) {
             uint8_t a = srcP[i];
             if (a > 0) {
                 dstP[i].r = textColor_.r;
@@ -363,14 +361,14 @@ void TextLabel::DrawTextLoop(unsigned char ch, char* tmpBuf, int textSx, int tex
 void TextLabel::DrawFocus()
 {
     BRGA888Pixel pixBuf[viewWidth_];
-    for (int a = 0; a < viewWidth_; a++) {
+    for (int32_t a = 0; a < viewWidth_; a++) {
         pixBuf[a].r = actionBgColor_.r;
         pixBuf[a].g = actionBgColor_.g;
         pixBuf[a].b = actionBgColor_.b;
         pixBuf[a].a = actionBgColor_.a;
     }
     void* viewBgBuf = GetBuffer();
-    for (int i = 0; i < viewHeight_; i++) {
+    for (int32_t i = 0; i < viewHeight_; i++) {
         if (memcpy_s(static_cast<char*>(static_cast<char*>(viewBgBuf) + i * viewWidth_ * sizeof(BRGA888Pixel)),
             viewWidth_ * sizeof(BRGA888Pixel) + 1, reinterpret_cast<char*>(pixBuf),
             viewWidth_ * sizeof(BRGA888Pixel)) != EOK) {

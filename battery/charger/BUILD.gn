@@ -49,11 +49,11 @@ ohos_executable("charger") {
   ]
 
   external_deps = [
-    "startup_l2:syspara",
-    "power_manager_native:powermgr_client",
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
     "ipc:ipc_core",
+    "power_manager_native:powermgr_client",
+    "startup_l2:syspara",
     "utils_base:utils",
   ]
 

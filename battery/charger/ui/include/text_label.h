@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <string>
+#include <functional>
 #include "frame.h"
 
 namespace OHOS {
@@ -25,7 +26,7 @@ namespace HDI {
 namespace Battery {
 namespace V1_0 {
 class TextLabel : public View {
-using ClickCallback = std::function<void(int id)>;
+using ClickCallback = std::function<void(int32_t id)>;
 enum class FontType {
     DEFAULT_FONT,
 };
@@ -36,8 +37,8 @@ enum class AlignmentMethod {
     ALIGN_TO_TOP,
 };
 public:
-    TextLabel(int mStartX, int mStartY, int w, int h, Frame* mparent);
-    ~TextLabel() override {};
+    TextLabel(int32_t mStartX, int32_t mStartY, int32_t w, int32_t h, Frame* mparent);
+    ~TextLabel() override = default;;
     void SetText(const char* str);
     void SetTextColor(BRGA888Pixel color);
     void SetFont(FontType fType);
@@ -48,7 +49,7 @@ private:
     void InitFont();
     FILE* InitFontType();
     void DrawText();
-    void DrawTextLoop(unsigned char ch, char* tmpBuf, int textSx, int textSy);
+    void DrawTextLoop(unsigned char ch, char* tmpBuf, int32_t textSx, int32_t textSy);
     void DrawOutline();
     void DrawFocus();
 
@@ -69,11 +70,11 @@ private:
 
     FontType fontType_ { FontType::DEFAULT_FONT };
     char fontBuf_[4096 * 4096] {};
-    unsigned int fontWidth_ = 0;
-    unsigned int fontHeight_ = 0;
+    uint32_t fontWidth_ = 0;
+    uint32_t fontHeight_ = 0;
 };
 }  // namespace V1_0
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS
-#endif // CHARGER_UI_
+#endif // CHARGER_UI_TEXT_LABLE_H

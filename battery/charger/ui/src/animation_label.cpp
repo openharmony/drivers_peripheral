@@ -28,14 +28,14 @@ namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_0 {
-constexpr int PNG_HEADER_SIZE = 8;
-constexpr int MAX_PICTURE_CHANNELS = 3;
-constexpr int MAX_BIT_DEPTH = 8;
+constexpr int32_t PNG_HEADER_SIZE = 8;
+constexpr int32_t MAX_PICTURE_CHANNELS = 3;
+constexpr int32_t MAX_BIT_DEPTH = 8;
 constexpr useconds_t SECOND_PER_MS = 1000;
 bool AnimationLabel::isVisible_ = true;
 bool AnimationLabel::needStop_ = false;
 
-AnimationLabel::AnimationLabel(int startX, int startY, int w, int h, Frame* mParent)
+AnimationLabel::AnimationLabel(int32_t startX, int32_t startY, int32_t w, int32_t h, Frame* mParent)
 {
     startX_ = startX;
     startY_ = startY;
@@ -58,12 +58,12 @@ AnimationLabel::~AnimationLabel()
     imgList_.clear();
 }
 
-void AnimationLabel::SetStaticImg(int picId)
+void AnimationLabel::SetStaticImg(int32_t picId)
 {
     staticShowId_ = picId;
 }
 
-void AnimationLabel::SetIsVisible(const bool visible)
+void AnimationLabel::SetIsVisible(bool visible)
 {
     isVisible_ = visible;
 }
@@ -80,7 +80,7 @@ void AnimationLabel::SetPlayMode(AnimationLabel::PlayMode mode)
 void AnimationLabel::UpdateLoop()
 {
     BATTERY_HILOGD(FEATURE_CHARGING, "start update animation loop");
-    unsigned int index = 0;
+    uint32_t index = 0;
 
     while (!needStop_) {
         if (showStatic_) {
@@ -129,10 +129,10 @@ void AnimationLabel::AddImg(const std::string& imgFileName)
     mutex_.unlock();
 }
 
-int AnimationLabel::AddStaticImg(const std::string& imgFileName)
+int32_t AnimationLabel::AddStaticImg(const std::string& imgFileName)
 {
     BATTERY_HILOGD(FEATURE_CHARGING, "add static img, name=%{public}s", imgFileName.c_str());
-    int id = staticImgSize_;
+    int32_t id = staticImgSize_;
     mutex_.lock();
     staticImgList_[id] = static_cast<char*>(LoadPng(imgFileName));
     staticImgSize_++;
@@ -140,7 +140,7 @@ int AnimationLabel::AddStaticImg(const std::string& imgFileName)
     return id;
 }
 
-int AnimationLabel::LoadPngInternalWithFile(FILE* fp, png_structpp pngPtr, png_infopp pngInfoPtr,
+int32_t AnimationLabel::LoadPngInternalWithFile(FILE* fp, png_structpp pngPtr, png_infopp pngInfoPtr,
     struct PictureAttr& attr)
 {
     if (fp == nullptr) {
@@ -193,19 +193,19 @@ int AnimationLabel::LoadPngInternalWithFile(FILE* fp, png_structpp pngPtr, png_i
 void AnimationLabel::CopyPictureBuffer(struct PictureAttr& attr, char* pictureBufferTmp,
     BRGA888Pixel* pictureBuffer) const
 {
-    int copyHeight = (viewHeight_ < static_cast<int>(attr.pictureHeight)) ? viewHeight_ :
-        static_cast<int>(attr.pictureHeight);
-    int copyWidth = (viewWidth_ < static_cast<int>(attr.pictureWidth)) ? viewWidth_ :
-        static_cast<int>(attr.pictureWidth);
+    auto pictureHeight = static_cast<int32_t>(attr.pictureHeight);
+    auto pictureWidth = static_cast<int32_t>(attr.pictureWidth);
+    int32_t copyHeight = (viewHeight_ < pictureHeight) ? viewHeight_ : pictureHeight;
+    int32_t copyWidth = (viewWidth_ < pictureWidth) ? viewWidth_ : pictureWidth;
     auto* rgb = reinterpret_cast<RGB888Pixel*>(pictureBufferTmp);
-    for (int y = 0; y < copyHeight; y++) {
-        for (int x = 0; x < copyWidth; x++) {
-            unsigned int colorValue = rgb[x + y * attr.pictureWidth].r +
-            rgb[x + y * attr.pictureWidth].g + rgb[x + y * attr.pictureWidth].b;
+    for (int32_t y = 0; y < copyHeight; y++) {
+        for (int32_t x = 0; x < copyWidth; x++) {
+            uint32_t colorValue = rgb[x + y * pictureWidth].r +
+            rgb[x + y * pictureWidth].g + rgb[x + y * pictureWidth].b;
             if (colorValue > 0) {
-                pictureBuffer[x + y * viewWidth_].r = rgb[x + y * attr.pictureWidth].r;
-                pictureBuffer[x + y * viewWidth_].g = rgb[x + y * attr.pictureWidth].g;
-                pictureBuffer[x + y * viewWidth_].b = rgb[x + y * attr.pictureWidth].b;
+                pictureBuffer[x + y * viewWidth_].r = rgb[x + y * pictureWidth].r;
+                pictureBuffer[x + y * viewWidth_].g = rgb[x + y * pictureWidth].g;
+                pictureBuffer[x + y * viewWidth_].b = rgb[x + y * pictureWidth].b;
                 pictureBuffer[x + y * viewWidth_].a = 0xff;
             }
         }
@@ -231,7 +231,7 @@ void* AnimationLabel::LoadPng(const std::string& imgFileName)
         fp = nullptr;
         return nullptr;
     }
-    unsigned int pictureRowSize = attr.pictureWidth * attr.pictureChannels;
+    uint32_t pictureRowSize = attr.pictureWidth * attr.pictureChannels;
     pictureBufferTmp = static_cast<char*>(malloc(pictureRowSize * attr.pictureHeight));
     if (pictureBufferTmp == nullptr) {
         BATTERY_HILOGD(FEATURE_CHARGING, "malloc memory failed.");
@@ -242,7 +242,7 @@ void* AnimationLabel::LoadPng(const std::string& imgFileName)
         return nullptr;
     }
 
-    for (unsigned int y = 0; y < attr.pictureHeight; y++) {
+    for (uint32_t y = 0; y < attr.pictureHeight; y++) {
         pictureRow = reinterpret_cast<uint8_t*>((pictureBufferTmp) + y * pictureRowSize);
         png_read_row(pngPtr, pictureRow, nullptr);
     }
@@ -253,7 +253,7 @@ void* AnimationLabel::LoadPng(const std::string& imgFileName)
 
 View::BRGA888Pixel* AnimationLabel::HandleLoadPng(FILE** fp, char** pictureBufferTmp, struct PictureAttr& attr)
 {
-    int pictureBufferSize = viewHeight_ * viewWidth_ * sizeof(BRGA888Pixel);
+    int32_t pictureBufferSize = viewHeight_ * viewWidth_ * sizeof(BRGA888Pixel);
     BRGA888Pixel* pictureBuffer = nullptr;
     char* backgroundBuffer = static_cast<char*>(GetRawBuffer());
 
@@ -290,7 +290,7 @@ View::BRGA888Pixel* AnimationLabel::HandleLoadPng(FILE** fp, char** pictureBuffe
     CopyPictureBuffer(attr, *pictureBufferTmp, pictureBuffer);
     free(*pictureBufferTmp);
     *pictureBufferTmp = nullptr;
-    int ret = fclose(*fp);
+    int32_t ret = fclose(*fp);
     if (ret < 0) {
         BATTERY_HILOGD(FEATURE_CHARGING, "fp file close failed.");
         return nullptr;
@@ -299,7 +299,7 @@ View::BRGA888Pixel* AnimationLabel::HandleLoadPng(FILE** fp, char** pictureBuffe
     return pictureBuffer;
 }
 
-void AnimationLabel::SetInterval(int ms)
+void AnimationLabel::SetInterval(int32_t ms)
 {
     intervalMs_ = static_cast<uint32_t>(ms);
 }
