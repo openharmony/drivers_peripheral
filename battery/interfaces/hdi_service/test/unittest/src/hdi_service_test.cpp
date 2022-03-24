@@ -1224,7 +1224,7 @@ HWTEST_F (HdiServiceTest, HdiService020, TestSize.Level1)
 
 /**
  * @tc.name: HdiService021
- * @tc.desc: Test functions VibrateInit in ChargerThread
+ * @tc.desc: Test functions InitVibration in ChargerThread
  * @tc.type: FUNC
  */
 HWTEST_F (HdiServiceTest, HdiService021, TestSize.Level1)
@@ -1232,12 +1232,12 @@ HWTEST_F (HdiServiceTest, HdiService021, TestSize.Level1)
     std::unique_ptr<BatteryVibrate> vibrate = std::make_unique<BatteryVibrate>();
     const std::string VIBRATOR_PLAYMODE_PATH = "/sys/class/leds/vibrator/play_mode";
     const std::string VIBRATOR_DURATIONMODE_PATH = "/sys/class/leds/vibrator/duration";
-    auto ret = vibrate->VibrateInit();
+    auto ret = vibrate->InitVibration();
     if ((access(VIBRATOR_PLAYMODE_PATH.c_str(), F_OK) == 0) ||
         (access(VIBRATOR_DURATIONMODE_PATH.c_str(), F_OK) == 0)) {
-        ASSERT_TRUE(ret == 0);
+        ASSERT_TRUE(ret);
     } else {
-        ASSERT_TRUE(ret == -1);
+        ASSERT_FALSE(ret);
     }
 }
 

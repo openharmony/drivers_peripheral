@@ -16,7 +16,7 @@
 #ifndef CHARGER_UI_SURFACE_DEV_H
 #define CHARGER_UI_SURFACE_DEV_H
 
-#include <mutex>
+#include <cstdint>
 
 namespace OHOS {
 namespace HDI {
@@ -32,9 +32,7 @@ public:
     explicit SurfaceDev(SurfaceDev::DevType devType);
     ~SurfaceDev();
     void Flip(char* buf);
-    void GetScreenSize(int& w, int& h);
-private:
-    std::mutex mMutex;
+    void GetScreenSize(int32_t& w, int32_t& h);
 };
 }  // namespace V1_0
 }  // namespace Battery

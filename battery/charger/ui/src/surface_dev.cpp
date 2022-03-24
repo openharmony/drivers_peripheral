@@ -18,7 +18,6 @@
 #include <cstring>
 #include <drm_fourcc.h>
 #include <fcntl.h>
-#include <poll.h>
 #include <sys/mman.h>
 #include <xf86drm.h>
 #include <xf86drmMode.h>
@@ -54,18 +53,18 @@ void SurfaceDev::Flip(char* buf)
     }
 }
 
-static int ModesetCreateFb(int fd, struct BufferObject* bo)
+static int32_t ModesetCreateFb(int32_t fd, struct BufferObject* bo)
 {
     struct drm_mode_create_dumb create = {};
     struct drm_mode_map_dumb map = {};
-    const int offsetNumber = 4;
+    const int32_t offsetNumber = 4;
     uint32_t handles[offsetNumber] = {0};
     uint32_t pitches[offsetNumber] = {0};
     uint32_t offsets[offsetNumber] = {0};
-    int ret;
+    int32_t ret;
 
     /* create a dumb-buffer, the pixel format is XRGB888 */
-    const int pixelDepth = 32;
+    const int32_t pixelDepth = 32;
     create.width = bo->width;
     create.height = bo->height;
     create.bpp = pixelDepth;
@@ -103,10 +102,10 @@ static int ModesetCreateFb(int fd, struct BufferObject* bo)
     return 0;
 }
 
-int DrmInit(void)
+int32_t DrmInit(void)
 {
     BATTERY_HILOGD(FEATURE_CHARGING, "start init drm");
-    int fd = -1;
+    int32_t fd = -1;
     drmModeConnector* conn;
     uint32_t connId;
     uint32_t crtcId;
@@ -147,10 +146,10 @@ SurfaceDev::SurfaceDev(SurfaceDev::DevType devType)
     }
 }
 
-void SurfaceDev::GetScreenSize(int& w, int& h)
+void SurfaceDev::GetScreenSize(int32_t& w, int32_t& h)
 {
-    const int screenSizeW = 480;
-    const int screenSizeH = 960;
+    const int32_t screenSizeW = 480;
+    const int32_t screenSizeH = 960;
     w = screenSizeW;
     h = screenSizeH;
 }

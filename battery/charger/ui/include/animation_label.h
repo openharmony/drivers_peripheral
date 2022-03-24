@@ -33,18 +33,18 @@ public:
         ANIMATION_MODE = 0,
         STATIC_MODE,
     };
-    AnimationLabel(int startX, int startY, int w, int h, Frame* mParent);
-    AnimationLabel() {}
+    AnimationLabel(int32_t startX, int32_t startY, int32_t w, int32_t h, Frame* mParent);
+    AnimationLabel() = default;
     ~AnimationLabel() override;
 public:
     void AddImg(const std::string& imgFileName);
-    int AddStaticImg(const std::string& imgFileName);
-    void SetStaticImg(int picId);
+    int32_t AddStaticImg(const std::string& imgFileName);
+    void SetStaticImg(int32_t picId);
     void SetPlayMode(AnimationLabel::PlayMode mode);
-    void SetInterval(int ms);
+    void SetInterval(int32_t ms);
     std::thread updateThread;
     bool selectable = false;
-    static void SetIsVisible(const bool visible);
+    static void SetIsVisible(bool visible);
     void UpdateLoop();
     static bool needStop_;
 private:
@@ -52,20 +52,20 @@ private:
         png_uint_32 pictureWidth;
         png_uint_32 pictureHeight;
         png_byte pictureChannels;
-        int bitDepth;
-        int colorType;
+        int32_t bitDepth;
+        int32_t colorType;
     };
     void* LoadPng(const std::string& imgFileName);
     View::BRGA888Pixel* HandleLoadPng(FILE** fp, char** pictureBufferTmp, struct PictureAttr& attr);
-    int LoadPngInternalWithFile(FILE* fp, png_structpp pngPtr, png_infopp pngInfoPtr, struct PictureAttr& attr);
+    int32_t LoadPngInternalWithFile(FILE* fp, png_structpp pngPtr, png_infopp pngInfoPtr, struct PictureAttr& attr);
     void CopyPictureBuffer(struct PictureAttr& attr, char* pictureBufferTmp, BRGA888Pixel* pictureBuffer) const;
     Frame* parent_ {};
     uint32_t intervalMs_ = 50;
     std::vector<char*> imgList_ {};
     char* staticImgList_[255] {};
-    int staticShowId_ = 0;
+    int32_t staticShowId_ = 0;
     bool showStatic_ = false;
-    int staticImgSize_ = 0;
+    int32_t staticImgSize_ = 0;
     static bool isVisible_;
 };
 }  // namespace V1_0

@@ -24,13 +24,15 @@ namespace Battery {
 namespace V1_0 {
 class BatteryVibrate {
 public:
-    int VibrateInit();
-    void HandleVibrate(const int time);
+    bool InitVibration();
+    void HandleVibration(int32_t time) const;
 private:
-    void HandlePlayMode(const int time) const;
-    void HandleDurationMode(const int time) const;
-    FILE* HandlePlayModePath() const;
-    int vibrateMode_ = -1;
+    static void HandlePlayMode(int32_t time);
+    static void HandleDurationMode(int32_t time);
+    static void SetPlayMode(const std::string& modeName);
+    static void ActivateVibration(bool isActive);
+    static void SetDuration(int32_t time);
+    int32_t vibrateMode_ = -1;
 };
 }  // namespace V1_0
 }  // namespace Battery

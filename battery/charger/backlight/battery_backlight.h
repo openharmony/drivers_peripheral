@@ -25,16 +25,16 @@ namespace V1_0 {
 class BatteryBacklight {
 public:
     BatteryBacklight();
-    int32_t InitBacklightSysfs();
+    static int32_t InitBacklightSysfs();
     void TurnOnScreen();
     void TurnOffScreen();
-    int HandleBacklight(const unsigned int backlight) const;
+    static int32_t HandleBacklight(uint32_t backlight);
     bool GetScreenState() const;
 private:
-    std::string CreateFile(std::string path, std::string content) const;
-    void InitDevicePah(std::string& path) const;
-    void InitDefaultSysfs(void) const;
-    void TraversalBacklightNode();
+    static void CreateFile(const std::string& path, const std::string& content) ;
+    static void InitDevicePah(std::string& path);
+    void InitDefaultSysfs() const;
+    static void TraversalBacklightNode();
     bool screenOn_ = false;
 };
 }  // namespace V1_0

@@ -1,6 +1,6 @@
 {
     "led":{
-        "comments":"capacity_begin, capacity_end, led_color, led_brighness",
+        "comments":"capacity_begin, capacity_end, led_color, led_brightness",
         "table":[
             [0, 10, 4, 255],
             [10, 90, 6, 255],

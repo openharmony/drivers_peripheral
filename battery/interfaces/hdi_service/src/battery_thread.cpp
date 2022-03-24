@@ -173,7 +173,7 @@ int32_t BatteryThread::Init([[maybe_unused]] void* service)
     return HDF_SUCCESS;
 }
 
-int BatteryThread::UpdateWaitInterval()
+int32_t BatteryThread::UpdateWaitInterval()
 {
     return HDF_FAILURE;
 }

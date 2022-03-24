@@ -35,11 +35,11 @@ namespace V1_0 {
         bool bottom;
     };
 
-void MenuItemInit(int height, int width, View::BRGA888Pixel bgColor, Frame* gHosFrame);
+void MenuItemInit(int32_t height, int32_t width, View::BRGA888Pixel bgColor, Frame* gHosFrame);
 void TextLabelInit(TextLabel* t, const std::string& text, struct Bold bold, struct FocusInfo focus,
     View::BRGA888Pixel color);
 }  // namespace V1_0
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS
-#endif /* CHARGER_UI_HOS_UPDATER_H */
+#endif // CHARGER_UI_UPDATER_UI_H

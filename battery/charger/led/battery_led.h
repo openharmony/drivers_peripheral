@@ -16,7 +16,6 @@
 #ifndef BATTERY_LED_H
 #define BATTERY_LED_H
 
-#include "power_supply_provider.h"
 #include "battery_config.h"
 
 namespace OHOS {
@@ -26,16 +25,15 @@ namespace V1_0 {
 class BatteryLed {
 public:
     int32_t InitLedsSysfs();
-    void TurnOffLed();
-    void WriteLedInfoToSys(const int redbrightness, const int greenbrightness, const int bluebrightness);
-    void UpdateLedColor(const int32_t& chargestate, const int32_t& capacity);
+    static void TurnOffLed();
+    static void WriteLedInfoToSys(int32_t  redBrightness, int32_t  greenBrightness, int32_t  blueBrightness);
+    void UpdateLedColor(int32_t chargeState, int32_t capacity);
 private:
-    void InitMockLedFile(std::string& redPath, std::string& greenPath, std::string& bluePath) const;
-    void TraversalNode();
-    void InitRedLedPath(std::string& redLedPath) const;
-    void InitGreenLedPath(std::string& greenLedPath) const;
-    void InitBlueLedPath(std::string& blueLedPath) const;
-    std::string CreateFile(std::string path, std::string content) const;
+    static void InitMockLedFile(std::string& redPath, std::string& greenPath, std::string& bluePath) ;
+    static void TraversalNode();
+    static void CreateMockLedPath(const std::string& mockPath) ;
+    static void CreateMockLedFile(const std::string& path, const std::string& content) ;
+    static void WriteLedNode(std::string& ledPath, int32_t brightness);
 };
 }  // namespace V1_0
 }  // namespace Battery

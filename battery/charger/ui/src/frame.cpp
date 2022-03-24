@@ -23,7 +23,7 @@ namespace Battery {
 namespace V1_0 {
 using namespace std;
 
-Frame::Frame(unsigned int w, unsigned int h, View::PixelFormat pixType, SurfaceDev* sfDev)
+Frame::Frame(uint32_t w, uint32_t h, View::PixelFormat pixType, SurfaceDev* sfDev)
 {
     this->CreateBuffer(w, h, pixType);
     this->startX_ = 0;
@@ -32,7 +32,6 @@ Frame::Frame(unsigned int w, unsigned int h, View::PixelFormat pixType, SurfaceD
     listIndex_ = 0;
     flushFlag_ = false;
     std::thread(&Frame::FlushThreadLoop, this).detach();
-    currentActionIndex_ = 0;
 }
 
 Frame::~Frame()
@@ -53,7 +52,7 @@ void Frame::FlushThreadLoop()
 
         SyncBuffer();
         frameMutex_.lock();
-        std::map<View*, int>::iterator iter;
+        std::map<View*, int32_t>::iterator iter;
         for (iter = viewMapList_.begin(); iter != viewMapList_.end(); ++iter) {
             View* tmpView = (*iter).first;
             BATTERY_HILOGD(FEATURE_CHARGING, "enter, tmpView->IsVisiable()=%{public}d", tmpView->IsVisiable());

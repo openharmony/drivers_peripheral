@@ -45,45 +45,31 @@ private:
     void HandleTemperature(const int32_t& temperature);
     void HandleCapacity(const int32_t& capacity);
     void HandleStates() override;
-    int UpdateWaitInterval() override;
+    int32_t UpdateWaitInterval() override;
     void CycleMatters() override;
-    void AnimationInit();
-    void LoadImgs(AnimationLabel* g_animationLabel);
-    static void SetKeyWait(struct KeyState& key, int64_t timeout);
-    static int SetKeyState(int code, int value, int64_t now);
-    int InputInit();
-    static void EventPkgCallback(const EventPackage** pkgs, const uint32_t count, uint32_t devIndex);
+    static void AnimationInit();
+    static void LoadImages(AnimationLabel* animationLabel);
+    void SetKeyWait(struct KeyState& key, int64_t timeout);
+    static void SetKeyState(int32_t code, int32_t value, int64_t now);
+    static void InitInput();
+    static void EventPkgCallback(const EventPackage** pkgs, uint32_t count, uint32_t devIndex);
     void HandlePowerKeyState();
-    void HandlePowerKey(int keycode, int64_t now);
+    void HandlePowerKey(int32_t keycode, int64_t now);
     static void HandleInputEvent(const struct input_event* iev);
     std::unique_ptr<BatteryConfig> batteryConfig_ = nullptr;
     std::unique_ptr<PowerSupplyProvider> provider_ = nullptr;
     std::unique_ptr<BatteryVibrate> vibrate_ = nullptr;
     std::unique_ptr<BatteryBacklight> backlight_ = nullptr;
     std::unique_ptr<BatteryLed> led_ = nullptr;
-    int64_t pluginWait_ = -1;
-    static int64_t keyWait_;
-    static int64_t backlightWait_;
-    static int32_t capacity_;
-    int32_t chargeState_ = -1;
+
+    static const int32_t INVALID = -1;
+    int64_t pluginWait_ = INVALID;
+    int64_t keyWait_ = INVALID;
+    int64_t backlightWait_ = INVALID;
+    int32_t capacity_ = INVALID;
+    int32_t chargeState_ = PowerSupplyProvider::BatteryChargeState::CHARGE_STATE_RESERVED;
     bool started_ = false;
 };
-
-constexpr int START_X1 = 0;
-constexpr int START_Y1 = 850;
-constexpr int WIDTH1 = 480;
-constexpr int HEIGHT1 = 30;
-constexpr int START_X2 = 0;
-constexpr int START_Y2 = 900;
-constexpr int WIDTH2 = 480;
-constexpr int HEIGHT2 = 30;
-constexpr int START_X5 = 0;
-constexpr int START_Y5 = 900;
-constexpr int HEIGHT5 = 100;
-constexpr int START_X_SCALE = 8;
-constexpr int START_Y_SCALE = 8;
-constexpr int WIDTH_SCALE1 = 3;
-constexpr int WIDTH_SCALE2 = 4;
 }  // namespace V1_0
 }  // namespace Battery
 }  // namespace HDI
