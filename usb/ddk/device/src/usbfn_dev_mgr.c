@@ -138,11 +138,11 @@ static int32_t CreatDev(const char *udcName, struct UsbFnDeviceDesc *des, struct
     }
 
     fnDevMgr->fnDev.object.objectId = devCnt;
-    ret = snprintf_s(fnDevMgr->name, MAX_NAMELEN, MAX_NAMELEN - 1, "g%d", devCnt);
+    ret = sprintf_s(fnDevMgr->name, MAX_NAMELEN, "g%d", devCnt);
     if (ret < 0) {
         return HDF_ERR_IO;
     }
-    ret = strcpy_s(fnDevMgr->udcName, MAX_NAMELEN - 1, udcName);
+    ret = strcpy_s(fnDevMgr->udcName, MAX_NAMELEN, udcName);
     if (ret != EOK) {
         return HDF_ERR_IO;
     }

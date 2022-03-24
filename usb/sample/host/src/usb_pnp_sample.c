@@ -34,6 +34,10 @@ static void UsbPnpSampleTestWriteLog(char *string)
     gettimeofday(&time, NULL);
 
     fp = fopen("/data/usbhost_pnp_xts", "a+");
+    if (!fp) {
+        HDF_LOGE("%s: fopen failed", __func__);
+        return;
+    }
 
     (void)snprintf_s(str, STR_LEN, STR_LEN - 1, "[XTSCHECK] %d.%06d, %s\n",
         time.tv_sec, time.tv_usec, string);
