@@ -28,8 +28,8 @@ using namespace testing::ext;
 namespace MessageTest {
 class WiFiMessageTest : public testing::Test {
 public:
-    WiFiMessageTest() {};
-    virtual ~WiFiMessageTest() {};
+    WiFiMessageTest() {}
+    virtual ~WiFiMessageTest() {}
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
