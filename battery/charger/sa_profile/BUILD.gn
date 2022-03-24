@@ -18,6 +18,6 @@ import("//build/ohos.gni")
 ohos_prebuilt_etc("led_config") {
   source = "led_config.json"
   relative_install_dir = "ledconfig"
-  part_name = "battery_manager_native"
-  subsystem_name = "powermgr"
+  part_name = "battery_device_driver"
+  subsystem_name = "hdf"
 }

@@ -11,34 +11,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/powermgr/battery_manager/batterymgr.gni")
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
-import("//foundation/appexecfwk/standard/appexecfwk.gni")
 
 config("batteryd_private_config") {
   include_dirs = [
-    "//drivers/ability/sbuf/include",
-    "//drivers/framework/include",
-    "//drivers/framework/include/core",
-  ]
-}
-
-config("batteryd_public_config") {
-  include_dirs = [
     "include",
-    "${battery_manager_path}/hdi/api/include",
-    "//third_party/jsoncpp/include",
-    "//base/startup/syspara_lite/adapter/native/syspara/include",
     "//drivers/peripheral/battery/charger/ui/include",
     "//drivers/peripheral/battery/charger/vibrate",
     "//drivers/peripheral/battery/charger/backlight",
     "//drivers/peripheral/battery/charger/led",
-    "//base/powermgr/power_manager/interfaces/innerkits/native/include",
-    "//drivers/peripheral/input/interfaces/include",
     "//drivers/peripheral/battery/interfaces/hdi_service/include",
     "//drivers/peripheral/battery/interfaces/include",
-    "//third_party/libpng",
+    "//drivers/peripheral/battery/utils/include",
   ]
 }
 
@@ -53,32 +37,27 @@ ohos_executable("charger") {
     "vibrate/battery_vibrate.cpp",
   ]
 
-  configs = [
-    "${utils_path}:utils_config",
-    ":batteryd_private_config",
-  ]
-
-  public_configs = [ ":batteryd_public_config" ]
+  configs = [ ":batteryd_private_config" ]
 
   deps = [
-    "${hdf_uhdf_path}/host:libhdf_host",
-    "${hdf_uhdf_path}/ipc:libhdf_ipc_adapter",
-    "${hdf_uhdf_path}/utils:libhdf_utils",
-    "//drivers/peripheral/battery/charger/ui:libminui",
-    "//base/powermgr/power_manager/interfaces/innerkits:powermgr_client",
-    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//drivers/interface/battery/v1_0:libbattery_proxy_1.0",
+    "//drivers/peripheral/battery/charger/ui:libminui",
     "//drivers/peripheral/battery/interfaces/hdi_service:libbattery_interface_service_1.0",
     "//third_party/jsoncpp:jsoncpp",
-    "//utils/native/base:utils",
+    "//third_party/libdrm:libdrm",
+    "//third_party/libpng:libpng",
   ]
 
   external_deps = [
+    "startup_l2:syspara",
+    "power_manager_native:powermgr_client",
     "hiviewdfx_hilog_native:libhilog",
+    "input_device_driver:hdi_input",
     "ipc:ipc_core",
+    "utils_base:utils",
   ]
 
-  part_name = "battery_manager_native"
+  part_name = "battery_device_driver"
 }
 
 group("charger_group") {
