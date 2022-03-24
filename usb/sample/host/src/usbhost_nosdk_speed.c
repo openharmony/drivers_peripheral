@@ -47,6 +47,7 @@
 #define TEST_PRINT_TIME 2
 #define TEST_PRINT_TIME_UINT    1000
 #define ENDPOINT_IN_OFFSET 7
+#define PATH_MAX_LENGTH 24
 
 
 static pid_t tid;
@@ -76,10 +77,10 @@ static void CloseDevice()
 
 static int32_t OpenDevice()
 {
-    char path[24];
+    char path[PATH_MAX_LENGTH];
     int32_t ret;
 
-    ret = snprintf_s(path, 24, sizeof(path), USB_DEV_FS_PATH "/%03u/%03u", g_busNum, g_devAddr);
+    ret = sprintf_s(path, sizeof(char) * PATH_MAX_LENGTH, USB_DEV_FS_PATH "/%03u/%03u", g_busNum, g_devAddr);
     if (ret < 0) {
         printf("path error\n");
         return ret;
@@ -113,6 +114,8 @@ static int32_t ClaimInterface(unsigned int iface)
 
 static void FillUrb(struct UsbAdapterUrb *urb, int32_t len)
 {
+    int32_t ret;
+
     if (urb == NULL)
     {
         urb = OsalMemCalloc(sizeof(*urb));
@@ -122,7 +125,10 @@ static void FillUrb(struct UsbAdapterUrb *urb, int32_t len)
         urb->endPoint = endNum;
     }
     if ((endNum >> ENDPOINT_IN_OFFSET) == 0) {
-        memset_s(urb->buffer, len, 'c', len);
+        ret = memset_s(urb->buffer, len, 'c', len);
+        if (ret != EOK) {
+            printf("memset_s failed: ret = %d\n", ret);
+        }
     }
 }
 

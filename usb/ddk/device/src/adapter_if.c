@@ -1288,11 +1288,20 @@ void *UsbFnMemCalloc(size_t size)
     struct RawUsbRamTestList *testEntry = NULL;
     struct RawUsbRamTestList *pos = NULL;
     uint32_t totalSize = 0;
+    int32_t ret = 0;
 
     buf = OsalMemAlloc(size);
-    if (buf != NULL) {
-        (void)memset_s(buf, size, 0, size);
+    if (buf == NULL) {
+        HDF_LOGE("%{public}s: %{public}d, OsalMemAlloc failed", __func__, __LINE__);
+        return NULL;
     }
+    ret = memset_s(buf, size, 0, size);
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s: %{public}d, memset_s failed", __func__, __LINE__);
+        OsalMemFree(buf);
+        return NULL;
+    }
+
     if (g_usbRamTestFlag) {
         if (g_usbRamTestHead == NULL) {
             g_usbRamTestHead = OsalMemAlloc(sizeof(struct RawUsbRamTestList));
