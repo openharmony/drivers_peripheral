@@ -404,7 +404,7 @@ HWTEST_F(WifiHdiHalServiceTest, ResetDriverTest_016, TestSize.Level1)
 {
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_STATION;
     std::shared_ptr<WifiFeatureInfo> feature = nullptr;
-    uint8_t chipId= 0;
+    uint8_t chipId = 0;
 
     auto wlanObj = IWlan::Get(WLAN_SERVICE_NAME);
     ASSERT_TRUE(wlanObj != nullptr);

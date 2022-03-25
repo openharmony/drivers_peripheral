@@ -412,7 +412,7 @@ HWTEST_F(HdfWifiServiceCTest, ResetDriverTest_016, TestSize.Level1)
 {
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_STATION;
     struct WlanFeatureInfo *ifeature = nullptr;
-    uint8_t chipId= 0;
+    uint8_t chipId = 0;
     int32_t rc;
 
     rc = g_wlanObj->createFeature(g_wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
