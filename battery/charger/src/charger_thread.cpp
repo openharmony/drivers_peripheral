@@ -132,13 +132,13 @@ void ChargerThread::LoadImages(AnimationLabel* animationLabel)
 
         if (i < LOOP_TOP_PICTURES) {
             if (snprintf_s(nameBuf, MAX_IMG_NAME_SIZE, MAX_IMG_NAME_SIZE - 1,
-                           "/system/etc/resources/loop0000%d.png", i) != EOK) {
+                           "/system/etc/resources/loop0000%d.png", i) == -1) {
                 BATTERY_HILOGW(FEATURE_CHARGING, "snprintf_s failed, index=%{public}d", i);
                 return;
             }
         } else {
             if (snprintf_s(nameBuf, MAX_IMG_NAME_SIZE, MAX_IMG_NAME_SIZE - 1,
-                           "/system/etc/resources/loop000%d.png", i) != EOK) {
+                           "/system/etc/resources/loop000%d.png", i) == -1) {
                 BATTERY_HILOGW(FEATURE_CHARGING, "snprintf_s failed, index=%{public}d", i);
                 return;
             }
@@ -472,7 +472,7 @@ void ChargerThread::Init()
     }
 
     if (!vibrate_->InitVibration()) {
-        BATTERY_HILOGE(FEATURE_CHARGING, "InitVibration failed, vibration does not work");
+        BATTERY_HILOGW(FEATURE_CHARGING, "InitVibration failed, vibration does not work");
     }
 
     backlight_ = std::make_unique<BatteryBacklight>();

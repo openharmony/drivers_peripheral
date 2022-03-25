@@ -28,6 +28,7 @@ config("batteryd_private_config") {
 
 ohos_executable("charger") {
   install_enable = true
+  defines = [ "ENABLE_INIT_LOG" ]
   sources = [
     "backlight/battery_backlight.cpp",
     "led/battery_led.cpp",
@@ -35,6 +36,9 @@ ohos_executable("charger") {
     "src/charger_thread.cpp",
     "ui/src/updater_ui.cpp",
     "vibrate/battery_vibrate.cpp",
+    "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_config.cpp",
+    "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_thread.cpp",
+    "//drivers/peripheral/battery/interfaces/hdi_service/src/power_supply_provider.cpp",
   ]
 
   configs = [ ":batteryd_private_config" ]
@@ -49,7 +53,8 @@ ohos_executable("charger") {
   ]
 
   external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
+    "device_driver_framework:libhdf_utils",
+    "init:libbegetutil",
     "input_device_driver:hdi_input",
     "ipc:ipc_core",
     "power_manager_native:powermgr_client",
