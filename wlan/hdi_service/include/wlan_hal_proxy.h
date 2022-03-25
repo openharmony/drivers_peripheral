@@ -68,7 +68,7 @@ private:
 
 class IPCObjectStubWlan: public OHOS::IPCObjectStub {
 public:
-    explicit IPCObjectStubWlan() : OHOS::IPCObjectStub(u"") {};
+    explicit IPCObjectStubWlan() : OHOS::IPCObjectStub(u"") {}
     virtual ~IPCObjectStubWlan() = default;
     int OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data,
         OHOS::MessageParcel &reply, OHOS::MessageOption &option) override;
