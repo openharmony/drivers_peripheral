@@ -224,7 +224,7 @@ void BatteryLed::InitMockLedFile(std::string& redPath, std::string& greenPath, s
         sleep(MKDIR_WAIT_TIME);
     }
 
-    BATTERY_HILOGE(FEATURE_CHARGING, "create mock led path and file");
+    BATTERY_HILOGD(FEATURE_CHARGING, "create mock led path and file");
     CreateMockLedPath(RED_LED_PATH);
     CreateMockLedPath(GREEN_LED_PATH);
     CreateMockLedPath(BLUE_LED_PATH);

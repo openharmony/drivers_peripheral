@@ -55,7 +55,7 @@ void Frame::FlushThreadLoop()
         std::map<View*, int32_t>::iterator iter;
         for (iter = viewMapList_.begin(); iter != viewMapList_.end(); ++iter) {
             View* tmpView = (*iter).first;
-            BATTERY_HILOGD(FEATURE_CHARGING, "enter, tmpView->IsVisiable()=%{public}d", tmpView->IsVisiable());
+            BATTERY_HILOGD(FEATURE_CHARGING, "tmpView->IsVisiable()=%{public}d", tmpView->IsVisiable());
             if (tmpView->IsVisiable()) {
                 char* bufTmp = static_cast<char*>(tmpView->GetBuffer());
                 DrawSubView(tmpView->startX_, tmpView->startY_, tmpView->viewWidth_, tmpView->viewHeight_, bufTmp);

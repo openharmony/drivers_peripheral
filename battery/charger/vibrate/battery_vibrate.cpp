@@ -53,7 +53,7 @@ bool BatteryVibrate::InitVibration()
         return true;
     }
 
-    BATTERY_HILOGI(FEATURE_CHARGING, "not support vibrate path");
+    BATTERY_HILOGW(FEATURE_CHARGING, "not support vibrate path");
     return false;
 }
 

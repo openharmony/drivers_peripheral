@@ -14,6 +14,7 @@
 import("//build/ohos.gni")
 
 ohos_static_library("libminui") {
+  defines = [ "ENABLE_INIT_LOG" ]
   sources = [
     "src/animation_label.cpp",
     "src/frame.cpp",
@@ -34,7 +35,7 @@ ohos_static_library("libminui") {
     "//third_party/libpng:libpng",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [ "init:libbegetutil" ]
 
   subsystem_name = "hdf"
   part_name = "battery_device_driver"

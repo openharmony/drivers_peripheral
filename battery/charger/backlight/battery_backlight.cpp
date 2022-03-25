@@ -73,7 +73,7 @@ int32_t BatteryBacklight::InitBacklightSysfs()
 
     dir = opendir(BACKLIGHT_BASE_PATH.c_str());
     if (dir == nullptr) {
-        BATTERY_HILOGE(FEATURE_CHARGING, "backlight base path is not exist");
+        BATTERY_HILOGW(FEATURE_CHARGING, "backlight base path is not exist");
         return ERR_INVALID_VALUE;
     }
 
@@ -127,7 +127,6 @@ bool BatteryBacklight::GetScreenState() const
 
 void BatteryBacklight::CreateFile(const std::string& path, const std::string& content)
 {
-    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
         BATTERY_HILOGD(FEATURE_CHARGING, "Cannot create file %{public}s", path.c_str());
@@ -139,20 +138,18 @@ void BatteryBacklight::CreateFile(const std::string& path, const std::string& co
 
 void BatteryBacklight::InitDefaultSysfs() const
 {
-    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
     std::string brightnessPath = "/data";
     if (access(brightnessPath.c_str(), 0) == -1) {
         mkdir("/data", S_IRWXU);
         sleep(MKDIR_WAIT_TIME);
     }
 
-    BATTERY_HILOGE(FEATURE_CHARGING, "create default brightness path for Hi3516DV300");
+    BATTERY_HILOGI(FEATURE_CHARGING, "create default brightness path");
     CreateFile("/data/brightness", "127");
 }
 
 void BatteryBacklight::InitDevicePah(std::string& path)
 {
-    BATTERY_HILOGI(FEATURE_CHARGING, "enter");
     if (access(path.c_str(), F_OK) == 0) {
         BATTERY_HILOGI(FEATURE_CHARGING, "system backlight path exist");
         return;
