@@ -113,7 +113,7 @@ static int32_t UsbdDriverBind(struct HdfDeviceObject *device)
         return HDF_FAILURE;
     }
     if (memset_s(dev, sizeof(struct UsbdService), 0, sizeof(struct UsbdService)) != EOK) {
-        HDF_LOGE("%{public}s:%{public}d  memset_s faild ", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d  memset_s failed ", __func__, __LINE__);
         OsalMemFree(dev);
         return HDF_FAILURE;
     }

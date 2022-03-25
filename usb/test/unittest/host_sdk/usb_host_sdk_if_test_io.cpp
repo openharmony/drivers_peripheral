@@ -73,8 +73,8 @@ static void AcmWriteBulk(struct UsbRequest *req)
 {
     int32_t status;
 
-    if (req == NULL) {
-        printf("%s:%d req is NULL!", __func__, __LINE__);
+    if (req == nullptr) {
+        printf("%s:%d req is nullptr!", __func__, __LINE__);
         return;
     }
 
@@ -99,7 +99,7 @@ static int32_t AcmWriteBufAlloc(struct AcmDevice *acm)
 {
     int32_t i;
     struct AcmWb *wb;
-    for (wb = &acm->wb[0],i = 0; i < ACM_NW; i++,wb++) {
+    for (wb = &acm->wb[0], i = 0; i < ACM_NW; i++, wb++) {
         wb->buf = (uint8_t *)OsalMemCalloc(acm->writeSize);
         if (!wb->buf) {
             while (i != 0) {
@@ -116,8 +116,8 @@ static int32_t AcmWriteBufAlloc(struct AcmDevice *acm)
 
 static void AcmCtrlIrq(struct UsbRequest *req)
 {
-    if (req == NULL) {
-        printf("%s:%d req is NULL!", __func__, __LINE__);
+    if (req == nullptr) {
+        printf("%s:%d req is nullptr!", __func__, __LINE__);
         return;
     }
     int32_t status = req->compInfo.status;
@@ -268,7 +268,7 @@ static void AcmFillWriteRequest()
 
     for (i = 0; i < ACM_NW; i++) {
         g_acm->wb[i].len = size;
-        if ((g_acm->wb[i].buf == NULL) || (g_acm->writeSize == 0)) {
+        if ((g_acm->wb[i].buf == nullptr) || (g_acm->writeSize == 0)) {
             break;
         }
         ret = memcpy_s(g_acm->wb[i].buf, g_acm->writeSize, sendData, size);

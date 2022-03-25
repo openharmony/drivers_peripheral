@@ -403,7 +403,7 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialDeviceInfo, TestSize.Level1)
     char targetLog[logMaxLen] = {0};
     const char *fmt = "device descriptor info:[%s %s %s %s %s]";
     snprintf_s(targetLog, logMaxLen, logMaxLen -1, fmt, \
-    idVendor, idProduct, bDeviceClass,bDeviceSubClass, bDeviceProtocol);
+    idVendor, idProduct, bDeviceClass, bDeviceSubClass, bDeviceProtocol);
     printf("targetLog==>%s\n", targetLog);
     double startTs = GetNowTs();
     ASSERT_EQ(system("usbhost_ddk_test -AC"), 0);

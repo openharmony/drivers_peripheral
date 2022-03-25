@@ -23,13 +23,10 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <fcntl.h>
-#include <stdlib.h>
 #include <sys/time.h>
 #include <signal.h>
-#include <sys/mman.h>
 #include <osal_sem.h>
 #include <osal_thread.h>
-#include <errno.h>
 #include <sys/syscall.h>
 #include <time.h>
 #include "usbhost_nosdk_speed.h"
@@ -169,13 +166,13 @@ static int32_t SendProcess(void *argurb)
         for (i = 0; i < TEST_CYCLE; i++) {
             if (urb[i].inUse == 0) {
                 urb[i].inUse = 1;
-                urb[i].urb->userContext = (void*)(&urb[i]);
+                urb[i].urb->userContext = (void *)(&urb[i]);
                 break;
             }
         }
 
-        if (i==TEST_CYCLE) {
-            i=TEST_CYCLE-1;
+        if (i == TEST_CYCLE) {
+            i = TEST_CYCLE - 1;
         }
         sendUrb = urb[i].urb;
         FillUrb(sendUrb, TEST_LENGTH);
@@ -222,7 +219,7 @@ static int32_t ReapProcess(void *argurb)
         }
         unsigned char *recvBuf = (unsigned char*)urbrecv->buffer;
 
-        if (g_printData == true) {
+        if (g_printData) {
             for (int32_t i = 0; i < urbrecv->actualLength; i++)
                 printf("%c", recvBuf[i]);
             fflush(stdout);
@@ -297,7 +294,7 @@ static int32_t BeginProcess(unsigned char endPoint)
     }
 
     kill(tid, SIGUSR1);
-    while (exitOk != true) {
+    while (!exitOk) {
         OsalMSleep(10);
     }
     for (int32_t i = 0; i < TEST_CYCLE; i++) {

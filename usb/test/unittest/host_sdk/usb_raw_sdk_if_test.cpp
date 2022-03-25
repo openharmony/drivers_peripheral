@@ -56,28 +56,28 @@ static int32_t UsbIoThread(void *data)
     struct AcmDevice *acm = (struct AcmDevice *)data;
 
     for (;;) {
-        if (acm == NULL) {
-            printf("%s:%d acm is NULL\n", __func__, __LINE__);
+        if (acm == nullptr) {
+            printf("%s:%d acm is nullptr\n", __func__, __LINE__);
             OsalMSleep(USB_RAW_IO_SLEEP_MS_TIME);
             continue;
         }
 
-        if (acm->devHandle == NULL) {
-            printf("%s:%d acm->devHandle is NULL!\n", __func__, __LINE__);
+        if (acm->devHandle == nullptr) {
+            printf("%s:%d acm->devHandle is nullptr!\n", __func__, __LINE__);
             OsalMSleep(USB_RAW_IO_SLEEP_MS_TIME);
             continue;
         }
 
         ret = UsbRawHandleRequests(acm->devHandle);
         if (ret < 0) {
-            printf("%s:%d UsbRawHandleRequests faile, ret=%d \n", __func__, __LINE__, ret);
+            printf("%s:%d UsbRawHandleRequests faile, ret = %d \n", __func__, __LINE__, ret);
             if (ret == HDF_DEV_ERR_NO_DEVICE) {
-                printf("%s:%d, ret=%d\n", __func__, __LINE__, ret);
+                printf("%s:%d, ret = %d\n", __func__, __LINE__, ret);
                 OsalMSleep(USB_RAW_IO_SLEEP_MS_TIME);
             }
         }
 
-        if (g_stopIoThreadFlag == true) {
+        if (g_stopIoThreadFlag) {
             printf("%s:%d\n", __func__, __LINE__);
             g_stopIoThreadFlag = false;
             break;
@@ -122,7 +122,7 @@ static int32_t UsbStopIo(struct AcmDevice *acm)
     int32_t ret;
 
     HDF_LOGD("%{public}s:%{public}d", __func__, __LINE__);
-    if (g_stopIoThreadFlag == false) {
+    if (!g_stopIoThreadFlag) {
         HDF_LOGD("%{public}s:%{public}d", __func__, __LINE__);
         g_stopIoThreadFlag = true;
     }
@@ -162,19 +162,18 @@ static void AcmWriteBulkCallback(const void *requestArg)
     struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
 
     printf("%s:%d entry!", __func__, __LINE__);
-
-    if (req == NULL) {
-        printf("%s:%d req is NULL!", __func__, __LINE__);
+    if (req == nullptr) {
+        printf("%s:%d req is nullptr!", __func__, __LINE__);
         return;
     }
     struct AcmWb *wb  = (struct AcmWb *)req->userData;
-    if (wb == NULL) {
-        printf("%s:%d userData(wb) is NULL!", __func__, __LINE__);
+    if (wb == nullptr) {
+        printf("%s:%d userData(wb) is nullptr!", __func__, __LINE__);
         return;
     }
 
     if (req->status != USB_REQUEST_COMPLETED) {
-        printf("%s: write req failed, status=%d", __func__, req->status);
+        printf("%s: write req failed, status = %d", __func__, req->status);
     }
 
     wb->use = 0;
@@ -185,14 +184,13 @@ static void AcmReadBulkCallback(const void *requestArg)
     struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
 
     printf("%s:%d entry!", __func__, __LINE__);
-
-    if (req == NULL) {
-        printf("%s:%d req is NULL!", __func__, __LINE__);
+    if (req == nullptr) {
+        printf("%s:%d req is nullptr!", __func__, __LINE__);
         return;
     }
     struct AcmDevice *acm = (struct AcmDevice *)req->userData;
-    if (acm == NULL) {
-        printf("%s:%d userData(acm) is NULL!", __func__, __LINE__);
+    if (acm == nullptr) {
+        printf("%s:%d userData(acm) is nullptr!", __func__, __LINE__);
         return;
     }
     size_t size = req->actualLength;
@@ -245,15 +243,15 @@ static void AcmProcessNotification(struct AcmDevice *acm, unsigned char *buf)
 static void AcmNotifyReqCallback(const void *requestArg)
 {
     struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
-    if (req == NULL) {
+    if (req == nullptr) {
         return;
     }
     struct AcmDevice *acm = (struct AcmDevice *)req->userData;
-    if (acm == NULL) {
+    if (acm == nullptr) {
         return;
     }
     struct UsbCdcNotification *dr = (struct UsbCdcNotification *)req->buffer;
-    if (dr == NULL) {
+    if (dr == nullptr) {
         return;
     }
     unsigned int currentSize = req->actualLength;
@@ -347,7 +345,7 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConf
             case USB_DDK_CLASS_COMM:
                 acm->ctrlIface = i;
                 acm->notifyEp = (UsbEndpoint *)OsalMemAlloc(sizeof(struct UsbEndpoint));
-                if (acm->notifyEp == NULL) {
+                if (acm->notifyEp == nullptr) {
                     printf("%s:%d allocate endpoint failed\n", __func__, __LINE__);
                     return;
                 }
@@ -365,7 +363,7 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConf
                     if ((endPoint->endpointDescriptor.bEndpointAddress \
                         & USB_DDK_ENDPOINT_DIR_MASK) == USB_DDK_DIR_IN) {
                         acm->dataInEp = (UsbEndpoint *)OsalMemAlloc(sizeof(struct UsbEndpoint));
-                        if (acm->dataInEp == NULL) {
+                        if (acm->dataInEp == nullptr) {
                             printf("%s:%d allocate dataInEp failed\n", __func__, __LINE__);
                             break;
                         }
@@ -374,7 +372,7 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConf
                         acm->dataInEp->maxPacketSize = endPoint->endpointDescriptor.wMaxPacketSize;
                     } else { /* get bulk out endpoint */
                         acm->dataOutEp = (UsbEndpoint *)OsalMemAlloc(sizeof(struct UsbEndpoint));
-                        if (acm->dataOutEp == NULL) {
+                        if (acm->dataOutEp == nullptr) {
                             printf("%s:%d allocate dataOutEp failed\n", __func__, __LINE__);
                             break;
                         }
