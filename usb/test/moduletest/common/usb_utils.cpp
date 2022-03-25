@@ -35,7 +35,7 @@ bool HasLog(const string &target, double startTs, const string &file)
         double logTs;
         pos = lineStr.find(flagStr);
         if (pos != string::npos) {
-            logTs = atof(lineStr.substr(pos + tsStartPos, tsLength).c_str());
+            logTs = stod(lineStr.substr(pos + tsStartPos, tsLength));
             if ((logTs - startTs) >= 0) {
                 if (lineStr.find(target) != string::npos) {
                     ret = true;
@@ -95,7 +95,7 @@ void CalcProcInfoFromFile(struct ProcInfo &info, const string &file)
         while (pch != nullptr) {
             if (strstr(pch, "VmRSS")) {
                 pch = strtok(nullptr, " ");
-                ramCur = atof(pch);
+                ramCur = stod(pch);
                 ramCount += 1;
                 ramTotal += ramCur;
                 if (ramCur > ramPeak) {
@@ -105,7 +105,7 @@ void CalcProcInfoFromFile(struct ProcInfo &info, const string &file)
             }
             if (strstr(pch, "Cpu")) {
                 pch = strtok(nullptr, " ");
-                cpuCur = atof(pch);
+                cpuCur = stod(pch);
                 cpuCount += 1;
                 cpuTotal += cpuCur;
                 if (cpuCur > cpuPeak) {
@@ -115,7 +115,7 @@ void CalcProcInfoFromFile(struct ProcInfo &info, const string &file)
             }
             if (strstr(pch, "Threads")) {
                 pch = strtok(nullptr, " ");
-                threadCur = atoi(pch);
+                threadCur = stoi(pch);
                 if (threadCur > threadPeak) {
                     threadPeak = threadCur;
                 }
@@ -144,7 +144,7 @@ double GetTsFromLog(const string &target, double startTs, const string &file)
     const int32_t tsLength = 17;
     while (getline(logFile, lineStr)) {
         if (lineStr.find(target) != string::npos) {
-            logTs = atof(lineStr.substr(tsStartPos, tsLength).c_str());
+            logTs = stod(lineStr.substr(tsStartPos, tsLength));
             if ((logTs - startTs) >= 0) {
                 return logTs;
             }

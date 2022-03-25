@@ -47,7 +47,7 @@ HWTEST_F(UsbHostPerformanceTest, CheckHostSdkRom, TestSize.Level1)
 {
     printf("------start CheckHostSdkRom------\n");
     const char *hostSdkPath = HDF_LIBRARY_FULL_PATH("libusb_ddk_host");
-    long size = 0;
+    int64_t size = 0;
     FILE *fp = fopen(hostSdkPath, "rb");
     fseek(fp, 0, SEEK_END);
     size = ftell(fp);
@@ -88,7 +88,7 @@ HWTEST_F(UsbHostPerformanceTest, CheckHostSdkProcInfo, TestSize.Level1)
     }
     res = popen("ps -ef | grep 'usb_watch_process.sh' | grep -v grep | cut -F 2", "r");
     pch = ParseSysCmdResult(*res, 1, 1);
-    watchPid = atoi(pch);
+    watchPid = stoi(pch);
     printf("try to kill usb_watch_process.sh, pid: %d\n", watchPid);
     kill(watchPid, SIGKILL);
     CalcProcInfoFromFile(info, logFile);
@@ -96,7 +96,7 @@ HWTEST_F(UsbHostPerformanceTest, CheckHostSdkProcInfo, TestSize.Level1)
     EXPECT_LT(info.cpuAvg, 10) << "ErrInfo: average cpu is not less than 10%";
     res = popen("ps -ef | grep 'pnp_host' | grep -v grep | wc -l", "r");
     pch = ParseSysCmdResult(*res, 1, 1);
-    processCount = atoi(pch);
+    processCount = stoi(pch);
     EXPECT_EQ(processCount, 1) << "ErrInfo: host sdk process count is not equal to 1";
     printf("------end CheckHostSdkProcInfo------\n");
 }

@@ -147,8 +147,8 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_004, TestSize.Level2)
 HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_001, TestSize.Level1)
 {
     printf("------start HcsPropTest_001------\n");
-    const char *propName1= "idVendor";
-    const char *propName2= "idProduct";
+    const char *propName1 = "idVendor";
+    const char *propName2 = "idProduct";
     char propValue1[] = "12d1";
     char propValue2[] = "5000";
     char readBuf1[256] = {0};
@@ -171,8 +171,8 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_001, TestSize.Level1)
 HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_002, TestSize.Level1)
 {
     printf("------start HcsPropTest_002------\n");
-    const char *propName= "idVendor";
-    const char *writeBuf= "1234";
+    const char *propName = "idVendor";
+    const char *writeBuf = "1234";
     char readBuf[256] = {0};
     acm_prop_write(propName, writeBuf);
     acm_prop_read(propName, readBuf);
@@ -190,8 +190,8 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_002, TestSize.Level1)
 HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_003, TestSize.Level1)
 {
     printf("------start HcsPropTest_003------\n");
-    const char *propName= "idVendor";
-    const char *writeBuf= "12d1";
+    const char *propName = "idVendor";
+    const char *writeBuf = "12d1";
     char readBuf[256] = {0};
     acm_prop_write(propName, writeBuf);
     acm_prop_read(propName, readBuf);
@@ -209,8 +209,8 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_003, TestSize.Level1)
 HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_004, TestSize.Level1)
 {
     printf("------start HcsPropTest_004------\n");
-    const char *propName= "testp";
-    const char *propValue= "a123";
+    const char *propName = "testp";
+    const char *propValue = "a123";
     char readBuf[256] = {0};
     acm_prop_regist(propName, propValue);
     acm_prop_read(propName, readBuf);
@@ -228,8 +228,8 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_004, TestSize.Level1)
 HWTEST_F(UsbDeviceSerialFuncTest, HcsPropTest_005, TestSize.Level1)
 {
     printf("------start HcsPropTest_005------\n");
-    const char *propName= "testp";
-    const char *writeBuf= "111";
+    const char *propName = "testp";
+    const char *writeBuf = "111";
     char readBuf[256] = {0};
     acm_prop_write(propName, writeBuf);
     acm_prop_read(propName, readBuf);

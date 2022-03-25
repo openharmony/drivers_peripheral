@@ -50,7 +50,7 @@ struct UsbDevice {
 
 struct UsbDeviceHandle {
     struct OsalMutex lock;
-    unsigned long claimedInterfaces;
+    uint64_t claimedInterfaces;
     struct UsbDevice *dev;
     struct UsbSession *session;
     uint32_t caps;

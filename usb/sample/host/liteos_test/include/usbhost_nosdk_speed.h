@@ -29,6 +29,10 @@
 #define TEST_TIME               0xffffffff
 #define TEST_PRINT_TIME         2
 #define TEST_PRINT_TIME_UINT    1000
+#define TEST_PRINT_MAX_RANGE    10000
+#define TEST_DOUBLE_COUNT      (1.0)
+#define TEST_BYTE_COUNT_UINT    1024
+#define INPUT_COMPARE_PARAMNUM  6
 
 #define TEST_WRITE              true
 #define TEST_READ               false

@@ -113,9 +113,9 @@ static void TestPnpAdd(struct HdfIoService *serv)
     }
 
     flag = HdfSbufReadInt32(g_reply, &replyData);
-    if ((flag == false) || (replyData != INT32_MAX)) {
+    if ((!flag) || (replyData != INT32_MAX)) {
         TestPnpWriteLog("usb pnp sample device driver test add reply faile.");
-    } else if ((flag == true) && (replyData == INT32_MAX)) {
+    } else if (flag && replyData == INT32_MAX) {
         TestPnpWriteLog("usb pnp sample device driver test add reply ok.");
     }
 }
@@ -136,9 +136,9 @@ static void TestPnpRemove(struct HdfIoService *serv)
     }
 
     flag = HdfSbufReadInt32(g_reply, &replyData);
-    if ((flag == false) || (replyData != INT32_MAX)) {
+    if ((!flag) || (replyData != INT32_MAX)) {
         TestPnpWriteLog("usb pnp sample device driver test remove reply faile.");
-    } else if ((flag == true) && (replyData == INT32_MAX)) {
+    } else if (flag && replyData == INT32_MAX) {
         TestPnpWriteLog("usb pnp sample device driver test remove reply ok.");
     }
 }
