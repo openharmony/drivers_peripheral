@@ -21,7 +21,6 @@
 #include "osal_time.h"
 #include "vibrator_if.h"
 #include "vibrator_type.h"
-#include "osal_time.h"
 
 using namespace testing::ext;
 
@@ -86,7 +85,7 @@ HWTEST_F(HdfVibratorPerformanceTest, VibratorStartOnce001, TestSize.Level1)
     
     timeUsed = ((tv2.tv_sec * VIBRATOR_USEC_TIME + tv2.tv_nsec / VIBRATOR_MSEC_TIME) - 
         (tv1.tv_sec * VIBRATOR_USEC_TIME + tv1.tv_nsec / VIBRATOR_MSEC_TIME));
-    EXPECT_GT(VIBRATOR_COMMON_TIME,timeUsed);
+    EXPECT_GT(VIBRATOR_COMMON_TIME, timeUsed);
     EXPECT_EQ(0, ret);
     EXPECT_EQ(0, endRet);
 }
