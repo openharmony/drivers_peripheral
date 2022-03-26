@@ -454,7 +454,7 @@ void UsbHostDdkTestStdGetStatus(char *readSbuf)
                 HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
             }
         }
-        printf("%s:%d usb serial control CMD_STD_CTRL_GET_STATUS command done,data=%d\n", __func__, __LINE__, data);
+        printf("%s:%d usb serial control CMD_STD_CTRL_GET_STATUS command done,data=%hu\n", __func__, __LINE__, data);
         TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_STD_CTRL_GET_STATUS", NULL);
     }
 }

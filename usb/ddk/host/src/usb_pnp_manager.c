@@ -24,13 +24,13 @@
 #include "usb_ddk_pnp_loader.h"
 
 #define HDF_LOG_TAG usb_pnp_manager
+#define MODULENAMESIZE 128
 
 bool UsbPnpManagerWriteModuleName(struct HdfSBuf *sbuf, const char *moduleName)
 {
-    char modName[128] = {0};
-
-    if (sprintf_s(modName, sizeof(modName) - 1, "lib%s.z.so", moduleName) < 0) {
-        HDF_LOGE("%s: sprintf_s modName fail", __func__);
+    char modName[MODULENAMESIZE] = {0};
+    if (sprintf_s(modName, MODULENAMESIZE, "lib%s.z.so", moduleName) < 0) {
+        HDF_LOGE("%s: sprintf_s modName failed", __func__);
         return false;
     }
 
@@ -81,7 +81,7 @@ static int32_t UsbPnpManagerInit(struct HdfDeviceObject *device)
 
     status = HdfDeviceRegisterEventListener(usbPnpServ, &usbPnpListener);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("HdfDeviceRegisterEventListener faile status=%d", status);
+        HDF_LOGE("HdfDeviceRegisterEventListener failed status=%d", status);
         return status;
     }
 

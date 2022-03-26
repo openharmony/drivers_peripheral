@@ -144,6 +144,10 @@ int32_t SetPort(int32_t portId, int32_t powerRole, int32_t dataRole, const struc
 
 int32_t QueryPort(int32_t *portId, int32_t *powerRole, int32_t *dataRole, int32_t *mode, struct UsbdService *service)
 {
+    if (portId == NULL || powerRole == NULL || dataRole == NULL || mode == NULL || service ==NULL) {
+        HDF_LOGE("%{public}s: Pointer is NULL", __func__);
+        return HDF_FAILURE;
+    }
     *portId = currentPortId;
     *powerRole = currentPowerRole;
     *dataRole = currentDataRole;

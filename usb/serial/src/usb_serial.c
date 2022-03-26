@@ -671,7 +671,7 @@ static int32_t SerialGetBaudrate(struct SerialDevice *port, struct HdfSBuf *repl
         return HDF_ERR_IO;
     }
 
-    HDF_LOGE("%s:%d baudRate=%d", __func__, __LINE__, baudRate);
+    HDF_LOGE("%s:%d baudRate=%u", __func__, __LINE__, baudRate);
     return HDF_SUCCESS;
 }
 
