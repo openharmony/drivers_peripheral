@@ -527,7 +527,7 @@ static int32_t UsbFnEventProcess(void *arg)
             break;
         }
         ret = memset_s(&event, sizeof(event), 0, sizeof(event));
-        if (ret != HDF_SUCCESS) {
+        if (ret != EOK) {
             HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
             return ret;
         }

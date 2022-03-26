@@ -24,7 +24,7 @@ int32_t UsbdSubscriber::OnRemoteRequest(uint32_t code, MessageParcel &data, Mess
     int32_t ret;
     UsbInfo info;
     PortInfo pinfo;
-    HDF_LOGI("%{public}s:%{public}d subscriber event code:%{public}d", __func__, __LINE__, code);
+    HDF_LOGI("%{public}s:%{public}d subscriber event code:%{public}u", __func__, __LINE__, code);
     switch (code) {
         case CMD_NOTIFY_SUBSCRIBER_DEVICE_EVENT:
             if (data.ReadInterfaceToken() != GetDescriptor()) {

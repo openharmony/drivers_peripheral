@@ -37,14 +37,20 @@
 static struct RawUsbRamTestList *g_usbRamTestHead = NULL;
 static bool g_usbRamTestFlag = false;
 
-static bool IsDirExist(const char *dir)
+static bool IsDirExist(const char *path)
 {
-    if (NULL == dir) {
+    DIR *dir = NULL;
+    if (path == NULL) {
         return false;
     }
-    if (NULL == opendir(dir)) {
+    
+    dir= opendir(path);
+    if (dir == NULL) {
+        HDF_LOGE("%{public}s: %{public}d: opendir failed!, path is %{public}s, errno is %{public}d",
+            __func__,  __LINE__, path, errno);
         return false;
     }
+    closedir(dir);
     return true;
 }
 
@@ -715,7 +721,7 @@ static int32_t CreatDeviceDir(const char *devName)
 {
     int32_t ret;
     char tmp[MAX_PATHLEN];
-    memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+    (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s", CONFIGFS_DIR, devName);
     if (ret < 0) {
         return HDF_ERR_IO;
@@ -1318,8 +1324,7 @@ void *UsbFnMemCalloc(size_t size)
             totalSize += pos->size;
         }
         OsalMutexUnlock(&g_usbRamTestHead->lock);
-
-        HDF_LOGE("%{public}s add size=%{public}d totalSize=%{public}d", __func__, (uint32_t)size, totalSize);
+        HDF_LOGE("%{public}s add size=%{public}u totalSize=%{public}u", __func__, (uint32_t)size, totalSize);
     }
     return buf;
 }

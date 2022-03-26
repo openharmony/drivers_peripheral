@@ -212,7 +212,7 @@ int32_t UsbdClient::DoDispatch(uint32_t cmd, MessageParcel &data, MessageParcel 
     MessageOption option;
     auto ret = usbd->SendRequest(cmd, data, reply, option);
     if (ret != UEC_OK) {
-        HDF_LOGE("failed to send request, cmd: %{public}d, ret: %{public}d", cmd, ret);
+        HDF_LOGE("failed to send request, cmd: %{public}u, ret: %{public}d", cmd, ret);
         return ret;
     }
     return UEC_OK;
@@ -295,12 +295,12 @@ int32_t UsbdClient::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::
     WRITE_PARCEL_WITH_RET(data, Uint8, descId, UEC_SERVICE_WRITE_PARCEL_ERROR);
     int32_t ret = UsbdClient::DoDispatch(CMD_FUN_GET_STRING_DESCRIPTOR, data, reply);
     if (ret != UEC_OK) {
-        HDF_LOGE("%{public}s:%{public}d strId:%{public}d failed:%{public}d", __func__, __LINE__, descId, ret);
+        HDF_LOGE("%{public}s:%{public}d strId:%{public}hhu failed:%{public}d", __func__, __LINE__, descId, ret);
         return ret;
     }
     ret = UsbdClient::GetBufferMessage(reply, decriptor);
     if (ret != UEC_OK) {
-        HDF_LOGE("%{public}s:%{public}d strId:%{public}d failed:%{public}d", __func__, __LINE__, descId, ret);
+        HDF_LOGE("%{public}s:%{public}d strId:%{public}hhu failed:%{public}d", __func__, __LINE__, descId, ret);
     }
     return ret;
 }

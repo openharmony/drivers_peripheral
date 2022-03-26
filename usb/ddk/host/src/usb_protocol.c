@@ -160,7 +160,7 @@ static const struct UsbRawEndpointDescriptor *UsbGetEpDesc(
         return NULL;
     }
     if (ifDes->interfaceDescriptor.bNumEndpoints < (idx + 1)) {
-        HDF_LOGE("%s: invalid param numEp:%d+idx:%d\n ",
+        HDF_LOGE("%s: invalid param numEp:%d+idx:%hhu\n ",
             __func__, ifDes->interfaceDescriptor.bNumEndpoints, idx);
         return NULL;
     }

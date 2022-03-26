@@ -51,7 +51,7 @@ int32_t main(int32_t argc, char *argv[])
         strcmp(arg[0], "?") == 0) {
         ShowUsage();
     } else {
-        printf("unkown cmd\n");
+        printf("unknown cmd\n");
     }
     return 0;
 }
