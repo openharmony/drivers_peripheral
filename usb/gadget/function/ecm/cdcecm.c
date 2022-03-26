@@ -145,7 +145,7 @@ static void UsbEcmRxPush(struct UsbEcm *port)
             }
             count = DataFifoWrite(&port->readFifo, data, size);
             if (count != size) {
-                HDF_LOGW("%s: write %d less than expected %d",
+                HDF_LOGW("%s: write %d less than expected %u",
                     __func__, count, size);
             }
             OsalMutexUnlock(&port->lockReadFifo);
@@ -538,7 +538,7 @@ static int32_t EcmSetup(const struct UsbEcmDevice *ecm, const struct UsbFnCtrlRe
 
         default:
             INVALID:
-            HDF_LOGD("invalid control req%02x.%02x v%04x i%04x l%d\n",
+            HDF_LOGD("invalid control req%02x.%02x v%04x i%04x l%hu\n",
                 ctrl->reqType, ctrl->request, value, index, length);
     }
 
@@ -1009,6 +1009,7 @@ static int32_t EcmRelease(struct HdfDeviceObject *device)
 
 static int32_t EcmDriverInit(struct HdfDeviceObject *device)
 {
+    (void)device;
     HDF_LOGE("%s: usbfn do nothing...", __func__);
     return 0;
 }

@@ -76,6 +76,7 @@ static void WriteSpeedDone(void)
 
 void StopWriteSpeedTest(int32_t signo)
 {
+    (void)signo;
     WriteSpeedDone();
     g_readRuning = false;
     printf("acm_speed_write exit.\n");

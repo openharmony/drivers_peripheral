@@ -98,6 +98,7 @@ static void EcmFreeFifo(struct DataFifo *fifo)
     OsalMemFree(buf);
     DataFifoInit(fifo, 0, NULL);
 }
+
 static int32_t EcmWbIsAvail(struct EcmDevice *ecm)
 {
     int32_t i, n;
@@ -477,6 +478,7 @@ static int32_t EcmWrite(struct EcmDevice *ecm, struct HdfSBuf *data)
 
 static int32_t EcmGetMac(struct EcmDevice *ecm, struct HdfSBuf *reply)
 {
+    (void)reply;
     return HDF_SUCCESS;
 }
 

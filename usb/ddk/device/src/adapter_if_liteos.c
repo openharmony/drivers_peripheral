@@ -1118,7 +1118,7 @@ void UsbFnMemFree(const void *mem)
             totalSize += pos->size;
         }
         OsalMutexUnlock(&g_usbRamTestHead->lock);
-        HDF_LOGE("%{public}s rm size=%{public}d totalSize=%{public}d", __func__, size, totalSize);
+        HDF_LOGE("%{public}s rm size=%{public}u totalSize=%{public}d", __func__, size, totalSize);
     }
 
     if (mem != NULL) {
