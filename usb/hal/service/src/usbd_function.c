@@ -109,12 +109,12 @@ static int32_t RemoveHdc()
 {
     uint8_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_OFF);
     if (status) {
-        HDF_LOGE("%{public}s:%{public}d remove hdc config error = %{public}d\n", __func__, __LINE__, status);
+        HDF_LOGE("%{public}s:%{public}d remove hdc config error = %{public}hhu\n", __func__, __LINE__, status);
         return HDF_FAILURE;
     }
     status = SetParameter(SYS_USB_CONFIGFS, HDC_CONFIGFS_OFF);
     if (status) {
-        HDF_LOGE("%{public}s:%{public}d remove hdc configs error = %{public}d\n", __func__, __LINE__, status);
+        HDF_LOGE("%{public}s:%{public}d remove hdc configs error = %{public}hhu\n", __func__, __LINE__, status);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -124,12 +124,12 @@ static int32_t AddHdc()
 {
     uint8_t status = SetParameter(SYS_USB_CONFIGFS, HDC_CONFIGFS_ON);
     if (status) {
-        HDF_LOGE("%{public}s:%{public}d add hdc configfs error = %{public}d\n", __func__, __LINE__, status);
+        HDF_LOGE("%{public}s:%{public}d add hdc configfs error = %{public}hhu\n", __func__, __LINE__, status);
         return HDF_FAILURE;
     }
     status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_ON);
     if (status) {
-        HDF_LOGE("%{public}s:%{public}d add hdc config error = %{public}d\n", __func__, __LINE__, status);
+        HDF_LOGE("%{public}s:%{public}d add hdc config error = %{public}hhu\n", __func__, __LINE__, status);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
