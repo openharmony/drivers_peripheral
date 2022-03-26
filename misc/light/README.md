@@ -1,4 +1,4 @@
-# light
+# Light
 
 ## Introduction
 
