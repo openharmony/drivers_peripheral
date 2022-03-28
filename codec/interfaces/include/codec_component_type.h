@@ -13,6 +13,27 @@
  * limitations under the License.
  */
 
+/**
+ * @addtogroup Codec
+ * @{
+ *
+ * @brief Defines APIs related to the Codec module.
+ *
+ * The Codec module provides APIs for initializing the custom data and audio and video codecs,
+ * setting codec parameters, and controlling and transferring data.
+ *
+ * @since 3.1
+ */
+
+/**
+ * @file codec_component_type.h
+ *
+ * @brief Declares custom data types used in the Codec module APIs, including the codec types,
+ * audio and video parameters, and buffers.
+ *
+ * @since 3.1
+ */
+
 #ifndef CODEC_COMPONENT_TYPE_H
 #define CODEC_COMPONENT_TYPE_H
 
@@ -27,6 +48,9 @@ extern "C" {
 #endif
 #endif /* __cplusplus */
 
+/**
+ * @brief Defines the maximum value of the sampling format.
+ */
 #define SAMPLE_FMT_NUM 32
 
 /**
@@ -41,7 +65,7 @@ typedef enum {
 } CodecType;
 
 /**
- * @brief Enumerates role types.
+ * @brief Enumerates the types of audio and video encoding/decoding components.
  */
 typedef enum {
     MEDIA_ROLETYPE_IMAGE_JPEG = 0,        /**< JPEG image */
