@@ -211,7 +211,7 @@ int IPCObjectStubWlan::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data,
     int32_t ret = 0;
     int32_t status = -1;
 
-    HDF_LOGI("IPCObjectStubWlan::OnRemoteRequest called, code = %d", code);
+    HDF_LOGI("IPCObjectStubWlan::OnRemoteRequest called, code = %u", code);
     struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
         HDF_LOGE("%s: dataSbuf malloc failed!", __func__);

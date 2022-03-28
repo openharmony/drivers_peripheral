@@ -44,7 +44,7 @@ static int32_t SendCmdSync(const uint32_t cmd, struct HdfSBuf *reqData, struct H
         return RET_CODE_MISUSE;
     }
     int32_t ret = g_wifiService->dispatcher->Dispatch(&g_wifiService->object, cmd, reqData, respData);
-    HILOG_INFO(LOG_DOMAIN, "%s: cmd=%d, ret=%d", __FUNCTION__, cmd, ret);
+    HILOG_INFO(LOG_DOMAIN, "%s: cmd=%u, ret=%d", __FUNCTION__, cmd, ret);
     return ret;
 }
 

@@ -494,7 +494,7 @@ static int32_t ParserIsSupportCombo(struct nl_msg *msg, void *arg)
             }
         }
     }
-    HILOG_INFO(LOG_DOMAIN, "%s: isSupportCombo is %d", __FUNCTION__, *isSupportCombo);
+    HILOG_INFO(LOG_DOMAIN, "%s: isSupportCombo is %hhu", __FUNCTION__, *isSupportCombo);
     return NL_SKIP;
 }
 
@@ -706,7 +706,7 @@ int32_t IsSupportCombo(uint8_t *isSupportCombo)
 
     ifaceId = if_nametoindex(networkInfo.infos[0].name);
     if (ifaceId == 0) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: get iface id(%d) failed", __FUNCTION__, ifaceId);
+        HILOG_ERROR(LOG_DOMAIN, "%s: get iface id(%u) failed", __FUNCTION__, ifaceId);
         return RET_CODE_FAILURE;
     }
 
