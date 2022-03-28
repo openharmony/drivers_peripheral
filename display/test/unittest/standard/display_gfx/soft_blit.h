@@ -49,7 +49,7 @@ public:
     SoftBlit(const BufferHandle &srcBuffer, const IRect &srcRect, const BufferHandle &dstBuffer, const IRect &dstRect,
         const BlendType type);
     bool RunAndCheck(const BufferHandle &exBuffer);
-    ~SoftBlit() {};
+    ~SoftBlit() {}
 
 private:
     IRect mSrcRect = { 0 };

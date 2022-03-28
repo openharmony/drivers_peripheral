@@ -98,7 +98,7 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
         .expectStride = 1080 * 4,
         .expectSize = 1080 * 1920 * 4
     },
-    
+
     {
         .allocInfo = {
             .width = 1080,
@@ -121,7 +121,7 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
         .expectStride = 1080 * 2,
         .expectSize = 1080 * 1920 * 2
     },
-     
+
     {
         .allocInfo = {
             .width = 1080,

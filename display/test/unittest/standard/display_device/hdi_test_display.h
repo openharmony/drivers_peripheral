@@ -30,7 +30,7 @@ namespace TEST {
 class HdiTestDisplay {
 public:
     HdiTestDisplay(uint32_t id, DeviceFuncs &deviceFunc);
-    virtual ~HdiTestDisplay() {};
+    virtual ~HdiTestDisplay() {}
     int32_t Init();
     int32_t GetModeInfoFromId(int32_t id, DisplayModeInfo &modeInfo);
     std::shared_ptr<HdiTestLayer> CreateHdiTestLayer(LayerInfo &info);
