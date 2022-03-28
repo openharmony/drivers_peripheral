@@ -41,6 +41,7 @@ std::shared_ptr<IBuffer> HeapBufferAllocator::AllocBuffer(const uint32_t width,
     }
     if (heap == nullptr) {
         CAMERA_LOGE("Alloc buffer failed");
+        return nullptr;
     }
     std::shared_ptr<IBuffer> buffer = std::make_shared<ImageBuffer>(sourceType_);
     if (buffer != nullptr) {
@@ -53,7 +54,7 @@ std::shared_ptr<IBuffer> HeapBufferAllocator::AllocBuffer(const uint32_t width,
         buffer->SetFormat(format);
         CAMERA_LOGD("Alloc buffer succeed to shared memory segment size:%{public}d.", size);
     } else {
-        delete heap;
+        delete[] heap;
         heap = nullptr;
         CAMERA_LOGE("Alloc buffer failed to shared memory segment.");
     }

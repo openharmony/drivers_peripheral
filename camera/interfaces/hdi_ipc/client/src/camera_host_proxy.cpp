@@ -175,6 +175,7 @@ CamRetCode CameraHostProxy::OpenCamera(const std::string &cameraId,
         sptr<IRemoteObject> remoteCameraDevice = reply.ReadRemoteObject();
         if (remoteCameraDevice == nullptr) {
             HDF_LOGE("%{public}s: CameraHostProxy remoteCameraDevice is null", __func__);
+            return INVALID_ARGUMENT;
         }
         pDevice = OHOS::iface_cast<ICameraDevice>(remoteCameraDevice);
     }

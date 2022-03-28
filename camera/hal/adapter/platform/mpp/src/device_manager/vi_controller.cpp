@@ -14,6 +14,7 @@
  */
 
 #include "vi_controller.h"
+#include <cinttypes>
 #include "camera_metadata_info.h"
 #include "create_sensor_factory.h"
 
@@ -223,7 +224,7 @@ RetCode ViController::GetAEMetaData(std::shared_ptr<CameraStandard::CameraMetada
                     oldExpoTime = expoTime;
                 }
                 meta->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
-                CAMERA_LOGD("%{public}s Get CMD_AE_EXPOTIME [%{public}d]", __FUNCTION__, expoTime);
+                CAMERA_LOGD("%{public}s Get CMD_AE_EXPOTIME [%{public}" PRId64 "]", __FUNCTION__, expoTime);
                 break;
             }
             default:

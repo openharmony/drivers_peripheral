@@ -273,7 +273,7 @@ void LcdDrawScreen(unsigned char* displayBuf, const unsigned char* addr)
     ProcessImage(addr, displayBuf);
 }
 
-void V4L2UvcCallback(const std::string cameraId, const std::vector<DeviceControl>& control,
+void V4L2UvcCallback(const std::string& cameraId, const std::vector<DeviceControl>& control,
     const std::vector<DeviceFormat>& fromat, const bool inOut)
 {
     CAMERA_LOGD("main test:V4L2UvcCallback cameraId = %s, inOut = %d\n", cameraId.c_str(), inOut);
@@ -385,7 +385,7 @@ RetCode V4L2StartFrame(const std::string& cameraID,
     return RC_OK;
 }
 
-void V4L2SetDeviceFormat(DeviceFormat& format, const std::string devname)
+void V4L2SetDeviceFormat(DeviceFormat& format, const std::string& devname)
 {
     constexpr uint32_t captureHeight = 720;
     constexpr uint32_t captureWidth = 1280;
@@ -429,7 +429,7 @@ void V4L2SetDeviceFormat(DeviceFormat& format, const std::string devname)
     }
 }
 
-RetCode V4L2ConfigFormat(DeviceFormat& format, const std::string devname,
+RetCode V4L2ConfigFormat(DeviceFormat& format, const std::string& devname,
     const std::shared_ptr<HosV4L2Dev>& myV4L2Dev)
 {
     RetCode rc = RC_OK;
@@ -452,8 +452,8 @@ RetCode V4L2ConfigFormat(DeviceFormat& format, const std::string devname,
     return rc;
 }
 
-void V4L2SetBuffers(const int i, std::shared_ptr<FrameSpec> buffptr[],
-    const unsigned int bufSize, const std::string devname)
+void V4L2SetBuffers(const int32_t i, std::shared_ptr<FrameSpec> buffptr[],
+    const uint32_t bufSize, const std::string& devname)
 {
     buffptr[i] = std::make_shared<FrameSpec>();
     buffptr[i]->buffer_ = std::make_shared<IBuffer>();
@@ -589,7 +589,6 @@ void StopAllFrame(bool freeFb)
         pthread_join(g_previewThreadId, nullptr);
 
         if (freeFb) {
-            FBUninit();
             FBUninit();
         }
     } else {

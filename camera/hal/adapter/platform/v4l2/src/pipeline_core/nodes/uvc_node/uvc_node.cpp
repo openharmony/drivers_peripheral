@@ -68,14 +68,17 @@ RetCode UvcNode::StartCheck(int64_t &bufferPoolId)
     BufferManager* manager = Camera::BufferManager::GetInstance();
     if (manager == nullptr) {
         CAMERA_LOGE("buffer manager is null");
+        return RC_ERROR;
     }
     bufferPoolId = manager->GenerateBufferPoolId();
     if (bufferPoolId == 0) {
         CAMERA_LOGE("bufferpool id is 0");
+        return RC_ERROR;
     }
     bufferPool_ = manager->GetBufferPool(bufferPoolId);
     if (bufferPool_ == nullptr) {
         CAMERA_LOGE("bufferpool is null ");
+        return RC_ERROR;
     }
     GetOutPorts();
     return RC_OK;
