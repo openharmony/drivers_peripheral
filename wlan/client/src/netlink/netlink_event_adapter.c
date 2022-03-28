@@ -76,6 +76,7 @@ static int HandleCtrlEvent(int fd)
 
 static int NoSeqCheck(struct nl_msg *msg, void *arg)
 {
+    (void)msg;
     return NL_OK;
 }
 

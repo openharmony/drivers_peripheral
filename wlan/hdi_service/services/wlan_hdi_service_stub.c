@@ -36,7 +36,7 @@ static int32_t WifiServiceCallback(struct HdfDeviceObject *device, struct HdfRem
     int32_t *code;
     WifiScanResult *scanResult;
 
-    HDF_LOGI("WifiServiceCallback enter , eventId = %{public}d", eventId);
+    HDF_LOGI("WifiServiceCallback enter , eventId = %{public}u", eventId);
     struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (dataSbuf == NULL) {
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
@@ -96,7 +96,7 @@ static int32_t HdiWifiConstruct(struct HdfDeviceIoClient *client, struct HdfSBuf
     }
     int32_t ret = WifiConstruct(&g_wifi);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s contruct WiFi failed! error code: %d", __func__, ret);
+        HDF_LOGE("%s construct WiFi failed! error code: %d", __func__, ret);
         return HDF_FAILURE;
     }
     return ret;
