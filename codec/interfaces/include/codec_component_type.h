@@ -54,342 +54,240 @@ extern "C" {
 #define SAMPLE_FMT_NUM 32
 
 /**
- * @brief Enumerates the codec types.
+ * @brief Enumerates codec types.
  */
 typedef enum {
-    /** Video decoder */
-    VIDEO_DECODER,
-    /** Video encoder */
-    VIDEO_ENCODER,
-    /** Audio decoder */
-    AUDIO_DECODER,
-    /** Audio encoder */
-    AUDIO_ENCODER,
-    /** Invalid type */
-    INVALID_TYPE
+    VIDEO_DECODER, /**< Video decoding */
+    VIDEO_ENCODER, /**< Video encoding */
+    AUDIO_DECODER, /**< Audio decoding */
+    AUDIO_ENCODER, /**< Audio encoding */
+    INVALID_TYPE   /**< Invalid type */
 } CodecType;
 
 /**
  * @brief Enumerates the types of audio and video encoding/decoding components.
  */
 typedef enum {
-    /** JPEG image */
-    MEDIA_ROLETYPE_IMAGE_JPEG = 0,
-    /** H.264 video */
-    MEDIA_ROLETYPE_VIDEO_AVC,
-    /** H.265 video */
-    MEDIA_ROLETYPE_VIDEO_HEVC,
-    /** Audio codec */
-    MEDIA_ROLETYPE_AUDIO_FIRST = 0x10000,
-    /** Advanced Audio Coding (AAC) */
-    MEDIA_ROLETYPE_AUDIO_AAC = 0x10000,
-    /** G711A audio */
-    MEDIA_ROLETYPE_AUDIO_G711A,
-    /** G711U audio */
-    MEDIA_ROLETYPE_AUDIO_G711U,
-    /** G726 audio */
-    MEDIA_ROLETYPE_AUDIO_G726,
-    /** Pulse-Code Modulation (PCM) audio */
-    MEDIA_ROLETYPE_AUDIO_PCM,
-    /** MP3 */
-    MEDIA_ROLETYPE_AUDIO_MP3,
-    /** Invalid type */
-    MEDIA_ROLETYPE_INVALID,
+    MEDIA_ROLETYPE_IMAGE_JPEG = 0,        /**< JPEG image */
+    MEDIA_ROLETYPE_VIDEO_AVC,             /**< H.264 video */
+    MEDIA_ROLETYPE_VIDEO_HEVC,            /**< H.265 video */
+    MEDIA_ROLETYPE_AUDIO_FIRST = 0x10000, /**< Dummy id pointing at the start of audio codecs */
+    MEDIA_ROLETYPE_AUDIO_AAC = 0x10000,   /**< AAC audio */
+    MEDIA_ROLETYPE_AUDIO_G711A,           /**< G711A audio */
+    MEDIA_ROLETYPE_AUDIO_G711U,           /**< G711U audio */
+    MEDIA_ROLETYPE_AUDIO_G726,            /**< G726 audio */
+    MEDIA_ROLETYPE_AUDIO_PCM,             /**< PCM audio */
+    MEDIA_ROLETYPE_AUDIO_MP3,             /**< MP3 audio */
+    MEDIA_ROLETYPE_INVALID,               /**< Invalid role type */
 } AvCodecRole;
 
 /**
- * @brief Enumerates the codec profiles.
+ * @brief Enumerates codec profiles.
  */
 typedef enum {
-    /** Invalid profile */
-    INVALID_PROFILE = 0,
-    /** AAC-Low Complex */
-    AAC_LC_PROFILE = 0x1000,
-    /** AAC-Main */
-    AAC_MAIN_PROFILE,
-    /** HEAAC, AAC+, or AACPlusV1 */
-    AAC_HE_V1_PROFILE,
-    /** AAC++ or AACPlusV2 */
-    AAC_HE_V2_PROFILE,
-    /** AAC-Low Delay */
-    AAC_LD_PROFILE,
-    /** AAC-Enhanced Low Delay */
-    AAC_ELD_PROFILE,
-    /** H.264 Baseline */
-    AVC_BASELINE_PROFILE = 0x2000,
-    /** H.264 Main */
-    AVC_MAIN_PROFILE,
-    /** H.264 High */
-    AVC_HIGH_PROFILE,
-    /** H.265 Main */
-    HEVC_MAIN_PROFILE = 0x3000,
-    /** H.265 Main 10 */
-    HEVC_MAIN_10_PROFILE,
+    INVALID_PROFILE = 0,               /**< Invalid profile */
+    AAC_LC_PROFILE = 0x1000,           /**< AAC-Low Complex */
+    AAC_MAIN_PROFILE,                  /**< AAC-Main */
+    AAC_HE_V1_PROFILE,                 /**< HEAAC,  AAC+, or AACPlusV1 */
+    AAC_HE_V2_PROFILE,                 /**< AAC++ or AACPlusV2 */
+    AAC_LD_PROFILE,                    /**< AAC-Low Delay */
+    AAC_ELD_PROFILE,                   /**< AAC-Enhanced Low Delay */
+    AVC_BASELINE_PROFILE = 0x2000,     /**< H.264 Baseline */
+    AVC_MAIN_PROFILE,                  /**< H.264 Main */
+    AVC_HIGH_PROFILE,                  /**< H.264 High */
+    HEVC_MAIN_PROFILE = 0x3000,        /**< H.265 Main */
+    HEVC_MAIN_10_PROFILE,              /**< H.265 Main 10 */
 } Profile;
 
 /**
 * @brief Defines the alignment.
  */
 typedef struct {
-    int32_t widthAlginment; /** Value to align with the width */
-    int32_t heightAlginment; /** Value to align with the height */
+    int32_t widthAlginment;  /**< Value to align with the width */
+    int32_t heightAlginment; /**< Value to align with the height */
 } Alginment;
 
 /**
  * @brief Defines a rectangle.
  */
 typedef struct {
-    int32_t width;  /** Width of the rectangle */
-    int32_t height; /** Height of the rectangle */
+    int32_t width;  /**< Width */
+    int32_t height; /**< Height */
 } Rect;
 
 /**
- * @brief Defines a value range.
+ * @brief Defines a range.
  */
 typedef struct {
-    int32_t min; /** Minimum value */
-    int32_t max; /** Maximum value */
+    int32_t min; /**< Lower end of the range. */
+    int32_t max; /**< Upper end of the range. */
 } RangeValue;
 
 /**
- * @brief Enumerates the playback capabilities.
+ * @brief Enumerates playback capabilities.
  */
 typedef enum {
-    /** Adaptive playback */
-    CODEC_CAP_ADAPTIVE_PLAYBACK = 0x1,
-    /** Secure playback */
-    CODEC_CAP_SECURE_PLAYBACK = 0x2,
-    /** Tunnel playback */
-    CODEC_CAP_TUNNEL_PLAYBACK = 0x4,
-    /** Multi-plane (video image plane and audio tunnel plane) playback */
-    CODEC_CAP_MULTI_PLANE = 0x10000,
+    CODEC_CAP_ADAPTIVE_PLAYBACK = 0x1, /**< Adaptive playback */
+    CODEC_CAP_SECURE_PLAYBACK   = 0x2, /**< Secure playback */
+    CODEC_CAP_TUNNEL_PLAYBACK   = 0x4, /**< Tunnel playback */
+    CODEC_CAP_MULTI_PLANE = 0x10000,    /**< Video picture planes/audio channel planar */
 } CodecCapsMask;
 
 /**
- * @brief Enumerates the audio sampling rates.
+ * @brief Enumerates audio sampling rates.
  */
 typedef enum {
-    /** 8 kHz */
-    AUD_SAMPLE_RATE_8000   = 8000,
-    /** 12 kHz */
-    AUD_SAMPLE_RATE_12000  = 12000,
-    /** 11.025 kHz */
-    AUD_SAMPLE_RATE_11025  = 11025,
-    /** 16 kHz */
-    AUD_SAMPLE_RATE_16000  = 16000,
-    /** 22.050 kHz */
-    AUD_SAMPLE_RATE_22050  = 22050,
-    /** 24 kHz */
-    AUD_SAMPLE_RATE_24000  = 24000,
-    /** 32 kHz */
-    AUD_SAMPLE_RATE_32000  = 32000,
-    /** 44.1 kHz */
-    AUD_SAMPLE_RATE_44100  = 44100,
-    /** 48 kHz */
-    AUD_SAMPLE_RATE_48000  = 48000,
-    /** 64 kHz */
-    AUD_SAMPLE_RATE_64000  = 64000,
-    /** 96 kHz */
-    AUD_SAMPLE_RATE_96000  = 96000,
-    /** Invalid sampling rate */
-    AUD_SAMPLE_RATE_INVALID,
+    AUD_SAMPLE_RATE_8000   = 8000,    /**< 8 KHz */
+    AUD_SAMPLE_RATE_12000  = 12000,   /**< 12 KHz */
+    AUD_SAMPLE_RATE_11025  = 11025,   /**< 11.025 KHz */
+    AUD_SAMPLE_RATE_16000  = 16000,   /**< 16 KHz */
+    AUD_SAMPLE_RATE_22050  = 22050,   /**< 22.050 KHz */
+    AUD_SAMPLE_RATE_24000  = 24000,   /**< 24 KHz */
+    AUD_SAMPLE_RATE_32000  = 32000,   /**< 32 KHz  */
+    AUD_SAMPLE_RATE_44100  = 44100,   /**< 44.1 KHz */
+    AUD_SAMPLE_RATE_48000  = 48000,   /**< 48 KHz */
+    AUD_SAMPLE_RATE_64000  = 64000,   /**< 64 KHz */
+    AUD_SAMPLE_RATE_96000  = 96000,   /**< 96 KHz */
+    AUD_SAMPLE_RATE_INVALID,          /**< Invalid sampling rate */
 } AudioSampleRate;
 
 /**
- * @brief Enumerate the audio sampling formats.
- *
- * For the planar sampling format, the data of each channel is independently stored in data.
- * For the packed sampling format, only the first data is used, and the data of each channel is interleaved.
+ * @brief Enumerates audio sample formats.
+ * For planar sample formats, each audio channel is in a seperate data plane.
+ * For packed sample formats, only the first data plane is used, and samples for each channel are interleaved.
  */
 typedef enum {
-    /** Unsigned 8 bits, packed */
-    AUDIO_SAMPLE_FMT_U8,
-    /** Signed 16 bits, packed */
-    AUDIO_SAMPLE_FMT_S16,
-    /** Signed 32 bits, packed */
-    AUDIO_SAMPLE_FMT_S32,
-    /** Float, packed */
-    AUDIO_SAMPLE_FMT_FLOAT,
-    /** Double, packed */
-    AUDIO_SAMPLE_FMT_DOUBLE,
-    /** Unsigned 8 bits, planar */
-    AUDIO_SAMPLE_FMT_U8P,
-    /** Signed 16 bits, planar */
-    AUDIO_SAMPLE_FMT_S16P,
-    /** Signed 32 bits, planar */
-    AUDIO_SAMPLE_FMT_S32P,
-    /** Float, planar */
-    AUDIO_SAMPLE_FMT_FLOATP,
-    /** Double, planar */
-    AUDIO_SAMPLE_FMT_DOUBLEP,
-    /** Invalid sampling format */
-    AUDIO_SAMPLE_FMT_INVALID,
+    AUDIO_SAMPLE_FMT_U8,      /**< Unsigned 8 bits, packed */
+    AUDIO_SAMPLE_FMT_S16,     /**< Signed 16 bits, packed */
+    AUDIO_SAMPLE_FMT_S32,     /**< Signed 32 bits, packed */
+    AUDIO_SAMPLE_FMT_FLOAT,   /**< Float, packed */
+    AUDIO_SAMPLE_FMT_DOUBLE,  /**< Double, packed */
+    AUDIO_SAMPLE_FMT_U8P,     /**< Unsigned 8 bits, planar */
+    AUDIO_SAMPLE_FMT_S16P,    /**< Signed 16 bits, planar */
+    AUDIO_SAMPLE_FMT_S32P,    /**< Signed 32 bits, planar */
+    AUDIO_SAMPLE_FMT_FLOATP,  /**< Float, planar */
+    AUDIO_SAMPLE_FMT_DOUBLEP, /**< Double, planar */
+    AUDIO_SAMPLE_FMT_INVALID, /**< Invalid sampling format */
 } AudioSampleFormat;
 
 /**
- * @brief Defines the video encoding and decoding capabilities.
+ * @brief Defines the video codec port capability.
  */
-#define PIX_FORMAT_NUM 16 /** Size of the supported pixel format array */
+#define PIX_FORMAT_NUM 16 /**< Indicates the array size of supported pixel formats */
 typedef struct {
-    Rect minSize;                            /** Minimum resolution supported. */
-    Rect maxSize;                            /** Maximum resolution supported. */
-    Alginment whAlignment;                   /** Values to align with the width and height. */
-    RangeValue blockCount;                   /** Number of blocks supported. */
-    RangeValue blocksPerSecond;              /** Number of blocks processed per second. */
-    Rect blockSize;                          /** Block size supported. */
-    int32_t supportPixFmts[PIX_FORMAT_NUM];  /** Supported pixel format. For details,
-                                                 see {@link OMX_COLOR_FORMATTYPE}. */
+    Rect minSize;                            /**< Minimum resolution supported */
+    Rect maxSize;                            /**< Maximum resolution supported */
+    Alginment whAlignment;                   /**< Value to align with the width and height */
+    RangeValue blockCount;
+    RangeValue blocksPerSecond;
+    Rect blockSize;
+    int32_t supportPixFmts[PIX_FORMAT_NUM];    /**< Supported pixel formats, array is terminated by
+                                                    <b> OMX_COLOR_FORMATTYPE</b> */
 } VideoPortCap;
 
 /**
- * @brief Defines the video encoding and decoding capabilities.
+ * @brief Defines the audio codec port capability.
  */
-#define SAMPLE_FORMAT_NUM 12 /** Size of the audio sampling format array supported. */
-#define SAMPLE_RATE_NUM 16 /** Size of the audio sampling rate array supported. */
-#define CHANNEL_NUM 16 /** Size of the audio channel array supported. */
+#define SAMPLE_FORMAT_NUM 12 /**< Indicates the array size of supported audio sample formats */
+#define SAMPLE_RATE_NUM 16 /**< Indicates the array size of supported audio sample rate */
+#define CHANNEL_NUM 16 /**< Indicates the array size of supported audio channel count */
 typedef struct {
-    int32_t sampleFormats[SAMPLE_FMT_NUM]; /** Supported audio sampling formats. For details,
-                                               see {@link AudioSampleFormat}. */
-    int32_t sampleRate[SAMPLE_RATE_NUM];   /** Supported audio sampling rates. For details,
-                                               see {@link AudioSampleRate}. */
-    int32_t channelLayouts[CHANNEL_NUM];   /** Supported audio channel layouts. */
-    int32_t channelCount[CHANNEL_NUM];     /** Supported audio channels. */
+    int32_t sampleFormats[SAMPLE_FMT_NUM]; /**< Supported audio sample formats, array is terminated by
+                                                <b> AUDIO_SAMPLE_FMT_INVALID</b> */
+    int32_t sampleRate[SAMPLE_RATE_NUM];   /**< Supported audio sample rate, array is terminated by
+                                                <b> AUD_SAMPLE_RATE_INVALID</b> */
+    int32_t channelLayouts[CHANNEL_NUM];   /**< Supported count of audio channel layouts,
+                                                array is terminated by <b> -1</b> */
+    int32_t channelCount[CHANNEL_NUM];     /**< Supported audio channel count, array is terminated by <b> -1</b> */
 } AudioPortCap;
 
-/**
- * @brief Defines the audio and video encoding and decoding capabilities.
- */
 typedef union {
-    VideoPortCap video;               /** Video encoding and decoding capabilities */
-    AudioPortCap audio;               /** Audio encoding and decoding capabilities */
+    VideoPortCap video;               /**< Video codec port capability */
+    AudioPortCap audio;               /**< Audio codec port capability */
 } PortCap;
 
-/**
- * @brief Enumerates the codec processing modes.
- */
 typedef enum {
-    /** Input buffer in sync mode */
-    PROCESS_BLOCKING_INPUT_BUFFER     = 0X1,
-    /** Output buffer in sync mode */
-    PROCESS_BLOCKING_OUTPUT_BUFFER    = 0X2,
-    /** Control flow in sync mode */
-    PROCESS_BLOCKING_CONTROL_FLOW     = 0X4,
-    /** Input buffer in async mode */
-    PROCESS_NONBLOCKING_INPUT_BUFFER  = 0X100,
-    /** Output buffer in async mode */
-    PROCESS_NONBLOCKING_OUTPUT_BUFFER = 0X200,
-    /** Control flow in async mode */
-    PROCESS_NONBLOCKING_CONTROL_FLOW  = 0X400,
+    PROCESS_BLOCKING_INPUT_BUFFER       = 0X1,
+    PROCESS_BLOCKING_OUTPUT_BUFFER      = 0X2,
+    PROCESS_BLOCKING_CONTROL_FLOW       = 0X4,
+    PROCESS_NONBLOCKING_INPUT_BUFFER    = 0X100,
+    PROCESS_NONBLOCKING_OUTPUT_BUFFER   = 0X200,
+    PROCESS_NONBLOCKING_CONTROL_FLOW    = 0X400,
 } CodecProcessMode;
 
 /**
- * @brief Defines the codec capabilities.
+ * @brief Defines the codec capability.
  */
-#define NAME_LENGTH 32  /** Size of the component name. */
-#define PROFILE_NUM 256  /** Size of the profile array supported. */
+#define NAME_LENGTH 32  /**< Indicates the array size of component name */
+#define PROFILE_NUM 256  /**< Indicates the array size of supported profile */
 typedef struct {
-    AvCodecRole role;                     /** Media type. */
-    CodecType type;                       /** Codec type. */
-    char compName[NAME_LENGTH];           /** Codec component name. */
-    int32_t supportProfiles[PROFILE_NUM]; /** Supported profiles. For details, see {@link Profile}. */
-    int32_t maxInst;                      /** Maximum instance. */
-    bool isSoftwareCodec;                 /** Whether it is software codec or hardware codec. */
-    int32_t processModeMask;              /** Codec processing mode mask. For details,
-                                              see {@link CodecProcessMode}. */
-    uint32_t capsMask;                    /** Codec playback capability mask. For details,
-                                              see {@link CodecCapsMask}. */
-    RangeValue bitRate;                   /** Supported bit rate range. */
-    PortCap port;                         /** Supported audio and video encoding/decoding capabilities. */
+    AvCodecRole role;                     /**< Role type */
+    CodecType type;                       /**< Codec type */
+    char compName[NAME_LENGTH];           /**< Codec name char string */
+    int32_t supportProfiles[PROFILE_NUM]; /**< Supported profiles, array is terminated by <b> INVALID_PROFILE</b> */
+    int32_t maxInst;                      /**< max instances */
+    bool isSoftwareCodec;                 /**< Software codec or hardware codec */
+    int32_t processModeMask;              /**< Codec process mode mask. For details, see {@link CodecProcessMode}. */
+    uint32_t capsMask;                    /**< Capability mask. For details, see {@link CodecCapsMask}. */
+    RangeValue bitRate;                   /**< Range bit rate supported */
+    PortCap port;
 } CodecCompCapability;
 
-/**
- * @brief Enumerates the buffer types.
- */
 enum BufferType {
-    /** Invalid buffer type. */
     BUFFER_TYPE_INVALID = 0,
-    /** Virtual address type. */
     BUFFER_TYPE_VIRTUAL_ADDR = 0x1,
-    /** Shared memory. */
     BUFFER_TYPE_AVSHARE_MEM_FD = 0x2,
-    /** Handle. */
     BUFFER_TYPE_HANDLE = 0x4,
-    /** Dynamic handle. */
     BUFFER_TYPE_DYNAMIC_HANDLE = 0x8,
 };
 
-/**
- * @brief Enumerate the shared memory types.
- */
 enum ShareMemTypes {
-    /** Readable and writable shared memory */
     READ_WRITE_TYPE = 0x1,
-    /** Readable shared memory */
     READ_ONLY_TYPE = 0x2,
 };
 
-/**
- * @brief Defines the codec buffer information.
- */
 struct OmxCodecBuffer {
-    uint32_t bufferId;               /** Buffer ID. */
-    uint32_t size;                   /** Size of the structure. */
-    union OMX_VERSIONTYPE version;   /** Component version. */
-    enum BufferType bufferType;      /** Buffer type. */
-    uint8_t *buffer;                 /** Buffer used for encoding or decoding. */
-    uint32_t bufferLen;              /** Size of the buffer. */
-    uint32_t allocLen;               /** Size of the buffer allocated. */
-    uint32_t filledLen;              /** Size of the buffer filled. */
-    uint32_t offset;                 /** Offset to the start position of the valid data in the buffer. */
-    int32_t fenceFd;                 /** Fence file descriptor used to signal when the input or
-                                         output buffer is ready to consume. */
-    enum ShareMemTypes type;         /** Shared memory type. */
-    int64_t pts;                     /** Timestamp. */
-    uint32_t flag;                   /** Flag. */
+    uint32_t bufferId;
+    uint32_t size;                   /**< size of the structure in bytes */
+    union OMX_VERSIONTYPE version;   /**< OMX specification version information */
+    enum BufferType bufferType;
+    uint8_t *buffer;            /**< Pointer to actual block of memory that is acting as the buffer */
+    uint32_t bufferLen;         /**< size of buffer */
+    uint32_t allocLen;          /**< size of the buffer allocated, in bytes */
+    uint32_t filledLen;         /**< number of bytes currently in the buffer */
+    uint32_t offset;            /**< start offset of valid data in bytes from the start of the buffer */
+    int32_t fenceFd;
+    enum ShareMemTypes type;
+    int64_t pts;
+    uint32_t flag;
 };
 
-/**
- * @brief Enumerates the extended codec indexes.
- */
 enum OmxIndexCodecExType {
-    /** Extended BufferType index */
     OMX_IndexExtBufferTypeStartUnused = OMX_IndexKhronosExtensions + 0x00a00000,
-    /** SupportBuffer */
     OMX_IndexParamSupportBufferType,
-    /** UseBuffer */
     OMX_IndexParamUseBufferType,
-    /** GetBufferHandleUsage */
     OMX_IndexParamGetBufferHandleUsage,
 };
 
-/**
- * @brief Defines the <b>SupportBuffer</b>.
- */
 struct SupportBufferType {
-    uint32_t size;                                          /** Size of the structure */
-    union OMX_VERSIONTYPE version;                          /** Component version */
-    uint32_t portIndex;                                     /** Port index */
-    uint32_t bufferTypes;                                   /** Supported buffer types */
+    uint32_t size;
+    union OMX_VERSIONTYPE version;
+    uint32_t portIndex;
+    uint32_t bufferTypes;
 };
 
-/**
- * @brief Define the <b>UseBuffer</b>.
- */
 struct UseBufferType {
-    uint32_t size;                                         /** Size of the structure */
-    union OMX_VERSIONTYPE version;                         /** Component version */
-    uint32_t portIndex;                                    /** Port index */
-    uint32_t bufferType;                                   /** Buffer type */
-};
+    uint32_t size;
+    union OMX_VERSIONTYPE version;
+    uint32_t portIndex;
+    uint32_t bufferType;
+} ;
 
-/**
- * @brief Defines the <b>BufferHandleUsage</b>.
- */
 struct GetBufferHandleUsageParams {
-    uint32_t size;                                         /** Size of the structure */
-    union OMX_VERSIONTYPE version;                         /** Component version */
-    uint32_t portIndex;                                    /** Port index */
-    uint32_t usage;                                        /** Usage */
+    uint32_t size;
+    union OMX_VERSIONTYPE version;
+    uint32_t portIndex;
+    uint32_t usage;
 };
 
 #ifdef __cplusplus
