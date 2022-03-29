@@ -20,7 +20,7 @@
 #include <sys/timerfd.h>
 #include <unistd.h>
 #include <linux/netlink.h>
-#include "core/hdf_device_desc.h"
+#include "hdf_base.h"
 #include "battery_log.h"
 
 namespace OHOS {
@@ -173,7 +173,7 @@ int32_t BatteryThread::Init([[maybe_unused]] void* service)
     return HDF_SUCCESS;
 }
 
-int BatteryThread::UpdateWaitInterval()
+int32_t BatteryThread::UpdateWaitInterval()
 {
     return HDF_FAILURE;
 }
