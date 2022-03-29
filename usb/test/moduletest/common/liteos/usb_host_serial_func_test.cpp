@@ -426,7 +426,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialClsCtrlCmdSync_002, TestSize.Level2)
 {
     printf("------start UsbSerialClsCtrlCmdSync_002------\n");
     char readBuf[DATA_MAX_LEN] = {0};
-    for (int32_t i=0; i < TEST_COUNT; i++) {
+    for (int32_t i = 0; i < TEST_COUNT; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_CTRL_CLASS_SYNC);
         UsbHostDdkTestCtrlClass(readBuf);
@@ -466,7 +466,7 @@ HWTEST_F(UsbHostSerialFuncTest, UsbSerialCtrlCmdAsync_002, TestSize.Level2)
 {
     printf("------start UsbSerialCtrlCmdAsync_002------\n");
     char readBuf[DATA_MAX_LEN] = {0};
-    for (int32_t i=0; i < TEST_COUNT; i++) {
+    for (int32_t i = 0; i < TEST_COUNT; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
         UsbHostDdkTestOpen(HOST_ACM_CTRL_ASYNC_DESCRIPTOR);
         UsbHostDdkTestStdGetDesAsync(readBuf);

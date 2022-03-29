@@ -35,7 +35,7 @@ bool HasLog(const string &target, double startTs, const string &file)
         double logTs;
         pos = lineStr.find(flagStr);
         if (pos != string::npos) {
-            logTs = atof(lineStr.substr(pos + tsStartPos, tsLength).c_str());
+            logTs = stod(lineStr.substr(pos + tsStartPos, tsLength));
             if ((logTs - startTs) >= 0) {
                 if (lineStr.find(target) != string::npos) {
                     ret = true;
@@ -153,7 +153,7 @@ double GetTsFromLog(const string &target, double startTs, const string &file)
     const int32_t tsLength = 17;
     while (getline(logFile, lineStr)) {
         if (lineStr.find(target) != string::npos) {
-            logTs = atof(lineStr.substr(tsStartPos, tsLength).c_str());
+            logTs = stod(lineStr.substr(tsStartPos, tsLength));
             if ((logTs - startTs) >= 0) {
                 return logTs;
             }

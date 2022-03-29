@@ -1092,7 +1092,7 @@ static int32_t UsbSerialDeviceDispatch(struct HdfDeviceIoClient *client, int32_t
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    if (g_acmReleaseFlag == true) {
+    if (g_acmReleaseFlag) {
         HDF_LOGE("%s:%d g_acmReleaseFlag is true", __func__, __LINE__);
         return HDF_FAILURE;
     }
@@ -1692,7 +1692,7 @@ static int32_t AcmInit(struct AcmDevice *acm)
     int32_t ret;
     struct UsbSession *session = NULL;
 
-    if (acm->initFlag == true) {
+    if (acm->initFlag) {
         HDF_LOGE("%s:%d: initFlag is true", __func__, __LINE__);
         return HDF_SUCCESS;
     }
@@ -1751,7 +1751,7 @@ ERROR_CLAIM_INTERFACES:
 
 static void AcmRelease(struct AcmDevice *acm)
 {
-    if (acm->initFlag == false) {
+    if (!(acm->initFlag)) {
         HDF_LOGE("%s:%d: initFlag is false", __func__, __LINE__);
         return;
     }
@@ -1813,7 +1813,7 @@ static void UsbSerialDriverRelease(struct HdfDeviceObject *device)
 
     g_acmReleaseFlag = true;
 
-    if (acm->initFlag == true) {
+    if (acm->initFlag) {
         HDF_LOGE("%s:%d AcmRelease", __func__, __LINE__);
         AcmRelease(acm);
     }

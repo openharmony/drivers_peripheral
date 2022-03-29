@@ -1442,11 +1442,11 @@ int32_t RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddR
     }
 
     flag = HdfSbufReadInt32(pnpReply, &replyData);
-    if ((flag == false) || (replyData != INT32_MAX)) {
+    if ((!flag) || (replyData != INT32_MAX)) {
         ret = HDF_FAILURE;
         HDF_LOGE("%s:%d cmdType=%d reply faile.", __func__, __LINE__, cmdType);
         goto OUT;
-    } else if ((flag == true) && (replyData == INT32_MAX)) {
+    } else if (flag && replyData == INT32_MAX) {
         HDF_LOGE("%s:%d cmdType=%d reply success.", __func__, __LINE__, cmdType);
     }
 
@@ -1545,7 +1545,7 @@ void RawUsbMemFree(void *mem)
         return;
     }
 
-    if ((g_usbRamTestFlag == true) && (g_usbRamTestHead != NULL)) {
+    if (g_usbRamTestFlag && g_usbRamTestHead != NULL) {
         OsalMutexLock(&g_usbRamTestHead->lock);
         DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
             if (pos->address == (uintptr_t)mem) {

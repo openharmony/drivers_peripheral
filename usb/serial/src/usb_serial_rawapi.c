@@ -948,7 +948,7 @@ static int32_t UsbSerialDeviceDispatch(struct HdfDeviceIoClient *client, int32_t
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    if (g_rawAcmReleaseFlag == true) {
+    if (g_rawAcmReleaseFlag) {
         HDF_LOGE("%s:%d g_rawAcmReleaseFlag is true", __func__, __LINE__);
         return HDF_FAILURE;
     }
@@ -1274,8 +1274,7 @@ static void UsbFreeNotifyReqeust(struct AcmDevice *acm)
     if (ret == HDF_SUCCESS) {
         acm->notifyReq = NULL;
     } else {
-        HDF_LOGE("%s: UsbFreeNotifyReqeust failed, ret=%d",
-            __func__, ret);
+        HDF_LOGE("%s: UsbFreeNotifyReqeust failed, ret=%d", __func__, ret);
     }
 }
 
@@ -1285,7 +1284,7 @@ static int32_t UsbSerialInit(struct AcmDevice *acm)
     UsbRawHandle *devHandle = NULL;
     int32_t ret;
 
-    if (acm->initFlag == true) {
+    if (acm->initFlag) {
         HDF_LOGE("%s:%d: initFlag is true", __func__, __LINE__);
         return HDF_SUCCESS;
     }
@@ -1387,7 +1386,7 @@ ERR_OPEN_DEVICE:
 
 static void UsbSerialRelease(struct AcmDevice *acm)
 {
-    if (acm->initFlag == false) {
+    if (!(acm->initFlag)) {
         HDF_LOGE("%s:%d: initFlag is false", __func__, __LINE__);
         return;
     }
@@ -1444,7 +1443,7 @@ static void UsbSerialDriverRelease(struct HdfDeviceObject *device)
 {
     struct AcmDevice *acm = NULL;
     if (device == NULL) {
-        HDF_LOGE("%s: device is NULL", __func__);
+        HDF_LOGE("%s: device is null", __func__);
         return;
     }
 
@@ -1456,7 +1455,7 @@ static void UsbSerialDriverRelease(struct HdfDeviceObject *device)
 
     g_rawAcmReleaseFlag = true;
 
-    if (acm->initFlag == true) {
+    if (acm->initFlag) {
         HDF_LOGE("%s:%d UsbSerialRelease", __func__, __LINE__);
         UsbSerialRelease(acm);
     }
