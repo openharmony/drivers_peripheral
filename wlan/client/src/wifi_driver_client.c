@@ -39,7 +39,7 @@ void WifiEventReport(const char *ifName, uint32_t event, void *data)
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_callbackEventMap[i] != NULL && (strcmp(g_callbackEventMap[i]->ifName, ifName) == 0) &&
             (((1 << event) & g_callbackEventMap[i]->eventType) != 0)) {
-            HILOG_INFO(LOG_DOMAIN, "%s: WifiEventReport send event = %d, ifName = %s",
+            HILOG_INFO(LOG_DOMAIN, "%s: WifiEventReport send event = %u, ifName = %s",
                 __FUNCTION__, event, ifName);
             g_callbackEventMap[i]->onRecFunc(event, data, ifName);
         }
