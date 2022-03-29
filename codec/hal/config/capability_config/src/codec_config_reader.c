@@ -26,18 +26,18 @@ extern "C" {
 
 #define HDF_LOG_TAG "codec_config_client"
 
-static int32_t DeserializeCapAlignment(struct HdfSBuf *reply, Alginment *alginment)
+static int32_t DeserializeCapAlignment(struct HdfSBuf *reply, Alignment *alignment)
 {
-    if (reply == NULL || alginment == NULL) {
+    if (reply == NULL || alignment == NULL) {
         HDF_LOGE("%{public}s: params NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufReadInt32(reply, &alginment->widthAlginment)) {
-        HDF_LOGE("%{public}s: read widthAlginment failed!", __func__);
+    if (!HdfSbufReadInt32(reply, &alignment->widthAlignment)) {
+        HDF_LOGE("%{public}s: read widthAlignment failed!", __func__);
         return HDF_FAILURE;
     }
-    if (!HdfSbufReadInt32(reply, &alginment->heightAlginment)) {
-        HDF_LOGE("%{public}s: read heightAlginment failed!", __func__);
+    if (!HdfSbufReadInt32(reply, &alignment->heightAlignment)) {
+        HDF_LOGE("%{public}s: read heightAlignment failed!", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;

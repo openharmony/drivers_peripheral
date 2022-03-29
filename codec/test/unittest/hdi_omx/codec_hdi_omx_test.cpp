@@ -128,8 +128,8 @@ static void PrintCapability(CodecCompCapability *cap, int32_t index)
         HDF_LOGI("minSize.height:%{public}d", cap->port.video.minSize.height);
         HDF_LOGI("maxSize.width:%{public}d", cap->port.video.maxSize.width);
         HDF_LOGI("maxSize.height:%{public}d", cap->port.video.maxSize.height);
-        HDF_LOGI("widthAlginment:%{public}d", cap->port.video.whAlignment.widthAlginment);
-        HDF_LOGI("heightAlginment:%{public}d", cap->port.video.whAlignment.heightAlginment);
+        HDF_LOGI("widthAlignment:%{public}d", cap->port.video.whAlignment.widthAlignment);
+        HDF_LOGI("heightAlignment:%{public}d", cap->port.video.whAlignment.heightAlignment);
         HDF_LOGI("blockCount.min:%{public}d", cap->port.video.blockCount.min);
         HDF_LOGI("blockCount.max:%{public}d", cap->port.video.blockCount.max);
         HDF_LOGI("blocksPerSecond.min:%{public}d", cap->port.video.blocksPerSecond.min);

@@ -363,9 +363,9 @@ typedef struct {
 * @brief Defines the alignment.
  */
 typedef struct {
-    int widthAlginment;  /**< Value to align with the width */
-    int heightAlginment; /**< Value to align with the height */
-} Alginment;
+    int widthAlignment;  /**< Value to align with the width */
+    int heightAlignment; /**< Value to align with the height */
+} Alignment;
 
 /**
  * @brief Defines a rectangle.
@@ -399,7 +399,7 @@ typedef enum {
 typedef struct {
     AvCodecMime mime;                   /**< MIME type */
     CodecType type;                     /**< Codec type */
-    Alginment whAlignment;              /**< Value to align with the width and height */
+    Alignment whAlignment;              /**< Value to align with the width and height */
     Rect minSize;                       /**< Minimum resolution supported */
     Rect maxSize;                       /**< Maximum resolution supported */
     uint64_t minBitRate;                /**< Minimum bit rate supported */

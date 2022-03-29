@@ -131,9 +131,9 @@ typedef enum {
 * @brief Defines the alignment.
  */
 typedef struct {
-    int32_t widthAlginment; /** Value to align with the width */
-    int32_t heightAlginment; /** Value to align with the height */
-} Alginment;
+    int32_t widthAlignment; /** Value to align with the width */
+    int32_t heightAlignment; /** Value to align with the height */
+} Alignment;
 
 /**
  * @brief Defines a rectangle.
@@ -233,7 +233,7 @@ typedef enum {
 typedef struct {
     Rect minSize;                            /** Minimum resolution supported. */
     Rect maxSize;                            /** Maximum resolution supported. */
-    Alginment whAlignment;                   /** Values to align with the width and height. */
+    Alignment whAlignment;                   /** Values to align with the width and height. */
     RangeValue blockCount;                   /** Number of blocks supported. */
     RangeValue blocksPerSecond;              /** Number of blocks processed per second. */
     Rect blockSize;                          /** Block size supported. */

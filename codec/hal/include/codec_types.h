@@ -45,9 +45,9 @@ bool RectBlockMarshalling(struct HdfSBuf *data, const Rect *dataBlock);
 
 bool RectBlockUnmarshalling(struct HdfSBuf *data, Rect *dataBlock);
 
-bool AlginmentBlockMarshalling(struct HdfSBuf *data, const Alginment *dataBlock);
+bool AlignmentBlockMarshalling(struct HdfSBuf *data, const Alignment *dataBlock);
 
-bool AlginmentBlockUnmarshalling(struct HdfSBuf *data, Alginment *dataBlock);
+bool AlignmentBlockUnmarshalling(struct HdfSBuf *data, Alignment *dataBlock);
 
 bool VideoPortCapBlockMarshalling(struct HdfSBuf *data, const VideoPortCap *dataBlock);
 

@@ -27,18 +27,18 @@
 static CodecCapablites codecCapabilites = {0};
 static const struct DeviceResourceNode *resourceNode;
 
-static int32_t SerializeCapAlginment(struct HdfSBuf *reply, Alginment *alginment)
+static int32_t SerializeCapAlignment(struct HdfSBuf *reply, Alignment *alignment)
 {
-    if (reply == NULL || alginment == NULL) {
+    if (reply == NULL || alignment == NULL) {
         HDF_LOGE("%{public}s: params null!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteInt32(reply, alginment->widthAlginment)) {
-        HDF_LOGE("%{public}s: Write widthAlginment failed!", __func__);
+    if (!HdfSbufWriteInt32(reply, alignment->widthAlignment)) {
+        HDF_LOGE("%{public}s: Write widthAlignment failed!", __func__);
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteInt32(reply, alginment->heightAlginment)) {
-        HDF_LOGE("%{public}s: Write heightAlginment failed!", __func__);
+    if (!HdfSbufWriteInt32(reply, alignment->heightAlignment)) {
+        HDF_LOGE("%{public}s: Write heightAlignment failed!", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -93,7 +93,7 @@ static int32_t SerializeCodecCapbility(struct HdfSBuf *reply, CodecCapbility *ca
     if (!HdfSbufWriteUint32(reply, (uint32_t)cap->type)) {
         return HDF_FAILURE;
     }
-    if (SerializeCapAlginment(reply, &cap->whAlignment) != HDF_SUCCESS) {
+    if (SerializeCapAlignment(reply, &cap->whAlignment) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
     if (SerializeCapRect(reply, &cap->minSize) != HDF_SUCCESS) {
