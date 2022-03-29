@@ -311,7 +311,7 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0002, Tes
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
     manager = GetAudioManager();

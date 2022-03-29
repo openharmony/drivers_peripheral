@@ -97,7 +97,7 @@ static int32_t DspSetI2sBitWidth(enum AudioFormat format, uint16_t *bitWidth)
         AUDIO_DRIVER_LOG_ERR("input param is nullptr.");
         return HDF_ERR_INVALID_PARAM;
     }
-    
+
     switch (format) {
         case AUDIO_FORMAT_PCM_8_BIT:
             *bitWidth = I2S_SAMPLE_FORMAT_REG_VAL_24;

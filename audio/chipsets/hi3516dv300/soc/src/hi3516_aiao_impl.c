@@ -82,15 +82,15 @@ int32_t AiaoHalSysInit(void)
 
 int32_t AiaoClockReset(void)
 {
-    volatile const unsigned int crgVal = 0xa; // AIAO CLOCK RESET
+    volatile const uint32_t crgVal = 0xa; // AIAO CLOCK RESET
 
     /* RESET AIAO */
-    volatile char *vAddr = OsalIoRemap(PERI_CRG103, sizeof(unsigned int));
+    volatile char *vAddr = OsalIoRemap(PERI_CRG103, sizeof(uint32_t));
     if (vAddr == NULL) {
         AUDIO_DEVICE_LOG_ERR("vAddr is null \n");
         return HDF_FAILURE;
     }
-    
+
     OSAL_WRITEL(crgVal, vAddr);
     OsalIoUnmap((void *)((uintptr_t)(void*)vAddr));
     return HDF_SUCCESS;
@@ -103,10 +103,10 @@ uint32_t AiaoHalReadReg(uint32_t offset)
         return 0x0;
     }
 
-    return (*(volatile uint32_t *)((unsigned char *)g_regAiaoBase + (unsigned int)offset));
+    return (*(volatile uint32_t *)((unsigned char *)g_regAiaoBase + (uint32_t)offset));
 }
 
-static int32_t AiaoGetBclkSel(const unsigned int bclkDiv, unsigned int *bclkSel)
+static int32_t AiaoGetBclkSel(const uint32_t bclkDiv, uint32_t *bclkSel)
 {
     const int bclkDivReg[12][2] = {
         {1, 0x00}, {2, 0x02}, {3, 0x01},
@@ -128,7 +128,7 @@ static int32_t AiaoGetBclkSel(const unsigned int bclkDiv, unsigned int *bclkSel)
     return HDF_FAILURE;
 }
 
-static int32_t AiaoGetLrclkSel(const unsigned int lrclkDiv, unsigned int *lrclkSel)
+static int32_t AiaoGetLrclkSel(const uint32_t lrclkDiv, uint32_t *lrclkSel)
 {
     const int lrclkDivReg[6][2] = {
         {16, 0x00}, {32, 0x01}, {48, 0x02},
@@ -148,14 +148,14 @@ static int32_t AiaoGetLrclkSel(const unsigned int lrclkDiv, unsigned int *lrclkS
     return HDF_FAILURE;
 }
 
-void AiaoHalWriteReg(unsigned int offset, unsigned int value)
+void AiaoHalWriteReg(uint32_t offset, uint32_t value)
 {
     if (g_regAiaoBase == NULL) {
         AUDIO_DEVICE_LOG_ERR("g_aio_base is null.\n");
         return;
     }
 
-    *(volatile  unsigned int *)((unsigned char *)(g_regAiaoBase) + (unsigned int)(offset)) = value;
+    *(volatile  uint32_t *)((unsigned char *)(g_regAiaoBase) + (uint32_t)(offset)) = value;
 }
 
 int32_t AiaoSysPinMux(void)
@@ -185,22 +185,22 @@ int32_t AiaoSysPinMux(void)
     return HDF_SUCCESS;
 }
 
-static int32_t AipHalSetBufferAddr(unsigned int chnId, unsigned long long value)
+static int32_t AipHalSetBufferAddr(uint32_t chnId, uint64_t value)
 {
-    unsigned int saddr;
+    uint32_t saddr;
 
     if (chnId >= g_wChannelIdMax) {
         AUDIO_DEVICE_LOG_ERR("ai_dev%d is invalid!\n", chnId);
         return HDF_FAILURE;
     }
 
-    saddr = (unsigned int)(value & 0xffffffff);
+    saddr = (uint32_t)(value & 0xffffffff);
     AiaoHalWriteReg(AiopRegCfg(AIP_BUFF_SADDR_REG, OFFSET_MULTL, chnId), saddr); // buf start
 
     return HDF_SUCCESS;
 }
 
-int32_t AipHalSetBuffWptr(unsigned int chnId, unsigned int value)
+int32_t AipHalSetBuffWptr(uint32_t chnId, uint32_t value)
 {
     UTxBuffWptr unTmp;
 
@@ -215,7 +215,7 @@ int32_t AipHalSetBuffWptr(unsigned int chnId, unsigned int value)
     return HDF_SUCCESS;
 }
 
-int32_t AipHalSetBuffRptr(unsigned int chnId, unsigned int value)
+int32_t AipHalSetBuffRptr(uint32_t chnId, uint32_t value)
 {
     UTxBuffRptr unTmp;
 
@@ -233,7 +233,7 @@ int32_t AipHalSetBuffRptr(unsigned int chnId, unsigned int value)
     return HDF_SUCCESS;
 }
 
-static int32_t AipHalSetBufferSize(unsigned int chnId, unsigned int value)
+static int32_t AipHalSetBufferSize(uint32_t chnId, uint32_t value)
 {
     UTxBuffSize unTmp;
 
@@ -249,7 +249,7 @@ static int32_t AipHalSetBufferSize(unsigned int chnId, unsigned int value)
     return HDF_SUCCESS;
 }
 
-static int32_t AipHalSetTransSize(unsigned int chnId, unsigned int value)
+static int32_t AipHalSetTransSize(uint32_t chnId, uint32_t value)
 {
     UTxTransSize unTmp;
 
@@ -265,7 +265,7 @@ static int32_t AipHalSetTransSize(unsigned int chnId, unsigned int value)
     return HDF_SUCCESS;
 }
 
-int32_t AipHalSetRxStart(unsigned int chnId, bool en)
+int32_t AipHalSetRxStart(uint32_t chnId, bool en)
 {
     URxDspCtrl unTmp;
 
@@ -284,7 +284,7 @@ int32_t AipHalSetRxStart(unsigned int chnId, bool en)
     return 0;
 }
 
-static void AopSetCtrlReg(unsigned int chnId)
+static void AopSetCtrlReg(uint32_t chnId)
 {
     UTxDspCtrl aopCtrlReg;
     aopCtrlReg.Bits.reserved0 = 0;
@@ -292,30 +292,30 @@ static void AopSetCtrlReg(unsigned int chnId)
     aopCtrlReg.Bits.txEnable = 0;
     aopCtrlReg.Bits.reserved1 = 0;
     aopCtrlReg.Bits.reserved2 = 0;
-    
+
     AiaoHalWriteReg(AiopRegCfg(AOP_CTRL_REG, OFFSET_MULTL, chnId), aopCtrlReg.u32);
     AUDIO_DEVICE_LOG_DEBUG("[OHOS] AopSetCtrlReg AopSetAttrReg write = %08x\n", aopCtrlReg.u32);
 }
 
-static int32_t AopHalSetBufferAddr(unsigned int chnId, unsigned long long value)
+static int32_t AopHalSetBufferAddr(uint32_t chnId, uint64_t value)
 {
-    unsigned int saddr;
+    uint32_t saddr;
 
     if (chnId >=  g_wChannelIdMax) {
         AUDIO_DEVICE_LOG_ERR("ao_dev%d is invalid!\n", chnId);
         return HDF_FAILURE;
     }
 
-    saddr = (unsigned int)(value & 0xffffffff);
+    saddr = (uint32_t)(value & 0xffffffff);
     AiaoHalWriteReg(AiopRegCfg(AOP_BUFF_SADDR_REG, OFFSET_MULTL, chnId), saddr); // buf start
 
     return HDF_SUCCESS;
 }
 
-int32_t AopHalSetBuffWptr(unsigned int chnId, unsigned int value)
+int32_t AopHalSetBuffWptr(uint32_t chnId, uint32_t value)
 {
     UTxBuffWptr unTmp;
-    
+
     if (chnId >= g_wChannelIdMax) {
         AUDIO_DEVICE_LOG_ERR("ao_dev%d is invalid!\n", chnId);
         return HDF_FAILURE;
@@ -324,11 +324,11 @@ int32_t AopHalSetBuffWptr(unsigned int chnId, unsigned int value)
     unTmp.u32 = AiaoHalReadReg(AiopRegCfg(AOP_BUFF_WPTR_REG, OFFSET_MULTL, chnId));
     unTmp.Bits.txBuffWptr = value;
     AiaoHalWriteReg(AiopRegCfg(AOP_BUFF_WPTR_REG, OFFSET_MULTL, chnId), unTmp.u32);
-    
+
     return HDF_SUCCESS;
 }
 
-int32_t AopHalSetBuffRptr(unsigned int chnId, unsigned int value)
+int32_t AopHalSetBuffRptr(uint32_t chnId, uint32_t value)
 {
     UTxBuffRptr unTmp;
 
@@ -344,7 +344,7 @@ int32_t AopHalSetBuffRptr(unsigned int chnId, unsigned int value)
     return HDF_SUCCESS;
 }
 
-static int32_t AopHalSetBufferSize(unsigned int chnId, unsigned int value)
+static int32_t AopHalSetBufferSize(uint32_t chnId, uint32_t value)
 {
     UTxBuffSize unTmp;
 
@@ -361,7 +361,7 @@ static int32_t AopHalSetBufferSize(unsigned int chnId, unsigned int value)
     return HDF_SUCCESS;
 }
 
-static int32_t AopHalSetTransSize(unsigned int chnId, unsigned int value)
+static int32_t AopHalSetTransSize(uint32_t chnId, uint32_t value)
 {
     UTxTransSize unTmp;
 
@@ -378,7 +378,7 @@ static int32_t AopHalSetTransSize(unsigned int chnId, unsigned int value)
     return HDF_SUCCESS;
 }
 
-int32_t AopHalSetTxStart(unsigned int chnId, bool en)
+int32_t AopHalSetTxStart(uint32_t chnId, bool en)
 {
     UTxDspCtrl unTmp;
 
@@ -395,7 +395,7 @@ int32_t AopHalSetTxStart(unsigned int chnId, bool en)
     return HDF_SUCCESS;
 }
 
-int32_t AopHalDevEnable(unsigned int chnId)
+int32_t AopHalDevEnable(uint32_t chnId)
 {
     int ret = AopHalSetTxStart(chnId, HI_TRUE);
     if (ret != HDF_SUCCESS) {
@@ -404,11 +404,11 @@ int32_t AopHalDevEnable(unsigned int chnId)
     return HDF_SUCCESS;
 }
 
-static int32_t AiaoGetBclkFsclk(const unsigned int fsBit, const unsigned int rate,
+static int32_t AiaoGetBclkFsclk(const uint32_t fsBit, const uint32_t rate,
     const int32_t mclkSel, int32_t *bclkSel, int32_t *lrclkSel)
 {
     int32_t ret;
-    unsigned int mclkRateNum;
+    uint32_t mclkRateNum;
     const int aioFifoBitWidth256 = 256; // 256 is aiao fifo bit width
     const int aioFifoBitWidth320 = 320; // 320 is aiao fifo bit width
 
@@ -445,7 +445,7 @@ static int32_t AiaoGetBclkFsclk(const unsigned int fsBit, const unsigned int rat
     return ret;
 }
 
-int32_t AiaoGetMclk(unsigned int rate, uint32_t *mclkSel)
+int32_t AiaoGetMclk(uint32_t rate, uint32_t *mclkSel)
 {
     if (mclkSel == NULL) {
         AUDIO_DEVICE_LOG_ERR("mclkSel is null");
@@ -484,7 +484,7 @@ int32_t AiaoGetMclk(unsigned int rate, uint32_t *mclkSel)
     return HDF_SUCCESS;
 }
 
-static unsigned int AiaoGetBitCnt(unsigned int bitWidth)
+static uint32_t AiaoGetBitCnt(uint32_t bitWidth)
 {
     if (bitWidth == BIT_WIDTH8) {
         return BIT_WIDTH8; /* 8:8bit */
@@ -520,7 +520,7 @@ int32_t AiaoSetSysCtlRegValue(uint32_t mclkSel, uint32_t bitWidth, uint32_t rate
     return HDF_SUCCESS;
 }
 
-static void AipSetCtrlReg(unsigned int chnId)
+static void AipSetCtrlReg(uint32_t chnId)
 {
     URxDspCtrl aipCtrlReg;
     aipCtrlReg.Bits.reserved0 = 0;
@@ -530,20 +530,20 @@ static void AipSetCtrlReg(unsigned int chnId)
     AiaoHalWriteReg(AiopRegCfg(AIP_CTRL_REG, OFFSET_MULTL, chnId), aipCtrlReg.u32);
 }
 
-int32_t AiaoRxIntClr(unsigned int chnId)
+int32_t AiaoRxIntClr(uint32_t chnId)
 {
-    const unsigned int rxTransIntClear = 0x1;
+    const uint32_t rxTransIntClear = 0x1;
     AiaoHalWriteReg(AiopRegCfg(RX_INT_CLR, OFFSET_MULTL, chnId), rxTransIntClear);
     return HDF_SUCCESS;
 }
 
-int32_t AiaoDeviceInit(unsigned int chnId)
+int32_t AiaoDeviceInit(uint32_t chnId)
 {
-    const unsigned int aipAttrVal = 0xe4880014;
-    const unsigned int aopAttrVal = 0xe4000054;
+    const uint32_t aipAttrVal = 0xe4880014;
+    const uint32_t aopAttrVal = 0xe4000054;
 
-    const unsigned int rxIntEnaVal = 0x1;
-    const unsigned int rxCh0IntEna = 0x1;
+    const uint32_t rxIntEnaVal = 0x1;
+    const uint32_t rxCh0IntEna = 0x1;
 
     AiaoHalWriteReg(AiopRegCfg(AIP_INF_ATTRI_REG, OFFSET_MULTL, chnId), aipAttrVal);
     AiaoHalWriteReg(AiopRegCfg(AOP_INF_ATTRI_REG, OFFSET_MULTL, chnId),  aopAttrVal);
@@ -563,7 +563,7 @@ int32_t AudioAoInit(const struct PlatformData *platformData)
         AUDIO_DEVICE_LOG_ERR("input param is NULL.");
         return HDF_FAILURE;
     }
-    
+
     ret = AopHalSetBufferAddr(0, platformData->renderBufInfo.phyAddr);
     if (ret != HDF_SUCCESS) {
         AUDIO_DEVICE_LOG_ERR("AopHalSetBufferAddr fail.");
@@ -575,7 +575,7 @@ int32_t AudioAoInit(const struct PlatformData *platformData)
         AUDIO_DEVICE_LOG_ERR("AopHalSetBufferSize: failed.");
         return HDF_FAILURE;
     }
-    
+
     ret = AopHalSetTransSize(0, platformData->renderBufInfo.trafBufSize);
     if (ret != HDF_SUCCESS) {
         AUDIO_DEVICE_LOG_ERR("AopHalSetTransSize fail");

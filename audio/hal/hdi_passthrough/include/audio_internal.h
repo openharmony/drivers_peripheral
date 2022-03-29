@@ -23,7 +23,6 @@
 #include <math.h>
 #include <sys/mman.h>
 #include <sys/types.h>
-#include <unistd.h>
 #include <pthread.h>
 #include <errno.h>
 

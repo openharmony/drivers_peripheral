@@ -171,7 +171,7 @@ int32_t mixer_ctl_enumerated_select(struct mixer_ctl *ctl, const char *value)
     return 0;
 }
 
-int32_t GetCtlMinValue(struct snd_ctl_elem_info *elemInfo, long long *min)
+int32_t GetCtlMinValue(struct snd_ctl_elem_info *elemInfo, int64_t *min)
 {
     snd_ctl_elem_type_t type =  elemInfo->type;
     if (type == SNDRV_CTL_ELEM_TYPE_BOOLEAN || type == SNDRV_CTL_ELEM_TYPE_INTEGER) {
@@ -184,7 +184,7 @@ int32_t GetCtlMinValue(struct snd_ctl_elem_info *elemInfo, long long *min)
     return 0;
 }
 
-int32_t GetCtlMaxValue(struct snd_ctl_elem_info *elemInfo, long long *max)
+int32_t GetCtlMaxValue(struct snd_ctl_elem_info *elemInfo, int64_t *max)
 {
     snd_ctl_elem_type_t type =  elemInfo->type;
     if (type == SNDRV_CTL_ELEM_TYPE_BOOLEAN || type == SNDRV_CTL_ELEM_TYPE_INTEGER) {
@@ -197,7 +197,7 @@ int32_t GetCtlMaxValue(struct snd_ctl_elem_info *elemInfo, long long *max)
     return 0;
 }
 
-int32_t mixer_get_ctl_minmax(struct mixer_ctl *ctl, long long *min, long long *max)
+int32_t mixer_get_ctl_minmax(struct mixer_ctl *ctl, int64_t *min, int64_t *max)
 {
     if (ctl == NULL || ctl->info == NULL) {
         return -EINVAL;
@@ -214,10 +214,10 @@ int32_t mixer_get_ctl_minmax(struct mixer_ctl *ctl, long long *min, long long *m
     return 0;
 }
 
-void mixer_ctl_value_check(struct mixer_ctl *ctl, long long *value)
+void mixer_ctl_value_check(struct mixer_ctl *ctl, int64_t *value)
 {
-    long long min;
-    long long max;
+    int64_t min;
+    int64_t max;
     int32_t ret = mixer_get_ctl_minmax(ctl, &min, &max);
     if (ret < 0) {
         LOG_FUN_ERR("mixer_ctl_value_check() mixer_get_ctl_minmax error");
@@ -232,7 +232,7 @@ void mixer_ctl_value_check(struct mixer_ctl *ctl, long long *value)
     return;
 }
 
-int32_t mixer_ctl_set_int_double(struct mixer_ctl *ctl, long long left, long long right)
+int32_t mixer_ctl_set_int_double(struct mixer_ctl *ctl, int64_t left, int64_t right)
 {
     struct snd_ctl_elem_value elemValue;
     struct snd_ctl_elem_info *elemInfo = ctl->info;
@@ -242,7 +242,7 @@ int32_t mixer_ctl_set_int_double(struct mixer_ctl *ctl, long long left, long lon
     (void)memset_s(&elemValue, sizeof(elemValue), 0, sizeof(elemValue));
     elemValue.id.numid = elemInfo->id.numid;
     mixer_ctl_value_check(ctl, &left);
-    long long value = left;
+    int64_t value = left;
 
     switch (type) {
         case SNDRV_CTL_ELEM_TYPE_BOOLEAN:
@@ -254,7 +254,7 @@ int32_t mixer_ctl_set_int_double(struct mixer_ctl *ctl, long long left, long lon
             break;
         case SNDRV_CTL_ELEM_TYPE_INTEGER: {
             for (n = 0; n < elemInfo->count; n++) {
-                elemValue.value.integer.value[n] = (long)value;
+                elemValue.value.integer.value[n] = (int32_t)value;
                 mixer_ctl_value_check(ctl, &right);
                 value = right;
             }
@@ -333,7 +333,7 @@ char* GetSndCardId(int32_t card, uint32_t *length)
         return NULL;
     }
     (void)memset_s(sndCardId, SND_CARD_ID_LEN, 0, SND_CARD_ID_LEN);
-    
+
     int32_t ret = sprintf_s(path, sizeof(path) - 1, "/proc/asound/card%d/id", card);
     if (ret < 0) {
         LOG_FUN_ERR("sndCardId path sprintf_s failed");
@@ -379,7 +379,7 @@ int32_t SndCardRouteTableInit(int32_t card)
         LOG_FUN_ERR("getSndCardId failed");
         return -1;
     }
-    
+
     LOG_FUN_ERR("Sound card%d is %s length is %d", card, sndCardId, sndCardIdLength);
     MatchRouteTableInfo(sndCardId, &sndCardIdLength);
     free(sndCardId);
@@ -527,7 +527,7 @@ int32_t CtleNamesInit(struct snd_ctl_elem_info *elemInfo, struct mixer *mixer, i
         tempInfo.id.numid = elemInfo->id.numid;
         tempInfo.value.enumerated.item = i;
         TinyalsaGetElemInfo(mixer->fd, &tempInfo);
-        
+
         uint32_t nameLen = strlen(tempInfo.value.enumerated.name) + 1;
         enames[i] = (char *)malloc(nameLen);
         if (!enames[i]) {
@@ -587,7 +587,7 @@ struct mixer *mixer_open_legacy(int32_t card)
         close(fd);
         return NULL;
     }
-    
+
     struct mixer *mixer = MixerInit(elemList.count);
     if (mixer == NULL) {
         close(fd);
@@ -595,7 +595,7 @@ struct mixer *mixer_open_legacy(int32_t card)
     }
     mixer->count = elemList.count;
     mixer->fd = fd;
-    
+
     struct snd_ctl_elem_id *elemId = calloc(elemList.count, sizeof(struct snd_ctl_elem_id));
     if (elemId == NULL) {
         mixer_close_legacy(mixer);
@@ -647,7 +647,7 @@ int32_t RoutePcmClose(unsigned route)
     return 0;
 }
 
-int32_t mixer_ctl_set_int(struct mixer_ctl *ctl, long long value)
+int32_t mixer_ctl_set_int(struct mixer_ctl *ctl, int64_t value)
 {
     return mixer_ctl_set_int_double(ctl, value, value);
 }
@@ -731,8 +731,8 @@ int32_t set_voice_volume(const char *ctlName, float volume)
 int32_t set_capture_voice_volume(const char *ctlName, float volume)
 {
     struct mixer* mMixer = g_mixerCapture;
-    long long volMin;
-    long long volMax;
+    int64_t volMin;
+    int64_t volMax;
     if (mMixer == NULL || ctlName[0] == '\0') {
         return 0;
     }
@@ -788,7 +788,7 @@ int32_t RouteGetVoiceVolume(char *ctlName, bool isPlayback)
     if (mixer == NULL || ctlName[0] == '\0') {
         return 0;
     }
-    
+
     ctl = mixer_get_control(mixer, ctlName);
     if (ctl == NULL) {
         return 0;
@@ -796,7 +796,7 @@ int32_t RouteGetVoiceVolume(char *ctlName, bool isPlayback)
     return MixerCtlGetIntValue(ctl);
 }
 
-int32_t RouteGetVoiceMinMaxStep(long long *volMin, long long *volMax, char *ctlName, bool isPlayback)
+int32_t RouteGetVoiceMinMaxStep(int64_t *volMin, int64_t *volMax, char *ctlName, bool isPlayback)
 {
     struct mixer* mMixer = NULL;
     if (isPlayback) {

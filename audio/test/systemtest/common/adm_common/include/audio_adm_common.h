@@ -86,13 +86,13 @@ struct AudioPcmHwParams {
 
 struct AudioXferi {
     char *buf;
-    unsigned long bufsize;
-    unsigned long frameSize;
+    uint32_t bufsize;
+    uint32_t frameSize;
 };
 
 int32_t WriteHwParamsToBuf(struct HdfSBuf *sBuf, struct AudioPcmHwParams hwParams);
 
-int32_t AdmRenderFramePrepare(const std::string& path, char *&frame, unsigned long& numRead, unsigned long& frameSize);
+int32_t AdmRenderFramePrepare(const std::string& path, char *&frame, uint32_t& numRead, uint32_t& frameSize);
 
 int32_t WriteFrameToSBuf(struct HdfSBuf *&sBufT, const std::string& path);
 

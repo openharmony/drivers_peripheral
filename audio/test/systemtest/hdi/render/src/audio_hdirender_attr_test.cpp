@@ -1004,7 +1004,7 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetFrameCount_0001, TestSiz
     uint64_t count = 0;
     uint64_t zero = 0;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
     manager = GetAudioManager();
@@ -1030,7 +1030,7 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetFrameCount_0002, TestSiz
     int32_t ret = -1;
     uint64_t count = 0;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
@@ -1056,7 +1056,7 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetFrameCount_0003, TestSiz
     int32_t ret = -1;
     uint64_t *countNull = nullptr;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
     manager = GetAudioManager();
@@ -1488,8 +1488,8 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderSetExtraParams_0004, TestSi
     int32_t ret = -1;
     struct AudioAdapter *adapter = {};
     struct AudioRender *render = nullptr;
-    char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000;\
-attr-para=123";
+    char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;\
+attr-frame-count=82;attr-sampling-rate=48000;attr-para=123";
 
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();

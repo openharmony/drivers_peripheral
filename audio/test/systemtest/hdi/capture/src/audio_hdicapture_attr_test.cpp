@@ -1533,8 +1533,8 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_0004, Test
     int32_t ret = -1;
     struct AudioAdapter *adapter = {};
     struct AudioCapture *capture = nullptr;
-    char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000;\
-attr-para=abc";
+    char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;\
+attr-frame-count=82;attr-sampling-rate=48000;attr-para=abc";
 
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
@@ -1748,7 +1748,8 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetExtraParams_0003, Test
     int32_t ret = -1;
     struct AudioAdapter *adapter = {};
     struct AudioCapture *capture = nullptr;
-    char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000;";
+    char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;\
+attr-frame-count=82;attr-sampling-rate=48000;";
     char keyValueListValue[256] = {};
     int32_t listLenth = 8;
 

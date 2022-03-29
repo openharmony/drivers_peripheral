@@ -230,7 +230,7 @@ uint32_t PcmFormatToBits(enum AudioFormat format)
             return PCM_8_BIT;
         default:
             return PCM_16_BIT;
-    };
+    }
 }
 
 void StreamClose(int32_t sig)
