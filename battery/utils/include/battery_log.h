@@ -16,8 +16,7 @@
 #ifndef BATTERY_LOG_H
 #define BATTERY_LOG_H
 
-#define CONFIG_HILOG
-#ifdef CONFIG_HILOG
+#ifndef ENABLE_INIT_LOG
 
 #include "hilog/log.h"
 
@@ -105,12 +104,53 @@ static constexpr OHOS::HiviewDFX::HiLogLabel BATTERY_LABEL[LABEL_END] = {
 
 #else
 
-#define BATTERY_HILOGF(...)
-#define BATTERY_HILOGE(...)
-#define BATTERY_HILOGW(...)
-#define BATTERY_HILOGI(...)
-#define BATTERY_HILOGD(...)
+#include <string>
+#include "beget_ext.h"
 
-#endif // CONFIG_HILOG
+#define CHARGER_LOG_FILE "charger.log"
+#define FEATURE_CHARGING "charger: "
+#define FEATURE_BATT_INFO FEATURE_CHARGING
+#define COMP_HDI FEATURE_CHARGING
+
+inline void ReplaceHolder(std::string& str, const std::string& holder)
+{
+    size_t index = 0;
+    size_t holderLen = holder.size();
+    while ((index = str.find(holder, index)) != std::string::npos) {
+        str = str.replace(index, holderLen, "");
+        index++;
+    }
+}
+
+inline std::string ReplaceHolders(const char* fmt)
+{
+    std::string str(fmt);
+    ReplaceHolder(str, "{public}");
+    ReplaceHolder(str, "{private}");
+    return "[%s:%d] %s# " + str + "\n";
+}
+
+#define BATTERY_HILOGE(label, fmt, ...) \
+    do {    \
+        InitLogPrint(INIT_LOG_PATH CHARGER_LOG_FILE, INIT_ERROR, label, (ReplaceHolders(fmt).c_str()), \
+            (FILE_NAME), (__LINE__), (__FUNCTION__), ##__VA_ARGS__); \
+    } while (0)
+#define BATTERY_HILOGW(label, fmt, ...) \
+    do {    \
+        InitLogPrint(INIT_LOG_PATH CHARGER_LOG_FILE, INIT_WARN, label, (ReplaceHolders(fmt).c_str()), \
+            (FILE_NAME), (__LINE__), (__FUNCTION__), ##__VA_ARGS__); \
+    } while (0)
+#define BATTERY_HILOGI(label, fmt, ...) \
+    do {    \
+        InitLogPrint(INIT_LOG_PATH CHARGER_LOG_FILE, INIT_INFO, label, (ReplaceHolders(fmt).c_str()), \
+            (FILE_NAME), (__LINE__), (__FUNCTION__), ##__VA_ARGS__); \
+    } while (0)
+#define BATTERY_HILOGD(label, fmt, ...) \
+    do {    \
+        InitLogPrint(INIT_LOG_PATH CHARGER_LOG_FILE, INIT_DEBUG, label, (ReplaceHolders(fmt).c_str()), \
+            (FILE_NAME), (__LINE__), (__FUNCTION__), ##__VA_ARGS__); \
+    } while (0)
+
+#endif // ENABLE_INIT_LOG
 
 #endif // BATTERY_LOG_H
