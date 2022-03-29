@@ -40,9 +40,9 @@
 
 #define HDF_LOG_TAG analog_headset_test
 namespace {
-const int INIT_DEFAULT_VALUE = 255;
-const int NAME_MAX_LEN = 10;
-const int KEEP_ALIVE_TIME_MS = 15000;
+    const int INIT_DEFAULT_VALUE = 255;
+    const int NAME_MAX_LEN = 10;
+    const int KEEP_ALIVE_TIME_MS = 15000;
 }
 
 using namespace testing::ext;
@@ -126,26 +126,23 @@ HWTEST_F(HdfAnalogHeadsetTest, OpenInputDev001, TestSize.Level1)
 HWTEST_F(HdfAnalogHeadsetTest, GetInputDevice001, TestSize.Level1)
 {
     int32_t ret;
-    DeviceInfo *dev = new DeviceInfo();
+    DeviceInfo *dev = NULL;
     IInputInterface *inputHdi = CommonGetInputInterface();
 
     if ((inputHdi == NULL) || (inputHdi->iInputManager == NULL)) {
         HDF_LOGE("%s: inputHdi or inputHdi->iInputManager is NULL.", __func__);
         return;
     }
-    ret = inputHdi->iInputManager->OpenInputDevice(HEADSET_JACK_INDEX);
-    if (ret != INPUT_SUCCESS) {
-        HDF_LOGE("%s: open device1 failed, ret %d", __func__, ret);
-    }
-
     ret = inputHdi->iInputManager->GetInputDevice(HEADSET_JACK_INDEX, &dev);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1 failed, ret %d", __func__, ret);
+    } else {
+        if (dev != NULL) {
+            HDF_LOGI("%s: devindex = %u, devType = %u", __func__, dev->devIndex, dev->devType);
+            HDF_LOGI("%s: chipInfo = %s, vendorName = %s, chipName = %s",
+                __func__, dev->chipInfo, dev->vendorName, dev->chipName);
+        }
     }
-
-    HDF_LOGI("%s: devindex = %u, devType = %u", __func__, dev->devIndex, dev->devType);
-    HDF_LOGI("%s: chipInfo = %s, vendorName = %s, chipName = %s",
-        __func__, dev->chipInfo, dev->vendorName, dev->chipName);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
 
@@ -168,8 +165,9 @@ HWTEST_F(HdfAnalogHeadsetTest, GetVendorName001, TestSize.Level1)
     ret = inputHdi->iInputController->GetVendorName(HEADSET_JACK_INDEX, vendorName, NAME_MAX_LEN);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1's vendor name failed, ret %d", __func__, ret);
+    } else {
+        HDF_LOGI("%s: device1's vendor name is %s:", __func__, vendorName);
     }
-    HDF_LOGI("%s: device1's vendor name is %s:", __func__, vendorName);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
 
@@ -192,8 +190,9 @@ HWTEST_F(HdfAnalogHeadsetTest, GetChipName001, TestSize.Level1)
     ret = inputHdi->iInputController->GetChipName(HEADSET_JACK_INDEX, chipName, NAME_MAX_LEN);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1's chip name failed, ret %d", __func__, ret);
+    } else {
+        HDF_LOGI("%s: device1's chip name is %s", __func__, chipName);
     }
-    HDF_LOGI("%s: device1's chip name is %s", __func__, chipName);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
 
@@ -216,8 +215,9 @@ HWTEST_F(HdfAnalogHeadsetTest, GetDeviceType001, TestSize.Level1)
     ret = inputHdi->iInputController->GetDeviceType(HEADSET_JACK_INDEX, &devType);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1's type failed, ret %d", __func__, ret);
+    } else {
+        HDF_LOGI("%s: device1's type is %u", __func__, devType);
     }
-    HDF_LOGI("%s: device1's type is %u", __func__, devType);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
 
@@ -240,8 +240,9 @@ HWTEST_F(HdfAnalogHeadsetTest, GetChipInfo001, TestSize.Level1)
     ret = inputHdi->iInputController->GetChipInfo(HEADSET_JACK_INDEX, chipInfo, CHIP_INFO_LEN);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1's chip info failed, ret %d", __func__, ret);
+    } else {
+        HDF_LOGI("%s: device1's chip info is %s", __func__, chipInfo);
     }
-    HDF_LOGI("%s: device1's chip info is %s", __func__, chipInfo);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
 
@@ -299,7 +300,6 @@ static void ReportHandleInputEvent(const EventPackage *pkg)
         in = (!!pkg->value) ? true : false;
         headsetHookBtn.jackStatus = in;
         headsetHookBtn.jackType = pkg->code;
-        // print "%s plugs %s.\n", (pkg->code == KEY_JACK_HEADSET) ? "headset" : "headphone", in ? "in" : "out".
         if (in) {
             printf("%s plugs in.\n", (pkg->code == KEY_JACK_HEADSET) ? "headset" : "headphone");
         } else {
@@ -356,17 +356,17 @@ HWTEST_F(HdfAnalogHeadsetTest, RegisterReportCallback001, TestSize.Level1)
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: open device[%d] failed, ret %d", __func__, HEADSET_JACK_INDEX, ret);
     }
-    ASSERT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
 
     eventCb.EventPkgCallback = ReportEventPkgCallback;
     ret = inputHdi->iInputReporter->RegisterReportCallback(HEADSET_JACK_INDEX, &eventCb);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: [RegisterReportCallback] failed, ret %d", __func__, ret);
+    } else {
+        HDF_LOGI("%s: wait 15s for testing, pls touch the panel now", __func__);
+        HDF_LOGI("%s: The event data is as following:", __func__);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
-    HDF_LOGI("%s: wait 15s for testing, pls touch the panel now", __func__);
-    HDF_LOGI("%s: The event data is as following:", __func__);
-    // OsalMSleep(KEEP_ALIVE_TIME_MS) can be check callback function.
 }
 
 /**
@@ -394,9 +394,10 @@ HWTEST_F(HdfAnalogHeadsetTest, UnregisterReportCallback001, TestSize.Level1)
     ret = inputHdi->iInputManager->CloseInputDevice(HEADSET_JACK_INDEX);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: close device1 failed, ret %d", __func__, ret);
+    } else {
+        HDF_LOGI("%s: Close the device1 successfully after all test", __func__);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
-    HDF_LOGI("%s: Close the device1 successfully after all test", __func__);
 }
 
 /**
@@ -419,17 +420,17 @@ HWTEST_F(HdfAnalogHeadsetTest, RegisterHotPlugCallback001, TestSize.Level1)
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: open device[%d] failed, ret %d", __func__, HEADSET_JACK_INDEX, ret);
     }
-    ASSERT_EQ(ret, INPUT_SUCCESS);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
 
     hotPlugCb.HotPlugCallback = ReportHotPlugEventPkgCallback;
     ret = inputHdi->iInputReporter->RegisterHotPlugCallback(&hotPlugCb);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: [RegisterHotPlugCallback] failed, ret %d", __func__, ret);
+    } else {
+        HDF_LOGI("%s: wait 15s for testing, pls touch the panel now", __func__);
+        HDF_LOGI("%s: The event data is as following:", __func__);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
-    HDF_LOGI("%s: wait 15s for testing, pls touch the panel now", __func__);
-    HDF_LOGI("%s: The event data is as following:", __func__);
-    // OsalMSleep(KEEP_ALIVE_TIME_MS) can be check callback function.
 }
 
 /**
@@ -457,9 +458,10 @@ HWTEST_F(HdfAnalogHeadsetTest, UnregisterHotPlugCallback001, TestSize.Level1)
     ret = inputHdi->iInputManager->CloseInputDevice(HEADSET_JACK_INDEX);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: close device1 failed, ret %d", __func__, ret);
+    } else {
+        HDF_LOGI("%s: Close the device1 successfully after all test", __func__);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
-    HDF_LOGI("%s: Close the device1 successfully after all test", __func__);
 }
 
 /**
@@ -495,31 +497,6 @@ static int32_t AnalogHeadsetTestInit()
     return INPUT_SUCCESS;
 }
 
-static void AnalogHeadsetTestRelease()
-{
-    int32_t ret;
-    IInputInterface *inputHdi = CommonGetInputInterface();
-
-    if ((inputHdi == NULL) || (inputHdi->iInputReporter == NULL) || (inputHdi->iInputManager == NULL)) {
-        HDF_LOGE("%s: inputHdi, iInputReporter or iInputManager is NULL.", __func__);
-        ret = INPUT_FAILURE;
-    }
-    ASSERT_EQ(ret, INPUT_SUCCESS);
-
-    ret = inputHdi->iInputReporter->UnregisterReportCallback(HEADSET_JACK_INDEX);
-    if (ret != INPUT_SUCCESS) {
-        HDF_LOGE("%s: [UnregisterReportCallback] failed for device1, ret %d", __func__, ret);
-    }
-    ASSERT_EQ(ret, INPUT_SUCCESS);
-
-    ret = inputHdi->iInputManager->CloseInputDevice(HEADSET_JACK_INDEX);
-    if (ret != INPUT_SUCCESS) {
-        HDF_LOGE("%s: [CloseInputDevice] failed, ret %d", __func__, ret);
-    }
-    ReleaseInputInterface(inputHdi);
-    ASSERT_EQ(ret, INPUT_SUCCESS);
-}
-
 /**
   * @tc.name: AnalogHeadsetFunctionTest001
   * @tc.desc: Comprehensive test entrance of analog earphone.
@@ -540,7 +517,6 @@ HWTEST_F(HdfAnalogHeadsetTest, AnalogHeadsetFunctionTest001, TestSize.Level1)
     printf("The event data is as following:\n");
     OsalMSleep(KEEP_ALIVE_TIME_MS);
 
-    // call AnalogHeadsetTestRelease will be error.
     HDF_LOGI("%s: finished.", __func__);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
