@@ -71,8 +71,8 @@ static int HdfSensorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfSensorInterfaceHost->ioservice.Dispatch = SensorInterfaceDriverDispatch;
-    hdfSensorInterfaceHost->ioservice.Open = NULL;
-    hdfSensorInterfaceHost->ioservice.Release = NULL;
+    hdfSensorInterfaceHost->ioservice.Open = nullptr;
+    hdfSensorInterfaceHost->ioservice.Release = nullptr;
     hdfSensorInterfaceHost->service = new SensorImpl();
 
     deviceObject->service = &hdfSensorInterfaceHost->ioservice;

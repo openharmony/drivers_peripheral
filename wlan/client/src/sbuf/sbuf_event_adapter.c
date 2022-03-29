@@ -211,7 +211,7 @@ static void WifiDriverEventRemainOnChannelProcess(const char *ifName, uint32_t e
 {
     WifiOnChannel result = {0};
     if (!HdfSbufReadUint32(reqData, &(result.freq))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s failed to get frequence.", __FUNCTION__);
+        HILOG_ERROR(LOG_DOMAIN, "%s failed to get frequency.", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadUint32(reqData, &(result.duration))) {

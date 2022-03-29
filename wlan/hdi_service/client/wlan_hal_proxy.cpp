@@ -197,7 +197,7 @@ int32_t WlanInterfaceProxy::getFeatureByIfName(std::string& ifName, std::shared_
 int32_t WlanInterfaceProxy::CallbackWlanProxy(int32_t event, struct HdfSBuf *reqData)
 {
     HDF_LOGI("%s: enter", __func__);
-    if (reqData == NULL) {
+    if (reqData == nullptr) {
         HDF_LOGE("%s: ptr NULL", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -211,9 +211,9 @@ int IPCObjectStubWlan::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data,
     int32_t ret = 0;
     int32_t status = -1;
 
-    HDF_LOGI("IPCObjectStubWlan::OnRemoteRequest called, code = %d", code);
+    HDF_LOGI("IPCObjectStubWlan::OnRemoteRequest called, code = %u", code);
     struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
-    if (dataSbuf == NULL) {
+    if (dataSbuf == nullptr) {
         HDF_LOGE("%s: dataSbuf malloc failed!", __func__);
         HdfSbufRecycle(dataSbuf);
     }

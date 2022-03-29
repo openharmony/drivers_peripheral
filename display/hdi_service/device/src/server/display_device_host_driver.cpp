@@ -1633,6 +1633,7 @@ int32_t DisplayDeviceServerStub::GetLayerBuffer(MessageParcel *data, MessageParc
     }
     if (!DisplayDeviceWriteData(reply, &bufferTmp)) {
         DISPLAY_LOG("error: server write buffer into data failed");
+        bufferTmp.data.virAddr = nullptr;
         return DISPLAY_FAILURE;
     }
     if (!DisplayDeviceWriteBufHdl(reply, bufferTmp.hdl)) {

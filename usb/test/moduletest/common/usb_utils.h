@@ -26,6 +26,20 @@ struct ProcInfo {
     int32_t threadPeak;
 };
 
+struct ParseProcInfo {
+    double ramTotal;
+    double ramPeak;
+    double ramCur;
+    double cpuTotal;
+    double cpuPeak;
+    double cpuCur;
+
+    int32_t ramCount;
+    int32_t cpuCount;
+    int32_t threadPeak;
+    int32_t threadCur;
+};
+
 extern bool HasLog(const std::string &target, double startTs, const std::string &file = "/data/acm_write_xts");
 extern double GetNowTs(void);
 extern char *ParseSysCmdResult(FILE &result, int32_t line, int32_t word);

@@ -80,55 +80,64 @@ char *ParseSysCmdResult(FILE &result, int32_t line, int32_t word)
     return pch;
 }
 
+static void ParseFile(char *pch, struct ParseProcInfo &Pinfo)
+{
+    while (pch != nullptr) {
+        if (strstr(pch, "VmRSS")) {
+            pch = strtok(nullptr, " ");
+            Pinfo.ramCur = atof(pch);
+            Pinfo.ramCount += 1;
+            Pinfo.ramTotal += Pinfo.ramCur;
+            if (Pinfo.ramCur > Pinfo.ramPeak) {
+                Pinfo.ramPeak = Pinfo.ramCur;
+            }
+            break;
+        }
+        if (strstr(pch, "Cpu")) {
+            pch = strtok(nullptr, " ");
+            Pinfo.cpuCur = atof(pch);
+            Pinfo.cpuCount += 1;
+            Pinfo.cpuTotal += Pinfo.cpuCur;
+            if (Pinfo.cpuCur > Pinfo.cpuPeak) {
+                Pinfo.cpuPeak = Pinfo.cpuCur;
+            }
+            break;
+        }
+        if (strstr(pch, "Threads")) {
+            pch = strtok(nullptr, " ");
+            Pinfo.threadCur = atoi(pch);
+            if (Pinfo.threadCur > Pinfo.threadPeak) {
+                Pinfo.threadPeak = Pinfo.threadCur;
+            }
+            break;
+        }
+        pch = strtok(nullptr, " ");
+    }
+}
+
 void CalcProcInfoFromFile(struct ProcInfo &info, const string &file)
 {
-    static double ramTotal, ramPeak, ramCur, cpuTotal, cpuPeak, cpuCur;
-    static int32_t ramCount, cpuCount, threadPeak, threadCur;
     char s[100];
     char *pch;
+    struct ParseProcInfo Pinfo = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0};
     FILE *f = fopen(file.c_str(), "r");
     while (1) {
         if (fgets(s, sizeof(s), f) == nullptr) {
             break;
         }
         pch = strtok(s, " \t");
-        while (pch != nullptr) {
-            if (strstr(pch, "VmRSS")) {
-                pch = strtok(nullptr, " ");
-                ramCur = stod(pch);
-                ramCount += 1;
-                ramTotal += ramCur;
-                if (ramCur > ramPeak) {
-                    ramPeak = ramCur;
-                }
-                break;
-            }
-            if (strstr(pch, "Cpu")) {
-                pch = strtok(nullptr, " ");
-                cpuCur = stod(pch);
-                cpuCount += 1;
-                cpuTotal += cpuCur;
-                if (cpuCur > cpuPeak) {
-                    cpuPeak = cpuCur;
-                }
-                break;
-            }
-            if (strstr(pch, "Threads")) {
-                pch = strtok(nullptr, " ");
-                threadCur = stoi(pch);
-                if (threadCur > threadPeak) {
-                    threadPeak = threadCur;
-                }
-                break;
-            }
-            pch = strtok(nullptr, " ");
-        }
+        ParseFile(pch, Pinfo);
     }
-    info.ramPeak = ramPeak;
-    info.ramAvg = ramTotal / ramCount;
-    info.cpuPeak = cpuPeak;
-    info.cpuAvg = cpuTotal / cpuCount;
-    info.threadPeak = threadPeak;
+
+    if (Pinfo.ramCount == 0 || Pinfo.cpuCount == 0) {
+        fclose(f);
+        return;
+    }
+    info.ramPeak = Pinfo.ramPeak;
+    info.ramAvg = Pinfo.ramTotal / Pinfo.ramCount;
+    info.cpuPeak = Pinfo.cpuPeak;
+    info.cpuAvg = Pinfo.cpuTotal / Pinfo.cpuCount;
+    info.threadPeak = Pinfo.threadPeak;
 
     if (fclose(f)) {
         return;

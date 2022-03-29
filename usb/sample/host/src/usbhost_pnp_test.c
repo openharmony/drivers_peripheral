@@ -150,7 +150,7 @@ int32_t main(int32_t argc, char *argv[])
     char cmd;
     int32_t argNum = 2;
     if (argc != argNum) {
-        HDF_LOGE("%s:%d invalid parma", __func__, __LINE__);
+        HDF_LOGE("%s:%d invalid param", __func__, __LINE__);
         return HDF_FAILURE;
     }
     if (!strcmp(argv[1], "-add")) {
@@ -158,7 +158,7 @@ int32_t main(int32_t argc, char *argv[])
     } else if (!strcmp(argv[1], "-remove")) {
         cmd = 'r';
     } else {
-        HDF_LOGE("%s:%d invalid paramter", __func__, __LINE__);
+        HDF_LOGE("%s:%d invalid param", __func__, __LINE__);
         return HDF_FAILURE;
     }
 

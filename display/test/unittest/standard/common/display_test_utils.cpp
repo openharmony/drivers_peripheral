@@ -55,6 +55,7 @@ void SaveFile(const char *fileName, uint8_t *data, int size)
     int fileFd = open(fileName, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
     int hasWriten = write(fileFd, data, size);
     DISPLAY_TEST_LOGD("SaveFile hasWriten %d", hasWriten);
+    close(fileFd);
 }
 
 static uint32_t ConverToRGBA(PixelFormat fmt, uint32_t color)
@@ -192,7 +193,7 @@ std::vector<IRect> SplitBuffer(const BufferHandle &handle, std::vector<uint32_t>
     const uint32_t cellWidth = handle.width / rowNum;
     const uint32_t cellHeight = handle.height / colNum;
     IRect rect = { 0, 0, cellWidth, cellHeight };
-    DISPLAY_TEST_LOGD("rowNum %d, colNum %d cellWidth %d cellHeight %d", rowNum, colNum, cellWidth, cellHeight);
+    DISPLAY_TEST_LOGD("rowNum %u, colNum %u cellWidth %u cellHeight %u", rowNum, colNum, cellWidth, cellHeight);
     uint32_t count = 0;
     for (uint32_t x = 0; x < rowNum; x++) {
         for (uint32_t y = 0; y < colNum; y++) {

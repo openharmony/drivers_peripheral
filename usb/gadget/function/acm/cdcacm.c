@@ -782,6 +782,7 @@ static int32_t UsbSerialSetProp(struct UsbAcmDevice *acmDevice, struct HdfSBuf *
 
 static int32_t UsbSerialRegistPropAGet(const struct UsbFnInterface *intf, const char *name, const char *value)
 {
+    (void)intf;
     HDF_LOGE("%s: name = %s", __func__, name);
     HDF_LOGE("%s: value = %s", __func__, value);
 
@@ -790,6 +791,7 @@ static int32_t UsbSerialRegistPropAGet(const struct UsbFnInterface *intf, const 
 
 static int32_t UsbSerialRegistPropASet(const struct UsbFnInterface *intf, const char *name, const char *value)
 {
+    (void)intf;
     HDF_LOGE("%s: name = %s", __func__, name);
     HDF_LOGE("%s: value = %s", __func__, value);
 

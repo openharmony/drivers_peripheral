@@ -64,7 +64,7 @@ void HdfSensorPerformanceTest::SetUpTestCase()
 {
     g_sensorPerformanceDev = NewSensorInterfaceInstance();
     if (g_sensorPerformanceDev == nullptr) {
-        printf("test sensorHdi get Module instace failed\n\r");
+        printf("test sensorHdi get Module instance failed\n\r");
     }
 }
 

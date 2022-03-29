@@ -29,16 +29,14 @@
 #define SLEEP_TIME          500000
 static void *OsAdapterRealloc(void *ptr, size_t oldSize, size_t newSize)
 {
-    void *mem;
-
-    mem = RawUsbMemAlloc(newSize);
+    void *mem = RawUsbMemAlloc(newSize);
     if (mem == NULL) {
         HDF_LOGE("%s:%d", __func__, __LINE__);
         goto OUT;
     }
 
     if (oldSize > 0) {
-        if (memmove_s(mem, newSize, ptr, oldSize) != HDF_SUCCESS) {
+        if (memmove_s(mem, newSize, ptr, oldSize) != EOK) {
             HDF_LOGE("%s:%d", __func__, __LINE__);
             RawUsbMemFree(mem);
             mem = NULL;

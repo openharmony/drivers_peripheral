@@ -27,7 +27,7 @@ namespace V1_0 {
 int32_t VibratorInterfaceImpl::StartOnce(uint32_t duration)
 {
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
-    if (vibratorInterface == NULL || vibratorInterface->StartOnce == NULL) {
+    if (vibratorInterface == nullptr || vibratorInterface->StartOnce == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
         return HDF_FAILURE;
     }
@@ -41,7 +41,7 @@ int32_t VibratorInterfaceImpl::StartOnce(uint32_t duration)
 int32_t VibratorInterfaceImpl::Start(const std::string& effectType)
 {
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
-    if (vibratorInterface == NULL || vibratorInterface->Start == NULL) {
+    if (vibratorInterface == nullptr || vibratorInterface->Start == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
         return HDF_FAILURE;
     }
@@ -55,7 +55,7 @@ int32_t VibratorInterfaceImpl::Start(const std::string& effectType)
 int32_t VibratorInterfaceImpl::Stop(HdfVibratorMode mode)
 {
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
-    if (vibratorInterface == NULL || vibratorInterface->Stop == NULL) {
+    if (vibratorInterface == nullptr || vibratorInterface->Stop == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
         return HDF_FAILURE;
     }

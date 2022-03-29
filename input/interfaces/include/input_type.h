@@ -62,7 +62,7 @@ extern "C" {
 #endif
 #define DIV_ROUND_UP(nr, d) (((nr) + (d) - 1) / (d))
 #define BYTE_HAS_BITS 8
-#define BITS_TO_UINT64(count)    DIV_ROUND_UP(count, BYTE_HAS_BITS * sizeof(unsigned long))
+#define BITS_TO_UINT64(count)    DIV_ROUND_UP(count, BYTE_HAS_BITS * sizeof(uint64_t))
 #define HDF_FF_CNT    (0x7f + 1)
 /**
  * @brief Enumerates return values.
@@ -164,20 +164,20 @@ typedef struct {
 } InputHostCb;
 
 typedef struct {
-    unsigned long devProp[BITS_TO_UINT64(INPUT_PROP_CNT)];
-    unsigned long eventType[BITS_TO_UINT64(EV_CNT)];
-    unsigned long absCode[BITS_TO_UINT64(ABS_CNT)];
-    unsigned long relCode[BITS_TO_UINT64(REL_CNT)];
-    unsigned long keyCode[BITS_TO_UINT64(KEY_CNT)];
-    unsigned long ledCode[BITS_TO_UINT64(LED_CNT)];
-    unsigned long miscCode[BITS_TO_UINT64(MSC_CNT)];
-    unsigned long soundCode[BITS_TO_UINT64(SND_CNT)];
-    unsigned long forceCode[BITS_TO_UINT64(HDF_FF_CNT)];
-    unsigned long switchCode[BITS_TO_UINT64(SW_CNT)];
-    unsigned long keyType[BITS_TO_UINT64(KEY_CNT)];
-    unsigned long ledType[BITS_TO_UINT64(LED_CNT)];
-    unsigned long soundType[BITS_TO_UINT64(SND_CNT)];
-    unsigned long switchType[BITS_TO_UINT64(SW_CNT)];
+    uint64_t devProp[BITS_TO_UINT64(INPUT_PROP_CNT)];
+    uint64_t eventType[BITS_TO_UINT64(EV_CNT)];
+    uint64_t absCode[BITS_TO_UINT64(ABS_CNT)];
+    uint64_t relCode[BITS_TO_UINT64(REL_CNT)];
+    uint64_t keyCode[BITS_TO_UINT64(KEY_CNT)];
+    uint64_t ledCode[BITS_TO_UINT64(LED_CNT)];
+    uint64_t miscCode[BITS_TO_UINT64(MSC_CNT)];
+    uint64_t soundCode[BITS_TO_UINT64(SND_CNT)];
+    uint64_t forceCode[BITS_TO_UINT64(HDF_FF_CNT)];
+    uint64_t switchCode[BITS_TO_UINT64(SW_CNT)];
+    uint64_t keyType[BITS_TO_UINT64(KEY_CNT)];
+    uint64_t ledType[BITS_TO_UINT64(LED_CNT)];
+    uint64_t soundType[BITS_TO_UINT64(SND_CNT)];
+    uint64_t switchType[BITS_TO_UINT64(SW_CNT)];
 } DevAbility;
 
 typedef struct {
