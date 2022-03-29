@@ -29,6 +29,7 @@ std::vector<std::shared_ptr<HdiDeviceInterface>> HdiDeviceInterface::DiscoveryDe
     std::shared_ptr<HdiDeviceInterface> drmDevice = DrmDevice::Create();
     if (!drmDevice) {
         DISPLAY_LOGE("can not create drm device");
+        return devices;
     }
     ret = drmDevice->Init();
     if (ret == DISPLAY_SUCCESS) {

@@ -19,7 +19,6 @@
 #include <securec.h>
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "osal_time.h"
 #include "v1_0/vibrator_interface_proxy.h"
 
 using namespace OHOS::HDI::Vibrator::V1_0;

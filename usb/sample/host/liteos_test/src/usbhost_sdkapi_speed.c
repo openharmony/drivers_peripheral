@@ -293,6 +293,7 @@ static void ShowHelp(const char *name)
     printf(">>      %s [<busNum> <devAddr>]  <ifaceNum> <w>/<r> [printdata]> \n", name);
     printf("\n");
 }
+
 static void UsbGetDevInfo(int32_t *busNum, int32_t *devNum)
 {
     struct UsbGetDevicePara paraData;

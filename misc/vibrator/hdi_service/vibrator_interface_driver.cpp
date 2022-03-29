@@ -64,8 +64,8 @@ static int HdfVibratorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfVibratorInterfaceHost->ioservice.Dispatch = VibratorInterfaceDriverDispatch;
-    hdfVibratorInterfaceHost->ioservice.Open = NULL;
-    hdfVibratorInterfaceHost->ioservice.Release = NULL;
+    hdfVibratorInterfaceHost->ioservice.Open = nullptr;
+    hdfVibratorInterfaceHost->ioservice.Release = nullptr;
     hdfVibratorInterfaceHost->service = new VibratorInterfaceImpl();
 
     deviceObject->service = &hdfVibratorInterfaceHost->ioservice;

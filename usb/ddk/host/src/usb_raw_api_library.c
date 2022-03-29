@@ -29,6 +29,7 @@ static void SyncRequestCallback(const void *requestArg)
         HDF_LOGE("%s:%d request is NULL!", __func__, __LINE__);
         return;
     }
+
     int32_t *completed = request->userData;
     *completed = 1;
     OsalSemPost(&request->sem);
@@ -175,7 +176,7 @@ static int32_t GetInterfaceNumber(const uint8_t *buffer, size_t size, uint8_t nI
         }
         header = (struct UsbiDescriptorHeader *)buffer2;
         if ((header->bLength > size2) || (header->bLength < sizeof(struct UsbDescriptorHeader))) {
-            HDF_LOGW("%s: invalid descriptor lenght %d, skipping remainder",
+            HDF_LOGW("%s: invalid descriptor length %d, skipping remainder",
                      __func__, header->bLength);
             break;
         }
@@ -622,7 +623,7 @@ static int32_t ParseConfiguration(struct UsbRawConfigDescriptor *config, const u
     for (i = 0; i < intfNum; ++i) {
         j = nAlts[i];
         if (j > USB_MAXALTSETTING) {
-            HDF_LOGW("%s: too many alternate settings: %d", __func__, j);
+            HDF_LOGW("%s: too many alternate settings: %hhu", __func__, j);
             nAlts[i] = USB_MAXALTSETTING;
             j = USB_MAXALTSETTING;
         }

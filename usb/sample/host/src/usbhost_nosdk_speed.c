@@ -113,8 +113,7 @@ static void FillUrb(struct UsbAdapterUrb *urb, int32_t len)
 {
     int32_t ret;
 
-    if (urb == NULL)
-    {
+    if (urb == NULL) {
         urb = OsalMemCalloc(sizeof(*urb));
         urb->userContext = (void *)(urb);
         urb->type = USB_ADAPTER_URB_TYPE_BULK;
@@ -259,11 +258,11 @@ static int32_t BeginProcess(unsigned char endPoint)
         urb[i].urb->streamId = 0;
         urb[i].urb->endPoint = endPoint;
 
-        data = OsalMemCalloc(TEST_LENGTH);//AllocMemTest(TEST_LENGTH)
+        data = OsalMemCalloc(TEST_LENGTH); // AllocMemTest(TEST_LENGTH)
         if (data == NULL) {
             return -1;
         }
-        memset_s(data, TEST_LENGTH, 'c', TEST_LENGTH);
+        (void)memset_s(data, TEST_LENGTH, 'c', TEST_LENGTH);
         data[TEST_LENGTH - 1] = '\0';
         urb[i].urb->buffer = (void *)data;
         urb[i].urb->bufferLength = TEST_LENGTH;
@@ -273,7 +272,7 @@ static int32_t BeginProcess(unsigned char endPoint)
     signal(SIGINT, SignalHandler);
     signal(SIGALRM, SignalHandler);
 
-    printf("test NO SDK endpoint:%d\n", endPoint);
+    printf("test NO SDK endpoint:%u\n", endPoint);
 
     for (i = 0; i < TEST_CYCLE; i++) {
         urb[i].inUse = 1;

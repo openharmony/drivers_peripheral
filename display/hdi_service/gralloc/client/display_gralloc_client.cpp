@@ -33,14 +33,9 @@ IDisplayGralloc *IDisplayGralloc::Get()
     HDF_LOGI("%{public}s: Get display gralloc client handle succ", __func__);
     return instance;
 }
- 
-DisplayGrallocClient::DisplayGrallocClient()
-{
-    mapperAdapter_ = std::make_shared<MapperAdapter>();
-    if (mapperAdapter_ == nullptr) {
-        return;
-    }
 
+DisplayGrallocClient::DisplayGrallocClient() : mapperAdapter_(std::make_shared<MapperAdapter>())
+{
     allocatorProxy_ = IDisplayAllocator::Get("hdi_display_gralloc_service");
     if (allocatorProxy_ == nullptr) {
         return;
@@ -80,7 +75,7 @@ int32_t DisplayGrallocClient::Unmap(const BufferHandle &handle) const
     auto ret = mapperAdapter_->UnmapBuffer(handle);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: failed, ret %{public}d", __func__, ret);
-    } 
+    }
     return ret;
 }
 
@@ -89,7 +84,7 @@ int32_t DisplayGrallocClient::FlushCache(const BufferHandle &handle) const
     auto ret = mapperAdapter_->FlushCache(handle);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: failed, ret %{public}d", __func__, ret);
-    } 
+    }
     return ret;
 }
 
@@ -98,7 +93,7 @@ int32_t DisplayGrallocClient::InvalidateCache(const BufferHandle &handle) const
     auto ret = mapperAdapter_->InvalidateCache(handle);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGI("%{public}s: failed, ret %{public}d", __func__, ret);
-    } 
+    }
     return ret;
 }
 

@@ -117,12 +117,12 @@ static void UsbStopIo(struct AcmDevice *acm)
     int32_t i = 0;
 
     if (g_stopIoStatus != USB_RAW_IO_PROCESS_STOPED) {
-        HDF_LOGD("%s:%d not stoped", __func__, __LINE__);
+        HDF_LOGD("%s:%d not stopped", __func__, __LINE__);
         OsalMutexLock(&g_stopIoLock);
         g_stopIoStatus = USB_RAW_IO_PROCESS_STOP;
         OsalMutexUnlock(&g_stopIoLock);
     } else {
-        HDF_LOGD("%s:%d stoped", __func__, __LINE__);
+        HDF_LOGD("%s:%d stopped", __func__, __LINE__);
     }
 
     while (g_stopIoStatus != USB_RAW_IO_PROCESS_STOPED) {

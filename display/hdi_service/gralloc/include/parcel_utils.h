@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#ifndef HDI_PARCEL_UTILS_V1_0_H 
+#ifndef HDI_PARCEL_UTILS_V1_0_H
 #define HDI_PARCEL_UTILS_V1_0_H
 
 #include <message_parcel.h>

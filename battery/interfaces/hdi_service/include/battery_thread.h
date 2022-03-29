@@ -44,7 +44,7 @@ protected:
     virtual void UpdateBatteryInfo(void* service, char* msg);
     virtual void UpdateBatteryInfo(void* service);
     virtual void HandleStates() {}
-    virtual int UpdateWaitInterval();
+    virtual int32_t UpdateWaitInterval();
     void UpdateEpollInterval(int32_t chargeState);
     virtual void CycleMatters() {}
 private:
