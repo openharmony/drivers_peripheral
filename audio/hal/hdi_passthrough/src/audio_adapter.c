@@ -383,7 +383,7 @@ int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct
         return HDF_FAILURE;
     }
     /* Get Adapter name */
-    int32_t ret = strncpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName, NAME_LEN - 1,
+    int32_t ret = strncpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName, NAME_LEN,
                             hwAdapter->adapterDescriptor.adapterName, adapterNameLen);
     if (ret != EOK) {
         LOG_FUN_ERR("copy fail");
@@ -745,7 +745,7 @@ int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const str
         return HDF_FAILURE;
     }
     /* Get Adapter name */
-    int32_t ret = strncpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN - 1,
+    int32_t ret = strncpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN,
                             hwAdapter->adapterDescriptor.adapterName, adapterNameLen);
     if (ret != EOK) {
         LOG_FUN_ERR("copy fail");

@@ -27,6 +27,7 @@
 static int32_t AudioPnpDevPlugMsgDeSerialize(uint8_t *msgStr, struct PnpReportDevPlugMsg *devPlugMsg)
 {
     int i;
+    int32_t ret = -1;
     char *stringTepm = NULL;
     uint8_t buf[PNP_REPORT_MSG_FIELD_NUM - 1] = {0};
 
@@ -35,8 +36,11 @@ static int32_t AudioPnpDevPlugMsgDeSerialize(uint8_t *msgStr, struct PnpReportDe
         return AUDIO_HAL_ERR_INTERNAL;
     }
     char strTemp[PNP_REPORT_MSG_LEN_MAX] = {0};
-    memcpy_s(strTemp, PNP_REPORT_MSG_LEN_MAX - 1, (char *)msgStr, strlen((char *)msgStr));
-
+    ret = memcpy_s(strTemp, PNP_REPORT_MSG_LEN_MAX, (char *)msgStr, strlen((char *)msgStr));
+    if (ret != EOK) {
+        HDF_LOGE("[%{public}s]: memcpy_s fail!", __func__);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     stringTepm = strtok((char*)strTemp, ";");
     if (stringTepm != NULL) {
         devPlugMsg->eventType = (uint8_t)atoi(stringTepm);
@@ -66,6 +70,7 @@ static int32_t AudioPnpDevPlugMsgDeSerialize(uint8_t *msgStr, struct PnpReportDe
 static int32_t AudioPnpDevEventMsgDeSerialize(uint8_t *msgStr, struct PnpReportEventMsg *eventMsg)
 {
     int i;
+    int32_t ret = -1;
     char *stringTepm = NULL;
     uint8_t buf[PNP_REPORT_MSG_FIELD_NUM - 1] = {0};
 
@@ -74,7 +79,11 @@ static int32_t AudioPnpDevEventMsgDeSerialize(uint8_t *msgStr, struct PnpReportE
         return AUDIO_HAL_ERR_INTERNAL;
     }
     char strTemp[PNP_REPORT_MSG_LEN_MAX] = {0};
-    memcpy_s(strTemp, PNP_REPORT_MSG_LEN_MAX - 1, (char *)msgStr, strlen((char *)msgStr));
+    ret = memcpy_s(strTemp, PNP_REPORT_MSG_LEN_MAX, (char *)msgStr, strlen((char *)msgStr));
+    if (ret != EOK) {
+        HDF_LOGE("[%{public}s]: memcpy_s fail!", __func__);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
 
     stringTepm = strtok((char *)strTemp, ";");
     if (stringTepm != NULL) {

@@ -149,7 +149,7 @@ static bool dev_id_match(const char *info, const char *did)
         idx++;
     }
     if (strstr(id, did)) {
-        LOG_PARA_INFO("match dai!!!: %s", id, did);
+        LOG_PARA_INFO("match dai!!!: %s %s", id, did);
         return true;
     }
     return false;
