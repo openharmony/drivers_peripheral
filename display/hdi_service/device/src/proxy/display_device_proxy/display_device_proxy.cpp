@@ -49,6 +49,7 @@ void IDisplayDevice::Initialize(void)
         sptr<IRemoteObject> remote = servMgr->GetService(serverName.c_str());
         if (remote == nullptr) {
             DISPLAY_LOG("IServiceManager IDisplayDevice(%{public}s) failed!", serverName.c_str());
+            break;
         }
         g_instance = iface_cast<IDisplayDevice>(remote);
         if (g_instance == nullptr) {

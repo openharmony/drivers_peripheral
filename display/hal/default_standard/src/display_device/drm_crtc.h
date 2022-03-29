@@ -34,7 +34,7 @@ class DrmDevice;
 class DrmCrtc {
 public:
     DrmCrtc(drmModeCrtcPtr c, uint32_t pipe);
-    virtual ~DrmCrtc() {};
+    virtual ~DrmCrtc() {}
     int32_t BindToDisplay(uint32_t id);
     void UnBindDisplay(uint32_t id);
     bool CanBind();
