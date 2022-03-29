@@ -158,7 +158,7 @@ uint32_t PcmFormatToBits(enum AudioFormat format)
             return PCM_32_BIT;
         default:
             return PCM_16_BIT;
-    };
+    }
 }
 
 uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)

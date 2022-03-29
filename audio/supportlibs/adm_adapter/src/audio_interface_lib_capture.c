@@ -915,8 +915,8 @@ int32_t AudioCtlCaptureGetVolThresholdSBuf(struct HdfSBuf *sBuf, const struct Au
 #ifdef ALSA_MODE
 int32_t TinyAlsaAudioCtlCaptureGetVolThreshold(struct AudioHwCaptureParam *handleData)
 {
-    long long volMin = 0;
-    long long volMax = 0;
+    int64_t volMin = 0;
+    int64_t volMax = 0;
     char *ctlName = "DACL Capture Volume";
     ReadInSoundCard();
     (void)memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));

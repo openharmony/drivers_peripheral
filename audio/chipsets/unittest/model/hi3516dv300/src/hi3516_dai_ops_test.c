@@ -25,7 +25,7 @@ int32_t TestDaiDeviceInit(void)
     int ret;
 
     ret = DaiDeviceInit(audioCard, dai);
- 
+
     HDF_LOGI("TestDaiHwParams: success");
     return HDF_SUCCESS;
 }

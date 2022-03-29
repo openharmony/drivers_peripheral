@@ -214,8 +214,8 @@ struct PrepareAudioPara {
     struct AudioTimeStamp time;
     struct timeval start;
     struct timeval end;
-    long delayTime;
-    long totalTime;
+    int64_t delayTime;
+    int64_t totalTime;
     float averageDelayTime;
     struct AudioDeviceDescriptor devDesc;
 };

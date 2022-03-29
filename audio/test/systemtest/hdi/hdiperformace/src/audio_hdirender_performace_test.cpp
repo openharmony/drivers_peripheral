@@ -42,9 +42,9 @@ using namespace HMOS::Audio;
 namespace {
 const string ADAPTER_NAME_USB = "usb";
 const float COUNT = 1000;
-const long LOWLATENCY = 10000;
-const long NORMALLATENCY = 30000;
-const long HIGHLATENCY = 60000;
+const int32_t LOWLATENCY = 10000;
+const int32_t NORMALLATENCY = 30000;
+const int32_t HIGHLATENCY = 60000;
 
 class AudioHdiRenderPerformaceTest : public testing::Test {
 public:

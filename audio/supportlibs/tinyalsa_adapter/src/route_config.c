@@ -80,7 +80,7 @@ static struct PathRouteCfgTable default_config_table = {
         .controls = default_headphone_normal_controls,
         .ctlsNums = sizeof(default_headphone_normal_controls) / sizeof(struct RouteCfgInfo),
     },
-  
+
     .speakerHeadphoneNormal = {
         .sndCard = 1,
         .devices = DEVICES_0,
