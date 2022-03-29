@@ -1081,7 +1081,7 @@ int32_t TransferSampleRate(const char *value, uint32_t *sampleRate)
     }
     char *endptr = NULL;
     errno = 0;
-    uint32_t tempSampleRate = strtoul(value, &endptr, DECIMAL_SYSTEM);
+    uint64_t tempSampleRate = strtoul(value, &endptr, DECIMAL_SYSTEM);
     if ((errno == ERANGE && (tempSampleRate == ULONG_MAX)) || (errno != 0 && tempSampleRate == 0)) {
         return HDF_FAILURE;
     }
