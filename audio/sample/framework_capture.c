@@ -1266,7 +1266,7 @@ int32_t CheckAndOpenFile(int32_t argc, char const *argv[])
     if (argv[1] == NULL || strlen(argv[1]) == 0) {
         return HDF_FAILURE;
     }
-    ret = strncpy_s(g_path, PATH_LEN - 1, argv[1], strlen(argv[1]) + 1);
+    ret = strncpy_s(g_path, PATH_LEN, argv[1], strlen(argv[1]) + 1);
     if (ret != 0) {
         LOG_FUN_ERR("copy fail");
         return HDF_FAILURE;

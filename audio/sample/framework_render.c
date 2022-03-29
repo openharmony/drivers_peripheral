@@ -237,15 +237,16 @@ int32_t InitDevDesc(struct AudioDeviceDescriptor *devDesc, uint32_t portId)
     return HDF_SUCCESS;
 }
 
-uint32_t StringToInt(const char *flag)
+uint32_t StringToInt(const char *str)
 {
-    if (flag == NULL) {
+    if (str == NULL || str[0] == '\0') {
         return 0;
     }
-    uint32_t temp = flag[0];
-    for (int32_t i = strlen(flag) - 1; i >= 0; i--) {
+    uint32_t temp = str[0];
+    int32_t strLength = strlen(str) - 1;
+    for (int32_t i = strLength; i >= 0; i--) {
         temp <<= MOVE_LEFT_NUM;
-        temp += flag[i];
+        temp += str[i];
     }
     return temp;
 }
@@ -1235,6 +1236,7 @@ void Choice(void)
 
 int32_t main(int32_t argc, char const *argv[])
 {
+    int32_t ret = 0;
     if (argc < 2 || argv == NULL || argv[0] == NULL) { // The parameter number is not greater than 2
         printf("usage:[1]sample [2]/data/test.wav\n");
         return 0;
@@ -1242,8 +1244,9 @@ int32_t main(int32_t argc, char const *argv[])
     if (argv[1] == NULL || strlen(argv[1]) == 0) {
         return HDF_FAILURE;
     }
-    int32_t ret = strncpy_s(g_path, PATH_LEN - 1, argv[1], strlen(argv[1]) + 1);
+    ret = strncpy_s(g_path, PATH_LEN, argv[1], strlen(argv[1]) + 1);
     if (ret != 0) {
+        LOG_FUN_ERR("strncpy_s failed!");
         return HDF_FAILURE;
     }
     char pathBuf[PATH_MAX] = {'\0'};

@@ -171,13 +171,13 @@ static int32_t AudioPathSelGetPlanRenderScene(struct AudioHwRenderParam *renderS
         return HDF_ERR_NOT_SUPPORT;
     }
     ret = strncpy_s(renderSceneParam->renderMode.hwInfo.pathSelect.useCase,
-                    NAME_LEN - 1, useCase, strlen(useCase) + 1);
+                    NAME_LEN, useCase, strlen(useCase) + 1);
     if (ret != 0) {
         LOG_FUN_ERR("strncpy_s failed!");
         return HDF_FAILURE;
     }
     ret = strncpy_s(renderSceneParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceType,
-                    NAME_LEN - 1, deviceType, strlen(deviceType) + 1);
+                    NAME_LEN, deviceType, strlen(deviceType) + 1);
     if (ret != 0) {
         LOG_FUN_ERR("strncpy_s failed!");
         return HDF_FAILURE;
@@ -225,13 +225,13 @@ static int32_t AudioPathSelGetPlanCaptureScene(struct AudioHwCaptureParam *captu
         return HDF_ERR_NOT_SUPPORT;
     }
     ret = strncpy_s(captureSceneParam->captureMode.hwInfo.pathSelect.useCase,
-                    NAME_LEN - 1, useCase, strlen(useCase) + 1);
+                    NAME_LEN, useCase, strlen(useCase) + 1);
     if (ret != 0) {
         LOG_FUN_ERR("strncpy_s failed!");
         return HDF_FAILURE;
     }
     ret = strncpy_s(captureSceneParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceType,
-                    NAME_LEN - 1, deviceType, strlen(deviceType) + 1);
+                    NAME_LEN, deviceType, strlen(deviceType) + 1);
     if (ret != 0) {
         LOG_FUN_ERR("strncpy_s failed!");
         return HDF_FAILURE;
@@ -276,7 +276,7 @@ static int32_t AudioCapturePathSelGetUsecaseDevice(struct AudioHwCaptureParam *c
         }
         captureParam->captureMode.hwInfo.pathSelect.pathPlan[pathIndex].value = device->valueint;
         ret = strncpy_s(captureParam->captureMode.hwInfo.pathSelect.pathPlan[pathIndex].pathPlanName,
-                        PATHPLAN_LEN - 1, pathKey, strlen(pathKey) + 1);
+                        PATHPLAN_LEN, pathKey, strlen(pathKey) + 1);
         if (ret != 0) {
             LOG_FUN_ERR("strncpy_s failed!");
             return HDF_FAILURE;
@@ -322,7 +322,7 @@ static int32_t AudioCapturePathSelGetDeviceSplit(struct AudioHwCaptureParam *cap
         decValue = devObj->valueint;
         captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[decIndex].value = decValue;
         ret = strncpy_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[decIndex].deviceSwitch,
-                        PATHPLAN_LEN - 1, decKey, strlen(decKey) + 1);
+                        PATHPLAN_LEN, decKey, strlen(decKey) + 1);
         if (ret != 0) {
             LOG_FUN_ERR("strncpy_s failed!");
             return HDF_FAILURE;
@@ -384,13 +384,13 @@ static int32_t AudioPathSelGetPlanCapture(struct AudioHwCaptureParam *capturePar
         return HDF_FAILURE;
     }
     ret = strncpy_s(captureParam->captureMode.hwInfo.pathSelect.useCase,
-                    NAME_LEN - 1, useCase, strlen(useCase) + 1);
+                    NAME_LEN, useCase, strlen(useCase) + 1);
     if (ret != 0) {
         LOG_FUN_ERR("strncpy_s failed!");
         return HDF_FAILURE;
     }
     ret = strncpy_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceType,
-                    NAME_LEN - 1, deviceType, strlen(deviceType) + 1);
+                    NAME_LEN, deviceType, strlen(deviceType) + 1);
     if (ret != 0) {
         LOG_FUN_ERR("strncpy_s failed!");
         return HDF_FAILURE;
@@ -446,7 +446,7 @@ static int32_t AudioRenderPathSelGetUsecaseDevice(struct AudioHwRenderParam *ren
         }
         renderParam->renderMode.hwInfo.pathSelect.pathPlan[pathIndex].value = device->valueint;
         ret = strncpy_s(renderParam->renderMode.hwInfo.pathSelect.pathPlan[pathIndex].pathPlanName,
-                        PATHPLAN_LEN - 1, pathKey, strlen(pathKey));
+                        PATHPLAN_LEN, pathKey, strlen(pathKey));
         if (ret != 0) {
             LOG_FUN_ERR("strncpy_s is Fail!");
             return HDF_FAILURE;
@@ -498,7 +498,7 @@ static int32_t AudioRenderPathSelGetDevice(struct AudioHwRenderParam *renderPara
         }
         renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[decIndex].value = device->valueint;
         ret = strncpy_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[decIndex].deviceSwitch,
-                        PATHPLAN_LEN - 1, decKey, strlen(decKey) + 1);
+                        PATHPLAN_LEN, decKey, strlen(decKey) + 1);
         if (ret != 0) {
             LOG_FUN_ERR("strncpy_s is Fail!");
             return HDF_FAILURE;
@@ -536,13 +536,13 @@ static int32_t AudioPathSelGetPlanRender(struct AudioHwRenderParam *renderParam)
         return HDF_FAILURE;
     }
     ret = strncpy_s(renderParam->renderMode.hwInfo.pathSelect.useCase,
-                    NAME_LEN - 1, useCase, strlen(useCase) + 1);
+                    NAME_LEN, useCase, strlen(useCase) + 1);
     if (ret != 0) {
         LOG_FUN_ERR("strncpy_s is Fail!");
         return HDF_FAILURE;
     }
     ret = strncpy_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceType,
-                    NAME_LEN - 1, deviceType, strlen(deviceType) + 1);
+                    NAME_LEN, deviceType, strlen(deviceType) + 1);
     if (ret != 0) {
         LOG_FUN_ERR("strncpy_s is Fail!");
         return HDF_FAILURE;

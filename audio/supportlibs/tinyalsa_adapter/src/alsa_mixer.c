@@ -571,7 +571,7 @@ int32_t MixerCtlsInit(struct mixer *mixer, struct snd_ctl_elem_id *elemId)
 struct mixer *mixer_open_legacy(int32_t card)
 {
     char dname[sizeof(SOUND_CTL_PREFIX) + 20];
-    int32_t ret = sprintf_s(dname, sizeof(dname) - 1,  SOUND_CTL_PREFIX, card);
+    int32_t ret = sprintf_s(dname, sizeof(dname),  SOUND_CTL_PREFIX, card);
     if (ret < 0) {
         LOG_FUN_ERR("sound card contorl node path sprintf failed");
         return NULL;
@@ -744,7 +744,7 @@ int32_t set_capture_voice_volume(const char *ctlName, float volume)
         LOG_FUN_ERR("mixer_get_dB_range() get control min max value fail");
         return 0;
     }
-    LOG_PARA_INFO("set_capture_voice_volume vol_min %d, vol_max %d", volMin, volMax);
+    LOG_PARA_INFO("set_capture_voice_volume vol_min , vol_max");
     return mixer_ctl_set_int(ctl, volume);
 }
 
@@ -870,4 +870,3 @@ void RoutePcmCardOpen(int32_t card, uint32_t route)
     }
     return;
 }
-
