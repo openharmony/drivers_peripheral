@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,8 +32,6 @@ namespace HDI {
 namespace Battery {
 namespace V1_0 {
 namespace {
-const std::string SEMICOLON = ";";
-constexpr int32_t MAX_STR_LEN = 255;
 constexpr uint32_t BACKLIGHT_ON = 128;
 constexpr uint32_t BACKLIGHT_OFF = 0;
 constexpr uint32_t MKDIR_WAIT_TIME = 1;
@@ -140,7 +138,7 @@ void BatteryBacklight::InitDefaultSysfs() const
 {
     std::string brightnessPath = "/data";
     if (access(brightnessPath.c_str(), 0) == -1) {
-        mkdir("/data", S_IRWXU);
+        mkdir(brightnessPath.c_str(), S_IRWXU);
         sleep(MKDIR_WAIT_TIME);
     }
 
@@ -165,38 +163,21 @@ void BatteryBacklight::InitDevicePah(std::string& path)
 int32_t BatteryBacklight::HandleBacklight(uint32_t backlight)
 {
     FILE* fp = nullptr;
-    int32_t writeFile = -1;
-    char* path = nullptr;
-    char* pathGroup = nullptr;
-    uint32_t bufferLen;
+    int32_t ret = -1;
     std::string devicePath = BACKLIGHT_BASE_PATH + "/" + g_backlightNode + "/" + "brightness";
     BATTERY_HILOGD(FEATURE_CHARGING, "backlight devicePath is %{public}s", devicePath.c_str());
     InitDevicePah(devicePath);
 
     BATTERY_HILOGD(FEATURE_CHARGING, "backlight value is %{public}d", backlight);
-    bufferLen = strnlen(devicePath.c_str(), MAX_STR_LEN) + 1;
-    pathGroup = (char*)malloc(bufferLen);
-    if (pathGroup == nullptr) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "malloc error");
-        return writeFile;
+    fp = fopen(devicePath.c_str(), "w");
+    if (fp != nullptr) {
+        ret = fprintf(fp, "%u\n", backlight);
+        fclose(fp);
     }
-
-    strlcpy(pathGroup, devicePath.c_str(), bufferLen);
-
-    path = pathGroup;
-    while ((path = strtok(path, SEMICOLON.c_str())) != nullptr) {
-        fp = fopen(path, "w");
-        if (fp != nullptr) {
-            writeFile = fprintf(fp, "%u\n", backlight);
-            fclose(fp);
-        }
-        if (writeFile <= 0) {
-            BATTERY_HILOGD(FEATURE_CHARGING, "failed to set backlight path=%{public}s.", path);
-        }
-        path = nullptr;
+    if (ret <= 0) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "failed to set backlight path=%{public}s.", devicePath.c_str());
     }
-    free(pathGroup);
-    return writeFile;
+    return ret;
 }
 }  // namespace V1_0
 }  // namespace Battery
