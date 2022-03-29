@@ -22,20 +22,16 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <fcntl.h>
-#include <stdlib.h>
 #include <sys/time.h>
 #include <signal.h>
-#include <sys/mman.h>
 #include <osal_sem.h>
 #include <osal_thread.h>
-#include <errno.h>
 #include <sys/syscall.h>
 #include <time.h>
 #include "usbhost_nosdk_speed.h"
 #include "osal_time.h"
 #include "osal_mem.h"
 #include "implementation/global_implementation.h"
-#include "signal.h"
 #include "liteos_ddk_usb.h"
 #include "usb_pnp_notify.h"
 
@@ -54,7 +50,7 @@ static uint64_t g_byteTotal = 0;
 static struct UsbAdapterUrbs urb[TEST_CYCLE];
 static struct urb *sendUrb = NULL;
 static bool g_printData = false;
-static unsigned char endNum;
+static uint8_t endNum;
 static struct OsalSem timeSem;
 static struct usb_device *fd = NULL;
 static uint32_t sigCnt = 0;
@@ -62,12 +58,12 @@ static struct UsbAdapterHostEndpoint *uhe = NULL;
 static bool g_writeOrRead = TEST_WRITE;
 static struct AcmDevice *acm = NULL;
 
-static void CloseDevice()
+static void CloseDevice(void)
 {
     return;
 }
 
-static int32_t OpenDevice()
+static int32_t OpenDevice(void)
 {
     struct UsbGetDevicePara paraData;
     paraData.type = USB_PNP_DEVICE_ADDRESS_TYPE;
@@ -75,7 +71,7 @@ static int32_t OpenDevice()
     paraData.devNum = (uint8_t)g_devAddr;
     fd = UsbPnpNotifyGetUsbDevice(paraData);
     if (fd == NULL) {
-        printf("err fd\n");
+        HDF_LOGE("%{public}s:%{public}d err fd\n", __func__, __LINE__);
         return -1;
     }
     return 0;
@@ -83,11 +79,11 @@ static int32_t OpenDevice()
 
 static int32_t ClaimInterface(unsigned int iface)
 {
-    printf("claim success: iface=%u\n", iface);
+    HDF_LOGI("%{public}s:%{public}d claim success: iface=%u\n", __func__, __LINE__, iface);
     return HDF_SUCCESS;
 }
 
-void SpeedPrint()
+void SpeedPrint(void)
 {
     double speed;
     uint64_t count;
@@ -97,7 +93,8 @@ void SpeedPrint()
     if (count >= TEST_TIME) {
         g_speedFlag = true;
     }
-    speed = (g_byteTotal * 1.0) / (sigCnt * TEST_PRINT_TIME  * 1024 * 1024);
+    speed = (g_byteTotal * TEST_DOUBLE_COUNT) /
+        (sigCnt * TEST_PRINT_TIME * TEST_BYTE_COUNT_UINT * TEST_BYTE_COUNT_UINT);
     printf("\nSpeed:%f MB/s\n", speed);
 }
 
@@ -118,14 +115,14 @@ static int32_t SendProcess(void *argurb)
             i = TEST_CYCLE - 1;
         }
         sendUrb = urb[i].urb;
-        r = usb_setup_endpoint(fd, uhe, 1024);
+        r = usb_setup_endpoint(fd, uhe, TEST_BYTE_COUNT_UINT);
         if (r) {
             DPRINTFN(0, "setup failed ret:%d\n", r);
             return r;
         }
         r = usb_submit_urb(sendUrb, 0);
         if (r < 0) {
-            printf("SubmitBulkRequest: ret:%d\n", r);
+            HDF_LOGI("SubmitBulkRequest: ret:%d\n", r);
             urb[i].inUse = 0;
             continue;
         }
@@ -136,12 +133,12 @@ static int32_t SendProcess(void *argurb)
 
 static void UrbCompleteHandle(const struct urb *curUrb)
 {
-    if (g_printData == true) {
+    if (g_printData) {
         for (int32_t i = 0; i < curUrb->actual_length; i++) {
             printf("%c", *(((char*)curUrb->transfer_buffer) + i));
         }
         fflush(stdout);
-    } else if (g_recv_count % 10000 == 0) {
+    } else if (g_recv_count % TEST_PRINT_MAX_RANGE == 0) {
         printf("#");
         fflush(stdout);
     }
@@ -165,7 +162,7 @@ static void UrbComplete(struct urb *curUrb)
     }
 }
 
-static int32_t BeginProcessHandleFirst()
+static int32_t BeginProcessHandleFirst(void)
 {
     char *data = NULL;
     int32_t i;
@@ -174,7 +171,7 @@ static int32_t BeginProcessHandleFirst()
         if (urb[i].urb == NULL) {
             urb[i].urb = OsalMemCalloc(sizeof(struct urb));
             if (urb[i].urb == NULL) {
-                printf("urb calloc err\n");
+                HDF_LOGE("%{public}s:%{public}d urb calloc err\n", __func__, __LINE__);
                 return -1;
             }
         }
@@ -186,7 +183,7 @@ static int32_t BeginProcessHandleFirst()
         if (data == NULL) {
             data = OsalMemCalloc(TEST_LENGTH);
             if (data == NULL) {
-                printf("data calloc err\n");
+                HDF_LOGE("%{public}s:%{public}d data calloc err\n", __func__, __LINE__);
                 return -1;
             }
         }
@@ -207,13 +204,13 @@ static int32_t BeginProcess(unsigned char endPoint)
     int32_t i;
 
     if (endPoint <= 0) {
-        printf("parameter error\n");
+        HDF_LOGE("%{public}s:%{public}d parameter error\n", __func__, __LINE__);
         return -1;
     }
 
     uhe = usb_find_host_endpoint(fd, USB_REQUEST_TYPE_BULK, endPoint);
     if (uhe == NULL) {
-        printf("usb_find_host_endpoint error\n");
+        HDF_LOGE("%{public}s:%{public}d usb_find_host_endpoint error\n", __func__, __LINE__);
         return -1;
     }
     r = BeginProcessHandleFirst();
@@ -221,7 +218,7 @@ static int32_t BeginProcess(unsigned char endPoint)
         return r;
     }
 
-    printf("test NO SDK endpoint:%u\n", endPoint);
+    HDF_LOGI("%{public}s:%{public}d test NO SDK endpoint:%u\n", __func__, __LINE__, endPoint);
 
     for (i = 0; i < TEST_CYCLE; i++) {
         if (urb[i].inUse == 0) {
@@ -235,7 +232,7 @@ static int32_t BeginProcess(unsigned char endPoint)
             }
             r = usb_submit_urb(sendUrb, 0);
             if (r < 0) {
-                printf("SubmitBulkRequest: ret:%d\n", r);
+                HDF_LOGI("%{public}s:%{public}d SubmitBulkRequest: ret:%d\n", __func__, __LINE__, r);
                 urb[i].inUse = 0;
                 continue;
             }
@@ -272,7 +269,7 @@ static void UsbGetDevInfo(int32_t *busNum, int32_t *devNum)
     paraData.productId = USB_DEVICE_PRODUCT_ID;
     usbPnpDevice = UsbPnpNotifyGetUsbDevice(paraData);
     if (usbPnpDevice == NULL) {
-        printf("%s:%d UsbPnpNotifyGetUsbDevice is NULL!", __func__, __LINE__);
+        HDF_LOGE("%s:%d UsbPnpNotifyGetUsbDevice is NULL!", __func__, __LINE__);
         return;
     }
     *busNum = (int)usbPnpDevice->address;
@@ -280,11 +277,11 @@ static void UsbGetDevInfo(int32_t *busNum, int32_t *devNum)
     printf("%s:%d busNum=%d devNum=%d!\n", __func__, __LINE__, *busNum, *devNum);
 }
 
-static int32_t UsbSerialOpen()
+static int32_t UsbSerialOpen(void)
 {
     return HDF_SUCCESS;
 }
-static int32_t UsbSerialClose()
+static int32_t UsbSerialClose(void)
 {
     if (!g_speedFlag) {
         g_speedFlag = true;
@@ -310,7 +307,7 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int32_t *ifa
     g_devAddr = 2;
 
     UsbGetDevInfo(&g_busNum, &g_devAddr);
-    if (input->paramNum == 6) {
+    if (input->paramNum == INPUT_COMPARE_PARAMNUM) {
         g_busNum = input->busNum;
         g_devAddr = input->devAddr;
         *ifaceNum = input->ifaceNum;
@@ -332,16 +329,15 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int32_t *ifa
     } else {
         printf("Error: parameter error! \n\n");
         ShowHelp("speedtest");
-        ret = HDF_FAILURE;
-        goto END;
+        return HDF_FAILURE;
     }
     OsalSemInit(&sem, 0);
     OsalSemInit(&timeSem, 0);
-END:
+
     return ret;
 }
 
-static int32_t UsbSerialSpeedThreadCreate()
+static int32_t UsbSerialSpeedThreadCreate(void)
 {
     int32_t ret;
     struct OsalThread urbSendProcess;
@@ -353,17 +349,16 @@ static int32_t UsbSerialSpeedThreadCreate()
 
     ret = OsalThreadCreate(&urbSendProcess, (OsalThreadEntry)SendProcess, NULL);
     if (ret != HDF_SUCCESS) {
-        printf("OsalThreadCreate fail, ret=%d\n", ret);
-        goto END;
+        HDF_LOGE("OsalThreadCreate failed, ret = %d\n", ret);
+        return ret;
     }
 
     ret = OsalThreadStart(&urbSendProcess, &threadCfg);
     if (ret != HDF_SUCCESS) {
-        printf("OsalThreadStart fail, ret=%d\n", ret);
-        goto END;
+        HDF_LOGE("OsalThreadStart failed, ret = %d\n", ret);
+        return ret;
     }
 
-END:
     return ret;
 }
 
@@ -373,8 +368,8 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     int32_t ret;
     struct UsbSpeedTest *input = NULL;
     uint32_t size = 0;
-    if (acm->busy == true) {
-        printf("%s: speed test busy\n", __func__);
+    if (acm->busy) {
+        HDF_LOGE("%{public}s: %{public}d speed test busy\n", __func__, __LINE__);
         ret = HDF_ERR_IO;
         goto END;
     } else {
@@ -383,7 +378,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
 
     (void)HdfSbufReadBuffer(data, (const void **)&input, &size);
     if ((input == NULL) || (size != sizeof(struct UsbSpeedTest))) {
-        printf("%s: sbuf read buffer failed\n", __func__);
+        HDF_LOGE("%{public}s: %{public}d sbuf read buffer failed\n", __func__, __LINE__);
         ret = HDF_ERR_IO;
         goto END;
     }

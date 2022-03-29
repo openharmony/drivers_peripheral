@@ -269,7 +269,7 @@ int32_t UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
 
     fnDevMgr->running = false;
-    while (fnDevMgr->running != true) {
+    while (!(fnDevMgr->running)) {
         i++;
         OsalMSleep(SLEEP_100MS);
         if (i > SLEEP_TIMES) {
@@ -482,7 +482,7 @@ static struct UsbHandleMgr *GetHandleMgr(const struct UsbFnDeviceMgr *devMgr, in
     }
     for (i = 0; i < devMgr->fnDev.numInterfaces; i++) {
         intfMgr = devMgr->interfaceMgr + i;
-        if (intfMgr->isOpen == false) {
+        if (!(intfMgr->isOpen)) {
             continue;
         }
         handle = intfMgr->handle;

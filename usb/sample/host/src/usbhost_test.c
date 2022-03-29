@@ -227,12 +227,12 @@ static int32_t TestCmdLoop(int32_t cmdType, const char *param)
     bool asyncFlag = false;
     int32_t cnt = 0;
 
-    if (TestGetExitFlag() == true) {
+    if (TestGetExitFlag()) {
         HDF_LOGD("%s:%d g_exitFlag is true!", __func__, __LINE__);
         return HDF_FAILURE;
     }
 
-    while ((loopFlag == true) && (run != false)) {
+    while ((loopFlag) && (!run)) {
         switch (cmdType) {
             case HOST_ACM_SYNC_READ:
                 UsbHostDdkTestSyncRead(NULL);
@@ -264,7 +264,7 @@ static int32_t TestCmdLoop(int32_t cmdType, const char *param)
                 break;
         }
 
-        if (asyncFlag == false) {
+        if (!asyncFlag) {
             loopFlag = false;
         }
     }

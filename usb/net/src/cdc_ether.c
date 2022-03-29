@@ -273,7 +273,7 @@ static int32_t EcmRead(struct EcmDevice *ecm, struct HdfSBuf *reply)
         HDF_LOGE("%d: invalid parma", __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (ecm->openFlag == false) {
+    if (!(ecm->openFlag)) {
         return HDF_ERR_BAD_FD;
     }
 
@@ -372,7 +372,7 @@ static void EcmClostRelease(struct EcmDevice *ecm)
     int32_t cnt = 0;
     const int32_t temp = 20;
 
-    if (ecm->openFlag == false) {
+    if (!(ecm->openFlag)) {
         HDF_LOGE("%s:%d: openFlag is false", __func__, __LINE__);
         return;
     }
@@ -527,7 +527,7 @@ static int32_t EcmDeviceDispatch(struct HdfDeviceIoClient *client, int32_t cmd,
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    if (g_ecmReleaseFlag == true) {
+    if (g_ecmReleaseFlag) {
         HDF_LOGE("%s:%d g_ecmReleaseFlag is true", __func__, __LINE__);
         return HDF_ERR_DEVICE_BUSY;
     }
@@ -1047,7 +1047,7 @@ static int32_t EcmInit(struct EcmDevice *ecm)
     const uint8_t altsetting = 1;
     struct UsbSession *session = NULL;
 
-    if (ecm->initFlag == true) {
+    if (ecm->initFlag) {
         HDF_LOGE("%s:%d: initFlag is true", __func__, __LINE__);
         return HDF_SUCCESS;
     }
@@ -1121,7 +1121,7 @@ ERR_CLAIM_INTERFACES:
 
 static void EcmRelease(struct EcmDevice *ecm)
 {
-    if (ecm->initFlag == false) {
+    if (!(ecm->initFlag)) {
         HDF_LOGE("%s:%d: initFlag is false", __func__, __LINE__);
         return;
     }
@@ -1174,11 +1174,11 @@ static void EcmDriverRelease(struct HdfDeviceObject *device)
 
     g_ecmReleaseFlag = true;
 
-    if (ecm->openFlag == true) {
+    if (ecm->openFlag) {
         HDF_LOGD("%s:%d EcmClostRelease", __func__, __LINE__);
         EcmClostRelease(ecm);
     }
-    if (ecm->initFlag == true) {
+    if (ecm->initFlag) {
         HDF_LOGD("%s:%d EcmRelease", __func__, __LINE__);
         EcmRelease(ecm);
     }

@@ -76,7 +76,7 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
             continue;
         }
 
-        if (IoCancelRequest(interfacePool, submitRequest) == true) {
+        if (IoCancelRequest(interfacePool, submitRequest)) {
             continue;
         }
 

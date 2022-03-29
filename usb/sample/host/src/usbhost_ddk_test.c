@@ -442,7 +442,7 @@ void UsbHostDdkTestStdGetStatus(char *readSbuf)
     }
 
     status = HdfSbufReadUint16(g_reply, &data);
-    if (status == false) {
+    if (!status) {
         printf("%s:%d HdfSbufReadBuffer status = %d\n", __func__, __LINE__, status);
         HDF_LOGE("%s:%d HdfSbufReadBuffer status=%d",
             __func__, __LINE__, status);
@@ -631,7 +631,7 @@ void UsbHostDdkTestRemoveInterface(uint32_t value)
 
 int32_t UsbHostDdkTestOpen(int32_t cmdType)
 {
-    if (g_exitFlag == true) {
+    if (g_exitFlag) {
         HDF_LOGD("%s:%d g_exitFlag is true!", __func__, __LINE__);
         return HDF_FAILURE;
     }
@@ -658,7 +658,7 @@ int32_t UsbHostDdkTestOpen(int32_t cmdType)
 
 int32_t UsbHostDdkTestClose(int32_t cmdType)
 {
-    if (g_exitFlag == true) {
+    if (g_exitFlag) {
         HDF_LOGD("%s:%d g_exitFlag is true!", __func__, __LINE__);
         return HDF_FAILURE;
     }

@@ -78,8 +78,8 @@ static void AcmWriteBulk(struct UsbRequest *req)
 {
     int32_t status;
 
-    if (req == NULL) {
-        printf("%s:%d req is NULL!", __func__, __LINE__);
+    if (req == nullptr) {
+        printf("%s:%d req is nullptr!", __func__, __LINE__);
         return;
     }
 
@@ -105,7 +105,7 @@ static int32_t AcmWriteBufAlloc(struct AcmDevice *acm)
 {
     int32_t i;
     struct AcmWb *wb;
-    for (wb = &acm->wb[0],i = 0; i < ACM_NW; i++,wb++) {
+    for (wb = &acm->wb[0], i = 0; i < ACM_NW; i++, wb++) {
         wb->buf = (uint8_t *)OsalMemCalloc(acm->writeSize);
         if (!wb->buf) {
             while (i != 0) {
@@ -140,8 +140,8 @@ static void AcmProcessNotification(struct AcmDevice *acm, unsigned char *buf)
 
 static void AcmCtrlIrq(struct UsbRequest *req)
 {
-    if (req == NULL) {
-        printf("%s:%d req is NULL!", __func__, __LINE__);
+    if (req == nullptr) {
+        printf("%s:%d req is nullptr!", __func__, __LINE__);
         return;
     }
     int32_t retval, ret;
@@ -160,8 +160,8 @@ static void AcmCtrlIrq(struct UsbRequest *req)
     if (acm->nbIndex) {
         dr = (struct UsbCdcNotification *)acm->notificationBuffer;
     }
-    if (dr == NULL) {
-        printf("%s:%d dr is NULL!", __func__, __LINE__);
+    if (dr == nullptr) {
+        printf("%s:%d dr is nullptr!", __func__, __LINE__);
         return;
     }
     expectedSize = sizeof(struct UsbCdcNotification) + Le16ToCpu(dr->wLength);

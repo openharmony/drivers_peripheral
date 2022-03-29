@@ -23,10 +23,8 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <fcntl.h>
-#include <stdlib.h>
 #include <sys/time.h>
 #include <signal.h>
-#include <sys/mman.h>
 #include <osal_sem.h>
 #include <osal_thread.h>
 #include <inttypes.h>
@@ -154,7 +152,7 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
         printf("error status=%d\r\n", status);
     }
 
-    if (g_printData == true) {
+    if (g_printData) {
         for (unsigned int i = 0; i < req->compInfo.actualLength; i++) {
             printf("%c", req->compInfo.buffer[i]);
         }

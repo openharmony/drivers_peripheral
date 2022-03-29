@@ -65,8 +65,8 @@ static HDF_STATUS IfDestroyPipeObj(const struct UsbSdkInterface *interfaceObj, c
 
     OsalMutexLock((struct OsalMutex *)&interfaceObj->listLock);
     DLIST_FOR_EACH_ENTRY_SAFE(pipePos, pipeTemp, &interfaceObj->pipeList, struct UsbPipe, object.entry) {
-        if ((destroyFlag == true) || ((destroyFlag == false)
-            && (pipePos->object.objectId == pipeObj->object.objectId))) {
+        if ((destroyFlag == true) || ((destroyFlag == false) &&
+            (pipePos->object.objectId == pipeObj->object.objectId))) {
             found = true;
             DListRemove(&pipePos->object.entry);
             ret = IfFreePipeObj(pipePos);
@@ -75,14 +75,14 @@ static HDF_STATUS IfDestroyPipeObj(const struct UsbSdkInterface *interfaceObj, c
                 break;
             }
 
-            if (destroyFlag == false) {
+            if (!destroyFlag) {
                 break;
             }
         }
     }
     OsalMutexUnlock((struct OsalMutex *)&interfaceObj->listLock);
 
-    if (found == false) {
+    if (!found) {
         ret = HDF_FAILURE;
         HDF_LOGE("%s:%d the pipe object to be destroyed does not exist, ret=%d ", \
             __func__, __LINE__, ret);
@@ -205,7 +205,7 @@ static HDF_STATUS IfDestroyInterfacePool(const struct UsbInterfacePool *interfac
         }
     }
 
-    if (found == false) {
+    if (!found) {
         ret = HDF_FAILURE;
         HDF_LOGE("%s:%d the interfacePool object to be destroyed does not exist",
             __func__, __LINE__);
@@ -217,7 +217,7 @@ static HDF_STATUS IfDestroyInterfacePool(const struct UsbInterfacePool *interfac
 static void IfInterfaceRefCount(const struct UsbSdkInterface *interfaceObj,
     uint8_t interfaceIndex, bool refCountFlag, bool *claimFlag)
 {
-    if ((refCountFlag == true) && (interfaceIndex != USB_CTRL_INTERFACE_ID)) {
+    if (refCountFlag && (interfaceIndex != USB_CTRL_INTERFACE_ID)) {
         if (OsalAtomicRead((OsalAtomic *)&interfaceObj->refCount) == 0) {
             if (claimFlag != NULL) {
                 *claimFlag = true;
@@ -262,18 +262,17 @@ static struct UsbPipe *IfFindPipeObj(const struct UsbSdkInterface *interfaceObj,
                 break;
         }
 
-        if (findFlag == true) {
+        if (findFlag) {
             break;
         }
     }
     OsalMutexUnlock((struct OsalMutex *)&interfaceObj->listLock);
 
-    if (findFlag == false) {
+    if (!findFlag) {
         HDF_LOGE("%s:%d the pipe object to be find does not exist. ", __func__, __LINE__);
         return NULL;
-    } else {
-        return pipePos;
     }
+    return pipePos;
 }
 
 static struct UsbSdkInterface *IfFindInterfaceObj(const struct UsbInterfacePool *interfacePool,
@@ -308,22 +307,21 @@ static struct UsbSdkInterface *IfFindInterfaceObj(const struct UsbInterfacePool 
                 break;
         }
 
-        if (found == true) {
+        if (found) {
             IfInterfaceRefCount(interfacePos, queryPara.interfaceIndex, refCountFlag, claimFlag);
             break;
         }
     }
     OsalMutexUnlock((struct OsalMutex *)&interfacePool->interfaceLock);
 
-    if (found == false) {
+    if (!found) {
         HDF_LOGE("%s:%d the interface object to be find does not exist.",
                  __func__, __LINE__);
         return NULL;
     }
 
-    if ((statusFlag == true) && (interfacePos->status == USB_INTERFACE_STATUS_REMOVE)) {
-        HDF_LOGE("%s:%d status=%d error.",
-                 __func__, __LINE__, interfacePos->status);
+    if (statusFlag && (interfacePos->status == USB_INTERFACE_STATUS_REMOVE)) {
+        HDF_LOGE("%s:%d status=%d error.", __func__, __LINE__, interfacePos->status);
         return NULL;
     }
     return interfacePos;
@@ -368,8 +366,8 @@ static struct UsbInterfacePool *IfFindInterfacePool(
                 break;
         }
 
-        if (found == true) {
-            if (refCountFlag == true) {
+        if (found) {
+            if (refCountFlag) {
                 AdapterAtomicInc(&interfacePoolPos->refCount);
             }
 
@@ -378,9 +376,8 @@ static struct UsbInterfacePool *IfFindInterfacePool(
     }
     OsalMutexUnlock((struct OsalMutex *)&session->lock);
 
-    if (found == false) {
-        HDF_LOGE("%s:%d the interfacePool object to be find does not exist.",
-                 __func__, __LINE__);
+    if (!found) {
+        HDF_LOGE("%s:%d the interfacePool object to be find does not exist.", __func__, __LINE__);
         return NULL;
     }
 
@@ -630,7 +627,7 @@ static int32_t IfDestoryDevice(const struct UsbSession *session, const struct Us
     }
 
     OsalMutexLock((struct OsalMutex *)&session->lock);
-    if (refCountFlag == true) {
+    if (refCountFlag) {
         AdapterAtomicDec((OsalAtomic *)&interfacePool->refCount);
     }
 
@@ -780,28 +777,26 @@ HDF_STATUS UsbIfDestroyInterfaceObj(const struct UsbInterfacePool *interfacePool
     OsalMutexLock((struct OsalMutex *)&interfacePool->interfaceLock);
     DLIST_FOR_EACH_ENTRY_SAFE(interfacePos, interfaceTemp, &interfacePool->interfaceList, \
         struct UsbSdkInterface, interface.object.entry) {
-        if ((destroyFlag == true) || ((destroyFlag == false) \
-            && (interfacePos->interface.object.objectId == interfaceObj->interface.object.objectId))) {
+        if ((destroyFlag == true) || ((destroyFlag == false) &&
+            (interfacePos->interface.object.objectId == interfaceObj->interface.object.objectId))) {
             found = true;
             DListRemove(&interfacePos->interface.object.entry);
             ret = IfFreeInterfaceObj(interfacePos);
             if (ret != HDF_SUCCESS) {
-                HDF_LOGE("%s:%d IfFreeInterfaceObj fail, ret=%d ",
-                    __func__, __LINE__, ret);
+                HDF_LOGE("%s:%d IfFreeInterfaceObj fail, ret=%d ", __func__, __LINE__, ret);
                 break;
             }
 
-            if (destroyFlag == false) {
+            if (!destroyFlag) {
                 break;
             }
         }
     }
     OsalMutexUnlock((struct OsalMutex *)&interfacePool->interfaceLock);
 
-    if (found == false) {
+    if (!found) {
         ret = HDF_FAILURE;
-        HDF_LOGE("%s:%d the interface object to be destroyed does not exist",
-            __func__, __LINE__);
+        HDF_LOGE("%s:%d the interface object to be destroyed does not exist", __func__, __LINE__);
     }
 
     return ret;
@@ -1311,7 +1306,7 @@ int32_t UsbSubmitRequestAsync(const struct UsbRequest *request)
     struct UsbIfRequest *requestObj = (struct UsbIfRequest *)request;
     requestObj->isSyncReq = false;
     if (memset_s((void *)&request->compInfo, sizeof(request->compInfo), 0, sizeof(request->compInfo)) != EOK) {
-        HDF_LOGE("%s:%d memset_s faild ", __func__, __LINE__);
+        HDF_LOGE("%s:%d memset_s failed ", __func__, __LINE__);
         return HDF_FAILURE;
     }
     return IfSubmitRequestToQueue(requestObj);

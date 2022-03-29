@@ -23,10 +23,8 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <fcntl.h>
-#include <stdlib.h>
 #include <sys/time.h>
 #include <signal.h>
-#include <sys/mman.h>
 #include <osal_thread.h>
 #include "hdf_base.h"
 #include "hdf_log.h"
@@ -35,7 +33,6 @@
 #include "osal_mem.h"
 #include "osal_time.h"
 #include "securec.h"
-#include "signal.h"
 #include "usb_ddk_interface.h"
 #include "usb_pnp_notify.h"
 
@@ -90,7 +87,7 @@ static int32_t UsbIoThread(void *data)
             }
         }
 
-        if (g_stopIoThreadFlag == true) {
+        if (g_stopIoThreadFlag) {
             HDF_LOGD("%s:%d", __func__, __LINE__);
             g_stopIoThreadFlag = false;
             break;
@@ -173,7 +170,7 @@ static int32_t UsbStopIo(struct AcmDevice *acm)
     int32_t i = 0;
 
     printf("%s:%d", __func__, __LINE__);
-    if (g_stopIoThreadFlag == false) {
+    if (!g_stopIoThreadFlag) {
         printf("%s:%d", __func__, __LINE__);
         g_stopIoThreadFlag = true;
     }
@@ -465,7 +462,7 @@ static void AcmTestBulkCallback(const void *requestArg)
         printf("status error\n");
     }
 
-    if (g_printData == true) {
+    if (g_printData) {
         for (int32_t i = 0; i < req->actualLength; i++) {
             printf("%c", req->buffer[i]);
         }

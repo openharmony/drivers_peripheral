@@ -1340,7 +1340,7 @@ void UsbFnMemFree(const void *mem)
         return;
     }
 
-    if ((g_usbRamTestFlag == true) && (g_usbRamTestHead != NULL)) {
+    if (g_usbRamTestFlag && (g_usbRamTestHead != NULL)) {
         OsalMutexLock(&g_usbRamTestHead->lock);
         DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
             if (pos->address == (uintptr_t)mem) {

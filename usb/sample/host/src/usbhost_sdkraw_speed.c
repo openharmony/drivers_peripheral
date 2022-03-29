@@ -23,10 +23,8 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <fcntl.h>
-#include <stdlib.h>
 #include <sys/time.h>
 #include <signal.h>
-#include <sys/mman.h>
 #include <osal_thread.h>
 #include <inttypes.h>
 #include "hdf_base.h"
@@ -85,7 +83,7 @@ static int32_t UsbIoThread(void *data)
             }
         }
 
-        if (g_stopIoThreadFlag == true) {
+        if (g_stopIoThreadFlag) {
             HDF_LOGD("%s:%d", __func__, __LINE__);
             g_stopIoThreadFlag = false;
             break;
@@ -167,7 +165,7 @@ static int32_t UsbStopIo(struct AcmDevice *acm)
     int32_t i = 0;
 
     HDF_LOGD("%s:%d", __func__, __LINE__);
-    if (g_stopIoThreadFlag == false) {
+    if (!g_stopIoThreadFlag) {
         HDF_LOGD("%s:%d", __func__, __LINE__);
         g_stopIoThreadFlag = true;
     }
@@ -185,8 +183,7 @@ static int32_t UsbStopIo(struct AcmDevice *acm)
 
     ret = OsalThreadDestroy(&acm->ioThread);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadDestroy faile, ret=%d ",
-                 __func__, __LINE__, ret);
+        HDF_LOGE("%s:%d OsalThreadDestroy faile, ret=%d ", __func__, __LINE__, ret);
         return ret;
     }
 
@@ -472,7 +469,7 @@ static void AcmTestBulkCallback(const void *requestArg)
         printf("status error\n");
     }
 
-    if (g_printData == true) {
+    if (g_printData) {
         for (int32_t i = 0; i < req->actualLength; i++)
             printf("%c", req->buffer[i]);
         fflush(stdout);

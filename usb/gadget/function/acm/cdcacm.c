@@ -180,9 +180,9 @@ static bool isGetReadTimeStart = false;
 static void UsbSerialReadComplete(uint8_t pipe, struct UsbFnRequest *req)
 {
     struct UsbSerial *port = (struct UsbSerial *)req->context;
-    if (g_isReadDone != true && g_isStartRead == true && req->status == USB_REQUEST_COMPLETED) {
+    if ((!g_isReadDone) && g_isStartRead && req->status == USB_REQUEST_COMPLETED) {
         g_readCnt += req->actual;
-        if (isGetReadTimeStart == false) {
+        if (!isGetReadTimeStart) {
             isGetReadTimeStart = true;
             gettimeofday(&g_readTimeStart, NULL);
         }
@@ -487,7 +487,7 @@ static void UsbSerialWriteSpeedComplete(uint8_t pipe, struct UsbFnRequest *req)
     switch (req->status) {
         case USB_REQUEST_COMPLETED:
             g_writeCnt += req->actual;
-            if (isGetWriteTimeStart == false) {
+            if (!isGetWriteTimeStart) {
                 isGetWriteTimeStart = true;
                 gettimeofday(&g_timeStart, NULL);
             }
