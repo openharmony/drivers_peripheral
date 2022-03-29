@@ -177,9 +177,9 @@ int32_t Tfa9879DaiHwParams(const struct AudioCard *card, const struct AudioPcmHw
         AUDIO_DEVICE_LOG_ERR("input para is NULL.");
         return HDF_ERR_INVALID_PARAM;
     }
-    ret = AcessoryDeviceFrequencyParse(param->rate, &frequency);
+    ret = AccessoryDeviceFrequencyParse(param->rate, &frequency);
     if (ret != HDF_SUCCESS) {
-        AUDIO_DEVICE_LOG_ERR("AcessoryDeviceFrequencyParse failed.");
+        AUDIO_DEVICE_LOG_ERR("AccessoryDeviceFrequencyParse failed.");
         return HDF_ERR_NOT_SUPPORT;
     }
     ret = Tfa9879FormatParse(param->format, &bitWidth);
