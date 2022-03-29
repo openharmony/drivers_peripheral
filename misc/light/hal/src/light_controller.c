@@ -68,10 +68,6 @@ static int32_t ReadLightInfo(struct HdfSBuf *reply, struct LightDevice *priv)
         HDF_LOGE("%s: sbuf read lightNum failed", __func__);
         return HDF_FAILURE;
     }
-    if (priv->lightNum < LIGHT_TYPE_NONE || priv->lightNum > LIGHT_TYPE_BUTT) {
-        HDF_LOGE("%{public}s: type not supported", __func__);
-        return HDF_FAILURE;
-    }
 
     if (priv->lightInfoEntry != NULL) {
         OsalMemFree(priv->lightInfoEntry);
@@ -80,6 +76,7 @@ static int32_t ReadLightInfo(struct HdfSBuf *reply, struct LightDevice *priv)
 
     priv->lightInfoEntry = (struct LightInfo *)OsalMemCalloc(sizeof(*priv->lightInfoEntry) * priv->lightNum);
     if (priv->lightInfoEntry == NULL) {
+        HDF_LOGE("%s: malloc fail", __func__);
         return HDF_FAILURE;
     }
 
@@ -146,7 +143,7 @@ static int32_t GetLightInfo(struct LightInfo **lightInfo, uint32_t *count)
 
 static int32_t ValidityJudgment(uint32_t type, struct LightEffect *effect)
 {
-    if (type < LIGHT_TYPE_NONE || type >= LIGHT_TYPE_BUTT) {
+    if (type >= LIGHT_TYPE_BUTT) {
         HDF_LOGE("%{public}s: type not supported", __func__);
         return LIGHT_NOT_SUPPORT;
     }
@@ -223,7 +220,7 @@ static int32_t OnLight(uint32_t type, struct LightEffect *effect)
 
 static int32_t OffLight(uint32_t type)
 {
-    if (type < LIGHT_TYPE_NONE || type >= LIGHT_TYPE_BUTT) {
+    if (type >= LIGHT_TYPE_BUTT) {
         HDF_LOGE("%{public}s: type not supported", __func__);
         return HDF_FAILURE;
     }
