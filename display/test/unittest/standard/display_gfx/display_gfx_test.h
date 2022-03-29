@@ -24,7 +24,7 @@
 namespace {
 class GfxTestBase {
 public:
-    virtual ~GfxTestBase() {};
+    virtual ~GfxTestBase() {}
 
 protected:
     void TestSetUp();

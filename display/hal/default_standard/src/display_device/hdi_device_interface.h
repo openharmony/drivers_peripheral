@@ -29,7 +29,7 @@ public:
     virtual std::unordered_map<uint32_t, std::shared_ptr<HdiDisplay>> DiscoveryDisplay() = 0;
     virtual int32_t Init() = 0;
     virtual void DeInit() = 0;
-    virtual ~HdiDeviceInterface() {};
+    virtual ~HdiDeviceInterface() {}
 };
 } // namespace OHOS
 } // namespace HDI
