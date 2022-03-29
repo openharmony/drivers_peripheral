@@ -992,7 +992,7 @@ int32_t CheckAttrRoute(int32_t param)
     return HDF_SUCCESS;
 }
 
-int32_t CheckAttrChannel(uint64_t param)
+int32_t CheckAttrChannel(uint32_t param)
 {
     if (param != 1 && param != 2) { // channel 1 and 2
         return HDF_FAILURE;
