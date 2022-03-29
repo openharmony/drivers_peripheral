@@ -16,7 +16,6 @@ if (defined(ohos_lite)) {
     deps = [
       "client:wifi_driver_client",
       "hal:wifi_hal",
-      "//device/soc/hisilicon/common/platform/wifi/hi3881v100/firmware:wifi_firmware",
     ]
   }
 } else {
