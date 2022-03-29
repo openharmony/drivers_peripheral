@@ -115,10 +115,10 @@ static int32_t GetOneCapability(const struct DeviceResourceIface *iface,
         return HDF_FAILURE;
     }
 
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_WIDTH_ALGINMENT,
-        (uint32_t*)&cap->whAlignment.widthAlginment, 0) != HDF_SUCCESS
-        || iface->GetUint32(childNode, CODEC_CONFIG_KEY_HEIGHT_ALGINMENT,
-            (uint32_t*)&cap->whAlignment.heightAlginment, 0) != HDF_SUCCESS
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_WIDTH_ALIGNMENT,
+        (uint32_t*)&cap->whAlignment.widthAlignment, 0) != HDF_SUCCESS
+        || iface->GetUint32(childNode, CODEC_CONFIG_KEY_HEIGHT_ALIGNMENT,
+            (uint32_t*)&cap->whAlignment.heightAlignment, 0) != HDF_SUCCESS
         || iface->GetUint32(childNode, CODEC_CONFIG_KEY_MIN_WIDTH, (uint32_t*)&cap->minSize.width, 0) != HDF_SUCCESS
         || iface->GetUint32(childNode, CODEC_CONFIG_KEY_MIN_HEIGHT, (uint32_t*)&cap->minSize.height, 0) != HDF_SUCCESS
         || iface->GetUint32(childNode, CODEC_CONFIG_KEY_MAX_WIDTH, (uint32_t*)&cap->maxSize.width, 0) != HDF_SUCCESS
