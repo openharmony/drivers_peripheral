@@ -34,7 +34,7 @@ struct PlatformData g_platformData = {
 static int32_t Hi3516DmaDriverBind(struct HdfDeviceObject *device)
 {
     struct PlatformHost *platformHost = NULL;
-    
+
     if (device == NULL) {
         AUDIO_DRIVER_LOG_ERR("input para is NULL.");
         return HDF_FAILURE;
@@ -45,7 +45,7 @@ static int32_t Hi3516DmaDriverBind(struct HdfDeviceObject *device)
         AUDIO_DRIVER_LOG_ERR("malloc host fail!");
         return HDF_FAILURE;
     }
-    
+
     platformHost->device = device;
     device->service = &platformHost->service;
 

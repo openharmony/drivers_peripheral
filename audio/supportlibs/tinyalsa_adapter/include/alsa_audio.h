@@ -127,7 +127,7 @@ struct PcmCaptureParam {
 int32_t RouteSetVoiceVolume(float volume);
 int32_t RouteSetCaptureVoiceVolume(float volume);
 int32_t RouteGetVoiceVolume(char *ctlName, bool isPlayback);
-int32_t RouteGetVoiceMinMaxStep(long long *volMin, long long *volMax, char *ctlName, bool isPlayback);
+int32_t RouteGetVoiceMinMaxStep(int64_t *volMin, int64_t *volMax, char *ctlName, bool isPlayback);
 int32_t MixerOpenLegacy(bool isPlayback, int32_t card);
 void ReadOutSoundCard(void);
 void ReadInSoundCard(void);

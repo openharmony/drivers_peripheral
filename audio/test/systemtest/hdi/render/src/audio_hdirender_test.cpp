@@ -254,7 +254,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderSetRenderSpeed_0001, TestS
     int32_t ret = -1;
     float speed = 100;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     ASSERT_NE(GetAudioManager, nullptr);
     manager = GetAudioManager();
@@ -279,7 +279,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderSetRenderSpeed_0002, TestS
     int32_t ret = -1;
     float speed = 0;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
     ASSERT_NE(GetAudioManager, nullptr);
@@ -305,7 +305,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderSpeed_0001, TestS
     int32_t ret = -1;
     float speed = 0;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     ASSERT_NE(GetAudioManager, nullptr);
     manager = GetAudioManager();
@@ -328,7 +328,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderSpeed_0002, TestS
 {
     int32_t ret = -1;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
     float speed = 0;
@@ -354,7 +354,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderSpeed_0003, TestS
 {
     int32_t ret = -1;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     float *speedNull = nullptr;
     ASSERT_NE(GetAudioManager, nullptr);
@@ -544,7 +544,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderSetChannelMode_0001, TestS
 {
     int32_t ret = -1;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     enum AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
     enum AudioChannelMode modeOne = AUDIO_CHANNEL_BOTH_LEFT;
@@ -588,7 +588,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderSetChannelMode_0002, TestS
 {
     int32_t ret = -1;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     enum AudioChannelMode mode = AUDIO_CHANNEL_MIX;
     enum AudioChannelMode modeOne = AUDIO_CHANNEL_LEFT_MUTE;
@@ -632,7 +632,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderSetChannelMode_0003, TestS
 {
     int32_t ret = -1;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     enum AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
     enum AudioPortPin pins = PIN_OUT_SPEAKER;
@@ -660,7 +660,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderSetChannelMode_0004, TestS
     int32_t ret = -1;
     TestAudioManager* manager = {};
     struct AudioRender *render = nullptr;
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *renderNull = nullptr;
     enum AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
     enum AudioPortPin pins = PIN_OUT_SPEAKER;
@@ -685,7 +685,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetChannelMode_0001, TestS
 {
     int32_t ret = -1;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     enum AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
     ASSERT_NE(GetAudioManager, nullptr);
@@ -715,7 +715,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetChannelMode_0002, TestS
 {
     int32_t ret = -1;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *renderNull = nullptr;
     struct AudioRender *render = nullptr;
     enum AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
@@ -846,7 +846,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderPosition_0003, Te
     int32_t ret = -1;
     int64_t timeExp = 0;
     uint64_t frames = 0;
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
     ASSERT_NE(GetAudioManager, nullptr);
@@ -876,7 +876,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderPosition_0004, Te
     uint64_t frames = 0;
     int64_t timeExp = 0;
     struct AudioRender *render = nullptr;
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
 
     ASSERT_NE(GetAudioManager, nullptr);
@@ -901,7 +901,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderPosition_0005, Te
     int32_t ret = -1;
     uint64_t frames = 0;
     struct AudioTimeStamp time = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
 
@@ -927,7 +927,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderPosition_0006, Te
     int32_t ret = -1;
     uint64_t *framesNull = nullptr;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
 
@@ -953,7 +953,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderPosition_0007, Te
     int32_t ret = -1;
     uint64_t frames = 0;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioTimeStamp *timeNull = nullptr;
 
@@ -981,7 +981,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderPosition_0008, Te
     int64_t timeExp = 0;
     uint64_t frames = 0;
     TestAudioManager* manager = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
     ASSERT_NE(GetAudioManager, nullptr);

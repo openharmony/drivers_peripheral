@@ -45,13 +45,13 @@ namespace {
         void TearDown();
 };
 
-void AudioAdmInterfaceTest::SetUpTestCase(void) {};
+void AudioAdmInterfaceTest::SetUpTestCase(void) {}
 
-void AudioAdmInterfaceTest::TearDownTestCase(void) {};
+void AudioAdmInterfaceTest::TearDownTestCase(void) {}
 
-void AudioAdmInterfaceTest::SetUp(void) {};
+void AudioAdmInterfaceTest::SetUp(void) {}
 
-void AudioAdmInterfaceTest::TearDown(void) {};
+void AudioAdmInterfaceTest::TearDown(void) {}
 
 /**
 * @tc.name  Test the ADM ctrl data analysis function via setting the incoming parameter cmdid is illegal
