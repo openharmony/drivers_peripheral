@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The vibrator driver model provides and implements vibrator-related Hardware Driver Interfaces (HDIs). It supports the time sequence configuration in the static HDF Configuration Source (HCS) and the duration configuration through dynamic parameters. The vibrator hardware service calls **StartOnce** to start one-shot vibration with a given duration and calls **StartEffect** to start vibration with a specified effect.
+The vibrator driver model provides and implements vibrator-related Hardware Device Interfaces (HDIs). It supports the time sequence configuration in the static HDF Configuration Source (HCS) and the duration configuration through dynamic parameters. The vibrator hardware service calls **StartOnce** to start one-shot vibration with a given duration and calls **StartEffect** to start vibration with a specified effect.
 
 **Figure 1** Vibrator driver model
 
