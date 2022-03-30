@@ -16,6 +16,7 @@
 #include "hdf_audio_server_common.h"
 #include "audio_hal_log.h"
 
+#define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
 
 #define MANAGER_ADAPTER_NAME_LEN        32
 

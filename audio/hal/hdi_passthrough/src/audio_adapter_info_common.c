@@ -19,7 +19,7 @@
 #include "audio_hal_log.h"
 #include "cJSON.h"
 
-#define HDF_LOG_TAG hal_audio_adapter_info_common
+#define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
 #define AUDIO_ADAPTER_CONFIG    HDF_CONFIG_DIR"/adapter_config.json"
 #define ADAPTER_NAME_LEN        32

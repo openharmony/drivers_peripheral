@@ -12,7 +12,7 @@
 #include "audio_driver_log.h"
 #include "audio_accessory_base.h"
 
-#define HDF_LOG_TAG dsp_ops
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 
 #define DEFAULT_SPEED 2000000
 #define BITS_PER_WORD_EIGHT 8

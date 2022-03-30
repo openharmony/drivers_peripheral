@@ -17,7 +17,7 @@
 #include "audio_hal_log.h"
 #include "osal_time.h"
 
-#define HDF_LOG_TAG hal_audio_common
+#define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
 void AudioDlClose(void **ppHandleSo)
 {

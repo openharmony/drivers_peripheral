@@ -20,7 +20,7 @@
 #include "audio_interface_lib_capture.h"
 #include "audio_interface_lib_render.h"
 
-#define HDF_LOG_TAG hal_audio_manager
+#define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
 struct AudioAdapterDescriptor *g_localAddrAudioAdapterOut = NULL; // add for Fuzz
 int g_localAdapterNum = 0; // add for Fuzz

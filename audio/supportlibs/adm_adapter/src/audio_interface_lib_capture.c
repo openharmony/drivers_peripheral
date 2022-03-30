@@ -21,6 +21,8 @@ struct pcm *pcm;
 struct DevInfo g_inDevInfo;
 #endif
 
+#define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
+
 /* virtual mixer device */
 #define AUDIODRV_CTL_CAPTUREELEM_IFACE_MIXER ((int32_t)2)
 #define AUDIODRV_CTL_ELEM_IFACE_ADC 1

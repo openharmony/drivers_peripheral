@@ -16,7 +16,7 @@
 #include "audio_pathselect.h"
 #include "audio_hal_log.h"
 
-#define HDF_LOG_TAG hal_audio_pathselect
+#define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
 #define SPEAKER     "Speaker"
 #define HEADPHONES  "headphones"

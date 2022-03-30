@@ -38,7 +38,7 @@
 #include "input_manager.h"
 #include "osal_time.h"
 
-#define HDF_LOG_TAG analog_headset_test
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 namespace {
     const int INIT_DEFAULT_VALUE = 255;
     const int NAME_MAX_LEN = 10;

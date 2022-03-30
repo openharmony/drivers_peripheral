@@ -15,7 +15,7 @@
 #include "osal_io.h"
 #include <asm/io.h>
 
-#define HDF_LOG_TAG hi3516_codec_impl
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 
 static void *g_regAcodecBase = NULL; // CODEC Reg Base Addr
 const int HALF_MINUTE = 30;

@@ -13,7 +13,7 @@
 #include "hdf_types.h"
 #include "hi3516_aiao_impl.h"
 
-#define HDF_LOG_TAG hi3516_aiao_impl_test
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 
 const unsigned int CHANNELNUM = 2;
 const unsigned int BITWIDTH = 16;

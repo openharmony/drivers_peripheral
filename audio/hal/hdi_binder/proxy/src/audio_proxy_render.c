@@ -16,7 +16,7 @@
 #include "audio_proxy_common.h"
 #include "audio_hal_log.h"
 
-#define HDF_LOG_TAG hal_audio_proxy_render
+#define HDF_LOG_TAG HDF_AUDIO_HAL_PROXY
 
 int32_t AudioProxyRenderCtrl(int cmId, AudioHandle handle)
 {

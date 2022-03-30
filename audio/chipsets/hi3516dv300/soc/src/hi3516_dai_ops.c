@@ -14,7 +14,7 @@
 #include "audio_driver_log.h"
 #include "osal_io.h"
 
-#define HDF_LOG_TAG hi3516_dai_ops
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 
 /* Hi35xx IO register address */
 #define HI35XX_I2C_REG_BASE_ADDR  (0x114F0000)
@@ -212,7 +212,7 @@ static int32_t SetIISRate(const struct DaiDevice *device, const struct AudioMixe
     if (AiaoSetSysCtlRegValue(mclkSel, bitWidth, rate, &bclkRegVal) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    // Index of HCS configuration file register information
+
     if (AudioUpdateDaiRegBits(device, regCfgItem[1 + shift].reg, regCfgItem[1 + shift].mask,
         regCfgItem[1 + shift].shift, bclkRegVal) != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("set frequency fail.");
@@ -257,7 +257,7 @@ int32_t DaiParamsUpdate(const struct DaiDevice *device)
         AUDIO_DEVICE_LOG_ERR(" invalued bitWidth: %d.", bitWidth);
         return HDF_FAILURE;
     }
-    // Index of HCS configuration file register information
+
     if (AudioUpdateDaiRegBits(device, regCfgItem[index2 + shift].reg, regCfgItem[index2 + shift].mask,
         regCfgItem[index2 + shift].shift, value) != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("set bitWidth fail.");
