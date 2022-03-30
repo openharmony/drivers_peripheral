@@ -773,9 +773,9 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_0004, TestSize.L
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test CapturePause API via the capture is paused after stoped.
+    * @tc.name  Test CapturePause API via the capture is paused after stopped.
     * @tc.number  SUB_Audio_HDI_CapturePause_0005
-    * @tc.desc  Test CapturePause interface, return -1 the capture is paused after stoped.
+    * @tc.desc  Test CapturePause interface, return -1 the capture is paused after stopped.
     * @tc.author: tiansuli
 */
 HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_0005, TestSize.Level1)
