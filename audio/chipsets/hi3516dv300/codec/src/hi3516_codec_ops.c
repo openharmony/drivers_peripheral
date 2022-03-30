@@ -13,7 +13,7 @@
 #include "audio_driver_log.h"
 #include "audio_codec_base.h"
 
-#define HDF_LOG_TAG hi3516_codec_ops
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 
 static const struct AudioSapmRoute g_audioRoutes[] = {
     { "SPKL", "Dacl enable", "DACL"},

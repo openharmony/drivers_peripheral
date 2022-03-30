@@ -13,7 +13,7 @@
 #include "audio_driver_log.h"
 #include "osal_io.h"
 
-#define HDF_LOG_TAG dsp_adapter
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 
 struct DspData g_dspData = {
     .DspInit = DspDeviceInit,

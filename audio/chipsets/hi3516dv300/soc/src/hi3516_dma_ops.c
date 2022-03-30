@@ -20,7 +20,7 @@
 #include "osal_irq.h"
 #include "osal_time.h"
 
-#define HDF_LOG_TAG hi3516_dma_ops
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 const int AUDIO_CACHE_ALIGN_SIZE = 64;
 const int DMA_VIRTUAL_IRQ_NUM = 71;
 

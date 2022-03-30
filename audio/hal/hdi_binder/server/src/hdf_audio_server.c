@@ -20,7 +20,7 @@
 #include "hdf_audio_server_common.h"
 #include "hdf_audio_server_render.h"
 
-#define HDF_LOG_TAG hdf_audio_server
+#define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
 
 struct AudioAdapterDescriptor *g_descs = NULL;
 struct AudioManager *g_serverManager = NULL;

@@ -11,7 +11,7 @@
 #include "audio_accessory_if.h"
 #include "audio_driver_log.h"
 
-#define HDF_LOG_TAG "accessory"
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 
 struct AccessoryData g_tfa9879Data = {
     .Init = Tfa9879DeviceInit,

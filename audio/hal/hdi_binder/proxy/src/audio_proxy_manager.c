@@ -18,7 +18,7 @@
 #include "audio_proxy_common.h"
 #include "audio_proxy_internal.h"
 
-#define HDF_LOG_TAG hal_audio_proxy_manager
+#define HDF_LOG_TAG HDF_AUDIO_HAL_PROXY
 
 #define HDI_SERVER_NAME  "audio_hdi_service"
 #define CONFIG_FRAME_SIZE      (1024 * 2 * 1)

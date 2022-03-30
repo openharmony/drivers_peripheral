@@ -17,7 +17,7 @@
 #include <servmgr_hdi.h>
 #include "audio_hal_log.h"
 
-#define HDF_LOG_TAG hal_audio_proxy_common
+#define HDF_LOG_TAG HDF_AUDIO_HAL_PROXY
 
 #define AUDIO_HDF_SBUF_IPC 1
 #define PROXY_VOLUME_CHANGE 100
