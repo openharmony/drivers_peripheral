@@ -145,6 +145,7 @@ static int32_t EcmStartWb(struct EcmDevice *ecm,
     }
     return rc;
 }
+
 static int32_t EcmWriteBufAlloc(struct EcmDevice *ecm)
 {
     int32_t i;
@@ -487,7 +488,7 @@ static int32_t EcmAddOrRemoveInterface(int32_t cmd, struct EcmDevice *ecm, struc
     UsbInterfaceStatus status = USB_INTERFACE_STATUS_NORMAL;
     uint32_t index = 0;
     if (ecm == NULL) {
-        HDF_LOGE("%d: invalid parma", __LINE__);
+        HDF_LOGE("%d: invalid param", __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -513,17 +514,17 @@ static int32_t EcmDeviceDispatch(struct HdfDeviceIoClient *client, int32_t cmd,
 {
     struct EcmDevice *ecm = NULL;
     if (client == NULL) {
-        HDF_LOGE("%s: client is NULL", __func__);
+        HDF_LOGE("%s: client is null", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     if (client->device == NULL) {
-        HDF_LOGE("%s: client->device is NULL", __func__);
+        HDF_LOGE("%s: client->device is null", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     if (client->device->service == NULL) {
-        HDF_LOGE("%s: client->device->service is NULL", __func__);
+        HDF_LOGE("%s: client->device->service is null", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
