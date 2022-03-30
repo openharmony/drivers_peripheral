@@ -61,7 +61,7 @@ void HdfLightHdiTest::TearDown()
 
 /**
   * @tc.name: CheckLightInstanceIsEmpty
-  * @tc.desc: Creat a light instance. The instance is not empty.
+  * @tc.desc: Create a light instance. The instance is not empty.
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */

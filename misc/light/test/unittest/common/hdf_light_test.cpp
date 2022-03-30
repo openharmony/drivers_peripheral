@@ -53,7 +53,7 @@ void HdfLightTest::SetUpTestCase()
     }
     int32_t ret = g_lightDev->GetLightInfo(&g_lightInfo, &g_count);
     if (ret == HDF_FAILURE) {
-        printf("get light informations failed\n\r");
+        printf("get light information failed\n\r");
     }
 }
 
@@ -75,7 +75,7 @@ void HdfLightTest::TearDown()
 
 /**
   * @tc.name: CheckLightInstanceIsEmpty
-  * @tc.desc: Creat a light instance. The instance is not empty.
+  * @tc.desc: Create a light instance. The instance is not empty.
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
