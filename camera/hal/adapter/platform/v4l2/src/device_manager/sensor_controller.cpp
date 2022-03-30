@@ -14,6 +14,7 @@
  */
 
 #include "sensor_controller.h"
+#include <cinttypes>
 #include "securec.h"
 
 namespace OHOS::Camera {
@@ -197,7 +198,7 @@ RetCode SensorController::GetAEMetaData(std::shared_ptr<CameraStandard::CameraMe
         switch (*iter) {
             case OHOS_SENSOR_EXPOSURE_TIME: {
                 rc = sensorVideo_->QuerySetting(GetName(), CMD_AE_EXPO, (int*)&expoTime);
-                CAMERA_LOGD("%s Get CMD_AE_EXPOTIME [%d]", __FUNCTION__, expoTime);
+                CAMERA_LOGD("%s Get CMD_AE_EXPOTIME [%" PRId64 "]", __FUNCTION__, expoTime);
                 if (rc == RC_ERROR) {
                     CAMERA_LOGE("%s CMD_AE_EXPO QuerySetting fail", __FUNCTION__);
                     return rc;
