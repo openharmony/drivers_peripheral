@@ -933,8 +933,10 @@ int32_t SetTxPower(const char *ifName, int32_t power)
 int32_t GetAssociatedStas(const char *ifName, struct AssocStaInfoResult *result)
 {
     (void)ifName;
-    (void)result;
-    memset_s(result, sizeof(struct AssocStaInfoResult), 0, sizeof(struct AssocStaInfoResult));
+    if (memset_s(result, sizeof(struct AssocStaInfoResult), 0, sizeof(struct AssocStaInfoResult)) != EOK) {
+        HDF_LOGE("%s::memset_s result fail!", __func__);
+        return RET_CODE_FAILURE;
+    }
     return RET_CODE_SUCCESS;
 }
 
