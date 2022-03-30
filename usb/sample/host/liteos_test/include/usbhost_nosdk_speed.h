@@ -33,6 +33,8 @@
 #define TEST_DOUBLE_COUNT      (1.0)
 #define TEST_BYTE_COUNT_UINT    1024
 #define INPUT_COMPARE_PARAMNUM  6
+#define INPUT_COMPARE_NUMONE    3
+#define INPUT_COMPARE_NUMTWO    5
 
 #define TEST_WRITE              true
 #define TEST_READ               false

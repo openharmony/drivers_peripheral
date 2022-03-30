@@ -344,7 +344,7 @@ void UsbHostDdkTestCtrlClass(char *readSbuf)
             const char tmp[] = "CMD_CLASS_CTRL";
             errno_t err = memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
             if (err != EOK) {
-                HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
+                HDF_LOGE("%s:%d err = %d", __func__, __LINE__, err);
             }
         }
         printf("%s:%d usb serial control CMD_CLASS_CTRL command done\n", __func__, __LINE__);
@@ -376,14 +376,14 @@ void UsbHostDdkTestStdGetDes(char *readSbuf)
         if (readSbuf != NULL) {
             errno_t err = memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
             if (err != EOK) {
-                HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
+                HDF_LOGE("%s:%d err = %d", __func__, __LINE__, err);
             }
         }
         printf("%s:%d %s!\n", __func__, __LINE__, tmp);
         TestModuleWriteLog(HOST_ACM_CTRL_READ, tmp, NULL);
     } else {
-        printf("%s:%d HdfSbufReadBuffer faile\n", __func__, __LINE__);
-        HDF_LOGE("%s:%d HdfSbufReadBuffer faile", __func__, __LINE__);
+        printf("%s:%d HdfSbufReadBuffer failed\n", __func__, __LINE__);
+        HDF_LOGE("%s:%d HdfSbufReadBuffer failed", __func__, __LINE__);
     }
 }
 
@@ -412,14 +412,14 @@ void UsbHostDdkTestStdGetDesAsync(char *readSbuf)
         if (readSbuf != NULL) {
             errno_t err = memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
             if (err != EOK) {
-                HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
+                HDF_LOGE("%s:%d err = %d", __func__, __LINE__, err);
             }
         }
         printf("%s:%d %s!\n", __func__, __LINE__, tmp);
         TestModuleWriteLog(HOST_ACM_CTRL_READ, tmp, NULL);
     } else {
-        printf("%s:%d HdfSbufReadBuffer faile\n", __func__, __LINE__);
-        HDF_LOGE("%s:%d HdfSbufReadBuffer faile", __func__, __LINE__);
+        printf("%s:%d HdfSbufReadBuffer failed\n", __func__, __LINE__);
+        HDF_LOGE("%s:%d HdfSbufReadBuffer failed", __func__, __LINE__);
     }
 }
 
@@ -437,24 +437,22 @@ void UsbHostDdkTestStdGetStatus(char *readSbuf)
     if (status < 0) {
         g_exitFlag = true;
         printf("%s:%d Dispatch CMD_STD_CTRL_GET_STATUS_CMD failed status = %d\n", __func__, __LINE__, status);
-        HDF_LOGE("%s:%d Dispatch CMD_STD_CTRL_GET_STATUS_CMD failed status = %d",
-            __func__, __LINE__, status);
+        HDF_LOGE("%s:%d Dispatch CMD_STD_CTRL_GET_STATUS_CMD failed status = %d", __func__, __LINE__, status);
     }
 
     status = HdfSbufReadUint16(g_reply, &data);
     if (!status) {
         printf("%s:%d HdfSbufReadBuffer status = %d\n", __func__, __LINE__, status);
-        HDF_LOGE("%s:%d HdfSbufReadBuffer status=%d",
-            __func__, __LINE__, status);
+        HDF_LOGE("%s:%d HdfSbufReadBuffer status = %d", __func__, __LINE__, status);
     } else {
         if (readSbuf != NULL) {
             const char tmp[DATA_MAX_LEN] = "CMD_STD_CTRL_GET_STATUS";
             errno_t err = memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
             if (err != EOK) {
-                HDF_LOGE("%s:%d err=%d", __func__, __LINE__, err);
+                HDF_LOGE("%s:%d err = %d", __func__, __LINE__, err);
             }
         }
-        printf("%s:%d usb serial control CMD_STD_CTRL_GET_STATUS command done,data=%hu\n", __func__, __LINE__, data);
+        printf("%s:%d usb serial control CMD_STD_CTRL_GET_STATUS command done,data = %hu\n", __func__, __LINE__, data);
         TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_STD_CTRL_GET_STATUS", NULL);
     }
 }

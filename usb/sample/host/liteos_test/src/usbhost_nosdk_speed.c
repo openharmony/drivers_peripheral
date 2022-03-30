@@ -166,6 +166,7 @@ static int32_t BeginProcessHandleFirst(void)
 {
     char *data = NULL;
     int32_t i;
+    int32_t ret;
 
     for (i = 0; i < TEST_CYCLE; i++) {
         if (urb[i].urb == NULL) {
@@ -188,7 +189,11 @@ static int32_t BeginProcessHandleFirst(void)
             }
         }
 
-        memset_s(data, TEST_LENGTH, 'c', TEST_LENGTH);
+        ret = memset_s(data, TEST_LENGTH, 'c', TEST_LENGTH);
+        if (ret != EOK) {
+            HDF_LOGE("%{public}s:%{public}d memset_s failed.", __func__, __LINE__);
+            return -1;
+        }
         data[TEST_LENGTH - 1] = '\0';
         urb[i].urb->transfer_buffer = (void *)data;
         urb[i].urb->transfer_buffer_length = TEST_LENGTH;
@@ -225,7 +230,7 @@ static int32_t BeginProcess(unsigned char endPoint)
             urb[i].inUse = 1;
             urb[i].urbNum = transNum;
             sendUrb = urb[i].urb;
-            r = usb_setup_endpoint(fd, uhe, 1024);
+            r = usb_setup_endpoint(fd, uhe, TEST_BYTE_COUNT_UINT);
             if (r) {
                 DPRINTFN(0, "setup failed ret:%d\n", r);
                 return r;
@@ -293,6 +298,7 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int32_t *ifa
 {
     int32_t ret = HDF_SUCCESS;
     if (input == NULL) {
+        HDF_LOGE("%{public}s:%{public}d input is null", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -316,13 +322,13 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int32_t *ifa
         if (g_writeOrRead == TEST_READ) {
             g_printData = input->printData;
         }
-    } else if (input->paramNum == 5) {
+    } else if (input->paramNum == INPUT_COMPARE_NUMTWO) {
         g_busNum = input->busNum;
         g_devAddr = input->devAddr;
         *ifaceNum = input->ifaceNum;
         endNum = input->writeOrRead;
         g_writeOrRead = ((endNum >> ENDPOINT_IN_OFFSET) == 0) ? TEST_WRITE : TEST_READ;
-    } else if (input->paramNum == 3) {
+    } else if (input->paramNum == INPUT_COMPARE_NUMONE) {
         *ifaceNum = input->ifaceNum;
         endNum = input->writeOrRead;
         g_writeOrRead = ((endNum >> ENDPOINT_IN_OFFSET) == 0) ? TEST_WRITE : TEST_READ;
@@ -377,7 +383,7 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     }
 
     (void)HdfSbufReadBuffer(data, (const void **)&input, &size);
-    if ((input == NULL) || (size != sizeof(struct UsbSpeedTest))) {
+    if (input == NULL || size != sizeof(struct UsbSpeedTest)) {
         HDF_LOGE("%{public}s: %{public}d sbuf read buffer failed\n", __func__, __LINE__);
         ret = HDF_ERR_IO;
         goto END;

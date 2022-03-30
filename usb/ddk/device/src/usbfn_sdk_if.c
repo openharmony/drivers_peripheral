@@ -162,6 +162,7 @@ static void UsbFnChangeFunction(struct UsbFnDeviceDesc *des, struct UsbFnDescrip
         }
     }
 }
+
 const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName,
     struct UsbFnDescriptorData *descriptor)
 {
