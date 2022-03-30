@@ -115,7 +115,7 @@ int32_t InputServerStub::InputServerStubGetInputDevice(MessageParcel &data,
     int32_t ret = mService_->GetInputDevice(index, &devInfo);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("InputServerStub:: %{public}s:called failed line%{public}d", __func__, __LINE__);
-        devInfo = nullptr;
+        delete devInfo;
         return HDF_FAILURE;
     }
     if (!reply.WriteUint32(sizeof(DeviceInfo))) {
@@ -148,7 +148,7 @@ int32_t InputServerStub::InputServerStubGetInputDeviceList(MessageParcel &data,
     int32_t ret = mService_->GetInputDeviceList(&devNum, &devInfo, size);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("InputServerStub:: %{public}s:called failed line%{public}d", __func__, __LINE__);
-        devInfo = nullptr;
+        delete[] devInfo;
         return HDF_FAILURE;
     }
     HDF_LOGE("InputServerStub:: %{public}s:called line%{public}d devNum:%{public}d", __func__, __LINE__, devNum);
@@ -245,7 +245,7 @@ int32_t InputServerStub::InputServerStubGetChipInfo(MessageParcel &data,
     int32_t ret = mService_->GetChipInfo(index, chipInfo, length);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("InputServerStub %{public}s: GetChipInfo failed line:%{public}d", __func__, __LINE__);
-        chipInfo = nullptr;
+        delete[] chipInfo;
         return HDF_FAILURE;
     }
     if (!reply.WriteUint32(strlen(chipInfo) + 1)) {
@@ -273,7 +273,7 @@ int32_t InputServerStub::InputServerStubGetVendorName(MessageParcel &data,
     int32_t ret = mService_->GetVendorName(index, vendorName, length);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("InputServerStub %{public}s: GetVendorName failed line:%{public}d", __func__, __LINE__);
-        vendorName = nullptr;
+        delete[] chipInfo;
         return HDF_FAILURE;
     }
     HDF_LOGE("InputServerStub %{public}s: GetVendorName line:%{public}d vendorName:%{public}s",
@@ -303,7 +303,7 @@ int32_t InputServerStub::InputServerStubGetChipName(MessageParcel &data,
     int32_t ret = mService_->GetChipName(index, chipName, length);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("InputServerStub %{public}s: GetChipName failed line:%{public}d", __func__, __LINE__);
-        chipName = nullptr;
+        delete[] chipName;
         return HDF_FAILURE;
     }
     if (!reply.WriteUint32(strlen(chipName) + 1)) {
