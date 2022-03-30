@@ -103,20 +103,20 @@ typedef union {
 uint32_t AiopRegCfg(const int reg, const int offset, uint32_t n);
 int32_t AiaoHalSysInit(void);
 int32_t AiaoClockReset(void);
-uint32_t AiaoHalReadReg(unsigned int offset);
-int32_t AopHalSetBuffRptr(unsigned int chnId, unsigned int value);
-int32_t AopHalSetBuffWptr(unsigned int chnId, unsigned int value);
-int32_t AipHalSetBuffWptr(unsigned int chnId, unsigned int value);
-int32_t AipHalSetBuffRptr(unsigned int chnId, unsigned int value);
-int32_t AopHalSetTxStart(unsigned int chnId, bool en);
-int32_t AipHalSetRxStart(unsigned int chnId, bool en);
-int32_t AopHalDevEnable(unsigned int chnId);
-int32_t AiaoDeviceInit(unsigned int chnId);
+uint32_t AiaoHalReadReg(uint32_t offset);
+int32_t AopHalSetBuffRptr(uint32_t chnId, uint32_t value);
+int32_t AopHalSetBuffWptr(uint32_t chnId, uint32_t value);
+int32_t AipHalSetBuffWptr(uint32_t chnId, uint32_t value);
+int32_t AipHalSetBuffRptr(uint32_t chnId, uint32_t value);
+int32_t AopHalSetTxStart(uint32_t chnId, bool en);
+int32_t AipHalSetRxStart(uint32_t chnId, bool en);
+int32_t AopHalDevEnable(uint32_t chnId);
+int32_t AiaoDeviceInit(uint32_t chnId);
 int32_t AudioAoInit(const struct PlatformData *platformData);
 int32_t AudioAiInit(const struct PlatformData *platformData);
 int32_t AiaoSysPinMux(void);
-int32_t AiaoRxIntClr(unsigned int chnId);
-int32_t AiaoGetMclk(unsigned int rate, uint32_t *mclkSel);
+int32_t AiaoRxIntClr(uint32_t chnId);
+int32_t AiaoGetMclk(uint32_t rate, uint32_t *mclkSel);
 int32_t AiaoSetSysCtlRegValue(uint32_t mclkSel, uint32_t bitWidth,
     uint32_t rate, uint32_t *clkRegVal);
 #endif // __HI3516_ACODEC_H__
