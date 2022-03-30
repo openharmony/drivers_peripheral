@@ -39,15 +39,15 @@ int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamVal
 int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key, void *value);
 int32_t GetErrorReason(int reason, char* reasonDesc);
 int32_t GetCurrentTime(char *time);
-int32_t CheckAttrRoute(long param);
-int32_t CheckAttrChannel(unsigned long param);
+int32_t CheckAttrRoute(int32_t param);
+int32_t CheckAttrChannel(uint32_t param);
 int32_t TransferRoute(const char *value, int32_t *route);
 int32_t TransferFormat(const char *value, int32_t *format);
 int32_t TransferChannels(const char *value, uint32_t *channels);
 int32_t TransferFrames(const char *value, uint64_t *frames);
 int32_t TransferSampleRate(const char *value, uint32_t *sampleRate);
 int32_t FormatToBits(enum AudioFormat format, uint32_t *formatBits);
-int32_t BitsToFormat(enum AudioFormat *format, long formatBits);
+int32_t BitsToFormat(enum AudioFormat *format, int32_t formatBits);
 int32_t SetExtParam(const char *key, const char *value, struct ExtraParams *mExtraParams);
 int32_t AudioSetExtraParams(const char *keyValueList, int32_t *count,
     struct ExtraParams *mExtraParams, int32_t *sumOk);

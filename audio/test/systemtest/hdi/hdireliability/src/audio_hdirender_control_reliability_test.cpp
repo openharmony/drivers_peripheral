@@ -556,7 +556,7 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderGetRende
     struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
     ret = RelAudioRenderProcedure(g_para[0]);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    
+
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         ret = memcpy_s(&arrpara[i], sizeof(PrepareAudioPara), &g_para[0], sizeof(PrepareAudioPara));

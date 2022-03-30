@@ -872,8 +872,8 @@ int32_t AudioCtlRenderSceneGetGainThreshold(const struct DevHandle *handle,
 int32_t AudioCtlRenderGetVolThreshold(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
 {
 #ifdef ALSA_MODE
-    long long volMin = 0;
-    long long volMax = 0;
+    int64_t volMin = 0;
+    int64_t volMax = 0;
     char *ctlName = "DACL Playback Volume";
     ReadOutSoundCard();
     (void)memset_s(&g_outDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
