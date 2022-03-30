@@ -118,6 +118,8 @@ namespace {
 
     int32_t MedicalSensorTestDataCallback(const struct SensorEvents *event)
     {
+        (void)event;
+
         return SENSOR_SUCCESS;
     }
 }
@@ -139,7 +141,7 @@ void HdfSensorTest::SetUpTestCase()
     }
     int32_t ret = g_sensorDev->GetAllSensors(&g_sensorInfo, &g_count);
     if (ret == -1) {
-        printf("get sensor informations failed\n\r");
+        printf("get sensor information failed\n\r");
     }
 }
 

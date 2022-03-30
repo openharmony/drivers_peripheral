@@ -62,7 +62,7 @@ void HdfVibratorHdiTest::TearDown()
 
 /**
   * @tc.name: CheckVibratorInstanceIsEmpty
-  * @tc.desc: Creat a vibrator instance. The instance is not empty.
+  * @tc.desc: Create a vibrator instance. The instance is not empty.
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
@@ -216,7 +216,7 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect006, TestSize.Level1)
 
 /**
   * @tc.name: ExecuteVibratorEffect007
-  * @tc.desc: Controls this Perform a one-shot vibrator with a arbitrary string.
+  * @tc.desc: Controls this Perform a one-shot vibrator with an arbitrary string.
   * Controls this vibrator to stop the vibrator.
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
