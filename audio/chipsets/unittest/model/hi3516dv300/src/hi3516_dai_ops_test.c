@@ -15,7 +15,7 @@
 #include "hdf_log.h"
 #include "hi3516_common_func.h"
 
-#define HDF_LOG_TAG hi3516_dai_ops_test
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 
 
 int32_t TestDaiDeviceInit(void)

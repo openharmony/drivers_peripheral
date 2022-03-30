@@ -17,6 +17,8 @@
 #include "audio_hal_log.h"
 #include "hdf_audio_server_common.h"
 
+#define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
+
 int32_t GetInitCaptureParaAttrs(struct HdfSBuf *data, struct AudioSampleAttributes *attrs)
 {
     if (data == NULL || attrs == NULL) {

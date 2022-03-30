@@ -11,7 +11,7 @@
 #include "audio_core.h"
 #include "audio_driver_log.h"
 
-#define HDF_LOG_TAG hi3516_codec_adapter
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 
 struct CodecData g_codecData = {
     .Init = CodecDeviceInit,

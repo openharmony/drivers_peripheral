@@ -12,7 +12,7 @@
 #include "audio_driver_log.h"
 #include "osal_io.h"
 
-#define HDF_LOG_TAG hi3516_dai_adapter
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 
 struct AudioDaiOps g_daiDeviceOps = {
     .HwParams = DaiHwParams,

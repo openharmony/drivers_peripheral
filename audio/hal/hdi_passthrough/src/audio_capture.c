@@ -19,7 +19,7 @@
 #include "audio_interface_lib_capture.h"
 
 
-#define HDF_LOG_TAG hal_audio_capture
+#define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
 #define CONFIG_FRAME_SIZE      (1024 * 2 * 1)
 #define FRAME_SIZE              1024

@@ -13,7 +13,7 @@
 #include "hdf_types.h"
 #include "hi3516_codec_impl.h"
 
-#define HDF_LOG_TAG hi3516_codec_impl_test
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 
 int32_t TestCodecHalSysInit(void)
 {

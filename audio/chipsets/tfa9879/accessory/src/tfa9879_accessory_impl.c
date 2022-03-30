@@ -11,7 +11,7 @@
 #include "audio_driver_log.h"
 #include "gpio_if.h"
 
-#define HDF_LOG_TAG "tfa9879_codec"
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 
 /* Hi35xx register address */
 #define HI35XX_GPIO_REG_BASE_ADDR   (0x112F0000)

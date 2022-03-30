@@ -14,7 +14,7 @@
 #include "hi3516_dai_ops_test.h"
 #include "hi3516_dma_ops_test.h"
 
-#define HDF_LOG_TAG hdf_hi3516_audio_driver_test
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 
 static HdfTestCaseList g_hdfHi3516DirverTestCaseList[] = {
     {AUDIO_DRIVER_TESTDAIDEVICEINIT, TestDaiDeviceInit},

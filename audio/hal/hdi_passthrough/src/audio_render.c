@@ -18,7 +18,7 @@
 #include "audio_interface_lib_render.h"
 
 
-#define HDF_LOG_TAG hal_audio_render
+#define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
 #define CONFIG_OUT_LATENCY_MS  100 // unit: ms
 
