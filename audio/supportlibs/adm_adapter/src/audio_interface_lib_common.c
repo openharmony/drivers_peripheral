@@ -16,6 +16,8 @@
 #include "audio_interface_lib_common.h"
 #include "audio_hal_log.h"
 
+#define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
+
 struct HdfIoService *HdfIoServiceBindName(const char *serviceName)
 {
 #ifdef ALSA_MODE

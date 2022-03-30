@@ -17,8 +17,7 @@
 #include "audio_proxy_common.h"
 #include "audio_proxy_internal.h"
 
-
-#define HDF_LOG_TAG hal_audio_proxy_adapter
+#define HDF_LOG_TAG HDF_AUDIO_HAL_PROXY
 
 int32_t AudioProxyCommonInitAttrs(struct HdfSBuf *data, const struct AudioSampleAttributes *attrs)
 {

@@ -22,6 +22,8 @@
 #include "hdf_log.h"
 #include "pnp_message_report.h"
 
+#define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
+
 #define PNP_REPORT_MSG_FIELD_NUM 5
 
 static int32_t AudioPnpDevPlugMsgDeSerialize(uint8_t *msgStr, struct PnpReportDevPlugMsg *devPlugMsg)

@@ -19,7 +19,7 @@
 #include "audio_interface_lib_capture.h"
 #include "audio_interface_lib_render.h"
 
-#define HDF_LOG_TAG hal_audio_adapter
+#define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
 #define CONFIG_CHANNEL_COUNT  2 // two channels
 #define GAIN_MAX 50.0

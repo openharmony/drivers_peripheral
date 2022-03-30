@@ -10,7 +10,7 @@
 #include "audio_driver_log.h"
 #include "hi3516_dma_ops.h"
 
-#define HDF_LOG_TAG hi3516_platform_adapter
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 
 struct AudioDmaOps g_dmaDeviceOps = {
     .DmaBufAlloc = Hi3516DmaBufAlloc,

@@ -13,7 +13,7 @@
 #include "audio_dai_base.h"
 #include "osal_io.h"
 
-#define HDF_LOG_TAG hi3516_aiao_impl
+#define HDF_LOG_TAG HDF_AUDIO_DRIVER
 
 #define PERI_CRG103             0x1201019c // 0x12010000 + 0x019c
 
