@@ -530,7 +530,7 @@ int32_t CaptureChoiceModeAndRecording(struct StrParaCapture *StrParam, struct Au
             return HDF_FAILURE;
         }
 #else
-        printf("not suport liteos!");
+        printf("not support liteos!");
         return HDF_FAILURE;
 #endif
     } else {
@@ -1205,7 +1205,7 @@ void PrintMenu0(void)
 {
     printf(" ============== Play Capture select ===========\n");
     printf("| 1. Capture Poll                             |\n");
-    printf("| 2. Capture Interupt                         |\n");
+    printf("| 2. Capture Interrupt                        |\n");
     printf(" ==============================================\n");
 }
 

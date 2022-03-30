@@ -272,9 +272,9 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0006, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test the audio path route selection function via runing multi service scenarios
+* @tc.name  Test the audio path route selection function via running multi service scenarios
 * @tc.number  SUB_Audio_AudioPathRoute_0007
-* @tc.desc  The audio path route can be opened successfully,When runing multi service scenarios
+* @tc.desc  The audio path route can be opened successfully,When running multi service scenarios
 * @tc.author: liweiming
 */
 HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0007, TestSize.Level1)
