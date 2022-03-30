@@ -50,6 +50,8 @@ static int32_t LightInterfaceDriverDispatch(struct HdfDeviceIoClient *client, in
 
 static int HdfLightInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
+    (void)deviceObject;
+
     HDF_LOGI("HdfLightInterfaceDriverInit enter");
     return HDF_SUCCESS;
 }
