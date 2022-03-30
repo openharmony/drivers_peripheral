@@ -27,8 +27,8 @@ using namespace testing::ext;
 
 namespace {
     constexpr uint32_t g_sleepTime = 30;
-    constexpr int32_t g_minLightId = HDF_LIGHT_TYPE_BATTERY;
-    constexpr int32_t g_maxLightId = HDF_LIGHT_TYPE_ATTENTION;
+    constexpr int32_t g_minLightId = HDF_LIGHT_ID_BATTERY;
+    constexpr int32_t g_maxLightId = HDF_LIGHT_ID_ATTENTION;
     constexpr int32_t g_onTime = 500;
     constexpr int32_t g_offTime = 500;
     sptr<ILightInterface> g_lightInterface = nullptr;
