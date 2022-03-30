@@ -52,8 +52,8 @@ void PrintCapability(const char *where, CodecCapbility *cap)
     HDF_LOGI("%{public}s, --- start print cap ----------------------------", where);
     HDF_LOGI("%{public}s, mime: %{public}d", where, (int32_t)cap->mime);
     HDF_LOGI("%{public}s, type: %{public}d", where, (int32_t)cap->type);
-    HDF_LOGI("%{public}s, widthAlginment: %{public}d", where, (int32_t)cap->whAlignment.widthAlginment);
-    HDF_LOGI("%{public}s, heightAlginment: %{public}d", where, (int32_t)cap->whAlignment.heightAlginment);
+    HDF_LOGI("%{public}s, widthAlignment: %{public}d", where, (int32_t)cap->whAlignment.widthAlignment);
+    HDF_LOGI("%{public}s, heightAlignment: %{public}d", where, (int32_t)cap->whAlignment.heightAlignment);
     HDF_LOGI("%{public}s, minwidth: %{public}d", where, (int32_t)cap->minSize.width);
     HDF_LOGI("%{public}s, minHeight: %{public}d", where, (int32_t)cap->minSize.height);
     HDF_LOGI("%{public}s, maxwidth: %{public}d", where, (int32_t)cap->maxSize.width);

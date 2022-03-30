@@ -333,33 +333,33 @@ bool RectBlockUnmarshalling(struct HdfSBuf *data, Rect *dataBlock)
     return true;
 }
 
-bool AlginmentBlockMarshalling(struct HdfSBuf *data, const Alginment *dataBlock)
+bool AlignmentBlockMarshalling(struct HdfSBuf *data, const Alignment *dataBlock)
 {
-    if (!HdfSbufWriteInt32(data, dataBlock->widthAlginment)) {
-        HDF_LOGE("%{public}s: write dataBlock->widthAlginment failed!", __func__);
+    if (!HdfSbufWriteInt32(data, dataBlock->widthAlignment)) {
+        HDF_LOGE("%{public}s: write dataBlock->widthAlignment failed!", __func__);
         return false;
     }
 
-    if (!HdfSbufWriteInt32(data, dataBlock->heightAlginment)) {
-        HDF_LOGE("%{public}s: write dataBlock->heightAlginment failed!", __func__);
+    if (!HdfSbufWriteInt32(data, dataBlock->heightAlignment)) {
+        HDF_LOGE("%{public}s: write dataBlock->heightAlignment failed!", __func__);
         return false;
     }
 
     return true;
 }
 
-bool AlginmentBlockUnmarshalling(struct HdfSBuf *data, Alginment *dataBlock)
+bool AlignmentBlockUnmarshalling(struct HdfSBuf *data, Alignment *dataBlock)
 {
     if (dataBlock == NULL) {
         return false;
     }
-    if (!HdfSbufReadInt32(data, &dataBlock->widthAlginment)) {
-        HDF_LOGE("%{public}s: read dataBlock->widthAlginment failed!", __func__);
+    if (!HdfSbufReadInt32(data, &dataBlock->widthAlignment)) {
+        HDF_LOGE("%{public}s: read dataBlock->widthAlignment failed!", __func__);
         return false;
     }
 
-    if (!HdfSbufReadInt32(data, &dataBlock->heightAlginment)) {
-        HDF_LOGE("%{public}s: read dataBlock->heightAlginment failed!", __func__);
+    if (!HdfSbufReadInt32(data, &dataBlock->heightAlignment)) {
+        HDF_LOGE("%{public}s: read dataBlock->heightAlignment failed!", __func__);
         return false;
     }
 
@@ -378,7 +378,7 @@ bool VideoPortCapBlockMarshalling(struct HdfSBuf *data, const VideoPortCap *data
         return false;
     }
 
-    if (!AlginmentBlockMarshalling(data, &dataBlock->whAlignment)) {
+    if (!AlignmentBlockMarshalling(data, &dataBlock->whAlignment)) {
         HDF_LOGE("%{public}s: write dataBlock->whAlignment failed!", __func__);
         return false;
     }
@@ -423,7 +423,7 @@ bool VideoPortCapBlockUnmarshalling(struct HdfSBuf *data, VideoPortCap *dataBloc
         return false;
     }
 
-    if (!AlginmentBlockUnmarshalling(data, &dataBlock->whAlignment)) {
+    if (!AlignmentBlockUnmarshalling(data, &dataBlock->whAlignment)) {
         HDF_LOGE("%{public}s: read &dataBlock->whAlignment failed!", __func__);
         return false;
     }
