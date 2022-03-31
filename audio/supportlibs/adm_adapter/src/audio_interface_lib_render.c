@@ -343,7 +343,7 @@ int32_t AudioCtlRenderSetMuteBuf(struct HdfSBuf *sBuf, const struct AudioHwRende
         return HDF_FAILURE;
     }
     uint32_t card = handleData->renderMode.hwInfo.card;
-    if (card < 0 || card >= AUDIO_SERVICE_MAX) {
+    if (card >= AUDIO_SERVICE_MAX) {
         LOG_FUN_ERR("RenderSetMuteBuf card is Error!");
         return HDF_FAILURE;
     }

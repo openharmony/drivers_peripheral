@@ -498,7 +498,7 @@ static int32_t AudioAdaptersGetArraySize(const cJSON *cJsonObj, int *size)
 static int32_t AudioAdapterParsePort(struct AudioPort *info, const cJSON *port)
 {
     int32_t ret;
-    uint32_t tmpId;
+    int32_t tmpId;
     cJSON *portDir = NULL;
     cJSON *portID = NULL;
     cJSON *portName = NULL;
