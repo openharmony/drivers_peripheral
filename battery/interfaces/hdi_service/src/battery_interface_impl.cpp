@@ -191,6 +191,10 @@ int32_t BatteryInterfaceImpl::GetBatteryInfo(BatteryInfo& info)
     info.pluggedMaxVoltage = batteryInfo.pluggedMaxVoltage_;
     info.chargeState = batteryInfo.chargeState_;
     info.chargeCounter = batteryInfo.chargeCounter_;
+    info.curNow = batteryInfo.curNow_;
+    info.curAverage = batteryInfo.curAverage_;
+    info.remainEnergy = batteryInfo.remainEnergy_;
+    info.totalEnergy = batteryInfo.totalEnergy_;
     info.present = batteryInfo.present_;
     info.technology = batteryInfo.technology_;
 
