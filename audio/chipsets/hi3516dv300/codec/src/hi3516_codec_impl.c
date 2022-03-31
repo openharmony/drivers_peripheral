@@ -143,7 +143,7 @@ static unsigned int CodecGetAdcModeSel(const unsigned int rate)
         case AUDIO_SAMPLE_RATE_96000:
             return ACODEC_ADC_MODESEL_6144;
         default:
-            AUDIO_DEVICE_LOG_DEBUG("unsupport samplerate %d.\n", rate);
+            AUDIO_DEVICE_LOG_DEBUG("unsupport samplerate %u.\n", rate);
             return ACODEC_I2S_FS_BUTT;
     }
 }
@@ -169,7 +169,7 @@ static int32_t CodecGetI2s1DataWidth(unsigned int bitWidth, uint16_t *i2s1DataWi
             *i2s1DataWidth = AUDIO_CODEC_BIT_WIDTH_24;
             break;
         default:
-            AUDIO_DEVICE_LOG_ERR("unsupport sample bit width %d.\n", bitWidth);
+            AUDIO_DEVICE_LOG_ERR("unsupport sample bit width %u.\n", bitWidth);
             return AUDIO_CODEC_BIT_WIDTH_BUTT;
     }
     return HDF_SUCCESS;

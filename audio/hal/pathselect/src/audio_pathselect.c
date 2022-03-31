@@ -588,7 +588,7 @@ int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdapt
             captureScenceCheck = (struct AudioHwCaptureParam *)adapterParam;
             return (AudioPathSelGetPlanCaptureScene(captureScenceCheck));
         default:
-            LOG_FUN_ERR("Path select mode invaild");
+            LOG_FUN_ERR("Path select mode invalid");
             break;
     }
     return HDF_FAILURE;
