@@ -127,8 +127,14 @@ int32_t WlanInterfaceProxy::createFeature(int32_t type, std::shared_ptr<WifiFeat
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: SendRequest failed, error code is %d", __func__, ret);
     }
-    char *name = (char *)reply.ReadCString();
+
+    const char *name = reply.ReadCString();
+    if (name == nullptr) {
+        HDF_LOGE("%s: read ifName failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     ifeature->ifName = strdup(name);
+
     int32_t wlan_type = reply.ReadInt32();
     ifeature->type = wlan_type;
     return ret;
@@ -220,11 +226,18 @@ int IPCObjectStubWlan::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data,
     switch (code) {
         case WIFI_EVENT_RESET_DRIVER: {
             const char *name = data.ReadCString();
+            if (name == nullptr) {
+                HDF_LOGE("%s: read ifName falied!", __func__);
+                ret = HDF_ERR_INVALID_PARAM;
+                break;
+            }
             HDF_LOGI("IPCObjectStubWlan::OnRemoteRequest called, ifName = %{public}s", name);
             status = data.ReadInt32();
             if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
                 !data.WriteInt32(status)) {
                 HDF_LOGE("%s: write status failed!", __func__);
+                ret = HDF_ERR_INVALID_PARAM;
+                break;
             }
             ret = WlanInterfaceProxy::CallbackWlanProxy((int32_t)code, dataSbuf);
             if (ret != 0) {
@@ -380,9 +393,14 @@ int32_t WlanInterfaceProxy::getNetworkIfaceName(std::shared_ptr<WifiFeatureInfo>
     int32_t ret = Remote()->SendRequest(WLAN_SERVICE_GET_NETWORK_NAME, data, reply, option);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: SendRequest failed, error code is %d", __func__, ret);
+        return ret;
     }
-    char *name = (char *)reply.ReadCString();
-    ifeature->ifName = name;
+    const char *name = reply.ReadCString();
+    if (name == nullptr) {
+        HDF_LOGE("%s:read ifName failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    ifeature->ifName = strdup(name);
     return ret;
 }
 
@@ -536,7 +554,6 @@ int32_t WlanInterfaceProxy::getIfNamesByChipId(const uint8_t chipId, std::string
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    char *name = NULL;
 
     if (!data.WriteInterfaceToken(WlanInterfaceProxy::GetDescriptor()) ||
         !data.WriteUint8(chipId)) {
@@ -547,9 +564,15 @@ int32_t WlanInterfaceProxy::getIfNamesByChipId(const uint8_t chipId, std::string
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: SendRequest failed, error code is %d", __func__, ret);
     }
-    name = (char *)reply.ReadCString();
-    num = reply.ReadUint32();
+
+    const char *name = reply.ReadCString();
+    if (name == nullptr) {
+        HDF_LOGE("%s: read ifNames failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     ifNames = name;
+
+    num = reply.ReadUint32();
     return ret;
 }
 
