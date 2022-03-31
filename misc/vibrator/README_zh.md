@@ -10,7 +10,7 @@
 
 ## 简介
 
-Vibrator驱动模型主要包含Vibrator（传感器）相关的HDI接口与实现，提供Vibrator HDI（Hardware Driver Interface）能力接口，支持静态HCS配置的时间序列和动态配置持续时间两种振动效果。调用StartOnce接口动态配置持续振动时间；调用StartEffect接口启动静态配置的振动效果。
+Vibrator驱动模型主要包含Vibrator（传感器）相关的HDI接口与实现，提供Vibrator HDI（ Hardware Device Interface ）能力接口，支持静态HCS配置的时间序列和动态配置持续时间两种振动效果。调用StartOnce接口动态配置持续振动时间；调用StartEffect接口启动静态配置的振动效果。
 
 **图 1** Vibrator驱动模型图
 
