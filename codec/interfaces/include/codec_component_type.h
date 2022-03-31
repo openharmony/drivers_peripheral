@@ -52,7 +52,7 @@ extern "C" {
  * @brief Defines the maximum value of the sampling format.
  */
 #define SAMPLE_FMT_NUM 32
-
+#define UUID_LENGTH 128
 /**
  * @brief Enumerates the codec types.
  */
@@ -360,6 +360,35 @@ enum OmxIndexCodecExType {
     OMX_IndexParamUseBufferType,
     /** GetBufferHandleUsage */
     OMX_IndexParamGetBufferHandleUsage,
+};
+
+/**
+ * @brief Enumerates the extended codec codingtyps.
+ */
+enum OmxVideoExType {
+    OMX_VIDEO_CodingHEVC = 11,  /** HEVC Index in Codec HDI */
+};
+
+/**
+ * @brief Defines the <b>CompVerInfo</b>.
+ */
+struct CompVerInfo {
+    char compName[NAME_LENGTH];         /** The name of the component */
+    uint8_t compUUID[UUID_LENGTH];      /** The UUID of the component */
+    union OMX_VERSIONTYPE compVersion;  /** The version of the component. For details, see {@link OMX_VERSIONTYPE}. */
+    union OMX_VERSIONTYPE specVersion;  /** The spec version of the component. */
+};
+
+/**
+ * @brief Defines the <b>EventInfo</b>.
+ */
+struct EventInfo {
+    int8_t *appData;                /** The pointer to the upper-layer instance passed to the callback */
+    uint32_t appDataLen;            /** The length of <b>appData</b>, in bytes. */
+    uint32_t data1;                 /** Data 1 carried in the event. */
+    uint32_t data2;                 /** Data 2 carried in the event. */
+    int8_t *eventData;              /** The pointer of data carried in the event. */
+    uint32_t eventDataLen;          /** The length of <b>eventData</b>, in bytes. */
 };
 
 /**

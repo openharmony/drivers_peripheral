@@ -79,21 +79,15 @@ struct CodecCallbackType {
      * the values of <b>data1</b>, <b>data2</b>, and <b>eventData</b> are <b>0</b>.
      *
      * @param self Indicates the pointer to the callback to be invoked.
-     * @param appData Indicates the pointer to the upper-layer instance passed to the callback.
-     * @param appDataLen Indicates the length of <b>appData</b>, in bytes.
-     * @param eEvent Indicates the type of events to report. For details, see {@link OMX_EVENTTYPE}.
-     * @param data1 Indicates data 1 carried in the event.
-     * @param data2 Indicates data 2 carried in the event.
-     * @param eventData Indicates the pointer to the data carried in the event.
-     * @param eventDataLen Indicates the length of <b>eventData</b>, in bytes.
+     * @param event Indicates the type of events to report. For details, see {@link OMX_EVENTTYPE}.
+     * @param info Indicates the pointer to event info. For detials see{@link EventInfo}.
      *
      * @return Returns <b>HDF_SUCCESS</b> if the operation is successful.
      * @return Returns <b>HDF_ERR_INVALID_PARAM</b> if the operation failed due to invalid parameters.
      * @return Returns <b>HDF_ERR_INVALID_OBJECT</b> if the operation failed due to invalid objects.
      * @return Returns <b>HDF_ERR_MALLOC_FAIL</b> if the operation failed due to insufficient memory.
      */
-    int32_t (*EventHandler)(struct CodecCallbackType *self, int8_t *appData, uint32_t appDataLen,
-        enum OMX_EVENTTYPE eEvent, uint32_t data1, uint32_t data2, int8_t *eventData, uint32_t eventDataLen);
+    int32_t (*EventHandler)(struct CodecCallbackType *self, enum OMX_EVENTTYPE event, struct EventInfo *info);
 
     /**
      * @brief Reports an event indicating that the encoding or decoding in the input buffer is complete.

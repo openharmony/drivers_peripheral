@@ -184,12 +184,8 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiOmxTest_004, TestSize.Level1)
     const uint32_t compVersionNum = 10;
     const uint32_t specVersionNum = 1;
     const uint8_t uuidValue = 127;
-    char compName[componentNameLength];
-    OMX_VERSIONTYPE compVersion;
-    OMX_VERSIONTYPE specVersion;
-    unsigned char compUuid[componentUuidLength];
-    int32_t ret = g_component->GetComponentVersion(g_component, compName, &compVersion, &specVersion,
-        compUuid, componentUuidLength);
+    struct CompVerInfo verInfo;
+    int32_t ret = g_component->GetComponentVersion(g_component, &verInfo);
     ASSERT_EQ(ret, HDF_SUCCESS);
     ASSERT_EQ(compVersion.nVersion, compVersionNum);
     ASSERT_EQ(specVersion.nVersion, specVersionNum);
@@ -296,7 +292,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiOmxTest_014, TestSize.Level1)
     const uint32_t bufferId = 11;
     struct OmxCodecBuffer buffer;
     FillDataOmxCodecBuffer(&buffer);
-    int32_t ret = g_component->AllocateBuffer(g_component, &buffer, portIndex);
+    int32_t ret = g_component->AllocateBuffer(g_component, portIndex, &buffer);
     ASSERT_EQ(buffer.bufferId, bufferId);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
