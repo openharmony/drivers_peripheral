@@ -34,8 +34,6 @@
 
 typedef void (*SERVICE_CONSTRUCT_FUNC)(struct OmxComponentManager *, struct CodecComponentType *);
 
-static const int COMPONENT_NAME_LENGTH = 128;
-
 static void FreeMem(int8_t *mem, uint32_t memLen)
 {
     if (memLen > 0 && mem != NULL) {
@@ -151,56 +149,18 @@ static int32_t SerStubGetComponentVersion(struct CodecComponentTypeStub *stub,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
-    char compName[COMPONENT_NAME_LENGTH] = {0};
-    union OMX_VERSIONTYPE compVersion;
-    union OMX_VERSIONTYPE specVersion;
-    uint8_t *compUUID = NULL;
-    uint32_t compUUIDLen = 0;
+    struct CompVerInfo verInfo = {0};
 
-    if (!HdfSbufReadUint32(data, &compUUIDLen)) {
-        HDF_LOGE("%{public}s: read compUUIDLen failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    compUUID = (uint8_t*)OsalMemCalloc(sizeof(uint8_t) * (compUUIDLen));
-    if (compUUID == NULL) {
-        HDF_LOGE("%{public}s: HDF_ERR_MALLOC_FAIL!", __func__);
-        return HDF_ERR_MALLOC_FAIL;
-    }
-    ret = stub->service.GetComponentVersion(&stub->service, compName,
-        &compVersion, &specVersion, compUUID, compUUIDLen);
+    ret = stub->service.GetComponentVersion(&stub->service, &verInfo);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call GetComponentVersion function failed!", __func__);
-        FreeMem((int8_t*)compUUID, compUUIDLen);
         return ret;
     }
-
-    if (!HdfSbufWriteString(reply, compName)) {
-        HDF_LOGE("%{public}s: write compName failed!", __func__);
-        FreeMem((int8_t*)compUUID, compUUIDLen);
+    if (!HdfSbufWriteUnpadBuffer(reply, (const uint8_t *)&verInfo, sizeof(struct CompVerInfo))) {
+        HDF_LOGE("%{public}s: write verInfo failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (!HdfSbufWriteUnpadBuffer(reply, (const uint8_t *)&compVersion, sizeof(union OMX_VERSIONTYPE))) {
-        HDF_LOGE("%{public}s: write compVersion failed!", __func__);
-        FreeMem((int8_t*)compUUID, compUUIDLen);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    if (!HdfSbufWriteUnpadBuffer(reply, (const uint8_t *)&specVersion, sizeof(union OMX_VERSIONTYPE))) {
-        HDF_LOGE("%{public}s: write specVersion failed!", __func__);
-        FreeMem((int8_t*)compUUID, compUUIDLen);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    for (uint32_t i = 0; i < compUUIDLen; i++) {
-        if (!HdfSbufWriteUint8(reply, compUUID[i])) {
-            HDF_LOGE("%{public}s: write compUUID[i] failed!", __func__);
-            FreeMem((int8_t*)compUUID, compUUIDLen);
-            return HDF_ERR_INVALID_PARAM;
-        }
-    }
-
-    FreeMem((int8_t*)compUUID, compUUIDLen);
     return HDF_SUCCESS;
 }
 
@@ -571,17 +531,17 @@ static int32_t SerStubAllocateBuffer(struct CodecComponentTypeStub *stub,
     struct OmxCodecBuffer buffer;
     uint32_t portIndex = 0;
 
-    if (!OmxCodecBufferBlockUnmarshalling(data, &buffer)) {
-        HDF_LOGE("%{public}s: read buffer failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
     if (!HdfSbufReadUint32(data, &portIndex)) {
         HDF_LOGE("%{public}s: read &portIndex failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    ret = stub->service.AllocateBuffer(&stub->service, &buffer, portIndex);
+    if (!OmxCodecBufferBlockUnmarshalling(data, &buffer)) {
+        HDF_LOGE("%{public}s: read buffer failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    
+    ret = stub->service.AllocateBuffer(&stub->service, portIndex, &buffer);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call AllocateBuffer function failed!", __func__);
         return ret;

@@ -64,21 +64,14 @@ struct CodecComponentType {
      * @brief Obtains the version of a codec component.
      *
      * @param self Indicates the pointer to the target codec component.
-     * @param compName Indicates the pointer to the component name.
-     * @param compVersion Indicates the pointer to the OMX component version. For details, see {@link OMX_VERSIONTYPE}.
-     * @param specVersion Indicates the pointer to the version information of the specifications based on which the
-     * component is built. For details, see {@link OMX_VERSIONTYPE}.
-     * @param compUUID Indicates the pointer to the UUID that uniquely identifies the component.
-     * @param compUUIDLen Indicates the length of <b>compUUID</b>, in bytes.
+     * @param verInfo Indicates info of the component. For details, see {@link CompVerInfo}
      *
      * @return Returns <b>HDF_SUCCESS</b> if the operation is successful.
      * @return Returns <b>HDF_ERR_INVALID_PARAM</b> if the operation failed due to invalid parameters.
      * @return Returns <b>HDF_ERR_INVALID_OBJECT</b> if the operation failed due to invalid objects.
      * @return Returns <b>HDF_ERR_MALLOC_FAIL</b> if the operation failed due to insufficient memory.
      */
-    int32_t (*GetComponentVersion)(struct CodecComponentType *self, char *compName,
-        union OMX_VERSIONTYPE *compVersion, union OMX_VERSIONTYPE *specVersion,
-        uint8_t *compUUID, uint32_t compUUIDLen);
+    int32_t (*GetComponentVersion)(struct CodecComponentType *self, struct CompVerInfo *verInfo);
 
     /**
      * @brief Sends a command to a component.
@@ -261,15 +254,15 @@ struct CodecComponentType {
      * The component is in the OMX_StateExecuting, OMX_StatePause, or OMX_StateIdle state on a disabled port.
      *
      * @param self Indicates the pointer to the target codec component.
-     * @param buffer Indicates the pointer to the buffer requested. For details, see {@link OmxCodecBuffer}.
      * @param portIndex Indicates the port of the component.
+     * @param buffer Indicates the pointer to the buffer requested. For details, see {@link OmxCodecBuffer}.
      *
      * @return Returns <b>HDF_SUCCESS</b> if the operation is successful.
      * @return Returns <b>HDF_ERR_INVALID_PARAM</b> if the operation failed due to invalid parameters.
      * @return Returns <b>HDF_ERR_INVALID_OBJECT</b> if the operation failed due to invalid objects.
      * @return Returns <b>HDF_ERR_MALLOC_FAIL</b> if the operation failed due to insufficient memory.
      */
-    int32_t (*AllocateBuffer)(struct CodecComponentType *self, struct OmxCodecBuffer *buffer, uint32_t portIndex);
+    int32_t (*AllocateBuffer)(struct CodecComponentType *self, uint32_t portIndex, struct OmxCodecBuffer *buffer);
 
     /**
      * @brief Releases a buffer.

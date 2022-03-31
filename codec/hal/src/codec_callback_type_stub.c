@@ -58,80 +58,87 @@ static int32_t ReadArray(struct HdfSBuf *data, int8_t **array, uint32_t *arrayLe
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (bufferLen > 0) {
-        buffer = (int8_t*)OsalMemCalloc(sizeof(int8_t) * bufferLen);
-        if (buffer == NULL) {
-            return HDF_ERR_MALLOC_FAIL;
-        }
-
-        for (uint32_t i = 0; i < bufferLen; i++) {
-            if (!HdfSbufReadInt8(data, &buffer[i])) {
-                HDF_LOGE("%{public}s: read &buffer[i] failed!", __func__);
-                return HDF_ERR_INVALID_PARAM;
-            }
-        }
+    if (bufferLen <= 0) {
+        *arrayLen = bufferLen;
+        return HDF_SUCCESS;
+    }
+    
+    buffer = (int8_t*)OsalMemCalloc(sizeof(int8_t) * bufferLen);
+    if (buffer == NULL) {
+        return HDF_ERR_MALLOC_FAIL;
     }
 
+    for (uint32_t i = 0; i < bufferLen; i++) {
+        if (!HdfSbufReadInt8(data, &buffer[i])) {
+            HDF_LOGE("%{public}s: read &buffer[i] failed!", __func__);
+            OsalMemFree(buffer);
+            return HDF_ERR_INVALID_PARAM;
+        }
+    }
+    
     *array = buffer;
     *arrayLen = bufferLen;
     return HDF_SUCCESS;
+}
+
+static int32_t ReadEventInfo(struct HdfSBuf *data, struct EventInfo *info)
+{
+    int32_t ret;
+    ret = ReadArray(data, &info->appData, &info->appDataLen);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: read appData failed!", __func__);
+        return ret;
+    }
+
+    if (!HdfSbufReadUint32(data, &info->data1)) {
+        HDF_LOGE("%{public}s: read &data1 failed!", __func__);
+        FreeMem(info->appData, info->appDataLen);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (!HdfSbufReadUint32(data, &info->data2)) {
+        HDF_LOGE("%{public}s: read &data2 failed!", __func__);
+        FreeMem(info->appData, info->appDataLen);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    ret = ReadArray(data, &info->eventData, &info->eventDataLen);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: read eventData failed!", __func__);
+        FreeMem(info->appData, info->appDataLen);
+    }
+    return ret;
+}
+
+static void ReleaseEventInfo(struct EventInfo *info)
+{
+    FreeMem(info->appData, info->appDataLen);
+    FreeMem(info->eventData, info->eventDataLen);
 }
 
 static int32_t SerStubEventHandler(struct CodecCallbackType *serviceImpl,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
-    int8_t *appData = NULL;
-    uint32_t appDataLen = 0;
-    enum OMX_EVENTTYPE eEvent;
-    uint32_t data1 = 0;
-    uint32_t data2 = 0;
-    int8_t *eventData = NULL;
-    uint32_t eventDataLen = 0;
+    enum OMX_EVENTTYPE event;
+    struct EventInfo info = {0};
+    
+    if (!HdfSbufReadUint32(data, (uint32_t*)&event)) {
+        HDF_LOGE("%{public}s: read &event failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
 
-    ret = ReadArray(data, &appData, &appDataLen);
+    ret = ReadEventInfo(data, &info);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read appData failed!", __func__);
-        FreeMem(appData, appDataLen);
-        return ret;
-    }
-
-    if (!HdfSbufReadUint32(data, (uint32_t*)&eEvent)) {
-        HDF_LOGE("%{public}s: read &eEvent failed!", __func__);
-        FreeMem(appData, appDataLen);
+        HDF_LOGE("%{public}s: read &info failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
-    if (!HdfSbufReadUint32(data, &data1)) {
-        HDF_LOGE("%{public}s: read &data1 failed!", __func__);
-        FreeMem(appData, appDataLen);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    if (!HdfSbufReadUint32(data, &data2)) {
-        HDF_LOGE("%{public}s: read &data2 failed!", __func__);
-        FreeMem(appData, appDataLen);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    ret = ReadArray(data, &eventData, &eventDataLen);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read eventData failed!", __func__);
-        FreeMem(appData, appDataLen);
-        FreeMem(eventData, eventDataLen);
-        return ret;
-    }
-
-    ret = serviceImpl->EventHandler(serviceImpl, appData, appDataLen, eEvent, data1, data2, eventData, eventDataLen);
+    
+    ret = serviceImpl->EventHandler(serviceImpl, event, &info);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call EventHandler function failed!", __func__);
-        FreeMem(appData, appDataLen);
-        FreeMem(eventData, eventDataLen);
-        return ret;
     }
-
-    FreeMem(appData, appDataLen);
-    FreeMem(eventData, eventDataLen);
+    ReleaseEventInfo(&info);
     return ret;
 }
 

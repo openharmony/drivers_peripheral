@@ -32,9 +32,7 @@ int32_t OmxManagerDestroyComponent(OMX_HANDLETYPE compHandle)
     return HDF_SUCCESS;
 }
 
-int32_t CodecComponentTypeGetComponentVersion(struct CodecComponentType *self,
-    char* compName, union OMX_VERSIONTYPE *compVersion, union OMX_VERSIONTYPE *specVersion,
-    uint8_t *compUUID, uint32_t compUUIDLen)
+int32_t CodecComponentTypeGetComponentVersion(struct CodecComponentType *self, struct CompVerInfo *verInfo)
 {
     HDF_LOGI("%{public}s, service impl!", __func__);
     return HDF_SUCCESS;
@@ -105,7 +103,7 @@ int32_t CodecComponentTypeUseBuffer(struct CodecComponentType *self,
 }
 
 int32_t CodecComponentTypeAllocateBuffer(struct CodecComponentType *self,
-    struct OmxCodecBuffer *buffer, uint32_t portIndex)
+    uint32_t portIndex, struct OmxCodecBuffer *buffer)
 {
     HDF_LOGI("%{public}s, service impl!", __func__);
     return HDF_SUCCESS;
