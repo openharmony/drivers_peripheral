@@ -934,7 +934,7 @@ int32_t GetAssociatedStas(const char *ifName, struct AssocStaInfoResult *result)
 {
     (void)ifName;
     if (memset_s(result, sizeof(struct AssocStaInfoResult), 0, sizeof(struct AssocStaInfoResult)) != EOK) {
-        HDF_LOGE("%s::memset_s result fail!", __func__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: memset_s result failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     return RET_CODE_SUCCESS;
