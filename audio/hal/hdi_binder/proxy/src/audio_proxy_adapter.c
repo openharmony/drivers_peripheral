@@ -313,7 +313,7 @@ int32_t AudioProxyAdapterCreateRenderSplit(const struct AudioHwAdapter *hwAdapte
     }
     uint32_t adapterNameLen = strlen(hwAdapter->adapterDescriptor.adapterName);
     /* Get Adapter name */
-    int32_t ret = strncpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName, NAME_LEN - 1,
+    int32_t ret = strncpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName, NAME_LEN,
         hwAdapter->adapterDescriptor.adapterName, adapterNameLen);
     if (ret != EOK) {
         return HDF_FAILURE;
@@ -511,7 +511,7 @@ int32_t AudioProxyAdapterCreateCaptureSplit(const struct AudioHwAdapter *hwAdapt
     }
     uint32_t adapterNameLen = strlen(hwAdapter->adapterDescriptor.adapterName);
     /* Get AdapterName */
-    int32_t ret = strncpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN - 1,
+    int32_t ret = strncpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName, NAME_LEN,
         hwAdapter->adapterDescriptor.adapterName, adapterNameLen);
     if (ret != EOK) {
         return HDF_FAILURE;

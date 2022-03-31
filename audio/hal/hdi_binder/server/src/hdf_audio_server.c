@@ -550,6 +550,7 @@ int AudioHdiServerInit(struct HdfDeviceObject *deviceObject)
     }
     sdkInitSp = (int32_t (*)())(dlsym(sdkHandle, "MpiSdkInit"));
     if (sdkInitSp == NULL) {
+        dlclose(sdkHandle);
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     sdkInitSp();
