@@ -31,5 +31,5 @@ enable_audio_adm_service = true
 #If flag is true, the MPI_SERVICE version testcase will be built; if set flag is false, the other version will be built.
 enable_audio_mpi_service = false
 
-#If all above flag is setted to false, it will build failure.so forbid setting all above flag to false.
+#If all above flag is set to false, it will build failure.so forbid setting all above flag to false.
 enable_coverage = false

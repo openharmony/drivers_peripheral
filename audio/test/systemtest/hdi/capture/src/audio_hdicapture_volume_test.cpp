@@ -17,7 +17,7 @@
  * @addtogroup Audio
  * @{
  *
- * @brief Defines audio-related APIs, including custom data types and functions for capture drivers funtion.
+ * @brief Defines audio-related APIs, including custom data types and functions for capture drivers function.
  * accessing a driver adapter, and capturing audios.
  *
  * @since 1.0

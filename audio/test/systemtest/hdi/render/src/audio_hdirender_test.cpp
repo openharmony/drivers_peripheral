@@ -1184,7 +1184,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderGetRenderPosition_0012, Te
 /**
 * @tc.name  Test ReqMmapBuffer API via legal input
 * @tc.number  SUB_Audio_HDI_RenderReqMmapBuffer_0001
-* @tc.desc  Test ReqMmapBuffer interface,return 0 if call ReqMmapBuffer interface sucessfully
+* @tc.desc  Test ReqMmapBuffer interface,return 0 if call ReqMmapBuffer interface successfully
 * @tc.author: liweiming
 */
 
@@ -1230,7 +1230,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_RenderReqMmapBuffer_0001, TestSize.Le
 * @tc.name  Test ReqMmapBuffer API via setting the incoming parameter reqSize is bigger than
             the size of actual audio file
 * @tc.number  SUB_Audio_HDI_RenderReqMmapBuffer_0002
-* @tc.desc  Test ReqMmapBuffer interface,return -3 if call ReqMmapBuffer interface unsucessfully when setting the
+* @tc.desc  Test ReqMmapBuffer interface,return -3 if call ReqMmapBuffer interface unsuccessfully when setting the
             incoming parameter reqSize is bigger than the size of actual audio file
 * @tc.author: liweiming
 */
@@ -1268,7 +1268,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_RenderReqMmapBuffer_0002, TestSize.Le
 * @tc.name  Test ReqMmapBuffer API via setting the incoming parameter reqSize is smaller than
             the size of actual audio file
 * @tc.number  SUB_Audio_HDI_RenderReqMmapBuffer_0003
-* @tc.desc  Test ReqMmapBuffer interface,return 0 if call ReqMmapBuffer interface sucessfully when setting the
+* @tc.desc  Test ReqMmapBuffer interface,return 0 if call ReqMmapBuffer interface successfully when setting the
             incoming parameter reqSize is smaller than the size of actual audio file
 * @tc.author: liweiming
 */
@@ -1308,7 +1308,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_RenderReqMmapBuffer_0003, TestSize.Le
 /**
 * @tc.name  Test ReqMmapBuffer API via setting the incoming parameter reqSize is zero
 * @tc.number  SUB_Audio_HDI_RenderReqMmapBuffer_0003
-* @tc.desc  Test ReqMmapBuffer interface,return -1 if call ReqMmapBuffer interface unsucessfully when setting the
+* @tc.desc  Test ReqMmapBuffer interface,return -1 if call ReqMmapBuffer interface unsuccessfully when setting the
             incoming parameter reqSize is zero
 * @tc.author: liweiming
 */
@@ -1345,7 +1345,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_RenderReqMmapBuffer_0004, TestSize.Le
 /**
 * @tc.name  Test ReqMmapBuffer API via setting the incoming parameter memoryFd  of desc is illegal
 * @tc.number  SUB_Audio_HDI_RenderReqMmapBuffer_0003
-* @tc.desc  Test ReqMmapBuffer interface,return -3 if call ReqMmapBuffer interface unsucessfully when setting the
+* @tc.desc  Test ReqMmapBuffer interface,return -3 if call ReqMmapBuffer interface unsuccessfully when setting the
             incoming parameter memoryFd  of desc is illegal
 * @tc.author: liweiming
 */
@@ -1382,7 +1382,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_RenderReqMmapBuffer_0005, TestSize.Le
 /**
 * @tc.name  Test ReqMmapBuffer API via the incoming parameter handle is nullptr
 * @tc.number  SUB_Audio_HDI_RenderReqMmapBuffer_0005
-* @tc.desc  Test ReqMmapBuffer interface,return -3 if call ReqMmapBuffer interface unsucessfully when setting the
+* @tc.desc  Test ReqMmapBuffer interface,return -3 if call ReqMmapBuffer interface unsuccessfully when setting the
             incoming parameter handle is nullptr
 * @tc.author: liweiming
 */
@@ -1419,7 +1419,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_RenderReqMmapBuffer_0006, TestSize.Le
 /**
 * @tc.name  Test ReqMmapBuffer API via the incoming parameter desc is nullptr
 * @tc.number  SUB_Audio_HDI_RenderReqMmapBuffer_0006
-* @tc.desc  Test ReqMmapBuffer interface,return -3 if call ReqMmapBuffer interface unsucessfully when setting the
+* @tc.desc  Test ReqMmapBuffer interface,return -3 if call ReqMmapBuffer interface unsuccessfully when setting the
             incoming parameter desc is nullptr
 * @tc.author: liweiming
 */

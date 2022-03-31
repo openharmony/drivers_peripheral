@@ -417,9 +417,9 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0004, TestSize.Lev
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name Test AudioRenderPause API via the render is paused after stoped.
+* @tc.name Test AudioRenderPause API via the render is paused after stopped.
 * @tc.number  SUB_Audio_HDI_RenderPause_0005
-* @tc.desc  Test AudioRenderPause interface, return -1 the render is paused after stoped.
+* @tc.desc  Test AudioRenderPause interface, return -1 the render is paused after stopped.
 * @tc.author: Xuhuandi
 */
 HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0005, TestSize.Level1)

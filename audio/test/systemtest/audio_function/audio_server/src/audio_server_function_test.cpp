@@ -783,7 +783,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0005, TestSize
 /**
 * @tc.name  Set SampleAttributes during recording.
 * @tc.number  SUB_Audio_Function_Capture_Test_0006
-* @tc.desc  test capture function,the sampleattributes were setted success,and the audio file is recorded successfully.
+* @tc.desc  test capture function,the sampleattributes were set success,and the audio file is recorded successfully.
 * @tc.author: liutian
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0006, TestSize.Level1)

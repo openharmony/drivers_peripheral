@@ -439,7 +439,7 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
     }
 #endif
     /* Init RenderPathSelect send first */
-    /* portId small than  AUDIO_SERVICE_PORTID_FLAG shoud SceneSelect */
+    /* portId small than  AUDIO_SERVICE_PORTID_FLAG should SceneSelect */
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
     if (hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId < AUDIO_SERVICE_PORTID_FLAG) {
         ret = (*pInterfaceLibModeRender)(hwRender->devCtlHandle, &hwRender->renderParam,

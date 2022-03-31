@@ -12,7 +12,7 @@
 #include <linux/types.h>
 #include "audio_platform_base.h"
 
-/* AIO  base addres */
+/* AIO  base address */
 #define AIAO_REG_BASE            0x113b0000
 #define AIAO_MAX_REG_SIZE        0x10000
 
