@@ -32,8 +32,8 @@ namespace {
     const int32_t g_onTime = 500;
     const int32_t g_offTime = 500;
     const int32_t LIGHT_WAIT_TIME = 30;
-    const int32_t g_minLightType = LIGHT_TYPE_NONE;
-    const int32_t g_maxLightType = LIGHT_TYPE_BUTT;
+    const int32_t g_minLightId = LIGHT_ID_NONE;
+    const int32_t g_maxLightId = LIGHT_ID_BUTT;
 }
 
 class HdfLightTest : public testing::Test {
@@ -103,9 +103,9 @@ HWTEST_F(HdfLightTest, GetLightList001, TestSize.Level1)
     info = g_lightInfo;
 
     for (int i = 0; i < g_count; ++i) {
-        printf("get lightId[%d]\n\r", info->lightType);
-        EXPECT_GE(info->lightType, g_minLightType);
-        EXPECT_LE(info->lightType, g_maxLightType);
+        printf("get lightId[%d]\n\r", info->lightId);
+        EXPECT_GE(info->lightId, g_minLightId);
+        EXPECT_LE(info->lightId, g_maxLightId);
         info++;
     }
 }
@@ -128,7 +128,7 @@ HWTEST_F(HdfLightTest, GetLightList002, TestSize.Level1)
 
 /**
   * @tc.name: EnableLight001
-  * @tc.desc: Enables the light available in the light list based on the specified light type.
+  * @tc.desc: Enables the light available in the light list based on the specified light id.
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869R, AR000F8QNL
   */
@@ -144,19 +144,19 @@ HWTEST_F(HdfLightTest, EnableLight001, TestSize.Level1)
 
     for (i = 0; i < g_count; ++i) {
 
-        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightType, &effect);
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(0, ret);
 
         OsalSleep(LIGHT_WAIT_TIME);
 
-        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightType);
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
         EXPECT_EQ(0, ret);
     }
 }
 
 /**
   * @tc.name: EnableLight002
-  * @tc.desc: Enables the light available in the light list based on the specified light type.
+  * @tc.desc: Enables the light available in the light list based on the specified light id.
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869R, AR000F8QNL
   */
@@ -171,19 +171,19 @@ HWTEST_F(HdfLightTest, EnableLight002, TestSize.Level1)
     effect.flashEffect.offTime = g_offTime;
 
     for (i = 0; i < g_count; ++i) {
-        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightType, &effect);
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(0, ret);
 
         OsalSleep(LIGHT_WAIT_TIME);
 
-        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightType);
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
         EXPECT_EQ(0, ret);
     }
 }
 
 /**
   * @tc.name: EnableLight003
-  * @tc.desc: Enables the light available in the light list based on the specified light type.
+  * @tc.desc: Enables the light available in the light list based on the specified light id.
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869R, AR000F8QNL
   */
@@ -191,10 +191,10 @@ HWTEST_F(HdfLightTest, EnableLight003, TestSize.Level1)
 {
     int32_t i;
     int32_t ret;
-    uint32_t lightType = LIGHT_TYPE_BUTT;
+    uint32_t lightId = LIGHT_ID_BUTT;
     struct LightEffect effect;
 
-    ret = g_lightDev->TurnOnLight(lightType, &effect);
+    ret = g_lightDev->TurnOnLight(lightId, &effect);
     EXPECT_EQ(LIGHT_NOT_SUPPORT, ret);
 
     for (i = 0; i < g_count; ++i) {
@@ -203,31 +203,31 @@ HWTEST_F(HdfLightTest, EnableLight003, TestSize.Level1)
         effect.flashEffect.onTime = g_onTime;
         effect.flashEffect.offTime = g_offTime;
 
-        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightType, &effect);
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(LIGHT_NOT_FLASH, ret);
 
         effect.flashEffect.flashMode = LIGHT_FLASH_TIMED;
         effect.flashEffect.onTime = 0;
-        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightType, &effect);
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(LIGHT_NOT_FLASH, ret);
 
         effect.flashEffect.onTime = g_onTime;
         effect.flashEffect.offTime = 0;
-        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightType, &effect);
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(LIGHT_NOT_FLASH, ret);
     }
 }
 
 /**
   * @tc.name: DisableLight001
-  * @tc.desc: Disable the light available in the light list based on the specified light type.
+  * @tc.desc: Disable the light available in the light list based on the specified light id.
   * @tc.type: FUNC
   * @tc.require: SR000F869M, AR000F869R, AR000F8QNL
   */
 HWTEST_F(HdfLightTest, DisableLight001, TestSize.Level1)
 {
-    uint32_t lightType = LIGHT_TYPE_BUTT;
+    uint32_t lightId = LIGHT_ID_BUTT;
 
-    int32_t ret = g_lightDev->TurnOffLight(lightType);
+    int32_t ret = g_lightDev->TurnOffLight(lightId);
     EXPECT_EQ(HDF_FAILURE, ret);
 }
