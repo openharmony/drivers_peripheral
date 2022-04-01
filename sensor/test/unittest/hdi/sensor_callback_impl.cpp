@@ -60,7 +60,7 @@ namespace {
         {SENSOR_TYPE_GRAVITY, "gravity", 1, 3, g_gravityRange}
     };
 
-    constexpr int g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
+    constexpr int32_t g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
     constexpr float EPSINON = 1e-6;
 
     void SensorDataVerification(const float &data, const struct SensorDevelopmentList &sensorNode)
@@ -100,7 +100,7 @@ int32_t SensorCallbackImpl::OnDataEvent(const HdfSensorEvents& event)
        *tmp++ = value;
     }
 
-    for (int i = 0; i < g_listNum; ++i) {
+    for (int32_t i = 0; i < g_listNum; ++i) {
         if (event.sensorId == g_sensorList[i].sensorTypeId) {
             float *data = (float*)eventData;
             SensorDataVerification(*data, g_sensorList[i]);
