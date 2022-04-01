@@ -63,7 +63,7 @@ namespace {
         {SENSOR_TYPE_GRAVITY, "gravity", 1, 3, g_gravityRange}
     };
 
-    constexpr int g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
+    constexpr int32_t g_listNum = sizeof(g_sensorList) / sizeof(g_sensorList[0]);
     uint32_t g_sensorDataFlag = 1;
     constexpr int32_t SENSOR_INTERVAL1 = 200000000;
     constexpr int32_t SENSOR_INTERVAL2 = 20000000;
@@ -313,7 +313,7 @@ HWTEST_F(HdfSensorTest, GetSensorList001, TestSize.Level1)
 HWTEST_F(HdfSensorTest, GetSensorList002, TestSize.Level1)
 {
     struct SensorInformation *info = nullptr;
-    int j;
+    int32_t j;
 
     if (g_sensorInfo == nullptr) {
         EXPECT_NE(nullptr, g_sensorInfo);
