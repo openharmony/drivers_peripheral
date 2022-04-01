@@ -188,6 +188,7 @@ static int32_t SendProcess(void *argurb)
 
 static int32_t ReapProcess(void *argurb)
 {
+    (void)argurb;
     int32_t r;
     struct UsbAdapterUrb *urbrecv = NULL;
     struct itimerval new_value, old_value;
@@ -272,7 +273,7 @@ static int32_t BeginProcess(unsigned char endPoint)
     signal(SIGINT, SignalHandler);
     signal(SIGALRM, SignalHandler);
 
-    printf("test NO SDK endpoint:%u\n", endPoint);
+    printf("test NO SDK endpoint:%hhu\n", endPoint);
 
     for (i = 0; i < TEST_CYCLE; i++) {
         urb[i].inUse = 1;

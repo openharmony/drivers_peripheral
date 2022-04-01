@@ -205,7 +205,7 @@ static int32_t GetInterfacePipe(const struct HostDevice *dev, struct UsbInterfac
         return HDF_FAILURE;
     }
     if (dev == NULL || interface == NULL || pipe == NULL) {
-        HDF_LOGE("%{public}s:%{public}d invalid parmas", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d invalid params", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     info = &interface->info;
@@ -222,7 +222,7 @@ static int32_t GetInterfacePipe(const struct HostDevice *dev, struct UsbInterfac
 
     for (uint8_t i = 1; i <= info->pipeNum; ++i) {
         ret = UsbGetPipeInfo(interfaceHandle, info->curAltSetting, i, &pipeTmp);
-        if ((ret == HDF_SUCCESS) && ((pipeTmp.pipeAddress | (uint8_t)pipeTmp.pipeDirection) == pipeAddr)) {
+        if (ret == HDF_SUCCESS && ((pipeTmp.pipeAddress | (uint8_t)pipeTmp.pipeDirection) == pipeAddr)) {
             if (pipe) {
                 *pipe = pipeTmp;
             }
@@ -235,18 +235,18 @@ static int32_t GetInterfacePipe(const struct HostDevice *dev, struct UsbInterfac
 static int32_t GetPipe(const struct HostDevice *dev, uint8_t interfaceId, uint8_t pipeId, struct UsbPipeInfo *pipe)
 {
     if (dev == NULL) {
-        HDF_LOGE("%{public}s:%{public}d invalid params ifId:%{public}hhu epId:%{public}d", __func__, __LINE__,
-                 interfaceId, pipeId);
+        HDF_LOGE("%{public}s:%{public}d invalid params ifId:%{public}hhu epId:%{public}hhu",
+            __func__, __LINE__, interfaceId, pipeId);
         return HDF_ERR_INVALID_PARAM;
     }
     if (interfaceId > USB_MAX_INTERFACES) {
-        HDF_LOGE("%{public}s:%{public}d invalid params ifId:%{public}d epId:%{public}d", __func__, __LINE__,
-                 interfaceId, pipeId);
+        HDF_LOGE("%{public}s:%{public}d invalid params ifId:%{public}d epId:%{public}hhu",
+            __func__, __LINE__, interfaceId, pipeId);
         return HDF_ERR_INVALID_PARAM;
     }
     struct UsbInterface *interface = dev->iface[interfaceId];
     if (interface == NULL) {
-        HDF_LOGE("%{public}s:%{public}d invalid interface ifId:%{public}hhu, epId:%{public}d",
+        HDF_LOGE("%{public}s:%{public}d invalid interface ifId:%{public}hhu, epId:%{public}hhu",
             __func__, __LINE__, interfaceId, pipeId);
         return HDF_FAILURE;
     }
@@ -529,7 +529,7 @@ static int32_t FunBulkReadSync(struct HostDevice *port, struct HdfSBuf *data, st
     struct UsbdRequestSync *requestSync = NULL;
 
     if ((port == NULL) || (data == NULL) || (reply == NULL)) {
-        HDF_LOGE("%{public}s:%{public}d mangf invalid parma", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d mangf invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t ret = UsbdBulkReadSyncGetParams(data, &interfaceId, &pipeId, &timeout);
@@ -549,9 +549,7 @@ static int32_t FunBulkReadSync(struct HostDevice *port, struct HdfSBuf *data, st
     }
     ret = UsbdBulkReadSyncBase(timeout, tbuf, tsize, &actlength, requestSync);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGW(
-            "%{public}s:%{public}d UsbdBulkReadSyncBase ret:%{public}d "
-            "len:%{public}d",
+        HDF_LOGW("%{public}s:%{public}d UsbdBulkReadSyncBase ret:%{public}d, len:%{public}u",
             __func__, __LINE__, ret, actlength);
     }
     if (actlength > 0) {
@@ -633,19 +631,15 @@ static int32_t UsbdBulkWriteSyncBase(struct HostDevice *port, struct UsbdRequest
         tcur += tsize;
         ret = UsbFillRequest(requestSync->request, requestSync->ifHandle, &requestSync->params);
         if (HDF_SUCCESS != ret) {
-            HDF_LOGE(
-                "%{public}s:%{public}d UsbFillRequest failed, ret=%{public}d "
-                "handle:%{public}p tcur:%{public}d "
-                "length:%{public}u\n",
+            HDF_LOGE("%{public}s:%{public}d UsbFillRequest failed, ret = %{public}d, "
+                "handle:%{public}p tcur:%{public}d, length:%{public}u\n",
                 __func__, __LINE__, ret, requestSync->ifHandle, tcur, length);
             break;
         }
         ret = UsbSubmitRequestSync(requestSync->request);
         if (HDF_SUCCESS != ret) {
-            HDF_LOGE(
-                "%{public}s:%{public}d UsbSubmitRequestSync failed, "
-                "ret=%{public}d tcur:%{public}d length:%{public}u\n",
-                __func__, __LINE__, ret, tcur, length);
+            HDF_LOGE("%{public}s:%{public}d UsbSubmitRequestSync failed, "
+                "ret = %{public}d tcur:%{public}d length:%{public}u\n", __func__, __LINE__, ret, tcur, length);
             break;
         }
     }
@@ -661,7 +655,7 @@ static int32_t FunBulkWriteSync(struct HostDevice *port, struct HdfSBuf *data, s
     int32_t timeout = 0;
     uint32_t length = 0;
     struct UsbdRequestSync *requestSync = NULL;
-    if ((port == NULL) || (data == NULL) || (reply == NULL)) {
+    if (port == NULL || data == NULL || reply == NULL) {
         HDF_LOGE("%{public}s:%{public}d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -675,12 +669,12 @@ static int32_t FunBulkWriteSync(struct HostDevice *port, struct HdfSBuf *data, s
         return HDF_ERR_IO;
     }
     ret = UsbdFindRequestSyncAndCreat(port, interfaceId, pipeId, &requestSync);
-    if ((HDF_SUCCESS != ret) || (!requestSync)) {
+    if (HDF_SUCCESS != ret || !requestSync) {
         HDF_LOGE("%{public}s:%{public}d read timeout error", __func__, __LINE__);
         return ret;
     }
-    if ((requestSync->pipe.pipeDirection != USB_PIPE_DIRECTION_OUT) ||
-        (requestSync->pipe.pipeType != USB_PIPE_TYPE_BULK)) {
+    if (requestSync->pipe.pipeDirection != USB_PIPE_DIRECTION_OUT ||
+        requestSync->pipe.pipeType != USB_PIPE_TYPE_BULK) {
         HDF_LOGE("%{public}s:%{public}d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -732,14 +726,14 @@ static int32_t UsbControlTransferEx(struct HostDevice *dev, struct UsbControlPar
 
     int32_t ret = UsbControlSetUp(ctrParams, &parmas.ctrlReq);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d UsbControlSetUp failed, ret=%{public}d", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d UsbControlSetUp failed, ret = %{public}d", __func__, __LINE__, ret);
         return ret;
     }
     OsalMutexLock(&dev->lock);
     do {
         ret = UsbFillRequest(request, dev->ctrDevHandle, &parmas);
         if (HDF_SUCCESS != ret) {
-            HDF_LOGE("%{public}s:%{public}d UsbFillRequest failed, ret=%{public}d", __func__, __LINE__, ret);
+            HDF_LOGE("%{public}s:%{public}d UsbFillRequest failed, ret = %{public}d", __func__, __LINE__, ret);
             break;
         }
 
@@ -761,7 +755,7 @@ static int32_t UsbControlTransferEx(struct HostDevice *dev, struct UsbControlPar
     return ret;
 }
 
-static int32_t CtrlTranParamGetReqType(struct HdfSBuf *data, struct UsbControlParams *pCtrParams, int32_t requestType)
+static int32_t CtrlTranParamGetReqType(struct HdfSBuf *data, struct UsbControlParams *pCtrParams, uint32_t requestType)
 {
     if (data == NULL || pCtrParams == NULL) {
         HDF_LOGE("%{public}s:%{public}d param failed", __func__, __LINE__);
@@ -772,7 +766,7 @@ static int32_t CtrlTranParamGetReqType(struct HdfSBuf *data, struct UsbControlPa
 
     int32_t target = requestType & USB_RECIP_MASK;
     int32_t direction = (requestType >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK;
-    int32_t cmdType = ((uint32_t)(requestType >> CMD_OFFSET_5)) & CMD_TYPE_MASK;
+    int32_t cmdType = (requestType >> CMD_OFFSET_5) & CMD_TYPE_MASK;
     if (direction == USB_REQUEST_DIR_TO_DEVICE) {
         if (!HdfSbufReadBuffer(data, (const void **)&buffer, &length)) {
             HDF_LOGE("%{public}s:%{public}d hdf sbuf Read failed", __func__, __LINE__);
@@ -786,7 +780,7 @@ static int32_t CtrlTranParamGetReqType(struct HdfSBuf *data, struct UsbControlPa
             return HDF_ERR_MALLOC_FAIL;
         }
         if (memset_s(buffer, length, 0, length) != EOK) {
-            HDF_LOGE("%{public}s:%{public}d  memset_s failed ", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%{public}d  memset_s failed", __func__, __LINE__);
             OsalMemFree(buffer);
             return HDF_FAILURE;
         }
@@ -995,13 +989,15 @@ static int32_t FunReleaseInterface(struct HostDevice *port, struct HdfSBuf *data
 
 static int32_t UsbdOpenInterfaces(struct HostDevice *dev)
 {
+    int32_t ret;
+
     if (dev == NULL) {
         HDF_LOGE("%{public}s:%{public}d: invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (memset_s(dev->devHandle, sizeof(uint8_t) * USB_MAX_INTERFACES, 0, sizeof(uint8_t) * USB_MAX_INTERFACES) !=
-        EOK) {
+    ret = memset_s(dev->devHandle, sizeof(uint8_t) * USB_MAX_INTERFACES, 0, sizeof(uint8_t) * USB_MAX_INTERFACES);
+    if (ret != EOK) {
         HDF_LOGE("%{public}s:%{public}d  memset_s failed ", __func__, __LINE__);
         return HDF_FAILURE;
     }
@@ -1183,7 +1179,7 @@ static int32_t UsbdClaimInterfaces(struct HostDevice *dev)
     }
 
     if (memset_s(dev->iface, sizeof(uint8_t) * USB_MAX_INTERFACES, 0, sizeof(uint8_t) * USB_MAX_INTERFACES) != EOK) {
-        HDF_LOGE("%{public}s:%{public}d  memset_s failded", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d  memset_s failed", __func__, __LINE__);
         return HDF_FAILURE;
     }
     dev->ctrIface = GetUsbInterfaceById((const struct HostDevice *)dev, USB_CTRL_INTERFACE_ID);
@@ -1603,9 +1599,11 @@ static int32_t FillReqAyncParams(struct UsbdRequestASync *userData, struct UsbPi
 
 static struct UsbdRequestASync *UsbdRequestASyncAlloc(void)
 {
+    int32_t ret;
     struct UsbdRequestASync *req = (struct UsbdRequestASync *)OsalMemAlloc(sizeof(struct UsbdRequestASync));
     if (req) {
-        if (memset_s(req, sizeof(struct UsbdRequestASync), 0, sizeof(struct UsbdRequestASync)) != EOK) {
+        ret = memset_s(req, sizeof(struct UsbdRequestASync), 0, sizeof(struct UsbdRequestASync));
+        if (ret != EOK) {
             HDF_LOGE("%{public}s:%{public}d  memset_s failed", __func__, __LINE__);
             OsalMemFree(req);
             return NULL;
@@ -2036,7 +2034,7 @@ static int32_t FunQueryPort(struct HdfSBuf *data, struct HdfSBuf *reply, struct 
     int32_t mode = 0;
     int32_t ret = QueryPort(&portId, &powerRole, &dataRole, &mode, service);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d QueryPort failed, ret=%{public}d", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d QueryPort failed, ret = %{public}d", __func__, __LINE__, ret);
         return ret;
     }
     if (reply) {
@@ -2064,7 +2062,7 @@ static int32_t FunSetCurrentFunctions(struct HdfSBuf *data, struct HdfSBuf *repl
     HdfSbufReadInt32(data, &funcs);
     int32_t ret = UsbdSetFunction(funcs);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d FunSetCurrentFunctions failed, ret=%{public}d", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d FunSetCurrentFunctions failed, ret = %{public}d", __func__, __LINE__, ret);
         return ret;
     }
     return HDF_SUCCESS;
@@ -2072,14 +2070,15 @@ static int32_t FunSetCurrentFunctions(struct HdfSBuf *data, struct HdfSBuf *repl
 
 static int32_t DispatchBindUsbSubscriber(struct UsbdService *service, struct HdfSBuf *data)
 {
+    int32_t ret;
     struct UsbdSubscriber *subscriber = NULL;
     if (service == NULL || data == NULL) {
-        HDF_LOGE("%{public}s:%{public}d param is NULL", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d param is null", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     struct HdfRemoteService *remoteService = HdfSbufReadRemoteService(data);
     if (remoteService == NULL) {
-        HDF_LOGE("%{public}s: remoteService is NULL", __func__);
+        HDF_LOGE("%{public}s: remoteService is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -2088,7 +2087,9 @@ static int32_t DispatchBindUsbSubscriber(struct UsbdService *service, struct Hdf
         HDF_LOGE("%{public}s: calloc subscriber error", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
-    if (memset_s(subscriber, sizeof(struct UsbdSubscriber), 0, sizeof(struct UsbdSubscriber)) != EOK) {
+
+    ret = memset_s(subscriber, sizeof(struct UsbdSubscriber), 0, sizeof(struct UsbdSubscriber));
+    if (ret != EOK) {
         HDF_LOGE("%{public}s:%{public}d  memset_s failed", __func__, __LINE__);
         OsalMemFree(subscriber);
         return HDF_FAILURE;
@@ -2225,9 +2226,12 @@ static int32_t HostDeviceInit(struct HostDevice *port)
 int32_t HostDeviceCreate(struct HostDevice **port)
 {
     struct HostDevice *tmp = NULL;
+
     if (!port) {
+        HDF_LOGE("%{public}s:%{public}d invalid param port.", __func__, __LINE__);
         return HDF_FAILURE;
     }
+
     tmp = (struct HostDevice *)OsalMemCalloc(sizeof(struct HostDevice));
     if (!tmp) {
         HDF_LOGE("%{public}s:%{public}d Alloc usb host device failed", __func__, __LINE__);
@@ -2461,14 +2465,12 @@ static struct UsbdBulkASyncList *UsbdBulkASyncListAlloc(struct HostDevice *port,
     struct UsbdBulkASyncList *bulkAsyncList = NULL;
 
     if (memset_s(&pipe, sizeof(struct UsbPipeInfo), 0, sizeof(struct UsbPipeInfo)) != EOK) {
-        HDF_LOGE("%{public}s:%{public}d  memset_s failed", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
         return NULL;
     }
     ret = GetPipe(port, ifId, epId, &pipe);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE(
-            "%{public}s:%{public}d GetPipe ret:%{public}d ifId:%{public}d "
-            "epId:%{public}d",
+        HDF_LOGE("%{public}s:%{public}d GetPipe ret:%{public}d ifId:%{public}hhu, epId:%{public}hhu",
             __func__, __LINE__, ret, ifId, epId);
         return NULL;
     }

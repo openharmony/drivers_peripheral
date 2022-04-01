@@ -61,7 +61,7 @@ static int32_t CreateCtrPipe(const struct UsbInterfacePool *pool)
     struct UsbPipe *pipe = NULL;
 
     if (pool == NULL) {
-        HDF_LOGE("%s invalid para", __func__);
+        HDF_LOGE("%s:%d invalid param pool", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -145,7 +145,7 @@ static const struct UsbRawInterfaceDescriptor *UsbGetInterfaceDesc(
     const struct UsbRawInterface *altSetting, uint8_t settingIndex)
 {
     if (altSetting == NULL) {
-        HDF_LOGE("%s: invalid param", __func__);
+        HDF_LOGE("%s:%d invalid param altSetting", __func__, __LINE__);
         return NULL;
     }
 
@@ -156,12 +156,11 @@ static const struct UsbRawEndpointDescriptor *UsbGetEpDesc(
     const struct UsbRawInterfaceDescriptor *ifDes, uint8_t idx)
 {
     if (ifDes == NULL) {
-        HDF_LOGE("%s: invalid param", __func__);
+        HDF_LOGE("%s:%d invalid param ifDes", __func__, __LINE__);
         return NULL;
     }
     if (ifDes->interfaceDescriptor.bNumEndpoints < (idx + 1)) {
-        HDF_LOGE("%s: invalid param numEp:%d+idx:%hhu\n ",
-            __func__, ifDes->interfaceDescriptor.bNumEndpoints, idx);
+        HDF_LOGE("%s:invalid param numEp:%d+idx:%hhu\n", __func__, ifDes->interfaceDescriptor.bNumEndpoints, idx);
         return NULL;
     }
 

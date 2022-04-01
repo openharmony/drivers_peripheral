@@ -70,7 +70,7 @@ static int32_t UsbSerialAllocFifo(struct DataFifo *fifo, uint32_t size)
 static void UsbSerialFreeFifo(const struct DataFifo *fifo)
 {
     if (fifo == NULL) {
-        HDF_LOGE("%s:%d fifo is NULL", __func__, __LINE__);
+        HDF_LOGE("%s:%d fifo is null", __func__, __LINE__);
         return;
     }
 
@@ -156,13 +156,13 @@ static int32_t AcmStartWbSync(struct AcmDevice *acm,
     parmas.callback = NULL;
     rc = UsbFillRequest(wb->request, InterfaceIdToHandle(acm, acm->dataOutPipe->interfaceId), &parmas);
     if (HDF_SUCCESS != rc) {
-        HDF_LOGE("%s:UsbFillRequest faile,ret=%d \n", __func__, rc);
+        HDF_LOGE("%s:UsbFillRequest failed, ret = %d\n", __func__, rc);
         return rc;
     }
     acm->writeReq = wb->request;
     rc = UsbSubmitRequestSync(wb->request);
     if (rc < 0) {
-        HDF_LOGE("UsbSubmitRequestSync faile, ret=%d \n", rc);
+        HDF_LOGE("UsbSubmitRequestSync failed, ret = %d\n", rc);
     }
     wb->use = 0;
     return rc;
@@ -203,7 +203,7 @@ static void AcmWriteBufFree(struct AcmDevice *acm)
 static void AcmWriteBulk(struct UsbRequest *req)
 {
     if (req == NULL) {
-        HDF_LOGE("%s:%{pulib}d req is NULL!", __func__, __LINE__);
+        HDF_LOGE("%s:%{pulib}d req is null!", __func__, __LINE__);
         goto EXIT;
     }
     int32_t status = req->compInfo.status;
@@ -376,12 +376,12 @@ static int32_t UsbGetInterface(const UsbInterfaceHandle *devHandle,
     parmas.callback = NULL;
     ret = UsbFillRequest((struct UsbRequest *)request, (UsbInterfaceHandle *)devHandle, &parmas);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s: faile, ret=%d ", __func__, ret);
+        HDF_LOGE("%s: UsbFillRequest failed, ret = %d ", __func__, ret);
         return ret;
     }
     ret = UsbSubmitRequestSync((struct UsbRequest *)request);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("UsbSubmitRequestSync  faile, ret=%d ", ret);
+        HDF_LOGE("%s: UsbSubmitRequestSync failed, ret = %d ", __func__, ret);
         return ret;
     }
     return HDF_SUCCESS;
@@ -466,12 +466,12 @@ static int32_t SerialCtrlMsg(struct AcmDevice *acm, uint8_t request,
     parmas.callback = NULL;
     ret = UsbFillRequest(acm->ctrlReq, acm->ctrDevHandle, &parmas);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s: faile, ret=%d ", __func__, ret);
+        HDF_LOGE("%s: UsbFillRequest failed, ret = %d ", __func__, ret);
         return ret;
     }
     ret = UsbSubmitRequestSync(acm->ctrlReq);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("UsbSubmitRequestSync  faile, ret=%d ", ret);
+        HDF_LOGE("UsbSubmitRequestSync failed, ret = %d ", ret);
         return ret;
     }
     if (!acm->ctrlReq->compInfo.status) {
@@ -541,7 +541,7 @@ static int32_t UsbSerialDeviceAlloc(struct AcmDevice *acm)
         return HDF_FAILURE;
     }
     if (OsalMutexInit(&port->lock) != HDF_SUCCESS) {
-        HDF_LOGE("%s: init lock fail!", __func__);
+        HDF_LOGE("%s: init lock failed!", __func__);
         return HDF_FAILURE;
     }
     port->lineCoding.dwDTERate = CpuToLe32(DATARATE);
@@ -583,7 +583,7 @@ static int32_t UsbSerialRead(struct SerialDevice *port, struct HdfSBuf *reply)
 
     if (g_acmReadBuffer == NULL) {
         OsalMutexUnlock(&acm->readLock);
-        HDF_LOGE("%s:%d g_acmReadBuffer is NULL", __func__, __LINE__);
+        HDF_LOGE("%s:%d g_acmReadBuffer is null", __func__, __LINE__);
         return HDF_ERR_MALLOC_FAIL;
     }
 
@@ -629,7 +629,7 @@ static int32_t SerialSetBaudrate(struct SerialDevice *port, const struct HdfSBuf
         ret = memcpy_s(&acm->lineCoding, sizeof(struct UsbCdcLineCoding),
             &port->lineCoding, sizeof(port->lineCoding));
         if (ret != EOK) {
-            HDF_LOGE("memcpy_s fail, ret=%d", ret);
+            HDF_LOGE("memcpy_s failed, ret = %d", ret);
         }
         HDF_LOGE("%s - set line: %d %d %d %d\n",
             __func__, (port->lineCoding.dwDTERate), port->lineCoding.bCharFormat,
@@ -637,7 +637,7 @@ static int32_t SerialSetBaudrate(struct SerialDevice *port, const struct HdfSBuf
         ret = SerialCtrlMsg(acm, USB_DDK_CDC_REQ_SET_LINE_CODING, 0,
             &acm->lineCoding, sizeof (struct UsbCdcLineCoding));
         if (ret) {
-            HDF_LOGE("SerialCtrlMsg fail\n");
+            HDF_LOGE("SerialCtrlMsg failed\n");
             return ret;
         }
     }
@@ -657,7 +657,7 @@ static int32_t UsbCtrlMsg(struct SerialDevice *port, struct HdfSBuf *data)
     ret = SerialCtrlMsg(acm, USB_DDK_CDC_REQ_SET_LINE_CODING, 0,
         &lineCoding, sizeof (struct UsbCdcLineCoding));
     if (ret) {
-        HDF_LOGE("SerialCtrlMsg fail\n");
+        HDF_LOGE("SerialCtrlMsg failed.\n");
         return ret;
     }
     return ret;
@@ -671,7 +671,7 @@ static int32_t SerialGetBaudrate(struct SerialDevice *port, struct HdfSBuf *repl
         return HDF_ERR_IO;
     }
 
-    HDF_LOGE("%s:%d baudRate=%u", __func__, __LINE__, baudRate);
+    HDF_LOGE("%s:%d baudRate = %u", __func__, __LINE__, baudRate);
     return HDF_SUCCESS;
 }
 
@@ -751,7 +751,7 @@ static int32_t UsbStdCtrlCmd(struct SerialDevice *port, SerialOPCmd cmd, struct 
         case CMD_STD_CTRL_GET_DESCRIPTOR_CMD:
             ret = GetDeviceDescriptor(acm->ctrDevHandle, g_ctrlCmdRequest, (void *)(&des), sizeof(des));
             if (ret != HDF_SUCCESS) {
-                HDF_LOGE("GetDeviceDescriptor fail ret:%d", ret);
+                HDF_LOGE("GetDeviceDescriptor failed ret:%d", ret);
                 return HDF_FAILURE;
             }
             (void)snprintf_s(str, STR_LEN, STR_LEN - 1,
@@ -784,7 +784,7 @@ static int32_t UsbStdCtrlCmd(struct SerialDevice *port, SerialOPCmd cmd, struct 
         case CMD_STD_CTRL_GET_STATUS_CMD:
             ret = UsbGetStatus(acm->ctrDevHandle, g_ctrlCmdRequest, &ss);
             if (ret != HDF_SUCCESS) {
-                HDF_LOGE("UsbGetStatus fail ret:%d", ret);
+                HDF_LOGE("UsbGetStatus failed ret:%d", ret);
                 return HDF_FAILURE;
             }
             ret = HdfSbufWriteUint16(reply, ss);
@@ -792,7 +792,7 @@ static int32_t UsbStdCtrlCmd(struct SerialDevice *port, SerialOPCmd cmd, struct 
         case CMD_STD_CTRL_GET_CONFIGURATION:
             ret = UsbGetConfig(acm->ctrDevHandle, g_ctrlCmdRequest, &data);
             if (ret != HDF_SUCCESS) {
-                HDF_LOGE("UsbGetStatus fail ret:%d", ret);
+                HDF_LOGE("UsbGetStatus failed ret:%d", ret);
                 return HDF_FAILURE;
             }
             ret = HdfSbufWriteUint8(reply, data);
@@ -800,7 +800,7 @@ static int32_t UsbStdCtrlCmd(struct SerialDevice *port, SerialOPCmd cmd, struct 
         case CMD_STD_CTRL_GET_INTERFACE:
             ret = UsbGetInterface(acm->ctrDevHandle, g_ctrlCmdRequest, &id);
             if (ret != HDF_SUCCESS) {
-                HDF_LOGE("UsbGetStatus fail ret:%d", ret);
+                HDF_LOGE("UsbGetStatus failed ret:%d", ret);
                 return HDF_FAILURE;
             }
             ret = HdfSbufWriteUint8(reply, id);
@@ -823,12 +823,12 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
     int32_t wbn;
     struct AcmWb *wb = NULL;
     if (port == NULL || data == NULL) {
-        HDF_LOGE("%d: invalid parma", __LINE__);
+        HDF_LOGE("%d: invalid param", __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     struct AcmDevice *acm = port->acm;
     if (acm == NULL) {
-        HDF_LOGE("%d: invalid parma", __LINE__);
+        HDF_LOGE("%d: invalid param", __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (AcmWbIsAvail(acm)) {
@@ -853,7 +853,7 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
     size = (size > acm->writeSize) ? acm->writeSize : size;
     ret = memcpy_s(wb->buf, acm->writeSize, tmp, size);
     if (ret != EOK) {
-        HDF_LOGE("memcpy_s fail, ret=%d", ret);
+        HDF_LOGE("memcpy_s failed, ret = %d", ret);
     }
     wb->len = (int)size;
     if (acm->dataOutPipe == NULL) {
@@ -910,7 +910,7 @@ static int32_t SerialOpen(const struct SerialDevice *port, struct HdfSBuf *data)
     for (int32_t i = 0; i < ACM_NR; i++) {
         ret = UsbSubmitRequestAsync(acm->readReq[i]);
         if (HDF_SUCCESS != ret) {
-            HDF_LOGE("UsbSubmitRequestAsync  faile, ret=%d ", ret);
+            HDF_LOGE("UsbSubmitRequestAsync  failed, ret = %d ", ret);
             goto ERR;
         }
     }
@@ -928,12 +928,12 @@ static int32_t SerialClose(const struct SerialDevice *port, struct HdfSBuf *data
     struct AcmDevice *acm = NULL;
 
     if ((port == NULL) || (data == NULL)) {
-        HDF_LOGE("%s: invalid parma", __func__);
+        HDF_LOGE("%s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     acm = port->acm;
     if (acm == NULL) {
-        HDF_LOGE("%s: invalid parma", __func__);
+        HDF_LOGE("%s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -968,12 +968,12 @@ static int32_t SerialWrite(const struct SerialDevice *port, struct HdfSBuf *data
     int32_t wbn;
     struct AcmWb *wb = NULL;
     if (port == NULL) {
-        HDF_LOGE("%d: invalid parma", __LINE__);
+        HDF_LOGE("%d: invalid param", __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     struct AcmDevice *acm = port->acm;
     if (acm == NULL) {
-        HDF_LOGE("%d: invalid parma", __LINE__);
+        HDF_LOGE("%d: invalid param", __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (AcmWbIsAvail(acm)) {
@@ -997,7 +997,7 @@ static int32_t SerialWrite(const struct SerialDevice *port, struct HdfSBuf *data
     size = (size > acm->writeSize) ? acm->writeSize : size;
     ret = memcpy_s(wb->buf, acm->writeSize, tmp, size);
     if (ret != EOK) {
-        HDF_LOGE("memcpy_s fail, ret=%d", ret);
+        HDF_LOGE("memcpy_s failed, ret = %d", ret);
     }
     wb->len = (int)size;
     ret = AcmStartWb(acm, wb, acm->dataOutPipe);
@@ -1074,21 +1074,21 @@ static int32_t UsbSerialDeviceDispatch(struct HdfDeviceIoClient *client, int32_t
     struct SerialDevice *port = NULL;
 
     if (client == NULL) {
-        HDF_LOGE("%s:%d client is NULL", __func__, __LINE__);
+        HDF_LOGE("%s:%d client is null", __func__, __LINE__);
         return HDF_ERR_INVALID_OBJECT;
     }
     if (client->device == NULL) {
-        HDF_LOGE("%s:%d client->device is NULL", __func__, __LINE__);
+        HDF_LOGE("%s:%d client->device is null", __func__, __LINE__);
         return HDF_ERR_INVALID_OBJECT;
     }
     if (client->device->service == NULL) {
-        HDF_LOGE("%s:%d client->device->service is NULL", __func__, __LINE__);
+        HDF_LOGE("%s:%d client->device->service is null", __func__, __LINE__);
         return HDF_ERR_INVALID_OBJECT;
     }
     acm = (struct AcmDevice *)client->device->service;
     port = acm->port;
     if (port == NULL) {
-        HDF_LOGE("%s:%d port is NULL", __func__, __LINE__);
+        HDF_LOGE("%s:%d port is null", __func__, __LINE__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
@@ -1172,7 +1172,7 @@ static struct UsbPipeInfo *GetPipe(const struct AcmDevice *acm,
 {
     uint8_t i;
     if (acm == NULL) {
-        HDF_LOGE("%s: invalid parmas", __func__);
+        HDF_LOGE("%s: invalid param", __func__);
         return NULL;
     }
     for (i = 0; i < acm->interfaceCnt; i++) {
@@ -1205,7 +1205,7 @@ static int32_t UsbSerialDriverBind(struct HdfDeviceObject *device)
         return HDF_FAILURE;
     }
     if (OsalMutexInit(&acm->lock) != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalMutexInit fail", __func__, __LINE__);
+        HDF_LOGE("%s:%d OsalMutexInit failed", __func__, __LINE__);
         goto ERROR;
     }
     info = (struct UsbPnpNotifyServiceInfo *)device->priv;
@@ -1218,12 +1218,12 @@ static int32_t UsbSerialDriverBind(struct HdfDeviceObject *device)
         err = memcpy_s((void *)(acm->interfaceIndex), USB_MAX_INTERFACES,
               (const void*)info->interfaceNumber, info->interfaceLength);
         if (err != EOK) {
-            HDF_LOGE("%s:%d memcpy_s faile err=%d", \
+            HDF_LOGE("%s:%d memcpy_s failed err = %d", \
                 __func__, __LINE__, err);
             goto LOCK_ERROR;
         }
     } else {
-        HDF_LOGE("%s:%d info is NULL!", __func__, __LINE__);
+        HDF_LOGE("%s:%d info is null!", __func__, __LINE__);
         goto LOCK_ERROR;
     }
     acm->device  = device;
@@ -1234,7 +1234,7 @@ static int32_t UsbSerialDriverBind(struct HdfDeviceObject *device)
 
 LOCK_ERROR:
     if (OsalMutexDestroy(&acm->lock)) {
-        HDF_LOGE("%s:%d OsalMutexDestroy fail", __func__, __LINE__);
+        HDF_LOGE("%s:%d OsalMutexDestroy failed", __func__, __LINE__);
     }
 ERROR:
     OsalMemFree(acm);
@@ -1293,7 +1293,7 @@ static int32_t AcmCtrlIrqCheckSize(struct UsbRequest *req, struct AcmDevice *acm
         ret = memcpy_s(&acm->notificationBuffer[acm->nbIndex], acm->nbSize - acm->nbIndex,
             req->compInfo.buffer, copySize);
         if (ret != EOK) {
-            HDF_LOGE("memcpy_s fail ret=%d", ret);
+            HDF_LOGE("memcpy_s failed ret = %d", ret);
         }
         acm->nbIndex += copySize;
         currentSize = acm->nbIndex;
@@ -1309,7 +1309,7 @@ static int32_t AcmCtrlIrqCheckSize(struct UsbRequest *req, struct AcmDevice *acm
 static void AcmCtrlIrq(struct UsbRequest *req)
 {
     if (req == NULL) {
-        HDF_LOGE("%s:%d req is NULL!", __func__, __LINE__);
+        HDF_LOGE("%s:%d req is null!", __func__, __LINE__);
         goto EXIT;
     }
     int32_t ret;
@@ -1328,7 +1328,7 @@ static void AcmCtrlIrq(struct UsbRequest *req)
         dr = (struct UsbCdcNotification *)acm->notificationBuffer;
     }
     if ((dr == NULL) || (acm == NULL)) {
-        HDF_LOGE("%s:%d dr or acm is NULL!", __func__, __LINE__);
+        HDF_LOGE("%s:%d dr or acm is null!", __func__, __LINE__);
         goto EXIT;
     }
 
@@ -1346,7 +1346,7 @@ EXIT:
 static void AcmReadBulk(struct UsbRequest *req)
 {
     if (req == NULL) {
-        HDF_LOGE("%s:%d req is NULL!", __func__, __LINE__);
+        HDF_LOGE("%s:%d req is null!", __func__, __LINE__);
         return;
     }
     int32_t retval;
@@ -1354,7 +1354,7 @@ static void AcmReadBulk(struct UsbRequest *req)
     size_t size = req->compInfo.actualLength;
     struct AcmDevice *acm = (struct AcmDevice *)req->compInfo.userData;
     if (acm == NULL || acm->port == NULL) {
-        HDF_LOGE("%s:%d acm is NULL!", __func__, __LINE__);
+        HDF_LOGE("%s:%d acm is null!", __func__, __LINE__);
         return;
     }
 
@@ -1398,7 +1398,7 @@ static void AcmFreeWriteRequests(struct AcmDevice *acm)
         snd = &acm->wb[i];
         ret = UsbCancelRequest(snd->request);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("UsbCancelRequest rd faile, ret=%d ", ret);
+            HDF_LOGE("UsbCancelRequest rd failed, ret = %d ", ret);
         }
     }
     for (i = 0; i < ACM_NW; i++) {
@@ -1422,7 +1422,7 @@ static void AcmFreeReadRequests(struct AcmDevice *acm)
     for (i = 0; i < ACM_NR; i++) {
         ret = UsbCancelRequest(acm->readReq[i]);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("UsbCancelRequest rd faile, ret=%d ", ret);
+            HDF_LOGE("UsbCancelRequest rd failed, ret=%d ", ret);
         }
     }
     for (i = 0; i < ACM_NR; i++) {
@@ -1438,19 +1438,18 @@ static void AcmFreeNotifyReqeust(struct AcmDevice *acm)
     int32_t ret;
 
     if ((acm == NULL) || (acm->notifyReq == NULL)) {
-        HDF_LOGE("%s: acm or notifyReq is NULL", __func__);
+        HDF_LOGE("%s: acm or notifyReq is null", __func__);
         return;
     }
     ret = UsbCancelRequest(acm->notifyReq);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("UsbCancelRequest rd faile, ret=%d ", ret);
+        HDF_LOGE("UsbCancelRequest rd failed, ret = %d ", ret);
     }
     ret = UsbFreeRequest(acm->notifyReq);
     if (ret == HDF_SUCCESS) {
         acm->notifyReq = NULL;
     } else {
-        HDF_LOGE("%s: AcmFreeNotifyReqeust failed, ret=%d",
-            __func__, ret);
+        HDF_LOGE("%s: AcmFreeNotifyReqeust failed, ret = %d", __func__, ret);
     }
 }
 
@@ -1476,7 +1475,7 @@ static int32_t AcmAllocReadRequests(struct AcmDevice *acm)
         readParmas.dataReq.length = (int)acm->readSize;
         ret = UsbFillRequest(acm->readReq[i], InterfaceIdToHandle(acm, acm->dataInPipe->interfaceId), &readParmas);
         if (HDF_SUCCESS != ret) {
-            HDF_LOGE("%s: UsbFillRequest faile, ret=%d \n", __func__, ret);
+            HDF_LOGE("%s: UsbFillRequest failed, ret=%d \n", __func__, ret);
             goto ERROR;
         }
     }
@@ -1493,7 +1492,7 @@ static int32_t AcmAllocNotifyRequest(struct AcmDevice *acm)
     struct UsbRequestParams intParmas = {};
     acm->notifyReq = UsbAllocRequest(InterfaceIdToHandle(acm, acm->intPipe->interfaceId), 0, acm->intSize);
     if (!acm->notifyReq) {
-        HDF_LOGE("notifyReq request fail\n");
+        HDF_LOGE("notifyReq request failed.\n");
         return HDF_ERR_MALLOC_FAIL;
     }
     intParmas.userData = (void *)acm;
@@ -1508,7 +1507,7 @@ static int32_t AcmAllocNotifyRequest(struct AcmDevice *acm)
     intParmas.dataReq.length = (int)acm->intSize;
     ret = UsbFillRequest(acm->notifyReq, InterfaceIdToHandle(acm, acm->intPipe->interfaceId), &intParmas);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s: UsbFillRequest faile, ret=%d", __func__, ret);
+        HDF_LOGE("%s: UsbFillRequest failed, ret = %d", __func__, ret);
         goto ERROR;
     }
     return HDF_SUCCESS;
@@ -1598,25 +1597,25 @@ static int32_t AcmGetPipes(struct AcmDevice *acm)
 {
     acm->dataInPipe = GetPipe(acm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_IN);
     if (acm->dataInPipe == NULL) {
-        HDF_LOGE("dataInPipe is NULL");
+        HDF_LOGE("dataInPipe is null");
         goto ERROR;
     }
 
     acm->dataOutPipe = GetPipe(acm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_OUT);
     if (acm->dataOutPipe == NULL) {
-        HDF_LOGE("dataOutPipe is NULL");
+        HDF_LOGE("dataOutPipe is null");
         goto ERROR;
     }
 
     acm->ctrPipe = EnumePipe(acm, acm->ctrIface->info.interfaceIndex, USB_PIPE_TYPE_CONTROL, USB_PIPE_DIRECTION_OUT);
     if (acm->ctrPipe == NULL) {
-        HDF_LOGE("ctrPipe is NULL");
+        HDF_LOGE("ctrPipe is null");
         goto ERROR;
     }
 
     acm->intPipe = GetPipe(acm, USB_PIPE_TYPE_INTERRUPT, USB_PIPE_DIRECTION_IN);
     if (acm->intPipe == NULL) {
-        HDF_LOGE("intPipe is NULL");
+        HDF_LOGE("intPipe is null");
         goto ERROR;
     }
 
@@ -1781,8 +1780,7 @@ static int32_t UsbSerialDriverInit(struct HdfDeviceObject *device)
     }
     OsalMutexInit(&acm->readLock);
     OsalMutexInit(&acm->writeLock);
-    HDF_LOGD("%s:%d busNum=%d,devAddr=%d", \
-        __func__, __LINE__, acm->busNum, acm->devAddr);
+    HDF_LOGD("%s:%d busNum = %d,devAddr = %d",  __func__, __LINE__, acm->busNum, acm->devAddr);
 
     ret = UsbSerialDeviceAlloc(acm);
     if (ret != HDF_SUCCESS) {
@@ -1802,7 +1800,7 @@ static void UsbSerialDriverRelease(struct HdfDeviceObject *device)
     struct AcmDevice *acm = NULL;
 
     if (device == NULL) {
-        HDF_LOGE("%s: device is NULL", __func__);
+        HDF_LOGE("%s: device is null", __func__);
         return;
     }
     acm = (struct AcmDevice *)device->service;

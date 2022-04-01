@@ -789,11 +789,14 @@ static int32_t AcmDriverBind(struct HdfDeviceObject *device)
 
 static int32_t AcmDriverInit(struct HdfDeviceObject *device)
 {
+    (void)device;
     return 0;
 }
 
 static void AcmDriverRelease(struct HdfDeviceObject *device)
 {
+    (void)device;
+    return;
 }
 
 struct HdfDriverEntry g_usbRawApiSpeedDriverEntry = {

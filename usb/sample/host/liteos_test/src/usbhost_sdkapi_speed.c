@@ -303,18 +303,19 @@ static void UsbGetDevInfo(int32_t *busNum, int32_t *devNum)
     paraData.productId = USB_DEVICE_PRODUCT_ID;
     usbPnpDevice = UsbPnpNotifyGetUsbDevice(paraData);
     if (usbPnpDevice == NULL) {
-        HDF_LOGE("%s:%d UsbPnpNotifyGetUsbDevice is NULL!", __func__, __LINE__);
+        HDF_LOGE("%s:%d UsbPnpNotifyGetUsbDevice is null!", __func__, __LINE__);
         return;
     }
     *busNum = (int)usbPnpDevice->address;
     *devNum = (int)usbPnpDevice->port_no;
-    printf("%s:%d busNum=%d devNum=%d!\n", __func__, __LINE__, *busNum, *devNum);
+    printf("%s:%d busNum = %d, devNum = %d!\n", __func__, __LINE__, *busNum, *devNum);
 }
 
 static int32_t UsbSerialOpen(void)
 {
     return HDF_SUCCESS;
 }
+
 static int32_t UsbSerialClose(void)
 {
     if (!g_speedFlag) {
@@ -378,7 +379,7 @@ static int32_t UsbSpeedDdkInit(void)
 
     ret = UsbInitHostSdk(NULL);
     if (ret != HDF_SUCCESS) {
-        printf("%s: UsbInitHostSdk failed", __func__);
+        HDF_LOGE("%{public}s:%{public}d UsbInitHostSdk failed", __func__, __LINE__);
         return HDF_ERR_IO;
     }
 
@@ -393,6 +394,7 @@ static int32_t UsbSpeedDdkInit(void)
                 HDF_LOGI("%s: UsbOpenInterface null", __func__);
             }
         } else {
+            HDF_LOGE("%{public}s:%{public}d g_acm->iface[%hhu] is null.", __func__, __LINE__, i);
             return HDF_FAILURE;
         }
     }
@@ -402,7 +404,7 @@ static int32_t UsbSpeedDdkInit(void)
         g_acm->dataPipe = GetPipe(g_acm, USB_PIPE_TYPE_BULK, USB_PIPE_DIRECTION_IN);
     }
     if (g_acm->dataPipe == NULL) {
-        HDF_LOGE("%{public}s:%{public}d dataPipe is NULL\n", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d dataPipe is null\n", __func__, __LINE__);
         return HDF_FAILURE;
     }
 
@@ -586,11 +588,14 @@ static int32_t AcmDriverBind(struct HdfDeviceObject *device)
 
 static int32_t AcmDriverInit(struct HdfDeviceObject *device)
 {
+    (void)device;
     return 0;
 }
 
 static void AcmDriverRelease(struct HdfDeviceObject *device)
 {
+    (void)device;
+    return;
 }
 
 struct HdfDriverEntry g_usbSdkApiSpeedDriverEntry = {

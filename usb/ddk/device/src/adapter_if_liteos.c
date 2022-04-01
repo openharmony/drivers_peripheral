@@ -1102,6 +1102,7 @@ void UsbFnMemFree(const void *mem)
     uint32_t size = 0;
 
     if (mem == NULL) {
+        HDF_LOGE("%{public}s:%{public}d invalid param mem.", __func__, __LINE__);
         return;
     }
 
@@ -1117,7 +1118,7 @@ void UsbFnMemFree(const void *mem)
             totalSize += pos->size;
         }
         OsalMutexUnlock(&g_usbRamTestHead->lock);
-        HDF_LOGE("%{public}s rm size=%{public}u totalSize=%{public}d", __func__, size, totalSize);
+        HDF_LOGE("%{public}s:rm size = %{public}u, totalSize = %{public}u", __func__, size, totalSize);
     }
 
     if (mem != NULL) {

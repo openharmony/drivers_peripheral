@@ -310,7 +310,7 @@ int32_t UsbdClient::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::
     MessageParcel data;
     MessageParcel reply;
 
-    if (data.WriteInterfaceToken(GetDescriptor()) == false) {
+    if (!(data.WriteInterfaceToken(GetDescriptor()))) {
         HDF_LOGE(" WriteInterfaceToken failed.");
         return UEC_HDF_FAILURE;
     }

@@ -85,7 +85,7 @@ static void ParseFile(char *pch, struct ParseProcInfo &Pinfo)
     while (pch != nullptr) {
         if (strstr(pch, "VmRSS")) {
             pch = strtok(nullptr, " ");
-            Pinfo.ramCur = atof(pch);
+            Pinfo.ramCur = stod(pch);
             Pinfo.ramCount += 1;
             Pinfo.ramTotal += Pinfo.ramCur;
             if (Pinfo.ramCur > Pinfo.ramPeak) {
@@ -95,7 +95,7 @@ static void ParseFile(char *pch, struct ParseProcInfo &Pinfo)
         }
         if (strstr(pch, "Cpu")) {
             pch = strtok(nullptr, " ");
-            Pinfo.cpuCur = atof(pch);
+            Pinfo.cpuCur = stod(pch);
             Pinfo.cpuCount += 1;
             Pinfo.cpuTotal += Pinfo.cpuCur;
             if (Pinfo.cpuCur > Pinfo.cpuPeak) {
@@ -105,7 +105,7 @@ static void ParseFile(char *pch, struct ParseProcInfo &Pinfo)
         }
         if (strstr(pch, "Threads")) {
             pch = strtok(nullptr, " ");
-            Pinfo.threadCur = atoi(pch);
+            Pinfo.threadCur = stoi(pch);
             if (Pinfo.threadCur > Pinfo.threadPeak) {
                 Pinfo.threadPeak = Pinfo.threadCur;
             }
@@ -120,7 +120,12 @@ void CalcProcInfoFromFile(struct ProcInfo &info, const string &file)
     char s[100];
     char *pch;
     struct ParseProcInfo Pinfo = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0};
+
     FILE *f = fopen(file.c_str(), "r");
+    if (!f) {
+        printf("%s:%d file open failed.", __func__, __LINE__);
+        return;
+    }
     while (1) {
         if (fgets(s, sizeof(s), f) == nullptr) {
             break;
