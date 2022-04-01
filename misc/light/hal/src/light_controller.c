@@ -87,7 +87,7 @@ static int32_t ReadLightInfo(struct HdfSBuf *reply, struct LightDevice *priv)
             return HDF_FAILURE;
         }
 
-        pos->lightType = buf->lightType;
+        pos->lightId = buf->lightId;
         pos->reserved = buf->reserved;
         pos++;
     }
@@ -120,7 +120,7 @@ static int32_t GetLightInfo(struct LightInfo **lightInfo, uint32_t *count)
 
     int32_t ret = SendLightMsg(LIGHT_IO_CMD_GET_INFO_LIST, NULL, reply);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Light get light type failed, ret[%{public}d]", __func__, ret);
+        HDF_LOGE("%{public}s: Light send cmd failed, ret[%{public}d]", __func__, ret);
         HdfSbufRecycle(reply);
         (void)OsalMutexUnlock(&priv->mutex);
         return ret;
@@ -141,10 +141,10 @@ static int32_t GetLightInfo(struct LightInfo **lightInfo, uint32_t *count)
     return HDF_SUCCESS;
 }
 
-static int32_t ValidityJudgment(uint32_t type, struct LightEffect *effect)
+static int32_t ValidityJudgment(uint32_t lightId, struct LightEffect *effect)
 {
-    if (type >= LIGHT_TYPE_BUTT) {
-        HDF_LOGE("%{public}s: type not supported", __func__);
+    if (lightId >= LIGHT_ID_BUTT) {
+        HDF_LOGE("%{public}s: id not supported", __func__);
         return LIGHT_NOT_SUPPORT;
     }
 
@@ -162,7 +162,7 @@ static int32_t ValidityJudgment(uint32_t type, struct LightEffect *effect)
     return LIGHT_SUCCESS;
 }
 
-static int32_t OnLight(uint32_t type, struct LightEffect *effect)
+static int32_t OnLight(uint32_t lightId, struct LightEffect *effect)
 {
     int32_t ret;
 
@@ -171,7 +171,7 @@ static int32_t OnLight(uint32_t type, struct LightEffect *effect)
         return HDF_FAILURE;
     }
 
-    ret = ValidityJudgment(type, effect);
+    ret = ValidityJudgment(lightId, effect);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: effect is false", __func__);
         return ret;
@@ -187,7 +187,7 @@ static int32_t OnLight(uint32_t type, struct LightEffect *effect)
         return HDF_FAILURE;
     }
 
-    if (!HdfSbufWriteInt32(msg, type)) {
+    if (!HdfSbufWriteInt32(msg, lightId)) {
         HDF_LOGE("%{public}s: Light write id failed", __func__);
         HdfSbufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);
@@ -218,10 +218,10 @@ static int32_t OnLight(uint32_t type, struct LightEffect *effect)
     return ret;
 }
 
-static int32_t OffLight(uint32_t type)
+static int32_t OffLight(uint32_t lightId)
 {
-    if (type >= LIGHT_TYPE_BUTT) {
-        HDF_LOGE("%{public}s: type not supported", __func__);
+    if (lightId >= LIGHT_ID_BUTT) {
+        HDF_LOGE("%{public}s: id not supported", __func__);
         return HDF_FAILURE;
     }
 
@@ -235,7 +235,7 @@ static int32_t OffLight(uint32_t type)
         return HDF_FAILURE;
     }
 
-    if (!HdfSbufWriteInt32(msg, type)) {
+    if (!HdfSbufWriteInt32(msg, lightId)) {
         HDF_LOGE("%{public}s: Light write id failed", __func__);
         HdfSbufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);

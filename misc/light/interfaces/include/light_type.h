@@ -21,14 +21,14 @@
  *
  * The light module provides a unified interface for the light service to access the light driver.
  * After obtaining the light driver object or proxy, the service can call related APIs to obtain light information,
- * turn on or off a light, and set the light blinking mode based on the light type.
+ * turn on or off a light, and set the light blinking mode based on the light id.
  * @since 3.1
  */
 
 /**
  * @file light_type.h
  *
- * @brief Defines the light data structure, including the light type, lighting mode,
+ * @brief Defines the light data structure, including the light id, lighting mode,
  * blinking mode and duration, return values, and lighting effect.
  * @since 3.1
  */
@@ -52,7 +52,7 @@ extern "C" {
 enum LightStatus {
     /** The operation is successful. */
     LIGHT_SUCCESS            = 0,
-    /** The light type is not supported. */
+    /** The light id is not supported. */
     LIGHT_NOT_SUPPORT        = -1,
     /** Blinking setting is not supported. */
     LIGHT_NOT_FLASH          = -2,
@@ -61,21 +61,21 @@ enum LightStatus {
 };
 
 /**
- * @brief Enumerates the light types.
+ * @brief Enumerates the light ids.
  *
  * @since 3.1
  */
-enum LightType {
-    /** Unknown type */
-    LIGHT_TYPE_NONE                = 0,
+enum LightId {
+    /** Unknown id */
+    LIGHT_ID_NONE                = 0,
     /** Power light */
-    LIGHT_TYPE_BATTERY             = 1,
+    LIGHT_ID_BATTERY             = 1,
     /** Notification light */
-    LIGHT_TYPE_NOTIFICATIONS       = 2,
+    LIGHT_ID_NOTIFICATIONS       = 2,
     /** Alarm light */
-    LIGHT_TYPE_ATTENTION           = 3,
-    /** Invalid type */
-    LIGHT_TYPE_BUTT                = 4,
+    LIGHT_ID_ATTENTION           = 3,
+    /** Invalid id */
+    LIGHT_ID_BUTT                = 4,
 };
 
 /**
@@ -121,13 +121,13 @@ struct LightEffect {
 /**
  * @brief Defines the basic light information.
  *
- * Basic light information includes the light type and custom extended information.
+ * Basic light information includes the light id and custom extended information.
  *
  * @since 3.1
  */
 struct LightInfo {
-    uint32_t lightType; /** Light type. For details, see {@link LightType}. */
-    int32_t reserved;     /** Custom extended information. */
+    uint32_t lightId;    /** Light id. For details, see {@link LightId}. */
+    int32_t reserved;    /** Custom extended information. */
 };
 
 #ifdef __cplusplus

@@ -69,7 +69,7 @@ struct LightInterface {
     /**
      * @brief Turns on available lights in the list based on the specified light type.
      *
-     * @param type Indicates the light type. For details, see {@link LightType}.
+     * @param lightId Indicates the light type. For details, see {@link LightType}.
      *
      * @param effect Indicates the pointer to the lighting effect. For details, see {@link LightEffect}.
      *
@@ -80,19 +80,19 @@ struct LightInterface {
      *
      * @since 3.1
      */
-    int32_t (*TurnOnLight)(uint32_t type, struct LightEffect *effect);
+    int32_t (*TurnOnLight)(uint32_t lightId, struct LightEffect *effect);
 
     /**
      * @brief Turns off available lights in the list based on the specified light type.
      *
-     * @param type Indicates the light type. For details, see {@link LightType}.
+     * @param lightId Indicates the light type. For details, see {@link LightType}.
      *
      * @return Returns <b>0</b> if the operation is successful.
      * @return Returns a negative value if the operation fails.
      *
      * @since 3.1
      */
-    int32_t (*TurnOffLight)(uint32_t type);
+    int32_t (*TurnOffLight)(uint32_t lightId);
 };
 
 /**
