@@ -275,6 +275,10 @@ static int32_t WlanServiceStudGetFeatureByIfName(struct HdfDeviceIoClient *clien
         return HDF_ERR_INVALID_PARAM;
     }
     const char *ifName = HdfSbufReadString(data);
+    if (ifName == NULL) {
+        HDF_LOGE("%s: ifName is NULL", __func__);
+        return HDF_FAILURE;
+    }
     ret = g_wifi->getFeatureByIfName(ifName, (struct IWiFiBaseFeature **)&baseFeature);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s get FeatureByIfName failed!, error code: %d", __func__, ret);
