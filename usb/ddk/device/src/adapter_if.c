@@ -40,7 +40,9 @@ static bool g_usbRamTestFlag = false;
 static bool IsDirExist(const char *path)
 {
     DIR *dir = NULL;
+
     if (path == NULL) {
+        HDF_LOGE("%{public}s:%{public}d invalid param path.", __func__, __LINE__);
         return false;
     }
     
@@ -1324,7 +1326,7 @@ void *UsbFnMemCalloc(size_t size)
             totalSize += pos->size;
         }
         OsalMutexUnlock(&g_usbRamTestHead->lock);
-        HDF_LOGE("%{public}s add size=%{public}u totalSize=%{public}u", __func__, (uint32_t)size, totalSize);
+        HDF_LOGE("%{public}s:add size = %{public}zu, totalSize = %{public}u", __func__, size, totalSize);
     }
     return buf;
 }
@@ -1337,10 +1339,11 @@ void UsbFnMemFree(const void *mem)
     uint32_t size = 0;
 
     if (mem == NULL) {
+        HDF_LOGE("%{public}s:%{public}d invalid param mem.", __func__, __LINE__);
         return;
     }
 
-    if (g_usbRamTestFlag && (g_usbRamTestHead != NULL)) {
+    if (g_usbRamTestFlag && g_usbRamTestHead != NULL) {
         OsalMutexLock(&g_usbRamTestHead->lock);
         DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
             if (pos->address == (uintptr_t)mem) {
@@ -1352,7 +1355,7 @@ void UsbFnMemFree(const void *mem)
             totalSize += pos->size;
         }
         OsalMutexUnlock(&g_usbRamTestHead->lock);
-        HDF_LOGE("%{public}s rm size=%{public}d totalSize=%{public}d", __func__, size, totalSize);
+        HDF_LOGE("%{public}s:rm size = %{public}u, totalSize = %{public}u", __func__, size, totalSize);
     }
 
     if (mem != NULL) {

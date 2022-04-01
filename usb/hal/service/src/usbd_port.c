@@ -94,7 +94,7 @@ static int32_t WritePortFile(int32_t powerRole, int32_t dataRole, int32_t mode)
     int32_t len = strlen(modeStr);
     int32_t fd = open(fn, O_WRONLY | O_TRUNC);
     if (fd < 0) {
-        HDF_LOGE("%{public}s: file open error fd= %{public}d", __func__, fd);
+        HDF_LOGE("%{public}s: file open error fd = %{public}d", __func__, fd);
         return HDF_FAILURE;
     }
     int32_t ret = write(fd, modeStr, len);
@@ -134,7 +134,7 @@ int32_t SetPort(int32_t portId, int32_t powerRole, int32_t dataRole, const struc
 {
     int32_t ret = SetPortInit(portId, powerRole, dataRole);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: SetPortInit fail! ret:%{public}d", __func__, ret);
+        HDF_LOGE("%{public}s: SetPortInit failed! ret:%{public}d", __func__, ret);
         return ret;
     }
 
@@ -144,8 +144,8 @@ int32_t SetPort(int32_t portId, int32_t powerRole, int32_t dataRole, const struc
 
 int32_t QueryPort(int32_t *portId, int32_t *powerRole, int32_t *dataRole, int32_t *mode, struct UsbdService *service)
 {
-    if (portId == NULL || powerRole == NULL || dataRole == NULL || mode == NULL || service ==NULL) {
-        HDF_LOGE("%{public}s: Pointer is NULL", __func__);
+    if (portId == NULL || powerRole == NULL || dataRole == NULL || mode == NULL || service == NULL) {
+        HDF_LOGE("%{public}s: %{public}d invalid params", __func__, __LINE__);
         return HDF_FAILURE;
     }
     *portId = currentPortId;

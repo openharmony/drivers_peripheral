@@ -62,9 +62,8 @@ void UsbHostSdkIfTestIo::TearDown()
 
 static void AcmReadBulk(struct UsbRequest *req)
 {
-    uint32_t size;
+    uint32_t size = req->compInfo.actualLength;
     int32_t status = req->compInfo.status;
-    size = req->compInfo.actualLength;
     printf("Bulk status:%d,actualLength:%u\n", status, size);
     return;
 }
