@@ -19,8 +19,8 @@
 
 #define HDF_LOG_TAG codec_hdi_cb_server
 
-int32_t CodecCallbackTypeEventHandler(struct CodecCallbackType *self, int8_t *appData, uint32_t appDataLen,
-    enum OMX_EVENTTYPE eEvent, uint32_t data1, uint32_t data2, int8_t *eventData, uint32_t eventDataLen)
+int32_t CodecCallbackTypeEventHandler(struct CodecCallbackType *self, enum OMX_EVENTTYPE eEvent,
+    struct EventInfo *info)
 {
     HDF_LOGI("%{public}s, callback service impl", __func__);
     return HDF_SUCCESS;
