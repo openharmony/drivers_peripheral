@@ -66,59 +66,23 @@ static int32_t CodecComponentTypeProxyCall(struct CodecComponentType *self, int3
     return proxy->remote->dispatcher->Dispatch(proxy->remote, id, data, reply);
 }
 
-static int32_t ReadValuesForGetComponentVersion(struct HdfSBuf *reply, char *compName,
-    union OMX_VERSIONTYPE *compVersion, union OMX_VERSIONTYPE *specVersion, uint8_t *compUUID)
+static int32_t ReadValuesForGetComponentVersion(struct HdfSBuf *reply, struct CompVerInfo *verInfo)
 {
     int32_t ret;
-
-    const char *componentNameCopy = HdfSbufReadString(reply);
-    if (componentNameCopy == NULL) {
-        HDF_LOGE("%{public}s: read componentNameCopy failed!", __func__);
+    struct CompVerInfo *verInfoCp = (struct CompVerInfo *)HdfSbufReadUnpadBuffer(reply, sizeof(struct CompVerInfo));
+    if (verInfoCp == NULL) {
+        HDF_LOGE("%{public}s: read compVerInfo failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    ret = strcpy_s(compName, OMX_MAX_STRINGNAME_SIZE, componentNameCopy);
-    if (ret != EOK) {
-        HDF_LOGE("%{public}s: strcpy_s compName failed, error code: %{public}d", __func__, ret);
-        return HDF_FAILURE;
-    }
-
-    const union OMX_VERSIONTYPE *componentVersionCp
-        = (union OMX_VERSIONTYPE *)HdfSbufReadUnpadBuffer(reply, sizeof(union OMX_VERSIONTYPE));
-    if (componentVersionCp == NULL) {
-        HDF_LOGE("%{public}s: read componentVersionCp failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    ret = memcpy_s(compVersion, sizeof(union OMX_VERSIONTYPE), componentVersionCp, sizeof(union OMX_VERSIONTYPE));
+    ret = memcpy_s(verInfo, sizeof(struct CompVerInfo), verInfoCp, sizeof(struct CompVerInfo));
     if (ret != EOK) {
         HDF_LOGE("%{public}s: memcpy_s compVersion failed, error code: %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-
-    const union OMX_VERSIONTYPE *specVersionCp
-        = (union OMX_VERSIONTYPE *)HdfSbufReadUnpadBuffer(reply, sizeof(union OMX_VERSIONTYPE));
-    if (specVersionCp == NULL) {
-        HDF_LOGE("%{public}s: read specVersionCp failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    ret = memcpy_s(specVersion, sizeof(union OMX_VERSIONTYPE), specVersionCp, sizeof(union OMX_VERSIONTYPE));
-    if (ret != EOK) {
-        HDF_LOGE("%{public}s: memcpy_s specVersion failed, error code: %{public}d", __func__, ret);
-        return HDF_FAILURE;
-    }
-
-    uint32_t compUUIDLen = sizeof(OMX_UUIDTYPE);
-    for (uint32_t i = 0; i < compUUIDLen; i++) {
-        if (!HdfSbufReadUint8(reply, &compUUID[i])) {
-            HDF_LOGE("%{public}s: read compUUID[i] failed!", __func__);
-            return HDF_ERR_INVALID_PARAM;
-        }
-    }
-
     return HDF_SUCCESS;
 }
 
-static int32_t CodecComponentTypeProxyGetComponentVersion(struct CodecComponentType *self, char *compName,
-    union OMX_VERSIONTYPE *compVersion, union OMX_VERSIONTYPE *specVersion, uint8_t *compUUID, uint32_t compUUIDLen)
+static int32_t CodecComponentTypeProxyGetComponentVersion(struct CodecComponentType *self, struct CompVerInfo *verInfo)
 {
     int32_t ret;
 
@@ -136,12 +100,6 @@ static int32_t CodecComponentTypeProxyGetComponentVersion(struct CodecComponentT
         return HDF_FAILURE;
     }
 
-    if (!HdfSbufWriteUint32(data, compUUIDLen)) {
-        HDF_LOGE("%{public}s: write compUUIDLen failed!", __func__);
-        ReleaseSbuf(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
     ret = CodecComponentTypeProxyCall(self, CMD_GET_COMPONENT_VERSION, data, reply);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
@@ -149,7 +107,7 @@ static int32_t CodecComponentTypeProxyGetComponentVersion(struct CodecComponentT
         return ret;
     }
 
-    ret = ReadValuesForGetComponentVersion(reply, compName, compVersion, specVersion, compUUID);
+    ret = ReadValuesForGetComponentVersion(reply, verInfo);
     ReleaseSbuf(data, reply);
     return ret;
 }
@@ -610,7 +568,7 @@ static int32_t CodecComponentTypeProxyUseBuffer(struct CodecComponentType *self,
 }
 
 static int32_t CodecComponentTypeProxyAllocateBuffer(struct CodecComponentType *self,
-    struct OmxCodecBuffer *buffer, uint32_t portIndex)
+    uint32_t portIndex, struct OmxCodecBuffer *buffer)
 {
     int32_t ret;
 
@@ -628,14 +586,14 @@ static int32_t CodecComponentTypeProxyAllocateBuffer(struct CodecComponentType *
         return HDF_FAILURE;
     }
 
-    if (!OmxCodecBufferBlockMarshalling(data, buffer)) {
-        HDF_LOGE("%{public}s: write buffer failed!", __func__);
+    if (!HdfSbufWriteUint32(data, portIndex)) {
+        HDF_LOGE("%{public}s: write portIndex failed!", __func__);
         ReleaseSbuf(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (!HdfSbufWriteUint32(data, portIndex)) {
-        HDF_LOGE("%{public}s: write portIndex failed!", __func__);
+    if (!OmxCodecBufferBlockMarshalling(data, buffer)) {
+        HDF_LOGE("%{public}s: write buffer failed!", __func__);
         ReleaseSbuf(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }

@@ -65,29 +65,33 @@ static int32_t WriteArray(struct HdfSBuf *data, int8_t *array, uint32_t arrayLen
     return HDF_SUCCESS;
 }
 
-static int32_t WriteEventData(struct HdfSBuf *data, enum OMX_EVENTTYPE eEvent, uint32_t data1, uint32_t data2)
+static int32_t WriteEventInfo(struct HdfSBuf *data, struct EventInfo* info)
 {
-    if (!HdfSbufWriteUint32(data, (uint32_t)eEvent)) {
-        HDF_LOGE("%{public}s: write eEvent failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+    int32_t ret = WriteArray(data, info->appData, info->appDataLen);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write appData failed!", __func__);
+        return ret;
     }
 
-    if (!HdfSbufWriteUint32(data, data1)) {
+    if (!HdfSbufWriteUint32(data, info->data1)) {
         HDF_LOGE("%{public}s: write data1 failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (!HdfSbufWriteUint32(data, data2)) {
+    if (!HdfSbufWriteUint32(data, info->data2)) {
         HDF_LOGE("%{public}s: write data2 failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    return HDF_SUCCESS;
+    ret = WriteArray(data, info->eventData, info->eventDataLen);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write eventData failed!", __func__);
+    }
+    return ret;
 }
 
 static int32_t CodecCallbackTypeProxyEventHandler(struct CodecCallbackType *self,
-    int8_t *appData, uint32_t appDataLen, enum OMX_EVENTTYPE eEvent, uint32_t data1,
-    uint32_t data2, int8_t *eventData, uint32_t eventDataLen)
+    enum OMX_EVENTTYPE event, struct EventInfo* info)
 {
     int32_t ret;
 
@@ -105,32 +109,17 @@ static int32_t CodecCallbackTypeProxyEventHandler(struct CodecCallbackType *self
         return HDF_FAILURE;
     }
 
-    ret = WriteArray(data, appData, appDataLen);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: write appData failed!", __func__);
+    if (!HdfSbufWriteUint32(data, (uint32_t)event)) {
+        HDF_LOGE("%{public}s: write event failed!", __func__);
         ReleaseSbuf(data, reply);
-        return ret;
+        return HDF_ERR_INVALID_PARAM;
     }
 
-    ret = WriteEventData(data, eEvent, data1, data2);
+    ret = WriteEventInfo(data, info);
     if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write event info failed", __func__);
         ReleaseSbuf(data, reply);
-        return ret;
-    }
-
-    ret = WriteArray(data, eventData, eventDataLen);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: write eventData failed!", __func__);
-        ReleaseSbuf(data, reply);
-        return ret;
-    }
-
-    for (uint32_t i = 0; i < eventDataLen; i++) {
-        if (!HdfSbufWriteInt8(data, eventData[i])) {
-            HDF_LOGE("%{public}s: write eventData[i] failed!", __func__);
-            ReleaseSbuf(data, reply);
-            return HDF_ERR_INVALID_PARAM;
-        }
+        return HDF_ERR_INVALID_PARAM;
     }
 
     ret = CodecCallbackTypeProxyCall(self, CMD_EVENT_HANDLER, data, reply);
