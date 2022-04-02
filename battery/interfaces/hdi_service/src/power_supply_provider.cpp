@@ -406,6 +406,10 @@ void PowerSupplyProvider::UpdateInfoByReadSysFile(struct BatterydInfo* info) con
     ParseHealthState(&info->healthState_);
     ParseChargeState(&info->chargeState_);
     ParseChargeCounter(&info->chargeCounter_);
+    ParseCurrentNow(&info->curNow_);
+    ParseCurrentAverage(&info->curAverage_);
+    ParseRemainEnergy(&info->remainEnergy_);
+    ParseTotalEnergy(&info->totalEnergy_);
     ParsePresent(&info->present_);
 
     info->pluggedType_ = PLUGGED_TYPE_NONE;
@@ -479,6 +483,10 @@ void PowerSupplyProvider::CopyBatteryInfo(const struct BatterydInfo* info) const
     g_batteryInfo.pluggedMaxVoltage_ = info->pluggedMaxVoltage_;
     g_batteryInfo.chargeState_ = info->chargeState_;
     g_batteryInfo.chargeCounter_ = info->chargeCounter_;
+    g_batteryInfo.curNow_ = info->curNow_;
+    g_batteryInfo.curAverage_ = info->curAverage_;
+    g_batteryInfo.totalEnergy_ = info->totalEnergy_;
+    g_batteryInfo.remainEnergy_ = info->remainEnergy_;
     g_batteryInfo.present_ = info->present_;
     g_batteryInfo.technology_ = info->technology_;
 }
