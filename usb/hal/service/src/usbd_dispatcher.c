@@ -2814,7 +2814,7 @@ static void UsbdBulkASyncWriteCallbackAutoSubmit(struct UsbRequest *request)
     if (status == 0) {
         ret = UsbdBulkASyncReqWriteAutoSubmit(request);
         if (HDF_DEV_ERR_NODATA == ret) {
-            int32_t count = DlistGetCount(&node->list->eList);
+            int32_t count = DListGetCount(&node->list->eList);
             if (count >= USBD_BULKASYNCREQ_NUM_MAX) {
                 ret = UsbdBulkWriteRemoteCallback(node->list->pList->cb, HDF_SUCCESS, &node->list->pList->asmHandle);
             }
@@ -2846,7 +2846,7 @@ static void UsbdBulkASyncReadCallbackAutoSubmit(struct UsbRequest *request)
     if (status == 0) {
         ret = UsbdBulkASyncReqReadAutoSubmit(request);
         if (HDF_DEV_ERR_NODATA == ret) {
-            int32_t count = DlistGetCount(&node->list->eList);
+            int32_t count = DListGetCount(&node->list->eList);
             if (count >= USBD_BULKASYNCREQ_NUM_MAX) {
                 ret = UsbdBulkReadRemoteCallback(node->list->pList->cb, HDF_SUCCESS, &node->list->pList->asmHandle);
             }
