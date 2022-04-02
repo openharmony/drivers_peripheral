@@ -176,9 +176,7 @@ HWTEST_F(BufferManagerTest, TestHeapBuffer, TestSize.Level0)
 
         char src[4] = {'t', 'e', 's', 't'};
         char* dest = reinterpret_cast<char*>(buffer->GetVirAddress());
-        if (dest == nullptr) {
-            std::cerr << "dest allocate failed!" << std::endl;
-        }
+        EXPECT_EQ(true, dest != nullptr);
         (void)memcpy_s(dest, sizeof(char) * 4, src, sizeof(char) * 4);
         EXPECT_EQ(true, 0 == ::memcmp(src, dest, 4));
 
@@ -381,7 +379,7 @@ HWTEST_F(BufferManagerTest, TestTrackingBufferLoop, TestSize.Level0)
     for (auto it = graph.begin(); it != graph.end(); it++) {
         std::cout << "node [" << it->first << "] has buffer {";
         for (auto& b : it->second) {
-            std::cout << static_cast<unsigned long>(b.GetFrameNumber()) << ", ";
+            std::cout << static_cast<uint32_t>(b.GetFrameNumber()) << ", ";
         }
         std::cout << "}" << std::endl;
     }
@@ -725,8 +723,8 @@ void BufferManagerTest::Pipeline::CollectBuffers()
 
 void BufferManagerTest::Pipeline::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
-    buffer->SetFrameNumber(frameNumber++);
-    std::cout << "deliver buffer : " << static_cast<unsigned long>(frameNumber) << std::endl;
+    buffer->SetFrameNumber(frameNumber_++);
+    std::cout << "deliver buffer : " << static_cast<uint64_t>(frameNumber_) << std::endl;
     sourceNode_->Receive(buffer);
     return;
 }
@@ -800,7 +798,7 @@ void BufferManagerTest::Node::Process(std::shared_ptr<IBuffer>& buffer)
     return;
 }
 
-void BufferManagerTest::SinkNode::BindCallback(std::function<void(std::shared_ptr<IBuffer>&)> func)
+void BufferManagerTest::SinkNode::BindCallback(std::function<void(std::shared_ptr<IBuffer>&)>& func)
 {
     callback_ = func;
     return;

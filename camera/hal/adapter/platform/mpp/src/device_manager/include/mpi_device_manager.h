@@ -19,6 +19,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <stdlib.h>
 #include "create_devicemanager_factory.h"
 #include "icontroller.h"
 #include "idevice_manager.h"
@@ -58,10 +59,10 @@ public:
     void SetDevStatusCallBack(const DeviceStatusCb cb);
     RetCode SetFlashlight(FlashMode flashMode, bool enable, CameraId cameraId = CAMERA_MAX);
     void Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta);
-    virtual RetCode PreConfig(const ModeMeta& meta, const std::vector<DeviceStreamSetting>& settings) override;
-    virtual RetCode Flush(int32_t streamId) override;
-    virtual RetCode StartRecvFrame(int32_t streamId) override;
-    virtual RetCode StopRecvFrame(int32_t streamId) override;
+    RetCode PreConfig(const ModeMeta& meta, const std::vector<DeviceStreamSetting>& settings) override;
+    RetCode Flush(int32_t streamId) override;
+    RetCode StartRecvFrame(int32_t streamId) override;
+    RetCode StopRecvFrame(int32_t streamId) override;
 
 private:
     RetCode CreateController(std::shared_ptr<IManager> manager, ManagerId managerId);

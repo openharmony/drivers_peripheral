@@ -278,7 +278,7 @@ HWTEST_F(StabilityTest, Camera_Stability_Flashlight_0001, TestSize.Level3)
     // Cycle to turn on and off the flashlight
     for (int i = 0; i < 1000; i++) {
         std::cout <<"times: " << i << std::endl;
-        bool status= true;
+        bool status = true;
         Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), status);
         if (Test_->rc != Camera::NO_ERROR) {
             std::cout << "==========[test log] Check Performance: Flashlight turn on fail, at the " << (i+1);

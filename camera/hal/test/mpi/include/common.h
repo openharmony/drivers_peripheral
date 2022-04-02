@@ -181,11 +181,11 @@ public:
     {
         test_ = test;
     }
-    virtual void OnCameraStatus(const std::string &cameraId, CameraStatus status) override
+    void OnCameraStatus(const std::string &cameraId, CameraStatus status) override
     {
         test_->onCameraStatusFlag = true;
     }
-    virtual void OnFlashlightStatus(const std::string &cameraId, FlashlightStatus status) override
+    void OnFlashlightStatus(const std::string &cameraId, FlashlightStatus status) override
     {
         test_->onFlashlightStatusFlag = true;
     }
@@ -198,11 +198,11 @@ public:
     {
         test_ = test;
     }
-    virtual void OnError(ErrorType type, int32_t errorMsg) override
+    void OnError(ErrorType type, int32_t errorMsg) override
     {
         test_->onErrorFlag = true;
     }
-    virtual void OnResult(uint64_t timestamp, const std::shared_ptr<CameraStandard::CameraMetadata> &result) override
+    void OnResult(uint64_t timestamp, const std::shared_ptr<CameraStandard::CameraMetadata> &result) override
     {
         test_->onResultFlag = true;
     }
@@ -215,21 +215,21 @@ public:
     {
         test_ = test;
     }
-    virtual void OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId) override
+    void OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId) override
     {
         test_->captureStartFlag = true;
     }
-    virtual void OnCaptureEnded(int32_t captureId,
+    void OnCaptureEnded(int32_t captureId,
         const std::vector<std::shared_ptr<CaptureEndedInfo>> &info) override
     {
         test_->captureEndFlag = true;
     }
-    virtual void OnCaptureError(int32_t captureId,
+    void OnCaptureError(int32_t captureId,
         const std::vector<std::shared_ptr<CaptureErrorInfo>> &info) override
     {
         test_->captureErrorFlag = true;
     }
-    virtual void OnFrameShutter(int32_t captureId,
+    void OnFrameShutter(int32_t captureId,
         const std::vector<int32_t> &streamId, uint64_t timestamp) override
     {
         test_->frameShutterFlag = true;

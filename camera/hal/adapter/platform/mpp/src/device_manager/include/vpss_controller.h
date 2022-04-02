@@ -32,7 +32,7 @@ public:
     bool GetStartVpssState()
     {
         return startVpssState_;
-    };
+    }
     RetCode PowerUp(CameraId cameraId);
     RetCode PowerDown(CameraId cameraId);
     RetCode ConfigVpss();
@@ -47,16 +47,16 @@ public:
     {
         (void)meta;
         return RC_OK;
-    };
+    }
     bool GetMetaDataFlag()
     {
         return false;
-    };
+    }
     RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> camMeta)
     {
         (void)camMeta;
         return RC_OK;
-    };
+    }
     void SetMetaDataFlag(bool metaDataFlag)
     {
         (void)metaDataFlag;

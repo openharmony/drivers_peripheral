@@ -26,17 +26,17 @@ public:
     HeapBufferAllocator();
     virtual ~HeapBufferAllocator();
 
-    virtual RetCode Init() override;
+    RetCode Init() override;
 
-    virtual std::shared_ptr<IBuffer> AllocBuffer(const uint32_t width,
+    std::shared_ptr<IBuffer> AllocBuffer(const uint32_t width,
                                                  const uint32_t height,
                                                  const uint64_t cameraUsage,
                                                  const uint32_t format) override;
-    virtual RetCode FreeBuffer(std::shared_ptr<IBuffer>& buffer) override;
-    virtual RetCode MapBuffer(std::shared_ptr<IBuffer>&) override;
-    virtual RetCode UnmapBuffer(std::shared_ptr<IBuffer>&) override;
-    virtual RetCode FlushCache(std::shared_ptr<IBuffer>&) override;
-    virtual RetCode InvalidateCache(std::shared_ptr<IBuffer>&) override;
+    RetCode FreeBuffer(std::shared_ptr<IBuffer>& buffer) override;
+    RetCode MapBuffer(std::shared_ptr<IBuffer>&) override;
+    RetCode UnmapBuffer(std::shared_ptr<IBuffer>&) override;
+    RetCode FlushCache(std::shared_ptr<IBuffer>&) override;
+    RetCode InvalidateCache(std::shared_ptr<IBuffer>&) override;
 
 private:
     const int32_t sourceType_ = CAMERA_BUFFER_SOURCE_TYPE_HEAP;

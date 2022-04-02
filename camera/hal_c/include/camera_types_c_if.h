@@ -201,9 +201,9 @@ typedef struct GraphicBufferCIF {
     int height;
     int size;
     int format;
-    long long usage;
+    int64_t usage;
     void* virAddr;
-    unsigned long long phyAddr;
+    uint64_t phyAddr;
     int fence;
     int streamId;
 } GraphicBufferCIF;

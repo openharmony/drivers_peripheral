@@ -35,21 +35,21 @@ public:
     StreamBase& operator=(StreamBase&& other) = delete;
 
 public:
-    virtual RetCode ConfigStream(StreamConfiguration& config) override;
-    virtual RetCode CommitStream() override;
-    virtual RetCode StartStream() override;
-    virtual RetCode StopStream() override;
-    virtual RetCode AddRequest(std::shared_ptr<CaptureRequest>& request) override;
-    virtual RetCode CancelRequest(const std::shared_ptr<CaptureRequest>& request) override;
-    virtual RetCode AttachStreamTunnel(std::shared_ptr<StreamTunnel>& tunnel) override;
-    virtual RetCode DetachStreamTunnel() override;
-    virtual RetCode ChangeToOfflineStream(std::shared_ptr<OfflineStream> offlineStream) override;
-    virtual bool GetTunnelMode() const override;
-    virtual StreamConfiguration GetStreamAttribute() const override;
-    virtual int32_t GetStreamId() const override;
-    virtual RetCode Capture(const std::shared_ptr<CaptureRequest>& request) override;
-    virtual RetCode OnFrame(const std::shared_ptr<CaptureRequest>& request) override;
-    virtual bool IsRunning() const override;
+    RetCode ConfigStream(StreamConfiguration& config) override;
+    RetCode CommitStream() override;
+    RetCode StartStream() override;
+    RetCode StopStream() override;
+    RetCode AddRequest(std::shared_ptr<CaptureRequest>& request) override;
+    RetCode CancelRequest(const std::shared_ptr<CaptureRequest>& request) override;
+    RetCode AttachStreamTunnel(std::shared_ptr<StreamTunnel>& tunnel) override;
+    RetCode DetachStreamTunnel() override;
+    RetCode ChangeToOfflineStream(std::shared_ptr<OfflineStream> offlineStream) override;
+    bool GetTunnelMode() const override;
+    StreamConfiguration GetStreamAttribute() const override;
+    int32_t GetStreamId() const override;
+    RetCode Capture(const std::shared_ptr<CaptureRequest>& request) override;
+    RetCode OnFrame(const std::shared_ptr<CaptureRequest>& request) override;
+    bool IsRunning() const override;
 
     virtual void HandleRequest();
     virtual uint64_t GetUsage();

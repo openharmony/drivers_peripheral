@@ -31,21 +31,21 @@ public:
     BufferPool();
     virtual ~BufferPool();
 
-    virtual RetCode Init(const uint32_t width,
+    RetCode Init(const uint32_t width,
                          const uint32_t height,
                          const uint64_t usage,
                          const uint32_t bufferFormat,
                          const uint32_t count,
                          const int32_t bufferSourceType) override;
-    virtual RetCode AddBuffer(std::shared_ptr<IBuffer>& buffer) override;
-    virtual std::shared_ptr<IBuffer> AcquireBuffer(int timeout) override;
-    virtual RetCode ReturnBuffer(std::shared_ptr<IBuffer>& buffer) override;
-    virtual void EnableTracking(const int32_t id) override;
-    virtual void SetId(const int64_t id) override;
-    virtual void NotifyStop() override;
-    virtual void NotifyStart() override;
-    virtual void ClearBuffers() override;
-    virtual uint32_t GetIdleBufferCount() override;
+    RetCode AddBuffer(std::shared_ptr<IBuffer>& buffer) override;
+    std::shared_ptr<IBuffer> AcquireBuffer(int timeout) override;
+    RetCode ReturnBuffer(std::shared_ptr<IBuffer>& buffer) override;
+    void EnableTracking(const int32_t id) override;
+    void SetId(const int64_t id) override;
+    void NotifyStop() override;
+    void NotifyStart() override;
+    void ClearBuffers() override;
+    uint32_t GetIdleBufferCount() override;
 
 private:
     RetCode PrepareBuffer();

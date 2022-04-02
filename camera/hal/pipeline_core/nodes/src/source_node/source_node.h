@@ -24,15 +24,15 @@ class SourceNode : virtual public NodeBase {
 public:
     SourceNode(const std::string& name, const std::string& type);
     ~SourceNode() override;
-    virtual RetCode Init(const int32_t streamId) override;
-    virtual RetCode Start(const int32_t streamId) override;
-    virtual RetCode Flush(const int32_t streamId) override;
-    virtual RetCode Stop(const int32_t streamId) override;
-    virtual RetCode Capture(const int32_t streamId, const int32_t captureId) override;
-    virtual RetCode CancelCapture(const int32_t streamId) override;
-    virtual RetCode Config(const int32_t streamId, const CaptureMeta& meta) override;
-    virtual void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
-    virtual RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
+    RetCode Init(const int32_t streamId) override;
+    RetCode Start(const int32_t streamId) override;
+    RetCode Flush(const int32_t streamId) override;
+    RetCode Stop(const int32_t streamId) override;
+    RetCode Capture(const int32_t streamId, const int32_t captureId) override;
+    RetCode CancelCapture(const int32_t streamId) override;
+    RetCode Config(const int32_t streamId, const CaptureMeta& meta) override;
+    void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
+    RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
 
     virtual void OnPackBuffer(std::shared_ptr<FrameSpec> frameSpec);
     virtual void SetBufferCallback();

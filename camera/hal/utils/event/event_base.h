@@ -50,7 +50,7 @@ public:
         m_func = NULL;
     }
 
-    void SendEvent(T arg,Args... args)
+    void SendEvent(T arg, Args... args)
     {
         (m_obj->*pMemFunc(m_func))(arg, args...);
     }

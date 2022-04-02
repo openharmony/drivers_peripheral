@@ -25,12 +25,12 @@ public:
     virtual ~StreamOperatorCallback() = default;
 
 public:
-    virtual void OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId) override;
-    virtual void OnCaptureEnded(int32_t captureId,
+    void OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId) override;
+    void OnCaptureEnded(int32_t captureId,
         const std::vector<std::shared_ptr<CaptureEndedInfo>> &info) override;
-    virtual void OnCaptureError(int32_t captureId,
+    void OnCaptureError(int32_t captureId,
         const std::vector<std::shared_ptr<CaptureErrorInfo>> &info) override;
-    virtual void OnFrameShutter(int32_t captureId,
+    void OnFrameShutter(int32_t captureId,
         const std::vector<int32_t> &streamId, uint64_t timestamp) override;
 };
 }
