@@ -27,15 +27,15 @@ public:
     BufferAllocator() = default;
     virtual ~BufferAllocator() = default;
 
-    virtual RetCode Init() override;
+    RetCode Init() override;
 
-    virtual std::shared_ptr<IBuffer>
+    std::shared_ptr<IBuffer>
         AllocBuffer(const uint32_t, const uint32_t, const uint64_t, const uint32_t) override;
-    virtual RetCode FreeBuffer(std::shared_ptr<IBuffer>&) override;
-    virtual RetCode MapBuffer(std::shared_ptr<IBuffer>&) override;
-    virtual RetCode UnmapBuffer(std::shared_ptr<IBuffer>&) override;
-    virtual RetCode FlushCache(std::shared_ptr<IBuffer>&) override;
-    virtual RetCode InvalidateCache(std::shared_ptr<IBuffer>&) override;
+    RetCode FreeBuffer(std::shared_ptr<IBuffer>&) override;
+    RetCode MapBuffer(std::shared_ptr<IBuffer>&) override;
+    RetCode UnmapBuffer(std::shared_ptr<IBuffer>&) override;
+    RetCode FlushCache(std::shared_ptr<IBuffer>&) override;
+    RetCode InvalidateCache(std::shared_ptr<IBuffer>&) override;
 };
 } // namespace OHOS::Camera
 #endif

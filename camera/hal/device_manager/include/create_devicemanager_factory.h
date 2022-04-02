@@ -25,7 +25,7 @@ namespace Camera {
 typedef std::shared_ptr<IDeviceManager> (*createClass)(void);
 class CreateDeviceManagerFactory {
 public:
-    virtual ~CreateDeviceManagerFactory(){};
+    virtual ~CreateDeviceManagerFactory(){}
     std::shared_ptr<IDeviceManager> GetDeviceManagerByName(std::string className)
     {
         std::map<std::string, createClass>::const_iterator iter;
@@ -36,19 +36,19 @@ public:
         } else {
             return iter->second();
         }
-    };
+    }
     void RegistClass(std::string name, createClass method)
     {
         deviceManagerMap_.insert(std::pair<std::string, createClass>(name, method));
-    };
+    }
     static CreateDeviceManagerFactory& SharedDeviceManagerFactory()
     {
         static CreateDeviceManagerFactory deviceManagerFactory_;
         return deviceManagerFactory_;
-    };
+    }
 
 private:
-    CreateDeviceManagerFactory(){};
+    CreateDeviceManagerFactory(){}
     std::map<std::string, createClass> deviceManagerMap_;
 };
 
@@ -57,7 +57,7 @@ public:
     DeviceManagerDynamicClass(std::string name, createClass method)
     {
         CreateDeviceManagerFactory::SharedDeviceManagerFactory().RegistClass(name, method);
-    };
+    }
     ~DeviceManagerDynamicClass() {}
 };
 

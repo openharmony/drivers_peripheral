@@ -52,14 +52,14 @@ private:
     CameraHostConfig();
     class AutoRelease {
     public:
-        AutoRelease() {};
+        AutoRelease() {}
         ~AutoRelease()
         {
             if (CameraHostConfig::instance_ != nullptr) {
                 delete CameraHostConfig::instance_;
                 CameraHostConfig::instance_ = nullptr;
             }
-        };
+        }
     };
     static CameraHostConfig *instance_;
     static AutoRelease autoRelease_;

@@ -28,7 +28,7 @@ extern "C" {
 
 extern void BindCameraDeviceCallback(const OHOS::sptr<OHOS::Camera::ICameraDeviceCallback>& callback);
 extern void DeviceCBOnError(int /*ErrorTypeCIF*/ type, int errorMsg);
-extern void DeviceCBOnResult(long timestamp, CameraResultCIF* result);
+extern void DeviceCBOnResult(uint64_t timestamp, CameraResultCIF* result);
 
 #ifdef __cplusplus
 }

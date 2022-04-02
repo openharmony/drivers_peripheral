@@ -27,17 +27,17 @@ namespace OHOS::Camera {
 class TestNode
 {
 public:
-    ~TestNode() {};
-    TestNode() {};
+    ~TestNode() {}
+    TestNode() {}
 public:
-    void CallBack(std::shared_ptr<FrameSpec> buffer) {};
+    void CallBack(std::shared_ptr<FrameSpec> buffer) {}
     void Init()
     {
         std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();
         deviceManager->SetNodeCallBack([&](std::shared_ptr<FrameSpec> frameBuffer) {
             CallBack(frameBuffer);
         });
-    };
+    }
 };
 
 class TestDevice
@@ -84,7 +84,7 @@ HWTEST_F(UtestMpiDeviceManager, Init_Success, TestSize.Level0)
     if(DM != nullptr) {
         rc = DM->Init();
     }
-    EXPECT_EQ(RC_OK,rc);
+    EXPECT_EQ(RC_OK, rc);
 }
 
 HWTEST_F(UtestMpiDeviceManager, PowerUp_Failed, TestSize.Level0)
@@ -93,7 +93,7 @@ HWTEST_F(UtestMpiDeviceManager, PowerUp_Failed, TestSize.Level0)
     if(DM != nullptr) {
         rc = DM->PowerUp(CAMERA_THIRD);
     }
-    EXPECT_EQ(RC_ERROR,rc);
+    EXPECT_EQ(RC_ERROR, rc);
 }
 
 HWTEST_F(UtestMpiDeviceManager, PowerUp_Success, TestSize.Level0)
@@ -102,7 +102,7 @@ HWTEST_F(UtestMpiDeviceManager, PowerUp_Success, TestSize.Level0)
     if(DM != nullptr) {
         rc = DM->PowerUp(CAMERA_FIRST);
     }
-    EXPECT_EQ(RC_OK,rc);
+    EXPECT_EQ(RC_OK, rc);
 }
 
 HWTEST_F(UtestMpiDeviceManager, GetSensor_Success, TestSize.Level0)
@@ -111,9 +111,9 @@ HWTEST_F(UtestMpiDeviceManager, GetSensor_Success, TestSize.Level0)
     if(DM != nullptr) {
         sensor = DM->GetSensor(CAMERA_FIRST);
     }
-    CameraStandard::CameraMetadata meta(100,2000);
+    CameraStandard::CameraMetadata meta(100, 2000);
     sensor->Init(meta);
-    EXPECT_EQ(true,sensor != nullptr);
+    EXPECT_EQ(true, sensor != nullptr);
 }
 
 HWTEST_F(UtestMpiDeviceManager, GetSensor_Success2, TestSize.Level0)
@@ -122,9 +122,9 @@ HWTEST_F(UtestMpiDeviceManager, GetSensor_Success2, TestSize.Level0)
     if(DM != nullptr) {
         sensor = DM->GetSensor(CAMERA_SECOND);
     }
-    CameraStandard::CameraMetadata meta(100,2000);
+    CameraStandard::CameraMetadata meta(100, 2000);
     sensor->Init(meta);
-    EXPECT_EQ(true,sensor != nullptr);
+    EXPECT_EQ(true, sensor != nullptr);
 }
 
 
@@ -134,7 +134,7 @@ HWTEST_F(UtestMpiDeviceManager, GetSensor_Failed, TestSize.Level0)
     if(DM != nullptr) {
         sensor = DM->GetSensor(CAMERA_THIRD);
     }
-    EXPECT_EQ(true,sensor == nullptr);
+    EXPECT_EQ(true, sensor == nullptr);
 }
 
 HWTEST_F(UtestMpiDeviceManager, GetManager_Success, TestSize.Level0)
@@ -143,7 +143,7 @@ HWTEST_F(UtestMpiDeviceManager, GetManager_Success, TestSize.Level0)
     if(DM != nullptr) {
         manager = DM->GetManager(DM_M_VI);
     }
-    EXPECT_EQ(true,manager != nullptr);
+    EXPECT_EQ(true, manager != nullptr);
 }
 
 HWTEST_F(UtestMpiDeviceManager, GetManager_Failed, TestSize.Level0)
@@ -152,34 +152,34 @@ HWTEST_F(UtestMpiDeviceManager, GetManager_Failed, TestSize.Level0)
     if(DM != nullptr) {
         manager = DM->GetManager(DM_M_FLASH);
     }
-    EXPECT_EQ(true,manager == nullptr);
+    EXPECT_EQ(true, manager == nullptr);
 }
 
 HWTEST_F(UtestMpiDeviceManager, GetController_Success, TestSize.Level0)
 {
     std::shared_ptr<IController> controller;
     if(DM != nullptr) {
-        controller = DM->GetController(DM_M_VI,DM_C_VI);
+        controller = DM->GetController(DM_M_VI, DM_C_VI);
     }
-    EXPECT_EQ(true,controller != nullptr);
+    EXPECT_EQ(true, controller != nullptr);
 }
 
 HWTEST_F(UtestMpiDeviceManager, GetController_Failed1, TestSize.Level0)
 {
     std::shared_ptr<IController> controller;
     if(DM != nullptr) {
-        controller = DM->GetController(DM_M_VI,DM_C_SENSOR);
+        controller = DM->GetController(DM_M_VI, DM_C_SENSOR);
     }
-    EXPECT_EQ(true,controller == nullptr);
+    EXPECT_EQ(true, controller == nullptr);
 }
 
 HWTEST_F(UtestMpiDeviceManager, GetController_Failed2, TestSize.Level0)
 {
     std::shared_ptr<IController> controller;
     if(DM != nullptr) {
-        controller = DM->GetController(DM_M_VPSS,DM_C_VO);
+        controller = DM->GetController(DM_M_VPSS, DM_C_VO);
     }
-    EXPECT_EQ(true,controller == nullptr);
+    EXPECT_EQ(true, controller == nullptr);
 }
 
 HWTEST_F(UtestMpiDeviceManager, GetCameraId_Success, TestSize.Level0)
@@ -189,36 +189,36 @@ HWTEST_F(UtestMpiDeviceManager, GetCameraId_Success, TestSize.Level0)
         cameraId = DM->GetCameraId();
     }
     for (auto iter = cameraId.cbegin(); iter != cameraId.cend(); iter++) {
-        EXPECT_EQ(true,(*iter) != CAMERA_MAX);
+        EXPECT_EQ(true, (*iter) != CAMERA_MAX);
     }
 }
 
 HWTEST_F(UtestMpiDeviceManager, Connect_Success, TestSize.Level0)
 {
     std::shared_ptr<IController> controller;
-    controller = DM->GetController(DM_M_VI,DM_C_VI);
+    controller = DM->GetController(DM_M_VI, DM_C_VI);
     std::shared_ptr<ViController> vi;
     vi = std::static_pointer_cast<ViController>(controller);
     vi->ConfigVi();
     vi->StartVi();
-    RetCode rc = DM->Connect("vi#0","out#0","vpss#0","in#0");
-    EXPECT_EQ(RC_OK,rc);
+    RetCode rc = DM->Connect("vi#0", "out#0", "vpss#0", "in#0");
+    EXPECT_EQ(RC_OK, rc);
 
-    controller = DM->GetController(DM_M_VPSS,DM_C_VPSS);
+    controller = DM->GetController(DM_M_VPSS, DM_C_VPSS);
     std::shared_ptr<VpssController> vpss;
     vpss = std::static_pointer_cast<VpssController>(controller);
     vpss->ConfigVpss();
     vpss->StartVpss();
-    rc = DM->Connect("vpss#0","out#0","vo#0","in#0");
-    EXPECT_EQ(RC_OK,rc);
+    rc = DM->Connect("vpss#0", "out#0", "vo#0", "in#0");
+    EXPECT_EQ(RC_OK, rc);
 
-    controller = DM->GetController(DM_M_VO,DM_C_VO);
+    controller = DM->GetController(DM_M_VO, DM_C_VO);
     std::shared_ptr<VoController> vo;
     vo = std::static_pointer_cast<VoController>(controller);
     rc = vo->ConfigVo();
-    EXPECT_EQ(RC_OK,rc);
+    EXPECT_EQ(RC_OK, rc);
     rc = vo->StartVo();
-    EXPECT_EQ(RC_OK,rc);
+    EXPECT_EQ(RC_OK, rc);
     sleep(1);
 }
 
@@ -235,15 +235,15 @@ HWTEST_F(UtestMpiDeviceManager, SendFrameBuffer_Success, TestSize.Level0)
 HWTEST_F(UtestMpiDeviceManager, Configure_Success, TestSize.Level0)
 {
     std::shared_ptr<IController> controller;
-    controller = DM->GetController(DM_M_VI,DM_C_VI);
-    EXPECT_EQ(true,controller != nullptr);
-    std::shared_ptr<CameraStandard::CameraMetadata> meta = std::make_shared<CameraStandard::CameraMetadata>(100,2000);
+    controller = DM->GetController(DM_M_VI, DM_C_VI);
+    EXPECT_EQ(true, controller != nullptr);
+    std::shared_ptr<CameraStandard::CameraMetadata> meta = std::make_shared<CameraStandard::CameraMetadata>(100, 2000);
     int32_t expo = 0;
-    meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo ,1);
+    meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo , 1);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_AUTO;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     RetCode rc = controller->Configure(meta);
-    EXPECT_EQ(RC_OK,rc);
+    EXPECT_EQ(RC_OK, rc);
     sleep(1);
 }
 
@@ -262,25 +262,25 @@ HWTEST_F(UtestMpiDeviceManager, UnConnect_Success, TestSize.Level0)
 {
     RetCode rc = RC_ERROR;
     std::shared_ptr<IController> controller;
-    controller = DM->GetController(DM_M_VPSS,DM_C_VPSS);
+    controller = DM->GetController(DM_M_VPSS, DM_C_VPSS);
     std::shared_ptr<VpssController> vpss;
     vpss = std::static_pointer_cast<VpssController>(controller);
-    rc = DM->UnConnect("vpss#0","out#0","vo#0","in#0");
-    EXPECT_EQ(RC_OK,rc);
+    rc = DM->UnConnect("vpss#0", "out#0", "vo#0", "in#0");
+    EXPECT_EQ(RC_OK, rc);
     vpss->StopVpss();
 
-    controller = DM->GetController(DM_M_VO,DM_C_VO);
+    controller = DM->GetController(DM_M_VO, DM_C_VO);
     std::shared_ptr<VoController> vo;
     vo = std::static_pointer_cast<VoController>(controller);
     rc = vo->StopVo();
-    EXPECT_EQ(RC_OK,rc);
+    EXPECT_EQ(RC_OK, rc);
 
-    controller = DM->GetController(DM_M_VI,DM_C_VI);
+    controller = DM->GetController(DM_M_VI, DM_C_VI);
     std::shared_ptr<ViController> vi;
     vi = std::static_pointer_cast<ViController>(controller);
-    rc = DM->UnConnect("vi#0","out#0","vpss#0","in#0");
+    rc = DM->UnConnect("vi#0", "out#0", "vpss#0", "in#0");
     vi->StopVi();
-    EXPECT_EQ(RC_OK,rc);
+    EXPECT_EQ(RC_OK, rc);
 }
 
 HWTEST_F(UtestMpiDeviceManager, PowerDown_Success, TestSize.Level0)
@@ -289,38 +289,38 @@ HWTEST_F(UtestMpiDeviceManager, PowerDown_Success, TestSize.Level0)
     if(DM != nullptr) {
         rc = DM->PowerDown(CAMERA_FIRST);
     }
-    EXPECT_EQ(RC_OK,rc);
+    EXPECT_EQ(RC_OK, rc);
 }
 
 HWTEST_F(UtestMpiDeviceManager, Connect_Failed1, TestSize.Level0)
 {
     std::shared_ptr<IController> controller;
-    controller = DM->GetController(DM_M_VI,DM_C_VI);
+    controller = DM->GetController(DM_M_VI, DM_C_VI);
     std::shared_ptr<ViController> vi;
     vi = std::static_pointer_cast<ViController>(controller);
-    RetCode rc = DM->Connect("vi#0","out#1","venc#0","in#0");
-    EXPECT_EQ(RC_OK,rc);
+    RetCode rc = DM->Connect("vi#0", "out#1", "venc#0", "in#0");
+    EXPECT_EQ(RC_OK, rc);
 }
 
 HWTEST_F(UtestMpiDeviceManager, Connect_Failed2, TestSize.Level0)
 {
     std::shared_ptr<IController> controller;
-    controller = DM->GetController(DM_M_VO,DM_C_VO);
+    controller = DM->GetController(DM_M_VO, DM_C_VO);
     std::shared_ptr<VoController> vo;
     vo = std::static_pointer_cast<VoController>(controller);
-    RetCode rc = DM->Connect("vo#0","out#4","vi#0","in#0");
-    EXPECT_EQ(RC_ERROR,rc);
+    RetCode rc = DM->Connect("vo#0", "out#4", "vi#0", "in#0");
+    EXPECT_EQ(RC_ERROR, rc);
 }
 
 HWTEST_F(UtestMpiDeviceManager, UnConnect_Failed1, TestSize.Level0)
 {
-    RetCode rc = DM->UnConnect("vpss#0","out#0","vpss#0","in#0");
-    EXPECT_EQ(RC_ERROR,rc);
+    RetCode rc = DM->UnConnect("vpss#0", "out#0", "vpss#0", "in#0");
+    EXPECT_EQ(RC_ERROR, rc);
 }
 
 HWTEST_F(UtestMpiDeviceManager, UnConnect_Failed2, TestSize.Level0)
 {
-    RetCode rc = DM->UnConnect("test#0","out#0","vpss#0","in#0");
-    EXPECT_EQ(RC_OK,rc);
+    RetCode rc = DM->UnConnect("test#0", "out#0", "vpss#0", "in#0");
+    EXPECT_EQ(RC_OK, rc);
 }
 }// namespace OHOS::Camera

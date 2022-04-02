@@ -28,11 +28,11 @@ public:
     virtual ~StreamStillCapture();
 
 public:
-    virtual void HandleResult(std::shared_ptr<IBuffer>& buffer) override;
-    virtual RetCode Capture(const std::shared_ptr<CaptureRequest>& request) override;
-    virtual RetCode ChangeToOfflineStream(std::shared_ptr<OfflineStream> offlineStream) override;
-    virtual RetCode StopStream() override;
-    virtual bool IsRunning() const override;
+    void HandleResult(std::shared_ptr<IBuffer>& buffer) override;
+    RetCode Capture(const std::shared_ptr<CaptureRequest>& request) override;
+    RetCode ChangeToOfflineStream(std::shared_ptr<OfflineStream> offlineStream) override;
+    RetCode StopStream() override;
+    bool IsRunning() const override;
 
 private:
     std::weak_ptr<OfflineStream> offlineStream;

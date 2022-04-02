@@ -27,7 +27,7 @@ typedef struct StreamOperatorCallbackCIF {
     void (*OnCaptureStarted)(int captureId, int* streamId, int count);
     void (*OnCaptureEnded)(int captureId, CaptureEndedInfoCIF* info, int count);
     void (*OnCaptureError)(int captureId, CaptureErrorInfoCIF* info, int count);
-    void (*OnFrameShutter)(int captureId, int* streamId, int count, long timestamp);
+    void (*OnFrameShutter)(int captureId, int* streamId, int count, uint64_t timestamp);
 } StreamOperatorCallbackCIF;
 
 typedef struct OfflineStreamOperatorCIF {

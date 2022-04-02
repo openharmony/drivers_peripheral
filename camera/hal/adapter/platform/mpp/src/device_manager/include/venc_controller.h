@@ -32,19 +32,19 @@ public:
     bool GetStartVencState()
     {
         return startVencState_;
-    };
+    }
     RetCode StartGetStream()
     {
         return RC_OK;
-    };
+    }
     RetCode StopGetStream()
     {
         return RC_OK;
-    };
+    }
     RetCode SnapProcess()
     {
         return RC_OK;
-    };
+    }
     RetCode PowerUp(CameraId cameraId);
     RetCode PowerDown(CameraId cameraId);
     RetCode StopVenc();
@@ -54,7 +54,7 @@ public:
     {
         (void)camMeta;
         return RC_OK;
-    };
+    }
     void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag)
     {
         (void)abilityMetaDataTag;
@@ -63,11 +63,11 @@ public:
     {
         (void)meta;
         return RC_OK;
-    };
+    }
     bool GetMetaDataFlag()
     {
         return false;
-    };
+    }
     void SetMetaDataFlag(bool dataFlag)
     {
         (void)dataFlag;

@@ -63,7 +63,7 @@ public:
         : ICaptureMessage(streamId, captureId, time, count)
     {
     }
-    virtual CaptureMessageType GetMessageType() const override
+    CaptureMessageType GetMessageType() const override
     {
         return CAPTURE_MESSAGE_TYPE_ON_STARTED;
     }
@@ -81,7 +81,7 @@ public:
     {
         return frameCount_;
     }
-    virtual CaptureMessageType GetMessageType() const override
+    CaptureMessageType GetMessageType() const override
     {
         return CAPTURE_MESSAGE_TYPE_ON_ENDED;
     }
@@ -104,7 +104,7 @@ public:
         return errorCode_;
     }
 
-    virtual CaptureMessageType GetMessageType() const override
+    CaptureMessageType GetMessageType() const override
     {
         return CAPTURE_MESSAGE_TYPE_ON_ERROR;
     }
@@ -120,7 +120,7 @@ public:
         : ICaptureMessage(streamId, captureId, time, count)
     {
     }
-    virtual CaptureMessageType GetMessageType() const override
+    CaptureMessageType GetMessageType() const override
     {
         return CAPTURE_MESSAGE_TYPE_ON_SHUTTER;
     }

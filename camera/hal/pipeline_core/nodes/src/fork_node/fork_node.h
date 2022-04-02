@@ -30,7 +30,7 @@ public:
     RetCode Stop(const int32_t streamId) override;
     void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
     void ForkBuffers();
-    virtual RetCode Capture(const int32_t streamId, const int32_t captureId) override;
+    RetCode Capture(const int32_t streamId, const int32_t captureId) override;
     RetCode CancelCapture(const int32_t streamId) override;
     RetCode Flush(const int32_t streamId);
 private:

@@ -33,7 +33,6 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include <unistd.h>
 #include <sys/wait.h>
 
 #include "icamera_host.h"
@@ -69,7 +68,7 @@ class TestStreamConsumerListener: public IBufferConsumerListener {
 
 class StreamConsumer {
     public:
-        OHOS::sptr<OHOS::IBufferProducer> CreateProducer(std::function<void(void*, uint32_t)> callback)
+        OHOS::sptr<OHOS::IBufferProducer> CreateProducer(std::function<void(void*, uint32_t)>& callback)
         {
             consumer_ = OHOS::Surface::CreateSurfaceAsConsumer();
             if (consumer_ == nullptr) {

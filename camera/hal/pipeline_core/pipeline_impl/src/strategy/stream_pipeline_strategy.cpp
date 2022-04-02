@@ -37,7 +37,7 @@ std::shared_ptr<PipelineSpec> StreamPipelineStrategy::GeneratePipelineSpec(const
 std::string StreamPipelineStrategy::ConstructKeyStrIndex(const int32_t& mode)
 {
     std::string keyStr;
-    std::string sceneStr= CheckIdExsit(mode, G_SCENE_TABLE_PTR, G_SCENE_TABLE_SIZE);
+    std::string sceneStr = CheckIdExsit(mode, G_SCENE_TABLE_PTR, G_SCENE_TABLE_SIZE);
     if (sceneStr.empty()) {
         CAMERA_LOGE("scene:%{public}d not supported!\n", mode);
         return keyStr;
@@ -93,7 +93,7 @@ RetCode StreamPipelineStrategy::SetUpBasicInPortFormat(const NodeSpec& nodeSpec,
     return RC_OK;
 }
 PortFormat StreamPipelineStrategy::SetPortFormat(G_PIPELINE_SPEC_DATA_TYPE &pipeSpecPtr,
-                                                 std::optional<int32_t> typeId,
+                                                 std::optional<int32_t>& typeId,
                                                  int j,
                                                  int k,
                                                  HostStreamInfo hostStreamInfo)
@@ -112,7 +112,7 @@ PortFormat StreamPipelineStrategy::SetPortFormat(G_PIPELINE_SPEC_DATA_TYPE &pipe
     return f;
 }
 
-void StreamPipelineStrategy::InitPipeSpecPtr(G_PIPELINE_SPEC_DATA_TYPE &pipeSpecPtr, std::string keyStr)
+void StreamPipelineStrategy::InitPipeSpecPtr(G_PIPELINE_SPEC_DATA_TYPE &pipeSpecPtr, std::string& keyStr)
 {
     for (int i = 0; i < G_PIPELINE_SPECS_SIZE; i++) {
         if (G_PIPELINE_SPECS_TABLE[i].name == keyStr) {
@@ -248,7 +248,7 @@ std::unique_ptr<StreamPipelineStrategy> StreamPipelineStrategy::Create(const std
 
 RetCode StreamPipelineStrategy::CheckPipelineSpecExist(const int32_t mode, const std::vector<int32_t>& types)
 {
-    std::string sceneStr= CheckIdExsit(mode, G_SCENE_TABLE_PTR, G_SCENE_TABLE_SIZE);
+    std::string sceneStr = CheckIdExsit(mode, G_SCENE_TABLE_PTR, G_SCENE_TABLE_SIZE);
     if (sceneStr.empty()) {
         return RC_ERROR;
     }

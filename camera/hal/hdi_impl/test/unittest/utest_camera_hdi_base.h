@@ -35,7 +35,6 @@
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <sys/wait.h>
-#include <unistd.h>
 
 #include "icamera_host.h"
 #include "camera_host_callback.h"
