@@ -24,13 +24,13 @@
 #define AUDIO_ADAPTER_CONFIG    HDF_CONFIG_DIR"/adapter_config.json"
 #define ADAPTER_NAME_LEN        32
 #define PORT_NAME_LEN           ADAPTER_NAME_LEN
-#define SUPPORT_PORT_NUM_MAX    3
-#define SUPPORT_PORT_ID_MAX     18
-#define CONFIG_FILE_SIZE_MAX    (SUPPORT_ADAPTER_NUM_MAX * 1024)  // 8KB
+#define SUPPORT_PORT_NUM_MAX    4
+#define SUPPORT_PORT_ID_MAX     41
+#define CONFIG_FILE_SIZE_MAX    (SUPPORT_ADAPTER_NUM_MAX * 1024 * 2)  // 16KB
 #define CONFIG_CHANNEL_COUNT    2 // two channels
 #define TIME_BASE_YEAR_1900     1900
 #define DECIMAL_SYSTEM          10
-#define MAX_ADDR_RECORD_NUM (SUPPORT_ADAPTER_NUM_MAX*3)
+#define MAX_ADDR_RECORD_NUM     (SUPPORT_ADAPTER_NUM_MAX * 3)
 
 int32_t g_adapterNum = 0;
 struct AudioAdapterDescriptor *g_audioAdapterOut = NULL;
@@ -560,6 +560,65 @@ static int32_t AudioAdapterParsePort(struct AudioPort *info, const cJSON *port)
     return HDF_SUCCESS;
 }
 
+enum AudioAdapterType MatchAdapterType(const char *adapterName, uint32_t portId)
+{
+    if (adapterName == NULL) {
+        LOG_FUN_ERR("Invalid parameter!\n");
+
+        return AUDIO_ADAPTER_MAX;
+    }
+
+    if (strncmp(adapterName, "primary", strlen("primary")) == 0) {
+        if (portId >= AUDIO_PRIMARY_ID_MIN && portId <= AUDIO_PRIMARY_ID_MAX) {
+            return AUDIO_ADAPTER_PRIMARY;
+        }
+        return AUDIO_ADAPTER_PRIMARY_EXT;
+    } else if (strcmp(adapterName, "usb") == 0) {
+        return AUDIO_ADAPTER_USB;
+    } else if (strcmp(adapterName, "a2dp") == 0) {
+        return AUDIO_ADAPTER_A2DP;
+    } else {
+        return AUDIO_ADAPTER_MAX;
+    }
+}
+
+int32_t AudioAdapterCheckPortId(const char *adapterName, uint32_t portId)
+{
+    if (adapterName == NULL) {
+        LOG_FUN_ERR("Invalid parameter!\n");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    enum AudioAdapterType adapterType = MatchAdapterType(adapterName, portId);
+    switch (adapterType) {
+        case AUDIO_ADAPTER_PRIMARY:
+            if (portId < AUDIO_PRIMARY_ID_MIN || portId > AUDIO_PRIMARY_ID_MAX) {
+                return HDF_FAILURE;
+            }
+            break;
+        case AUDIO_ADAPTER_PRIMARY_EXT:
+            if (portId < AUDIO_PRIMARY_EXT_ID_MIN || portId > AUDIO_PRIMARY_EXT_ID_MAX) {
+                return HDF_FAILURE;
+            }
+            break;
+        case AUDIO_ADAPTER_USB:
+            if (portId < AUDIO_USB_ID_MIN || portId > AUDIO_USB_ID_MAX) {
+                return HDF_FAILURE;
+            }
+            break;
+        case AUDIO_ADAPTER_A2DP:
+            if (portId < AUDIO_A2DP_ID_MIN || portId > AUDIO_A2DP_ID_MAX) {
+                return HDF_FAILURE;
+            }
+            break;
+        default:
+            LOGE("%s: An unsupported adapter type.", __func__);
+            return HDF_ERR_NOT_SUPPORT;
+    }
+
+    return HDF_SUCCESS;
+}
+
 static int32_t AudioAdapterParsePorts(struct AudioAdapterDescriptor *desc, const cJSON *adapter)
 {
     uint32_t i;
@@ -605,6 +664,11 @@ static int32_t AudioAdapterParsePorts(struct AudioAdapterDescriptor *desc, const
         adapterPort = cJSON_GetArrayItem(adapterPorts, i);
         if (adapterPort != NULL) {
             ret = AudioAdapterParsePort(&desc->ports[i], adapterPort);
+            if (ret != HDF_SUCCESS) {
+                return ret;
+            }
+
+            ret = AudioAdapterCheckPortId(desc->adapterName, desc->ports[i].portId);
             if (ret != HDF_SUCCESS) {
                 return ret;
             }
@@ -910,21 +974,59 @@ int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size)
     return HDF_SUCCESS;
 }
 
+bool ReleaseAudioManagerObjectComm(struct AudioManager *object)
+{
+    if (object == NULL) {
+        return false;
+    }
+
+    object->GetAllAdapters = NULL;
+    object->LoadAdapter = NULL;
+    object->UnloadAdapter = NULL;
+    object->ReleaseAudioManagerObject = NULL;
+
+    if (g_audioAdapterDescs != NULL && g_audioAdapterOut != NULL &&
+        g_adapterNum > 0 && g_adapterNum <= SUPPORT_ADAPTER_NUM_MAX) {
+        AudioAdaptersNamesRepair();
+        AudioPortsNamesRepair();
+    }
+
+    AudioAdapterReleaseDescs(g_audioAdapterDescs, g_adapterNum);
+    AudioAdapterReleaseDescs(g_audioAdapterOut, g_adapterNum);
+    g_audioAdapterDescs = NULL;
+    g_audioAdapterOut = NULL;
+    g_adapterNum = 0;
+
+    return true;
+}
+
 static enum AudioFormat g_formatIdZero = AUDIO_FORMAT_PCM_16_BIT;
-int32_t HdmiPortInit(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex)
+int32_t InitPortForCapabilitySub(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex)
 {
     if (capabilityIndex == NULL) {
         LOG_FUN_ERR("capabilityIndex Is NULL");
         return HDF_FAILURE;
     }
+    if (portIndex.portId == 0 || (portIndex.portId > 1 && portIndex.portId <= AUDIO_PRIMARY_ID_MAX)) {
+        capabilityIndex->deviceId = PIN_OUT_SPEAKER;
+        capabilityIndex->sampleRateMasks = AUDIO_SAMPLE_RATE_MASK_16000;
+    } else if (portIndex.portId == 1 ||
+        (portIndex.portId >= AUDIO_USB_ID_MIN && portIndex.portId <= AUDIO_USB_ID_MAX)) {
+        capabilityIndex->deviceId = PIN_OUT_HEADSET;
+        capabilityIndex->sampleRateMasks = AUDIO_SAMPLE_RATE_MASK_16000 | AUDIO_SAMPLE_RATE_MASK_8000;
+    } else if (portIndex.portId >= AUDIO_PRIMARY_EXT_ID_MIN && portIndex.portId <= AUDIO_PRIMARY_EXT_ID_MAX) {
+        capabilityIndex->deviceId = PIN_OUT_SPEAKER;
+        capabilityIndex->sampleRateMasks = AUDIO_SAMPLE_RATE_MASK_16000 | AUDIO_SAMPLE_RATE_MASK_24000;
+    } else {
+        LOG_FUN_ERR("The port ID not support!");
+        return HDF_ERR_NOT_SUPPORT;
+    }
     capabilityIndex->hardwareMode = true;
     capabilityIndex->channelMasks = AUDIO_CHANNEL_STEREO;
     capabilityIndex->channelCount = CONFIG_CHANNEL_COUNT;
     capabilityIndex->deviceType = portIndex.dir;
-    capabilityIndex->deviceId = PIN_OUT_SPEAKER;
     capabilityIndex->formatNum = 1;
     capabilityIndex->formats = &g_formatIdZero;
-    capabilityIndex->sampleRateMasks = AUDIO_SAMPLE_RATE_MASK_16000 | AUDIO_SAMPLE_RATE_MASK_24000;
     capabilityIndex->subPortsNum = 1;
     capabilityIndex->subPorts = (struct AudioSubPortCapability *)calloc(capabilityIndex->subPortsNum,
         sizeof(struct AudioSubPortCapability));

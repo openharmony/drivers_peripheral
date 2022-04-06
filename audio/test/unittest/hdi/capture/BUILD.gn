@@ -66,7 +66,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   ###########################unittest###########################
-  module_output_path = "hdf/audio/unittest/hal"
+  module_output_path = "audio_device_driver/audio"
 
   ###########################hdf_audio_hdi_capture_test###########################
   ohos_unittest("hdf_audio_hdi_capture_test") {

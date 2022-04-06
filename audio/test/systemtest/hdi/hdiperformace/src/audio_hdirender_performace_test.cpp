@@ -40,7 +40,6 @@ using namespace testing::ext;
 using namespace HMOS::Audio;
 
 namespace {
-const string ADAPTER_NAME_USB = "usb";
 const float COUNT = 1000;
 const int32_t LOWLATENCY = 10000;
 const int32_t NORMALLATENCY = 30000;
@@ -242,7 +241,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerInitAllPorts_Pe
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .totalTime = 0
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -276,7 +275,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioGetPortCapability_Perf
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .totalTime = 0
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -312,7 +311,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioSetPassthroughMode_Per
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .mode = PORT_PASSTHROUGH_LPCM,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .mode = PORT_PASSTHROUGH_LPCM,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -352,7 +351,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioGetPassthroughMode_Per
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .mode = PORT_PASSTHROUGH_LPCM,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .mode = PORT_PASSTHROUGH_LPCM,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -392,7 +391,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetLatency_Perfo
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str(), .totalTime = 0
     };
     uint32_t latencyTimeExpc = 0;
@@ -431,7 +430,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioCreateRender_Performan
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -475,7 +474,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioDestroyRender_Performa
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -518,7 +517,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetRenderPositio
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str(), .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -556,7 +555,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetRenderSpeed_P
     int32_t ret = -1;
     float speedNormal = 30;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -597,7 +596,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetRenderSpeed_P
     int32_t ret = -1;
     float speedValue = 30;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -636,7 +635,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetChannelMode_P
     int32_t ret = -1;
     enum AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -677,7 +676,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetChannelMode_P
     int32_t ret = -1;
     enum AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -718,7 +717,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetFrameCount_Pe
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -756,7 +755,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetCurrentChanne
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -794,7 +793,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderFlush_Performanc
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -833,7 +832,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetFrameSize_Per
     int32_t ret = -1;
     uint64_t zero = 0;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -877,7 +876,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderCheckSceneCapabi
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     struct AudioSceneDescriptor scenes = {.scene.id = 0, .desc.pins = PIN_OUT_SPEAKER};
@@ -916,7 +915,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSelectScene_Perf
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     struct AudioSceneDescriptor scenes = {.scene.id = 0, .desc.pins = PIN_OUT_SPEAKER};
@@ -955,7 +954,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetMute_Performa
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -995,7 +994,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetMute_Performa
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -1035,7 +1034,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetVolume_Perfor
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .character.setvolume = 0.8, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -1076,7 +1075,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetVolume_Perfor
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -1114,7 +1113,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetGainThreshold
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -1153,7 +1152,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetGain_Performa
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -1190,7 +1189,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetGain_Performa
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .character.setgain = 7, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -1231,7 +1230,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderFrame_Performanc
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str(), .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -1287,7 +1286,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderStart_Performanc
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -1322,7 +1321,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderStop_Performance
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER, .totalTime = 0
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -1360,7 +1359,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetSampleAttribu
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER, .totalTime = 0
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -1396,7 +1395,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderPause_Performanc
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -1435,7 +1434,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderResume_Performan
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -1473,7 +1472,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetSampleAttribu
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -1514,7 +1513,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderReqMmapBuffer_Pe
     int32_t reqSize = 0;
     struct AudioMmapBufferDescripter desc = {};
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER, .totalTime = 0
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -1572,7 +1571,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetMmapPosition_
     uint64_t framesRendering = 0;
     int64_t timeExp = 0;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = LOW_LATENCY_AUDIO_FILE.c_str(), .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -1621,12 +1620,12 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetExtraParams_P
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateStartRender(audiopara.manager, &audiopara.render, &audiopara.adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(audiopara.manager, &audiopara.render, &audiopara.adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     for (int i = 0; i < COUNT; ++i) {
@@ -1665,7 +1664,7 @@ attr-sampling-rate=48000";
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
 
-    ret = AudioCreateStartRender(audiopara.manager, &audiopara.render, &audiopara.adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(audiopara.manager, &audiopara.render, &audiopara.adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->attr.SetExtraParams((AudioHandle)audiopara.render, keyValueList);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);

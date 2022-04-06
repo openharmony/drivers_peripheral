@@ -69,7 +69,6 @@ const int FRAME_SIZE = 1024;
 const int FRAME_COUNT = 4;
 const int ADAPTER_COUNT = 32;
 const int TRY_NUM_FRAME = 20;
-const int AUDIO_ADAPTER_MAX_NUM = 3;
 const string AUDIO_LOW_LATENCY_CAPTURE_FILE = "//bin/lowlatencycapturetest.wav";
 const string AUDIO_LOW_LATENCY_RENDER_FILE = "//bin/lowlatencyrendertest.wav";
 

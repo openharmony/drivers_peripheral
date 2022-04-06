@@ -272,7 +272,7 @@ int32_t TestAiaoSysPinMux(void)
 int32_t TestAiaoGetMclk(void)
 {
     int ret;
-    unsigned int rate = SAMPLERATE;
+    uint32_t rate = SAMPLERATE;
     uint32_t *mclkSel = NULL;
 
     HDF_LOGI("TestAiaoGetMclk: enter");

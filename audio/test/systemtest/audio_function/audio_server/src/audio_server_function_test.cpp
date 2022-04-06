@@ -21,8 +21,6 @@ using namespace testing::ext;
 using namespace HMOS::Audio;
 
 namespace {
-const string ADAPTER_NAME_USB = "usb";
-const string ADAPTER_NAME_INTERNAL = "internal";
 const uint64_t FILESIZE = 1024;
 const uint32_t CHANNELCOUNTEXOECT = 2;
 const uint32_t SAMPLERATEEXOECT = 48000;
@@ -134,7 +132,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0001, TestSize.
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
 
@@ -157,7 +155,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0002, TestSize.
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     float volumeMax = 1.0;
@@ -198,7 +196,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0003, TestSize.
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     bool muteTrue = true;
@@ -239,7 +237,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0003, TestSize.
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0004, TestSize.Level1)
 {
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     int32_t ret = -1;
@@ -273,7 +271,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0005, TestSize.
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     float gain = 0;
@@ -317,7 +315,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0006, TestSize.
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     float volumeValue = 1.0;
@@ -369,7 +367,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0007, TestSize.
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     float volumeMax = 1.0;
@@ -418,7 +416,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0008, TestSize.
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     float speed = 3;
@@ -452,7 +450,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0008, TestSize.
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0009, TestSize.Level1)
 {
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     uint64_t size = 0;
@@ -484,7 +482,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0010, TestSize.
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     uint64_t count = 0;
@@ -517,7 +515,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0011, TestSize.
     int64_t timeExp = 0;
     struct AudioTimeStamp time = {.tvSec = 0};
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
 
@@ -548,7 +546,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0012, TestSize.
     bool supported = false;
     struct AudioSceneDescriptor scenes = {};
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     scenes.scene.id = 0;
@@ -579,7 +577,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0013, TestSize.
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     uint32_t samplerateValue = 48000;
@@ -598,7 +596,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0013, TestSize.
         audiopara.attrs.format = AUDIO_FORMAT_PCM_16_BIT;
         audiopara.attrs.sampleRate = 48000;
         audiopara.attrs.channelCount = 2;
-        audiopara.attrs.period = 4096;
+        audiopara.attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
 
         ret = audiopara.render->attr.SetSampleAttributes(audiopara.render, &(audiopara.attrs));
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -624,7 +622,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0001, TestSize
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     ret = GetManager(audiopara);
@@ -645,7 +643,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0002, TestSize
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     ret = GetManager(audiopara);
@@ -678,7 +676,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0003, TestSize
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     float val = 0.9;
@@ -710,7 +708,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0004, TestSize
     int32_t ret = -1;
     bool isMute = false;
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     bool mute = true;
@@ -749,7 +747,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0005, TestSize
     float gainMin = 0;
     float gainMax = 0;
     struct PrepareAudioPara para = {
-        .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     float gainValue = 0;
@@ -791,7 +789,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0006, TestSize
     int32_t ret = -1;
     struct AudioSampleAttributes attrsValue = {};
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     struct AudioSampleAttributes attrs = {};
@@ -836,7 +834,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0007, TestSize
     int32_t ret = -1;
     uint32_t channelId = 0;
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     uint32_t channelIdValue = CHANNELCOUNT;
@@ -864,7 +862,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0008, TestSize
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     uint64_t size = 0;
@@ -894,7 +892,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0009, TestSize
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     uint64_t count = 0;
@@ -924,7 +922,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0010, TestSize
     int32_t ret = -1;
     float min = 0;
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     float max = 0;
@@ -954,7 +952,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0011, TestSize
     int32_t ret = -1;
     bool supported = false;
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME_INTERNAL.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     struct AudioSceneDescriptor scenes = {};

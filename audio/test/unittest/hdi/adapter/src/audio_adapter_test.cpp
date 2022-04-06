@@ -309,7 +309,7 @@ HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenPortIdIsOne, TestSize.Lev
 
 HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenPortIdIsHdmiPortId, TestSize.Level1)
 {
-    TestInitForGetPortCapability(HDMI_PORT_ID);
+    TestInitForGetPortCapability(12); // 12 as portID
 }
 
 HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenPortIdIsTwo, TestSize.Level1)

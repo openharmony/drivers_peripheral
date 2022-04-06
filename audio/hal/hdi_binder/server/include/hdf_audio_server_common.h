@@ -23,6 +23,13 @@
 #define MAX_AUDIO_ADAPTER_NUM_SERVER    8   // Limit the number of sound cards supported to a maximum of 8
 #define STR_MAX 512
 
+enum AudioServerType {
+    AUDIO_SERVER_PRIMARY,
+    AUDIO_SERVER_USB,
+    AUDIO_SERVER_A2DP,
+    AUDIO_SERVER_BOTTOM
+};
+
 /* RenderManage Info */
 struct AudioInfoInAdapter {
     const char *adapterName;
@@ -91,5 +98,30 @@ int32_t HdiServicePositionWrite(struct HdfSBuf *reply,
     uint64_t frames, struct AudioTimeStamp time);
 int32_t HdiServiceReqMmapBuffer(struct AudioMmapBufferDescripter *desc, struct HdfSBuf *data);
 
+int32_t HdiServiceGetFuncs();
+int32_t HdiServiceGetAllAdapter(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceLoadAdapter(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceInitAllPorts(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceUnloadAdapter(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceGetPortCapability(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceSetPassthroughMode(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceGetPassthroughMode(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceGetDevStatusByPNP(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceDynamicInitSet(uint8_t* strMsgReport, struct HdfDeviceObject *deviceObject);
+
+enum AudioServerType AudioHdiGetLoadServerFlag(void);
+void AudioHdiSetLoadServerFlag(enum AudioServerType serverType);
+void AudioHdiClearLoadServerFlag(void);
+
+int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
+    struct HdfSBuf *reply);
 #endif
 

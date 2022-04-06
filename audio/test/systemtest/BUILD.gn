@@ -12,24 +12,31 @@
 # limitations under the License.
 
 if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
-} else {
-  import("//build/test.gni")
-  import("//drivers/adapter/uhdf2/uhdf.gni")
-}
-
-#################################group#########################################
-group("systemtest") {
-  if (!defined(ohos_lite)) {
-    testonly = true
+  lite_component("hdf_test_audio") {
+    # add hdf subsystem
+    if (ohos_build_type == "debug") {
+      deps = [
+        "adm:adm",
+        "adm_interface_lib:lib",
+        "audio_function:function",
+        "hdi:hdi",
+      ]
+    }
+    features = []
   }
-  deps = []
+} else {
+  group("systemtest") {
+    testonly = true
 
-  deps += [
-    "adm:adm",
-    "adm_interface_lib:lib",
-    "audio_function:function",
-    "hdi:hdi",
-  ]
+    deps = [
+      "adm:adm",
+      "adm_interface_lib:lib",
+      "audio_function:function",
+      "hdi:hdi",
+
+      #"audio_adapter:audio_adapter",
+    ]
+  }
 }
-###############################################################################

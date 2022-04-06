@@ -16,13 +16,18 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/test.gni")
   import("//drivers/adapter/uhdf2/uhdf.gni")
-  import("//drivers/peripheral/audio/audio.gni")
 }
+import("//drivers/peripheral/audio/audio.gni")
 
 if (defined(ohos_lite)) {
   ###########################LITEOS##########################################
   ###########################hdf_audio_hdi_capture_attr_test#####################
   unittest("hdf_audio_hdi_capture_attr_test") {
+    if (defined(enable_liteos_test_bin) && enable_liteos_test_bin == true) {
+      output_extension = "bin"
+      output_dir = "$root_out_dir/test/systemtest/hdf"
+    }
+
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "src/audio_hdicapture_attr_test.cpp",
@@ -63,6 +68,11 @@ if (defined(ohos_lite)) {
   ###########################end###########################
   ###########################hdf_audio_hdi_capture_control_test#####################
   unittest("hdf_audio_hdi_capture_control_test") {
+    if (defined(enable_liteos_test_bin) && enable_liteos_test_bin == true) {
+      output_extension = "bin"
+      output_dir = "$root_out_dir/test/systemtest/hdf"
+    }
+
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "src/audio_hdicapture_control_test.cpp",
@@ -103,6 +113,11 @@ if (defined(ohos_lite)) {
   ###########################end###########################
   ###########################hdf_audio_hdi_capture_volume_test#####################
   unittest("hdf_audio_hdi_capture_volume_test") {
+    if (defined(enable_liteos_test_bin) && enable_liteos_test_bin == true) {
+      output_extension = "bin"
+      output_dir = "$root_out_dir/test/systemtest/hdf"
+    }
+
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "src/audio_hdicapture_volume_test.cpp",
@@ -143,6 +158,10 @@ if (defined(ohos_lite)) {
   ###########################end###########################
   ###########################hdf_audio_hdi_capture_scene_test#####################
   unittest("hdf_audio_hdi_capture_scene_test") {
+    if (defined(enable_liteos_test_bin) && enable_liteos_test_bin == true) {
+      output_extension = "bin"
+      output_dir = "$root_out_dir/test/systemtest/hdf"
+    }
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "src/audio_hdicapture_scene_test.cpp",
@@ -183,6 +202,10 @@ if (defined(ohos_lite)) {
   ###########################end###########################
   ###########################hdf_audio_hdi_capture_test#####################
   unittest("hdf_audio_hdi_capture_test") {
+    if (defined(enable_liteos_test_bin) && enable_liteos_test_bin == true) {
+      output_extension = "bin"
+      output_dir = "$root_out_dir/test/systemtest/hdf"
+    }
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "src/audio_hdicapture_test.cpp",

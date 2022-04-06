@@ -40,7 +40,6 @@ using namespace testing::ext;
 using namespace HMOS::Audio;
 
 namespace {
-const string ADAPTER_NAME_USB = "usb";
 const float COUNT = 1000;
 const int32_t LOWLATENCY = 10000;
 const int32_t NORMALLATENCY = 30000;
@@ -143,7 +142,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCreateCapture_Perform
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -187,7 +186,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioDestroyCapture_Perfor
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -222,7 +221,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureStart_Performa
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -255,7 +254,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCapturePause_Performa
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -293,7 +292,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureResume_Perform
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -330,7 +329,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureStop_Performan
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -369,7 +368,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetSampleAttri
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -406,7 +405,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureCaptureFrame_P
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0,
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0,
         .requestBytes = BUFFER_LENTH
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -462,7 +461,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetSampleAttri
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -502,7 +501,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetMute_Perfor
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -542,7 +541,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetMute_Perfor
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -582,7 +581,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetVolume_Perf
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0,
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0,
         .character.setvolume = 0.7
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -623,7 +622,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetVolume_Perf
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0,
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0,
         .character.setvolume = 0.8
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -664,7 +663,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetGain_Perfor
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0,
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0,
         .character.setgain = 7
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -705,7 +704,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetGain_Perfor
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0,
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0,
         .character.setgain = 8
     };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -746,7 +745,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetCurrentChan
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -783,7 +782,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetFrameCount_
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -821,7 +820,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetFrameSize_P
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -859,7 +858,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureFlush_Performa
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -895,7 +894,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetGainThresho
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -936,7 +935,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureCheckSceneCapa
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     struct AudioSceneDescriptor scenes = { .scene.id = 0, .desc.pins = PIN_IN_MIC };
     bool supported = false;
@@ -975,7 +974,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSelectScene_Pe
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     struct AudioSceneDescriptor scenes = { .scene.id = 0, .desc.pins = PIN_IN_MIC };
     ASSERT_NE(nullptr, GetAudioManager);
@@ -1013,7 +1012,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioGetCapturePosition_Pe
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
@@ -1050,12 +1049,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetExtraParams
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = AudioCreateStartCapture(audiopara.manager, &audiopara.capture, &audiopara.adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartCapture(audiopara.manager, &audiopara.capture, &audiopara.adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     for (int i = 0; i < COUNT; ++i) {
@@ -1084,7 +1083,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetExtraParams
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     char keyValueList[] = "attr-format=24;attr-frame-count=4096;";
     char keyValueListExp[] = "attr-route=0;attr-format=24;attr-channels=2;attr-frame-count=4096;\
@@ -1094,7 +1093,7 @@ attr-sampling-rate=48000";
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
 
-    ret = AudioCreateStartCapture(audiopara.manager, &audiopara.capture, &audiopara.adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartCapture(audiopara.manager, &audiopara.capture, &audiopara.adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.capture->attr.SetExtraParams((AudioHandle)audiopara.capture, keyValueList);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -1129,7 +1128,7 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetMmapPositio
     uint64_t frames = 0;
     int64_t timeExp = 0;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME_USB.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();

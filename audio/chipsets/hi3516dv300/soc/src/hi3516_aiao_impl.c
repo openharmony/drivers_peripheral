@@ -47,10 +47,16 @@
 #define I2S_IOCFG3_BASE1 0x44
 #define I2S_IOCFG3_BASE1_VAL 0x0600
 
-static void     *g_regAiaoBase = NULL;   // AIAO Reg Base Addr
-static const int g_hiAiDevMaxNum = 3;
-static const int g_hiAoDevMaxNum = 3;
-static const int g_wChannelIdMax = 13;
+static void *g_regAiaoBase = NULL;   // AIAO Reg Base Addr
+
+#define HI3516_AI_DEV_MAX_NUM 3
+#define HI3516_AO_DEV_MAX_NUM 3
+#define HI3516_CHANNEL_ID_MAX 13
+
+#define AI_ATTR_INIT_VAL 0xe4880014
+#define AO_ATTR_INIT_VAL 0xe4000054
+#define RX_INT_ENA_VAL 0x01
+#define RX_CHO_INT_ENA 0x01
 
 static const AiaoClkInfo g_aioClkInfo = {
     .clkSelect        = 0,          /* 0 is Audio base clk; 1 is Audio spare clk. */
@@ -189,7 +195,7 @@ static int32_t AipHalSetBufferAddr(uint32_t chnId, uint64_t value)
 {
     uint32_t saddr;
 
-    if (chnId >= g_wChannelIdMax) {
+    if (chnId >= HI3516_CHANNEL_ID_MAX) {
         AUDIO_DEVICE_LOG_ERR("ai_dev%d is invalid!\n", chnId);
         return HDF_FAILURE;
     }
@@ -204,7 +210,7 @@ int32_t AipHalSetBuffWptr(uint32_t chnId, uint32_t value)
 {
     UTxBuffWptr unTmp;
 
-    if (chnId >= g_wChannelIdMax) {
+    if (chnId >= HI3516_CHANNEL_ID_MAX) {
         AUDIO_DEVICE_LOG_ERR("ao_dev%d is invalid!\n", chnId);
         return HDF_FAILURE;
     }
@@ -219,7 +225,7 @@ int32_t AipHalSetBuffRptr(uint32_t chnId, uint32_t value)
 {
     UTxBuffRptr unTmp;
 
-    if (chnId >= g_hiAiDevMaxNum) {
+    if (chnId >= HI3516_AI_DEV_MAX_NUM) {
         AUDIO_DEVICE_LOG_ERR("ai_dev%d is invalid!\n", chnId);
         return HDF_FAILURE;
     }
@@ -237,7 +243,7 @@ static int32_t AipHalSetBufferSize(uint32_t chnId, uint32_t value)
 {
     UTxBuffSize unTmp;
 
-    if (chnId >= g_hiAoDevMaxNum) {
+    if (chnId >= HI3516_AO_DEV_MAX_NUM) {
         AUDIO_DEVICE_LOG_ERR("ao_dev%d is invalid!\n", chnId);
         return HDF_FAILURE;
     }
@@ -253,7 +259,7 @@ static int32_t AipHalSetTransSize(uint32_t chnId, uint32_t value)
 {
     UTxTransSize unTmp;
 
-    if (chnId >= g_hiAoDevMaxNum) {
+    if (chnId >= HI3516_AO_DEV_MAX_NUM) {
         AUDIO_DEVICE_LOG_ERR("ai_dev%d is invalid!\n", chnId);
         return HDF_FAILURE;
     }
@@ -269,7 +275,7 @@ int32_t AipHalSetRxStart(uint32_t chnId, bool en)
 {
     URxDspCtrl unTmp;
 
-    if (chnId >= g_hiAiDevMaxNum) {
+    if (chnId >= HI3516_AI_DEV_MAX_NUM) {
         AUDIO_DEVICE_LOG_ERR("AipHalSetRxStart chnId %d is invalid!\n", chnId);
         return -1;
     }
@@ -301,7 +307,7 @@ static int32_t AopHalSetBufferAddr(uint32_t chnId, uint64_t value)
 {
     uint32_t saddr;
 
-    if (chnId >=  g_wChannelIdMax) {
+    if (chnId >=  HI3516_CHANNEL_ID_MAX) {
         AUDIO_DEVICE_LOG_ERR("ao_dev%d is invalid!\n", chnId);
         return HDF_FAILURE;
     }
@@ -316,7 +322,7 @@ int32_t AopHalSetBuffWptr(uint32_t chnId, uint32_t value)
 {
     UTxBuffWptr unTmp;
 
-    if (chnId >= g_wChannelIdMax) {
+    if (chnId >= HI3516_CHANNEL_ID_MAX) {
         AUDIO_DEVICE_LOG_ERR("ao_dev%d is invalid!\n", chnId);
         return HDF_FAILURE;
     }
@@ -332,7 +338,7 @@ int32_t AopHalSetBuffRptr(uint32_t chnId, uint32_t value)
 {
     UTxBuffRptr unTmp;
 
-    if (chnId >= g_wChannelIdMax) {
+    if (chnId >= HI3516_CHANNEL_ID_MAX) {
         AUDIO_DEVICE_LOG_ERR("ao_dev%d is invalid!\n", chnId);
         return HDF_FAILURE;
     }
@@ -348,7 +354,7 @@ static int32_t AopHalSetBufferSize(uint32_t chnId, uint32_t value)
 {
     UTxBuffSize unTmp;
 
-    if (chnId >= g_hiAoDevMaxNum) {
+    if (chnId >= HI3516_AO_DEV_MAX_NUM) {
         AUDIO_DEVICE_LOG_ERR("ao_dev%d is invalid!\n", chnId);
         return HDF_FAILURE;
     }
@@ -365,7 +371,7 @@ static int32_t AopHalSetTransSize(uint32_t chnId, uint32_t value)
 {
     UTxTransSize unTmp;
 
-    if (chnId >= g_hiAoDevMaxNum) {
+    if (chnId >= HI3516_AO_DEV_MAX_NUM) {
         AUDIO_DEVICE_LOG_ERR("ao_dev%d is invalid!\n", chnId);
         return HDF_FAILURE;
     }
@@ -382,7 +388,7 @@ int32_t AopHalSetTxStart(uint32_t chnId, bool en)
 {
     UTxDspCtrl unTmp;
 
-    if (chnId >= g_hiAoDevMaxNum) {
+    if (chnId >= HI3516_AO_DEV_MAX_NUM) {
         AUDIO_DEVICE_LOG_ERR("ao_dev%d is invalid!\n", chnId);
         return HDF_FAILURE;
     }
@@ -539,19 +545,13 @@ int32_t AiaoRxIntClr(uint32_t chnId)
 
 int32_t AiaoDeviceInit(uint32_t chnId)
 {
-    const uint32_t aipAttrVal = 0xe4880014;
-    const uint32_t aopAttrVal = 0xe4000054;
-
-    const uint32_t rxIntEnaVal = 0x1;
-    const uint32_t rxCh0IntEna = 0x1;
-
-    AiaoHalWriteReg(AiopRegCfg(AIP_INF_ATTRI_REG, OFFSET_MULTL, chnId), aipAttrVal);
-    AiaoHalWriteReg(AiopRegCfg(AOP_INF_ATTRI_REG, OFFSET_MULTL, chnId),  aopAttrVal);
+    AiaoHalWriteReg(AiopRegCfg(AIP_INF_ATTRI_REG, OFFSET_MULTL, chnId), AI_ATTR_INIT_VAL);
+    AiaoHalWriteReg(AiopRegCfg(AOP_INF_ATTRI_REG, OFFSET_MULTL, chnId), AO_ATTR_INIT_VAL);
     AopSetCtrlReg(chnId);
     AipSetCtrlReg(chnId);
 
-    AiaoHalWriteReg(AiopRegCfg(AIAO_INT_ENA, OFFSET_MULTL, chnId), rxCh0IntEna);
-    AiaoHalWriteReg(AiopRegCfg(RX_INT_ENA, OFFSET_MULTL, chnId), rxIntEnaVal);
+    AiaoHalWriteReg(AiopRegCfg(AIAO_INT_ENA, OFFSET_MULTL, chnId), RX_CHO_INT_ENA);
+    AiaoHalWriteReg(AiopRegCfg(RX_INT_ENA, OFFSET_MULTL, chnId), RX_INT_ENA_VAL);
     return HDF_SUCCESS;
 }
 
