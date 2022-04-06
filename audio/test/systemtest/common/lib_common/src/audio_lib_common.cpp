@@ -76,7 +76,12 @@ int32_t InitHwCaptureFramepara(struct AudioFrameCaptureMode& frameCaptureMode)
 
 int32_t InitHwRenderMode(struct AudioHwRenderMode& renderMode)
 {
-    renderMode.hwInfo.card = AUDIO_SERVICE_IN;
+    int codePrimaryLen = strlen(HDF_AUDIO_CODEC_PRIMARY.c_str());
+    int32_t ret = strncpy_s(renderMode.hwInfo.cardServiceName, NAME_LEN - 1,
+        HDF_AUDIO_CODEC_PRIMARY.c_str(), codePrimaryLen);
+    if (ret != 0) {
+        return HDF_FAILURE;
+    }
     renderMode.hwInfo.portDescript.dir = PORT_OUT;
     renderMode.hwInfo.portDescript.portId = G_PORTID;
     renderMode.hwInfo.portDescript.portName = "AOP";
@@ -88,7 +93,13 @@ int32_t InitHwRenderMode(struct AudioHwRenderMode& renderMode)
 
 int32_t InitHwCaptureMode(struct AudioHwCaptureMode& captureMode)
 {
-    captureMode.hwInfo.card = AUDIO_SERVICE_IN;
+    int codePrimaryLen = strlen(HDF_AUDIO_CODEC_PRIMARY.c_str());
+    int32_t ret = strncpy_s(captureMode.hwInfo.cardServiceName, NAME_LEN - 1,
+        HDF_AUDIO_CODEC_PRIMARY.c_str(), codePrimaryLen);
+    if (ret != 0) {
+        return HDF_FAILURE;
+    }
+
     captureMode.hwInfo.portDescript.dir = PORT_IN;
     captureMode.hwInfo.portDescript.portId = 0;
     captureMode.hwInfo.portDescript.portName = "AIP";

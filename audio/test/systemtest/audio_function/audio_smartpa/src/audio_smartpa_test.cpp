@@ -21,9 +21,6 @@ using namespace testing::ext;
 using namespace HMOS::Audio;
 
 namespace {
-const string ADAPTER_NAME_HDMI = "hdmi";
-const string ADAPTER_NAME_USB = "usb";
-const string ADAPTER_NAME_INTERNAL = "internal";
 const string BIND_CONTROL = "control";
 const string BIND_RENDER = "render";
 const string BIND_NAME_ERROR = "rendeo";
@@ -160,7 +157,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0001, TestSize.Level1
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     uint32_t latencyTime = 0;
@@ -201,7 +198,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0002, TestSize.Level1
     int32_t ret = -1;
     float volumeMax = 1.0;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     float volumeValue[10] = {0};
@@ -237,7 +234,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0003, TestSize.Level1
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
 
@@ -275,7 +272,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0004, TestSize.Level1
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     uint64_t frames = 0;
@@ -307,7 +304,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0005, TestSize.Level1
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     uint64_t size = 0;
@@ -343,7 +340,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0005, TestSize.Level1
 HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0006, TestSize.Level1)
 {
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     int32_t ret = -1;
@@ -361,10 +358,10 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0006, TestSize.Level1
     if (audiopara.render != nullptr) {
         audiopara.attrs.type = AUDIO_IN_MEDIA;
         audiopara.attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+        audiopara.attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
         audiopara.attrs.sampleRate = 48000;
         audiopara.attrs.channelCount = 1;
         audiopara.attrs.stopThreshold = INT_32_MAX;
-        audiopara.attrs.period = 4096;
 
         ret = audiopara.render->attr.SetSampleAttributes(audiopara.render, &(audiopara.attrs));
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -397,7 +394,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0007, TestSize.Level1
     struct DevHandle *handle = nullptr;
     struct AudioHwRender *hwRender = nullptr;
 
-    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_HDMI, handle);
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_OUT, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -422,7 +419,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0008, TestSize.Level1
     int32_t ret = -1;
     struct DevHandle *handle = nullptr;
     struct AudioHwRender *hwRender = nullptr;
-    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_HDMI, handle);
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_OUT, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -445,7 +442,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0009, TestSize.Level1
     float volumeBoundaryValueOut = 127.9;
     struct DevHandle *handle = nullptr;
     struct AudioHwRender *hwRender = nullptr;
-    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_HDMI, handle);
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_OUT, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -496,7 +493,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0010, TestSize.Level1
     float volumevalue = 0;
     struct DevHandle *handle = nullptr;
     struct AudioHwRender *hwRender = nullptr;
-    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_HDMI, handle);
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_OUT, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -536,7 +533,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0011, TestSize.Level1
     float volumeThresholdValueMin = 0;
     struct DevHandle *handle = nullptr;
     struct AudioHwRender *hwRender = nullptr;
-    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_HDMI, handle);
+    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_OUT, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -567,7 +564,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0012, TestSize.Level1
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_HDMI.c_str()
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str()
     };
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();

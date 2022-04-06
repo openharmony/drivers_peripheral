@@ -17,15 +17,18 @@
 
 #include "audio_internal.h"
 #include "hdf_audio_server.h"
+#include "audio_proxy_manager.h"
 
 #define CONFIG_CHANNEL_COUNT  2 // two channels
 #define GAIN_MAX 50.0
 #define STR_MAX 512
 
-struct HdfSBuf *AudioProxyObtainHdfSBuf();
+struct HdfSBuf *AudioProxyObtainHdfSBuf(void);
 void AudioProxyBufReplyRecycle(struct HdfSBuf *data, struct HdfSBuf *reply);
 int32_t AudioProxyPreprocessSBuf(struct HdfSBuf **data, struct HdfSBuf **reply);
 int32_t AudioProxyDispatchCall(struct HdfRemoteService *self, int32_t id, struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t AudioProxyAdapterGetRemoteHandle(struct AudioProxyManager *proxyManager, struct AudioHwAdapter *hwAdapter,
+    const char *adapterName);
 int32_t AudioProxyPreprocessRender(struct AudioHwRender *render, struct HdfSBuf **data, struct HdfSBuf **reply);
 int32_t AudioProxyPreprocessCapture(struct AudioHwCapture *capture, struct HdfSBuf **data, struct HdfSBuf **reply);
 int32_t AudioProxyWriteSampleAttributes(struct HdfSBuf *data, const struct AudioSampleAttributes *attrs);

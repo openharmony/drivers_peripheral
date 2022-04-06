@@ -28,6 +28,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include "securec.h"
+#include "audio_types.h"
 
 enum {INFO};
 #define FILE_NAME_LEN 256

@@ -16,15 +16,15 @@
 #ifndef AUDIO_INTERNAL_H
 #define AUDIO_INTERNAL_H
 
-#include <unistd.h>
-#include "audio_manager.h"
-#include "audio_common.h"
-#include "hdf_base.h"
+#include <errno.h>
 #include <math.h>
+#include <pthread.h>
 #include <sys/mman.h>
 #include <sys/types.h>
-#include <pthread.h>
-#include <errno.h>
+#include <unistd.h>
+#include "hdf_base.h"
+#include "audio_common.h"
+#include "audio_manager.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,7 +45,6 @@ extern "C" {
 #define PATH_NAME_LEN 128
 #define VOLUME_CHANGE 100
 #define SEC_TO_NSEC 1000000000
-#define HDMI_PORT_ID 12
 #define MAP_MAX 100
 #define FORMAT_ONE "%-5d  %-10d  %-20llu  %-15s  %s\n"
 #define FORMAT_TWO "%-5d  %-10d  %s\n"
@@ -55,6 +54,14 @@ extern "C" {
 #define RANGE_MIN 4
 #define EXTPARAM_LEN 32
 #define KEY_VALUE_LIST_LEN 128
+
+#define HDF_AUDIO_CODEC_PRIMARY_DEV         "hdf_audio_codec_primary_dev"
+#define HDF_AUDIO_CODEC_USB_DEV             "hdf_audio_codec_usb_dev"
+#define HDF_AUDIO_CODEC_A2DP_DEV            "hdf_audio_codec_a2dp_dev"
+#define PRIMARY                             "primary"
+#define USB                                 "usb"
+#define A2DP                                "a2dp"
+
 
 /**
  * @brief Enumerates HAL return value types.
@@ -247,6 +254,7 @@ struct PathSelect {
 struct HwInfo {
     uint32_t card;
     uint32_t device;
+    char cardServiceName[NAME_LEN];
     int flags;
     bool callBackEnable;
     char adapterName[NAME_LEN];
@@ -410,7 +418,7 @@ typedef struct DevHandleCapture *(*BindServiceCaptureSo)(const char *);
 typedef int32_t (*InterfaceLibModeCaptureSo)(struct DevHandleCapture *, struct AudioHwCaptureParam *, int);
 typedef void(*CloseServiceCaptureSo)(struct DevHandleCapture *);
 
-typedef int32_t (*PathSelGetConfToJsonObj)();
+typedef int32_t (*PathSelGetConfToJsonObj)(void);
 typedef int32_t (*PathSelAnalysisJson)(void *adapterParam, enum AudioAdaptType adaptType);
 
 BindServiceRenderSo *AudioSoGetBindServiceRender(void);

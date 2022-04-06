@@ -31,6 +31,7 @@ group("hdi") {
     "capture:hdf_audio_hdi_capture_scene_test",
     "capture:hdf_audio_hdi_capture_test",
     "capture:hdf_audio_hdi_capture_volume_test",
+    "manager:hdf_audio_hdi_manager_test",
     "render:hdf_audio_hdi_render_attr_test",
     "render:hdf_audio_hdi_render_control_test",
     "render:hdf_audio_hdi_render_scene_test",

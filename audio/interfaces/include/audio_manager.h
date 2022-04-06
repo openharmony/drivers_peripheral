@@ -86,6 +86,14 @@ struct AudioManager {
      * @see LoadAdapter
      */
     void (*UnloadAdapter)(struct AudioManager *manager, struct AudioAdapter *adapter);
+
+    /**
+     * @brief Release the AudioManager Object.
+     *
+     * @param object Indicates the pointer to the audio adapter manager to operate.
+     * @return Returns <b>true</b> if the Object is released; returns <b>false</b> otherwise.
+     */
+    bool (*ReleaseAudioManagerObject)(struct AudioManager *object);
 };
 
 /**

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "audio_adapter_info_common.h"
 #include "audio_hal_log.h"
 #include "audio_proxy_common.h"
 #include "audio_proxy_internal.h"
@@ -174,42 +175,11 @@ int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCap
         capabilityIndex->channelCount = CONFIG_CHANNEL_COUNT;
         return HDF_SUCCESS;
     }
-    if (portIndex.portId == 0) {
-        capabilityIndex->hardwareMode = true;
-        capabilityIndex->channelMasks = AUDIO_CHANNEL_STEREO;
-        capabilityIndex->channelCount = CONFIG_CHANNEL_COUNT;
-        capabilityIndex->deviceType = portIndex.dir;
-        capabilityIndex->deviceId = PIN_OUT_SPEAKER;
-        capabilityIndex->formatNum = 1;
-        capabilityIndex->formats = &g_formatIdZero;
-        capabilityIndex->sampleRateMasks = AUDIO_SAMPLE_RATE_MASK_16000;
-        capabilityIndex->subPortsNum = 1;
-        capabilityIndex->subPorts = (struct AudioSubPortCapability *)calloc(capabilityIndex->subPortsNum,
-            sizeof(struct AudioSubPortCapability));
-        if (capabilityIndex->subPorts == NULL) {
-            LOG_FUN_ERR("pointer is null!");
-            return HDF_FAILURE;
-        }
-        capabilityIndex->subPorts->portId = portIndex.portId;
-        capabilityIndex->subPorts->desc = portIndex.portName;
-        capabilityIndex->subPorts->mask = PORT_PASSTHROUGH_LPCM;
-        return HDF_SUCCESS;
+    if (InitPortForCapabilitySub(portIndex, capabilityIndex) != HDF_SUCCESS) {
+        LOG_FUN_ERR("PortInitForCapability fail");
+        return HDF_FAILURE;
     }
-    if (portIndex.portId == 1) {
-        capabilityIndex->hardwareMode = true;
-        capabilityIndex->channelMasks = AUDIO_CHANNEL_STEREO;
-        capabilityIndex->channelCount = CONFIG_CHANNEL_COUNT;
-        capabilityIndex->deviceType = portIndex.dir;
-        capabilityIndex->deviceId = PIN_OUT_HEADSET;
-        capabilityIndex->formatNum = 1;
-        capabilityIndex->formats = &g_formatIdZero;
-        capabilityIndex->sampleRateMasks = AUDIO_SAMPLE_RATE_MASK_16000 | AUDIO_SAMPLE_RATE_MASK_8000;
-        return HDF_SUCCESS;
-    }
-    if (portIndex.portId == HDMI_PORT_ID) {
-        return HdmiPortInit(portIndex, capabilityIndex);
-    }
-    return HDF_FAILURE;
+    return HDF_SUCCESS;
 }
 
 void AudioAdapterReleaseCapSubPorts(const struct AudioPortAndCapability *portCapabilitys, const int32_t num)
@@ -544,6 +514,7 @@ int32_t AudioProxyCaptureDispatchSplit(const struct AudioHwAdapter *hwAdapter,
     }
     return AUDIO_HAL_SUCCESS;
 }
+
 static inline int32_t AudioProxyWriteTokenAndInitDataForCapture(struct AudioHwAdapter *hwAdapter, struct HdfSBuf *data,
                                                                 const struct AudioDeviceDescriptor *desc,
                                                                 const struct AudioSampleAttributes *attrs)
@@ -754,6 +725,7 @@ int32_t AudioProxyAdapterSetAndGetPassthroughModeSBuf(struct HdfSBuf *data,
     }
     return HDF_SUCCESS;
 }
+
 int32_t AudioProxyWriteTokenAndNameForSetPassThrough(struct AudioHwAdapter *hwAdapter, struct HdfSBuf *data)
 {
     if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL ||
@@ -895,4 +867,3 @@ int32_t AudioProxyAdapterGetPassthroughMode(struct AudioAdapter *adapter,
     AudioProxyBufReplyRecycle(data, reply);
     return AUDIO_HAL_SUCCESS;
 }
-

@@ -52,33 +52,19 @@ if ("$product_name" != "ohos-arm64") {
 }
 if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
   if (defined(ohos_lite)) {
-    shared_library("hdi_audio_client") {
+    ohos_shared_library("hdi_audio_client") {
       include_dirs = [
         "//drivers/peripheral/audio/interfaces/include",
         "//drivers/peripheral/audio/hal/hdi_passthrough/include",
         "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
         "//drivers/peripheral/audio/hal/hdi_binder/server/include",
-        "$hdf_framework_path/include/core",
-        "$hdf_framework_path/include/utils",
-        "$hdf_framework_path/include/osal",
-        "$hdf_framework_path/ability/sbuf/include",
-        "$hdf_framework_path/utils/include",
-        "$hdf_framework_path/include",
-        "$hdf_framework_path/core/sec/include",
-        "$hdf_framework_path/core/shared/include",
-        "$hdf_framework_path/core/host/include",
-        "$hdf_framework_path/core/manager/include",
-        "$hdf_framework_path/core/common/include/host/",
         "//third_party/cJSON",
         "//third_party/bounds_checking_function/include",
-        "//drivers/adapter/khdf/liteos/osal/include",
-        "$hdf_uhdf_path/shared/include",
-        "$hdf_uhdf_path/include/hdi/",
-        "$hdf_uhdf_path/host/include",
+        "//drivers/adapter/uhdf2/include/hdi",
+        "//drivers/adapter/uhdf2/shared/include",
       ]
 
       sources = [
-        "$hdf_framework_path/ability/sbuf/src/hdf_sbuf.c",
         "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_adapter_info_common.c",
         "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
         "//third_party/cJSON/cJSON.c",
@@ -94,17 +80,19 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
         "//third_party/bounds_checking_function:libsec_shared",
       ]
 
+      external_deps = [ "device_driver_framework:libhdf_utils" ]
       if (enable_audio_hal_hdf_log) {
         defines = [ "AUDIO_HAL_HDF_LOG" ]
       }
 
       public_configs = [ ":hdi_service_proxy_config" ]
-    }
-
-    lite_component("hdi_audio") {
-      features = [ ":hdi_audio_client" ]
+      subsystem_name = "hdf"
+      part_name = "audio_device_driver"
     }
   } else {
+    if ("$product_name" != "ohos-arm64") {
+      import("//vendor/$product_company/$product_name/hals/audio/product.gni")
+    }
     ohos_shared_library("hdi_audio_client") {
       include_dirs = [
         "//drivers/peripheral/audio/interfaces/include",

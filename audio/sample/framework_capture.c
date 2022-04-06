@@ -52,7 +52,6 @@
 #define PCM_16_BIT 16
 #define AUDIO_TOTALSIZE_15M (1024 * 15)
 #define AUDIO_RECORD_INTERVAL_512KB 512
-#define MAX_SUPPORT_ADAPTER_NUM 8
 #define FILE_CAPTURE_SIZE (1024 * 1024 * 3) // 3M
 #define BUFFER_LEN 256
 #define EXT_PARAMS_MAXLEN 107
@@ -71,7 +70,7 @@ struct AudioDeviceDescriptor g_devDesc;
 struct AudioSampleAttributes g_attrs;
 struct AudioCapture *g_capture = NULL;
 struct AudioManager *g_manager = NULL;
-static struct AudioProxyManager *g_proxyManager = NULL;
+static struct AudioManager *g_proxyManager = NULL;
 static struct StrParaCapture g_str;
 void *g_captureHandle;
 
@@ -179,7 +178,7 @@ int32_t CheckInputName(int type, void *val)
     }
     return HDF_SUCCESS;
 }
-void SystemInputFail()
+void SystemInputFail(void)
 {
     printf("please ENTER to go on...");
     while (getchar() != '\n') {
@@ -250,16 +249,17 @@ static int AudioPnpSvcThresholdMsgCheck(struct ServiceStatus *svcStatus, struct 
 {
     int ret;
     if (svcStatus == NULL || pnpReportMsg == NULL) {
-        printf("input param is null!\n");
+        printf("AudioPnpSvcThresholdMsgCheck:input param is null!\n");
         return HDF_FAILURE;
     }
 
     ret = PnpReportMsgDeSerialize((uint8_t *)svcStatus->info, EVENT_REPORT, pnpReportMsg);
     if (ret != HDF_SUCCESS) {
-        printf("PnpReportMsgParse fail \n");
+        printf("PnpReportMsgDeSerialize fail \n");
         return HDF_FAILURE;
     }
     if (pnpReportMsg->eventMsg.eventType != EVENT_REPORT || pnpReportMsg->eventMsg.eventId != CAPTURE_THRESHOLD) {
+        printf("AudioPnpSvcThresholdMsgCheck eventType or eventId not fit.\n");
         return HDF_FAILURE;
     }
 
@@ -282,7 +282,6 @@ static void AudioPnpSvcEvenReceived(struct ServiceStatusListener *listener, stru
         return ;
     }
     if (AudioPnpSvcThresholdMsgCheck(svcStatus, &pnpReportMsg) != HDF_SUCCESS) {
-        printf("This event is not a threshold report event  \n");
         return ;
     }
     strParam = (struct StrParaCapture *)listener->priv;
@@ -314,6 +313,7 @@ static void AudioPnpSvcEvenReceived(struct ServiceStatusListener *listener, stru
         }
     }
     free(frame);
+    return ;
 }
 
 int RegisterListen(struct StrParaCapture *capture)
@@ -622,7 +622,7 @@ int32_t SwitchAdapterCapture(struct AudioAdapterDescriptor *descs, const char *a
     }
     return HDF_FAILURE;
 }
-void PrintMenu1()
+void PrintMenu1(void)
 {
     printf(" ============== Play Capture Loading Mode ===========\n");
     printf("| 1. Capture Direct Loading                         |\n");
@@ -692,7 +692,7 @@ int32_t GetCapturePassthroughManagerFunc(const char *adapterNameCase)
     int32_t size = 0;
     int32_t ret;
     int32_t index;
-    struct AudioManager *(*getAudioManager)() = NULL;
+    struct AudioManager *(*getAudioManager)(void) = NULL;
     getAudioManager = (struct AudioManager *(*)())(dlsym(g_captureHandle, "GetAudioManagerFuncs"));
     if (getAudioManager == NULL) {
         LOG_FUN_ERR("Get Audio Manager Funcs Fail");
@@ -700,7 +700,7 @@ int32_t GetCapturePassthroughManagerFunc(const char *adapterNameCase)
     }
     manager = getAudioManager();
     ret = manager->GetAllAdapters(manager, &descs, &size);
-    int32_t param = size > MAX_SUPPORT_ADAPTER_NUM || size == 0 || descs == NULL || ret < 0;
+    int32_t param = size == 0 || descs == NULL || ret < 0;
     if (param) {
         LOG_FUN_ERR("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
@@ -739,21 +739,21 @@ int32_t GetCaptureProxyManagerFunc(const char *adapterNameCase)
         LOG_FUN_ERR("The Parameter is NULL");
         return HDF_FAILURE;
     }
-    struct AudioProxyManager *proxyManager = NULL;
+    struct AudioManager *proxyManager = NULL;
     struct AudioAdapterDescriptor *descs = NULL;
     enum AudioPortDirection port = PORT_OUT; // Set port information
     struct AudioPort capturePort;
     int32_t size = 0;
     int32_t ret;
     int32_t index;
-    struct AudioProxyManager *(*getAudioManager)() = NULL;
-    getAudioManager = (struct AudioProxyManager *(*)())(dlsym(g_captureHandle, "GetAudioProxyManagerFuncs"));
+    struct AudioManager *(*getAudioManager)(void) = NULL;
+    getAudioManager = (struct AudioManager *(*)())(dlsym(g_captureHandle, "GetAudioProxyManagerFuncs"));
     if (getAudioManager == NULL) {
         return HDF_FAILURE;
     }
     proxyManager = getAudioManager();
     ret = proxyManager->GetAllAdapters(proxyManager, &descs, &size);
-    int32_t check = size > MAX_SUPPORT_ADAPTER_NUM || size == 0 || descs == NULL || ret < 0;
+    int32_t check = size == 0 || descs == NULL || ret < 0;
     if (check) {
         LOG_FUN_ERR("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
@@ -789,7 +789,7 @@ int32_t GetCaptureProxyManagerFunc(const char *adapterNameCase)
     return HDF_SUCCESS;
 }
 
-int32_t InitParam()
+int32_t InitParam(void)
 {
     char resolvedPath[PATH_LEN] = {0};
     char func[PATH_LEN] = {0};
@@ -809,7 +809,7 @@ int32_t InitParam()
     audioPort.dir = PORT_IN;
     audioPort.portId = 0;
     audioPort.portName = "AOP";
-    char adapterNameCase[PATH_LEN] = "usb";
+    char adapterNameCase[PATH_LEN] = "primary";
     if (strcmp(func, "GetAudioManagerFuncs") == 0) {
         if (GetCapturePassthroughManagerFunc(adapterNameCase) < 0) {
             LOG_FUN_ERR("GetCapturePassthroughManagerFunc Fail");
@@ -843,8 +843,9 @@ int32_t InitParam()
     return HDF_SUCCESS;
 }
 
-int32_t SetCaptureMute()
+int32_t SetCaptureMute(struct AudioCapture **capture)
 {
+    (void)capture;
     int32_t val = 0;
     bool isMute = false;
     int32_t ret;
@@ -876,8 +877,9 @@ int32_t SetCaptureMute()
     return ret;
 }
 
-int32_t SetCaptureVolume()
+int32_t SetCaptureVolume(struct AudioCapture **capture)
 {
+    (void)capture;
     int32_t ret;
     float val = 0.5;
     if (g_capture == NULL || g_capture->volume.GetVolume == NULL) {
@@ -915,8 +917,9 @@ int32_t SetCaptureVolume()
     return ret;
 }
 
-int32_t SetCaptureGain()
+int32_t SetCaptureGain(struct AudioCapture **capture)
 {
+    (void)capture;
     int32_t ret;
     float val = 1.0;
     if (g_capture == NULL || g_capture->volume.GetGain == NULL) {
@@ -955,8 +958,9 @@ int32_t SetCaptureGain()
     return ret;
 }
 
-int32_t SetCaptyrePause()
+int32_t SetCaptyrePause(struct AudioCapture **capture)
 {
+    (void)capture;
     int32_t ret;
     if (g_capture == NULL || g_capture->control.Pause == NULL) {
         return HDF_FAILURE;
@@ -968,8 +972,9 @@ int32_t SetCaptyrePause()
     return HDF_SUCCESS;
 }
 
-int32_t SetCaptureResume()
+int32_t SetCaptureResume(struct AudioCapture **capture)
 {
+    (void)capture;
     int32_t ret;
     if (g_capture == NULL || g_capture->control.Resume == NULL) {
         return HDF_FAILURE;
@@ -981,7 +986,7 @@ int32_t SetCaptureResume()
     return HDF_SUCCESS;
 }
 
-void PrintAttributesFromat()
+void PrintAttributesFromat(void)
 {
     printf(" ============= Capture Sample Attributes Fromat =============== \n");
     printf("| 1. Capture AUDIO_FORMAT_PCM_8_BIT                            |\n");
@@ -1024,8 +1029,9 @@ int32_t SelectAttributesFomat(uint32_t *fomat)
     return HDF_SUCCESS;
 }
 
-int32_t SetCaptureAttributes()
+int32_t SetCaptureAttributes(struct AudioCapture **capture)
 {
+    (void)capture;
     int32_t ret;
     struct AudioSampleAttributes attrs;
     if (g_capture == NULL || g_capture->attr.GetSampleAttributes == NULL) {
@@ -1072,8 +1078,9 @@ int32_t SetCaptureAttributes()
     return ret;
 }
 
-int32_t SelectCaptureScene()
+int32_t SelectCaptureScene(struct AudioCapture **capture)
 {
+    (void)capture;
     system("clear");
     int32_t ret;
     int val = 0;
@@ -1110,8 +1117,9 @@ int32_t SelectCaptureScene()
     }
     return ret;
 }
-int32_t GetCaptureExtParams()
+int32_t GetCaptureExtParams(struct AudioCapture **capture)
 {
+    (void)capture;
     char keyValueList[BUFFER_LEN] = {0};
     int32_t ret;
     if (g_capture == NULL || g_capture->attr.GetExtraParams == NULL) {
@@ -1127,8 +1135,9 @@ int32_t GetCaptureExtParams()
     return HDF_SUCCESS;
 }
 
-int32_t GetCaptureMmapPosition()
+int32_t GetCaptureMmapPosition(struct AudioCapture **capture)
 {
+    (void)capture;
     int32_t ret;
     if (g_capture == NULL || g_capture->attr.GetMmapPosition == NULL) {
         return HDF_FAILURE;
@@ -1148,7 +1157,7 @@ int32_t GetCaptureMmapPosition()
     return HDF_SUCCESS;
 }
 
-void PrintMenu2()
+void PrintMenu2(void)
 {
     printf(" ================== Play Capture Menu ================== \n");
     printf("| 1. Capture Start                                      |\n");
