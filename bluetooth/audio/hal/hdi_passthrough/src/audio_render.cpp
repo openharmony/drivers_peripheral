@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <hdf_log.h>
 #include "audio_internal.h"
 #include "audio_adapter_info_common.h"
 #include "audio_bluetooth_manager.h"
@@ -47,18 +47,18 @@ int32_t AudioRenderStart(AudioHandle handle)
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
-        LOG_FUN_ERR("AudioRender already start!");
+        HDF_LOGE("AudioRender already start!");
         return AUDIO_HAL_ERR_AO_BUSY; // render is busy now
     }
 
-    LOG_PARA_INFO("%s, StartPlaying", __func__);
+    HDF_LOGI("%s, StartPlaying", __func__);
     if (OHOS::Bluetooth::GetPlayingState() == false) {
         OHOS::Bluetooth::StartPlaying();
     }
 
     char *buffer = (char *)calloc(1, FRAME_DATA);
     if (buffer == NULL) {
-        LOG_FUN_ERR("Calloc Render buffer Fail!");
+        HDF_LOGE("Calloc Render buffer Fail!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     hwRender->renderParam.frameRenderMode.buffer = buffer;
@@ -67,7 +67,7 @@ int32_t AudioRenderStart(AudioHandle handle)
 
 int32_t AudioRenderStop(AudioHandle handle)
 {
-    LOG_FUN_INFO();
+    HDF_LOGI("AudioRenderStop");
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -75,14 +75,15 @@ int32_t AudioRenderStop(AudioHandle handle)
     if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
         AudioMemFree((void **)&hwRender->renderParam.frameRenderMode.buffer);
     } else {
-        LOG_FUN_ERR("Repeat invalid stop operation!");
+        HDF_LOGE("Repeat invalid stop operation!");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
 
-    LOG_PARA_INFO("%s, StopPlaying", __func__);
+    HDF_LOGI("%s, StopPlaying", __func__);
     if (OHOS::Bluetooth::GetPlayingState() == true) {
         OHOS::Bluetooth::StopPlaying();
     }
+    hwRender->renderParam.renderMode.ctlParam.pause = false;
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -93,15 +94,15 @@ int32_t AudioRenderPause(AudioHandle handle)
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwRender->renderParam.frameRenderMode.buffer == NULL) {
-        LOG_FUN_ERR("AudioRender already stop!");
+        HDF_LOGE("AudioRender already stop!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (hwRender->renderParam.renderMode.ctlParam.pause) {
-        LOG_FUN_ERR("Audio is already pause!");
+        HDF_LOGE("Audio is already pause!");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
     
-    LOG_PARA_INFO("%s, SuspendPlaying", __func__);
+    HDF_LOGI("%s, SuspendPlaying", __func__);
     if (OHOS::Bluetooth::GetPlayingState() == true) {
         OHOS::Bluetooth::SuspendPlaying();
     }
@@ -112,17 +113,17 @@ int32_t AudioRenderPause(AudioHandle handle)
 
 int32_t AudioRenderResume(AudioHandle handle)
 {
-    LOG_FUN_INFO();
+    HDF_LOGI("AudioRenderResume");
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (!hwRender->renderParam.renderMode.ctlParam.pause) {
-        LOG_FUN_ERR("Audio is already Resume !");
+        HDF_LOGE("Audio is already Resume !");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
     
-    LOG_PARA_INFO("%s, StartPlaying", __func__);
+    HDF_LOGI("%s, StartPlaying", __func__);
     if (OHOS::Bluetooth::GetPlayingState() == false) {
         OHOS::Bluetooth::StartPlaying();
     }
@@ -133,7 +134,7 @@ int32_t AudioRenderResume(AudioHandle handle)
 
 int32_t AudioRenderFlush(AudioHandle handle)
 {
-    LOG_FUN_INFO();
+    HDF_LOGI("AudioRenderFlush");
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -197,7 +198,7 @@ int32_t AudioRenderGetSampleAttributes(AudioHandle handle, struct AudioSampleAtt
 
 int32_t AudioRenderGetCurrentChannelId(AudioHandle handle, uint32_t *channelId)
 {
-    LOG_FUN_INFO();
+    HDF_LOGI("AudioRenderGetCurrentChannelId");
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || channelId == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -209,7 +210,7 @@ int32_t AudioRenderGetCurrentChannelId(AudioHandle handle, uint32_t *channelId)
 int32_t AudioRenderCheckSceneCapability(AudioHandle handle, const struct AudioSceneDescriptor *scene,
                                         bool *supported)
 {
-    LOG_FUN_INFO();
+    HDF_LOGI("AudioRenderCheckSceneCapability");
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -240,19 +241,19 @@ int32_t AudioRenderGetVolume(AudioHandle handle, float *volume)
 
 int32_t AudioRenderGetGainThreshold(AudioHandle handle, float *min, float *max)
 {
-    LOG_FUN_INFO();
+    HDF_LOGI("AudioRenderGetGainThreshold");
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioRenderGetGain(AudioHandle handle, float *gain)
 {
-    LOG_FUN_INFO();
+    HDF_LOGI("AudioRenderGetGain");
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioRenderSetGain(AudioHandle handle, float gain)
 {
-    LOG_FUN_INFO();
+    HDF_LOGI("AudioRenderSetGain");
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -281,20 +282,20 @@ int32_t AudioRenderRenderFramSplit(struct AudioHwRender *hwRender)
 int32_t AudioRenderRenderFrame(struct AudioRender *render, const void *frame,
                                uint64_t requestBytes, uint64_t *replyBytes)
 {
-    LOG_FUN_INFO();
+    HDF_LOGI("AudioRenderRenderFrame");
     struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(render);
     if (hwRender == NULL || frame == NULL || replyBytes == NULL ||
         hwRender->renderParam.frameRenderMode.buffer == NULL) {
-        LOG_FUN_ERR("Render Frame Paras is NULL!");
+        HDF_LOGE("Render Frame Paras is NULL!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (FRAME_DATA < requestBytes) {
-        LOG_FUN_ERR("Out of FRAME_DATA size!");
+        HDF_LOGE("Out of FRAME_DATA size!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int32_t ret = memcpy_s(hwRender->renderParam.frameRenderMode.buffer, FRAME_DATA, frame, (uint32_t)requestBytes);
     if (ret != EOK) {
-        LOG_FUN_ERR("memcpy_s fail");
+        HDF_LOGE("memcpy_s fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     hwRender->renderParam.frameRenderMode.bufferSize = requestBytes;
@@ -310,13 +311,13 @@ int32_t AudioRenderRenderFrame(struct AudioRender *render, const void *frame,
     *replyBytes = requestBytes;
     hwRender->renderParam.frameRenderMode.frames += hwRender->renderParam.frameRenderMode.bufferFrameSize;
     if (hwRender->renderParam.frameRenderMode.attrs.sampleRate == 0) {
-        LOG_FUN_ERR("Divisor cannot be zero!");
+        HDF_LOGE("Divisor cannot be zero!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (TimeToAudioTimeStamp(hwRender->renderParam.frameRenderMode.bufferFrameSize,
         &hwRender->renderParam.frameRenderMode.time,
         hwRender->renderParam.frameRenderMode.attrs.sampleRate) == HDF_FAILURE) {
-        LOG_FUN_ERR("Frame is NULL");
+        HDF_LOGE("Frame is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
@@ -338,7 +339,7 @@ int32_t AudioRenderGetRenderPosition(struct AudioRender *render, uint64_t *frame
 
 int32_t AudioRenderSetRenderSpeed(struct AudioRender *render, float speed)
 {
-    LOG_FUN_INFO();
+    HDF_LOGI("AudioRenderSetRenderSpeed");
     struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(render);
     if (hwRender == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -348,7 +349,7 @@ int32_t AudioRenderSetRenderSpeed(struct AudioRender *render, float speed)
 
 int32_t AudioRenderGetRenderSpeed(struct AudioRender *render, float *speed)
 {
-    LOG_FUN_INFO();
+    HDF_LOGI("AudioRenderGetRenderSpeed");
     struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(render);
     if (hwRender == NULL || speed == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -358,13 +359,13 @@ int32_t AudioRenderGetRenderSpeed(struct AudioRender *render, float *speed)
 
 int32_t AudioRenderSetChannelMode(struct AudioRender *render, AudioChannelMode mode)
 {
-    LOG_FUN_INFO();
+    HDF_LOGI("AudioRenderSetChannelMode");
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioRenderGetChannelMode(struct AudioRender *render, AudioChannelMode *mode)
 {
-    LOG_FUN_INFO();
+    HDF_LOGI("AudioRenderGetChannelMode");
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -452,7 +453,7 @@ int32_t AudioRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_
 
 int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc)
 {
-    LOG_PARA_INFO("AudioRenderReqMmapBuffer Success!");
+    HDF_LOGI("AudioRenderReqMmapBuffer Success!");
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -521,7 +522,7 @@ int32_t CallbackProcessing(AudioHandle handle, AudioCallbackType callBackType)
 {
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
     if (render == NULL) {
-        LOG_PARA_INFO("Unregistered callback.\n");
+        HDF_LOGI("Unregistered callback.\n");
         return HDF_FAILURE;
     }
     if (render->renderParam.frameRenderMode.callback == NULL) {
@@ -541,7 +542,7 @@ int32_t CallbackProcessing(AudioHandle handle, AudioCallbackType callBackType)
             break;
     }
     if (!isCallBack) {
-        LOG_PARA_INFO("No callback processing is required.\n");
+        HDF_LOGI("No callback processing is required.\n");
         return HDF_ERR_NOT_SUPPORT;
     }
     render->renderParam.frameRenderMode.callback(callBackType, NULL, render->renderParam.frameRenderMode.cookie);
