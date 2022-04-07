@@ -47,6 +47,26 @@ int32_t AudioProxyDispatchCall(struct HdfRemoteService *self,
     return self->dispatcher->Dispatch(self, id, data, reply);
 }
 
+int32_t AudioProxyAdapterGetRemoteHandle(struct AudioProxyManager *proxyManager, struct AudioHwAdapter *hwAdapter,
+    const char *adapterName)
+{
+    if (proxyManager == NULL || hwAdapter == NULL || adapterName == NULL) {
+        LOG_FUN_ERR("AudioProxyAdapterGetRemoteHandle parameter is null");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
+        hwAdapter->proxyRemoteHandle = proxyManager->remote;
+    } else if (strncmp(adapterName, USB, strlen(USB)) == 0) {
+        hwAdapter->proxyRemoteHandle = proxyManager->usbRemote;
+    } else if (strncmp(adapterName, A2DP, strlen(A2DP)) == 0) {
+        hwAdapter->proxyRemoteHandle = proxyManager->a2dpRemote;
+    } else {
+        LOG_FUN_ERR("Remote not found!");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    return HDF_SUCCESS;
+}
+
 void AudioProxyBufReplyRecycle(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (data != NULL) {
@@ -420,4 +440,3 @@ int32_t AudioProxyReqMmapBufferWrite(struct HdfSBuf *data, int32_t reqSize,
     }
     return HDF_SUCCESS;
 }
-

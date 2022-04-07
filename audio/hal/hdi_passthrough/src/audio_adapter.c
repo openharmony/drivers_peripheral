@@ -23,7 +23,6 @@
 
 #define CONFIG_CHANNEL_COUNT  2 // two channels
 #define GAIN_MAX 50.0
-#define AUDIO_SERVICE_PORTID_FLAG 10
 #define DEFAULT_RENDER_SAMPLING_RATE 48000
 #define DEEP_BUFFER_RENDER_PERIOD_SIZE 4096
 #define DEEP_BUFFER_RENDER_PERIOD_COUNT 8
@@ -144,6 +143,92 @@ int32_t AttrFormatToBit(const struct AudioSampleAttributes *attrs, int32_t *form
     }
 }
 
+static int32_t AudioFormatServiceName(char *cardServiceName, char *adapterName, uint32_t id)
+{
+    if (cardServiceName == NULL || adapterName == NULL) {
+        LOG_FUN_ERR("Pointer Is Empty!");
+        return HDF_FAILURE;
+    }
+
+    if (snprintf_s(cardServiceName, NAME_LEN, NAME_LEN - 1, "%s%u", adapterName, id) < 0) {
+        LOG_FUN_ERR("snprintf_s failed!");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioCheckDescPortId(const struct AudioAdapterDescriptor *adapterDescriptor, uint32_t portId,
+    uint32_t *id)
+{
+    if (adapterDescriptor == NULL || adapterDescriptor->ports == NULL || id == NULL) {
+        LOG_FUN_ERR("Pointer Is Empty!");
+        return HDF_FAILURE;
+    }
+    int adapterNum = AudioAdapterGetAdapterNum();
+    if (adapterNum <= 0) {
+        LOG_FUN_ERR("Get adapterNum fail!");
+        return HDF_FAILURE;
+    }
+    struct AudioAdapterDescriptor *Descs = AudioAdapterGetConfigOut();
+    if (Descs == NULL) {
+        LOG_FUN_ERR("Get adapterDescs is NULL!");
+        return HDF_FAILURE;
+    }
+    bool checkFlag = false;
+    for (int index = 0; index < adapterNum; index++) {
+        if (strcmp(Descs[index].adapterName, adapterDescriptor->adapterName) == 0) {
+            if (Descs[index].ports[0].portId == portId) {
+                checkFlag = true;
+                break;
+            } else {
+                LOG_FUN_ERR("The Audio Port ID is invalid, please check!");
+                return HDF_FAILURE;
+            }
+        }
+    }
+    if (!checkFlag) {
+        LOG_FUN_ERR("The Audio AdapterName is illegal, please check!");
+        return HDF_FAILURE;
+    }
+    for (int index = 0; index < adapterNum; index++) {
+        if (strncmp(Descs[index].adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
+            if (Descs[index].ports[0].portId <= AUDIO_PRIMARY_ID_MAX &&
+                Descs[index].ports[0].portId >= AUDIO_PRIMARY_ID_MIN) {
+                *id = Descs[index].ports[0].portId;
+                break;
+            }
+        }
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioMakeCardServiceName(char *cardServiceName, const struct AudioAdapterDescriptor *adapterDescriptor,
+    uint32_t portId)
+{
+    if (cardServiceName == NULL || adapterDescriptor == NULL || adapterDescriptor->ports == NULL) {
+        LOG_FUN_ERR("Pointer Is Empty!");
+        return HDF_FAILURE;
+    }
+    uint32_t priPortId = 0;
+    int32_t ret;
+    ret = AudioCheckDescPortId(adapterDescriptor, portId, &priPortId);
+    if (ret != HDF_SUCCESS) {
+        LOG_FUN_ERR("The Audio Port ID is illegal, please check!");
+        return HDF_FAILURE;
+    }
+    if (strncmp(adapterDescriptor->adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
+        ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_PRIMARY_DEV, portId);
+    } else if (strncmp(adapterDescriptor->adapterName, USB, strlen(USB)) == 0) {
+        ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_PRIMARY_DEV, priPortId);
+    } else if (strncmp(adapterDescriptor->adapterName, A2DP, strlen(A2DP)) == 0) {
+        ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_A2DP_DEV, portId);
+    } else {
+        LOG_FUN_ERR("The selected sound card is not in the range of sound card list, please check!");
+        return HDF_FAILURE;
+    }
+    return ret;
+}
+
 int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDeviceDescriptor *desc,
                           const struct AudioSampleAttributes *attrs)
 {
@@ -193,7 +278,6 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
     return HDF_SUCCESS;
 }
 
-enum AudioFormat g_formatIdZero = AUDIO_FORMAT_PCM_16_BIT;
 int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex)
 {
     if (capabilityIndex == NULL) {
@@ -207,42 +291,11 @@ int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCap
         capabilityIndex->channelCount = CONFIG_CHANNEL_COUNT;
         return HDF_SUCCESS;
     }
-    if (portIndex.portId == 0) {
-        capabilityIndex->hardwareMode = true;
-        capabilityIndex->channelMasks = AUDIO_CHANNEL_STEREO;
-        capabilityIndex->channelCount = CONFIG_CHANNEL_COUNT;
-        capabilityIndex->deviceType = portIndex.dir;
-        capabilityIndex->deviceId = PIN_OUT_SPEAKER;
-        capabilityIndex->formatNum = 1;
-        capabilityIndex->formats = &g_formatIdZero;
-        capabilityIndex->sampleRateMasks = AUDIO_SAMPLE_RATE_MASK_16000;
-        capabilityIndex->subPortsNum = 1;
-        capabilityIndex->subPorts = (struct AudioSubPortCapability *)calloc(capabilityIndex->subPortsNum,
-                                                                            sizeof(struct AudioSubPortCapability));
-        if (capabilityIndex->subPorts == NULL) {
-            LOG_FUN_ERR("capabilityIndex subPorts is NULL!");
-            return HDF_FAILURE;
-        }
-        capabilityIndex->subPorts->portId = portIndex.portId;
-        capabilityIndex->subPorts->desc = portIndex.portName;
-        capabilityIndex->subPorts->mask = PORT_PASSTHROUGH_LPCM;
-        return HDF_SUCCESS;
+    if (InitPortForCapabilitySub(portIndex, capabilityIndex) != HDF_SUCCESS) {
+        LOG_FUN_ERR("PortInitForCapability fail");
+        return HDF_FAILURE;
     }
-    if (portIndex.portId == 1) {
-        capabilityIndex->hardwareMode = true;
-        capabilityIndex->channelMasks = AUDIO_CHANNEL_STEREO;
-        capabilityIndex->channelCount = CONFIG_CHANNEL_COUNT;
-        capabilityIndex->deviceType = portIndex.dir;
-        capabilityIndex->deviceId = PIN_OUT_HEADSET;
-        capabilityIndex->formatNum = 1;
-        capabilityIndex->formats = &g_formatIdZero;
-        capabilityIndex->sampleRateMasks = AUDIO_SAMPLE_RATE_MASK_16000 | AUDIO_SAMPLE_RATE_MASK_8000;
-        return HDF_SUCCESS;
-    }
-    if (portIndex.portId == HDMI_PORT_ID) {
-        return HdmiPortInit(portIndex, capabilityIndex);
-    }
-    return HDF_FAILURE;
+    return HDF_SUCCESS;
 }
 
 void AudioAdapterReleaseCapSubPorts(const struct AudioPortAndCapability *portCapabilitys, int32_t num)
@@ -334,24 +387,54 @@ int32_t AudioSetAcodeModeRender(struct AudioHwRender *hwRender,
     if (hwRender == NULL || pInterfaceLibMode == NULL || hwRender->devCtlHandle == NULL) {
         return HDF_FAILURE;
     }
-    if (hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId < AUDIO_SERVICE_PORTID_FLAG) {
+
+    uint32_t portId = hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId;
+    if ((portId >= AUDIO_PRIMARY_ID_MIN && portId <= AUDIO_PRIMARY_ID_MAX) ||
+            (portId >= AUDIO_USB_ID_MIN && portId <= AUDIO_USB_ID_MAX)) {
         return(*pInterfaceLibMode)(hwRender->devCtlHandle, &hwRender->renderParam,
                                          AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN);
-    } else {
+    } else if (portId >= AUDIO_PRIMARY_EXT_ID_MIN && portId <= AUDIO_PRIMARY_EXT_ID_MAX) {
         return(*pInterfaceLibMode)(hwRender->devCtlHandle, &hwRender->renderParam,
                                          AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT);
+    } else if (portId >= AUDIO_A2DP_ID_MIN && portId <= AUDIO_A2DP_ID_MAX) {
+        LOG_FUN_ERR("Not currently supported!");
+        return AUDIO_HAL_ERR_NOT_SUPPORT;
+    } else {
+        return HDF_FAILURE;
+    }
+}
+
+int32_t AudioSetAcodeModeCapture(struct AudioHwCapture *hwCapture,
+    const InterfaceLibModeCaptureSo *pInterfaceLibMode)
+{
+    LOG_FUN_INFO();
+    if (hwCapture == NULL || pInterfaceLibMode == NULL || hwCapture->devCtlHandle == NULL) {
+        return HDF_FAILURE;
+    }
+
+    uint32_t portId = hwCapture->captureParam.captureMode.hwInfo.deviceDescript.portId;
+    if ((portId >= AUDIO_PRIMARY_ID_MIN && portId <= AUDIO_PRIMARY_ID_MAX) ||
+            (portId >= AUDIO_USB_ID_MIN && portId <= AUDIO_USB_ID_MAX)) {
+        return(*pInterfaceLibMode)(hwCapture->devCtlHandle, &hwCapture->captureParam,
+                                         AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN_CAPTURE);
+    } else if (portId >= AUDIO_PRIMARY_EXT_ID_MIN && portId <= AUDIO_PRIMARY_EXT_ID_MAX) {
+        return(*pInterfaceLibMode)(hwCapture->devCtlHandle, &hwCapture->captureParam,
+                                         AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT_CAPTURE);
+    } else if (portId >= AUDIO_A2DP_ID_MIN && portId <= AUDIO_A2DP_ID_MAX) {
+        LOG_FUN_ERR("Not currently supported!");
+        return AUDIO_HAL_ERR_NOT_SUPPORT;
+    } else {
+        return HDF_FAILURE;
     }
 }
 
 int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct AudioDeviceDescriptor *desc,
                                     const struct AudioSampleAttributes *attrs, const struct AudioHwAdapter *hwAdapter)
 {
-    LOG_FUN_INFO();
     if (hwAdapter == NULL || hwRender == NULL || desc == NULL || attrs == NULL) {
         LOG_FUN_ERR("Pointer is null!");
         return HDF_FAILURE;
     }
-
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
     PathSelAnalysisJson *pPathSelAnalysisJson = AudioSoGetPathSelAnalysisJson();
     if (pPathSelAnalysisJson == NULL || *pPathSelAnalysisJson == NULL) {
@@ -389,6 +472,13 @@ int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct
         LOG_FUN_ERR("copy fail");
         return HDF_FAILURE;
     }
+    uint32_t portId = hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId;
+    ret = AudioMakeCardServiceName(hwRender->renderParam.renderMode.hwInfo.cardServiceName,
+                                   &hwAdapter->adapterDescriptor, portId);
+    if (ret != HDF_SUCCESS) {
+        LOG_FUN_ERR("AudioMakeCardServiceName fail");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
@@ -400,12 +490,6 @@ int32_t BindServiceRenderOpen(struct AudioHwRender *hwRender,
         pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
         LOG_FUN_ERR("Input para is null!");
         return HDF_FAILURE;
-    }
-    /* render open */
-    if (hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId < AUDIO_SERVICE_PORTID_FLAG) {
-        hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
-    } else {
-        hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_OUT;
     }
     int32_t ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle,
         &hwRender->renderParam, AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN);
@@ -441,7 +525,9 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
     /* Init RenderPathSelect send first */
     /* portId small than  AUDIO_SERVICE_PORTID_FLAG should SceneSelect */
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
-    if (hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId < AUDIO_SERVICE_PORTID_FLAG) {
+    uint32_t portId = hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId;
+    if ((portId >= AUDIO_PRIMARY_ID_MIN && portId <= AUDIO_PRIMARY_ID_MAX) ||
+            (portId >= AUDIO_USB_ID_MIN && portId <= AUDIO_USB_ID_MAX)) {
         ret = (*pInterfaceLibModeRender)(hwRender->devCtlHandle, &hwRender->renderParam,
             AUDIODRV_CTL_IOCTL_SCENESELECT_WRITE);
         if (ret < 0) {
@@ -676,12 +762,6 @@ int32_t InitHwCaptureParam(struct AudioHwCapture *hwCapture, const struct AudioD
     hwCapture->captureParam.frameCaptureMode.attrs.silenceThreshold = attrs->silenceThreshold;
     hwCapture->captureParam.frameCaptureMode.attrs.isBigEndian = attrs->isBigEndian;
     hwCapture->captureParam.frameCaptureMode.attrs.isSignedData = attrs->isSignedData;
-    /* Select Codec Mode */
-    if (hwCapture->captureParam.captureMode.hwInfo.deviceDescript.portId < AUDIO_SERVICE_PORTID_FLAG) {
-        hwCapture->captureParam.captureMode.hwInfo.card = AUDIO_SERVICE_IN;
-    } else {
-        hwCapture->captureParam.captureMode.hwInfo.card = AUDIO_SERVICE_OUT;
-    }
     return HDF_SUCCESS;
 }
 
@@ -723,13 +803,10 @@ int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const str
     if (GetAudioCaptureFunc(hwCapture) < 0) {
         return HDF_FAILURE;
     }
-    /* Fill hwCapture para */
     if (InitHwCaptureParam(hwCapture, desc, attrs) < 0) {
         return HDF_FAILURE;
     }
-
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
-    /* Select Path */
     if ((*pPathSelAnalysisJson)((void *)&hwCapture->captureParam, CAPTURE_PATH_SELECT) < 0) {
         LOG_FUN_ERR("Path Select Fail!");
         return HDF_FAILURE;
@@ -751,53 +828,58 @@ int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const str
         LOG_FUN_ERR("copy fail");
         return HDF_FAILURE;
     }
+    uint32_t portId = hwCapture->captureParam.captureMode.hwInfo.deviceDescript.portId;
+    ret = AudioMakeCardServiceName(hwCapture->captureParam.captureMode.hwInfo.cardServiceName,
+                                   &hwAdapter->adapterDescriptor, portId);
+    if (ret != HDF_SUCCESS) {
+        LOG_FUN_ERR("AudioMakeCardServiceName fail");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
 int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
 {
-    LOG_FUN_INFO();
     if (hwCapture == NULL || hwCapture->devCtlHandle == NULL || hwCapture->devDataHandle == NULL) {
         return HDF_FAILURE;
     }
-    int32_t ret;
-    InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
-    if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
+    InterfaceLibModeCaptureSo *LibCap = AudioSoGetInterfaceLibModeCapture();
+    if (LibCap == NULL || *LibCap == NULL) {
         LOG_FUN_ERR("lib capture func not exist");
         return HDF_FAILURE;
     }
-    ret = (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam,
-                                      AUDIO_DRV_PCM_IOCTRL_CAPTURE_OPEN);
+    int32_t ret = (*LibCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTRL_CAPTURE_OPEN);
     if (ret < 0) {
         LOG_FUN_ERR("CAPTURE_OPEN FAIL");
         return HDF_FAILURE;
     }
+#ifndef AUDIO_HAL_USER
+    ret = AudioSetAcodeModeCapture(hwCapture, LibCap);
+    if (ret < 0) {
+        LOG_FUN_ERR("Select Codec Mode FAIL!");
+        return HDF_FAILURE;
+    }
+#endif
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
-    /* Init CapturePathSelect send first */
-    ret = (*pInterfaceLibModeCapture)(hwCapture->devCtlHandle, &hwCapture->captureParam,
-                                              AUDIODRV_CTL_IOCTL_SCENESELECT_CAPTURE);
+    ret = (*LibCap)(hwCapture->devCtlHandle, &hwCapture->captureParam, AUDIODRV_CTL_IOCTL_SCENESELECT_CAPTURE);
     if (ret < 0) {
         LOG_FUN_ERR("SetParams FAIL!");
         return HDF_FAILURE;
     }
 #endif
-    ret = (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam,
-                                      AUDIO_DRV_PCM_IOCTL_HW_PARAMS);
+    ret = (*LibCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_HW_PARAMS);
     if (ret < 0) {
         LOG_FUN_ERR("AudioCaptureStart SetParams FAIL");
         return HDF_FAILURE;
     }
-    /* get volThreshold capture */
-    ret = (*pInterfaceLibModeCapture)(hwCapture->devCtlHandle, &hwCapture->captureParam,
-                                              AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE);
+    ret = (*LibCap)(hwCapture->devCtlHandle, &hwCapture->captureParam, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE);
     if (ret < 0) {
         LOG_FUN_ERR("SetParams FAIL!");
         return HDF_FAILURE;
     }
 #ifdef AUDIO_HAL_USER
 #else
-    ret = (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam,
-                                      AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE);
+    ret = (*LibCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE);
     if (ret < 0) {
         LOG_FUN_ERR("AudioCaptureStart prepare FAIL");
         return HDF_FAILURE;

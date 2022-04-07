@@ -31,28 +31,26 @@ using namespace testing::ext;
 using namespace HMOS::Audio;
 
 namespace {
-const string ADAPTER_USB = "usb";
-const string ADAPTER_INTERNAL = "internal";
 const int REGISTER_STATUS_ON = 1;
 const int REGISTER_STATUS_OFF = 0;
 static struct AudioCtlElemValue g_elemValues[4] = {
     {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = "hdf_audio_codec_primary_dev0",
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
         .id.itemName = "Dacl enable",
         .value[0] = 0,
     }, {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = "hdf_audio_codec_primary_dev0",
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
         .id.itemName = "Dacr enable",
         .value[0] = 0,
     }, {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = "hdf_audio_codec_primary_dev0",
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_PGA,
         .id.itemName = "LPGA MIC Switch",
         .value[0] = 0,
     }, {
-        .id.cardServiceName = "hdf_audio_codec_dev0",
+        .id.cardServiceName = "hdf_audio_codec_primary_dev0",
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_PGA,
         .id.itemName = "RPGA MIC Switch",
         .value[0] = 0,
@@ -109,14 +107,13 @@ void AudioPathRouteTest::TearDown(void) {}
 HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
     struct AudioRender *render = nullptr;
     struct AudioAdapter *adapter = nullptr;
     ret = PowerOff(g_elemValues[0], g_elemValues[1]);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    ret = AudioCreateRender(manager, pins, ADAPTER_USB, &adapter, &render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = CheckRegisterStatus(g_elemValues[0].id, g_elemValues[1].id, REGISTER_STATUS_ON, REGISTER_STATUS_ON);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -133,7 +130,6 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0001, TestSize.Level1)
 HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
     struct AudioRender *render = nullptr;
     struct AudioAdapter *adapter = nullptr;
     g_elemValues[0].value[0] = 1;
@@ -142,7 +138,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0002, TestSize.Level1)
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    ret = AudioCreateRender(manager, pins, ADAPTER_USB, &adapter, &render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
     struct AudioSceneDescriptor scene = {
         .scene.id = 0,
@@ -171,7 +167,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0003, TestSize.Level1)
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_USB, &adapter, &render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
     struct AudioSceneDescriptor scene = {
         .scene.id = 0,
@@ -194,7 +190,6 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0003, TestSize.Level1)
 HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0004, TestSize.Level1)
 {
     int32_t ret = -1;
-    enum AudioPortPin pins = PIN_IN_MIC;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     g_elemValues[3].value[0] = 1;
@@ -202,7 +197,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0004, TestSize.Level1)
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    ret = AudioCreateCapture(manager, pins, ADAPTER_INTERNAL, &adapter, &capture);
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = CheckRegisterStatus(g_elemValues[2].id, g_elemValues[3].id, REGISTER_STATUS_ON, REGISTER_STATUS_OFF);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -219,7 +214,6 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0004, TestSize.Level1)
 HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0005, TestSize.Level1)
 {
     int32_t ret = -1;
-    enum AudioPortPin pins = PIN_IN_MIC;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     g_elemValues[2].value[0] = 1;
@@ -228,7 +222,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0005, TestSize.Level1)
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    ret = AudioCreateCapture(manager, pins, ADAPTER_INTERNAL, &adapter, &capture);
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
     struct AudioSceneDescriptor scene = {
         .scene.id = 0,
@@ -258,7 +252,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0006, TestSize.Level1)
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_INTERNAL, &adapter, &capture);
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
     struct AudioSceneDescriptor scene = {
         .scene.id = 0,
@@ -280,30 +274,34 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0006, TestSize.Level1)
 HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0007, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioAdapter *captureAdapter = nullptr;
-    struct AudioAdapter *renderAdapter = nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     struct AudioRender *render = nullptr;
+    struct AudioPort* audioPort = nullptr;
+    struct AudioSampleAttributes attrs = {};
+    struct AudioDeviceDescriptor renderDevDesc = {};
+    struct AudioDeviceDescriptor captureDevDesc = {};
     ret = PowerOff(g_elemValues[0], g_elemValues[1]);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = PowerOff(g_elemValues[2], g_elemValues[3]);
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_INTERNAL, &captureAdapter, &capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = CheckRegisterStatus(g_elemValues[2].id, g_elemValues[3].id, REGISTER_STATUS_ON, REGISTER_STATUS_OFF);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_USB, &renderAdapter, &render);
-    if (ret < 0) {
-        captureAdapter->DestroyCapture(captureAdapter, capture);
-        manager->UnloadAdapter(manager, captureAdapter);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, audioPort);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    InitAttrs(attrs);
+    InitDevDesc(renderDevDesc, audioPort->portId, PIN_OUT_SPEAKER);
+    InitDevDesc(captureDevDesc, audioPort->portId, PIN_IN_MIC);
+    ret = adapter->CreateRender(adapter, &renderDevDesc, &attrs, &render);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = CheckRegisterStatus(g_elemValues[0].id, g_elemValues[1].id, REGISTER_STATUS_ON, REGISTER_STATUS_ON);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    captureAdapter->DestroyCapture(captureAdapter, capture);
-    manager->UnloadAdapter(manager, captureAdapter);
-    renderAdapter->DestroyRender(renderAdapter, render);
-    manager->UnloadAdapter(manager, renderAdapter);
+    ret = adapter->CreateCapture(adapter, &captureDevDesc, &attrs, &capture);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    ret = CheckRegisterStatus(g_elemValues[2].id, g_elemValues[3].id, REGISTER_STATUS_ON, REGISTER_STATUS_OFF);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    adapter->DestroyCapture(adapter, capture);
+    adapter->DestroyRender(adapter, render);
+    manager->UnloadAdapter(manager, adapter);
 }
 }

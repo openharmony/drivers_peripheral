@@ -37,6 +37,16 @@
 
 #define CTRL_CMD    "control"          // For Bind control service
 
+#define AUDIODRV_CTL_ACODEC_ENABLE 1
+#define AUDIODRV_CTL_ACODEC_DISABLE 0
+#define AUDIODRV_CTL_INTERNAL_ACODEC_ENABLE 1
+#define AUDIODRV_CTL_EXTERN_ACODEC_ENABLE 2
+#define AUDIODRV_CTL_EXTERN_CODEC_STR "External Codec Enable"
+#define AUDIODRV_CTL_INTERNAL_CODEC_STR "Internally Codec Enable"
+
+#define AUDIODRV_CTL_INTER_CARD_STR    "hdf_audio_codec_primary_dev0"
+#define AUDIODRV_CTL_EXTN_CARD_STR    "hdf_audio_codec_primary_dev11"
+
 struct AudioPcmHwParams {
     enum AudioStreamType streamType;
     uint32_t channels;
