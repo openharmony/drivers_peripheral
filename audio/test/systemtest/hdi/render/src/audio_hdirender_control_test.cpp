@@ -41,9 +41,6 @@ using namespace testing::ext;
 using namespace HMOS::Audio;
 
 namespace {
-const string ADAPTER_NAME_USB = "usb";
-const string ADAPTER_NAME_INTERNAL = "internal";
-
 class AudioHdiRenderControlTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -139,11 +136,10 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStart_0001, TestSize.Lev
     TestAudioManager* manager = {};
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
 
     ASSERT_NE(nullptr, GetAudioManager);
     manager = GetAudioManager();
-    ret = AudioCreateRender(manager, pins, ADAPTER_NAME_USB, &adapter, &render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Start((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -164,13 +160,12 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStart_0002, TestSize.Lev
     int32_t ret = -1;
     TestAudioManager* manager = {};
     struct AudioAdapter *adapter = nullptr;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
 
     ASSERT_NE(nullptr, GetAudioManager);
     manager = GetAudioManager();
-    ret = AudioCreateRender(manager, pins, ADAPTER_NAME_USB, &adapter, &render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Start((AudioHandle)renderNull);
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
@@ -189,12 +184,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStart_0003, TestSize.Lev
     int32_t ret = -1;
     TestAudioManager* manager = {};
     struct AudioAdapter *adapter = nullptr;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
     struct AudioRender *render = nullptr;
 
     manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateRender(manager, pins, ADAPTER_NAME_USB, &adapter, &render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Start((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -217,12 +211,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStop_0001, TestSize.Leve
     int32_t ret = -1;
     TestAudioManager* manager = {};
     struct AudioAdapter *adapter = nullptr;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
     struct AudioRender *render = nullptr;
 
     manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateRender(manager, pins, ADAPTER_NAME_USB, &adapter, &render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Start((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -244,11 +237,10 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStop_0002, TestSize.Leve
     TestAudioManager* manager = {};
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
 
     manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateRender(manager, pins, ADAPTER_NAME_USB, &adapter, &render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Stop((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, ret);
@@ -268,11 +260,10 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStop_0003, TestSize.Leve
     TestAudioManager* manager = {};
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
 
     manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateRender(manager, pins, ADAPTER_NAME_USB, &adapter, &render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Start((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -293,7 +284,6 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStop_0003, TestSize.Leve
 HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStop_0004, TestSize.Level1)
 {
     int32_t ret = -1;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
     TestAudioManager* manager = {};
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
@@ -301,7 +291,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStop_0004, TestSize.Leve
 
     manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateRender(manager, pins, ADAPTER_NAME_USB, &adapter, &render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Start((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -328,7 +318,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0001, TestSize.Lev
 
     manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Pause((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -353,7 +343,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0002, TestSize.Lev
 
     manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Pause((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -376,11 +366,10 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0003, TestSize.Lev
     TestAudioManager* manager = {};
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
 
     manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateRender(manager, pins, ADAPTER_NAME_USB, &adapter, &render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Pause((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
@@ -402,7 +391,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0004, TestSize.Lev
 
     manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Pause((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -431,7 +420,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0005, TestSize.Lev
 
     manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Stop((AudioHandle)render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -457,7 +446,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0006, TestSize.Lev
 
     manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Pause((AudioHandle)renderNull);
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
@@ -481,7 +470,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0001, TestSize.Le
 
     TestAudioManager* manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Resume((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, ret);
@@ -505,7 +494,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0002, TestSize.Le
 
     TestAudioManager* manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Stop((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -529,7 +518,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0003, TestSize.Le
 
     TestAudioManager* manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Pause((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -555,7 +544,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0004, TestSize.Le
 
     TestAudioManager* manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Pause((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -583,7 +572,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0005, TestSize.Le
 
     TestAudioManager* manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Pause((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -612,7 +601,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0006, TestSize.Le
 
     TestAudioManager* manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Pause((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -635,41 +624,13 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0001, TestSize.Le
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    ret = AudioCreateRender(manager, pins, ADAPTER_NAME_USB, &adapter, &render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     adapter->DestroyRender(adapter, render);
     manager->UnloadAdapter(manager, adapter);
-}
-/**
-    * @tc.name  Test AudioCreateRender API when two renders is created successful.
-    * @tc.number  SUB_Audio_HDI_AudioCreateRender_0002
-    * @tc.desc  Test AudioCreateRender interface,return 0 when two renders is created successful.
-    * @tc.author: ZHANGHAILIN
-*/
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_AudioCreateRender_0002, TestSize.Level1)
-{
-    int32_t ret = -1;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioAdapter *adapter2 = nullptr;
-    struct AudioRender *render = nullptr;
-    struct AudioRender *render2 = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
-
-    ret = AudioCreateRender(manager, pins, ADAPTER_NAME_USB, &adapter, &render);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
-
-    ret = AudioCreateRender(manager, pins, ADAPTER_NAME_USB, &adapter2, &render2);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    adapter2->DestroyRender(adapter2, render2);
-    manager->UnloadAdapter(manager, adapter2);
 }
 /**
     * @tc.name  Test AudioCreateRender API via setting the incoming parameter pins is PIN_IN_MIC.
@@ -687,7 +648,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0003, TestSize.Le
     struct AudioDeviceDescriptor devDesc = {};
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, renderPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, renderPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     InitAttrs(attrs);
@@ -715,7 +676,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0004, TestSize.Le
     uint32_t channelCountErr = 5;
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, renderPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, renderPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     InitAttrs(attrs);
@@ -749,7 +710,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0005, TestSize.Le
     struct AudioDeviceDescriptor devDesc = {};
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, renderPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, renderPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     InitAttrs(attrs);
@@ -777,7 +738,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0006, TestSize.Le
     struct AudioDeviceDescriptor *devDescNull = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, renderPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, renderPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     InitAttrs(attrs);
@@ -804,7 +765,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0007, TestSize.Le
     struct AudioDeviceDescriptor devDesc = {};
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, renderPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, renderPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     InitDevDesc(devDesc, renderPort->portId, PIN_OUT_SPEAKER);
@@ -831,7 +792,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0008, TestSize.Le
     struct AudioDeviceDescriptor devDesc = {};
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, renderPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, renderPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     InitAttrs(attrs);
@@ -859,7 +820,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0009, TestSize.Le
     struct AudioPort* renderPort = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, renderPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, renderPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = InitAttrs(attrs);
@@ -878,6 +839,34 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0009, TestSize.Le
     manager->UnloadAdapter(manager, adapter);
 }
 /**
+    * @tc.name  Test AudioCreateRender API via setting the incoming parameter desc which portID is not configed
+    * @tc.number  SUB_Audio_HDI_CreateRender_0010
+    * @tc.desc  test AudioCreateRender interface,Returns -1 if the incoming desc which portID is not configed
+    * @tc.author: ZHANGHAILIN
+*/
+HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0010, TestSize.Level1)
+{
+    int32_t ret = -1;
+    struct AudioAdapter *adapter = nullptr;
+    struct AudioRender *render = nullptr;
+    struct AudioSampleAttributes attrs = {};
+    struct AudioDeviceDescriptor devDesc = {};
+    struct AudioPort* renderPort = nullptr;
+    uint32_t portID = 10;
+    ASSERT_NE(nullptr, GetAudioManager);
+    TestAudioManager* manager = GetAudioManager();
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, renderPort);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+
+    ret = InitAttrs(attrs);
+    InitDevDesc(devDesc, portID, PIN_OUT_SPEAKER);
+
+    ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render);
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
+    ret = adapter->DestroyRender(adapter, render);
+    manager->UnloadAdapter(manager, adapter);
+}
+/**
     * @tc.name  Test AudioDestroyRender API via legal input.
     * @tc.number  SUB_Audio_HDI_DestroyRender_0001
     * @tc.desc  Test AudioDestroyRender interface, return 0 if render is destroyed successful.
@@ -888,10 +877,9 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_DestroyRender_0001, TestSize.L
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
     TestAudioManager* manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateRender(manager, pins, ADAPTER_NAME_USB, &adapter, &render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = adapter->DestroyRender(adapter, render);
@@ -907,13 +895,12 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_DestroyRender_0001, TestSize.L
 HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_DestroyRender_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
     TestAudioManager* manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateRender(manager, pins, ADAPTER_NAME_USB, &adapter, &render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = adapter->DestroyRender(adapter, renderNull);
@@ -936,7 +923,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderFlush_0001, TestSize.Lev
 
     manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Stop((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -962,7 +949,7 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderFlush_0002, TestSize.Lev
 
     manager = GetAudioManager();
     ASSERT_NE(nullptr, GetAudioManager);
-    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
+    ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->control.Pause((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);

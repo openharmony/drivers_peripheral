@@ -36,27 +36,28 @@
 #ifndef AUDIO_PROXY_MANAGER_H
 #define AUDIO_PROXY_MANAGER_H
 #include "audio_adapter.h"
+#include "audio_manager.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct AudioProxyManager {
+    uint64_t audioMagic;
     struct HdfRemoteService *remote;
-    int32_t (*GetAllAdapters)(struct AudioProxyManager *manager, struct AudioAdapterDescriptor **descs, int32_t *size);
-    int32_t (*LoadAdapter)(struct AudioProxyManager *manager, const struct AudioAdapterDescriptor *desc,
-                           struct AudioAdapter **adapter);
-    void (*UnloadAdapter)(struct AudioProxyManager *manager, struct AudioAdapter *adapter);
+    struct HdfRemoteService *usbRemote;
+    struct HdfRemoteService *a2dpRemote;
+    struct AudioManager impl;
 };
 
-int32_t AudioProxyManagerGetAllAdapters(struct AudioProxyManager *manager,
+int32_t AudioProxyManagerGetAllAdapters(struct AudioManager *manager,
                                         struct AudioAdapterDescriptor **descs,
                                         int *size);
-int32_t AudioProxyManagerLoadAdapter(struct AudioProxyManager *manager, const struct AudioAdapterDescriptor *desc,
+int32_t AudioProxyManagerLoadAdapter(struct AudioManager *manager, const struct AudioAdapterDescriptor *desc,
                                      struct AudioAdapter **adapter);
-void AudioProxyManagerUnloadAdapter(struct AudioProxyManager *manager, struct AudioAdapter *adapter);
+void AudioProxyManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter *adapter);
 
-struct AudioProxyManager *GetAudioProxyManagerFuncs(void);
+struct AudioManager *GetAudioProxyManagerFuncs(void);
 
 #ifdef __cplusplus
 }

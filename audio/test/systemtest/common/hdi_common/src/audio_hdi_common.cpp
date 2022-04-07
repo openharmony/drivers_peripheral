@@ -59,13 +59,14 @@ int32_t InitAttrs(struct AudioSampleAttributes &attrs)
     attrs.silenceThreshold = BUFFER_LENTH;
     return HDF_SUCCESS;
 }
-int32_t InitAttrsUpdate(struct AudioSampleAttributes &attrs, enum AudioFormat format, uint32_t channelCount,
-    uint32_t sampleRate)
+int32_t InitAttrsUpdate(struct AudioSampleAttributes &attrs, int format, uint32_t channelCount,
+    uint32_t sampleRate, uint32_t silenceThreshold)
 {
     InitAttrs(attrs);
-    attrs.format = format;
+    attrs.format = (enum AudioFormat)format;
     attrs.sampleRate = sampleRate;
     attrs.channelCount = channelCount;
+    attrs.silenceThreshold = silenceThreshold;
     return HDF_SUCCESS;
 }
 int32_t AudioRenderSetGetSampleAttributes(struct AudioSampleAttributes attrs, struct AudioSampleAttributes &attrsValue,
@@ -112,16 +113,16 @@ uint32_t StringToInt(std::string flag)
     return temp;
 }
 
-int32_t InitDevDesc(struct AudioDeviceDescriptor &devDesc, const uint32_t portId, enum AudioPortPin pins)
+int32_t InitDevDesc(struct AudioDeviceDescriptor &devDesc, const uint32_t portId, int pins)
 {
     devDesc.portId = portId;
-    devDesc.pins = pins;
+    devDesc.pins = (enum AudioPortPin)pins;
     devDesc.desc = nullptr;
     return HDF_SUCCESS;
 }
 
 int32_t SwitchAdapter(struct AudioAdapterDescriptor *descs, const std::string &adapterNameCase,
-    enum AudioPortDirection portFlag, struct AudioPort *&audioPort, int size)
+    int portFlag, struct AudioPort *&audioPort, int size)
 {
     if (descs == nullptr || size > ADAPTER_COUNT) {
         return HDF_FAILURE;
@@ -145,7 +146,7 @@ int32_t SwitchAdapter(struct AudioAdapterDescriptor *descs, const std::string &a
     return HDF_FAILURE;
 }
 
-uint32_t PcmFormatToBits(enum AudioFormat format)
+uint32_t PcmFormatToBits(int format)
 {
     switch (format) {
         case AUDIO_FORMAT_PCM_8_BIT:
@@ -231,7 +232,7 @@ int32_t GetAdapters(TestAudioManager *manager, struct AudioAdapterDescriptor **d
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t GetLoadAdapter(TestAudioManager *manager, enum AudioPortDirection portType,
+int32_t GetLoadAdapter(TestAudioManager *manager, int portType,
     const std::string &adapterName, struct AudioAdapter **adapter, struct AudioPort *&audioPort)
 {
     int32_t ret = -1;
@@ -267,7 +268,7 @@ int32_t GetLoadAdapter(TestAudioManager *manager, enum AudioPortDirection portTy
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t AudioCreateRender(TestAudioManager *manager, enum AudioPortPin pins, const std::string &adapterName,
+int32_t AudioCreateRender(TestAudioManager *manager, int pins, const std::string &adapterName,
     struct AudioAdapter **adapter, struct AudioRender **render)
 {
     int32_t ret = -1;
@@ -302,12 +303,11 @@ int32_t AudioCreateStartRender(TestAudioManager *manager, struct AudioRender **r
     const std::string &adapterName)
 {
     int32_t ret = -1;
-    enum AudioPortPin pins = PIN_OUT_SPEAKER;
 
     if (adapter == nullptr || render == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    ret = AudioCreateRender(manager, pins, adapterName, adapter, render);
+    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, adapterName, adapter, render);
     if (ret < 0) {
         return ret;
     }
@@ -357,7 +357,7 @@ int32_t AudioRenderStartAndOneFrame(struct AudioRender *render)
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t AudioCreateCapture(TestAudioManager *manager, enum AudioPortPin pins, const std::string &adapterName,
+int32_t AudioCreateCapture(TestAudioManager *manager, int pins, const std::string &adapterName,
     struct AudioAdapter **adapter, struct AudioCapture **capture)
 {
     int32_t ret = -1;
@@ -393,11 +393,10 @@ int32_t AudioCreateStartCapture(TestAudioManager *manager, struct AudioCapture *
 {
     int32_t ret = -1;
     struct AudioSampleAttributes attrs = {};
-    enum AudioPortPin pins = PIN_IN_MIC;
     if (adapter == nullptr || capture == nullptr) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    ret = AudioCreateCapture(manager, pins, adapterName, adapter, capture);
+    ret = AudioCreateCapture(manager, PIN_IN_MIC, adapterName, adapter, capture);
     if (ret < 0) {
         manager->UnloadAdapter(manager, *adapter);
         return ret;
@@ -507,7 +506,7 @@ int32_t FrameStartCapture(struct AudioCapture *capture, FILE *file, const struct
         return ret;
     }
     uint32_t pcmBytes = PcmFramesToBytes(attrs);
-    if (pcmBytes < 1024 || pcmBytes > 8192) {
+    if (pcmBytes < PCM_BYTE_MIN || pcmBytes > PCM_BYTE_MAX) {
         return HDF_FAILURE;
     }
     bufferSize = FRAME_COUNT * pcmBytes;
@@ -789,9 +788,7 @@ int32_t StopAudio(struct PrepareAudioPara &audiopara)
             audiopara.adapter = nullptr;
             return ret;
         }
-        if (audiopara.adapter != nullptr) {
-            audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
-        }
+        audiopara.adapter->DestroyCapture(audiopara.adapter, audiopara.capture);
         audiopara.capture = nullptr;
     }
     if (audiopara.render != nullptr) {

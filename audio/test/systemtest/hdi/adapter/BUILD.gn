@@ -16,13 +16,18 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/test.gni")
   import("//drivers/adapter/uhdf2/uhdf.gni")
-  import("//drivers/peripheral/audio/audio.gni")
 }
+import("//drivers/peripheral/audio/audio.gni")
 
 if (defined(ohos_lite)) {
   ###########################LITEOS##############################
   ###########################hdf_audio_hdi_adapter_test#####################
   unittest("hdf_audio_hdi_adapter_test") {
+    if (defined(enable_liteos_test_bin) && enable_liteos_test_bin == true) {
+      output_extension = "bin"
+      output_dir = "$root_out_dir/test/systemtest/hdf"
+    }
+
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "src/audio_hdiadapter_test.cpp",

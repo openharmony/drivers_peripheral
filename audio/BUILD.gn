@@ -17,14 +17,14 @@ import("//drivers/peripheral/audio/audio.gni")
 
 if (defined(ohos_lite)) {
   group("audio_test_entry") {
-    deps = [ "//drivers/peripheral/audio/test/systemtest:systemtest" ]
+    deps = [ "test/systemtest:hdf_test_audio" ]
   }
 } else {
   group("audio_test_entry") {
     testonly = true
     deps = [
-      "//drivers/peripheral/audio/test/systemtest:systemtest",
-      "//drivers/peripheral/audio/test/unittest:audiotest",
+      "test/systemtest:systemtest",
+      "test/unittest:audiotest",
     ]
   }
 }
@@ -39,25 +39,18 @@ group("hdi_audio") {
       deps += [
         "config/linux:hdf_audio_json",
         "hal/hdi_binder/proxy:hdi_audio_client",
-        "hal/hdi_binder/server:hdi_audio_server",
+        "hal/hdi_binder/server:hdi_audio_a2dp_server",
+        "hal/hdi_binder/server:hdi_audio_pnp_server",
+        "hal/hdi_binder/server:hdi_audio_primary_server",
+        "hal/hdi_binder/server:hdi_audio_usb_server",
       ]
-    } else {
-      deps += [ "config/linux:hdf_audio_json" ]
     }
   }
 
-  if (enable_audio_device_mpi) {
-    deps += [
-      "//device/hisilicon/hardware/media/proprietary/hal/audio:hdi_audio_interface_lib_capture",
-      "//device/hisilicon/hardware/media/proprietary/hal/audio:hdi_audio_interface_lib_mpi",
-      "//device/hisilicon/hardware/media/proprietary/hal/audio:hdi_audio_interface_lib_render",
-    ]
-  } else {
-    deps += [
-      "supportlibs/adm_adapter:hdi_audio_interface_lib_capture",
-      "supportlibs/adm_adapter:hdi_audio_interface_lib_render",
-    ]
-  }
+  deps += [
+    "supportlibs/adm_adapter:hdi_audio_interface_lib_capture",
+    "supportlibs/adm_adapter:hdi_audio_interface_lib_render",
+  ]
   if (enable_audio_hal_notsupport_pathselect == false) {
     deps += [ "hal/pathselect:hdi_audio_path_select" ]
 

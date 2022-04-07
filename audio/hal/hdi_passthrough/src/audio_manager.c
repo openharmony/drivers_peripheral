@@ -22,6 +22,8 @@
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
+static struct AudioManager g_audioManagerFuncs = {0};
+static bool audioAdapterAddrMgrFlag = false;
 struct AudioAdapterDescriptor *g_localAddrAudioAdapterOut = NULL; // add for Fuzz
 int g_localAdapterNum = 0; // add for Fuzz
 
@@ -238,8 +240,121 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
     return AUDIO_HAL_SUCCESS;
 }
 
+static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
+{
+    if (desc == NULL || adapter == NULL) {
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)calloc(1, sizeof(*hwAdapter));
+    if (hwAdapter == NULL) {
+        LOGE("%s: calloc AudioHwAdapter failed", __func__);
+        return AUDIO_HAL_ERR_MALLOC_FAIL;
+    }
+    hwAdapter->common.InitAllPorts = AudioAdapterInitAllPorts;
+    hwAdapter->common.CreateRender = AudioAdapterCreateRender;
+    hwAdapter->common.DestroyRender = AudioAdapterDestroyRender;
+    hwAdapter->common.CreateCapture = AudioAdapterCreateCapture;
+    hwAdapter->common.DestroyCapture = AudioAdapterDestroyCapture;
+    hwAdapter->common.GetPortCapability = AudioAdapterGetPortCapability;
+    hwAdapter->common.SetPassthroughMode = AudioAdapterSetPassthroughMode;
+    hwAdapter->common.GetPassthroughMode = AudioAdapterGetPassthroughMode;
+    hwAdapter->adapterDescriptor = *desc;
+    hwAdapter->adapterMgrRenderFlag = 0; // The adapterMgrRenderFlag init is zero
+    hwAdapter->adapterMgrCaptureFlag = 0; // The adapterMgrCaptureFlag init is zero
+    int32_t ret = AudioAddAdapterAddrToList((AudioHandle)(&hwAdapter->common), desc);
+    if (ret < 0) { // add for Fuzz
+        LOG_FUN_ERR("AudioAdapterAddrGet check Failed");
+        AudioMemFree((void **)&hwAdapter);
+        return ret;
+    }
+    *adapter = &hwAdapter->common;
+
+    return AUDIO_HAL_SUCCESS;
+}
+
+static int32_t loadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
+{
+    if (desc == NULL || adapter == NULL) {
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)calloc(1, sizeof(*hwAdapter));
+    if (hwAdapter == NULL) {
+        LOGE("%s: calloc AudioHwAdapter failed", __func__);
+        return AUDIO_HAL_ERR_MALLOC_FAIL;
+    }
+    hwAdapter->common.InitAllPorts = AudioAdapterInitAllPorts;
+    hwAdapter->common.CreateRender = AudioAdapterCreateRender;
+    hwAdapter->common.DestroyRender = AudioAdapterDestroyRender;
+    hwAdapter->common.CreateCapture = AudioAdapterCreateCapture;
+    hwAdapter->common.DestroyCapture = AudioAdapterDestroyCapture;
+    hwAdapter->common.GetPortCapability = AudioAdapterGetPortCapability;
+    hwAdapter->common.SetPassthroughMode = AudioAdapterSetPassthroughMode;
+    hwAdapter->common.GetPassthroughMode = AudioAdapterGetPassthroughMode;
+    hwAdapter->adapterDescriptor = *desc;
+    hwAdapter->adapterMgrRenderFlag = 0; // The adapterMgrRenderFlag init is zero
+    hwAdapter->adapterMgrCaptureFlag = 0; // The adapterMgrCaptureFlag init is zero
+    int32_t ret = AudioAddAdapterAddrToList((AudioHandle)(&hwAdapter->common), desc);
+    if (ret < 0) { // add for Fuzz
+        LOG_FUN_ERR("AudioAdapterAddrGet check Failed");
+        AudioMemFree((void **)&hwAdapter);
+        return ret;
+    }
+    *adapter = &hwAdapter->common;
+
+    return AUDIO_HAL_SUCCESS;
+}
+
+static int32_t loadAdapterA2dp(const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
+{
+    if (desc == NULL || adapter == NULL) {
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    return AUDIO_HAL_SUCCESS;
+}
+
+static int32_t selectAppropriateAdapter(enum AudioAdapterType adapterType,
+    const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
+{
+    int32_t ret;
+
+    if (desc == NULL || adapter == NULL) {
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    switch (adapterType) {
+        case AUDIO_ADAPTER_PRIMARY:
+        case AUDIO_ADAPTER_PRIMARY_EXT:
+            ret = loadAdapterPrimary(desc, adapter);
+            if (ret != AUDIO_HAL_SUCCESS) {
+                LOGE("%s: loadAdapterPrimary failed.", __func__);
+                return ret;
+            }
+            break;
+        case AUDIO_ADAPTER_USB:
+            ret = loadAdapterUsb(desc, adapter);
+            if (ret != AUDIO_HAL_SUCCESS) {
+                LOGE("%s: loadAdapterUsb failed.", __func__);
+                return ret;
+            }
+            LOGE("%s: Can't loadAdapterUsb.", __func__);
+            break;
+        case AUDIO_ADAPTER_A2DP:
+            ret = loadAdapterA2dp(desc, adapter);
+            if (ret != AUDIO_HAL_SUCCESS) {
+                LOGE("%s: loadAdapterA2dp failed.", __func__);
+                return ret;
+            }
+            break;
+        default:
+            LOGE("%s: An unsupported Adapter.", __func__);
+            return AUDIO_HAL_ERR_NOT_SUPPORT;
+    }
+
+    return AUDIO_HAL_SUCCESS;
+}
+
 int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct AudioAdapterDescriptor *desc,
-                                struct AudioAdapter **adapter)
+    struct AudioAdapter **adapter)
 {
     LOG_FUN_INFO();
     if (manager == NULL || desc == NULL || desc->adapterName == NULL || desc->ports == NULL || adapter == NULL) {
@@ -266,29 +381,14 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
         LOGE("%s: not supported this adapter %s", __func__, desc->adapterName);
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)calloc(1, sizeof(*hwAdapter));
-    if (hwAdapter == NULL) {
-        LOGE("%s: calloc AudioHwAdapter failed", __func__);
-        return AUDIO_HAL_ERR_MALLOC_FAIL;
-    }
-    hwAdapter->common.InitAllPorts = AudioAdapterInitAllPorts;
-    hwAdapter->common.CreateRender = AudioAdapterCreateRender;
-    hwAdapter->common.DestroyRender = AudioAdapterDestroyRender;
-    hwAdapter->common.CreateCapture = AudioAdapterCreateCapture;
-    hwAdapter->common.DestroyCapture = AudioAdapterDestroyCapture;
-    hwAdapter->common.GetPortCapability = AudioAdapterGetPortCapability;
-    hwAdapter->common.SetPassthroughMode = AudioAdapterSetPassthroughMode;
-    hwAdapter->common.GetPassthroughMode = AudioAdapterGetPassthroughMode;
-    hwAdapter->adapterDescriptor = *desc;
-    hwAdapter->adapterMgrRenderFlag = 0; // The adapterMgrRenderFlag init is zero
-    hwAdapter->adapterMgrCaptureFlag = 0; // The adapterMgrCaptureFlag init is zero
-    int32_t ret = AudioAddAdapterAddrToList((AudioHandle)(&hwAdapter->common), desc);
-    if (ret < 0) { // add for Fuzz
-        LOG_FUN_ERR("AudioAdapterAddrGet check Failed");
-        AudioMemFree((void **)&hwAdapter);
+
+    enum AudioAdapterType sndCardType = MatchAdapterType(desc->adapterName, desc->ports[0].portId);
+    int32_t ret = selectAppropriateAdapter(sndCardType, desc, adapter);
+    if (ret != AUDIO_HAL_SUCCESS) {
+        LOGE("%s: Load adapter failed.", __func__);
         return ret;
     }
-    *adapter = &hwAdapter->common;
+
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -320,17 +420,33 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
     AudioMemFree((void **)&adapter);
 }
 
-static struct AudioManager g_audioManagerFuncs = {
-    .GetAllAdapters = AudioManagerGetAllAdapters,
-    .LoadAdapter = AudioManagerLoadAdapter,
-    .UnloadAdapter = AudioManagerUnloadAdapter,
-};
+bool ReleaseAudioManagerObject(struct AudioManager *object)
+{
+    if ((&g_audioManagerFuncs) != object || object == NULL) {
+        return false;
+    }
+    ReleaseAudioManagerObjectComm(object);
+    audioAdapterAddrMgrFlag = false;
+    return true;
+}
+
+static void AudioMgrConstruct(struct AudioManager *audioMgr)
+{
+    if (audioMgr == NULL) {
+        LOG_FUN_ERR("Input pointer is null!");
+        return;
+    }
+    audioMgr->GetAllAdapters = AudioManagerGetAllAdapters;
+    audioMgr->LoadAdapter = AudioManagerLoadAdapter;
+    audioMgr->UnloadAdapter = AudioManagerUnloadAdapter;
+    audioMgr->ReleaseAudioManagerObject = ReleaseAudioManagerObject;
+}
 
 struct AudioManager *GetAudioManagerFuncs(void)
 {
-    static bool audioAdapterAddrMgrFlag = false;
     if (!audioAdapterAddrMgrFlag) {
         AudioAdapterAddrMgrInit(); // memset for Fuzz
+        AudioMgrConstruct(&g_audioManagerFuncs);
         audioAdapterAddrMgrFlag = true;
     }
     return &g_audioManagerFuncs;

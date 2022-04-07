@@ -88,4 +88,3 @@ char *PnpReportMsgSerialize(struct PnpReportMsg *pnpReportMsg);
     }
 #endif
 #endif /* PNP_MESSAGE_REPORT_H */
-

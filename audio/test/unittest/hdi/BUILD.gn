@@ -26,11 +26,11 @@ group("hdi") {
     testonly = true
   }
   deps = []
-  deps += [ "manager:hdf_audio_hdi_manager_test" ]
   if (defined(enable_hdf_audio_full_test_suite)) {
     deps += [
       "adapter:hdf_audio_hdi_adapter_test",
       "capture:hdf_audio_hdi_capture_test",
+      "manager:hdf_audio_hdi_manager_test",
       "render:hdf_audio_hdi_render_test",
     ]
   }

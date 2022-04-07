@@ -29,12 +29,35 @@
 #include "audio_types.h"
 #include "audio_internal.h"
 
+#define AUDIO_PRIMARY_ID_MIN        0
+#define AUDIO_PRIMARY_ID_MAX        10
+
+#define AUDIO_PRIMARY_EXT_ID_MIN    11
+#define AUDIO_PRIMARY_EXT_ID_MAX    20
+
+#define AUDIO_USB_ID_MIN            21
+#define AUDIO_USB_ID_MAX            30
+
+#define AUDIO_A2DP_ID_MIN           31
+#define AUDIO_A2DP_ID_MAX           40
+
+enum AudioAdapterType {
+    AUDIO_ADAPTER_PRIMARY = 0,  /* internel sound card */
+    AUDIO_ADAPTER_PRIMARY_EXT,  /* extern sound card */
+    AUDIO_ADAPTER_USB,         /* usb sound card */
+    AUDIO_ADAPTER_A2DP,         /* blue tooth sound card */
+    AUDIO_ADAPTER_MAX,          /* Invalid value. */
+};
+
+enum AudioAdapterType MatchAdapterType(const char *adapterName, uint32_t portId);
+int32_t AudioAdapterCheckPortId(const char *adapterName, uint32_t portId);
+
 struct AudioAdapterDescriptor *AudioAdapterGetConfigOut(void);
 struct AudioAdapterDescriptor *AudioAdapterGetConfigDescs(void);
 int32_t AudioAdapterGetAdapterNum(void);
 int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size);
 int32_t AudioAdapterExist(const char *adapterName);
-int32_t HdmiPortInit(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex);
+int32_t InitPortForCapabilitySub(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex);
 int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamValMap[], int32_t *count);
 int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key, void *value);
 int32_t GetErrorReason(int reason, char* reasonDesc);
@@ -62,5 +85,6 @@ int32_t AudioAddCaptureAddrToList(AudioHandle capture);
 int32_t AudioCheckCaptureAddr(AudioHandle capture);
 int32_t AudioDelCaptureAddrFromList(AudioHandle capture);
 void AudioSetFuzzCheckFlag(bool check);
+bool ReleaseAudioManagerObjectComm(struct AudioManager *object);
 
 #endif

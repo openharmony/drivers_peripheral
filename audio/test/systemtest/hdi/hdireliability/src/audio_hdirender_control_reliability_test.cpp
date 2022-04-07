@@ -22,13 +22,12 @@ using namespace testing::ext;
 using namespace HMOS::Audio;
 
 namespace {
-const string ADAPTER_NAME_USB = "usb";
 const int PTHREAD_SAMEADA_COUNT = 10;
 const int PTHREAD_DIFFADA_COUNT = 1;
 mutex g_testMutex;
 static struct PrepareAudioPara g_para[PTHREAD_DIFFADA_COUNT] = {
     {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_USB.c_str(),  .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(),  .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     }
 };

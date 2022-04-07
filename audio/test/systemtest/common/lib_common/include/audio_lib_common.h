@@ -49,6 +49,7 @@ const int G_SILENCETHRESHOLE = 0;
 const int G_PORTID = 0;
 const int STOP_THRESHOLD = 32;
 const int START_THRESHOLD = 8;
+const std::string HDF_AUDIO_CODEC_PRIMARY = "hdf_audio_codec_primary_dev0";
 
 int32_t InitRenderFramepara(struct AudioFrameRenderMode& frameRenderMode);
 

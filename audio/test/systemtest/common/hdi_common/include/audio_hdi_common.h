@@ -42,38 +42,33 @@
 #include "audio_types.h"
 #include "hdf_io_service_if.h"
 #include "hdf_sbuf.h"
-#include "audio_proxy_manager.h"
 
 namespace HMOS {
 namespace Audio {
 #ifdef AUDIO_ADM_SO
     const std::string FUNCTION_NAME = "GetAudioManagerFuncs";
     const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio");
-    using TestAudioManager = struct AudioManager;
     const int IS_ADM = true;
 #endif
 #ifdef AUDIO_MPI_SO
     const std::string FUNCTION_NAME = "GetAudioManagerFuncs";
     const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio");
-    using TestAudioManager = struct AudioManager;
     const int IS_ADM = false;
 #endif
 #ifdef AUDIO_ADM_SERVICE
     const std::string FUNCTION_NAME = "GetAudioProxyManagerFuncs";
     const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio_client");
-    using TestAudioManager = struct AudioProxyManager;
+    using TestAudioManager = struct AudioManager;
     const int IS_ADM = true;
 #endif
 #ifdef AUDIO_MPI_SERVICE
     const std::string FUNCTION_NAME = "GetAudioProxyManagerFuncs";
     const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio_client");
-    using TestAudioManager = struct AudioProxyManager;
     const int IS_ADM = false;
 #endif
 #ifdef __LITEOS__
     const std::string FUNCTION_NAME = "GetAudioManagerFuncs";
     const std::string RESOLVED_PATH = "/usr/lib/libhdi_audio.so";
-    using TestAudioManager = struct AudioManager;
     const int IS_ADM = true;
     const std::string AUDIO_FILE = "/userdata/audiorendertest.wav";
     const std::string LOW_LATENCY_AUDIO_FILE = "/userdata/lowlatencyrendertest.wav";
@@ -85,7 +80,10 @@ namespace Audio {
     const std::string AUDIO_CAPTURE_FILE = "//bin/audiocapture.wav";
     const std::string AUDIO_LOW_LATENCY_CAPTURE_FILE = "//bin/lowlatencycapturetest.wav";
 #endif
+const std::string ADAPTER_NAME = "primary";
+const std::string ADAPTER_NAME_OUT = "primary_ext";
 
+using TestAudioManager = struct AudioManager;
 const std::string AUDIO_RIFF = "RIFF";
 const std::string AUDIO_WAVE = "WAVE";
 const std::string AUDIO_DATA = "data";
@@ -106,7 +104,7 @@ const int FRAME_SIZE = 1024;
 const int FRAME_COUNT = 4;
 const int ADAPTER_COUNT = 32;
 const int TRY_NUM_FRAME = 20;
-const int AUDIO_ADAPTER_MAX_NUM = 4;
+const int AUDIO_ADAPTER_MAX_NUM = 5;
 const int AUDIO_WRITE_COMPELETED_VALUE = 1;
 const int AUDIO_RENDER_FULL_VALUE = 2;
 const int AUDIO_FLUSH_COMPLETED_VALUE = 3;
@@ -132,12 +130,13 @@ enum ControlDispMethodCmd {
     AUDIODRV_CTRL_IOCTRL_ELEM_BUTT,
 };
 
-enum AudioPCMBit {
-    PCM_8_BIT  = 8,
-    PCM_16_BIT = 16,
-    PCM_24_BIT = 24,
-    PCM_32_BIT = 32,
-};
+constexpr int PCM_8_BIT  = 8;
+constexpr int PCM_16_BIT = 16;
+constexpr int PCM_24_BIT = 24;
+constexpr int PCM_32_BIT = 32;
+
+constexpr int PCM_BYTE_MIN = 1024;
+constexpr int PCM_BYTE_MAX = 8 * 1024;
 
 struct AudioCtlElemId {
     const char *cardServiceName;
@@ -222,12 +221,12 @@ struct PrepareAudioPara {
 
 int32_t InitAttrs(struct AudioSampleAttributes &attrs);
 
-int32_t InitDevDesc(struct AudioDeviceDescriptor &devDesc, const uint32_t portId, enum AudioPortPin pins);
+int32_t InitDevDesc(struct AudioDeviceDescriptor &devDesc, const uint32_t portId, int pins);
 
 int32_t SwitchAdapter(struct AudioAdapterDescriptor *descs, const std::string &adapterNameCase,
-    enum AudioPortDirection portFlag, struct AudioPort *&audioPort, int size);
+    int portFlag, struct AudioPort *&audioPort, int size);
 
-uint32_t PcmFormatToBits(enum AudioFormat format);
+uint32_t PcmFormatToBits(int format);
 
 uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs);
 
@@ -235,13 +234,13 @@ int32_t WavHeadAnalysis(struct AudioHeadInfo &wavHeadInfo, FILE *file, struct Au
 
 int32_t GetAdapters(TestAudioManager *manager, struct AudioAdapterDescriptor **descs, int &size);
 
-int32_t GetLoadAdapter(TestAudioManager *manager, enum AudioPortDirection portType,
+int32_t GetLoadAdapter(TestAudioManager *manager, int portType,
     const std::string &adapterName, struct AudioAdapter **adapter, struct AudioPort *&audioPort);
 
-int32_t AudioCreateRender(TestAudioManager *manager, enum AudioPortPin pins, const std::string &adapterName,
+int32_t AudioCreateRender(TestAudioManager *manager, int pins, const std::string &adapterName,
     struct AudioAdapter **adapter, struct AudioRender **render);
 
-int32_t AudioCreateCapture(TestAudioManager *manager, enum AudioPortPin pins, const std::string &adapterName,
+int32_t AudioCreateCapture(TestAudioManager *manager, int pins, const std::string &adapterName,
     struct AudioAdapter **adapter, struct AudioCapture **capture);
 
 int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render, FILE *file,
@@ -282,8 +281,8 @@ int32_t PlayAudioFile(struct PrepareAudioPara &audiopara);
 
 int32_t RecordAudio(struct PrepareAudioPara &audiopara);
 
-int32_t InitAttrsUpdate(struct AudioSampleAttributes &attrs, enum AudioFormat format, uint32_t channelCount,
-    uint32_t sampleRate);
+int32_t InitAttrsUpdate(struct AudioSampleAttributes &attrs, int format, uint32_t channelCount,
+    uint32_t sampleRate, uint32_t silenceThreshold = BUFFER_LENTH);
 
 int32_t AudioRenderSetGetSampleAttributes(struct AudioSampleAttributes attrs, struct AudioSampleAttributes &attrsValue,
     struct AudioRender *render);
