@@ -34,13 +34,13 @@ RawAddress g_device;
 
 static void AudioOnConnectionStateChanged(const RawAddress &device, int state)
 {
-    HDF_LOGI("AudioOnConnectionStateChanged");
+    HDF_LOGI("AudioOnConnectionStateChanged, state:%d", state);
     g_device = RawAddress(device);
 }
 
 static void AudioOnPlayingStatusChanged(const RawAddress &device, int playingState, int error)
 {
-    HDF_LOGI("AudioOnPlayingStatusChanged");
+    HDF_LOGI("AudioOnPlayingStatusChanged, playingState:%d", playingState);
     g_playState = playingState;
 }
 
@@ -58,6 +58,7 @@ static BtA2dpAudioCallback g_hdiCallbacks = {
 
 int GetPlayingState()
 {
+    HDF_LOGI("GetPlayingState, state:%d", g_playState);
     return g_playState;
 }
 
