@@ -19,6 +19,7 @@ group("hdi_audio_bluetooth") {
   deps = [
     "hal/hdi_binder/proxy:audio_bluetooth_hdi_proxy_server",
     "hal/hdi_binder/server:audio_bluetooth_hdi_adapter_server",
+    "hal/hdi_config:hdf_a2dp_adapter_json",
     "hal/hdi_passthrough:hdi_audio_bluetooth",
   ]
 }

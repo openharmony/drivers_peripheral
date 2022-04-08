@@ -19,7 +19,7 @@
 #include "cJSON.h"
 #include "audio_adapter_info_common.h"
 namespace OHOS::HDI::Audio_Bluetooth {
-constexpr const char *AUDIO_ADAPTER_CONFIG = "/vendor/etc/hdfconfig/adapter_config.json";
+constexpr const char *AUDIO_ADAPTER_CONFIG = "/vendor/etc/hdfconfig/a2dp_adapter_config.json";
 constexpr int ADAPTER_NAME_LEN = 32;
 #define PORT_NAME_LEN           ADAPTER_NAME_LEN
 constexpr int SUPPORT_ADAPTER_NUM_MAX = 8;
