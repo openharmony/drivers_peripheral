@@ -21,7 +21,7 @@
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
-#define AUDIO_ADAPTER_CONFIG    HDF_CONFIG_DIR"/adapter_config.json"
+#define AUDIO_ADAPTER_CONFIG    HDF_CONFIG_DIR"/audio_adapter_config.json"
 #define ADAPTER_NAME_LEN        32
 #define PORT_NAME_LEN           ADAPTER_NAME_LEN
 #define SUPPORT_PORT_NUM_MAX    4
