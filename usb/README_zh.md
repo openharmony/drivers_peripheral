@@ -14,12 +14,12 @@
 -   Usb Host DDK：负责提供用户态第三方功能驱动的USB设备数据读写接口，向内核USB驱动框架注册的设备插拔时间通知接口，提供移除USB逻辑设备的接口；
 
 **图 1**  USB仓HOST侧相关模块逻辑视图<a name="fig3672817152110"></a>
-![](figures/logic-view-of-usb-host-modules_zh.png "logic-view-of-usb-host-modules_zh")
+![](figures/logic-view-of-usb-host-modules.png "logic-view-of-usb-host-modules")
 
 -   Usb Device DDK：负责创建和删除USB设备，接口的事件获取、打开、关闭等，管道同步异步读写通信，设置Usb自定义属性等；
 
 **图 2**  USB仓Device侧相关模块逻辑视图<a name="fig3672817152110"></a>
-![](figures/logic-view-of-usb-device-modules_zh.png "logic-view-of-usb-device-modules_zh")
+![](figures/logic-view-of-usb-device-modules.png "logic-view-of-usb-device-modules")
 
 ## 目录<a name="section161941989596"></a>
 
