@@ -55,7 +55,7 @@ int32_t AudioPathSelGetConfToJsonObj()
     }
     fpJson = fopen(CJSONFILE_CONFIG_PATH, "r");
     if (fpJson == NULL) {
-        LOG_FUN_ERR("parse.json file fail!");
+        LOG_FUN_ERR("audio_parse.json file fail!");
         return HDF_FAILURE;
     }
     if (fseek(fpJson, 0, SEEK_END) != HDF_SUCCESS) {
