@@ -33,11 +33,11 @@ group("hdi_audio") {
   deps = [ "hal/hdi_passthrough:hdi_audio" ]
 
   if (defined(ohos_lite)) {
-    deps += [ "config/lite:hdf_audio_json" ]
+    deps += [ "config/lite:hdf_audio_adapter_json" ]
   } else {
     if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
       deps += [
-        "config/linux:hdf_audio_json",
+        "config/linux:hdf_audio_adapter_json",
         "hal/hdi_binder/proxy:hdi_audio_client",
         "hal/hdi_binder/server:hdi_audio_a2dp_server",
         "hal/hdi_binder/server:hdi_audio_pnp_server",
