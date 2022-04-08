@@ -13,7 +13,6 @@
 
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
-import("../../../hal/camera.gni")
 group("camera_client") {
   deps = [ ":libcamera_client" ]
 }
@@ -25,11 +24,9 @@ config("libcamera_client_config") {
     "//drivers/peripheral/camera/interfaces/include",
     "//drivers/peripheral/camera/interfaces/hdi_ipc",
     "//drivers/peripheral/camera/interfaces/hdi_ipc/utils/include",
-    "//drivers/peripheral/camera/interfaces/hdi_ipc/server/include",
     "//drivers/peripheral/camera/interfaces/hdi_ipc/callback/device/include",
     "//drivers/peripheral/camera/interfaces/hdi_ipc/callback/operator/include",
     "//drivers/peripheral/camera/interfaces/hdi_ipc/callback/host/include",
-    "//drivers/peripheral/display/interfaces/include",
   ]
 }
 
