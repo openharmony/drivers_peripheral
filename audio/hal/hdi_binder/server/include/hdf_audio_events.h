@@ -13,21 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef HDF_AUDIO_PNP_SERVER_H
-#define HDF_AUDIO_PNP_SERVER_H
+#ifndef HDF_AUDIO_EVENTS_H
+#define HDF_AUDIO_EVENTS_H
 
-#include "hdf_types.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int32_t AudioPnpStatusSend(const char *serverName,
-    const char *tokenServerName, const char *pnpInfo, const int cmd);
-/* statusInfo is update new info */
-int32_t AudioPnpUpdateInfo(const char *statusInfo);
+#define AUDIO_PNP_MSG_LEN_MAX 256
+
+int32_t AudioPnpMsgDeSerialize(const char *pnpInfo, const char *typeName, uint32_t *value);
 
 #ifdef __cplusplus
-}
+    }
 #endif
-#endif
+#endif /* HDF_AUDIO_EVENTS_H */

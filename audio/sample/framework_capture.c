@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "audio_manager.h"
 #include <dlfcn.h>
 #include <limits.h>
 #include <pthread.h>
@@ -24,15 +23,17 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include "audio_proxy_manager.h"
-#include "audio_types.h"
-#include "hdf_base.h"
 #include "inttypes.h"
+#include "ioservstat_listener.h"
+#include "hdf_base.h"
 #include "hdf_io_service_if.h"
 #include "hdf_service_status.h"
-#include "ioservstat_listener.h"
 #include "svcmgr_ioservice.h"
-#include "pnp_message_report.h"
+#include "audio_events.h"
+#include "audio_manager.h"
+#include "audio_types.h"
+#include "audio_proxy_manager.h"
+#include "hdf_audio_events.h"
 
 #define LOG_FUN_ERR(fmt, arg...) do { \
         printf("%s: [%s]: [%d]:[ERROR]:" fmt"\n", __FILE__, __func__, __LINE__, ##arg); \
@@ -245,21 +246,19 @@ uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)
 }
 
 #ifndef __LITEOS__
-static int AudioPnpSvcThresholdMsgCheck(struct ServiceStatus *svcStatus, struct PnpReportMsg *pnpReportMsg)
+static int AudioPnpSvcThresholdMsgCheck(struct ServiceStatus *svcStatus, struct AudioEvent *audioEvent)
 {
-    int ret;
-    if (svcStatus == NULL || pnpReportMsg == NULL) {
+    if (svcStatus == NULL || audioEvent == NULL) {
         printf("AudioPnpSvcThresholdMsgCheck:input param is null!\n");
         return HDF_FAILURE;
     }
-
-    ret = PnpReportMsgDeSerialize((uint8_t *)svcStatus->info, EVENT_REPORT, pnpReportMsg);
-    if (ret != HDF_SUCCESS) {
-        printf("PnpReportMsgDeSerialize fail \n");
+    if ((AudioPnpMsgDeSerialize(svcStatus->info, "EVENT_TYPE", &(audioEvent->eventType)) != HDF_SUCCESS) ||
+        (AudioPnpMsgDeSerialize(svcStatus->info, "DEVICE_TYPE", &(audioEvent->deviceType)) != HDF_SUCCESS)) {
+        printf("DeSerialize fail!\n");
         return HDF_FAILURE;
     }
-    if (pnpReportMsg->eventMsg.eventType != EVENT_REPORT || pnpReportMsg->eventMsg.eventId != CAPTURE_THRESHOLD) {
-        printf("AudioPnpSvcThresholdMsgCheck eventType or eventId not fit.\n");
+    if (audioEvent->eventType != HDF_AUDIO_CAPTURE_THRESHOLD || audioEvent->deviceType != HDF_AUDIO_PRIMARY_DEVICE) {
+        printf("AudioPnpSvcThresholdMsgCheck deviceType not fit.\n");
         return HDF_FAILURE;
     }
 
@@ -274,14 +273,14 @@ static void AudioPnpSvcEvenReceived(struct ServiceStatusListener *listener, stru
     uint64_t replyBytes = 0;
     uint64_t requestBytes = AUDIO_BUFF_SIZE; // 16 * 1024 = 16KB
     int32_t index = 0;
-    struct PnpReportMsg pnpReportMsg = {0};
+    struct AudioEvent audioEvent = {0};
     char *frame = NULL;
 
     if ((svcStatus == NULL) || (listener == NULL)) {
         printf("input param is null!\n");
         return ;
     }
-    if (AudioPnpSvcThresholdMsgCheck(svcStatus, &pnpReportMsg) != HDF_SUCCESS) {
+    if (AudioPnpSvcThresholdMsgCheck(svcStatus, &audioEvent) != HDF_SUCCESS) {
         return ;
     }
     strParam = (struct StrParaCapture *)listener->priv;
@@ -679,33 +678,47 @@ int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen, char *func, int32
     return HDF_SUCCESS;
 }
 
+struct AudioManager *GetAudioManagerInsForCapture(const char *funcString)
+{
+    struct AudioManager *(*getAudioManager)(void) = NULL;
+    if (funcString == NULL) {
+        LOG_FUN_ERR("funcString is null!");
+        return NULL;
+    }
+    if (g_captureHandle == NULL) {
+        LOG_FUN_ERR("g_captureHandle is null!");
+        return NULL;
+    }
+    getAudioManager = (struct AudioManager *(*)())(dlsym(g_captureHandle, funcString));
+    if (getAudioManager == NULL) {
+        LOG_FUN_ERR("Get Audio Manager Funcs Fail");
+        return NULL;
+    }
+    return getAudioManager();
+}
+
 int32_t GetCapturePassthroughManagerFunc(const char *adapterNameCase)
 {
-    if (adapterNameCase == NULL) {
-        LOG_FUN_ERR("The Parameter is NULL");
-        return HDF_FAILURE;
-    }
-    struct AudioManager *manager = NULL;
     struct AudioAdapterDescriptor *descs = NULL;
     enum AudioPortDirection port = PORT_OUT; // Set port information
     struct AudioPort capturePort;
     int32_t size = 0;
-    int32_t ret;
-    int32_t index;
-    struct AudioManager *(*getAudioManager)(void) = NULL;
-    getAudioManager = (struct AudioManager *(*)())(dlsym(g_captureHandle, "GetAudioManagerFuncs"));
-    if (getAudioManager == NULL) {
-        LOG_FUN_ERR("Get Audio Manager Funcs Fail");
+    if (adapterNameCase == NULL) {
+        LOG_FUN_ERR("The Parameter is NULL");
         return HDF_FAILURE;
     }
-    manager = getAudioManager();
-    ret = manager->GetAllAdapters(manager, &descs, &size);
+    struct AudioManager *manager = GetAudioManagerInsForCapture("GetAudioManagerFuncs");
+    if (manager == NULL) {
+        LOG_FUN_ERR("GetAudioManagerInsForCapture Fail");
+        return HDF_FAILURE;
+    }
+    int32_t ret = manager->GetAllAdapters(manager, &descs, &size);
     int32_t param = size == 0 || descs == NULL || ret < 0;
     if (param) {
         LOG_FUN_ERR("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
     }
-    index = SwitchAdapterCapture(descs, adapterNameCase, port, &capturePort, size);
+    int32_t index = SwitchAdapterCapture(descs, adapterNameCase, port, &capturePort, size);
     if (index < 0) {
         LOG_FUN_ERR("Not Switch Adapter Fail");
         return HDF_ERR_NOT_SUPPORT;
@@ -735,31 +748,26 @@ int32_t GetCapturePassthroughManagerFunc(const char *adapterNameCase)
 
 int32_t GetCaptureProxyManagerFunc(const char *adapterNameCase)
 {
-    if (adapterNameCase == NULL) {
-        LOG_FUN_ERR("The Parameter is NULL");
-        return HDF_FAILURE;
-    }
-    struct AudioManager *proxyManager = NULL;
     struct AudioAdapterDescriptor *descs = NULL;
     enum AudioPortDirection port = PORT_OUT; // Set port information
     struct AudioPort capturePort;
     int32_t size = 0;
-    int32_t ret;
-    int32_t index;
-    struct AudioManager *(*getAudioManager)(void) = NULL;
-    getAudioManager = (struct AudioManager *(*)())(dlsym(g_captureHandle, "GetAudioProxyManagerFuncs"));
-    if (getAudioManager == NULL) {
+    if (adapterNameCase == NULL) {
+        LOG_FUN_ERR("The Parameter is NULL");
         return HDF_FAILURE;
     }
-    proxyManager = getAudioManager();
-    ret = proxyManager->GetAllAdapters(proxyManager, &descs, &size);
+    struct AudioManager *proxyManager = GetAudioManagerInsForCapture("GetAudioProxyManagerFuncs");
+    if (proxyManager == NULL) {
+        LOG_FUN_ERR("GetAudioManagerInsForCapture Fail");
+        return HDF_FAILURE;
+    }
+    int32_t ret = proxyManager->GetAllAdapters(proxyManager, &descs, &size);
     int32_t check = size == 0 || descs == NULL || ret < 0;
     if (check) {
         LOG_FUN_ERR("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
     }
-    // Get qualified sound card and port
-    index = SwitchAdapterCapture(descs, adapterNameCase, port, &capturePort, size);
+    int32_t index = SwitchAdapterCapture(descs, adapterNameCase, port, &capturePort, size);
     if (index < 0) {
         LOG_FUN_ERR("Not Switch Adapter Fail");
         return HDF_ERR_NOT_SUPPORT;
@@ -774,14 +782,11 @@ int32_t GetCaptureProxyManagerFunc(const char *adapterNameCase)
         LOG_FUN_ERR("load audio device failed");
         return HDF_FAILURE;
     }
-    // Initialization port information, can fill through mode and other parameters
     (void)g_adapter->InitAllPorts(g_adapter);
-    // User needs to set
     if (InitAttrsCapture(&g_attrs) < 0) {
         g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
         return HDF_FAILURE;
     }
-    // Specify a hardware device
     if (InitDevDescCapture(&g_devDesc, capturePort.portId) < 0) {
         g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
         return HDF_FAILURE;
