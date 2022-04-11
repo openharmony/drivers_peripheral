@@ -452,7 +452,8 @@ int32_t MpiDeviceManager::CheckNodePortNum(std::string controllerName)
         CAMERA_LOGW("num length is 0");
         return 0;
     }
-    return atoi(num.c_str());
+    
+    return static_cast<int32_t>(strtol(num.c_str(), nullptr, 10)); // 10:decimal
 }
 
 void MpiDeviceManager::SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag)

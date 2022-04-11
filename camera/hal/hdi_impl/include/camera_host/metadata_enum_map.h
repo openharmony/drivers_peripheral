@@ -116,7 +116,7 @@ std::map<std::string, camera_ae_antibanding_mode_t> AeAntibandingModeMap = {
     {"OHOS_CAMERA_AE_ANTIBANDING_MODE_AUTO", OHOS_CAMERA_AE_ANTIBANDING_MODE_AUTO},
 };
 
-std::map<std::string, camera_ae_lock_t> AeLockMap= {
+std::map<std::string, camera_ae_lock_t> AeLockMap = {
     {"OHOS_CAMERA_AE_LOCK_OFF", OHOS_CAMERA_AE_LOCK_OFF},
     {"OHOS_CAMERA_AE_LOCK_ON", OHOS_CAMERA_AE_LOCK_ON},
 };

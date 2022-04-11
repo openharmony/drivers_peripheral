@@ -25,16 +25,16 @@ public:
     GrallocBufferAllocator();
     virtual ~GrallocBufferAllocator();
 
-    virtual RetCode Init() override;
-    virtual std::shared_ptr<IBuffer> AllocBuffer(const uint32_t width,
+    RetCode Init() override;
+    std::shared_ptr<IBuffer> AllocBuffer(const uint32_t width,
                                                  const uint32_t height,
                                                  const uint64_t cameraUsage,
                                                  const uint32_t format) override;
-    virtual RetCode FreeBuffer(std::shared_ptr<IBuffer>& buffer) override;
-    virtual RetCode MapBuffer(std::shared_ptr<IBuffer>& buffer) override;
-    virtual RetCode UnmapBuffer(std::shared_ptr<IBuffer>& buffer) override;
-    virtual RetCode FlushCache(std::shared_ptr<IBuffer>& buffer) override;
-    virtual RetCode InvalidateCache(std::shared_ptr<IBuffer>& buffer) override;
+    RetCode FreeBuffer(std::shared_ptr<IBuffer>& buffer) override;
+    RetCode MapBuffer(std::shared_ptr<IBuffer>& buffer) override;
+    RetCode UnmapBuffer(std::shared_ptr<IBuffer>& buffer) override;
+    RetCode FlushCache(std::shared_ptr<IBuffer>& buffer) override;
+    RetCode InvalidateCache(std::shared_ptr<IBuffer>& buffer) override;
 
 private:
     GrallocFuncs* grallocFuncs_ = nullptr;

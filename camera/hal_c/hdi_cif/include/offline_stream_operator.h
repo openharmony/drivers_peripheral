@@ -27,9 +27,9 @@ public:
     OfflineStreamOperator();
     void Init(OfflineStreamOperatorCIF* op);
     virtual ~OfflineStreamOperator();
-    virtual CamRetCode CancelCapture(int captureId) override;
-    virtual CamRetCode ReleaseStreams(const std::vector<int>& streamIds) override;
-    virtual CamRetCode Release() override;
+    CamRetCode CancelCapture(int captureId) override;
+    CamRetCode ReleaseStreams(const std::vector<int>& streamIds) override;
+    CamRetCode Release() override;
 
 private:
     OfflineStreamOperatorCIF* operator_ = nullptr;

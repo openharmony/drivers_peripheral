@@ -36,29 +36,29 @@ public:
     CameraDeviceImpl& operator=(CameraDeviceImpl &&other) = delete;
 
 public:
-    virtual CamRetCode GetStreamOperator(const OHOS::sptr<IStreamOperatorCallback> &callback,
+    CamRetCode GetStreamOperator(const OHOS::sptr<IStreamOperatorCallback> &callback,
         OHOS::sptr<IStreamOperator> &streamOperator) override;
-    virtual CamRetCode UpdateSettings(const std::shared_ptr<CameraSetting> &settings) override;
-    virtual CamRetCode SetResultMode(const ResultCallbackMode &mode) override;
-    virtual CamRetCode GetEnabledResults(std::vector<MetaType> &results) override;
-    virtual CamRetCode EnableResult(const std::vector<MetaType> &results) override;
-    virtual CamRetCode DisableResult(const std::vector<MetaType> &results) override;
-    virtual void Close() override;
+    CamRetCode UpdateSettings(const std::shared_ptr<CameraSetting> &settings) override;
+    CamRetCode SetResultMode(const ResultCallbackMode &mode) override;
+    CamRetCode GetEnabledResults(std::vector<MetaType> &results) override;
+    CamRetCode EnableResult(const std::vector<MetaType> &results) override;
+    CamRetCode DisableResult(const std::vector<MetaType> &results) override;
+    void Close() override;
 
-    virtual std::shared_ptr<IPipelineCore> GetPipelineCore() const override;
-    virtual CamRetCode SetCallback(const OHOS::sptr<ICameraDeviceCallback> &callback) override;
-    virtual ResultCallbackMode GetMetaResultMode() const override;
+    std::shared_ptr<IPipelineCore> GetPipelineCore() const override;
+    CamRetCode SetCallback(const OHOS::sptr<ICameraDeviceCallback> &callback) override;
+    ResultCallbackMode GetMetaResultMode() const override;
     /* RC_OK: metadata changed；RC_ERROR: metadata unchanged； */
-    virtual RetCode GetMetadataResults(std::shared_ptr<CameraStandard::CameraMetadata> &metadata) override;
-    virtual void ResultMetadata() override;
-    virtual void GetCameraId(std::string &cameraId) const override;
-    virtual bool IsOpened() const override;
-    virtual void SetStatus(bool isOpened) override;
+    RetCode GetMetadataResults(std::shared_ptr<CameraStandard::CameraMetadata> &metadata) override;
+    void ResultMetadata() override;
+    void GetCameraId(std::string &cameraId) const override;
+    bool IsOpened() const override;
+    void SetStatus(bool isOpened) override;
     void OnRequestTimeout();
 
 protected:
-    virtual void OnMetadataChanged(const std::shared_ptr<CameraStandard::CameraMetadata> &metadata) override;
-    virtual void OnDevStatusErr() override;
+    void OnMetadataChanged(const std::shared_ptr<CameraStandard::CameraMetadata> &metadata) override;
+    void OnDevStatusErr() override;
 
 private:
     RetCode GetEnabledFromCfg();

@@ -25,8 +25,8 @@ public:
     virtual ~CameraDeviceCallback() = default;
 
 public:
-    virtual void OnError(ErrorType type, int32_t errorMsg) override;
-    virtual void OnResult(uint64_t timestamp, const std::shared_ptr<CameraStandard::CameraMetadata> &result) override;
+    void OnError(ErrorType type, int32_t errorMsg) override;
+    void OnResult(uint64_t timestamp, const std::shared_ptr<CameraStandard::CameraMetadata> &result) override;
 };
 }
 #endif // HDI_CAMERA_DEVICE_CALLBACK_H

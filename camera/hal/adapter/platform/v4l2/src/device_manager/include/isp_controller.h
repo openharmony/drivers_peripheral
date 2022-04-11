@@ -41,7 +41,7 @@ public:
     {
         (void)meta;
         return RC_OK;
-    };
+    }
 private:
     std::mutex startIsplock_;
     bool startIspState_ = false;

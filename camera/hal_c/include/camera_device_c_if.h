@@ -26,7 +26,7 @@ extern "C" {
 
 typedef struct CameraDeviceCallbackCIF {
     void (*OnError)(int /*ErrorTypeCIF*/ type, int errorMsg);
-    void (*OnResult)(long timestamp, CameraResultCIF* result);
+    void (*OnResult)(uint64_t timestamp, CameraResultCIF* result);
 } CameraDeviceCallbackCIF;
 
 typedef struct CameraDeviceCIF {

@@ -135,7 +135,7 @@ public:
         SinkNode(const std::string name) : Node(name) {}
         ~SinkNode() {}
         void Deliver(std::shared_ptr<IBuffer>& buffer) override;
-        void BindCallback(std::function<void(std::shared_ptr<IBuffer>&)> callback);
+        void BindCallback(std::function<void(std::shared_ptr<IBuffer>&)>& callback);
 
     private:
         std::function<void(std::shared_ptr<IBuffer>&)> callback_ = nullptr;
@@ -171,7 +171,7 @@ public:
         std::mutex streamLock_;
         std::thread* collectThread_ = nullptr;
         std::shared_ptr<Node> sourceNode_ = nullptr;
-        uint64_t frameNumber = 0;
+        uint64_t frameNumber_ = 0;
 
         struct LocalStream {
             std::mutex deviceLock_;

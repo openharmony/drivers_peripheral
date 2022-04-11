@@ -34,14 +34,14 @@ public:
 
 public:
     void Init(CameraDeviceCIF* device);
-    virtual CamRetCode GetStreamOperator(const OHOS::sptr<IStreamOperatorCallback>& callback,
+    CamRetCode GetStreamOperator(const OHOS::sptr<IStreamOperatorCallback>& callback,
                                          OHOS::sptr<IStreamOperator>& streamOperator) override;
-    virtual CamRetCode UpdateSettings(const std::shared_ptr<CameraSetting>& settings) override;
-    virtual CamRetCode SetResultMode(const ResultCallbackMode& mode) override;
-    virtual CamRetCode GetEnabledResults(std::vector<MetaType>& results) override;
-    virtual CamRetCode EnableResult(const std::vector<MetaType>& results) override;
-    virtual CamRetCode DisableResult(const std::vector<MetaType>& results) override;
-    virtual void Close() override;
+    CamRetCode UpdateSettings(const std::shared_ptr<CameraSetting>& settings) override;
+    CamRetCode SetResultMode(const ResultCallbackMode& mode) override;
+    CamRetCode GetEnabledResults(std::vector<MetaType>& results) override;
+    CamRetCode EnableResult(const std::vector<MetaType>& results) override;
+    CamRetCode DisableResult(const std::vector<MetaType>& results) override;
+    void Close() override;
 
 private:
     CameraDeviceCIF* device_ = nullptr;

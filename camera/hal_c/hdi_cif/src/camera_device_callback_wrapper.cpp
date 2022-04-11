@@ -36,13 +36,13 @@ void DeviceCBOnError(int /*ErrorTypeCIF*/ type, int errorMsg)
     return;
 }
 
-void DeviceCBOnResult(long timestamp, CameraResultCIF* result)
+void DeviceCBOnResult(uint64_t timestamp, CameraResultCIF* result)
 {
     if (g_deviceCallback == nullptr) {
         return;
     }
 
-    std::shared_ptr<OHOS::CameraStandard::CameraMetadata> meta = std::make_shared<OHOS::CameraStandard::CameraMetadata>(0,0);
+    std::shared_ptr<OHOS::CameraStandard::CameraMetadata> meta = std::make_shared<OHOS::CameraStandard::CameraMetadata>(0, 0);
     g_deviceCallback->OnResult(timestamp, meta);
 
     return;

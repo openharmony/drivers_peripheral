@@ -26,25 +26,25 @@ public:
     explicit StreamOperatorProxy(const sptr<IRemoteObject>& impl) : IRemoteProxy<IStreamOperator>(impl) {}
     virtual ~StreamOperatorProxy() = default;
 
-    virtual CamRetCode IsStreamsSupported(
+    CamRetCode IsStreamsSupported(
         OperationMode mode,
         const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
         const std::vector<std::shared_ptr<StreamInfo>>& pInfo,
         StreamSupportType &pType) override;
-    virtual CamRetCode CreateStreams(
+    CamRetCode CreateStreams(
         const std::vector<std::shared_ptr<StreamInfo>> &streamInfos) override;
-    virtual CamRetCode ReleaseStreams(const std::vector<int> &streamIds) override;
-    virtual CamRetCode CommitStreams(OperationMode mode,
+    CamRetCode ReleaseStreams(const std::vector<int> &streamIds) override;
+    CamRetCode CommitStreams(OperationMode mode,
         const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting) override;
-    virtual CamRetCode GetStreamAttributes(
+    CamRetCode GetStreamAttributes(
         std::vector<std::shared_ptr<StreamAttribute>> &attributes) override;
-    virtual CamRetCode AttachBufferQueue(int streamId,
+    CamRetCode AttachBufferQueue(int streamId,
         const OHOS::sptr<OHOS::IBufferProducer> &producer) override;
-    virtual CamRetCode DetachBufferQueue(int streamId) override;
-    virtual CamRetCode Capture(int captureId,
+    CamRetCode DetachBufferQueue(int streamId) override;
+    CamRetCode Capture(int captureId,
         const std::shared_ptr<CaptureInfo> &pInfo,  bool isStreaming) override;
-    virtual CamRetCode CancelCapture(int captureId) override;
-    virtual CamRetCode ChangeToOfflineStream(const std::vector<int> &streamIds,
+    CamRetCode CancelCapture(int captureId) override;
+    CamRetCode ChangeToOfflineStream(const std::vector<int> &streamIds,
         OHOS::sptr<IStreamOperatorCallback> &callback,
         OHOS::sptr<IOfflineStreamOperator> &offlineOperator) override;
 

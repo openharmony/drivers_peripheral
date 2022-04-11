@@ -76,7 +76,7 @@ void StreamCBOnCaptureError(int captureId, CaptureErrorInfoCIF* info, int count)
     return;
 }
 
-void StreamCBOnFrameShutter(int captureId, int* streamId, int count, long timestamp)
+void StreamCBOnFrameShutter(int captureId, int* streamId, int count, uint64_t timestamp)
 {
     if (g_streamCallback == nullptr) {
         return;

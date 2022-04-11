@@ -27,9 +27,9 @@ class OfflineStreamOperator : public OfflineStreamOperatorStub {
 public:
     OfflineStreamOperator();
     virtual ~OfflineStreamOperator();
-    virtual CamRetCode CancelCapture(int captureId) override;
-    virtual CamRetCode ReleaseStreams(const std::vector<int>& streamIds) override;
-    virtual CamRetCode Release() override;
+    CamRetCode CancelCapture(int captureId) override;
+    CamRetCode ReleaseStreams(const std::vector<int>& streamIds) override;
+    CamRetCode Release() override;
 
 public:
     RetCode CommitOfflineStream(const std::shared_ptr<OfflineStream>& of);

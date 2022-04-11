@@ -31,7 +31,7 @@ public:
     std::string GetName()
     {
         return hardwareName_;
-    };
+    }
     bool GetPowerOnState();
     void SetPowerOnState(bool powerOnState);
     virtual void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag) = 0;
@@ -39,7 +39,7 @@ public:
     virtual bool GetMetaDataFlag()
     {
         return false;
-    };
+    }
     virtual void SetMetaDataFlag(bool metaDataFlag);
     virtual RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta) = 0;
 

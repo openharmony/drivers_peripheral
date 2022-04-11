@@ -26,20 +26,20 @@ class StreamPipelineCore : public IStreamPipelineCore {
 public:
     StreamPipelineCore(const std::shared_ptr<NodeContext>& c) : context_(c) {}
     virtual ~StreamPipelineCore() override = default;
-    virtual RetCode Init() override;
-    virtual RetCode PreConfig(const ModeMeta& meta) override;
-    virtual RetCode CreatePipeline(const int32_t& mode) override;
-    virtual RetCode DestroyPipeline(const std::vector<int32_t>& ids) override;
-    virtual RetCode Prepare(const std::vector<int32_t>& ids) override;
-    virtual RetCode Start(const std::vector<int32_t>& ids) override;
-    virtual RetCode Flush(const std::vector<int32_t>& ids) override;
-    virtual RetCode Stop(const std::vector<int32_t>& ids) override;
-    virtual RetCode Config(const std::vector<int32_t>& ids, const CaptureMeta& meta) override;
-    virtual RetCode Capture(const std::vector<int32_t>& ids, const int32_t captureId) override;
-    virtual RetCode CancelCapture(const std::vector<int>& streamIds) override;
-    virtual std::shared_ptr<OfflinePipeline> GetOfflinePipeline(const int32_t id) override;
-    virtual OperationMode GetCurrentMode() const override;
-    virtual DynamicStreamSwitchMode CheckStreamsSupported(OperationMode mode,
+    RetCode Init() override;
+    RetCode PreConfig(const ModeMeta& meta) override;
+    RetCode CreatePipeline(const int32_t& mode) override;
+    RetCode DestroyPipeline(const std::vector<int32_t>& ids) override;
+    RetCode Prepare(const std::vector<int32_t>& ids) override;
+    RetCode Start(const std::vector<int32_t>& ids) override;
+    RetCode Flush(const std::vector<int32_t>& ids) override;
+    RetCode Stop(const std::vector<int32_t>& ids) override;
+    RetCode Config(const std::vector<int32_t>& ids, const CaptureMeta& meta) override;
+    RetCode Capture(const std::vector<int32_t>& ids, const int32_t captureId) override;
+    RetCode CancelCapture(const std::vector<int>& streamIds) override;
+    std::shared_ptr<OfflinePipeline> GetOfflinePipeline(const int32_t id) override;
+    OperationMode GetCurrentMode() const override;
+    DynamicStreamSwitchMode CheckStreamsSupported(OperationMode mode,
         const ModeMeta& meta, const std::vector<StreamConfiguration>& configs) override;
 
 protected:
