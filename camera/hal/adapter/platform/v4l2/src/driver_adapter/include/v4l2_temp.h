@@ -28,7 +28,7 @@ namespace OHOS::Camera {
 class IBuffer {
 public:
     IBuffer() {}
-    ~IBuffer(){};
+    ~IBuffer(){}
 
     int32_t GetIndex()
     {

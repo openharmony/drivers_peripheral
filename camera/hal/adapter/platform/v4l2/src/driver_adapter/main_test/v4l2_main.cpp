@@ -229,7 +229,7 @@ void ProcessImage(const unsigned char* p, unsigned char* fbp)
     int istride = 1280;
     int x, y, j;
     int y0, u, v, r, g, b;
-    long location = 0;
+    int32_t location = 0;
     int xpos = (g_vInfo.xres - width) / 2;
     int ypos = (g_vInfo.yres - height) / 2;
     int yPos, uPos, vPos;

@@ -32,7 +32,7 @@ public:
     {
         (void)meta;
         return RC_OK;
-    };
+    }
     RetCode SetFlashlight(FlashMode flashMode, bool enable);
     void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag);
     RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);

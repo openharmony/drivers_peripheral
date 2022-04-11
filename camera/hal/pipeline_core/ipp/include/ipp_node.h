@@ -27,16 +27,16 @@ class IppNode : public NodeBase, public OfflinePipeline {
 public:
     IppNode(const std::string& name, const std::string& type);
     ~IppNode();
-    virtual RetCode Init(const int32_t streamId) override;
-    virtual RetCode Start(const int32_t streamId) override;
-    virtual RetCode Stop(const int32_t streamId) override;
-    virtual RetCode Flush(const int32_t streamId) override;
-    virtual RetCode Config(const int32_t streamId, const CaptureMeta& meta) override;
-    virtual void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
-    virtual void DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
-    virtual void ProcessCache(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
-    virtual void DeliverCache(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
-    virtual void DeliverCancelCache(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
+    RetCode Init(const int32_t streamId) override;
+    RetCode Start(const int32_t streamId) override;
+    RetCode Stop(const int32_t streamId) override;
+    RetCode Flush(const int32_t streamId) override;
+    RetCode Config(const int32_t streamId, const CaptureMeta& meta) override;
+    void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
+    void DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
+    void ProcessCache(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
+    void DeliverCache(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
+    void DeliverCancelCache(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
 
 protected:
     RetCode GetOutputBuffer(std::vector<std::shared_ptr<IBuffer>>& buffers, std::shared_ptr<IBuffer>& outBuffer);

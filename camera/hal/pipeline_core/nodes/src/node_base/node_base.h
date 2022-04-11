@@ -37,8 +37,8 @@ public:
     int32_t Direction() const override;
     std::shared_ptr<INode> GetNode() const override;
     std::shared_ptr<IPort> Peer() const override;
-    virtual void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
-    virtual void DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
+    void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
+    void DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
     void DeliverBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
     void DeliverBuffers(std::vector<std::shared_ptr<FrameSpec>> mergeVec) override;
 protected:

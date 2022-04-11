@@ -27,14 +27,14 @@ public:
     explicit CameraHostProxy(const sptr<IRemoteObject>& impl) : IRemoteProxy<ICameraHost>(impl) {}
     virtual ~CameraHostProxy() {}
 
-    virtual CamRetCode SetCallback(const OHOS::sptr<ICameraHostCallback> &callback) override;
-    virtual CamRetCode GetCameraIds(std::vector<std::string> &cameraIds) override;
-    virtual CamRetCode GetCameraAbility(const std::string &cameraId,
+    CamRetCode SetCallback(const OHOS::sptr<ICameraHostCallback> &callback) override;
+    CamRetCode GetCameraIds(std::vector<std::string> &cameraIds) override;
+    CamRetCode GetCameraAbility(const std::string &cameraId,
         std::shared_ptr<CameraAbility> &ability) override;
-    virtual CamRetCode OpenCamera(const std::string &cameraId,
+    CamRetCode OpenCamera(const std::string &cameraId,
         const OHOS::sptr<ICameraDeviceCallback> &callback,
         OHOS::sptr<ICameraDevice> &pDevice) override;
-    virtual CamRetCode SetFlashlight(const std::string &cameraId, bool &isEnable) override;
+    CamRetCode SetFlashlight(const std::string &cameraId, bool &isEnable) override;
 
 private:
     static inline BrokerDelegator<CameraHostProxy> delegator_;

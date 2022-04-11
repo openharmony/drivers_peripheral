@@ -38,11 +38,11 @@ public:
     {
         (void)metadata;
         return RC_OK;
-    };
+    }
     bool GetStartVoState()
     {
         return startVoState_;
-    };
+    }
     void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag)
     {
         (void)abilityMetaDataTag;
@@ -52,11 +52,11 @@ public:
     {
         (void)cameraMeta;
         return RC_OK;
-    };
+    }
     bool GetMetaDataFlag()
     {
         return false;
-    };
+    }
     void SetMetaDataFlag(bool metaDataFlag)
     {
         (void)metaDataFlag;

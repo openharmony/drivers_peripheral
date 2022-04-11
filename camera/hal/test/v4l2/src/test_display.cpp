@@ -152,7 +152,7 @@ void TestDisplay::ProcessImage(const unsigned char* p, unsigned char* fbp)
     int istride = 1280; // 1280:Initial value of span
     int x, y, j;
     int y0, u, v, r, g, b;
-    long location = 0;
+    int32_t location = 0;
     int xpos = (vinfo_.xres - width) / 2;
     int ypos = (vinfo_.yres - height) / 2;
     int y_pos, u_pos, v_pos;

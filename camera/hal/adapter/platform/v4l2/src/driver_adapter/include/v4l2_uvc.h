@@ -21,7 +21,6 @@
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
 #include <sys/select.h>
-#include <linux/netlink.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <sys/eventfd.h>

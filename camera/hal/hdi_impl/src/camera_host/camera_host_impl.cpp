@@ -19,7 +19,6 @@
 #include "camera_host_config.h"
 #include "camera_device_impl.h"
 
-#include "idevice_manager.h"
 #include "icamera_host_callback.h"
 #include "icamera_device.h"
 
