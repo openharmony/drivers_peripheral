@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <hdf_log.h>
 #include "audio_adapter_info_common.h"
 #include "audio_internal.h"
 #include "audio_bluetooth_manager.h"
@@ -22,13 +22,13 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
                                    int *size)
 {
     int32_t ret;
-    LOG_FUN_INFO();
+    HDF_LOGI("%s", __func__);
     if (manager == NULL || descs == NULL || size == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     ret = AudioAdaptersForUser(descs, size);
     if (ret < 0) {
-        LOG_FUN_ERR("AudioAdaptersForUser FAIL!");
+        HDF_LOGE("AudioAdaptersForUser FAIL!");
         return AUDIO_HAL_ERR_NOTREADY; // Failed to read sound card configuration file
     }
     return AUDIO_HAL_SUCCESS;
@@ -37,18 +37,18 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
 int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct AudioAdapterDescriptor *desc,
                                 struct AudioAdapter **adapter)
 {
-    LOG_FUN_INFO();
+    HDF_LOGI("%s", __func__);
     if (manager == NULL || desc == NULL || desc->adapterName == NULL || desc->ports == NULL || adapter == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     LOGV("%s: adapter name %s", __func__, desc->adapterName);
     if (AudioAdapterExist(desc->adapterName)) {
-        LOGE("%s: not supported this adapter %s", __func__, desc->adapterName);
+        HDF_LOGE("%s: not supported this adapter %s", __func__, desc->adapterName);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)calloc(1, sizeof(*hwAdapter));
     if (hwAdapter == NULL) {
-        LOGE("%s: calloc AudioHwAdapter failed", __func__);
+        HDF_LOGE("%s: calloc AudioHwAdapter failed", __func__);
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     hwAdapter->common.InitAllPorts = AudioAdapterInitAllPorts;

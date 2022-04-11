@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <hdf_log.h>
 #include "audio_internal.h"
 #include "audio_adapter_info_common.h"
 #include "audio_adapter.h"
@@ -142,23 +142,23 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
                           const struct AudioSampleAttributes *attrs)
 {
     if (hwRender == NULL || desc == NULL || attrs == NULL) {
-        LOG_FUN_ERR("InitHwRenderParam param Is NULL");
+        HDF_LOGE("InitHwRenderParam param Is NULL");
         return HDF_FAILURE;
     }
     int32_t ret = CheckParaDesc(desc, TYPE_RENDER);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("CheckParaDesc Fail");
+        HDF_LOGE("CheckParaDesc Fail");
         return ret;
     }
     ret = CheckParaAttr(attrs);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("CheckParaAttr Fail");
+        HDF_LOGE("CheckParaAttr Fail");
         return ret;
     }
     int32_t formatValue = -1;
     ret = AttrFormatToBit(attrs, &formatValue);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("AttrFormatToBit Fail");
+        HDF_LOGE("AttrFormatToBit Fail");
         return ret;
     }
     if (attrs->channelCount == 0) {
@@ -188,7 +188,7 @@ AudioFormat g_formatIdZero = AUDIO_FORMAT_PCM_16_BIT;
 int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex)
 {
     if (capabilityIndex == NULL) {
-        LOG_FUN_ERR("capabilityIndex Is NULL");
+        HDF_LOGE("capabilityIndex Is NULL");
         return HDF_FAILURE;
     }
     /* get capabilityIndex from driver or default */
@@ -211,7 +211,7 @@ int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCap
         capabilityIndex->subPorts = (struct AudioSubPortCapability *)calloc(capabilityIndex->subPortsNum,
                                                                             sizeof(struct AudioSubPortCapability));
         if (capabilityIndex->subPorts == NULL) {
-            LOG_FUN_ERR("capabilityIndex subPorts is NULL!");
+            HDF_LOGE("capabilityIndex subPorts is NULL!");
             return HDF_FAILURE;
         }
         capabilityIndex->subPorts->portId = portIndex.portId;
@@ -256,17 +256,17 @@ int32_t AudioAdapterInitAllPorts(struct AudioAdapter *adapter)
 {
     struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
     if (hwAdapter == NULL) {
-        LOG_FUN_ERR("hwAdapter Is NULL");
+        HDF_LOGE("hwAdapter Is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwAdapter->portCapabilitys != NULL) {
-        LOG_PARA_INFO("portCapabilitys already Init!");
+        HDF_LOGE("portCapabilitys already Init!");
         return AUDIO_HAL_SUCCESS;
     }
     uint32_t portNum = hwAdapter->adapterDescriptor.portNum;
     struct AudioPort *ports = hwAdapter->adapterDescriptor.ports;
     if (ports == NULL) {
-        LOG_FUN_ERR("ports is NULL!");
+        HDF_LOGE("ports is NULL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (portNum == 0) {
@@ -275,13 +275,13 @@ int32_t AudioAdapterInitAllPorts(struct AudioAdapter *adapter)
     struct AudioPortAndCapability *portCapability =
         (struct AudioPortAndCapability *)calloc(portNum, sizeof(struct AudioPortAndCapability));
     if (portCapability == NULL) {
-        LOG_FUN_ERR("portCapability is NULL!");
+        HDF_LOGE("portCapability is NULL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     for (uint32_t i = 0; i < portNum; i++) {
         portCapability[i].port = ports[i];
         if (InitForGetPortCapability(ports[i], &portCapability[i].capability)) {
-            LOG_FUN_ERR("ports Init Fail!");
+            HDF_LOGE("ports Init Fail!");
             AudioAdapterReleaseCapSubPorts(portCapability, portNum);
             AudioMemFree((void **)&portCapability);
             return AUDIO_HAL_ERR_INTERNAL;
@@ -300,9 +300,9 @@ void AudioReleaseRenderHandle(struct AudioHwRender *hwRender)
 int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct AudioDeviceDescriptor *desc,
                                     const struct AudioSampleAttributes *attrs, const struct AudioHwAdapter *hwAdapter)
 {
-    LOG_FUN_INFO();
+    HDF_LOGI("%s", __func__);
     if (hwAdapter == NULL || hwRender == NULL || desc == NULL || attrs == NULL) {
-        LOG_FUN_ERR("Pointer is null!");
+        HDF_LOGE("Pointer is null!");
         return HDF_FAILURE;
     }
 
@@ -315,19 +315,19 @@ int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct
     }
     /* Select Path */
     if (hwAdapter->adapterDescriptor.adapterName == NULL) {
-        LOG_FUN_ERR("pointer is null!");
+        HDF_LOGE("pointer is null!");
         return HDF_FAILURE;
     }
     uint32_t adapterNameLen = strlen(hwAdapter->adapterDescriptor.adapterName);
     if (adapterNameLen == 0) {
-        LOG_FUN_ERR("adapterNameLen is null!");
+        HDF_LOGE("adapterNameLen is null!");
         return HDF_FAILURE;
     }
     /* Get Adapter name */
     int32_t ret = strncpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName, NAME_LEN - 1,
                             hwAdapter->adapterDescriptor.adapterName, adapterNameLen);
     if (ret != EOK) {
-        LOG_FUN_ERR("copy fail");
+        HDF_LOGE("copy fail");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -341,17 +341,17 @@ int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct Audi
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwAdapter->adapterMgrRenderFlag > 0) {
-        LOG_FUN_ERR("Create render repeatedly!");
+        HDF_LOGE("Create render repeatedly!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
     if (hwRender == NULL) {
-        LOG_FUN_ERR("hwRender is NULL!");
+        HDF_LOGE("hwRender is NULL!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     int32_t ret = AudioAdapterCreateRenderPre(hwRender, desc, attrs, hwAdapter);
     if (ret != 0) {
-        LOG_FUN_ERR("AudioAdapterCreateRenderPre fail");
+        HDF_LOGE("AudioAdapterCreateRenderPre fail");
         AudioMemFree((void **)&hwRender);
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -376,7 +376,7 @@ int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRend
     if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
         int ret = render->control.Stop((AudioHandle)render);
         if (ret < 0) {
-            LOG_FUN_ERR("render Stop failed");
+            HDF_LOGE("render Stop failed");
         }
     }
     AudioReleaseRenderHandle(hwRender);
@@ -397,7 +397,7 @@ int32_t AudioAdapterGetPortCapability(struct AudioAdapter *adapter, const struct
     }
     struct AudioPortAndCapability *hwAdapterPortCapabilitys = hwAdapter->portCapabilitys;
     if (hwAdapterPortCapabilitys == NULL) {
-        LOG_FUN_ERR("hwAdapter portCapabilitys is NULL!");
+        HDF_LOGE("hwAdapter portCapabilitys is NULL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int32_t portNum = hwAdapter->adapterDescriptor.portNum;
@@ -423,7 +423,7 @@ int32_t AudioAdapterSetPassthroughMode(struct AudioAdapter *adapter,
     }
     struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
     if (hwAdapter->portCapabilitys == NULL) {
-        LOG_FUN_ERR("The pointer is null!");
+        HDF_LOGE("The pointer is null!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioPortAndCapability *portCapabilityTemp = hwAdapter->portCapabilitys;
@@ -438,12 +438,12 @@ int32_t AudioAdapterSetPassthroughMode(struct AudioAdapter *adapter,
         portNum--;
     }
     if (portCapability == NULL || portNum <= 0) {
-        LOG_FUN_ERR("hwAdapter portCapabilitys is Not Find!");
+        HDF_LOGE("hwAdapter portCapabilitys is Not Find!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioSubPortCapability *subPortCapability = portCapability->subPorts;
     if (subPortCapability == NULL) {
-        LOG_FUN_ERR("portCapability->subPorts is NULL!");
+        HDF_LOGE("portCapability->subPorts is NULL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int32_t subPortNum = portCapability->subPortsNum;
@@ -472,7 +472,7 @@ int32_t AudioAdapterGetPassthroughMode(struct AudioAdapter *adapter, const struc
     }
     struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
     if (hwAdapter->portCapabilitys == NULL) {
-        LOG_FUN_ERR("portCapabilitys pointer is null!");
+        HDF_LOGE("portCapabilitys pointer is null!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioPortAndCapability *portCapabilitys = hwAdapter->portCapabilitys;
