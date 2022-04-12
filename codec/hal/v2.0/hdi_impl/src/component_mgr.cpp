@@ -105,7 +105,7 @@ int32_t ComponentMgr::EnumerateComponentsByIndex(uint32_t index, char *component
 {
     size_t componentNum = componentNameAndObjectPoint_.size();
     if (index >= componentNum) {
-        HDF_LOGE("%{public}s index [%{public}d] > componentNum [%{public}d]", __func__, index, componentNum);
+        HDF_LOGE("%{public}s index [%{public}d] > componentNum [%{public}zu]", __func__, index, componentNum);
         return OMX_ErrorInvalidComponentName;
     }
     std::string &compName = componentNameAndObjectPoint_[index].componentName;

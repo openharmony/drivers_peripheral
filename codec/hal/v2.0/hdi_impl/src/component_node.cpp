@@ -114,8 +114,6 @@ ComponentNode::~ComponentNode()
         omxCallback_ = nullptr;
     }
 
-    HDF_LOGI("%{public}s bufferInfoMap_.size()=[%{public}d],bufferHeaderMap_.size()=[%{public}d]", __func__,
-             bufferInfoMap_.size(), bufferHeaderMap_.size());
     bufferInfoMap_.clear();
     bufferHeaderMap_.clear();
     bufferIdCount_ = 0;
@@ -214,7 +212,8 @@ int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTy
         return OMX_ErrorInvalidComponent;
     }
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
-    return comType->ComponentTunnelRequest(comp_, port, (OMX_HANDLETYPE)omxHandleTypeTunneledComp, tunneledPort,
+    unsigned long tunneledComp = (unsigned long)omxHandleTypeTunneledComp;
+    return comType->ComponentTunnelRequest(comp_, port, (OMX_HANDLETYPE)tunneledComp, tunneledPort,
                                            tunnelSetup);
 }
 
@@ -442,7 +441,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, struct OmxCodecBuffer 
     int sharedFD = AshmemCreate(nullptr, bufferHdrType->nAllocLen);
     std::shared_ptr<Ashmem> sharedMemory = std::make_shared<Ashmem>(sharedFD, bufferHdrType->nAllocLen);
     SaveBufferInfo(buffer, bufferHdrType, sharedMemory);
-    buffer.buffer = (uint8_t *)&sharedFD;
+    buffer.buffer = (uint8_t *)(unsigned long)sharedFD;
     buffer.bufferLen = FD_SIZE;
     return OMX_ErrorNone;
 }
@@ -609,7 +608,7 @@ void ComponentNode::CheckBuffer(struct OmxCodecBuffer &buffer)
 {
     if ((buffer.buffer != nullptr) && (buffer.bufferType == BUFFER_TYPE_AVSHARE_MEM_FD) &&
         (buffer.bufferLen == FD_SIZE)) {
-        int fd = reinterpret_cast<int>(buffer.buffer);
+        int fd = (int)reinterpret_cast<unsigned long>(buffer.buffer);
         close(fd);
         buffer.buffer = 0;
         buffer.bufferLen = 0;
@@ -630,8 +629,6 @@ BufferInfoSPtr ComponentNode::GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *buffer
     }
 
     uint32_t nBufferID = iterHead->second;
-    HDF_LOGI("%{public}s buffer[%{public}p], nBufferID[%{public}d], ", __func__, buffer, nBufferID);
-
     auto iter = bufferInfoMap_.find(nBufferID);
     if (iter == bufferInfoMap_.end()) {
         HDF_LOGE("%{public}s can not find bufferInfo by nBufferID = %{public}d", __func__, nBufferID);
@@ -704,7 +701,7 @@ int32_t ComponentNode::UseSharedBuffer(struct OmxCodecBuffer &omxCodecBuffer, ui
         return err;
     }
 
-    int shardFd = reinterpret_cast<int>(omxCodecBuffer.buffer);
+    int shardFd = (int)reinterpret_cast<unsigned long>(omxCodecBuffer.buffer);
     if (shardFd < 0) {
         HDF_LOGE("%{public}s error, shardFd < 0", __func__);
         return err;
@@ -744,7 +741,7 @@ int32_t ComponentNode::UseHandleBuffer(struct OmxCodecBuffer &omxCodecBuffer, ui
     int32_t err = OMX_ErrorUndefined;
 
     if (sizeof(BufferHandle) != omxCodecBuffer.bufferLen) {
-        HDF_LOGE("%{public}s error, BufferHandle size = %{public}d, omxBuffer.ptrSize = %{public}d ", __func__,
+        HDF_LOGE("%{public}s error, BufferHandle size = %{public}zu, omxBuffer.ptrSize = %{public}d ", __func__,
                  sizeof(BufferHandle), omxCodecBuffer.bufferLen);
         return err;
     }
