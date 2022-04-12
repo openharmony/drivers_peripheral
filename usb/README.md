@@ -36,8 +36,8 @@ The source code directory structure is as follows:
 │   └── ddk         # API definitions for both the USB device and host
 ├── net             # ECM driver demo implementation for the USB host
 ├── sample          # Application test program implementation
-│   └── device      # Implementation of the ACM driver read/write and speed test application for the USB device (for Linux and Huawei LiteOS)
-│   └── host        # Implementation of the ACM driver read/write and speed test application for the USB host (for Linux and Huawei LiteOS)
+│   └── device      # Implementation of the ACM driver read/write and speed test application for the USB device (for Linux and LiteOS)
+│   └── host        # Implementation of the ACM driver read/write and speed test application for the USB host (for Linux and LiteOS)
 ├── serial          # ACM driver demo implementation for the USB host
 ├── test            # Test code
 │   └── unittest    # Unit test code for both the USB host and device
