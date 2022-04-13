@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include <string>
 
 #ifdef HITRACE_LOG_ENABLED
 #include "hitrace.h"
@@ -63,7 +64,8 @@ namespace Camera {
 #define CAMERA_LOGV(fmt, ...) DECORATOR_HDFLOG(HDF_LOGV, fmt, ##__VA_ARGS__)
 #define CAMERA_LOGD(fmt, ...) DECORATOR_HDFLOG(HDF_LOGD, fmt, ##__VA_ARGS__)
 
-constexpr uint32_t FRAME_SIZE_TAG = 100;
+constexpr uint32_t FRAME_SIZE_TAG_UINT32 = 100;
+const std::string FRAME_SIZE_TAG_STRING = "FRAME_SIZE";
 
 using RetCode = uint32_t;
 enum Ret : uint32_t {

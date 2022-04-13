@@ -132,9 +132,12 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
         int32_t fence = -1;
         EsFrameInfo esInfo = buffer->GetEsFrameInfo();
         if (esInfo.size != -1) {
-            sb->ExtraSet(OHOS::Camera::dataSize, esInfo.size);
-            sb->ExtraSet(OHOS::Camera::isKeyFrame, esInfo.isKey);
-            sb->ExtraSet(OHOS::Camera::timeStamp, esInfo.timestamp);
+            const sptr<OHOS::BufferExtraData>& extraData = sb->GetExtraData();
+            if (extraData != nullptr) {
+                extraData->ExtraSet(OHOS::Camera::dataSize, esInfo.size);
+                extraData->ExtraSet(OHOS::Camera::isKeyFrame, esInfo.isKey);
+                extraData->ExtraSet(OHOS::Camera::timeStamp, esInfo.timestamp);
+            }
         }
         bufferQueue_->FlushBuffer(sb, fence, flushConfig_);
         frameCount_++;
