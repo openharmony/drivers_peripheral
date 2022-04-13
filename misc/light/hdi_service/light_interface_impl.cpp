@@ -42,7 +42,7 @@ int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfo>& info)
 
     while (count--) {
         HdfLightInfo hdfLightInfo;
-        hdfLightInfo.lightId = lightInfo->lightType;
+        hdfLightInfo.lightId = lightInfo->lightId;
         hdfLightInfo.reserved = lightInfo->reserved;
         info.push_back(hdfLightInfo);
         lightInfo++;
