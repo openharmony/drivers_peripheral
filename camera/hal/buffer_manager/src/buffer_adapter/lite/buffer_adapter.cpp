@@ -49,7 +49,7 @@ RetCode BufferAdapter::SetExtInfoToSurfaceBuffer(const std::shared_ptr<IBuffer>&
 
     EsFrameInfo info = buffer->GetEsFrameInfo();
     if (info.size != -1) {
-        surfaceBuffer->SetInt32(FRAME_SIZE_TAG, info.size);
+        surfaceBuffer->SetInt32(FRAME_SIZE_TAG_UINT32, info.size);
     }
     return RC_OK;
 }
