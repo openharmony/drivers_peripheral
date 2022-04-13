@@ -21,11 +21,8 @@ group("usbfn_master") {
 ohos_shared_library("libusbfn_master") {
   default_config_path =
       "//device/soc/$device_company/common/hal/usb/$device_name/include"
-  if (product_company == "hihope") {
-    default_config_path =
-        "//device/board/$product_company/$device_name/usb/include"
-  } else if (device_company == "openharmony") {
-    default_config_path = "//device/board/hihope/rk3568/usb/include"
+  if (device_company == "openharmony") {
+    default_config_path = "//device/soc/rockchip/common/hal/usb/rk3568/include"
   }
 
   include_dirs = [
