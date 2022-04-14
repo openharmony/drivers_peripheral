@@ -16,6 +16,7 @@
 #ifndef HDI_IDISPLAY_GRALLOC_V1_0_H
 #define HDI_IDISPLAY_GRALLOC_V1_0_H
 
+#include <vector>
 #include "display_type.h"
 #include "buffer_handle.h"
 
@@ -130,6 +131,20 @@ public:
      * @version 1.0
      */
     virtual int32_t InvalidateCache(const BufferHandle &handle) const = 0;
+
+    /**
+     * @brief Query whether the given VerifyAllocInfo array is allocatable.
+     *
+     * @param infos Indicates the array of VerifyAllocInfo.
+     * @param supporteds Indicates the array that supports allocation.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
+     * otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    virtual int32_t IsSupportedAlloc(const std::vector<VerifyAllocInfo> &infos,
+                                     std::vector<bool> &supporteds) const = 0;
 };
 } // namespace V1_0
 } // namespace Display

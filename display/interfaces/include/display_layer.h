@@ -711,6 +711,38 @@ typedef struct {
      */
     int32_t (*SetLayerMetaDataSet)(uint32_t devId, uint32_t layerId, HDRMetadataKey key, uint32_t num,
                                    const uint8_t *metaData);
+
+    /**
+     * @brief Obtains the hardware display present timeStamp type supported for a layer.
+     *
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
+     * display device, and 4 indicates the last display device.
+     * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
+     * with the specified layer ID.
+     * @param type Indicates the pointer to the present timestamp type obtained.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
+     * otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*GetSupportedPresentTimestamp)(uint32_t devId, uint32_t layerId, PresentTimestampType *type);
+
+    /**
+     * @brief Obtains the hardware display present timestamp for a layer.
+     *
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
+     * display device, and 4 indicates the last display device.
+     * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
+     * with the specified layer ID.
+     * @param pts Indicates the pointer to the present timestamp obtained.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
+     * otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*GetHwPresentTimestamp)(uint32_t devId, uint32_t layerId, PresentTimestamp *pts);
 } LayerFuncs;
 
 /**
