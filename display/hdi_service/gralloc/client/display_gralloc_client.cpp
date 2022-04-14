@@ -108,6 +108,14 @@ int32_t DisplayGrallocClient::FlushMCache(const BufferHandle &handle) const
     (void)handle;
     return DISPLAY_NOT_SUPPORT;
 }
+
+int32_t DisplayGrallocClient::IsSupportedAlloc(const std::vector<VerifyAllocInfo> &infos,
+                                               std::vector<bool> &supporteds) const
+{
+    (void)infos;
+    (void)supporteds;
+    return DISPLAY_NOT_SUPPORT;
+}
 } // namespace V1_0
 } // namespace Display
 } // namespace HDI
