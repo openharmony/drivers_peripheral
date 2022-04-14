@@ -1,349 +1,360 @@
-# Camera<a name="ZH-CN_TOPIC_0000001078436908"></a>
+# Camera
 
--   [简介](#section11660541593)
--   [目录](#section161941989596)
--   [接口说明](#section1564411661810)
--   [使用说明](#section19806524151819)
--   [相关仓](#section1371113476307)
+## 概述
 
-## 简介<a name="section11660541593"></a>
+OpenHarmony相机驱动框架模型对上实现相机HDI（Hardware Device Interface）接口，对下实现相机Pipeline模型，管理相机各个硬件设备。
+该驱动框架模型内部分为三层，依次为HDI实现层、框架层和设备适配层，各层基本概念如下：
 
-OHOS相机驱动框架模型对上实现相机HDI接口，对下实现相机Pipeline模型，管理相机各个硬件设备。
-各层的基本概念如下：
++ HDI实现层：实现OHOS（OpenHarmony Operation System）相机标准南向接口。
++ 框架层：对接HDI实现层的控制、流的转发，实现数据通路的搭建，管理相机各个硬件设备等功能。
++ 设备适配层：屏蔽底层芯片和OS（Operation System）差异，支持多平台适配。    
 
-1.  HDI实现层，对上实现OHOS相机标准南向接口。
-
-2.  框架层，对接HDI实现层的控制、流的转发，实现数据通路的搭建、管理相机各个硬件设备等功能。
-
-3.  适配层，屏蔽底层芯片和OS差异，支持多平台适配。
-
-**图 1**  Camera驱动模块架构图<a name="fig14142101381112"></a>
+**图 1**  Camera驱动模块架构图
 
 
-![](figures/logic-view-of-modules-related-to-this-repository_zh.png)
+　　　　　　　　![](figures/Camera模块驱动模型.png)
+
+## 目录
+
+- Camera模块目录表如下：
+
+  ```
+  /drivers/peripheral/camera
+      ├── hal                         # camera模块的hal层代码
+      │   ├── adapter                 # camera hal平台适配层的实现
+      │   ├── buffer_manager          # camera hal统一的Buffer管理
+      │   ├── device_manager          # 提供camera hal层设备管理能力，包括设备枚举、设备能力查询等
+      │   ├── hdi_impl                # camera hal HDI的具体实现
+      │   ├── include                 # camera hal层内部的头文件
+      │   ├── init                    # camera hal层HDI接口使用样例实现
+      │   ├── pipeline_core           # camera hal层pipeline核心代码 
+      │   ├── test                    # camera hal层测试代码实现
+      │   └── utils                   # camera hal层工具类代码，目前提供的是watchdog
+      ├── hal_c                       # 提供C实现的HAL接口
+      │   ├── hdi_cif                 # C实现的HDI接口适配代码
+      │   └── include                 # C形式的HDI接口
+      └── interfaces                  # camera hal对上层服务提供的驱动能力接口
+          ├── hdi_ipc                 # IPC模式的HDI实现
+          ├── hdi_passthrough         # 直通模式的HDI实现
+          └── include                 # camera hal对外提供的HDI定义
+  ```
+
+  
+
+## 接口说明
+
+- icamera_device.h
+
+  | 功能描述                     | 接口名称                                                     |
+  | ---------------------------- | ------------------------------------------------------------ |
+  | 获取流控制器                 | CamRetCode GetStreamOperator(<br/>    const OHOS::sptr\<IStreamOperatorCallback\> &callback,<br/>    OHOS::sptr\<IStreamOperator\> &streamOperator) |
+  | 更新设备控制参数             | CamRetCode UpdateSettings(const std::shared_ptr\<CameraSetting\> &settingss) |
+  | 设置Result回调模式和回调函数 | CamRetCode SetResultMode(const ResultCallbackMode &mode)     |
+  | 获取使能的ResultMeta         | CamRetCode GetEnabledResults(std::vector\<MetaType\> &results) |
+  | 使能具体的ResultMeta         | CamRetCode EnableResult(const std::vector\<MetaType\> &results) |
+  | 禁止具体的ResultMeta         | CamRetCode DisableResult(const std::vector\<MetaType\> &results) |
+  | 关闭Camera设备               | void Close()                                                 |
+
+- icamera_device_callback.h
+
+  | 功能描述                                                   | 接口名称                                                     |
+  | ---------------------------------------------------------- | ------------------------------------------------------------ |
+  | 设备发生错误时调用，由调用者实现，用于返回错误信息给调用者 | void OnError(ErrorType type, int32_t errorCode)              |
+  | 上报camera设备相关的metadata的回调                         | void OnResult(uint64_t timestamp, const std::shared_ptr\<CameraMetadata\> &result) |
 
 
-## 目录<a name="section161941989596"></a>
+- icamera_host.h
+
+  | 功能描述                       | 接口名称                                                     |
+  | ------------------------------ | ------------------------------------------------------------ |
+  | 设置ICameraHost回调接口        | CamRetCode SetCallback(const OHOS::sptr\<ICameraHostCallback\> &callback) |
+  | 获取当前可用的Camera设备ID列表 | CamRetCode GetCameraIds(std::vector\<std::string\> &cameraIds) |
+  | 获取Camera设备能力集合         | CamRetCode GetCameraAbility(const std::string &cameraId,<br/>    std::shared_ptr\<CameraAbility\> &ability) |
+  | 打开Camera设备                 | CamRetCode OpenCamera(const std::string &cameraId,<br/>    const OHOS::sptr\<ICameraDeviceCallback\> &callback,<br/>    OHOS::sptr\<ICameraDevice\> &device) |
+  | 打开或关闭闪光灯               | CamRetCode SetFlashlight(const std::string &cameraId, bool &isEnable) |
+
+- icamera_host_callback.h
+
+  | 功能描述               | 接口名称                                                     |
+  | ---------------------- | ------------------------------------------------------------ |
+  | Camera设备状态变化上报 | void OnCameraStatus(const std::string &cameraId, CameraStatus status) |
+  | 闪光灯状态变化回调     | void OnFlashlightStatus(const std::string &cameraId, FlashlightStatus status) |
+
+- ioffline_stream_operator.h
+
+  | 功能描述       | 接口名称                                                     |
+  | -------------- | ------------------------------------------------------------ |
+  | 取消捕获请求   | CamRetCode CancelCapture(int captureId)                      |
+  | 释放流         | CamRetCode ReleaseStreams(const std::vector\<int\> &streamIds) |
+  | 释放所有离线流 | CamRetCode Release()                                         |
+
+- istream_operator.h
+
+  | 功能描述                         | 接口名称                                                     |
+  | -------------------------------- | ------------------------------------------------------------ |
+  | 查询是否支持添加参数对应的流     | CamRetCode IsStreamsSupported(<br/>    OperationMode mode,<br/>    const std::shared_ptr\<CameraStandard::CameraMetadata> &modeSetting,<br/>    const std::vector\<std::shared_ptr\<StreamInfo\>\> &info,<br/>    StreamSupportType &type) |
+  | 创建流                           | CamRetCode CreateStreams(const std::vector\<std::shared_ptr\<StreamInfo\>\> &streamInfos) |
+  | 释放流                           | CamRetCode ReleaseStreams(const std::vector\<int\> &streamIds) |
+  | 配置流                           | CamRetCode CommitStreams(OperationMode mode,<br/>    const std::shared_ptr\<CameraMetadata\> &modeSetting) |
+  | 获取流的属性                     | CamRetCode GetStreamAttributes(<br/>    std::vector\<std::shared_ptr\<StreamAttribute\>\> &attributes) |
+  | 绑定生产者句柄和指定流           | CamRetCode AttachBufferQueue(int streamId, const OHOS::sptr\<OHOS::IBufferProducer\> &producer) |
+  | 解除生产者句柄和指定流的绑定关系 | CamRetCode DetachBufferQueue(int streamId)                   |
+  | 捕获图像                         | CamRetCode Capture(int captureId,<br/>    const std::shared_ptr\<CaptureInfo\> &info, bool isStreaming) |
+  | 取消捕获                         | CamRetCode CancelCapture(int captureId)                      |
+  | 将指定流转换成离线流             | CamRetCode ChangeToOfflineStream(const std::vector\<int\> &streamIds,<br/>    OHOS::sptr\<IStreamOperatorCallback\> &callback,<br/>    OHOS::sptr\<IOfflineStreamOperator\> &offlineOperator) |
+
+- istream_operator_callback.h
+
+  | 功能描述                                 | 接口名称                                                     |
+  | ---------------------------------------- | ------------------------------------------------------------ |
+  | 捕获开始回调，在捕获开始时调用           | void OnCaptureStarted(int32_t captureId, const std::vector\<int32_t\> &streamIds) |
+  | 捕获结束回调，在捕获结束时调用           | void OnCaptureEnded(int32_t captureId,<br/>    const std::vector\<std::shared_ptr\<CaptureEndedInfo\>\> &infos) |
+  | 捕获错误回调，在捕获过程中发生错误时调用 | void OnCaptureError(int32_t captureId,<br/>    const std::vector\<std::shared_ptr\<CaptureErrorInfo\>\> &infos) |
+  | 帧捕获回调                               | void OnFrameShutter(int32_t captureId,<br/>    const std::vector\<int32_t\> &streamIds, uint64_t timestamp) |
 
 
-```
-/drivers/peripheral/input
-    ├── hal                         # camera模块的hal层代码
-    │   ├── adapter                 # camera hal平台适配层的实现
-    │   ├── buffer_manager          # camera hal统一的Buffer管理
-    │   ├── device_manager          # 提供camera hal层设备管理能力，包括设备枚举、设备能力查询等
-    │   ├── hdi_impl                # camera hal HDI的具体实现
-    │   ├── include                 # camera hal层内部的头文件
-    │   ├── init                    # camera hal层HDI接口使用样例实现
-    │   ├── pipeline_core           # camera hal层pipeline核心代码 
-    │   ├── test                    # camera hal层测试代码实现
-    │   └── utils                   # camera hal层工具类代码，目前提供的是watchdog
-    ├── hal_c                       # 提供C实现的HAL接口
-    │   ├── hdi_cif                 # C实现的HDI接口适配代码
-    │   └── include                 # C形式的HDI接口
-    └── interfaces                  # camera hal对上层服务提供的驱动能力接口
-        ├── hdi_ipc                 # IPC模式的HDI实现
-        ├── hdi_passthrough         # 直通模式的HDI实现
-        └── include                 # camera hal对外提供的HDI定义
-
-
-```
-
-## 接口说明<a name="section1564411661810"></a>
-
-<table border=0 cellpadding=0 cellspacing=0 width=1119 style='border-collapse:
- collapse;table-layout:fixed;width:839pt'>
- <col width=119 style='mso-width-source:userset;mso-width-alt:3797;width:89pt'>
- <col width=568 style='mso-width-source:userset;mso-width-alt:18176;width:426pt'>
- <col width=363 style='mso-width-source:userset;mso-width-alt:11605;width:272pt'>
- <col width=69 style='width:52pt'>
- <tr height=19 style='height:14.0pt'>
-  <td height=19 width=119 style='height:14.0pt;width:89pt'>头文件</td>
-  <td width=568 style='width:426pt'><a name=p14132125715552>接口名称</a></td>
-  <td width=363 style='width:272pt'><a name=p18132205755516>功能描述</a>
-</td>
- </tr>
- <tr height=37 style='height:28.0pt'>
-  <td rowspan=7 height=160 class=xl66 style='height:112.0pt'>icamera_device.h</td>
-  <td class=xl65 width=568 style='width:426pt'>CamRetCode
-  GetStreamOperator(<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const OHOS::sptr&lt;IStreamOperatorCallback&gt; &amp;callback,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>OHOS::sptr&lt;IStreamOperator&gt; &amp;streamOperator)</td>
-  <td>获取流控制器</td>
- </tr>
- <tr height=37 style='height:28.0pt'>
-  <td height=37 style='height:28.0pt'>CamRetCode UpdateSettings(const
-      std::shared_ptr&lt;CameraSetting&gt; &amp;settings<span
-  style='display:none'>s)</span></td>
- <td>更新设备控制参数</td
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td height=19 style='height:14.0pt'>CamRetCode SetResultMode(const ResultCallbackMode &amp;mode)</td>
-  <td>设置Result回调模式和回调函数</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>CamRetCode
-  GetEnabledResults(std::vector&lt;MetaType&gt; &amp;results)</td>
- <td>获取使能的ResultMeta</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>CamRetCode
-  EnableResult(const std::vector&lt;MetaType&gt; &amp;results)</td>
-  <td>使能具体的ResultMeta</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>CamRetCode
-  DisableResult(const std::vector&lt;MetaType&gt; &amp;results)</td>
-  <td>禁止具体的ResultMeta</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>void
-  Close()</td>
-  <td>关闭Camera设备</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td rowspan=2 height=38 class=xl66 style='height:28.0pt'>icamera_device_callback.h</td>
-  <td class=xl65 width=568 style='width:426pt'>void OnError(ErrorType type,
-  int32_t errorCode)</td>
-  <td>设备发生错误时调用，由调用者实现，用于返回错误信息给调用者</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>void
-  OnResult(uint64_t timestamp, const std::shared_ptr&lt;CameraMetadata&gt;
-  &amp;result)</td>
-  <td class=xl65 width=363 style='width:272pt'>上报camera设备相关的metadata的回调</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td rowspan=5 height=150 class=xl66 style='height:112.0pt'>icamera_host.h</td>
-  <td class=xl65 width=568 style='width:426pt'>CamRetCode SetCallback(const
-  OHOS::sptr&lt;ICameraHostCallback&gt; &amp;callback)</td>
-  <td>设置ICameraHost回调接口</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td height=19 style='height:14.0pt'>CamRetCode
-  GetCameraIds(std::vector&lt;std::string&gt; &amp;cameraIds)</td>
-  <td>获取当前可用的Camera设备ID列表</td>
- </tr>
- <tr height=37 style='height:28.0pt'>
-  <td height=37 class=xl65 width=568 style='height:28.0pt;width:426pt'>CamRetCode
-  GetCameraAbility(const std::string &amp;cameraId,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>std::shared_ptr&lt;CameraAbility&gt; &amp;ability)</td>
-  <td>获取Camera设备能力集合</td>
- </tr>
- <tr height=56 style='height:42.0pt'>
-  <td height=56 class=xl65 width=568 style='height:42.0pt;width:426pt'>CamRetCode
-  OpenCamera(const std::string &amp;cameraId,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const OHOS::sptr&lt;ICameraDeviceCallback&gt; &amp;callback,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>OHOS::sptr&lt;ICameraDevice&gt; &amp;device)</td>
-  <td>打开Camera设备</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>CamRetCode
-  SetFlashlight(const std::string &amp;cameraId, bool &amp;isEnable)</td>
-  <td>打开或关闭闪光灯</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td rowspan=2 height=38 class=xl66 style='height:28.0pt'>icamera_host_callback.h</td>
-  <td class=xl65 width=568 style='width:426pt'>void OnCameraStatus(const
-  std::string &amp;cameraId, CameraStatus status)</td>
-  <td>Camera设备状态变化上报</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>void
-  OnFlashlightStatus(const std::string &amp;cameraId, FlashlightStatus status)</td>
-  <td>闪光灯状态变化回调</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td rowspan=3 height=57 class=xl66 style='height:42.0pt'>ioffline_stream_operator.h</td>
-  <td class=xl65 width=568 style='width:426pt'><span
-  style='mso-spacerun:yes'>&nbsp;</span>CamRetCode CancelCapture(int captureId)</td>
-  <td>取消捕获请求</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>CamRetCode
-  ReleaseStreams(const std::vector&lt;int&gt; &amp;streamIds)</td>
-  <td>释放流</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>CamRetCode
-  Release()</td>
-  <td>释放所有离线流</td>
- </tr>
- <tr height=93 style='height:70.0pt'>
-  <td rowspan=10 height=783 class=xl66 style='height:588.0pt'>istream_operator.h</td>
-  <td class=xl65 width=568 style='width:426pt'>CamRetCode
-  IsStreamsSupported(<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>OperationMode mode,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::shared_ptr&lt;CameraStandard::CameraMetadata&gt; &amp;modeSetting,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::vector&ltstd::shared_ptr&ltStreamInfo&gt&gt; &amp;info,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>StreamSupportType &amp;type)</td>
-  <td>查询是否支持添加参数对应的流</td>
- </tr>
- <tr height=37 style='height:28.0pt'>
-  <td height=37 class=xl65 width=568 style='height:28.0pt;width:426pt'>CamRetCode
-  CreateStreams(const std::vector&lt;std::shared_ptr&lt;StreamInfo&gt;&gt;
-  &amp;streamInfos)</td>
-  <td>创建流</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>CamRetCode
-  ReleaseStreams(const std::vector&lt;int&gt; &amp;streamIds)</td>
-  <td>释放流</td>
- </tr>
- <tr height=37 style='height:28.0pt'>
-  <td height=37 class=xl65 width=568 style='height:28.0pt;width:426pt'>CamRetCode
-  CommitStreams(OperationMode mode,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::shared_ptr&lt;CameraMetadata&gt; &amp;modeSetting)</td>
-  <td class=xl65 width=363 style='width:272pt'><br>
-    配置流</td>
- </tr>
- <tr height=37 style='height:28.0pt'>
-  <td height=37 class=xl65 width=568 style='height:28.0pt;width:426pt'>CamRetCode
-  GetStreamAttributes(<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>std::vector&lt;std::shared_ptr&lt;StreamAttribute&gt;&gt;
-  &amp;attributes)</td>
-  <td>获取流的属性</td>
- </tr>
- <tr height=37 style='height:28.0pt'>
-  <td height=37 class=xl65 width=568 style='height:28.0pt;width:426pt'>CamRetCode
-  AttachBufferQueue(int streamId, const OHOS::sptr&lt;OHOS::IBufferProducer&gt;
-  &amp;producer)</td>
-  <td>绑定生产者句柄和指定流</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'><span
-  style='mso-spacerun:yes'>&nbsp;</span>CamRetCode DetachBufferQueue(int
-  streamId)</td>
-  <td>解除生产者句柄和指定流的绑定关系</td>
- </tr>
- <tr height=429 style='height:322.0pt'>
-  <td height=429 class=xl65 width=568 style='height:322.0pt;width:426pt'>CamRetCode
-  Capture(int captureId,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::shared_ptr&lt;CaptureInfo&gt; &amp;info,<span
-  style='mso-spacerun:yes'>&nbsp; </span>bool isStreaming)</td>
-  <td class=xl65 width=363 style='width:272pt'>捕获图像<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp; </span>*<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp; </span>* 本接口必须在调用
-  {@link CommitStreams} 配置流之后调用。<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp; </span>*
-  图像捕获有两种模式，分别是连续捕获和单次捕获。连续捕获即触发之后模块内部进行连续的捕获，<br>
-    	 * 消费者可以连续收到图像数据，不需要多次调用本接口，若再次调用了本接口，<br>
-    	 * 则停止当前捕获，更新捕获信息，再进行一次新的捕获，多用于预览、录像或者连拍场景。<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp; </span>*
-  单次捕获即触发之后只捕获一帧图像数据，用于单次拍照场景。<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp; </span>* 捕获启动时，会调用
-  {@link OnCaptureStarted}来通知调用者捕获已经启动。<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp; </span>* 连续捕获需调用
-  {@link CancelCapture} 来停止捕获。<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp; </span>* 捕获结束时，会调用
-  {@link OnCaptureEnded}来通知调用者捕获的帧计数等信息。<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp; </span>* {@link
-  CaptureInfo} 的 enableShutterCallback_ 使能 {@link OnFrameShutter}，使能后每次捕获触发
-  {@link OnFrameShutter}<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp; </span>*
-  对于多个流同时捕获的场景，本模块内部保证同时上报多路流捕获数据。</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td height=19 class=xl65 width=568 style='height:14.0pt;width:426pt'>CamRetCode
-  CancelCapture(int captureId)</td>
-  <td>取消捕获</td>
- </tr>
- <tr height=56 style='height:42.0pt'>
-  <td height=56 class=xl65 width=568 style='height:42.0pt;width:426pt'>CamRetCode
-  ChangeToOfflineStream(const std::vector&lt;int&gt; &amp;streamIds,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>OHOS::sptr&lt;IStreamOperatorCallback&gt; &amp;callback,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>OHOS::sptr&lt;IOfflineStreamOperator&gt; &amp;offlineOperator)</td>
-  <td>将指定流转换成离线流</td>
- </tr>
- <tr height=19 style='height:14.0pt'>
-  <td rowspan=4 height=130 class=xl66 style='height:98.0pt'>istream_operator_callback.h</td>
-  <td class=xl65 width=568 style='width:426pt'>void OnCaptureStarted(int32_t
-  captureId, const std::vector&lt;int32_t&gt; &amp;streamIds)</td>
-  <td>捕获开始回调，在捕获开始时调用</td>
- </tr>
- <tr height=37 style='height:28.0pt'>
-  <td height=37 class=xl65 width=568 style='height:28.0pt;width:426pt'>void
-  OnCaptureEnded(int32_t captureId,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::vector&lt;std::shared_ptr&lt;CaptureEndedInfo&gt;&gt;
-  &amp;infos)</td>
-  <td>捕获结束回调，在捕获结束时调用</td>
- </tr>
- <tr height=37 style='height:28.0pt'>
-  <td height=37 class=xl65 width=568 style='height:28.0pt;width:426pt'>void
-  OnCaptureError(int32_t captureId,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::vector&lt;std::shared_ptr&lt;CaptureErrorInfo&gt;&gt;
-  &amp;infos)</td>
-  <td>捕获错误回调，在捕获过程中发生错误时调用</td>
- </tr>
- <tr height=37 style='height:28.0pt'>
-  <td height=37 class=xl65 width=568 style='height:28.0pt;width:426pt'>void
-  OnFrameShutter(int32_t captureId,<br>
-    <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::vector&lt;int32_t&gt; &amp;streamIds, uint64_t timestamp)</td>
-  <td>帧捕获回调</td>
-</table>
 
 ## 使用方法
 
-### 获取CameraHost
+在/drivers/peripheral/camera/hal/init目录下有一个关于Camera的demo，该demo可以完成Camera的预览，拍照等基础功能。下面我们就以此demo为例讲述怎样用HDI接口去编写预览PreviewOn()和拍照CaptureOn()的用例，可参考[ohos_camera_demo](https://gitee.com/openharmony/drivers_peripheral/tree/master/camera/hal/init)。
 
-    std::shared_ptr<Camera::CameraHost> cameraHost = Camera::CameraHost::CreateCameraHost();
+1. 在main函数中构造一个CameraDemo 对象，该对象中有对Camera初始化、启停流、释放等控制的方法。下面mainDemo->InitSensors()函数为初始化CameraHost，mainDemo->InitCameraDevice()函数为初始化CameraDevice。
 
-### 获取配置的cameraId
+   ```
+   int main(int argc, char** argv)
+   {
+       RetCode rc = RC_OK;
+       auto mainDemo = std::make_shared<CameraDemo>();
+       rc = mainDemo->InitSensors(); // 初始化CameraHost
+       if (rc == RC_ERROR) {
+           CAMERA_LOGE("main test: mainDemo->InitSensors() error\n");
+           return RC_ERROR;
+       }
+   
+       rc = mainDemo->InitCameraDevice(); // 初始化CameraDevice
+       if (rc == RC_ERROR) {
+           CAMERA_LOGE("main test: mainDemo->InitCameraDevice() error\n");
+           return RC_ERROR;
+       }
+   
+       rc = PreviewOn(0, mainDemo); // 配流和启流
+       if (rc != RC_OK) {
+           CAMERA_LOGE("main test: PreviewOn() error demo exit");
+           return RC_ERROR;
+       }
+   
+       ManuList(mainDemo, argc, argv); // 打印菜单到控制台
+   
+       return RC_OK;
+   }
+   ```
 
-    std::vector<std::string> cameraIds;
-cameraHost->GetCameraIds(cameraIds); #
+   初始化CameraHost函数实现如下，这里调用了HDI接口ICameraHost::Get()去获取demoCameraHost，并对其设置回调函数。
 
-### 打开camera设备并获取到device
+   ```
+   RetCode CameraDemo::InitSensors()
+   {
+       demoCameraHost_ = ICameraHost::Get(DEMO_SERVICE_NAME);
+       if (demoCameraHost_ == nullptr) {
+           CAMERA_LOGE("demo test: ICameraHost::Get error");
+           return RC_ERROR;
+       }
+   
+       hostCallback_ = new CameraHostCallback();
+       rc = demoCameraHost_->SetCallback(hostCallback_);
+       return RC_OK;
+   }
+   ```
 
-    const std::shared_ptr<Camera::ICameraDeviceCallback> callback = std::make_shared<Camera::ICameraDeviceCallback>();
-    
-    std::shared_ptr<Camera::CameraDevice> device;
-    
-    std::cout << "cameraIds.front() = " << cameraIds.front() << std::endl;
-    
-    Camera::CamRetCode rc = cameraHost->OpenCamera(cameraIds.front(), callback, device);
+   初始化CameraDevice函数实现如下，这里调用了GetCameraIds(cameraIds)，GetCameraAbility(cameraId, ability)，OpenCamera(cameraIds.front(), callback, demoCameraDevice_)等接口实现了demoCameraHost的获取。
+
+   ```
+   RetCode CameraDemo::InitCameraDevice()
+   {
+       (void)demoCameraHost_->GetCameraIds(cameraIds_);
+       const std::string cameraId = cameraIds_.front();
+       demoCameraHost_->GetCameraAbility(cameraId, ability_);
+   
+       sptr<CameraDeviceCallback> callback = new CameraDeviceCallback();
+       rc = demoCameraHost_->OpenCamera(cameraIds_.front(), callback, demoCameraDevice_);
+       return RC_OK;
+   }   
+   ```
+
+2. PreviewOn()接口包含配置流、开启预览流和启动Capture动作。该接口执行完成后Camera预览通路已经开始运转并开启了两路流，一路流是preview，另外一路流是capture或者video，两路流中仅对preview流进行capture动作。
+
+   ```
+   static RetCode PreviewOn(int mode, const std::shared_ptr<CameraDemo> &mainDemo)
+   {
+        rc = mainDemo->StartPreviewStream(); // 配置preview流
+        if (mode == 0) {
+           rc = mainDemo->StartCaptureStream(); // 配置capture流
+        } else {
+           rc = mainDemo->StartVideoStream(); // 配置video流
+        }
+   
+        rc = mainDemo->CaptureOn(STREAM_ID_PREVIEW, CAPTURE_ID_PREVIEW, CAPTURE_PREVIEW); // 将preview流capture
+        return RC_OK;
+   }           
+   ```
+
+   StartCaptureStream()、StartVideoStream()和StartPreviewStream()接口都会调用CreateStream()接口，只是传入的参数不同。
+
+   ```
+   RetCode CameraDemo::StartVideoStream()
+   {
+       RetCode rc = RC_OK;
+       if (!isVideoOn_) {
+           isVideoOn_ = true;
+           rc = CreateStream(STREAM_ID_VIDEO, streamCustomerVideo_, VIDEO); // 如需启preview或者capture流更改该接口参数即可。
+       }
+       return RC_OK;
+   }
+   ```
+
+   CreateStream()方法调用HDI接口去配置和创建流，首先调用HDI接口去获取StreamOperation对象，然后创建一个StreamInfo。调用CreateStreams()和CommitStreams()实际创建流并配置流。
+
+   ```
+   RetCode CameraDemo::CreateStreams()
+   {
+       std::vector<std::shared_ptr<StreamInfo>> streamInfos;
+       GetStreamOpt(); // 获取StreamOperator对象        
+       
+       rc = streamOperator_->CreateStreams(streamInfos); // 创建流    
+       rc = streamOperator_->CommitStreams(Camera::NORMAL, ability_);
+        
+       return RC_OK;
+   }
+   ```
+   
+   CaptureOn()接口调用streamOperator的Capture()方法获取Camera数据并轮转buffer，拉起一个线程接收相应类型的数据。
+   
+   ```
+   RetCode CameraDemo::CaptureOn(const int streamId, const int captureId, CaptureMode mode)
+   {
+       std::shared_ptr<Camera::CaptureInfo> captureInfo = std::make_shared<Camera::CaptureInfo>(); // 创建并填充CaptureInfo
+       captureInfo->streamIds_ = {streamId};
+       captureInfo->captureSetting_ = ability_;
+       captureInfo->enableShutterCallback_ = false;
+   
+       int rc = streamOperator_->Capture(captureId, captureInfo, true); // 实际capture开始，buffer轮转开始
+       if (mode == CAPTURE_PREVIEW) {
+           streamCustomerPreview_->ReceiveFrameOn(nullptr); // 创建预览线程接收递上来的buffer
+       } else if (mode == CAPTURE_SNAPSHOT) {
+           streamCustomerCapture_->ReceiveFrameOn([this](void* addr, const uint32_t size) { // 创建capture线程通过StoreImage回调接收递上来的buffer
+               StoreImage(addr, size);
+           });
+       } else if (mode == CAPTURE_VIDEO) {
+           OpenVideoFile();
+           streamCustomerVideo_->ReceiveFrameOn([this](void* addr, const uint32_t size) {// 创建Video线程通过StoreVideo回调接收递上来的buffer
+               StoreVideo(addr, size);
+           });
+       }
+       return RC_OK;
+   }
+   ```
+   
+3. ManuList()函数从控制台通过fgets()接口获取字符，不同字符所对应demo支持的功能不同，并打印出该demo所支持功能的菜单。
+
+   ```
+   static void ManuList(const std::shared_ptr<CameraDemo> &mainDemo,
+       const int argc, char** argv)
+   {
+       int idx, c;
+       int awb = 1;
+       constexpr char shortOptions[] = "h:cwvaqof:";
+       c = getopt_long(argc, argv, shortOptions, longOptions, &idx);
+       while(1) {
+           switch (c) {
+               case 'h':
+                   c = PutMenuAndGetChr(); // 打印菜单
+                   break;                
+               case 'f':
+                   FlashLightTest(mainDemo); // 手电筒功能测试
+                   c = PutMenuAndGetChr();
+                   break;
+               case 'o':
+                   OfflineTest(mainDemo); // Offline功能测试
+                   c = PutMenuAndGetChr();
+                   break;
+               case 'c':
+                   CaptureTest(mainDemo); // Capture功能测试
+                   c = PutMenuAndGetChr();
+                   break;
+               case 'w': // AWB功能测试
+                   if (awb) {
+                       mainDemo->SetAwbMode(OHOS_CAMERA_AWB_MODE_INCANDESCENT);
+                   } else {
+                       mainDemo->SetAwbMode(OHOS_CAMERA_AWB_MODE_OFF);
+                   }
+                   awb = !awb;
+                   c = PutMenuAndGetChr();
+                   break;
+               case 'a': // AE功能测试
+                   mainDemo->SetAeExpo();
+                   c = PutMenuAndGetChr();
+                   break;
+               case 'v': // Video功能测试
+                   VideoTest(mainDemo);
+                   c = PutMenuAndGetChr();
+                   break;
+               case 'q': // 退出demo
+                   PreviewOff(mainDemo);
+                   mainDemo->QuitDemo();
+                   exit(EXIT_SUCCESS);
+   
+               default:
+                   CAMERA_LOGE("main test: command error please retry input command");
+                   c = PutMenuAndGetChr();
+                   break;
+           }
+       }
+   }
+   ```
+   
+
+PutMenuAndGetChr()接口打印了demo程序的菜单，并调用fgets()等待从控制台输入命令，内容如下：
+
+``` 
+   static int PutMenuAndGetChr(void)
+   {
+       constexpr uint32_t inputCount = 50;
+       int c = 0;
+       char strs[inputCount];
+       Usage(stdout);
+       CAMERA_LOGD("pls input command(input -q exit this app)\n");
+       fgets(strs, inputCount, stdin);
+   
+       for (int i = 0; i < inputCount; i++) {
+           if (strs[i] != '-') {
+               c = strs[i];
+               break;
+           }
+       }
+       return c;
+   }
+```
+
+控制台输出菜单详情如下：
+
+```
+   "Options:\n"
+   "-h | --help          Print this message\n"
+   "-o | --offline       stream offline test\n"
+   "-c | --capture       capture one picture\n"
+   "-w | --set WB        Set white balance Cloudy\n"
+   "-v | --video         capture Viedeo of 10s\n"
+   "-a | --Set AE        Set Auto exposure\n"
+   "-f | --Set Flashlight        Set flashlight ON 5s OFF\n"
+   "-q | --quit          stop preview and quit this app\n");
+```
 
 
-### 调用device的GetStreamOperator函数获取streamOperator
 
-    std::make_shared<Camera::IStreamOperatorCallback>();
-    std::shared_ptr<Camera::StreamOperator> streamOperator = nullptr;
-    rc = device->GetStreamOperator(streamOperatorCallback, streamOperator);`
-### 批量创建数据流
-    std::vector<std::shared_ptr<Camera::StreamInfo>> streamInfos;
-    std::shared_ptr<Camera::StreamInfo> streamInfo = std::make_shared<Camera::StreamInfo>();
-    streamInfo->streamId_ = 1001;
-    streamInfo->width_ = 1280;
-    streamInfo->height_ = 720;
-    streamInfo->format_ = 2;
-    streamInfo->datasapce_ = 10;
-    streamInfo->intent_ = Camera::PREVIEW;
-    streamInfo->tunneledMode_ = 5;
-    streamInfos.push_back(streamInfo);
-    rc = streamOperator->CreateStreams(streamInfos);
-### 配流起流
-    rc = streamOperator->CommitStreams(Camera::NORMAL, nullptr);
+## 相关链接
+　　[驱动子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E9%A9%B1%E5%8A%A8%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
 
-## 相关仓<a name="section1371113476307"></a>
-[驱动子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E9%A9%B1%E5%8A%A8%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
+　　[vendor_hisilicon/tree/master/Hi3516DV300/hdf_config](https://gitee.com/openharmony/vendor_hisilicon/blob/master/README_zh.md)
 
-[vendor_hisilicon/tree/master/Hi3516DV300/hdf_config](https://gitee.com/openharmony/vendor_hisilicon/blob/master/README_zh.md)
+　　 
 
-[drivers\_peripheral](https://gitee.com/openharmony/drivers_peripheral)
