@@ -38,7 +38,7 @@ namespace {
 
     struct SensorValueRange g_testRange[] = {{1e5, 0.0}};
     struct SensorValueRange g_accelRange[] = {{78.0, -78.0}, {78.0, -78.0}, {78.0, -78.0}};
-    struct SensorValueRange g_alsRange[] = {{10000.0, 0.0}};
+    struct SensorValueRange g_alsRange[] = {{10000000.0, 0.0}};
     struct SensorValueRange g_pedometerRange[] = {{10000.0, 0.0}};
     struct SensorValueRange g_proximityRange[] = {{5.0, 0.0}};
     struct SensorValueRange g_hallRange[] = {{1.0, 0.0}};
