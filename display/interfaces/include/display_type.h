@@ -601,6 +601,36 @@ typedef struct {
     float value;
 } HDRMetaData;
 
+/**
+ * @brief Defines information for verify the allocate memory
+ *
+ */
+typedef struct {
+    uint32_t width;               /**< The width of the verify allocation */
+    uint32_t height;              /**< The height of the verify allocation */
+    uint64_t usage;               /**< The usage of the verify allocation */
+    PixelFormat format;           /**< The format of the verify allocation */
+} VerifyAllocInfo;
+
+/**
+ * @brief Enumerates the present timestamp type.
+ *
+ */
+typedef enum {
+    HARDWARE_DISPLAY_PTS_UNSUPPORTED = 0,        /**< Unsupported */
+    HARDWARE_DISPLAY_PTS_DELAY = 1 << 0,         /**< Delay */
+    HARDWARE_DISPLAY_PTS_TIMESTAMP = 1 << 1,     /**< Timestamp */
+} PresentTimestampType;
+
+/**
+ * @brief Defines the present timestamp.
+ *
+ */
+typedef struct {
+    PresentTimestampType type;            /**< Present timestamp type */
+    int64_t time;                         /**< Present timestamp value */
+} PresentTimestamp;
+
 #ifdef __cplusplus
 }
 #endif
