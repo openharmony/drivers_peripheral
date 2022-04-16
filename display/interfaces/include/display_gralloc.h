@@ -140,6 +140,20 @@ typedef struct {
      * @version 1.0
      */
     int32_t (*InvalidateCache)(BufferHandle* handle);
+
+    /**
+     * @brief Query whether the given VerifyAllocInfo array is allocatable.
+     *
+     * @param num Indicates the size of infos array.
+     * @param infos Indicates the pointer to the array of VerifyAllocInfo.
+     * @param supporteds Indicates the pointer to an array that supports allocation.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
+     * otherwise.
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*IsSupportedAlloc)(uint32_t num, const VerifyAllocInfo *infos, bool *supporteds);
 } GrallocFuncs;
 
 /**
