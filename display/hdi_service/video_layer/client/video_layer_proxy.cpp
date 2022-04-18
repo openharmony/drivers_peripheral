@@ -17,6 +17,7 @@
 #include <buffer_handle_parcel.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include <iservmgr_hdi.h>
 #include <message_parcel.h>
 
 namespace OHOS {

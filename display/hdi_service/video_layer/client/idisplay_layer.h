@@ -38,7 +38,6 @@
 #ifndef HDI_IDISPLAY_LAYER_PXY_V1_0_H
 #define HDI_IDISPLAY_LAYER_PXY_V1_0_H
 
-#include <iservmgr_hdi.h>
 #include "display_type.h"
 
 namespace OHOS {
