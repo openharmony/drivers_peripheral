@@ -27,8 +27,8 @@ using namespace testing::ext;
 
 namespace {
     constexpr int32_t LIGHT_COMMON_TIME = 500;
-    constexpr int32_t g_minLightId = HDF_LIGHT_TYPE_BATTERY;
-    constexpr int32_t g_maxLightId = HDF_LIGHT_TYPE_ATTENTION;
+    constexpr int32_t g_minLightId = HDF_LIGHT_ID_BATTERY;
+    constexpr int32_t g_maxLightId = HDF_LIGHT_ID_ATTENTION;
     constexpr int32_t LIGHT_USEC_TIME = 1000000;
     constexpr int32_t LIGHT_MSEC_TIME = 1000;
     constexpr int32_t g_onTime = 500;
