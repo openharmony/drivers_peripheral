@@ -16,8 +16,9 @@
 #include "sensor_impl.h"
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include "callback_death_recipient.h"
 
-#define HDF_LOG_TAG    hdf_sensor_dal
+#define HDF_LOG_TAG hdf_sensor_dal
 
 namespace OHOS {
 namespace HDI {
@@ -26,9 +27,11 @@ namespace V1_0 {
 namespace {
     constexpr int32_t CALLBACK_CTOUNT_THRESHOLD = 1;
     using GroupIdCallBackMap = std::unordered_map<int32_t, std::vector<sptr<ISensorCallback>>>;
+    using CallBackDeathRecipientMap = std::unordered_map<IRemoteObject *, sptr<CallBackDeathRecipient>>;
     GroupIdCallBackMap g_groupIdCallBackMap;
+    CallBackDeathRecipientMap g_callBackDeathRecipientMap;
     std::mutex g_mutex;
-}
+} // namespace
 
 int32_t TradtionalSensorDataCallback(const struct SensorEvents *event)
 {
@@ -100,6 +103,30 @@ int32_t MedicalSensorDataCallback(const struct SensorEvents *event)
     return SENSOR_SUCCESS;
 }
 
+SensorImpl::~SensorImpl()
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto iter = g_groupIdCallBackMap.find(TRADITIONAL_SENSOR_TYPE);
+    if (iter != g_groupIdCallBackMap.end()) {
+        for (auto callback : g_groupIdCallBackMap[TRADITIONAL_SENSOR_TYPE]) {
+            auto recipient = g_callBackDeathRecipientMap[callback->AsObject().GetRefPtr()];
+            if (recipient != nullptr) {
+                callback->AsObject()->RemoveDeathRecipient(recipient);
+            }
+        }
+    }
+    iter = g_groupIdCallBackMap.find(MEDICAL_SENSOR_TYPE);
+    if (iter != g_groupIdCallBackMap.end()) {
+        for (auto callback : g_groupIdCallBackMap[MEDICAL_SENSOR_TYPE]) {
+            auto recipient = g_callBackDeathRecipientMap[callback->AsObject().GetRefPtr()];
+            if (recipient != nullptr) {
+                callback->AsObject()->RemoveDeathRecipient(recipient);
+            }
+        }
+    }
+    FreeSensorInterfaceInstance();
+}
+
 void SensorImpl::Init()
 {
     sensorInterface = NewSensorInterfaceInstance();
@@ -108,7 +135,7 @@ void SensorImpl::Init()
     }
 }
 
-int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformation>& info)
+int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformation> &info)
 {
     if (sensorInterface == nullptr || sensorInterface->GetAllSensors == nullptr) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
@@ -228,7 +255,7 @@ int32_t SensorImpl::SetOption(int32_t sensorId, uint32_t option)
     return ret;
 }
 
-int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallback>& callbackObj)
+int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
 {
     if (sensorInterface == nullptr || sensorInterface->Register == nullptr) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
@@ -245,11 +272,12 @@ int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallback>& callb
     if (groupCallBackIter != g_groupIdCallBackMap.end()) {
         auto callBackIter =
             find_if(g_groupIdCallBackMap[groupId].begin(), g_groupIdCallBackMap[groupId].end(),
-            [callbackObj](const sptr<ISensorCallback> &callbackRegistered) {
+            [&callbackObj](const sptr<ISensorCallback> &callbackRegistered) {
                 return callbackObj->AsObject().GetRefPtr() == callbackRegistered->AsObject().GetRefPtr();
             });
         if (callBackIter == g_groupIdCallBackMap[groupId].end()) {
             g_groupIdCallBackMap[groupId].push_back(callbackObj);
+            AddSensorDeathRecipient(callbackObj);
         }
         return SENSOR_SUCCESS;
     }
@@ -269,12 +297,20 @@ int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallback>& callb
     std::vector<sptr<ISensorCallback>> remoteVec;
     remoteVec.push_back(callbackObj);
     g_groupIdCallBackMap[groupId] = remoteVec;
+    AddSensorDeathRecipient(callbackObj);
 
     return ret;
 }
 
-int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallback>& callbackObj)
+int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
 {
+    std::lock_guard<std::mutex> lock(g_mutex);
+    return UnregisterImpl(groupId, callbackObj->AsObject().GetRefPtr());
+}
+
+int32_t SensorImpl::UnregisterImpl(int groupId, IRemoteObject *callbackObj)
+{
+    const SensorInterface *sensorInterface = NewSensorInterfaceInstance();
     if (sensorInterface == nullptr || sensorInterface->Unregister == nullptr) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
@@ -285,7 +321,6 @@ int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallback>& cal
         return SENSOR_INVALID_PARAM;
     }
 
-    std::lock_guard<std::mutex> lock(g_mutex);
     auto groupIdCallBackIter = g_groupIdCallBackMap.find(groupId);
     if (groupIdCallBackIter == g_groupIdCallBackMap.end()) {
         HDF_LOGE("%{public}s: groupId [%{public}d] callbackObj not registered", __func__, groupId);
@@ -294,8 +329,8 @@ int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallback>& cal
 
     auto callBackIter =
         find_if(g_groupIdCallBackMap[groupId].begin(), g_groupIdCallBackMap[groupId].end(),
-        [callbackObj](const sptr<ISensorCallback> &callbackRegistered) {
-            return callbackObj->AsObject().GetRefPtr() == callbackRegistered->AsObject().GetRefPtr();
+        [&callbackObj](const sptr<ISensorCallback> &callbackRegistered) {
+            return callbackObj == callbackRegistered->AsObject().GetRefPtr();
         });
     if (callBackIter == g_groupIdCallBackMap[groupId].end()) {
         HDF_LOGE("%{public}s: groupId [%{public}d] callbackObj not registered", __func__, groupId);
@@ -308,6 +343,7 @@ int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallback>& cal
      * from the vector
      */
     if (g_groupIdCallBackMap[groupId].size() > CALLBACK_CTOUNT_THRESHOLD) {
+        RemoveSensorDeathRecipient(callBackIter, callbackObj);
         g_groupIdCallBackMap[groupId].erase(callBackIter);
         return SENSOR_SUCCESS;
     }
@@ -323,11 +359,67 @@ int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallback>& cal
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
         return ret;
     }
+
+    RemoveSensorDeathRecipient(callBackIter, callbackObj);
     g_groupIdCallBackMap.erase(groupId);
 
     return ret;
 }
-} // V1_0
-} // Sensor
-} // HDI
-} // OHOS
+
+void SensorImpl::AddSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj)
+{
+    sptr<CallBackDeathRecipient> callBackDeathRecipient = new CallBackDeathRecipient(shared_from_this());
+    bool result = callbackObj->AsObject()->AddDeathRecipient(callBackDeathRecipient);
+    if (result) {
+        g_callBackDeathRecipientMap[callbackObj->AsObject().GetRefPtr()] = callBackDeathRecipient;
+    } else {
+        HDF_LOGE("%{public}s: AddDeathRecipient fail", __func__);
+    }
+}
+
+void SensorImpl::RemoveSensorDeathRecipient(std::vector<sptr<ISensorCallback>>::iterator &callBackIter,
+    IRemoteObject *callbackObj)
+{
+    auto callBackDeathRecipientIter = g_callBackDeathRecipientMap.find(callbackObj);
+    if (callBackDeathRecipientIter != g_callBackDeathRecipientMap.end()) {
+        bool result = (*callBackIter)->AsObject()->RemoveDeathRecipient(callBackDeathRecipientIter->second);
+        if (!result) {
+            HDF_LOGE("%{public}s: RemoveDeathRecipient fail", __func__);
+        }
+        g_callBackDeathRecipientMap.erase(callBackDeathRecipientIter);
+    }
+}
+
+void SensorImpl::OnRemoteDied(const wptr<IRemoteObject> &object)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    sptr<IRemoteObject> callbackObject = object.promote();
+    if (callbackObject == nullptr) {
+        return;
+    }
+
+    int32_t groupId = TRADITIONAL_SENSOR_TYPE;
+    auto callBackIter =
+        find_if(g_groupIdCallBackMap[groupId].begin(), g_groupIdCallBackMap[groupId].end(),
+        [&callbackObject](const sptr<ISensorCallback> &callbackRegistered) {
+            return callbackObject.GetRefPtr() == callbackRegistered->AsObject().GetRefPtr();
+        });
+    if (callBackIter != g_groupIdCallBackMap[groupId].end()) {
+        UnregisterImpl(groupId, callbackObject.GetRefPtr());
+        return;
+    }
+
+    groupId = MEDICAL_SENSOR_TYPE;
+    callBackIter =
+        find_if(g_groupIdCallBackMap[groupId].begin(), g_groupIdCallBackMap[groupId].end(),
+        [&callbackObject](const sptr<ISensorCallback> &callbackRegistered) {
+            return callbackObject.GetRefPtr() == callbackRegistered->AsObject().GetRefPtr();
+        });
+    if (callBackIter != g_groupIdCallBackMap[groupId].end()) {
+        UnregisterImpl(groupId, callbackObject.GetRefPtr());
+    }
+}
+} // namespace V1_0
+} // namespace Sensor
+} // namespace HDI
+} // namespace OHOS
