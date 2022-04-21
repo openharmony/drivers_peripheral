@@ -271,16 +271,23 @@ RetCode HcsDeal::DealAeCompensationSteps(
     const struct DeviceResourceNode &metadataNode,
     std::shared_ptr<CameraStandard::CameraMetadata> &metadata)
 {
-    std::vector<int32_t> aeCompensationSteps;
-    int32_t elemNum = pDevResIns->GetElemNum(&metadataNode, "aeCompensationSteps");
+    constexpr const char *AE_COMPENSATION_STEPS = "aeCompensationSteps";
+    int32_t elemNum = pDevResIns->GetElemNum(&metadataNode, AE_COMPENSATION_STEPS);
     uint32_t nodeValue;
-    for (int i = 0; i < elemNum; i++) {
-        pDevResIns->GetUint32ArrayElem(&metadataNode, "aeCompensationSteps", i, &nodeValue, -1);
-        aeCompensationSteps.push_back(static_cast<int32_t>(nodeValue));
+    camera_rational_t aeCompensationStep;
+    constexpr uint32_t groupLen = 2;
+
+    if (elemNum != groupLen) {
+        CAMERA_LOGE("aeCompensationSteps hcs file configuration error");
+        return RC_ERROR;
     }
 
-    bool ret = metadata->addEntry(OHOS_CONTROL_AE_COMPENSATION_STEP,
-        aeCompensationSteps.data(), aeCompensationSteps.size());
+    pDevResIns->GetUint32ArrayElem(&metadataNode, AE_COMPENSATION_STEPS, 0, &nodeValue, -1);
+    aeCompensationStep.numerator = (int32_t)nodeValue;
+    pDevResIns->GetUint32ArrayElem(&metadataNode, AE_COMPENSATION_STEPS, 1, &nodeValue, -1);
+    aeCompensationStep.denominator = (int32_t)nodeValue;
+
+    bool ret = metadata->addEntry(OHOS_CONTROL_AE_COMPENSATION_STEP, &aeCompensationStep, 1);
     if (!ret) {
         CAMERA_LOGE("aeCompensationSteps add failed");
         return RC_ERROR;
