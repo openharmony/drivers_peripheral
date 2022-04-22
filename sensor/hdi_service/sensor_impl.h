@@ -23,18 +23,17 @@ namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V1_0 {
-class SensorImpl : public SensorInterfaceStub, public std::enable_shared_from_this<SensorImpl> {
+class SensorImpl : public SensorInterfaceStub {
 public:
+    SensorImpl(): sensorInterface(NULL)
+    {}
 
-    virtual ~SensorImpl();
+    virtual ~SensorImpl()
+    {
+        FreeSensorInterfaceInstance();
+    }
 
     void Init();
-
-    static std::shared_ptr<SensorImpl> create()
-    {
-        class MakeSharedEnabler : public SensorImpl {};
-        return std::make_shared<MakeSharedEnabler>();
-    }
 
     int32_t GetAllSensorInfo(std::vector<HdfSensorInformation>& info) override;
 
@@ -51,17 +50,8 @@ public:
     int32_t Register(int32_t groupId, const sptr<ISensorCallback>& callbackObj) override;
 
     int32_t Unregister(int32_t groupId, const sptr<ISensorCallback>& callbackObj) override;
-
-    void OnRemoteDied(const wptr<IRemoteObject> &object);
 private:
     const SensorInterface *sensorInterface;
-    void AddSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj);
-    void RemoveSensorDeathRecipient(std::vector<sptr<ISensorCallback>>::iterator &callBackIter,
-        IRemoteObject *callbackObj);
-    int32_t UnregisterImpl(int groupId, IRemoteObject *callbackObj);
-private:
-    SensorImpl(): sensorInterface(NULL)
-    {}
 };
 } // V1_0
 } // Sensor
