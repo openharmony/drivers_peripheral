@@ -27,7 +27,7 @@ using namespace OHOS::HDI::Sensor::V1_0;
 
 struct HdfSensorInterfaceHost {
     struct IDeviceIoService ioservice;
-    std::shared_ptr<SensorImpl> service;
+    SensorImpl *service;
 };
 
 static int32_t SensorInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
@@ -73,7 +73,7 @@ static int HdfSensorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfSensorInterfaceHost->ioservice.Dispatch = SensorInterfaceDriverDispatch;
     hdfSensorInterfaceHost->ioservice.Open = nullptr;
     hdfSensorInterfaceHost->ioservice.Release = nullptr;
-    hdfSensorInterfaceHost->service = SensorImpl::create();
+    hdfSensorInterfaceHost->service = new SensorImpl();
 
     deviceObject->service = &hdfSensorInterfaceHost->ioservice;
     HDF_LOGI("HdfSensorInterfaceDriverBind Success");
@@ -84,6 +84,7 @@ static void HdfSensorInterfaceDriverRelease(struct HdfDeviceObject *deviceObject
 {
     struct HdfSensorInterfaceHost *hdfSensorInterfaceHost =
         CONTAINER_OF(deviceObject->service, struct HdfSensorInterfaceHost, ioservice);
+    delete hdfSensorInterfaceHost->service;
     OsalMemFree(hdfSensorInterfaceHost);
     HDF_LOGI("HdfSensorInterfaceDriverRelease Success");
 }
