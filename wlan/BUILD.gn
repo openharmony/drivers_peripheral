@@ -24,7 +24,6 @@ if (defined(ohos_lite)) {
       "client:wifi_driver_client",
       "hal:wifi_hal",
       "hdi_service:wifi_hdi_c_device",
-      "hdi_service:wifi_hdi_device",
     ]
   }
 }
