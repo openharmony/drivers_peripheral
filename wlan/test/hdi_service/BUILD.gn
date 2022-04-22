@@ -18,42 +18,6 @@ module_output_path = "hdf/wlan"
 
 ###########################palTest###########################
 
-ohos_unittest("WlanHdiServiceTest") {
-  module_out_path = module_output_path
-  sources = [ "wlan_hdi_hal_services_test.cpp" ]
-
-  deps = [
-    "//drivers/peripheral/wlan/client:wifi_driver_client",
-    "//drivers/peripheral/wlan/hal:wifi_hal",
-    "//drivers/peripheral/wlan/hdi_service:wifi_hdi_device",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
-
-  include_dirs = [
-    "include",
-    "//drivers/peripheral/wlan/interfaces/include",
-    "//drivers/peripheral/wlan/hdi_service/services",
-    "//drivers/peripheral/wlan/client/include",
-    "//drivers/peripheral/wlan/hal/include",
-    "//drivers/peripheral/wlan/hdi_service/include",
-  ]
-
-  if (is_standard_system) {
-    external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_ipc_adapter",
-      "device_driver_framework:libhdf_utils",
-      "device_driver_framework:libhdi",
-      "hiviewdfx_hilog_native:libhilog",
-      "utils_base:utils",
-    ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
-  }
-  external_deps += [ "ipc:ipc_single" ]
-}
-
 ohos_unittest("WlanHdiServiceTestC") {
   module_out_path = module_output_path
   sources = [ "wlan_hdi_hal_services_c_test.cpp" ]
@@ -93,8 +57,5 @@ ohos_unittest("WlanHdiServiceTestC") {
 ###########################end###########################
 group("unittest") {
   testonly = true
-  deps = [
-    ":WlanHdiServiceTest",
-    ":WlanHdiServiceTestC",
-  ]
+  deps = [ ":WlanHdiServiceTestC" ]
 }
