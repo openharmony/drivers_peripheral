@@ -249,14 +249,19 @@ void BatteryThread::UpdateBatteryInfo(void* service, char* msg)
     event.chargeCounter = batteryInfo->chargeCounter_;
     event.present = batteryInfo->present_;
     event.technology = batteryInfo->technology_;
+    event.curNow = batteryInfo->curNow_;
+    event.remainEnergy = batteryInfo->remainEnergy_;
+    event.totalEnergy = batteryInfo->totalEnergy_;
 
-    BATTERY_HILOGD(FEATURE_BATT_INFO, "BatteryInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "BatteryInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
         "healthState=%{public}d, pluggedType=%{public}d, pluggedMaxCurrent=%{public}d, " \
         "pluggedMaxVoltage=%{public}d, chargeState=%{public}d, chargeCounter=%{public}d, present=%{public}d, " \
-        "technology=%{public}s", batteryInfo->capacity_, batteryInfo->voltage_,
+        "technology=%{public}s, curNow=%{public}d, remainEnergy=%{public}d, totalEnergy=%{public}d",
+        batteryInfo->capacity_, batteryInfo->voltage_,
         batteryInfo->temperature_, batteryInfo->healthState_, batteryInfo->pluggedType_,
         batteryInfo->pluggedMaxCurrent_, batteryInfo->pluggedMaxVoltage_, batteryInfo->chargeState_,
-        batteryInfo->chargeCounter_, batteryInfo->present_, batteryInfo->technology_.c_str());
+        batteryInfo->chargeCounter_, batteryInfo->present_, batteryInfo->technology_.c_str(),
+        batteryInfo->curNow_, batteryInfo->remainEnergy_, batteryInfo->totalEnergy_);
 
     if (g_callback != nullptr) {
         g_callback->Update(event);
@@ -286,14 +291,19 @@ void BatteryThread::UpdateBatteryInfo(void* service)
     event.chargeCounter = batteryInfo->chargeCounter_;
     event.present = batteryInfo->present_;
     event.technology = batteryInfo->technology_;
+    event.curNow = batteryInfo->curNow_;
+    event.remainEnergy = batteryInfo->remainEnergy_;
+    event.totalEnergy = batteryInfo->totalEnergy_;
 
     BATTERY_HILOGI(FEATURE_BATT_INFO, "BatteryInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
         "healthState=%{public}d, pluggedType=%{public}d, pluggedMaxCurrent=%{public}d, " \
         "pluggedMaxVoltage=%{public}d, chargeState=%{public}d, chargeCounter=%{public}d, present=%{public}d, " \
-        "technology=%{public}s", batteryInfo->capacity_, batteryInfo->voltage_,
+        "technology=%{public}s, curNow==%{public}d, remainEnergy==%{public}d, totalEnergy==%{public}d",
+        batteryInfo->capacity_, batteryInfo->voltage_,
         batteryInfo->temperature_, batteryInfo->healthState_, batteryInfo->pluggedType_,
         batteryInfo->pluggedMaxCurrent_, batteryInfo->pluggedMaxVoltage_, batteryInfo->chargeState_,
-        batteryInfo->chargeCounter_, batteryInfo->present_, batteryInfo->technology_.c_str());
+        batteryInfo->chargeCounter_, batteryInfo->present_, batteryInfo->technology_.c_str(),
+        batteryInfo->curNow_, batteryInfo->remainEnergy_, batteryInfo->totalEnergy_);
 
     if (g_callback != nullptr) {
         g_callback->Update(event);
