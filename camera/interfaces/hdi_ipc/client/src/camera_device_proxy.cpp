@@ -74,7 +74,7 @@ CamRetCode CameraDeviceProxy::UpdateSettings(const std::shared_ptr<CameraSetting
         return INVALID_ARGUMENT;
     }
 
-    bool bRet = CameraStandard::MetadataUtils::EncodeCameraMetadata(settings, data);
+    bool bRet = Camera::MetadataUtils::EncodeCameraMetadata(settings, data);
     if (!bRet) {
         HDF_LOGE("%s: write metadata failed", __func__);
         return INVALID_ARGUMENT;
