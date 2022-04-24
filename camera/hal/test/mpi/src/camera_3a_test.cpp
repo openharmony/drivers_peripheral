@@ -48,7 +48,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0001, TestSize.Level0)
     // Get preview
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     // Issue 3A parameters
-    std::shared_ptr<CameraStandard::CameraMetadata> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<Camera::CameraMetadata> meta = std::make_shared<Camera::CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     Test_->cameraDevice->UpdateSettings(meta);

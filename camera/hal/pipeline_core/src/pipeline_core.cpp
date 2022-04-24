@@ -22,7 +22,7 @@ RetCode PipelineCore::Init()
     return RC_OK;
 }
 
-void PipelineCore::UpdateMetadata(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+void PipelineCore::UpdateMetadata(std::shared_ptr<Camera::CameraMetadata> meta)
 {
     RetCode rc = RC_OK;
     std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();

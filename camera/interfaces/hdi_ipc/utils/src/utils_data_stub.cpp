@@ -16,7 +16,7 @@
 #include "utils_data_stub.h"
 
 namespace OHOS::Camera {
-bool UtilsDataStub::EncodeCameraMetadata(const std::shared_ptr<CameraStandard::CameraMetadata> &metadata,
+bool UtilsDataStub::EncodeCameraMetadata(const std::shared_ptr<Camera::CameraMetadata> &metadata,
     MessageParcel &data)
 {
     if (metadata == nullptr) {
@@ -27,12 +27,12 @@ bool UtilsDataStub::EncodeCameraMetadata(const std::shared_ptr<CameraStandard::C
     uint32_t tagCount = 0;
     common_metadata_header_t *meta = metadata->get();
     if (meta != nullptr) {
-        tagCount = CameraStandard::GetCameraMetadataItemCount(meta);
+        tagCount = Camera::GetCameraMetadataItemCount(meta);
         bRet = (bRet && data.WriteInt32(static_cast<int32_t>(tagCount)));
-        camera_metadata_item_entry_t *item = CameraStandard::GetMetadataItems(meta);
+        camera_metadata_item_entry_t *item = Camera::GetMetadataItems(meta);
         for (uint32_t i = 0; i < tagCount; i++, item++) {
             camera_metadata_item_t entry;
-            int ret = CameraStandard::FindCameraMetadataItem(meta, item->item, &entry);
+            int ret = Camera::FindCameraMetadataItem(meta, item->item, &entry);
             if (ret == -ENOENT) {
                 return false;
             }
@@ -49,7 +49,7 @@ bool UtilsDataStub::EncodeCameraMetadata(const std::shared_ptr<CameraStandard::C
     return bRet;
 }
 
-void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<CameraStandard::CameraMetadata> &metadata)
+void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<Camera::CameraMetadata> &metadata)
 {
     int32_t tagCount = data.ReadInt32();
     if (tagCount <= 0) {
@@ -70,13 +70,13 @@ void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<Ca
         entrys.push_back(entry);
     }
 
-    metadata = std::make_shared<CameraStandard::CameraMetadata>(tagCount, metadataSize);
+    metadata = std::make_shared<Camera::CameraMetadata>(tagCount, metadataSize);
     common_metadata_header_t *meta = metadata->get();
     for (auto &entry : entrys) {
         void *buffer = nullptr;
         UtilsDataStub::EntryDataToBuffer(entry, &buffer);
         if (buffer != nullptr) {
-            (void)CameraStandard::AddCameraMetadataItem(meta, entry.item, buffer, entry.count);
+            (void)Camera::AddCameraMetadataItem(meta, entry.item, buffer, entry.count);
         }
     }
 }

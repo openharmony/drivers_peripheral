@@ -20,7 +20,7 @@ namespace OHOS::Camera {
 class PipelineCore : public IPipelineCore {
 public:
     RetCode Init() override;
-    void UpdateMetadata(std::shared_ptr<CameraStandard::CameraMetadata> meta) override;
+    void UpdateMetadata(std::shared_ptr<Camera::CameraMetadata> meta) override;
     std::shared_ptr<HostStreamMgr> GetHostStreamMgr() const override;
     std::shared_ptr<IStreamPipelineCore> GetStreamPipelineCore() const override;
     PipelineCore() = default;
