@@ -38,19 +38,34 @@
 
 #include <stdint.h>
 
-enum AudioEventType {
-    HDF_AUDIO_DEVICE_ADD    = 0x1,
-    HDF_AUDIO_DEVICE_REMOVE = 0x2,
+typedef enum AudioEventType {
+    HDF_AUDIO_DEVICE_ADD        = 0x1,
+    HDF_AUDIO_DEVICE_REMOVE     = 0x2,
+    HDF_AUDIO_LOAD_SUCCESS      = 0x3,
+    HDF_AUDIO_LOAD_FAILURE      = 0x4,
+    HDF_AUDIO_UNLOAD            = 0x5,
+    HDF_AUDIO_SERVICE_VALID     = 0x7,
+    HDF_AUDIO_SERVICE_INVALID   = 0x8,
+    HDF_AUDIO_CAPTURE_THRESHOLD = 0x9,
     HDF_AUDIO_EVENT_UNKOWN,
-};
+} EVENT_TYPE;
 
-enum AudioDeviceType {
-    HDF_AUDIO_LINEOUT     = 0x1,
-    HDF_AUDIO_HEADPHONE   = 0x2,
-    HDF_AUDIO_HEADSET     = 0x4,
-    HDF_AUDIO_USB_HEADSET = 0x8,
+typedef enum AudioEventType EVENT_LOAD_TYPE;
+typedef enum AudioEventType EVENT_SERVICE_TYPE;
+
+typedef enum AudioDeviceType {
+    HDF_AUDIO_LINEOUT        = 0x1,
+    HDF_AUDIO_HEADPHONE      = 0x2,
+    HDF_AUDIO_HEADSET        = 0x4,
+    HDF_AUDIO_USB_HEADSET    = 0x8,
+    HDF_AUDIO_USB_HEADPHONE  = 0x10,
+    HDF_AUDIO_USBA_HEADSET   = 0x20,
+    HDF_AUDIO_USBA_HEADPHONE = 0x40,
+    HDF_AUDIO_PRIMARY_DEVICE = 0x80,
+    HDF_AUDIO_USB_DEVICE     = 0x100,
+    HDF_AUDIO_A2DP_DEVICE    = 0x200,
     HDF_AUDIO_DEVICE_UNKOWN,
-};
+} DEVICE_TYPE;
 
 struct AudioEvent {
     uint32_t eventType;

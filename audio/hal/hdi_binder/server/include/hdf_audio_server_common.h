@@ -18,6 +18,7 @@
 
 #include "hdf_device_desc.h"
 #include "hdf_log.h"
+#include "audio_events.h"
 #include "audio_internal.h"
 
 #define MAX_AUDIO_ADAPTER_NUM_SERVER    8   // Limit the number of sound cards supported to a maximum of 8
@@ -115,7 +116,8 @@ int32_t HdiServiceGetPassthroughMode(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
 int32_t HdiServiceGetDevStatusByPNP(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
-int32_t HdiServiceDynamicInitSet(uint8_t* strMsgReport, struct HdfDeviceObject *deviceObject);
+int32_t AudioServiceStateChange(struct HdfDeviceObject *device,
+    struct AudioEvent *audioSrvEvent);
 
 enum AudioServerType AudioHdiGetLoadServerFlag(void);
 void AudioHdiSetLoadServerFlag(enum AudioServerType serverType);

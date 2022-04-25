@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "audio_manager.h"
 #include <dlfcn.h>
 #include <limits.h>
 #include <pthread.h>
@@ -24,10 +23,11 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include "audio_proxy_manager.h"
-#include "audio_types.h"
 #include "hdf_base.h"
 #include "inttypes.h"
+#include "audio_manager.h"
+#include "audio_proxy_manager.h"
+#include "audio_types.h"
 
 #define LOG_FUN_ERR(fmt, arg...) do { \
         printf("%s: [%s]: [%d]:[ERROR]:" fmt"\n", __FILE__, __func__, __LINE__, ##arg); \
@@ -238,16 +238,15 @@ int32_t InitDevDesc(struct AudioDeviceDescriptor *devDesc, uint32_t portId)
     return HDF_SUCCESS;
 }
 
-uint32_t StringToInt(const char *str)
+uint32_t StringToInt(const char *flag)
 {
-    if (str == NULL || str[0] == '\0') {
+    if (flag == NULL) {
         return 0;
     }
-    uint32_t temp = str[0];
-    int32_t strLength = strlen(str) - 1;
-    for (int32_t i = strLength; i >= 0; i--) {
+    uint32_t temp = flag[0];
+    for (int32_t i = strlen(flag) - 1; i >= 0; i--) {
         temp <<= MOVE_LEFT_NUM;
-        temp += str[i];
+        temp += flag[i];
     }
     return temp;
 }
@@ -713,33 +712,47 @@ int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen, char *func, int32
     return HDF_SUCCESS;
 }
 
+struct AudioManager *GetAudioManagerInsForRender(const char *funcString)
+{
+    struct AudioManager *(*getAudioManager)(void) = NULL;
+    if (funcString == NULL) {
+        LOG_FUN_ERR("funcString is null!");
+        return NULL;
+    }
+    if (g_handle == NULL) {
+        LOG_FUN_ERR("g_captureHandle is null!");
+        return NULL;
+    }
+    getAudioManager = (struct AudioManager *(*)())(dlsym(g_handle, funcString));
+    if (getAudioManager == NULL) {
+        LOG_FUN_ERR("Get Audio Manager Funcs Fail");
+        return NULL;
+    }
+    return getAudioManager();
+}
+
 int32_t GetRenderPassthroughManagerFunc(const char *adapterNameCase)
 {
-    if (adapterNameCase == NULL) {
-        LOG_FUN_ERR("The Parameter is NULL");
-        return HDF_FAILURE;
-    }
-    struct AudioManager *manager = NULL;
     struct AudioAdapterDescriptor *descs = NULL;
     enum AudioPortDirection port = PORT_OUT; // Set port information
     struct AudioPort renderPort;
     int32_t size = 0;
-    int32_t ret;
-    int32_t index;
-    struct AudioManager *(*getAudioManager)(void) = NULL;
-    getAudioManager = (struct AudioManager *(*)())(dlsym(g_handle, "GetAudioManagerFuncs"));
-    if (getAudioManager == NULL) {
-        LOG_FUN_ERR("Get Audio Manager Funcs Fail");
+    if (adapterNameCase == NULL) {
+        LOG_FUN_ERR("The Parameter is NULL");
         return HDF_FAILURE;
     }
-    manager = getAudioManager();
-    ret = manager->GetAllAdapters(manager, &descs, &size);
+    struct AudioManager *manager = GetAudioManagerInsForRender("GetAudioManagerFuncs");
+    if (manager == NULL) {
+        LOG_FUN_ERR("GetAudioManagerInsForRender Fail");
+        return HDF_FAILURE;
+    }
+    int32_t ret = manager->GetAllAdapters(manager, &descs, &size);
     int32_t check = size == 0 || descs == NULL || ret < 0;
     if (check) {
         LOG_FUN_ERR("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
     }
-    index = SwitchAdapter(descs, adapterNameCase, port, &renderPort, size);
+    int32_t index = SwitchAdapter(descs, adapterNameCase, port, &renderPort, size);
     if (index < 0) {
         LOG_FUN_ERR("Not Switch Adapter Invalid");
         return HDF_ERR_NOT_SUPPORT;
@@ -769,31 +782,27 @@ int32_t GetRenderPassthroughManagerFunc(const char *adapterNameCase)
 
 int32_t GetRenderProxyManagerFunc(const char *adapterNameCase)
 {
-    if (adapterNameCase == NULL) {
-        LOG_FUN_ERR("The Parameter is NULL");
-        return HDF_FAILURE;
-    }
-    struct AudioManager *proxyManager = NULL;
     struct AudioAdapterDescriptor *descs = NULL;
     enum AudioPortDirection port = PORT_OUT; // Set port information
     struct AudioPort renderPort;
     int32_t size = 0;
-    int32_t ret;
-    int32_t index;
-    struct AudioManager *(*getAudioManager)(void) = NULL;
-    getAudioManager = (struct AudioManager *(*)())(dlsym(g_handle, "GetAudioProxyManagerFuncs"));
-    if (getAudioManager == NULL) {
+    if (adapterNameCase == NULL) {
+        LOG_FUN_ERR("The Parameter is NULL");
         return HDF_FAILURE;
     }
-    proxyManager = getAudioManager();
-    ret = proxyManager->GetAllAdapters(proxyManager, &descs, &size);
+    struct AudioManager *proxyManager = GetAudioManagerInsForRender("GetAudioProxyManagerFuncs");
+    if (proxyManager == NULL) {
+        LOG_FUN_ERR("GetAudioManagerInsForRender Fail");
+        return HDF_FAILURE;
+    }
+    int32_t ret = proxyManager->GetAllAdapters(proxyManager, &descs, &size);
     int32_t temp = size == 0 || descs == NULL || ret < 0;
     if (temp) {
         LOG_FUN_ERR("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
     }
     // Get qualified sound card and port
-    index = SwitchAdapter(descs, adapterNameCase, port, &renderPort, size);
+    int32_t index = SwitchAdapter(descs, adapterNameCase, port, &renderPort, size);
     if (index < 0) {
         LOG_FUN_ERR("Not Switch Adapter Fail");
         return HDF_ERR_NOT_SUPPORT;
