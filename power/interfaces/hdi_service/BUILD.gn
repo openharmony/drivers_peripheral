@@ -90,10 +90,8 @@ ohos_shared_library("libpower_driver") {
 }
 
 group("hdf_power") {
-  if (target_cpu == "arm") {
-    deps = [
-      ":libpower_driver",
-      ":libpower_interface_service_1.0",
-    ]
-  }
+  deps = [
+    ":libpower_driver",
+    ":libpower_interface_service_1.0",
+  ]
 }

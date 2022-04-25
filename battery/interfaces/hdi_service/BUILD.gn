@@ -95,10 +95,8 @@ ohos_shared_library("libbattery_driver") {
 }
 
 group("hdf_battery") {
-  if (target_cpu == "arm") {
-    deps = [
-      ":libbattery_driver",
-      ":libbattery_interface_service_1.0",
-    ]
-  }
+  deps = [
+    ":libbattery_driver",
+    ":libbattery_interface_service_1.0",
+  ]
 }
