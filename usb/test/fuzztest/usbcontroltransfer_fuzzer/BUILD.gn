@@ -58,8 +58,5 @@ ohos_fuzztest("UsbControlTransferFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [
-    # deps file
-    ":UsbControlTransferFuzzTest",
-  ]
+  deps += [ ":UsbControlTransferFuzzTest" ]
 }
