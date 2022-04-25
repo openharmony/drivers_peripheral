@@ -58,8 +58,5 @@ ohos_fuzztest("UsbCloseDeviceFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [
-    # deps file
-    ":UsbCloseDeviceFuzzTest",
-  ]
+  deps += [ ":UsbCloseDeviceFuzzTest" ]
 }
