@@ -13,21 +13,12 @@
  * limitations under the License.
  */
 
-#ifndef HDF_AUDIO_PNP_SERVER_H
-#define HDF_AUDIO_PNP_SERVER_H
+#ifndef HDF_AUDIO_PNP_UEVENT_H
+#define HDF_AUDIO_PNP_UEVENT_H
 
 #include "hdf_types.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/* start uevent to monitor USB headset/headphone */
+int32_t AudioPnpUeventStartThread(void);
 
-int32_t AudioPnpStatusSend(const char *serverName,
-    const char *tokenServerName, const char *pnpInfo, const int cmd);
-/* statusInfo is update new info */
-int32_t AudioPnpUpdateInfo(const char *statusInfo);
-
-#ifdef __cplusplus
-}
-#endif
 #endif
