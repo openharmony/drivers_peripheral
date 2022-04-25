@@ -16,15 +16,15 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 module_output_path = "hdf/usb/"
 
-ohos_fuzztest("UsbClaimInterfaceFuzzTest") {
+ohos_fuzztest("UsbGetFileDescriptorFuzzTest") {
   module_out_path = module_output_path
 
   fuzz_config_file =
-      "//drivers/peripheral/usb/test/fuzztest/usbclaiminterface_fuzzer"
+      "//drivers/peripheral/usb/test/fuzztest/usbgetfiledescriptor_fuzzer"
 
   include_dirs = [
     "//drivers/peripheral/usb/hal/client/include",
-    "//drivers/peripheral/usb/test/fuzztest/usbclaiminterface_fuzzer",
+    "//drivers/peripheral/usb/test/fuzztest/usbgetfiledescriptor_fuzzer",
     "//drivers/peripheral/usb/test/UsbSubscriberTest",
     "//drivers/framework/include/utils",
   ]
@@ -51,12 +51,12 @@ ohos_fuzztest("UsbClaimInterfaceFuzzTest") {
 
   sources = [
     "//drivers/peripheral/usb/test/UsbSubscriberTest/UsbSubscriberTest.cpp",
-    "usbclaiminterface_fuzzer.cpp",
+    "usbgetfiledescriptor_fuzzer.cpp",
   ]
 }
 
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [ ":UsbClaimInterfaceFuzzTest" ]
+  deps += [ ":UsbGetFileDescriptorFuzzTest" ]
 }
