@@ -90,11 +90,9 @@ ohos_shared_library("libthermal_driver") {
 }
 
 group("hdf_thermal") {
-  if (target_cpu == "arm") {
-    deps = [
-      ":libthermal_driver",
-      ":libthermal_interface_service_1.0",
-      "profile:thermal_hdf_config",
-    ]
-  }
+  deps = [
+    ":libthermal_driver",
+    ":libthermal_interface_service_1.0",
+    "profile:thermal_hdf_config",
+  ]
 }
