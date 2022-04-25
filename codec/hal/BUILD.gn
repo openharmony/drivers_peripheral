@@ -16,7 +16,6 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libcodec_hdi_omx_server") {
   include_dirs = [
-    "//drivers/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",

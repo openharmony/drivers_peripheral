@@ -14,10 +14,14 @@
  */
 #include "proxy_msgproc.h"
 #include <hdf_log.h>
+#include <osal_mem.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+
+#define HDF_LOG_TAG codec_hdi_proxy
+
 int32_t CodecProxyParseAlignment(struct HdfSBuf *reply, Alignment *alignment)
 {
     if (reply == NULL || alignment == NULL) {
@@ -129,41 +133,61 @@ int32_t CodecProxyPackParam(struct HdfSBuf *data, const Param *param)
         HDF_LOGE("%{public}s: params NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)param->key)) {
-        HDF_LOGE("%{public}s: Write key failed!", __func__);
-        return HDF_FAILURE;
+
+    if (!HdfSbufWriteInt32(data, (int32_t)param->key)) {
+        HDF_LOGE("%{public}s: write param->key failed!", __func__);
+        return false;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)&param->val)) {
-        HDF_LOGE("%{public}s: Write val failed!", __func__);
-        return HDF_FAILURE;
-    }
+
     if (!HdfSbufWriteInt32(data, param->size)) {
-        HDF_LOGE("%{public}s: Write size failed!", __func__);
-        return HDF_FAILURE;
+        HDF_LOGE("%{public}s: write param->size failed!", __func__);
+        return false;
     }
+    for (int32_t i = 0; i < param->size; i++) {
+        if (!HdfSbufWriteInt8(data, ((int8_t*)(param->val))[i])) {
+            HDF_LOGE("%{public}s: write (param->val)[i] failed!", __func__);
+            return false;
+        }
+    }
+
     return HDF_SUCCESS;
 }
 
 int32_t CodecProxyParseParam(struct HdfSBuf *reply, Param *param)
 {
-    uint32_t tempKey = 0;
     if (reply == NULL || param == NULL) {
         HDF_LOGE("%{public}s: params NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufReadUint32(reply, &tempKey)) {
-        HDF_LOGE("%{public}s: read tempKey failed!", __func__);
+
+    if (!HdfSbufReadInt32(reply, (int32_t*)&param->key)) {
+        HDF_LOGE("%{public}s: read param->key failed!", __func__);
         return HDF_FAILURE;
     }
-    param->key = (ParamKey)tempKey;
-    if (!HdfSbufReadUint32(reply, (uint32_t *)&param->val)) {
-        HDF_LOGE("%{public}s: Read val failed!", __func__);
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadInt32(reply, (int32_t*)&param->size)) {
+
+    int8_t* valCp = NULL;
+    int32_t valCpLen = 0;
+    if (!HdfSbufReadInt32(reply, &valCpLen)) {
         HDF_LOGE("%{public}s: read size failed!", __func__);
         return HDF_FAILURE;
     }
+    if (valCpLen > 0) {
+        valCp = (int8_t*)OsalMemCalloc(sizeof(int8_t) * valCpLen);
+        if (valCp == NULL) {
+            HDF_LOGE("%{public}s: alloc mem failed!", __func__);
+            return HDF_FAILURE;
+        }
+        for (int32_t i = 0; i < valCpLen; i++) {
+            if (!HdfSbufReadInt8(reply, &valCp[i])) {
+                HDF_LOGE("%{public}s: read valCp[i] failed!", __func__);
+                OsalMemFree(valCp);
+                return HDF_FAILURE;
+            }
+        }
+    }
+    param->val = (void*)valCp;
+    param->size = valCpLen;
+
     return HDF_SUCCESS;
 }
 

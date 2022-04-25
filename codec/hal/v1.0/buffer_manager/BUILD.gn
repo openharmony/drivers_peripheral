@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Shenzhen Kaihong DID Co., Ltd.
+# Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -14,16 +14,14 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libcodec_capability_config") {
+ohos_shared_library("libcodec_buffer_manager") {
   include_dirs = [
     "//drivers/peripheral/codec/interfaces/include",
-    "//drivers/peripheral/codec/hal/config/capability_config/include",
-    "//drivers/peripheral/codec/hal/config/common/include",
+    "//drivers/peripheral/codec/hal/v1.0/buffer_manager/include",
   ]
   sources = [
-    "capability_config/src/codec_capability_config.c",
-    "capability_config/src/config_parser.c",
-    "common/src/codec_utils.c",
+    "src/buffer_manager.cpp",
+    "src/buffer_manager_wrapper.cpp",
   ]
 
   if (is_standard_system) {
@@ -33,6 +31,7 @@ ohos_shared_library("libcodec_capability_config") {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -43,6 +42,6 @@ ohos_shared_library("libcodec_capability_config") {
   part_name = "codec_device_driver"
 }
 
-group("codec_capability_config") {
-  deps = [ ":libcodec_capability_config" ]
+group("codec_buffer_manager") {
+  deps = [ ":libcodec_buffer_manager" ]
 }

@@ -299,6 +299,12 @@ static int32_t CodecCapabilityBind(struct HdfDeviceObject *deviceObject)
     static struct IDeviceIoService deviceIoService = {
         .Dispatch = CodecCapabilityDispatch,
     };
+ 
+    int ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, "ohos.hdi.codec_service");
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("failed to set interface desc");
+        return ret;
+    }
     deviceObject->service = &deviceIoService;
 
     return HDF_SUCCESS;
