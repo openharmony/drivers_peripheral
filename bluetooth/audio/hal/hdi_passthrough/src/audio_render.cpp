@@ -322,8 +322,7 @@ int32_t AudioRenderRenderFrame(struct AudioRender *render, const void *frame,
     }
 
     LOGV("%s, WriteFrame", __func__);
-    OHOS::Bluetooth::WriteFrame((const uint8_t *)frame, (uint32_t)requestBytes);
-    return AUDIO_HAL_SUCCESS;
+    return OHOS::Bluetooth::WriteFrame((const uint8_t *)frame, (uint32_t)requestBytes);
 }
 
 int32_t AudioRenderGetRenderPosition(struct AudioRender *render, uint64_t *frames, struct AudioTimeStamp *time)
