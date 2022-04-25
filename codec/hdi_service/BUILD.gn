@@ -49,20 +49,35 @@ ohos_shared_library("libcodec_server") {
   include_dirs = [
     "//drivers/peripheral/codec/interfaces/include/",
     "//drivers/peripheral/codec/hdi_service/codec_proxy/",
+    "//drivers/peripheral/codec/hal/v1.0/codec_instance/include",
+    "//drivers/peripheral/codec/hal/v1.0/share_mem/include",
+    "//drivers/peripheral/codec/hal/v1.0/oem_interface/include",
+    "//drivers/peripheral/codec/hal/v1.0/buffer_manager/include",
   ]
   sources = [
+    "//drivers/peripheral/codec/hal/v1.0/codec_instance/src/codec_instance.c",
+    "//drivers/peripheral/codec/hal/v1.0/share_mem/src/ashmem_wrapper.cpp",
+    "//drivers/peripheral/codec/hal/v1.0/share_mem/src/share_mem.c",
     "codec_service_stub/codec_callback_service.c",
     "codec_service_stub/codec_callback_stub.c",
     "codec_service_stub/codec_host.c",
+    "codec_service_stub/codec_service.c",
     "codec_service_stub/codec_stub.c",
     "codec_service_stub/stub_msgproc.c",
   ]
-  CODEC_LIB_PATH = "//device/soc/hisilicon/common/hal/media/codec/hi3516dv300/linux_standard/libs"
-  CODEC_LIB_REAL_PATH = rebase_path("$CODEC_LIB_PATH")
-  ldflags = [ "-L$CODEC_LIB_REAL_PATH" ]
-  ldflags += [ "-lcodec" ]
+
+  if (product_name == "Hi3516DV300") {
+    CODEC_LIB_PATH = "//device/soc/hisilicon/common/hal/media/codec/hi3516dv300/linux_standard/libs"
+    CODEC_LIB_REAL_PATH = rebase_path("$CODEC_LIB_PATH")
+    ldflags = [ "-L$CODEC_LIB_REAL_PATH" ]
+    ldflags += [ "-lcodec" ]
+  }
 
   deps = [ "//drivers/peripheral/codec/hdi_service:codec_client" ]
+
+  if (product_name == "rk3568") {
+    deps += [ "//device/soc/rockchip/hardware/codec:codec_oem_interface" ]
+  }
 
   if (is_standard_system) {
     external_deps = [
@@ -71,6 +86,7 @@ ohos_shared_library("libcodec_server") {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
       "hiviewdfx_hilog_native:libhilog",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -82,7 +98,8 @@ ohos_shared_library("libcodec_server") {
 }
 
 group("codec_service") {
-  if (target_cpu == "arm" && device_company == "hisilicon") {
+  if ((target_cpu == "arm" && product_name == "Hi3516DV300") ||
+      product_name == "rk3568") {
     deps = [ ":libcodec_server" ]
   }
 }

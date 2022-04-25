@@ -94,6 +94,8 @@ typedef enum {
     KEY_SOUND_MODE,           /**< Audio channel mode. For the value type, see {@link AudioSoundMode}. */
     KEY_POINT_NUM_PER_FRAME,  /**< Number of sampling points per frame. The value type is uint32_t. */
     KEY_DEVICE_ID,            /**< Device ID. The value type is uint32_t. */
+    KEY_EXT_START = 0xF000,   /**< Manufacture extended features. The keys should be defined in oem adapter files. */
+    KEY_EXT_END = 0xFFFF,
 } ParamKey;
 
 /**
