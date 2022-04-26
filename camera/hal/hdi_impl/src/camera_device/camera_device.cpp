@@ -43,7 +43,7 @@ std::shared_ptr<CameraDevice> CameraDevice::CreateCameraDevice(const std::string
     // set deviceManager metadata & dev status callback
     std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();
     if (deviceManager != nullptr) {
-        deviceManager->SetMetaDataCallBack([device](const std::shared_ptr<CameraStandard::CameraMetadata> &metadata) {
+        deviceManager->SetMetaDataCallBack([device](const std::shared_ptr<Camera::CameraMetadata> &metadata) {
             std::static_pointer_cast<CameraDevice>(device)->OnMetadataChanged(metadata);
         });
         deviceManager->SetDevStatusCallBack([device]() {

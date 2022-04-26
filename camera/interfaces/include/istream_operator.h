@@ -75,7 +75,7 @@ public:
      */
     virtual CamRetCode IsStreamsSupported(
         OperationMode mode,
-        const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
+        const std::shared_ptr<Camera::CameraMetadata> &modeSetting,
         const std::vector<std::shared_ptr<StreamInfo>> &info,
         StreamSupportType &type) = 0;
 
@@ -124,7 +124,7 @@ public:
      * @version 1.0
      */
     virtual CamRetCode CommitStreams(OperationMode mode,
-        const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting) = 0;
+        const std::shared_ptr<Camera::CameraMetadata> &modeSetting) = 0;
 
     /**
      * @brief Obtains stream attributes.

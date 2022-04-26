@@ -19,7 +19,7 @@
 #include "camera_metadata_operator.h"
 
 namespace OHOS {
-namespace CameraStandard {
+namespace Camera {
 class CameraMetadata {
 public:
     CameraMetadata(size_t itemCapacity, size_t dataCapacity);
@@ -37,6 +37,6 @@ private:
     bool resize_add_metadata(uint32_t item, const void *data, size_t data_count);
     void replace_metadata(common_metadata_header_t *newMetadata);
 };
-} // namespace CameraStandard
+} // namespace Camera
 } // namespace OHOS
 #endif /* CAMERA_METADATA_INFO_H */
