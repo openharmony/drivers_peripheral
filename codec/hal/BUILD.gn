@@ -83,11 +83,19 @@ ohos_shared_library("libcodec_hdi_omx_client") {
 ohos_shared_library("libcodec_hdi_omx_service_impl") {
   include_dirs = [
     "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/peripheral/codec/hal/v2.0/hdi_impl/include",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
+    "//drivers/peripheral/base",
   ]
-  sources = [ "src/codec_component_type_service.c" ]
+  sources = [
+    "src/codec_adapter.cpp",
+    "src/codec_component_type_service.c",
+    "v2.0/hdi_impl/src/component_mgr.cpp",
+    "v2.0/hdi_impl/src/component_node.cpp",
+    "v2.0/hdi_impl/src/component_node_mgr.cpp",
+  ]
 
   if (is_standard_system) {
     external_deps = [

@@ -54,7 +54,7 @@ int32_t ComponentNodeMgr::CreateComponent(OMX_HANDLETYPE *compHandle, char *comp
         node = nullptr;
         return err;
     }
-    HDF_LOGI("%{public}s ceate component handle [%{public}d] ", __func__, (int)comp);
+    HDF_LOGI("%{public}s ceate component handle [%{public}p] ", __func__, comp);
 
     *compHandle = (OMX_HANDLETYPE)comp;
     node->SetHandle((OMX_HANDLETYPE)comp);
