@@ -54,7 +54,7 @@ std::shared_ptr<IController> FlashManager::GetController(ControllerId controller
     return nullptr;
 }
 
-void FlashManager::Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+void FlashManager::Configure(std::shared_ptr<Camera::CameraMetadata> meta)
 {
     if (flashList_.size() == 0) {
         return;

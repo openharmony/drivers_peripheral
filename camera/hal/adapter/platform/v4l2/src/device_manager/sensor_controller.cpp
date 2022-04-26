@@ -59,7 +59,7 @@ RetCode SensorController::PowerDown()
     return rc;
 }
 
-RetCode SensorController::Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+RetCode SensorController::Configure(std::shared_ptr<Camera::CameraMetadata> meta)
 {
     return SendSensorMetaData(meta);
 };
@@ -129,8 +129,8 @@ void SensorController::BufferCallback(std::shared_ptr<FrameSpec> buffer)
 
     const int ENTRY_CAPACITY = 30; // 30:entry capacity
     const int DATA_CAPACITY = 2000; // 2000:data capacity
-    std::shared_ptr<CameraStandard::CameraMetadata> meta =
-        std::make_shared<CameraStandard::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
+    std::shared_ptr<Camera::CameraMetadata> meta =
+        std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
     RetCode rc = GetAbilityMetaData(meta);
     std::lock_guard<std::mutex> l(metaDataFlaglock_);
     if (rc == RC_OK && metaDataFlag_ == true) {
@@ -149,7 +149,7 @@ void SensorController::BufferCallback(std::shared_ptr<FrameSpec> buffer)
     }
 }
 
-RetCode SensorController::GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+RetCode SensorController::GetAbilityMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
 {
     return GetSensorMetaData(meta);
 }
@@ -174,7 +174,7 @@ void SensorController::SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDat
     }
 }
 
-RetCode SensorController::GetSensorMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+RetCode SensorController::GetSensorMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
 {
     RetCode rc = GetAEMetaData(meta);
     if (rc == RC_ERROR) {
@@ -188,7 +188,7 @@ RetCode SensorController::GetSensorMetaData(std::shared_ptr<CameraStandard::Came
     return rc;
 }
 
-RetCode SensorController::GetAEMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+RetCode SensorController::GetAEMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
 {
     static int64_t oldExpoTime = 0;
     int64_t expoTime = 0;
@@ -218,7 +218,7 @@ RetCode SensorController::GetAEMetaData(std::shared_ptr<CameraStandard::CameraMe
     return rc;
 }
 
-RetCode SensorController::GetAWBMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+RetCode SensorController::GetAWBMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
 {
     static float oldColorGains[4] = {0};
     float colorGains[4] = {0};
@@ -251,7 +251,7 @@ RetCode SensorController::GetAWBMetaData(std::shared_ptr<CameraStandard::CameraM
     return rc;
 }
 
-RetCode SensorController::SendSensorMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+RetCode SensorController::SendSensorMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
 {
     common_metadata_header_t *data = meta->get();
     if (data == nullptr) {
@@ -275,7 +275,7 @@ RetCode SensorController::SendAEMetaData(common_metadata_header_t *data)
     int32_t expo = 0;
     RetCode rc = RC_OK;
     camera_metadata_item_t entry;
-    int ret = CameraStandard::FindCameraMetadataItem(data, OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &entry);
+    int ret = Camera::FindCameraMetadataItem(data, OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &entry);
     if (ret == 0) {
         expo = *(entry.data.i32);
         if (expo != 0) {
@@ -301,7 +301,7 @@ RetCode SensorController::SendAWBMetaData(common_metadata_header_t *data)
     uint8_t awbMode = 0;
     RetCode rc = RC_OK;
     camera_metadata_item_t entry;
-    int ret = CameraStandard::FindCameraMetadataItem(data, OHOS_CONTROL_AWB_MODE, &entry);
+    int ret = Camera::FindCameraMetadataItem(data, OHOS_CONTROL_AWB_MODE, &entry);
     if (ret == 0) {
         awbMode = *(entry.data.u8);
         rc = sensorVideo_->UpdateSetting(GetName(), CMD_AWB_MODE, (int*)&awbMode);

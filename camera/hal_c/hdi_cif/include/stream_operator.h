@@ -25,13 +25,13 @@ class StreamOperator : public StreamOperatorStub {
 public:
     void Init(StreamOperatorCIF* op);
     CamRetCode IsStreamsSupported(OperationMode mode,
-        const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
+        const std::shared_ptr<Camera::CameraMetadata> &modeSetting,
         const std::shared_ptr<StreamInfo> &pInfo,
         StreamSupportType &pType) override;
     CamRetCode CreateStreams(const std::vector<std::shared_ptr<StreamInfo>> &streamInfos) override;
     CamRetCode ReleaseStreams(const std::vector<int> &streamIds) override;
     CamRetCode CommitStreams(OperationMode mode,
-        const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting) override;
+        const std::shared_ptr<Camera::CameraMetadata> &modeSetting) override;
     CamRetCode GetStreamAttributes(std::vector<std::shared_ptr<StreamAttribute>> &attributes) override;
     CamRetCode AttachBufferQueue(int streamId, const OHOS::sptr<OHOS::IBufferProducer> &producer) override;
     CamRetCode DetachBufferQueue(int streamId) override;

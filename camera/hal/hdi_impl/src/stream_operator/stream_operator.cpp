@@ -67,7 +67,7 @@ RetCode StreamOperator::Init()
 }
 
 CamRetCode StreamOperator::IsStreamsSupported(OperationMode mode,
-                                              const std::shared_ptr<CameraStandard::CameraMetadata>& modeSetting,
+                                              const std::shared_ptr<Camera::CameraMetadata>& modeSetting,
                                               const std::vector<std::shared_ptr<StreamInfo>>& pInfo,
                                               StreamSupportType& type)
 {
@@ -162,7 +162,7 @@ CamRetCode StreamOperator::IsStreamsSupported(OperationMode mode,
 
 DynamicStreamSwitchMode StreamOperator::CheckStreamsSupported(
     OperationMode mode,
-    const std::shared_ptr<CameraStandard::CameraMetadata>& modeSetting,
+    const std::shared_ptr<Camera::CameraMetadata>& modeSetting,
     const std::vector<std::shared_ptr<StreamInfo>>& infos)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamPipeline_, DYNAMIC_STREAM_SWITCH_NOT_SUPPORT);
@@ -278,7 +278,7 @@ RetCode StreamOperator::ReleaseStreams()
 }
 
 CamRetCode StreamOperator::CommitStreams(OperationMode mode,
-                                         const std::shared_ptr<CameraStandard::CameraMetadata>& modeSetting)
+                                         const std::shared_ptr<Camera::CameraMetadata>& modeSetting)
 {
     CAMERA_LOGV("enter");
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamPipeline_, DEVICE_ERROR);

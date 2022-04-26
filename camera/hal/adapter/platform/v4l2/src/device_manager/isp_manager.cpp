@@ -74,7 +74,7 @@ RetCode IspManager::PowerDown(std::string hardwareName)
     return RC_ERROR;
 }
 
-void IspManager::Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+void IspManager::Configure(std::shared_ptr<Camera::CameraMetadata> meta)
 {
     if (ispList_.size() == 0) {
         return;

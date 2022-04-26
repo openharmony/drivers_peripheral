@@ -17,7 +17,7 @@
 #include "metadata_log.h"
 
 namespace OHOS {
-namespace CameraStandard {
+namespace Camera {
 CameraMetadata::CameraMetadata(size_t itemCapacity, size_t dataCapacity)
 {
     metadata_ = AllocateCameraMetadataBuffer(itemCapacity, AlignTo(dataCapacity, DATA_ALIGNMENT));
