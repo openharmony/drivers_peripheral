@@ -15,6 +15,7 @@
 -->
 <configuration ver="2.0">
     <target name="">
-        <depend resource="audiorendertest.wav" pushpath="system/bin" findpath="drivers/peripheral/audio/test/resource/hdi/common" presstcmd=""/>
+        <depend resource="audiorendertest.wav" pushpath="data" findpath="drivers/peripheral/audio/test/resource/hdi/common" presstcmd=""/>
+        <depend resource="lowlatencycapturetest.wav" pushpath="data" findpath="drivers/peripheral/audio/test/resource/hdi/common" presstcmd=""/>
     </target>
 </configuration>
