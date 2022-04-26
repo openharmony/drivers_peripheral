@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
-#include "audio_internal.h"
-#include "audio_hal_log.h"
+#include <osal_mem.h>
 #include "osal_time.h"
+#include "audio_hal_log.h"
+#include "audio_internal.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
@@ -32,6 +33,15 @@ void AudioMemFree(void **ppMem)
 {
     if ((ppMem != NULL) && ((*ppMem) != NULL)) {
         free(*ppMem);
+        *ppMem = NULL;
+    }
+    return;
+}
+
+void AudioMemFreeOsalMem(void **ppMem)
+{
+    if ((ppMem != NULL) && ((*ppMem) != NULL)) {
+        OsalMemFree(*ppMem);
         *ppMem = NULL;
     }
     return;
