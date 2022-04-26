@@ -13,5 +13,8 @@
 
 group("hdf_test_media_codec") {
   testonly = true
-  deps = [ "unittest:hdf_unittest_codec" ]
+  deps = [
+    "demo/v2.0:codec_hdi_omx_demo",
+    "unittest:hdf_unittest_codec",
+  ]
 }
