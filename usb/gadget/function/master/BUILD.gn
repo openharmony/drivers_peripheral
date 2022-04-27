@@ -13,15 +13,13 @@
 
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/peripheral/usb/usb.gni")
 
 group("usbfn_master") {
   deps = [ ":libusbfn_master" ]
 }
 
 ohos_shared_library("libusbfn_master") {
-  default_config_path =
-      "//device/soc/$device_company/common/hal/usb/$device_name/include"
-
   include_dirs = [
     "//drivers/peripheral/usb/interfaces/ddk/device",
     "//drivers/peripheral/usb/interfaces/ddk/common",
