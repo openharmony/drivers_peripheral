@@ -107,7 +107,7 @@ int32_t CameraHostStub::CameraHostStubGetCameraAbility(
         return HDF_FAILURE;
     }
 
-    bool bRet = CameraStandard::MetadataUtils::EncodeCameraMetadata(ability, reply);
+    bool bRet = Camera::MetadataUtils::EncodeCameraMetadata(ability, reply);
     if (!bRet) {
         HDF_LOGE("%s: write ability failed", __func__);
         return HDF_FAILURE;

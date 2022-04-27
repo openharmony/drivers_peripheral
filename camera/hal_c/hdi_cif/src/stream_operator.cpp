@@ -29,7 +29,7 @@ void StreamOperator::Init(StreamOperatorCIF* op)
 }
 
 CamRetCode StreamOperator::IsStreamsSupported(OperationMode mode,
-                                              const std::shared_ptr<CameraStandard::CameraMetadata>& modeSetting,
+                                              const std::shared_ptr<Camera::CameraMetadata>& modeSetting,
                                               const std::shared_ptr<StreamInfo>& pInfo,
                                               StreamSupportType& pType)
 {
@@ -136,7 +136,7 @@ CamRetCode StreamOperator::ReleaseStreams(const std::vector<int>& streamIds)
     return static_cast<CamRetCode>(ret);
 }
 
-CamRetCode StreamOperator::CommitStreams(OperationMode mode, const std::shared_ptr<CameraStandard::CameraMetadata>& modeSetting)
+CamRetCode StreamOperator::CommitStreams(OperationMode mode, const std::shared_ptr<Camera::CameraMetadata>& modeSetting)
 {
     if (operator_ == nullptr) {
         return INSUFFICIENT_RESOURCES;

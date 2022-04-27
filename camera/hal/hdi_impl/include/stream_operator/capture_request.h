@@ -26,7 +26,7 @@
 
 namespace OHOS::Camera {
 class IStream;
-using CaptureSetting = std::weak_ptr<CameraStandard::CameraMetadata>;
+using CaptureSetting = std::weak_ptr<Camera::CameraMetadata>;
 
 class CaptureRequest final : public std::enable_shared_from_this<CaptureRequest> {
 public:
