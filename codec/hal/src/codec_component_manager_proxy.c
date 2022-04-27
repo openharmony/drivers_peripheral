@@ -251,5 +251,6 @@ void CodecComponentManagerRelease(void)
 {
     if (g_codecComponentManagerProxy.remoteOmx != NULL) {
         HdfRemoteServiceRecycle(g_codecComponentManagerProxy.remoteOmx);
+        g_codecComponentManagerProxy.remoteOmx = NULL;
     }
 }
