@@ -50,8 +50,8 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0120, TestSize.Level0)
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     // Configure mode and modeSetting
     Camera::OperationMode mode = Camera::NORMAL;
-    std::shared_ptr<CameraStandard::CameraMetadata> modeSetting =
-        std::make_shared<CameraStandard::CameraMetadata>(2, 128);
+    std::shared_ptr<Camera::CameraMetadata> modeSetting =
+        std::make_shared<Camera::CameraMetadata>(2, 128);
     int64_t expoTime = 0;
     modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
     int64_t colorGains[4] = {0};
@@ -194,8 +194,8 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0123, TestSize.Level1)
     }
     // Configure mode and modeSetting
     Camera::OperationMode mode = Camera::NORMAL;
-    std::shared_ptr<CameraStandard::CameraMetadata> modeSetting =
-        std::make_shared<CameraStandard::CameraMetadata>(2, 128);
+    std::shared_ptr<Camera::CameraMetadata> modeSetting =
+        std::make_shared<Camera::CameraMetadata>(2, 128);
     // Configure stream information
     Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
     Test_->streamInfo->width_ = 640; // 640:width of stream
@@ -574,8 +574,8 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0137, TestSize.Level2)
     Test_->streamInfos.push_back(Test_->streamInfo);
     // Configure mode and modeSetting
     Camera::OperationMode mode = Camera::NORMAL;
-    std::shared_ptr<CameraStandard::CameraMetadata> modeSetting =
-        std::make_shared<CameraStandard::CameraMetadata>(2, 128);
+    std::shared_ptr<Camera::CameraMetadata> modeSetting =
+        std::make_shared<Camera::CameraMetadata>(2, 128);
     Camera::StreamSupportType pType;
     std::vector<std::shared_ptr<Camera::StreamInfo>> stre;
     stre.push_back(Test_->streamInfo);
@@ -653,7 +653,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0139, TestSize.Level2)
     EXPECT_EQ(false, Test_->rc != Camera::NO_ERROR || Test_->streamOperator == nullptr);
     // Configure mode and modeSetting
     Camera::OperationMode mode = Camera::NORMAL;
-    std::shared_ptr<CameraStandard::CameraMetadata> modeSetting = nullptr;
+    std::shared_ptr<Camera::CameraMetadata> modeSetting = nullptr;
     // Configure stream information
     Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
     Test_->streamInfo->streamId_ = 1001;
@@ -1207,7 +1207,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0171, TestSize.Level1)
     Test_->streamInfos.push_back(Test_->streamInfo);
     Test_->rc = Test_->streamOperator->CreateStreams(Test_->streamInfos);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    std::shared_ptr<CameraStandard::CameraMetadata> modeSetting = nullptr;
+    std::shared_ptr<Camera::CameraMetadata> modeSetting = nullptr;
     // Distribution stream
     Test_->rc = Test_->streamOperator->CommitStreams(Camera::NORMAL, nullptr);
     EXPECT_EQ(Test_->rc, INVALID_ARGUMENT);

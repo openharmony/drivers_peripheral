@@ -29,7 +29,7 @@ public:
     virtual ~VpssManager();
     RetCode CreateController(ControllerId controllerId, std::string hardwareName);
     std::shared_ptr<IController> GetController(ControllerId controllerId);
-    void Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+    void Configure(std::shared_ptr<Camera::CameraMetadata> meta)
     {
         vpss_->Configure(meta);
     };
@@ -51,7 +51,7 @@ public:
     {
         vpss_->SetAbilityMetaDataTag(abilityMetaDataTag);
     };
-    RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+    RetCode GetAbilityMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
     {
         return vpss_->GetAbilityMetaData(meta);
     };

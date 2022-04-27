@@ -20,7 +20,7 @@
 #include "metadata_log.h"
 
 namespace OHOS {
-namespace CameraStandard {
+namespace Camera {
 const int METADATA_HEADER_DATA_SIZE = 4;
 
 uint32_t AlignTo(uint32_t val, uint32_t alignment)
@@ -579,5 +579,5 @@ uint32_t CopyCameraMetadataItems(common_metadata_header_t *newMetadata, const co
 
     return CAM_META_SUCCESS;
 }
-} // CameraStandard
+} // Camera
 } // OHOS

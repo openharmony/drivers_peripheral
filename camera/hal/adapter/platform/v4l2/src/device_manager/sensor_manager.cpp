@@ -55,7 +55,7 @@ std::shared_ptr<IController> SensorManager::GetController(ControllerId controlle
     return nullptr;
 }
 
-void SensorManager::Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+void SensorManager::Configure(std::shared_ptr<Camera::CameraMetadata> meta)
 {
     if (sensorList_.size() == 0) {
         return;
