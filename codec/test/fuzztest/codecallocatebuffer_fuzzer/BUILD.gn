@@ -17,8 +17,9 @@ module_output_path = "hdf/codec"
 
 ohos_fuzztest("CodecAllocateBufferFuzzTest") {
   module_out_path = module_output_path
-  
-  fuzz_config_file = "//drivers/peripheral/codec/test/fuzztest/codecallocatebuffer_fuzzer"
+
+  fuzz_config_file =
+      "//drivers/peripheral/codec/test/fuzztest/codecallocatebuffer_fuzzer"
 
   include_dirs = [
     "//drivers/adapter/uhdf2/include/hdi",
@@ -28,30 +29,29 @@ ohos_fuzztest("CodecAllocateBufferFuzzTest") {
     "//drivers/peripheral/codec/test/fuzztest/codecallocatebuffer_fuzzer",
   ]
 
-  deps = [
-    "//drivers/peripheral/codec/hal:codec_hdi_omx",
+  deps = [ "//drivers/peripheral/codec/hal:codec_hdi_omx" ]
+
+  external_deps = [
+    "device_driver_framework:libhdf_host",
+    "device_driver_framework:libhdf_ipc_adapter",
+    "device_driver_framework:libhdf_utils",
+    "device_driver_framework:libhdi",
+    "hiviewdfx_hilog_native:libhilog",
+    "utils_base:utils",
   ]
 
-    external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_ipc_adapter",
-      "device_driver_framework:libhdf_utils",
-      "device_driver_framework:libhdi",
-      "hiviewdfx_hilog_native:libhilog",
-      "utils_base:utils",
-    ]
-
-  cflags = ["-g","-O0","-Wno-unused-variable","-fno-omit-frame-pointer"]
-
-  sources = [
-    "codecallocatebuffer_fuzzer.cpp",
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
   ]
+
+  sources = [ "codecallocatebuffer_fuzzer.cpp" ]
 }
 
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [
-    ":CodecAllocateBufferFuzzTest",
-  ]
+  deps += [ ":CodecAllocateBufferFuzzTest" ]
 }
