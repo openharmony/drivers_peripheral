@@ -142,7 +142,7 @@ public:
 private:
     void Init();
     void OnError(Camera::ErrorType type, int32_t errorMsg);
-    void OnResult(uint64_t timestamp, const std::shared_ptr<CameraStandard::CameraMetadata>& result);
+    void OnResult(uint64_t timestamp, const std::shared_ptr<Camera::CameraMetadata>& result);
     void ForkProcess();
     void StopProcess();
 };

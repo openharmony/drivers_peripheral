@@ -26,18 +26,18 @@ public:
     ISensor();
     explicit ISensor(std::string sensorName);
     virtual ~ISensor();
-    virtual void Init(CameraStandard::CameraMetadata& camera_meta_data) = 0;
+    virtual void Init(Camera::CameraMetadata& camera_meta_data) = 0;
     std::string GetSensorName()
     {
         return sensorName_;
     };
-    virtual void InitSensitivityRange(CameraStandard::CameraMetadata& camera_meta_data);
-    virtual void InitAwbModes(CameraStandard::CameraMetadata& camera_meta_data);
-    virtual void InitCompensationRange(CameraStandard::CameraMetadata& camera_meta_data);
-    virtual void InitFpsTarget(CameraStandard::CameraMetadata& camera_meta_data);
-    virtual void InitAvailableModes(CameraStandard::CameraMetadata& camera_meta_data);
-    virtual void InitAntiBandingModes(CameraStandard::CameraMetadata& camera_meta_data);
-    virtual void InitPhysicalSize(CameraStandard::CameraMetadata& camera_meta_data);
+    virtual void InitSensitivityRange(Camera::CameraMetadata& camera_meta_data);
+    virtual void InitAwbModes(Camera::CameraMetadata& camera_meta_data);
+    virtual void InitCompensationRange(Camera::CameraMetadata& camera_meta_data);
+    virtual void InitFpsTarget(Camera::CameraMetadata& camera_meta_data);
+    virtual void InitAvailableModes(Camera::CameraMetadata& camera_meta_data);
+    virtual void InitAntiBandingModes(Camera::CameraMetadata& camera_meta_data);
+    virtual void InitPhysicalSize(Camera::CameraMetadata& camera_meta_data);
 private:
     std::string sensorName_;
 };

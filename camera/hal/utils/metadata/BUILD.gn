@@ -28,6 +28,7 @@ if (defined(ohos_lite)) {
     cflags_cc = cflags
     include_dirs = [ "include" ]
     deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
+    install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "camera_device_driver"
   }
