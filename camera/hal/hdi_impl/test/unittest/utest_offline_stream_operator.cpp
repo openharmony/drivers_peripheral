@@ -160,7 +160,7 @@ HWTEST_F(OffileStreamOperatorImplTest, UTestPreviewAndSnapshotCombineCapture, Te
 
     OHOS::Camera::CamRetCode rc = streamOperator_->CreateStreams(streamInfos);
     EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);
-    std::shared_ptr<CameraStandard::CameraMetadata> modeSetting = std::make_shared<CameraStandard::CameraMetadata>(2, 128);
+    std::shared_ptr<Camera::CameraMetadata> modeSetting = std::make_shared<Camera::CameraMetadata>(2, 128);
     int64_t expoTime = 0;
     modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
     int64_t colorGains[4] = {0};

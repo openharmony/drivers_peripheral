@@ -30,7 +30,7 @@ public:
     RetCode Init();
     RetCode PowerUp();
     RetCode PowerDown();
-    RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta);
+    RetCode Configure(std::shared_ptr<Camera::CameraMetadata> meta);
     RetCode Start(int buffCont, DeviceFormat& format);
     RetCode Stop();
 
@@ -41,16 +41,16 @@ public:
     void BufferCallback(std::shared_ptr<FrameSpec> buffer);
 
     void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag);
-    RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
+    RetCode GetAbilityMetaData(std::shared_ptr<Camera::CameraMetadata> meta);
     RetCode Flush(int32_t streamId);
 
 private:
-    RetCode SendSensorMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
+    RetCode SendSensorMetaData(std::shared_ptr<Camera::CameraMetadata> meta);
     RetCode SendAEMetaData(common_metadata_header_t *data);
     RetCode SendAWBMetaData(common_metadata_header_t *data);
-    RetCode GetSensorMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
-    RetCode GetAEMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
-    RetCode GetAWBMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
+    RetCode GetSensorMetaData(std::shared_ptr<Camera::CameraMetadata> meta);
+    RetCode GetAEMetaData(std::shared_ptr<Camera::CameraMetadata> meta);
+    RetCode GetAWBMetaData(std::shared_ptr<Camera::CameraMetadata> meta);
     template<typename T>
     bool CheckNumequal(T oldnum, T num, int size)
     {

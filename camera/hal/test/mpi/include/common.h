@@ -202,7 +202,7 @@ public:
     {
         test_->onErrorFlag = true;
     }
-    void OnResult(uint64_t timestamp, const std::shared_ptr<CameraStandard::CameraMetadata> &result) override
+    void OnResult(uint64_t timestamp, const std::shared_ptr<Camera::CameraMetadata> &result) override
     {
         test_->onResultFlag = true;
     }
