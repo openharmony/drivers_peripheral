@@ -25,8 +25,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
     uint8_t *dataFuzz = const_cast<uint8_t *>(data);
-    struct AudioAdapterDescriptor *descFuzz = reinterpret_cast<struct AudioAdapterDescriptor *>(dataFuzz);
+    struct AudioAdapterDescriptor descFuzz = {
+        .adapterName = reinterpret_cast<char *>(dataFuzz),
+    };
     struct AudioAdapter *adapter = nullptr;
-    manager->LoadAdapter(manager, descFuzz, &adapter);
+    manager->LoadAdapter(manager, &descFuzz, &adapter);
     return 0;
 }

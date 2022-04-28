@@ -133,8 +133,7 @@ int32_t GetLoadAdapter(TestAudioManager *manager, struct AudioAdapter **adapter,
     if (descs == nullptr) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    std::string adapterName = "usb";
-    int index = SwitchAdapter(descs, adapterName, PORT_OUT_IN, audioPort, size);
+    int index = SwitchAdapter(descs, ADAPTER_NAME, PORT_OUT, audioPort, size);
     if (index < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }

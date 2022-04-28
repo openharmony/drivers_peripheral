@@ -26,6 +26,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     }
     struct AudioAdapter *adapter = nullptr;
     struct AudioPort *capturePort = nullptr;
+    ret = GetLoadAdapter(manager, &adapter, capturePort);
     if (ret < 0 || adapter == nullptr || capturePort == nullptr) {
         return 0;
     }
