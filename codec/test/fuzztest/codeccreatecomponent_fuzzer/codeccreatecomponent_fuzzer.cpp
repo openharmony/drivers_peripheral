@@ -18,8 +18,8 @@
 #include "codec_component_type.h"
 #include "codec_component_manager.h"
 
-#include <stddef.h>
-#include <stdint.h>
+#include <cstddef.h>
+#include <cstdint.h>
 #include <osal_mem.h>
 #include <hdf_log.h>
 
@@ -33,13 +33,13 @@ namespace Codec {
         CodecCallbackType* callback = CodecCallbackTypeStubGetInstance();
 
         manager = GetCodecComponentManager();
-        if (manager == NULL) {
+        if (manager == nullptr) {
             HDF_LOGE("%{public}s: GetCodecComponentManager failed\n", __func__);
             return false;
         }
 
         int32_t ret = manager->CreateComponent(&component, (char*)data, (void *)data, sizeof((int32_t)data), callback);
-         if (ret == HDF_SUCCESS) {
+        if (ret == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: CreateComponent succeed\n", __func__);
             result = true;
         }

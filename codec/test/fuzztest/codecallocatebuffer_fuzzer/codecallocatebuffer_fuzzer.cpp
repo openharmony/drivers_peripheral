@@ -18,8 +18,8 @@
 #include "codec_component_type.h"
 #include "codec_component_manager.h"
 
-#include <stddef.h>
-#include <stdint.h>
+#include <cstddef.h>
+#include <cstdint.h>
 #include <osal_mem.h>
 #include <hdf_log.h>
 
@@ -53,7 +53,7 @@ namespace Codec {
         dataFuzz->type = (enum ShareMemTypes)DATA_TYPE;
         dataFuzz->pts = DATA_PTS;
         dataFuzz->flag = DATA_FLAG;
-     }
+    }
 
     bool CodecAllocateBuffer(const uint8_t* data, size_t size)
     {
@@ -65,7 +65,7 @@ namespace Codec {
         CodecCallbackType* callback = CodecCallbackTypeStubGetInstance();
         
         manager = GetCodecComponentManager();
-        if (manager == NULL) {
+        if (manager == nullptr) {
             HDF_LOGE("%{public}s: GetCodecComponentManager failed\n", __func__);
             return false;
         }
