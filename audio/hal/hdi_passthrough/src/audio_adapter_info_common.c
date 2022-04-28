@@ -568,14 +568,14 @@ enum AudioAdapterType MatchAdapterType(const char *adapterName, uint32_t portId)
         return AUDIO_ADAPTER_MAX;
     }
 
-    if (strncmp(adapterName, "primary", strlen("primary")) == 0) {
+    if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
         if (portId >= AUDIO_PRIMARY_ID_MIN && portId <= AUDIO_PRIMARY_ID_MAX) {
             return AUDIO_ADAPTER_PRIMARY;
         }
         return AUDIO_ADAPTER_PRIMARY_EXT;
-    } else if (strcmp(adapterName, "usb") == 0) {
+    } else if (strcmp(adapterName, USB) == 0) {
         return AUDIO_ADAPTER_USB;
-    } else if (strcmp(adapterName, "a2dp") == 0) {
+    } else if (strcmp(adapterName, A2DP) == 0) {
         return AUDIO_ADAPTER_A2DP;
     } else {
         return AUDIO_ADAPTER_MAX;

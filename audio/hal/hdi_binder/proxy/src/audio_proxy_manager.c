@@ -27,7 +27,7 @@
 #define CONFIG_FRAME_SIZE      (1024 * 2 * 1)
 #define FRAME_SIZE              1024
 #define CONFIG_FRAME_COUNT     ((8000 * 2 * 1 + (CONFIG_FRAME_SIZE - 1)) / CONFIG_FRAME_SIZE)
-#define AUDIO_MAGIC            (0xAAAAAAAAAAAAAAAA)
+#define AUDIO_MAGIC            (0xAAAAAAAA)
 
 static bool audioProxyAdapterAddrMgrFlag = false;
 static struct AudioAdapterDescriptor *g_localAudioProxyAdapterAddrOut = NULL; // add for Fuzz
