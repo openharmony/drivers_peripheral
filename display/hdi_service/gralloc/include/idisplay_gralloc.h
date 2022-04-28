@@ -29,9 +29,9 @@ public:
     virtual ~IDisplayGralloc() = default;
 
     /**
-     * @brief Get all interfaces of display gralloc.
+     * @brief Obtains all interfaces of IDisplayGralloc.
      *
-     * @return Returns <b>IDisplayGralloc* </b> if the operation is successful; returns an Null point otherwise.
+     * @return Returns <b>IDisplayGralloc*</b> if the operation is successful; returns an null point otherwise.
      * @since 1.0
      * @version 1.0
      */
@@ -41,9 +41,9 @@ public:
     /**
      * @brief Allocates memory based on the parameters passed by the GUI.
      *
-     * @param info Indicates the reference to the description info of the memory to allocate.
+     * @param info Indicates the description of the memory to allocate.
      *
-     * @param handle Indicates the reference of pointer to the buffer of the memory to allocate.
+     * @param handle Indicates the pointer to the buffer of the memory to allocate.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
      * otherwise.
@@ -85,7 +85,7 @@ public:
     virtual void *MmapCache(const BufferHandle &buffer) const = 0;
 
     /**
-     * @brief Unmaps memory, that is, removes any mappings in the process's address space.
+     * @brief Unmaps memory, that is, removes mappings from the process's address space.
      *
      * @param handle Indicates the reference to the buffer of the memory to unmap.
      *
@@ -121,9 +121,9 @@ public:
     virtual int32_t FlushMCache(const BufferHandle &buffer) const = 0;
 
     /**
-     * @brief Invalidate the Cache, it will update the cache from memory.
+     * @brief Invalidates the cache to update it from memory.
      *
-     * @param handle Indicates the reference to the buffer of the cache which will been invalidated
+     * @param handle Indicates the reference to the buffer of the cache, which will be invalidated.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
      * otherwise.
@@ -133,10 +133,10 @@ public:
     virtual int32_t InvalidateCache(const BufferHandle &handle) const = 0;
 
     /**
-     * @brief Query whether the given VerifyAllocInfo array is allocatable.
+     * @brief Checks whether the given VerifyAllocInfo array is allocatable.
      *
-     * @param infos Indicates the array of VerifyAllocInfo.
-     * @param supporteds Indicates the array that supports allocation.
+     * @param infos Indicates the VerifyAllocInfo array.
+     * @param supporteds Indicates whether the array is allocatable.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
      * otherwise.
