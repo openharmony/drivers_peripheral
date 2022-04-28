@@ -713,7 +713,7 @@ typedef struct {
                                    const uint8_t *metaData);
 
     /**
-     * @brief Obtains the hardware display present timeStamp type supported for a layer.
+     * @brief Obtains the hardware display present timestamp type supported by a layer.
      *
      * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.
@@ -729,7 +729,7 @@ typedef struct {
     int32_t (*GetSupportedPresentTimestamp)(uint32_t devId, uint32_t layerId, PresentTimestampType *type);
 
     /**
-     * @brief Obtains the hardware display present timestamp for a layer.
+     * @brief Obtains the hardware display present timestamp of a layer.
      *
      * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
      * display device, and 4 indicates the last display device.

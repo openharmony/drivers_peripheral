@@ -602,18 +602,18 @@ typedef struct {
 } HDRMetaData;
 
 /**
- * @brief Defines information for verify the allocate memory
+ * @brief Defines information for verifying the memory to allocate.
  *
  */
 typedef struct {
-    uint32_t width;               /**< The width of the verify allocation */
-    uint32_t height;              /**< The height of the verify allocation */
-    uint64_t usage;               /**< The usage of the verify allocation */
-    PixelFormat format;           /**< The format of the verify allocation */
+    uint32_t width;               /**< Width of the memory to allocate */
+    uint32_t height;              /**< Height of the memory to allocate */
+    uint64_t usage;               /**< Usage of the memory */
+    PixelFormat format;           /**< Format of the memory to allocate */
 } VerifyAllocInfo;
 
 /**
- * @brief Enumerates the present timestamp type.
+ * @brief Enumerates the present timestamp types.
  *
  */
 typedef enum {
