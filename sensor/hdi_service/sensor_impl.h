@@ -23,35 +23,36 @@ namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V1_0 {
-class SensorImpl : public SensorInterfaceStub {
+class SensorImpl : public SensorInterfaceStub, public std::enable_shared_from_this<SensorImpl> {
 public:
-    SensorImpl(): sensorInterface(NULL)
-    {}
 
-    virtual ~SensorImpl()
-    {
-        FreeSensorInterfaceInstance();
-    }
-
+    virtual ~SensorImpl();
     void Init();
 
+    static std::shared_ptr<SensorImpl> create()
+    {
+        class MakeSharedEnabler : public SensorImpl {};
+        static std::shared_ptr<SensorImpl> impl = std::make_shared<MakeSharedEnabler>();
+        return impl;
+    }
+
     int32_t GetAllSensorInfo(std::vector<HdfSensorInformation>& info) override;
-
     int32_t Enable(int32_t sensorId) override;
-
     int32_t Disable(int32_t sensorId) override;
-
     int32_t SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval) override;
-
     int32_t SetMode(int32_t sensorId, int32_t mode) override;
-
     int32_t SetOption(int32_t sensorId, uint32_t option) override;
-
     int32_t Register(int32_t groupId, const sptr<ISensorCallback>& callbackObj) override;
-
     int32_t Unregister(int32_t groupId, const sptr<ISensorCallback>& callbackObj) override;
+    void OnRemoteDied(const wptr<IRemoteObject> &object);
 private:
     const SensorInterface *sensorInterface;
+    int32_t AddSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj);
+    int32_t RemoveSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj);
+    int32_t UnregisterImpl(int32_t groupId, IRemoteObject *callbackObj);
+private:
+    SensorImpl(): sensorInterface(NULL)
+    {}
 };
 } // V1_0
 } // Sensor
