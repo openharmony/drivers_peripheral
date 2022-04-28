@@ -51,7 +51,7 @@ namespace Codec {
         dataFuzz->type = (enum ShareMemTypes)DATA_TYPE;
         dataFuzz->pts = DATA_PTS;
         dataFuzz->flag = DATA_FLAG;
-     }
+    }
 
     bool CodecFreeBuffer(const uint8_t* data, size_t size)
     {
