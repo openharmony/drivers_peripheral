@@ -85,14 +85,14 @@ typedef enum {
  *
  */
 enum {
-    HBM_USE_CPU_READ = (1 << 0),        /**< CPU will read the memory */
-    HBM_USE_CPU_WRITE = (1 << 1),       /**< CPU will write the memory */
-    HBM_USE_MEM_MMZ = (1 << 2),         /**< will use mmz to allocate memory */
-    HBM_USE_MEM_DMA = (1 << 3),         /**< the allocator should support dma buffer */
-    HBM_USE_MEM_SHARE = (1 << 4),       /**< the allocator should support shared memory buffer*/
-    HBM_USE_MEM_MMZ_CACHE = (1 << 5),   /**< will use mmz to allocate memory with cache*/
-    HBM_USE_MEM_FB = (1 << 6),          /**< the buffer allocate for framebuffer */
-    HBM_USE_ASSIGN_SIZE = (1 << 7),     /**< assign memory size from requester */
+    HBM_USE_CPU_READ = (1 << 0),        /**< CPU read buffer */
+    HBM_USE_CPU_WRITE = (1 << 1),       /**< CPU write memory */
+    HBM_USE_MEM_MMZ = (1 << 2),         /**< Media memory zone (MMZ) */
+    HBM_USE_MEM_DMA = (1 << 3),         /**< Direct memory access (DMA) buffer */
+    HBM_USE_MEM_SHARE = (1 << 4),       /**< Shared memory buffer*/
+    HBM_USE_MEM_MMZ_CACHE = (1 << 5),   /**< MMZ with cache*/
+    HBM_USE_MEM_FB = (1 << 6),          /**< Framebuffer */
+    HBM_USE_ASSIGN_SIZE = (1 << 7),     /**< Memory assigned */
 };
 
 /**
@@ -363,7 +363,7 @@ typedef struct {
  *
  */
 typedef struct {
-    bool enGlobalAlpha;         /**< Golbal alpha enable bit */
+    bool enGlobalAlpha;         /**< Global alpha enable bit */
     uint32_t globalAlpha;       /**< Global alpha value */
     bool enPixelAlpha;          /**< Pixel alpha enable bit */
     BlendType blendType;        /**< Blending type */
@@ -411,58 +411,58 @@ typedef enum {
  * @brief Defines the capability of the output.
  */
 typedef struct {
-    char name[PROPERTY_NAME_LEN];       /**< name of output */
-    InterfaceType type;                 /**< interface type of output */
+    char name[PROPERTY_NAME_LEN];       /**< Name of the output */
+    InterfaceType type;                 /**< Interface type of the output */
     uint32_t phyWidth;                  /**< Physical width */
-    uint32_t phyHeight;                 /**< Physical width */
-    uint32_t supportLayers;             /**< BitMask of LayerType */
-    uint32_t virtualDispCount;          /**< the count of virtual displays supported*/
-    bool supportWriteBack;              /**< wether support writeback*/
+    uint32_t phyHeight;                 /**< Physical height */
+    uint32_t supportLayers;             /**< Bitmask of LayerType */
+    uint32_t virtualDispCount;          /**< Count of virtual displays supported */
+    bool supportWriteBack;              /**< Whether writeback is supported */
     uint32_t propertyCount;             /**< Count of properties */
     PropertyObject* props;              /**< Array of property objects */
 } DisplayCapability;
 
 /**
- * @brief Defines output mode info
+ * @brief Defines output mode info.
  */
 typedef struct {
-    int32_t width;      /**< width in pixel */
-    int32_t height;     /**< height in pixel */
-    uint32_t freshRate; /**< fresh rate in one second */
-    int32_t id;         /**< the id of the mode */
+    int32_t width;      /**< Width in pixel */
+    int32_t height;     /**< Height in pixel */
+    uint32_t freshRate; /**< Fresh rate per second */
+    int32_t id;         /**< ID of the mode */
 } DisplayModeInfo;
 
 /**
- * @brief Defines information for allocate memory
+ * @brief Defines information about the memory to allocate.
  *
  */
 typedef struct {
-    uint32_t width;               /**< The width of the request allocation */
-    uint32_t height;              /**< The height of the request allocation */
-    uint64_t usage;               /**< The usage of the request allocation */
-    PixelFormat format;           /**< The format of the request allocation */
-    uint32_t expectedSize;        /**< The size assigned by memory requester */
+    uint32_t width;               /**< Width of the requested memory */
+    uint32_t height;              /**< Height of the requested memory */
+    uint64_t usage;               /**< Usage of the requested memory */
+    PixelFormat format;           /**< Format of the requested memory */
+    uint32_t expectedSize;        /**< Size assigned by memory requester */
 } AllocInfo;
 /**
  * @brief Enumerates power status.
  */
 
 typedef enum {
-    POWER_STATUS_ON,              /**< The power status is on */
-    POWER_STATUS_STANDBY,         /**< The power status is standby */
-    POWER_STATUS_SUSPEND,         /**< The power status is suspend */
-    POWER_STATUS_OFF,             /**< The power status is off */
+    POWER_STATUS_ON,              /**< The power status is on. */
+    POWER_STATUS_STANDBY,         /**< The power status is standby. */
+    POWER_STATUS_SUSPEND,         /**< The power status is suspended. */
+    POWER_STATUS_OFF,             /**< The power status is off. */
     POWER_STATUS_BUTT
 } DispPowerStatus;
 
 /**
- * @brief Enumerates composition type for special layer
+ * @brief Enumerates the composition types of the special layer.
  */
 typedef enum {
-    COMPOSITION_CLIENT,       /**< client composistion type, the composer should been cpu or gpu */
-    COMPOSITION_DEVICE,       /**< device composistion type, the composer should been a hardware */
-    COMPOSITION_CURSOR,       /**< cursor composistion type. it should been used for cursor */
-    COMPOSITION_VIDEO,        /**< cursor composistion type. it should been used for video */
+    COMPOSITION_CLIENT,       /**< Client composition type. The composer should be the CPU or GPU. */
+    COMPOSITION_DEVICE,       /**< Device composition type. The composer should be the hardware. */
+    COMPOSITION_CURSOR,       /**< Cursor composition type, used for cursor. */
+    COMPOSITION_VIDEO,        /**< Cursor composition type, used for video. */
     COMPOSITION_BUTT
 } CompositionType;
 
