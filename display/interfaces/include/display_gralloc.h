@@ -94,7 +94,7 @@ typedef struct {
     void *(*MmapCache)(BufferHandle *handle);
 
     /**
-     * @brief Unmaps memory, that is, removes any mappings in the process's address space.
+     * @brief Unmaps memory, that is, removes any mappings from the process's address space.
      *
      * @param handle Indicates the pointer to the buffer of the memory to unmap.
      *
@@ -130,9 +130,9 @@ typedef struct {
     int32_t (*FlushMCache)(BufferHandle *handle);
 
     /**
-     * @brief Invalidate the Cache, it will update the cache from memory.
+     * @brief Invalidates the cache to update it from memory.
      *
-     * @param handle Indicates the pointer to the buffer of the cache which will been invalidated
+     * @param handle Indicates the pointer to the buffer of the cache, which will been invalidated.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
      * otherwise.
@@ -142,11 +142,11 @@ typedef struct {
     int32_t (*InvalidateCache)(BufferHandle* handle);
 
     /**
-     * @brief Query whether the given VerifyAllocInfo array is allocatable.
+     * @brief Checks whether the given VerifyAllocInfo array is allocatable.
      *
      * @param num Indicates the size of infos array.
-     * @param infos Indicates the pointer to the array of VerifyAllocInfo.
-     * @param supporteds Indicates the pointer to an array that supports allocation.
+     * @param infos Indicates the pointer to the VerifyAllocInfo array.
+     * @param supporteds Indicates the pointer to the array that can be allocated.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
      * otherwise.
