@@ -34,7 +34,8 @@ namespace Codec {
             return false;
         }
 
-        CodecCompCapability *capList = (CodecCompCapability *)OsalMemAlloc(sizeof(CodecCompCapability) *reinterpret_cast<int32_t>(data));
+        CodecCompCapability *capList = (CodecCompCapability *)OsalMemAlloc(sizeof(CodecCompCapability)
+            *reinterpret_cast<int32_t>(data));
         if (capList == NULL) {
             HDF_LOGE("%{public}s: OsalMemAlloc CodecCompCapability failed\n", __func__);
             return false;
