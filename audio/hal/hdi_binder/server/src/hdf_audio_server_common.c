@@ -1097,11 +1097,10 @@ int32_t HdiServiceGetAllAdapter(const struct HdfDeviceIoClient *client,
     }
     AudioSetFuzzCheckFlag(false);
     g_descs = descs;
-    if (getAdaptersFlag == true) {  // Initialize only once
+    if (getAdaptersFlag) {  // Initialize only once
         ret = AdaptersServerManageInit(descs, size);
         if (ret != AUDIO_HAL_SUCCESS) {
             HDF_LOGE("%{public}s: AdapterServerManageInit fail", __func__);
-
             return ret;
         }
         getAdaptersFlag = false;
@@ -1125,7 +1124,7 @@ static int SwitchAdapter(struct AudioAdapterDescriptor *descs, const char *adapt
         if (desc->adapterName == NULL) {
             return HDF_FAILURE;
         }
-        if (strcmp(desc->adapterName, adapterNameCase)) {
+        if (strcmp(desc->adapterName, adapterNameCase) != 0) {
             continue;
         }
         for (uint32_t port = 0; port < desc->portNum; port++) {
@@ -1425,13 +1424,11 @@ int32_t HdiServiceUnloadAdapter(const struct HdfDeviceIoClient *client,
     }
     ret = AudioAdapterListDestory(adapterName, &adapter);
     if (ret == AUDIO_HAL_ERR_INTERNAL) {
-        HDF_LOGE("%{public}s: Other dev Use the adapter", __func__);
+        HDF_LOGI("%{public}s: Other dev Use the adapter", __func__);
         return AUDIO_HAL_SUCCESS;
     } else if (ret == AUDIO_HAL_ERR_INVALID_PARAM) {
         HDF_LOGE("%{public}s: param invalid!", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
-    } else {
-        HDF_LOGE("%{public}s: Unload the adapter!", __func__);
     }
     if (adapter == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -1441,6 +1438,7 @@ int32_t HdiServiceUnloadAdapter(const struct HdfDeviceIoClient *client,
     if (AudioLoadStateChange(client->device, &g_audioEventLoad) != AUDIO_HAL_SUCCESS) {
         HDF_LOGE("%{public}s: AudioLoadStateChange fail!", __func__);
     }
+    HDF_LOGI("%{public}s: Unload the adapter!", __func__);
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -1470,7 +1468,7 @@ int32_t HdiServiceGetPortCapability(const struct HdfDeviceIoClient *client,
     if ((port.portName = HdfSbufReadString(data)) == NULL) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    HDF_LOGE("port.portName = %{public}s", port.portName);
+    HDF_LOGD("port.portName = %{public}s", port.portName);
     if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
         HDF_LOGE("%{public}s: AudioAdapterListGetAdapter fail", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
@@ -1515,7 +1513,7 @@ int32_t HdiServiceSetPassthroughMode(const struct HdfDeviceIoClient *client,
         HDF_LOGE("port.portName = %{public}s", port.portName);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    HDF_LOGE("port.portName = %{public}s", port.portName);
+    HDF_LOGD("port.portName = %{public}s", port.portName);
     uint32_t tempMode = 0;
     if (!HdfSbufReadUint32(data, &tempMode)) {
         return AUDIO_HAL_ERR_INTERNAL;
