@@ -546,9 +546,9 @@ typedef struct {
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
-     * @param num Indiactes the count of rect. the region contains multiple IRect, the num means how much rects in the
+     * @param num Indicates the count of rect. the region contains multiple IRect, the num means how much rects in the
      * region.
-     * @param rect Indiactes the pointer of the rectes.
+     * @param rect Indicates the pointer of the rectes.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
      * otherwise.
@@ -565,9 +565,9 @@ typedef struct {
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
-     * @param buffer Indiactes pointer of the buffer handle, the buffer handle should contain all the information of the
-     * buffer which will been used for composition
-     * @param fence Indiactes the fd of a sync file
+     * @param buffer Indicates the pointer of the buffer handle. The buffer handle should contain all information of the
+     * buffer which will be used for composition.
+     * @param fence Indicates the fd of a sync file.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
      * otherwise.
@@ -584,7 +584,7 @@ typedef struct {
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
-     * @param cmd Indiactes externsion cmd, the implement will use it to identify different intention
+     * @param cmd Indicates extension cmd to be used to identify different intention.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
      * otherwise.
@@ -601,7 +601,7 @@ typedef struct {
      * display device, and 4 indicates the last display device.
      * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
      * with the specified layer ID.
-     * @param type Indicates composition type which the client expect, it may be chagne by the implement
+     * @param type Indicates the composition type which the client expect. It may vary with the implementation.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
      * otherwise.
