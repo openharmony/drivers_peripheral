@@ -34,7 +34,7 @@ static uint32_t DmacIsrCallBack(int irq, void *data)
     uint32_t chanlID = 0;
     int ret;
     struct HdfDeviceObject *device = NULL;
-    struct PnpReportMsg reportMsg;
+    struct AudioEvent reportMsg;
 
     AiaoRxIntClr(chanlID);
 
@@ -43,12 +43,8 @@ static uint32_t DmacIsrCallBack(int irq, void *data)
         AUDIO_DRIVER_LOG_ERR("device is null.");
         return HDF_FAILURE;
     }
-
-    reportMsg.reportType = EVENT_REPORT;
-    reportMsg.eventMsg.eventType = EVENT_REPORT;
-    reportMsg.eventMsg.eventId = THRESHOLD_REPORT;
-    reportMsg.eventMsg.deviceType = PRIMARY_DEVICE;
-    reportMsg.eventMsg.eventValue = 1;
+    reportMsg.eventType = HDF_AUDIO_CAPTURE_THRESHOLD;
+    reportMsg.deviceType = HDF_AUDIO_PRIMARY_DEVICE;
     ret = AudioCapSilenceThresholdEvent(device, &reportMsg);
     if (ret != HDF_SUCCESS) {
         AUDIO_DRIVER_LOG_ERR("AudioCapSilenceThresholdEvent failed.");
