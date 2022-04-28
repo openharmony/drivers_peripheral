@@ -20,7 +20,7 @@
 #include <stdint.h>
 
 namespace OHOS {
-namespace CameraStandard {
+namespace Camera {
 const static size_t OHOS_CAMERA_METADATA_TYPE_SIZE[META_NUM_TYPES] = {
     [META_TYPE_BYTE]     = sizeof(uint8_t),
     [META_TYPE_INT32]    = sizeof(int32_t),
@@ -152,6 +152,6 @@ const static item_info_t *g_ohosItemInfo[OHOS_SECTION_COUNT] = {
     g_ohosStreamAbility,
     g_ohosStreamJpeg,
 };
-} // namespace CameraStandard
+} // namespace Camera
 } // namespace OHOS
 #endif /* CAMERA_METADATA_ITEM_INFO_H */

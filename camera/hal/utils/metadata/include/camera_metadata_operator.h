@@ -132,7 +132,7 @@ typedef enum camera_metadata_sec {
 #define BITWISE_SHIFT_16 16
 
 namespace OHOS {
-namespace CameraStandard {
+namespace Camera {
 uint32_t AlignTo(uint32_t val, uint32_t alignment);
 
 uint32_t MaxAlignment(uint32_t dataAlignment, uint32_t metadataAlignment);
@@ -176,6 +176,6 @@ uint32_t GetCameraMetadataDataSize(const common_metadata_header_t *metadata_head
 uint32_t CopyCameraMetadataItems(common_metadata_header_t *newMetadata, const common_metadata_header_t *oldMetadata);
 size_t CalculateCameraMetadataItemDataSize(uint32_t type, size_t data_count);
 int32_t GetCameraMetadataItemType(uint32_t item, uint32_t *data_type);
-} // CameraStandard
+} // Camera
 } // OHOS
 #endif

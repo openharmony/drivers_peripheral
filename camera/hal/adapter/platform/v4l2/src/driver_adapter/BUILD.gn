@@ -54,7 +54,7 @@ ohos_shared_library("camera_v4l2_adapter") {
   include_dirs = [
     "$camera_path/include",
     "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter/include",
-    "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
+    "//drivers/peripheral/camera/interfaces/metadata/include",
   ]
 
   if (is_standard_system) {

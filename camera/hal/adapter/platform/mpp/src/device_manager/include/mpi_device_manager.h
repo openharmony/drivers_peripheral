@@ -57,7 +57,7 @@ public:
     void SetMetaDataCallBack(const MetaDataCb cb, CameraId cameraId = CAMERA_MAX);
     void SetDevStatusCallBack(const DeviceStatusCb cb);
     RetCode SetFlashlight(FlashMode flashMode, bool enable, CameraId cameraId = CAMERA_MAX);
-    void Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta);
+    void Configure(std::shared_ptr<CameraMetadata> meta);
     virtual RetCode PreConfig(const ModeMeta& meta, const std::vector<DeviceStreamSetting>& settings) override;
     virtual RetCode Flush(int32_t streamId) override;
     virtual RetCode StartRecvFrame(int32_t streamId) override;
@@ -72,7 +72,7 @@ private:
     RetCode CreateManager();
     RetCode StartNode(ControllerId controllerId);
     int32_t CheckNodePortNum(std::string controllerName);
-    RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta, bool &sendflag);
+    RetCode GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta, bool &sendflag);
 
 private:
     std::vector<HardwareConfiguration> hardwareList_;

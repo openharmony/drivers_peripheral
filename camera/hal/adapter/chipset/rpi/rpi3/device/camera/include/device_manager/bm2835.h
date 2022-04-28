@@ -26,14 +26,14 @@ class Bm2835 : public ISensor {
 public:
     Bm2835();
     virtual ~Bm2835();
-    void InitSensitivityRange(CameraStandard::CameraMetadata& camera_meta_data);
-    void InitAwbModes(CameraStandard::CameraMetadata& camera_meta_data);
-    void InitCompensationRange(CameraStandard::CameraMetadata& camera_meta_data);
-    void InitFpsTarget(CameraStandard::CameraMetadata& camera_meta_data);
-    void InitAvailableModes(CameraStandard::CameraMetadata& camera_meta_data);
-    void InitAntiBandingModes(CameraStandard::CameraMetadata& camera_meta_data);
-    void InitPhysicalSize(CameraStandard::CameraMetadata& camera_meta_data);
-    void Init(CameraStandard::CameraMetadata& camera_meta_data);
+    void InitSensitivityRange(CameraMetadata& camera_meta_data);
+    void InitAwbModes(CameraMetadata& camera_meta_data);
+    void InitCompensationRange(CameraMetadata& camera_meta_data);
+    void InitFpsTarget(CameraMetadata& camera_meta_data);
+    void InitAvailableModes(CameraMetadata& camera_meta_data);
+    void InitAntiBandingModes(CameraMetadata& camera_meta_data);
+    void InitPhysicalSize(CameraMetadata& camera_meta_data);
+    void Init(CameraMetadata& camera_meta_data);
 };
 } // namespace OHOS::Camera
 #endif

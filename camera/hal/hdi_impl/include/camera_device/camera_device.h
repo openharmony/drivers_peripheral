@@ -38,14 +38,14 @@ public:
     virtual CamRetCode SetCallback(const OHOS::sptr<ICameraDeviceCallback> &callback) = 0;
     virtual ResultCallbackMode GetMetaResultMode() const = 0;
     /* RC_OK metadata changed；RC_ERROR metadata unchanged； */
-    virtual RetCode GetMetadataResults(std::shared_ptr<CameraStandard::CameraMetadata> &metadata) = 0;
+    virtual RetCode GetMetadataResults(std::shared_ptr<CameraMetadata> &metadata) = 0;
     virtual void ResultMetadata() = 0;
     virtual void GetCameraId(std::string &cameraId) const = 0;
     virtual bool IsOpened() const = 0;
     virtual void SetStatus(bool isOpened) = 0;
 
 protected:
-    virtual void OnMetadataChanged(const std::shared_ptr<CameraStandard::CameraMetadata> &metadata) = 0;
+    virtual void OnMetadataChanged(const std::shared_ptr<CameraMetadata> &metadata) = 0;
     virtual void OnDevStatusErr() = 0;
 };
 } // end namespace OHOS::Camera
