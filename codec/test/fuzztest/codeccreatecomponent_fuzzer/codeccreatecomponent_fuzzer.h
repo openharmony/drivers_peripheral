@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef CODECCOMPONENTDEINIT_FUZZER
-#define CODECCOMPONENTDEINIT_FUZZER
+#ifndef CODECCREATCOMPONENT_FUZZER
+#define CODECCREATCOMPONENT_FUZZER
 
-#define FUZZ_PROJECT_NAME "codeccomponentdeinit_fuzzer"
+#define FUZZ_PROJECT_NAME "codeccreatecomponent_fuzzer"
 
 #endif

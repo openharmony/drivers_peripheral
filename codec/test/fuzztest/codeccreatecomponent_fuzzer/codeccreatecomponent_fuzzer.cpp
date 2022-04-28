@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "codeccomponentdeinit_fuzzer.h"
+#include "codeccreatecomponent_fuzzer.h"
 #include "codec_callback_type_stub.h"
 #include "codec_component_type.h"
 #include "codec_component_manager.h"
@@ -25,37 +25,22 @@
 
 namespace OHOS {
 namespace Codec {
-    bool CodecComponentDeInit(const uint8_t* data, size_t size)
+    bool CodecCreateComponent(const uint8_t* data, size_t size)
     {
         bool result = false;
-        const int32_t testingAppData = 33;
         struct CodecComponentManager *manager = nullptr;
         struct CodecComponentType *component = nullptr;
-        int32_t appData = testingAppData;
         CodecCallbackType* callback = CodecCallbackTypeStubGetInstance();
-        
+
         manager = GetCodecComponentManager();
         if (manager == NULL) {
             HDF_LOGE("%{public}s: GetCodecComponentManager failed\n", __func__);
             return false;
         }
 
-        int32_t ret = manager->CreateComponent(&component, (char*)"compName", &appData, sizeof(appData), callback);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: CreateComponent failed\n", __func__);
-            return false;
-        }
-
-        OMX_STATETYPE state;
-        ret = component->GetState(component, &state);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: GetState Component faild\n", __func__);
-            return false;
-        }
-
-        ret = component->ComponentDeInit((struct CodecComponentType *)data);
-        if (ret == HDF_SUCCESS) {
-            HDF_LOGI("%{public}s: ComponentDeInit succeed\n", __func__);
+        int32_t ret = manager->CreateComponent(&component, (char*)data, (void *)data, sizeof((int32_t)data), callback);
+         if (ret == HDF_SUCCESS) {
+            HDF_LOGI("%{public}s: CreateComponent succeed\n", __func__);
             result = true;
         }
 
@@ -73,6 +58,6 @@ namespace Codec {
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::Codec::CodecComponentDeInit(data, size);
+    OHOS::Codec::CodecCreateComponent(data, size);
     return 0;
 }
