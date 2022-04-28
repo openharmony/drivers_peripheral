@@ -70,7 +70,7 @@ OHOS相机驱动框架模型对上实现相机HDI接口，对下实现相机Pipe
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span>OperationMode mode,<br>
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::shared_ptr&lt;CameraStandard::CameraMetadata&gt;&amp; modeSetting,<br>
+  </span>const std::shared_ptr&lt;CameraMetadata&gt;&amp; modeSetting,<br>
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span>const std::vector&lt;std::shared_ptr&ltStreamInfo&gt;&gt &amp;info,<br>
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -231,7 +231,7 @@ OHOS相机驱动框架模型对上实现相机HDI接口，对下实现相机Pipe
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span>OperationMode mode,<br>
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  </span>const std::shared_ptr&lt;CameraStandard::CameraMetadata&gt; &amp;modeSetting,<br>
+  </span>const std::shared_ptr&lt;CameraMetadata&gt; &amp;modeSetting,<br>
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span>const std::vector&ltstd::shared_ptr&ltStreamInfo&gt&gt; &amp;info,<br>
     <span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

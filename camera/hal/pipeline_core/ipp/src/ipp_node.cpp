@@ -121,7 +121,7 @@ void IppNode::ProcessCache(std::vector<std::shared_ptr<IBuffer>>& buffers)
         CAMERA_LOGE("fatal error, can't get output buffer, ipp will do nothing.");
         return;
     }
-    std::shared_ptr<CameraStandard::CameraMetadata> meta = nullptr;
+    std::shared_ptr<CameraMetadata> meta = nullptr;
     if (algoPlugin_ != nullptr) {
         CAMERA_LOGV("process buffers with algo, input buffer count = %{public}u.", buffers.size());
         algoPlugin_->Process(outBuffer, buffers, meta);

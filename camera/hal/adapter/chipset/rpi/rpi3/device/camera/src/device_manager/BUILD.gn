@@ -55,12 +55,12 @@ ohos_shared_library("camera_device_manager") {
     "$camera_device_name_path/camera/include/device_manager",
     "$camera_path/adapter/platform/v4l2/src/device_manager/include",
     "$camera_path/adapter/platform/v4l2/src/driver_adapter/include/",
-    "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
+    "//drivers/peripheral/camera/interfaces/metadata/include",
   ]
 
   deps = [
     "$camera_path/adapter/platform/v4l2/src/driver_adapter:camera_v4l2_adapter",
-    "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
+    "//drivers/peripheral/camera/interfaces/metadata:metadata",
   ]
 
   if (is_standard_system) {

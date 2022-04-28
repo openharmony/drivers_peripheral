@@ -30,7 +30,7 @@ public:
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;
     RetCode GetDeviceController();
-    RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta);
+    RetCode Configure(std::shared_ptr<CameraMetadata> meta);
 private:
     std::shared_ptr<ViController>       viController_ = nullptr;
     std::atomic_bool                    streamRunning_ = false;

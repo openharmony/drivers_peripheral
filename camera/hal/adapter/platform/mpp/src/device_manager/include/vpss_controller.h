@@ -43,7 +43,7 @@ public:
         (void)abilityMetaDataTag;
         return;
     }
-    RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+    RetCode Configure(std::shared_ptr<CameraMetadata> meta)
     {
         (void)meta;
         return RC_OK;
@@ -52,7 +52,7 @@ public:
     {
         return false;
     };
-    RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> camMeta)
+    RetCode GetAbilityMetaData(std::shared_ptr<CameraMetadata> camMeta)
     {
         (void)camMeta;
         return RC_OK;
