@@ -18,8 +18,6 @@
 #include "codec_component_type.h"
 #include "codec_component_manager.h"
 
-#include <cstddef.h>
-#include <cstdint.h>
 #include <osal_mem.h>
 #include <hdf_log.h>
 
