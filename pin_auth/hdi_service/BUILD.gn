@@ -1,0 +1,85 @@
+# Copyright (C) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//drivers/adapter/uhdf2/uhdf.gni")
+
+ohos_shared_library("libpin_auth_interface_service_1.0") {
+  include_dirs = [
+    "inc",
+    "//drivers/peripheral/pin_auth/hdi/main/inc",
+    "//base/user_iam/user_auth/common/logs",
+  ]
+  sources = [
+    "src/executor_impl.cpp",
+    "src/pin_auth_interface_service.cpp",
+  ]
+  public_deps = [
+    "//drivers/interface/pin_auth/v1_0:libpinauth_stub_1.0",
+    "//drivers/peripheral/pin_auth/hdi:libpinauth_sample_1.0",
+    "//third_party/openssl:libcrypto_static",
+  ]
+
+  deps = [
+    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
+    "//base/user_iam/user_auth/common:iam_utils",
+    "//third_party/openssl:libcrypto_static",
+  ]
+
+  external_deps = [
+    "device_driver_framework:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "utils_base:utils",
+  ]
+
+  install_images = [ chipset_base_dir ]
+  remove_configs = [ "//build/config/compiler:no_exceptions" ]
+  subsystem_name = "hdf"
+  part_name = "pinauth_device_driver"
+}
+
+ohos_shared_library("libpinauth_driver") {
+  include_dirs = [
+    "inc",
+    "//drivers/peripheral/pin_auth/hdi/main/inc",
+    "//base/user_iam/user_auth/common/logs",
+  ]
+  sources = [ "src/pin_auth_interface_driver.cpp" ]
+  deps = [
+    "//base/user_iam/user_auth/common:iam_utils",
+    "//drivers/peripheral/pin_auth/hdi:libpinauth_sample_1.0",
+    "//drivers/peripheral/pin_auth/hdi_service:libpin_auth_interface_service_1.0",
+  ]
+
+  external_deps = [
+    "device_driver_framework:libhdf_host",
+    "device_driver_framework:libhdf_ipc_adapter",
+    "device_driver_framework:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "utils_base:utils",
+  ]
+
+  install_images = [ chipset_base_dir ]
+  remove_configs = [ "//build/config/compiler:no_exceptions" ]
+  subsystem_name = "hdf"
+  part_name = "pinauth_device_driver"
+}
+
+group("hdf_pinauth_service") {
+  deps = [
+    ":libpin_auth_interface_service_1.0",
+    ":libpinauth_driver",
+  ]
+}
