@@ -17,13 +17,13 @@
 #define OHOS_HDI_THERMAL_V1_0_THERMALCALLBACKIMPL_H
 
 #include <functional>
-#include "v1_0/thermal_callback_stub.h"
+#include "v1_0/ithermal_callback.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
 namespace V1_0 {
-class ThermalCallbackImpl : public ThermalCallbackStub {
+class ThermalCallbackImpl : public IThermalCallback {
 public:
     virtual ~ThermalCallbackImpl() {}
     using ThermalEventCallback = std::function<int32_t(const HdfThermalCallbackInfo& event)>;

@@ -16,13 +16,13 @@
 #ifndef HDI_THERMAL_V1_0_THERMALINTERFACEIMPL_H
 #define HDI_THERMAL_V1_0_THERMALINTERFACEIMPL_H
 
-#include "v1_0/thermal_interface_stub.h"
+#include "v1_0/ithermal_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
 namespace V1_0 {
-class ThermalInterfaceImpl : public ThermalInterfaceStub {
+class ThermalInterfaceImpl : public IThermalInterface {
 public:
     ThermalInterfaceImpl();
     virtual ~ThermalInterfaceImpl() {}

@@ -19,13 +19,13 @@
 #define FUZZ_PROJECT_NAME "sensorregistercallback_fuzzer"
 
 #include <hdf_base.h>
-#include "v1_0/sensor_callback_stub.h"
+#include "v1_0/isensor_callback.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V1_0 {
-class SensorRegisterCallbackFuzzer : public SensorCallbackStub {
+class SensorRegisterCallbackFuzzer : public ISensorCallback {
 public:
     virtual ~SensorRegisterCallbackFuzzer() {}
 

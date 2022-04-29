@@ -19,7 +19,7 @@
 #include <securec.h>
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "v1_0/light_interface_proxy.h"
+#include "v1_0/ilight_interface.h"
 #include "light_type.h"
 
 using namespace OHOS::HDI::Light::V1_0;

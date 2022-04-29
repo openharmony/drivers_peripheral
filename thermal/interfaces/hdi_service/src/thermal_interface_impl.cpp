@@ -41,6 +41,11 @@ static std::shared_ptr<ThermalSimulationNode> simulation_ = nullptr;
 static std::shared_ptr<ThermalDeviceMitigation> mitigation_ = nullptr;
 static std::shared_ptr<ThermalZoneManager> thermalZoneMgr_ = nullptr;
 
+extern "C" IThermalInterface *ThermalInterfaceImplGetInstance(void)
+{
+    return new (std::nothrow) ThermalInterfaceImpl();
+}
+
 ThermalInterfaceImpl::ThermalInterfaceImpl()
 {
     Init();

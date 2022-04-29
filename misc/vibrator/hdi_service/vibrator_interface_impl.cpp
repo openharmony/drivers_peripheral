@@ -24,6 +24,11 @@ namespace OHOS {
 namespace HDI {
 namespace Vibrator {
 namespace V1_0 {
+extern "C" IVibratorInterface *VibratorInterfaceImplGetInstance(void)
+{
+    return new (std::nothrow) VibratorInterfaceImpl();
+}
+
 int32_t VibratorInterfaceImpl::StartOnce(uint32_t duration)
 {
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();

@@ -16,13 +16,13 @@
 #ifndef OHOS_HDI_POWER_V1_0_POWERINTERFACEIMPL_H
 #define OHOS_HDI_POWER_V1_0_POWERINTERFACEIMPL_H
 
-#include "v1_0/power_interface_stub.h"
+#include "v1_0/ipower_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
 namespace V1_0 {
-class PowerInterfaceImpl : public PowerInterfaceStub {
+class PowerInterfaceImpl : public IPowerInterface {
 public:
     virtual ~PowerInterfaceImpl() {}
 
