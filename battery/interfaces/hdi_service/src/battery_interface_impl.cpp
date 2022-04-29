@@ -21,6 +21,22 @@ namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_0 {
+extern "C" IBatteryInterface *BatteryInterfaceImplGetInstance(void)
+{
+    using OHOS::HDI::Battery::V1_0::BatteryInterfaceImpl;
+    BatteryInterfaceImpl *service = new (std::nothrow) BatteryInterfaceImpl();
+    if (service == nullptr) {
+        return nullptr;
+    }
+
+    if (service->Init() != HDF_SUCCESS) {
+        delete service;
+        return nullptr;
+    }
+
+    return service;
+}
+
 int32_t BatteryInterfaceImpl::Init()
 {
     provider_ = std::make_unique<OHOS::HDI::Battery::V1_0::PowerSupplyProvider>();

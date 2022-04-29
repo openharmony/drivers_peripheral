@@ -16,13 +16,13 @@
 #ifndef OHOS_HDI_LIGHT_V1_0_LIGHTINTERFACEIMPL_H
 #define OHOS_HDI_LIGHT_V1_0_LIGHTINTERFACEIMPL_H
 
-#include "v1_0/light_interface_stub.h"
+#include "v1_0/ilight_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Light {
 namespace V1_0 {
-class LightInterfaceImpl : public LightInterfaceStub {
+class LightInterfaceImpl : public ILightInterface {
 public:
     virtual ~LightInterfaceImpl() {}
 

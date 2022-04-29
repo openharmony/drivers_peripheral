@@ -17,14 +17,15 @@
 #define OHOS_HDI_BATTERY_V1_0_BATTERYCALLBACKIMPL_H
 
 #include <functional>
-#include "v1_0/battery_callback_stub.h"
+#include "v1_0/ibattery_callback.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_0 {
-class BatteryCallbackImpl : public BatteryCallbackStub {
+class BatteryCallbackImpl : public IBatteryCallback {
 public:
+    BatteryCallbackImpl() {}
     virtual ~BatteryCallbackImpl() {}
     using BatteryEventCallback = std::function<int32_t(const BatteryInfo& event)>;
     static int32_t RegisterBatteryEvent(const BatteryEventCallback& eventCb);

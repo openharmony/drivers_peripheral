@@ -16,13 +16,13 @@
 #ifndef OHOS_HDI_VIBRATOR_V1_0_VIBRATORINTERFACEIMPL_H
 #define OHOS_HDI_VIBRATOR_V1_0_VIBRATORINTERFACEIMPL_H
 
-#include "v1_0/vibrator_interface_stub.h"
+#include "v1_0/ivibrator_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Vibrator {
 namespace V1_0 {
-class VibratorInterfaceImpl : public VibratorInterfaceStub {
+class VibratorInterfaceImpl : public IVibratorInterface {
 public:
     virtual ~VibratorInterfaceImpl() {}
 

@@ -20,7 +20,7 @@
 #include <securec.h>
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "v1_0/sensor_interface_proxy.h"
+#include "v1_0/isensor_interface.h"
 #include "sensor_type.h"
 #include "sensor_callback_impl.h"
 
@@ -153,9 +153,9 @@ HWTEST_F(HdfSensorHdiTest, RegisterSensorDataCb0001, TestSize.Level1)
         ASSERT_NE(nullptr, g_sensorInterface);
         return;
     }
-    int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_medicalCallback);
+    int32_t ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
-    ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_medicalCallback);
+    ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
     EXPECT_EQ(SENSOR_SUCCESS, ret);
 }
 

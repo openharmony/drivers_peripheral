@@ -13,19 +13,18 @@
  * limitations under the License.
  */
 
-#include <osal_mem.h>
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "hdf_sbuf_ipc.h"
 #include "battery_log.h"
-#include "battery_interface_impl.h"
+#include "v1_0/battery_interface_stub.h"
 
-using namespace OHOS::HDI::Battery;
 using namespace OHOS::HDI::Battery::V1_0;
+using namespace OHOS::HDI::Battery;
 
 struct HdfBatteryInterfaceHost {
     struct IDeviceIoService ioService;
-    BatteryInterfaceImpl *service;
+    OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
 static int32_t BatteryInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
@@ -46,28 +45,38 @@ static int32_t BatteryInterfaceDriverDispatch(struct HdfDeviceIoClient *client, 
         return HDF_ERR_INVALID_PARAM;
     }
 
-    return hdfBatteryInterfaceHost->service->OnRemoteRequest(cmdId, *dataParcel, *replyParcel, option);
+    return hdfBatteryInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
 static int32_t HdfBatteryInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
-    auto *hdfBatteryInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfBatteryInterfaceHost, ioService);
-    return hdfBatteryInterfaceHost->service->Init();
+    return HDF_SUCCESS;
 }
 
 static int32_t HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    auto *hdfBatteryInterfaceHost =
-        (struct HdfBatteryInterfaceHost *)OsalMemAlloc(sizeof(struct HdfBatteryInterfaceHost));
+    auto *hdfBatteryInterfaceHost = new (std::nothrow) HdfBatteryInterfaceHost;
     if (hdfBatteryInterfaceHost == nullptr) {
-        BATTERY_HILOGE(COMP_HDI, "OsalMemAlloc HdfBatteryInterfaceHost failed");
+        BATTERY_HILOGE(COMP_HDI, "%{public}s: failed to create HdfBatteryInterfaceHost object", __func__);
         return HDF_FAILURE;
     }
 
     hdfBatteryInterfaceHost->ioService.Dispatch = BatteryInterfaceDriverDispatch;
     hdfBatteryInterfaceHost->ioService.Open = nullptr;
     hdfBatteryInterfaceHost->ioService.Release = nullptr;
-    hdfBatteryInterfaceHost->service = new BatteryInterfaceImpl();
+
+    auto serviceImpl = IBatteryInterface::Get(true);
+    if (serviceImpl == nullptr) {
+        BATTERY_HILOGE(COMP_HDI, "%{public}s: failed to get of implement service", __func__);
+        return HDF_FAILURE;
+    }
+
+    hdfBatteryInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
+        IBatteryInterface::GetDescriptor());
+    if (hdfBatteryInterfaceHost->stub == nullptr) {
+        BATTERY_HILOGE(COMP_HDI, "%{public}s: failed to get stub object", __func__);
+        return HDF_FAILURE;
+    }
 
     deviceObject->service = &hdfBatteryInterfaceHost->ioService;
     return HDF_SUCCESS;
@@ -76,8 +85,7 @@ static int32_t HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObjec
 static void HdfBatteryInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     auto *hdfBatteryInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfBatteryInterfaceHost, ioService);
-    delete hdfBatteryInterfaceHost->service;
-    OsalMemFree(hdfBatteryInterfaceHost);
+    delete hdfBatteryInterfaceHost;
 }
 
 static struct HdfDriverEntry g_batteryInterfaceDriverEntry = {

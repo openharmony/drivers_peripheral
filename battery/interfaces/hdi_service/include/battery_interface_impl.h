@@ -21,13 +21,13 @@
 #include "battery_led.h"
 #include "battery_thread.h"
 #include "power_supply_provider.h"
-#include "v1_0/battery_interface_stub.h"
+#include "v1_0/ibattery_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_0 {
-class BatteryInterfaceImpl : public BatteryInterfaceStub {
+class BatteryInterfaceImpl : public IBatteryInterface {
 public:
     BatteryInterfaceImpl() = default;
     virtual ~BatteryInterfaceImpl() = default;
