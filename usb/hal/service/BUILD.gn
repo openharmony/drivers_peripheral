@@ -13,15 +13,13 @@
 
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/peripheral/usb/usb.gni")
 
 config("usbd_private_config") {
   include_dirs = []
 }
 
 config("usbd_public_config") {
-  default_config_path =
-      "//device/soc/$device_company/common/hal/usb/$device_name/include"
-
   include_dirs = [
     "include",
     "//drivers/peripheral/usb/hal/client/include",
