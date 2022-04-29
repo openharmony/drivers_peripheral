@@ -14,7 +14,7 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-module_output_path = "hdf/usb/"
+module_output_path = "hdf/usb"
 
 ohos_fuzztest("UsbGetStringDescriptorFuzzTest") {
   module_out_path = module_output_path

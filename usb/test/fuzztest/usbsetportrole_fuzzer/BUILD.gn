@@ -16,16 +16,15 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 module_output_path = "hdf/usb"
 
-ohos_fuzztest("UsbBulkTransferWriteFuzzTest") {
+ohos_fuzztest("UsbSetPortRoleFuzzTest") {
   module_out_path = module_output_path
 
   fuzz_config_file =
-      "//drivers/peripheral/usb/test/fuzztest/usbbulktransferwrite_fuzzer"
+      "//drivers/peripheral/usb/test/fuzztest/usbsetportrole_fuzzer"
 
   include_dirs = [
     "//drivers/peripheral/usb/hal/client/include",
-    "//drivers/peripheral/usb/test/fuzztest/usbbulktransferwrite_fuzzer",
-    "//drivers/peripheral/usb/test/UsbSubscriberTest",
+    "//drivers/peripheral/usb/test/fuzztest/usbsetportrole_fuzzer",
     "//drivers/framework/include/utils",
   ]
 
@@ -49,14 +48,11 @@ ohos_fuzztest("UsbBulkTransferWriteFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [
-    "//drivers/peripheral/usb/test/UsbSubscriberTest/UsbSubscriberTest.cpp",
-    "usbbulktransferwrite_fuzzer.cpp",
-  ]
+  sources = [ "usbsetportrole_fuzzer.cpp" ]
 }
 
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [ ":UsbBulkTransferWriteFuzzTest" ]
+  deps += [ ":UsbSetPortRoleFuzzTest" ]
 }

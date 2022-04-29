@@ -11,13 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#####################hydra-fuzz###################
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-module_output_path = "hdf/usb/"
+module_output_path = "hdf/usb"
 
-##############################fuzztest##########################################
 ohos_fuzztest("UsbSetCurrentFunctionsFuzzTest") {
   module_out_path = module_output_path
 
