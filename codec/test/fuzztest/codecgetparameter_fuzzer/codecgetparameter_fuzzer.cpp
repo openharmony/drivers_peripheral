@@ -33,7 +33,7 @@ namespace Codec {
         CodecCallbackType* callback = CodecCallbackTypeStubGetInstance();
 
         manager = GetCodecComponentManager();
-        if (manager == NULL) {
+        if (manager == nullptr) {
             HDF_LOGE("%{public}s: GetCodecComponentManager failed\n", __func__);
             return false;
         }
