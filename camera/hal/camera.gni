@@ -17,22 +17,7 @@ if (defined(ohos_lite)) {
       "//device/soc/hisilicon/common/hal/media/camera/hi3516dv300/linux_standard/camera/product.gni")
 } else {
   import("//build/ohos.gni")
-  if ("${product_name}" == "ohos-arm64") {
-    import(
-        "//drivers/peripheral/camera/hal/adapter/chipset/rpi/rpi3/device/camera/product.gni")
-  } else if ("${product_name}" == "hispark_phoenix") {
-    import(
-        "//device/soc/hisilicon/common/hal/media/camera/hi3516dv300/linux_standard/camera/product.gni")
-  } else if ("${product_name}" == "Hi3516DV300") {
-    import(
-        "//device/soc/hisilicon/common/hal/media/camera/hi3516dv300/linux_standard/camera/product.gni")
-  } else if ("${product_name}" == "watchos") {
-    import(
-        "//device/soc/hisilicon/common/hal/media/camera/hi3516dv300/linux_standard/camera/product.gni")
-  } else {
-    import(
-        "//device/board/${product_company}/${device_name}/camera/product.gni")
-  }
+  import("//vendor/$product_company/$product_name/product.gni")
 }
 
 camera_path = "//drivers/peripheral/camera/hal"
