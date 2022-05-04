@@ -42,10 +42,7 @@ if (defined(ohos_lite)) {
       "//foundation/graphic/surface/interfaces/kits",
       "//foundation/graphic/surface/interfaces/innerkits",
     ]
-    deps = [
-      "$camera_path/buffer_manager:camera_buffer_manager",
-      "//foundation/graphic/surface:surface",
-    ]
+    deps = [ "$camera_path/buffer_manager:camera_buffer_manager" ]
   }
 } else {
   import("//build/test.gni")
@@ -82,7 +79,6 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "device_driver_framework:libhdf_utils",
-        "graphic_standard:surface",
         "hiviewdfx_hilog_native:libhilog",
         "samgr_standard:samgr_proxy",
         "utils_base:utils",
