@@ -25,5 +25,11 @@ group("hdf_input_fuzztest") {
     "inputgetpowerstatus_fuzzer:fuzztest",
     "inputgetvendorname_fuzzer:fuzztest",
     "inputregisterreportcallback_fuzzer:fuzztest",
+    "inputsetgesturemode_fuzzer:fuzztest",
+    "inputsetpowerstatus_fuzzer:fuzztest",
+    "inputunregisterreportcallback_fuzzer:fuzztest",
+    "openinputdevice_fuzzer:fuzztest",
+    "runcapacitancetest_fuzzer:fuzztest",
+    "runextracommand_fuzzer:fuzztest",
   ]
 }

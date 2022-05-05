@@ -23,11 +23,10 @@ namespace OHOS {
     bool InputGetVendorNameFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
-        static bool g_hasDev = false;
         int32_t ret;
         const int MAX_DEVICES = 32;
-        const int NAME_MAX_LEN = 10;
-        char vendorName[NAME_MAX_LEN] = {0};
+        uint32_t length = static_cast<uint32_t>(*data);
+        char vendorName[] = {0};
         DevDesc sta[MAX_DEVICES];
         IInputInterface *g_inputInterface;
 
@@ -44,10 +43,13 @@ namespace OHOS {
             if (sta[i].devIndex == 0) {
                 break;
             }
-            g_hasDev = true;
+            ret = g_inputInterface->iInputManager->OpenInputDevice(sta[i].devIndex);
+            if (ret != INPUT_SUCCESS) {
+                HDF_LOGE("%s: open input device failed, ret %d", __func__, ret);
+            }
         }
 
-        ret = g_inputInterface->iInputController->GetVendorName((uint32_t)data, vendorName, NAME_MAX_LEN);
+        ret = g_inputInterface->iInputController->GetVendorName((uint32_t)data, vendorName, length);
         if (!ret) {
             result = true;
         }

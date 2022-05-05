@@ -22,7 +22,6 @@ namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         bool result = false;
-        static bool g_hasDev = false;
         int32_t ret;
         const int MAX_DEVICES = 32;
         DevDesc sta[MAX_DEVICES];
@@ -42,7 +41,10 @@ namespace OHOS {
             if (sta[i].devIndex == 0) {
                 break;
             }
-            g_hasDev = true;
+            ret = g_inputInterface->iInputManager->OpenInputDevice(sta[i].devIndex);
+            if (ret != INPUT_SUCCESS) {
+                HDF_LOGE("%s: open input device failed, ret %d", __func__, ret);
+            }
         }
 
         ret  = g_inputInterface->iInputReporter->RegisterReportCallback((uint32_t)data, &g_callback);
