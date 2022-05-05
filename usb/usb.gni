@@ -11,10 +11,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (device_name == "hispark_phoenix") {
-  import("//vendor/${product_company}/${product_name}/product.gni")
-  default_config_path = usb_default_config_path
-} else {
-  default_config_path =
-      "//device/soc/$device_company/common/hal/usb/$device_name/include"
-}
+import("//vendor/${product_company}/${product_name}/product.gni")
+default_config_path = usb_default_config_path
