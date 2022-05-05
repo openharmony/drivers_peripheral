@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,8 +21,8 @@
 #include "usbd_dispatcher.h"
 
 #define HDF_LOG_TAG Usbd
-
 #define HEX_NUM_09 0x09
+#define HDF_USB_INFO_MAX_SIZE (USB_MAX_DEVICE_NUMBER * 12) // all usb device info, 12 byte is reply size
 
 const int32_t DEFAULT_PORT_ID = 1;
 const int32_t DEFAULT_POWER_ROLE = 2;
@@ -248,12 +248,12 @@ static int32_t UsbdAddDevicesOnStart(struct UsbdService *service)
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *data = HdfSbufObtain(HDF_USB_INFO_MAX_SIZE);
     if (data == NULL) {
         HDF_LOGE("%{public}s: fail to obtain sbuf data", __func__);
         return HDF_DEV_ERR_NO_MEMORY;
     }
-    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufObtain(HDF_USB_INFO_MAX_SIZE);
     if (reply == NULL) {
         HDF_LOGE("%{public}s: fail to obtain sbuf reply", __func__);
         HdfSbufRecycle(data);
