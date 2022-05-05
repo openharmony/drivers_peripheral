@@ -111,7 +111,6 @@ if (defined(ohos_lite)) {
       "$hdf_uhdf_path/utils:libhdf_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
-      "//foundation/graphic/surface:surface",
     ]
   }
 } else {
@@ -215,7 +214,6 @@ if (defined(ohos_lite)) {
       external_deps = [
         "device_driver_framework:libhdf_utils",
         "device_driver_framework:libhdi",
-        "graphic_standard:surface",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_single",
         "utils_base:utils",

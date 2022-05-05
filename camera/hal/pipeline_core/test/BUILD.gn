@@ -120,7 +120,6 @@ if (defined(ohos_lite)) {
       # hcs parser
       "$hdf_uhdf_path/utils:libhdf_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//foundation/graphic/surface:surface",
     ]
   }
 } else {
@@ -225,7 +224,6 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "device_driver_framework:libhdf_utils",
-        "graphic_standard:surface",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]
