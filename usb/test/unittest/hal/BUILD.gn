@@ -37,8 +37,6 @@ ohos_unittest("test_transfer") {
   ]
 
   external_deps = [
-    "ability_base:want",
-    "bundle_framework:appexecfwk_base",
     "device_driver_framework:libhdf_utils",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
@@ -60,8 +58,6 @@ ohos_unittest("test_device") {
   ]
 
   external_deps = [
-    "ability_base:want",
-    "bundle_framework:appexecfwk_base",
     "device_driver_framework:libhdf_utils",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
@@ -84,8 +80,6 @@ ohos_unittest("test_function") {
   ]
 
   external_deps = [
-    "ability_base:want",
-    "bundle_framework:appexecfwk_base",
     "device_driver_framework:libhdf_utils",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
@@ -109,8 +103,6 @@ ohos_unittest("test_request") {
   ]
 
   external_deps = [
-    "ability_base:want",
-    "bundle_framework:appexecfwk_base",
     "device_driver_framework:libhdf_utils",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
