@@ -43,7 +43,7 @@ extern "C" {
 #endif
 
 struct AudioProxyManager {
-    uint64_t audioMagic;
+    uint32_t audioMagic;
     struct HdfRemoteService *remote;
     struct HdfRemoteService *usbRemote;
     struct HdfRemoteService *a2dpRemote;

@@ -93,7 +93,7 @@ int AudioHdiPrimaryServerInit(struct HdfDeviceObject *deviceObject)
     void *sdkHandle;
     int (*sdkInitSp)() = NULL;
     char sdkResolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
-    sdkHandle = dlopen(sdkResolvedPath, 1);
+    sdkHandle = dlopen(sdkResolvedPath, RTLD_LAZY);
     if (sdkHandle == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
