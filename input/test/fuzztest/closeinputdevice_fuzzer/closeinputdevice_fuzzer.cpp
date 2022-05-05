@@ -23,7 +23,6 @@ namespace OHOS {
     bool CloseInputDeviceFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
-        static bool g_hasDev = false;
         int32_t ret;
         const int MAX_DEVICES = 32;
         DevDesc sta[MAX_DEVICES];
@@ -31,7 +30,7 @@ namespace OHOS {
 
         ret = GetInputInterface(&g_inputInterface);
         if (ret != INPUT_SUCCESS) {
-            HDF_LOGE("%s: get input hdi failed", __func__);
+            HDF_LOGE("%s: get input hdi failed, ret %d", __func__, ret);
         }
 
         ret = g_inputInterface->iInputManager->ScanInputDevice(sta, MAX_DEVICES);
@@ -42,7 +41,10 @@ namespace OHOS {
             if (sta[i].devIndex == 0) {
                 break;
             }
-            g_hasDev = true;
+            ret = g_inputInterface->iInputManager->OpenInputDevice(sta[i].devIndex);
+            if (ret != INPUT_SUCCESS) {
+                HDF_LOGE("%s: open input device failed, ret %d", __func__, ret);
+            }
         }
 
         ret = g_inputInterface->iInputManager->CloseInputDevice((uint32_t)data);

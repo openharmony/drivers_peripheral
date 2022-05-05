@@ -16,12 +16,11 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 module_output_path = "hdf/input"
 
-ohos_fuzztest("InputGetChipInfoFuzzTest") {
+ohos_fuzztest("InputUnregisterReportCallbackFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file =
-      "//drivers/peripheral/input/test/fuzztest/inputgetchipinfo_fuzzer"
+  fuzz_config_file = "//drivers/peripheral/input/test/fuzztest/inputunregisterreportcallback_fuzzer"
   include_dirs = [
-    "//drivers/peripheral/input/test/fuzztest/inputgetchipinfo_fuzzer",
+    "//drivers/peripheral/input/test/fuzztest/inputunregisterreportcallback_fuzzer",
     "//drivers/peripheral/input/interfaces/include",
   ]
   cflags = [
@@ -30,7 +29,7 @@ ohos_fuzztest("InputGetChipInfoFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "inputgetchipinfo_fuzzer.cpp" ]
+  sources = [ "inputunregisterreportcallback_fuzzer.cpp" ]
   deps = [ "//drivers/peripheral/input/hal:hdi_input" ]
   external_deps = [
     "device_driver_framework:libhdf_test_common",
@@ -43,5 +42,5 @@ ohos_fuzztest("InputGetChipInfoFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [ ":InputGetChipInfoFuzzTest" ]
+  deps += [ ":InputUnregisterReportCallbackFuzzTest" ]
 }

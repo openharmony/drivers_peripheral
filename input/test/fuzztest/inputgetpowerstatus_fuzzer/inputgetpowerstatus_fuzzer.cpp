@@ -23,8 +23,8 @@ namespace OHOS {
     bool InputGetpowerStatusFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
-        static bool g_hasDev = false;
         int32_t ret;
+        uint32_t getStatus = 0;
         const int MAX_DEVICES = 32;
         DevDesc sta[MAX_DEVICES];
         IInputInterface *g_inputInterface;
@@ -42,10 +42,13 @@ namespace OHOS {
             if (sta[i].devIndex == 0) {
                 break;
             }
-            g_hasDev = true;
+            ret = g_inputInterface->iInputManager->OpenInputDevice(sta[i].devIndex);
+            if (ret != INPUT_SUCCESS) {
+                HDF_LOGE("%s: open input device failed, ret %d", __func__, ret);
+            }
         }
 
-        ret = g_inputInterface->iInputController->GetPowerStatus((uint32_t)data, (uint32_t *)data);
+        ret = g_inputInterface->iInputController->GetPowerStatus((uint32_t)data, &getStatus);
         if (!ret) {
             HDF_LOGE("%s: get device1's power status failed, ret %d", __func__, ret);
         }
