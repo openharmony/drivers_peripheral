@@ -13,22 +13,19 @@
  * limitations under the License.
  */
 
-#include "inputgetdevicetype_fuzzer.h"
+#include "inputsetgesturemode_fuzzer.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "input_manager.h"
-#include "input_type.h"
 
 namespace OHOS {
-    bool InputGetDeviceTypeFuzzTest(const uint8_t* data, size_t size)
+    bool InputSetGestureModeFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
         int32_t ret;
         const int MAX_DEVICES = 32;
         DevDesc sta[MAX_DEVICES];
         IInputInterface *g_inputInterface;
-        const int INIT_DEFAULT_VALUE = 255;
-        uint32_t devType = INIT_DEFAULT_VALUE;
 
         ret = GetInputInterface(&g_inputInterface);
         if (ret != INPUT_SUCCESS) {
@@ -48,12 +45,9 @@ namespace OHOS {
                 HDF_LOGE("%s: open input device failed, ret %d", __func__, ret);
             }
         }
-
-        ret = g_inputInterface->iInputController->GetDeviceType((uint32_t)data, &devType);
-        if (!ret) {
-            if (ret != INPUT_SUCCESS) {
-                HDF_LOGE("%s: open input device failed, ret %d", __func__, ret);
-            }
+        
+        if (!g_inputInterface->iInputController->SetGestureMode((uint32_t)data, (uint32_t)data)) {
+            result = true;
         }
         return result;
     }
@@ -63,7 +57,7 @@ namespace OHOS {
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::InputGetDeviceTypeFuzzTest(data, size);
+    OHOS::InputSetGestureModeFuzzTest(data, size);
     return 0;
 }
 

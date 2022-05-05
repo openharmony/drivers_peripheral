@@ -23,11 +23,11 @@ namespace OHOS {
     bool InputGetchipInfoFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
-        static bool g_hasDev = false;
         int32_t ret;
         const int MAX_DEVICES = 32;
         DevDesc sta[MAX_DEVICES];
-        char chipInfo[CHIP_INFO_LEN] = {0};
+        uint32_t length = static_cast<uint32_t>(*data);
+        char chipInfo[] = {0};
         IInputInterface *g_inputInterface;
 
         ret = GetInputInterface(&g_inputInterface);
@@ -43,14 +43,16 @@ namespace OHOS {
             if (sta[i].devIndex == 0) {
                 break;
             }
-            g_hasDev = true;
+            ret = g_inputInterface->iInputManager->OpenInputDevice(sta[i].devIndex);
+            if (ret != INPUT_SUCCESS) {
+                HDF_LOGE("%s: open input device failed, ret %d", __func__, ret);
+            }
         }
 
-        ret = g_inputInterface->iInputController->GetChipInfo((uint32_t)data, chipInfo, CHIP_INFO_LEN);
+        ret = g_inputInterface->iInputController->GetChipInfo((uint32_t)data, chipInfo, length);
         if (!ret) {
             result = true;
         }
-
         return result;
     }
 }
