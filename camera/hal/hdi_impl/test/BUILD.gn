@@ -128,7 +128,6 @@ if (defined(ohos_lite)) {
       "//drivers/adapter/uhdf/platform:hdf_platform",
       "//drivers/adapter/uhdf/posix:hdf_posix_osal",
       "//drivers/adapter/uhdf/test/unittest/common:hdf_test_common",
-      "//foundation/graphic/surface:surface",
     ]
   }
 } else {
@@ -238,7 +237,6 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdf_ipc_adapter",
         "device_driver_framework:libhdf_utils",
         "device_driver_framework:libhdi",
-        "graphic_standard:surface",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_single",
         "utils_base:utils",

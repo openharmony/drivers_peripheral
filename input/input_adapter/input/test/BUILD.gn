@@ -73,7 +73,6 @@ ohos_unittest("hdi_input_unittest_neu") {
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
-      "graphic_standard:surface",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
       "utils_base:utils",
