@@ -25,6 +25,6 @@ if (defined(ohos_lite)) {
 } else {
   group("hdf_test_display") {
     testonly = true
-    deps = []
+    deps = [ "fuzztest:hdf_display_fuzztest" ]
   }
 }
