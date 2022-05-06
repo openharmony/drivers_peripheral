@@ -18,34 +18,36 @@
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
-#include "thermal_interface_impl.h"
+#include "v1_0/thermal_interface_stub.h"
 
 #define HDF_LOG_TAG ThermalInterfaceDriver
 
 using namespace OHOS::HDI::Thermal::V1_0;
 
 struct HdfThermalInterfaceHost {
-    struct IDeviceIoService ioservice;
-    ThermalInterfaceImpl *service;
+    struct IDeviceIoService ioService;
+    OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
 static int32_t ThermalInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    struct HdfThermalInterfaceHost *hdfThermalInterfaceHost =
-        CONTAINER_OF(client->device->service, struct HdfThermalInterfaceHost, ioservice);
+    auto *hdfThermalInterfaceHost = CONTAINER_OF(client->device->service, struct HdfThermalInterfaceHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
     OHOS::MessageOption option;
 
-    (void)SbufToParcel(reply, &replyParcel);
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
 
-    return hdfThermalInterfaceHost->service->OnRemoteRequest(cmdId, *dataParcel, *replyParcel, option);
+    return hdfThermalInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
 int HdfThermalInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
@@ -58,29 +60,38 @@ int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfThermalInterfaceDriverBind enter");
 
-    struct HdfThermalInterfaceHost *hdfThermalInterfaceHost = (struct HdfThermalInterfaceHost *)OsalMemAlloc(
-        sizeof(struct HdfThermalInterfaceHost));
+    auto *hdfThermalInterfaceHost = new (std::nothrow) HdfThermalInterfaceHost;
     if (hdfThermalInterfaceHost == nullptr) {
-        HDF_LOGE("HdfThermalInterfaceDriverBind OsalMemAlloc HdfThermalInterfaceHost failed!");
+        HDF_LOGE("%{public}s failed to create HdfThermalInterfaceHost object", __func__);
         return HDF_FAILURE;
     }
 
-    hdfThermalInterfaceHost->ioservice.Dispatch = ThermalInterfaceDriverDispatch;
-    hdfThermalInterfaceHost->ioservice.Open = NULL;
-    hdfThermalInterfaceHost->ioservice.Release = NULL;
-    hdfThermalInterfaceHost->service = new ThermalInterfaceImpl();
+    hdfThermalInterfaceHost->ioService.Dispatch = ThermalInterfaceDriverDispatch;
+    hdfThermalInterfaceHost->ioService.Open = NULL;
+    hdfThermalInterfaceHost->ioService.Release = NULL;
 
-    deviceObject->service = &hdfThermalInterfaceHost->ioservice;
+    auto serviceImpl = IThermalInterface::Get(true);
+    if (serviceImpl == nullptr) {
+        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        return HDF_FAILURE;
+    }
+
+    hdfThermalInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
+        IThermalInterface::GetDescriptor());
+    if (hdfThermalInterfaceHost->stub == nullptr) {
+        HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        return HDF_FAILURE;
+    }
+
+    deviceObject->service = &hdfThermalInterfaceHost->ioService;
     return HDF_SUCCESS;
 }
 
 void HdfThermalInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfThermalInterfaceDriverRelease enter");
-    struct HdfThermalInterfaceHost *hdfThermalInterfaceHost =
-        CONTAINER_OF(deviceObject->service, struct HdfThermalInterfaceHost, ioservice);
-    delete hdfThermalInterfaceHost->service;
-    OsalMemFree(hdfThermalInterfaceHost);
+    auto *hdfThermalInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfThermalInterfaceHost, ioService);
+    delete hdfThermalInterfaceHost;
 }
 
 struct HdfDriverEntry g_thermalinterfaceDriverEntry = {

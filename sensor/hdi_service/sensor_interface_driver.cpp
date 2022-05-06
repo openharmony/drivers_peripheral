@@ -19,72 +19,78 @@
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
 #include "sensor_if.h"
-#include "sensor_impl.h"
+#include "v1_0/sensor_interface_stub.h"
 
 #define HDF_LOG_TAG    hdf_sensor_if_driver
 
 using namespace OHOS::HDI::Sensor::V1_0;
 
 struct HdfSensorInterfaceHost {
-    struct IDeviceIoService ioservice;
-    std::shared_ptr<SensorImpl> service {nullptr};
+    struct IDeviceIoService ioService;
+    OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
 static int32_t SensorInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    struct HdfSensorInterfaceHost *hdfSensorInterfaceHost = CONTAINER_OF(
-        client->device->service, struct HdfSensorInterfaceHost, ioservice);
+    auto *hdfSensorInterfaceHost = CONTAINER_OF(client->device->service, struct HdfSensorInterfaceHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
     OHOS::MessageOption option;
 
-    (void)SbufToParcel(reply, &replyParcel);
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
 
-    return hdfSensorInterfaceHost->service->OnRemoteRequest(cmdId, *dataParcel, *replyParcel, option);
+    return hdfSensorInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
 static int HdfSensorInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfSensorInterfaceDriverInit enter");
-    struct HdfSensorInterfaceHost *hdfSensorInterfaceHost =
-        CONTAINER_OF(deviceObject->service, struct HdfSensorInterfaceHost, ioservice);
-    if (hdfSensorInterfaceHost != nullptr && hdfSensorInterfaceHost->service != nullptr) {
-        hdfSensorInterfaceHost->service->Init();
-    }
-    
     return HDF_SUCCESS;
 }
 
 static int HdfSensorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    struct HdfSensorInterfaceHost *hdfSensorInterfaceHost = new HdfSensorInterfaceHost();
+    auto *hdfSensorInterfaceHost = new (std::nothrow) HdfSensorInterfaceHost;
     if (hdfSensorInterfaceHost == nullptr) {
-        HDF_LOGE("HdfSensorInterfaceDriverBind OsalMemAlloc HdfSensorInterfaceHost failed!");
+        HDF_LOGE("%{public}s: failed to create HdfSensorInterfaceHost object", __func__);
         return HDF_FAILURE;
     }
 
-    hdfSensorInterfaceHost->ioservice.Dispatch = SensorInterfaceDriverDispatch;
-    hdfSensorInterfaceHost->ioservice.Open = nullptr;
-    hdfSensorInterfaceHost->ioservice.Release = nullptr;
-    hdfSensorInterfaceHost->service = SensorImpl::create();
+    hdfSensorInterfaceHost->ioService.Dispatch = SensorInterfaceDriverDispatch;
+    hdfSensorInterfaceHost->ioService.Open = nullptr;
+    hdfSensorInterfaceHost->ioService.Release = nullptr;
 
-    deviceObject->service = &hdfSensorInterfaceHost->ioservice;
+    auto serviceImpl = ISensorInterface::Get(true);
+    if (serviceImpl == nullptr) {
+        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        return HDF_FAILURE;
+    }
+
+    hdfSensorInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
+        ISensorInterface::GetDescriptor());
+    if (hdfSensorInterfaceHost->stub == nullptr) {
+        HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        return HDF_FAILURE;
+    }
+
+    deviceObject->service = &hdfSensorInterfaceHost->ioService;
     HDF_LOGI("HdfSensorInterfaceDriverBind Success");
     return HDF_SUCCESS;
 }
 
 static void HdfSensorInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    struct HdfSensorInterfaceHost *hdfSensorInterfaceHost =
-        CONTAINER_OF(deviceObject->service, struct HdfSensorInterfaceHost, ioservice);
+    auto *hdfSensorInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfSensorInterfaceHost, ioService);
     delete hdfSensorInterfaceHost;
-    hdfSensorInterfaceHost = nullptr;
     HDF_LOGI("HdfSensorInterfaceDriverRelease Success");
 }
 

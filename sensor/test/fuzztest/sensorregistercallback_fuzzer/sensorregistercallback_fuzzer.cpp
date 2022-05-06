@@ -16,8 +16,7 @@
 #include "sensorregistercallback_fuzzer.h"
 #include "hdf_base.h"
 #include "sensor_impl.h"
-#include "v1_0/sensor_callback_stub.h"
-#include "v1_0/sensor_interface_proxy.h"
+#include "v1_0/isensor_interface.h"
 
 using namespace OHOS::HDI::Sensor::V1_0;
 

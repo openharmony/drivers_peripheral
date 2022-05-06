@@ -18,34 +18,36 @@
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
-#include "light_interface_impl.h"
+#include "v1_0/light_interface_stub.h"
 
 #define HDF_LOG_TAG           hdf_light_if_driver
 
 using namespace OHOS::HDI::Light::V1_0;
 
 struct HdfLightInterfaceHost {
-    struct IDeviceIoService ioservice;
-    LightInterfaceImpl *service;
+    struct IDeviceIoService ioService;
+    OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
 static int32_t LightInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    struct HdfLightInterfaceHost *hdfLightInterfaceHost = CONTAINER_OF(
-        client->device->service, struct HdfLightInterfaceHost, ioservice);
+    auto *hdfLightInterfaceHost = CONTAINER_OF(client->device->service, struct HdfLightInterfaceHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
     OHOS::MessageOption option;
 
-    (void)SbufToParcel(reply, &replyParcel);
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
 
-    return hdfLightInterfaceHost->service->OnRemoteRequest(cmdId, *dataParcel, *replyParcel, option);
+    return hdfLightInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
 static int HdfLightInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
@@ -58,19 +60,30 @@ static int HdfLightInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 
 static int HdfLightInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    struct HdfLightInterfaceHost *hdfLightInterfaceHost = (struct HdfLightInterfaceHost *)OsalMemAlloc(
-        sizeof(struct HdfLightInterfaceHost));
+    auto *hdfLightInterfaceHost = new (std::nothrow) HdfLightInterfaceHost;
     if (hdfLightInterfaceHost == nullptr) {
-        HDF_LOGE("HdfLightInterfaceDriverBind OsalMemAlloc HdfLightInterfaceHost failed!");
+        HDF_LOGE("%{public}s: failed to create HdfLightInterfaceHost object", __func__);
         return HDF_FAILURE;
     }
 
-    hdfLightInterfaceHost->ioservice.Dispatch = LightInterfaceDriverDispatch;
-    hdfLightInterfaceHost->ioservice.Open = nullptr;
-    hdfLightInterfaceHost->ioservice.Release = nullptr;
-    hdfLightInterfaceHost->service = new LightInterfaceImpl();
+    hdfLightInterfaceHost->ioService.Dispatch = LightInterfaceDriverDispatch;
+    hdfLightInterfaceHost->ioService.Open = nullptr;
+    hdfLightInterfaceHost->ioService.Release = nullptr;
 
-    deviceObject->service = &hdfLightInterfaceHost->ioservice;
+    auto serviceImpl = ILightInterface::Get(true);
+    if (serviceImpl == nullptr) {
+        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        return HDF_FAILURE;
+    }
+
+    hdfLightInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
+        ILightInterface::GetDescriptor());
+    if (hdfLightInterfaceHost->stub == nullptr) {
+        HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        return HDF_FAILURE;
+    }
+
+    deviceObject->service = &hdfLightInterfaceHost->ioService;
     HDF_LOGI("HdfLightInterfaceDriverBind success");
     return HDF_SUCCESS;
 }
@@ -79,10 +92,8 @@ static void HdfLightInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfLightInterfaceDriverRelease enter");
 
-    struct HdfLightInterfaceHost *hdfLightInterfaceHost = CONTAINER_OF(
-        deviceObject->service, struct HdfLightInterfaceHost, ioservice);
-    delete hdfLightInterfaceHost->service;
-    OsalMemFree(hdfLightInterfaceHost);
+    auto *hdfLightInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfLightInterfaceHost, ioService);
+    delete hdfLightInterfaceHost;
 }
 
 struct HdfDriverEntry g_lightinterfaceDriverEntry = {

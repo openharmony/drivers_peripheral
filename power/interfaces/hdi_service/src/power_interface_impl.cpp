@@ -56,6 +56,11 @@ static std::string ReadWakeCount();
 static bool WriteWakeCount(const std::string& count);
 static void NotifyCallback(int code);
 
+extern "C" IPowerInterface *PowerInterfaceImplGetInstance(void)
+{
+    return new (std::nothrow) PowerInterfaceImpl();
+}
+
 int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback>& ipowerHdiCallback)
 {
     std::lock_guard<std::mutex> lock(mutex_);

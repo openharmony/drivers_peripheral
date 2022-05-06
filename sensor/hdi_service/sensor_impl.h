@@ -17,24 +17,18 @@
 #define OHOS_HDI_SENSOR_V1_0_SENSORIMPL_H
 
 #include "sensor_if.h"
-#include "v1_0/sensor_interface_stub.h"
+#include "v1_0/isensor_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V1_0 {
-class SensorImpl : public SensorInterfaceStub, public std::enable_shared_from_this<SensorImpl> {
+class SensorImpl : public ISensorInterface {
 public:
+    SensorImpl(): sensorInterface(NULL) {}
 
     virtual ~SensorImpl();
     void Init();
-
-    static std::shared_ptr<SensorImpl> create()
-    {
-        class MakeSharedEnabler : public SensorImpl {};
-        static std::shared_ptr<SensorImpl> impl = std::make_shared<MakeSharedEnabler>();
-        return impl;
-    }
 
     int32_t GetAllSensorInfo(std::vector<HdfSensorInformation>& info) override;
     int32_t Enable(int32_t sensorId) override;
@@ -50,9 +44,6 @@ private:
     int32_t AddSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj);
     int32_t RemoveSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj);
     int32_t UnregisterImpl(int32_t groupId, IRemoteObject *callbackObj);
-private:
-    SensorImpl(): sensorInterface(NULL)
-    {}
 };
 } // V1_0
 } // Sensor

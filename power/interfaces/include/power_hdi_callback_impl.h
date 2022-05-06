@@ -16,13 +16,13 @@
 #ifndef OHOS_HDI_POWER_V1_0_POWERHDICALLBACKIMPL_H
 #define OHOS_HDI_POWER_V1_0_POWERHDICALLBACKIMPL_H
 
-#include "v1_0/power_hdi_callback_stub.h"
+#include "v1_0/ipower_hdi_callback.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
 namespace V1_0 {
-class PowerHdiCallbackImpl : public PowerHdiCallbackStub {
+class PowerHdiCallbackImpl : public IPowerHdiCallback {
 public:
     virtual ~PowerHdiCallbackImpl() {}
 
