@@ -37,7 +37,6 @@ ohos_fuzztest("hdf_audio_hdi_flush_capture_fuzzer") {
   include_dirs = [
     "//drivers/peripheral/audio/interfaces/include",
     "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-    "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
     "//drivers/framework/include/core",
     "//drivers/framework/include/utils",
     "//drivers/framework/include/osal",
@@ -85,7 +84,6 @@ ohos_fuzztest("hdf_audio_hdi_flush_render_fuzzer") {
   include_dirs = [
     "//drivers/peripheral/audio/interfaces/include",
     "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-    "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
     "//drivers/framework/include/core",
     "//drivers/framework/include/utils",
     "//drivers/framework/include/osal",
@@ -133,7 +131,6 @@ ohos_fuzztest("hdf_audio_hdi_pause_capture_fuzzer") {
   include_dirs = [
     "//drivers/peripheral/audio/interfaces/include",
     "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-    "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
     "//drivers/framework/include/core",
     "//drivers/framework/include/utils",
     "//drivers/framework/include/osal",
@@ -181,7 +178,6 @@ ohos_fuzztest("hdf_audio_hdi_pause_render_fuzzer") {
   include_dirs = [
     "//drivers/peripheral/audio/interfaces/include",
     "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-    "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
     "//drivers/framework/include/core",
     "//drivers/framework/include/utils",
     "//drivers/framework/include/osal",
@@ -229,7 +225,6 @@ ohos_fuzztest("hdf_audio_hdi_resume_capture_fuzzer") {
   include_dirs = [
     "//drivers/peripheral/audio/interfaces/include",
     "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-    "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
     "//drivers/framework/include/core",
     "//drivers/framework/include/utils",
     "//drivers/framework/include/osal",
@@ -277,7 +272,6 @@ ohos_fuzztest("hdf_audio_hdi_resume_render_fuzzer") {
   include_dirs = [
     "//drivers/peripheral/audio/interfaces/include",
     "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-    "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
     "//drivers/framework/include/core",
     "//drivers/framework/include/utils",
     "//drivers/framework/include/osal",
@@ -325,7 +319,6 @@ ohos_fuzztest("hdf_audio_hdi_start_capture_fuzzer") {
   include_dirs = [
     "//drivers/peripheral/audio/interfaces/include",
     "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-    "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
     "//drivers/framework/include/core",
     "//drivers/framework/include/utils",
     "//drivers/framework/include/osal",
@@ -373,7 +366,6 @@ ohos_fuzztest("hdf_audio_hdi_start_render_fuzzer") {
   include_dirs = [
     "//drivers/peripheral/audio/interfaces/include",
     "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-    "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
     "//drivers/framework/include/core",
     "//drivers/framework/include/utils",
     "//drivers/framework/include/osal",
@@ -421,7 +413,6 @@ ohos_fuzztest("hdf_audio_hdi_stop_capture_fuzzer") {
   include_dirs = [
     "//drivers/peripheral/audio/interfaces/include",
     "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-    "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
     "//drivers/framework/include/core",
     "//drivers/framework/include/utils",
     "//drivers/framework/include/osal",
@@ -469,7 +460,6 @@ ohos_fuzztest("hdf_audio_hdi_stop_render_fuzzer") {
   include_dirs = [
     "//drivers/peripheral/audio/interfaces/include",
     "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-    "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
     "//drivers/framework/include/core",
     "//drivers/framework/include/utils",
     "//drivers/framework/include/osal",

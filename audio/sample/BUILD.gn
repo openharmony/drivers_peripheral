@@ -19,7 +19,6 @@ if (defined(ohos_lite)) {
   ohos_executable("audio_sample_render") {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
       "//utils/native/base/include",
       "//third_party/bounds_checking_function/include",
     ]
@@ -40,7 +39,6 @@ if (defined(ohos_lite)) {
   ohos_executable("audio_sample_capture") {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
       "//utils/native/base/include",
       "//third_party/bounds_checking_function/include",
       "//drivers/peripheral/audio/hal/hdi_binder/server/include",
@@ -60,10 +58,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   ohos_executable("audio_sample_render") {
-    include_dirs = [
-      "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
-    ]
+    include_dirs = [ "//drivers/peripheral/audio/interfaces/include" ]
 
     sources = [ "framework_render.c" ]
 
@@ -94,7 +89,6 @@ if (defined(ohos_lite)) {
   ohos_executable("audio_sample_capture") {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
       "//drivers/peripheral/audio/hal/hdi_binder/server/include",
     ]
 
