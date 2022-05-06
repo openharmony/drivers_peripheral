@@ -1,0 +1,32 @@
+{
+    "name": "nfc_device_driver",
+    "description": "nfc hdf",
+    "version": "1.0",
+    "license": "Apache License 2.0",
+    "component": {
+      "name": "nfc_device_driver",
+      "subsystem": "hdf",
+      "syscap": [ "" ],
+      "adapter_system_type": ["standard"],
+      "rom": "1000KB",
+      "ram": "1000KB",
+      "deps": {
+        "components": [
+          "ipc",
+          "device_driver_framework",
+          "hiviewdfx_hilog_native",
+          "utils_base"
+        ],
+        "third_part": [
+          "libnfc-halimpl"
+        ]
+      },
+      "build": {
+        "sub_component": [
+          "//drivers/peripheral/nfc/nfc_core/hdi_service:libnfc_core_interface_service_1.0",
+          "//third_party/nfc-nci/nfc-halimpl/SN100x:libnfc-halimpl"
+        ]
+      }
+    }
+  }
+  
