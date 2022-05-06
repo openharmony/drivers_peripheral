@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,13 +27,20 @@ extern "C" {
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002500
 
+#ifndef IFNAMSIZ
 #define IFNAMSIZ 16
+#endif
 #define ETH_ADDR_LEN 6
 #define WIFI_24G_CHANNEL_NUM 14
 #define WIFI_MAX_CHANNEL_NUM 24
 #define IEEE80211G_RATES_NUM 12
 #define IEEE80211B_RATES_NUM 4
 #define IEEE80211A_RATES_NUM 8
+
+#define WIFI_POWER_MODE_SLEEPING 0
+#define WIFI_POWER_MODE_GENERAL 1
+#define WIFI_POWER_MODE_THROUGH_WALL 2
+#define WIFI_POWER_MODE_NUM 3
 
 /* common related interface */
 enum WifiDriverClientResultCode {
@@ -221,6 +228,8 @@ int32_t AcquireChipId(const char *ifName, uint8_t *chipId);
 int32_t GetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num);
 int32_t SetResetDriver(const uint8_t chipId, const char *ifName);
 int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult);
+int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode);
+int32_t SetPowerMode(const char *ifName, uint8_t mode);
 
 /* wpa related interface */
 #define MAX_SSID_LEN 32
