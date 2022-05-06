@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -250,6 +250,25 @@ static int32_t GetNetDevInfoInner(struct NetDeviceInfoResult *netDeviceInfoResul
     return GetNetDeviceInfo(netDeviceInfoResult);
 }
 
+static int32_t GetPowerModeInner(const char *ifName, uint8_t *mode)
+{
+    if (ifName == NULL || mode == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    return GetCurrentPowerMode(ifName, mode);
+}
+
+static int32_t SetPowerModeInner(const char *ifName, uint8_t mode)
+{
+    if (ifName == NULL || mode >= WIFI_POWER_MODE_NUM) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return SetPowerMode(ifName, mode);
+}
+
 static int32_t Start(struct IWiFi *iwifi)
 {
     HalMutexLock();
@@ -338,6 +357,22 @@ static int32_t GetNetDevInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
     return ret;
 }
 
+static int32_t WifiGetPowerMode(const char *ifName, uint8_t *mode)
+{
+    HalMutexLock();
+    int32_t ret = GetPowerModeInner(ifName, mode);
+    HalMutexUnlock();
+    return ret;
+}
+
+static int32_t WifiSetPowerMode(const char *ifName, uint8_t mode)
+{
+    HalMutexLock();
+    int32_t ret = SetPowerModeInner(ifName, mode);
+    HalMutexUnlock();
+    return ret;
+}
+
 int32_t WifiConstruct(struct IWiFi **wifiInstance)
 {
     static bool isInited = false;
@@ -360,6 +395,8 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
         singleWifiInstance.unregisterEventCallback = HalUnregisterEventCallback;
         singleWifiInstance.resetDriver = ResetDriver;
         singleWifiInstance.getNetDevInfo = GetNetDevInfo;
+        singleWifiInstance.getPowerMode = WifiGetPowerMode;
+        singleWifiInstance.setPowerMode = WifiSetPowerMode;
         InitIWiFiList();
         isInited = true;
     }

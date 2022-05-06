@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,49 +13,52 @@
  * limitations under the License.
  */
 
-#include <stdio.h>
-#include <stdbool.h>
+#include <arpa/inet.h>
 #include <dirent.h>
-#include <unistd.h>
-#include <securec.h>
-#include <net/if.h>
 #include <linux/if.h>
 #include <linux/if_arp.h>
-#include <linux/nl80211.h>
 #include <linux/netlink.h>
+#include <linux/nl80211.h>
 #include <linux/wireless.h>
+#include <net/if.h>
+#include <netlink-private/types.h>
 #include <netlink/genl/ctrl.h>
 #include <netlink/genl/genl.h>
 #include <netlink/handlers.h>
+#include <securec.h>
+#include <stdbool.h>
+#include <stdio.h>
 #include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/time.h>
 #include <sys/socket.h>
-#include <netlink-private/types.h>
-#include <arpa/inet.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-#include "hilog/log.h"
 #include "../wifi_common_cmd.h"
+#include "hilog/log.h"
 #include "netlink_adapter.h"
 
 #define VENDOR_ID 0x001A11
 
 // vendor subcmd
-#define WIFI_SUBCMD_SET_COUNTRY_CODE 0x100E
+#define WIFI_SUBCMD_SET_COUNTRY_CODE   0x100E
 #define WIFI_SUBCMD_SET_RANDOM_MAC_OUI 0x100C
 
-#define WAITFORMUTEX 100000
+#define WAITFORMUTEX  100000
 #define WAITFORTHREAD 100000
-#define RETRIES 30
+#define RETRIES       30
 
-#define STR_WLAN0 "wlan0"
-#define STR_WLAN1 "wlan1"
-#define STR_P2P0 "p2p0"
-#define STR_P2P0_X "p2p0-"
-#define STRLEN_WLAN0 5
-#define STRLEN_WLAN1 5
-#define STRLEN_P2P0 4
-#define STRLEN_P2P0_X 5
+#define STR_WLAN0     "wlan0"
+#define STR_WLAN1     "wlan1"
+#define STR_P2P0      "p2p0"
+#define STR_P2P0_X    "p2p0-"
+
+#define PRIMARY_ID_POWER_MODE    0x8bfd
+#define SECONDARY_ID_POWER_MODE 0x101
+#define SET_POWER_MODE_SLEEP     "pow_mode sleep"
+#define SET_POWER_MODE_INIT      "pow_mode init"
+#define SET_POWER_MODE_THIRD     "pow_mode third"
+#define GET_POWER_MODE           "get_pow_mode"
 
 // vendor attr
 enum AndrWifiAttr {
@@ -81,6 +84,23 @@ struct WifiHalInfo {
     enum ThreadStatus status;
     pthread_mutex_t mutex;
 };
+
+typedef struct {
+    void *buf;
+    uint16_t length;
+    uint16_t flags;
+} DataPoint;
+
+union HwprivReqData {
+    char name[IFNAMSIZ];
+    int32_t mode;
+    DataPoint point;
+};
+
+typedef struct {
+    char interfaceName[IFNAMSIZ];
+    union HwprivReqData data;
+} HwprivIoctlData;
 
 static struct WifiHalInfo g_wifiHalInfo = {0};
 
@@ -211,8 +231,8 @@ int32_t SendCmdSync(struct nl_msg *msg, const RespHandler handler, void *data)
     while (error > 0) {
         rc = nl_recvmsgs(g_wifiHalInfo.cmdSock, cb);
         if (rc < 0) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: nl_recvmsgs failed: rc = %d, errno = %d, (%s)",
-                __FUNCTION__, rc, errno, strerror(errno));
+            HILOG_ERROR(LOG_DOMAIN, "%s: nl_recvmsgs failed: rc = %d, errno = %d, (%s)", __FUNCTION__, rc, errno,
+                strerror(errno));
         }
     }
     nl_cb_put(cb);
@@ -234,18 +254,15 @@ static int FamilyIdHandler(struct nl_msg *msg, void *arg)
         return NL_SKIP;
     }
 
-    nla_parse(attr, CTRL_ATTR_MAX, genlmsg_attrdata(hdr, 0),
-        genlmsg_attrlen(hdr, 0), NULL);
+    nla_parse(attr, CTRL_ATTR_MAX, genlmsg_attrdata(hdr, 0), genlmsg_attrlen(hdr, 0), NULL);
     if (!attr[CTRL_ATTR_MCAST_GROUPS]) {
         return NL_SKIP;
     }
 
     nla_for_each_nested(mcastGrp, attr[CTRL_ATTR_MCAST_GROUPS], i) {
         struct nlattr *attrMcastGrp[CTRL_ATTR_MCAST_GRP_MAX + 1];
-        nla_parse(attrMcastGrp, CTRL_ATTR_MCAST_GRP_MAX, nla_data(mcastGrp),
-            nla_len(mcastGrp), NULL);
-        if (attrMcastGrp[CTRL_ATTR_MCAST_GRP_NAME] &&
-            attrMcastGrp[CTRL_ATTR_MCAST_GRP_ID] &&
+        nla_parse(attrMcastGrp, CTRL_ATTR_MCAST_GRP_MAX, nla_data(mcastGrp), nla_len(mcastGrp), NULL);
+        if (attrMcastGrp[CTRL_ATTR_MCAST_GRP_NAME] && attrMcastGrp[CTRL_ATTR_MCAST_GRP_ID] &&
             strncmp(nla_data(attrMcastGrp[CTRL_ATTR_MCAST_GRP_NAME]), familyData->group,
                 nla_len(attrMcastGrp[CTRL_ATTR_MCAST_GRP_NAME])) == 0) {
             familyData->id = nla_get_u32(attrMcastGrp[CTRL_ATTR_MCAST_GRP_ID]);
@@ -301,8 +318,8 @@ static int NlsockAddMembership(struct nl_sock *sock, const char *group)
 
     ret = nl_socket_add_membership(sock, id);
     if (ret < 0) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Could not add multicast membership for %d: %d (%s)",
-            __FUNCTION__, id, ret, strerror(-ret));
+        HILOG_ERROR(LOG_DOMAIN, "%s: Could not add multicast membership for %d: %d (%s)", __FUNCTION__, id, ret,
+            strerror(-ret));
         return RET_CODE_FAILURE;
     }
 
@@ -462,35 +479,32 @@ static int32_t ParserIsSupportCombo(struct nl_msg *msg, void *arg)
     struct nlattr *attrComb[NUM_NL80211_IFACE_COMB];
     uint8_t *isSupportCombo = (uint8_t *)arg;
     int32_t ret, i;
-    static struct nla_policy
-    ifaceCombPolicy[NUM_NL80211_IFACE_COMB];
+    static struct nla_policy ifaceCombPolicy[NUM_NL80211_IFACE_COMB];
     ifaceCombPolicy[NL80211_IFACE_COMB_LIMITS].type = NLA_NESTED;
     ifaceCombPolicy[NL80211_IFACE_COMB_MAXNUM].type = NLA_U32;
     ifaceCombPolicy[NL80211_IFACE_COMB_NUM_CHANNELS].type = NLA_U32;
-    
+
     // parse all enum nl80211_attrs type
-    ret = nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0),
-        genlmsg_attrlen(hdr, 0), NULL);
+    ret = nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0), genlmsg_attrlen(hdr, 0), NULL);
     if (ret != 0) {
         HILOG_ERROR(LOG_DOMAIN, "%s: nla_parse tb failed", __FUNCTION__);
         return NL_SKIP;
     }
 
     if (attr[NL80211_ATTR_INTERFACE_COMBINATIONS] != NULL) {
-        nla_for_each_nested(nlComb, attr[NL80211_ATTR_INTERFACE_COMBINATIONS], i) {
+        nla_for_each_nested(nlComb, attr[NL80211_ATTR_INTERFACE_COMBINATIONS], i)
+        {
             // parse all enum nl80211_if_combination_attrs type
-            ret = nla_parse_nested(attrComb, MAX_NL80211_IFACE_COMB,
-                nlComb, ifaceCombPolicy);
+            ret = nla_parse_nested(attrComb, MAX_NL80211_IFACE_COMB, nlComb, ifaceCombPolicy);
             if (ret != 0) {
                 HILOG_ERROR(LOG_DOMAIN, "%s: nla_parse_nested nlComb failed", __FUNCTION__);
                 return NL_SKIP;
             }
-            if (!attrComb[NL80211_IFACE_COMB_LIMITS] ||
-                !attrComb[NL80211_IFACE_COMB_MAXNUM] ||
+            if (!attrComb[NL80211_IFACE_COMB_LIMITS] || !attrComb[NL80211_IFACE_COMB_MAXNUM] ||
                 !attrComb[NL80211_IFACE_COMB_NUM_CHANNELS]) {
-                    *isSupportCombo = 0;
+                *isSupportCombo = 0;
             } else {
-                    *isSupportCombo = 1;
+                *isSupportCombo = 1;
             }
         }
     }
@@ -508,16 +522,15 @@ static int32_t ParserSupportComboInfo(struct nl_msg *msg, void *arg)
     struct nlattr *attrLimit[NUM_NL80211_IFACE_LIMIT];
     int32_t ret, i, j, k, type;
     static struct nla_policy ifaceCombPolicy[NUM_NL80211_IFACE_COMB];
-    ifaceCombPolicy[NL80211_IFACE_COMB_LIMITS].type  = NLA_NESTED;
-    ifaceCombPolicy[NL80211_IFACE_COMB_MAXNUM].type  = NLA_U32;
-    ifaceCombPolicy[NL80211_IFACE_COMB_NUM_CHANNELS].type  = NLA_U32;
+    ifaceCombPolicy[NL80211_IFACE_COMB_LIMITS].type = NLA_NESTED;
+    ifaceCombPolicy[NL80211_IFACE_COMB_MAXNUM].type = NLA_U32;
+    ifaceCombPolicy[NL80211_IFACE_COMB_NUM_CHANNELS].type = NLA_U32;
 
     static struct nla_policy ifaceLimitPolicy[NUM_NL80211_IFACE_LIMIT];
-    ifaceLimitPolicy[NL80211_IFACE_LIMIT_MAX].type  = NLA_U32;
-    ifaceLimitPolicy[NL80211_IFACE_LIMIT_TYPES].type  = NLA_NESTED;
-    
-    ret = nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0),
-        genlmsg_attrlen(hdr, 0), NULL);
+    ifaceLimitPolicy[NL80211_IFACE_LIMIT_MAX].type = NLA_U32;
+    ifaceLimitPolicy[NL80211_IFACE_LIMIT_TYPES].type = NLA_NESTED;
+
+    ret = nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0), genlmsg_attrlen(hdr, 0), NULL);
     if (ret != 0) {
         HILOG_ERROR(LOG_DOMAIN, "%s: nla_parse tb failed", __FUNCTION__);
         return NL_SKIP;
@@ -525,26 +538,26 @@ static int32_t ParserSupportComboInfo(struct nl_msg *msg, void *arg)
 
     if (attr[NL80211_ATTR_INTERFACE_COMBINATIONS] != NULL) {
         // get each ieee80211_iface_combination
-        nla_for_each_nested(nlComb, attr[NL80211_ATTR_INTERFACE_COMBINATIONS], i) {
-            ret = nla_parse_nested(attrComb, MAX_NL80211_IFACE_COMB,
-                nlComb, ifaceCombPolicy);
+        nla_for_each_nested(nlComb, attr[NL80211_ATTR_INTERFACE_COMBINATIONS], i)
+        {
+            ret = nla_parse_nested(attrComb, MAX_NL80211_IFACE_COMB, nlComb, ifaceCombPolicy);
             if (ret != 0) {
                 HILOG_ERROR(LOG_DOMAIN, "%s: nla_parse_nested nlComb failed", __FUNCTION__);
                 return NL_SKIP;
             }
-            if (!attrComb[NL80211_IFACE_COMB_LIMITS] ||
-                !attrComb[NL80211_IFACE_COMB_MAXNUM] ||
+            if (!attrComb[NL80211_IFACE_COMB_LIMITS] || !attrComb[NL80211_IFACE_COMB_MAXNUM] ||
                 !attrComb[NL80211_IFACE_COMB_NUM_CHANNELS]) {
                 return RET_CODE_NOT_SUPPORT;
             }
             // parse each ieee80211_iface_limit
-            nla_for_each_nested(nlLimit, attrComb[NL80211_IFACE_COMB_LIMITS], j) {
-                ret = nla_parse_nested(attrLimit, MAX_NL80211_IFACE_LIMIT,
-                    nlLimit, ifaceLimitPolicy);
+            nla_for_each_nested(nlLimit, attrComb[NL80211_IFACE_COMB_LIMITS], j)
+            {
+                ret = nla_parse_nested(attrLimit, MAX_NL80211_IFACE_LIMIT, nlLimit, ifaceLimitPolicy);
                 if (ret || !attrLimit[NL80211_IFACE_LIMIT_TYPES])
                     return RET_CODE_NOT_SUPPORT; /* broken combination */
                 // parse each ieee80211_iface_limit's types
-                nla_for_each_nested(nlMode, attrLimit[NL80211_IFACE_LIMIT_TYPES], k) {
+                nla_for_each_nested(nlMode, attrLimit[NL80211_IFACE_LIMIT_TYPES], k)
+                {
                     type = nla_type(nlMode);
                     if (type > WIFI_IFTYPE_UNSPECIFIED && type < WIFI_IFTYPE_MAX) {
                         HILOG_INFO(LOG_DOMAIN, "%s: mode: %d", __FUNCTION__, type);
@@ -576,23 +589,21 @@ static int32_t ParserValidFreq(struct nl_msg *msg, void *arg)
     freqPolicy[NL80211_FREQUENCY_ATTR_FREQ].type = NLA_U32;
     freqPolicy[NL80211_FREQUENCY_ATTR_MAX_TX_POWER].type = NLA_U32;
 
-    nla_parse(attrMsg, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0),
-        genlmsg_attrlen(hdr, 0), NULL);
+    nla_parse(attrMsg, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0), genlmsg_attrlen(hdr, 0), NULL);
     if (!attrMsg[NL80211_ATTR_WIPHY_BANDS]) {
         HILOG_ERROR(LOG_DOMAIN, "%s: no wiphy bands", __FUNCTION__);
         return NL_SKIP;
     }
-    HILOG_INFO(LOG_DOMAIN, "%s: parse freq 000000000000000000", __FUNCTION__);
     // get each ieee80211_supported_band
-    nla_for_each_nested(nlBand, attrMsg[NL80211_ATTR_WIPHY_BANDS], i) {
-        nla_parse(attrBand, NL80211_BAND_ATTR_MAX, nla_data(nlBand),
-            nla_len(nlBand), NULL);
+    nla_for_each_nested(nlBand, attrMsg[NL80211_ATTR_WIPHY_BANDS], i)
+    {
+        nla_parse(attrBand, NL80211_BAND_ATTR_MAX, nla_data(nlBand), nla_len(nlBand), NULL);
         if (attrBand[NL80211_BAND_ATTR_FREQS] == NULL)
             continue;
         // get each ieee80211_channel
-        nla_for_each_nested(nlFreq, attrBand[NL80211_BAND_ATTR_FREQS], j) {
-            nla_parse(attrFreq, NL80211_FREQUENCY_ATTR_MAX,
-                nla_data(nlFreq), nla_len(nlFreq), freqPolicy);
+        nla_for_each_nested(nlFreq, attrBand[NL80211_BAND_ATTR_FREQS], j)
+        {
+            nla_parse(attrFreq, NL80211_FREQUENCY_ATTR_MAX, nla_data(nlFreq), nla_len(nlFreq), freqPolicy);
             // get center freq
             if (!attrFreq[NL80211_FREQUENCY_ATTR_FREQ] && attrFreq[NL80211_FREQUENCY_ATTR_MAX_TX_POWER])
                 continue;
@@ -643,8 +654,7 @@ static int32_t GetAllIfaceInfo(struct NetworkInfoResult *infoResult)
             continue;
         }
         if (IsWifiIface(de->d_name)) {
-            if (strncpy_s(infoResult->infos[infoResult->nums].name, IFNAMSIZ,
-                de->d_name, sizeof(de->d_name)) != EOK) {
+            if (strncpy_s(infoResult->infos[infoResult->nums].name, IFNAMSIZ, de->d_name, sizeof(de->d_name)) != EOK) {
                 HILOG_ERROR(LOG_DOMAIN, "%s: strncpy_s infoResult->infos failed", __FUNCTION__);
                 return RET_CODE_FAILURE;
             }
@@ -670,20 +680,20 @@ int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result)
 
     HILOG_INFO(LOG_DOMAIN, "%s: wifi iface num %d", __FUNCTION__, result->nums);
     for (i = 0; i < result->nums; ++i) {
-        ret = memset_s(result->infos[i].supportMode, sizeof(result->infos[i].supportMode),
-            0, sizeof(result->infos[i].supportMode));
+        ret = memset_s(result->infos[i].supportMode, sizeof(result->infos[i].supportMode), 0,
+            sizeof(result->infos[i].supportMode));
         if (ret != EOK) {
             HILOG_ERROR(LOG_DOMAIN, "%s: memset_s esult->infos failed", __FUNCTION__);
             return RET_CODE_FAILURE;
         }
-        if (strncmp(result->infos[i].name, STR_WLAN0, STRLEN_WLAN0) == 0) {
+        if (strncmp(result->infos[i].name, STR_WLAN0, strlen(STR_WLAN0)) == 0) {
             result->infos[i].supportMode[WIFI_IFTYPE_STATION] = 1;
             result->infos[i].supportMode[WIFI_IFTYPE_AP] = 1;
-        } else if (strncmp(result->infos[i].name, STR_WLAN1, STRLEN_WLAN1) == 0) {
+        } else if (strncmp(result->infos[i].name, STR_WLAN1, strlen(STR_WLAN1)) == 0) {
             result->infos[i].supportMode[WIFI_IFTYPE_STATION] = 1;
-        } else if (strncmp(result->infos[i].name, STR_P2P0, STRLEN_P2P0) == 0) {
+        } else if (strncmp(result->infos[i].name, STR_P2P0, strlen(STR_P2P0)) == 0) {
             result->infos[i].supportMode[WIFI_IFTYPE_P2P_DEVICE] = 1;
-        } else if (strncmp(result->infos[i].name, STR_P2P0_X, STRLEN_P2P0_X) == 0) {
+        } else if (strncmp(result->infos[i].name, STR_P2P0_X, strlen(STR_P2P0_X)) == 0) {
             result->infos[i].supportMode[WIFI_IFTYPE_P2P_CLIENT] = 1;
             result->infos[i].supportMode[WIFI_IFTYPE_P2P_GO] = 1;
         }
@@ -716,8 +726,7 @@ int32_t IsSupportCombo(uint8_t *isSupportCombo)
         return RET_CODE_NOMEM;
     }
 
-    genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_DUMP,
-        NL80211_CMD_GET_WIPHY, 0);
+    genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_DUMP, NL80211_CMD_GET_WIPHY, 0);
     nla_put_flag(msg, NL80211_ATTR_SPLIT_WIPHY_DUMP);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
     ret = SendCmdSync(msg, ParserIsSupportCombo, isSupportCombo);
@@ -756,8 +765,7 @@ int32_t GetComboInfo(uint64_t *comboInfo, uint32_t size)
         HILOG_ERROR(LOG_DOMAIN, "%s: nlmsg alloc failed", __FUNCTION__);
         return RET_CODE_NOMEM;
     }
-    genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_DUMP,
-        NL80211_CMD_GET_WIPHY, 0);
+    genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_DUMP, NL80211_CMD_GET_WIPHY, 0);
     nla_put_flag(msg, NL80211_ATTR_SPLIT_WIPHY_DUMP);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
     ret = SendCmdSync(msg, ParserSupportComboInfo, comboInfo);
@@ -791,9 +799,7 @@ int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
 
     ret = ioctl(fd, SIOCSIFHWADDR, &req);
     if (ret != 0) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: ioctl failed, errno = %d, (%s)\n",
-            __FUNCTION__, errno, strerror(errno));
-        printf("%s: octl failed, errno = %d, (%s)\n", __FUNCTION__, errno, strerror(errno));
+        HILOG_ERROR(LOG_DOMAIN, "%s: ioctl failed, errno = %d, (%s)\n", __FUNCTION__, errno, strerror(errno));
         ret = RET_CODE_FAILURE;
     }
     close(fd);
@@ -808,8 +814,7 @@ static int32_t ParserChipId(struct nl_msg *msg, void *arg)
     uint8_t *getChipId = NULL;
     int32_t ret;
 
-    ret = nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0),
-        genlmsg_attrlen(hdr, 0), NULL);
+    ret = nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0), genlmsg_attrlen(hdr, 0), NULL);
     if (ret != 0) {
         HILOG_ERROR(LOG_DOMAIN, "%s: nla_parse failed", __FUNCTION__);
         return NL_SKIP;
@@ -823,8 +828,7 @@ static int32_t ParserChipId(struct nl_msg *msg, void *arg)
     return NL_SKIP;
 }
 
-int32_t GetDevMacAddr(const char *ifName,
-    int32_t type, uint8_t *mac, uint8_t len)
+int32_t GetDevMacAddr(const char *ifName, int32_t type, uint8_t *mac, uint8_t len)
 {
     (void)type;
     int fd, ret;
@@ -839,8 +843,7 @@ int32_t GetDevMacAddr(const char *ifName,
     strncpy_s(req.ifr_name, IFNAMSIZ, ifName, strlen(ifName));
     ret = ioctl(fd, SIOCGIFHWADDR, &req);
     if (ret != 0) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: ioctl failed, errno = %d, (%s)\n",
-            __FUNCTION__, errno, strerror(errno));
+        HILOG_ERROR(LOG_DOMAIN, "%s: ioctl failed, errno = %d, (%s)\n", __FUNCTION__, errno, strerror(errno));
         close(fd);
         return RET_CODE_FAILURE;
     }
@@ -875,8 +878,7 @@ int32_t GetValidFreqByBand(const char *ifName, int32_t band, struct FreqInfoResu
         return RET_CODE_NOMEM;
     }
 
-    genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_DUMP,
-        NL80211_CMD_GET_WIPHY, 0);
+    genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_DUMP, NL80211_CMD_GET_WIPHY, 0);
     nla_put_flag(msg, NL80211_ATTR_SPLIT_WIPHY_DUMP);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
     ret = memset_s(result->freqs, size * sizeof(int32_t), 0, sizeof(result->freqs));
@@ -904,29 +906,28 @@ int32_t SetTxPower(const char *ifName, int32_t power)
 
     ifaceId = if_nametoindex(ifName);
     if (ifaceId == 0) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: get iface id(%d) failed", __func__, ifaceId);
+        HILOG_ERROR(LOG_DOMAIN, "%s: get iface id(%d) failed", __FUNCTION__, ifaceId);
         return RET_CODE_INVALID_PARAM;
     }
 
     msg = nlmsg_alloc();
     if (msg == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: nlmsg alloc failed", __func__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: nlmsg alloc failed", __FUNCTION__);
         return RET_CODE_NOMEM;
     }
 
-    genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0,
-        NL80211_CMD_SET_WIPHY, 0);
+    genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0, NL80211_CMD_SET_WIPHY, 0);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
     nla_put_u32(msg, NL80211_ATTR_WIPHY_TX_POWER_SETTING, NL80211_TX_POWER_LIMITED);
     nla_put_u32(msg, NL80211_ATTR_WIPHY_TX_POWER_LEVEL, 100 * power);
     ret = SendCmdSync(msg, NULL, NULL);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed", __func__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed", __FUNCTION__);
         nlmsg_free(msg);
         return RET_CODE_FAILURE;
     }
     nlmsg_free(msg);
-    HILOG_INFO(LOG_DOMAIN, "%s: send end success", __func__);
+    HILOG_INFO(LOG_DOMAIN, "%s: send end success", __FUNCTION__);
     return RET_CODE_SUCCESS;
 }
 
@@ -987,22 +988,21 @@ int32_t SetScanMacAddr(const char *ifName, uint8_t *scanMac, uint8_t len)
     struct nlattr *data = NULL;
 
     if (msg == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: nlmsg alloc failed", __func__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: nlmsg alloc failed", __FUNCTION__);
         return RET_CODE_NOMEM;
     }
     if (ifaceId == 0) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: if_nametoindex failed", __func__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: if_nametoindex failed", __FUNCTION__);
         nlmsg_free(msg);
         return RET_CODE_FAILURE;
     }
-    genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0,
-        NL80211_CMD_VENDOR, 0);
+    genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0, NL80211_CMD_VENDOR, 0);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
     nla_put_u32(msg, NL80211_ATTR_VENDOR_ID, VENDOR_ID);
     nla_put_u32(msg, NL80211_ATTR_VENDOR_SUBCMD, WIFI_SUBCMD_SET_RANDOM_MAC_OUI);
     data = nla_nest_start(msg, NL80211_ATTR_VENDOR_DATA);
     if (data == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: nla_nest_start failed", __func__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: nla_nest_start failed", __FUNCTION__);
         nlmsg_free(msg);
         return RET_CODE_FAILURE;
     }
@@ -1010,7 +1010,7 @@ int32_t SetScanMacAddr(const char *ifName, uint8_t *scanMac, uint8_t len)
     nla_nest_end(msg, data);
     ret = SendCmdSync(msg, NULL, NULL);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed", __func__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed", __FUNCTION__);
     }
     nlmsg_free(msg);
     return ret;
@@ -1029,13 +1029,13 @@ int32_t AcquireChipId(const char *ifName, uint8_t *chipId)
 
     ifaceId = if_nametoindex(ifName);
     if (ifaceId == 0) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: if_nametoindex failed", __func__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: if_nametoindex failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
 
     msg = nlmsg_alloc();
     if (msg == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: nlmsg alloc failed", __func__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: nlmsg alloc failed", __FUNCTION__);
         return RET_CODE_NOMEM;
     }
 
@@ -1084,8 +1084,7 @@ static int NetDeviceInfoHandler(struct nl_msg *msg, void *arg)
     struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
     struct NetDeviceInfo *info = (struct NetDeviceInfo *)arg;
 
-    nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0),
-        genlmsg_attrlen(hdr, 0), NULL);
+    nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0), genlmsg_attrlen(hdr, 0), NULL);
 
     if (attr[NL80211_ATTR_IFTYPE]) {
         info->iftype = nla_get_u32(attr[NL80211_ATTR_IFTYPE]);
@@ -1157,7 +1156,7 @@ static int CmdScanPutMsg(struct nl_msg *msg, const WifiScan *scan)
     if (scan->ssids) {
         nest = nla_nest_start(msg, NL80211_ATTR_SCAN_SSIDS);
         if (nest == NULL) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: nla_nest_start failed", __func__);
+            HILOG_ERROR(LOG_DOMAIN, "%s: nla_nest_start failed", __FUNCTION__);
             return RET_CODE_FAILURE;
         }
         for (i = 0; i < scan->numSsids; i++) {
@@ -1169,7 +1168,7 @@ static int CmdScanPutMsg(struct nl_msg *msg, const WifiScan *scan)
     if (scan->freqs) {
         nest = nla_nest_start(msg, NL80211_ATTR_SCAN_FREQUENCIES);
         if (nest == NULL) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: nla_nest_start failed", __func__);
+            HILOG_ERROR(LOG_DOMAIN, "%s: nla_nest_start failed", __FUNCTION__);
             return RET_CODE_FAILURE;
         }
         for (i = 0; i < scan->numFreqs; i++) {
@@ -1196,13 +1195,13 @@ int32_t WifiCmdScan(const char *ifName, WifiScan *scan)
     int32_t ret;
 
     if (ifaceId == 0) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: if_nametoindex failed", __func__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: if_nametoindex failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
 
     msg = nlmsg_alloc();
     if (msg == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: nlmsg alloc failed", __func__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: nlmsg alloc failed", __FUNCTION__);
         return RET_CODE_NOMEM;
     }
 
@@ -1211,13 +1210,13 @@ int32_t WifiCmdScan(const char *ifName, WifiScan *scan)
 
     ret = CmdScanPutMsg(msg, scan);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: put msg failed\n", __func__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: put msg failed\n", __FUNCTION__);
         goto err;
     }
 
     ret = SendCmdSync(msg, NULL, NULL);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed\n", __func__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed\n", __FUNCTION__);
         goto err;
     }
 
@@ -1225,4 +1224,137 @@ int32_t WifiCmdScan(const char *ifName, WifiScan *scan)
 err:
     nlmsg_free(msg);
     return RET_CODE_FAILURE;
+}
+
+static int32_t ParsePowerMode(const char *buf, uint16_t len, uint8_t *mode)
+{
+    char *key[WIFI_POWER_MODE_NUM] = {"sleep", "third", "init"};
+    char *str = "pow_mode = ";
+    if (buf == NULL || mode == NULL) {
+        return RET_CODE_INVALID_PARAM;
+    }
+    char *pos = strstr(buf, str);
+    if (pos == NULL) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: no power mode", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    pos += strlen(str);
+    if (!strcmp(pos, key[WIFI_POWER_MODE_SLEEPING])) {
+        *mode = WIFI_POWER_MODE_SLEEPING;
+    } else if (!strcmp(pos, key[WIFI_POWER_MODE_GENERAL])) {
+        *mode = WIFI_POWER_MODE_GENERAL;
+    } else if (!strcmp(pos, key[WIFI_POWER_MODE_THROUGH_WALL])) {
+        *mode = WIFI_POWER_MODE_THROUGH_WALL;
+    } else {
+        HILOG_ERROR(LOG_DOMAIN, "%s: no invalid power mode", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    return RET_CODE_SUCCESS;
+}
+
+int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode)
+{
+    int32_t fd = socket(PF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+    int32_t ret;
+    HwprivIoctlData ioctlData = {0};
+
+    if (fd < 0) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: open socket failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    do {
+        if (strcpy_s(ioctlData.interfaceName, IFNAMSIZ, ifName)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: strcpy_s failed", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+        ioctlData.data.point.flags = SECONDARY_ID_POWER_MODE;
+        ioctlData.data.point.length = strlen(GET_POWER_MODE) + 1;
+        ioctlData.data.point.buf = calloc(ioctlData.data.point.length, sizeof(char));
+        if (ioctlData.data.point.buf == NULL) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: calloc failed", __FUNCTION__);
+            ret = RET_CODE_NOMEM;
+            break;
+        }
+        if (memcpy_s(ioctlData.data.point.buf, ioctlData.data.point.length, GET_POWER_MODE, strlen(GET_POWER_MODE))) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: memcpy_s failed", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+        ret = ioctl(fd, PRIMARY_ID_POWER_MODE, &ioctlData);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: ioctl failed, errno = %d, (%s)\n", __FUNCTION__, errno, strerror(errno));
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+        ret = ParsePowerMode(ioctlData.data.point.buf, ioctlData.data.point.length, mode);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: ParsePowerMode failed\n", __FUNCTION__);
+            break;
+        }
+    } while (0);
+    if (ioctlData.data.point.buf != NULL) {
+        free(ioctlData.data.point.buf);
+        ioctlData.data.point.buf = NULL;
+    }
+    close(fd);
+    return ret;
+}
+
+static int32_t FillHwprivIoctlData(HwprivIoctlData *ioctlData, uint8_t mode)
+{
+    char *strTable[WIFI_POWER_MODE_NUM] = {SET_POWER_MODE_SLEEP, SET_POWER_MODE_THIRD, SET_POWER_MODE_INIT};
+
+    ioctlData->data.point.length = strlen(strTable[mode]) + 1;
+    ioctlData->data.point.buf = calloc(ioctlData->data.point.length, sizeof(char));
+    if (ioctlData->data.point.buf == NULL) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: calloc failed", __FUNCTION__);
+        return RET_CODE_NOMEM;
+    }
+    ioctlData->data.point.flags = SECONDARY_ID_POWER_MODE;
+    if (sprintf_s(ioctlData->data.point.buf, ioctlData->data.point.length, "%s", strTable[mode]) !=
+        strlen(strTable[mode])) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: sprintf failed", __FUNCTION__);
+        free(ioctlData->data.point.buf);
+        return RET_CODE_FAILURE;
+    }
+
+    return RET_CODE_SUCCESS;
+}
+
+int32_t SetPowerMode(const char *ifName, uint8_t mode)
+{
+    int32_t fd;
+    int32_t ret;
+    HwprivIoctlData ioctlData = {0};
+
+    fd = socket(PF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+    if (fd < 0) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: open socket failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+
+    do {
+        if (strcpy_s(ioctlData.interfaceName, IFNAMSIZ, ifName)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: strcpy_s failed", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+        ret = FillHwprivIoctlData(&ioctlData, mode);
+        if (ret != RET_CODE_SUCCESS) {
+            break;
+        }
+        ret = ioctl(fd, PRIMARY_ID_POWER_MODE, &ioctlData);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: ioctl failed, errno = %d, (%s)\n", __FUNCTION__, errno, strerror(errno));
+            ret = RET_CODE_FAILURE;
+        }
+    } while (0);
+
+    if (ioctlData.data.point.buf != NULL) {
+        free(ioctlData.data.point.buf);
+        ioctlData.data.point.buf = NULL;
+    }
+    close(fd);
+    return ret;
 }

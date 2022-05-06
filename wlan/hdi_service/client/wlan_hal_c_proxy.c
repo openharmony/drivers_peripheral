@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1090,6 +1090,86 @@ finished:
     return ec;
 }
 
+static int32_t WlanGetPowerMode(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, uint8_t *mode)
+{
+    int32_t ec = HDF_FAILURE;
+
+    if (self == NULL) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
+    do {
+        if (data == NULL || reply == NULL) {
+            HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+            ec = HDF_ERR_MALLOC_FAIL;
+            break;
+        }
+        if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+            !HdfSbufWriteString(data, ifeature->ifName)) {
+            HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
+            ec = HDF_ERR_MALLOC_FAIL;
+            break;
+        }
+        ec = WlanProxyCall(self, WLAN_SERVICE_GET_POWER_MODE, data, reply);
+        if (ec != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
+            ec = HDF_FAILURE;
+            break;
+        }
+        if (!HdfSbufReadUint8(reply, mode)) {
+            ec = HDF_FAILURE;
+        }
+    } while (0);
+
+    if (data != NULL) {
+        HdfSbufRecycle(data);
+    }
+    if (reply != NULL) {
+        HdfSbufRecycle(reply);
+    }
+    return ec;
+}
+
+static int32_t WlanSetPowerMode(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, uint8_t mode)
+{
+    int32_t ec = HDF_FAILURE;
+
+    if (self == NULL) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
+    do {
+        if (data == NULL) {
+            HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+            ec = HDF_ERR_MALLOC_FAIL;
+            break;
+        }
+        if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
+            !HdfSbufWriteString(data, ifeature->ifName)) {
+            HDF_LOGE("%{public}s: write ifeature->ifName failed!", __func__);
+            ec = HDF_ERR_MALLOC_FAIL;
+            break;
+        }
+        if (!HdfSbufWriteUint8(data, mode)) {
+            HDF_LOGE("%{public}s: write power mode failed!", __func__);
+            ec = HDF_ERR_MALLOC_FAIL;
+            break;
+        }
+        ec = WlanProxyCall(self, WLAN_SERVICE_GET_POWER_MODE, data, NULL);
+        if (ec != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
+        }
+    } while (0);
+
+    if (data != NULL) {
+        HdfSbufRecycle(data);
+    }
+    return ec;
+}
+
 static void IwifiConstruct(struct IWifiInterface *inst)
 {
     inst->construct = WlanConstruct;
@@ -1117,6 +1197,8 @@ static void IwifiConstruct(struct IWifiInterface *inst)
     inst->setTxPower = WlanSetTxPower;
     inst->getNetDevInfo = WlanGetNetDevInfo;
     inst->startScan = WlanStartScan;
+    inst->getPowerMode = WlanGetPowerMode;
+    inst->setPowerMode = WlanSetPowerMode;
 }
 
 struct IWifiInterface *HdIWifiInterfaceGet(const char *serviceName)
