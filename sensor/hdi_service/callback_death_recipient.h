@@ -26,11 +26,11 @@ namespace Sensor {
 namespace V1_0 {
 class CallBackDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
-    explicit CallBackDeathRecipient(std::weak_ptr<SensorImpl> sensorImpl) : sensorImpl(sensorImpl) {};
+    explicit CallBackDeathRecipient(const wptr<SensorImpl> &sensorImpl) : sensorImpl(sensorImpl) {};
     virtual ~CallBackDeathRecipient() = default;
     void OnRemoteDied(const wptr<IRemoteObject> &object) override
     {
-        std::shared_ptr<SensorImpl> impl = sensorImpl.lock();
+        sptr<SensorImpl> impl = sensorImpl.promote();
         if (impl == nullptr) {
             return;
         }
@@ -38,7 +38,7 @@ public:
     };
 
 private:
-    std::weak_ptr<SensorImpl> sensorImpl;
+    wptr<SensorImpl> sensorImpl;
 };
 }  // namespace V1_0
 }  // namespace Senosr

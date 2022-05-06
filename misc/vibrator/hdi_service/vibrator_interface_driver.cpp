@@ -18,34 +18,36 @@
 #include <hdf_sbuf_ipc.h>
 #include <hdf_log.h>
 #include <osal_mem.h>
-#include "vibrator_interface_impl.h"
+#include "v1_0/vibrator_interface_stub.h"
 
 #define HDF_LOG_TAG              hdf_vibrator_if_driver
 
 using namespace OHOS::HDI::Vibrator::V1_0;
 
 struct HdfVibratorInterfaceHost {
-    struct IDeviceIoService ioservice;
-    VibratorInterfaceImpl *service;
+    struct IDeviceIoService ioService;
+    OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
 static int32_t VibratorInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    struct HdfVibratorInterfaceHost *hdfVibratorInterfaceHost = CONTAINER_OF(
-        client->device->service, struct HdfVibratorInterfaceHost, ioservice);
+    auto *hdfVibratorInterfaceHost = CONTAINER_OF(client->device->service, struct HdfVibratorInterfaceHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
     OHOS::MessageOption option;
 
-    (void)SbufToParcel(reply, &replyParcel);
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
 
-    return hdfVibratorInterfaceHost->service->OnRemoteRequest(cmdId, *dataParcel, *replyParcel, option);
+    return hdfVibratorInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
 static int HdfVibratorInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
@@ -56,19 +58,30 @@ static int HdfVibratorInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 
 static int HdfVibratorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    struct HdfVibratorInterfaceHost *hdfVibratorInterfaceHost = (struct HdfVibratorInterfaceHost *)OsalMemAlloc(
-        sizeof(struct HdfVibratorInterfaceHost));
+    auto *hdfVibratorInterfaceHost = new (std::nothrow) HdfVibratorInterfaceHost;
     if (hdfVibratorInterfaceHost == nullptr) {
-        HDF_LOGE("HdfVibratorInterfaceDriverBind OsalMemAlloc HdfVibratorInterfaceHost failed!");
+        HDF_LOGE("%{public}s: failed to create HdfVibratorInterfaceHost object", __func__);
         return HDF_FAILURE;
     }
 
-    hdfVibratorInterfaceHost->ioservice.Dispatch = VibratorInterfaceDriverDispatch;
-    hdfVibratorInterfaceHost->ioservice.Open = nullptr;
-    hdfVibratorInterfaceHost->ioservice.Release = nullptr;
-    hdfVibratorInterfaceHost->service = new VibratorInterfaceImpl();
+    hdfVibratorInterfaceHost->ioService.Dispatch = VibratorInterfaceDriverDispatch;
+    hdfVibratorInterfaceHost->ioService.Open = nullptr;
+    hdfVibratorInterfaceHost->ioService.Release = nullptr;
 
-    deviceObject->service = &hdfVibratorInterfaceHost->ioservice;
+    auto serviceImpl = IVibratorInterface::Get(true);
+    if (serviceImpl == nullptr) {
+        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        return HDF_FAILURE;
+    }
+
+    hdfVibratorInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
+        IVibratorInterface::GetDescriptor());
+    if (hdfVibratorInterfaceHost->stub == nullptr) {
+        HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        return HDF_FAILURE;
+    }
+
+    deviceObject->service = &hdfVibratorInterfaceHost->ioService;
     HDF_LOGI("HdfVibratorInterfaceDriverBind Success");
     return HDF_SUCCESS;
 }
@@ -77,10 +90,8 @@ static void HdfVibratorInterfaceDriverRelease(struct HdfDeviceObject *deviceObje
 {
     HDF_LOGI("HdfVibratorInterfaceDriverRelease enter");
 
-    struct HdfVibratorInterfaceHost *hdfVibratorInterfaceHost = CONTAINER_OF(
-        deviceObject->service, struct HdfVibratorInterfaceHost, ioservice);
-    delete hdfVibratorInterfaceHost->service;
-    OsalMemFree(hdfVibratorInterfaceHost);
+    auto *hdfVibratorInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfVibratorInterfaceHost, ioService);
+    delete hdfVibratorInterfaceHost;
 }
 
 struct HdfDriverEntry g_vibratorInterfaceDriverEntry = {

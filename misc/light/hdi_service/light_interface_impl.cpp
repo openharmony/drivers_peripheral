@@ -24,6 +24,11 @@ namespace OHOS {
 namespace HDI {
 namespace Light {
 namespace V1_0 {
+extern "C" ILightInterface *LightInterfaceImplGetInstance(void)
+{
+    return new (std::nothrow) LightInterfaceImpl();
+}
+
 int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfo>& info)
 {
     const struct LightInterface *lightInterface = NewLightInterfaceInstance();
