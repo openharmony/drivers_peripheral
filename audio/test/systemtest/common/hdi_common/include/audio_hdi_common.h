@@ -56,13 +56,13 @@ namespace Audio {
     const int IS_ADM = false;
 #endif
 #ifdef AUDIO_ADM_SERVICE
-    const std::string FUNCTION_NAME = "GetAudioProxyManagerFuncs";
+    const std::string FUNCTION_NAME = "GetAudioManagerFuncs";
     const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio_client");
     using TestAudioManager = struct AudioManager;
     const int IS_ADM = true;
 #endif
 #ifdef AUDIO_MPI_SERVICE
-    const std::string FUNCTION_NAME = "GetAudioProxyManagerFuncs";
+    const std::string FUNCTION_NAME = "GetAudioManagerFuncs";
     const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio_client");
     const int IS_ADM = false;
 #endif

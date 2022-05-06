@@ -307,7 +307,7 @@ static void ProxyAudioMgrConstruct(struct AudioProxyManager *proxyMgr)
     proxyMgr->audioMagic = AUDIO_MAGIC;
 }
 
-struct AudioManager *GetAudioProxyManagerFuncs(void)
+struct AudioManager *GetAudioManagerFuncs(void)
 {
     LOG_FUN_INFO();
     if (audioProxyAdapterAddrMgrFlag) {
