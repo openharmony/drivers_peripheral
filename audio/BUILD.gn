@@ -15,20 +15,6 @@ import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
-if (defined(ohos_lite)) {
-  group("audio_test_entry") {
-    deps = [ "test/systemtest:hdf_test_audio" ]
-  }
-} else {
-  group("audio_test_entry") {
-    testonly = true
-    deps = [
-      "test/systemtest:systemtest",
-      "test/unittest:audiotest",
-    ]
-  }
-}
-
 group("hdi_audio") {
   deps = [ "hal/hdi_passthrough:hdi_audio" ]
 
