@@ -38,8 +38,6 @@ if (is_standard_system) {
 
     sources = [ "video_layer_proxy.cpp" ]
 
-    deps = [ "//foundation/graphic/standard/utils:buffer_handle" ]
-
     if (is_standard_system) {
       external_deps = [
         "device_driver_framework:libhdf_host",
@@ -52,6 +50,7 @@ if (is_standard_system) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
+    external_deps += [ "graphic_chipsetsdk:surface" ]
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"

@@ -38,7 +38,6 @@ ohos_shared_library("libdisplay_device_server") {
   ]
   deps = [
     "//drivers/peripheral/display/hal:hdi_display_device",
-    "//foundation/graphic/standard/frameworks/surface:surface",
     "//utils/native/base:utils",
   ]
 
@@ -54,6 +53,7 @@ ohos_shared_library("libdisplay_device_server") {
     "device_driver_framework:libhdf_ipc_adapter",
     "device_driver_framework:libhdf_utils",
     "device_driver_framework:libhdi",
+    "graphic_chipsetsdk:surface",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
   ]
