@@ -15,7 +15,7 @@
 
 #include "drm_device.h"
 #include <string>
-#include <errno.h>
+#include <cerrno>
 #include <fcntl.h>
 #include <memory>
 #include <drm_fourcc.h>

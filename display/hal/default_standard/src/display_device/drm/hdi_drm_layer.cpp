@@ -15,7 +15,7 @@
 
 #include "hdi_drm_layer.h"
 #include <cinttypes>
-#include <errno.h>
+#include <cerrno>
 #include "drm_device.h"
 
 namespace OHOS {

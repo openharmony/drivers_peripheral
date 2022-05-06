@@ -25,7 +25,7 @@ public:
     int32_t Init(void) override;
     int32_t SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer) override;
     int32_t Apply(bool modeSet) override;
-    virtual ~HdiGfxComposition()
+    ~HdiGfxComposition() override
     {
         (void)GfxModuleDeinit();
     }
@@ -40,6 +40,9 @@ private:
     void *mGfxModule = nullptr;
     GfxFuncs *mGfxFuncs = nullptr;
     HdiLayer *mClientLayer;
+    static constexpr const char* LIB_HDI_GFX_NAME = "libdisplay_gfx.z.so";
+    static constexpr const char* LIB_GFX_FUNC_INIT = "GfxInitialize";
+    static constexpr const char* LIB_GFX_FUNC_DEINIT = "GfxUninitialize";
 };
 } // namespace OHOS
 } // namespace HDI
