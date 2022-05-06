@@ -40,7 +40,6 @@
 #include "audio_adapter.h"
 #include "audio_internal.h"
 #include "audio_types.h"
-#include "audio_proxy_manager.h"
 
 namespace HMOS {
 namespace Audio {
@@ -49,13 +48,12 @@ using namespace std;
 #ifdef AUDIO_ADM_SO
     const std::string FUNCTION_NAME = "GetAudioManagerFuncs";
     const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio");
-    using TestAudioManager = struct AudioManager;
 #endif
 #ifdef AUDIO_ADM_SERVICE
     const std::string FUNCTION_NAME = "GetAudioProxyManagerFuncs";
     const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio_client");
-    using TestAudioManager = struct AudioProxyManager;
 #endif
+using TestAudioManager = struct AudioManager;
 const uint32_t INT_32_MAX = 0x7fffffff;
 const uint32_t MOVE_RIGHT_NUM = 3;
 const int MOVE_LEFT_NUM = 8;
@@ -69,9 +67,9 @@ const int FRAME_SIZE = 1024;
 const int FRAME_COUNT = 4;
 const int ADAPTER_COUNT = 32;
 const int TRY_NUM_FRAME = 20;
-const string AUDIO_LOW_LATENCY_CAPTURE_FILE = "//bin/lowlatencycapturetest.wav";
-const string AUDIO_LOW_LATENCY_RENDER_FILE = "//bin/lowlatencyrendertest.wav";
-
+const string AUDIO_LOW_LATENCY_CAPTURE_FILE = "/data/lowlatencycapturetest.wav";
+const string AUDIO_LOW_LATENCY_RENDER_FILE = "/data/lowlatencyrendertest.wav";
+const string ADAPTER_NAME = "primary";
 
 enum AudioPCMBit {
     PCM_8_BIT  = 8,
