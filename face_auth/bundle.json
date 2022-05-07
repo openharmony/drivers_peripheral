@@ -1,0 +1,34 @@
+{
+    "name": "faceauth_device_driver",
+    "description": "faceauth device driver",
+    "version": "3.1",
+    "license": "Apache License 2.0",
+    "component": {
+      "name": "faceauth_device_driver",
+      "subsystem": "hdf",
+      "syscap": [""],
+      "adapter_system_type": ["standard"],
+      "rom": "675KB",
+      "ram": "7400KB",
+      "deps": {
+        "components": [
+          "ipc",
+          "device_driver_framework",
+          "hiviewdfx_hilog_native",
+          "utils_base"
+        ],
+        "third_part": [
+          "bounds_checking_function"
+        ]
+      },
+      "build": {
+        "sub_component": [
+          "//drivers/peripheral/face_auth:faceauth_entry"
+        ],
+        "test": [
+        ],
+        "inner_kits": [
+        ]
+      }
+    }
+  }
