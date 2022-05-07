@@ -26,7 +26,7 @@
 using namespace std;
 using namespace OHOS;
 
-constexpr int32_t FD_SIZE = 4;
+constexpr int32_t FD_SIZE = sizeof(int);
 constexpr int32_t FRAME = 30 << 16;
 constexpr int32_t PARAM_LEN = 5;
 constexpr int32_t denominator = 2;
@@ -86,7 +86,7 @@ int CodecHdiDecode::GetYuvSize()
     return width_ * height_ * numerator / denominator;
 }
 
-bool CodecHdiDecode::ReadOnePacket(FILE *fp, char *buf, size_t &filledCount)
+bool CodecHdiDecode::ReadOnePacket(FILE *fp, char *buf, uint32_t &filledCount)
 {
     // read start code first
     size_t t = fread(buf, 1, START_CODE_SIZE_FRAME, fp);
@@ -482,7 +482,7 @@ void CodecHdiDecode::Run()
         }
         auto bufferInfo = iter->second;
         void *sharedAddr = (void *)bufferInfo->avSharedPtr->ReadFromAshmem(0, 0);
-        eosFlag = (size_t)this->ReadOnePacket(fpIn_, (char *)sharedAddr, bufferInfo->omxBuffer->filledLen);
+        eosFlag = this->ReadOnePacket(fpIn_, (char *)sharedAddr, bufferInfo->omxBuffer->filledLen);
         HDF_LOGI("read data size is %{public}d", bufferInfo->omxBuffer->filledLen);
         bufferInfo->omxBuffer->offset = 0;
         if (eosFlag) {
