@@ -38,14 +38,12 @@ ohos_shared_library("libdisplay_device_proxy") {
     "display_device_proxy/display_device_proxy.cpp",
   ]
 
-  deps = [
-    "//foundation/graphic/standard/frameworks/surface:surface",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//utils/native/base:utils" ]
 
   external_deps = [
     "device_driver_framework:libhdf_utils",
     "device_driver_framework:libhdi",
+    "graphic_chipsetsdk:surface",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
   ]

@@ -33,10 +33,7 @@ if (is_standard_system) {
       "video_layer_stub.cpp",
     ]
 
-    deps = [
-      "//drivers/peripheral/display/hal:hdi_display_gralloc",
-      "//foundation/graphic/standard/utils:buffer_handle",
-    ]
+    deps = [ "//drivers/peripheral/display/hal:hdi_display_gralloc" ]
 
     if (target_cpu == "arm") {
       deps += [ "//drivers/peripheral/display/hal:hdi_display_layer" ]
@@ -54,6 +51,7 @@ if (is_standard_system) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
+    external_deps += [ "graphic_chipsetsdk:surface" ]
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
