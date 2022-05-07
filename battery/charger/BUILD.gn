@@ -46,7 +46,6 @@ ohos_executable("charger") {
   deps = [
     "//drivers/interface/battery/v1_0:libbattery_proxy_1.0",
     "//drivers/peripheral/battery/charger/ui:libminui",
-    "//drivers/peripheral/battery/interfaces/hdi_service:libbattery_interface_service_1.0",
     "//third_party/jsoncpp:jsoncpp",
     "//third_party/libdrm:libdrm",
     "//third_party/libpng:libpng",
