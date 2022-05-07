@@ -12,10 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <cmath>
 
-#include "sensor_callback_impl.h"
-#include "sensor_type.h"
 #include "osal_mem.h"
+#include "sensor_type.h"
+#include "sensor_callback_impl.h"
 
 namespace OHOS {
 namespace HDI {
@@ -68,8 +69,8 @@ namespace {
         for (int32_t j = 0; j < sensorNode.dataDimension; ++j) {
             printf("sensor id :[%d], data[%d]: %f\n\r", sensorNode.sensorTypeId, j + 1, *(&data + j));
             if (sensorNode.dataForm == 0) {
-                if (abs(*(&data + j) - sensorNode.valueRange[j].highThreshold) < EPSINON ||
-                    abs(*(&data + j) - sensorNode.valueRange[j].lowThreshold) < EPSINON) {
+                if (std::abs(*(&data + j) - sensorNode.valueRange[j].highThreshold) < EPSINON ||
+                    std::abs(*(&data + j) - sensorNode.valueRange[j].lowThreshold) < EPSINON) {
                     SensorCallbackImpl::sensorDataFlag &= 1;
                 } else {
                     SensorCallbackImpl::sensorDataFlag = 0;
