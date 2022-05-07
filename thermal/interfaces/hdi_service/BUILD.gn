@@ -31,7 +31,7 @@ ohos_shared_library("libthermal_interface_service_1.0") {
     "src/thermal_zone_manager.cpp",
   ]
 
-  public_deps = [
+  deps = [
     "//drivers/interface/thermal/v1_0:libthermal_stub_1.0",
     "//third_party/libxml2:xml2",
   ]
@@ -64,7 +64,7 @@ ohos_shared_library("libthermal_driver") {
   ]
   sources = [ "src/thermal_interface_driver.cpp" ]
 
-  deps = [ "//drivers/peripheral/thermal/interfaces/hdi_service:libthermal_interface_service_1.0" ]
+  deps = [ "//drivers/interface/thermal/v1_0:libthermal_stub_1.0" ]
 
   if (is_standard_system) {
     external_deps = [

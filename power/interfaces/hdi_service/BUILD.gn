@@ -59,7 +59,6 @@ ohos_shared_library("libpower_driver") {
   sources = [ "src/power_interface_driver.cpp" ]
 
   deps = [
-    ":libpower_interface_service_1.0",
     "//drivers/interface/power/v1_0:libpower_stub_1.0",
     "//utils/native/base:utils",
   ]

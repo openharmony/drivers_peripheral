@@ -25,7 +25,7 @@ if (defined(ohos_lite)) {
     ]
     sources = [ "vibrator_interface_impl.cpp" ]
 
-    public_deps = [
+    deps = [
       "//drivers/interface/vibrator/v1_0:libvibrator_stub_1.0",
       "//drivers/peripheral/misc/vibrator/hal:hdi_vibrator",
       "//utils/native/base:utils",
@@ -69,8 +69,8 @@ if (defined(ohos_lite)) {
 
     deps = [
       "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+      "//drivers/interface/vibrator/v1_0:libvibrator_stub_1.0",
       "//drivers/peripheral/misc/vibrator/hal:hdi_vibrator",
-      "//drivers/peripheral/misc/vibrator/hdi_service:libvibrator_interface_service_1.0",
       "//utils/native/base:utils",
     ]
 
