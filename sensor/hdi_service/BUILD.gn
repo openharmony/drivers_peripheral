@@ -17,7 +17,7 @@ ohos_shared_library("libsensor_interface_service_1.0") {
   include_dirs = [ "//drivers/peripheral/sensor/interfaces/include/" ]
   sources = [ "sensor_impl.cpp" ]
 
-  public_deps = [
+  deps = [
     "//drivers/interface/sensor/v1_0:libsensor_stub_1.0",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
   ]
@@ -56,9 +56,7 @@ ohos_shared_library("libsensor_driver") {
 
   sources = [ "sensor_interface_driver.cpp" ]
 
-  deps = [
-    "//drivers/peripheral/sensor/hdi_service:libsensor_interface_service_1.0",
-  ]
+  deps = [ "//drivers/interface/sensor/v1_0:libsensor_stub_1.0" ]
 
   cflags = [
     "-Wall",

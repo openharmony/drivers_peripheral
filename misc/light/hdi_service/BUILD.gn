@@ -20,7 +20,7 @@ ohos_shared_library("liblight_interface_service_1.0") {
   ]
   sources = [ "light_interface_impl.cpp" ]
 
-  public_deps = [
+  deps = [
     "//drivers/interface/light/v1_0:liblight_stub_1.0",
     "//drivers/peripheral/misc/light/hal:hdi_light",
     "//utils/native/base:utils",
@@ -60,8 +60,8 @@ ohos_shared_library("liblight_driver") {
 
   deps = [
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+    "//drivers/interface/light/v1_0:liblight_stub_1.0",
     "//drivers/peripheral/misc/light/hal:hdi_light",
-    "//drivers/peripheral/misc/light/hdi_service:liblight_interface_service_1.0",
     "//utils/native/base:utils",
   ]
 
