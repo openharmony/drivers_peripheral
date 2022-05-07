@@ -112,7 +112,7 @@ ohos_shared_library("camera_pipeline_core") {
   if (is_standard_system) {
     external_deps = [
       "device_driver_framework:libhdf_utils",
-      "graphic_standard:surface",
+      "graphic_chipsetsdk:surface",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
       "utils_base:utils",

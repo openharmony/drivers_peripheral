@@ -152,7 +152,7 @@ if (defined(ohos_lite)) {
         "device_driver_framework:libhdf_utils",
         "device_driver_framework:libhdi",
         "display_device_driver:hdi_display_gralloc",
-        "graphic_standard:surface",
+        "graphic_chipsetsdk:surface",
         "hiviewdfx_hilog_native:libhilog",
         "samgr_standard:samgr_proxy",
         "utils_base:utils",

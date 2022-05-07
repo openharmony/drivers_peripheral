@@ -31,10 +31,7 @@ ohos_shared_library("libhdi_display_gralloc_stub") {
     "allocator_service_stub.cpp",
   ]
 
-  deps = [
-    "//drivers/peripheral/display/hal:hdi_display_gralloc",
-    "//foundation/graphic/standard/utils:buffer_handle",
-  ]
+  deps = [ "//drivers/peripheral/display/hal:hdi_display_gralloc" ]
 
   if (is_standard_system) {
     external_deps = [
@@ -48,6 +45,7 @@ ohos_shared_library("libhdi_display_gralloc_stub") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "graphic_chipsetsdk:surface" ]
 
   # install_enable = true
   install_images = [ chipset_base_dir ]
