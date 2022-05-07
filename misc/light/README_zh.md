@@ -42,8 +42,8 @@ Light驱动模型支持获取系统中所有灯的信息，动态配置闪烁模
 | 接口名                                                       | 功能描述                                                     |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | int32_t (*GetLightInfo)(struct LightInfo **lightInfo, uint32_t *count) | 获取系统中所有灯的信息，lightInfo表示灯设备的基本信息，count表示获取灯的个数。 |
-| int32_t (*TurnOnLight)(uint32_t type, struct LightEffect *effect) | 打开指定类型的灯，type表示灯类型，effect表示要设置的效果信息。 |
-| int32_t (*TurnOffLight)(uint32_t type)                       | 关闭指定类型的灯。                                           |
+| int32_t (*TurnOnLight)(uint32_t lightId, struct LightEffect *effect) | 打开指定类型的灯，lightId表示灯类型，effect表示要设置的效果信息。 |
+| int32_t (*TurnOffLight)(uint32_t lightId)                    | 关闭指定类型的灯。                                           |
 
 ### 使用说明
 
@@ -60,8 +60,8 @@ void LightSample(void)
     const int32_t g_onTime = 500;
     const int32_t g_offTime = 500;
     const int32_t LIGHT_WAIT_TIME = 30;
-    const int32_t g_minLightType = LIGHT_TYPE_NONE;
-    const int32_t g_maxLightType = LIGHT_TYPE_BUTT;
+    const int32_t g_minLightId = LIGHT_ID_NONE;
+    const int32_t g_maxLightId = LIGHT_ID_BUTT;
     struct LightEffect effect;
 
 	/* 创建Light接口实例 */
@@ -73,36 +73,36 @@ void LightSample(void)
  	ret = g_lightDev->GetLightInfo(&g_lightInfo, &g_count);
 
     /* 按照指定的灯颜色，常亮模式打开灯列表中可用的灯 */
-    effect.lightBrightness = 0x80000000; // 亮度值，RGB最高位表示颜色：R:16-31位、G:8-15位、B:0-7位
+    effect.lightBrightness = 0x00800000; // 亮度值，RGB最高位表示颜色：R:16-31位、G:8-15位、B:0-7位
     effect.flashEffect.flashMode = LIGHT_FLASH_NONE;
 
     for (i = 0; i < g_count; ++i) {
-        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightType, &effect);
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(0, ret);
 
         OsalSleep(LIGHT_WAIT_TIME);
 
-        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightType);
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
         EXPECT_EQ(0, ret);
     }
     /* 按照指定的灯颜色，闪烁模式打开灯列表中可用的灯 */
-    effect.lightBrightness = 0x80000000;
+    effect.lightBrightness = 0x00800000;
     effect.flashEffect.flashMode = LIGHT_FLASH_TIMED;
     effect.flashEffect.onTime = g_onTime;    // 一个闪烁周期内亮灯时长（ms）
     effect.flashEffect.offTime = g_offTime;    // 一个闪烁周期内熄灯时长（ms）
     
     for (i = 0; i < g_count; ++i) {
-        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightType, &effect);
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(0, ret);
 
         OsalSleep(LIGHT_WAIT_TIME);
 
-        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightType);
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
         EXPECT_EQ(0, ret);
     }
 
     /* 关闭灯列表中指定类型的灯 */
-    ret = g_lightDev->TurnOffLight(lightType);
+    ret = g_lightDev->TurnOffLight(lightId);
     EXPECT_EQ(0, ret);
 
     /* 释放Light接口实例 */
