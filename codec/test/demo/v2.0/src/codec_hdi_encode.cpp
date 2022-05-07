@@ -30,7 +30,7 @@ using namespace OHOS;
 constexpr int32_t FRAME = 30 << 16;
 constexpr int32_t BITRATE = 3000000;
 constexpr int32_t PARAM_LEN = 5;
-constexpr int32_t FD_SIZE = 4;
+constexpr int32_t FD_SIZE = sizeof(int);
 constexpr const char *encoder_avc = "OMX.rk.video_encoder.avc";
 #define AV_COLOR_FORMAT OMX_COLOR_FormatYUV420SemiPlanar
 
@@ -71,7 +71,7 @@ void CodecHdiEncode::onStatusChanged()
     statusCondition_.notify_one();
 }
 
-bool CodecHdiEncode::ReadOneFrame(FILE *fp, char *buf, size_t &filledCount)
+bool CodecHdiEncode::ReadOneFrame(FILE *fp, char *buf, uint32_t &filledCount)
 {
     bool ret = false;
     filledCount = fread(buf, 1, width_ * height_ * numerator / denominator, fp);

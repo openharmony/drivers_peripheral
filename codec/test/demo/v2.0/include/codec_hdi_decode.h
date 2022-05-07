@@ -104,7 +104,7 @@ public:
     }
     void WaitForStatusChanged();
     void onStatusChanged();
-    bool ReadOnePacket(FILE *fp, char *buf, size_t &filledCount);
+    bool ReadOnePacket(FILE *fp, char *buf, uint32_t &filledCount);
 
 private:
     int32_t UseBufferOnPort(PortIndex portIndex);
