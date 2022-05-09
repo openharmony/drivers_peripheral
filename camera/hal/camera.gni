@@ -13,7 +13,8 @@
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
-  import("//device/board/hisilicon/hispark_taurus/device.gni")
+  import(
+      "//device/soc/hisilicon/common/hal/media/camera/hi3516dv300/linux_standard/camera/product.gni")
 } else {
   import("//build/ohos.gni")
   import("//vendor/$product_company/$product_name/product.gni")

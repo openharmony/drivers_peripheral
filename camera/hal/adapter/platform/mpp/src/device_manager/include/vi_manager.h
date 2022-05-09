@@ -30,7 +30,7 @@ public:
     RetCode CreateController(ControllerId controllerId, std::string hardwareName);
     std::shared_ptr<IController> GetController(ControllerId controllerId);
     std::shared_ptr<ISensor> GetSensor(std::string sensorName);
-    void Configure(std::shared_ptr<CameraMetadata> meta)
+    void Configure(std::shared_ptr<Camera::CameraMetadata> meta)
     {
         vi_->Configure(meta);
     };
@@ -52,7 +52,7 @@ public:
         (void)pu32FrameRate;
         return RC_OK;
     };
-    CameraMetadata GetSensorInfo(CameraId cameraIdt);
+    Camera::CameraMetadata GetSensorInfo(CameraId cameraIdt);
     RetCode StartCapture(int32_t snapCnt)
     {
         (void)snapCnt;
@@ -64,7 +64,7 @@ public:
     {
         vi_->SetAbilityMetaDataTag(abilityMetaDataTag);
     };
-    RetCode GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta)
+    RetCode GetAbilityMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
     {
         return vi_->GetAbilityMetaData(meta);
     };

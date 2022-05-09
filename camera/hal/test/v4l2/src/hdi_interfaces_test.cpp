@@ -1177,8 +1177,8 @@ TEST_F(UtestHdiIterTest, camera_hdi_0170)
         std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc << std::endl;
     }
 
-    std::shared_ptr<CameraMetadata> modeSetting =
-        std::make_shared<CameraMetadata>(2, 128);
+    std::shared_ptr<OHOS::Camera::CameraMetadata> modeSetting =
+        std::make_shared<OHOS::Camera::CameraMetadata>(2, 128);
     // Distribution stream
     display_->rc = display_->streamOperator->CommitStreams(Camera::NORMAL, modeSetting);
     EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
@@ -1230,7 +1230,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0171)
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc << std::endl;
     }
-    std::shared_ptr<CameraMetadata> modeSetting = nullptr;
+    std::shared_ptr<OHOS::Camera::CameraMetadata> modeSetting = nullptr;
 
     // Distribution stream
     display_->rc = display_->streamOperator->CommitStreams(Camera::NORMAL, modeSetting);
@@ -1315,7 +1315,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0180)
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc << std::endl;
     }
-    std::shared_ptr<CameraMetadata> modeSetting = nullptr;
+    std::shared_ptr<OHOS::Camera::CameraMetadata> modeSetting = nullptr;
 
     // Distribution stream
     display_->rc = display_->streamOperator->CommitStreams(Camera::NORMAL, modeSetting);

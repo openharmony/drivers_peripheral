@@ -56,15 +56,15 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager/include/mpi",
       "$camera_path/device_manager/src",
       "$camera_path/device_manager/src/mpi",
-      "$board_camera_path/driver_adapter/include",
+      "$camera_device_name_path/camera/include/driver_adapter",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/include",
       "$camera_path/device_manager/test/unittest/mpi",
       "$camera_path/utils/event",
       "//drivers/adapter/uhdf2/osal/include",
-      "$board_camera_path/device_manager/include",
+      "$camera_device_name_path/camera/include/device_manager",
       "$camera_path/adapter/platform/mpp/src/device_manager/include",
-      "//drivers/peripheral/camera/interfaces/metadata/include",
+      "$camera_path/utils/metadata/include",
       "//drivers/framework/include/config",
       "//drivers/framework/include/osal",
       "//drivers/framework/include/utils",
@@ -76,9 +76,9 @@ if (defined(ohos_lite)) {
     ldflags += [ "-ldriver_adapter" ]
     deps = [
       "$camera_path/device_manager:camera_device_manager",
+      "$camera_path/utils/metadata:metadata_lite",
       "$hdf_uhdf_path/utils:libhdf_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/peripheral/camera/interfaces/metadata:metadata",
     ]
   }
 } else {
@@ -130,12 +130,12 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager/include/mpi",
       "$camera_path/device_manager/src",
       "$camera_path/device_manager/src/mpi",
-      "$board_camera_path/driver_adapter/include",
+      "$camera_device_name_path/camera/include/driver_adapter",
       "$camera_path/include",
       "$camera_path/device_manager/test/unittest/mpi",
       "$camera_path/utils/event",
+      "$camera_device_name_path/camera/include/device_manager",
       "$camera_path/adapter/platform/mpp/src/device_manager/include",
-      "$board_camera_path/device_manager/include",
       "//drivers/peripheral/camera/interfaces/metadata/include",
     ]
     if (need_link_hispark_taurus_lib) {

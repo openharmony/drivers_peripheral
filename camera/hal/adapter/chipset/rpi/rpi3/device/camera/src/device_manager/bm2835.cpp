@@ -21,38 +21,38 @@ IMPLEMENT_SENSOR(Bm2835)
 Bm2835::Bm2835() : ISensor("bm2835") {}
 
 Bm2835::~Bm2835() {}
-void Bm2835::InitPhysicalSize(CameraMetadata& camera_meta_data)
+void Bm2835::InitPhysicalSize(Camera::CameraMetadata& camera_meta_data)
 {
     ISensor::InitPhysicalSize(camera_meta_data);
 }
-void Bm2835::InitAntiBandingModes(CameraMetadata& camera_meta_data)
+void Bm2835::InitAntiBandingModes(Camera::CameraMetadata& camera_meta_data)
 {
     ISensor::InitAntiBandingModes(camera_meta_data);
 }
-void Bm2835::InitAvailableModes(CameraMetadata& camera_meta_data)
+void Bm2835::InitAvailableModes(Camera::CameraMetadata& camera_meta_data)
 {
     ISensor::InitAvailableModes(camera_meta_data);
 }
-void Bm2835::InitFpsTarget(CameraMetadata& camera_meta_data)
+void Bm2835::InitFpsTarget(Camera::CameraMetadata& camera_meta_data)
 {
     ISensor::InitFpsTarget(camera_meta_data);
 }
-void Bm2835::InitCompensationRange(CameraMetadata& camera_meta_data)
+void Bm2835::InitCompensationRange(Camera::CameraMetadata& camera_meta_data)
 {
     ISensor::InitCompensationRange(camera_meta_data);
 }
 
-void Bm2835::InitAwbModes(CameraMetadata& camera_meta_data)
+void Bm2835::InitAwbModes(Camera::CameraMetadata& camera_meta_data)
 {
     ISensor::InitAwbModes(camera_meta_data);
 }
 
-void Bm2835::InitSensitivityRange(CameraMetadata& camera_meta_data)
+void Bm2835::InitSensitivityRange(Camera::CameraMetadata& camera_meta_data)
 {
     ISensor::InitSensitivityRange(camera_meta_data);
 }
 
-void Bm2835::Init(CameraMetadata& camera_metaData)
+void Bm2835::Init(Camera::CameraMetadata& camera_metaData)
 {
     InitPhysicalSize(camera_metaData);
     InitAntiBandingModes(camera_metaData);

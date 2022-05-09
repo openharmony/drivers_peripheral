@@ -30,7 +30,7 @@ public:
     virtual ~CameraDeviceCallbackProxy() = default;
 
     void OnError(ErrorType type, int32_t errorMsg) override;
-    void OnResult(uint64_t timestamp, const std::shared_ptr<CameraMetadata> &result) override;
+    void OnResult(uint64_t timestamp, const std::shared_ptr<Camera::CameraMetadata> &result) override;
 
 private:
     static inline BrokerDelegator<CameraDeviceCallbackProxy> delegator_;
