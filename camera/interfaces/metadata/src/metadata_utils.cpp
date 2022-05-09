@@ -18,7 +18,7 @@
 #include "metadata_log.h"
 
 namespace OHOS::Camera {
-bool MetadataUtils::EncodeCameraMetadata(const std::shared_ptr<Camera::CameraMetadata> &metadata,
+bool MetadataUtils::EncodeCameraMetadata(const std::shared_ptr<CameraMetadata> &metadata,
                                          MessageParcel &data)
 {
     if (metadata == nullptr) {
@@ -52,7 +52,7 @@ bool MetadataUtils::EncodeCameraMetadata(const std::shared_ptr<Camera::CameraMet
     return bRet;
 }
 
-void MetadataUtils::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<Camera::CameraMetadata> &metadata)
+void MetadataUtils::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<CameraMetadata> &metadata)
 {
     uint32_t tagCount = data.ReadUint32();
     uint32_t itemCapacity = data.ReadUint32();
@@ -153,7 +153,7 @@ bool MetadataUtils::WriteMetadata(const camera_metadata_item_t &item, MessagePar
     return bRet;
 }
 
-std::string MetadataUtils::EncodeToString(std::shared_ptr<Camera::CameraMetadata> metadata)
+std::string MetadataUtils::EncodeToString(std::shared_ptr<CameraMetadata> metadata)
 {
     int32_t ret, dataLen;
     const int32_t headerLength = sizeof(common_metadata_header_t);
@@ -210,7 +210,7 @@ std::string MetadataUtils::EncodeToString(std::shared_ptr<Camera::CameraMetadata
     return s;
 }
 
-std::shared_ptr<Camera::CameraMetadata> MetadataUtils::DecodeFromString(std::string setting)
+std::shared_ptr<CameraMetadata> MetadataUtils::DecodeFromString(std::string setting)
 {
     uint32_t ret, dataLen;
     uint32_t totalLen = setting.capacity();
@@ -232,7 +232,7 @@ std::shared_ptr<Camera::CameraMetadata> MetadataUtils::DecodeFromString(std::str
     }
     header.item_capacity = header.item_count;
     header.data_capacity = header.data_count;
-    std::shared_ptr<Camera::CameraMetadata> metadata
+    std::shared_ptr<CameraMetadata> metadata
         = std::make_shared<CameraMetadata>(header.item_capacity, header.data_capacity);
     common_metadata_header_t *meta = metadata->get();
     if (!meta) {

@@ -22,7 +22,7 @@ void CameraDeviceCallback::OnError(ErrorType type, int32_t errorMsg)
     HDF_LOGV("%{public}s, enter.", __func__);
 }
 
-void CameraDeviceCallback::OnResult(uint64_t timestamp, const std::shared_ptr<Camera::CameraMetadata> &result)
+void CameraDeviceCallback::OnResult(uint64_t timestamp, const std::shared_ptr<CameraMetadata> &result)
 {
     HDF_LOGV("%{public}s, enter.", __func__);
 }

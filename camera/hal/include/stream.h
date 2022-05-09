@@ -22,8 +22,8 @@
 
 namespace OHOS {
 namespace Camera {
-using ModeMeta = std::shared_ptr<OHOS::Camera::CameraMetadata>;
-using CaptureMeta = std::shared_ptr<OHOS::Camera::CameraMetadata>;
+using ModeMeta = std::shared_ptr<CameraMetadata>;
+using CaptureMeta = std::shared_ptr<CameraMetadata>;
 
 struct StreamConfiguration {
     int32_t id;

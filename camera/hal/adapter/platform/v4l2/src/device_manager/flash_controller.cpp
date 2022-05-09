@@ -56,7 +56,7 @@ RetCode FlashController::SetFlashlight(FlashMode flashMode, bool enable)
 
 void FlashController::SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag) {}
 
-RetCode FlashController::GetAbilityMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
+RetCode FlashController::GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta)
 {
     return RC_OK;
 }

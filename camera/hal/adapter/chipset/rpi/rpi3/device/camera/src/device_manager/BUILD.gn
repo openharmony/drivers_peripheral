@@ -33,7 +33,7 @@ config("device_manager_config") {
 
 ohos_shared_library("camera_device_manager") {
   sources = [
-    "$camera_device_name_path/camera/src/device_manager/bm2835.cpp",
+    "$board_camera_path/camera/src/device_manager/bm2835.cpp",
     "$camera_path/adapter/platform/v4l2/src/device_manager/enumerator_manager.cpp",
     "$camera_path/adapter/platform/v4l2/src/device_manager/flash_controller.cpp",
     "$camera_path/adapter/platform/v4l2/src/device_manager/flash_manager.cpp",
@@ -52,7 +52,7 @@ ohos_shared_library("camera_device_manager") {
     "$camera_path/include",
     "$camera_path/utils/event",
     "$camera_path/device_manager/include",
-    "$camera_device_name_path/camera/include/device_manager",
+    "$board_camera_path/device_manager/include",
     "$camera_path/adapter/platform/v4l2/src/device_manager/include",
     "$camera_path/adapter/platform/v4l2/src/driver_adapter/include/",
     "//drivers/peripheral/camera/interfaces/metadata/include",

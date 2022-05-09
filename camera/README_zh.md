@@ -92,7 +92,7 @@ OpenHarmony相机驱动框架模型对上实现相机HDI（Hardware Device Inter
 
   | 功能描述                         | 接口名称                                                     |
   | -------------------------------- | ------------------------------------------------------------ |
-  | 查询是否支持添加参数对应的流     | CamRetCode IsStreamsSupported(<br/>    OperationMode mode,<br/>    const std::shared_ptr\<Camera::CameraMetadata> &modeSetting,<br/>    const std::vector\<std::shared_ptr\<StreamInfo\>\> &info,<br/>    StreamSupportType &type) |
+  | 查询是否支持添加参数对应的流     | CamRetCode IsStreamsSupported(<br/>    OperationMode mode,<br/>    const std::shared_ptr\<CameraMetadata> &modeSetting,<br/>    const std::vector\<std::shared_ptr\<StreamInfo\>\> &info,<br/>    StreamSupportType &type) |
   | 创建流                           | CamRetCode CreateStreams(const std::vector\<std::shared_ptr\<StreamInfo\>\> &streamInfos) |
   | 释放流                           | CamRetCode ReleaseStreams(const std::vector\<int\> &streamIds) |
   | 配置流                           | CamRetCode CommitStreams(OperationMode mode,<br/>    const std::shared_ptr\<CameraMetadata\> &modeSetting) |

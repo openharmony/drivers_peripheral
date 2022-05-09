@@ -79,7 +79,7 @@ RetCode ViNode::Stop(const int32_t streamId)
     return RC_OK;
 }
 
-RetCode ViNode::Configure(std::shared_ptr<Camera::CameraMetadata> meta)
+RetCode ViNode::Configure(std::shared_ptr<CameraMetadata> meta)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(meta, RC_ERROR);
     return viController_->Configure(meta);

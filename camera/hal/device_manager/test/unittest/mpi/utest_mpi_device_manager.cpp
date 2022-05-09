@@ -49,11 +49,11 @@ public:
     void Init()
     {
         std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();
-        deviceManager->SetMetaDataCallBack([&](std::shared_ptr<Camera::CameraMetadata> meta) {
+        deviceManager->SetMetaDataCallBack([&](std::shared_ptr<CameraMetadata> meta) {
             CallBack(meta);
         });
     };
-    void CallBack(std::shared_ptr<Camera::CameraMetadata> meta) {};
+    void CallBack(std::shared_ptr<CameraMetadata> meta) {};
 };
 
 std::shared_ptr<IDeviceManager> DM = nullptr;
@@ -111,7 +111,7 @@ HWTEST_F(UtestMpiDeviceManager, GetSensor_Success, TestSize.Level0)
     if(DM != nullptr) {
         sensor = DM->GetSensor(CAMERA_FIRST);
     }
-    Camera::CameraMetadata meta(100, 2000);
+    CameraMetadata meta(100, 2000);
     sensor->Init(meta);
     EXPECT_EQ(true, sensor != nullptr);
 }
@@ -122,7 +122,7 @@ HWTEST_F(UtestMpiDeviceManager, GetSensor_Success2, TestSize.Level0)
     if(DM != nullptr) {
         sensor = DM->GetSensor(CAMERA_SECOND);
     }
-    Camera::CameraMetadata meta(100, 2000);
+    CameraMetadata meta(100, 2000);
     sensor->Init(meta);
     EXPECT_EQ(true, sensor != nullptr);
 }
@@ -237,7 +237,7 @@ HWTEST_F(UtestMpiDeviceManager, Configure_Success, TestSize.Level0)
     std::shared_ptr<IController> controller;
     controller = DM->GetController(DM_M_VI, DM_C_VI);
     EXPECT_EQ(true, controller != nullptr);
-    std::shared_ptr<Camera::CameraMetadata> meta = std::make_shared<Camera::CameraMetadata>(100, 2000);
+    std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(100, 2000);
     int32_t expo = 0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo , 1);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_AUTO;

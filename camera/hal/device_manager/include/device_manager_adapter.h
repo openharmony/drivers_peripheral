@@ -79,8 +79,8 @@ struct camera_metadata_rational {
 using camera_rational_t = struct camera_metadata_rational;
 
 using NodeBufferCb = std::function<void(std::shared_ptr<FrameSpec>)>;
-using MetaDataCb = std::function<void(std::shared_ptr<Camera::CameraMetadata>)>;
-using HotplugDevCb = std::function<void(std::shared_ptr<Camera::CameraMetadata>, bool, CameraId)>;
+using MetaDataCb = std::function<void(std::shared_ptr<CameraMetadata>)>;
+using HotplugDevCb = std::function<void(std::shared_ptr<CameraMetadata>, bool, CameraId)>;
 using DeviceStatusCb = std::function<void()>;
 
 } // namespace Camera
