@@ -27,7 +27,7 @@ public:
     explicit IspController(std::string hardwareName);
     virtual ~IspController();
     RetCode Init();
-    RetCode Configure(std::shared_ptr<CameraMetadata> meta);
+    RetCode Configure(std::shared_ptr<Camera::CameraMetadata> meta);
     RetCode PowerUp();
     RetCode PowerDown();
     RetCode Stop();
@@ -37,7 +37,7 @@ public:
         (void)abilityMetaDataTag;
         return;
     }
-    RetCode GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta)
+    RetCode GetAbilityMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
     {
         (void)meta;
         return RC_OK;

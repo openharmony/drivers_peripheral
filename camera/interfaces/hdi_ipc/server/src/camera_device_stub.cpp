@@ -112,8 +112,8 @@ int32_t CameraDeviceStub::CameraDeviceStubUpdateSettings(
         return INVALID_ARGUMENT;
     }
 
-    std::shared_ptr<CameraMetadata> metadata = nullptr;
-    MetadataUtils::DecodeCameraMetadata(data, metadata);
+    std::shared_ptr<Camera::CameraMetadata> metadata = nullptr;
+    Camera::MetadataUtils::DecodeCameraMetadata(data, metadata);
 
     CamRetCode ret = UpdateSettings(metadata);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {

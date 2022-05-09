@@ -50,7 +50,7 @@ public:
     RetCode StopVenc();
     RetCode StartVenc();
     RetCode ConfigVenc();
-    RetCode Configure(std::shared_ptr<CameraMetadata> camMeta)
+    RetCode Configure(std::shared_ptr<Camera::CameraMetadata> camMeta)
     {
         (void)camMeta;
         return RC_OK;
@@ -59,7 +59,7 @@ public:
     {
         (void)abilityMetaDataTag;
     }
-    RetCode GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta)
+    RetCode GetAbilityMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
     {
         (void)meta;
         return RC_OK;

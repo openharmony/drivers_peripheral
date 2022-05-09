@@ -33,7 +33,7 @@ AlgoPlugin::~AlgoPlugin()
     }
 }
 
-RetCode AlgoPlugin::Init(std::shared_ptr<CameraMetadata> meta)
+RetCode AlgoPlugin::Init(std::shared_ptr<Camera::CameraMetadata> meta)
 {
     (void)meta;
     if (algoHandler_->func.Init == nullptr) {
@@ -82,7 +82,7 @@ RetCode AlgoPlugin::Flush()
 
 RetCode AlgoPlugin::Process(std::shared_ptr<IBuffer>& outBuffer,
                             std::vector<std::shared_ptr<IBuffer>>& inBuffers,
-                            std::shared_ptr<CameraMetadata>& meta)
+                            std::shared_ptr<Camera::CameraMetadata>& meta)
 {
     (void)meta;
     if (algoHandler_->func.Process == nullptr) {

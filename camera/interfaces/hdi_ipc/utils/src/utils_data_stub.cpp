@@ -16,7 +16,7 @@
 #include "utils_data_stub.h"
 
 namespace OHOS::Camera {
-bool UtilsDataStub::EncodeCameraMetadata(const std::shared_ptr<CameraMetadata> &metadata,
+bool UtilsDataStub::EncodeCameraMetadata(const std::shared_ptr<Camera::CameraMetadata> &metadata,
     MessageParcel &data)
 {
     if (metadata == nullptr) {
@@ -32,7 +32,7 @@ bool UtilsDataStub::EncodeCameraMetadata(const std::shared_ptr<CameraMetadata> &
         camera_metadata_item_entry_t *item = Camera::GetMetadataItems(meta);
         for (uint32_t i = 0; i < tagCount; i++, item++) {
             camera_metadata_item_t entry;
-            int ret = FindCameraMetadataItem(meta, item->item, &entry);
+            int ret = Camera::FindCameraMetadataItem(meta, item->item, &entry);
             if (ret == -ENOENT) {
                 return false;
             }
@@ -49,7 +49,7 @@ bool UtilsDataStub::EncodeCameraMetadata(const std::shared_ptr<CameraMetadata> &
     return bRet;
 }
 
-void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<CameraMetadata> &metadata)
+void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<Camera::CameraMetadata> &metadata)
 {
     int32_t tagCount = data.ReadInt32();
     if (tagCount <= 0) {
@@ -70,7 +70,7 @@ void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<Ca
         entrys.push_back(entry);
     }
 
-    metadata = std::make_shared<CameraMetadata>(tagCount, metadataSize);
+    metadata = std::make_shared<Camera::CameraMetadata>(tagCount, metadataSize);
     common_metadata_header_t *meta = metadata->get();
     for (auto &entry : entrys) {
         void *buffer = nullptr;

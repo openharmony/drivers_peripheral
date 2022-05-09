@@ -23,7 +23,7 @@ ISensor::ISensor(std::string sensorName) : sensorName_(sensorName) {}
 
 ISensor::~ISensor() {}
 
-void ISensor::InitPhysicalSize(CameraMetadata& camera_meta_data)
+void ISensor::InitPhysicalSize(Camera::CameraMetadata& camera_meta_data)
 {
     std::vector<float> physicalSize = {
         2592,
@@ -32,7 +32,7 @@ void ISensor::InitPhysicalSize(CameraMetadata& camera_meta_data)
     camera_meta_data.addEntry(OHOS_SENSOR_INFO_PHYSICAL_SIZE, physicalSize.data(),
         physicalSize.size());
 }
-void ISensor::InitAntiBandingModes(CameraMetadata& camera_meta_data)
+void ISensor::InitAntiBandingModes(Camera::CameraMetadata& camera_meta_data)
 {
     std::vector<uint8_t> aeAvailableAntiBandingModes = {
         OHOS_CAMERA_AE_ANTIBANDING_MODE_OFF,
@@ -43,7 +43,7 @@ void ISensor::InitAntiBandingModes(CameraMetadata& camera_meta_data)
     camera_meta_data.addEntry(OHOS_CONTROL_AE_AVAILABLE_ANTIBANDING_MODES, aeAvailableAntiBandingModes.data(),
                               aeAvailableAntiBandingModes.size());
 }
-void ISensor::InitAvailableModes(CameraMetadata& camera_meta_data)
+void ISensor::InitAvailableModes(Camera::CameraMetadata& camera_meta_data)
 {
     std::vector<uint8_t> aeAvailableModes = {
         OHOS_CAMERA_AE_MODE_ON,
@@ -51,7 +51,7 @@ void ISensor::InitAvailableModes(CameraMetadata& camera_meta_data)
     camera_meta_data.addEntry(OHOS_CONTROL_AE_AVAILABLE_MODES, aeAvailableModes.data(),
                               aeAvailableModes.size());
 }
-void ISensor::InitFpsTarget(CameraMetadata& camera_meta_data)
+void ISensor::InitFpsTarget(Camera::CameraMetadata& camera_meta_data)
 {
     std::vector<int32_t> availableAeFpsTarget = {
         15,
@@ -60,7 +60,7 @@ void ISensor::InitFpsTarget(CameraMetadata& camera_meta_data)
     camera_meta_data.addEntry(OHOS_CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES, availableAeFpsTarget.data(),
                               availableAeFpsTarget.size());
 }
-void ISensor::InitCompensationRange(CameraMetadata& camera_meta_data)
+void ISensor::InitCompensationRange(Camera::CameraMetadata& camera_meta_data)
 {
     std::vector<int32_t> aeCompensationRange = {
         0,
@@ -70,7 +70,7 @@ void ISensor::InitCompensationRange(CameraMetadata& camera_meta_data)
                               aeCompensationRange.size());
 }
 
-void ISensor::InitAwbModes(CameraMetadata& camera_meta_data)
+void ISensor::InitAwbModes(Camera::CameraMetadata& camera_meta_data)
 {
     std::vector<uint8_t> availableAwbModes = {
         OHOS_CAMERA_AWB_MODE_OFF,
@@ -79,7 +79,7 @@ void ISensor::InitAwbModes(CameraMetadata& camera_meta_data)
                               availableAwbModes.size());
 }
 
-void ISensor::InitSensitivityRange(CameraMetadata& camera_meta_data)
+void ISensor::InitSensitivityRange(Camera::CameraMetadata& camera_meta_data)
 {
     int32_t sensitivityRange[] = {
         32,

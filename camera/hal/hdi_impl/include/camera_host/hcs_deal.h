@@ -27,7 +27,7 @@
 namespace OHOS::Camera {
 class HcsDeal {
 using CameraIdMap = std::map<std::string, std::vector<std::string>>;
-using CameraMetadataMap = std::map<std::string, std::shared_ptr<CameraMetadata>>;
+using CameraMetadataMap = std::map<std::string, std::shared_ptr<Camera::CameraMetadata>>;
 public:
     HcsDeal(const std::string &pathName);
     virtual ~HcsDeal();
@@ -51,31 +51,31 @@ private:
 
     RetCode DealAeAvailableAntiBandingModes(
         const struct DeviceResourceNode &metadataNode,
-        std::shared_ptr<CameraMetadata> &metadata);
+        std::shared_ptr<Camera::CameraMetadata> &metadata);
     RetCode DealAeAvailableModes(
         const struct DeviceResourceNode &metadataNode,
-        std::shared_ptr<CameraMetadata> &metadata);
+        std::shared_ptr<Camera::CameraMetadata> &metadata);
     RetCode DealAvailableAeFpsTargets(
         const struct DeviceResourceNode &metadataNode,
-        std::shared_ptr<CameraMetadata> &metadata);
+        std::shared_ptr<Camera::CameraMetadata> &metadata);
     RetCode DealAeCompensationRange(
         const struct DeviceResourceNode &metadataNode,
-        std::shared_ptr<CameraMetadata> &metadata);
+        std::shared_ptr<Camera::CameraMetadata> &metadata);
     RetCode DealAeCompensationSteps(
         const struct DeviceResourceNode &metadataNode,
-        std::shared_ptr<CameraMetadata> &metadata);
+        std::shared_ptr<Camera::CameraMetadata> &metadata);
     RetCode DealAvailableAwbModes(
         const struct DeviceResourceNode &metadataNode,
-        std::shared_ptr<CameraMetadata> &metadata);
+        std::shared_ptr<Camera::CameraMetadata> &metadata);
     RetCode DealSensitivityRange(
         const struct DeviceResourceNode &metadataNode,
-        std::shared_ptr<CameraMetadata> &metadata);
+        std::shared_ptr<Camera::CameraMetadata> &metadata);
     RetCode DealFaceDetectMode(
         const struct DeviceResourceNode &metadataNode,
-        std::shared_ptr<CameraMetadata> &metadata);
+        std::shared_ptr<Camera::CameraMetadata> &metadata);
     RetCode DealAvailableResultKeys(
         const struct DeviceResourceNode &metadataNode,
-        std::shared_ptr<CameraMetadata> &metadata);
+        std::shared_ptr<Camera::CameraMetadata> &metadata);
 
 private:
     std::string sPathName;

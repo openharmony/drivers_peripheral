@@ -35,8 +35,8 @@
 #include "type_common.h"
 
 namespace OHOS::Camera {
-using CameraAbility = CameraMetadata;
-using CameraSetting = CameraMetadata;
+using CameraAbility = Camera::CameraMetadata;
+using CameraSetting = Camera::CameraMetadata;
 
 /**
  * @brief Enumerates return values of the HDIs.
@@ -308,7 +308,7 @@ struct CaptureInfo {
     /**
      * Captured configuration information.
      */
-    std::shared_ptr<CameraMetadata> captureSetting_;
+    std::shared_ptr<Camera::CameraMetadata> captureSetting_;
 
     /**
      * Whether to enable callback for each capture. If enabled, {@link OnFrameShutter} is called upon each capture.

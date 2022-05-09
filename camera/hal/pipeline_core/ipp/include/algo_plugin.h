@@ -34,12 +34,12 @@ public:
     int GetMode() const;
     RetCode LoadLib();
     RetCode UnloadLib();
-    RetCode Init(std::shared_ptr<CameraMetadata> meta);
+    RetCode Init(std::shared_ptr<Camera::CameraMetadata> meta);
     RetCode Start();
     RetCode Flush();
     RetCode Process(std::shared_ptr<IBuffer>& outBuffer,
                     std::vector<std::shared_ptr<IBuffer>>& inBuffers,
-                    std::shared_ptr<CameraMetadata>& meta);
+                    std::shared_ptr<Camera::CameraMetadata>& meta);
     RetCode Stop();
     std::string GetName() const;
 
