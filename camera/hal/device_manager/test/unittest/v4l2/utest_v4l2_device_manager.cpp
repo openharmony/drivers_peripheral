@@ -83,7 +83,7 @@ HWTEST_F(UtestV4l2DeviceManager, GetSensor_Success, TestSize.Level0)
     if(DM != nullptr) {
         sensor = DM->GetSensor(CAMERA_FIRST);
     }
-    CameraMetadata meta(100, 2000);
+    Camera::CameraMetadata meta(100, 2000);
     sensor->Init(meta);
     EXPECT_EQ(true, sensor != nullptr);
 }
@@ -94,7 +94,7 @@ HWTEST_F(UtestV4l2DeviceManager, GetSensor_Success2, TestSize.Level0)
     if(DM != nullptr) {
         sensor = DM->GetSensor(CAMERA_SECOND);
     }
-    CameraMetadata meta(100, 2000);;
+    Camera::CameraMetadata meta(100, 2000);;
     sensor->Init(meta);
     EXPECT_EQ(true, sensor != nullptr);
 }

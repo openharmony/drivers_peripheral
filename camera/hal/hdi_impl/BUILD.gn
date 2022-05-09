@@ -71,9 +71,9 @@ if (defined(ohos_lite)) {
       "$camera_path/hdi_impl/include/offline_stream_operator",
       "$camera_path/device_manager/include/",
       "$camera_path/buffer_manager/src/buffer_adapter/lite",
-      "$camera_path/utils/event",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
-      "//drivers/peripheral/camera/interfaces/metadata/include",
+      "$camera_path/utils/event",
+      "$camera_path/utils/metadata/include",
       "//drivers/peripheral/display/interfaces/include",
       "//drivers/peripheral/base",
 
@@ -101,8 +101,8 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",
       "$camera_path/utils:camera_utils",
+      "$camera_path/utils/metadata:metadata_lite",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/peripheral/camera/interfaces/metadata:metadata",
       "//foundation/graphic/surface:surface",
     ]
     external_deps = [ "device_driver_framework:libhdf_utils" ]

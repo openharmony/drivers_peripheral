@@ -23,7 +23,7 @@ class IPCStreamOperatorFuzzer : public StreamOperatorStub {
 public:
     CamRetCode IsStreamsSupported(
         OperationMode mode,
-        const std::shared_ptr<CameraMetadata> &modeSetting,
+        const std::shared_ptr<Camera::CameraMetadata> &modeSetting,
         const std::vector<std::shared_ptr<StreamInfo>> &info,
         StreamSupportType &type) override
     {
@@ -31,7 +31,7 @@ public:
     }
     CamRetCode IsStreamsSupported(
         OperationMode mode,
-        const std::shared_ptr<CameraMetadata> &modeSetting,
+        const std::shared_ptr<Camera::CameraMetadata> &modeSetting,
         const std::shared_ptr<StreamInfo> &info,
         StreamSupportType &type) override
     {
@@ -46,7 +46,7 @@ public:
         return OHOS::Camera::NO_ERROR;
     }
     CamRetCode CommitStreams(OperationMode mode,
-                                     const std::shared_ptr<CameraMetadata>& modeSetting) override
+                                     const std::shared_ptr<Camera::CameraMetadata>& modeSetting) override
     {
         return OHOS::Camera::NO_ERROR;
     }
