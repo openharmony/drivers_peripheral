@@ -120,12 +120,12 @@ void ViController::SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag
     }
 }
 
-RetCode ViController::Configure(std::shared_ptr<Camera::CameraMetadata> meta)
+RetCode ViController::Configure(std::shared_ptr<CameraMetadata> meta)
 {
     return SendIspMetaData(meta);
 }
 
-RetCode ViController::SendIspMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
+RetCode ViController::SendIspMetaData(std::shared_ptr<CameraMetadata> meta)
 {
     common_metadata_header_t* data = meta->get();
     if (data == nullptr) {
@@ -149,7 +149,7 @@ RetCode ViController::SendAEMetaData(common_metadata_header_t& data)
     int32_t expo = 0;
     RetCode rc = RC_OK;
     camera_metadata_item_t entry;
-    int ret = Camera::FindCameraMetadataItem(&data, OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &entry);
+    int ret = FindCameraMetadataItem(&data, OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &entry);
     if (ret == 0) {
         expo = *(entry.data.i32);
         rc = viObject_->UpdateSetting(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, (char*)&expo);
@@ -167,7 +167,7 @@ RetCode ViController::SendAWBMetaData(common_metadata_header_t& data)
     uint8_t awbMode = 0;
     RetCode rc = RC_OK;
     camera_metadata_item_t entry;
-    int ret = Camera::FindCameraMetadataItem(&data, OHOS_CONTROL_AWB_MODE, &entry);
+    int ret = FindCameraMetadataItem(&data, OHOS_CONTROL_AWB_MODE, &entry);
     if (ret == 0) {
         awbMode = *(entry.data.u8);
         rc = viObject_->UpdateSetting(OHOS_CONTROL_AWB_MODE, (char*)&awbMode);
@@ -180,12 +180,12 @@ RetCode ViController::SendAWBMetaData(common_metadata_header_t& data)
     return rc;
 }
 
-RetCode ViController::GetAbilityMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
+RetCode ViController::GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta)
 {
     return GetIspMetaData(meta);
 }
 
-RetCode ViController::GetIspMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
+RetCode ViController::GetIspMetaData(std::shared_ptr<CameraMetadata> meta)
 {
     RetCode ret = RC_ERROR;
     RetCode rc = GetAEMetaData(meta);
@@ -204,7 +204,7 @@ RetCode ViController::GetIspMetaData(std::shared_ptr<Camera::CameraMetadata> met
     return ret;
 }
 
-RetCode ViController::GetAEMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
+RetCode ViController::GetAEMetaData(std::shared_ptr<CameraMetadata> meta)
 {
     static int64_t oldExpoTime = 0;
     int64_t expoTime = 0;
@@ -234,7 +234,7 @@ RetCode ViController::GetAEMetaData(std::shared_ptr<Camera::CameraMetadata> meta
     return rc;
 }
 
-RetCode ViController::GetAWBMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
+RetCode ViController::GetAWBMetaData(std::shared_ptr<CameraMetadata> meta)
 {
     RetCode rc = RC_ERROR;
     std::lock_guard<std::mutex> l(metaDataSetlock_);
@@ -255,7 +255,7 @@ RetCode ViController::GetAWBMetaData(std::shared_ptr<Camera::CameraMetadata> met
     return rc;
 }
 
-RetCode ViController::GetColorCorrectionGains(std::shared_ptr<Camera::CameraMetadata> meta)
+RetCode ViController::GetColorCorrectionGains(std::shared_ptr<CameraMetadata> meta)
 {
     static constexpr int DATA_COUNT = 4;
     static float oldColorGains[DATA_COUNT] = {0};

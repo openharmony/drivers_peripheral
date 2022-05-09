@@ -72,7 +72,7 @@ RetCode IspController::Stop()
     return rc;
 }
 
-RetCode IspController::Configure(std::shared_ptr<Camera::CameraMetadata> meta)
+RetCode IspController::Configure(std::shared_ptr<CameraMetadata> meta)
 {
     return RC_OK;
 }

@@ -45,8 +45,8 @@ int32_t CameraDeviceCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &
             }
 
             uint64_t timestamp = data.ReadUint64();
-            std::shared_ptr<Camera::CameraMetadata> result = nullptr;
-            Camera::MetadataUtils::DecodeCameraMetadata(data, result);
+            std::shared_ptr<CameraMetadata> result = nullptr;
+            MetadataUtils::DecodeCameraMetadata(data, result);
             OnResult(timestamp, result);
             break;
         }

@@ -154,7 +154,7 @@ RetCode HcsDeal::DealMetadata(const std::string &cameraId, const struct DeviceRe
     std::string cmpTmp;
     const int ENTRY_CAPACITY = 30;
     const int DATA_CAPACITY = 2000;
-    std::shared_ptr<Camera::CameraMetadata> metadata = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
+    std::shared_ptr<CameraMetadata> metadata = std::make_shared<CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
     DealAeAvailableAntiBandingModes(node, metadata);
     DealAeAvailableModes(node, metadata);
     DealAvailableAeFpsTargets(node, metadata);
@@ -171,7 +171,7 @@ RetCode HcsDeal::DealMetadata(const std::string &cameraId, const struct DeviceRe
 
 RetCode HcsDeal::DealAeAvailableAntiBandingModes(
     const struct DeviceResourceNode &metadataNode,
-    std::shared_ptr<Camera::CameraMetadata> &metadata)
+    std::shared_ptr<CameraMetadata> &metadata)
 {
     const char *nodeValue = nullptr;
     std::vector<uint8_t> aeAvailableAntiBandingModeUint8s;
@@ -193,7 +193,7 @@ RetCode HcsDeal::DealAeAvailableAntiBandingModes(
 
 RetCode HcsDeal::DealAeAvailableModes(
     const struct DeviceResourceNode &metadataNode,
-    std::shared_ptr<Camera::CameraMetadata> &metadata)
+    std::shared_ptr<CameraMetadata> &metadata)
 {
     int32_t hcbRet = -1;
     const char *nodeValue = nullptr;
@@ -220,7 +220,7 @@ RetCode HcsDeal::DealAeAvailableModes(
 
 RetCode HcsDeal::DealAvailableAeFpsTargets(
     const struct DeviceResourceNode &metadataNode,
-    std::shared_ptr<Camera::CameraMetadata> &metadata)
+    std::shared_ptr<CameraMetadata> &metadata)
 {
     int32_t hcbRet = -1;
     uint32_t nodeValue;
@@ -247,7 +247,7 @@ RetCode HcsDeal::DealAvailableAeFpsTargets(
 
 RetCode HcsDeal::DealAeCompensationRange(
     const struct DeviceResourceNode &metadataNode,
-    std::shared_ptr<Camera::CameraMetadata> &metadata)
+    std::shared_ptr<CameraMetadata> &metadata)
 {
     std::vector<int32_t> aeCompensationRange;
     int32_t elemNum = pDevResIns->GetElemNum(&metadataNode, "aeCompensationRange");
@@ -269,7 +269,7 @@ RetCode HcsDeal::DealAeCompensationRange(
 
 RetCode HcsDeal::DealAeCompensationSteps(
     const struct DeviceResourceNode &metadataNode,
-    std::shared_ptr<Camera::CameraMetadata> &metadata)
+    std::shared_ptr<CameraMetadata> &metadata)
 {
     constexpr const char *AE_COMPENSATION_STEPS = "aeCompensationSteps";
     int32_t elemNum = pDevResIns->GetElemNum(&metadataNode, AE_COMPENSATION_STEPS);
@@ -298,7 +298,7 @@ RetCode HcsDeal::DealAeCompensationSteps(
 
 RetCode HcsDeal::DealAvailableAwbModes(
     const struct DeviceResourceNode &metadataNode,
-    std::shared_ptr<Camera::CameraMetadata> &metadata)
+    std::shared_ptr<CameraMetadata> &metadata)
 {
     int32_t hcbRet = -1;
     const char *nodeValue = nullptr;
@@ -324,7 +324,7 @@ RetCode HcsDeal::DealAvailableAwbModes(
 
 RetCode HcsDeal::DealSensitivityRange(
     const struct DeviceResourceNode &metadataNode,
-    std::shared_ptr<Camera::CameraMetadata> &metadata)
+    std::shared_ptr<CameraMetadata> &metadata)
 {
     std::vector<int32_t> sensitivityRange;
     int32_t elemNum = pDevResIns->GetElemNum(&metadataNode, "sensitivityRange");
@@ -347,7 +347,7 @@ RetCode HcsDeal::DealSensitivityRange(
 
 RetCode HcsDeal::DealFaceDetectMode(
     const struct DeviceResourceNode &metadataNode,
-    std::shared_ptr<Camera::CameraMetadata> &metadata)
+    std::shared_ptr<CameraMetadata> &metadata)
 {
     const char *pNodeValue = nullptr;
     int32_t rc = pDevResIns->GetString(&metadataNode, "faceDetectMode", &pNodeValue, nullptr);
@@ -368,7 +368,7 @@ RetCode HcsDeal::DealFaceDetectMode(
 
 RetCode HcsDeal::DealAvailableResultKeys(
     const struct DeviceResourceNode &metadataNode,
-    std::shared_ptr<Camera::CameraMetadata> &metadata)
+    std::shared_ptr<CameraMetadata> &metadata)
 {
     int32_t hcbRet = -1;
     const char *nodeValue = nullptr;

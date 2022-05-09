@@ -45,7 +45,7 @@ ohos_executable("v4l2_main") {
   ]
 
   include_dirs = [
-    "$camera_device_name_path/camera/src/driver_adapter/main_test",
+    "$board_camera_path/driver_adapter/test/v4l2_test/include",
     "$camera_path/include",
     "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter/include",
   ]
