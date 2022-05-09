@@ -71,7 +71,7 @@ static int32_t UsbEcmStartTx(struct UsbEcm *port)
         ret = UsbFnSubmitRequestAsync(req);
         port->writeBusy = false;
         if (ret != HDF_SUCCESS) {
-            HDF_LOGD("%s: send request erro %d", __func__, ret);
+            HDF_LOGE("%{public}s: send request erro %{public}d", __func__, ret);
             DListInsertTail(&req->list, pool);
             break;
         }
@@ -102,7 +102,7 @@ static uint32_t UsbEcmStartRx(struct UsbEcm *port)
         req->length = out->maxPacketSize;
         ret = UsbFnSubmitRequestAsync(req);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGD("%s: send request erro %d", __func__, ret);
+            HDF_LOGE("%{public}s: send request erro %{public}d", __func__, ret);
             DListInsertTail(&req->list, pool);
             break;
         }
@@ -658,37 +658,37 @@ static void UsbEcmEventCallback(struct UsbFnEvent *event)
     struct UsbEcmDevice *ecm = NULL;
 
     if (event == NULL || event->context == NULL) {
-        HDF_LOGE("%s: event is null", __func__);
+        HDF_LOGE("%{public}s: event is null", __func__);
         return;
     }
 
     ecm = (struct UsbEcmDevice *)event->context;
     switch (event->type) {
         case USBFN_STATE_BIND:
-            HDF_LOGI("%s: receive bind event", __func__);
+            HDF_LOGI("%{public}s: receive bind event", __func__);
             break;
         case USBFN_STATE_UNBIND:
-            HDF_LOGI("%s: receive unbind event", __func__);
+            HDF_LOGI("%{public}s: receive unbind event", __func__);
             break;
         case USBFN_STATE_ENABLE:
-            HDF_LOGI("%s: receive enable event", __func__);
+            HDF_LOGI("%{public}s: receive enable event", __func__);
             EcmEnable(ecm);
             break;
         case USBFN_STATE_DISABLE:
-            HDF_LOGI("%s: receive disable event", __func__);
+            HDF_LOGI("%{public}s: receive disable event", __func__);
             EcmDisable(ecm);
             break;
         case USBFN_STATE_SETUP:
-            HDF_LOGI("%s: receive setup event", __func__);
+            HDF_LOGI("%{public}s: receive setup event", __func__);
             if (event->setup != NULL) {
                 EcmSetup(ecm, event->setup);
             }
             break;
         case USBFN_STATE_SUSPEND:
-            HDF_LOGI("%s: receive suspend event", __func__);
+            HDF_LOGI("%{public}s: receive suspend event", __func__);
             break;
         case USBFN_STATE_RESUME:
-            HDF_LOGI("%s: receive resume event", __func__);
+            HDF_LOGI("%{public}s: receive resume event", __func__);
             break;
         default:
             break;

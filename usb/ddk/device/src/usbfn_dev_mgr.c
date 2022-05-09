@@ -213,25 +213,25 @@ const struct UsbFnDeviceMgr *UsbFnMgrDeviceCreate(const char *udcName,
 
     struct UsbFnDeviceMgr *fnDevMgr = NULL;
     if (udcName == NULL || des == NULL) {
-        HDF_LOGE("%s:%d invalid param.", __func__, __LINE__);
+        HDF_LOGE("%{public}s invalid param.", __func__);
         return NULL;
     }
 
     fnDevMgr = UsbFnMemCalloc(sizeof(struct UsbFnDeviceMgr));
     if (fnDevMgr == NULL) {
-        HDF_LOGE("%s:%d UsbFnMemCalloc failed!", __func__, __LINE__);
+        HDF_LOGE("%{public}s UsbFnMemCalloc failed!", __func__);
         return NULL;
     }
 
     ret = CreatDev(udcName, des, fnDevMgr);
     if (ret) {
-        HDF_LOGE("%s:%d CreatDev failed!", __func__, __LINE__);
+        HDF_LOGE("%{public}s CreatDev failed!", __func__);
         goto FREE_DEVMGR;
     }
 
     ret = AllocInterfaceAndFuncMgr(fnDevMgr, des);
     if (ret) {
-        HDF_LOGE("%s:%d AllocInterfaceAndFuncMgr failed!", __func__, __LINE__);
+        HDF_LOGE("%{public}s AllocInterfaceAndFuncMgr failed!", __func__);
         goto FREE_DEVMGR;
     }
 
@@ -315,11 +315,11 @@ const struct UsbFnDeviceMgr *UsbFnMgrDeviceGet(const char *udcName)
     struct UsbObject *obj = NULL;
     struct UsbObject *temp = NULL;
     if (udcName == NULL) {
-        HDF_LOGE("%s:%d invalid param.", __func__, __LINE__);
+        HDF_LOGE("%{public}s invalid param.", __func__);
         return NULL;
     }
     if (g_devEntry.next == 0 || DListIsEmpty(&g_devEntry)) {
-        HDF_LOGE("%s:%d no device creat", __func__, __LINE__);
+        HDF_LOGE("%{public}s no device creat", __func__);
         return NULL;
     }
 
