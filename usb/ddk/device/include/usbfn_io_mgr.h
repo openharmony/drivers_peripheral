@@ -31,7 +31,7 @@ struct ReqList {
     struct DListHead    entry;
     uint8_t             pipe;
     int32_t                 fd;
-    uintptr_t           buf;
+    uint64_t           buf;
     uint32_t            bufLen;
     struct UsbHandleMgr *handle;
 };
