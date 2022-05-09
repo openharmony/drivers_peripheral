@@ -93,7 +93,7 @@ ohos_shared_library("camera_pipeline_core") {
     "$camera_path/pipeline_core/ipp/include",
     "$camera_path/utils/event",
     "$camera_path/adapter/platform/v4l2/src/device_manager/include",
-    "$camera_device_name_path/camera/include/device_manager",
+    "$board_camera_path/device_manager/include",
     "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/v4l2_source_node",
     "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/uvc_node",
     "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter/include/",
@@ -139,7 +139,7 @@ config("example_config") {
 }
 
 ohos_shared_library("camera_ipp_algo_example") {
-  sources = [ "$camera_device_name_path/camera/src/pipeline_core/ipp_algo_example/ipp_algo_example.c" ]
+  sources = [ "$board_camera_path/pipeline_core/ipp_algo_example.c" ]
 
   include_dirs = [ "$camera_path/pipeline_core/ipp/include" ]
   external_deps = [ "utils_base:utils" ]

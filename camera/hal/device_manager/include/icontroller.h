@@ -35,13 +35,13 @@ public:
     bool GetPowerOnState();
     void SetPowerOnState(bool powerOnState);
     virtual void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag) = 0;
-    virtual RetCode GetAbilityMetaData(std::shared_ptr<Camera::CameraMetadata> meta) = 0;
+    virtual RetCode GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta) = 0;
     virtual bool GetMetaDataFlag()
     {
         return false;
     }
     virtual void SetMetaDataFlag(bool metaDataFlag);
-    virtual RetCode Configure(std::shared_ptr<Camera::CameraMetadata> meta) = 0;
+    virtual RetCode Configure(std::shared_ptr<CameraMetadata> meta) = 0;
 
 private:
     std::mutex powerOnStatelock_;
