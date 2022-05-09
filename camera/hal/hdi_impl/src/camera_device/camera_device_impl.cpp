@@ -139,7 +139,7 @@ RetCode CameraDeviceImpl::GetEnabledFromCfg()
     if (config == nullptr) {
         return RC_ERROR;
     }
-    std::shared_ptr<Camera::CameraMetadata> ability;
+    std::shared_ptr<CameraMetadata> ability;
     RetCode rc = config->GetCameraAbility(cameraId_, ability);
     if (rc != RC_OK || ability == nullptr) {
         CAMERA_LOGD("GetCameraAbility failed.");
@@ -153,7 +153,7 @@ RetCode CameraDeviceImpl::GetEnabledFromCfg()
     }
 
     camera_metadata_item_t entry;
-    int ret = Camera::FindCameraMetadataItem(metadata,
+    int ret = FindCameraMetadataItem(metadata,
         OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, &entry);
     if (ret == 0) {
         CAMERA_LOGD("FindCameraMetadataIte tags = %{public}d. type = %{public}d", entry.count, entry.data_type);
@@ -215,7 +215,7 @@ CamRetCode CameraDeviceImpl::DisableResult(const std::vector<MetaType> &results)
     return NO_ERROR;
 }
 
-RetCode CameraDeviceImpl::GetMetadataResults(std::shared_ptr<Camera::CameraMetadata> &metadata)
+RetCode CameraDeviceImpl::GetMetadataResults(std::shared_ptr<CameraMetadata> &metadata)
 {
     // the value of metadataResults_ comes from event or directly from devicemanager
     RetCode rc = RC_OK;
@@ -254,13 +254,13 @@ RetCode CameraDeviceImpl::UpdataMetadataResultsBase()
 
     for (auto &metaType : enabledResults_) {
         camera_metadata_item_t baseEntry;
-        int ret = Camera::FindCameraMetadataItem(metadataBase, metaType, &baseEntry);
+        int ret = FindCameraMetadataItem(metadataBase, metaType, &baseEntry);
         if (ret == -ENOENT) {
             CAMERA_LOGE("metadata base not found tag.[metaType = %{public}d]", metaType);
             continue;
         }
         camera_metadata_item_t newEntry;
-        ret = Camera::FindCameraMetadataItem(metadataNew, metaType, &newEntry);
+        ret = FindCameraMetadataItem(metadataNew, metaType, &newEntry);
         if (ret == -ENOENT) {
             CAMERA_LOGE("metadata result not found tag.[metaType = %{public}d]", metaType);
             continue;
@@ -377,7 +377,7 @@ void CameraDeviceImpl::ResultMetadata()
         return;
     }
 
-    std::shared_ptr<Camera::CameraMetadata> metadata;
+    std::shared_ptr<CameraMetadata> metadata;
     RetCode rc = GetMetadataResults(metadata);
     if (rc == RC_OK || metaResultMode_ == PER_FRAME) {
         uint64_t timestamp = GetCurrentLocalTimeStamp();
@@ -405,7 +405,7 @@ void CameraDeviceImpl::OnRequestTimeout()
     cameraDeciceCallback_->OnError(REQUEST_TIMEOUT, 0);
 }
 
-void CameraDeviceImpl::OnMetadataChanged(const std::shared_ptr<Camera::CameraMetadata> &metadata)
+void CameraDeviceImpl::OnMetadataChanged(const std::shared_ptr<CameraMetadata> &metadata)
 {
     CAMERA_LOGD("OnMetadataChanged callback success.");
     // device metadata changed callback

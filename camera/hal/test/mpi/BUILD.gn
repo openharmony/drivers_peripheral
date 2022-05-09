@@ -70,11 +70,11 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/utils/event",
       "//drivers/peripheral/base",
+      "//drivers/peripheral/camera/interfaces/metadata/include",
       "//drivers/peripheral/display/interfaces/include",
       "//foundation/communication/ipc_lite/interfaces/kits",
       "//foundation/graphic/surface/interfaces/kits",
       "//foundation/graphic/surface/interfaces/innerkits",
-      "$camera_path/utils/metadata/include",
       "//base/startup/syspara_lite/interfaces/kits",
 
       #producer
@@ -107,10 +107,10 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/hdi_impl:camera_hdi_impl",
       "$camera_path/pipeline_core:camera_pipeline_core",
-      "$camera_path/utils/metadata:metadata_lite",
       "$hdf_uhdf_path/utils:libhdf_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
+      "//drivers/peripheral/camera/interfaces/metadata:metadata",
     ]
   }
 } else {
