@@ -69,7 +69,7 @@ HWTEST_F(StreamOperatorImplTest, UTestIsStreamsSupported, TestSize.Level0)
     EXPECT_EQ(true, rc);
 
     OperationMode mode = NORMAL;
-    std::shared_ptr<Camera::CameraMetadata> modeSetting = std::make_shared<Camera::CameraMetadata>(2, 128);
+    std::shared_ptr<CameraMetadata> modeSetting = std::make_shared<CameraMetadata>(2, 128);
     int64_t expoTime = 0;
     modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
     int64_t colorGains[4] = {0};

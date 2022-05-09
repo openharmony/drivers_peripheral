@@ -27,12 +27,12 @@
 namespace OHOS::Camera {
 class MetadataUtils {
 public:
-    static bool EncodeCameraMetadata(const std::shared_ptr<Camera::CameraMetadata> &metadata,
+    static bool EncodeCameraMetadata(const std::shared_ptr<CameraMetadata> &metadata,
                                      MessageParcel &data);
-    static void DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<Camera::CameraMetadata> &metadata);
+    static void DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<CameraMetadata> &metadata);
 
-    static std::string EncodeToString(std::shared_ptr<Camera::CameraMetadata> metadata);
-    static std::shared_ptr<Camera::CameraMetadata> DecodeFromString(std::string setting);
+    static std::string EncodeToString(std::shared_ptr<CameraMetadata> metadata);
+    static std::shared_ptr<CameraMetadata> DecodeFromString(std::string setting);
 
 private:
     static bool WriteMetadata(const camera_metadata_item_t &item, MessageParcel &data);

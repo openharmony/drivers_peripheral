@@ -55,7 +55,7 @@ ohos_unittest("v4l2_adapter_unittest") {
   include_dirs = [
     "$camera_path/include",
     "$camera_path/adapter/platform/v4l2/src/driver_adapter/include",
-    "$camera_device_name_path/camera/src/driver_adapter/test/unittest/include",
+    "$board_camera_path/camera/src/driver_adapter/test/unittest/include",
     "//third_party/googletest/googletest/include/gtest",
   ]
 

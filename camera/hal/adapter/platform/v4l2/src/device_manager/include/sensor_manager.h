@@ -31,7 +31,7 @@ public:
     RetCode DestroyController(ControllerId controllerId, std::string hardwareName);
     std::shared_ptr<IController> GetController(ControllerId controllerId, std::string hardwareName);
 
-    void Configure(std::shared_ptr<Camera::CameraMetadata> meta);
+    void Configure(std::shared_ptr<CameraMetadata> meta);
     RetCode Start(std::string hardwareName, int buffCont, DeviceFormat& format);
     RetCode Stop(std::string hardwareName);
     RetCode PowerUp(std::string hardwareName);
