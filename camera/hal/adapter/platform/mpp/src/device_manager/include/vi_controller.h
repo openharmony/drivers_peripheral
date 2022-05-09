@@ -32,7 +32,7 @@ public:
     virtual ~ViController();
     RetCode Init();
     std::shared_ptr<ISensor> GetSensor(std::string sensorName);
-    RetCode Configure(std::shared_ptr<CameraMetadata> meta);
+    RetCode Configure(std::shared_ptr<Camera::CameraMetadata> meta);
     bool GetStartViState()
     {
         return startViState_;
@@ -55,19 +55,19 @@ public:
     RetCode StartVi();
     RetCode ConfigVi();
     void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag);
-    RetCode GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta);
+    RetCode GetAbilityMetaData(std::shared_ptr<Camera::CameraMetadata> meta);
     bool GetMetaDataFlag();
     void SetMetaDataFlag(bool metaDataFlag);
     RetCode SetFlashlight(FlashMode flashMode, bool enable);
 
 private:
-    RetCode SendIspMetaData(std::shared_ptr<CameraMetadata> meta);
+    RetCode SendIspMetaData(std::shared_ptr<Camera::CameraMetadata> meta);
     RetCode SendAEMetaData(common_metadata_header_t &data);
     RetCode SendAWBMetaData(common_metadata_header_t &data);
-    RetCode GetIspMetaData(std::shared_ptr<CameraMetadata> meta);
-    RetCode GetAEMetaData(std::shared_ptr<CameraMetadata> meta);
-    RetCode GetAWBMetaData(std::shared_ptr<CameraMetadata> meta);
-    RetCode GetColorCorrectionGains(std::shared_ptr<CameraMetadata> meta);
+    RetCode GetIspMetaData(std::shared_ptr<Camera::CameraMetadata> meta);
+    RetCode GetAEMetaData(std::shared_ptr<Camera::CameraMetadata> meta);
+    RetCode GetAWBMetaData(std::shared_ptr<Camera::CameraMetadata> meta);
+    RetCode GetColorCorrectionGains(std::shared_ptr<Camera::CameraMetadata> meta);
     template<typename T>
     bool CheckNumequal(T oldnum, T num, int size)
     {

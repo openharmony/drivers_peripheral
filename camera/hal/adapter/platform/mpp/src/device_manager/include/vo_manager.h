@@ -30,7 +30,7 @@ public:
     RetCode CreateController(ControllerId controllerId, std::string hardwareName);
     std::shared_ptr<IController> GetController(ControllerId controllerId);
 
-    void Configure(std::shared_ptr<CameraMetadata> meta)
+    void Configure(std::shared_ptr<Camera::CameraMetadata> meta)
     {
         vo_->Configure(meta);
     };
@@ -52,7 +52,7 @@ public:
     {
         vo_->SetAbilityMetaDataTag(abilityMetaDataTag);
     };
-    RetCode GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta)
+    RetCode GetAbilityMetaData(std::shared_ptr<Camera::CameraMetadata> meta)
     {
         return vo_->GetAbilityMetaData(meta);
     };

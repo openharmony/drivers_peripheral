@@ -62,10 +62,10 @@ RetCode ViManager::PowerDown(CameraId cameraId)
     return vi_->PowerDown(cameraId);
 }
 
-CameraMetadata ViManager::GetSensorInfo(CameraId cameraId)
+Camera::CameraMetadata ViManager::GetSensorInfo(CameraId cameraId)
 {
     (void)cameraId;
-    CameraMetadata meta(0, 0);
+    Camera::CameraMetadata meta(0, 0);
     return meta;
 }
 } // namespace Camera

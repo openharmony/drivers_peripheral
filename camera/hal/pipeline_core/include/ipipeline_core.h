@@ -26,7 +26,7 @@ public:
     virtual RetCode Init() = 0;
     virtual std::shared_ptr<HostStreamMgr> GetHostStreamMgr() const = 0;
     virtual std::shared_ptr<IStreamPipelineCore> GetStreamPipelineCore() const = 0;
-    virtual void UpdateMetadata(std::shared_ptr<CameraMetadata> meta)  = 0;
+    virtual void UpdateMetadata(std::shared_ptr<Camera::CameraMetadata> meta)  = 0;
     virtual ~IPipelineCore() = default;
 };
 }

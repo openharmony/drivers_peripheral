@@ -444,8 +444,8 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0120, TestSize.Level0)
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     // Configure mode and modeSetting
     Camera::OperationMode mode = Camera::NORMAL;
-    std::shared_ptr<CameraMetadata> modeSetting =
-        std::make_shared<CameraMetadata>(2, 128);
+    std::shared_ptr<Camera::CameraMetadata> modeSetting =
+        std::make_shared<Camera::CameraMetadata>(2, 128);
     int64_t colorGains[4] = {0};
     modeSetting->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
     int64_t expoTime = 0;

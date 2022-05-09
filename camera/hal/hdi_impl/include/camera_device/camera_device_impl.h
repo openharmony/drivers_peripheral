@@ -49,7 +49,7 @@ public:
     CamRetCode SetCallback(const OHOS::sptr<ICameraDeviceCallback> &callback) override;
     ResultCallbackMode GetMetaResultMode() const override;
     /* RC_OK: metadata changed；RC_ERROR: metadata unchanged； */
-    RetCode GetMetadataResults(std::shared_ptr<CameraMetadata> &metadata) override;
+    RetCode GetMetadataResults(std::shared_ptr<Camera::CameraMetadata> &metadata) override;
     void ResultMetadata() override;
     void GetCameraId(std::string &cameraId) const override;
     bool IsOpened() const override;
@@ -57,7 +57,7 @@ public:
     void OnRequestTimeout();
 
 protected:
-    void OnMetadataChanged(const std::shared_ptr<CameraMetadata> &metadata) override;
+    void OnMetadataChanged(const std::shared_ptr<Camera::CameraMetadata> &metadata) override;
     void OnDevStatusErr() override;
 
 private:
@@ -78,9 +78,9 @@ private:
     std::vector<MetaType> deviceMetaTypes_;
     std::mutex enabledRstMutex_;
     std::vector<MetaType> enabledResults_;
-    std::shared_ptr<CameraMetadata> metadataResultsBase_;
+    std::shared_ptr<Camera::CameraMetadata> metadataResultsBase_;
     std::mutex metaRstMutex_;
-    std::shared_ptr<CameraMetadata> metadataResults_;
+    std::shared_ptr<Camera::CameraMetadata> metadataResults_;
 
     // to keep OHOS::sptr<IStreamOperator> alive
     OHOS::sptr<IStreamOperator> ismOperator_ = nullptr;
