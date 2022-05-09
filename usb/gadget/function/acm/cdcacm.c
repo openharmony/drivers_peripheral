@@ -71,7 +71,7 @@ static int32_t UsbSerialStartTx(struct UsbSerial *port)
         ret = UsbFnSubmitRequestAsync(req);
         port->writeBusy = false;
         if (ret != HDF_SUCCESS) {
-            HDF_LOGD("%s: send request erro %d", __func__, ret);
+            HDF_LOGE("%{public}s: send request erro %{public}d", __func__, ret);
             DListInsertTail(&req->list, pool);
             break;
         }
@@ -101,7 +101,7 @@ static uint32_t UsbSerialStartRx(struct UsbSerial *port)
         req->length = out->maxPacketSize;
         ret = UsbFnSubmitRequestAsync(req);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGD("%s: send request erro %d", __func__, ret);
+            HDF_LOGE("%{public}s: send request erro %{public}d", __func__, ret);
             DListInsertTail(&req->list, pool);
             break;
         }
@@ -363,6 +363,7 @@ static int32_t UsbSerialStartIo(struct UsbSerial *port)
     if (port->readAllocated == 0) {
         ret = UsbSerialAllocReadRequests(port, QUEUE_SIZE);
         if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: UsbSerialAllocReadRequests failed:%{public}d", __func__, ret);
             return ret;
         }
     }
@@ -370,6 +371,7 @@ static int32_t UsbSerialStartIo(struct UsbSerial *port)
         ret = UsbSerialAllocWriteRequests(port, QUEUE_SIZE);
         if (ret != HDF_SUCCESS) {
             UsbSerialFreeRequests(head, &port->readAllocated);
+            HDF_LOGE("%{public}s: UsbSerialAllocWriteRequests failed:%{public}d", __func__, ret);
             return ret;
         }
     }
@@ -380,6 +382,7 @@ static int32_t UsbSerialStartIo(struct UsbSerial *port)
     } else {
         UsbSerialFreeRequests(head, &port->readAllocated);
         UsbSerialFreeRequests(&port->writePool, &port->writeAllocated);
+        HDF_LOGE("%{public}s: UsbSerialStartRx failed", __func__);
         ret = HDF_ERR_IO;
     }
 
@@ -1058,18 +1061,18 @@ static uint32_t AcmEnable(struct UsbAcmDevice *acm)
 
     ret = UsbSerialAllocFifo(&port->writeFifo, WRITE_BUF_SIZE);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbSerialAllocFifo failed", __func__);
+        HDF_LOGE("%{public}s: UsbSerialAllocFifo failed", __func__);
         return HDF_FAILURE;
     }
     ret = UsbSerialAllocFifo(&port->readFifo, READ_BUF_SIZE);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbSerialAllocFifo failed", __func__);
+        HDF_LOGE("%{public}s: UsbSerialAllocFifo failed", __func__);
         return HDF_FAILURE;
     }
 
     ret = UsbSerialStartIo(port);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbSerialStartIo failed", __func__);
+        HDF_LOGE("%{public}s: UsbSerialStartIo failed", __func__);
     }
     if (acm->notify && acm->notify->Connect) {
         acm->notify->Connect(acm);
@@ -1195,7 +1198,7 @@ static void AcmResume(struct UsbAcmDevice *acm)
     }
     ret = UsbSerialStartIo(port);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbSerialStartIo failed", __func__);
+        HDF_LOGE("%{public}s: UsbSerialStartIo failed", __func__);
     }
     if (acm->notify && acm->notify->Connect) {
         acm->notify->Connect(acm);
@@ -1209,39 +1212,39 @@ static void UsbAcmEventCallback(struct UsbFnEvent *event)
     struct UsbAcmDevice *acm = NULL;
 
     if (event == NULL || event->context == NULL) {
-        HDF_LOGE("%s: event is null", __func__);
+        HDF_LOGE("%{public}s: event is null", __func__);
         return;
     }
 
     acm = (struct UsbAcmDevice *)event->context;
     switch (event->type) {
         case USBFN_STATE_BIND:
-            HDF_LOGI("%s: receive bind event", __func__);
+            HDF_LOGI("%{public}s: receive bind event", __func__);
             break;
         case USBFN_STATE_UNBIND:
-            HDF_LOGI("%s: receive unbind event", __func__);
+            HDF_LOGI("%{public}s: receive unbind event", __func__);
             break;
         case USBFN_STATE_ENABLE:
-            HDF_LOGI("%s: receive enable event", __func__);
+            HDF_LOGI("%{public}s: receive enable event", __func__);
             AcmEnable(acm);
             break;
         case USBFN_STATE_DISABLE:
-            HDF_LOGI("%s: receive disable event", __func__);
+            HDF_LOGI("%{public}s: receive disable event", __func__);
             AcmDisable(acm);
             acm->enableEvtCnt = 0;
             break;
         case USBFN_STATE_SETUP:
-            HDF_LOGI("%s: receive setup event", __func__);
+            HDF_LOGI("%{public}s: receive setup event", __func__);
             if (event->setup != NULL) {
                 AcmSetup(acm, event->setup);
             }
             break;
         case USBFN_STATE_SUSPEND:
-            HDF_LOGI("%s: receive suspend event", __func__);
+            HDF_LOGI("%{public}s: receive suspend event", __func__);
             AcmSuspend(acm);
             break;
         case USBFN_STATE_RESUME:
-            HDF_LOGI("%s: receive resume event", __func__);
+            HDF_LOGI("%{public}s: receive resume event", __func__);
             AcmResume(acm);
             break;
         default:
@@ -1293,7 +1296,7 @@ static int32_t AcmNotifySerialState(struct UsbAcmDevice *acm)
 
     OsalMutexLock(&acm->lock);
     if (acm->notifyReq) {
-        HDF_LOGD("acm serial state %04x\n", acm->serialState);
+        HDF_LOGI("acm serial state %{public}04x\n", acm->serialState);
         serialState = CpuToLe16(acm->serialState);
         ret = AcmSendNotifyRequest(acm, USB_DDK_CDC_NOTIFY_SERIAL_STATE,
             0, &serialState, sizeof(acm->serialState));

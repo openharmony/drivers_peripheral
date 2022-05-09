@@ -170,17 +170,16 @@ struct IoData {
     uint32_t read;      /* 0 for write ,1 for read */
     uint32_t len;       /* the len of this io request */
     uint32_t timeout;   /* sync timeout */
-    uintptr_t buf;       /* the address of map buf */
+    uint64_t buf;       /* the address of map buf */
 };
 
 struct GenericMemory {
-    size_t size;
-    uintptr_t buf;
-    char storage[];
+    uint32_t size;
+    uint64_t buf;
 };
 
 struct UsbFnReqEvent {
-    uintptr_t buf;
+    uint64_t buf;
     uint32_t actual;
     int32_t      status;
 };

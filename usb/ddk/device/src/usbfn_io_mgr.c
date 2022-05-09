@@ -21,7 +21,7 @@ static int32_t ReqToIoData(struct UsbFnRequest *req, struct IoData *ioData,
     uint32_t aio, uint32_t timeout)
 {
     if (req == NULL || ioData == NULL) {
-        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     struct ReqList *reqList = (struct ReqList *) req;
@@ -135,7 +135,7 @@ int32_t UsbFnIoMgrRequestFree(struct UsbFnRequest *req)
     struct GenericMemory mem;
     int32_t ret;
     if (req == NULL) {
-        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -148,10 +148,10 @@ int32_t UsbFnIoMgrRequestFree(struct UsbFnRequest *req)
         return HDF_ERR_DEVICE_BUSY;
     }
     mem.size = reqList->bufLen;
-    mem.buf = (uintptr_t)req->buf;
+    mem.buf = (uint64_t)req->buf;
     ret = fnOps->releaseBuf(reqList->fd, &mem);
     if (ret) {
-        HDF_LOGE("%s:%d releaseBuf err", __func__, __LINE__);
+        HDF_LOGE("%{public}s releaseBuf err::%{public}d", __func__, ret);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -166,15 +166,19 @@ int32_t UsbFnIoMgrRequestSubmitAsync(struct UsbFnRequest *req)
     struct IoData ioData = {0};
     struct ReqList *reqList = NULL;
     if (req == NULL) {
-        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     reqList = (struct ReqList *) req;
     if (ReqToIoData(req, &ioData, 1, 0)) {
         return HDF_ERR_IO;
     }
+
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
     ret = fnOps->pipeIo(reqList->fd, &ioData);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s pipeIo failed fd:%{public}d read:%{public}u", __func__, reqList->fd, ioData.read);
+    }
 
     return ret;
 }
@@ -185,7 +189,7 @@ int32_t UsbFnIoMgrRequestCancel(struct UsbFnRequest *req)
     struct IoData ioData = {0};
     struct ReqList *reqList = NULL;
     if (req == NULL) {
-        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     reqList = (struct ReqList *) req;
@@ -203,7 +207,7 @@ int32_t UsbFnIoMgrRequestGetStatus(struct UsbFnRequest *req, UsbRequestStatus *s
     struct IoData ioData = {0};
     struct ReqList *reqList;
     if (req == NULL) {
-        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     reqList = (struct ReqList *) req;
@@ -223,7 +227,7 @@ int32_t UsbFnIoMgrRequestSubmitSync(struct UsbFnRequest *req, uint32_t timeout)
     struct ReqList *reqList;
 
     if (req == NULL) {
-        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     reqList = (struct ReqList *) req;
@@ -310,14 +314,14 @@ int32_t UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle)
     int32_t ret;
     uint32_t i;
     if (handle == NULL) {
-        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
     struct UsbFnInterfaceMgr *interfaceMgr = handle->intfMgr;
 
     if (interfaceMgr == NULL || interfaceMgr->isOpen == false) {
-        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     for (i = 0; i < handle->numFd; i++) {
@@ -348,7 +352,7 @@ int32_t UsbFnIoMgrInterfaceGetPipeInfo(struct UsbFnInterface *interface,
     int32_t ret;
     int32_t fd;
     if (info == NULL || interface == NULL || pipeId >= interface->info.numPipes) {
-        HDF_LOGE("%s:%d INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();

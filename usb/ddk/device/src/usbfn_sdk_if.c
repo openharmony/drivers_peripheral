@@ -175,7 +175,7 @@ const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName,
         return NULL;
     }
     if (UsbFnMgrDeviceGet(udcName)) {
-        HDF_LOGE("%s:%s haved create!", __func__, udcName);
+        HDF_LOGE("%{public}s:%{public}s haved create!", __func__, udcName);
         return NULL;
     }
     if (descriptor->type == USBFN_DESC_DATA_TYPE_PROP) {
@@ -209,7 +209,7 @@ int32_t UsbFnRemoveDevice(struct UsbFnDevice *fnDevice)
 const struct UsbFnDevice *UsbFnGetDevice(const char *udcName)
 {
     if (udcName == NULL) {
-        HDF_LOGE("%s: INVALID PARAM", __func__);
+        HDF_LOGE("%{public}s: INVALID PARAM", __func__);
         return NULL;
     }
     return (struct UsbFnDevice *)UsbFnMgrDeviceGet((const char *)udcName);
@@ -315,7 +315,7 @@ struct UsbFnRequest *UsbFnAllocRequest(UsbFnInterfaceHandle handle, uint8_t pipe
 {
     struct UsbHandleMgr *handleMgr = handle;
     if (handle == NULL || len > MAX_BUFLEN || len == 0 || pipe >= handleMgr->numFd) {
-        HDF_LOGE("%s: INVALID PARAM", __func__);
+        HDF_LOGE("%{public}s: INVALID PARAM", __func__);
         return NULL;
     }
     return UsbFnIoMgrRequestAlloc(handleMgr, pipe + 1, len);
@@ -352,7 +352,7 @@ int32_t UsbFnGetRequestStatus(struct UsbFnRequest *req, UsbRequestStatus *status
 int32_t UsbFnSubmitRequestAsync(struct UsbFnRequest *req)
 {
     if (req == NULL) {
-        HDF_LOGE("%s: INVALID PARAM", __func__);
+        HDF_LOGE("%{public}s: INVALID PARAM", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     return UsbFnIoMgrRequestSubmitAsync(req);
