@@ -30,7 +30,7 @@ public:
     std::shared_ptr<IController> GetController(ControllerId controllerId, std::string hardwareName);
     RetCode PowerUp(std::string hardwareName);
     RetCode PowerDown(std::string hardwareName);
-    void Configure(std::shared_ptr<Camera::CameraMetadata> meta);
+    void Configure(std::shared_ptr<CameraMetadata> meta);
     void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag, std::string hardwareName)
     {
         (void)abilityMetaDataTag;

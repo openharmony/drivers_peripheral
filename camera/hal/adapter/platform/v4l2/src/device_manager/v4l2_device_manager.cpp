@@ -235,7 +235,7 @@ bool V4L2DeviceManager::CheckManagerList(ManagerId managerId)
     return false;
 }
 
-void V4L2DeviceManager::Configure(std::shared_ptr<Camera::CameraMetadata> meta)
+void V4L2DeviceManager::Configure(std::shared_ptr<CameraMetadata> meta)
 {
     if (managerList_.size() != 0) {
         for (auto iter = managerList_.cbegin(); iter != managerList_.cend(); iter++) {
@@ -318,7 +318,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
             physicalSize.push_back((*iter).fmtdesc.width);
             physicalSize.push_back((*iter).fmtdesc.height);
         }
-        std::shared_ptr<Camera::CameraMetadata> meta = std::make_shared<Camera::CameraMetadata>(30,
+        std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(30,
             2000);
         meta->addEntry(OHOS_SENSOR_INFO_PHYSICAL_SIZE, physicalSize.data(), physicalSize.size());
         CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
@@ -333,8 +333,8 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
 
         for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend(); iter++) {
             if ((*iter).hardwareName == hardwareName) {
-                std::shared_ptr<Camera::CameraMetadata> meta =
-                    std::make_shared<Camera::CameraMetadata>(30, 2000);
+                std::shared_ptr<CameraMetadata> meta =
+                    std::make_shared<CameraMetadata>(30, 2000);
                 uvcCb_(meta, uvcState, id);
                 hardwareList_.erase(iter);
                 break;

@@ -88,7 +88,7 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/ipp/include",
       "$camera_path/interfaces/hdi",
       "$camera_path/utils/event",
-      "$camera_path/utils/metadata/include",
+      "//drivers/peripheral/camera/interfaces/metadata/include",
       "//foundation/graphic/surface/interfaces/kits",
       "//foundation/graphic/surface/interfaces/innerkits",
 
@@ -115,7 +115,7 @@ if (defined(ohos_lite)) {
       "$camera_path/buffer_manager:camera_buffer_manager",
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",
-      "$camera_path/utils/metadata:metadata_lite",
+      "//drivers/peripheral/camera/interfaces/metadata:metadata",
 
       # hcs parser
       "$hdf_uhdf_path/utils:libhdf_utils",
