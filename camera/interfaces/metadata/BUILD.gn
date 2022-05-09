@@ -15,22 +15,31 @@ import("//build/ohos.gni")
 
 ohos_shared_library("metadata") {
   install_enable = true
-  sources = [
-    "src/camera_metadata_info.cpp",
-    "src/camera_metadata_operator.cpp",
-    "src/metadata_utils.cpp",
-  ]
   cflags = [
     "-fPIC",
     "-Wall",
   ]
   cflags_cc = cflags
   include_dirs = [ "//drivers/peripheral/camera/interfaces/metadata/include" ]
-  deps = [ "//utils/native/base:utils" ]
-  external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_single",
-  ]
+  if (defined(ohos_lite)) {
+    sources = [
+      "src/camera_metadata_info.cpp",
+      "src/camera_metadata_operator.cpp",
+    ]
+    deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
+  } else {
+    sources = [
+      "src/camera_metadata_info.cpp",
+      "src/camera_metadata_operator.cpp",
+      "src/metadata_utils.cpp",
+    ]
+    deps = [ "//utils/native/base:utils" ]
+    external_deps = [
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_single",
+    ]
+  }
+
   install_images = [ chipset_base_dir ]
   part_name = "camera_device_driver"
   subsystem_name = "hdf"
@@ -44,8 +53,9 @@ ohos_executable("metadata_sample") {
   include_dirs = [ "//drivers/peripheral/camera/interfaces/metadata/include" ]
 
   deps = [ "//drivers/peripheral/camera/interfaces/metadata:metadata" ]
-
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  if (!defined(ohos_lite)) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  }
 
   part_name = "camera_device_driver"
   subsystem_name = "hdf"

@@ -6,7 +6,7 @@ import("$hdf_framework_path/tools/hc-gen/hc_gen.gni")
 
 hc_gen("build_camera_host_config") {
   sources = [ rebase_path(
-          "$camera_product_name_path/hdf_config/uhdf/camera/hdi_impl/camera_host_config.hcs") ]
+          "$vendor_camera_path/hdf_config/uhdf/camera/hdi_impl/camera_host_config.hcs") ]
 }
 
 ohos_prebuilt_etc("camera_host_config.hcb") {
@@ -21,8 +21,8 @@ ohos_prebuilt_etc("camera_host_config.hcb") {
 
 hc_gen_c("generate_source") {
   sources = [
-    "$camera_product_name_path/hdf_config/uhdf/camera/pipeline_core/config.hcs",
-    "$camera_product_name_path/hdf_config/uhdf/camera/pipeline_core/params.hcs",
+    "$vendor_camera_path/hdf_config/uhdf/camera/pipeline_core/config.hcs",
+    "$vendor_camera_path/hdf_config/uhdf/camera/pipeline_core/params.hcs",
   ]
 }
 
@@ -67,7 +67,7 @@ ohos_prebuilt_etc("params.c") {
 
 hc_gen("build_ipp_algo_config") {
   sources = [ rebase_path(
-          "$camera_product_name_path/hdf_config/uhdf/camera/pipeline_core/ipp_algo_config.hcs") ]
+          "$vendor_camera_path/hdf_config/uhdf/camera/pipeline_core/ipp_algo_config.hcs") ]
 }
 
 ohos_prebuilt_etc("ipp_algo_config.hcb") {
@@ -96,7 +96,7 @@ group("chipset_build") {
     ":config.c",
     ":ipp_algo_config.hcb",
     ":params.c",
-    "$camera_device_name_path/camera/src/pipeline_core:camera_ipp_algo_example",
+    "$board_camera_path/camera/src/pipeline_core:camera_ipp_algo_example",
     "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter:camera_v4l2_adapter",
     "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter/main_test:v4l2_main",
   ]
