@@ -88,7 +88,7 @@ public:
     }
     void WaitForStatusChanged();
     void onStatusChanged();
-    bool ReadOneFrame(FILE *fp, char *buf, size_t &filledCount);
+    bool ReadOneFrame(FILE *fp, char *buf, uint32_t &filledCount);
 
 private:
     int32_t OnEmptyBufferDone(const struct OmxCodecBuffer &buffer);
