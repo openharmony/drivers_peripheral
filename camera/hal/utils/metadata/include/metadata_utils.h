@@ -25,18 +25,18 @@
 #include "message_parcel.h"
 
 namespace OHOS {
-namespace CameraStandard {
+namespace Camera {
 class MetadataUtils {
 public:
-    static bool EncodeCameraMetadata(const std::shared_ptr<CameraStandard::CameraMetadata> &metadata,
+    static bool EncodeCameraMetadata(const std::shared_ptr<CameraMetadata> &metadata,
                                      MessageParcel &data);
-    static void DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<CameraStandard::CameraMetadata> &metadata);
+    static void DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<CameraMetadata> &metadata);
 
 private:
     static bool WriteMetadata(const camera_metadata_item_t &item, MessageParcel &data);
     static bool ReadMetadata(camera_metadata_item_t &item, MessageParcel &data);
     static void ItemDataToBuffer(const camera_metadata_item_t &item, void **buffer);
 };
-} // namespace CameraStandard
+} // namespace Camera
 } // namespace OHOS
 #endif // OHOS_CAMERA_METADATA_UTILS_H

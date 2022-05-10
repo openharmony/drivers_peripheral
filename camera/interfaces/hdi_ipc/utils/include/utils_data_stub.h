@@ -27,9 +27,9 @@
 namespace OHOS::Camera {
 class UtilsDataStub {
 public:
-    static bool EncodeCameraMetadata(const std::shared_ptr<CameraStandard::CameraMetadata> &metadata,
+    static bool EncodeCameraMetadata(const std::shared_ptr<CameraMetadata> &metadata,
         MessageParcel &data);
-    static void DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<CameraStandard::CameraMetadata> &metadata);
+    static void DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<CameraMetadata> &metadata);
     static bool EncodeStreamInfo(const std::shared_ptr<StreamInfo> &pInfo, MessageParcel &parcel);
     static void DecodeStreamInfo(MessageParcel &parcel, std::shared_ptr<StreamInfo> &pInfo);
 private:

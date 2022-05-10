@@ -34,7 +34,7 @@ public:
     RetCode StopVo();
     RetCode StartVo();
     RetCode ConfigVo();
-    RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> metadata)
+    RetCode Configure(std::shared_ptr<CameraMetadata> metadata)
     {
         (void)metadata;
         return RC_OK;
@@ -48,7 +48,7 @@ public:
         (void)abilityMetaDataTag;
         return;
     }
-    RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> cameraMeta)
+    RetCode GetAbilityMetaData(std::shared_ptr<CameraMetadata> cameraMeta)
     {
         (void)cameraMeta;
         return RC_OK;

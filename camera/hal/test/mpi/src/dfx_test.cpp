@@ -302,8 +302,8 @@ HWTEST_F(DfxTest, Camera_Dfx_0020, TestSize.Level3) {
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         // Configure mode and modeSetting
         Camera::OperationMode mode = Camera::NORMAL;
-        std::shared_ptr<CameraStandard::CameraMetadata> modeSetting =
-            std::make_shared<CameraStandard::CameraMetadata>(2, 128);
+        std::shared_ptr<CameraMetadata> modeSetting =
+            std::make_shared<CameraMetadata>(2, 128);
         int64_t expoTime = 0;
         modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
         int64_t colorGains[4] = {0};
@@ -1090,8 +1090,8 @@ HWTEST_F(DfxTest, Camera_Dfx_0020, TestSize.Level3) {
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         // Configure mode and modeSetting
         Camera::OperationMode mode = Camera::NORMAL;
-        std::shared_ptr<CameraStandard::CameraMetadata> modeSetting =
-            std::make_shared<CameraStandard::CameraMetadata>(2, 128);
+        std::shared_ptr<CameraMetadata> modeSetting =
+            std::make_shared<CameraMetadata>(2, 128);
         int64_t expoTime = 0;
         modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
         int64_t colorGains[4] = {0};

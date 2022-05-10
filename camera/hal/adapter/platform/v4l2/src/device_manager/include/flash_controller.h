@@ -28,14 +28,14 @@ public:
     RetCode Init();
     RetCode PowerUp();
     RetCode PowerDown();
-    RetCode Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+    RetCode Configure(std::shared_ptr<CameraMetadata> meta)
     {
         (void)meta;
         return RC_OK;
-    };
+    }
     RetCode SetFlashlight(FlashMode flashMode, bool enable);
     void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag);
-    RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta);
+    RetCode GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta);
 private:
     std::mutex startVolock_;
     bool startVoState_ = false;
