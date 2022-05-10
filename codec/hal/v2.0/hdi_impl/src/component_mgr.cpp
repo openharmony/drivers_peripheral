@@ -15,6 +15,7 @@
 
 #include <cstring>
 #include <dlfcn.h>
+#include <hdf_base.h>
 #include <hdf_log.h>
 #include <memory.h>
 #include <securec.h>
@@ -22,11 +23,6 @@
 #include "component_mgr.h"
 #define HDF_LOG_TAG codec_hdi_server
 constexpr int COMPONENT_NAME_MAX_LEN = 128;
-#ifdef __ARM64__
-constexpr char DRIVER_PATH[] = "/vendor/lib64";
-#else
-constexpr char DRIVER_PATH[] = "/vendor/lib";
-#endif
 
 namespace OHOS {
 namespace Codec {
@@ -146,7 +142,8 @@ int32_t ComponentMgr::GetRolesForComponent(const char *componentName, std::vecto
 
 void ComponentMgr::AddVendorComponent()
 {
-    AddComponentByLibName("libOMX_Pluginhw.z.so");
+    std::string path = HDF_LIBRARY_FULL_PATH("libOMX_Pluginhw");
+    AddComponentByLibName(path.c_str());
 }
 
 void ComponentMgr::AddSoftComponent()
@@ -154,16 +151,9 @@ void ComponentMgr::AddSoftComponent()
 
 void ComponentMgr::AddComponentByLibName(const char *libName)
 {
-    char path[PATH_MAX + 1] = {0};
-
-    if (snprintf_s(path, sizeof(path), sizeof(path) - 1, "%s/%s", DRIVER_PATH, libName) < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
-        return;
-    }
-    void *libHandle = NULL;
-    libHandle = dlopen(path, RTLD_LAZY);
+    void *libHandle = dlopen(libName, RTLD_LAZY);
     if (libHandle == NULL) {
-        HDF_LOGE("ComponentMgr::AddComponentByLibName:libHandle is NULL");
+        HDF_LOGE("ComponentMgr::AddComponentByLibName:libHandle is NULL, path is %{public}s", libName);
         return;
     }
     typedef IComponentMgr *(*CreateOMXPluginFunc)();

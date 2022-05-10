@@ -608,7 +608,7 @@ void ComponentNode::CheckBuffer(struct OmxCodecBuffer &buffer)
 {
     if ((buffer.buffer != nullptr) && (buffer.bufferType == BUFFER_TYPE_AVSHARE_MEM_FD) &&
         (buffer.bufferLen == FD_SIZE)) {
-        int fd = (int)reinterpret_cast<unsigned long>(buffer.buffer);
+        int fd = (int)reinterpret_cast<uintptr_t>(buffer.buffer);
         close(fd);
         buffer.buffer = 0;
         buffer.bufferLen = 0;
@@ -701,7 +701,7 @@ int32_t ComponentNode::UseSharedBuffer(struct OmxCodecBuffer &omxCodecBuffer, ui
         return err;
     }
 
-    int shardFd = (int)reinterpret_cast<unsigned long>(omxCodecBuffer.buffer);
+    int shardFd = (int)reinterpret_cast<uintptr_t>(omxCodecBuffer.buffer);
     if (shardFd < 0) {
         HDF_LOGE("%{public}s error, shardFd < 0", __func__);
         return err;
