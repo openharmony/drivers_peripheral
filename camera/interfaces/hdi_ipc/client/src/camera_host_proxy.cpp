@@ -129,7 +129,7 @@ CamRetCode CameraHostProxy::GetCameraAbility(const std::string &cameraId,
     }
 
     CamRetCode retCode = static_cast<CamRetCode>(reply.ReadInt32());
-    CameraStandard::MetadataUtils::DecodeCameraMetadata(reply, ability);
+    MetadataUtils::DecodeCameraMetadata(reply, ability);
 
     return retCode;
 }

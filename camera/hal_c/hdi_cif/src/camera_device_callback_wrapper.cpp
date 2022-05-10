@@ -42,7 +42,7 @@ void DeviceCBOnResult(long timestamp, CameraResultCIF* result)
         return;
     }
 
-    std::shared_ptr<OHOS::CameraStandard::CameraMetadata> meta = std::make_shared<OHOS::CameraStandard::CameraMetadata>(0,0);
+    std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(0,0);
     g_deviceCallback->OnResult(timestamp, meta);
 
     return;

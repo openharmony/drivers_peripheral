@@ -210,8 +210,8 @@ HWTEST_F(CaptureTest, Camera_Capture_0005, TestSize.Level2)
     Test_->consumerMap_[Camera::STILL_CAPTURE] = capture_consumer;
     // Query whether the IsStreamsSupported interface supports
     Camera::StreamSupportType pType;
-    std::shared_ptr<CameraStandard::CameraMetadata> modeSetting =
-        std::make_shared<CameraStandard::CameraMetadata>(2, 128);
+    std::shared_ptr<CameraMetadata> modeSetting =
+        std::make_shared<CameraMetadata>(2, 128);
     int64_t expoTime = 0;
     modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
     int64_t colorGains[4] = {0};

@@ -26,7 +26,7 @@ public:
     IManager();
     explicit IManager(ManagerId managerId);
     virtual ~IManager();
-    virtual void Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta) = 0;
+    virtual void Configure(std::shared_ptr<CameraMetadata> meta) = 0;
     ManagerId GetManagerId()
     {
         return managerID_;
@@ -84,12 +84,12 @@ public:
         (void)abilityMetaDataTag;
         (void)hardwareName;
     }
-    virtual RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+    virtual RetCode GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta)
     {
         (void)meta;
         return RC_OK;
-    };
-    virtual RetCode GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta, std::string hardwareName)
+    }
+    virtual RetCode GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta, std::string hardwareName)
     {
         (void)meta;
         (void)hardwareName;

@@ -464,7 +464,7 @@ void MpiDeviceManager::SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDat
     }
 }
 
-RetCode MpiDeviceManager::GetAbilityMetaData(std::shared_ptr<CameraStandard::CameraMetadata> meta, bool &sendFlag)
+RetCode MpiDeviceManager::GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta, bool &sendFlag)
 {
     if (managerList_.size() != 0) {
         for (auto iter = managerList_.cbegin(); iter != managerList_.cend(); iter++) {
@@ -494,8 +494,8 @@ void MpiDeviceManager::BufferCallback(std::shared_ptr<FrameSpec> buffer)
 
     const int ENTRY_CAPACITY = 30;
     const int DATA_CAPACITY = 2000;
-    std::shared_ptr<CameraStandard::CameraMetadata> meta =
-        std::make_shared<CameraStandard::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
+    std::shared_ptr<CameraMetadata> meta =
+        std::make_shared<CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
     RetCode rc;
     bool sendFlag = metaSendflag_;
     rc = GetAbilityMetaData(meta, sendFlag);
@@ -531,7 +531,7 @@ void MpiDeviceManager::SetNodeCallBack(const NodeBufferCb cb, CameraId cameraId)
     });
 }
 
-void MpiDeviceManager::Configure(std::shared_ptr<CameraStandard::CameraMetadata> meta)
+void MpiDeviceManager::Configure(std::shared_ptr<CameraMetadata> meta)
 {
     if (managerList_.size() != 0) {
         for (auto iter = managerList_.cbegin(); iter != managerList_.cend(); iter++) {

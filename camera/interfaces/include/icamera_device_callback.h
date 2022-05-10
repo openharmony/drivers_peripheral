@@ -61,7 +61,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    virtual void OnResult(uint64_t timestamp, const std::shared_ptr<CameraStandard::CameraMetadata> &result) = 0;
+    virtual void OnResult(uint64_t timestamp, const std::shared_ptr<CameraMetadata> &result) = 0;
 };
 }
 #endif // HDI_CAMERA_DEVICE_CALLBACK_SERVER_H

@@ -174,7 +174,7 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager/include/mpi",
       "//base/startup/syspara_lite/adapter/native/syspara/include",
       "$camera_path/utils/event",
-      "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
+      "//drivers/peripheral/camera/interfaces/metadata/include",
 
       #producer
       "//utils/native/base/include",
@@ -204,7 +204,7 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/hdi_impl:camera_hdi_impl",
       "$camera_path/pipeline_core:camera_pipeline_core",
-      "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
+      "//drivers/peripheral/camera/interfaces/metadata:metadata",
       "//third_party/googletest:gmock",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest",
