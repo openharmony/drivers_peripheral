@@ -51,4 +51,8 @@ ohos_unittest("codec_hdi_omx_test") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+
+  if (device_name == "rk3568") {
+    cflags += [ "-DRK" ]
+  }
 }
