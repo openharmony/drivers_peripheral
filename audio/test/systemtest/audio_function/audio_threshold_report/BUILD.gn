@@ -1,0 +1,60 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+if (!defined(ohos_lite)) {
+  import("//build/test.gni")
+  import("//drivers/adapter/uhdf2/uhdf.gni")
+}
+import("//drivers/peripheral/audio/audio.gni")
+if (!defined(ohos_lite)) {
+  module_output_path = "audio_device_driver/audio"
+
+  ohos_systemtest("hdf_audio_threshold_report_test") {
+    module_out_path = module_output_path
+    sources = [
+      "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "src/audio_threshold_report_test.cpp",
+    ]
+
+    include_dirs = [
+      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
+      "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
+      "//drivers/peripheral/audio/hal/hdi_binder/server/include",
+      "//drivers/adapter/uhdf2/include/hdi",
+      "//drivers/adapter/uhdf2/shared/include",
+      "//third_party/bounds_checking_function/include",
+      "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
+      "//third_party/googletest/googletest/include/gtest",
+    ]
+    deps = [
+      "//drivers/peripheral/audio/hal/hdi_binder/server:hdi_audio_primary_server",
+      "//third_party/googletest:gmock_main",
+      "//third_party/googletest:gtest_main",
+    ]
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "utils_base:utils",
+    ]
+    defines = []
+    if (enable_audio_adm_so) {
+      defines += [ "AUDIO_ADM_SO" ]
+    }
+    if (enable_audio_adm_service) {
+      defines += [ "AUDIO_ADM_SERVICE" ]
+    }
+  }
+}
