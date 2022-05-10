@@ -18,7 +18,7 @@
 #include <unistd.h>
 #include <inttypes.h>
 #include <string.h>
-#include <errno.h>
+#include <cerrno>
 #include <fcntl.h>
 #include <limits.h>
 #include <linux/dma-buf.h>

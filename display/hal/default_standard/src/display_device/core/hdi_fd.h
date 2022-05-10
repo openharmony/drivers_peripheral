@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef HDI_SHARED_FD
-#define HDI_SHARED_FD
+#ifndef HDI_FD_H
+#define HDI_FD_H
 #include <fcntl.h>
 #include <memory>
 #include "display_common.h"
@@ -62,4 +62,4 @@ using FdPtr = std::shared_ptr<HdiFd>;
 } // HDIO
 } // DISPLAY
 
-#endif // HDI_SHARED_FD
+#endif // HDI_FD_H

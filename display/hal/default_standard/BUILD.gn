@@ -48,8 +48,6 @@ ohos_shared_library("def_display_gralloc") {
     "include",
     "//drivers/peripheral/display/interfaces/include",
     "//drivers/peripheral/base",
-    "//foundation/graphic/standard/utils/include",
-    "//foundation/graphic/standard/prebuilts/librarys/drm/include",
   ]
   output_name = "display_gralloc"
   cflags = [
@@ -88,21 +86,21 @@ config("def_display_device_pub_config") {
 
 ohos_shared_library("def_display_device") {
   sources = [
-    "src/display_device/drm_connector.cpp",
-    "src/display_device/drm_crtc.cpp",
-    "src/display_device/drm_device.cpp",
-    "src/display_device/drm_display.cpp",
-    "src/display_device/drm_encoder.cpp",
-    "src/display_device/drm_plane.cpp",
-    "src/display_device/drm_vsync_worker.cpp",
-    "src/display_device/hdi_composer.cpp",
-    "src/display_device/hdi_device_interface.cpp",
-    "src/display_device/hdi_display.cpp",
-    "src/display_device/hdi_drm_composition.cpp",
-    "src/display_device/hdi_drm_layer.cpp",
-    "src/display_device/hdi_gfx_composition.cpp",
-    "src/display_device/hdi_layer.cpp",
-    "src/display_device/hdi_session.cpp",
+    "src/display_device/composer/hdi_composer.cpp",
+    "src/display_device/composer/hdi_gfx_composition.cpp",
+    "src/display_device/core/hdi_device_interface.cpp",
+    "src/display_device/core/hdi_display.cpp",
+    "src/display_device/core/hdi_layer.cpp",
+    "src/display_device/core/hdi_session.cpp",
+    "src/display_device/drm/drm_connector.cpp",
+    "src/display_device/drm/drm_crtc.cpp",
+    "src/display_device/drm/drm_device.cpp",
+    "src/display_device/drm/drm_display.cpp",
+    "src/display_device/drm/drm_encoder.cpp",
+    "src/display_device/drm/drm_plane.cpp",
+    "src/display_device/drm/drm_vsync_worker.cpp",
+    "src/display_device/drm/hdi_drm_composition.cpp",
+    "src/display_device/drm/hdi_drm_layer.cpp",
   ]
   public_configs = [ ":def_display_device_pub_config" ]
 
@@ -114,6 +112,9 @@ ohos_shared_library("def_display_device") {
     "//drivers/peripheral/base",
     "//foundation/graphic/standard/utils/include",
     "//foundation/graphic/standard/prebuilts/librarys/drm/include",
+    "src/display_device/drm",
+    "src/display_device/core",
+    "src/display_device/composer",
   ]
   deps = [
     ":def_display_gralloc",

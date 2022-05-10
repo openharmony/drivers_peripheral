@@ -14,7 +14,7 @@
  */
 
 #include "hi_gbm.h"
-#include <errno.h>
+#include <cerrno>
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>

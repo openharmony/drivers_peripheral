@@ -14,7 +14,7 @@
  */
 
 #include <hdi_session.h>
-#include <errno.h>
+#include <cerrno>
 #include <mutex>
 #include "display_common.h"
 #include "display_device.h"

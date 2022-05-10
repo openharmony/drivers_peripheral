@@ -15,7 +15,7 @@
 
 #include "hdi_layer.h"
 #include <unistd.h>
-#include <errno.h>
+#include <cerrno>
 
 namespace OHOS {
 namespace HDI {

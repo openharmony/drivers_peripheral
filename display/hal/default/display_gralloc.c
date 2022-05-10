@@ -14,7 +14,7 @@
  */
 
 #include "display_gralloc.h"
-#include <errno.h>
+#include <cerrno>
 #include <inttypes.h>
 #include <pthread.h>
 #include <stdio.h>
