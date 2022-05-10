@@ -15,7 +15,7 @@
 
 #include "hdi_netlink_monitor.h"
 #include <sys/socket.h>
-#include <errno.h>
+#include <cerrno>
 
 namespace OHOS {
 namespace HDI {
@@ -67,5 +67,3 @@ Void HdiNetLinkMonitor::MonitorThread()
 } // DISPLAY
 } // HDI
 } // OHOS
-
-#endif // HDI_NETLINK_NONITOR_H

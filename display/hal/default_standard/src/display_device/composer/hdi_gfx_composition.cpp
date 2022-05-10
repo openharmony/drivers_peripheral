@@ -16,12 +16,8 @@
 #include "hdi_gfx_composition.h"
 #include <cinttypes>
 #include <dlfcn.h>
-#include <errno.h>
+#include <cerrno>
 #include "display_gfx.h"
-
-#define LIB_HDI_GFX_NAME "libdisplay_gfx.z.so"
-#define LIB_GFX_FUNC_INIT "GfxInitialize"
-#define LIB_GFX_FUNC_DEINIT "GfxUninitialize"
 
 namespace OHOS {
 namespace HDI {

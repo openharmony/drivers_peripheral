@@ -100,7 +100,8 @@ int32_t DrmConnector::Init(DrmDevice &drmDevice)
     return DISPLAY_SUCCESS;
 }
 
-int32_t DrmConnector::GetBrightness(uint32_t& level) {
+int32_t DrmConnector::GetBrightness(uint32_t &level)
+{
     if (mPropBrightnessId == DRM_INVALID_ID) {
         DISPLAY_LOGE("the prop id of brightness is invalid");
         return DISPLAY_NOT_SUPPORT;
@@ -283,8 +284,7 @@ DrmModeBlock::DrmModeBlock(DrmMode &mode)
 int32_t DrmModeBlock::Init(DrmMode &mode)
 {
     int ret;
-    int drmFd;
-    drmFd = DrmDevice::GetDrmFd();
+    int drmFd = DrmDevice::GetDrmFd();
     DISPLAY_CHK_RETURN((drmFd < 0), DISPLAY_FAILURE, DISPLAY_LOGE("the drm fd is invalid"));
     drmModeModeInfo modeInfo = *(mode.GetModeInfoPtr());
     ret = drmModeCreatePropertyBlob(drmFd, static_cast<void *>(&modeInfo), sizeof(modeInfo), &mBlockId);
