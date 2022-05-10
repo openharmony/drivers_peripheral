@@ -23,6 +23,8 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#define HDF_LOG_TAG codec_hdi_proxy
+
 static int32_t CodecProxyCall(struct ICodec *self,
     int32_t id, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
@@ -228,7 +230,7 @@ int32_t CodecProxyCreate(struct ICodec *self, const char* name, const Param *att
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)handle)) {
+    if (!HdfSbufWriteUint64(data, (uint64_t)handle)) {
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -238,7 +240,7 @@ int32_t CodecProxyCreate(struct ICodec *self, const char* name, const Param *att
         CodecProxySBufRecycle(data, reply);
         return ret;
     }
-    if (!HdfSbufReadUint32(reply, (uint32_t *)handle)) {
+    if (!HdfSbufReadUint64(reply, (uint64_t *)handle)) {
         ret = HDF_ERR_INVALID_PARAM;
     }
     CodecProxySBufRecycle(data, reply);
@@ -263,7 +265,7 @@ int32_t CodecProxyDestroy(struct ICodec *self, CODEC_HANDLETYPE handle)
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
+    if (!HdfSbufWriteUint64(data, (uint64_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: Write handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -293,7 +295,7 @@ int32_t CodecProxySetPortMode(struct ICodec *self, CODEC_HANDLETYPE handle, Dire
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
+    if (!HdfSbufWriteUint64(data, (uint64_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: Read size failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -334,7 +336,7 @@ int32_t CodecProxySetParameter(struct ICodec *self, CODEC_HANDLETYPE handle, con
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
+    if (!HdfSbufWriteUint64(data, (uint64_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write size failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -374,7 +376,7 @@ int32_t CodecProxyGetParameter(struct ICodec *self, CODEC_HANDLETYPE handle, Par
         return HDF_FAILURE;
     }
     if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
-        !HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
+        !HdfSbufWriteUint64(data, (uint64_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write interface token or size failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -425,7 +427,7 @@ int32_t CodecProxyStart(struct ICodec *self, CODEC_HANDLETYPE handle)
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
+    if (!HdfSbufWriteUint64(data, (uint64_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -455,7 +457,7 @@ int32_t CodecProxyStop(struct ICodec *self, CODEC_HANDLETYPE handle)
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
+    if (!HdfSbufWriteUint64(data, (uint64_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write input handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -485,7 +487,7 @@ int32_t CodecProxyFlush(struct ICodec *self, CODEC_HANDLETYPE handle, DirectionT
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
+    if (!HdfSbufWriteUint64(data, (uint64_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write input handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -521,7 +523,7 @@ int32_t CodecPorxyQueueInput(struct ICodec *self, CODEC_HANDLETYPE handle,
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
+    if (!HdfSbufWriteUint64(data, (uint64_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write input handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -561,7 +563,7 @@ int32_t CodecProxyDequeInput(struct ICodec *self, CODEC_HANDLETYPE handle, uint3
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
+    if (!HdfSbufWriteUint64(data, (uint64_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write input handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -578,7 +580,9 @@ int32_t CodecProxyDequeInput(struct ICodec *self, CODEC_HANDLETYPE handle, uint3
     }
     ret = CodecProxyCall(self, CMD_CODEC_DEQUEQUE_INPUT, data, reply);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
+        if (ret != HDF_ERR_TIMEOUT) {
+            HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
+        }
         CodecProxySBufRecycle(data, reply);
         return ret;
     }
@@ -609,7 +613,7 @@ int32_t CodecProxyQueueOutput(struct ICodec *self, CODEC_HANDLETYPE handle, Outp
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
+    if (!HdfSbufWriteUint64(data, (uint64_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write input handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -651,7 +655,7 @@ int32_t CodecProxyDequeueOutput(struct ICodec *self, CODEC_HANDLETYPE handle, ui
         return HDF_FAILURE;
     }
     if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) ||
-        !HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
+        !HdfSbufWriteUint64(data, (uint64_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write interface token or input handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -668,7 +672,9 @@ int32_t CodecProxyDequeueOutput(struct ICodec *self, CODEC_HANDLETYPE handle, ui
     }
     ret = CodecProxyCall(self, CMD_CODEC_DEQUEQUE_OUTPUT, data, reply);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
+        if (ret != HDF_ERR_TIMEOUT) {
+            HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
+        }
         CodecProxySBufRecycle(data, reply);
         return ret;
     }
@@ -704,7 +710,7 @@ int32_t CodecProxySetCallback(struct ICodec *self, CODEC_HANDLETYPE handle, stru
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)(uintptr_t)handle)) {
+    if (!HdfSbufWriteUint64(data, (uint64_t)(uintptr_t)handle)) {
         HDF_LOGE("%{public}s: write input handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;

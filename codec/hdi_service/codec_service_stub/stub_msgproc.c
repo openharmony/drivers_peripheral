@@ -14,6 +14,9 @@
  */
 #include "stub_msgproc.h"
 #include <hdf_log.h>
+#include <osal_mem.h>
+
+#define HDF_LOG_TAG codec_hdi_stub
 
 int32_t CodecSerPackAlignment(struct HdfSBuf *reply, Alignment *alignment)
 {
@@ -126,18 +129,33 @@ int32_t CodecSerParseParam(struct HdfSBuf *data, Param *param)
         HDF_LOGE("%{public}s: params null!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufReadUint32(data, (uint32_t *)&param->key)) {
-        HDF_LOGE("%{public}s: Read key failed!", __func__);
+    if (!HdfSbufReadInt32(data, (int32_t *)&param->key)) {
+        HDF_LOGE("%{public}s: read param->key failed!", __func__);
         return HDF_FAILURE;
     }
-    if (!HdfSbufReadUint32(data, (uint32_t *)&param->val)) {
-        HDF_LOGE("%{public}s: Read val failed!", __func__);
+
+    int8_t *valCp = NULL;
+    int32_t valCpLen = 0;
+    if (!HdfSbufReadInt32(data, &valCpLen)) {
+        HDF_LOGE("%{public}s: read size failed!", __func__);
         return HDF_FAILURE;
     }
-    if (!HdfSbufReadInt32(data, (int32_t*)&param->size)) {
-        HDF_LOGE("%{public}s: Read size failed!", __func__);
-        return HDF_FAILURE;
+    if (valCpLen > 0) {
+        valCp = (int8_t *)OsalMemCalloc(sizeof(int8_t) * valCpLen);
+        if (valCp == NULL) {
+            return HDF_FAILURE;
+        }
+        for (int32_t i = 0; i < valCpLen; i++) {
+            if (!HdfSbufReadInt8(data, &valCp[i])) {
+                HDF_LOGE("%{public}s: read valCp[i] failed!", __func__);
+                OsalMemFree(valCp);
+                return HDF_FAILURE;
+            }
+        }
     }
+    param->val = (void *)valCp;
+    param->size = valCpLen;
+
     return HDF_SUCCESS;
 }
 
@@ -147,18 +165,23 @@ int32_t CodecSerPackParam(struct HdfSBuf *reply, Param *param)
         HDF_LOGE("%{public}s: params null!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(reply, (uint32_t)param->key)) {
-        HDF_LOGE("%{public}s: write key failed!", __func__);
-        return HDF_FAILURE;
+
+    if (!HdfSbufWriteInt32(reply, (int32_t)param->key)) {
+        HDF_LOGE("%{public}s: write param->key failed!", __func__);
+        return false;
     }
-    if (!HdfSbufWriteUint32(reply, (uint32_t)&param->val)) {
-        HDF_LOGE("%{public}s: Write val failed!", __func__);
-        return HDF_FAILURE;
-    }
+
     if (!HdfSbufWriteInt32(reply, param->size)) {
-        HDF_LOGE("%{public}s: write size failed!", __func__);
-        return HDF_FAILURE;
+        HDF_LOGE("%{public}s: write param->size failed!", __func__);
+        return false;
     }
+    for (int32_t i = 0; i < param->size; i++) {
+        if (!HdfSbufWriteInt8(reply, ((int8_t *)(param->val))[i])) {
+            HDF_LOGE("%{public}s: write (param->val)[i] failed!", __func__);
+            return false;
+        }
+    }
+
     return HDF_SUCCESS;
 }
 

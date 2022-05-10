@@ -18,5 +18,6 @@ group("hdf_media_codec") {
   deps = [
     "hal:codec_hdi_omx",
     "hal/config:codec_capability_config",
+    "hal/v1.0/buffer_manager:codec_buffer_manager",
   ]
 }
