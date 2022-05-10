@@ -15,14 +15,21 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 
 module_output_path = "hdf/codec"
 
-ohos_unittest("codec_test") {
+ohos_unittest("codec_hdi_1.0_test") {
   module_out_path = module_output_path
   include_dirs = [
     "//drivers/peripheral/codec/interfaces/include/",
     "//drivers/peripheral/codec/hdi_service/codec_proxy/",
     "//drivers/peripheral/codec/hdi_service/codec_service_stub/",
+    "//drivers/peripheral/codec/hal/config/capability_config/include",
+    "//drivers/peripheral/codec/hal/config/common/include",
+    "//drivers/peripheral/codec/hal/v1.0/share_mem/include",
   ]
-  sources = [ "unittest/codec_proxy_test.cpp" ]
+  sources = [
+    "//drivers/peripheral/codec/hal/config/capability_config/src/codec_config_reader.c",
+    "//drivers/peripheral/codec/hal/config/common/src/codec_utils.c",
+    "codec_proxy_test.cpp",
+  ]
 
   cflags = [
     "-Wall",
@@ -38,13 +45,21 @@ ohos_unittest("codec_test") {
     "//drivers/peripheral/codec/hdi_service:codec_service",
     "//third_party/googletest:gtest_main",
   ]
-  external_deps = [
-    "device_driver_framework:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
-  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "device_driver_framework:libhdf_host",
+      "device_driver_framework:libhdf_ipc_adapter",
+      "device_driver_framework:libhdf_utils",
+      "device_driver_framework:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
 }
 
 group("codec_client_test") {
   testonly = true
-  deps = [ ":codec_test" ]
+  deps = [ ":codec_hdi_1.0_test" ]
 }
