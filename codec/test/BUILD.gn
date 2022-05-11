@@ -13,9 +13,8 @@
 
 group("hdf_test_media_codec") {
   testonly = true
-  deps = [ "//drivers/peripheral/codec/test/fuzztest:hdf_fuzztest_media_codec" ]
   if (product_name == "rk3568") {
-    deps += [
+    deps = [
       "demo/v1.0:codec_hdi_demo",
       "unittest:hdf_unittest_codec",
     ]
