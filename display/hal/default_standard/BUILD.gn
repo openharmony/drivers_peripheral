@@ -42,7 +42,6 @@ ohos_shared_library("def_display_gralloc") {
   sources = [
     "src/display_gralloc/display_gralloc.c",
     "src/display_gralloc/display_gralloc_gbm.c",
-    "src/display_gralloc/wayland_drm_auth_client.c",
   ]
   include_dirs = [
     "include",
@@ -57,8 +56,6 @@ ohos_shared_library("def_display_gralloc") {
   deps = [
     ":higbm",
     "//third_party/libdrm:libdrm",
-    "//third_party/wayland_standard:libwayland_client",
-    "//third_party/weston:drm_auth_protocol",
   ]
 
   external_deps = [
