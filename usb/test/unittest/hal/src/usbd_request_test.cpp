@@ -678,7 +678,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor001, TestSize.Level1)
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor001 %{public}d ret=%{public}d", __LINE__, ret);
-    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor001 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor001 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     ASSERT_TRUE(ret == 0);
 }
@@ -699,7 +699,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor002, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor002 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor002 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor002 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -721,7 +721,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor003, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor003 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor003 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor003 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -743,7 +743,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor004, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor004 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor004 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor004 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
@@ -765,7 +765,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor005, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor005 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor005 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor005 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -787,7 +787,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor006, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor006 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor006 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor006 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -809,7 +809,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor007, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor007 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor007 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor007 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -831,7 +831,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor008, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor008 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor008 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor008 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -857,7 +857,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor001, TestSize.Level1)
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor001 %{public}d ret=%{public}d", __LINE__, ret);
-    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor001 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor001 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     ASSERT_TRUE(ret == 0);
 }
@@ -879,7 +879,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor002, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor002 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor002 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor002 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
@@ -902,7 +902,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor003, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor003 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor003 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor003 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
@@ -925,7 +925,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor004, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor004 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor004 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor004 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -948,7 +948,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor005, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor005 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor005 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor005 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -971,7 +971,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor006, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor006 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor006 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor006 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -994,7 +994,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor007, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor007 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor007 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor007 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -1017,7 +1017,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor008, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor008 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor008 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor008 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -1043,7 +1043,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor001, TestSize.Level1)
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor001 %{public}d ret=%{public}d", __LINE__, ret);
-    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor001 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor001 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     ASSERT_TRUE(ret == 0);
 }
@@ -1065,7 +1065,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor002, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor002 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor002 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor002 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -1088,7 +1088,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor003, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor003 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor003 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor003 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -1111,7 +1111,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor004, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor004 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor004 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor004 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
@@ -1134,7 +1134,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor005, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor005 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor005 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor005 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -1157,7 +1157,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor006, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor006 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor006 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor006 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -1180,7 +1180,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor007, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor007 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor007 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor007 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -1203,7 +1203,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor008, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
     auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
-    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor008 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor008 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              devdata.size(), sizeof(devdata));
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor008 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -1223,7 +1223,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetRawDescriptor001, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> rawData;
     auto ret = UsbdClient::GetInstance().GetRawDescriptor(dev, rawData);
-    HDF_LOGI("UsbdRequestTest::UsbdGetRawDescriptor001 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetRawDescriptor001 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              rawData.size(), sizeof(rawData));
     HDF_LOGI("UsbdRequestTest::UsbdGetRawDescriptor001 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
@@ -1243,7 +1243,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetRawDescriptor002, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> rawData;
     auto ret = UsbdClient::GetInstance().GetRawDescriptor(dev, rawData);
-    HDF_LOGI("UsbdRequestTest::UsbdGetRawDescriptor002 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetRawDescriptor002 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              rawData.size(), sizeof(rawData));
     HDF_LOGI("UsbdRequestTest::UsbdGetRawDescriptor002 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -1263,7 +1263,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetRawDescriptor003, TestSize.Level1)
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> rawData;
     auto ret = UsbdClient::GetInstance().GetRawDescriptor(dev, rawData);
-    HDF_LOGI("UsbdRequestTest::UsbdGetRawDescriptor003 %{public}d length=%{public}d buffer=%{public}d", __LINE__,
+    HDF_LOGI("UsbdRequestTest::UsbdGetRawDescriptor003 %{public}d length=%{public}zu buffer=%{public}zu", __LINE__,
              rawData.size(), sizeof(rawData));
     HDF_LOGI("UsbdRequestTest::UsbdGetRawDescriptor003 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
