@@ -499,6 +499,7 @@ static int32_t SerStubUseBuffer(struct CodecComponentTypeStub *stub, struct HdfS
     int32_t ret;
     struct OmxCodecBuffer buffer;
     uint32_t portIndex = 0;
+    InitOmxCodecBuffer(&buffer);
 
     if (!HdfSbufReadUint32(data, &portIndex)) {
         HDF_LOGE("%{public}s: read &portIndex failed!", __func__);
@@ -507,20 +508,23 @@ static int32_t SerStubUseBuffer(struct CodecComponentTypeStub *stub, struct HdfS
 
     if (!OmxCodecBufferBlockUnmarshalling(data, &buffer)) {
         HDF_LOGE("%{public}s: read buffer failed!", __func__);
+        ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
 
     ret = stub->service.UseBuffer(&stub->service, portIndex, &buffer);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call UseBuffer function failed!", __func__);
+        ReleaseOmxCodecBuffer(&buffer);
         return ret;
     }
 
     if (!OmxCodecBufferBlockMarshalling(reply, &buffer)) {
         HDF_LOGE("%{public}s: write buffer failed!", __func__);
+        ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    ReleaseOmxCodecBuffer(&buffer);
     return ret;
 }
 
@@ -530,6 +534,7 @@ static int32_t SerStubAllocateBuffer(struct CodecComponentTypeStub *stub,
     int32_t ret;
     struct OmxCodecBuffer buffer;
     uint32_t portIndex = 0;
+    InitOmxCodecBuffer(&buffer);
 
     if (!HdfSbufReadUint32(data, &portIndex)) {
         HDF_LOGE("%{public}s: read &portIndex failed!", __func__);
@@ -538,20 +543,23 @@ static int32_t SerStubAllocateBuffer(struct CodecComponentTypeStub *stub,
 
     if (!OmxCodecBufferBlockUnmarshalling(data, &buffer)) {
         HDF_LOGE("%{public}s: read buffer failed!", __func__);
+        ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
     
     ret = stub->service.AllocateBuffer(&stub->service, portIndex, &buffer);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call AllocateBuffer function failed!", __func__);
+        ReleaseOmxCodecBuffer(&buffer);
         return ret;
     }
 
     if (!OmxCodecBufferBlockMarshalling(reply, &buffer)) {
         HDF_LOGE("%{public}s: write buffer failed!", __func__);
+        ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    ReleaseOmxCodecBuffer(&buffer);
     return ret;
 }
 
@@ -560,7 +568,7 @@ static int32_t SerStubFreeBuffer(struct CodecComponentTypeStub *stub, struct Hdf
     int32_t ret;
     uint32_t portIndex = 0;
     struct OmxCodecBuffer buffer;
-
+    InitOmxCodecBuffer(&buffer);
     if (!HdfSbufReadUint32(data, &portIndex)) {
         HDF_LOGE("%{public}s: read &portIndex failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -568,15 +576,17 @@ static int32_t SerStubFreeBuffer(struct CodecComponentTypeStub *stub, struct Hdf
 
     if (!OmxCodecBufferBlockUnmarshalling(data, &buffer)) {
         HDF_LOGE("%{public}s: read buffer failed!", __func__);
+        ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
 
     ret = stub->service.FreeBuffer(&stub->service, portIndex, &buffer);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call FreeBuffer function failed!", __func__);
+        ReleaseOmxCodecBuffer(&buffer);
         return ret;
     }
-
+    ReleaseOmxCodecBuffer(&buffer);
     return ret;
 }
 
@@ -585,18 +595,20 @@ static int32_t SerStubEmptyThisBuffer(struct CodecComponentTypeStub *stub,
 {
     int32_t ret;
     struct OmxCodecBuffer buffer;
-
+    InitOmxCodecBuffer(&buffer);
     if (!OmxCodecBufferBlockUnmarshalling(data, &buffer)) {
         HDF_LOGE("%{public}s: read buffer failed!", __func__);
+        ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
 
     ret = stub->service.EmptyThisBuffer(&stub->service, &buffer);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call EmptyThisBuffer function failed!", __func__);
+        ReleaseOmxCodecBuffer(&buffer);
         return ret;
     }
-
+    ReleaseOmxCodecBuffer(&buffer);
     return ret;
 }
 
@@ -605,18 +617,20 @@ static int32_t SerStubFillThisBuffer(struct CodecComponentTypeStub *stub,
 {
     int32_t ret;
     struct OmxCodecBuffer buffer;
-
+    InitOmxCodecBuffer(&buffer);
     if (!OmxCodecBufferBlockUnmarshalling(data, &buffer)) {
         HDF_LOGE("%{public}s: read buffer failed!", __func__);
+        ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
 
     ret = stub->service.FillThisBuffer(&stub->service, &buffer);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call FillThisBuffer function failed!", __func__);
+        ReleaseOmxCodecBuffer(&buffer);
         return ret;
     }
-
+    ReleaseOmxCodecBuffer(&buffer);
     return ret;
 }
 
