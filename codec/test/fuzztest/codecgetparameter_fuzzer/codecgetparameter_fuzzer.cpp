@@ -51,7 +51,7 @@ namespace Codec {
             return false;
         }
 
-        ret = component->GetParameter(component, (uint32_t)data, (int8_t *)data, sizeof(*data)*size);
+        ret = component->GetParameter(component, (uint64_t)data, (int8_t *)data, sizeof(*data)*size);
         if (ret == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: GetParameter succeed\n", __func__);
             result = true;

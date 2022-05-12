@@ -82,7 +82,7 @@ namespace Codec {
         }
         struct OmxCodecBuffer buffer;
         FillDataOmxCodecBuffer(&buffer);
-        ret = component->FreeBuffer(component, (uint32_t)data, &buffer);
+        ret = component->FreeBuffer(component, (uint64_t)data, &buffer);
         if (ret == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: FreeBuffer succeed\n", __func__);
             result = true;
