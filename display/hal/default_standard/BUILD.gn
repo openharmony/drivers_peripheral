@@ -88,6 +88,7 @@ ohos_shared_library("def_display_device") {
   sources = [
     "src/display_device/composer/hdi_composer.cpp",
     "src/display_device/composer/hdi_gfx_composition.cpp",
+    "src/display_device/composer/hdi_video_composition.cpp",
     "src/display_device/core/hdi_device_interface.cpp",
     "src/display_device/core/hdi_display.cpp",
     "src/display_device/core/hdi_layer.cpp",
@@ -110,7 +111,6 @@ ohos_shared_library("def_display_device") {
     "include",
     "//drivers/peripheral/display/interfaces/include",
     "//drivers/peripheral/base",
-    "//foundation/graphic/standard/utils/include",
     "//foundation/graphic/standard/prebuilts/librarys/drm/include",
     "src/display_device/drm",
     "src/display_device/core",
@@ -118,6 +118,7 @@ ohos_shared_library("def_display_device") {
   ]
   deps = [
     ":def_display_gralloc",
+    ":def_display_layer_video",
     "//third_party/libdrm:libdrm",
   ]
   cflags = [ "-Wno-unused-function" ]
@@ -126,6 +127,36 @@ ohos_shared_library("def_display_device") {
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
   ]
+
+  install_enable = true
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "display_device_driver"
+}
+
+ohos_shared_library("def_display_layer_video") {
+  sources = [ "src/display_layer_video/display_layer_video.cpp" ]
+  public_configs = [ ":def_display_device_pub_config" ]
+
+  output_name = "display_layer_video"
+  include_dirs = [
+    "//drivers/peripheral/display/interfaces/include",
+    "//drivers/peripheral/base",
+    "//drivers/peripheral/display/hdi_service/video_layer/client",
+    "//drivers/adapter/uhdf2/include/hdi",
+  ]
+
+  external_deps = [
+    "device_driver_framework:libhdf_host",
+    "device_driver_framework:libhdf_ipc_adapter",
+    "device_driver_framework:libhdf_utils",
+    "device_driver_framework:libhdi",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "utils_base:utils",
+  ]
+
+  public_deps = [ "//drivers/peripheral/display/hdi_service/video_layer/client:video_layer_client" ]
 
   install_enable = true
   install_images = [ chipset_base_dir ]
