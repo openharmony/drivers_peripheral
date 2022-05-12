@@ -149,6 +149,7 @@ static int32_t SerStubEmptyBufferDone(struct CodecCallbackType *serviceImpl,
     int8_t *appData = NULL;
     uint32_t appDataLen = 0;
     struct OmxCodecBuffer buffer;
+    InitOmxCodecBuffer(&buffer);
 
     if (!HdfSbufReadUint32(data, &appDataLen)) {
         HDF_LOGE("%{public}s: read appData size failed!", __func__);
@@ -173,6 +174,7 @@ static int32_t SerStubEmptyBufferDone(struct CodecCallbackType *serviceImpl,
     if (!OmxCodecBufferBlockUnmarshalling(data, &buffer)) {
         HDF_LOGE("%{public}s: read buffer failed!", __func__);
         FreeMem(appData, appDataLen);
+        ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -180,10 +182,12 @@ static int32_t SerStubEmptyBufferDone(struct CodecCallbackType *serviceImpl,
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call EmptyBufferDone function failed!", __func__);
         FreeMem(appData, appDataLen);
+        ReleaseOmxCodecBuffer(&buffer);
         return ret;
     }
 
     FreeMem(appData, appDataLen);
+    ReleaseOmxCodecBuffer(&buffer);
     return ret;
 }
 
@@ -194,7 +198,7 @@ static int32_t SerStubFillBufferDone(struct CodecCallbackType *serviceImpl,
     int8_t *appData = NULL;
     uint32_t appDataLen = 0;
     struct OmxCodecBuffer buffer;
-
+    InitOmxCodecBuffer(&buffer);
     if (!HdfSbufReadUint32(data, &appDataLen)) {
         HDF_LOGE("%{public}s: read appData size failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -225,10 +229,12 @@ static int32_t SerStubFillBufferDone(struct CodecCallbackType *serviceImpl,
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call FillBufferDone function failed!", __func__);
         FreeMem(appData, appDataLen);
+        ReleaseOmxCodecBuffer(&buffer);
         return ret;
     }
 
     FreeMem(appData, appDataLen);
+    ReleaseOmxCodecBuffer(&buffer);
     return ret;
 }
 

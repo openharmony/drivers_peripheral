@@ -35,7 +35,8 @@ void OMX_TUNNELSETUPTYPEFree(struct OMX_TUNNELSETUPTYPE *dataBlock, bool freeSel
 bool OmxCodecBufferBlockMarshalling(struct HdfSBuf *data, const struct OmxCodecBuffer *dataBlock);
 
 bool OmxCodecBufferBlockUnmarshalling(struct HdfSBuf *data, struct OmxCodecBuffer *dataBlock);
-
+void ReleaseOmxCodecBuffer(struct OmxCodecBuffer *codecBuffer);
+void InitOmxCodecBuffer(struct OmxCodecBuffer *codecBuffer);
 // for config marshall
 bool RangeValueBlockMarshalling(struct HdfSBuf *data, const RangeValue *dataBlock);
 
