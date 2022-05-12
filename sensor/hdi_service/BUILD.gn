@@ -90,10 +90,8 @@ ohos_shared_library("libsensor_driver") {
 }
 
 group("hdi_sensor_service") {
-  if (target_cpu == "arm") {
-    deps = [
-      ":libsensor_driver",
-      ":libsensor_interface_service_1.0",
-    ]
-  }
+  deps = [
+    ":libsensor_driver",
+    ":libsensor_interface_service_1.0",
+  ]
 }
