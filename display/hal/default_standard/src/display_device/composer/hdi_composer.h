@@ -28,7 +28,7 @@ public:
     virtual int32_t Init()
     {
         return DISPLAY_SUCCESS;
-    };
+    }
     virtual int32_t SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer)
     {
         return DISPLAY_SUCCESS;
@@ -49,18 +49,31 @@ public:
     virtual ~HdiComposer() {}
     int32_t Prepare(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer);
     int32_t Commit(bool modeSet);
-    HdiComposition *GetPreCompostion()
+    HdiComposition *GetPreCompostion(uint32_t index)
     {
-        return mPreComp.get();
-    }
-    HdiComposition *GetPostCompostion()
-    {
-        return mPostComp.get();
+        if (index >= preComp_.size()) {
+            DISPLAY_LOGE("the index is overflow index %{public}d", index);
+            return nullptr;
+        }
+        return preComp_[index].get();
     }
 
+    HdiComposition *GetPostCompostion(uint32_t index)
+    {
+        if (index >= postComp_.size()) {
+            DISPLAY_LOGE("the index is overflow index %{public}d", index);
+            return nullptr;
+        }
+        return postComp_[index].get();
+    }
+
+    void AddPostComp(std::unique_ptr<HdiComposition> post)
+    {
+        postComp_.emplace_back(std::move(post));
+    }
 private:
-    std::unique_ptr<HdiComposition> mPreComp;
-    std::unique_ptr<HdiComposition> mPostComp;
+    std::vector<std::unique_ptr<HdiComposition>> preComp_;
+    std::vector<std::unique_ptr<HdiComposition>> postComp_;
 };
 } // namespace OHOS
 } // namespace HDI
