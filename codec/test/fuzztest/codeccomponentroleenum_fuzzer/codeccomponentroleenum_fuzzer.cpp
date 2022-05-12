@@ -44,7 +44,7 @@ namespace Codec {
             return false;
         }
 
-        ret = component->ComponentRoleEnum(component, const_cast<uint8_t *>(data), (uint32_t)data, (uint32_t)data);
+        ret = component->ComponentRoleEnum(component, const_cast<uint8_t *>(data), (uint64_t)data, (uint64_t)data);
         if (ret == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: ComponentRoleEnum succeed\n", __func__);
             result = true;

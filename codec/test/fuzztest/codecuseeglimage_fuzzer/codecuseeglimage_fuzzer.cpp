@@ -82,7 +82,7 @@ namespace Codec {
         }
         struct OmxCodecBuffer buffer;
         FillDataOmxCodecBuffer(&buffer);
-        ret = component->UseEglImage(component, &buffer, (uint32_t)data, (int8_t *)data, sizeof(*data)*size);
+        ret = component->UseEglImage(component, &buffer, (uint64_t)data, (int8_t *)data, sizeof(*data)*size);
         if (ret == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: UseEglImage succeed\n", __func__);
             result = true;

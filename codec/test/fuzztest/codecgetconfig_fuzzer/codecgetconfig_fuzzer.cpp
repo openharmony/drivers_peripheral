@@ -44,7 +44,7 @@ namespace Codec {
             return false;
         }
 
-        ret = component->GetConfig(component, (uint32_t)data, (int8_t *)data, sizeof(*data)*size);
+        ret = component->GetConfig(component, (uint64_t)data, (int8_t *)data, sizeof(*data)*size);
         if (ret == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: GetConfig succeed\n", __func__);
             result = true;
