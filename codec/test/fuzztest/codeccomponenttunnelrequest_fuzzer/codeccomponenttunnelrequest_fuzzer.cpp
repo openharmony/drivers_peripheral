@@ -51,7 +51,7 @@ namespace Codec {
             return false;
         }
 
-        ret = component->ComponentTunnelRequest(component, (uint32_t)data, (int32_t)data, (uint32_t)data,
+        ret = component->ComponentTunnelRequest(component, (uint64_t)data, (int64_t)data, (uint64_t)data,
             (struct OMX_TUNNELSETUPTYPE *)data);
         if (ret == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: ComponentTunnelRequest succeed\n", __func__);
