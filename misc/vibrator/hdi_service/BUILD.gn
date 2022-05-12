@@ -102,11 +102,9 @@ if (defined(ohos_lite)) {
   }
 
   group("hdf_vibrator_service") {
-    if (target_cpu == "arm") {
-      deps = [
-        ":libvibrator_driver",
-        ":libvibrator_interface_service_1.0",
-      ]
-    }
+    deps = [
+      ":libvibrator_driver",
+      ":libvibrator_interface_service_1.0",
+    ]
   }
 }
