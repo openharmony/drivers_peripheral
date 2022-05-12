@@ -93,10 +93,8 @@ ohos_shared_library("liblight_driver") {
 }
 
 group("hdf_light_service") {
-  if (target_cpu == "arm") {
-    deps = [
-      ":liblight_driver",
-      ":liblight_interface_service_1.0",
-    ]
-  }
+  deps = [
+    ":liblight_driver",
+    ":liblight_interface_service_1.0",
+  ]
 }
