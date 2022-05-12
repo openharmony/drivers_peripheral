@@ -1,7 +1,7 @@
 {
   "name": "pinauth_device_driver",
   "description": "pinauth device driver",
-  "version": "3.1",
+  "version": "3.2",
   "license": "Apache License 2.0",
   "component": {
     "name": "pinauth_device_driver",
