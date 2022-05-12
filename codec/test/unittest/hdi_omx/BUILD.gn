@@ -22,6 +22,7 @@ ohos_unittest("codec_hdi_omx_test") {
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
+    "//drivers/peripheral/display/hdi_service/gralloc/include",
   ]
   sources = [ "codec_hdi_omx_test.cpp" ]
 
@@ -45,6 +46,8 @@ ohos_unittest("codec_hdi_omx_test") {
       "device_driver_framework:libhdf_ipc_adapter",
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
+      "display_device_driver:hdi_gralloc_client",
+      "graphic_chipsetsdk:buffer_handle",
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]
