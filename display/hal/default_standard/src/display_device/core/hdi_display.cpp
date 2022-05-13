@@ -194,8 +194,8 @@ int32_t HdiDisplay::PrepareDisplayLayers(bool *needFlushFb)
         if (layer->GetDeviceSelect() != layer->GetCompositionType()) {
             DISPLAY_LOGD("layer change");
             layer->SetLayerCompositionType(layer->GetDeviceSelect());
+            mChangeLayers.push_back(layer);
         }
-        mChangeLayers.push_back(layer);
     }
     *needFlushFb = true;
     return DISPLAY_SUCCESS;

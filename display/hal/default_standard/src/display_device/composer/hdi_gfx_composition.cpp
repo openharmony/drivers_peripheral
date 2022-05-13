@@ -174,7 +174,7 @@ int32_t HdiGfxComposition::Apply(bool modeSet)
     DISPLAY_LOGD("composer layers size %{public}zd", mCompLayers.size());
     for (uint32_t i = 0; i < mCompLayers.size(); i++) {
         HdiLayer *layer = mCompLayers[i];
-        CompositionType compType = layer->GetCompositionType();
+        CompositionType compType = layer->GetDeviceSelect();
         switch (compType) {
             case COMPOSITION_VIDEO:
                 ret = ClearRect(*layer, *mClientLayer);
