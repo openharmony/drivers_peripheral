@@ -99,28 +99,39 @@ ohos_shared_library("def_display_device") {
     "src/display_device/drm/drm_vsync_worker.cpp",
     "src/display_device/drm/hdi_drm_composition.cpp",
     "src/display_device/drm/hdi_drm_layer.cpp",
+    "src/display_device/fbdev/fb_composition.cpp",
+    "src/display_device/fbdev/fb_device.cpp",
+    "src/display_device/fbdev/fb_display.cpp",
+    "src/display_device/vsync/sorft_vsync.cpp",
+    "src/utils/display_adapter.cpp",
   ]
   public_configs = [ ":def_display_device_pub_config" ]
 
   output_name = "display_device"
+
   include_dirs = [
     "src/display_device",
     "include",
     "//drivers/peripheral/display/interfaces/include",
     "//drivers/peripheral/base",
-    "//foundation/graphic/standard/prebuilts/librarys/drm/include",
     "src/display_device/drm",
+    "src/display_device/fbdev",
     "src/display_device/core",
     "src/display_device/composer",
+    "src/utils",
   ]
+
   deps = [
     ":def_display_gralloc",
     ":def_display_layer_video",
     "//third_party/libdrm:libdrm",
   ]
+
   cflags = [ "-Wno-unused-function" ]
+
   external_deps = [
     "device_driver_framework:libhdf_utils",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
   ]

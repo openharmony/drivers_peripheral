@@ -16,8 +16,9 @@
 #ifndef HDI_LAYER_H
 #define HDI_LAYER_H
 #include <unordered_set>
-#include <memory>
 #include <vector>
+#include <memory>
+#include <queue>
 #include "buffer_handle.h"
 #include "display_common.h"
 #include "hdi_device_common.h"
@@ -44,7 +45,7 @@ public:
     {
         return mHeight;
     }
-    int32_t GetWight() const
+    int32_t GetWidth() const
     {
         return mWidth;
     }
@@ -132,7 +133,15 @@ public:
 
     int GetReleaseFenceFd()
     {
-        return mReleaseFence.GetFd();
+        int fd;
+        if (releaseFences_.empty()) {
+            fd = -1;
+        } else {
+            fd = releaseFences_.front();
+            releaseFences_.pop();
+        }
+        DISPLAY_LOGD("fd is %d releaseFences_ size %d", fd, releaseFences_.size());
+        return fd;
     }
 
     bool IsVisible()
@@ -142,7 +151,7 @@ public:
 
     void SetReleaseFence(int fd)
     {
-        mReleaseFence = fd;
+        releaseFences_.push(fd);
     };
     void ClearColor(uint32_t color);
 
@@ -173,7 +182,7 @@ private:
     bool mVisible = true;
     uint32_t mId = 0;
     HdiFd mAcquireFence;
-    HdiFd mReleaseFence;
+    std::queue<int> releaseFences_;
     LayerType mType;
 
     IRect mDisplayRect;

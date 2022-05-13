@@ -26,10 +26,17 @@ int32_t HdiGfxComposition::Init(void)
 {
     DISPLAY_LOGD();
     int32_t ret = GfxModuleInit();
-    DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS) || (mGfxFuncs == nullptr), DISPLAY_FAILURE,
-        DISPLAY_LOGE("GfxModuleInit failed"));
+    if ((ret != DISPLAY_SUCCESS) || (mGfxFuncs == nullptr)) {
+        DISPLAY_LOGE("GfxModuleInit failed will use client composition always");
+        return DISPLAY_SUCCESS;
+    }
     ret = mGfxFuncs->InitGfx();
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("gfx init failed"));
+    if (ret != DISPLAY_SUCCESS) {
+        DISPLAY_LOGE("Failed to init gfx will use client composition always");
+        return DISPLAY_SUCCESS;
+    }
+    valid_ = true;
     return DISPLAY_SUCCESS;
 }
 
@@ -79,7 +86,7 @@ bool HdiGfxComposition::CanHandle(HdiLayer &hdiLayer)
 {
     DISPLAY_LOGD();
     (void)hdiLayer;
-    return true;
+    return valid_;
 }
 
 int32_t HdiGfxComposition::SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer)
@@ -96,6 +103,8 @@ int32_t HdiGfxComposition::SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &
                 layer->SetDeviceSelect(layer->GetCompositionType());
             }
             mCompLayers.push_back(layer);
+        } else {
+            layer->SetDeviceSelect(COMPOSITION_CLIENT);
         }
     }
     DISPLAY_LOGD("composer layers size %{public}zd", mCompLayers.size());
@@ -104,7 +113,7 @@ int32_t HdiGfxComposition::SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &
 
 void HdiGfxComposition::InitGfxSurface(ISurface &surface, HdiLayerBuffer &buffer)
 {
-    surface.width = buffer.GetWight();
+    surface.width = buffer.GetWidth();
     surface.height = buffer.GetHeight();
     surface.phyAddr = buffer.GetMemHandle();
     surface.enColorFmt = (PixelFormat)buffer.GetFormat();
