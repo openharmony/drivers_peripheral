@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -973,6 +973,70 @@ static int32_t WlanServiceStubStartScan(struct HdfDeviceIoClient *client, struct
     return ret;
 }
 
+static int32_t WlanServiceStubGetPowerMode(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
+    struct HdfSBuf *reply)
+{
+    int ret;
+    uint8_t mode;
+
+    if (data == NULL) {
+        HDF_LOGE("%s: data is NULL", __func__);
+        return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    const char *ifName = HdfSbufReadString(data);
+    if (ifName == NULL) {
+        HDF_LOGE("%s: ifName is NULL", __func__);
+        return HDF_FAILURE;
+    }
+
+    ret = g_wifi->getPowerMode(ifName, &mode);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: get power mode failed!, error code: %d", __func__, ret);
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufWriteUint8(reply, mode)) {
+        HDF_LOGE("%s: write buffer fail!", __func__);
+        ret = HDF_ERR_IO;
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t WlanServiceStubSetPowerMode(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
+    struct HdfSBuf *reply)
+{
+    int ret;
+    uint8_t mode;
+
+    if (data == NULL) {
+        HDF_LOGE("%s: data is NULL", __func__);
+        return HDF_FAILURE;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    const char *ifName = HdfSbufReadString(data);
+    if (ifName == NULL) {
+        HDF_LOGE("%s: ifName is NULL", __func__);
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufReadUint8(data, &mode)) {
+        HDF_LOGE(" %s: read power mode failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    ret = g_wifi->setPowerMode(ifName, mode);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: set power mode failed!, error code: %d", __func__, ret);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
 int32_t WlanHdiServiceOnRemoteRequest(struct HdfDeviceIoClient *client, int cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
@@ -1027,6 +1091,10 @@ int32_t WlanHdiServiceOnRemoteRequest(struct HdfDeviceIoClient *client, int cmdI
             return WlanServiceStubGetNetdevInfo(client, data, reply);
         case WLAN_SERVICE_START_SCAN:
             return WlanServiceStubStartScan(client, data, reply);
+        case WLAN_SERVICE_GET_POWER_MODE:
+            return WlanServiceStubGetPowerMode(client, data, reply);
+        case WLAN_SERVICE_SET_POWER_MODE:
+            return WlanServiceStubSetPowerMode(client, data, reply);
         default:
             HDF_LOGW("SampleServiceDispatch: not support cmd %d", cmdId);
             return HDF_ERR_INVALID_PARAM;

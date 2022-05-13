@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,11 +14,12 @@
  */
 
 #include <stdlib.h>
+
+#include "../wifi_common_cmd.h"
 #include "hdf_io_service.h"
 #include "hdf_sbuf.h"
 #include "hilog/log.h"
 #include "securec.h"
-#include "../wifi_common_cmd.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -38,8 +39,7 @@ static int32_t SendCmdSync(const uint32_t cmd, struct HdfSBuf *reqData, struct H
         HILOG_ERROR(LOG_DOMAIN, "%s: params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
-    if (g_wifiService == NULL || g_wifiService->dispatcher == NULL ||
-        g_wifiService->dispatcher->Dispatch == NULL) {
+    if (g_wifiService == NULL || g_wifiService->dispatcher == NULL || g_wifiService->dispatcher->Dispatch == NULL) {
         HILOG_ERROR(LOG_DOMAIN, "%s:bad remote service found!", __FUNCTION__);
         return RET_CODE_MISUSE;
     }
@@ -68,8 +68,8 @@ static int32_t ParserNetworkInfo(struct HdfSBuf *reply, struct NetworkInfoResult
             HILOG_ERROR(LOG_DOMAIN, "%s: get ifName failed", __FUNCTION__);
             return RET_CODE_FAILURE;
         }
-        if (!HdfSbufReadBuffer(reply, (const void **)&mode, &replayDataSize) ||
-            mode == NULL || replayDataSize != WIFI_IFTYPE_MAX) {
+        if (!HdfSbufReadBuffer(reply, (const void **)&mode, &replayDataSize) || mode == NULL ||
+            replayDataSize != WIFI_IFTYPE_MAX) {
             HILOG_ERROR(LOG_DOMAIN, "%s: get mode failed", __FUNCTION__);
             return RET_CODE_FAILURE;
         }
@@ -85,8 +85,7 @@ static int32_t ParserNetworkInfo(struct HdfSBuf *reply, struct NetworkInfoResult
     return RET_CODE_SUCCESS;
 }
 
-static int32_t ParserDeviceMacAddr(struct HdfSBuf *reply,
-    uint8_t *mac, uint8_t len)
+static int32_t ParserDeviceMacAddr(struct HdfSBuf *reply, uint8_t *mac, uint8_t len)
 {
     uint8_t isEfuseSavedMac;
     uint32_t replayDataSize = 0;
@@ -100,8 +99,7 @@ static int32_t ParserDeviceMacAddr(struct HdfSBuf *reply,
         HILOG_ERROR(LOG_DOMAIN, "%s: not support to get device mac addr", __FUNCTION__);
         return RET_CODE_NOT_SUPPORT;
     }
-    if (!HdfSbufReadBuffer(reply, (const void **)(&replayData),
-        &replayDataSize) || replayDataSize != len) {
+    if (!HdfSbufReadBuffer(reply, (const void **)(&replayData), &replayDataSize) || replayDataSize != len) {
         HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufReadBuffer failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
@@ -141,8 +139,7 @@ static int32_t ParserFreqInfo(struct HdfSBuf *reply, struct FreqInfoResult *resu
     return RET_CODE_SUCCESS;
 }
 
-static int32_t ParserAssociatedStas(struct HdfSBuf *reply,
-    struct AssocStaInfoResult *result)
+static int32_t ParserAssociatedStas(struct HdfSBuf *reply, struct AssocStaInfoResult *result)
 {
     uint32_t replayDataSize = 0;
     const uint8_t *replayData = 0;
@@ -206,7 +203,7 @@ int32_t WifiDriverClientInit(void)
         HILOG_ERROR(LOG_DOMAIN, "%s: fail to get remote service!", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    g_wifiDevEventListener.onReceive  = OnWiFiEvents;
+    g_wifiDevEventListener.onReceive = OnWiFiEvents;
     if (g_isHasRegisterListener) {
         HILOG_INFO(LOG_DOMAIN, "%s:has register listener!", __FUNCTION__);
         return RET_CODE_SUCCESS;
@@ -649,8 +646,7 @@ static int32_t GetIfNames(struct HdfSBuf *reply, char **ifNames, uint32_t *num)
     }
 
     for (i = 0; i < *num; i++) {
-        if (memcpy_s(*ifNames + i * IFNAMSIZ, IFNAMSIZ, replayData + i * IFNAMSIZ,
-            replayDataSize) != EOK) {
+        if (memcpy_s(*ifNames + i * IFNAMSIZ, IFNAMSIZ, replayData + i * IFNAMSIZ, replayDataSize) != EOK) {
             HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __FUNCTION__);
             free(*ifNames);
             *ifNames = NULL;
@@ -699,7 +695,7 @@ int32_t SetResetDriver(const uint8_t chipId, const char *ifName)
     if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
-    do{
+    do {
         if (!HdfSbufWriteUint8(data, chipId)) {
             HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufWriteUint8 failed", __FUNCTION__);
             ret = RET_CODE_FAILURE;
@@ -736,7 +732,7 @@ int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
     if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
         return RET_CODE_FAILURE;
     }
-    do{
+    do {
         ret = SendCmdSync(WIFI_HAL_CMD_GET_NETDEV_INFO, data, reply);
         if (ret != RET_CODE_SUCCESS) {
             break;
@@ -772,8 +768,8 @@ int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
     return ret;
 }
 
-int32_t WifiEapolPacketSend(const char *ifName, const uint8_t *srcAddr, const uint8_t *dstAddr, uint8_t *buf,
-    uint32_t length)
+int32_t WifiEapolPacketSend(
+    const char *ifName, const uint8_t *srcAddr, const uint8_t *dstAddr, uint8_t *buf, uint32_t length)
 {
     (void)srcAddr;
     (void)dstAddr;
@@ -806,7 +802,7 @@ int32_t WifiEapolPacketSend(const char *ifName, const uint8_t *srcAddr, const ui
 int32_t WifiEapolPacketReceive(const char *ifName, WifiRxEapol *rxEapol)
 {
     int32_t ret;
-    WifiRxEapol eapol = { 0 };
+    WifiRxEapol eapol = {0};
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *respData = NULL;
 
@@ -1115,7 +1111,7 @@ int32_t WifiCmdGetOwnMac(const char *ifName, void *buf, uint32_t len)
         goto RELEASE_DATA;
     }
     if (memcpy_s(buf, len, replayData, replayDataSize) != EOK) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __func__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     }
 
@@ -1157,7 +1153,7 @@ int32_t WifiCmdGetHwFeature(const char *ifName, WifiHwFeatureData *hwFeatureData
         goto RELEASE_DATA;
     }
     if (memcpy_s(hwFeatureData, sizeof(WifiHwFeatureData), respFeaturenData, dataSize) != EOK) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __func__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __FUNCTION__);
         ret = RET_CODE_FAILURE;
         goto RELEASE_DATA;
     }
@@ -1199,6 +1195,67 @@ int32_t WifiCmdScan(const char *ifName, WifiScan *scan)
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SCAN, data, NULL);
     }
+    HdfSbufRecycle(data);
+    return ret;
+}
+
+int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode)
+{
+    int32_t ret;
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufObtainDefault fail", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+
+    do {
+        if (!HdfSbufWriteString(data, ifName)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write ifName fail!", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_GET_POWER_MODE, data, reply);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: SendCmdSync fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufReadUint8(reply, mode)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufReadBuffer failed", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+    } while (0);
+
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
+    return ret;
+}
+
+int32_t SetPowerMode(const char *ifName, uint8_t mode)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    struct HdfSBuf *data = NULL;
+
+    data = HdfSbufObtainDefaultSize();
+    if (data == NULL) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufObtainDefaultSize fail!", __FUNCTION__);
+        return ret;
+    }
+
+    do {
+        if (!HdfSbufWriteString(data, ifName)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write ifName fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteUint8(data, mode)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write ifName fail!", __FUNCTION__);
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_SET_POWER_MODE, data, NULL);
+    } while (0);
+
     HdfSbufRecycle(data);
     return ret;
 }
@@ -1365,7 +1422,7 @@ int32_t WifiCmdSetClient(uint32_t clientNum)
     return ret;
 }
 
-int32_t WifiCmdProbeReqReport(const char* ifName, const int32_t *report)
+int32_t WifiCmdProbeReqReport(const char *ifName, const int32_t *report)
 {
     if (ifName == NULL || report == NULL) {
         return RET_CODE_FAILURE;
@@ -1390,7 +1447,7 @@ int32_t WifiCmdProbeReqReport(const char* ifName, const int32_t *report)
     return ret;
 }
 
-int32_t WifiCmdRemainOnChannel(const char* ifName, const WifiOnChannel *onChannel)
+int32_t WifiCmdRemainOnChannel(const char *ifName, const WifiOnChannel *onChannel)
 {
     if (ifName == NULL || onChannel == NULL) {
         return RET_CODE_FAILURE;
@@ -1416,7 +1473,7 @@ int32_t WifiCmdRemainOnChannel(const char* ifName, const WifiOnChannel *onChanne
     return ret;
 }
 
-int32_t WifiCmdCancelRemainOnChannel(const char* ifName)
+int32_t WifiCmdCancelRemainOnChannel(const char *ifName)
 {
     if (ifName == NULL) {
         return RET_CODE_FAILURE;

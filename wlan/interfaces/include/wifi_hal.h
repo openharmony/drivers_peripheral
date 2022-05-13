@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -212,6 +212,32 @@ struct IWiFi {
      * @version 1.0
      */
     int32_t (*getNetDevInfo)(struct NetDeviceInfoResult *netDeviceInfoResult);
+
+    /**
+     * @brief Obtains the power mode which is being used.
+     *
+     * @param ifName Indicates the pointer to the network interface name.
+     * @param mode Indicates the pointer to the power mode.
+     *
+     * @return Returns <b>0</b> if get infos successful; returns a negative value otherwise.
+     *
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*getPowerMode)(const char *ifName, uint8_t *mode);
+
+    /**
+     * @brief Set the power mode.
+     *
+     * @param ifName Indicates the pointer to the network interface name.
+     * @param mode The value set to power mode.
+     *
+     * @return Returns <b>0</b> if get infos successful; returns a negative value otherwise.
+     *
+     * @since 1.0
+     * @version 1.0
+     */
+    int32_t (*setPowerMode)(const char *ifName, uint8_t mode);
 };
 
 /**

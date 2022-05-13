@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -64,6 +64,8 @@ struct IWifiInterface {
         unsigned char *scanMac, uint8_t len);
     int32_t (*getNetDevInfo)(struct IWifiInterface *self, struct NetDeviceInfoResult *netDeviceInfoResult);
     int32_t (*startScan)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, WifiScan *scan);
+    int32_t (*getPowerMode)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, uint8_t *mode);
+    int32_t (*setPowerMode)(struct IWifiInterface *self, const struct WlanFeatureInfo *ifeature, uint8_t mode);
 };
 
 struct IWifiInterface *HdIWifiInterfaceGet(const char *serviceName);
