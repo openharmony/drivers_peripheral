@@ -29,8 +29,8 @@
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-DrmDisplay::DrmDisplay(std::shared_ptr<DrmConnector> connector, std::shared_ptr<DrmCrtc> crtc,
-    std::shared_ptr<DrmDevice> drmDevice)
+DrmDisplay::DrmDisplay(std::shared_ptr<DrmConnector> &connector, std::shared_ptr<DrmCrtc> &crtc,
+    std::shared_ptr<DrmDevice> &drmDevice)
     : mDrmDevice(drmDevice), mConnector(connector), mCrtc(crtc)
 {}
 
@@ -210,7 +210,7 @@ int32_t DrmDisplay::PushFirstFrame()
     mClientLayer->SetLayerBuffer(buffer, -1);
 
     std::vector<HdiLayer *> layers;
-    HdiDrmComposition *drmComp = static_cast<HdiDrmComposition *>(mComposer->GetPostCompostion());
+    HdiDrmComposition *drmComp = static_cast<HdiDrmComposition *>(mComposer->GetPostCompostion(0));
     drmComp->SetLayers(layers, *mClientLayer);
     drmComp->Apply(true);
     return DISPLAY_SUCCESS;
