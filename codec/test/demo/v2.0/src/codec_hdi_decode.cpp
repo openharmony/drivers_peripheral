@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "codec_hdi_decode.h"
 #include <chrono>
 #include <dlfcn.h>
 #include <hdf_log.h>
@@ -21,14 +22,11 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#include "codec_hdi_decode.h"
-
+OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiDecode::gralloc_ = nullptr;
 using namespace std;
 using namespace OHOS;
-
 constexpr int32_t FD_SIZE = sizeof(int);
 constexpr int32_t FRAME = 30 << 16;
-constexpr int32_t PARAM_LEN = 5;
 constexpr int32_t denominator = 2;
 constexpr int32_t numerator = 3;
 constexpr int32_t START_CODE_OFFSET_ONE = -1;
@@ -51,10 +49,11 @@ CodecHdiDecode::CodecHdiDecode() : fpIn_(nullptr), fpOut_(nullptr)
     callback_ = nullptr;
     omxMgr_ = nullptr;
     exit_ = false;
-    isSupply_ = false;
     width_ = 0;
     height_ = 0;
     codecMime_ = codecMime::AVC;
+    count_ = 0;
+    useBufferHandle_ = false;
 }
 
 CodecHdiDecode::~CodecHdiDecode()
@@ -119,16 +118,23 @@ bool CodecHdiDecode::ReadOnePacket(FILE *fp, char *buf, uint32_t &filledCount)
     return ret;
 }
 
-bool CodecHdiDecode::Init(int width, int height, std::string &filename, codecMime codec)
+bool CodecHdiDecode::Init(CommandOpt &opt)
 {
-    this->width_ = width;
-    this->height_ = height;
-    this->codecMime_ = codec;
-    HDF_LOGI("width[%{public}d], height[%{public}d]", width_, height_);
-    fpIn_ = fopen(filename.c_str(), "rb");
-    fpOut_ = fopen("/data/out.yuv", "wb+");
+    this->width_ = opt.width;
+    this->height_ = opt.height;
+    this->codecMime_ = opt.codec;
+    this->stride_ = align_up(opt.width);
+    this->useBufferHandle_ = opt.useBuffer;
+    HDF_LOGI("width[%{public}d], height[%{public}d],stride_[%{public}d],infile[%{public}s],outfile[%{public}s]", width_,
+             height_, stride_, opt.fileInput.c_str(), opt.fileOutput.c_str());
+
+    // gralloc init
+    gralloc_ = OHOS::HDI::Display::V1_0::IDisplayGralloc::Get();
+    fpIn_ = fopen(opt.fileInput.c_str(), "rb");
+    fpOut_ = fopen(opt.fileOutput.c_str(), "wb+");
     if ((fpIn_ == nullptr) || (fpOut_ == nullptr)) {
-        HDF_LOGE("%{public}s failed to open file %{public}s", __func__, filename.c_str());
+        HDF_LOGE("%{public}s failed to open file %{public}s or %{public}s", __func__, opt.fileInput.c_str(),
+                 opt.fileOutput.c_str());
         return false;
     }
 
@@ -143,9 +149,8 @@ bool CodecHdiDecode::Init(int width, int height, std::string &filename, codecMim
     callback_->EventHandler = &CodecHdiDecode::OnEvent;
     callback_->EmptyBufferDone = &CodecHdiDecode::OnEmptyBufferDone;
     callback_->FillBufferDone = &CodecHdiDecode::OnFillBufferDone;
-
     int32_t err = HDF_SUCCESS;
-    if (codec == codecMime::AVC) {
+    if (codecMime_ == codecMime::AVC) {
         err = omxMgr_->CreateComponent(&client_, const_cast<char *>(decoder_avc), 0, 0, callback_);
     } else {
         err = omxMgr_->CreateComponent(&client_, const_cast<char *>(decoder_hevc), 0, 0, callback_);
@@ -182,7 +187,7 @@ int32_t CodecHdiDecode::ConfigPortDefine()
              param.format.video.eCompressionFormat, param.format.video.eColorFormat);
     param.format.video.nFrameWidth = width_;
     param.format.video.nFrameHeight = height_;
-    param.format.video.nStride = width_;
+    param.format.video.nStride = stride_;
     param.format.video.nSliceHeight = height_;
     err = client_->SetParameter(client_, OMX_IndexParamPortDefinition, (int8_t *)&param, sizeof(param));
     if (err != HDF_SUCCESS) {
@@ -203,7 +208,7 @@ int32_t CodecHdiDecode::ConfigPortDefine()
              param.format.video.eCompressionFormat, param.format.video.eColorFormat);
     param.format.video.nFrameWidth = width_;
     param.format.video.nFrameHeight = height_;
-    param.format.video.nStride = width_;
+    param.format.video.nStride = stride_;
     param.format.video.nSliceHeight = height_;
     param.format.video.eColorFormat = AV_COLOR_FORMAT;  // YUV420SP
     err = client_->SetParameter(client_, OMX_IndexParamPortDefinition, (int8_t *)&param, sizeof(param));
@@ -242,7 +247,57 @@ bool CodecHdiDecode::Configure()
         HDF_LOGE("%{public}s failed  with PortIndex::PORT_INDEX_INPUT", __func__);
         return false;
     }
+
+    err = CheckAndUseBufferHandle();
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed  with CheckAndUseBufferHandle", __func__);
+        return false;
+    }
     return true;
+}
+
+int32_t CodecHdiDecode::CheckAndUseBufferHandle()
+{
+    if (!useBufferHandle_) {
+        return HDF_SUCCESS;
+    }
+    SupportBufferType param;
+    InitParamInOhos(param);
+    param.portIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+
+    auto err = client_->GetParameter(client_, OMX_IndexParamSupportBufferType, (int8_t *)&param, sizeof(param));
+    HDF_LOGI(
+        "OMX_GetParameter:OMX_IndexParamSupportBufferType:kPortIndexInput, err [%{public}x], bufferTypes[%{public}d]",
+        err, param.bufferTypes);
+    if (err != HDF_SUCCESS) {
+        return err;
+    }
+    InitParamInOhos(param);
+    param.portIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
+    err = client_->GetParameter(client_, OMX_IndexParamSupportBufferType, (int8_t *)&param, sizeof(param));
+    HDF_LOGI(
+        "OMX_GetParameter:OMX_IndexParamSupportBufferType:kPortIndexOutput, err [%{public}x], bufferTypes[%{public}d]",
+        err, param.bufferTypes);
+    if (err != HDF_SUCCESS) {
+        return err;
+    }
+    GetBufferHandleUsageParams usage;
+    InitParamInOhos(usage);
+    usage.portIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
+    err = client_->GetParameter(client_, OMX_IndexParamGetBufferHandleUsage, (int8_t *)&usage, sizeof(usage));
+    HDF_LOGI(
+        "OMX_GetParameter:OMX_IndexParamGetBufferHandleUsage:kPortIndexOutput, err [%{public}x], usage[%{public}d]",
+        err, usage.usage);
+    if (err != HDF_SUCCESS) {
+        return err;
+    }
+    UseBufferType type;
+    InitParamInOhos(type);
+    type.portIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
+    type.bufferType = BUFFER_TYPE_HANDLE;
+    err = client_->SetParameter(client_, OMX_IndexParamUseBufferType, (int8_t *)&type, sizeof(type));
+    HDF_LOGI("OMX_SetParameter:OMX_IndexParamUseBufferType:kPortIndexOutput, err [%{public}x]", err);
+    return err;
 }
 
 bool CodecHdiDecode::UseBuffers()
@@ -364,10 +419,14 @@ int32_t CodecHdiDecode::UseBufferOnPort(PortIndex portIndex)
         InitParam(param);
         param.nPortIndex = (uint32_t)portIndex;
         err = client_->GetParameter(client_, OMX_IndexParamCompBufferSupplier, (int8_t *)&param, sizeof(param));
-        HDF_LOGI("param.eBufferSupplier[%{public}d] isSupply [%{public}d], err [%{public}d]", param.eBufferSupplier,
-                 this->isSupply_, err);
+        HDF_LOGI("param.eBufferSupplier[%{public}d] err [%{public}d]", param.eBufferSupplier, err);
     }
-    err = UseBufferOnPort(portIndex, bufferCount, bufferSize);
+    if (useBufferHandle_ && portIndex == PortIndex::PORT_INDEX_OUTPUT) {
+        err = UseBufferHandle(bufferCount, bufferSize);
+    } else {
+        err = UseBufferOnPort(portIndex, bufferCount, bufferSize);
+    }
+
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s UseBufferOnPort err[%{public}x]", __func__, err);
         return err;
@@ -379,6 +438,54 @@ int32_t CodecHdiDecode::UseBufferOnPort(PortIndex portIndex)
             HDF_LOGE("%{public}s SendCommand OMX_CommandPortEnable::PortIndex::PORT_INDEX_INPUT error", __func__);
             return err;
         }
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t CodecHdiDecode::UseBufferHandle(int bufferCount, int bufferSize)
+{
+    if (bufferCount <= 0 || bufferSize <= 0 || gralloc_ == nullptr) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    AllocInfo alloc = {.width = this->stride_,
+                       .height = this->height_,
+                       .usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA,
+                       .format = PIXEL_FMT_YCBCR_420_SP};
+    int32_t err = HDF_SUCCESS;
+    for (int i = 0; i < bufferCount; i++) {
+        std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
+        omxBuffer->size = sizeof(OmxCodecBuffer);
+        omxBuffer->version.s.nVersionMajor = 1;
+        omxBuffer->bufferType = BUFFER_TYPE_HANDLE;
+        BufferHandle *bufferHandle = nullptr;
+        err = gralloc_->AllocMem(alloc, bufferHandle);
+        HDF_LOGI("%{public}s AlloceMem ret val err[%{public}d], buffer [%{public}p]", __func__, err, bufferHandle);
+        if (DISPLAY_SUCCESS != err) {
+            HDF_LOGE("%{public}s AllocMem error", __func__);
+            return err;
+        }
+        size_t handleSize =
+            sizeof(BufferHandle) + (sizeof(int32_t) * (bufferHandle->reserveFds + bufferHandle->reserveInts));
+        omxBuffer->bufferLen = handleSize;
+        omxBuffer->buffer = (uint8_t *)bufferHandle;
+        omxBuffer->allocLen = bufferSize;
+        omxBuffer->fenceFd = -1;  // check use -1 first with no window
+        omxBuffer->pts = 0;
+        omxBuffer->flag = 0;
+        auto err = client_->UseBuffer(client_, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, omxBuffer.get());
+        if (err != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s failed to UseBuffer with  output port]", __func__);
+            return err;
+        }
+        omxBuffer->bufferLen = 0;
+        HDF_LOGI("UseBuffer returned bufferID [%{public}d]", omxBuffer->bufferId);
+
+        std::shared_ptr<BufferInfo> bufferInfo = std::make_shared<BufferInfo>();
+        bufferInfo->omxBuffer = omxBuffer;
+        bufferInfo->setBufferHandle(bufferHandle);
+        bufferInfo->portIndex = PortIndex::PORT_INDEX_OUTPUT;
+        omxBuffers_.emplace(std::make_pair(omxBuffer->bufferId, bufferInfo));
+        unUsedOutBuffers_.push_back(omxBuffer->bufferId);
     }
     return HDF_SUCCESS;
 }
@@ -429,7 +536,14 @@ bool CodecHdiDecode::FillAllTheBuffer()
         auto iter = omxBuffers_.find(bufferId);
         if (iter != omxBuffers_.end()) {
             auto bufferInfo = iter->second;
-            auto err = client_->FillThisBuffer(client_, bufferInfo->omxBuffer.get());
+            auto buffer = bufferInfo->omxBuffer.get();
+            if (bufferInfo->bufferHandle != nullptr) {
+                buffer->buffer = (uint8_t *)bufferInfo->bufferHandle;
+                buffer->bufferLen = sizeof(BufferHandle) + sizeof(int32_t) * (bufferInfo->bufferHandle->reserveFds +
+                                                                              bufferInfo->bufferHandle->reserveInts);
+            }
+
+            auto err = client_->FillThisBuffer(client_, buffer);
             if (err != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s FillThisBuffer error", __func__);
                 return false;
@@ -465,6 +579,7 @@ void CodecHdiDecode::Run()
         return;
     }
 
+    auto t1 = std::chrono::system_clock::now();
     bool eosFlag = false;
     while (!eosFlag) {
         HDF_LOGI(" inputput run");
@@ -499,6 +614,9 @@ void CodecHdiDecode::Run()
         usleep(10000);
         continue;
     }
+    auto t2 = std::chrono::system_clock::now();
+    std::chrono::duration<double> diff = t2 - t1;
+    HDF_LOGI("cost %{public}f, count=%{public}d", diff.count(), count_);
     // command to IDLE
     (void)client_->SendCommand(client_, OMX_CommandStateSet, OMX_StateIdle, NULL, 0);
     return;
@@ -556,11 +674,20 @@ int32_t CodecHdiDecode::OnFillBufferDone(struct OmxCodecBuffer &buffer)
     if ((iter == omxBuffers_.end()) || (iter->second == nullptr)) {
         return HDF_SUCCESS;
     }
+    count_++;
     // read buffer
     auto bufferInfo = iter->second;
-    const void *addr = bufferInfo->avSharedPtr->ReadFromAshmem(buffer.filledLen, buffer.offset);
-    // save to file
-    (void)fwrite(addr, 1, buffer.filledLen, fpOut_);
+    if (bufferInfo->avSharedPtr != nullptr) {
+        const void *addr = bufferInfo->avSharedPtr->ReadFromAshmem(buffer.filledLen, buffer.offset);
+        (void)fwrite(addr, 1, buffer.filledLen, fpOut_);
+    } else if (bufferInfo->bufferHandle != nullptr && gralloc_ != nullptr) {
+        gralloc_->Mmap(*bufferInfo->bufferHandle);
+        (void)fwrite(bufferInfo->bufferHandle->virAddr, 1,
+                     bufferInfo->bufferHandle->width * bufferInfo->bufferHandle->height * numerator / denominator,
+                     fpOut_);
+        gralloc_->Unmap(*bufferInfo->bufferHandle);
+    }
+
     (void)fflush(fpOut_);
     // reset buffer
     buffer.offset = 0;
@@ -579,31 +706,19 @@ int32_t CodecHdiDecode::OnFillBufferDone(struct OmxCodecBuffer &buffer)
     }
     return HDF_SUCCESS;
 }
+
 int main(int argc, char *argv[])
 {
-    if (argc < PARAM_LEN) {
-        HDF_LOGE("usage AVC width_ heigh filename");
-        return 0;
+    CommandOpt opt;
+    CommandParse parse;
+    if (!parse.Parse(argc, argv, opt)) {
+        return HDF_FAILURE;
     }
-    std::string codecString = argv[1];
-    codecMime codec = codecMime::AVC;
-    if (strcmp(codecString.c_str(), "avc") == 0 || strcmp(codecString.c_str(), "AVC") == 0) {
-        codec = codecMime::AVC;
-    } else if (strcmp(codecString.c_str(), "hevc") == 0 || strcmp(codecString.c_str(), "HEVC") == 0) {
-        codec = codecMime::HEVC;
-    } else {
-        return 0;
-    }
-
-    int width = atoi(argv[2]);
-    int height = atoi(argv[3]);
-    string filename = argv[4];
-
     if (g_core == nullptr) {
         g_core = new CodecHdiDecode();
     }
     // Init width, height, input file
-    if (!g_core->Init(width, height, filename, codec)) {
+    if (!g_core->Init(opt)) {
         delete g_core;
         g_core = nullptr;
         return HDF_FAILURE;
