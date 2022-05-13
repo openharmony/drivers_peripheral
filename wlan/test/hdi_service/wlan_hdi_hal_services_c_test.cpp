@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -391,12 +391,51 @@ HWTEST_F(HdfWifiServiceCTest, GetNetdevInfoTest_014, TestSize.Level1)
 }
 
 /**
+ * @tc.name: GetPowerModeTest_015
+ * @tc.desc: Wifi hdi get power mode function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(HdfWifiServiceCTest, GetPowerModeTest_015, TestSize.Level1)
+{
+    struct WlanFeatureInfo *ifeature = nullptr;
+    uint8_t mode = 0;
+
+    int32_t rc = g_wlanObj->createFeature(g_wlanObj, PROTOCOL_80211_IFTYPE_AP, (struct WlanFeatureInfo **)&ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->getPowerMode(g_wlanObj, (struct WlanFeatureInfo *)ifeature, &mode);
+    printf("mode = 0x%02x\n", mode);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: SetPowerModeTest_015
+ * @tc.desc: Wifi hdi set power mode function test
+ * @tc.type: FUNC
+ * @tc.require: AR000FRMJB
+ */
+HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_016, TestSize.Level1)
+{
+    struct WlanFeatureInfo *ifeature = nullptr;
+    uint8_t mode = WIFI_POWER_MODE_SLEEPING;
+
+    int32_t rc = g_wlanObj->createFeature(g_wlanObj, PROTOCOL_80211_IFTYPE_AP, (struct WlanFeatureInfo **)&ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->setPowerMode(g_wlanObj, (struct WlanFeatureInfo *)ifeature, mode);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+}
+
+/**
  * @tc.name: RegisterEventCallbackTest_015
  * @tc.desc: Wifi hdi reister event call back function test
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, RegisterEventCallbackTest_015, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, RegisterEventCallbackTest_017, TestSize.Level1)
 {
     int32_t rc = g_wlanObj->registerEventCallback(g_wlanObj, HalResetCallbackEvent);
     ASSERT_EQ(rc, HDF_SUCCESS);
@@ -408,7 +447,7 @@ HWTEST_F(HdfWifiServiceCTest, RegisterEventCallbackTest_015, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, ResetDriverTest_016, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, ResetDriverTest_018, TestSize.Level1)
 {
     int32_t wlan_type = PROTOCOL_80211_IFTYPE_STATION;
     struct WlanFeatureInfo *ifeature = nullptr;
@@ -432,7 +471,7 @@ HWTEST_F(HdfWifiServiceCTest, ResetDriverTest_016, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, StartScanTest_017, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, StartScanTest_019, TestSize.Level1)
 {
     int32_t rc;
     const int32_t wlan_type = PROTOCOL_80211_IFTYPE_STATION;
@@ -454,7 +493,7 @@ HWTEST_F(HdfWifiServiceCTest, StartScanTest_017, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, UnregisterEventCallbackTest_018, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, UnregisterEventCallbackTest_020, TestSize.Level1)
 {
     int32_t rc = g_wlanObj->unregisterEventCallback(g_wlanObj);
     ASSERT_EQ(rc, HDF_SUCCESS);

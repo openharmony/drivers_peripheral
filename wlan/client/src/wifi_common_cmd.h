@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,6 +53,9 @@ enum BaseCommands {
     CMD_BASE_GET_IFNAMES,
     CMD_BASE_RESET_DRIVER,
     CMD_BASE_GET_NETDEV_INFO,
+    CMD_BASE_DO_RESET_PRIVATE,
+    CMD_BASE_GET_POWER_MODE,
+    CMD_BASE_SET_POWER_MODE
 };
 
 enum APCommands {
@@ -100,6 +103,8 @@ typedef enum {
     WIFI_HAL_CMD_GET_IFNAMES = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_GET_IFNAMES),
     WIFI_HAL_CMD_RESET_DRIVER = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_RESET_DRIVER),
     WIFI_HAL_CMD_GET_NETDEV_INFO = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_GET_NETDEV_INFO),
+    WIFI_HAL_CMD_GET_POWER_MODE = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_GET_POWER_MODE),
+    WIFI_HAL_CMD_SET_POWER_MODE = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_SET_POWER_MODE)
 } WifiHalCmd;
 
 typedef enum {
