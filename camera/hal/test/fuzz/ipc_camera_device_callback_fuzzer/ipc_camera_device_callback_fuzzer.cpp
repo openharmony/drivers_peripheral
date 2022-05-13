@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,14 +15,13 @@
 
 #include "ipc_camera_device_callback_fuzzer.h"
 #include "fuzz_base.h"
+#include "types.h"
 
-#include <cstddef>
-#include <cstdint>
-
+using namespace OHOS::Camera;
 class IPCCameraDeviceCallbackFuzzer : public CameraDeviceCallbackStub {
 public:
     void OnError(ErrorType type, int32_t errorCode) override {}
-    void OnResult(uint64_t timestamp, const std::shared_ptr<CameraMetadata> &result) override {}
+    void OnResult(uint64_t timestamp, const std::shared_ptr<OHOS::CameraStandard::CameraMetadata> &result) override {}
 };
 
 static uint32_t U32_AT(const uint8_t *ptr)
@@ -30,31 +29,30 @@ static uint32_t U32_AT(const uint8_t *ptr)
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
 }
 
-static int32_t onRemoteRequest(uint32_t code, MessageParcel &data)
+static int32_t onRemoteRequest(uint32_t code, OHOS::MessageParcel &data)
 {
-    MessageParcel reply;
-    MessageOption option;
+    OHOS::MessageParcel reply;
+    OHOS::MessageOption option;
     IPCCameraDeviceCallbackFuzzer IPCDeviceCallback;
-
     auto ret = IPCDeviceCallback.OnRemoteRequest(code, data, reply, option);
     return ret;
 }
 
 static void IpcFuzzService(const uint8_t *data, size_t size)
 {
-    MessageParcel reply;
-    MessageOption option;
-    MessageParcel dataMessageParcel;
+    OHOS::MessageParcel reply;
+    OHOS::MessageOption option;
+    OHOS::MessageParcel dataMessageParcel;
+    uint32_t code = U32_AT(data);
+    const uint8_t *number = data;
+    number = number + sizeof(uint32_t);
     if (size > sizeof(uint32_t)) {
-        uint32_t code = U32_AT(data);
         if (code == 1) { // 1:code size
             return;
         }
-        uint8_t *number = data;
-        number = number + sizeof(uint32_t);
         size_t length = size;
         length = length - sizeof(uint32_t);
-        dataMessageParcel.WriteInterfaceToken(CameraDeviceCallbackStub::GetDescriptor());
+        dataMessageParcel.WriteInterfaceToken(OHOS::Camera::CameraDeviceCallbackStub::GetDescriptor());
         dataMessageParcel.WriteBuffer(number, length);
         dataMessageParcel.RewindRead(0);
         onRemoteRequest(code, dataMessageParcel);

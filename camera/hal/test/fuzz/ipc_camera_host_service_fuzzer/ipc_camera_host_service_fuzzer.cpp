@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,19 +16,16 @@
 #include "ipc_camera_host_service_fuzzer.h"
 #include "fuzz_base.h"
 
-#include <cstddef>
-#include <cstdint>
-
 static uint32_t U32_AT(const uint8_t *ptr)
 {
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
 }
 
-static int32_t onRemoteRequest(int cmdId, MessageParcel &data)
+static int32_t onRemoteRequest(int cmdId, OHOS::MessageParcel &data)
 {
-    MessageParcel reply;
-    MessageOption option;
-    std::shared_ptr<CameraHostStub> IPCHost = std::make_shared<CameraHostStub>();
+    OHOS::MessageParcel reply;
+    OHOS::MessageOption option;
+    std::shared_ptr<OHOS::Camera::CameraHostStub> IPCHost = std::make_shared<OHOS::Camera::CameraHostStub>();
     sleep(1);
     auto ret = IPCHost->CameraHostServiceStubOnRemoteRequest(cmdId, data, reply, option);
     return ret;
@@ -36,11 +33,11 @@ static int32_t onRemoteRequest(int cmdId, MessageParcel &data)
 
 static void IpcFuzzService(const uint8_t *data, size_t size)
 {
-    MessageParcel reply;
-    MessageOption option;
-    MessageParcel dataMessageParcel;
+    OHOS::MessageParcel reply;
+    OHOS::MessageOption option;
+    OHOS::MessageParcel dataMessageParcel;
     uint32_t code = U32_AT(data);
-    uint8_t *number = data;
+    const uint8_t *number = data;
     number = number + sizeof(uint32_t);
     if (size > sizeof(uint32_t)) {
         if ((code == 0) || (code == 3)) { // 0:code size 3:code size
