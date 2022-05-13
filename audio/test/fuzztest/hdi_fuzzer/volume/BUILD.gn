@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -22,26 +22,25 @@ group("volume") {
 
   deps += [
     # deps file
-    "src:hdf_audio_hdi_getgain_capture_fuzzer",
-    "src:hdf_audio_hdi_getgain_render_fuzzer",
-    "src:hdf_audio_hdi_getgainthreshold_capture_fuzzer",
-    "src:hdf_audio_hdi_getgainthreshold_render_fuzzer",
-    "src:hdf_audio_hdi_getmute_capture_fuzzer",
-    "src:hdf_audio_hdi_getmute_render_fuzzer",
-    "src:hdf_audio_hdi_getvolume_capture_fuzzer",
-    "src:hdf_audio_hdi_getvolume_render_fuzzer",
-    "src:hdf_audio_hdi_setgain_capture_fuzzer",
-    "src:hdf_audio_hdi_setgain_capture_gain_fuzzer",
-    "src:hdf_audio_hdi_setgain_render_fuzzer",
-    "src:hdf_audio_hdi_setgain_render_gain_fuzzer",
-    "src:hdf_audio_hdi_setmute_capture_fuzzer",
-    "src:hdf_audio_hdi_setmute_capture_mute_fuzzer",
-    "src:hdf_audio_hdi_setmute_render_fuzzer",
-    "src:hdf_audio_hdi_setmute_render_mute_fuzzer",
-    "src:hdf_audio_hdi_setvolume_capture_fuzzer",
-    "src:hdf_audio_hdi_setvolume_capture_volume_fuzzer",
-    "src:hdf_audio_hdi_setvolume_render_fuzzer",
-    "src:hdf_audio_hdi_setvolume_render_volume_fuzzer",
+    "audiogetgaincapture_fuzzer:AudioGetgainCaptureFuzzTest",
+    "audiogetgainrender_fuzzer:AudioGetgainRenderFuzzTest",
+    "audiogetgainthresholdcapture_fuzzer:AudioGetgainthresholdCaptureFuzzTest",
+    "audiogetgainthresholdrender_fuzzer:AudioGetgainthresholdRenderFuzzTest",
+    "audiogetmutecapture_fuzzer:AudioGetmuteCaptureFuzzTest",
+    "audiogetmuterender_fuzzer:AudioGetmuteRenderFuzzTest",
+    "audiogetvolumecapture_fuzzer:AudioGetvolumeCaptureFuzzTest",
+    "audiogetvolumerender_fuzzer:AudioGetvolumeRenderFuzzTest",
+    "audiosetgaincapture_fuzzer:AudioSetgainCaptureFuzzTest",
+    "audiosetgaincapturegain_fuzzer:AudioSetgainCaptureGainFuzzTest",
+    "audiosetgainrender_fuzzer:AudioSetgainRenderFuzzTest",
+    "audiosetgainrendergain_fuzzer:AudioSetgainRenderGainFuzzTest",
+    "audiosetmutecapture_fuzzer:AudioSetmuteCaptureFuzzTest",
+    "audiosetmutecapturemute_fuzzer:AudioSetmuteCaptureMuteFuzzTest",
+    "audiosetmuterender_fuzzer:AudioSetmuteRenderFuzzTest",
+    "audiosetmuterendermute_fuzzer:AudioSetmuteRenderMuteFuzzTest",
+    "audiosetvolumecapture_fuzzer:AudioSetvolumeCaptureFuzzTest",
+    "audiosetvolumecapturevolume_fuzzer:AudioSetvolumeCaptureVolumeFuzzTest",
+    "audiosetvolumerender_fuzzer:AudioSetvolumeRenderFuzzTest",
+    "audiosetvolumerendervolume_fuzzer:AudioSetvolumeRenderVolumeFuzzTest",
   ]
 }
-############################end########################################

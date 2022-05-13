@@ -193,6 +193,11 @@ int32_t AudioCaptureResume(AudioHandle handle)
 int32_t AudioCaptureFlush(AudioHandle handle)
 {
     LOG_FUN_INFO();
+    int32_t ret = AudioCheckCaptureAddr(handle);
+    if (ret < 0) {
+        LOG_FUN_ERR("The capture address passed in is invalid, ret = %{public}d", ret);
+        return ret;
+    }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;

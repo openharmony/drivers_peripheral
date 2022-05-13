@@ -18,7 +18,6 @@ import("//drivers/peripheral/audio/audio.gni")
 
 module_output_path = "hdf/audio"
 
-#############hdf_audio_hdi_getcaptureposition_capture_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_getcaptureposition_capture_fuzzer") {
   module_out_path = module_output_path
 
@@ -64,8 +63,6 @@ ohos_fuzztest("hdf_audio_hdi_getcaptureposition_capture_fuzzer") {
   }
 }
 
-############################end########################################
-#############hdf_audio_hdi_captureframe_requestbytes_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_captureframe_requestbytes_fuzzer") {
   module_out_path = module_output_path
 
@@ -111,8 +108,6 @@ ohos_fuzztest("hdf_audio_hdi_captureframe_requestbytes_fuzzer") {
   }
 }
 
-############################end########################################
-#############hdf_audio_hdi_captureframe_capture_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_captureframe_capture_fuzzer") {
   module_out_path = module_output_path
 
@@ -158,8 +153,6 @@ ohos_fuzztest("hdf_audio_hdi_captureframe_capture_fuzzer") {
   }
 }
 
-############################end########################################
-#############hdf_audio_hdi_setextraparams_capture_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_setextraparams_capture_fuzzer") {
   module_out_path = module_output_path
 
@@ -205,8 +198,6 @@ ohos_fuzztest("hdf_audio_hdi_setextraparams_capture_fuzzer") {
   }
 }
 
-############################end########################################
-#############hdf_audio_hdi_setextraparams_capture_keyvaluelist_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_setextraparams_capture_keyvaluelist_fuzzer") {
   module_out_path = module_output_path
 
@@ -252,8 +243,6 @@ ohos_fuzztest("hdf_audio_hdi_setextraparams_capture_keyvaluelist_fuzzer") {
   }
 }
 
-############################end########################################
-#############hdf_audio_hdi_getextraparams_capture_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_getextraparams_capture_fuzzer") {
   module_out_path = module_output_path
 
@@ -298,4 +287,3 @@ ohos_fuzztest("hdf_audio_hdi_getextraparams_capture_fuzzer") {
     defines += [ "AUDIO_ADM_SERVICE" ]
   }
 }
-############################end########################################
