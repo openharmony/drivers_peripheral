@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,27 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#ifndef HDI_DEVICE_COMMON_H
-#define HDI_DEVICE_COMMON_H
-#include <memory>
-#include <unordered_map>
-#include "display_type.h"
+#ifndef DISPLAY_BYTRACE_H
+#define DISPLAY_BYTRACE_H
+#include <string>
+#include <hitrace_meter.h>
 
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-constexpr int32_t INVALID_MODE_ID = -1;
-constexpr uint32_t DRM_INVALID_ID = 0xFFFFFFFF;
-template<typename T> using IdMapPtr = std::unordered_map<uint32_t, std::shared_ptr<T>>;
-class DrmEncoder;
-class DrmCrtc;
-class DrmPlane;
-class DrmDevice;
-class DrmConnector;
-class DrmVsyncWorker;
-} // namespace OHOS
-} // namespace HDI
-} // namespace DISPLAY
+class DisplayBytrace {
+public:
+    DisplayBytrace(std::string value)
+    {
+        StartTrace(HITRACE_TAG_GRAPHIC_AGP, value.c_str());
+    }
 
-#endif // HDI_DEVICE_COMMON_H
+    ~DisplayBytrace()
+    {
+        FinishTrace(HITRACE_TAG_GRAPHIC_AGP);
+    }
+};
+} // namespace DISPLAY
+} // namespace HDI
+} // namespace OHOS
+
+#endif // DISPLAY_BYTRACE_H
