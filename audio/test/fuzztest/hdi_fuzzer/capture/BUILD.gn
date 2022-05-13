@@ -30,4 +30,3 @@ group("capture") {
     "src:hdf_audio_hdi_setextraparams_capture_keyvaluelist_fuzzer",
   ]
 }
-############################end########################################

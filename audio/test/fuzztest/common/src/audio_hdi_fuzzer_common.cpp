@@ -34,7 +34,7 @@
 
 #include "audio_hdi_fuzzer_common.h"
 
-namespace HMOS {
+namespace OHOS {
 namespace Audio {
 int32_t GetManager(TestAudioManager *&manager)
 {

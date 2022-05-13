@@ -215,6 +215,11 @@ int32_t AudioRenderResume(AudioHandle handle)
 int32_t AudioRenderFlush(AudioHandle handle)
 {
     LOG_FUN_INFO();
+    int32_t ret = AudioCheckRenderAddr(handle);
+    if (ret < 0) {
+        LOG_FUN_ERR("The render address passed in is invalid, ret = %{public}d", ret);
+        return ret;
+    }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;

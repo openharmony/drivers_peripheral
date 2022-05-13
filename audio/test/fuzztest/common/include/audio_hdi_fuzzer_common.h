@@ -41,7 +41,7 @@
 #include "audio_internal.h"
 #include "audio_types.h"
 
-namespace HMOS {
+namespace OHOS {
 namespace Audio {
 using namespace std;
 
