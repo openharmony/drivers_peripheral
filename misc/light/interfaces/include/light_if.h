@@ -71,7 +71,8 @@ struct LightInterface {
      *
      * @param lightId Indicates the light type. For details, see {@link LightType}.
      *
-     * @param effect Indicates the pointer to the lighting effect. For details, see {@link LightEffect}.
+     * @param effect Indicates the pointer to the lighting effect, if the lightbrightness field is 0,
+     * light brightness according to the defaultBrightness configured by HCS. For details, see {@link LightEffect}.
      *
      * @return Returns <b>0</b> if the operation is successful.
      * @return Returns <b>-1</b> if the light type is not supported.
