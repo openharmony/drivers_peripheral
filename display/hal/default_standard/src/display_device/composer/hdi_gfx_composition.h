@@ -43,6 +43,7 @@ private:
     static constexpr const char* LIB_HDI_GFX_NAME = "libdisplay_gfx.z.so";
     static constexpr const char* LIB_GFX_FUNC_INIT = "GfxInitialize";
     static constexpr const char* LIB_GFX_FUNC_DEINIT = "GfxUninitialize";
+    bool valid_ = false;
 };
 } // namespace OHOS
 } // namespace HDI
