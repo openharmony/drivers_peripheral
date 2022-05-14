@@ -43,11 +43,11 @@ void DrmGemBuffer::Init(int drmFd, HdiLayerBuffer &hdl)
     pitches[0] = hdl.GetStride();
     gemHandles[0] = mGemHandle;
     offsets[0] = 0;
-    ret = drmModeAddFB2(drmFd, hdl.GetWight(), hdl.GetHeight(), mDrmFormat, gemHandles, pitches, offsets, &mFdId, 0);
+    ret = drmModeAddFB2(drmFd, hdl.GetWidth(), hdl.GetHeight(), mDrmFormat, gemHandles, pitches, offsets, &mFdId, 0);
     DISPLAY_LOGD("mGemHandle %{public}d  mFdId %{public}d", mGemHandle, mFdId);
     DISPLAY_LOGD("w: %{public}d  h: %{public}d mDrmFormat : %{public}d gemHandles: %{public}d pitches: %{public}d "
         "offsets: %{public}d",
-        hdl.GetWight(), hdl.GetHeight(), mDrmFormat, gemHandles[0], pitches[0], offsets[0]);
+        hdl.GetWidth(), hdl.GetHeight(), mDrmFormat, gemHandles[0], pitches[0], offsets[0]);
     DISPLAY_CHK_RETURN_NOT_VALUE((ret != 0), DISPLAY_LOGE("can not add fb errno %{public}d", errno));
 }
 

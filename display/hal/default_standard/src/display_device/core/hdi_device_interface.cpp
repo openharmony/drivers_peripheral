@@ -17,7 +17,7 @@
 #include <vector>
 #include "display_common.h"
 #include "drm_device.h"
-
+#include "fb_device.h"
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
@@ -27,16 +27,25 @@ std::vector<std::shared_ptr<HdiDeviceInterface>> HdiDeviceInterface::DiscoveryDe
     int ret;
     std::vector<std::shared_ptr<HdiDeviceInterface>> devices;
     std::shared_ptr<HdiDeviceInterface> drmDevice = DrmDevice::Create();
-    if (!drmDevice) {
-        DISPLAY_LOGE("can not create drm device");
-        return devices;
+    if (drmDevice != nullptr) {
+        ret = drmDevice->Init();
+        if (ret == DISPLAY_SUCCESS) {
+            DISPLAY_LOGD("drm device init success");
+            devices.push_back(std::move(drmDevice));
+            return devices;
+        } else {
+            DISPLAY_LOGE("drm device init failed");
+        }
     }
-    ret = drmDevice->Init();
-    if (ret == DISPLAY_SUCCESS) {
-        DISPLAY_LOGD("drm device init success");
-        devices.push_back(std::move(drmDevice));
-    } else {
-        DISPLAY_LOGE("drm device init failed");
+    std::shared_ptr<HdiDeviceInterface> fbDevice = FbDevice::Create();
+    if (fbDevice != nullptr) {
+        ret = fbDevice->Init();
+        if (ret == DISPLAY_SUCCESS) {
+            DISPLAY_LOGD("fd device init success");
+            devices.push_back(std::move(fbDevice));
+        } else {
+            DISPLAY_LOGE("fd device init failed");
+        }
     }
     return devices;
 }

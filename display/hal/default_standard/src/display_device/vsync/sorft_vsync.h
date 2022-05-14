@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,42 +13,38 @@
  * limitations under the License.
  */
 
-#ifndef DRM_VSYNC_WORKER_H
-#define DRM_VSYNC_WORKER_H
+#ifndef SORFT_VSYNC_H
+#define SORFT_VSYNC_H
+
+#include <thread>
 #include <memory>
 #include <mutex>
-#include <thread>
-#include <condition_variable>
-#include "display_device.h"
 #include "hdi_display.h"
-
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-class DrmVsyncWorker {
+class SorftVsync {
 public:
-    DrmVsyncWorker();
-    virtual ~DrmVsyncWorker();
-    int32_t Init(int fd);
-    static DrmVsyncWorker &GetInstance();
+    SorftVsync();
+    virtual ~SorftVsync();
+    static SorftVsync &GetInstance();
 
+    int32_t Init();
     void EnableVsync(bool enable);
     void WorkThread();
-    uint64_t WaitNextVBlank(unsigned int &sq);
-    bool WaitSignalAndCheckRuning();
     void ReqesterVBlankCb(std::shared_ptr<VsyncCallBack> &cb);
+    bool CheckRuning();
 
 private:
-    int mDrmFd = 0;
-    std::unique_ptr<std::thread> mThread;
-    bool mEnable = false;
-    std::mutex mMutex;
-    std::condition_variable mCondition;
-    std::shared_ptr<VsyncCallBack> mCallBack;
-    bool mRunning = false;
+    std::unique_ptr<std::thread> thread_;
+    bool enable_ = false;
+    std::mutex mutext_;
+    std::condition_variable condition_;
+    std::shared_ptr<VsyncCallBack> callback_;
+    bool running_ = false;
 };
 } // namespace OHOS
 } // namespace HDI
 } // namespace DISPLAY
 
-#endif // DRM_VSYNC_WORKER_H
+#endif // SORFT_VSYNC_H
