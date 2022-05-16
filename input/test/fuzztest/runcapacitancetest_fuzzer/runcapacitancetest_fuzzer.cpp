@@ -48,8 +48,8 @@ namespace OHOS {
             }
         }
 
-        ret = g_inputInterface->iInputController->RunCapacitanceTest((uint32_t)data,
-            (uint32_t)data, testresult, length);
+        ret = g_inputInterface->iInputController->RunCapacitanceTest(static_cast<uint32_t>(*data),
+            static_cast<uint32_t>(*data), testresult, length);
         if (!ret) {
             result = true;
         }

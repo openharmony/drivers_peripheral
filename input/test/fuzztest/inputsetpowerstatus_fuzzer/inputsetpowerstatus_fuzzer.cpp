@@ -46,7 +46,8 @@ namespace OHOS {
             }
         }
 
-        ret = g_inputInterface->iInputController->SetPowerStatus((uint32_t)data, (uint32_t)data);
+        ret = g_inputInterface->iInputController->SetPowerStatus(static_cast<uint32_t>(*data),
+            static_cast<uint32_t>(*data));
         if (!ret) {
             result = true;
         }

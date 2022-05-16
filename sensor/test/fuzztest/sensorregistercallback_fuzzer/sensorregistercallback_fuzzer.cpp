@@ -40,7 +40,7 @@ namespace OHOS {
         bool result = false;
         sptr<ISensorInterface> g_sensorInterface = ISensorInterface::Get();
         sptr<ISensorCallback> g_traditionalCallback = new SensorRegisterCallbackFuzzer();
-        if (!g_sensorInterface->Register((int32_t)data, g_traditionalCallback)) {
+        if (!g_sensorInterface->Register(static_cast<int32_t>(*data), g_traditionalCallback)) {
             result = true;
         }
         return result;

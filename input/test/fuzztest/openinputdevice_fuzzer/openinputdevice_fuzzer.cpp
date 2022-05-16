@@ -44,7 +44,7 @@ namespace OHOS {
             g_hasDev = true;
         }
         
-        ret = g_inputInterface->iInputManager->OpenInputDevice((uint32_t)data);
+        ret = g_inputInterface->iInputManager->OpenInputDevice(static_cast<uint32_t>(*data));
         if (!ret) {
             result = true;
         }
