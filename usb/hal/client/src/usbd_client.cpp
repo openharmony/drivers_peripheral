@@ -364,7 +364,7 @@ int32_t UsbdClient::GetConfig(const UsbDev &dev, uint8_t &configIndex)
         HDF_LOGE("%{public}s failed", __func__);
         return ret;
     }
-    READ_PARCEL_WITH_RET(data, Uint8, configIndex, UEC_SERVICE_READ_PARCEL_ERROR);
+    READ_PARCEL_WITH_RET(reply, Uint8, configIndex, UEC_SERVICE_READ_PARCEL_ERROR);
     return ret;
 }
 
