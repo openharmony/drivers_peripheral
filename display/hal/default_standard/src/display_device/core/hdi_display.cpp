@@ -168,7 +168,7 @@ int32_t HdiDisplay::GetDisplayReleaseFence(uint32_t *num, uint32_t *layers, int3
             *(layers + i) = layer->GetId();
         }
         if (fences != nullptr) {
-            *(fences + i) = dup(layer->GetReleaseFenceFd());
+            *(fences + i) = layer->GetReleaseFenceFd();
         }
         DISPLAY_LOGD("layer id %{public}d fencefd %{public}d", layer->GetId(), layer->GetReleaseFenceFd());
         i++;
@@ -205,7 +205,7 @@ int32_t HdiDisplay::Commit(int32_t *fence)
 {
     DISPLAY_LOGD();
     mComposer->Commit(false);
-    *fence = dup(mClientLayer->GetReleaseFenceFd());
+    *fence = mClientLayer->GetReleaseFenceFd();
     DISPLAY_LOGD("the release fence is %{public}d", *fence);
     return DISPLAY_SUCCESS;
 }

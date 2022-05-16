@@ -15,13 +15,11 @@
 
 #ifndef HISILICON_DRM_H
 #define HISILICON_DRM_H
-
 #include "drm.h"
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
-#define DRM_HISILICON_GEM_FD_TO_PHYADDR 0x1
 
 struct DrmHisiliconPhyaddr {
     /* * return the physical address */
@@ -31,7 +29,7 @@ struct DrmHisiliconPhyaddr {
 };
 
 #define DRM_IOCTL_HISILICON_GEM_FD_TO_PHYADDR \
-    DRM_IOWR(DRM_COMMAND_BASE + DRM_HISILICON_GEM_FD_TO_PHYADDR, struct DrmHisiliconPhyaddr)
+    DRM_IOWR(DRM_COMMAND_BASE + 0x01, struct DrmHisiliconPhyaddr)
 
 #if defined(__cplusplus)
 }
