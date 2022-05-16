@@ -20,8 +20,8 @@
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-HdiDrmComposition::HdiDrmComposition(std::shared_ptr<DrmConnector> connector, std::shared_ptr<DrmCrtc> crtc,
-    std::shared_ptr<DrmDevice> drmDevice)
+HdiDrmComposition::HdiDrmComposition(std::shared_ptr<DrmConnector> &connector, std::shared_ptr<DrmCrtc> &crtc,
+    std::shared_ptr<DrmDevice> &drmDevice)
     : mDrmDevice(drmDevice), mConnector(connector), mCrtc(crtc)
 {
     DISPLAY_LOGD();
@@ -159,9 +159,10 @@ int32_t HdiDrmComposition::Apply(bool modeSet)
         DISPLAY_LOGE("drmModeAtomicCommit failed %{public}d errno %{public}d", ret, errno));
     // set the release fence
     for (auto layer : mCompLayers) {
-        layer->SetReleaseFence(static_cast<int>(crtcOutFence));
+        layer->SetReleaseFence(dup(static_cast<int32_t>(crtcOutFence)));
     }
-
+    close(static_cast<int32_t>(crtcOutFence));
+    crtcOutFence = -1;
     return DISPLAY_SUCCESS;
 }
 } // OHOS
