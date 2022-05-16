@@ -42,7 +42,7 @@ ohos_shared_library("libfaceauth_driver") {
     "//base/user_iam/user_auth/common/logs",
   ]
   sources = [ "src/face_auth_interface_driver.cpp" ]
-  deps = [ "//drivers/peripheral/face_auth/hdi_service:libface_auth_interface_service_1.0" ]
+  deps = [ "//drivers/interface/face_auth/v1_0:libfaceauth_stub_1.0" ]
 
   external_deps = [
     "device_driver_framework:libhdf_host",

@@ -19,7 +19,7 @@ if (defined(ohos_lite)) {
   group("faceauth_entry") {
     deps = [
       "./hdi_service:hdf_faceauth_service",
-      "//drivers/interface/face_auth/v1_0:libfaceauth_proxy_1.0",
+      "//drivers/interface/face_auth/v1_0:faceauth",
     ]
   }
 }
