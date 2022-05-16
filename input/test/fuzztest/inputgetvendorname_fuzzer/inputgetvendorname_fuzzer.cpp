@@ -49,7 +49,7 @@ namespace OHOS {
             }
         }
 
-        ret = g_inputInterface->iInputController->GetVendorName((uint32_t)data, vendorName, length);
+        ret = g_inputInterface->iInputController->GetVendorName(static_cast<uint32_t>(*data), vendorName, length);
         if (!ret) {
             result = true;
         }

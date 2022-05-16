@@ -24,7 +24,7 @@ namespace OHOS {
     {
         bool result = false;
         sptr<IVibratorInterface> g_vibratorInterface = IVibratorInterface::Get();
-        if (!g_vibratorInterface->StartOnce((uint32_t)data)) {
+        if (!g_vibratorInterface->StartOnce(static_cast<uint32_t>(*data))) {
             result = true;
         }
         return result;

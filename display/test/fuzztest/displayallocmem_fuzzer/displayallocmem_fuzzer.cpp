@@ -24,11 +24,11 @@ namespace OHOS {
     {
         bool result = false;
         static AllocInfo info = {
-            .width = (uint32_t)data,
-            .height = (uint32_t)data,
+            .width = static_cast<uint32_t>(*data),
+            .height = static_cast<uint32_t>(*data),
         };
         BufferHandle *handle = nullptr;
-        int32_t ret = DisplayGrallocClient::Get()->AllocMem(info, handle);
+        int32_t ret = IDisplayGralloc::Get()->AllocMem(info, handle);
         if (!ret) {
             result = true;
         }
