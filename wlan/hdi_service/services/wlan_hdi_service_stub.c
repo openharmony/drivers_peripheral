@@ -651,10 +651,6 @@ static int32_t WlanServcieStubSetMacAddr(struct HdfDeviceIoClient *client, struc
         HDF_LOGE("%s: wlan type is invalid", __func__);
         ret = HDF_FAILURE;
     }
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s set mac address failed!, error code: %d", __func__, ret);
-        return HDF_FAILURE;
-    }
     return ret;
 }
 
@@ -995,7 +991,7 @@ static int32_t WlanServiceStubGetPowerMode(struct HdfDeviceIoClient *client, str
     ret = g_wifi->getPowerMode(ifName, &mode);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: get power mode failed!, error code: %d", __func__, ret);
-        return HDF_FAILURE;
+        return ret;
     }
 
     if (!HdfSbufWriteUint8(reply, mode)) {
@@ -1008,7 +1004,6 @@ static int32_t WlanServiceStubGetPowerMode(struct HdfDeviceIoClient *client, str
 static int32_t WlanServiceStubSetPowerMode(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    int ret;
     uint8_t mode;
 
     if (data == NULL) {
@@ -1028,13 +1023,7 @@ static int32_t WlanServiceStubSetPowerMode(struct HdfDeviceIoClient *client, str
         return HDF_FAILURE;
     }
 
-    ret = g_wifi->setPowerMode(ifName, mode);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: set power mode failed!, error code: %d", __func__, ret);
-        return HDF_FAILURE;
-    }
-
-    return HDF_SUCCESS;
+    return g_wifi->setPowerMode(ifName, mode);
 }
 
 int32_t WlanHdiServiceOnRemoteRequest(struct HdfDeviceIoClient *client, int cmdId,
