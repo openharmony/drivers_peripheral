@@ -13,22 +13,28 @@
  * limitations under the License.
  */
 
+#include "hdf_audio_pnp_server.h"
+#include "hdf_audio_input_event.h"
+#include "hdf_audio_pnp_uevent.h"
 #include "hdf_device_desc.h"
 #include "hdf_io_service_if.h"
 #include "hdf_log.h"
 #include "hdf_sbuf.h"
 #include "hdf_service_status.h"
 #include "servmgr_hdi.h"
-#include "hdf_audio_pnp_uevent.h"
 
-#define HDF_LOG_TAG HDF_AUDIO_HAL_HOST
+#define HDF_LOG_TAG             HDF_AUDIO_HAL_HOST
+#define AUDIO_HDI_SERVICE_NAME  "audio_hdi_usb_service"
+#define AUDIO_TOKEN_SERVER_NAME "ohos.hdi.audio_service"
+#define AUDIO_PNP_SEND_USB_CMD  8
+#define AUDIO_PNP_INFO_LEN_MAX  256
 
 static struct HdfDeviceObject *g_audioPnpDevice = NULL;
 
 int32_t AudioPnpStatusSend(const char *serverName,
     const char *tokenServerName, const char *pnpInfo, const int cmd)
 {
-    if (serverName == NULL || tokenServerName == NULL|| pnpInfo == NULL) {
+    if (serverName == NULL || tokenServerName == NULL || pnpInfo == NULL) {
         HDF_LOGE("%{public}s: serverName is null!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -97,6 +103,56 @@ int32_t AudioPnpUpdateInfo(const char *statusInfo)
     return HDF_SUCCESS;
 }
 
+int32_t AudioPnpUpdateInfoOnly(struct AudioEvent audioEvent)
+{
+    int32_t ret;
+    char pnpInfo[AUDIO_PNP_INFO_LEN_MAX] = {0};
+
+    ret = snprintf_s(pnpInfo, AUDIO_PNP_INFO_LEN_MAX, AUDIO_PNP_INFO_LEN_MAX - 1,
+                     "EVENT_TYPE=0x%x;DEVICE_TYPE=0x%x", audioEvent.eventType, audioEvent.deviceType);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: snprintf_s fail!", __func__);
+        return HDF_FAILURE;
+    }
+
+    ret = AudioPnpUpdateInfo(pnpInfo);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: update info fail! ret = %{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGD("%{public}s: %{public}s", __func__, pnpInfo);
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioPnpUpdateAndSend(struct AudioEvent audioEvent)
+{
+    int32_t ret;
+    char pnpInfo[AUDIO_PNP_INFO_LEN_MAX] = {0};
+
+    ret = snprintf_s(pnpInfo, AUDIO_PNP_INFO_LEN_MAX, AUDIO_PNP_INFO_LEN_MAX - 1,
+                     "EVENT_TYPE=0x%x;DEVICE_TYPE=0x%x", audioEvent.eventType, audioEvent.deviceType);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: snprintf_s fail!", __func__);
+        return HDF_FAILURE;
+    }
+
+    ret = AudioPnpUpdateInfo(pnpInfo);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: update info fail! ret = %{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+
+    ret = AudioPnpStatusSend(AUDIO_HDI_SERVICE_NAME, AUDIO_TOKEN_SERVER_NAME, pnpInfo, AUDIO_PNP_SEND_USB_CMD);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: send info fail! ret = %{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    HDF_LOGD("%{public}s: %{public}s", __func__, pnpInfo);
+
+    return HDF_SUCCESS;
+}
+
 static int32_t HdfAudioPnpBind(struct HdfDeviceObject *device)
 {
     HDF_LOGI("%{public}s: enter.", __func__);
@@ -123,6 +179,7 @@ static int32_t HdfAudioPnpInit(struct HdfDeviceObject *device)
     }
     g_audioPnpDevice = device;
     AudioPnpUeventStartThread();
+    AudioPnpInputStartThread();
 
     HDF_LOGI("%{public}s: end.", __func__);
     return HDF_SUCCESS;
@@ -135,6 +192,7 @@ static void HdfAudioPnpRelease(struct HdfDeviceObject *device)
         HDF_LOGE("%{public}s: device is null!", __func__);
         return;
     }
+    AudioPnpInputEndThread();
     device->service = NULL;
     HDF_LOGI("%{public}s: end.", __func__);
     return;
