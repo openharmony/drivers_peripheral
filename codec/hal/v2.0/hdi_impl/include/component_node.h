@@ -17,36 +17,15 @@
 #include <OMX_Component.h>
 #include <OMX_Core.h>
 #include <OMX_Types.h>
-#include <ashmem.h>
 #include <map>
 #include <memory>
 #include <nocopyable.h>
 #include <osal_mem.h>
 
+#include "icodec_buffer.h"
 #include "codec_callback_if.h"
 #include "codec_component_type.h"
 
-struct BufferInfo {
-    struct OmxCodecBuffer omxCodecBuffer;
-    std::shared_ptr<OHOS::Ashmem> sharedMem;  // sharedMem
-
-    BufferInfo()
-    {
-        omxCodecBuffer = {0};
-        sharedMem = nullptr;
-    }
-    ~BufferInfo()
-    {
-        if (sharedMem) {
-            sharedMem->UnmapAshmem();
-            sharedMem->CloseAshmem();
-            sharedMem = nullptr;
-        }
-    }
-};
-using BufferInfo = struct BufferInfo;
-using BufferInfoSPtr = std::shared_ptr<BufferInfo>;
-using BufferInfoWPtr = std::weak_ptr<BufferInfo>;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
@@ -116,41 +95,17 @@ private:
     int32_t OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer);
 
     uint32_t GenerateBufferId();
-
-    void inline CheckBuffer(struct OmxCodecBuffer &buffer);
-
-    BufferInfoSPtr GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *buffer);
-
-    bool GetBufferById(uint32_t bufferId, BufferInfoSPtr &bufferInfo, OMX_BUFFERHEADERTYPE *&bufferHdrType);
-
-    void ReleaseBufferById(uint32_t bufferId);
-
-    int32_t UseSharedBuffer(struct OmxCodecBuffer &omxCodecBuffer, uint32_t portIndex);
-
-    int32_t UseHandleBuffer(struct OmxCodecBuffer &omxCodecBuffer, uint32_t portIndex);
-
-    int32_t UseDynaHandleBuffer(struct OmxCodecBuffer &omxCodecBuffer, uint32_t portIndex);
-
-    int32_t EmptySharedBuffer(struct OmxCodecBuffer &buffer, BufferInfoSPtr bufferInfo,
-                              OMX_BUFFERHEADERTYPE *bufferHdrType);
-
-    void SaveBufferInfo(struct OmxCodecBuffer &omxCodecBuffer, OMX_BUFFERHEADERTYPE *bufferHdrType,
-                        std::shared_ptr<Ashmem> sharedMem);
+    sptr<ICodecBuffer> GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *buffer);
+    bool GetBufferById(uint32_t bufferId, sptr<ICodecBuffer> &codecBuffer, OMX_BUFFERHEADERTYPE *&bufferHdrType);
 
 private:
     OMX_HANDLETYPE comp_;                                         // Compnent handle
     struct CodecCallbackType *omxCallback_;                       // Callbacks in HDI
     int8_t *appData_;                                             // Use data, default is nullptr
     int32_t appDataSize_;                                         // User data length, default is 0
-    std::map<uint32_t, BufferInfoSPtr> bufferInfoMap_;            // Key is buffferID
+    std::map<uint32_t, sptr<ICodecBuffer>> codecBufferMap_;       // Key is buffferID
     std::map<OMX_BUFFERHEADERTYPE *, uint32_t> bufferHeaderMap_;  // Key is omx buffer header type
-
     uint32_t bufferIdCount_;
-
-#ifdef NODE_DEBUG
-    FILE *fp_in;
-    FILE *fp_out;
-#endif
 };
 }  // namespace Omx
 }  // namespace Codec

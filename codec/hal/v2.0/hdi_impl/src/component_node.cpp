@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
+#include "component_node.h"
 #include <ashmem.h>
-#include <buffer_handle.h>
 #include <cstring>
 #include <hdf_log.h>
+#include <libsync.h>
 #include <memory.h>
 #include <securec.h>
 #include <sys/mman.h>
 #include <unistd.h>
-
-#include "component_node.h"
+#include "icodec_buffer.h"
 
 #define HDF_LOG_TAG codec_hdi_server
 #define FD_SIZE     sizeof(int)
@@ -76,33 +76,14 @@ ComponentNode::ComponentNode(struct CodecCallbackType *callback, int8_t *appData
         appDataSize_ = 0;
     }
     comp_ = nullptr;
-    bufferInfoMap_.clear();
+    codecBufferMap_.clear();
     bufferHeaderMap_.clear();
     omxCallback_ = callback;
     bufferIdCount_ = 0;
-#ifdef NODE_DEBUG
-    char filename[256] = {0};
-    (void)snprintf_s(filename, sizeof(filename), sizeof(filename) - 1, "/data/codec_in_%p.h264", this);
-    fp_in = fopen(filename, "wb+");
-    (void)snprintf_s(filename, sizeof(filename), sizeof(filename) - 1, "/data/codec_out_%p.yuv", this);
-    fp_out = fopen(filename, "wb+");
-#endif
 }
 
 ComponentNode::~ComponentNode()
 {
-#ifdef NODE_DEBUG
-    if (fp_in != nullptr) {
-        fclose(fp_in);
-        fp_in = nullptr;
-    }
-
-    if (fp_out != nullptr) {
-        fclose(fp_out);
-        fp_out = nullptr;
-    }
-#endif
-
     if (appData_ != nullptr) {
         OsalMemFree(appData_);
         appData_ = nullptr;
@@ -113,8 +94,7 @@ ComponentNode::~ComponentNode()
         OsalMemFree(omxCallback_);
         omxCallback_ = nullptr;
     }
-
-    bufferInfoMap_.clear();
+    codecBufferMap_.clear();
     bufferHeaderMap_.clear();
     bufferIdCount_ = 0;
 }
@@ -213,8 +193,7 @@ int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTy
     }
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
     unsigned long tunneledComp = (unsigned long)omxHandleTypeTunneledComp;
-    return comType->ComponentTunnelRequest(comp_, port, (OMX_HANDLETYPE)tunneledComp, tunneledPort,
-                                           tunnelSetup);
+    return comType->ComponentTunnelRequest(comp_, port, (OMX_HANDLETYPE)tunneledComp, tunneledPort, tunnelSetup);
 }
 
 int32_t ComponentNode::SetCallbacks(struct CodecCallbackType *omxCallback, int8_t *appData, uint32_t appDataLen)
@@ -289,14 +268,15 @@ int32_t ComponentNode::OnEvent(OMX_EVENTTYPE event, uint32_t data1, uint32_t dat
         return OMX_ErrorNone;
     }
 
-    struct EventInfo info = {0};
+    struct EventInfo info = {
+        .appData = nullptr, .appDataLen = 0, .data1 = 0, .data2 = 0, .eventData = nullptr, .eventDataLen = 0};
     info.appData = appData_;
     info.appDataLen = appDataSize_;
     info.data1 = data1;
     info.data2 = data2;
     info.eventData = static_cast<int8_t *>(eventData);
     info.eventDataLen = 0;
-    omxCallback_->EventHandler(omxCallback_, event, &info);
+    (void)omxCallback_->EventHandler(omxCallback_, event, &info);
 
     return OMX_ErrorNone;
 }
@@ -307,39 +287,13 @@ int32_t ComponentNode::OnEmptyBufferDone(OMX_BUFFERHEADERTYPE *buffer)
         HDF_LOGE("%{public}s error, omxCallback_ or buffer is null", __func__);
         return OMX_ErrorNone;
     }
-    BufferInfoSPtr bufferInfo = GetBufferInfoByHeader(buffer);
-    if (bufferInfo == nullptr) {
-        HDF_LOGE("%{public}s get bufferinfo by header[0x%{public}p] error", __func__, buffer);
+    sptr<ICodecBuffer> codecBuffer = GetBufferInfoByHeader(buffer);
+    if (codecBuffer == nullptr || codecBuffer->EmptyOmxBufferDone(*buffer) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s codecBuffer is null or EmptyOmxBufferDone error", __func__);
         return OMX_ErrorNone;
     }
-
-    struct OmxCodecBuffer &omxCodecBuffer = bufferInfo->omxCodecBuffer;
-    switch (omxCodecBuffer.bufferType) {
-        case BUFFER_TYPE_AVSHARE_MEM_FD: {
-            omxCodecBuffer.offset = buffer->nOffset;
-            omxCodecBuffer.filledLen = buffer->nFilledLen;
-            break;
-        }
-
-        case BUFFER_TYPE_HANDLE: {
-            HDF_LOGE("%{public}s error, bufferTypeBufferHandle = %{public}d is not implement", __func__,
-                     omxCodecBuffer.bufferType);
-            break;
-        }
-
-        case BUFFER_TYPE_DYNAMIC_HANDLE: {
-            HDF_LOGE("%{public}s error, bufferTypeBufferHandle = %{public}d is not implement", __func__,
-                     omxCodecBuffer.bufferType);
-            break;
-        }
-        default: {
-            HDF_LOGE("%{public}s error, bufferTypeBufferHandle = %{public}d is not implement", __func__,
-                     omxCodecBuffer.bufferType);
-            break;
-        }
-    }
-
-    omxCallback_->EmptyBufferDone(omxCallback_, appData_, appDataSize_, &omxCodecBuffer);
+    struct OmxCodecBuffer &codecOmxBuffer = codecBuffer->GetCodecBuffer();
+    (void)omxCallback_->EmptyBufferDone(omxCallback_, appData_, appDataSize_, &codecOmxBuffer);
     return OMX_ErrorNone;
 }
 
@@ -350,50 +304,14 @@ int32_t ComponentNode::OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer)
         return OMX_ErrorNone;
     }
 
-    BufferInfoSPtr bufferInfo = GetBufferInfoByHeader(buffer);
-    if (bufferInfo == nullptr) {
-        HDF_LOGE("%{public}s error, GetBufferInfoByHeader return null", __func__);
+    sptr<ICodecBuffer> codecBuffer = GetBufferInfoByHeader(buffer);
+    if (codecBuffer == nullptr || codecBuffer->FillOmxBufferDone(*buffer) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s codecBuffer is null or EmptyOmxBufferDone error", __func__);
         return OMX_ErrorNone;
     }
 
-    struct OmxCodecBuffer &omxCodecBuffer = bufferInfo->omxCodecBuffer;
-
-    switch (omxCodecBuffer.bufferType) {
-        case BUFFER_TYPE_AVSHARE_MEM_FD: {
-            if (!bufferInfo->sharedMem->WriteToAshmem(buffer->pBuffer, buffer->nFilledLen, buffer->nOffset)) {
-                HDF_LOGE("%{public}s write to ashmem fail", __func__);
-                return OMX_ErrorNone;
-            }
-#ifdef NODE_DEBUG
-            (void)fwrite(buffer->buffer + buffer->nOffset, 1, buffer->nFilledLen, fp_out);
-            (void)fflush(fp_out);
-#endif
-            omxCodecBuffer.offset = buffer->nOffset;
-            omxCodecBuffer.filledLen = buffer->nFilledLen;
-            break;
-        }
-
-        case BUFFER_TYPE_HANDLE: {
-            HDF_LOGE("%{public}s error, bufferTypeBufferHandle = %{public}d is not implement", __func__,
-                     omxCodecBuffer.bufferType);
-            break;
-        }
-
-        case BUFFER_TYPE_DYNAMIC_HANDLE: {
-            HDF_LOGE("%{public}s error, bufferTypeBufferHandle = %{public}d is not implement", __func__,
-                     omxCodecBuffer.bufferType);
-            break;
-        }
-        default: {
-            break;
-        }
-    }
-
-    // save the flags
-    omxCodecBuffer.flag = buffer->nFlags;
-    omxCodecBuffer.pts = buffer->nTimeStamp;
-    omxCallback_->FillBufferDone(omxCallback_, appData_, appDataSize_, &omxCodecBuffer);
-
+    struct OmxCodecBuffer &codecOmxBuffer = codecBuffer->GetCodecBuffer();
+    (void)omxCallback_->FillBufferDone(omxCallback_, appData_, appDataSize_, &codecOmxBuffer);
     return OMX_ErrorNone;
 }
 
@@ -403,22 +321,36 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, struct OmxCodecBuffer &buff
         HDF_LOGE("%{public}s error, comp_ is null", __func__);
         return OMX_ErrorInvalidComponent;
     }
-
-    int32_t err = OMX_ErrorUndefined;
-
-    switch (buffer.bufferType) {
-        case BUFFER_TYPE_AVSHARE_MEM_FD:
-            err = UseSharedBuffer(buffer, portIndex);
-            break;
-        case BUFFER_TYPE_HANDLE:
-            err = UseHandleBuffer(buffer, portIndex);
-            break;
-        case BUFFER_TYPE_DYNAMIC_HANDLE:
-            err = UseDynaHandleBuffer(buffer, portIndex);
-            break;
-        default:
-            break;
+    if (buffer.fenceFd >= 0) {
+        close(buffer.fenceFd);
+        buffer.fenceFd = -1;
     }
+
+    int32_t err = OMX_ErrorBadParameter;
+    sptr<ICodecBuffer> codecBuffer = ICodecBuffer::CreateCodeBuffer(buffer);
+    if (codecBuffer == nullptr) {
+        HDF_LOGE("%{public}s error, comp_ is null", __func__);
+        return OMX_ErrorInvalidComponent;
+    }
+    OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
+    if (buffer.bufferType == BUFFER_TYPE_AVSHARE_MEM_FD) {
+        err = OMX_AllocateBuffer((OMX_HANDLETYPE)comp_, &bufferHdrType, portIndex, 0, buffer.allocLen);
+    } else {
+        err = OMX_UseBuffer((OMX_HANDLETYPE)comp_, &bufferHdrType, portIndex, 0, buffer.allocLen,
+                            codecBuffer->GetBuffer());
+    }
+
+    if (err != OMX_ErrorNone) {
+        HDF_LOGE("%{public}s : type [%{public}d] OMX_AllocateBuffer or OMX_UseBuffer ret err[%{public}x]", __func__,
+                 buffer.bufferType, err);
+        codecBuffer = nullptr;
+        return err;
+    }
+    uint32_t bufferId = GenerateBufferId();
+    buffer.bufferId = bufferId;
+    codecBuffer->SetBufferId(bufferId);
+    codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
+    bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
 
     return err;
 }
@@ -429,7 +361,6 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, struct OmxCodecBuffer 
         HDF_LOGE("%{public}s error, comp_ is null", __func__);
         return OMX_ErrorInvalidComponent;
     }
-
     OMX_BUFFERHEADERTYPE *bufferHdrType = 0;
     int32_t err = OMX_AllocateBuffer((OMX_HANDLETYPE)comp_, &bufferHdrType, portIndex, 0, buffer.allocLen);
     if (err != OMX_ErrorNone) {
@@ -437,12 +368,18 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, struct OmxCodecBuffer 
         return err;
     }
 
-    // create shared memory
-    int sharedFD = AshmemCreate(nullptr, bufferHdrType->nAllocLen);
-    std::shared_ptr<Ashmem> sharedMemory = std::make_shared<Ashmem>(sharedFD, bufferHdrType->nAllocLen);
-    SaveBufferInfo(buffer, bufferHdrType, sharedMemory);
-    buffer.buffer = (uint8_t *)(unsigned long)sharedFD;
-    buffer.bufferLen = FD_SIZE;
+    buffer.allocLen = bufferHdrType->nAllocLen;
+    sptr<ICodecBuffer> codecBuffer = ICodecBuffer::AllocateCodecBuffer(buffer);
+    if (codecBuffer == nullptr) {
+        HDF_LOGE("%{public}s error, comp_ is null", __func__);
+        (void)OMX_FreeBuffer((OMX_HANDLETYPE)comp_, portIndex, bufferHdrType);
+        return OMX_ErrorInvalidComponent;
+    }
+
+    uint32_t bufferId = GenerateBufferId();
+    buffer.bufferId = bufferId;
+    codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
+    bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
     return OMX_ErrorNone;
 }
 
@@ -452,41 +389,36 @@ int32_t ComponentNode::FreeBuffer(uint32_t portIndex, struct OmxCodecBuffer &buf
         HDF_LOGE("%{public}s error, comp_ = %{public}p", __func__, comp_);
         return OMX_ErrorInvalidComponent;
     }
-    CheckBuffer(buffer);
-    int32_t err = OMX_ErrorUndefined;
-    BufferInfoSPtr bufferInfo = nullptr;
+
+    int32_t err = OMX_ErrorBadParameter;
+    sptr<ICodecBuffer> codecBufer = nullptr;
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
-    if (!GetBufferById(buffer.bufferId, bufferInfo, bufferHdrType)) {
+    if (!GetBufferById(buffer.bufferId, codecBufer, bufferHdrType)) {
         HDF_LOGE("%{public}s error, GetBufferById return false", __func__);
         return err;
     }
-    switch (bufferInfo->omxCodecBuffer.bufferType) {
-        case BUFFER_TYPE_AVSHARE_MEM_FD: {
-            err = OMX_FreeBuffer((OMX_HANDLETYPE)comp_, portIndex, bufferHdrType);
-            HDF_LOGI("%{public}s , OMX_FreeBuffer ret [0x%{public}x]", __func__, err);
-            break;
-        }
 
-        case BUFFER_TYPE_HANDLE: {
-            HDF_LOGE("%{public}s error, bufferTypeBufferHandle is not implement", __func__);
-            err = OMX_ErrorUndefined;
-            break;
-        }
+    err = OMX_FreeBuffer((OMX_HANDLETYPE)comp_, portIndex, bufferHdrType);
+    if (err != OMX_ErrorNone) {
+        HDF_LOGE("%{public}s error, OMX_FreeBuffer err [%{public}x]", __func__, err);
+        return err;
+    }
 
-        case BUFFER_TYPE_DYNAMIC_HANDLE: {
-            HDF_LOGE("%{public}s error, bufferTypeBufferHandle is not implement", __func__);
-            err = OMX_ErrorUndefined;
+    auto iterOmxBuffer = bufferHeaderMap_.begin();
+    while (iterOmxBuffer != bufferHeaderMap_.end()) {
+        if (iterOmxBuffer->first == bufferHdrType) {
+            bufferHeaderMap_.erase(iterOmxBuffer);
             break;
         }
-        default: {
-            err = OMX_ErrorUndefined;
-            break;
-        }
+        iterOmxBuffer++;
     }
-    if (err == OMX_ErrorNone) {
-        ReleaseBufferById(buffer.bufferId);
-        bufferInfo = nullptr;
+
+    auto iter = codecBufferMap_.find(buffer.bufferId);
+    if (iter != codecBufferMap_.end()) {
+        codecBufferMap_.erase(iter);
     }
+    (void)codecBufer->FreeBuffer(buffer);
+
     return err;
 }
 
@@ -496,46 +428,20 @@ int32_t ComponentNode::EmptyThisBuffer(struct OmxCodecBuffer &buffer)
         HDF_LOGE("%{public}s error, comp_ = %{public}p", __func__, comp_);
         return OMX_ErrorInvalidComponent;
     }
-    CheckBuffer(buffer);
-    int32_t err = OMX_ErrorUndefined;
-    BufferInfoSPtr bufferInfo = nullptr;
+    int32_t err = OMX_ErrorBadParameter;
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
-    if (!GetBufferById(buffer.bufferId, bufferInfo, bufferHdrType)) {
+    sptr<ICodecBuffer> codecBuffer = nullptr;
+    if (!GetBufferById(buffer.bufferId, codecBuffer, bufferHdrType)) {
         HDF_LOGE("%{public}s error, GetBufferById return false", __func__);
         return err;
     }
-    switch (bufferInfo->omxCodecBuffer.bufferType) {
-        case BUFFER_TYPE_AVSHARE_MEM_FD: {
-            err = EmptySharedBuffer(buffer, bufferInfo, bufferHdrType);
-            break;
-        }
-        // When empty buffer, this case is disabled
-        case BUFFER_TYPE_HANDLE: {
-            HDF_LOGE("%{public}s error, bufferTypeBufferHandle is not implement", __func__);
-            err = OMX_ErrorBadParameter;
-            break;
-        }
-
-        case BUFFER_TYPE_DYNAMIC_HANDLE: {
-            int eFence = buffer.fenceFd;
-            if (eFence > 0) {
-                ;  // sync_wait(eFence, 5);
-            }
-            err = OMX_ErrorNone;
-            break;
-        }
-        default: {
-            err = OMX_ErrorUndefined;
-            break;
-        }
+    err = codecBuffer->EmptyOmxBuffer(buffer, *bufferHdrType);
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s EmptyOmxBuffer err [%{public}d]", __func__, err);
+        return err;
     }
 
-    if (err == OMX_ErrorNone) {
-        bufferHdrType->nOffset = buffer.offset;
-        bufferHdrType->nFilledLen = buffer.filledLen;
-        bufferHdrType->nFlags = buffer.flag;
-        err = OMX_EmptyThisBuffer((OMX_HANDLETYPE)comp_, bufferHdrType);
-    }
+    err = OMX_EmptyThisBuffer((OMX_HANDLETYPE)comp_, bufferHdrType);
     return err;
 }
 
@@ -545,50 +451,21 @@ int32_t ComponentNode::FillThisBuffer(struct OmxCodecBuffer &buffer)
         HDF_LOGE("%{public}s error, comp_ = %{public}p", __func__, comp_);
         return OMX_ErrorInvalidComponent;
     }
-
-    CheckBuffer(buffer);
-
-    int32_t err = OMX_ErrorUndefined;
+    int32_t err = OMX_ErrorBadParameter;
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
-    BufferInfoSPtr bufferInfo = nullptr;
-    if (!GetBufferById(buffer.bufferId, bufferInfo, bufferHdrType)) {
+    sptr<ICodecBuffer> codecBuffer = nullptr;
+    if (!GetBufferById(buffer.bufferId, codecBuffer, bufferHdrType)) {
         HDF_LOGE("%{public}s error, GetBufferById return false", __func__);
         return err;
     }
 
-    switch (bufferInfo->omxCodecBuffer.bufferType) {
-        case BUFFER_TYPE_AVSHARE_MEM_FD: {
-            if ((bufferInfo->sharedMem == nullptr) || (bufferInfo->omxCodecBuffer.type != READ_WRITE_TYPE)) {
-                HDF_LOGE("%{public}s error, pBufferHdrType [0x%{public}p] omxCodecBuffer.type[%{public}d]", __func__,
-                         bufferHdrType, bufferInfo->omxCodecBuffer.type);
-            } else {
-                err = OMX_ErrorNone;
-            }
-
-            break;
-        }
-        case BUFFER_TYPE_HANDLE: {
-            int eFence = buffer.fenceFd;
-            if (eFence > 0) {
-                ;  // we may sync_wait here// sync_wait(eFence, 5);
-            }
-            err = OMX_ErrorUndefined;
-            break;
-        }
-        default: {
-            HDF_LOGE("%{public}s error, bufferTypeBufferHandle = %{public}d is not implement", __func__,
-                     bufferInfo->omxCodecBuffer.bufferType);
-            err = OMX_ErrorBadParameter;
-            break;
-        }
+    err = codecBuffer->FillOmxBuffer(buffer, *bufferHdrType);
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s FillOmxBuffer err [%{public}d]", __func__, err);
+        return err;
     }
 
-    if (err == OMX_ErrorNone) {
-        // check this
-        bufferHdrType->nOffset = buffer.offset;
-        bufferHdrType->nFilledLen = buffer.filledLen;
-        err = OMX_FillThisBuffer((OMX_HANDLETYPE)comp_, bufferHdrType);
-    }
+    err = OMX_FillThisBuffer((OMX_HANDLETYPE)comp_, bufferHdrType);
     return err;
 }
 
@@ -600,22 +477,11 @@ uint32_t ComponentNode::GenerateBufferId()
             ++bufferIdCount_;
         }
         bufferId = bufferIdCount_;
-    } while (bufferInfoMap_.find(bufferId) != bufferInfoMap_.end());
+    } while (codecBufferMap_.find(bufferId) != codecBufferMap_.end());
     return bufferId;
 }
 
-void ComponentNode::CheckBuffer(struct OmxCodecBuffer &buffer)
-{
-    if ((buffer.buffer != nullptr) && (buffer.bufferType == BUFFER_TYPE_AVSHARE_MEM_FD) &&
-        (buffer.bufferLen == FD_SIZE)) {
-        int fd = (int)reinterpret_cast<uintptr_t>(buffer.buffer);
-        close(fd);
-        buffer.buffer = 0;
-        buffer.bufferLen = 0;
-    }
-}
-
-BufferInfoSPtr ComponentNode::GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *buffer)
+sptr<ICodecBuffer> ComponentNode::GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *buffer)
 {
     if (buffer == nullptr) {
         HDF_LOGE("%{public}s buffer is null", __func__);
@@ -629,24 +495,19 @@ BufferInfoSPtr ComponentNode::GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *buffer
     }
 
     uint32_t nBufferID = iterHead->second;
-    auto iter = bufferInfoMap_.find(nBufferID);
-    if (iter == bufferInfoMap_.end()) {
+    auto iter = codecBufferMap_.find(nBufferID);
+    if (iter == codecBufferMap_.end()) {
         HDF_LOGE("%{public}s can not find bufferInfo by nBufferID = %{public}d", __func__, nBufferID);
         return nullptr;
     }
-    BufferInfoSPtr bufferInfo = iter->second;
-    if (bufferInfo == nullptr) {
-        HDF_LOGE("%{public}s pBufferInfo is null", __func__);
-        return nullptr;
-    }
-
-    return bufferInfo;
+    return iter->second;
 }
 
-bool ComponentNode::GetBufferById(uint32_t bufferId, BufferInfoSPtr &bufferInfo, OMX_BUFFERHEADERTYPE *&bufferHdrType)
+bool ComponentNode::GetBufferById(uint32_t bufferId, sptr<ICodecBuffer> &codecBuffer,
+                                  OMX_BUFFERHEADERTYPE *&bufferHdrType)
 {
-    auto iter = bufferInfoMap_.find(bufferId);
-    if ((iter == bufferInfoMap_.end()) || (iter->second == nullptr)) {
+    auto iter = codecBufferMap_.find(bufferId);
+    if ((iter == codecBufferMap_.end()) || (iter->second == nullptr)) {
         HDF_LOGE("%{public}s error, can not find bufferIndo by bufferID [%{public}d]", __func__, bufferId);
         return false;
     }
@@ -663,164 +524,8 @@ bool ComponentNode::GetBufferById(uint32_t bufferId, BufferInfoSPtr &bufferInfo,
         return false;
     }
     bufferHdrType = iterHead->first;
-    bufferInfo = iter->second;
+    codecBuffer = iter->second;
     return true;
-}
-
-void ComponentNode::ReleaseBufferById(uint32_t bufferId)
-{
-    auto iter = bufferInfoMap_.find(bufferId);
-    if ((iter == bufferInfoMap_.end()) || (iter->second == nullptr)) {
-        HDF_LOGE("%{public}s error, can not find bufferIndo by bufferID [%{public}d]", __func__, bufferId);
-        return;
-    }
-
-    auto iterHead = bufferHeaderMap_.begin();
-    for (; iterHead != bufferHeaderMap_.end(); iterHead++) {
-        if (iterHead->second == bufferId) {
-            break;
-        }
-    }
-    if ((iterHead == bufferHeaderMap_.end()) || (iterHead->first == nullptr)) {
-        HDF_LOGE("%{public}s error, can not find bufferHeaderType by bufferID [%{public}d] or iterHead->first is null",
-                 __func__, bufferId);
-        return;
-    }
-    BufferInfoSPtr bufferInfo = iter->second;
-    bufferInfoMap_.erase(iter);
-    bufferHeaderMap_.erase(iterHead);
-    bufferInfo = nullptr;
-}
-
-int32_t ComponentNode::UseSharedBuffer(struct OmxCodecBuffer &omxCodecBuffer, uint32_t portIndex)
-{
-    OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
-    int32_t err = OMX_ErrorUndefined;
-    if (omxCodecBuffer.bufferLen != FD_SIZE) {
-        HDF_LOGE("%{public}s error, omxCodecBuffer.bufferLen = %{public}d ", __func__, omxCodecBuffer.bufferLen);
-        return err;
-    }
-
-    int shardFd = (int)reinterpret_cast<uintptr_t>(omxCodecBuffer.buffer);
-    if (shardFd < 0) {
-        HDF_LOGE("%{public}s error, shardFd < 0", __func__);
-        return err;
-    }
-
-    int size = AshmemGetSize(shardFd);
-    HDF_LOGI("%{public}s , shardFd = %{public}d, size = %{public}d", __func__, shardFd, size);
-    std::shared_ptr<Ashmem> sharedMem = std::make_shared<Ashmem>(shardFd, size);
-    // check READ/WRITE
-    bool mapd = false;
-    if (omxCodecBuffer.type == READ_WRITE_TYPE) {
-        mapd = sharedMem->MapReadAndWriteAshmem();
-    } else {
-        mapd = sharedMem->MapReadOnlyAshmem();
-    }
-
-    if (!mapd) {
-        HDF_LOGE("%{public}s error, MapReadAndWriteAshmem or MapReadOnlyAshmem return false", __func__);
-        return err;
-    }
-
-    err = OMX_AllocateBuffer((OMX_HANDLETYPE)comp_, &bufferHdrType, portIndex, 0, omxCodecBuffer.allocLen);
-    if (err != OMX_ErrorNone) {
-        HDF_LOGE("%{public}s error, OMX_AllocateBuffer failed", __func__);
-        sharedMem->UnmapAshmem();
-        sharedMem->CloseAshmem();
-        sharedMem = nullptr;
-        return err;
-    }
-    SaveBufferInfo(omxCodecBuffer, bufferHdrType, sharedMem);
-
-    return err;
-}
-int32_t ComponentNode::UseHandleBuffer(struct OmxCodecBuffer &omxCodecBuffer, uint32_t portIndex)
-{
-    OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
-    int32_t err = OMX_ErrorUndefined;
-
-    if (sizeof(BufferHandle) != omxCodecBuffer.bufferLen) {
-        HDF_LOGE("%{public}s error, BufferHandle size = %{public}zu, omxBuffer.ptrSize = %{public}d ", __func__,
-                 sizeof(BufferHandle), omxCodecBuffer.bufferLen);
-        return err;
-    }
-
-    BufferHandle *bufferHandle = (BufferHandle *)omxCodecBuffer.buffer;
-    (void)bufferHandle;
-    // bufferHandle trans to native_handle_t, then use native_handle_t in omx
-    err = OMX_UseBuffer((OMX_HANDLETYPE)comp_, &bufferHdrType, portIndex, 0, omxCodecBuffer.allocLen, nullptr);
-    if (err != OMX_ErrorNone) {
-        HDF_LOGE("%{public}s error, OMX_UseBuffer ret[%{public}d]", __func__, err);
-    }
-    HDF_LOGW("%{public}s error, bufferType BufferHandle is not implement", __func__);
-    // bufferID
-    SaveBufferInfo(omxCodecBuffer, bufferHdrType, nullptr);
-    return err;
-}
-
-int32_t ComponentNode::UseDynaHandleBuffer(struct OmxCodecBuffer &omxCodecBuffer, uint32_t portIndex)
-{
-    OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
-    int32_t err = OMX_ErrorUndefined;
-    // check: buffer need alloc 8 Bytes
-    // type 4 Bytes，native_handle 4 Bytes
-    err = OMX_UseBuffer((OMX_HANDLETYPE)comp_, &bufferHdrType, portIndex, 0, omxCodecBuffer.allocLen, nullptr);
-    if (err != OMX_ErrorNone) {
-        HDF_LOGE("%{public}s error, OMX_UseBuffer ret [%{public}d]", __func__, err);
-    }
-    HDF_LOGW("%{public}s error, bufferTypeBufferHandle is not implement", __func__);
-    // bufferID
-    SaveBufferInfo(omxCodecBuffer, bufferHdrType, nullptr);
-    return err;
-}
-
-int32_t ComponentNode::EmptySharedBuffer(struct OmxCodecBuffer &buffer, BufferInfoSPtr bufferInfo,
-                                         OMX_BUFFERHEADERTYPE *bufferHdrType)
-{
-    void *sharedPtr = const_cast<void *>(bufferInfo->sharedMem->ReadFromAshmem(buffer.filledLen, buffer.offset));
-    if (!sharedPtr) {
-        HDF_LOGE("%{public}s error, omxBuffer.length [%{public}d omxBuffer.offset[%{public}d]", __func__,
-                 buffer.filledLen, buffer.offset);
-        return OMX_ErrorUndefined;
-    }
-    auto ret = memcpy_s(bufferHdrType->pBuffer + buffer.offset, buffer.allocLen - buffer.offset, sharedPtr,
-                        buffer.filledLen);
-    if (ret != EOK) {
-        HDF_LOGE("%{public}s error, memcpy_s ret [%{public}d", __func__, ret);
-        return OMX_ErrorUndefined;
-    }
-
-#ifdef NODE_DEBUG
-    (void)fwrite(sharedPtr, 1, buffer->filledLen, fp_in);
-    (void)fflush(fp_in);
-#endif
-
-    return OMX_ErrorNone;
-}
-
-void ComponentNode::SaveBufferInfo(struct OmxCodecBuffer &omxCodecBuffer, OMX_BUFFERHEADERTYPE *bufferHdrType,
-                                   std::shared_ptr<Ashmem> sharedMem)
-{
-    BufferInfoSPtr bufferInfo = std::make_shared<BufferInfo>();
-    uint32_t bufferId = GenerateBufferId();
-    // set bufferId
-    omxCodecBuffer.bufferId = bufferId;
-    omxCodecBuffer.version = bufferHdrType->nVersion;
-    omxCodecBuffer.allocLen = bufferHdrType->nAllocLen;
-    omxCodecBuffer.filledLen = bufferHdrType->nFilledLen;
-    omxCodecBuffer.offset = bufferHdrType->nOffset;
-    omxCodecBuffer.pts = bufferHdrType->nTimeStamp;
-    omxCodecBuffer.flag = bufferHdrType->nFlags;
-
-    bufferInfo->omxCodecBuffer = omxCodecBuffer;
-    bufferInfo->omxCodecBuffer.buffer = 0;
-    bufferInfo->omxCodecBuffer.bufferLen = 0;
-    bufferInfo->sharedMem = sharedMem;
-    uint32_t bufferIdTemp = bufferId;
-    bufferInfoMap_.insert(std::make_pair<uint32_t, BufferInfoSPtr>(std::move(bufferId), std::move(bufferInfo)));
-    bufferHeaderMap_.insert(
-        std::make_pair<OMX_BUFFERHEADERTYPE *, uint32_t>(std::move(bufferHdrType), std::move(bufferIdTemp)));
 }
 }  // namespace Omx
 }  // namespace Codec
