@@ -58,8 +58,8 @@ ohos_shared_library("libpinauth_driver") {
   sources = [ "src/pin_auth_interface_driver.cpp" ]
   deps = [
     "//base/user_iam/user_auth/common:iam_utils",
+    "//drivers/interface/pin_auth/v1_0:libpinauth_stub_1.0",
     "//drivers/peripheral/pin_auth/hdi:libpinauth_sample_1.0",
-    "//drivers/peripheral/pin_auth/hdi_service:libpin_auth_interface_service_1.0",
   ]
 
   external_deps = [

@@ -19,8 +19,7 @@ if (defined(ohos_lite)) {
   group("pinauth_entry") {
     deps = [
       "./hdi_service:hdf_pinauth_service",
-      "//drivers/interface/pin_auth/v1_0:libpinauth_proxy_1.0",
-      "//drivers/interface/pin_auth/v1_0:libpinauth_stub_1.0",
+      "//drivers/interface/pin_auth/v1_0:pinauth",
       "//drivers/peripheral/pin_auth/hdi:libpinauth_sample_1.0",
     ]
   }
