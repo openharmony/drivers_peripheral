@@ -1115,7 +1115,6 @@ static int32_t WlanGetPowerMode(struct IWifiInterface *self, const struct WlanFe
         ec = WlanProxyCall(self, WLAN_SERVICE_GET_POWER_MODE, data, reply);
         if (ec != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
-            ec = HDF_FAILURE;
             break;
         }
         if (!HdfSbufReadUint8(reply, mode)) {
@@ -1158,7 +1157,7 @@ static int32_t WlanSetPowerMode(struct IWifiInterface *self, const struct WlanFe
             ec = HDF_ERR_MALLOC_FAIL;
             break;
         }
-        ec = WlanProxyCall(self, WLAN_SERVICE_GET_POWER_MODE, data, NULL);
+        ec = WlanProxyCall(self, WLAN_SERVICE_SET_POWER_MODE, data, NULL);
         if (ec != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ec);
         }

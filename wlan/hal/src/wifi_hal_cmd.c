@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -130,7 +130,7 @@ int32_t HalCmdSetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
 
     ret = SetMacAddr(ifName, mac, len);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: SetMacAddr failed", __FUNCTION__);
+        HDF_LOGE("%s: SetMacAddr failed, ret = %{public}d", __FUNCTION__, ret);
     }
     return ret;
 }
