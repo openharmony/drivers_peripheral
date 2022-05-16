@@ -18,6 +18,10 @@
 
 #include "pin_db.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #define TAG_AND_LEN_BYTE 8
 #define TAG_ANG_LEN_T 12
 #define TAG_AND_LEN_S 16
@@ -113,4 +117,7 @@ ResultCode GenerateKeyPair();
 ResultCode DoGetExecutorInfo(PinExecutorInfo *pinExecutorInfo);
 ResultCode DoVerifyTemplateData(const uint64_t *templateIdList, uint32_t templateIdListLen);
 
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 #endif // PINAUTHTA_FUNC_H

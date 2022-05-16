@@ -18,6 +18,13 @@
 
 #include "adaptor_file.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 FileOperator *GetDefaultFileOperator(void);
 
-#endif
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+#endif // ADAPTOR_FILE_OPERATOR_H

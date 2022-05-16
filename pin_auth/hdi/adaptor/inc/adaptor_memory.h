@@ -18,8 +18,15 @@
 
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 void *Malloc(const size_t size);
 
 void Free(void *ptr);
 
-#endif
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+#endif // ADAPTOR_MEMORY_H
