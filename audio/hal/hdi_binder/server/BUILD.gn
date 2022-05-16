@@ -183,6 +183,7 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
     ]
 
     sources = [
+      "src/hdf_audio_input_event.c",
       "src/hdf_audio_pnp_server.c",
       "src/hdf_audio_pnp_uevent.c",
     ]
