@@ -18,6 +18,10 @@
 
 #include "hilog/log_c.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #ifndef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002422
 #endif
@@ -30,4 +34,7 @@
 #define LOG_ERROR(format, args...) HiLogPrint(LOG_CORE, LOG_ERROR, LOG_DOMAIN, APP_LOG_TAG, \
     "%{public}s: " format "", __func__, ##args)
 
-#endif
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+#endif // ADAPTOR_LOG_H

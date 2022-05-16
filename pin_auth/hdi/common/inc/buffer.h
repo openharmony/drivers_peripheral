@@ -22,6 +22,10 @@
 #include "defines.h"
 #include "adaptor_log.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 typedef struct {
     uint8_t *buf;
     uint32_t contentSize;
@@ -38,4 +42,7 @@ Buffer *CreateBufferByData(const uint8_t *data, const uint32_t dataSize);
 ResultCode GetBufferData(const Buffer *buffer, uint8_t *data, uint32_t *dataSize);
 bool CheckBufferWithSize(const Buffer *buffer, const uint32_t size);
 
-#endif
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+#endif // COMMON_BUFFER_H
