@@ -22,6 +22,7 @@
 #include <sys/ioctl.h>
 #include <securec.h>
 #include "hdf_io_service_if.h"
+#include "osal_time.h"
 #include "input_common.h"
 
 #define TOUCH_INDEX 1
