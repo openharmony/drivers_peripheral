@@ -25,8 +25,8 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
     "src/pin_auth_interface_service.cpp",
   ]
   public_deps = [
-    "//drivers/interface/pin_auth/v1_0:libpinauth_stub_1.0",
-    "//drivers/peripheral/pin_auth/hdi:libpinauth_sample_1.0",
+    "//drivers/interface/pin_auth/v1_0:libpin_auth_stub_1.0",
+    "//drivers/peripheral/pin_auth/hdi:libpin_auth_sample_1.0",
     "//third_party/openssl:libcrypto_static",
   ]
 
@@ -46,10 +46,10 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
   install_images = [ chipset_base_dir ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
   subsystem_name = "hdf"
-  part_name = "pinauth_device_driver"
+  part_name = "pin_auth_device_driver"
 }
 
-ohos_shared_library("libpinauth_driver") {
+ohos_shared_library("libpin_auth_driver") {
   include_dirs = [
     "inc",
     "//drivers/peripheral/pin_auth/hdi/main/inc",
@@ -58,8 +58,8 @@ ohos_shared_library("libpinauth_driver") {
   sources = [ "src/pin_auth_interface_driver.cpp" ]
   deps = [
     "//base/user_iam/user_auth/common:iam_utils",
-    "//drivers/interface/pin_auth/v1_0:libpinauth_stub_1.0",
-    "//drivers/peripheral/pin_auth/hdi:libpinauth_sample_1.0",
+    "//drivers/interface/pin_auth/v1_0:libpin_auth_stub_1.0",
+    "//drivers/peripheral/pin_auth/hdi:libpin_auth_sample_1.0",
   ]
 
   external_deps = [
@@ -74,12 +74,12 @@ ohos_shared_library("libpinauth_driver") {
   install_images = [ chipset_base_dir ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
   subsystem_name = "hdf"
-  part_name = "pinauth_device_driver"
+  part_name = "pin_auth_device_driver"
 }
 
-group("hdf_pinauth_service") {
+group("hdf_pin_auth_service") {
   deps = [
+    ":libpin_auth_driver",
     ":libpin_auth_interface_service_1.0",
-    ":libpinauth_driver",
   ]
 }
