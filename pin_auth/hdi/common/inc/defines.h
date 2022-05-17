@@ -16,6 +16,10 @@
 #ifndef COMMON_DEFINES_H
 #define COMMON_DEFINES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 typedef enum ResultCode {
     RESULT_SUCCESS = 0x0,
     RESULT_GENERAL_ERROR = 0x1,
@@ -107,4 +111,7 @@ typedef enum AuthSubType {
 
 #define MAX_DULPLICATE_CHECK 100
 
-#endif
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+#endif // COMMON_DEFINES_H

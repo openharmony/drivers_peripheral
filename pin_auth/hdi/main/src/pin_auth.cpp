@@ -13,19 +13,16 @@
  * limitations under the License.
  */
 
+#include "pin_auth.h"
 #include <map>
-#include <vector>
-#include "pthread.h"
-
-extern "C" {
 #include <sys/stat.h>
+#include <vector>
 #include <unistd.h>
+#include "pthread.h"
 #include "adaptor_memory.h"
 #include "adaptor_log.h"
 #include "pin_func.h"
 #include "securec.h"
-#include "pin_auth.h"
-}
 
 namespace OHOS {
 namespace UserIAM {

@@ -18,7 +18,14 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 uint64_t GetSystemTime(void);
 uint64_t GetRtcTime(void);
 
-#endif
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+#endif // ADAPTOR_TIME_H

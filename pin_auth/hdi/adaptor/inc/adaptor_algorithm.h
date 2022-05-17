@@ -20,6 +20,10 @@
 #include <stdint.h>
 #include "buffer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #define ED25519_FIX_SIGN_BUFFER_SIZE 64
 
 typedef struct {
@@ -38,5 +42,8 @@ int32_t HmacSha512(const Buffer *hmacKey, const Buffer *data, Buffer **hmac);
 
 int32_t SecureRandom(uint8_t *buffer, uint32_t size);
 
-#endif
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+#endif // ADAPTOR_ALGORITHM_H
 
