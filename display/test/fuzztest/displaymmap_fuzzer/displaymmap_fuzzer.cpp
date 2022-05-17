@@ -20,7 +20,7 @@
 using namespace OHOS::HDI::Display::V1_0;
 
 namespace OHOS {
-    bool DisplayMapFuzzTest(const uint8_t* data, size_t size)
+    bool DisplayMmapFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
         int32_t ret;
@@ -28,7 +28,7 @@ namespace OHOS {
         handle.height = static_cast<int32_t>(*data);
         handle.width = static_cast<int32_t>(*data);
         
-        if (!DisplayGrallocClient::Get()->Mmap(handle)) {
+        if (!IDisplayGralloc::Get()->Mmap(handle)) {
             result = true;
         }
 
@@ -44,7 +44,7 @@ namespace OHOS {
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DisplayMapFuzzTest(data, size);
+    OHOS::DisplayMmapFuzzTest(data, size);
     return 0;
 }
 
