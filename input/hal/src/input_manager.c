@@ -56,6 +56,7 @@ static int32_t GetInputDevice(uint32_t devIndex, DeviceInfo **devInfo)
         if (ret == INPUT_SUCCESS) {
             break;
         }
+        OsalMSleep(10);
     }
     if (count == 0) {
         HDF_LOGE("%s: update dev info failed", __func__);
