@@ -19,6 +19,10 @@
 #include "defines.h"
 #include "buffer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #define MAX_USER_NAME_LEN 32
 #define INVALID_TEMPLATE_ID 0xFFFFFFFFFFFFFFFF
 #define PIN_DB_TWO_PARAMS 2
@@ -94,4 +98,7 @@ ResultCode GetSubType(uint64_t templateId, uint64_t *subType);
 ResultCode GetAntiBruteInfo(uint64_t templateId, uint32_t *authErrorConut, uint64_t *startFreezeTime);
 ResultCode VerifyTemplateDataPin(const uint64_t *templateIdList, uint32_t templateIdListLen);
 
-#endif
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+#endif  // PIN_DB_H
