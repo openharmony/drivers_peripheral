@@ -113,7 +113,7 @@ HWTEST_F(HdfLightHdiTest, TurnOnLight001, TestSize.Level1)
         EXPECT_LE(iter.lightId, g_maxLightId);
 
         HdfLightEffect effect;
-        effect.lightBrightness = 0xFFFF0000;
+        effect.lightBrightness = 0x00800000;
         effect.flashEffect.flashMode = HDF_LIGHT_FLASH_NONE;
         int32_t ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -144,7 +144,7 @@ HWTEST_F(HdfLightHdiTest, TurnOnLight002, TestSize.Level1)
         EXPECT_LE(iter.lightId, g_maxLightId);
 
         HdfLightEffect effect;
-        effect.lightBrightness = 0xFFFF0000;
+        effect.lightBrightness = 0x00800000;
         effect.flashEffect.flashMode = HDF_LIGHT_FLASH_BUTT;
         int32_t ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
         EXPECT_EQ(LIGHT_NOT_FLASH, ret);
@@ -172,7 +172,7 @@ HWTEST_F(HdfLightHdiTest, TurnOnLight003, TestSize.Level1)
         EXPECT_LE(iter.lightId, g_maxLightId);
 
         HdfLightEffect effect;
-        effect.lightBrightness = 0xFFFF0000;
+        effect.lightBrightness = 0x00800000;
         effect.flashEffect.flashMode = HDF_LIGHT_FLASH_TIMED;
         effect.flashEffect.onTime = g_onTime;
         effect.flashEffect.offTime = g_offTime;

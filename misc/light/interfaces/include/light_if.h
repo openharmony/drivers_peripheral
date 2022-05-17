@@ -20,7 +20,7 @@
  * @brief Provides APIs for the light service.
  *
  * The light module provides a unified interface for the light service to access the light driver.
- * After obtaining the driver object or proxy, the light service distinguishes light devices by type
+ * After obtaining the driver object or proxy, the light service distinguishes light devices by id
  * and call related APIs to obtain light information, turn on or off a light, or set the blinking mode.
  * @since 3.1
  */
@@ -28,7 +28,7 @@
 /**
  * @file Light_if.h
  *
- * @brief Declares common APIs of the light module. These APIs can be used to obtain the light type,
+ * @brief Declares common APIs of the light module. These APIs can be used to obtain the light id,
  * turn on or off a light, and set the light brightness and blinking mode.
  * @since 3.1
  */
@@ -67,15 +67,15 @@ struct LightInterface {
     int32_t (*GetLightInfo)(struct LightInfo **lightInfo, uint32_t *count);
 
     /**
-     * @brief Turns on available lights in the list based on the specified light type.
+     * @brief Turns on available lights in the list based on the specified light id.
      *
-     * @param lightId Indicates the light type. For details, see {@link LightType}.
+     * @param lightId Indicates the light id. For details, see {@link LightId}.
      *
      * @param effect Indicates the pointer to the lighting effect, if the lightbrightness field is 0,
      * light brightness according to the defaultBrightness configured by HCS. For details, see {@link LightEffect}.
      *
      * @return Returns <b>0</b> if the operation is successful.
-     * @return Returns <b>-1</b> if the light type is not supported.
+     * @return Returns <b>-1</b> if the light id is not supported.
      * @return Returns <b>-2</b> if the blinking setting is not supported.
      * @return Returns <b>-3</b> if the brightness setting is not supported.
      *
@@ -84,9 +84,9 @@ struct LightInterface {
     int32_t (*TurnOnLight)(uint32_t lightId, struct LightEffect *effect);
 
     /**
-     * @brief Turns off available lights in the list based on the specified light type.
+     * @brief Turns off available lights in the list based on the specified light id.
      *
-     * @param lightId Indicates the light type. For details, see {@link LightType}.
+     * @param lightId Indicates the light id. For details, see {@link LightId}.
      *
      * @return Returns <b>0</b> if the operation is successful.
      * @return Returns a negative value if the operation fails.
