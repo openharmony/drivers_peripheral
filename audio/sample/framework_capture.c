@@ -252,8 +252,8 @@ static int AudioPnpSvcThresholdMsgCheck(struct ServiceStatus *svcStatus, struct 
         printf("AudioPnpSvcThresholdMsgCheck:input param is null!\n");
         return HDF_FAILURE;
     }
-    if ((AudioPnpMsgDeSerialize(svcStatus->info, "EVENT_TYPE", &(audioEvent->eventType)) != HDF_SUCCESS) ||
-        (AudioPnpMsgDeSerialize(svcStatus->info, "DEVICE_TYPE", &(audioEvent->deviceType)) != HDF_SUCCESS)) {
+    if ((AudioPnpMsgReadValue(svcStatus->info, "EVENT_TYPE", &(audioEvent->eventType)) != HDF_SUCCESS) ||
+        (AudioPnpMsgReadValue(svcStatus->info, "DEVICE_TYPE", &(audioEvent->deviceType)) != HDF_SUCCESS)) {
         printf("DeSerialize fail!\n");
         return HDF_FAILURE;
     }
@@ -278,25 +278,25 @@ static void AudioPnpSvcEvenReceived(struct ServiceStatusListener *listener, stru
 
     if ((svcStatus == NULL) || (listener == NULL)) {
         printf("input param is null!\n");
-        return ;
+        return;
     }
     if (AudioPnpSvcThresholdMsgCheck(svcStatus, &audioEvent) != HDF_SUCCESS) {
-        return ;
+        return;
     }
     strParam = (struct StrParaCapture *)listener->priv;
     if (strParam == NULL) {
         printf("strParam is null \n");
-        return ;
+        return;
     }
     capture = strParam->capture;
     if (capture == NULL || capture->CaptureFrame == NULL || strParam->file == NULL) {
         printf("capture is null \n");
-        return ;
+        return;
     }
     frame = (char *)calloc(1, bufferSize);
     if (frame == NULL) {
         printf("calloc frame failed!\n");
-        return ;
+        return;
     }
     g_receiveFrameCount++;
     for (index = g_receiveFrameCount; index > 0; index--) {
@@ -312,7 +312,7 @@ static void AudioPnpSvcEvenReceived(struct ServiceStatusListener *listener, stru
         }
     }
     free(frame);
-    return ;
+    return;
 }
 
 int RegisterListen(struct StrParaCapture *capture)

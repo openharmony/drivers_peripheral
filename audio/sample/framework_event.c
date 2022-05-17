@@ -44,8 +44,6 @@ static int32_t AudioServiceDeviceVal(enum AudioDeviceType deviceType)
             printf("Unknown device type.\n");
             return HDF_FAILURE;
     }
-
-    return HDF_SUCCESS;
 }
 
 static int32_t AudioServiceDeviceInVal(enum AudioDeviceType deviceType)
@@ -63,8 +61,6 @@ static int32_t AudioServiceDeviceInVal(enum AudioDeviceType deviceType)
             printf("Unknown device type.\n");
             return HDF_FAILURE;
     }
-
-    return HDF_SUCCESS;
 }
 
 static int32_t AudioServiceMsgParse(struct AudioEvent *svcMsg)
@@ -84,7 +80,6 @@ static int32_t AudioServiceMsgParse(struct AudioEvent *svcMsg)
             printf("Unknown event type.\n");
             return HDF_FAILURE;
     }
-    return HDF_SUCCESS;
 }
 
 static int AudioGetServiceStatus(struct ServiceStatus *svcStatus)
@@ -101,8 +96,8 @@ static int AudioGetServiceStatus(struct ServiceStatus *svcStatus)
     if (memcpy_s(strTemp, AUDIO_PNP_MSG_LEN_MAX, (char *)svcStatus->info, strlen((char *)svcStatus->info))) {
         return HDF_FAILURE;
     }
-    if ((AudioPnpMsgDeSerialize(strTemp, "EVENT_SERVICE_TYPE", &(serviceMsg.eventType)) != HDF_SUCCESS) ||
-        (AudioPnpMsgDeSerialize(strTemp, "DEVICE_TYPE", &(serviceMsg.deviceType)) != HDF_SUCCESS)) {
+    if ((AudioPnpMsgReadValue(strTemp, "EVENT_SERVICE_TYPE", &(serviceMsg.eventType)) != HDF_SUCCESS) ||
+        (AudioPnpMsgReadValue(strTemp, "DEVICE_TYPE", &(serviceMsg.deviceType)) != HDF_SUCCESS)) {
         return HDF_FAILURE;
     }
     if (AudioServiceMsgParse(&serviceMsg) != HDF_SUCCESS) {
@@ -127,8 +122,6 @@ static int32_t AudioLoadDeviceSucc(enum AudioDeviceType deviceType)
             printf("Unknown device type.\n");
             return HDF_FAILURE;
     }
-
-    return HDF_SUCCESS;
 }
 
 static int32_t AudioLoadDeviceFail(enum AudioDeviceType deviceType)
@@ -146,8 +139,6 @@ static int32_t AudioLoadDeviceFail(enum AudioDeviceType deviceType)
             printf("Unknown device type.\n");
             return HDF_FAILURE;
     }
-
-    return HDF_SUCCESS;
 }
 
 static int32_t AudioUnLoadDevice(enum AudioDeviceType deviceType)
@@ -165,8 +156,6 @@ static int32_t AudioUnLoadDevice(enum AudioDeviceType deviceType)
             printf("Unknown device type.\n");
             return HDF_FAILURE;
     }
-
-    return HDF_SUCCESS;
 }
 
 static int32_t AudioLoadMsgParse(struct AudioEvent *loadMsg)
@@ -186,8 +175,6 @@ static int32_t AudioLoadMsgParse(struct AudioEvent *loadMsg)
             printf("Unknown event type.\n");
             return HDF_FAILURE;
     }
-
-    return HDF_SUCCESS;
 }
 
 static int AudioGetLoadStatus(struct ServiceStatus *svcStatus)
@@ -204,8 +191,8 @@ static int AudioGetLoadStatus(struct ServiceStatus *svcStatus)
     if (memcpy_s(strTemp, AUDIO_PNP_MSG_LEN_MAX, (char *)svcStatus->info, strlen((char *)svcStatus->info))) {
         return HDF_FAILURE;
     }
-    if ((AudioPnpMsgDeSerialize(strTemp, "EVENT_LOAD_TYPE", &(loadMsg.eventType)) != HDF_SUCCESS) ||
-        (AudioPnpMsgDeSerialize(strTemp, "DEVICE_TYPE", &(loadMsg.deviceType)) != HDF_SUCCESS)) {
+    if ((AudioPnpMsgReadValue(strTemp, "EVENT_LOAD_TYPE", &(loadMsg.eventType)) != HDF_SUCCESS) ||
+        (AudioPnpMsgReadValue(strTemp, "DEVICE_TYPE", &(loadMsg.deviceType)) != HDF_SUCCESS)) {
         return HDF_FAILURE;
     }
     if (AudioLoadMsgParse(&loadMsg) != HDF_SUCCESS) {
@@ -232,8 +219,6 @@ static int32_t AudioPnpDeviceAdd(enum AudioDeviceType deviceType)
             printf("Unknown device type.\n");
             return HDF_FAILURE;
     }
-
-    return HDF_SUCCESS;
 }
 
 static int32_t AudioPnpDeviceRemove(enum AudioDeviceType deviceType)
@@ -253,8 +238,6 @@ static int32_t AudioPnpDeviceRemove(enum AudioDeviceType deviceType)
             printf("Unknown device type.\n");
             return HDF_FAILURE;
     }
-
-    return HDF_SUCCESS;
 }
 
 
@@ -275,8 +258,6 @@ static int32_t AudioPnpMsgParse(struct AudioEvent *pnpMsg)
             printf("Unknown event type.\n");
             return HDF_FAILURE;
     }
-
-    return HDF_SUCCESS;
 }
 
 static int AudioGetUsbPnpStatus(struct ServiceStatus *svcStatus)
@@ -293,8 +274,8 @@ static int AudioGetUsbPnpStatus(struct ServiceStatus *svcStatus)
     if (memcpy_s(strTemp, AUDIO_PNP_MSG_LEN_MAX, (char *)svcStatus->info, strlen((char *)svcStatus->info))) {
         return HDF_FAILURE;
     }
-    if ((AudioPnpMsgDeSerialize(strTemp, "EVENT_TYPE", &(pnpMsg.eventType)) != HDF_SUCCESS) ||
-        (AudioPnpMsgDeSerialize(strTemp, "DEVICE_TYPE", &(pnpMsg.deviceType)) != HDF_SUCCESS)) {
+    if ((AudioPnpMsgReadValue(strTemp, "EVENT_TYPE", &(pnpMsg.eventType)) != HDF_SUCCESS) ||
+        (AudioPnpMsgReadValue(strTemp, "DEVICE_TYPE", &(pnpMsg.deviceType)) != HDF_SUCCESS)) {
         return HDF_FAILURE;
     }
     if (AudioPnpMsgParse(&pnpMsg) != HDF_SUCCESS) {
@@ -376,7 +357,7 @@ int main(void)
     (void)signal(SIGINT, StopListenerBySig);
     (void)signal(SIGTERM, StopListenerBySig);
     while (g_listenerState) {
-        sleep(1);
+        sleep(1); // Wait for 1 second
     }
 
     return HDF_SUCCESS;
