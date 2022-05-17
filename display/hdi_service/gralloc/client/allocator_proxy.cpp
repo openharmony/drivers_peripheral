@@ -19,8 +19,8 @@
 #include "iremote_object.h"
 #include "iservmgr_hdi.h"
 #include "parcel_utils.h"
-#include "refbase.h"
 #include "unistd.h"
+#include "refbase.h"
 
 #define HDF_LOG_TAG HDI_DISP_PROXY
 
@@ -37,7 +37,7 @@ sptr<IDisplayAllocator> IDisplayAllocator::Get(const char *serviceName)
         uint32_t cnt = 0;
         do {
             servMgr = IServiceManager::Get();
-            HDF_LOGE("%{public}s: IServiceManager cnt:%{public}d", __func__, ++cnt);
+            HDF_LOGI("%{public}s: IServiceManager cnt:%{public}d", __func__, ++cnt);
             usleep(10000);  // 10 ms
         } while (servMgr == nullptr);
 
@@ -45,7 +45,7 @@ sptr<IDisplayAllocator> IDisplayAllocator::Get(const char *serviceName)
         sptr<IRemoteObject> remote = nullptr;
         do {
             remote = servMgr->GetService(serviceName);
-            HDF_LOGE("%{public}s: get IServiceManager IDisplayAllocator cnt:%{public}d", __func__, ++cnt);
+            HDF_LOGI("%{public}s: get IServiceManager IDisplayAllocator cnt:%{public}d", __func__, ++cnt);
             usleep(10000);  // 10 ms
         } while (remote == nullptr);
 
@@ -95,7 +95,6 @@ int32_t AllocatorProxy::AllocMem(const AllocInfo &info, BufferHandle *&handle)
     } else {
         retCode = DISPLAY_NULL_PTR;
     }
-    HDF_LOGE("%{public}s: %{public}s(%{public}d) end", __FILE__, __func__, __LINE__);
     return retCode;
 }
 } // namespace V1_0
