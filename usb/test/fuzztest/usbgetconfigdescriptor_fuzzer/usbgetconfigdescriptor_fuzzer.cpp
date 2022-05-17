@@ -54,7 +54,7 @@ namespace USB {
             return false;
         }
 
-        uint8_t descId = (reinterpret_cast<uint32_t>(data)) % 256;
+        uint8_t descId = (*(uint32_t *)data) % 256;
         ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, descId,
             reinterpret_cast<std::vector<uint8_t> &>(data));
         if (ret == UEC_OK) {

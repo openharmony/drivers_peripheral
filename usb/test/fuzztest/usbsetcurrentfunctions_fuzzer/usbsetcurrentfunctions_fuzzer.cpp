@@ -23,7 +23,7 @@ namespace USB {
     bool UsbSetCurrentFunctionsFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
-        int32_t ret = UsbdClient::GetInstance().SetCurrentFunctions(reinterpret_cast<int32_t>(data));
+        int32_t ret = UsbdClient::GetInstance().SetCurrentFunctions(*(int32_t *)data);
         if (ret == UEC_OK) {
             HDF_LOGI("%{public}s: set interface succeed\n", __func__);
             result = true;
