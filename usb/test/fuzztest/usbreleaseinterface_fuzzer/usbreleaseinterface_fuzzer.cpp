@@ -54,7 +54,7 @@ namespace USB {
             return false;
         }
 
-        uint8_t interfaceId = (reinterpret_cast<uint32_t>(data)) % 256;
+        uint8_t interfaceId = (*(uint32_t *)data) % 256;
         ret = UsbdClient::GetInstance().ReleaseInterface(dev, interfaceId);
         if (ret == UEC_OK) {
             HDF_LOGI("%{public}s: reg bulk callback succeed\n", __func__);
