@@ -55,7 +55,7 @@ namespace USB {
         }
 
         ret = UsbdClient::GetInstance().BulkTransferWrite(dev, reinterpret_cast<const UsbPipe &>(data),
-            reinterpret_cast<int32_t>(data), reinterpret_cast<const std::vector<uint8_t> &>(data));
+            *(int32_t *)data, reinterpret_cast<const std::vector<uint8_t> &>(data));
         if (ret == UEC_OK) {
             HDF_LOGI("%{public}s: bulk transfer Write succeed\n", __func__);
             result = true;

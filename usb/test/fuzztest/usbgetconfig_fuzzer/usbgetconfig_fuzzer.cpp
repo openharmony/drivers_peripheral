@@ -54,7 +54,7 @@ namespace USB {
             return false;
         }
 
-        uint8_t configIndex = (reinterpret_cast<uint32_t>(data)) % 256;
+        uint8_t configIndex = (*(uint32_t *)data) % 256;
         ret = UsbdClient::GetInstance().GetConfig(dev, configIndex);
         if (ret == UEC_OK) {
             HDF_LOGI("%{public}s: get config succeed\n", __func__);
