@@ -40,7 +40,6 @@ DisplayGrallocClient::DisplayGrallocClient() : mapperAdapter_(std::make_shared<M
     if (allocatorProxy_ == nullptr) {
         return;
     }
-    HDF_LOGI("%{public}s instance ok", __func__);
 }
 
 int32_t DisplayGrallocClient::AllocMem(const AllocInfo &info, BufferHandle *&handle) const
