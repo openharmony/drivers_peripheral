@@ -1581,27 +1581,27 @@ int32_t WifiCmdGetDrvFlags(const char *ifname, WifiGetDrvFlags *params)
     }
     struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     struct HdfSBuf *reply = HdfSbufObtainDefaultSize();
-    if (ifname == NULL || reply == NULL) {
-        ret = RET_CODE_FAILURE;
-        goto RELEASE_DATA;
-    }
-    bool isSerializeFailed = false;
-    isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifname);
-    if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
-        ret = RET_CODE_FAILURE;
-    } else {
+    do {
+        if (ifname == NULL || reply == NULL) {
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+
+        if (!HdfSbufWriteString(data, ifname)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufWriteString failed!", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+            break;
+        }
         ret = SendCmdSync(WIFI_WPA_CMD_GET_DRIVER_FLAGS, data, reply);
-    }
-    if (ret) {
-        ret = RET_CODE_FAILURE;
-        goto RELEASE_DATA;
-    }
-    if (!HdfSbufReadUint64(reply, &(params->drvFlags))) {
-        ret = RET_CODE_FAILURE;
-        goto RELEASE_DATA;
-    }
-RELEASE_DATA:
+        if (ret != RET_CODE_SUCCESS) {
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+        if (!HdfSbufReadUint64(reply, &(params->drvFlags))) {
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+    } while (0);
     HdfSbufRecycle(reply);
     HdfSbufRecycle(data);
     return ret;
