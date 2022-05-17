@@ -54,8 +54,8 @@ namespace USB {
             return false;
         }
         
-        uint8_t interfaceId = (reinterpret_cast<uint32_t>(data)) % 256;
-        uint8_t altIndex = (reinterpret_cast<uint32_t>(data)) % 256;
+        uint8_t interfaceId = (*(uint32_t *)data) % 256;
+        uint8_t altIndex = (*(uint32_t *)data) % 256;
         ret = UsbdClient::GetInstance().SetInterface(dev, interfaceId, altIndex);
         if (ret == UEC_OK) {
             HDF_LOGI("%{public}s: set interface succeed\n", __func__);
