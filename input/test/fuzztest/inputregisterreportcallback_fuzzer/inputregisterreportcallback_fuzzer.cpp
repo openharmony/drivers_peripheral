@@ -47,7 +47,7 @@ namespace OHOS {
             }
         }
 
-        ret  = g_inputInterface->iInputReporter->RegisterReportCallback((uint32_t)data, &g_callback);
+        ret  = g_inputInterface->iInputReporter->RegisterReportCallback(static_cast<uint32_t>(*data), &g_callback);
         if (!ret) {
             result = true;
         }

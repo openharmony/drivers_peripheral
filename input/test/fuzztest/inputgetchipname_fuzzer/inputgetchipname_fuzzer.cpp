@@ -48,7 +48,7 @@ namespace OHOS {
             }
         }
 
-        ret = g_inputInterface->iInputController->GetChipName((uint32_t)data, chipName, length);
+        ret = g_inputInterface->iInputController->GetChipName(static_cast<uint32_t>(*data), chipName, length);
         if (!ret) {
             result = true;
         }

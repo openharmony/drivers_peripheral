@@ -26,7 +26,7 @@ namespace OHOS {
         std::vector<bool> supporteds;
         int32_t ret;
 
-        ret = DisplayGrallocClient::Get()->IsSupportedAlloc(
+        ret = IDisplayGralloc::Get()->IsSupportedAlloc(
             reinterpret_cast<std::vector<VerifyAllocInfo> &>(data), supporteds);
         if (!ret) {
             result = true;

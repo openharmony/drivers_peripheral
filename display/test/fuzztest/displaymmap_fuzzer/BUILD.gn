@@ -16,7 +16,7 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 module_output_path = "hdf/display"
 
-ohos_fuzztest("DisplayMapFuzzTest") {
+ohos_fuzztest("DisplayMmapFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file =
       "//drivers/peripheral/display/test/fuzztest/displaymmap_fuzzer"
@@ -49,5 +49,5 @@ ohos_fuzztest("DisplayMapFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [ ":DisplayMapFuzzTest" ]
+  deps += [ ":DisplayMmapFuzzTest" ]
 }
