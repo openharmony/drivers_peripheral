@@ -26,7 +26,7 @@ using namespace OHOS::HDI::Nfc::NfcCore;
 
 struct HdfNfcInterfaceHost {
     struct IDeviceIoService ioservice;
-    NfcImpl *service;
+    OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
 static int32_t NfcInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
@@ -61,9 +61,9 @@ static int HdfNfcInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfNfcInterfaceDriverBind enter");
 
-    auto *hdfNfcInterfaceHost = new (std::nothrow) HdfNfcInterfaceHost));
+    auto *hdfNfcInterfaceHost = new (std::nothrow) HdfNfcInterfaceHost;
     if (hdfNfcInterfaceHost == nullptr) {
-        HDF_LOGE("%{public}s: falied to create HdfNfcInterfaceDriverBind Object!");
+        HDF_LOGE("%{public}s: falied to create HdfNfcInterfaceDriverBind Object!", __func__);
         return HDF_FAILURE;
     }
 
@@ -73,14 +73,15 @@ static int HdfNfcInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
     auto serviceImpl = INfcInterface::Get(true);
     if (serviceImpl == nullptr) {
-        HDF_LOGE(COMP_HDI, "%{public}s: failed to get of implement service", __func__);
+        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         return HDF_FAILURE;
     }
 
     hdfNfcInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
         INfcInterface::GetDescriptor());
     if (hdfNfcInterfaceHost->stub == nullptr) {
-        HDF_LOGE(COMP_HDI, "%{public}s: failed to get stub object", __func__);
+        HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        delete hdfNfcInterfaceHost;
         return HDF_FAILURE;
     }
 

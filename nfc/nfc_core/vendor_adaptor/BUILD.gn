@@ -10,15 +10,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-group("nfc_entry") {
-  deps = [
-    "hdi_service:hdi_nfc_service",
-    "vendor_adaptor:nfc_vendor_adaptor",
-    "//drivers/interface/nfc/nfc_core/v1_0:nfc",
-    "//third_party/nfc-nci/nfc-halimpl/SN100x:libnfc-halimpl",
+ohos_shared_library("nfc_vendor_adaptor") {
+  include_dirs = [
+    "//drivers/peripheral/nfc/nfc_core/vendor_adaptor",
+    "//third_party/nfc-nci/nfc-halimpl/SN100x/halimpl/inc",
   ]
+  sources = [ "nfc_vendor_adaptions.cpp" ]
+
+  public_deps = [ "//third_party/nfc-nci/nfc-halimpl/SN100x:libnfc-halimpl" ]
+
+  cflags = []
+
+  external_deps = [
+    "device_driver_framework:libhdf_ipc_adapter",
+    "device_driver_framework:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "utils_base:utils",
+  ]
+
+  subsystem_name = "hdf"
+  part_name = "nfc_device_driver"
 }

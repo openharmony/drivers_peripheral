@@ -23,7 +23,7 @@
       },
       "build": {
         "sub_component": [
-          "//drivers/peripheral/nfc/nfc_core/hdi_service:libnfc_core_interface_service_1.0",
+          "//drivers/peripheral/nfc/nfc_core:nfc_entry",
           "//third_party/nfc-nci/nfc-halimpl/SN100x:libnfc-halimpl"
         ]
       }
