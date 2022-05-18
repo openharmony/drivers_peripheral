@@ -13,35 +13,40 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libnfc_core_interface_service_1.0") {
-  include_dirs = [ "//drivers/peripheral/nfc/nfc_core/hdi_service" ]
+ohos_shared_library("libnfc_interface_service_1.0") {
+  include_dirs = [
+    "//drivers/peripheral/nfc/nfc_core/hdi_service",
+    "//drivers/peripheral/nfc/nfc_core/vendor_adaptor",
+    "//third_party/nfc-nci/nfc-halimpl/SN100x/halimpl/inc",
+  ]
   sources = [ "nfc_impl.cpp" ]
 
-  public_deps = [ "//drivers/interface/nfc/nfc_core/v1_0:libnfc_stub_1.0" ]
+  public_deps = [
+    "//drivers/interface/nfc/nfc_core/v1_0:libnfc_stub_1.0",
+    "//drivers/peripheral/nfc/nfc_core/vendor_adaptor:nfc_vendor_adaptor",
+    "//third_party/nfc-nci/nfc-halimpl/SN100x:libnfc-halimpl",
+  ]
 
   cflags = []
 
-  if (is_standard_system) {
-    external_deps = [
-      "device_driver_framework:libhdf_ipc_adapter",
-      "device_driver_framework:libhdf_utils",
-      "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_single",
-      "utils_base:utils",
-    ]
-  } else {
-    external_deps = [
-      "hilog:libhilog",
-      "ipc:ipc_single",
-    ]
-  }
+  external_deps = [
+    "device_driver_framework:libhdf_ipc_adapter",
+    "device_driver_framework:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "utils_base:utils",
+  ]
 
   subsystem_name = "hdf"
   part_name = "nfc_device_driver"
 }
 
 ohos_shared_library("nfc_hdi_driver") {
-  include_dirs = [ "//drivers/peripheral/nfc/nfc_core/hdi_service" ]
+  include_dirs = [
+    "//drivers/peripheral/nfc/nfc_core/hdi_service",
+    "//drivers/peripheral/nfc/nfc_core/vendor_adaptor",
+    "//third_party/nfc-nci/nfc-halimpl/SN100x/halimpl/inc",
+  ]
 
   sources = [ "nfc_interface_driver.cpp" ]
 
@@ -49,20 +54,13 @@ ohos_shared_library("nfc_hdi_driver") {
 
   cflags = []
 
-  if (is_standard_system) {
-    external_deps = [
-      "device_driver_framework:libhdf_ipc_adapter",
-      "device_driver_framework:libhdf_utils",
-      "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_single",
-      "utils_base:utils",
-    ]
-  } else {
-    external_deps = [
-      "hilog:libhilog",
-      "ipc:ipc_single",
-    ]
-  }
+  external_deps = [
+    "device_driver_framework:libhdf_ipc_adapter",
+    "device_driver_framework:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "utils_base:utils",
+  ]
 
   subsystem_name = "hdf"
   part_name = "nfc_device_driver"
@@ -70,7 +68,7 @@ ohos_shared_library("nfc_hdi_driver") {
 
 group("hdi_nfc_service") {
   deps = [
-    ":libnfc_core_interface_service_1.0",
+    ":libnfc_interface_service_1.0",
     ":nfc_hdi_driver",
   ]
 }

@@ -16,6 +16,7 @@
 #ifndef OHOS_HDI_NFC_NFC_CORE_V1_0_NFCIMPL_H
 #define OHOS_HDI_NFC_NFC_CORE_V1_0_NFCIMPL_H
 
+#include "nfc_vendor_adaptions.h"
 #include "v1_0/infc_interface.h"
 
 namespace OHOS {
@@ -27,13 +28,15 @@ class NfcImpl : public INfcInterface {
 public:
     virtual ~NfcImpl() {}
     int32_t Open(const sptr<INfcCallback> &callbackObj, NfcStatus &status) override;
-    int32_t CoreInitialized(const sptr<INfcCallback> &callbackObj, NfcStatus &status) override;
+    int32_t CoreInitialized(const std::vector<uint8_t> &data, NfcStatus &status) override;
     int32_t Prediscover(NfcStatus &status) override;
     int32_t Write(const std::vector<uint8_t> &data, NfcStatus &status) override;
     int32_t ControlGranted(NfcStatus &status) override;
     int32_t PowerCycle(NfcStatus &status) override;
     int32_t Close(NfcStatus &status) override;
     int32_t Ioctl(NfcCommand cmd, const std::vector<uint8_t> &data, NfcStatus &status) override;
+private:
+    NfcVendorAdaptions adaptor_;
 };
 } // V1_0
 } // NfcCore
