@@ -275,7 +275,8 @@ HWTEST_F(WifiHalTest, WifiHalSetMacAddress001, TestSize.Level1)
     EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)apFeature, mac, ETH_ADDR_LEN);
     printf("%s: ret = %d\n", __func__, ret);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -300,7 +301,8 @@ HWTEST_F(WifiHalTest, WifiHalSetMacAddress002, TestSize.Level1)
     EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)staFeature, mac, ETH_ADDR_LEN);
     printf("%s: ret = %d\n", __func__, ret);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -371,7 +373,8 @@ HWTEST_F(WifiHalTest, WifiHalGetIfNamesByChipId001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_NE(nullptr, staFeature);
     ret = staFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)staFeature, &chipId);
-    ASSERT_TRUE(chipId <= WLAN_MAX_CHIPID && chipId >= WLAN_MIN_CHIPID);
+    bool flag = (chipId <= WLAN_MAX_CHIPID && chipId >= WLAN_MIN_CHIPID);
+    ASSERT_TRUE(flag);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = staFeature->baseFeature.getIfNamesByChipId(chipId, nullptr, nullptr);
     EXPECT_NE(HDF_SUCCESS, ret);
@@ -449,7 +452,8 @@ HWTEST_F(WifiHalTest, GetPowerMode001, TestSize.Level1)
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = g_wifi->getPowerMode(apFeature->baseFeature.ifName, &mode);
     printf("%s: ret = %d\n", __func__, ret);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
 }
@@ -481,7 +485,8 @@ HWTEST_F(WifiHalTest, GetPowerMode002, TestSize.Level1)
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = g_wifi->getPowerMode(staFeature->baseFeature.ifName, &mode);
     printf("%s: ret = %d\n", __func__, ret);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
 }
@@ -533,7 +538,8 @@ HWTEST_F(WifiHalTest, SetPowerMode002, TestSize.Level1)
     ret = g_wifi->setPowerMode(ifName, WIFI_POWER_MODE_SLEEPING);
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = g_wifi->setPowerMode(apFeature->baseFeature.ifName, WIFI_POWER_MODE_SLEEPING);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
 }
@@ -559,7 +565,8 @@ HWTEST_F(WifiHalTest, SetPowerMode003, TestSize.Level1)
     ret = g_wifi->setPowerMode(ifName, WIFI_POWER_MODE_GENERAL);
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = g_wifi->setPowerMode(apFeature->baseFeature.ifName, WIFI_POWER_MODE_GENERAL);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
 }
@@ -585,7 +592,8 @@ HWTEST_F(WifiHalTest, SetPowerMode004, TestSize.Level1)
     ret = g_wifi->setPowerMode(ifName, WIFI_POWER_MODE_THROUGH_WALL);
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = g_wifi->setPowerMode(apFeature->baseFeature.ifName, WIFI_POWER_MODE_THROUGH_WALL);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
 }
@@ -637,7 +645,8 @@ HWTEST_F(WifiHalTest, SetPowerMode006, TestSize.Level1)
     ret = g_wifi->setPowerMode(ifName, WIFI_POWER_MODE_SLEEPING);
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = g_wifi->setPowerMode(staFeature->baseFeature.ifName, WIFI_POWER_MODE_SLEEPING);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
 }
@@ -663,7 +672,8 @@ HWTEST_F(WifiHalTest, SetPowerMode007, TestSize.Level1)
     ret = g_wifi->setPowerMode(ifName, WIFI_POWER_MODE_GENERAL);
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = g_wifi->setPowerMode(staFeature->baseFeature.ifName, WIFI_POWER_MODE_GENERAL);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
 }
@@ -689,7 +699,8 @@ HWTEST_F(WifiHalTest, SetPowerMode008, TestSize.Level1)
     ret = g_wifi->setPowerMode(ifName, WIFI_POWER_MODE_THROUGH_WALL);
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = g_wifi->setPowerMode(staFeature->baseFeature.ifName, WIFI_POWER_MODE_THROUGH_WALL);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
 }
