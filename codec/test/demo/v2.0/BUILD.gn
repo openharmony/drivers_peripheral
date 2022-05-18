@@ -24,11 +24,13 @@ ohos_executable("codec_hdi_omx_decode") {
     "//drivers/peripheral/codec/hal/config/common/include",
     "//utils/native/base/include",
     "//third_party/openmax/api/1.1.2",
+    "//drivers/peripheral/display/hdi_service/gralloc/include",
   ]
 
-  cflags_cc = [ "-DRK" ]
-
-  sources = [ "src/codec_hdi_decode.cpp" ]
+  sources = [
+    "src/codec_hdi_decode.cpp",
+    "src/command_parse.cpp",
+  ]
 
   deps = [
     "//drivers/adapter/uhdf2/hdi:libhdi",
@@ -42,7 +44,11 @@ ohos_executable("codec_hdi_omx_decode") {
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "display_device_driver:hdi_gralloc_client",
+      "graphic_chipsetsdk:buffer_handle",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -63,11 +69,13 @@ ohos_executable("codec_hdi_omx_encode") {
     "//drivers/peripheral/codec/hal/config/common/include",
     "//utils/native/base/include",
     "//third_party/openmax/api/1.1.2",
+    "//drivers/peripheral/display/hdi_service/gralloc/include",
   ]
 
-  cflags_cc = [ "-DRK" ]
-
-  sources = [ "src/codec_hdi_encode.cpp" ]
+  sources = [
+    "src/codec_hdi_encode.cpp",
+    "src/command_parse.cpp",
+  ]
 
   deps = [
     "//drivers/adapter/uhdf2/hdi:libhdi",
@@ -81,7 +89,11 @@ ohos_executable("codec_hdi_omx_encode") {
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "display_device_driver:hdi_gralloc_client",
+      "graphic_chipsetsdk:buffer_handle",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
