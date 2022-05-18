@@ -32,8 +32,18 @@ static int32_t FaceAuthInterfaceDriverDispatch(struct HdfDeviceIoClient *client,
     struct HdfSBuf *reply)
 {
     IAM_LOGI("start");
+    if (client == nullptr || data == nullptr || reply == nullptr || client->device == nullptr ||
+        client->device->service == nullptr) {
+        IAM_LOGE("invalid param");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
     auto *hdfFaceAuthInterfaceHost = CONTAINER_OF(client->device->service,
         struct HdfFaceAuthInterfaceHost, ioService);
+    if (hdfFaceAuthInterfaceHost == nullptr || hdfFaceAuthInterfaceHost->stub == nullptr) {
+        IAM_LOGE("hdfFaceAuthInterfaceHost is invalid");
+        return HDF_ERR_INVALID_PARAM;
+    }
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
@@ -60,6 +70,10 @@ static int HdfFaceAuthInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 static int HdfFaceAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
     IAM_LOGI("start");
+    if (deviceObject == nullptr) {
+        IAM_LOGE("deviceObject is nullptr");
+        return HDF_ERR_INVALID_PARAM;
+    }
     auto *hdfFaceAuthInterfaceHost = new (std::nothrow) HdfFaceAuthInterfaceHost;
     if (hdfFaceAuthInterfaceHost == nullptr) {
         IAM_LOGE("%{public}s: failed to create create HdfFaceAuthInterfaceHost object", __func__);
@@ -73,6 +87,7 @@ static int HdfFaceAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     auto serviceImpl = IFaceAuthInterface::Get(true);
     if (serviceImpl == nullptr) {
         IAM_LOGE("%{public}s: failed to get of implement service", __func__);
+        delete hdfFaceAuthInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -80,6 +95,7 @@ static int HdfFaceAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
         IFaceAuthInterface::GetDescriptor());
     if (hdfFaceAuthInterfaceHost->stub == nullptr) {
         IAM_LOGE("%{public}s: failed to get stub object", __func__);
+        delete hdfFaceAuthInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -91,8 +107,16 @@ static int HdfFaceAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfFaceAuthInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     IAM_LOGI("start");
+    if (deviceObject == nullptr || deviceObject->service == nullptr) {
+        IAM_LOGE("deviceObject is invalid");
+        return;
+    }
     auto *hdfFaceAuthInterfaceHost = CONTAINER_OF(deviceObject->service,
         struct HdfFaceAuthInterfaceHost, ioService);
+    if (hdfFaceAuthInterfaceHost == nullptr) {
+        IAM_LOGE("hdfFaceAuthInterfaceHost is nullptr");
+        return;
+    }
     delete hdfFaceAuthInterfaceHost;
     IAM_LOGI("success");
 }
