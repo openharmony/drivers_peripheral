@@ -253,7 +253,8 @@ HWTEST_F(HdfWifiServiceCTest, SetMacAddressTest_008, TestSize.Level1)
     int32_t rc = g_wlanObj->createFeature(g_wlanObj, wlan_type, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->setMacAddress(g_wlanObj, (struct WlanFeatureInfo *)ifeature, mac, ETH_ADDR_LEN);
-    ASSERT_TRUE(rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
     rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
@@ -404,7 +405,8 @@ HWTEST_F(HdfWifiServiceCTest, GetPowerModeTest_015, TestSize.Level1)
     int32_t rc = g_wlanObj->createFeature(g_wlanObj, PROTOCOL_80211_IFTYPE_AP, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->getPowerMode(g_wlanObj, (struct WlanFeatureInfo *)ifeature, &mode);
-    ASSERT_TRUE(rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
     printf("mode = 0x%02x\n", mode);
     rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
@@ -424,7 +426,8 @@ HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_016, TestSize.Level1)
     int32_t rc = g_wlanObj->createFeature(g_wlanObj, PROTOCOL_80211_IFTYPE_AP, (struct WlanFeatureInfo **)&ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->setPowerMode(g_wlanObj, (struct WlanFeatureInfo *)ifeature, mode);
-    ASSERT_TRUE(rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
     rc = g_wlanObj->destroyFeature(g_wlanObj, (struct WlanFeatureInfo *)ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
