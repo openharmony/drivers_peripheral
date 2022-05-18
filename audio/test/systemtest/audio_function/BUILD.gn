@@ -32,7 +32,10 @@ group("function") {
     ]
   } else {
     if (enable_audio_adm_so || enable_audio_adm_service) {
-      deps += [ "audio_smartpa:hdf_audio_smartpa_test" ]
+      deps += [
+        "audio_smartpa:hdf_audio_smartpa_test",
+        "audio_threshold_report:hdf_audio_threshold_report_test",
+      ]
     }
     if (enable_audio_adm_so) {
       deps += [ "audio_pathroute:hdf_audio_hdi_path_route_test" ]
