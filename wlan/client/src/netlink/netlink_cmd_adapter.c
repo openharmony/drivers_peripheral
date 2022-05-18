@@ -179,7 +179,7 @@ static int32_t CmdSocketAckHandler(struct nl_msg *msg, void *arg)
     return NL_STOP;
 }
 
-int32_t SendCmdSync(struct nl_msg *msg, const RespHandler handler, void *data)
+int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *data)
 {
     int32_t rc;
     int32_t error;
@@ -295,7 +295,7 @@ static int GetMulticastId(const char *family, const char *group)
         return RET_CODE_FAILURE;
     }
 
-    ret = SendCmdSync(msg, FamilyIdHandler, &familyData);
+    ret = NetlinkSendCmdSync(msg, FamilyIdHandler, &familyData);
     if (ret == 0) {
         ret = familyData.id;
     }
@@ -728,7 +728,7 @@ int32_t IsSupportCombo(uint8_t *isSupportCombo)
     genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_DUMP, NL80211_CMD_GET_WIPHY, 0);
     nla_put_flag(msg, NL80211_ATTR_SPLIT_WIPHY_DUMP);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
-    ret = SendCmdSync(msg, ParserIsSupportCombo, isSupportCombo);
+    ret = NetlinkSendCmdSync(msg, ParserIsSupportCombo, isSupportCombo);
     if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed", __FUNCTION__);
         nlmsg_free(msg);
@@ -767,7 +767,7 @@ int32_t GetComboInfo(uint64_t *comboInfo, uint32_t size)
     genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_DUMP, NL80211_CMD_GET_WIPHY, 0);
     nla_put_flag(msg, NL80211_ATTR_SPLIT_WIPHY_DUMP);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
-    ret = SendCmdSync(msg, ParserSupportComboInfo, comboInfo);
+    ret = NetlinkSendCmdSync(msg, ParserSupportComboInfo, comboInfo);
     if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed", __FUNCTION__);
         nlmsg_free(msg);
@@ -889,7 +889,7 @@ int32_t GetValidFreqByBand(const char *ifName, int32_t band, struct FreqInfoResu
     }
     result->nums = 0;
     result->band = band;
-    ret = SendCmdSync(msg, ParserValidFreq, result);
+    ret = NetlinkSendCmdSync(msg, ParserValidFreq, result);
     if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed", __FUNCTION__);
         nlmsg_free(msg);
@@ -921,7 +921,7 @@ int32_t SetTxPower(const char *ifName, int32_t power)
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
     nla_put_u32(msg, NL80211_ATTR_WIPHY_TX_POWER_SETTING, NL80211_TX_POWER_LIMITED);
     nla_put_u32(msg, NL80211_ATTR_WIPHY_TX_POWER_LEVEL, 100 * power);
-    ret = SendCmdSync(msg, NULL, NULL);
+    ret = NetlinkSendCmdSync(msg, NULL, NULL);
     if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed", __FUNCTION__);
         nlmsg_free(msg);
@@ -973,7 +973,7 @@ int32_t WifiSetCountryCode(const char *ifName, const char *code, uint32_t len)
     nla_put(msg, WIFI_ATTRIBUTE_COUNTRY, len, code);
     nla_nest_end(msg, data);
 
-    ret = SendCmdSync(msg, NULL, NULL);
+    ret = NetlinkSendCmdSync(msg, NULL, NULL);
     if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed", __FUNCTION__);
     }
@@ -1009,7 +1009,7 @@ int32_t SetScanMacAddr(const char *ifName, uint8_t *scanMac, uint8_t len)
     }
     nla_put(msg, ANDR_WIFI_ATTRIBUTE_RANDOM_MAC_OUI, len, scanMac);
     nla_nest_end(msg, data);
-    ret = SendCmdSync(msg, NULL, NULL);
+    ret = NetlinkSendCmdSync(msg, NULL, NULL);
     if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed", __FUNCTION__);
     }
@@ -1044,7 +1044,7 @@ int32_t AcquireChipId(const char *ifName, uint8_t *chipId)
     nla_put_flag(msg, NL80211_ATTR_SPLIT_WIPHY_DUMP);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
 
-    ret = SendCmdSync(msg, ParserChipId, chipId);
+    ret = NetlinkSendCmdSync(msg, ParserChipId, chipId);
 
     return RET_CODE_SUCCESS;
 }
@@ -1112,9 +1112,9 @@ static uint32_t GetIftypeAndMac(struct NetDeviceInfo *info)
     genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0, NL80211_CMD_GET_INTERFACE, 0);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, if_nametoindex(info->ifName));
 
-    ret = SendCmdSync(msg, NetDeviceInfoHandler, info);
+    ret = NetlinkSendCmdSync(msg, NetDeviceInfoHandler, info);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: SendCmdSync failed.\n", __FUNCTION__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: NetlinkSendCmdSync failed.\n", __FUNCTION__);
         nlmsg_free(msg);
         return RET_CODE_FAILURE;
     }
@@ -1215,7 +1215,7 @@ int32_t WifiCmdScan(const char *ifName, WifiScan *scan)
         goto err;
     }
 
-    ret = SendCmdSync(msg, NULL, NULL);
+    ret = NetlinkSendCmdSync(msg, NULL, NULL);
     if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed\n", __FUNCTION__);
         goto err;

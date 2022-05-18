@@ -215,7 +215,7 @@ static void WifiEventScanResultProcess(const char *ifName)
 
     genlmsg_put(msg, 0, 0, g_familyId, 0, NLM_F_DUMP, NL80211_CMD_GET_SCAN, 0);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
-    ret = SendCmdSync(msg, WifiGetScanResultHandler, (void *)ifName);
+    ret = NetlinkSendCmdSync(msg, WifiGetScanResultHandler, (void *)ifName);
     if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed", __func__);
     }
