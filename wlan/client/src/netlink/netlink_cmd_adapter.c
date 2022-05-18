@@ -13,14 +13,9 @@
  * limitations under the License.
  */
 
+#include <net/if.h>
 #include <arpa/inet.h>
 #include <dirent.h>
-#include <linux/if.h>
-#include <linux/if_arp.h>
-#include <linux/netlink.h>
-#include <linux/nl80211.h>
-#include <linux/wireless.h>
-#include <net/if.h>
 #include <netlink-private/types.h>
 #include <netlink/genl/ctrl.h>
 #include <netlink/genl/genl.h>
@@ -33,6 +28,10 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <linux/if_arp.h>
+#include <linux/netlink.h>
+#include <linux/nl80211.h>
+#include <linux/wireless.h>
 
 #include "../wifi_common_cmd.h"
 #include "hilog/log.h"
@@ -789,18 +788,20 @@ int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
         HILOG_ERROR(LOG_DOMAIN, "%s: open socket failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    strncpy_s(req.ifr_name, IFNAMSIZ, ifName, strlen(ifName));
     req.ifr_addr.sa_family = ARPHRD_ETHER;
     if (memcpy_s(req.ifr_hwaddr.sa_data, len, mac, len) != EOK) {
         HILOG_ERROR(LOG_DOMAIN, "%s: memcpy_s req.ifr_hwaddr.sa_data failed", __FUNCTION__);
         close(fd);
         return RET_CODE_FAILURE;
     }
-
     ret = ioctl(fd, SIOCSIFHWADDR, &req);
-    if (ret != 0) {
+    if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_DOMAIN, "%s: ioctl failed, errno = %d, (%s)\n", __FUNCTION__, errno, strerror(errno));
-        ret = RET_CODE_FAILURE;
+        if (errno == EPERM) {
+            ret = RET_CODE_NOT_SUPPORT;
+        } else {
+            ret = RET_CODE_FAILURE;
+        }
     }
     close(fd);
     return ret;
@@ -1228,7 +1229,7 @@ err:
 
 static int32_t ParsePowerMode(const char *buf, uint16_t len, uint8_t *mode)
 {
-    char *key[WIFI_POWER_MODE_NUM] = {"sleep", "third", "init"};
+    char *key[WIFI_POWER_MODE_NUM] = {"sleep\n", "third\n", "init\n"};
     char *str = "pow_mode = ";
     if (buf == NULL || mode == NULL) {
         return RET_CODE_INVALID_PARAM;
@@ -1239,11 +1240,11 @@ static int32_t ParsePowerMode(const char *buf, uint16_t len, uint8_t *mode)
         return RET_CODE_FAILURE;
     }
     pos += strlen(str);
-    if (!strcmp(pos, key[WIFI_POWER_MODE_SLEEPING])) {
+    if (!strncmp(pos, key[WIFI_POWER_MODE_SLEEPING], strlen(key[WIFI_POWER_MODE_SLEEPING]))) {
         *mode = WIFI_POWER_MODE_SLEEPING;
-    } else if (!strcmp(pos, key[WIFI_POWER_MODE_GENERAL])) {
+    } else if (!strncmp(pos, key[WIFI_POWER_MODE_GENERAL], strlen(key[WIFI_POWER_MODE_GENERAL]))) {
         *mode = WIFI_POWER_MODE_GENERAL;
-    } else if (!strcmp(pos, key[WIFI_POWER_MODE_THROUGH_WALL])) {
+    } else if (!strncmp(pos, key[WIFI_POWER_MODE_THROUGH_WALL], strlen(key[WIFI_POWER_MODE_THROUGH_WALL]))) {
         *mode = WIFI_POWER_MODE_THROUGH_WALL;
     } else {
         HILOG_ERROR(LOG_DOMAIN, "%s: no invalid power mode", __FUNCTION__);
@@ -1284,7 +1285,11 @@ int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode)
         ret = ioctl(fd, PRIMARY_ID_POWER_MODE, &ioctlData);
         if (ret != RET_CODE_SUCCESS) {
             HILOG_ERROR(LOG_DOMAIN, "%s: ioctl failed, errno = %d, (%s)\n", __FUNCTION__, errno, strerror(errno));
-            ret = RET_CODE_FAILURE;
+            if (errno == EOPNOTSUPP) {
+                ret = RET_CODE_NOT_SUPPORT;
+            } else {
+                ret = RET_CODE_FAILURE;
+            }
             break;
         }
         ret = ParsePowerMode(ioctlData.data.point.buf, ioctlData.data.point.length, mode);
@@ -1347,7 +1352,11 @@ int32_t SetPowerMode(const char *ifName, uint8_t mode)
         ret = ioctl(fd, PRIMARY_ID_POWER_MODE, &ioctlData);
         if (ret != RET_CODE_SUCCESS) {
             HILOG_ERROR(LOG_DOMAIN, "%s: ioctl failed, errno = %d, (%s)\n", __FUNCTION__, errno, strerror(errno));
-            ret = RET_CODE_FAILURE;
+            if (errno == EOPNOTSUPP) {
+                ret = RET_CODE_NOT_SUPPORT;
+            } else {
+                ret = RET_CODE_FAILURE;
+            }
         }
     } while (0);
 
