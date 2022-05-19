@@ -225,49 +225,7 @@ void BatteryThread::UeventCallback(void* service)
     if (!IsPowerSupplyEvent(msg)) {
         return;
     }
-    UpdateBatteryInfo(service, msg);
-}
-
-void BatteryThread::UpdateBatteryInfo(void* service, char* msg)
-{
-    BatteryInfo event = {};
-    std::unique_ptr<BatterydInfo> batteryInfo = std::make_unique<BatterydInfo>();
-    if (batteryInfo == nullptr) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "make_unique BatterydInfo error");
-        return;
-    }
-
-    provider_->ParseUeventToBatterydInfo(msg, batteryInfo.get());
-    event.capacity = batteryInfo->capacity_;
-    event.voltage= batteryInfo->voltage_;
-    event.temperature = batteryInfo->temperature_;
-    event.healthState = batteryInfo->healthState_;
-    event.pluggedType = batteryInfo->pluggedType_;
-    event.pluggedMaxCurrent = batteryInfo->pluggedMaxCurrent_;
-    event.pluggedMaxVoltage = batteryInfo->pluggedMaxVoltage_;
-    event.chargeState = batteryInfo->chargeState_;
-    event.chargeCounter = batteryInfo->chargeCounter_;
-    event.present = batteryInfo->present_;
-    event.technology = batteryInfo->technology_;
-    event.curNow = batteryInfo->curNow_;
-    event.remainEnergy = batteryInfo->remainEnergy_;
-    event.totalEnergy = batteryInfo->totalEnergy_;
-
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "BatteryInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
-        "healthState=%{public}d, pluggedType=%{public}d, pluggedMaxCurrent=%{public}d, " \
-        "pluggedMaxVoltage=%{public}d, chargeState=%{public}d, chargeCounter=%{public}d, present=%{public}d, " \
-        "technology=%{public}s, curNow=%{public}d, remainEnergy=%{public}d, totalEnergy=%{public}d",
-        batteryInfo->capacity_, batteryInfo->voltage_,
-        batteryInfo->temperature_, batteryInfo->healthState_, batteryInfo->pluggedType_,
-        batteryInfo->pluggedMaxCurrent_, batteryInfo->pluggedMaxVoltage_, batteryInfo->chargeState_,
-        batteryInfo->chargeCounter_, batteryInfo->present_, batteryInfo->technology_.c_str(),
-        batteryInfo->curNow_, batteryInfo->remainEnergy_, batteryInfo->totalEnergy_);
-
-    if (g_callback != nullptr) {
-        g_callback->Update(event);
-    } else {
-        BATTERY_HILOGW(FEATURE_BATT_INFO, "g_callback is nullptr");
-    }
+    UpdateBatteryInfo(service);
 }
 
 void BatteryThread::UpdateBatteryInfo(void* service)
