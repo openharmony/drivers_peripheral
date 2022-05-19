@@ -49,7 +49,7 @@ namespace OHOS {
             }
         }
 
-        ret = g_inputInterface->iInputController->GetDeviceType(static_cast<uint32_t>(*data), &devType);
+        ret = g_inputInterface->iInputController->GetDeviceType(*(uint32_t *)data, &devType);
         if (!ret) {
             if (ret != INPUT_SUCCESS) {
                 HDF_LOGE("%s: open input device failed, ret %d", __func__, ret);

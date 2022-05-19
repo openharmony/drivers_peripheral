@@ -46,8 +46,8 @@ namespace OHOS {
             }
         }
         
-        if (!g_inputInterface->iInputController->SetGestureMode(static_cast<uint32_t>(*data),
-            static_cast<uint32_t>(*data))) {
+        if (!g_inputInterface->iInputController->SetGestureMode(*(uint32_t *)data,
+            *(uint32_t *)data)) {
             result = true;
         }
         return result;

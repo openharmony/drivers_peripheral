@@ -47,7 +47,7 @@ namespace OHOS {
             }
         }
 
-        ret = g_inputInterface->iInputManager->CloseInputDevice(static_cast<uint32_t>(*data));
+        ret = g_inputInterface->iInputManager->CloseInputDevice(*(uint32_t *)data);
         if (!ret) {
             result = true;
         }

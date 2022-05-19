@@ -49,7 +49,7 @@ namespace OHOS {
             }
         }
         
-        ret = g_inputInterface->iInputController->RunExtraCommand(static_cast<uint32_t>(*data), &extraCmd);
+        ret = g_inputInterface->iInputController->RunExtraCommand(*(uint32_t *)data, &extraCmd);
         if (!ret) {
             result = true;
         }
