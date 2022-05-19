@@ -333,7 +333,7 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, struct OmxCodecBuffer &buff
         return OMX_ErrorInvalidComponent;
     }
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
-    if (buffer.bufferType == BUFFER_TYPE_AVSHARE_MEM_FD) {
+    if (buffer.bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
         err = OMX_AllocateBuffer((OMX_HANDLETYPE)comp_, &bufferHdrType, portIndex, 0, buffer.allocLen);
     } else {
         err = OMX_UseBuffer((OMX_HANDLETYPE)comp_, &bufferHdrType, portIndex, 0, buffer.allocLen,

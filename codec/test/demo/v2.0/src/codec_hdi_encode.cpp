@@ -189,7 +189,7 @@ int32_t CodecHdiEncode::CheckAndUseBufferHandle()
     UseBufferType type;
     InitParamInOhos(type);
     type.portIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
-    type.bufferType = BUFFER_TYPE_DYNAMIC_HANDLE;
+    type.bufferType = CODEC_BUFFER_TYPE_DYNAMIC_HANDLE;
     err = client_->SetParameter(client_, OMX_IndexParamUseBufferType, (int8_t *)&type, sizeof(type));
     HDF_LOGI("OMX_SetParameter:OMX_IndexParamUseBufferType:PORT_INDEX_INPUT, err [%{public}x]", err);
     return err;
@@ -311,7 +311,7 @@ int32_t CodecHdiEncode::UseBufferOnPort(PortIndex portIndex, int bufferCount, in
         auto omxBuffer = std::make_shared<OmxCodecBuffer>();
         omxBuffer->size = sizeof(OmxCodecBuffer);
         omxBuffer->version.s.nVersionMajor = 1;
-        omxBuffer->bufferType = BUFFER_TYPE_AVSHARE_MEM_FD;
+        omxBuffer->bufferType = CODEC_BUFFER_TYPE_AVSHARE_MEM_FD;
         int fd = AshmemCreate(0, bufferSize);
         shared_ptr<Ashmem> spSharedMem = make_shared<Ashmem>(fd, bufferSize);
         omxBuffer->bufferLen = FD_SIZE;
@@ -363,7 +363,7 @@ int32_t CodecHdiEncode::UseDynaBuffer(int bufferCount, int bufferSize)
         auto omxBuffer = std::make_shared<OmxCodecBuffer>();
         omxBuffer->size = sizeof(OmxCodecBuffer);
         omxBuffer->version.s.nVersionMajor = 1;
-        omxBuffer->bufferType = BUFFER_TYPE_DYNAMIC_HANDLE;
+        omxBuffer->bufferType = CODEC_BUFFER_TYPE_DYNAMIC_HANDLE;
         omxBuffer->bufferLen = 0;
         omxBuffer->buffer = nullptr;
         omxBuffer->allocLen = bufferSize;

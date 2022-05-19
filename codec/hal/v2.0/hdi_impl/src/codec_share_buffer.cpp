@@ -69,7 +69,7 @@ OHOS::sptr<ICodecBuffer> CodecShareBuffer::Create(struct OmxCodecBuffer &codecBu
 
 OHOS::sptr<ICodecBuffer> CodecShareBuffer::Allocate(struct OmxCodecBuffer &codecBuffer)
 {
-    codecBuffer.bufferType = BUFFER_TYPE_AVSHARE_MEM_FD;
+    codecBuffer.bufferType = CODEC_BUFFER_TYPE_AVSHARE_MEM_FD;
     // create shared memory
     int sharedFD = AshmemCreate(nullptr, codecBuffer.allocLen);
 

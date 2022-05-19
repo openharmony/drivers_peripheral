@@ -178,13 +178,14 @@ static bool CodecBufferMarshalling(struct HdfSBuf *data, const struct OmxCodecBu
         return false;
     }
 
-    if (dataBlock->bufferType == BUFFER_TYPE_AVSHARE_MEM_FD) {
+    if (dataBlock->bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
         int fd = (int)dataBlock->buffer;
         if (!HdfSbufWriteFileDescriptor(data, fd)) {
             HDF_LOGE("%{public}s: write fd failed!", __func__);
             return false;
         }
-    } else if (dataBlock->bufferType == BUFFER_TYPE_HANDLE || dataBlock->bufferType == BUFFER_TYPE_DYNAMIC_HANDLE) {
+    } else if (dataBlock->bufferType == CODEC_BUFFER_TYPE_HANDLE
+        || dataBlock->bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE) {
         BufferHandle *handle = (BufferHandle *)dataBlock->buffer;
         if (!BufferHandleMarshalling(data, handle)) {
             HDF_LOGE("%{public}s: write handle failed!", __func__);
@@ -249,10 +250,6 @@ bool OmxCodecBufferBlockMarshalling(struct HdfSBuf *data, const struct OmxCodecB
 
 static bool CodecBufferUnmarshalling(struct HdfSBuf *data, struct OmxCodecBuffer *dataBlock)
 {
-    if (dataBlock == NULL) {
-        HDF_LOGE("%{public}s: dataBlock is NULL!", __func__);
-        return false;
-    }
     if (!HdfSbufReadInt32(data, (int32_t *)&dataBlock->bufferType)) {
         HDF_LOGE("%{public}s: read dataBlock->bufferType failed!", __func__);
         return false;
@@ -268,14 +265,15 @@ static bool CodecBufferUnmarshalling(struct HdfSBuf *data, struct OmxCodecBuffer
         dataBlock->buffer = NULL;
         return true;
     }
-    if (dataBlock->bufferType == BUFFER_TYPE_AVSHARE_MEM_FD) {
+    if (dataBlock->bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
         int fd = HdfSbufReadFileDescriptor(data);
         if (fd < 0) {
             HDF_LOGE("%{public}s: read fd failed!", __func__);
             return false;
         }
         dataBlock->buffer = (uint8_t *)(unsigned long)fd;
-    } else if (dataBlock->bufferType == BUFFER_TYPE_HANDLE || dataBlock->bufferType == BUFFER_TYPE_DYNAMIC_HANDLE) {
+    } else if (dataBlock->bufferType == CODEC_BUFFER_TYPE_HANDLE
+        || dataBlock->bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE) {
         BufferHandle *handle = NULL;
         if (!BufferHandleUnmarshalling(data, &handle)) {
             HDF_LOGE("%{public}s: read bufferhandle failed!", __func__);
@@ -316,9 +314,10 @@ void ReleaseOmxCodecBuffer(struct OmxCodecBuffer *codecBuffer)
         return;
     }
 
-    if (codecBuffer->bufferType == BUFFER_TYPE_DYNAMIC_HANDLE || codecBuffer->bufferType == BUFFER_TYPE_HANDLE) {
+    if (codecBuffer->bufferType == CODEC_BUFFER_TYPE_DYNAMIC_HANDLE
+        || codecBuffer->bufferType == CODEC_BUFFER_TYPE_HANDLE) {
         FreeBufferHandle((BufferHandle *)codecBuffer->buffer);
-    } else if (codecBuffer->bufferType != BUFFER_TYPE_AVSHARE_MEM_FD) {
+    } else if (codecBuffer->bufferType != CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
         OsalMemFree(codecBuffer->buffer);
     }
     codecBuffer->buffer = NULL;
