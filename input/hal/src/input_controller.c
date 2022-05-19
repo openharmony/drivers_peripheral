@@ -69,13 +69,13 @@ static bool ReadStrBuf(struct HdfSBuf *reply, void *buf, uint32_t length)
 static bool ReadAttrBuf(struct HdfSBuf *data, void *attr)
 {
     uint32_t len = 0;
-    DevAttr *tmpAttr = NULL;
+    InputDevAttr *tmpAttr = NULL;
 
     if (!HdfSbufReadBuffer(data, (const void **)&tmpAttr, &len)) {
         HDF_LOGE("%s: HdfSbufReadBuffer failed, line: %d", __func__, __LINE__);
         return false;
     }
-    if (memcpy_s(attr, sizeof(DevAttr), tmpAttr, sizeof(DevAttr)) != EOK) {
+    if (memcpy_s(attr, sizeof(InputDevAttr), tmpAttr, sizeof(InputDevAttr)) != EOK) {
         HDF_LOGE("%s: memcpy_s failed, line: %d", __func__, __LINE__);
         return false;
     }
@@ -85,13 +85,13 @@ static bool ReadAttrBuf(struct HdfSBuf *data, void *attr)
 static bool ReadAbilityBuf(struct HdfSBuf *data, void *ability)
 {
     uint32_t len = 0;
-    DevAbility *tmpAbility = NULL;
+    InputDevAbility *tmpAbility = NULL;
 
     if (!HdfSbufReadBuffer(data, (const void **)&tmpAbility, &len)) {
         HDF_LOGE("%s: HdfSbufReadBuffer failed, line: %d", __func__, __LINE__);
         return false;
     }
-    if (memcpy_s(ability, sizeof(DevAbility), tmpAbility, sizeof(DevAbility)) != EOK) {
+    if (memcpy_s(ability, sizeof(InputDevAbility), tmpAbility, sizeof(InputDevAbility)) != EOK) {
         HDF_LOGE("%s: memcpy_s failed, line: %d", __func__, __LINE__);
         return false;
     }
@@ -477,7 +477,7 @@ static int32_t RunExtraCommand(uint32_t devIndex, InputExtraCmd *cmdInfo)
     return INPUT_FAILURE;
 }
 
-static int32_t GetDeviceAbility(uint32_t devIndex, DevAbility *ability)
+static int32_t GetDeviceAbility(uint32_t devIndex, InputDevAbility *ability)
 {
     DeviceInfoNode *pos = NULL;
     DeviceInfoNode *next = NULL;
@@ -494,13 +494,13 @@ static int32_t GetDeviceAbility(uint32_t devIndex, DevAbility *ability)
         if (pos->payload.devIndex != devIndex) {
             continue;
         }
-        if (IoServiceOps(pos->service, GET_DEV_ABILITY, NULL, ability, sizeof(DevAbility))) {
+        if (IoServiceOps(pos->service, GET_DEV_ABILITY, NULL, ability, sizeof(InputDevAbility))) {
             pthread_mutex_unlock(&manager->mutex);
             HDF_LOGE("%s: get dev ability failed", __func__);
             return INPUT_FAILURE;
         }
 
-        if (memcpy_s(&pos->payload.abilitySet, sizeof(DevAbility), ability, sizeof(DevAbility)) != EOK) {
+        if (memcpy_s(&pos->payload.abilitySet, sizeof(InputDevAbility), ability, sizeof(InputDevAbility)) != EOK) {
             HDF_LOGE("%s: memcpy_s failed in getting ability, line: %d", __func__, __LINE__);
             pthread_mutex_unlock(&manager->mutex);
             return INPUT_FAILURE;
@@ -523,7 +523,7 @@ static int32_t UpdateAbilityInfo(uint32_t devIndex)
     return INPUT_SUCCESS;
 }
 
-static int32_t GetDeviceAttr(uint32_t devIndex, DevAttr *attr)
+static int32_t GetDeviceAttr(uint32_t devIndex, InputDevAttr *attr)
 {
     DeviceInfoNode *pos = NULL;
     DeviceInfoNode *next = NULL;
@@ -540,13 +540,13 @@ static int32_t GetDeviceAttr(uint32_t devIndex, DevAttr *attr)
             continue;
         }
 
-        if (IoServiceOps(pos->service, GET_DEV_ATTR, NULL, attr, sizeof(DevAttr))) {
+        if (IoServiceOps(pos->service, GET_DEV_ATTR, NULL, attr, sizeof(InputDevAttr))) {
             pthread_mutex_unlock(&manager->mutex);
             HDF_LOGE("%s: get dev attr failed", __func__);
             return INPUT_FAILURE;
         }
 
-        if (memcpy_s(&pos->payload.attrSet, sizeof(DevAttr), attr, sizeof(DevAttr)) != EOK) {
+        if (memcpy_s(&pos->payload.attrSet, sizeof(InputDevAttr), attr, sizeof(InputDevAttr)) != EOK) {
             HDF_LOGE("%s: memcpy_s failed in getting attr", __func__);
             pthread_mutex_unlock(&manager->mutex);
             return INPUT_FAILURE;

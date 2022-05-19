@@ -33,10 +33,10 @@ InputEventCb g_callback;
 InputHostCb g_hotplugCb;
 static bool g_hasDev = false;
 
-static void ReportHotPlugEventPkgCallback(const HotPlugEvent *msg);
-static void ReportEventPkgCallback(const EventPackage **pkgs, uint32_t count, uint32_t devIndex);
-static void CloseOnlineDev(DevDesc *sta, int32_t len);
-static void OpenOnlineDev(DevDesc *sta, int32_t len);
+static void ReportHotPlugEventPkgCallback(const InputHotPlugEvent *msg);
+static void ReportEventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex);
+static void CloseOnlineDev(InputDevDesc *sta, int32_t len);
+static void OpenOnlineDev(InputDevDesc *sta, int32_t len);
 
 class HdiInputTest : public testing::Test {
 public:
@@ -49,8 +49,8 @@ public:
 void HdiInputTest::SetUpTestCase()
 {
     int32_t ret;
-    DevDesc sta[MAX_DEVICES];
-    ret = memset_s(sta, MAX_DEVICES * sizeof(DevDesc), 0, MAX_DEVICES * sizeof(DevDesc));
+    InputDevDesc sta[MAX_DEVICES];
+    ret = memset_s(sta, MAX_DEVICES * sizeof(InputDevDesc), 0, MAX_DEVICES * sizeof(InputDevDesc));
     if (ret != 0) {
         HDF_LOGE("memset failed");
         return;
@@ -94,17 +94,17 @@ void HdiInputTest::TearDown()
     } \
 } while (0)
 
-static void ReportEventPkgCallback(const EventPackage **pkgs, uint32_t count, uint32_t devIndex)
+static void ReportEventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     if (pkgs == NULL) {
         return;
     }
     for (uint32_t i = 0; i < count; i++) {
-        printf("%s: pkgs[%d] = 0x%x, 0x%x, %d\n", __func__, i, pkgs[i]->type, pkgs[i]->code, pkgs[i]->value);
+        printf("%s: pkgs[%u] = 0x%x, 0x%x, %d\n", __func__, i, pkgs[i]->type, pkgs[i]->code, pkgs[i]->value);
     }
 }
 
-static void ReportHotPlugEventPkgCallback(const HotPlugEvent *msg)
+static void ReportHotPlugEventPkgCallback(const InputHotPlugEvent *msg)
 {
     int32_t ret;
     if (msg == NULL) {
@@ -135,7 +135,7 @@ static void ReportHotPlugEventPkgCallback(const HotPlugEvent *msg)
     }
 }
 
-static void OpenOnlineDev(DevDesc *sta, int32_t len)
+static void OpenOnlineDev(InputDevDesc *sta, int32_t len)
 {
     int32_t ret = g_inputInterface->iInputManager->ScanInputDevice(sta, len);
     if (ret) {
@@ -161,7 +161,7 @@ static void OpenOnlineDev(DevDesc *sta, int32_t len)
     }
 }
 
-static void CloseOnlineDev(DevDesc *sta, int32_t len)
+static void CloseOnlineDev(InputDevDesc *sta, int32_t len)
 {
     int32_t ret = g_inputInterface->iInputManager->ScanInputDevice(sta, len);
     if (ret) {
@@ -189,7 +189,7 @@ static void CloseOnlineDev(DevDesc *sta, int32_t len)
 
 HWTEST_F(HdiInputTest, ScanInputDevice, TestSize.Level1)
 {
-    DevDesc sta[MAX_DEVICES];
+    InputDevDesc sta[MAX_DEVICES];
 
     HDF_LOGI("%s: [Input] RegisterCallbackAndReportData001 enter", __func__);
     int32_t ret;
@@ -197,7 +197,7 @@ HWTEST_F(HdiInputTest, ScanInputDevice, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
 
-    ret  = g_inputInterface->iInputManager->ScanInputDevice(sta, sizeof(sta)/sizeof(DevDesc));
+    ret  = g_inputInterface->iInputManager->ScanInputDevice(sta, sizeof(sta)/sizeof(InputDevDesc));
     if (!ret) {
         HDF_LOGI("%s:%d, %d, %d, %d", __func__, sta[0].devType, sta[0].devIndex, sta[1].devType, sta[1].devIndex);
     }
@@ -209,7 +209,7 @@ HWTEST_F(HdiInputTest, HotPlugCallback, TestSize.Level1)
 {
     HDF_LOGI("%s: [Input] HotPlugCallback Testcase enter", __func__);
     int32_t ret = INPUT_SUCCESS;
-    DevDesc sta[MAX_DEVICES];
+    InputDevDesc sta[MAX_DEVICES];
 
     ret = memset_s(sta, sizeof(sta), 0, sizeof(sta));
     if (ret != 0) {
@@ -334,7 +334,7 @@ HWTEST_F(HdiInputTest, GetInputDevice001, TestSize.Level1)
 {
     ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] GetInputDevice001 enter", __func__);
-    DeviceInfo *dev = NULL;
+    InputDeviceInfo *dev = NULL;
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
 
@@ -368,7 +368,7 @@ HWTEST_F(HdiInputTest, GetInputDeviceList001, TestSize.Level1)
     HDF_LOGI("%s: [Input] GetInputDeviceList001 enter", __func__);
     int32_t ret;
     uint32_t num = 0;
-    DeviceInfo *dev[MAX_INPUT_DEV_NUM] = {0};
+    InputDeviceInfo *dev[MAX_INPUT_DEV_NUM] = {0};
 
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
@@ -447,7 +447,7 @@ HWTEST_F(HdiInputTest, GetInputDevice002, TestSize.Level1)
     ASSERT_EQ(g_hasDev, true);
     HDF_LOGI("%s: [Input] GetInputDevice002 enter", __func__);
     int32_t ret;
-    DeviceInfo *dev = NULL;
+    InputDeviceInfo *dev = NULL;
 
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);

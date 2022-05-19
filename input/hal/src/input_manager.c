@@ -38,7 +38,7 @@ InputDevManager *GetDevManager(void)
     return g_devManager;
 }
 
-static int32_t GetInputDevice(uint32_t devIndex, DeviceInfo **devInfo)
+static int32_t GetInputDevice(uint32_t devIndex, InputDeviceInfo **devInfo)
 {
     int32_t ret;
     DeviceInfoNode *pos = NULL;
@@ -74,13 +74,13 @@ static int32_t GetInputDevice(uint32_t devIndex, DeviceInfo **devInfo)
     return INPUT_FAILURE;
 }
 
-static int32_t GetInputDeviceList(uint32_t *devNum, DeviceInfo **deviceList, uint32_t size)
+static int32_t GetInputDeviceList(uint32_t *devNum, InputDeviceInfo **deviceList, uint32_t size)
 {
     DeviceInfoNode *pos = NULL;
     DeviceInfoNode *next = NULL;
     InputDevManager *manager = NULL;
     uint32_t tempSize = 0;
-    DeviceInfo **tempList = NULL;
+    InputDeviceInfo **tempList = NULL;
 
     if (devNum == NULL || deviceList == NULL) {
         HDF_LOGE("%s: invalid param", __func__);
@@ -214,7 +214,7 @@ static int32_t OpenInputDevice(uint32_t devIndex)
     return INPUT_SUCCESS;
 }
 
-static int32_t ScanInputDevice(DevDesc *staArr, uint32_t arrLen)
+static int32_t ScanInputDevice(InputDevDesc *staArr, uint32_t arrLen)
 {
     InputDevManager *manager = NULL;
     struct HdfIoService *service = NULL;
@@ -251,11 +251,11 @@ static int32_t ScanInputDevice(DevDesc *staArr, uint32_t arrLen)
 
     while (count < arrLen) {
         if (!HdfSbufReadBuffer(reply, (const void **)(&data), &replayDataSize) ||
-            replayDataSize != sizeof(DevDesc)) {
+            replayDataSize != sizeof(InputDevDesc)) {
             HDF_LOGE("%s: sbuf read failed", __func__);
             break;
         }
-        if (memcpy_s(&staArr[count], sizeof(DevDesc), data, replayDataSize) != EOK) {
+        if (memcpy_s(&staArr[count], sizeof(InputDevDesc), data, replayDataSize) != EOK) {
             HDF_LOGE("%s: memcpy failed, line: %d", __func__, __LINE__);
             HdfSbufRecycle(reply);
             return INPUT_FAILURE;
@@ -405,7 +405,6 @@ void ReleaseInputInterface(IInputInterface *inputInterface)
         return;
     }
     FreeInputHdi(inputInterface);
-    inputInterface = NULL;
 
     if (g_devManager == NULL) {
         return;

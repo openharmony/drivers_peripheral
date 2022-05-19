@@ -49,7 +49,7 @@ extern "C" {
  * @brief Describes the information nodes of input devices.
  */
 typedef struct {
-    DeviceInfo payload;                      /* Device information payload */
+    InputDeviceInfo payload;                 /* Device information payload */
     struct HdfIoService *service;            /* Service of the device */
     struct HdfDevEventlistener *listener;    /* Event listener of the device */
     InputEventCb *eventCb;                   /* evtCallback {@link InputEventCb} for reporting data */

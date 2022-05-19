@@ -26,7 +26,7 @@ namespace OHOS {
         int32_t ret;
         uint32_t getStatus = 0;
         const int MAX_DEVICES = 32;
-        DevDesc sta[MAX_DEVICES];
+        InputDevDesc sta[MAX_DEVICES];
         IInputInterface *g_inputInterface;
 
         ret = GetInputInterface(&g_inputInterface);
