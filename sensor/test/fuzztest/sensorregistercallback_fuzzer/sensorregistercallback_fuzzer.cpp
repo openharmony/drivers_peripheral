@@ -35,12 +35,12 @@ int32_t SensorRegisterCallbackFuzzer::OnDataEvent(const HdfSensorEvents& event)
 } // OHOS
 
 namespace OHOS {
-    bool SensorRegisterFuzzTest(const uint8_t* data, size_t size)
+    bool SensorRegisterCallbackFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
         sptr<ISensorInterface> g_sensorInterface = ISensorInterface::Get();
         sptr<ISensorCallback> g_traditionalCallback = new SensorRegisterCallbackFuzzer();
-        if (!g_sensorInterface->Register(static_cast<int32_t>(*data), g_traditionalCallback)) {
+        if (!g_sensorInterface->Register(*(int32_t *)data, g_traditionalCallback)) {
             result = true;
         }
         return result;
@@ -51,7 +51,7 @@ namespace OHOS {
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::SensorRegisterFuzzTest(data, size);
+    OHOS::SensorRegisterCallbackFuzzTest(data, size);
     return 0;
 }
 
