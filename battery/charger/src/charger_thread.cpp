@@ -391,7 +391,7 @@ void ChargerThread::HandleInputEvent(const struct input_event* iev)
     SetKeyState(ev.code, ev.value, GetCurrentTime());
 }
 
-void ChargerThread::EventPkgCallback(const EventPackage** pkgs, uint32_t count, uint32_t devIndex)
+void ChargerThread::EventPkgCallback(const InputEventPackage** pkgs, uint32_t count, uint32_t devIndex)
 {
     (void)devIndex;
     BATTERY_HILOGD(FEATURE_CHARGING, "start key event callback");

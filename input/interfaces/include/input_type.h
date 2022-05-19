@@ -123,18 +123,18 @@ typedef struct {
     uint32_t code;          /**< Specific code item of the input event */
     int32_t value;          /**< Value of the input event code item */
     uint64_t timestamp;     /**< Timestamp of the input event */
-} EventPackage;
+} InputEventPackage;
 
 typedef struct {
     uint32_t devIndex;
     uint32_t devType;
     uint32_t status;
-} HotPlugEvent;
+} InputHotPlugEvent;
 
 typedef struct {
     uint32_t devIndex;
     uint32_t devType;
-} DevDesc;
+} InputDevDesc;
 
 /**
  * @brief Describes the input event callback registered by the input service.
@@ -149,7 +149,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    void (*EventPkgCallback)(const EventPackage **pkgs, uint32_t count, uint32_t devIndex);
+    void (*EventPkgCallback)(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex);
 } InputEventCb;
 
 typedef struct {
@@ -160,7 +160,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    void (*HotPlugCallback)(const HotPlugEvent *event);
+    void (*HotPlugCallback)(const InputHotPlugEvent *event);
 } InputHostCb;
 
 typedef struct {
@@ -178,7 +178,7 @@ typedef struct {
     uint64_t ledType[BITS_TO_UINT64(LED_CNT)];
     uint64_t soundType[BITS_TO_UINT64(SND_CNT)];
     uint64_t switchType[BITS_TO_UINT64(SW_CNT)];
-} DevAbility;
+} InputDevAbility;
 
 typedef struct {
     int32_t axis;
@@ -187,7 +187,7 @@ typedef struct {
     int32_t fuzz;
     int32_t flat;
     int32_t range;
-} DimensionInfo;
+} InputDimensionInfo;
 
 typedef struct {
     uint16_t busType;
@@ -199,8 +199,8 @@ typedef struct {
 typedef struct {
     char devName[DEV_NAME_LEN];
     InputDevIdentify id;
-    DimensionInfo axisInfo[ABS_CNT];
-} DevAttr;
+    InputDimensionInfo axisInfo[ABS_CNT];
+} InputDevAttr;
 
 /**
  * @brief Describes basic device information of the input device.
@@ -211,9 +211,9 @@ typedef struct {
     char chipInfo[CHIP_INFO_LEN];        /**< Driver chip information */
     char vendorName[VENDOR_NAME_LEN];    /**< Module vendor name */
     char chipName[CHIP_NAME_LEN];        /**< Driver chip name */
-    DevAttr attrSet;
-    DevAbility abilitySet;
-} DeviceInfo;
+    InputDevAttr attrSet;
+    InputDevAbility abilitySet;
+} InputDeviceInfo;
 
 /**
  * @brief Describes the extra commands.

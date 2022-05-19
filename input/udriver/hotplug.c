@@ -27,7 +27,7 @@
 static InputDevManager *g_hotPlugManager;
 static InputHostCb hotPlug;
 
-static void HotPlugCallback(const HotPlugEvent *msg)
+static void HotPlugCallback(const InputHotPlugEvent *msg)
 {
     int32_t ret;
     char shell[SHELL_LEN];
@@ -51,7 +51,7 @@ static int32_t HotPlugEventListenerCallback(struct HdfDevEventlistener *listener
     (void)listener;
     (void)id;
     uint32_t len = 0;
-    HotPlugEvent *event = NULL;
+    InputHotPlugEvent *event = NULL;
     bool ret = false;
 
     if (service == NULL || data == NULL) {
@@ -64,7 +64,7 @@ static int32_t HotPlugEventListenerCallback(struct HdfDevEventlistener *listener
         HDF_LOGE("%s: read sbuf failed", __func__);
         return INPUT_FAILURE;
     }
-    g_hotPlugManager->hostDev.hostCb->HotPlugCallback((const HotPlugEvent *)event);
+    g_hotPlugManager->hostDev.hostCb->HotPlugCallback((const InputHotPlugEvent *)event);
 
     return INPUT_SUCCESS;
 }

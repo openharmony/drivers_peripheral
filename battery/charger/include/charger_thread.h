@@ -52,7 +52,7 @@ private:
     void SetKeyWait(struct KeyState& key, int64_t timeout);
     static void SetKeyState(int32_t code, int32_t value, int64_t now);
     static void InitInput();
-    static void EventPkgCallback(const EventPackage** pkgs, uint32_t count, uint32_t devIndex);
+    static void EventPkgCallback(const InputEventPackage** pkgs, uint32_t count, uint32_t devIndex);
     void HandlePowerKeyState();
     void HandlePowerKey(int32_t keycode, int64_t now);
     static void HandleInputEvent(const struct input_event* iev);
