@@ -25,7 +25,7 @@ namespace OHOS {
         bool result = false;
         int32_t ret;
         const int MAX_DEVICES = 32;
-        DevDesc sta[MAX_DEVICES];
+        InputDevDesc sta[MAX_DEVICES];
         IInputInterface *g_inputInterface;
         const int INIT_DEFAULT_VALUE = 255;
         uint32_t devType = INIT_DEFAULT_VALUE;

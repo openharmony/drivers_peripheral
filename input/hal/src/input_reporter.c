@@ -38,7 +38,7 @@ static int32_t EventListenerCallback(struct HdfDevEventlistener *listener, struc
     (void)id;
     int32_t count = 0;
     uint32_t len = 0;
-    EventPackage *pkgs[MAX_EVENT_PKG_NUM] = {0};
+    InputEventPackage *pkgs[MAX_EVENT_PKG_NUM] = {0};
     DeviceInfoNode *pos = NULL;
     DeviceInfoNode *next = NULL;
     InputDevManager *manager = NULL;
@@ -72,7 +72,7 @@ static int32_t EventListenerCallback(struct HdfDevEventlistener *listener, struc
 
     DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &manager->devList, DeviceInfoNode, node) {
         if (pos->service == service) {
-            pos->eventCb->EventPkgCallback((const EventPackage **)pkgs, count, pos->payload.devIndex);
+            pos->eventCb->EventPkgCallback((const InputEventPackage **)pkgs, count, pos->payload.devIndex);
         }
     }
     return INPUT_SUCCESS;
@@ -181,7 +181,7 @@ static int32_t HotPlugEventListenerCallback(struct HdfDevEventlistener *listener
     (void)listener;
     (void)id;
     uint32_t len = 0;
-    HotPlugEvent *event = NULL;
+    InputHotPlugEvent *event = NULL;
     InputDevManager *manager = NULL;
     bool ret = false;
 
@@ -197,7 +197,7 @@ static int32_t HotPlugEventListenerCallback(struct HdfDevEventlistener *listener
         HDF_LOGE("%s: read sbuf failed", __func__);
         return INPUT_FAILURE;
     }
-    manager->hostDev.hostCb->HotPlugCallback((const HotPlugEvent *)event);
+    manager->hostDev.hostCb->HotPlugCallback((const InputHotPlugEvent *)event);
     return INPUT_SUCCESS;
 }
 

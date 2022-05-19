@@ -27,7 +27,7 @@ namespace OHOS {
         const int MAX_DEVICES = 32;
         uint32_t length = *(uint32_t *)data;
         char vendorName[] = {0};
-        DevDesc sta[MAX_DEVICES];
+        InputDevDesc sta[MAX_DEVICES];
         IInputInterface *g_inputInterface;
 
         ret = GetInputInterface(&g_inputInterface);

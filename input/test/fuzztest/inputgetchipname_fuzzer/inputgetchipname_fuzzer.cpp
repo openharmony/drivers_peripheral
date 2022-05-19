@@ -25,7 +25,7 @@ namespace OHOS {
         int32_t ret;
         const int MAX_DEVICES = 32;
         uint32_t length = *(uint32_t *)data;
-        DevDesc sta[MAX_DEVICES];
+        InputDevDesc sta[MAX_DEVICES];
         char chipName[] = {0};
         IInputInterface *g_inputInterface;
 
