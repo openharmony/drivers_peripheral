@@ -56,7 +56,6 @@ ohos_executable("charger") {
     "init:libbegetutil",
     "input_device_driver:hdi_input",
     "ipc:ipc_core",
-    "power_manager_native:powermgr_client",
     "startup_l2:syspara",
     "utils_base:utils",
   ]
