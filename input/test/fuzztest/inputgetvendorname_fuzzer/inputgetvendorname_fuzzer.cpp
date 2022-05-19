@@ -25,7 +25,7 @@ namespace OHOS {
         bool result = false;
         int32_t ret;
         const int MAX_DEVICES = 32;
-        uint32_t length = static_cast<uint32_t>(*data);
+        uint32_t length = *(uint32_t *)data;
         char vendorName[] = {0};
         DevDesc sta[MAX_DEVICES];
         IInputInterface *g_inputInterface;
@@ -49,7 +49,7 @@ namespace OHOS {
             }
         }
 
-        ret = g_inputInterface->iInputController->GetVendorName(static_cast<uint32_t>(*data), vendorName, length);
+        ret = g_inputInterface->iInputController->GetVendorName(*(uint32_t *)data, vendorName, length);
         if (!ret) {
             result = true;
         }

@@ -26,8 +26,7 @@ namespace OHOS {
         bool result = false;
         sptr<ISensorInterface> g_sensorInterface = ISensorInterface::Get();
 
-        if (!g_sensorInterface->SetBatch(static_cast<int32_t>(*data), static_cast<int64_t>(*data),
-            static_cast<int64_t>(*data))) {
+        if (!g_sensorInterface->SetBatch(*(int32_t *)data, *(int64_t *)data, *(int64_t *)data)) {
             result = true;
         }
         return result;
