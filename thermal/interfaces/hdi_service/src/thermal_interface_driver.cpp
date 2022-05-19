@@ -73,6 +73,7 @@ int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     auto serviceImpl = IThermalInterface::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        delete hdfThermalInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -80,6 +81,7 @@ int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
         IThermalInterface::GetDescriptor());
     if (hdfThermalInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        delete hdfThermalInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -90,6 +92,11 @@ int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 void HdfThermalInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfThermalInterfaceDriverRelease enter");
+    if (deviceObject->service == nullptr) {
+        HDF_LOGE("HdfThermalInterfaceDriverRelease not initted");
+        return;
+    }
+
     auto *hdfThermalInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfThermalInterfaceHost, ioService);
     delete hdfThermalInterfaceHost;
 }

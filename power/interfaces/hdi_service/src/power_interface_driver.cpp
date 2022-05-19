@@ -73,6 +73,7 @@ static int HdfPowerInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     auto serviceImpl = IPowerInterface::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        delete hdfPowerInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -80,6 +81,7 @@ static int HdfPowerInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
         IPowerInterface::GetDescriptor());
     if (hdfPowerInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        delete hdfPowerInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -90,6 +92,10 @@ static int HdfPowerInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfPowerInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfPowerInterfaceDriverRelease enter");
+    if (deviceObject->service == nullptr) {
+        HDF_LOGE("HdfPowerInterfaceDriverRelease not initted");
+        return;
+    }
 
     auto *hdfPowerInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfPowerInterfaceHost, ioService);
     delete hdfPowerInterfaceHost;
