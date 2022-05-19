@@ -41,6 +41,7 @@
 #include <stdbool.h>
 #include "OMX_Types.h"
 #include "OMX_Index.h"
+#include "codec_common_type.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -53,21 +54,6 @@ extern "C" {
  */
 #define SAMPLE_FMT_NUM 32
 #define UUID_LENGTH 128
-/**
- * @brief Enumerates the codec types.
- */
-typedef enum {
-    /** Video decoder */
-    VIDEO_DECODER,
-    /** Video encoder */
-    VIDEO_ENCODER,
-    /** Audio decoder */
-    AUDIO_DECODER,
-    /** Audio encoder */
-    AUDIO_ENCODER,
-    /** Invalid type */
-    INVALID_TYPE
-} CodecType;
 
 /**
  * @brief Enumerates the types of audio and video encoding/decoding components.
@@ -96,104 +82,6 @@ typedef enum {
     /** Invalid type */
     MEDIA_ROLETYPE_INVALID,
 } AvCodecRole;
-
-/**
- * @brief Enumerates the codec profiles.
- */
-typedef enum {
-    /** Invalid profile */
-    INVALID_PROFILE = 0,
-    /** AAC-Low Complex */
-    AAC_LC_PROFILE = 0x1000,
-    /** AAC-Main */
-    AAC_MAIN_PROFILE,
-    /** HEAAC, AAC+, or AACPlusV1 */
-    AAC_HE_V1_PROFILE,
-    /** AAC++ or AACPlusV2 */
-    AAC_HE_V2_PROFILE,
-    /** AAC-Low Delay */
-    AAC_LD_PROFILE,
-    /** AAC-Enhanced Low Delay */
-    AAC_ELD_PROFILE,
-    /** H.264 Baseline */
-    AVC_BASELINE_PROFILE = 0x2000,
-    /** H.264 Main */
-    AVC_MAIN_PROFILE,
-    /** H.264 High */
-    AVC_HIGH_PROFILE,
-    /** H.265 Main */
-    HEVC_MAIN_PROFILE = 0x3000,
-    /** H.265 Main 10 */
-    HEVC_MAIN_10_PROFILE,
-} Profile;
-
-/**
-* @brief Defines the alignment.
- */
-typedef struct {
-    int32_t widthAlignment; /** Value to align with the width */
-    int32_t heightAlignment; /** Value to align with the height */
-} Alignment;
-
-/**
- * @brief Defines a rectangle.
- */
-typedef struct {
-    int32_t width;  /** Width of the rectangle */
-    int32_t height; /** Height of the rectangle */
-} Rect;
-
-/**
- * @brief Defines a value range.
- */
-typedef struct {
-    int32_t min; /** Minimum value */
-    int32_t max; /** Maximum value */
-} RangeValue;
-
-/**
- * @brief Enumerates the playback capabilities.
- */
-typedef enum {
-    /** Adaptive playback */
-    CODEC_CAP_ADAPTIVE_PLAYBACK = 0x1,
-    /** Secure playback */
-    CODEC_CAP_SECURE_PLAYBACK = 0x2,
-    /** Tunnel playback */
-    CODEC_CAP_TUNNEL_PLAYBACK = 0x4,
-    /** Multi-plane (video image plane and audio tunnel plane) playback */
-    CODEC_CAP_MULTI_PLANE = 0x10000,
-} CodecCapsMask;
-
-/**
- * @brief Enumerates the audio sampling rates.
- */
-typedef enum {
-    /** 8 kHz */
-    AUD_SAMPLE_RATE_8000   = 8000,
-    /** 12 kHz */
-    AUD_SAMPLE_RATE_12000  = 12000,
-    /** 11.025 kHz */
-    AUD_SAMPLE_RATE_11025  = 11025,
-    /** 16 kHz */
-    AUD_SAMPLE_RATE_16000  = 16000,
-    /** 22.050 kHz */
-    AUD_SAMPLE_RATE_22050  = 22050,
-    /** 24 kHz */
-    AUD_SAMPLE_RATE_24000  = 24000,
-    /** 32 kHz */
-    AUD_SAMPLE_RATE_32000  = 32000,
-    /** 44.1 kHz */
-    AUD_SAMPLE_RATE_44100  = 44100,
-    /** 48 kHz */
-    AUD_SAMPLE_RATE_48000  = 48000,
-    /** 64 kHz */
-    AUD_SAMPLE_RATE_64000  = 64000,
-    /** 96 kHz */
-    AUD_SAMPLE_RATE_96000  = 96000,
-    /** Invalid sampling rate */
-    AUD_SAMPLE_RATE_INVALID,
-} AudioSampleRate;
 
 /**
  * @brief Enumerate the audio sampling formats.
@@ -265,24 +153,6 @@ typedef union {
 } PortCap;
 
 /**
- * @brief Enumerates the codec processing modes.
- */
-typedef enum {
-    /** Input buffer in sync mode */
-    PROCESS_BLOCKING_INPUT_BUFFER     = 0X1,
-    /** Output buffer in sync mode */
-    PROCESS_BLOCKING_OUTPUT_BUFFER    = 0X2,
-    /** Control flow in sync mode */
-    PROCESS_BLOCKING_CONTROL_FLOW     = 0X4,
-    /** Input buffer in async mode */
-    PROCESS_NONBLOCKING_INPUT_BUFFER  = 0X100,
-    /** Output buffer in async mode */
-    PROCESS_NONBLOCKING_OUTPUT_BUFFER = 0X200,
-    /** Control flow in async mode */
-    PROCESS_NONBLOCKING_CONTROL_FLOW  = 0X400,
-} CodecProcessMode;
-
-/**
  * @brief Defines the codec capabilities.
  */
 #define NAME_LENGTH 32  /** Size of the component name. */
@@ -305,17 +175,17 @@ typedef struct {
 /**
  * @brief Enumerates the buffer types.
  */
-enum BufferType {
+enum CodecBufferType {
     /** Invalid buffer type. */
-    BUFFER_TYPE_INVALID = 0,
+    CODEC_BUFFER_TYPE_INVALID = 0,
     /** Virtual address type. */
-    BUFFER_TYPE_VIRTUAL_ADDR = 0x1,
+    CODEC_BUFFER_TYPE_VIRTUAL_ADDR = 0x1,
     /** Shared memory. */
-    BUFFER_TYPE_AVSHARE_MEM_FD = 0x2,
+    CODEC_BUFFER_TYPE_AVSHARE_MEM_FD = 0x2,
     /** Handle. */
-    BUFFER_TYPE_HANDLE = 0x4,
+    CODEC_BUFFER_TYPE_HANDLE = 0x4,
     /** Dynamic handle. */
-    BUFFER_TYPE_DYNAMIC_HANDLE = 0x8,
+    CODEC_BUFFER_TYPE_DYNAMIC_HANDLE = 0x8,
 };
 
 /**
@@ -335,7 +205,7 @@ struct OmxCodecBuffer {
     uint32_t bufferId;               /** Buffer ID. */
     uint32_t size;                   /** Size of the structure. */
     union OMX_VERSIONTYPE version;   /** Component version. */
-    enum BufferType bufferType;      /** Buffer type. */
+    enum CodecBufferType bufferType; /** Codec buffer type. */
     uint8_t *buffer;                 /** Buffer used for encoding or decoding. */
     uint32_t bufferLen;              /** Size of the buffer. */
     uint32_t allocLen;               /** Size of the buffer allocated. */

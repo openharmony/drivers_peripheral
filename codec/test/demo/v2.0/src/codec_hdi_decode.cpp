@@ -294,7 +294,7 @@ int32_t CodecHdiDecode::CheckAndUseBufferHandle()
     UseBufferType type;
     InitParamInOhos(type);
     type.portIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
-    type.bufferType = BUFFER_TYPE_HANDLE;
+    type.bufferType = CODEC_BUFFER_TYPE_HANDLE;
     err = client_->SetParameter(client_, OMX_IndexParamUseBufferType, (int8_t *)&type, sizeof(type));
     HDF_LOGI("OMX_SetParameter:OMX_IndexParamUseBufferType:kPortIndexOutput, err [%{public}x]", err);
     return err;
@@ -347,7 +347,7 @@ int32_t CodecHdiDecode::UseBufferOnPort(PortIndex portIndex, int bufferCount, in
         std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
         omxBuffer->size = sizeof(OmxCodecBuffer);
         omxBuffer->version.s.nVersionMajor = 1;
-        omxBuffer->bufferType = BUFFER_TYPE_AVSHARE_MEM_FD;
+        omxBuffer->bufferType = CODEC_BUFFER_TYPE_AVSHARE_MEM_FD;
         int fd = AshmemCreate(0, bufferSize);
         shared_ptr<Ashmem> sharedMem = make_shared<Ashmem>(fd, bufferSize);
         omxBuffer->bufferLen = FD_SIZE;
@@ -456,7 +456,7 @@ int32_t CodecHdiDecode::UseBufferHandle(int bufferCount, int bufferSize)
         std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
         omxBuffer->size = sizeof(OmxCodecBuffer);
         omxBuffer->version.s.nVersionMajor = 1;
-        omxBuffer->bufferType = BUFFER_TYPE_HANDLE;
+        omxBuffer->bufferType = CODEC_BUFFER_TYPE_HANDLE;
         BufferHandle *bufferHandle = nullptr;
         err = gralloc_->AllocMem(alloc, bufferHandle);
         HDF_LOGI("%{public}s AlloceMem ret val err[%{public}d], buffer [%{public}p]", __func__, err, bufferHandle);
