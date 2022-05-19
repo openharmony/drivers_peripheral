@@ -74,6 +74,7 @@ static int HdfNfcInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     auto serviceImpl = INfcInterface::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE(COMP_HDI, "%{public}s: failed to get of implement service", __func__);
+        delete hdfNfcInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -81,6 +82,7 @@ static int HdfNfcInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
         INfcInterface::GetDescriptor());
     if (hdfNfcInterfaceHost->stub == nullptr) {
         HDF_LOGE(COMP_HDI, "%{public}s: failed to get stub object", __func__);
+        delete hdfNfcInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -92,6 +94,10 @@ static int HdfNfcInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfNfcInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfNfcInterfaceDriverRelease enter");
+    if (deviceObject->service == nullptr) {
+        HDF_LOGE("HdfNfcInterfaceDriverRelease not initted");
+        return;
+    }
 
     auto *hdfNfcInterfaceHost =
         CONTAINER_OF(deviceObject->service, struct HdfNfcInterfaceHost, ioservice);
