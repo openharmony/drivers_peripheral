@@ -71,6 +71,7 @@ static int HdfVibratorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     auto serviceImpl = IVibratorInterface::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        delete hdfVibratorInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -78,6 +79,7 @@ static int HdfVibratorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
         IVibratorInterface::GetDescriptor());
     if (hdfVibratorInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        delete hdfVibratorInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -89,6 +91,10 @@ static int HdfVibratorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfVibratorInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfVibratorInterfaceDriverRelease enter");
+    if (deviceObject->service == nullptr) {
+        HDF_LOGE("HdfVibratorInterfaceDriverRelease not initted");
+        return;
+    }
 
     auto *hdfVibratorInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfVibratorInterfaceHost, ioService);
     delete hdfVibratorInterfaceHost;
