@@ -25,8 +25,7 @@ namespace OHOS {
     {
         bool result = false;
         sptr<ILightInterface> g_lightInterface = ILightInterface::Get();
-        if (!g_lightInterface->TurnOnLight(static_cast<int32_t>(*data),
-            reinterpret_cast<const HdfLightEffect &>(data))) {
+        if (!g_lightInterface->TurnOnLight(*(int32_t *)data, reinterpret_cast<const HdfLightEffect &>(data))) {
             result = true;
         }
         return result;
