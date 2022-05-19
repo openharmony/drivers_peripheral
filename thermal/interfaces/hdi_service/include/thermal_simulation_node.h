@@ -18,9 +18,7 @@
 
 #include <string>
 #include <vector>
-#include <mutex>
 #include <map>
-#include "thermal_types.h"
 
 namespace OHOS {
 namespace HDI {
@@ -38,7 +36,6 @@ private:
     int32_t AddSensorTypeTemp();
     int32_t AddMitigationDevice();
     int32_t WriteFile(std::string path, std::string buf, size_t size);
-    std::mutex mutex_;
 };
 } // V1_0
 } // Thermal

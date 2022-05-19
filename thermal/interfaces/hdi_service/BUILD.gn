@@ -16,7 +16,6 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 ohos_shared_library("libthermal_interface_service_1.0") {
   include_dirs = [
     "//drivers/adapter/uhdf2/shared/include",
-    "//drivers/peripheral/thermal/interfaces/include",
     "//third_party/libxml2/include",
     "include",
   ]
@@ -58,10 +57,7 @@ ohos_shared_library("libthermal_interface_service_1.0") {
 ##############################################################################################
 
 ohos_shared_library("libthermal_driver") {
-  include_dirs = [
-    "//drivers/peripheral/thermal/interfaces/include/",
-    "include",
-  ]
+  include_dirs = [ "include" ]
   sources = [ "src/thermal_interface_driver.cpp" ]
 
   deps = [ "//drivers/interface/thermal/v1_0:libthermal_stub_1.0" ]
