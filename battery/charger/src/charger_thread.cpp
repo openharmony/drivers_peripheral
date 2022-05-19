@@ -176,31 +176,6 @@ void ChargerThread::CycleMatters()
     UpdateEpollInterval(chargeState_);
 }
 
-void ChargerThread::UpdateBatteryInfo(void* arg, char* msg)
-{
-    BATTERY_HILOGD(FEATURE_CHARGING, "start update battery info by uevent msg");
-    std::unique_ptr<BatterydInfo> batteryInfo = std::make_unique<BatterydInfo>();
-    if (batteryInfo == nullptr) {
-        BATTERY_HILOGE(FEATURE_CHARGING, "make_unique BatterydInfo return nullptr");
-        return;
-    }
-
-    provider_->ParseUeventToBatterydInfo(msg, batteryInfo.get());
-
-    capacity_ = batteryInfo->capacity_;
-    chargeState_ = batteryInfo->chargeState_;
-
-    HandleCapacity(capacity_);
-    HandleTemperature(batteryInfo->temperature_);
-
-    led_->UpdateLedColor(chargeState_, capacity_);
-    if (backlight_->GetScreenState()) {
-        UpdateAnimation(capacity_);
-    }
-
-    BATTERY_HILOGD(FEATURE_CHARGING, "finish update battery info");
-}
-
 void ChargerThread::UpdateBatteryInfo(void* arg)
 {
     BATTERY_HILOGD(FEATURE_CHARGING, "start update battery info by provider");
