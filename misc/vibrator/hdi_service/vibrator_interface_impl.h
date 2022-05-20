@@ -13,28 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_VIBRATOR_V1_0_VIBRATORINTERFACEIMPL_H
-#define OHOS_HDI_VIBRATOR_V1_0_VIBRATORINTERFACEIMPL_H
+#ifndef OHOS_HDI_VIBRATOR_V1_1_VIBRATORINTERFACEIMPL_H
+#define OHOS_HDI_VIBRATOR_V1_1_VIBRATORINTERFACEIMPL_H
 
-#include "v1_0/ivibrator_interface.h"
+#include "v1_1/ivibrator_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Vibrator {
-namespace V1_0 {
+namespace V1_1 {
 class VibratorInterfaceImpl : public IVibratorInterface {
 public:
     virtual ~VibratorInterfaceImpl() {}
-
     int32_t StartOnce(uint32_t duration) override;
-
     int32_t Start(const std::string& effectType) override;
-
     int32_t Stop(HdfVibratorMode mode) override;
+    int32_t GetVibratorInfo(std::vector<HdfVibratorInfo>& vibratorInfo) override;
+    int32_t SetModulationParameter(uint32_t vibrationPeriod, int32_t intensity, int32_t frequency) override;
 };
-} // V1_0
+} // V1_1
 } // Vibrator
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_VIBRATOR_V1_0_VIBRATORINTERFACEIMPL_H
+#endif // OHOS_HDI_VIBRATOR_V1_1_VIBRATORINTERFACEIMPL_H

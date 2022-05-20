@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Vibrator {
-namespace V1_0 {
+namespace V1_1 {
 extern "C" IVibratorInterface *VibratorInterfaceImplGetInstance(void)
 {
     return new (std::nothrow) VibratorInterfaceImpl();
@@ -38,7 +38,7 @@ int32_t VibratorInterfaceImpl::StartOnce(uint32_t duration)
     }
     int32_t ret = vibratorInterface->StartOnce(duration);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
     return ret;
 }
@@ -52,7 +52,7 @@ int32_t VibratorInterfaceImpl::Start(const std::string& effectType)
     }
     int32_t ret = vibratorInterface->Start(effectType.c_str());
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
     return ret;
 }
@@ -79,11 +79,57 @@ int32_t VibratorInterfaceImpl::Stop(HdfVibratorMode mode)
 
     int32_t ret = vibratorInterface->Stop(tmp);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
     return ret;
 }
-} // V1_0
+
+int32_t VibratorInterfaceImpl::GetVibratorInfo(std::vector<HdfVibratorInfo>& vibratorInfo)
+{
+    const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
+    if (vibratorInterface == nullptr || vibratorInterface->GetVibratorInfo == nullptr) {
+        HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
+    HdfVibratorInfo hdfVibratorInfo;
+    struct VibratorInfo *tmp = nullptr;
+
+    int32_t ret = vibratorInterface->GetVibratorInfo(&tmp);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+        return ret;
+    }
+
+    if (tmp == nullptr) {
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+
+    hdfVibratorInfo.isSupportFrequency = tmp->isSupportFrequency;
+    hdfVibratorInfo.frequencyMaxValue = tmp->frequencyMaxValue;
+    hdfVibratorInfo.frequencyMinValue = tmp->frequencyMinValue;
+    hdfVibratorInfo.isSupportIntensity = tmp->isSupportIntensity;
+    hdfVibratorInfo.intensityMaxValue = tmp->intensityMaxValue;
+    hdfVibratorInfo.intensityMinValue = tmp->intensityMinValue;
+    vibratorInfo.push_back(std::move(hdfVibratorInfo));
+
+    return HDF_SUCCESS;
+}
+
+int32_t VibratorInterfaceImpl::SetModulationParameter(uint32_t vibrationPeriod, int32_t intensity, int32_t frequency)
+{
+    const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
+    if (vibratorInterface == nullptr || vibratorInterface->SetModulationParameter == nullptr) {
+        HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
+    int32_t ret = vibratorInterface->SetModulationParameter(vibrationPeriod, intensity, frequency);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+    }
+    return ret;
+}
+} // V1_1
 } // Vibrator
 } // HDI
 } // OHOS
