@@ -57,8 +57,6 @@ int32_t AudioProxyManagerLoadAdapter(struct AudioManager *manager, const struct 
                                      struct AudioAdapter **adapter);
 void AudioProxyManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter *adapter);
 
-struct AudioManager *GetAudioProxyManagerFuncs(void);
-
 #ifdef __cplusplus
 }
 #endif

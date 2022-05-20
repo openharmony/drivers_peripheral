@@ -50,7 +50,7 @@ using namespace std;
     const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio");
 #endif
 #ifdef AUDIO_ADM_SERVICE
-    const std::string FUNCTION_NAME = "GetAudioProxyManagerFuncs";
+    const std::string FUNCTION_NAME = "GetAudioManagerFuncs";
     const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio_client");
 #endif
 using TestAudioManager = struct AudioManager;

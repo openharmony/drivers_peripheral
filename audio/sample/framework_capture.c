@@ -32,7 +32,6 @@
 #include "audio_events.h"
 #include "audio_manager.h"
 #include "audio_types.h"
-#include "audio_proxy_manager.h"
 #include "hdf_audio_events.h"
 
 #define LOG_FUN_ERR(fmt, arg...) do { \
@@ -660,7 +659,7 @@ int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen, char *func, int32
                 LOG_FUN_ERR("snprintf_s failed!");
                 return HDF_FAILURE;
             }
-            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioProxyManagerFuncs") < 0) {
+            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioManagerFuncs") < 0) {
                 return HDF_FAILURE;
             }
             break;
@@ -756,7 +755,7 @@ int32_t GetCaptureProxyManagerFunc(const char *adapterNameCase)
         LOG_FUN_ERR("The Parameter is NULL");
         return HDF_FAILURE;
     }
-    struct AudioManager *proxyManager = GetAudioManagerInsForCapture("GetAudioProxyManagerFuncs");
+    struct AudioManager *proxyManager = GetAudioManagerInsForCapture("GetAudioManagerFuncs");
     if (proxyManager == NULL) {
         LOG_FUN_ERR("GetAudioManagerInsForCapture Fail");
         return HDF_FAILURE;
