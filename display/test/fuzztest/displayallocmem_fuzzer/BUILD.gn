@@ -32,7 +32,10 @@ ohos_fuzztest("DisplayAllocMemFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "displayallocmem_fuzzer.cpp" ]
-  deps = [ "//drivers/peripheral/display/hal:hdi_display_gralloc" ]
+  deps = [
+    "//drivers/peripheral/display/hdi_service/gralloc/client:libhdi_display_gralloc_client",
+    "//drivers/peripheral/display/hdi_service/gralloc/client:libhdi_display_gralloc_proxy",
+  ]
 
   external_deps = [
     "device_driver_framework:libhdf_host",

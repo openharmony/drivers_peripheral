@@ -16,7 +16,7 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 module_output_path = "hdf/input"
 
-ohos_fuzztest("RunCapacitanceFuzzTest") {
+ohos_fuzztest("RunCapacitanceTestFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file =
       "//drivers/peripheral/input/test/fuzztest/runcapacitancetest_fuzzer"
@@ -43,5 +43,5 @@ ohos_fuzztest("RunCapacitanceFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [ ":RunCapacitanceFuzzTest" ]
+  deps += [ ":RunCapacitanceTestFuzzTest" ]
 }
