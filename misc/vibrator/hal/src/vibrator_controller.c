@@ -14,9 +14,10 @@
  */
 
 #include "vibrator_controller.h"
+#include <securec.h>
 #include "hdf_base.h"
 #include "hdf_log.h"
-#include "vibrator_if.h"
+#include "osal_mem.h"
 
 #define HDF_LOG_TAG              hdf_vibrator_dal
 #define EFFECT_SUN 64
@@ -32,8 +33,163 @@ static struct VibratorDevice *GetVibratorDevicePriv(void)
     return &vibratorDeviceData;
 }
 
+static int32_t SendVibratorMsg(uint32_t cmd, struct HdfSBuf *msg, struct HdfSBuf *reply)
+{
+    struct VibratorDevice *priv = GetVibratorDevicePriv();
+
+    if (priv->ioService == NULL || priv->ioService->dispatcher == NULL ||
+        priv->ioService->dispatcher->Dispatch == NULL) {
+        HDF_LOGE("%s: para invalid", __func__);
+        return HDF_FAILURE;
+    }
+
+    int32_t ret = priv->ioService->dispatcher->Dispatch(&priv->ioService->object, cmd, msg, reply);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: Vibrator dispatch failed", __func__);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t ReadVibratorInfo(struct HdfSBuf *reply, struct VibratorDevice *priv)
+{
+    uint32_t len;
+    struct VibratorInfo *buf = NULL;
+
+    if (!HdfSbufReadBuffer(reply, (const void **)&buf, &len)) {
+        return HDF_FAILURE;
+    }
+
+    if (buf == NULL || len != sizeof(struct VibratorInfo)) {
+        HDF_LOGE("%s: read size is error", __func__);
+        HdfSbufRecycle(reply);
+        return HDF_FAILURE;
+    }
+
+    if (memcpy_s(&priv->vibratorInfoEntry, sizeof(priv->vibratorInfoEntry), buf, sizeof(*buf)) != EOK) {
+        HDF_LOGE("%s: Memcpy buf failed", __func__);
+        HdfSbufRecycle(reply);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t GetVibratorInfo(struct VibratorInfo **vibratorInfo)
+{
+    int32_t ret;
+    if (vibratorInfo == NULL) {
+        HDF_LOGE("%s:line:%{public}d pointer is null and return ret", __func__, __LINE__);
+        return HDF_FAILURE;
+    }
+    struct VibratorDevice *priv = GetVibratorDevicePriv();
+
+    (void)OsalMutexLock(&priv->mutex);
+    struct HdfSBuf *reply = HdfSbufObtainDefaultSize();
+    if (reply == NULL) {
+        HDF_LOGE("%s: get sbuf failed", __func__);
+        (void)OsalMutexUnlock(&priv->mutex);
+        return HDF_FAILURE;
+    }
+
+    ret = SendVibratorMsg(VIBRATOR_IO_GET_INFO, NULL, reply);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: Vibrator send cmd failed, ret[%{public}d]", __func__, ret);
+        HdfSbufRecycle(reply);
+        (void)OsalMutexUnlock(&priv->mutex);
+        return ret;
+    }
+
+    if (ReadVibratorInfo(reply, priv) != HDF_SUCCESS) {
+        HdfSbufRecycle(reply);
+        (void)OsalMutexUnlock(&priv->mutex);
+        return HDF_FAILURE;
+    }
+
+    HdfSbufRecycle(reply);
+    (void)OsalMutexUnlock(&priv->mutex);
+
+    *vibratorInfo = &priv->vibratorInfoEntry;
+
+    return HDF_SUCCESS;
+}
+
+static int32_t ValidityJudgment(uint32_t vibrationPeriod, int32_t intensity, int32_t frequency)
+{
+    struct VibratorDevice *priv = GetVibratorDevicePriv();
+    if (vibrationPeriod == 0) {
+        HDF_LOGE("%s:invalid vibration period", __func__);
+        return VIBRATOR_NOT_PERIOD;
+    }
+
+    if ((priv->vibratorInfoEntry.isSupportIntensity == 0) || (intensity < priv->vibratorInfoEntry.intensityMinValue) ||
+        (intensity > priv->vibratorInfoEntry.intensityMaxValue)) {
+        HDF_LOGE("%s:intensity not supported", __func__);
+        return VIBRATOR_NOT_INTENSITY;
+    }
+
+    if ((priv->vibratorInfoEntry.isSupportFrequency == 0) || (frequency < priv->vibratorInfoEntry.frequencyMinValue) ||
+        (frequency > priv->vibratorInfoEntry.frequencyMaxValue)) {
+        HDF_LOGE("%s:frequency not supported", __func__);
+        return VIBRATOR_NOT_FREQUENCY;
+    }
+
+    return VIBRATOR_SUCCESS;
+}
+
+static int32_t SetModulationParameter(uint32_t vibrationPeriod, int32_t intensity, int32_t frequency)
+{
+    int32_t ret;
+    struct VibratorDevice *priv = GetVibratorDevicePriv();
+
+    ret = ValidityJudgment(vibrationPeriod, intensity, frequency);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: effect is false", __func__);
+        return ret;
+    }
+
+    (void)OsalMutexLock(&priv->mutex);
+    struct HdfSBuf *msg = HdfSbufObtainDefaultSize();
+    if (msg == NULL) {
+        HDF_LOGE("%{public}s: get sbuf failed", __func__);
+        (void)OsalMutexUnlock(&priv->mutex);
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufWriteUint32(msg, vibrationPeriod)) {
+        HDF_LOGE("%{public}s: write vibrationPeriod failed.", __func__);
+        HdfSbufRecycle(msg);
+        (void)OsalMutexUnlock(&priv->mutex);
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufWriteInt32(msg, intensity)) {
+        HDF_LOGE("%{public}s: write intensity failed.", __func__);
+        HdfSbufRecycle(msg);
+        (void)OsalMutexUnlock(&priv->mutex);
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufWriteInt32(msg, frequency)) {
+        HDF_LOGE("%{public}s: write frequency failed.", __func__);
+        HdfSbufRecycle(msg);
+        (void)OsalMutexUnlock(&priv->mutex);
+        return HDF_FAILURE;
+    }
+    ret = SendVibratorMsg(VIBRATOR_IO_SET_MODULATION_PARAMETER, msg, NULL);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: Vibrator send cmd failed, ret[%{public}d]", __func__, ret);
+    }
+    HdfSbufRecycle(msg);
+    (void)OsalMutexUnlock(&priv->mutex);
+
+    return ret;
+}
+
 static int32_t StartOnce(uint32_t duration)
 {
+    int32_t ret;
     struct VibratorDevice *priv = GetVibratorDevicePriv();
 
     if (duration == 0) {
@@ -56,30 +212,19 @@ static int32_t StartOnce(uint32_t duration)
         return HDF_FAILURE;
     }
 
-    if (priv->ioService == NULL || priv->ioService->dispatcher == NULL ||
-        priv->ioService->dispatcher->Dispatch == NULL) {
-        HDF_LOGE("%s: para invalid", __func__);
-        HdfSbufRecycle(msg);
-        (void)OsalMutexUnlock(&priv->mutex);
-        return HDF_FAILURE;
-    }
-
-    int32_t ret = priv->ioService->dispatcher->Dispatch(&priv->ioService->object, VIBRATOR_IO_START_ONCE, msg, NULL);
+    ret = SendVibratorMsg(VIBRATOR_IO_START_ONCE, msg, NULL);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: dispatcher duration failed", __func__);
-        HdfSbufRecycle(msg);
-        (void)OsalMutexUnlock(&priv->mutex);
-        return ret;
+        HDF_LOGE("%{public}s: Vibrator send cmd failed, ret[%{public}d]", __func__, ret);
     }
-
     HdfSbufRecycle(msg);
     (void)OsalMutexUnlock(&priv->mutex);
 
-    return HDF_SUCCESS;
+    return ret;
 }
 
 static int32_t Start(const char *effect)
 {
+    int32_t ret;
     struct VibratorDevice *priv = GetVibratorDevicePriv();
 
     if (effect == NULL) {
@@ -96,14 +241,6 @@ static int32_t Start(const char *effect)
         return HDF_FAILURE;
     }
 
-    if (priv->ioService == NULL || priv->ioService->dispatcher == NULL ||
-        priv->ioService->dispatcher->Dispatch == NULL) {
-        HDF_LOGE("%s: para invalid", __func__);
-        HdfSbufRecycle(msg);
-        (void)OsalMutexUnlock(&priv->mutex);
-        return HDF_FAILURE;
-    }
-
     if (!HdfSbufWriteString(msg, effect)) {
         HDF_LOGE("%s: write effectName failed", __func__);
         HdfSbufRecycle(msg);
@@ -111,36 +248,25 @@ static int32_t Start(const char *effect)
         return HDF_FAILURE;
     }
 
-    int32_t ret = priv->ioService->dispatcher->Dispatch(&priv->ioService->object, VIBRATOR_IO_START_EFFECT, msg, NULL);
+    ret = SendVibratorMsg(VIBRATOR_IO_START_EFFECT, msg, NULL);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: dispatcher effect failed", __func__);
-        HdfSbufRecycle(msg);
-        (void)OsalMutexUnlock(&priv->mutex);
-        return ret;
+        HDF_LOGE("%{public}s: Vibrator send cmd failed, ret[%{public}d]", __func__, ret);
     }
-
     HdfSbufRecycle(msg);
     (void)OsalMutexUnlock(&priv->mutex);
 
-    return HDF_SUCCESS;
+    return ret;
 }
 
 static int32_t Stop(enum VibratorMode mode)
 {
+    int32_t ret;
     struct VibratorDevice *priv = GetVibratorDevicePriv();
 
     (void)OsalMutexLock(&priv->mutex);
     struct HdfSBuf *msg = HdfSbufObtainDefaultSize();
     if (msg == NULL) {
         HDF_LOGE("%s: get sbuf failed", __func__);
-        (void)OsalMutexUnlock(&priv->mutex);
-        return HDF_FAILURE;
-    }
-
-    if (priv->ioService == NULL || priv->ioService->dispatcher == NULL ||
-        priv->ioService->dispatcher->Dispatch == NULL) {
-        HDF_LOGE("%s: para invalid", __func__);
-        HdfSbufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);
         return HDF_FAILURE;
     }
@@ -152,18 +278,14 @@ static int32_t Stop(enum VibratorMode mode)
         return HDF_FAILURE;
     }
 
-    int32_t ret = priv->ioService->dispatcher->Dispatch(&priv->ioService->object, VIBRATOR_IO_STOP, msg, NULL);
+    ret = SendVibratorMsg(VIBRATOR_IO_STOP, msg, NULL);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: dispatcher stop failed", __func__);
-        HdfSbufRecycle(msg);
-        (void)OsalMutexUnlock(&priv->mutex);
-        return ret;
+        HDF_LOGE("%{public}s: Vibrator send cmd failed, ret[%{public}d]", __func__, ret);
     }
-
     HdfSbufRecycle(msg);
     (void)OsalMutexUnlock(&priv->mutex);
 
-    return HDF_SUCCESS;
+    return ret;
 }
 
 const struct VibratorInterface *NewVibratorInterfaceInstance(void)
@@ -179,6 +301,8 @@ const struct VibratorInterface *NewVibratorInterfaceInstance(void)
     vibratorDevInstance.Start = Start;
     vibratorDevInstance.StartOnce = StartOnce;
     vibratorDevInstance.Stop = Stop;
+    vibratorDevInstance.GetVibratorInfo = GetVibratorInfo;
+    vibratorDevInstance.SetModulationParameter = SetModulationParameter;
 
     priv->ioService = HdfIoServiceBind(VIBRATOR_SERVICE_NAME);
     if (priv->ioService == NULL) {

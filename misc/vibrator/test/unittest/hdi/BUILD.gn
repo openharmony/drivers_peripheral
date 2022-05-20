@@ -18,7 +18,7 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 module_output_path = "hdf/misc"
 ohos_unittest("hdf_unittest_hdi_vibrator") {
   module_out_path = module_output_path
-  include_dirs = []
+  include_dirs = [ "//drivers/peripheral/misc/vibrator/interfaces/include" ]
 
   sources = [ "hdf_vibrator_hdi_test.cpp" ]
   cflags = [
@@ -29,7 +29,7 @@ ohos_unittest("hdf_unittest_hdi_vibrator") {
     "-fno-common",
     "-fno-strict-aliasing",
   ]
-  deps = [ "//drivers/interface/vibrator/v1_0:libvibrator_proxy_1.0" ]
+  deps = [ "//drivers/interface/vibrator/v1_1:libvibrator_proxy_1.1" ]
   if (is_standard_system) {
     external_deps = [
       "device_driver_framework:libhdf_utils",
