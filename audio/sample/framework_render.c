@@ -26,7 +26,6 @@
 #include "hdf_base.h"
 #include "inttypes.h"
 #include "audio_manager.h"
-#include "audio_proxy_manager.h"
 #include "audio_types.h"
 
 #define LOG_FUN_ERR(fmt, arg...) do { \
@@ -694,7 +693,7 @@ int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen, char *func, int32
             if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", soPathProxy) < 0) {
                 return HDF_FAILURE;
             }
-            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioProxyManagerFuncs") < 0) {
+            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioManagerFuncs") < 0) {
                 return HDF_FAILURE;
             }
             break;
@@ -790,7 +789,7 @@ int32_t GetRenderProxyManagerFunc(const char *adapterNameCase)
         LOG_FUN_ERR("The Parameter is NULL");
         return HDF_FAILURE;
     }
-    struct AudioManager *proxyManager = GetAudioManagerInsForRender("GetAudioProxyManagerFuncs");
+    struct AudioManager *proxyManager = GetAudioManagerInsForRender("GetAudioManagerFuncs");
     if (proxyManager == NULL) {
         LOG_FUN_ERR("GetAudioManagerInsForRender Fail");
         return HDF_FAILURE;
