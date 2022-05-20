@@ -16,7 +16,7 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 module_output_path = "hdf/input"
 
-ohos_fuzztest("InputSetestureModeFuzzTest") {
+ohos_fuzztest("InputSetGestureModeFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file =
       "//drivers/peripheral/input/test/fuzztest/inputsetgesturemode_fuzzer"
@@ -43,5 +43,5 @@ ohos_fuzztest("InputSetestureModeFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [ ":InputSetestureModeFuzzTest" ]
+  deps += [ ":InputSetGestureModeFuzzTest" ]
 }
