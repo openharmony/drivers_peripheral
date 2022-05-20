@@ -19,7 +19,7 @@
 #include "input_manager.h"
 
 namespace OHOS {
-    bool RunCapacitanceFuzzTest(const uint8_t* data, size_t size)
+    bool RunCapacitanceTestFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
         int32_t ret;
@@ -61,7 +61,7 @@ namespace OHOS {
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::RunCapacitanceFuzzTest(data, size);
+    OHOS::RunCapacitanceTestFuzzTest(data, size);
     return 0;
 }
 
