@@ -788,6 +788,10 @@ int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
         HILOG_ERROR(LOG_DOMAIN, "%s: open socket failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
+    if (strncpy_s(req.ifr_name, IFNAMSIZ, ifName, strlen(ifName)) != EOK) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: strncpy_s fail", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
     req.ifr_addr.sa_family = ARPHRD_ETHER;
     if (memcpy_s(req.ifr_hwaddr.sa_data, len, mac, len) != EOK) {
         HILOG_ERROR(LOG_DOMAIN, "%s: memcpy_s req.ifr_hwaddr.sa_data failed", __FUNCTION__);
