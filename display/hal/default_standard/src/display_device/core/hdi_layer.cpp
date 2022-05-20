@@ -209,6 +209,13 @@ void HdiLayer::ClearColor(uint32_t color)
         }
     }
 }
+HdiLayer::~HdiLayer()
+{
+    while (!releaseFences_.empty()) {
+        close(releaseFences_.front());
+        releaseFences_.pop();
+    }
+}
 } // namespace OHOS
 } // namespace HDI
 } // namespace DISPLAY

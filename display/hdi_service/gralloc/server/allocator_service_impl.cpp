@@ -44,7 +44,10 @@ AllocatorService::~AllocatorService()
 int32_t AllocatorService::AllocMem(const AllocInfo &info, BufferHandle *&handle)
 {
     if (grallocFuncs_ == nullptr) {
-        return HDF_ERR_INVALID_OBJECT;
+        if (GrallocInitialize(&grallocFuncs_) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: gralloc init failed", __func__);
+            return HDF_FAILURE;
+        }
     }
     return grallocFuncs_->AllocMem(&info, &handle);
 }
