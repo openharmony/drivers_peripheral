@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//drivers/peripheral/audio/audio.gni")
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
 } else {
@@ -18,15 +19,13 @@ if (defined(ohos_lite)) {
   import("//drivers/adapter/uhdf2/uhdf.gni")
 }
 
-###########################group###########################
 group("audiotest") {
   if (!defined(ohos_lite)) {
     testonly = true
   }
-  deps = []
 
   # hal ut
-  deps += [
+  deps = [
     "hdi:hdi",
     "lib:lib",
   ]
@@ -34,9 +33,8 @@ group("audiotest") {
   # adm + driver ut
   if (defined(enable_hdf_audio_full_test_suite)) {
     deps += [
-      "adm:hdf_test_audio",
-      "driver:khdf_test_audio_driver",
+      "adm:khdf_audio_adm_test",
+      "driver:khdf_audio_driver_test",
     ]
   }
 }
-############################end############################

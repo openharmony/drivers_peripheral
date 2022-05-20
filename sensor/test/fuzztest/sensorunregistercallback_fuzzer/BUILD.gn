@@ -16,7 +16,7 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 module_output_path = "hdf/sensor"
 
-ohos_fuzztest("SensorUnregisterFuzzTest") {
+ohos_fuzztest("SensorUnregisterCallbackFuzzTest") {
   module_out_path = module_output_path
 
   fuzz_config_file = "//drivers/peripheral/sensor/test/fuzztest/sensorunregistercallback_fuzzer"
@@ -52,6 +52,6 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":SensorUnregisterFuzzTest",
+    ":SensorUnregisterCallbackFuzzTest",
   ]
 }

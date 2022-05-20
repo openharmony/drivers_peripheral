@@ -44,7 +44,7 @@ namespace Codec {
         }
 
         OMX_COMMANDTYPE cmd = static_cast<OMX_COMMANDTYPE>(*data);
-        ret = component->SendCommand(component, cmd, (uint64_t)data, (int8_t *)data, sizeof(*data)*size);
+        ret = component->SendCommand(component, cmd, *(uint32_t *)data, (int8_t *)data, sizeof(*data)*size);
         if (ret == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: SendCommand succeed\n", __func__);
             result = true;

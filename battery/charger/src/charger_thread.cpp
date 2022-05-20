@@ -24,7 +24,7 @@
 #include "view.h"
 #include "input_manager.h"
 #include "input_type.h"
-#include "power_mgr_client.h"
+#include "init_reboot.h"
 #include "battery_log.h"
 
 namespace OHOS {
@@ -41,6 +41,8 @@ constexpr int32_t VIBRATE_TIME_MS = 75;
 constexpr int32_t MAX_IMG_COUNT = 62;
 constexpr int32_t MAX_IMG_NAME_SIZE = 255;
 constexpr int32_t LOOP_TOP_PICTURES = 10;
+const char* REBOOT_CMD = "";
+const char* SHUTDOWN_CMD = "shutdown";
 }
 
 struct KeyState {
@@ -224,13 +226,11 @@ void ChargerThread::HandleCapacity(const int32_t& capacity)
 {
     auto lowCapacity = batteryConfig_->GetCapacityConf();
     BATTERY_HILOGD(FEATURE_CHARGING, "capacity=%{public}d, lowCapacity=%{public}d", capacity, lowCapacity);
-    auto& powerMgrClient = OHOS::PowerMgr::PowerMgrClient::GetInstance();
     if ((capacity <= lowCapacity) &&
         ((chargeState_ == PowerSupplyProvider::CHARGE_STATE_NONE) ||
         (chargeState_ == PowerSupplyProvider::CHARGE_STATE_RESERVED))) {
         BATTERY_HILOGW(FEATURE_CHARGING, "low capacity, shutdown device");
-        std::string reason = "LowCapacity";
-        powerMgrClient.ShutDownDevice(reason);
+        DoReboot(SHUTDOWN_CMD);
     }
 }
 
@@ -240,12 +240,10 @@ void ChargerThread::HandleTemperature(const int32_t& temperature)
     BATTERY_HILOGD(FEATURE_CHARGING, "temperature=%{public}d, tempConf.lower=%{public}d, tempConf.upper=%{public}d",
         temperature, tempConf.lower, tempConf.upper);
 
-    auto& powerMgrClient = OHOS::PowerMgr::PowerMgrClient::GetInstance();
     if (((temperature <= tempConf.lower) || (temperature >= tempConf.upper)) &&
         (tempConf.lower != tempConf.upper)) {
         BATTERY_HILOGW(FEATURE_CHARGING, "temperature out of range, shutdown device");
-        std::string reason = "TemperatureOutOfRange";
-        powerMgrClient.ShutDownDevice(reason);
+        DoReboot(SHUTDOWN_CMD);
     }
 }
 
@@ -261,8 +259,6 @@ void ChargerThread::HandleChargingState()
 {
     int64_t now = GetCurrentTime();
     BATTERY_HILOGD(FEATURE_CHARGING, "chargeState_=%{public}d, now=%{public}" PRId64 "", chargeState_, now);
-    auto& powerMgrClient = OHOS::PowerMgr::PowerMgrClient::GetInstance();
-
     if ((chargeState_ == PowerSupplyProvider::CHARGE_STATE_NONE) ||
         (chargeState_ == PowerSupplyProvider::CHARGE_STATE_RESERVED)) {
         if (pluginWait_ == INVALID) {
@@ -273,9 +269,9 @@ void ChargerThread::HandleChargingState()
             AnimationLabel::needStop_ = true;
             pluginWait_ = now + SHUTDOWN_TIME_MS;
         } else if (now >= pluginWait_) {
-            BATTERY_HILOGI(FEATURE_CHARGING, "shutdown device, pluginWait_=%{public}" PRId64 "", pluginWait_);
-            std::string reason = "charger unplugged";
-            powerMgrClient.ShutDownDevice(reason);
+            BATTERY_HILOGI(FEATURE_CHARGING, "shutdown device, charger unplugged, pluginWait_=%{public}" PRId64 "",
+                pluginWait_);
+            DoReboot(SHUTDOWN_CMD);
         } else {
             BATTERY_HILOGD(FEATURE_CHARGING, "ShutDownDevice timer already in scheduled.");
         }
@@ -342,7 +338,6 @@ void ChargerThread::HandlePowerKeyState()
 
 void ChargerThread::HandlePowerKey(int32_t keycode, int64_t now)
 {
-    auto& powerMgrClient = OHOS::PowerMgr::PowerMgrClient::GetInstance();
     KeyState key = g_keys[keycode];
     if (keycode == KEY_POWER) {
         if (key.down) {
@@ -353,8 +348,7 @@ void ChargerThread::HandlePowerKey(int32_t keycode, int64_t now)
                 backlight_->TurnOffScreen();
                 AnimationLabel::needStop_ = true;
                 vibrate_->HandleVibration(VIBRATE_TIME_MS);
-                std::string reason = "Reboot";
-                powerMgrClient.RebootDevice(reason);
+                DoReboot(REBOOT_CMD);
             } else {
                 SetKeyWait(key, REBOOT_TIME);
                 backlight_->TurnOnScreen();
@@ -391,7 +385,7 @@ void ChargerThread::HandleInputEvent(const struct input_event* iev)
     SetKeyState(ev.code, ev.value, GetCurrentTime());
 }
 
-void ChargerThread::EventPkgCallback(const EventPackage** pkgs, uint32_t count, uint32_t devIndex)
+void ChargerThread::EventPkgCallback(const InputEventPackage** pkgs, uint32_t count, uint32_t devIndex)
 {
     (void)devIndex;
     BATTERY_HILOGD(FEATURE_CHARGING, "start key event callback");

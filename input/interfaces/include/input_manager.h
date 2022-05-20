@@ -65,7 +65,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*ScanInputDevice)(DevDesc *staArr, uint32_t arrLen);
+    int32_t (*ScanInputDevice)(InputDevDesc *staArr, uint32_t arrLen);
 
     /**
      * @brief Opens a specified input device file.
@@ -103,7 +103,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*GetInputDevice)(uint32_t devIndex, DeviceInfo **devInfo);
+    int32_t (*GetInputDevice)(uint32_t devIndex, InputDeviceInfo **devInfo);
 
     /**
      * @brief Gets information about all input devices in the device list.
@@ -117,7 +117,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*GetInputDeviceList)(uint32_t *devNum, DeviceInfo **devList, uint32_t size);
+    int32_t (*GetInputDeviceList)(uint32_t *devNum, InputDeviceInfo **devList, uint32_t size);
 } InputManager;
 
 /**

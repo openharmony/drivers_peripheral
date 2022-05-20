@@ -24,7 +24,7 @@ namespace OHOS {
         bool result = false;
         int32_t ret;
         const int MAX_DEVICES = 32;
-        DevDesc sta[MAX_DEVICES];
+        InputDevDesc sta[MAX_DEVICES];
         InputExtraCmd extraCmd = {0};
         extraCmd.cmdCode = "WakeUpMode";
         extraCmd.cmdValue = "Enable";
@@ -49,7 +49,7 @@ namespace OHOS {
             }
         }
         
-        ret = g_inputInterface->iInputController->RunExtraCommand(static_cast<uint32_t>(*data), &extraCmd);
+        ret = g_inputInterface->iInputController->RunExtraCommand(*(uint32_t *)data, &extraCmd);
         if (!ret) {
             result = true;
         }

@@ -25,8 +25,8 @@ namespace OHOS {
         bool result = false;
         int32_t ret;
         BufferHandle handle;
-        handle.height = static_cast<int32_t>(*data);
-        handle.width = static_cast<int32_t>(*data);
+        handle.height = *(int32_t *)data;
+        handle.width = *(int32_t *)data;
         
         if (!IDisplayGralloc::Get()->Mmap(handle)) {
             result = true;

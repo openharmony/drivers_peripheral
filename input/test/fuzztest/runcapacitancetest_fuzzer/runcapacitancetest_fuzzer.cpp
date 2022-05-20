@@ -24,8 +24,8 @@ namespace OHOS {
         bool result = false;
         int32_t ret;
         const int MAX_DEVICES = 32;
-        DevDesc sta[MAX_DEVICES];
-        uint32_t length = static_cast<uint32_t>(*data);
+        InputDevDesc sta[MAX_DEVICES];
+        uint32_t length = *(uint32_t *)data;
         char testresult[] = {0};
         IInputInterface *g_inputInterface;
 
@@ -48,8 +48,8 @@ namespace OHOS {
             }
         }
 
-        ret = g_inputInterface->iInputController->RunCapacitanceTest(static_cast<uint32_t>(*data),
-            static_cast<uint32_t>(*data), testresult, length);
+        ret = g_inputInterface->iInputController->RunCapacitanceTest(*(uint32_t *)data,
+            *(uint32_t *)data, testresult, length);
         if (!ret) {
             result = true;
         }
