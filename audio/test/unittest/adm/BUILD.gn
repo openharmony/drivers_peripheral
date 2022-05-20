@@ -13,8 +13,8 @@
 
 import("//build/test.gni")
 
-module_output_path = "audio_device_driver/audio"
-ohos_unittest("hdf_audio_adm_test") {
+module_output_path = "audio_device_driver/adm"
+ohos_unittest("khdf_audio_adm_test") {
   module_out_path = module_output_path
 
   include_dirs = [
@@ -55,9 +55,4 @@ ohos_unittest("hdf_audio_adm_test") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-}
-
-group("hdf_test_audio") {
-  testonly = true
-  deps = [ ":hdf_audio_adm_test" ]
 }
