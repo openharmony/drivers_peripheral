@@ -46,8 +46,8 @@ private:
 
 class HdiDrmComposition : public HdiComposition {
 public:
-    HdiDrmComposition(std::shared_ptr<DrmConnector> connector, std::shared_ptr<DrmCrtc> crtc,
-        std::shared_ptr<DrmDevice> drmDevice);
+    HdiDrmComposition(std::shared_ptr<DrmConnector> &connector, std::shared_ptr<DrmCrtc> &crtc,
+        std::shared_ptr<DrmDevice> &drmDevice);
     virtual ~HdiDrmComposition() {}
     int32_t Init();
     int32_t SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer);

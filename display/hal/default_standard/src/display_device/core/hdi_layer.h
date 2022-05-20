@@ -64,6 +64,8 @@ public:
     BufferHandle mHandle;
 
 private:
+    HdiLayerBuffer(const HdiLayerBuffer &rhs);
+    HdiLayerBuffer& operator=(const HdiLayerBuffer &rhs);
     uint64_t mPhyAddr = 0;
     int32_t mHeight = 0;
     int32_t mWidth = 0;
@@ -173,7 +175,7 @@ public:
     {
         return mHdiBuffer.get();
     }
-    virtual ~HdiLayer() {}
+    virtual ~HdiLayer();
 
 private:
     static uint32_t GetIdleId();
