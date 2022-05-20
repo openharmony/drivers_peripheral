@@ -36,7 +36,8 @@ namespace Codec {
             return false;
         }
 
-        int32_t ret = manager->CreateComponent(&component, (char*)data, (void *)data, sizeof((int64_t)data), callback);
+        int32_t ret = manager->CreateComponent(&component, (char*)data, (void *)data,
+            sizeof(*(int32_t *)data), callback);
         if (ret == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: CreateComponent succeed\n", __func__);
             result = true;

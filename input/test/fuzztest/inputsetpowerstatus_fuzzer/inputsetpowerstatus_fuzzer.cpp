@@ -24,7 +24,7 @@ namespace OHOS {
         bool result = false;
         int32_t ret;
         const int MAX_DEVICES = 32;
-        DevDesc sta[MAX_DEVICES];
+        InputDevDesc sta[MAX_DEVICES];
         IInputInterface *g_inputInterface;
 
         ret = GetInputInterface(&g_inputInterface);
@@ -46,8 +46,8 @@ namespace OHOS {
             }
         }
 
-        ret = g_inputInterface->iInputController->SetPowerStatus(static_cast<uint32_t>(*data),
-            static_cast<uint32_t>(*data));
+        ret = g_inputInterface->iInputController->SetPowerStatus(*(uint32_t *)data,
+            *(uint32_t *)data);
         if (!ret) {
             result = true;
         }

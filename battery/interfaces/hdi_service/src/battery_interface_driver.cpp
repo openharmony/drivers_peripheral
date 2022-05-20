@@ -68,6 +68,7 @@ static int32_t HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObjec
     auto serviceImpl = IBatteryInterface::Get(true);
     if (serviceImpl == nullptr) {
         BATTERY_HILOGE(COMP_HDI, "%{public}s: failed to get of implement service", __func__);
+        delete hdfBatteryInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -75,6 +76,7 @@ static int32_t HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObjec
         IBatteryInterface::GetDescriptor());
     if (hdfBatteryInterfaceHost->stub == nullptr) {
         BATTERY_HILOGE(COMP_HDI, "%{public}s: failed to get stub object", __func__);
+        delete hdfBatteryInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -84,6 +86,11 @@ static int32_t HdfBatteryInterfaceDriverBind(struct HdfDeviceObject *deviceObjec
 
 static void HdfBatteryInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
+    if (deviceObject->service == nullptr) {
+        BATTERY_HILOGE(COMP_HDI, "HdfBatteryInterfaceDriverRelease not initted");
+        return;
+    }
+
     auto *hdfBatteryInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfBatteryInterfaceHost, ioService);
     delete hdfBatteryInterfaceHost;
 }

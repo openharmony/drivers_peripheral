@@ -24,7 +24,7 @@ namespace OHOS {
         bool result = false;
         int32_t ret;
         const int MAX_DEVICES = 32;
-        DevDesc sta[MAX_DEVICES];
+        InputDevDesc sta[MAX_DEVICES];
         IInputInterface *g_inputInterface;
 
         ret = GetInputInterface(&g_inputInterface);
@@ -46,8 +46,8 @@ namespace OHOS {
             }
         }
         
-        if (!g_inputInterface->iInputController->SetGestureMode(static_cast<uint32_t>(*data),
-            static_cast<uint32_t>(*data))) {
+        if (!g_inputInterface->iInputController->SetGestureMode(*(uint32_t *)data,
+            *(uint32_t *)data)) {
             result = true;
         }
         return result;

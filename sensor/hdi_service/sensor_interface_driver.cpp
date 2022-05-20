@@ -72,6 +72,7 @@ static int HdfSensorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     auto serviceImpl = ISensorInterface::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        delete hdfSensorInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -79,6 +80,7 @@ static int HdfSensorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
         ISensorInterface::GetDescriptor());
     if (hdfSensorInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        delete hdfSensorInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -89,6 +91,11 @@ static int HdfSensorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
 static void HdfSensorInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
+    if (deviceObject->service == nullptr) {
+        HDF_LOGE("HdfSensorInterfaceDriverRelease not initted");
+        return;
+    }
+
     auto *hdfSensorInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfSensorInterfaceHost, ioService);
     delete hdfSensorInterfaceHost;
     HDF_LOGI("HdfSensorInterfaceDriverRelease Success");

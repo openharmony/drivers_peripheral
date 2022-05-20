@@ -13,19 +13,21 @@
 
 import("//build/test.gni")
 
-module_output_path = "audio_device_driver/audio"
+module_output_path = "audio_device_driver/driver"
 ohos_unittest("khdf_audio_driver_test") {
   module_out_path = module_output_path
 
-  include_dirs = [ "//drivers/peripheral/audio/chipsets/hi3516dv300/codec/test/unittest/common" ]
+  include_dirs = [
+    "//device/board/hisilicon/hispark_taurus/audio_drivers/unittest/include",
+  ]
 
   defines = [ "__USER__" ]
   sources = [
-    "//drivers/peripheral/audio/chipsets/hi3516dv300/codec/test/unittest/common/hi3516_codec_impl_test.cpp",
-    "//drivers/peripheral/audio/chipsets/hi3516dv300/codec/test/unittest/common/hi3516_codec_ops_test.cpp",
-    "//drivers/peripheral/audio/chipsets/hi3516dv300/soc/test/unittest/common/hi3516_aiao_impl_test.cpp",
-    "//drivers/peripheral/audio/chipsets/hi3516dv300/soc/test/unittest/common/hi3516_dai_ops_test.cpp",
-    "//drivers/peripheral/audio/chipsets/hi3516dv300/soc/test/unittest/common/hi3516_dma_ops_test.cpp",
+    "//device/board/hisilicon/hispark_taurus/audio_drivers/unittest/src/hi3516_aiao_impl_test.cpp",
+    "//device/board/hisilicon/hispark_taurus/audio_drivers/unittest/src/hi3516_codec_impl_test.cpp",
+    "//device/board/hisilicon/hispark_taurus/audio_drivers/unittest/src/hi3516_codec_ops_test.cpp",
+    "//device/board/hisilicon/hispark_taurus/audio_drivers/unittest/src/hi3516_dai_ops_test.cpp",
+    "//device/board/hisilicon/hispark_taurus/audio_drivers/unittest/src/hi3516_dma_ops_test.cpp",
   ]
 
   cflags = [
@@ -46,9 +48,4 @@ ohos_unittest("khdf_audio_driver_test") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-}
-
-group("khdf_test_audio_driver") {
-  testonly = true
-  deps = [ ":khdf_audio_driver_test" ]
 }

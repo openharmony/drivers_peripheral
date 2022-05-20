@@ -25,8 +25,8 @@ namespace OHOS {
         bool result = false;
         int32_t ret;
         const int MAX_DEVICES = 32;
-        DevDesc sta[MAX_DEVICES];
-        uint32_t length = static_cast<uint32_t>(*data);
+        InputDevDesc sta[MAX_DEVICES];
+        uint32_t length = *(uint32_t *)data;
         char chipInfo[] = {0};
         IInputInterface *g_inputInterface;
 
@@ -49,7 +49,7 @@ namespace OHOS {
             }
         }
 
-        ret = g_inputInterface->iInputController->GetChipInfo(static_cast<uint32_t>(*data), chipInfo, length);
+        ret = g_inputInterface->iInputController->GetChipInfo(*(uint32_t *)data, chipInfo, length);
         if (!ret) {
             result = true;
         }

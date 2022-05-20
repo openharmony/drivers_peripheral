@@ -23,6 +23,7 @@ if (!defined(ohos_lite)) {
     module_out_path = module_output_path
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
+      "//drivers/peripheral/audio/hal/hdi_binder/server/src/hdf_audio_events.c",
       "src/audio_threshold_report_test.cpp",
     ]
 
@@ -38,7 +39,6 @@ if (!defined(ohos_lite)) {
       "//third_party/googletest/googletest/include/gtest",
     ]
     deps = [
-      "//drivers/peripheral/audio/hal/hdi_binder/server:hdi_audio_primary_server",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
@@ -47,6 +47,7 @@ if (!defined(ohos_lite)) {
       "device_driver_framework:libhdf_ipc_adapter",
       "device_driver_framework:libhdf_utils",
       "device_driver_framework:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]
     defines = []

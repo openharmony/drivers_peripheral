@@ -26,7 +26,7 @@ namespace OHOS {
         int32_t ret;
         uint32_t getStatus = 0;
         const int MAX_DEVICES = 32;
-        DevDesc sta[MAX_DEVICES];
+        InputDevDesc sta[MAX_DEVICES];
         IInputInterface *g_inputInterface;
 
         ret = GetInputInterface(&g_inputInterface);
@@ -48,7 +48,7 @@ namespace OHOS {
             }
         }
 
-        ret = g_inputInterface->iInputController->GetPowerStatus(static_cast<uint32_t>(*data), &getStatus);
+        ret = g_inputInterface->iInputController->GetPowerStatus(*(uint32_t *)data, &getStatus);
         if (!ret) {
             HDF_LOGE("%s: get device1's power status failed, ret %d", __func__, ret);
         }

@@ -73,6 +73,7 @@ static int HdfLightInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     auto serviceImpl = ILightInterface::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        delete hdfLightInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -80,6 +81,7 @@ static int HdfLightInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
         ILightInterface::GetDescriptor());
     if (hdfLightInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        delete hdfLightInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -91,6 +93,10 @@ static int HdfLightInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfLightInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfLightInterfaceDriverRelease enter");
+    if (deviceObject->service == nullptr) {
+        HDF_LOGE("HdfLightInterfaceDriverRelease not initted");
+        return;
+    }
 
     auto *hdfLightInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfLightInterfaceHost, ioService);
     delete hdfLightInterfaceHost;

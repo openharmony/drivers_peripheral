@@ -24,7 +24,7 @@ namespace OHOS {
         bool result = false;
         int32_t ret;
         const int MAX_DEVICES = 32;
-        DevDesc sta[MAX_DEVICES];
+        InputDevDesc sta[MAX_DEVICES];
         InputEventCb g_callback;
         IInputInterface *g_inputInterface;
 
@@ -47,7 +47,7 @@ namespace OHOS {
             }
         }
 
-        ret  = g_inputInterface->iInputReporter->RegisterReportCallback(static_cast<uint32_t>(*data), &g_callback);
+        ret  = g_inputInterface->iInputReporter->RegisterReportCallback(*(uint32_t *)data, &g_callback);
         if (!ret) {
             result = true;
         }
