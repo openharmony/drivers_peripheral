@@ -33,13 +33,13 @@ sptr<ICodecBuffer> ICodecBuffer::CreateCodeBuffer(struct OmxCodecBuffer &codecBu
 {
     sptr<ICodecBuffer> buffer = nullptr;
     switch (codecBuffer.bufferType) {
-        case BUFFER_TYPE_AVSHARE_MEM_FD:
+        case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD:
             buffer = CodecShareBuffer::Create(codecBuffer);
             break;
-        case BUFFER_TYPE_HANDLE:
+        case CODEC_BUFFER_TYPE_HANDLE:
             buffer = CodecHandleBuffer::Create(codecBuffer);
             break;
-        case BUFFER_TYPE_DYNAMIC_HANDLE:
+        case CODEC_BUFFER_TYPE_DYNAMIC_HANDLE:
             buffer = CodecDynaBuffer::Create(codecBuffer);
             break;
         default:
@@ -53,7 +53,7 @@ sptr<ICodecBuffer> ICodecBuffer::AllocateCodecBuffer(struct OmxCodecBuffer &code
 {
     sptr<ICodecBuffer> buffer = nullptr;
     switch (codecBuffer.bufferType) {
-        case BUFFER_TYPE_AVSHARE_MEM_FD:
+        case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD:
             buffer = CodecShareBuffer::Allocate(codecBuffer);
             break;
         default:

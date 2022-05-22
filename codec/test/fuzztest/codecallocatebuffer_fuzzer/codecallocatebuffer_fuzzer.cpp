@@ -41,7 +41,7 @@ namespace Codec {
         dataFuzz->bufferId = DATA_BUFFERID;
         dataFuzz->size = DATA_SIZE;
         dataFuzz->version.nVersion = DATA_VERSION_NVERSION;
-        dataFuzz->bufferType = (enum BufferType)DATA_BUFFERTYPE;
+        dataFuzz->bufferType = (enum CodecBufferType)DATA_BUFFERTYPE;
         dataFuzz->buffer = (uint8_t*)OsalMemAlloc(DATA_BUFFERLEN);
         dataFuzz->bufferLen = DATA_BUFFERLEN;
         dataFuzz->allocLen = DATA_ALLOCLEN;
