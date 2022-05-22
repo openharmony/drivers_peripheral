@@ -98,7 +98,7 @@ static void InitCodecBufferWithAshMem(enum PortIndex portIndex, int bufferSize, 
 {
     omxBuffer->size = sizeof(OmxCodecBuffer);
     omxBuffer->version = g_version;
-    omxBuffer->bufferType = BUFFER_TYPE_AVSHARE_MEM_FD;
+    omxBuffer->bufferType = CODEC_BUFFER_TYPE_AVSHARE_MEM_FD;
     omxBuffer->bufferLen = sizeof(int);
     omxBuffer->buffer = (uint8_t *)(uintptr_t)sharedMem->GetAshmemFd();
     omxBuffer->allocLen = bufferSize;
@@ -608,7 +608,7 @@ struct OmxCodecBuffer allocBuffer;
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
-    allocBuffer.bufferType = BUFFER_TYPE_INVALID;
+    allocBuffer.bufferType = CODEC_BUFFER_TYPE_INVALID;
     allocBuffer.fenceFd = -1;
     allocBuffer.version = g_version;
     allocBuffer.allocLen = BUFFER_SIZE;
@@ -624,7 +624,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_001, TestSize.Level1)
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_002, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
-    allocBuffer.bufferType = BUFFER_TYPE_VIRTUAL_ADDR;
+    allocBuffer.bufferType = CODEC_BUFFER_TYPE_VIRTUAL_ADDR;
     int32_t ret = g_component->AllocateBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_INPUT, &allocBuffer);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
@@ -632,7 +632,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_002, TestSize.Level1)
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_003, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
-    allocBuffer.bufferType = BUFFER_TYPE_INVALID;
+    allocBuffer.bufferType = CODEC_BUFFER_TYPE_INVALID;
     int32_t ret = g_component->AllocateBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, &allocBuffer);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
@@ -640,7 +640,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_003, TestSize.Level1)
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_004, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
-    allocBuffer.bufferType = BUFFER_TYPE_VIRTUAL_ADDR;
+    allocBuffer.bufferType = CODEC_BUFFER_TYPE_VIRTUAL_ADDR;
     int32_t ret = g_component->AllocateBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, &allocBuffer);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
@@ -653,7 +653,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_001, TestSize.Level1)
     ASSERT_TRUE(omxBuffer != nullptr);
     omxBuffer->size = sizeof(OmxCodecBuffer);
     omxBuffer->version = g_version;
-    omxBuffer->bufferType = BUFFER_TYPE_INVALID;
+    omxBuffer->bufferType = CODEC_BUFFER_TYPE_INVALID;
     omxBuffer->bufferLen = 0;
     omxBuffer->buffer = nullptr;
     omxBuffer->allocLen = 0;
@@ -672,7 +672,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_002, TestSize.Level1)
     ASSERT_TRUE(omxBuffer != nullptr);
     omxBuffer->size = sizeof(OmxCodecBuffer);
     omxBuffer->version = g_version;
-    omxBuffer->bufferType = BUFFER_TYPE_INVALID;
+    omxBuffer->bufferType = CODEC_BUFFER_TYPE_INVALID;
     omxBuffer->bufferLen = 0;
     omxBuffer->buffer = nullptr;
     omxBuffer->allocLen = 0;
@@ -691,7 +691,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_003, TestSize.Level1)
     ASSERT_TRUE(omxBuffer != nullptr);
     omxBuffer->size = sizeof(OmxCodecBuffer);
     omxBuffer->version = g_version;
-    omxBuffer->bufferType = BUFFER_TYPE_VIRTUAL_ADDR;
+    omxBuffer->bufferType = CODEC_BUFFER_TYPE_VIRTUAL_ADDR;
     omxBuffer->bufferLen = 0;
     omxBuffer->buffer = nullptr;
     omxBuffer->allocLen = 0;
@@ -710,7 +710,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_004, TestSize.Level1)
     ASSERT_TRUE(omxBuffer != nullptr);
     omxBuffer->size = sizeof(OmxCodecBuffer);
     omxBuffer->version = g_version;
-    omxBuffer->bufferType = BUFFER_TYPE_VIRTUAL_ADDR;
+    omxBuffer->bufferType = CODEC_BUFFER_TYPE_VIRTUAL_ADDR;
     omxBuffer->bufferLen = 0;
     omxBuffer->buffer = nullptr;
     omxBuffer->allocLen = 0;
@@ -755,7 +755,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_006, TestSize.Level1)
         sizeof(BufferHandle) + (sizeof(int32_t) * (bufferHandle->reserveFds + bufferHandle->reserveInts));
     omxBuffer->size = sizeof(OmxCodecBuffer);
     omxBuffer->version = g_version;
-    omxBuffer->bufferType = BUFFER_TYPE_HANDLE;
+    omxBuffer->bufferType = CODEC_BUFFER_TYPE_HANDLE;
 
     omxBuffer->bufferLen = handleSize;
     omxBuffer->buffer = reinterpret_cast<uint8_t *>(bufferHandle);
@@ -802,7 +802,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_008, TestSize.Level1)
     ASSERT_TRUE(omxBuffer != nullptr);
     omxBuffer->size = sizeof(OmxCodecBuffer);
     omxBuffer->version = g_version;
-    omxBuffer->bufferType = BUFFER_TYPE_DYNAMIC_HANDLE;
+    omxBuffer->bufferType = CODEC_BUFFER_TYPE_DYNAMIC_HANDLE;
 
     omxBuffer->bufferLen = 0;
     omxBuffer->buffer = nullptr;
@@ -859,7 +859,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_010, TestSize.Level1)
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_005, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
-    allocBuffer.bufferType = BUFFER_TYPE_AVSHARE_MEM_FD;
+    allocBuffer.bufferType = CODEC_BUFFER_TYPE_AVSHARE_MEM_FD;
     int32_t ret = g_component->AllocateBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_INPUT, &allocBuffer);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
@@ -867,7 +867,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_005, TestSize.Level1)
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_006, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
-    allocBuffer.bufferType = BUFFER_TYPE_AVSHARE_MEM_FD;
+    allocBuffer.bufferType = CODEC_BUFFER_TYPE_AVSHARE_MEM_FD;
     int32_t ret = g_component->AllocateBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, &allocBuffer);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
@@ -878,7 +878,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseEglImageTest_001, TestSize.Level1)
     struct OmxCodecBuffer buffer;
     buffer.fenceFd = -1;
     buffer.version = g_version;
-    buffer.bufferType = BUFFER_TYPE_AVSHARE_MEM_FD;
+    buffer.bufferType = CODEC_BUFFER_TYPE_AVSHARE_MEM_FD;
     buffer.allocLen = BUFFER_SIZE;
     buffer.buffer = 0;
     buffer.bufferLen = 0;
