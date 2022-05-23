@@ -41,7 +41,6 @@ public:
 protected:
     int32_t LoopingThreadEntry(void* arg);
     virtual void Run(void* service);
-    virtual void UpdateBatteryInfo(void* service, char* msg);
     virtual void UpdateBatteryInfo(void* service);
     virtual void HandleStates() {}
     virtual int32_t UpdateWaitInterval();
