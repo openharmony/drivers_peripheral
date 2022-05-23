@@ -33,17 +33,7 @@
       "test": [
         "//drivers/peripheral/battery/interfaces/hdi_service/test:unittest"
       ],
-      "inner_kits": [
-        {
-          "name": "//drivers/interface/battery/v1_0:libbattery_proxy_1.0",
-          "header": {
-            "header_files": [
-                "battery_callback_impl.h"
-            ],
-            "header_base": "//drivers/peripheral/battery/interfaces/include"
-          }
-        }
-      ]
+      "inner_kits": []
     }
   }
 }
