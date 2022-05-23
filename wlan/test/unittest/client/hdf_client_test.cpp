@@ -13,10 +13,8 @@
  * limitations under the License.
  */
 
-#include "hdf_wifi_test.h"
 #include <gtest/gtest.h>
 #include <osal_mem.h>
-#include "hdf_uhdf_test.h"
 #include "wifi_driver_client.h"
 
 using namespace testing::ext;
