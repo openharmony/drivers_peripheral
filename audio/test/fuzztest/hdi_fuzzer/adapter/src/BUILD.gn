@@ -18,7 +18,6 @@ import("//drivers/peripheral/audio/audio.gni")
 
 module_output_path = "hdf/audio"
 
-#############hdf_audio_hdi_getalladapters_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_getalladapters_fuzzer") {
   module_out_path = module_output_path
 
@@ -63,7 +62,6 @@ ohos_fuzztest("hdf_audio_hdi_getalladapters_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_loadadapter_manager_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_loadadapter_manager_fuzzer") {
   module_out_path = module_output_path
 
@@ -108,7 +106,6 @@ ohos_fuzztest("hdf_audio_hdi_loadadapter_manager_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_loadadapter_desc_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_loadadapter_desc_fuzzer") {
   module_out_path = module_output_path
 
@@ -153,7 +150,6 @@ ohos_fuzztest("hdf_audio_hdi_loadadapter_desc_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_unloadadapter_manager_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_unloadadapter_manager_fuzzer") {
   module_out_path = module_output_path
 
@@ -198,7 +194,6 @@ ohos_fuzztest("hdf_audio_hdi_unloadadapter_manager_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_unloadadapter_adapter_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_unloadadapter_adapter_fuzzer") {
   module_out_path = module_output_path
 
@@ -243,7 +238,6 @@ ohos_fuzztest("hdf_audio_hdi_unloadadapter_adapter_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_unloadadapter_adapter_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_initallports_fuzzer") {
   module_out_path = module_output_path
 
@@ -288,7 +282,6 @@ ohos_fuzztest("hdf_audio_hdi_initallports_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_createrender_adater_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_createrender_adater_fuzzer") {
   module_out_path = module_output_path
 
@@ -333,7 +326,6 @@ ohos_fuzztest("hdf_audio_hdi_createrender_adater_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_createrender_desc_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_createrender_desc_fuzzer") {
   module_out_path = module_output_path
 
@@ -378,7 +370,6 @@ ohos_fuzztest("hdf_audio_hdi_createrender_desc_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_createrender_attrs_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_createrender_attrs_fuzzer") {
   module_out_path = module_output_path
 
@@ -423,7 +414,6 @@ ohos_fuzztest("hdf_audio_hdi_createrender_attrs_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_destroyrender_adapter_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_destroyrender_adapter_fuzzer") {
   module_out_path = module_output_path
 
@@ -468,7 +458,6 @@ ohos_fuzztest("hdf_audio_hdi_destroyrender_adapter_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_destroyrender_render_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_destroyrender_render_fuzzer") {
   module_out_path = module_output_path
 
@@ -513,7 +502,6 @@ ohos_fuzztest("hdf_audio_hdi_destroyrender_render_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_createcapture_adater_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_createcapture_adater_fuzzer") {
   module_out_path = module_output_path
 
@@ -558,7 +546,6 @@ ohos_fuzztest("hdf_audio_hdi_createcapture_adater_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_createcapture_desc_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_createcapture_desc_fuzzer") {
   module_out_path = module_output_path
 
@@ -603,7 +590,6 @@ ohos_fuzztest("hdf_audio_hdi_createcapture_desc_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_createcapture_attrs_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_createcapture_attrs_fuzzer") {
   module_out_path = module_output_path
 
@@ -648,7 +634,6 @@ ohos_fuzztest("hdf_audio_hdi_createcapture_attrs_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_destroycapture_adapter_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_destroycapture_adapter_fuzzer") {
   module_out_path = module_output_path
 
@@ -693,7 +678,6 @@ ohos_fuzztest("hdf_audio_hdi_destroycapture_adapter_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_destroycapture_capture_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_destroycapture_capture_fuzzer") {
   module_out_path = module_output_path
 
@@ -738,7 +722,6 @@ ohos_fuzztest("hdf_audio_hdi_destroycapture_capture_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_getportcapability_adapter_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_getportcapability_adapter_fuzzer") {
   module_out_path = module_output_path
 
@@ -783,7 +766,6 @@ ohos_fuzztest("hdf_audio_hdi_getportcapability_adapter_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_setpassthroughmode_adapter_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_setpassthroughmode_adapter_fuzzer") {
   module_out_path = module_output_path
 
@@ -828,7 +810,6 @@ ohos_fuzztest("hdf_audio_hdi_setpassthroughmode_adapter_fuzzer") {
   }
 }
 
-#############hdf_audio_hdi_getpassthroughmode_adapter_fuzzer###################
 ohos_fuzztest("hdf_audio_hdi_getpassthroughmode_adapter_fuzzer") {
   module_out_path = module_output_path
 

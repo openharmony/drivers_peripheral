@@ -22,16 +22,15 @@ group("control") {
 
   deps += [
     # deps file
-    "src:hdf_audio_hdi_flush_capture_fuzzer",
-    "src:hdf_audio_hdi_flush_render_fuzzer",
-    "src:hdf_audio_hdi_pause_capture_fuzzer",
-    "src:hdf_audio_hdi_pause_render_fuzzer",
-    "src:hdf_audio_hdi_resume_capture_fuzzer",
-    "src:hdf_audio_hdi_resume_render_fuzzer",
-    "src:hdf_audio_hdi_start_capture_fuzzer",
-    "src:hdf_audio_hdi_start_render_fuzzer",
-    "src:hdf_audio_hdi_stop_capture_fuzzer",
-    "src:hdf_audio_hdi_stop_render_fuzzer",
+    "audioflushcapture_fuzzer:AudioFlushCaptureFuzzTest",
+    "audioflushrender_fuzzer:AudioFlushRenderFuzzTest",
+    "audiopausecapture_fuzzer:AudioPauseCaptureFuzzTest",
+    "audiopauserender_fuzzer:AudioPauseRenderFuzzTest",
+    "audioresumecapture_fuzzer:AudioResumeCaptureFuzzTest",
+    "audioresumerender_fuzzer:AudioResumeRenderFuzzTest",
+    "audiostartcapture_fuzzer:AudioStartCaptureFuzzTest",
+    "audiostartrender_fuzzer:AudioStartRenderFuzzTest",
+    "audiostopcapture_fuzzer:AudioStopCaptureFuzzTest",
+    "audiostoprender_fuzzer:AudioStopRenderFuzzTest",
   ]
 }
-############################end########################################

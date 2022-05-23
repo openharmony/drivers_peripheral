@@ -35,7 +35,7 @@
 
 #include "audio_adm_fuzzer_common.h"
 
-namespace HMOS {
+namespace OHOS {
 namespace Audio {
 int32_t InitRenderFramepara(struct AudioFrameRenderMode& frameRenderMode)
 {
@@ -108,7 +108,7 @@ int32_t InitHwRender(struct AudioHwRender *&hwRender)
     }
     hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     ret = strcpy_s(hwRender->renderParam.renderMode.hwInfo.adapterName,
-                   NAME_LEN, ADAPTER_NAME_USB.c_str());
+                   NAME_LEN, ADAPTER_NAME.c_str());
     if (ret < 0) {
         return HDF_FAILURE;
     }
@@ -126,7 +126,7 @@ int32_t InitHwCapture(struct AudioHwCapture *&hwCapture)
         return HDF_FAILURE;
     }
     ret = strcpy_s(hwCapture->captureParam.captureMode.hwInfo.adapterName,
-                   NAME_LEN, ADAPTER_NAME_INTERNAL.c_str());
+                   NAME_LEN, ADAPTER_NAME.c_str());
     if (ret < 0) {
         return HDF_FAILURE;
     }

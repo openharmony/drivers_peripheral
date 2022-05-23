@@ -38,13 +38,12 @@
 
 #include "audio_hdi_fuzzer_common.h"
 
-namespace HMOS {
+namespace OHOS {
 namespace Audio {
+using namespace std;
 const string BIND_CONTROL = "control";
 const string BIND_RENDER = "render";
 const string BIND_CAPTURE = "capture";
-const string ADAPTER_NAME_USB = "usb";
-const string ADAPTER_NAME_INTERNAL = "internal";
 const int G_PERIODSIZE = 4096;
 const int G_PERIODCOUNT = 8;
 const int G_BYTERATE = 48000;
