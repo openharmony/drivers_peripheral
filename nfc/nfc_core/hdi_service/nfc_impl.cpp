@@ -43,7 +43,7 @@ static void DataCallback(uint16_t len, uint8_t *data)
     }
 }
 
-extern "C" INfcInterface *NfcImplGetInstance(void)
+extern "C" INfcInterface *NfcInterfaceImplGetInstance(void)
 {
     using OHOS::HDI::Nfc::NfcCore::V1_0::NfcImpl;
     NfcImpl *service = new (std::nothrow) NfcImpl();

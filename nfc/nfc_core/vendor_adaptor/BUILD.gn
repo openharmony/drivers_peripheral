@@ -32,6 +32,7 @@ ohos_shared_library("nfc_vendor_adaptor") {
     "utils_base:utils",
   ]
 
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "nfc_device_driver"
 }
