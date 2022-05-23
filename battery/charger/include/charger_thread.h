@@ -38,7 +38,6 @@ private:
     void Init();
     static void UpdateAnimation(const int32_t& capacity);
     void Run(void* service) override;
-    void UpdateBatteryInfo(void* arg, char* msg) override;
     void UpdateBatteryInfo(void* arg) override;
     void HandleChargingState();
     void HandleScreenState();
