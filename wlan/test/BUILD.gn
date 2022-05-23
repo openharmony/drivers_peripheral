@@ -35,7 +35,9 @@ if (defined(ohos_lite)) {
     if (ohos_build_type == "debug") {
       deps = [
         "performance:hdf_peripheral_wlan_test_performance",
-        "unittest:hdf_peripheral_wlan_test",
+        "unittest:hdf_client_wifi",
+        "unittest:hdf_common_wifi",
+        "unittest:hdf_hal_wifi",
       ]
     }
     features = []
@@ -47,7 +49,9 @@ if (defined(ohos_lite)) {
       deps = [
         "hdi_service:WlanHdiServiceTestC",
         "performance:hdf_peripheral_wlan_test_performance",
-        "unittest:hdf_unittest_wifi",
+        "unittest:hdf_client_wifi",
+        "unittest:hdf_common_wifi",
+        "unittest:hdf_hal_wifi",
       ]
     }
   }
