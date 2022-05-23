@@ -332,7 +332,7 @@ static int32_t UsbdBulkReadSyncBase(int32_t timeout, uint8_t *buffer, uint32_t s
     msize = requestSync->pipe.maxPacketSize;
     while (tcur + msize < size) {
         ret = UsbFillRequest(requestSync->request, requestSync->ifHandle, &requestSync->params);
-        if (HDF_SUCCESS != ret) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: UsbFillRequest failed, ret=%{public}d \n", __func__, ret);
             break;
         }
@@ -459,7 +459,7 @@ static int32_t UsbdRequestSyncRelease(struct UsbdRequestSync *requestSync)
         OsalMutexLock(&requestSync->lock);
         if (requestSync->request) {
             ret = UsbFreeRequest(requestSync->request);
-            if (HDF_SUCCESS != ret) {
+            if (ret != HDF_SUCCESS) {
                 HDF_LOGW("%{public}s:%{public}d UsbFreeRequest failed", __func__, __LINE__);
             }
             requestSync->request = NULL;
@@ -504,7 +504,7 @@ static int32_t UsbdFindRequestSyncAndCreat(struct HostDevice *port, uint8_t inte
             return HDF_ERR_MALLOC_FAIL;
         }
         ret = UsbdRequestSyncInit(port, ifHandle, &pipe, requestSync);
-        if (HDF_SUCCESS != ret) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d UsbdRequestSyncInit fail ret:%{public}d", __func__, __LINE__, ret);
             int32_t tRet = UsbdRequestSyncRelease(requestSync);
             requestSync = NULL;
@@ -533,7 +533,7 @@ static int32_t FunBulkReadSync(struct HostDevice *port, struct HdfSBuf *data, st
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t ret = UsbdBulkReadSyncGetParams(data, &interfaceId, &pipeId, &timeout);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbdBulkReadSyncGetParams error:%{public}d", __func__, __LINE__, ret);
         return ret;
     }
@@ -548,7 +548,7 @@ static int32_t FunBulkReadSync(struct HostDevice *port, struct HdfSBuf *data, st
         return HDF_ERR_INVALID_PARAM;
     }
     ret = UsbdBulkReadSyncBase(timeout, tbuf, tsize, &actlength, requestSync);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGW("%{public}s:%{public}d UsbdBulkReadSyncBase ret:%{public}d, len:%{public}u",
             __func__, __LINE__, ret, actlength);
     }
@@ -599,7 +599,7 @@ static int32_t UsbdRequestSyncReleaseList(struct HostDevice *port)
         HdfSListIteratorRemove(&it);
         ret = UsbdRequestSyncRelease(req);
         req = NULL;
-        if (HDF_SUCCESS != ret) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d UsbdRequestSyncRelease failed\n", __func__, __LINE__);
         }
     }
@@ -621,7 +621,7 @@ static int32_t UsbdBulkWriteSyncBase(struct HostDevice *port, struct UsbdRequest
     int32_t initTimeout = timeout < 0 ? 0 : timeout;
     requestSync->params.timeout = initTimeout;
     requestSync->params.userData = port;
-    uint16_t tsize = requestSync->pipe.maxPacketSize;
+    uint16_t tsize;
     uint16_t tcur = 0;
     uint16_t msize = requestSync->pipe.maxPacketSize;
     while (tcur < length) {
@@ -630,14 +630,14 @@ static int32_t UsbdBulkWriteSyncBase(struct HostDevice *port, struct UsbdRequest
         requestSync->params.dataReq.length = tsize;
         tcur += tsize;
         ret = UsbFillRequest(requestSync->request, requestSync->ifHandle, &requestSync->params);
-        if (HDF_SUCCESS != ret) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d UsbFillRequest failed, ret = %{public}d, "
                 "handle:%{public}p tcur:%{public}d, length:%{public}u\n",
                 __func__, __LINE__, ret, requestSync->ifHandle, tcur, length);
             break;
         }
         ret = UsbSubmitRequestSync(requestSync->request);
-        if (HDF_SUCCESS != ret) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d UsbSubmitRequestSync failed, "
                 "ret = %{public}d tcur:%{public}d length:%{public}u\n", __func__, __LINE__, ret, tcur, length);
             break;
@@ -732,13 +732,13 @@ static int32_t UsbControlTransferEx(struct HostDevice *dev, struct UsbControlPar
     OsalMutexLock(&dev->lock);
     do {
         ret = UsbFillRequest(request, dev->ctrDevHandle, &parmas);
-        if (HDF_SUCCESS != ret) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d UsbFillRequest failed, ret = %{public}d", __func__, __LINE__, ret);
             break;
         }
 
         ret = UsbSubmitRequestSync(request);
-        if (HDF_SUCCESS != ret) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d UsbSubmitRequestSync failed, ret=%{public}d", __func__, __LINE__, ret);
             OsalMSleep(SUBMIT_SLEEP_TIME);
             break;
@@ -831,7 +831,7 @@ static int32_t CtrlTransferParamInit(struct HdfSBuf *data, struct UsbControlPara
     pCtrParams->index = index;
 
     int32_t ret = CtrlTranParamGetReqType(data, pCtrParams, requestType);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d CtrlTransferParamInit failed:%{public}d", __func__, __LINE__, ret);
         OsalMemFree(pCtrParams->data);
         pCtrParams->data = NULL;
@@ -860,7 +860,7 @@ static int32_t FunControlTransfer(struct HostDevice *port, struct HdfSBuf *data,
         return HDF_FAILURE;
     }
     ret = CtrlTransferParamInit(data, &controlParams, &timeout);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d CtrlTransferParamInit failed:%{public}d", __func__, __LINE__, ret);
         OsalMemFree(controlParams.data);
         controlParams.data = NULL;
@@ -1035,7 +1035,7 @@ static int32_t FunGetDeviceDescriptor(struct HostDevice *port, struct HdfSBuf *r
     struct UsbControlParams controlParams = {};
     MakeUsbControlParams(&controlParams, buffer, &length, (int32_t)USB_DDK_DT_DEVICE << TYPE_OFFSET_8, 0);
     int32_t ret = UsbControlTransferEx(port, &controlParams, USB_CTRL_SET_TIMEOUT);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d failed ret:%{public}d", __func__, __LINE__, ret);
         return ret;
     }
@@ -1066,7 +1066,7 @@ static int32_t FunGetConfigDescriptor(struct HostDevice *port, struct HdfSBuf *d
     struct UsbControlParams controlParams = {};
     MakeUsbControlParams(&controlParams, buffer, &length, ((int32_t)USB_DDK_DT_CONFIG << TYPE_OFFSET_8) + configId, 0);
     int32_t ret = UsbControlTransferEx(port, &controlParams, USB_CTRL_SET_TIMEOUT);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d failed", __func__, __LINE__);
 
         return ret;
@@ -1098,7 +1098,7 @@ static int32_t FunGetStringDescriptor(struct HostDevice *port, struct HdfSBuf *d
     struct UsbControlParams controlParams = {};
     MakeUsbControlParams(&controlParams, buffer, &length, ((int32_t)USB_DDK_DT_STRING << TYPE_OFFSET_8) + stringId, 0);
     int32_t ret = UsbControlTransferEx(port, &controlParams, GET_STRING_SET_TIMEOUT);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d failed ret=%{public}d", __func__, __LINE__, ret);
         return ret;
     }
@@ -1135,7 +1135,7 @@ static int32_t FunGetActiveConfig(struct HostDevice *port, struct HdfSBuf *data,
     struct UsbControlParams controlParams = {};
     MakeGetActiveUsbControlParams(&controlParams, &configId, &length, 0, 0);
     int32_t ret = UsbControlTransferEx(port, &controlParams, USB_CTRL_SET_TIMEOUT);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d failed", __func__, __LINE__);
         return HDF_ERR_IO;
     }
@@ -1284,7 +1284,7 @@ static int32_t UsbdRequestASyncRelease(struct UsbdRequestASync *request)
         if (request->reqMsg.request) {
             ret = UsbFreeRequest(request->reqMsg.request);
             request->reqMsg.request = NULL;
-            if (HDF_SUCCESS != ret) {
+            if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s:%{public}d UsbFreeRequest failed", __func__, __LINE__);
             }
         }
@@ -1313,7 +1313,7 @@ static int32_t UsbdRequestASyncReleaseList(struct HostDevice *port)
         HdfSListIteratorRemove(&it);
         ret = UsbdRequestASyncRelease(req);
         req = NULL;
-        if (HDF_SUCCESS != ret) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGW("%{public}s:%{public}d UsbdRequestASyncRelease failed\n", __func__, __LINE__);
         }
     }
@@ -1350,7 +1350,7 @@ static int32_t UsbdBulkASyncListReleasePort(struct HostDevice *port)
     if ((!port) || (!port->bulkASyncList)) {
         return HDF_SUCCESS;
     }
-    struct UsbdBulkASyncList *list = port->bulkASyncList;
+    struct UsbdBulkASyncList *list;
     while (port->bulkASyncList) {
         list = port->bulkASyncList;
         port->bulkASyncList = list->next;
@@ -1455,7 +1455,7 @@ static int32_t FunSetActiveConfig(struct HostDevice *port, struct HdfSBuf *data,
     struct UsbControlParams controlParams = {};
     MakeGetActiveUsbControlParams(&controlParams, &configIdOld, &length, 0, 0);
     int32_t ret = UsbControlTransferEx(port, &controlParams, USB_CTRL_SET_TIMEOUT);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d getConfiguration failed ret:%{public}d", __func__, __LINE__, ret);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -1469,7 +1469,7 @@ static int32_t FunSetActiveConfig(struct HostDevice *port, struct HdfSBuf *data,
     length = 0;
     MakeSetActiveUsbControlParams(&controlParams, &configId, &length, (int32_t)0 + configId, 0);
     ret = UsbControlTransferEx(port, &controlParams, USB_CTRL_SET_TIMEOUT);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d setConfiguration failed ret:%{public}d", __func__, __LINE__, ret);
         return HDF_ERR_IO;
     }
@@ -1666,7 +1666,7 @@ static struct UsbdRequestASync *UsbdRequestASyncCreatAndInsert(struct HostDevice
     req = UsbdRequestASyncAlloc();
     if (req) {
         ret = UsbdRequestASyncInit(port, ifHandle, &pipe, req);
-        if (HDF_SUCCESS != ret) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d UsbdRequestASyncInit failed:%{public}d\n", __func__, __LINE__, ret);
             UsbdRequestASyncRelease(req);
             req = NULL;
@@ -1754,7 +1754,7 @@ static int32_t FunRequestQueueFillAndSubmit(struct HostDevice *port, struct Usbd
 
     FillReqAyncParams(reqAsync, &reqAsync->pipe, &reqAsync->params, buffer, length);
     int32_t ret = UsbFillRequest(reqAsync->reqMsg.request, reqAsync->ifHandle, &reqAsync->params);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbFillRequest failed, ret=%{public}d \n", __func__, __LINE__, ret);
         OsalMutexLock(&reqAsync->lock);
         reqAsync->reqMsg.clientData = NULL;
@@ -1800,7 +1800,7 @@ static int32_t FunRequestQueue(struct HostDevice *port, struct HdfSBuf *data, st
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t ret = UsbReqQueueParamInfo(data, &interfaceId, &pipeAddr);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbReqQueueParamInfo failed", __func__, __LINE__);
         return ret;
     }
@@ -1826,7 +1826,7 @@ static int32_t FunRequestQueue(struct HostDevice *port, struct HdfSBuf *data, st
     reqAsync->reqMsg.clientData = (void *)clientData;
     reqAsync->reqMsg.clientLength = clientLength;
     ret = FunRequestQueueFillAndSubmit(port, reqAsync, buffer, length);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d FunRequestQueueFillAndSubmit failed:%{public}d", __func__, __LINE__, ret);
         OsalMemFree(clientData);
         clientData = NULL;
@@ -1839,7 +1839,6 @@ static int32_t FunRequestQueue(struct HostDevice *port, struct HdfSBuf *data, st
 static int32_t GetRequestMsgFromQueue(struct HostDevice *port, struct UsbdRequestASync **reqMsg)
 {
     struct HdfSListNode *requestNode = NULL;
-    int32_t requestCount = 0;
     if (port == NULL) {
         HDF_LOGE("%{public}s: invalid parma", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -1847,7 +1846,6 @@ static int32_t GetRequestMsgFromQueue(struct HostDevice *port, struct UsbdReques
     OsalMutexLock(&port->requestLock);
     if (!HdfSListIsEmpty(&port->requestQueue)) {
         requestNode = HdfSListPop(&port->requestQueue);
-        requestCount = HdfSListCount(&port->requestQueue);
     }
     OsalMutexUnlock(&port->requestLock);
     if (requestNode == NULL) {
@@ -1872,7 +1870,7 @@ static int32_t GetRequestMsgData(struct HostDevice *port, struct UsbdRequestASyn
     }
     if ((int32_t)(reqMsg->reqMsg.request->compInfo.status) == -1) {
         ret = OsalSemWait(&((struct UsbIfRequest *)reqMsg->reqMsg.request)->hostRequest->sem, timeout);
-        if (HDF_SUCCESS != ret) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d OsalSemWait failed, ret=%{public}d", __func__, __LINE__, ret);
             OsalMutexLock(&port->requestLock);
             HdfSListAdd(&port->requestQueue, &reqMsg->qNode);
@@ -1913,7 +1911,7 @@ static int32_t FunRequestWait(struct HostDevice *port, struct HdfSBuf *data, str
 
     if ((int32_t)(reqMsg->reqMsg.request->compInfo.status) == -1) {
         ret = OsalSemWait(&((struct UsbIfRequest *)reqMsg->reqMsg.request)->hostRequest->sem, timeout);
-        if (HDF_SUCCESS != ret) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d OsalSemWait failed, ret=%{public}d", __func__, __LINE__, ret);
             OsalMutexLock(&port->requestLock);
             HdfSListAdd(&port->requestQueue, &reqMsg->qNode);
@@ -1923,7 +1921,7 @@ static int32_t FunRequestWait(struct HostDevice *port, struct HdfSBuf *data, str
     }
 
     ret = GetRequestMsgData(port, reqMsg, timeout, &buffer, &length);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d GetRequestMsgData error:%{public}d", __func__, __LINE__, ret);
         return ret;
     }
@@ -2500,7 +2498,7 @@ static struct UsbdBulkASyncList *UsbdBulkASyncListAlloc(struct HostDevice *port,
     UsbdBulkASyncReqFillParams(&bulkAsyncList->pipe, &bulkAsyncList->params, NULL);
 
     ret = UsbdBulkASyncReqInit(&bulkAsyncList->rList, bulkAsyncList);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbdBulkASyncReqInit ret:%{public}d", __func__, __LINE__, ret);
         UsbdBulkASyncListRelease(bulkAsyncList);
         bulkAsyncList = NULL;
@@ -2741,19 +2739,19 @@ static int32_t UsbdBulkASyncReqWriteAutoSubmit(struct UsbRequest *request)
     memcpy_s(&params, sizeof(params), &db->list->pList->params, sizeof(params));
     params.userData = (void *)db;
     ret = UsbdBulkAsyncGetAsmData(&db->list->pList->asmHandle, &params, db->list->pList->pipe.maxPacketSize);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         UsbdBulkASyncReqNodeSetNoUse(db);
         return ret;
     }
     db->request->compInfo.status = 0;
     ret = UsbFillRequest(request, db->list->pList->ifHandle, &params);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         UsbdBulkASyncReqNodeSetNoUse(db);
         HDF_LOGE("%{public}s:%{public}d UsbFillRequest ret:%{public}d", __func__, __LINE__, ret);
         return ret;
     }
     ret = UsbSubmitRequestAsync(request);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         UsbdBulkASyncReqNodeSetNoUse(db);
         HDF_LOGE("%{public}s:%{public}d UsbSubmitRequestAsync ret:%{public}d", __func__, __LINE__, ret);
     }
@@ -2766,7 +2764,7 @@ static int32_t UsbdBulkASyncReqReadAutoSubmit(struct UsbRequest *request)
     struct UsbdBulkASyncReqNode *db = (struct UsbdBulkASyncReqNode *)request->compInfo.userData;
     int32_t ret =
         UsbdBulkASyncPutAsmData(&db->list->pList->asmHandle, request->compInfo.buffer, request->compInfo.actualLength);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE(
             "%{public}s:%{public}d UsbdBulkASyncPutAsmData error "
             "size:%{public}d ret:%{public}d ",
@@ -2775,6 +2773,12 @@ static int32_t UsbdBulkASyncReqReadAutoSubmit(struct UsbRequest *request)
         return ret;
     }
     ret = UsbdBulkAsyncGetAsmReqLen(&db->list->pList->asmHandle, &readLen, db->list->pList->pipe.maxPacketSize);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:%{public}d invalid param", __func__, __LINE__);
+        UsbdBulkASyncReqNodeSetNoUse(db);
+        return ret;
+    }
+
     if (readLen < 1) {
         UsbdBulkASyncReqNodeSetNoUse(db);
         HDF_LOGE("%{public}s:%{public}d invalid param", __func__, __LINE__);
@@ -2789,14 +2793,14 @@ static int32_t UsbdBulkASyncReqReadAutoSubmit(struct UsbRequest *request)
         params.dataReq.length = readLen;
         params.userData = (void *)db;
         ret = UsbFillRequest(request, db->list->pList->ifHandle, &params);
-        if (HDF_SUCCESS != ret) {
+        if (ret != HDF_SUCCESS) {
             UsbdBulkASyncReqNodeSetNoUse(db);
             HDF_LOGE("%{public}s:%{public}d UsbFillRequest ret:%{public}d ", __func__, __LINE__, ret);
             return ret;
         }
     }
     ret = UsbSubmitRequestAsync(request);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         UsbdBulkASyncReqNodeSetNoUse(db);
         HDF_LOGE("%{public}s:%{public}d UsbSubmitRequestAsync ret:%{public}d ", __func__, __LINE__, ret);
     }
@@ -2811,27 +2815,37 @@ static void UsbdBulkASyncWriteCallbackAutoSubmit(struct UsbRequest *request)
     int32_t ret = HDF_SUCCESS;
     struct UsbdBulkASyncReqNode *node = (struct UsbdBulkASyncReqNode *)request->compInfo.userData;
     int32_t status = request->compInfo.status;
-    if (status == 0) {
-        ret = UsbdBulkASyncReqWriteAutoSubmit(request);
-        if (HDF_DEV_ERR_NODATA == ret) {
-            int32_t count = DListGetCount(&node->list->eList);
-            if (count >= USBD_BULKASYNCREQ_NUM_MAX) {
-                ret = UsbdBulkWriteRemoteCallback(node->list->pList->cb, HDF_SUCCESS, &node->list->pList->asmHandle);
+    if (status != 0) {
+        UsbdBulkASyncReqNodeSetNoUse(node);
+        ret = UsbdBulkWriteRemoteCallback(node->list->pList->cb, status, &node->list->pList->asmHandle);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE(
+                "%{public}s:%{public}d UsbdBulkWriteRemoteCallback ret:%{public}d "
+                "req:%{public}p id:%{public}d status:%{public}d",
+                __func__, __LINE__, ret, request, node->id, status);
+        }
+        return;
+    }
+
+    ret = UsbdBulkASyncReqWriteAutoSubmit(request);
+    if (ret == HDF_DEV_ERR_NODATA) {
+        int32_t count = DListGetCount(&node->list->eList);
+        if (count >= USBD_BULKASYNCREQ_NUM_MAX) {
+            ret = UsbdBulkWriteRemoteCallback(node->list->pList->cb, HDF_SUCCESS, &node->list->pList->asmHandle);
+            if (ret != HDF_SUCCESS) {
+                HDF_LOGE("%{public}s: UsbdBulkReadRemoteCallback failed", __func__);
+                return;
             }
-        } else if (HDF_SUCCESS != ret) {
-            ret = UsbdBulkWriteRemoteCallback(node->list->pList->cb, ret, &node->list->pList->asmHandle);
+        }
+    } else if (ret != HDF_SUCCESS) {
+        ret = UsbdBulkWriteRemoteCallback(node->list->pList->cb, ret, &node->list->pList->asmHandle);
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE(
                 "%{public}s:%{public}d UsbdBulkWriteRemoteCallback "
                 "ret:%{public}d req:%{public}p id:%{public}d",
                 __func__, __LINE__, ret, request, node->id);
+            return;
         }
-    } else {
-        UsbdBulkASyncReqNodeSetNoUse(node);
-        ret = UsbdBulkWriteRemoteCallback(node->list->pList->cb, status, &node->list->pList->asmHandle);
-        HDF_LOGE(
-            "%{public}s:%{public}d UsbdBulkWriteRemoteCallback ret:%{public}d "
-            "req:%{public}p id:%{public}d status:%{public}d",
-            __func__, __LINE__, ret, request, node->id, status);
     }
 }
 
@@ -2843,27 +2857,37 @@ static void UsbdBulkASyncReadCallbackAutoSubmit(struct UsbRequest *request)
     int32_t ret = HDF_SUCCESS;
     struct UsbdBulkASyncReqNode *node = (struct UsbdBulkASyncReqNode *)request->compInfo.userData;
     int32_t status = request->compInfo.status;
-    if (status == 0) {
-        ret = UsbdBulkASyncReqReadAutoSubmit(request);
-        if (HDF_DEV_ERR_NODATA == ret) {
-            int32_t count = DListGetCount(&node->list->eList);
-            if (count >= USBD_BULKASYNCREQ_NUM_MAX) {
-                ret = UsbdBulkReadRemoteCallback(node->list->pList->cb, HDF_SUCCESS, &node->list->pList->asmHandle);
+    if (status != 0) {
+        UsbdBulkASyncReqNodeSetNoUse(node);
+        ret = UsbdBulkReadRemoteCallback(node->list->pList->cb, status, &node->list->pList->asmHandle);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE(
+                "%{public}s:%{public}d UsbdBulkReadRemoteCallback ret:%{public}d "
+                "req:%{public}p id:%{public}d status:%{public}d",
+                __func__, __LINE__, ret, request, node->id, status);
+        }
+        return;
+    }
+    
+    ret = UsbdBulkASyncReqReadAutoSubmit(request);
+    if (ret == HDF_DEV_ERR_NODATA) {
+        int32_t count = DListGetCount(&node->list->eList);
+        if (count >= USBD_BULKASYNCREQ_NUM_MAX) {
+            ret = UsbdBulkReadRemoteCallback(node->list->pList->cb, HDF_SUCCESS, &node->list->pList->asmHandle);
+            if (ret != HDF_SUCCESS) {
+                HDF_LOGE("%{public}s: UsbdBulkReadRemoteCallback failed", __func__);
+                return;
             }
-        } else if (HDF_SUCCESS != ret) {
-            ret = UsbdBulkReadRemoteCallback(node->list->pList->cb, ret, &node->list->pList->asmHandle);
+        }
+    } else if (ret != HDF_SUCCESS) {
+        ret = UsbdBulkReadRemoteCallback(node->list->pList->cb, ret, &node->list->pList->asmHandle);
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE(
                 "%{public}s:%{public}d UsbdBulkReadRemoteCallback "
                 "ret:%{public}d req:%{public}p id:%{public}d",
                 __func__, __LINE__, ret, request, node->id);
+            return;
         }
-    } else {
-        UsbdBulkASyncReqNodeSetNoUse(node);
-        ret = UsbdBulkReadRemoteCallback(node->list->pList->cb, status, &node->list->pList->asmHandle);
-        HDF_LOGE(
-            "%{public}s:%{public}d UsbdBulkReadRemoteCallback ret:%{public}d "
-            "req:%{public}p id:%{public}d status:%{public}d",
-            __func__, __LINE__, ret, request, node->id, status);
     }
 }
 
@@ -2894,20 +2918,20 @@ static int32_t UsbdBulkASyncReqWriteSubmit(struct UsbdBulkASyncReqNode *req)
     memcpy_s(&params, sizeof(params), &req->list->pList->params, sizeof(params));
     params.userData = (void *)req;
     ret = UsbdBulkAsyncGetAsmData(&req->list->pList->asmHandle, &params, req->list->pList->pipe.maxPacketSize);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         UsbdBulkASyncReqNodeSetNoUse(req);
         HDF_LOGE("%{public}s:%{public}d UsbdBulkAsyncGetAsmData ret:%{public}d", __func__, __LINE__, ret);
         return ret;
     }
     req->request->compInfo.status = 0;
     ret = UsbFillRequest(req->request, req->list->pList->ifHandle, &params);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         UsbdBulkASyncReqNodeSetNoUse(req);
         HDF_LOGE("%{public}s:%{public}d UsbFillRequest ret:%{public}d", __func__, __LINE__, ret);
         return ret;
     }
     ret = UsbSubmitRequestAsync(req->request);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         UsbdBulkASyncReqNodeSetNoUse(req);
         HDF_LOGE("%{public}s:%{public}d UsbSubmitRequestAsync ret:%{public}d", __func__, __LINE__, ret);
     }
@@ -2930,7 +2954,7 @@ static int32_t UsbdBulkASyncWriteSubmitStart(struct UsbdBulkASyncList *list)
             break;
         } else {
             ret = UsbdBulkASyncReqWriteSubmit(req);
-            if (HDF_SUCCESS != ret) {
+            if (ret != HDF_SUCCESS) {
                 break;
             }
         }
@@ -2946,6 +2970,12 @@ static int32_t UsbdBulkASyncReqReadSubmit(struct UsbdBulkASyncReqNode *db)
     int32_t ret = HDF_SUCCESS;
     uint32_t readLen = 0;
     ret = UsbdBulkAsyncGetAsmReqLen(&db->list->pList->asmHandle, &readLen, db->list->pList->pipe.maxPacketSize);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:UsbdBulkAsyncGetAsmReqLen failed", __func__);
+        UsbdBulkASyncReqNodeSetNoUse(db);
+        return HDF_ERR_IO;
+    }
+
     if (readLen == 0) {
         UsbdBulkASyncReqNodeSetNoUse(db);
         HDF_LOGE("%{public}s:%{public}d readLen:%{public}d", __func__, __LINE__, readLen);
@@ -2958,14 +2988,14 @@ static int32_t UsbdBulkASyncReqReadSubmit(struct UsbdBulkASyncReqNode *db)
     params.dataReq.length = readLen;
     params.userData = (void *)db;
     ret = UsbFillRequest(db->request, db->list->pList->ifHandle, &params);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d readLen:%{public}d", __func__, __LINE__, readLen);
         UsbdBulkASyncReqNodeSetNoUse(db);
         return ret;
     }
 
     ret = UsbSubmitRequestAsync(db->request);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d readLen:%{public}d", __func__, __LINE__, readLen);
         UsbdBulkASyncReqNodeSetNoUse(db);
     }
@@ -2989,7 +3019,7 @@ static int32_t UsbdBulkReadASyncSubmitStart(struct UsbdBulkASyncList *list)
             break;
         } else {
             ret = UsbdBulkASyncReqReadSubmit(req);
-            if (HDF_SUCCESS != ret) {
+            if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s:%{public}d invalid param", __func__, __LINE__);
                 break;
             }
@@ -3101,6 +3131,10 @@ static int32_t BulkRequestCancel(struct UsbdBulkASyncList *list)
     for (int32_t i = 0; i < USBD_BULKASYNCREQ_NUM_MAX; ++i) {
         if ((list->rList.node[i].use == USBD_REQNODE_USE) || (list->rList.node[i].use == USBD_REQNODE_OTHER)) {
             ret = UsbCancelRequest(list->rList.node[i].request);
+            if (ret != HDF_SUCCESS) {
+                HDF_LOGE("%{public}s: UsbCancelRequest failed, ret=%{public}d ", __func__, ret);
+                return ret;
+            }
         }
     }
     OsalMSleep(USB_BULK_CANCEL_SLEEP_TIME);
@@ -3212,7 +3246,7 @@ static int32_t FunBulkRead(struct HostDevice *port, struct HdfSBuf *data, struct
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t ret = UsbdGetBulkParams(data, &ifId, &epId, &fd, &size);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbdReadAshmemFromHdfSBuf error ret:%{public}d ", __func__, __LINE__, ret);
         return ret;
     }
@@ -3222,7 +3256,7 @@ static int32_t FunBulkRead(struct HostDevice *port, struct HdfSBuf *data, struct
         return HDF_ERR_MALLOC_FAIL;
     }
     ret = InitAsmBufferHandle(&list->asmHandle, fd, size);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE(
             "%{public}s:%{public}d InitAsmBufferHandle error ret:%{public}d "
             "ashmem fd:%{public}d size:%{public}d",
@@ -3230,10 +3264,10 @@ static int32_t FunBulkRead(struct HostDevice *port, struct HdfSBuf *data, struct
         return ret;
     }
     ret = UsbdBulkReadASyncSubmitStart(list);
-    if ((HDF_DEV_ERR_NODATA == ret) || (HDF_DEV_ERR_NO_MEMORY == ret) || (HDF_ERR_DEVICE_BUSY == ret)) {
+    if ((ret == HDF_DEV_ERR_NODATA) || (ret == HDF_DEV_ERR_NO_MEMORY) || (ret == HDF_ERR_DEVICE_BUSY)) {
         ret = HDF_SUCCESS;
     }
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE(
             "%{public}s:%{public}d UsbdBulkReadASyncSubmitStart error "
             "ret:%{public}d ",
@@ -3255,7 +3289,7 @@ static int32_t FunBulkWrite(struct HostDevice *port, struct HdfSBuf *data, struc
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t ret = UsbdGetBulkParams(data, &ifId, &epId, &fd, &size);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbdReadAshmemFromHdfSBuf error ret:%{public}d ", __func__, __LINE__, ret);
         return ret;
     }
@@ -3265,7 +3299,7 @@ static int32_t FunBulkWrite(struct HostDevice *port, struct HdfSBuf *data, struc
         return HDF_ERR_MALLOC_FAIL;
     }
     ret = InitAsmBufferHandle(&list->asmHandle, fd, size);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE(
             "%{public}s:%{public}d InitAsmBufferHandle error ret:%{public}d "
             "ashmem fd:%{public}d size:%{public}d",
@@ -3276,7 +3310,7 @@ static int32_t FunBulkWrite(struct HostDevice *port, struct HdfSBuf *data, struc
     if ((HDF_DEV_ERR_NODATA == ret) || (HDF_DEV_ERR_NO_MEMORY == ret) || (HDF_ERR_DEVICE_BUSY == ret)) {
         ret = HDF_SUCCESS;
     }
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE(
             "%{public}s:%{public}d UsbdBulkASyncWriteSubmitStart error "
             "ret:%{public}d ",
