@@ -25,7 +25,6 @@ ohos_unittest("khdf_audio_adm_test") {
 
   defines = [ "__USER__" ]
   sources = [
-    "//drivers/framework/model/audio/common/test/unittest/common/audio_accessory_base_test.cpp",
     "//drivers/framework/model/audio/common/test/unittest/common/audio_codec_base_test.cpp",
     "//drivers/framework/model/audio/common/test/unittest/common/audio_dai_base_test.cpp",
     "//drivers/framework/model/audio/common/test/unittest/common/audio_dma_base_test.cpp",
