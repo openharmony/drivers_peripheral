@@ -90,9 +90,17 @@ std::map<std::string, camera_type_enum_t> CameraTypeMap = {
     {"OHOS_CAMERA_TYPE_UNSPECIFIED", OHOS_CAMERA_TYPE_UNSPECIFIED},
 };
 
+std::map<std::string, camera_connection_type_t> cameraConnectionTypeMap = {
+    {"OHOS_CAMERA_CONNECTION_TYPE_BUILTIN", OHOS_CAMERA_CONNECTION_TYPE_BUILTIN},
+    {"OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN", OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN},
+    {"OHOS_CAMERA_CONNECTION_TYPE_REMOTE", OHOS_CAMERA_CONNECTION_TYPE_REMOTE},
+};
+
 std::map<std::string, camera_exposure_mode_enum_t> ExposureModeMap = {
     {"OHOS_CAMERA_EXPOSURE_MODE_MANUAL", OHOS_CAMERA_EXPOSURE_MODE_MANUAL},
     {"OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO", OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO},
+    {"OHOS_CAMERA_EXPOSURE_MODE_LOCKED", OHOS_CAMERA_EXPOSURE_MODE_LOCKED},
+    {"OHOS_CAMERA_EXPOSURE_MODE_AUTO", OHOS_CAMERA_EXPOSURE_MODE_AUTO},
 };
 
 std::map<std::string, camera_focus_mode_enum_t> FocusModeMap = {
@@ -107,6 +115,24 @@ std::map<std::string, camera_flash_mode_enum_t> FlashModeMap = {
     {"OHOS_CAMERA_FLASH_MODE_OPEN", OHOS_CAMERA_FLASH_MODE_OPEN},
     {"OHOS_CAMERA_FLASH_MODE_AUTO", OHOS_CAMERA_FLASH_MODE_AUTO},
     {"OHOS_CAMERA_FLASH_MODE_ALWAYS_OPEN", OHOS_CAMERA_FLASH_MODE_ALWAYS_OPEN},
+};
+
+std::map<std::string, camera_meter_mode_t> meterModeMap = {
+    {"OHOS_CAMERA_SPOT_METERING", OHOS_CAMERA_SPOT_METERING},
+    {"OHOS_CAMERA_REGION_METERING", OHOS_CAMERA_REGION_METERING},
+    {"OHOS_CAMERA_OVERALL_METERING", OHOS_CAMERA_OVERALL_METERING},
+};
+
+std::map<std::string, camera_mirror_t> mirrorMap = {
+    {"OHOS_CAMERA_MIRROR_OFF", OHOS_CAMERA_MIRROR_OFF},
+    {"OHOS_CAMERA_MIRROR_ON", OHOS_CAMERA_MIRROR_ON}
+};
+
+std::vector<camera_format_t> formatArray = {
+    OHOS_CAMERA_FORMAT_RGBA_8888,
+    OHOS_CAMERA_FORMAT_YCBCR_420_888,
+    OHOS_CAMERA_FORMAT_YCRCB_420_SP,
+    OHOS_CAMERA_FORMAT_JPEG
 };
 
 std::map<std::string, camera_ae_antibanding_mode_t> AeAntibandingModeMap = {
@@ -159,7 +185,6 @@ std::map<std::string, camera_awb_mode_t> AwbModeMap = {
 std::map<std::string, camera_face_detect_mode_t> FaceDetectModeMap = {
     {"OHOS_CAMERA_FACE_DETECT_MODE_OFF", OHOS_CAMERA_FACE_DETECT_MODE_OFF},
     {"OHOS_CAMERA_FACE_DETECT_MODE_SIMPLE", OHOS_CAMERA_FACE_DETECT_MODE_SIMPLE},
-    {"OHOS_CAMERA_FACE_DETECT_MODE_FULL", OHOS_CAMERA_FACE_DETECT_MODE_FULL},
 };
 
 std::map<std::string, camera_histogram_mode_t> HistogramModeMap = {

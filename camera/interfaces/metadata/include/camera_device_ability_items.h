@@ -87,6 +87,7 @@ typedef enum camera_device_metadata_tag {
     OHOS_ABILITY_CAMERA_POSITION = OHOS_CAMERA_PROPERTIES_START,
     OHOS_ABILITY_CAMERA_TYPE,
     OHOS_ABILITY_CAMERA_CONNECTION_TYPE,
+    OHOS_ABILITY_FPS_RANGES,
     OHOS_CAMERA_PROPERTIES_END,
 
     OHOS_SENSOR_EXPOSURE_TIME = OHOS_CAMERA_SENSOR_START,
@@ -99,9 +100,12 @@ typedef enum camera_device_metadata_tag {
     OHOS_SENSOR_INFO_MAX_FRAME_DURATION,
     OHOS_SENSOR_INFO_PHYSICAL_SIZE,
     OHOS_SENSOR_INFO_PIXEL_ARRAY_SIZE,
+    OHOS_SENSOR_INFO_TIMESTAMP,
     OHOS_CAMERA_SENSOR_INFO_END,
 
     OHOS_STATISTICS_FACE_DETECT_MODE = OHOS_CAMERA_STATISTICS_START,
+    OHOS_STATISTICS_FACE_DETECT_SWITCH,
+    OHOS_STATISTICS_FACE_DETECT_MAX_NUM,
     OHOS_STATISTICS_HISTOGRAM_MODE,
     OHOS_STATISTICS_FACE_IDS,
     OHOS_STATISTICS_FACE_LANDMARKS,
@@ -115,6 +119,7 @@ typedef enum camera_device_metadata_tag {
     OHOS_CONTROL_AE_MODE,
     OHOS_CONTROL_AE_REGIONS,
     OHOS_CONTROL_AE_TARGET_FPS_RANGE,
+    OHOS_CONTROL_FPS_RANGES,
     OHOS_CONTROL_AF_MODE,
     OHOS_CONTROL_AF_REGIONS,
     OHOS_CONTROL_AF_TRIGGER,
@@ -132,19 +137,31 @@ typedef enum camera_device_metadata_tag {
     OHOS_CONTROL_AWB_AVAILABLE_MODES,
     OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED,
     OHOS_CONTROL_CAPTURE_MIRROR,
+    OHOS_CONTROL_FOCUS_STATE,
+    OHOS_CONTROL_METER_POINT,
+    OHOS_CONTROL_METER_MODE,
+    OHOS_CONTROL_EXPOSURE_STATE,
     OHOS_DEVICE_CONTROL_END,
 
     // Camera device image acquisition related
     OHOS_ABILITY_DEVICE_AVAILABLE_EXPOSUREMODES = OHOS_DEVICE_EXPOSURE_START,
     OHOS_CONTROL_EXPOSUREMODE,
+    OHOS_ABILITY_EXPOSURE_MODES,
+    OHOS_CONTROL_EXPOSURE_MODE,
+    OHOS_ABILITY_METER_MODES,
     OHOS_DEVICE_EXPOSURE_END,
 
     OHOS_ABILITY_DEVICE_AVAILABLE_FOCUSMODES = OHOS_DEVICE_FOCUS_START,
     OHOS_CONTROL_FOCUSMODE,
+    OHOS_ABILITY_FOCUS_MODES,
+    OHOS_CONTROL_FOCUS_MODE,
+    OHOS_ABILITY_FOCAL_LENGTH,
     OHOS_DEVICE_FOCUS_END,
 
     OHOS_ABILITY_DEVICE_AVAILABLE_FLASHMODES = OHOS_DEVICE_FLASH_START,
     OHOS_CONTROL_FLASHMODE,
+    OHOS_ABILITY_FLASH_MODES,
+    OHOS_CONTROL_FLASH_MODE,
     OHOS_CONTROL_FLASH_STATE,
     OHOS_DEVICE_FLASH_END,
 
@@ -173,14 +190,14 @@ typedef enum camera_device_metadata_tag {
     OHOS_STREAM_JPEG_END,
 } camera_device_metadata_tag_t;
 
-// OHOS_ABILITY_CAMERA_POSITION
+// OHOS_ABILITY_CAMERA_POSITION enumeration values
 typedef enum camera_position_enum {
     OHOS_CAMERA_POSITION_FRONT = 0,
     OHOS_CAMERA_POSITION_BACK,
     OHOS_CAMERA_POSITION_OTHER
 } camera_position_enum_t;
 
-// OHOS_ABILITY_CAMERA_TYPE
+// OHOS_ABILITY_CAMERA_TYPE enumeration values
 typedef enum camera_type_enum {
     OHOS_CAMERA_TYPE_WIDE_ANGLE = 0,
     OHOS_CAMERA_TYPE_ULTRA_WIDE,
@@ -190,7 +207,7 @@ typedef enum camera_type_enum {
     OHOS_CAMERA_TYPE_UNSPECIFIED,
 } camera_type_enum_t;
 
-// OHOS_ABILITY_CAMERA_CONNECTION_TYPE
+// OHOS_ABILITY_CAMERA_CONNECTION_TYPE enumeration values
 typedef enum camera_connection_type {
     OHOS_CAMERA_CONNECTION_TYPE_BUILTIN = 0,
     OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN,
@@ -198,12 +215,15 @@ typedef enum camera_connection_type {
 } camera_connection_type_t;
 
 // OHOS_CONTROL_EXPOSUREMODE
+// and OHOS_ABILITY_EXPOSURE_MODES enumeration values
 typedef enum camera_exposure_mode_enum {
     OHOS_CAMERA_EXPOSURE_MODE_MANUAL = 0,
-    OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO
+    OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO,
+    OHOS_CAMERA_EXPOSURE_MODE_LOCKED,
+    OHOS_CAMERA_EXPOSURE_MODE_AUTO
 } camera_exposure_mode_enum_t;
 
-// OHOS_CONTROL_FOCUSMODE
+// OHOS_CONTROL_FOCUS_MODE and OHOS_ABILITY_FOCUS_MODES enumeration values
 typedef enum camera_focus_mode_enum {
     OHOS_CAMERA_FOCUS_MODE_MANUAL = 0,
     OHOS_CAMERA_FOCUS_MODE_CONTINUOUS_AUTO,
@@ -211,7 +231,7 @@ typedef enum camera_focus_mode_enum {
     OHOS_CAMERA_FOCUS_MODE_LOCKED
 } camera_focus_mode_enum_t;
 
-// OHOS_CONTROL_FLASHMODE
+// OHOS_CONTROL_FLASHMODE and OHOS_ABILITY_FLASH_MODES enumeration values
 typedef enum camera_flash_mode_enum {
     OHOS_CAMERA_FLASH_MODE_CLOSE = 0,
     OHOS_CAMERA_FLASH_MODE_OPEN,
@@ -219,7 +239,7 @@ typedef enum camera_flash_mode_enum {
     OHOS_CAMERA_FLASH_MODE_ALWAYS_OPEN
 } camera_flash_mode_enum_t;
 
-// OHOS_CONTROL_FLASH_STATE
+// OHOS_CONTROL_FLASH_STATE enumeration values
 typedef enum camera_flash_state_enum {
     OHOS_CAMERA_FLASH_STATE_UNAVAILABLE = 0,
     OHOS_CAMERA_FLASH_STATE_CHARGING,
@@ -228,7 +248,7 @@ typedef enum camera_flash_state_enum {
     OHOS_CAMERA_FLASH_STATE_UNKNOWN
 } camera_flash_state_enum_t;
 
-// OHOS_CONTROL_AE_ANTIBANDING_MODE
+// OHOS_CONTROL_AE_ANTIBANDING_MODE enumeration values
 typedef enum camera_ae_antibanding_mode {
     OHOS_CAMERA_AE_ANTIBANDING_MODE_OFF,
     OHOS_CAMERA_AE_ANTIBANDING_MODE_50HZ,
@@ -236,13 +256,13 @@ typedef enum camera_ae_antibanding_mode {
     OHOS_CAMERA_AE_ANTIBANDING_MODE_AUTO,
 } camera_ae_antibanding_mode_t;
 
-// OHOS_CONTROL_AE_LOCK
+// OHOS_CONTROL_AE_LOCK enumeration values
 typedef enum camera_ae_lock {
     OHOS_CAMERA_AE_LOCK_OFF,
     OHOS_CAMERA_AE_LOCK_ON,
 } camera_ae_lock_t;
 
-// OHOS_CONTROL_AE_MODE
+// OHOS_CONTROL_AE_MODE enumeration values
 typedef enum camera_ae_mode {
     OHOS_CAMERA_AE_MODE_OFF,
     OHOS_CAMERA_AE_MODE_ON,
@@ -252,7 +272,7 @@ typedef enum camera_ae_mode {
     OHOS_CAMERA_AE_MODE_ON_EXTERNAL_FLASH,
 } camera_ae_mode_t;
 
-// OHOS_CONTROL_AF_MODE
+// OHOS_CONTROL_AF_MODE enumeration values
 typedef enum camera_af_mode {
     OHOS_CAMERA_AF_MODE_OFF,
     OHOS_CAMERA_AF_MODE_AUTO,
@@ -262,14 +282,14 @@ typedef enum camera_af_mode {
     OHOS_CAMERA_AF_MODE_EDOF,
 } camera_af_mode_t;
 
-// OHOS_CONTROL_AF_TRIGGER
+// OHOS_CONTROL_AF_TRIGGER enumeration values
 typedef enum camera_af_trigger {
     OHOS_CAMERA_AF_TRIGGER_IDLE,
     OHOS_CAMERA_AF_TRIGGER_START,
     OHOS_CAMERA_AF_TRIGGER_CANCEL,
 } camera_af_trigger_t;
 
-// OHOS_CONTROL_AF_STATE
+// OHOS_CONTROL_AF_STATE enumeration values
 typedef enum camera_af_state {
     OHOS_CAMERA_AF_STATE_INACTIVE,
     OHOS_CAMERA_AF_STATE_PASSIVE_SCAN,
@@ -280,13 +300,13 @@ typedef enum camera_af_state {
     OHOS_CAMERA_AF_STATE_PASSIVE_UNFOCUSED,
 } camera_af_state_t;
 
-// OHOS_CONTROL_AWB_LOCK
+// OHOS_CONTROL_AWB_LOCK enumeration values
 typedef enum camera_awb_lock {
     OHOS_CAMERA_AWB_LOCK_OFF,
     OHOS_CAMERA_AWB_LOCK_ON,
 } camera_awb_lock_t;
 
-// OHOS_CONTROL_AWB_MODE
+// OHOS_CONTROL_AWB_MODE enumeration values
 typedef enum camera_awb_mode {
     OHOS_CAMERA_AWB_MODE_OFF,
     OHOS_CAMERA_AWB_MODE_AUTO,
@@ -300,24 +320,66 @@ typedef enum camera_awb_mode {
 } camera_awb_mode_t;
 
 // OHOS_STATISTICS_FACE_DETECT_MODE
+// and OHOS_STATISTICS_FACE_DETECT_SWITCH enumeration values
 typedef enum camera_face_detect_mode {
     OHOS_CAMERA_FACE_DETECT_MODE_OFF,
-    OHOS_CAMERA_FACE_DETECT_MODE_SIMPLE,
-    OHOS_CAMERA_FACE_DETECT_MODE_FULL,
+    OHOS_CAMERA_FACE_DETECT_MODE_SIMPLE
 } camera_face_detect_mode_t;
 
-// OHOS_STATISTICS_HISTOGRAM_MODE
+// OHOS_STATISTICS_HISTOGRAM_MODE enumeration values
 typedef enum camera_histogram_mode {
     OHOS_CAMERA_HISTOGRAM_MODE_OFF,
     OHOS_CAMERA_HISTOGRAM_MODE_ON,
 } camera_histogram_mode_t;
 
 // OHOS_STREAM_AVAILABLE_FORMATS
+// and OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS enumeration values
 typedef enum camera_format {
     OHOS_CAMERA_FORMAT_RGBA_8888 = 1,
     OHOS_CAMERA_FORMAT_YCBCR_420_888,
     OHOS_CAMERA_FORMAT_YCRCB_420_SP,
     OHOS_CAMERA_FORMAT_JPEG,
 } camera_format_t;
+
+// OHOS_CONTROL_FOCUS_STATE enumeration values
+typedef enum camera_focus_state {
+    OHOS_CAMERA_FOCUS_STATE_SCAN,
+    OHOS_CAMERA_FOCUS_STATE_FOCUSED,
+    OHOS_CAMERA_FOCUS_STATE_UNFOCUSED,
+} camera_focus_state_t;
+
+// OHOS_CONTROL_METER_MODE and OHOS_ABILITY_METER_MODES enumeration values
+typedef enum camera_meter_mode {
+    OHOS_CAMERA_SPOT_METERING = 0,
+    OHOS_CAMERA_REGION_METERING,
+    OHOS_CAMERA_OVERALL_METERING,
+} camera_meter_mode_t;
+
+typedef enum camera_exposure_state {
+    OHOS_CAMERA_EXPOSURE_STATE_SCAN,
+    OHOS_CAMERA_EXPOSURE_STATE_CONVERGED,
+} camera_exposure_state_t;
+
+// OHOS_CONTROL_CAPTURE_MIRROR
+// and OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED enumeration values
+typedef enum camera_mirror {
+    OHOS_CAMERA_MIRROR_OFF = 0,
+    OHOS_CAMERA_MIRROR_ON,
+} camera_mirror_t;
+
+// OHOS_JPEG_ORIENTATION enumeration values
+typedef enum camera_jpeg_orientation {
+    OHOS_CAMERA_JPEG_ROTATION_0 = 0,
+    OHOS_CAMERA_JPEG_ROTATION_90 = 1,
+    OHOS_CAMERA_JPEG_ROTATION_180 = 2,
+    OHOS_CAMERA_JPEG_ROTATION_270 = 3,
+} camera_jpeg_orientation_t;
+
+// OHOS_JPEG_QUALITY enumeration values
+typedef enum camera_jpeg_quality {
+    OHOS_CAMERA_JPEG_LEVEL_LOW = 0,
+    OHOS_CAMERA_JPEG_LEVEL_MIDDLE,
+    OHOS_CAMERA_JPEG_LEVEL_HIGH,
+} camera_jpeg_quality_t;
 
 #endif
