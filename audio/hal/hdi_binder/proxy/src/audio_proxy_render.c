@@ -81,6 +81,11 @@ int32_t AudioProxyRenderResume(AudioHandle handle)
 
 int32_t AudioProxyRenderFlush(AudioHandle handle)
 {
+    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    if (ret < 0) {
+        LOG_FUN_ERR("The proxy render address passed in is invalid, ret = %{public}d", ret);
+        return ret;
+    }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;

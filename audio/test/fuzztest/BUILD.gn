@@ -21,11 +21,7 @@ group("fuzztest") {
   deps = []
 
   deps += [
-    "hdi_fuzzer/adapter:adapter",
-    "hdi_fuzzer/attribute:attribute",
-    "hdi_fuzzer/capture:capture",
-    "hdi_fuzzer/control:control",
-    "hdi_fuzzer/render:render",
-    "hdi_fuzzer/volume:volume",
+    "adm_fuzzer:adm_fuzzer",
+    "hdi_fuzzer:hdi_fuzzer",
   ]
 }
