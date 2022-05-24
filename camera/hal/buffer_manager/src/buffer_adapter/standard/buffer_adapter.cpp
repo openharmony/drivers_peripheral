@@ -38,9 +38,7 @@ RetCode BufferAdapter::SurfaceBufferToCameraBuffer(const OHOS::sptr<OHOS::Surfac
     buffer->SetFormat(format);
     buffer->SetUsage(CameraUsageToGrallocUsage(bufHandle->usage));
     buffer->SetSize(static_cast<uint32_t>(bufHandle->size));
-    if (bufHandle->virAddr != nullptr) {
-        buffer->SetVirAddress(bufHandle->virAddr);
-    }
+    buffer->SetVirAddress(surfaceBuffer->GetVirAddr());
 
     return RC_OK;
 }
