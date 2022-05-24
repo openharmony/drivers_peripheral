@@ -26,6 +26,7 @@
         "//drivers/peripheral/pin_auth:pinauth_entry"
       ],
       "test": [
+        "//drivers/peripheral/pin_auth/test/fuzztest/pin_auth:fuzztest"
       ],
       "inner_kits": [
         {
