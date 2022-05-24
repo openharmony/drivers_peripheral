@@ -13,10 +13,12 @@
  * limitations under the License.
  */
 
-#include "codec_stub.h"
 #include <hdf_device_object.h>
 #include <hdf_log.h>
 #include <osal_mem.h>
+#include "codec_config_parser.h"
+#include "codec_stub.h"
+
 
 static int32_t CodecServiceDispatch(struct HdfDeviceIoClient *client, int cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
@@ -28,11 +30,12 @@ void HdfCodecDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     struct IDeviceIoService *testService = deviceObject->service;
     OsalMemFree(testService);
+    ClearCapabilityGroup();
 }
 
 int HdfCodecDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGE("HdfCodecDriverBind enter!");
+    HDF_LOGI("HdfCodecDriverBind enter!");
 
     struct IDeviceIoService *ioService = (struct IDeviceIoService *)OsalMemAlloc(sizeof(struct IDeviceIoService));
     if (ioService == NULL) {
@@ -54,7 +57,11 @@ int HdfCodecDriverBind(struct HdfDeviceObject *deviceObject)
 
 int HdfCodecDriverInit(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGE("HdfSampleDriverCInit enter, new hdi impl");
+    HDF_LOGI("HdfSampleDriverCInit enter, new hdi impl");
+    if (LoadCodecCapabilityFromHcs(deviceObject->property) != HDF_SUCCESS) {
+        HDF_LOGE("LoadCodecCapabilityFromHcs failed");
+        ClearCapabilityGroup();
+    }
     return HDF_SUCCESS;
 }
 

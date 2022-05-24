@@ -17,8 +17,7 @@
 #include <osal_mem.h>
 #include <unistd.h>
 #include "codec_callback_stub.h"
-#include "codec_config_reader.h"
-#include "codec_utils.h"
+#include "hdf_log.h"
 #include "icodec.h"
 #include "share_mem.h"
 
@@ -42,6 +41,7 @@ constexpr const char *TEST_SERVICE_NAME = "codec_hdi_service";
 constexpr const int TEST_PACKET_BUFFER_SIZE = 4096;
 constexpr const int TEST_FRAME_BUFFER_SIZE = 640 * 480 * 3 / 2;
 constexpr const int QUEUE_TIME_OUT = 10;
+constexpr const int CAPABILITY_COUNT = 8;
 struct ICodec *codecObj = nullptr;
 ShareMemory inputBuffer;
 ShareMemory outputBuffer;
@@ -60,6 +60,54 @@ public:
     void TearDown() {}
 };
 
+static void PrintArray(const char *where, const char *name, ResizableArray *array)
+{
+    uint32_t index;
+    
+    if (array == NULL) {
+        return;
+    }
+    HDF_LOGI("%{public}s, %{public}s len: %{public}d", where, name, (int32_t)array->actualLen);
+    for (index = 0; index < array->actualLen; index++) {
+        HDF_LOGI("%{public}s, %{public}s-%{public}d: %{public}d",
+            where, name, index, (int32_t)array->element[index]);
+    }
+}
+
+static void PrintCapability(const char *where, CodecCapbility *cap)
+{
+    int32_t mime = 0;
+    if (cap == NULL) {
+        HDF_LOGE("%{public}s, null capability!", where);
+        return;
+    }
+    mime = (int32_t)cap->mime;
+    if (mime < 0) {
+        HDF_LOGE("%{public}s, print invalid capability!", where);
+        return;
+    }
+
+    HDF_LOGI("%{public}s, --- start print cap ----------------------------", where);
+    HDF_LOGI("%{public}s, mime: %{public}d", where, (int32_t)cap->mime);
+    HDF_LOGI("%{public}s, type: %{public}d", where, (int32_t)cap->type);
+    HDF_LOGI("%{public}s, widthAlignment: %{public}d", where, (int32_t)cap->whAlignment.widthAlignment);
+    HDF_LOGI("%{public}s, heightAlignment: %{public}d", where, (int32_t)cap->whAlignment.heightAlignment);
+    HDF_LOGI("%{public}s, minwidth: %{public}d", where, (int32_t)cap->minSize.width);
+    HDF_LOGI("%{public}s, minHeight: %{public}d", where, (int32_t)cap->minSize.height);
+    HDF_LOGI("%{public}s, maxwidth: %{public}d", where, (int32_t)cap->maxSize.width);
+    HDF_LOGI("%{public}s, maxheight: %{public}d", where, (int32_t)cap->maxSize.height);
+    HDF_LOGI("%{public}s, minBitRate: %{public}d", where, (int32_t)cap->minBitRate);
+    HDF_LOGI("%{public}s, maxBitRate: %{public}d", where, (int32_t)cap->maxBitRate);
+    PrintArray(where, "supportProfiles", &(cap->supportProfiles));
+    PrintArray(where, "supportLevels", &(cap->supportLevels));
+    PrintArray(where, "supportPixelFormats", &(cap->supportPixelFormats));
+    HDF_LOGI("%{public}s, minInputBufferNum: %{public}d", where, (int32_t)cap->minInputBufferNum);
+    HDF_LOGI("%{public}s, minOutputBufferNum: %{public}d", where, (int32_t)cap->minOutputBufferNum);
+    HDF_LOGI("%{public}s, allocateMask: %{public}d", where, (int32_t)cap->allocateMask);
+    HDF_LOGI("%{public}s, capsMask: %{public}d", where, (int32_t)cap->capsMask);
+    HDF_LOGI("%{public}s, ------------------------------ end print cap ---", where);
+}
+
 HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetCodecObjTest_001, TestSize.Level1)
 {
     codecObj = HdiCodecGet(TEST_SERVICE_NAME);
@@ -68,13 +116,10 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetCodecObjTest_001, TestSize.Level1)
 
 HWTEST_F(CodecProxyTest, HdfCodecHdiV1EnumerateCapbilityTest_002, TestSize.Level1)
 {
-    struct HdfRemoteService *remote = GetConfigService();
-    ASSERT_TRUE(remote != nullptr);
-
     int32_t ret = HDF_SUCCESS;
-    for (int32_t index = 0; index < 8; index++) {
+    for (int index = 0; index < CAPABILITY_COUNT; index++) {
         CodecCapbility cap;
-        ret = EnumrateCapability(remote, index, &cap);
+        ret = codecObj->CodecEnumerateCapbility(codecObj, index, &cap);
         ASSERT_EQ(ret, HDF_SUCCESS);
         PrintCapability("codec_config_utest", &cap);
     }
@@ -82,11 +127,8 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1EnumerateCapbilityTest_002, TestSize.Level
 
 HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetCapbilityTest_003, TestSize.Level1)
 {
-    struct HdfRemoteService *remote = GetConfigService();
-    ASSERT_TRUE(remote != nullptr);
-
     CodecCapbility cap;
-    int32_t ret = GetCapability(remote, MEDIA_MIMETYPE_VIDEO_HEVC, VIDEO_ENCODER, 0, &cap);
+    int32_t ret = codecObj->CodecGetCapbility(codecObj, MEDIA_MIMETYPE_VIDEO_HEVC, VIDEO_ENCODER, 0, &cap);
     ASSERT_EQ(ret, HDF_SUCCESS);
     PrintCapability("codec_config_utest", &cap);
 }

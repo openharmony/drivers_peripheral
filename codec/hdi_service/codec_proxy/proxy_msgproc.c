@@ -62,7 +62,7 @@ int32_t CodecProxyParseArray(struct HdfSBuf *reply, ResizableArray *resArr)
         HDF_LOGE("%{public}s: params NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    resArr->actualLen = 0;
     if (!HdfSbufReadUint32(reply, &resArr->actualLen)) {
         HDF_LOGE("%{public}s: read actualLen failed!", __func__);
         return HDF_FAILURE;

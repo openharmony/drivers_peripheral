@@ -77,7 +77,10 @@ typedef struct {
     CodecCapablityGroup audioSwDecoderGroup;
 } CodecCapablites;
 
-int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node, CodecCapablites *caps);
-int32_t ClearCapabilityGroup(CodecCapablites *caps);
+int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node);
+int32_t ClearCapabilityGroup();
+CodecCapablityGroup *GetCapablityGroup(int32_t groupIndex);
+bool CodecCapablitesInited();
+int32_t ReloadCapabilities();
 
 #endif  // DRIVERS_PERIPHERAL_CODEC_CONFIG_PARSER_H_
