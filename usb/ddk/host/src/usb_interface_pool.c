@@ -686,7 +686,7 @@ static struct UsbInterfacePool *IfGetInterfacePool(
     interfacePool = IfFindInterfacePool(realSession, poolQueryPara, true);
     if (interfacePool == NULL || interfacePool->device == NULL) {
         interfacePool = (struct UsbInterfacePool *)((*devHandle)->dev->privateObject);
-        ret = IfDestoryDevice(realSession, interfacePool, *devHandle, false);
+        (void)IfDestoryDevice(realSession, interfacePool, *devHandle, false);
         return NULL;
     }
 

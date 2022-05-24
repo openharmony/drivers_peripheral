@@ -472,6 +472,10 @@ static int32_t EcmWrite(struct EcmDevice *ecm, struct HdfSBuf *data)
             wb->len = (int)len;
             wb->ecm = ecm;
             ret = EcmStartWb(ecm, wb);
+            if (ret != HDF_SUCCESS) {
+                HDF_LOGE("%{public}s: EcmStartWb failed, ret=%{public}d", __func__, ret);
+                return HDF_FAILURE;
+            }
         }
     }
     return totalSize;
