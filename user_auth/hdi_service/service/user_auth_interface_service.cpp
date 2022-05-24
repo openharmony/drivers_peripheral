@@ -483,10 +483,28 @@ int32_t UserAuthInterfaceService::AddExecutor(const ExecutorRegisterInfo &info, 
         IAM_LOGE("invalid info");
         return RESULT_BAD_PARAM;
     }
+    templateIds.clear();
     GlobalLock();
     ExecutorInfoHal executorInfoHal = {};
     CopyExecutorInfo(info, executorInfoHal);
     int32_t ret = RegisterExecutor(&executorInfoHal, &index);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("register executor failed");
+        GlobalUnLock();
+        return ret;
+    }
+    CredentialInfoHal *credentialInfos = nullptr;
+    uint32_t num = 0;
+    ret = QueryCredentialFromExecutor(static_cast<uint32_t>(info.authType), &credentialInfos, &num);
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("query credential failed");
+        GlobalUnLock();
+        return ret;
+    }
+    for (uint32_t i = 0; i < num; ++i) {
+        templateIds.push_back(credentialInfos[i].templateId);
+    }
+    free(credentialInfos);
     GlobalUnLock();
     return ret;
 }
