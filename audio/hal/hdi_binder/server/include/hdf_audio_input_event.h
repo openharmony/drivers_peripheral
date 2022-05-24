@@ -13,24 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef HDF_AUDIO_PNP_SERVER_H
-#define HDF_AUDIO_PNP_SERVER_H
+#ifndef HDF_AUDIO_INPUT_EVENT_H
+#define HDF_AUDIO_INPUT_EVENT_H
 
-#include "audio_events.h"
 #include "hdf_types.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/* start input-event to monitor analog headset/headphone */
+int32_t AudioPnpInputStartThread(void);
+void AudioPnpInputEndThread(void);
 
-int32_t AudioPnpStatusSend(const char *serverName,
-    const char *tokenServerName, const char *pnpInfo, const int cmd);
-/* statusInfo is update new info */
-int32_t AudioPnpUpdateInfo(const char *statusInfo);
-int32_t AudioPnpUpdateInfoOnly(struct AudioEvent audioEvent);
-int32_t AudioPnpUpdateAndSend(struct AudioEvent audioEvent);
-
-#ifdef __cplusplus
-}
-#endif
 #endif
