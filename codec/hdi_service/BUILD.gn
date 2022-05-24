@@ -60,6 +60,7 @@ ohos_shared_library("libcodec_server") {
     "//drivers/peripheral/codec/hal/v1.0/share_mem/src/share_mem.c",
     "codec_service_stub/codec_callback_service.c",
     "codec_service_stub/codec_callback_stub.c",
+    "codec_service_stub/codec_config_parser.c",
     "codec_service_stub/codec_host.c",
     "codec_service_stub/codec_service.c",
     "codec_service_stub/codec_stub.c",
