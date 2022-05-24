@@ -343,8 +343,6 @@ OUT:
 
 int32_t UsbEcmClose(struct UsbEcm *port)
 {
-    struct UsbEcmDevice *ecm = NULL;
-
     if (port == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
@@ -356,7 +354,6 @@ int32_t UsbEcmClose(struct UsbEcm *port)
     }
 
     HDF_LOGD("%s: close usb serial", __func__);
-    ecm = port->ecm;
 
     DataFifoReset(&port->writeFifo);
     DataFifoReset(&port->readFifo);

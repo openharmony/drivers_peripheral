@@ -859,7 +859,13 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
     if (acm->dataOutPipe == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
+
     ret = AcmStartWbSync(acm, wb, acm->dataOutPipe);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: AcmStartWbSync failed, ret=%{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+
     return size;
 }
 
@@ -1000,7 +1006,12 @@ static int32_t SerialWrite(const struct SerialDevice *port, struct HdfSBuf *data
         HDF_LOGE("memcpy_s failed, ret = %d", ret);
     }
     wb->len = (int)size;
+    
     ret = AcmStartWb(acm, wb, acm->dataOutPipe);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: AcmStartWb failed, ret=%d", __func__, ret);
+        return HDF_FAILURE;
+    }
     return size;
 }
 

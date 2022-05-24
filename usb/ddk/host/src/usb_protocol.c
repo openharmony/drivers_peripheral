@@ -170,7 +170,7 @@ static const struct UsbRawEndpointDescriptor *UsbGetEpDesc(
 static int32_t UsbProtocalCreatePipeObj(
     const struct UsbRawInterfaceDescriptor *ifDes, const struct UsbSdkInterface *interfaceObj)
 {
-    int32_t ret;
+    int32_t ret = HDF_SUCCESS;
     uint8_t id = 0;
     const struct UsbRawEndpointDescriptor *ep = NULL;
     struct UsbPipe *pipe = NULL;
@@ -204,7 +204,7 @@ static int32_t UsbProtocalCreatInterfaceObj(const struct UsbRawConfigDescriptor 
     const struct UsbInterfacePool *interfacePool)
 {
     uint8_t j;
-    int32_t ret;
+    int32_t ret = HDF_SUCCESS;
     const struct UsbRawInterface *itface = NULL;
     const struct UsbRawInterfaceDescriptor *ifDes = NULL;
     struct UsbSdkInterface *interfaceObj = NULL;

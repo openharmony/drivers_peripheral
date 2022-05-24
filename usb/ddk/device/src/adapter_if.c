@@ -440,7 +440,7 @@ static void GetHeaderStr(struct UsbFnStrings **strings,
 {
     uint32_t i, j;
     uint32_t langCount = 0;
-    uint32_t strCount;
+    uint32_t strCount = 0;
     uint32_t len = 0;
     for (i = 0; strings[i] != NULL; i++) {
         langCount++;
