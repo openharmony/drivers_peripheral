@@ -203,6 +203,27 @@ RetCode HosCameraDemo::InitCameraDevice()
     const std::string cameraId = cameraIds_.front();
     demoCameraHost_->GetCameraAbility(cameraId, ability_);
 
+    if (ability_ == nullptr) {
+        CAMERA_LOGE("demo test: InitCameraDevice ability_ == nullptr");
+        return RC_ERROR;
+    }
+
+    GetFaceDetectMode(ability_);
+    GetFocalLength(ability_);
+    GetAvailableFocusModes(ability_);
+    GetAvailableExposureModes(ability_);
+    GetExposureCompensationRange(ability_);
+    GetExposureCompensationSteps(ability_);
+    GetAvailableMeterModes(ability_);
+    GetAvailableFlashModes(ability_);
+    GetMirrorSupported(ability_);
+    GetStreamBasicConfigurations(ability_);
+    GetFpsRange(ability_);
+    GetCameraPosition(ability_);
+    GetCameraType(ability_);
+    GetCameraConnectionType(ability_);
+    GetFaceDetectMaxNum(ability_);
+
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     std::shared_ptr<CameraDeviceCallback> callback = std::make_shared<CameraDeviceCallback>();
 #else
@@ -695,6 +716,296 @@ RetCode HosCameraDemo::StreamOffline(const int streamId)
 
     CAMERA_LOGD("demo test: StreamOffline exit\n");
 
+    return RC_OK;
+}
+
+RetCode HosCameraDemo::GetFaceDetectMode(std::shared_ptr<CameraAbility> &ability)
+{
+    common_metadata_header_t* data = ability->get();
+    uint8_t faceDetectMode;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_DETECT_MODE, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_STATISTICS_FACE_DETECT_MODE error\n");
+        return RC_ERROR;
+    }
+    faceDetectMode = *(entry.data.u8);
+    CAMERA_LOGD("demo test: faceDetectMode %{public}d\n",  faceDetectMode);
+    return RC_OK;
+}
+
+RetCode HosCameraDemo::GetFocalLength(std::shared_ptr<CameraAbility> &ability)
+{
+    common_metadata_header_t* data = ability->get();
+    float focalLength = 0.0;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_FOCAL_LENGTH, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test:  get OHOS_ABILITY_FOCAL_LENGTH error\n");
+        return RC_ERROR;
+    }
+    focalLength = *(entry.data.f);
+    CAMERA_LOGD("demo test: focalLength %{public}f\n", focalLength);
+    return RC_OK;
+}
+
+RetCode HosCameraDemo::GetAvailableFocusModes(std::shared_ptr<CameraAbility> &ability)
+{
+    common_metadata_header_t* data = ability->get();
+    std::vector<uint8_t> focusMode;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_FOCUS_MODES, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_FOCUS_MODES  error\n");
+        return RC_ERROR;
+    }
+    uint32_t count = entry.count;
+    CAMERA_LOGD("demo test: count  %{public}d\n",  count);
+
+    for (int i = 0 ; i < count; i++) {
+        focusMode.push_back(*(entry.data.u8 + i));
+    }
+
+    for (auto it = focusMode.begin(); it != focusMode.end(); it++) {
+        CAMERA_LOGD("demo test: focusMode : %{public}d \n", *it);
+    }
+    return RC_OK;
+}
+
+RetCode HosCameraDemo::GetAvailableExposureModes(std::shared_ptr<CameraAbility> &ability)
+{
+    common_metadata_header_t* data = ability->get();
+    std::vector<uint8_t> exposureMode;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_EXPOSURE_MODES, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_EXPOSURE_MODES  error\n");
+        return RC_ERROR;
+    }
+    uint32_t count = entry.count;
+    CAMERA_LOGD("demo test: count  %{public}d\n",  count);
+
+    for (int i = 0 ; i < count; i++) {
+        exposureMode.push_back(*(entry.data.u8 + i));
+    }
+
+    for (auto it = exposureMode.begin(); it != exposureMode.end(); it++) {
+        CAMERA_LOGD("demo test: exposureMode : %{public}d \n", *it);
+    }
+    return RC_OK;
+}
+
+RetCode HosCameraDemo::GetExposureCompensationRange(std::shared_ptr<CameraAbility> &ability)
+{
+    common_metadata_header_t* data = ability->get();
+    std::vector<int32_t>  exposureCompensationRange;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AE_COMPENSATION_RANGE, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_CONTROL_AE_COMPENSATION_RANGE error\n");
+        return RC_ERROR;
+    }
+
+    uint32_t count = entry.count;
+    CAMERA_LOGD("demo test:  exposureCompensationRange count  %{public}d\n",  count);
+    for (int i = 0 ; i < count; i++) {
+        exposureCompensationRange.push_back(*(entry.data.i32 + i));
+    }
+
+    for (auto it = exposureCompensationRange.begin(); it != exposureCompensationRange.end(); it++) {
+        CAMERA_LOGD("demo test: exposureCompensationRange %{public}d \n", *it);
+    }
+
+    return RC_OK;
+}
+
+RetCode HosCameraDemo::GetExposureCompensationSteps(std::shared_ptr<CameraAbility> &ability)
+{
+    common_metadata_header_t* data = ability->get();
+    camera_rational_t exposureCompensationSteps;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AE_COMPENSATION_STEP, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_CONTROL_AE_COMPENSATION_STEP error\n");
+        return RC_ERROR;
+    }
+    exposureCompensationSteps.numerator = entry.data.r->numerator;
+    exposureCompensationSteps.denominator = entry.data.r->denominator;
+    CAMERA_LOGD("demo test: steps.numerator %{public}d  and steps.denominator %{public}d \n",
+        exposureCompensationSteps.numerator, exposureCompensationSteps.denominator);
+    return RC_OK;
+}
+
+RetCode HosCameraDemo::GetAvailableMeterModes(std::shared_ptr<CameraAbility> &ability)
+{
+    common_metadata_header_t* data = ability->get();
+    std::vector<uint8_t> meterModes;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_METER_MODES, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_METER_MODES  error\n");
+        return RC_ERROR;
+    }
+    uint32_t count = entry.count;
+    CAMERA_LOGD("demo test: count  %{public}d\n",  count);
+
+    for (int i = 0 ; i < count; i++) {
+        meterModes.push_back(*(entry.data.u8 + i));
+    }
+
+    for (auto it = meterModes.begin(); it != meterModes.end(); it++) {
+        CAMERA_LOGD("demo test: meterModes : %{public}d \n", *it);
+    }
+    return RC_OK;
+}
+
+RetCode HosCameraDemo::GetAvailableFlashModes(std::shared_ptr<CameraAbility> &ability)
+{
+    common_metadata_header_t* data = ability->get();
+    std::vector<uint8_t> flashModes;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_FLASH_MODES, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_FLASH_MODES  error\n");
+        return RC_ERROR;
+    }
+    uint32_t count = entry.count;
+    CAMERA_LOGD("demo test: count  %{public}d\n",  count);
+
+    for (int i = 0 ; i < count; i++) {
+        flashModes.push_back(*(entry.data.u8 + i));
+    }
+
+    for (auto it = flashModes.begin(); it != flashModes.end(); it++) {
+        CAMERA_LOGD("demo test: flashModes : %{public}d \n", *it);
+    }
+    return RC_OK;
+}
+
+RetCode HosCameraDemo::GetMirrorSupported(std::shared_ptr<CameraAbility> &ability)
+{
+    common_metadata_header_t* data = ability->get();
+    uint8_t mirrorSupported;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED error\n");
+        return RC_ERROR;
+    }
+    mirrorSupported = *(entry.data.u8);
+    uint8_t  *tmpPtr = entry.data.u8;
+    CAMERA_LOGD("demo test: mirrorSupported  %{public}d\n",  mirrorSupported);
+    return RC_OK;
+}
+
+RetCode HosCameraDemo::GetStreamBasicConfigurations(std::shared_ptr<CameraAbility> &ability)
+{
+    common_metadata_header_t* data = ability->get();
+    std::vector<int32_t>  streamBasicConfigurations;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS error\n");
+        return RC_ERROR;
+    }
+
+    uint32_t count = entry.count;
+    CAMERA_LOGD("demo test: streamBasicConfigurations count  %{public}d\n",  count);
+    for (int i = 0 ; i < count; i++) {
+        streamBasicConfigurations.push_back(*(entry.data.i32 + i));
+    }
+
+    for (auto it = streamBasicConfigurations.begin(); it != streamBasicConfigurations.end(); it++) {
+        CAMERA_LOGD("demo test: streamBasicConfigurations %{public}d \n", *it);
+    }
+
+    return RC_OK;
+}
+
+RetCode HosCameraDemo::GetFpsRange(std::shared_ptr<CameraAbility> &ability)
+{
+    common_metadata_header_t* data = ability->get();
+    std::vector<int32_t>  fpsRange;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_FPS_RANGES, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_FPS_RANGES error\n");
+        return RC_ERROR;
+    }
+
+    uint32_t count = entry.count;
+    CAMERA_LOGD("demo test: fpsRange count  %{public}d\n",  count);
+    for (int i = 0 ; i < count; i++) {
+        fpsRange.push_back(*(entry.data.i32 + i));
+    }
+
+    for (auto it = fpsRange.begin(); it != fpsRange.end(); it++) {
+        CAMERA_LOGD("demo test: fpsRange %{public}d \n", *it);
+    }
+
+    return RC_OK;
+}
+
+RetCode HosCameraDemo::GetCameraPosition(std::shared_ptr<CameraAbility> &ability)
+{
+    common_metadata_header_t* data = ability->get();
+    uint8_t  cameraPosition;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_POSITION, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_CAMERA_POSITION error\n");
+        return RC_ERROR;
+    }
+
+    cameraPosition= *(entry.data.u8);
+    CAMERA_LOGD("demo test: cameraPosition  %{public}d\n", cameraPosition);
+    return RC_OK;
+}
+
+RetCode HosCameraDemo::GetCameraType(std::shared_ptr<CameraAbility> &ability)
+{
+    common_metadata_header_t* data = ability->get();
+    uint8_t  cameraType;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_TYPE, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_CAMERA_TYPE error\n");
+        return RC_ERROR;
+    }
+
+    cameraType= *(entry.data.u8);
+    CAMERA_LOGD("demo test: cameraType  %{public}d\n", cameraType);
+    return RC_OK;
+}
+
+RetCode HosCameraDemo::GetCameraConnectionType(std::shared_ptr<CameraAbility> &ability)
+{
+    common_metadata_header_t* data = ability->get();
+    uint8_t  cameraConnectionType;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_ABILITY_CAMERA_CONNECTION_TYPE error\n");
+        return RC_ERROR;
+    }
+
+    cameraConnectionType= *(entry.data.u8);
+    CAMERA_LOGD("demo test: cameraConnectionType  %{public}d\n", cameraConnectionType);
+    return RC_OK;
+}
+
+RetCode HosCameraDemo::GetFaceDetectMaxNum(std::shared_ptr<CameraAbility> &ability)
+{
+    common_metadata_header_t* data = ability->get();
+    uint8_t  faceDetectMaxNum;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_DETECT_MAX_NUM, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_STATISTICS_FACE_DETECT_MAX_NUM error\n");
+        return RC_ERROR;
+    }
+    faceDetectMaxNum = *(entry.data.u8);
+    CAMERA_LOGD("demo test: faceDetectMaxNum %{public}d \n", faceDetectMaxNum);
     return RC_OK;
 }
 } // namespace OHOS::Camera

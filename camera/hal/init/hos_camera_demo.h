@@ -105,6 +105,22 @@ private:
     void StoreVideo(const void* bufStart, const uint32_t size) const;
     void OpenVideoFile();
 
+    RetCode GetFaceDetectMode(std::shared_ptr<CameraAbility> &ability);
+    RetCode GetFocalLength(std::shared_ptr<CameraAbility> &ability);
+    RetCode GetAvailableFocusModes(std::shared_ptr<CameraAbility> &ability);
+    RetCode GetAvailableExposureModes(std::shared_ptr<CameraAbility> &ability);
+    RetCode GetExposureCompensationRange(std::shared_ptr<CameraAbility> &ability);
+    RetCode GetExposureCompensationSteps(std::shared_ptr<CameraAbility> &ability);
+    RetCode GetAvailableMeterModes(std::shared_ptr<CameraAbility> &ability);
+    RetCode GetAvailableFlashModes(std::shared_ptr<CameraAbility> &ability);
+    RetCode GetMirrorSupported(std::shared_ptr<CameraAbility> &ability);
+    RetCode GetStreamBasicConfigurations(std::shared_ptr<CameraAbility> &ability);
+    RetCode GetFpsRange(std::shared_ptr<CameraAbility> &ability);
+    RetCode GetCameraPosition(std::shared_ptr<CameraAbility> &ability);
+    RetCode GetCameraType(std::shared_ptr<CameraAbility> &ability);
+    RetCode GetCameraConnectionType(std::shared_ptr<CameraAbility> &ability);
+    RetCode GetFaceDetectMaxNum(std::shared_ptr<CameraAbility> &ability);
+
     int aeStatus_ = 1;
     int videoFd_ = -1;
     unsigned int isPreviewOn_ = 0;
