@@ -13,8 +13,10 @@
  * limitations under the License.
  */
 
-#include "v1_0/face_auth_interface_service.h"
+#include "face_auth_interface_service.h"
+
 #include <hdf_base.h>
+
 #include "executor_impl.h"
 #include "iam_logger.h"
 
@@ -24,10 +26,6 @@ namespace OHOS {
 namespace HDI {
 namespace FaceAuth {
 namespace V1_0 {
-static constexpr uint16_t SENSOR_ID = 123;
-static constexpr uint32_t EXECUTOR_TYPE = 123;
-static constexpr size_t PUBLIC_KEY_LEN = 32;
-
 extern "C" IFaceAuthInterface *FaceAuthInterfaceImplGetInstance(void)
 {
     auto faceAuthInterfaceService = new (std::nothrow) FaceAuthInterfaceService();
@@ -38,30 +36,24 @@ extern "C" IFaceAuthInterface *FaceAuthInterfaceImplGetInstance(void)
     return faceAuthInterfaceService;
 }
 
+FaceAuthInterfaceService::FaceAuthInterfaceService()
+{
+    auto executor = new (std::nothrow) ExecutorImpl();
+    if (executor == nullptr) {
+        IAM_LOGE("executor is nullptr");
+        return;
+    }
+    executorList_.push_back(sptr<IExecutor>(executor));
+}
+
 int32_t FaceAuthInterfaceService::GetExecutorList(std::vector<sptr<IExecutor>> &executorList)
 {
     IAM_LOGI("interface mock start");
-    executorList.clear();
-    struct ExecutorInfo executorInfoExample = {
-        .sensorId = SENSOR_ID,
-        .executorType = EXECUTOR_TYPE,
-        .executorRole = ExecutorRole::ALL_IN_ONE,
-        .authType = AuthType::FACE,
-        .esl = ExecutorSecureLevel::ESL0,
-        .publicKey = std::vector<uint8_t>(PUBLIC_KEY_LEN, 0),
-        .extraInfo = {},
-    };
-    auto executor = new (std::nothrow) ExecutorImpl(executorInfoExample);
-    if (executor == nullptr) {
-        IAM_LOGE("executor is nullptr");
-        return HDF_FAILURE;
-    }
-    executorList.push_back(sptr<IExecutor>(executor));
+    executorList = executorList_;
     IAM_LOGI("interface mock success");
     return HDF_SUCCESS;
 }
-} // V1_0
-} // FaceAuth
-} // HDI
-} // OHOS
-
+} // namespace V1_0
+} // namespace FaceAuth
+} // namespace HDI
+} // namespace OHOS
