@@ -13,32 +13,36 @@
  * limitations under the License.
  */
 
-#include <pthread.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <linux/netlink.h>
-
-#include "securec.h"
-#include "hdf_log.h"
-#include "hdf_base.h"
-#include "audio_events.h"
-#include "hdf_audio_pnp_server.h"
 #include "hdf_audio_pnp_uevent.h"
+#include <pthread.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <linux/netlink.h>
+#include "hdf_audio_pnp_server.h"
+#include "hdf_base.h"
+#include "hdf_log.h"
+#include "securec.h"
 
-#define UEVENT_ACTION       "ACTION="
-#define UEVENT_NAME         "NAME="
-#define UEVENT_STATE        "STATE="
-#define UEVENT_DEVTYPE      "DEVTYPE="
-#define UEVENT_ADD          "add"
-#define UEVENT_REMOVE       "remove"
-#define UEVENT_TYPE_PORT    "typec_port"
-#define UEVENT_DIGITAL_KEY  "USB-C HEADSET"
-#define UEVENT_USB_HOST     "USB-HOST=0"
-#define UEVENT_ANALOG_KEY   "HEADPHONE=0"
-
-#define AUDIO_HDI_SERVICE_NAME  "audio_hdi_usb_service"
-#define AUDIO_TOKEN_SERVER_NAME "ohos.hdi.audio_service"
-#define AUDIO_PNP_SEND_USB_CMD  8
+#define UEVENT_ACTION           "ACTION="
+#define UEVENT_NAME             "NAME="
+#define UEVENT_STATE            "STATE="
+#define UEVENT_DEVTYPE          "DEVTYPE="
+#define UEVENT_SUBSYSTEM        "SUBSYSTEM="
+#define UEVENT_SWITCH_NAME      "SWITCH_NAME="
+#define UEVENT_SWITCH_STATE     "SWITCH_STATE="
+#define UEVENT_ACTION_ADD       "add"
+#define UEVENT_ACTION_REMOVE    "remove"
+#define UEVENT_ACTION_CHANGE    "change"
+#define UEVENT_TYPE_PORT        "typec_port"
+#define UEVENT_TYPE_EXTCON      "extcon3"
+#define UEVENT_NAME_DIGITAL_KEY "USB-C HEADSET"
+#define UEVENT_NAME_HEADSET     "headset"
+#define UEVENT_USB_HOST         "USB-HOST=0"
+#define UEVENT_ANALOG_KEY       "HEADPHONE=0"
+#define UEVENT_STATE_ANALOG_HS0 "MICROPHONE=0"
+#define UEVENT_STATE_ANALOG_HS1 "MICROPHONE=1"
+#define UEVENT_SUBSYSTEM_SWITCH "switch"
+#define UEVENT_SWITCH_NAME_H2W  "h2w"
 
 #define UEVENT_SOCKET_BUFF_SIZE (64 * 1024)
 #define UEVENT_SOCKET_GROUPS    0xffffffff
@@ -47,11 +51,9 @@
 #define TIMEVAL_SECOND  0
 #define TIMEVAL_USECOND (100 * 1000)
 
-#define AUDIO_PNP_INFO_LEN_MAX 256
-
-#define AUDIO_PNP_STATE_INIT  0
-#define AUDIO_PNP_STATE_ON    1
-#define AUDIO_PNP_STATE_OFF (-1)
+#define AUDIO_PNP_STATE_INIT 0
+#define AUDIO_PNP_STATE_ON   1
+#define AUDIO_PNP_STATE_OFF  (-1)
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_HOST
 
@@ -60,6 +62,9 @@ struct AudioPnpUevent {
     const char *name;
     const char *state;
     const char *devType;
+    const char *subSystem;
+    const char *switchName;
+    const char *switchState;
 };
 
 struct AudioUsbPnpTag {
@@ -68,32 +73,6 @@ struct AudioUsbPnpTag {
     int32_t audioPnpDigitalState;
 };
 
-static int32_t AudioPnpUpdateAndSend(struct AudioEvent audioEvent)
-{
-    int32_t ret;
-    char pnpInfo[AUDIO_PNP_INFO_LEN_MAX] = {0};
-
-    ret = snprintf_s(pnpInfo, AUDIO_PNP_INFO_LEN_MAX, AUDIO_PNP_INFO_LEN_MAX - 1,
-                     "EVENT_TYPE=0x%x;DEVICE_TYPE=0x%x", audioEvent.eventType, audioEvent.deviceType);
-    if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s fail!", __func__);
-        return HDF_FAILURE;
-    }
-
-    ret = AudioPnpUpdateInfo(pnpInfo);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: update info fail! ret = %{public}d", __func__, ret);
-        return HDF_FAILURE;
-    }
-
-    ret = AudioPnpStatusSend(AUDIO_HDI_SERVICE_NAME, AUDIO_TOKEN_SERVER_NAME, pnpInfo, AUDIO_PNP_SEND_USB_CMD);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: send info fail! ret = %{public}d", __func__, ret);
-        return HDF_FAILURE;
-    }
-
-    return HDF_SUCCESS;
-}
 static int32_t AudioUsbDeviceStateCheck(struct AudioPnpUevent *audioPnpUevent, struct AudioUsbPnpTag *pnpTag)
 {
     if (audioPnpUevent == NULL || pnpTag == NULL) {
@@ -101,9 +80,9 @@ static int32_t AudioUsbDeviceStateCheck(struct AudioPnpUevent *audioPnpUevent, s
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (strncmp(audioPnpUevent->action, UEVENT_ADD, strlen(UEVENT_ADD)) == 0) {
+    if (strncmp(audioPnpUevent->action, UEVENT_ACTION_ADD, strlen(UEVENT_ACTION_ADD)) == 0) {
         pnpTag->audioPnpState = true;
-    } else if (strncmp(audioPnpUevent->action, UEVENT_REMOVE, strlen(UEVENT_REMOVE)) == 0) {
+    } else if (strncmp(audioPnpUevent->action, UEVENT_ACTION_REMOVE, strlen(UEVENT_ACTION_REMOVE)) == 0) {
         pnpTag->audioPnpState = false;
     }
 
@@ -118,7 +97,7 @@ static int32_t AudioUsbDigitalDeviceCheck(struct AudioPnpUevent *audioPnpUevent,
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (strstr(audioPnpUevent->name, UEVENT_DIGITAL_KEY) != NULL) {
+    if (strstr(audioPnpUevent->name, UEVENT_NAME_DIGITAL_KEY) != NULL) {
         if (pnpTag->audioPnpState) {
             pnpTag->audioPnpDigitalState = AUDIO_PNP_STATE_OFF;
             HDF_LOGI("%{public}s: USB-C DIGITAL HEADSET Online.", __func__);
@@ -192,15 +171,66 @@ static int32_t AudioPnpUeventCompare(struct AudioPnpUevent *audioPnpUevent)
     return HDF_SUCCESS;
 }
 
+static int32_t AudioAnalogHeadsetDeviceCheck(struct AudioPnpUevent *audioPnpUevent)
+{
+    struct AudioEvent audioEvent;
+    static int32_t h2wTypeLast = HDF_AUDIO_HEADSET;
+    if (audioPnpUevent == NULL) {
+        HDF_LOGE("%{public}s: audioPnpUevent is null!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (strncmp(audioPnpUevent->subSystem, UEVENT_SUBSYSTEM_SWITCH, strlen(UEVENT_SUBSYSTEM_SWITCH)) == 0) {
+        if (strncmp(audioPnpUevent->switchName, UEVENT_SWITCH_NAME_H2W, strlen(UEVENT_SWITCH_NAME_H2W)) != 0) {
+            HDF_LOGE("%{public}s: the switch name of 'h2w' not found!", __func__);
+            return HDF_FAILURE;
+        }
+        if (audioPnpUevent->switchState[0] == '0') {
+            audioEvent.eventType = HDF_AUDIO_DEVICE_REMOVE;
+            audioEvent.deviceType = h2wTypeLast;
+        } else if (audioPnpUevent->switchState[0] == '1') {
+            audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
+            audioEvent.deviceType = HDF_AUDIO_HEADSET;
+        } else {
+            audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
+            audioEvent.deviceType = HDF_AUDIO_HEADPHONE;
+        }
+        h2wTypeLast = audioEvent.deviceType;
+    } else {
+        if (strncmp(audioPnpUevent->action, UEVENT_ACTION_CHANGE, strlen(UEVENT_ACTION_CHANGE)) != 0) {
+            return HDF_FAILURE;
+        }
+        if (strstr(audioPnpUevent->name, UEVENT_NAME_HEADSET) == NULL) {
+            HDF_LOGE("%{public}s: don't surpport headset type, name = %{public}s!", __func__, audioPnpUevent->name);
+            return HDF_FAILURE;
+        }
+        if (strncmp(audioPnpUevent->devType, UEVENT_TYPE_EXTCON, strlen(UEVENT_TYPE_EXTCON)) != 0) {
+            HDF_LOGE("%{public}s: don't surpport devType = %{public}s!", __func__, audioPnpUevent->devType);
+            return HDF_FAILURE;
+        }
+        if (strstr(audioPnpUevent->state, UEVENT_STATE_ANALOG_HS0) != NULL) {
+            audioEvent.eventType = HDF_AUDIO_DEVICE_REMOVE;
+        } else if (strstr(audioPnpUevent->state, UEVENT_STATE_ANALOG_HS1) != NULL) {
+            audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
+        } else {
+            HDF_LOGE("%{public}s: don't surpport type, state = %{public}s!", __func__, audioPnpUevent->state);
+            return HDF_FAILURE;
+        }
+        audioEvent.deviceType = HDF_AUDIO_HEADSET;
+    }
+    return AudioPnpUpdateInfoOnly(audioEvent);
+}
+
 static int32_t AudioPnpUeventParse(const char *msg, const int32_t strLength)
 {
+    errno_t ret;
     if (msg == NULL || strLength < 0 || strLength > UEVENT_MSG_LEN) {
         HDF_LOGE("%{public}s: msg is null or strLength error!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     char eventMsg[UEVENT_MSG_LEN] = {0};
     (void)memset_s(eventMsg, UEVENT_MSG_LEN, 0, UEVENT_MSG_LEN);
-    errno_t ret = memcpy_s(eventMsg, UEVENT_MSG_LEN, msg, strLength);
+    ret = memcpy_s(eventMsg, UEVENT_MSG_LEN, msg, strLength);
     if (ret != EOK) {
         HDF_LOGE("%{public}s: msg copy fail! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
@@ -210,6 +240,9 @@ static int32_t AudioPnpUeventParse(const char *msg, const int32_t strLength)
         .name = "",
         .state = "",
         .devType = "",
+        .subSystem = "",
+        .switchName = "",
+        .switchState = ""
     };
     char *msgTmp = eventMsg;
     while (*msgTmp) {
@@ -225,10 +258,19 @@ static int32_t AudioPnpUeventParse(const char *msg, const int32_t strLength)
         } else if (strncmp(msgTmp, UEVENT_DEVTYPE, strlen(UEVENT_DEVTYPE)) == 0) {
             msgTmp += strlen(UEVENT_DEVTYPE);
             audioPnpUevent.devType = msgTmp;
+        } else if (strncmp(msgTmp, UEVENT_SUBSYSTEM, strlen(UEVENT_SUBSYSTEM)) == 0) {
+            msgTmp += strlen(UEVENT_SUBSYSTEM);
+            audioPnpUevent.subSystem = msgTmp;
+        } else if (strncmp(msgTmp, UEVENT_SWITCH_NAME, strlen(UEVENT_SWITCH_NAME)) == 0) {
+            msgTmp += strlen(UEVENT_SWITCH_NAME);
+            audioPnpUevent.switchName = msgTmp;
+        } else if (strncmp(msgTmp, UEVENT_SWITCH_STATE, strlen(UEVENT_SWITCH_STATE)) == 0) {
+            msgTmp += strlen(UEVENT_SWITCH_STATE);
+            audioPnpUevent.switchState = msgTmp;
         }
         msgTmp += strlen(msgTmp) + 1; // 1 is a skip character '\0'
     }
-
+    (void)AudioAnalogHeadsetDeviceCheck(&audioPnpUevent);
     return AudioPnpUeventCompare(&audioPnpUevent);
 }
 
@@ -256,7 +298,7 @@ static int AudioPnpUeventOpen(int *fd)
         HDF_LOGE("%{public}s: setsockopt failed!", __func__);
         return HDF_FAILURE;
     }
-    if (bind(socketfd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+    if (bind(socketfd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
         HDF_LOGE("%{public}s: bind socketfd failed!", __func__);
         close(socketfd);
         return HDF_FAILURE;
