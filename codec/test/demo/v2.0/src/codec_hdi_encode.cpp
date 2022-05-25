@@ -46,6 +46,7 @@ CodecHdiEncode::CodecHdiEncode() : fpIn_(nullptr), fpOut_(nullptr)
     useBufferHandle_ = false;
     width_ = 0;
     height_ = 0;
+    compoentId_ = 0;
 }
 
 CodecHdiEncode::~CodecHdiEncode()
@@ -111,7 +112,8 @@ bool CodecHdiEncode::Init(CommandOpt &opt)
     callback_->FillBufferDone = &CodecHdiEncode::OnFillBufferDone;
 
     // create a component
-    auto err = omxMgr_->CreateComponent(&client_, const_cast<char *>(encoder_avc), 0, 0, callback_);
+    auto err =
+        omxMgr_->CreateComponent(&client_, &compoentId_, const_cast<char *>(encoder_avc), (int64_t)this, callback_);
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to CreateComponent", __func__);
         return false;
@@ -422,9 +424,9 @@ void CodecHdiEncode::FreeBuffers()
 
 void CodecHdiEncode::Release()
 {
-    omxMgr_->DestoryComponent(client_);
-
-    // DestoryComponent has released  client_ and omx component calls DeInit
+    omxMgr_->DestoryComponent(compoentId_);
+    CodecComponentTypeRelease(client_);
+    client_ = nullptr;
     CodecComponentManagerRelease();
 }
 
@@ -565,7 +567,7 @@ int32_t CodecHdiEncode::createBufferHandle()
 
 int32_t CodecHdiEncode::OnEvent(struct CodecCallbackType *self, enum OMX_EVENTTYPE event, struct EventInfo *info)
 {
-    HDF_LOGI("OnEvent: pAppData[0x%{public}p], eEvent [%{public}d], "
+    HDF_LOGI("OnEvent: pAppData[%{public}ld], eEvent [%{public}d], "
              "nData1[%{public}d]",
              info->appData, event, info->data1);
     switch (event) {
@@ -585,15 +587,15 @@ int32_t CodecHdiEncode::OnEvent(struct CodecCallbackType *self, enum OMX_EVENTTY
     return HDF_SUCCESS;
 }
 
-int32_t CodecHdiEncode::OnEmptyBufferDone(struct CodecCallbackType *self, int8_t *appData, uint32_t appDataLen,
+int32_t CodecHdiEncode::OnEmptyBufferDone(struct CodecCallbackType *self, int64_t appData,
                                           const struct OmxCodecBuffer *buffer)
 {
     HDF_LOGI("OnEmptyBufferDone: pBuffer.bufferID [%{public}d]", buffer->bufferId);
     return g_core->OnEmptyBufferDone(*buffer);
 }
 
-int32_t CodecHdiEncode::OnFillBufferDone(struct CodecCallbackType *self, int8_t *appData, uint32_t appDataLen,
-                                         struct OmxCodecBuffer *buffer)
+int32_t CodecHdiEncode::OnFillBufferDone(struct CodecCallbackType *self, int64_t appData,
+                                         const struct OmxCodecBuffer *buffer)
 {
     HDF_LOGI("OnFillBufferDone: pBuffer.bufferID [%{public}d]", buffer->bufferId);
     return g_core->OnFillBufferDone(*buffer);
@@ -611,7 +613,7 @@ int32_t CodecHdiEncode::OnEmptyBufferDone(const struct OmxCodecBuffer &buffer)
     return HDF_SUCCESS;
 }
 
-int32_t CodecHdiEncode::OnFillBufferDone(struct OmxCodecBuffer &buffer)
+int32_t CodecHdiEncode::OnFillBufferDone(const struct OmxCodecBuffer &buffer)
 {
     if (exit_) {
         return HDF_SUCCESS;
@@ -627,8 +629,7 @@ int32_t CodecHdiEncode::OnFillBufferDone(struct OmxCodecBuffer &buffer)
     // save to file
     (void)fwrite(addr, 1, buffer.filledLen, fpOut_);
     (void)fflush(fpOut_);
-    buffer.offset = 0;
-    buffer.filledLen = 0;
+
     if (buffer.flag == OMX_BUFFERFLAG_EOS) {
         exit_ = true;
         HDF_LOGI("OnFillBufferDone the END coming");

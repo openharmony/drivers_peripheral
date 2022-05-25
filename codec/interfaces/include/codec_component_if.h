@@ -47,6 +47,8 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#define CODEC_COMPONENT_INTERFACE_DESC "CODEC_HDI_2.0_COMPONENT"
+
 /**
  * @brief Defines the APIs for codec components.
  *
@@ -324,15 +326,13 @@ struct CodecComponentType {
      * @param callback Indicates the pointer to the {@link CodecCallbackType} object.
      * @param appData Indicates the pointer to the value defined by the application.
      * The value is returned by the callback.
-     * @param appDataLen Indicates the length of <b>appData</b>, in bytes.
      *
      * @return Returns <b>HDF_SUCCESS</b> if the operation is successful.
      * @return Returns <b>HDF_ERR_INVALID_PARAM</b> if the operation failed due to invalid parameters.
      * @return Returns <b>HDF_ERR_INVALID_OBJECT</b> if the operation failed due to invalid objects.
      * @return Returns <b>HDF_ERR_MALLOC_FAIL</b> if the operation failed due to insufficient memory.
      */
-    int32_t (*SetCallbacks)(struct CodecComponentType *self, struct CodecCallbackType *callback,
-        int8_t *appData, uint32_t appDataLen);
+    int32_t (*SetCallbacks)(struct CodecComponentType *self, struct CodecCallbackType *callback, int64_t appData);
 
     /**
      * @brief Deinitializes a component.
@@ -387,6 +387,8 @@ struct CodecComponentType {
      * @return Returns <b>HDF_ERR_MALLOC_FAIL</b> if the operation failed due to insufficient memory.
      */
     int32_t (*ComponentRoleEnum)(struct CodecComponentType *self, uint8_t *role, uint32_t roleLen, uint32_t index);
+
+    struct HdfRemoteService *(*AsObject)(struct CodecComponentType *self);
 };
 
 /**

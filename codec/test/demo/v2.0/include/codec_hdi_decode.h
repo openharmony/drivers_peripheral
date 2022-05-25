@@ -90,10 +90,10 @@ public:
     void Run();
     void Release();
     static int32_t OnEvent(struct CodecCallbackType *self, enum OMX_EVENTTYPE event, struct EventInfo *info);
-    static int32_t OnEmptyBufferDone(struct CodecCallbackType *self, int8_t *appData, uint32_t appDataLen,
+    static int32_t OnEmptyBufferDone(struct CodecCallbackType *self, int64_t appData,
                                      const struct OmxCodecBuffer *buffer);
-    static int32_t OnFillBufferDone(struct CodecCallbackType *self, int8_t *appData, uint32_t appDataLen,
-                                    struct OmxCodecBuffer *buffer);
+    static int32_t OnFillBufferDone(struct CodecCallbackType *self, int64_t appData,
+                                    const struct OmxCodecBuffer *buffer);
     template <typename T>
     inline void InitParam(T &param)
     {
@@ -117,7 +117,7 @@ private:
     int32_t UseBufferOnPort(PortIndex portIndex, int bufferCount, int bufferSize);
     int32_t UseBufferHandle(int bufferCount, int bufferSize);
     int32_t OnEmptyBufferDone(const struct OmxCodecBuffer &buffer);
-    int32_t OnFillBufferDone(struct OmxCodecBuffer &buffer);
+    int32_t OnFillBufferDone(const struct OmxCodecBuffer &buffer);
     int32_t CheckAndUseBufferHandle();
     int GetYuvSize();
     int32_t ConfigPortDefine();
@@ -137,6 +137,7 @@ private:
     struct CodecComponentType *client_;
     struct CodecCallbackType *callback_;
     struct CodecComponentManager *omxMgr_;
+    uint32_t compoentId_;
     std::map<int, std::shared_ptr<BufferInfo>> omxBuffers_;  // key is buferid
     std::list<int> unUsedInBuffers_;
     std::list<int> unUsedOutBuffers_;

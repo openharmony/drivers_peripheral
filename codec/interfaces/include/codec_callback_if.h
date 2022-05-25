@@ -94,7 +94,6 @@ struct CodecCallbackType {
      *
      * @param self Indicates the pointer to the callback to be invoked.
      * @param appData Indicates the pointer to the upper-layer instance passed to the callback.
-     * @param appDataLen Indicates the length of <b>appData</b>, in bytes.
      * @param buffer Indicates the pointer to the input buffer {@link OmxCodecBuffer} that has data processed.
      *
      * @return Returns <b>HDF_SUCCESS</b> if the operation is successful.
@@ -102,15 +101,13 @@ struct CodecCallbackType {
      * @return Returns <b>HDF_ERR_INVALID_OBJECT</b> if the operation failed due to invalid objects.
      * @return Returns <b>HDF_ERR_MALLOC_FAIL</b> if the operation failed due to insufficient memory.
      */
-    int32_t (*EmptyBufferDone)(struct CodecCallbackType *self, int8_t *appData,
-        uint32_t appDataLen, const struct OmxCodecBuffer *buffer);
+    int32_t (*EmptyBufferDone)(struct CodecCallbackType *self, int64_t appData, const struct OmxCodecBuffer *buffer);
 
     /**
      * @brief Reports an event indicating that the output buffer is filled.
      *
      * @param self Indicates the pointer to the callback to be invoked.
      * @param appData Indicates the pointer to the upper-layer instance passed to the callback.
-     * @param appDataLen Indicates the length of <b>appData</b>, in bytes.
      * @param buffer Indicates the pointer to the buffer {@link OmxCodecBuffer} that has data filled.
      *
      * @return Returns <b>HDF_SUCCESS</b> if the operation is successful.
@@ -118,8 +115,7 @@ struct CodecCallbackType {
      * @return Returns <b>HDF_ERR_INVALID_OBJECT</b> if the operation failed due to invalid objects.
      * @return Returns <b>HDF_ERR_MALLOC_FAIL</b> if the operation failed due to insufficient memory.
      */
-    int32_t (*FillBufferDone)(struct CodecCallbackType *self, int8_t* appData,
-        uint32_t appDataLen, struct OmxCodecBuffer* buffer);
+    int32_t (*FillBufferDone)(struct CodecCallbackType *self, int64_t appData, const struct OmxCodecBuffer *buffer);
 };
 
 /**

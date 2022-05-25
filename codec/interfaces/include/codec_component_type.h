@@ -253,8 +253,7 @@ struct CompVerInfo {
  * @brief Defines the <b>EventInfo</b>.
  */
 struct EventInfo {
-    int8_t *appData;                /** The pointer to the upper-layer instance passed to the callback */
-    uint32_t appDataLen;            /** The length of <b>appData</b>, in bytes. */
+    int64_t appData;                /** The pointer to the upper-layer instance passed to the callback */
     uint32_t data1;                 /** Data 1 carried in the event. */
     uint32_t data2;                 /** Data 2 carried in the event. */
     int8_t *eventData;              /** The pointer of data carried in the event. */
