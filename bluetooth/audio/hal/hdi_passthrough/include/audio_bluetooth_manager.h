@@ -35,6 +35,7 @@ int GetPlayingState();
 RawAddress& GetDevice();
 void GetProxy();
 void RegisterObserver();
+void DeRegisterObserver();
 BluetoothA2dpCodecStatus GetCodecStatus();
 int WriteFrame(const uint8_t *data, uint32_t size);
 int StartPlaying();
