@@ -664,7 +664,7 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface008, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor001
  * @tc.desc: Test functions to GetDeviceDescriptor
- * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
  * @tc.desc: 正向测试：参数正确
  * @tc.type: FUNC
  */
@@ -686,7 +686,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor001, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor002
  * @tc.desc: Test functions to GetDeviceDescriptor
- * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：参数异常，busNum错误
  * @tc.type: FUNC
  */
@@ -708,7 +708,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor002, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor003
  * @tc.desc: Test functions to GetDeviceDescriptor
- * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：参数异常，devAddr错误
  * @tc.type: FUNC
  */
@@ -730,7 +730,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor003, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor004
  * @tc.desc: Test functions to GetDeviceDescriptor
- * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：参数异常，length错误
  * @tc.type: FUNC
  */
@@ -752,7 +752,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor004, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor005
  * @tc.desc: Test functions to GetDeviceDescriptor
- * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：参数异常，busNum、devAddr错误
  * @tc.type: FUNC
  */
@@ -774,7 +774,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor005, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor006
  * @tc.desc: Test functions to GetDeviceDescriptor
- * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：参数异常，busNum、length错误
  * @tc.type: FUNC
  */
@@ -796,7 +796,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor006, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor007
  * @tc.desc: Test functions to GetDeviceDescriptor
- * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：devAddr、length错误
  * @tc.type: FUNC
  */
@@ -818,7 +818,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor007, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor008
  * @tc.desc: Test functions to GetDeviceDescriptor
- * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：busNum、devAddr、length错误
  * @tc.type: FUNC
  */
@@ -842,7 +842,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor008, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor001
  * @tc.desc: Test functions to GetStringDescriptor
- * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 正向测试：参数正确
  * @tc.type: FUNC
  */
@@ -865,7 +865,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor001, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor002
  * @tc.desc: Test functions to GetStringDescriptor
- * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：参数异常，busNum错误
  * @tc.type: FUNC
  */
@@ -888,7 +888,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor002, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor003
  * @tc.desc: Test functions to GetStringDescriptor
- * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：参数异常，stringId错误
  * @tc.type: FUNC
  */
@@ -911,7 +911,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor003, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor004
  * @tc.desc: Test functions to GetStringDescriptor
- * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：参数异常，devAddr错误
  * @tc.type: FUNC
  */
@@ -934,7 +934,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor004, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor005
  * @tc.desc: Test functions to GetStringDescriptor
- * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：参数异常，busNum、devAddr错误
  * @tc.type: FUNC
  */
@@ -957,7 +957,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor005, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor006
  * @tc.desc: Test functions to GetStringDescriptor
- * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：参数异常，busNum错误
  * @tc.type: FUNC
  */
@@ -980,7 +980,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor006, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor007
  * @tc.desc: Test functions to GetStringDescriptor
- * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：devAddr、stringID错误
  * @tc.type: FUNC
  */
@@ -1003,7 +1003,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor007, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor008
  * @tc.desc: Test functions to GetStringDescriptor
- * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：busNum、devAddr、length错误
  * @tc.type: FUNC
  */
@@ -1028,7 +1028,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor008, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor001
  * @tc.desc: Test functions to GetConfigDescriptor
- * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 正向测试：参数正确
  * @tc.type: FUNC
  */
@@ -1051,7 +1051,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor001, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor002
  * @tc.desc: Test functions to GetConfigDescriptor
- * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：参数异常，busNum错误
  * @tc.type: FUNC
  */
@@ -1074,7 +1074,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor002, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor003
  * @tc.desc: Test functions to GetConfigDescriptor
- * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：参数异常，devAddr错误
  * @tc.type: FUNC
  */
@@ -1097,7 +1097,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor003, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor004
  * @tc.desc: Test functions to GetConfigDescriptor
- * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：参数异常，configId
  * @tc.type: FUNC
  */
@@ -1120,7 +1120,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor004, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor005
  * @tc.desc: Test functions to GetConfigDescriptor
- * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：参数异常，busNum、devAddr错误
  * @tc.type: FUNC
  */
@@ -1143,7 +1143,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor005, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor006
  * @tc.desc: Test functions to GetConfigDescriptor
- * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：参数异常，busNum、configId错误
  * @tc.type: FUNC
  */
@@ -1166,7 +1166,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor006, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor007
  * @tc.desc: Test functions to GetConfigDescriptor
- * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：devAddr、configId错误
  * @tc.type: FUNC
  */
@@ -1189,7 +1189,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor007, TestSize.Level1)
 /**
  * @tc.name: UsbdDescriptor008
  * @tc.desc: Test functions to GetConfigDescriptor
- * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试：busNum、devAddr、configId错误
  * @tc.type: FUNC
  */
@@ -1212,7 +1212,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor008, TestSize.Level1)
 /**
  * @tc.name: UsbdGetRawDescriptor001
  * @tc.desc: Test functions to GetRawDescriptor
- * @tc.desc: int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
  * @tc.desc: 正向测试：参数正确
  * @tc.type: FUNC
  */
@@ -1232,7 +1232,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetRawDescriptor001, TestSize.Level1)
 /**
  * @tc.name: UsbdGetRawDescriptor002
  * @tc.desc: Test functions to GetRawDescriptor
- * @tc.desc: int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试: 错误参数
  * @tc.type: FUNC
  */
@@ -1252,7 +1252,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetRawDescriptor002, TestSize.Level1)
 /**
  * @tc.name: UsbdGetRawDescriptor003
  * @tc.desc: Test functions to GetRawDescriptor
- * @tc.desc: int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+ * @tc.desc: int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
  * @tc.desc: 反向测试: 错误参数
  * @tc.type: FUNC
  */

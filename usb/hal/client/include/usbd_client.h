@@ -74,7 +74,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
-    int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+    int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
 
     /* *
      * @brief Obtains the string descriptor of a USB device based on the specified string ID.
@@ -86,7 +86,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
-    int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+    int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
 
     /* *
      * @brief Obtains the configuration descriptor of a USB device based on the specified config ID.
@@ -98,7 +98,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
-    int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor);
+    int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
 
     /* *
      * @brief Obtains the raw descriptor.
@@ -109,7 +109,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns a non-0 value if the operation fails.
      * @since 3.0
      */
-    int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor);
+    int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
     
     /* *
      * @brief Obtains the file descriptor.
