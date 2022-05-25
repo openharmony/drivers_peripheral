@@ -504,6 +504,10 @@ void PowerSupplyProvider::SetSysFilePath(const std::string& path)
 
 void PowerSupplyProvider::CreateFile(const std::string& path, const std::string& content)
 {
+    if (access(path.c_str(), F_OK) == 0) {
+        return;
+    }
+
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "cannot create file %{public}s", path.c_str());
