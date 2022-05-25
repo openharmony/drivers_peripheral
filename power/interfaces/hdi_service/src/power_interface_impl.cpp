@@ -19,9 +19,6 @@
 #include <hdf_base.h>
 #include <file_ex.h>
 #include <sys/eventfd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
@@ -30,7 +27,6 @@
 #include "errors.h"
 #include "hdf_sbuf.h"
 #include "pubdef.h"
-#include "securec.h"
 #include "utils/hdf_log.h"
 #include "hdf_device_desc.h"
 #include "hdf_remote_service.h"
@@ -56,7 +52,6 @@ static sptr<IPowerHdiCallback> callback_;
 static UniqueFd wakeupCountFd;
 static void AutoSuspendLoop();
 static int32_t DoSuspend();
-static bool LoadStringFd(int32_t fd, std::string& content);
 static std::string ReadWakeCount();
 static bool WriteWakeCount(const std::string& count);
 static void NotifyCallback(int code);
@@ -114,6 +109,7 @@ void AutoSuspendLoop()
 
 int32_t DoSuspend()
 {
+    HDF_LOGI("DoSuspend enter");
     std::lock_guard<std::mutex> lock(mutex_);
     UniqueFd suspendStateFd(TEMP_FAILURE_RETRY(open(SUSPEND_STATE_PATH, O_RDWR | O_CLOEXEC)));
     if (suspendStateFd < 0) {
@@ -123,10 +119,10 @@ int32_t DoSuspend()
     do {
         ret = SaveStringToFd(suspendStateFd, SUSPEND_STATE);
     } while (!ret && (errno == EINTR || errno == EBUSY));
-
     if (!ret) {
         return HDF_FAILURE;
     }
+    HDF_LOGI("DoSuspend end");
     return HDF_SUCCESS;
 }
 
@@ -192,38 +188,13 @@ int32_t PowerInterfaceImpl::SuspendUnblock(const std::string& name)
     return HDF_SUCCESS;
 }
 
-bool LoadStringFd(int32_t fd, std::string& content)
-{
-    if (fd <= 0) {
-        HDF_LOGE("invalid fd: %{public}d", fd);
-        return false;
-    }
- 
-    struct stat statBuf;
-    (void)memset_s(&statBuf, sizeof(struct stat), 0, sizeof(struct stat));
-    if (fstat(fd, &statBuf) != 0) {
-        HDF_LOGE("Failed to get the file size");
-        return false;
-    }
-    const int32_t fileLength = static_cast<uint32_t>(statBuf.st_size);
-
-    const int32_t len = TEMP_FAILURE_RETRY(read(fd, content.data(), static_cast<size_t>(fileLength)));
-    if (len < 0) {
-        HDF_LOGE("the length read from file is not equal to fileLength!len: %{public}d,fileLen: %{public}d",
-            len, fileLength);
-        return false;
-    }
-
-    return true;
-}
-
 std::string ReadWakeCount()
 {
     if (wakeupCountFd < 0) {
         wakeupCountFd = UniqueFd(TEMP_FAILURE_RETRY(open(WAKEUP_COUNT_PATH, O_RDWR | O_CLOEXEC)));
     }
     std::string wakeupCount;
-    LoadStringFd(wakeupCountFd, wakeupCount);
+    LoadStringFromFd(wakeupCountFd, wakeupCount);
 
     return wakeupCount;
 }
