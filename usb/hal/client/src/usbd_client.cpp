@@ -218,7 +218,7 @@ int32_t UsbdClient::DoDispatch(uint32_t cmd, MessageParcel &data, MessageParcel 
     return UEC_OK;
 }
 
-int32_t UsbdClient::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor)
+int32_t UsbdClient::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -234,7 +234,7 @@ int32_t UsbdClient::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &de
         HDF_LOGE("%{public}s:%{public}d DoDispatch failed:%{public}d", __func__, __LINE__, ret);
         return ret;
     }
-    ret = UsbdClient::GetBufferMessage(reply, decriptor);
+    ret = UsbdClient::GetBufferMessage(reply, descriptor);
     if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d GetBufferMessage failed:%{public}d", __func__, __LINE__, ret);
     }
@@ -261,7 +261,7 @@ int32_t UsbdClient::GetFileDescriptor(const UsbDev &dev, int32_t &fd)
     return ret;
 }
 
-int32_t UsbdClient::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor)
+int32_t UsbdClient::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -277,11 +277,11 @@ int32_t UsbdClient::GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> 
         HDF_LOGE("%{public}s failed", __func__);
         return ret;
     }
-    ret = UsbdClient::GetBufferMessage(reply, decriptor);
+    ret = UsbdClient::GetBufferMessage(reply, descriptor);
     return ret;
 }
 
-int32_t UsbdClient::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor)
+int32_t UsbdClient::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -298,14 +298,14 @@ int32_t UsbdClient::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::
         HDF_LOGE("%{public}s:%{public}d strId:%{public}hhu failed:%{public}d", __func__, __LINE__, descId, ret);
         return ret;
     }
-    ret = UsbdClient::GetBufferMessage(reply, decriptor);
+    ret = UsbdClient::GetBufferMessage(reply, descriptor);
     if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d strId:%{public}hhu failed:%{public}d", __func__, __LINE__, descId, ret);
     }
     return ret;
 }
 
-int32_t UsbdClient::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor)
+int32_t UsbdClient::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -322,7 +322,7 @@ int32_t UsbdClient::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::
         HDF_LOGE("%{public}s:%{public}d cfgId:%{public}d failed:%{public}d", __func__, __LINE__, descId, ret);
         return ret;
     }
-    ret = UsbdClient::GetBufferMessage(reply, decriptor);
+    ret = UsbdClient::GetBufferMessage(reply, descriptor);
     if (ret != UEC_OK) {
         HDF_LOGE("%{public}s:%{public}d strId:%{public}d failed:%{public}d", __func__, __LINE__, descId, ret);
     }
