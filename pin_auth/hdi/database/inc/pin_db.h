@@ -27,11 +27,11 @@ extern "C" {
 #define INVALID_TEMPLATE_ID 0xFFFFFFFFFFFFFFFF
 #define PIN_DB_TWO_PARAMS 2
 #define MAX_RANDOM_TIME 10
-#define DEFAULT_FILE_HEAD "/data/pin/"
+#define DEFAULT_FILE_HEAD "/data/service/el1/public/pinauth/"
 #define MAX_UINT_LEN 21
 #define MAX_CRYPTO_INFO_SIZE 100
 #define CURRENT_VERSION 0
-#define PIN_INDEX_NAME "/data/pin/PinIndexDb"
+#define PIN_INDEX_NAME "/data/service/el1/public/pinauth/PinIndexDb"
 #define MAX_FILE_NAME_LEN 256
 #define CRYPTO_SUFFIX "_CryptoInfo"
 #define ANTI_BRUTE_SUFFIX "_BruteForceCount"
