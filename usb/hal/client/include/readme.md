@@ -4,9 +4,9 @@
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | int32_t OpenDevice(const UsbDev &dev);                       | 打开设备，建立连接                                           |
 | int32_t CloseDevice(const UsbDev &dev);                      | 关闭设备，释放与设备相关的所有系统资源                       |
-| int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor); | 获取设备描述符                                               |
-| int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor); | 获取设备的配置描述符                                         |
-| int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &decriptor); | 获取设备的字符串描述符                                       |
+| int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor); | 获取设备描述符                                               |
+| int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor); | 获取设备的配置描述符                                         |
+| int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor); | 获取设备的字符串描述符                                       |
 | int32_t SetConfig(const UsbDev &dev, uint8_t configIndex);   | 设置设备当前使用的配置，通过配置值进行指定                   |
 | int32_t GetConfig(const UsbDev &dev, uint8_t &configIndex);  | 获取当前生效的配置值                                         |
 | int32_t ClaimInterface(const UsbDev &dev, uint8_t interfaceid); | 打开接口，并申明独占接口，必须在数据传输前执行               |
