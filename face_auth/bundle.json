@@ -26,6 +26,7 @@
           "//drivers/peripheral/face_auth:faceauth_entry"
         ],
         "test": [
+          "//drivers/peripheral/face_auth/test/fuzztest/face_auth:fuzztest"
         ],
         "inner_kits": [
         ]

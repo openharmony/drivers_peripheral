@@ -13,10 +13,11 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_FACEAUTH_V1_0_EXECUTOR_IMPL_H
-#define OHOS_HDI_FACEAUTH_V1_0_EXECUTOR_IMPL_H
+#ifndef EXECUTOR_IMPL_H
+#define EXECUTOR_IMPL_H
 
 #include <vector>
+
 #include "v1_0/executor_stub.h"
 
 namespace OHOS {
@@ -25,13 +26,13 @@ namespace FaceAuth {
 namespace V1_0 {
 class ExecutorImpl : public IExecutor {
 public:
-    explicit ExecutorImpl(struct ExecutorInfo executorInfo);
+    ExecutorImpl();
 
-    virtual ~ExecutorImpl() {}
+    virtual ~ExecutorImpl() = default;
 
-    int32_t GetExecutorInfo(ExecutorInfo &info) override;
+    int32_t GetExecutorInfo(ExecutorInfo &executorInfo) override;
 
-    int32_t GetTemplateInfo(uint64_t templateId, TemplateInfo &info) override;
+    int32_t GetTemplateInfo(uint64_t templateId, TemplateInfo &templateInfo) override;
 
     int32_t OnRegisterFinish(const std::vector<uint64_t> &templateIdList,
         const std::vector<uint8_t> &frameworkPublicKey, const std::vector<uint8_t> &extraInfo) override;
@@ -49,14 +50,14 @@ public:
 
     int32_t Cancel(uint64_t scheduleId) override;
 
-    int32_t SendCommand(int32_t commandId, const std::vector<uint8_t> &extraInfo,
-        const sptr<IExecutorCallback> &callbackObj) override;
+    int32_t SendCommand(
+        int32_t commandId, const std::vector<uint8_t> &extraInfo, const sptr<IExecutorCallback> &callbackObj) override;
 
 private:
     struct ExecutorInfo executorInfo_;
 };
-} // V1_0
-} // FaceAuth
-} // HDI
-} // OHOS
-#endif // OHOS_HDI_FACEAUTH_V1_0_EXECUTOR_IMPL_H
+} // namespace V1_0
+} // namespace FaceAuth
+} // namespace HDI
+} // namespace OHOS
+#endif // EXECUTOR_IMPL_H

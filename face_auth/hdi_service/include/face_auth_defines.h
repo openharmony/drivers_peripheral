@@ -36,8 +36,8 @@ enum ResultCode : int32_t {
     FRAMEWORK_RESULT_CODE_MAX,
     VENDOR_RESULT_CODE_BEGIN = 10000,
 };
-} // V1_0
-} // FaceAuth
-} // HDI
-} // OHOS
-#endif  // FACE_AUTH_DEFINES_H
+} // namespace V1_0
+} // namespace FaceAuth
+} // namespace HDI
+} // namespace OHOS
+#endif // FACE_AUTH_DEFINES_H
