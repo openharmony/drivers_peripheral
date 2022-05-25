@@ -13,30 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef NETLINK_ADAPTER_H
-#define NETLINK_ADAPTER_H
+#ifndef SBUF_COMMON_ADAPTER_H
+#define SBUF_COMMON_ADAPTER_H
 
-#include <netlink/socket.h>
-#include <netlink/msg.h>
-#include <pthread.h>
+#include "../wifi_common_cmd.h"
+#include "hdf_io_service.h"
+#include "hdf_sbuf.h"
 
-enum ThreadStatus {
-    THREAD_INIT,
-    THREAD_STARTING,
-    THREAD_RUN,
-    THREAD_STOPPING,
-    THREAD_STOP,
-};
+int32_t SendCmdSync(const uint32_t cmd, struct HdfSBuf *reqData, struct HdfSBuf *respData);
+struct HdfIoService *GetWifiService(void);
+struct HdfIoService *InitWifiService(const char *serviceName);
+void ReleaseWifiService(void);
+int OnWiFiEvents(struct HdfDevEventlistener *listener,
+    struct HdfIoService *service, uint32_t eventId, struct HdfSBuf *data);
 
-typedef int32_t (*RespHandler)(struct nl_msg *msg, void *data);
-
-struct WifiThreadParam {
-    struct nl_sock *eventSock;
-    int familyId;
-    enum ThreadStatus *status;
-};
-int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *data);
-void *EventThread(void *para);
-
-
-#endif /* end of netlink_adapter.h */
+#endif /* end of sbuf_common_adapter.h */

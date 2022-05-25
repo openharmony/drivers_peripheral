@@ -437,7 +437,7 @@ int32_t WifiCmdDelKey(const char *ifName, WifiKeyExt *keyExt);
 int32_t WifiCmdNewKey(const char *ifName, WifiKeyExt *keyExt);
 int32_t WifiCmdSetKey(const char *ifName, WifiKeyExt *keyExt);
 int32_t WifiCmdSetMode(const char *ifName, WifiSetMode *setMode);
-int32_t WifiCmdGetOwnMac(const char *ifName, void *buf, uint32_t len);
+int32_t WifiCmdGetOwnMac(const char *ifName, char *buf, uint32_t len);
 int32_t WifiCmdGetHwFeature(const char *ifName, WifiHwFeatureData *hwFeatureData);
 int32_t WifiCmdScan(const char *ifName, WifiScan *scan);
 int32_t WifiCmdDisconnet(const char *ifName, int32_t reasonCode);
