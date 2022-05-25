@@ -108,6 +108,12 @@ void RegisterObserver()
     g_proxy_->RegisterObserver(g_btA2dpSrcObserverCallbacks);
 }
 
+void DeRegisterObserver()
+{
+    HDF_LOGI("audio_bluetooth_manager DeRegisterObserver");
+    g_proxy_->DeregisterObserver(g_btA2dpSrcObserverCallbacks);
+}
+
 BluetoothA2dpCodecStatus GetCodecStatus()
 {
     HDF_LOGI("audio_bluetooth_manager GetCodecStatus");

@@ -41,7 +41,7 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
     if (manager == NULL || desc == NULL || desc->adapterName == NULL || desc->ports == NULL || adapter == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    LOGV("%s: adapter name %s", __func__, desc->adapterName);
+    HDF_LOGI("%s: adapter name %s", __func__, desc->adapterName);
     if (AudioAdapterExist(desc->adapterName)) {
         HDF_LOGE("%s: not supported this adapter %s", __func__, desc->adapterName);
         return AUDIO_HAL_ERR_INTERNAL;
@@ -61,7 +61,7 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
     hwAdapter->adapterDescriptor = *desc;
     hwAdapter->adapterMgrRenderFlag = 0; // The adapterMgrRenderFlag init is zero
 
-    LOGV("%s call bluetooth RegisterObserver interface", __func__);
+    HDF_LOGI("%s call bluetooth RegisterObserver interface", __func__);
     OHOS::Bluetooth::GetProxy();
     OHOS::Bluetooth::RegisterObserver();
     
@@ -86,6 +86,9 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
         AudioMemFree((void **)&hwAdapter->portCapabilitys);
     }
     AudioMemFree((void **)&adapter);
+
+    HDF_LOGI("%s call bluetooth DeRegisterObserver interface", __func__);
+    OHOS::Bluetooth::DeRegisterObserver();
 }
 
 static struct AudioManager g_audioManagerFuncs = {
