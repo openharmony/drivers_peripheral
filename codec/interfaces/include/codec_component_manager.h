@@ -86,10 +86,10 @@ struct CodecComponentManager {
      * You can use this API to create a codec component instance based on the component name.
      *
      * @param component Indicates the pointer to the codec component created.
+	 * @param componentId Indicates the id to the codec component created.
      * @param compName Indicates the name of the component to create.
      * @param appData Indicates the pointer to the value defined by the application.
      * The value is returned by the callback.
-     * @param appDataSize Indicates the length of <b>appData</b>, in bytes.
      * @param callbacks Indicates the pointer to the callback defined by <b>OMX_CALLBACKTYPE</b>.
      * For details, see {@link CodecCallbackType}.
      *
@@ -98,20 +98,22 @@ struct CodecComponentManager {
      * @return Returns <b>HDF_ERR_INVALID_OBJECT</b> if the operation failed due to invalid objects.
      * @return Returns <b>HDF_ERR_MALLOC_FAIL</b> if the operation failed due to insufficient memory.
      */
-    int32_t (*CreateComponent)(struct CodecComponentType **component, char *compName, void *appData,
-        int32_t appDataSize, struct CodecCallbackType *callbacks);
+    int32_t (*CreateComponent)(struct CodecComponentType **component, uint32_t *componentId, char *compName,
+                               int64_t appData, struct CodecCallbackType *callbacks);
 
     /**
      * @brief Destroys a codec component instance.
      *
-     * @param component Indicates the codec component to destroy.
+     * @param componentId Indicates the codec component id to destroy.
      *
      * @return Returns <b>HDF_SUCCESS</b> if the operation is successful.
      * @return Returns <b>HDF_ERR_INVALID_PARAM</b> if the operation failed due to invalid parameters.
      * @return Returns <b>HDF_ERR_INVALID_OBJECT</b> if the operation failed due to invalid objects.
      * @return Returns <b>HDF_ERR_MALLOC_FAIL</b> if the operation failed due to insufficient memory.
      */
-    int32_t (*DestoryComponent)(struct CodecComponentType *component);
+    int32_t (*DestoryComponent)(uint32_t componentId);
+
+    struct HdfRemoteService *(*AsObject)(struct CodecComponentManager *self);
 };
 
 /**

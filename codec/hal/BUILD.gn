@@ -17,20 +17,41 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 ohos_shared_library("libcodec_hdi_omx_server") {
   include_dirs = [
     "//drivers/peripheral/codec/interfaces/include",
+    "//drivers/peripheral/codec/hal/v2.0/hdi_impl/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
     "//drivers/peripheral/base",
   ]
   sources = [
+    "src/codec_adapter.cpp",
     "src/codec_callback_type_proxy.c",
     "src/codec_component_capability_config.c",
+    "src/codec_component_manager_service.c",
+    "src/codec_component_manager_stub.c",
     "src/codec_component_type_driver.c",
+    "src/codec_component_type_service.c",
     "src/codec_component_type_stub.c",
     "src/codec_config_parser.c",
     "src/codec_types.c",
+    "v2.0/hdi_impl/src/codec_dyna_buffer.cpp",
+    "v2.0/hdi_impl/src/codec_handle_buffer.cpp",
+    "v2.0/hdi_impl/src/codec_share_buffer.cpp",
+    "v2.0/hdi_impl/src/component_mgr.cpp",
+    "v2.0/hdi_impl/src/component_node.cpp",
+    "v2.0/hdi_impl/src/icodec_buffer.cpp",
+  ]
+
+  cflags_cc = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wno-#warnings",
+    "-Wno-missing-braces",
+    "-Wno-missing-field-initializers",
   ]
 
   if (is_standard_system) {
+    deps = [ "//third_party/libdrm:libdrm" ]
     external_deps = [
       "device_driver_framework:libhdf_host",
       "device_driver_framework:libhdf_ipc_adapter",
@@ -79,58 +100,6 @@ ohos_shared_library("libcodec_hdi_omx_client") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-
-  install_images = [ chipset_base_dir ]
-  subsystem_name = "hdf"
-  part_name = "codec_device_driver"
-}
-
-ohos_shared_library("libcodec_hdi_omx_service_impl") {
-  include_dirs = [
-    "//drivers/adapter/uhdf2/include/hdi",
-    "//drivers/peripheral/codec/hal/v2.0/hdi_impl/include",
-    "//drivers/peripheral/codec/interfaces/include",
-    "//drivers/peripheral/codec/hal/include",
-    "//third_party/openmax/api/1.1.2",
-    "//drivers/peripheral/base",
-  ]
-  sources = [
-    "src/codec_adapter.cpp",
-    "src/codec_component_type_service.c",
-    "v2.0/hdi_impl/src/codec_dyna_buffer.cpp",
-    "v2.0/hdi_impl/src/codec_handle_buffer.cpp",
-    "v2.0/hdi_impl/src/codec_share_buffer.cpp",
-    "v2.0/hdi_impl/src/component_mgr.cpp",
-    "v2.0/hdi_impl/src/component_node.cpp",
-    "v2.0/hdi_impl/src/component_node_mgr.cpp",
-    "v2.0/hdi_impl/src/icodec_buffer.cpp",
-  ]
-
-  cflags_cc = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-Wno-#warnings",
-    "-Wno-missing-braces",
-    "-Wno-missing-field-initializers",
-  ]
-
-  if (is_standard_system) {
-    external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_ipc_adapter",
-      "device_driver_framework:libhdf_utils",
-      "device_driver_framework:libhdi",
-      "graphic_chipsetsdk:buffer_handle",
-      "hiviewdfx_hilog_native:libhilog",
-      "utils_base:utils",
-    ]
-
-    deps = [ "//third_party/libdrm:libdrm" ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
-  }
-
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "codec_device_driver"
@@ -168,6 +137,5 @@ group("codec_hdi_omx") {
     ":libcodec_hdi_omx_callback_type_service_impl",
     ":libcodec_hdi_omx_client",
     ":libcodec_hdi_omx_server",
-    ":libcodec_hdi_omx_service_impl",
   ]
 }

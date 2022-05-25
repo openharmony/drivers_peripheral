@@ -16,31 +16,27 @@
 #ifndef HDI_OMXCOMPONENTTYPESTUB_H
 #define HDI_OMXCOMPONENTTYPESTUB_H
 
+#include <hdf_remote_service.h>
+#include <hdf_sbuf.h>
 #include "codec_component_if.h"
 #include "codec_internal.h"
 #include "codec_types.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
 struct CodecComponentTypeStub {
-    struct CodecComponentType service;
-    struct OmxComponentManager managerService;
-    struct HdfDeviceObject *device;
-    void *dlHandler;
-    OMX_HANDLETYPE componentHandle;
+    struct CodecComponentType interface;
+    struct HdfRemoteService *remote;
+    struct HdfRemoteDispatcher dispatcher;
 };
 
-int32_t CodecComponentTypeServiceOnRemoteRequest(struct CodecComponentTypeStub *service,
-    int32_t cmdId, struct HdfSBuf *data, struct HdfSBuf *reply);
+bool CodecComponentTypeStubConstruct(struct CodecComponentTypeStub *stub);
 
-struct CodecComponentTypeStub* CodecComponentTypeStubGetInstance(void);
-
-void CodecComponentTypeStubRelease(struct CodecComponentTypeStub *instance);
+void CodecComponentTypeStubRelease(struct CodecComponentTypeStub *stub);
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
-#endif // HDI_OMXCOMPONENTTYPESTUB_H
+#endif  // HDI_OMXCOMPONENTTYPESTUB_H
