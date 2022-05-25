@@ -25,39 +25,37 @@ const int MIN_FLOAT_TO_INT32 = -2147483520;
 
 using BlendFunction = void (*)(ColorRGBAf &src, ColorRGBAf &dst);
 
-static inline uint32_t RgbaGetA(uint32_t color)
+static inline uint32_t RgbaGetR(uint32_t color)
 {
     return ((color >> 0) & 0xFF);
 }
 
-static inline uint32_t RgbaGetR(uint32_t color)
-{
-    const uint32_t shift = 24;
-    const uint32_t mask = 0xFF;
-    return ((color >> shift) & mask);
-}
-
 static inline uint32_t RgbaGetG(uint32_t color)
-{
-    const uint32_t shift = 16;
-    const uint32_t mask = 0xFF;
-    return ((color >> shift) & mask);
-}
-
-static inline uint32_t RgbaGetB(uint32_t color)
 {
     const uint32_t shift = 8;
     const uint32_t mask = 0xFF;
     return ((color >> shift) & mask);
 }
 
+static inline uint32_t RgbaGetB(uint32_t color)
+{
+    const uint32_t shift = 16;
+    const uint32_t mask = 0xFF;
+    return ((color >> shift) & mask);
+}
+
+static inline uint32_t RgbaGetA(uint32_t color)
+{
+    const uint32_t shift = 24;
+    const uint32_t mask = 0xFF;
+    return ((color >> shift) & mask);
+}
+
 static constexpr inline uint32_t ColorSetARGB(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
-    const uint32_t shiftR = 24;
-    const uint32_t shiftG = 16;
-    const uint32_t shiftB = 8;
-    return (r << shiftR) | (g << shiftG) | (b << shiftB) | (a << 0);
+    return (r << 0) | (g << 8) | (b << 16) | (a << 24);
 }
+
 // blend none
 /*
 fs: sa      fd: 1.0-sa
