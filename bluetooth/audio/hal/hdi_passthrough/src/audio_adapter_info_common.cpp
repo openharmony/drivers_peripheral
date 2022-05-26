@@ -676,7 +676,7 @@ static void AudioPortsNamesRecord(void)
 
 int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size)
 {
-    int32_t realSize;
+    int32_t realSize = -1;
 
     if (descs == NULL || size == NULL) {
         return HDF_ERR_INVALID_PARAM;
