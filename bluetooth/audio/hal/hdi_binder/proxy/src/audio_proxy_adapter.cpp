@@ -331,6 +331,7 @@ int32_t AudioProxyAdapterCreateRender(struct AudioAdapter *adapter, const struct
     }
     if (!HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data)) {
         AudioProxyBufReplyRecycle(data, reply);
+        AudioMemFree((void **)&hwRender);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioProxyCommonInitCreateData(data, hwAdapter, desc, attrs) < 0) {
