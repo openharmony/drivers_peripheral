@@ -1045,8 +1045,12 @@ int32_t AcquireChipId(const char *ifName, uint8_t *chipId)
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
 
     ret = NetlinkSendCmdSync(msg, ParserChipId, chipId);
+    if (ret != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: NetlinkSendCmdSync failed.\n", __FUNCTION__);
+    }
 
-    return RET_CODE_SUCCESS;
+    nlmsg_free(msg);
+    return ret;
 }
 
 int32_t GetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num)
