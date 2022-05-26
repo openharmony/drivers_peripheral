@@ -1,10 +1,10 @@
 {
-  "name": "pinauth_device_driver",
-  "description": "pinauth device driver",
+  "name": "pin_auth_device_driver",
+  "description": "pin auth device driver",
   "version": "3.2",
   "license": "Apache License 2.0",
   "component": {
-    "name": "pinauth_device_driver",
+    "name": "pin_auth_device_driver",
     "subsystem": "hdf",
     "syscap": [""],
     "adapter_system_type": ["standard"],
@@ -23,13 +23,13 @@
     },
     "build": {
       "sub_component": [
-        "//drivers/peripheral/pin_auth:pinauth_entry"
+        "//drivers/peripheral/pin_auth:pin_auth_entry"
       ],
       "test": [
       ],
       "inner_kits": [
         {
-          "name": "//drivers/interface/pin_auth/v1_0:libpinauth_proxy_1.0",
+          "name": "//drivers/interface/pin_auth/v1_0:libpin_auth_proxy_1.0",
             "header": {
               "header_files": [
               ],
