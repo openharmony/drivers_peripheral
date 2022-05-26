@@ -40,6 +40,7 @@ namespace OHOS {
 namespace HDI {
 namespace Power {
 namespace V1_0 {
+static constexpr const int32_t MAX_FILE_LENGTH = 32 * 1024 * 1024;
 static constexpr const char * const SUSPEND_STATE = "mem";
 static constexpr const char * const SUSPEND_STATE_PATH = "/sys/power/state";
 static constexpr const char * const LOCK_PATH = "/sys/power/wake_lock";
@@ -56,7 +57,7 @@ static sptr<IPowerHdiCallback> callback_;
 static UniqueFd wakeupCountFd;
 static void AutoSuspendLoop();
 static int32_t DoSuspend();
-static bool LoadStringFd(int32_t fd, std::string& content);
+static void LoadStringFd(int32_t fd, std::string& content);
 static std::string ReadWakeCount();
 static bool WriteWakeCount(const std::string& count);
 static void NotifyCallback(int code);
@@ -192,29 +193,30 @@ int32_t PowerInterfaceImpl::SuspendUnblock(const std::string& name)
     return HDF_SUCCESS;
 }
 
-bool LoadStringFd(int32_t fd, std::string& content)
+void LoadStringFd(int32_t fd, std::string& content)
 {
     if (fd <= 0) {
-        HDF_LOGE("invalid fd: %{public}d", fd);
-        return false;
+        HDF_LOGW("invalid fd: %{public}d", fd);
+        return;
     }
- 
-    struct stat statBuf;
-    (void)memset_s(&statBuf, sizeof(struct stat), 0, sizeof(struct stat));
-    if (fstat(fd, &statBuf) != 0) {
-        HDF_LOGE("Failed to get the file size");
-        return false;
-    }
-    const int32_t fileLength = static_cast<uint32_t>(statBuf.st_size);
 
-    const int32_t len = TEMP_FAILURE_RETRY(read(fd, content.data(), static_cast<size_t>(fileLength)));
-    if (len < 0) {
-        HDF_LOGE("the length read from file is not equal to fileLength!len: %{public}d,fileLen: %{public}d",
+    const int32_t fileLength = lseek(fd, 0, SEEK_END);
+    if (fileLength > MAX_FILE_LENGTH || fileLength <= 0) {
+        HDF_LOGW("invalid file length(%{public}d)!", fileLength);
+        return;
+    }
+    int32_t loc = lseek(fd, 0, SEEK_SET);
+    if (loc == -1) {
+        HDF_LOGE("lseek file to begin failed!");
+        return;
+    }
+    content.resize(fileLength);
+    const int32_t len = static_cast<int32_t>(read(fd, content.data(), fileLength));
+    if (len <= 0) {
+        HDF_LOGW("the length read from file is failed, len: %{public}d, fileLen: %{public}d",
             len, fileLength);
-        return false;
+        content.clear();
     }
-
-    return true;
 }
 
 std::string ReadWakeCount()
