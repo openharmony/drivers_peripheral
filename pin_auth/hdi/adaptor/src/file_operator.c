@@ -15,6 +15,7 @@
 
 #include "file_operator.h"
 #include <stdio.h>
+#include <unistd.h>
 #include "adaptor_log.h"
 #include "defines.h"
 
@@ -70,6 +71,10 @@ static int32_t WriteFile(const char *fileName, const uint8_t *buf, uint32_t len)
         (void)fclose(fileOperator);
         return RESULT_BAD_WRITE;
     }
+    if (fflush(fileOperator) == EOF) {
+        LOG_ERROR("fflush file fail");
+    }
+    (void)fsync(fileno(fileOperator));
     (void)fclose(fileOperator);
     return RESULT_SUCCESS;
 }
