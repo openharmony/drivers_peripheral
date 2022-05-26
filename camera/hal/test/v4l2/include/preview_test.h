@@ -14,6 +14,7 @@
  */
 
 #include "test_display.h"
+#include "stream_customer.h"
 
 class UtestPreviewTest : public testing::Test {
 public:
