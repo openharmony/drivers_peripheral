@@ -1,10 +1,10 @@
 {
-    "name": "face_auth_device_driver",
-    "description": "face auth device driver",
+    "name": "fingerprint_auth_device_driver",
+    "description": "fingerprint_auth device driver",
     "version": "3.2",
     "license": "Apache License 2.0",
     "component": {
-      "name": "face_auth_device_driver",
+      "name": "fingerprint_auth_device_driver",
       "subsystem": "hdf",
       "syscap": [""],
       "adapter_system_type": ["standard"],
@@ -22,10 +22,10 @@
       },
       "build": {
         "sub_component": [
-          "//drivers/peripheral/face_auth:face_auth_entry"
+          "//drivers/peripheral/fingerprint_auth:fingerprint_auth_entry"
         ],
         "test": [
-          "//drivers/peripheral/face_auth/test/fuzztest/face_auth:fuzztest"
+          "//drivers/peripheral/fingerprint_auth/test/fuzztest/fingerprint_auth:fuzztest"
         ],
         "inner_kits": [
         ]
