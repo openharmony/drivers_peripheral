@@ -20,9 +20,10 @@
 
 #include "parcel.h"
 
-#include "executor_impl.h"
-#include "iam_logger.h"
 #include "iam_fuzz_test.h"
+#include "iam_logger.h"
+
+#include "executor_impl.h"
 
 #define LOG_LABEL OHOS::UserIAM::Common::LABEL_FACE_AUTH_HDI
 
@@ -196,7 +197,7 @@ void FuzzSendCommand(Parcel &parcel)
 }
 
 using FuzzFunc = decltype(FuzzGetExecutorInfo);
-FuzzFunc *fuzzFuncs[] = {
+FuzzFunc *g_fuzzFuncs[] = {
     FuzzGetExecutorInfo,
     FuzzGetTemplateInfo,
     FuzzOnRegisterFinish,
@@ -213,8 +214,8 @@ void FaceAuthHdiFuzzTest(const uint8_t *data, size_t size)
     Parcel parcel;
     parcel.WriteBuffer(data, size);
     parcel.RewindRead(0);
-    uint32_t index = parcel.ReadUint32() % (sizeof(fuzzFuncs) / sizeof(FuzzFunc *));
-    auto fuzzFunc = fuzzFuncs[index];
+    uint32_t index = parcel.ReadUint32() % (sizeof(g_fuzzFuncs) / sizeof(FuzzFunc *));
+    auto fuzzFunc = g_fuzzFuncs[index];
     fuzzFunc(parcel);
     return;
 }
