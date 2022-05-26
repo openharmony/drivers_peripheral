@@ -25,7 +25,7 @@ if (defined(ohos_lite)) {
     ]
     deps += [ "${chipset_build_deps}" ]
   }
-  group("camera_hal_lite_unittest") {
+  group("camera_hal_unittest") {
     deps = []
   }
 } else {
@@ -46,17 +46,20 @@ if (defined(ohos_lite)) {
     }
   }
 
-  group("camera_hal_standard_unittest") {
+  group("camera_hal_unittest") {
     if (is_standard_system) {
       testonly = true
-      deps = [
-        "buffer_manager/test:camera_hal_buffer_manager_unittest",
-        "device_manager/test:camera_hal_device_manager_unittest",
-        "hdi_impl/test:camera_hal_hdi_impl_unittest",
-        "pipeline_core/test:camera_hal_pipeline_core_unittest",
-        "test/fuzz:camera_hal_fuzztest",
-        "test/mpi:camera_case_unittest",
-      ]
+      if (product_name == "rk3568") {
+        deps = [ "test/v4l2:camera_case_unittest" ]
+      } else {
+        deps = [
+          "buffer_manager/test:camera_hal_buffer_manager_unittest",
+          "device_manager/test:camera_hal_device_manager_unittest",
+          "hdi_impl/test:camera_hal_hdi_impl_unittest",
+          "pipeline_core/test:camera_hal_pipeline_core_unittest",
+          "test/fuzz:camera_hal_fuzztest",
+        ]
+      }
     }
   }
 }
