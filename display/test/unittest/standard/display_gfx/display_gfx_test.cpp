@@ -499,7 +499,7 @@ int32_t GfxRotateTest::RotateTest(RotateParam param)
         for (int y = 0; y < mDstBuffer->height; y++) {
             uint32_t pixel = GetPixelValue(*mDstBuffer, x, y);
             if ((pixel == CHECK_COLOR) && (x == param.expectX) && (y == param.expectY)) {
-                DISPLAY_TEST_LOGE("angle = %d, current position = %d,%d", param.transformType, x, y);
+                DISPLAY_TEST_LOGD("angle = %d, current position = %d,%d", param.transformType, x, y);
                 ret = DISPLAY_SUCCESS;
             }
         }
