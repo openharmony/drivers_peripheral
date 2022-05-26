@@ -157,13 +157,23 @@ RetCode HcsDeal::DealMetadata(const std::string &cameraId, const struct DeviceRe
     std::shared_ptr<CameraMetadata> metadata = std::make_shared<CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
     DealAeAvailableAntiBandingModes(node, metadata);
     DealAeAvailableModes(node, metadata);
-    DealAvailableAeFpsTargets(node, metadata);
+    DealAvailableFpsRange(node, metadata);
+    DealCameraPosition(node, metadata);
+    DealCameraType(node, metadata);
+    DealCameraConnectionType(node, metadata);
+    DealCameraFaceDetectMaxNum(node, metadata);
     DealAeCompensationRange(node, metadata);
     DealAeCompensationSteps(node, metadata);
     DealAvailableAwbModes(node, metadata);
     DealSensitivityRange(node, metadata);
     DealFaceDetectMode(node, metadata);
-    DealAvailableResultKeys(node, metadata);
+    DealFocalLength(node, metadata);
+    DealAvailableFocusModes(node, metadata);
+    DealAvailableExposureModes(node, metadata);
+    DealAvailableMetereModes(node, metadata);
+    DealAvalialbleFlashModes(node, metadata);
+    DealMirrorSupported(node, metadata);
+    DealAvaliableBasicConfigurations(node, metadata);
     cameraMetadataMap_.insert(std::make_pair(cameraId, metadata));
 
     return RC_OK;
@@ -218,30 +228,144 @@ RetCode HcsDeal::DealAeAvailableModes(
     return RC_OK;
 }
 
-RetCode HcsDeal::DealAvailableAeFpsTargets(
+RetCode HcsDeal::DealAvailableFpsRange(
     const struct DeviceResourceNode &metadataNode,
     std::shared_ptr<CameraMetadata> &metadata)
 {
     int32_t hcbRet = -1;
     uint32_t nodeValue;
-    std::vector<int32_t> availableAeFpsTargets;
-    int32_t elemNum = pDevResIns->GetElemNum(&metadataNode, "availableAeFpsTargets");
-    for (int i = 0; i < elemNum; i++) {
-        hcbRet = pDevResIns->GetUint32ArrayElem(&metadataNode, "availableAeFpsTargets", i, &nodeValue, -1);
-        if (hcbRet != 0) {
-            CAMERA_LOGD("get availableAeFpsTargets failed");
-            continue;
-        }
-        availableAeFpsTargets.push_back(static_cast<int32_t>(nodeValue));
-        CAMERA_LOGD("get availableAeFpsTargets:%{public}d", nodeValue);
-    }
-    bool ret = metadata->addEntry(OHOS_CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES,
-        availableAeFpsTargets.data(), availableAeFpsTargets.size());
-    if (!ret) {
-        CAMERA_LOGE("availableAeFpsTargets add failed");
+    std::vector<int32_t> availableFpsRange;
+    int32_t elemNum = pDevResIns->GetElemNum(&metadataNode, "availableFpsRange");
+    constexpr uint32_t groupLen = 2;
+
+    if (elemNum != groupLen) {
+        CAMERA_LOGE("availableFpsRange hcs file configuration error");
         return RC_ERROR;
     }
-    CAMERA_LOGD("availableAeFpsTargets add success");
+
+    for (int i = 0; i < elemNum; i++) {
+        hcbRet = pDevResIns->GetUint32ArrayElem(&metadataNode,
+            "availableFpsRange", i, &nodeValue, -1);
+        if (hcbRet != 0) {
+            CAMERA_LOGD("get availableFpsRange failed");
+            continue;
+        }
+        availableFpsRange.push_back(static_cast<int32_t>(nodeValue));
+        CAMERA_LOGD("get availableFpsRange:%{public}d", nodeValue);
+    }
+    bool ret = metadata->addEntry(OHOS_ABILITY_FPS_RANGES,
+        availableFpsRange.data(), availableFpsRange.size());
+    if (!ret) {
+        CAMERA_LOGE("availableFpsRange add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGD("availableFpsRange add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealCameraPosition(
+    const struct DeviceResourceNode &metadataNode,
+    std::shared_ptr<CameraMetadata> &metadata)
+{
+    CAMERA_LOGD("cameraPosition in...");
+    const char *nodeValue = nullptr;
+    uint8_t cameraPosition = 0;
+
+    int32_t rc = pDevResIns->GetString(&metadataNode, "cameraPosition", &nodeValue, nullptr);
+    if (rc != 0 || (nodeValue == nullptr)) {
+        CAMERA_LOGE("get cameraPosition failed");
+        return RC_ERROR;
+    }
+
+    cameraPosition = CameraPositionMap[std::string(nodeValue)];
+    CAMERA_LOGD("cameraPosition  = %{public}d", cameraPosition);
+
+    bool ret = metadata->addEntry(OHOS_ABILITY_CAMERA_POSITION,
+        static_cast<const void*>(&cameraPosition), sizeof(cameraPosition));
+    if (!ret) {
+        CAMERA_LOGE("cameraPosition add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGD("cameraPosition add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealCameraType(
+    const struct DeviceResourceNode &metadataNode,
+    std::shared_ptr<CameraMetadata> &metadata)
+{
+    CAMERA_LOGD("cameraType in...");
+    const char *nodeValue = nullptr;
+    uint8_t cameraType = 0;
+
+    int32_t rc = pDevResIns->GetString(&metadataNode, "cameraType", &nodeValue, nullptr);
+    if (rc != 0 || (nodeValue == nullptr)) {
+        CAMERA_LOGE("get cameraType failed");
+        return RC_ERROR;
+    }
+
+    cameraType = CameraTypeMap[std::string(nodeValue)];
+    CAMERA_LOGD("cameraType  = %{public}d", cameraType);
+
+    bool ret = metadata->addEntry(OHOS_ABILITY_CAMERA_TYPE,
+        static_cast<const void*>(&cameraType), sizeof(cameraType));
+    if (!ret) {
+        CAMERA_LOGE("cameraType add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGD("cameraType add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealCameraConnectionType(
+    const struct DeviceResourceNode &metadataNode,
+    std::shared_ptr<CameraMetadata> &metadata)
+{
+    CAMERA_LOGD("cameraConnectionType in...");
+    const char *nodeValue = nullptr;
+    uint8_t cameraConnectionType = 0;
+
+    int32_t rc = pDevResIns->GetString(&metadataNode, "cameraConnectionType", &nodeValue, nullptr);
+    if (rc != 0 || (nodeValue == nullptr)) {
+        CAMERA_LOGE("get cameraConnectionType failed");
+        return RC_ERROR;
+    }
+
+    cameraConnectionType = cameraConnectionTypeMap[std::string(nodeValue)];
+    CAMERA_LOGD("cameraConnectionType  = %{public}d", cameraConnectionType);
+
+    bool ret = metadata->addEntry(OHOS_ABILITY_CAMERA_CONNECTION_TYPE,
+        static_cast<const void*>(&cameraConnectionType), sizeof(cameraConnectionType));
+    if (!ret) {
+        CAMERA_LOGE("cameraConnectionType add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGD("cameraConnectionType add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealCameraFaceDetectMaxNum(
+    const struct DeviceResourceNode &metadataNode,
+    std::shared_ptr<CameraMetadata> &metadata)
+{
+    const char *pNodeValue = nullptr;
+    uint8_t faceDetectMaxNum;
+
+    int32_t rc = pDevResIns->GetString(&metadataNode, "faceDetectMaxNum", &pNodeValue, nullptr);
+    if (rc != 0 || (pNodeValue == nullptr)) {
+        CAMERA_LOGE("get faceDetectMaxNum failed");
+        return RC_ERROR;
+    }
+
+    faceDetectMaxNum = atoi(pNodeValue);
+    CAMERA_LOGD("faceDetectMaxNum  = %{public}f", faceDetectMaxNum);
+
+    bool ret = metadata->addEntry(OHOS_STATISTICS_FACE_DETECT_MAX_NUM, static_cast<const void*>(&faceDetectMaxNum), 1);
+    if (!ret) {
+        CAMERA_LOGE("faceDetectMaxNum add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGD("faceDetectMaxNum add success");
     return RC_OK;
 }
 
@@ -394,6 +518,216 @@ RetCode HcsDeal::DealAvailableResultKeys(
     return RC_OK;
 }
 
+RetCode HcsDeal::DealFocalLength(
+    const struct DeviceResourceNode &metadataNode,
+    std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    const char *pNodeValue = nullptr;
+    float focalLength;
+
+    int32_t rc = pDevResIns->GetString(&metadataNode, "focalLength", &pNodeValue, nullptr);
+    if (rc != 0 || (pNodeValue == nullptr)) {
+        CAMERA_LOGE("get focalLength failed");
+        return RC_ERROR;
+    }
+
+    focalLength = atof(pNodeValue);
+    CAMERA_LOGD("focalLength  = %{public}f", focalLength);
+
+    bool ret = metadata->addEntry(OHOS_ABILITY_FOCAL_LENGTH, static_cast<const void*>(&focalLength), 1);
+    if (!ret) {
+        CAMERA_LOGE("focalLength add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGD("focalLength add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealAvailableFocusModes(
+    const struct DeviceResourceNode &metadataNode,
+    std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    uint8_t hcbRet = 0;
+    const char *nodeValue = nullptr;
+    std::vector<uint8_t> focusAvailableModes;
+
+    int32_t elemNum = pDevResIns->GetElemNum(
+        &metadataNode, "focusAvailableModes");
+    CAMERA_LOGD("elemNum = %{public}d", elemNum);
+
+    for (int i = 0; i < elemNum; i++) {
+        hcbRet = pDevResIns->GetStringArrayElem(
+            &metadataNode, "focusAvailableModes", i, &nodeValue, nullptr);
+        if (hcbRet != 0) {
+            CAMERA_LOGE("get focusAvailableModes failed");
+            continue;
+        }
+        CAMERA_LOGD("nodeValue = %{public}s", nodeValue);
+        focusAvailableModes.push_back(FocusModeMap[std::string(nodeValue)]);
+    }
+    bool ret = metadata->addEntry(OHOS_ABILITY_FOCUS_MODES,
+    focusAvailableModes.data(), focusAvailableModes.size());
+    if (!ret) {
+        CAMERA_LOGE("focusAvailableModes add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGD("focusAvailableModes add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealAvailableExposureModes(
+    const struct DeviceResourceNode &metadataNode,
+    std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    uint8_t hcbRet = 0;
+    const char *nodeValue = nullptr;
+    std::vector<uint8_t> exposureModeResult;
+
+    int32_t elemNum = pDevResIns->GetElemNum(
+        &metadataNode, "exposureAvailableModes");
+    CAMERA_LOGD("elemNum = %{public}d", elemNum);
+
+    for (int i = 0; i < elemNum; i++) {
+        hcbRet = pDevResIns->GetStringArrayElem(
+            &metadataNode, "exposureAvailableModes", i, &nodeValue, nullptr);
+        if (hcbRet != 0) {
+            CAMERA_LOGE("get exposureModeResult failed");
+            continue;
+        }
+        CAMERA_LOGD("nodeValue = %{public}s", nodeValue);
+        exposureModeResult.push_back(ExposureModeMap[std::string(nodeValue)]);
+    }
+    bool ret = metadata->addEntry(OHOS_ABILITY_EXPOSURE_MODES,
+    exposureModeResult.data(), exposureModeResult.size());
+    if (!ret) {
+        CAMERA_LOGE("exposureModeResult add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGD("exposureModeResult add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealAvailableMetereModes(
+    const struct DeviceResourceNode &metadataNode,
+    std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    uint8_t hcbRet = 0;
+    const char *nodeValue = nullptr;
+    std::vector<uint8_t> meterModeResult;
+
+    int32_t elemNum = pDevResIns->GetElemNum(
+        &metadataNode, "meterAvailableModes");
+    CAMERA_LOGD("elemNum = %{public}d", elemNum);
+
+    for (int i = 0; i < elemNum; i++) {
+        hcbRet = pDevResIns->GetStringArrayElem(
+            &metadataNode, "meterAvailableModes", i, &nodeValue, nullptr);
+        if (hcbRet != 0) {
+            CAMERA_LOGE("get meterModeResult failed");
+            continue;
+        }
+        CAMERA_LOGD("nodeValue = %{public}s", nodeValue);
+        meterModeResult.push_back(meterModeMap[std::string(nodeValue)]);
+    }
+    bool ret = metadata->addEntry(OHOS_ABILITY_METER_MODES,
+    meterModeResult.data(), meterModeResult.size());
+    if (!ret) {
+        CAMERA_LOGE("meterModeResult add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGD("meterModeResult add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealAvalialbleFlashModes(
+    const struct DeviceResourceNode &metadataNode,
+    std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    uint8_t hcbRet = 0;
+    const char *nodeValue = nullptr;
+    std::vector<uint8_t> flashAvailableModeUint8s;
+
+    int32_t elemNum = pDevResIns->GetElemNum(
+        &metadataNode, "flashAvailableModes");
+    CAMERA_LOGD("elemNum = %{public}d", elemNum);
+
+    for (int i = 0; i < elemNum; i++) {
+        hcbRet = pDevResIns->GetStringArrayElem(
+            &metadataNode, "flashAvailableModes", i, &nodeValue, nullptr);
+        if (hcbRet != 0) {
+            CAMERA_LOGE("get flashAvailableModes failed");
+            continue;
+        }
+        CAMERA_LOGD("nodeValue = %{public}s", nodeValue);
+        flashAvailableModeUint8s.push_back(FlashModeMap[std::string(nodeValue)]);
+    }
+    bool ret = metadata->addEntry(OHOS_ABILITY_FLASH_MODES,
+    flashAvailableModeUint8s.data(), flashAvailableModeUint8s.size());
+    if (!ret) {
+        CAMERA_LOGE("flashAvailableModes add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGD("flashAvailableModes add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealMirrorSupported(
+    const struct DeviceResourceNode &metadataNode,
+    std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    const char *nodeValue = nullptr;
+    uint8_t mirrorSupportU8;
+
+    int32_t rc = pDevResIns->GetString(&metadataNode, "mirrorSupported", &nodeValue, nullptr);
+    if (rc != 0 || (nodeValue == nullptr)) {
+        CAMERA_LOGE("get mirrorSupported failed");
+        return RC_ERROR;
+    }
+
+    mirrorSupportU8 = mirrorMap[std::string(nodeValue)];
+    CAMERA_LOGD("mirrorSupportU8  = %{public}d", mirrorSupportU8);
+
+    bool ret = metadata->addEntry(OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED, static_cast<const void*>(&mirrorSupportU8), 1);
+    if (!ret) {
+        CAMERA_LOGE("mirrorSupported add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGD("mirrorSupported add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealAvaliableBasicConfigurations(
+    const struct DeviceResourceNode &metadataNode,
+    std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    uint32_t nodeValue;
+    std::vector<int32_t> basicConfigAvaliableInt32s;
+
+    int32_t elemNum = pDevResIns->GetElemNum(&metadataNode, "basicAvailableConfigurations");
+    CAMERA_LOGD("elemNum = %{public}d", elemNum);
+
+    constexpr int STREAM_INFO_ITEM_LENGTH = 3;
+    for (int i = 0; i < elemNum; i++) {
+        pDevResIns->GetUint32ArrayElem(&metadataNode, "basicAvailableConfigurations", i, &nodeValue, -1);
+        CAMERA_LOGD("nodeValue = %{public}d", nodeValue);
+
+        if (i % STREAM_INFO_ITEM_LENGTH == 0) {
+            basicConfigAvaliableInt32s.push_back(formatArray[static_cast<int32_t>(nodeValue) - 1]);
+        } else {
+            basicConfigAvaliableInt32s.push_back(static_cast<int32_t>(nodeValue));
+        }
+    }
+
+    bool ret = metadata->addEntry(OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS,
+        basicConfigAvaliableInt32s.data(), basicConfigAvaliableInt32s.size());
+    if (!ret) {
+        CAMERA_LOGD("basicAvailableConfigurations add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGI("basicAvailableConfigurations add success");
+    return RC_OK;
+}
+
 RetCode HcsDeal::GetMetadata(CameraMetadataMap &metadataMap) const
 {
     metadataMap = cameraMetadataMap_;
@@ -405,4 +739,4 @@ RetCode HcsDeal::GetCameraId(CameraIdMap &cameraIdMap) const
     cameraIdMap = cameraIdMap_;
     return RC_OK;
 }
-} // namespace OHOS::CameraHost
+}  // namespace OHOS::Camera
