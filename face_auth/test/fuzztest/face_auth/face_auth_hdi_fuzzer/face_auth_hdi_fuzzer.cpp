@@ -19,7 +19,6 @@
 #include <cstdint>
 
 #include "parcel.h"
-#include "securec.h"
 
 #include "executor_impl.h"
 #include "iam_logger.h"
@@ -60,7 +59,7 @@ private:
     int32_t acquire_;
 };
 
-ExecutorImpl executorImpl;
+ExecutorImpl g_executorImpl;
 
 void FillFuzzExecutorInfo(Parcel &parcel, ExecutorInfo &executorInfo)
 {
@@ -102,7 +101,7 @@ void FuzzGetExecutorInfo(Parcel &parcel)
     IAM_LOGI("begin");
     ExecutorInfo executorInfo;
     FillFuzzExecutorInfo(parcel, executorInfo);
-    executorImpl.GetExecutorInfo(executorInfo);
+    g_executorImpl.GetExecutorInfo(executorInfo);
     IAM_LOGI("end");
 }
 
@@ -112,7 +111,7 @@ void FuzzGetTemplateInfo(Parcel &parcel)
     uint64_t templateId = parcel.ReadUint64();
     TemplateInfo templateInfo;
     FillFuzzTemplateInfo(parcel, templateInfo);
-    executorImpl.GetTemplateInfo(templateId, templateInfo);
+    g_executorImpl.GetTemplateInfo(templateId, templateInfo);
     IAM_LOGI("end");
 }
 
@@ -125,7 +124,7 @@ void FuzzOnRegisterFinish(Parcel &parcel)
     FillFuzzUint8Vector(parcel, frameworkPublicKey);
     std::vector<uint8_t> extraInfo;
     FillFuzzUint8Vector(parcel, extraInfo);
-    executorImpl.OnRegisterFinish(templateIdList, frameworkPublicKey, extraInfo);
+    g_executorImpl.OnRegisterFinish(templateIdList, frameworkPublicKey, extraInfo);
     IAM_LOGI("end");
 }
 
@@ -137,7 +136,7 @@ void FuzzEnroll(Parcel &parcel)
     FillFuzzUint8Vector(parcel, extraInfo);
     sptr<IExecutorCallback> callbackObj;
     FillFuzzIExecutorCallback(parcel, callbackObj);
-    executorImpl.Enroll(scheduleId, extraInfo, callbackObj);
+    g_executorImpl.Enroll(scheduleId, extraInfo, callbackObj);
     IAM_LOGI("end");
 }
 
@@ -151,7 +150,7 @@ void FuzzAuthenticate(Parcel &parcel)
     FillFuzzUint8Vector(parcel, extraInfo);
     sptr<IExecutorCallback> callbackObj;
     FillFuzzIExecutorCallback(parcel, callbackObj);
-    executorImpl.Authenticate(scheduleId, templateIdList, extraInfo, callbackObj);
+    g_executorImpl.Authenticate(scheduleId, templateIdList, extraInfo, callbackObj);
     IAM_LOGI("end");
 }
 
@@ -163,7 +162,7 @@ void FuzzIdentify(Parcel &parcel)
     FillFuzzUint8Vector(parcel, extraInfo);
     sptr<IExecutorCallback> callbackObj;
     FillFuzzIExecutorCallback(parcel, callbackObj);
-    executorImpl.Identify(scheduleId, extraInfo, callbackObj);
+    g_executorImpl.Identify(scheduleId, extraInfo, callbackObj);
     IAM_LOGI("end");
 }
 
@@ -172,7 +171,7 @@ void FuzzDelete(Parcel &parcel)
     IAM_LOGI("begin");
     std::vector<uint64_t> templateIdList;
     FillFuzzUint64Vector(parcel, templateIdList);
-    executorImpl.Delete(templateIdList);
+    g_executorImpl.Delete(templateIdList);
     IAM_LOGI("end");
 }
 
@@ -180,7 +179,7 @@ void FuzzCancel(Parcel &parcel)
 {
     IAM_LOGI("begin");
     uint64_t scheduleId = parcel.ReadUint64();
-    executorImpl.Cancel(scheduleId);
+    g_executorImpl.Cancel(scheduleId);
     IAM_LOGI("end");
 }
 
@@ -192,7 +191,7 @@ void FuzzSendCommand(Parcel &parcel)
     FillFuzzUint8Vector(parcel, extraInfo);
     sptr<IExecutorCallback> callbackObj;
     FillFuzzIExecutorCallback(parcel, callbackObj);
-    executorImpl.SendCommand(commandId, extraInfo, callbackObj);
+    g_executorImpl.SendCommand(commandId, extraInfo, callbackObj);
     IAM_LOGI("end");
 }
 
@@ -214,8 +213,7 @@ void FaceAuthHdiFuzzTest(const uint8_t *data, size_t size)
     Parcel parcel;
     parcel.WriteBuffer(data, size);
     parcel.RewindRead(0);
-    FuzzGetTemplateInfo(parcel);
-    int32_t index = parcel.ReadUint32() % (sizeof(fuzzFuncs) / sizeof(FuzzFunc *));
+    uint32_t index = parcel.ReadUint32() % (sizeof(fuzzFuncs) / sizeof(FuzzFunc *));
     auto fuzzFunc = fuzzFuncs[index];
     fuzzFunc(parcel);
     return;
