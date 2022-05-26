@@ -32,7 +32,7 @@ if (defined(ohos_lite)) {
     testonly = true
     deps = [
       "fuzztest:hdf_input_fuzztest",
-      "unittest:hdf_unittest_input",
+      "unittest/hdi:hdi_unittest_input",
     ]
   }
 }
