@@ -12,15 +12,15 @@
 # limitations under the License.
 
 if (defined(ohos_lite)) {
-  group("pinauth_entry") {
-    deps = [ "//drivers/peripheral/pin_auth/hdi:libpinauth_sample_1.0" ]
+  group("pin_auth_entry") {
+    deps = [ "//drivers/peripheral/pin_auth/hdi:libpin_auth_sample_1.0" ]
   }
 } else {
-  group("pinauth_entry") {
+  group("pin_auth_entry") {
     deps = [
-      "./hdi_service:hdf_pinauth_service",
-      "//drivers/interface/pin_auth/v1_0:pinauth",
-      "//drivers/peripheral/pin_auth/hdi:libpinauth_sample_1.0",
+      "./hdi_service:hdf_pin_auth_service",
+      "//drivers/interface/pin_auth/v1_0:pin_auth",
+      "//drivers/peripheral/pin_auth/hdi:libpin_auth_sample_1.0",
     ]
   }
 }
