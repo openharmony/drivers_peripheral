@@ -23,7 +23,7 @@
 #include "buffer.h"
 #include "idm_common.h"
 
-#define IDM_USER_INFO "/data/useriam/userinfo"
+#define IDM_USER_INFO "/data/service/el1/public/userauth/userinfo"
 #define MAX_BUFFER_LEN 512000
 #define DEFAULT_EXPANSION_RATIO 2
 #define PRE_APPLY_LEN 2048
