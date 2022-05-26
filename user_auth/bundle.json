@@ -26,6 +26,7 @@
         "//drivers/peripheral/user_auth:user_auth_entry"
       ],
       "test": [
+        "//drivers/peripheral/user_auth/test/fuzztest/user_auth:fuzztest"
       ],
       "inner_kits": [
       ]
