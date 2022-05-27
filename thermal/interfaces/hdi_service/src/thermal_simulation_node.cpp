@@ -17,12 +17,10 @@
 
 #include <iostream>
 #include <cstring>
-#include <cstdio>
 #include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 
 #include "hdf_base.h"
 #include "hdf_log.h"

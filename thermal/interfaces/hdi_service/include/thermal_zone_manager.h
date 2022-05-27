@@ -21,7 +21,7 @@
 #include <string>
 #include <mutex>
 #include "thermal_hdf_config.h"
-#include "thermal_types.h"
+#include "v1_0/thermal_types.h"
 
 namespace OHOS {
 namespace HDI {

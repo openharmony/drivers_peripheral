@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,21 +18,38 @@
 #include <gtest/gtest.h>
 #include <mutex>
 #include <fcntl.h>
+#include <functional>
 #include <securec.h>
 #include <unistd.h>
 
 #include "hdf_base.h"
 #include "osal_time.h"
 #include "v1_0/ithermal_interface.h"
-#include "thermal_types.h"
-#include "thermal_callback_impl.h"
+#include "v1_0/ithermal_callback.h"
+#include "v1_0/thermal_types.h"
 
 using namespace OHOS::HDI::Thermal::V1_0;
 using namespace testing::ext;
 
+class ThermalCallbackMock : public IThermalCallback {
+public:
+    virtual ~ThermalCallbackMock() {}
+    using ThermalEventCallback = std::function<int32_t(const HdfThermalCallbackInfo &event)>;
+    static int32_t RegisterThermalEvent(const ThermalEventCallback &eventCb)
+    {
+        (void)eventCb;
+        return 0;
+    }
+    int32_t OnThermalDataEvent(const HdfThermalCallbackInfo &event) override
+    {
+        (void)event;
+        return 0;
+    }
+};
+
 namespace {
     sptr<IThermalInterface> g_thermalInterface = nullptr;
-    sptr<IThermalCallback> g_callback = new ThermalCallbackImpl();
+    sptr<IThermalCallback> g_callback = new ThermalCallbackMock();
     std::mutex g_mutex;
     const uint32_t MAX_PATH = 256;
     const uint32_t WAIT_TIME = 1;
