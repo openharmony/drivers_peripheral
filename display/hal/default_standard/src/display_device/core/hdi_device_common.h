@@ -13,26 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef HISILICON_DRM_H
-#define HISILICON_DRM_H
-#include <cstdint>
-#include "drm.h"
-#if defined(__cplusplus)
-extern "C" {
-#endif
+#ifndef HDI_DEVICE_COMMON_H
+#define HDI_DEVICE_COMMON_H
+#include <memory>
+#include <unordered_map>
+#include "display_type.h"
 
-struct DrmHisiliconPhyaddr {
-    /* * return the physical address */
-    uint64_t phyaddr;
-    /* * dmabuf file descriptor */
-    int32_t fd;
-};
+namespace OHOS {
+namespace HDI {
+namespace DISPLAY {
+constexpr int32_t INVALID_MODE_ID = -1;
+constexpr uint32_t DRM_INVALID_ID = 0xFFFFFFFF;
+template<typename T> using IdMapPtr = std::unordered_map<uint32_t, std::shared_ptr<T>>;
+class DrmEncoder;
+class DrmCrtc;
+class DrmPlane;
+class DrmDevice;
+class DrmConnector;
+class DrmVsyncWorker;
+} // namespace OHOS
+} // namespace HDI
+} // namespace DISPLAY
 
-#define DRM_IOCTL_HISILICON_GEM_FD_TO_PHYADDR \
-    DRM_IOWR(DRM_COMMAND_BASE + 0x01, struct DrmHisiliconPhyaddr)
-
-#if defined(__cplusplus)
-}
-#endif
-
-#endif // HISILICON_DRM_H
+#endif // HDI_DEVICE_COMMON_H
