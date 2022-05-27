@@ -20,10 +20,7 @@ module_output_path = "hdf/thermal"
 ohos_unittest("hdi_unittest_thermal") {
   module_out_path = module_output_path
 
-  include_dirs = [
-    "//drivers/peripheral/thermal/interfaces",
-    "//drivers/peripheral/thermal/interfaces/include/",
-  ]
+  include_dirs = []
 
   sources = [ "./hdf_thermal_hdi_test.cpp" ]
 
@@ -36,13 +33,13 @@ ohos_unittest("hdi_unittest_thermal") {
     "-fno-strict-aliasing",
   ]
 
+  deps = [ "//drivers/interface/thermal/v1_0:libthermal_stub_1.0" ]
+
   if (is_standard_system) {
     external_deps = [
       "device_driver_framework:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
-      "thermal_device_driver:libthermal_callback",
-      "thermal_device_driver:libthermal_proxy_1.0",
       "utils_base:utils",
     ]
   } else {
