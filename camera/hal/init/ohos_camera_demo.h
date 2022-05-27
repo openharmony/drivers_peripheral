@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef HOS_CAMERA_CAMERA_DEMO_H
-#define HOS_CAMERA_CAMERA_DEMO_H
+#ifndef OHOS_CAMERA_CAMERA_DEMO_H
+#define OHOS_CAMERA_CAMERA_DEMO_H
 
 #include <vector>
 #include <map>
@@ -63,10 +63,10 @@ enum DemoActionID {
     CAPTURE_ID_VIDEO,
 };
 
-class HosCameraDemo {
+class OhosCameraDemo {
 public:
-    HosCameraDemo();
-    ~HosCameraDemo();
+    OhosCameraDemo();
+    ~OhosCameraDemo();
 
     RetCode InitCameraDevice();
     void ReleaseCameraDevice();
@@ -92,17 +92,17 @@ public:
     void QuitDemo();
 
 private:
-    void SetStreamInfo(std::shared_ptr<OHOS::Camera::StreamInfo>& streamInfo,
-        const std::shared_ptr<StreamCustomer>& streamCustomer,
+    void SetStreamInfo(std::shared_ptr<OHOS::Camera::StreamInfo> &streamInfo,
+        const std::shared_ptr<StreamCustomer> &streamCustomer,
         const int streamId, const StreamIntent intent);
     void GetStreamOpt();
 
-    RetCode CreateStream(const int streamId, std::shared_ptr<StreamCustomer>& streamCustomer,
+    RetCode CreateStream(const int streamId, std::shared_ptr<StreamCustomer> &streamCustomer,
         StreamIntent intent);
     RetCode CreateStreams(const int streamIdSecond, StreamIntent intent);
 
-    void StoreImage(const void* bufStart, const uint32_t size) const;
-    void StoreVideo(const void* bufStart, const uint32_t size) const;
+    void StoreImage(const void *bufStart, const uint32_t size) const;
+    void StoreVideo(const void *bufStart, const uint32_t size) const;
     void OpenVideoFile();
 
     RetCode GetFaceDetectMode(std::shared_ptr<CameraAbility> &ability);
@@ -127,10 +127,18 @@ private:
     unsigned int isCaptureOn_ = 0;
     unsigned int isVideoOn_ = 0;
 
+    uint8_t captureQuality_ = 0;
+    int32_t captureOrientation_ = 0;
+    uint8_t mirrorSwitch_ = 0;
+    std::vector<double> gps_;
+
     std::shared_ptr<StreamCustomer> streamCustomerPreview_ = nullptr;
     std::shared_ptr<StreamCustomer> streamCustomerCapture_ = nullptr;
     std::shared_ptr<StreamCustomer> streamCustomerVideo_ = nullptr;
     std::shared_ptr<CameraAbility> ability_ = nullptr;
+    std::shared_ptr<CameraSetting> captureSetting_ = nullptr;
+    std::shared_ptr<Camera::CaptureInfo> captureInfo_ = nullptr;
+    std::mutex metaDatalock_;
 
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     std::shared_ptr<CameraHostCallback> hostCallback_ = nullptr;
@@ -146,4 +154,4 @@ private:
     std::vector<std::string> cameraIds_ = {};
 };
 } // namespace OHOS::Camera
-#endif // HOS_CAMERA_CAMERA_DEMO_H
+#endif // OHOS_CAMERA_CAMERA_DEMO_H
