@@ -29,6 +29,9 @@
       "sub_component": [
         "//drivers/peripheral/camera/hal:camera_hal"
       ],
+      "test": [
+        "//drivers/peripheral/camera/hal:camera_hal_unittest"
+      ],
       "inner_kits": [
         {
           "name": "//drivers/peripheral/camera/interfaces/hdi_ipc/client:libcamera_client",

@@ -27,7 +27,7 @@
 #include <climits>
 #include "types.h"
 #include "camera_device_impl.h"
-#include "stream_operator_impl.h"
+#include "stream_operator_proxy.h"
 #include "idevice_manager.h"
 #include "camera_metadata_info.h"
 #include <display_type.h>
@@ -35,9 +35,14 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/wait.h>
-#include "buffer_queue_producer.h"
 #include "buffer_manager.h"
-#include "test_stream_operator_impl.h"
+#include "stream_customer.h"
+#include "camera_host_callback.h"
+#include "camera_device_callback.h"
+#include "stream_operator_callback.h"
+#include "istream_operator_callback.h"
+#include "icamera_host.h"
+#include "camera_host_proxy.h"
 #include "ibuffer.h"
 #include <algorithm>
 #include <assert.h>
@@ -64,6 +69,10 @@
 #define BUFFERSCOUNT 8
 #define CAMERA_BUFFER_QUEUE_IPC 654320
 #define RANGE_LIMIT(x) (x > 255 ? 255 : (x < 0 ? 0 : x))
+#define PREVIEW_WIDTH 640
+#define PREVIEW_HEIGHT 480
+#define CAPTURE_WIDTH 1280
+#define CAPTURE_HEIGHT 960
 
 class TestDisplay {
 public:
@@ -81,8 +90,11 @@ public:
     int fbFd_, readIndex_;
     struct fb_var_screeninfo vinfo_;
     struct fb_fix_screeninfo finfo_;
-
-    std::shared_ptr<OHOS::Camera::IStreamOperator> streamOperator = nullptr;
+    
+    std::shared_ptr<StreamCustomer> streamCustomerPreview_ = nullptr;
+    std::shared_ptr<StreamCustomer> streamCustomerCapture_ = nullptr;
+    std::shared_ptr<StreamCustomer> streamCustomerVideo_ = nullptr;
+    OHOS::sptr<OHOS::Camera::IStreamOperator> streamOperator = nullptr;
     std::shared_ptr<OHOS::Camera::IStreamOperatorCallback> streamOperatorCallback = nullptr;
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = nullptr;
     std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>> streamInfos;
@@ -90,12 +102,12 @@ public:
     std::shared_ptr<OHOS::Camera::StreamInfo> streamInfoPre = nullptr;
     std::shared_ptr<OHOS::Camera::StreamInfo> streamInfoVideo = nullptr;
     std::shared_ptr<OHOS::Camera::StreamInfo> streamInfoCapture = nullptr;
-    std::shared_ptr<IBufferProducer> producer = nullptr;
-    std::shared_ptr<IBufferProducer> producerCapture = nullptr;
-    std::shared_ptr<IBufferProducer> producerVideo = nullptr;
-    std::shared_ptr<OHOS::Camera::CameraHost> cameraHost = nullptr;
-    std::shared_ptr<OHOS::Camera::ICameraDevice> cameraDevice = nullptr;
-    std::shared_ptr<CameraAbility> ability = nullptr;
+    std::shared_ptr<OHOS::IBufferProducer> producer = nullptr;
+    std::shared_ptr<OHOS::IBufferProducer> producerCapture = nullptr;
+    std::shared_ptr<OHOS::IBufferProducer> producerVideo = nullptr;
+    OHOS::sptr<OHOS::Camera::ICameraHost> cameraHost = nullptr;
+    OHOS::sptr<OHOS::Camera::ICameraDevice> cameraDevice = nullptr;
+    std::shared_ptr<OHOS::Camera::CameraAbility> ability = nullptr;
     std::vector<int> captureIds;
     std::vector<std::string> cameraIds;
     std::vector<int> streamIds;
@@ -124,10 +136,10 @@ public:
     int DoFbMunmap(unsigned char* addr);
     unsigned char* DoFbMmap(int* pmemfd);
     void FBLog();
-    RetCode FBInit();
+    OHOS::Camera::RetCode FBInit();
     void ProcessImage(const unsigned char* p, unsigned char* fbp);
     void LcdDrawScreen(unsigned char* displayBuf_, unsigned char* addr);
-    void BufferCallback(std::shared_ptr<SurfaceBuffer> buffer, int choice);
+    void BufferCallback(void* addr, int choice);
     void Init();
     void UsbInit();
     void Close();
