@@ -13,26 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef HISILICON_DRM_H
-#define HISILICON_DRM_H
-#include <cstdint>
-#include "drm.h"
-#if defined(__cplusplus)
-extern "C" {
-#endif
+#ifndef HDI_DEVICE_INTERFACE_H
+#define HDI_DEVICE_INTERFACE_H
+#include <unordered_map>
+#include <vector>
+#include <memory>
+#include "hdi_display.h"
 
-struct DrmHisiliconPhyaddr {
-    /* * return the physical address */
-    uint64_t phyaddr;
-    /* * dmabuf file descriptor */
-    int32_t fd;
+namespace OHOS {
+namespace HDI {
+namespace DISPLAY {
+class HdiDeviceInterface {
+public:
+    static std::vector<std::shared_ptr<HdiDeviceInterface>> DiscoveryDevice();
+    virtual std::unordered_map<uint32_t, std::shared_ptr<HdiDisplay>> DiscoveryDisplay() = 0;
+    virtual int32_t Init() = 0;
+    virtual void DeInit() = 0;
+    virtual ~HdiDeviceInterface() {}
 };
+} // namespace OHOS
+} // namespace HDI
+} // namespace DISPLAY
 
-#define DRM_IOCTL_HISILICON_GEM_FD_TO_PHYADDR \
-    DRM_IOWR(DRM_COMMAND_BASE + 0x01, struct DrmHisiliconPhyaddr)
-
-#if defined(__cplusplus)
-}
-#endif
-
-#endif // HISILICON_DRM_H
+#endif // HDI_DEVICE_INTERFACE_H
