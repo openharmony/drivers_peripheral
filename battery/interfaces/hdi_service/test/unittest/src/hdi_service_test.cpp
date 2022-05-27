@@ -1153,7 +1153,7 @@ HWTEST_F (HdiServiceTest, HdiService016, TestSize.Level1)
     conf->Init();
     auto tempConf = conf->GetTempConf();
 
-    ASSERT_TRUE(tempConf.lower == -100);
+    ASSERT_TRUE(tempConf.lower == -500);
     ASSERT_TRUE(tempConf.upper == 600);
 }
 
@@ -1201,7 +1201,7 @@ HWTEST_F (HdiServiceTest, HdiService019, TestSize.Level1)
     std::unique_ptr<BatteryConfig> conf = std::make_unique<BatteryConfig>();
     auto tempConf = conf->GetTempConf();
 
-    ASSERT_TRUE(tempConf.lower != -100);
+    ASSERT_TRUE(tempConf.lower != -500);
     ASSERT_TRUE(tempConf.upper != 600);
 }
 
