@@ -19,9 +19,10 @@
 #include <securec.h>
 #include "hdf_base.h"
 #include "osal_time.h"
-#include "v1_0/ivibrator_interface.h"
+#include "v1_1/ivibrator_interface.h"
+#include "vibrator_type.h"
 
-using namespace OHOS::HDI::Vibrator::V1_0;
+using namespace OHOS::HDI::Vibrator::V1_1;
 using namespace testing::ext;
 
 namespace {
@@ -72,13 +73,13 @@ HWTEST_F(HdfVibratorHdiTest, CheckVibratorInstanceIsEmpty, TestSize.Level1)
 }
 
 /**
-  * @tc.name: PerformOneShotVibratorDuration001
+  * @tc.name: PerformOneShotVibratorDuration_001
   * @tc.desc: Controls this vibrator to perform a one-shot vibrator at a given duration.
   * Controls this vibrator to stop the vibrator
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfVibratorHdiTest, PerformOneShotVibratorDuration001, TestSize.Level1)
+HWTEST_F(HdfVibratorHdiTest, PerformOneShotVibratorDuration_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
@@ -92,13 +93,13 @@ HWTEST_F(HdfVibratorHdiTest, PerformOneShotVibratorDuration001, TestSize.Level1)
 }
 
 /**
-  * @tc.name: PerformOneShotVibratorDuration002
+  * @tc.name: PerformOneShotVibratorDuration_002
   * @tc.desc: Controls this vibrator to perform a one-shot vibrator at 0 millisecond.
   * Controls this vibrator to stop the vibrator
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfVibratorHdiTest, PerformOneShotVibratorDuration002, TestSize.Level1)
+HWTEST_F(HdfVibratorHdiTest, PerformOneShotVibratorDuration_002, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
@@ -110,13 +111,13 @@ HWTEST_F(HdfVibratorHdiTest, PerformOneShotVibratorDuration002, TestSize.Level1)
 }
 
 /**
-  * @tc.name: ExecuteVibratorEffect001
+  * @tc.name: ExecuteVibratorEffect_001
   * @tc.desc: Controls this Performing Time Series Vibrator Effects.
   * Controls this vibrator to stop the vibrator
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect001, TestSize.Level1)
+HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
@@ -130,13 +131,13 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect001, TestSize.Level1)
 }
 
 /**
-  * @tc.name: ExecuteVibratorEffect002
+  * @tc.name: ExecuteVibratorEffect_002
   * @tc.desc: Controls this Performing built-in Vibrator Effects.
   * Controls this vibrator to stop the vibrator.
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect002, TestSize.Level1)
+HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_002, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
@@ -150,13 +151,13 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect002, TestSize.Level1)
 }
 
 /**
-  * @tc.name: ExecuteVibratorEffect004
+  * @tc.name: ExecuteVibratorEffect_004
   * @tc.desc: Controls this Performing Time Series Vibrator Effects.
   * Controls this vibrator to stop the vibrator.
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect004, TestSize.Level1)
+HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_004, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
@@ -173,14 +174,14 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect004, TestSize.Level1)
 }
 
 /**
-  * @tc.name: ExecuteVibratorEffect005
+  * @tc.name: ExecuteVibratorEffect_005
   * @tc.desc: Controls this vibrator to stop the vibrator.
   * Controls this Performing Time Series Vibrator Effects.
   * Controls this vibrator to stop the vibrator.
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect005, TestSize.Level1)
+HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_005, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
@@ -194,14 +195,14 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect005, TestSize.Level1)
 }
 
 /**
-  * @tc.name: ExecuteVibratorEffect006
+  * @tc.name: ExecuteVibratorEffect_006
   * @tc.desc: Controls this vibrator to stop the vibrator.
   * Controls this Perform built-in Vibrator Effects.
   * Controls this vibrator to stop the vibrator.
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect006, TestSize.Level1)
+HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_006, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
@@ -215,13 +216,13 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect006, TestSize.Level1)
 }
 
 /**
-  * @tc.name: ExecuteVibratorEffect007
+  * @tc.name: ExecuteVibratorEffect_007
   * @tc.desc: Controls this Perform a one-shot vibrator with an arbitrary string.
   * Controls this vibrator to stop the vibrator.
   * @tc.type: FUNC
   * @tc.require: #I4NN4Z
   */
-HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect007, TestSize.Level1)
+HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect_007, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_vibratorInterface);
 
@@ -230,4 +231,115 @@ HWTEST_F(HdfVibratorHdiTest, ExecuteVibratorEffect007, TestSize.Level1)
 
     int32_t endRet = g_vibratorInterface->Stop(HDF_VIBRATOR_MODE_ONCE);
     EXPECT_EQ(endRet, HDF_SUCCESS);
+}
+
+/**
+  * @tc.name: GetVibratorInfo_001
+  * @tc.desc: Obtain the vibrator setting strength, frequency capability and range in the system.
+  * Validity check of input parameters.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfVibratorHdiTest, GetVibratorInfo_001, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    std::vector<HdfVibratorInfo> info;
+
+    int32_t startRet = g_vibratorInterface->GetVibratorInfo(info);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+
+    printf("intensity = %d, intensityMaxValue = %d, intensityMinValue = %d\n\t",
+    info[0].isSupportIntensity, info[0].intensityMaxValue, info[0].intensityMinValue);
+    printf("frequency = %d, intensityMaxValue = %d, intensityMinValue = %d\n\t",
+    info[0].isSupportFrequency, info[0].frequencyMaxValue, info[0].frequencyMinValue);
+}
+
+/**
+  * @tc.name: SetModulationParameter_001
+  * @tc.desc: Start vibrator based on the setting vibration effect.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfVibratorHdiTest, SetModulationParameter_001, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    std::vector<HdfVibratorInfo> info;
+
+    int32_t startRet = g_vibratorInterface->GetVibratorInfo(info);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+
+    uint32_t vibrationPeriod = 5000;
+    int32_t intensity = 80;
+    int32_t frequency = 200;
+    ASSERT_NE(nullptr, g_vibratorInterface);
+    EXPECT_GT(vibrationPeriod, 0);
+    EXPECT_EQ(info[0].isSupportIntensity, 1);
+    EXPECT_EQ(info[0].isSupportFrequency, 1);
+    EXPECT_GE(intensity, info[0].intensityMinValue);
+    EXPECT_LE(intensity, info[0].intensityMaxValue);
+    EXPECT_GE(frequency, info[0].frequencyMinValue);
+    EXPECT_LE(frequency, info[0].frequencyMaxValue);
+
+    startRet = g_vibratorInterface->SetModulationParameter(vibrationPeriod, intensity, frequency);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+
+    OsalMSleep(g_sleepTime2);
+}
+
+/**
+  * @tc.name: SetModulationParameter_002
+  * @tc.desc: Start vibrator based on the setting vibration effect.
+  * Validity check of input parameters.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfVibratorHdiTest, SetModulationParameter_002, TestSize.Level1)
+{
+    uint32_t vibrationPeriod = 0;
+    int32_t intensity = 80;
+    int32_t frequency = 200;
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    int32_t startRet = g_vibratorInterface->SetModulationParameter(vibrationPeriod, intensity, frequency);
+    EXPECT_EQ(startRet, VIBRATOR_NOT_PERIOD);
+}
+
+/**
+  * @tc.name: SetModulationParameter_003
+  * @tc.desc: Start vibrator based on the setting vibration effect.
+  * Validity check of input parameters.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfVibratorHdiTest, SetModulationParameter_003, TestSize.Level1)
+{
+    uint32_t vibrationPeriod = 50;
+    int32_t intensity = -80;
+    int32_t frequency = 200;
+
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    int32_t startRet = g_vibratorInterface->SetModulationParameter(vibrationPeriod, intensity, frequency);
+    EXPECT_EQ(startRet, VIBRATOR_NOT_INTENSITY);
+}
+
+/**
+  * @tc.name: SetModulationParameter_004
+  * @tc.desc: Start vibrator based on the setting vibration effect.
+  * Validity check of input parameters.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfVibratorHdiTest, SetModulationParameter_004, TestSize.Level1)
+{
+    uint32_t vibrationPeriod = 50;
+    int32_t intensity = 80;
+    int32_t frequency = -200;
+
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    int32_t startRet = g_vibratorInterface->SetModulationParameter(vibrationPeriod, intensity, frequency);
+    EXPECT_EQ(startRet, VIBRATOR_NOT_FREQUENCY);
 }

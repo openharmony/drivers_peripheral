@@ -15,9 +15,9 @@
 
 #include "vibratorstop_fuzzer.h"
 #include "hdf_base.h"
-#include "v1_0/vibrator_interface_proxy.h"
+#include "v1_1/vibrator_interface_proxy.h"
 
-using namespace OHOS::HDI::Vibrator::V1_0;
+using namespace OHOS::HDI::Vibrator::V1_1;
 
 namespace OHOS {
     bool VibratorStopFuzzTest(const uint8_t* data, size_t size)

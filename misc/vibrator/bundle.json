@@ -40,7 +40,7 @@
           }
         },
         {
-          "name": "//drivers/interface/vibrator/v1_0:libvibrator_proxy_1.0",
+          "name": "//drivers/interface/vibrator/v1_1:libvibrator_proxy_1.1",
           "header": {
             "header_files": [
               "vibrator_if.h",

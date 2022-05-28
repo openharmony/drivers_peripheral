@@ -18,16 +18,21 @@
 
 #include "hdf_io_service_if.h"
 #include "osal_mutex.h"
+#include "vibrator_if.h"
+#include "vibrator_type.h"
 
 enum VibratorIoCmd {
-    VIBRATOR_IO_START_ONCE    = 0,
-    VIBRATOR_IO_START_EFFECT  = 1,
-    VIBRATOR_IO_STOP          = 2,
+    VIBRATOR_IO_START_ONCE                  = 0,
+    VIBRATOR_IO_START_EFFECT                = 1,
+    VIBRATOR_IO_STOP                        = 2,
+    VIBRATOR_IO_GET_INFO                    = 3,
+    VIBRATOR_IO_SET_MODULATION_PARAMETER    = 4,
     VIBRATOR_IO_END,
 };
 
 struct VibratorDevice {
     bool initState;
+    struct VibratorInfo vibratorInfoEntry;
     struct HdfIoService *ioService;
     struct OsalMutex mutex;
 };

@@ -18,11 +18,11 @@
 #include <hdf_sbuf_ipc.h>
 #include <hdf_log.h>
 #include <osal_mem.h>
-#include "v1_0/vibrator_interface_stub.h"
+#include "v1_1/vibrator_interface_stub.h"
 
 #define HDF_LOG_TAG              hdf_vibrator_if_driver
 
-using namespace OHOS::HDI::Vibrator::V1_0;
+using namespace OHOS::HDI::Vibrator::V1_1;
 
 struct HdfVibratorInterfaceHost {
     struct IDeviceIoService ioService;
