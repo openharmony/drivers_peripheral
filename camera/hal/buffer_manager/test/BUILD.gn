@@ -48,7 +48,7 @@ if (defined(ohos_lite)) {
   import("//build/test.gni")
   import("//drivers/adapter/uhdf2/uhdf.gni")
 
-  module_output_path = "hdf/buffer_manager_test"
+  module_output_path = "hdf/camera"
 
   config("buffer_manager_utest_config") {
     visibility = [ ":*" ]

@@ -135,7 +135,7 @@ if (defined(ohos_lite)) {
   import("//build/test.gni")
   import("//drivers/adapter/uhdf2/uhdf.gni")
 
-  module_output_path = "hdf/hdi_impl_test"
+  module_output_path = "hdf/camera"
 
   config("camhdi_impl_utest_config") {
     visibility = [ ":*" ]
