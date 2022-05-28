@@ -55,7 +55,7 @@ struct VibratorInterface {
      * exit periodic vibration.
      *
      * @param duration Indicates the duration that the one-shot vibration lasts, in milliseconds.
-      * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
      *
      * @since 2.2
      * @version 1.0
@@ -69,7 +69,7 @@ struct VibratorInterface {
      *
      * @param effectType Indicates the pointer to the preset effect type. It is recommended that the
      * maximum length be 64 bytes.
-      * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
      *
      * @since 2.2
      * @version 1.0
@@ -83,12 +83,41 @@ struct VibratorInterface {
      *
      * @param mode Indicates the vibration mode, which can be one-shot or periodic. For details,
      * see {@link VibratorMode}.
-      * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
      *
      * @since 2.2
      * @version 1.0
      */
     int32_t (*Stop)(enum VibratorMode mode);
+    /**
+     * @brief Obtains information about all the vibrator that support setting intensity and frequency in the system.
+     *
+     * @param vibratorInfo Indicates the pointer to the vibration effect, For details, see {@link VibratorInfo}.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     *
+     * @since 3.2
+     * @version 1.1
+     */
+    int32_t (*GetVibratorInfo)(struct VibratorInfo **vibratorInfo);
+    /**
+     * @brief Start the vibrator according to the incoming vibration effect.
+     *
+     * @param vibrationPeriod Indicates vibration period (in ms).
+     *
+     * @param intensity indicates vibrator intensity in a vibration period.
+     *
+     * @param frequency indicates vibrator frequency in a vibration period.
+     *
+     * @return Returns <b>0</b> if the operation is successful.
+     * @return Returns <b>-1</b> if the vibrationPeriod setting is not supported.
+     * @return Returns <b>-2</b> if the intensity setting is not supported.
+     * @return Returns <b>-3</b> if the frequency setting is not supported.
+     *
+     * @since 3.2
+     * @version 1.1
+     */
+    int32_t (*SetModulationParameter)(uint32_t vibrationPeriod, int32_t intensity, int32_t frequency);
 };
 
 /**
@@ -96,7 +125,8 @@ struct VibratorInterface {
  *
  * The obtained <b>VibratorInterface</b> instance can be used to control the vibrator to vibrate as configured.
  *
- * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+ * @return Returns <b>0</b> if the operation is successful.
+ * @return Returns negative value if the get failed.
  *
  * @since 2.2
  * @version 1.0

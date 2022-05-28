@@ -46,14 +46,55 @@ extern "C" {
 #endif /* __cplusplus */
 
 /**
+ * @brief Enumerates the return values of the vibrator module.
+ *
+ * @since 3.2
+ */
+enum VibratorStatus {
+    /** The operation is successful. */
+    VIBRATOR_SUCCESS            = 0,
+    /** The period setting is not supported. */
+    VIBRATOR_NOT_PERIOD         = -1,
+    /** The intensity setting is not supported. */
+    VIBRATOR_NOT_INTENSITY      = -2,
+    /** The frequency setting is not supported. */
+    VIBRATOR_NOT_FREQUENCY      = -3,
+};
+
+/**
  * @brief Enumerates the vibration modes of this vibrator.
  *
  * @since 2.2
  */
 enum VibratorMode {
-    VIBRATOR_MODE_ONCE   = 0,    /**< Indicates the one-shot vibration with the given duration. */
-    VIBRATOR_MODE_PRESET = 1,    /**< Indicates the periodic vibration with the preset effect. */
-    VIBRATOR_MODE_BUTT           /**< Indicates invalid the effect mode. */
+    /**< Indicates the one-shot vibration with the given duration. */
+    VIBRATOR_MODE_ONCE   = 0,
+    /**< Indicates the periodic vibration with the preset effect. */
+    VIBRATOR_MODE_PRESET = 1,
+    /**< Indicates invalid the effect mode. */
+    VIBRATOR_MODE_BUTT
+};
+
+/**
+ * @brief Defines the vibration parameters.
+ *
+ * The parameters include the setting intensity and frequency capability the on and intensity and frequency range.
+ *
+ * @since 3.2
+ */
+struct VibratorInfo {
+    /**< setting intensity capability. 1 indicates support, 0 indicates not support. */
+    int32_t isSupportIntensity ;
+    /**< setting frequency capability. 1 indicates support, 0 indicates not support. */
+    int32_t isSupportFrequency;
+    /**< Max intensity */
+    int32_t intensityMaxValue;
+    /**< Min intensity */
+    int32_t intensityMinValue;
+    /**< Max frequency */
+    int32_t frequencyMaxValue;
+    /**< Min frequency */
+    int32_t frequencyMinValue;
 };
 
 #ifdef __cplusplus
