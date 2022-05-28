@@ -93,7 +93,6 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/pipeline_impl/src/strategy",
       "$camera_path/pipeline_core/ipp/include",
 
-      # HCS文件解析需要
       "//drivers/framework/include/osal",
       "//drivers/framework/include/utils",
       "//drivers/adapter/uhdf2/osal/include",
@@ -118,7 +117,7 @@ if (defined(ohos_lite)) {
   import("//build/test.gni")
   import("//drivers/adapter/uhdf2/uhdf.gni")
 
-  module_output_path = "hdf/camera_test"
+  module_output_path = "hdf/camera"
 
   config("cameraTest_config") {
     visibility = [ ":*" ]

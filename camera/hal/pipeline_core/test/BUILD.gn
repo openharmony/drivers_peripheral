@@ -125,7 +125,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/test.gni")
   import("//drivers/adapter/uhdf2/uhdf.gni")
-  module_output_path = "hdf/pipeline_core_test"
+  module_output_path = "hdf/camera"
   config("pipe_config") {
     visibility = [ ":*" ]
     cflags_cc = [

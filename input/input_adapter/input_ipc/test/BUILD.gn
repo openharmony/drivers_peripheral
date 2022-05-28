@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 hdi_input_base_path = "//drivers/peripheral/hidl_adapter/input_ipc"
-module_output_path = "hidl_adapter/input_ipc"
+module_output_path = "hdf/input"
 config("camhdi_impl_utest_config") {
   visibility = [ ":*" ]
   cflags_cc = [
