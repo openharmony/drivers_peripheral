@@ -16,16 +16,7 @@
 #ifndef BATTERYD_API_H
 #define BATTERYD_API_H
 
-#include <cstdlib>
 #include <string>
-
-enum BatterydPluggedType {
-    PLUGGED_TYPE_NONE = 0,
-    PLUGGED_TYPE_AC,
-    PLUGGED_TYPE_USB,
-    PLUGGED_TYPE_WIRELESS,
-    PLUGGED_TYPE_BUTT
-};
 
 // Keep it same as the inner kit battery_info.h
 struct BatterydInfo {
