@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("//drivers/adapter/uhdf/uhdf.gni")
 
-module_output_path = "battery_device_driver/battery_hdi"
+module_output_path = "hdf/battery"
 
 ###############################################################################
 config("module_private_config") {
