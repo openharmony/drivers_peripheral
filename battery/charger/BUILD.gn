@@ -44,7 +44,6 @@ ohos_executable("charger") {
   configs = [ ":batteryd_private_config" ]
 
   deps = [
-    "//drivers/interface/battery/v1_0:libbattery_proxy_1.0",
     "//drivers/peripheral/battery/charger/ui:libminui",
     "//third_party/jsoncpp:jsoncpp",
     "//third_party/libdrm:libdrm",
@@ -52,6 +51,7 @@ ohos_executable("charger") {
   ]
 
   external_deps = [
+    "battery_device_driver_interface:libbattery_proxy_1.0",
     "device_driver_framework:libhdf_utils",
     "init:libbegetutil",
     "input_device_driver:hdi_input",

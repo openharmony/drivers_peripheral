@@ -18,10 +18,11 @@
 
 #include <map>
 #include <memory>
+#include <refbase.h>
 #include <thread>
 #include <vector>
-#include "battery_callback_impl.h"
 #include "power_supply_provider.h"
+#include "v1_0/ibattery_callback.h"
 
 namespace OHOS {
 namespace HDI {
