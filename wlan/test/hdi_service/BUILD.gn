@@ -20,12 +20,16 @@ module_output_path = "hdf/wlan"
 
 ohos_unittest("WlanHdiServiceTestC") {
   module_out_path = module_output_path
-  sources = [ "wlan_hdi_hal_services_c_test.cpp" ]
+  sources = [
+    "wlan_callback_impl.c",
+    "wlan_hdi_hal_services_c_test.cpp",
+  ]
 
   deps = [
+    "//drivers/interface/wlan/v1_0:libwlan_proxy_1.0",
     "//drivers/peripheral/wlan/client:wifi_driver_client",
     "//drivers/peripheral/wlan/hal:wifi_hal",
-    "//drivers/peripheral/wlan/hdi_service:wifi_hdi_c_device",
+    "//drivers/peripheral/wlan/hdi_service:hdi_wlan_service",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -33,10 +37,9 @@ ohos_unittest("WlanHdiServiceTestC") {
   include_dirs = [
     "include",
     "//drivers/peripheral/wlan/interfaces/include",
-    "//drivers/peripheral/wlan/hdi_service/services",
+    "//drivers/peripheral/wlan/hdi_service",
     "//drivers/peripheral/wlan/client/include",
     "//drivers/peripheral/wlan/hal/include",
-    "//drivers/peripheral/wlan/hdi_service/include",
   ]
 
   if (is_standard_system) {
