@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 
-module_output_path = "audio_device_driver/adm"
+module_output_path = "hdf/audio"
 ohos_unittest("khdf_audio_adm_test") {
   module_out_path = module_output_path
 

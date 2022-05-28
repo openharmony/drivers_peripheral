@@ -54,7 +54,7 @@ if (defined(ohos_lite)) {
     public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
   }
 } else {
-  module_output_path = "hdf/misc"
+  module_output_path = "hdf/vibrator"
   ohos_unittest("hdf_peripheral_misc_test_vibrator_performance") {
     module_out_path = module_output_path
     include_dirs = []

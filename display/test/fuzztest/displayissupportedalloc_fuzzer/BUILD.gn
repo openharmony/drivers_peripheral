@@ -14,7 +14,7 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-module_output_path = "hdf/display/"
+module_output_path = "hdf/display"
 
 ohos_fuzztest("DisplayIssupportedAllocFuzzTest") {
   module_out_path = module_output_path

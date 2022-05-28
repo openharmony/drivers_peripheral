@@ -15,7 +15,7 @@ import("//build/test.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/camera/hal/camera.gni")
 
-module_output_path = "hdf/v4l2_adapter_test"
+module_output_path = "hdf/camera"
 
 config("v4l2_utest_config") {
   visibility = [ ":*" ]
