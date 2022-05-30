@@ -13,62 +13,55 @@
  * limitations under the License.
  */
 
-#include "ipc_stream_operator_fuzzer.h"
+#include "ipcstreamoperator_fuzzer.h"
 #include "fuzz_base.h"
 
-class IPCStreamOperatorFuzzer : public OHOS::Camera::StreamOperatorStub {
+using namespace OHOS::Camera;
+class IPCStreamOperatorFuzzer : public StreamOperatorStub {
 public:
-    OHOS::Camera::CamRetCode IsStreamsSupported(
-        OHOS::Camera::OperationMode mode,
-        const std::shared_ptr<OHOS::CameraStandard::CameraMetadata> &modeSetting,
-        const std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>> &info,
-        OHOS::Camera::StreamSupportType &type) override
+    CamRetCode IsStreamsSupported(OperationMode mode, const std::shared_ptr<CameraMetadata> &modeSetting,
+        const std::vector<std::shared_ptr<StreamInfo>> &info, StreamSupportType &type) override
     {
-        return OHOS::Camera::NO_ERROR;
+        return NO_ERROR;
     }
-    OHOS::Camera::CamRetCode CreateStreams(const std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>>
-        &streamInfos) override
+    CamRetCode CreateStreams(const std::vector<std::shared_ptr<StreamInfo>> &streamInfos) override
     {
-        return OHOS::Camera::NO_ERROR;
+        return NO_ERROR;
     }
-   
-    OHOS::Camera::CamRetCode ReleaseStreams(const std::vector<int>& streamIds) override
+
+    CamRetCode ReleaseStreams(const std::vector<int> &streamIds) override
     {
-        return OHOS::Camera::NO_ERROR;
+        return NO_ERROR;
     }
-    OHOS::Camera::CamRetCode CommitStreams(OHOS::Camera::OperationMode mode,
-        const std::shared_ptr<OHOS::CameraStandard::CameraMetadata>& modeSetting) override
+    CamRetCode CommitStreams(OperationMode mode, const std::shared_ptr<CameraMetadata> &modeSetting) override
     {
-        return OHOS::Camera::NO_ERROR;
+        return NO_ERROR;
     }
-    OHOS::Camera::CamRetCode GetStreamAttributes(std::vector<std::shared_ptr<OHOS::Camera::StreamAttribute>>
-        &attributes) override
+
+    CamRetCode GetStreamAttributes(std::vector<std::shared_ptr<StreamAttribute>> &attributes) override
     {
-        return OHOS::Camera::NO_ERROR;
+        return NO_ERROR;
     }
-    
-    OHOS::Camera::CamRetCode AttachBufferQueue(int streamId, const OHOS::sptr<OHOS::IBufferProducer> &producer) override
+    CamRetCode AttachBufferQueue(int streamId, const OHOS::sptr<OHOS::IBufferProducer> &producer) override
     {
-        return OHOS::Camera::NO_ERROR;
+        return NO_ERROR;
     }
-    OHOS::Camera::CamRetCode DetachBufferQueue(int streamId) override
+    CamRetCode DetachBufferQueue(int streamId) override
     {
-        return OHOS::Camera::NO_ERROR;
+        return NO_ERROR;
     }
-    OHOS::Camera::CamRetCode Capture(int captureId,
-        const std::shared_ptr<OHOS::Camera::CaptureInfo>& captureInfo, bool isStreaming) override
+    CamRetCode Capture(int captureId, const std::shared_ptr<CaptureInfo> &captureInfo, bool isStreaming) override
     {
-        return OHOS::Camera::NO_ERROR;
+        return NO_ERROR;
     }
-    OHOS::Camera::CamRetCode CancelCapture(int captureId) override
+    CamRetCode CancelCapture(int captureId) override
     {
-        return OHOS::Camera::NO_ERROR;
+        return NO_ERROR;
     }
-    OHOS::Camera::CamRetCode ChangeToOfflineStream(const std::vector<int>& streamIds,
-        OHOS::sptr<OHOS::Camera::IStreamOperatorCallback>& callback,
-        OHOS::sptr<OHOS::Camera::IOfflineStreamOperator>& offlineOperator) override
+    CamRetCode ChangeToOfflineStream(const std::vector<int> &streamIds, OHOS::sptr<IStreamOperatorCallback> &callback,
+        OHOS::sptr<IOfflineStreamOperator> &offlineOperator) override
     {
-        return OHOS::Camera::NO_ERROR;
+        return NO_ERROR;
     }
 };
 

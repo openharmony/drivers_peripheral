@@ -21,7 +21,8 @@ module_output_path = "hdf/camera"
 
 ohos_fuzztest("CameraIpcCameraDeviceRemoteFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "//drivers/peripheral/camera/hal/test/fuzz/ipc_camera_device_remote_fuzzer"
+  fuzz_config_file =
+      "//drivers/peripheral/camera/hal/test/fuzz/ipccameradeviceremote_fuzzer"
   cflags = [
     "-g",
     "-O0",
@@ -30,12 +31,12 @@ ohos_fuzztest("CameraIpcCameraDeviceRemoteFuzzTest") {
   ]
   sources = [
     "$camera_path/../interfaces/hdi_ipc/server/src/camera_device_stub.cpp",
-    "./ipc_camera_device_remote_fuzzer/ipc_camera_device_remote_fuzzer.cpp",
+    "./ipccameradeviceremote_fuzzer/ipccameradeviceremote_fuzzer.cpp",
   ]
 
   include_dirs = [
     "./include",
-    "$camera_path/test/fuzz/ipc_camera_device_remote_fuzzer",
+    "$camera_path/test/fuzz/ipccameradeviceremote_fuzzer",
     "$camera_path/../interfaces/include",
     "$camera_path/../interfaces/hdi_ipc",
     "$camera_path/../interfaces/hdi_ipc/utils/include",
@@ -61,6 +62,9 @@ ohos_fuzztest("CameraIpcCameraDeviceRemoteFuzzTest") {
     "$camera_path/pipeline_core/nodes/include",
     "$camera_path/utils/event",
     "//drivers/peripheral/camera/interfaces/metadata/include",
+    "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/standard",
+    "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/lite",
+    "//drivers/peripheral/display/interfaces/include",
   ]
 
   deps = [
@@ -102,19 +106,18 @@ ohos_fuzztest("CameraIpcCameraDeviceRemoteFuzzTest") {
 ohos_fuzztest("CameraIpcCameraHostServiceFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file =
-      "//drivers/peripheral/camera/hal/test/fuzz/ipc_camera_host_service_fuzzer"
+      "//drivers/peripheral/camera/hal/test/fuzz/ipccamerahostservice_fuzzer"
   cflags = [
     "-g",
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources =
-      [ "./ipc_camera_host_service_fuzzer/ipc_camera_host_service_fuzzer.cpp" ]
+  sources = [ "./ipccamerahostservice_fuzzer/ipccamerahostservice_fuzzer.cpp" ]
 
   include_dirs = [
     "./include",
-    "$camera_path/test/fuzz/ipc_camera_host_service_fuzzer",
+    "$camera_path/test/fuzz/ipccamerahostservice_fuzzer",
     "$camera_path/../interfaces/include",
     "$camera_path/../interfaces/hdi_ipc/utils/include",
     "$camera_path/../interfaces/hdi_ipc/client/include",
@@ -139,6 +142,9 @@ ohos_fuzztest("CameraIpcCameraHostServiceFuzzTest") {
     "$camera_path/pipeline_core/nodes/include",
     "$camera_path/utils/event",
     "//drivers/peripheral/camera/interfaces/metadata/include",
+    "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/standard",
+    "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/lite",
+    "//drivers/peripheral/display/interfaces/include",
   ]
 
   deps = [
@@ -180,18 +186,18 @@ ohos_fuzztest("CameraIpcCameraHostServiceFuzzTest") {
 ohos_fuzztest("CameraIpcOfflineFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file =
-      "//drivers/peripheral/camera/hal/test/fuzz/ipc_offline_fuzzer"
+      "//drivers/peripheral/camera/hal/test/fuzz/ipcoffline_fuzzer"
   cflags = [
     "-g",
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "./ipc_offline_fuzzer/ipc_offline_fuzzer.cpp" ]
+  sources = [ "./ipcoffline_fuzzer/ipcoffline_fuzzer.cpp" ]
 
   include_dirs = [
     "./include",
-    "$camera_path/test/fuzz/ipc_offline_fuzzer",
+    "$camera_path/test/fuzz/ipcoffline_fuzzer",
     "$camera_path/../interfaces/include",
     "$camera_path/../interfaces/hdi_ipc/utils/include",
     "$camera_path/../interfaces/hdi_ipc/client/include",
@@ -216,6 +222,9 @@ ohos_fuzztest("CameraIpcOfflineFuzzTest") {
     "$camera_path/pipeline_core/nodes/include",
     "$camera_path/utils/event",
     "//drivers/peripheral/camera/interfaces/metadata/include",
+    "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/standard",
+    "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/lite",
+    "//drivers/peripheral/display/interfaces/include",
   ]
 
   deps = [
@@ -256,18 +265,18 @@ ohos_fuzztest("CameraIpcOfflineFuzzTest") {
 ohos_fuzztest("CameraIpcStreamOperatorFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file =
-      "//drivers/peripheral/camera/hal/test/fuzz/ipc_stream_operator_fuzzer"
+      "//drivers/peripheral/camera/hal/test/fuzz/ipcstreamoperator_fuzzer"
   cflags = [
     "-g",
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "./ipc_stream_operator_fuzzer/ipc_stream_operator_fuzzer.cpp" ]
+  sources = [ "./ipcstreamoperator_fuzzer/ipcstreamoperator_fuzzer.cpp" ]
 
   include_dirs = [
     "./include",
-    "$camera_path/test/fuzz/ipc_stream_operator_fuzzer",
+    "$camera_path/test/fuzz/ipcstreamoperator_fuzzer",
     "$camera_path/../interfaces/include",
     "$camera_path/../interfaces/hdi_ipc/utils/include",
     "$camera_path/../interfaces/hdi_ipc/client/include",
@@ -292,6 +301,9 @@ ohos_fuzztest("CameraIpcStreamOperatorFuzzTest") {
     "$camera_path/pipeline_core/nodes/include",
     "$camera_path/utils/event",
     "//drivers/peripheral/camera/interfaces/metadata/include",
+    "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/standard",
+    "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/lite",
+    "//drivers/peripheral/display/interfaces/include",
   ]
 
   deps = [
@@ -331,20 +343,20 @@ ohos_fuzztest("CameraIpcStreamOperatorFuzzTest") {
 
 ohos_fuzztest("CameraIpcCameraDeviceCallbackFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "//drivers/peripheral/camera/hal/test/fuzz/ipc_camera_device_callback_fuzzer"
+  fuzz_config_file =
+      "//drivers/peripheral/camera/hal/test/fuzz/ipccameradevicecallback_fuzzer"
   cflags = [
     "-g",
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [
-    "./ipc_camera_device_callback_fuzzer/ipc_camera_device_callback_fuzzer.cpp",
-  ]
+  sources =
+      [ "./ipccameradevicecallback_fuzzer/ipccameradevicecallback_fuzzer.cpp" ]
 
   include_dirs = [
     "./include",
-    "$camera_path/test/fuzz/ipc_camera_device_callback_fuzzer",
+    "$camera_path/test/fuzz/ipccameradevicecallback_fuzzer",
     "$camera_path/../interfaces/include",
     "$camera_path/../interfaces/hdi_ipc/utils/include",
     "$camera_path/../interfaces/hdi_ipc/client/include",
@@ -371,6 +383,9 @@ ohos_fuzztest("CameraIpcCameraDeviceCallbackFuzzTest") {
     "$camera_path/pipeline_core/nodes/include",
     "$camera_path/utils/event",
     "//drivers/peripheral/camera/interfaces/metadata/include",
+    "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/standard",
+    "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/lite",
+    "//drivers/peripheral/display/interfaces/include",
   ]
 
   deps = [
@@ -410,20 +425,20 @@ ohos_fuzztest("CameraIpcCameraDeviceCallbackFuzzTest") {
 
 ohos_fuzztest("CameraIpcCameraHostCallbackFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "//drivers/peripheral/camera/hal/test/fuzz/ipc_camera_device_callback_fuzzer"
+  fuzz_config_file =
+      "//drivers/peripheral/camera/hal/test/fuzz/ipccamerahostcallback_fuzzer"
   cflags = [
     "-g",
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [
-    "./ipc_camera_host_callback_fuzzer/ipc_camera_host_callback_fuzzer.cpp",
-  ]
+  sources =
+      [ "./ipccamerahostcallback_fuzzer/ipccamerahostcallback_fuzzer.cpp" ]
 
   include_dirs = [
     "./include",
-    "$camera_path/test/fuzz/ipc_camera_host_callback_fuzzer",
+    "$camera_path/test/fuzz/ipccamerahostcallback_fuzzer",
     "$camera_path/../interfaces/include",
     "$camera_path/../interfaces/hdi_ipc/utils/include",
     "$camera_path/../interfaces/hdi_ipc/client/include",
@@ -448,6 +463,9 @@ ohos_fuzztest("CameraIpcCameraHostCallbackFuzzTest") {
     "$camera_path/pipeline_core/nodes/include",
     "$camera_path/utils/event",
     "//drivers/peripheral/camera/interfaces/metadata/include",
+    "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/standard",
+    "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/lite",
+    "//drivers/peripheral/display/interfaces/include",
   ]
 
   deps = [
@@ -487,18 +505,20 @@ ohos_fuzztest("CameraIpcCameraHostCallbackFuzzTest") {
 
 ohos_fuzztest("CameraIpcStreamOperatorCallbackFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "//drivers/peripheral/camera/hal/test/fuzz/ipc_stream_operator_callback_fuzzer"
+  fuzz_config_file = "//drivers/peripheral/camera/hal/test/fuzz/ipcstreamoperatorcallback_fuzzer"
   cflags = [
     "-g",
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "./ipc_stream_operator_callback_fuzzer/ipc_stream_operator_callback_fuzzer.cpp" ]
+  sources = [
+    "./ipcstreamoperatorcallback_fuzzer/ipcstreamoperatorcallback_fuzzer.cpp",
+  ]
 
   include_dirs = [
     "./include",
-    "$camera_path/test/fuzz/ipc_stream_operator_callback_fuzzer",
+    "$camera_path/test/fuzz/ipcstreamoperatorcallback_fuzzer",
     "$camera_path/../interfaces/include",
     "$camera_path/../interfaces/hdi_ipc/utils/include",
     "$camera_path/../interfaces/hdi_ipc/client/include",
@@ -523,6 +543,9 @@ ohos_fuzztest("CameraIpcStreamOperatorCallbackFuzzTest") {
     "$camera_path/pipeline_core/nodes/include",
     "$camera_path/utils/event",
     "//drivers/peripheral/camera/interfaces/metadata/include",
+    "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/standard",
+    "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/lite",
+    "//drivers/peripheral/display/interfaces/include",
   ]
 
   deps = [
@@ -563,7 +586,7 @@ ohos_fuzztest("CameraIpcStreamOperatorCallbackFuzzTest") {
 group("camera_hal_fuzztest") {
   testonly = true
   deps = [
-    ":CameraIpcCameraDeviceCallbackFuzzTest",
+    #":CameraIpcCameraDeviceCallbackFuzzTest",
     ":CameraIpcCameraDeviceRemoteFuzzTest",
     ":CameraIpcCameraHostCallbackFuzzTest",
     ":CameraIpcCameraHostServiceFuzzTest",

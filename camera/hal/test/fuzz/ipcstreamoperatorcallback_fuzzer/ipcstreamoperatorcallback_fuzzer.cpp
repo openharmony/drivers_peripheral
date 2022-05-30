@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "ipc_stream_operator_callback_fuzzer.h"
+#include "ipcstreamoperatorcallback_fuzzer.h"
 #include "fuzz_base.h"
 
 class IPCStreamOperatorCallbackFuzzer : public OHOS::Camera::StreamOperatorCallbackStub {

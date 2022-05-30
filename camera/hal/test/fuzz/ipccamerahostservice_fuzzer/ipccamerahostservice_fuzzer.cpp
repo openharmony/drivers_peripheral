@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "ipc_camera_host_service_fuzzer.h"
+#include "ipccamerahostservice_fuzzer.h"
 #include "fuzz_base.h"
 
 static uint32_t U32_AT(const uint8_t *ptr)
