@@ -14,9 +14,10 @@
 import("//build/config/features.gni")
 import("//build/test.gni")
 
-ohos_fuzztest("UserAuthHdiFuzzTest") {
-  module_out_path = "hdf/user_auth"
-  fuzz_config_file = "//drivers/peripheral/user_auth/test/fuzztest/user_auth/user_auth_hdi_fuzzer"
+ohos_fuzztest("PinAuthHdiFuzzTest") {
+  module_out_path = "hdf/pin_auth"
+  fuzz_config_file =
+      "//drivers/peripheral/pin_auth/test/fuzztest/pin_auth/pinauthhdi_fuzzer"
   cflags = [
     "-g",
     "-O0",
@@ -24,15 +25,17 @@ ohos_fuzztest("UserAuthHdiFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   include_dirs = [
-    "//drivers/peripheral/user_auth/hdi_service/include",
+    "//drivers/peripheral/pin_auth/hdi_service/inc",
+    "//drivers/peripheral/pin_auth/hdi/main/inc",
     "//base/user_iam/user_auth/common/logs",
   ]
 
-  sources = [ "user_auth_hdi_fuzzer.cpp" ]
+  sources = [ "pin_auth_hdi_fuzzer.cpp" ]
 
   deps = [
     "//base/user_iam/user_auth/common:iam_test",
-    "//drivers/peripheral/user_auth/hdi_service:libuser_auth_interface_service_1.0",
+    "//drivers/peripheral/pin_auth/hdi_service:libpin_auth_interface_service_1.0",
+    "//utils/native/base:utils",
   ]
 
   external_deps = [

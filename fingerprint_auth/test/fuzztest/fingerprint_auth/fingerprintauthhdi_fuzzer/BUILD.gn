@@ -16,7 +16,7 @@ import("//build/test.gni")
 
 ohos_fuzztest("FingerprintAuthHdiFuzzTest") {
   module_out_path = "hdf/fingerprint_auth"
-  fuzz_config_file = "//drivers/peripheral/fingerprint_auth/test/fuzztest/fingerprint_auth/fingerprint_auth_hdi_fuzzer"
+  fuzz_config_file = "//drivers/peripheral/fingerprint_auth/test/fuzztest/fingerprint_auth/fingerprintauthhdi_fuzzer"
   cflags = [
     "-g",
     "-O0",
