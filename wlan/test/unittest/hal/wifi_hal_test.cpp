@@ -1193,7 +1193,6 @@ HWTEST_F(WifiHalTest, GetAsscociatedStas001, TestSize.Level1)
     int32_t ret;
     struct IWiFiAp *apFeature = nullptr;
     struct StaInfo staInfo[MAX_ASSOC_STA_NUM] = {0};
-    uint32_t count = MAX_ASSOC_STA_NUM;
     uint32_t num = 0;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
