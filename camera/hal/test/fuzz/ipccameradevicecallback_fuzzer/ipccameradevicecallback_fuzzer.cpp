@@ -13,14 +13,15 @@
  * limitations under the License.
  */
 
-#include "ipc_camera_host_callback_fuzzer.h"
+#include "ipccameradevicecallback_fuzzer.h"
 #include "fuzz_base.h"
+#include "types.h"
 
-class IPCCameraHostCallbackFuzzer : public OHOS::Camera::CameraHostCallbackStub {
+using namespace OHOS::Camera;
+class IPCCameraDeviceCallbackFuzzer : public CameraDeviceCallbackStub {
 public:
-    void OnCameraStatus(const std::string &cameraId, OHOS::Camera::CameraStatus status) override {}
-    void OnFlashlightStatus(const std::string &cameraId, OHOS::Camera::FlashlightStatus status) override {}
-    void OnCameraEvent(const std::string &cameraId, OHOS::Camera::CameraEvent event) override {}
+    void OnError(ErrorType type, int32_t errorCode) override {}
+    void OnResult(uint64_t timestamp, const std::shared_ptr<CameraMetadata> &result) override {}
 };
 
 static uint32_t U32_AT(const uint8_t *ptr)
@@ -32,8 +33,8 @@ static int32_t onRemoteRequest(uint32_t code, OHOS::MessageParcel &data)
 {
     OHOS::MessageParcel reply;
     OHOS::MessageOption option;
-    std::shared_ptr<IPCCameraHostCallbackFuzzer> IPCHostCall = std::make_shared<IPCCameraHostCallbackFuzzer>();
-    auto ret = IPCHostCall->OnRemoteRequest(code, data, reply, option);
+    IPCCameraDeviceCallbackFuzzer *IPCDeviceCallback;
+    auto ret = IPCDeviceCallback->OnRemoteRequest(code, data, reply, option);
     return ret;
 }
 
@@ -42,13 +43,16 @@ static void IpcFuzzService(const uint8_t *data, size_t size)
     OHOS::MessageParcel reply;
     OHOS::MessageOption option;
     OHOS::MessageParcel dataMessageParcel;
+    uint32_t code = U32_AT(data);
+    const uint8_t *number = data;
+    number = number + sizeof(uint32_t);
     if (size > sizeof(uint32_t)) {
-        uint32_t code = U32_AT(data);
-        const uint8_t *number = data;
-        number = number + sizeof(uint32_t);
+        if (code == 1) { // 1:code size
+            return;
+        }
         size_t length = size;
         length = length - sizeof(uint32_t);
-        dataMessageParcel.WriteInterfaceToken(IPCCameraHostCallbackFuzzer::CameraHostCallbackStub::GetDescriptor());
+        dataMessageParcel.WriteInterfaceToken(OHOS::Camera::CameraDeviceCallbackStub::GetDescriptor());
         dataMessageParcel.WriteBuffer(number, length);
         dataMessageParcel.RewindRead(0);
         onRemoteRequest(code, dataMessageParcel);

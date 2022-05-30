@@ -13,24 +13,14 @@
  * limitations under the License.
  */
 
-#include "ipc_offline_fuzzer.h"
+#include "ipccamerahostcallback_fuzzer.h"
 #include "fuzz_base.h"
 
-class IPCOfflineFuzzer : public OHOS::Camera::OfflineStreamOperatorStub {
+class IPCCameraHostCallbackFuzzer : public OHOS::Camera::CameraHostCallbackStub {
 public:
-    virtual OHOS::Camera::CamRetCode CancelCapture(int captureId)
-    {
-        static_cast<void>(captureId);
-        return OHOS::Camera::NO_ERROR;
-    }
-    virtual OHOS::Camera::CamRetCode ReleaseStreams(const std::vector<int>& streamIds)
-    {
-        return OHOS::Camera::NO_ERROR;
-    }
-    virtual OHOS::Camera::CamRetCode Release()
-    {
-        return OHOS::Camera::NO_ERROR;
-    }
+    void OnCameraStatus(const std::string &cameraId, OHOS::Camera::CameraStatus status) override {}
+    void OnFlashlightStatus(const std::string &cameraId, OHOS::Camera::FlashlightStatus status) override {}
+    void OnCameraEvent(const std::string &cameraId, OHOS::Camera::CameraEvent event) override {}
 };
 
 static uint32_t U32_AT(const uint8_t *ptr)
@@ -42,8 +32,8 @@ static int32_t onRemoteRequest(uint32_t code, OHOS::MessageParcel &data)
 {
     OHOS::MessageParcel reply;
     OHOS::MessageOption option;
-    IPCOfflineFuzzer IPCOfflineSer;
-    auto ret = IPCOfflineSer.OnRemoteRequest(code, data, reply, option);
+    std::shared_ptr<IPCCameraHostCallbackFuzzer> IPCHostCall = std::make_shared<IPCCameraHostCallbackFuzzer>();
+    auto ret = IPCHostCall->OnRemoteRequest(code, data, reply, option);
     return ret;
 }
 
@@ -52,13 +42,13 @@ static void IpcFuzzService(const uint8_t *data, size_t size)
     OHOS::MessageParcel reply;
     OHOS::MessageOption option;
     OHOS::MessageParcel dataMessageParcel;
-    uint32_t code = U32_AT(data);
-    const uint8_t *number = data;
-    number = number + sizeof(uint32_t);
     if (size > sizeof(uint32_t)) {
+        uint32_t code = U32_AT(data);
+        const uint8_t *number = data;
+        number = number + sizeof(uint32_t);
         size_t length = size;
         length = length - sizeof(uint32_t);
-        dataMessageParcel.WriteInterfaceToken(IPCOfflineFuzzer::OfflineStreamOperatorStub::GetDescriptor());
+        dataMessageParcel.WriteInterfaceToken(IPCCameraHostCallbackFuzzer::CameraHostCallbackStub::GetDescriptor());
         dataMessageParcel.WriteBuffer(number, length);
         dataMessageParcel.RewindRead(0);
         onRemoteRequest(code, dataMessageParcel);
