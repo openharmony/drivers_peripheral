@@ -22,6 +22,9 @@ group("hdi_fuzzer") {
 
   deps += [
     # deps file
+    "adapter:adapter",
+    "attribute:attribute",
+    "capture:capture",
     "control:control",
     "render:render",
     "volume:volume",

@@ -22,6 +22,7 @@ group("adm_fuzzer") {
 
   deps += [
     # deps file
+    "audioadmdispatchercapturecmdid_fuzzer:AudioAdmDispatcherCaptureCmdidFuzzTest",
     "audioadmdispatchercontrolcmdid_fuzzer:AudioAdmDispatcherControlCmdidFuzzTest",
     "audioadmdispatcherrendercmdid_fuzzer:AudioAdmDispatcherRenderCmdidFuzzTest",
     "audiointerfacelibctlcapturecmdid_fuzzer:AudioInterfacelibctlcaptureCmdidFuzzTest",
