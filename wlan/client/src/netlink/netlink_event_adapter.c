@@ -171,7 +171,7 @@ static void DoGetScanResult(struct nlattr *attr[], int len, WifiScanResult *scan
 
 static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
 {
-    WifiScanResult scanResult;
+    WifiScanResult scanResult = {0};
     struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
     const char *ifName = (const char *)arg;
     struct nlattr *attr[NL80211_ATTR_MAX + 1], *bssAttr[NL80211_BSS_MAX + 1];
