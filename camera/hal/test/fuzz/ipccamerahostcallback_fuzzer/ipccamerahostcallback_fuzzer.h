@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef IPC_CAMERA_DEVICE_REMOTE_FUZZER_H
-#define IPC_CAMERA_DEVICE_REMOTE_FUZZER_H
+#ifndef IPCCAMERAHOSTCALLBACK_FUZZER_H
+#define IPCCAMERAHOSTCALLBACK_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "IPCCameraDeviceRemote_fuzzer"
+#define FUZZ_PROJECT_NAME "IPCCameraHostCallback_fuzzer"
 
 #endif

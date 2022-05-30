@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef IPC_STREAM_OPERATOR_FUZZER_H
-#define IPC_STREAM_OPERATOR_FUZZER_H
+#ifndef IPCSTREAMOPERATOR_FUZZER_H
+#define IPCSTREAMOPERATOR_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "IPCStreamOperator_fuzzer"
 

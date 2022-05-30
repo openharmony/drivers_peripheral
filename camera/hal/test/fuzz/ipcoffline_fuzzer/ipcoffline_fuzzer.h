@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef IPC_OFFLINE_FUZZER_H
-#define IPC_OFFLINE_FUZZER_H
+#ifndef IPCOFFLINE_FUZZER_H
+#define IPCOFFLINE_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "IPCOffline_fuzzer"
 

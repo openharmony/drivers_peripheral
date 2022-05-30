@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef IPC_CAMERA_HOST_CALLBACK_FUZZER_H
-#define IPC_CAMERA_HOST_CALLBACK_FUZZER_H
+#ifndef IPCCAMERAHOSTSERVICE_FUZZER_H
+#define IPCCAMERAHOSTSERVICE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "IPCCameraHostCallback_fuzzer"
+#define FUZZ_PROJECT_NAME "IPCCameraHostService_fuzzer"
 
 #endif
