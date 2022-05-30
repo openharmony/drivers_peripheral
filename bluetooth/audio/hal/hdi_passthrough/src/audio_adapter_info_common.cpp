@@ -999,28 +999,28 @@ int32_t SetExtParam(const char *key, const char *value, struct ExtraParams *mExt
     }
     int ret = HDF_FAILURE;
     if (strcmp(key, AUDIO_ATTR_PARAM_ROUTE) == 0) {
-        int32_t route;
+        int32_t route = 0;
         ret = TransferRoute(value, &route);
         if (ret < 0) {
             return HDF_FAILURE;
         }
         mExtraParams->route = route;
     } else if (strcmp(key, AUDIO_ATTR_PARAM_FORMAT) == 0) {
-        int32_t format;
+        int32_t format = 0;
         ret = TransferFormat(value, &format);
         if (ret < 0) {
             return HDF_FAILURE;
         }
         mExtraParams->format = format;
     } else if (strcmp(key, AUDIO_ATTR_PARAM_CHANNELS) == 0) {
-        uint32_t channels;
+        uint32_t channels = 0;
         ret = TransferChannels(value, &channels);
         if (ret < 0) {
             return HDF_FAILURE;
         }
         mExtraParams->channels = channels;
     } else if (strcmp(key, AUDIO_ATTR_PARAM_FRAME_COUNT) == 0) {
-        uint64_t frames;
+        uint64_t frames = 0;
         ret = TransferFrames(value, &frames);
         if (ret < 0) {
             return HDF_FAILURE;
