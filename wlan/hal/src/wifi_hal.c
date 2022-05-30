@@ -238,6 +238,10 @@ static int32_t UnregisterEventCallbackInner(OnReceiveFunc onRecFunc, const char 
 
 static int32_t ResetDriverInner(uint8_t chipId, const char *ifName)
 {
+    if (ifName == NULL || chipId >= MAX_WLAN_DEVICE) {
+        HDF_LOGE("%s: input parameter invalid, line: %d, chipId = %d", __FUNCTION__, __LINE__, chipId);
+        return HDF_ERR_INVALID_PARAM;
+    }
     return HalCmdSetResetDriver(chipId, ifName);
 }
 
