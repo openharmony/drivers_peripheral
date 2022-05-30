@@ -13,5 +13,5 @@
 
 group("fuzztest") {
   testonly = true
-  deps = [ "face_auth_hdi_fuzzer:FaceAuthHdiFuzzTest" ]
+  deps = [ "faceauthhdi_fuzzer:FaceAuthHdiFuzzTest" ]
 }
