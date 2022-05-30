@@ -158,6 +158,8 @@ int32_t WifiRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, c
 void WifiUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
 
 /* hal related interface */
+#define MAX_WLAN_DEVICE 3
+#define MAX_CHANNEL_NUM 14
 
 enum Ieee80211Band {
     IEEE80211_BAND_2GHZ,  /**< 2.4 GHz */
