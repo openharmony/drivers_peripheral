@@ -13,15 +13,37 @@
  * limitations under the License.
  */
 
-#include "ipc_camera_device_callback_fuzzer.h"
+#include "ipccameradeviceremote_fuzzer.h"
 #include "fuzz_base.h"
-#include "types.h"
 
-using namespace OHOS::Camera;
-class IPCCameraDeviceCallbackFuzzer : public CameraDeviceCallbackStub {
+class IPCCameraDeviceRemoteFuzzer : public OHOS::Camera::CameraDeviceStub {
 public:
-    void OnError(ErrorType type, int32_t errorCode) override {}
-    void OnResult(uint64_t timestamp, const std::shared_ptr<OHOS::CameraStandard::CameraMetadata> &result) override {}
+    OHOS::Camera::CamRetCode GetStreamOperator(const OHOS::sptr<OHOS::Camera::IStreamOperatorCallback> &callback,
+    OHOS::sptr<OHOS::Camera::IStreamOperator> &streamOperator) override
+    {
+        return OHOS::Camera::NO_ERROR;
+    }
+    OHOS::Camera::CamRetCode UpdateSettings(const std::shared_ptr<OHOS::Camera::CameraSetting> &settings) override
+    {
+        return OHOS::Camera::NO_ERROR;
+    }
+    OHOS::Camera::CamRetCode SetResultMode(const OHOS::Camera::ResultCallbackMode &mode) override
+    {
+        return OHOS::Camera::NO_ERROR;
+    }
+    OHOS::Camera::CamRetCode GetEnabledResults(std::vector<OHOS::Camera::MetaType> &results) override
+    {
+        return OHOS::Camera::NO_ERROR;
+    }
+    OHOS::Camera::CamRetCode EnableResult(const std::vector<OHOS::Camera::MetaType> &results) override
+    {
+        return OHOS::Camera::NO_ERROR;
+    }
+    OHOS::Camera::CamRetCode DisableResult(const std::vector<OHOS::Camera::MetaType> &results) override
+    {
+        return OHOS::Camera::NO_ERROR;
+    }
+    void Close() override {}
 };
 
 static uint32_t U32_AT(const uint8_t *ptr)
@@ -33,8 +55,8 @@ static int32_t onRemoteRequest(uint32_t code, OHOS::MessageParcel &data)
 {
     OHOS::MessageParcel reply;
     OHOS::MessageOption option;
-    IPCCameraDeviceCallbackFuzzer IPCDeviceCallback;
-    auto ret = IPCDeviceCallback.OnRemoteRequest(code, data, reply, option);
+    IPCCameraDeviceRemoteFuzzer *IPCDevice = new IPCCameraDeviceRemoteFuzzer();
+    auto ret = IPCDevice->OnRemoteRequest(code, data, reply, option);
     return ret;
 }
 
@@ -43,16 +65,16 @@ static void IpcFuzzService(const uint8_t *data, size_t size)
     OHOS::MessageParcel reply;
     OHOS::MessageOption option;
     OHOS::MessageParcel dataMessageParcel;
-    uint32_t code = U32_AT(data);
-    const uint8_t *number = data;
-    number = number + sizeof(uint32_t);
     if (size > sizeof(uint32_t)) {
+        uint32_t code = U32_AT(data);
         if (code == 1) { // 1:code size
             return;
         }
+        const uint8_t *number = data;
+        number = number + sizeof(uint32_t);
         size_t length = size;
         length = length - sizeof(uint32_t);
-        dataMessageParcel.WriteInterfaceToken(OHOS::Camera::CameraDeviceCallbackStub::GetDescriptor());
+        dataMessageParcel.WriteInterfaceToken(IPCCameraDeviceRemoteFuzzer::CameraDeviceStub::GetDescriptor());
         dataMessageParcel.WriteBuffer(number, length);
         dataMessageParcel.RewindRead(0);
         onRemoteRequest(code, dataMessageParcel);
