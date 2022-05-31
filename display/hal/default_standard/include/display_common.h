@@ -33,43 +33,50 @@ extern "C" {
 #define LOG_DOMAIN 0xD001400
 
 #ifndef DISPLAY_UNUSED
-#define DISPLAY_UNUSED(x) (void)x
+#define DISPLAY_UNUSED(x) ((void)(x))
 #endif
 
-#define __FILENAME__ (strrchr(__FILE__, '/') ? (strrchr(__FILE__, '/') + 1) : __FILE__)
+#define DISP_FILENAME (strrchr(__FILE__, '/') ? (strrchr(__FILE__, '/') + 1) : __FILE__)
+
+#ifndef DISPLAY_DEBUG_ENABLE
+#define DISPLAY_DEBUG_ENABLE 0
+#endif
 
 #ifndef DISPLAY_LOGD
-#define DISPLAY_LOGD(format, ...)                                                                                      \
-    do {                                                                                                               \
-        HILOG_DEBUG(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n", __FUNCTION__, __FILENAME__, __LINE__, \
-            ##__VA_ARGS__);                                                                                            \
+#define DISPLAY_LOGD(format, ...)                                                    \
+    do {                                                                             \
+        if (DISPLAY_DEBUG_ENABLE) {                                                  \
+            HILOG_DEBUG(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n", \
+                __FUNCTION__, DISP_FILENAME, __LINE__,                               \
+                ##__VA_ARGS__);                                                      \
+        }                                                                            \
     } while (0)
 #endif
 
 #ifndef DISPLAY_LOGI
-#define DISPLAY_LOGI(format, ...)                                                                                     \
-    do {                                                                                                              \
-        HILOG_INFO(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n", __FUNCTION__, __FILENAME__, __LINE__, \
-            ##__VA_ARGS__);                                                                                           \
+#define DISPLAY_LOGI(format, ...)                                                                                      \
+    do {                                                                                                               \
+        HILOG_INFO(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n", __FUNCTION__, DISP_FILENAME, __LINE__, \
+            ##__VA_ARGS__);                                                                                            \
     } while (0)
 #endif
 
 #ifndef DISPLAY_LOGW
-#define DISPLAY_LOGW(format, ...)                                                                                     \
-    do {                                                                                                              \
-        HILOG_WARN(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n", __FUNCTION__, __FILENAME__, __LINE__, \
-            ##__VA_ARGS__);                                                                                           \
+#define DISPLAY_LOGW(format, ...)                                                                                      \
+    do {                                                                                                               \
+        HILOG_WARN(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n", __FUNCTION__, DISP_FILENAME, __LINE__, \
+            ##__VA_ARGS__);                                                                                            \
     } while (0)
 #endif
 
 #ifndef DISPLAY_LOGE
-#define DISPLAY_LOGE(format, ...)                                 \
-    do {                                                          \
-        HILOG_ERROR(LOG_CORE,                                     \
-            "\033[0;32;31m"                                       \
-            "[%{public}s@%{public}s:%{public}d] " format "\033[m" \
-            "\n",                                                 \
-            __FUNCTION__, __FILENAME__, __LINE__, ##__VA_ARGS__); \
+#define DISPLAY_LOGE(format, ...)                                   \
+    do {                                                            \
+        HILOG_ERROR(LOG_CORE,                                       \
+            "\033[0;32;31m"                                         \
+            "[%{public}s@%{public}s:%{public}d] " format "\033[m"   \
+            "\n",                                                   \
+            __FUNCTION__, DISP_FILENAME, __LINE__, ##__VA_ARGS__);  \
     } while (0)
 #endif
 
