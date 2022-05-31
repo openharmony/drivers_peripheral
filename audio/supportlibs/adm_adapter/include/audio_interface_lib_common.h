@@ -15,54 +15,34 @@
 
 #ifndef AUDIO_INTERFACE_LIB_COMMON_H
 #define AUDIO_INTERFACE_LIB_COMMON_H
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include "securec.h"
 #include "audio_internal.h"
-#include "audio_adapter.h"
 #include "osal_mem.h"
 #include "hdf_io_service_if.h"
 #include "hdf_sbuf.h"
 
-#define CTRL_NUM 100
 #define SERVIC_NAME_MAX_LEN             32
 #define AUDIO_MIN_DEVICENUM             1
 #define AUDIODRV_CTL_ELEM_IFACE_GAIN    2
 
-#define AUDIO_WAIT_DELAY (10 * 1000)    // 10ms
-#define AUDIO_CAP_WAIT_DELAY (5 * 1000)    // 5ms
+#define AUDIO_WAIT_DELAY        (10 * 1000) // 10ms
+#define AUDIO_CAP_WAIT_DELAY    (5 * 1000)  // 5ms
 
-#define CTRL_CMD    "control"          // For Bind control service
 
-#define AUDIODRV_CTL_ACODEC_ENABLE 1
+#define AUDIODRV_CTL_ACODEC_ENABLE  1
 #define AUDIODRV_CTL_ACODEC_DISABLE 0
 #define AUDIODRV_CTL_INTERNAL_ACODEC_ENABLE 1
-#define AUDIODRV_CTL_EXTERN_ACODEC_ENABLE 2
-#define AUDIODRV_CTL_EXTERN_CODEC_STR "External Codec Enable"
+#define AUDIODRV_CTL_EXTERN_ACODEC_ENABLE   2
+#define AUDIODRV_CTL_EXTERN_CODEC_STR   "External Codec Enable"
 #define AUDIODRV_CTL_INTERNAL_CODEC_STR "Internally Codec Enable"
 
-#define AUDIODRV_CTL_INTER_CARD_STR    "hdf_audio_codec_primary_dev0"
-#define AUDIODRV_CTL_EXTN_CARD_STR    "hdf_audio_codec_primary_dev11"
+#define AUDIODRV_CTL_INTER_CARD_STR "hdf_audio_codec_primary_dev0"
+#define AUDIODRV_CTL_EXTN_CARD_STR  "hdf_audio_codec_primary_dev11"
 
-struct AudioPcmHwParams {
-    enum AudioStreamType streamType;
-    uint32_t channels;
-    uint32_t rate;
-    uint32_t periodSize;
-    uint32_t periodCount;
-    enum AudioFormat format;
-    char *cardServiceName;
-    uint32_t period;
-    uint32_t frameSize;
-    uint32_t startThreshold;
-    uint32_t stopThreshold;
-    uint32_t silenceThreshold;
-    bool isBigEndian;
-    bool isSignedData;
-};
 
 struct AudioCtlElemId {
     const char *cardServiceName;
@@ -77,10 +57,10 @@ struct AudioCtlElemValue {
 
 struct AudioCtrlElemInfo {
     struct AudioCtlElemId id;
-    uint32_t count;     /* count of values */
-    int32_t type;       /* R: value type - AUDIODRV_CTL_ELEM_IFACE_MIXER_* */
-    int32_t min;        /* R: minimum value */
-    int32_t max;        /* R: maximum value */
+    uint32_t count; /* count of values */
+    int32_t type;   /* R: value type - AUDIODRV_CTL_ELEM_IFACE_MIXER_* */
+    int32_t min;    /* R: minimum value */
+    int32_t max;    /* R: maximum value */
 };
 
 struct HdfIoService *HdfIoServiceBindName(const char *serviceName);
