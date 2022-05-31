@@ -36,6 +36,7 @@ if (defined(ohos_lite)) {
 
     include_dirs = [
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
+      "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/framework/include/core",
@@ -83,6 +84,7 @@ if (defined(ohos_lite)) {
 
     include_dirs = [
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
+      "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//third_party/bounds_checking_function/include",
