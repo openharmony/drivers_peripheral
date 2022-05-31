@@ -197,7 +197,7 @@ int32_t CodecProxyPackBufferHandle(struct HdfSBuf *data, CodecBufferHandle *buff
         HDF_LOGE("%{public}s: params NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint8(data, (uint8_t)&bufferHandle->virAddr)) {
+    if (!HdfSbufWriteUint64(data, (uint64_t)bufferHandle->virAddr)) {
         HDF_LOGE("%{public}s: Write virAddr failed!", __func__);
         return HDF_FAILURE;
     }
@@ -219,7 +219,7 @@ int32_t CodecProxyPackBufferInfo(struct HdfSBuf *data, CodecBufferInfo *buffers)
         return HDF_FAILURE;
     }
     if (buffers->type == BUFFER_TYPE_VIRTUAL) {
-        if (!HdfSbufWriteUint8(data, (uint8_t)&buffers->addr)) {
+        if (!HdfSbufWriteBuffer(data, buffers->addr, buffers->length)) {
             HDF_LOGE("%{public}s: Write addr failed!", __func__);
             return HDF_FAILURE;
         }
@@ -285,7 +285,7 @@ int32_t CodecProxyParseBufferHandle(struct HdfSBuf *reply, CodecBufferHandle *bu
         HDF_LOGE("%{public}s: params NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufReadUint8(reply, bufferHandle->virAddr)) {
+    if (!HdfSbufReadUint64(reply, (uint64_t *)&bufferHandle->virAddr)) {
         HDF_LOGE("%{public}s: read virAddr failed!", __func__);
         return HDF_FAILURE;
     }
@@ -299,6 +299,7 @@ int32_t CodecProxyParseBufferHandle(struct HdfSBuf *reply, CodecBufferHandle *bu
 int32_t CodecProxyParseBufferInfo(struct HdfSBuf *reply, CodecBufferInfo *buffers)
 {
     uint32_t tempType = 0;
+    uint32_t readLen = 0;
     if (reply == NULL || buffers == NULL) {
         HDF_LOGE("%{public}s: buffers null!", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -309,7 +310,7 @@ int32_t CodecProxyParseBufferInfo(struct HdfSBuf *reply, CodecBufferInfo *buffer
     }
     buffers->type = (BufferType)tempType;
     if (buffers->type == BUFFER_TYPE_VIRTUAL) {
-        if (!HdfSbufReadUint8(reply, buffers->addr)) {
+        if (!HdfSbufReadBuffer(reply, (const void **)&buffers->addr, &readLen)) {
             HDF_LOGE("%{public}s: read addr failed!", __func__);
             return HDF_FAILURE;
         }

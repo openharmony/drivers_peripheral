@@ -191,7 +191,7 @@ int32_t CodecSerPackBufferHandle(struct HdfSBuf *reply, CodecBufferHandle *buffe
         HDF_LOGE("%{public}s: params null!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint8(reply, (uint8_t)&bufferHandle->virAddr)) {
+    if (!HdfSbufWriteUint64(reply, (uint64_t)bufferHandle->virAddr)) {
         HDF_LOGE("%{public}s: Write virAddr failed!", __func__);
         return HDF_FAILURE;
     }
@@ -213,7 +213,7 @@ int32_t CodecSerPackBufferInfo(struct HdfSBuf *reply, CodecBufferInfo *buffers)
         return HDF_FAILURE;
     }
     if (buffers->type == BUFFER_TYPE_VIRTUAL) {
-        if (!HdfSbufWriteUint8(reply, (uint8_t)&buffers->addr)) {
+        if (!HdfSbufWriteBuffer(reply, buffers->addr, buffers->length)) {
             HDF_LOGE("%{public}s: Write addr failed!", __func__);
             return HDF_FAILURE;
         }
@@ -272,7 +272,7 @@ int32_t CodecSerParseBufferHandle(struct HdfSBuf *reply, CodecBufferHandle *buff
         HDF_LOGE("%{public}s: params null!", __func__);
         return HDF_FAILURE;
     }
-    if (!HdfSbufReadUint8(reply, bufferHandle->virAddr)) {
+    if (!HdfSbufReadUint64(reply, (uint64_t *)&bufferHandle->virAddr)) {
         HDF_LOGE("%{public}s: read virAddr failed!", __func__);
         return HDF_FAILURE;
     }
@@ -290,6 +290,7 @@ int32_t CodecSerParseBufferInfo(struct HdfSBuf *data, CodecBufferInfo *buffers)
         return HDF_FAILURE;
     }
     uint32_t tempType = 0;
+    uint32_t readLen = 0;
     if (buffers == NULL) {
         HDF_LOGE("%{public}s: buffers is NULL!", __func__);
         return HDF_FAILURE;
@@ -300,7 +301,7 @@ int32_t CodecSerParseBufferInfo(struct HdfSBuf *data, CodecBufferInfo *buffers)
     }
     buffers->type = (BufferType)tempType;
     if (buffers->type == BUFFER_TYPE_VIRTUAL) {
-        if (!HdfSbufReadUint8(data, buffers->addr)) {
+        if (!HdfSbufReadBuffer(data, (const void **)&buffers->addr, &readLen)) {
             HDF_LOGE("%{public}s: read addr failed!", __func__);
             return HDF_FAILURE;
         }
