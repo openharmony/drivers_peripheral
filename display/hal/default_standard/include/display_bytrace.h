@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,27 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef DISPLAY_BYTRACE_H
+#define DISPLAY_BYTRACE_H
+#include <string>
+#include <bytrace.h>
+#include <hilog/log.h>
 
-#ifndef HISILICON_DRM_H
-#define HISILICON_DRM_H
-#include <cstdint>
-#include "drm.h"
-#if defined(__cplusplus)
-extern "C" {
-#endif
+namespace OHOS {
+namespace HDI {
+namespace DISPLAY {
+class DisplayBytrace {
+public:
+    DisplayBytrace(std::string value)
+    {
+        StartTrace(BYTRACE_TAG_GRAPHIC_AGP, value.c_str());
+    }
 
-struct DrmHisiliconPhyaddr {
-    /* * return the physical address */
-    uint64_t phyaddr;
-    /* * dmabuf file descriptor */
-    int32_t fd;
+    ~DisplayBytrace()
+    {
+        FinishTrace(BYTRACE_TAG_GRAPHIC_AGP);
+    }
 };
+} // namespace DISPLAY
+} // namespace HDI
+} // namespace OHOS
 
-#define DRM_IOCTL_HISILICON_GEM_FD_TO_PHYADDR \
-    DRM_IOWR(DRM_COMMAND_BASE + 0x01, struct DrmHisiliconPhyaddr)
-
-#if defined(__cplusplus)
-}
-#endif
-
-#endif // HISILICON_DRM_H
+#endif // DISPLAY_BYTRACE_H
