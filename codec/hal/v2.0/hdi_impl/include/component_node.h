@@ -31,7 +31,7 @@ namespace Codec {
 namespace Omx {
 class ComponentNode : NoCopyable {
 public:
-    ComponentNode(struct CodecCallbackType *callback, int8_t *appData, int32_t appDataLen);
+    ComponentNode(struct CodecCallbackType *callback, int64_t appData);
 
     ~ComponentNode();
 
@@ -64,7 +64,7 @@ public:
 
     int32_t FillThisBuffer(struct OmxCodecBuffer &buffer);
 
-    int32_t SetCallbacks(struct CodecCallbackType *omxCallback, int8_t *appData, uint32_t appDataLen);
+    int32_t SetCallbacks(struct CodecCallbackType *omxCallback, int64_t appData);
 
     int32_t UseEglImage(struct OmxCodecBuffer &buffer, uint32_t portIndex, int8_t *eglImage, uint32_t eglImageLen);
 
@@ -84,6 +84,11 @@ public:
         this->comp_ = comp;
     }
 
+    OMX_HANDLETYPE GetHandle()
+    {
+        return comp_;
+    }
+
 public:
     static OMX_CALLBACKTYPE callbacks_;  // callbacks
 
@@ -101,8 +106,7 @@ private:
 private:
     OMX_HANDLETYPE comp_;                                         // Compnent handle
     struct CodecCallbackType *omxCallback_;                       // Callbacks in HDI
-    int8_t *appData_;                                             // Use data, default is nullptr
-    int32_t appDataSize_;                                         // User data length, default is 0
+    int64_t appData_;                                             // Use data, default is 0
     std::map<uint32_t, sptr<ICodecBuffer>> codecBufferMap_;       // Key is buffferID
     std::map<OMX_BUFFERHEADERTYPE *, uint32_t> bufferHeaderMap_;  // Key is omx buffer header type
     uint32_t bufferIdCount_;

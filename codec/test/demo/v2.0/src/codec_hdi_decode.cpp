@@ -54,6 +54,7 @@ CodecHdiDecode::CodecHdiDecode() : fpIn_(nullptr), fpOut_(nullptr)
     codecMime_ = codecMime::AVC;
     count_ = 0;
     useBufferHandle_ = false;
+    compoentId_ = 0;
 }
 
 CodecHdiDecode::~CodecHdiDecode()
@@ -151,9 +152,11 @@ bool CodecHdiDecode::Init(CommandOpt &opt)
     callback_->FillBufferDone = &CodecHdiDecode::OnFillBufferDone;
     int32_t err = HDF_SUCCESS;
     if (codecMime_ == codecMime::AVC) {
-        err = omxMgr_->CreateComponent(&client_, const_cast<char *>(decoder_avc), 0, 0, callback_);
+        err =
+            omxMgr_->CreateComponent(&client_, &compoentId_, const_cast<char *>(decoder_avc), (int64_t)this, callback_);
     } else {
-        err = omxMgr_->CreateComponent(&client_, const_cast<char *>(decoder_hevc), 0, 0, callback_);
+        err = omxMgr_->CreateComponent(&client_, &compoentId_, const_cast<char *>(decoder_hevc), (int64_t)this,
+                                       callback_);
     }
 
     if (err != HDF_SUCCESS) {
@@ -524,7 +527,8 @@ void CodecHdiDecode::FreeBuffers()
 
 void CodecHdiDecode::Release()
 {
-    omxMgr_->DestoryComponent(client_);
+    omxMgr_->DestoryComponent(compoentId_);
+    CodecComponentTypeRelease(client_);
     client_ = nullptr;
     CodecComponentManagerRelease();
 }
@@ -623,9 +627,8 @@ void CodecHdiDecode::Run()
 }
 int32_t CodecHdiDecode::OnEvent(struct CodecCallbackType *self, enum OMX_EVENTTYPE event, struct EventInfo *info)
 {
-    HDF_LOGI("onEvent: appData[0x%{public}p], eEvent [%{public}d], "
-             "nData1[%{public}d]",
-             info->appData, event, info->data1);
+    HDF_LOGI("%{public}s: appData[%{public}ld] eEvent [%{public}d], nData1[%{public}d]", __func__, info->appData, event,
+             info->data1);
     switch (event) {
         case OMX_EventCmdComplete: {
             OMX_COMMANDTYPE cmd = (OMX_COMMANDTYPE)info->data1;
@@ -643,15 +646,15 @@ int32_t CodecHdiDecode::OnEvent(struct CodecCallbackType *self, enum OMX_EVENTTY
     return HDF_SUCCESS;
 }
 
-int32_t CodecHdiDecode::OnEmptyBufferDone(struct CodecCallbackType *self, int8_t *appData, uint32_t appDataLen,
+int32_t CodecHdiDecode::OnEmptyBufferDone(struct CodecCallbackType *self, int64_t appData,
                                           const struct OmxCodecBuffer *buffer)
 {
     HDF_LOGI("onEmptyBufferDone: pBuffer.bufferID [%{public}d]", buffer->bufferId);
     return g_core->OnEmptyBufferDone(*buffer);
 }
 
-int32_t CodecHdiDecode::OnFillBufferDone(struct CodecCallbackType *self, int8_t *appData, uint32_t appDataLen,
-                                         struct OmxCodecBuffer *buffer)
+int32_t CodecHdiDecode::OnFillBufferDone(struct CodecCallbackType *self, int64_t appData,
+                                         const struct OmxCodecBuffer *buffer)
 {
     HDF_LOGI("onFillBufferDone: pBuffer.bufferID [%{public}d]", buffer->bufferId);
     return g_core->OnFillBufferDone(*buffer);
@@ -664,7 +667,7 @@ int32_t CodecHdiDecode::OnEmptyBufferDone(const struct OmxCodecBuffer &buffer)
     return HDF_SUCCESS;
 }
 
-int32_t CodecHdiDecode::OnFillBufferDone(struct OmxCodecBuffer &buffer)
+int32_t CodecHdiDecode::OnFillBufferDone(const struct OmxCodecBuffer &buffer)
 {
     if (exit_) {
         return HDF_SUCCESS;
@@ -689,9 +692,6 @@ int32_t CodecHdiDecode::OnFillBufferDone(struct OmxCodecBuffer &buffer)
     }
 
     (void)fflush(fpOut_);
-    // reset buffer
-    buffer.offset = 0;
-    buffer.filledLen = 0;
     if (buffer.flag == OMX_BUFFERFLAG_EOS) {
         // end
         exit_ = true;

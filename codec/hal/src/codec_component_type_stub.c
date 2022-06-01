@@ -30,10 +30,6 @@
 #else
 #define DRIVER_PATH "/vendor/lib"
 #endif
-#define CODEC_SERVICE_IMPL  "libcodec_hdi_omx_service_impl"
-
-typedef void (*SERVICE_CONSTRUCT_FUNC)(struct OmxComponentManager *, struct CodecComponentType *);
-
 static void FreeMem(int8_t *mem, uint32_t memLen)
 {
     if (memLen > 0 && mem != NULL) {
@@ -41,117 +37,12 @@ static void FreeMem(int8_t *mem, uint32_t memLen)
     }
 }
 
-static int32_t SerStubGetComponentNum(struct CodecComponentTypeStub *stub,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
-{
-    return HandleGetNumCmd(reply);
-}
-
-static int32_t SerStubGetComponentCapablityList(struct CodecComponentTypeStub *stub,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
-{
-    return HandleGetAllCapablityListCmd(reply);
-}
-
-static int32_t ReadParamsForCreateComponent(struct HdfSBuf *data, char **compName, int8_t **appData,
-    uint32_t *appDataSize, struct CodecCallbackType **callback)
-{
-    const char *compNameCp = HdfSbufReadString(data);
-    if (compNameCp == NULL) {
-        HDF_LOGE("%{public}s: read compNameCp failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    if (!HdfSbufReadUint32(data, appDataSize)) {
-        HDF_LOGE("%{public}s: read appData size failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    *compName = strdup(compNameCp);
-
-    if (*appDataSize > 0) {
-        *appData = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (*appDataSize));
-        if (*appData == NULL) {
-            HDF_LOGE("%{public}s: HDF_ERR_MALLOC_FAIL!", __func__);
-            return HDF_ERR_MALLOC_FAIL;
-        }
-
-        for (uint32_t i = 0; i < *appDataSize; i++) {
-            if (!HdfSbufReadInt8(data, &(*appData)[i])) {
-                HDF_LOGE("%{public}s: read appData[i] failed!", __func__);
-                return HDF_ERR_INVALID_PARAM;
-            }
-        }
-    }
-
-    struct HdfRemoteService *callbackRemote = HdfSbufReadRemoteService(data);
-    if (callbackRemote == NULL) {
-        HDF_LOGE("%{public}s: read callbackRemote failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    *callback = CodecCallbackTypeGet(callbackRemote);
-
-    return HDF_SUCCESS;
-}
-
-static int32_t SerStubCreateComponent(struct CodecComponentTypeStub *stub,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
-{
-    int32_t ret;
-    OMX_HANDLETYPE componentHandle;
-    int8_t *appData = NULL;
-    uint32_t appDataSize = 0;
-    struct CodecCallbackType *callback = NULL;
-    char *compName = NULL;
-
-    ret = ReadParamsForCreateComponent(data, &compName, &appData, &appDataSize, &callback);
-    if (ret != HDF_SUCCESS) {
-        if (compName != NULL) {
-            OsalMemFree(compName);
-            compName = NULL;
-        }
-        if (appDataSize > 0 && appData != NULL) {
-            OsalMemFree(appData);
-        }
-        return ret;
-    }
-
-    ret = stub->managerService.CreateComponent(&componentHandle, compName, appData, appDataSize, callback);
-    if (compName != NULL) {
-        OsalMemFree(compName);
-        compName = NULL;
-    }
-    if (appDataSize > 0 && appData != NULL) {
-        OsalMemFree(appData);
-    }
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call CreateComponent function failed!", __func__);
-        return ret;
-    }
-    stub->componentHandle = componentHandle;
-
-    return ret;
-}
-
-static int32_t SerStubDestroyComponent(struct CodecComponentTypeStub *stub,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
-{
-    int32_t ret;
-
-    ret = stub->managerService.DestoryComponent(stub->componentHandle);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call DestroyComponent function failed!", __func__);
-    }
-
-    return ret;
-}
-
-static int32_t SerStubGetComponentVersion(struct CodecComponentTypeStub *stub,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubGetComponentVersion(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
+                                          struct HdfSBuf *reply)
 {
     int32_t ret;
     struct CompVerInfo verInfo = {0};
-
-    ret = stub->service.GetComponentVersion(&stub->service, &verInfo);
+    ret = serviceImpl->GetComponentVersion(serviceImpl, &verInfo);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call GetComponentVersion function failed!", __func__);
         return ret;
@@ -164,7 +55,7 @@ static int32_t SerStubGetComponentVersion(struct CodecComponentTypeStub *stub,
     return HDF_SUCCESS;
 }
 
-static int32_t SerStubSendCommand(struct CodecComponentTypeStub *stub, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubSendCommand(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
     enum OMX_COMMANDTYPE cmd;
@@ -203,7 +94,7 @@ static int32_t SerStubSendCommand(struct CodecComponentTypeStub *stub, struct Hd
         }
     }
 
-    ret = stub->service.SendCommand(&stub->service, cmd, param, cmdData, cmdDataLen);
+    ret = serviceImpl->SendCommand(serviceImpl, cmd, param, cmdData, cmdDataLen);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call SendCommand function failed!", __func__);
         FreeMem(cmdData, cmdDataLen);
@@ -214,7 +105,7 @@ static int32_t SerStubSendCommand(struct CodecComponentTypeStub *stub, struct Hd
     return HDF_SUCCESS;
 }
 
-static int32_t SerStubGetParameter(struct CodecComponentTypeStub *stub, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubGetParameter(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
     uint32_t paramIndex = 0;
@@ -244,7 +135,7 @@ static int32_t SerStubGetParameter(struct CodecComponentTypeStub *stub, struct H
         }
     }
 
-    ret = stub->service.GetParameter(&stub->service, paramIndex, paramStruct, paramStructLen);
+    ret = serviceImpl->GetParameter(serviceImpl, paramIndex, paramStruct, paramStructLen);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call GetParameter function failed!", __func__);
         FreeMem(paramStruct, paramStructLen);
@@ -263,7 +154,7 @@ static int32_t SerStubGetParameter(struct CodecComponentTypeStub *stub, struct H
     return HDF_SUCCESS;
 }
 
-static int32_t SerStubSetParameter(struct CodecComponentTypeStub *stub, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubSetParameter(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
     uint32_t index = 0;
@@ -296,7 +187,7 @@ static int32_t SerStubSetParameter(struct CodecComponentTypeStub *stub, struct H
         }
     }
 
-    ret = stub->service.SetParameter(&stub->service, index, paramStruct, paramStructLen);
+    ret = serviceImpl->SetParameter(serviceImpl, index, paramStruct, paramStructLen);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call SetParameter function failed!", __func__);
         FreeMem(paramStruct, paramStructLen);
@@ -307,7 +198,7 @@ static int32_t SerStubSetParameter(struct CodecComponentTypeStub *stub, struct H
     return HDF_SUCCESS;
 }
 
-static int32_t SerStubGetConfig(struct CodecComponentTypeStub *stub, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubGetConfig(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
     uint32_t index = 0;
@@ -337,7 +228,7 @@ static int32_t SerStubGetConfig(struct CodecComponentTypeStub *stub, struct HdfS
         }
     }
 
-    ret = stub->service.GetConfig(&stub->service, index, cfgStruct, cfgStructLen);
+    ret = serviceImpl->GetConfig(serviceImpl, index, cfgStruct, cfgStructLen);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call GetConfig function failed!", __func__);
         FreeMem(cfgStruct, cfgStructLen);
@@ -356,7 +247,7 @@ static int32_t SerStubGetConfig(struct CodecComponentTypeStub *stub, struct HdfS
     return ret;
 }
 
-static int32_t SerStubSetConfig(struct CodecComponentTypeStub *stub, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubSetConfig(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
     uint32_t index = 0;
@@ -389,7 +280,7 @@ static int32_t SerStubSetConfig(struct CodecComponentTypeStub *stub, struct HdfS
         }
     }
 
-    ret = stub->service.SetConfig(&stub->service, index, cfgStruct, cfgStructLen);
+    ret = serviceImpl->SetConfig(serviceImpl, index, cfgStruct, cfgStructLen);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call SetConfig function failed!", __func__);
         FreeMem(cfgStruct, cfgStructLen);
@@ -400,8 +291,8 @@ static int32_t SerStubSetConfig(struct CodecComponentTypeStub *stub, struct HdfS
     return ret;
 }
 
-static int32_t SerStubGetExtensionIndex(struct CodecComponentTypeStub *stub,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubGetExtensionIndex(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
+                                        struct HdfSBuf *reply)
 {
     int32_t ret;
     char *paramName = NULL;
@@ -414,7 +305,7 @@ static int32_t SerStubGetExtensionIndex(struct CodecComponentTypeStub *stub,
     }
     paramName = strdup(paramNameCp);
 
-    ret = stub->service.GetExtensionIndex(&stub->service, paramName, &indexType);
+    ret = serviceImpl->GetExtensionIndex(serviceImpl, paramName, &indexType);
     if (paramName != NULL) {
         OsalMemFree(paramName);
         paramName = NULL;
@@ -432,12 +323,12 @@ static int32_t SerStubGetExtensionIndex(struct CodecComponentTypeStub *stub,
     return ret;
 }
 
-static int32_t SerStubGetState(struct CodecComponentTypeStub *stub, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubGetState(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
     enum OMX_STATETYPE state;
 
-    ret = stub->service.GetState(&stub->service, &state);
+    ret = serviceImpl->GetState(serviceImpl, &state);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call GetState function failed!", __func__);
         return ret;
@@ -451,8 +342,8 @@ static int32_t SerStubGetState(struct CodecComponentTypeStub *stub, struct HdfSB
     return ret;
 }
 
-static int32_t SerStubComponentTunnelRequest(struct CodecComponentTypeStub *stub,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubComponentTunnelRequest(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
+                                             struct HdfSBuf *reply)
 {
     int32_t ret;
     uint32_t port = 0;
@@ -480,7 +371,7 @@ static int32_t SerStubComponentTunnelRequest(struct CodecComponentTypeStub *stub
         return HDF_ERR_INVALID_PARAM;
     }
 
-    ret = stub->service.ComponentTunnelRequest(&stub->service, port, tunneledComp, tunneledPort, &tunnelSetup);
+    ret = serviceImpl->ComponentTunnelRequest(serviceImpl, port, tunneledComp, tunneledPort, &tunnelSetup);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call ComponentTunnelRequest function failed!", __func__);
         return ret;
@@ -494,7 +385,7 @@ static int32_t SerStubComponentTunnelRequest(struct CodecComponentTypeStub *stub
     return ret;
 }
 
-static int32_t SerStubUseBuffer(struct CodecComponentTypeStub *stub, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubUseBuffer(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
     struct OmxCodecBuffer buffer;
@@ -512,7 +403,7 @@ static int32_t SerStubUseBuffer(struct CodecComponentTypeStub *stub, struct HdfS
         return HDF_ERR_INVALID_PARAM;
     }
 
-    ret = stub->service.UseBuffer(&stub->service, portIndex, &buffer);
+    ret = serviceImpl->UseBuffer(serviceImpl, portIndex, &buffer);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call UseBuffer function failed!", __func__);
         ReleaseOmxCodecBuffer(&buffer);
@@ -528,8 +419,8 @@ static int32_t SerStubUseBuffer(struct CodecComponentTypeStub *stub, struct HdfS
     return ret;
 }
 
-static int32_t SerStubAllocateBuffer(struct CodecComponentTypeStub *stub,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubAllocateBuffer(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
+                                     struct HdfSBuf *reply)
 {
     int32_t ret;
     struct OmxCodecBuffer buffer;
@@ -546,8 +437,8 @@ static int32_t SerStubAllocateBuffer(struct CodecComponentTypeStub *stub,
         ReleaseOmxCodecBuffer(&buffer);
         return HDF_ERR_INVALID_PARAM;
     }
-    
-    ret = stub->service.AllocateBuffer(&stub->service, portIndex, &buffer);
+
+    ret = serviceImpl->AllocateBuffer(serviceImpl, portIndex, &buffer);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call AllocateBuffer function failed!", __func__);
         ReleaseOmxCodecBuffer(&buffer);
@@ -563,7 +454,7 @@ static int32_t SerStubAllocateBuffer(struct CodecComponentTypeStub *stub,
     return ret;
 }
 
-static int32_t SerStubFreeBuffer(struct CodecComponentTypeStub *stub, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubFreeBuffer(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
     uint32_t portIndex = 0;
@@ -580,7 +471,7 @@ static int32_t SerStubFreeBuffer(struct CodecComponentTypeStub *stub, struct Hdf
         return HDF_ERR_INVALID_PARAM;
     }
 
-    ret = stub->service.FreeBuffer(&stub->service, portIndex, &buffer);
+    ret = serviceImpl->FreeBuffer(serviceImpl, portIndex, &buffer);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call FreeBuffer function failed!", __func__);
         ReleaseOmxCodecBuffer(&buffer);
@@ -590,8 +481,8 @@ static int32_t SerStubFreeBuffer(struct CodecComponentTypeStub *stub, struct Hdf
     return ret;
 }
 
-static int32_t SerStubEmptyThisBuffer(struct CodecComponentTypeStub *stub,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubEmptyThisBuffer(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
+                                      struct HdfSBuf *reply)
 {
     int32_t ret;
     struct OmxCodecBuffer buffer;
@@ -602,7 +493,7 @@ static int32_t SerStubEmptyThisBuffer(struct CodecComponentTypeStub *stub,
         return HDF_ERR_INVALID_PARAM;
     }
 
-    ret = stub->service.EmptyThisBuffer(&stub->service, &buffer);
+    ret = serviceImpl->EmptyThisBuffer(serviceImpl, &buffer);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call EmptyThisBuffer function failed!", __func__);
         ReleaseOmxCodecBuffer(&buffer);
@@ -612,8 +503,8 @@ static int32_t SerStubEmptyThisBuffer(struct CodecComponentTypeStub *stub,
     return ret;
 }
 
-static int32_t SerStubFillThisBuffer(struct CodecComponentTypeStub *stub,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubFillThisBuffer(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
+                                     struct HdfSBuf *reply)
 {
     int32_t ret;
     struct OmxCodecBuffer buffer;
@@ -624,7 +515,7 @@ static int32_t SerStubFillThisBuffer(struct CodecComponentTypeStub *stub,
         return HDF_ERR_INVALID_PARAM;
     }
 
-    ret = stub->service.FillThisBuffer(&stub->service, &buffer);
+    ret = serviceImpl->FillThisBuffer(serviceImpl, &buffer);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call FillThisBuffer function failed!", __func__);
         ReleaseOmxCodecBuffer(&buffer);
@@ -634,12 +525,11 @@ static int32_t SerStubFillThisBuffer(struct CodecComponentTypeStub *stub,
     return ret;
 }
 
-static int32_t SerStubSetCallbacks(struct CodecComponentTypeStub *stub, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubSetCallbacks(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
-    struct CodecCallbackType* callback = NULL;
-    int8_t *appData = NULL;
-    uint32_t appDataLen = 0;
+    struct CodecCallbackType *callback = NULL;
+    int64_t appData = 0;
 
     struct HdfRemoteService *callbackRemote = HdfSbufReadRemoteService(data);
     if (callbackRemote == NULL) {
@@ -648,44 +538,25 @@ static int32_t SerStubSetCallbacks(struct CodecComponentTypeStub *stub, struct H
     }
     callback = CodecCallbackTypeGet(callbackRemote);
 
-    if (!HdfSbufReadUint32(data, &appDataLen)) {
+    if (!HdfSbufReadInt64(data, &appData)) {
         HDF_LOGE("%{public}s: read appData size failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (appDataLen > 0) {
-        appData = (int8_t*)OsalMemCalloc(sizeof(int8_t) * (appDataLen));
-        if (appData == NULL) {
-            HDF_LOGE("%{public}s: HDF_ERR_MALLOC_FAIL!", __func__);
-            return HDF_ERR_MALLOC_FAIL;
-        }
-
-        for (uint32_t i = 0; i < appDataLen; i++) {
-            if (!HdfSbufReadInt8(data, &appData[i])) {
-                HDF_LOGE("%{public}s: read &appData[i] failed!", __func__);
-                FreeMem(appData, appDataLen);
-                return HDF_ERR_INVALID_PARAM;
-            }
-        }
-    }
-
-    ret = stub->service.SetCallbacks(&stub->service, callback, appData, appDataLen);
+    ret = serviceImpl->SetCallbacks(serviceImpl, callback, appData);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call SetCallbacks function failed!", __func__);
-        FreeMem(appData, appDataLen);
         return ret;
     }
-
-    FreeMem(appData, appDataLen);
     return ret;
 }
 
-static int32_t SerStubComponentDeInit(struct CodecComponentTypeStub *stub,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubComponentDeInit(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
+                                      struct HdfSBuf *reply)
 {
     int32_t ret;
 
-    ret = stub->service.ComponentDeInit(&stub->service);
+    ret = serviceImpl->ComponentDeInit(serviceImpl);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call ComponentDeInit function failed!", __func__);
     }
@@ -693,7 +564,7 @@ static int32_t SerStubComponentDeInit(struct CodecComponentTypeStub *stub,
     return ret;
 }
 
-static int32_t SerStubUseEglImage(struct CodecComponentTypeStub *stub, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubUseEglImage(struct CodecComponentType *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
     struct OmxCodecBuffer buffer;
@@ -732,7 +603,7 @@ static int32_t SerStubUseEglImage(struct CodecComponentTypeStub *stub, struct Hd
         }
     }
 
-    ret = stub->service.UseEglImage(&stub->service, &buffer, portIndex, eglImage, eglImageLen);
+    ret = serviceImpl->UseEglImage(serviceImpl, &buffer, portIndex, eglImage, eglImageLen);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call UseEglImage function failed!", __func__);
         FreeMem(eglImage, eglImageLen);
@@ -749,8 +620,8 @@ static int32_t SerStubUseEglImage(struct CodecComponentTypeStub *stub, struct Hd
     return ret;
 }
 
-static int32_t SerStubComponentRoleEnum(struct CodecComponentTypeStub *stub,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerStubComponentRoleEnum(struct CodecComponentType *serviceImpl, struct HdfSBuf *data,
+                                        struct HdfSBuf *reply)
 {
     int32_t ret;
     uint8_t *role = NULL;
@@ -774,7 +645,7 @@ static int32_t SerStubComponentRoleEnum(struct CodecComponentTypeStub *stub,
         return HDF_ERR_INVALID_PARAM;
     }
 
-    ret = stub->service.ComponentRoleEnum(&stub->service, role, roleLen, index);
+    ret = serviceImpl->ComponentRoleEnum(serviceImpl, role, roleLen, index);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call ComponentRoleEnum function failed!", __func__);
         FreeMem((int8_t*)role, roleLen);
@@ -793,159 +664,96 @@ static int32_t SerStubComponentRoleEnum(struct CodecComponentTypeStub *stub,
     return ret;
 }
 
-static int32_t HandleComponentManagerCmd(struct CodecComponentTypeStub *stub,
-    int32_t cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
+int32_t CodecComponentTypeServiceOnRemoteRequest(struct HdfRemoteService *remote, int32_t cmdId, struct HdfSBuf *data,
+                                                 struct HdfSBuf *reply)
 {
-    switch (cmdId) {
-        case CMD_CODEC_GET_COMPONENT_NUM:
-            return SerStubGetComponentNum(stub, data, reply);
-        case CMD_CODEC_GET_COMPONENT_CAPABILITY_LIST:
-            return SerStubGetComponentCapablityList(stub, data, reply);
-        case CMD_CREATE_COMPONENT:
-            return SerStubCreateComponent(stub, data, reply);
-        case CMD_DESTROY_COMPONENT:
-            return SerStubDestroyComponent(stub, data, reply);
-        default:
-            HDF_LOGE("%{public}s: not support cmd %{public}d", __func__, cmdId);
-            return HDF_ERR_INVALID_PARAM;
-    }
-}
-
-static int32_t HandleComponentCmd(struct CodecComponentTypeStub *stub,
-    int32_t cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
-{
-    switch (cmdId) {
-        case CMD_GET_COMPONENT_VERSION:
-            return SerStubGetComponentVersion(stub, data, reply);
-        case CMD_SEND_COMMAND:
-            return SerStubSendCommand(stub, data, reply);
-        case CMD_GET_PARAMETER:
-            return SerStubGetParameter(stub, data, reply);
-        case CMD_SET_PARAMETER:
-            return SerStubSetParameter(stub, data, reply);
-        case CMD_GET_CONFIG:
-            return SerStubGetConfig(stub, data, reply);
-        case CMD_SET_CONFIG:
-            return SerStubSetConfig(stub, data, reply);
-        case CMD_GET_EXTENSION_INDEX:
-            return SerStubGetExtensionIndex(stub, data, reply);
-        case CMD_GET_STATE:
-            return SerStubGetState(stub, data, reply);
-        case CMD_COMPONENT_TUNNEL_REQUEST:
-            return SerStubComponentTunnelRequest(stub, data, reply);
-        case CMD_USE_BUFFER:
-            return SerStubUseBuffer(stub, data, reply);
-        case CMD_ALLOCATE_BUFFER:
-            return SerStubAllocateBuffer(stub, data, reply);
-        case CMD_FREE_BUFFER:
-            return SerStubFreeBuffer(stub, data, reply);
-        case CMD_EMPTY_THIS_BUFFER:
-            return SerStubEmptyThisBuffer(stub, data, reply);
-        case CMD_FILL_THIS_BUFFER:
-            return SerStubFillThisBuffer(stub, data, reply);
-        case CMD_SET_CALLBACKS:
-            return SerStubSetCallbacks(stub, data, reply);
-        case CMD_COMPONENT_DE_INIT:
-            return SerStubComponentDeInit(stub, data, reply);
-        case CMD_USE_EGL_IMAGE:
-            return SerStubUseEglImage(stub, data, reply);
-        case CMD_COMPONENT_ROLE_ENUM:
-            return SerStubComponentRoleEnum(stub, data, reply);
-        default:
-            HDF_LOGE("%{public}s: not support cmd %{public}d", __func__, cmdId);
-            return HDF_ERR_INVALID_PARAM;
-    }
-}
-
-int32_t CodecComponentTypeServiceOnRemoteRequest(struct CodecComponentTypeStub *service,
-    int32_t cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
-{
-    if (!HdfDeviceObjectCheckInterfaceDesc(service->device, data)) {
-        HDF_LOGE("%{public}s: check interface token failed!", __func__);
+    struct CodecComponentType *serviceImpl = (struct CodecComponentType *)remote;
+    if (!HdfRemoteServiceCheckInterfaceToken(serviceImpl->AsObject(serviceImpl), data)) {
+        HDF_LOGE("%{public}s: interface token check failed", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    
+
     switch (cmdId) {
-        case CMD_CODEC_GET_COMPONENT_NUM:
-        case CMD_CODEC_GET_COMPONENT_CAPABILITY_LIST:
-        case CMD_CREATE_COMPONENT:
-        case CMD_DESTROY_COMPONENT:
-            return HandleComponentManagerCmd(service, cmdId, data, reply);
         case CMD_GET_COMPONENT_VERSION:
+            return SerStubGetComponentVersion(serviceImpl, data, reply);
         case CMD_SEND_COMMAND:
+            return SerStubSendCommand(serviceImpl, data, reply);
         case CMD_GET_PARAMETER:
+            return SerStubGetParameter(serviceImpl, data, reply);
         case CMD_SET_PARAMETER:
+            return SerStubSetParameter(serviceImpl, data, reply);
         case CMD_GET_CONFIG:
+            return SerStubGetConfig(serviceImpl, data, reply);
         case CMD_SET_CONFIG:
+            return SerStubSetConfig(serviceImpl, data, reply);
         case CMD_GET_EXTENSION_INDEX:
+            return SerStubGetExtensionIndex(serviceImpl, data, reply);
         case CMD_GET_STATE:
+            return SerStubGetState(serviceImpl, data, reply);
         case CMD_COMPONENT_TUNNEL_REQUEST:
+            return SerStubComponentTunnelRequest(serviceImpl, data, reply);
         case CMD_USE_BUFFER:
+            return SerStubUseBuffer(serviceImpl, data, reply);
         case CMD_ALLOCATE_BUFFER:
+            return SerStubAllocateBuffer(serviceImpl, data, reply);
         case CMD_FREE_BUFFER:
+            return SerStubFreeBuffer(serviceImpl, data, reply);
         case CMD_EMPTY_THIS_BUFFER:
+            return SerStubEmptyThisBuffer(serviceImpl, data, reply);
         case CMD_FILL_THIS_BUFFER:
+            return SerStubFillThisBuffer(serviceImpl, data, reply);
         case CMD_SET_CALLBACKS:
+            return SerStubSetCallbacks(serviceImpl, data, reply);
         case CMD_COMPONENT_DE_INIT:
+            return SerStubComponentDeInit(serviceImpl, data, reply);
         case CMD_USE_EGL_IMAGE:
+            return SerStubUseEglImage(serviceImpl, data, reply);
         case CMD_COMPONENT_ROLE_ENUM:
-            return HandleComponentCmd(service, cmdId, data, reply);
+            return SerStubComponentRoleEnum(serviceImpl, data, reply);
         default:
             HDF_LOGE("%{public}s: not support cmd %{public}d", __func__, cmdId);
             return HDF_ERR_INVALID_PARAM;
     }
 }
 
-static void *LoadServiceHandler(void)
+static struct HdfRemoteService *CodecComponentTypeAsObject(struct CodecComponentType *self)
 {
-    char *libPath = NULL;
-    void *handler = NULL;
-
-    libPath = HDF_LIBRARY_FULL_PATH(CODEC_SERVICE_IMPL);
-    handler = dlopen(libPath, RTLD_LAZY);
-    if (handler == NULL) {
-        HDF_LOGE("%{public}s: dlopen failed %{public}s", __func__, dlerror());
+    if (self == NULL) {
         return NULL;
     }
-
-    return handler;
+    struct CodecComponentTypeStub *stub = CONTAINER_OF(self, struct CodecComponentTypeStub, interface);
+    return stub->remote;
 }
 
-struct CodecComponentTypeStub *CodecComponentTypeStubGetInstance(void)
+bool CodecComponentTypeStubConstruct(struct CodecComponentTypeStub *stub)
 {
-    SERVICE_CONSTRUCT_FUNC serviceConstructFunc = NULL;
-    struct CodecComponentTypeStub *stub
-        = (struct CodecComponentTypeStub *)OsalMemAlloc(sizeof(struct CodecComponentTypeStub));
     if (stub == NULL) {
-        HDF_LOGE("%{public}s: OsalMemAlloc obj failed!", __func__);
-        return NULL;
+        HDF_LOGE("%{public}s: stub is null!", __func__);
+        return false;
     }
 
-    stub->dlHandler = LoadServiceHandler();
-    if (stub->dlHandler == NULL) {
-        HDF_LOGE("%{public}s: stub->dlHanlder is null", __func__);
-        OsalMemFree(stub);
-        return NULL;
+    stub->dispatcher.Dispatch = CodecComponentTypeServiceOnRemoteRequest;
+    stub->remote = HdfRemoteServiceObtain((struct HdfObject *)stub, &(stub->dispatcher));
+    if (stub->remote == NULL) {
+        HDF_LOGE("%{public}s: stub->remote is null", __func__);
+        return false;
     }
 
-    serviceConstructFunc = (SERVICE_CONSTRUCT_FUNC)dlsym(stub->dlHandler, "CodecComponentTypeServiceConstruct");
-    if (serviceConstructFunc == NULL) {
-        HDF_LOGE("%{public}s: dlsym failed %{public}s", __func__, dlerror());
-        dlclose(stub->dlHandler);
-        OsalMemFree(stub);
-        return NULL;
+    if (!HdfRemoteServiceSetInterfaceDesc(stub->remote, CODEC_COMPONENT_INTERFACE_DESC)) {
+        HDF_LOGE("%{public}s: failed to set remote service interface descriptor", __func__);
+        CodecComponentTypeStubRelease(stub);
+        return false;
     }
 
-    serviceConstructFunc(&stub->managerService, &stub->service);
-    return stub;
+    stub->interface.AsObject = CodecComponentTypeAsObject;
+    return true;
 }
 
-void CodecComponentTypeStubRelease(struct CodecComponentTypeStub *instance)
+void CodecComponentTypeStubRelease(struct CodecComponentTypeStub *stub)
 {
-    if (instance == NULL) {
+    if (stub == NULL) {
         return;
     }
-
-    dlclose(instance->dlHandler);
-    OsalMemFree(instance);
+    HdfRemoteServiceRecycle(stub->remote);
+    stub->remote = NULL;
 }

@@ -65,16 +65,9 @@ OMX_ERRORTYPE ComponentNode::OnFillBufferDone(OMX_HANDLETYPE component, void *ap
 OMX_CALLBACKTYPE ComponentNode::callbacks_ = {&ComponentNode::OnEvent, &ComponentNode::OnEmptyBufferDone,
                                               &ComponentNode::OnFillBufferDone};
 
-ComponentNode::ComponentNode(struct CodecCallbackType *callback, int8_t *appData, int32_t appDataLen)
+ComponentNode::ComponentNode(struct CodecCallbackType *callback, int64_t appData)
 {
-    if (appData != nullptr && appDataLen != 0) {
-        appData_ = (int8_t *)OsalMemCalloc(sizeof(int8_t) * appDataLen);
-        (void)memcpy_s(appData_, appDataLen, appData, appDataLen);
-        appDataSize_ = appDataLen;
-    } else {
-        appData_ = nullptr;
-        appDataSize_ = 0;
-    }
+    appData_ = appData;
     comp_ = nullptr;
     codecBufferMap_.clear();
     bufferHeaderMap_.clear();
@@ -84,12 +77,6 @@ ComponentNode::ComponentNode(struct CodecCallbackType *callback, int8_t *appData
 
 ComponentNode::~ComponentNode()
 {
-    if (appData_ != nullptr) {
-        OsalMemFree(appData_);
-        appData_ = nullptr;
-        appDataSize_ = 0;
-    }
-
     if (omxCallback_ != nullptr) {
         OsalMemFree(omxCallback_);
         omxCallback_ = nullptr;
@@ -196,25 +183,15 @@ int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTy
     return comType->ComponentTunnelRequest(comp_, port, (OMX_HANDLETYPE)tunneledComp, tunneledPort, tunnelSetup);
 }
 
-int32_t ComponentNode::SetCallbacks(struct CodecCallbackType *omxCallback, int8_t *appData, uint32_t appDataLen)
+int32_t ComponentNode::SetCallbacks(struct CodecCallbackType *omxCallback, int64_t appData)
 {
     // release this->omxCallback_
     if (this->omxCallback_ != nullptr) {
         OsalMemFree(this->omxCallback_);
         this->omxCallback_ = nullptr;
     }
-
     this->omxCallback_ = omxCallback;
-
-    if (this->appData_ != nullptr) {
-        OsalMemFree(this->appData_);
-        this->appData_ = nullptr;
-    }
-    if ((appData != nullptr) && appDataLen != 0) {
-        this->appData_ = (int8_t *)OsalMemCalloc(sizeof(int8_t) * appDataLen);
-        (void)memcpy_s(this->appData_, appDataLen, appData, appDataLen);
-    }
-    this->appDataSize_ = appDataLen;
+    this->appData_ = appData;
     return OMX_ErrorNone;
 }
 
@@ -268,14 +245,11 @@ int32_t ComponentNode::OnEvent(OMX_EVENTTYPE event, uint32_t data1, uint32_t dat
         return OMX_ErrorNone;
     }
 
-    struct EventInfo info = {
-        .appData = nullptr, .appDataLen = 0, .data1 = 0, .data2 = 0, .eventData = nullptr, .eventDataLen = 0};
-    info.appData = appData_;
-    info.appDataLen = appDataSize_;
-    info.data1 = data1;
-    info.data2 = data2;
-    info.eventData = static_cast<int8_t *>(eventData);
-    info.eventDataLen = 0;
+    struct EventInfo info = {.appData = appData_,
+                             .data1 = data1,
+                             .data2 = data2,
+                             .eventData = static_cast<int8_t *>(eventData),
+                             .eventDataLen = 0};
     (void)omxCallback_->EventHandler(omxCallback_, event, &info);
 
     return OMX_ErrorNone;
@@ -293,7 +267,7 @@ int32_t ComponentNode::OnEmptyBufferDone(OMX_BUFFERHEADERTYPE *buffer)
         return OMX_ErrorNone;
     }
     struct OmxCodecBuffer &codecOmxBuffer = codecBuffer->GetCodecBuffer();
-    (void)omxCallback_->EmptyBufferDone(omxCallback_, appData_, appDataSize_, &codecOmxBuffer);
+    (void)omxCallback_->EmptyBufferDone(omxCallback_, appData_, &codecOmxBuffer);
     return OMX_ErrorNone;
 }
 
@@ -311,7 +285,7 @@ int32_t ComponentNode::OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer)
     }
 
     struct OmxCodecBuffer &codecOmxBuffer = codecBuffer->GetCodecBuffer();
-    (void)omxCallback_->FillBufferDone(omxCallback_, appData_, appDataSize_, &codecOmxBuffer);
+    (void)omxCallback_->FillBufferDone(omxCallback_, appData_, &codecOmxBuffer);
     return OMX_ErrorNone;
 }
 
