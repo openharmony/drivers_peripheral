@@ -17,10 +17,11 @@
 #include <hdf_log.h>
 #include <osal_mem.h>
 #include "codec_callback_proxy.h"
+#include "codec_config_parser.h"
 #include "codec_interface.h"
+#include "codec_service.h"
 #include "icodec.h"
 #include "stub_msgproc.h"
-#include "codec_service.h"
 
 #define HDF_LOG_TAG codec_hdi_stub
 #define HDF_CODEC_NAME_LEN 50
@@ -52,35 +53,42 @@ static int32_t SerCodecDeinit(struct HdfDeviceIoClient *client, struct HdfSBuf *
     }
     return errNum;
 }
+
 static int32_t SerCodecEnumerateCapbility(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
-                                          struct HdfSBuf *reply)
+    struct HdfSBuf *reply)
 {
     uint32_t index;
     CodecCapbility capbility;
 
-    if (!HdfSbufReadUint32(data, (uint32_t *)&index)) {
-        HDF_LOGE("%{public}s: read index data failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+    if (!HdfSbufReadUint32(data, &index)) {
+        HDF_LOGE("%{public}s: read index failed!", __func__);
+        return HDF_FAILURE;
     }
-    int32_t errNum = HDF_SUCCESS;
-    if (errNum != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call CodecEnumerateCapbility fuc failed!", __func__);
-        return errNum;
+    if (!CodecCapablitesInited()) {
+        HDF_LOGE("%{public}s: codec capablities not inited!", __func__);
+        return HDF_FAILURE;
+    }
+    if (CodecEnumerateCapbility(index, &capbility) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: EnumrateCapablity - no more capability to Enumrate!", __func__);
+        return HDF_FAILURE;
+    }
+    if (capbility.mime == MEDIA_MIMETYPE_INVALID) {
+        HDF_LOGE("%{public}s: Capablity invalid, discard!", __func__);
+        return HDF_FAILURE;
     }
     if (CodecSerPackCapbility(reply, &capbility) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: write capbility failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s: write capbility to sbuf failed!", __func__);
+        return HDF_FAILURE;
     }
-    return errNum;
+    return HDF_SUCCESS;
 }
 
 static int32_t SerCodecGetCapbility(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     uint32_t flags;
-    int32_t errNum;
     AvCodecMime mime;
     CodecType type;
-    CodecCapbility cap;
+    CodecCapbility capbility;
 
     if (!HdfSbufReadUint32(data, (uint32_t*)&mime)) {
         HDF_LOGE("%{public}s: read input mime failed!", __func__);
@@ -94,16 +102,15 @@ static int32_t SerCodecGetCapbility(struct HdfDeviceIoClient *client, struct Hdf
         HDF_LOGE("%{public}s: read input flags failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    errNum = CodecGetCapbility(mime, type, flags, &cap);
-    if (errNum != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call CodecGetCapbility fuc failed!", __func__);
-        return errNum;
+    if (CodecGetCapbility(mime, type, flags, &capbility) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: GetCapability - got nothing!", __func__);
+        return HDF_FAILURE;
     }
-    if (CodecSerPackCapbility(reply, &cap) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: write cap failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+    if (CodecSerPackCapbility(reply, &capbility) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write capbility to sbuf failed!", __func__);
+        return HDF_FAILURE;
     }
-    return errNum;
+    return HDF_SUCCESS;
 }
 
 static int32_t SerCodecCreate(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
@@ -553,6 +560,11 @@ int32_t CodecServiceOnRemoteRequest(struct HdfDeviceIoClient *client, int cmdId,
     if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
         HDF_LOGE("check interface token failed");
         return HDF_ERR_INVALID_PARAM;
+    }
+    if ((cmdId == CMD_CODEC_ENUM_CAP) || (cmdId == CMD_CODEC_GET_CAP)) {
+        if (!CodecCapablitesInited()) {
+            ReloadCapabilities();
+        }
     }
     switch (cmdId) {
         case CMD_CODEC_INIT:
