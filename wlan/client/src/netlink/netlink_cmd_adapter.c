@@ -871,6 +871,11 @@ int32_t GetValidFreqByBand(const char *ifName, int32_t band, struct FreqInfoResu
         return RET_CODE_INVALID_PARAM;
     }
 
+    if (band >= IEEE80211_NUM_BANDS) {
+        HILOG_ERROR(LOG_DOMAIN, "%s:  Invalid input parameter, band = %d", __FUNCTION__, band);
+        return RET_CODE_INVALID_PARAM;
+    }
+
     ifaceId = if_nametoindex(ifName);
     if (ifaceId == 0) {
         HILOG_ERROR(LOG_DOMAIN, "%s: get iface id(%d) failed", __FUNCTION__, ifaceId);
@@ -1060,10 +1065,13 @@ int32_t AcquireChipId(const char *ifName, uint8_t *chipId)
 
 int32_t GetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num)
 {
-    (void)chipId;
-
     if (ifNames == NULL || num == NULL) {
         HILOG_ERROR(LOG_DOMAIN, "%s params is NULL", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
+    }
+
+    if (chipId >= MAX_WLAN_DEVICE) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: chipId = %d", __FUNCTION__, chipId);
         return RET_CODE_INVALID_PARAM;
     }
     *num = 1;
