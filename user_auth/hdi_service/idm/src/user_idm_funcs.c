@@ -98,23 +98,18 @@ static int32_t GetIsPinUpdate(int32_t userId, bool *isUpdate)
     return ret;
 }
 
-int32_t CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleId)
+static int32_t CheckEnrollToken(PermissionCheckParam param, bool *isUpdate)
 {
-    if (scheduleId == NULL) {
-        LOG_ERROR("scheduleId is null");
-        return RESULT_BAD_PARAM;
-    }
-
-    UserAuthTokenHal *authToken = (UserAuthTokenHal *)param.token;
     int32_t ret;
-    bool isUpdate = false;
+    *isUpdate = false;
+    UserAuthTokenHal *authToken = (UserAuthTokenHal *)param.token;
     if (param.authType == PIN_AUTH) {
-        ret = GetIsPinUpdate(param.userId, &isUpdate);
+        ret = GetIsPinUpdate(param.userId, isUpdate);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("get isUpdate failed");
             return ret;
         }
-        if (isUpdate) {
+        if (*isUpdate) {
             ret = CheckPinPermission(param.userId, authToken);
         }
     } else if (param.authType == FACE_AUTH) {
@@ -123,12 +118,28 @@ int32_t CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleId)
         LOG_ERROR("AuthType is invalid");
         ret = RESULT_BAD_MATCH;
     }
+    return ret;
+}
+
+int32_t CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleId)
+{
+    if (scheduleId == NULL) {
+        LOG_ERROR("scheduleId is null");
+        return RESULT_BAD_PARAM;
+    }
+
+    bool isUpdate;
+    int32_t ret = CheckEnrollToken(param, &isUpdate);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("permission check failed");
+        LOG_ERROR("CheckEnrollToken failed");
         return ret;
     }
     uint64_t challenge;
     ret = GetChallenge(&challenge);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("GetChallenge failed");
+        return ret;
+    }
     CoAuthSchedule *enrollSchedule = GenerateIdmSchedule(challenge, param.authType, param.authSubType);
     if (enrollSchedule == NULL) {
         LOG_ERROR("enrollSchedule malloc failed");
