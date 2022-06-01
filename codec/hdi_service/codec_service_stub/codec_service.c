@@ -21,10 +21,15 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include "ashmem_wrapper.h"
+#include "codec_config_parser.h"
 #include "hdf_log.h"
 #include "osal_mem.h"
 
 #define HDF_LOG_TAG codec_hdi_service
+#define VIDEO_HARDWARE_ENCODER_INDEX 0
+#define VIDEO_HARDWARE_DECODER_INDEX 1
+#define AUDIO_HARDWARE_ENCODER_INDEX 4
+#define AUDIO_HARDWARE_DECODER_INDEX 5
 
 struct CodecInstance *g_codecInstance = NULL;
 
@@ -191,12 +196,54 @@ int32_t CodecDeinit()
 
 int32_t CodecEnumerateCapbility(uint32_t index, CodecCapbility *cap)
 {
-    return HDF_SUCCESS;
+    int32_t loopIndex;
+    uint32_t cursor = index;
+    CodecCapablityGroup *group = NULL;
+    for (loopIndex = 0; loopIndex < CODEC_CAPABLITY_GROUP_NUM; loopIndex++) {
+        group = GetCapablityGroup(loopIndex);
+        if (group == NULL) {
+            continue;
+        }
+        if (cursor + 1 <= (uint32_t)group->num) {
+            *cap = group->capablitis[cursor];
+            return HDF_SUCCESS;
+        } else {
+            cursor -= group->num;
+        }
+    }
+
+    return HDF_FAILURE;
 }
 
 int32_t CodecGetCapbility(AvCodecMime mime, CodecType type, uint32_t flags, CodecCapbility *cap)
 {
-    return HDF_SUCCESS;
+    int32_t groupIndex;
+    int32_t capIndex;
+    CodecCapablityGroup *group = NULL;
+    CodecCapbility *capItem;
+    bool inputHardwareFlag = flags == 0;
+
+    for (groupIndex = 0; groupIndex < CODEC_CAPABLITY_GROUP_NUM; groupIndex++) {
+        group = GetCapablityGroup(groupIndex);
+        if (group == NULL) {
+            continue;
+        }
+        bool curHardwareFlag = (groupIndex == VIDEO_HARDWARE_ENCODER_INDEX)
+            || (groupIndex == VIDEO_HARDWARE_DECODER_INDEX) || (groupIndex == AUDIO_HARDWARE_ENCODER_INDEX)
+            || (groupIndex == AUDIO_HARDWARE_DECODER_INDEX);
+        if (inputHardwareFlag != curHardwareFlag) {
+            continue;
+        }
+        for (capIndex = 0; capIndex < group->num; capIndex++) {
+            capItem = &group->capablitis[capIndex];
+            if (mime == capItem->mime && type == capItem->type) {
+                *cap = group->capablitis[capIndex];
+                return HDF_SUCCESS;
+            }
+        }
+    }
+
+    return HDF_FAILURE;
 }
 
 int32_t CodecCreate(const char* name, const Param *attr, int32_t len, CODEC_HANDLETYPE *handle)

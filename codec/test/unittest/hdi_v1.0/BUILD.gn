@@ -21,15 +21,9 @@ ohos_unittest("codec_hdi_1.0_test") {
     "//drivers/peripheral/codec/interfaces/include/",
     "//drivers/peripheral/codec/hdi_service/codec_proxy/",
     "//drivers/peripheral/codec/hdi_service/codec_service_stub/",
-    "//drivers/peripheral/codec/hal/config/capability_config/include",
-    "//drivers/peripheral/codec/hal/config/common/include",
     "//drivers/peripheral/codec/hal/v1.0/share_mem/include",
   ]
-  sources = [
-    "//drivers/peripheral/codec/hal/config/capability_config/src/codec_config_reader.c",
-    "//drivers/peripheral/codec/hal/config/common/src/codec_utils.c",
-    "codec_proxy_test.cpp",
-  ]
+  sources = [ "codec_proxy_test.cpp" ]
 
   cflags = [
     "-Wall",
