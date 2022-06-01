@@ -19,22 +19,21 @@
 
 #define HDF_LOG_TAG codec_hdi_cb_server
 
-int32_t CodecCallbackTypeEventHandler(struct CodecCallbackType *self, enum OMX_EVENTTYPE eEvent,
-    struct EventInfo *info)
+int32_t CodecCallbackTypeEventHandler(struct CodecCallbackType *self, enum OMX_EVENTTYPE eEvent, struct EventInfo *info)
 {
     HDF_LOGI("%{public}s, callback service impl", __func__);
     return HDF_SUCCESS;
 }
 
-int32_t CodecCallbackTypeEmptyBufferDone(struct CodecCallbackType *self,
-    int8_t *appData, uint32_t appDataLen, const struct OmxCodecBuffer *buffer)
+int32_t CodecCallbackTypeEmptyBufferDone(struct CodecCallbackType *self, int64_t appData,
+                                         const struct OmxCodecBuffer *buffer)
 {
     HDF_LOGI("%{public}s, callback service impl", __func__);
     return HDF_SUCCESS;
 }
 
-int32_t CodecCallbackTypeFillBufferDone(struct CodecCallbackType *self,
-    int8_t* appData, uint32_t appDataLen, struct OmxCodecBuffer *buffer)
+int32_t CodecCallbackTypeFillBufferDone(struct CodecCallbackType *self, int64_t appData,
+                                        const struct OmxCodecBuffer *buffer)
 {
     HDF_LOGI("%{public}s, callback service impl", __func__);
     return HDF_SUCCESS;

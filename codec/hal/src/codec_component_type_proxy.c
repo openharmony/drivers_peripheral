@@ -39,33 +39,17 @@ static void ReleaseSbuf(struct HdfSBuf *data, struct HdfSBuf *reply)
     }
 }
 
-static int32_t WriteInterfaceToken(struct CodecComponentType *self, struct HdfSBuf *data)
-{
-    struct CodecComponentTypeProxy *proxy = CONTAINER_OF(self, struct CodecComponentTypeProxy, instance);
-    if (proxy == NULL) {
-        HDF_LOGE("%{public}s: proxy is null", __func__);
-        return HDF_FAILURE;
-    }
-    if (!HdfRemoteServiceWriteInterfaceToken(proxy->remote, data)) {
-        return HDF_FAILURE;
-    }
-
-    return HDF_SUCCESS;
-}
-
 static int32_t CodecComponentTypeProxyCall(struct CodecComponentType *self, int32_t id, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
-    struct CodecComponentTypeProxy *proxy = CONTAINER_OF(self, struct CodecComponentTypeProxy, instance);
-    if (proxy->remote == NULL ||
-        proxy->remote->dispatcher == NULL ||
-        proxy->remote->dispatcher->Dispatch == NULL) {
-        HDF_LOGE("%{public}s: obj is null", __func__);
+    struct HdfRemoteService *remote = self->AsObject(self);
+    if (remote == NULL || remote->dispatcher == NULL || remote->dispatcher->Dispatch == NULL ||
+        remote->dispatcher->DispatchAsync == NULL) {
+        HDF_LOGE("%{public}s: Invalid HdfRemoteService obj", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
-    return proxy->remote->dispatcher->Dispatch(proxy->remote, id, data, reply);
+    return remote->dispatcher->Dispatch(remote, id, data, reply);
 }
-
 static int32_t ReadValuesForGetComponentVersion(struct HdfSBuf *reply, struct CompVerInfo *verInfo)
 {
     int32_t ret;
@@ -94,7 +78,7 @@ static int32_t CodecComponentTypeProxyGetComponentVersion(struct CodecComponentT
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -125,7 +109,7 @@ static int32_t CodecComponentTypeProxySendCommand(struct CodecComponentType *sel
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -180,7 +164,7 @@ static int32_t CodecComponentTypeProxyGetParameter(struct CodecComponentType *se
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -238,7 +222,7 @@ static int32_t CodecComponentTypeProxySetParameter(struct CodecComponentType *se
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -287,7 +271,7 @@ static int32_t CodecComponentTypeProxyGetConfig(struct CodecComponentType *self,
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -345,7 +329,7 @@ static int32_t CodecComponentTypeProxySetConfig(struct CodecComponentType *self,
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -394,7 +378,7 @@ static int32_t CodecComponentTypeProxyGetExtensionIndex(struct CodecComponentTyp
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -436,7 +420,7 @@ static int32_t CodecComponentTypeProxyGetState(struct CodecComponentType *self,
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -472,7 +456,7 @@ static int32_t CodecComponentTypeProxyComponentTunnelRequest(struct CodecCompone
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -532,7 +516,7 @@ static int32_t CodecComponentTypeProxyUseBuffer(struct CodecComponentType *self,
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -580,7 +564,7 @@ static int32_t CodecComponentTypeProxyAllocateBuffer(struct CodecComponentType *
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -628,7 +612,7 @@ static int32_t CodecComponentTypeProxyFreeBuffer(struct CodecComponentType *self
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -670,7 +654,7 @@ static int32_t CodecComponentTypeProxyEmptyThisBuffer(struct CodecComponentType 
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -706,7 +690,7 @@ static int32_t CodecComponentTypeProxyFillThisBuffer(struct CodecComponentType *
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -730,7 +714,7 @@ static int32_t CodecComponentTypeProxyFillThisBuffer(struct CodecComponentType *
 }
 
 static int32_t CodecComponentTypeProxySetCallbacks(struct CodecComponentType *self,
-    struct CodecCallbackType *callback, int8_t *appData, uint32_t appDataLen)
+    struct CodecCallbackType *callback, int64_t appData)
 {
     int32_t ret;
 
@@ -742,7 +726,7 @@ static int32_t CodecComponentTypeProxySetCallbacks(struct CodecComponentType *se
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -754,17 +738,10 @@ static int32_t CodecComponentTypeProxySetCallbacks(struct CodecComponentType *se
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (!HdfSbufWriteUint32(data, appDataLen)) {
+    if (!HdfSbufWriteInt64(data, appData)) {
         HDF_LOGE("%{public}s: write appData failed!", __func__);
         ReleaseSbuf(data, reply);
         return HDF_ERR_INVALID_PARAM;
-    }
-    for (uint32_t i = 0; i < appDataLen; i++) {
-        if (!HdfSbufWriteInt8(data, appData[i])) {
-            HDF_LOGE("%{public}s: write appData[i] failed!", __func__);
-            ReleaseSbuf(data, reply);
-            return HDF_ERR_INVALID_PARAM;
-        }
     }
 
     ret = CodecComponentTypeProxyCall(self, CMD_SET_CALLBACKS, data, reply);
@@ -790,7 +767,7 @@ static int32_t CodecComponentTypeProxyComponentDeInit(struct CodecComponentType 
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -820,7 +797,7 @@ static int32_t CodecComponentTypeProxyUseEglImage(struct CodecComponentType *sel
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -881,7 +858,7 @@ static int32_t CodecComponentTypeProxyComponentRoleEnum(struct CodecComponentTyp
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    if (WriteInterfaceToken(self, data) != HDF_SUCCESS) {
+    if (!HdfRemoteServiceWriteInterfaceToken(self->AsObject(self), data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
@@ -918,6 +895,15 @@ static int32_t CodecComponentTypeProxyComponentRoleEnum(struct CodecComponentTyp
     return ret;
 }
 
+static struct HdfRemoteService *CodecComponentTypeProxyAsObject(struct CodecComponentType *self)
+{
+    if (self == NULL) {
+        return NULL;
+    }
+    struct CodecComponentTypeProxy *proxy = CONTAINER_OF(self, struct CodecComponentTypeProxy, instance);
+    return proxy->remote;
+}
+
 static void CodecComponentTypeProxyConstruct(struct CodecComponentType *instance)
 {
     instance->GetComponentVersion = CodecComponentTypeProxyGetComponentVersion;
@@ -938,12 +924,23 @@ static void CodecComponentTypeProxyConstruct(struct CodecComponentType *instance
     instance->ComponentDeInit = CodecComponentTypeProxyComponentDeInit;
     instance->UseEglImage = CodecComponentTypeProxyUseEglImage;
     instance->ComponentRoleEnum = CodecComponentTypeProxyComponentRoleEnum;
+    instance->AsObject = CodecComponentTypeProxyAsObject;
 }
 
 struct CodecComponentType *CodecComponentTypeGet(struct HdfRemoteService *remote)
 {
-    struct CodecComponentTypeProxy *proxy
-        = (struct CodecComponentTypeProxy *)OsalMemAlloc(sizeof(struct CodecComponentTypeProxy));
+    if (remote == NULL) {
+        HDF_LOGE("%{public}s: remote is null", __func__);
+        return NULL;
+    }
+
+    if (!HdfRemoteServiceSetInterfaceDesc(remote, CODEC_COMPONENT_INTERFACE_DESC)) {
+        HDF_LOGE("%{public}s: set interface token failed!", __func__);
+        HdfRemoteServiceRecycle(remote);
+        return NULL;
+    }
+    struct CodecComponentTypeProxy *proxy =
+        (struct CodecComponentTypeProxy *)OsalMemAlloc(sizeof(struct CodecComponentTypeProxy));
     if (proxy == NULL) {
         HDF_LOGE("%{public}s: malloc CodecComponentType proxy failed!", __func__);
         HdfRemoteServiceRecycle(remote);

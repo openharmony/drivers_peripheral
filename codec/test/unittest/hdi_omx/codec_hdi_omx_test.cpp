@@ -39,11 +39,13 @@ using namespace testing::ext;
 namespace {
 struct CodecComponentManager *g_manager = nullptr;
 struct CodecComponentType *g_component = nullptr;
+uint32_t g_compoentId = 0;
 struct CodecCallbackType *g_callback = nullptr;
 int32_t g_count = 0;
 
 #ifdef RK
-#define COMPONENT_NAME "OMX.rk.video_encoder.avc"
+#define COMPONENT_NAME        "OMX.rk.video_encoder.avc"
+#define COMPOENT_DECODER_NAME "OMX.rk.video_decoder.avc"
 #endif
 
 constexpr int32_t INT_TO_STR_LEN = 32;
@@ -57,6 +59,7 @@ constexpr int32_t BUFFER_SIZE = 640 * 480 * 3;
 constexpr int32_t ROLE_LEN = 240;
 constexpr int32_t FRAMERATE = 30 << 16;
 constexpr uint32_t BUFFER_ID_ERROR = 65000;
+constexpr int64_t APP_DATA = 64;
 enum class PortIndex { PORT_INDEX_INPUT = 0, PORT_INDEX_OUTPUT = 1 };
 
 template <typename T>
@@ -285,7 +288,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiCreateComponentTest_001, TestSize.Level1)
     ASSERT_TRUE(g_manager != nullptr);
     ASSERT_TRUE(g_callback != nullptr);
     char name[] = "test";
-    int32_t ret = g_manager->CreateComponent(&g_component, (char *)name, nullptr, 0, g_callback);
+    int32_t ret = g_manager->CreateComponent(&g_component, &g_compoentId, (char *)name, APP_DATA, g_callback);
     ASSERT_NE(ret, HDF_SUCCESS);
     ASSERT_TRUE(g_component == nullptr);
 }
@@ -294,7 +297,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiCreateComponentTest_002, TestSize.Level1)
 {
     ASSERT_TRUE(g_manager != nullptr);
     ASSERT_TRUE(g_callback != nullptr);
-    int32_t ret = g_manager->CreateComponent(&g_component, nullptr, nullptr, 0, g_callback);
+    int32_t ret = g_manager->CreateComponent(&g_component, &g_compoentId, nullptr, APP_DATA, g_callback);
     ASSERT_NE(ret, HDF_SUCCESS);
     ASSERT_TRUE(g_component == nullptr);
 }
@@ -302,14 +305,31 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiCreateComponentTest_002, TestSize.Level1)
 #ifdef COMPONENT_NAME
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiCreateComponentTest_003, TestSize.Level1)
 {
-    const int32_t testingAppData = 33;
     ASSERT_TRUE(g_manager != nullptr);
     ASSERT_TRUE(g_callback != nullptr);
-    int32_t appData = testingAppData;
-    int32_t ret = g_manager->CreateComponent(&g_component, const_cast<char *>(COMPONENT_NAME), &appData,
-                                             sizeof(appData), g_callback);
+    int32_t ret = g_manager->CreateComponent(&g_component, &g_compoentId, const_cast<char *>(COMPONENT_NAME), APP_DATA,
+                                             g_callback);
     ASSERT_EQ(ret, HDF_SUCCESS);
     ASSERT_TRUE(g_component != nullptr);
+}
+
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiCreateComponentTest_004, TestSize.Level1)
+{
+    ASSERT_TRUE(g_manager != nullptr);
+    struct CodecCallbackType *callback = CodecCallbackTypeStubGetInstance();
+    ASSERT_TRUE(callback != nullptr);
+    struct CodecComponentType *component = nullptr;
+    uint32_t compoentId = 0;
+    int32_t ret = g_manager->CreateComponent(&component, &compoentId, const_cast<char *>(COMPOENT_DECODER_NAME),
+                                             APP_DATA, callback);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    ASSERT_TRUE(component != nullptr);
+    ret = g_manager->DestoryComponent(compoentId);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    CodecComponentTypeRelease(component);
+    component = nullptr;
+    CodecCallbackTypeStubRelease(callback);
+    callback = nullptr;
 }
 
 // Test GetComponentVersion
@@ -966,17 +986,12 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiEmptyThisBufferTest_002, TestSize.Level1)
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetCallbackTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
-    const int32_t appDataLen = 10;
     if (g_callback != nullptr) {
         CodecCallbackTypeStubRelease(g_callback);
     }
     g_callback = CodecCallbackTypeStubGetInstance();
     ASSERT_TRUE(g_callback != nullptr);
-    int8_t appData[appDataLen];
-    for (int8_t i = 0; i < appDataLen; i++) {
-        appData[i] = i;
-    }
-    int32_t ret = g_component->SetCallbacks(g_component, g_callback, appData, (uint32_t)appDataLen);
+    int32_t ret = g_component->SetCallbacks(g_component, g_callback, APP_DATA);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
@@ -1076,8 +1091,9 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiDestoryComponentTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     ASSERT_TRUE(g_manager != nullptr);
-    int ret = g_manager->DestoryComponent(g_component);
+    int ret = g_manager->DestoryComponent(g_compoentId);
     ASSERT_EQ(ret, HDF_SUCCESS);
+    CodecComponentTypeRelease(g_component);
     g_component = nullptr;
 }
 #endif  // COMPONENT_NAME

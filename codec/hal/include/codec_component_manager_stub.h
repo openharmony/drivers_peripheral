@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,24 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef HDI_OMXCOMPONENTTYPESERVICE_H
-#define HDI_OMXCOMPONENTTYPESERVICE_H
+#ifndef CODEC_COMPONENT_MANAGER_STUB_H
+#define CODEC_COMPONENT_MANAGER_STUB_H
 
-#include "codec_component_if.h"
+#include "codec_component_manager.h"
 #include "codec_internal.h"
-#include "codec_adapter_interface.h"
+#include "codec_types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-void CodecComponentTypeServiceConstruct(struct CodecComponentType *service);
-struct CodecComponentType *CodecComponentTypeServiceGet(void);
-void CodecComponentTypeServiceRelease(struct CodecComponentType *self);
-void CodecCompoentTypeServiceSetCodecNode(struct CodecComponentType *self, struct CodecComponentNode *codecNode);
-struct CodecComponentNode *CodecCompoentTypeServiceGetCodecNode(struct CodecComponentType *self);
+struct CodecComponentManagerStub {
+    struct CodecComponentManager interface;
+    int32_t (*OnRemoteRequest)(struct CodecComponentManager *serviceImpl, int code, struct HdfSBuf *data,
+                               struct HdfSBuf *reply);
+};
+
+bool CodecComponentManagerStubConstruct(struct CodecComponentManagerStub *stub);
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
-#endif // HDI_OMXCOMPONENTTYPESERVICE_H
+#endif  // HDI_OMXCOMPONENTTYPESTUB_H

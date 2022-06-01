@@ -13,10 +13,12 @@
     "deps": {
       "components": [
         "device_driver_framework",
-        "hiviewdfx_hilog_native"
+        "hiviewdfx_hilog_native",
+        "display"
       ],
       "third_part": [
-        "googletest"
+        "googletest",
+        "libdrm"
       ]
     },
     "build": {

@@ -39,11 +39,9 @@ static void ReleaseSbuf(struct HdfSBuf *data, struct HdfSBuf *reply)
 }
 
 static int32_t CodecCallbackTypeProxyCall(struct CodecCallbackType *self, int32_t id, struct HdfSBuf *data,
-    struct HdfSBuf *reply)
+                                          struct HdfSBuf *reply)
 {
-    if (self->remote == NULL ||
-        self->remote->dispatcher == NULL ||
-        self->remote->dispatcher->Dispatch == NULL) {
+    if (self->remote == NULL || self->remote->dispatcher == NULL || self->remote->dispatcher->Dispatch == NULL) {
         HDF_LOGE("%{public}s: obj is null", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
@@ -65,12 +63,11 @@ static int32_t WriteArray(struct HdfSBuf *data, int8_t *array, uint32_t arrayLen
     return HDF_SUCCESS;
 }
 
-static int32_t WriteEventInfo(struct HdfSBuf *data, struct EventInfo* info)
+static int32_t WriteEventInfo(struct HdfSBuf *data, struct EventInfo *info)
 {
-    int32_t ret = WriteArray(data, info->appData, info->appDataLen);
-    if (ret != HDF_SUCCESS) {
+    if (!HdfSbufWriteInt64(data, info->appData)) {
         HDF_LOGE("%{public}s: write appData failed!", __func__);
-        return ret;
+        return HDF_ERR_INVALID_PARAM;
     }
 
     if (!HdfSbufWriteUint32(data, info->data1)) {
@@ -83,15 +80,15 @@ static int32_t WriteEventInfo(struct HdfSBuf *data, struct EventInfo* info)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    ret = WriteArray(data, info->eventData, info->eventDataLen);
+    int32_t ret = WriteArray(data, info->eventData, info->eventDataLen);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: write eventData failed!", __func__);
     }
     return ret;
 }
 
-static int32_t CodecCallbackTypeProxyEventHandler(struct CodecCallbackType *self,
-    enum OMX_EVENTTYPE event, struct EventInfo* info)
+static int32_t CodecCallbackTypeProxyEventHandler(struct CodecCallbackType *self, enum OMX_EVENTTYPE event,
+                                                  struct EventInfo *info)
 {
     int32_t ret;
 
@@ -133,8 +130,8 @@ static int32_t CodecCallbackTypeProxyEventHandler(struct CodecCallbackType *self
     return ret;
 }
 
-static int32_t CodecCallbackTypeProxyEmptyBufferDone(struct CodecCallbackType *self,
-    int8_t *appData, uint32_t appDataLen, const struct OmxCodecBuffer *buffer)
+static int32_t CodecCallbackTypeProxyEmptyBufferDone(struct CodecCallbackType *self, int64_t appData,
+                                                     const struct OmxCodecBuffer *buffer)
 {
     int32_t ret;
 
@@ -152,19 +149,11 @@ static int32_t CodecCallbackTypeProxyEmptyBufferDone(struct CodecCallbackType *s
         return HDF_FAILURE;
     }
 
-    if (!HdfSbufWriteUint32(data, appDataLen)) {
+    if (!HdfSbufWriteInt64(data, appData)) {
         HDF_LOGE("%{public}s: write appData failed!", __func__);
         ReleaseSbuf(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    for (uint32_t i = 0; i < appDataLen; i++) {
-        if (!HdfSbufWriteInt8(data, appData[i])) {
-            HDF_LOGE("%{public}s: write appData[i] failed!", __func__);
-            ReleaseSbuf(data, reply);
-            return HDF_ERR_INVALID_PARAM;
-        }
-    }
-
     if (!OmxCodecBufferBlockMarshalling(data, buffer)) {
         HDF_LOGE("%{public}s: write buffer failed!", __func__);
         ReleaseSbuf(data, reply);
@@ -182,8 +171,8 @@ static int32_t CodecCallbackTypeProxyEmptyBufferDone(struct CodecCallbackType *s
     return ret;
 }
 
-static int32_t CodecCallbackTypeProxyFillBufferDone(struct CodecCallbackType *self,
-    int8_t* appData, uint32_t appDataLen, struct OmxCodecBuffer* buffer)
+static int32_t CodecCallbackTypeProxyFillBufferDone(struct CodecCallbackType *self, int64_t appData,
+                                                    const struct OmxCodecBuffer *buffer)
 {
     int32_t ret;
 
@@ -201,19 +190,11 @@ static int32_t CodecCallbackTypeProxyFillBufferDone(struct CodecCallbackType *se
         return HDF_FAILURE;
     }
 
-    if (!HdfSbufWriteUint32(data, appDataLen)) {
+    if (!HdfSbufWriteInt64(data, appData)) {
         HDF_LOGE("%{public}s: write appData failed!", __func__);
         ReleaseSbuf(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    for (uint32_t i = 0; i < appDataLen; i++) {
-        if (!HdfSbufWriteInt8(data, appData[i])) {
-            HDF_LOGE("%{public}s: write appData[i] failed!", __func__);
-            ReleaseSbuf(data, reply);
-            return HDF_ERR_INVALID_PARAM;
-        }
-    }
-
     if (!OmxCodecBufferBlockMarshalling(data, buffer)) {
         HDF_LOGE("%{public}s: write buffer failed!", __func__);
         ReleaseSbuf(data, reply);
@@ -245,7 +226,7 @@ struct CodecCallbackType *CodecCallbackTypeGet(struct HdfRemoteService *remote)
         return NULL;
     }
 
-    struct CodecCallbackType *instance = (struct CodecCallbackType*)OsalMemAlloc(sizeof(struct CodecCallbackType));
+    struct CodecCallbackType *instance = (struct CodecCallbackType *)OsalMemAlloc(sizeof(struct CodecCallbackType));
     if (instance == NULL) {
         HDF_LOGE("%{public}s: OsalMemAlloc failed!", __func__);
         return NULL;

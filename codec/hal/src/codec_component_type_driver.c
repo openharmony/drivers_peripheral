@@ -17,23 +17,32 @@
 #include <hdf_device_object.h>
 #include <hdf_log.h>
 #include <osal_mem.h>
-#include "codec_component_type_stub.h"
 #include "codec_component_capability_config.h"
+#include "codec_component_manager_service.h"
+#include "codec_component_type_stub.h"
 
 #define HDF_LOG_TAG codec_hdi_server
 
 struct HdfCodecComponentTypeHost {
     struct IDeviceIoService ioservice;
-    struct CodecComponentTypeStub *instance;
+    struct CodecComponentManagerSerivce *service;
 };
 
 static int32_t CodecComponentTypeDriverDispatch(struct HdfDeviceIoClient *client, int32_t cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    struct HdfCodecComponentTypeHost *omxcomponenttypeHost = CONTAINER_OF(
-        client->device->service, struct HdfCodecComponentTypeHost, ioservice);
-    omxcomponenttypeHost->instance->device = client->device;
-    return CodecComponentTypeServiceOnRemoteRequest(omxcomponenttypeHost->instance, cmdId, data, reply);
+    struct HdfCodecComponentTypeHost *omxcomponenttypeHost =
+        CONTAINER_OF(client->device->service, struct HdfCodecComponentTypeHost, ioservice);
+    if (omxcomponenttypeHost->service == NULL || omxcomponenttypeHost->service->stub.OnRemoteRequest == NULL) {
+        HDF_LOGE("%{public}s: invalid service obj", __func__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        HDF_LOGE("%{public}s: check interface desc failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return omxcomponenttypeHost->service->stub.OnRemoteRequest(&omxcomponenttypeHost->service->stub.interface, cmdId,
+                                                               data, reply);
 }
 
 int32_t HdfCodecComponentTypeDriverInit(struct HdfDeviceObject *deviceObject)
@@ -53,14 +62,13 @@ int32_t HdfCodecComponentTypeDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfCodecComponentTypeDriverBind enter.");
 
-    struct HdfCodecComponentTypeHost *omxcomponenttypeHost = (struct HdfCodecComponentTypeHost *)OsalMemAlloc(
-        sizeof(struct HdfCodecComponentTypeHost));
+    struct HdfCodecComponentTypeHost *omxcomponenttypeHost =
+        (struct HdfCodecComponentTypeHost *)OsalMemAlloc(sizeof(struct HdfCodecComponentTypeHost));
     if (omxcomponenttypeHost == NULL) {
         HDF_LOGE("HdfCodecComponentTypeDriverBind OsalMemAlloc HdfCodecComponentTypeHost failed!");
         return HDF_FAILURE;
     }
-
-    int ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, "ohos.hdi.codec_service");
+    int ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, COMPONENT_MANAGER_SERVICE_DESC);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("Failed to set interface desc");
         return ret;
@@ -69,8 +77,8 @@ int32_t HdfCodecComponentTypeDriverBind(struct HdfDeviceObject *deviceObject)
     omxcomponenttypeHost->ioservice.Dispatch = CodecComponentTypeDriverDispatch;
     omxcomponenttypeHost->ioservice.Open = NULL;
     omxcomponenttypeHost->ioservice.Release = NULL;
-    omxcomponenttypeHost->instance = CodecComponentTypeStubGetInstance();
-    if (omxcomponenttypeHost->instance == NULL) {
+    omxcomponenttypeHost->service = CodecComponentManagerSerivceGet();
+    if (omxcomponenttypeHost->service == NULL) {
         OsalMemFree(omxcomponenttypeHost);
         return HDF_FAILURE;
     }
@@ -82,9 +90,9 @@ int32_t HdfCodecComponentTypeDriverBind(struct HdfDeviceObject *deviceObject)
 void HdfCodecComponentTypeDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfCodecComponentTypeDriverRelease enter.");
-    struct HdfCodecComponentTypeHost *omxcomponenttypeHost
-        = CONTAINER_OF(deviceObject->service, struct HdfCodecComponentTypeHost, ioservice);
-    CodecComponentTypeStubRelease(omxcomponenttypeHost->instance);
+    struct HdfCodecComponentTypeHost *omxcomponenttypeHost =
+        CONTAINER_OF(deviceObject->service, struct HdfCodecComponentTypeHost, ioservice);
+    OmxComponentManagerSeriveRelease(omxcomponenttypeHost->service);
     OsalMemFree(omxcomponenttypeHost);
     ClearCapabilityData();
 }

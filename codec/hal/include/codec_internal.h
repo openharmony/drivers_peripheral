@@ -24,7 +24,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 #define CODEC_HDI_OMX_SERVICE_NAME  "codec_hdi_omx_service"
-
+#define COMPONENT_MANAGER_SERVICE_DESC "ohos.hdi.codec_service"
 enum ComponentDispatchCmd {
     CMD_CODEC_GET_COMPONENT_NUM,
     CMD_CODEC_GET_COMPONENT_CAPABILITY_LIST,
