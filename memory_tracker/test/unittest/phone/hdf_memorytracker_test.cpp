@@ -67,7 +67,7 @@ HWTEST_F(HdfMemoryTrackerTest, GetMemoryTest_01, TestSize.Level1)
         printf("memtrack calll GetMemory success, num_records=%zu \n", records.size());
         int i = 0;
         for (auto record : records) {
-            printf("memtrack: \trecords[%d], flag=%d, size=%zd \n", i++, record.flags, record.size);
+            printf("memtrack: \trecords[%d], flag=%d, size=%lld \n", i++, record.flags, (long long)record.size);
         }
     }
 }
@@ -87,7 +87,7 @@ HWTEST_F(HdfMemoryTrackerTest, GetMemoryTest_02, TestSize.Level1)
         printf("memtrack calll GetMemory success, num_records=%zu \n", records.size());
         int i = 0;
         for (auto record : records) {
-            printf("memtrack: \trecords[%d], flag=%d, size=%zd \n", i++, record.flags, record.size);
+            printf("memtrack: \trecords[%d], flag=%d, size=%lld \n", i++, record.flags, (long long)record.size);
         }
     }
 }
