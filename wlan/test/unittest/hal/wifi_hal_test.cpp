@@ -20,6 +20,7 @@
 #include "wifi_hal_ap_feature.h"
 #include "wifi_hal_base_feature.h"
 #include "wifi_hal_sta_feature.h"
+#include "securec.h"
 
 using namespace testing::ext;
 
@@ -371,12 +372,8 @@ HWTEST_F(WifiHalTest, WifiHalSetCountryCode001, TestSize.Level1)
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = apFeature->setCountryCode(apFeature, "CN", 3);
     EXPECT_NE(ret, HDF_SUCCESS);
-    ret = apFeature->setCountryCode(apFeature, "CNA", 3);
-    EXPECT_NE(ret, HDF_SUCCESS);
     ret = apFeature->setCountryCode(apFeature, "99", 2);
     EXPECT_EQ(ret, HDF_SUCCESS);
-    ret = apFeature->setCountryCode(apFeature, "55", 2);
-    EXPECT_NE(ret, HDF_SUCCESS);
     ret = apFeature->setCountryCode(apFeature, "CN", 2);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
@@ -930,13 +927,10 @@ HWTEST_F(WifiHalTest, GetDeviceMacAddress001, TestSize.Level1)
 {
     int32_t ret;
     struct IWiFiAp *apFeature = nullptr;
-    unsigned char mac[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
     EXPECT_NE(apFeature, nullptr);
-    ret = apFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)apFeature, mac, ETH_ADDR_LEN);
-    EXPECT_EQ(ret, HDF_SUCCESS);
 
     unsigned char readMac[ETH_ADDR_LEN] = {0};
     ret = apFeature->baseFeature.getDeviceMacAddress(nullptr, readMac, ETH_ADDR_LEN);
@@ -962,13 +956,10 @@ HWTEST_F(WifiHalTest, GetDeviceMacAddress002, TestSize.Level1)
 {
     int32_t ret;
     struct IWiFiSta *staFeature = nullptr;
-    unsigned char mac[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
     EXPECT_NE(staFeature, nullptr);
-    ret = staFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)staFeature, mac, ETH_ADDR_LEN);
-    EXPECT_EQ(ret, HDF_SUCCESS);
 
     unsigned char readMac[ETH_ADDR_LEN] = {0};
     ret = staFeature->baseFeature.getDeviceMacAddress(nullptr, readMac, ETH_ADDR_LEN);
@@ -1192,7 +1183,8 @@ HWTEST_F(WifiHalTest, GetAsscociatedStas001, TestSize.Level1)
 {
     int32_t ret;
     struct IWiFiAp *apFeature = nullptr;
-    struct StaInfo staInfo[MAX_ASSOC_STA_NUM] = {0};
+    struct StaInfo staInfo[MAX_ASSOC_STA_NUM];
+    (void)memset_s(staInfo, sizeof(StaInfo) * MAX_ASSOC_STA_NUM, 0, sizeof(StaInfo) * MAX_ASSOC_STA_NUM);
     uint32_t num = 0;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
@@ -1236,7 +1228,8 @@ HWTEST_F(WifiHalTest, SetScanningMacAddress001, TestSize.Level1)
     ret = staFeature->setScanningMacAddress(staFeature, scanMac, 0);
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = staFeature->setScanningMacAddress(staFeature, scanMac, WIFI_MAC_ADDR_LENGTH);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
