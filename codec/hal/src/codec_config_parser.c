@@ -137,7 +137,9 @@ static int32_t GetVideoPortCapability(const struct DeviceResourceIface *iface,
         {CODEC_CONFIG_KEY_MIN_BLOCKS_PER_SECOND, (uint32_t*)&cap->port.video.blocksPerSecond.min,         0},
         {CODEC_CONFIG_KEY_MAX_BLOCKS_PER_SECOND, (uint32_t*)&cap->port.video.blocksPerSecond.max,         0},
         {CODEC_CONFIG_KEY_BLOCK_SIZE_WIDTH,      (uint32_t*)&cap->port.video.blockSize.width,             0},
-        {CODEC_CONFIG_KEY_BLOCK_SIZE_HEIGHT,     (uint32_t*)&cap->port.video.blockSize.height,            0}
+        {CODEC_CONFIG_KEY_BLOCK_SIZE_HEIGHT,     (uint32_t*)&cap->port.video.blockSize.height,            0},
+        {CODEC_CONFIG_KEY_MIN_FRAME_RATE,        (uint32_t *)&cap->port.video.frameRate.min,              0},
+        {CODEC_CONFIG_KEY_MAX_FRAME_RATE,        (uint32_t *)&cap->port.video.frameRate.max,              0}
     };
 
     int32_t count = sizeof(nodeAttrs) / sizeof(ConfigUintNodeAttr);
@@ -150,14 +152,21 @@ static int32_t GetVideoPortCapability(const struct DeviceResourceIface *iface,
         }
     }
 
-    ConfigUintArrayNodeAttr attr = {CODEC_CONFIG_KEY_SUPPORT_PIXEL_FMTS,
-        cap->port.video.supportPixFmts, PIX_FORMAT_NUM, OMX_COLOR_FormatUnused};
-    if (GetUintTableConfig(iface, childNode, &attr) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s, failed to get %{public}s.%{public}s!",
-            __func__, childNode->name, CODEC_CONFIG_KEY_SUPPORT_PIXEL_FMTS);
-        return HDF_FAILURE;
-    }
+    ConfigUintArrayNodeAttr arrayAttrs[] = {
+        {CODEC_CONFIG_KEY_SUPPORT_PIXEL_FMTS, cap->port.video.supportPixFmts, PIX_FORMAT_NUM, OMX_COLOR_FormatUnused},
+        {CODEC_CONFIG_KEY_BITE_RATE_MODE, (int32_t *)cap->port.video.bitRatemode, BIT_RATE_MODE_NUM,
+         BIT_RATE_MODE_INVALID},
+        {CODEC_CONFIG_KEY_MESURED_FRAME_RATE, cap->port.video.measuredFrameRate, MEASURED_FRAME_RATE_NUM, 0}
+    };
 
+    count = sizeof(arrayAttrs) / sizeof(ConfigUintArrayNodeAttr);
+    for (int32_t i = 0; i < count; i++) {
+        if (GetUintTableConfig(iface, childNode, &arrayAttrs[i]) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s, failed to get %{public}s.%{public}s!", __func__, childNode->name,
+                     nodeAttrs[i].attrName);
+            return HDF_FAILURE;
+        }
+    }
     return HDF_SUCCESS;
 }
 

@@ -118,6 +118,23 @@ typedef enum {
  * @brief Defines the video encoding and decoding capabilities.
  */
 #define PIX_FORMAT_NUM 16 /** Size of the supported pixel format array */
+#define BIT_RATE_MODE_NUM 5 /* Size of the array bit rate mode. */
+#define MEASURED_FRAME_RATE_NUM 32 /* Size of the array measured frame rate. */
+
+typedef enum {
+    BIT_RATE_MODE_INVALID,
+    /** Variable Bit Rate. */
+    BIT_RATE_MODE_VBR,
+    /* Constant Bit Rate. */
+    BIT_RATE_MODE_CBR,
+    /* Constant Quality. */
+    BIT_RATE_MODE_CQ,
+     /* Constrained VariableBit Rate. */
+    BIT_RATE_MODE_VCBR,
+    /* Average Bit Rate. */
+    BIT_RATE_MODE_ABR,
+} BitRateMode;
+
 typedef struct {
     Rect minSize;                            /** Minimum resolution supported. */
     Rect maxSize;                            /** Maximum resolution supported. */
@@ -127,6 +144,9 @@ typedef struct {
     Rect blockSize;                          /** Block size supported. */
     int32_t supportPixFmts[PIX_FORMAT_NUM];  /** Supported pixel format. For details,
                                                  see {@link OMX_COLOR_FORMATTYPE}. */
+    BitRateMode bitRatemode[BIT_RATE_MODE_NUM]; /* Bit Rate Mode. For details, see {@link BitRateMode}. */
+    RangeValue frameRate;                       /* Frame Rate. */
+    int32_t measuredFrameRate[MEASURED_FRAME_RATE_NUM]; /* Measured Frame Rate.  */
 } VideoPortCap;
 
 /**
