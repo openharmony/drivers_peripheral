@@ -34,8 +34,8 @@ group("hdi_audio") {
   }
 
   deps += [
-    "supportlibs/adm_adapter:hdi_audio_interface_lib_capture",
-    "supportlibs/adm_adapter:hdi_audio_interface_lib_render",
+    "supportlibs:hdi_audio_interface_lib_capture",
+    "supportlibs:hdi_audio_interface_lib_render",
   ]
   if (enable_audio_hal_notsupport_pathselect == false) {
     deps += [ "hal/pathselect:hdi_audio_path_select" ]

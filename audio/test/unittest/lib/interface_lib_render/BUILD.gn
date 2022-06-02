@@ -31,6 +31,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
+      "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//drivers/adapter/uhdf2/include/hdi",
       "//drivers/adapter/uhdf2/shared/include",
       "//drivers/framework/include/core",
@@ -50,7 +51,9 @@ if (defined(ohos_lite)) {
     ]
 
     if (!enable_audio_device_mpi) {
-      deps += [ "//drivers/peripheral/audio/supportlibs/adm_adapter:hdi_audio_interface_lib_render" ]
+      deps += [
+        "//drivers/peripheral/audio/supportlibs:hdi_audio_interface_lib_render",
+      ]
     }
 
     cflags = [
@@ -77,6 +80,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
+      "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
@@ -87,7 +91,9 @@ if (defined(ohos_lite)) {
     ]
     external_deps = [ "device_driver_framework:libhdf_utils" ]
     if (!enable_audio_device_mpi) {
-      deps += [ "//drivers/peripheral/audio/supportlibs/adm_adapter:hdi_audio_interface_lib_render" ]
+      deps += [
+        "//drivers/peripheral/audio/supportlibs:hdi_audio_interface_lib_render",
+      ]
     }
 
     cflags = [
