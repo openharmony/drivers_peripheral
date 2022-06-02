@@ -51,13 +51,14 @@ if (defined(ohos_lite)) {
   ohos_shared_library("hdi_audio_interface_lib_capture") {
     sources = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
-      "src/audio_interface_lib_capture.c",
-      "src/audio_interface_lib_common.c",
+      "adm_adapter/src/audio_interface_lib_capture.c",
+      "adm_adapter/src/audio_interface_lib_common.c",
     ]
 
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
+      "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//drivers/peripheral/audio/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/kits/",
@@ -77,13 +78,14 @@ if (defined(ohos_lite)) {
   ohos_shared_library("hdi_audio_interface_lib_render") {
     sources = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
-      "src/audio_interface_lib_common.c",
-      "src/audio_interface_lib_render.c",
+      "adm_adapter/src/audio_interface_lib_common.c",
+      "adm_adapter/src/audio_interface_lib_render.c",
     ]
 
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
+      "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//drivers/peripheral/audio/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/kits/",
@@ -106,14 +108,15 @@ if (defined(ohos_lite)) {
   ohos_shared_library("hdi_audio_interface_lib_capture") {
     sources = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
-      "src/audio_interface_lib_capture.c",
-      "src/audio_interface_lib_common.c",
+      "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_capture.c",
+      "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_common.c",
     ]
 
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
       "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
     ]
@@ -160,14 +163,15 @@ if (defined(ohos_lite)) {
   ohos_shared_library("hdi_audio_interface_lib_render") {
     sources = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
-      "src/audio_interface_lib_common.c",
-      "src/audio_interface_lib_render.c",
+      "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_common.c",
+      "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_render.c",
     ]
 
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
       "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
     ]
