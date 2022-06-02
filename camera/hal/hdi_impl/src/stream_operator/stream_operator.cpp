@@ -190,6 +190,8 @@ CamRetCode StreamOperator::CreateStreams(const std::vector<std::shared_ptr<Strea
     DFX_LOCAL_HITRACE_BEGIN;
     for (auto it : streamInfos) {
         CHECK_IF_NOT_EQUAL_RETURN_VALUE(CheckStreamInfo(it), true, INVALID_ARGUMENT);
+        CAMERA_LOGI("streamId:%{public}d and format:%{public}d and width:%{public}d and height:%{public}d",
+            it->streamId_, it->format_, it->width_, it->height_);
         if (streamMap_.count(it->streamId_) > 0) {
             CAMERA_LOGE("stream [id = %{public}d] has already been created.", it->streamId_);
             return INVALID_ARGUMENT;

@@ -18,7 +18,7 @@ if (defined(ohos_lite)) {
       "$camera_path/../interfaces/hdi_passthrough/callback/src/camera_host_callback.cpp",
       "$camera_path/../interfaces/hdi_passthrough/callback/src/stream_operator_callback.cpp",
       "./demo_main.cpp",
-      "./hos_camera_demo.cpp",
+      "./ohos_camera_demo.cpp",
       "./stream_customer.cpp",
     ]
     include_dirs = [
@@ -87,7 +87,7 @@ if (defined(ohos_lite)) {
     install_enable = true
     sources = [
       "./demo_main.cpp",
-      "./hos_camera_demo.cpp",
+      "./ohos_camera_demo.cpp",
       "./stream_customer.cpp",
     ]
 

@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#include "hos_camera_demo.h"
+#include "ohos_camera_demo.h"
 
 namespace OHOS::Camera {
-HosCameraDemo::HosCameraDemo() {}
-HosCameraDemo::~HosCameraDemo() {}
+OhosCameraDemo::OhosCameraDemo() {}
+OhosCameraDemo::~OhosCameraDemo() {}
 
-void HosCameraDemo::SetStreamInfo(std::shared_ptr<StreamInfo>& streamInfo,
-    const std::shared_ptr<StreamCustomer>& streamCustomer,
+void OhosCameraDemo::SetStreamInfo(std::shared_ptr<StreamInfo> &streamInfo,
+    const std::shared_ptr<StreamCustomer> &streamCustomer,
     const int streamId, const StreamIntent intent)
 {
     constexpr uint32_t datasapce = 8;
@@ -54,7 +54,7 @@ void HosCameraDemo::SetStreamInfo(std::shared_ptr<StreamInfo>& streamInfo,
     streamInfo->bufferQueue_->SetQueueSize(8); // 8:set bufferQueue size
 }
 
-void HosCameraDemo::GetStreamOpt()
+void OhosCameraDemo::GetStreamOpt()
 {
     int rc = 0;
 
@@ -73,19 +73,47 @@ void HosCameraDemo::GetStreamOpt()
     }
 }
 
-RetCode HosCameraDemo::CaptureON(const int streamId, const int captureId, CaptureMode mode)
+RetCode OhosCameraDemo::CaptureON(const int streamId,
+    const int captureId, CaptureMode mode)
 {
-    CAMERA_LOGD("demo test: CaptureON enter mode == %{public}d", mode);
+    CAMERA_LOGI("demo test: CaptureON enter streamId == %{public}d and captureId == %{public}d and mode == %{public}d",
+        streamId, captureId, mode);
+    std::lock_guard<std::mutex> l(metaDatalock_);
+    if (mode == CAPTURE_SNAPSHOT) {
+        constexpr double latitude = 27.987500; // dummy data: Qomolangma latitde
+        constexpr double longitude = 86.927500; // dummy data: Qomolangma longituude
+        constexpr double altitude = 8848.86; // dummy data: Qomolangma altitude
+        constexpr size_t entryCapacity = 100;
+        constexpr size_t dataCapacity = 2000;
+        captureSetting_ = std::make_shared<CameraSetting>(entryCapacity, dataCapacity);
+        captureQuality_ = OHOS_CAMERA_JPEG_LEVEL_HIGH;
+        captureOrientation_ = OHOS_CAMERA_JPEG_ROTATION_270;
+        mirrorSwitch_ = OHOS_CAMERA_MIRROR_ON;
+        gps_.push_back(latitude);
+        gps_.push_back(longitude);
+        gps_.push_back(altitude);
+        captureSetting_->addEntry(OHOS_JPEG_QUALITY, static_cast<void*>(&captureQuality_),
+            sizeof(captureQuality_));
+        captureSetting_->addEntry(OHOS_JPEG_ORIENTATION, static_cast<void*>(&captureOrientation_),
+            sizeof(captureOrientation_));
+        captureSetting_->addEntry(OHOS_CONTROL_CAPTURE_MIRROR, static_cast<void*>(&mirrorSwitch_),
+            sizeof(mirrorSwitch_));
+        captureSetting_->addEntry(OHOS_JPEG_GPS_COORDINATES, gps_.data(), gps_.size());
+    }
 
-    std::shared_ptr<Camera::CaptureInfo> captureInfo = std::make_shared<Camera::CaptureInfo>();
-    captureInfo->streamIds_ = {streamId};
-    captureInfo->captureSetting_ = ability_;
-    captureInfo->enableShutterCallback_ = false;
+    captureInfo_ = std::make_shared<CaptureInfo>();
+    captureInfo_->streamIds_ = {streamId};
+    if (mode == CAPTURE_SNAPSHOT) {
+        captureInfo_->captureSetting_ = captureSetting_;
+    } else {
+        captureInfo_->captureSetting_ = ability_;
+    }
+    captureInfo_->enableShutterCallback_ = false;
 
-    int rc = streamOperator_->Capture(captureId, captureInfo, true);
+    int rc = streamOperator_->Capture(captureId, captureInfo_, true);
     if (rc != Camera::NO_ERROR) {
         CAMERA_LOGE("demo test: CaptureStart Capture error\n");
-        streamOperator_->ReleaseStreams(captureInfo->streamIds_);
+        streamOperator_->ReleaseStreams(captureInfo_->streamIds_);
         return RC_ERROR;
     }
 
@@ -107,7 +135,7 @@ RetCode HosCameraDemo::CaptureON(const int streamId, const int captureId, Captur
     return RC_OK;
 }
 
-RetCode HosCameraDemo::CaptureOff(const int captureId, const CaptureMode mode)
+RetCode OhosCameraDemo::CaptureOff(const int captureId, const CaptureMode mode)
 {
     int rc = 0;
     CAMERA_LOGD("demo test: CaptureOff enter mode == %{public}d", mode);
@@ -139,7 +167,7 @@ RetCode HosCameraDemo::CaptureOff(const int captureId, const CaptureMode mode)
     return RC_OK;
 }
 
-RetCode HosCameraDemo::CreateStream(const int streamId, std::shared_ptr<StreamCustomer>& streamCustomer,
+RetCode OhosCameraDemo::CreateStream(const int streamId, std::shared_ptr<StreamCustomer> &streamCustomer,
     StreamIntent intent)
 {
     int rc = 0;
@@ -176,7 +204,9 @@ RetCode HosCameraDemo::CreateStream(const int streamId, std::shared_ptr<StreamCu
     rc = streamOperator_->CommitStreams(Camera::NORMAL, ability_);
     if (rc != Camera::NO_ERROR) {
         CAMERA_LOGE("demo test: CreateStream CommitStreams error\n");
-        streamOperator_->ReleaseStreams({streamId});
+        std::vector<int> streamIds;
+        streamIds.push_back(streamId);
+        streamOperator_->ReleaseStreams(streamIds);
         return RC_ERROR;
     }
 
@@ -185,7 +215,7 @@ RetCode HosCameraDemo::CreateStream(const int streamId, std::shared_ptr<StreamCu
     return RC_OK;
 }
 
-RetCode HosCameraDemo::InitCameraDevice()
+RetCode OhosCameraDemo::InitCameraDevice()
 {
     int rc = 0;
 
@@ -240,7 +270,7 @@ RetCode HosCameraDemo::InitCameraDevice()
     return RC_OK;
 }
 
-void HosCameraDemo::ReleaseCameraDevice()
+void OhosCameraDemo::ReleaseCameraDevice()
 {
     if (demoCameraDevice_ != nullptr) {
         CAMERA_LOGD("demo test: ReleaseCameraDevice close Device");
@@ -249,7 +279,7 @@ void HosCameraDemo::ReleaseCameraDevice()
     }
 }
 
-RetCode HosCameraDemo::InitSensors()
+RetCode OhosCameraDemo::InitSensors()
 {
     int rc = 0;
 
@@ -285,7 +315,7 @@ RetCode HosCameraDemo::InitSensors()
     return RC_OK;
 }
 
-void HosCameraDemo::StoreImage(const void* bufStart, const uint32_t size) const
+void OhosCameraDemo::StoreImage(const void *bufStart, const uint32_t size) const
 {
     constexpr uint32_t pathLen = 64;
     char path[pathLen] = {0};
@@ -321,7 +351,7 @@ void HosCameraDemo::StoreImage(const void* bufStart, const uint32_t size) const
     close(imgFD);
 }
 
-void HosCameraDemo::StoreVideo(const void* bufStart, const uint32_t size) const
+void OhosCameraDemo::StoreVideo(const void *bufStart, const uint32_t size) const
 {
     int ret = 0;
 
@@ -332,7 +362,7 @@ void HosCameraDemo::StoreVideo(const void* bufStart, const uint32_t size) const
     CAMERA_LOGD("demo test:StoreVideo buf_start == %{public}p size == %{public}d\n", bufStart, size);
 }
 
-void HosCameraDemo::OpenVideoFile()
+void OhosCameraDemo::OpenVideoFile()
 {
     constexpr uint32_t pathLen = 64;
     char path[pathLen] = {0};
@@ -352,7 +382,7 @@ void HosCameraDemo::OpenVideoFile()
     }
 }
 
-RetCode HosCameraDemo::CreateStreams(const int streamIdSecond, StreamIntent intent)
+RetCode OhosCameraDemo::CreateStreams(const int streamIdSecond, StreamIntent intent)
 {
     int rc = 0;
     std::vector<std::shared_ptr<StreamInfo>> streamInfos;
@@ -413,12 +443,12 @@ RetCode HosCameraDemo::CreateStreams(const int streamIdSecond, StreamIntent inte
     return RC_OK;
 }
 
-RetCode HosCameraDemo::CaptureOnDualStreams(const int streamIdSecond)
+RetCode OhosCameraDemo::CaptureOnDualStreams(const int streamIdSecond)
 {
     int rc = 0;
     CAMERA_LOGD("demo test: CaptuCaptureOnDualStreamsreON enter");
 
-    std::shared_ptr<Camera::CaptureInfo> previewCaptureInfo = std::make_shared<Camera::CaptureInfo>();
+    std::shared_ptr<CaptureInfo> previewCaptureInfo = std::make_shared<CaptureInfo>();
     previewCaptureInfo->streamIds_ = {STREAM_ID_PREVIEW};
     previewCaptureInfo->captureSetting_ = ability_;
     previewCaptureInfo->enableShutterCallback_ = false;
@@ -431,7 +461,7 @@ RetCode HosCameraDemo::CaptureOnDualStreams(const int streamIdSecond)
     }
     streamCustomerPreview_->ReceiveFrameOn(nullptr);
 
-    std::shared_ptr<Camera::CaptureInfo> secondCaptureInfo = std::make_shared<Camera::CaptureInfo>();
+    std::shared_ptr<CaptureInfo> secondCaptureInfo = std::make_shared<CaptureInfo>();
     secondCaptureInfo->streamIds_ = {streamIdSecond};
     secondCaptureInfo->captureSetting_ = ability_;
     previewCaptureInfo->enableShutterCallback_ = false;
@@ -444,7 +474,7 @@ RetCode HosCameraDemo::CaptureOnDualStreams(const int streamIdSecond)
             return RC_ERROR;
         }
 
-        streamCustomerCapture_->ReceiveFrameOn([this](void* addr, const uint32_t size) {
+        streamCustomerCapture_->ReceiveFrameOn([this](void *addr, const uint32_t size) {
             StoreImage(addr, size);
         });
     } else {
@@ -466,7 +496,7 @@ RetCode HosCameraDemo::CaptureOnDualStreams(const int streamIdSecond)
     return RC_OK;
 }
 
-RetCode HosCameraDemo::StartDualStreams(const int streamIdSecond)
+RetCode OhosCameraDemo::StartDualStreams(const int streamIdSecond)
 {
     RetCode rc = RC_OK;
 
@@ -512,7 +542,7 @@ RetCode HosCameraDemo::StartDualStreams(const int streamIdSecond)
     return RC_OK;
 }
 
-RetCode HosCameraDemo::StartCaptureStream()
+RetCode OhosCameraDemo::StartCaptureStream()
 {
     RetCode rc = RC_OK;
 
@@ -536,7 +566,7 @@ RetCode HosCameraDemo::StartCaptureStream()
     return RC_OK;
 }
 
-RetCode HosCameraDemo::StartVideoStream()
+RetCode OhosCameraDemo::StartVideoStream()
 {
     RetCode rc = RC_OK;
 
@@ -560,7 +590,7 @@ RetCode HosCameraDemo::StartVideoStream()
     return RC_OK;
 }
 
-RetCode HosCameraDemo::StartPreviewStream()
+RetCode OhosCameraDemo::StartPreviewStream()
 {
     RetCode rc = RC_OK;
 
@@ -585,7 +615,7 @@ RetCode HosCameraDemo::StartPreviewStream()
     return RC_OK;
 }
 
-RetCode HosCameraDemo::ReleaseAllStream()
+RetCode OhosCameraDemo::ReleaseAllStream()
 {
     std::vector<int> streamIds = {};
 
@@ -615,13 +645,13 @@ RetCode HosCameraDemo::ReleaseAllStream()
     return RC_OK;
 }
 
-void HosCameraDemo::QuitDemo()
+void OhosCameraDemo::QuitDemo()
 {
     ReleaseCameraDevice();
     CAMERA_LOGD("demo test: QuitDemo done\n");
 }
 
-void HosCameraDemo::SetAwbMode(const int mode) const
+void OhosCameraDemo::SetAwbMode(const int mode) const
 {
     CAMERA_LOGD("demo test: SetAwbMode enter\n");
 
@@ -637,7 +667,7 @@ void HosCameraDemo::SetAwbMode(const int mode) const
     CAMERA_LOGD("demo test: SetAwbMode exit\n");
 }
 
-void HosCameraDemo::SetAeExpo()
+void OhosCameraDemo::SetAeExpo()
 {
     int32_t expo;
 
@@ -660,7 +690,7 @@ void HosCameraDemo::SetAeExpo()
     CAMERA_LOGD("demo test: SetAeExpo exit\n");
 }
 
-void HosCameraDemo::FlashlightOnOff(bool onOff)
+void OhosCameraDemo::FlashlightOnOff(bool onOff)
 {
     CAMERA_LOGD("demo test: FlashlightOnOff enter\n");
 
@@ -674,7 +704,7 @@ void HosCameraDemo::FlashlightOnOff(bool onOff)
     CAMERA_LOGD("demo test: FlashlightOnOff exit \n");
 }
 
-RetCode HosCameraDemo::StreamOffline(const int streamId)
+RetCode OhosCameraDemo::StreamOffline(const int streamId)
 {
     int rc = 0;
     constexpr size_t offlineDelayTime = 4;
@@ -686,7 +716,9 @@ RetCode HosCameraDemo::StreamOffline(const int streamId)
     sptr<IStreamOperatorCallback> streamOperatorCallback = new StreamOperatorCallback();
     sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
 #endif
-    rc = streamOperator_->ChangeToOfflineStream({streamId}, streamOperatorCallback, offlineStreamOperator);
+    std::vector<int> streamIds;
+    streamIds.push_back(streamId);
+    rc = streamOperator_->ChangeToOfflineStream(streamIds, streamOperatorCallback, offlineStreamOperator);
     if (rc != NO_ERROR) {
         CAMERA_LOGE("demo test: StreamOffline ChangeToOfflineStream error\n");
         return RC_ERROR;
@@ -719,7 +751,7 @@ RetCode HosCameraDemo::StreamOffline(const int streamId)
     return RC_OK;
 }
 
-RetCode HosCameraDemo::GetFaceDetectMode(std::shared_ptr<CameraAbility> &ability)
+RetCode OhosCameraDemo::GetFaceDetectMode(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     uint8_t faceDetectMode;
@@ -734,7 +766,7 @@ RetCode HosCameraDemo::GetFaceDetectMode(std::shared_ptr<CameraAbility> &ability
     return RC_OK;
 }
 
-RetCode HosCameraDemo::GetFocalLength(std::shared_ptr<CameraAbility> &ability)
+RetCode OhosCameraDemo::GetFocalLength(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     float focalLength = 0.0;
@@ -749,7 +781,7 @@ RetCode HosCameraDemo::GetFocalLength(std::shared_ptr<CameraAbility> &ability)
     return RC_OK;
 }
 
-RetCode HosCameraDemo::GetAvailableFocusModes(std::shared_ptr<CameraAbility> &ability)
+RetCode OhosCameraDemo::GetAvailableFocusModes(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     std::vector<uint8_t> focusMode;
@@ -772,7 +804,7 @@ RetCode HosCameraDemo::GetAvailableFocusModes(std::shared_ptr<CameraAbility> &ab
     return RC_OK;
 }
 
-RetCode HosCameraDemo::GetAvailableExposureModes(std::shared_ptr<CameraAbility> &ability)
+RetCode OhosCameraDemo::GetAvailableExposureModes(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     std::vector<uint8_t> exposureMode;
@@ -795,7 +827,7 @@ RetCode HosCameraDemo::GetAvailableExposureModes(std::shared_ptr<CameraAbility> 
     return RC_OK;
 }
 
-RetCode HosCameraDemo::GetExposureCompensationRange(std::shared_ptr<CameraAbility> &ability)
+RetCode OhosCameraDemo::GetExposureCompensationRange(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     std::vector<int32_t>  exposureCompensationRange;
@@ -819,7 +851,7 @@ RetCode HosCameraDemo::GetExposureCompensationRange(std::shared_ptr<CameraAbilit
     return RC_OK;
 }
 
-RetCode HosCameraDemo::GetExposureCompensationSteps(std::shared_ptr<CameraAbility> &ability)
+RetCode OhosCameraDemo::GetExposureCompensationSteps(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     camera_rational_t exposureCompensationSteps;
@@ -836,7 +868,7 @@ RetCode HosCameraDemo::GetExposureCompensationSteps(std::shared_ptr<CameraAbilit
     return RC_OK;
 }
 
-RetCode HosCameraDemo::GetAvailableMeterModes(std::shared_ptr<CameraAbility> &ability)
+RetCode OhosCameraDemo::GetAvailableMeterModes(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     std::vector<uint8_t> meterModes;
@@ -859,7 +891,7 @@ RetCode HosCameraDemo::GetAvailableMeterModes(std::shared_ptr<CameraAbility> &ab
     return RC_OK;
 }
 
-RetCode HosCameraDemo::GetAvailableFlashModes(std::shared_ptr<CameraAbility> &ability)
+RetCode OhosCameraDemo::GetAvailableFlashModes(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     std::vector<uint8_t> flashModes;
@@ -882,7 +914,7 @@ RetCode HosCameraDemo::GetAvailableFlashModes(std::shared_ptr<CameraAbility> &ab
     return RC_OK;
 }
 
-RetCode HosCameraDemo::GetMirrorSupported(std::shared_ptr<CameraAbility> &ability)
+RetCode OhosCameraDemo::GetMirrorSupported(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     uint8_t mirrorSupported;
@@ -898,7 +930,7 @@ RetCode HosCameraDemo::GetMirrorSupported(std::shared_ptr<CameraAbility> &abilit
     return RC_OK;
 }
 
-RetCode HosCameraDemo::GetStreamBasicConfigurations(std::shared_ptr<CameraAbility> &ability)
+RetCode OhosCameraDemo::GetStreamBasicConfigurations(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     std::vector<int32_t>  streamBasicConfigurations;
@@ -922,7 +954,7 @@ RetCode HosCameraDemo::GetStreamBasicConfigurations(std::shared_ptr<CameraAbilit
     return RC_OK;
 }
 
-RetCode HosCameraDemo::GetFpsRange(std::shared_ptr<CameraAbility> &ability)
+RetCode OhosCameraDemo::GetFpsRange(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     std::vector<int32_t>  fpsRange;
@@ -946,7 +978,7 @@ RetCode HosCameraDemo::GetFpsRange(std::shared_ptr<CameraAbility> &ability)
     return RC_OK;
 }
 
-RetCode HosCameraDemo::GetCameraPosition(std::shared_ptr<CameraAbility> &ability)
+RetCode OhosCameraDemo::GetCameraPosition(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     uint8_t  cameraPosition;
@@ -962,7 +994,7 @@ RetCode HosCameraDemo::GetCameraPosition(std::shared_ptr<CameraAbility> &ability
     return RC_OK;
 }
 
-RetCode HosCameraDemo::GetCameraType(std::shared_ptr<CameraAbility> &ability)
+RetCode OhosCameraDemo::GetCameraType(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     uint8_t  cameraType;
@@ -978,7 +1010,7 @@ RetCode HosCameraDemo::GetCameraType(std::shared_ptr<CameraAbility> &ability)
     return RC_OK;
 }
 
-RetCode HosCameraDemo::GetCameraConnectionType(std::shared_ptr<CameraAbility> &ability)
+RetCode OhosCameraDemo::GetCameraConnectionType(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     uint8_t  cameraConnectionType;
@@ -994,7 +1026,7 @@ RetCode HosCameraDemo::GetCameraConnectionType(std::shared_ptr<CameraAbility> &a
     return RC_OK;
 }
 
-RetCode HosCameraDemo::GetFaceDetectMaxNum(std::shared_ptr<CameraAbility> &ability)
+RetCode OhosCameraDemo::GetFaceDetectMaxNum(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     uint8_t  faceDetectMaxNum;
