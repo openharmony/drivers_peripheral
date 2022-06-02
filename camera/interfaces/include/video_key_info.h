@@ -46,5 +46,15 @@ const int32_t VIDEO_KEY_INFO_TIMESTAMP = 0x02;
  */
 const std::string isKeyFrame = "isKeyFrame";
 const int32_t VIDEO_KEY_INFO_IS_KEY_FRAME = 0x03;
+
+/**
+ * @brief Indicates the stream id corresponding to the image data. The value type is int32_t.
+ */
+const std::string streamId = "streamId";
+
+/**
+ * @brief Indicates the capture id corresponding to the image data. The value type is int32_t.
+ */
+const std::string captureId = "captureId";
 } // end namespace OHOS::Camera
 #endif
