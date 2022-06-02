@@ -74,11 +74,25 @@ if (defined(ohos_lite)) {
     ]
   }
   ohos_shared_library("camera_utils") {
-    sources = [ "watchdog/watchdog.cpp" ]
-    include_dirs = [ "watchdog" ]
+    sources = [
+      "exif/exif_utils.cpp",
+      "watchdog/watchdog.cpp",
+    ]
+    include_dirs = [
+      "//drivers/peripheral/camera/hal/include",
+      "//third_party/libexif",
+      "watchdog",
+      "exif",
+    ]
     libs = []
     defines = []
-    deps = []
+    deps = [ "//third_party/libexif:libexif" ]
+
+    external_deps = [
+      "device_driver_framework:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "utils_base:utils",
+    ]
     if (enable_camera_device_utest) {
       defines += [ "CAMERA_DEVICE_UTEST" ]
     }

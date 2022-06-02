@@ -27,7 +27,7 @@ namespace OHOS::Camera {
 int32_t StreamOperatorStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    HDF_LOGE("%s: CameraDeviceStub::OnRemoteRequest entry!", __func__);
+    HDF_LOGE("%{public}s: CameraDeviceStub::OnRemoteRequest entry!", __func__);
     int32_t ret = HDF_SUCCESS;
     switch (code) {
         case CMD_STREAM_OPERATOR_IS_STREAMS_SUPPORTED: {
@@ -104,12 +104,12 @@ int32_t StreamOperatorStub::StreamOperatorStubIsStreamsSupported(
     StreamSupportType streamSupportType;
     CamRetCode ret = IsStreamsSupported(operationMode, metadata, streamInfos, streamSupportType);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
-        HDF_LOGE("%s: write retcode failed", __func__);
+        HDF_LOGE("%{public}: write retcode failed", __func__);
         return HDF_FAILURE;
     }
 
     if (!reply.WriteInt32(static_cast<int32_t>(streamSupportType))) {
-        HDF_LOGE("%s: write retcode failed", __func__);
+        HDF_LOGE("%{public}s: write retcode failed", __func__);
         return HDF_FAILURE;
     }
 
@@ -134,7 +134,7 @@ int32_t StreamOperatorStub::StreamOperatorStubCreateStreams(
 
     CamRetCode ret = CreateStreams(streamInfos);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
-        HDF_LOGE("%s: write retcode failed", __func__);
+        HDF_LOGE("%{public}s: write retcode failed", __func__);
         return HDF_FAILURE;
     }
 
@@ -151,13 +151,13 @@ int32_t StreamOperatorStub::StreamOperatorStubReleaseStreams(
 
     std::vector<int32_t> streamIds;
     if (!data.ReadInt32Vector(&streamIds)) {
-        HDF_LOGE("%s: read streamIds failed", __func__);
+        HDF_LOGE("%{public}s: read streamIds failed", __func__);
         return HDF_FAILURE;
     }
 
     CamRetCode ret = ReleaseStreams(streamIds);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
-        HDF_LOGE("%s: write retcode failed", __func__);
+        HDF_LOGE("%{public}s: write retcode failed", __func__);
         return HDF_FAILURE;
     }
 
@@ -179,7 +179,7 @@ int32_t StreamOperatorStub::StreamOperatorStubCommitStreams(
 
     CamRetCode ret = CommitStreams(mode, metadata);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
-        HDF_LOGE("%s: write retcode failed", __func__);
+        HDF_LOGE("%{public}s: write retcode failed", __func__);
         return HDF_FAILURE;
     }
 
@@ -197,19 +197,19 @@ int32_t StreamOperatorStub::StreamOperatorStubGetStreamAttributes(
     std::vector<std::shared_ptr<StreamAttribute>> attributes;
     CamRetCode ret = GetStreamAttributes(attributes);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
-        HDF_LOGE("%s: write retcode failed", __func__);
+        HDF_LOGE("%{public}s: write retcode failed", __func__);
         return HDF_FAILURE;
     }
 
     size_t count = attributes.size();
     if (!reply.WriteInt32(static_cast<int32_t>(count))) {
-        HDF_LOGE("%s: write attributes count failed", __func__);
+        HDF_LOGE("%{public}s: write attributes count failed", __func__);
         return HDF_FAILURE;
     }
 
     for (size_t i = 0; i < count; i++) {
         if (!reply.WriteBuffer((void*)(attributes[i].get()), sizeof(StreamAttribute))) {
-            HDF_LOGE("%s: write attribute failed. index = %d", __func__, i);
+            HDF_LOGE("%{public}s: write attribute failed. index = %d", __func__, i);
             return HDF_FAILURE;
         }
     }
@@ -232,7 +232,7 @@ int32_t StreamOperatorStub::StreamOperatorStubAttachBufferQueue(
 
     CamRetCode ret = AttachBufferQueue(streamId, bufferProducer);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
-        HDF_LOGE("%s: write retcode failed", __func__);
+        HDF_LOGE("%{public}s: write retcode failed", __func__);
         return HDF_FAILURE;
     }
 
@@ -250,7 +250,7 @@ int32_t StreamOperatorStub::StreamOperatorStubDetachBufferQueue(
     int32_t streamId = data.ReadInt32();
     CamRetCode ret = DetachBufferQueue(streamId);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
-        HDF_LOGE("%s: write retcode failed", __func__);
+        HDF_LOGE("%{public}s: write retcode failed", __func__);
         return HDF_FAILURE;
     }
 
@@ -269,7 +269,7 @@ int32_t StreamOperatorStub::StreamOperatorStubCapture(
 
     std::vector<int32_t> streamIds;
     if (!data.ReadInt32Vector(&streamIds)) {
-        HDF_LOGE("%s: write streamIds failed", __func__);
+        HDF_LOGE("%{public}s: write streamIds failed", __func__);
         return HDF_FAILURE;
     }
 
@@ -277,16 +277,17 @@ int32_t StreamOperatorStub::StreamOperatorStubCapture(
     MetadataUtils::DecodeCameraMetadata(data, metadata);
 
     bool enableShutterCallback = data.ReadBool();
-    std::shared_ptr<CaptureInfo> pInfo = std::make_shared<CaptureInfo>();
-    pInfo->streamIds_ = streamIds;
-    pInfo->captureSetting_ = metadata;
-    pInfo->enableShutterCallback_ = enableShutterCallback;
+    std::lock_guard<std::mutex> lock(metaDatalock_);
+    pInfo_ = std::make_shared<CaptureInfo>();
+    pInfo_->streamIds_ = streamIds;
+    pInfo_->captureSetting_ = metadata;
+    pInfo_->enableShutterCallback_ = enableShutterCallback;
 
     bool isStreaming = data.ReadBool();
 
-    CamRetCode ret = Capture(captureId, pInfo, isStreaming);
+    CamRetCode ret = Capture(captureId, pInfo_, isStreaming);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
-        HDF_LOGE("%s: write retcode failed", __func__);
+        HDF_LOGE("%{public}s: write retcode failed", __func__);
         return HDF_FAILURE;
     }
 
@@ -304,7 +305,7 @@ int32_t StreamOperatorStub::StreamOperatorStubCancelCapture(
     int32_t captureId = data.ReadInt32();
     CamRetCode ret = CancelCapture(captureId);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
-        HDF_LOGE("%s: write retcode failed", __func__);
+        HDF_LOGE("%{public}s: write retcode failed", __func__);
         return HDF_FAILURE;
     }
 
@@ -321,7 +322,7 @@ int32_t StreamOperatorStub::StreamOperatorStubChangeToOfflineStream(
 
     std::vector<int32_t> streamIds;
     if (!data.ReadInt32Vector(&streamIds)) {
-        HDF_LOGE("%s: read streamIds failed", __func__);
+        HDF_LOGE("%{public}s: read streamIds failed", __func__);
         return HDF_FAILURE;
     }
 
@@ -329,24 +330,24 @@ int32_t StreamOperatorStub::StreamOperatorStubChangeToOfflineStream(
     sptr<IStreamOperatorCallback> spStreamOperatorCallback =
         OHOS::iface_cast<IStreamOperatorCallback>(remoteObj);
     if (spStreamOperatorCallback == nullptr) {
-        HDF_LOGE("%s: read operator callback failed", __func__);
+        HDF_LOGE("%{public}s: read operator callback failed", __func__);
         return HDF_FAILURE;
     }
 
     OHOS::sptr<IOfflineStreamOperator> offlineOperator = nullptr;
     CamRetCode ret = ChangeToOfflineStream(streamIds, spStreamOperatorCallback, offlineOperator);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
-        HDF_LOGE("%s: write retcode failed", __func__);
+        HDF_LOGE("%{public}s: write retcode failed", __func__);
         return HDF_FAILURE;
     }
 
     if (offlineOperator == nullptr) {
-        HDF_LOGE("%s, change to offline stream failed, offlineOperator is null.", __func__);
+        HDF_LOGE("%{public}s, change to offline stream failed, offlineOperator is null.", __func__);
         return HDF_FAILURE;
     }
 
     if (!reply.WriteRemoteObject(offlineOperator->AsObject())) {
-        HDF_LOGE("%s: write offline stream operator failed", __func__);
+        HDF_LOGE("%{public}s: write offline stream operator failed", __func__);
         return HDF_FAILURE;
     }
 

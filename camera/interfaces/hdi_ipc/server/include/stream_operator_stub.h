@@ -39,6 +39,9 @@ public:
     int32_t StreamOperatorStubCapture(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t StreamOperatorStubCancelCapture(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t StreamOperatorStubChangeToOfflineStream(MessageParcel &data, MessageParcel &reply, MessageOption &option);
+
+    std::shared_ptr<CaptureInfo> pInfo_ = nullptr;
+    std::mutex metaDatalock_;
 };
 }
 #endif // HDI_STREAM_OPERATOR_SERVICE_STUB_INF_H
