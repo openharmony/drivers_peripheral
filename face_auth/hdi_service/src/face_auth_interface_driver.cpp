@@ -65,6 +65,10 @@ int32_t FaceAuthInterfaceDriverDispatch(
 int HdfFaceAuthInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
     IAM_LOGI("start");
+    if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_USERAUTH)) {
+        IAM_LOGE("set face auth hdf class failed");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
