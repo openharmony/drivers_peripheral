@@ -28,6 +28,7 @@ static void Usage(FILE* fp)
             "-w | --set WB        Set white balance Cloudy\n"
             "-v | --video         capture Viedeo of 10s\n"
             "-a | --Set AE        Set Auto exposure\n"
+            "-e | --Set Metadeta  Set Metadata\n"
             "-f | --Set Flashlight        Set flashlight ON 5s OFF\n"
             "-q | --quit          stop preview and quit this app\n");
 }
@@ -186,30 +187,25 @@ static void ManuList(const std::shared_ptr<OhosCameraDemo>& mainDemo,
 {
     int idx, c;
     int awb = 1;
-    const char *shortOptions = "h:cwvaqof:";
-
+    const char *shortOptions = "h:cwvaeqof:";
     c = getopt_long(argc, argv, shortOptions, longOptions, &idx);
     while(1) {
         switch (c) {
             case 'h':
                 c = PutMenuAndGetChr();
                 break;
-
             case 'f':
                 FlashLightTest(mainDemo);
                 c = PutMenuAndGetChr();
                 break;
-
             case 'o':
                 OfflineTest(mainDemo);
                 c = PutMenuAndGetChr();
                 break;
-
             case 'c':
                 CaptureTest(mainDemo);
                 c = PutMenuAndGetChr();
                 break;
-
             case 'w':
                 if (awb) {
                     mainDemo->SetAwbMode(OHOS_CAMERA_AWB_MODE_INCANDESCENT);
@@ -219,22 +215,22 @@ static void ManuList(const std::shared_ptr<OhosCameraDemo>& mainDemo,
                 awb = !awb;
                 c = PutMenuAndGetChr();
                 break;
-
             case 'a':
                 mainDemo->SetAeExpo();
                 c = PutMenuAndGetChr();
                 break;
-
+            case 'e':
+                mainDemo->SetMetadata();
+                c = PutMenuAndGetChr();
+                break;
             case 'v':
                 VideoTest(mainDemo);
                 c = PutMenuAndGetChr();
                 break;
-
             case 'q':
                 PreviewOff(mainDemo);
                 mainDemo->QuitDemo();
                 return;
-
             default:
                 CAMERA_LOGE("main test: command error please retry input command");
                 c = PutMenuAndGetChr();
@@ -258,6 +254,7 @@ int main(int argc, char** argv)
         CAMERA_LOGE("main test: mainDemo->InitCameraDevice() error\n");
         return -1;
     }
+    mainDemo->SetEnableResult();
 
     rc = PreviewOn(0, mainDemo);
     if (rc != RC_OK) {

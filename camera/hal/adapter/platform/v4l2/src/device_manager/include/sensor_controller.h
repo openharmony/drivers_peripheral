@@ -22,6 +22,8 @@
 #include "v4l2_common.h"
 
 namespace OHOS::Camera {
+class SensorController;
+using TagFunType = std::function<void(SensorController*, std::shared_ptr<CameraMetadata>, const int32_t&)>;
 class SensorController : public IController {
 public:
     SensorController();
@@ -37,7 +39,7 @@ public:
     RetCode SendFrameBuffer(std::shared_ptr<FrameSpec> buffer);
 
     void SetNodeCallBack(const NodeBufferCb cb);
-    void SetMetaDataCallBack(const MetaDataCb cb);
+    void SetMetaDataCallBack(MetaDataCb cb) override;
     void BufferCallback(std::shared_ptr<FrameSpec> buffer);
 
     void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag);
@@ -48,9 +50,41 @@ private:
     RetCode SendSensorMetaData(std::shared_ptr<CameraMetadata> meta);
     RetCode SendAEMetaData(common_metadata_header_t *data);
     RetCode SendAWBMetaData(common_metadata_header_t *data);
+    RetCode SendExposureMetaData(common_metadata_header_t *data);
+    RetCode SendFocusMetaData(common_metadata_header_t *data);
+    RetCode SendMeterMetaData(common_metadata_header_t *data);
+    RetCode SendFlashMetaData(common_metadata_header_t *data);
+    RetCode SendFpsMetaData(common_metadata_header_t *data);
     RetCode GetSensorMetaData(std::shared_ptr<CameraMetadata> meta);
     RetCode GetAEMetaData(std::shared_ptr<CameraMetadata> meta);
     RetCode GetAWBMetaData(std::shared_ptr<CameraMetadata> meta);
+    static void GetFocusMode(SensorController *sensorController,
+        std::shared_ptr<CameraMetadata> meta, const int32_t &value);
+    static void GetFocusState(SensorController *sensorController,
+        std::shared_ptr<CameraMetadata> meta, const int32_t &value);
+    static void GetExposureMode(SensorController *sensorController,
+        std::shared_ptr<CameraMetadata> meta, const int32_t &value);
+    static void GetExposureTime(SensorController *sensorController,
+        std::shared_ptr<CameraMetadata> meta, const int32_t &value);
+    static void GetExposureCompensation(SensorController *sensorController,
+        std::shared_ptr<CameraMetadata> meta, const int32_t &value);
+    static void GetMeterMode(SensorController *sensorController,
+        std::shared_ptr<CameraMetadata> meta, const int32_t &value);
+    static void GetExposureState(SensorController *sensorController,
+        std::shared_ptr<CameraMetadata> meta, const int32_t &value);
+    static void GetFlashMode(SensorController *sensorController,
+        std::shared_ptr<CameraMetadata> meta, const int32_t &value);
+    static void GetCaptureMirror(SensorController *sensorController,
+        std::shared_ptr<CameraMetadata> meta, const int32_t &value);
+    static void GetBasicConfigurations(SensorController *sensorController,
+        std::shared_ptr<CameraMetadata> meta, const int32_t &value);
+    static void GetFpsRange(SensorController *sensorController,
+        std::shared_ptr<CameraMetadata> meta, const int32_t &value);
+    static void GetJpegOrientation(SensorController *sensorController,
+        std::shared_ptr<CameraMetadata> meta, const int32_t &value);
+    static void GetJpegQuality(SensorController *sensorController,
+        std::shared_ptr<CameraMetadata> meta, const int32_t &value);
+
     template<typename T>
     bool CheckNumequal(T oldnum, T num, int size)
     {
@@ -75,6 +109,8 @@ private:
     bool metaDataFlag_ = false;
     int buffCont_;
     std::shared_ptr<HosV4L2Dev> sensorVideo_;
+    static std::map<int32_t, uint32_t> tagV4L2CidMap_;
+    static std::map<int32_t, TagFunType> tagMethodMap_;
 };
 } // namespace OHOS::Camera
 #endif

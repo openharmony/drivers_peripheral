@@ -22,6 +22,7 @@
 #include "ibuffer.h"
 #include "ibuffer_pool.h"
 #include "camera_metadata_info.h"
+#include "device_manager_adapter.h"
 #include <functional>
 
 namespace OHOS::Camera {
@@ -55,8 +56,10 @@ public:
     virtual RetCode Init(const int32_t streamId) = 0;
     virtual RetCode Start(const int32_t streamId) = 0;
     virtual RetCode Flush(const int32_t streamId) = 0;
+    virtual RetCode SetCallback(const MetaDataCb cb) = 0;
     virtual RetCode Stop(const int32_t streamId) = 0;
     virtual RetCode Config(const int32_t streamId, const CaptureMeta& meta) = 0;
+    virtual RetCode UpdateSettingsConfig(const CaptureMeta& meta) = 0;
     virtual RetCode Capture(const int32_t streamId, const int32_t captureId) = 0;
     virtual RetCode CancelCapture(const int32_t streamId) = 0;
     virtual int32_t GetNumberOfInPorts() const = 0;

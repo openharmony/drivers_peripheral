@@ -30,9 +30,12 @@ public:
     virtual RetCode Prepare(const int32_t id);
     virtual RetCode Start(const int32_t id);
     virtual RetCode Config(const int32_t id, const CaptureMeta& meta);
+    virtual RetCode UpdateSettingsConfig(const CaptureMeta& meta);
     virtual RetCode Capture(const int32_t ids, const int32_t captureId);
     virtual RetCode CancelCapture(const int32_t streamId);
     virtual RetCode Flush(const int32_t id);
+    virtual void SetCallback(const MetaDataCb cb);
+    virtual RetCode SetDispatcherCallback();
     virtual RetCode Stop(const int32_t id);
     virtual RetCode Destroy(const int32_t id);
     virtual std::shared_ptr<INode> GetNode(const int32_t streamId, const std::string name);
@@ -43,6 +46,7 @@ protected:
     void CutUselessBranch(int32_t streamId, std::vector<std::shared_ptr<INode>>& branch);
 protected:
     std::unordered_map<int, std::vector<std::shared_ptr<INode>>> seqNode_;
+    MetaDataCb metaDataCb_ = nullptr;
 };
 }
 #endif
