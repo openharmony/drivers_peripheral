@@ -19,6 +19,14 @@ namespace OHOS::Camera {
 OhosCameraDemo::OhosCameraDemo() {}
 OhosCameraDemo::~OhosCameraDemo() {}
 
+std::vector<int32_t> results_list_;
+
+const int32_t METER_POINT_X = 305;
+const int32_t METER_POINT_Y = 205;
+const int32_t AF_REGIONS_X = 400;
+const int32_t AF_REGIONS_Y = 200;
+const int32_t FPS_RANGE = 30;
+
 void OhosCameraDemo::SetStreamInfo(std::shared_ptr<StreamInfo> &streamInfo,
     const std::shared_ptr<StreamCustomer> &streamCustomer,
     const int streamId, const StreamIntent intent)
@@ -257,7 +265,7 @@ RetCode OhosCameraDemo::InitCameraDevice()
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     std::shared_ptr<CameraDeviceCallback> callback = std::make_shared<CameraDeviceCallback>();
 #else
-    sptr<CameraDeviceCallback> callback = new CameraDeviceCallback();
+    sptr<DemoCameraDeviceCallback> callback = new DemoCameraDeviceCallback();
 #endif
     rc = demoCameraHost_->OpenCamera(cameraIds_.front(), callback, demoCameraDevice_);
     if (rc != Camera::NO_ERROR || demoCameraDevice_ == nullptr) {
@@ -651,6 +659,17 @@ void OhosCameraDemo::QuitDemo()
     CAMERA_LOGD("demo test: QuitDemo done\n");
 }
 
+void OhosCameraDemo::SetEnableResult()
+{
+    CAMERA_LOGI("demo test: SetEnableResult enter\n");
+
+    results_list_.push_back(OHOS_CONTROL_EXPOSURE_MODE);
+    results_list_.push_back(OHOS_CONTROL_FOCUS_MODE);
+    demoCameraDevice_->EnableResult(results_list_);
+
+    CAMERA_LOGI("demo test: SetEnableResult exit\n");
+}
+
 void OhosCameraDemo::SetAwbMode(const int mode) const
 {
     CAMERA_LOGD("demo test: SetAwbMode enter\n");
@@ -688,6 +707,75 @@ void OhosCameraDemo::SetAeExpo()
     demoCameraDevice_->UpdateSettings(metaData);
 
     CAMERA_LOGD("demo test: SetAeExpo exit\n");
+}
+
+void OhosCameraDemo::SetMetadata()
+{
+    CAMERA_LOGI("demo test: SetMetadata enter\n");
+    int32_t expo;
+    constexpr size_t entryCapacity = 100;
+    constexpr size_t dataCapacity = 2000;
+    std::shared_ptr<CameraSetting> metaData = std::make_shared<CameraSetting>(entryCapacity, dataCapacity);
+
+    // awb
+    SetAwbMode(OHOS_CAMERA_AWB_MODE_INCANDESCENT);
+
+    // ae
+    uint8_t aeMode = OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO;
+    metaData->addEntry(OHOS_CONTROL_EXPOSURE_MODE, &aeMode, sizeof(aeMode));
+
+    int64_t exposureTime = 400;
+    metaData->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &exposureTime, sizeof(exposureTime));
+
+    int32_t aeExposureCompensation = 4;
+    metaData->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &aeExposureCompensation, sizeof(aeExposureCompensation));
+
+    // meter
+    std::vector<int32_t> meterPoint;
+    meterPoint.push_back(METER_POINT_X);
+    meterPoint.push_back(METER_POINT_Y);
+    metaData->addEntry(OHOS_CONTROL_METER_POINT, meterPoint.data(), meterPoint.size());
+
+    uint8_t meterMode = OHOS_CAMERA_OVERALL_METERING;
+    metaData->addEntry(OHOS_CONTROL_METER_MODE, &meterMode, sizeof(meterMode));
+
+    // flash
+    uint8_t flashMode = OHOS_CAMERA_FLASH_MODE_ALWAYS_OPEN;
+    metaData->addEntry(OHOS_CONTROL_FLASH_MODE, &flashMode, sizeof(flashMode));
+
+    // mirror
+    uint8_t mirror = OHOS_CAMERA_MIRROR_ON;
+    metaData->addEntry(OHOS_CONTROL_CAPTURE_MIRROR, &mirror, sizeof(mirror));
+
+    // fps
+    std::vector<int32_t> fpsRange;
+    fpsRange.push_back(FPS_RANGE);
+    fpsRange.push_back(FPS_RANGE);
+    metaData->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());
+
+    // jpeg
+    int32_t orientation = OHOS_CAMERA_JPEG_ROTATION_180;
+    metaData->addEntry(OHOS_JPEG_ORIENTATION, &orientation, sizeof(orientation));
+
+    uint8_t quality = OHOS_CAMERA_JPEG_LEVEL_HIGH;
+    metaData->addEntry(OHOS_JPEG_QUALITY, &quality, sizeof(quality));
+
+    // af
+    uint8_t afMode = OHOS_CAMERA_FOCUS_MODE_AUTO;
+    metaData->addEntry(OHOS_CONTROL_FOCUS_MODE, &afMode, sizeof(afMode));
+
+    std::vector<int32_t> afRegions;
+    afRegions.push_back(AF_REGIONS_X);
+    afRegions.push_back(AF_REGIONS_Y);
+    metaData->addEntry(OHOS_CONTROL_AF_REGIONS, afRegions.data(), afRegions.size());
+
+    // face
+    uint8_t faceMode = OHOS_CAMERA_FACE_DETECT_MODE_SIMPLE;
+    metaData->addEntry(OHOS_STATISTICS_FACE_DETECT_SWITCH, &faceMode, sizeof(faceMode));
+
+    demoCameraDevice_->UpdateSettings(metaData);
+
+    CAMERA_LOGI("demo test: SetMetadata exit\n");
 }
 
 void OhosCameraDemo::FlashlightOnOff(bool onOff)
@@ -1040,4 +1128,47 @@ RetCode OhosCameraDemo::GetFaceDetectMaxNum(std::shared_ptr<CameraAbility> &abil
     CAMERA_LOGD("demo test: faceDetectMaxNum %{public}d \n", faceDetectMaxNum);
     return RC_OK;
 }
+
+#ifndef CAMERA_BUILT_ON_OHOS_LITE
+void DemoCameraDeviceCallback::OnError(const Camera::ErrorType type, const int32_t errorMsg)
+{
+    CAMERA_LOGI("demo test: OnError type : %{public}d, errorMsg : %{public}d", type, errorMsg);
+}
+
+void DemoCameraDeviceCallback::OnResult(const uint64_t timestamp,
+                                        const std::shared_ptr<Camera::CameraMetadata>& result)
+{
+    CAMERA_LOGI("demo test: OnResult timestamp : %{public}ld,", timestamp);
+    for (auto it = results_list_.cbegin(); it != results_list_.cend(); it++) {
+        switch (*it) {
+            case OHOS_CONTROL_FOCUS_MODE: {
+                common_metadata_header_t* data = result->get();
+                uint8_t focusMode;
+                camera_metadata_item_t entry;
+                int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FOCUS_MODE, &entry);
+                if (ret != 0) {
+                    CAMERA_LOGE("demo test: get OHOS_CONTROL_FOCUS_MODE error\n");
+                    break;
+                }
+                focusMode = *(entry.data.u8);
+                CAMERA_LOGI("demo test: focusMode %{public}d\n", focusMode);
+                break;
+            }
+            case OHOS_CONTROL_EXPOSURE_MODE: {
+                common_metadata_header_t* data = result->get();
+                uint8_t exposureMode;
+                camera_metadata_item_t entry;
+                int ret = FindCameraMetadataItem(data, OHOS_CONTROL_EXPOSURE_MODE, &entry);
+                if (ret != 0) {
+                    CAMERA_LOGE("demo test: get OHOS_CONTROL_EXPOSURE_MODE error\n");
+                    break;
+                }
+                exposureMode = *(entry.data.u8);
+                CAMERA_LOGI("demo test: exposureMode %{public}d\n", exposureMode);
+                break;
+            }
+        }
+    }
+}
+#endif
 } // namespace OHOS::Camera

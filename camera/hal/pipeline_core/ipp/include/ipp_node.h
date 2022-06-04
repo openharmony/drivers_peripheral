@@ -31,7 +31,9 @@ public:
     RetCode Start(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;
     RetCode Flush(const int32_t streamId) override;
+    RetCode SetCallback(const MetaDataCb cb) override;
     RetCode Config(const int32_t streamId, const CaptureMeta& meta) override;
+    RetCode UpdateSettingsConfig(const CaptureMeta& meta) override;
     void DeliverBuffer(std::shared_ptr<IBuffer>& buffer) override;
     void DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
     void ProcessCache(std::vector<std::shared_ptr<IBuffer>>& buffers) override;
@@ -45,10 +47,30 @@ protected:
                               std::vector<std::shared_ptr<IBuffer>>& inBuffers,
                               std::shared_ptr<IBuffer>& product,
                               std::vector<std::shared_ptr<IBuffer>>& recycleBuffers);
+    RetCode GetDeviceController();
+    void OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata);
+    RetCode SendNodeMetaData(const std::shared_ptr<CameraMetadata> meta);
+    RetCode SendExposureMetaData(const common_metadata_header_t *data);
+    RetCode SendFocusMetaData(const common_metadata_header_t *data);
+    RetCode SendFaceModeMetaData(const common_metadata_header_t *data);
+    void GetNodeMetaData(std::shared_ptr<CameraMetadata> meta);
+    void GetFocusMode(std::shared_ptr<CameraMetadata> meta);
+    void GetFocusState(std::shared_ptr<CameraMetadata> meta);
+    void GetExposureMode(std::shared_ptr<CameraMetadata> meta);
+    void GetExposureTime(std::shared_ptr<CameraMetadata> meta);
+    void GetExposureCompensation(std::shared_ptr<CameraMetadata> meta);
+    void GetExposureState(std::shared_ptr<CameraMetadata> meta);
+    void GetCameraFaceDetectSwitch(std::shared_ptr<CameraMetadata> meta);
+    void GetCameraFaceRectangles(std::shared_ptr<CameraMetadata> meta);
+    void GetCameraFaceIds(std::shared_ptr<CameraMetadata> meta);
+    void GetTimestamp(std::shared_ptr<CameraMetadata> meta);
 
 protected:
     std::shared_ptr<AlgoPluginManager> algoPluginManager_ = nullptr;
     std::shared_ptr<AlgoPlugin> algoPlugin_ = nullptr;
+    std::shared_ptr<IController> sensorController_ = nullptr;
+    std::shared_ptr<IDeviceManager> deviceManager_ = nullptr;
+    MetaDataCb metaDataCb_ = nullptr;
 };
 } // namespace OHOS::Camera
 

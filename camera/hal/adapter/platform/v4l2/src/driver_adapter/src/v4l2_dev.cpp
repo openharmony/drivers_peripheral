@@ -405,12 +405,10 @@ RetCode HosV4L2Dev::UpdateSetting(const std::string& cameraID, AdapterCmd comman
 {
     int32_t fd;
     int rc = 0;
-
     if (args == nullptr) {
         CAMERA_LOGE("HosV4L2Dev::UpdateSetting: args is NULL\n");
         return RC_ERROR;
     }
-
     if (myControl_ == nullptr) {
         myControl_ = std::make_shared<HosV4L2Control>();
         if (myControl_ == nullptr) {
@@ -418,38 +416,43 @@ RetCode HosV4L2Dev::UpdateSetting(const std::string& cameraID, AdapterCmd comman
             return RC_ERROR;
         }
     }
-
     fd = GetCurrentFd(cameraID);
     if (fd < 0) {
         CAMERA_LOGE("UpdateSetting: GetCurrentFd error\n");
         return RC_ERROR;
     }
-
     switch (command) {
-        case CMD_AE_EXPO:
+        case CMD_EXPOSURE_MODE:
             rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_EXPOSURE_AUTO, *(int32_t*)args);
             break;
-
         case CMD_AE_EXPOTIME:
             rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_EXPOSURE_ABSOLUTE, *(int32_t*)args);
             break;
-
+        case CMD_EXPOSURE_COMPENSATION:
+            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_EXPOSURE, *(int32_t*)args);
+            break;
         case CMD_AWB_MODE:
             rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_AUTO_N_PRESET_WHITE_BALANCE, *(int32_t*)args);
             break;
-
+        case CMD_FOCUS_MODE:
+            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_FOCUS_AUTO, *(int32_t*)args);
+            break;
+        case CMD_METER_MODE:
+            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_EXPOSURE_METERING, *(int32_t*)args);
+            break;
+        case CMD_FLASH_MODE:
+            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_FLASH_LED_MODE, *(int32_t*)args);
+            break;
         default:
             break;
     }
-
     if (rc != RC_OK) {
         return RC_ERROR;
     }
-
     return RC_OK;
 }
 
-RetCode HosV4L2Dev::QuerySetting(const std::string& cameraID, AdapterCmd command, int* args)
+RetCode HosV4L2Dev::QuerySetting(const std::string& cameraID, unsigned int command, int* args)
 {
     int32_t fd;
     int32_t value = 0;
@@ -474,23 +477,7 @@ RetCode HosV4L2Dev::QuerySetting(const std::string& cameraID, AdapterCmd command
         return RC_ERROR;
     }
 
-    switch (command) {
-        case CMD_AE_EXPO:
-            rc = myControl_->V4L2GetCtrl(fd, V4L2_CID_EXPOSURE_AUTO, value);
-            break;
-
-        case CMD_AE_EXPOTIME:
-            rc = myControl_->V4L2GetCtrl(fd, V4L2_CID_EXPOSURE_ABSOLUTE, value);
-            break;
-
-        case CMD_AWB_MODE:
-            rc = myControl_->V4L2GetCtrl(fd, V4L2_CID_AUTO_N_PRESET_WHITE_BALANCE, value);
-            break;
-
-        default:
-            break;
-    }
-
+    rc = myControl_->V4L2GetCtrl(fd, command, value);
     if (rc != RC_OK) {
         return RC_ERROR;
     }
