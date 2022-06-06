@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,23 +17,18 @@
 #include <iostream>
 #include <vector>
 #include "hdf_log.h"
-#include "usb_param.h"
 #include "usbd_client.h"
+#include "UsbSubscriberTest.h"
+#include "usb_errors.h"
 
 const int SLEEP_TIME = 3;
-
-const uint8_t BUS_NUM_1 = 1;
-const uint8_t DEV_ADDR_2 = 2;
-
+uint8_t BUS_NUM_1 = 0;
+uint8_t DEV_ADDR_2 = 0;
 const uint8_t BUS_NUM_255 = 255;
 const uint8_t DEV_ADDR_255 = 255;
-
 const uint8_t BUS_NUM_222 = 222;
-
 const uint32_t LENGTH_NUM_255 = 255;
-
 const uint8_t INTERFACEID_1 = 1;
-
 const uint8_t POINTID_1 = 1;
 const uint8_t POINTID_129 = 129;
 
@@ -41,6 +36,8 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::USB;
 using namespace std;
+
+struct UsbDev UsbdTransferTest::dev_ = {0, 0};
 
 void UsbdTransferTest::SetUpTestCase(void)
 {
@@ -55,16 +52,27 @@ void UsbdTransferTest::SetUpTestCase(void)
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {
     }
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    ret = UsbdClient::GetInstance().OpenDevice(dev);
+
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    if (UsbdClient::GetInstance().BindUsbdSubscriber(subscriber) != UEC_OK) {
+        HDF_LOGE("%{public}s: bind usbd subscriber failed\n", __func__);
+        exit(0);
+    }
+    dev_ = {subscriber->busNum_, subscriber->devAddr_};
+    ret = UsbdClient::GetInstance().OpenDevice(dev_);
     HDF_LOGI("UsbdTransferTest:: %{public}d OpenDevice=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
 }
 
 void UsbdTransferTest::TearDownTestCase(void)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    auto ret = UsbdClient::GetInstance().CloseDevice(dev);
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    if (UsbdClient::GetInstance().BindUsbdSubscriber(subscriber) != UEC_OK) {
+        HDF_LOGE("%{public}s: bind usbd subscriber failed\n", __func__);
+        exit(0);
+    }
+    dev_ = {subscriber->busNum_, subscriber->devAddr_};
+    auto ret = UsbdClient::GetInstance().CloseDevice(dev_);
     HDF_LOGI("UsbdTransferTest:: %{public}d Close=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
 }
@@ -76,13 +84,12 @@ void UsbdTransferTest::TearDown(void) {}
 /**
  * @tc.name: UsbdControlTransfer001
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: 正向测试：参数正确
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer001, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     uint32_t length = LENGTH_NUM_255;
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -95,13 +102,12 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer001, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer002
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: 反向测试：BUS_NUM_255
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer002, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_255;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = {BUS_NUM_255, dev_.devAddr};
     uint8_t buffer[LENGTH_NUM_255] = {0};
     uint32_t length = LENGTH_NUM_255;
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -114,13 +120,12 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer002, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer003
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: 反向测试：DEV_ADDR_255
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer003, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_255;
+    struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
     uint8_t buffer[LENGTH_NUM_255] = {0};
     uint32_t length = LENGTH_NUM_255;
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -133,13 +138,12 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer003, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer004
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: 反向测试：参数正确
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer004, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -156,9 +160,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer004, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer005, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_255;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = {BUS_NUM_255, dev_.devAddr};
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -175,9 +177,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer005, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer006, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_255;
+    struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -194,10 +194,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer006, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer007, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
+    struct UsbDev dev = dev_;
     int32_t intercafeidex = 0;
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -214,10 +212,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer007, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer008, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
+    struct UsbDev dev = {BUS_NUM_255, dev_.devAddr};
     int32_t intercafeidex = 0;
-    dev.busNum = BUS_NUM_255;
-    dev.devAddr = DEV_ADDR_2;
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -234,10 +230,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer008, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer009, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
+    struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
     int32_t intercafeidex = 0;
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_255;
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -254,9 +248,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer009, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer010, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -273,9 +265,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer010, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer011, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_255;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = {BUS_NUM_255, dev_.devAddr};
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -292,9 +282,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer011, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer012, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_255;
+    struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -311,9 +299,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer012, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer013, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -330,9 +316,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer013, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer014, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_255;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = {BUS_NUM_255, dev_.devAddr};
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -349,9 +333,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer014, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer015, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_255;
+    struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -368,9 +350,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer015, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer016, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -387,9 +367,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer016, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer017, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_255;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = {BUS_NUM_255, dev_.devAddr};
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -406,9 +384,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer017, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer018, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_255;
+    struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -425,9 +401,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer018, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer019, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -444,9 +418,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer019, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer020, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_255;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = {BUS_NUM_255, dev_.devAddr};
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -463,9 +435,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer020, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer021, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_255;
+    struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = {};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
@@ -483,9 +453,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer021, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead001, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -508,9 +476,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead001, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead002, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -534,9 +500,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead002, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead003, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -560,9 +524,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead003, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead004, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -586,9 +548,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead004, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead005, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -612,9 +572,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead005, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite001, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -637,9 +595,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite001, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite002, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -663,9 +619,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite002, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite003, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -689,9 +643,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite003, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite004, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -715,9 +667,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite004, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite005, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -741,9 +691,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite005, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite006, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -768,9 +716,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite006, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite007, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = 99;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -793,10 +739,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite007, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite008, TestSize.Level1)
 {
-    HDF_LOGI("Case Start : UsbdBulkTransferWrite008 : BulkTransferWrite");
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -819,9 +762,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite008, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead001, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -845,9 +786,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead001, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead002, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -872,9 +811,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead002, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead003, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -897,9 +834,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead003, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead004, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -924,9 +859,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead004, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead005, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -951,9 +884,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead005, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite001, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -977,9 +908,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite001, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite002, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1004,9 +933,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite002, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite003, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1031,9 +958,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite003, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite004, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1058,9 +983,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite004, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite005, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1085,9 +1008,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite005, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite006, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1113,9 +1034,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite006, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite007, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = 99;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1139,9 +1058,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite007, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite008, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1165,9 +1082,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite008, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead001, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1190,9 +1105,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead001, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead002, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead002 %{public}d interfaceId=%{public}d", __LINE__, interfaceId);
@@ -1217,9 +1130,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead002, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead003, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1243,9 +1154,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead003, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead004, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1269,9 +1178,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead004, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead005, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1295,9 +1202,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead005, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite001, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1320,9 +1225,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite001, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite002, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1346,9 +1249,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite002, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite003, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1372,9 +1273,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite003, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite004, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1398,9 +1297,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite004, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite005, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1424,9 +1321,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite005, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite006, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1451,9 +1346,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite006, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite007, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = 99;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
@@ -1476,9 +1369,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite007, TestSize.Level1)
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite008, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_1, DEV_ADDR_2};
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
