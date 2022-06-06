@@ -49,17 +49,14 @@ if (defined(ohos_lite)) {
   group("camera_hal_unittest") {
     if (is_standard_system) {
       testonly = true
-      if (product_name == "rk3568") {
-        deps = [ "test/v4l2:camera_case_unittest" ]
-      } else {
-        deps = [
-          "buffer_manager/test:camera_hal_buffer_manager_unittest",
-          "device_manager/test:camera_hal_device_manager_unittest",
-          "hdi_impl/test:camera_hal_hdi_impl_unittest",
-          "pipeline_core/test:camera_hal_pipeline_core_unittest",
-          "test/fuzz:camera_hal_fuzztest",
-        ]
-      }
+      deps = [
+        "buffer_manager/test:camera_hal_buffer_manager_unittest",
+        "device_manager/test:camera_hal_device_manager_unittest",
+        "hdi_impl/test:camera_hal_hdi_impl_unittest",
+        "pipeline_core/test:camera_hal_pipeline_core_unittest",
+        "test/fuzz:camera_hal_fuzztest",
+        "test/v4l2:camera_case_unittest",
+      ]
     }
   }
 }
