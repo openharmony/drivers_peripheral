@@ -72,6 +72,10 @@ static int HdfPinAuthInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
         IAM_LOGE("Pin hal init failed");
         return HDF_FAILURE;
     }
+    if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_USERAUTH)) {
+        IAM_LOGE("set pin auth hdf class failed");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
