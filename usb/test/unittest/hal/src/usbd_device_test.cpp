@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,21 +16,20 @@
 #include <iostream>
 #include <vector>
 #include "hdf_log.h"
-#include "usb_param.h"
 #include "usbd_client.h"
+#include "UsbSubscriberTest.h"
+#include "usb_errors.h"
+
+const int SLEEP_TIME = 3;
+const uint8_t BUS_NUM_255 = 255;
+const uint8_t DEV_ADDR_255 = 255;
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::USB;
 using namespace std;
 
-const int SLEEP_TIME = 3;
-
-const uint8_t BUS_NUM_1 = 1;
-const uint8_t DEV_ADDR_2 = 2;
-
-const uint8_t BUS_NUM_255 = 255;
-const uint8_t DEV_ADDR_255 = 255;
+struct UsbDev UsbdDeviceTest::dev_ = {0, 0};
 
 void UsbdDeviceTest::SetUpTestCase(void)
 {
@@ -41,6 +40,14 @@ void UsbdDeviceTest::SetUpTestCase(void)
     if (ret != 0) {
         exit(0);
     }
+
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    if (UsbdClient::GetInstance().BindUsbdSubscriber(subscriber) != UEC_OK) {
+        HDF_LOGE("%{public}s: bind usbd subscriber failed\n", __func__);
+        exit(0);
+    }
+    dev_ = {subscriber->busNum_, subscriber->devAddr_};
+
     std::cout << "please connect device, press enter to continue" << std::endl;
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {
@@ -62,9 +69,7 @@ void UsbdDeviceTest::TearDown(void) {}
  */
 HWTEST_F(UsbdDeviceTest, UsbdOpenDevice001, TestSize.Level1)
 {
-    uint8_t busNum = BUS_NUM_1;
-    uint8_t devAddr = DEV_ADDR_2;
-    struct UsbDev dev = {busNum, devAddr};
+    struct UsbDev dev = dev_;
     auto ret = UsbdClient::GetInstance().OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result =%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
@@ -79,9 +84,7 @@ HWTEST_F(UsbdDeviceTest, UsbdOpenDevice001, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdOpenDevice002, TestSize.Level1)
 {
-    uint8_t busNum = BUS_NUM_255;
-    uint8_t devAddr = DEV_ADDR_2;
-    struct UsbDev dev = {busNum, devAddr};
+    struct UsbDev dev = {BUS_NUM_255, dev_.devAddr};
     auto ret = UsbdClient::GetInstance().OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -96,9 +99,7 @@ HWTEST_F(UsbdDeviceTest, UsbdOpenDevice002, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdOpenDevice003, TestSize.Level1)
 {
-    uint8_t busNum = BUS_NUM_1;
-    uint8_t devAddr = DEV_ADDR_255;
-    struct UsbDev dev = {busNum, devAddr};
+    struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
     auto ret = UsbdClient::GetInstance().OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -113,9 +114,7 @@ HWTEST_F(UsbdDeviceTest, UsbdOpenDevice003, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdOpenDevice004, TestSize.Level1)
 {
-    uint8_t busNum = BUS_NUM_255;
-    uint8_t devAddr = DEV_ADDR_255;
-    struct UsbDev dev = {busNum, devAddr};
+    struct UsbDev dev = {BUS_NUM_255, DEV_ADDR_255};
     auto ret = UsbdClient::GetInstance().OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
@@ -132,9 +131,7 @@ HWTEST_F(UsbdDeviceTest, UsbdOpenDevice004, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdCloseDevice001, TestSize.Level1)
 {
-    uint8_t busNum = BUS_NUM_1;
-    uint8_t devAddr = DEV_ADDR_2;
-    struct UsbDev dev = {busNum, devAddr};
+    struct UsbDev dev = dev_;
     auto ret = UsbdClient::GetInstance().OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
@@ -152,9 +149,7 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice001, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdCloseDevice002, TestSize.Level1)
 {
-    uint8_t busNum = BUS_NUM_1;
-    uint8_t devAddr = DEV_ADDR_2;
-    struct UsbDev dev = {busNum, devAddr};
+    struct UsbDev dev = dev_;
     auto ret = UsbdClient::GetInstance().OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
@@ -162,7 +157,7 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice002, TestSize.Level1)
     ret = UsbdClient::GetInstance().CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
-    dev.busNum = BUS_NUM_1;
+    dev = dev_;;
     UsbdClient::GetInstance().CloseDevice(dev);
 }
 
@@ -175,9 +170,7 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice002, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdCloseDevice003, TestSize.Level1)
 {
-    uint8_t busNum = BUS_NUM_1;
-    uint8_t devAddr = DEV_ADDR_2;
-    struct UsbDev dev = {busNum, devAddr};
+    struct UsbDev dev = dev_;
     auto ret = UsbdClient::GetInstance().OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
@@ -185,7 +178,7 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice003, TestSize.Level1)
     ret = UsbdClient::GetInstance().CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
-    dev.devAddr = DEV_ADDR_2;
+    dev = dev_;
     UsbdClient::GetInstance().CloseDevice(dev);
 }
 
@@ -198,9 +191,7 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice003, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdCloseDevice004, TestSize.Level1)
 {
-    uint8_t busNum = BUS_NUM_1;
-    uint8_t devAddr = DEV_ADDR_2;
-    struct UsbDev dev = {busNum, devAddr};
+    struct UsbDev dev = dev_;
     auto ret = UsbdClient::GetInstance().OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret == 0);
@@ -209,7 +200,6 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice004, TestSize.Level1)
     ret = UsbdClient::GetInstance().CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
     ASSERT_TRUE(ret != 0);
-    dev.busNum = BUS_NUM_1;
-    dev.devAddr = DEV_ADDR_2;
+    dev = dev_;
     UsbdClient::GetInstance().CloseDevice(dev);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #define USBD_Request_TEST_H
 
 #include <gtest/gtest.h>
+#include "usb_param.h"
 
 class UsbdRequestTest : public testing::Test {
 public:
@@ -23,5 +24,7 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+
+    static struct OHOS::USB::UsbDev dev_;
 };
 #endif // USBD_Request_TEST_H
