@@ -46,6 +46,13 @@ group("hdi_audio") {
       deps += [ "config/linux:hdf_audio_path_json" ]
     }
   }
+
+  if (defined(enable_audio_policy_config) &&
+      enable_audio_policy_config == true) {
+    deps += [
+      "//vendor/${product_company}/${product_name}/audio:audio_policy_config",
+    ]
+  }
 }
 
 group("audio_sample_client") {
