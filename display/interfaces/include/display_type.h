@@ -100,41 +100,42 @@ enum {
  *
  */
 typedef enum {
-    PIXEL_FMT_CLUT8 = 0,        /**< CLUT8 format */
-    PIXEL_FMT_CLUT1,            /**< CLUT1 format */
-    PIXEL_FMT_CLUT4,            /**< CLUT4 format */
-    PIXEL_FMT_RGB_565,          /**< RGB565 format */
-    PIXEL_FMT_RGBA_5658,        /**< RGBA5658 format */
-    PIXEL_FMT_RGBX_4444,        /**< RGBX4444 format */
-    PIXEL_FMT_RGBA_4444,        /**< RGBA4444 format */
-    PIXEL_FMT_RGB_444,          /**< RGB444 format */
-    PIXEL_FMT_RGBX_5551,        /**< RGBX5551 format */
-    PIXEL_FMT_RGBA_5551,        /**< RGBA5551 format */
-    PIXEL_FMT_RGB_555,          /**< RGB555 format */
-    PIXEL_FMT_RGBX_8888,        /**< RGBX8888 format */
-    PIXEL_FMT_RGBA_8888,        /**< RGBA8888 format */
-    PIXEL_FMT_RGB_888,          /**< RGB888 format */
-    PIXEL_FMT_BGR_565,          /**< BGR565 format */
-    PIXEL_FMT_BGRX_4444,        /**< BGRX4444 format */
-    PIXEL_FMT_BGRA_4444,        /**< BGRA4444 format */
-    PIXEL_FMT_BGRX_5551,        /**< BGRX5551 format */
-    PIXEL_FMT_BGRA_5551,        /**< BGRA5551 format */
-    PIXEL_FMT_BGRX_8888,        /**< BGRX8888 format */
-    PIXEL_FMT_BGRA_8888,        /**< BGRA8888 format */
-    PIXEL_FMT_YUV_422_I,        /**< YUV422 interleaved format */
-    PIXEL_FMT_YCBCR_422_SP,     /**< YCBCR422 semi-planar format */
-    PIXEL_FMT_YCRCB_422_SP,     /**< YCRCB422 semi-planar format */
-    PIXEL_FMT_YCBCR_420_SP,     /**< YCBCR420 semi-planar format */
-    PIXEL_FMT_YCRCB_420_SP,     /**< YCRCB420 semi-planar format */
-    PIXEL_FMT_YCBCR_422_P,      /**< YCBCR422 planar format */
-    PIXEL_FMT_YCRCB_422_P,      /**< YCRCB422 planar format */
-    PIXEL_FMT_YCBCR_420_P,      /**< YCBCR420 planar format */
-    PIXEL_FMT_YCRCB_420_P,      /**< YCRCB420 planar format */
-    PIXEL_FMT_YUYV_422_PKG,     /**< YUYV422 packed format */
-    PIXEL_FMT_UYVY_422_PKG,     /**< UYVY422 packed format */
-    PIXEL_FMT_YVYU_422_PKG,     /**< YVYU422 packed format */
-    PIXEL_FMT_VYUY_422_PKG,     /**< VYUY422 packed format */
-    PIXEL_FMT_BUTT              /**< Invalid pixel format */
+    PIXEL_FMT_CLUT8 = 0,                 /**< CLUT8 format */
+    PIXEL_FMT_CLUT1,                     /**< CLUT1 format */
+    PIXEL_FMT_CLUT4,                     /**< CLUT4 format */
+    PIXEL_FMT_RGB_565,                   /**< RGB565 format */
+    PIXEL_FMT_RGBA_5658,                 /**< RGBA5658 format */
+    PIXEL_FMT_RGBX_4444,                 /**< RGBX4444 format */
+    PIXEL_FMT_RGBA_4444,                 /**< RGBA4444 format */
+    PIXEL_FMT_RGB_444,                   /**< RGB444 format */
+    PIXEL_FMT_RGBX_5551,                 /**< RGBX5551 format */
+    PIXEL_FMT_RGBA_5551,                 /**< RGBA5551 format */
+    PIXEL_FMT_RGB_555,                   /**< RGB555 format */
+    PIXEL_FMT_RGBX_8888,                 /**< RGBX8888 format */
+    PIXEL_FMT_RGBA_8888,                 /**< RGBA8888 format */
+    PIXEL_FMT_RGB_888,                   /**< RGB888 format */
+    PIXEL_FMT_BGR_565,                   /**< BGR565 format */
+    PIXEL_FMT_BGRX_4444,                 /**< BGRX4444 format */
+    PIXEL_FMT_BGRA_4444,                 /**< BGRA4444 format */
+    PIXEL_FMT_BGRX_5551,                 /**< BGRX5551 format */
+    PIXEL_FMT_BGRA_5551,                 /**< BGRA5551 format */
+    PIXEL_FMT_BGRX_8888,                 /**< BGRX8888 format */
+    PIXEL_FMT_BGRA_8888,                 /**< BGRA8888 format */
+    PIXEL_FMT_YUV_422_I,                 /**< YUV422 interleaved format */
+    PIXEL_FMT_YCBCR_422_SP,              /**< YCBCR422 semi-planar format */
+    PIXEL_FMT_YCRCB_422_SP,              /**< YCRCB422 semi-planar format */
+    PIXEL_FMT_YCBCR_420_SP,              /**< YCBCR420 semi-planar format */
+    PIXEL_FMT_YCRCB_420_SP,              /**< YCRCB420 semi-planar format */
+    PIXEL_FMT_YCBCR_422_P,               /**< YCBCR422 planar format */
+    PIXEL_FMT_YCRCB_422_P,               /**< YCRCB422 planar format */
+    PIXEL_FMT_YCBCR_420_P,               /**< YCBCR420 planar format */
+    PIXEL_FMT_YCRCB_420_P,               /**< YCRCB420 planar format */
+    PIXEL_FMT_YUYV_422_PKG,              /**< YUYV422 packed format */
+    PIXEL_FMT_UYVY_422_PKG,              /**< UYVY422 packed format */
+    PIXEL_FMT_YVYU_422_PKG,              /**< YVYU422 packed format */
+    PIXEL_FMT_VYUY_422_PKG,              /**< VYUY422 packed format */
+    PIXEL_FMT_VENDER_MASK = 0X7FFF0000,  /**< vendor mask format */
+    PIXEL_FMT_BUTT = 0X7FFFFFFF          /**< Invalid pixel format */
 } PixelFormat;
 
 /**
@@ -463,6 +464,9 @@ typedef enum {
     COMPOSITION_DEVICE,       /**< Device composition type. The composer should be the hardware. */
     COMPOSITION_CURSOR,       /**< Cursor composition type, used for cursor. */
     COMPOSITION_VIDEO,        /**< Cursor composition type, used for video. */
+    COMPOSITION_DEVICE_CLEAR, /**< Device clear composition type, the device will clear the target region. */
+    COMPOSITION_CLIENT_CLEAR, /**< Client clear composition type, the service will clear the target region. */
+    COMPOSITION_TUNNEL,       /**< Tunnel composition type, used for tunnel. */
     COMPOSITION_BUTT
 } CompositionType;
 
@@ -631,6 +635,21 @@ typedef struct {
     int64_t time;                         /**< Present timestamp value */
 } PresentTimestamp;
 
+typedef struct {
+    int32_t fd;                  /**< Handle fd, -1 if not supported */
+    uint32_t reserveInts;        /**< the number of reserved integer value */
+    int32_t reserve[0];          /**< the reserved data */
+} __attribute__((__packed__)) ExtDataHandle;
+
+typedef struct {
+    void *baseAddr;              /**< Base address of memory */
+    size_t yOffset;              /**< Offset of Y */
+    size_t uOffset;              /**< Offset of U */
+    size_t vOffset;              /**< Offset of V */
+    size_t yStride;              /**< Stride of Y */
+    size_t uvStride;             /**< Stride of UV */
+    size_t uvStep;               /**< Step of UV */
+} __attribute__((__packed__)) YUVDescInfo;
 #ifdef __cplusplus
 }
 #endif
