@@ -106,15 +106,21 @@ if (defined(ohos_lite)) {
   }
 } else {
   ohos_shared_library("hdi_audio_interface_lib_capture") {
-    sources = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
-      "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_capture.c",
-      "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_common.c",
-    ]
-
+    sources =
+        [ "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c" ]
+    if (defined(enable_audio_alsa_lib) && enable_audio_alsa_lib == true) {
+      sources += [
+        "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_capture.c",
+        "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_common.c",
+      ]
+    } else {
+      sources += [
+        "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_capture.c",
+        "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_common.c",
+      ]
+    }
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
@@ -139,7 +145,16 @@ if (defined(ohos_lite)) {
       ]
       deps += [ "//third_party/tinyalsa:libtinyalsa" ]
     }
-
+    if (defined(enable_audio_alsa_lib) && enable_audio_alsa_lib == true) {
+      include_dirs += [
+        "//third_party/alsa-lib/include",
+        "//drivers/peripheral/audio/supportlibs/alsa_adapter/include",
+      ]
+      deps += [ "//third_party/alsa-lib:libasound" ]
+    } else {
+      include_dirs +=
+          [ "//drivers/peripheral/audio/supportlibs/adm_adapter/include" ]
+    }
     if (is_standard_system) {
       external_deps = [
         "device_driver_framework:libhdf_host",
@@ -161,15 +176,22 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("hdi_audio_interface_lib_render") {
-    sources = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
-      "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_common.c",
-      "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_render.c",
-    ]
+    sources =
+        [ "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c" ]
+    if (defined(enable_audio_alsa_lib) && enable_audio_alsa_lib == true) {
+      sources += [
+        "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_common.c",
+        "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_render.c",
+      ]
+    } else {
+      sources += [
+        "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_common.c",
+        "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_render.c",
+      ]
+    }
 
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
@@ -194,7 +216,16 @@ if (defined(ohos_lite)) {
       ]
       deps += [ "//third_party/tinyalsa:libtinyalsa" ]
     }
-
+    if (defined(enable_audio_alsa_lib) && enable_audio_alsa_lib == true) {
+      include_dirs += [
+        "//drivers/peripheral/audio/supportlibs/alsa_adapter/include",
+        "//third_party/alsa-lib/include",
+      ]
+      deps += [ "//third_party/alsa-lib:libasound" ]
+    } else {
+      include_dirs +=
+          [ "//drivers/peripheral/audio/supportlibs/adm_adapter/include" ]
+    }
     if (is_standard_system) {
       external_deps = [
         "device_driver_framework:libhdf_host",

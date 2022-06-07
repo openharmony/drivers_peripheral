@@ -353,8 +353,8 @@ int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
 {
     int32_t ret;
     struct AudioCardInfo *cardIns;
-    int32_t volMax = MAX_VOLUME;
-    int32_t volMin = MIN_VOLUME;
+    long volMax = MAX_VOLUME;
+    long volMin = MIN_VOLUME;
 
     if (handleData == NULL) {
         LOG_FUN_ERR("Param is NULL!");
@@ -377,7 +377,7 @@ int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
     }
 
     ret = snd_mixer_selem_get_capture_volume_range(cardIns->ctrlLeftVolume,
-                                                   (long *)&volMin, (long *)&volMax);
+                                                   &volMin, &volMax);
     if (ret < 0) {
         LOG_FUN_ERR("Get capture volume range fail: %{public}s.", snd_strerror(ret));
         (void)CloseMixerHandle(cardIns->mixer);
