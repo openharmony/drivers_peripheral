@@ -14,19 +14,36 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
+HDI_WLAN_SERVICE_PATH =
+    rebase_path("//device/soc/${device_company}/common/hal/wlan")
+cmd = "if [ -f ${HDI_WLAN_SERVICE_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
+HAVE_WLAN_DAL_SERVICE =
+    exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
+
 ohos_shared_library("libwlan_service_1.0") {
   include_dirs = [
     "//drivers/peripheral/wlan/interfaces/include",
     "//drivers/peripheral/wlan/client/include",
     "//drivers/peripheral/wlan/hal/include",
+    "//drivers/peripheral/wlan/hdi_service/service_common",
   ]
-  sources = [ "wlan_impl.c" ]
+  sources = [
+    "service_common/wlan_common_cmd.c",
+    "wlan_interface_service.c",
+  ]
 
   deps = [
     "//drivers/interface/wlan/v1_0:libwlan_stub_1.0",
     "//drivers/peripheral/wlan/hal:wifi_hal",
   ]
 
+  if (HAVE_WLAN_DAL_SERVICE) {
+    deps += [ "${HDI_WLAN_SERVICE_PATH}:service_extend" ]
+    include_dirs += [ "//device/soc/${device_company}/common/hal/wlan" ]
+  } else {
+    deps += [ "//drivers/peripheral/wlan/hdi_service/service_extend:libwlan_service_extend" ]
+    include_dirs += [ "//drivers/peripheral/wlan/hdi_service/service_extend" ]
+  }
   defines = [ "__OHOS__USER__" ]
 
   cflags = [
@@ -71,6 +88,14 @@ ohos_shared_library("libwifi_hdi_c_device") {
     "//drivers/interface/wlan/v1_0:libwlan_stub_1.0",
     "//drivers/peripheral/wlan/hdi_service:libwlan_service_1.0",
   ]
+
+  if (HAVE_WLAN_DAL_SERVICE) {
+    deps += [ "${HDI_WLAN_SERVICE_PATH}:service_extend" ]
+    include_dirs += [ "//device/soc/${device_company}/common/hal/wlan" ]
+  } else {
+    deps += [ "//drivers/peripheral/wlan/hdi_service/service_extend:libwlan_service_extend" ]
+    include_dirs += [ "//drivers/peripheral/wlan/hdi_service/service_extend" ]
+  }
 
   cflags = [
     "-Wall",

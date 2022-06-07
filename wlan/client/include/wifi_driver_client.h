@@ -232,6 +232,8 @@ int32_t SetResetDriver(const uint8_t chipId, const char *ifName);
 int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult);
 int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode);
 int32_t SetPowerMode(const char *ifName, uint8_t mode);
+int32_t StartChannelMeas(const char *ifName, int32_t commandId, const int32_t *paramBuf, uint32_t paramBufLen);
+int32_t GetChannelMeasResult(const char *ifName, int32_t commandId, uint32_t *paramBuf, uint32_t *paramBufLen);
 
 /* wpa related interface */
 #define MAX_SSID_LEN 32

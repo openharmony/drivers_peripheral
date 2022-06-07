@@ -843,6 +843,72 @@ int32_t WifiCmdScan(const char *ifName, WifiScan *scan)
     return ret;
 }
 
+int32_t StartChannelMeas(const char *ifName, int32_t commandId, const int32_t *paramBuf, uint32_t paramBufLen)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    struct HdfSBuf *data = NULL;
+
+    data = HdfSbufObtainDefaultSize();
+    if (data == NULL) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufObtainDefaultSize fail!", __FUNCTION__);
+        return ret;
+    }
+
+    do {
+        if (!HdfSbufWriteString(data, ifName)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write ifName fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteInt32(data, commandId)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write commandId fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteBuffer(data, paramBuf, paramBufLen)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write paramBuf fail!", __FUNCTION__);
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_START_CHANNEL_MEAS, data, NULL);
+    } while (0);
+
+    HdfSbufRecycle(data);
+    return ret;
+}
+
+int32_t GetChannelMeasResult(const char *ifName, int32_t commandId, uint32_t *paramBuf, uint32_t *paramBufLen)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufObtainDefault fail", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+
+    do {
+        if (!HdfSbufWriteString(data, ifName)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write ifName fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteInt32(data, commandId)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write commandId fail!", __FUNCTION__);
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_GET_CHANNEL_MEAS_RESULT, data, reply);
+        if (ret != RET_CODE_SUCCESS) {
+            break;
+        }
+        if (!HdfSbufReadBuffer(reply, (const void **)(&paramBuf), paramBufLen)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: read paramBuf fail!", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+        }
+    } while (0);
+
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
+    return ret;
+}
+
 #ifdef __cplusplus
 #if __cplusplus
 }
