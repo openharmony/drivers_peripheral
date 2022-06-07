@@ -26,7 +26,8 @@ group("lib") {
     testonly = true
   }
   deps = []
-  if (!enable_audio_device_mpi) {
+  if (!enable_audio_device_mpi &&
+      (!defined(enable_audio_alsa_lib) || enable_audio_alsa_lib == false)) {
     deps += [
       "interface_lib_capture:hdf_audio_lib_capture_test",
       "interface_lib_render:hdf_audio_lib_render_test",

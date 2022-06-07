@@ -596,7 +596,7 @@ int32_t HdiServiceCaptureCaptureFrame(const struct HdfDeviceIoClient *client,
     if (!HdfSbufReadUint64(data, &requestBytes)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    frame = (char *)calloc(1, FRAME_DATA);
+    frame = (char *)calloc(1, CAPTURE_FRAME_DATA); // 1 for one element
     if (frame == NULL) {
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
