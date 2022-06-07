@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include "camera_metadata_operator.h"
 #include "ipp_node.h"
 
 namespace OHOS::Camera {
@@ -66,6 +66,151 @@ RetCode IppNode::Flush(const int32_t streamId)
     return RC_OK;
 }
 
+RetCode IppNode::SetCallback(const MetaDataCb cb)
+{
+    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
+    metaDataCb_ = cb;
+    GetDeviceController();
+    sensorController_->SetMetaDataCallBack([this](const std::shared_ptr<CameraMetadata>& metadata) {
+        OnMetadataChanged(metadata);
+    });
+    return RC_OK;
+}
+
+void IppNode::OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata)
+{
+    if (metadata == nullptr) {
+        CAMERA_LOGE("meta is nullptr");
+        return;
+    }
+    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
+    // device metadata changed callback
+    GetNodeMetaData(metadata);
+    if (metaDataCb_ == nullptr) {
+        CAMERA_LOGE("metaDataCb_ is nullptr");
+        return;
+    }
+    metaDataCb_(metadata);
+}
+
+void IppNode::GetNodeMetaData(std::shared_ptr<CameraMetadata> metadata)
+{
+    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
+    GetCameraFaceDetectSwitch(metadata);
+    GetCameraFaceRectangles(metadata);
+    GetCameraFaceIds(metadata);
+    GetTimestamp(metadata);
+    GetFocusMode(metadata);
+    GetFocusState(metadata);
+    GetExposureMode(metadata);
+    GetExposureTime(metadata);
+    GetExposureCompensation(metadata);
+    GetExposureState(metadata);
+}
+
+void IppNode::GetCameraFaceDetectSwitch(std::shared_ptr<CameraMetadata> meta)
+{
+    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
+    uint8_t faceDetectSwitch = OHOS_CAMERA_FACE_DETECT_MODE_SIMPLE;
+    meta->addEntry(OHOS_STATISTICS_FACE_DETECT_SWITCH, &faceDetectSwitch, sizeof(faceDetectSwitch));
+}
+
+void IppNode::GetCameraFaceIds(std::shared_ptr<CameraMetadata> meta)
+{
+    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
+    std::vector<int32_t> vFaceIds;
+    vFaceIds.push_back(0);
+    meta->addEntry(OHOS_STATISTICS_FACE_IDS,
+        vFaceIds.data(),
+        vFaceIds.size());
+}
+
+void IppNode::GetTimestamp(std::shared_ptr<CameraMetadata> meta)
+{
+    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
+    int64_t timestamp = 0;
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    timestamp =  static_cast<uint64_t>(tv.tv_sec) * 1000 * 1000 + tv.tv_usec; // 1000:microsecond
+    meta->addEntry(OHOS_SENSOR_INFO_TIMESTAMP, &timestamp, sizeof(timestamp));
+}
+
+void IppNode::GetCameraFaceRectangles(std::shared_ptr<CameraMetadata> meta)
+{
+    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
+    std::vector<std::vector<int32_t>> vFaceRectangles;
+    std::vector<int32_t> vFaceRectangle;
+    int32_t faceRectangle = 1;
+    vFaceRectangle.push_back(faceRectangle);
+    vFaceRectangle.push_back(faceRectangle);
+    vFaceRectangle.push_back(faceRectangle);
+    vFaceRectangle.push_back(faceRectangle);
+    vFaceRectangles.push_back(vFaceRectangle);
+    meta->addEntry(OHOS_STATISTICS_FACE_RECTANGLES,
+        vFaceRectangles.data(),
+        vFaceRectangles.size());
+}
+
+void IppNode::GetFocusMode(std::shared_ptr<CameraMetadata> meta)
+{
+    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
+    uint8_t focusMode = OHOS_CAMERA_FOCUS_MODE_LOCKED;
+    meta->addEntry(OHOS_CONTROL_FOCUS_MODE, &focusMode, sizeof(focusMode));
+}
+
+void IppNode::GetFocusState(std::shared_ptr<CameraMetadata> meta)
+{
+    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
+    uint8_t focusState = OHOS_CAMERA_FOCUS_STATE_UNFOCUSED;
+    meta->addEntry(OHOS_CONTROL_FOCUS_STATE, &focusState, sizeof(focusState));
+}
+
+void IppNode::GetExposureMode(std::shared_ptr<CameraMetadata> meta)
+{
+    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
+    uint8_t exposureMode = OHOS_CAMERA_EXPOSURE_MODE_AUTO;
+    meta->addEntry(OHOS_CONTROL_EXPOSURE_MODE, &exposureMode, sizeof(exposureMode));
+}
+
+void IppNode::GetExposureTime(std::shared_ptr<CameraMetadata> meta)
+{
+    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
+    int64_t exposureTime = 1;
+    meta->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &exposureTime, sizeof(exposureTime));
+}
+
+void IppNode::GetExposureCompensation(std::shared_ptr<CameraMetadata> meta)
+{
+    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
+    int32_t exposureCompensation = 1;
+    meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &exposureCompensation, sizeof(exposureCompensation));
+}
+
+void IppNode::GetExposureState(std::shared_ptr<CameraMetadata> meta)
+{
+    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
+    uint8_t exposureState = OHOS_CAMERA_EXPOSURE_STATE_SCAN;
+    meta->addEntry(OHOS_CONTROL_EXPOSURE_STATE, &exposureState, sizeof(exposureState));
+}
+
+RetCode IppNode::GetDeviceController()
+{
+    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
+    deviceManager_ = IDeviceManager::GetInstance();
+    if (deviceManager_ == nullptr) {
+        CAMERA_LOGE("get device manager failed.");
+        return RC_ERROR;
+    }
+    CameraId cameraId = CAMERA_FIRST;
+    sensorController_ = std::static_pointer_cast<IController>
+        (deviceManager_->GetController(cameraId, DM_M_SENSOR, DM_C_SENSOR));
+    if (sensorController_ == nullptr) {
+        CAMERA_LOGE("get device controller failed");
+        return RC_ERROR;
+    }
+    return RC_OK;
+}
+
 RetCode IppNode::Stop(const int32_t streamId)
 {
     // stop offline stream process thread
@@ -90,6 +235,110 @@ RetCode IppNode::Config(const int32_t streamId, const CaptureMeta& meta)
     }
 
     return RC_OK;
+}
+
+RetCode IppNode::UpdateSettingsConfig(const CaptureMeta& meta)
+{
+    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
+    return SendNodeMetaData(meta);
+}
+
+RetCode IppNode::SendNodeMetaData(const std::shared_ptr<CameraMetadata> meta)
+{
+    if (meta == nullptr) {
+        CAMERA_LOGE("meta is nullptr");
+        return RC_ERROR;
+    }
+    common_metadata_header_t *data = meta->get();
+    if (data == nullptr) {
+        CAMERA_LOGE("data is nullptr");
+        return RC_ERROR;
+    }
+
+    RetCode rc = SendExposureMetaData(data);
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("SendExposureMetaData fail");
+    }
+    rc = SendFocusMetaData(data);
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("SendFocusMetaData fail");
+    }
+    rc = SendFaceModeMetaData(data);
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("SendFaceModeMetaData fail");
+    }
+    return rc;
+}
+
+RetCode IppNode::SendExposureMetaData(const common_metadata_header_t *data)
+{
+    uint8_t exposureMode = 0;
+    camera_metadata_item_t entry;
+    (void) data;
+
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_EXPOSURE_MODE, &entry);
+    if (ret == 0) {
+        exposureMode = *(entry.data.u8);
+        CAMERA_LOGI("Set  exposureMode [%{public}d]", exposureMode);
+    }
+
+    int64_t exposureTime = 0;
+    ret = FindCameraMetadataItem(data, OHOS_SENSOR_EXPOSURE_TIME, &entry);
+    if (ret == 0) {
+        exposureTime = *(entry.data.i64);
+        CAMERA_LOGI("Set exposureTime [%{public}d]", exposureTime);
+    }
+
+    int32_t exposureCompensation = 0;
+    ret = FindCameraMetadataItem(data, OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &entry);
+    if (ret == 0) {
+        exposureCompensation = *(entry.data.i32);
+        CAMERA_LOGI("Set exposureCompensation [%{public}d]", exposureCompensation);
+    }
+
+    return RC_OK;
+}
+
+RetCode IppNode::SendFocusMetaData(const common_metadata_header_t *data)
+{
+    uint8_t focusMode = -1;
+    camera_metadata_item_t entry;
+    (void) data;
+
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FOCUS_MODE, &entry);
+    if (ret == 0) {
+        focusMode = *(entry.data.u8);
+        CAMERA_LOGI("Set focusMode [%{public}d]", focusMode);
+    }
+
+    std::vector<int32_t> afRegions;
+    ret = FindCameraMetadataItem(data, OHOS_CONTROL_AF_REGIONS, &entry);
+    if (ret == 0) {
+        for (int i = 0; i < entry.count; i++) {
+            CAMERA_LOGI("Set afRegions [%{public}d]", *(entry.data.i32 + i));
+            afRegions.push_back(*(entry.data.i32 + i));
+        }
+    }
+
+    return RC_OK;
+}
+
+RetCode IppNode::SendFaceModeMetaData(const common_metadata_header_t *data)
+{
+    RetCode rc = RC_OK;
+    uint8_t faceMode = 0;
+    camera_metadata_item_t entry;
+    (void) data;
+
+    int ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_DETECT_SWITCH, &entry);
+    if (ret != 0) {
+        rc = RC_ERROR;
+        CAMERA_LOGE("Facemode not found in metadata.");
+        return rc;
+    }
+    faceMode = *(entry.data.u8);
+    CAMERA_LOGI("Set faceMode [%{public}d]", faceMode);
+    return rc;
 }
 
 void IppNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)

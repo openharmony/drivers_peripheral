@@ -148,6 +148,12 @@ RetCode NodeBase::Flush(const int32_t streamId)
     return RC_OK;
 }
 
+RetCode NodeBase::SetCallback(const MetaDataCb cb)
+{
+    (void)cb;
+    return RC_OK;
+}
+
 RetCode NodeBase::Stop(const int32_t streamId)
 {
     (void)streamId;
@@ -157,6 +163,12 @@ RetCode NodeBase::Stop(const int32_t streamId)
 RetCode NodeBase::Config(const int32_t streamId, const CaptureMeta& meta)
 {
     (void)streamId;
+    (void)meta;
+    return RC_OK;
+}
+
+RetCode NodeBase::UpdateSettingsConfig(const CaptureMeta& meta)
+{
     (void)meta;
     return RC_OK;
 }

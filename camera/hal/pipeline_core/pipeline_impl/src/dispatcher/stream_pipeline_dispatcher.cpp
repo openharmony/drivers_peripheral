@@ -69,7 +69,25 @@ RetCode StreamPipelineDispatcher::Update(const std::shared_ptr<Pipeline>& p)
         }
     }
     CAMERA_LOGI("------------------------Node Seq(UpStream) Dump End-------------\n");
+#ifndef CAMERA_BUILT_ON_OHOS_LITE
+    SetDispatcherCallback();
+#endif
+
     return RC_OK;
+}
+
+RetCode StreamPipelineDispatcher::SetDispatcherCallback()
+{
+    CAMERA_LOGI("StreamPipelineDispatcher line: %{public}d", __LINE__);
+    RetCode ret = RC_OK;
+    for (auto iter = seqNode_.begin(); iter != seqNode_.end(); iter++) {
+        for (auto it = iter->second.rbegin(); it != iter->second.rend(); it++) {
+            CAMERA_LOGI("SetCallback node %{public}s begin", (*it)->GetName().c_str());
+            ret = (*it)->SetCallback(metaDataCb_) | ret;
+            CAMERA_LOGI("SetCallback node %{public}s end", (*it)->GetName().c_str());
+        }
+    }
+    return ret;
 }
 
 void StreamPipelineDispatcher::CutUselessBranch(int32_t streamId, std::vector<std::shared_ptr<INode>>& branch)
@@ -99,13 +117,13 @@ RetCode StreamPipelineDispatcher::Prepare(const int32_t streamId)
         return RC_ERROR;
     }
 
-    RetCode re = RC_OK;
+    RetCode ret = RC_OK;
     for (auto it = seqNode_[streamId].rbegin(); it != seqNode_[streamId].rend(); it++) {
         CAMERA_LOGV("init node %{public}s begin", (*it)->GetName().c_str());
-        re = (*it)->Init(streamId) | re;
+        ret = (*it)->Init(streamId) | ret;
         CAMERA_LOGV("init node %{public}s end", (*it)->GetName().c_str());
     }
-    return re;
+    return ret;
 }
 
 RetCode StreamPipelineDispatcher::Start(const int32_t streamId)
@@ -114,13 +132,13 @@ RetCode StreamPipelineDispatcher::Start(const int32_t streamId)
         return RC_ERROR;
     }
 
-    RetCode re = RC_OK;
+    RetCode ret = RC_OK;
     for (auto it = seqNode_[streamId].rbegin(); it != seqNode_[streamId].rend(); it++) {
         CAMERA_LOGV("start node %{public}s begin", (*it)->GetName().c_str());
-        re = (*it)->Start(streamId) | re;
+        ret = (*it)->Start(streamId) | ret;
         CAMERA_LOGV("start node %{public}s end", (*it)->GetName().c_str());
     }
-    return re;
+    return ret;
 }
 
 RetCode StreamPipelineDispatcher::Config(const int32_t streamId, const CaptureMeta& meta)
@@ -129,11 +147,24 @@ RetCode StreamPipelineDispatcher::Config(const int32_t streamId, const CaptureMe
         return RC_ERROR;
     }
 
-    RetCode re = RC_OK;
+    RetCode ret = RC_OK;
     for (auto it = seqNode_[streamId].rbegin(); it != seqNode_[streamId].rend(); it++) {
-        re = (*it)->Config(streamId, meta) | re;
+        ret = (*it)->Config(streamId, meta) | ret;
     }
-    return re;
+    return ret;
+}
+
+RetCode StreamPipelineDispatcher::UpdateSettingsConfig(const CaptureMeta& meta)
+{
+    RetCode ret = RC_OK;
+    for (auto iter = seqNode_.begin(); iter != seqNode_.end(); iter++) {
+        for (auto it = iter->second.rbegin(); it != iter->second.rend(); it++) {
+            CAMERA_LOGV("UpdateSettingsConfig node %{public}s begin", (*it)->GetName().c_str());
+            ret = (*it)->UpdateSettingsConfig(meta) | ret;
+            CAMERA_LOGV("UpdateSettingsConfig node %{public}s end", (*it)->GetName().c_str());
+        }
+    }
+    return ret;
 }
 
 RetCode StreamPipelineDispatcher::Flush(const int32_t streamId)
@@ -142,13 +173,19 @@ RetCode StreamPipelineDispatcher::Flush(const int32_t streamId)
         return RC_ERROR;
     }
 
-    RetCode re = RC_OK;
+    RetCode ret = RC_OK;
     for (auto it = seqNode_[streamId].rbegin(); it != seqNode_[streamId].rend(); it++) {
         CAMERA_LOGV("flush node %{public}s begin", (*it)->GetName().c_str());
-        re = (*it)->Flush(streamId) | re;
+        ret = (*it)->Flush(streamId) | ret;
         CAMERA_LOGV("flush node %{public}s end", (*it)->GetName().c_str());
     }
-    return re;
+    return ret;
+}
+
+void StreamPipelineDispatcher::SetCallback(const MetaDataCb cb)
+{
+    CAMERA_LOGI("StreamPipelineDispatcher line: %{public}d", __LINE__);
+    metaDataCb_ = cb;
 }
 
 RetCode StreamPipelineDispatcher::Stop(const int32_t streamId)
@@ -157,13 +194,13 @@ RetCode StreamPipelineDispatcher::Stop(const int32_t streamId)
         return RC_OK;
     }
 
-    RetCode re = RC_OK;
+    RetCode ret = RC_OK;
     for (auto it = seqNode_[streamId].rbegin(); it != seqNode_[streamId].rend(); it++) {
         CAMERA_LOGV("stop node %{public}s begin", (*it)->GetName().c_str());
-        re = (*it)->Stop(streamId) | re;
+        ret = (*it)->Stop(streamId) | ret;
         CAMERA_LOGV("stop node %{public}s end", (*it)->GetName().c_str());
     }
-    return re;
+    return ret;
 }
 
 RetCode StreamPipelineDispatcher::Capture(const int32_t streamId, const int32_t captureId)
@@ -172,12 +209,12 @@ RetCode StreamPipelineDispatcher::Capture(const int32_t streamId, const int32_t 
         return RC_ERROR;
     }
 
-    RetCode re = RC_OK;
+    RetCode ret = RC_OK;
     for (auto it = seqNode_[streamId].begin(); it != seqNode_[streamId].end(); it++) {
-        re = (*it)->Capture(streamId, captureId) | re;
+        ret = (*it)->Capture(streamId, captureId) | ret;
     }
 
-    return re;
+    return ret;
 }
 
 RetCode StreamPipelineDispatcher::CancelCapture(const int32_t streamId)
@@ -186,12 +223,12 @@ RetCode StreamPipelineDispatcher::CancelCapture(const int32_t streamId)
         return RC_ERROR;
     }
 
-    RetCode re = RC_OK;
+    RetCode ret = RC_OK;
     for (auto it = seqNode_[streamId].begin(); it != seqNode_[streamId].end(); it++) {
-        re = (*it)->CancelCapture(streamId) | re;
+        ret = (*it)->CancelCapture(streamId) | ret;
     }
 
-    return re;
+    return ret;
 }
 
 RetCode StreamPipelineDispatcher::Destroy(const int32_t streamId)
