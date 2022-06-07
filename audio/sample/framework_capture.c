@@ -48,6 +48,7 @@
 #define INT_32_MAX 0x7fffffff
 #define PERIOD_SIZE 1024
 #define AUDIO_BUFF_SIZE (1024 * 16)
+#define AUDIO_ALSA_LIB_BUFF_SIZE (1000 * 24)
 #define PCM_8_BIT 8
 #define PCM_16_BIT 16
 #define AUDIO_TOTALSIZE_15M (1024 * 15)
@@ -78,7 +79,7 @@ pthread_t g_tids;
 FILE *g_file;
 char *g_frame;
 void *g_handle;
-char g_path[256];
+char g_path[256] = {'\0'};
 #ifdef AUDIO_HAL_USER
 void *g_sdkHandle;
 int (*g_sdkInitSp)() = NULL;
@@ -456,20 +457,39 @@ int32_t FrameStartCaptureMmap(const AudioHandle param)
     return HDF_SUCCESS;
 }
 
+static int32_t WriteDataToFile(FILE *file, char *buffer, uint64_t replyBytes, uint32_t *failCount, uint64_t *totalSize)
+{
+    if (file == NULL || buffer == NULL || failCount == NULL || totalSize == NULL) {
+        LOG_FUN_ERR("WriteDataToFile params is null!");
+        return HDF_FAILURE;
+    }
+    *failCount = 0;
+    (void)fwrite(buffer, (size_t)replyBytes, 1, file);
+    *totalSize += (replyBytes / PERIOD_SIZE); // 1024 = 1Kb
+    if (*totalSize % AUDIO_RECORD_INTERVAL_512KB == 0) { // 512KB
+        printf("\nRecording,the audio file size is %"PRIu64"Kb\n", *totalSize);
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t FrameStartCapture(const AudioHandle param)
 {
     if (param == NULL) {
         return HDF_FAILURE;
     }
+#ifdef ALSA_LIB_MODE
+    uint32_t bufferSize = AUDIO_ALSA_LIB_BUFF_SIZE;
+    uint64_t requestBytes = AUDIO_ALSA_LIB_BUFF_SIZE;
+#else
+    uint32_t bufferSize = AUDIO_BUFF_SIZE;
+    uint64_t requestBytes = AUDIO_BUFF_SIZE;
+#endif
     struct StrParaCapture *strParam = (struct StrParaCapture *)param;
     struct AudioCapture *capture = strParam->capture;
-    FILE *file = strParam->file;
-    uint32_t bufferSize = AUDIO_BUFF_SIZE;   // 16 * 1024 = 16KB, it needs to be calculated by audio parameters
     uint64_t replyBytes = 0;
     uint64_t totalSize = 0;
-    uint64_t requestBytes = AUDIO_BUFF_SIZE; // 16 * 1024 = 16KB
     uint32_t failCount = 0;
-    if (capture == NULL || capture->CaptureFrame == NULL || file == NULL) {
+    if (capture == NULL || capture->CaptureFrame == NULL) {
         return HDF_FAILURE;
     }
     char *frame = (char *)calloc(1, bufferSize);
@@ -490,16 +510,12 @@ int32_t FrameStartCapture(const AudioHandle param)
             }
             continue;
         }
-        failCount = 0;
-        fwrite(frame, (size_t)replyBytes, 1, file);
-        totalSize += (replyBytes / PERIOD_SIZE); // 1024 = 1Kb
-        if (totalSize % AUDIO_RECORD_INTERVAL_512KB == 0) { // 512KB
-            printf("\nRecording,the audio file size is %"PRIu64"Kb\n", totalSize);
+        if (WriteDataToFile(strParam->file, frame, replyBytes, &failCount, &totalSize) < 0) {
+            free(frame);
+            return HDF_FAILURE;
         }
     } while ((totalSize <= AUDIO_TOTALSIZE_15M) && (!g_closeEnd)); // 15 * 1024 = 15M
-    if (frame != NULL) {
-        free(frame);
-    }
+    free(frame);
     if (!g_closeEnd) {
         if (StopButtonCapture(&g_capture) < 0) {
             return HDF_FAILURE;

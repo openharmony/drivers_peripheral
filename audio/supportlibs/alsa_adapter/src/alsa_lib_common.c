@@ -211,15 +211,30 @@ struct AudioCardInfo *GetCardIns(const char *cardName)
 
 void CheckCardStatus(struct AudioCardInfo *cardIns)
 {
+    int32_t ret;
     if (cardIns == NULL) {
         LOG_FUN_ERR("The parameter is empty!");
         return;
     }
     if (cardIns->cardStatus > 0) {
         cardIns->cardStatus -= 1;
-        if (cardIns->cardStatus == 0) {
-            (void)memset_s(cardIns->cardName, MAX_CARD_NAME_LEN + 1, 0, MAX_CARD_NAME_LEN + 1);
+    }
+    if (cardIns->cardStatus == 0) {
+        if (cardIns->renderPcmHandle != NULL) {
+            ret = snd_pcm_close(cardIns->renderPcmHandle);
+            if (ret < 0) {
+                LOG_FUN_ERR("snd_pcm_close fail: %{public}s", snd_strerror(ret));
+            }
+            cardIns->renderPcmHandle = NULL;
         }
+        if (cardIns->capturePcmHandle != NULL) {
+            ret = snd_pcm_close(cardIns->capturePcmHandle);
+            if (ret < 0) {
+                LOG_FUN_ERR("snd_pcm_close fail: %{public}s", snd_strerror(ret));
+            }
+            cardIns->capturePcmHandle = NULL;
+        }
+        (void)memset_s(cardIns->cardName, MAX_CARD_NAME_LEN + 1, 0, MAX_CARD_NAME_LEN + 1);
     }
 }
 

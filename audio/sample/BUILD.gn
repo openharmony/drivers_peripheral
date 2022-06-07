@@ -99,6 +99,10 @@ if (defined(ohos_lite)) {
       defines += [ "AUDIO_HAL_USER" ]
     }
 
+    if (defined(enable_audio_alsa_lib) && enable_audio_alsa_lib == true) {
+      defines += [ "ALSA_LIB_MODE" ]
+    }
+
     if (is_standard_system) {
       deps = [ "//drivers/peripheral/audio/hal/hdi_binder/server:hdi_audio_primary_server" ]
       external_deps = [
