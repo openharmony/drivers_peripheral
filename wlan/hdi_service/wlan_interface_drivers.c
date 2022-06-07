@@ -58,8 +58,8 @@ int HdfWlanInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
         HDF_LOGE("%{public}s: Mutex init failed, error code: %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-    if (WlanInterfaceWifiConstruct() != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Mutex init failed, error code: %{public}d", __func__, ret);
+    if (WlanInterfaceServiceInit() != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: wlan interface service init failed!", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;

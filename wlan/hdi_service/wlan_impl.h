@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef WLAN_HDI_SERVICE_STUD_H
-#define WLAN_HDI_SERVICE_STUD_H
+#ifndef WLAN_IMPL_H
+#define WLAN_IMPL_H
 
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
@@ -32,10 +32,6 @@
 #include "wifi_hal_cmd.h"
 #include "wifi_hal_sta_feature.h"
 
-struct WlanInterfaceService *WlanInterfaceServiceGet(void);
-void WlanInterfaceServiceRelease(struct WlanInterfaceService *instance);
-int32_t WlanInterfaceWifiConstruct(void);
-
 struct HdfWlanRemoteNode {
     struct IWlanCallback *callbackObj;
     struct HdfRemoteService *service;
@@ -48,5 +44,7 @@ struct HdfWlanStubData {
 };
 
 struct HdfWlanStubData *HdfStubDriver(void);
+
+int32_t WlanInterfaceServiceInit(void);
 
 #endif
