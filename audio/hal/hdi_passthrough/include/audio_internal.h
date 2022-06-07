@@ -40,6 +40,7 @@ extern "C" {
 #define PERIOD_SIZE 1024
 #define PERIOD_COUNT 2
 #define FRAME_DATA (8192 * 2)
+#define CAPTURE_FRAME_DATA 24000
 #define PATHPLAN_LEN 64
 #define PATHPLAN_COUNT 32
 #define PATH_NAME_LEN 128
