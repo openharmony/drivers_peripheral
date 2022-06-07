@@ -32,9 +32,11 @@ public:
     RetCode DestroyPipeline(const std::vector<int32_t>& ids) override;
     RetCode Prepare(const std::vector<int32_t>& ids) override;
     RetCode Start(const std::vector<int32_t>& ids) override;
+    RetCode SetCallback(const MetaDataCb cb) override;
     RetCode Flush(const std::vector<int32_t>& ids) override;
     RetCode Stop(const std::vector<int32_t>& ids) override;
     RetCode Config(const std::vector<int32_t>& ids, const CaptureMeta& meta) override;
+    RetCode UpdateSettingsConfig(const CaptureMeta& meta) override;
     RetCode Capture(const std::vector<int32_t>& ids, const int32_t captureId) override;
     RetCode CancelCapture(const std::vector<int>& streamIds) override;
     std::shared_ptr<OfflinePipeline> GetOfflinePipeline(const int32_t id) override;

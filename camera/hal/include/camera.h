@@ -135,7 +135,21 @@ enum CameraEncodeType : int32_t {
 
 enum FlashMode : uint32_t { FlASH_OFF = 0, FlASH_SINGLE, FLASH_TORCH, FLASH_AUTO };
 
-enum AdapterCmd : uint32_t { CMD_AE_EXPO, CMD_AWB_MODE, CMD_AE_EXPOTIME, CMD_AWB_COLORGAINS };
+enum AdapterCmd : uint32_t {
+    CMD_AE_EXPO,
+    CMD_AWB_MODE,
+    CMD_AE_EXPOTIME,
+    CMD_EXPOSURE_MODE,
+    CMD_EXPOSURE_COMPENSATION,
+    CMD_EXPOSURE_STATE,
+    CMD_AWB_COLORGAINS,
+    CMD_FOCUS_MODE,
+    CMD_FOCUS_REGION,
+    CMD_METER_MODE,
+    CMD_METER_POINT,
+    CMD_FLASH_MODE,
+    CMD_FPS_RANGE
+};
 
 enum AwbMode : uint32_t {
     AWB_MODE_AUTO,
