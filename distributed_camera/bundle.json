@@ -27,8 +27,8 @@
         },
         "build":{
             "sub_component":[
-                "//foundation/distributedhardware/distributedcamera/camera_hdf/interfaces/hdi_ipc/config/host:distributed_camera_host_config",
-                "//foundation/distributedhardware/distributedcamera/camera_hdf/interfaces/hdi_ipc/config/provider:distributed_camera_provider_config"
+                "//foundation/distributedhardware/distributed_camera/camera_hdf/interfaces/hdi_ipc/config/host:distributed_camera_host_config",
+                "//foundation/distributedhardware/distributed_camera/camera_hdf/interfaces/hdi_ipc/config/provider:distributed_camera_provider_config"
             ],
             "inner_kits":[
 
