@@ -52,6 +52,10 @@
 #define CODEC_CONFIG_KEY_SUPPORT_PIXEL_FMTS     "supportPixelFmts"
 #define CODEC_CONFIG_KEY_BLOCK_SIZE_WIDTH       "blockSizeWidth"
 #define CODEC_CONFIG_KEY_BLOCK_SIZE_HEIGHT      "blockSizeHeight"
+#define CODEC_CONFIG_KEY_MIN_FRAME_RATE         "minFrameRate"
+#define CODEC_CONFIG_KEY_MAX_FRAME_RATE         "maxFrameRate"
+#define CODEC_CONFIG_KEY_BITE_RATE_MODE         "bitRateMode"
+#define CODEC_CONFIG_KEY_MESURED_FRAME_RATE     "measuredFrameRate"
 
 #define CODEC_CONFIG_KEY_SAMPLE_FORMATS         "sampleFormats"
 #define CODEC_CONFIG_KEY_SAMPLE_RATE            "sampleRate"
