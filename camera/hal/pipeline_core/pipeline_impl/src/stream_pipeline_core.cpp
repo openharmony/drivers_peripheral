@@ -87,6 +87,15 @@ RetCode StreamPipelineCore::Start(const std::vector<int>& streamIds)
     return re;
 }
 
+RetCode StreamPipelineCore::SetCallback(const MetaDataCb cb)
+{
+    CAMERA_LOGE("StreamPipelineCore %{public}s: line: %{public}d", __FUNCTION__, __LINE__);
+    std::lock_guard<std::mutex> l(mutex_);
+    RetCode re = RC_OK;
+    dispatcher_->SetCallback(cb);
+    return re;
+}
+
 RetCode StreamPipelineCore::Stop(const std::vector<int>& streamIds)
 {
     std::lock_guard<std::mutex> l(mutex_);
@@ -106,6 +115,15 @@ RetCode StreamPipelineCore::Config(const std::vector<int>& streamIds, const Capt
     for (const auto& it : streamIds) {
         re = dispatcher_->Config(it, meta) | re;
     }
+    return re;
+}
+
+RetCode StreamPipelineCore::UpdateSettingsConfig(const CaptureMeta& meta)
+{
+    CAMERA_LOGE("StreamPipelineCore %{public}s: line: %{public}d", __FUNCTION__, __LINE__);
+    std::lock_guard<std::mutex> l(mutex_);
+    RetCode re = RC_OK;
+    dispatcher_->UpdateSettingsConfig(meta);
     return re;
 }
 

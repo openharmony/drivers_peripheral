@@ -40,5 +40,11 @@ void IController::SetMetaDataFlag(bool metaDataFlag)
     (void)metaDataFlag;
     return;
 }
+
+void IController::SetMetaDataCallBack(const MetaDataCb cb)
+{
+    (void)cb;
+    return;
+}
 } // namespace Camera
 } // namespace OHOS

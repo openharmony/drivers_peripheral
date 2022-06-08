@@ -64,7 +64,13 @@ CamRetCode CameraDeviceImpl::GetStreamOperator(
         ismOperator_ = spStreamOperator_;
     }
     streamOperator = ismOperator_;
-
+#ifndef CAMERA_BUILT_ON_OHOS_LITE
+    CAMERA_LOGI("CameraDeviceImpl %{public}s: line: %{public}d", __FUNCTION__, __LINE__);
+    pipelineCore_->GetStreamPipelineCore()->SetCallback(
+        [this](const std::shared_ptr<CameraMetadata> &metadata) {
+        OnMetadataChanged(metadata);
+    });
+#endif
     DFX_LOCAL_HITRACE_END;
     return NO_ERROR;
 }
@@ -265,7 +271,10 @@ RetCode CameraDeviceImpl::UpdataMetadataResultsBase()
             CAMERA_LOGE("metadata result not found tag.[metaType = %{public}d]", metaType);
             continue;
         }
-
+        if (baseEntry.count == 0 || newEntry.count == 0) {
+            CAMERA_LOGE("metadata Entry count is 0");
+            continue;
+        }
         if (!CompareTagData(baseEntry, newEntry)) {
             metadataResultsBase_ = metadataResults_;
             rc = RC_OK;
@@ -407,7 +416,7 @@ void CameraDeviceImpl::OnRequestTimeout()
 
 void CameraDeviceImpl::OnMetadataChanged(const std::shared_ptr<CameraMetadata> &metadata)
 {
-    CAMERA_LOGD("OnMetadataChanged callback success.");
+    CAMERA_LOGI("OnMetadataChanged callback success.");
     // device metadata changed callback
     {
         std::unique_lock<std::mutex> lock(metaRstMutex_);
