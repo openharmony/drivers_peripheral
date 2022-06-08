@@ -176,14 +176,12 @@ int32_t AudioCtlRenderSetPauseStu(const struct DevHandle *handle,
         return HDF_FAILURE;
     }
 
-    if (g_canPause == 0) {
-        /* The hardware does not support pause/resume,
-         * so a success message is returned.
-         * The software processing scheme is implemented
-         * in AudioOutputRenderWrite interface.
-        */
-        return HDF_SUCCESS;
-    }
+    /* The hardware does not support pause/resume,
+     * so a success message is returned.
+     * The software processing scheme is implemented
+     * in AudioOutputRenderWrite interface.
+    */
+    return HDF_SUCCESS;
 
     const char *adapterName = handleData->renderMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
@@ -385,7 +383,6 @@ int32_t AudioCtlRenderGetVolThreshold(const struct DevHandle *handle,
 
     if (handleData == NULL) {
         LOG_FUN_ERR("AudioCtlRenderGetVolThreshold parameter is NULL!");
-        (void)DestroyCardList();
         return HDF_FAILURE;
     }
 
@@ -393,16 +390,12 @@ int32_t AudioCtlRenderGetVolThreshold(const struct DevHandle *handle,
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
         LOG_FUN_ERR("cardIns is NULL!");
-        (void)DestroyCardList();
         return HDF_FAILURE;
     }
 
     ret = snd_mixer_selem_get_playback_volume_range(cardIns->ctrlLeftVolume, &volMin, &volMax);
     if (ret < 0) {
         LOG_FUN_ERR("snd_mixer_selem_get_playback_volume_range fail: %{public}s", snd_strerror(ret));
-        (void)CloseMixerHandle(cardIns->mixer);
-        CheckCardStatus(cardIns);
-        (void)DestroyCardList();
         return HDF_FAILURE;
     }
     handleData->renderMode.ctlParam.volThreshold.volMin = (int)volMin;
@@ -490,11 +483,12 @@ int32_t AudioInterfaceLibCtlRender(const struct DevHandle *handle,
 
     return HDF_FAILURE;
 }
+
 static int32_t SetHWParamsSub(snd_pcm_t *handle, snd_pcm_hw_params_t *params, struct AudioPcmHwParams hwParams,
     snd_pcm_access_t access)
 {
     int32_t ret;
-
+    snd_pcm_format_t pcmFormat;
     if (handle == NULL || params == NULL) {
         LOG_FUN_ERR("SetHWParamsSub parameter is null!");
         return HDF_FAILURE;
@@ -512,8 +506,13 @@ static int32_t SetHWParamsSub(snd_pcm_t *handle, snd_pcm_hw_params_t *params, st
         LOG_FUN_ERR("Access type not available for playback: %{public}s", snd_strerror(ret));
         return HDF_FAILURE;
     }
+    ret = CheckParaFormat(hwParams, &pcmFormat);
+    if (ret < 0) {
+        LOG_FUN_ERR("CheckParaFormat error.");
+        return HDF_FAILURE;
+    }
     /* set the sample format */
-    ret = snd_pcm_hw_params_set_format(handle, params, hwParams.format);
+    ret = snd_pcm_hw_params_set_format(handle, params, pcmFormat);
     if (ret < 0) {
         LOG_FUN_ERR("Sample format not available for playback: %{public}s", snd_strerror(ret));
         return HDF_FAILURE;
@@ -709,7 +708,6 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
 
     if (handleData == NULL) {
         LOG_FUN_ERR("The parameter is empty");
-        (void)DestroyCardList();
         return HDF_FAILURE;
     }
 
@@ -717,16 +715,12 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
         LOG_FUN_ERR("cardIns is NULL!");
-        (void)DestroyCardList();
         return HDF_FAILURE;
     }
 
     ret = GetHwParams(cardIns, handleData);
     if (ret < 0) {
         LOG_FUN_ERR("GetHwParams error.");
-        (void)CloseMixerHandle(cardIns->mixer);
-        CheckCardStatus(cardIns);
-        (void)DestroyCardList();
         return HDF_FAILURE;
     }
 
@@ -735,17 +729,11 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
     if ((ret = SetHWParams(cardIns->renderPcmHandle, hwParams, cardIns->hwRenderParams,
         SND_PCM_ACCESS_RW_INTERLEAVED)) < 0) {
         LOG_FUN_ERR("Setting of hwparams failed.");
-        (void)CloseMixerHandle(cardIns->mixer);
-        CheckCardStatus(cardIns);
-        (void)DestroyCardList();
         return HDF_FAILURE;
     }
 
     if ((ret = SetSWParams(cardIns->renderPcmHandle, swParams)) < 0) {
         LOG_FUN_ERR("Setting of swparams failed.");
-        (void)CloseMixerHandle(cardIns->mixer);
-        CheckCardStatus(cardIns);
-        (void)DestroyCardList();
         return HDF_FAILURE;
     }
 
@@ -812,7 +800,6 @@ int32_t AudioOutputRenderPrepare(const struct DevHandle *handle,
 
     if (handleData == NULL) {
         LOG_FUN_ERR("The parameter is NULL!");
-        (void)DestroyCardList();
         return HDF_FAILURE;
     }
 
@@ -820,16 +807,12 @@ int32_t AudioOutputRenderPrepare(const struct DevHandle *handle,
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
         LOG_FUN_ERR("cardIns is NULL!");
-        (void)DestroyCardList();
         return HDF_FAILURE;
     }
 
     ret = snd_pcm_prepare(cardIns->renderPcmHandle);
     if (ret < 0) {
         LOG_FUN_ERR("snd_pcm_prepare fail: %{public}s", snd_strerror(ret));
-        (void)CloseMixerHandle(cardIns->mixer);
-        CheckCardStatus(cardIns);
-        (void)DestroyCardList();
         return HDF_FAILURE;
     }
 

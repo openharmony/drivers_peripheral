@@ -123,7 +123,6 @@ struct HdfIoService *HdfIoServiceBindName(const char *serviceName);
 void InitSound(snd_mixer_t **mixer, char *hwCtlName);
 int32_t CloseMixerHandle(snd_mixer_t *alsaMixHandle);
 int32_t InitCardIns(void);
-int32_t AudioAddCardIns(const char *cardName);
 struct AudioCardInfo *GetCardIns(const char *cardName);
 struct AudioCardInfo *AudioGetCardInfo(const char *adapterName, snd_pcm_stream_t stream);
 void CheckCardStatus(struct AudioCardInfo *cardIns);
