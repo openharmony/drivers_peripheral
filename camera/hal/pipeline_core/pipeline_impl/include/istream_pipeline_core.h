@@ -37,9 +37,11 @@ public:
     virtual RetCode DestroyPipeline(const std::vector<int32_t>& ids) = 0;
     virtual RetCode Prepare(const std::vector<int32_t>& ids) = 0;
     virtual RetCode Start(const std::vector<int32_t>& ids) = 0;
+    virtual RetCode SetCallback(const MetaDataCb cb) = 0;
     virtual RetCode Flush(const std::vector<int32_t>& ids) = 0;
     virtual RetCode Stop(const std::vector<int32_t>& ids) = 0;
     virtual RetCode Config(const std::vector<int32_t>& ids, const CaptureMeta& meta) = 0;
+    virtual RetCode UpdateSettingsConfig(const CaptureMeta& meta) = 0;
     virtual ~IStreamPipelineCore() = default;
     virtual std::shared_ptr<OfflinePipeline> GetOfflinePipeline(const int32_t id) = 0;
     virtual RetCode Capture(const std::vector<int32_t>& ids, const int32_t captureId) = 0;

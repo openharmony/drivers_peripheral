@@ -273,6 +273,28 @@ void V4L2DeviceManager::SetMetaDataCallBack(const MetaDataCb cb, CameraId camera
     }
 }
 
+void V4L2DeviceManager::SetAbilityMetaDataTag(std::vector<int32_t>& abilityMetaDataTag)
+{
+    CAMERA_LOGI("V4L2DeviceManager %{public}s: line: %{public}d", __FUNCTION__, __LINE__);
+    CameraId cameraId = CAMERA_FIRST;
+    if (managerList_.size() == 0) {
+        CAMERA_LOGE("%{public}s managerList_ size is 0.", __FUNCTION__);
+        return;
+    }
+
+    for (auto iter = managerList_.cbegin(); iter != managerList_.cend(); iter++) {
+        if ((*iter)->GetManagerId() == DM_M_SENSOR) {
+            if (cameraId == CAMERA_MAX) {
+                (std::static_pointer_cast<SensorManager>(*iter))->SetAbilityMetaDataTag(abilityMetaDataTag,
+                    CameraIdToHardware(CAMERA_FIRST, DM_M_SENSOR));
+            } else {
+                (std::static_pointer_cast<SensorManager>(*iter))->SetAbilityMetaDataTag(abilityMetaDataTag,
+                    CameraIdToHardware(cameraId, DM_M_SENSOR));
+            }
+        }
+    }
+}
+
 std::string V4L2DeviceManager::CameraIdToHardware(CameraId cameraId, ManagerId managerId)
 {
     for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend(); iter++) {
