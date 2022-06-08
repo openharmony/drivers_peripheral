@@ -36,6 +36,7 @@ public:
     void SetPowerOnState(bool powerOnState);
     virtual void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag) = 0;
     virtual RetCode GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta) = 0;
+    virtual void SetMetaDataCallBack(const MetaDataCb cb);
     virtual bool GetMetaDataFlag()
     {
         return false;

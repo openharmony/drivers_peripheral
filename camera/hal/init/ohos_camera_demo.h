@@ -85,6 +85,8 @@ public:
 
     void SetAwbMode(const int mode) const;
     void SetAeExpo();
+    void SetMetadata();
+    void SetEnableResult();
     void FlashlightOnOff(bool onOff);
 
     RetCode StreamOffline(const int streamId);
@@ -153,5 +155,17 @@ private:
 #endif
     std::vector<std::string> cameraIds_ = {};
 };
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+
+#else
+class DemoCameraDeviceCallback : public Camera::CameraDeviceCallbackStub {
+public:
+    DemoCameraDeviceCallback() = default;
+    virtual ~DemoCameraDeviceCallback() = default;
+    void OnError(Camera::ErrorType type, int32_t errorMsg) override;
+    void OnResult(const uint64_t timestamp,
+                  const std::shared_ptr<Camera::CameraMetadata>& result) override;
+};
+#endif
 } // namespace OHOS::Camera
 #endif // OHOS_CAMERA_CAMERA_DEMO_H
