@@ -140,6 +140,7 @@ static struct AudioCardInfo *AddCardIns(const char *cardName)
 
     for (i = 0; i < MAX_CARD_NUM; i++) {
         if (g_audioCardIns[i].cardStatus == 0) {
+            (void)memset_s(&g_audioCardIns[i], sizeof(struct AudioCardInfo), 0, sizeof(struct AudioCardInfo));
             ret = strncpy_s(g_audioCardIns[i].cardName,
                             MAX_CARD_NAME_LEN + 1, cardName, strlen(cardName));
             if (ret != 0) {
@@ -178,7 +179,7 @@ static struct AudioCardInfo *FindCardIns(const char *cardName)
     return NULL;
 }
 
-int32_t AudioAddCardIns(const char *cardName)
+static int32_t AudioAddCardIns(const char *cardName)
 {
     struct AudioCardInfo *cardInfo = NULL;
 
@@ -729,3 +730,51 @@ struct AudioCardInfo *AudioGetCardInfo(const char *adapterName, snd_pcm_stream_t
 
     return cardIns;
 }
+
+int32_t CheckParaFormat(struct AudioPcmHwParams hwParams, snd_pcm_format_t *alsaPcmFormat)
+{
+    if (alsaPcmFormat == NULL) {
+        LOG_FUN_ERR("paras is NULL!");
+        return HDF_FAILURE;
+    }
+    enum AudioFormat audioFormat = hwParams.format;
+    bool isBigEndian = hwParams.isBigEndian;
+
+    /** Little Endian */
+    if (!isBigEndian) {
+        switch (audioFormat) {
+            case AUDIO_FORMAT_PCM_8_BIT:
+                *alsaPcmFormat = SND_PCM_FORMAT_S8;    /** Signed 8 bit */
+                return HDF_SUCCESS;
+            case AUDIO_FORMAT_PCM_16_BIT:
+                *alsaPcmFormat = SND_PCM_FORMAT_S16_LE; /** Signed 16 bit Little Endian */
+                return HDF_SUCCESS;
+            case AUDIO_FORMAT_PCM_24_BIT:
+                *alsaPcmFormat = SND_PCM_FORMAT_S24_LE; /** Signed 24 bit Little Endian */
+                return HDF_SUCCESS;
+            case AUDIO_FORMAT_PCM_32_BIT:
+                *alsaPcmFormat = SND_PCM_FORMAT_S32_LE; /** Signed 32 bit Little Endian */
+                return HDF_SUCCESS;
+            default:
+                return HDF_ERR_NOT_SUPPORT;
+        }
+    } else { /** Big Endian */
+        switch (audioFormat) {
+            case AUDIO_FORMAT_PCM_8_BIT:
+                *alsaPcmFormat = SND_PCM_FORMAT_S8;    /** Signed 8 bit */
+                return HDF_SUCCESS;
+            case AUDIO_FORMAT_PCM_16_BIT:
+                *alsaPcmFormat = SND_PCM_FORMAT_S16_BE; /** Signed 16 bit Big Endian */
+                return HDF_SUCCESS;
+            case AUDIO_FORMAT_PCM_24_BIT:
+                *alsaPcmFormat = SND_PCM_FORMAT_S24_BE; /** Signed 24 bit Big Endian */
+                return HDF_SUCCESS;
+            case AUDIO_FORMAT_PCM_32_BIT:
+                *alsaPcmFormat = SND_PCM_FORMAT_S32_BE; /** Signed 32 bit Big Endian */
+                return HDF_SUCCESS;
+            default:
+                return HDF_ERR_NOT_SUPPORT;
+        }
+    }
+}
+
