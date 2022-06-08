@@ -51,11 +51,11 @@ static int32_t PinAuthInterfaceDriverDispatch(struct HdfDeviceIoClient *client, 
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        IAM_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
+        IAM_LOGE("invalid data sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
-        IAM_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        IAM_LOGE("invalid reply sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -65,6 +65,10 @@ static int32_t PinAuthInterfaceDriverDispatch(struct HdfDeviceIoClient *client, 
 static int HdfPinAuthInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
     IAM_LOGI("start");
+    if (deviceObject == nullptr) {
+        IAM_LOGE("deviceObject is nullptr");
+        return HDF_ERR_INVALID_PARAM;
+    }
     std::shared_ptr<OHOS::UserIAM::PinAuth::PinAuth> pinHdi =
         OHOS::UserIAM::Common::MakeShared<OHOS::UserIAM::PinAuth::PinAuth>();
     constexpr uint32_t SUCCESS = 0;
@@ -88,7 +92,7 @@ static int HdfPinAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
     auto *hdfPinAuthInterfaceHost = new (std::nothrow) HdfPinAuthInterfaceHost;
     if (hdfPinAuthInterfaceHost == nullptr) {
-        IAM_LOGE("%{public}s: failed to create create HdfPinAuthInterfaceHost object", __func__);
+        IAM_LOGE("failed to create create HdfPinAuthInterfaceHost object");
         return HDF_FAILURE;
     }
 
@@ -98,7 +102,7 @@ static int HdfPinAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
     auto serviceImpl = IPinAuthInterface::Get(true);
     if (serviceImpl == nullptr) {
-        IAM_LOGE("%{public}s: failed to get of implement service", __func__);
+        IAM_LOGE("failed to get of implement service");
         delete hdfPinAuthInterfaceHost;
         return HDF_FAILURE;
     }
@@ -106,7 +110,7 @@ static int HdfPinAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfPinAuthInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
         IPinAuthInterface::GetDescriptor());
     if (hdfPinAuthInterfaceHost->stub == nullptr) {
-        IAM_LOGE("%{public}s: failed to get stub object", __func__);
+        IAM_LOGE("failed to get stub object");
         delete hdfPinAuthInterfaceHost;
         return HDF_FAILURE;
     }
