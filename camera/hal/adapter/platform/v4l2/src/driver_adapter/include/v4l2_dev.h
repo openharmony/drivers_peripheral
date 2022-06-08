@@ -59,7 +59,7 @@ public:
 
     RetCode UpdateSetting(const std::string& cameraID, AdapterCmd command, const int* args);
 
-    RetCode QuerySetting(const std::string& cameraID, AdapterCmd command, int* args);
+    RetCode QuerySetting(const std::string& cameraID, unsigned int command, int* args);
 
     RetCode ReqBuffers(const std::string& cameraID, unsigned int buffCont);
 
