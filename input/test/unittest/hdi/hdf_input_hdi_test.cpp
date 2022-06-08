@@ -85,7 +85,7 @@ HWTEST_F(HdfInputHdiTest, ScanInputDevice001, TestSize.Level1)
     int32_t ret;
 
     ret  = g_inputInterfaces->ScanInputDevice(sta);
-    if (!ret) {
+    if (ret == INPUT_SUCCESS) {
         printf("%s: %d, %d, %d, %d\n", __func__, sta[0].devType, sta[0].devIndex, sta[1].devType, sta[1].devIndex);
     }
 
@@ -107,7 +107,7 @@ HWTEST_F(HdfInputHdiTest, OpenInputDevice001, TestSize.Level1)
     printf("%s: [Hdi-Input] OpenInputDevice enter\n", __func__);
 
     int32_t ret = g_inputInterfaces->OpenInputDevice(TOUCH_INDEX);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: open device failed, ret %d\n", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
@@ -128,7 +128,7 @@ HWTEST_F(HdfInputHdiTest, CloseInputDevice001, TestSize.Level1)
     printf("%s: [hdi-input] CloseInputDevice enter\n", __func__);
 
     int32_t ret = g_inputInterfaces->CloseInputDevice(TOUCH_INDEX);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: close device failed, ret %d\n", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
@@ -150,15 +150,16 @@ HWTEST_F(HdfInputHdiTest, GetInputDevice001, TestSize.Level1)
     struct DeviceInfo dev;
 
     int32_t ret = g_inputInterfaces->OpenInputDevice(TOUCH_INDEX);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: open device failed, ret %d\n", __func__, ret);
     }
     ASSERT_EQ(ret, INPUT_SUCCESS);
 
     ret = g_inputInterfaces->GetInputDevice(TOUCH_INDEX, dev);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: get device failed, ret %d\n", __func__, ret);
     }
+    ASSERT_EQ(ret, INPUT_SUCCESS);
 
     printf("%s: devindex = %u, devType = %u\n", __func__, dev.devIndex,
             dev.devType);
@@ -185,11 +186,11 @@ HWTEST_F(HdfInputHdiTest, GetInputDeviceList001, TestSize.Level1)
     std::vector<DeviceInfo> dev;
 
     ret = g_inputInterfaces->GetInputDeviceList(num, dev, MAX_INPUT_DEV_NUM);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: get device list failed, ret %d\n", __func__, ret);
     }
     ret = num <= MAX_INPUT_DEV_NUM ? HDF_SUCCESS : HDF_FAILURE;  /* num <= MAX_INPUT_DEV_NUM return true */
-    ASSERT_EQ(ret, INPUT_SUCCESS);
+    ASSERT_EQ(ret, HDF_SUCCESS);
 
 
     for (uint32_t i = 0; i < num; i++) {
@@ -219,9 +220,11 @@ HWTEST_F(HdfInputHdiTest, GetDeviceType001, TestSize.Level1)
     uint32_t devType = INIT_DEFAULT_VALUE;
 
     ret = g_inputInterfaces->GetDeviceType(TOUCH_INDEX, devType);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: get device's type failed, ret %d\n", __func__, ret);
     }
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+
     printf("%s: device's type is %u\n", __func__, devType);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
@@ -243,9 +246,11 @@ HWTEST_F(HdfInputHdiTest, GetChipInfo001, TestSize.Level1)
     std::string chipInfo;
 
     ret = g_inputInterfaces->GetChipInfo(TOUCH_INDEX, chipInfo);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: get device's chip info failed, ret %d\n", __func__, ret);
     }
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+
     printf("%s: device's chip info is %s\n", __func__, chipInfo.c_str());
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
@@ -267,7 +272,7 @@ HWTEST_F(HdfInputHdiTest, SetPowerStatus001, TestSize.Level1)
     uint32_t setStatus = INPUT_LOW_POWER;
 
     ret = g_inputInterfaces->SetPowerStatus(TOUCH_INDEX, setStatus);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: set device's power status failed, ret %d\n", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
@@ -290,9 +295,11 @@ HWTEST_F(HdfInputHdiTest, GetPowerStatus001, TestSize.Level1)
     uint32_t getStatus = 0;
 
     ret = g_inputInterfaces->GetPowerStatus(TOUCH_INDEX, getStatus);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: get device's power status failed, ret %d\n", __func__, ret);
     }
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+
     printf("%s: device's power status is %u:\n", __func__, getStatus);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
@@ -314,9 +321,11 @@ HWTEST_F(HdfInputHdiTest, GetVendorName001, TestSize.Level1)
     std::string vendorName;
 
     ret = g_inputInterfaces->GetVendorName(TOUCH_INDEX, vendorName);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: get device's vendor name failed, ret %d\n", __func__, ret);
     }
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+
     printf("%s: device's vendor name is %s:\n", __func__, vendorName.c_str());
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
@@ -338,9 +347,11 @@ HWTEST_F(HdfInputHdiTest, GetChipName001, TestSize.Level1)
     std::string chipName;
 
     ret = g_inputInterfaces->GetChipName(TOUCH_INDEX, chipName);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: get device's chip name failed, ret %d\n", __func__, ret);
     }
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+
     printf("%s: device's chip name is %s\n", __func__, chipName.c_str());
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
@@ -362,7 +373,7 @@ HWTEST_F(HdfInputHdiTest, SetGestureMode001, TestSize.Level1)
     uint32_t gestureMode = 1;
 
     ret = g_inputInterfaces->SetGestureMode(TOUCH_INDEX, gestureMode);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: get device's gestureMode failed, ret %d\n", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
@@ -383,11 +394,11 @@ HWTEST_F(HdfInputHdiTest, RegisterCallbackAndReportData001, TestSize.Level1)
     printf("%s: [hdi-input] RegisterCallbackAndReportData enter\n", __func__);
     int32_t ret;
 
-    ret  = g_inputInterfaces->RegisterReportCallback(TOUCH_INDEX, g_callback);
-    if (ret) {
+    ret = g_inputInterfaces->RegisterReportCallback(TOUCH_INDEX, g_callback);
+    if (ret != INPUT_SUCCESS) {
         printf("%s: register callback failed for device 1, ret %d\n", __func__, ret);
     }
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+    ASSERT_EQ(ret, INPUT_SUCCESS);
     printf("%s: wait 15s for testing, pls touch the panel now\n", __func__);
     printf("%s: The event data is as following:\n", __func__);
     OsalMSleep(KEEP_ALIVE_TIME_MS);
@@ -409,15 +420,15 @@ HWTEST_F(HdfInputHdiTest, UnregisterReportCallback001, TestSize.Level1)
     int32_t ret;
 
     ret  = g_inputInterfaces->UnregisterReportCallback(TOUCH_INDEX);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: unregister callback failed for device, ret %d\n", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
 
     ret = g_inputInterfaces->CloseInputDevice(TOUCH_INDEX);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: close device failed, ret %d\n", __func__, ret);
     }
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+    ASSERT_EQ(ret, INPUT_SUCCESS);
     printf("%s: Close the device successfully after all test\n", __func__);
 }

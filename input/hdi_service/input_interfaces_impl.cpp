@@ -48,69 +48,72 @@ extern "C" IInputInterfaces *InputInterfacesImplGetInstance(void)
     return service;
 }
 
-static struct DeviceInfo TransferDevInfo(DeviceInfo& hdiDevInfo, InputDeviceInfo *halDevInfo)
+static struct DeviceInfo TransferDevInfo(InputDeviceInfo &halDevInfo)
 {
-    hdiDevInfo.devIndex = halDevInfo->devIndex;
-    hdiDevInfo.devType = halDevInfo->devType;
-    hdiDevInfo.chipInfo = halDevInfo->chipInfo;
-    hdiDevInfo.vendorName = halDevInfo->vendorName;
-    hdiDevInfo.chipName = halDevInfo->chipName;
-    hdiDevInfo.attrSet.devName = halDevInfo->attrSet.devName;
-    hdiDevInfo.attrSet.id.busType = halDevInfo->attrSet.id.busType;
-    hdiDevInfo.attrSet.id.vendor = halDevInfo->attrSet.id.vendor;
-    hdiDevInfo.attrSet.id.product = halDevInfo->attrSet.id.product;
-    hdiDevInfo.attrSet.id.version = halDevInfo->attrSet.id.version;
+    DeviceInfo hdiDevInfo;
+    hdiDevInfo.devIndex = halDevInfo.devIndex;
+    hdiDevInfo.devType = halDevInfo.devType;
+    hdiDevInfo.chipInfo = halDevInfo.chipInfo;
+    hdiDevInfo.vendorName = halDevInfo.vendorName;
+    hdiDevInfo.chipName = halDevInfo.chipName;
+    hdiDevInfo.attrSet.devName = halDevInfo.attrSet.devName;
+    hdiDevInfo.attrSet.id.busType = halDevInfo.attrSet.id.busType;
+    hdiDevInfo.attrSet.id.vendor = halDevInfo.attrSet.id.vendor;
+    hdiDevInfo.attrSet.id.product = halDevInfo.attrSet.id.product;
+    hdiDevInfo.attrSet.id.version = halDevInfo.attrSet.id.version;
     hdiDevInfo.attrSet.axisInfo.resize(ABS_CNT);
     for (int32_t i = 0; i < ABS_CNT; i++) {
-        hdiDevInfo.attrSet.axisInfo[i].axis = halDevInfo->attrSet.axisInfo[i].axis;
-        hdiDevInfo.attrSet.axisInfo[i].min = halDevInfo->attrSet.axisInfo[i].min;
-        hdiDevInfo.attrSet.axisInfo[i].max = halDevInfo->attrSet.axisInfo[i].max;
-        hdiDevInfo.attrSet.axisInfo[i].fuzz = halDevInfo->attrSet.axisInfo[i].fuzz;
-        hdiDevInfo.attrSet.axisInfo[i].flat = halDevInfo->attrSet.axisInfo[i].flat;
-        hdiDevInfo.attrSet.axisInfo[i].range = halDevInfo->attrSet.axisInfo[i].range;
+        hdiDevInfo.attrSet.axisInfo[i].axis = halDevInfo.attrSet.axisInfo[i].axis;
+        hdiDevInfo.attrSet.axisInfo[i].min = halDevInfo.attrSet.axisInfo[i].min;
+        hdiDevInfo.attrSet.axisInfo[i].max = halDevInfo.attrSet.axisInfo[i].max;
+        hdiDevInfo.attrSet.axisInfo[i].fuzz = halDevInfo.attrSet.axisInfo[i].fuzz;
+        hdiDevInfo.attrSet.axisInfo[i].flat = halDevInfo.attrSet.axisInfo[i].flat;
+        hdiDevInfo.attrSet.axisInfo[i].range = halDevInfo.attrSet.axisInfo[i].range;
     }
-    hdiDevInfo.abilitySet.devProp.assign(halDevInfo->abilitySet.devProp,
-        halDevInfo->abilitySet.devProp + BITS_TO_UINT64(INPUT_PROP_CNT));
-    hdiDevInfo.abilitySet.eventType.assign(halDevInfo->abilitySet.eventType,
-        halDevInfo->abilitySet.eventType + BITS_TO_UINT64(EV_CNT));
-    hdiDevInfo.abilitySet.absCode.assign(halDevInfo->abilitySet.absCode,
-        halDevInfo->abilitySet.absCode + BITS_TO_UINT64(ABS_CNT));
-    hdiDevInfo.abilitySet.relCode.assign(halDevInfo->abilitySet.relCode,
-        halDevInfo->abilitySet.relCode + BITS_TO_UINT64(REL_CNT));
-    hdiDevInfo.abilitySet.keyCode.assign(halDevInfo->abilitySet.keyCode,
-        halDevInfo->abilitySet.keyCode + BITS_TO_UINT64(KEY_CNT));
-    hdiDevInfo.abilitySet.ledCode.assign(halDevInfo->abilitySet.ledCode,
-        halDevInfo->abilitySet.ledCode + BITS_TO_UINT64(LED_CNT));
-    hdiDevInfo.abilitySet.miscCode.assign(halDevInfo->abilitySet.miscCode,
-        halDevInfo->abilitySet.miscCode + BITS_TO_UINT64(MSC_CNT));
-    hdiDevInfo.abilitySet.soundCode.assign(halDevInfo->abilitySet.soundCode,
-        halDevInfo->abilitySet.soundCode + BITS_TO_UINT64(SND_CNT));
-    hdiDevInfo.abilitySet.forceCode.assign(halDevInfo->abilitySet.forceCode,
-        halDevInfo->abilitySet.forceCode + BITS_TO_UINT64(HDF_FF_CNT));
-    hdiDevInfo.abilitySet.switchCode.assign(halDevInfo->abilitySet.switchCode,
-        halDevInfo->abilitySet.switchCode + BITS_TO_UINT64(SW_CNT));
-    hdiDevInfo.abilitySet.keyType.assign(halDevInfo->abilitySet.keyType,
-        halDevInfo->abilitySet.keyType + BITS_TO_UINT64(KEY_CNT));
-    hdiDevInfo.abilitySet.ledType.assign(halDevInfo->abilitySet.ledType,
-        halDevInfo->abilitySet.ledType + BITS_TO_UINT64(LED_CNT));
-    hdiDevInfo.abilitySet.soundType.assign(halDevInfo->abilitySet.soundType,
-        halDevInfo->abilitySet.soundType + BITS_TO_UINT64(SND_CNT));
-    hdiDevInfo.abilitySet.switchType.assign(halDevInfo->abilitySet.switchType,
-        halDevInfo->abilitySet.switchType + BITS_TO_UINT64(SW_CNT));
+    hdiDevInfo.abilitySet.devProp.assign(halDevInfo.abilitySet.devProp,
+        halDevInfo.abilitySet.devProp + BITS_TO_UINT64(INPUT_PROP_CNT));
+    hdiDevInfo.abilitySet.eventType.assign(halDevInfo.abilitySet.eventType,
+        halDevInfo.abilitySet.eventType + BITS_TO_UINT64(EV_CNT));
+    hdiDevInfo.abilitySet.absCode.assign(halDevInfo.abilitySet.absCode,
+        halDevInfo.abilitySet.absCode + BITS_TO_UINT64(ABS_CNT));
+    hdiDevInfo.abilitySet.relCode.assign(halDevInfo.abilitySet.relCode,
+        halDevInfo.abilitySet.relCode + BITS_TO_UINT64(REL_CNT));
+    hdiDevInfo.abilitySet.keyCode.assign(halDevInfo.abilitySet.keyCode,
+        halDevInfo.abilitySet.keyCode + BITS_TO_UINT64(KEY_CNT));
+    hdiDevInfo.abilitySet.ledCode.assign(halDevInfo.abilitySet.ledCode,
+        halDevInfo.abilitySet.ledCode + BITS_TO_UINT64(LED_CNT));
+    hdiDevInfo.abilitySet.miscCode.assign(halDevInfo.abilitySet.miscCode,
+        halDevInfo.abilitySet.miscCode + BITS_TO_UINT64(MSC_CNT));
+    hdiDevInfo.abilitySet.soundCode.assign(halDevInfo.abilitySet.soundCode,
+        halDevInfo.abilitySet.soundCode + BITS_TO_UINT64(SND_CNT));
+    hdiDevInfo.abilitySet.forceCode.assign(halDevInfo.abilitySet.forceCode,
+        halDevInfo.abilitySet.forceCode + BITS_TO_UINT64(HDF_FF_CNT));
+    hdiDevInfo.abilitySet.switchCode.assign(halDevInfo.abilitySet.switchCode,
+        halDevInfo.abilitySet.switchCode + BITS_TO_UINT64(SW_CNT));
+    hdiDevInfo.abilitySet.keyType.assign(halDevInfo.abilitySet.keyType,
+        halDevInfo.abilitySet.keyType + BITS_TO_UINT64(KEY_CNT));
+    hdiDevInfo.abilitySet.ledType.assign(halDevInfo.abilitySet.ledType,
+        halDevInfo.abilitySet.ledType + BITS_TO_UINT64(LED_CNT));
+    hdiDevInfo.abilitySet.soundType.assign(halDevInfo.abilitySet.soundType,
+        halDevInfo.abilitySet.soundType + BITS_TO_UINT64(SND_CNT));
+    hdiDevInfo.abilitySet.switchType.assign(halDevInfo.abilitySet.switchType,
+        halDevInfo.abilitySet.switchType + BITS_TO_UINT64(SW_CNT));
     return hdiDevInfo;
 }
 
 void InputEventDataCallback(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
-    if (pkgs == nullptr || (pkgs != nullptr && *pkgs == nullptr)) {
+    if (pkgs == nullptr || *pkgs == nullptr) {
         HDF_LOGE("%{public}s failed, pkgs is nullptr", __func__);
         return;
     }
 
-    std::lock_guard<std::mutex> lock(g_mutex);
-
     std::vector<EventPackage> tmp;
     for (uint32_t i = 0; i < count; i++) {
+        if (pkgs[i] == nullptr) {
+            HDF_LOGE("%{public}s failed, pkgs[%{public}u] is nullptr", __func__, i);
+            return;
+        }
         EventPackage InputEvents;
         InputEvents.type = pkgs[i]->type;
         InputEvents.code = pkgs[i]->code;
@@ -119,7 +122,12 @@ void InputEventDataCallback(const InputEventPackage **pkgs, uint32_t count, uint
         tmp.push_back(InputEvents);
     }
 
-    g_inputEventCallback->EventPkgCallback(tmp, count, devIndex);
+    std::lock_guard<std::mutex> lock(g_mutex);
+    if (g_inputEventCallback == nullptr) {
+        HDF_LOGE("%{public}s: g_inputEventCallback is nullptr", __func__);
+        return;
+    }
+    g_inputEventCallback->EventPkgCallback(tmp, devIndex);
 }
 
 void HotplugEventDataCallback(const InputHotPlugEvent *event)
@@ -129,13 +137,16 @@ void HotplugEventDataCallback(const InputHotPlugEvent *event)
         return;
     }
 
-    std::lock_guard<std::mutex> lock(g_mutex);
-
     HotPlugEvent HotPlugEvent;
     HotPlugEvent.devIndex = event->devIndex;
     HotPlugEvent.devType = event->devType;
     HotPlugEvent.status = event->status;
 
+    std::lock_guard<std::mutex> lock(g_mutex);
+    if (g_hotplugEventCallback == nullptr) {
+        HDF_LOGE("%{public}s: g_hotplugEventCallback is nullptr", __func__);
+        return;
+    }
     g_hotplugEventCallback->HotPlugCallback(HotPlugEvent);
 }
 
@@ -150,10 +161,10 @@ void InputInterfacesImpl::Init()
     hostCb.HotPlugCallback = HotplugEventDataCallback;
 }
 
-int32_t InputInterfacesImpl::ScanInputDevice(std::vector<DevDesc>& staArr)
+int32_t InputInterfacesImpl::ScanInputDevice(std::vector<DevDesc> &staArr)
 {
     if (inputInterface_ == nullptr || inputInterface_->iInputManager == nullptr ||
-        inputInterface_->iInputManager->OpenInputDevice == nullptr) {
+        inputInterface_->iInputManager->ScanInputDevice == nullptr) {
         HDF_LOGE("%{public}s: get input device Module instance failed", __func__);
         return HDF_FAILURE;
     }
@@ -208,7 +219,7 @@ int32_t InputInterfacesImpl::CloseInputDevice(uint32_t devIndex)
     return ret;
 }
 
-int32_t InputInterfacesImpl::GetInputDevice(uint32_t devIndex, DeviceInfo& devInfo)
+int32_t InputInterfacesImpl::GetInputDevice(uint32_t devIndex, DeviceInfo &devInfo)
 {
     if (inputInterface_ == nullptr || inputInterface_->iInputManager == nullptr ||
         inputInterface_->iInputManager->GetInputDevice == nullptr) {
@@ -224,12 +235,16 @@ int32_t InputInterfacesImpl::GetInputDevice(uint32_t devIndex, DeviceInfo& devIn
         return ret;
     }
 
-    devInfo = TransferDevInfo(devInfo, deviceInfo);
+    if (deviceInfo == nullptr) {
+        HDF_LOGE("%{public}s get deviceInfo failed, info is null", __func__);
+        return HDF_FAILURE;
+    }
+    devInfo = TransferDevInfo(*deviceInfo);
 
     return ret;
 }
 
-int32_t InputInterfacesImpl::GetInputDeviceList(uint32_t devNum, std::vector<DeviceInfo>& devList, uint32_t size)
+int32_t InputInterfacesImpl::GetInputDeviceList(uint32_t &devNum, std::vector<DeviceInfo> &devList, uint32_t size)
 {
     if (inputInterface_ == nullptr || inputInterface_->iInputManager == nullptr ||
         inputInterface_->iInputManager->GetInputDeviceList == nullptr) {
@@ -243,12 +258,19 @@ int32_t InputInterfacesImpl::GetInputDeviceList(uint32_t devNum, std::vector<Dev
     int32_t ret = inputInterface_->iInputManager->GetInputDeviceList(&devNum, &deviceList, size);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+        return HDF_FAILURE;
     }
 
     tmp = deviceList;
-    while (size--) {
-        hdfDevInfo = TransferDevInfo(hdfDevInfo, tmp);
-        devList.push_back(std::move(hdfDevInfo));
+    if (tmp == nullptr) {
+        HDF_LOGE("%{public}s deviceList is null", __func__);
+        return HDF_FAILURE;
+    }
+
+    devList.reserve(devNum);
+    for (uint32_t i = 0; i < devNum; i++) {
+        hdfDevInfo = TransferDevInfo(*tmp);
+        devList.push_back(hdfDevInfo);
         tmp++;
     }
 
@@ -271,7 +293,7 @@ int32_t InputInterfacesImpl::SetPowerStatus(uint32_t devIndex, uint32_t status)
     return ret;
 }
 
-int32_t InputInterfacesImpl::GetPowerStatus(uint32_t devIndex, uint32_t& status)
+int32_t InputInterfacesImpl::GetPowerStatus(uint32_t devIndex, uint32_t &status)
 {
     if (inputInterface_ == nullptr || inputInterface_->iInputController == nullptr ||
         inputInterface_->iInputController->GetPowerStatus == nullptr) {
@@ -287,7 +309,7 @@ int32_t InputInterfacesImpl::GetPowerStatus(uint32_t devIndex, uint32_t& status)
     return ret;
 }
 
-int32_t InputInterfacesImpl::GetDeviceType(uint32_t devIndex, uint32_t& deviceType)
+int32_t InputInterfacesImpl::GetDeviceType(uint32_t devIndex, uint32_t &deviceType)
 {
     if (inputInterface_ == nullptr || inputInterface_->iInputController == nullptr ||
         inputInterface_->iInputController->GetDeviceType == nullptr) {
@@ -303,7 +325,7 @@ int32_t InputInterfacesImpl::GetDeviceType(uint32_t devIndex, uint32_t& deviceTy
     return ret;
 }
 
-int32_t InputInterfacesImpl::GetChipInfo(uint32_t devIndex, std::string& chipInfo)
+int32_t InputInterfacesImpl::GetChipInfo(uint32_t devIndex, std::string &chipInfo)
 {
     if (inputInterface_ == nullptr || inputInterface_->iInputController == nullptr ||
         inputInterface_->iInputController->GetChipInfo == nullptr) {
@@ -315,13 +337,14 @@ int32_t InputInterfacesImpl::GetChipInfo(uint32_t devIndex, std::string& chipInf
     int32_t ret = inputInterface_->iInputController->GetChipInfo(devIndex, infoStr, CHIP_INFO_LEN);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+        return HDF_FAILURE;
     }
 
     chipInfo.assign(infoStr);
     return ret;
 }
 
-int32_t InputInterfacesImpl::GetVendorName(uint32_t devIndex, std::string& vendorName)
+int32_t InputInterfacesImpl::GetVendorName(uint32_t devIndex, std::string &vendorName)
 {
     if (inputInterface_ == nullptr || inputInterface_->iInputController == nullptr ||
         inputInterface_->iInputController->GetVendorName == nullptr) {
@@ -333,13 +356,14 @@ int32_t InputInterfacesImpl::GetVendorName(uint32_t devIndex, std::string& vendo
     int32_t ret = inputInterface_->iInputController->GetVendorName(devIndex, infoStr, VENDOR_NAME_LEN);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+        return HDF_FAILURE;
     }
 
     vendorName.assign(infoStr);
     return ret;
 }
 
-int32_t InputInterfacesImpl::GetChipName(uint32_t devIndex, std::string& chipName)
+int32_t InputInterfacesImpl::GetChipName(uint32_t devIndex, std::string &chipName)
 {
     if (inputInterface_ == nullptr || inputInterface_->iInputController == nullptr ||
         inputInterface_->iInputController->GetChipName == nullptr) {
@@ -351,6 +375,7 @@ int32_t InputInterfacesImpl::GetChipName(uint32_t devIndex, std::string& chipNam
     int32_t ret = inputInterface_->iInputController->GetChipName(devIndex, infoStr, CHIP_NAME_LEN);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+        return HDF_FAILURE;
     }
 
     chipName.assign(infoStr);
@@ -373,7 +398,7 @@ int32_t InputInterfacesImpl::SetGestureMode(uint32_t devIndex, uint32_t gestureM
     return ret;
 }
 
-int32_t InputInterfacesImpl::RunCapacitanceTest(uint32_t devIndex, uint32_t testType, std::string& result,
+int32_t InputInterfacesImpl::RunCapacitanceTest(uint32_t devIndex, uint32_t testType, std::string &result,
     uint32_t length)
 {
     if (inputInterface_ == nullptr || inputInterface_->iInputController == nullptr ||
@@ -390,7 +415,7 @@ int32_t InputInterfacesImpl::RunCapacitanceTest(uint32_t devIndex, uint32_t test
     return ret;
 }
 
-int32_t InputInterfacesImpl::RunExtraCommand(uint32_t devIndex, const ExtraCmd& cmd)
+int32_t InputInterfacesImpl::RunExtraCommand(uint32_t devIndex, const ExtraCmd &cmd)
 {
     InputExtraCmd cmdInfo;
     cmdInfo.cmdCode = cmd.cmdCode.c_str();
@@ -410,7 +435,7 @@ int32_t InputInterfacesImpl::RunExtraCommand(uint32_t devIndex, const ExtraCmd& 
     return ret;
 }
 
-int32_t InputInterfacesImpl::RegisterReportCallback(uint32_t devIndex, const sptr<IInputCallback>& eventPkgCallback)
+int32_t InputInterfacesImpl::RegisterReportCallback(uint32_t devIndex, const sptr<IInputCallback> &eventPkgCallback)
 {
     if (inputInterface_ == nullptr || inputInterface_->iInputReporter == nullptr ||
         inputInterface_->iInputReporter->RegisterReportCallback == nullptr) {
@@ -423,12 +448,12 @@ int32_t InputInterfacesImpl::RegisterReportCallback(uint32_t devIndex, const spt
         return INPUT_INVALID_PARAM;
     }
 
-    std::lock_guard<std::mutex> lock(g_mutex);
-
     if (eventPkgCallback == nullptr) {
         HDF_LOGE("%{public}s: hotPlugCallback is null", __func__);
         return HDF_FAILURE;
     }
+
+    std::lock_guard<std::mutex> lock(g_mutex);
     if (g_inputEventCallback != nullptr) {
         sptr<IRemoteObject> lhs = OHOS::HDI::hdi_objcast<IInputCallback>(eventPkgCallback);
         sptr<IRemoteObject> rhs = OHOS::HDI::hdi_objcast<IInputCallback>(g_inputEventCallback);
@@ -460,14 +485,16 @@ int32_t InputInterfacesImpl::UnregisterReportCallback(uint32_t devIndex)
     int32_t ret = inputInterface_->iInputReporter->UnregisterReportCallback(devIndex);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+        return ret;
     }
 
+    std::lock_guard<std::mutex> lock(g_mutex);
     g_inputEventCallback = nullptr;
 
     return ret;
 }
 
-int32_t InputInterfacesImpl::RegisterHotPlugCallback(const sptr<IInputCallback>& hotPlugCallback)
+int32_t InputInterfacesImpl::RegisterHotPlugCallback(const sptr<IInputCallback> &hotPlugCallback)
 {
     if (inputInterface_ == nullptr || inputInterface_->iInputReporter == nullptr ||
         inputInterface_->iInputReporter->UnregisterReportCallback == nullptr) {
@@ -475,12 +502,12 @@ int32_t InputInterfacesImpl::RegisterHotPlugCallback(const sptr<IInputCallback>&
         return HDF_FAILURE;
     }
 
-    std::lock_guard<std::mutex> lock(g_mutex);
-
     if (hotPlugCallback == nullptr) {
         HDF_LOGE("%{public}s: hotPlugCallback is null", __func__);
         return HDF_FAILURE;
     }
+
+    std::lock_guard<std::mutex> lock(g_mutex);
     if (g_hotplugEventCallback != nullptr) {
         sptr<IRemoteObject> lhs = OHOS::HDI::hdi_objcast<IInputCallback>(hotPlugCallback);
         sptr<IRemoteObject> rhs = OHOS::HDI::hdi_objcast<IInputCallback>(g_hotplugEventCallback);
@@ -496,7 +523,7 @@ int32_t InputInterfacesImpl::RegisterHotPlugCallback(const sptr<IInputCallback>&
         return ret;
     }
 
-    g_inputEventCallback = hotPlugCallback;
+    g_hotplugEventCallback = hotPlugCallback;
 
     return ret;
 }
@@ -512,8 +539,10 @@ int32_t InputInterfacesImpl::UnregisterHotPlugCallback()
     int32_t ret = inputInterface_->iInputReporter->UnregisterHotPlugCallback();
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+        return ret;
     }
 
+    std::lock_guard<std::mutex> lock(g_mutex);
     g_hotplugEventCallback = nullptr;
 
     return ret;

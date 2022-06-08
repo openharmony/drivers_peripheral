@@ -31,24 +31,24 @@ public:
         ReleaseInputInterface(inputInterface_);
     }
     void Init();
-    int32_t ScanInputDevice(std::vector<DevDesc>& staArr) override;
+    int32_t ScanInputDevice(std::vector<DevDesc> &staArr) override;
     int32_t OpenInputDevice(uint32_t devIndex) override;
     int32_t CloseInputDevice(uint32_t devIndex) override;
-    int32_t GetInputDevice(uint32_t devIndex, DeviceInfo& devInfo) override;
-    int32_t GetInputDeviceList(uint32_t devNum, std::vector<DeviceInfo>& devList, uint32_t size) override;
+    int32_t GetInputDevice(uint32_t devIndex, DeviceInfo &devInfo) override;
+    int32_t GetInputDeviceList(uint32_t &devNum, std::vector<DeviceInfo> &devList, uint32_t size) override;
     int32_t SetPowerStatus(uint32_t devIndex, uint32_t status) override;
-    int32_t GetPowerStatus(uint32_t devIndex, uint32_t& status) override;
-    int32_t GetDeviceType(uint32_t devIndex, uint32_t& deviceType) override;
-    int32_t GetChipInfo(uint32_t devIndex, std::string& chipInfo) override;
-    int32_t GetVendorName(uint32_t devIndex, std::string& vendorName) override;
-    int32_t GetChipName(uint32_t devIndex, std::string& chipName) override;
+    int32_t GetPowerStatus(uint32_t devIndex, uint32_t &status) override;
+    int32_t GetDeviceType(uint32_t devIndex, uint32_t &deviceType) override;
+    int32_t GetChipInfo(uint32_t devIndex, std::string &chipInfo) override;
+    int32_t GetVendorName(uint32_t devIndex, std::string &vendorName) override;
+    int32_t GetChipName(uint32_t devIndex, std::string &chipName) override;
     int32_t SetGestureMode(uint32_t devIndex, uint32_t gestureMode) override;
-    int32_t RunCapacitanceTest(uint32_t devIndex, uint32_t testType, std::string& result,
+    int32_t RunCapacitanceTest(uint32_t devIndex, uint32_t testType, std::string &result,
         uint32_t length) override;
-    int32_t RunExtraCommand(uint32_t devIndex, const ExtraCmd& cmd) override;
-    int32_t RegisterReportCallback(uint32_t devIndex, const sptr<IInputCallback>& eventPkgCallback) override;
+    int32_t RunExtraCommand(uint32_t devIndex, const ExtraCmd &cmd) override;
+    int32_t RegisterReportCallback(uint32_t devIndex, const sptr<IInputCallback> &eventPkgCallback) override;
     int32_t UnregisterReportCallback(uint32_t devIndex) override;
-    int32_t RegisterHotPlugCallback(const sptr<IInputCallback>& hotPlugCallback) override;
+    int32_t RegisterHotPlugCallback(const sptr<IInputCallback> &hotPlugCallback) override;
     int32_t UnregisterHotPlugCallback() override;
 private:
     IInputInterface *inputInterface_;
