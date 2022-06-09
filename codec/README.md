@@ -188,12 +188,12 @@ _manager.h</p>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.2.2 "><p id="p1341272515610"><a name="p1341272515610"></a><a name="p1341272515610"></a>Obtains the codec capability list</p>
 </td>
 </tr>
-<tr id="row4385112822818"><td class="cellrowborder" valign="top" headers="mcps1.2.4.2.1 "><p id="p14413122555620"><a name="p14413122555620"></a><a name="p14413122555620"></a>int32_t (*CreateComponent)(struct CodecComponentType **component, char *compName, void *appData, int32_t appDataSize, struct CodecCallbackType *callbacks);</p>
+<tr id="row4385112822818"><td class="cellrowborder" valign="top" headers="mcps1.2.4.2.1 "><p id="p14413122555620"><a name="p14413122555620"></a><a name="p14413122555620"></a>int32_t (*CreateComponent)(struct CodecComponentType **component, uint32_t *componentId, char *compName, int64_t appData, struct CodecCallbackType *callbacks);</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.2.2 "><p id="p1141372575614"><a name="p1141372575614"></a><a name="p1141372575614"></a>Creates a codec instance</p>
 </td>
 </tr>
-<tr id="row181371630162816"><td class="cellrowborder" valign="top" headers="mcps1.2.4.2.1 "><p id="p1941362515561"><a name="p1941362515561"></a><a name="p1941362515561"></a>int32_t (*DestoryComponent)(struct CodecComponentType *component);</p>
+<tr id="row181371630162816"><td class="cellrowborder" valign="top" headers="mcps1.2.4.2.1 "><p id="p1941362515561"><a name="p1941362515561"></a><a name="p1941362515561"></a>int32_t (*DestoryComponent)(uint32_t componentId);</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.2.2 "><p id="p44131025115619"><a name="p44131025115619"></a><a name="p44131025115619"></a>Destroys a codec component instance</p>
 </td>
@@ -202,7 +202,7 @@ _manager.h</p>
 <tbody><tr id="row1267017500275"><td class="cellrowborder" rowspan="18" align="left" valign="top" width="12.821282128212822%" headers="mcps1.2.4.2.1 "><p id="p15674038923"><a name="p15674038923"></a><a name="p15674038923"></a>codec_component
 _if.h</p>
 </td>
-<td class="cellrowborder" valign="top" width="63.61636163616362%" headers="mcps1.2.4.2.2 "><p id="p174121125175619"><a name="p174121125175619"></a><a name="p174121125175619"></a>int32_t (*GetComponentVersion)(struct CodecComponentType *self, char *compName, union OMX_VERSIONTYPE *compVersion, union OMX_VERSIONTYPE *specVersion, uint8_t *compUUID, uint32_t compUUIDLen);</p>
+<td class="cellrowborder" valign="top" width="63.61636163616362%" headers="mcps1.2.4.2.2 "><p id="p174121125175619"><a name="p174121125175619"></a><a name="p174121125175619"></a>int32_t (*GetComponentVersion)(struct CodecComponentType *self, struct CompVerInfo *verInfo);</p>
 </td>
 <td class="cellrowborder" valign="top" width="23.562356235623565%" headers="mcps1.2.4.2.3 "><p id="p114126258569"><a name="p114126258569"></a><a name="p114126258569"></a>Obtains the version of a codec component</p>
 </td>
@@ -252,7 +252,7 @@ _if.h</p>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.2.2 "><p id="p1741382510566"><a name="p1741382510566"></a><a name="p1741382510566"></a>Specify the buffer of the component port</p>
 </td>
 </tr>
-<tr id="row133541652202712"><td class="cellrowborder" valign="top" headers="mcps1.2.4.2.1 "><p id="p11413125185617"><a name="p11413125185617"></a><a name="p11413125185617"></a>int32_t (*AllocateBuffer)(struct CodecComponentType *self, struct OmxCodecBuffer *buffer, uint32_t portIndex);</p>
+<tr id="row133541652202712"><td class="cellrowborder" valign="top" headers="mcps1.2.4.2.1 "><p id="p11413125185617"><a name="p11413125185617"></a><a name="p11413125185617"></a>int32_t (*AllocateBuffer)(struct CodecComponentType *self, uint32_t portIndex, struct OmxCodecBuffer *buffer);</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.2.2 "><p id="p154137256566"><a name="p154137256566"></a><a name="p154137256566"></a>Requests a port buffer from the component</p>
 </td>
@@ -272,7 +272,7 @@ _if.h</p>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.2.2 "><p id="p341492555613"><a name="p341492555613"></a><a name="p341492555613"></a>Specify the buffer to be filled with the encoding and decoding output by a component</p>
 </td>
 </tr>
-<tr id="row560213915277"><td class="cellrowborder" valign="top" headers="mcps1.2.4.2.1 "><p id="p8414525145610"><a name="p8414525145610"></a><a name="p8414525145610"></a>int32_t (*SetCallbacks)(struct CodecComponentType *self, struct CodecCallbackType *callback, int8_t *appData, uint32_t appDataLen);</p>
+<tr id="row560213915277"><td class="cellrowborder" valign="top" headers="mcps1.2.4.2.1 "><p id="p8414525145610"><a name="p8414525145610"></a><a name="p8414525145610"></a>int32_t (*SetCallbacks)(struct CodecComponentType *self, struct CodecCallbackType *callback, int64_t appData);</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.2.2 "><p id="p1241442513569"><a name="p1241442513569"></a><a name="p1241442513569"></a>Set a callback for the codec component</p>
 </td>
@@ -295,17 +295,17 @@ _if.h</p>
 </tbody>
 <tbody><tr id="row1267017500275"><td class="cellrowborder" rowspan="3" align="left" valign="top" width="12.821282128212822%" headers="mcps1.2.4.2.1 "><p id="p15674038923"><a name="p15674038923"></a><a name="p15674038923"></a>codec_callback_if.h</p>
 </td>
-<td class="cellrowborder" valign="top" width="63.61636163616362%" headers="mcps1.2.4.2.2 "><p id="p174121125175619"><a name="p174121125175619"></a><a name="p174121125175619"></a>int32_t (*EventHandler)(struct CodecCallbackType *self, int8_t *appData, uint32_t appDataLen, enum OMX_EVENTTYPE eEvent, uint32_t data1, uint32_t data2, int8_t *eventData, uint32_t eventDataLen);</p>
+<td class="cellrowborder" valign="top" width="63.61636163616362%" headers="mcps1.2.4.2.2 "><p id="p174121125175619"><a name="p174121125175619"></a><a name="p174121125175619"></a>int32_t (*EventHandler)(struct CodecCallbackType *self, enum OMX_EVENTTYPE event, struct EventInfo *info);</p>
 </td>
 <td class="cellrowborder" valign="top" width="23.562356235623565%" headers="mcps1.2.4.2.3 "><p id="p114126258569"><a name="p114126258569"></a><a name="p114126258569"></a>Reports an event</p>
 </td>
 </tr>
-<tr id="row2661171172814"><td class="cellrowborder" valign="top" headers="mcps1.2.4.2.1 "><p id="p1341212595610"><a name="p1341212595610"></a><a name="p1341212595610"></a>int32_t (*EmptyBufferDone)(struct CodecCallbackType *self, int8_t *appData, uint32_t appDataLen, const struct OmxCodecBuffer *buffer);</p>
+<tr id="row2661171172814"><td class="cellrowborder" valign="top" headers="mcps1.2.4.2.1 "><p id="p1341212595610"><a name="p1341212595610"></a><a name="p1341212595610"></a>int32_t (*EmptyBufferDone)(struct CodecCallbackType *self, int64_t appData, const struct OmxCodecBuffer *buffer);</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.2.2 "><p id="p1341272515610"><a name="p1341272515610"></a><a name="p1341272515610"></a>Reports an event indicating that the encoding or decoding in the input buffer is complete</p>
 </td>
 </tr>
-<tr id="row4385112822818"><td class="cellrowborder" valign="top" headers="mcps1.2.4.2.1 "><p id="p14413122555620"><a name="p14413122555620"></a><a name="p14413122555620"></a>int32_t (*FillBufferDone)(struct CodecCallbackType *self, int8_t* appData, uint32_t appDataLen, struct OmxCodecBuffer* buffer);</p>
+<tr id="row4385112822818"><td class="cellrowborder" valign="top" headers="mcps1.2.4.2.1 "><p id="p14413122555620"><a name="p14413122555620"></a><a name="p14413122555620"></a>int32_t (*FillBufferDone)(struct CodecCallbackType *self, int64_t appData, const struct OmxCodecBuffer *buffer);</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.2.2 "><p id="p1141372575614"><a name="p1141372575614"></a><a name="p1141372575614"></a>Reports an event indicating that the output buffer is filled</p>
 </td>
