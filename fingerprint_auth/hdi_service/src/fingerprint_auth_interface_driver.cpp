@@ -51,11 +51,11 @@ int32_t FingerprintAuthInterfaceDriverDispatch(
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        IAM_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
+        IAM_LOGE("invalid data sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
-        IAM_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        IAM_LOGE("invalid reply sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -65,6 +65,14 @@ int32_t FingerprintAuthInterfaceDriverDispatch(
 int HdfFingerprintAuthInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
     IAM_LOGI("start");
+    if (deviceObject == nullptr) {
+        IAM_LOGE("deviceObject is nullptr");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_USERAUTH)) {
+        IAM_LOGE("set fingerprint auth hdf class failed");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
@@ -77,7 +85,7 @@ int HdfFingerprintAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
     auto *hdfFingerprintAuthInterfaceHost = new (std::nothrow) HdfFingerprintAuthInterfaceHost;
     if (hdfFingerprintAuthInterfaceHost == nullptr) {
-        IAM_LOGE("%{public}s: failed to create create HdfFingerprinteAuthInterfaceHost object", __func__);
+        IAM_LOGE("failed to create create HdfFingerprinteAuthInterfaceHost object");
         return HDF_FAILURE;
     }
 
@@ -87,7 +95,7 @@ int HdfFingerprintAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
     auto serviceImpl = IFingerprintAuthInterface::Get(true);
     if (serviceImpl == nullptr) {
-        IAM_LOGE("%{public}s: failed to get of implement service", __func__);
+        IAM_LOGE("failed to get of implement service");
         delete hdfFingerprintAuthInterfaceHost;
         return HDF_FAILURE;
     }
@@ -95,7 +103,7 @@ int HdfFingerprintAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfFingerprintAuthInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
         IFingerprintAuthInterface::GetDescriptor());
     if (hdfFingerprintAuthInterfaceHost->stub == nullptr) {
-        IAM_LOGE("%{public}s: failed to get stub object", __func__);
+        IAM_LOGE("failed to get stub object");
         delete hdfFingerprintAuthInterfaceHost;
         return HDF_FAILURE;
     }

@@ -51,11 +51,11 @@ int32_t FaceAuthInterfaceDriverDispatch(
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        IAM_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
+        IAM_LOGE("invalid data sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
-        IAM_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        IAM_LOGE("invalid reply sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -65,6 +65,10 @@ int32_t FaceAuthInterfaceDriverDispatch(
 int HdfFaceAuthInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
     IAM_LOGI("start");
+    if (deviceObject == nullptr) {
+        IAM_LOGE("deviceObject is nullptr");
+        return HDF_ERR_INVALID_PARAM;
+    }
     if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_USERAUTH)) {
         IAM_LOGE("set face auth hdf class failed");
         return HDF_FAILURE;
@@ -81,7 +85,7 @@ int HdfFaceAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
     auto *hdfFaceAuthInterfaceHost = new (std::nothrow) HdfFaceAuthInterfaceHost;
     if (hdfFaceAuthInterfaceHost == nullptr) {
-        IAM_LOGE("%{public}s: failed to create create HdfFaceAuthInterfaceHost object", __func__);
+        IAM_LOGE("failed to create create HdfFaceAuthInterfaceHost object");
         return HDF_FAILURE;
     }
 
@@ -91,7 +95,7 @@ int HdfFaceAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
     auto serviceImpl = IFaceAuthInterface::Get(true);
     if (serviceImpl == nullptr) {
-        IAM_LOGE("%{public}s: failed to get of implement service", __func__);
+        IAM_LOGE("failed to get of implement service");
         delete hdfFaceAuthInterfaceHost;
         return HDF_FAILURE;
     }
@@ -99,7 +103,7 @@ int HdfFaceAuthInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfFaceAuthInterfaceHost->stub =
         OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl, IFaceAuthInterface::GetDescriptor());
     if (hdfFaceAuthInterfaceHost->stub == nullptr) {
-        IAM_LOGE("%{public}s: failed to get stub object", __func__);
+        IAM_LOGE("failed to get stub object");
         delete hdfFaceAuthInterfaceHost;
         return HDF_FAILURE;
     }
