@@ -29,20 +29,20 @@ namespace Codec {
         struct CodecComponentManager *manager = nullptr;
         struct CodecComponentType *component = nullptr;
         CodecCallbackType* callback = CodecCallbackTypeStubGetInstance();
-        uint32_t compoentId = 0;
+        uint32_t componentId = 0;
         manager = GetCodecComponentManager();
         if (manager == nullptr) {
             HDF_LOGE("%{public}s: GetCodecComponentManager failed\n", __func__);
             return false;
         }
 
-        int32_t ret = manager->CreateComponent(&component, &compoentId, (char*)data, (int64_t)data, callback);
+        int32_t ret = manager->CreateComponent(&component, &componentId, (char*)data, (int64_t)data, callback);
         if (ret == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: CreateComponent succeed\n", __func__);
             result = true;
         }
 
-        ret = manager->DestoryComponent(compoentId);
+        ret = manager->DestoryComponent(componentId);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: DestoryComponent failed\n", __func__);
             return false;
