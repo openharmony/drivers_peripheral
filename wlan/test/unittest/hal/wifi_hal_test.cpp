@@ -267,7 +267,6 @@ HWTEST_F(WifiHalTest, WifiHalSetMacAddress001, TestSize.Level1)
     struct IWiFiAp *apFeature = nullptr;
     unsigned char errorMac[ETH_ADDR_LEN] = {0x11, 0x34, 0x56, 0x78, 0xab, 0xcd};
     unsigned char mac[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
-    unsigned char errorMacZero[ETH_ADDR_LEN] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -279,8 +278,6 @@ HWTEST_F(WifiHalTest, WifiHalSetMacAddress001, TestSize.Level1)
     ret = apFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)apFeature, mac, 0);
     EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
     ret = apFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)apFeature, errorMac, ETH_ADDR_LEN);
-    EXPECT_NE(ret, HDF_SUCCESS);
-    ret = apFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)apFeature, errorMacZero, ETH_ADDR_LEN);
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = apFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)apFeature, mac, ETH_ADDR_LEN);
     printf("%s: ret = %d\n", __func__, ret);
@@ -303,7 +300,6 @@ HWTEST_F(WifiHalTest, WifiHalSetMacAddress002, TestSize.Level1)
     struct IWiFiSta *staFeature = nullptr;
     unsigned char mac[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
     unsigned char errorMac[ETH_ADDR_LEN] = {0x11, 0x34, 0x56, 0x78, 0xab, 0xcd};
-    unsigned char errorMacZero[ETH_ADDR_LEN] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -315,8 +311,6 @@ HWTEST_F(WifiHalTest, WifiHalSetMacAddress002, TestSize.Level1)
     ret = staFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)staFeature, mac, 0);
     EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
     ret = staFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)staFeature, errorMac, ETH_ADDR_LEN);
-    EXPECT_NE(ret, HDF_SUCCESS);
-    ret = staFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)staFeature, errorMacZero, ETH_ADDR_LEN);
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = staFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)staFeature, mac, ETH_ADDR_LEN);
     printf("%s: ret = %d\n", __func__, ret);
