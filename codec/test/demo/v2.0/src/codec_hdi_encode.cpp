@@ -715,7 +715,7 @@ int32_t CodecHdiEncode::ConfigBitMode()
     OMX_VIDEO_PARAM_BITRATETYPE biteType;
     InitParam(biteType);
     biteType.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
-    err = client_->SetParameter(client_, OMX_IndexParamVideoBitrate, (int8_t *)&biteType, sizeof(biteType));
+    err = client_->GetParameter(client_, OMX_IndexParamVideoBitrate, (int8_t *)&biteType, sizeof(biteType));
     if (err != OMX_ErrorNone) {
         HDF_LOGE("%{public}s OMX_GetParameter portindex = PORT_INDEX_OUTPUT, err[%{public}d]", __func__, err);
         return err;
