@@ -102,12 +102,12 @@ static int32_t SerStubCreateComponent(struct CodecComponentManager *serviceImpl,
 static int32_t SerStubDestroyComponent(struct CodecComponentManager *serviceImpl, struct HdfSBuf *data,
                                        struct HdfSBuf *reply)
 {
-    uint32_t compoentId = 0;
-    if (!HdfSbufReadUint32(data, &compoentId)) {
-        HDF_LOGE("%{public}s: read compoentId failed!", __func__);
+    uint32_t componentId = 0;
+    if (!HdfSbufReadUint32(data, &componentId)) {
+        HDF_LOGE("%{public}s: read componentId failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t ret = serviceImpl->DestoryComponent(compoentId);
+    int32_t ret = serviceImpl->DestoryComponent(componentId);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call DestroyComponent function failed!", __func__);
     }

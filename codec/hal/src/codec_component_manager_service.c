@@ -25,8 +25,8 @@
 #define HDF_LOG_TAG codec_hdi_server
 
 struct CodecComponentManagerSerivce *g_service = NULL;
-uint32_t g_compoentId = 0;
-uint32_t GetNextCompoentId()
+uint32_t g_componentId = 0;
+uint32_t GetNextComponentId()
 {
     uint32_t tempId = 0;
     if (g_service == NULL) {
@@ -37,7 +37,7 @@ uint32_t GetNextCompoentId()
     bool find = false;
 
     do {
-        tempId = ++g_compoentId;
+        tempId = ++g_componentId;
         find = false;
         DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &g_service->head, struct CompoentTypeNode, node)
         {
@@ -82,7 +82,7 @@ int32_t OmxManagerCreateComponent(struct CodecComponentType **component, uint32_
     }
     *component = comp;
     pthread_mutex_lock(&g_service->listMute);
-    *componentId = GetNextCompoentId();
+    *componentId = GetNextComponentId();
     CodecCompoentTypeServiceSetCodecNode(comp, codecNode);
     DListInsertTail(&node->node, &g_service->head);
     pthread_mutex_unlock(&g_service->listMute);
@@ -93,9 +93,9 @@ int32_t OmxManagerCreateComponent(struct CodecComponentType **component, uint32_
     return err;
 }
 
-int32_t OmxManagerDestroyComponent(uint32_t compoentId)
+int32_t OmxManagerDestroyComponent(uint32_t componentId)
 {
-    HDF_LOGI("%{public}s, service impl, %{public}d!", __func__, compoentId);
+    HDF_LOGI("%{public}s, service impl, %{public}d!", __func__, componentId);
     if (g_service == NULL) {
         HDF_LOGE("%{public}s, g_service is not init!", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -106,7 +106,7 @@ int32_t OmxManagerDestroyComponent(uint32_t compoentId)
     pthread_mutex_lock(&g_service->listMute);
     DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &g_service->head, struct CompoentTypeNode, node)
     {
-        if (pos == NULL || compoentId != pos->componentId) {
+        if (pos == NULL || componentId != pos->componentId) {
             continue;
         }
         struct CodecComponentNode *codecNode = CodecCompoentTypeServiceGetCodecNode(pos->service);

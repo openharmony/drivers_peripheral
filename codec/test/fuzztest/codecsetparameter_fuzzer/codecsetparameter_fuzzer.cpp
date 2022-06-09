@@ -31,14 +31,14 @@ namespace Codec {
         struct CodecComponentType *component = nullptr;
         int32_t appData = testingAppData;
         CodecCallbackType* callback = CodecCallbackTypeStubGetInstance();
-        uint32_t compoentId = 0;
+        uint32_t componentId = 0;
         manager = GetCodecComponentManager();
         if (manager == nullptr) {
             HDF_LOGE("%{public}s: GetCodecComponentManager failed\n", __func__);
             return false;
         }
 
-        int32_t ret = manager->CreateComponent(&component, &compoentId, (char*)"compName", appData,  callback);
+        int32_t ret = manager->CreateComponent(&component, &componentId, (char*)"compName", appData,  callback);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: CreateComponent failed\n", __func__);
             return false;
@@ -57,7 +57,7 @@ namespace Codec {
             result = true;
         }
 
-        ret = manager->DestoryComponent(compoentId);
+        ret = manager->DestoryComponent(componentId);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: DestoryComponent failed\n", __func__);
             return false;
