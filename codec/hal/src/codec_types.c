@@ -179,7 +179,7 @@ static bool CodecBufferMarshalling(struct HdfSBuf *data, const struct OmxCodecBu
     }
 
     if (dataBlock->bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
-        int fd = (int)dataBlock->buffer;
+        int fd = (int)(uintptr_t)dataBlock->buffer;
         if (!HdfSbufWriteFileDescriptor(data, fd)) {
             HDF_LOGE("%{public}s: write fd failed!", __func__);
             return false;
