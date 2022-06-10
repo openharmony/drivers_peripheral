@@ -85,6 +85,9 @@ RetCode SensorController::Stop()
     std::lock_guard<std::mutex> l(startSensorLock_);
     RetCode rc = RC_OK;
     if (startSensorState_ == true) {
+        sensorVideo_->StopStream(GetName());
+        sensorVideo_->ReleaseBuffers(GetName());
+        sensorVideo_->stop(GetName());
         startSensorState_ = false;
     }
     return rc;
