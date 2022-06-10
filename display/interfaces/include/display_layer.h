@@ -743,6 +743,36 @@ typedef struct {
      * @version 1.0
      */
     int32_t (*GetHwPresentTimestamp)(uint32_t devId, uint32_t layerId, PresentTimestamp *pts);
+    /**
+     * @brief Sets a tunnel handle for a layer.
+     *
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
+     * display device, and 4 indicates the last display device.
+     * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
+     * with the specified layer ID.
+     * @param handle Indicates the handle of ExtDataHandle.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
+     * otherwise.
+     * @since 3.2
+     * @version 1.0
+     */
+    int32_t (*SetLayerTunnelHandle)(uint32_t devId, uint32_t layerId, ExtDataHandle *handle);
+    /**
+     * @brief Obtains the release fence of a layer.
+     *
+     * @param devId Indicates the ID of the display device. The value ranges from 0 to 4, where 0 indicates the first
+     * display device, and 4 indicates the last display device.
+     * @param layerId Indicates the layer ID, which uniquely identifies a layer. You can perform operations on the layer
+     * with the specified layer ID.
+     * @param fence Indicates the pointer to the release fence obtained.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}
+     * otherwise.
+     * @since 3.2
+     * @version 1.0
+     */
+    int32_t (*GetLayerReleaseFence)(uint32_t devId, uint32_t layerId, int32_t *fence);
 } LayerFuncs;
 
 /**
