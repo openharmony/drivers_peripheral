@@ -18,21 +18,19 @@
 #include <thread>
 #include <memory>
 #include <hdf_base.h>
-#include <hdf_log.h>
 #include "thermal_hdf_config.h"
 #include "thermal_hdf_timer.h"
 #include "thermal_simulation_node.h"
 #include "thermal_device_mitigation.h"
 #include "thermal_zone_manager.h"
-
-#define HDF_LOG_TAG ThermalInterfaceImpl
+#include "thermal_log.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
 namespace V1_0 {
 namespace {
-const std::string FILE_NAME = HDF_ETC_DIR "/thermal_config/hdf/thermal_hdi_config.xml";
+const std::string HDI_XML_NAME = HDF_ETC_DIR "/thermal_config/hdf/thermal_hdi_config.xml";
 }
 static sptr<IThermalCallback> theramalCb_ = nullptr;
 static std::shared_ptr<HdfThermalCallbackInfo> callbackInfo_ = nullptr;
@@ -48,9 +46,9 @@ ThermalInterfaceImpl::ThermalInterfaceImpl()
 
 int32_t ThermalInterfaceImpl::Init()
 {
-    int32_t ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(FILE_NAME);
+    int32_t ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(HDI_XML_NAME);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: failed to init XML, ret: %{public}d", __func__, ret);
+        THERMAL_HILOGE(COMP_HDI, "failed to init XML, ret: %{public}d", ret);
         return HDF_FAILURE;
     }
 
@@ -95,7 +93,7 @@ int32_t ThermalInterfaceImpl::SetCpuFreq(int32_t freq)
     if (mitigation_ != nullptr) {
         int32_t ret = mitigation_->CpuRequest(freq);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: failed to set freq %{public}d", __func__, ret);
+            THERMAL_HILOGE(COMP_HDI, "failed to set freq %{public}d", ret);
             return ret;
         }
     }
@@ -107,7 +105,7 @@ int32_t ThermalInterfaceImpl::SetGpuFreq(int32_t freq)
     if (mitigation_ != nullptr) {
         int32_t ret = mitigation_->GpuRequest(freq);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: failed to set freq %{public}d", __func__, ret);
+            THERMAL_HILOGE(COMP_HDI, "failed to set freq %{public}d", ret);
             return ret;
         }
     }
@@ -119,7 +117,7 @@ int32_t ThermalInterfaceImpl::SetBatteryCurrent(int32_t current)
     if (mitigation_ != nullptr) {
         int32_t ret = mitigation_->ChargerRequest(current);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: failed to set current %{public}d", __func__, ret);
+            THERMAL_HILOGE(COMP_HDI, "failed to set current %{public}d", ret);
             return ret;
         }
     }

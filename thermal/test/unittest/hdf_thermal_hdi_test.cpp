@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,9 @@
 #include "v1_0/thermal_interface_proxy.h"
 #include "thermal_types.h"
 #include "thermal_callback_impl.h"
+#include "thermal_log.h"
 
+using namespace OHOS::HDI;
 using namespace OHOS::HDI::Thermal::V1_0;
 using namespace testing::ext;
 
@@ -75,13 +77,13 @@ int32_t HdfThermalHdiTest::ReadFile(const char *path, char *buf, size_t size)
 
     int32_t fd = open(path, O_RDONLY);
     if (fd < HDF_SUCCESS) {
-        GTEST_LOG_(INFO) << "WriteFile: failed to open file" << fd;
+        THERMAL_HILOGE(LABEL_TEST, "WriteFile: failed to open file %{public}d", fd);
         return HDF_FAILURE;
     }
 
     ret = read(fd, buf, size);
     if (ret < HDF_SUCCESS) {
-        GTEST_LOG_(INFO) << "WriteFile: failed to read file" << ret;
+        THERMAL_HILOGE(LABEL_TEST, "WriteFile: failed to read file %{public}d", ret);
         close(fd);
         return HDF_FAILURE;
     }
@@ -114,7 +116,7 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest001, TestSize.Level1)
   */
 HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "HdfThermalHdiTest002: start.";
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest002: start.");
     int32_t cpuFreq = 2000000;
     int32_t ret = g_thermalInterface->SetCpuFreq(cpuFreq);
     EXPECT_EQ(0, ret);
@@ -129,15 +131,15 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest002, TestSize.Level1)
     sleep(WAIT_TIME);
     ret = HdfThermalHdiTest::ReadFile(cpuBuf, freqValue, sizeof(freqValue));
     if (ret != HDF_SUCCESS) {
-        GTEST_LOG_(INFO) << "HdfThermalHdiTest002: Failed to read file ";
+        THERMAL_HILOGE(LABEL_TEST, "HdfThermalHdiTest002: Failed to read file ");
         return;
     }
 
     std::string freq = freqValue;
     int32_t value = HdfThermalHdiTest::ConvertInt(freq);
-    GTEST_LOG_(INFO) << "freq is:" << value;
+    THERMAL_HILOGD(LABEL_TEST, "freq is %{public}d", value);
     EXPECT_EQ(value, cpuFreq) << "HdfThermalHdiTest002 failed";
-    GTEST_LOG_(INFO) << "HdfThermalHdiTest002: return.";
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest002: return.");
 }
 
 /**
@@ -147,7 +149,7 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest002, TestSize.Level1)
   */
 HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest003, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "HdfThermalHdiTest003: start.";
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest003: start.");
     int32_t gpuFreq = 40000;
     int32_t ret = g_thermalInterface->SetGpuFreq(gpuFreq);
     EXPECT_EQ(0, ret);
@@ -162,15 +164,15 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest003, TestSize.Level1)
     sleep(WAIT_TIME);
     ret = HdfThermalHdiTest::ReadFile(cpuBuf, freqValue, sizeof(freqValue));
     if (ret != HDF_SUCCESS) {
-        GTEST_LOG_(INFO) << "HdfThermalHdiTest003: Failed to read file ";
+        THERMAL_HILOGE(LABEL_TEST, "HdfThermalHdiTest003: Failed to read file ");
         return;
     }
 
     std::string freq = freqValue;
     int32_t value = HdfThermalHdiTest::ConvertInt(freq);
-    GTEST_LOG_(INFO) << "freq is:" << value;
+    THERMAL_HILOGD(LABEL_TEST, "freq is %{public}d", value);
     EXPECT_EQ(value, gpuFreq) << "HdfThermalHdiTest003 failed";
-    GTEST_LOG_(INFO) << "HdfThermalHdiTest003: return.";
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest003: return.");
 }
 
 /**
@@ -180,7 +182,7 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest003, TestSize.Level1)
   */
 HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest004, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "HdfThermalHdiTest004: start.";
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest004: start.");
     int32_t batteryCurrent = 1000;
     int32_t ret = g_thermalInterface->SetBatteryCurrent(batteryCurrent);
     EXPECT_EQ(0, ret);
@@ -195,15 +197,15 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest004, TestSize.Level1)
     sleep(WAIT_TIME);
     ret = HdfThermalHdiTest::ReadFile(cpuBuf, currentValue, sizeof(currentValue));
     if (ret != HDF_SUCCESS) {
-        GTEST_LOG_(INFO) << "HdfThermalHdiTest004: Failed to read file ";
+        THERMAL_HILOGE(LABEL_TEST, "HdfThermalHdiTest004: Failed to read file ");
         return;
     }
 
     std::string current = currentValue;
     int32_t value = HdfThermalHdiTest::ConvertInt(current);
-    GTEST_LOG_(INFO) << "current is:" << value;
+    THERMAL_HILOGD(LABEL_TEST, "freq is %{public}d", value);
     EXPECT_EQ(value, batteryCurrent) << "HdfThermalHdiTest004 failed";
-    GTEST_LOG_(INFO) << "HdfThermalHdiTest004: return.";
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest004: return.");
 }
 
 /**
@@ -214,14 +216,14 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest004, TestSize.Level1)
 HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest005, TestSize.Level1)
 {
     HdfThermalCallbackInfo event;
-    GTEST_LOG_(INFO) << "HdfThermalHdiTest005: start.";
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest005: start.");
     int32_t ret = g_thermalInterface->GetThermalZoneInfo(event);
     EXPECT_EQ(0, ret) << "HdfThermalHdiTest005 failed";
     for (auto iter : event.info) {
-        GTEST_LOG_(INFO) << "type:" << iter.type;
-        GTEST_LOG_(INFO) << "temp:" << iter.temp;
+        THERMAL_HILOGD(LABEL_TEST, "type is %{public}s", iter.type.c_str());
+        THERMAL_HILOGD(LABEL_TEST, "temp is %{public}d", iter.temp);
     }
-    GTEST_LOG_(INFO) << "HdfThermalHdiTest005: return.";
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest005: return.");
 }
 
 /**
@@ -232,11 +234,12 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest005, TestSize.Level1)
 HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest006, TestSize.Level1)
 {
     HdfThermalCallbackInfo event;
-    GTEST_LOG_(INFO) << "HdfThermalHdiTest006: start.";
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest006: start.");
     int32_t ret = g_thermalInterface->Register(g_callback);
     EXPECT_EQ(0, ret) << "HdfThermalHdiTest006 failed";
     ret = g_thermalInterface->Unregister();
     EXPECT_EQ(0, ret) << "HdfThermalHdiTest006 failed";
-    GTEST_LOG_(INFO) << "HdfThermalHdiTest006: return.";
+    THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest006: return.");
 }
 }
+
