@@ -24,6 +24,7 @@
 #include "hdf_base.h"
 #include "securec.h"
 #include "utils/hdf_log.h"
+#include "thermal_log.h"
 
 #define HDF_LOG_TAG ThermalDeviceMitigation
 
@@ -69,7 +70,7 @@ int32_t ThermalDeviceMitigation::OpenSysfsFile(std::string filePath, int32_t fla
 
     ret = open(filePath.c_str(), flags);
     if (ret < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open file %{public}s", __func__, filePath.c_str());
+        THERMAL_HILOGE(COMP_HDI, "failed to open file %{public}s", filePath.c_str());
         return ret;
     }
     return ret;
@@ -79,7 +80,7 @@ int32_t ThermalDeviceMitigation::WriteSysfsFile(std::string filePath, std::strin
 {
     int32_t fd = OpenSysfsFile(filePath.c_str(), O_RDWR);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, filePath.c_str());
+        THERMAL_HILOGE(COMP_HDI, "failed to open %{public}s", filePath.c_str());
         return HDF_ERR_IO;
     }
     int32_t ret = WriteSysfsFd(fd, buf.c_str(), bytesSize);
@@ -109,10 +110,10 @@ int32_t ThermalDeviceMitigation::ExecuteCpuRequest(uint32_t freq, const std::str
         return ret;
     }
     if (WriteSysfsFile(nodeBuf, freqBuf, strlen(freqBuf)) > NUM_ZERO) {
-        HDF_LOGI("%{public}s: Set freq to %{public}d", __func__, freq);
+        THERMAL_HILOGI(COMP_HDI, "Set freq to %{public}d", freq);
         ret = HDF_SUCCESS;
     } else {
-        HDF_LOGE("%{public}s: failed to set freq", __func__);
+        THERMAL_HILOGE(COMP_HDI, "failed to set freq");
         ret = HDF_FAILURE;
     }
     return ret;
@@ -122,7 +123,7 @@ int32_t ThermalDeviceMitigation::CpuRequest(uint32_t freq)
 {
     int32_t ret = ExecuteCpuRequest(freq, ACTUAL_CPU_FREQ_PATH);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: failed to really set freq", __func__);
+        THERMAL_HILOGE(COMP_HDI, "failed to really set freq");
     }
     ret = ExecuteCpuRequest(freq, SIM_CPU_FREQ_PATH);
     if (ret != HDF_SUCCESS) {
@@ -135,7 +136,7 @@ int32_t ThermalDeviceMitigation::ChargerRequest(uint32_t current)
 {
     int32_t ret = ExecuteChargerRequest(current, ACTUAL_BATTERY_CURRENT_PATH);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: failed to really set current", __func__);
+        THERMAL_HILOGE(COMP_HDI, "failed to really set current");
     }
     ret = ExecuteChargerRequest(current, SIM_BATTERY_CURRENT_PATH);
     if (ret != HDF_SUCCESS) {
@@ -160,10 +161,10 @@ int32_t ThermalDeviceMitigation::GpuRequest(uint32_t freq)
         return ret;
     }
     if (WriteSysfsFile(nodeBuf, freqBuf, strlen(freqBuf)) > NUM_ZERO) {
-        HDF_LOGI("%{public}s: Set freq to %{public}d", __func__, freq);
+        THERMAL_HILOGI(COMP_HDI, "Set freq to %{public}d", freq);
         ret = HDF_SUCCESS;
     } else {
-        HDF_LOGE("%{public}s: failed to set freq", __func__);
+        THERMAL_HILOGE(COMP_HDI, "failed to set freq");
         ret = HDF_FAILURE;
     }
     return ret;
@@ -189,11 +190,11 @@ int32_t ThermalDeviceMitigation::ExecuteChargerRequest(uint32_t current, const s
         return ret;
     }
     if (WriteSysfsFile(nodeBuf, currentBuf, strlen(currentBuf)) > NUM_ZERO) {
-        HDF_LOGI("%{public}s: Set current to %{public}d", __func__, current);
+        THERMAL_HILOGI(COMP_HDI, "Set current to %{public}d", current);
         previous = current;
         ret = HDF_SUCCESS;
     } else {
-        HDF_LOGE("%{public}s: failed to set current", __func__);
+        THERMAL_HILOGE(COMP_HDI, "failed to set current");
         ret = HDF_FAILURE;
     }
     return ret;
@@ -215,10 +216,10 @@ int32_t ThermalDeviceMitigation::BatteryCurrentRequest(uint32_t current)
         return ret;
     }
     if (WriteSysfsFile(nodeBuf, currentBuf, strlen(currentBuf)) > NUM_ZERO) {
-        HDF_LOGI("%{public}s: Set current to %{public}d", __func__, current);
+        THERMAL_HILOGI(COMP_HDI, "Set current to %{public}d", current);
         ret = HDF_SUCCESS;
     } else {
-        HDF_LOGE("%{public}s: failed to set current", __func__);
+        THERMAL_HILOGE(COMP_HDI, "failed to set current");
         ret = HDF_FAILURE;
     }
     return ret;
@@ -240,10 +241,10 @@ int32_t ThermalDeviceMitigation::BatteryVoltageRequest(uint32_t voltage)
         return ret;
     }
     if (WriteSysfsFile(voltageNode, voltageBuf, strlen(voltageBuf)) > NUM_ZERO) {
-        HDF_LOGI("%{public}s: Set current to %{public}d", __func__, voltage);
+        THERMAL_HILOGI(COMP_HDI, "Set current to %{public}d", voltage);
         ret = HDF_SUCCESS;
     } else {
-        HDF_LOGE("%{public}s: failed to set current", __func__);
+        THERMAL_HILOGE(COMP_HDI, "failed to set current");
         ret = HDF_FAILURE;
     }
     return ret;

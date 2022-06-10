@@ -26,14 +26,6 @@ namespace V1_0 {
 ThermalCallbackImpl::ThermalEventCallback ThermalCallbackImpl::eventCb_ = nullptr;
 int32_t ThermalCallbackImpl::OnThermalDataEvent(const HdfThermalCallbackInfo& event)
 {
-    int size = static_cast<int>(event.info.size());
-    HDF_LOGI("%{public}s event.info.size=%{public}d", __func__, size);
-    if (!event.info.empty()) {
-        for (auto iter = event.info.begin(); iter != event.info.end(); iter++) {
-            HDF_LOGI("%{public}s: type: %{public}s", __func__, iter->type.c_str());
-            HDF_LOGI("%{public}s: temp: %{public}d", __func__, iter->temp);
-        }
-    }
     if (eventCb_ == nullptr) {
         return HDF_FAILURE;
     }
