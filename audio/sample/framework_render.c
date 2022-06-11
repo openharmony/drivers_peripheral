@@ -252,6 +252,7 @@ uint32_t StringToInt(const char *flag)
 int32_t WavHeadAnalysis(FILE *file, struct AudioSampleAttributes *attrs)
 {
     if (file == NULL || attrs == NULL) {
+        printf("params is null\n");
         return HDF_FAILURE;
     }
     uint32_t ret;
@@ -267,6 +268,7 @@ int32_t WavHeadAnalysis(FILE *file, struct AudioSampleAttributes *attrs)
     uint32_t aduioDataId = StringToInt(aduioDataIdParam);
     if (g_wavHeadInfo.testFileRiffId != audioRiffId || g_wavHeadInfo.testFileFmt != audioFileFmt ||
         g_wavHeadInfo.dataId != aduioDataId) {
+        printf("audio format error \n");
         return HDF_FAILURE;
         }
     attrs->channelCount = g_wavHeadInfo.audioChannelNum;
@@ -289,6 +291,7 @@ int32_t WavHeadAnalysis(FILE *file, struct AudioSampleAttributes *attrs)
             break;
         }
         default:
+            printf("nonsupport audio format %d\n", g_wavHeadInfo.audioBitsPerSample);
             return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -443,6 +446,27 @@ static inline void ProcessCommonSig(void)
     return;
 }
 
+int32_t MmapInitFile(FILE **fp)
+{
+    if (fp == NULL) {
+        return HDF_FAILURE;
+    }
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(g_path, pathBuf) == NULL) {
+        return HDF_FAILURE;
+    }
+    *fp = fopen(pathBuf, "rb+");
+    if (*fp == NULL) {
+        printf("Open file failed!\n");
+        return HDF_FAILURE;
+    }
+    int32_t ret = fseek(*fp, 0, SEEK_END);
+    if (ret != 0) {
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t FrameStartMmap(const AudioHandle param)
 {
     if (param == NULL) {
@@ -453,19 +477,11 @@ int32_t FrameStartMmap(const AudioHandle param)
     struct AudioMmapBufferDescripter desc;
     ProcessCommonSig();
     // get file length
-    char pathBuf[PATH_MAX] = {'\0'};
-    if (realpath(g_path, pathBuf) == NULL) {
-        return HDF_FAILURE;
-    }
-    FILE *fp = fopen(pathBuf, "rb+");
-    if (fp == NULL) {
-        printf("Open file failed!\n");
-        return HDF_FAILURE;
-    }
-    int32_t ret = fseek(fp, 0, SEEK_END);
-    if (ret != 0) {
-        fclose(fp);
-        return HDF_FAILURE;
+    FILE *fp = NULL;
+    if (MmapInitFile(&fp) < 0) {
+        if (fp != NULL) {
+            fclose(fp);
+        }
     }
     int32_t reqSize = ftell(fp);
     // Converts a file pointer to a device descriptor
@@ -485,7 +501,7 @@ int32_t FrameStartMmap(const AudioHandle param)
         fclose(fp);
         return HDF_FAILURE;
     }
-    ret = render->attr.ReqMmapBuffer(render, reqSize, &desc);
+    int32_t ret = render->attr.ReqMmapBuffer(render, reqSize, &desc);
     if (ret < 0 || reqSize <= 0) {
         printf("Request map fail,please check.\n");
         fclose(fp);
@@ -493,9 +509,11 @@ int32_t FrameStartMmap(const AudioHandle param)
     }
     munmap(desc.memoryAddress, reqSize);
     fclose(fp);
-    ret = StopAudioFiles(&render);
-    if (ret < 0) {
-        LOG_FUN_ERR("StopAudioFiles File!");
+    if (g_render != NULL) {
+        ret = StopAudioFiles(&render);
+        if (ret < 0) {
+            LOG_FUN_ERR("StopAudioFiles File!");
+        }
     }
     return HDF_SUCCESS;
 }
@@ -562,17 +580,70 @@ int32_t InitPlayingAudioParam(struct AudioRender *render)
     return HDF_SUCCESS;
 }
 
-int32_t PlayingAudioFiles(struct AudioRender **renderS)
+void PrintPlayMode(void)
 {
-    if (renderS == NULL || g_adapter == NULL || g_adapter->CreateRender == NULL) {
+    printf(" ============= Play Render Mode ==========\n");
+    printf("| 1. Render non-mmap                     |\n");
+    printf("| 2. Render mmap                         |\n");
+    printf(" ======================================== \n");
+}
+
+int32_t SelectPlayMode(int32_t *palyModeFlag)
+{
+    if (palyModeFlag == NULL) {
+        LOG_FUN_ERR("palyModeFlag is null");
         return HDF_FAILURE;
     }
+    system("clear");
+    int choice = 0;
+    PrintPlayMode();
+    printf("Please enter your choice:");
+    int32_t ret = CheckInputName(INPUT_INT, (void *)&choice);
+    if (ret < 0) {
+        LOG_FUN_ERR("CheckInputName Fail");
+        return HDF_FAILURE;
+    } else {
+        *palyModeFlag = choice;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t StartPlayThread(int32_t palyModeFlag)
+{
+    pthread_attr_t tidsAttr;
+    pthread_attr_init(&tidsAttr);
+    pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
+    switch (palyModeFlag) {
+        case 1: // 1. Stander Loading
+            if (pthread_create(&g_tids, &tidsAttr, (void *)(&FrameStart), &g_str) != 0) {
+                LOG_FUN_ERR("Create Thread Fail");
+                return HDF_FAILURE;
+            }
+            break;
+        case 2: // 2. Low latency Loading
+            if (pthread_create(&g_tids, &tidsAttr, (void *)(&FrameStartMmap), &g_str) != 0) {
+                LOG_FUN_ERR("Create Thread Fail");
+                return HDF_FAILURE;
+            }
+            break;
+        default:
+            printf("Input error,Switched to non-mmap Mode for you,");
+            SystemInputFail();
+            if (pthread_create(&g_tids, &tidsAttr, (void *)(&FrameStart), &g_str) != 0) {
+                LOG_FUN_ERR("Create Thread Fail");
+                return HDF_FAILURE;
+            }
+            break;
+    }
+    return HDF_SUCCESS;
+}
+int32_t PlayingAudioInitFile(void)
+{
     if (g_file != NULL) {
         LOG_FUN_ERR("the music is playing,please stop first");
         return HDF_FAILURE;
     }
     g_closeEnd = false;
-    struct AudioRender *render = NULL;
     char pathBuf[PATH_MAX] = {'\0'};
     if (realpath(g_path, pathBuf) == NULL) {
         return HDF_FAILURE;
@@ -587,6 +658,24 @@ int32_t PlayingAudioFiles(struct AudioRender **renderS)
         FileClose(&g_file);
         return HDF_FAILURE;
     }
+    return HDF_SUCCESS;
+}
+int32_t PlayingAudioFiles(struct AudioRender **renderS)
+{
+    if (renderS == NULL || g_adapter == NULL || g_adapter->CreateRender == NULL) {
+        return HDF_FAILURE;
+    }
+    if (PlayingAudioInitFile() < 0) {
+        LOG_FUN_ERR("PlayingAudioInitFile Fail");
+        return HDF_FAILURE;
+    }
+    int32_t palyModeFlag = 0;
+    if (SelectPlayMode(&palyModeFlag) < 0) {
+        LOG_FUN_ERR("SelectPlayMode Fail");
+        FileClose(&g_file);
+        return HDF_FAILURE;
+    }
+    struct AudioRender *render = NULL;
     int32_t ret = g_adapter->CreateRender(g_adapter, &g_devDesc, &g_attrs, &render);
     if (render == NULL || ret < 0 || render->RenderFrame == NULL) {
         LOG_FUN_ERR("AudioDeviceCreateRender failed or RenderFrame is null");
@@ -600,13 +689,11 @@ int32_t PlayingAudioFiles(struct AudioRender **renderS)
         return HDF_FAILURE;
     }
     if (InitPlayingAudioParam(render) < 0) {
+        LOG_FUN_ERR("InitPlayingAudioParam Fail");
         FileClose(&g_file);
         return HDF_FAILURE;
     }
-    pthread_attr_t tidsAttr;
-    pthread_attr_init(&tidsAttr);
-    pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
-    if (pthread_create(&g_tids, &tidsAttr, (void *)(&FrameStart), &g_str) != 0) {
+    if (StartPlayThread(palyModeFlag) < 0) {
         LOG_FUN_ERR("Create Thread Fail");
         FileClose(&g_file);
         return HDF_FAILURE;

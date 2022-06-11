@@ -101,8 +101,8 @@ void AudioThresholdReportReceived(struct ServiceStatusListener *listener, struct
         return;
     }
     struct AudioEvent thresholdReportEvent = {};
-    AudioPnpMsgReadValue(svcStatus->info, "EVENT_TYPE", &(thresholdReportEvent.eventType));
-    AudioPnpMsgReadValue(svcStatus->info, "DEVICE_TYPE", &(thresholdReportEvent.deviceType));
+    AudioPnpMsgDeSerialize(svcStatus->info, "EVENT_TYPE", &(thresholdReportEvent.eventType));
+    AudioPnpMsgDeSerialize(svcStatus->info, "DEVICE_TYPE", &(thresholdReportEvent.deviceType));
     if (thresholdReportEvent.eventType == HDF_AUDIO_CAPTURE_THRESHOLD &&
         thresholdReportEvent.deviceType == HDF_AUDIO_PRIMARY_DEVICE) {
         g_reportCount++;

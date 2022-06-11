@@ -24,7 +24,7 @@
 
 #define STRTOL_FORMART_HEX 16
 
-int32_t AudioPnpMsgReadValue(const char *pnpInfo, const char *typeName, uint32_t *value)
+int32_t AudioPnpMsgDeSerialize(const char *pnpInfo, const char *typeName, uint32_t *value)
 {
     char pnpInfoTemp[AUDIO_PNP_MSG_LEN_MAX] = {0};
     char *typeNameTepm = NULL;
