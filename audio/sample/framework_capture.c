@@ -38,6 +38,9 @@
         printf("%s: [%s]: [%d]:[ERROR]:" fmt"\n", __FILE__, __func__, __LINE__, ##arg); \
     } while (0)
 
+#define WAV_HEAD_OFFSET 44
+#define WAV_HEAD_RIFF_OFFSET 8
+
 #define AUDIO_CHANNELCOUNT 2
 #define AUDIO_SAMPLE_RATE_48K 48000
 #define PATH_LEN 256
@@ -50,6 +53,7 @@
 #define AUDIO_BUFF_SIZE (1024 * 16)
 #define AUDIO_ALSA_LIB_BUFF_SIZE (1000 * 24)
 #define PCM_8_BIT 8
+#define MOVE_LEFT_NUM 8
 #define PCM_16_BIT 16
 #define AUDIO_TOTALSIZE_15M (1024 * 15)
 #define AUDIO_RECORD_INTERVAL_512KB 512
@@ -57,6 +61,22 @@
 #define BUFFER_LEN 256
 #define EXT_PARAMS_MAXLEN 107
 #define ONE_MS 1000
+
+struct AudioHeadInfo {
+    uint32_t riffId;
+    uint32_t riffSize;
+    uint32_t riffType;
+    uint32_t audioFileFmtId;
+    uint32_t audioFileFmtSize;
+    uint16_t audioFileFormat;
+    uint16_t audioChannelNum;
+    uint32_t audioSampleRate;
+    uint32_t audioByteRate;
+    uint16_t audioBlockAlign;
+    uint16_t audioBitsPerSample;
+    uint32_t dataId;
+    uint32_t dataSize;
+};
 
 struct StrParaCapture {
     struct AudioCapture *capture;
@@ -66,6 +86,7 @@ struct StrParaCapture {
     char *frame;
     int32_t bufferSize;
 };
+
 struct AudioAdapter *g_adapter = NULL;
 struct AudioDeviceDescriptor g_devDesc;
 struct AudioSampleAttributes g_attrs;
@@ -252,8 +273,8 @@ static int AudioPnpSvcThresholdMsgCheck(struct ServiceStatus *svcStatus, struct 
         printf("AudioPnpSvcThresholdMsgCheck:input param is null!\n");
         return HDF_FAILURE;
     }
-    if ((AudioPnpMsgReadValue(svcStatus->info, "EVENT_TYPE", &(audioEvent->eventType)) != HDF_SUCCESS) ||
-        (AudioPnpMsgReadValue(svcStatus->info, "DEVICE_TYPE", &(audioEvent->deviceType)) != HDF_SUCCESS)) {
+    if ((AudioPnpMsgDeSerialize(svcStatus->info, "EVENT_TYPE", &(audioEvent->eventType)) != HDF_SUCCESS) ||
+        (AudioPnpMsgDeSerialize(svcStatus->info, "DEVICE_TYPE", &(audioEvent->deviceType)) != HDF_SUCCESS)) {
         printf("DeSerialize fail!\n");
         return HDF_FAILURE;
     }
@@ -361,6 +382,64 @@ int UnRegisterListen(void)
 }
 #endif
 
+static inline void FileClose(FILE **file)
+{
+    if ((file != NULL) && ((*file) != NULL)) {
+        fclose(*file);
+        *file = NULL;
+    }
+    return;
+}
+
+uint32_t StringToInt(const char *flag)
+{
+    if (flag == NULL) {
+        return 0;
+    }
+    uint32_t temp = flag[0];
+    for (int32_t i = strlen(flag) - 1; i >= 0; i--) {
+        temp <<= MOVE_LEFT_NUM;
+        temp += flag[i];
+    }
+    return temp;
+}
+
+int32_t AddWavFileHeader(struct StrParaCapture *StrParam)
+{
+    if (StrParam == NULL) {
+        LOG_FUN_ERR("InitCaptureStrParam is NULL");
+        return HDF_FAILURE;
+    }
+
+    struct AudioHeadInfo headInfo;
+    (void)fseek(g_file, 0, SEEK_END);
+
+    headInfo.riffId = StringToInt("RIFF");
+    headInfo.riffSize = (uint32_t)ftell(g_file) - WAV_HEAD_RIFF_OFFSET;
+    headInfo.riffType = StringToInt("WAVE");
+    headInfo.audioFileFmtId = StringToInt("fmt ");
+    headInfo.audioFileFmtSize = PcmFormatToBits(StrParam->attrs.format);
+    headInfo.audioFileFormat = 1;
+    headInfo.audioChannelNum = StrParam->attrs.channelCount;
+    headInfo.audioSampleRate = StrParam->attrs.sampleRate;
+    headInfo.audioByteRate = headInfo.audioSampleRate * headInfo.audioChannelNum * headInfo.audioFileFmtSize
+                             / PCM_8_BIT;
+    headInfo.audioBlockAlign = headInfo.audioChannelNum * headInfo.audioFileFmtSize / PCM_8_BIT;
+    headInfo.audioBitsPerSample = headInfo.audioFileFmtSize;
+    headInfo.dataId = StringToInt("data");
+    headInfo.dataSize = (uint32_t)ftell(g_file) - WAV_HEAD_OFFSET;
+
+    rewind(g_file);
+
+    ssize_t ret = fwrite(&headInfo, sizeof(struct AudioHeadInfo), 1, g_file);
+    if (ret != 1) {
+        printf("write wav file head error");
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
 int32_t StopButtonCapture(struct AudioCapture **captureS)
 {
     if (captureS == NULL) {
@@ -391,10 +470,13 @@ int32_t StopButtonCapture(struct AudioCapture **captureS)
         free(g_frame);
         g_frame = NULL;
     }
-    if (g_file != NULL) {
-        fclose(g_file);
-        g_file = NULL;
+
+    if (AddWavFileHeader(&g_str) < 0) {
+        LOG_FUN_ERR("AddWavFileHeader Fail");
+        return HDF_FAILURE;
     }
+
+    FileClose(&g_file);
     if (g_CaptureModeFlag == CAPTURE_INTERUPT) {
 #ifndef __LITEOS__
         ret = UnRegisterListen();
@@ -416,19 +498,10 @@ int32_t FrameStartCaptureMmap(const AudioHandle param)
     struct AudioCapture *capture = strParam->capture;
     struct AudioMmapBufferDescripter desc;
     // Modify file size
-    char pathBuf[PATH_MAX] = {'\0'};
-    if (realpath(g_path, pathBuf) == NULL) {
-        return HDF_FAILURE;
-    }
-    FILE *fp = fopen(pathBuf, "rb+");
-    if (fp == NULL) {
-        printf("Open file failed!\n");
-        return HDF_FAILURE;
-    }
-    int fd = fileno(fp);
+
+    int fd = fileno(strParam->file);
     if (fd == -1) {
         printf("fileno failed, fd is %d\n", fd);
-        fclose(fp);
         return HDF_FAILURE;
     }
     ftruncate(fd, FILE_CAPTURE_SIZE);
@@ -439,13 +512,11 @@ int32_t FrameStartCaptureMmap(const AudioHandle param)
     desc.offset = 0; // Recording must be 0
     // start
     if (capture == NULL || capture->attr.ReqMmapBuffer == NULL) {
-        fclose(fp);
         return HDF_FAILURE;
     }
     int32_t ret = capture->attr.ReqMmapBuffer(capture, FILE_CAPTURE_SIZE, &desc);
     if (ret < 0) {
         printf("Request map fail,please check.\n");
-        fclose(fp);
         return HDF_FAILURE;
     }
     ret = msync(desc.memoryAddress, FILE_CAPTURE_SIZE, MS_ASYNC);
@@ -453,7 +524,6 @@ int32_t FrameStartCaptureMmap(const AudioHandle param)
         printf("sync fail.\n");
     }
     munmap(desc.memoryAddress, FILE_CAPTURE_SIZE);
-    fclose(fp);
     return HDF_SUCCESS;
 }
 
@@ -523,8 +593,66 @@ int32_t FrameStartCapture(const AudioHandle param)
     }
     return HDF_SUCCESS;
 }
+void PrintPlayMode(void)
+{
+    printf(" ============= Play Capture Mode ==========\n");
+    printf("| 1. Capture non-mmap                     |\n");
+    printf("| 2. Capture mmap                         |\n");
+    printf(" ========================================= \n");
+}
 
-int32_t CaptureChoiceModeAndRecording(struct StrParaCapture *StrParam, struct AudioCapture *capture)
+int32_t SelectPlayMode(int32_t *palyModeFlag)
+{
+    if (palyModeFlag == NULL) {
+        LOG_FUN_ERR("palyModeFlag is null");
+        return HDF_FAILURE;
+    }
+    system("clear");
+    int choice = 0;
+    PrintPlayMode();
+    printf("Please enter your choice:");
+    int32_t ret = CheckInputName(INPUT_INT, (void *)&choice);
+    if (ret < 0) {
+        LOG_FUN_ERR("CheckInputName Fail");
+        return HDF_FAILURE;
+    } else {
+        *palyModeFlag = choice;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t StartPlayThread(int32_t palyModeFlag)
+{
+    pthread_attr_t tidsAttr;
+    pthread_attr_init(&tidsAttr);
+    pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
+    switch (palyModeFlag) {
+        case 1: // 1. Stander Loading
+            if (pthread_create(&g_tids, &tidsAttr, (void *)(&FrameStartCapture), &g_str) != 0) {
+                LOG_FUN_ERR("Create Thread Fail");
+                return HDF_FAILURE;
+            }
+            break;
+        case 2: // 2. Low latency Loading
+            if (pthread_create(&g_tids, &tidsAttr, (void *)(&FrameStartCaptureMmap), &g_str) != 0) {
+                LOG_FUN_ERR("Create Thread Fail");
+                return HDF_FAILURE;
+            }
+            break;
+        default:
+            printf("Input error,Switched to non-mmap Mode for you,");
+            SystemInputFail();
+            if (pthread_create(&g_tids, &tidsAttr, (void *)(&FrameStartCapture), &g_str) != 0) {
+                LOG_FUN_ERR("Create Thread Fail");
+                return HDF_FAILURE;
+            }
+            break;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t CaptureChoiceModeAndRecording(struct StrParaCapture *StrParam, struct AudioCapture *capture,
+    int32_t palyModeFlag)
 {
     if (StrParam == NULL || capture == NULL) {
         LOG_FUN_ERR("InitCaptureStrParam is NULL");
@@ -548,14 +676,68 @@ int32_t CaptureChoiceModeAndRecording(struct StrParaCapture *StrParam, struct Au
         return HDF_FAILURE;
 #endif
     } else {
-        pthread_attr_t tidsAttr;
-        pthread_attr_init(&tidsAttr);
-        pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
-        ret = pthread_create(&g_tids, &tidsAttr, (void *)(&FrameStartCapture), &g_str);
-        if (ret != 0) {
+        if (StartPlayThread(palyModeFlag) < 0) {
+            LOG_FUN_ERR("Create Thread Fail");
             return HDF_FAILURE;
         }
     }
+    return HDF_SUCCESS;
+}
+
+int32_t PlayingAudioInitFile(void)
+{
+    if (g_file != NULL) {
+        LOG_FUN_ERR("the capture is playing,please stop first");
+        return HDF_FAILURE;
+    }
+    g_closeEnd = false;
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(g_path, pathBuf) == NULL) {
+        return HDF_FAILURE;
+    }
+    g_file = fopen(pathBuf, "wb+");
+    if (g_file == NULL) {
+        printf("failed to open '%s'\n", g_path);
+        return HDF_FAILURE;
+    }
+
+    int32_t ret = fseek(g_file, WAV_HEAD_OFFSET, SEEK_SET);
+    if (ret != 0) {
+        printf("write wav file head error");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t PlayingAudioInitCapture(struct AudioCapture **captureTemp)
+{
+    if (captureTemp == NULL) {
+        LOG_FUN_ERR("captureTemp is null");
+        return HDF_FAILURE;
+    }
+
+    struct AudioCapture *capture = NULL;
+    int32_t ret = g_adapter->CreateCapture(g_adapter, &g_devDesc, &g_attrs, &capture);
+    if (capture == NULL || ret < 0) {
+        return HDF_FAILURE;
+    }
+    ret = capture->control.Start((AudioHandle)capture);
+    if (ret < 0) {
+        if (g_adapter != NULL && g_adapter->DestroyCapture != NULL) {
+            g_adapter->DestroyCapture(g_adapter, capture);
+        }
+        return HDF_FAILURE;
+    }
+    uint32_t bufferSize = PcmFramesToBytes(g_attrs);
+    g_frame = (char *)calloc(1, bufferSize);
+    if (g_frame == NULL) {
+        if (g_adapter != NULL && g_adapter->DestroyCapture != NULL) {
+            g_adapter->DestroyCapture(g_adapter, capture);
+        }
+        return HDF_FAILURE;
+    }
+
+    *captureTemp = capture;
     return HDF_SUCCESS;
 }
 
@@ -564,40 +746,28 @@ int32_t StartButtonCapture(struct AudioCapture **captureS)
     if (captureS == NULL || g_adapter == NULL || g_adapter->CreateCapture == NULL) {
         return HDF_FAILURE;
     }
-    if (g_file != NULL) {
-        LOG_FUN_ERR("the capture is playing,please stop first");
+    if (PlayingAudioInitFile() < 0) {
+        LOG_FUN_ERR("PlayingAudioInitFile Fail");
         return HDF_FAILURE;
     }
-    g_closeEnd = false;
+    int32_t palyModeFlag = 0;
+    if (SelectPlayMode(&palyModeFlag) < 0) {
+        LOG_FUN_ERR("SelectPlayMode Fail");
+        FileClose(&g_file);
+        return HDF_FAILURE;
+    }
     struct AudioCapture *capture = NULL;
-    int32_t ret = g_adapter->CreateCapture(g_adapter, &g_devDesc, &g_attrs, &capture);
-    if (capture == NULL || ret < 0) {
+    if (PlayingAudioInitCapture(&capture) < 0) {
+        LOG_FUN_ERR("PlayingAudioInitCapture Fail");
+        FileClose(&g_file);
         return HDF_FAILURE;
     }
-    char *path = g_path;
-    if (path == NULL) {
-        return HDF_FAILURE;
-    }
-    g_file = fopen(g_path, "wb+");
-    if (g_file == NULL) {
-        printf("failed to open '%s'\n", g_path);
-        return HDF_FAILURE;
-    }
-    ret = capture->control.Start((AudioHandle)capture);
-    if (ret < 0) {
-        if (g_file != NULL) {
-            fclose(g_file);
-            g_file = NULL;
-        }
-        return HDF_FAILURE;
-    }
-    uint32_t bufferSize = PcmFramesToBytes(g_attrs);
-    g_frame = (char *)calloc(1, bufferSize);
-    if (g_frame == NULL) {
-        return HDF_FAILURE;
-    }
-    if (CaptureChoiceModeAndRecording(&g_str, capture) < 0) {
+    if (CaptureChoiceModeAndRecording(&g_str, capture, palyModeFlag) < 0) {
         LOG_FUN_ERR("CaptureChoiceModeAndRecording failed");
+        FileClose(&g_file);
+        if (g_adapter != NULL && g_adapter->DestroyCapture != NULL) {
+            g_adapter->DestroyCapture(g_adapter, capture);
+        }
         return HDF_FAILURE;
     }
     *captureS = capture;

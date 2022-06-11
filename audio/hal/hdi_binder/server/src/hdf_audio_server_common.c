@@ -1597,8 +1597,8 @@ static int32_t HdiServiceGetDevStatusByPnp(const struct HdfDeviceIoClient *clien
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
-    if ((AudioPnpMsgReadValue(strDevPlugMsg, "EVENT_TYPE", &(g_audioEventPnp.eventType)) != HDF_SUCCESS) ||
-        (AudioPnpMsgReadValue(strDevPlugMsg, "DEVICE_TYPE", &(g_audioEventPnp.deviceType)) != HDF_SUCCESS)) {
+    if ((AudioPnpMsgDeSerialize(strDevPlugMsg, "EVENT_TYPE", &(g_audioEventPnp.eventType)) != HDF_SUCCESS) ||
+        (AudioPnpMsgDeSerialize(strDevPlugMsg, "DEVICE_TYPE", &(g_audioEventPnp.deviceType)) != HDF_SUCCESS)) {
         HDF_LOGE("%{public}s: DeSerialize fail!", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
     }
