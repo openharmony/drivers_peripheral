@@ -6,6 +6,7 @@
   "component": {
     "name": "audio_device_driver",
     "subsystem": "hdf",
+    "features": ["audio_device_driver_feature_mono_to_stereo"],
     "syscap": [ "" ],
     "adapter_system_type": ["standard", "small"],
     "rom": "1035KB",
