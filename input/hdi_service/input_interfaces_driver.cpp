@@ -64,12 +64,13 @@ static int HdfInputInterfacesDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfInputInterfacesHost->ioService.Dispatch = InputInterfacesDriverDispatch;
-    hdfInputInterfacesHost->ioService.Open = NULL;
-    hdfInputInterfacesHost->ioService.Release = NULL;
+    hdfInputInterfacesHost->ioService.Open = nullptr;
+    hdfInputInterfacesHost->ioService.Release = nullptr;
 
     auto serviceImpl = IInputInterfaces::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        delete hdfInputInterfacesHost;
         return HDF_FAILURE;
     }
 
@@ -77,6 +78,7 @@ static int HdfInputInterfacesDriverBind(struct HdfDeviceObject *deviceObject)
         IInputInterfaces::GetDescriptor());
     if (hdfInputInterfacesHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        delete hdfInputInterfacesHost;
         return HDF_FAILURE;
     }
 
@@ -87,6 +89,11 @@ static int HdfInputInterfacesDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfInputInterfacesDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfInputInterfacesDriverRelease enter");
+    if (deviceObject->service == nullptr) {
+        HDF_LOGE("HdfInputInterfacesDriverRelease not initted");
+        return;
+    }
+
     auto *hdfInputInterfacesHost = CONTAINER_OF(deviceObject->service, struct HdfInputInterfacesHost, ioService);
     delete hdfInputInterfacesHost;
 }

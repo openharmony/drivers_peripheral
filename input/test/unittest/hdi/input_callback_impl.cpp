@@ -20,20 +20,19 @@ namespace OHOS {
 namespace HDI {
 namespace Input {
 namespace V1_0 {
-int32_t InputCallbackImpl::EventPkgCallback(const std::vector<EventPackage>& pkgs, uint32_t count,
-    uint32_t devIndex)
+int32_t InputCallbackImpl::EventPkgCallback(const std::vector<EventPackage> &pkgs, uint32_t devIndex)
 {
     if (pkgs.empty()) {
         printf("%s: event packages are null\n", __func__);
         return HDF_FAILURE;
     }
-    for (uint32_t i = 0; i < count; i++) {
+    for (uint32_t i = 0; i < pkgs.size(); i++) {
         printf("%s: pkgs[%u] = 0x%x, 0x%x, %d\n", __func__, i, pkgs[i].type, pkgs[i].code, pkgs[i].value);
     }
     return HDF_SUCCESS;
 }
 
-int32_t InputCallbackImpl::HotPlugCallback(const HotPlugEvent& event)
+int32_t InputCallbackImpl::HotPlugCallback(const HotPlugEvent &event)
 {
     return HDF_SUCCESS;
 }

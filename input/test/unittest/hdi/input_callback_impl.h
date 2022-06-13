@@ -26,8 +26,8 @@ class InputCallbackImpl : public IInputCallback {
 public:
     InputCallbackImpl() = default;
     virtual ~InputCallbackImpl() = default;
-    int32_t EventPkgCallback(const std::vector<EventPackage>& pkgs, uint32_t count, uint32_t devIndex) override;
-    int32_t HotPlugCallback(const HotPlugEvent& event) override;
+    int32_t EventPkgCallback(const std::vector<EventPackage> &pkgs, uint32_t devIndex) override;
+    int32_t HotPlugCallback(const HotPlugEvent &event) override;
 };
 } // V1_0
 } // Input

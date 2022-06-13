@@ -62,9 +62,7 @@ ohos_shared_library("libinput_driver") {
 
   sources = [ "input_interfaces_driver.cpp" ]
 
-  deps = [
-    "//drivers/peripheral/input/hdi_service:libinput_interfaces_service_1.0",
-  ]
+  deps = [ "//drivers/interface/input/v1_0:libinput_stub_1.0" ]
 
   cflags = [
     "-Wall",
@@ -98,10 +96,8 @@ ohos_shared_library("libinput_driver") {
 }
 
 group("hdi_input_service") {
-  if (target_cpu == "arm") {
-    deps = [
-      ":libinput_driver",
-      ":libinput_interfaces_service_1.0",
-    ]
-  }
+  deps = [
+    ":libinput_driver",
+    ":libinput_interfaces_service_1.0",
+  ]
 }
