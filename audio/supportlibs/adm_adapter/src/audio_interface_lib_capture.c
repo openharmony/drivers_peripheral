@@ -1259,6 +1259,36 @@ int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
 }
 #endif
 
+#ifdef MONO_TO_STEREO
+void CaptureChannelFixed(void *data, uint32_t len)
+{
+    int16_t *pcmLeft = (int16_t*)data;
+    int16_t *pcmRight = pcmLeft + 1; // right channel offset + 1
+
+    for (uint32_t index = 0; index < len; index += 2) { // 16bit, step = 2
+        pcmRight[index] = pcmLeft[index];
+    }
+    return;
+}
+#endif
+
+int32_t AudioInputCaptureReadInfoToHandleData(struct AudioHwCaptureParam *handleData,
+    char *frame, uint32_t frameCount, uint32_t dataSize)
+{
+    int32_t ret = memcpy_s(handleData->frameCaptureMode.buffer, FRAME_DATA, frame, dataSize);
+    if (ret != 0) {
+        return HDF_FAILURE;
+    }
+#ifdef MONO_TO_STEREO
+    if (g_hwParams.channels == 2) { // if rk3568 channel = 2, and 16bit
+        CaptureChannelFixed(handleData->frameCaptureMode.buffer, dataSize / 2); // len = dataSize / 2
+    }
+#endif
+    handleData->frameCaptureMode.bufferSize = dataSize;
+    handleData->frameCaptureMode.bufferFrameSize = frameCount;
+    return HDF_SUCCESS;
+}
+
 int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
@@ -1303,13 +1333,12 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
         HdfSbufRecycle(reply);
         return HDF_FAILURE;
     }
-    ret = memcpy_s(handleData->frameCaptureMode.buffer, FRAME_DATA, frame, dataSize);
-    if (ret != 0) {
+    ret = AudioInputCaptureReadInfoToHandleData(handleData, frame, frameCount, dataSize);
+    if (ret != HDF_SUCCESS) {
+        LOG_FUN_ERR("AudioInputCaptureReadInfoToHandleData Failed!");
         HdfSbufRecycle(reply);
-        return HDF_FAILURE;
+        return ret;
     }
-    handleData->frameCaptureMode.bufferSize = dataSize;
-    handleData->frameCaptureMode.bufferFrameSize = frameCount;
     HdfSbufRecycle(reply);
     return HDF_SUCCESS;
 }
