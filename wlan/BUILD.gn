@@ -11,19 +11,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  group("wlan_entry") {
-    deps = [
-      "client:wifi_driver_client",
-      "hal:wifi_hal",
-    ]
-  }
-} else {
-  group("wlan_entry") {
-    deps = [
-      "client:wifi_driver_client",
-      "hal:wifi_hal",
-      "hdi_service:hdi_wlan_service",
-    ]
+group("wlan_entry") {
+  deps = [
+    "client:wifi_driver_client",
+    "hal:wifi_hal",
+  ]
+  if (!defined(ohos_lite)) {
+    deps += [ "hdi_service:hdi_wlan_service" ]
   }
 }

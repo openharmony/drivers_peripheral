@@ -1385,3 +1385,21 @@ int32_t SetPowerMode(const char *ifName, uint8_t mode)
     close(fd);
     return ret;
 }
+
+int32_t StartChannelMeas(const char *ifName, int32_t commandId, const int32_t *paramBuf, uint32_t paramBufLen)
+{
+    (void)ifName;
+    (void)commandId;
+    (void)paramBuf;
+    (void)paramBufLen;
+    return RET_CODE_NOT_SUPPORT;
+}
+
+int32_t GetChannelMeasResult(const char *ifName, int32_t commandId, uint32_t *paramBuf, uint32_t *paramBufLen)
+{
+    (void)ifName;
+    (void)commandId;
+    (void)paramBuf;
+    (void)paramBufLen;
+    return RET_CODE_NOT_SUPPORT;
+}

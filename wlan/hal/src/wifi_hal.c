@@ -273,6 +273,26 @@ static int32_t SetPowerModeInner(const char *ifName, uint8_t mode)
     return SetPowerMode(ifName, mode);
 }
 
+static int32_t StartChannelMeasInner(const char *ifName, int32_t commandId, const int32_t *paramBuf,
+    uint32_t paramBufLen)
+{
+    if (ifName == NULL || paramBuf == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return StartChannelMeas(ifName, commandId, paramBuf, paramBufLen);
+}
+
+static int32_t GetChannelMeasResultInner(const char *ifName, int32_t commandId, uint32_t *paramBuf,
+    uint32_t *paramBufLen)
+{
+    if (ifName == NULL || paramBuf == NULL || paramBufLen == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return GetChannelMeasResult(ifName, commandId, paramBuf, paramBufLen);
+}
+
 static int32_t Start(struct IWiFi *iwifi)
 {
     HalMutexLock();
@@ -377,6 +397,24 @@ static int32_t WifiSetPowerMode(const char *ifName, uint8_t mode)
     return ret;
 }
 
+static int32_t WifiStartChannelMeas(const char *ifName, int32_t commandId, const int32_t *paramBuf,
+    uint32_t paramBufLen)
+{
+    HalMutexLock();
+    int32_t ret = StartChannelMeasInner(ifName, commandId, paramBuf, paramBufLen);
+    HalMutexUnlock();
+    return ret;
+}
+
+static int32_t WifiGetChannelMeasResult(const char *ifName, int32_t commandId, uint32_t *paramBuf,
+    uint32_t *paramBufLen)
+{
+    HalMutexLock();
+    int32_t ret = GetChannelMeasResultInner(ifName, commandId, paramBuf, paramBufLen);
+    HalMutexUnlock();
+    return ret;
+}
+
 int32_t WifiConstruct(struct IWiFi **wifiInstance)
 {
     static bool isInited = false;
@@ -401,6 +439,8 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
         singleWifiInstance.getNetDevInfo = GetNetDevInfo;
         singleWifiInstance.getPowerMode = WifiGetPowerMode;
         singleWifiInstance.setPowerMode = WifiSetPowerMode;
+        singleWifiInstance.startChannelMeas = WifiStartChannelMeas;
+        singleWifiInstance.getChannelMeasResult = WifiGetChannelMeasResult;
         InitIWiFiList();
         isInited = true;
     }
