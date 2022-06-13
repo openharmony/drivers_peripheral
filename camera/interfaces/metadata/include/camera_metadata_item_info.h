@@ -63,7 +63,7 @@ static item_info_t g_ohosCameraSensorInfo[OHOS_CAMERA_SENSOR_INFO_END - OHOS_CAM
     [OHOS_SENSOR_INFO_MAX_FRAME_DURATION - OHOS_CAMERA_SENSOR_INFO_START] = {"maxFrameDuration", META_TYPE_INT64, 1},
     [OHOS_SENSOR_INFO_PHYSICAL_SIZE - OHOS_CAMERA_SENSOR_INFO_START] = {"physicalSize", META_TYPE_FLOAT, 1},
     [OHOS_SENSOR_INFO_PIXEL_ARRAY_SIZE - OHOS_CAMERA_SENSOR_INFO_START] = {"pixelArraySize", META_TYPE_INT32, -1},
-    [OHOS_SENSOR_INFO_TIMESTAMP - OHOS_CAMERA_SENSOR_INFO_START] = {"sensorOutputTimeStamp", META_TYPE_INT64, -1},
+    [OHOS_SENSOR_INFO_TIMESTAMP - OHOS_CAMERA_SENSOR_INFO_START] = {"sensorOutputTimeStamp", META_TYPE_INT64, 1},
 };
 
 static item_info_t g_ohosCameraStatistics[OHOS_CAMERA_STATISTICS_END - OHOS_CAMERA_STATISTICS_START] = {
@@ -73,7 +73,7 @@ static item_info_t g_ohosCameraStatistics[OHOS_CAMERA_STATISTICS_END - OHOS_CAME
     [OHOS_STATISTICS_HISTOGRAM_MODE - OHOS_CAMERA_STATISTICS_START] = {"histogramMode", META_TYPE_BYTE, 1},
     [OHOS_STATISTICS_FACE_IDS - OHOS_CAMERA_STATISTICS_START] = {"faceIds", META_TYPE_INT32, -1},
     [OHOS_STATISTICS_FACE_LANDMARKS - OHOS_CAMERA_STATISTICS_START] = {"faceLandmarks", META_TYPE_INT32, -1},
-    [OHOS_STATISTICS_FACE_RECTANGLES - OHOS_CAMERA_STATISTICS_START] = {"faceRectangles", META_TYPE_INT32, -1},
+    [OHOS_STATISTICS_FACE_RECTANGLES - OHOS_CAMERA_STATISTICS_START] = {"faceRectangles", META_TYPE_FLOAT, -1},
     [OHOS_STATISTICS_FACE_SCORES - OHOS_CAMERA_STATISTICS_START] = {"faceScores", META_TYPE_BYTE, -1},
 };
 
@@ -118,7 +118,7 @@ static item_info_t g_ohosDeviceExposure[OHOS_DEVICE_EXPOSURE_END - OHOS_DEVICE_E
     [OHOS_ABILITY_EXPOSURE_MODES - OHOS_DEVICE_EXPOSURE_START] =
         {"exposureSupportiveModes", META_TYPE_BYTE, -1},
     [OHOS_CONTROL_EXPOSURE_MODE - OHOS_DEVICE_EXPOSURE_START] = {"exMode", META_TYPE_BYTE, 1},
-    [OHOS_ABILITY_METER_MODES - OHOS_DEVICE_EXPOSURE_START] = {"meterAvailableModes", META_TYPE_BYTE, 1},
+    [OHOS_ABILITY_METER_MODES - OHOS_DEVICE_EXPOSURE_START] = {"meterAvailableModes", META_TYPE_BYTE, -1},
 };
 
 static item_info_t g_ohosDeviceFocus[OHOS_DEVICE_FOCUS_END - OHOS_DEVICE_FOCUS_START] = {
@@ -164,6 +164,12 @@ static item_info_t g_ohosStreamJpeg[OHOS_STREAM_JPEG_END - OHOS_STREAM_JPEG_STAR
     [OHOS_JPEG_SIZE - OHOS_STREAM_JPEG_START] = {"size", META_TYPE_INT32, 1},
 };
 
+static item_info_t g_ohosStreamVideo[OHOS_STREAM_VIDEO_END - OHOS_STREAM_VIDEO_START] = {
+    [OHOS_ABILITY_VIDEO_STABILIZATION_MODES - OHOS_STREAM_VIDEO_START] =
+        {"videoAvailableStabilizationModes", META_TYPE_BYTE, -1},
+    [OHOS_CONTROL_VIDEO_STABILIZATION_MODE - OHOS_STREAM_VIDEO_START] = {"videoStabilizationMode", META_TYPE_BYTE, 1},
+};
+
 const static item_info_t *g_ohosItemInfo[OHOS_SECTION_COUNT] = {
     g_ohosCameraProperties,
     g_ohosCameraSensor,
@@ -176,6 +182,7 @@ const static item_info_t *g_ohosItemInfo[OHOS_SECTION_COUNT] = {
     g_ohosDeviceZoom,
     g_ohosStreamAbility,
     g_ohosStreamJpeg,
+    g_ohosStreamVideo,
 };
 } // namespace Camera
 #endif /* CAMERA_METADATA_ITEM_INFO_H */
