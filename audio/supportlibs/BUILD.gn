@@ -40,6 +40,9 @@ config("audio_interface_config") {
     "-ffunction-sections",
     "-fdata-sections",
   ]
+  if (audio_device_driver_feature_mono_to_stereo) {
+    cflags += [ "-DMONO_TO_STEREO" ]
+  }
   if (enable_audio_alsa_mode) {
     cflags += [ "-DALSA_MODE" ]
   }
