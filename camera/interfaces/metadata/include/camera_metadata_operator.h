@@ -117,6 +117,7 @@ typedef enum camera_metadata_sec {
     OHOS_SECTION_DEVICE_ZOOM,
     OHOS_SECTION_STREAM_ABILITY,
     OHOS_SECTION_STREAM_JPEG,
+    OHOS_SECTION_STREAM_VIDEO,
     OHOS_SECTION_COUNT,
 } camera_metadata_sec_t;
 
