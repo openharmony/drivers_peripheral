@@ -17,7 +17,7 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 ohos_shared_library("libfingerprint_auth_interface_service_1.0") {
   include_dirs = [
     "include",
-    "//base/user_iam/user_auth/common/logs",
+    "//base/useriam/user_auth_framework/common/logs",
   ]
   sources = [
     "src/executor_impl.cpp",
@@ -41,7 +41,7 @@ ohos_shared_library("libfingerprint_auth_interface_service_1.0") {
 ohos_shared_library("libfingerprint_auth_driver") {
   include_dirs = [
     "include",
-    "//base/user_iam/user_auth/common/logs",
+    "//base/useriam/user_auth_framework/common/logs",
   ]
   sources = [ "src/fingerprint_auth_interface_driver.cpp" ]
   deps = [

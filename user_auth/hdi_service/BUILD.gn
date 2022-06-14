@@ -27,7 +27,7 @@ ohos_shared_library("libuser_auth_interface_service_1.0") {
     "user_auth/inc",
     "service",
     "//third_party/openssl/include",
-    "//base/user_iam/user_auth/common/logs",
+    "//base/useriam/user_auth_framework/common/logs",
   ]
   sources = [
     "adaptor/src/adaptor_algorithm.c",
@@ -66,7 +66,7 @@ ohos_shared_library("libuser_auth_interface_service_1.0") {
     "utils_base:utils",
   ]
   deps = [
-    "//base/user_iam/user_auth/common:iam_utils",
+    "//base/useriam/user_auth_framework/common:iam_utils",
     "//third_party/openssl:libcrypto_static",
   ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
@@ -79,11 +79,11 @@ ohos_shared_library("libuser_auth_interface_service_1.0") {
 ohos_shared_library("libuser_auth_driver") {
   include_dirs = [
     "interface",
-    "//base/user_iam/user_auth/common/logs",
+    "//base/useriam/user_auth_framework/common/logs",
   ]
   sources = [ "service/user_auth_interface_driver.cpp" ]
   deps = [
-    "//base/user_iam/user_auth/common:iam_utils",
+    "//base/useriam/user_auth_framework/common:iam_utils",
     "//drivers/peripheral/user_auth/hdi_service:libuser_auth_interface_service_1.0",
   ]
 
