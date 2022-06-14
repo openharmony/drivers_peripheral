@@ -13,14 +13,9 @@
  * limitations under the License.
  */
 
+#include <net/if.h>
 #include <arpa/inet.h>
 #include <dirent.h>
-#include <linux/if.h>
-#include <linux/if_arp.h>
-#include <linux/netlink.h>
-#include <linux/nl80211.h>
-#include <linux/wireless.h>
-#include <net/if.h>
 #include <netlink-private/types.h>
 #include <netlink/genl/ctrl.h>
 #include <netlink/genl/genl.h>
@@ -33,6 +28,10 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <linux/if_arp.h>
+#include <linux/netlink.h>
+#include <linux/nl80211.h>
+#include <linux/wireless.h>
 
 #include "../wifi_common_cmd.h"
 #include "hilog/log.h"
@@ -1228,7 +1227,7 @@ err:
 
 static int32_t ParsePowerMode(const char *buf, uint16_t len, uint8_t *mode)
 {
-    char *key[WIFI_POWER_MODE_NUM] = {"sleep", "third", "init"};
+    char *key[WIFI_POWER_MODE_NUM] = {"sleep\n", "third\n", "init\n"};
     char *str = "pow_mode = ";
     if (buf == NULL || mode == NULL) {
         return RET_CODE_INVALID_PARAM;
@@ -1239,11 +1238,11 @@ static int32_t ParsePowerMode(const char *buf, uint16_t len, uint8_t *mode)
         return RET_CODE_FAILURE;
     }
     pos += strlen(str);
-    if (!strcmp(pos, key[WIFI_POWER_MODE_SLEEPING])) {
+    if (!strncmp(pos, key[WIFI_POWER_MODE_SLEEPING], strlen(key[WIFI_POWER_MODE_SLEEPING]))) {
         *mode = WIFI_POWER_MODE_SLEEPING;
-    } else if (!strcmp(pos, key[WIFI_POWER_MODE_GENERAL])) {
+    } else if (!strncmp(pos, key[WIFI_POWER_MODE_GENERAL], strlen(key[WIFI_POWER_MODE_GENERAL]))) {
         *mode = WIFI_POWER_MODE_GENERAL;
-    } else if (!strcmp(pos, key[WIFI_POWER_MODE_THROUGH_WALL])) {
+    } else if (!strncmp(pos, key[WIFI_POWER_MODE_THROUGH_WALL], strlen(key[WIFI_POWER_MODE_THROUGH_WALL]))) {
         *mode = WIFI_POWER_MODE_THROUGH_WALL;
     } else {
         HILOG_ERROR(LOG_DOMAIN, "%s: no invalid power mode", __FUNCTION__);
