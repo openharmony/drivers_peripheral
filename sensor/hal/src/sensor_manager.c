@@ -32,6 +32,7 @@ struct SensorDevManager *GetSensorDevManager(void)
         .hasSensorListener = false,
         .sensorSum = 0,
         .sensorInfoEntry = NULL,
+        .serviceGroup = NULL,
     };
 
     return &devManager;
@@ -94,6 +95,7 @@ static void ReleaseSensorServiceList()
     struct SensorManagerNode *tmp = NULL;
     struct SensorDevManager *manager = GetSensorDevManager();
 
+    HDF_LOGI("%{public}s: Sensor host release service group", __func__);
     (void)OsalMutexLock(&manager->mutex);
     DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &manager->managerHead, struct SensorManagerNode, node) {
         if (pos->ioService != NULL) {
@@ -116,6 +118,7 @@ static void ReleaseSensorServiceList()
             }
         }
         HdfIoServiceGroupRecycle(manager->serviceGroup);
+        manager->serviceGroup = NULL;
     }
     (void)OsalMutexUnlock(&manager->eventMutex);
     (void)OsalMutexUnlock(&manager->mutex);
