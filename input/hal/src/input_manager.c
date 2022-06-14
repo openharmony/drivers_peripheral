@@ -22,6 +22,7 @@
 #include <sys/ioctl.h>
 #include <securec.h>
 #include "hdf_io_service_if.h"
+#include "osal_time.h"
 #include "input_common.h"
 
 #define TOUCH_INDEX 1
@@ -41,6 +42,7 @@ InputDevManager *GetDevManager(void)
 static int32_t GetInputDevice(uint32_t devIndex, InputDeviceInfo **devInfo)
 {
     int32_t ret;
+    int32_t count = 3; // 3 : number of attempts
     DeviceInfoNode *pos = NULL;
     DeviceInfoNode *next = NULL;
     InputDevManager *manager = NULL;
@@ -50,8 +52,14 @@ static int32_t GetInputDevice(uint32_t devIndex, InputDeviceInfo **devInfo)
         return INPUT_INVALID_PARAM;
     }
 
-    ret = UpdateDevFullInfo(devIndex);
-    if (ret != INPUT_SUCCESS) {
+    while (count--) {
+        ret = UpdateDevFullInfo(devIndex);
+        if (ret == INPUT_SUCCESS) {
+            break;
+        }
+        OsalMSleep(10); // 10 : delay time
+    }
+    if (count == 0) {
         HDF_LOGE("%s: update dev info failed", __func__);
         return ret;
     }
