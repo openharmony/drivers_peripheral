@@ -151,6 +151,7 @@ static int32_t AddSensorDevServiceGroup(void)
         if ((pos->ioService != NULL) &&
             (HdfIoServiceGroupAddService(manager->serviceGroup, pos->ioService) != SENSOR_SUCCESS)) {
             HdfIoServiceGroupRecycle(manager->serviceGroup);
+            manager->serviceGroup = NULL;
             HDF_LOGE("%{public}s: Add service to group failed", __func__);
             return SENSOR_INVALID_SERVICE;
         }
@@ -160,6 +161,7 @@ static int32_t AddSensorDevServiceGroup(void)
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s: Register listener to group failed", __func__);
         HdfIoServiceGroupRecycle(manager->serviceGroup);
+        manager->serviceGroup = NULL;
         return ret;
     }
 
