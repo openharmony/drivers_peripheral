@@ -500,18 +500,28 @@ int32_t BindServiceRenderOpen(struct AudioHwRender *hwRender,
     return HDF_SUCCESS;
 }
 
-int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
+int32_t AudioCtrlRenderClose(struct AudioHwRender *hwRender, InterfaceLibModeRenderSo *pInterfaceLibModeRender)
+{
+    if (hwRender == NULL || hwRender->devDataHandle == NULL ||
+        pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
+        LOG_FUN_ERR("Audio render handle param not exist");
+        return HDF_FAILURE;
+    }
+    int32_t ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam,
+                                             AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE);
+    if (ret < 0) {
+        LOG_FUN_ERR("Audio render close fail, ret is %{public}d", ret);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioSetParamToDev(struct AudioHwRender *hwRender, InterfaceLibModeRenderSo *pInterfaceLibModeRender)
 {
     int32_t ret;
-    if (hwRender == NULL || hwRender->devDataHandle == NULL || hwRender->devCtlHandle == NULL) {
-        return HDF_FAILURE;
-    }
-    InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
-    if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("InterfaceLibModeRender not exist");
-        return HDF_FAILURE;
-    }
-    if (BindServiceRenderOpen(hwRender, pInterfaceLibModeRender)) {
+    if (hwRender == NULL || hwRender->devDataHandle == NULL || hwRender->devCtlHandle == NULL ||
+        pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
+        LOG_FUN_ERR("The parameter is empty.");
         return HDF_FAILURE;
     }
 #ifndef AUDIO_HAL_USER
@@ -527,7 +537,7 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
     uint32_t portId = hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId;
     if ((portId >= AUDIO_PRIMARY_ID_MIN && portId <= AUDIO_PRIMARY_ID_MAX) ||
-            (portId >= AUDIO_USB_ID_MIN && portId <= AUDIO_USB_ID_MAX)) {
+        (portId >= AUDIO_USB_ID_MIN && portId <= AUDIO_USB_ID_MAX)) {
         ret = (*pInterfaceLibModeRender)(hwRender->devCtlHandle, &hwRender->renderParam,
             AUDIODRV_CTL_IOCTL_SCENESELECT_WRITE);
         if (ret < 0) {
@@ -544,7 +554,7 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
     }
     /* get volThreshold */
     ret = (*pInterfaceLibModeRender)(hwRender->devCtlHandle, &hwRender->renderParam,
-           AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ);
+        AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ);
     if (ret < 0) {
         LOG_FUN_ERR("SetParams FAIL!");
         return HDF_FAILURE;
@@ -556,6 +566,29 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
         return HDF_FAILURE;
     }
 #endif
+    return HDF_SUCCESS;
+}
+
+int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
+{
+    int32_t ret;
+    if (hwRender == NULL || hwRender->devDataHandle == NULL || hwRender->devCtlHandle == NULL) {
+        return HDF_FAILURE;
+    }
+    InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
+    if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
+        LOG_FUN_ERR("InterfaceLibModeRender not exist");
+        return HDF_FAILURE;
+    }
+    if (BindServiceRenderOpen(hwRender, pInterfaceLibModeRender)) {
+        return HDF_FAILURE;
+    }
+    ret = AudioSetParamToDev(hwRender, pInterfaceLibModeRender);
+    if (ret < 0) {
+        LOG_FUN_ERR("AudioSetParamToDev FAIL.");
+        (void)AudioCtrlRenderClose(hwRender, pInterfaceLibModeRender);
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
@@ -838,6 +871,22 @@ int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const str
     return HDF_SUCCESS;
 }
 
+int32_t AudioCtrlCaptureClose(struct AudioHwCapture *hwCapture, InterfaceLibModeCaptureSo *pInterfaceLibModeCapture)
+{
+    if (hwCapture == NULL || hwCapture->devDataHandle == NULL ||
+        pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
+        LOG_FUN_ERR("Audio capture handle param not exist");
+        return HDF_FAILURE;
+    }
+    int32_t ret = (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam,
+                                              AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE);
+    if (ret < 0) {
+        LOG_FUN_ERR("Audio capture close fail, ret is %{public}d", ret);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
 {
     if (hwCapture == NULL || hwCapture->devCtlHandle == NULL || hwCapture->devDataHandle == NULL) {
@@ -864,17 +913,20 @@ int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
     ret = (*LibCap)(hwCapture->devCtlHandle, &hwCapture->captureParam, AUDIODRV_CTL_IOCTL_SCENESELECT_CAPTURE);
     if (ret < 0) {
         LOG_FUN_ERR("SetParams FAIL!");
+        (void)AudioCtrlCaptureClose(hwCapture, LibCap);
         return HDF_FAILURE;
     }
 #endif
     ret = (*LibCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_HW_PARAMS);
     if (ret < 0) {
         LOG_FUN_ERR("AudioCaptureStart SetParams FAIL");
+        (void)AudioCtrlCaptureClose(hwCapture, LibCap);
         return HDF_FAILURE;
     }
     ret = (*LibCap)(hwCapture->devCtlHandle, &hwCapture->captureParam, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE);
     if (ret < 0) {
         LOG_FUN_ERR("SetParams FAIL!");
+        (void)AudioCtrlCaptureClose(hwCapture, LibCap);
         return HDF_FAILURE;
     }
 #ifdef AUDIO_HAL_USER
@@ -882,6 +934,7 @@ int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
     ret = (*LibCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE);
     if (ret < 0) {
         LOG_FUN_ERR("AudioCaptureStart prepare FAIL");
+        (void)AudioCtrlCaptureClose(hwCapture, LibCap);
         return HDF_FAILURE;
     }
 #endif
