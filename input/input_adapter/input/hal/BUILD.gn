@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/hidl_adapter/base/hidl_adapter.gni")
 
 INPUT_ROOT_DIR = "//drivers/peripheral/hidl_adapter/input"
@@ -40,7 +40,7 @@ ohos_shared_library("hdi_input") {
 
   if (is_standard_system) {
     external_deps = [
-      "device_driver_framework:libhdf_utils",
+      "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
       "utils_base:utils",

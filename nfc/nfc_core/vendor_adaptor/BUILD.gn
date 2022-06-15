@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("nfc_vendor_adaptor") {
   include_dirs = [
@@ -25,8 +25,8 @@ ohos_shared_library("nfc_vendor_adaptor") {
   cflags = []
 
   external_deps = [
-    "device_driver_framework:libhdf_ipc_adapter",
-    "device_driver_framework:libhdf_utils",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",

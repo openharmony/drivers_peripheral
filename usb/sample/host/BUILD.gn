@@ -33,7 +33,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
-    external_deps = [ "device_driver_framework:libhdf_utils" ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
     defines = [ "__LITEOS_USB_HOST_DDK_TEST__" ]
 
     install_enable = false
@@ -42,7 +42,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   import("//build/ohos.gni")
-  import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
   ohos_executable("usbhost_ddk_test") {
     include_dirs = [
@@ -64,10 +64,10 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_host",
-        "device_driver_framework:libhdf_ipc_adapter",
-        "device_driver_framework:libhdf_utils",
-        "device_driver_framework:libhdi",
+        "hdf_core:libhdf_host",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
+        "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]
@@ -101,9 +101,9 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_host",
-        "device_driver_framework:libhdf_ipc_adapter",
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_host",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]
@@ -127,10 +127,10 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_host",
-        "device_driver_framework:libhdf_ipc_adapter",
-        "device_driver_framework:libhdf_utils",
-        "device_driver_framework:libhdi",
+        "hdf_core:libhdf_host",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
+        "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]
@@ -161,9 +161,9 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_host",
-        "device_driver_framework:libhdf_ipc_adapter",
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_host",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]
@@ -194,9 +194,9 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_host",
-        "device_driver_framework:libhdf_ipc_adapter",
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_host",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]
@@ -227,10 +227,10 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_host",
-        "device_driver_framework:libhdf_ipc_adapter",
-        "device_driver_framework:libhdf_utils",
-        "device_driver_framework:libhdi",
+        "hdf_core:libhdf_host",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
+        "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]

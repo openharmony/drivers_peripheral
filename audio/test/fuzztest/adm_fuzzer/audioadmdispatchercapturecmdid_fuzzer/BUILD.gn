@@ -13,7 +13,7 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
 module_output_path = "hdf/audio"
@@ -46,10 +46,10 @@ ohos_fuzztest("AudioAdmDispatcherCaptureCmdidFuzzTest") {
     "//third_party/bounds_checking_function/include",
   ]
   external_deps = [
-    "device_driver_framework:libhdf_host",
-    "device_driver_framework:libhdf_ipc_adapter",
-    "device_driver_framework:libhdf_utils",
-    "device_driver_framework:libhdi",
+    "hdf_core:libhdf_host",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
     "utils_base:utils",
   ]
   defines = []

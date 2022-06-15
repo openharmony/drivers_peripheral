@@ -66,7 +66,7 @@ ohos_unittest("gralloctest") {
     "//foundation/graphic/standard/utils/include",
   ]
   external_deps = [
-    "device_driver_framework:libhdf_utils",
+    "hdf_core:libhdf_utils",
     "utils_base:utils",
   ]
 }
@@ -89,7 +89,7 @@ ohos_unittest("gfxtest") {
     "//drivers/peripheral/base",
   ]
   external_deps = [
-    "device_driver_framework:libhdf_utils",
+    "hdf_core:libhdf_utils",
     "utils_base:utils",
   ]
 }
@@ -116,7 +116,7 @@ ohos_unittest("devicetest") {
     ".",
   ]
   external_deps = [
-    "device_driver_framework:libhdf_utils",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
   ]

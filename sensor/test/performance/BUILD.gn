@@ -18,13 +18,13 @@ unittest("hdf_peripheral_sensor_test_performance") {
   output_dir = "$root_out_dir/test/unittest/hdf"
   include_dirs = [
     "//third_party/bounds_checking_function/include",
-    "//drivers/framework/include/platform",
-    "//drivers/framework/include/core",
-    "//drivers/framework/include/osal",
-    "//drivers/framework/include/utils",
+    "//drivers/hdf_core/framework/include/platform",
+    "//drivers/hdf_core/framework/include/core",
+    "//drivers/hdf_core/framework/include/osal",
+    "//drivers/hdf_core/framework/include/utils",
     "//drivers/peripheral/sensor/interfaces/include",
-    "//drivers/adapter/uhdf/posix/include",
-    "//drivers/framework/test/unittest/include",
+    "//drivers/hdf_core/adapter/uhdf/posix/include",
+    "//drivers/hdf_core/framework/test/unittest/include",
   ]
 
   sources = [ "./common/hdf_sensor_performance_test.cpp" ]
@@ -44,9 +44,9 @@ unittest("hdf_peripheral_sensor_test_performance") {
   }
   deps = [
     "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-    "//drivers/adapter/uhdf/manager:hdf_core",
-    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
-    "//drivers/adapter/uhdf/test/unittest/common:hdf_test_common",
+    "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+    "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
+    "//drivers/hdf_core/adapter/uhdf/test/unittest/common:hdf_test_common",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
   ]
   public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]

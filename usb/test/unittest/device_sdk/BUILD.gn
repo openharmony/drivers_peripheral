@@ -16,7 +16,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/config/sanitizers/sanitizers.gni")
   import("//build/test.gni")
-  import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 }
 
 if (defined(ohos_lite)) {
@@ -26,25 +26,25 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//third_party/googletest/googletest/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/framework/ability/sbuf/include",
-      "//drivers/framework/include/platform",
-      "//drivers/framework/include/core",
-      "//drivers/framework/include/osal",
-      "//drivers/adapter/uhdf/posix/include",
-      "//drivers/framework/include/utils",
-      "//drivers/framework/include/config",
-      "//drivers/framework/include",
-      "//drivers/framework/test/unittest/include",
+      "//drivers/hdf_core/framework/ability/sbuf/include",
+      "//drivers/hdf_core/framework/include/platform",
+      "//drivers/hdf_core/framework/include/core",
+      "//drivers/hdf_core/framework/include/osal",
+      "//drivers/hdf_core/adapter/uhdf/posix/include",
+      "//drivers/hdf_core/framework/include/utils",
+      "//drivers/hdf_core/framework/include/config",
+      "//drivers/hdf_core/framework/include",
+      "//drivers/hdf_core/framework/test/unittest/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
     ]
 
     sources = [ "//drivers/peripheral/usb/test/unittest/common/usb_device_liteos_sdk_test.cpp" ]
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/adapter/uhdf/manager:hdf_core",
-      "//drivers/adapter/uhdf/platform:hdf_platform",
-      "//drivers/adapter/uhdf/posix:hdf_posix_osal",
-      "//drivers/adapter/uhdf/test/unittest/common:hdf_test_common",
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/platform:hdf_platform",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
+      "//drivers/hdf_core/adapter/uhdf/test/unittest/common:hdf_test_common",
     ]
     public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     cflags = [
@@ -77,10 +77,10 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_host",
-        "device_driver_framework:libhdf_ipc_adapter",
-        "device_driver_framework:libhdf_utils",
-        "device_driver_framework:libhdi",
+        "hdf_core:libhdf_host",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
+        "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]

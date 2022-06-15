@@ -37,7 +37,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/config/sanitizers/sanitizers.gni")
   import("//build/test.gni")
-  import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
   module_output_path = "hdf/usb"
   ohos_unittest("usb_device_sdk_io_test") {
@@ -60,10 +60,10 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_host",
-        "device_driver_framework:libhdf_ipc_adapter",
-        "device_driver_framework:libhdf_utils",
-        "device_driver_framework:libhdi",
+        "hdf_core:libhdf_host",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
+        "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]

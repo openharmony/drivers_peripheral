@@ -26,7 +26,7 @@ ohos_fuzztest("UsbInterruptTransferWriteFuzzTest") {
     "//drivers/peripheral/usb/hal/client/include",
     "//drivers/peripheral/usb/test/fuzztest/usbinterrupttransferwrite_fuzzer",
     "//drivers/peripheral/usb/test/UsbSubscriberTest",
-    "//drivers/framework/include/utils",
+    "//drivers/hdf_core/framework/include/utils",
   ]
 
   deps = [
@@ -35,8 +35,8 @@ ohos_fuzztest("UsbInterruptTransferWriteFuzzTest") {
   ]
 
   external_deps = [
-    "device_driver_framework:libhdf_utils",
-    "device_driver_framework:libhdf_utils",
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",

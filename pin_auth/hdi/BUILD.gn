@@ -45,7 +45,7 @@ ohos_shared_library("libpin_auth_sample_1.0") {
   ]
 
   external_deps = [
-    "device_driver_framework:libhdf_utils",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
   ]
 }

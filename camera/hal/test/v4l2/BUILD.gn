@@ -15,7 +15,7 @@ import("//drivers/peripheral/camera/hal/camera.gni")
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
-  import("//drivers/adapter/uhdf/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf/uhdf.gni")
 
   config("cameraTest_config") {
     visibility = [ ":*" ]
@@ -93,9 +93,9 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/pipeline_impl/src/strategy",
       "$camera_path/pipeline_core/ipp/include",
 
-      "//drivers/framework/include/osal",
-      "//drivers/framework/include/utils",
-      "//drivers/adapter/uhdf2/osal/include",
+      "//drivers/hdf_core/framework/include/osal",
+      "//drivers/hdf_core/framework/include/utils",
+      "//drivers/hdf_core/adapter/uhdf2/osal/include",
       "//system/core/include/cutils",
       "$hdf_uhdf_path/manager/include",
       "$hdf_uhdf_path/include/hdi",
@@ -115,7 +115,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
   import("//build/test.gni")
-  import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
   module_output_path = "hdf/camera_test"
 
@@ -205,11 +205,11 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_host",
-        "device_driver_framework:libhdf_ipc_adapter",
-        "device_driver_framework:libhdf_utils",
-        "device_driver_framework:libhdi",
         "graphic_chipsetsdk:surface",
+        "hdf_core:libhdf_host",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
+        "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_single",
         "utils_base:utils",

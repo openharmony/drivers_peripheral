@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
 if (defined(ohos_lite)) {
@@ -26,7 +26,7 @@ if (defined(ohos_lite)) {
     sources = [ "framework_render.c" ]
 
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-    external_deps = [ "device_driver_framework:libhdf_utils" ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
     defines = []
     if (enable_audio_device_mpi) {
       defines += [ "AUDIO_HAL_USER" ]
@@ -47,7 +47,7 @@ if (defined(ohos_lite)) {
     sources = [ "framework_capture.c" ]
 
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-    external_deps = [ "device_driver_framework:libhdf_utils" ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
     defines = []
     if (enable_audio_device_mpi) {
       defines += [ "AUDIO_HAL_USER" ]
@@ -69,10 +69,10 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_host",
-        "device_driver_framework:libhdf_ipc_adapter",
-        "device_driver_framework:libhdf_utils",
-        "device_driver_framework:libhdi",
+        "hdf_core:libhdf_host",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
+        "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]
@@ -106,10 +106,10 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       deps = [ "//drivers/peripheral/audio/hal/hdi_binder/server:hdi_audio_primary_server" ]
       external_deps = [
-        "device_driver_framework:libhdf_host",
-        "device_driver_framework:libhdf_ipc_adapter",
-        "device_driver_framework:libhdf_utils",
-        "device_driver_framework:libhdi",
+        "hdf_core:libhdf_host",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
+        "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]
@@ -140,10 +140,10 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_host",
-        "device_driver_framework:libhdf_ipc_adapter",
-        "device_driver_framework:libhdf_utils",
-        "device_driver_framework:libhdi",
+        "hdf_core:libhdf_host",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
+        "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]

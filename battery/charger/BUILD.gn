@@ -52,7 +52,7 @@ ohos_executable("charger") {
 
   external_deps = [
     "battery_device_driver_interface:libbattery_proxy_1.0",
-    "device_driver_framework:libhdf_utils",
+    "hdf_core:libhdf_utils",
     "init:libbegetutil",
     "input_device_driver:hdi_input",
     "ipc:ipc_core",

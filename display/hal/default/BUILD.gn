@@ -25,7 +25,7 @@ ohos_static_library("def_display_layer") {
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
   ]
   deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-  external_deps = [ "device_driver_framework:libhdf_utils" ]
+  external_deps = [ "hdf_core:libhdf_utils" ]
   defines = [ "__USER__" ]
   cflags = [
     "-Wall",
@@ -50,7 +50,7 @@ ohos_shared_library("def_display_gralloc") {
   ]
 
   deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-  external_deps = [ "device_driver_framework:libhdf_utils" ]
+  external_deps = [ "hdf_core:libhdf_utils" ]
   cflags = [
     "-Wall",
     "-Wextra",
@@ -73,7 +73,7 @@ ohos_shared_library("def_display_gfx") {
   ]
 
   deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-  external_deps = [ "device_driver_framework:libhdf_utils" ]
+  external_deps = [ "hdf_core:libhdf_utils" ]
   cflags = [
     "-Wall",
     "-Wextra",

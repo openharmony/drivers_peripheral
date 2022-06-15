@@ -45,7 +45,7 @@ ohos_shared_library("def_display_gralloc") {
   ]
 
   external_deps = [
-    "device_driver_framework:libhdf_utils",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
   ]
@@ -116,7 +116,7 @@ ohos_shared_library("def_display_device") {
   cflags = [ "-Wno-unused-function" ]
 
   external_deps = [
-    "device_driver_framework:libhdf_utils",
+    "hdf_core:libhdf_utils",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
@@ -137,14 +137,14 @@ ohos_shared_library("def_display_layer_video") {
     "//drivers/peripheral/display/interfaces/include",
     "//drivers/peripheral/base",
     "//drivers/peripheral/display/hdi_service/video_layer/client",
-    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
   ]
 
   external_deps = [
-    "device_driver_framework:libhdf_host",
-    "device_driver_framework:libhdf_ipc_adapter",
-    "device_driver_framework:libhdf_utils",
-    "device_driver_framework:libhdi",
+    "hdf_core:libhdf_host",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",
