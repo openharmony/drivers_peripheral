@@ -137,6 +137,8 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
                 extraData->ExtraSet(OHOS::Camera::dataSize, esInfo.size);
                 extraData->ExtraSet(OHOS::Camera::isKeyFrame, esInfo.isKey);
                 extraData->ExtraSet(OHOS::Camera::timeStamp, esInfo.timestamp);
+                extraData->ExtraSet(OHOS::Camera::streamId, buffer->GetStreamId());
+                extraData->ExtraSet(OHOS::Camera::captureId, buffer->GetCaptureId());
             }
         }
         bufferQueue_->FlushBuffer(sb, fence, flushConfig_);
