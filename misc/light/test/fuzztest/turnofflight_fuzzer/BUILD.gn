@@ -37,7 +37,7 @@ ohos_fuzztest("TurnOffLightFuzzTest") {
     "//drivers/peripheral/misc/light/hal:hdi_light",
   ]
   external_deps = [
-    "device_driver_framework:libhdf_utils",
+    "hdf_core:libhdf_utils",
     "ipc:ipc_single",
     "utils_base:utils",
   ]

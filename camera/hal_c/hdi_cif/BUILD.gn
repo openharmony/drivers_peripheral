@@ -1,7 +1,7 @@
 # Copyright (c) Huawei Technologies Co., Ltd. 2021. All rights reserved.
 
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("../camera.gni")
 
 config("hdi_cif_config") {
@@ -69,10 +69,10 @@ ohos_shared_library("hdi_cif") {
 
   if (is_standard_system) {
     external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_ipc_adapter",
-      "device_driver_framework:libhdf_utils",
-      "device_driver_framework:libhdi",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
       "utils_base:utils",

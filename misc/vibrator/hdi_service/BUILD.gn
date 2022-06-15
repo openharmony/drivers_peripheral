@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 if (defined(ohos_lite)) {
   group("hdf_vibrator_service") {
     deps = []
@@ -20,7 +20,7 @@ if (defined(ohos_lite)) {
 } else {
   ohos_shared_library("libvibrator_interface_service_1.1") {
     include_dirs = [
-      "//drivers/adapter/uhdf2/include/hdi",
+      "//drivers/hdf_core/adapter/uhdf2/include/hdi",
       "//drivers/peripheral/misc/vibrator/interfaces/include/",
     ]
     sources = [ "vibrator_interface_impl.cpp" ]
@@ -42,7 +42,7 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_single",
       ]
@@ -60,15 +60,15 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("libvibrator_driver") {
     include_dirs = [
-      "//drivers/adapter/uhdf2/ipc/include",
-      "//drivers/adapter/uhdf2/include/host",
-      "//drivers/adapter/uhdf2/include/hdi",
+      "//drivers/hdf_core/adapter/uhdf2/ipc/include",
+      "//drivers/hdf_core/adapter/uhdf2/include/host",
+      "//drivers/hdf_core/adapter/uhdf2/include/hdi",
       "//drivers/peripheral/misc/vibrator/interfaces/include/",
     ]
     sources = [ "vibrator_interface_driver.cpp" ]
 
     deps = [
-      "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+      "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
       "//drivers/interface/vibrator/v1_1:libvibrator_stub_1.1",
       "//drivers/peripheral/misc/vibrator/hal:hdi_vibrator",
       "//drivers/peripheral/misc/vibrator/hdi_service:libvibrator_interface_service_1.1",
@@ -86,7 +86,7 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_single",
       ]

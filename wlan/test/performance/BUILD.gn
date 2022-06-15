@@ -15,7 +15,7 @@ if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
 } else {
   import("//build/test.gni")
-  import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 }
 
 if (defined(ohos_lite)) {
@@ -25,26 +25,26 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//third_party/googletest/googletest/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/framework/include/platform",
-      "//drivers/framework/include/core",
-      "//drivers/framework/include/osal",
-      "//drivers/adapter/uhdf/posix/include",
-      "//drivers/framework/include/utils",
-      "//drivers/framework/include",
+      "//drivers/hdf_core/framework/include/platform",
+      "//drivers/hdf_core/framework/include/core",
+      "//drivers/hdf_core/framework/include/osal",
+      "//drivers/hdf_core/adapter/uhdf/posix/include",
+      "//drivers/hdf_core/framework/include/utils",
+      "//drivers/hdf_core/framework/include",
       "//drivers/peripheral/wlan/client/include",
       "//drivers/peripheral/wlan/hal/include",
       "//drivers/peripheral/wlan/interfaces/include",
-      "//drivers/framework/test/unittest/include",
+      "//drivers/hdf_core/framework/test/unittest/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
     ]
 
     sources = [ "//drivers/peripheral/wlan/test/performance/common/hdf_wlan_performance_test.cpp" ]
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/adapter/build/test_common:libhdf_test_common",
-      "//drivers/adapter/uhdf/manager:hdf_core",
-      "//drivers/adapter/uhdf/platform:hdf_platform",
-      "//drivers/adapter/uhdf/posix:hdf_posix_osal",
+      "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/platform:hdf_platform",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//drivers/peripheral/wlan/client:wifi_driver_client",
       "//drivers/peripheral/wlan/hal:wifi_hal",
     ]
@@ -82,8 +82,8 @@ if (defined(ohos_lite)) {
     ]
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_test_common",
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_test_common",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]

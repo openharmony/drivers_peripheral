@@ -15,7 +15,7 @@ import("//drivers/peripheral/camera/hal/camera.gni")
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
-  import("//drivers/adapter/uhdf/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf/uhdf.gni")
 
   config("buffer_manager_utest_config") {
     visibility = [ ":*" ]
@@ -35,8 +35,8 @@ if (defined(ohos_lite)) {
       "//third_party/googletest/googletest/include",
       "//foundation/communication/ipc_lite/interfaces/kits",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
-      "//drivers/framework/include/utils",
-      "//drivers/adapter/uhdf2/osal/include",
+      "//drivers/hdf_core/framework/include/utils",
+      "//drivers/hdf_core/adapter/uhdf2/osal/include",
       "//drivers/peripheral/base",
       "//drivers/peripheral/display/interfaces/include",
       "//foundation/graphic/surface/interfaces/kits",
@@ -46,7 +46,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   import("//build/test.gni")
-  import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
   module_output_path = "hdf/camera"
 
@@ -78,7 +78,7 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "samgr_standard:samgr_proxy",
         "utils_base:utils",

@@ -15,7 +15,7 @@ if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
 } else {
   import("//build/test.gni")
-  import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 }
 import("//drivers/peripheral/audio/audio.gni")
 
@@ -39,20 +39,20 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/framework/include/core",
-      "//drivers/framework/include/utils",
-      "//drivers/framework/include/osal",
-      "//drivers/framework/utils/include",
-      "//drivers/framework/include",
-      "//drivers/framework/core/sec/include",
-      "//drivers/framework/core/shared/include",
-      "//drivers/framework/core/host/include",
-      "//drivers/framework/core/manager/include",
-      "//drivers/framework/core/common/include/host/",
+      "//drivers/hdf_core/framework/include/core",
+      "//drivers/hdf_core/framework/include/utils",
+      "//drivers/hdf_core/framework/include/osal",
+      "//drivers/hdf_core/framework/utils/include",
+      "//drivers/hdf_core/framework/include",
+      "//drivers/hdf_core/framework/core/sec/include",
+      "//drivers/hdf_core/framework/core/shared/include",
+      "//drivers/hdf_core/framework/core/host/include",
+      "//drivers/hdf_core/framework/core/manager/include",
+      "//drivers/hdf_core/framework/core/common/include/host/",
       "//third_party/bounds_checking_function/include",
-      "//drivers/adapter/khdf/liteos/osal/include",
-      "//drivers/adapter/uhdf2/shared/include",
-      "//drivers/adapter/uhdf2/include/hdi/",
+      "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
+      "//drivers/hdf_core/adapter/uhdf2/shared/include",
+      "//drivers/hdf_core/adapter/uhdf2/include/hdi/",
       "//drivers/peripheral/audio/test/systemtest/common/lib_common/include",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//drivers/peripheral/audio/test/systemtest/adm_interface_lib/capture/include",
@@ -106,7 +106,7 @@ if (defined(ohos_lite)) {
       "//third_party/googletest:gtest_main",
     ]
     external_deps = [
-      "device_driver_framework:libhdf_utils",
+      "hdf_core:libhdf_utils",
       "utils_base:utils",
     ]
     defines = []

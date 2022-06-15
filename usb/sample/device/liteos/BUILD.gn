@@ -29,10 +29,10 @@ ohos_executable("usb_dev_test") {
 
   deps = [
     "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-    "//drivers/adapter/uhdf/manager:hdf_core",
-    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
+    "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+    "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
   ]
-  external_deps = [ "device_driver_framework:libhdf_utils" ]
+  external_deps = [ "hdf_core:libhdf_utils" ]
   public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
   defines = [ "__USER__" ]
 

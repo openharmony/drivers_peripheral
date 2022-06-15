@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 root_path = "//drivers/peripheral/nfc/connected_tag/v1_0"
 
@@ -25,7 +25,7 @@ group("connected_tag_hdi") {
 
 ohos_shared_library("connected_tag_client") {
   include_dirs = [
-    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "$root_path",
   ]
 
@@ -34,10 +34,10 @@ ohos_shared_library("connected_tag_client") {
   deps = [ "//drivers/peripheral/nfc/connected_tag:connected_tag_server" ]
 
   external_deps = [
-    "device_driver_framework:libhdf_host",
-    "device_driver_framework:libhdf_ipc_adapter",
-    "device_driver_framework:libhdf_utils",
-    "device_driver_framework:libhdi",
+    "hdf_core:libhdf_host",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",
@@ -50,7 +50,7 @@ ohos_shared_library("connected_tag_client") {
 
 ohos_shared_library("connected_tag_server") {
   include_dirs = [
-    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "$root_path/client",
   ]
 
@@ -61,10 +61,10 @@ ohos_shared_library("connected_tag_server") {
   ]
 
   external_deps = [
-    "device_driver_framework:libhdf_host",
-    "device_driver_framework:libhdf_ipc_adapter",
-    "device_driver_framework:libhdf_utils",
-    "device_driver_framework:libhdi",
+    "hdf_core:libhdf_host",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",

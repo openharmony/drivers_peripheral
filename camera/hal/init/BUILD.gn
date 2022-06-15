@@ -4,7 +4,7 @@ import("../camera.gni")
 
 if (defined(ohos_lite)) {
   import("//build/ohos.gni")
-  import("//drivers/adapter/uhdf/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf/uhdf.gni")
 
   config("ohos_camera_demo_config") {
     visibility = [ ":*" ]
@@ -69,7 +69,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/camera/interfaces/metadata:metadata",
       "//foundation/graphic/surface:surface",
     ]
-    external_deps = [ "device_driver_framework:libhdf_utils" ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
     public_configs = [ ":ohos_camera_demo_config" ]
     install_enable = true
     subsystem_name = "hdf"
@@ -77,7 +77,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   import("//build/ohos.gni")
-  import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
   config("ohos_camera_demo_config") {
     visibility = [ ":*" ]
@@ -147,12 +147,12 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_host",
-        "device_driver_framework:libhdf_ipc_adapter",
-        "device_driver_framework:libhdf_utils",
-        "device_driver_framework:libhdi",
         "display_device_driver:hdi_display_gralloc",
         "graphic_chipsetsdk:surface",
+        "hdf_core:libhdf_host",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
+        "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
         "samgr_standard:samgr_proxy",
         "utils_base:utils",

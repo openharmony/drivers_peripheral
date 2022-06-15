@@ -13,7 +13,7 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
 module_output_path = "hdf/audio"
@@ -38,9 +38,9 @@ ohos_fuzztest("AudioRenderReqmmapbufferReqsizeFuzzTest") {
     "//drivers/peripheral/audio/interfaces/include",
     "//drivers/peripheral/audio/hal/hdi_passthrough/include",
     "//third_party/bounds_checking_function/include",
-    "//drivers/framework/include/utils",
-    "//drivers/adapter/khdf/liteos/osal/include",
-    "//drivers/adapter/uhdf2/include/hdi/",
+    "//drivers/hdf_core/framework/include/utils",
+    "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi/",
     "//drivers/peripheral/audio/test/fuzztest/hdi_fuzzer/attribute/audiorenderreqmmapbufferreqsize_fuzzer/include",
     "//drivers/peripheral/audio/test/fuzztest/common/include",
   ]

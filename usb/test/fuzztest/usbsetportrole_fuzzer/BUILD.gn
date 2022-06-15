@@ -25,7 +25,7 @@ ohos_fuzztest("UsbSetPortRoleFuzzTest") {
   include_dirs = [
     "//drivers/peripheral/usb/hal/client/include",
     "//drivers/peripheral/usb/test/fuzztest/usbsetportrole_fuzzer",
-    "//drivers/framework/include/utils",
+    "//drivers/hdf_core/framework/include/utils",
   ]
 
   deps = [
@@ -34,8 +34,8 @@ ohos_fuzztest("UsbSetPortRoleFuzzTest") {
   ]
 
   external_deps = [
-    "device_driver_framework:libhdf_utils",
-    "device_driver_framework:libhdf_utils",
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",

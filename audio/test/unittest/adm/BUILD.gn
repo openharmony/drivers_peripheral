@@ -18,22 +18,22 @@ ohos_unittest("khdf_audio_adm_test") {
   module_out_path = module_output_path
 
   include_dirs = [
-    "//drivers/framework/test/unittest/model/audio/include",
-    "//drivers/framework/model/audio/core/test/unittest/common",
-    "//drivers/framework/model/audio/common/test/unittest/common",
+    "//drivers/hdf_core/framework/test/unittest/model/audio/include",
+    "//drivers/hdf_core/framework/model/audio/core/test/unittest/common",
+    "//drivers/hdf_core/framework/model/audio/common/test/unittest/common",
   ]
 
   defines = [ "__USER__" ]
   sources = [
-    "//drivers/framework/model/audio/common/test/unittest/common/audio_codec_base_test.cpp",
-    "//drivers/framework/model/audio/common/test/unittest/common/audio_dai_base_test.cpp",
-    "//drivers/framework/model/audio/common/test/unittest/common/audio_dma_base_test.cpp",
-    "//drivers/framework/model/audio/common/test/unittest/common/audio_dsp_base_test.cpp",
-    "//drivers/framework/model/audio/common/test/unittest/common/audio_platform_base_test.cpp",
-    "//drivers/framework/model/audio/core/test/unittest/common/audio_core_test.cpp",
-    "//drivers/framework/model/audio/core/test/unittest/common/audio_host_test.cpp",
-    "//drivers/framework/model/audio/core/test/unittest/common/audio_parse_test.cpp",
-    "//drivers/framework/model/audio/sapm/test/unittest/common/audio_sapm_test.cpp",
+    "//drivers/hdf_core/framework/model/audio/common/test/unittest/common/audio_codec_base_test.cpp",
+    "//drivers/hdf_core/framework/model/audio/common/test/unittest/common/audio_dai_base_test.cpp",
+    "//drivers/hdf_core/framework/model/audio/common/test/unittest/common/audio_dma_base_test.cpp",
+    "//drivers/hdf_core/framework/model/audio/common/test/unittest/common/audio_dsp_base_test.cpp",
+    "//drivers/hdf_core/framework/model/audio/common/test/unittest/common/audio_platform_base_test.cpp",
+    "//drivers/hdf_core/framework/model/audio/core/test/unittest/common/audio_core_test.cpp",
+    "//drivers/hdf_core/framework/model/audio/core/test/unittest/common/audio_host_test.cpp",
+    "//drivers/hdf_core/framework/model/audio/core/test/unittest/common/audio_parse_test.cpp",
+    "//drivers/hdf_core/framework/model/audio/sapm/test/unittest/common/audio_sapm_test.cpp",
   ]
 
   cflags = [
@@ -46,8 +46,8 @@ ohos_unittest("khdf_audio_adm_test") {
   ]
   if (is_standard_system) {
     external_deps = [
-      "device_driver_framework:libhdf_test_common",
-      "device_driver_framework:libhdf_utils",
+      "hdf_core:libhdf_test_common",
+      "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]

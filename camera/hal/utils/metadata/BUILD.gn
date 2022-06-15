@@ -13,7 +13,7 @@
 
 if (defined(ohos_lite)) {
   import("//build/ohos.gni")
-  import("//drivers/adapter/uhdf/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf/uhdf.gni")
   import("//drivers/peripheral/camera/hal/camera.gni")
 
   ohos_shared_library("metadata_lite") {

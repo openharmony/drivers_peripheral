@@ -13,7 +13,7 @@
 
 if (!defined(ohos_lite)) {
   import("//build/test.gni")
-  import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 }
 import("//drivers/peripheral/audio/audio.gni")
 if (!defined(ohos_lite)) {
@@ -32,8 +32,8 @@ if (!defined(ohos_lite)) {
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
       "//drivers/peripheral/audio/hal/hdi_binder/server/include",
-      "//drivers/adapter/uhdf2/include/hdi",
-      "//drivers/adapter/uhdf2/shared/include",
+      "//drivers/hdf_core/adapter/uhdf2/include/hdi",
+      "//drivers/hdf_core/adapter/uhdf2/shared/include",
       "//third_party/bounds_checking_function/include",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
@@ -43,10 +43,10 @@ if (!defined(ohos_lite)) {
       "//third_party/googletest:gtest_main",
     ]
     external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_ipc_adapter",
-      "device_driver_framework:libhdf_utils",
-      "device_driver_framework:libhdi",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]

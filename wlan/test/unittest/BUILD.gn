@@ -15,7 +15,7 @@ if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
 } else {
   import("//build/test.gni")
-  import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 }
 
 configFlag = [
@@ -33,10 +33,10 @@ if (defined(ohos_lite)) {
     output_dir = "$root_out_dir/test/unittest/hdf"
     include_dirs = [
       "//third_party/bounds_checking_function/include",
-      "//drivers/framework/include/platform",
-      "//drivers/framework/include/core",
-      "//drivers/framework/include",
-      "//drivers/framework/test/unittest/include",
+      "//drivers/hdf_core/framework/include/platform",
+      "//drivers/hdf_core/framework/include/core",
+      "//drivers/hdf_core/framework/include",
+      "//drivers/hdf_core/framework/test/unittest/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
     ]
 
@@ -49,9 +49,9 @@ if (defined(ohos_lite)) {
     ]
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/adapter/build/test_common:libhdf_test_common",
-      "//drivers/adapter/uhdf/manager:hdf_core",
-      "//drivers/adapter/uhdf/platform:hdf_platform",
+      "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/platform:hdf_platform",
     ]
     public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
@@ -63,10 +63,10 @@ if (defined(ohos_lite)) {
     output_dir = "$root_out_dir/test/unittest/hdf"
     include_dirs = [
       "//third_party/bounds_checking_function/include",
-      "//drivers/framework/include/osal",
-      "//drivers/adapter/uhdf/posix/include",
-      "//drivers/framework/include/utils",
-      "//drivers/framework/include",
+      "//drivers/hdf_core/framework/include/osal",
+      "//drivers/hdf_core/adapter/uhdf/posix/include",
+      "//drivers/hdf_core/framework/include/utils",
+      "//drivers/hdf_core/framework/include",
       "//drivers/peripheral/wlan/client/include",
       "//drivers/peripheral/wlan/hal/include",
       "//drivers/peripheral/wlan/interfaces/include",
@@ -75,8 +75,8 @@ if (defined(ohos_lite)) {
     sources =
         [ "//drivers/peripheral/wlan/test/unittest/hal/wifi_hal_test.cpp" ]
     deps = [
-      "//drivers/adapter/build/test_common:libhdf_test_common",
-      "//drivers/adapter/uhdf/posix:hdf_posix_osal",
+      "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//drivers/peripheral/wlan/client:wifi_driver_client",
       "//drivers/peripheral/wlan/hal:wifi_hal",
     ]
@@ -90,10 +90,10 @@ if (defined(ohos_lite)) {
     output_dir = "$root_out_dir/test/unittest/hdf"
     include_dirs = [
       "//third_party/bounds_checking_function/include",
-      "//drivers/framework/include/osal",
-      "//drivers/adapter/uhdf/posix/include",
-      "//drivers/framework/include/utils",
-      "//drivers/framework/include",
+      "//drivers/hdf_core/framework/include/osal",
+      "//drivers/hdf_core/adapter/uhdf/posix/include",
+      "//drivers/hdf_core/framework/include/utils",
+      "//drivers/hdf_core/framework/include",
       "//drivers/peripheral/wlan/client/include",
       "//drivers/peripheral/wlan/hal/include",
       "//drivers/peripheral/wlan/interfaces/include",
@@ -102,8 +102,8 @@ if (defined(ohos_lite)) {
     sources =
         [ "//drivers/peripheral/wlan/test/unittest/client/hdf_client_test.cpp" ]
     deps = [
-      "//drivers/adapter/build/test_common:libhdf_test_common",
-      "//drivers/adapter/uhdf/posix:hdf_posix_osal",
+      "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//drivers/peripheral/wlan/client:wifi_driver_client",
       "//drivers/peripheral/wlan/hal:wifi_hal",
     ]
@@ -128,7 +128,7 @@ if (defined(ohos_lite)) {
       "./common/hdf_net_device_test.cpp",
     ]
     resource_config_file =
-        "//drivers/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
+        "//drivers/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
 
     cflags = configFlag
     deps = [
@@ -137,8 +137,8 @@ if (defined(ohos_lite)) {
     ]
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_test_common",
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_test_common",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]
@@ -156,7 +156,7 @@ if (defined(ohos_lite)) {
     ]
     sources = [ "./hal/wifi_hal_test.cpp" ]
     resource_config_file =
-        "//drivers/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
+        "//drivers/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
 
     cflags = configFlag
     deps = [
@@ -165,8 +165,8 @@ if (defined(ohos_lite)) {
     ]
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_test_common",
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_test_common",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]
@@ -184,7 +184,7 @@ if (defined(ohos_lite)) {
     ]
     sources = [ "./client/hdf_client_test.cpp" ]
     resource_config_file =
-        "//drivers/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
+        "//drivers/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
 
     cflags = configFlag
     deps = [
@@ -193,8 +193,8 @@ if (defined(ohos_lite)) {
     ]
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_test_common",
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_test_common",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]
