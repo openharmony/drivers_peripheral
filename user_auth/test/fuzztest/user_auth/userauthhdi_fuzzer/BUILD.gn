@@ -25,13 +25,13 @@ ohos_fuzztest("UserAuthHdiFuzzTest") {
   ]
   include_dirs = [
     "//drivers/peripheral/user_auth/hdi_service/include",
-    "//base/user_iam/user_auth/common/logs",
+    "//base/useriam/user_auth_framework/common/logs",
   ]
 
   sources = [ "user_auth_hdi_fuzzer.cpp" ]
 
   deps = [
-    "//base/user_iam/user_auth/common:iam_test",
+    "//base/useriam/user_auth_framework/common:iam_test",
     "//drivers/peripheral/user_auth/hdi_service:libuser_auth_interface_service_1.0",
   ]
 

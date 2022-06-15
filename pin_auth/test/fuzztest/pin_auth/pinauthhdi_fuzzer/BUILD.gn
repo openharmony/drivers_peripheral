@@ -27,13 +27,13 @@ ohos_fuzztest("PinAuthHdiFuzzTest") {
   include_dirs = [
     "//drivers/peripheral/pin_auth/hdi_service/inc",
     "//drivers/peripheral/pin_auth/hdi/main/inc",
-    "//base/user_iam/user_auth/common/logs",
+    "//base/useriam/user_auth_framework/common/logs",
   ]
 
   sources = [ "pin_auth_hdi_fuzzer.cpp" ]
 
   deps = [
-    "//base/user_iam/user_auth/common:iam_test",
+    "//base/useriam/user_auth_framework/common:iam_test",
     "//drivers/peripheral/pin_auth/hdi_service:libpin_auth_interface_service_1.0",
     "//utils/native/base:utils",
   ]

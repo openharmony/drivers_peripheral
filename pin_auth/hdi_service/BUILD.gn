@@ -18,7 +18,7 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
   include_dirs = [
     "inc",
     "//drivers/peripheral/pin_auth/hdi/main/inc",
-    "//base/user_iam/user_auth/common/logs",
+    "//base/useriam/user_auth_framework/common/logs",
   ]
   sources = [
     "src/executor_impl.cpp",
@@ -32,7 +32,7 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
 
   deps = [
     "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
-    "//base/user_iam/user_auth/common:iam_utils",
+    "//base/useriam/user_auth_framework/common:iam_utils",
     "//third_party/openssl:libcrypto_static",
   ]
 
@@ -53,11 +53,11 @@ ohos_shared_library("libpin_auth_driver") {
   include_dirs = [
     "inc",
     "//drivers/peripheral/pin_auth/hdi/main/inc",
-    "//base/user_iam/user_auth/common/logs",
+    "//base/useriam/user_auth_framework/common/logs",
   ]
   sources = [ "src/pin_auth_interface_driver.cpp" ]
   deps = [
-    "//base/user_iam/user_auth/common:iam_utils",
+    "//base/useriam/user_auth_framework/common:iam_utils",
     "//drivers/interface/pin_auth/v1_0:libpin_auth_stub_1.0",
     "//drivers/peripheral/pin_auth/hdi:libpin_auth_sample_1.0",
   ]
