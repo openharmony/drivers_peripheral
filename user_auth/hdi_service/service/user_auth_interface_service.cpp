@@ -63,15 +63,15 @@ static bool CopyScheduleInfo(const CoAuthSchedule *in, ScheduleInfo *out)
     out->scheduleId = in->scheduleId;
     out->authType = static_cast<AuthType>(in->executors[0].authType);
     out->templateIds.push_back(in->templateId);
-    out->executorType = static_cast<uint32_t>(in->authSubType);
-    out->scheduleMode = static_cast<uint32_t>(in->scheduleMode);
+    out->executorMatcher = static_cast<uint32_t>(in->authSubType);
+    out->scheduleMode = static_cast<ScheduleMode>(in->scheduleMode);
     for (uint32_t i = 0; i < in->executorSize; i++) {
         ExecutorInfo temp = {};
-        temp.index = in->executors[i].executorId;
+        temp.executorIndex = in->executors[i].executorId;
         temp.info.authType = static_cast<AuthType>(in->executors[i].authType);
         temp.info.executorRole = static_cast<ExecutorRole>(in->executors[i].executorType);
-        temp.info.executorId = 0;
-        temp.info.executorType = static_cast<AuthType>(in->executors[i].authAbility);
+        temp.info.executorSensorHint = 0;
+        temp.info.executorMatcher = static_cast<uint32_t>(in->executors[i].authAbility);
         temp.info.esl = static_cast<ExecutorSecureLevel>(in->executors[i].esl);
         temp.info.publicKey.resize(PUBLIC_KEY_LEN);
         if (memcpy_s(&temp.info.publicKey[0], temp.info.publicKey.size(),
@@ -182,7 +182,7 @@ int32_t UserAuthInterfaceService::CancelAuthentication(uint64_t contextId)
 }
 
 int32_t UserAuthInterfaceService::BeginIdentification(uint64_t contextId, AuthType authType,
-    const std::vector<int8_t> &challenge, uint32_t executorId, ScheduleInfo &scheduleInfo)
+    const std::vector<uint8_t>& challenge, uint32_t executorSensorHint, ScheduleInfo& scheduleInfo)
 {
     IAM_LOGI("start");
     return RESULT_SUCCESS;
@@ -259,7 +259,7 @@ int32_t UserAuthInterfaceService::BeginEnrollment(int32_t userId, const std::vec
     }
     checkParam.authType = param.authType;
     checkParam.userId = userId;
-    checkParam.authSubType = static_cast<uint64_t>(param.executorType);
+    checkParam.authSubType = static_cast<uint64_t>(param.executorSensorHint);
     CoAuthSchedule scheduleInfo = {};
     int32_t ret = CheckEnrollPermission(checkParam, &scheduleInfo.scheduleId);
     if (ret != RESULT_SUCCESS) {
@@ -293,9 +293,9 @@ static void CopyCredentialInfo(const CredentialInfoHal &in, CredentialInfo &out)
     out.authType = static_cast<AuthType>(in.authType);
     out.credentialId = in.credentialId;
     out.templateId = in.templateId;
-    out.executorType = static_cast<uint32_t>(in.authSubType);
-    out.executorId = 0;
-    out.index = 0;
+    out.executorMatcher = static_cast<uint32_t>(in.authSubType);
+    out.executorSensorHint = 0;
+    out.executorIndex = 0;
 }
 
 int32_t UserAuthInterfaceService::UpdateEnrollmentResult(int32_t userId, const std::vector<uint8_t> &scheduleResult,
@@ -384,7 +384,8 @@ int32_t UserAuthInterfaceService::GetCredential(int32_t userId, AuthType authTyp
     return RESULT_SUCCESS;
 }
 
-int32_t UserAuthInterfaceService::GetSecureInfo(int32_t userId, uint64_t &secureUid, std::vector<EnrolledInfo> &infos)
+int32_t UserAuthInterfaceService::GetUserInfo(int32_t userId, uint64_t& secureUid, PinSubType& pinSubType,
+    std::vector<EnrolledInfo>& infos)
 {
     IAM_LOGI("start");
     GlobalLock();
@@ -465,7 +466,7 @@ int32_t UserAuthInterfaceService::EnforceDeleteUser(int32_t userId, std::vector<
 static bool CopyExecutorInfo(const ExecutorRegisterInfo &in, ExecutorInfoHal &out)
 {
     out.authType = in.authType;
-    out.authAbility = in.executorType;
+    out.authAbility = in.executorMatcher;
     out.esl = in.esl;
     out.executorType = in.executorRole;
     if (memcpy_s(out.pubKey, PUBLIC_KEY_LEN, &in.publicKey[0], in.publicKey.size()) != EOK) {
