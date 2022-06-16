@@ -314,7 +314,6 @@ int HosFileFormat::V4L2OpenDevice(const std::string& deviceName)
     rc = open(devName, O_RDWR | O_NONBLOCK, 0);
 
     CAMERA_LOGD("V4L2OpenDevice %s\n", devName);
-    free(devName);
 
     return rc;
 }
