@@ -52,8 +52,8 @@ void FillFuzzExecutorRegisterInfo(Parcel &parcel, ExecutorRegisterInfo &executor
 {
     executorRegisterInfo.authType = static_cast<AuthType>(parcel.ReadInt32());
     executorRegisterInfo.executorRole = static_cast<ExecutorRole>(parcel.ReadInt32());
-    executorRegisterInfo.executorId = parcel.ReadUint32();
-    executorRegisterInfo.executorType = parcel.ReadUint32();
+    executorRegisterInfo.executorSensorHint = parcel.ReadUint32();
+    executorRegisterInfo.executorMatcher = parcel.ReadUint32();
     executorRegisterInfo.esl = static_cast<ExecutorSecureLevel>(parcel.ReadInt32());
     FillFuzzUint8Vector(parcel, executorRegisterInfo.publicKey);
     IAM_LOGI("success");
@@ -61,7 +61,7 @@ void FillFuzzExecutorRegisterInfo(Parcel &parcel, ExecutorRegisterInfo &executor
 
 void FillFuzzExecutorInfo(Parcel &parcel, ExecutorInfo &executorInfo)
 {
-    executorInfo.index = parcel.ReadUint64();
+    executorInfo.executorIndex = parcel.ReadUint64();
     FillFuzzExecutorRegisterInfo(parcel, executorInfo.info);
     IAM_LOGI("success");
 }
@@ -81,8 +81,8 @@ void FillFuzzScheduleInfo(Parcel &parcel, ScheduleInfo &scheduleInfo)
     scheduleInfo.scheduleId = parcel.ReadUint64();
     FillFuzzUint64Vector(parcel, scheduleInfo.templateIds);
     scheduleInfo.authType = static_cast<AuthType>(parcel.ReadInt32());
-    scheduleInfo.executorType = parcel.ReadUint32();
-    scheduleInfo.scheduleMode = parcel.ReadUint32();
+    scheduleInfo.executorMatcher = parcel.ReadUint32();
+    scheduleInfo.scheduleMode = static_cast<ScheduleMode>(parcel.ReadInt32());
     FillFuzzExecutorInfoVector(parcel, scheduleInfo.executors);
     IAM_LOGI("success");
 }
@@ -102,14 +102,14 @@ void FillFuzzAuthSolution(Parcel &parcel, AuthSolution &authSolution)
     authSolution.userId = parcel.ReadInt32();
     authSolution.authTrustLevel = parcel.ReadUint32();
     authSolution.authType = static_cast<AuthType>(parcel.ReadInt32());
-    authSolution.executorId = parcel.ReadUint32();
+    authSolution.executorSensorHint = parcel.ReadUint32();
     FillFuzzUint8Vector(parcel, authSolution.challenge);
     IAM_LOGI("success");
 }
 
 void FillFuzzExecutorSendMsg(Parcel &parcel, ExecutorSendMsg &executorSendMsg)
 {
-    executorSendMsg.index = parcel.ReadUint32();
+    executorSendMsg.executorIndex = parcel.ReadUint32();
     FillFuzzUint8Vector(parcel, executorSendMsg.msg);
     IAM_LOGI("success");
 }
@@ -145,19 +145,18 @@ void FillFuzzIdentifyResultInfo(Parcel &parcel, IdentifyResultInfo &identifyResu
 void FillFuzzEnrollParam(Parcel &parcel, EnrollParam &enrollParam)
 {
     enrollParam.authType = static_cast<AuthType>(parcel.ReadInt32());
-    enrollParam.executorType = parcel.ReadUint32();
-    enrollParam.executorId = parcel.ReadUint32();
+    enrollParam.executorSensorHint = parcel.ReadUint32();
     IAM_LOGI("success");
 }
 
 void FillFuzzCredentialInfo(Parcel &parcel, CredentialInfo &credentialInfo)
 {
     credentialInfo.credentialId = parcel.ReadUint64();
-    credentialInfo.index = parcel.ReadUint64();
+    credentialInfo.executorIndex = parcel.ReadUint64();
     credentialInfo.templateId = parcel.ReadUint64();
     credentialInfo.authType = static_cast<AuthType>(parcel.ReadInt32());
-    credentialInfo.executorType = parcel.ReadUint32();
-    credentialInfo.executorId = parcel.ReadUint32();
+    credentialInfo.executorMatcher = parcel.ReadUint32();
+    credentialInfo.executorSensorHint = parcel.ReadUint32();
     IAM_LOGI("success");
 }
 
@@ -299,9 +298,10 @@ void FuzzGetSecureInfo(Parcel &parcel)
     IAM_LOGI("begin");
     int32_t userId = parcel.ReadInt32();
     uint64_t secureUid = parcel.ReadUint64();
+    PinSubType pinSubType = static_cast<PinSubType>(parcel.ReadUint32());
     std::vector<EnrolledInfo> infos;
     FillFuzzEnrolledInfoVector(parcel, infos);
-    g_service.GetSecureInfo(userId, secureUid, infos);
+    g_service.GetUserInfo(userId, secureUid, pinSubType, infos);
     IAM_LOGI("end");
 }
 
@@ -364,8 +364,8 @@ void FuzzBeginIdentification(Parcel &parcel)
     IAM_LOGI("begin");
     uint64_t contextId = parcel.ReadUint64();
     AuthType authType = static_cast<AuthType>(parcel.ReadInt32());
-    std::vector<int8_t> challenge;
-    FillFuzzInt8Vector(parcel, challenge);
+    std::vector<uint8_t> challenge;
+    FillFuzzUint8Vector(parcel, challenge);
     uint32_t executorId = parcel.ReadUint32();
     ScheduleInfo scheduleInfo;
     FillFuzzScheduleInfo(parcel, scheduleInfo);
