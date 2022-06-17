@@ -14,7 +14,7 @@
     "deps": {
       "components": [
         "hiviewdfx_hilog_native",
-        "device_driver_framework",
+        "hdf_core",
         "utils_base"
       ],
       "third_part": [

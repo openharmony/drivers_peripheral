@@ -44,8 +44,8 @@ ohos_unittest("test_transfer") {
   ]
 
   external_deps = [
-    "device_driver_framework:libhdf_utils",
     "eventhandler:libeventhandler",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
@@ -70,8 +70,8 @@ ohos_unittest("test_device") {
   ]
 
   external_deps = [
-    "device_driver_framework:libhdf_utils",
     "eventhandler:libeventhandler",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
@@ -92,8 +92,8 @@ ohos_unittest("test_function") {
   ]
 
   external_deps = [
-    "device_driver_framework:libhdf_utils",
     "eventhandler:libeventhandler",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
@@ -120,8 +120,8 @@ ohos_unittest("test_request") {
   ]
 
   external_deps = [
-    "device_driver_framework:libhdf_utils",
     "eventhandler:libeventhandler",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",

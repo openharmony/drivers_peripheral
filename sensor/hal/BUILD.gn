@@ -40,7 +40,7 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
-    external_deps = [ "device_driver_framework:libhdf_utils" ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
     cflags = [
       "-Wall",
       "-Wextra",
@@ -94,7 +94,7 @@ if (defined(ohos_lite)) {
     part_name = "sensor_device_driver"
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
       ]
     } else {

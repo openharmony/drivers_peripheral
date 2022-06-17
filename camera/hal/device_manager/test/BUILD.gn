@@ -15,7 +15,7 @@ import("//drivers/peripheral/camera/hal/camera.gni")
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
-  import("//drivers/adapter/uhdf/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf/uhdf.gni")
 
   config("mpi_device_config") {
     visibility = [ ":*" ]
@@ -61,13 +61,13 @@ if (defined(ohos_lite)) {
       "$camera_path/include",
       "$camera_path/device_manager/test/unittest/mpi",
       "$camera_path/utils/event",
-      "//drivers/adapter/uhdf2/osal/include",
+      "//drivers/hdf_core/adapter/uhdf2/osal/include",
       "$board_camera_path/device_manager/include",
       "$camera_path/adapter/platform/mpp/src/device_manager/include",
       "//drivers/peripheral/camera/interfaces/metadata/include",
-      "//drivers/framework/include/config",
-      "//drivers/framework/include/osal",
-      "//drivers/framework/include/utils",
+      "//drivers/hdf_core/framework/include/config",
+      "//drivers/hdf_core/framework/include/osal",
+      "//drivers/hdf_core/framework/include/utils",
     ]
 
     hispark_taurus_lib_path = "//device/soc/hisilicon/common/hal/media/camera/hi3516dv300/liteos_a/libs/"
@@ -83,7 +83,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   import("//build/test.gni")
-  import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
   need_link_hispark_taurus_lib = true
   if (need_link_hispark_taurus_lib) {
     if (use_musl) {
@@ -151,7 +151,7 @@ if (defined(ohos_lite)) {
     ]
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]

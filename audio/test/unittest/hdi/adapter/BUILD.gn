@@ -16,7 +16,7 @@ if (defined(ohos_lite)) {
   import("//drivers/peripheral/audio/audio.gni")
 } else {
   import("//build/test.gni")
-  import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
   import("//drivers/peripheral/audio/audio.gni")
 }
 
@@ -35,20 +35,20 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
-      "//drivers/adapter/uhdf2/include/hdi",
-      "//drivers/adapter/uhdf2/shared/include",
-      "//drivers/framework/include/core",
-      "//drivers/framework/include/utils",
-      "//drivers/framework/include/osal",
-      "//drivers/framework/include",
+      "//drivers/hdf_core/adapter/uhdf2/include/hdi",
+      "//drivers/hdf_core/adapter/uhdf2/shared/include",
+      "//drivers/hdf_core/framework/include/core",
+      "//drivers/hdf_core/framework/include/utils",
+      "//drivers/hdf_core/framework/include/osal",
+      "//drivers/hdf_core/framework/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/framework/utils/include",
-      "//drivers/adapter/uhdf2/osal/include",
+      "//drivers/hdf_core/framework/utils/include",
+      "//drivers/hdf_core/adapter/uhdf2/osal/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
 
     deps = [
-      "//drivers/adapter/uhdf2/utils:libhdf_utils",
+      "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
       "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
@@ -91,7 +91,7 @@ if (defined(ohos_lite)) {
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
-    external_deps = [ "device_driver_framework:libhdf_utils" ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
     cflags = [
       "-Wall",
       "-Wextra",

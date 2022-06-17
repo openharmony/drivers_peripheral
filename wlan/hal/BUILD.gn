@@ -33,10 +33,10 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "//drivers/adapter/uhdf/posix:hdf_posix_osal",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
-    external_deps = [ "device_driver_framework:libhdf_utils" ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
     defines = [ "__USER__" ]
 
     cflags = [
@@ -85,7 +85,7 @@ if (defined(ohos_lite)) {
     part_name = "wlan_device_driver"
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]

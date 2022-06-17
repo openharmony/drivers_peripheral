@@ -22,7 +22,7 @@ ohos_fuzztest("CodecSendCommandFuzzTest") {
       "//drivers/peripheral/codec/test/fuzztest/codecsendcommand_fuzzer"
 
   include_dirs = [
-    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
@@ -32,10 +32,10 @@ ohos_fuzztest("CodecSendCommandFuzzTest") {
   deps = [ "//drivers/peripheral/codec/hal:codec_hdi_omx" ]
 
   external_deps = [
-    "device_driver_framework:libhdf_host",
-    "device_driver_framework:libhdf_ipc_adapter",
-    "device_driver_framework:libhdf_utils",
-    "device_driver_framework:libhdi",
+    "hdf_core:libhdf_host",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
   ]

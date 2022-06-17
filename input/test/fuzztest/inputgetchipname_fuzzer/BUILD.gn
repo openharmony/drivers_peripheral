@@ -33,8 +33,8 @@ ohos_fuzztest("InputGetChipnameFuzzTest") {
   sources = [ "inputgetchipname_fuzzer.cpp" ]
   deps = [ "//drivers/peripheral/input/hal:hdi_input" ]
   external_deps = [
-    "device_driver_framework:libhdf_test_common",
-    "device_driver_framework:libhdf_utils",
+    "hdf_core:libhdf_test_common",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
   ]

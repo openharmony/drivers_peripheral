@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libcodec_hdi_omx_server") {
   include_dirs = [
@@ -53,11 +53,11 @@ ohos_shared_library("libcodec_hdi_omx_server") {
   if (is_standard_system) {
     deps = [ "//third_party/libdrm:libdrm" ]
     external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_ipc_adapter",
-      "device_driver_framework:libhdf_utils",
-      "device_driver_framework:libhdi",
       "graphic_chipsetsdk:buffer_handle",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]
@@ -72,7 +72,7 @@ ohos_shared_library("libcodec_hdi_omx_server") {
 
 ohos_shared_library("libcodec_hdi_omx_client") {
   include_dirs = [
-    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
@@ -89,11 +89,11 @@ ohos_shared_library("libcodec_hdi_omx_client") {
     deps = [ "//third_party/libdrm:libdrm" ]
 
     external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_ipc_adapter",
-      "device_driver_framework:libhdf_utils",
-      "device_driver_framework:libhdi",
       "graphic_chipsetsdk:buffer_handle",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]
@@ -107,7 +107,7 @@ ohos_shared_library("libcodec_hdi_omx_client") {
 
 ohos_shared_library("libcodec_hdi_omx_callback_type_service_impl") {
   include_dirs = [
-    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
@@ -116,10 +116,10 @@ ohos_shared_library("libcodec_hdi_omx_callback_type_service_impl") {
 
   if (is_standard_system) {
     external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_ipc_adapter",
-      "device_driver_framework:libhdf_utils",
-      "device_driver_framework:libhdi",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]
