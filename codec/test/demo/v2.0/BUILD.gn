@@ -12,12 +12,12 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 ohos_executable("codec_hdi_omx_decode") {
   include_dirs = [
     "./include",
     "//drivers/peripheral/codec/hal/include",
-    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/omx/include",
     "//drivers/peripheral/codec/interfaces/include",
     "//utils/native/base/include",
@@ -31,10 +31,10 @@ ohos_executable("codec_hdi_omx_decode") {
   ]
 
   deps = [
-    "//drivers/adapter/uhdf2/hdi:libhdi",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
+    "//drivers/hdf_core/adapter/uhdf2/hdi:libhdi",
+    "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host",
+    "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+    "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/codec/hal:libcodec_hdi_omx_callback_type_service_impl",
     "//drivers/peripheral/codec/hal:libcodec_hdi_omx_client",
     "//third_party/bounds_checking_function:libsec_shared",
@@ -60,7 +60,7 @@ ohos_executable("codec_hdi_omx_encode") {
   include_dirs = [
     "./include",
     "//drivers/peripheral/codec/hal/include",
-    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/omx/include",
     "//drivers/peripheral/codec/interfaces/include",
     "//utils/native/base/include",
@@ -74,10 +74,10 @@ ohos_executable("codec_hdi_omx_encode") {
   ]
 
   deps = [
-    "//drivers/adapter/uhdf2/hdi:libhdi",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
+    "//drivers/hdf_core/adapter/uhdf2/hdi:libhdi",
+    "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host",
+    "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+    "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
     "//drivers/peripheral/codec/hal:libcodec_hdi_omx_callback_type_service_impl",
     "//drivers/peripheral/codec/hal:libcodec_hdi_omx_client",
     "//third_party/bounds_checking_function:libsec_shared",

@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 INPUT_ROOT_DIR = "//drivers/peripheral/input"
 
@@ -25,8 +25,8 @@ ohos_shared_library("libhdf_input_hotplug") {
 
   if (is_standard_system) {
     external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_utils",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]

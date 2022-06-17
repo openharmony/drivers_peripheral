@@ -39,7 +39,7 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
-    external_deps = [ "device_driver_framework:libhdf_utils" ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
     defines = [ "__USER__" ]
 
     cflags = [
@@ -93,7 +93,7 @@ if (defined(ohos_lite)) {
     subsystem_name = "hdf"
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]

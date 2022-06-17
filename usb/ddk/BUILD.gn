@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 group("libusb_core") {
   deps = [
@@ -41,8 +41,8 @@ ohos_shared_library("libusb_ddk_host") {
 
   if (is_standard_system) {
     external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_utils",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]
@@ -64,8 +64,8 @@ ohos_shared_library("libusb_pnp_manager") {
 
   if (is_standard_system) {
     external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_utils",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]
@@ -96,8 +96,8 @@ ohos_shared_library("libusb_ddk_device") {
 
   if (is_standard_system) {
     external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_utils",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]

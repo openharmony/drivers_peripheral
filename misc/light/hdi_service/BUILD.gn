@@ -11,11 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("liblight_interface_service_1.0") {
   include_dirs = [
-    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/misc/light/interfaces/include/",
   ]
   sources = [ "light_interface_impl.cpp" ]
@@ -36,7 +36,7 @@ ohos_shared_library("liblight_interface_service_1.0") {
 
   if (is_standard_system) {
     external_deps = [
-      "device_driver_framework:libhdf_utils",
+      "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {
@@ -51,15 +51,15 @@ ohos_shared_library("liblight_interface_service_1.0") {
 
 ohos_shared_library("liblight_driver") {
   include_dirs = [
-    "//drivers/adapter/uhdf2/ipc/include",
-    "//drivers/adapter/uhdf2/include/host",
-    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/hdf_core/adapter/uhdf2/ipc/include",
+    "//drivers/hdf_core/adapter/uhdf2/include/host",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/misc/light/interfaces/include/",
   ]
   sources = [ "light_interface_driver.cpp" ]
 
   deps = [
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+    "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/interface/light/v1_0:liblight_stub_1.0",
     "//drivers/peripheral/misc/light/hal:hdi_light",
     "//utils/native/base:utils",
@@ -76,7 +76,7 @@ ohos_shared_library("liblight_driver") {
 
   if (is_standard_system) {
     external_deps = [
-      "device_driver_framework:libhdf_utils",
+      "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
     ]

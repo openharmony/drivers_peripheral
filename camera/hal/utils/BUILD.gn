@@ -2,7 +2,7 @@
 
 if (defined(ohos_lite)) {
   import("//build/ohos.gni")
-  import("//drivers/adapter/uhdf/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf/uhdf.gni")
   import("//drivers/peripheral/camera/hal/camera.gni")
   config("utils_config") {
     visibility = [ ":*" ]
@@ -89,7 +89,7 @@ if (defined(ohos_lite)) {
     deps = [ "//third_party/libexif:libexif" ]
 
     external_deps = [
-      "device_driver_framework:libhdf_utils",
+      "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]

@@ -17,7 +17,7 @@ import("//build/ohos.gni")
 LIGHT_ROOT_DIR = "//drivers/peripheral/misc/light"
 
 if (defined(ohos_lite)) {
-  FWK_ROOT_DIR = "//drivers/framework"
+  FWK_ROOT_DIR = "//drivers/hdf_core/framework"
   ohos_shared_library("hdi_light") {
     sources = [ "$LIGHT_ROOT_DIR/hal/src/light_controller.c" ]
 
@@ -47,7 +47,7 @@ if (defined(ohos_lite)) {
     part_name = "light_device_driver"
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]
@@ -82,7 +82,7 @@ if (defined(ohos_lite)) {
     part_name = "light_device_driver"
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]

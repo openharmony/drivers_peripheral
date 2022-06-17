@@ -13,7 +13,7 @@
       "deps": {
         "components": [
           "ipc",
-          "device_driver_framework",
+          "hdf_core",
           "hiviewdfx_hilog_native",
           "utils_base"
         ],

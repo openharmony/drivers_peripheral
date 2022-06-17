@@ -18,7 +18,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
   import("//build/test.gni")
-  import("//drivers/adapter/uhdf2/uhdf.gni")
+  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
   import("//drivers/peripheral/audio/audio.gni")
 }
 
@@ -29,14 +29,14 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/test/unittest/hdi/jack/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-      "//drivers/adapter/uhdf/posix/include",
-      "//drivers/framework/include",
-      "//drivers/framework/include/core",
-      "//drivers/framework/include/osal",
-      "//drivers/framework/include/platform",
-      "//drivers/framework/include/utils",
-      "//drivers/framework/utils/include",
-      "//drivers/framework/test/unittest/include",
+      "//drivers/hdf_core/adapter/uhdf/posix/include",
+      "//drivers/hdf_core/framework/include",
+      "//drivers/hdf_core/framework/include/core",
+      "//drivers/hdf_core/framework/include/osal",
+      "//drivers/hdf_core/framework/include/platform",
+      "//drivers/hdf_core/framework/include/utils",
+      "//drivers/hdf_core/framework/utils/include",
+      "//drivers/hdf_core/framework/test/unittest/include",
       "//drivers/peripheral/input/hal/include",
       "//drivers/peripheral/input/interfaces/include",
       "//third_party/bounds_checking_function/include",
@@ -45,10 +45,10 @@ if (defined(ohos_lite)) {
 
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/adapter/uhdf/manager:hdf_core",
-      "//drivers/adapter/uhdf/platform:hdf_platform",
-      "//drivers/adapter/uhdf/posix:hdf_posix_osal",
-      "//drivers/adapter/uhdf/test/unittest/common:hdf_test_common",
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/platform:hdf_platform",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
+      "//drivers/hdf_core/adapter/uhdf/test/unittest/common:hdf_test_common",
       "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
       "//drivers/peripheral/input/hal:hdi_input",
     ]
@@ -85,14 +85,14 @@ if (defined(ohos_lite)) {
     ]
     if (is_standard_system) {
       external_deps = [
-        "device_driver_framework:libhdf_test_common",
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_test_common",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]
     } else {
       external_deps = [
-        "device_driver_framework:libhdf_utils",
+        "hdf_core:libhdf_utils",
         "hilog:libhilog",
       ]
     }

@@ -20,7 +20,7 @@ module_output_path = "memorytrackertest/"
 memorytracker_deps = [ "//utils/native/base:utils" ]
 
 memorytracker_external_deps = [
-  "device_driver_framework:libhdf_utils",
+  "hdf_core:libhdf_utils",
   "ipc:ipc_core",
   "memorytracker_device_driver_interface:libmemorytracker_proxy_1.0",
 ]

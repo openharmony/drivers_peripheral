@@ -23,12 +23,12 @@ ohos_executable("liteos_host_speed_test") {
   ]
   deps = [
     "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-    "//drivers/adapter/uhdf/manager:hdf_core",
-    "//drivers/adapter/uhdf/posix:hdf_posix_osal",
+    "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+    "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
   ]
 
   public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-  external_deps = [ "device_driver_framework:libhdf_utils" ]
+  external_deps = [ "hdf_core:libhdf_utils" ]
   defines = [ "__USER__" ]
 
   cflags = [

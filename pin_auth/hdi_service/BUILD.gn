@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libpin_auth_interface_service_1.0") {
   include_dirs = [
@@ -37,7 +37,7 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
   ]
 
   external_deps = [
-    "device_driver_framework:libhdf_utils",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",
@@ -63,9 +63,9 @@ ohos_shared_library("libpin_auth_driver") {
   ]
 
   external_deps = [
-    "device_driver_framework:libhdf_host",
-    "device_driver_framework:libhdf_ipc_adapter",
-    "device_driver_framework:libhdf_utils",
+    "hdf_core:libhdf_host",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",

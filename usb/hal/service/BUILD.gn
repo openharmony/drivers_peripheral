@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/usb/usb.gni")
 
 config("usbd_private_config") {
@@ -29,7 +29,7 @@ config("usbd_public_config") {
     "//drivers/peripheral/usb/interfaces/ddk/host",
     "//drivers/peripheral/usb/interfaces/ddk/device",
     "//drivers/peripheral/usb/gadget/function/include",
-    "//drivers/framework/model/usb/include",
+    "//drivers/hdf_core/framework/model/usb/include",
     default_config_path,
   ]
 }
@@ -50,10 +50,10 @@ ohos_shared_library("usbd") {
   deps = [ "//drivers/peripheral/usb/ddk:libusb_core" ]
 
   external_deps = [
-    "device_driver_framework:libhdf_host",
-    "device_driver_framework:libhdf_ipc_adapter",
-    "device_driver_framework:libhdf_utils",
-    "device_driver_framework:libhdi",
+    "hdf_core:libhdf_host",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
     "startup_l2:syspara",
     "utils_base:utils",

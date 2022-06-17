@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_executable("codec_decode_test_ipc") {
   sources = [
@@ -54,10 +54,10 @@ ohos_executable("codec_decode_test_ipc") {
 
   if (is_standard_system) {
     external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_ipc_adapter",
-      "device_driver_framework:libhdf_utils",
-      "device_driver_framework:libhdi",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]
@@ -108,10 +108,10 @@ ohos_executable("codec_encode_test_ipc") {
   ]
   if (is_standard_system) {
     external_deps = [
-      "device_driver_framework:libhdf_host",
-      "device_driver_framework:libhdf_ipc_adapter",
-      "device_driver_framework:libhdf_utils",
-      "device_driver_framework:libhdi",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",
     ]
