@@ -52,7 +52,6 @@ ohos_unittest("test_hdisrv") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "//base/powermgr/power_manager/interfaces/innerkits:powermgr_client",
     "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//drivers/interface/battery/v1_0:libbattery_proxy_1.0",
     "//drivers/interface/battery/v1_0:libbattery_stub_1.0",
@@ -94,7 +93,6 @@ ohos_unittest("test_capacity_shutdown") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "//base/powermgr/power_manager/interfaces/innerkits:powermgr_client",
     "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//drivers/interface/battery/v1_0:libbattery_proxy_1.0",
     "//drivers/interface/battery/v1_0:libbattery_stub_1.0",
@@ -112,6 +110,7 @@ ohos_unittest("test_capacity_shutdown") {
     "device_driver_framework:libhdf_ipc_adapter",
     "device_driver_framework:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
     "input_device_driver:hdi_input",
     "ipc:ipc_single",
   ]
