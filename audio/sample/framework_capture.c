@@ -273,8 +273,8 @@ static int AudioPnpSvcThresholdMsgCheck(struct ServiceStatus *svcStatus, struct 
         printf("AudioPnpSvcThresholdMsgCheck:input param is null!\n");
         return HDF_FAILURE;
     }
-    if ((AudioPnpMsgDeSerialize(svcStatus->info, "EVENT_TYPE", &(audioEvent->eventType)) != HDF_SUCCESS) ||
-        (AudioPnpMsgDeSerialize(svcStatus->info, "DEVICE_TYPE", &(audioEvent->deviceType)) != HDF_SUCCESS)) {
+    if ((AudioPnpMsgReadValue(svcStatus->info, "EVENT_TYPE", &(audioEvent->eventType)) != HDF_SUCCESS) ||
+        (AudioPnpMsgReadValue(svcStatus->info, "DEVICE_TYPE", &(audioEvent->deviceType)) != HDF_SUCCESS)) {
         printf("DeSerialize fail!\n");
         return HDF_FAILURE;
     }
