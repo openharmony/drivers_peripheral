@@ -61,7 +61,7 @@ if (defined(ohos_lite)) {
     ]
 
     subsystem_name = "hdf"
-    part_name = "wlan_device_driver"
+    part_name = "drivers_peripheral_wlan"
     install_images = [ "system" ]
   }
 } else {
@@ -102,7 +102,7 @@ if (defined(ohos_lite)) {
 
       install_images = [ chipset_base_dir ]
       subsystem_name = "hdf"
-      part_name = "wlan_device_driver"
+      part_name = "drivers_peripheral_wlan"
     } else {
       sources += [
         "$CLIENT_ROOT_DIR/client/src/netlink/netlink_cmd_adapter.c",
@@ -142,7 +142,7 @@ if (defined(ohos_lite)) {
 
       install_images = [ chipset_base_dir ]
       subsystem_name = "hdf"
-      part_name = "wlan_device_driver"
+      part_name = "drivers_peripheral_wlan"
     }
   }
 }
