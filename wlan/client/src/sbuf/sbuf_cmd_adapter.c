@@ -909,6 +909,115 @@ int32_t GetChannelMeasResult(const char *ifName, int32_t commandId, uint32_t *pa
     return ret;
 }
 
+int32_t GetCoexChannelList(const char *ifName, struct CoexChannelList *list)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufObtainDefault fail", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+
+    do {
+        if (!HdfSbufWriteString(data, ifName)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write ifName fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteUint32(data, list->bufLen)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write paramBufLen fail!", __FUNCTION__);
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_GET_COEX_CHANNEL_LIST, data, reply);
+        if (ret != RET_CODE_SUCCESS) {
+            break;
+        }
+        if (!HdfSbufReadBuffer(reply, (const void **)(&(list->buf)), &(list->bufLen))) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: read paramBuf fail!", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+        }
+    } while (0);
+
+    if (data != NULL) {
+        HdfSbufRecycle(data);
+        data = NULL;
+    }
+    if (reply != NULL) {
+        HdfSbufRecycle(reply);
+        reply = NULL;
+    }
+    return ret;
+}
+
+int32_t SendHmlCmd(const char *ifName, const struct CmdData* data)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    struct HdfSBuf *req = NULL;
+
+    req = HdfSbufObtainDefaultSize();
+    if (req == NULL) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufObtainDefaultSize fail!", __FUNCTION__);
+        return ret;
+    }
+
+    do {
+        if (!HdfSbufWriteString(req, ifName)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write ifName fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteInt32(req, data->cmdId)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write cmd fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteBuffer(req, data->buf, data->bufLen)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write data fail!", __FUNCTION__);
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_SEND_HML_CMD, req, NULL);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: SendCmdSync fail, ret = %{public}d!", __FUNCTION__, ret);
+        }
+    } while (0);
+
+    HdfSbufRecycle(req);
+    return ret;
+}
+
+int32_t SendP2pCmd(const char *ifName, const struct CmdData* data)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    struct HdfSBuf *req = NULL;
+
+    req = HdfSbufObtainDefaultSize();
+    if (req == NULL) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufObtainDefaultSize fail!", __FUNCTION__);
+        return ret;
+    }
+
+    do {
+        if (!HdfSbufWriteString(req, ifName)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write ifName fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteInt32(req, data->cmdId)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write cmd fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteBuffer(req, data->buf, data->bufLen)) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: write data fail!", __FUNCTION__);
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_SEND_P2P_CMD, req, NULL);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: SendCmdSync fail, ret = %{public}d!", __FUNCTION__, ret);
+        }
+    } while (0);
+
+    HdfSbufRecycle(req);
+    return ret;
+}
+
 #ifdef __cplusplus
 #if __cplusplus
 }

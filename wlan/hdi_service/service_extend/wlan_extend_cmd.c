@@ -65,6 +65,68 @@ int32_t WlanInterfaceGetChannelMeasResult(struct IWlanInterface *self, const cha
     return ret;
 }
 
+int32_t WlanInterfaceRegisterHmlCallback(NotifyMessage func, const char *ifName)
+{
+    int32_t ret;
+
+    ret = g_wifi->registerHmlCallback(func, ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: Register hml callback failed!, error code: %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int32_t WlanInterfaceUnregisterHmlCallback(NotifyMessage func, const char *ifName)
+{
+    int32_t ret;
+
+    ret = g_wifi->unregisterHmlCallback(func, ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: Register hml callback failed!, error code: %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int32_t WlanInterfaceGetCoexChannelList(struct IWlanInterface *self, const char* ifName, struct CoexChannelList *data)
+{
+    int32_t ret;
+
+    (void)self;
+    if (ifName == NULL || data == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (g_wifi == NULL) {
+        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+    ret = g_wifi->getCoexChannelList(ifName, data);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: get coex channel list failed!, error code: %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int32_t WlanInterfaceSendHmlCmd(struct IWlanInterface *self, const char* ifName, const struct CmdData* data)
+{
+    int32_t ret;
+
+    (void)self;
+    if (ifName == NULL || data == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (g_wifi == NULL) {
+        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+    ret = g_wifi->sendHmlCmd(ifName, data);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: get channel meas result failed!, error code: %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
 int32_t WlanExtendInterfaceWifiConstruct(void)
 {
     int32_t ret;
