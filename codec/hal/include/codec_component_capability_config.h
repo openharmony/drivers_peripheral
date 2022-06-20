@@ -16,9 +16,9 @@
 #ifndef HDI_CODEC_COMPONENT_CAPABILITY_CONFIG_H
 #define HDI_CODEC_COMPONENT_CAPABILITY_CONFIG_H
 
+#include "codec_config_parser.h"
 #include "device_resource_if.h"
 #include "hdf_sbuf.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -26,9 +26,8 @@ extern "C" {
 int32_t InitDataNode(const struct DeviceResourceNode *node);
 int32_t LoadCapabilityData();
 int32_t ClearCapabilityData();
-int32_t HandleGetNumCmd(struct HdfSBuf *reply);
-int32_t HandleGetAllCapablityListCmd(struct HdfSBuf *reply);
-
+int32_t GetComponentNum(int32_t *num);
+int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t count);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

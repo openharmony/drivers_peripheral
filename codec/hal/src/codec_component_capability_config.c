@@ -15,40 +15,11 @@
 
 #include "codec_component_capability_config.h"
 #include <hdf_log.h>
-#include "codec_config_parser.h"
-#include "codec_types.h"
 
 #define HDF_LOG_TAG codec_hdi_server
 
 static CodecCapablites g_codecCapabilites = {0};
 static const struct DeviceResourceNode *g_resourceNode = NULL;
-
-static int32_t AllCapabilityMarshalling(struct HdfSBuf *reply)
-{
-    int32_t groupIndex;
-    int32_t capIndex;
-    CodecCapablityGroup *group = NULL;
-    CodecCompCapability *cap = NULL;
-    CodecCapablityGroup *codeCapGroups[] = {
-        &(g_codecCapabilites.videoHwEncoderGroup), &(g_codecCapabilites.videoHwDecoderGroup),
-        &(g_codecCapabilites.audioHwEncoderGroup), &(g_codecCapabilites.audioHwDecoderGroup),
-        &(g_codecCapabilites.videoSwEncoderGroup), &(g_codecCapabilites.videoSwDecoderGroup),
-        &(g_codecCapabilites.audioSwEncoderGroup), &(g_codecCapabilites.audioSwDecoderGroup)
-    };
-
-    for (groupIndex = 0; groupIndex < CODEC_CAPABLITY_GROUP_NUM; groupIndex++) {
-        group = codeCapGroups[groupIndex];
-        for (capIndex = 0; capIndex < group->num; capIndex++) {
-            cap = &group->capablitis[capIndex];
-            if (!CodecCompCapabilityBlockMarshalling(reply, cap)) {
-                HDF_LOGE("%{public}s: write capbility to sbuf failed!", __func__);
-                return HDF_FAILURE;
-            }
-        }
-    }
-
-    return HDF_SUCCESS;
-}
 
 int32_t InitDataNode(const struct DeviceResourceNode *node)
 {
@@ -70,32 +41,39 @@ int32_t LoadCapabilityData()
     return LoadCodecCapabilityFromHcs(g_resourceNode, &g_codecCapabilites);
 }
 
-int32_t HandleGetNumCmd(struct HdfSBuf *reply)
+int32_t GetComponentNum(int32_t *num)
 {
     if (!g_codecCapabilites.inited) {
         HDF_LOGE("%{public}s: g_codecCapabilites not init!", __func__);
         return HDF_FAILURE;
     }
-
-    if (!HdfSbufWriteInt32(reply, g_codecCapabilites.total)) {
-        HDF_LOGE("%{public}s: write num failed!", __func__);
-        return HDF_FAILURE;
-    }
-
+    *num = g_codecCapabilites.total;
     return HDF_SUCCESS;
 }
 
-int32_t HandleGetAllCapablityListCmd(struct HdfSBuf *reply)
+int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t count)
 {
     if (!g_codecCapabilites.inited) {
         HDF_LOGE("%{public}s: g_codecCapabilites not init!", __func__);
         return HDF_FAILURE;
     }
+    int32_t groupIndex;
+    int32_t capIndex;
+    int32_t curCount = 0;
+    CodecCapablityGroup *group = NULL;
+    CodecCompCapability *cap = NULL;
+    CodecCapablityGroup *codeCapGroups[] = {
+        &(g_codecCapabilites.videoHwEncoderGroup), &(g_codecCapabilites.videoHwDecoderGroup),
+        &(g_codecCapabilites.audioHwEncoderGroup), &(g_codecCapabilites.audioHwDecoderGroup),
+        &(g_codecCapabilites.videoSwEncoderGroup), &(g_codecCapabilites.videoSwDecoderGroup),
+        &(g_codecCapabilites.audioSwEncoderGroup), &(g_codecCapabilites.audioSwDecoderGroup)};
 
-    if (AllCapabilityMarshalling(reply) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: write all capbility to sbuf failed!", __func__);
-        return HDF_FAILURE;
+    for (groupIndex = 0; groupIndex < CODEC_CAPABLITY_GROUP_NUM; groupIndex++) {
+        group = codeCapGroups[groupIndex];
+        for (capIndex = 0; (capIndex < group->num) && (count > 0); capIndex++) {
+            cap = &group->capablitis[capIndex];
+            capList[curCount++] = *cap;
+        }
     }
-
     return HDF_SUCCESS;
 }
