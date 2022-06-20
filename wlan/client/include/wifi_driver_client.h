@@ -42,6 +42,14 @@ extern "C" {
 #define WIFI_POWER_MODE_THROUGH_WALL 2
 #define WIFI_POWER_MODE_NUM 3
 
+#define HML_PARAM_BUF_SIZE 1024
+
+#define CMD_CLOSE_GO_CAC 133
+#define CMD_SET_GO_CSA_CHANNEL 161
+#define CMD_SET_GO_RADAR_DETECT 163
+#define CMD_ID_MCC_STA_P2P_QUOTA_TIME 167
+#define CMD_ID_CTRL_ROAM_CHANNEL 169
+
 /* common related interface */
 enum WifiDriverClientResultCode {
     RET_CODE_SUCCESS = 0,
@@ -152,10 +160,39 @@ enum WifiClientType {
     WIFI_CLIENT_BUTT
 };
 
+#ifndef WLANTYPES_H
+struct HdfWifiInfo {
+    int32_t band;
+    uint32_t size;
+};
+
+struct CmdData {
+    int32_t cmdId;
+    int8_t* buf;
+    uint32_t bufLen;
+};
+
+struct HmlEventData {
+    uint32_t eventId;
+    uint8_t* buf;
+    uint32_t bufLen;
+};
+
+struct CoexChannelList {
+    uint8_t* buf;
+    uint32_t bufLen;
+};
+#endif
+
 typedef int32_t (*OnReceiveFunc)(uint32_t event, void *data, const char *ifName);
 
 int32_t WifiRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
 void WifiUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
+
+typedef int32_t (*NotifyMessage)(const char* ifName, struct HmlEventData *data);
+
+int32_t WifiRegisterHmlCallback(NotifyMessage func, const char *ifName);
+int32_t WifiUnregisterHmlCallback(NotifyMessage func, const char *ifName);
 
 /* hal related interface */
 #define MAX_WLAN_DEVICE 3
@@ -234,6 +271,9 @@ int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode);
 int32_t SetPowerMode(const char *ifName, uint8_t mode);
 int32_t StartChannelMeas(const char *ifName, int32_t commandId, const int32_t *paramBuf, uint32_t paramBufLen);
 int32_t GetChannelMeasResult(const char *ifName, int32_t commandId, uint32_t *paramBuf, uint32_t *paramBufLen);
+int32_t GetCoexChannelList(const char *ifName, struct CoexChannelList *list);
+int32_t SendHmlCmd(const char *ifName, const struct CmdData* data);
+int32_t SendP2pCmd(const char *ifName, const struct CmdData* data);
 
 /* wpa related interface */
 #define MAX_SSID_LEN 32

@@ -47,17 +47,25 @@
 #define WAITFORTHREAD 100000
 #define RETRIES       30
 
-#define STR_WLAN0     "wlan0"
-#define STR_WLAN1     "wlan1"
-#define STR_P2P0      "p2p0"
-#define STR_P2P0_X    "p2p0-"
+#define STR_WLAN0  "wlan0"
+#define STR_WLAN1  "wlan1"
+#define STR_P2P0   "p2p0"
+#define STR_P2P0_X "p2p0-"
 
-#define PRIMARY_ID_POWER_MODE    0x8bfd
+#define PRIMARY_ID_POWER_MODE   0x8bfd
 #define SECONDARY_ID_POWER_MODE 0x101
-#define SET_POWER_MODE_SLEEP     "pow_mode sleep"
-#define SET_POWER_MODE_INIT      "pow_mode init"
-#define SET_POWER_MODE_THIRD     "pow_mode third"
-#define GET_POWER_MODE           "get_pow_mode"
+#define SET_POWER_MODE_SLEEP    "pow_mode sleep"
+#define SET_POWER_MODE_INIT     "pow_mode init"
+#define SET_POWER_MODE_THIRD    "pow_mode third"
+#define GET_POWER_MODE          "get_pow_mode"
+
+#define CMD_SET_CLOSE_GO_CAC      "SET_CLOSE_GO_CAC"
+#define CMD_SET_CHANGE_GO_CHANNEL "CMD_SET_CHANGE_GO_CHANNEL"
+#define CMD_SET_GO_DETECT_RADAR   "CMD_SET_GO_DETECT_RADAR"
+#define CMD_SET_DYNAMIC_DBAC_MODE "SET_DYNAMIC_DBAC_MODE"
+#define CMD_SET_P2P_SCENES        "CMD_SET_P2P_SCENES"
+#define P2P_BUF_SIZE              64
+#define MAX_PRIV_CMD_SIZE         4096
 
 // vendor attr
 enum AndrWifiAttr {
@@ -100,6 +108,12 @@ typedef struct {
     char interfaceName[IFNAMSIZ];
     union HwprivReqData data;
 } HwprivIoctlData;
+
+typedef struct {
+    char *buf;
+    int size;
+    int len;
+}WifiPrivCmd;
 
 static struct WifiHalInfo g_wifiHalInfo = {0};
 
@@ -1402,4 +1416,190 @@ int32_t GetChannelMeasResult(const char *ifName, int32_t commandId, uint32_t *pa
     (void)paramBuf;
     (void)paramBufLen;
     return RET_CODE_NOT_SUPPORT;
+}
+
+int32_t GetCoexChannelList(const char *ifName, struct CoexChannelList *list)
+{
+    (void)ifName;
+    (void)list;
+    return RET_CODE_NOT_SUPPORT;
+}
+
+int32_t SendHmlCmd(const char *ifName, const struct CmdData *data)
+{
+    (void)ifName;
+    (void)data;
+    return RET_CODE_NOT_SUPPORT;
+}
+
+static int32_t SendCommandToDriver(const char *cmd, uint32_t len, const char *ifName)
+{
+    struct ifreq ifr = {0};
+    int ret = RET_CODE_FAILURE;
+    WifiPrivCmd privCmd = {0};
+    char buf[MAX_PRIV_CMD_SIZE] = {0};
+    uint32_t bufSize = MAX_PRIV_CMD_SIZE;
+
+    if (cmd == NULL) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: cmd is null\n", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
+    }
+    if (len > MAX_PRIV_CMD_SIZE) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: Size of command is too large\n", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
+    }
+
+    if (memcpy_s(buf, bufSize, cmd, len) != EOK) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: memcpy_s error\n", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    privCmd.buf = buf;
+    privCmd.size = sizeof(buf);
+    privCmd.len = size;
+    ifr.ifr_data = &privCmd;
+    if (strcpy_s(ifr.ifr_name, IFNAMSIZ, ifName) != EOK) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: strcpy_s error\n", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sock < 0) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: socket failed, errno = %d, (%s)\n", __FUNCTION__, errno, strerror(errno));
+        return ret;
+    }
+    do {
+        ret = ioctl(sock, SIOCDEVPRIVATE + 1, &ifr);
+        if (ret < 0) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: ioctl failed, errno = %d, (%s)\n", __FUNCTION__, errno, strerror(errno));
+            ret = (errno == EOPNOTSUPP) ? RET_CODE_NOT_SUPPORT : RET_CODE_FAILURE;
+            break;
+        }
+        (void)memset_s((void *)cmd, len, 0, len);
+        if (memcpy_s((void *)cmd, len, privCmd.buf, len - 1) != EOK) {
+            HILOG_ERROR(LOG_DOMAIN, "%s: memcpy_s error\n", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+        }
+    } while (0);
+
+    close(sock);
+    return RET_CODE_SUCCESS;
+}
+
+static int32_t DisableNextCacOnce(const char *ifName)
+{
+    char cmdBuf[P2P_BUF_SIZE] = {CMD_SET_CLOSE_GO_CAC};
+
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
+}
+
+static int32_t SetGoChannel(const char *ifName, const int8_t *data, uint32_t len)
+{
+    int ret = RET_CODE_FAILURE;
+    char cmdBuf[P2P_BUF_SIZE] = {0};
+    uint32_t cmdLen = strlen(CMD_SET_CHANGE_GO_CHANNEL);
+
+    if ((cmdLen + len) > P2P_BUF_SIZE) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: the length of input data is too large\n", __FUNCTION__);
+        return ret;
+    }
+    ret = snprintf_s(cmdBuf, P2P_BUF_SIZE, P2P_BUF_SIZE - 1, "%s %d", CMD_SET_CHANGE_GO_CHANNEL, *data);
+    if (ret != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: ifName: %s, len = %u, value: %d, cmdBuf: %s\n", __FUNCTION__, ifName, len, *data,
+            cmdBuf);
+        return RET_CODE_FAILURE;
+    }
+
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
+}
+
+static int32_t SetGoDetectRadar(const char *ifName, const int8_t *data, uint32_t len)
+{
+    int ret = RET_CODE_FAILURE;
+    char cmdBuf[P2P_BUF_SIZE] = {0};
+    uint32_t cmdLen = strlen(CMD_SET_GO_DETECT_RADAR);
+
+    if ((cmdLen + len) > P2P_BUF_SIZE) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: the length of input data is too large\n", __FUNCTION__);
+        return ret;
+    }
+    ret = snprintf_s(cmdBuf, P2P_BUF_SIZE, P2P_BUF_SIZE - 1, "%s %d", CMD_SET_GO_DETECT_RADAR, *data);
+    if (ret != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: ifName: %s, len = %u, value: %d, cmdBuf: %s\n", __FUNCTION__, ifName, len, *data,
+            cmdBuf);
+        return RET_CODE_FAILURE;
+    }
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
+}
+
+static int32_t SetP2pScenes(const char *ifName, const int8_t *data, uint32_t len)
+{
+    int ret = RET_CODE_FAILURE;
+    char cmdBuf[P2P_BUF_SIZE] = {0};
+    uint32_t cmdLen = strlen(CMD_SET_P2P_SCENES);
+
+    if ((cmdLen + len) > P2P_BUF_SIZE) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: the length of input data is too large\n", __FUNCTION__);
+        return ret;
+    }
+    ret = snprintf_s(cmdBuf, P2P_BUF_SIZE, P2P_BUF_SIZE - 1, "%s %d", CMD_SET_P2P_SCENES, *data);
+    if (ret != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: ifName: %s, len = %u, value: %d, cmdBuf: %s\n", __FUNCTION__, ifName, len, *data,
+            cmdBuf);
+        return RET_CODE_FAILURE;
+    }
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
+}
+
+static int32_t SetDynamicDbacMode(const char *ifName, int8_t *data, uint32_t len)
+{
+    int ret = RET_CODE_FAILURE;
+    char cmdBuf[P2P_BUF_SIZE] = {0};
+    uint32_t cmdLen = strlen(CMD_SET_DYNAMIC_DBAC_MODE);
+
+    if ((cmdLen + len) > P2P_BUF_SIZE) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: the length of input data is too large\n", __FUNCTION__);
+        return ret;
+    }
+    ret = snprintf_s(cmdBuf, P2P_BUF_SIZE, P2P_BUF_SIZE - 1, "%s %d", CMD_SET_DYNAMIC_DBAC_MODE, *data);
+    if (ret != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: ifName: %s, len = %u, value: %d, cmdBuf: %s\n", __FUNCTION__, ifName, len, *data,
+            cmdBuf);
+        return RET_CODE_FAILURE;
+    }
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
+}
+
+int32_t SendP2pCmd(const char *ifName, const struct CmdData *data)
+{
+    int32_t ret;
+
+    if (strcmp(ifName, STR_WLAN0) != EOK) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: %s is not supported\n", __FUNCTION__, ifName);
+        return RET_CODE_NOT_SUPPORT;
+    }
+    switch (data->cmdId) {
+        case CMD_CLOSE_GO_CAC:
+            ret = DisableNextCacOnce(ifName);
+            break;
+        case CMD_SET_GO_CHANNEL:
+            ret = SetGoChannel(ifName, data->buf, data->bufLen);
+            break;
+        case CMD_SET_GO_RADAR_DETECT:
+            ret = SetGoDetectRadar(ifName, data->buf, data->bufLen);
+            break;
+        case CMD_ID_MCC_STA_P2P_QUOTA_TIME:
+            ret = SetDynamicDbacMode(data->buf, data->bufLen);
+            break;
+        case CMD_ID_CTRL_ROAM_CHANNEL:
+            ret = SetP2pScenes(ifName, data->buf, data->bufLen);
+            break;
+        default:
+            HILOG_ERROR(LOG_DOMAIN, "%s: Invalid command id", __FUNCTION__);
+            return RET_CODE_NOT_SUPPORT;
+    }
+
+    if (ret != HDF_SUCCESS) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: Send p2p command fail, ret = %d\n", __FUNCTION__, ret);
+        ret = RET_CODE_FAILURE;
+    }
+    return ret;
 }

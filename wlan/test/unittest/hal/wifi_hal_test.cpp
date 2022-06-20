@@ -31,6 +31,7 @@ const uint32_t IFNAME_MIN_NUM = 0;
 const uint32_t IFNAME_MAX_NUM = 32;
 const uint32_t MAX_IF_NAME_LENGTH = 16;
 const uint32_t SIZE = 4;
+const int32_t TEST_CMD = 123;
 
 class WifiHalTest : public testing::Test {
 public:
@@ -171,6 +172,16 @@ static int32_t HalCallbackEvent(uint32_t event, void *respData, const char *ifNa
         default:
             break;
     }
+    return HDF_SUCCESS;
+}
+
+static int32_t HmlCallbackEvent(const char *ifName, struct HmlEventData *data)
+{
+    if (ifName == NULL || data == NULL) {
+        return HDF_FAILURE;
+    }
+
+    printf("Receive hml callback event\n");
     return HDF_SUCCESS;
 }
 
@@ -1225,6 +1236,280 @@ HWTEST_F(WifiHalTest, SetScanningMacAddress001, TestSize.Level1)
     bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ASSERT_TRUE(flag);
 
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: WifiHalRegisterHmlCallback001
+ * @tc.desc: Wifi hal register callback function test
+ * @tc.type: FUNC
+ * @tc.require: AR000F869G
+ */
+HWTEST_F(WifiHalTest, WifiHalRegisterHmlCallback001, TestSize.Level1)
+{
+    int ret;
+
+    ret = g_wifi->registerHmlCallback(HmlCallbackEvent, "wlan0");
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: WifiHalUnregisterHmlCallback001
+ * @tc.desc: Wifi hal unregister callback function test
+ * @tc.type: FUNC
+ * @tc.require: AR000F869G
+ */
+HWTEST_F(WifiHalTest, WifiHalUnregisterHmlCallback001, TestSize.Level1)
+{
+    int ret;
+
+    ret = g_wifi->unregisterHmlCallback(HmlCallbackEvent, "wlan0");
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: GetCoexChannelList001
+ * @tc.desc: wifi hal get coex channel list function test
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
+HWTEST_F(WifiHalTest, GetCoexChannelList001, TestSize.Level1)
+{
+    int32_t ret;
+    struct IWiFiAp *apFeature = nullptr;
+    uint32_t bufLen = HML_PARAM_BUF_SIZE;
+    uint8_t buf[HML_PARAM_BUF_SIZE] = {0};
+    struct CoexChannelList list = {0};
+    list.buf = buf;
+    list.bufLen = bufLen;
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_NE(apFeature, nullptr);
+    ret = g_wifi->getCoexChannelList(nullptr, nullptr);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getCoexChannelList(apFeature->baseFeature.ifName, nullptr);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getCoexChannelList(nullptr, &list);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getCoexChannelList(apFeature->baseFeature.ifName, &list);
+    printf("GetCoexChannelList001_%d: ret = %d\n", __LINE__, ret);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: GetCoexChannelList002
+ * @tc.desc: wifi hal get coex channel list function test
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
+HWTEST_F(WifiHalTest, GetCoexChannelList002, TestSize.Level1)
+{
+    int32_t ret;
+    struct IWiFiSta *staFeature = nullptr;
+    uint32_t bufLen = HML_PARAM_BUF_SIZE;
+    uint8_t buf[HML_PARAM_BUF_SIZE] = {0};
+    struct CoexChannelList list = {0};
+    list.buf = buf;
+    list.bufLen = bufLen;
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_NE(staFeature, nullptr);
+    ret = g_wifi->getCoexChannelList(nullptr, nullptr);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getCoexChannelList(staFeature->baseFeature.ifName, nullptr);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getCoexChannelList(nullptr, &list);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getCoexChannelList(staFeature->baseFeature.ifName, &list);
+    printf("GetCoexChannelList002_%d: ret = %d\n", __LINE__, ret);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: SendHmlCmd001
+ * @tc.desc: wifi hal send hml command function test
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
+HWTEST_F(WifiHalTest, SendHmlCmd001, TestSize.Level1)
+{
+    int32_t ret;
+    struct IWiFiAp *apFeature = nullptr;
+    uint32_t bufLen = HML_PARAM_BUF_SIZE;
+    int8_t buf[HML_PARAM_BUF_SIZE] = {0};
+    struct CmdData data = {0};
+    data.cmdId = TEST_CMD;
+    data.buf = buf;
+    data.bufLen = bufLen;
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    ret = g_wifi->sendHmlCmd(nullptr, nullptr);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendHmlCmd(apFeature->baseFeature.ifName, nullptr);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendHmlCmd(nullptr, &data);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendHmlCmd(apFeature->baseFeature.ifName, &data);
+    printf("GetCoexChannelList002_%d: ret = %d\n", __LINE__, ret);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: SendHmlCmd002
+ * @tc.desc: wifi hal send hml command function test
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
+HWTEST_F(WifiHalTest, SendHmlCmd002, TestSize.Level1)
+{
+    int32_t ret;
+    struct IWiFiSta *staFeature = nullptr;
+    uint32_t bufLen = HML_PARAM_BUF_SIZE;
+    int8_t buf[HML_PARAM_BUF_SIZE] = {0};
+    struct CmdData data = {0};
+    data.cmdId = TEST_CMD;
+    data.buf = buf;
+    data.bufLen = bufLen;
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    ret = g_wifi->sendHmlCmd(nullptr, nullptr);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendHmlCmd(staFeature->baseFeature.ifName, nullptr);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendHmlCmd(nullptr, &data);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendHmlCmd(staFeature->baseFeature.ifName, &data);
+    printf("GetCoexChannelList002_%d: ret = %d\n", __LINE__, ret);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: SendP2pCmd001
+ * @tc.desc: wifi hal send p2p command function test
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
+HWTEST_F(WifiHalTest, SendP2pCmd001, TestSize.Level1)
+{
+    int32_t ret;
+    bool flag;
+    struct IWiFiAp *apFeature = nullptr;
+    uint32_t bufLen = HML_PARAM_BUF_SIZE;
+    int8_t buf[HML_PARAM_BUF_SIZE] = {0};
+    struct CmdData data = {0};
+    data.cmdId = TEST_CMD;
+    data.buf = buf;
+    data.bufLen = bufLen;
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    ret = g_wifi->sendP2pCmd(nullptr, nullptr);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendP2pCmd(apFeature->baseFeature.ifName, nullptr);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendP2pCmd(nullptr, &data);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendP2pCmd(apFeature->baseFeature.ifName, &data);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    data.cmdId = CMD_CLOSE_GO_CAC;
+    ret = g_wifi->sendP2pCmd(apFeature->baseFeature.ifName, &data);
+    printf("GetCoexChannelList002_%d: ret = %d\n", __LINE__, ret);
+    flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    data.cmdId = CMD_SET_GO_CSA_CHANNEL;
+    ret = g_wifi->sendP2pCmd(apFeature->baseFeature.ifName, &data);
+    printf("GetCoexChannelList002_%d: ret = %d\n", __LINE__, ret);
+    flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    data.cmdId = CMD_SET_RADAR_DETECT;
+    ret = g_wifi->sendP2pCmd(apFeature->baseFeature.ifName, &data);
+    printf("GetCoexChannelList002_%d: ret = %d\n", __LINE__, ret);
+    flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    data.cmdId = CMD_ID_MCC_STA_P2P_QUOTA_TIME;
+    ret = g_wifi->sendP2pCmd(apFeature->baseFeature.ifName, &data);
+    printf("GetCoexChannelList002_%d: ret = %d\n", __LINE__, ret);
+    flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    data.cmdId = CMD_ID_CTRL_ROAM_CHANNEL;
+    ret = g_wifi->sendP2pCmd(apFeature->baseFeature.ifName, &data);
+    printf("GetCoexChannelList002_%d: ret = %d\n", __LINE__, ret);
+    flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: SendP2pCmd002
+ * @tc.desc: wifi hal send p2p command function test
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
+HWTEST_F(WifiHalTest, SendP2pCmd002, TestSize.Level1)
+{
+    int32_t ret;
+    bool flag;
+    struct IWiFiSta *staFeature = nullptr;
+    uint32_t bufLen = HML_PARAM_BUF_SIZE;
+    int8_t buf[HML_PARAM_BUF_SIZE] = {0};
+    struct CmdData data = {0};
+    data.cmdId = TEST_CMD;
+    data.buf = buf;
+    data.bufLen = bufLen;
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&staFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    ret = g_wifi->sendP2pCmd(nullptr, nullptr);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendP2pCmd(staFeature->baseFeature.ifName, nullptr);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendP2pCmd(nullptr, &data);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendP2pCmd(staFeature->baseFeature.ifName, &data);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    data.cmdId = CMD_CLOSE_GO_CAC;
+    ret = g_wifi->sendP2pCmd(staFeature->baseFeature.ifName, &data);
+    printf("GetCoexChannelList002_%d: ret = %d\n", __LINE__, ret);
+    flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    data.cmdId = CMD_SET_GO_CSA_CHANNEL;
+    ret = g_wifi->sendP2pCmd(staFeature->baseFeature.ifName, &data);
+    printf("GetCoexChannelList002_%d: ret = %d\n", __LINE__, ret);
+    flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    data.cmdId = CMD_SET_RADAR_DETECT;
+    ret = g_wifi->sendP2pCmd(staFeature->baseFeature.ifName, &data);
+    printf("GetCoexChannelList002_%d: ret = %d\n", __LINE__, ret);
+    flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    data.cmdId = CMD_ID_MCC_STA_P2P_QUOTA_TIME;
+    ret = g_wifi->sendP2pCmd(staFeature->baseFeature.ifName, &data);
+    printf("GetCoexChannelList002_%d: ret = %d\n", __LINE__, ret);
+    flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    data.cmdId = CMD_ID_CTRL_ROAM_CHANNEL;
+    ret = g_wifi->sendP2pCmd(staFeature->baseFeature.ifName, &data);
+    printf("GetCoexChannelList002_%d: ret = %d\n", __LINE__, ret);
+    flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
 }
