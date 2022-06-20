@@ -70,6 +70,14 @@ void InitParam(T &param)
     param.nVersion = g_version;
 }
 
+template <typename T>
+void InitOhosParam(T &param)
+{
+    memset_s(&param, sizeof(param), 0x0, sizeof(param));
+    param.size = sizeof(param);
+    param.version = g_version;
+}
+
 struct BufferInfo {
     std::shared_ptr<OmxCodecBuffer> omxBuffer;
     std::shared_ptr<OHOS::Ashmem> sharedMem;
@@ -324,6 +332,27 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiCreateComponentTest_004, TestSize.Level1)
                                              APP_DATA, callback);
     ASSERT_EQ(ret, HDF_SUCCESS);
     ASSERT_TRUE(component != nullptr);
+    struct CompVerInfo verInfo;
+    ret = component->GetComponentVersion(component, &verInfo);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    CodecPixFormatParam pixFormat;
+    InitOhosParam(pixFormat);
+    pixFormat.version = verInfo.compVersion;
+    pixFormat.portIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    ret = component->GetParameter(component, OMX_IndexParamCodecPixFormat,
+                                         reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
+    ASSERT_NE(ret, HDF_SUCCESS);
+
+    pixFormat.portIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
+    ret = component->GetParameter(component, OMX_IndexParamCodecPixFormat,
+                                         reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
+    ASSERT_EQ(ret, HDF_SUCCESS);
+
+    pixFormat.codecColorFormat = PIXEL_FMT_RGB_555;
+    ret = component->GetParameter(component, OMX_IndexParamCodecPixFormat,
+                                         reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
+    ASSERT_EQ(ret, HDF_SUCCESS);
+
     ret = g_manager->DestoryComponent(componentId);
     ASSERT_EQ(ret, HDF_SUCCESS);
     CodecComponentTypeRelease(component);
@@ -349,7 +378,27 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetVersionTest_002, TestSize.Level1)
     int32_t ret = g_component->GetComponentVersion(g_component, nullptr);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetParameterTest_001, TestSize.Level1)
+{
+    ASSERT_TRUE(g_component != nullptr);
+    CodecPixFormatParam pixFormat;
+    InitOhosParam(pixFormat);
+    pixFormat.portIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
+    auto ret = g_component->GetParameter(g_component, OMX_IndexParamCodecPixFormat,
+                                         reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
+    ASSERT_NE(ret, HDF_SUCCESS);
+}
 
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetParameterTest_002, TestSize.Level1)
+{
+    ASSERT_TRUE(g_component != nullptr);
+    CodecPixFormatParam pixFormat;
+    InitOhosParam(pixFormat);
+    pixFormat.portIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    auto ret = g_component->GetParameter(g_component, OMX_IndexParamCodecPixFormat,
+                                         reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
+    ASSERT_EQ(ret, HDF_SUCCESS);
+}
 // Test GetParameter
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetParameterTest_003, TestSize.Level1)
 {
@@ -454,6 +503,21 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetParameterTest_005, TestSize.Level1)
     int32_t ret = g_component->SetParameter(g_component, OMX_IndexVideoStartUnused, reinterpret_cast<int8_t *>(&param),
                                             sizeof(param));
     ASSERT_NE(ret, HDF_SUCCESS);
+}
+
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetParameterTest_006, TestSize.Level1)
+{
+    ASSERT_TRUE(g_component != nullptr);
+    CodecPixFormatParam pixFormat;
+    InitOhosParam(pixFormat);
+    pixFormat.portIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    auto ret = g_component->GetParameter(g_component, OMX_IndexParamCodecPixFormat,
+                                         reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    pixFormat.codecColorFormat = PIXEL_FMT_RGB_555;
+    ret = g_component->SetParameter(g_component, OMX_IndexParamCodecPixFormat, reinterpret_cast<int8_t *>(&pixFormat),
+                                    sizeof(pixFormat));
+    ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
 // Test GetConfig
