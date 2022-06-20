@@ -42,24 +42,20 @@ struct CodecComponentType *g_component = nullptr;
 uint32_t g_componentId = 0;
 struct CodecCallbackType *g_callback = nullptr;
 int32_t g_count = 0;
-
-#ifdef RK
-#define COMPONENT_NAME        "OMX.rk.video_encoder.avc"
-#define COMPOENT_DECODER_NAME "OMX.rk.video_decoder.avc"
-#endif
+CodecCompCapability g_codecAvcEncodeCap;
 
 constexpr int32_t INT_TO_STR_LEN = 32;
 constexpr int32_t ARRAY_TO_STR_LEN = 1000;
 constexpr uint32_t WIDTH = 640;
 constexpr uint32_t HEIGHT = 480;
 OHOS::HDI::Display::V1_0::IDisplayGralloc *g_gralloc = nullptr;
-#ifdef COMPONENT_NAME
+#ifdef SUPPORT_OMX
 union OMX_VERSIONTYPE g_version;
+constexpr uint32_t MAX_ROLE_INDEX = 1000;
 constexpr int32_t BUFFER_SIZE = 640 * 480 * 3;
 constexpr int32_t ROLE_LEN = 240;
 constexpr int32_t FRAMERATE = 30 << 16;
 constexpr uint32_t BUFFER_ID_ERROR = 65000;
-constexpr int64_t APP_DATA = 64;
 enum class PortIndex { PORT_INDEX_INPUT = 0, PORT_INDEX_OUTPUT = 1 };
 
 template <typename T>
@@ -159,7 +155,7 @@ static bool UseBufferOnPort(enum PortIndex portIndex, int bufferCount, int buffe
     }
     return true;
 }
-#endif  // COMPONENT_NAME
+#endif  // SUPPORT_OMX
 class CodecHdiOmxTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -243,7 +239,12 @@ static void PrintCapability(CodecCompCapability *cap, int32_t index)
         HDF_LOGI("blocksPerSecond.max:%{public}d", cap->port.video.blocksPerSecond.max);
         HDF_LOGI("blockSize.width:%{public}d", cap->port.video.blockSize.width);
         HDF_LOGI("blockSize.height:%{public}d", cap->port.video.blockSize.height);
+        HDF_LOGI("frameRate.min:%{public}d", cap->port.video.frameRate.min);
+        HDF_LOGI("frameRate.max:%{public}d", cap->port.video.frameRate.max);
         HDF_LOGI("supportPixFmts:%{public}s", GetArrayStr(cap->port.video.supportPixFmts, PIX_FORMAT_NUM, 0));
+        HDF_LOGI("bitRatemode:%{public}s", GetArrayStr((int32_t *)cap->port.video.bitRatemode, BIT_RATE_MODE_NUM, 0));
+        HDF_LOGI("measuredFrameRate:%{public}s",
+                 GetArrayStr(cap->port.video.measuredFrameRate, MEASURED_FRAME_RATE_NUM, 0));
     } else {
         HDF_LOGI(":%{public}s", GetArrayStr(cap->port.audio.sampleFormats, SAMPLE_FMT_NUM, AUDIO_SAMPLE_FMT_INVALID));
         HDF_LOGI(":%{public}s", GetArrayStr(cap->port.audio.sampleRate, SAMPLE_RATE_NUM, AUD_SAMPLE_RATE_INVALID));
@@ -277,6 +278,9 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetCapabilityListTest_001, TestSize.Level1)
     g_manager->GetComponentCapabilityList(capList, g_count);
     for (int32_t i = 0; i < g_count; i++) {
         PrintCapability(&capList[i], i);
+        if (capList[i].type == VIDEO_ENCODER && capList[i].role == MEDIA_ROLETYPE_VIDEO_AVC) {
+            g_codecAvcEncodeCap = capList[i];
+        }
     }
     OsalMemFree(capList);
     capList = nullptr;
@@ -288,7 +292,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiCreateComponentTest_001, TestSize.Level1)
     ASSERT_TRUE(g_manager != nullptr);
     ASSERT_TRUE(g_callback != nullptr);
     char name[] = "test";
-    int32_t ret = g_manager->CreateComponent(&g_component, &g_componentId, (char *)name, APP_DATA, g_callback);
+    int32_t ret = g_manager->CreateComponent(&g_component, &g_componentId, (char *)name, (int64_t)this, g_callback);
     ASSERT_NE(ret, HDF_SUCCESS);
     ASSERT_TRUE(g_component == nullptr);
 }
@@ -297,17 +301,18 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiCreateComponentTest_002, TestSize.Level1)
 {
     ASSERT_TRUE(g_manager != nullptr);
     ASSERT_TRUE(g_callback != nullptr);
-    int32_t ret = g_manager->CreateComponent(&g_component, &g_componentId, nullptr, APP_DATA, g_callback);
+    int32_t ret = g_manager->CreateComponent(&g_component, &g_componentId, nullptr, (int64_t)this, g_callback);
     ASSERT_NE(ret, HDF_SUCCESS);
     ASSERT_TRUE(g_component == nullptr);
 }
 
-#ifdef COMPONENT_NAME
+#ifdef SUPPORT_OMX
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiCreateComponentTest_003, TestSize.Level1)
 {
     ASSERT_TRUE(g_manager != nullptr);
     ASSERT_TRUE(g_callback != nullptr);
-    int32_t ret = g_manager->CreateComponent(&g_component, &g_componentId, const_cast<char *>(COMPONENT_NAME), APP_DATA,
+    ASSERT_TRUE(g_codecAvcEncodeCap.role == MEDIA_ROLETYPE_VIDEO_AVC);
+    int32_t ret = g_manager->CreateComponent(&g_component, &g_componentId, g_codecAvcEncodeCap.compName, (int64_t)this,
                                              g_callback);
     ASSERT_EQ(ret, HDF_SUCCESS);
     ASSERT_TRUE(g_component != nullptr);
@@ -318,10 +323,11 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiCreateComponentTest_004, TestSize.Level1)
     ASSERT_TRUE(g_manager != nullptr);
     struct CodecCallbackType *callback = CodecCallbackTypeStubGetInstance();
     ASSERT_TRUE(callback != nullptr);
+    ASSERT_TRUE(g_codecAvcEncodeCap.role == MEDIA_ROLETYPE_VIDEO_AVC);
     struct CodecComponentType *component = nullptr;
     uint32_t componentId = 0;
-    int32_t ret = g_manager->CreateComponent(&component, &componentId, const_cast<char *>(COMPOENT_DECODER_NAME),
-                                             APP_DATA, callback);
+    int32_t ret =
+        g_manager->CreateComponent(&component, &componentId, g_codecAvcEncodeCap.compName, (int64_t)this, callback);
     ASSERT_EQ(ret, HDF_SUCCESS);
     ASSERT_TRUE(component != nullptr);
     ret = g_manager->DestoryComponent(componentId);
@@ -340,7 +346,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetVersionTest_001, TestSize.Level1)
     int32_t ret = g_component->GetComponentVersion(g_component, &verInfo);
     g_version = verInfo.compVersion;
     ASSERT_EQ(ret, HDF_SUCCESS);
-    ASSERT_STREQ(COMPONENT_NAME, verInfo.compName);
+    ASSERT_STREQ(g_codecAvcEncodeCap.compName, verInfo.compName);
 }
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetVersionTest_002, TestSize.Level1)
@@ -554,9 +560,8 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetExtensionIndexTest_002, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     OMX_INDEXTYPE indexType;
-    int32_t ret =
-        g_component->GetExtensionIndex(g_component, "OMX.Topaz.index.param.extended_video", (uint32_t *)&indexType);
-    ASSERT_EQ(ret, HDF_SUCCESS);
+    int32_t ret = g_component->GetExtensionIndex(g_component, nullptr, (uint32_t *)&indexType);
+    ASSERT_NE(ret, HDF_SUCCESS);
 }
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetExtensionIndexTest_003, TestSize.Level1)
@@ -991,7 +996,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetCallbackTest_001, TestSize.Level1)
     }
     g_callback = CodecCallbackTypeStubGetInstance();
     ASSERT_TRUE(g_callback != nullptr);
-    int32_t ret = g_component->SetCallbacks(g_component, g_callback, APP_DATA);
+    int32_t ret = g_component->SetCallbacks(g_component, g_callback, (int64_t)this);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
@@ -1001,6 +1006,21 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiRoleEnumTest_001, TestSize.Level1)
     uint8_t role[ROLE_LEN] = {0};
     int32_t ret = g_component->ComponentRoleEnum(g_component, role, ROLE_LEN, 0);
     ASSERT_EQ(ret, HDF_SUCCESS);
+}
+
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiRoleEnumTest_002, TestSize.Level1)
+{
+    ASSERT_TRUE(g_component != nullptr);
+    int32_t ret = g_component->ComponentRoleEnum(g_component, nullptr, 0, 0);
+    ASSERT_NE(ret, HDF_SUCCESS);
+}
+
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiRoleEnumTest_003, TestSize.Level1)
+{
+    ASSERT_TRUE(g_component != nullptr);
+    uint8_t role[ROLE_LEN] = {0};
+    int32_t ret = g_component->ComponentRoleEnum(g_component, role, ROLE_LEN, MAX_ROLE_INDEX);
+    ASSERT_NE(ret, HDF_SUCCESS);
 }
 
 // Executing to Idle
@@ -1096,7 +1116,13 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiDestoryComponentTest_001, TestSize.Level1)
     CodecComponentTypeRelease(g_component);
     g_component = nullptr;
 }
-#endif  // COMPONENT_NAME
+
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiDestoryComponentTest_002, TestSize.Level1)
+{
+    int ret = g_manager->DestoryComponent(g_componentId);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+}
+#endif  // SUPPORT_OMX
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiReleaseTest_001, TestSize.Level1)
 {
