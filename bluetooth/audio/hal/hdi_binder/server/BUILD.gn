@@ -77,5 +77,5 @@ ohos_shared_library("audio_bluetooth_hdi_adapter_server") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "bluetooth_device_driver"
+  part_name = "drivers_peripheral_bluetooth"
 }
