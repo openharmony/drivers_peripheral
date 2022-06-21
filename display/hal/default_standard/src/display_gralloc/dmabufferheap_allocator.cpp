@@ -36,6 +36,7 @@ int32_t DmaBufferHeapAllocator::Allocate(const BufferInfo &bufferInfo, BufferHan
     DISPLAY_LOGD();
     DmabufHeapBuffer buffer;
     buffer.size = bufferInfo.size_;
+    buffer.heapFlags = 0;
     DmabufHeapBufferAlloc(deviceFd_, &buffer);
     handle.fd = buffer.fd;
     return DISPLAY_SUCCESS;
