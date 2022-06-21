@@ -20,9 +20,9 @@ module_output_path = "memorytrackertest/"
 memorytracker_deps = [ "//utils/native/base:utils" ]
 
 memorytracker_external_deps = [
+  "drivers_interface_memorytracker:libmemorytracker_proxy_1.0",
   "hdf_core:libhdf_utils",
   "ipc:ipc_core",
-  "memorytracker_device_driver_interface:libmemorytracker_proxy_1.0",
 ]
 
 memmgr_public_deps = [ "//third_party/googletest:gtest_main" ]
@@ -35,8 +35,6 @@ ohos_unittest("memorytracker_test") {
     external_deps = memorytracker_external_deps
     public_deps = memmgr_public_deps
   }
-  part_name = "hdf"
-  subsystem_name = "memorytracker_device_driver"
 }
 
 group("memorytracker_unittest") {
