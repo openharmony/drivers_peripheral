@@ -25,12 +25,14 @@ bool AudioLoadadapterManagerFuzzTest(const uint8_t *data, size_t size)
     TestAudioManager *manager = nullptr;
     int32_t ret = GetManager(manager);
     if (ret < 0 || manager == nullptr) {
+        HDF_LOGE("%{public}s: GetManager failed \n", __func__);
         return false;
     }
     struct AudioAdapterDescriptor *descs = nullptr;
     int sizeone = 0;
     ret = manager->GetAllAdapters(manager, &descs, &sizeone);
     if (ret < 0 || manager == nullptr) {
+        HDF_LOGE("%{public}s: GetAllAdapters failed \n", __func__);
         return false;
     }
     struct AudioAdapterDescriptor *desc = &descs[0];

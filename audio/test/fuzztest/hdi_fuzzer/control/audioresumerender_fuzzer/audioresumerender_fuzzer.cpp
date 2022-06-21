@@ -27,6 +27,7 @@ bool AudioResumeRenderFuzzTest(const uint8_t *data, size_t size)
     struct AudioRender *render = nullptr;
     int32_t ret = AudioGetManagerCreateStartRender(manager, &adapter, &render);
     if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+        HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
         return false;
     }
     ret = render->control.Pause((AudioHandle)render);
@@ -34,6 +35,7 @@ bool AudioResumeRenderFuzzTest(const uint8_t *data, size_t size)
         adapter->DestroyRender(adapter, render);
         manager->UnloadAdapter(manager, adapter);
         render = nullptr;
+        HDF_LOGE("%{public}s: Pause failed \n", __func__);
         return false;
     }
 

@@ -27,6 +27,7 @@ bool AudioSetextraparamsRenderFuzzTest(const uint8_t *data, size_t size)
     struct AudioRender *render = nullptr;
     int32_t ret = AudioGetManagerCreateStartRender(manager, &adapter, &render);
     if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+        HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
         return false;
     }
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";

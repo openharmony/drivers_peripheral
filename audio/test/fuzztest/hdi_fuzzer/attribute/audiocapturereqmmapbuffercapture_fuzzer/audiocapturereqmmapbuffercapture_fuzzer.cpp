@@ -27,12 +27,14 @@ namespace Audio {
         struct AudioCapture *capture = nullptr;
         int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
         if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+            HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
             return false;
         }
         FILE *fp = fopen(AUDIO_LOW_LATENCY_CAPTURE_FILE.c_str(), "wb+");
         if (fp == nullptr) {
             adapter->DestroyCapture(adapter, capture);
             manager->UnloadAdapter(manager, adapter);
+            HDF_LOGE("%{public}s: fopen failed \n", __func__);
             return false;
         }
         ret = capture->control.Start((AudioHandle)capture);
@@ -40,6 +42,7 @@ namespace Audio {
             adapter->DestroyCapture(adapter, capture);
             manager->UnloadAdapter(manager, adapter);
             fclose(fp);
+            HDF_LOGE("%{public}s: Start failed \n", __func__);
             return false;
         }
         bool isRender = true;
@@ -50,6 +53,7 @@ namespace Audio {
             adapter->DestroyCapture(adapter, capture);
             manager->UnloadAdapter(manager, adapter);
             (void)fclose(fp);
+            HDF_LOGE("%{public}s: InitMmapDesc failed \n", __func__);
             return false;
         }
 

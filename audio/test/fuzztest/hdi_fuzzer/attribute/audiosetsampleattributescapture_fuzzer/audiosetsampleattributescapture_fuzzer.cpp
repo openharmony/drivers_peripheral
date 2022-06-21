@@ -27,6 +27,7 @@ namespace Audio {
         struct AudioCapture *capture = nullptr;
         int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
         if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+            HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
             return false;
         }
         struct AudioSampleAttributes attrs = {};

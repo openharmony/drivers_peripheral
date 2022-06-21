@@ -27,14 +27,13 @@ namespace Audio {
         struct AudioRender *render = nullptr;
         int32_t ret = AudioGetManagerCreateRender(manager, &adapter, &render);
         if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+            HDF_LOGE("%{public}s: AudioGetManagerCreateRender failed \n", __func__);
             return false;
         }
         struct AudioSceneDescriptor sceneFuzz = {};
-        sceneFuzz.scene.id = *(uint32_t *)data,
-        sceneFuzz.scene.desc = (char *)data,
-        sceneFuzz.desc.portId = *(uint32_t *)data,
-        sceneFuzz.desc.pins = *(AudioPortPin *)data,
-        sceneFuzz.desc.desc = (char *)data,
+        if (memcpy_s((void *)&sceneFuzz, sizeof(sceneFuzz), data, sizeof(sceneFuzz)) != 0) {
+            return false;
+        }
 
         ret = render->scene.SelectScene(render, &sceneFuzz);
         if (ret == HDF_SUCCESS) {
