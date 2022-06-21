@@ -18,6 +18,6 @@ if (is_standard_system) {
     relative_install_dir = "hdfconfig"
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "bluetooth_device_driver"
+    part_name = "drivers_peripheral_bluetooth"
   }
 }
