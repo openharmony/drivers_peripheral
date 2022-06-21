@@ -14,87 +14,49 @@
  */
 
 #include "codecuseeglimage_fuzzer.h"
-#include "codec_callback_type_stub.h"
-#include "codec_component_type.h"
-#include "codec_component_manager.h"
+#include "codeccommon_fuzzer.h"
 
-#include <osal_mem.h>
-#include <hdf_log.h>
+#include <securec.h>
+
+struct AllParameters {
+    uint32_t portIndex;
+    int8_t *eglImage;
+    uint32_t eglImageLen;
+};
 
 namespace OHOS {
 namespace Codec {
-    const int32_t DATA_BUFFERID = 10;
-    const int32_t DATA_SIZE = 20;
-    const int32_t DATA_VERSION_NVERSION = 30;
-    const int32_t DATA_BUFFERTYPE = 40;
-    const int32_t DATA_BUFFERLEN = 50;
-    const int32_t DATA_ALLOCLEN = 60;
-    const int32_t DATA_FILLEDLEN = 70;
-    const int32_t DATA_OFFSET = 80;
-    const int32_t DATA_FENCEFD = 90;
-    const int32_t DATA_TYPE = 100;
-    const int32_t DATA_PTS = 200;
-    const int32_t DATA_FLAG = 300;
-
-    static void FillDataOmxCodecBuffer(struct OmxCodecBuffer *dataFuzz)
-    {
-        dataFuzz->bufferId = DATA_BUFFERID;
-        dataFuzz->size = DATA_SIZE;
-        dataFuzz->version.nVersion = DATA_VERSION_NVERSION;
-        dataFuzz->bufferType = (enum CodecBufferType)DATA_BUFFERTYPE;
-        dataFuzz->buffer = (uint8_t*)OsalMemAlloc(DATA_BUFFERLEN);
-        dataFuzz->bufferLen = DATA_BUFFERLEN;
-        dataFuzz->allocLen = DATA_ALLOCLEN;
-        dataFuzz->filledLen = DATA_FILLEDLEN;
-        dataFuzz->offset = DATA_OFFSET;
-        dataFuzz->fenceFd = DATA_FENCEFD;
-        dataFuzz->type = (enum ShareMemTypes)DATA_TYPE;
-        dataFuzz->pts = DATA_PTS;
-        dataFuzz->flag = DATA_FLAG;
-    }
-
     bool CodecUseEglImage(const uint8_t* data, size_t size)
     {
+        struct AllParameters params;
+        if (data == nullptr) {
+            return false;
+        }
+
+        if (memcpy_s((void *)&params, sizeof(params), data, sizeof(params)) != 0) {
+            return false;
+        }
+
         bool result = false;
-        const int32_t testingAppData = 33;
-        struct CodecComponentManager *manager = nullptr;
-        struct CodecComponentType *component = nullptr;
-        int32_t appData = testingAppData;
-        CodecCallbackType* callback = CodecCallbackTypeStubGetInstance();
-        uint32_t componentId = 0;
-        manager = GetCodecComponentManager();
-        if (manager == nullptr) {
-            HDF_LOGE("%{public}s: GetCodecComponentManager failed\n", __func__);
+        result = Preconditions();
+        if (!result) {
+            HDF_LOGE("%{public}s: Preconditions failed\n", __func__);
             return false;
         }
 
-        int32_t ret = manager->CreateComponent(&component, &componentId, (char*)"compName", appData, callback);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: CreateComponent failed\n", __func__);
-            return false;
-        }
-
-        OMX_STATETYPE state;
-        ret = component->GetState(component, &state);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: GetState Component faild\n", __func__);
-            return false;
-        }
         struct OmxCodecBuffer buffer;
         FillDataOmxCodecBuffer(&buffer);
-        ret = component->UseEglImage(component, &buffer, *(uint32_t *)data, (int8_t *)data, sizeof(*data)*size);
+        int32_t ret = component->UseEglImage(component, &buffer, params.portIndex, params.eglImage, params.eglImageLen);
         if (ret == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: UseEglImage succeed\n", __func__);
             result = true;
         }
 
-        ret = manager->DestoryComponent(componentId);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: DestoryComponent failed\n", __func__);
+        result = Destory();
+        if (!result) {
+            HDF_LOGE("%{public}s: Destory failed\n", __func__);
             return false;
         }
-        CodecComponentTypeRelease(component);
-        CodecComponentManagerRelease();
 
         return result;
     }

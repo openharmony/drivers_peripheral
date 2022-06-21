@@ -27,6 +27,7 @@ ohos_fuzztest("CodecComponentRoleEnumFuzzTest") {
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
     "//drivers/peripheral/codec/test/fuzztest/codeccomponentroleenum_fuzzer",
+    "//drivers/peripheral/codec/test/fuzztest/codeccommon_fuzzer",
   ]
 
   deps = [ "//drivers/peripheral/codec/hal:codec_hdi_omx" ]
@@ -47,7 +48,10 @@ ohos_fuzztest("CodecComponentRoleEnumFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "codeccomponentroleenum_fuzzer.cpp" ]
+  sources = [
+    "../codeccommon_fuzzer/codeccommon_fuzzer.cpp",
+    "codeccomponentroleenum_fuzzer.cpp",
+  ]
 }
 
 group("fuzztest") {
