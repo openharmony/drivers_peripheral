@@ -33,7 +33,6 @@ namespace {
     const char *g_builtIn = "haptic.default.effect";
     const char *g_arbitraryStr = "arbitraryString";
     const struct VibratorInterface *g_vibratorDev = nullptr;
-    static struct VibratorInfo *g_vibratorInfo = nullptr;
 }
 
 class HdfVibratorTest : public testing::Test {
@@ -253,25 +252,4 @@ HWTEST_F(HdfVibratorTest, ExecuteVibratorEffect_007, TestSize.Level1)
 
     int32_t endRet = g_vibratorDev->Stop(VIBRATOR_MODE_ONCE);
     EXPECT_EQ(endRet, HDF_SUCCESS);
-}
-
-/**
-  * @tc.name: GetVibratorInfo_001
-  * @tc.desc: Obtain the vibrator setting strength, frequency capability and range in the system.
-  * Validity check of input parameters.
-  * @tc.type: FUNC
-  * @tc.require: AR000FK1JN,AR000FK1J0,AR000FK1JP
-  */
-HWTEST_F(HdfVibratorTest, GetVibratorInfo_001, TestSize.Level1)
-{
-    ASSERT_NE(nullptr, g_vibratorDev);
-
-    int32_t startRet = g_vibratorDev->GetVibratorInfo(&g_vibratorInfo);
-    EXPECT_EQ(startRet, HDF_SUCCESS);
-    EXPECT_NE(g_vibratorInfo, nullptr);
-
-    printf("intensity = %d, intensityMaxValue = %d, intensityMinValue = %d\n\t",
-    g_vibratorInfo->isSupportIntensity, g_vibratorInfo->intensityMaxValue, g_vibratorInfo->intensityMinValue);
-    printf("frequency = %d, frequencyMaxValue = %d, frequencyMinValue = %d\n\t",
-    g_vibratorInfo->isSupportFrequency, g_vibratorInfo->frequencyMaxValue, g_vibratorInfo->frequencyMinValue);
 }
