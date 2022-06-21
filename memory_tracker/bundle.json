@@ -1,10 +1,10 @@
 {
-    "name": "memorytracker_device_driver",
+    "name": "drivers_peripheral_memorytracker",
     "description": "memorytracker_hdf",
     "version": "3.1",
     "license": "Apache License 2.0",
     "component": {
-      "name": "memorytracker_device_driver",
+      "name": "drivers_peripheral_memorytracker",
       "subsystem": "hdf",
       "syscap": [""],
       "adapter_system_type": ["standard"],
