@@ -24,6 +24,8 @@ extern "C" {
 #endif
 #endif
 
+#undef LOG_TAG
+#define LOG_TAG "HDF_WIFI_CORE"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002500
 
