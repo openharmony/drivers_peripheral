@@ -131,7 +131,7 @@ void HdfFaceAuthInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 
 struct HdfDriverEntry g_faceAuthInterfaceDriverEntry = {
     .moduleVersion = 1,
-    .moduleName = "faceauth_interface_service",
+    .moduleName = "drivers_peripheral_face_auth",
     .Bind = HdfFaceAuthInterfaceDriverBind,
     .Init = HdfFaceAuthInterfaceDriverInit,
     .Release = HdfFaceAuthInterfaceDriverRelease,

@@ -139,7 +139,7 @@ static void HdfPinAuthInterfaceDriverRelease(struct HdfDeviceObject *deviceObjec
 
 static struct HdfDriverEntry g_pinAuthInterfaceDriverEntry = {
     .moduleVersion = 1,
-    .moduleName = "pinauth_interface_service",
+    .moduleName = "drivers_peripheral_pin_auth",
     .Bind = HdfPinAuthInterfaceDriverBind,
     .Init = HdfPinAuthInterfaceDriverInit,
     .Release = HdfPinAuthInterfaceDriverRelease,

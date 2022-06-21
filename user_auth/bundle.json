@@ -1,10 +1,10 @@
 {
-  "name": "user_auth_device_driver",
+  "name": "drivers_peripheral_user_auth",
   "description": "user_auth device driver",
   "version": "3.2",
   "license": "Apache License 2.0",
   "component": {
-    "name": "user_auth_device_driver",
+    "name": "drivers_peripheral_user_auth",
     "subsystem": "hdf",
     "syscap": [""],
     "adapter_system_type": ["standard"],
