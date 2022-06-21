@@ -14,50 +14,47 @@
  */
 
 #include "codeccomponentroleenum_fuzzer.h"
-#include "codec_callback_type_stub.h"
-#include "codec_component_type.h"
-#include "codec_component_manager.h"
+#include "codeccommon_fuzzer.h"
 
-#include <osal_mem.h>
-#include <hdf_log.h>
+#include <securec.h>
+
+struct AllParameters {
+    uint8_t *role;
+    uint32_t roleLen;
+    uint32_t index;
+};
 
 namespace OHOS {
 namespace Codec {
     bool CodecComponentRoleEnum(const uint8_t* data, size_t size)
     {
+        struct AllParameters params;
+        if (data == nullptr) {
+            return false;
+        }
+
+        if (memcpy_s((void *)&params, sizeof(params), data, sizeof(params)) != 0) {
+            return false;
+        }
+
         bool result = false;
-        const int32_t testingAppData = 33;
-        struct CodecComponentManager *manager = nullptr;
-        struct CodecComponentType *component = nullptr;
-        int32_t appData = testingAppData;
-        CodecCallbackType* callback = CodecCallbackTypeStubGetInstance();
-        uint32_t componentId = 0;
-        manager = GetCodecComponentManager();
-        if (manager == nullptr) {
-            HDF_LOGE("%{public}s: GetCodecComponentManager failed\n", __func__);
+        result = Preconditions();
+        if (!result) {
+            HDF_LOGE("%{public}s: Preconditions failed\n", __func__);
             return false;
         }
 
-        int32_t ret = manager->CreateComponent(&component, &componentId, (char*)"compName", appData, callback);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: CreateComponent failed\n", __func__);
-            return false;
-        }
-
-        ret = component->ComponentRoleEnum(component, const_cast<uint8_t *>(data),
-            *(uint32_t *)data, *(uint32_t *)data);
+        int32_t ret = component->ComponentRoleEnum(component, params.role, params.roleLen, params.index);
         if (ret == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: ComponentRoleEnum succeed\n", __func__);
             result = true;
         }
 
-        ret = manager->DestoryComponent(componentId);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: DestoryComponent failed\n", __func__);
+        result = Destory();
+        if (!result) {
+            HDF_LOGE("%{public}s: Destory failed\n", __func__);
             return false;
         }
-        CodecComponentTypeRelease(component);
-        CodecComponentManagerRelease();
 
         return result;
     }

@@ -27,6 +27,7 @@ ohos_fuzztest("CodecCreateComponentFuzzTest") {
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
     "//drivers/peripheral/codec/test/fuzztest/codeccreatecomponent_fuzzer",
+    "//drivers/peripheral/codec/test/fuzztest/codeccommon_fuzzer",
   ]
 
   deps = [ "//drivers/peripheral/codec/hal:codec_hdi_omx" ]
@@ -47,7 +48,10 @@ ohos_fuzztest("CodecCreateComponentFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "codeccreatecomponent_fuzzer.cpp" ]
+  sources = [
+    "../codeccommon_fuzzer/codeccommon_fuzzer.cpp",
+    "codeccreatecomponent_fuzzer.cpp",
+  ]
 }
 
 group("fuzztest") {
