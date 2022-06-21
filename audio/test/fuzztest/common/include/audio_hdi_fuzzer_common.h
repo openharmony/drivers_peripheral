@@ -37,6 +37,7 @@
 #define AUDIO_HDI_FUZZER_COMMON_H
 #include <iostream>
 #include <cstring>
+#include "hdf_log.h"
 #include "audio_adapter.h"
 #include "audio_internal.h"
 #include "audio_types.h"

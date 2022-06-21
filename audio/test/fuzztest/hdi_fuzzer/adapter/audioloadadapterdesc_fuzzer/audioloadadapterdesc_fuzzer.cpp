@@ -14,6 +14,7 @@
  */
 
 #include "audioloadadapterdesc_fuzzer.h"
+#include "securec.h"
 #include "audio_hdi_fuzzer_common.h"
 
 using namespace OHOS::Audio;
@@ -25,21 +26,20 @@ bool AudioLoadadapterDescFuzzTest(const uint8_t *data, size_t size)
     TestAudioManager *manager = nullptr;
     int32_t ret = GetManager(manager);
     if (ret < 0 || manager == nullptr) {
+        HDF_LOGE("%{public}s: GetManager failed \n", __func__);
         return false;
     }
 
-    struct AudioPort port = {
-        .dir = *(AudioPortDirection *)data,
-        .portId = *(uint32_t *)data,
-        .portName = (char *)data,
-    };
+    struct AudioPort port = {};
+    if (memcpy_s((void *)&port, sizeof(port), data, sizeof(port)) != 0) {
+        return false;
+    }
 
-    struct AudioAdapterDescriptor descFuzz = {
-        .adapterName = (char *)data,
-        .portNum = *(uint32_t *)data,
-        .ports = &port,
-    };
-    
+    struct AudioAdapterDescriptor descFuzz = {};
+    if (memcpy_s((void *)&descFuzz, sizeof(descFuzz), data, sizeof(descFuzz)) != 0) {
+        return false;
+    }
+    descFuzz.ports = &port;
     struct AudioAdapter *adapter = nullptr;
     ret = manager->LoadAdapter(manager, &descFuzz, &adapter);
     if (ret == HDF_SUCCESS) {

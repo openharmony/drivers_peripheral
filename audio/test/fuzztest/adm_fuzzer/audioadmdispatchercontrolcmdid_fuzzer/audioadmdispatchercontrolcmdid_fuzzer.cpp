@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "audioadmdispatchercontrolcmdid_fuzzer.h"
+#include "hdf_log.h"
 #include "audio_hdi_common.h"
 #include "audio_adm_common.h"
 
@@ -35,21 +36,25 @@ namespace Audio {
 
         service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
         if (service == nullptr || service->dispatcher == nullptr) {
+            HDF_LOGE("%{public}s: HdfIoServiceBind failed\n", __func__);
             return false;
         }
 
         writeBuf = HdfSbufObtainDefaultSize();
         if (writeBuf == nullptr) {
+            HDF_LOGE("%{public}s: writeBuf is NULL\n", __func__);
             HdfIoServiceRecycle(service);
             return false;
         }
         int32_t ret = WriteEleValueToBuf(writeBuf, writeElemValue);
         if (ret < 0) {
+            HDF_LOGE("%{public}s: Write eleValue to buffer failed\n", __func__);
             return false;
         }
         int32_t cmdId = *(int32_t *)(data);
         ret = service->dispatcher->Dispatch(&service->object, cmdId, writeBuf, writeReply);
         if (ret == HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: Dispatch sucess\n", __func__);
             result = true;
         }
         HdfSbufRecycle(writeBuf);

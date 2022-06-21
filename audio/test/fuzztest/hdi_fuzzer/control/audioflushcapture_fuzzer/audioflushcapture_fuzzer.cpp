@@ -27,6 +27,7 @@ bool AudioFlushCaptureFuzzTest(const uint8_t *data, size_t size)
     struct AudioCapture *capture = nullptr;
     int32_t ret = AudioGetManagerCreateStartCapture(manager, &adapter, &capture);
     if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+        HDF_LOGE("%{public}s: AudioGetManagerCreateStartCapture failed \n", __func__);
         return false;
     }
     ret = capture->control.Stop((AudioHandle)capture);
@@ -34,6 +35,7 @@ bool AudioFlushCaptureFuzzTest(const uint8_t *data, size_t size)
         adapter->DestroyCapture(adapter, capture);
         manager->UnloadAdapter(manager, adapter);
         capture = nullptr;
+        HDF_LOGE("%{public}s: Stop failed \n", __func__);
         return false;
     }
 
