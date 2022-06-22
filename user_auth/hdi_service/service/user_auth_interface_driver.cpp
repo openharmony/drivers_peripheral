@@ -120,7 +120,7 @@ static void HdfUserAuthInterfaceDriverRelease(struct HdfDeviceObject *deviceObje
 
 struct HdfDriverEntry g_userAuthInterfaceDriverEntry = {
     .moduleVersion = 1,
-    .moduleName = "user_auth_device_driver",
+    .moduleName = "drivers_peripheral_user_auth",
     .Bind = HdfUserAuthInterfaceDriverBind,
     .Init = HdfUserAuthInterfaceDriverInit,
     .Release = HdfUserAuthInterfaceDriverRelease,
