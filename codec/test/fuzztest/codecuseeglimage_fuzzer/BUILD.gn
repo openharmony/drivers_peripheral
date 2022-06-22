@@ -27,6 +27,7 @@ ohos_fuzztest("CodecUseEglImageFuzzTest") {
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
     "//drivers/peripheral/codec/test/fuzztest/codecuseeglimage_fuzzer",
+    "//drivers/peripheral/codec/test/fuzztest/codeccommon_fuzzer",
   ]
 
   deps = [ "//drivers/peripheral/codec/hal:codec_hdi_omx" ]
@@ -47,7 +48,10 @@ ohos_fuzztest("CodecUseEglImageFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "codecuseeglimage_fuzzer.cpp" ]
+  sources = [
+    "../codeccommon_fuzzer/codeccommon_fuzzer.cpp",
+    "codecuseeglimage_fuzzer.cpp",
+  ]
 }
 
 group("fuzztest") {
