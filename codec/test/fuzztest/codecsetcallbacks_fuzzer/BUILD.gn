@@ -27,6 +27,7 @@ ohos_fuzztest("CodecSetCallbacksFuzzTest") {
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
     "//drivers/peripheral/codec/test/fuzztest/codecsetcallbacks_fuzzer",
+    "//drivers/peripheral/codec/test/fuzztest/codeccommon_fuzzer",
   ]
 
   deps = [ "//drivers/peripheral/codec/hal:codec_hdi_omx" ]
@@ -47,7 +48,10 @@ ohos_fuzztest("CodecSetCallbacksFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "codecsetcallbacks_fuzzer.cpp" ]
+  sources = [
+    "../codeccommon_fuzzer/codeccommon_fuzzer.cpp",
+    "codecsetcallbacks_fuzzer.cpp",
+  ]
 }
 
 group("fuzztest") {
