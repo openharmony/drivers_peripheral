@@ -52,5 +52,5 @@ ohos_executable("usb_dev_test") {
 
   install_enable = false
   subsystem_name = "hdf"
-  part_name = "usb_device_driver"
+  part_name = "drivers_peripheral_usb"
 }
