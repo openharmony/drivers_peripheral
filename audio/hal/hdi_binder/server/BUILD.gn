@@ -90,7 +90,7 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "audio_device_driver"
+    part_name = "drivers_peripheral_audio"
   }
 
   ohos_shared_library("hdi_audio_usb_server") {
@@ -131,7 +131,7 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "audio_device_driver"
+    part_name = "drivers_peripheral_audio"
   }
 
   ohos_shared_library("hdi_audio_a2dp_server") {
@@ -172,7 +172,7 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "audio_device_driver"
+    part_name = "drivers_peripheral_audio"
   }
 
   ohos_shared_library("hdi_audio_pnp_server") {
@@ -210,6 +210,6 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "audio_device_driver"
+    part_name = "drivers_peripheral_audio"
   }
 }

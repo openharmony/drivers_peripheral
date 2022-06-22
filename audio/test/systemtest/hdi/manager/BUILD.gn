@@ -65,7 +65,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   ###########################NOT LITEOS##############################
-  module_output_path = "audio_device_driver/audio"
+  module_output_path = "drivers_peripheral_audio/audio"
 
   ###########################hdf_audio_hdi_manager_test#####################
   ohos_systemtest("hdf_audio_hdi_manager_test") {

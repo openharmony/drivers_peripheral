@@ -53,7 +53,7 @@ ohos_executable("codec_hdi_omx_decode") {
   install_enable = false
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "codec_device_driver"
+  part_name = "drivers_peripheral_codec"
 }
 
 ohos_executable("codec_hdi_omx_encode") {
@@ -96,7 +96,7 @@ ohos_executable("codec_hdi_omx_encode") {
   install_enable = false
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "codec_device_driver"
+  part_name = "drivers_peripheral_codec"
 }
 group("codec_hdi_omx_demo") {
   deps = [
