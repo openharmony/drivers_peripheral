@@ -39,7 +39,7 @@ ohos_shared_library("libnfc_interface_service_1.0") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "nfc_device_driver"
+  part_name = "drivers_peripheral_nfc"
 }
 
 ohos_shared_library("nfc_hdi_driver") {
@@ -65,7 +65,7 @@ ohos_shared_library("nfc_hdi_driver") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "nfc_device_driver"
+  part_name = "drivers_peripheral_nfc"
 }
 
 group("hdi_nfc_service") {
