@@ -1,10 +1,10 @@
 {
-  "name": "connected_tag_device_driver",
+  "name": "drivers_peripheral_connected_tag",
   "description": "connected tag device driver",
   "version": "3.1",
   "license": "Apache License 2.0",
   "component": {
-    "name": "connected_tag_device_driver",
+    "name": "drivers_peripheral_connected_tag",
     "subsystem": "hdf",
     "syscap": [ "" ],
     "adapter_system_type": ["standard"],
