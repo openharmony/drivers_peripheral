@@ -73,7 +73,7 @@ if (defined(ohos_lite)) {
     ]
   }
 } else {
-  module_output_path = "audio_device_driver/audio"
+  module_output_path = "drivers_peripheral_audio/audio"
 
   ###########################hdf_audio_adm_interface_test###########################
   ohos_systemtest("hdf_audio_adm_interface_test") {

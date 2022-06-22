@@ -67,7 +67,7 @@ if (defined(ohos_lite)) {
 
     public_configs = [ ":pathseltct_config" ]
     subsystem_name = "hdf"
-    part_name = "audio_device_driver"
+    part_name = "drivers_peripheral_audio"
   }
 } else {
   ohos_shared_library("hdi_audio_path_select") {
@@ -107,6 +107,6 @@ if (defined(ohos_lite)) {
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "audio_device_driver"
+    part_name = "drivers_peripheral_audio"
   }
 }
