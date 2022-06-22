@@ -38,7 +38,7 @@ if (defined(ohos_lite)) {
 
     install_enable = false
     subsystem_name = "hdf"
-    part_name = "usb_device_driver"
+    part_name = "drivers_peripheral_usb"
   }
 } else {
   import("//build/ohos.gni")
@@ -78,7 +78,7 @@ if (defined(ohos_lite)) {
     install_enable = false
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "usb_device_driver"
+    part_name = "drivers_peripheral_usb"
   }
 
   group("usb_pnp_sample_driver") {
@@ -113,7 +113,7 @@ if (defined(ohos_lite)) {
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "usb_device_driver"
+    part_name = "drivers_peripheral_usb"
   }
 
   ohos_executable("usbhost_pnp_test") {
@@ -141,7 +141,7 @@ if (defined(ohos_lite)) {
     install_enable = false
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "usb_device_driver"
+    part_name = "drivers_peripheral_usb"
   }
 
   ohos_executable("usbhost_sdkapi_speed_test") {
@@ -174,7 +174,7 @@ if (defined(ohos_lite)) {
     install_enable = false
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "usb_device_driver"
+    part_name = "drivers_peripheral_usb"
   }
 
   ohos_executable("usbhost_sdkraw_speed_test") {
@@ -207,7 +207,7 @@ if (defined(ohos_lite)) {
     install_enable = false
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "usb_device_driver"
+    part_name = "drivers_peripheral_usb"
   }
 
   ohos_executable("usbhost_nosdk_speed_test") {
@@ -240,6 +240,6 @@ if (defined(ohos_lite)) {
     install_enable = false
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "usb_device_driver"
+    part_name = "drivers_peripheral_usb"
   }
 }
