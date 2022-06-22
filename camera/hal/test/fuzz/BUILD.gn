@@ -100,7 +100,7 @@ ohos_fuzztest("CameraIpcCameraDeviceRemoteFuzzTest") {
   install_enable = true
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "camera_device_driver"
+  part_name = "driver_peripheral_camera"
 }
 
 ohos_fuzztest("CameraIpcCameraHostServiceFuzzTest") {
@@ -180,7 +180,7 @@ ohos_fuzztest("CameraIpcCameraHostServiceFuzzTest") {
   install_enable = true
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "camera_device_driver"
+  part_name = "driver_peripheral_camera"
 }
 
 ohos_fuzztest("CameraIpcOfflineFuzzTest") {
@@ -259,7 +259,7 @@ ohos_fuzztest("CameraIpcOfflineFuzzTest") {
   install_enable = true
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "camera_device_driver"
+  part_name = "driver_peripheral_camera"
 }
 
 ohos_fuzztest("CameraIpcStreamOperatorFuzzTest") {
@@ -338,7 +338,7 @@ ohos_fuzztest("CameraIpcStreamOperatorFuzzTest") {
   install_enable = true
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "camera_device_driver"
+  part_name = "driver_peripheral_camera"
 }
 
 ohos_fuzztest("CameraIpcCameraDeviceCallbackFuzzTest") {
@@ -420,7 +420,7 @@ ohos_fuzztest("CameraIpcCameraDeviceCallbackFuzzTest") {
   install_enable = true
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "camera_device_driver"
+  part_name = "driver_peripheral_camera"
 }
 
 ohos_fuzztest("CameraIpcCameraHostCallbackFuzzTest") {
@@ -500,7 +500,7 @@ ohos_fuzztest("CameraIpcCameraHostCallbackFuzzTest") {
   install_enable = true
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "camera_device_driver"
+  part_name = "driver_peripheral_camera"
 }
 
 ohos_fuzztest("CameraIpcStreamOperatorCallbackFuzzTest") {
@@ -580,7 +580,7 @@ ohos_fuzztest("CameraIpcStreamOperatorCallbackFuzzTest") {
   install_enable = true
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "camera_device_driver"
+  part_name = "driver_peripheral_camera"
 }
 
 group("camera_hal_fuzztest") {
