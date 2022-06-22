@@ -38,5 +38,5 @@ ohos_static_library("libminui") {
   external_deps = [ "init:libbegetutil" ]
 
   subsystem_name = "hdf"
-  part_name = "battery_device_driver"
+  part_name = "drivers_peripheral_battery"
 }
