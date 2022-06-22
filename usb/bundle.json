@@ -1,10 +1,10 @@
 {
-  "name": "usb_device_driver",
+  "name": "drivers_peripheral_usb",
   "description": "usb device driver",
   "version": "3.1",
   "license": "Apache License 2.0",
   "component": {
-    "name": "usb_device_driver",
+    "name": "drivers_peripheral_usb",
     "subsystem": "hdf",
     "syscap": [ "" ],
     "adapter_system_type": ["standard", "small"],
