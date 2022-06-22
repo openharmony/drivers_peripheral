@@ -18,5 +18,5 @@ ohos_prebuilt_etc("thermal_hdf_config") {
   relative_install_dir = "thermal_config/hdf"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "thermal_device_driver"
+  part_name = "drivers_peripheral_thermal"
 }
