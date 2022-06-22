@@ -1,10 +1,10 @@
 {
-  "name": "camera_device_driver",
+  "name": "driver_peripheral_camera",
   "description": "camera device driver",
   "version": "3.1",
   "license": "Apache License 2.0",
   "component": {
-    "name": "camera_device_driver",
+    "name": "driver_peripheral_camera",
     "subsystem": "hdf",
     "syscap": [ "" ],
     "adapter_system_type": ["standard"],
