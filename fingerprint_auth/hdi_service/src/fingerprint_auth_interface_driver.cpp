@@ -132,7 +132,7 @@ void HdfFingerprintAuthInterfaceDriverRelease(struct HdfDeviceObject *deviceObje
 
 struct HdfDriverEntry g_fingerprintAuthInterfaceDriverEntry = {
     .moduleVersion = 1,
-    .moduleName = "fingerprint_auth_interface_service",
+    .moduleName = "drivers_peripheral_fingerprint_auth",
     .Bind = HdfFingerprintAuthInterfaceDriverBind,
     .Init = HdfFingerprintAuthInterfaceDriverInit,
     .Release = HdfFingerprintAuthInterfaceDriverRelease,
