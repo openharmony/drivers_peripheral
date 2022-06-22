@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -176,6 +176,8 @@ typedef struct {
      * @param modeId indicates the pointer to the ID of the current display mode of the device. The display mode ID
      * is written by this API.
      *
+     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * in {@link DispErrCode} otherwise.
      * @since 1.0
      * @version 1.0
      */
@@ -253,8 +255,7 @@ typedef struct {
      *
      * @param devId Indicates the ID of the display device.
      * @param id Indicates the property ID returned by <b>GetDisplayCapability</b>.
-     * @param level Indicates the pointer to the property corresponding to the property ID. The property value is
-     * written by this interface.
+     * @param value Indicates the property to get.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined
      * in {@link DispErrCode} otherwise.
@@ -304,7 +305,7 @@ typedef struct {
      * @param devId Indicates the ID of the display device.
      * @param num Indicates the pointer to the number of layers whose composition types have changed.
      * @param Layers Indicates the pointer to the start address of the layer array.
-     * @param Layers Indicates the pointer to the start address of the composition type array.
+     * @param type Indicates the pointer to the start address of the composition type array.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined
      * in {@link DispErrCode} otherwise.
@@ -528,8 +529,6 @@ typedef struct {
      * the hardware for display.
      *
      * @param devId Indicates the ID of the display device.
-     * @param num Indicates the pointer to the number of layers.
-     * @param layers Indicates the pointer to the start address of the layer array.
      * @param fences Indicates the pointer to the start address of the fence array.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined
