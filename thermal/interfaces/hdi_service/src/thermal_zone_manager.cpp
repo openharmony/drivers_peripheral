@@ -26,10 +26,9 @@
 #include <securec.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include "utils/hdf_log.h"
-#include "osal/osal_mem.h"
 
-#define HDF_LOG_TAG ThermalZoneManager
+#include "osal/osal_mem.h"
+#include "thermal_log.h"
 
 using namespace std;
 
@@ -55,7 +54,7 @@ const int32_t NUM_ZERO = 0;
 void ThermalZoneManager::FormatThermalPaths(char *path, size_t size, const char *format, const char* name)
 {
     if (snprintf_s(path, PATH_MAX, size - 1, format, name) < HDF_SUCCESS) {
-        HDF_LOGW("%{public}s: failed to format path of %{public}s", __func__, name);
+        THERMAL_HILOGW(COMP_HDI, "failed to format path of %{public}s", name);
     }
 }
 
@@ -72,8 +71,8 @@ void ThermalZoneManager::FormatThermalSysfsPaths(struct ThermalSysfsPathInfo *pT
     FormatThermalPaths(tzSysPathInfo_.typePath, sizeof(tzSysPathInfo_.typePath),
         THEERMAL_TYPE_PATH.c_str(), pTSysPathInfo->name);
 
-    HDF_LOGI("%{public}s: temp path: %{public}s, type path: %{public}s ",
-        __func__, tzSysPathInfo_.temperturePath, tzSysPathInfo_.typePath);
+    THERMAL_HILOGI(COMP_HDI, "temp path: %{public}s, type path: %{public}s ",
+        tzSysPathInfo_.temperturePath, tzSysPathInfo_.typePath);
 
     tzSysPathInfo_.fd = pTSysPathInfo->fd;
     lTzSysPathInfo_.push_back(tzSysPathInfo_);
@@ -88,7 +87,7 @@ int32_t ThermalZoneManager::InitThermalZoneSysfs()
 
     dir = opendir(THERMAL_SYSFS.c_str());
     if (dir == NULL) {
-        HDF_LOGE("%{public}s: cannot open thermal zone path", __func__);
+        THERMAL_HILOGE(COMP_HDI, "cannot open thermal zone path");
         return HDF_ERR_IO;
     }
 
@@ -109,16 +108,16 @@ int32_t ThermalZoneManager::InitThermalZoneSysfs()
         if (entry->d_type == DT_DIR || entry->d_type == DT_LNK) {
             struct ThermalSysfsPathInfo sysfsInfo = {0};
             sysfsInfo.name = entry->d_name;
-            HDF_LOGI("%{public}s: init sysfs info of %{public}s", __func__, sysfsInfo.name);
+            THERMAL_HILOGI(COMP_HDI, "init sysfs info of %{public}s", sysfsInfo.name);
             int32_t ret = sscanf_s(sysfsInfo.name, THERMAL_ZONE_DIR_NAME.c_str(), &id);
             if (ret < HDF_SUCCESS) {
                 return ret;
             }
 
-            HDF_LOGI("%{public}s: Sensor %{public}s found at tz: %{public}d", __func__, sysfsInfo.name, id);
+            THERMAL_HILOGI(COMP_HDI, "Sensor %{public}s found at tz: %{public}d", sysfsInfo.name, id);
             sysfsInfo.fd = id;
             if (index > MAX_SYSFS_SIZE) {
-                HDF_LOGE("%{public}s: too many plugged types", __func__);
+                THERMAL_HILOGE(COMP_HDI, "too many plugged types");
                 break;
             }
 
@@ -144,13 +143,13 @@ int32_t ThermalZoneManager::ReadSysfsFile(const char* path, char* buf, size_t si
     int32_t readSize;
     int32_t fd = open(path, O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, path);
+        THERMAL_HILOGE(COMP_HDI, "failed to open %{public}s", path);
         return HDF_ERR_IO;
     }
 
     readSize = read(fd, buf, size - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, path);
+        THERMAL_HILOGE(COMP_HDI, "failed to read %{public}s", path);
         close(fd);
         return HDF_ERR_IO;
     }
@@ -166,7 +165,7 @@ int32_t ThermalZoneManager::ReadThermalSysfsToBuff(const char* path, char* buf, 
 {
     int32_t ret = ReadSysfsFile(path, buf, size);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGW("%{public}s: read path %{private}s failed, ret: %{public}d", __func__, path, ret);
+        THERMAL_HILOGW(COMP_HDI, "read path %{private}s failed, ret: %{public}d", path, ret);
         return ret;
     }
 
@@ -177,19 +176,19 @@ int32_t ThermalZoneManager::ParseThermalZoneInfo()
 {
     int32_t ret;
     char bufType[MAX_BUFF_SIZE] = {0};
-    HDF_LOGI("%{public}s start to parse thermal zone", __func__);
+    THERMAL_HILOGD(COMP_HDI, "start to parse thermal zone");
 
     ret = InitThermalZoneSysfs();
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: failed to init thermal zone node", __func__);
+        THERMAL_HILOGE(COMP_HDI, "failed to init thermal zone node");
     }
     std::map<std::string, std::string> tzPathMap;
     if (!lTzSysPathInfo_.empty()) {
-        HDF_LOGI("%{public}s: tzInfo.size=%{public}zu", __func__, GetLTZPathInfo().size());
+        THERMAL_HILOGI(COMP_HDI, "tzInfo.size=%{public}zu", GetLTZPathInfo().size());
         for (auto iter = lTzSysPathInfo_.begin(); iter != lTzSysPathInfo_.end(); iter++) {
             ret = ReadThermalSysfsToBuff(iter->typePath, bufType, sizeof(bufType));
             if (ret != HDF_SUCCESS) {
-                HDF_LOGE("%{public}s: failed to read thermal zone type", __func__);
+                THERMAL_HILOGE(COMP_HDI, "failed to read thermal zone type");
                 return ret;
             }
             std::string tzType = bufType;
@@ -224,7 +223,7 @@ int32_t ThermalZoneManager::UpdateThermalZoneData(std::map<std::string, std::str
             ReportedThermalData data;
             data.type = tnIter.type;
             if (access(tnIter.path.c_str(), 0) == NUM_ZERO) {
-                HDF_LOGI("%{public}s: This directory already exists.", __func__);
+                THERMAL_HILOGD(COMP_HDI, "This directory already exists.");
                 data.tempPath = tnIter.path;
             }
             sensorIter.second->thermalDataList_.push_back(data);
@@ -246,7 +245,7 @@ void ThermalZoneManager::CalculateMaxCd()
 {
     sensorTypeMap_ = ThermalHdfConfig::GetInsance().GetSensorTypeMap();
     if (sensorTypeMap_.empty()) {
-        HDF_LOGE("%{public}s: configed sensor info is empty", __func__);
+        THERMAL_HILOGE(COMP_HDI, "configed sensor info is empty");
         return;
     }
 
@@ -257,7 +256,7 @@ void ThermalZoneManager::CalculateMaxCd()
         }
     }
     maxCd_ = GetIntervalCommonDivisor(intervalList);
-    HDF_LOGI("%{public}s: maxCd_ %{public}d", __func__, maxCd_);
+    THERMAL_HILOGI(COMP_HDI, "maxCd_ %{public}d", maxCd_);
 }
 
 int32_t ThermalZoneManager::GetMaxCommonDivisor(int32_t a, int32_t b)
@@ -302,7 +301,7 @@ void ThermalZoneManager::ReportThermalZoneData(int32_t reportTime, std::vector<i
 {
     char tempBuf[MAX_BUFF_SIZE] = {0};
     if (sensorTypeMap_.empty()) {
-        HDF_LOGI("%{public}s: sensorTypeMap is empty", __func__); {
+        THERMAL_HILOGI(COMP_HDI, "sensorTypeMap is empty"); {
             return;
         }
     }
@@ -315,20 +314,20 @@ void ThermalZoneManager::ReportThermalZoneData(int32_t reportTime, std::vector<i
         if (sensorIter.second->multiple_ == NUM_ZERO) {
             return;
         }
-        HDF_LOGI("%{public}s: multiple %{public}d", __func__, sensorIter.second->multiple_);
+        THERMAL_HILOGI(COMP_HDI, "multiple %{public}d", sensorIter.second->multiple_);
         if (reportTime % (sensorIter.second->multiple_) == NUM_ZERO) {
             for (auto iter : sensorIter.second->thermalDataList_) {
-                HDF_LOGI("%{public}s: data type %{public}s", __func__, iter.type.c_str());
-                HDF_LOGI("%{public}s: data temp path %{public}s", __func__, iter.tempPath.c_str());
+                THERMAL_HILOGI(COMP_HDI, "data type %{public}s", iter.type.c_str());
+                THERMAL_HILOGI(COMP_HDI, "data temp path %{public}s", iter.tempPath.c_str());
                 ThermalZoneInfo info;
                 info.type = iter.type;
                 ret = ReadThermalSysfsToBuff(iter.tempPath.c_str(), tempBuf, sizeof(tempBuf));
                 if (ret != NUM_ZERO) {
-                    HDF_LOGE("%{public}s: failed to read thermal zone temp", __func__);
+                    THERMAL_HILOGE(COMP_HDI, "failed to read thermal zone temp");
                     continue;
                 }
                 info.temp = ConvertInt(tempBuf);
-                HDF_LOGI("%{public}s: temp=%{public}d", __func__, info.temp);
+                THERMAL_HILOGI(COMP_HDI, "temp=%{public}d", info.temp);
                 tzInfoAcaualEvent_.info.push_back(info);
             }
         }

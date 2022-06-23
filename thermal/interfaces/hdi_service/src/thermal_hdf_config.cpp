@@ -15,11 +15,9 @@
 
 #include "thermal_hdf_config.h"
 
+#include "thermal_log.h"
 #include "hdf_remote_service.h"
 #include "osal/osal_mem.h"
-#include "utils/hdf_log.h"
-
-#define HDF_LOG_TAG ThermalHdfConfig
 
 namespace OHOS {
 namespace HDI {
@@ -49,21 +47,21 @@ int32_t ThermalHdfConfig::ParseThermalHdiXMLConfig(const std::string &path)
     std::unique_ptr<xmlDoc, decltype(&xmlFreeDoc)> docPtr(
         xmlReadFile(path.c_str(), nullptr, XML_PARSE_NOBLANKS), xmlFreeDoc);
     if (docPtr == nullptr) {
-        HDF_LOGE("%{public}s: failed to read xml file", __func__);
+        THERMAL_HILOGE(COMP_HDI, "failed to read xml file");
         return HDF_ERR_INVALID_OBJECT;
     }
 
     auto rootNode = xmlDocGetRootElement(docPtr.get());
     if (rootNode == nullptr) {
-        HDF_LOGE("%{public}s: failed to read root node", __func__);
+        THERMAL_HILOGE(COMP_HDI, "failed to read root node");
         return HDF_ERR_INVALID_OBJECT;
     }
 
     if (!xmlStrcmp(rootNode->name, BAD_CAST"thermal")) {
         this->thermal_.version = std::stof((char *)xmlGetProp(rootNode, BAD_CAST"version"));
         this->thermal_.product = (char *)xmlGetProp(rootNode, BAD_CAST"product");
-        HDF_LOGI("%{public}s: version: %{public}s, product: %{public}s",
-            __func__, this->thermal_.version.c_str(), this->thermal_.product.c_str());
+        THERMAL_HILOGI(COMP_HDI, "version: %{public}s, product: %{public}s",
+            this->thermal_.version.c_str(), this->thermal_.product.c_str());
     }
 
     for (auto node = rootNode->children; node; node = node->next) {
@@ -87,8 +85,8 @@ void ThermalHdfConfig::ParseBaseNode(xmlNodePtr node)
         BaseItem item;
         item.tag = (char *)xmlGetProp(cur, BAD_CAST"tag");
         item.value = (char *)xmlGetProp(cur, BAD_CAST"value");
-        HDF_LOGI("%{public}s: ParseBaseNode tag: %{public}s, value: %{public}s",
-            __func__, item.tag.c_str(), item.value.c_str());
+        THERMAL_HILOGI(COMP_HDI, "ParseBaseNode tag: %{public}s, value: %{public}s",
+            item.tag.c_str(), item.value.c_str());
         vBase.push_back(item);
         cur = cur->next;
     }
@@ -103,8 +101,8 @@ void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
         std::string groupName = (char*)xmlGetProp(cur, BAD_CAST"name");
         sensorInfo->SetGroupName(groupName);
         uint32_t interval = atoi((char*)xmlGetProp(cur, BAD_CAST"interval"));
-        HDF_LOGI("%{public}s: ParsePollingNode groupName: %{public}s, interval: %{public}d",
-            __func__, groupName.c_str(), interval);
+        THERMAL_HILOGI(COMP_HDI, "ParsePollingNode groupName: %{public}s, interval: %{public}d",
+            groupName.c_str(), interval);
         sensorInfo->SetGroupInterval(interval);
         std::vector<XMLThermalZoneInfo> xmlTzInfoList;
         std::vector<XMLThermalNodeInfo> xmlTnInfoList;
@@ -112,15 +110,15 @@ void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
             if (!xmlStrcmp(subNode->name, BAD_CAST"thermal_zone")) {
                 XMLThermalZoneInfo tz;
                 GetThermalZoneNodeInfo(tz, subNode);
-                HDF_LOGI("%{public}s: ParsePollingNode ParsePollingNodetztype: %{public}s, replace: %{public}s",
-                    __func__, tz.type.c_str(), tz.replace.c_str());
+                THERMAL_HILOGI(COMP_HDI, "ParsePollingNode ParsePollingNodetztype: %{public}s, replace: %{public}s",
+                    tz.type.c_str(), tz.replace.c_str());
                 xmlTzInfoList.push_back(tz);
             } else if (!xmlStrcmp(subNode->name, BAD_CAST"thermal_node")) {
                 XMLThermalNodeInfo tn;
                 tn.type = (char *)xmlGetProp(subNode, BAD_CAST"type");
                 tn.path = (char *)xmlGetProp(subNode, BAD_CAST"path");
-                HDF_LOGI("%{public}s: ParsePollingNode tntype: %{public}s, path: %{public}s",
-                    __func__, tn.type.c_str(), tn.path.c_str());
+                THERMAL_HILOGI(COMP_HDI, "ParsePollingNode tntype: %{public}s, path: %{public}s",
+                    tn.type.c_str(), tn.path.c_str());
                 xmlTnInfoList.push_back(tn);
             }
         }
