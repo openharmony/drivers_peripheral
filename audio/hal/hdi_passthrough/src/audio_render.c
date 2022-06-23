@@ -70,7 +70,7 @@ int32_t AudioRenderStart(AudioHandle handle)
         LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
+    if (!hwRender->renderParam.renderMode.ctlParam.stop) {
         LOG_FUN_ERR("AudioRender already start!");
         return AUDIO_HAL_ERR_AO_BUSY; // render is busy now
     }
@@ -83,12 +83,7 @@ int32_t AudioRenderStart(AudioHandle handle)
         LOG_FUN_ERR("AudioRenderStart SetParams FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    char *buffer = (char *)calloc(1, FRAME_DATA);
-    if (buffer == NULL) {
-        LOG_FUN_ERR("Calloc Render buffer Fail!");
-        return AUDIO_HAL_ERR_MALLOC_FAIL;
-    }
-    hwRender->renderParam.frameRenderMode.buffer = buffer;
+    hwRender->renderParam.renderMode.ctlParam.stop = false;
     AudioLogRecord(INFO, "[%s]-[%s]-[%d] :> [%s]", __FILE__, __func__, __LINE__, "Audio Render Start");
     return AUDIO_HAL_SUCCESS;
 }
@@ -106,12 +101,11 @@ int32_t AudioRenderStop(AudioHandle handle)
         LOG_FUN_ERR("hwRender is invalid");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
-        AudioMemFree((void **)&hwRender->renderParam.frameRenderMode.buffer);
-    } else {
+    if (hwRender->renderParam.renderMode.ctlParam.stop) {
         LOG_FUN_ERR("Repeat invalid stop operation!");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
+    hwRender->renderParam.renderMode.ctlParam.stop = true;
     if (hwRender->devDataHandle == NULL) {
         LOG_FUN_ERR("RenderStart Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
@@ -144,7 +138,7 @@ int32_t AudioRenderPause(AudioHandle handle)
         LOG_FUN_ERR("hwRender is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    if (hwRender->renderParam.frameRenderMode.buffer == NULL) {
+    if (hwRender->renderParam.renderMode.ctlParam.stop) {
         LOG_FUN_ERR("AudioRender already stop!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -816,6 +810,10 @@ int32_t AudioRenderRenderFrame(struct AudioRender *render, const void *frame,
         hwRender->renderParam.frameRenderMode.buffer == NULL) {
         LOG_FUN_ERR("Render Frame Paras is NULL!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    if (hwRender->renderParam.renderMode.ctlParam.stop) {
+        LOG_FUN_ERR("Render not started!");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     if (FRAME_DATA < requestBytes) {
         LOG_FUN_ERR("Out of FRAME_DATA size!");
