@@ -16,10 +16,10 @@
 #define WLAN_EXTEND_CMD_H
 #include "../wlan_impl.h"
 
-int32_t WlanInterfaceStartChannelMeas(struct IWlanInterface *self, const char* ifName, int32_t commandId,
-    const int32_t* paramBuf, uint32_t paramBufLen);
-int32_t WlanInterfaceGetChannelMeasResult(struct IWlanInterface *self, const char* ifName, int32_t commandId,
-    uint32_t* paramBuf, uint32_t* paramBufLen);
+int32_t WlanInterfaceStartChannelMeas(struct IWlanInterface *self, const char *ifName,
+    const struct MeasChannelParam *measChannelParam);
+int32_t WlanInterfaceGetChannelMeasResult(struct IWlanInterface *self, const char *ifName,
+    struct MeasChannelResult *measChannelResult);
 int32_t WlanExtendInterfaceWifiConstruct(void);
 int32_t WlanExtendInterfaceWifiDestruct(void);
 #endif
