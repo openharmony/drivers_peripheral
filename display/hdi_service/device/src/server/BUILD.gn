@@ -61,5 +61,5 @@ ohos_shared_library("libdisplay_device_server") {
   install_images = [ chipset_base_dir ]
   install_enable = true
   subsystem_name = "hdf"
-  part_name = "display_device_driver"
+  part_name = "drivers_peripheral_display"
 }
