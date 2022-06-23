@@ -103,7 +103,7 @@ struct VibratorInterface {
     /**
      * @brief Start the vibrator according to the incoming vibration effect.
      *
-     * @param vibrationPeriod Indicates vibration period (in ms).
+     * @param duration Indicates the duration that the vibration lasts, in milliseconds.
      *
      * @param intensity indicates vibrator intensity in a vibration period.
      *
@@ -117,7 +117,7 @@ struct VibratorInterface {
      * @since 3.2
      * @version 1.1
      */
-    int32_t (*SetModulationParameter)(uint32_t vibrationPeriod, int32_t intensity, int32_t frequency);
+    int32_t (*EnableVibratorModulation)(uint32_t duration, int32_t intensity, int32_t frequency);
 };
 
 /**

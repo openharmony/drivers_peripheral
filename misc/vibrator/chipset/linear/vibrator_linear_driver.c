@@ -14,6 +14,7 @@
 #include "hdf_device_desc.h"
 #include "osal_mem.h"
 #include "vibrator_driver.h"
+#include "vibrator_parser.h"
 #include "vibrator_driver_type.h"
 
 #define HDF_LOG_TAG    hdf_vibrator_driver
@@ -30,14 +31,15 @@ static int32_t StartLinearVibrator()
     struct VibratorLinearDriverData *drvData = GetLinearVibratorData();
     CHECK_VIBRATOR_NULL_PTR_RETURN_VALUE(drvData, HDF_FAILURE);
 
-    if (drvData->busType != VIBRATOR_BUS_GPIO) {
+    if (drvData->linearCfgData->vibratorBus.busType != VIBRATOR_BUS_GPIO) {
         HDF_LOGE("%s: vibrator bus type not gpio", __func__);
         return HDF_FAILURE;
     }
 
-    ret = GpioWrite(drvData->gpioNum, GPIO_VAL_LOW);
+    ret = GpioWrite(drvData->linearCfgData->vibratorBus.GpioNum, GPIO_VAL_LOW);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: pull gpio%d to %d level failed", __func__, drvData->gpioNum, GPIO_VAL_LOW);
+        HDF_LOGE("%s: pull gpio%d to %d level failed", __func__,
+            drvData->linearCfgData->vibratorBus.GpioNum, GPIO_VAL_LOW);
         return ret;
     }
     return HDF_SUCCESS;
@@ -56,14 +58,15 @@ static int32_t StopLinearVibrator()
     struct VibratorLinearDriverData *drvData = GetLinearVibratorData();
     CHECK_VIBRATOR_NULL_PTR_RETURN_VALUE(drvData, HDF_FAILURE);
 
-    if (drvData->busType != VIBRATOR_BUS_GPIO) {
+    if (drvData->linearCfgData->vibratorBus.busType != VIBRATOR_BUS_GPIO) {
         HDF_LOGE("%s: vibrator bus type not gpio", __func__);
         return HDF_FAILURE;
     }
 
-    ret = GpioWrite(drvData->gpioNum, GPIO_VAL_HIGH);
+    ret = GpioWrite(drvData->linearCfgData->vibratorBus.GpioNum, GPIO_VAL_HIGH);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: pull gpio%d to %d level failed", __func__, drvData->gpioNum, GPIO_VAL_HIGH);
+        HDF_LOGE("%s: pull gpio%d to %d level failed", __func__,
+            drvData->linearCfgData->vibratorBus.GpioNum, GPIO_VAL_HIGH);
         return ret;
     }
     return HDF_SUCCESS;
@@ -97,37 +100,6 @@ int32_t BindLinearVibratorDriver(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-static int32_t ParserLinearConfig(const struct DeviceResourceNode *node, struct VibratorLinearDriverData *drvData)
-{
-    int32_t ret;
-    struct DeviceResourceIface *parser = NULL;
-    const struct DeviceResourceNode *configNode = NULL;
-
-    CHECK_VIBRATOR_NULL_PTR_RETURN_VALUE(node, HDF_FAILURE);
-    CHECK_VIBRATOR_NULL_PTR_RETURN_VALUE(drvData, HDF_FAILURE);
-
-    parser = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
-    CHECK_VIBRATOR_NULL_PTR_RETURN_VALUE(parser, HDF_ERR_INVALID_PARAM);
-    CHECK_VIBRATOR_NULL_PTR_RETURN_VALUE(parser->GetChildNode, HDF_ERR_INVALID_PARAM);
-
-    configNode = parser->GetChildNode(node, "vibratorChipConfig");
-    ret = parser->GetUint32(configNode, "busType", &drvData->busType, 0);
-    CHECK_VIBRATOR_PARSER_RESULT_RETURN_VALUE(ret, "busType");
-    if (drvData->busType == VIBRATOR_BUS_GPIO) {
-        ret = parser->GetUint32(configNode, "gpioNum", &drvData->gpioNum, 0);
-        CHECK_VIBRATOR_PARSER_RESULT_RETURN_VALUE(ret, "gpioNum");
-    }
-
-    ret = parser->GetUint32(configNode, "startReg", &drvData->startReg, 0);
-    CHECK_VIBRATOR_PARSER_RESULT_RETURN_VALUE(ret, "startReg");
-    ret = parser->GetUint32(configNode, "stopReg", &drvData->stopReg, 0);
-    CHECK_VIBRATOR_PARSER_RESULT_RETURN_VALUE(ret, "stopReg");
-    ret = parser->GetUint32(configNode, "startMask", &drvData->mask, 0);
-    CHECK_VIBRATOR_PARSER_RESULT_RETURN_VALUE(ret, "startMask");
-
-    return HDF_SUCCESS;
-}
-
 int32_t InitLinearVibratorDriver(struct HdfDeviceObject *device)
 {
     static struct VibratorOps ops;
@@ -141,18 +113,27 @@ int32_t InitLinearVibratorDriver(struct HdfDeviceObject *device)
     ops.Start = StartLinearVibrator;
     ops.StartEffect = StartEffectLinearVibrator;
     ops.Stop = StopLinearVibrator;
+    ops.SetParameter = NULL;
 
-    if (RegisterVibrator(&ops) != HDF_SUCCESS) {
+    if (RegisterVibratorOps(&ops) != HDF_SUCCESS) {
         HDF_LOGE("%s: register vibrator ops fail", __func__);
         return HDF_FAILURE;
     }
 
-    if (ParserLinearConfig(device->property, drvData) != HDF_SUCCESS) {
+    drvData->linearCfgData = (struct VibratorCfgData *)OsalMemCalloc(sizeof(*drvData->linearCfgData));
+    CHECK_VIBRATOR_NULL_PTR_RETURN_VALUE(drvData->linearCfgData, HDF_ERR_MALLOC_FAIL);
+
+    if (GetVibratorBaseConfigData(device->property, drvData->linearCfgData) != HDF_SUCCESS) {
         HDF_LOGE("%s: parser vibrator cfg fail", __func__);
         return HDF_FAILURE;
     }
 
-    if (GpioSetDir(drvData->gpioNum, GPIO_DIR_OUT) != HDF_SUCCESS) {
+    if (RegisterVibratorInfo(&drvData->linearCfgData->vibratorInfo) != HDF_SUCCESS) {
+        HDF_LOGE("%s: register vibrator info fail", __func__);
+        return HDF_FAILURE;
+    }
+
+    if (GpioSetDir(drvData->linearCfgData->vibratorBus.GpioNum, GPIO_DIR_OUT) != HDF_SUCCESS) {
         HDF_LOGE("%s: set vibrator gpio fail", __func__);
         return HDF_FAILURE;
     }
@@ -173,7 +154,8 @@ void ReleaseLinearVibratorDriver(struct HdfDeviceObject *device)
         return;
     }
 
-    (void)OsalMemFree(drvData);
+    OsalMemFree(drvData->linearCfgData);
+    OsalMemFree(drvData);
     g_linearVibratorData = NULL;
 }
 

@@ -29,10 +29,15 @@ namespace {
     uint32_t g_noDuration = 0;
     uint32_t g_sleepTime1 = 2000;
     uint32_t g_sleepTime2 = 5000;
+    int32_t g_intensity1 = 30;
+    int32_t g_intensity2 = -30;
+    int32_t g_frequency1 = 200;
+    int32_t g_frequency2 = -200;
     const char *g_timeSequence = "haptic.clock.timer";
     const char *g_builtIn = "haptic.default.effect";
     const char *g_arbitraryStr = "arbitraryString";
     const struct VibratorInterface *g_vibratorDev = nullptr;
+    static struct VibratorInfo *g_vibratorInfo = nullptr;
 }
 
 class HdfVibratorTest : public testing::Test {
@@ -252,4 +257,119 @@ HWTEST_F(HdfVibratorTest, ExecuteVibratorEffect_007, TestSize.Level1)
 
     int32_t endRet = g_vibratorDev->Stop(VIBRATOR_MODE_ONCE);
     EXPECT_EQ(endRet, HDF_SUCCESS);
+}
+
+/**
+  * @tc.name: GetVibratorInfo_001
+  * @tc.desc: Obtain the vibrator setting strength, frequency capability and range in the system.
+  * Validity check of input parameters.
+  * @tc.type: FUNC
+  * @tc.require: AR000FK1JN,AR000FK1J0,AR000FK1JP
+  */
+HWTEST_F(HdfVibratorTest, GetVibratorInfo_001, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorDev);
+
+    int32_t startRet = g_vibratorDev->GetVibratorInfo(&g_vibratorInfo);
+    EXPECT_EQ(startRet, HDF_SUCCESS);
+    EXPECT_NE(g_vibratorInfo, nullptr);
+
+    printf("intensity = %d, intensityMaxValue = %d, intensityMinValue = %d\n\t",
+    g_vibratorInfo->isSupportIntensity, g_vibratorInfo->intensityMaxValue, g_vibratorInfo->intensityMinValue);
+    printf("frequency = %d, frequencyMaxValue = %d, frequencyMinValue = %d\n\t",
+    g_vibratorInfo->isSupportFrequency, g_vibratorInfo->frequencyMaxValue, g_vibratorInfo->frequencyMinValue);
+}
+
+/**
+  * @tc.name: GetVibratorInfo_002
+  * @tc.desc: Obtain the vibrator setting strength, frequency capability and range in the system.
+  * Validity check of input parameters.
+  * @tc.type: FUNC
+  * @tc.require: AR000FK1JN,AR000FK1J0,AR000FK1JP
+  */
+HWTEST_F(HdfVibratorTest, GetVibratorInfo_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorDev);
+
+    int32_t startRet = g_vibratorDev->GetVibratorInfo(nullptr);
+    EXPECT_EQ(startRet, HDF_FAILURE);
+}
+
+/**
+  * @tc.name: EnableVibratorModulation_001
+  * @tc.desc: Start vibrator based on the setting vibration effect.
+  * @tc.type: FUNC
+  * @tc.require: AR000FK1JN,AR000FK1J0,AR000FK1JP
+  */
+HWTEST_F(HdfVibratorTest, EnableVibratorModulation_001, TestSize.Level1)
+{
+    int32_t startRet;
+    ASSERT_NE(nullptr, g_vibratorDev);
+    EXPECT_GT(g_duration, 0);
+
+    if ((g_vibratorInfo->isSupportIntensity == 1) || (g_vibratorInfo->isSupportFrequency == 1)) {
+        EXPECT_GE(g_intensity1, g_vibratorInfo->intensityMinValue);
+        EXPECT_LE(g_intensity1, g_vibratorInfo->intensityMaxValue);
+        EXPECT_GE(g_frequency1, g_vibratorInfo->frequencyMinValue);
+        EXPECT_LE(g_frequency1, g_vibratorInfo->frequencyMaxValue);
+
+        startRet = g_vibratorDev->EnableVibratorModulation(g_duration, g_intensity1, g_frequency1);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+        OsalMSleep(g_sleepTime1);
+        startRet = g_vibratorDev->Stop(VIBRATOR_MODE_ONCE);
+        EXPECT_EQ(startRet, HDF_SUCCESS);
+    }
+}
+
+/**
+  * @tc.name: EnableVibratorModulation_002
+  * @tc.desc: Start vibrator based on the setting vibration effect.
+  * Validity check of input parameters.
+  * @tc.type: FUNC
+  * @tc.require: AR000FK1JN,AR000FK1J0,AR000FK1JP
+  */
+HWTEST_F(HdfVibratorTest, EnableVibratorModulation_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorDev);
+    int32_t startRet;
+    if ((g_vibratorInfo->isSupportIntensity == 1) || (g_vibratorInfo->isSupportFrequency == 1)) {
+        startRet = g_vibratorDev->EnableVibratorModulation(g_noDuration, g_intensity1, g_frequency1);
+        EXPECT_EQ(startRet, VIBRATOR_NOT_PERIOD);
+    }
+}
+
+/**
+  * @tc.name: EnableVibratorModulation_003
+  * @tc.desc: Start vibrator based on the setting vibration effect.
+  * Validity check of input parameters.
+  * @tc.type: FUNC
+  * @tc.require: AR000FK1JN,AR000FK1J0,AR000FK1JP
+  */
+HWTEST_F(HdfVibratorTest, EnableVibratorModulation_003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorDev);
+    int32_t startRet;
+
+    if ((g_vibratorInfo->isSupportIntensity == 1) || (g_vibratorInfo->isSupportFrequency == 1)) {
+        startRet = g_vibratorDev->EnableVibratorModulation(g_duration, g_intensity2, g_frequency1);
+        EXPECT_EQ(startRet, VIBRATOR_NOT_INTENSITY);
+    }
+}
+
+/**
+  * @tc.name: EnableVibratorModulation_004
+  * @tc.desc: Start vibrator based on the setting vibration effect.
+  * Validity check of input parameters.
+  * @tc.type: FUNC
+  * @tc.require: AR000FK1JN,AR000FK1J0,AR000FK1JP
+  */
+HWTEST_F(HdfVibratorTest, EnableVibratorModulation_004, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorDev);
+    int32_t startRet;
+
+    if ((g_vibratorInfo->isSupportIntensity == 1) || (g_vibratorInfo->isSupportFrequency == 1)) {
+        startRet = g_vibratorDev->EnableVibratorModulation(g_duration, g_intensity1, g_frequency2);
+        EXPECT_EQ(startRet, VIBRATOR_NOT_FREQUENCY);
+    }
 }

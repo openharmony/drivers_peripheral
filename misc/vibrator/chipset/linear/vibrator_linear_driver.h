@@ -14,11 +14,7 @@
 struct VibratorLinearDriverData {
     struct IDeviceIoService ioService;
     struct HdfDeviceObject *device;
-    uint32_t busType;
-    uint32_t gpioNum;
-    uint32_t startReg;
-    uint32_t stopReg;
-    uint32_t mask;
+    struct VibratorCfgData *linearCfgData;
 };
 
 #endif /* VIBRATOR_LINEAR_DRIVER_H */
