@@ -66,7 +66,7 @@ ohos_executable("codec_decode_test_ipc") {
   }
 
   subsystem_name = "hdf"
-  part_name = "codec_device_driver"
+  part_name = "drivers_peripheral_codec"
 }
 
 ohos_executable("codec_encode_test_ipc") {
@@ -120,7 +120,7 @@ ohos_executable("codec_encode_test_ipc") {
   }
 
   subsystem_name = "hdf"
-  part_name = "codec_device_driver"
+  part_name = "drivers_peripheral_codec"
 }
 
 group("codec_hdi_demo") {

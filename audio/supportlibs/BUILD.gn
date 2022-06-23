@@ -40,7 +40,7 @@ config("audio_interface_config") {
     "-ffunction-sections",
     "-fdata-sections",
   ]
-  if (audio_device_driver_feature_mono_to_stereo) {
+  if (drivers_peripheral_audio_feature_mono_to_stereo) {
     cflags += [ "-DMONO_TO_STEREO" ]
   }
   if (enable_audio_alsa_mode) {
@@ -75,7 +75,7 @@ if (defined(ohos_lite)) {
     external_deps = [ "hdf_core:libhdf_utils" ]
     public_configs = [ ":audio_interface_config" ]
     subsystem_name = "hdf"
-    part_name = "audio_device_driver"
+    part_name = "drivers_peripheral_audio"
   }
 
   ohos_shared_library("hdi_audio_interface_lib_render") {
@@ -105,7 +105,7 @@ if (defined(ohos_lite)) {
     }
     public_configs = [ ":audio_interface_config" ]
     subsystem_name = "hdf"
-    part_name = "audio_device_driver"
+    part_name = "drivers_peripheral_audio"
   }
 } else {
   ohos_shared_library("hdi_audio_interface_lib_capture") {
@@ -175,7 +175,7 @@ if (defined(ohos_lite)) {
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "audio_device_driver"
+    part_name = "drivers_peripheral_audio"
   }
 
   ohos_shared_library("hdi_audio_interface_lib_render") {
@@ -246,6 +246,6 @@ if (defined(ohos_lite)) {
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "audio_device_driver"
+    part_name = "drivers_peripheral_audio"
   }
 }
