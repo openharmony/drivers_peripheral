@@ -20,7 +20,7 @@
         id = 2;
         name = "snapshot";
     }
-    normal :: scene_info {
+     :: scene_info {
         id = 0;
         name = "normal";
     }
