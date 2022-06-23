@@ -68,7 +68,7 @@ if (defined(ohos_lite)) {
     }
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "display_device_driver"
+    part_name = "drivers_peripheral_display"
   }
 
   ohos_shared_library("libhdi_display_gralloc_proxy") {
@@ -95,7 +95,7 @@ if (defined(ohos_lite)) {
     external_deps += [ "graphic_chipsetsdk:buffer_handle" ]
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "display_device_driver"
+    part_name = "drivers_peripheral_display"
   }
 
   ohos_shared_library("libhdi_mapper_adapter") {
@@ -117,6 +117,6 @@ if (defined(ohos_lite)) {
     }
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "display_device_driver"
+    part_name = "drivers_peripheral_display"
   }
 }
