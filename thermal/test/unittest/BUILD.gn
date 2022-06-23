@@ -20,7 +20,8 @@ module_output_path = "hdf/thermal"
 ohos_unittest("hdi_unittest_thermal") {
   module_out_path = module_output_path
 
-  include_dirs = []
+  include_dirs =
+      [ "//drivers/peripheral/thermal/interfaces/hdi_service/include" ]
 
   sources = [ "./hdf_thermal_hdi_test.cpp" ]
 
