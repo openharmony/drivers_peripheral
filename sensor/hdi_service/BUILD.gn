@@ -48,7 +48,7 @@ ohos_shared_library("libsensor_interface_service_1.0") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "sensor_device_driver"
+  part_name = "drivers_peripheral_sensor"
 }
 
 ohos_shared_library("libsensor_driver") {
@@ -86,7 +86,7 @@ ohos_shared_library("libsensor_driver") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "sensor_device_driver"
+  part_name = "drivers_peripheral_sensor"
 }
 
 group("hdi_sensor_service") {

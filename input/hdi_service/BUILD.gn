@@ -51,7 +51,7 @@ ohos_shared_library("libinput_interfaces_service_1.0") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "input_device_driver"
+  part_name = "drivers_peripheral_input"
 }
 
 ohos_shared_library("libinput_driver") {
@@ -92,7 +92,7 @@ ohos_shared_library("libinput_driver") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "input_device_driver"
+  part_name = "drivers_peripheral_input"
 }
 
 group("hdi_input_service") {

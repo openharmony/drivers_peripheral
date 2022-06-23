@@ -63,12 +63,12 @@ ohos_unittest("test_hdisrv") {
   ]
 
   external_deps = [
+    "drivers_peripheral_input:hdi_input",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
-    "input_device_driver:hdi_input",
     "ipc:ipc_single",
   ]
 }
@@ -102,12 +102,12 @@ ohos_unittest("test_capacity_shutdown") {
   ]
 
   external_deps = [
+    "drivers_peripheral_input:hdi_input",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
-    "input_device_driver:hdi_input",
     "ipc:ipc_single",
   ]
 }
