@@ -1,10 +1,10 @@
 {
-  "name": "motion_device_driver",
+  "name": "drivers_peripheral_motion",
   "description": "motion device driver",
   "version": "3.2",
   "license": "Apache License 2.0",
   "component": {
-    "name": "motion_device_driver",
+    "name": "drivers_peripheral_motion",
     "subsystem": "hdf",
     "syscap": [ "" ],
     "adapter_system_type": ["standard"],
