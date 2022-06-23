@@ -1,10 +1,10 @@
 {
-  "name": "battery_device_driver",
+  "name": "drivers_peripheral_battery",
   "description": "battery hdf",
   "version": "3.1",
   "license": "Apache License 2.0",
   "component": {
-    "name": "battery_device_driver",
+    "name": "drivers_peripheral_battery",
     "subsystem": "hdf",
     "syscap": [ "" ],
     "adapter_system_type": ["standard", "small"],
