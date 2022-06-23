@@ -38,7 +38,7 @@ ohos_shared_library("libcodec_client") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "codec_device_driver"
+  part_name = "drivers_peripheral_codec"
 }
 
 group("codec_client") {
@@ -95,7 +95,7 @@ ohos_shared_library("libcodec_server") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "codec_device_driver"
+  part_name = "drivers_peripheral_codec"
 }
 
 group("codec_service") {
