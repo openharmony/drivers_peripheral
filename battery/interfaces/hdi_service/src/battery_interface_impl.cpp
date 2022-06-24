@@ -21,6 +21,10 @@ namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_0 {
+namespace {
+sptr<BatteryInterfaceImpl::BatteryDeathRecipient> g_deathRecipient = nullptr;
+}
+
 extern "C" IBatteryInterface *BatteryInterfaceImplGetInstance(void)
 {
     using OHOS::HDI::Battery::V1_0::BatteryInterfaceImpl;
@@ -86,11 +90,19 @@ int32_t BatteryInterfaceImpl::Register(const sptr<IBatteryCallback>& callback)
     batteryCallback_ = callback;
     BATTERY_HILOGD(FEATURE_BATT_INFO, "IBatteryCallback registered, ref is %{public}p", callback.GetRefPtr());
     loop_->InitCallback(batteryCallback_);
+
+    g_deathRecipient = new BatteryInterfaceImpl::BatteryDeathRecipient(this);
+    if (g_deathRecipient == nullptr) {
+        BATTERY_HILOGE(COMP_HDI, "Failed to allocate BatteryDeathRecipient");
+        return HDF_ERR_MALLOC_FAIL;
+    }
+    AddBatteryDeathRecipient(batteryCallback_);
     return HDF_SUCCESS;
 }
 
 int32_t BatteryInterfaceImpl::UnRegister()
 {
+    RemoveBatteryDeathRecipient(batteryCallback_);
     batteryCallback_ = nullptr;
     return HDF_SUCCESS;
 }
@@ -215,6 +227,35 @@ int32_t BatteryInterfaceImpl::GetBatteryInfo(BatteryInfo& info)
     info.technology = batteryInfo.technology_;
 
     return HDF_SUCCESS;
+}
+
+int32_t BatteryInterfaceImpl::AddBatteryDeathRecipient(const sptr<IBatteryCallback>& callback)
+{
+    const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IBatteryCallback>(callback);
+    bool result = remote->AddDeathRecipient(g_deathRecipient);
+    if (!result) {
+        BATTERY_HILOGE(COMP_HDI, "AddDeathRecipient fail");
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t BatteryInterfaceImpl::RemoveBatteryDeathRecipient(const sptr<IBatteryCallback>& callback)
+{
+    const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IBatteryCallback>(callback);
+    bool result = remote->RemoveDeathRecipient(g_deathRecipient);
+    if (!result) {
+        BATTERY_HILOGE(COMP_HDI, "RemoveDeathRecipient fail");
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+void BatteryInterfaceImpl::BatteryDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& object)
+{
+    interfaceImpl_->UnRegister();
 }
 }  // namespace V1_0
 }  // namespace Battery
