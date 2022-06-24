@@ -21,7 +21,13 @@ IppNode::IppNode(const std::string& name, const std::string& type)
 {
 }
 
-IppNode::~IppNode() {}
+IppNode::~IppNode()
+{
+    GetDeviceController();
+    sensorController_->SetMetaDataCallBack([this](const std::shared_ptr<CameraMetadata>& metadata) {
+        CAMERA_LOGE("V4L2 ipp node already been destroyed!");
+    });
+}
 
 RetCode IppNode::Init(const int32_t streamId)
 {
@@ -61,8 +67,13 @@ RetCode IppNode::Flush(const int32_t streamId)
         return RC_OK;
     }
 
-    algoPlugin_->Flush();
-    NodeBase::Flush(streamId);
+    if (algoPlugin_ == nullptr) {
+        CAMERA_LOGW("IppNode algoPlugin_ is null");
+        return RC_ERROR;
+    } else {
+        algoPlugin_->Flush();
+        NodeBase::Flush(streamId);
+    }
     return RC_OK;
 }
 
