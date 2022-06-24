@@ -14,12 +14,7 @@
  */
 
 #include "codeccreatecomponent_fuzzer.h"
-#include "codec_callback_type_stub.h"
-#include "codec_component_type.h"
-#include "codec_component_manager.h"
-
-#include <osal_mem.h>
-#include <hdf_log.h>
+#include "codeccommon_fuzzer.h"
 
 namespace OHOS {
 namespace Codec {
@@ -29,14 +24,14 @@ namespace Codec {
         struct CodecComponentManager *manager = nullptr;
         struct CodecComponentType *component = nullptr;
         CodecCallbackType* callback = CodecCallbackTypeStubGetInstance();
-        uint32_t componentId = 0;
+
         manager = GetCodecComponentManager();
         if (manager == nullptr) {
             HDF_LOGE("%{public}s: GetCodecComponentManager failed\n", __func__);
             return false;
         }
 
-        int32_t ret = manager->CreateComponent(&component, &componentId, (char*)data, (int64_t)data, callback);
+        int32_t ret = manager->CreateComponent(&component, &componentId, (char*)data, *(int64_t *)data, callback);
         if (ret == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: CreateComponent succeed\n", __func__);
             result = true;

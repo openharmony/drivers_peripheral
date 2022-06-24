@@ -178,7 +178,7 @@ int32_t WlanInterfaceGetAsscociatedStas(struct IWlanInterface *self, const struc
     }
     ret = g_apFeature->getAsscociatedStas(g_apFeature, wifiStaInfo, sizeof(struct StaInfo), num);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s get asscociated sta failed!, error code: %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s get associated sta failed!, error code: %{public}d", __func__, ret);
         OsalMemFree(wifiStaInfo);
         return ret;
     }
@@ -595,29 +595,6 @@ static void HdfWlanDelRemoteObj(struct IWlanCallback *self)
     WlanCallbackRelease(self);
 }
 
-int32_t HdfWLanHmlCallbackFun(const char* ifName, struct HmlEventData *data)
-{
-    struct HdfWlanRemoteNode *pos = NULL;
-    struct DListHead *head = &HdfStubDriver()->remoteListHead;
-    int32_t ret = HDF_FAILURE;
-
-    if (data == NULL || ifName == NULL) {
-        HDF_LOGE("%{public}s: data or ifName is NULL!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    DLIST_FOR_EACH_ENTRY(pos, head, struct HdfWlanRemoteNode, node) {
-        if (pos->service == NULL || pos->callbackObj == NULL) {
-            HDF_LOGW("%{public}s: pos->service or pos->callbackObj NULL", __func__);
-            continue;
-        }
-        ret = pos->callbackObj->NotifyMessage(pos->callbackObj, ifName, data);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
-        }
-    }
-    return ret;
-}
-
 int32_t WlanInterfaceRegisterEventCallback(struct IWlanInterface *self, struct IWlanCallback *cbFunc,
     const char *ifName)
 {
@@ -639,20 +616,11 @@ int32_t WlanInterfaceRegisterEventCallback(struct IWlanInterface *self, struct I
         HDF_LOGE("%{public}s: HdfSensorAddRemoteObj false", __func__);
         return ret;
     }
-    do {
-        ret = g_wifi->registerEventCallback(HdfWLanCallbackFun, ifName);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: Register failed!, error code: %{public}d", __func__, ret);
-            HdfWlanDelRemoteObj(cbFunc);
-            break;
-        }
-        ret = WlanInterfaceRegisterHmlCallback(HdfWLanHmlCallbackFun, ifName);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: Register hml callback failed!, error code: %{public}d", __func__, ret);
-            HdfWlanDelRemoteObj(cbFunc);
-            g_wifi->unregisterEventCallback(HdfWLanCallbackFun, ifName);
-        }
-    } while (0);
+    ret = g_wifi->registerEventCallback(HdfWLanCallbackFun, ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: Register failed!, error code: %{public}d", __func__, ret);
+        HdfWlanDelRemoteObj(cbFunc);
+    }
     
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
     return ret;
@@ -677,14 +645,8 @@ int32_t WlanInterfaceUnregisterEventCallback(struct IWlanInterface *self, struct
     if (DListIsEmpty(&HdfStubDriver()->remoteListHead)) {
         ret = g_wifi->unregisterEventCallback(HdfWLanCallbackFun, ifName);
         if (ret != HDF_SUCCESS) {
-            (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
             HDF_LOGE("%{public}s: Unregister failed!, error code: %{public}d", __func__, ret);
-            return ret;
-        }
-        ret = WlanInterfaceUnregisterHmlCallback(HdfWLanHmlCallbackFun, ifName);
-        if (ret != HDF_SUCCESS) {
             (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
-            HDF_LOGE("%{public}s: Unregister hml callback failed!, error code: %{public}d", __func__, ret);
             return ret;
         }
     }
@@ -1040,7 +1002,7 @@ int32_t WlanInterfaceSetPowerMode(struct IWlanInterface *self, const struct HdfF
     return ret;
 }
 
-int32_t WlanInterfaceSendP2pCmd(struct IWlanInterface *self, const char* ifName, const struct CmdData* data)
+int32_t WlanInterfaceSendP2pCmd(struct IWlanInterface *self, const char *ifName, const struct CmdData *data)
 {
     int32_t ret;
 
@@ -1053,7 +1015,7 @@ int32_t WlanInterfaceSendP2pCmd(struct IWlanInterface *self, const char* ifName,
         HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
         return HDF_FAILURE;
     }
-    ret = g_wifi->sendP2pCmd(ifName, data);
+    ret = g_wifi->sendP2pCmd(ifName, (struct HalCmdData *)data);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: get channel meas result failed!, error code: %{public}d", __func__, ret);
     }
@@ -1066,7 +1028,7 @@ int32_t WlanInterfaceWifiConstruct(void)
 
     ret = WifiConstruct(&g_wifi);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s contruct WiFi failed! error code: %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s construct WiFi failed! error code: %{public}d", __func__, ret);
     }
     return ret;
 }

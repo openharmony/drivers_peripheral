@@ -73,6 +73,10 @@
 #define PREVIEW_HEIGHT 480
 #define CAPTURE_WIDTH 1280
 #define CAPTURE_HEIGHT 960
+#define VIDEO_WIDTH 1280
+#define VIDEO_HEIGHT 960
+#define ANALYZE_WIDTH 640
+#define ANALYZE_HEIGHT 480
 
 class TestDisplay {
 public:
@@ -94,6 +98,7 @@ public:
     std::shared_ptr<StreamCustomer> streamCustomerPreview_ = nullptr;
     std::shared_ptr<StreamCustomer> streamCustomerCapture_ = nullptr;
     std::shared_ptr<StreamCustomer> streamCustomerVideo_ = nullptr;
+    std::shared_ptr<StreamCustomer> streamCustomerAnalyze_ = nullptr;
     OHOS::sptr<OHOS::Camera::IStreamOperator> streamOperator = nullptr;
     std::shared_ptr<OHOS::Camera::IStreamOperatorCallback> streamOperatorCallback = nullptr;
     std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = nullptr;
@@ -102,9 +107,7 @@ public:
     std::shared_ptr<OHOS::Camera::StreamInfo> streamInfoPre = nullptr;
     std::shared_ptr<OHOS::Camera::StreamInfo> streamInfoVideo = nullptr;
     std::shared_ptr<OHOS::Camera::StreamInfo> streamInfoCapture = nullptr;
-    std::shared_ptr<OHOS::IBufferProducer> producer = nullptr;
-    std::shared_ptr<OHOS::IBufferProducer> producerCapture = nullptr;
-    std::shared_ptr<OHOS::IBufferProducer> producerVideo = nullptr;
+    std::shared_ptr<OHOS::Camera::StreamInfo> streamInfoAnalyze = nullptr;
     OHOS::sptr<OHOS::Camera::ICameraHost> cameraHost = nullptr;
     OHOS::sptr<OHOS::Camera::ICameraDevice> cameraDevice = nullptr;
     std::shared_ptr<OHOS::Camera::CameraAbility> ability = nullptr;
@@ -116,14 +119,17 @@ public:
         streamId_preview = 1000, // 1000:preview streamID
         streamId_capture,
         streamId_video,
+        streamId_analyze,
         captureId_preview = 2000, // 2000:preview captureId
         captureId_capture,
-        captureId_video
+        captureId_video,
+        captureId_analyze
     };
     enum {
         preview_mode = 0,
         capture_mode,
-        video_mode
+        video_mode,
+        analyze_mode,
     };
     OHOS::Camera::CamRetCode rc;
     int init_flag = 0;
@@ -149,5 +155,10 @@ public:
     void StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds);
     void StartCapture(int streamId, int captureId, bool shutterCallback, bool isStreaming);
     float calTime(struct timeval start, struct timeval end);
+    void StoreImage(const void *bufStart, const uint32_t size) const;
+    void StoreVideo(const void *bufStart, const uint32_t size) const;
+    void OpenVideoFile();
+    void PrintFaceDetectInfo(const void *bufStart, const uint32_t size) const;
+    int videoFd_ = -1;
 };
 #endif

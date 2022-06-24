@@ -133,6 +133,7 @@ void SensorController::SetNodeCallBack(const NodeBufferCb cb)
 void SensorController::SetMetaDataCallBack(const MetaDataCb cb)
 {
     CAMERA_LOGI("SensorController line: %{public}d", __LINE__);
+    std::lock_guard<std::mutex> lock(metaDataFlaglock_);
     metaDataCb_ = cb;
 }
 
@@ -142,6 +143,12 @@ void SensorController::BufferCallback(std::shared_ptr<FrameSpec> buffer)
         CAMERA_LOGE("nodeBufferCb_ is nullptr");
         return;
     }
+
+    constexpr uint32_t UNIT_COUNT = 1000;
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    int64_t timestamp = static_cast<uint64_t>(tv.tv_sec) * UNIT_COUNT * UNIT_COUNT + tv.tv_usec;
+    buffer->buffer_->SetEsTimestamp(timestamp);
     nodeBufferCb_(buffer);
 
     const int ENTRY_CAPACITY = 30; // 30:entry capacity

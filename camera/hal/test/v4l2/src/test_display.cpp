@@ -29,6 +29,125 @@ uint64_t TestDisplay::GetCurrentLocalTimeStamp()
     return tmp.count();
 }
 
+void TestDisplay::StoreImage(const void *bufStart, const uint32_t size) const
+{
+    constexpr uint32_t pathLen = 64;
+    char path[pathLen] = {0};
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    char prefix[] = "/userdata/photo/";
+#else
+    char prefix[] = "/data/";
+#endif
+
+    int imgFD = 0;
+    int ret = 0;
+
+    struct timeval start = {};
+    gettimeofday(&start, nullptr);
+    if (sprintf_s(path, sizeof(path), "%spicture_%ld.jpeg", prefix, start.tv_usec) < 0) {
+        CAMERA_LOGE("sprintf_s error .....\n");
+        return;
+    }
+
+    imgFD = open(path, O_RDWR | O_CREAT, 00766); // 00766:file operate permission
+    if (imgFD == -1) {
+        CAMERA_LOGE("demo test:open image file error %{public}s.....\n", strerror(errno));
+        return;
+    }
+
+    CAMERA_LOGD("demo test:StoreImage %{public}s buf_start == %{public}p size == %{public}d\n", path, bufStart, size);
+
+    ret = write(imgFD, bufStart, size);
+    if (ret == -1) {
+        CAMERA_LOGE("demo test:write image file error %{public}s.....\n", strerror(errno));
+    }
+
+    close(imgFD);
+}
+
+void TestDisplay::StoreVideo(const void *bufStart, const uint32_t size) const
+{
+    int ret = 0;
+
+    ret = write(videoFd_, bufStart, size);
+    if (ret == -1) {
+        CAMERA_LOGE("demo test:write video file error %{public}s.....\n", strerror(errno));
+    }
+    CAMERA_LOGD("demo test:StoreVideo buf_start == %{public}p size == %{public}d\n", bufStart, size);
+}
+
+void TestDisplay::OpenVideoFile()
+{
+    constexpr uint32_t pathLen = 64;
+    char path[pathLen] = {0};
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    char prefix[] = "/userdata/video/";
+#else
+    char prefix[] = "/data/";
+#endif
+    auto seconds = time(nullptr);
+    if (sprintf_s(path, sizeof(path), "%svideo%ld.h264", prefix, seconds) < 0) {
+        CAMERA_LOGE("%{public}s: sprintf  failed", __func__);
+        return;
+    }
+    videoFd_ = open(path, O_RDWR | O_CREAT, 00766); // 00766:file operate permission
+    if (videoFd_ < 0) {
+        CAMERA_LOGE("demo test: StartVideo open %s %{public}s failed", path, strerror(errno));
+    }
+}
+
+void TestDisplay::PrintFaceDetectInfo(const void *bufStart, const uint32_t size) const
+{
+    common_metadata_header_t* data = static_cast<common_metadata_header_t*>((const_cast<void*>(bufStart)));
+    camera_metadata_item_t entry;
+    int ret = 0;
+    ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_DETECT_SWITCH, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_STATISTICS_FACE_DETECT_SWITCH error\n");
+        return;
+    }
+    uint8_t switchValue = *(entry.data.u8);
+    CAMERA_LOGI("demo test: switchValue=%{public}d", switchValue);
+
+    ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_RECTANGLES, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_STATISTICS_FACE_RECTANGLES error\n");
+        return;
+    }
+    uint32_t rectCount = entry.count;
+    std::cout << "==========[test log] PrintFaceDetectInfo rectCount=" << rectCount << std::endl;
+    CAMERA_LOGI("demo test: rectCount=%{public}d", rectCount);
+    std::vector<std::vector<float>> faceRectangles;
+    std::vector<float> faceRectangle;
+    for (int i = 0; i < rectCount; i++) {
+        faceRectangle.push_back(*(entry.data.f + i));
+    }
+    faceRectangles.push_back(faceRectangle);
+    for (std::vector<std::vector<float>>::iterator it = faceRectangles.begin(); it < faceRectangles.end(); it++) {
+        for (std::vector<float>::iterator innerIt = (*it).begin(); innerIt < (*it).end(); innerIt++) {
+            std::cout << "==========[test log] PrintFaceDetectInfo innerIt : " << *innerIt << std::endl;
+            CAMERA_LOGI("demo test: innerIt : %{public}f \n", *innerIt);
+        }
+    }
+
+    ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_IDS, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_STATISTICS_FACE_IDS error\n");
+        return;
+    }
+    uint32_t idCount = entry.count;
+    std::cout << "==========[test log] PrintFaceDetectInfo idCount=" << idCount << std::endl;
+    CAMERA_LOGI("demo test: idCount=%{public}d", idCount);
+    std::vector<int32_t> faceIds;
+    for (int i = 0; i < idCount; i++) {
+        faceIds.push_back(*(entry.data.i32 + i));
+    }
+    for (auto it = faceIds.begin(); it != faceIds.end(); it++) {
+        std::cout << "==========[test log] PrintFaceDetectInfo faceIds : " << *it << std::endl;
+        CAMERA_LOGI("demo test: faceIds : %{public}d\n", *it);
+    }
+}
+
 int32_t TestDisplay::SaveYUV(char* type, unsigned char* buffer, int32_t size)
 {
     int ret;
@@ -327,13 +446,11 @@ void TestDisplay::StartStream(std::vector<OHOS::Camera::StreamIntent> intents)
     streamInfoPre = std::make_shared<OHOS::Camera::StreamInfo>();
     streamInfoCapture = std::make_shared<OHOS::Camera::StreamInfo>();
     streamInfoVideo = std::make_shared<OHOS::Camera::StreamInfo>();
+    streamInfoAnalyze = std::make_shared<OHOS::Camera::StreamInfo>();
     for (auto& intent : intents) {
-        if (intent == 0) {
-            streamCustomerPreview_ = std::make_shared<StreamCustomer>();
-            OHOS::sptr<OHOS::IBufferProducer> producer = streamCustomerPreview_->CreateProducer();
-            producer->SetQueueSize(8); // 8:set bufferQueue size
-            if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
-                std::cout << "~~~~~~~" << std::endl;
+        if (intent == OHOS::Camera::PREVIEW) {
+            if (streamCustomerPreview_ == nullptr) {
+                streamCustomerPreview_ = std::make_shared<StreamCustomer>();
             }
             streamInfoPre->streamId_ = streamId_preview;
             streamInfoPre->width_ = PREVIEW_WIDTH; // 640:picture width
@@ -342,48 +459,61 @@ void TestDisplay::StartStream(std::vector<OHOS::Camera::StreamIntent> intents)
             streamInfoPre->datasapce_ = 8; // 8:picture datasapce
             streamInfoPre->intent_ = intent;
             streamInfoPre->tunneledMode_ = 5; // 5:tunnel mode
-            streamInfoPre->bufferQueue_ = producer;
+            streamInfoPre->bufferQueue_ = streamCustomerPreview_->CreateProducer();
+            streamInfoPre->bufferQueue_->SetQueueSize(8); // 8:set bufferQueue size
             std::cout << "==========[test log]preview success." << std::endl;
             std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>>().swap(streamInfos);
             streamInfos.push_back(streamInfoPre);
-        } else if (intent == 1) {
-            streamCustomerVideo_ = std::make_shared<StreamCustomer>();
-            OHOS::sptr<OHOS::IBufferProducer> producerVideo = streamCustomerVideo_->CreateProducer();
-            producerVideo->SetQueueSize(8); // 8:set bufferQueue size
-            if (producerVideo->GetQueueSize() != 8) { // 8:get bufferQueue size
-                std::cout << "~~~~~~~" << std::endl;
+        } else if (intent == OHOS::Camera::VIDEO) {
+            if (streamCustomerVideo_ == nullptr) {
+                streamCustomerVideo_ = std::make_shared<StreamCustomer>();
             }
             streamInfoVideo->streamId_ = streamId_video;
-            streamInfoVideo->width_ = CAPTURE_WIDTH; // 640:picture width
-            streamInfoVideo->height_ = CAPTURE_HEIGHT; // 480:picture height
+            streamInfoVideo->width_ = VIDEO_WIDTH; // 1280:picture width
+            streamInfoVideo->height_ = VIDEO_HEIGHT; // 960:picture height
             streamInfoVideo->format_ = PIXEL_FMT_RGBA_8888;
             streamInfoVideo->datasapce_ = 8; // 8:picture datasapce
             streamInfoVideo->intent_ = intent;
             streamInfoVideo->encodeType_ = OHOS::Camera::ENCODE_TYPE_H264;
             streamInfoVideo->tunneledMode_ = 5; // 5:tunnel mode
-            streamInfoVideo->bufferQueue_ = producerVideo;
+            streamInfoVideo->bufferQueue_ = streamCustomerVideo_->CreateProducer();
+            streamInfoVideo->bufferQueue_->SetQueueSize(8); // 8:set bufferQueue size
             std::cout << "==========[test log]video success." << std::endl;
             std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>>().swap(streamInfos);
             streamInfos.push_back(streamInfoVideo);
-        } else {
-            streamCustomerCapture_ = std::make_shared<StreamCustomer>();
-            OHOS::sptr<OHOS::IBufferProducer> producerCapture = streamCustomerCapture_->CreateProducer();
-            producerCapture->SetQueueSize(8); // 8:set bufferQueue size
-            if (producerCapture->GetQueueSize() != 8) { // 8:get bufferQueue size
-                std::cout << "~~~~~~~" << std::endl;
+        } else if (intent == OHOS::Camera::STILL_CAPTURE) {
+            if (streamCustomerCapture_ == nullptr) {
+                streamCustomerCapture_ = std::make_shared<StreamCustomer>();
             }
             streamInfoCapture->streamId_ = streamId_capture;
-            streamInfoCapture->width_ = CAPTURE_WIDTH; // 640:picture width
-            streamInfoCapture->height_ = CAPTURE_HEIGHT; // 480:picture height
+            streamInfoCapture->width_ = CAPTURE_WIDTH; // 1280:picture width
+            streamInfoCapture->height_ = CAPTURE_HEIGHT; // 960:picture height
             streamInfoCapture->format_ = PIXEL_FMT_RGBA_8888;
             streamInfoCapture->datasapce_ = 8; // 8:picture datasapce
             streamInfoCapture->intent_ = intent;
             streamInfoCapture->encodeType_ = OHOS::Camera::ENCODE_TYPE_JPEG;
             streamInfoCapture->tunneledMode_ = 5; // 5:tunnel mode
-            streamInfoCapture->bufferQueue_ = producerCapture;
+            streamInfoCapture->bufferQueue_ = streamCustomerCapture_->CreateProducer();
+            streamInfoCapture->bufferQueue_->SetQueueSize(8); // 8:set bufferQueue size
             std::cout << "==========[test log]capture success." << std::endl;
             std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>>().swap(streamInfos);
             streamInfos.push_back(streamInfoCapture);
+        } else if (intent == OHOS::Camera::ANALYZE) {
+            if (streamCustomerAnalyze_ == nullptr) {
+                streamCustomerAnalyze_ = std::make_shared<StreamCustomer>();
+            }
+            streamInfoAnalyze->streamId_ = streamId_analyze;
+            streamInfoAnalyze->width_ = ANALYZE_WIDTH; // 640:picture width
+            streamInfoAnalyze->height_ = ANALYZE_HEIGHT; // 480:picture height
+            streamInfoAnalyze->format_ = PIXEL_FMT_RGBA_8888;
+            streamInfoAnalyze->datasapce_ = 8; // 8:picture datasapce
+            streamInfoAnalyze->intent_ = intent;
+            streamInfoAnalyze->tunneledMode_ = 5; // 5:tunnel mode
+            streamInfoAnalyze->bufferQueue_ = streamCustomerAnalyze_->CreateProducer();
+            streamInfoAnalyze->bufferQueue_->SetQueueSize(8); // 8:set bufferQueue size
+            std::cout << "==========[test log]analyze success." << std::endl;
+            std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>>().swap(streamInfos);
+            streamInfos.push_back(streamInfoAnalyze);
         }
         rc = streamOperator->CreateStreams(streamInfos);
         EXPECT_EQ(false, rc != OHOS::Camera::NO_ERROR);
@@ -420,13 +550,16 @@ void TestDisplay::StartCapture(int streamId, int captureId, bool shutterCallback
         streamCustomerPreview_->ReceiveFrameOn(nullptr);
     } else if (captureId == captureId_capture) {
         streamCustomerCapture_->ReceiveFrameOn([this](void* addr, const uint32_t size) {
-            BufferCallback(addr, capture_mode);
-            return;
+            StoreImage(addr, size);
         });
     } else if (captureId == captureId_video) {
+        OpenVideoFile();
         streamCustomerVideo_->ReceiveFrameOn([this](void* addr, const uint32_t size) {
-            BufferCallback(addr, video_mode);
-            return;
+            StoreVideo(addr, size);
+        });
+    } else if (captureId == captureId_analyze) {
+        streamCustomerAnalyze_->ReceiveFrameOn([this](void* addr, const uint32_t size) {
+            PrintFaceDetectInfo(addr, size);
         });
     }
     sleep(2); // 2:sleep two second
@@ -438,10 +571,14 @@ void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& str
         for (auto &captureId : captureIds) {
             if (captureId == captureId_preview) {
                 streamCustomerPreview_->ReceiveFrameOff();
-            }  else if (captureId == captureId_capture) {
+            } else if (captureId == captureId_capture) {
                 streamCustomerCapture_->ReceiveFrameOff();
-            }  else if (captureId == captureId_video) {
+            } else if (captureId == captureId_video) {
                 streamCustomerVideo_->ReceiveFrameOff();
+                close(videoFd_);
+                videoFd_ = -1;
+            } else if (captureId == captureId_analyze) {
+                streamCustomerAnalyze_->ReceiveFrameOff();
             }
             std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
             rc = streamOperator->CancelCapture(captureId);

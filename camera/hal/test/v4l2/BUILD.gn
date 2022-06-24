@@ -127,6 +127,7 @@ if (defined(ohos_lite)) {
     testonly = true
     module_out_path = module_output_path
     sources = [
+      "./src/hdfcamera_facedetect.cpp",
       "./src/open_camera_test.cpp",
       "./src/preview_test.cpp",
       "./src/stream_customer.cpp",
@@ -144,7 +145,6 @@ if (defined(ohos_lite)) {
       "$camera_path/../interfaces/hdi_ipc/callback/host/include",
       "$camera_path/../interfaces/hdi_ipc/callback/device/include",
       "$camera_path/../interfaces/hdi_ipc/callback/operator/include",
-      "//foundation/graphic/graphic/frameworks/surface/include",
       "$camera_path/include",
       "$camera_path/hdi_impl",
       "$camera_path/hdi_impl/include",
@@ -155,11 +155,6 @@ if (defined(ohos_lite)) {
       "$camera_path/hdi_impl/src/stream_operator/stream_tunnel/standard",
       "$camera_path/device_manager/include/",
       "$camera_path/device_manager/include/v4l2",
-      "//foundation/graphic/utils/interfaces/kits",
-      "//foundation/graphic/graphic/interfaces/kits",
-      "//foundation/graphic/graphic/interfaces/inner_api/surface",
-      "//foundation/graphic/graphic/interfaces/inner_api/common",
-      "//foundation/graphic/graphic/utils/buffer_handle/export",
       "//base/startup/syspara_lite/adapter/native/syspara/include",
       "$camera_path/utils/event",
       "//drivers/peripheral/camera/interfaces/metadata/include",

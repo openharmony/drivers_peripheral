@@ -10,7 +10,7 @@
             <thermal_zone type="soc-thermal"/>
             <thermal_zone type="gpu-thermal"/>
         </group>
-        <group name="sim" interval="10000">
+        <group name="sim" interval="5000">
             <thermal_node type="soc" path="data/sensor/soc/temp"/>
             <thermal_node type="cpu" path="data/sensor/cpu/temp"/>
             <thermal_node type="ap" path="data/sensor/ap/temp"/>

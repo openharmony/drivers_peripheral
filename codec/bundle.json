@@ -1,10 +1,10 @@
 {
-  "name": "codec_device_driver",
+  "name": "drivers_peripheral_codec",
   "description": "codec device driver",
   "version": "3.1",
   "license": "Apache License 2.0",
   "component": {
-    "name": "codec_device_driver",
+    "name": "drivers_peripheral_codec",
     "subsystem": "hdf",
     "syscap": [ "" ],
     "adapter_system_type": ["standard"],

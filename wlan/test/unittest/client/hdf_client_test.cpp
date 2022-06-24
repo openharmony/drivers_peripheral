@@ -127,7 +127,8 @@ HWTEST_F(WifiClientTest, WifiClientSetMacAddr001, TestSize.Level1)
     unsigned char errorMac[ETH_ADDR_LEN] = {0x11, 0x34, 0x56, 0x78, 0xab, 0xcd};
 
     ret = SetMacAddr(WLAN_IFNAME, mac, ETH_ADDR_LEN);
-    EXPECT_EQ(RET_CODE_SUCCESS, ret);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_DEVICE_BUSY);
+    ASSERT_TRUE(flag);
     ret = SetMacAddr(WLAN_IFNAME, errorMac, ETH_ADDR_LEN);
     EXPECT_NE(RET_CODE_SUCCESS, ret);
 }
@@ -239,7 +240,7 @@ HWTEST_F(WifiClientTest, WifiClientGetAssociatedStas001, TestSize.Level1)
 
 /**
  * @tc.name: WifiClientSetScanMacAddr001
- * @tc.desc: Wifi client set scan MAC adress function test
+ * @tc.desc: Wifi client set scan MAC address function test
  * @tc.type: FUNC
  * @tc.require: AR000H603L
  */

@@ -260,6 +260,7 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
     hwRender->renderParam.frameRenderMode.attrs = *attrs;
     hwRender->renderParam.renderMode.ctlParam.audioGain.gainMax = GAIN_MAX;  // init gainMax
     hwRender->renderParam.renderMode.ctlParam.audioGain.gainMin = 0;
+    hwRender->renderParam.renderMode.ctlParam.stop = true;
     hwRender->renderParam.frameRenderMode.frames = 0;
     hwRender->renderParam.frameRenderMode.time.tvNSec = 0;
     hwRender->renderParam.frameRenderMode.time.tvSec = 0;
@@ -274,6 +275,10 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
     hwRender->renderParam.frameRenderMode.attrs.isBigEndian = attrs->isBigEndian;
     hwRender->renderParam.frameRenderMode.attrs.isSignedData = attrs->isSignedData;
     hwRender->renderParam.frameRenderMode.renderhandle = (AudioHandle)hwRender;
+    if ((hwRender->renderParam.frameRenderMode.buffer = (char *)calloc(1, FRAME_DATA)) == NULL) {
+        LOG_FUN_ERR("alloc frame render buffer failed");
+        return AUDIO_HAL_ERR_MALLOC_FAIL;
+    }
     hwRender->renderParam.renderMode.ctlParam.turnStandbyStatus = AUDIO_TURN_STANDBY_LATER;
     return HDF_SUCCESS;
 }

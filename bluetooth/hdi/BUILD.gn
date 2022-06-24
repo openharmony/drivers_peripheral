@@ -50,7 +50,7 @@ ohos_shared_library("bluetooth_hdi_client") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "bluetooth_device_driver"
+  part_name = "drivers_peripheral_bluetooth"
 }
 
 ohos_shared_library("bluetooth_hdi_server") {
@@ -92,5 +92,5 @@ ohos_shared_library("bluetooth_hdi_server") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "bluetooth_device_driver"
+  part_name = "drivers_peripheral_bluetooth"
 }

@@ -273,24 +273,22 @@ static int32_t SetPowerModeInner(const char *ifName, uint8_t mode)
     return SetPowerMode(ifName, mode);
 }
 
-static int32_t StartChannelMeasInner(const char *ifName, int32_t commandId, const int32_t *paramBuf,
-    uint32_t paramBufLen)
+static int32_t StartChannelMeasInner(const char *ifName, const struct MeasParam *measParam)
 {
-    if (ifName == NULL || paramBuf == NULL) {
+    if (ifName == NULL || measParam == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    return StartChannelMeas(ifName, commandId, paramBuf, paramBufLen);
+    return StartChannelMeas(ifName, measParam);
 }
 
-static int32_t GetChannelMeasResultInner(const char *ifName, int32_t commandId, uint32_t *paramBuf,
-    uint32_t *paramBufLen)
+static int32_t GetChannelMeasResultInner(const char *ifName, struct MeasResult *measResult)
 {
-    if (ifName == NULL || paramBuf == NULL || paramBufLen == NULL) {
+    if (ifName == NULL || measResult == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    return GetChannelMeasResult(ifName, commandId, paramBuf, paramBufLen);
+    return HDF_ERR_NOT_SUPPORT;
 }
 
 static int32_t HalRegisterHmlCallbackInner(NotifyMessage func, const char *ifName)
@@ -316,16 +314,16 @@ static int32_t HalUnregisterHmlCallbackInner(NotifyMessage func, const char *ifN
     return HDF_SUCCESS;
 }
 
-static int32_t GetCoexChannelListInner(const char *ifName, struct CoexChannelList *list)
+static int32_t GetCoexChannelListInner(const char *ifName, uint8_t *buf, uint32_t *bufLen)
 {
-    if (ifName == NULL || list == NULL) {
+    if (ifName == NULL || buf == NULL || bufLen == NULL) {
         HDF_LOGE("%{public}s: input parameter invalid, line: %{public}d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    return GetCoexChannelList(ifName, list);
+    return GetCoexChannelList(ifName, buf, bufLen);
 }
 
-static int32_t SendHmlCmdInner(const char *ifName, const struct CmdData* data)
+static int32_t SendHmlCmdInner(const char *ifName, const struct HalCmdData *data)
 {
     if (ifName == NULL || data == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
@@ -334,7 +332,7 @@ static int32_t SendHmlCmdInner(const char *ifName, const struct CmdData* data)
     return SendHmlCmd(ifName, data);
 }
 
-static int32_t SendP2pCmdInner(const char *ifName, const struct CmdData* data)
+static int32_t SendP2pCmdInner(const char *ifName, const struct HalCmdData *data)
 {
     if (ifName == NULL || data == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
@@ -447,20 +445,18 @@ static int32_t WifiSetPowerMode(const char *ifName, uint8_t mode)
     return ret;
 }
 
-static int32_t WifiStartChannelMeas(const char *ifName, int32_t commandId, const int32_t *paramBuf,
-    uint32_t paramBufLen)
+static int32_t WifiStartChannelMeas(const char *ifName, const struct MeasParam *measParam)
 {
     HalMutexLock();
-    int32_t ret = StartChannelMeasInner(ifName, commandId, paramBuf, paramBufLen);
+    int32_t ret = StartChannelMeasInner(ifName, measParam);
     HalMutexUnlock();
     return ret;
 }
 
-static int32_t WifiGetChannelMeasResult(const char *ifName, int32_t commandId, uint32_t *paramBuf,
-    uint32_t *paramBufLen)
+static int32_t WifiGetChannelMeasResult(const char *ifName, struct MeasResult *measResult)
 {
     HalMutexLock();
-    int32_t ret = GetChannelMeasResultInner(ifName, commandId, paramBuf, paramBufLen);
+    int32_t ret = GetChannelMeasResultInner(ifName, measResult);
     HalMutexUnlock();
     return ret;
 }
@@ -481,15 +477,15 @@ static int32_t HalUnregisterHmlCallback(NotifyMessage func, const char *ifName)
     return ret;
 }
 
-static int32_t WifiGetCoexChannelList(const char *ifName, struct CoexChannelList *list)
+static int32_t WifiGetCoexChannelList(const char *ifName, uint8_t *buf, uint32_t *bufLen)
 {
     HalMutexLock();
-    int32_t ret = GetCoexChannelListInner(ifName, list);
+    int32_t ret = GetCoexChannelListInner(ifName, buf, bufLen);
     HalMutexUnlock();
     return ret;
 }
 
-static int32_t WifiSendHmlCmd(const char *ifName, const struct CmdData* data)
+static int32_t WifiSendHmlCmd(const char *ifName, const struct HalCmdData *data)
 {
     HalMutexLock();
     int32_t ret = SendHmlCmdInner(ifName, data);
@@ -497,7 +493,7 @@ static int32_t WifiSendHmlCmd(const char *ifName, const struct CmdData* data)
     return ret;
 }
 
-static int32_t WifiSendP2pCmd(const char *ifName, const struct CmdData* data)
+static int32_t WifiSendP2pCmd(const char *ifName, const struct HalCmdData *data)
 {
     HalMutexLock();
     int32_t ret = SendP2pCmdInner(ifName, data);

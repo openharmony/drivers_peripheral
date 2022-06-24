@@ -57,7 +57,7 @@ if (defined(ohos_lite)) {
       chipset_base_dir,
       "updater",
     ]
-    part_name = "input_device_driver"
+    part_name = "drivers_peripheral_input"
   }
 } else {
   INPUT_ROOT_DIR = "//drivers/peripheral/input"
@@ -104,6 +104,6 @@ if (defined(ohos_lite)) {
       chipset_base_dir,
       "updater",
     ]
-    part_name = "input_device_driver"
+    part_name = "drivers_peripheral_input"
   }
 }

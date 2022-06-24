@@ -51,7 +51,7 @@ ohos_shared_library("libthermal_interface_service_1.0") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "thermal_device_driver"
+  part_name = "drivers_peripheral_thermal"
 }
 
 ##############################################################################################
@@ -79,7 +79,7 @@ ohos_shared_library("libthermal_driver") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "thermal_device_driver"
+  part_name = "drivers_peripheral_thermal"
 }
 
 group("hdf_thermal") {

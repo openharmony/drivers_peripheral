@@ -27,6 +27,7 @@ const int32_t WLAN_TX_POWER = 160;
 const int32_t DEFAULT_COMBO_SIZE = 6;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
 const uint32_t RESET_TIME = 20;
+const uint32_t MEAS_CHANNEL_TIME = 10;
 
 const char *WLAN_SERVICE_NAME = "wlan_hal_c_service";
 
@@ -233,7 +234,7 @@ HWTEST_F(HdfWifiServiceCTest, SetMacAddressTest_008, TestSize.Level1)
     rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, errorMac, macLen);
     ASSERT_NE(rc, HDF_SUCCESS);
     rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, mac, macLen);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_ERR_DEVICE_BUSY);
     ASSERT_TRUE(flag);
     rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
@@ -425,7 +426,7 @@ HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_016, TestSize.Level1)
 
 /**
  * @tc.name: RegisterEventCallbackTest_017
- * @tc.desc: Wifi hdi reister event call back function test
+ * @tc.desc: Wifi hdi register event call back function test
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
@@ -599,7 +600,7 @@ HWTEST_F(HdfWifiServiceCTest, SetMacAddressTest_025, TestSize.Level1)
     rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, errorMac, macLen);
     ASSERT_NE(rc, HDF_SUCCESS);
     rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, mac, macLen);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_ERR_DEVICE_BUSY);
     ASSERT_TRUE(flag);
     rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
@@ -761,5 +762,28 @@ HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_033, TestSize.Level1)
     ASSERT_NE(rc, HDF_SUCCESS);
     rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: StartChannelMeasTest_034
+ * @tc.desc: Wifi hdi start channel meas and get meas result function test
+ * @tc.type: FUNC
+ * @tc.require: AR000H603J
+ */
+HWTEST_F(HdfWifiServiceCTest, StartChannelMeasTest_034, TestSize.Level1)
+{
+    const char *ifName = "wlan0";
+    struct MeasChannelParam measChannelParam;
+    struct MeasChannelResult measChannelResult = {0};
+
+    measChannelParam.channelId = 1;
+    measChannelParam.measTime = 15;
+    int32_t rc = g_wlanObj->StartChannelMeas(g_wlanObj, ifName, &measChannelParam);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    sleep(MEAS_CHANNEL_TIME);
+    rc = g_wlanObj->GetChannelMeasResult(g_wlanObj, ifName, &measChannelResult);
+    flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_DEV_ERR_NODATA);
+    ASSERT_TRUE(flag);
 }
 };

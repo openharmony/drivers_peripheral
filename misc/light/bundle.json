@@ -1,10 +1,10 @@
 {
-  "name": "light_device_driver",
+  "name": "drivers_peripheral_light",
   "description": "light device driver",
   "version": "3.1",
   "license": "Apache License 2.0",
   "component": {
-    "name": "light_device_driver",
+    "name": "drivers_peripheral_light",
     "subsystem": "hdf",
     "syscap": [""],
     "adapter_system_type": ["standard"],

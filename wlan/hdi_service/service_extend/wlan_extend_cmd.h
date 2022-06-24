@@ -16,14 +16,15 @@
 #define WLAN_EXTEND_CMD_H
 #include "../wlan_impl.h"
 
-int32_t WlanInterfaceStartChannelMeas(struct IWlanInterface *self, const char* ifName, int32_t commandId,
-    const int32_t* paramBuf, uint32_t paramBufLen);
-int32_t WlanInterfaceGetChannelMeasResult(struct IWlanInterface *self, const char* ifName, int32_t commandId,
-    uint32_t* paramBuf, uint32_t* paramBufLen);
+int32_t WlanInterfaceStartChannelMeas(struct IWlanInterface *self, const char *ifName,
+    const struct MeasChannelParam *measChannelParam);
+int32_t WlanInterfaceGetChannelMeasResult(struct IWlanInterface *self, const char *ifName,
+    struct MeasChannelResult *measChannelResult);
 int32_t WlanInterfaceRegisterHmlCallback(NotifyMessage func, const char *ifName);
 int32_t WlanInterfaceUnregisterHmlCallback(NotifyMessage func, const char *ifName);
-int32_t WlanInterfaceGetCoexChannelList(struct IWlanInterface *self, const char* ifName, struct CoexChannelList *data);
-int32_t WlanInterfaceSendHmlCmd(struct IWlanInterface *self, const char* ifName, const struct CmdData* data);
+int32_t WlanInterfaceGetCoexChannelList(struct IWlanInterface *self, const char *ifName, uint8_t *buf,
+    uint32_t *bufLen);
+int32_t WlanInterfaceSendHmlCmd(struct IWlanInterface *self, const char *ifName, const struct CmdData *data);
 int32_t WlanExtendInterfaceWifiConstruct(void);
 int32_t WlanExtendInterfaceWifiDestruct(void);
 #endif

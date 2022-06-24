@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -412,11 +412,11 @@ typedef enum {
  * @brief Defines the capability of the output.
  */
 typedef struct {
-    char name[PROPERTY_NAME_LEN];       /**< Name of the output */
-    InterfaceType type;                 /**< Interface type of the output */
+    char name[PROPERTY_NAME_LEN];       /**< Name of the display device */
+    InterfaceType type;                 /**< Interface type of panel */
     uint32_t phyWidth;                  /**< Physical width */
     uint32_t phyHeight;                 /**< Physical height */
-    uint32_t supportLayers;             /**< Bitmask of LayerType */
+    uint32_t supportLayers;             /**< Number of supported layers */
     uint32_t virtualDispCount;          /**< Count of virtual displays supported */
     bool supportWriteBack;              /**< Whether writeback is supported */
     uint32_t propertyCount;             /**< Count of properties */

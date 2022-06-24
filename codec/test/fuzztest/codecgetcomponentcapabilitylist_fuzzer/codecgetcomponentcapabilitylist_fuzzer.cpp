@@ -41,7 +41,7 @@ namespace Codec {
             return false;
         }
 
-        int32_t ret = manager->GetComponentCapabilityList(capList, reinterpret_cast<int64_t>(data));
+        int32_t ret = manager->GetComponentCapabilityList(capList, *(int32_t *)data);
         if (ret == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: GetComponentCapabilityList succeed\n", __func__);
             result = true;
