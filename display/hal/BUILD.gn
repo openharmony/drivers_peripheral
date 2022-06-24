@@ -27,8 +27,6 @@ if (defined(ohos_lite)) {
   import("//build/ohos.gni")
   import("//vendor/${product_company}/${product_name}/product.gni")
 
-  device_hal = display_device_hal
-
   config("display_hdi_public_config") {
     visibility = [ ":*" ]
     include_dirs = [
@@ -55,7 +53,8 @@ if (defined(ohos_lite)) {
     public_configs = [ ":display_hdi_public_config" ]
   }
 
-  if (product_name != "ohos-arm64") {
+  if (product_name != "ohos-arm64" && target_cpu != "x86_64") {
+    device_hal = display_device_hal
     group("hdi_display_device") {
       deps = [ "//device/${device_hal}/display:display_device" ]
       public_configs = [ ":display_hdi_public_config" ]
