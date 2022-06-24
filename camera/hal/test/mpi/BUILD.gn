@@ -170,7 +170,6 @@ if (defined(ohos_lite)) {
       "$camera_path/hdi_impl/include/offline_stream_operator",
       "$camera_path/device_manager/include/",
       "$camera_path/device_manager/include/mpi",
-      "//base/startup/syspara_lite/adapter/native/syspara/include",
       "$camera_path/utils/event",
       "//drivers/peripheral/camera/interfaces/metadata/include",
 
@@ -222,9 +221,9 @@ if (defined(ohos_lite)) {
     }
 
     external_deps += [
+      "init:libbegetutil",
       "ipc:ipc_single",
       "samgr_standard:samgr_proxy",
-      "startup_l2:syspara",
     ]
 
     public_configs = [ ":cameraTest_config" ]
