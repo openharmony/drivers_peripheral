@@ -21,7 +21,5 @@ group("motion_entry") {
 
   if (HAVE_MOTION_DAL_SERVICE) {
     deps += [ "${HDI_MOTION_SERVICE_PATH}:dal_service" ]
-  } else {
-    deps += [ "//drivers/peripheral/motion/hdi_service:hdi_motion_service" ]
   }
 }
