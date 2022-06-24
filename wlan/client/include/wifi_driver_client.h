@@ -212,6 +212,17 @@ struct NetDeviceInfoResult {
     struct NetDeviceInfo deviceInfos[MAX_NETDEVICE_COUNT];
 };
 
+struct MeasParam {
+    int32_t channelId;
+    int32_t measTime;
+};
+
+struct MeasResult {
+    int32_t channelId;
+    int32_t chload;
+    int32_t noise;
+};
+
 int32_t WifiDriverClientInit(void);
 void WifiDriverClientDeinit(void);
 
@@ -234,8 +245,8 @@ int32_t SetResetDriver(const uint8_t chipId, const char *ifName);
 int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult);
 int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode);
 int32_t SetPowerMode(const char *ifName, uint8_t mode);
-int32_t StartChannelMeas(const char *ifName, int32_t commandId, const int32_t *paramBuf, uint32_t paramBufLen);
-int32_t GetChannelMeasResult(const char *ifName, int32_t commandId, uint32_t *paramBuf, uint32_t *paramBufLen);
+int32_t StartChannelMeas(const char *ifName, const struct MeasParam *measParam);
+int32_t GetChannelMeasResult(const char *ifName, struct MeasResult *measResult);
 
 /* wpa related interface */
 #define MAX_SSID_LEN 32
