@@ -63,7 +63,6 @@ static int32_t UserAuthInterfaceDriverDispatch(struct HdfDeviceIoClient *client,
 static int HdfUserAuthInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
     IAM_LOGI("HdfUserAuthInterfaceDriverInit enter");
-    OHOS::UserIAM::Common::Init();
     return HDF_SUCCESS;
 }
 

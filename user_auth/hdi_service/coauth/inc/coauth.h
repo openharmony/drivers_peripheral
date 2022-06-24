@@ -16,6 +16,7 @@
 #ifndef USERIAM_COAUTH_H
 #define USERIAM_COAUTH_H
 
+#include "defines.h"
 #include "pool.h"
 
 #ifdef __cplusplus
@@ -25,22 +26,27 @@ extern "C" {
 #define INVALID_SESSION_ID 0
 #define MAX_EXECUTOR_SIZE 2
 
-typedef enum ScheduleMode {
-    SCHEDULE_MODE_ENROLL = 0,
-    SCHEDULE_MODE_AUTH = 1,
-} ScheduleMode;
-
 typedef union AssociateId {
     uint64_t contextId;
-    uint64_t challenge;
+    int32_t userId;
 } AssociateId;
+
+typedef struct ScheduleParam {
+    uint32_t authType;
+    ScheduleMode scheduleMode;
+    AssociateId associateId;
+    TemplateIdArrays *templateIds;
+    uint32_t collectorSensorHint;
+    uint32_t verifierSensorHint;
+    uint32_t executorMatcher;
+} ScheduleParam;
 
 typedef struct CoAuthSchedule {
     uint64_t scheduleId;
+    uint32_t authType;
     ScheduleMode scheduleMode;
     AssociateId associateId;
-    uint64_t templateId;
-    uint64_t authSubType;
+    TemplateIdArrays templateIds;
     uint32_t executorSize;
     ExecutorInfoHal executors[MAX_EXECUTOR_SIZE];
 } CoAuthSchedule;
@@ -48,14 +54,17 @@ typedef struct CoAuthSchedule {
 ResultCode InitCoAuth(void);
 void DestoryCoAuth(void);
 
-CoAuthSchedule *GenerateAuthSchedule(uint64_t contextId, uint32_t authType, uint64_t authSubType,
-    uint64_t templateId);
-CoAuthSchedule *GenerateIdmSchedule(uint64_t challenge, uint32_t authType, uint64_t authSubType);
+CoAuthSchedule *GenerateSchedule(const ScheduleParam *param);
 
-ResultCode AddCoAuthSchedule(CoAuthSchedule *coAuthSchedule);
+ResultCode AddCoAuthSchedule(const CoAuthSchedule *coAuthSchedule);
 ResultCode RemoveCoAuthSchedule(uint64_t scheduleId);
-ResultCode GetCoAuthSchedule(CoAuthSchedule *coAuthSchedule);
+const CoAuthSchedule *GetCoAuthSchedule(uint64_t scheduleId);
+uint32_t GetScheduleVeriferSensorHint(const CoAuthSchedule *coAuthSchedule);
 void DestroyCoAuthSchedule(CoAuthSchedule *coAuthSchedule);
+CoAuthSchedule *CopyCoAuthSchedule(const CoAuthSchedule *coAuthSchedule);
+void DestroyScheduleNode(void *data);
+bool IsTemplateArraysValid(const TemplateIdArrays *templateIds);
+ResultCode CopyTemplateArrays(const TemplateIdArrays *in, TemplateIdArrays *out);
 
 #ifdef __cplusplus
 }

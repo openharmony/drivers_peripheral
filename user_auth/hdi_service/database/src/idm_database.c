@@ -36,7 +36,6 @@ typedef bool (*DuplicateCheckFunc)(LinkedList *collection, uint64_t value);
 
 static UserInfo *QueryUserInfo(int32_t userId);
 static ResultCode GetAllEnrolledInfoFromUser(UserInfo *userInfo, EnrolledInfoHal **enrolledInfos, uint32_t *num);
-static ResultCode GetAllCredentialInfoFromUser(UserInfo *userInfo, CredentialInfoHal **credentialInfos, uint32_t *num);
 static ResultCode DeleteUser(int32_t userId);
 static CredentialInfoHal *QueryCredentialById(uint64_t credentialId, LinkedList *credentialList);
 static CredentialInfoHal *QueryCredentialByAuthType(uint32_t authType, LinkedList *credentialList);
@@ -153,9 +152,9 @@ ResultCode GetEnrolledInfo(int32_t userId, EnrolledInfoHal **enrolledInfos, uint
     return GetAllEnrolledInfoFromUser(user, enrolledInfos, num);
 }
 
-ResultCode DeleteUserInfo(int32_t userId, CredentialInfoHal **credentialInfos, uint32_t *num)
+ResultCode DeleteUserInfo(int32_t userId, LinkedList **creds)
 {
-    if (credentialInfos == NULL || num == NULL) {
+    if (creds == NULL) {
         LOG_ERROR("param is invalid");
         return RESULT_BAD_PARAM;
     }
@@ -164,34 +163,30 @@ ResultCode DeleteUserInfo(int32_t userId, CredentialInfoHal **credentialInfos, u
         LOG_ERROR("can't find this user");
         return RESULT_NOT_FOUND;
     }
-    ResultCode ret = GetAllCredentialInfoFromUser(user, credentialInfos, num);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("GetAllCredentialInfoFromUser failed");
-        return ret;
+    CredentialCondition condition = {};
+    SetCredentialConditionUserId(&condition, userId);
+    *creds = QueryCredentialLimit(&condition);
+    if (*creds == NULL) {
+        LOG_ERROR("query credential failed");
+        return RESULT_UNKNOWN;
     }
     g_currentUser = NULL;
 
-    ret = DeleteUser(userId);
+    ResultCode ret = DeleteUser(userId);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("deleteUser failed");
+        DestroyLinkedList(*creds);
+        *creds = NULL;
         return ret;
     }
-
-    return UpdateFileInfo(g_userInfoList);
-}
-
-ResultCode QueryCredentialInfoAll(int32_t userId, CredentialInfoHal **credentialInfos, uint32_t *num)
-{
-    if (credentialInfos == NULL || num == NULL) {
-        LOG_ERROR("param is invalid");
-        return RESULT_BAD_PARAM;
+    ret = UpdateFileInfo(g_userInfoList);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("update file info failed");
+        DestroyLinkedList(*creds);
+        *creds = NULL;
+        return ret;
     }
-    UserInfo *user = QueryUserInfo(userId);
-    if (!IsUserInfoValid(user)) {
-        LOG_ERROR("can't find this user");
-        return RESULT_NOT_FOUND;
-    }
-    return GetAllCredentialInfoFromUser(user, credentialInfos, num);
+    return ret;
 }
 
 static UserInfo *QueryUserInfo(int32_t userId)
@@ -258,44 +253,6 @@ EXIT:
     return result;
 }
 
-static ResultCode GetAllCredentialInfoFromUser(UserInfo *userInfo, CredentialInfoHal **credentialInfos, uint32_t *num)
-{
-    LinkedList *credentialInfoList = userInfo->credentialInfoList;
-    uint32_t size = credentialInfoList->getSize(credentialInfoList);
-    *credentialInfos = Malloc(sizeof(CredentialInfoHal) * size);
-    if (*credentialInfos == NULL) {
-        LOG_ERROR("credentialInfos malloc failed");
-        return RESULT_NO_MEMORY;
-    }
-    (void)memset_s(*credentialInfos, sizeof(CredentialInfoHal) * size, 0, sizeof(CredentialInfoHal) * size);
-    LinkedListNode *temp = credentialInfoList->head;
-    ResultCode result = RESULT_SUCCESS;
-    for (*num = 0; *num < size; (*num)++) {
-        if (temp == NULL) {
-            LOG_ERROR("temp node is NULL, something wrong");
-            result = RESULT_BAD_PARAM;
-            goto EXIT;
-        }
-        CredentialInfoHal *tempInfo = (CredentialInfoHal *)temp->data;
-        if (memcpy_s((*credentialInfos) + *num, sizeof(CredentialInfoHal) * (size - *num),
-            tempInfo, sizeof(CredentialInfoHal)) != EOK) {
-            LOG_ERROR("copy the %u information failed", *num);
-            result = RESULT_NO_MEMORY;
-            goto EXIT;
-        }
-        temp = temp->next;
-    }
-
-EXIT:
-    if (result != RESULT_SUCCESS) {
-        (void)memset_s(*credentialInfos, sizeof(CredentialInfoHal) * size, 0, sizeof(CredentialInfoHal) * size);
-        Free(*credentialInfos);
-        *credentialInfos = NULL;
-        *num = 0;
-    }
-    return result;
-}
-
 static bool IsSecureUidDuplicate(LinkedList *userInfoList, uint64_t secureUid)
 {
     if (userInfoList == NULL) {
@@ -342,18 +299,22 @@ static ResultCode DeleteUser(int32_t userId)
     return g_userInfoList->remove(g_userInfoList, &userId, MatchUserInfo, true);
 }
 
-static bool IsCredentialIdDuplicate(LinkedList *credentialList, uint64_t credentialId)
+static bool IsCredentialIdDuplicate(LinkedList *userInfoList, uint64_t credentialId)
 {
-    LinkedListNode *temp = credentialList->head;
-    CredentialInfoHal *credentialInfo = NULL;
-    while (temp != NULL) {
-        credentialInfo = (CredentialInfoHal *)temp->data;
-        if (credentialInfo != NULL && credentialInfo->credentialId == credentialId) {
-            return true;
-        }
-        temp = temp->next;
+    (void)userInfoList;
+    CredentialCondition condition = {};
+    SetCredentialConditionCredentialId(&condition, credentialId);
+    LinkedList *credList = QueryCredentialLimit(&condition);
+    if (credList == NULL) {
+        LOG_ERROR("query failed");
+        return true;
     }
-
+    if (credList->getSize(credList) != 0) {
+        LOG_ERROR("duplicate credential id");
+        DestroyLinkedList(credList);
+        return true;
+    }
+    DestroyLinkedList(credList);
     return false;
 }
 
@@ -379,7 +340,7 @@ static ResultCode GenerateDeduplicateUint64(LinkedList *collection, uint64_t *de
         return RESULT_BAD_PARAM;
     }
 
-    for (uint32_t i = 0; i < MAX_DUPLICATE_CHECK; i++) {
+    for (uint32_t i = 0; i < MAX_DUPLICATE_CHECK; ++i) {
         uint64_t tempRandom;
         if (SecureRandom((uint8_t *)&tempRandom, sizeof(uint64_t)) != RESULT_SUCCESS) {
             LOG_ERROR("get random failed");
@@ -434,10 +395,13 @@ static ResultCode UpdateEnrolledId(LinkedList *enrolledList, uint32_t authType)
 
 static ResultCode AddCredentialToUser(UserInfo *user, CredentialInfoHal *credentialInfo)
 {
+    if (g_userInfoList == NULL) {
+        LOG_ERROR("g_userInfoList is uninitialized");
+        return RESULT_NEED_INIT;
+    }
     LinkedList *credentialList = user->credentialInfoList;
     LinkedList *enrolledList = user->enrolledInfoList;
-    if (enrolledList->getSize(enrolledList) > MAX_AUTH_TYPE
-        || credentialList->getSize(credentialList) >= MAX_CREDENTIAL) {
+    if (credentialList->getSize(credentialList) >= MAX_CREDENTIAL) {
         LOG_ERROR("the number of credentials reaches the maximum");
         return RESULT_EXCEED_LIMIT;
     }
@@ -447,8 +411,7 @@ static ResultCode AddCredentialToUser(UserInfo *user, CredentialInfoHal *credent
         LOG_ERROR("update enrolledId failed");
         return ret;
     }
-
-    ret = GenerateDeduplicateUint64(credentialList, &credentialInfo->credentialId, IsCredentialIdDuplicate);
+    ret = GenerateDeduplicateUint64(g_userInfoList, &credentialInfo->credentialId, IsCredentialIdDuplicate);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GenerateDeduplicateUint64 failed");
         return ret;
@@ -523,6 +486,7 @@ ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
         ResultCode ret = AddUser(userId, credentialInfo);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("add user failed");
+            return ret;
         }
         ret = UpdateFileInfo(g_userInfoList);
         if (ret != RESULT_SUCCESS) {
@@ -535,11 +499,20 @@ ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
         return RESULT_BAD_PARAM;
     }
     if (credentialInfo->authType == PIN_AUTH) {
-        ResultCode ret = QueryCredentialInfo(userId, PIN_AUTH, credentialInfo);
-        if (ret != RESULT_NOT_FOUND) {
+        CredentialCondition condition = {};
+        SetCredentialConditionAuthType(&condition, PIN_AUTH);
+        SetCredentialConditionUserId(&condition, userId);
+        LinkedList *credList = QueryCredentialLimit(&condition);
+        if (credList == NULL) {
+            LOG_ERROR("query credential failed");
+            return RESULT_UNKNOWN;
+        }
+        if (credList->getSize(credList) != 0) {
             LOG_ERROR("double pin");
+            DestroyLinkedList(credList);
             return RESULT_BAD_PARAM;
         }
+        DestroyLinkedList(credList);
     }
     ResultCode ret = AddCredentialToUser(user, credentialInfo);
     if (ret != RESULT_SUCCESS) {
@@ -549,7 +522,6 @@ ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
     ret = UpdateFileInfo(g_userInfoList);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("updateFileInfo failed");
-        return ret;
     }
     return ret;
 }
@@ -635,7 +607,7 @@ static CredentialInfoHal *QueryCredentialById(uint64_t credentialId, LinkedList 
     LinkedListNode *temp = credentialList->head;
     CredentialInfoHal *credentialInfo = NULL;
     while (temp != NULL) {
-        CredentialInfoHal *nodeData = (CredentialInfoHal*)temp->data;
+        CredentialInfoHal *nodeData = (CredentialInfoHal *)temp->data;
         if (nodeData != NULL && nodeData->credentialId == credentialId) {
             credentialInfo = nodeData;
             break;
@@ -663,78 +635,231 @@ static CredentialInfoHal *QueryCredentialByAuthType(uint32_t authType, LinkedLis
     return credentialInfo;
 }
 
-ResultCode QueryCredentialInfo(int32_t userId, uint32_t authType, CredentialInfoHal *credentialInfo)
+static bool IsCredMatch(const CredentialCondition *limit, const CredentialInfoHal *credentialInfo)
 {
-    UserInfo *user = QueryUserInfo(userId);
-    if (user == NULL) {
-        LOG_ERROR("can't find this user, userId is %{public}d", userId);
-        return RESULT_NOT_FOUND;
+    if ((limit->conditionFactor & CREDENTIAL_CONDITION_CREDENTIAL_ID) != 0 &&
+        limit->credentialId != credentialInfo->credentialId) {
+        return false;
     }
-    LinkedList *credentialList = user->credentialInfoList;
-    if (credentialList == NULL) {
-        LOG_ERROR("credentialList is null");
-        return RESULT_NOT_FOUND;
+    if ((limit->conditionFactor & CREDENTIAL_CONDITION_AUTH_TYPE) != 0 && limit->authType != credentialInfo->authType) {
+        return false;
     }
-    CredentialInfoHal *credentialQuery = QueryCredentialByAuthType(authType, credentialList);
-    if (credentialQuery == NULL) {
-        LOG_ERROR("credentialQuery is null");
-        return RESULT_NOT_FOUND;
+    if ((limit->conditionFactor & CREDENTIAL_CONDITION_TEMPLATE_ID) != 0 &&
+        limit->templateId != credentialInfo->templateId) {
+        return false;
     }
-    if (memcpy_s(credentialInfo, sizeof(CredentialInfoHal), credentialQuery, sizeof(CredentialInfoHal)) != EOK) {
-        LOG_ERROR("copy credentialInfo failed");
-        return RESULT_BAD_COPY;
+    if ((limit->conditionFactor & CREDENTIAL_CONDITION_SENSOR_HINT) != 0 &&
+        limit->executorSensorHint != INVALID_SENSOR_HINT &&
+        limit->executorSensorHint != credentialInfo->executorSensorHint) {
+        return false;
     }
-    return RESULT_SUCCESS;
+    if ((limit->conditionFactor & CREDENTIAL_CONDITION_EXECUTOR_MATCHER) != 0 &&
+        limit->executorMatcher != credentialInfo->executorMatcher) {
+        return false;
+    }
+    return true;
 }
 
-ResultCode QueryCredentialFromExecutor(uint32_t authType, CredentialInfoHal **credentialInfos, uint32_t *num)
+static bool IsUserMatch(const CredentialCondition *limit, const UserInfo *user)
 {
-    if (credentialInfos == NULL || num == NULL) {
-        LOG_ERROR("param is invalid");
-        return RESULT_BAD_PARAM;
+    if ((limit->conditionFactor & CREDENTIAL_CONDITION_USER_ID) != 0 && limit->userId != user->userId) {
+        return false;
     }
-    if (g_userInfoList == NULL) {
-        return RESULT_NEED_INIT;
+    return true;
+}
+
+static ResultCode TraverseCredentialList(const CredentialCondition *limit, const LinkedList *credentialList,
+    LinkedList *credListGet)
+{
+    if (credentialList == NULL) {
+        LOG_ERROR("credentialList is null");
+        return RESULT_GENERAL_ERROR;
     }
-    uint32_t preApplyNum = PRE_APPLY_NUM;
-    *credentialInfos = Malloc(preApplyNum * sizeof(CredentialInfoHal));
-    if (*credentialInfos == NULL) {
-        LOG_ERROR("no memory");
-        return RESULT_NO_MEMORY;
-    }
-    *num = 0;
-    LinkedListNode *temp = g_userInfoList->head;
+    LinkedListNode *temp = credentialList->head;
     while (temp != NULL) {
-        UserInfo *user = (UserInfo *)temp->data;
-        CredentialInfoHal *credentialQuery = QueryCredentialByAuthType(authType, user->credentialInfoList);
-        if (credentialQuery != NULL) {
-            (*num)++;
-            if (*num <= preApplyNum) {
-                (*credentialInfos)[*num - 1] = *credentialQuery;
-                temp = temp->next;
-                continue;
-            }
-            if (preApplyNum * MEM_GROWTH_FACTOR > MAX_CREDENTIAL_RETURN) {
-                LOG_ERROR("too large");
-                Free(*credentialInfos);
-                *credentialInfos = NULL;
-                return RESULT_NO_MEMORY;
-            }
-            preApplyNum *= MEM_GROWTH_FACTOR;
-            CredentialInfoHal *credentialsTemp = Malloc(sizeof(CredentialInfoHal) * preApplyNum);
-            if (memcpy_s(credentialsTemp, sizeof(CredentialInfoHal) * preApplyNum,
-                *credentialInfos, sizeof(CredentialInfoHal) * (*num - 1)) != EOK) {
-                LOG_ERROR("copy failed");
-                Free(credentialsTemp);
-                Free(*credentialInfos);
-                *credentialInfos = NULL;
-                return RESULT_BAD_COPY;
-            }
-            Free(*credentialInfos);
-            *credentialInfos = credentialsTemp;
-            (*credentialInfos)[*num - 1] = *credentialQuery;
+        CredentialInfoHal *nodeData = (CredentialInfoHal*)temp->data;
+        if (nodeData == NULL) {
+            LOG_ERROR("nodeData is null");
+            return RESULT_UNKNOWN;
+        }
+        if (!IsCredMatch(limit, nodeData)) {
+            temp = temp->next;
+            continue;
+        }
+        CredentialInfoHal *copy = (CredentialInfoHal *)Malloc(sizeof(CredentialInfoHal));
+        *copy = *nodeData;
+        ResultCode ret = credListGet->insert(credListGet, copy);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("insert failed");
+            Free(copy);
+            return ret;
         }
         temp = temp->next;
     }
     return RESULT_SUCCESS;
+}
+
+LinkedList *QueryCredentialLimit(const CredentialCondition *limit)
+{
+    if (limit == NULL) {
+        LOG_ERROR("limit is null");
+        return NULL;
+    }
+    if (g_userInfoList == NULL) {
+        LOG_ERROR("g_userInfoList is null");
+        return NULL;
+    }
+    LinkedList *credList = CreateLinkedList(DestroyCredentialNode);
+    if (credList == NULL) {
+        LOG_ERROR("credList is null");
+        return NULL;
+    }
+    LinkedListNode *temp = g_userInfoList->head;
+    while (temp != NULL) {
+        UserInfo *user = (UserInfo *)temp->data;
+        if (user == NULL) {
+            LOG_ERROR("node data is null");
+            DestroyLinkedList(credList);
+            return NULL;
+        }
+        if (IsUserMatch(limit, user)) {
+            ResultCode ret = TraverseCredentialList(limit, user->credentialInfoList, credList);
+            if (ret != RESULT_SUCCESS) {
+                LOG_ERROR("TraverseCredentialList faild");
+                DestroyLinkedList(credList);
+                return NULL;
+            }
+        }
+        temp = temp->next;
+    }
+    return credList;
+}
+
+ResultCode QueryCredentialUserId(uint64_t credentialId, int32_t *userId)
+{
+    if (userId == NULL) {
+        LOG_ERROR("userId is null");
+        return RESULT_BAD_PARAM;
+    }
+    if (g_userInfoList == NULL) {
+        LOG_ERROR("g_userInfoList is null");
+        return RESULT_NEED_INIT;
+    }
+    LinkedList *credList = CreateLinkedList(DestroyCredentialNode);
+    if (credList == NULL) {
+        LOG_ERROR("credList is null");
+        return RESULT_NO_MEMORY;
+    }
+    LinkedListNode *temp = g_userInfoList->head;
+    CredentialCondition condition = {};
+    SetCredentialConditionCredentialId(&condition, credentialId);
+    while (temp != NULL) {
+        UserInfo *user = (UserInfo *)temp->data;
+        if (user == NULL) {
+            LOG_ERROR("user is null");
+            DestroyLinkedList(credList);
+            return RESULT_UNKNOWN;
+        }
+        ResultCode ret = TraverseCredentialList(&condition, user->credentialInfoList, credList);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("TraverseCredentialList faild");
+            DestroyLinkedList(credList);
+            return RESULT_UNKNOWN;
+        }
+        if (credList->getSize(credList) != 0) {
+            DestroyLinkedList(credList);
+            *userId = user->userId;
+            return RESULT_SUCCESS;
+        }
+        temp = temp->next;
+    }
+    DestroyLinkedList(credList);
+    LOG_ERROR("can't find this credential");
+    return RESULT_NOT_FOUND;
+}
+
+ResultCode SetPinSubType(int32_t userId, uint64_t pinSubType)
+{
+    UserInfo *user = QueryUserInfo(userId);
+    if (user == NULL) {
+        LOG_ERROR("can't find this user");
+        return RESULT_NOT_FOUND;
+    }
+    user->pinSubType = pinSubType;
+    return RESULT_SUCCESS;
+}
+
+ResultCode GetPinSubType(int32_t userId, uint64_t *pinSubType)
+{
+    if (pinSubType == NULL) {
+        LOG_ERROR("pinSubType is null");
+        return RESULT_BAD_PARAM;
+    }
+    UserInfo *user = QueryUserInfo(userId);
+    if (user == NULL) {
+        LOG_ERROR("can't find this user");
+        return RESULT_NOT_FOUND;
+    }
+    *pinSubType = user->pinSubType;
+    return RESULT_SUCCESS;
+}
+
+void SetCredentialConditionCredentialId(CredentialCondition *condition, uint64_t credentialId)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    condition->credentialId = credentialId;
+    condition->conditionFactor |= CREDENTIAL_CONDITION_CREDENTIAL_ID;
+}
+
+void SetCredentialConditionTemplateId(CredentialCondition *condition, uint64_t templateId)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    condition->templateId = templateId;
+    condition->conditionFactor |= CREDENTIAL_CONDITION_TEMPLATE_ID;
+}
+
+void SetCredentialConditionAuthType(CredentialCondition *condition, uint32_t authType)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    condition->authType = authType;
+    condition->conditionFactor |= CREDENTIAL_CONDITION_AUTH_TYPE;
+}
+
+void SetCredentialConditionExecutorSensorHint(CredentialCondition *condition, uint32_t executorSensorHint)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    condition->executorSensorHint = executorSensorHint;
+    condition->conditionFactor |= CREDENTIAL_CONDITION_SENSOR_HINT;
+}
+
+void SetCredentialConditionExecutorMatcher(CredentialCondition *condition, uint32_t executorMatcher)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    condition->executorMatcher = executorMatcher;
+    condition->conditionFactor |= CREDENTIAL_CONDITION_EXECUTOR_MATCHER;
+}
+
+void SetCredentialConditionUserId(CredentialCondition *condition, uint32_t userId)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    condition->userId = userId;
+    condition->conditionFactor |= CREDENTIAL_CONDITION_USER_ID;
 }

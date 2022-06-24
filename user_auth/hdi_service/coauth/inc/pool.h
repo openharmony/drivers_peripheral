@@ -24,28 +24,56 @@ extern "C" {
 #endif
 
 #define PUBLIC_KEY_LEN 32
+#define INVALID_EXECUTOR_INDEX 0
 
-typedef enum ExecutorType {
+typedef enum ExecutorRole {
     COLLECTOR = 1,
     VERIFIER = 2,
     ALL_IN_ONE = 3,
-} ExecutorType;
+} ExecutorRole;
 
 typedef struct ExecutorInfoHal {
-    uint64_t executorId;
+    uint64_t executorIndex;
     uint32_t authType;
-    uint64_t authAbility;
+    uint32_t executorSensorHint;
+    uint32_t executorRole;
+    uint32_t executorMatcher;
     uint32_t esl;
-    uint32_t executorType;
     uint8_t pubKey[PUBLIC_KEY_LEN];
 } ExecutorInfoHal;
+
+typedef enum ExecutorConditionTag {
+    EXECUTOR_CONDITION_INDEX = 1,
+    EXECUTOR_CONDITION_AUTH_TYPE = 2, // 1 << 1
+    EXECUTOR_CONDITION_SENSOR_HINT = 4, // 1 << 2
+    EXECUTOR_CONDITION_ROLE = 8, // 1 << 3
+    EXECUTOR_CONDITION_MATCHER = 16, // 1 << 4
+} ExecutorConditionTag;
+
+typedef struct ExecutorCondition {
+    uint64_t conditonFactor;
+    uint64_t executorIndex;
+    uint32_t authType;
+    uint32_t executorSensorHint;
+    uint32_t executorRole;
+    uint32_t executorMatcher;
+} ExecutorCondition;
 
 ResultCode InitResourcePool(void);
 void DestroyResourcePool(void);
 ResultCode RegisterExecutorToPool(ExecutorInfoHal *executorInfo);
-ResultCode UnregisterExecutorToPool(uint64_t executorId);
-ResultCode QueryExecutor(uint32_t authType, LinkedList **result);
+ResultCode UnregisterExecutorToPool(uint64_t executorIndex);
+
+LinkedList *QueryExecutor(const ExecutorCondition *condition);
+ResultCode QueryCollecterMatcher(uint32_t authType, uint32_t executorSensorHint, uint32_t *matcher);
+uint64_t QueryCredentialExecutorIndex(uint32_t authType, uint32_t executorSensorHint);
 ExecutorInfoHal *CopyExecutorInfo(ExecutorInfoHal *src);
+
+void SetExecutorConditionExecutorIndex(ExecutorCondition *condition, uint64_t executorIndex);
+void SetExecutorConditionAuthType(ExecutorCondition *condition, uint32_t authType);
+void SetExecutorConditionSensorHint(ExecutorCondition *condition, uint32_t executorSensorHint);
+void SetExecutorConditionExecutorRole(ExecutorCondition *condition, uint32_t executorRole);
+void SetExecutorConditionExecutorMatcher(ExecutorCondition *condition, uint32_t executorMatcher);
 
 #ifdef __cplusplus
 }

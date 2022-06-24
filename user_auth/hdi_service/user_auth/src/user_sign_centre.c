@@ -21,6 +21,7 @@
 #include "adaptor_log.h"
 #include "adaptor_time.h"
 #include "token_key.h"
+#include "idm_database.h"
 
 #define TOKEN_VALIDITY_PERIOD (10 * 60 * 1000)
 
@@ -109,4 +110,35 @@ EXIT:
     DestoryBuffer(sign);
     DestoryBuffer(rightSign);
     return ret;
+}
+
+ResultCode GetTokenDataAndSign(const UserAuthContext *context,
+    uint64_t credentialId, uint32_t authMode, UserAuthTokenHal *authToken)
+{
+    if (context == NULL || authToken == NULL) {
+        LOG_ERROR("context or authToken is null");
+        return RESULT_BAD_PARAM;
+    }
+    EnrolledInfoHal enrolledInfo = {};
+    int32_t ret = GetEnrolledInfoAuthType(context->userId, context->authType, &enrolledInfo);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("get enrolled info failed");
+        return ret;
+    }
+    uint64_t secureUid;
+    ret = GetSecureUid(context->userId, &secureUid);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("get secure uid failed");
+        return ret;
+    }
+    authToken->authTrustLevel = context->authTrustLevel;
+    authToken->authType = context->authType;
+    authToken->authMode = authMode;
+    authToken->secureUid = secureUid;
+    authToken->credentialId = credentialId;
+    authToken->enrolledId = enrolledInfo.enrolledId;
+    authToken->challenge = context->challenge;
+    authToken->time = GetSystemTime();
+    authToken->version = TOKEN_VERSION;
+    return UserAuthTokenSign(authToken);
 }

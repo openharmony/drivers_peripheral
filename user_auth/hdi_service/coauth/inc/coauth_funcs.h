@@ -19,28 +19,14 @@
 #include "buffer.h"
 
 #include "coauth.h"
-#include "coauth_sign_centre.h"
 #include "pool.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct {
-    ExecutorInfoHal executorInfos[MAX_EXECUTOR_SIZE];
-    uint32_t executorInfoNum;
-    uint64_t templateId;
-    uint64_t authSubType;
-    uint32_t scheduleMode;
-} ScheduleInfoHal;
-
-int32_t GetScheduleInfo(uint64_t scheduleId, ScheduleInfoHal *scheduleInfo);
-int32_t ScheduleFinish(const Buffer *executorMsg, ScheduleTokenHal *scheduleToken);
-
-int32_t RegisterExecutor(const ExecutorInfoHal *executorInfo, uint64_t *executorId);
-int32_t UnRegisterExecutor(uint64_t executorId);
-
-bool IsExecutorExistFunc(uint32_t authType);
+int32_t RegisterExecutor(const ExecutorInfoHal *executorInfo, uint64_t *executorIndex);
+int32_t UnRegisterExecutor(uint64_t executorIndex);
 
 #ifdef __cplusplus
 }

@@ -103,7 +103,7 @@ static ResultCode StreamWriteEnrolledInfo(Buffer *parcel, LinkedList *enrolledLi
         return ret;
     }
     LinkedListNode *temp = enrolledList->head;
-    for (uint32_t i = 0; i < size; i++) {
+    for (uint32_t i = 0; i < size; ++i) {
         if (temp == NULL) {
             LOG_ERROR("listSize is invalid");
             return RESULT_BAD_PARAM;
@@ -130,7 +130,7 @@ static ResultCode StreamWriteCredentialList(Buffer *parcel, LinkedList *credenti
         return ret;
     }
     LinkedListNode *temp = credentialList->head;
-    for (uint32_t i = 0; i < size; i++) {
+    for (uint32_t i = 0; i < size; ++i) {
         if (temp == NULL) {
             LOG_ERROR("listSize is invalid");
             return RESULT_BAD_PARAM;
@@ -201,7 +201,7 @@ ResultCode UpdateFileInfo(LinkedList *userInfoList)
     }
 
     LinkedListNode *temp = userInfoList->head;
-    for (uint32_t i = 0; i < size; i++) {
+    for (uint32_t i = 0; i < size; ++i) {
         if (temp == NULL || temp->data == NULL) {
             LOG_ERROR("temp is null");
             ret = RESULT_NEED_INIT;
@@ -263,7 +263,7 @@ static ResultCode StreamReadCredentialList(Buffer *parcel, uint32_t *index, Link
         LOG_ERROR("Bad credential num");
         return RESULT_BAD_READ;
     }
-    for (uint32_t i = 0; i < credentialNum; i++) {
+    for (uint32_t i = 0; i < credentialNum; ++i) {
         CredentialInfoHal *credentialInfo = Malloc(sizeof(CredentialInfoHal));
         if (credentialInfo == NULL) {
             LOG_ERROR("credentialInfo malloc failed");
@@ -296,7 +296,7 @@ static ResultCode StreamReadEnrolledList(Buffer *parcel, uint32_t *index, Linked
         LOG_ERROR("bad enrolled num");
         return RESULT_BAD_READ;
     }
-    for (uint32_t i = 0; i < enrolledNum; i++) {
+    for (uint32_t i = 0; i < enrolledNum; ++i) {
         EnrolledInfoHal *enrolledInfo = Malloc(sizeof(EnrolledInfoHal));
         if (enrolledInfo == NULL) {
             LOG_ERROR("enrolledInfo malloc failed");
@@ -384,7 +384,7 @@ static bool StreamReadFileInfo(Buffer *parcel, LinkedList *userInfoList)
         LOG_ERROR("bad user num");
         return false;
     }
-    for (uint32_t i = 0; i < userNum; i++) {
+    for (uint32_t i = 0; i < userNum; ++i) {
         UserInfo *userInfo = InitUserInfoNode();
         if (userInfo == NULL) {
             LOG_ERROR("userInfoNode init failed");
