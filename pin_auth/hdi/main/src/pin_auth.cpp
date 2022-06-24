@@ -228,11 +228,12 @@ int32_t PinAuth::AuthPin(uint64_t scheduleId, uint64_t templateId, const std::ve
     ResultCode result = DoAuthPin(pinAuthParam, retTlv);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("DoAuthPin fail!");
-        goto ERROR;
     }
-    result = SetResultTlv(retTlv, resultTlv);
-    if (result != RESULT_SUCCESS) {
+    ResultCode setRet = SetResultTlv(retTlv, resultTlv);
+    if (setRet != RESULT_SUCCESS) {
         LOG_ERROR("SetRsultTlv fail!");
+        result = setRet;
+        resultTlv.clear();
         goto ERROR;
     }
 

@@ -24,13 +24,14 @@ extern "C" {
 #endif
 
 #define MAX_USER 1000
-#define MAX_CREDENTIAL 5
+#define MAX_CREDENTIAL 100
 
 typedef struct {
     uint64_t credentialId;
-    uint32_t authType;
-    uint64_t authSubType;
     uint64_t templateId;
+    uint32_t authType;
+    uint32_t executorSensorHint;
+    uint32_t executorMatcher;
     uint32_t capabilityLevel;
 } CredentialInfoHal;
 
@@ -42,6 +43,7 @@ typedef struct {
 typedef struct {
     int32_t userId;
     uint64_t secUid;
+    uint64_t pinSubType;
     LinkedList *credentialInfoList;
     LinkedList *enrolledInfoList;
 } UserInfo;

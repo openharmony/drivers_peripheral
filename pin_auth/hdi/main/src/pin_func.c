@@ -33,7 +33,7 @@ ResultCode DoEnrollPin(PinEnrollParam *pinEnrollParam, Buffer *retTlv)
         return ret;
     }
 
-    ret = GenerateRetTlv(RESULT_SUCCESS, pinEnrollParam->scheduleId, pinEnrollParam->subType, templateId, retTlv);
+    ret = GenerateRetTlv(RESULT_SUCCESS, pinEnrollParam->scheduleId, templateId, retTlv);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GenerateRetTlv DoEnrollPin fail.");
     }
@@ -89,7 +89,7 @@ ResultCode DoAuthPin(PinAuthParam *pinAuthParam, Buffer *retTlv)
         ret = RESULT_PIN_FREEZE;
     }
 
-    ResultCode tlvRet = GenerateRetTlv(ret, pinAuthParam->scheduleId, subType, pinAuthParam->templateId, retTlv);
+    ResultCode tlvRet = GenerateRetTlv(ret, pinAuthParam->scheduleId, pinAuthParam->templateId, retTlv);
     if (tlvRet != RESULT_SUCCESS) {
         LOG_ERROR("GenerateRetTlv DoAuthPin fail.");
         return tlvRet;
@@ -195,18 +195,28 @@ static ResultCode WriteTlv(const AuthAttributeType type, const uint32_t length, 
     return RESULT_SUCCESS;
 }
 
-static Buffer *GetDataTlvContent(uint32_t result, uint64_t scheduleId, uint64_t subType, uint64_t templatedId)
+static Buffer *GetDataTlvContent(uint32_t result, uint64_t scheduleId, uint64_t templateId)
 {
     Buffer *ret = CreateBufferBySize(MAX_TLV_LEN);
     if (!IsBufferValid(ret)) {
         LOG_ERROR("no memory.");
         return NULL;
     }
+    PinCredentialInfos pinCredentialInfo;
+    if (DoQueryPinInfo(templateId, &pinCredentialInfo) != RESULT_SUCCESS) {
+        LOG_ERROR("DoQueryPinInfo fail.");
+        return NULL;
+    }
     uint32_t acl = PIN_CAPABILITY_LEVEL;
     if (WriteTlv(AUTH_RESULT_CODE, sizeof(result), (const uint8_t *)&result, ret) != RESULT_SUCCESS ||
-        WriteTlv(AUTH_TEMPLATE_ID, sizeof(templatedId), (const uint8_t *)&templatedId, ret) != RESULT_SUCCESS ||
+        WriteTlv(AUTH_TEMPLATE_ID, sizeof(templateId), (const uint8_t *)&templateId, ret) != RESULT_SUCCESS ||
         WriteTlv(AUTH_SCHEDULE_ID, sizeof(scheduleId), (const uint8_t *)&scheduleId, ret) != RESULT_SUCCESS ||
-        WriteTlv(AUTH_SUBTYPE, sizeof(subType), (const uint8_t *)&subType, ret) != RESULT_SUCCESS ||
+        WriteTlv(AUTH_SUBTYPE,
+            sizeof(pinCredentialInfo.subType), (const uint8_t *)&pinCredentialInfo.subType, ret) != RESULT_SUCCESS ||
+        WriteTlv(AUTH_REMAIN_COUNT, sizeof(pinCredentialInfo.remainTimes),
+            (const uint8_t *)&pinCredentialInfo.remainTimes, ret) != RESULT_SUCCESS ||
+        WriteTlv(AUTH_REMAIN_TIME, sizeof(pinCredentialInfo.freezeTime),
+            (const uint8_t *)&pinCredentialInfo.freezeTime, ret) != RESULT_SUCCESS ||
         WriteTlv(AUTH_CAPABILITY_LEVEL, sizeof(acl), (const uint8_t *)&acl, ret) != RESULT_SUCCESS) {
         LOG_ERROR("write tlv fail.");
         DestoryBuffer(ret);
@@ -215,14 +225,13 @@ static Buffer *GetDataTlvContent(uint32_t result, uint64_t scheduleId, uint64_t 
     return ret;
 }
 
-ResultCode GenerateRetTlv(uint32_t result, uint64_t scheduleId, uint64_t subType, uint64_t templatedId,
-    Buffer *retTlv)
+ResultCode GenerateRetTlv(uint32_t result, uint64_t scheduleId, uint64_t templatedId, Buffer *retTlv)
 {
     if (!IsBufferValid(retTlv) || !IsEd25519KeyPairValid(g_keyPair)) {
         LOG_ERROR("param is invalid.");
         return RESULT_BAD_PARAM;
     }
-    Buffer *dataContent = GetDataTlvContent(result, scheduleId, subType, templatedId);
+    Buffer *dataContent = GetDataTlvContent(result, scheduleId, templatedId);
     if (!IsBufferValid(dataContent)) {
         LOG_ERROR("get data content fail.");
         return RESULT_BAD_COPY;
