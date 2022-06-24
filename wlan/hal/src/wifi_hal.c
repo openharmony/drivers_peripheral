@@ -273,24 +273,22 @@ static int32_t SetPowerModeInner(const char *ifName, uint8_t mode)
     return SetPowerMode(ifName, mode);
 }
 
-static int32_t StartChannelMeasInner(const char *ifName, int32_t commandId, const int32_t *paramBuf,
-    uint32_t paramBufLen)
+static int32_t StartChannelMeasInner(const char *ifName, const struct MeasParam *measParam)
 {
-    if (ifName == NULL || paramBuf == NULL) {
+    if (ifName == NULL || measParam == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    return StartChannelMeas(ifName, commandId, paramBuf, paramBufLen);
+    return StartChannelMeas(ifName, measParam);
 }
 
-static int32_t GetChannelMeasResultInner(const char *ifName, int32_t commandId, uint32_t *paramBuf,
-    uint32_t *paramBufLen)
+static int32_t GetChannelMeasResultInner(const char *ifName, struct MeasResult* measResult)
 {
-    if (ifName == NULL || paramBuf == NULL || paramBufLen == NULL) {
+    if (ifName == NULL || measResult == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    return GetChannelMeasResult(ifName, commandId, paramBuf, paramBufLen);
+    return HDF_ERR_NOT_SUPPORT;
 }
 
 static int32_t Start(struct IWiFi *iwifi)
@@ -397,20 +395,18 @@ static int32_t WifiSetPowerMode(const char *ifName, uint8_t mode)
     return ret;
 }
 
-static int32_t WifiStartChannelMeas(const char *ifName, int32_t commandId, const int32_t *paramBuf,
-    uint32_t paramBufLen)
+static int32_t WifiStartChannelMeas(const char *ifName, const struct MeasParam *measParam)
 {
     HalMutexLock();
-    int32_t ret = StartChannelMeasInner(ifName, commandId, paramBuf, paramBufLen);
+    int32_t ret = StartChannelMeasInner(ifName, measParam);
     HalMutexUnlock();
     return ret;
 }
 
-static int32_t WifiGetChannelMeasResult(const char *ifName, int32_t commandId, uint32_t *paramBuf,
-    uint32_t *paramBufLen)
+static int32_t WifiGetChannelMeasResult(const char *ifName, struct MeasResult* measResult)
 {
     HalMutexLock();
-    int32_t ret = GetChannelMeasResultInner(ifName, commandId, paramBuf, paramBufLen);
+    int32_t ret = GetChannelMeasResultInner(ifName, measResult);
     HalMutexUnlock();
     return ret;
 }

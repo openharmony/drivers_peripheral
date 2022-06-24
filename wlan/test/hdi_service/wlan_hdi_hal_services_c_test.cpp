@@ -762,4 +762,26 @@ HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_033, TestSize.Level1)
     rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
+
+/**
+ * @tc.name: StartChannelMeasTest_034
+ * @tc.desc: Wifi hdi start channel meas and get meas result function test
+ * @tc.type: FUNC
+ * @tc.require: AR000H603J
+ */
+HWTEST_F(HdfWifiServiceCTest, StartChannelMeasTest_034, TestSize.Level1)
+{
+    const char *ifName = "wlan0";
+    struct MeasChannelParam measChannelParam;
+    struct MeasChannelResult measChannelResult = {0};
+
+    measChannelParam.channelId = 1;
+    measChannelParam.measTime = 15;
+    int32_t rc = g_wlanObj->StartChannelMeas(g_wlanObj, ifName, &measChannelParam);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    rc = g_wlanObj->GetChannelMeasResult(g_wlanObj, ifName, &measChannelResult);
+    flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+}
 };
