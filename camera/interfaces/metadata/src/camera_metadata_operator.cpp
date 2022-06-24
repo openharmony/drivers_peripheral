@@ -157,6 +157,9 @@ int32_t GetMetadataSection(uint32_t itemSection, uint32_t *section)
         case OHOS_STREAM_JPEG:
             *section = OHOS_SECTION_STREAM_JPEG;
             break;
+        case OHOS_STREAM_VIDEO:
+            *section = OHOS_SECTION_STREAM_VIDEO;
+            break;
         default:
             METADATA_ERR_LOG("GetMetadataSection item section is not defined");
             ret = CAM_META_FAILURE;
