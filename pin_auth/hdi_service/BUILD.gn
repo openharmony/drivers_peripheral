@@ -31,7 +31,6 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
   ]
 
   deps = [
-    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//base/useriam/user_auth_framework/common:iam_utils",
     "//third_party/openssl:libcrypto_static",
   ]
@@ -39,6 +38,7 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
   external_deps = [
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "utils_base:utils",
   ]

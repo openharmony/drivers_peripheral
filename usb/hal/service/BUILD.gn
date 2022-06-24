@@ -55,7 +55,7 @@ ohos_shared_library("usbd") {
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
-    "startup_l2:syspara",
+    "init:libbegetutil",
     "utils_base:utils",
   ]
 
