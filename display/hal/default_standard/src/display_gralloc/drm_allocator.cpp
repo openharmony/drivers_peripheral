@@ -90,7 +90,6 @@ uint64_t DrmAllocator::GetPhysicalAddr(int primeFd)
     if (ret != 0) {
         DISPLAY_LOGE("DRM_IOCTL_HISILICON_GEM_FD_TO_PHYADDR return failed");
     }
-    DISPLAY_LOGD("phyaddr %{public}" PRIx64 "", args.phyaddr);
     return args.phyaddr;
 }
 

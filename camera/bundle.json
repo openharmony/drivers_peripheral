@@ -43,30 +43,17 @@
           }
         },
         {
-          "name": "//drivers/peripheral/camera/hal:camera_hal",
+          "name": "//drivers/peripheral/camera/interfaces/metadata:metadata",
           "header": {
             "header_files": [
-              "icamera_device.h"
+              "camera_device_ability_items.h",
+              "camera_metadata_info.h",
+              "camera_metadata_item_info.h",
+              "camera_metadata_operator.h",
+              "metadata_log.h",
+              "metadata_utils.h"
             ],
-            "header_base": "//drivers/peripheral/camera/interfaces/include"
-          }
-        },
-        {
-          "name":  "//drivers/peripheral/camera/hal/device_manager:camera_device_manager",
-          "header": {
-            "header_files": [
-              "idevice_manager.h"
-            ],
-            "header_base": "//drivers/peripheral/camera/hal/device_manager/include"
-          }
-        },
-        {
-          "name": "//drivers/peripheral/camera/hal/hdi_impl:camera_hdi_impl",
-          "header": {
-            "header_files": [
-              "camera_device/camera_device_impl.h"
-            ],
-            "header_base": "//drivers/peripheral/camera/hal/hdi_impl/include"
+            "header_base": "//drivers/peripheral/camera/interfaces/metadata/include"
           }
         }
       ]

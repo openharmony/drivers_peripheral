@@ -142,7 +142,7 @@ public:
             fd = releaseFences_.front();
             releaseFences_.pop();
         }
-        DISPLAY_LOGD("fd is %d releaseFences_ size %d", fd, releaseFences_.size());
+        DISPLAY_LOGD("fd is %d releaseFences_ size %zu", fd, releaseFences_.size());
         return fd;
     }
 
