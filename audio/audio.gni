@@ -13,7 +13,7 @@ if (defined(ohos_lite)) {
 }
 
 declare_args() {
-  audio_device_driver_feature_mono_to_stereo = false
+  drivers_peripheral_audio_feature_mono_to_stereo = false
 }
 
 #If set flag is false, the ADM version will be built; if set flag is true, the MPI version will be built.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,7 +51,6 @@ typedef struct {
      * @brief Allocates memory based on the parameters passed by the GUI.
      *
      * @param info Indicates the pointer to the description info of the memory to allocate.
-     *
      * @param handle Indicates the double pointer to the buffer of the memory to allocate.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined in {@link DispErrCode}

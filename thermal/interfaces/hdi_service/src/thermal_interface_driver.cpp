@@ -15,12 +15,11 @@
 
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
-#include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
 #include "v1_0/thermal_interface_stub.h"
+#include "thermal_log.h"
 
-#define HDF_LOG_TAG ThermalInterfaceDriver
 
 using namespace OHOS::HDI::Thermal::V1_0;
 
@@ -39,11 +38,11 @@ static int32_t ThermalInterfaceDriverDispatch(struct HdfDeviceIoClient *client, 
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
+        THERMAL_HILOGE(COMP_HDI, "invalid data sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        THERMAL_HILOGE(COMP_HDI, "invalid reply sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -52,17 +51,17 @@ static int32_t ThermalInterfaceDriverDispatch(struct HdfDeviceIoClient *client, 
 
 int HdfThermalInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfThermalInterfaceDriverInit enter");
+    THERMAL_HILOGD(COMP_HDI, "enter");
     return HDF_SUCCESS;
 }
 
 int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfThermalInterfaceDriverBind enter");
+    THERMAL_HILOGD(COMP_HDI, "enter");
 
     auto *hdfThermalInterfaceHost = new (std::nothrow) HdfThermalInterfaceHost;
     if (hdfThermalInterfaceHost == nullptr) {
-        HDF_LOGE("%{public}s failed to create HdfThermalInterfaceHost object", __func__);
+        THERMAL_HILOGE(COMP_HDI, "failed to create HdfThermalInterfaceHost object");
         return HDF_FAILURE;
     }
 
@@ -72,7 +71,7 @@ int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
     auto serviceImpl = IThermalInterface::Get(true);
     if (serviceImpl == nullptr) {
-        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        THERMAL_HILOGE(COMP_HDI, "failed to get of implement service");
         delete hdfThermalInterfaceHost;
         return HDF_FAILURE;
     }
@@ -80,7 +79,7 @@ int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     hdfThermalInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
         IThermalInterface::GetDescriptor());
     if (hdfThermalInterfaceHost->stub == nullptr) {
-        HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        THERMAL_HILOGE(COMP_HDI, "failed to get stub object");
         delete hdfThermalInterfaceHost;
         return HDF_FAILURE;
     }
@@ -91,9 +90,9 @@ int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
 void HdfThermalInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfThermalInterfaceDriverRelease enter");
+    THERMAL_HILOGD(COMP_HDI, "enter");
     if (deviceObject->service == nullptr) {
-        HDF_LOGE("HdfThermalInterfaceDriverRelease not initted");
+        THERMAL_HILOGE(COMP_HDI, "HdfThermalInterfaceDriverRelease not initted");
         return;
     }
 

@@ -67,14 +67,14 @@ typedef int32_t (*CallbackFunc)(uint32_t event, void *data, const char *ifName);
  *
  * @param ifName The interface name.
  * @param buf Indicates the pointer to the data passed to the callback.
- * @param size Indicates the size of buf;
+ * @param size Indicates the size of buf.
  *
  * @return Returns <b>0</b> if the <b>IWiFi</b> callback is defined; returns a negative value otherwise.
  *
  * @since 1.0
  * @version 1.0
  */
-typedef int32_t (*HmlCallbackFunc)(const char* ifName, int32_t cmd, const int8_t *buf, uint32_t bufLen);
+typedef int32_t (*HmlCallbackFunc)(const char *ifName, int32_t cmd, const int8_t *buf, uint32_t bufLen);
 
 /**
  * @brief Defines the basic WLAN features provided by the hardware abstraction layer (HAL).
@@ -254,34 +254,31 @@ struct IWiFi {
     int32_t (*setPowerMode)(const char *ifName, uint8_t mode);
 
     /**
-     * @brief Start channel measurement.
+     * @brief Start channel measurement(asynchronous interface, need call getChannelMeasResult to
+     * get measurement results).
      *
      * @param ifName Indicates the pointer to the network interface name.
-     * @param commandId Indicates the ID of the delivered command.
-     * @param paramBuf Parameters of the measurement channel.
-     * @param paramBufLen Buffer size for measuring channel parameters.
+     * @param measParam Parameters of the measurement channel.
      *
      * @return Returns <b>0</b> if get infos successful; returns a negative value otherwise.
      *
      * @since 3.2
      * @version 1.0
      */
-    int32_t (*startChannelMeas)(const char *ifName, int32_t commandId, const int32_t *paramBuf, uint32_t paramBufLen);
+    int32_t (*startChannelMeas)(const char *ifName, const struct MeasParam *measParam);
 
     /**
-     * @brief Obtaining Channel Measurement Results.
+     * @brief Obtaining channel measurement results.
      *
      * @param ifName Indicates the pointer to the network interface name.
-     * @param commandId Indicates the ID of the delivered command.
-     * @param paramBuf Channel measurement result data.
-     * @param paramBufLen Buffer size of channel measurement result data.
+     * @param measResult Channel measurement result data.
      *
      * @return Returns <b>0</b> if get infos successful; returns a negative value otherwise.
      *
      * @since 3.2
      * @version 1.0
      */
-    int32_t (*getChannelMeasResult)(const char *ifName, int32_t commandId, uint32_t *paramBuf, uint32_t *paramBufLen);
+    int32_t (*getChannelMeasResult)(const char *ifName, struct MeasResult *measResult);
 
     /**
      * @brief Registers a callback to listen for <b>IWiFi</b> asynchronous hml events.
@@ -321,7 +318,7 @@ struct IWiFi {
      * @since 3.2
      * @version 1.0
      */
-    int32_t (*getCoexChannelList)(const char* ifName, struct CoexChannelList *data);
+    int32_t (*getCoexChannelList)(const char *ifName, uint8_t *buf, uint32_t *bufLen);
 
     /**
      * @brief Send hml command to driver.
@@ -334,7 +331,7 @@ struct IWiFi {
      * @since 3.2
      * @version 1.0
      */
-    int32_t (*sendHmlCmd)(const char *ifName, const struct CmdData* data);
+    int32_t (*sendHmlCmd)(const char *ifName, const struct HalCmdData *data);
 
     /**
      * @brief Send p2p command to driver.
@@ -347,7 +344,7 @@ struct IWiFi {
      * @since 3.2
      * @version 1.0
      */
-    int32_t (*sendP2pCmd)(const char *ifName, const struct CmdData* data);
+    int32_t (*sendP2pCmd)(const char *ifName, const struct HalCmdData *data);
 };
 
 /**

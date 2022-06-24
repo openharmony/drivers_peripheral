@@ -52,7 +52,7 @@ ohos_shared_library("libusb_ddk_host") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "usb_device_driver"
+  part_name = "drivers_peripheral_usb"
 }
 
 ohos_shared_library("libusb_pnp_manager") {
@@ -75,7 +75,7 @@ ohos_shared_library("libusb_pnp_manager") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "usb_device_driver"
+  part_name = "drivers_peripheral_usb"
 }
 
 ohos_shared_library("libusb_ddk_device") {
@@ -107,5 +107,5 @@ ohos_shared_library("libusb_ddk_device") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "usb_device_driver"
+  part_name = "drivers_peripheral_usb"
 }

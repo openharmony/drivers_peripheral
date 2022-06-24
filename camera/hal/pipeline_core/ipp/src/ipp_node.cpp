@@ -21,7 +21,13 @@ IppNode::IppNode(const std::string& name, const std::string& type)
 {
 }
 
-IppNode::~IppNode() {}
+IppNode::~IppNode()
+{
+    GetDeviceController();
+    sensorController_->SetMetaDataCallBack([this](const std::shared_ptr<CameraMetadata>& metadata) {
+        CAMERA_LOGE("V4L2 ipp node already been destroyed!");
+    });
+}
 
 RetCode IppNode::Init(const int32_t streamId)
 {
@@ -61,8 +67,13 @@ RetCode IppNode::Flush(const int32_t streamId)
         return RC_OK;
     }
 
-    algoPlugin_->Flush();
-    NodeBase::Flush(streamId);
+    if (algoPlugin_ == nullptr) {
+        CAMERA_LOGW("IppNode algoPlugin_ is null");
+        return RC_ERROR;
+    } else {
+        algoPlugin_->Flush();
+        NodeBase::Flush(streamId);
+    }
     return RC_OK;
 }
 
@@ -83,7 +94,6 @@ void IppNode::OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata)
         CAMERA_LOGE("meta is nullptr");
         return;
     }
-    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
     // device metadata changed callback
     GetNodeMetaData(metadata);
     if (metaDataCb_ == nullptr) {
@@ -95,11 +105,6 @@ void IppNode::OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata)
 
 void IppNode::GetNodeMetaData(std::shared_ptr<CameraMetadata> metadata)
 {
-    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
-    GetCameraFaceDetectSwitch(metadata);
-    GetCameraFaceRectangles(metadata);
-    GetCameraFaceIds(metadata);
-    GetTimestamp(metadata);
     GetFocusMode(metadata);
     GetFocusState(metadata);
     GetExposureMode(metadata);
@@ -108,94 +113,44 @@ void IppNode::GetNodeMetaData(std::shared_ptr<CameraMetadata> metadata)
     GetExposureState(metadata);
 }
 
-void IppNode::GetCameraFaceDetectSwitch(std::shared_ptr<CameraMetadata> meta)
-{
-    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
-    uint8_t faceDetectSwitch = OHOS_CAMERA_FACE_DETECT_MODE_SIMPLE;
-    meta->addEntry(OHOS_STATISTICS_FACE_DETECT_SWITCH, &faceDetectSwitch, sizeof(faceDetectSwitch));
-}
-
-void IppNode::GetCameraFaceIds(std::shared_ptr<CameraMetadata> meta)
-{
-    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
-    std::vector<int32_t> vFaceIds;
-    vFaceIds.push_back(0);
-    meta->addEntry(OHOS_STATISTICS_FACE_IDS,
-        vFaceIds.data(),
-        vFaceIds.size());
-}
-
-void IppNode::GetTimestamp(std::shared_ptr<CameraMetadata> meta)
-{
-    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
-    int64_t timestamp = 0;
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    timestamp =  static_cast<uint64_t>(tv.tv_sec) * 1000 * 1000 + tv.tv_usec; // 1000:microsecond
-    meta->addEntry(OHOS_SENSOR_INFO_TIMESTAMP, &timestamp, sizeof(timestamp));
-}
-
-void IppNode::GetCameraFaceRectangles(std::shared_ptr<CameraMetadata> meta)
-{
-    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
-    std::vector<std::vector<int32_t>> vFaceRectangles;
-    std::vector<int32_t> vFaceRectangle;
-    int32_t faceRectangle = 1;
-    vFaceRectangle.push_back(faceRectangle);
-    vFaceRectangle.push_back(faceRectangle);
-    vFaceRectangle.push_back(faceRectangle);
-    vFaceRectangle.push_back(faceRectangle);
-    vFaceRectangles.push_back(vFaceRectangle);
-    meta->addEntry(OHOS_STATISTICS_FACE_RECTANGLES,
-        vFaceRectangles.data(),
-        vFaceRectangles.size());
-}
-
 void IppNode::GetFocusMode(std::shared_ptr<CameraMetadata> meta)
 {
-    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
     uint8_t focusMode = OHOS_CAMERA_FOCUS_MODE_LOCKED;
     meta->addEntry(OHOS_CONTROL_FOCUS_MODE, &focusMode, sizeof(focusMode));
 }
 
 void IppNode::GetFocusState(std::shared_ptr<CameraMetadata> meta)
 {
-    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
     uint8_t focusState = OHOS_CAMERA_FOCUS_STATE_UNFOCUSED;
     meta->addEntry(OHOS_CONTROL_FOCUS_STATE, &focusState, sizeof(focusState));
 }
 
 void IppNode::GetExposureMode(std::shared_ptr<CameraMetadata> meta)
 {
-    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
     uint8_t exposureMode = OHOS_CAMERA_EXPOSURE_MODE_AUTO;
     meta->addEntry(OHOS_CONTROL_EXPOSURE_MODE, &exposureMode, sizeof(exposureMode));
 }
 
 void IppNode::GetExposureTime(std::shared_ptr<CameraMetadata> meta)
 {
-    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
     int64_t exposureTime = 1;
     meta->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &exposureTime, sizeof(exposureTime));
 }
 
 void IppNode::GetExposureCompensation(std::shared_ptr<CameraMetadata> meta)
 {
-    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
     int32_t exposureCompensation = 1;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &exposureCompensation, sizeof(exposureCompensation));
 }
 
 void IppNode::GetExposureState(std::shared_ptr<CameraMetadata> meta)
 {
-    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
     uint8_t exposureState = OHOS_CAMERA_EXPOSURE_STATE_SCAN;
     meta->addEntry(OHOS_CONTROL_EXPOSURE_STATE, &exposureState, sizeof(exposureState));
 }
 
 RetCode IppNode::GetDeviceController()
 {
-    CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
     deviceManager_ = IDeviceManager::GetInstance();
     if (deviceManager_ == nullptr) {
         CAMERA_LOGE("get device manager failed.");

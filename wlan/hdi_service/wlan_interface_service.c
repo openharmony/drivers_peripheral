@@ -64,6 +64,8 @@ struct WlanInterfaceService *WlanInterfaceServiceGet(void)
     service->stub.interface.StartScan = WlanInterfaceStartScan;
     service->stub.interface.GetPowerMode = WlanInterfaceGetPowerMode;
     service->stub.interface.SetPowerMode = WlanInterfaceSetPowerMode;
+    service->stub.interface.StartChannelMeas = WlanInterfaceStartChannelMeas;
+    service->stub.interface.GetChannelMeasResult = WlanInterfaceGetChannelMeasResult;
     return service;
 }
 
@@ -72,12 +74,12 @@ int32_t WlanInterfaceServiceInit(void)
     int32_t ret;
     ret = WlanInterfaceWifiConstruct();
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s contruct wifi interface failed! error code: %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s construct wifi interface failed! error code: %{public}d", __func__, ret);
         return ret;
     }
     ret = WlanExtendInterfaceWifiConstruct();
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s contruct wifi extend interface failed! error code: %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s construct wifi extend interface failed! error code: %{public}d", __func__, ret);
         return ret;
     }
     return ret;

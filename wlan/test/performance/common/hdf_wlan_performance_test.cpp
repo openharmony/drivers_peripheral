@@ -261,7 +261,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHaGetValidFreqsWithBand001, TestSize.Level1
 
 /**
  * @tc.name: WifiHalGetAssociatedStas001
- * @tc.desc: Get asscociated STA info
+ * @tc.desc: Get associated STA info
  * @tc.type: FUNC
  * @tc.require: AR000F869K
  */

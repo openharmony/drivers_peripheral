@@ -46,7 +46,7 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
   install_images = [ chipset_base_dir ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
   subsystem_name = "hdf"
-  part_name = "pin_auth_device_driver"
+  part_name = "drivers_peripheral_pin_auth"
 }
 
 ohos_shared_library("libpin_auth_driver") {
@@ -74,7 +74,7 @@ ohos_shared_library("libpin_auth_driver") {
   install_images = [ chipset_base_dir ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
   subsystem_name = "hdf"
-  part_name = "pin_auth_device_driver"
+  part_name = "drivers_peripheral_pin_auth"
 }
 
 group("hdf_pin_auth_service") {

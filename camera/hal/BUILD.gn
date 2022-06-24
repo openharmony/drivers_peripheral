@@ -29,25 +29,27 @@ if (defined(ohos_lite)) {
     deps = []
   }
 } else {
-  print("product_name : , ${product_name}")
   group("camera_hal") {
     if (is_standard_system) {
-      deps = [
-        "$camera_path/../interfaces/hdi_ipc/client:libcamera_client",
-        "buffer_manager:camera_buffer_manager",
-        "device_manager:camera_device_manager",
-        "hdi_impl:camera_hdi_impl",
-        "init:ohos_camera_demo",
-        "pipeline_core:camera_pipeline_core",
-        "utils:camera_utils",
-      ]
-
-      deps += [ "${chipset_build_deps}" ]
+      if (target_cpu == "x86_64") {
+        deps = [ "$camera_path/../interfaces/hdi_ipc/client:libcamera_client" ]
+      } else {
+        deps = [
+          "$camera_path/../interfaces/hdi_ipc/client:libcamera_client",
+          "buffer_manager:camera_buffer_manager",
+          "device_manager:camera_device_manager",
+          "hdi_impl:camera_hdi_impl",
+          "init:ohos_camera_demo",
+          "pipeline_core:camera_pipeline_core",
+          "utils:camera_utils",
+        ]
+        deps += [ "${chipset_build_deps}" ]
+      }
     }
   }
 
   group("camera_hal_unittest") {
-    if (is_standard_system) {
+    if (is_standard_system && target_cpu != "x86_64") {
       testonly = true
       deps = [
         "buffer_manager/test:camera_hal_buffer_manager_unittest",

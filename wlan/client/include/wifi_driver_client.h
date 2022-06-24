@@ -24,6 +24,8 @@ extern "C" {
 #endif
 #endif
 
+#undef LOG_TAG
+#define LOG_TAG "HDF_WIFI_CORE"
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002500
 
@@ -42,8 +44,6 @@ extern "C" {
 #define WIFI_POWER_MODE_THROUGH_WALL 2
 #define WIFI_POWER_MODE_NUM 3
 
-#define HML_PARAM_BUF_SIZE 1024
-
 #define CMD_CLOSE_GO_CAC 133
 #define CMD_SET_GO_CSA_CHANNEL 161
 #define CMD_SET_GO_RADAR_DETECT 163
@@ -56,9 +56,10 @@ enum WifiDriverClientResultCode {
     RET_CODE_FAILURE = -1,
     RET_CODE_NOT_SUPPORT = -2,
     RET_CODE_INVALID_PARAM = -3,
-    RET_CODE_MISUSE = -4, /* uncorrectly API used */
+    RET_CODE_MISUSE = -4, /* incorrectly API used */
     RET_CODE_NOT_AVAILABLE = -5,
     RET_CODE_NOMEM = -6,
+    RET_CODE_DEVICE_BUSY = -16,
 };
 
 enum WifiIfType {
@@ -160,36 +161,24 @@ enum WifiClientType {
     WIFI_CLIENT_BUTT
 };
 
-#ifndef WLANTYPES_H
-struct HdfWifiInfo {
-    int32_t band;
-    uint32_t size;
-};
-
-struct CmdData {
+struct HalCmdData {
     int32_t cmdId;
-    int8_t* buf;
+    int8_t *buf;
     uint32_t bufLen;
 };
 
-struct HmlEventData {
+struct HalEventData {
     uint32_t eventId;
-    uint8_t* buf;
+    uint8_t *buf;
     uint32_t bufLen;
 };
-
-struct CoexChannelList {
-    uint8_t* buf;
-    uint32_t bufLen;
-};
-#endif
 
 typedef int32_t (*OnReceiveFunc)(uint32_t event, void *data, const char *ifName);
 
 int32_t WifiRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
 void WifiUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
 
-typedef int32_t (*NotifyMessage)(const char* ifName, struct HmlEventData *data);
+typedef int32_t (*NotifyMessage)(const char *ifName, struct HalEventData *data);
 
 int32_t WifiRegisterHmlCallback(NotifyMessage func, const char *ifName);
 int32_t WifiUnregisterHmlCallback(NotifyMessage func, const char *ifName);
@@ -247,6 +236,17 @@ struct NetDeviceInfoResult {
     struct NetDeviceInfo deviceInfos[MAX_NETDEVICE_COUNT];
 };
 
+struct MeasParam {
+    int32_t channelId;
+    int32_t measTime;
+};
+
+struct MeasResult {
+    int32_t channelId;
+    int32_t chload;
+    int32_t noise;
+};
+
 int32_t WifiDriverClientInit(void);
 void WifiDriverClientDeinit(void);
 
@@ -269,11 +269,11 @@ int32_t SetResetDriver(const uint8_t chipId, const char *ifName);
 int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult);
 int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode);
 int32_t SetPowerMode(const char *ifName, uint8_t mode);
-int32_t StartChannelMeas(const char *ifName, int32_t commandId, const int32_t *paramBuf, uint32_t paramBufLen);
-int32_t GetChannelMeasResult(const char *ifName, int32_t commandId, uint32_t *paramBuf, uint32_t *paramBufLen);
-int32_t GetCoexChannelList(const char *ifName, struct CoexChannelList *list);
-int32_t SendHmlCmd(const char *ifName, const struct CmdData* data);
-int32_t SendP2pCmd(const char *ifName, const struct CmdData* data);
+int32_t StartChannelMeas(const char *ifName, const struct MeasParam *measParam);
+int32_t GetChannelMeasResult(const char *ifName, struct MeasResult *measResult);
+int32_t GetCoexChannelList(const char *ifName, uint8_t *buf, uint32_t *bufLen);
+int32_t SendHmlCmd(const char *ifName, const struct HalCmdData* data);
+int32_t SendP2pCmd(const char *ifName, const struct HalCmdData* data);
 
 /* wpa related interface */
 #define MAX_SSID_LEN 32
@@ -490,9 +490,9 @@ int32_t WifiCmdSetNetdev(const char *ifName, WifiSetNewDev *info);
 int32_t WifiCmdStaRemove(const char *ifName, const uint8_t *addr, uint32_t addrLen);
 int32_t WifiCmdSendAction(const char *ifName, WifiActionData *actionData);
 int32_t WifiCmdSetClient(uint32_t clientNum);
-int32_t WifiCmdProbeReqReport(const char* ifName, const int32_t *report);
-int32_t WifiCmdRemainOnChannel(const char* ifName, const WifiOnChannel *onChannel);
-int32_t WifiCmdCancelRemainOnChannel(const char* ifName);
+int32_t WifiCmdProbeReqReport(const char *ifName, const int32_t *report);
+int32_t WifiCmdRemainOnChannel(const char *ifName, const WifiOnChannel *onChannel);
+int32_t WifiCmdCancelRemainOnChannel(const char *ifName);
 int32_t WifiCmdAddIf(const char *ifname, const WifiIfAdd *ifAdd);
 int32_t WifiCmdRemoveIf(const char *ifname, const WifiIfRemove *ifRemove);
 int32_t WifiCmdSetApWpsP2pIe(const char *ifname, const WifiAppIe *appIe);

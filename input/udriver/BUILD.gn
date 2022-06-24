@@ -36,5 +36,5 @@ ohos_shared_library("libhdf_input_hotplug") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "input_device_driver"
+  part_name = "drivers_peripheral_input"
 }

@@ -46,18 +46,6 @@ int32_t WlanCallbackScanResult(struct IWlanCallback *self, uint32_t event, const
     return HDF_SUCCESS;
 }
 
-int32_t WlanCallbackHmlNotifyMessage(struct IWlanCallback *self, const char *ifName,
-    const struct HmlEventData *data)
-{
-    (void)self;
-    if (ifName == NULL || data == NULL) {
-        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    HDF_LOGE("WlanCallbackResetDriver: receive hml notify message\n");
-    return HDF_SUCCESS;
-}
-
 struct IWlanCallback *WlanCallbackServiceGet(void)
 {
     struct WlanCallbackService *service =
@@ -75,7 +63,6 @@ struct IWlanCallback *WlanCallbackServiceGet(void)
 
     service->stub.interface.ResetDriverResult = WlanCallbackResetDriver;
     service->stub.interface.ScanResult = WlanCallbackScanResult;
-    service->stub.interface.NotifyMessage = WlanCallbackHmlNotifyMessage;
     return &service->stub.interface;
 }
 
