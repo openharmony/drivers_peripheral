@@ -21,6 +21,7 @@
 #include "defines.h"
 #include "adaptor_memory.h"
 #include "idm_common.h"
+#include "linked_list.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,16 +31,44 @@ ResultCode InitUserInfoList(void);
 void DestroyUserInfoList(void);
 UserInfo *InitUserInfoNode(void);
 
+typedef enum CredentialConditionTag {
+    CREDENTIAL_CONDITION_CREDENTIAL_ID = 1,
+    CREDENTIAL_CONDITION_AUTH_TYPE = 2, // 1 << 1
+    CREDENTIAL_CONDITION_TEMPLATE_ID = 4, // 1 << 2
+    CREDENTIAL_CONDITION_SENSOR_HINT = 8, // 1 << 3
+    CREDENTIAL_CONDITION_EXECUTOR_MATCHER = 16, // 1 << 4
+    CREDENTIAL_CONDITION_USER_ID = 32, // 1 << 5
+} CredentialConditionTag;
+
+typedef struct {
+    uint64_t conditionFactor;
+    uint64_t credentialId;
+    uint64_t templateId;
+    uint32_t authType;
+    uint32_t executorSensorHint;
+    uint32_t executorMatcher;
+    int32_t userId;
+} CredentialCondition;
+
 ResultCode GetSecureUid(int32_t userId, uint64_t *secUid);
 ResultCode GetEnrolledInfo(int32_t userId, EnrolledInfoHal **enrolledInfos, uint32_t *num);
 ResultCode GetEnrolledInfoAuthType(int32_t userId, uint32_t authType, EnrolledInfoHal *enrolledInfo);
-ResultCode DeleteUserInfo(int32_t userId, CredentialInfoHal **credentialInfos, uint32_t *num);
+ResultCode DeleteUserInfo(int32_t userId, LinkedList **creds);
+
+LinkedList *QueryCredentialLimit(const CredentialCondition *limit);
+ResultCode QueryCredentialUserId(uint64_t credentialId, int32_t *userId);
 
 ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo);
-ResultCode QueryCredentialInfoAll(int32_t userId, CredentialInfoHal **credentialInfos, uint32_t *num);
-ResultCode QueryCredentialInfo(int32_t userId, uint32_t authType, CredentialInfoHal *credentialInfo);
+ResultCode SetPinSubType(int32_t userId, uint64_t pinSubType);
+ResultCode GetPinSubType(int32_t userId, uint64_t *pinSubType);
 ResultCode DeleteCredentialInfo(int32_t userId, uint64_t credentialId, CredentialInfoHal *credentialInfo);
-ResultCode QueryCredentialFromExecutor(uint32_t authType, CredentialInfoHal **credentialInfos, uint32_t *num);
+
+void SetCredentialConditionCredentialId(CredentialCondition *condition, uint64_t credentialId);
+void SetCredentialConditionTemplateId(CredentialCondition *condition, uint64_t templateId);
+void SetCredentialConditionAuthType(CredentialCondition *condition, uint32_t authType);
+void SetCredentialConditionExecutorSensorHint(CredentialCondition *condition, uint32_t executorSensorHint);
+void SetCredentialConditionExecutorMatcher(CredentialCondition *condition, uint32_t executorMatcher);
+void SetCredentialConditionUserId(CredentialCondition *condition, uint32_t userId);
 
 #ifdef __cplusplus
 }

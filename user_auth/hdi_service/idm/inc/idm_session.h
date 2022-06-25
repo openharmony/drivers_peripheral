@@ -31,6 +31,7 @@ ResultCode AssociateCoauthSchedule(uint64_t scheduleId, uint32_t authType, bool 
 void BreakOffCoauthSchedule(void);
 
 bool IsSessionTimeout(void);
+bool IsSessionValid(int32_t userId);
 ResultCode GetUserId(int32_t *userId);
 ResultCode GetChallenge(uint64_t *challenge);
 ResultCode GetIsUpdate(bool *isUpdate);

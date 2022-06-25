@@ -30,13 +30,45 @@ static bool IsCoAuthInit()
     return g_scheduleList != NULL;
 }
 
-static void DestroySchedule(void *data)
+void DestroyScheduleNode(void *data)
 {
     if (data == NULL) {
         LOG_ERROR("get null data");
         return;
     }
-    Free(data);
+    CoAuthSchedule *schedule = (CoAuthSchedule *)data;
+    if (schedule->templateIds.value != NULL) {
+        Free(schedule->templateIds.value);
+        schedule->templateIds.value = NULL;
+    }
+    Free(schedule);
+}
+
+CoAuthSchedule *CopyCoAuthSchedule(const CoAuthSchedule *coAuthSchedule)
+{
+    if (coAuthSchedule == NULL || !IsTemplateArraysValid(&(coAuthSchedule->templateIds))) {
+        LOG_ERROR("coAuthSchedule is invalid");
+        return NULL;
+    }
+    CoAuthSchedule *schedule = (CoAuthSchedule *)Malloc(sizeof(CoAuthSchedule));
+    if (schedule == NULL) {
+        LOG_ERROR("schedule is null");
+        return NULL;
+    }
+    if (memcpy_s(schedule, sizeof(CoAuthSchedule), coAuthSchedule, sizeof(CoAuthSchedule)) != EOK) {
+        LOG_ERROR("copy schedule failed");
+        Free(schedule);
+        return NULL;
+    }
+    schedule->templateIds.value = NULL;
+    schedule->templateIds.num = 0;
+    ResultCode ret = CopyTemplateArrays(&(coAuthSchedule->templateIds), &(schedule->templateIds));
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("copy templateIds failed");
+        Free(schedule);
+        return NULL;
+    }
+    return schedule;
 }
 
 void DestroyCoAuthSchedule(CoAuthSchedule *coAuthSchedule)
@@ -44,13 +76,13 @@ void DestroyCoAuthSchedule(CoAuthSchedule *coAuthSchedule)
     if (coAuthSchedule == NULL) {
         return;
     }
-    DestroySchedule(coAuthSchedule);
+    DestroyScheduleNode(coAuthSchedule);
 }
 
 ResultCode InitCoAuth(void)
 {
     if (!IsCoAuthInit()) {
-        g_scheduleList = CreateLinkedList(DestroySchedule);
+        g_scheduleList = CreateLinkedList(DestroyScheduleNode);
     }
     if (g_scheduleList == NULL) {
         return RESULT_GENERAL_ERROR;
@@ -64,7 +96,7 @@ void DestoryCoAuth(void)
     g_scheduleList = NULL;
 }
 
-ResultCode AddCoAuthSchedule(CoAuthSchedule *coAuthSchedule)
+ResultCode AddCoAuthSchedule(const CoAuthSchedule *coAuthSchedule)
 {
     if (!IsCoAuthInit()) {
         LOG_ERROR("pool not init");
@@ -74,21 +106,15 @@ ResultCode AddCoAuthSchedule(CoAuthSchedule *coAuthSchedule)
         LOG_ERROR("get null schedule");
         return RESULT_BAD_PARAM;
     }
-    CoAuthSchedule *schedule = (CoAuthSchedule *)Malloc(sizeof(CoAuthSchedule));
+    CoAuthSchedule *schedule = CopyCoAuthSchedule(coAuthSchedule);
     if (schedule == NULL) {
         LOG_ERROR("no memory");
         return RESULT_NO_MEMORY;
     }
-    if (memcpy_s(schedule, sizeof(CoAuthSchedule), coAuthSchedule, sizeof(CoAuthSchedule)) != EOK) {
-        LOG_ERROR("copy failed");
-        Free(schedule);
-        return RESULT_BAD_COPY;
-    }
     ResultCode result = g_scheduleList->insert(g_scheduleList, schedule);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("insert failed");
-        Free(schedule);
-        return result;
+        DestroyCoAuthSchedule(schedule);
     }
     return result;
 }
@@ -113,38 +139,33 @@ ResultCode RemoveCoAuthSchedule(uint64_t scheduleId)
     return g_scheduleList->remove(g_scheduleList, (void *)&scheduleId, IsScheduleMatch, true);
 }
 
-ResultCode GetCoAuthSchedule(CoAuthSchedule *coAuthSchedule)
+const CoAuthSchedule *GetCoAuthSchedule(uint64_t scheduleId)
 {
     if (!IsCoAuthInit()) {
         LOG_ERROR("pool not init");
-        return RESULT_NEED_INIT;
-    }
-    if (coAuthSchedule == NULL) {
-        LOG_ERROR("get null schedule");
-        return RESULT_BAD_PARAM;
+        return NULL;
     }
     LinkedListIterator *iterator = g_scheduleList->createIterator(g_scheduleList);
     if (iterator == NULL) {
         LOG_ERROR("create iterator failed");
-        return RESULT_NO_MEMORY;
+        return NULL;
     }
-    int32_t result = RESULT_BAD_MATCH;
+    CoAuthSchedule *schedule = NULL;
     while (iterator->hasNext(iterator)) {
-        CoAuthSchedule *schedule = (CoAuthSchedule *)iterator->next(iterator);
-        if (schedule->scheduleId != coAuthSchedule->scheduleId) {
+        schedule = (CoAuthSchedule *)iterator->next(iterator);
+        if (schedule == NULL) {
+            LOG_ERROR("list node is null, please check");
             continue;
         }
-        if (memcpy_s(coAuthSchedule, sizeof(CoAuthSchedule), schedule, sizeof(CoAuthSchedule)) != EOK) {
-            LOG_ERROR("memcpy failed");
-            result = RESULT_BAD_COPY;
-            break;
+        if (schedule->scheduleId != scheduleId) {
+            continue;
         }
         g_scheduleList->destroyIterator(iterator);
-        return RESULT_SUCCESS;
+        return schedule;
     }
-
     g_scheduleList->destroyIterator(iterator);
-    return result;
+    LOG_ERROR("can't find this schedule");
+    return NULL;
 }
 
 static bool IsScheduleIdDuplicate(uint64_t scheduleId)
@@ -169,7 +190,7 @@ static ResultCode GenerateValidScheduleId(uint64_t *scheduleId)
         return RESULT_BAD_PARAM;
     }
 
-    for (uint32_t i = 0; i < MAX_DUPLICATE_CHECK; i++) {
+    for (uint32_t i = 0; i < MAX_DUPLICATE_CHECK; ++i) {
         uint64_t tempRandom;
         if (SecureRandom((uint8_t *)&tempRandom, sizeof(uint64_t)) != RESULT_SUCCESS) {
             LOG_ERROR("get random failed");
@@ -185,35 +206,66 @@ static ResultCode GenerateValidScheduleId(uint64_t *scheduleId)
     return RESULT_GENERAL_ERROR;
 }
 
-static ResultCode MountExecutor(uint32_t authType, CoAuthSchedule *coAuthSchedule)
+static ResultCode MountExecutorOnce(const LinkedList *executors, CoAuthSchedule *coAuthSchedule, uint32_t sensorHint,
+    uint32_t executorRole)
 {
-    LinkedList *executors = NULL;
-    ResultCode ret = QueryExecutor(authType, &executors);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("query executor failed");
-        return ret;
+    LinkedListNode *tempNode = executors->head;
+    while (tempNode != NULL) {
+        if (tempNode->data == NULL) {
+            LOG_ERROR("data is null");
+            return RESULT_UNKNOWN;
+        }
+        ExecutorInfoHal *executor = (ExecutorInfoHal *)tempNode->data;
+        if (executor->executorRole != executorRole) {
+            tempNode = tempNode->next;
+            continue;
+        }
+        if (sensorHint != INVALID_SENSOR_HINT && sensorHint != executor->executorSensorHint) {
+            tempNode = tempNode->next;
+            continue;
+        }
+        coAuthSchedule->executors[coAuthSchedule->executorSize] = *executor;
+        ++(coAuthSchedule->executorSize);
+        return RESULT_SUCCESS;
     }
+    LOG_ERROR("mount executor failed");
+    return RESULT_NOT_FOUND;
+}
 
-    coAuthSchedule->executorSize = executors->getSize(executors);
-    if (coAuthSchedule->executorSize <= 0 || coAuthSchedule->executorSize > MAX_EXECUTOR_SIZE) {
-        LOG_ERROR("executorSize is invalid");
-        ret = RESULT_UNKNOWN;
+static ResultCode MountExecutor(const ScheduleParam *param, CoAuthSchedule *coAuthSchedule)
+{
+    ExecutorCondition condition = {};
+    SetExecutorConditionAuthType(&condition, param->authType);
+    if (param->collectorSensorHint != INVALID_SENSOR_HINT || param->verifierSensorHint != INVALID_SENSOR_HINT) {
+        SetExecutorConditionExecutorMatcher(&condition, param->executorMatcher);
+    }
+    LinkedList *executors = QueryExecutor(&condition);
+    if (executors == NULL) {
+        LOG_ERROR("query executor failed");
+        return RESULT_UNKNOWN;
+    }
+    ResultCode ret;
+    if (param->collectorSensorHint == INVALID_SENSOR_HINT || param->verifierSensorHint == INVALID_SENSOR_HINT ||
+        param->collectorSensorHint == param->verifierSensorHint) {
+        uint32_t allInOneSensorHint = param->verifierSensorHint | param->collectorSensorHint;
+        ret = MountExecutorOnce(executors, coAuthSchedule, allInOneSensorHint, ALL_IN_ONE);
+        if (ret == RESULT_SUCCESS) {
+            goto EXIT;
+        }
+    }
+    if (param->scheduleMode == SCHEDULE_MODE_IDENTIFY) {
+        LOG_ERROR("identification only supports all in one");
+        ret = RESULT_GENERAL_ERROR;
         goto EXIT;
     }
-    LinkedListNode *tempNode = executors->head;
-    for (uint32_t i = 0; i < coAuthSchedule->executorSize; i++) {
-        if (tempNode == NULL || tempNode->data == NULL) {
-            LOG_ERROR("tempNode or data is null");
-            ret = RESULT_UNKNOWN;
-            goto EXIT;
-        }
-        if (memcpy_s(coAuthSchedule->executors + i, sizeof(ExecutorInfoHal),
-            tempNode->data, sizeof(ExecutorInfoHal)) != EOK) {
-            LOG_ERROR("copy executorinfo failed");
-            ret = RESULT_UNKNOWN;
-            goto EXIT;
-        }
-        tempNode = tempNode->next;
+    ret = MountExecutorOnce(executors, coAuthSchedule, param->verifierSensorHint, VERIFIER);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("verifier is not found");
+        goto EXIT;
+    }
+    ret = MountExecutorOnce(executors, coAuthSchedule, param->collectorSensorHint, COLLECTOR);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("collector is not found");
     }
 
 EXIT:
@@ -221,9 +273,28 @@ EXIT:
     return ret;
 }
 
-CoAuthSchedule *GenerateAuthSchedule(uint64_t contextId, uint32_t authType, uint64_t authSubType,
-    uint64_t templateId)
+uint32_t GetScheduleVeriferSensorHint(const CoAuthSchedule *coAuthSchedule)
 {
+    if (coAuthSchedule == NULL) {
+        LOG_ERROR("coAuthSchedule is null");
+        return INVALID_SENSOR_HINT;
+    }
+    for (uint32_t i = 0; i < coAuthSchedule->executorSize; ++i) {
+        const ExecutorInfoHal *executor = coAuthSchedule->executors + i;
+        if (executor->executorRole == VERIFIER || executor->executorRole == ALL_IN_ONE) {
+            return executor->executorSensorHint;
+        }
+    }
+    LOG_ERROR("not found");
+    return INVALID_SENSOR_HINT;
+}
+
+CoAuthSchedule *GenerateSchedule(const ScheduleParam *param)
+{
+    if (param == NULL) {
+        LOG_ERROR("param is invalid");
+        return NULL;
+    }
     CoAuthSchedule *coAuthSchedule = Malloc(sizeof(CoAuthSchedule));
     if (coAuthSchedule == NULL) {
         LOG_ERROR("coAuthSchedule is null");
@@ -231,61 +302,72 @@ CoAuthSchedule *GenerateAuthSchedule(uint64_t contextId, uint32_t authType, uint
     }
     if (memset_s(coAuthSchedule, sizeof(CoAuthSchedule), 0, sizeof(CoAuthSchedule)) != EOK) {
         LOG_ERROR("reset coAuthSchedule failed");
-        goto EXIT;
+        Free(coAuthSchedule);
+        return NULL;
     }
     ResultCode ret = GenerateValidScheduleId(&coAuthSchedule->scheduleId);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("get scheduleId failed");
-        goto EXIT;
+        goto FAIL;
+    }
+    coAuthSchedule->associateId = param->associateId;
+    coAuthSchedule->scheduleMode = param->scheduleMode;
+    coAuthSchedule->authType = param->authType;
+    if (param->templateIds != NULL) {
+        ret = CopyTemplateArrays(param->templateIds, &(coAuthSchedule->templateIds));
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("copy template failed");
+            goto FAIL;
+        }
     }
 
-    coAuthSchedule->associateId.contextId = contextId;
-    coAuthSchedule->templateId = templateId;
-    coAuthSchedule->authSubType = authSubType;
-    coAuthSchedule->scheduleMode = SCHEDULE_MODE_AUTH;
-
-    ret = MountExecutor(authType, coAuthSchedule);
+    ret = MountExecutor(param, coAuthSchedule);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("mount failed");
-        goto EXIT;
+        goto FAIL;
     }
-
     return coAuthSchedule;
-
-EXIT:
-    Free(coAuthSchedule);
+FAIL:
+    DestroyCoAuthSchedule(coAuthSchedule);
     return NULL;
 }
 
-CoAuthSchedule *GenerateIdmSchedule(uint64_t challenge, uint32_t authType, uint64_t authSubType)
+bool IsTemplateArraysValid(const TemplateIdArrays *templateIds)
 {
-    CoAuthSchedule *coAuthSchedule = Malloc(sizeof(CoAuthSchedule));
-    if (coAuthSchedule == NULL) {
-        LOG_ERROR("coAuthSchedule is null");
-        return NULL;
+    if (templateIds == NULL) {
+        LOG_ERROR("templateIds is null");
+        return false;
     }
-    if (memset_s(coAuthSchedule, sizeof(CoAuthSchedule), 0, sizeof(CoAuthSchedule)) != EOK) {
-        LOG_ERROR("reset coAuthSchedule failed");
-        goto EXIT;
+    if (templateIds->num > MAX_TEMPLATE_OF_SCHEDULE || (templateIds->num != 0 && templateIds->value == NULL)) {
+        LOG_ERROR("templateIds's content is invalid");
+        return false;
     }
-    ResultCode ret = GenerateValidScheduleId(&coAuthSchedule->scheduleId);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("get scheduleId failed");
-        goto EXIT;
-    }
+    return true;
+}
 
-    coAuthSchedule->associateId.challenge = challenge;
-    coAuthSchedule->authSubType = authSubType;
-    coAuthSchedule->scheduleMode = SCHEDULE_MODE_ENROLL;
-
-    ret = MountExecutor(authType, coAuthSchedule);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("mount failed");
-        goto EXIT;
+ResultCode CopyTemplateArrays(const TemplateIdArrays *in, TemplateIdArrays *out)
+{
+    if (!IsTemplateArraysValid(in) || out == NULL || out->value != NULL) {
+        LOG_ERROR("param is invalid");
+        return RESULT_BAD_PARAM;
     }
-
-    return coAuthSchedule;
-EXIT:
-    Free(coAuthSchedule);
-    return NULL;
+    if (in->num == 0) {
+        out->num = 0;
+        return RESULT_SUCCESS;
+    }
+    out->num = in->num;
+    out->value = (uint64_t *)Malloc(sizeof(uint64_t) * out->num);
+    if (out->value == NULL) {
+        LOG_ERROR("out value is null");
+        out->num = 0;
+        return RESULT_NO_MEMORY;
+    }
+    if (memcpy_s(out->value, (sizeof(uint64_t) * out->num), in->value, (sizeof(uint64_t) * in->num)) != EOK) {
+        LOG_ERROR("copy failed");
+        Free(out->value);
+        out->value = NULL;
+        out->num = 0;
+        return RESULT_BAD_COPY;
+    }
+    return RESULT_SUCCESS;
 }
