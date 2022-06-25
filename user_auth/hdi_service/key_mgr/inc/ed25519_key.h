@@ -13,18 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef USER_IAM_LOCK
-#define USER_IAM_LOCK
+#ifndef USER_IAM_ED25519_KEY_H
+#define USER_IAM_ED25519_KEY_H
+
+#include "buffer.h"
+#include "defines.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void GlobalLock(void);
-void GlobalUnLock(void);
+ResultCode GenerateKeyPair(void);
+void DestoryEd25519KeyPair(void);
+Buffer *ExecutorMsgSign(const Buffer *data);
+const Buffer *GetPriKey(void);
+const Buffer *GetPubKey(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif // USER_IAM_ED25519_KEY_H

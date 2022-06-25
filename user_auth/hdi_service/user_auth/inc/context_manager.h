@@ -18,6 +18,7 @@
 
 #include "coauth.h"
 #include "linked_list.h"
+#include "executor_message.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,6 +32,7 @@ typedef struct UserAuthContext {
     uint64_t challenge;
     uint32_t authType;
     uint32_t authTrustLevel;
+    uint32_t collectorSensorHint;
     LinkedList *scheduleList;
 } UserAuthContext;
 
@@ -40,16 +42,27 @@ typedef struct {
     uint64_t challenge;
     uint32_t authType;
     uint32_t authTrustLevel;
+    uint32_t executorSensorHint;
 } AuthSolutionHal;
+
+typedef struct IdentifyParam {
+    uint64_t contextId;
+    uint64_t challenge;
+    uint32_t authType;
+    uint32_t executorSensorHint;
+} IdentifyParam;
 
 ResultCode InitUserAuthContextList();
 void DestoryUserAuthContextList(void);
-UserAuthContext *GenerateContext(AuthSolutionHal params);
+UserAuthContext *GenerateAuthContext(AuthSolutionHal params);
+UserAuthContext *GenerateIdentifyContext(IdentifyParam params);
 
 UserAuthContext *GetContext(uint64_t contextId);
 ResultCode ScheduleOnceFinish(UserAuthContext *context, uint64_t scheduleId);
 void DestoryContext(UserAuthContext *context);
-ResultCode GetSchedules(UserAuthContext *context, CoAuthSchedule **schedules, uint32_t *scheduleNum);
+int32_t DestoryContextbyId(uint64_t contextId);
+ResultCode CopySchedules(UserAuthContext *context, LinkedList **schedules);
+int32_t FillInContext(UserAuthContext *context, uint64_t *credentialId, ExecutorResultInfo *info);
 
 #ifdef __cplusplus
 }

@@ -20,11 +20,13 @@
 
 #include "buffer.h"
 #include "defines.h"
+#include "linked_list.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#define BUFFER_SIZE 2048
 typedef enum AuthAttributeType {
     /* Root tag */
     AUTH_ROOT = 100000,
@@ -73,22 +75,29 @@ typedef enum AuthAttributeType {
     /* capability level */
     AUTH_CAPABILITY_LEVEL = 100029,
     /* algorithm setinfo */
-    ALGORITHM_INFO,
-} AuthAttributeType;
+    ALGORITHM_INFO = 100030,
+    /* time stamp */
+    AUTH_TIME_STAMP = 100031,
+} AuthAttributeType; // the new tag must be consistent with userauth SA
 
 typedef struct ExecutorResultInfo {
-    Buffer *data;
-    Buffer *sign;
     int32_t result;
     uint64_t scheduleId;
     uint64_t templateId;
     uint64_t authSubType;
     uint32_t capabilityLevel;
+    int32_t freezingTime;
+    int32_t remainTimes;
 } ExecutorResultInfo;
 
+typedef struct ExecutorMsg {
+    uint64_t executorIndex;
+    Buffer *msg;
+} ExecutorMsg;
+
 ExecutorResultInfo *CreateExecutorResultInfo(const Buffer *executorResultInfo);
-bool IsExecutorInfoValid(const ExecutorResultInfo *executorResultInfo);
 void DestoryExecutorResultInfo(ExecutorResultInfo *result);
+ResultCode GetExecutorMsgList(uint32_t authPropertyMode, LinkedList **executorMsg);
 
 #ifdef __cplusplus
 }
