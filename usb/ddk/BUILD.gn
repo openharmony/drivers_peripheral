@@ -14,6 +14,17 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
+USB_HAL_PATH =
+    rebase_path("//vendor/${product_company}/${product_name}/hals/usb")
+cmd = "if [ -f $USB_HAL_PATH/product.gni ]; then echo true; else echo false; fi"
+HAVE_USB_HAL_PATH =
+    exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
+if (HAVE_USB_HAL_PATH) {
+  import("$USB_HAL_PATH/product.gni")
+} else {
+  enable_linux_native_mode = false
+}
+
 group("libusb_core") {
   deps = [
     ":libusb_ddk_device",
@@ -39,6 +50,10 @@ ohos_shared_library("libusb_ddk_host") {
     "host/src/usb_raw_api_library.c",
   ]
 
+  if (enable_linux_native_mode) {
+    defines = [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
+  }
+
   if (is_standard_system) {
     external_deps = [
       "device_driver_framework:libhdf_host",
@@ -61,6 +76,10 @@ ohos_shared_library("libusb_pnp_manager") {
     "$hdf_framework_path/model/usb/src/usb_ddk_pnp_loader.c",
     "host/src/usb_pnp_manager.c",
   ]
+
+  if (enable_linux_native_mode) {
+    defines = [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
+  }
 
   if (is_standard_system) {
     external_deps = [
@@ -103,6 +122,10 @@ ohos_shared_library("libusb_ddk_device") {
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
+  }
+
+  if (enable_linux_native_mode) {
+    defines = [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
   }
 
   install_images = [ chipset_base_dir ]
