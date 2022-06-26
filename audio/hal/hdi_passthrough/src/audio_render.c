@@ -1146,6 +1146,22 @@ int32_t AudioRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct 
     return AUDIO_HAL_SUCCESS;
 }
 
+int32_t AudioRenderAddEffect(AudioHandle handle, uint64_t effectid)
+{
+    (void)handle;
+    (void)effectid;
+    HDF_LOGI("%{public}s: add render effect success", __func__);
+    return AUDIO_HAL_SUCCESS;
+}
+
+int32_t AudioRenderRemoveEffect(AudioHandle handle, uint64_t effectid)
+{
+    (void)handle;
+    (void)effectid;
+    HDF_LOGI("%{public}s: remove render effect success", __func__);
+    return AUDIO_HAL_SUCCESS;
+}
+
 int32_t AudioRenderTurnStandbyMode(AudioHandle handle)
 {
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
