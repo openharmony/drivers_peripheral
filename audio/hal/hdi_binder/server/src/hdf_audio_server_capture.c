@@ -746,6 +746,56 @@ int32_t HdiServiceCaptureGetMmapPosition(const struct HdfDeviceIoClient *client,
     return AUDIO_HAL_SUCCESS;
 }
 
+int32_t HdiServiceCaptureAddEffect(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    (void)client;
+    (void)reply;
+    uint64_t effectid = 0;
+    if (data == NULL) {
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    struct AudioCapture *capture = NULL;
+    int32_t ret = AudioAdapterListCheckAndGetCapture(&capture, data);
+    if (ret < 0 || capture == NULL) {
+        HDF_LOGE("%{public}s: capture is NULL or ret = %{public}d", __func__, ret);
+        return ret;
+    }
+
+    if (!HdfSbufReadUint64(data, &effectid)) {
+        HDF_LOGE("%{public}s: read buf fail ", __func__);
+        return HDF_FAILURE;
+    }
+
+    return capture->attr.AddAudioEffect((AudioHandle)capture, effectid);
+}
+
+int32_t HdiServiceCaptureRemoveEffect(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    (void)client;
+    (void)reply;
+    uint64_t effectid = 0;
+    if (data == NULL) {
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    struct AudioCapture *capture = NULL;
+    int32_t ret = AudioAdapterListCheckAndGetCapture(&capture, data);
+    if (ret < 0 || capture == NULL) {
+        HDF_LOGE("%{public}s: capture is NULL or ret = %{public}d", __func__, ret);
+        return ret;
+    }
+
+    if (!HdfSbufReadUint64(data, &effectid)) {
+        HDF_LOGE("%{public}s: read buf fail ", __func__);
+        return HDF_FAILURE;
+    }
+
+    return capture->attr.RemoveAudioEffect((AudioHandle)capture, effectid);
+}
+
 int32_t HdiServiceCaptureTurnStandbyMode(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
