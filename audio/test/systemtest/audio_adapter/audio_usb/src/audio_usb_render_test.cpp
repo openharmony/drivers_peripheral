@@ -562,9 +562,9 @@ HWTEST_F(AudioUsbRenderTest, SUB_Audio_HDI_RenderPause_0003, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name Test AudioRenderPause API via the render is paused after stoped.
+* @tc.name Test AudioRenderPause API via the render is paused after stopped.
 * @tc.number  SUB_Audio_HDI_RenderPause_0005
-* @tc.desc  Test AudioRenderPause interface, return -1 the render is paused after stoped.
+* @tc.desc  Test AudioRenderPause interface, return -1 the render is paused after stopped.
 * @tc.author: Xuhuandi
 */
 HWTEST_F(AudioUsbRenderTest, SUB_Audio_HDI_RenderPause_0005, TestSize.Level1)
@@ -1286,9 +1286,9 @@ HWTEST_F(AudioUsbRenderTest, SUB_Audio_HDI_RenderCheckSceneCapability_0001, Test
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name   Test checking scene's capability where the scene is not configed in the josn.
+* @tc.name   Test checking scene's capability where the scene is not configured in the josn.
 * @tc.number  SUB_Audio_HDI_RenderCheckSceneCapability_0002
-* @tc.desc  Test RenderCheckSceneCapability interface,return -1 if the scene is not configed in the josn.
+* @tc.desc  Test RenderCheckSceneCapability interface,return -1 if the scene is not configured in the josn.
 * @tc.author: ZHANGHAILIN
 */
 HWTEST_F(AudioUsbRenderTest, SUB_Audio_HDI_RenderCheckSceneCapability_0002, TestSize.Level1)
@@ -1395,9 +1395,9 @@ HWTEST_F(AudioUsbRenderTest, SUB_Audio_HDI_AudioRenderSelectScene_0003, TestSize
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioRenderSelectScene API where the scene is not configed in the josn.
+* @tc.name  Test AudioRenderSelectScene API where the scene is not configured in the josn.
 * @tc.number  SUB_Audio_HDI_AudioRenderSelectScene_0005
-* @tc.desc  Test AudioRenderSelectScene, return -1 if the scene is not configed in the josn.
+* @tc.desc  Test AudioRenderSelectScene, return -1 if the scene is not configured in the josn.
 * @tc.author: ZHANGHAILIN
 */
 HWTEST_F(AudioUsbRenderTest, SUB_Audio_HDI_AudioRenderSelectScene_0005, TestSize.Level1)
@@ -1850,7 +1850,7 @@ HWTEST_F(AudioUsbRenderTest, SUB_Audio_HDI_AudioRenderAudioDevDump_0001, TestSiz
 /**
 * @tc.name  Test ReqMmapBuffer API via legal input
 * @tc.number  SUB_Audio_HDI_RenderReqMmapBuffer_0001
-* @tc.desc  Test ReqMmapBuffer interface,return 0 if call ReqMmapBuffer interface sucessfully
+* @tc.desc  Test ReqMmapBuffer interface,return 0 if call ReqMmapBuffer interface successfully
 * @tc.author: liweiming
 */
 HWTEST_F(AudioUsbRenderTest, SUB_Audio_HDI_RenderReqMmapBuffer_0001, TestSize.Level1)

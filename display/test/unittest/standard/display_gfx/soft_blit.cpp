@@ -244,7 +244,7 @@ static uint32_t GetPixelRGBA32(const BufferHandle &handle, int x, int y)
 
     int32_t position = y * handle.width + x;
     if ((position * pixelBytes) > handle.size) {
-        DISPLAY_TEST_LOGE("the pixel postion outside\n");
+        DISPLAY_TEST_LOGE("the pixel position outside\n");
     }
     uint32_t *pixel = reinterpret_cast<uint32_t *>(handle.virAddr) + position;
     return *pixel;

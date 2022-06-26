@@ -96,7 +96,7 @@ static int32_t SendCmdToService(const char *name, int32_t cmd, unsigned char fun
     }
     int32_t status = service->dispatcher->Dispatch(service, cmd, data, reply);
     if (status) {
-        HDF_LOGW("%{public}s:%{public}d serice %{public}s dispatch cmd : %{public}d error\n", __func__, __LINE__, name,
+        HDF_LOGW("%{public}s:%{public}d service %{public}s dispatch cmd : %{public}d error\n", __func__, __LINE__, name,
                  cmd);
     }
     HdfSbufRecycle(data);

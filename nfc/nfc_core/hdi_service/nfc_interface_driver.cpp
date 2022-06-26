@@ -63,7 +63,7 @@ static int HdfNfcInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
     auto *hdfNfcInterfaceHost = new (std::nothrow) HdfNfcInterfaceHost;
     if (hdfNfcInterfaceHost == nullptr) {
-        HDF_LOGE("%{public}s: falied to create HdfNfcInterfaceDriverBind Object!", __func__);
+        HDF_LOGE("%{public}s: failed to create HdfNfcInterfaceDriverBind Object!", __func__);
         return HDF_FAILURE;
     }
 

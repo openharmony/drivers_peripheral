@@ -61,7 +61,7 @@ void DrmConnector::InitModes(drmModeConnector c)
         DISPLAY_LOGD("mode: hdisplay %{public}d, vdisplay %{public}d vrefresh %{public}d type %{public}d",
             mode->hdisplay, mode->vdisplay, mode->vrefresh, mode->type);
         if ((mPreferenceId == INVALID_MODE_ID) && (mode->type & DRM_MODE_TYPE_PREFERRED)) {
-            DISPLAY_LOGD("set it to prefernce id %{public}d", i);
+            DISPLAY_LOGD("set it to preference id %{public}d", i);
             mPreferenceId = i;
         }
         mModes.emplace(i, DrmMode { *mode, i });
@@ -201,13 +201,13 @@ int32_t DrmConnector::PickIdleCrtcId(IdMapPtr<DrmEncoder> &encoders, IdMapPtr<Dr
     DISPLAY_LOGD("encoder_id %{public}d", mEncoderId);
     int ret = TryPickEncoder(encoders, mEncoderId, crtcs, crtcId);
     DISPLAY_CHK_RETURN((ret == DISPLAY_SUCCESS), DISPLAY_SUCCESS,
-        DISPLAY_LOGD("connector : %{public}d pick endcoder : %{public}d crtcId : %{public}d",
+        DISPLAY_LOGD("connector : %{public}d pick encoder : %{public}d crtcId : %{public}d",
         mId, mEncoderId, crtcId));
 
     for (auto encoder : mPossibleEncoders) {
         ret = TryPickEncoder(encoders, encoder, crtcs, crtcId);
         DISPLAY_CHK_RETURN((ret == DISPLAY_SUCCESS), DISPLAY_SUCCESS,
-            DISPLAY_LOGD("connector : %{public}d pick endcoder : %{public}d crtcId : %{public}d", mId, mEncoderId,
+            DISPLAY_LOGD("connector : %{public}d pick encoder : %{public}d crtcId : %{public}d", mId, mEncoderId,
             crtcId));
     }
 

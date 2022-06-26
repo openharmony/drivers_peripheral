@@ -1178,7 +1178,7 @@ int32_t SetCaptureResume(struct AudioCapture **capture)
 
 void PrintAttributesFromat(void)
 {
-    printf(" ============= Capture Sample Attributes Fromat =============== \n");
+    printf(" ============= Capture Sample Attributes Format =============== \n");
     printf("| 1. Capture AUDIO_FORMAT_PCM_8_BIT                            |\n");
     printf("| 2. Capture AUDIO_FORMAT_PCM_16_BIT                           |\n");
     printf("| 3. Capture AUDIO_FORMAT_PCM_24_BIT                           |\n");

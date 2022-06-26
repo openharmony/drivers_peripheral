@@ -66,7 +66,7 @@ typedef enum {
 
     KEY_BITRATE = 0x500,      /**< Bit rate. The value type is uint32_t. */
     KEY_WIDTH = 0x1000,       /**< Width. The value type is uint32_t. */
-    KEY_HEIGHT,               /**< Hight. The value type is uint32_t. */
+    KEY_HEIGHT,               /**< Height. The value type is uint32_t. */
     KEY_STRIDE,               /**< Stride. The value type is uint32_t. */
     KEY_VIDEO_FIELD,          /**< Video field. For the value type, see {@link VideoField}. */
     KEY_PIXEL_FORMAT,         /**< Pixel format. For the value type, see {@link PixelFormat}. */

@@ -291,7 +291,7 @@ static int HandleEvent(struct nl_sock *sock)
     int ret;
     struct nl_cb *cb = CreateCb();
     if (cb == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Ceate cb failed", __FUNCTION__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: Create cb failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
 

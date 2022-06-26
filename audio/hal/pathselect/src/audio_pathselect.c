@@ -566,7 +566,7 @@ int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdapt
 {
     LOG_FUN_INFO();
     if (adaptType < 0 || adapterParam == NULL) {
-        LOG_FUN_ERR("Param Invaild!");
+        LOG_FUN_ERR("Param Invalid!");
         return HDF_FAILURE;
     }
     struct AudioHwRenderParam *renderParam = NULL;
@@ -580,7 +580,7 @@ int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdapt
         case CAPTURE_PATH_SELECT:
             captureParam = (struct AudioHwCaptureParam *)adapterParam;
             return (AudioPathSelGetPlanCapture(captureParam));
-        /* Scene is surport */
+        /* Scene is supported */
         case CHECKSCENE_PATH_SELECT:
             renderSceneCheck = (struct AudioHwRenderParam *)adapterParam;
             return (AudioPathSelGetPlanRenderScene(renderSceneCheck));

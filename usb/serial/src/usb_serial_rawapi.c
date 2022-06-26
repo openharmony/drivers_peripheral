@@ -1169,7 +1169,7 @@ static void AcmReadBulkCallback(const void *requestArg)
             }
             break;
         default:
-            HDF_LOGW("%s:%d the request is failed, staus=%d",
+            HDF_LOGW("%s:%d the request is failed, status=%d",
                 __func__, __LINE__, req->status);
             return;
     }

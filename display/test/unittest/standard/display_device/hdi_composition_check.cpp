@@ -33,7 +33,7 @@ void HdiCompositionCheck::GetCheckPoints(Point center, std::vector<Point> &point
     points.push_back({ center.x - step, center.y + step });
     points.push_back({ center.x, center.y - step });
 }
-// simple hande the alpha it may not compatible with all scenarios
+// simple handle the alpha it may not compatible with all scenarios
 void HdiCompositionCheck::SimpleHandleAlpha(const LayerSettings &layers, uint32_t &color)
 {
     const float inv = 1.0f / 255.0f;
@@ -61,7 +61,7 @@ std::vector<uint32_t> HdiCompositionCheck::GetCheckColors(std::vector<LayerSetti
         for (uint32_t i = layers.size(); i > 0; i--) {
             auto layer = layers[i - 1];
             IRect &rect = layer.displayRect;
-            // check wether the point is inside the rect
+            // check whether the point is inside the rect
             if ((point.x >= rect.x) && (point.x < (rect.x + rect.w)) && (point.y >= rect.y) &&
                 (point.y < (rect.y + rect.h))) {
                 if (layer.compositionType != COMPOSITION_VIDEO) {

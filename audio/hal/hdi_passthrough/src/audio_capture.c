@@ -577,7 +577,7 @@ int32_t AudioCaptureGetVolume(AudioHandle handle, float *volume)
         return AUDIO_HAL_ERR_INTERNAL;
     }
     volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / 2);
-    int volumeT = (int)((pow(10, volumeTemp) + 5) / 10); // delet 0.X num
+    int volumeT = (int)((pow(10, volumeTemp) + 5) / 10); // delete 0.X num
     *volume = (float)volumeT / 10;  // get volume (0-1)
     return AUDIO_HAL_SUCCESS;
 }

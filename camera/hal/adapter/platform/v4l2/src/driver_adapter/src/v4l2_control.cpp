@@ -47,7 +47,7 @@ RetCode HosV4L2Control::V4L2SetCtrls (int fd, std::vector<DeviceControl>& contro
             ctrls.controls = cList;
             ret = ioctl(fd, VIDIOC_S_EXT_CTRLS, &ctrls);
             if (ret) {
-                CAMERA_LOGE("HosV4L2Control::VIDIOC_S_EXT_CTRLS set faile try to VIDIOC_S_CTRL\n");
+                CAMERA_LOGE("HosV4L2Control::VIDIOC_S_EXT_CTRLS set failed try to VIDIOC_S_CTRL\n");
                 struct v4l2_control ctrl;
 
                 for (int i = 0; count > 0; i++, count--) {
@@ -97,7 +97,7 @@ RetCode HosV4L2Control::V4L2GetCtrls (int fd, std::vector<DeviceControl>& contro
             ctrls.controls = cList;
             ret = ioctl(fd, VIDIOC_G_EXT_CTRLS, &ctrls);
             if (ret) {
-                CAMERA_LOGE("HosV4L2Control::VIDIOC_G_EXT_CTRLS set faile try to VIDIOC_S_CTRL\n");
+                CAMERA_LOGE("HosV4L2Control::VIDIOC_G_EXT_CTRLS set failed try to VIDIOC_S_CTRL\n");
                 struct v4l2_control ctrl;
                 for (int i = 0; count > 0; i++, count--) {
                     ctrl.id = cList[i].id;
