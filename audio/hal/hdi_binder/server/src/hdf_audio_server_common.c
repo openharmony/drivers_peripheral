@@ -1662,6 +1662,8 @@ struct HdiServiceDispatchCmdHandleList g_hdiServiceDispatchCmdHandleList[] = {
     {AUDIO_HDI_RENDER_GET_EXTRA_PARAMS, HdiServiceRenderGetExtraParams},
     {AUDIO_HDI_RENDER_REQ_MMAP_BUFFER, HdiServiceRenderReqMmapBuffer},
     {AUDIO_HDI_RENDER_GET_MMAP_POSITION, HdiServiceRenderGetMmapPosition},
+    {AUDIO_HDI_RENDER_ADD_EFFECT, HdiServiceRenderAddEffect},
+    {AUDIO_HDI_RENDER_REMOVE_EFFECT, HdiServiceRenderRemoveEffect},
     {AUDIO_HDI_RENDER_TURN_STAND_BY_MODE, HdiServiceRenderTurnStandbyMode},
     {AUDIO_HDI_RENDER_DEV_DUMP, HdiServiceRenderDevDump},
     {AUDIO_HDI_RENDER_REG_CALLBACK, HdiServiceRenderRegCallback},
@@ -1696,6 +1698,8 @@ static struct HdiServiceDispatchCmdHandleList g_hdiServiceDispatchCmdHandleCapLi
     {AUDIO_HDI_CAPTURE_GET_EXTRA_PARAMS, HdiServiceCaptureGetExtraParams},
     {AUDIO_HDI_CAPTURE_REQ_MMAP_BUFFER, HdiServiceCaptureReqMmapBuffer},
     {AUDIO_HDI_CAPTURE_GET_MMAP_POSITION, HdiServiceCaptureGetMmapPosition},
+    {AUDIO_HDI_CAPTURE_ADD_EFFECT, HdiServiceCaptureAddEffect},
+    {AUDIO_HDI_CAPTURE_REMOVE_EFFECT, HdiServiceCaptureRemoveEffect},
     {AUDIO_HDI_CAPTURE_TURN_STAND_BY_MODE, HdiServiceCaptureTurnStandbyMode},
     {AUDIO_HDI_CAPTURE_DEV_DUMP, HdiServiceCaptureDevDump},
 };

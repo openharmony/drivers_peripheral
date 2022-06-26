@@ -128,6 +128,8 @@ int32_t GetAudioProxyRenderFunc(struct AudioHwRender *hwRender)
     hwRender->common.attr.GetExtraParams = AudioProxyRenderGetExtraParams;
     hwRender->common.attr.ReqMmapBuffer = AudioProxyRenderReqMmapBuffer;
     hwRender->common.attr.GetMmapPosition = AudioProxyRenderGetMmapPosition;
+    hwRender->common.attr.AddAudioEffect = AudioProxyRenderAddEffect;
+    hwRender->common.attr.RemoveAudioEffect = AudioProxyRenderRemoveEffect;
     hwRender->common.scene.CheckSceneCapability = AudioProxyRenderCheckSceneCapability;
     hwRender->common.scene.SelectScene = AudioProxyRenderSelectScene;
     hwRender->common.volume.SetMute = AudioProxyRenderSetMute;
@@ -445,6 +447,8 @@ int32_t GetAudioProxyCaptureFunc(struct AudioHwCapture *hwCapture)
     hwCapture->common.attr.GetExtraParams = AudioProxyCaptureGetExtraParams;
     hwCapture->common.attr.ReqMmapBuffer = AudioProxyCaptureReqMmapBuffer;
     hwCapture->common.attr.GetMmapPosition = AudioProxyCaptureGetMmapPosition;
+    hwCapture->common.attr.AddAudioEffect = AudioProxyCaptureAddEffect;
+    hwCapture->common.attr.RemoveAudioEffect = AudioProxyCaptureRemoveEffect;
     hwCapture->common.scene.CheckSceneCapability = AudioProxyCaptureCheckSceneCapability;
     hwCapture->common.scene.SelectScene = AudioProxyCaptureSelectScene;
     hwCapture->common.volume.SetMute = AudioProxyCaptureSetMute;

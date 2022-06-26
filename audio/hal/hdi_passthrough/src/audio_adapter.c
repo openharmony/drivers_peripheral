@@ -52,6 +52,8 @@ int32_t GetAudioRenderFunc(struct AudioHwRender *hwRender)
     hwRender->common.attr.GetExtraParams = AudioRenderGetExtraParams;
     hwRender->common.attr.ReqMmapBuffer = AudioRenderReqMmapBuffer;
     hwRender->common.attr.GetMmapPosition = AudioRenderGetMmapPosition;
+    hwRender->common.attr.AddAudioEffect = AudioRenderAddEffect;
+    hwRender->common.attr.RemoveAudioEffect = AudioRenderRemoveEffect;
     hwRender->common.scene.CheckSceneCapability = AudioRenderCheckSceneCapability;
     hwRender->common.scene.SelectScene = AudioRenderSelectScene;
     hwRender->common.volume.SetMute = AudioRenderSetMute;
@@ -746,6 +748,8 @@ int32_t GetAudioCaptureFunc(struct AudioHwCapture *hwCapture)
     hwCapture->common.attr.GetExtraParams = AudioCaptureGetExtraParams;
     hwCapture->common.attr.ReqMmapBuffer = AudioCaptureReqMmapBuffer;
     hwCapture->common.attr.GetMmapPosition = AudioCaptureGetMmapPosition;
+    hwCapture->common.attr.AddAudioEffect = AudioCaptureAddEffect;
+    hwCapture->common.attr.RemoveAudioEffect = AudioCaptureRemoveEffect;
     hwCapture->common.scene.CheckSceneCapability = AudioCaptureCheckSceneCapability;
     hwCapture->common.scene.SelectScene = AudioCaptureSelectScene;
     hwCapture->common.volume.SetMute = AudioCaptureSetMute;
