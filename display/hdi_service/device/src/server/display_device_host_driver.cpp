@@ -239,7 +239,7 @@ int32_t DisplayDeviceServerStub::GetDisplaySupportedModes(MessageParcel *data, M
         return DISPLAY_FAILURE;
     }
     if (!data->ReadUint32(modesNum) || modesNum > COMPOSER_SERVER_ARRAY_NUMBER_MAX) {
-        DISPLAY_LOG("modesNum invlid");
+        DISPLAY_LOG("modesNum invalid");
         return DISPLAY_FAILURE;
     }
     DisplayModeInfo modesTmp[COMPOSER_SERVER_ARRAY_NUMBER_MAX];

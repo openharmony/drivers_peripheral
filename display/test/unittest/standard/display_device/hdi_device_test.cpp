@@ -147,7 +147,7 @@ static const std::vector<std::vector<LayerSettings>> TEST_ALPHA = {
             .color = RED,
             .alpha = 0x00 },
     },
-    // RED float will overide, must use green now
+    // RED float will override, must use green now
     {
         {
             .rectRatio = { 0, 0, 1.0f, 1.0f },
@@ -277,12 +277,12 @@ static void AdjustLayerSettings(std::vector<LayerSettings> &settings, uint32_t w
         if ((setting.bufferRatio.h > 0.0f) || (setting.bufferRatio.w > 0.0f)) {
             setting.bufferSize.h = static_cast<uint32_t>(setting.bufferRatio.h * h);
             setting.bufferSize.w = static_cast<uint32_t>(setting.bufferRatio.w * w);
-            DISPLAY_TEST_LOGD("buffer szie adjust for %f %f to %d %d", setting.bufferRatio.w, setting.bufferRatio.h,
+            DISPLAY_TEST_LOGD("buffer size adjust for %f %f to %d %d", setting.bufferRatio.w, setting.bufferRatio.h,
                 setting.bufferSize.w, setting.bufferSize.h);
         }
 
         if ((setting.bufferSize.w == 0) || (setting.bufferSize.h == 0)) {
-            DISPLAY_TEST_LOGD("buffer szie adjust for %d %d to %d %d", setting.bufferSize.w, setting.bufferSize.h,
+            DISPLAY_TEST_LOGD("buffer size adjust for %d %d to %d %d", setting.bufferSize.w, setting.bufferSize.h,
                 setting.displayRect.w, setting.displayRect.h);
 
             setting.bufferSize.w = setting.displayRect.w;
@@ -431,7 +431,7 @@ TEST_P(LayerRotateTest, SplitCheck)
     auto splitRects = SplitBuffer(*(handle->Get()), splitColors);
     ASSERT_TRUE(splitRects.size() == splitColors.size()); // ensure the  splitRects size
     PrepareAndPrensent();
-    // chage the rect and color to clockwise.
+    // change the rect and color to clockwise.
     std::swap(splitColors[2], splitColors[1]);
     std::swap(splitColors[2], splitColors[3]);
     std::swap(splitRects[2], splitRects[1]);

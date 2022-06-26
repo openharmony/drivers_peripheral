@@ -202,7 +202,7 @@ int32_t WifiDriverClientInit(void)
     }
     ret = WifiMsgRegisterEventListener(&g_wifiDevEventListener);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: register event listener faild, line: %d", __FUNCTION__, __LINE__);
+        HILOG_ERROR(LOG_DOMAIN, "%s: register event listener failed, line: %d", __FUNCTION__, __LINE__);
     }
     return ret;
 }

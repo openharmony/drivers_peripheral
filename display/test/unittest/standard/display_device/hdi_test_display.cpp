@@ -55,7 +55,7 @@ int32_t HdiTestDisplay::Init()
     mClientLayer = std::make_unique<HdiTestLayer>(layerinfo, clientLayerId, mId);
     ret = mClientLayer->Init();
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
-        DISPLAY_TEST_LOGE("the client layer can not creat"));
+        DISPLAY_TEST_LOGE("the client layer can not be created"));
     return DISPLAY_SUCCESS;
 }
 
@@ -81,7 +81,7 @@ std::shared_ptr<HdiTestLayer> HdiTestDisplay::CreateHdiTestLayer(LayerInfo &info
     LayerFuncs &layerFuncs = HdiTestDevice::GetInstance().GetLayerFuncs();
     int ret = layerFuncs.CreateLayer(mId, &info, &layerId);
     DISPLAY_TEST_LOGD(" layerId %d", layerId);
-    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), nullptr, DISPLAY_TEST_LOGE("layer creat failed"));
+    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), nullptr, DISPLAY_TEST_LOGE("layer create failed"));
     auto layer = std::make_shared<HdiTestLayer>(info, layerId, mId);
     ret = layer->Init();
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), nullptr, DISPLAY_TEST_LOGE("layer init failed"));
@@ -178,7 +178,7 @@ int32_t HdiTestDisplay::Commit()
         ClearColor(*handle, 0); // need clear the fb first
         ret = HdiTestDevice::GetInstance().GetDeviceFuncs().SetDisplayClientBuffer(mId, handle, -1);
         mCurrentFb = handle;
-        DISPLAY_TEST_LOGD("client fb phyaddr %" PRIx64 " vritual addr %p", handle->phyAddr, handle->virAddr);
+        DISPLAY_TEST_LOGD("client fb phyaddr %" PRIx64 " virtual addr %p", handle->phyAddr, handle->virAddr);
         DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
             DISPLAY_TEST_LOGE("set client buffer handle failed"));
     }

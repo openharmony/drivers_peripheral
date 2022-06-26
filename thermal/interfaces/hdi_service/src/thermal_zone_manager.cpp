@@ -245,7 +245,7 @@ void ThermalZoneManager::CalculateMaxCd()
 {
     sensorTypeMap_ = ThermalHdfConfig::GetInsance().GetSensorTypeMap();
     if (sensorTypeMap_.empty()) {
-        THERMAL_HILOGE(COMP_HDI, "configed sensor info is empty");
+        THERMAL_HILOGE(COMP_HDI, "configured sensor info is empty");
         return;
     }
 

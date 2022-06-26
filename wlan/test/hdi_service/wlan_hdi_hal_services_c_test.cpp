@@ -425,7 +425,7 @@ HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_016, TestSize.Level1)
 
 /**
  * @tc.name: RegisterEventCallbackTest_017
- * @tc.desc: Wifi hdi reister event call back function test
+ * @tc.desc: Wifi hdi register event call back function test
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */

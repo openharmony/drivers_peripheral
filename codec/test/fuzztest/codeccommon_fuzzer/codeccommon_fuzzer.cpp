@@ -72,7 +72,7 @@ namespace Codec {
         OMX_STATETYPE state;
         ret = component->GetState(component, &state);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: GetState Component faild\n", __func__);
+            HDF_LOGE("%{public}s: GetState Component failed\n", __func__);
             return false;
         }
 

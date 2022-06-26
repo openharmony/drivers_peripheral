@@ -71,7 +71,7 @@ RetCode StreamPipelineStrategy::SetUpBasicOutPortFormat(const PipelineSpec& pipe
             return info.peerPortName_ == p.info_.name_;
         });
     if (peerPort == peerNode->portSpecSet_.end()) {
-        CAMERA_LOGI("config fail! port name:%{public}s not exsit", info.name_.c_str());
+        CAMERA_LOGI("config fail! port name:%{public}s not exist", info.name_.c_str());
         return RC_ERROR;
     }
 
@@ -86,7 +86,7 @@ RetCode StreamPipelineStrategy::SetUpBasicInPortFormat(const NodeSpec& nodeSpec,
             return p.info_.name_ == "out0";
         });
     if (outPort == nodeSpec.portSpecSet_.end()) {
-        CAMERA_LOGI("config fail! node name:%{public}s  out0 not exsit", nodeSpec.name_.c_str());
+        CAMERA_LOGI("config fail! node name:%{public}s  out0 not exist", nodeSpec.name_.c_str());
         return RC_ERROR;
     }
     format = (*outPort).format_;
@@ -128,7 +128,7 @@ RetCode StreamPipelineStrategy::SelectPipelineSpec(const int32_t& mode, Pipeline
     G_PIPELINE_SPEC_DATA_TYPE pipeSpecPtr = nullptr;
     InitPipeSpecPtr(pipeSpecPtr, keyStr);
     if (pipeSpecPtr == nullptr) {
-        CAMERA_LOGE("target pipeline spec:%{public}s not exsit!i\n ", keyStr.c_str());
+        CAMERA_LOGE("target pipeline spec:%{public}s not exist!\n ", keyStr.c_str());
         return RC_ERROR;
     }
 

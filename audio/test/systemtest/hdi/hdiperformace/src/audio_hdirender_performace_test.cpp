@@ -131,9 +131,9 @@ void AudioHdiRenderPerformaceTest::SetUp(void) {}
 void AudioHdiRenderPerformaceTest::TearDown(void) {}
 
 /**
-* @tc.name  the performace of AudioManagerGetAllAdapters
+* @tc.name  the performance of AudioManagerGetAllAdapters
 * @tc.number  SUB_Audio_HDI_AudioManagerGetAllAdapter_Performance_0001
-* @tc.desc  tests the performace of AudioManagerGetAllAdapters interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioManagerGetAllAdapters interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -161,9 +161,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerGetAllAdapters_
 }
 
 /**
-* @tc.name  the performace of AudioManagerLoadAdapter
+* @tc.name  the performance of AudioManagerLoadAdapter
 * @tc.number  SUB_Audio_HDI_AudioManagerLoadAdapter_Performance_0001
-* @tc.desc  tests the performace of AudioManagerLoadAdapter interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioManagerLoadAdapter interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -196,9 +196,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerLoadAdapter_Per
 }
 
 /**
-* @tc.name  the performace of AudioManagerUnLoadAdapter
+* @tc.name  the performance of AudioManagerUnLoadAdapter
 * @tc.number  SUB_Audio_HDI_AudioManagerUnLoadAdapter_Performance_0001
-* @tc.desc  tests the performace of AudioManagerLoadAdapter interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioManagerLoadAdapter interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -231,9 +231,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerUnLoadAdapter_P
 }
 
 /**
-* @tc.name  the performace of AudioInitAllPorts
+* @tc.name  the performance of AudioInitAllPorts
 * @tc.number  SUB_Audio_HDI_AudioManagerInitAllPorts_Performance_0001
-* @tc.desc  tests the performace of AudioInitAllPorts interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioInitAllPorts interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -265,9 +265,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerInitAllPorts_Pe
 }
 
 /**
-* @tc.name  the performace of AudioGetPortCapability
+* @tc.name  the performance of AudioGetPortCapability
 * @tc.number  SUB_Audio_HDI_AudioGetPortCapability_Performance_0001
-* @tc.desc  tests the performace of AudioGetPortCapability interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioGetPortCapability interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -301,9 +301,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioGetPortCapability_Perf
 }
 
 /**
-* @tc.name  the performace of AudioSetPassthroughMode
+* @tc.name  the performance of AudioSetPassthroughMode
 * @tc.number  SUB_Audio_HDI_AudioSetPassthroughMode_Performance_0001
-* @tc.desc  tests the performace of AudioSetPassthroughMode interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioSetPassthroughMode interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -341,9 +341,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioSetPassthroughMode_Per
 }
 
 /**
-* @tc.name  the performace of AudioGetPassthroughMode
+* @tc.name  the performance of AudioGetPassthroughMode
 * @tc.number  SUB_Audio_HDI_AudioGetPassthroughMode_Performance_0001
-* @tc.desc  tests the performace of AudioGetPassthroughMode interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioGetPassthroughMode interface by executing 1000 times,
 * and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -381,9 +381,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioGetPassthroughMode_Per
 }
 
 /**
-* @tc.name  the performace of AudioRenderGetLatency
+* @tc.name  the performance of AudioRenderGetLatency
 * @tc.number  SUB_Audio_HDI_AudioRenderGetLatency_Performance_0001
-* @tc.desc  tests the performace of AudioRenderGetLatency interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderGetLatency interface by executing 1000 times,
 * and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -420,9 +420,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetLatency_Perfo
 }
 
 /**
-* @tc.name  the performace of AudioCreateRender
+* @tc.name  the performance of AudioCreateRender
 * @tc.number  SUB_Audio_HDI_AudioCreateRender_Performance_0001
-* @tc.desc  tests the performace of AudioCreateRender interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioCreateRender interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -464,9 +464,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioCreateRender_Performan
 }
 
 /**
-* @tc.name  the performace of AudioDestroyRender
+* @tc.name  the performance of AudioDestroyRender
 * @tc.number  SUB_Audio_HDI_AudioDestroyRender_Performance_0001
-* @tc.desc  tests the performace of AudioDestroyRender interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioDestroyRender interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -507,9 +507,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioDestroyRender_Performa
 }
 
 /**
-* @tc.name  the performace of AudioRenderGetRenderPosition
+* @tc.name  the performance of AudioRenderGetRenderPosition
 * @tc.number  SUB_Audio_HDI_AudioRenderGetRenderPosition_Performance_0001
-* @tc.desc  tests the performace of AudioRenderGetRenderPosition interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderGetRenderPosition interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -544,9 +544,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetRenderPositio
 }
 
 /**
-* @tc.name  the performace of AudioRenderSetRenderSpeed
+* @tc.name  the performance of AudioRenderSetRenderSpeed
 * @tc.number  SUB_Audio_HDI_AudioRenderSetRenderSpeed_Performance_0001
-* @tc.desc  tests the performace of AudioRenderSetRenderSpeed interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderSetRenderSpeed interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -585,9 +585,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetRenderSpeed_P
 }
 
 /**
-* @tc.name  the performace of AudioRenderGetRenderSpeed
+* @tc.name  the performance of AudioRenderGetRenderSpeed
 * @tc.number  SUB_Audio_HDI_AudioRenderGetRenderSpeed_Performance_0001
-* @tc.desc  tests the performace of AudioRenderGetRenderSpeed interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderGetRenderSpeed interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -624,9 +624,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetRenderSpeed_P
 }
 
 /**
-* @tc.name  the performace of AudioRenderSetChannelMode
+* @tc.name  the performance of AudioRenderSetChannelMode
 * @tc.number  SUB_Audio_HDI_AudioRenderSetChannelMode_Performance_0001
-* @tc.desc  tests the performace of AudioRenderSetChannelMode interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderSetChannelMode interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -665,9 +665,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetChannelMode_P
 }
 
 /**
-* @tc.name  the performace of AudioRenderGetChannelMode
+* @tc.name  the performance of AudioRenderGetChannelMode
 * @tc.number  SUB_Audio_HDI_AudioRenderGetChannelMode_Performance_0001
-* @tc.desc  tests the performace of AudioRenderGetChannelMode interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderGetChannelMode interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -707,9 +707,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetChannelMode_P
 }
 
 /**
-* @tc.name  the performace of AudioRenderGetFrameCount
+* @tc.name  the performance of AudioRenderGetFrameCount
 * @tc.number  SUB_Audio_HDI_AudioRenderGetFrameCount_Performance_0001
-* @tc.desc  tests the performace of AudioRenderGetFrameCount interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderGetFrameCount interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -745,9 +745,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetFrameCount_Pe
 }
 
 /**
-* @tc.name  the performace of AudioRenderGetCurrentChannelId
+* @tc.name  the performance of AudioRenderGetCurrentChannelId
 * @tc.number  SUB_Audio_HDI_AudioRenderGetCurrentChannelId_Performance_0001
-* @tc.desc  tests the performace of AudioRenderGetCurrentChannelId interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderGetCurrentChannelId interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -783,9 +783,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetCurrentChanne
 }
 
 /**
-* @tc.name  the performace of AudioRenderFlush
+* @tc.name  the performance of AudioRenderFlush
 * @tc.number  SUB_Audio_HDI_AudioRenderFlush_Performance_0001
-* @tc.desc  tests the performace of AudioRenderFlush interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderFlush interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -821,9 +821,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderFlush_Performanc
 }
 
 /**
-* @tc.name  the performace of AudioRenderGetFrameSize
+* @tc.name  the performance of AudioRenderGetFrameSize
 * @tc.number  SUB_Audio_HDI_AudioRenderGetFrameSize_Performance_0001
-* @tc.desc  tests the performace of AudioRenderGetFrameSize interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderGetFrameSize interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -866,9 +866,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetFrameSize_Per
 
 
 /**
-* @tc.name  the performace of AudioRenderCheckSceneCapability
+* @tc.name  the performance of AudioRenderCheckSceneCapability
 * @tc.number  SUB_Audio_HDI_AudioRenderCheckSceneCapability_Performance_0001
-* @tc.desc  tests the performace of AudioRenderCheckSceneCapability interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderCheckSceneCapability interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -905,9 +905,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderCheckSceneCapabi
 }
 
 /**
-* @tc.name  the performace of AudioRenderSelectScene
+* @tc.name  the performance of AudioRenderSelectScene
 * @tc.number  SUB_Audio_HDI_AudioRenderSelectScene_Performance_0001
-* @tc.desc  tests the performace of AudioRenderSelectScene interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderSelectScene interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -944,9 +944,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSelectScene_Perf
 }
 
 /**
-* @tc.name  the performace of AudiorenderSetMute
+* @tc.name  the performance of AudiorenderSetMute
 * @tc.number  SUB_Audio_HDI_AudiorenderSetMute_Performance_0001
-* @tc.desc  tests the performace of AudiorenderSetMute interface by executing 1000 times,
+* @tc.desc  tests the performance of AudiorenderSetMute interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -984,9 +984,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetMute_Performa
 }
 
 /**
-* @tc.name  the performace of AudiorenderGetMute
+* @tc.name  the performance of AudiorenderGetMute
 * @tc.number  SUB_Audio_HDI_AudiorenderGetMute_Performance_0001
-* @tc.desc  tests the performace of AudiorenderGetMute interface by executing 1000 times,
+* @tc.desc  tests the performance of AudiorenderGetMute interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1024,9 +1024,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetMute_Performa
 }
 
 /**
-* @tc.name  the performace of AudiorenderSetVolume
+* @tc.name  the performance of AudiorenderSetVolume
 * @tc.number  SUB_Audio_HDI_AudiorenderSetVolume_Performance_0001
-* @tc.desc  tests the performace of AudiorenderSetVolume interface by executing 1000 times,
+* @tc.desc  tests the performance of AudiorenderSetVolume interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1065,9 +1065,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetVolume_Perfor
 }
 
 /**
-* @tc.name  the performace of AudiorenderGetVolume
+* @tc.name  the performance of AudiorenderGetVolume
 * @tc.number  SUB_Audio_HDI_AudiorenderGetVolume_Performance_0001
-* @tc.desc  tests the performace of AudiorenderGetVolume interface by executing 1000 times,
+* @tc.desc  tests the performance of AudiorenderGetVolume interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1103,9 +1103,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetVolume_Perfor
 }
 
 /**
-* @tc.name  the performace of AudiorenderGetGainThreshold
+* @tc.name  the performance of AudiorenderGetGainThreshold
 * @tc.number  SUB_Audio_HDI_AudiorenderGetGainThreshold_Performance_0001
-* @tc.desc  tests the performace of AudiorenderGetGainThreshold interface by executing 1000 times,
+* @tc.desc  tests the performance of AudiorenderGetGainThreshold interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1142,9 +1142,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetGainThreshold
 }
 
 /**
-* @tc.name  the performace of AudiorenderGetGain
+* @tc.name  the performance of AudiorenderGetGain
 * @tc.number  SUB_Audio_HDI_AudiorenderGetGain_Performance_0001
-* @tc.desc  tests the performace of AudiorenderGetGain interface by executing 1000 times,
+* @tc.desc  tests the performance of AudiorenderGetGain interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1179,9 +1179,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetGain_Performa
 }
 
 /**
-* @tc.name  the performace of AudiorenderSetGain
+* @tc.name  the performance of AudiorenderSetGain
 * @tc.number  SUB_Audio_HDI_AudiorenderSetGain_Performance_0001
-* @tc.desc  tests the performace of AudiorenderSetGain interface by executing 1000 times,
+* @tc.desc  tests the performance of AudiorenderSetGain interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1220,9 +1220,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetGain_Performa
 }
 
 /**
-* @tc.name  the performace of AudioRenderFrame
+* @tc.name  the performance of AudioRenderFrame
 * @tc.number  SUB_Audio_HDI_AudioRenderFrame_Performance_0001
-* @tc.desc  tests the performace of AudioRenderFrame interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderFrame interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1276,9 +1276,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderFrame_Performanc
 }
 
 /**
-* @tc.name  the performace of AudioRenderStart
+* @tc.name  the performance of AudioRenderStart
 * @tc.number  SUB_Audio_HDI_AudioRenderStart_Performance_0001
-* @tc.desc  tests the performace of AudioRenderStart interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderStart interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1311,9 +1311,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderStart_Performanc
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of AudioRenderStop
+* @tc.name  the performance of AudioRenderStop
 * @tc.number  SUB_Audio_HDI_AudioRenderStop_Performance_0001
-* @tc.desc  tests the performace of AudioRenderStop interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderStop interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1349,9 +1349,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderStop_Performance
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of AudioRenderSetSampleAttributes
+* @tc.name  the performance of AudioRenderSetSampleAttributes
 * @tc.number  SUB_Audio_HDI_AudioRenderSetSampleAttributes_Performance_0001
-* @tc.desc  tests the performace of AudioRenderSetSampleAttributes interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderSetSampleAttributes interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1385,9 +1385,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetSampleAttribu
     audiopara.adapter = nullptr;
 }
 /**
-* @tc.name  the performace of AudioRenderPause
+* @tc.name  the performance of AudioRenderPause
 * @tc.number  SUB_Audio_HDI_AudioRenderPause_Performance_0001
-* @tc.desc  tests the performace of AudioRenderPause interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderPause interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1424,9 +1424,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderPause_Performanc
 }
 
 /**
-* @tc.name  the performace of AudioRenderResume
+* @tc.name  the performance of AudioRenderResume
 * @tc.number  SUB_Audio_HDI_AudioRenderResume_Performance_0001
-* @tc.desc  tests the performace of AudioRenderResume interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderResume interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1462,9 +1462,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderResume_Performan
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  the performace of AudioRenderGetSampleAttributes
+* @tc.name  the performance of AudioRenderGetSampleAttributes
 * @tc.number  SUB_Audio_HDI_AudioRenderGetSampleAttributes_Performance_0001
-* @tc.desc  tests the performace of AudioRenderGetSampleAttributes interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderGetSampleAttributes interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1500,9 +1500,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetSampleAttribu
     audiopara.adapter = nullptr;
 }
 /**
-* @tc.name  the performace of AudioRenderReqMmapBuffer
+* @tc.name  the performance of AudioRenderReqMmapBuffer
 * @tc.number  SUB_Audio_HDI_AudioRenderReqMmapBuffer_Performance_0001
-* @tc.desc  tests the performace of AudioRenderReqMmapBuffer interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderReqMmapBuffer interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1559,9 +1559,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderReqMmapBuffer_Pe
 }
 
 /**
-* @tc.name  the performace of AudioRenderGetMmapPosition
+* @tc.name  the performance of AudioRenderGetMmapPosition
 * @tc.number  SUB_Audio_HDI_AudioRenderGetMmapPosition_Performance_0001
-* @tc.desc  tests the performace of AudioRenderRenderGetMmapPosition interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderRenderGetMmapPosition interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1609,9 +1609,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetMmapPosition_
 }
 
 /**
-* @tc.name  the performace of AudioRenderSetExtraParams
+* @tc.name  the performance of AudioRenderSetExtraParams
 * @tc.number  SUB_Audio_HDI_AudioRenderSetExtraParams_Performance_0001
-* @tc.desc  tests the performace of AudioRenderSetExtraParams interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderSetExtraParams interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1644,9 +1644,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetExtraParams_P
 }
 
 /**
-* @tc.name  the performace of AudioRenderGetExtraParams
+* @tc.name  the performance of AudioRenderGetExtraParams
 * @tc.number  SUB_Audio_HDI_AudioRenderGetExtraParams_Performance_0001
-* @tc.desc  tests the performace of AudioRenderGetExtraParams interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioRenderGetExtraParams interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */

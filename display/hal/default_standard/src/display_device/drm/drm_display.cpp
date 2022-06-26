@@ -227,7 +227,7 @@ int32_t DrmDisplay::ChosePreferenceMode()
         modeId = 0;
     }
     ret = SetDisplayMode(modeId);
-    // Push first frame to the drm, for that the vblank must init all the componet.
+    // Push first frame to the drm, for that the vblank must init all the components.
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("set display mode failed"));
     return PushFirstFrame();
 }

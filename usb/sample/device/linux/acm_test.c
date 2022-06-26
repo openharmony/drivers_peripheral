@@ -101,13 +101,13 @@ static int32_t StartThreadRead()
 
     ret = OsalThreadCreate(&g_thread, (OsalThreadEntry)ReadThread, NULL);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s:%d OsalThreadCreate faile, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%s:%d OsalThreadCreate failed, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
 
     ret = OsalThreadStart(&g_thread, &threadCfg);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s:%d OsalThreadStart faile, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%s:%d OsalThreadStart failed, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
     return 0;

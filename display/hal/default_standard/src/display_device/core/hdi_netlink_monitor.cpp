@@ -34,7 +34,7 @@ int HdiNetLinkMonitor::Init()
     const int32_t bufferSize = 1024;
     DISPLAY_CHK_RETURN((mScoketFd < 0), DISPLAY_FAILURE, DISPLAY_LOGE("the socket has initial"));
     fd = socket(PF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
-    DISPLAY_CHK_RETURN((fd < 0), DISPLAY_FAILURE, DISPLAY_LOGE("scoket create failed"));
+    DISPLAY_CHK_RETURN((fd < 0), DISPLAY_FAILURE, DISPLAY_LOGE("socket create failed"));
     setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     ret = bind(fd, (struct sockaddr *)&snl, sizeof(struct sockaddr_nl));
     DISPLAY_CHK_RETURN((ret < 0), DISPLAY_FAILURE, DISPLAY_LOGE("bind failed errno : %{public}d", errno));

@@ -725,7 +725,7 @@ LinkedList *QueryCredentialLimit(const CredentialCondition *limit)
         if (IsUserMatch(limit, user)) {
             ResultCode ret = TraverseCredentialList(limit, user->credentialInfoList, credList);
             if (ret != RESULT_SUCCESS) {
-                LOG_ERROR("TraverseCredentialList faild");
+                LOG_ERROR("TraverseCredentialList failed");
                 DestroyLinkedList(credList);
                 return NULL;
             }
@@ -762,7 +762,7 @@ ResultCode QueryCredentialUserId(uint64_t credentialId, int32_t *userId)
         }
         ResultCode ret = TraverseCredentialList(&condition, user->credentialInfoList, credList);
         if (ret != RESULT_SUCCESS) {
-            LOG_ERROR("TraverseCredentialList faild");
+            LOG_ERROR("TraverseCredentialList failed");
             DestroyLinkedList(credList);
             return RESULT_UNKNOWN;
         }
