@@ -720,6 +720,78 @@ int32_t AudioProxyCaptureGetMmapPosition(const AudioHandle handle, uint64_t *fra
     return AUDIO_HAL_SUCCESS;
 }
 
+int32_t AudioProxyCaptureAddEffect(AudioHandle handle, uint64_t effectid)
+{
+    int32_t ret = AudioCheckCaptureAddr(handle);
+    if (ret < 0) {
+        LOG_FUN_ERR("The proxy render address passed in is invalid");
+        return ret;
+    }
+    if (handle == NULL) {
+        LOG_FUN_ERR("handle is empty");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
+    if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The pointer is null");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    if (AudioProxyPreprocessCapture(hwCapture, &data, &reply) < 0) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (!HdfSbufWriteUint64(data, effectid)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    ret = AudioProxyDispatchCall(hwCapture->proxyRemoteHandle, AUDIO_HDI_CAPTURE_ADD_EFFECT, data, reply);
+    if (ret < 0) {
+        LOG_FUN_ERR("Dispatch AudioProxyCaptureAddEffect FAIL ret = %{public}d", ret);
+        AudioProxyBufReplyRecycle(data, reply);
+        return ret;
+    }
+
+    AudioProxyBufReplyRecycle(data, reply);
+    return AUDIO_HAL_SUCCESS;
+}
+
+int32_t AudioProxyCaptureRemoveEffect(AudioHandle handle, uint64_t effectid)
+{
+    int32_t ret = AudioCheckCaptureAddr(handle);
+    if (ret < 0) {
+        LOG_FUN_ERR("The proxy render address passed in is invalid");
+        return ret;
+    }
+    if (handle == NULL) {
+        LOG_FUN_ERR("handle is empty");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    struct HdfSBuf *reply = NULL;
+    struct HdfSBuf *data = NULL;
+    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
+    if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The pointer is null");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    if (AudioProxyPreprocessCapture(hwCapture, &data, &reply) < 0) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (!HdfSbufWriteUint64(data, effectid)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    ret = AudioProxyDispatchCall(hwCapture->proxyRemoteHandle, AUDIO_HDI_CAPTURE_REMOVE_EFFECT, data, reply);
+    if (ret < 0) {
+        LOG_FUN_ERR("Dispatch AudioProxyCaptureRemoveEffect FAIL ret = %{public}d", ret);
+        AudioProxyBufReplyRecycle(data, reply);
+        return ret;
+    }
+
+    AudioProxyBufReplyRecycle(data, reply);
+    return AUDIO_HAL_SUCCESS;
+}
+
 int32_t AudioProxyCaptureTurnStandbyMode(const AudioHandle handle)
 {
     int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test

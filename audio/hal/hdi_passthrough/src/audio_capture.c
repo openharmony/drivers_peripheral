@@ -1019,6 +1019,22 @@ int32_t AudioCaptureGetMmapPosition(AudioHandle handle, uint64_t *frames, struct
     return AUDIO_HAL_SUCCESS;
 }
 
+int32_t AudioCaptureAddEffect(AudioHandle handle, uint64_t effectid)
+{
+    (void)handle;
+    (void)effectid;
+    HDF_LOGI("%{public}s: add capture effect success", __func__);
+    return AUDIO_HAL_SUCCESS;
+}
+
+int32_t AudioCaptureRemoveEffect(AudioHandle handle, uint64_t effectid)
+{
+    (void)handle;
+    (void)effectid;
+    HDF_LOGI("%{public}s: remove capture effect success", __func__);
+    return AUDIO_HAL_SUCCESS;
+}
+
 int32_t AudioCaptureTurnStandbyMode(AudioHandle handle)
 {
     int32_t ret = AudioCheckCaptureAddr(handle);
@@ -1075,4 +1091,3 @@ int32_t AudioCaptureAudioDevDump(AudioHandle handle, int32_t range, int32_t fd)
     }
     return AUDIO_HAL_SUCCESS;
 }
-
