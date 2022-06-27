@@ -174,6 +174,7 @@ RetCode HcsDeal::DealMetadata(const std::string &cameraId, const struct DeviceRe
     DealAvalialbleFlashModes(node, metadata);
     DealMirrorSupported(node, metadata);
     DealAvaliableBasicConfigurations(node, metadata);
+    DealSensorOrientation(node, metadata);
     cameraMetadataMap_.insert(std::make_pair(cameraId, metadata));
 
     return RC_OK;
@@ -725,6 +726,33 @@ RetCode HcsDeal::DealAvaliableBasicConfigurations(
         return RC_ERROR;
     }
     CAMERA_LOGI("basicAvailableConfigurations add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealSensorOrientation(
+    const struct DeviceResourceNode &metadataNode,
+    std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    const char *nodeValue = nullptr;
+    int32_t sensorOrientation;
+
+    int32_t rc = pDevResIns->GetString(&metadataNode, "sensorOrientationSupported", &nodeValue, nullptr);
+    if (rc != 0 || (nodeValue == nullptr)) {
+        CAMERA_LOGE("get sensorOrientationSupported failed");
+        return RC_ERROR;
+    }
+
+    sensorOrientation = atoi(nodeValue);
+    CAMERA_LOGI("sensorOrientation  = %{public}d", sensorOrientation);
+
+    constexpr uint32_t DATA_COUNT = 1;
+    bool ret = metadata->addEntry(OHOS_SENSOR_ORIENTATION,
+        static_cast<const void*>(&sensorOrientation), DATA_COUNT);
+    if (!ret) {
+        CAMERA_LOGE("sensorOrientationSupported add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGI("sensorOrientationSupported add success");
     return RC_OK;
 }
 
