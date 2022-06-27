@@ -134,7 +134,7 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest001, TestSize.Level1)
 HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest002, TestSize.Level1)
 {
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest002: start.");
-    int32_t cpuFreq = 1000;
+    int32_t cpuFreq = 2000000;
     int32_t ret = g_thermalInterface->SetCpuFreq(cpuFreq);
     EXPECT_EQ(0, ret);
 
@@ -167,7 +167,7 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest002, TestSize.Level1)
 HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest003, TestSize.Level1)
 {
     THERMAL_HILOGD(LABEL_TEST, "HdfThermalHdiTest003: start.");
-    int32_t gpuFreq = 1000;
+    int32_t gpuFreq = 40000;
     int32_t ret = g_thermalInterface->SetGpuFreq(gpuFreq);
     EXPECT_EQ(0, ret);
 
