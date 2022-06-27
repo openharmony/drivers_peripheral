@@ -11,14 +11,14 @@
             <thermal_zone type="gpu-thermal"/>
         </group>
         <group name="sim" interval="5000">
-            <thermal_node type="soc" path="data/sensor/soc/temp"/>
-            <thermal_node type="cpu" path="data/sensor/cpu/temp" record="true"/>
-            <thermal_node type="ap" path="data/sensor/ap/temp"/>
-            <thermal_node type="pa" path="data/sensor/pa/temp"/>
-            <thermal_node type="ambient" path="data/sensor/ambient/temp"/>
-            <thermal_node type="charger" path="data/sensor/charger/temp"/>
-            <thermal_node type="battery" path="data/sensor/battery/temp"/>
-            <thermal_node type="shell" path="data/sensor/shell/temp"/>
+            <thermal_node type="soc" path="data/service/el0/thermal/sensor/soc/temp"/>
+            <thermal_node type="cpu" path="data/service/el0/thermal/sensor/cpu/temp" record="true"/>
+            <thermal_node type="ap" path="data/service/el0/thermal/sensor/ap/temp"/>
+            <thermal_node type="pa" path="data/service/el0/thermal/sensor/pa/temp"/>
+            <thermal_node type="ambient" path="data/service/el0/thermal/sensor/ambient/temp"/>
+            <thermal_node type="charger" path="data/service/el0/thermal/sensor/charger/temp"/>
+            <thermal_node type="battery" path="data/service/el0/thermal/sensor/battery/temp"/>
+            <thermal_node type="shell" path="data/service/el0/thermal/sensor/shell/temp"/>
         </group>
     </polling>
 
