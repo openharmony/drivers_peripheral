@@ -16,17 +16,29 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libpin_auth_interface_service_1.0") {
   include_dirs = [
-    "inc",
-    "//drivers/peripheral/pin_auth/hdi/main/inc",
+    "service/inc",
+    "adaptor/inc",
+    "common/inc",
+    "database/inc",
+    "main/inc",
+    "//third_party/openssl/include",
     "//base/useriam/user_auth_framework/common/logs",
   ]
   sources = [
-    "src/executor_impl.cpp",
-    "src/pin_auth_interface_service.cpp",
+    "adaptor/src/adaptor_algorithm.c",
+    "adaptor/src/adaptor_file.c",
+    "adaptor/src/adaptor_memory.c",
+    "adaptor/src/adaptor_time.c",
+    "adaptor/src/file_operator.c",
+    "common/src/buffer.c",
+    "database/src/pin_db.c",
+    "main/src/pin_auth.cpp",
+    "main/src/pin_func.c",
+    "service/src/executor_impl.cpp",
+    "service/src/pin_auth_interface_service.cpp",
   ]
   public_deps = [
     "//drivers/interface/pin_auth/v1_0:libpin_auth_stub_1.0",
-    "//drivers/peripheral/pin_auth/hdi:libpin_auth_sample_1.0",
     "//third_party/openssl:libcrypto_static",
   ]
 
@@ -34,6 +46,7 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
     "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//base/useriam/user_auth_framework/common:iam_utils",
     "//third_party/openssl:libcrypto_static",
+    "//utils/native/base:utils",
   ]
 
   external_deps = [
@@ -51,15 +64,15 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
 
 ohos_shared_library("libpin_auth_driver") {
   include_dirs = [
-    "inc",
-    "//drivers/peripheral/pin_auth/hdi/main/inc",
+    "service/inc",
+    "main/inc",
     "//base/useriam/user_auth_framework/common/logs",
   ]
-  sources = [ "src/pin_auth_interface_driver.cpp" ]
+  sources = [ "service/src/pin_auth_interface_driver.cpp" ]
   deps = [
     "//base/useriam/user_auth_framework/common:iam_utils",
     "//drivers/interface/pin_auth/v1_0:libpin_auth_stub_1.0",
-    "//drivers/peripheral/pin_auth/hdi:libpin_auth_sample_1.0",
+    "//drivers/peripheral/pin_auth/hdi_service:libpin_auth_interface_service_1.0",
   ]
 
   external_deps = [
