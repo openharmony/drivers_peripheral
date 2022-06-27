@@ -147,7 +147,7 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
-        "display_device_driver:hdi_display_gralloc",
+        "drivers_peripheral_display:hdi_display_gralloc",
         "graphic_chipsetsdk:surface",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
