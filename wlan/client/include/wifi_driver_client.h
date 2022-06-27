@@ -53,6 +53,7 @@ enum WifiDriverClientResultCode {
     RET_CODE_MISUSE = -4, /* incorrectly API used */
     RET_CODE_NOT_AVAILABLE = -5,
     RET_CODE_NOMEM = -6,
+    RET_CODE_DEVICE_BUSY = -16,
 };
 
 enum WifiIfType {

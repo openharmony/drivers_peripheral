@@ -234,7 +234,7 @@ HWTEST_F(HdfWifiServiceCTest, SetMacAddressTest_008, TestSize.Level1)
     rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, errorMac, macLen);
     ASSERT_NE(rc, HDF_SUCCESS);
     rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, mac, macLen);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_ERR_DEVICE_BUSY);
     ASSERT_TRUE(flag);
     rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
@@ -600,7 +600,7 @@ HWTEST_F(HdfWifiServiceCTest, SetMacAddressTest_025, TestSize.Level1)
     rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, errorMac, macLen);
     ASSERT_NE(rc, HDF_SUCCESS);
     rc = g_wlanObj->SetMacAddress(g_wlanObj, &ifeature, mac, macLen);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_ERR_DEVICE_BUSY);
     ASSERT_TRUE(flag);
     rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
