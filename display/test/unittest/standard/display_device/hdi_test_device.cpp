@@ -66,7 +66,7 @@ std::shared_ptr<HdiTestDisplay> HdiTestDevice::FindDisplayOrCreate(uint32_t id)
     int ret;
     std::shared_ptr<HdiTestDisplay> display = GetDisplayFromId(id);
     if (display == nullptr) {
-        DISPLAY_TEST_LOGD("the display not find will creat a display");
+        DISPLAY_TEST_LOGD("the display not find will create a display");
     }
     display = std::make_shared<HdiTestDisplay>(id, *mDeviceFuncs);
     ret = display->Init();

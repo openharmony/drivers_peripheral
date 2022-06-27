@@ -41,12 +41,12 @@ static bool IsExecutorIdMatchById(void *data, void *condition)
         LOG_ERROR("input para is null");
         return false;
     }
-    uint64_t executorId = *(uint64_t *)condition;
+    uint64_t executorIndex = *(uint64_t *)condition;
     ExecutorInfoHal *executorInfo = (ExecutorInfoHal *)data;
-    return (executorInfo->executorId == executorId);
+    return (executorInfo->executorIndex == executorIndex);
 }
 
-static bool IsExecutorIdMatchByType(void *data, void *condition)
+static bool IsExecutorNodeMatch(void *data, void *condition)
 {
     if ((condition == NULL) || (data == NULL)) {
         LOG_ERROR("get null data");
@@ -54,8 +54,9 @@ static bool IsExecutorIdMatchByType(void *data, void *condition)
     }
     ExecutorInfoHal *executorIndex = (ExecutorInfoHal *)condition;
     ExecutorInfoHal *executorInfo = (ExecutorInfoHal *)data;
-    return (executorInfo->executorType == executorIndex->executorType &&
-        executorInfo->authType == executorIndex->authType);
+    return (executorInfo->executorRole == executorIndex->executorRole &&
+        executorInfo->authType == executorIndex->authType &&
+        executorInfo->executorSensorHint == executorIndex->executorSensorHint);
 }
 
 static bool IsInit()
@@ -89,13 +90,13 @@ static bool IsExecutorValid(ExecutorInfoHal *executorInfo)
     return true;
 }
 
-static bool IsExecutorIdDuplicate(uint64_t executorId)
+static bool IsExecutorIdDuplicate(uint64_t executorIndex)
 {
     LinkedListNode *temp = g_poolList->head;
     ExecutorInfoHal *executorInfo = NULL;
     while (temp != NULL) {
         executorInfo = (ExecutorInfoHal *)temp->data;
-        if (executorInfo != NULL && executorInfo->executorId == executorId) {
+        if (executorInfo != NULL && executorInfo->executorIndex == executorIndex) {
             return true;
         }
         temp = temp->next;
@@ -104,27 +105,36 @@ static bool IsExecutorIdDuplicate(uint64_t executorId)
     return false;
 }
 
-static ResultCode GenerateValidExecutorId(uint64_t *executorId)
+static ResultCode GenerateValidExecutorId(uint64_t *executorIndex)
 {
     if (g_poolList == NULL) {
         LOG_ERROR("g_poolList is null");
         return RESULT_BAD_PARAM;
     }
 
-    for (uint32_t i = 0; i < MAX_DUPLICATE_CHECK; i++) {
+    for (uint32_t i = 0; i < MAX_DUPLICATE_CHECK; ++i) {
         uint64_t tempRandom;
         if (SecureRandom((uint8_t *)&tempRandom, sizeof(uint64_t)) != RESULT_SUCCESS) {
             LOG_ERROR("get random failed");
             return RESULT_GENERAL_ERROR;
         }
         if (!IsExecutorIdDuplicate(tempRandom)) {
-            *executorId = tempRandom;
+            *executorIndex = tempRandom;
             return RESULT_SUCCESS;
         }
     }
 
     LOG_ERROR("a rare failure");
     return RESULT_GENERAL_ERROR;
+}
+
+static LinkedList *QueryRepeatExecutor(const ExecutorInfoHal *executorInfo)
+{
+    ExecutorCondition condition = {};
+    SetExecutorConditionAuthType(&condition, executorInfo->authType);
+    SetExecutorConditionSensorHint(&condition, executorInfo->executorSensorHint);
+    SetExecutorConditionExecutorRole(&condition, executorInfo->executorRole);
+    return QueryExecutor(&condition);
 }
 
 ResultCode RegisterExecutorToPool(ExecutorInfoHal *executorInfo)
@@ -137,35 +147,53 @@ ResultCode RegisterExecutorToPool(ExecutorInfoHal *executorInfo)
         LOG_ERROR("get invalid executorInfo");
         return RESULT_BAD_PARAM;
     }
-    if (g_poolList->remove(g_poolList, (void *)executorInfo, IsExecutorIdMatchByType, true) != RESULT_SUCCESS) {
-        LOG_INFO("current executor isn't registered");
+    LinkedList *executors = QueryRepeatExecutor(executorInfo);
+    if (executors == NULL) {
+        LOG_ERROR("query executor failed");
+        return RESULT_NO_MEMORY;
     }
-    ResultCode result = GenerateValidExecutorId(&executorInfo->executorId);
-    if (result != RESULT_SUCCESS) {
-        LOG_ERROR("get executorId failed");
-        return result;
+    ResultCode result = RESULT_UNKNOWN;
+    if (executors->getSize(executors) != 0) {
+        if (executors->head == NULL || executors->head->data == NULL) {
+            LOG_ERROR("list node is invalid");
+            goto EXIT;
+        }
+        executorInfo->executorIndex = ((ExecutorInfoHal *)(executors->head->data))->executorIndex;
+        if (g_poolList->remove(g_poolList, (void *)executorInfo, IsExecutorNodeMatch, true) != RESULT_SUCCESS) {
+            LOG_INFO("remove executor failed");
+            goto EXIT;
+        }
+    } else {
+        result = GenerateValidExecutorId(&executorInfo->executorIndex);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("get executorId failed");
+            goto EXIT;
+        }
     }
     ExecutorInfoHal *executorCopy = CopyExecutorInfo(executorInfo);
     if (executorCopy == NULL) {
         LOG_ERROR("copy executor failed");
-        return RESULT_NO_MEMORY;
+        result = RESULT_BAD_COPY;
+        goto EXIT;
     }
     result = g_poolList->insert(g_poolList, (void *)executorCopy);
     if (result != RESULT_SUCCESS) {
         LOG_ERROR("insert failed");
         DestroyExecutorInfo(executorCopy);
-        return result;
     }
+
+EXIT:
+    DestroyLinkedList(executors);
     return result;
 }
 
-ResultCode UnregisterExecutorToPool(uint64_t executorId)
+ResultCode UnregisterExecutorToPool(uint64_t executorIndex)
 {
     if (!IsInit()) {
         LOG_ERROR("pool not init");
         return RESULT_NEED_INIT;
     }
-    return g_poolList->remove(g_poolList, (void *)&executorId, IsExecutorIdMatchById, true);
+    return g_poolList->remove(g_poolList, (void *)&executorIndex, IsExecutorIdMatchById, true);
 }
 
 ExecutorInfoHal *CopyExecutorInfo(ExecutorInfoHal *src)
@@ -187,26 +215,48 @@ ExecutorInfoHal *CopyExecutorInfo(ExecutorInfoHal *src)
     return dest;
 }
 
-ResultCode QueryExecutor(uint32_t authType, LinkedList **result)
+static bool IsExecutorMatch(const ExecutorCondition *condition, const ExecutorInfoHal *credentialInfo)
+{
+    if ((condition->conditonFactor & EXECUTOR_CONDITION_INDEX) != 0 &&
+        condition->executorIndex != credentialInfo->executorIndex) {
+        return false;
+    }
+    if ((condition->conditonFactor & EXECUTOR_CONDITION_AUTH_TYPE) != 0 &&
+        condition->authType != credentialInfo->authType) {
+        return false;
+    }
+    if ((condition->conditonFactor & EXECUTOR_CONDITION_SENSOR_HINT) != 0 &&
+        condition->executorSensorHint != INVALID_SENSOR_HINT &&
+        condition->executorSensorHint != credentialInfo->executorSensorHint) {
+        return false;
+    }
+    if ((condition->conditonFactor & EXECUTOR_CONDITION_ROLE) != 0 &&
+        condition->executorRole != credentialInfo->executorRole) {
+        return false;
+    }
+    if ((condition->conditonFactor & EXECUTOR_CONDITION_MATCHER) != 0 &&
+        condition->executorMatcher != credentialInfo->executorMatcher) {
+        return false;
+    }
+    return true;
+}
+
+LinkedList *QueryExecutor(const ExecutorCondition *limit)
 {
     if (!IsInit()) {
         LOG_ERROR("pool not init");
-        return RESULT_NEED_INIT;
+        return NULL;
     }
+    LinkedList *result = CreateLinkedList(DestroyExecutorInfo);
     if (result == NULL) {
-        LOG_ERROR("get null data");
-        return RESULT_BAD_PARAM;
-    }
-    *result = CreateLinkedList(DestroyExecutorInfo);
-    if (*result == NULL) {
         LOG_ERROR("create result list failed");
-        return RESULT_NO_MEMORY;
+        return NULL;
     }
     LinkedListIterator *iterator = g_poolList->createIterator(g_poolList);
     if (iterator == NULL) {
         LOG_ERROR("create iterator failed");
-        DestroyLinkedList(*result);
-        return RESULT_NO_MEMORY;
+        DestroyLinkedList(result);
+        return NULL;
     }
 
     while (iterator->hasNext(iterator)) {
@@ -215,7 +265,7 @@ ResultCode QueryExecutor(uint32_t authType, LinkedList **result)
             LOG_ERROR("get invalid executor info");
             continue;
         }
-        if (executorInfo->authType != authType) {
+        if (!IsExecutorMatch(limit, executorInfo)) {
             continue;
         }
         ExecutorInfoHal *copy = CopyExecutorInfo(executorInfo);
@@ -223,12 +273,127 @@ ResultCode QueryExecutor(uint32_t authType, LinkedList **result)
             LOG_ERROR("copy executor info failed");
             continue;
         }
-        if ((*result)->insert(*result, copy) != RESULT_SUCCESS) {
+        if (result->insert(result, copy) != RESULT_SUCCESS) {
             LOG_ERROR("insert executor info failed");
             DestroyExecutorInfo(copy);
             continue;
         }
     }
     g_poolList->destroyIterator(iterator);
-    return RESULT_SUCCESS;
+    return result;
+}
+
+ResultCode QueryCollecterMatcher(uint32_t authType, uint32_t executorSensorHint, uint32_t *matcher)
+{
+    if (!IsInit()) {
+        LOG_ERROR("pool not init");
+        return RESULT_NEED_INIT;
+    }
+    if (matcher == NULL) {
+        LOG_ERROR("matcher is null");
+        return RESULT_BAD_PARAM;
+    }
+    LinkedListIterator *iterator = g_poolList->createIterator(g_poolList);
+    if (iterator == NULL) {
+        LOG_ERROR("create iterator failed");
+        return RESULT_NO_MEMORY;
+    }
+
+    while (iterator->hasNext(iterator)) {
+        ExecutorInfoHal *executorInfo = (ExecutorInfoHal *)(iterator->next(iterator));
+        if (!IsExecutorValid(executorInfo)) {
+            LOG_ERROR("get invalid executor info");
+            continue;
+        }
+        if (executorInfo->authType == authType && executorInfo->executorSensorHint == executorSensorHint &&
+            (executorInfo->executorRole == COLLECTOR || executorInfo->executorRole == ALL_IN_ONE)) {
+            *matcher = executorInfo->executorMatcher;
+            g_poolList->destroyIterator(iterator);
+            return RESULT_SUCCESS;
+        }
+    }
+    LOG_ERROR("can't found executor, sensor hint is %{public}u", executorSensorHint);
+    g_poolList->destroyIterator(iterator);
+    return RESULT_NOT_FOUND;
+}
+
+
+uint64_t QueryCredentialExecutorIndex(uint32_t authType, uint32_t executorSensorHint)
+{
+    if (!IsInit()) {
+        LOG_ERROR("pool not init");
+        return INVALID_EXECUTOR_INDEX;
+    }
+    LinkedListIterator *iterator = g_poolList->createIterator(g_poolList);
+    if (iterator == NULL) {
+        LOG_ERROR("create iterator failed");
+        return INVALID_EXECUTOR_INDEX;
+    }
+
+    while (iterator->hasNext(iterator)) {
+        ExecutorInfoHal *executorInfo = (ExecutorInfoHal *)(iterator->next(iterator));
+        if (!IsExecutorValid(executorInfo)) {
+            LOG_ERROR("get invalid executor info");
+            continue;
+        }
+        if (executorInfo->authType == authType && executorInfo->executorSensorHint == executorSensorHint &&
+            (executorInfo->executorRole == VERIFIER || executorInfo->executorRole == ALL_IN_ONE)) {
+            g_poolList->destroyIterator(iterator);
+            return executorInfo->executorIndex;
+        }
+    }
+    LOG_ERROR("can't found executor, sensor hint is %{public}u", executorSensorHint);
+    g_poolList->destroyIterator(iterator);
+    return INVALID_EXECUTOR_INDEX;
+}
+
+
+void SetExecutorConditionExecutorIndex(ExecutorCondition *condition, uint64_t executorIndex)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    condition->executorIndex = executorIndex;
+    condition->conditonFactor |= EXECUTOR_CONDITION_INDEX;
+}
+
+void SetExecutorConditionAuthType(ExecutorCondition *condition, uint32_t authType)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    condition->authType = authType;
+    condition->conditonFactor |= EXECUTOR_CONDITION_AUTH_TYPE;
+}
+
+void SetExecutorConditionSensorHint(ExecutorCondition *condition, uint32_t executorSensorHint)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    condition->executorSensorHint = executorSensorHint;
+    condition->conditonFactor |= EXECUTOR_CONDITION_SENSOR_HINT;
+}
+
+void SetExecutorConditionExecutorRole(ExecutorCondition *condition, uint32_t executorRole)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    condition->executorRole = executorRole;
+    condition->conditonFactor |= EXECUTOR_CONDITION_ROLE;
+}
+
+void SetExecutorConditionExecutorMatcher(ExecutorCondition *condition, uint32_t executorMatcher)
+{
+    if (condition == NULL) {
+        LOG_ERROR("condition is null");
+        return;
+    }
+    condition->executorMatcher = executorMatcher;
+    condition->conditonFactor |= EXECUTOR_CONDITION_MATCHER;
 }

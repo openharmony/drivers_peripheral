@@ -41,4 +41,8 @@ int32_t AudioProxyGetMmapPositionRead(struct HdfSBuf *reply, uint64_t *frames, s
 int32_t AudioProxyReqMmapBufferWrite(struct HdfSBuf *data, int32_t reqSize,
     const struct AudioMmapBufferDescripter *desc);
 
+int32_t AudioProxyRenderAddEffect(AudioHandle handle, uint64_t effectid);
+int32_t AudioProxyRenderRemoveEffect(AudioHandle handle, uint64_t effectid);
+int32_t AudioProxyCaptureAddEffect(AudioHandle handle, uint64_t effectid);
+int32_t AudioProxyCaptureRemoveEffect(AudioHandle handle, uint64_t effectid);
 #endif

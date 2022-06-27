@@ -65,7 +65,7 @@ static int32_t SerCodecEnumerateCapbility(struct HdfDeviceIoClient *client, stru
         return HDF_FAILURE;
     }
     if (!CodecCapablitesInited()) {
-        HDF_LOGE("%{public}s: codec capablities not inited!", __func__);
+        HDF_LOGE("%{public}s: codec capabilities not inited!", __func__);
         return HDF_FAILURE;
     }
     if (CodecEnumerateCapbility(index, &capbility) != HDF_SUCCESS) {
@@ -73,7 +73,7 @@ static int32_t SerCodecEnumerateCapbility(struct HdfDeviceIoClient *client, stru
         return HDF_FAILURE;
     }
     if (capbility.mime == MEDIA_MIMETYPE_INVALID) {
-        HDF_LOGE("%{public}s: Capablity invalid, discard!", __func__);
+        HDF_LOGE("%{public}s: Capability invalid, discard!", __func__);
         return HDF_FAILURE;
     }
     if (CodecSerPackCapbility(reply, &capbility) != HDF_SUCCESS) {

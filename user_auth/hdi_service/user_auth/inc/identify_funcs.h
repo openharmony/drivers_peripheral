@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,28 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DISPLAY_BYTRACE_H
-#define DISPLAY_BYTRACE_H
-#include <string>
-#include <hitrace_meter.h>
 
-namespace OHOS {
-namespace HDI {
-namespace DISPLAY {
-class DisplayBytrace {
-public:
-    DisplayBytrace(std::string value)
-    {
-        StartTrace(HITRACE_TAG_GRAPHIC_AGP, value.c_str());
-    }
+#ifndef USERIAM_IDENTIFY_FUNCS_H
+#define USERIAM_IDENTIFY_FUNCS_H
 
-    ~DisplayBytrace()
-    {
-        FinishTrace(HITRACE_TAG_GRAPHIC_AGP);
-    }
-};
-} // namespace DISPLAY
-} // namespace HDI
-} // namespace OHOS
+#include "buffer.h"
+#include "coauth.h"
+#include "context_manager.h"
+#include "user_sign_centre.h"
 
-#endif // DISPLAY_BYTRACE_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int32_t DoIdentify(const IdentifyParam param, LinkedList **schedule);
+int32_t DoUpdateIdentify(uint64_t contextId, const Buffer *scheduleResult, int32_t *userId, UserAuthTokenHal *token,
+    int32_t *result);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // USERIAM_IDENTIFY_FUNCS_H

@@ -120,7 +120,7 @@ static int32_t FindEmptyId(void)
             }
         }
         if (i == MAX_LIST) {
-            HDF_LOGE("%s:%d too much device creat!", __func__, __LINE__);
+            HDF_LOGE("%s:%d too much device created!", __func__, __LINE__);
             return -1;
         }
         devCnt = i;
@@ -319,7 +319,7 @@ const struct UsbFnDeviceMgr *UsbFnMgrDeviceGet(const char *udcName)
         return NULL;
     }
     if (g_devEntry.next == 0 || DListIsEmpty(&g_devEntry)) {
-        HDF_LOGE("%{public}s no device creat", __func__);
+        HDF_LOGE("%{public}s no device created", __func__);
         return NULL;
     }
 

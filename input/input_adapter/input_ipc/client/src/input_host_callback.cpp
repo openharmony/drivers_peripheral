@@ -24,7 +24,7 @@ void InputReportEventCallback::ReportEventPkgCallback(const EventPackage *pkgs, 
 {
     HDF_LOGD("device action pkgs[%{public}p] = count:%{public}d", pkgs, count);
     if (pkgs == NULL) {
-        HDF_LOGI("pkgs nulll,");
+        HDF_LOGI("pkgs null,");
         return;
     }
     for (uint32_t i = 0; i < count; i++) {

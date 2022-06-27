@@ -17,7 +17,7 @@
  * @addtogroup Audio
  * @{
  *
- * @brief Defines audio ADM test-related APIs, including data types and functions for writting data
+ * @brief Defines audio ADM test-related APIs, including data types and functions for writing data
 to buffer
  *
  * @since 1.0

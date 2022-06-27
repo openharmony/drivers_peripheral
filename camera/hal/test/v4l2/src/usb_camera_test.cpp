@@ -43,7 +43,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0001)
     std::vector<std::string> cameraIds;
     std::cout << "==========[test log] 1. get current system cameraID."<< std::endl;
     display_->cameraHost->GetCameraIds(cameraIds);
-    std::cout << "==========[test log] Fisrt cameraId.size = " << cameraIds.size() << std::endl;
+    std::cout << "==========[test log] First cameraId.size = " << cameraIds.size() << std::endl;
     std::cout << "==========[test log] OnCameraStatus interface has been mobilized" << std::endl;
     for (auto &cameraId : cameraIds) {
         std::cout << "==========[test log] cameraId = " << cameraId << std::endl;

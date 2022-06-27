@@ -25,7 +25,7 @@ extern "C" {
 #define TAG_AND_LEN_BYTE 8
 #define TAG_ANG_LEN_T 12
 #define TAG_AND_LEN_S 16
-#define MAX_TLV_LEN 200
+#define MAX_TLV_LEN 224
 #define SIGN_DATA_LEN 64
 #define PIN_RET_TYPE_LEN 8
 #define PIN_RET_DATA_LEN 72
@@ -112,7 +112,7 @@ ResultCode DoEnrollPin(PinEnrollParam *pinEnrollParam, Buffer *retTlv);
 ResultCode DoAuthPin(PinAuthParam *pinAuthParam, Buffer *data);
 ResultCode DoQueryPinInfo(uint64_t templateId, PinCredentialInfos *pinCredentialInfo);
 ResultCode DoDeleteTemplate(uint64_t templateId);
-ResultCode GenerateRetTlv(uint32_t result, uint64_t scheduleId, uint64_t subType, uint64_t templatedId, Buffer *retTlv);
+ResultCode GenerateRetTlv(uint32_t result, uint64_t scheduleId, uint64_t templatedId, Buffer *retTlv);
 ResultCode GenerateKeyPair();
 ResultCode DoGetExecutorInfo(PinExecutorInfo *pinExecutorInfo);
 ResultCode DoVerifyTemplateData(const uint64_t *templateIdList, uint32_t templateIdListLen);

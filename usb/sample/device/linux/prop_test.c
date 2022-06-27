@@ -35,7 +35,7 @@ static void ShowUsage()
     HDF_LOGE("Usage options:\n");
     HDF_LOGE("g : name of getting prop, as: g idProduct");
     HDF_LOGE("s : name of setting prop, as: s idProduct 0xa4b7");
-    HDF_LOGE("r : regist prop, as: r testa aaaaa");
+    HDF_LOGE("r : register prop, as: r testa aaaaa");
     HDF_LOGE("h : show this help message");
 }
 

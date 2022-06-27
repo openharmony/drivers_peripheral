@@ -405,7 +405,7 @@ int32_t FillRequest(struct AcmDevice *acm)
         snd->dbNum = acm->transmitting;
         rc = UsbFillRequest(snd->request, InterfaceIdToHandle(acm, acm->dataPipe->interfaceId), &parmas);
         if (rc != HDF_SUCCESS) {
-            HDF_LOGE("%s:UsbFillRequest faile,ret=%d \n", __func__, rc);
+            HDF_LOGE("%s:UsbFillRequest failed,ret=%d \n", __func__, rc);
             return rc;
         }
     }

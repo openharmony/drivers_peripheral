@@ -13,18 +13,28 @@
  * limitations under the License.
  */
 
-#include "lock.h"
+#ifndef USER_IDM_ENROLL_SPECIFICATION_CHECK
+#define USER_IDM_ENROLL_SPECIFICATION_CHECK
 
-#include "pthread.h"
+#include <stdint.h>
 
-static pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER;
+#include "defines.h"
+#include "user_sign_centre.h"
 
-void GlobalLock(void)
-{
-    (void)pthread_mutex_lock(&g_mutex);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define MAX_NUMBER_OF_PIN_PER_USER 1
+#define MAX_NUMBER_OF_FACE_PER_USER 1
+#define MAX_NUMBER_OF_FINGERS_PER_USER 10
+#define INVALID_AUTH_TYPE_EROLL_NUMBER 0
+
+ResultCode CheckSpecification(int32_t userId, uint32_t authType);
+ResultCode CheckEnrollToken(int32_t userId, UserAuthTokenHal *authToken);
+
+#ifdef __cplusplus
 }
+#endif
 
-void GlobalUnLock(void)
-{
-    (void)pthread_mutex_unlock(&g_mutex);
-}
+#endif // USER_IDM_ENROLL_SPECIFICATION_CHECK

@@ -20,24 +20,23 @@
 #include "adaptor_algorithm.h"
 #include "adaptor_log.h"
 #include "adaptor_time.h"
-#include "coauth_sign_centre.h"
 #include "context_manager.h"
 #include "executor_message.h"
 #include "idm_database.h"
 #include "user_sign_centre.h"
 
-int32_t GenerateSolutionFunc(AuthSolutionHal param, CoAuthSchedule **schedules, uint32_t *scheduleNum)
+int32_t GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules)
 {
-    if (schedules == NULL || scheduleNum == NULL) {
-        LOG_ERROR("param is null");
+    if (schedules == NULL) {
+        LOG_ERROR("schedules is null");
         return RESULT_BAD_PARAM;
     }
-    UserAuthContext *authContext = GenerateContext(param);
+    UserAuthContext *authContext = GenerateAuthContext(param);
     if (authContext == NULL) {
         LOG_ERROR("authContext is null");
         return RESULT_GENERAL_ERROR;
     }
-    int32_t ret = GetSchedules(authContext, schedules, scheduleNum);
+    int32_t ret = CopySchedules(authContext, schedules);
     if (ret != RESULT_SUCCESS) {
         DestoryContext(authContext);
         return ret;
@@ -45,37 +44,18 @@ int32_t GenerateSolutionFunc(AuthSolutionHal param, CoAuthSchedule **schedules, 
     return ret;
 }
 
-static int32_t GetTokenDataAndSign(UserAuthContext *context, UserAuthTokenHal *authToken)
+int32_t RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, UserAuthTokenHal *authToken,
+    AuthResult *result)
 {
-    if (context == NULL || authToken == NULL) {
-        LOG_ERROR("context or authToken is null");
-        return RESULT_BAD_PARAM;
-    }
-    authToken->authResult = RESULT_SUCCESS;
-    authToken->userId = context->userId;
-    authToken->authTrustLevel = context->authTrustLevel;
-    authToken->authType = context->authType;
-    EnrolledInfoHal enrolledInfo;
-    int32_t ret = GetEnrolledInfoAuthType(context->userId, authToken->authType, &enrolledInfo);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("get enrolledId info failed");
-        return ret;
-    }
-    authToken->enrolledId = enrolledInfo.enrolledId;
-    authToken->challenge = context->challenge;
-    authToken->time = GetSystemTime();
-    return UserAuthTokenSign(authToken);
-}
-
-int32_t RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, UserAuthTokenHal *authToken)
-{
-    if (!IsBufferValid(scheduleResult) || authToken == NULL) {
+    if (!IsBufferValid(scheduleResult) || authToken == NULL || result == NULL) {
         LOG_ERROR("param is null");
+        DestoryContextbyId(contextId);
         return RESULT_BAD_PARAM;
     }
     ExecutorResultInfo *executorResultInfo = CreateExecutorResultInfo(scheduleResult);
-    if (!IsExecutorInfoValid(executorResultInfo)) {
+    if (executorResultInfo == NULL) {
         LOG_ERROR("executorResultInfo is null");
+        DestoryContextbyId(contextId);
         return RESULT_UNKNOWN;
     }
 
@@ -85,39 +65,33 @@ int32_t RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, 
         DestoryExecutorResultInfo(executorResultInfo);
         return RESULT_UNKNOWN;
     }
-    int32_t ret = ScheduleOnceFinish(userAuthContext, executorResultInfo->scheduleId);
+    uint64_t credentialId;
+    int32_t ret = FillInContext(userAuthContext, &credentialId, executorResultInfo);
     if (ret != RESULT_SUCCESS) {
-        DestoryContext(userAuthContext);
-        DestoryExecutorResultInfo(executorResultInfo);
-        return ret;
+        LOG_ERROR("get info failed");
+        goto EXIT;
     }
-
+    ret = ScheduleOnceFinish(userAuthContext, executorResultInfo->scheduleId);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("failed to finish schedule");
+        goto EXIT;
+    }
     if (executorResultInfo->result == RESULT_SUCCESS) {
-        ret = GetTokenDataAndSign(userAuthContext, authToken);
+        ret = GetTokenDataAndSign(userAuthContext, credentialId, SCHEDULE_MODE_AUTH, authToken);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("sign token failed");
             (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
+            goto EXIT;
         }
     } else {
         (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
-        authToken->authResult = executorResultInfo->result;
     }
+    result->freezingTime = executorResultInfo->freezingTime;
+    result->remainTimes = executorResultInfo->remainTimes;
+    result->result = executorResultInfo->result;
+
+EXIT:
     DestoryExecutorResultInfo(executorResultInfo);
     DestoryContext(userAuthContext);
-    return ret;
-}
-
-int32_t CancelContextFunc(uint64_t contextId, CoAuthSchedule **schedules, uint32_t *scheduleNum)
-{
-    UserAuthContext *authContext = GetContext(contextId);
-    if (authContext == NULL) {
-        LOG_ERROR("get context failed");
-        return RESULT_NOT_FOUND;
-    }
-    int32_t ret = GetSchedules(authContext, schedules, scheduleNum);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("get schedule failed");
-    }
-    DestoryContext(authContext);
     return ret;
 }

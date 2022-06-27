@@ -193,7 +193,7 @@ void HdiLayer::SetPixel(const BufferHandle &handle, int x, int y, uint32_t color
         DISPLAY_LOGE("CheckPixel invalid parameter y:%{public}d height:%{public}d", y, handle.height));
     int32_t position = y * handle.width + x;
     if ((position * pixelBytes) > handle.size) {
-        DISPLAY_LOGE("the pixel postion outside\n");
+        DISPLAY_LOGE("the pixel position outside\n");
     }
     uint32_t *pixel = reinterpret_cast<uint32_t *>(handle.virAddr) + position;
     *pixel = color;

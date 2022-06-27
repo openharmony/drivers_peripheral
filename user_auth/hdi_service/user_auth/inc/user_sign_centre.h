@@ -20,7 +20,7 @@
 
 #include "buffer.h"
 #include "defines.h"
-#include "user_sign_centre.h"
+#include "context_manager.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,18 +33,21 @@ extern "C" {
 #define TOKEN_VERSION 0
 
 typedef struct {
-    int32_t authResult;
-    uint64_t contextId;
-    int32_t userId;
-    uint64_t challenge;
-    uint32_t authType;
-    uint32_t authTrustLevel;
-    uint64_t enrolledId;
     uint32_t version;
+    uint64_t challenge;
+    uint64_t secureUid;
+    uint64_t enrolledId;
+    uint64_t credentialId;
     uint64_t time;
+    uint32_t authTrustLevel;
+    uint32_t authType;
+    uint32_t authMode;
+    uint32_t securityLevel;
     uint8_t sign[SHA256_SIGN_LEN];
-} UserAuthTokenHal;
+} __attribute__((__packed__)) UserAuthTokenHal;
 
+ResultCode GetTokenDataAndSign(const UserAuthContext *context,
+    uint64_t credentialId, uint32_t authMode, UserAuthTokenHal *authToken);
 ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken);
 ResultCode UserAuthTokenVerify(const UserAuthTokenHal *userAuthToken);
 

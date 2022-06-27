@@ -50,7 +50,7 @@ enum WifiDriverClientResultCode {
     RET_CODE_FAILURE = -1,
     RET_CODE_NOT_SUPPORT = -2,
     RET_CODE_INVALID_PARAM = -3,
-    RET_CODE_MISUSE = -4, /* uncorrectly API used */
+    RET_CODE_MISUSE = -4, /* incorrectly API used */
     RET_CODE_NOT_AVAILABLE = -5,
     RET_CODE_NOMEM = -6,
 };

@@ -35,7 +35,7 @@ int32_t OMXAdapterCreateComponent(struct CodecComponentNode **codecNode, char *c
     OMX_COMPONENTTYPE *comp = nullptr;
     CodecComponentNode *tempNode = new CodecComponentNode;
     if (codecNode == nullptr) {
-        HDF_LOGE("%{public}s ceate CodecComponentNode error", __func__);
+        HDF_LOGE("%{public}s create CodecComponentNode error", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
 
@@ -47,7 +47,7 @@ int32_t OMXAdapterCreateComponent(struct CodecComponentNode **codecNode, char *c
     tempNode->node = std::make_shared<ComponentNode>(callbacks, appData);
     auto err = g_mgr.CreateComponentInstance(compName, &ComponentNode::callbacks_, tempNode->node.get(), &comp);
     if (err != OMX_ErrorNone) {
-        HDF_LOGE("%{public}s ceate component instance err[%{public}d]", __func__, err);
+        HDF_LOGE("%{public}s create component instance err[%{public}d]", __func__, err);
         delete tempNode;
         tempNode = nullptr;
         return err;

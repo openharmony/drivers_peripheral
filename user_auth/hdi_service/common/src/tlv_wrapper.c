@@ -88,7 +88,7 @@ int32_t ParseTlvWrapper(const uint8_t *buffer, uint32_t bufferSize, TlvListNode 
 
     uint32_t offset = 0;
     while (offset < bufferSize) {
-        if ((bufferSize - offset) < (sizeof(int32_t) + sizeof(int32_t))) {
+        if ((bufferSize - offset) < TLV_HEADER_LEN) {
             LOG_ERROR("bufferSize = %{public}u, offset = %{public}u", bufferSize, offset);
             return OPERA_FAIL;
         }
@@ -313,4 +313,54 @@ Buffer *GetBuffPara(TlvListNode *head, int32_t msgType)
         node = node->next;
     }
     return NULL;
+}
+
+int32_t TlvAppendObject(TlvListNode *head, int32_t type, const uint8_t *buffer, uint32_t length)
+{
+    if (head == NULL || buffer == NULL || length == 0 || length > MAX_BUFFER_SIZE) {
+        LOG_ERROR("param is invalid");
+        return PARAM_ERR;
+    }
+    return PutTlvObject(head, type, length, buffer);
+}
+
+int32_t SerializeTlvWrapper(TlvListNode *head, uint8_t *buffer, uint32_t maxSize, uint32_t *contentSize)
+{
+    if (head == NULL || buffer == NULL || contentSize == NULL || maxSize == 0) {
+        LOG_ERROR("param is invalid");
+        return PARAM_ERR;
+    }
+    uint32_t offset = 0;
+    TlvListNode *node = head->next;
+    while (node != NULL) {
+        TlvType *tlv = node->data.value;
+        if (tlv == NULL) {
+            LOG_ERROR("tlv is NULL");
+            return PARAM_ERR;
+        }
+        int32_t type = Ntohl(tlv->type);
+        if ((offset > UINT32_MAX - sizeof(int32_t) || offset + sizeof(int32_t) > maxSize) ||
+            (memcpy_s(buffer + offset, sizeof(int32_t), &type, sizeof(int32_t)) != EOK)) {
+            LOG_ERROR("copy type failed");
+            return MEMCPY_ERR;
+        }
+        offset += sizeof(int32_t);
+        uint32_t len = Ntohl(tlv->length);
+        if ((offset > UINT32_MAX - sizeof(int32_t)) || (offset + sizeof(int32_t)) > maxSize ||
+            (memcpy_s(buffer + offset, sizeof(int32_t), &len, sizeof(int32_t)) != EOK)) {
+            LOG_ERROR("copy len failed");
+            return MEMCPY_ERR;
+        }
+        offset += sizeof(int32_t);
+        if ((offset > UINT32_MAX - tlv->length) || (offset + tlv->length > maxSize) ||
+            ((tlv->length != 0) && (memcpy_s(buffer + offset, maxSize - offset, tlv->value, tlv->length) != EOK))) {
+            LOG_ERROR("copy value failed");
+            return MEMCPY_ERR;
+        }
+        offset += tlv->length;
+        node = node->next;
+    }
+
+    *contentSize = offset;
+    return OPERA_SUCC;
 }

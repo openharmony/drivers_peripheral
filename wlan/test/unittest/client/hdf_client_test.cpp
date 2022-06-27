@@ -239,7 +239,7 @@ HWTEST_F(WifiClientTest, WifiClientGetAssociatedStas001, TestSize.Level1)
 
 /**
  * @tc.name: WifiClientSetScanMacAddr001
- * @tc.desc: Wifi client set scan MAC adress function test
+ * @tc.desc: Wifi client set scan MAC address function test
  * @tc.type: FUNC
  * @tc.require: AR000H603L
  */

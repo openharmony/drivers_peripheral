@@ -258,15 +258,15 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
 static bool CheckBufferHandle(AllocTestPrms &info, BufferHandle &buffer)
 {
     if (buffer.stride != (ALIGN_UP(info.expectStride, WIDTH_ALIGN))) {
-        DISPLAY_TEST_LOGE("stride check faild stride %d, expect stride %d ", buffer.stride, info.expectStride);
-        DISPLAY_TEST_LOGE("stride check faild format %d width %d, height %d ", info.allocInfo.format,
+        DISPLAY_TEST_LOGE("stride check failed stride %d, expect stride %d ", buffer.stride, info.expectStride);
+        DISPLAY_TEST_LOGE("stride check failed format %d width %d, height %d ", info.allocInfo.format,
             info.allocInfo.width, info.allocInfo.height);
         return false;
     }
 
     if (buffer.size != info.expectSize) {
-        DISPLAY_TEST_LOGE("size check faild size %d, expect size %d ", buffer.size, info.expectSize);
-        DISPLAY_TEST_LOGE("stride check faild format %d width %d, height %d ", info.allocInfo.format,
+        DISPLAY_TEST_LOGE("size check failed size %d, expect size %d ", buffer.size, info.expectSize);
+        DISPLAY_TEST_LOGE("stride check failed format %d width %d, height %d ", info.allocInfo.format,
             info.allocInfo.width, info.allocInfo.height);
         return false;
     }

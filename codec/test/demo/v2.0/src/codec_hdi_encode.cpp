@@ -135,7 +135,7 @@ bool CodecHdiEncode::Configure()
     if (client_ == nullptr) {
         return false;
     }
-    // set input width, height and COLOR, set ouput port width and height
+    // set input width, height and COLOR, set output port width and height
     if (ConfigPortDefine() != HDF_SUCCESS) {
         HDF_LOGE("%{public}s ConfigPortDefine error", __func__);
         return false;
@@ -199,7 +199,7 @@ int32_t CodecHdiEncode::CheckAndUseBufferHandle()
 
 bool CodecHdiEncode::UseBuffers()
 {
-    // commad to IDLE
+    // command to IDLE
     auto err = client_->SendCommand(client_, OMX_CommandStateSet, OMX_StateIdle, NULL, 0);
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to SendCommand with OMX_CommandStateSet:OMX_StateIdle", __func__);

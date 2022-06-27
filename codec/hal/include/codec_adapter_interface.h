@@ -28,7 +28,7 @@ struct CodecComponentNode;
 extern int32_t OMXAdapterCreateComponent(struct CodecComponentNode **codecNode, char *compName, int64_t appData,
                                          struct CodecCallbackType *callbacks);
 /**
- * @brief Release the componet by handle.
+ * @brief Release the component by handle.
  */
 extern int32_t OmxAdapterDestoryComponent(struct CodecComponentNode *codecNode);
 /**

@@ -16,6 +16,8 @@
 #ifndef COMMON_DEFINES_H
 #define COMMON_DEFINES_H
 
+#include "stdint.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -49,14 +51,38 @@ typedef enum AuthType {
     DEFAULT_AUTH_TYPE = 0,
     PIN_AUTH = 1,
     FACE_AUTH = 2,
-    MAX_AUTH_TYPE = FACE_AUTH,
+    FINGER_AUTH = 4,
 } AuthType;
+
+typedef enum ScheduleMode {
+    SCHEDULE_MODE_ENROLL = 0,
+    SCHEDULE_MODE_AUTH = 1,
+    SCHEDULE_MODE_IDENTIFY = 2,
+} ScheduleMode;
 
 typedef enum AuthSubType {
     DEFAULT_TYPE = 0,
 } AuthSubType;
 
+typedef struct TemplateIdArrays {
+    uint64_t *value;
+    uint32_t num;
+} TemplateIdArrays;
+
+typedef enum AuthPropertyMode {
+    PROPERMODE_DELETE = 0,
+    PROPERMODE_GET = 1,
+    PROPERMODE_SET = 2,
+    PROPERMODE_LOCK = 3,
+    PROPERMODE_UNLOCK = 4,
+    PROPERMODE_INIT_ALGORITHM = 5,
+    PROPERMODE_RELEASE_ALGORITHM = 6,
+    PROPERMODE_SET_SURFACE_ID = 100,
+} AuthPropertyMode;
+
 #define MAX_DUPLICATE_CHECK 100
+#define INVALID_SENSOR_HINT 0
+#define MAX_TEMPLATE_OF_SCHEDULE 10
 
 #ifdef __cplusplus
 }

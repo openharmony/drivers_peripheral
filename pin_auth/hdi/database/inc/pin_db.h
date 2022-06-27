@@ -59,7 +59,7 @@ extern "C" {
 #define CONST_PIN_DATA_LEN 64U
 #define CONST_SALT_LEN 32U
 #define CONST_PUB_KEY_LEN 32U
-#define RESULT_TLV_LEN 160U
+#define RESULT_TLV_LEN 184U
 
 typedef struct {
     uint64_t templateId;
