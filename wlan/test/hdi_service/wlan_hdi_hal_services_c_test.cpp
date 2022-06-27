@@ -27,6 +27,7 @@ const int32_t WLAN_TX_POWER = 160;
 const int32_t DEFAULT_COMBO_SIZE = 6;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
 const uint32_t RESET_TIME = 20;
+const uint32_t MEAS_CHANNEL_TIME = 10;
 
 const char *WLAN_SERVICE_NAME = "wlan_hal_c_service";
 
@@ -780,8 +781,9 @@ HWTEST_F(HdfWifiServiceCTest, StartChannelMeasTest_034, TestSize.Level1)
     int32_t rc = g_wlanObj->StartChannelMeas(g_wlanObj, ifName, &measChannelParam);
     bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
     ASSERT_TRUE(flag);
+    sleep(MEAS_CHANNEL_TIME);
     rc = g_wlanObj->GetChannelMeasResult(g_wlanObj, ifName, &measChannelResult);
-    flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_DEV_ERR_NODATA);
     ASSERT_TRUE(flag);
 }
 };
