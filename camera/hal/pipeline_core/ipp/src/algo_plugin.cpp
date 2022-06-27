@@ -37,7 +37,7 @@ RetCode AlgoPlugin::Init(std::shared_ptr<CameraMetadata> meta)
 {
     (void)meta;
     if (algoHandler_->func.Init == nullptr) {
-        CAMERA_LOGE("unsupport operation.");
+        CAMERA_LOGE("unsupported operation.");
         return RC_ERROR;
     }
     // parse metadata
@@ -53,7 +53,7 @@ RetCode AlgoPlugin::Init(std::shared_ptr<CameraMetadata> meta)
 RetCode AlgoPlugin::Start()
 {
     if (algoHandler_->func.Start == nullptr) {
-        CAMERA_LOGE("unsupport operation.");
+        CAMERA_LOGE("unsupported operation.");
         return RC_ERROR;
     }
     int ret = algoHandler_->func.Start();
@@ -68,7 +68,7 @@ RetCode AlgoPlugin::Start()
 RetCode AlgoPlugin::Flush()
 {
     if (algoHandler_->func.Flush == nullptr) {
-        CAMERA_LOGE("unsupport operation.");
+        CAMERA_LOGE("unsupported operation.");
         return RC_ERROR;
     }
     int ret = algoHandler_->func.Flush();
@@ -86,7 +86,7 @@ RetCode AlgoPlugin::Process(std::shared_ptr<IBuffer>& outBuffer,
 {
     (void)meta;
     if (algoHandler_->func.Process == nullptr) {
-        CAMERA_LOGE("unsupport operation.");
+        CAMERA_LOGE("unsupported operation.");
         return RC_ERROR;
     }
 
@@ -141,7 +141,7 @@ RetCode AlgoPlugin::Process(std::shared_ptr<IBuffer>& outBuffer,
 RetCode AlgoPlugin::Stop()
 {
     if (algoHandler_->func.Stop == nullptr) {
-        CAMERA_LOGE("unsupport operation.");
+        CAMERA_LOGE("unsupported operation.");
         return RC_ERROR;
     }
     int ret = algoHandler_->func.Stop();

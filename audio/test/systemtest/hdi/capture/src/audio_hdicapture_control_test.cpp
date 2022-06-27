@@ -360,9 +360,9 @@ HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_AudioCreateCapture_0009, Test
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCreateCapture API via setting the incoming parameter desc which portID is not configed
+* @tc.name  Test AudioCreateCapture API via setting the incoming parameter desc which portID is not configured
 * @tc.number  SUB_Audio_HDI_AudioCreateCapture_0010
-* @tc.desc  Test AudioCreateCapture interface,Returns -1 if the incoming parameter desc which portID is not configed
+* @tc.desc  Test AudioCreateCapture interface,Returns -1 if the incoming parameter desc which portID is not configured
 * @tc.author: liweiming
 */
 HWTEST_F(AudioHdiCaptureControlTest, SUB_Audio_HDI_AudioCreateCapture_0010, TestSize.Level1)

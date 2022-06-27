@@ -101,7 +101,7 @@ static void HdfDCameraProviderDriverRelease(struct HdfDeviceObject *deviceObject
 {
     HDF_LOGI("HdfDCameraProviderDriverRelease enter");
     if (deviceObject == nullptr || deviceObject->service == nullptr) {
-        HDF_LOGE("%{public}s: parms is invalid.", __func__);
+        HDF_LOGE("%{public}s: params invalid.", __func__);
         return;
     }
     auto *hdfDCameraProviderHost = CONTAINER_OF(deviceObject->service, struct HdfDCameraProviderHost, ioService);

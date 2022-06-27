@@ -71,7 +71,7 @@ static int32_t UsbSerialStartTx(struct UsbSerial *port)
         ret = UsbFnSubmitRequestAsync(req);
         port->writeBusy = false;
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: send request erro %{public}d", __func__, ret);
+            HDF_LOGE("%{public}s: send request error %{public}d", __func__, ret);
             DListInsertTail(&req->list, pool);
             break;
         }
@@ -101,7 +101,7 @@ static uint32_t UsbSerialStartRx(struct UsbSerial *port)
         req->length = out->maxPacketSize;
         ret = UsbFnSubmitRequestAsync(req);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: send request erro %{public}d", __func__, ret);
+            HDF_LOGE("%{public}s: send request error %{public}d", __func__, ret);
             DListInsertTail(&req->list, pool);
             break;
         }
@@ -241,13 +241,13 @@ static int32_t StartThreadReadSpeed(struct UsbSerial *port)
 
     ret = OsalThreadCreate(&g_threadRead, (OsalThreadEntry)SpeedReadThread, port);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s:%d OsalThreadCreate faile, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%s:%d OsalThreadCreate failed, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
 
     ret = OsalThreadStart(&g_threadRead, &threadCfg);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s:%d OsalThreadStart faile, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%s:%d OsalThreadStart failed, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
     return HDF_SUCCESS;
@@ -581,13 +581,13 @@ static int32_t StartThreadSpeed(struct UsbSerial *port)
 
     ret = OsalThreadCreate(&g_thread, (OsalThreadEntry)SpeedThread, port);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s:%d OsalThreadCreate faile, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%s:%d OsalThreadCreate failed, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
 
     ret = OsalThreadStart(&g_thread, &threadCfg);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s:%d OsalThreadStart faile, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%s:%d OsalThreadStart failed, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
     return 0;

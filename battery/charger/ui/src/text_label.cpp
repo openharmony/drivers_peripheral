@@ -160,7 +160,7 @@ void TextLabel::InitFont()
     }
     fontPngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
     if (!fontPngPtr) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "creat font ptr failed!");
+        BATTERY_HILOGW(FEATURE_CHARGING, "create font ptr failed!");
         fclose(fp);
         return;
     }

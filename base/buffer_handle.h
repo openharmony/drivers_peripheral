@@ -26,7 +26,7 @@ typedef struct {
     int32_t fd;           /**< buffer fd, -1 if not supported */
     int32_t width;        /**< the width of memory */
     int32_t stride;       /**< the stride of memory */
-    int32_t height;       /**< the heigh of memory */
+    int32_t height;       /**< the height of memory */
     int32_t size;         /* < size of memory */
     int32_t format;       /**< the format of memory */
     uint64_t usage;        /**< the usage of memory */

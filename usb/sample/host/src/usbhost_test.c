@@ -55,8 +55,8 @@ void TestHelp(void)
     printf("  -S, --speedTest               : test speed for acm\n");
     printf("  -B, --setBaudrate             : test set baudrate for acm\n");
     printf("  -b, --getBaudrate             : test get baudrate for acm\n");
-    printf("  -I, --addInterface [index}    : test add interface for acm(not raw api funciton) and ecm\n");
-    printf("  -D, --removeInterface [index] : test remove interface for acm(not raw api funciton) and ecm\n");
+    printf("  -I, --addInterface [index}    : test add interface for acm(not raw api function) and ecm\n");
+    printf("  -D, --removeInterface [index] : test remove interface for acm(not raw api function) and ecm\n");
     printf("\n");
     printf("Examples:\n");
     printf("  usbhost_ddk_test -AR      : test sync read for acm by host ddk api function\n");
@@ -300,13 +300,13 @@ static int32_t StartThreadGetChar()
 
     ret = OsalThreadCreate(&g_Getchar, (OsalThreadEntry)GetCharThread, NULL);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s:%d OsalThreadCreate faile, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%s:%d OsalThreadCreate failed, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
 
     ret = OsalThreadStart(&g_Getchar, &threadCfg);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s:%d OsalThreadStart faile, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%s:%d OsalThreadStart failed, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
 #endif

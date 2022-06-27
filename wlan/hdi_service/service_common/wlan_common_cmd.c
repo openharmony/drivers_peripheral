@@ -177,7 +177,7 @@ int32_t WlanInterfaceGetAsscociatedStas(struct IWlanInterface *self, const struc
     }
     ret = g_apFeature->getAsscociatedStas(g_apFeature, wifiStaInfo, sizeof(struct StaInfo), num);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s get asscociated sta failed!, error code: %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s get associated sta failed!, error code: %{public}d", __func__, ret);
         OsalMemFree(wifiStaInfo);
         return ret;
     }
@@ -1007,7 +1007,7 @@ int32_t WlanInterfaceWifiConstruct(void)
 
     ret = WifiConstruct(&g_wifi);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s contruct WiFi failed! error code: %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s construct WiFi failed! error code: %{public}d", __func__, ret);
     }
     return ret;
 }

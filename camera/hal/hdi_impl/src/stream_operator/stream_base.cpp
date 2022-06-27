@@ -68,7 +68,7 @@ RetCode StreamBase::ConfigStream(StreamConfiguration& config)
     streamConfig_.bufferCount = GetBufferCount();
     streamConfig_.maxBatchCaptureCount = 1;
     streamConfig_.maxCaptureCount = 1;
-    // get device cappability to overide configuration
+    // get device cappability to override configuration
     return RC_OK;
 }
 

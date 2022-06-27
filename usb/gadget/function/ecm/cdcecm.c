@@ -71,7 +71,7 @@ static int32_t UsbEcmStartTx(struct UsbEcm *port)
         ret = UsbFnSubmitRequestAsync(req);
         port->writeBusy = false;
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: send request erro %{public}d", __func__, ret);
+            HDF_LOGE("%{public}s: send request error %{public}d", __func__, ret);
             DListInsertTail(&req->list, pool);
             break;
         }
@@ -102,7 +102,7 @@ static uint32_t UsbEcmStartRx(struct UsbEcm *port)
         req->length = out->maxPacketSize;
         ret = UsbFnSubmitRequestAsync(req);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: send request erro %{public}d", __func__, ret);
+            HDF_LOGE("%{public}s: send request error %{public}d", __func__, ret);
             DListInsertTail(&req->list, pool);
             break;
         }

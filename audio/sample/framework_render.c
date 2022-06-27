@@ -1107,7 +1107,7 @@ int32_t SetRenderResume(struct AudioRender **render)
 
 void PrintAttributesFromat(void)
 {
-    printf(" ============= Render Sample Attributes Fromat =============== \n");
+    printf(" ============= Render Sample Attributes Format =============== \n");
     printf("| 1. Render AUDIO_FORMAT_PCM_8_BIT                            |\n");
     printf("| 2. Render AUDIO_FORMAT_PCM_16_BIT                           |\n");
     printf("| 3. Render AUDIO_FORMAT_PCM_24_BIT                           |\n");

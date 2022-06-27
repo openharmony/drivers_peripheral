@@ -66,7 +66,7 @@ static uint32_t ConverToRGBA(PixelFormat fmt, uint32_t color)
         case PIXEL_FMT_RGBA_8888:
             return color;
         default:
-            DISPLAY_TEST_LOGE("the fmt can not covert %d", fmt);
+            DISPLAY_TEST_LOGE("the fmt can not convert %d", fmt);
     }
     return color;
 }
@@ -85,7 +85,7 @@ uint32_t GetPixelValue(const BufferHandle &handle, int x, int y)
 
     int32_t position = y * handle.width + x;
     if ((position * pixelBytes) > handle.size) {
-        DISPLAY_TEST_LOGE("the pixel postion outside\n");
+        DISPLAY_TEST_LOGE("the pixel position outside\n");
     }
     uint32_t *pixel = reinterpret_cast<uint32_t *>(handle.virAddr) + position;
     return *pixel;
@@ -115,7 +115,7 @@ uint32_t CheckPixel(const BufferHandle &handle, int x, int y, uint32_t color)
 
     int32_t position = y * handle.width + x;
     if ((position * pixelBytes) > handle.size) {
-        DISPLAY_TEST_LOGE("the pixel postion outside\n");
+        DISPLAY_TEST_LOGE("the pixel position outside\n");
     }
     uint32_t *pixel = reinterpret_cast<uint32_t *>(handle.virAddr) + position;
     uint32_t checkColor = ConverToRGBA(static_cast<PixelFormat>(handle.format), GetUint32(*pixel));
@@ -153,7 +153,7 @@ void SetPixel(const BufferHandle &handle, int x, int y, uint32_t color)
 
     int32_t position = y * handle.width + x;
     if ((position * pixelBytes) > handle.size) {
-        DISPLAY_TEST_LOGE("the pixel postion outside\n");
+        DISPLAY_TEST_LOGE("the pixel position outside\n");
     }
     uint32_t *pixel = reinterpret_cast<uint32_t *>(handle.virAddr) + position;
     SetUint32(*pixel, color);
