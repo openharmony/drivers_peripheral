@@ -126,13 +126,13 @@ static int32_t AcmStartWb(struct AcmDevice *acm,
     parmas.dataReq.buffer = wb->buf;
     rc = UsbFillRequest(wb->request, InterfaceIdToHandle(acm, acm->dataOutPipe->interfaceId), &parmas);
     if (HDF_SUCCESS != rc) {
-        HDF_LOGE("%s:UsbFillRequest faile,ret=%d \n", __func__, rc);
+        HDF_LOGE("%s:UsbFillRequest failed, ret=%d \n", __func__, rc);
         return rc;
     }
     acm->writeReq = wb->request;
     rc = UsbSubmitRequestAsync(wb->request);
     if (rc < 0) {
-        HDF_LOGE("UsbSubmitRequestAsync faile, ret=%d \n", rc);
+        HDF_LOGE("UsbSubmitRequestAsync failed, ret=%d \n", rc);
         wb->use = 0;
         acm->transmitting--;
     }
@@ -269,18 +269,18 @@ static int32_t UsbGetDescriptor(struct UsbDescriptorParams *descParams)
     parmas.callback = NULL;
     ret = UsbFillRequest(descParams->request, descParams->devHandle, &parmas);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s: faile, ret=%d ", __func__, ret);
+        HDF_LOGE("%s: UsbFillRequest failed, ret=%d ", __func__, ret);
         return ret;
     }
     ret = UsbSubmitRequestSync(descParams->request);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("UsbSubmitRequestSync  faile, ret=%d ", ret);
+        HDF_LOGE("UsbSubmitRequestSync failed, ret=%d ", ret);
         return ret;
     }
     ret = memcpy_s(descParams->buf, descParams->size, descParams->request->compInfo.buffer,
         descParams->request->compInfo.actualLength);
     if (EOK != ret) {
-        HDF_LOGE("memcpy_s fail ret=%d", ret);
+        HDF_LOGE("memcpy_s failed, ret=%d", ret);
         return ret;
     }
     return HDF_SUCCESS;
@@ -328,18 +328,18 @@ static int32_t UsbGetStatus(UsbInterfaceHandle *devHandle,
     parmas.callback = NULL;
     ret = UsbFillRequest(request, devHandle, &parmas);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s: faile, ret=%d ", __func__, ret);
+        HDF_LOGE("%s: UsbFillRequest failed, ret=%d ", __func__, ret);
         return ret;
     }
     ret = UsbSubmitRequestSync(request);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("UsbSubmitRequestSync  faile, ret=%d ", ret);
+        HDF_LOGE("UsbSubmitRequestSync failed, ret=%d ", ret);
         return ret;
     }
     if (request->compInfo.buffer) {
         ret = memcpy_s((void *)(&ss), sizeof(ss), request->compInfo.buffer, request->compInfo.actualLength);
         if (EOK != ret) {
-            HDF_LOGE("memcpy_s fail ret=%d", ret);
+            HDF_LOGE("memcpy_s failed, ret=%d", ret);
             return ret;
         }
     }
@@ -416,12 +416,12 @@ static int32_t UsbGetConfig(const UsbInterfaceHandle *devHandle,
     parmas.callback = NULL;
     ret = UsbFillRequest((struct UsbRequest *)request, (UsbInterfaceHandle *)devHandle, &parmas);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("%s: faile, ret=%d ", __func__, ret);
+        HDF_LOGE("%s: UsbFillRequest failed, ret=%d ", __func__, ret);
         return ret;
     }
     ret = UsbSubmitRequestSync((struct UsbRequest *)request);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("UsbSubmitRequestSync  faile, ret=%d ", ret);
+        HDF_LOGE("UsbSubmitRequestSync failed, ret=%d ", ret);
         return ret;
     }
     return HDF_SUCCESS;
@@ -508,12 +508,12 @@ static int32_t SerialCtrlAsyncMsg(UsbInterfaceHandle *devHandle,
     parmas.ctrlReq = UsbControlSetUp(&controlParams);
     int32_t ret = UsbFillRequest(request, devHandle, &parmas);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: faile, ret=%d ", __func__, ret);
+        HDF_LOGE("%s: UsbFillRequest failed, ret=%d ", __func__, ret);
         return ret;
     }
     ret = UsbSubmitRequestAsync(request);
     if (HDF_SUCCESS != ret) {
-        HDF_LOGE("UsbRequestSubmitAsync  faile, ret=%d ", ret);
+        HDF_LOGE("UsbRequestSubmitAsync failed, ret=%d ", ret);
         return ret;
     }
     OsalMSleep(500);
@@ -523,7 +523,7 @@ static int32_t SerialCtrlAsyncMsg(UsbInterfaceHandle *devHandle,
     }
     ret = memcpy_s(buf, size, request->compInfo.buffer, request->compInfo.actualLength);
     if (ret != EOK) {
-        HDF_LOGE("memcpy_s fail\n");
+        HDF_LOGE("memcpy_s failed\n");
     }
     return HDF_SUCCESS;
 }

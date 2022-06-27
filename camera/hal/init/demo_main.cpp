@@ -178,7 +178,7 @@ static void VideoTest(const std::shared_ptr<OhosCameraDemo>& mainDemo)
 
     rc = PreviewOn(0, mainDemo);
     if (rc != RC_OK) {
-        CAMERA_LOGE("main test: video PreviewOn() error plese -q exit demo");
+        CAMERA_LOGE("main test: video PreviewOn() error please -q exit demo");
     }
 }
 

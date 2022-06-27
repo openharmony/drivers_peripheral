@@ -85,13 +85,13 @@ int32_t InputReportHostEventCallbackStub::OnRemoteRequest(uint32_t code,
             }
             int32_t ret = memset_s(datatmp, readLen, 0, readLen);
             if (ret != 0) {
-                HDF_LOGE("memset_s faild : %{public}s", __func__);
+                HDF_LOGE("memset_s failed : %{public}s", __func__);
                 return 0;
             }
             HotPlugEvent* msg = (HotPlugEvent*)(data.ReadRawData(readLen));
             ret = memcpy_s(datatmp, readLen, msg, readLen);
             if (ret != 0) {
-                HDF_LOGE("memset_s faild : %{public}s", __func__);
+                HDF_LOGE("memset_s failed : %{public}s", __func__);
                 return 0;
             }
             msg = nullptr;

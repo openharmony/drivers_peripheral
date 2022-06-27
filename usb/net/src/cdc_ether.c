@@ -129,13 +129,13 @@ static int32_t EcmStartWb(struct EcmDevice *ecm,
     parmas.dataReq.buffer = wb->buf;
     rc = UsbFillRequest(wb->request, InterfaceIdToHandle(ecm, ecm->dataOutPipe->interfaceId), &parmas);
     if (HDF_SUCCESS != rc) {
-        HDF_LOGE("%s: UsbFillRequest faile, ret=%d", __func__, rc);
+        HDF_LOGE("%s: UsbFillRequest failed, ret=%d", __func__, rc);
         return rc;
     }
     ecm->writeReq = wb->request;
     rc = UsbSubmitRequestAsync(wb->request);
     if (rc < 0) {
-        HDF_LOGE("UsbRequestSubmitSync faile, ret=%d", rc);
+        HDF_LOGE("UsbRequestSubmitSync failed, ret=%d", rc);
         OsalMutexLock(&ecm->writeLock);
         wb->use = 0;
         OsalMutexUnlock(&ecm->writeLock);
@@ -251,12 +251,12 @@ static int32_t EcmCtrlMsg(struct EcmDevice *ecm, uint8_t request,
 
     ret = UsbFillRequest(ecm->ctrlReq, ecm->ctrDevHandle, &parmas);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: faile, ret=%d ", __func__, ret);
+        HDF_LOGE("%s: failed, ret=%d ", __func__, ret);
         return ret;
     }
     ret = UsbSubmitRequestAsync(ecm->ctrlReq);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("UsbRequestSubmitSync  faile, ret=%d ", ret);
+        HDF_LOGE("UsbRequestSubmitSync failed, ret=%d ", ret);
         return ret;
     }
     if (!ecm->ctrlReq->compInfo.status) {
@@ -355,7 +355,7 @@ static int32_t EcmOpen(struct EcmDevice *ecm, struct HdfSBuf *data)
     for (int32_t i = 0; i < ECM_NR; i++) {
         ret = UsbSubmitRequestAsync(ecm->readReq[i]);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("UsbRequestSubmitSync  faile, ret=%d ", ret);
+            HDF_LOGE("UsbSubmitRequestAsync failed, ret=%d ", ret);
             goto ERR;
         } else {
             ecm->readReqNum++;
@@ -381,14 +381,14 @@ static void EcmClostRelease(struct EcmDevice *ecm)
     for (int32_t i = 0; i < ECM_NR; i++ ) {
         ret = UsbCancelRequest(ecm->readReq[i]);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("UsbCancelRequest rd faile, ret=%d ", ret);
+            HDF_LOGE("UsbCancelRequest rd failed, ret=%d ", ret);
         }
     }
     for (int32_t i = 0; i < ECM_NW; i++) {
         struct EcmWb *snd = &(ecm->wb[i]);
         ret = UsbCancelRequest(snd->request);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("UsbCancelRequest wr faile, ret=%d ", ret);
+            HDF_LOGE("UsbCancelRequest wr failed, ret=%d ", ret);
         }
     }
 
@@ -706,7 +706,7 @@ static int32_t EcmDriverBind(struct HdfDeviceObject *device)
         err = memcpy_s((void *)(ecm->interfaceIndex), USB_MAX_INTERFACES,
             (const void*)info->interfaceNumber, info->interfaceLength);
         if (err != EOK) {
-            HDF_LOGE("%s:%d memcpy_s faile err=%d", \
+            HDF_LOGE("%s:%d memcpy_s failed err=%d", \
                 __func__, __LINE__, err);
             goto ERROR;
         }
@@ -901,7 +901,7 @@ int32_t EcmAllocIntReq(struct EcmDevice *ecm)
     intParmas.dataReq.length = (int)ecm->intSize;
     ret = UsbFillRequest(ecm->notifyReq, InterfaceIdToHandle(ecm, ecm->intPipe->interfaceId), &intParmas);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbFillRequest faile, ret=%d \n", __func__, ret);
+        HDF_LOGE("%s: UsbFillRequest failed, ret=%d \n", __func__, ret);
         return ret;
     }
     return HDF_SUCCESS;
@@ -929,7 +929,7 @@ void EcmAllocReadReq(struct EcmDevice *ecm)
         readParmas.dataReq.length = (int)ecm->readSize;
         ret = UsbFillRequest(ecm->readReq[i], InterfaceIdToHandle(ecm, ecm->dataInPipe->interfaceId), &readParmas);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%s: UsbFillRequest faile, ret=%d \n", __func__, ret);
+            HDF_LOGE("%s: UsbFillRequest failed, ret=%d \n", __func__, ret);
             return;
         }
     }
@@ -958,7 +958,7 @@ static void UsbFreeNotifyReqeust(struct EcmDevice *ecm)
     }
     ret = UsbCancelRequest(ecm->notifyReq);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("UsbCancelRequest rd faile, ret=%d ", ret);
+        HDF_LOGE("UsbCancelRequest rd failed, ret=%d ", ret);
     }
     ret = UsbFreeRequest(ecm->notifyReq);
     if (ret == HDF_SUCCESS) {

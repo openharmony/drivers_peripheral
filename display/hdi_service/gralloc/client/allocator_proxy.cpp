@@ -84,7 +84,7 @@ int32_t AllocatorProxy::AllocMem(const AllocInfo &info, BufferHandle *&handle)
 
     retCode = reply.ReadInt32();
     if (retCode != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Read retrun code failed, error code is %{public}x", __func__, retCode);
+        HDF_LOGE("%{public}s: Read return code failed, error code is %{public}x", __func__, retCode);
         return retCode;
     }
 

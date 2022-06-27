@@ -129,7 +129,7 @@ SensorImpl::~SensorImpl()
             if (recipientIter != g_callBackDeathRecipientMap.end()) {
                 bool removeResult = remote->RemoveDeathRecipient(recipientIter->second);
                 if (!removeResult) {
-                    HDF_LOGE("%{public}s: sensor destoryed, callback RemoveSensorDeathRecipient fail", __func__);
+                    HDF_LOGE("%{public}s: sensor destroyed, callback RemoveSensorDeathRecipient fail", __func__);
                 }
             }
         }
@@ -142,7 +142,7 @@ SensorImpl::~SensorImpl()
             if (recipientIter != g_callBackDeathRecipientMap.end()) {
                 bool removeResult = remote->RemoveDeathRecipient(recipientIter->second);
                 if (!removeResult) {
-                    HDF_LOGE("%{public}s: when destoryed, callback RemoveSensorDeathRecipient fail", __func__);
+                    HDF_LOGE("%{public}s: when destroyed, callback RemoveSensorDeathRecipient fail", __func__);
                 }
             }
         }

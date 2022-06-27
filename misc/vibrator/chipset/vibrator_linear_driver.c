@@ -46,7 +46,7 @@ static int32_t StartLinearVibrator()
 static int32_t StartEffectLinearVibrator(uint32_t effectType)
 {
     (void)effectType;
-     HDF_LOGE("%s: vibrator set build-in effect no support!", __func__);
+    HDF_LOGE("%s: vibrator set built-in effect no support!", __func__);
     return HDF_SUCCESS;
 }
 

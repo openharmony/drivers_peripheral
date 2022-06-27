@@ -91,7 +91,7 @@ static int32_t UsbStartIo(struct AcmDevice *acm)
 
     printf("%s start\n", __func__);
 
-    /* creat Io thread */
+    /* create Io thread */
     (void)memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
     threadCfg.name = (char *)("usb io thread");
     threadCfg.priority = OSAL_THREAD_PRI_LOW;
@@ -106,7 +106,7 @@ static int32_t UsbStartIo(struct AcmDevice *acm)
 
     ret = OsalThreadStart(&acm->ioThread, &threadCfg);
     if (ret != HDF_SUCCESS) {
-        printf("%s:%d OsalThreadStart faile, ret=%d \n", __func__, __LINE__, ret);
+        printf("%s:%d OsalThreadStart failed, ret=%d \n", __func__, __LINE__, ret);
         return ret;
     }
 
@@ -124,7 +124,7 @@ static int32_t UsbStopIo(struct AcmDevice *acm)
     }
     ret = OsalThreadDestroy(&acm->ioThread);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d OsalThreadDestroy faile, ret=%{public}d ", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d OsalThreadDestroy failed, ret=%{public}d ", __func__, __LINE__, ret);
         return ret;
     }
 

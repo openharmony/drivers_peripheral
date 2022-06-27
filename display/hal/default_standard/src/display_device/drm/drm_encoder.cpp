@@ -28,7 +28,7 @@ DrmEncoder::DrmEncoder(drmModeEncoder e)
 int32_t DrmEncoder::PickIdleCrtcId(IdMapPtr<DrmCrtc> &crtcs, uint32_t &crtcId)
 {
     // find the crtc id;
-    DISPLAY_LOGD("crtcs szie %{public}zu", crtcs.size());
+    DISPLAY_LOGD("crtcs size %{public}zu", crtcs.size());
     std::shared_ptr<DrmCrtc> crtc;
     auto crtcIter = crtcs.find(mCrtcId);
     if (crtcIter == crtcs.end()) {

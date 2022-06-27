@@ -104,7 +104,7 @@ void InputDeviceManager::DoRead(int32_t fd, struct input_event* event, size_t si
         }
         for (size_t i = 0; i < count; i++) {
             struct input_event& iEvent = event[i];
-            // device action events happend
+            // device action events happened
             (evtPkg + i)->type = iEvent.type;
             (evtPkg + i)->code = iEvent.code;
             (evtPkg + i)->value = iEvent.value;
@@ -339,7 +339,7 @@ void InputDeviceManager::DoWithEventDeviceAdd(int32_t& epollFd, int32_t& fd, str
 
 void InputDeviceManager::SendHotPlugEvent(uint32_t& type, uint32_t& index, uint32_t status)
 {
-    // hot plug evnets happend
+    // hot plug evnets happened
     HotPlugEvent* evtPlusPkg = (HotPlugEvent*)OsalMemAlloc(sizeof(HotPlugEvent));
     if (evtPlusPkg == nullptr) {
         HDF_LOGE("OsalMemAlloc failed !");
@@ -366,7 +366,7 @@ void InputDeviceManager::DoWithEventDeviceDel(int32_t& epollFd, uint32_t& index)
     RemoveEpoll(epollFd, inputDevList_[index].fd);
     HDF_LOGD("InputDeviceManager::%{public}s index: %{public}d fd: %{public}d devName: %{public}s", __func__,
              devIndex_, inputDevList_[index].fd, inputDevList_[index].detailInfo.attrSet.devName);
-    // hot plug evnets happend
+    // hot plug evnets happened
     auto sDevName = string(inputDevList_[index].detailInfo.attrSet.devName);
     if (sDevName.find("Keyboard") != std::string::npos) {
         type = INDEV_TYPE_KEYBOARD;

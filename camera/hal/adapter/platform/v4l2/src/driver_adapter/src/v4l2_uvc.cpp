@@ -134,7 +134,7 @@ RetCode HosV4L2UVC::V4L2UvcGetCap(const std::string v4l2Device, struct v4l2_capa
 
     rc = ioctl(fd, VIDIOC_QUERYCAP, &cap);
     if (rc < 0) {
-        CAMERA_LOGE("UVC:%{public}s V4L2EnmeDevices VIDIOC_QUERYCAP erro\n", v4l2Device.c_str());
+        CAMERA_LOGE("UVC:%{public}s V4L2EnmeDevices VIDIOC_QUERYCAP error\n", v4l2Device.c_str());
         close(fd);
         return RC_ERROR;
     }
@@ -398,7 +398,7 @@ RetCode HosV4L2UVC::V4L2UvcDetectInit(UvcCallback cb)
     uvcDetectThread_ = new (std::nothrow) std::thread(&HosV4L2UVC::loopUvcDevice, this);
     if (uvcDetectThread_ == nullptr) {
         uvcDetectEnable_ = 0;
-        CAMERA_LOGE("UVC:V4L2Detect creat loopUVCDevice thread error\n");
+        CAMERA_LOGE("UVC:V4L2Detect create loopUVCDevice thread error\n");
         goto error1;
     }
 
