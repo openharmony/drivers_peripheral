@@ -42,6 +42,7 @@ using namespace std;
 
 namespace HdiServiceTest {
 const std::string SYSTEM_BATTERY_PATH = "/sys/class/power_supply";
+const std::string MOCK_BATTERY_PATH = "/data/service/el0/battery/";
 static std::vector<std::string> g_filenodeName;
 static std::map<std::string, std::string> g_nodeInfo;
 const int STR_TO_LONG_LEN = 10;
@@ -819,8 +820,7 @@ HWTEST_F (HdiServiceTest, ProviderIsNotNull, TestSize.Level1)
 {
     ASSERT_TRUE(giver_ != nullptr);
     if (!IsNotMock()) {
-        std::string path = "/data/local/tmp";
-        giver_->SetSysFilePath(path);
+        giver_->SetSysFilePath(MOCK_BATTERY_PATH);
         BATTERY_HILOGI(LABEL_TEST, "Is mock test");
     }
     giver_->InitPowerSupplySysfs();
@@ -841,7 +841,7 @@ HWTEST_F (HdiServiceTest, HdiService001, TestSize.Level1)
             temperature, sysfsTemp);
         ASSERT_TRUE(temperature == sysfsTemp);
     } else {
-        CreateFile("/data/local/tmp/battery/temp", "567");
+        CreateFile(MOCK_BATTERY_PATH + "battery/temp", "567");
         giver_->ParseTemperature(&temperature);
         BATTERY_HILOGI(LABEL_TEST, "HdiService001::temperature=%{public}d.", temperature);
         ASSERT_TRUE(temperature == 567);
@@ -863,8 +863,8 @@ HWTEST_F (HdiServiceTest, HdiService002, TestSize.Level1)
             voltage, sysfsVoltage);
         ASSERT_TRUE(voltage == sysfsVoltage);
     } else {
-        CreateFile("/data/local/tmp/battery/voltage_avg", "4123456");
-        CreateFile("/data/local/tmp/battery/voltage_now", "4123456");
+        CreateFile(MOCK_BATTERY_PATH + "battery/voltage_avg", "4123456");
+        CreateFile(MOCK_BATTERY_PATH + "battery/voltage_now", "4123456");
         giver_->ParseVoltage(&voltage);
         BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService002::voltage=%{public}d", voltage);
         ASSERT_TRUE(voltage == 4123456);
@@ -886,7 +886,7 @@ HWTEST_F (HdiServiceTest, HdiService003, TestSize.Level1)
             capacity, sysfsCapacity);
         ASSERT_TRUE(capacity == sysfsCapacity);
     } else {
-        CreateFile("/data/local/tmp/battery/capacity", "11");
+        CreateFile(MOCK_BATTERY_PATH + "battery/capacity", "11");
         giver_->ParseCapacity(&capacity);
         BATTERY_HILOGI(LABEL_TEST, "HdiService003::capacity=%{public}d", capacity);
         ASSERT_TRUE(capacity == 11);
@@ -908,7 +908,7 @@ HWTEST_F (HdiServiceTest, HdiService004, TestSize.Level1)
             healthState, sysfsHealthState);
         ASSERT_TRUE(healthState == sysfsHealthState);
     } else {
-        CreateFile("/data/local/tmp/battery/health", "Good");
+        CreateFile(MOCK_BATTERY_PATH + "battery/health", "Good");
         giver_->ParseHealthState(&healthState);
         BATTERY_HILOGI(LABEL_TEST, "HdiService004::healthState=%{public}d.", healthState);
         ASSERT_TRUE(PowerSupplyProvider::BatteryHealthState(healthState) ==
@@ -931,8 +931,8 @@ HWTEST_F (HdiServiceTest, HdiService005, TestSize.Level1)
             pluggedType, sysfsPluggedType);
         ASSERT_TRUE(pluggedType == sysfsPluggedType);
     } else {
-        CreateFile("/data/local/tmp/ohos_charger/online", "1");
-        CreateFile("/data/local/tmp/ohos_charger/type", "Wireless");
+        CreateFile(MOCK_BATTERY_PATH + "ohos_charger/online", "1");
+        CreateFile(MOCK_BATTERY_PATH + "ohos_charger/type", "Wireless");
         giver_->ParsePluggedType(&pluggedType);
         BATTERY_HILOGI(LABEL_TEST, "HdiService005::pluggedType=%{public}d.", pluggedType);
         ASSERT_TRUE(PowerSupplyProvider::BatteryPluggedType(pluggedType) ==
@@ -955,7 +955,7 @@ HWTEST_F (HdiServiceTest, HdiService006, TestSize.Level1)
             chargeState, sysfsChargeState);
         ASSERT_TRUE(chargeState == sysfsChargeState);
     } else {
-        CreateFile("/data/local/tmp/battery/status", "Not charging");
+        CreateFile(MOCK_BATTERY_PATH + "battery/status", "Not charging");
         giver_->ParseChargeState(&chargeState);
         BATTERY_HILOGI(LABEL_TEST, "HdiService006::chargeState=%{public}d.", chargeState);
         ASSERT_TRUE(PowerSupplyProvider::BatteryChargeState(chargeState) ==
@@ -978,7 +978,7 @@ HWTEST_F (HdiServiceTest, HdiService007, TestSize.Level1)
             chargeCounter, sysfsChargeCounter);
         ASSERT_TRUE(chargeCounter == sysfsChargeCounter);
     } else {
-        CreateFile("/data/local/tmp/battery/charge_counter", "12345");
+        CreateFile(MOCK_BATTERY_PATH + "battery/charge_counter", "12345");
         giver_->ParseChargeCounter(&chargeCounter);
         BATTERY_HILOGI(LABEL_TEST, "HdiService007::chargeCounter=%{public}d.", chargeCounter);
         ASSERT_TRUE(chargeCounter == 12345);
@@ -1000,7 +1000,7 @@ HWTEST_F (HdiServiceTest, HdiService008, TestSize.Level1)
             present, sysfsPresent);
         ASSERT_TRUE(present == sysfsPresent);
     } else {
-        CreateFile("/data/local/tmp/battery/present", "1");
+        CreateFile(MOCK_BATTERY_PATH + "battery/present", "1");
         giver_->ParsePresent(&present);
         BATTERY_HILOGI(LABEL_TEST, "HdiService008::present=%{public}d.", present);
         ASSERT_TRUE(present == 1);
@@ -1023,7 +1023,7 @@ HWTEST_F (HdiServiceTest, HdiService009, TestSize.Level1)
             technology.c_str(), sysfsTechnology.c_str());
         ASSERT_TRUE(technology == sysfsTechnology);
     } else {
-        CreateFile("/data/local/tmp/ohos-fgu/technology", "Li");
+        CreateFile(MOCK_BATTERY_PATH + "ohos-fgu/technology", "Li");
         giver_->ParseTechnology(technology);
         BATTERY_HILOGI(LABEL_TEST, "HdiService009::technology=%{public}s.", technology.c_str());
         ASSERT_TRUE(technology == "Li");
@@ -1304,7 +1304,7 @@ HWTEST_F (HdiServiceTest, HdiService026, TestSize.Level1)
             totalEnergy, sysfsTotalEnergy);
         ASSERT_TRUE(totalEnergy == sysfsTotalEnergy);
     } else {
-        CreateFile("/data/local/tmp/battery/charge_full", "4000000");
+        CreateFile(MOCK_BATTERY_PATH + "battery/charge_full", "4000000");
         giver_->ParseTotalEnergy(&totalEnergy);
         BATTERY_HILOGI(LABEL_TEST, "HdiService026::totalEnergy=%{public}d.", totalEnergy);
         ASSERT_TRUE(totalEnergy == 4000000);
@@ -1326,7 +1326,7 @@ HWTEST_F (HdiServiceTest, HdiService027, TestSize.Level1)
             currentAvg, sysfsCurrentAvg);
         ASSERT_TRUE(currentAvg == sysfsCurrentAvg);
     } else {
-        CreateFile("/data/local/tmp/battery/current_avg", "1000");
+        CreateFile(MOCK_BATTERY_PATH + "battery/current_avg", "1000");
         giver_->ParseCurrentAverage(&currentAvg);
         BATTERY_HILOGI(LABEL_TEST, "HdiService027::currentAvg=%{public}d.", currentAvg);
         ASSERT_TRUE(currentAvg == 1000);
@@ -1348,7 +1348,7 @@ HWTEST_F (HdiServiceTest, HdiService028, TestSize.Level1)
             currentNow, sysfsCurrentNow);
         ASSERT_TRUE(currentNow == sysfsCurrentNow);
     } else {
-        CreateFile("/data/local/tmp/battery/current_now", "1000");
+        CreateFile(MOCK_BATTERY_PATH + "battery/current_now", "1000");
         giver_->ParseCurrentNow(&currentNow);
         BATTERY_HILOGI(LABEL_TEST, "HdiService028::currentNow=%{public}d.", currentNow);
         ASSERT_TRUE(currentNow == 1000);
@@ -1370,7 +1370,7 @@ HWTEST_F (HdiServiceTest, HdiService029, TestSize.Level1)
             chargeNow, sysfsChargeNow);
         ASSERT_TRUE(chargeNow == sysfsChargeNow);
     } else {
-        CreateFile("/data/local/tmp/battery/charge_now", "1000");
+        CreateFile(MOCK_BATTERY_PATH + "battery/charge_now", "1000");
         giver_->ParseRemainEnergy(&chargeNow);
         BATTERY_HILOGI(LABEL_TEST, "HdiService029::chargeNow=%{public}d.", chargeNow);
         ASSERT_TRUE(chargeNow == 1000);
