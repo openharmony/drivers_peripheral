@@ -281,7 +281,7 @@ HWTEST_F(WifiHalTest, WifiHalSetMacAddress001, TestSize.Level1)
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = apFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)apFeature, mac, ETH_ADDR_LEN);
     printf("%s: ret = %d\n", __func__, ret);
-    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_DEVICE_BUSY);
     ASSERT_TRUE(flag);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
@@ -314,7 +314,7 @@ HWTEST_F(WifiHalTest, WifiHalSetMacAddress002, TestSize.Level1)
     EXPECT_NE(ret, HDF_SUCCESS);
     ret = staFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)staFeature, mac, ETH_ADDR_LEN);
     printf("%s: ret = %d\n", __func__, ret);
-    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_DEVICE_BUSY);
     ASSERT_TRUE(flag);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);

@@ -803,6 +803,8 @@ int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
         HILOG_ERROR(LOG_DOMAIN, "%s: ioctl failed, errno = %d, (%s)\n", __FUNCTION__, errno, strerror(errno));
         if (errno == EPERM) {
             ret = RET_CODE_NOT_SUPPORT;
+        } else if (errno == EBUSY) {
+            ret = RET_CODE_DEVICE_BUSY;
         } else {
             ret = RET_CODE_FAILURE;
         }
