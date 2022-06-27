@@ -577,7 +577,7 @@ int32_t AudioCaptureGetVolume(AudioHandle handle, float *volume)
         return AUDIO_HAL_ERR_INTERNAL;
     }
     volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / 2);
-    int volumeT = (int)((pow(10, volumeTemp) + 5) / 10); // delet 0.X num
+    int volumeT = (int)((pow(10, volumeTemp) + 5) / 10); // delete 0.X num
     *volume = (float)volumeT / 10;  // get volume (0-1)
     return AUDIO_HAL_SUCCESS;
 }
@@ -1019,6 +1019,22 @@ int32_t AudioCaptureGetMmapPosition(AudioHandle handle, uint64_t *frames, struct
     return AUDIO_HAL_SUCCESS;
 }
 
+int32_t AudioCaptureAddEffect(AudioHandle handle, uint64_t effectid)
+{
+    (void)handle;
+    (void)effectid;
+    HDF_LOGI("%{public}s: add capture effect success", __func__);
+    return AUDIO_HAL_SUCCESS;
+}
+
+int32_t AudioCaptureRemoveEffect(AudioHandle handle, uint64_t effectid)
+{
+    (void)handle;
+    (void)effectid;
+    HDF_LOGI("%{public}s: remove capture effect success", __func__);
+    return AUDIO_HAL_SUCCESS;
+}
+
 int32_t AudioCaptureTurnStandbyMode(AudioHandle handle)
 {
     int32_t ret = AudioCheckCaptureAddr(handle);
@@ -1075,4 +1091,3 @@ int32_t AudioCaptureAudioDevDump(AudioHandle handle, int32_t range, int32_t fd)
     }
     return AUDIO_HAL_SUCCESS;
 }
-

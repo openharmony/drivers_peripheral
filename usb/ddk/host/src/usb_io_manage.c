@@ -67,7 +67,7 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
         }
 
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%s:%d UsbIoGetRequest faile, ret=%d ",
+            HDF_LOGE("%s:%d UsbIoGetRequest failed, ret=%d ",
                 __func__, __LINE__, ret);
             continue;
         }
@@ -90,7 +90,7 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
         }
 
         if (i >= USB_IO_SUBMIT_RETRY_TIME_CNT) {
-            HDF_LOGE("%s:%d submit request failes", __func__, __LINE__);
+            HDF_LOGE("%s:%d submit request failed", __func__, __LINE__);
             submitRequest->status = USB_REQUEST_ERROR;
             UsbIoSetRequestCompletionInfo(submitRequest);
             continue;
@@ -138,8 +138,6 @@ static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
 
         ret = RawHandleRequest(interfacePool->device->devHandle);
         if ((ret < 0) || (interfacePool->ioProcessStopStatus != USB_POOL_PROCESS_RUNNING)) {
-            HDF_LOGE("%s:%d RawHandleRequest faile, stopStatus=%d ret=%d ",
-                __func__, __LINE__, interfacePool->ioProcessStopStatus, ret);
             break;
         }
     }
@@ -213,7 +211,7 @@ HDF_STATUS UsbIoGetRequest(const struct UsbMessageQueue *msgQueue, struct UsbHos
 
     ret = OsalSemWait((struct OsalSem *)&msgQueue->sem, HDF_WAIT_FOREVER);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalSemWait faile, ret=%d\n",
+        HDF_LOGE("%s:%d OsalSemWait failed, ret=%d\n",
             __func__, __LINE__, ret);
         goto ERROR;
     }
@@ -259,7 +257,7 @@ HDF_STATUS UsbIoStart(struct UsbInterfacePool *interfacePool)
     interfacePool->ioProcessStopStatus = USB_POOL_PROCESS_RUNNING;
     OsalMutexUnlock(&interfacePool->ioStopLock);
 
-    /* creat IoSendProcess thread */
+    /* create IoSendProcess thread */
     (void)memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
     threadCfg.name = "usb io send process";
     threadCfg.priority = OSAL_THREAD_PRI_DEFAULT;
@@ -267,19 +265,19 @@ HDF_STATUS UsbIoStart(struct UsbInterfacePool *interfacePool)
 
     ret = OsalThreadCreate(&interfacePool->ioSendProcess, (OsalThreadEntry)IoSendProcess, (void *)interfacePool);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadCreate faile, ret=%d ",
+        HDF_LOGE("%s:%d OsalThreadCreate failed, ret=%d ",
             __func__, __LINE__, ret);
         return ret;
     }
 
     ret = OsalThreadStart(&interfacePool->ioSendProcess, &threadCfg);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadStart faile, ret=%d ",
+        HDF_LOGE("%s:%d OsalThreadStart failed, ret=%d ",
             __func__, __LINE__, ret);
         goto ERR_DESTROY_SEND;
     }
 
-    /* creat IoAsyncReceiveProcess thread */
+    /* create IoAsyncReceiveProcess thread */
     (void)memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
     threadCfg.name = "usb io async receive process";
     threadCfg.priority = OSAL_THREAD_PRI_DEFAULT;
@@ -288,14 +286,14 @@ HDF_STATUS UsbIoStart(struct UsbInterfacePool *interfacePool)
     ret = OsalThreadCreate(&interfacePool->ioAsyncReceiveProcess, \
         (OsalThreadEntry)IoAsyncReceiveProcess, (void *)interfacePool);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadCreate faile, ret=%d ",
+        HDF_LOGE("%s:%d OsalThreadCreate failed, ret=%d ",
             __func__, __LINE__, ret);
         goto ERR_DESTROY_SEND;
     }
 
     ret = OsalThreadStart(&interfacePool->ioAsyncReceiveProcess, &threadCfg);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadStart faile, ret=%d ",
+        HDF_LOGE("%s:%d OsalThreadStart failed, ret=%d ",
             __func__, __LINE__, ret);
         goto ERR_DESTROY_RECV;
     }
@@ -342,14 +340,14 @@ HDF_STATUS UsbIoStop(struct UsbInterfacePool *interfacePool)
 
     ret = OsalThreadDestroy(&interfacePool->ioSendProcess);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadDestroy faile, ret=%d ", \
+        HDF_LOGE("%s:%d OsalThreadDestroy failed, ret=%d ", \
             __func__, __LINE__, ret);
         return ret;
     }
 
     ret = OsalThreadDestroy(&interfacePool->ioAsyncReceiveProcess);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadDestroy faile, ret=%d ",
+        HDF_LOGE("%s:%d OsalThreadDestroy failed, ret=%d ",
             __func__, __LINE__, ret);
     }
 

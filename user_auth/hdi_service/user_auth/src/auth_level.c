@@ -55,50 +55,110 @@ static AtlGeneration g_generationAtl[] = {
     {ATL2, ACL1, ASL2}, {ATL1, ACL1, ASL0}, {ATL0, ACL0, ASL0},
 };
 
+uint32_t GetAtl(uint32_t acl, uint32_t asl)
+{
+    for (uint32_t i = 0; i < sizeof(g_generationAtl) / sizeof(AtlGeneration); ++i) {
+        if (asl >= g_generationAtl[i].asl && acl >= g_generationAtl[i].acl) {
+            return g_generationAtl[i].atl;
+        }
+    }
+    return ATL0;
+}
+
+static ResultCode QueryScheduleAsl(const CoAuthSchedule *coAuthSchedule, uint32_t *asl)
+{
+    if (coAuthSchedule == NULL || asl == NULL || coAuthSchedule->executorSize == 0) {
+        LOG_ERROR("param is null");
+        return RESULT_BAD_PARAM;
+    }
+
+    *asl = MAX_ASL;
+    for (uint32_t i = 0; i < coAuthSchedule->executorSize; ++i) {
+        uint32_t esl = coAuthSchedule->executors[i].esl;
+        if (*asl > esl) {
+            *asl = esl;
+        }
+    }
+    return RESULT_SUCCESS;
+}
+
+ResultCode QueryScheduleAtl(const CoAuthSchedule *coAuthSchedule, uint32_t acl, uint32_t *atl)
+{
+    if (coAuthSchedule == NULL || atl == NULL) {
+        LOG_ERROR("param is null");
+        return RESULT_BAD_PARAM;
+    }
+    uint32_t asl;
+    ResultCode ret = QueryScheduleAsl(coAuthSchedule, &asl);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("QueryScheduleAsl failed");
+        return ret;
+    }
+    *atl = GetAtl(acl, asl);
+    return RESULT_SUCCESS;
+}
+
 static ResultCode GetAsl(uint32_t authType, uint32_t *asl)
 {
-    LinkedList *executorList = NULL;
-    ResultCode ret = QueryExecutor(authType, &executorList);
-    if (ret != RESULT_SUCCESS) {
+    uint32_t allInOneMaxEsl = 0;
+    ExecutorCondition condition = {};
+    SetExecutorConditionAuthType(&condition, authType);
+    LinkedList *executorList = QueryExecutor(&condition);
+    if (executorList == NULL) {
         LOG_ERROR("query executor failed");
-        return ret;
+        return RESULT_UNKNOWN;
     }
     if (executorList->getSize(executorList) == 0) {
         LOG_ERROR("executor is unregistered");
         DestroyLinkedList(executorList);
         return RESULT_NEED_INIT;
     }
-
-    *asl = MAX_ASL;
     LinkedListNode *temp = executorList->head;
     while (temp != NULL) {
         ExecutorInfoHal *executorInfo = (ExecutorInfoHal *)temp->data;
-        if (executorInfo == NULL) {
+
+        // currently only all in one is supported
+        if (executorInfo == NULL || executorInfo->executorRole != ALL_IN_ONE) {
             *asl = 0;
-            LOG_ERROR("executorList data is null");
+            LOG_ERROR("executorInfo is invalid");
             DestroyLinkedList(executorList);
-            return RESULT_UNKNOWN;
+            return RESULT_GENERAL_ERROR;
         }
-        if (*asl > executorInfo->esl) {
-            *asl = executorInfo->esl;
+        if (executorInfo->executorRole == ALL_IN_ONE && allInOneMaxEsl < executorInfo->esl) {
+            allInOneMaxEsl = executorInfo->esl;
         }
         temp = temp->next;
     }
+    *asl = allInOneMaxEsl;
     DestroyLinkedList(executorList);
-    return ret;
+    return RESULT_SUCCESS;
 }
 
 static ResultCode GetAcl(uint32_t userId, uint32_t authType, uint32_t *acl)
 {
-    CredentialInfoHal credentialInfo;
-    ResultCode ret = QueryCredentialInfo(userId, authType, &credentialInfo);
-    if (ret != RESULT_SUCCESS) {
+    CredentialCondition condition = {};
+    SetCredentialConditionAuthType(&condition, authType);
+    SetCredentialConditionUserId(&condition, userId);
+    LinkedList *credList = QueryCredentialLimit(&condition);
+    if (credList == NULL || credList->getSize(credList) == 0) {
         LOG_ERROR("query credential failed");
-        return ret;
+        DestroyLinkedList(credList);
+        return RESULT_NOT_FOUND;
     }
-
-    *acl = credentialInfo.capabilityLevel;
-    return ret;
+    *acl = 0;
+    LinkedListNode *temp =  credList->head;
+    while (temp != NULL) {
+        if (temp->data == NULL) {
+            LOG_ERROR("link node is invalid");
+            DestroyLinkedList(credList);
+            return RESULT_UNKNOWN;
+        }
+        CredentialInfoHal *credInfo = (CredentialInfoHal *)temp->data;
+        *acl = *acl < credInfo->capabilityLevel ? credInfo->capabilityLevel : *acl;
+        temp = temp->next;
+    }
+    DestroyLinkedList(credList);
+    return RESULT_SUCCESS;
 }
 
 ResultCode SingleAuthTrustLevel(uint32_t userId, uint32_t authType, uint32_t *atl)
@@ -121,7 +181,7 @@ ResultCode SingleAuthTrustLevel(uint32_t userId, uint32_t authType, uint32_t *at
         return ret;
     }
 
-    for (uint32_t i = 0; i < sizeof(g_generationAtl) / sizeof(AtlGeneration); i++) {
+    for (uint32_t i = 0; i < sizeof(g_generationAtl) / sizeof(AtlGeneration); ++i) {
         if (authSecureLevel >= g_generationAtl[i].asl && authCapabilityLevel >= g_generationAtl[i].acl) {
             *atl = g_generationAtl[i].atl;
             return RESULT_SUCCESS;

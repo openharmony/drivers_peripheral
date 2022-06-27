@@ -502,6 +502,8 @@ int32_t AudioRenderSetExtraParams(AudioHandle handle, const char *keyValueList);
 int32_t AudioRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_t listLenth);
 int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc);
 int32_t AudioRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time);
+int32_t AudioRenderAddEffect(AudioHandle handle, uint64_t effectid);
+int32_t AudioRenderRemoveEffect(AudioHandle handle, uint64_t effectid);
 int32_t AudioRenderTurnStandbyMode(AudioHandle handle);
 int32_t AudioRenderAudioDevDump(AudioHandle handle, int32_t range, int32_t fd);
 int32_t AudioRenderRegCallback(struct AudioRender *render, RenderCallback callback, void* cookie);
@@ -533,6 +535,8 @@ int32_t AudioCaptureSetExtraParams(AudioHandle handle, const char *keyValueList)
 int32_t AudioCaptureGetExtraParams(const AudioHandle handle, char *keyValueList, int32_t listLenth);
 int32_t AudioCaptureReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc);
 int32_t AudioCaptureGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time);
+int32_t AudioCaptureAddEffect(AudioHandle handle, uint64_t effectid);
+int32_t AudioCaptureRemoveEffect(AudioHandle handle, uint64_t effectid);
 int32_t AudioCaptureTurnStandbyMode(AudioHandle handle);
 int32_t AudioCaptureAudioDevDump(AudioHandle handle, int32_t range, int32_t fd);
 int32_t CallbackProcessing(AudioHandle handle, enum AudioCallbackType callBackType);

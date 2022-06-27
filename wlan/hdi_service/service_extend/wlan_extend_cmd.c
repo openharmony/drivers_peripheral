@@ -70,7 +70,7 @@ int32_t WlanExtendInterfaceWifiConstruct(void)
     int32_t ret;
     ret = WifiConstruct(&g_wifi);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s contruct WiFi failed! error code: %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s conxtruct WiFi failed! error code: %{public}d", __func__, ret);
     }
     return ret;
 }

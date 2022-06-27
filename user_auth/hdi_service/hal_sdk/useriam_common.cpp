@@ -23,7 +23,7 @@
 #include "coauth.h"
 #include "context_manager.h"
 #include "adaptor_log.h"
-#include "lock.h"
+#include "ed25519_key.h"
 #include "token_key.h"
 
 namespace OHOS {
@@ -33,9 +33,8 @@ static bool g_isInitUserIAM = false;
 
 int32_t Init()
 {
-    GlobalLock();
     if (InitUserAuthContextList() != RESULT_SUCCESS) {
-        LOG_ERROR("init user auth failed");
+        LOG_ERROR("init context list failed");
         goto FAIL;
     }
 
@@ -55,25 +54,27 @@ int32_t Init()
         LOG_ERROR("init token key failed");
         goto FAIL;
     }
+    if (GenerateKeyPair() != RESULT_SUCCESS) {
+        LOG_ERROR("init ed25519 key failed");
+        goto FAIL;
+    }
+    LOG_INFO("init success");
     g_isInitUserIAM = true;
-    GlobalUnLock();
     return RESULT_SUCCESS;
 
 FAIL:
     Close();
-    GlobalUnLock();
     return RESULT_UNKNOWN;
 }
 
 int32_t Close()
 {
-    GlobalLock();
     DestoryUserAuthContextList();
     DestoryCoAuth();
     DestroyUserInfoList();
     DestroyResourcePool();
+    DestoryEd25519KeyPair();
     g_isInitUserIAM = false;
-    GlobalUnLock();
     return RESULT_SUCCESS;
 }
 

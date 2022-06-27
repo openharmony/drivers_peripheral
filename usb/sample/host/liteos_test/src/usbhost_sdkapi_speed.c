@@ -442,7 +442,7 @@ static int32_t UsbSpeedRequestHandle(void)
         snd->dbNum = g_acm->transmitting;
         rc = UsbFillRequest(snd->request, InterfaceIdToHandle(g_acm, g_acm->dataPipe->interfaceId), &parmas);
         if (rc != HDF_SUCCESS) {
-            printf("%s:UsbFillRequest faile,ret=%d \n", __func__, rc);
+            printf("%s:UsbFillRequest failed,ret=%d \n", __func__, rc);
             goto END;
         }
     }

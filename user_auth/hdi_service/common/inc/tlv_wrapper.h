@@ -43,6 +43,9 @@ int32_t GetUint32Para(TlvListNode *head, int32_t msgType, uint32_t *retVal);
 int32_t GetInt32Para(TlvListNode *head, int32_t msgType, int32_t *retVal);
 Buffer *GetBuffPara(TlvListNode *head, int32_t msgType);
 
+int32_t TlvAppendObject(TlvListNode *head, int32_t type, const uint8_t *buffer, uint32_t length);
+int32_t SerializeTlvWrapper(TlvListNode *head, uint8_t *buffer, uint32_t maxSize, uint32_t *contentSize);
+
 #ifdef __cplusplus
 }
 #endif

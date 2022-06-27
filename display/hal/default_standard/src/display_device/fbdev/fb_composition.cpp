@@ -17,7 +17,7 @@
 #include <vector>
 #include <memory>
 #include <cerrno>
-#include "display_bytrace.h"
+#include "hitrace_meter.h"
 #include "display_adapter.h"
 namespace OHOS {
 namespace HDI {
@@ -34,7 +34,7 @@ int32_t FbComposition::FbFresh(int fd, HdiLayer &clientlayer, int &fence)
     fbFrameInfo.stride = clientlayer.GetCurrentBuffer()->GetStride();
     fbFrameInfo.bufaddr = clientlayer.GetCurrentBuffer()->GetMemHandle();
     fbFrameInfo.format = PIXEL_FMT_RGBA_8888;
-    DisplayBytrace trace("fbfresh");
+    HitraceScoped trace(HITRACE_TAG_GRAPHIC_AGP, "fbfresh");
     if (DisplayAdapter::GetInstance()->FbFresh(fd, fbFrameInfo) != 0) {
         DISPLAY_LOGE(" HIFB_REFRESH_FRAMEINFO Error! %{public}d", errno);
     }
@@ -73,7 +73,7 @@ int32_t FbComposition::Apply(bool modeSet)
     for (uint32_t i = 0; i < mCompLayers.size(); i++) {
         int fence = -1;
         HdiLayer *layer = mCompLayers[i];
-        DisplayBytrace trace("fb apply");
+        HitraceScoped trace(HITRACE_TAG_GRAPHIC_AGP, "fb apply");
         int ret = FbFresh(fds_[i], *layer, fence);
         layer->SetReleaseFence(fence);
         DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("fb fresh failed"));

@@ -104,7 +104,7 @@ private:
     bool GetBufferById(uint32_t bufferId, sptr<ICodecBuffer> &codecBuffer, OMX_BUFFERHEADERTYPE *&bufferHdrType);
 
 private:
-    OMX_HANDLETYPE comp_;                                         // Compnent handle
+    OMX_HANDLETYPE comp_;                                         // Component handle
     struct CodecCallbackType *omxCallback_;                       // Callbacks in HDI
     int64_t appData_;                                             // Use data, default is 0
     std::map<uint32_t, sptr<ICodecBuffer>> codecBufferMap_;       // Key is buffferID

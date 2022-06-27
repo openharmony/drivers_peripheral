@@ -42,7 +42,7 @@
 #define AUDIO_A2DP_ID_MAX           40
 
 enum AudioAdapterType {
-    AUDIO_ADAPTER_PRIMARY = 0,  /* internel sound card */
+    AUDIO_ADAPTER_PRIMARY = 0,  /* internal sound card */
     AUDIO_ADAPTER_PRIMARY_EXT,  /* extern sound card */
     AUDIO_ADAPTER_USB,         /* usb sound card */
     AUDIO_ADAPTER_A2DP,         /* blue tooth sound card */

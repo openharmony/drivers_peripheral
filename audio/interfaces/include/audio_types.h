@@ -80,17 +80,20 @@ struct AudioAdapterDescriptor {
  * @brief Enumerates the pin of an audio adapter.
  */
 enum AudioPortPin {
-    PIN_NONE        = 0x0u,       /**< Invalid pin */
-    PIN_OUT_SPEAKER = 0x1u,       /**< Speaker output pin */
-    PIN_OUT_HEADSET = 0x2u,       /**< Wired headset pin for output */
-    PIN_OUT_LINEOUT = 0x4u,       /**< Line-out pin */
-    PIN_OUT_HDMI    = 0x8u,       /**< HDMI output pin */
-    PIN_OUT_USB     = 0x10u,      /**< USB device output */
-    PIN_OUT_USB_EXT = 0x20u,      /**< Extended USB device output */
-    PIN_IN_MIC      = 0x8000001u, /**< Microphone input pin */
-    PIN_IN_HS_MIC   = 0x8000002u, /**< Wired headset microphone pin for input */
-    PIN_IN_LINEIN   = 0x8000004u, /**< Line-in pin */
-    PIN_IN_USB_EXT  = 0x8000008u, /**< Extended USB device input */
+    PIN_NONE                     = 0x0u,       /**< Invalid pin */
+    PIN_OUT_SPEAKER              = 0x1u,       /**< Speaker output pin */
+    PIN_OUT_HEADSET              = 0x2u,       /**< Wired headset pin for output */
+    PIN_OUT_LINEOUT              = 0x4u,       /**< Line-out pin */
+    PIN_OUT_HDMI                 = 0x8u,       /**< HDMI output pin */
+    PIN_OUT_USB                  = 0x10u,      /**< USB output pin */
+    PIN_OUT_USB_EXT              = 0x20u,      /**< Extended USB output pin*/
+    PIN_OUT_EARPIECE             = 0x30u,      /**< Earpiece output pin */
+    PIN_OUT_BLUETOOTH_SCO        = 0x40u,      /**< Bluetooth SCO output pin */
+    PIN_IN_MIC                   = 0x8000001u, /**< Microphone input pin */
+    PIN_IN_HS_MIC                = 0x8000002u, /**< Wired headset microphone pin for input */
+    PIN_IN_LINEIN                = 0x8000004u, /**< Line-in pin */
+    PIN_IN_USB_EXT               = 0x8000008u, /**< Extended USB input pin*/
+    PIN_IN_BLUETOOTH_SCO_HEADSET = 0x8000010u, /**< Bluetooth SCO headset input pin */
 };
 
 /**

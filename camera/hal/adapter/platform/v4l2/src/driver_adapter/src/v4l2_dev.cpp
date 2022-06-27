@@ -648,7 +648,7 @@ RetCode HosV4L2Dev::ConfigSys(const std::string& cameraID, V4l2FmtCmd command, D
             break;
 
         default:
-            CAMERA_LOGE("HosV4L2Dev::ConfigSys unknow command\n");
+            CAMERA_LOGE("HosV4L2Dev::ConfigSys unknown command\n");
             break;
     }
 

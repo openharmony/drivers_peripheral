@@ -117,7 +117,7 @@ static int32_t UsbStartIo(struct AcmDevice *acm)
 
     HDF_LOGI("%s start", __func__);
 
-    /* creat Io thread */
+    /* create Io thread */
     (void)memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
     threadCfg.name      = "usb io thread";
     threadCfg.priority  = OSAL_THREAD_PRI_DEFAULT;
@@ -126,14 +126,14 @@ static int32_t UsbStartIo(struct AcmDevice *acm)
     ret = OsalThreadCreate(&acm->ioThread, \
                            (OsalThreadEntry)UsbIoThread, (void *)acm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadCreate faile, ret=%d ",
+        HDF_LOGE("%s:%d OsalThreadCreate failed, ret=%d ",
                  __func__, __LINE__, ret);
         return ret;
     }
 
     ret = OsalThreadStart(&acm->ioThread, &threadCfg);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadStart faile, ret=%d ",
+        HDF_LOGE("%s:%d OsalThreadStart failed, ret=%d ",
                  __func__, __LINE__, ret);
         return ret;
     }
@@ -144,14 +144,14 @@ static int32_t UsbStartIo(struct AcmDevice *acm)
     threadCfg.stackSize = USB_IO_THREAD_STACK_SIZE;
     ret = OsalThreadCreate(&acm->ioSendThread, (OsalThreadEntry)UsbIoSendThread, (void *)acm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadCreate faile, ret=%d ",
+        HDF_LOGE("%s:%d OsalThreadCreate failed, ret=%d ",
                  __func__, __LINE__, ret);
         return ret;
     }
 
     ret = OsalThreadStart(&acm->ioSendThread, &threadCfg);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadStart faile, ret=%d ",
+        HDF_LOGE("%s:%d OsalThreadStart failed, ret=%d ",
                  __func__, __LINE__, ret);
         return ret;
     }
@@ -183,13 +183,13 @@ static int32_t UsbStopIo(struct AcmDevice *acm)
 
     ret = OsalThreadDestroy(&acm->ioThread);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadDestroy faile, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%s:%d OsalThreadDestroy failed, ret=%d ", __func__, __LINE__, ret);
         return ret;
     }
 
     ret = OsalThreadDestroy(&acm->ioSendThread);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalThreadDestroy faile, ret=%d ",
+        HDF_LOGE("%s:%d OsalThreadDestroy failed, ret=%d ",
                  __func__, __LINE__, ret);
         return ret;
     }
@@ -342,7 +342,7 @@ static int32_t UsbAllocDataRequests(struct AcmDevice *acm)
 
         ret = UsbRawFillBulkRequest(snd->request, acm->devHandle, &reqData);
         if (ret) {
-            HDF_LOGE("%s: FillInterruptRequest faile, ret=%d",
+            HDF_LOGE("%s: FillInterruptRequest failed, ret=%d",
                      __func__, ret);
             return HDF_FAILURE;
         }
@@ -514,7 +514,7 @@ static int32_t SerialBegin(struct AcmDevice *acm)
 
     ret = UsbRawFillBulkRequest(db->request, acm->devHandle, &reqData);
     if (ret) {
-        HDF_LOGE("%s: FillInterruptRequest faile, ret=%d",
+        HDF_LOGE("%s: FillInterruptRequest failed, ret=%d",
                  __func__, ret);
         return HDF_FAILURE;
     }

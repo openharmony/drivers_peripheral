@@ -1480,7 +1480,7 @@ int32_t UsbAdapterKillSignal(struct UsbDeviceHandle *handle, UsbRawTidType tid)
         if (osDev != NULL) {
             g_CompleteExit = true;
             OsalSemPost(&osDev->cvWait);
-            HDF_LOGD("%s:%d sigal post", __func__, __LINE__);
+            HDF_LOGD("%s:%d signal post", __func__, __LINE__);
             return HDF_SUCCESS;
         } else {
             return HDF_FAILURE;

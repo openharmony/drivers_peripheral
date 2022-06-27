@@ -162,7 +162,7 @@ typedef struct {
 
     /**
      * Caller will open the interface and pass in the callback routines
-     * to the implemenation of this interface.
+     * to the implementation of this interface.
      */
     int (*init)(const bt_vendor_callbacks_t* p_cb, unsigned char* local_bdaddr);
 
