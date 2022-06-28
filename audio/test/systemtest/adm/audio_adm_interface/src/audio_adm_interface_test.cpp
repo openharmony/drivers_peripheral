@@ -30,12 +30,14 @@ using namespace testing::ext;
 using namespace OHOS::Audio;
 
 namespace {
-    const int CONTROL_DISP_METHOD_CMD_ILLEGAL = 5;
+    const int CONTROL_DISP_METHOD_CMD_ILLEGAL = 6;
     const int STREAM_DISP_METHOD_CMD_ILLEGAL = 30;
     const int CHANEL_MODE_ILLEGAL = 9;
     const int MAX_GAIN_VALUE = 15;
     const int MIN_GAIN_VALUE = 0;
     const int ERROR_GAIN_VALUE = MAX_GAIN_VALUE + 1;
+    const int WAITE_TIME = 5;
+    const int US_TO_MS = 1000;
 
     class AudioAdmInterfaceTest : public testing::Test {
     public:
@@ -68,7 +70,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlDispatch_0001, TestSize.Level1)
 
     struct AudioCtlElemValue writeElemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_GAIN,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Mic Left Gain",
         .value[0] = 5,
     };
@@ -105,7 +107,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlDispatch_0002, TestSize.Level1)
     struct HdfObject *objectNull = nullptr;
     struct AudioCtlElemValue writeElemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_GAIN,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Mic Left Gain",
         .value[0] = 6,
     };
@@ -215,7 +217,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0001, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_GAIN,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Mic Left Gain",
         .value[0] = 5,
     };
@@ -241,7 +243,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0002, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_GAIN,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Mic Left Gain",
         .value[0] = MIN_GAIN_VALUE,
     };
@@ -267,7 +269,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0003, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_GAIN,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Mic Left Gain",
         .value[0] = MAX_GAIN_VALUE,
     };
@@ -292,7 +294,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0004, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_GAIN,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Mic Left Gain",
         .value[0] = ERROR_GAIN_VALUE,
     };
@@ -316,7 +318,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0005, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_NORMAL,
     };
@@ -342,7 +344,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0006, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_BOTH_LEFT,
     };
@@ -368,7 +370,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0007, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_BOTH_RIGHT,
     };
@@ -394,7 +396,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0008, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_EXCHANGE,
     };
@@ -420,7 +422,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0009, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_MIX,
     };
@@ -446,7 +448,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0010, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_LEFT_MUTE,
     };
@@ -472,7 +474,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0011, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_RIGHT_MUTE,
     };
@@ -498,7 +500,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0012, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Render Channel Mode",
         .value[0] = AUDIO_CHANNEL_BOTH_MUTE,
     };
@@ -520,7 +522,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0013, TestSi
     struct HdfIoService *service = nullptr;
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_AIAO,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Render Channel Mode",
         .value[0] = CHANEL_MODE_ILLEGAL,
     };
@@ -547,7 +549,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0014, TestSi
     struct HdfSBuf *readReply = nullptr;
     struct AudioCtlElemId id = {
         .cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .iface = AUDIODRV_CTL_ELEM_IFACE_GAIN,
+        .iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .itemName = "Mic Left Gain",
     };
     struct AudioCtlElemValue readElemValue = {};
@@ -596,7 +598,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0015, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Main Playback Volume",
         .value[0] = 100,
     };
@@ -623,7 +625,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0016, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Main Playback Volume",
         .value[0] = 40,
     };
@@ -649,7 +651,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0017, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Main Playback Volume",
         .value[0] = 127,
     };
@@ -671,7 +673,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0018, TestSi
     struct HdfIoService *service = nullptr;
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Main Playback Volume",
         .value[0] = 128,
     };
@@ -694,7 +696,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0019, TestSi
     struct HdfIoService *service = nullptr;
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Main Playback Volume",
         .value[0] = 39,
     };
@@ -721,7 +723,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0020, TestSi
     ASSERT_NE(nullptr, service->dispatcher);
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Playback Mute",
         .value[0] = 0,
     };
@@ -743,7 +745,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0021, TestSi
     struct HdfIoService *service = nullptr;
     struct AudioCtlElemValue elemValue = {
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Playback Mute",
         .value[0] = 2,
     };
@@ -1263,10 +1265,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRead_0001, TestSize.Level1)
         ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_READ, nullptr, reply);
         EXPECT_EQ(HDF_SUCCESS, ret);
         EXPECT_GE(HdfSbufReadUint32(reply, &buffStatus), HDF_SUCCESS);
-        if (buffStatus == CIR_BUFF_EMPTY) {
+        if (buffStatus != CIR_BUFF_NORMAL) {
+            int32_t ms = buffStatus >= 0 ? buffStatus : WAITE_TIME;
             tryNumReply--;
             HdfSbufFlush(reply);
-            usleep(5000);
+            usleep(ms*US_TO_MS);
             continue;
         }
         break;
@@ -1275,8 +1278,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRead_0001, TestSize.Level1)
     ret = HdfSbufReadBuffer(reply, (const void **) & (transfer.buf), &readSize);
     EXPECT_NE(transfer.buf, nullptr);
     EXPECT_NE(readSize, (uint32_t)0);
-    ret = WriteToSBuf(sBufTStop);
-    if (ret < 0) {
+    if ((ret = WriteToSBuf(sBufTStop)) < 0) {
         HdfSbufRecycle(reply);
         HdfIoServiceRecycle(service);
         ASSERT_EQ(HDF_SUCCESS, ret);
@@ -1289,6 +1291,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRead_0001, TestSize.Level1)
     HdfSbufRecycle(sBufTStop);
     HdfIoServiceRecycle(service);
 }
+
 /**
 * @tc.name  Test the ADM stream function via calling prepare function(render service)
 * @tc.number  SUB_Audio_StreamHostRenderPrepare_0001

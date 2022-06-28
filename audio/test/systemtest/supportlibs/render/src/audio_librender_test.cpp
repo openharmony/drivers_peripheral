@@ -51,8 +51,8 @@ public:
     void SetUp();
     void TearDown();
     static struct DevHandle *(*BindServiceRenderSo)(const char *);
-    static int32_t (*InterfaceLibOutputRender)(struct DevHandle *, int, struct AudioHwRenderParam *);
-    static int32_t (*InterfaceLibCtlRender)(struct DevHandle *, int, struct AudioHwRenderParam *);
+    static int32_t (*InterfaceLibOutputRender)(struct DevHandle *, int32_t, struct AudioHwRenderParam *);
+    static int32_t (*InterfaceLibCtlRender)(struct DevHandle *, int32_t, struct AudioHwRenderParam *);
     static void (*CloseServiceRenderSo)(struct DevHandle *);
     static void *PtrHandle;
 #ifdef AUDIO_MPI_SO
@@ -366,8 +366,6 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volume_AcodecIn_Wri
     ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
 
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     volumeThresholdValueMaxIn = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
@@ -421,9 +419,6 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volume_AcodecIn_Wri
     ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
 
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     volumeThresholdValueMaxIn = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
@@ -469,8 +464,6 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volume_AcodecIn_Wri
 
     ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -508,8 +501,6 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GetVolthresholdRead
     struct DevHandle *handle = nullptr;
     ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -863,26 +854,6 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GetGainthresholdRea
     gainThresholdValueMinGet = hwRender->renderParam.renderMode.ctlParam.audioGain.gainMin;
     EXPECT_LT(expMax, gainThresholdValueMaxGet);
     EXPECT_EQ(expMix, gainThresholdValueMinGet);
-    CloseServiceRenderSo(handle);
-    free(hwRender);
-    hwRender = nullptr;
-}
-/**
-* @tc.name  test InterfaceLibCtlRender API via using Acodec_ChangeIn.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Acodec_ChangeIn_0001
-* @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN.
-* @tc.author: zhouyongxiao
-*/
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Acodec_ChangeIn_0001, TestSize.Level1)
-{
-    int32_t ret = -1;
-    struct DevHandle *handle = nullptr;
-    struct AudioHwRender *hwRender = nullptr;
-    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME, handle);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);
     hwRender = nullptr;

@@ -23,9 +23,12 @@
 extern "C" {
 #endif
 
-enum AudioCriBuffStatus {
-    CIR_BUFF_NO_FULL = 1,
-    CIR_BUFF_FULL,
+typedef int32_t (*InterfaceLibCtlRender)(struct DevHandle *handle, int32_t cmdId,
+    struct AudioHwRenderParam *handleData);
+
+struct InterfaceLibCtlRenderList {
+    enum AudioInterfaceLibRenderCtrl cmd;
+    InterfaceLibCtlRender func;
 };
 
 #ifdef __cplusplus

@@ -37,8 +37,6 @@ enum AudioInterfaceLibRenderCtrl {
     AUDIODRV_CTL_IOCTL_GAIN_READ,
     AUDIODRV_CTL_IOCTL_SCENESELECT_WRITE, // scene selsect
     AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_READ, // scene threshold
-    AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN,   // acodec change in
-    AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT,  // acodec change out
     AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ,  // get VolThreshold
 };
 
@@ -76,8 +74,6 @@ int32_t AudioCtlRenderSceneSelect(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData);
 int32_t AudioCtlRenderSceneGetGainThreshold(const struct DevHandle *handle,
     int cmdId, struct AudioHwRenderParam *handleData);
-int32_t AudioCtlRenderSetAcodecMode(const struct DevHandle *handle,
-    int cmdId, const struct AudioHwRenderParam *handleData);
 int32_t AudioCtlRenderGetVolThreshold(const struct DevHandle *handle,
     int cmdId, struct AudioHwRenderParam *handleData);
 int32_t AudioOutputRenderReqMmapBuffer(const struct DevHandle *handle,
