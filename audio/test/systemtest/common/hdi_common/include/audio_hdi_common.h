@@ -115,13 +115,7 @@ const std::string HDF_CONTROL_SERVICE = "hdf_audio_control";
 const std::string HDF_RENDER_SERVICE = "hdf_audio_render";
 const std::string HDF_CAPTURE_SERVICE = "hdf_audio_capture";
 
-const int AUDIODRV_CTL_ELEM_IFACE_DAC = 0; /* virtual dac device */
-const int AUDIODRV_CTL_ELEM_IFACE_ADC = 1; /* virtual adc device */
-const int AUDIODRV_CTL_ELEM_IFACE_GAIN = 2; /* virtual adc device */
-const int AUDIODRV_CTL_ELEM_IFACE_MIXER = 3; /* virtual mixer device */
-const int AUDIODRV_CTL_ELEM_IFACE_ACODEC = 4; /* Acodec device */
-const int AUDIODRV_CTL_ELEM_IFACE_PGA = 5; /* PGA device */
-const int AUDIODRV_CTL_ELEM_IFACE_AIAO = 6; /* AIAO device */
+const int AUDIODRV_CTL_ELEM_IFACE_MIXER = 2; /* virtual adc device */
 
 enum ControlDispMethodCmd {
     AUDIODRV_CTRL_IOCTRL_ELEM_INFO,

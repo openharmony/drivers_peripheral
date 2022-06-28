@@ -385,26 +385,6 @@ HWTEST_F(AudioAdapterTest, AudioReleaseRenderHandleWhenHwRenderIsNull, TestSize.
     EXPECT_EQ(nullptr, hwRender);
 }
 
-HWTEST_F(AudioAdapterTest, AudioSetAcodeModeRenderWhenHwRenderIsNull, TestSize.Level1)
-{
-    InterfaceLibModeRenderSo pInterfaceLibModeRender;
-    EXPECT_EQ(HDF_FAILURE, AudioSetAcodeModeRender(nullptr, &pInterfaceLibModeRender));
-}
-
-HWTEST_F(AudioAdapterTest, AudioSetAcodeModeRenderWhenpInterfaceLibModeRenderIsNull, TestSize.Level1)
-{
-    struct AudioHwRender hwRender;
-    EXPECT_EQ(HDF_FAILURE, AudioSetAcodeModeRender(&hwRender, nullptr));
-}
-
-HWTEST_F(AudioAdapterTest, AudioSetAcodeModeRenderWhenpDevCtlHandleIsNull, TestSize.Level1)
-{
-    struct AudioHwRender hwRender;
-    InterfaceLibModeRenderSo pInterfaceLibModeRender;
-    hwRender.devCtlHandle = nullptr;
-    EXPECT_EQ(HDF_FAILURE, AudioSetAcodeModeRender(&hwRender, &pInterfaceLibModeRender));
-}
-
 HWTEST_F(AudioAdapterTest, AudioAdapterCreateRenderPreWhenHwRenderIsNull, TestSize.Level1)
 {
     struct AudioHwRender *hwRender = nullptr;

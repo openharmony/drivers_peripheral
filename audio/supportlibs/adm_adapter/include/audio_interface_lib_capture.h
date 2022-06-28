@@ -23,11 +23,6 @@
 extern "C" {
 #endif
 
-enum AudioCriBuffStatusCapture {
-    CIR_BUFF_NORMAL = 1,
-    CIR_BUFF_EMPTY = 3,
-};
-
 #ifdef __cplusplus
 }
 #endif

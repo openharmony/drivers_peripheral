@@ -362,7 +362,7 @@ int32_t AudioCaptureCheckSceneCapability(AudioHandle handle, const struct AudioS
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
     *supported = false;
     /* Temporary storage does not save the structure */
-    struct AudioHwCaptureParam captureParam;
+    struct AudioHwCaptureParam captureParam = hwCapture->captureParam;
     captureParam.frameCaptureMode.attrs.type = (enum AudioCategory)scene->scene.id;
     captureParam.captureMode.hwInfo.deviceDescript.pins = scene->desc.pins;
     PathSelAnalysisJson *pPathSelAnalysisJson = AudioSoGetPathSelAnalysisJson();

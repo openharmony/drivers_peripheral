@@ -22,7 +22,7 @@
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
-#define AUDIO_ADAPTER_CONFIG    HDF_CONFIG_DIR"/audio_adapter_config.json"
+#define AUDIO_ADAPTER_CONFIG    HDF_CONFIG_DIR"/audio_adapter.json"
 #define ADAPTER_NAME_LEN        32
 #define PORT_NAME_LEN           ADAPTER_NAME_LEN
 #define SUPPORT_PORT_NUM_MAX    4
@@ -590,14 +590,17 @@ static int32_t AudioAdapterParsePort(struct AudioPort *info, const cJSON *port)
     }
     ret = AudioAdapterParsePortGetDir(info, port);
     if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioAdapterParsePortGetDir failed!\n");
         return ret;
     }
     ret = AudioAdapterParsePortGetID(info, port);
     if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioAdapterParsePortGetID failed!\n");
         return ret;
     }
     ret = AudioAdapterParsePortGetPortName(info, port);
     if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioAdapterParsePortGetPortName failed!\n");
         return ret;
     }
     return HDF_SUCCESS;
@@ -967,11 +970,30 @@ static void AudioPortsNamesRecord(void)
         }
     }
 }
+int32_t AudioAdaptersSetAdapterVar(cJSON *adaptersObj)
+{
+    if (adaptersObj == NULL) {
+        AUDIO_FUNC_LOGE("adaptersObj is NULL!");
+        return HDF_FAILURE;
+    }
+    if (AudioAdaptersSetAdapter(&g_audioAdapterDescs, g_adapterNum, adaptersObj) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioAdaptersSetAdapter g_audioAdapterDescs is failed!");
+        return HDF_FAILURE;
+    }
+    if (AudioAdaptersSetAdapter(&g_audioAdapterOut, g_adapterNum, adaptersObj) != HDF_SUCCESS) {
+        /* g_audioAdapterOut failure also releases g_audioAdapterDescs */
+        AUDIO_FUNC_LOGE("AudioAdaptersSetAdapter g_audioAdapterOut is failed!");
+        AudioAdapterReleaseDescs(g_audioAdapterDescs, g_adapterNum);
+        ClearAdaptersAllName();
+        g_audioAdapterDescs = NULL;
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
 
 int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size)
 {
     int32_t realSize;
-
     if (descs == NULL || size == NULL) {
         AUDIO_FUNC_LOGE("param descs or size is null!");
         return HDF_ERR_INVALID_PARAM;
@@ -983,7 +1005,6 @@ int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size)
         /* Existing content is no longer assigned twice */
         *descs = g_audioAdapterOut;
         *size = g_adapterNum;
-
         return HDF_SUCCESS;
     }
     cJSON *cJsonObj = AudioAdaptersGetConfigToJsonObj(AUDIO_ADAPTER_CONFIG);
@@ -995,31 +1016,18 @@ int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size)
     if (adaptersObj == NULL) {
         AUDIO_FUNC_LOGE("cJSON_GetObjectItem adapters failed!");
         cJSON_Delete(cJsonObj);
-
         return HDF_FAILURE;
     }
     if (AudioAdaptersGetArraySize(adaptersObj, &realSize) != HDF_SUCCESS || realSize != g_adapterNum) {
         AUDIO_FUNC_LOGE("realSize = %{public}d, adaptersNum = %{public}d.\n", realSize, g_adapterNum);
-        AUDIO_FUNC_LOGE("The defined adaptersnum does not match the actual adapters!\n");
         g_adapterNum = 0;
         cJSON_Delete(cJsonObj);
-
         return HDF_FAILURE;
     }
-    if (AudioAdaptersSetAdapter(&g_audioAdapterDescs, g_adapterNum, adaptersObj) != HDF_SUCCESS) {
+    if (AudioAdaptersSetAdapterVar(adaptersObj) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioAdaptersSetAdapterVar is failed!");
         g_adapterNum = 0;
         cJSON_Delete(cJsonObj);
-
-        return HDF_FAILURE;
-    }
-    if (AudioAdaptersSetAdapter(&g_audioAdapterOut, g_adapterNum, adaptersObj) != HDF_SUCCESS) {
-        /* g_audioAdapterOut failure also releases g_audioAdapterDescs */
-        AudioAdapterReleaseDescs(g_audioAdapterDescs, g_adapterNum);
-        ClearAdaptersAllName();
-        g_audioAdapterDescs = NULL;
-        g_adapterNum = 0;
-        cJSON_Delete(cJsonObj);
-
         return HDF_FAILURE;
     }
     AudioAdaptersNamesRecord();
@@ -1027,7 +1035,6 @@ int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size)
     *descs = g_audioAdapterOut;
     *size = g_adapterNum;
     cJSON_Delete(cJsonObj);
-
     return HDF_SUCCESS;
 }
 
@@ -1396,7 +1403,6 @@ int32_t SetExtParam(const char *key, const char *value, struct ExtraParams *mExt
     return ret;
 }
 
-
 int32_t GetErrorReason(int reason, char *reasonDesc)
 {
     int32_t ret;
@@ -1430,7 +1436,7 @@ int32_t GetCurrentTime(char *currentTime)
     // Get the current time
     char *week[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
     time_t timeSec;
-    time(&timeSec);
+    (void)time(&timeSec);
     struct tm *specificTime = localtime(&timeSec);
     if (specificTime == NULL) {
         AUDIO_FUNC_LOGE("localtime failed!");
@@ -1443,7 +1449,6 @@ int32_t GetCurrentTime(char *currentTime)
         AUDIO_FUNC_LOGE("sprintf_s failed!");
         return HDF_FAILURE;
     }
-
     return HDF_SUCCESS;
 }
 
