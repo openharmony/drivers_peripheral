@@ -15,7 +15,7 @@
 
 #include <stdlib.h>
 
-#include "hilog/log.h"
+#include "hdf_log.h"
 #include "securec.h"
 #include "sbuf_common_adapter.h"
 
@@ -49,16 +49,16 @@ void ReleaseWifiService(void)
 int32_t SendCmdSync(const uint32_t cmd, struct HdfSBuf *reqData, struct HdfSBuf *respData)
 {
     if (reqData == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: params is NULL", __FUNCTION__);
+        HDF_LOGE("%s: params is NULL", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
     if (g_wifiService == NULL || g_wifiService->dispatcher == NULL ||
         g_wifiService->dispatcher->Dispatch == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s:bad remote service found!", __FUNCTION__);
+        HDF_LOGE("%s:bad remote service found!", __FUNCTION__);
         return RET_CODE_MISUSE;
     }
     int32_t ret = g_wifiService->dispatcher->Dispatch(&g_wifiService->object, cmd, reqData, respData);
-    HILOG_INFO(LOG_DOMAIN, "%s: cmd=%u, ret=%d", __FUNCTION__, cmd, ret);
+    HDF_LOGI("%s: cmd=%u, ret=%d", __FUNCTION__, cmd, ret);
     return ret;
 }
 
