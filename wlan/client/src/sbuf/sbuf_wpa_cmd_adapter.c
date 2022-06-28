@@ -15,7 +15,7 @@
 
 #include <stdlib.h>
 
-#include "hilog/log.h"
+#include "hdf_log.h"
 #include "sbuf_common_adapter.h"
 #include "securec.h"
 
@@ -34,18 +34,19 @@ int32_t WifiEapolPacketSend(const char *ifName, const uint8_t *srcAddr,
     struct HdfSBuf *data = NULL;
 
     if (ifName == NULL || buf == NULL) {
+        HDF_LOGE("%s: Input param is null", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
     data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Init HdfSBuf failed", __FUNCTION__);
+        HDF_LOGE("%s: Init HdfSBuf failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, buf, length);
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SEND_EAPOL, data, NULL);
@@ -64,29 +65,30 @@ int32_t WifiEapolPacketReceive(const char *ifName, WifiRxEapol *rxEapol)
     struct HdfSBuf *respData = NULL;
 
     if (ifName == NULL || rxEapol == NULL) {
+        HDF_LOGE("%s: Input param is null", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
     data = HdfSbufObtainDefaultSize();
     respData = HdfSbufObtain(DEFAULT_EAPOL_PACKAGE_SIZE);
     do {
         if (data == NULL || respData == NULL) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: Init HdfSBuf failed", __FUNCTION__);
+            HDF_LOGE("%s: Init HdfSBuf failed", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;
         }
         if (!HdfSbufWriteString(data, ifName)) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+            HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;
         }
         ret = SendCmdSync(WIFI_WPA_CMD_RECEIVE_EAPOL, data, respData);
         if (ret != HDF_SUCCESS) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: WifiEapolPacketReceive failed ret = %d", __FUNCTION__, ret);
+            HDF_LOGE("%s: WifiEapolPacketReceive failed ret = %d", __FUNCTION__, ret);
             break;
         }
         if (!HdfSbufReadBuffer(respData, (const void **)(&(eapol.buf)), &(eapol.len))) {
             ret = RET_CODE_FAILURE;
-            HILOG_ERROR(LOG_DOMAIN, "%s: WifiEapolPacketReceive HdfSbufReadBuffer failed", __FUNCTION__);
+            HDF_LOGE("%s: WifiEapolPacketReceive HdfSbufReadBuffer failed", __FUNCTION__);
             break;
         }
         rxEapol->buf = NULL;
@@ -94,11 +96,12 @@ int32_t WifiEapolPacketReceive(const char *ifName, WifiRxEapol *rxEapol)
         if (eapol.len != 0) {
             rxEapol->buf = malloc(eapol.len);
             if (rxEapol->buf == NULL) {
+                HDF_LOGE("%s: rxEapol->buf is null", __FUNCTION__);
                 ret = RET_CODE_FAILURE;
                 break;
             }
             if (memcpy_s(rxEapol->buf, eapol.len, eapol.buf, eapol.len) != EOK) {
-                HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __FUNCTION__);
+                HDF_LOGE("%s: memcpy failed", __FUNCTION__);
             }
             rxEapol->len = eapol.len;
         }
@@ -114,16 +117,18 @@ int32_t WifiEapolEnable(const char *ifName)
     struct HdfSBuf *data = NULL;
 
     if (ifName == NULL) {
+        HDF_LOGE("%s: Input param is null", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
     data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: HdfSbufObtainDefaultSize fail", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     if (HdfSbufWriteString(data, ifName)) {
         ret = SendCmdSync(WIFI_WPA_CMD_ENALBE_EAPOL, data, NULL);
     } else {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     }
     HdfSbufRecycle(data);
@@ -146,7 +151,7 @@ int32_t WifiEapolDisable(const char *ifName)
     if (HdfSbufWriteString(data, ifName)) {
         ret = SendCmdSync(WIFI_WPA_CMD_DISABLE_EAPOL, data, NULL);
     } else {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     }
     HdfSbufRecycle(data);
@@ -159,10 +164,12 @@ int32_t WifiCmdSetAp(const char *ifName, WifiApSetting *apsettings)
     struct HdfSBuf *data = NULL;
 
     if (ifName == NULL || apsettings == NULL) {
+        HDF_LOGE("%s: Input param is null", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
     data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: HdfSbufObtainDefaultSize fail", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
@@ -189,7 +196,7 @@ int32_t WifiCmdSetAp(const char *ifName, WifiApSetting *apsettings)
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, apsettings->ssid, apsettings->ssidLen);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, apsettings->meshSsid, apsettings->meshSsidLen);
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SET_AP, data, NULL);
@@ -204,10 +211,12 @@ int32_t WifiCmdChangeBeacon(const char *ifName, WifiApSetting *apsettings)
     struct HdfSBuf *data = NULL;
 
     if (ifName == NULL || apsettings == NULL) {
+        HDF_LOGE("%s: Input param is null", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
     data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: HdfSbufObtainDefaultSize fail", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
@@ -219,7 +228,7 @@ int32_t WifiCmdChangeBeacon(const char *ifName, WifiApSetting *apsettings)
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, apsettings->ssid, apsettings->ssidLen);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, apsettings->meshSsid, apsettings->meshSsidLen);
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_CHANGE_BEACON, data, NULL);
@@ -246,7 +255,7 @@ int32_t WifiCmdSendMlme(const char *ifName, WifiMlmeData *mlme)
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, mlme->data, mlme->dataLen);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, mlme->cookie, sizeof(*mlme->cookie));
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SEND_MLME, data, NULL);
@@ -261,10 +270,12 @@ static int32_t WifiCmdOperKey(const char *ifName, uint32_t cmd, WifiKeyExt *keyE
     struct HdfSBuf *data = NULL;
 
     if (ifName == NULL || keyExt == NULL) {
+        HDF_LOGE("%s: Input param is null", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
     data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: HdfSbufObtainDefaultSize fail", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
@@ -284,7 +295,7 @@ static int32_t WifiCmdOperKey(const char *ifName, uint32_t cmd, WifiKeyExt *keyE
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, keyExt->key, keyExt->keyLen);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, keyExt->seq, keyExt->seqLen);
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(cmd, data, NULL);
@@ -314,22 +325,25 @@ int32_t WifiCmdSetMode(const char *ifName, WifiSetMode *setMode)
     struct HdfSBuf *data = NULL;
 
     if (ifName == NULL || setMode == NULL) {
+        HDF_LOGE("%s: Input param is null", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
     data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: HdfSbufObtainDefaultSize fail", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, setMode, sizeof(*setMode));
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SET_MODE, data, NULL);
     }
     HdfSbufRecycle(data);
+    HDF_LOGD("%s: WifiCmdSetMode finished! ret=%d", __FUNCTION__, ret);
     return ret;
 }
 
@@ -340,19 +354,21 @@ int32_t WifiCmdGetOwnMac(const char *ifName, char *buf, uint32_t len)
     struct HdfSBuf *reply = NULL;
 
     if (ifName == NULL || buf == NULL) {
+        HDF_LOGE("%s: Input param is null", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
     data = HdfSbufObtainDefaultSize();
     reply = HdfSbufObtainDefaultSize();
     do {
         if (data == NULL || reply == NULL) {
+            HDF_LOGE("%s: At least one param is null", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;
         }
         if (HdfSbufWriteString(data, ifName)) {
             ret = SendCmdSync(WIFI_WPA_CMD_GET_ADDR, data, reply);
         } else {
-            HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+            HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
             ret = RET_CODE_FAILURE;
         }
         if (ret) {
@@ -363,12 +379,12 @@ int32_t WifiCmdGetOwnMac(const char *ifName, char *buf, uint32_t len)
         const uint8_t *replayData = 0;
         if (!HdfSbufReadBuffer(reply, (const void **)(&replayData), &replayDataSize) ||
             replayDataSize != ETH_ADDR_LEN) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: fail or data size mismatch", __FUNCTION__);
+            HDF_LOGE("%s: fail or data size mismatch", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;
         }
         if (memcpy_s(buf, len, replayData, replayDataSize) != EOK) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __FUNCTION__);
+            HDF_LOGE("%s: memcpy failed", __FUNCTION__);
             ret = RET_CODE_FAILURE;
         }
     } while (0);
@@ -384,18 +400,21 @@ int32_t WifiCmdGetHwFeature(const char *ifName, WifiHwFeatureData *hwFeatureData
     struct HdfSBuf *reply = NULL;
 
     if (ifName == NULL || hwFeatureData == NULL) {
+        HDF_LOGE("%s: Input param is null", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
     data = HdfSbufObtainDefaultSize();
     reply = HdfSbufObtain(sizeof(WifiHwFeatureData) + sizeof(uint64_t));
     do {
         if (data == NULL || reply == NULL) {
+            HDF_LOGE("%s: At least one param is null", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;
         }
         if (HdfSbufWriteString(data, ifName)) {
             ret = SendCmdSync(WIFI_WPA_CMD_GET_HW_FEATURE, data, reply);
         } else {
+            HDF_LOGE("%s: HdfSbufWriteString failed", __FUNCTION__);
             ret = RET_CODE_FAILURE;
         }
         if (ret) {
@@ -406,11 +425,12 @@ int32_t WifiCmdGetHwFeature(const char *ifName, WifiHwFeatureData *hwFeatureData
         uint32_t dataSize = 0;
         if (!HdfSbufReadBuffer(reply, (const void **)(&respFeaturenData), &dataSize) ||
             dataSize != sizeof(WifiHwFeatureData)) {
+            HDF_LOGE("%s: HdfSbufReadBuffer failed or unexpect dataSize", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;
         }
         if (memcpy_s(hwFeatureData, sizeof(WifiHwFeatureData), respFeaturenData, dataSize) != EOK) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: memcpy failed", __FUNCTION__);
+            HDF_LOGE("%s: memcpy failed", __FUNCTION__);
             ret = RET_CODE_FAILURE;
         }
     } while (0);
@@ -425,17 +445,19 @@ int32_t WifiCmdDisconnet(const char *ifName, int32_t reasonCode)
     struct HdfSBuf *data = NULL;
 
     if (ifName == NULL) {
+        HDF_LOGE("%s: Input param is null", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
     data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: HdfSbufObtainDefaultSize fail", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint16(data, reasonCode);
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_DISCONNECT, data, NULL);
@@ -450,10 +472,12 @@ int32_t WifiCmdAssoc(const char *ifName, WifiAssociateParams *assocParams)
     struct HdfSBuf *data = NULL;
 
     if (ifName == NULL || assocParams == NULL) {
+        HDF_LOGE("%s: Input param is null!", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
     data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: HdfSbufObtainDefaultSize fail!", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
@@ -474,7 +498,7 @@ int32_t WifiCmdAssoc(const char *ifName, WifiAssociateParams *assocParams)
     isSerializeFailed =
         isSerializeFailed || !HdfSbufWriteBuffer(data, assocParams->crypto, sizeof(assocParams->crypto[0]));
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_ASSOC, data, NULL);
@@ -489,17 +513,19 @@ int32_t WifiCmdSetNetdev(const char *ifName, WifiSetNewDev *info)
     struct HdfSBuf *data = NULL;
 
     if (ifName == NULL || info == NULL) {
+        HDF_LOGE("%s: Input param is null!", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
     data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: HdfSbufObtainDefaultSize fail!", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, info, sizeof(WifiSetNewDev));
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SET_NETDEV, data, NULL);
@@ -524,7 +550,7 @@ int32_t WifiCmdStaRemove(const char *ifName, const uint8_t *addr, uint32_t addrL
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, addr, addrLen);
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_STA_REMOVE, data, NULL);
@@ -539,10 +565,12 @@ int32_t WifiCmdSendAction(const char *ifName, WifiActionData *actionData)
     struct HdfSBuf *data = NULL;
 
     if (ifName == NULL || actionData == NULL) {
+        HDF_LOGE("%s: input parameter invalid!", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
     data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: Init HdfSBuf failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
@@ -553,7 +581,7 @@ int32_t WifiCmdSendAction(const char *ifName, WifiActionData *actionData)
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, actionData->src, ETH_ADDR_LEN);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, actionData->data, actionData->dataLen);
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SEND_ACTION, data, NULL);
@@ -569,10 +597,11 @@ int32_t WifiCmdSetClient(uint32_t clientNum)
 
     data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: Init HdfSBuf failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     if (!HdfSbufWriteUint32(data, clientNum)) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: sbuf write failed!", __FUNCTION__);
+        HDF_LOGE("%s: sbuf write failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_CLIENT_CMD_SET_CLIENT, data, NULL);
@@ -584,10 +613,12 @@ int32_t WifiCmdSetClient(uint32_t clientNum)
 int32_t WifiCmdProbeReqReport(const char *ifName, const int32_t *report)
 {
     if (ifName == NULL || report == NULL) {
-        return RET_CODE_FAILURE;
+        HDF_LOGE("%s: input parameter invalid!", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
     }
     struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: Init HdfSBuf failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
@@ -595,7 +626,7 @@ int32_t WifiCmdProbeReqReport(const char *ifName, const int32_t *report)
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, *report);
     int32_t ret;
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "Serialize failed.");
+        HDF_LOGE("Serialize failed.");
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_PROBE_REQ_REPORT, data, NULL);
@@ -607,10 +638,12 @@ int32_t WifiCmdProbeReqReport(const char *ifName, const int32_t *report)
 int32_t WifiCmdRemainOnChannel(const char *ifName, const WifiOnChannel *onChannel)
 {
     if (ifName == NULL || onChannel == NULL) {
-        return RET_CODE_FAILURE;
+        HDF_LOGE("%s: input parameter invalid!", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
     }
     struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: Init HdfSBuf failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
@@ -619,7 +652,7 @@ int32_t WifiCmdRemainOnChannel(const char *ifName, const WifiOnChannel *onChanne
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint32(data, onChannel->duration);
     int32_t ret;
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "Serialize failed.");
+        HDF_LOGE("Serialize failed.");
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_REMAIN_ON_CHANNEL, data, NULL);
@@ -633,17 +666,19 @@ int32_t WifiCmdRemainOnChannel(const char *ifName, const WifiOnChannel *onChanne
 int32_t WifiCmdCancelRemainOnChannel(const char *ifName)
 {
     if (ifName == NULL) {
-        return RET_CODE_FAILURE;
+        HDF_LOGE("%s: input parameter invalid!", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
     }
     struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: Init HdfSBuf failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
     int32_t ret;
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "Serialize failed.");
+        HDF_LOGE("Serialize failed.");
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_CANCEL_REMAIN_ON_CHANNEL, data, NULL);
@@ -657,10 +692,12 @@ int32_t WifiCmdCancelRemainOnChannel(const char *ifName)
 int32_t WifiCmdAddIf(const char *ifname, const WifiIfAdd *ifAdd)
 {
     if (ifname == NULL || ifAdd == NULL) {
-        return RET_CODE_FAILURE;
+        HDF_LOGE("%s: input parameter invalid!", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
     }
     struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: Init HdfSBuf failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
@@ -668,7 +705,7 @@ int32_t WifiCmdAddIf(const char *ifname, const WifiIfAdd *ifAdd)
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint8(data, ifAdd->type);
     int32_t ret;
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_ADD_IF, data, NULL);
@@ -680,10 +717,12 @@ int32_t WifiCmdAddIf(const char *ifname, const WifiIfAdd *ifAdd)
 int32_t WifiCmdRemoveIf(const char *ifname, const WifiIfRemove *ifRemove)
 {
     if (ifname == NULL || ifRemove == NULL) {
-        return RET_CODE_FAILURE;
+        HDF_LOGE("%s: input parameter invalid!", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
     }
     struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: Init HdfSBuf failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
@@ -691,7 +730,7 @@ int32_t WifiCmdRemoveIf(const char *ifname, const WifiIfRemove *ifRemove)
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, ifRemove, sizeof(WifiIfRemove));
     int32_t ret;
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_REMOVE_IF, data, NULL);
@@ -703,10 +742,12 @@ int32_t WifiCmdRemoveIf(const char *ifname, const WifiIfRemove *ifRemove)
 int32_t WifiCmdSetApWpsP2pIe(const char *ifname, const WifiAppIe *appIe)
 {
     if (ifname == NULL || appIe == NULL) {
-        return RET_CODE_FAILURE;
+        HDF_LOGE("%s: input parameter invalid!", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
     }
     struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     if (data == NULL) {
+        HDF_LOGE("%s: Init HdfSBuf failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
@@ -720,7 +761,7 @@ int32_t WifiCmdSetApWpsP2pIe(const char *ifname, const WifiAppIe *appIe)
     }
     int32_t ret;
     if (isSerializeFailed) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Serialize failed!", __FUNCTION__);
+        HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     } else {
         ret = SendCmdSync(WIFI_WPA_CMD_SET_AP_WPS_P2P_IE, data, NULL);
@@ -734,18 +775,20 @@ int32_t WifiCmdGetDrvFlags(const char *ifname, WifiGetDrvFlags *params)
     int32_t ret;
 
     if (ifname == NULL || params == NULL) {
-        return RET_CODE_FAILURE;
+        HDF_LOGE("%s: input parameter invalid!", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
     }
     struct HdfSBuf *data = HdfSbufObtainDefaultSize();
     struct HdfSBuf *reply = HdfSbufObtainDefaultSize();
     do {
-        if (ifname == NULL || reply == NULL) {
+        if (data == NULL || reply == NULL) {
+            HDF_LOGE("%s: Init HdfSBuf failed", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;
         }
 
         if (!HdfSbufWriteString(data, ifname)) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: HdfSbufWriteString failed!", __FUNCTION__);
+            HDF_LOGE("%s: HdfSbufWriteString failed!", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;
         }
