@@ -18,8 +18,6 @@ import("//drivers/peripheral/audio/audio.gni")
 
 module_output_path = "hdf/audio"
 
-############################end########################################
-########AudioInitallportsFuzzTest##################
 ohos_fuzztest("AudioInitallportsFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file = "//drivers/peripheral/audio/test/fuzztest/hdi_fuzzer/adapter/audioinitallports_fuzzer"
@@ -46,6 +44,7 @@ ohos_fuzztest("AudioInitallportsFuzzTest") {
     "//drivers/peripheral/audio/test/fuzztest/hdi_fuzzer/adapter/audioinitallports_fuzzer/include",
     "//drivers/peripheral/audio/test/fuzztest/common/include",
   ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
   defines = []
   if (enable_audio_adm_so) {
     defines += [ "AUDIO_ADM_SO" ]

@@ -44,6 +44,10 @@ ohos_fuzztest("AudioCreaterenderDescFuzzTest") {
     "//drivers/peripheral/audio/test/fuzztest/hdi_fuzzer/adapter/audiocreaterenderdesc_fuzzer/include",
     "//drivers/peripheral/audio/test/fuzztest/common/include",
   ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "utils_base:utils",
+  ]
   defines = []
   if (enable_audio_adm_so) {
     defines += [ "AUDIO_ADM_SO" ]
