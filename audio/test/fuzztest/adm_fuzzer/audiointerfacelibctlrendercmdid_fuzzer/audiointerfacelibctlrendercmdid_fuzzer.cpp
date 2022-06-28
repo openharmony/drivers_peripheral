@@ -25,24 +25,27 @@ namespace Audio {
         char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
         void *PtrHandle = dlopen(resolvedPath, RTLD_LAZY);
         if (PtrHandle == nullptr) {
+            HDF_LOGE("%{public}s: dlopen failed \n", __func__);
             return false;
         }
         struct DevHandle *(*BindServiceRender)(const char *) = nullptr;
         int32_t (*InterfaceLibCtlRender)(struct DevHandle *, int, struct AudioHwRenderParam *) = nullptr;
         BindServiceRender = (struct DevHandle *(*)(const char *))dlsym(PtrHandle, "AudioBindServiceRender");
         if (BindServiceRender == nullptr) {
+            HDF_LOGE("%{public}s: dlsym AudioBindServiceRender failed \n", __func__);
             dlclose(PtrHandle);
             return false;
         }
-        struct DevHandle *handle = nullptr;
-        handle = BindServiceRender(BIND_CONTROL.c_str());
+        struct DevHandle *handle = BindServiceRender(BIND_CONTROL.c_str());
         if (handle == nullptr) {
+            HDF_LOGE("%{public}s: BindServiceRender failed \n", __func__);
             dlclose(PtrHandle);
             return false;
         }
         InterfaceLibCtlRender = (int32_t (*)(struct DevHandle *, int,
             struct AudioHwRenderParam *))dlsym(PtrHandle, "AudioInterfaceLibCtlRender");
         if (InterfaceLibCtlRender == nullptr) {
+            HDF_LOGE("%{public}s: dlsym AudioInterfaceLibCtlRender failed \n", __func__);
             dlclose(PtrHandle);
             return false;
         }
@@ -58,6 +61,7 @@ namespace Audio {
         void (*CloseService)(const struct DevHandle *) = nullptr;
         CloseService = (void (*)(const struct DevHandle *))dlsym(PtrHandle, "AudioCloseServiceRender");
         if (CloseService == nullptr) {
+            HDF_LOGE("%{public}s:dlsym AudioCloseServiceRender failed \n", __func__);
             dlclose(PtrHandle);
             return false;
         }

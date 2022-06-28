@@ -27,6 +27,7 @@ bool AudioSetvolumeCaptureVolumeFuzzTest(const uint8_t *data, size_t size)
     struct AudioCapture *capture = nullptr;
     int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
     if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+        HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
         return false;
     }
     int32_t volume = *(float *)data;

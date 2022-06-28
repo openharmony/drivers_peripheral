@@ -34,11 +34,9 @@ namespace Audio {
         }
 
         struct AudioSceneDescriptor sceneFuzz = {};
-        sceneFuzz.scene.id = *(uint32_t *)data,
-        sceneFuzz.scene.desc = (char *)data,
-        sceneFuzz.desc.portId = *(uint32_t *)data,
-        sceneFuzz.desc.pins = *(AudioPortPin *)data,
-        sceneFuzz.desc.desc = (char *)data,
+        if (memcpy_s((void *)&sceneFuzz, sizeof(sceneFuzz), data, sizeof(sceneFuzz)) != 0) {
+            return false;
+        }
         ret = render->scene.CheckSceneCapability(render, &sceneFuzz, &supported);
         if (ret == HDF_SUCCESS) {
             result = true;

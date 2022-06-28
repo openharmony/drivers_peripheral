@@ -27,23 +27,14 @@ namespace Audio {
         struct AudioCapture *capture = nullptr;
         int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
         if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+            HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
             return false;
         }
 
-    struct AudioSampleAttributes attrsFuzz {
-        .type = *(AudioCategory *)data,
-        .interleaved = *(bool *)data,
-        .format = *(AudioFormat *)data,
-        .sampleRate = *(uint32_t *)data,
-        .channelCount = *(uint32_t *)data,
-        .period = *(uint32_t *)data,
-        .frameSize = *(uint32_t *)data,
-        .isBigEndian = *(bool *)data,
-        .isSignedData = *(bool *)data,
-        .startThreshold = *(uint32_t *)data,
-        .stopThreshold = *(uint32_t *)data,
-        .silenceThreshold = *(uint32_t *)data,
-    };
+        struct AudioSampleAttributes attrsFuzz = {};
+        if (memcpy_s((void *)&attrsFuzz, sizeof(attrsFuzz), data, sizeof(attrsFuzz)) != 0) {
+            return false;
+        }
         ret = capture->attr.SetSampleAttributes(capture, &attrsFuzz);
         if (ret == HDF_SUCCESS) {
             result = true;
