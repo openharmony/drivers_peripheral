@@ -16,7 +16,7 @@ ohos_prebuilt_etc("camera_host_config.hcb") {
   relative_install_dir = "hdfconfig"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "driver_peripheral_camera"
+  part_name = "drivers_peripheral_camera"
 }
 
 hc_gen_c("generate_source") {
@@ -77,7 +77,7 @@ ohos_prebuilt_etc("ipp_algo_config.hcb") {
   relative_install_dir = "hdfconfig"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "driver_peripheral_camera"
+  part_name = "drivers_peripheral_camera"
 }
 
 config("example_config") {
