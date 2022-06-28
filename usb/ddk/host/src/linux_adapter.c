@@ -1239,7 +1239,6 @@ static int32_t AdapterUrbCompleteHandle(const struct UsbDeviceHandle *devHandle)
 
     ret = ioctl(devHandle->fd, USBDEVFS_REAPURB, &urb);
     if (ret < 0) {
-        HDF_LOGE("%s:%d reap failed, errno=%d", __func__, __LINE__, errno);
         if (errno == EAGAIN) {
             return 1;
         }

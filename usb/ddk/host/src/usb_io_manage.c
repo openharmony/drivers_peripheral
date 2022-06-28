@@ -138,8 +138,6 @@ static int32_t IoAsyncReceiveProcess(const void *interfacePoolArg)
 
         ret = RawHandleRequest(interfacePool->device->devHandle);
         if ((ret < 0) || (interfacePool->ioProcessStopStatus != USB_POOL_PROCESS_RUNNING)) {
-            HDF_LOGE("%s:%d RawHandleRequest failed, stopStatus=%d ret=%d ",
-                __func__, __LINE__, interfacePool->ioProcessStopStatus, ret);
             break;
         }
     }

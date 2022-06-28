@@ -1338,7 +1338,6 @@ int32_t RawHandleRequest(const struct UsbDeviceHandle *devHandle)
 
     ret = osAdapterOps->urbCompleteHandle(devHandle);
     if (ret < 0) {
-        HDF_LOGE("%s:%d handleEvents error, return %d", __func__, __LINE__, ret);
     }
 
     return ret;
