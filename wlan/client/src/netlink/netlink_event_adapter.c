@@ -67,7 +67,7 @@ static int HandleCtrlEvent(int fd)
 
     ret = TEMP_FAILURE_RETRY(read(fd, buf, sizeof(buf)));
     if (ret < 0) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Read after POLL returned %zd, error no = %d (%s)",
+        HILOG_ERROR(LOG_CORE, "%s: Read after POLL returned %zd, error no = %d (%s)",
             __FUNCTION__, ret, errno, strerror(errno));
     }
 
@@ -93,7 +93,7 @@ static void QcaWifiEventScanDoneProcess(const char *ifName, struct nlattr *data,
 
     status = nla_get_u8(attr[WLAN_ATTR_SCAN_STATUS]);
     if (status >= SCAN_STATUS_MAX) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: invalid status", __func__);
+        HILOG_ERROR(LOG_CORE, "%s: invalid status", __func__);
         return;
     }
 
@@ -108,23 +108,23 @@ static void WifiEventVendorProcess(const char *ifName, struct nlattr **attr)
     size_t len;
 
     if (attr[NL80211_ATTR_VENDOR_ID] == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: failed to get vendor id", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: failed to get vendor id", __FUNCTION__);
         return;
     }
     if (attr[NL80211_ATTR_VENDOR_SUBCMD] == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: failed to get vendor subcmd", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: failed to get vendor subcmd", __FUNCTION__);
         return;
     }
 
     vendor_id = nla_get_u32(attr[NL80211_ATTR_VENDOR_ID]);
     subcmd = nla_get_u32(attr[NL80211_ATTR_VENDOR_SUBCMD]);
     if (vendor_id != OUI_QCA || subcmd != NL80211_SCAN_DONE) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: unsupported vendor event", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: unsupported vendor event", __FUNCTION__);
         return;
     }
 
     if (attr[NL80211_ATTR_VENDOR_DATA] == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: get vendor data fail", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: get vendor data fail", __FUNCTION__);
         return;
     }
     data = nla_data(attr[NL80211_ATTR_VENDOR_DATA]);
@@ -187,17 +187,17 @@ static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
     bssPolicy[NL80211_BSS_SEEN_MS_AGO].type = NLA_U32;
 
     if (ifName == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: ifName is null", __func__);
+        HILOG_ERROR(LOG_CORE, "%s: ifName is null", __func__);
         return NL_SKIP;
     }
 
     nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0), genlmsg_attrlen(hdr, 0), NULL);
     if (!attr[NL80211_ATTR_BSS]) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: bss info missing", __func__);
+        HILOG_ERROR(LOG_CORE, "%s: bss info missing", __func__);
         return NL_SKIP;
     }
     if (nla_parse_nested(bssAttr, NL80211_BSS_MAX, attr[NL80211_ATTR_BSS], bssPolicy)) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: failed to parse nested attributes", __func__);
+        HILOG_ERROR(LOG_CORE, "%s: failed to parse nested attributes", __func__);
         return NL_SKIP;
     }
 
@@ -217,7 +217,7 @@ static void WifiEventScanResultProcess(const char *ifName)
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
     ret = NetlinkSendCmdSync(msg, WifiGetScanResultHandler, (void *)ifName);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: send cmd failed", __func__);
+        HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __func__);
     }
 
     nlmsg_free(msg);
@@ -233,7 +233,7 @@ static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
             WifiEventScanResultProcess(ifName);
             break;
         default:
-            HILOG_INFO(LOG_DOMAIN, "%s: not supported cmd, cmd = %d\n", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "%s: not supported cmd, cmd = %d\n", __FUNCTION__, cmd);
             break;
     }
 }
@@ -256,7 +256,7 @@ static int32_t ProcessEvent(struct nl_msg *msg, void *arg)
 
     ret = GetUsableNetworkInfo(&networkInfo);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: get usable network information failed", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: get usable network information failed", __FUNCTION__);
         return NL_SKIP;
     }
 
@@ -276,7 +276,7 @@ static struct nl_cb *CreateCb(void)
 
     cb = nl_cb_alloc(NL_CB_DEFAULT);
     if (cb == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: alloc cb failed", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: alloc cb failed", __FUNCTION__);
         return NULL;
     }
 
@@ -291,7 +291,7 @@ static int HandleEvent(struct nl_sock *sock)
     int ret;
     struct nl_cb *cb = CreateCb();
     if (cb == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Create cb failed", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: Create cb failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
 
@@ -312,7 +312,7 @@ void *EventThread(void *para)
     enum ThreadStatus *status = NULL;
 
     if (para == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: para is null", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: para is null", __FUNCTION__);
         return NULL;
     } else {
         threadParam = (struct WifiThreadParam *)para;
@@ -327,7 +327,7 @@ void *EventThread(void *para)
 
     ret = socketpair(AF_UNIX, SOCK_STREAM, 0, ctrlSocks);
     if (ret != 0) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail socketpair", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: fail socketpair", __FUNCTION__);
         *status = THREAD_STOP;
         return NULL;
     }
@@ -337,17 +337,17 @@ void *EventThread(void *para)
     while (*status == THREAD_RUN) {
         ret = TEMP_FAILURE_RETRY(poll(pollFds, LISTEN_FD_NUMS, POLLTIMEOUT));
         if (ret < 0) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: fail poll", __FUNCTION__);
+            HILOG_ERROR(LOG_CORE, "%s: fail poll", __FUNCTION__);
             break;
         } else if (pollFds[EVENT_SOCKET_INDEX].revents & POLLERR) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: event socket get POLLERR event", __FUNCTION__);
+            HILOG_ERROR(LOG_CORE, "%s: event socket get POLLERR event", __FUNCTION__);
             break;
         } else if (pollFds[EVENT_SOCKET_INDEX].revents & POLLIN) {
             if (HandleEvent(eventSock) != RET_CODE_SUCCESS) {
                 break;
             }
         } else if (pollFds[CTRL_SOCKET_INDEX].revents & POLLERR) {
-            HILOG_ERROR(LOG_DOMAIN, "%s: ctrl socket get POLLERR event", __FUNCTION__);
+            HILOG_ERROR(LOG_CORE, "%s: ctrl socket get POLLERR event", __FUNCTION__);
             break;
         } else if (pollFds[CTRL_SOCKET_INDEX].revents & POLLIN) {
             if (HandleCtrlEvent(pollFds[CTRL_SOCKET_INDEX].fd) != RET_CODE_SUCCESS) {

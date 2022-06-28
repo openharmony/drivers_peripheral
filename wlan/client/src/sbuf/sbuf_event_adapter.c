@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 #include "../wifi_common_cmd.h"
 #include "hdf_io_service.h"
 #include "hdf_sbuf.h"
-#include "hilog/log.h"
+#include "hdf_log.h"
 #include "securec.h"
 #include "wifi_driver_client.h"
 
@@ -32,15 +32,15 @@ static void WifiEventNewStaProcess(const char *ifName, uint32_t event, struct Hd
     uint32_t len = 0;
 
     if (!HdfSbufReadInt32(reqData, &staInfo.reassoc)) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get reassoc", __FUNCTION__);
+        HDF_LOGE("%s: fail to get reassoc", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadBuffer(reqData, (const void **)(&staInfo.ie), &staInfo.ieLen)) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get ie", __FUNCTION__);
+        HDF_LOGE("%s: fail to get ie", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadBuffer(reqData, (const void **)(&staInfo.macAddr), &len) || (len != ETH_ADDR_LEN)) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get macAddr", __FUNCTION__);
+        HDF_LOGE("%s: fail to get macAddr", __FUNCTION__);
         return;
     }
     WifiEventReport(ifName, event, &staInfo);
@@ -52,7 +52,7 @@ static void WifiEventDelStaProcess(const char *ifName, uint32_t event, struct Hd
     uint32_t len = 0;
 
     if ((!HdfSbufReadBuffer(reqData, (const void **)(&addr), &len)) || (len != ETH_ADDR_LEN)) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get macAddr", __FUNCTION__);
+        HDF_LOGE("%s: fail to get macAddr", __FUNCTION__);
         return;
     }
     WifiEventReport(ifName, event, addr);
@@ -63,15 +63,15 @@ static void WifiEventRxMgmtProcess(const char *ifName, uint32_t event, struct Hd
     WifiRxMgmt rxMgmt;
 
     if (!HdfSbufReadInt32(reqData, &rxMgmt.freq)) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get freq", __FUNCTION__);
+        HDF_LOGE("%s: fail to get freq", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadInt32(reqData, &rxMgmt.sigMbm)) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get sigMbm", __FUNCTION__);
+        HDF_LOGE("%s: fail to get sigMbm", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadBuffer(reqData, (const void **)(&rxMgmt.buf), &rxMgmt.len)) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get buf", __FUNCTION__);
+        HDF_LOGE("%s: fail to get buf", __FUNCTION__);
         return;
     }
     WifiEventReport(ifName, event, &rxMgmt);
@@ -82,11 +82,11 @@ static void WifiEventTxStatusProcess(const char *ifName, uint32_t event, struct 
     WifiTxStatus txStatus;
 
     if (!HdfSbufReadUint8(reqData, &txStatus.ack)) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get ack", __FUNCTION__);
+        HDF_LOGE("%s: fail to get ack", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadBuffer(reqData, (const void **)(&txStatus.buf), &txStatus.len)) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get buf", __FUNCTION__);
+        HDF_LOGE("%s: fail to get buf", __FUNCTION__);
         return;
     }
     WifiEventReport(ifName, event, &txStatus);
@@ -97,7 +97,7 @@ static void WifiEventScanDoneProcess(const char *ifName, uint32_t event, struct 
     uint32_t status;
 
     if (!HdfSbufReadUint32(reqData, &status)) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get status", __FUNCTION__);
+        HDF_LOGE("%s: fail to get status", __FUNCTION__);
         return;
     }
     WifiEventReport(ifName, event, &status);
@@ -109,35 +109,35 @@ static void WifiEventScanResultProcess(const char *ifName, uint32_t event, struc
     uint32_t len = 0;
 
     if (!HdfSbufReadInt16(reqData, &(scanResult.beaconInt))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get beaconInt", __FUNCTION__);
+        HDF_LOGE("%s: fail to get beaconInt", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadInt16(reqData, &(scanResult.caps))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get caps", __FUNCTION__);
+        HDF_LOGE("%s: fail to get caps", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadInt32(reqData, &(scanResult.level))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get level", __FUNCTION__);
+        HDF_LOGE("%s: fail to get level", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadInt32(reqData, &(scanResult.freq))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get freq", __FUNCTION__);
+        HDF_LOGE("%s: fail to get freq", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadInt32(reqData, &(scanResult.flags))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get flags", __FUNCTION__);
+        HDF_LOGE("%s: fail to get flags", __FUNCTION__);
         return;
     }
     if ((!HdfSbufReadBuffer(reqData, (const void **)(&(scanResult.bssid)), &len)) || len != ETH_ADDR_LEN) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get bssid", __FUNCTION__);
+        HDF_LOGE("%s: fail to get bssid", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadBuffer(reqData, (const void **)(&(scanResult.ie)), &(scanResult.ieLen))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get ie", __FUNCTION__);
+        HDF_LOGE("%s: fail to get ie", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadBuffer(reqData, (const void **)(&(scanResult.beaconIe)), &(scanResult.beaconIeLen))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get beaconIe", __FUNCTION__);
+        HDF_LOGE("%s: fail to get beaconIe", __FUNCTION__);
         return;
     }
     WifiEventReport(ifName, event, &scanResult);
@@ -149,23 +149,23 @@ static void WifiEventConnectResultProcess(const char *ifName, uint32_t event, st
     uint32_t len = 0;
 
     if (!HdfSbufReadUint16(reqData, &(result.status))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get status", __FUNCTION__);
+        HDF_LOGE("%s: fail to get status", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadUint16(reqData, &(result.freq))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get freq", __FUNCTION__);
+        HDF_LOGE("%s: fail to get freq", __FUNCTION__);
         return;
     }
     if ((!HdfSbufReadBuffer(reqData, (const void **)(&(result.bssid)), &len)) || len != ETH_ADDR_LEN) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get bssid", __FUNCTION__);
+        HDF_LOGE("%s: fail to get bssid", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadBuffer(reqData, (const void **)(&(result.reqIe)), &(result.reqIeLen))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get reqIe", __FUNCTION__);
+        HDF_LOGE("%s: fail to get reqIe", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadBuffer(reqData, (const void **)(&(result.respIe)), &(result.respIeLen))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get respIe", __FUNCTION__);
+        HDF_LOGE("%s: fail to get respIe", __FUNCTION__);
         return;
     }
     WifiEventReport(ifName, event, &result);
@@ -176,11 +176,11 @@ static void WifiEventDisconnectProcess(const char *ifName, uint32_t event, struc
     WifiDisconnect result;
 
     if (!HdfSbufReadUint16(reqData, &(result.reason))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get reason", __FUNCTION__);
+        HDF_LOGE("%s: fail to get reason", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadBuffer(reqData, (const void **)(&(result.ie)), &(result.ieLen))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get bssid", __FUNCTION__);
+        HDF_LOGE("%s: fail to get bssid", __FUNCTION__);
         return;
     }
     WifiEventReport(ifName, event, &result);
@@ -197,11 +197,11 @@ static void WifiEventResetDriverProcess(const char *ifName, int32_t event, struc
     int resetStatus;
 
     if (!HdfSbufReadInt32(reqData, &resetStatus)) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get resetStatus, line: %d", __FUNCTION__, __LINE__);
+        HDF_LOGE("%s: fail to get resetStatus, line: %d", __FUNCTION__, __LINE__);
         return;
     }
     if (!HdfSbufReadUint8(reqData, &chipId)) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get chipId, line: %d", __FUNCTION__, __LINE__);
+        HDF_LOGE("%s: fail to get chipId, line: %d", __FUNCTION__, __LINE__);
         return;
     }
     WifiEventReport(ifName, event, &resetStatus);
@@ -211,11 +211,11 @@ static void WifiDriverEventRemainOnChannelProcess(const char *ifName, uint32_t e
 {
     WifiOnChannel result = {0};
     if (!HdfSbufReadUint32(reqData, &(result.freq))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s failed to get frequency.", __FUNCTION__);
+        HDF_LOGE("%s failed to get frequency.", __FUNCTION__);
         return;
     }
     if (!HdfSbufReadUint32(reqData, &(result.duration))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s failed to get duration.", __FUNCTION__);
+        HDF_LOGE("%s failed to get duration.", __FUNCTION__);
         return;
     }
     WifiEventReport(ifName, event, &result);
@@ -225,7 +225,7 @@ static void WifiDriverEventCancelRemainOnChannelProcess(const char *ifName, uint
 {
     WifiOnChannel result = {0};
     if (!HdfSbufReadUint32(reqData, &(result.freq))) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: fail to get freq", __FUNCTION__);
+        HDF_LOGE("%s: fail to get freq", __FUNCTION__);
         return;
     }
     WifiEventReport(ifName, event, &result);
@@ -236,18 +236,17 @@ int OnWiFiEvents(struct HdfDevEventlistener *listener,
 {
     (void)listener;
     (void)service;
-    (void)data;
 
     if (data == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: params is NULL, line: %d", __FUNCTION__, __LINE__);
+        HDF_LOGE("%s: params is NULL, line: %d", __FUNCTION__, __LINE__);
         return RET_CODE_FAILURE;
     }
     const char *ifName = HdfSbufReadString(data);
     if (ifName == NULL) {
-        HILOG_ERROR(LOG_DOMAIN, "%s fail to get ifname", __FUNCTION__);
+        HDF_LOGE("%s fail to get ifname", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    HILOG_INFO(LOG_DOMAIN, "%s: WifiDriverEventProcess event=%d", __FUNCTION__, eventId);
+    HDF_LOGI("%s: WifiDriverEventProcess event=%d", __FUNCTION__, eventId);
     switch (eventId) {
         case WIFI_EVENT_NEW_STA:
             WifiEventNewStaProcess(ifName, eventId, data);
