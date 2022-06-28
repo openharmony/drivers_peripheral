@@ -107,7 +107,7 @@ int32_t ThermalSimulationNode::AddSensorTypeTemp()
     char fileBuf[MAX_PATH] = {0};
     char typeBuf[MAX_PATH] = {0};
     char tempBuf[MAX_PATH] = {0};
-    sensor["battery"] = 0;
+    sensor["battery"] = 40100;
     sensor["charger"] = 0;
     sensor["pa"] = 0;
     sensor["ap"] = 0;
