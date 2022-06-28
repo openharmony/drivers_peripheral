@@ -41,7 +41,7 @@ if (defined(ohos_lite)) {
     deps = []
     public_configs = [ ":utils_config" ]
     subsystem_name = "hdf"
-    part_name = "driver_peripheral_camera"
+    part_name = "drivers_peripheral_camera"
   }
 } else {
   import("//build/ohos.gni")
@@ -99,6 +99,6 @@ if (defined(ohos_lite)) {
     public_configs = [ ":utils_config" ]
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
-    part_name = "driver_peripheral_camera"
+    part_name = "drivers_peripheral_camera"
   }
 }
