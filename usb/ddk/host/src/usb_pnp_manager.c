@@ -67,6 +67,7 @@ static int32_t UsbPnpManagerBind(struct HdfDeviceObject *device)
 
 static int32_t UsbPnpManagerInit(struct HdfDeviceObject *device)
 {
+#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
     int32_t status;
     struct HdfIoService *usbPnpServ = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
     static struct HdfDevEventlistener usbPnpListener = {
@@ -84,6 +85,7 @@ static int32_t UsbPnpManagerInit(struct HdfDeviceObject *device)
         HDF_LOGE("HdfDeviceRegisterEventListener failed status=%d", status);
         return status;
     }
+#endif
 
     HDF_LOGE("UsbPnpManagerInit done");
     return UsbDdkPnpLoaderEventHandle();

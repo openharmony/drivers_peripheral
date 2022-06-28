@@ -39,6 +39,7 @@ int32_t UsbdDeviceCreateAndAttach(struct UsbdService *service, uint8_t busNum, u
 int32_t UsbdDeviceDettach(struct UsbdService *service, uint8_t busNum, uint8_t devAddr);
 int32_t UsbdRemoveBusDev(struct UsbdService *service, uint8_t busNum);
 
+#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, struct HdfSBuf *data)
 {
     struct UsbPnpNotifyMatchInfoTable *infoTable = NULL;
@@ -80,9 +81,11 @@ static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, struct HdfSBu
     }
     return HDF_SUCCESS;
 }
+#endif
 
 static int32_t UsbdEventHandle(const struct UsbdService *inst)
 {
+#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
     g_usbPnpServ = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
     g_usbPnpListener.callBack = UsbdPnpLoaderEventReceived;
     g_usbPnpListener.priv = (void *)(inst);
@@ -96,9 +99,10 @@ static int32_t UsbdEventHandle(const struct UsbdService *inst)
     status = HdfDeviceRegisterEventListener(g_usbPnpServ, &g_usbPnpListener);
     if (status != HDF_SUCCESS) {
         HDF_LOGE("HdfDeviceRegisterEventListener failed status=%{public}d", status);
+        return status;
     }
-
-    return status;
+#endif
+    return HDF_SUCCESS;
 }
 
 static int32_t UsbdDriverBind(struct HdfDeviceObject *device)
@@ -191,6 +195,7 @@ struct HdfDriverEntry g_usbdDriverEntry = {
 };
 HDF_INIT(g_usbdDriverEntry);
 
+#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 static int32_t HdfReadDevice(struct UsbdService *service, int32_t *count, int32_t *size, struct HdfSBuf *reply)
 {
     int32_t busNum;
@@ -236,9 +241,11 @@ static int32_t HdfReadDevice(struct UsbdService *service, int32_t *count, int32_
     ++(*count);
     return HDF_SUCCESS;
 }
+#endif
 
 static int32_t UsbdAddDevicesOnStart(struct UsbdService *service)
 {
+#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
     struct HdfIoService *usbPnpServ = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
     if (service == NULL || usbPnpServ == NULL) {
         HDF_LOGE(
@@ -279,7 +286,8 @@ static int32_t UsbdAddDevicesOnStart(struct UsbdService *service)
     HdfSbufRecycle(data);
     HdfSbufRecycle(reply);
     HdfIoServiceRecycle(usbPnpServ);
-    return ret;
+#endif
+    return HDF_SUCCESS;
 }
 
 int32_t BindUsbSubscriber(struct UsbdService *service, struct UsbdSubscriber *subscriber)
