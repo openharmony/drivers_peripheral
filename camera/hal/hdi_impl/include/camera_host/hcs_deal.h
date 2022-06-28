@@ -109,6 +109,9 @@ private:
     RetCode DealAvaliableBasicConfigurations(
         const struct DeviceResourceNode &metadataNode,
         std::shared_ptr<Camera::CameraMetadata> &metadata);
+    RetCode DealSensorOrientation(
+        const struct DeviceResourceNode &metadataNode,
+        std::shared_ptr<Camera::CameraMetadata> &metadata);
 
 private:
     std::string sPathName;
