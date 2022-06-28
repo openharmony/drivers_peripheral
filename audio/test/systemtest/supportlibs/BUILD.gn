@@ -20,7 +20,7 @@ if (defined(ohos_lite)) {
 }
 
 ###########################end###########################
-group("lib") {
+group("supportlibs") {
   if (!defined(ohos_lite)) {
     testonly = true
   }

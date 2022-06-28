@@ -212,22 +212,22 @@ int32_t AudioLibRenderTest::LibStartAndStream(const std::string path, struct Aud
         return HDF_FAILURE;
     }
     if (WavHeadAnalysis(wavHeadInfo, file, attrs)) {
-        fclose(file);
+        (void)fclose(file);
         return HDF_FAILURE;
     }
     ret = FrameLibStart(file, attrs, wavHeadInfo, hwRender);
     if (ret < 0) {
-        fclose(file);
+        (void)fclose(file);
         return HDF_FAILURE;
     }
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_WRITE, &hwRender->renderParam);
     if (ret < 0) {
-        fclose(file);
+        (void)fclose(file);
         free(hwRender->renderParam.frameRenderMode.buffer);
         hwRender->renderParam.frameRenderMode.buffer = nullptr;
         return HDF_FAILURE;
     }
-    fclose(file);
+    (void)fclose(file);
     free(hwRender->renderParam.frameRenderMode.buffer);
     hwRender->renderParam.frameRenderMode.buffer = nullptr;
     return HDF_SUCCESS;
