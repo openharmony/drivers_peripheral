@@ -79,7 +79,7 @@ static int32_t GetComponentNum()
 static int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t count)
 {
     struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
-    if (data == NULL) {
+    if (data == NULL || count <= 0) {
         HDF_LOGE("%{public}s: Failed to obtain", __func__);
         return HDF_FAILURE;
     }
@@ -95,15 +95,16 @@ static int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t 
         return HDF_FAILURE;
     }
 
+    if (!HdfSbufWriteInt32(data, count)) {
+        HDF_LOGE("%{public}s: write count failed!", __func__);
+        ReleaseSbuf(data, reply);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
     if (g_codecComponentManagerProxy.remoteOmx->dispatcher->Dispatch(g_codecComponentManagerProxy.remoteOmx,
                                                                      CMD_CODEC_GET_COMPONENT_CAPABILITY_LIST, data,
                                                                      reply) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: dispatch request failed!", __func__);
-        ReleaseSbuf(data, reply);
-        return HDF_FAILURE;
-    }
-
-    if (count <= 0) {
         ReleaseSbuf(data, reply);
         return HDF_FAILURE;
     }
