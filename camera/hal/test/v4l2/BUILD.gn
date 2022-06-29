@@ -128,6 +128,7 @@ if (defined(ohos_lite)) {
     module_out_path = module_output_path
     sources = [
       "./src/camera_ability_test.cpp",
+      "./src/double_preview_test.cpp",
       "./src/hdfcamera_facedetect.cpp",
       "./src/open_camera_test.cpp",
       "./src/preview_test.cpp",
