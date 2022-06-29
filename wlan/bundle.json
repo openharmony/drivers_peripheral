@@ -28,20 +28,7 @@
       "test": [
         "//drivers/peripheral/wlan/test:hdf_test_wlan"
       ],
-      "inner_kits": [
-        {
-          "name": "//drivers/interface/wlan/v1_0:libwlan_proxy_1.0",
-          "header": {
-            "header_files": [
-              "wifi_hal.h",
-              "wifi_hal_ap_feature.h",
-              "wifi_hal_base_feature.h",
-              "wifi_hal_sta_feature.h"
-            ],
-            "header_base": "//drivers/peripheral/wlan/interfaces/include"
-          }
-        }
-      ]
+      "inner_kits": []
     }
   }
 }

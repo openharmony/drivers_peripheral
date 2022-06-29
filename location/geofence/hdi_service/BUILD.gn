@@ -19,11 +19,10 @@ ohos_shared_library("libgeofence_interface_service_1.0") {
     "//drivers/peripheral/location/gnss/hdi_service",
   ]
   sources = [ "geofence_interface_impl.cpp" ]
-
-  deps = [
-    "//drivers/interface/location/geofence/v1_0:liblocation_geofence_stub_1.0",
-    "//drivers/peripheral/location/gnss/hdi_service:libgnss_interface_service_1.0",
+  configs = [
+    "//drivers/interface/location/geofence/v1_0:location_geofence_idl_headers",
   ]
+  deps = [ "//drivers/peripheral/location/gnss/hdi_service:libgnss_interface_service_1.0" ]
 
   cflags = [
     "-Wall",
@@ -74,6 +73,7 @@ ohos_shared_library("liblocation_geofence_hdi_driver") {
 
   if (is_standard_system) {
     external_deps = [
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",

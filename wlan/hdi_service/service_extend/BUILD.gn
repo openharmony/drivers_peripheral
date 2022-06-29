@@ -23,11 +23,8 @@ ohos_shared_library("libwlan_service_extend") {
     "//drivers/peripheral/wlan/hdi_service/service_extend",
   ]
   sources = [ "wlan_extend_cmd.c" ]
-
-  deps = [
-    "//drivers/interface/wlan/v1_0:libwlan_stub_1.0",
-    "//drivers/peripheral/wlan/hal:wifi_hal",
-  ]
+  configs = [ "//drivers/interface/wlan/v1_0:wlan_idl_headers" ]
+  deps = [ "//drivers/peripheral/wlan/hal:wifi_hal" ]
 
   defines = [ "__OHOS__USER__" ]
 
@@ -42,6 +39,7 @@ ohos_shared_library("libwlan_service_extend") {
 
   if (is_standard_system) {
     external_deps = [
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",

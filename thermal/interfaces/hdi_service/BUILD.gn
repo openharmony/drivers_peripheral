@@ -29,11 +29,8 @@ ohos_shared_library("libthermal_interface_service_1.0") {
     "src/thermal_simulation_node.cpp",
     "src/thermal_zone_manager.cpp",
   ]
-
-  deps = [
-    "//drivers/interface/thermal/v1_0:libthermal_stub_1.0",
-    "//third_party/libxml2:xml2",
-  ]
+  configs = [ "//drivers/interface/thermal/v1_0:thermal_idl_headers" ]
+  deps = [ "//third_party/libxml2:xml2" ]
 
   if (is_standard_system) {
     external_deps = [
@@ -64,6 +61,7 @@ ohos_shared_library("libthermal_driver") {
 
   if (is_standard_system) {
     external_deps = [
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",

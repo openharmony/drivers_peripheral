@@ -18,7 +18,7 @@
 
 #include <vector>
 
-#include "v1_0/executor_stub.h"
+#include "v1_0/iexecutor.h"
 
 namespace OHOS {
 namespace HDI {
