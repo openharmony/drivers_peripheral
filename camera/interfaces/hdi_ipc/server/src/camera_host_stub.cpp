@@ -40,6 +40,7 @@ RetCode CameraHostStub::Init()
 int32_t CameraHostStub::CameraHostStubSetCallback(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     if (data.ReadInterfaceToken() != CameraHostStub::GetDescriptor()) {
         HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
         return INVALID_ARGUMENT;
@@ -63,6 +64,7 @@ int32_t CameraHostStub::CameraHostStubSetCallback(
 int32_t CameraHostStub::CameraHostStubGetCameraIds(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     if (cameraHost_ == nullptr) {
         return HDF_FAILURE;
     }
@@ -89,6 +91,7 @@ int32_t CameraHostStub::CameraHostStubGetCameraIds(
 int32_t CameraHostStub::CameraHostStubGetCameraAbility(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     if (data.ReadInterfaceToken() != CameraHostStub::GetDescriptor()) {
         HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
         return INVALID_ARGUMENT;
@@ -119,6 +122,7 @@ int32_t CameraHostStub::CameraHostStubGetCameraAbility(
 int32_t CameraHostStub::CameraHostStubOpenCamera(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     if (data.ReadInterfaceToken() != CameraHostStub::GetDescriptor()) {
         HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
         return INVALID_ARGUMENT;
@@ -161,6 +165,7 @@ int32_t CameraHostStub::CameraHostStubOpenCamera(
 int32_t CameraHostStub::CameraHostStubSetFlashlight(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     if (data.ReadInterfaceToken() != CameraHostStub::GetDescriptor()) {
         HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
         return INVALID_ARGUMENT;
