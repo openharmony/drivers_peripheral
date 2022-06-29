@@ -17,9 +17,10 @@
 #define OHOS_HDI_PIN_AUTH_V1_0_EXECUTOR_IMPL_H
 
 #include <map>
+#include <mutex>
 #include <set>
 #include <vector>
-#include "v1_0/executor_stub.h"
+#include "v1_0/iexecutor.h"
 #include "pin_auth.h"
 #include "nocopyable.h"
 

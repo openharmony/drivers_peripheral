@@ -32,11 +32,9 @@ ohos_fuzztest("TurnOffLightFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "turnofflight_fuzzer.cpp" ]
-  deps = [
-    "//drivers/interface/light/v1_0:liblight_proxy_1.0",
-    "//drivers/peripheral/misc/light/hal:hdi_light",
-  ]
+  deps = [ "//drivers/peripheral/misc/light/hal:hdi_light" ]
   external_deps = [
+    "drivers_interface_light:liblight_proxy_1.0",
     "hdf_core:libhdf_utils",
     "ipc:ipc_single",
     "utils_base:utils",
