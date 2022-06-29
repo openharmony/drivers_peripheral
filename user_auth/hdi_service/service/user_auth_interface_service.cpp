@@ -416,7 +416,7 @@ static void CopyCredentialInfo(const CredentialInfoHal &in, CredentialInfo &out)
 }
 
 int32_t UserAuthInterfaceService::UpdateEnrollmentResult(int32_t userId, const std::vector<uint8_t> &scheduleResult,
-    uint64_t &credentialId, CredentialInfo &oldInfo)
+    EnrollResultInfo &info)
 {
     IAM_LOGI("start");
     if (scheduleResult.size() == 0) {
@@ -438,10 +438,10 @@ int32_t UserAuthInterfaceService::UpdateEnrollmentResult(int32_t userId, const s
     }
     if (isUpdate) {
         CredentialInfoHal oldCredentialHal = {};
-        ret = UpdateCredentialFunc(userId, scheduleResultBuffer, &credentialId, &oldCredentialHal);
-        CopyCredentialInfo(oldCredentialHal, oldInfo);
+        ret = UpdateCredentialFunc(userId, scheduleResultBuffer, &info.credentialId, &oldCredentialHal);
+        CopyCredentialInfo(oldCredentialHal, info.oldInfo);
     } else {
-        ret = AddCredentialFunc(scheduleResultBuffer, &credentialId);
+        ret = AddCredentialFunc(scheduleResultBuffer, &info.credentialId);
     }
     DestoryBuffer(scheduleResultBuffer);
     return ret;
