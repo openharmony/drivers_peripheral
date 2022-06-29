@@ -19,6 +19,7 @@
 #include <securec.h>
 #include <unistd.h>
 #include "codec_adapter_interface.h"
+#include "codec_component_capability_config.h"
 #include "codec_component_manager_stub.h"
 #include "codec_component_type_service.h"
 
@@ -48,6 +49,24 @@ uint32_t GetNextComponentId()
         }
     } while (find);
     return tempId;
+}
+
+int32_t OmxManagerGetComponentNum()
+{
+    int32_t num = 0;
+    if (GetComponentNum(&num) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s, GetComponentNum error!", __func__);
+    }
+    return num;
+}
+
+int32_t OmxManagerGetComponentCapabilityList(CodecCompCapability *capList, int32_t count)
+{
+    int32_t err = GetComponentCapabilityList(capList, count);
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s, GetComponentNum error!", __func__);
+    }
+    return err;
 }
 
 int32_t OmxManagerCreateComponent(struct CodecComponentType **component, uint32_t *componentId, char *compName,
@@ -129,6 +148,8 @@ int32_t OmxManagerDestroyComponent(uint32_t componentId)
 
 void CodecComponentManagerServiceConstruct(struct CodecComponentManager *manager)
 {
+    manager->GetComponentNum = OmxManagerGetComponentNum;
+    manager->GetComponentCapabilityList = OmxManagerGetComponentCapabilityList;
     manager->CreateComponent = OmxManagerCreateComponent;
     manager->DestoryComponent = OmxManagerDestroyComponent;
 }
