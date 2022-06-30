@@ -24,7 +24,7 @@
 uint64_t GetRtcTime(void)
 {
     struct timespec curTime;
-    int res = clock_gettime(CLOCK_REALTIME, &curTime);
+    int res = clock_gettime(CLOCK_MONOTONIC, &curTime);
     if (res != 0) {
         LOG_ERROR("get time fail");
         return 0;
