@@ -35,10 +35,9 @@ ohos_unittest("hdi_unittest_motion") {
     "-fno-strict-aliasing",
   ]
 
-  deps = [ "//drivers/interface/motion/v1_0:libmotion_proxy_1.0" ]
-
   if (is_standard_system) {
     external_deps = [
+      "drivers_interface_motion:libmotion_proxy_1.0",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",

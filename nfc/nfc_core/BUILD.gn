@@ -18,7 +18,6 @@ group("nfc_entry") {
   deps = [
     "hdi_service:hdi_nfc_service",
     "vendor_adaptor:nfc_vendor_adaptor",
-    "//drivers/interface/nfc/nfc_core/v1_0:nfc",
     "//third_party/nfc-nci/nfc-halimpl/SN100x:libnfc-halimpl",
   ]
 }

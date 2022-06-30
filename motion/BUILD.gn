@@ -12,7 +12,7 @@
 # limitations under the License.
 
 group("motion_entry") {
-  deps = [ "//drivers/interface/motion/v1_0:motion" ]
+  deps = []
   HDI_MOTION_SERVICE_PATH =
       rebase_path("//device/soc/${device_company}/common/hal/motion")
   cmd = "if [ -f ${HDI_MOTION_SERVICE_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
