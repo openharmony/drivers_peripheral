@@ -36,13 +36,14 @@ bool BufferHandleMarshalling(struct HdfSBuf *data, BufferHandle *handle)
         HDF_LOGE("%{public}s: write handle failed!", __func__);
         return false;
     }
-
-    validFd = (handle->fd >= 0);
+    if (handle->fd >= 0) {
+        validFd = 1;
+    }
     if (!HdfSbufWriteUint8(data, validFd)) {
         HDF_LOGE("%{public}s: write uint8_t failed!", __func__);
         return false;
     }
-    if (validFd && !HdfSbufWriteFileDescriptor(data, handle->fd)) {
+    if ((validFd != 0) && !HdfSbufWriteFileDescriptor(data, handle->fd)) {
         HDF_LOGE("%{public}s: write fd failed!", __func__);
         return false;
     }
