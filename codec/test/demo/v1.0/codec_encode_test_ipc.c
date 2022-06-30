@@ -29,7 +29,6 @@
 
 #define HDF_LOG_TAG codec_hdi_demo_encode
 #define TEST_SERVICE_NAME   "codec_hdi_service"
-#define STREAM_PACKET_BUFFER_SIZE   (4 * 1024)
 #define QUEUE_TIME_OUT              10
 #define READ_SEGMENT_SIZE           8192
 #define FRAME_SIZE_MULTI         	3
@@ -636,6 +635,7 @@ int32_t Encode(void)
 {
     pthread_t thd;
     pthread_attr_t attr;
+    int32_t bufferSize = g_cmd.width * g_cmd.height * INPUT_BUFFER_SIZE_OPERATOR;
     int32_t ret = 0;
 
     if (OpenFile() != HDF_SUCCESS) {
@@ -666,8 +666,7 @@ int32_t Encode(void)
         RevertEncodeStep3();
         return HDF_FAILURE;
     }
-    if (!InitBuffer(INPUT_BUFFER_NUM, g_cmd.width * g_cmd.height * INPUT_BUFFER_SIZE_OPERATOR,
-        OUTPUT_BUFFER_NUM, STREAM_PACKET_BUFFER_SIZE)) {
+    if (!InitBuffer(INPUT_BUFFER_NUM, bufferSize, OUTPUT_BUFFER_NUM, bufferSize)) {
         HDF_LOGE("%{public}s: InitBuffer failed", __func__);
         RevertEncodeStep3();
         return HDF_FAILURE;
