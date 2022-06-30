@@ -35,6 +35,7 @@ static int32_t CameraServiceDispatch(struct HdfDeviceIoClient *client, int cmdId
 
 int HdfCameraHostDriverInit(struct HdfDeviceObject *deviceObject)
 {
+    (void)deviceObject;
     return HDF_SUCCESS;
 }
 
