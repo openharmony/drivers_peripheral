@@ -254,10 +254,11 @@ void FuzzUpdateEnrollmentResult(Parcel &parcel)
     int32_t userId = parcel.ReadInt32();
     std::vector<uint8_t> scheduleResult;
     FillFuzzUint8Vector(parcel, scheduleResult);
-    uint64_t credentialId = parcel.ReadUint64();
-    CredentialInfo oldInfo;
-    FillFuzzCredentialInfo(parcel, oldInfo);
-    g_service.UpdateEnrollmentResult(userId, scheduleResult, credentialId, oldInfo);
+    EnrollResultInfo info = {};
+    FillFuzzCredentialInfo(parcel, info.oldInfo);
+    info.credentialId = parcel.ReadUint64();
+    FillFuzzUint8Vector(parcel, info.rootSecret);
+    g_service.UpdateEnrollmentResult(userId, scheduleResult, info);
     IAM_LOGI("end");
 }
 
