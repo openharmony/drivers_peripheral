@@ -18,7 +18,7 @@
 
 using namespace std;
 using namespace testing::ext;
-using namespace HMOS::Audio;
+using namespace OHOS::Audio;
 
 namespace {
 const string BIND_CONTROL = "control";
@@ -569,7 +569,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0012, TestSize.Level1
     ASSERT_NE(nullptr, GetAudioManager);
     audiopara.manager = GetAudioManager();
     ASSERT_NE(nullptr, audiopara.manager);
-    ret = HMOS::Audio::GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
+    ret = OHOS::Audio::GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
                                       &audiopara.adapter, audiopara.audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.adapter->InitAllPorts(audiopara.adapter);

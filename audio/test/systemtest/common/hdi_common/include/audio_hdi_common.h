@@ -43,7 +43,7 @@
 #include "hdf_io_service_if.h"
 #include "hdf_sbuf.h"
 
-namespace HMOS {
+namespace OHOS {
 namespace Audio {
 #ifdef AUDIO_ADM_SO
     const std::string FUNCTION_NAME = "GetAudioManagerFuncs";

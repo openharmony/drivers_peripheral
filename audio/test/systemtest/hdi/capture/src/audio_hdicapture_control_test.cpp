@@ -38,7 +38,7 @@
 
 using namespace std;
 using namespace testing::ext;
-using namespace HMOS::Audio;
+using namespace OHOS::Audio;
 
 namespace {
 const string ADAPTER_NAME_USB = "USB";
