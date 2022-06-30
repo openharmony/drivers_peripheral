@@ -132,9 +132,9 @@ void AudioHdiCapturePerformaceTest::SetUp(void) {}
 void AudioHdiCapturePerformaceTest::TearDown(void) {}
 
 /**
-* @tc.name  the performace of AudioCreateCapture
+* @tc.name  the performance of AudioCreateCapture
 * @tc.number  SUB_Audio_HDI_AudioCreateCapture_Performance_0001
-* @tc.devDesc  tests the performace of AudioCreateCapture interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCreateCapture interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -176,9 +176,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCreateCapture_Perform
 }
 
 /**
-* @tc.name  the performace of AudioDestroyCapture
+* @tc.name  the performance of AudioDestroyCapture
 * @tc.number  SUB_Audio_HDI_AudioDestroyCapture_Performance_0001
-* @tc.devDesc  tests the performace of AudioDestroyCapture interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioDestroyCapture interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -211,9 +211,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioDestroyCapture_Perfor
 }
 
 /**
-* @tc.name  the performace of AudioCaptureStart
+* @tc.name  the performance of AudioCaptureStart
 * @tc.number  SUB_Audio_HDI_AudioCaptureStart_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureStart interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureStart interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -244,9 +244,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureStart_Performa
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of AudioCapturePause
+* @tc.name  the performance of AudioCapturePause
 * @tc.number  SUB_Audio_HDI_AudioCapturePause_Performance_0001
-* @tc.devDesc  tests the performace of AudioCapturePause interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCapturePause interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -282,9 +282,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCapturePause_Performa
 }
 
 /**
-* @tc.name  the performace of AudioCaptureResume
+* @tc.name  the performance of AudioCaptureResume
 * @tc.number  SUB_Audio_HDI_AudioCaptureResume_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureResume interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureResume interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -319,9 +319,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureResume_Perform
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  the performace of AudioCaptureStop
+* @tc.name  the performance of AudioCaptureStop
 * @tc.number  SUB_Audio_HDI_AudioCaptureStop_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureStop interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureStop interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -358,9 +358,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureStop_Performan
 }
 
 /**
-* @tc.name  the performace of AudioCaptureSetSampleAttributes
+* @tc.name  the performance of AudioCaptureSetSampleAttributes
 * @tc.number  SUB_Audio_HDI_AudioCaptureSetSampleAttributes_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureSetSampleAttributes interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureSetSampleAttributes interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -395,9 +395,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetSampleAttri
     audiopara.adapter = nullptr;
 }
 /**
-* @tc.name  the performace of AudioCaptureCaptureFrame
+* @tc.name  the performance of AudioCaptureCaptureFrame
 * @tc.number  SUB_Audio_HDI_AudioCaptureCaptureFrame_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureCaptureFrame interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureCaptureFrame interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -451,9 +451,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureCaptureFrame_P
     audiopara.frame = nullptr;
 }
 /**
-* @tc.name  the performace of AudioCaptureGetSampleAttributes
+* @tc.name  the performance of AudioCaptureGetSampleAttributes
 * @tc.number  SUB_Audio_HDI_AudioCaptureGetSampleAttributes_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureGetSampleAttributes interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureGetSampleAttributes interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -491,9 +491,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetSampleAttri
 }
 
 /**
-* @tc.name  the performace of AudioCaptureSetMute
+* @tc.name  the performance of AudioCaptureSetMute
 * @tc.number  SUB_Audio_HDI_AudioCaptureSetMute_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureSetMute interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureSetMute interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -531,9 +531,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetMute_Perfor
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetMute
+* @tc.name  the performance of AudioCaptureGetMute
 * @tc.number  SUB_Audio_HDI_AudioCaptureGetMute_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureGetMute interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureGetMute interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -571,9 +571,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetMute_Perfor
 }
 
 /**
-* @tc.name  the performace of AudioCaptureSetVolume
+* @tc.name  the performance of AudioCaptureSetVolume
 * @tc.number  SUB_Audio_HDI_AudioCaptureSetVolume_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureSetVolume interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureSetVolume interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -612,9 +612,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetVolume_Perf
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetVolume
+* @tc.name  the performance of AudioCaptureGetVolume
 * @tc.number  SUB_Audio_HDI_AudioCaptureGetVolume_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureGetVolume interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureGetVolume interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -653,9 +653,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetVolume_Perf
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetGain
+* @tc.name  the performance of AudioCaptureGetGain
 * @tc.number  SUB_Audio_HDI_AudioCaptureGetGain_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureGetGain interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureGetGain interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -694,9 +694,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetGain_Perfor
 }
 
 /**
-* @tc.name  the performace of AudioCaptureSetGain
+* @tc.name  the performance of AudioCaptureSetGain
 * @tc.number  SUB_Audio_HDI_AudioCaptureSetGain_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureSetGain interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureSetGain interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -735,9 +735,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetGain_Perfor
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetCurrentChannelId
+* @tc.name  the performance of AudioCaptureGetCurrentChannelId
 * @tc.number  SUB_Audio_HDI_AudioCaptureGetCurrentChannelId_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureGetCurrentChannelId interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureGetCurrentChannelId interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -772,9 +772,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetCurrentChan
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetFrameCount
+* @tc.name  the performance of AudioCaptureGetFrameCount
 * @tc.number  SUB_Audio_HDI_AudioCaptureGetFrameCount_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureGetFrameCount interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureGetFrameCount interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -810,9 +810,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetFrameCount_
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetFrameSize
+* @tc.name  the performance of AudioCaptureGetFrameSize
 * @tc.number  SUB_Audio_HDI_AudioCaptureGetFrameSize_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureGetFrameSize interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureGetFrameSize interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -848,9 +848,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetFrameSize_P
 }
 
 /**
-* @tc.name  the performace of AudioCaptureFlush
+* @tc.name  the performance of AudioCaptureFlush
 * @tc.number  SUB_Audio_HDI_AudioCaptureFlush_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureFlush interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureFlush interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -884,9 +884,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureFlush_Performa
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetGainThreshold
+* @tc.name  the performance of AudioCaptureGetGainThreshold
 * @tc.number  SUB_Audio_HDI_AudioCaptureGetGainThreshold_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureGetGainThreshold interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureGetGainThreshold interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -924,9 +924,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetGainThresho
 }
 
 /**
-* @tc.name  the performace of AudioCaptureCheckSceneCapability
+* @tc.name  the performance of AudioCaptureCheckSceneCapability
 * @tc.number  SUB_Audio_HDI_AudioCaptureCheckSceneCapability_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureCheckSceneCapability interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureCheckSceneCapability interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -964,9 +964,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureCheckSceneCapa
 }
 
 /**
-* @tc.name  the performace of AudioCaptureSelectScene
+* @tc.name  the performance of AudioCaptureSelectScene
 * @tc.number  SUB_Audio_HDI_AudioCaptureSelectScene_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureSelectScene interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureSelectScene interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1002,9 +1002,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSelectScene_Pe
 }
 
 /**
-* @tc.name  the performace of AudioGetCapturePosition
+* @tc.name  the performance of AudioGetCapturePosition
 * @tc.number  SUB_Audio_HDI_AudioGetCapturePosition_Performance_0001
-* @tc.devDesc  tests the performace of AudioCaptureGetCapturePosition interface by executing 1000 times,
+* @tc.devDesc  tests the performance of AudioCaptureGetCapturePosition interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1038,9 +1038,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioGetCapturePosition_Pe
 }
 
 /**
-* @tc.name  the performace of AudioCaptureSetExtraParams
+* @tc.name  the performance of AudioCaptureSetExtraParams
 * @tc.number  SUB_Audio_HDI_AudioCaptureSetExtraParams_Performance_0001
-* @tc.desc  tests the performace of AudioCaptureSetExtraParams interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioCaptureSetExtraParams interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1073,9 +1073,9 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetExtraParams
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetExtraParams
+* @tc.name  the performance of AudioCaptureGetExtraParams
 * @tc.number  SUB_Audio_HDI_AudioCaptureGetExtraParams_Performance_0001
-* @tc.desc  tests the performace of AudioCaptureGetExtraParams interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioCaptureGetExtraParams interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */
@@ -1116,9 +1116,9 @@ attr-sampling-rate=48000";
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetMmapPosition
+* @tc.name  the performance of AudioCaptureGetMmapPosition
 * @tc.number  SUB_Audio_HDI_AudioCaptureGetMmapPosition_Performance_0001
-* @tc.desc  tests the performace of AudioCaptureGetMmapPosition interface by executing 1000 times,
+* @tc.desc  tests the performance of AudioCaptureGetMmapPosition interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.author: liutian
 */

@@ -134,6 +134,24 @@ struct AudioAttribute {
      * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
      */
     int32_t (*GetMmapPosition)(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time);
+
+    /**
+     * @brief Add the audio effect which the effectid indicated.
+     *
+     * @param handle Indicates the audio handle.
+     * @param effectid Indicates the audio effect instance identifier which is going to be added.
+     * @return Returns <b>0</b> if the audio effect were added succesffully; returns a negative value otherwise.
+     */
+    int32_t (*AddAudioEffect)(AudioHandle handle, uint64_t effectid);
+
+    /**
+     * @brief Remove the audio effect which the effectid indicated.
+     *
+     * @param handle Indicates the audio handle.
+     * @param effectid Indicates the audio effect which is going to be removed.
+     * @return Returns <b>0</b> if the audio effect were removed succesffully; returns a negative value otherwise.
+     */
+    int32_t (*RemoveAudioEffect)(AudioHandle handle, uint64_t effectid);
 };
 
 #endif /* AUDIO_ATTRIBUTE_H */

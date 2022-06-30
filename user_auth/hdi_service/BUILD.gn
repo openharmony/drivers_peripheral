@@ -16,7 +16,6 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libuser_auth_interface_service_1.0") {
   include_dirs = [
-    "lock/inc",
     "adaptor/inc",
     "coauth/inc",
     "database/inc",
@@ -37,7 +36,6 @@ ohos_shared_library("libuser_auth_interface_service_1.0") {
     "adaptor/src/file_operator.c",
     "coauth/src/coauth.c",
     "coauth/src/coauth_funcs.c",
-    "coauth/src/coauth_sign_centre.c",
     "coauth/src/executor_message.c",
     "coauth/src/pool.c",
     "common/src/buffer.c",
@@ -48,17 +46,20 @@ ohos_shared_library("libuser_auth_interface_service_1.0") {
     "database/src/idm_database.c",
     "database/src/idm_file_manager.c",
     "hal_sdk/useriam_common.cpp",
+    "idm/src/enroll_specification_check.c",
     "idm/src/idm_session.c",
     "idm/src/user_idm_funcs.c",
+    "key_mgr/src/ed25519_key.c",
     "key_mgr/src/token_key.c",
-    "lock/src/lock.c",
     "service/user_auth_interface_service.cpp",
     "user_auth/src/auth_level.c",
     "user_auth/src/context_manager.c",
+    "user_auth/src/identify_funcs.c",
     "user_auth/src/user_auth_funcs.c",
     "user_auth/src/user_sign_centre.c",
   ]
-  public_deps = [ "//drivers/interface/user_auth/v1_0:libuser_auth_stub_1.0" ]
+  public_configs =
+      [ "//drivers/interface/user_auth/v1_0:user_auth_idl_headers" ]
   external_deps = [
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
@@ -84,7 +85,7 @@ ohos_shared_library("libuser_auth_driver") {
   sources = [ "service/user_auth_interface_driver.cpp" ]
   deps = [
     "//base/useriam/user_auth_framework/common:iam_utils",
-    "//drivers/peripheral/user_auth/hdi_service:libuser_auth_interface_service_1.0",
+    "//drivers/interface/user_auth/v1_0:libuser_auth_stub_1.0",
   ]
 
   external_deps = [

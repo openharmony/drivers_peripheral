@@ -584,7 +584,7 @@ int32_t AudioRenderGetVolume(AudioHandle handle, float *volume)
         return AUDIO_HAL_ERR_INTERNAL;
     }
     volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / 2);
-    int volumeT = (int)((pow(10, volumeTemp) + 5) / 10); // delet 0.X num
+    int volumeT = (int)((pow(10, volumeTemp) + 5) / 10); // delete 0.X num
     *volume = (float)volumeT / 10;  // get volume (0-1)
     return AUDIO_HAL_SUCCESS;
 }
@@ -1141,6 +1141,22 @@ int32_t AudioRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct 
     render->renderParam.frameRenderMode.time.tvNSec =
         (int64_t)((lastBufFrames * SEC_TO_NSEC) / render->renderParam.frameRenderMode.attrs.sampleRate);
     *time = render->renderParam.frameRenderMode.time;
+    return AUDIO_HAL_SUCCESS;
+}
+
+int32_t AudioRenderAddEffect(AudioHandle handle, uint64_t effectid)
+{
+    (void)handle;
+    (void)effectid;
+    HDF_LOGI("%{public}s: add render effect success", __func__);
+    return AUDIO_HAL_SUCCESS;
+}
+
+int32_t AudioRenderRemoveEffect(AudioHandle handle, uint64_t effectid)
+{
+    (void)handle;
+    (void)effectid;
+    HDF_LOGI("%{public}s: remove render effect success", __func__);
     return AUDIO_HAL_SUCCESS;
 }
 

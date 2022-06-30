@@ -38,16 +38,6 @@
             ],
             "header_base": "//drivers/peripheral/sensor/interfaces/include"
           }
-        },
-        {
-          "name": "//drivers/interface/sensor/v1_0:libsensor_proxy_1.0",
-          "header": {
-            "header_files": [
-              "sensor_if.h",
-              "sensor_type.h"
-            ],
-            "header_base": "//drivers/peripheral/sensor/interfaces/include"
-          }
         }
       ]
     }

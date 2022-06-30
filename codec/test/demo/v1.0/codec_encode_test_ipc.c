@@ -266,7 +266,7 @@ void SetQpValue(RKHdiEncodeSetup *encSetup)
             break;
         }
         default: {
-            HDF_LOGE("%{public}s: unsupport encoder rc mode %{public}d", __func__, encSetup->rc.rcMode);
+            HDF_LOGE("%{public}s: unsupported encoder rc mode %{public}d", __func__, encSetup->rc.rcMode);
             break;
         }
     }
@@ -342,7 +342,7 @@ void SetCodecTypeData(RKHdiCodecTypeSetup *codecTypeSet)
             break;
         }
         default: {
-            HDF_LOGE("%{public}s: unsupport encoder coding type %{public}d", __func__, codecTypeSet->mimeCodecType);
+            HDF_LOGE("%{public}s: unsupported encoder coding type %{public}d", __func__, codecTypeSet->mimeCodecType);
             break;
         }
     }

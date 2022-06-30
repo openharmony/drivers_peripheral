@@ -72,7 +72,7 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
       ]
 
       deps = [
-        "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
+        "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common",
         "//third_party/bounds_checking_function:libsec_shared",
       ]
 
@@ -110,7 +110,8 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
         "src/audio_proxy_render.c",
       ]
 
-      deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+      deps =
+          [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common" ]
 
       if (is_standard_system) {
         external_deps = [

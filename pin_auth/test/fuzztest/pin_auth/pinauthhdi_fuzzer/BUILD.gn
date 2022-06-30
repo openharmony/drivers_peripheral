@@ -25,8 +25,8 @@ ohos_fuzztest("PinAuthHdiFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   include_dirs = [
-    "//drivers/peripheral/pin_auth/hdi_service/inc",
-    "//drivers/peripheral/pin_auth/hdi/main/inc",
+    "//drivers/peripheral/pin_auth/hdi_service/service/inc",
+    "//drivers/peripheral/pin_auth/hdi_service/main/inc",
     "//base/useriam/user_auth_framework/common/logs",
   ]
 

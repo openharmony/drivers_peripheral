@@ -583,7 +583,6 @@ static void HdfWlanDelRemoteObj(struct IWlanCallback *self)
     struct HdfWlanRemoteNode *tmp = NULL;
     struct DListHead *head = &HdfStubDriver()->remoteListHead;
 
-    (void)self;
     DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, head, struct HdfWlanRemoteNode, node) {
         if (pos->service->index == self->AsObject(self)->index) {
             DListRemove(&(pos->node));
@@ -1002,12 +1001,14 @@ int32_t WlanInterfaceSetPowerMode(struct IWlanInterface *self, const struct HdfF
     return ret;
 }
 
-int32_t WlanInterfaceSendP2pCmd(struct IWlanInterface *self, const char *ifName, const struct CmdData *data)
+int32_t WlanInterfaceSetProjectionScreenParam(struct IWlanInterface *self, const char *ifName,
+    const struct ProjectionScreenCmdParam *param)
 {
     int32_t ret;
+    ProjScrnCmdParam *projScrnCmdParam = NULL;
 
     (void)self;
-    if (ifName == NULL || data == NULL) {
+    if (ifName == NULL || param == NULL) {
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -1015,10 +1016,27 @@ int32_t WlanInterfaceSendP2pCmd(struct IWlanInterface *self, const char *ifName,
         HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
         return HDF_FAILURE;
     }
-    ret = g_wifi->sendP2pCmd(ifName, (struct HalCmdData *)data);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: get channel meas result failed!, error code: %{public}d", __func__, ret);
+
+    projScrnCmdParam = OsalMemCalloc(sizeof(ProjScrnCmdParam) + param->bufLen);
+    if (projScrnCmdParam == NULL) {
+        HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);
+        return HDF_FAILURE;
     }
+    projScrnCmdParam->cmdId = param->cmdId;
+    projScrnCmdParam->bufLen = param->bufLen;
+    do {
+        if (memcpy_s(projScrnCmdParam->buf, projScrnCmdParam->bufLen, param->buf, param->bufLen) != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s failed", __func__);
+            ret = HDF_FAILURE;
+            break;
+        }
+        ret = g_wifi->setProjectionScreenParam(ifName, projScrnCmdParam);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: get channel meas result failed!, error code: %{public}d", __func__, ret);
+        }
+    } while (0);
+    
+    OsalMemFree(projScrnCmdParam);
     return ret;
 }
 

@@ -839,9 +839,9 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0009, TestSize.Le
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test AudioCreateRender API via setting the incoming parameter desc which portID is not configed
+    * @tc.name  Test AudioCreateRender API via setting the incoming parameter desc which portID is not configured
     * @tc.number  SUB_Audio_HDI_CreateRender_0010
-    * @tc.desc  test AudioCreateRender interface,Returns -1 if the incoming desc which portID is not configed
+    * @tc.desc  test AudioCreateRender interface,Returns -1 if the incoming desc which portID is not configured
     * @tc.author: ZHANGHAILIN
 */
 HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0010, TestSize.Level1)

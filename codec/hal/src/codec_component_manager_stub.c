@@ -26,13 +26,44 @@ typedef void (*SERVICE_CONSTRUCT_FUNC)(struct OmxComponentManager *);
 static int32_t SerStubGetComponentNum(struct CodecComponentManager *serviceImpl, struct HdfSBuf *data,
                                       struct HdfSBuf *reply)
 {
-    return HandleGetNumCmd(reply);
+    int32_t num = serviceImpl->GetComponentNum();
+    if (!HdfSbufWriteInt32(reply, num)) {
+        HDF_LOGE("%{public}s: write num failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HDF_SUCCESS;
 }
 
 static int32_t SerStubGetComponentCapablityList(struct CodecComponentManager *serviceImpl, struct HdfSBuf *data,
                                                 struct HdfSBuf *reply)
 {
-    return HandleGetAllCapablityListCmd(reply);
+    int32_t count = 0;
+    int32_t err = HDF_SUCCESS;
+    CodecCompCapability *caps = NULL;
+    if (!HdfSbufReadInt32(data, &count) || (count <= 0)) {
+        HDF_LOGE("%{public}s: read count failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    caps = (CodecCompCapability *)OsalMemCalloc(sizeof(CodecCompCapability) * (count));
+    if (caps == NULL) {
+        HDF_LOGE("%{public}s: alloc caps failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    err = serviceImpl->GetComponentCapabilityList(caps, count);
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call GetComponentCapabilityList function failed!", __func__);
+        return err;
+    }
+
+    for (int32_t i = 0; i < count; i++) {
+        if (!CodecCompCapabilityBlockMarshalling(reply, &caps[i])) {
+            HDF_LOGE("%{public}s: call CodecCompCapabilityBlockMarshalling function failed!", __func__);
+            err = HDF_ERR_INVALID_PARAM;
+            break;
+        }
+    }
+    OsalMemFree(caps);
+    return err;
 }
 
 static int32_t ReadParamsForCreateComponent(struct HdfSBuf *data, char **compName, int64_t *appData,

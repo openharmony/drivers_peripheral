@@ -36,13 +36,14 @@ bool BufferHandleMarshalling(struct HdfSBuf *data, BufferHandle *handle)
         HDF_LOGE("%{public}s: write handle failed!", __func__);
         return false;
     }
-
-    validFd = (handle->fd >= 0);
+    if (handle->fd >= 0) {
+        validFd = 1;
+    }
     if (!HdfSbufWriteUint8(data, validFd)) {
         HDF_LOGE("%{public}s: write uint8_t failed!", __func__);
         return false;
     }
-    if (validFd && !HdfSbufWriteFileDescriptor(data, handle->fd)) {
+    if ((validFd != 0) && !HdfSbufWriteFileDescriptor(data, handle->fd)) {
         HDF_LOGE("%{public}s: write fd failed!", __func__);
         return false;
     }
@@ -192,7 +193,7 @@ static bool CodecBufferMarshalling(struct HdfSBuf *data, const struct OmxCodecBu
             return false;
         }
     } else {
-        HDF_LOGE("%{public}s:unsupport bufferType %{public}d!", __func__, dataBlock->bufferType);
+        HDF_LOGE("%{public}s:unsupported bufferType %{public}d!", __func__, dataBlock->bufferType);
         return false;
     }
     return true;
@@ -281,7 +282,7 @@ static bool CodecBufferUnmarshalling(struct HdfSBuf *data, struct OmxCodecBuffer
         }
         dataBlock->buffer = (uint8_t *)handle;
     } else {
-        HDF_LOGE("%{public}s: unsupport bufferType %{public}d", __func__, dataBlock->bufferType);
+        HDF_LOGE("%{public}s: unsupported bufferType %{public}d", __func__, dataBlock->bufferType);
         return false;
     }
     return true;

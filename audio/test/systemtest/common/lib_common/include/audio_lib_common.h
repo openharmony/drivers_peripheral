@@ -62,6 +62,11 @@ int32_t InitHwCaptureMode(struct AudioHwCaptureMode& captureMode);
 uint32_t InitHwRender(struct AudioHwRender *&hwRender, const std::string adapterNameCase);
 
 uint32_t InitHwCapture(struct AudioHwCapture *&hwCapture, const std::string adapterNameCase);
+
+int32_t CaptureReqMmapBufferInit(struct AudioFrameCaptureMode &frameCaptureMode,
+                                 std::string path, const int64_t fileSize);
+
+int32_t RenderReqMmapBufferInit(struct AudioFrameRenderMode& frameRenderMode, std::string path, int64_t &fileSize);
 }
 }
 #endif // AUDIO_LIB_COMMON_H

@@ -192,14 +192,14 @@ int32_t Allocator::FreeMem(BufferHandle *handle)
     DISPLAY_LOGD();
     DISPLAY_CHK_RETURN((handle == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("buffer is null"));
     if (handle->fd >= 0) {
-        DISPLAY_LOGD("relase the fd is %{public}d", handle->fd);
+        DISPLAY_LOGD("release the fd is %{public}d", handle->fd);
         close(handle->fd);
         handle->fd = -1;
     }
     const uint32_t reserveFds = handle->reserveFds;
     for (uint32_t i = 0; i < reserveFds; i++) {
         if (handle->reserve[i] >= 0) {
-            DISPLAY_LOGD("relase the fd is %{public}d", handle->reserve[i]);
+            DISPLAY_LOGD("release the fd is %{public}d", handle->reserve[i]);
             close(handle->reserve[i]);
             handle->reserve[i] = -1;
         }

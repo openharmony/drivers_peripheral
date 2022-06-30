@@ -145,5 +145,73 @@ uint32_t InitHwCapture(struct AudioHwCapture *&hwCapture, const std::string adap
     }
     return HDF_SUCCESS;
 }
+int32_t CaptureReqMmapBufferInit(struct AudioFrameCaptureMode &frameCaptureMode,
+                                 std::string path, const int64_t fileSize)
+{
+    FILE *file = fopen(path.c_str(), "wb+");
+    if (file == nullptr) {
+        return HDF_FAILURE;
+    }
+    int fd = fileno(file);
+    if (fd == -1) {
+        (void)fclose(file);
+        return HDF_FAILURE;
+    }
+    uint32_t formatBits = PcmFormatToBits(frameCaptureMode.attrs.format);
+
+    ftruncate(fd, FILE_CAPTURE_SIZE);
+    frameCaptureMode.mmapBufDesc.memoryAddress = mmap(NULL, fileSize, PROT_READ | PROT_WRITE,
+        MAP_SHARED, fd, 0);
+    if (frameCaptureMode.mmapBufDesc.memoryAddress == NULL ||
+        frameCaptureMode.mmapBufDesc.memoryAddress == (void *)(-1)) {
+        (void)fclose(file);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    frameCaptureMode.mmapBufDesc.totalBufferFrames = fileSize /
+        (frameCaptureMode.attrs.channelCount * (formatBits >> MOVE_RIGHT_NUM));
+    frameCaptureMode.mmapBufDesc.memoryFd = fd;
+    frameCaptureMode.mmapBufDesc.transferFrameSize = DEEP_BUFFER_RENDER_PERIOD_SIZE / FRAME_COUNT;
+    frameCaptureMode.mmapBufDesc.isShareable = 1;
+    frameCaptureMode.mmapBufDesc.offset = 0;
+    (void)fclose(file);
+    return AUDIO_HAL_SUCCESS;
+}
+
+int32_t RenderReqMmapBufferInit(struct AudioFrameRenderMode &frameRenderMode, std::string path, int64_t &fileSize)
+{
+    char absPath[PATH_MAX] = {0};
+    if (realpath(path.c_str(), absPath) == nullptr) {
+        return HDF_FAILURE;
+    }
+
+    FILE *file = fopen(absPath, "rb+");
+    if (file == nullptr) {
+        return HDF_FAILURE;
+    }
+    int fd = fileno(file);
+    if (fd == -1) {
+        (void)fclose(file);
+        return HDF_FAILURE;
+    }
+    uint32_t formatBits = PcmFormatToBits(frameRenderMode.attrs.format);
+    (void)fseek(file, 0, SEEK_END);
+    fileSize = ftell(file);
+    frameRenderMode.mmapBufDesc.memoryAddress = mmap(NULL, fileSize, PROT_READ,
+        MAP_SHARED, fd, 0);
+    if (frameRenderMode.mmapBufDesc.memoryAddress == NULL ||
+        frameRenderMode.mmapBufDesc.memoryAddress == (void *)(-1)) {
+        (void)fclose(file);
+        return HDF_FAILURE;
+    }
+    frameRenderMode.mmapBufDesc.totalBufferFrames = fileSize /
+        (frameRenderMode.attrs.channelCount * (formatBits >> MOVE_RIGHT_NUM));
+    frameRenderMode.mmapBufDesc.memoryFd = fd;
+    frameRenderMode.mmapBufDesc.transferFrameSize = DEEP_BUFFER_RENDER_PERIOD_SIZE / FRAME_COUNT;
+    frameRenderMode.mmapBufDesc.isShareable = 1;
+    struct AudioHeadInfo wavHeadInfo = {};
+    frameRenderMode.mmapBufDesc.offset = sizeof(wavHeadInfo);
+    (void)fclose(file);
+    return AUDIO_HAL_SUCCESS;
+}
 }
 }

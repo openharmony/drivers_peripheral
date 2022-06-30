@@ -19,12 +19,15 @@
 #include <stdint.h>
 
 #include "defines.h"
+#include "coauth.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 ResultCode SingleAuthTrustLevel(uint32_t userId, uint32_t authType, uint32_t *atl);
+uint32_t GetAtl(uint32_t acl, uint32_t asl);
+ResultCode QueryScheduleAtl(const CoAuthSchedule *coAuthSchedule, uint32_t acl, uint32_t *atl);
 
 #ifdef __cplusplus
 }

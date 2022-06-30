@@ -166,9 +166,9 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0001,
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name   Test checking scene's capability where the scene is not configed in the josn.
+* @tc.name   Test checking scene's capability where the scene is not configured in the josn.
 * @tc.number  SUB_Audio_HDI_RenderCheckSceneCapability_0002
-* @tc.desc  Test RenderCheckSceneCapability interface,return -1 if the scene is not configed in the josn.
+* @tc.desc  Test RenderCheckSceneCapability interface,return -1 if the scene is not configured in the josn.
 * @tc.author: ZHANGHAILIN
 */
 HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0002, TestSize.Level1)
@@ -374,9 +374,9 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0004, Tes
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioRenderSelectScene API where the scene is not configed in the josn.
+* @tc.name  Test AudioRenderSelectScene API where the scene is not configured in the josn.
 * @tc.number  SUB_Audio_HDI_AudioRenderSelectScene_0005
-* @tc.desc  Test AudioRenderSelectScene, return -1 if the scene is not configed in the josn.
+* @tc.desc  Test AudioRenderSelectScene, return -1 if the scene is not configured in the josn.
 * @tc.author: ZHANGHAILIN
 */
 HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0005, TestSize.Level1)

@@ -52,7 +52,7 @@ static uint64_t GenerateChallenge()
 {
     uint64_t challenge = 0;
 
-    for (uint32_t i = 0; i < MAX_CHALLENGE_GENERATION_TIMES; i++) {
+    for (uint32_t i = 0; i < MAX_CHALLENGE_GENERATION_TIMES; ++i) {
         if (SecureRandom((uint8_t *)&challenge, sizeof(uint64_t)) != RESULT_SUCCESS) {
             LOG_ERROR("get challenge failed");
             return INVALID_CHALLENGE;
@@ -211,4 +211,15 @@ ResultCode GetIsUpdate(bool *isUpdate)
     }
     *isUpdate = g_session->isUpdate;
     return RESULT_SUCCESS;
+}
+
+bool IsSessionValid(int32_t userId)
+{
+    if (!IsSessionExist()) {
+        return false;
+    }
+    if (g_session->userId == userId) {
+        return true;
+    }
+    return false;
 }

@@ -47,8 +47,6 @@ using DynamicBuffer = struct DynamicBuffer;
 
 class ICodecBuffer : public RefBase {
 public:
-    ICodecBuffer()
-    {}
     ICodecBuffer(struct OmxCodecBuffer &codecBuffer);
     virtual ~ICodecBuffer();
     sptr<ICodecBuffer> static CreateCodeBuffer(struct OmxCodecBuffer &codecBuffer);
@@ -63,6 +61,8 @@ public:
     void SetBufferId(int32_t bufferId);
 
 protected:
+    ICodecBuffer()
+    {}
     virtual bool CheckInvalid(struct OmxCodecBuffer &codecBuffer);
 
 protected:

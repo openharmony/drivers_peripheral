@@ -13,14 +13,10 @@
 
 if (defined(ohos_lite)) {
   group("pin_auth_entry") {
-    deps = [ "//drivers/peripheral/pin_auth/hdi:libpin_auth_sample_1.0" ]
+    deps = []
   }
 } else {
   group("pin_auth_entry") {
-    deps = [
-      "./hdi_service:hdf_pin_auth_service",
-      "//drivers/interface/pin_auth/v1_0:pin_auth",
-      "//drivers/peripheral/pin_auth/hdi:libpin_auth_sample_1.0",
-    ]
+    deps = [ "./hdi_service:hdf_pin_auth_service" ]
   }
 }

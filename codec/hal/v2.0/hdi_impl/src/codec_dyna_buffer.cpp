@@ -61,9 +61,9 @@ int32_t CodecDynaBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
     }
     ResetBuffer(codecBuffer, omxBuffer);
 
-    int eFence = codecBuffer.fenceFd;
-    if (eFence >= 0) {
-        sync_wait(eFence, TIME_WAIT_MS);
+    int fence = codecBuffer.fenceFd;
+    if (fence >= 0) {
+        sync_wait(fence, TIME_WAIT_MS);
         close(codecBuffer.fenceFd);
         codecBuffer.fenceFd = -1;
     }
@@ -80,11 +80,8 @@ int32_t CodecDynaBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
 
     if (codecBuffer.buffer != nullptr) {
         auto bufferHandle = reinterpret_cast<BufferHandle *>(codecBuffer.buffer);
-        // if recv new BufferHandle, save it
-        if (bufferHandle != nullptr) {
-            FreeBufferHandle(bufferHandle);
-            bufferHandle = nullptr;
-        }
+        // if recv new BufferHandle, free it
+        FreeBufferHandle(bufferHandle);
         codecBuffer.buffer = 0;
         codecBuffer.bufferLen = 0;
     }

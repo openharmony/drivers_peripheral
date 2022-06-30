@@ -20,9 +20,6 @@ if (defined(ohos_lite)) {
   }
 } else {
   group("location_gnss_entry") {
-    deps = [
-      "hdi_service:hdi_location_gnss_service",
-      "//drivers/interface/location/gnss/v1_0:location_gnss",
-    ]
+    deps = [ "hdi_service:hdi_location_gnss_service" ]
   }
 }

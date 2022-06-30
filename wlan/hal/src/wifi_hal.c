@@ -291,54 +291,13 @@ static int32_t GetChannelMeasResultInner(const char *ifName, struct MeasResult *
     return HDF_ERR_NOT_SUPPORT;
 }
 
-static int32_t HalRegisterHmlCallbackInner(NotifyMessage func, const char *ifName)
+static int32_t SetProjectionScreenParamInner(const char *ifName, const ProjScrnCmdParam *param)
 {
-    if (func == NULL || ifName == NULL) {
+    if (ifName == NULL || param == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (WifiRegisterHmlCallback(func, ifName) != HDF_SUCCESS) {
-        HDF_LOGE("%s: hml callback function has been registered, line: %d", __FUNCTION__, __LINE__);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-static int32_t HalUnregisterHmlCallbackInner(NotifyMessage func, const char *ifName)
-{
-    if (func == NULL || ifName == NULL) {
-        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    WifiUnregisterHmlCallback(func, ifName);
-    return HDF_SUCCESS;
-}
-
-static int32_t GetCoexChannelListInner(const char *ifName, uint8_t *buf, uint32_t *bufLen)
-{
-    if (ifName == NULL || buf == NULL || bufLen == NULL) {
-        HDF_LOGE("%{public}s: input parameter invalid, line: %{public}d", __FUNCTION__, __LINE__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    return GetCoexChannelList(ifName, buf, bufLen);
-}
-
-static int32_t SendHmlCmdInner(const char *ifName, const struct HalCmdData *data)
-{
-    if (ifName == NULL || data == NULL) {
-        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    return SendHmlCmd(ifName, data);
-}
-
-static int32_t SendP2pCmdInner(const char *ifName, const struct HalCmdData *data)
-{
-    if (ifName == NULL || data == NULL) {
-        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    return SendP2pCmd(ifName, data);
+    return SetProjectionScreenParam(ifName, param);
 }
 
 static int32_t Start(struct IWiFi *iwifi)
@@ -461,42 +420,10 @@ static int32_t WifiGetChannelMeasResult(const char *ifName, struct MeasResult *m
     return ret;
 }
 
-static int32_t HalRegisterHmlCallback(NotifyMessage func, const char *ifName)
+static int32_t WifiSetProjectionScreenParam(const char *ifName, const ProjScrnCmdParam *param)
 {
     HalMutexLock();
-    int32_t ret = HalRegisterHmlCallbackInner(func, ifName);
-    HalMutexUnlock();
-    return ret;
-}
-
-static int32_t HalUnregisterHmlCallback(NotifyMessage func, const char *ifName)
-{
-    HalMutexLock();
-    int32_t ret = HalUnregisterHmlCallbackInner(func, ifName);
-    HalMutexUnlock();
-    return ret;
-}
-
-static int32_t WifiGetCoexChannelList(const char *ifName, uint8_t *buf, uint32_t *bufLen)
-{
-    HalMutexLock();
-    int32_t ret = GetCoexChannelListInner(ifName, buf, bufLen);
-    HalMutexUnlock();
-    return ret;
-}
-
-static int32_t WifiSendHmlCmd(const char *ifName, const struct HalCmdData *data)
-{
-    HalMutexLock();
-    int32_t ret = SendHmlCmdInner(ifName, data);
-    HalMutexUnlock();
-    return ret;
-}
-
-static int32_t WifiSendP2pCmd(const char *ifName, const struct HalCmdData *data)
-{
-    HalMutexLock();
-    int32_t ret = SendP2pCmdInner(ifName, data);
+    int32_t ret = SetProjectionScreenParamInner(ifName, param);
     HalMutexUnlock();
     return ret;
 }
@@ -527,11 +454,7 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
         singleWifiInstance.setPowerMode = WifiSetPowerMode;
         singleWifiInstance.startChannelMeas = WifiStartChannelMeas;
         singleWifiInstance.getChannelMeasResult = WifiGetChannelMeasResult;
-        singleWifiInstance.registerHmlCallback = HalRegisterHmlCallback;
-        singleWifiInstance.unregisterHmlCallback = HalUnregisterHmlCallback;
-        singleWifiInstance.getCoexChannelList = WifiGetCoexChannelList;
-        singleWifiInstance.sendHmlCmd = WifiSendHmlCmd;
-        singleWifiInstance.sendP2pCmd = WifiSendP2pCmd;
+        singleWifiInstance.setProjectionScreenParam = WifiSetProjectionScreenParam;
         InitIWiFiList();
         isInited = true;
     }

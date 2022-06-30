@@ -63,7 +63,7 @@ typedef enum {
     AUDIO_HAL_SUCCESS = 0,
     AUDIO_HAL_ERR_INTERNAL = -1,      /* audio system internal errors */
     AUDIO_HAL_ERR_NOT_SUPPORT = -2,   /* operation is not supported */
-    AUDIO_HAL_ERR_INVALID_PARAM = -3, /* parameter is invaild */
+    AUDIO_HAL_ERR_INVALID_PARAM = -3, /* parameter is invalid */
     AUDIO_HAL_ERR_INVALID_OBJECT = -4, /**< Invalid object. */
     AUDIO_HAL_ERR_MALLOC_FAIL = -6, /**< Memory allocation fails. */
 

@@ -17,7 +17,7 @@
  * @addtogroup Audio
  * @{
  *
- * @brief Test audio-related APIs,functions for relese audiomanager,
+ * @brief Test audio-related APIs,functions for release audiomanager,
  *
  * @since 1.0
  * @version 1.0

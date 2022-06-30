@@ -76,6 +76,11 @@ enum CamRetCode : int32_t {
      * A critical error occurs at the driver layer.
      */
     DEVICE_ERROR = -6,
+
+    /**
+     * No permission to access the camera device.
+     */
+    NO_PERMISSION = -7,
 };
 
 /**
@@ -379,6 +384,37 @@ enum ErrorType : uint32_t {
      * A request timeout occurs. The camera device needs to be closed.
      */
     REQUEST_TIMEOUT = 1,
+
+    /**
+     * An error occurred int the driver.
+     */
+    DRIVER_ERROR = 2,
+
+    /**
+     * The device is preempted.
+     */
+    DEVICE_PREEMPT = 3,
+
+    /**
+     * Device disconnected.
+     */
+    DEVICE_DISCONNECT = 4,
+
+    /**
+     * The distributed camera error type starts,
+     * and all subsequent error types are distributed camera-specific.
+     */
+    DCAMERA_ERROR_BEGIN = 1024,
+
+    /**
+     * The distributed camera device is busy.
+     */
+    DCAMERA_ERROR_DEVICE_IN_USE = DCAMERA_ERROR_BEGIN,
+
+    /**
+     * No permission to access the distributed camera device.
+     */
+    DCAMERA_ERROR_NO_PERMISSION,
 };
 
 /**

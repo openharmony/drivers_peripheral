@@ -660,7 +660,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0017, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM control data which is writing invlaid value of volume.
+* @tc.name  Test the ADM control data which is writing invalid value of volume.
 * @tc.number  SUB_Audio_ControlHostElemWrite_read_0018
 * @tc.desc  Test the ADM control data,cmdid is AUDIODRV_CTRL_IOCTRL_ELEM_WRITE and AUDIODRV_CTRL_IOCTRL_ELEM_READ.
 * @tc.author: zhouyongxiao
@@ -683,7 +683,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0018, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM control data which is writing invlaid value of volume.
+* @tc.name  Test the ADM control data which is writing invalid value of volume.
 * @tc.number  SUB_Audio_ControlHostElemWrite_read_0019
 * @tc.desc  Test the ADM control data,cmdid is AUDIODRV_CTRL_IOCTRL_ELEM_WRITE and AUDIODRV_CTRL_IOCTRL_ELEM_READ.
 * @tc.author: zhouyongxiao

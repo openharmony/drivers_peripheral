@@ -44,6 +44,7 @@ ohos_fuzztest("AudioSetextraparamsCaptureFuzzTest") {
     "//drivers/peripheral/audio/test/fuzztest/hdi_fuzzer/capture/audiosetextraparamscapture_fuzzer/include",
     "//drivers/peripheral/audio/test/fuzztest/common/include",
   ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
   defines = []
   if (enable_audio_adm_so) {
     defines += [ "AUDIO_ADM_SO" ]

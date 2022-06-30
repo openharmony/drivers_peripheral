@@ -16,7 +16,6 @@ group("sensor_entry") {
   if (defined(ohos_lite)) {
     deps += [ "hal:hdi_sensor" ]
   } else {
-    deps += [ "//drivers/interface/sensor/v1_0:sensor" ]
     HDI_SENSOR_SERVICE_PATH =
         rebase_path("//device/soc/${device_company}/common/hal/sensor")
     cmd = "if [ -f ${HDI_SENSOR_SERVICE_PATH}/BUILD.gn ]; then echo true; else echo false; fi"

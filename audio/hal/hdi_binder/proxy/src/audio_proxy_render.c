@@ -813,6 +813,78 @@ int32_t AudioProxyRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, st
     return AUDIO_HAL_SUCCESS;
 }
 
+int32_t AudioProxyRenderAddEffect(AudioHandle handle, uint64_t effectid)
+{
+    int32_t ret = AudioCheckRenderAddr(handle);
+    if (ret < 0) {
+        LOG_FUN_ERR("The proxy render address passed in is invalid");
+        return ret;
+    }
+    if (handle == NULL) {
+        LOG_FUN_ERR("handle is empty");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The pointer is null");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (!HdfSbufWriteUint64(data, effectid)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_ADD_EFFECT, data, reply);
+    if (ret < 0) {
+        LOG_FUN_ERR("Dispatch AudioProxyRenderAddEffect FAIL ret = %{public}d", ret);
+        AudioProxyBufReplyRecycle(data, reply);
+        return ret;
+    }
+
+    AudioProxyBufReplyRecycle(data, reply);
+    return AUDIO_HAL_SUCCESS;
+}
+
+int32_t AudioProxyRenderRemoveEffect(AudioHandle handle, uint64_t effectid)
+{
+    int32_t ret = AudioCheckRenderAddr(handle);
+    if (ret < 0) {
+        LOG_FUN_ERR("The proxy render address passed in is invalid");
+        return ret;
+    }
+    if (handle == NULL) {
+        LOG_FUN_ERR("handle is empty");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    struct HdfSBuf *reply = NULL;
+    struct HdfSBuf *data = NULL;
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+        LOG_FUN_ERR("The pointer is null");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (!HdfSbufWriteUint64(data, effectid)) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_REMOVE_EFFECT, data, reply);
+    if (ret < 0) {
+        LOG_FUN_ERR("Dispatch AudioProxyRenderRemoveEffect FAIL ret = %{public}d", ret);
+        AudioProxyBufReplyRecycle(data, reply);
+        return ret;
+    }
+
+    AudioProxyBufReplyRecycle(data, reply);
+    return AUDIO_HAL_SUCCESS;
+}
+
 int32_t AudioProxyRenderTurnStandbyMode(AudioHandle handle)
 {
     int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test

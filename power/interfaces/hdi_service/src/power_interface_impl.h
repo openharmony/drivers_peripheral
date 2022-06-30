@@ -16,6 +16,9 @@
 #ifndef OHOS_HDI_POWER_V1_0_POWERINTERFACEIMPL_H
 #define OHOS_HDI_POWER_V1_0_POWERINTERFACEIMPL_H
 
+#include <functional>
+#include "iremote_object.h"
+#include "refbase.h"
 #include "v1_0/ipower_interface.h"
 
 namespace OHOS {
@@ -39,6 +42,21 @@ public:
     int32_t SuspendUnblock(const std::string& name) override;
 
     int32_t PowerDump(std::string& info) override;
+
+    class PowerDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        explicit PowerDeathRecipient(
+            const wptr<PowerInterfaceImpl> &powerInterfaceImpl) : powerInterfaceImpl_(powerInterfaceImpl) {};
+        virtual ~PowerDeathRecipient() = default;
+        virtual void OnRemoteDied(const wptr<IRemoteObject> &object) override;
+    private:
+        wptr<PowerInterfaceImpl> powerInterfaceImpl_;
+    };
+
+private:
+    int32_t UnRegister();
+    int32_t AddPowerDeathRecipient(const sptr<IPowerHdiCallback> &callback);
+    int32_t RemovePowerDeathRecipient(const sptr<IPowerHdiCallback> &callback);
 };
 } // V1_0
 } // Power

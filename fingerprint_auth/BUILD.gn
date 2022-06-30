@@ -17,9 +17,6 @@ if (defined(ohos_lite)) {
   }
 } else {
   group("fingerprint_auth_entry") {
-    deps = [
-      "./hdi_service:hdf_fingerprint_auth_service",
-      "//drivers/interface/fingerprint_auth/v1_0:fingerprint_auth",
-    ]
+    deps = [ "./hdi_service:hdf_fingerprint_auth_service" ]
   }
 }
