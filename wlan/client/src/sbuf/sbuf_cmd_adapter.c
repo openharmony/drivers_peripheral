@@ -873,109 +873,39 @@ int32_t StartChannelMeas(const char *ifName, const struct MeasParam *measParam)
     return ret;
 }
 
-int32_t GetCoexChannelList(const char *ifName, uint8_t *buf, uint32_t *bufLen)
-{
-    int32_t ret = RET_CODE_FAILURE;
-    struct HdfSBuf *data = NULL;
-    struct HdfSBuf *reply = NULL;
-
-    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
-        HDF_LOGE("%s: HdfSbufObtainDefault fail", __FUNCTION__);
-        return RET_CODE_FAILURE;
-    }
-
-    do {
-        if (!HdfSbufWriteString(data, ifName)) {
-            HDF_LOGE("%s: write ifName fail!", __FUNCTION__);
-            break;
-        }
-        if (!HdfSbufWriteUint32(data, *bufLen)) {
-            HDF_LOGE("%s: write bufLen fail!", __FUNCTION__);
-            break;
-        }
-        ret = SendCmdSync(WIFI_HAL_CMD_GET_COEX_CHANNEL_LIST, data, reply);
-        if (ret != RET_CODE_SUCCESS) {
-            break;
-        }
-        if (!HdfSbufReadBuffer(reply, (const void **)(&buf), bufLen)) {
-            HDF_LOGE("%s: read paramBuf fail!", __FUNCTION__);
-            ret = RET_CODE_FAILURE;
-        }
-    } while (0);
-
-    HdfSbufRecycle(data);
-    HdfSbufRecycle(reply);
-    return ret;
-}
-
-int32_t SendHmlCmd(const char *ifName, const struct HalCmdData *data)
+int32_t SetProjectionScreenParam(const char *ifName, const ProjScrnCmdParam *param)
 {
     int32_t ret = RET_CODE_FAILURE;
     struct HdfSBuf *req = NULL;
 
     req = HdfSbufObtainDefaultSize();
     if (req == NULL) {
-        HDF_LOGE("%s: HdfSbufObtainDefaultSize fail!", __FUNCTION__);
+        HDF_LOGE("%{public}s: HdfSbufObtainDefaultSize fail!", __FUNCTION__);
         return ret;
     }
 
     do {
         if (!HdfSbufWriteString(req, ifName)) {
-            HDF_LOGE("%s: write ifName fail!", __FUNCTION__);
+            HDF_LOGE("%{public}s: write ifName fail!", __FUNCTION__);
             break;
         }
-        if (!HdfSbufWriteInt32(req, data->cmdId)) {
-            HDF_LOGE("%s: write cmd fail!", __FUNCTION__);
+        if (!HdfSbufWriteInt32(req, param->cmdId)) {
+            HDF_LOGE("%{public}s: write cmd fail!", __FUNCTION__);
             break;
         }
-        if (!HdfSbufWriteBuffer(req, data->buf, data->bufLen)) {
-            HDF_LOGE("%s: write data fail!", __FUNCTION__);
+        if (!HdfSbufWriteBuffer(req, param->buf, param->bufLen)) {
+            HDF_LOGE("%{public}s: write buffer data fail!", __FUNCTION__);
             break;
         }
-        ret = SendCmdSync(WIFI_HAL_CMD_SEND_HML_CMD, req, NULL);
+        ret = SendCmdSync(WIFI_HAL_CMD_CONFIG_PROJECTION_SCREEN, req, NULL);
         if (ret != RET_CODE_SUCCESS) {
-            HDF_LOGE("%s: SendCmdSync fail, ret = %{public}d!", __FUNCTION__, ret);
+            HDF_LOGE("%{public}s: SendCmdSync fail, ret = %{public}d!", __FUNCTION__, ret);
         }
     } while (0);
 
     HdfSbufRecycle(req);
     return ret;
 }
-
-int32_t SendP2pCmd(const char *ifName, const struct HalCmdData *data)
-{
-    int32_t ret = RET_CODE_FAILURE;
-    struct HdfSBuf *req = NULL;
-
-    req = HdfSbufObtainDefaultSize();
-    if (req == NULL) {
-        HDF_LOGE("%s: HdfSbufObtainDefaultSize fail!", __FUNCTION__);
-        return ret;
-    }
-
-    do {
-        if (!HdfSbufWriteString(req, ifName)) {
-            HDF_LOGE("%s: write ifName fail!", __FUNCTION__);
-            break;
-        }
-        if (!HdfSbufWriteInt32(req, data->cmdId)) {
-            HDF_LOGE("%s: write cmd fail!", __FUNCTION__);
-            break;
-        }
-        if (!HdfSbufWriteBuffer(req, data->buf, data->bufLen)) {
-            HDF_LOGE("%s: write data fail!", __FUNCTION__);
-            break;
-        }
-        ret = SendCmdSync(WIFI_HAL_CMD_SEND_P2P_CMD, req, NULL);
-        if (ret != RET_CODE_SUCCESS) {
-            HDF_LOGE("%s: SendCmdSync fail, ret = %{public}d!", __FUNCTION__, ret);
-        }
-    } while (0);
-
-    HdfSbufRecycle(req);
-    return ret;
-}
-
 #ifdef __cplusplus
 #if __cplusplus
 }

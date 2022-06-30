@@ -38,16 +38,6 @@
             ],
             "header_base": "//drivers/peripheral/misc/light/interfaces/include"
           }
-        },
-        {
-          "name": "//drivers/interface/light/v1_0:liblight_proxy_1.0",
-          "header": {
-            "header_files": [
-              "light_if.h",
-              "light_type.h"
-            ],
-            "header_base": "//drivers/peripheral/misc/light/interfaces/include"
-          }
         }
       ]
     }

@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 #include "audioadmdispatchercapturecmdid_fuzzer.h"
+#include "hdf_log.h"
 #include "audio_hdi_common.h"
 #include "audio_adm_common.h"
-
 using namespace HMOS::Audio;
 namespace OHOS {
 namespace Audio {
@@ -33,19 +33,23 @@ namespace Audio {
 
         service = HdfIoServiceBind(HDF_CAPTURE_SERVICE.c_str());
         if (service == nullptr || service->dispatcher == nullptr) {
+            HDF_LOGE("%{public}s: HdfIoServiceBind failed\n", __func__);
             return false;
         }
         sBuf = HdfSbufObtainDefaultSize();
         if (sBuf == nullptr) {
+            HDF_LOGE("%{public}s: sBuf is NULL\n", __func__);
             return false;
         }
         int32_t ret = WriteHwParamsToBuf(sBuf, hwParams);
         if (ret < 0) {
+            HDF_LOGE("%{public}s: Write HwParams to buf failed\n", __func__);
             return false;
         }
         int32_t cmdId = *(int32_t *)(data);
         ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, reply);
         if (ret == HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: Dispatch success\n", __func__);
             result = true;
         }
         HdfSbufRecycle(sBuf);

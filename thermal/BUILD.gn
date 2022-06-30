@@ -12,8 +12,5 @@
 # limitations under the License.
 
 group("thermal_entry") {
-  deps = [
-    "interfaces/hdi_service:hdf_thermal",
-    "//drivers/interface/thermal/v1_0:thermal",
-  ]
+  deps = [ "interfaces/hdi_service:hdf_thermal" ]
 }

@@ -786,4 +786,27 @@ HWTEST_F(HdfWifiServiceCTest, StartChannelMeasTest_034, TestSize.Level1)
     flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_DEV_ERR_NODATA);
     ASSERT_TRUE(flag);
 }
+
+/**
+ * @tc.name: SetProjectionScreenParam_035
+ * @tc.desc: Wifi hdi set paramters to optimize projectino screen function test
+ * @tc.type: FUNC
+ * @tc.require: AR000HDUEE
+ */
+HWTEST_F(HdfWifiServiceCTest, SetProjectionScreenParam_035, TestSize.Level1)
+{
+    const char *ifName = "wlan0";
+    int32_t rc;
+    struct ProjectionScreenCmdParam param;
+    int8_t data = 0;
+    param.buf = &data;
+    param.bufLen = sizeof(data);
+
+    for (int i = CMD_CLOSE_GO_CAC; i <= CMD_ID_CTRL_ROAM_CHANNEL; i++) {
+        param.cmdId = i;
+        rc = g_wlanObj->SetProjectionScreenParam(g_wlanObj, ifName, &param);
+        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+        ASSERT_TRUE(flag);
+    }
+}
 };

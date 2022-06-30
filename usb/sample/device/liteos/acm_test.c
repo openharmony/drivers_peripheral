@@ -114,11 +114,11 @@ static void Test02()
             }
             g_readRuning = false;
         } else if (c == 'w') {
-            printf("input: strings and enter for send\n");
+            printf("input strings and press enter to send\n");
             getchar();
             getStr = gets_s(str, STR_LEN - 1);
             if (getStr == NULL) {
-                HDF_LOGE("%s: gets_s faile", __func__);
+                HDF_LOGE("%s: gets_s failed", __func__);
             }
             TestWrite(str);
         } else if (c == 'q') {

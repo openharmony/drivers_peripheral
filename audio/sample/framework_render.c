@@ -213,7 +213,7 @@ int32_t InitAttrs(struct AudioSampleAttributes *attrs)
     attrs->format = AUDIO_FORMAT_PCM_16_BIT;
     attrs->channelCount = AUDIO_CHANNELCOUNT;
     attrs->sampleRate = AUDIO_SAMPLE_RATE_48K;
-    attrs->interleaved = 0;
+    attrs->interleaved = 1;
     attrs->type = AUDIO_IN_MEDIA;
     attrs->period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
     attrs->frameSize = PCM_16_BIT * attrs->channelCount / PCM_8_BIT;
@@ -1107,7 +1107,7 @@ int32_t SetRenderResume(struct AudioRender **render)
 
 void PrintAttributesFromat(void)
 {
-    printf(" ============= Render Sample Attributes Fromat =============== \n");
+    printf(" ============= Render Sample Attributes Format =============== \n");
     printf("| 1. Render AUDIO_FORMAT_PCM_8_BIT                            |\n");
     printf("| 2. Render AUDIO_FORMAT_PCM_16_BIT                           |\n");
     printf("| 3. Render AUDIO_FORMAT_PCM_24_BIT                           |\n");

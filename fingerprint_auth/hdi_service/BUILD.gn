@@ -23,8 +23,8 @@ ohos_shared_library("libfingerprint_auth_interface_service_1.0") {
     "src/executor_impl.cpp",
     "src/fingerprint_auth_interface_service.cpp",
   ]
-  public_deps = [
-    "//drivers/interface/fingerprint_auth/v1_0:libfingerprint_auth_stub_1.0",
+  public_configs = [
+    "//drivers/interface/fingerprint_auth/v1_0:fingerprint_auth_idl_headers",
   ]
   external_deps = [
     "hdf_core:libhdf_utils",

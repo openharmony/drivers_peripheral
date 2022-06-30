@@ -116,7 +116,7 @@ static int32_t HandleSyncRequest(struct UsbHostRequest *request, const struct Us
 
     ret = OsalSemInit(&request->sem, 0);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalSemInit faile, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%s:%d OsalSemInit failed, ret=%d ", __func__, __LINE__, ret);
         return ret;
     }
 
@@ -1055,7 +1055,7 @@ int32_t RawSendControlRequest(struct UsbHostRequest *request, const struct UsbDe
 
     ret = OsalSemInit(&request->sem, 0);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalSemInit faile, ret = %d ", __func__, __LINE__, ret);
+        HDF_LOGE("%s:%d OsalSemInit failed, ret = %d ", __func__, __LINE__, ret);
         return ret;
     }
 
@@ -1338,7 +1338,6 @@ int32_t RawHandleRequest(const struct UsbDeviceHandle *devHandle)
 
     ret = osAdapterOps->urbCompleteHandle(devHandle);
     if (ret < 0) {
-        HDF_LOGE("%s:%d handleEvents error, return %d", __func__, __LINE__, ret);
     }
 
     return ret;

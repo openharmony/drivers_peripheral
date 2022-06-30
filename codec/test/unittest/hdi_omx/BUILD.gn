@@ -42,7 +42,7 @@ ohos_unittest("codec_hdi_omx_test") {
 
   if (is_standard_system) {
     external_deps = [
-      "display_device_driver:hdi_gralloc_client",
+      "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",

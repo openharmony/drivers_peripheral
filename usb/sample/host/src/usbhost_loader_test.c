@@ -71,7 +71,7 @@ int32_t main(int32_t argc, char *argv[])
     ret = HdfDeviceRegisterEventListener(serv, &usbPnpTestListener);
     if (ret != HDF_SUCCESS) {
         HdfIoServiceRecycle(serv);
-        HDF_LOGE("HdfDeviceRegisterEventListener faile ret=%d", ret);
+        HDF_LOGE("HdfDeviceRegisterEventListener failed ret=%d", ret);
         return HDF_FAILURE;
     }
 

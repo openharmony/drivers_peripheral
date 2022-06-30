@@ -82,6 +82,10 @@ int32_t HdiServiceRenderReqMmapBuffer(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
 int32_t HdiServiceRenderGetMmapPosition(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceRenderAddEffect(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceRenderRemoveEffect(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
 int32_t HdiServiceRenderTurnStandbyMode(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
 int32_t HdiServiceRenderDevDump(const struct HdfDeviceIoClient *client,

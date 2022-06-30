@@ -63,20 +63,6 @@ extern "C" {
 typedef int32_t (*CallbackFunc)(uint32_t event, void *data, const char *ifName);
 
 /**
- * @brief Defines a callback to listen for <b>IWiFi</b> asynchronous hml events.
- *
- * @param ifName The interface name.
- * @param buf Indicates the pointer to the data passed to the callback.
- * @param size Indicates the size of buf.
- *
- * @return Returns <b>0</b> if the <b>IWiFi</b> callback is defined; returns a negative value otherwise.
- *
- * @since 1.0
- * @version 1.0
- */
-typedef int32_t (*HmlCallbackFunc)(const char *ifName, int32_t cmd, const int8_t *buf, uint32_t bufLen);
-
-/**
  * @brief Defines the basic WLAN features provided by the hardware abstraction layer (HAL).
  *
  * The basic features include creating and stopping a channel between the HAL and the WLAN driver,
@@ -281,70 +267,17 @@ struct IWiFi {
     int32_t (*getChannelMeasResult)(const char *ifName, struct MeasResult *measResult);
 
     /**
-     * @brief Registers a callback to listen for <b>IWiFi</b> asynchronous hml events.
+     * @brief Config projection screen parameters.
      *
-     * @param func Indicates the callback to register.
      * @param ifName Indicates the pointer to the network interface name.
+     * @param param Indicates the parameters used to config projection screen.
      *
-     * @return Returns <b>0</b> if the callback is registered; returns a negative value otherwise.
+     * @return Returns <b>0</b> if  Config projection screen parameters successful; returns a negative value otherwise.
      *
      * @since 3.2
      * @version 1.0
      */
-    int32_t (*registerHmlCallback)(NotifyMessage func, const char *ifName);
-
-    /**
-     * @brief Unregisters an <b>IWiFi</b> hml callback.
-    
-     * @param func Indicates the callback to register.
-     * @param ifName Indicates the pointer to the network interface name.
-     *
-     * @return Returns <b>0</b> if the <b>IWiFi</b> callback is deregistered; returns a negative value otherwise.
-     *
-     * @since 3.2
-     * @version 1.0
-     */
-    int32_t (*unregisterHmlCallback)(NotifyMessage func, const char *ifName);
-
-    /**
-     * @brief Obtaining Coex Channel List.
-     *
-     * @param ifName Indicates the pointer to the network interface name.
-     * @param data Coex channel list result data.
-     * @param paramBufLen Buffer size of coex channel list result data.
-     *
-     * @return Returns <b>0</b> if get infos successful; returns a negative value otherwise.
-     *
-     * @since 3.2
-     * @version 1.0
-     */
-    int32_t (*getCoexChannelList)(const char *ifName, uint8_t *buf, uint32_t *bufLen);
-
-    /**
-     * @brief Send hml command to driver.
-     *
-     * @param ifName Indicates the pointer to the network interface name.
-     * @param data Struct whose member including command id, buffer and length of buffer.
-     *
-     * @return Returns <b>0</b> if send command successful; returns a negative value otherwise.
-     *
-     * @since 3.2
-     * @version 1.0
-     */
-    int32_t (*sendHmlCmd)(const char *ifName, const struct HalCmdData *data);
-
-    /**
-     * @brief Send p2p command to driver.
-     *
-     * @param ifName Indicates the pointer to the network interface name.
-     * @param data Struct whose member including command id, buffer and length of buffer.
-     *
-     * @return Returns <b>0</b> if send command successful; returns a negative value otherwise.
-     *
-     * @since 3.2
-     * @version 1.0
-     */
-    int32_t (*sendP2pCmd)(const char *ifName, const struct HalCmdData *data);
+    int32_t (*setProjectionScreenParam)(const char *ifName, const ProjScrnCmdParam *param);
 };
 
 /**

@@ -162,7 +162,7 @@ The table below describes major HDI 1.0 APIs provided by the codec module.
 </tbody>
 </table>
 
-The codec module alse provides codec HDI 2.0 APIs based on the OMX interfaces. The table below describes the HDI 2.0 APIs.
+The codec module also provides codec HDI 2.0 APIs based on the OMX interfaces. The table below describes the HDI 2.0 APIs.
 
 **Table  2**  HDI 2.0 APIs of the codec module
 

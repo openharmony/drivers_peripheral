@@ -42,18 +42,6 @@
             ],
             "header_base": "//drivers/peripheral/input/interfaces/include"
           }
-        },
-        {
-          "name": "//drivers/interface/input/v1_0:libinput_proxy_1.0",
-          "header": {
-            "header_files": [
-              "input_controller.h",
-              "input_manager.h",
-              "input_reporter.h",
-              "input_type.h"
-            ],
-            "header_base": "//drivers/peripheral/input/interfaces/include"
-          }
         }
       ]
     }

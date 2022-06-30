@@ -54,7 +54,7 @@ typedef struct {
 #define ADCRST_REG_OFFSET  (0x01u << 3)
 
 // IER IFR
-#define INT_MODE_TRIGER (0 << 15) // 0 triger
+#define INT_MODE_TRIGER (0 << 15) // 0 trigger
 
 #define LED_WARN_IER_OFFSET 5
 #define REG_ERR_IER_OFFSET  4

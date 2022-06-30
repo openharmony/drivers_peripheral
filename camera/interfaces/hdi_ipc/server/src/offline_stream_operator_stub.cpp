@@ -61,6 +61,7 @@ int32_t OfflineStreamOperatorStub::OnRemoteRequest(uint32_t code, MessageParcel 
 int32_t OfflineStreamOperatorStub::OfflineStreamOperatorStubCancelCapture(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     int32_t captureId = data.ReadInt32();
     CamRetCode ret = CancelCapture(captureId);
     if (reply.WriteInt32(static_cast<int32_t>(ret))) {
@@ -74,6 +75,7 @@ int32_t OfflineStreamOperatorStub::OfflineStreamOperatorStubCancelCapture(
 int32_t OfflineStreamOperatorStub::OfflineStreamOperatorStubReleaseStreams(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     std::vector<int32_t> streamIds;
     if (!data.ReadInt32Vector(&streamIds)) {
         HDF_LOGE("%s: read streamIds failed", __func__);
@@ -92,6 +94,8 @@ int32_t OfflineStreamOperatorStub::OfflineStreamOperatorStubReleaseStreams(
 int32_t OfflineStreamOperatorStub::OfflineStreamOperatorStubRelease(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)data;
+    (void)option;
     CamRetCode ret = Release();
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
         HDF_LOGE("%s: write retcode failed", __func__);

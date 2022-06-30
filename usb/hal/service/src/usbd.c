@@ -33,12 +33,13 @@ struct HdfDevEventlistener g_usbPnpListener = {0};
 
 int32_t HdfDeviceRegisterEventListener(struct HdfIoService *target, struct HdfDevEventlistener *listener);
 
-/* function defind in usbd_publisher.c */
+/* function defined in usbd_publisher.c */
 int32_t UsbdRealseDevices(struct UsbdService *service);
 int32_t UsbdDeviceCreateAndAttach(struct UsbdService *service, uint8_t busNum, uint8_t devAddr);
 int32_t UsbdDeviceDettach(struct UsbdService *service, uint8_t busNum, uint8_t devAddr);
 int32_t UsbdRemoveBusDev(struct UsbdService *service, uint8_t busNum);
 
+#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, struct HdfSBuf *data)
 {
     struct UsbPnpNotifyMatchInfoTable *infoTable = NULL;
@@ -80,25 +81,28 @@ static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, struct HdfSBu
     }
     return HDF_SUCCESS;
 }
+#endif
 
 static int32_t UsbdEventHandle(const struct UsbdService *inst)
 {
+#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
     g_usbPnpServ = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
     g_usbPnpListener.callBack = UsbdPnpLoaderEventReceived;
     g_usbPnpListener.priv = (void *)(inst);
 
     if (g_usbPnpServ == NULL) {
-        HDF_LOGE("%{public}s: HdfIoServiceBind faile.", __func__);
+        HDF_LOGE("%{public}s: HdfIoServiceBind failed.", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
     int32_t status;
     status = HdfDeviceRegisterEventListener(g_usbPnpServ, &g_usbPnpListener);
     if (status != HDF_SUCCESS) {
-        HDF_LOGE("HdfDeviceRegisterEventListener faile status=%{public}d", status);
+        HDF_LOGE("HdfDeviceRegisterEventListener failed status=%{public}d", status);
+        return status;
     }
-
-    return status;
+#endif
+    return HDF_SUCCESS;
 }
 
 static int32_t UsbdDriverBind(struct HdfDeviceObject *device)
@@ -191,6 +195,7 @@ struct HdfDriverEntry g_usbdDriverEntry = {
 };
 HDF_INIT(g_usbdDriverEntry);
 
+#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 static int32_t HdfReadDevice(struct UsbdService *service, int32_t *count, int32_t *size, struct HdfSBuf *reply)
 {
     int32_t busNum;
@@ -236,14 +241,16 @@ static int32_t HdfReadDevice(struct UsbdService *service, int32_t *count, int32_
     ++(*count);
     return HDF_SUCCESS;
 }
+#endif
 
 static int32_t UsbdAddDevicesOnStart(struct UsbdService *service)
 {
+#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
     struct HdfIoService *usbPnpServ = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
     if (service == NULL || usbPnpServ == NULL) {
         HDF_LOGE(
-            "%{public}s:%{public}d service is NULL or HdfIoServiceBind.faile "
-            "serv:%{public}s.",
+            "%{public}s:%{public}d service is NULL or HdfIoServiceBind failed "
+            "service:%{public}s.",
             __func__, __LINE__, USB_PNP_NOTIFY_SERVICE_NAME);
         return HDF_ERR_INVALID_OBJECT;
     }
@@ -279,7 +286,8 @@ static int32_t UsbdAddDevicesOnStart(struct UsbdService *service)
     HdfSbufRecycle(data);
     HdfSbufRecycle(reply);
     HdfIoServiceRecycle(usbPnpServ);
-    return ret;
+#endif
+    return HDF_SUCCESS;
 }
 
 int32_t BindUsbSubscriber(struct UsbdService *service, struct UsbdSubscriber *subscriber)

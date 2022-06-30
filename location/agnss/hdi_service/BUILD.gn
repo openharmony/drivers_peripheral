@@ -19,11 +19,9 @@ ohos_shared_library("libagnss_interface_service_1.0") {
     "//drivers/peripheral/location/gnss/hdi_service",
   ]
   sources = [ "agnss_interface_impl.cpp" ]
-
-  deps = [
-    "//drivers/interface/location/agnss/v1_0:liblocation_agnss_stub_1.0",
-    "//drivers/peripheral/location/gnss/hdi_service:libgnss_interface_service_1.0",
-  ]
+  configs =
+      [ "//drivers/interface/location/agnss/v1_0:location_agnss_idl_headers" ]
+  deps = [ "//drivers/peripheral/location/gnss/hdi_service:libgnss_interface_service_1.0" ]
 
   cflags = [
     "-Wall",
@@ -73,6 +71,7 @@ ohos_shared_library("liblocation_agnss_hdi_driver") {
 
   if (is_standard_system) {
     external_deps = [
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",

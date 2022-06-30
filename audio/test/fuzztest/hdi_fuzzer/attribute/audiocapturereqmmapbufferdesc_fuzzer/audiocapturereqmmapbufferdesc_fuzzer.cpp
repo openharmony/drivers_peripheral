@@ -14,6 +14,7 @@
  */
 
 #include "audiocapturereqmmapbufferdesc_fuzzer.h"
+#include "securec.h"
 #include "audio_hdi_fuzzer_common.h"
 
 using namespace OHOS::Audio;
@@ -27,17 +28,14 @@ namespace Audio {
         struct AudioCapture *capture = nullptr;
         int32_t ret = AudioGetManagerCreateStartCapture(manager, &adapter, &capture);
         if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+            HDF_LOGE("%{public}s: AudioGetManagerCreateStartCapture failed \n", __func__);
             return false;
         }
 
-        struct AudioMmapBufferDescripter descFuzz {
-            .memoryAddress = (void *)data,
-            .memoryFd = *(int32_t *)data,
-            .totalBufferFrames = *(int32_t *)data,
-            .transferFrameSize = *(int32_t *)data,
-            .isShareable = *(int32_t *)data,
-            .offset = *(uint32_t *)data,
-        };
+        struct AudioMmapBufferDescripter descFuzz = {};
+        if (memcpy_s((void *)&descFuzz, sizeof(descFuzz), data, sizeof(descFuzz)) != 0) {
+            return false;
+        }
         ret = capture->attr.ReqMmapBuffer((AudioHandle)capture, size, &descFuzz);
         if (ret == HDF_SUCCESS) {
             (void)munmap(descFuzz.memoryAddress, size);

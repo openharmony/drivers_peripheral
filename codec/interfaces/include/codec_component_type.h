@@ -250,6 +250,8 @@ enum OmxIndexCodecExType {
     OMX_IndexParamUseBufferType,
     /** GetBufferHandleUsage */
     OMX_IndexParamGetBufferHandleUsage,
+    /** CodecPixFormatParam */
+    OMX_IndexParamCodecPixFormat,
 };
 
 /**
@@ -308,6 +310,16 @@ struct GetBufferHandleUsageParams {
     union OMX_VERSIONTYPE version;                         /** Component version */
     uint32_t portIndex;                                    /** Port index */
     uint32_t usage;                                        /** Usage */
+};
+
+/**
+ * @brief Defines the <b>CodecPixFormatParam</b>.
+ */
+struct CodecPixFormatParam {
+    uint32_t size;                                         /** Size of the structure */
+    union OMX_VERSIONTYPE version;                         /** Component version */
+    uint32_t portIndex;                                    /** Port index */
+    uint32_t codecColorFormat;                             /** Color format defined in Display */
 };
 
 #ifdef __cplusplus

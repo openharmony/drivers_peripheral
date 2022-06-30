@@ -71,6 +71,10 @@ int32_t HdiServiceCaptureReqMmapBuffer(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
 int32_t HdiServiceCaptureGetMmapPosition(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceCaptureAddEffect(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
+int32_t HdiServiceCaptureRemoveEffect(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply);
 int32_t HdiServiceCaptureTurnStandbyMode(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
 int32_t HdiServiceCaptureDevDump(const struct HdfDeviceIoClient *client,

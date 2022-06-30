@@ -16,11 +16,8 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 ohos_shared_library("libsensor_interface_service_1.0") {
   include_dirs = [ "//drivers/peripheral/sensor/interfaces/include/" ]
   sources = [ "sensor_impl.cpp" ]
-
-  deps = [
-    "//drivers/interface/sensor/v1_0:libsensor_stub_1.0",
-    "//drivers/peripheral/sensor/hal:hdi_sensor",
-  ]
+  configs = [ "//drivers/interface/sensor/v1_0:sensor_idl_headers" ]
+  deps = [ "//drivers/peripheral/sensor/hal:hdi_sensor" ]
 
   cflags = [
     "-Wall",

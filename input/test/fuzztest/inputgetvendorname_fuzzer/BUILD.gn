@@ -31,9 +31,11 @@ ohos_fuzztest("InputGetVendorNameFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "inputgetvendorname_fuzzer.cpp" ]
-  deps = [ "//drivers/peripheral/input/hal:hdi_input" ]
+  deps = [
+    "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
+    "//drivers/peripheral/input/hal:hdi_input",
+  ]
   external_deps = [
-    "hdf_core:libhdf_test_common",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",

@@ -14,8 +14,5 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 group("power_entry") {
-  deps = [
-    "interfaces/hdi_service:hdf_power",
-    "//drivers/interface/power/v1_0:power",
-  ]
+  deps = [ "interfaces/hdi_service:hdf_power" ]
 }

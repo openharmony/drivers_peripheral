@@ -127,7 +127,7 @@ static int32_t HdiServiceLoadAdapter(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (ret == AUDIO_HAL_SUCCESS) {
-        HDF_LOGE("%{public}s: adapte already exist !", __func__);
+        HDF_LOGE("%{public}s: adapter already exist !", __func__);
         return AUDIO_HAL_SUCCESS;
     }
     if (!HdfSbufReadUint32(data, &tempDir)) {

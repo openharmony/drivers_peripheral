@@ -25,9 +25,15 @@
 extern "C" {
 #endif
 
-int32_t GenerateSolutionFunc(AuthSolutionHal param, CoAuthSchedule **schedules, uint32_t *scheduleNum);
-int32_t RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleToken, UserAuthTokenHal *authToken);
-int32_t CancelContextFunc(uint64_t contextId, CoAuthSchedule **schedules, uint32_t *scheduleNum);
+typedef struct AuthResult {
+    int32_t freezingTime;
+    int32_t remainTimes;
+    int32_t result;
+} AuthResult;
+
+int32_t GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules);
+int32_t RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, UserAuthTokenHal *authToken,
+    AuthResult *result);
 
 #ifdef __cplusplus
 }

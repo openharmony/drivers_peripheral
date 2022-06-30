@@ -18,7 +18,6 @@ if (defined(ohos_lite)) {
 } else {
   group("light_entry") {
     deps = [
-      "//drivers/interface/light/v1_0:light",
       "//drivers/peripheral/misc/light/hal:hdi_light",
       "//drivers/peripheral/misc/light/hdi_service:hdf_light_service",
     ]

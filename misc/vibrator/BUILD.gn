@@ -18,7 +18,6 @@ if (defined(ohos_lite)) {
 } else {
   group("vibrator_entry") {
     deps = [
-      "//drivers/interface/vibrator/v1_1:vibrator",
       "//drivers/peripheral/misc/vibrator/hal:hdi_vibrator",
       "//drivers/peripheral/misc/vibrator/hdi_service:hdf_vibrator_service",
     ]

@@ -80,12 +80,18 @@ if (defined(ohos_lite)) {
 
     deps = [
       "$hdf_uhdf_path/utils:libhdf_utils",
-      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
+      "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
+      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common",
       "//drivers/peripheral/input/hal:hdi_input",
     ]
+    if (!defined(enable_audio_user_mode) || enable_audio_user_mode == false) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    } else {
+      deps += [ "//device/soc/hisilicon/common/hal/media:hdi_audio" ]
+    }
+
     if (is_standard_system) {
       external_deps = [
-        "hdf_core:libhdf_test_common",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",

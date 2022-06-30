@@ -26,10 +26,12 @@ namespace Audio {
         char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
         void *PtrHandle = dlopen(resolvedPath, RTLD_LAZY);
         if (PtrHandle == nullptr) {
+            HDF_LOGE("%{public}s: dlopen failed \n", __func__);
             return false;
         }
         BindServiceCapture = (struct DevHandle *(*)(const char *))dlsym(PtrHandle, "AudioBindServiceCapture");
         if (BindServiceCapture == nullptr) {
+            HDF_LOGE("%{public}s: dlsym AudioBindServiceCapture failed \n", __func__);
             dlclose(PtrHandle);
             return false;
         }

@@ -18,6 +18,8 @@
 #include <atomic>
 #include <hdf_base.h>
 #include <file_ex.h>
+#include <iremote_object.h>
+#include <iproxy_broker.h>
 #include <sys/eventfd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -61,6 +63,9 @@ static void LoadStringFd(int32_t fd, std::string& content);
 static std::string ReadWakeCount();
 static bool WriteWakeCount(const std::string& count);
 static void NotifyCallback(int code);
+namespace {
+    sptr<PowerInterfaceImpl::PowerDeathRecipient> g_deathRecipient = nullptr;
+}
 
 extern "C" IPowerInterface *PowerInterfaceImplGetInstance(void)
 {
@@ -71,6 +76,23 @@ int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback>& ipow
 {
     std::lock_guard<std::mutex> lock(mutex_);
     callback_ = ipowerHdiCallback;
+    if (callback_ == nullptr) {
+        UnRegister();
+        return HDF_SUCCESS;
+    }
+    g_deathRecipient = new PowerDeathRecipient(this);
+    if (g_deathRecipient == nullptr) {
+        return HDF_FAILURE;
+    }
+    AddPowerDeathRecipient(callback_);
+    return HDF_SUCCESS;
+}
+
+int32_t PowerInterfaceImpl::UnRegister()
+{
+    HDF_LOGI("UnRegister");
+    RemovePowerDeathRecipient(callback_);
+    callback_ = nullptr;
     return HDF_SUCCESS;
 }
 
@@ -191,6 +213,35 @@ int32_t PowerInterfaceImpl::SuspendUnblock(const std::string& name)
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
+}
+
+int32_t PowerInterfaceImpl::AddPowerDeathRecipient(const sptr<IPowerHdiCallback> &callback)
+{
+    HDF_LOGI("AddPowerDeathRecipient");
+    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<IPowerHdiCallback>(callback);
+    bool result = remote->AddDeathRecipient(g_deathRecipient);
+    if (!result) {
+        HDF_LOGI("AddPowerDeathRecipient fail");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t PowerInterfaceImpl::RemovePowerDeathRecipient(const sptr<IPowerHdiCallback> &callback)
+{
+    HDF_LOGI("RemovePowerDeathRecipient");
+    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<IPowerHdiCallback>(callback);
+    bool result = remote->RemoveDeathRecipient(g_deathRecipient);
+    if (!result) {
+        HDF_LOGI("RemovePowerDeathRecipient fail");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+void PowerInterfaceImpl::PowerDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &object)
+{
+    powerInterfaceImpl_->UnRegister();
 }
 
 void LoadStringFd(int32_t fd, std::string& content)

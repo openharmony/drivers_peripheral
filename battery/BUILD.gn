@@ -12,8 +12,5 @@
 # limitations under the License.
 
 group("battery_entry") {
-  deps = [
-    "interfaces/hdi_service:hdf_battery",
-    "//drivers/interface/battery/v1_0:battery",
-  ]
+  deps = [ "interfaces/hdi_service:hdf_battery" ]
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +32,6 @@ extern "C" {
 
 #define MAX_CALL_BACK_COUNT 10
 static struct CallbackEvent *g_callbackEventMap[MAX_CALL_BACK_COUNT] = {NULL};
-static struct HmlCallbackEvent *g_hmlCallbackMap[MAX_CALL_BACK_COUNT] = {NULL};
 
 void WifiEventReport(const char *ifName, uint32_t event, void *data)
 {
@@ -105,75 +104,6 @@ void WifiUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, co
             return;
         }
     }
-}
-
-void WifiHmlReport(const char *ifName, struct HalEventData *data)
-{
-    uint32_t i;
-
-    for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
-        if (g_hmlCallbackMap[i] != NULL && (strcmp(g_hmlCallbackMap[i]->ifName, ifName) == 0)) {
-            HDF_LOGE("%s: WifiHmlReport send event, ifName = %s", __FUNCTION__, ifName);
-            g_hmlCallbackMap[i]->func(ifName, data);
-        }
-    }
-}
-
-int32_t WifiRegisterHmlCallback(NotifyMessage func, const char *ifName)
-{
-    uint32_t i;
-    struct HmlCallbackEvent *hmlCallbackEvent = NULL;
-
-    if (func == NULL || ifName == NULL) {
-        LOG_CORE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
-        return RET_CODE_INVALID_PARAM;
-    }
-    for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
-        if (g_hmlCallbackMap[i] != NULL && (strcmp(g_hmlCallbackMap[i]->ifName, ifName) == 0) &&
-            g_hmlCallbackMap[i]->func == func) {
-            HILOG_INFO("%s the func has been registered!", __FUNCTION__);
-            return RET_CODE_SUCCESS;
-        }
-    }
-    hmlCallbackEvent = (struct HmlCallbackEvent *)OsalMemCalloc(sizeof(struct HmlCallbackEvent));
-    if (hmlCallbackEvent == NULL) {
-        LOG_CORE("%s fail: malloc fail!", __FUNCTION__);
-        return RET_CODE_FAILURE;
-    }
-    if (strcpy_s(hmlCallbackEvent->ifName, IFNAMSIZ, ifName) != RET_CODE_SUCCESS) {
-        OsalMemFree(hmlCallbackEvent);
-        return RET_CODE_FAILURE;
-    }
-    hmlCallbackEvent->func = func;
-    for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
-        if (g_hmlCallbackMap[i] == NULL) {
-            g_hmlCallbackMap[i] = hmlCallbackEvent;
-            return RET_CODE_SUCCESS;
-        }
-    }
-    OsalMemFree(hmlCallbackEvent);
-    LOG_CORE("%s fail: register onRecFunc num more than %d!", __FUNCTION__, MAX_CALL_BACK_COUNT);
-    return RET_CODE_FAILURE;
-}
-
-int32_t WifiUnregisterHmlCallback(NotifyMessage func, const char *ifName)
-{
-    uint32_t i;
-
-    if (func == NULL || ifName == NULL) {
-        LOG_CORE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
-        return RET_CODE_FAILURE;
-    }
-    for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
-        if (g_hmlCallbackMap[i] != NULL && (strcmp(g_hmlCallbackMap[i]->ifName, ifName) == 0) &&
-            g_hmlCallbackMap[i]->func == func) {
-            g_hmlCallbackMap[i]->func = NULL;
-            OsalMemFree(g_hmlCallbackMap[i]);
-            g_hmlCallbackMap[i] = NULL;
-            return RET_CODE_SUCCESS;
-        }
-    }
-    return RET_CODE_FAILURE;
 }
 
 #ifdef __cplusplus

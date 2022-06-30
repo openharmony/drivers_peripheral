@@ -104,7 +104,7 @@ int32_t MixerCtlGetIntValue(struct mixer_ctl *contorl)
     elemValue.id.numid = contorl->info->id.numid;
     ret = ioctl(contorl->mixer->fd, SNDRV_CTL_IOCTL_ELEM_READ, &elemValue);
     if (ret < 0) {
-        LOG_FUN_ERR("read contorls value failed");
+        LOG_FUN_ERR("read controls value failed");
         return ret;
     }
     return elemValue.value.integer.value[0];
@@ -573,7 +573,7 @@ struct mixer *mixer_open_legacy(int32_t card)
     char dname[sizeof(SOUND_CTL_PREFIX) + 20];
     int32_t ret = sprintf_s(dname, sizeof(dname),  SOUND_CTL_PREFIX, card);
     if (ret < 0) {
-        LOG_FUN_ERR("sound card contorl node path sprintf failed");
+        LOG_FUN_ERR("sound card control node path sprintf failed");
         return NULL;
     }
     int32_t fd = open(dname, O_RDWR);

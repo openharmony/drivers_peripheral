@@ -23,7 +23,8 @@ ohos_shared_library("libface_auth_interface_service_1.0") {
     "src/executor_impl.cpp",
     "src/face_auth_interface_service.cpp",
   ]
-  public_deps = [ "//drivers/interface/face_auth/v1_0:libface_auth_stub_1.0" ]
+  public_configs =
+      [ "//drivers/interface/face_auth/v1_0:face_auth_idl_headers" ]
   external_deps = [
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
