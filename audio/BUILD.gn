@@ -16,7 +16,11 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
 group("hdi_audio") {
-  deps = [ "hal/hdi_passthrough:hdi_audio" ]
+  if (!defined(enable_audio_user_mode) || enable_audio_user_mode == false) {
+    deps = [ "hal/hdi_passthrough:hdi_audio" ]
+  } else {
+    deps = [ "//device/soc/hisilicon/common/hal/media:hdi_audio" ]
+  }
 
   if (defined(ohos_lite)) {
     deps += [ "config/lite:hdf_audio_adapter_json" ]
@@ -33,10 +37,13 @@ group("hdi_audio") {
     }
   }
 
-  deps += [
-    "supportlibs:hdi_audio_interface_lib_capture",
-    "supportlibs:hdi_audio_interface_lib_render",
-  ]
+  if (!defined(enable_audio_user_mode) || enable_audio_user_mode == false) {
+    deps += [
+      "supportlibs:hdi_audio_interface_lib_capture",
+      "supportlibs:hdi_audio_interface_lib_render",
+    ]
+  }
+
   if (enable_audio_hal_notsupport_pathselect == false) {
     deps += [ "hal/pathselect:hdi_audio_path_select" ]
 
