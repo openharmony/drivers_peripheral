@@ -20,9 +20,6 @@ if (defined(ohos_lite)) {
   }
 } else {
   group("location_geofence_entry") {
-    deps = [
-      "hdi_service:hdi_location_geofence_service",
-      "//drivers/interface/location/geofence/v1_0:location_geofence",
-    ]
+    deps = [ "hdi_service:hdi_location_geofence_service" ]
   }
 }

@@ -18,7 +18,8 @@ ohos_shared_library("libmemory_tracker_interface_service_1.0") {
   visibility = [ ":*" ]
   include_dirs = [ "include" ]
   sources = [ "src/memorytracker_interface_impl.cpp" ]
-  deps = [ "//drivers/interface/memory_tracker/v1_0:libmemorytracker_stub_1.0" ]
+  configs =
+      [ "//drivers/interface/memory_tracker/v1_0:memorytracker_idl_headers" ]
   external_deps = [
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",

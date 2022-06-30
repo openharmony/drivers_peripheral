@@ -17,9 +17,6 @@ if (defined(ohos_lite)) {
   }
 } else {
   group("face_auth_entry") {
-    deps = [
-      "./hdi_service:hdf_face_auth_service",
-      "//drivers/interface/face_auth/v1_0:face_auth",
-    ]
+    deps = [ "./hdi_service:hdf_face_auth_service" ]
   }
 }

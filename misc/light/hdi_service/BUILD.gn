@@ -19,9 +19,8 @@ ohos_shared_library("liblight_interface_service_1.0") {
     "//drivers/peripheral/misc/light/interfaces/include/",
   ]
   sources = [ "light_interface_impl.cpp" ]
-
+  configs = [ "//drivers/interface/light/v1_0:light_idl_headers" ]
   deps = [
-    "//drivers/interface/light/v1_0:liblight_stub_1.0",
     "//drivers/peripheral/misc/light/hal:hdi_light",
     "//utils/native/base:utils",
   ]
