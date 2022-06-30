@@ -56,6 +56,7 @@ static int32_t GetComponentNum()
 
     if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
         return HDF_FAILURE;
     }
 
@@ -135,6 +136,7 @@ static int32_t CreateComponent(struct CodecComponentType **component, uint32_t *
 
     if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(data, compName)) {
@@ -190,6 +192,7 @@ static int32_t DestoryComponent(uint32_t componentId)
 
     if (!HdfRemoteServiceWriteInterfaceToken(g_codecComponentManagerProxy.remoteOmx, data)) {
         HDF_LOGE("%{public}s: write interface token failed", __func__);
+        ReleaseSbuf(data, reply);
         return HDF_FAILURE;
     }
 

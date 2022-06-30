@@ -78,7 +78,7 @@ ComponentNode::ComponentNode(struct CodecCallbackType *callback, int64_t appData
 ComponentNode::~ComponentNode()
 {
     if (omxCallback_ != nullptr) {
-        OsalMemFree(omxCallback_);
+        CodecCallbackTypeRelease(omxCallback_);
         omxCallback_ = nullptr;
     }
     codecBufferMap_.clear();
@@ -187,7 +187,7 @@ int32_t ComponentNode::SetCallbacks(struct CodecCallbackType *omxCallback, int64
 {
     // release this->omxCallback_
     if (this->omxCallback_ != nullptr) {
-        OsalMemFree(this->omxCallback_);
+        CodecCallbackTypeRelease(this->omxCallback_);
         this->omxCallback_ = nullptr;
     }
     this->omxCallback_ = omxCallback;
