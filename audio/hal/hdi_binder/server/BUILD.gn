@@ -63,7 +63,12 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
       "src/hdf_audio_server_render.c",
     ]
 
-    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common" ]
+    if (!defined(enable_audio_user_mode) || enable_audio_user_mode == false) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    } else {
+      deps += [ "//device/soc/hisilicon/common/hal/media:hdi_audio" ]
+    }
 
     defines = []
     if (enable_audio_device_mpi) {
@@ -109,7 +114,12 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
       "src/hdf_audio_usb_server.c",
     ]
 
-    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common" ]
+    if (!defined(enable_audio_user_mode) || enable_audio_user_mode == false) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    } else {
+      deps += [ "//device/soc/hisilicon/common/hal/media:hdi_audio" ]
+    }
     if (is_standard_system) {
       external_deps = [
         "hdf_core:libhdf_host",
@@ -150,7 +160,12 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
       "src/hdf_audio_server_render.c",
     ]
 
-    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common" ]
+    if (!defined(enable_audio_user_mode) || enable_audio_user_mode == false) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    } else {
+      deps += [ "//device/soc/hisilicon/common/hal/media:hdi_audio" ]
+    }
     if (is_standard_system) {
       external_deps = [
         "hdf_core:libhdf_host",

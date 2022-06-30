@@ -217,7 +217,7 @@ int32_t InitAttrsCapture(struct AudioSampleAttributes *attrs)
     attrs->format = AUDIO_FORMAT_PCM_16_BIT;
     attrs->channelCount = AUDIO_CHANNELCOUNT;
     attrs->sampleRate = AUDIO_SAMPLE_RATE_48K;
-    attrs->interleaved = 0;
+    attrs->interleaved = 1;
     attrs->type = AUDIO_IN_MEDIA;
     attrs->period = BUFFER_PERIOD_SIZE;
     attrs->frameSize = PCM_16_BIT * attrs->channelCount / PCM_8_BIT;
