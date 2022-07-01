@@ -26,7 +26,6 @@ config("hdi_service_proxy_config") {
     "-fno-strict-aliasing",
     "-Wno-sign-compare",
     "-Wno-builtin-requires-header",
-    "-Wno-implicit-function-declaration",
     "-Wno-format",
     "-Wno-int-conversion",
     "-Wno-unused-function",
