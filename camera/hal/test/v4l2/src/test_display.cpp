@@ -361,7 +361,7 @@ void TestDisplay::Init()
     if (cameraDevice == nullptr) {
         cameraHost->GetCameraIds(cameraIds);
         cameraHost->GetCameraAbility(cameraIds.front(), ability);
-        const OHOS::sptr<OHOS::Camera::CameraDeviceCallback> callback = new CameraDeviceCallback();
+        const OHOS::sptr<DemoCameraDeviceCallback> callback = new DemoCameraDeviceCallback();
         rc = cameraHost->OpenCamera(cameraIds.front(), callback, cameraDevice);
         if (rc != OHOS::Camera::NO_ERROR || cameraDevice == nullptr) {
             std::cout << "==========[test log] OpenCamera failed, rc = " << rc << std::endl;
@@ -603,3 +603,39 @@ void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& str
         }
     }
 }
+
+void DemoCameraDeviceCallback::PrintStabiliInfo(const std::shared_ptr<OHOS::Camera::CameraMetadata>& result)
+{
+    if (result == nullptr) {
+        CAMERA_LOGE("TestDisplay: result is null");
+        return;
+    }
+    common_metadata_header_t* data = result->get();
+    if (data == nullptr) {
+        CAMERA_LOGE("TestDisplay: data is null");
+        return;
+    }
+    uint8_t videoStabiliMode;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_CONTROL_EXPOSURE_MODE error\n");
+        return;
+    }
+    videoStabiliMode = *(entry.data.u8);
+    CAMERA_LOGI("videoStabiliMode: %{public}d", videoStabiliMode);
+    std::cout << "==========[test log] PrintStabiliInfo videoStabiliMode: " << (int)videoStabiliMode << std::endl;
+}
+
+#ifndef CAMERA_BUILT_ON_OHOS_LITE
+void DemoCameraDeviceCallback::OnError(const OHOS::Camera::ErrorType type, const int32_t errorMsg)
+{
+    CAMERA_LOGI("demo test: OnError type : %{public}d, errorMsg : %{public}d", type, errorMsg);
+}
+
+void DemoCameraDeviceCallback::OnResult(const uint64_t timestamp,
+                                        const std::shared_ptr<OHOS::Camera::CameraMetadata>& result)
+{
+    PrintStabiliInfo(result);
+}
+#endif

@@ -175,6 +175,7 @@ RetCode HcsDeal::DealMetadata(const std::string &cameraId, const struct DeviceRe
     DealMirrorSupported(node, metadata);
     DealAvaliableBasicConfigurations(node, metadata);
     DealSensorOrientation(node, metadata);
+    DealAvalialbleVideoStabilizationModes(node, metadata);
     cameraMetadataMap_.insert(std::make_pair(cameraId, metadata));
 
     return RC_OK;
@@ -753,6 +754,37 @@ RetCode HcsDeal::DealSensorOrientation(
         return RC_ERROR;
     }
     CAMERA_LOGI("sensorOrientationSupported add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealAvalialbleVideoStabilizationModes(
+    const struct DeviceResourceNode &metadataNode,
+    std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    uint8_t hcbRet = 0;
+    const char *nodeValue = nullptr;
+    std::vector<uint8_t> videoStabilizationAvailableModes;
+
+    int32_t elemNum = pDevResIns->GetElemNum(
+        &metadataNode, "videoStabilizationAvailableModes");
+    CAMERA_LOGI("elemNum = %{public}d", elemNum);
+    for (int i = 0; i < elemNum; i++) {
+        hcbRet = pDevResIns->GetStringArrayElem(
+            &metadataNode, "videoStabilizationAvailableModes", i, &nodeValue, nullptr);
+        if (hcbRet != 0) {
+            CAMERA_LOGE("get videoStabilizationAvailableModes failed");
+            continue;
+        }
+        CAMERA_LOGI("nodeValue = %{public}s", nodeValue);
+        videoStabilizationAvailableModes.push_back(videoStabilizationMap[std::string(nodeValue)]);
+    }
+    bool ret = metadata->addEntry(OHOS_ABILITY_VIDEO_STABILIZATION_MODES,
+        videoStabilizationAvailableModes.data(), videoStabilizationAvailableModes.size());
+    if (!ret) {
+        CAMERA_LOGE("videoStabilizationAvailableModes add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGI("videoStabilizationAvailableModes add success");
     return RC_OK;
 }
 
