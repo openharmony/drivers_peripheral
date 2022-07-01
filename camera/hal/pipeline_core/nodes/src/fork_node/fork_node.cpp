@@ -192,6 +192,7 @@ RetCode ForkNode::CopyBuffer(uint64_t poolId, std::shared_ptr<IBuffer>& buffer)
         tmpBuffer_->GetVirAddress(), tmpBuffer_->GetSize()) != 0) {
             CAMERA_LOGE("memcpy_s failed.");
     }
+    buffer->SetEsFrameSize(buffer->GetSize());
     buffer->SetEsTimestamp(tmpBuffer_->GetEsFrameInfo().timestamp);
     return RC_OK;
 }
