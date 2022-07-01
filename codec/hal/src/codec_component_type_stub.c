@@ -754,6 +754,8 @@ void CodecComponentTypeStubRelease(struct CodecComponentTypeStub *stub)
     if (stub == NULL) {
         return;
     }
-    HdfRemoteServiceRecycle(stub->remote);
-    stub->remote = NULL;
+    if (stub->remote != NULL) {
+        HdfRemoteServiceRecycle(stub->remote);
+        stub->remote = NULL;
+    }
 }

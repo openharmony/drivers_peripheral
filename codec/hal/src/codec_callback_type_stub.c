@@ -283,5 +283,9 @@ void CodecCallbackTypeStubRelease(struct CodecCallbackType *instance)
     }
     struct CodecCallbackTypeStub *stub = CONTAINER_OF(instance, struct CodecCallbackTypeStub, service);
     dlclose(stub->dlHandler);
+    if (stub->service.remote != NULL) {
+        HdfRemoteServiceRecycle(stub->service.remote);
+        stub->service.remote = NULL;
+    }
     OsalMemFree(stub);
 }
