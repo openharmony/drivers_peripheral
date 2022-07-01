@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
+#include <fstream>
 #include <mutex>
 #include <unistd.h>
 
@@ -41,7 +42,6 @@ const std::string BATTERY_CHARGER_CURRENT_PATH = "/data/cooling/charger/current"
 const std::string SIM_BATTERY_CURRENT_PATH = "/data/cooling/battery/current";
 const std::string BATTERY_VOLTAGE_PATH = "/data/cooling/battery/voltage";
 std::mutex mutex_;
-const std::string ACTUAL_CPU_FREQ_PATH = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq";
 const std::string ACTUAL_BATTERY_CURRENT_PATH = "/sys/class/power_supply/battery/input_current_limited";
 const int32_t NUM_ZERO = 0;
 }
@@ -78,6 +78,8 @@ int32_t ThermalDeviceMitigation::OpenSysfsFile(std::string filePath, int32_t fla
 
 int32_t ThermalDeviceMitigation::WriteSysfsFile(std::string filePath, std::string buf, size_t bytesSize)
 {
+    std::fstream file(filePath.c_str(), std::ios::out | std::ios::trunc);
+    file.close();
     int32_t fd = OpenSysfsFile(filePath.c_str(), O_RDWR);
     if (fd < NUM_ZERO) {
         THERMAL_HILOGE(COMP_HDI, "failed to open %{public}s", filePath.c_str());
@@ -121,11 +123,7 @@ int32_t ThermalDeviceMitigation::ExecuteCpuRequest(uint32_t freq, const std::str
 
 int32_t ThermalDeviceMitigation::CpuRequest(uint32_t freq)
 {
-    int32_t ret = ExecuteCpuRequest(freq, ACTUAL_CPU_FREQ_PATH);
-    if (ret != HDF_SUCCESS) {
-        THERMAL_HILOGE(COMP_HDI, "failed to really set freq");
-    }
-    ret = ExecuteCpuRequest(freq, SIM_CPU_FREQ_PATH);
+    int32_t ret = ExecuteCpuRequest(freq, SIM_CPU_FREQ_PATH);
     if (ret != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
