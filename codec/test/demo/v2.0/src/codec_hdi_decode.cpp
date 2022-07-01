@@ -627,8 +627,8 @@ void CodecHdiDecode::Run()
 }
 int32_t CodecHdiDecode::OnEvent(struct CodecCallbackType *self, enum OMX_EVENTTYPE event, struct EventInfo *info)
 {
-    HDF_LOGI("%{public}s: appData[%{public}ld] eEvent [%{public}d], nData1[%{public}d]", __func__, info->appData, event,
-             info->data1);
+    HDF_LOGI("%{public}s: appData[%{public}" PRId64 "] eEvent [%{public}d], nData1[%{public}d]", __func__,
+             info->appData, event, info->data1);
     switch (event) {
         case OMX_EventCmdComplete: {
             OMX_COMMANDTYPE cmd = (OMX_COMMANDTYPE)info->data1;
