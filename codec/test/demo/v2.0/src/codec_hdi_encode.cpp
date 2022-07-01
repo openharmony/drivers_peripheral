@@ -567,9 +567,8 @@ int32_t CodecHdiEncode::createBufferHandle()
 
 int32_t CodecHdiEncode::OnEvent(struct CodecCallbackType *self, enum OMX_EVENTTYPE event, struct EventInfo *info)
 {
-    HDF_LOGI("OnEvent: pAppData[%{public}ld], eEvent [%{public}d], "
-             "nData1[%{public}d]",
-             info->appData, event, info->data1);
+    HDF_LOGI("OnEvent: pAppData[%{public} " PRId64 "], eEvent [%{public}d], nData1[%{public}d]", info->appData, event,
+             info->data1);
     switch (event) {
         case OMX_EventCmdComplete: {
             OMX_COMMANDTYPE cmd = (OMX_COMMANDTYPE)info->data1;

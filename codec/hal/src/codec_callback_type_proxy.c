@@ -248,6 +248,9 @@ void CodecCallbackTypeRelease(struct CodecCallbackType *instance)
         HDF_LOGE("%{public}s: instance is null", __func__);
         return;
     }
-    HdfRemoteServiceRecycle(instance->remote);
+    if (instance->remote != NULL) {
+        HdfRemoteServiceRecycle(instance->remote);
+        instance->remote = NULL;
+    }
     OsalMemFree(instance);
 }

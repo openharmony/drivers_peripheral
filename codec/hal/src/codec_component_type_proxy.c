@@ -959,5 +959,9 @@ void CodecComponentTypeRelease(struct CodecComponentType *instance)
         return;
     }
     struct CodecComponentTypeProxy *proxy = CONTAINER_OF(instance, struct CodecComponentTypeProxy, instance);
+    if (proxy->remote) {
+        HdfRemoteServiceRecycle(proxy->remote);
+        proxy->remote = NULL;
+    }
     OsalMemFree(proxy);
 }

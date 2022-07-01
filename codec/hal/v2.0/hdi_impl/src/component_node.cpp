@@ -244,7 +244,7 @@ int32_t ComponentNode::OnEvent(OMX_EVENTTYPE event, uint32_t data1, uint32_t dat
         HDF_LOGE("%{public}s omxCallback_ is null", __func__);
         return OMX_ErrorNone;
     }
-
+    HDF_LOGD("%{public}s, event [%d], data1 [%d],data2 [%d]", __func__, event, data1, data2);
     struct EventInfo info = {.appData = appData_,
                              .data1 = data1,
                              .data2 = data2,
