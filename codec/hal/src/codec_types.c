@@ -307,6 +307,9 @@ void ReleaseOmxCodecBuffer(struct OmxCodecBuffer *codecBuffer)
         FreeBufferHandle((BufferHandle *)codecBuffer->buffer);
     } else if (codecBuffer->bufferType != CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
         OsalMemFree(codecBuffer->buffer);
+    } else {
+        int fd = (uintptr_t)codecBuffer->buffer;
+        close(fd);
     }
     codecBuffer->buffer = NULL;
     codecBuffer->bufferLen = 0;

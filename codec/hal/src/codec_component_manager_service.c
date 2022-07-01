@@ -133,7 +133,7 @@ int32_t OmxManagerDestroyComponent(uint32_t componentId)
             err = OmxAdapterDestoryComponent(codecNode);
             if (err != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s, OmxAdapterDestoryComponent ret err[%{public}d]!", __func__, err);
-                return err;
+                break;
             }
         }
         DListRemove(&pos->node);
