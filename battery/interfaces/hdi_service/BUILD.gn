@@ -27,10 +27,8 @@ ohos_shared_library("libbattery_interface_service_1.0") {
     "src/battery_thread.cpp",
     "src/power_supply_provider.cpp",
   ]
-
-  configs = [ "//drivers/interface/battery/v1_0:battery_idl_headers" ]
-
   deps = [
+    "//drivers/interface/battery/v1_0:battery_idl_headers",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
