@@ -132,9 +132,19 @@ void SensorController::SetNodeCallBack(const NodeBufferCb cb)
 
 void SensorController::SetMetaDataCallBack(const MetaDataCb cb)
 {
-    CAMERA_LOGI("SensorController line: %{public}d", __LINE__);
     std::lock_guard<std::mutex> lock(metaDataFlaglock_);
-    metaDataCb_ = cb;
+    if (firstSetCallback_) {
+        CAMERA_LOGI("SensorController line: %{public}d", __LINE__);
+        firstSetCallback_ = false;
+        fromDeviceMetaDataCb_ = cb;
+        metaDataCb_ = fromDeviceMetaDataCb_;
+    } else if (cb == nullptr) {
+        CAMERA_LOGI("SensorController line: %{public}d", __LINE__);
+        metaDataCb_ = fromDeviceMetaDataCb_;
+    } else {
+        CAMERA_LOGI("SensorController line: %{public}d", __LINE__);
+        metaDataCb_ = cb;
+    }
 }
 
 void SensorController::BufferCallback(std::shared_ptr<FrameSpec> buffer)
@@ -399,11 +409,15 @@ void SensorController::GetExposureCompensation(SensorController *sensorControlle
         return;
     }
     int32_t exposureCompensation = value;
-
+    constexpr uint32_t DATA_COUNT = 1;
     CAMERA_LOGI("Get CMD_FEXPOSURE_COMPENSATION [%{public}]", exposureCompensation);
     std::lock_guard<std::mutex> lock(sensorController->metaDataFlaglock_);
     sensorController->metaDataFlag_ = true;
-    meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &exposureCompensation, 1);
+    meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &exposureCompensation, DATA_COUNT);
+
+    // dummy data
+    uint8_t videoStabiliMode = OHOS_CAMERA_VIDEO_STABILIZATION_OFF;
+    meta->addEntry(OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &videoStabiliMode, DATA_COUNT);
 }
 
 void SensorController::GetMeterMode(SensorController *sensorController,

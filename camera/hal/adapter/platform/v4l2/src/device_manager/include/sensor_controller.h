@@ -103,6 +103,7 @@ private:
     bool startSensorState_ = false;
     NodeBufferCb nodeBufferCb_ = nullptr;
     MetaDataCb metaDataCb_ = nullptr;
+    MetaDataCb fromDeviceMetaDataCb_ = nullptr;
     std::vector<int32_t> abilityMetaData_;
     std::mutex metaDataSetlock_;
     std::mutex metaDataFlaglock_;
@@ -111,6 +112,7 @@ private:
     std::shared_ptr<HosV4L2Dev> sensorVideo_;
     static std::map<int32_t, uint32_t> tagV4L2CidMap_;
     static std::map<int32_t, TagFunType> tagMethodMap_;
+    bool firstSetCallback_ = true;
 };
 } // namespace OHOS::Camera
 #endif

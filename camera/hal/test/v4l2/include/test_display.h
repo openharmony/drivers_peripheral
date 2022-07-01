@@ -161,4 +161,16 @@ public:
     void PrintFaceDetectInfo(const void *bufStart, const uint32_t size) const;
     int videoFd_ = -1;
 };
+
+#ifndef CAMERA_BUILT_ON_OHOS_LITE
+class DemoCameraDeviceCallback : public OHOS::Camera::CameraDeviceCallbackStub {
+public:
+    DemoCameraDeviceCallback() = default;
+    virtual ~DemoCameraDeviceCallback() = default;
+    void OnError(OHOS::Camera::ErrorType type, int32_t errorMsg) override;
+    void OnResult(const uint64_t timestamp,
+                  const std::shared_ptr<OHOS::Camera::CameraMetadata>& result) override;
+    void PrintStabiliInfo(const std::shared_ptr<OHOS::Camera::CameraMetadata>& result);
+};
+#endif
 #endif
