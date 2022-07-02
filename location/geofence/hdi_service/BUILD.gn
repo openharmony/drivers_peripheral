@@ -19,10 +19,11 @@ ohos_shared_library("libgeofence_interface_service_1.0") {
     "//drivers/peripheral/location/gnss/hdi_service",
   ]
   sources = [ "geofence_interface_impl.cpp" ]
-  configs = [
+
+  deps = [
     "//drivers/interface/location/geofence/v1_0:location_geofence_idl_headers",
+    "//drivers/peripheral/location/gnss/hdi_service:libgnss_interface_service_1.0",
   ]
-  deps = [ "//drivers/peripheral/location/gnss/hdi_service:libgnss_interface_service_1.0" ]
 
   cflags = [
     "-Wall",

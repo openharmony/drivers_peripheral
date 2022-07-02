@@ -24,8 +24,8 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/misc/vibrator/interfaces/include/",
     ]
     sources = [ "vibrator_interface_impl.cpp" ]
-    configs = [ "//drivers/interface/vibrator/v1_1:vibrator_idl_headers" ]
     deps = [
+      "//drivers/interface/vibrator/v1_1:vibrator_idl_headers",
       "//drivers/peripheral/misc/vibrator/hal:hdi_vibrator",
       "//utils/native/base:utils",
     ]
