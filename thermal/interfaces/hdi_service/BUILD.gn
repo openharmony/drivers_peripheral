@@ -29,8 +29,10 @@ ohos_shared_library("libthermal_interface_service_1.0") {
     "src/thermal_simulation_node.cpp",
     "src/thermal_zone_manager.cpp",
   ]
-  configs = [ "//drivers/interface/thermal/v1_0:thermal_idl_headers" ]
-  deps = [ "//third_party/libxml2:xml2" ]
+  deps = [
+    "//drivers/interface/thermal/v1_0:thermal_idl_headers",
+    "//third_party/libxml2:xml2",
+  ]
 
   if (is_standard_system) {
     external_deps = [

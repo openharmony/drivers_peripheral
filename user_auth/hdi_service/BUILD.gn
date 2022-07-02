@@ -58,14 +58,13 @@ ohos_shared_library("libuser_auth_interface_service_1.0") {
     "user_auth/src/user_auth_funcs.c",
     "user_auth/src/user_sign_centre.c",
   ]
-  public_configs =
-      [ "//drivers/interface/user_auth/v1_0:user_auth_idl_headers" ]
   external_deps = [
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",
   ]
+  public_deps = [ "//drivers/interface/user_auth/v1_0:user_auth_idl_headers" ]
   deps = [
     "//base/useriam/user_auth_framework/common:iam_utils",
     "//third_party/openssl:libcrypto_static",
