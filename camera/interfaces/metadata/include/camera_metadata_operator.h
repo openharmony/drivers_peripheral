@@ -143,6 +143,9 @@ common_metadata_header_t *AllocateCameraMetadataBuffer(uint32_t item_capacity, u
 // Find camera metadata item and fill the found item
 int FindCameraMetadataItem(const common_metadata_header_t *src, uint32_t item, camera_metadata_item_t *metadataItem);
 
+// Find camera metadata item index if the item exists
+int FindCameraMetadataItemIndex(const common_metadata_header_t *src, uint32_t item, uint32_t *index);
+
 // Get camera metadata item name
 const char *GetCameraMetadataItemName(uint32_t item);
 
