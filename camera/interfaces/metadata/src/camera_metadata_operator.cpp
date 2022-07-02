@@ -349,8 +349,8 @@ int FindCameraMetadataItemIndex(const common_metadata_header_t *src, uint32_t it
 {
     METADATA_DEBUG_LOG("FindCameraMetadataItemIndex start");
     METADATA_DEBUG_LOG("FindCameraMetadataItemIndex item: %{public}u", item);
-    if (src == nullptr) {
-        METADATA_ERR_LOG("FindCameraMetadataItemIndex src is null");
+    if (src == nullptr || idx == nullptr) {
+        METADATA_ERR_LOG("FindCameraMetadataItemIndex src or index is null");
         return CAM_META_INVALID_PARAM;
     }
 
