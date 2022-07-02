@@ -338,27 +338,6 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiCreateComponentTest_004, TestSize.Level1)
         g_manager->CreateComponent(&component, &componentId, g_codecAvcEncodeCap.compName, (int64_t)this, callback);
     ASSERT_EQ(ret, HDF_SUCCESS);
     ASSERT_TRUE(component != nullptr);
-    struct CompVerInfo verInfo;
-    ret = component->GetComponentVersion(component, &verInfo);
-    ASSERT_EQ(ret, HDF_SUCCESS);
-    CodecPixFormatParam pixFormat;
-    InitOhosParam(pixFormat);
-    pixFormat.version = verInfo.compVersion;
-    pixFormat.portIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
-    ret = component->GetParameter(component, OMX_IndexParamCodecPixFormat,
-                                         reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
-    ASSERT_NE(ret, HDF_SUCCESS);
-
-    pixFormat.portIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
-    ret = component->GetParameter(component, OMX_IndexParamCodecPixFormat,
-                                         reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
-    ASSERT_EQ(ret, HDF_SUCCESS);
-
-    pixFormat.codecColorFormat = PIXEL_FMT_RGB_555;
-    ret = component->GetParameter(component, OMX_IndexParamCodecPixFormat,
-                                         reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
-    ASSERT_EQ(ret, HDF_SUCCESS);
-
     ret = g_manager->DestoryComponent(componentId);
     ASSERT_EQ(ret, HDF_SUCCESS);
     CodecComponentTypeRelease(component);
