@@ -24,6 +24,7 @@
 #include <sys/timerfd.h>
 #include <linux/netlink.h>
 #include "thermal_log.h"
+#include "thermal_dfx.h"
 
 namespace OHOS {
 namespace HDI {
@@ -202,6 +203,10 @@ void ThermalHdfTimer::StartThread(void *service)
 
 int32_t ThermalHdfTimer::Init()
 {
+    std::unique_ptr<ThermalDfx> thermalDfx = std::make_unique<ThermalDfx>();
+    if (thermalDfx != nullptr) {
+        thermalDfx->Init();
+    }
     StartThread(this);
     return HDF_SUCCESS;
 }
