@@ -12,7 +12,7 @@
         </group>
         <group name="sim" interval="5000">
             <thermal_node type="soc" path="data/sensor/soc/temp"/>
-            <thermal_node type="cpu" path="data/sensor/cpu/temp"/>
+            <thermal_node type="cpu" path="data/sensor/cpu/temp" record="true"/>
             <thermal_node type="ap" path="data/sensor/ap/temp"/>
             <thermal_node type="pa" path="data/sensor/pa/temp"/>
             <thermal_node type="ambient" path="data/sensor/ambient/temp"/>
@@ -21,4 +21,17 @@
             <thermal_node type="shell" path="data/sensor/shell/temp"/>
         </group>
     </polling>
+
+    <tracing interval="5000" record="true" outpath="/data/log/thermal/thermal-log">
+        <node>
+            <title path="sys/class/thermal/thermal_zone0/type"/>
+            <value path="sys/class/thermal/thermal_zone0/temp"/>
+            <width value="10"/>
+        </node>
+        <node>
+            <title name="gpu-thermal"/>
+            <value path="sys/class/thermal/thermal_zone1/temp"/>
+            <width value="10"/>
+        </node>
+    </tracing>
 </thermal>
