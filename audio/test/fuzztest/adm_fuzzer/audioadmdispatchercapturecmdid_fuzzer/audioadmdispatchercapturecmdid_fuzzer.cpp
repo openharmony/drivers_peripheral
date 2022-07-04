@@ -16,7 +16,8 @@
 #include "hdf_log.h"
 #include "audio_hdi_common.h"
 #include "audio_adm_common.h"
-using namespace HMOS::Audio;
+
+using namespace OHOS::Audio;
 namespace OHOS {
 namespace Audio {
     bool AudioAdmDispatcherCaptureCmdidFuzzTest(const uint8_t *data, size_t size)

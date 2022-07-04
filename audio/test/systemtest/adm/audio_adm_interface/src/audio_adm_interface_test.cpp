@@ -27,7 +27,7 @@
 
 using namespace std;
 using namespace testing::ext;
-using namespace HMOS::Audio;
+using namespace OHOS::Audio;
 
 namespace {
     const int CONTROL_DISP_METHOD_CMD_ILLEGAL = 5;

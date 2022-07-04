@@ -39,7 +39,7 @@ to buffer
 #include "osal_mem.h"
 #include "audio_hdi_common.h"
 
-namespace HMOS {
+namespace OHOS {
 namespace Audio {
 const int REGISTER_STATUS_ON = 0;
 const int REGISTER_STATUS_OFF = 1;

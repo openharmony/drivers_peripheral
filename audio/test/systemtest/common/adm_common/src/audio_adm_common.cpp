@@ -37,7 +37,7 @@ to buffer.
 
 using namespace std;
 
-namespace HMOS {
+namespace OHOS {
 namespace Audio {
 int32_t WriteHwParamsToBuf(struct HdfSBuf *sBuf, struct AudioPcmHwParams hwParams)
 {
