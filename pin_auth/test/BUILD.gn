@@ -11,7 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+group("uinttest") {
+  testonly = true
+  deps = [ "uinttest/pin_auth:PinAuthHdiUtTest" ]
+}
+
 group("fuzztest") {
   testonly = true
-  deps = [ "pinauthhdi_fuzzer:PinAuthHdiFuzzTest" ]
+  deps = [ "fuzztest/pin_auth/pinauthhdi_fuzzer:PinAuthHdiFuzzTest" ]
 }
