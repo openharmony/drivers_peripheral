@@ -17,13 +17,13 @@ ohos_shared_library("libnfc_interface_service_1.0") {
   include_dirs = [
     "//drivers/peripheral/nfc/nfc_core/hdi_service",
     "//drivers/peripheral/nfc/nfc_core/vendor_adaptor",
-    "//third_party/nfc-nci/nfc-halimpl/SN100x/halimpl/inc",
+    "//third_party/nfc_hdiimpl/SN100x/halimpl/inc",
   ]
   sources = [ "nfc_impl.cpp" ]
   public_deps = [
     "//drivers/interface/nfc/nfc_core/v1_0:nfc_idl_headers",
     "//drivers/peripheral/nfc/nfc_core/vendor_adaptor:nfc_vendor_adaptor",
-    "//third_party/nfc-nci/nfc-halimpl/SN100x:libnfc-halimpl",
+    "//third_party/nfc_hdiimpl/SN100x:nfc_hdiimpl",
   ]
 
   cflags = []
@@ -45,7 +45,7 @@ ohos_shared_library("nfc_hdi_driver") {
   include_dirs = [
     "//drivers/peripheral/nfc/nfc_core/hdi_service",
     "//drivers/peripheral/nfc/nfc_core/vendor_adaptor",
-    "//third_party/nfc-nci/nfc-halimpl/SN100x/halimpl/inc",
+    "//third_party/nfc_hdiimpl/SN100x/halimpl/inc",
   ]
 
   sources = [ "nfc_interface_driver.cpp" ]
@@ -55,6 +55,7 @@ ohos_shared_library("nfc_hdi_driver") {
   cflags = []
 
   external_deps = [
+    "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
