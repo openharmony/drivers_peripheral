@@ -90,8 +90,8 @@ static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_001, TestSize.Level1)
     });
     sleep(2);
     // release stream
-    display_->captureIds = {display_->captureId_preview, display_->captureId_capture, display_->captureId_analyze};
-    display_->streamIds = {display_->streamId_preview, display_->streamId_capture, display_->streamId_analyze};
+    display_->captureIds = {display_->captureId_preview, display_->captureId_analyze, display_->captureId_capture};
+    display_->streamIds = {display_->streamId_preview, display_->streamId_analyze, display_->streamId_capture};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
