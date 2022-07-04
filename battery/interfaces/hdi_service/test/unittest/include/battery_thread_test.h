@@ -34,11 +34,6 @@ void UpdateEpollIntervalTest(const int32_t chargeState, BatteryThread& bthread);
 int GetEpollIntervalTest(BatteryThread& bthread);
 int32_t InitTest(void* service, BatteryThread& bthread);
 int32_t GetEpollFdTest(BatteryThread& bthread);
-int32_t InitTimerTest(BatteryThread& bthread);
-void SetTimerFdTest(const int32_t fd, BatteryThread& bthread);
-int32_t GetTimerFdTest(BatteryThread& bthread);
-void SetTimerIntervalTest(const int interval, BatteryThread& bthread);
-int32_t GetTimerIntervalTest(BatteryThread& bthread);
 int32_t InitUeventTest(BatteryThread& bthread);
 int32_t GetUeventFdTest(BatteryThread& bthread);
 void ParseConfigTest(const std::string filename, BatteryConfig& bconfig);
@@ -87,46 +82,6 @@ class GetEpollFdImplement {
     friend int32_t GetEpollFdTest(BatteryThread& bthread)
     {
         return (bthread.*privateFun);
-    }
-};
-
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
-class InitTimerImplement {
-    friend int32_t InitTimerTest(BatteryThread& bthread)
-    {
-        return (bthread.*privateFun)();
-    }
-};
-
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
-class GetTimerFdImplement {
-    friend int32_t GetTimerFdTest(BatteryThread& bthread)
-    {
-        return (bthread.*privateFun);
-    }
-};
-
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
-class SetTimerFdImplement {
-    friend void SetTimerFdTest(const int32_t fd, BatteryThread& bthread)
-    {
-        (bthread.*privateFun) = fd;
-    }
-};
-
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
-class GetTimerIntervalImplement {
-    friend int32_t GetTimerIntervalTest(BatteryThread& bthread)
-    {
-        return (bthread.*privateFun);
-    }
-};
-
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
-class SetTimerIntervalImplement {
-    friend void SetTimerIntervalTest(const int interval, BatteryThread& bthread)
-    {
-        (bthread.*privateFun) = interval;
     }
 };
 
@@ -238,36 +193,6 @@ template class GetEpollFdImplement <
     BatteryThreadUnitTest,
     decltype(&BatteryThread::epFd_),
     &BatteryThread::epFd_
->;
-
-template class InitTimerImplement <
-    BatteryThreadUnitTest,
-    decltype(&BatteryThread::InitTimer),
-    &BatteryThread::InitTimer
->;
-
-template class GetTimerFdImplement <
-    BatteryThreadUnitTest,
-    decltype(&BatteryThread::timerFd_),
-    &BatteryThread::timerFd_
->;
-
-template class SetTimerFdImplement <
-    BatteryThreadUnitTest,
-    decltype(&BatteryThread::timerFd_),
-    &BatteryThread::timerFd_
->;
-
-template class GetTimerIntervalImplement <
-    BatteryThreadUnitTest,
-    decltype(&BatteryThread::timerInterval_),
-    &BatteryThread::timerInterval_
->;
-
-template class SetTimerIntervalImplement <
-    BatteryThreadUnitTest,
-    decltype(&BatteryThread::timerInterval_),
-    &BatteryThread::timerInterval_
 >;
 
 template class InitUeventImplement <
