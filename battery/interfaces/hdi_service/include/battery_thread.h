@@ -52,16 +52,12 @@ private:
     bool IsPowerSupplyEvent(const char* msg);
     int32_t Init([[maybe_unused]]void* service);
     int32_t InitUevent();
-    int32_t InitTimer();
-    void TimerCallback(void* service);
     void UeventCallback(void* service);
     void SetTimerInterval(int32_t interval);
     int32_t RegisterCallback(int32_t fd, EventType et);
     static constexpr int32_t INVALID_FD = -1;
     int32_t ueventFd_ = INVALID_FD;
-    int32_t timerFd_ = INVALID_FD;
     int32_t epFd_ = INVALID_FD;
-    int32_t timerInterval_ = -1;
     int32_t epollInterval_ = -1;
     using Callback = std::function<void(BatteryThread*, void*)>;
     std::map<int32_t, Callback> callbacks_;

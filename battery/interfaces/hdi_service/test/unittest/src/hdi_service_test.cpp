@@ -1101,26 +1101,10 @@ HWTEST_F (HdiServiceTest, HdiService013, TestSize.Level1)
 
 /**
  * @tc.name: HdiService014
- * @tc.desc: Test functions InitTimer
- * @tc.type: FUNC
- */
-HWTEST_F (HdiServiceTest, HdiService014, TestSize.Level1)
-{
-    BatteryThread bt;
-
-    InitTimerTest(bt);
-    auto timerFd = GetTimerFdTest(bt);
-    BATTERY_HILOGI(LABEL_TEST, "HdiService014::timerFd==%{public}d", timerFd);
-
-    ASSERT_TRUE(timerFd > 0);
-}
-
-/**
- * @tc.name: HdiService015
  * @tc.desc: Test functions GetLedConf in BatteryConfig
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService015, TestSize.Level1)
+HWTEST_F (HdiServiceTest, HdiService014, TestSize.Level1)
 {
     std::unique_ptr<BatteryConfig> conf = std::make_unique<BatteryConfig>();
     conf->Init();
@@ -1143,11 +1127,11 @@ HWTEST_F (HdiServiceTest, HdiService015, TestSize.Level1)
 }
 
 /**
- * @tc.name: HdiService016
+ * @tc.name: HdiService015
  * @tc.desc: Test functions GetTempConf in BatteryConfig
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService016, TestSize.Level1)
+HWTEST_F (HdiServiceTest, HdiService015, TestSize.Level1)
 {
     std::unique_ptr<BatteryConfig> conf = std::make_unique<BatteryConfig>();
     conf->Init();
@@ -1158,11 +1142,11 @@ HWTEST_F (HdiServiceTest, HdiService016, TestSize.Level1)
 }
 
 /**
- * @tc.name: HdiService017
+ * @tc.name: HdiService016
  * @tc.desc: Test functions GetCapacityConf in BatteryConfig
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService017, TestSize.Level1)
+HWTEST_F (HdiServiceTest, HdiService016, TestSize.Level1)
 {
     std::unique_ptr<BatteryConfig> conf = std::make_unique<BatteryConfig>();
     conf->Init();
@@ -1172,11 +1156,11 @@ HWTEST_F (HdiServiceTest, HdiService017, TestSize.Level1)
 }
 
 /**
- * @tc.name: HdiService018
+ * @tc.name: HdiService017
  * @tc.desc: Test functions ParseLedInfo in BatteryConfig
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService018, TestSize.Level1)
+HWTEST_F (HdiServiceTest, HdiService017, TestSize.Level1)
 {
     std::string filename = "error_path/system/etc/ledconfig/led_config.json";
     BatteryConfig bc;
@@ -1188,11 +1172,11 @@ HWTEST_F (HdiServiceTest, HdiService018, TestSize.Level1)
 }
 
 /**
- * @tc.name: HdiService019
+ * @tc.name: HdiService018
  * @tc.desc: Test functions ParseTemperatureInfo in BatteryConfig
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService019, TestSize.Level1)
+HWTEST_F (HdiServiceTest, HdiService018, TestSize.Level1)
 {
     std::string filename = "error_path/system/etc/ledconfig/led_config.json";
     BatteryConfig bc;
@@ -1206,11 +1190,11 @@ HWTEST_F (HdiServiceTest, HdiService019, TestSize.Level1)
 }
 
 /**
- * @tc.name: HdiService020
+ * @tc.name: HdiService019
  * @tc.desc: Test functions ParseSocInfo in BatteryConfig
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService020, TestSize.Level1)
+HWTEST_F (HdiServiceTest, HdiService019, TestSize.Level1)
 {
     std::string filename = "error_path/system/etc/ledconfig/led_config.json";
     BatteryConfig bc;
@@ -1223,11 +1207,11 @@ HWTEST_F (HdiServiceTest, HdiService020, TestSize.Level1)
 }
 
 /**
- * @tc.name: HdiService021
+ * @tc.name: HdiService020
  * @tc.desc: Test functions InitVibration in ChargerThread
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService021, TestSize.Level1)
+HWTEST_F (HdiServiceTest, HdiService020, TestSize.Level1)
 {
     std::unique_ptr<BatteryVibrate> vibrate = std::make_unique<BatteryVibrate>();
     const std::string VIBRATOR_PLAYMODE_PATH = "/sys/class/leds/vibrator/play_mode";
@@ -1242,11 +1226,11 @@ HWTEST_F (HdiServiceTest, HdiService021, TestSize.Level1)
 }
 
 /**
- * @tc.name: HdiService022
+ * @tc.name: HdiService021
  * @tc.desc: Test functions CycleMatters in ChargerThread
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService022, TestSize.Level1)
+HWTEST_F (HdiServiceTest, HdiService021, TestSize.Level1)
 {
     ChargerThread ct;
 
@@ -1258,121 +1242,105 @@ HWTEST_F (HdiServiceTest, HdiService022, TestSize.Level1)
 }
 
 /**
- * @tc.name: HdiService024
- * @tc.desc: Test functions SetTimerInterval
- * @tc.type: FUNC
- */
-HWTEST_F (HdiServiceTest, HdiService024, TestSize.Level1)
-{
-    BatteryThread bt;
-
-    SetTimerFdTest(2, bt);
-    SetTimerIntervalTest(5, bt);
-    int interval = GetTimerIntervalTest(bt);
-
-    ASSERT_TRUE(interval == 5);
-}
-
-/**
- * @tc.name: HdiService025
+ * @tc.name: HdiService022
  * @tc.desc: Test functions HandleBacklight
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService025, TestSize.Level1)
+HWTEST_F (HdiServiceTest, HdiService022, TestSize.Level1)
 {
     std::unique_ptr<BatteryBacklight> backlight = std::make_unique<BatteryBacklight>();
     backlight->InitBacklightSysfs();
     auto ret = backlight->HandleBacklight(0);
-    BATTERY_HILOGI(LABEL_TEST, "HdiService025::ret==%{public}d", ret);
+    BATTERY_HILOGI(LABEL_TEST, "HdiService022::ret==%{public}d", ret);
     backlight->TurnOnScreen();
 
     ASSERT_TRUE(ret != -1);
 }
 
 /**
- * @tc.name: HdiService026
+ * @tc.name: HdiService023
  * @tc.desc: Test functions of ParseTotalEnergy
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService026, TestSize.Level1)
+HWTEST_F (HdiServiceTest, HdiService023, TestSize.Level1)
 {
     int32_t totalEnergy = 0;
     if (IsNotMock()) {
         giver_->ParseTotalEnergy(&totalEnergy);
         int32_t sysfsTotalEnergy = ReadTotalEnergySysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService026::totalEnergy=%{public}d, t=%{public}d",
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService023::totalEnergy=%{public}d, t=%{public}d",
             totalEnergy, sysfsTotalEnergy);
         ASSERT_TRUE(totalEnergy == sysfsTotalEnergy);
     } else {
         CreateFile("/data/local/tmp/battery/charge_full", "4000000");
         giver_->ParseTotalEnergy(&totalEnergy);
-        BATTERY_HILOGI(LABEL_TEST, "HdiService026::totalEnergy=%{public}d.", totalEnergy);
+        BATTERY_HILOGI(LABEL_TEST, "HdiService023::totalEnergy=%{public}d.", totalEnergy);
         ASSERT_TRUE(totalEnergy == 4000000);
     }
 }
 
 /**
- * @tc.name: HdiService027
+ * @tc.name: HdiService024
  * @tc.desc: Test functions of ParseCurrentAverage
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService027, TestSize.Level1)
+HWTEST_F (HdiServiceTest, HdiService024, TestSize.Level1)
 {
     int32_t currentAvg = HDF_FAILURE;
     if (IsNotMock()) {
         giver_->ParseCurrentAverage(&currentAvg);
         int32_t sysfsCurrentAvg = ReadCurrentAverageSysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService027::currentAvg=%{public}d, t=%{public}d",
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService024::currentAvg=%{public}d, t=%{public}d",
             currentAvg, sysfsCurrentAvg);
         ASSERT_TRUE(currentAvg == sysfsCurrentAvg);
     } else {
         CreateFile("/data/local/tmp/battery/current_avg", "1000");
         giver_->ParseCurrentAverage(&currentAvg);
-        BATTERY_HILOGI(LABEL_TEST, "HdiService027::currentAvg=%{public}d.", currentAvg);
+        BATTERY_HILOGI(LABEL_TEST, "HdiService024::currentAvg=%{public}d.", currentAvg);
         ASSERT_TRUE(currentAvg == 1000);
     }
 }
 
 /**
- * @tc.name: HdiService028
+ * @tc.name: HdiService025
  * @tc.desc: Test functions of ParseCurrentNow
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService028, TestSize.Level1)
+HWTEST_F (HdiServiceTest, HdiService025, TestSize.Level1)
 {
     int32_t currentNow = 0;
     if (IsNotMock()) {
         giver_->ParseCurrentNow(&currentNow);
         int32_t sysfsCurrentNow = ReadCurrentNowSysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService028::currentNow=%{public}d, t=%{public}d",
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService025::currentNow=%{public}d, t=%{public}d",
             currentNow, sysfsCurrentNow);
         ASSERT_TRUE(currentNow == sysfsCurrentNow);
     } else {
         CreateFile("/data/local/tmp/battery/current_now", "1000");
         giver_->ParseCurrentNow(&currentNow);
-        BATTERY_HILOGI(LABEL_TEST, "HdiService028::currentNow=%{public}d.", currentNow);
+        BATTERY_HILOGI(LABEL_TEST, "HdiService025::currentNow=%{public}d.", currentNow);
         ASSERT_TRUE(currentNow == 1000);
     }
 }
 
 /**
- * @tc.name: HdiService029
+ * @tc.name: HdiService026
  * @tc.desc: Test functions of ParseChargeNow
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService029, TestSize.Level1)
+HWTEST_F (HdiServiceTest, HdiService026, TestSize.Level1)
 {
     int32_t chargeNow = 0;
     if (IsNotMock()) {
         giver_->ParseRemainEnergy(&chargeNow);
         int32_t sysfsChargeNow = ReadRemainEnergySysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService029::chargeNow=%{public}d, t=%{public}d",
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService026::chargeNow=%{public}d, t=%{public}d",
             chargeNow, sysfsChargeNow);
         ASSERT_TRUE(chargeNow == sysfsChargeNow);
     } else {
         CreateFile("/data/local/tmp/battery/charge_now", "1000");
         giver_->ParseRemainEnergy(&chargeNow);
-        BATTERY_HILOGI(LABEL_TEST, "HdiService029::chargeNow=%{public}d.", chargeNow);
+        BATTERY_HILOGI(LABEL_TEST, "HdiService026::chargeNow=%{public}d.", chargeNow);
         ASSERT_TRUE(chargeNow == 1000);
     }
 }
