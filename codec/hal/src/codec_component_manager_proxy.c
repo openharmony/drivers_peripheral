@@ -27,7 +27,16 @@ struct CodecComponentManagerProxy {
     struct HdfRemoteService *remoteOmx;
 };
 
-static struct CodecComponentManagerProxy g_codecComponentManagerProxy = {0};
+static struct CodecComponentManagerProxy g_codecComponentManagerProxy = {
+    .instance = {
+        .GetComponentNum = NULL,
+        .GetComponentCapabilityList = NULL,
+        .CreateComponent = NULL,
+        .DestoryComponent = NULL,
+        .AsObject = NULL,
+    },
+    .remoteOmx = NULL,
+};
 
 static void ReleaseSbuf(struct HdfSBuf *data, struct HdfSBuf *reply)
 {

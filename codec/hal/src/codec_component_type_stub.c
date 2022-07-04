@@ -41,7 +41,8 @@ static int32_t SerStubGetComponentVersion(struct CodecComponentType *serviceImpl
                                           struct HdfSBuf *reply)
 {
     int32_t ret;
-    struct CompVerInfo verInfo = {0};
+    struct CompVerInfo verInfo;
+    (void)memset_s(&verInfo, sizeof(verInfo), 0, sizeof(verInfo));
     ret = serviceImpl->GetComponentVersion(serviceImpl, &verInfo);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call GetComponentVersion function failed!", __func__);
