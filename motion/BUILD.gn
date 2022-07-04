@@ -20,6 +20,6 @@ group("motion_entry") {
       exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
 
   if (HAVE_MOTION_DAL_SERVICE) {
-    deps += [ "${HDI_MOTION_SERVICE_PATH}:dal_service" ]
+    deps += [ "${HDI_MOTION_SERVICE_PATH}:motion_hdi_service" ]
   }
 }
