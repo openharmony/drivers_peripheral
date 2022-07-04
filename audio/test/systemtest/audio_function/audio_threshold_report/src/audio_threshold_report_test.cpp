@@ -23,7 +23,7 @@
 
 using namespace std;
 using namespace testing::ext;
-using namespace HMOS::Audio;
+using namespace OHOS::Audio;
 
 namespace {
 constexpr int BUFFER_SIZE_BIT = 16 * 1024;

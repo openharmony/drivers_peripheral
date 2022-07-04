@@ -37,7 +37,7 @@
 
 using namespace std;
 
-namespace HMOS {
+namespace OHOS {
 namespace Audio {
 int32_t InitRenderFramepara(struct AudioFrameRenderMode& frameRenderMode)
 {

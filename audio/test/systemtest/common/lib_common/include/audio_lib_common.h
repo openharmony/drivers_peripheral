@@ -38,7 +38,7 @@
 
 #include "audio_hdi_common.h"
 
-namespace HMOS {
+namespace OHOS {
 namespace Audio {
 const int G_PERIODSIZE = 4096;
 const int G_PERIODCOUNT = 8;

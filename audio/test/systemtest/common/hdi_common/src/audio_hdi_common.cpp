@@ -41,7 +41,7 @@ static int g_frameStatus = 1;
 static int g_writeCompleted = 0;
 static int g_renderFull = 0;
 static int g_flushCompleted = 0;
-namespace HMOS {
+namespace OHOS {
 namespace Audio {
 int32_t InitAttrs(struct AudioSampleAttributes &attrs)
 {

@@ -38,7 +38,7 @@
 
 using namespace std;
 using namespace testing::ext;
-using namespace HMOS::Audio;
+using namespace OHOS::Audio;
 
 namespace {
 const int BUFFER_SIZE = 16384;

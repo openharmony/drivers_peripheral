@@ -19,7 +19,7 @@
 
 using namespace std;
 using namespace testing::ext;
-using namespace HMOS::Audio;
+using namespace OHOS::Audio;
 
 namespace {
 const int PTHREAD_SAMEADA_COUNT = 3;

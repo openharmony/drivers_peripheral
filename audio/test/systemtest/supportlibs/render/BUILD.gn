@@ -76,8 +76,12 @@ if (defined(ohos_lite)) {
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "../../common/lib_common/src/audio_lib_common.cpp",
-      "src/audio_librender_test.cpp",
     ]
+    if (defined(enable_audio_alsa_lib) && enable_audio_alsa_lib == true) {
+      sources += [ "src/audio_alsa_librender_test.cpp" ]
+    } else {
+      sources += [ "src/audio_librender_test.cpp" ]
+    }
     include_dirs = [
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
