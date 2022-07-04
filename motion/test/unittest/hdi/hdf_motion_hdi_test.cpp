@@ -108,29 +108,23 @@ HWTEST_F(HdfMotionTest, EnableMotion_001, TestSize.Level1)
     int32_t ret = g_motionInterface->Register(g_motionCallback);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
-    for (int i = 0; i < HDF_MOTION_TYPE_MAX; i++) {
-        ret = g_motionInterface->EnableMotion(i);
-        if (ret == HDF_SUCCESS) {
-            printf("enable %d success\n", i);
-        } else {
-            printf("enable %d fail\n", i);
-        }
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        if (i == 1) {
-            OsalSleep(15);
-        } else {
-            OsalSleep(10);
-        }
-
-        ret =  g_motionInterface->DisableMotion(i);
-        if (ret == HDF_SUCCESS) {
-            printf("disable %d success\n", i);
-        } else {
-            printf("disable %d fail\n", i);
-        }
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        OsalSleep(2);
+    ret = g_motionInterface->EnableMotion(HDF_MOTION_TYPE_PICKUP);
+    if (ret == HDF_SUCCESS) {
+        printf("The pick up gesture is enabled successfully\n");
+    } else {
+        printf("Failed to enable the pick up gesture\n");
     }
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    OsalSleep(15);
+
+    ret =  g_motionInterface->DisableMotion(HDF_MOTION_TYPE_PICKUP);
+    if (ret == HDF_SUCCESS) {
+        printf("The pick up gesture is disabled successfully\n");
+    } else {
+        printf("Failed to disable the pick up gesture\n");
+    }
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    OsalSleep(2);
 
     ret = g_motionInterface->Unregister(g_motionCallback);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -155,12 +149,10 @@ HWTEST_F(HdfMotionTest, DisableMotion_001, TestSize.Level1)
     int32_t ret = g_motionInterface->Register(g_motionCallback);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
-    for (int i = 0; i < HDF_MOTION_TYPE_MAX; i++) {
-        ret = g_motionInterface->EnableMotion(i);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        ret =  g_motionInterface->DisableMotion(i);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-    }
+    ret = g_motionInterface->EnableMotion(HDF_MOTION_TYPE_PICKUP);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret =  g_motionInterface->DisableMotion(HDF_MOTION_TYPE_PICKUP);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = g_motionInterface->Unregister(g_motionCallback);
     EXPECT_EQ(HDF_SUCCESS, ret);
