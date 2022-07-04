@@ -69,7 +69,7 @@ int32_t BatteryConfig::ParseLedConf(Json::Value& root)
     ledConf_.clear();
 
     const size_t COLOR_SIZE = 4;
-    for (int32_t i = 0; i < size; ++i) {
+    for (uint32_t i = 0; i < size; ++i) {
         size_t colorSize = root["led"]["table"][i].size();
         if (colorSize != COLOR_SIZE) {
             BATTERY_HILOGW(COMP_HDI, "read json file fail, color size error, size=%{public}zu", colorSize);
