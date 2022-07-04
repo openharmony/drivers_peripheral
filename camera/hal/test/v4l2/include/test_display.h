@@ -172,6 +172,7 @@ public:
     void OnResult(const uint64_t timestamp,
                   const std::shared_ptr<OHOS::Camera::CameraMetadata>& result) override;
     void PrintStabiliInfo(const std::shared_ptr<OHOS::Camera::CameraMetadata>& result);
+    void PrintFpsInfo(const std::shared_ptr<OHOS::Camera::CameraMetadata>& result);
 };
 #endif
 #endif

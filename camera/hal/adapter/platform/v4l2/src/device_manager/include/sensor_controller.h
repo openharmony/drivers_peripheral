@@ -78,8 +78,8 @@ private:
         std::shared_ptr<CameraMetadata> meta, const int32_t &value);
     static void GetBasicConfigurations(SensorController *sensorController,
         std::shared_ptr<CameraMetadata> meta, const int32_t &value);
-    static void GetFpsRange(SensorController *sensorController,
-        std::shared_ptr<CameraMetadata> meta, const int32_t &value);
+    void GetFpsRange(SensorController *sensorController,
+        std::shared_ptr<CameraMetadata> meta);
     static void GetJpegOrientation(SensorController *sensorController,
         std::shared_ptr<CameraMetadata> meta, const int32_t &value);
     static void GetJpegQuality(SensorController *sensorController,
@@ -113,6 +113,7 @@ private:
     static std::map<int32_t, uint32_t> tagV4L2CidMap_;
     static std::map<int32_t, TagFunType> tagMethodMap_;
     bool firstSetCallback_ = true;
+    std::vector<int32_t> fpsRange_;
 };
 } // namespace OHOS::Camera
 #endif
