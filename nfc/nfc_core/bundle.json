@@ -18,15 +18,14 @@
           "utils_base"
         ],
         "third_part": [
-          "libnfc-halimpl"
+          "nfc_hdiimpl"
         ]
       },
       "build": {
         "sub_component": [
           "//drivers/peripheral/nfc/nfc_core:nfc_entry",
-          "//third_party/nfc-nci/nfc-halimpl/SN100x:libnfc-halimpl"
+          "//third_party/nfc_hdiimpl/SN100x:nfc_hdiimpl"
         ]
       }
     }
   }
-  
