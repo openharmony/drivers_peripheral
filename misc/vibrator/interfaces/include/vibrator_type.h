@@ -84,7 +84,7 @@ enum VibratorMode {
  */
 struct VibratorInfo {
     /**< setting intensity capability. 1 indicates support, 0 indicates not support. */
-    int32_t isSupportIntensity ;
+    int32_t isSupportIntensity;
     /**< setting frequency capability. 1 indicates support, 0 indicates not support. */
     int32_t isSupportFrequency;
     /**< Max intensity */
