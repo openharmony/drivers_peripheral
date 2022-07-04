@@ -20,8 +20,6 @@ ohos_shared_library("libgnss_interface_service_1.0") {
     "location_vendor_interface.cpp",
   ]
 
-  deps = [ "//drivers/interface/location/gnss/v1_0:location_gnss_idl_headers" ]
-
   cflags = [
     "-Wall",
     "-Wextra",
@@ -35,6 +33,7 @@ ohos_shared_library("libgnss_interface_service_1.0") {
 
   if (is_standard_system) {
     external_deps = [
+      "drivers_interface_location_gnss:location_gnss_idl_headers",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",

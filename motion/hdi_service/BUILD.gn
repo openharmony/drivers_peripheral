@@ -17,8 +17,6 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 ohos_shared_library("libmotion_interface_service_1.0") {
   include_dirs = [ "//drivers/peripheral/motion/interfaces/include/" ]
   sources = [ "motion_impl.cpp" ]
-  deps = [ "//drivers/interface/motion/v1_0:motion_idl_headers" ]
-
   cflags = [
     "-Wall",
     "-Wextra",
@@ -30,6 +28,7 @@ ohos_shared_library("libmotion_interface_service_1.0") {
 
   if (is_standard_system) {
     external_deps = [
+      "drivers_interface_motion:motion_idl_headers",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",

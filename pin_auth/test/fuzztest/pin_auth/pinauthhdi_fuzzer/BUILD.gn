@@ -39,6 +39,7 @@ ohos_fuzztest("PinAuthHdiFuzzTest") {
   ]
 
   external_deps = [
+    "drivers_interface_pin_auth:pin_auth_idl_headers",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "utils_base:utils",
