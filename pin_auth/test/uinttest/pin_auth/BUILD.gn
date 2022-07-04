@@ -1,0 +1,42 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+ohos_unittest("PinAuthHdiUtTest") {
+  module_out_path = "pin_auth/PinAuthHdiUtTest"
+
+  include_dirs = [
+    "adaptor/inc",
+    "//drivers/peripheral/pin_auth/hdi_service/adaptor/inc",
+    "//drivers/peripheral/pin_auth/hdi_service/common/inc",
+    "//drivers/peripheral/pin_auth/hdi_service/database/inc",
+    "//drivers/peripheral/pin_auth/hdi_service/main/inc",
+    "//drivers/peripheral/pin_auth/hdi_service/service/inc",
+  ]
+
+  sources = [ "adaptor/src/adaptor_algorithm_test.cpp" ]
+
+  deps = [
+    "//base/useriam/user_auth_framework/common:iam_test",
+    "//drivers/peripheral/pin_auth/hdi_service:libpin_auth_interface_service_1.0",
+    "//utils/native/base:utils",
+  ]
+
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "utils_base:utils",
+  ]
+}
