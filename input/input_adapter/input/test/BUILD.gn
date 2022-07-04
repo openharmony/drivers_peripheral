@@ -30,7 +30,6 @@ config("camhdi_impl_utest_config") {
     "-Wno-builtin-requires-header",
     "-Wno-unused-variable",
     "-Wno-unused-label",
-    "-Wno-implicit-function-declaration",
     "-Wno-format",
     "-Wno-int32_t-conversion",
     "-Wno-unused-function",
