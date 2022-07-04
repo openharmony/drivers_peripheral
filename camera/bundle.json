@@ -12,7 +12,7 @@
     "ram": "8500KB",
     "deps": {
       "components": [
-        "graphic_standard",
+        "graphic_graphic_2d",
         "hdf_core",
         "hiviewdfx_hilog_native",
         "multimedia_camera_standard",
