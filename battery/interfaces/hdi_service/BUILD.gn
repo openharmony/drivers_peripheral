@@ -28,13 +28,13 @@ ohos_shared_library("libbattery_interface_service_1.0") {
     "src/power_supply_provider.cpp",
   ]
   deps = [
-    "//drivers/interface/battery/v1_0:battery_idl_headers",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
     external_deps = [
+      "drivers_interface_battery:battery_idl_headers",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",

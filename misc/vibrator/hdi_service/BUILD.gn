@@ -25,7 +25,6 @@ if (defined(ohos_lite)) {
     ]
     sources = [ "vibrator_interface_impl.cpp" ]
     deps = [
-      "//drivers/interface/vibrator/v1_1:vibrator_idl_headers",
       "//drivers/peripheral/misc/vibrator/hal:hdi_vibrator",
       "//utils/native/base:utils",
     ]
@@ -41,6 +40,7 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
+        "drivers_interface_vibrator:vibrator_idl_headers",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_single",
