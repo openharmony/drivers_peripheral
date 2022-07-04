@@ -115,10 +115,10 @@ static int32_t GetVibratorInfo(struct VibratorInfo **vibratorInfo)
     return HDF_SUCCESS;
 }
 
-static int32_t ValidityJudgment(uint32_t vibrationPeriod, int32_t intensity, int32_t frequency)
+static int32_t ValidityJudgment(uint32_t duration, int32_t intensity, int32_t frequency)
 {
     struct VibratorDevice *priv = GetVibratorDevicePriv();
-    if (vibrationPeriod == 0) {
+    if (duration == 0) {
         HDF_LOGE("%s:invalid vibration period", __func__);
         return VIBRATOR_NOT_PERIOD;
     }
@@ -138,12 +138,12 @@ static int32_t ValidityJudgment(uint32_t vibrationPeriod, int32_t intensity, int
     return VIBRATOR_SUCCESS;
 }
 
-static int32_t SetModulationParameter(uint32_t vibrationPeriod, int32_t intensity, int32_t frequency)
+static int32_t EnableVibratorModulation(uint32_t duration, int32_t intensity, int32_t frequency)
 {
     int32_t ret;
     struct VibratorDevice *priv = GetVibratorDevicePriv();
 
-    ret = ValidityJudgment(vibrationPeriod, intensity, frequency);
+    ret = ValidityJudgment(duration, intensity, frequency);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: effect is false", __func__);
         return ret;
@@ -157,8 +157,8 @@ static int32_t SetModulationParameter(uint32_t vibrationPeriod, int32_t intensit
         return HDF_FAILURE;
     }
 
-    if (!HdfSbufWriteUint32(msg, vibrationPeriod)) {
-        HDF_LOGE("%{public}s: write vibrationPeriod failed.", __func__);
+    if (!HdfSbufWriteUint32(msg, duration)) {
+        HDF_LOGE("%{public}s: write duration failed.", __func__);
         HdfSbufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);
         return HDF_FAILURE;
@@ -177,7 +177,7 @@ static int32_t SetModulationParameter(uint32_t vibrationPeriod, int32_t intensit
         (void)OsalMutexUnlock(&priv->mutex);
         return HDF_FAILURE;
     }
-    ret = SendVibratorMsg(VIBRATOR_IO_SET_MODULATION_PARAMETER, msg, NULL);
+    ret = SendVibratorMsg(VIBRATOR_IO_ENABLE_MODULATION_PARAMETER, msg, NULL);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Vibrator send cmd failed, ret[%{public}d]", __func__, ret);
     }
@@ -302,7 +302,7 @@ const struct VibratorInterface *NewVibratorInterfaceInstance(void)
     vibratorDevInstance.StartOnce = StartOnce;
     vibratorDevInstance.Stop = Stop;
     vibratorDevInstance.GetVibratorInfo = GetVibratorInfo;
-    vibratorDevInstance.SetModulationParameter = SetModulationParameter;
+    vibratorDevInstance.EnableVibratorModulation = EnableVibratorModulation;
 
     priv->ioService = HdfIoServiceBind(VIBRATOR_SERVICE_NAME);
     if (priv->ioService == NULL) {

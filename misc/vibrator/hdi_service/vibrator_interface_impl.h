@@ -29,7 +29,7 @@ public:
     int32_t Start(const std::string& effectType) override;
     int32_t Stop(HdfVibratorMode mode) override;
     int32_t GetVibratorInfo(std::vector<HdfVibratorInfo>& vibratorInfo) override;
-    int32_t SetModulationParameter(uint32_t vibrationPeriod, int32_t intensity, int32_t frequency) override;
+    int32_t EnableVibratorModulation(uint32_t duration, int32_t intensity, int32_t frequency) override;
 };
 } // V1_1
 } // Vibrator

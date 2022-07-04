@@ -116,14 +116,15 @@ int32_t VibratorInterfaceImpl::GetVibratorInfo(std::vector<HdfVibratorInfo>& vib
     return HDF_SUCCESS;
 }
 
-int32_t VibratorInterfaceImpl::SetModulationParameter(uint32_t vibrationPeriod, int32_t intensity, int32_t frequency)
+int32_t VibratorInterfaceImpl::EnableVibratorModulation(uint32_t duration, int32_t intensity, int32_t frequency)
 {
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
-    if (vibratorInterface == nullptr || vibratorInterface->SetModulationParameter == nullptr) {
+    if (vibratorInterface == nullptr || vibratorInterface->EnableVibratorModulation == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
         return HDF_FAILURE;
     }
-    int32_t ret = vibratorInterface->SetModulationParameter(vibrationPeriod, intensity, frequency);
+
+    int32_t ret = vibratorInterface->EnableVibratorModulation(duration, intensity, frequency);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
