@@ -96,6 +96,12 @@ void TestDisplay::OpenVideoFile()
     }
 }
 
+void TestDisplay::CloseFd()
+{
+    close(videoFd_);
+    videoFd_ = -1;
+}
+
 void TestDisplay::PrintFaceDetectInfo(const void *bufStart, const uint32_t size) const
 {
     common_metadata_header_t* data = static_cast<common_metadata_header_t*>((const_cast<void*>(bufStart)));
@@ -567,6 +573,8 @@ void TestDisplay::StartCapture(int streamId, int captureId, bool shutterCallback
 
 void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
 {
+    constexpr uint32_t SLEEP_SECOND_TWO = 2;
+    sleep(SLEEP_SECOND_TWO);
     if (sizeof(captureIds) > 0) {
         for (auto &captureId : captureIds) {
             if (captureId == captureId_preview) {
@@ -575,13 +583,16 @@ void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& str
                 streamCustomerCapture_->ReceiveFrameOff();
             } else if (captureId == captureId_video) {
                 streamCustomerVideo_->ReceiveFrameOff();
-                close(videoFd_);
-                videoFd_ = -1;
+                sleep(1);
+                CloseFd();
             } else if (captureId == captureId_analyze) {
                 streamCustomerAnalyze_->ReceiveFrameOff();
             }
+        }
+        for (auto &captureId : captureIds) {
             std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
             rc = streamOperator->CancelCapture(captureId);
+            sleep(SLEEP_SECOND_TWO);
             EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);
             if (rc == OHOS::Camera::NO_ERROR) {
                 std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
