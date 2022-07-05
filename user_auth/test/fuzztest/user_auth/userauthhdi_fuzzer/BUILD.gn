@@ -36,6 +36,7 @@ ohos_fuzztest("UserAuthHdiFuzzTest") {
   ]
 
   external_deps = [
+    "drivers_interface_user_auth:user_auth_idl_headers",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "utils_base:utils",

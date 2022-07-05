@@ -19,10 +19,7 @@ ohos_shared_library("libinput_interfaces_service_1.0") {
     "//drivers/peripheral/input/hal/include/",
   ]
   sources = [ "input_interfaces_impl.cpp" ]
-  public_deps = [
-    "//drivers/interface/input/v1_0:input_idl_headers",
-    "//drivers/peripheral/input/hal:hdi_input",
-  ]
+  public_deps = [ "//drivers/peripheral/input/hal:hdi_input" ]
 
   cflags = [
     "-Wall",
@@ -35,6 +32,7 @@ ohos_shared_library("libinput_interfaces_service_1.0") {
 
   if (is_standard_system) {
     external_deps = [
+      "drivers_interface_input:input_idl_headers",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",

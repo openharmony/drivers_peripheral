@@ -21,7 +21,6 @@ ohos_shared_library("libnfc_interface_service_1.0") {
   ]
   sources = [ "nfc_impl.cpp" ]
   public_deps = [
-    "//drivers/interface/nfc/nfc_core/v1_0:nfc_idl_headers",
     "//drivers/peripheral/nfc/nfc_core/vendor_adaptor:nfc_vendor_adaptor",
     "//third_party/nfc_hdiimpl/SN100x:nfc_hdiimpl",
   ]
@@ -29,6 +28,7 @@ ohos_shared_library("libnfc_interface_service_1.0") {
   cflags = []
 
   external_deps = [
+    "drivers_interface_nfc:nfc_idl_headers",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
