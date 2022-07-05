@@ -59,7 +59,7 @@ enum CallbackDispatchCmd {
 struct OmxComponentManager {
     int32_t (*CreateComponent)(OMX_HANDLETYPE *compHandle, char *compName, void *appData,
         int32_t appDataSize, struct CodecCallbackType *callbacks);
-    int32_t (*DestoryComponent)(OMX_HANDLETYPE compHandle);
+    int32_t (*DestroyComponent)(OMX_HANDLETYPE compHandle);
 };
 
 #ifdef __cplusplus

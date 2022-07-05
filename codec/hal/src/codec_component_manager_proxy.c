@@ -32,7 +32,7 @@ static struct CodecComponentManagerProxy g_codecComponentManagerProxy = {
         .GetComponentNum = NULL,
         .GetComponentCapabilityList = NULL,
         .CreateComponent = NULL,
-        .DestoryComponent = NULL,
+        .DestroyComponent = NULL,
         .AsObject = NULL,
     },
     .remoteOmx = NULL,
@@ -187,7 +187,7 @@ static int32_t CreateComponent(struct CodecComponentType **component, uint32_t *
     return ret;
 }
 
-static int32_t DestoryComponent(uint32_t componentId)
+static int32_t DestroyComponent(uint32_t componentId)
 {
     int32_t ret;
 
@@ -250,7 +250,7 @@ static int32_t InitCodecComponentManagerProxy(void)
     g_codecComponentManagerProxy.instance.GetComponentNum = GetComponentNum;
     g_codecComponentManagerProxy.instance.GetComponentCapabilityList = GetComponentCapabilityList;
     g_codecComponentManagerProxy.instance.CreateComponent = CreateComponent;
-    g_codecComponentManagerProxy.instance.DestoryComponent = DestoryComponent;
+    g_codecComponentManagerProxy.instance.DestroyComponent = DestroyComponent;
 
     return HDF_SUCCESS;
 }

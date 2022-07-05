@@ -111,7 +111,7 @@ struct CodecComponentManager {
      * @return Returns <b>HDF_ERR_INVALID_OBJECT</b> if the operation failed due to invalid objects.
      * @return Returns <b>HDF_ERR_MALLOC_FAIL</b> if the operation failed due to insufficient memory.
      */
-    int32_t (*DestoryComponent)(uint32_t componentId);
+    int32_t (*DestroyComponent)(uint32_t componentId);
 
     struct HdfRemoteService *(*AsObject)(struct CodecComponentManager *self);
 };
