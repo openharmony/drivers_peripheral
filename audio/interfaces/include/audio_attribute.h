@@ -152,6 +152,15 @@ struct AudioAttribute {
      * @return Returns <b>0</b> if the audio effect were removed succesffully; returns a negative value otherwise.
      */
     int32_t (*RemoveAudioEffect)(AudioHandle handle, uint64_t effectid);
+	
+	/**
+     * @brief Get the buffer size of render or capturer
+     *
+     * @param handle Indicates the audio handle.
+     * @param bufferSize Indicates the buffer size (in bytes) queried from the vendor
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     */
+    int32_t (*GetFrameBufferSize)(AudioHandle handle, uint64_t *bufferSize);
 };
 
 #endif /* AUDIO_ATTRIBUTE_H */

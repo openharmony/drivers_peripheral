@@ -113,6 +113,7 @@ enum AudioCategory {
     AUDIO_IN_COMMUNICATION, /**< Communications */
     AUDIO_IN_RINGTONE,      /**< Ringtone */
     AUDIO_IN_CALL,          /**< Call */
+    AUDIO_MMAP_NOIRQ,       /**< Mmap mode */
 };
 
 /**
@@ -415,6 +416,18 @@ struct AudioRoute {
 };
 
 /**
+ * @brief Enumerates the restricted key type of the parameters
+ */
+enum AudioExtParamKey {
+    AUDIO_EXT_PARAM_KEY_NONE = 0,     /**< Distributed audio extra param key none */
+    AUDIO_EXT_PARAM_KEY_VOLUME = 1,   /**< Distributed audio extra param key volume event */
+    AUDIO_EXT_PARAM_KEY_FOCUS = 2,    /**< Distributed audio extra param key focus event */
+    AUDIO_EXT_PARAM_KEY_BUTTON = 3,   /**< Distributed audio extra param key media button event */
+    AUDIO_EXT_PARAM_KEY_EFFECT = 4,   /**< Distributed audio extra param key audio effect event */
+    AUDIO_EXT_PARAM_KEY_LOWPOWER = 1000, /**< Low power event type */
+};
+
+/**
  * @brief Called when an event defined in {@link AudioCallbackType} occurs.
  *
  * @param AudioCallbackType Indicates the occurred event that triggers this callback.
@@ -424,5 +437,18 @@ struct AudioRoute {
  * @see RegCallback
  */
 typedef int32_t (*RenderCallback)(enum AudioCallbackType, void *reserved, void *cookie);
+
+/**
+ * @brief Register audio extra param callback that will be invoked during audio param event.
+ *
+ * @param key Indicates param change event.
+ * @param condition Indicates the param condition.
+ * @param value Indicates the param value.
+ * @param reserved Indicates reserved param.
+ * @param cookie Indicates the pointer to the callback parameters;
+ * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+ */
+typedef int32_t (*ParamCallback)(enum AudioExtParamKey key, const char *condition, const char *value, void *reserved,
+    void *cookie);
 
 #endif /* AUDIO_TYPES_H */
