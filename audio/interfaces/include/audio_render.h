@@ -164,6 +164,17 @@ struct AudioRender {
      * @see RegCallback
      */
     int32_t (*DrainBuffer)(struct AudioRender *render, enum AudioDrainNotifyType *type);
+
+    /**
+     * @brief query whether the vendor supports draining buffer
+     *
+     * @param render Indicates the pointer to the <b>AudioRender</b> object to operate.
+     * @param support indicates the state whether the vendor supports draining buffer. Value <b>true</b> means that
+     * the vendor supports, and <b>false</b> means the opposite.
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     * @see IsSupportsDrain
+     */
+    int32_t (*IsSupportsDrain)(struct AudioRender *render, bool *support);
 };
 
 #endif /* AUDIO_RENDER_H */

@@ -171,7 +171,89 @@ struct AudioAdapter {
      * @see SetPassthroughMode
      */
     int32_t (*ReleaseAudioRoute)(struct AudioAdapter *adapter, int32_t routeHandle);
-};
 
+    /**
+     * @brief Sets the mute operation for the audio.
+     *
+     * @param adapter Indicates the pointer to the audio adapter to operate.
+     * @param mute Specifies whether to mute the audio. Value <b>true</b> means to mute the audio,
+     * and <b>false</b> means the opposite.
+     * @return Returns <b>0</b> if the setting is successful; returns a negative value otherwise.
+     * @see GetMute
+     */
+    int32_t (*SetMicMute)(struct AudioAdapter *adapter, bool mute);
+
+    /**
+     * @brief Obtains the mute operation set for the audio.
+     *
+     * @param adapter Indicates the pointer to the audio adapter to operate.
+     * @param mute Indicates the pointer to the mute operation set for the audio. Value <b>true</b> means that
+     * the audio is muted, and <b>false</b> means the opposite.
+     * @return Returns <b>0</b> if the mute operation is obtained; returns a negative value otherwise.
+     * @see SetMute
+     */
+    int32_t (*GetMicMute)(struct AudioAdapter *adapter, bool *mute);
+
+    /**
+     * @brief Sets the audio volume for voice call.
+     *
+     * The volume ranges from 0.0 to 1.0. If the volume level in an audio service ranges from 0 to 15,
+     * <b>0.0</b> indicates that the audio is muted, and <b>1.0</b> indicates the maximum volume level (15).
+     *
+     * @param adapter Indicates the pointer to the audio adapter to operate.
+     * @param volume Indicates the volume to set. The value ranges from 0.0 to 1.0.
+     * @return Returns <b>0</b> if the setting is successful; returns a negative value otherwise.
+     * @see GetVolume
+     */
+    int32_t (*SetVoiceVolume)(struct AudioAdapter *adapter, float volume);
+
+    /**
+     * @brief Sets extra audio parameters.
+     *
+     * @param adapter Indicates the audio adapter.
+     * @param key Indicates what kind of parameter type will be set.
+     * @param condition Indicates the specific extend parameter condition of AudioExtParamKey;
+     *
+     * The format of condition is <i>key=value</i>. Separate multiple key-value pairs by semicolons (;).
+     * When key equals to AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME, the format of condition must be like this:
+     * <i>"EVENT_TYPE=xxx;VOLUME_GROUP_ID=xxx;AUDIO_VOLUME_TYPE=xxx;"</i>
+     * EVENT_TYPE indicates sub volume event type: SetVolume = 1; SetMute = 4;
+     * VOLUME_GROUP_ID indicates which volume group will be set;
+     * AUDIO_VOLUME_TYPE indicates which volume type will be set;
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     */
+    int32_t (*SetExtraParams)(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                              const char *condition, const char *value);
+
+    /**
+     * @brief Get extra audio parameters.
+     *
+     * @param adapter Indicates the audio adapter.
+     * @param key Indicates what kind of parameter type will be get.
+     * @param condition Indicates the specific extend parameter condition of AudioExtParamKey;
+     *
+     * The format of condition is <i>key=value</i>. Separate multiple key-value pairs by semicolons (;).
+     * When key equals to AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME, the format of condition must be like this:
+     * <i>"EVENT_TYPE=xxx;VOLUME_GROUP_ID=xxx;AUDIO_VOLUME_TYPE=xxx;"</i>
+     * EVENT_TYPE indicates sub volume event type: GetVolume = 1; GetMinVolume = 2; GetMaxVolume = 3; IsStreamMute = 4;
+     * VOLUME_GROUP_ID indicates which volume group want get;
+     * AUDIO_VOLUME_TYPE indicates which volume type want get;
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     */
+    int32_t (*GetExtraParams)(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                              const char *condition, char *value);
+
+    /**
+     * @brief Register extra audio parameters observer.
+     *
+     * @param adapter Indicates the audio adapter.
+     * @param callback Indicates param observer.
+     * @param cookie Indicates the pointer to the callback parameters;
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     */
+    int32_t (*RegExtraParamObserver)(struct AudioAdapter *adapter, ParamCallback callback, void* cookie);
+};
 #endif /* AUDIO_ADAPTER_H */
 /** @} */
