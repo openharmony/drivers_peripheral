@@ -338,7 +338,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiCreateComponentTest_004, TestSize.Level1)
         g_manager->CreateComponent(&component, &componentId, g_codecAvcEncodeCap.compName, (int64_t)this, callback);
     ASSERT_EQ(ret, HDF_SUCCESS);
     ASSERT_TRUE(component != nullptr);
-    ret = g_manager->DestoryComponent(componentId);
+    ret = g_manager->DestroyComponent(componentId);
     ASSERT_EQ(ret, HDF_SUCCESS);
     CodecComponentTypeRelease(component);
     component = nullptr;
@@ -1150,19 +1150,19 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiDeInitTest_001, TestSize.Level1)
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiDestoryComponentTest_001, TestSize.Level1)
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiDestroyComponentTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     ASSERT_TRUE(g_manager != nullptr);
-    int ret = g_manager->DestoryComponent(g_componentId);
+    int ret = g_manager->DestroyComponent(g_componentId);
     ASSERT_EQ(ret, HDF_SUCCESS);
     CodecComponentTypeRelease(g_component);
     g_component = nullptr;
 }
 
-HWTEST_F(CodecHdiOmxTest, HdfCodecHdiDestoryComponentTest_002, TestSize.Level1)
+HWTEST_F(CodecHdiOmxTest, HdfCodecHdiDestroyComponentTest_002, TestSize.Level1)
 {
-    int ret = g_manager->DestoryComponent(g_componentId);
+    int ret = g_manager->DestroyComponent(g_componentId);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 #endif  // SUPPORT_OMX
