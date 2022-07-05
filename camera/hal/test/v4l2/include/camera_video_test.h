@@ -13,10 +13,12 @@
  * limitations under the License.
  */
 
-#include "test_display.h"
-#include "stream_customer.h"
+#ifndef CAMERA_VIDEO_TEST_H
+#define CAMERA_VIDEO_TEST_H
 
-class UtestPreviewTest : public testing::Test {
+#include "test_display.h"
+
+class CameraVideoTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
@@ -24,3 +26,4 @@ public:
     void TearDown(void);
     std::shared_ptr<TestDisplay> display_ = nullptr;
 };
+#endif /* CAMERA_VIDEO_TEST_H */
