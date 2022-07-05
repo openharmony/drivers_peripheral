@@ -19,6 +19,9 @@
 #include <hdf_device_desc.h>
 #include "camera_host_stub.h"
 
+#ifdef HDF_LOG_TAG
+#undef HDF_LOG_TAG
+#endif
 #define HDF_LOG_TAG camera_service
 
 struct HdfCameraService {
