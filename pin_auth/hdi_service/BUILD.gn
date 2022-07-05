@@ -37,10 +37,7 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
     "service/src/executor_impl.cpp",
     "service/src/pin_auth_interface_service.cpp",
   ]
-  public_deps = [
-    "//drivers/interface/pin_auth/v1_0:pin_auth_idl_headers",
-    "//third_party/openssl:libcrypto_static",
-  ]
+  public_deps = [ "//third_party/openssl:libcrypto_static" ]
 
   deps = [
     "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
@@ -50,6 +47,7 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
   ]
 
   external_deps = [
+    "drivers_interface_pin_auth:pin_auth_idl_headers",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
