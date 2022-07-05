@@ -52,7 +52,6 @@ protected:
     RetCode SendNodeMetaData(const std::shared_ptr<CameraMetadata> meta);
     RetCode SendExposureMetaData(const common_metadata_header_t *data);
     RetCode SendFocusMetaData(const common_metadata_header_t *data);
-    RetCode SendFaceModeMetaData(const common_metadata_header_t *data);
     void GetNodeMetaData(std::shared_ptr<CameraMetadata> meta);
     void GetFocusMode(std::shared_ptr<CameraMetadata> meta);
     void GetFocusState(std::shared_ptr<CameraMetadata> meta);
@@ -60,10 +59,6 @@ protected:
     void GetExposureTime(std::shared_ptr<CameraMetadata> meta);
     void GetExposureCompensation(std::shared_ptr<CameraMetadata> meta);
     void GetExposureState(std::shared_ptr<CameraMetadata> meta);
-    void GetCameraFaceDetectSwitch(std::shared_ptr<CameraMetadata> meta);
-    void GetCameraFaceRectangles(std::shared_ptr<CameraMetadata> meta);
-    void GetCameraFaceIds(std::shared_ptr<CameraMetadata> meta);
-    void GetTimestamp(std::shared_ptr<CameraMetadata> meta);
 
 protected:
     std::shared_ptr<AlgoPluginManager> algoPluginManager_ = nullptr;

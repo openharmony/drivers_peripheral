@@ -638,6 +638,33 @@ void DemoCameraDeviceCallback::PrintStabiliInfo(const std::shared_ptr<OHOS::Came
     std::cout << "==========[test log] PrintStabiliInfo videoStabiliMode: " << (int)videoStabiliMode << std::endl;
 }
 
+void DemoCameraDeviceCallback::PrintFpsInfo(const std::shared_ptr<OHOS::Camera::CameraMetadata>& result)
+{
+    if (result == nullptr) {
+        CAMERA_LOGE("TestDisplay: result is null");
+        return;
+    }
+    common_metadata_header_t* data = result->get();
+    if (data == nullptr) {
+        CAMERA_LOGE("TestDisplay: data is null");
+        return;
+    }
+    std::vector<int32_t> fpsRange;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FPS_RANGES, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_CONTROL_EXPOSURE_MODE error\n");
+        return;
+    }
+
+    for (int i = 0; i < entry.count; i++) {
+        fpsRange.push_back(*(entry.data.i32 + i));
+    }
+    CAMERA_LOGI("Set fpsRange: [%{public}d, %{public}d]", fpsRange[0], fpsRange[1]);
+    std::cout << "==========[test log] PrintFpsInfo fpsRange: [" << fpsRange[0] << ", " <<
+        fpsRange[1] << "]" << std::endl;
+}
+
 #ifndef CAMERA_BUILT_ON_OHOS_LITE
 void DemoCameraDeviceCallback::OnError(const OHOS::Camera::ErrorType type, const int32_t errorMsg)
 {
@@ -648,5 +675,6 @@ void DemoCameraDeviceCallback::OnResult(const uint64_t timestamp,
                                         const std::shared_ptr<OHOS::Camera::CameraMetadata>& result)
 {
     PrintStabiliInfo(result);
+    PrintFpsInfo(result);
 }
 #endif
