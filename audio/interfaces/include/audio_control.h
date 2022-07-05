@@ -112,6 +112,19 @@ struct AudioControl {
      * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
      */
     int32_t (*AudioDevDump)(AudioHandle handle, int32_t range, int32_t fd);
+
+    /**
+     * @brief Query whether the vendor support pause and resume.
+     *
+     * @param handle Indicates the audio handle.
+     * @param supportPause Indicates the state whether the vendor supports pausing. Value <b>true</b> means that
+     * the vendor supports, and <b>false</b> means the opposite.
+     * @param supportResume Indicates the state whether the vendor supports resuming. Value <b>true</b> means that
+     * the vendor supports, and <b>false</b> means the opposite.
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     * @see IsSupportsPauseAndResume
+     */
+    int32_t (*IsSupportsPauseAndResume)(AudioHandle handle, bool *supportPause, bool *supportResume);
 };
 
 #endif /* AUDIO_CONTROL_H */
