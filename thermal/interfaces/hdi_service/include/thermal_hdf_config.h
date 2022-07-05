@@ -36,6 +36,18 @@ struct XMLThermal {
     std::string product;
 };
 
+struct DfxTraceInfo {
+    std::string title;
+    std::string value;
+    std::string width;
+};
+
+struct XMLTracingInfo {
+    std::string interval;
+    std::string record;
+    std::string outpath;
+};
+
 class ThermalHdfConfig {
 public:
     using ThermalTypeMap = std::map<std::string, std::shared_ptr<SensorInfoConfig>>;
@@ -43,28 +55,41 @@ public:
     ~ThermalHdfConfig() = default;
     ThermalHdfConfig(const ThermalHdfConfig&) = delete;
     ThermalHdfConfig& operator=(const ThermalHdfConfig&) = delete;
-    static ThermalHdfConfig &GetInsance();
+    static ThermalHdfConfig& GetInsance();
 
-    int32_t ThermalHDIConfigInit(const std::string &path);
-    int32_t ParseThermalHdiXMLConfig(const std::string &path);
+    int32_t ThermalHDIConfigInit(const std::string& path);
+    int32_t ParseThermalHdiXMLConfig(const std::string& path);
     void ParseBaseNode(xmlNodePtr node);
     void ParsePollingNode(xmlNodePtr node);
-    void ParseConfigInfo(const xmlNode *cur, std::vector<XMLThermalZoneInfo> &tzInfoList,
-        std::vector<XMLThermalNodeInfo> &tnInfoList);
+    void SaveThermalDfxTraceInfo(xmlNodePtr node, XMLThermalNodeInfo tn);
+    void ParseTracingNode(xmlNodePtr node);
+    void ParseTracingSubNode(xmlNodePtr node);
+    void ParseConfigInfo(const xmlNode* cur, std::vector<XMLThermalZoneInfo>& tzInfoList,
+        std::vector<XMLThermalNodeInfo>& tnInfoList);
     ThermalTypeMap GetSensorTypeMap();
     void SetSensorTypeMap(const ThermalTypeMap& typesMap)
     {
         typesMap_ = typesMap;
     }
-    void GetThermalZoneNodeInfo(XMLThermalZoneInfo &tz, const xmlNode* node);
+    void GetThermalZoneNodeInfo(XMLThermalZoneInfo& tz, const xmlNode* node);
     std::shared_ptr<BaseInfoConfig> GetBaseConfig()
     {
         return baseConfig_;
+    }
+    std::vector<DfxTraceInfo> GetTracingInfo()
+    {
+        return traceInfo_;
+    }
+    XMLTracingInfo GetXmlTraceInfo()
+    {
+        return trace_;
     }
 private:
     std::shared_ptr<BaseInfoConfig> baseConfig_;
     ThermalTypeMap typesMap_;
     XMLThermal thermal_;
+    XMLTracingInfo trace_;
+    std::vector<DfxTraceInfo> traceInfo_;
 };
 } // V1_0
 } // Thermal
