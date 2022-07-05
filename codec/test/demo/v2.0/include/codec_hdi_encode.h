@@ -129,7 +129,7 @@ private:
     struct CodecComponentType *client_;
     struct CodecCallbackType *callback_;
     struct CodecComponentManager *omxMgr_;
-    uint32_t compoentId_;
+    uint32_t componentId_;
     std::map<int, std::shared_ptr<BufferInfo>> omxBuffers_;  // key is bufferID
     std::list<int> unUsedInBuffers_;
     std::list<int> unUsedOutBuffers_;

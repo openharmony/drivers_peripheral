@@ -26,7 +26,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-struct CompoentTypeNode {
+struct ComponentTypeNode {
     uint32_t componentId;
     struct CodecComponentType *service;
     struct DListHead node;
