@@ -15,6 +15,8 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libthermal_interface_service_1.0") {
   include_dirs = [
+    "//base/startup/init_lite/interfaces/innerkits/include/syspara",
+    "//developtools/hiperf/include",
     "//drivers/hdf_core/adapter/uhdf2/shared/include",
     "//third_party/libxml2/include",
     "include",
@@ -23,15 +25,20 @@ ohos_shared_library("libthermal_interface_service_1.0") {
     "src/base_info_config.cpp",
     "src/sensor_info_config.cpp",
     "src/thermal_device_mitigation.cpp",
+    "src/thermal_dfx.cpp",
     "src/thermal_hdf_config.cpp",
     "src/thermal_hdf_timer.cpp",
     "src/thermal_interface_impl.cpp",
     "src/thermal_simulation_node.cpp",
     "src/thermal_zone_manager.cpp",
   ]
+
   deps = [
+    "//base/startup/init_lite/interfaces/innerkits:libbegetutil",
+    "//developtools/hiperf:hiperf_platform_common",
     "//drivers/interface/thermal/v1_0:thermal_idl_headers",
     "//third_party/libxml2:xml2",
+    "//third_party/zlib:libz",
   ]
 
   if (is_standard_system) {
