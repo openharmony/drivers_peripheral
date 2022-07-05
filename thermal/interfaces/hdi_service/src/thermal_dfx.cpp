@@ -16,7 +16,6 @@
 #include "thermal_dfx.h"
 #include <cerrno>
 #include <fcntl.h>
-#include <filesystem>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <thread>
@@ -24,6 +23,7 @@
 #include <hdf_log.h>
 #include <hdf_base.h>
 
+#include "directory_ex.h"
 #include "thermal_log.h"
 #include "zlib.h"
 #include "utilities.h"
@@ -178,10 +178,9 @@ void ThermalDfx::CreateLogFile()
     }
 
     std::string logFile = g_xmlTraceInfo.outpath + "/" + "log" + std::to_string(g_logNumber) + ".txt";
-
     if (access(g_xmlTraceInfo.outpath.c_str(), 0) == -1) {
-        auto ret = std::filesystem::create_directories(g_xmlTraceInfo.outpath);
-        if (ret) {
+        auto ret = ForceCreateDirectory(g_xmlTraceInfo.outpath.c_str());
+        if (!ret) {
             THERMAL_HILOGE(COMP_HDI, "create output dir failed");
             return;
         }
