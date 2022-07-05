@@ -58,7 +58,7 @@ int32_t OMXAdapterCreateComponent(struct CodecComponentNode **codecNode, char *c
     return HDF_SUCCESS;
 }
 
-int32_t OmxAdapterDestoryComponent(struct CodecComponentNode *codecNode)
+int32_t OmxAdapterDestroyComponent(struct CodecComponentNode *codecNode)
 {
     if (codecNode == nullptr || codecNode->node == nullptr) {
         HDF_LOGE("%{public}s codecNode is null", __func__);

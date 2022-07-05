@@ -26,8 +26,8 @@ extern "C" {
 void CodecComponentTypeServiceConstruct(struct CodecComponentType *service);
 struct CodecComponentType *CodecComponentTypeServiceGet(void);
 void CodecComponentTypeServiceRelease(struct CodecComponentType *self);
-void CodecCompoentTypeServiceSetCodecNode(struct CodecComponentType *self, struct CodecComponentNode *codecNode);
-struct CodecComponentNode *CodecCompoentTypeServiceGetCodecNode(struct CodecComponentType *self);
+void CodecComponentTypeServiceSetCodecNode(struct CodecComponentType *self, struct CodecComponentNode *codecNode);
+struct CodecComponentNode *CodecComponentTypeServiceGetCodecNode(struct CodecComponentType *self);
 
 #ifdef __cplusplus
 }

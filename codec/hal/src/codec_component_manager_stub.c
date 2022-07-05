@@ -138,7 +138,7 @@ static int32_t SerStubDestroyComponent(struct CodecComponentManager *serviceImpl
         HDF_LOGE("%{public}s: read componentId failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t ret = serviceImpl->DestoryComponent(componentId);
+    int32_t ret = serviceImpl->DestroyComponent(componentId);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call DestroyComponent function failed!", __func__);
     }

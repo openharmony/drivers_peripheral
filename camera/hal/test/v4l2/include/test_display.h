@@ -159,6 +159,7 @@ public:
     void StoreVideo(const void *bufStart, const uint32_t size) const;
     void OpenVideoFile();
     void PrintFaceDetectInfo(const void *bufStart, const uint32_t size) const;
+    void CloseFd();
     int videoFd_ = -1;
 };
 
@@ -171,6 +172,7 @@ public:
     void OnResult(const uint64_t timestamp,
                   const std::shared_ptr<OHOS::Camera::CameraMetadata>& result) override;
     void PrintStabiliInfo(const std::shared_ptr<OHOS::Camera::CameraMetadata>& result);
+    void PrintFpsInfo(const std::shared_ptr<OHOS::Camera::CameraMetadata>& result);
 };
 #endif
 #endif

@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file expected in compliance with the License.
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,20 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "video_test.h"
+#include "camera_video_test.h"
 
-void UtestVideoTest::SetUpTestCase(void)
+using namespace testing::ext;
+
+void CameraVideoTest::SetUpTestCase(void)
 {}
-void UtestVideoTest::TearDownTestCase(void)
+void CameraVideoTest::TearDownTestCase(void)
 {}
-void UtestVideoTest::SetUp(void)
+void CameraVideoTest::SetUp(void)
 {
     if (display_ == nullptr)
     display_ = std::make_shared<TestDisplay>();
-    display_->FBInit();
     display_->Init();
 }
-void UtestVideoTest::TearDown(void)
+void CameraVideoTest::TearDown(void)
 {
     display_->Close();
 }
@@ -33,23 +34,23 @@ void UtestVideoTest::TearDown(void)
 /**
   * @tc.name: Video
   * @tc.desc: Preview + video, commit together, success.
-  * @tc.level: Level0
+  * @tc.level: Level1
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-TEST_F(UtestVideoTest, camera_video_0001)
+HWTEST_F(CameraVideoTest, camera_video_001, TestSize.Level1)
 {
     std::cout << "==========[test log] 1 Preview + video, commit together, success." << std::endl;
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW, Camera::VIDEO};
+    display_->intents = {OHOS::Camera::PREVIEW, OHOS::Camera::VIDEO};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_video, display_->captureId_preview, false, true);
-    // release stream
-    display_->captureIds = {display_->captureId_preview};
+    display_->StartCapture(display_->streamId_video, display_->captureId_video, false, true);
+
+    display_->captureIds = {display_->captureId_preview, display_->captureId_video};
     display_->streamIds = {display_->streamId_preview, display_->streamId_video};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
@@ -61,32 +62,32 @@ TEST_F(UtestVideoTest, camera_video_0001)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-TEST_F(UtestVideoTest, camera_video_0002)
+HWTEST_F(CameraVideoTest, camera_video_002, TestSize.Level1)
 {
     std::cout << "==========[test log] Preview + video, commit together, set 3A, success." << std::endl;
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
 
     // start stream
-    display_->intents = {Camera::PREVIEW, Camera::VIDEO};
+    display_->intents = {OHOS::Camera::PREVIEW, OHOS::Camera::VIDEO};
     display_->StartStream(display_->intents);
+    // Get preview
+    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->streamId_video, display_->captureId_video, false, true);
     // Issue 3A parameters to increase exposure
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);
-    if (display_->rc == Camera::NO_ERROR) {
+    if (display_->rc == OHOS::Camera::NO_ERROR) {
         std::cout << "==========[test log] UpdateSettings success, for 5s." << std::endl;
     } else {
         std::cout << "==========[test log] UpdateSettings fail, rc = " << display_->rc << std::endl;
     }
     sleep(3);
 
-    // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_video, false, true);
-    display_->StartCapture(display_->streamId_video, display_->captureId_video, false, true);
     // release stream
-    display_->captureIds = {display_->captureId_video};
+    display_->captureIds = {display_->captureId_preview, display_->captureId_video};
     display_->streamIds = {display_->streamId_preview, display_->streamId_video};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
@@ -98,20 +99,20 @@ TEST_F(UtestVideoTest, camera_video_0002)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-TEST_F(UtestVideoTest, camera_video_0003)
+HWTEST_F(CameraVideoTest, camera_video_003, TestSize.Level1)
 {
     std::cout << "==========[test log] Preview + video, commit together, then close device,";
     std::cout << "and preview + video again." << std::endl;
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW, Camera::VIDEO};
+    display_->intents = {OHOS::Camera::PREVIEW, OHOS::Camera::VIDEO};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_video, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->streamId_video, display_->captureId_video, false, true);
     // release stream
-    display_->captureIds = {display_->captureId_preview};
+    display_->captureIds = {display_->captureId_preview, display_->captureId_video};
     display_->streamIds = {display_->streamId_preview, display_->streamId_video};
     display_->StopStream(display_->captureIds, display_->streamIds);
 
@@ -124,13 +125,13 @@ TEST_F(UtestVideoTest, camera_video_0003)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW, Camera::VIDEO};
+    display_->intents = {OHOS::Camera::PREVIEW, OHOS::Camera::VIDEO};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_video, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->streamId_video, display_->captureId_video, false, true);
     // release stream
-    display_->captureIds = {display_->captureId_preview};
+    display_->captureIds = {display_->captureId_preview, display_->captureId_video};
     display_->streamIds = {display_->streamId_preview, display_->streamId_video};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
@@ -142,20 +143,20 @@ TEST_F(UtestVideoTest, camera_video_0003)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-TEST_F(UtestVideoTest, camera_video_0004)
+HWTEST_F(CameraVideoTest, camera_video_004, TestSize.Level1)
 {
     std::cout << "==========[test log] Preview + video, commit together, then close device,";
     std::cout << "and preview + capture." << std::endl;
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW, Camera::VIDEO};
+    display_->intents = {OHOS::Camera::PREVIEW, OHOS::Camera::VIDEO};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_video, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->streamId_video, display_->captureId_video, false, true);
     // release stream
-    display_->captureIds = {display_->captureId_preview};
+    display_->captureIds = {display_->captureId_preview, display_->captureId_video};
     display_->streamIds = {display_->streamId_preview, display_->streamId_video};
     display_->StopStream(display_->captureIds, display_->streamIds);
 
@@ -168,13 +169,13 @@ TEST_F(UtestVideoTest, camera_video_0004)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
+    display_->intents = {OHOS::Camera::PREVIEW, OHOS::Camera::STILL_CAPTURE};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_capture, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
     // release stream
-    display_->captureIds = {display_->captureId_preview};
+    display_->captureIds = {display_->captureId_preview, display_->captureId_capture};
     display_->streamIds = {display_->streamId_preview, display_->streamId_capture};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
@@ -186,76 +187,76 @@ TEST_F(UtestVideoTest, camera_video_0004)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-TEST_F(UtestVideoTest, camera_video_0005)
+HWTEST_F(CameraVideoTest, camera_video_005, TestSize.Level1)
 {
     std::cout << "==========[test log] 1 Preview + video, commit together, success." << std::endl;
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW, Camera::VIDEO};
+    display_->intents = {OHOS::Camera::PREVIEW, OHOS::Camera::VIDEO};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_video, display_->captureId_preview, false, true);
-    // release stream
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview, display_->streamId_video};
-    display_->StopStream(display_->captureIds, display_->streamIds);
-}
-
-/**
-  * @tc.name: Video
-  * @tc.desc: Video start&stop, for 5 times, success.
-  * @tc.level: Level2
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-TEST_F(UtestVideoTest, camera_video_0010)
-{
-    std::cout << "==========[test log] Video start&stop, for 5 times, success." << std::endl;
-    // Create and get streamOperator information
-    display_->AchieveStreamOperator();
-    for (int i = 0; i < 5; i++) {
-    // start stream
-    display_->intents = {Camera::PREVIEW, Camera::VIDEO};
-    display_->StartStream(display_->intents);
-    // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_video, display_->captureId_preview, false, true);
-    // release stream
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview, display_->streamId_video};
-    display_->StopStream(display_->captureIds, display_->streamIds);
-}
-}
-
-/**
-  * @tc.name: Video
-  * @tc.desc: Video start&stop, for 5 times, success.
-  * @tc.level: Level2
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-TEST_F(UtestVideoTest, camera_video_0011)
-{
-    std::cout << "==========[test log] Video start&stop, for 5 times, success." << std::endl;
-    // Create and get streamOperator information
-    display_->AchieveStreamOperator();
-    for (int i = 0; i < 5; i++) {
-    // start stream
-    display_->intents = {Camera::PREVIEW, Camera::VIDEO};
-    display_->StartStream(display_->intents);
-
-    // Start capture preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    // Start capture recording
     display_->StartCapture(display_->streamId_video, display_->captureId_video, false, true);
-
-    // post-processing
+    // release stream
     display_->captureIds = {display_->captureId_preview, display_->captureId_video};
     display_->streamIds = {display_->streamId_preview, display_->streamId_video};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
+
+/**
+  * @tc.name: Video
+  * @tc.desc: Video start&stop, for 5 times, success.
+  * @tc.level: Level2
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+HWTEST_F(CameraVideoTest, camera_video_010, TestSize.Level2)
+{
+    std::cout << "==========[test log] Video start&stop, for 5 times, success." << std::endl;
+    // Create and get streamOperator information
+    display_->AchieveStreamOperator();
+    for (int i = 0; i < 5; i++) {
+    // start stream
+    display_->intents = {OHOS::Camera::PREVIEW, OHOS::Camera::VIDEO};
+    display_->StartStream(display_->intents);
+    // Get preview
+    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->streamId_video, display_->captureId_video, false, true);
+    // release stream
+    display_->captureIds = {display_->captureId_preview, display_->captureId_video};
+    display_->streamIds = {display_->streamId_preview, display_->streamId_video};
+    display_->StopStream(display_->captureIds, display_->streamIds);
+}
+}
+
+/**
+  * @tc.name: Video
+  * @tc.desc: Video start&stop, for 5 times, success.
+  * @tc.level: Level2
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+HWTEST_F(CameraVideoTest, camera_video_011, TestSize.Level2)
+{
+    std::cout << "==========[test log] Video start&stop, for 5 times, success." << std::endl;
+    // Create and get streamOperator information
+    display_->AchieveStreamOperator();
+    for (int i = 0; i < 5; i++) {
+        // start stream
+        display_->intents = {OHOS::Camera::PREVIEW, OHOS::Camera::VIDEO};
+        display_->StartStream(display_->intents);
+
+        // Start capture preview
+        display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+        // Start capture recording
+        display_->StartCapture(display_->streamId_video, display_->captureId_video, false, true);
+
+        // post-processing
+        display_->captureIds = {display_->captureId_preview, display_->captureId_video};
+        display_->streamIds = {display_->streamId_preview, display_->streamId_video};
+        display_->StopStream(display_->captureIds, display_->streamIds);
+    }
 }
 
 /**
@@ -265,18 +266,18 @@ TEST_F(UtestVideoTest, camera_video_0011)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-TEST_F(UtestVideoTest, camera_video_0020)
+HWTEST_F(CameraVideoTest, camera_video_020, TestSize.Level2)
 {
     std::cout << "==========[test log] Video mode, preview, success." << std::endl;
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // Create data stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {OHOS::Camera::PREVIEW};
     display_->StartStream(display_->intents);
     // capture
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     // Create video stream
-    display_->intents = {Camera::VIDEO};
+    display_->intents = {OHOS::Camera::VIDEO};
     display_->StartStream(display_->intents);
     // Start capture preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
@@ -284,32 +285,36 @@ TEST_F(UtestVideoTest, camera_video_0020)
     display_->StartCapture(display_->streamId_video, display_->captureId_video, false, true);
 
     // post-processing
+    display_->streamCustomerPreview_->ReceiveFrameOff();
+    display_->streamCustomerVideo_->ReceiveFrameOff();
     display_->rc = display_->streamOperator->CancelCapture(display_->captureId_video);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc == OHOS::Camera::NO_ERROR);
+    if (display_->rc == OHOS::Camera::NO_ERROR) {
         std::cout << "==========[test log] CancelCapture success, captureId = ";
         std::cout << display_->captureId_video << std::endl;
     } else {
         std::cout << "==========[test log] CancelCapture fail, rc = " << display_->rc << std::endl;
     }
     display_->rc = display_->streamOperator->CancelCapture(display_->captureId_preview);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc == OHOS::Camera::NO_ERROR);
+    if (display_->rc == OHOS::Camera::NO_ERROR) {
         std::cout << "==========[test log] CancelCapture success, captureId = ";
         std::cout << display_->captureId_preview << std::endl;
     } else {
         std::cout << "==========[test log] CancelCapture fail, rc = " << display_->rc << std::endl;
     }
-    display_->rc = display_->streamOperator->ReleaseStreams({display_->streamId_video});
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    display_->rc = display_->streamOperator->ReleaseStreams(
+        {display_->streamId_video});
+    EXPECT_EQ(true, display_->rc == OHOS::Camera::NO_ERROR);
+    if (display_->rc == OHOS::Camera::NO_ERROR) {
         std::cout << "==========[test log] ReleaseStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] ReleaseStreams fail, rc = " << display_->rc << std::endl;
     }
-    display_->rc = display_->streamOperator->ReleaseStreams({display_->streamId_preview});
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    display_->rc = display_->streamOperator->ReleaseStreams(
+        {display_->streamId_preview});
+    EXPECT_EQ(true, display_->rc == OHOS::Camera::NO_ERROR);
+    if (display_->rc == OHOS::Camera::NO_ERROR) {
         std::cout << "==========[test log] ReleaseStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] ReleaseStreams fail, rc = " << display_->rc << std::endl;
@@ -323,23 +328,23 @@ TEST_F(UtestVideoTest, camera_video_0020)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-TEST_F(UtestVideoTest, camera_video_0021)
+HWTEST_F(CameraVideoTest, camera_video_021, TestSize.Level1)
 {
     std::cout << "==========[test log] Video mode, preview, set 3A, success." << std::endl;
     EXPECT_EQ(true, display_->cameraDevice != nullptr);
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW, Camera::VIDEO};
+    display_->intents = {OHOS::Camera::PREVIEW, OHOS::Camera::VIDEO};
     display_->StartStream(display_->intents);
     // capture
-    display_->StartCapture(display_->streamId_preview, display_->captureId_video, false, true);
+    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_video, display_->captureId_video, false, true);
     // Issue 3A parameters to increase exposure
     std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);
-    if (display_->rc == Camera::NO_ERROR) {
+    if (display_->rc == OHOS::Camera::NO_ERROR) {
         std::cout << "==========[test log] UpdateSettings success, for 5s." << std::endl;
     } else {
         std::cout << "==========[test log] UpdateSettings fail, rc = " << display_->rc << std::endl;
@@ -347,7 +352,7 @@ TEST_F(UtestVideoTest, camera_video_0021)
     sleep(3);
 
     // post-processing
-    display_->captureIds = {display_->captureId_video};
+    display_->captureIds = {display_->captureId_preview, display_->captureId_video};
     display_->streamIds = {display_->streamId_preview, display_->streamId_video};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
@@ -359,7 +364,7 @@ TEST_F(UtestVideoTest, camera_video_0021)
   * @tc.size: MediumTest
   * @tc.type: Function
   */
-TEST_F(UtestVideoTest, camera_video_0030)
+HWTEST_F(CameraVideoTest, camera_video_030, TestSize.Level2)
 {
     std::cout << "==========[test log] Video mode without preview, system not support,";
     std::cout << "expected return fail." << std::endl;
@@ -367,40 +372,36 @@ TEST_F(UtestVideoTest, camera_video_0030)
     EXPECT_EQ(true, display_->cameraDevice != nullptr);
     display_->AchieveStreamOperator();
     // Create video stream
-    std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
+    std::shared_ptr<StreamCustomer> streamCustomer = std::make_shared<StreamCustomer>();
+    OHOS::sptr<OHOS::IBufferProducer> producer = streamCustomer->CreateProducer();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
         std::cout << "~~~~~~~" << std::endl;
     }
-    auto callbackVideo = [this](std::shared_ptr<SurfaceBuffer> b) {
-        display_->BufferCallback(b, display_->video_mode);
-        return;
-    };
-    producer->SetCallback(callbackVideo);
+
+    std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>> streamInfos;
     display_->streamInfo = std::make_shared<OHOS::Camera::StreamInfo>();
     display_->streamInfo->streamId_ = display_->streamId_video;
-    display_->streamInfo->width_ = 640; // 640:picture width
-    display_->streamInfo->height_ = 480; // 480:picture height
-    display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
+    display_->streamInfo->width_ = 1280; // 1280:picture width
+    display_->streamInfo->height_ = 960; // 960:picture height
+    display_->streamInfo->format_ = PIXEL_FMT_RGBA_8888;
     display_->streamInfo->datasapce_ = 10;
-    display_->streamInfo->intent_ = Camera::VIDEO;
+    display_->streamInfo->intent_ = OHOS::Camera::VIDEO;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
-    std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>>().swap(streamInfos);
     streamInfos.push_back(display_->streamInfo);
     display_->rc = display_->streamOperator->CreateStreams(streamInfos);
-    EXPECT_EQ(false, display_->rc == Camera::METHOD_NOT_SUPPORTED);
-    if (display_->rc == Camera::METHOD_NOT_SUPPORTED) {
+    EXPECT_EQ(false, display_->rc == OHOS::Camera::METHOD_NOT_SUPPORTED);
+    if (display_->rc == OHOS::Camera::METHOD_NOT_SUPPORTED) {
         std::cout << "==========[test log] CreateStreams METHOD_NOT_SUPPORTED, streamId = ";
-        std::cout << display_->streamId_video <<", intent = Camera::VIDEO" << std::endl;
+        std::cout << display_->streamId_video <<", intent = OHOS::Camera::VIDEO" << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc << std::endl;
     }
 
-    display_->rc = display_->streamOperator->CommitStreams(Camera::NORMAL, nullptr);
-    EXPECT_EQ(false, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    display_->rc = display_->streamOperator->CommitStreams(OHOS::Camera::NORMAL, nullptr);
+    EXPECT_EQ(false, display_->rc == OHOS::Camera::NO_ERROR);
+    if (display_->rc == OHOS::Camera::NO_ERROR) {
         std::cout << "==========[test log] CommitStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] CommitStreams fail, rc = ." << display_->rc << std::endl;
