@@ -54,7 +54,7 @@ CodecHdiDecode::CodecHdiDecode() : fpIn_(nullptr), fpOut_(nullptr)
     codecMime_ = codecMime::AVC;
     count_ = 0;
     useBufferHandle_ = false;
-    compoentId_ = 0;
+    componentId_ = 0;
 }
 
 CodecHdiDecode::~CodecHdiDecode()
@@ -152,10 +152,10 @@ bool CodecHdiDecode::Init(CommandOpt &opt)
     callback_->FillBufferDone = &CodecHdiDecode::OnFillBufferDone;
     int32_t err = HDF_SUCCESS;
     if (codecMime_ == codecMime::AVC) {
-        err =
-            omxMgr_->CreateComponent(&client_, &compoentId_, const_cast<char *>(decoder_avc), (int64_t)this, callback_);
+        err = omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(decoder_avc), (int64_t)this,
+                                       callback_);
     } else {
-        err = omxMgr_->CreateComponent(&client_, &compoentId_, const_cast<char *>(decoder_hevc), (int64_t)this,
+        err = omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(decoder_hevc), (int64_t)this,
                                        callback_);
     }
 
@@ -527,7 +527,7 @@ void CodecHdiDecode::FreeBuffers()
 
 void CodecHdiDecode::Release()
 {
-    omxMgr_->DestoryComponent(compoentId_);
+    omxMgr_->DestroyComponent(componentId_);
     CodecComponentTypeRelease(client_);
     client_ = nullptr;
     CodecComponentManagerRelease();

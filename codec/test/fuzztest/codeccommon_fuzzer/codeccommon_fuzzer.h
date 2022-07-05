@@ -31,7 +31,7 @@ namespace Codec {
 
     void FillDataOmxCodecBuffer(struct OmxCodecBuffer *dataFuzz);
     bool Preconditions();
-    bool Destory();
+    bool Destroy();
 } // namespace codec
 } // namespace OHOS
 #endif // CODECCOMMON_FUZZER_H
