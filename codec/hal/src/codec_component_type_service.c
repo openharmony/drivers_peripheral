@@ -251,7 +251,7 @@ void CodecComponentTypeServiceRelease(struct CodecComponentType *self)
     OsalMemFree(service);
 }
 
-void CodecCompoentTypeServiceSetCodecNode(struct CodecComponentType *self, struct CodecComponentNode *codecNode)
+void CodecComponentTypeServiceSetCodecNode(struct CodecComponentType *self, struct CodecComponentNode *codecNode)
 {
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
     if (service == NULL) {
@@ -260,7 +260,7 @@ void CodecCompoentTypeServiceSetCodecNode(struct CodecComponentType *self, struc
     service->codecNode = codecNode;
 }
 
-struct CodecComponentNode *CodecCompoentTypeServiceGetCodecNode(struct CodecComponentType *self)
+struct CodecComponentNode *CodecComponentTypeServiceGetCodecNode(struct CodecComponentType *self)
 {
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
     if (service == NULL) {

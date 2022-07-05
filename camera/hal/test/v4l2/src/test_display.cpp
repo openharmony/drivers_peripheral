@@ -96,6 +96,12 @@ void TestDisplay::OpenVideoFile()
     }
 }
 
+void TestDisplay::CloseFd()
+{
+    close(videoFd_);
+    videoFd_ = -1;
+}
+
 void TestDisplay::PrintFaceDetectInfo(const void *bufStart, const uint32_t size) const
 {
     common_metadata_header_t* data = static_cast<common_metadata_header_t*>((const_cast<void*>(bufStart)));
@@ -567,6 +573,8 @@ void TestDisplay::StartCapture(int streamId, int captureId, bool shutterCallback
 
 void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
 {
+    constexpr uint32_t SLEEP_SECOND_TWO = 2;
+    sleep(SLEEP_SECOND_TWO);
     if (sizeof(captureIds) > 0) {
         for (auto &captureId : captureIds) {
             if (captureId == captureId_preview) {
@@ -575,13 +583,16 @@ void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& str
                 streamCustomerCapture_->ReceiveFrameOff();
             } else if (captureId == captureId_video) {
                 streamCustomerVideo_->ReceiveFrameOff();
-                close(videoFd_);
-                videoFd_ = -1;
+                sleep(1);
+                CloseFd();
             } else if (captureId == captureId_analyze) {
                 streamCustomerAnalyze_->ReceiveFrameOff();
             }
+        }
+        for (auto &captureId : captureIds) {
             std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
             rc = streamOperator->CancelCapture(captureId);
+            sleep(SLEEP_SECOND_TWO);
             EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);
             if (rc == OHOS::Camera::NO_ERROR) {
                 std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
@@ -627,6 +638,33 @@ void DemoCameraDeviceCallback::PrintStabiliInfo(const std::shared_ptr<OHOS::Came
     std::cout << "==========[test log] PrintStabiliInfo videoStabiliMode: " << (int)videoStabiliMode << std::endl;
 }
 
+void DemoCameraDeviceCallback::PrintFpsInfo(const std::shared_ptr<OHOS::Camera::CameraMetadata>& result)
+{
+    if (result == nullptr) {
+        CAMERA_LOGE("TestDisplay: result is null");
+        return;
+    }
+    common_metadata_header_t* data = result->get();
+    if (data == nullptr) {
+        CAMERA_LOGE("TestDisplay: data is null");
+        return;
+    }
+    std::vector<int32_t> fpsRange;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FPS_RANGES, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("demo test: get OHOS_CONTROL_EXPOSURE_MODE error\n");
+        return;
+    }
+
+    for (int i = 0; i < entry.count; i++) {
+        fpsRange.push_back(*(entry.data.i32 + i));
+    }
+    CAMERA_LOGI("Set fpsRange: [%{public}d, %{public}d]", fpsRange[0], fpsRange[1]);
+    std::cout << "==========[test log] PrintFpsInfo fpsRange: [" << fpsRange[0] << ", " <<
+        fpsRange[1] << "]" << std::endl;
+}
+
 #ifndef CAMERA_BUILT_ON_OHOS_LITE
 void DemoCameraDeviceCallback::OnError(const OHOS::Camera::ErrorType type, const int32_t errorMsg)
 {
@@ -637,5 +675,6 @@ void DemoCameraDeviceCallback::OnResult(const uint64_t timestamp,
                                         const std::shared_ptr<OHOS::Camera::CameraMetadata>& result)
 {
     PrintStabiliInfo(result);
+    PrintFpsInfo(result);
 }
 #endif

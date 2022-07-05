@@ -30,7 +30,7 @@ extern int32_t OMXAdapterCreateComponent(struct CodecComponentNode **codecNode, 
 /**
  * @brief Release the component by handle.
  */
-extern int32_t OmxAdapterDestoryComponent(struct CodecComponentNode *codecNode);
+extern int32_t OmxAdapterDestroyComponent(struct CodecComponentNode *codecNode);
 /**
  * @brief Get the version of the component.
  */

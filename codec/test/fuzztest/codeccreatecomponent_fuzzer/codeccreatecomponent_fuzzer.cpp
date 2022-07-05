@@ -37,9 +37,9 @@ namespace Codec {
             result = true;
         }
 
-        ret = manager->DestoryComponent(componentId);
+        ret = manager->DestroyComponent(componentId);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: DestoryComponent failed\n", __func__);
+            HDF_LOGE("%{public}s: DestroyComponent failed\n", __func__);
             return false;
         }
         CodecComponentTypeRelease(component);

@@ -193,7 +193,7 @@ _manager.h</p>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.2.2 "><p id="p1141372575614"><a name="p1141372575614"></a><a name="p1141372575614"></a>Creates a codec instance</p>
 </td>
 </tr>
-<tr id="row181371630162816"><td class="cellrowborder" valign="top" headers="mcps1.2.4.2.1 "><p id="p1941362515561"><a name="p1941362515561"></a><a name="p1941362515561"></a>int32_t (*DestoryComponent)(uint32_t componentId);</p>
+<tr id="row181371630162816"><td class="cellrowborder" valign="top" headers="mcps1.2.4.2.1 "><p id="p1941362515561"><a name="p1941362515561"></a><a name="p1941362515561"></a>int32_t (*DestroyComponent)(uint32_t componentId);</p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.2.2 "><p id="p44131025115619"><a name="p44131025115619"></a><a name="p44131025115619"></a>Destroys a codec component instance</p>
 </td>

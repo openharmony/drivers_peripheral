@@ -46,7 +46,7 @@ CodecHdiEncode::CodecHdiEncode() : fpIn_(nullptr), fpOut_(nullptr)
     useBufferHandle_ = false;
     width_ = 0;
     height_ = 0;
-    compoentId_ = 0;
+    componentId_ = 0;
 }
 
 CodecHdiEncode::~CodecHdiEncode()
@@ -113,7 +113,7 @@ bool CodecHdiEncode::Init(CommandOpt &opt)
 
     // create a component
     auto err =
-        omxMgr_->CreateComponent(&client_, &compoentId_, const_cast<char *>(encoder_avc), (int64_t)this, callback_);
+        omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(encoder_avc), (int64_t)this, callback_);
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to CreateComponent", __func__);
         return false;
@@ -424,7 +424,7 @@ void CodecHdiEncode::FreeBuffers()
 
 void CodecHdiEncode::Release()
 {
-    omxMgr_->DestoryComponent(compoentId_);
+    omxMgr_->DestroyComponent(componentId_);
     CodecComponentTypeRelease(client_);
     client_ = nullptr;
     CodecComponentManagerRelease();

@@ -51,9 +51,9 @@ namespace Codec {
             result = true;
         }
 
-        result = Destory();
+        result = Destroy();
         if (!result) {
-            HDF_LOGE("%{public}s: Destory failed\n", __func__);
+            HDF_LOGE("%{public}s: Destroy failed\n", __func__);
             return false;
         }
 

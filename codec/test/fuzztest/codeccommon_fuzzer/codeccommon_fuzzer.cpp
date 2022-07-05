@@ -79,11 +79,11 @@ namespace Codec {
         return true;
     }
 
-    bool Destory()
+    bool Destroy()
     {
-        int32_t ret = manager->DestoryComponent(componentId);
+        int32_t ret = manager->DestroyComponent(componentId);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: DestoryComponent failed\n", __func__);
+            HDF_LOGE("%{public}s: DestroyComponent failed\n", __func__);
             return false;
         }
         CodecComponentTypeRelease(component);
