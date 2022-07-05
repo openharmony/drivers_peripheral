@@ -44,6 +44,12 @@ RetCode SensorController::Init()
         CAMERA_LOGE("%s Create HosV4L2Dev fail", __FUNCTION__);
         return RC_ERROR;
     }
+
+    // push default value
+    constexpr uint32_t FPS_FIVE = 5;
+    constexpr uint32_t FPS_TEN = 10;
+    fpsRange_.push_back(FPS_FIVE);
+    fpsRange_.push_back(FPS_TEN);
     return RC_OK;
 }
 
@@ -267,8 +273,7 @@ RetCode SensorController::GetSensorMetaData(std::shared_ptr<CameraMetadata> meta
     GetFocusMode(this, meta, outValue);
     outValue = 1;
     GetMeterMode(this, meta, outValue);
-    outValue = 1;
-    GetFpsRange(this, meta, outValue);
+    GetFpsRange(this, meta);
     outValue = 1;
     GetFlashMode(this, meta, outValue);
     rc = RC_OK;
@@ -481,23 +486,32 @@ void SensorController::GetCaptureMirror(SensorController *sensorController,
 }
 
 void SensorController::GetFpsRange(SensorController *sensorController,
-    std::shared_ptr<CameraMetadata> meta, const int32_t &value)
+    std::shared_ptr<CameraMetadata> meta)
 {
     if (meta == nullptr) {
         CAMERA_LOGE("meta is nullptr");
         return;
     }
-    std::vector<int32_t> vfpsRange;
-    int32_t fpsRange = value;
 
-    CAMERA_LOGI("Get CMD_FPS_RANGES [%{public}]", fpsRange);
-    vfpsRange.push_back(fpsRange);
-    vfpsRange.push_back(fpsRange);
-    std::lock_guard<std::mutex> lock(sensorController->metaDataFlaglock_);
-    sensorController->metaDataFlag_ = true;
-    meta->addEntry(OHOS_CONTROL_FPS_RANGES,
-        vfpsRange.data(),
-        vfpsRange.size());
+    for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
+        switch (*iter) {
+            case OHOS_CONTROL_FPS_RANGES: {
+                DeviceFormat format;
+                std::lock_guard<std::mutex> lock(sensorController->metaDataFlaglock_);
+                sensorController->metaDataFlag_ = true;
+                RetCode rc = sensorVideo_->ConfigSys(GetName(), CMD_V4L2_GET_FPS, format);
+                if (rc == RC_ERROR) {
+                    CAMERA_LOGE("CMD_V4L2_GET_FPS ConfigSys fail");
+                }
+
+                // dummy data
+                meta->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange_.data(), fpsRange_.size());
+                break;
+            }
+            default:
+                break;
+        }
+    }
 }
 
 RetCode SensorController::SendSensorMetaData(std::shared_ptr<CameraMetadata> meta)
@@ -707,15 +721,25 @@ RetCode SensorController::SendFlashMetaData(common_metadata_header_t *data)
 RetCode SensorController::SendFpsMetaData(common_metadata_header_t *data)
 {
     RetCode rc = RC_OK;
-    std::vector<int32_t> fpsRange;
     camera_metadata_item_t entry;
+    constexpr uint32_t GROUP_LEN = 2;
+    DeviceFormat format;
+    fpsRange_.clear();
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FPS_RANGES, &entry);
     if (ret == 0) {
         for (int i = 0; i < entry.count; i++) {
-            fpsRange.push_back(*(entry.data.i32 + i));
-            CAMERA_LOGI("Set CMD_FPS_RANGE [%{public}d]", *(entry.data.i32 + i));
+            fpsRange_.push_back(*(entry.data.i32 + i));
         }
-        rc = sensorVideo_->UpdateSetting(GetName(), CMD_FPS_RANGE, (int*)&fpsRange);
+        if (fpsRange_.size() != GROUP_LEN) {
+            CAMERA_LOGE("fpsRange size error");
+            return RC_ERROR;
+        }
+        CAMERA_LOGI("Set CMD_FPS_RANGE [%{public}d, %{public}d]", fpsRange_[0], fpsRange_[1]);
+        format.fmtdesc.fps.denominator = (fpsRange_[0] + fpsRange_[1]) / GROUP_LEN;
+        format.fmtdesc.fps.numerator = 1;
+        CAMERA_LOGI("fps.denominator: %{public}d, fps.numerator: %{public}d",
+            format.fmtdesc.fps.denominator, format.fmtdesc.fps.numerator);
+        rc = sensorVideo_->ConfigSys(GetName(), CMD_V4L2_SET_FPS, format);
         if (rc == RC_ERROR) {
             CAMERA_LOGE("Send CMD_FPS_RANGE fail");
         }

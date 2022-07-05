@@ -273,7 +273,7 @@ void V4L2DeviceManager::SetMetaDataCallBack(const MetaDataCb cb, CameraId camera
     }
 }
 
-void V4L2DeviceManager::SetAbilityMetaDataTag(std::vector<int32_t>& abilityMetaDataTag)
+void V4L2DeviceManager::SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag)
 {
     CAMERA_LOGI("V4L2DeviceManager %{public}s: line: %{public}d", __FUNCTION__, __LINE__);
     CameraId cameraId = CAMERA_FIRST;

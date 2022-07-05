@@ -23,10 +23,12 @@ IppNode::IppNode(const std::string& name, const std::string& type)
 
 IppNode::~IppNode()
 {
-    GetDeviceController();
-    sensorController_->SetMetaDataCallBack([this](const std::shared_ptr<CameraMetadata>& metadata) {
-        CAMERA_LOGE("V4L2 ipp node already been destroyed!");
-    });
+    RetCode rc = GetDeviceController();
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("GetDeviceController failed.");
+        return;
+    }
+    sensorController_->SetMetaDataCallBack(nullptr);
 }
 
 RetCode IppNode::Init(const int32_t streamId)
@@ -81,7 +83,11 @@ RetCode IppNode::SetCallback(const MetaDataCb cb)
 {
     CAMERA_LOGI("IppNode line: %{public}d", __LINE__);
     metaDataCb_ = cb;
-    GetDeviceController();
+    RetCode rc = GetDeviceController();
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("GetDeviceController failed.");
+        return RC_ERROR;
+    }
     sensorController_->SetMetaDataCallBack([this](const std::shared_ptr<CameraMetadata>& metadata) {
         OnMetadataChanged(metadata);
     });
@@ -218,10 +224,6 @@ RetCode IppNode::SendNodeMetaData(const std::shared_ptr<CameraMetadata> meta)
     if (rc == RC_ERROR) {
         CAMERA_LOGE("SendFocusMetaData fail");
     }
-    rc = SendFaceModeMetaData(data);
-    if (rc == RC_ERROR) {
-        CAMERA_LOGE("SendFaceModeMetaData fail");
-    }
     return rc;
 }
 
@@ -276,24 +278,6 @@ RetCode IppNode::SendFocusMetaData(const common_metadata_header_t *data)
     }
 
     return RC_OK;
-}
-
-RetCode IppNode::SendFaceModeMetaData(const common_metadata_header_t *data)
-{
-    RetCode rc = RC_OK;
-    uint8_t faceMode = 0;
-    camera_metadata_item_t entry;
-    (void) data;
-
-    int ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_DETECT_SWITCH, &entry);
-    if (ret != 0) {
-        rc = RC_ERROR;
-        CAMERA_LOGE("Facemode not found in metadata.");
-        return rc;
-    }
-    faceMode = *(entry.data.u8);
-    CAMERA_LOGI("Set faceMode [%{public}d]", faceMode);
-    return rc;
 }
 
 void IppNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)

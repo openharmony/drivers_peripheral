@@ -129,6 +129,7 @@ if (defined(ohos_lite)) {
     sources = [
       "./src/camera_ability_test.cpp",
       "./src/camera_capture_test.cpp",
+      "./src/camera_fps_test.cpp",
       "./src/camera_preview_test.cpp",
       "./src/camera_stabili_test.cpp",
       "./src/camera_video_test.cpp",
