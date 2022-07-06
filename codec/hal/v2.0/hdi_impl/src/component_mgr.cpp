@@ -21,26 +21,14 @@
 #include <memory.h>
 #include <securec.h>
 #define HDF_LOG_TAG codec_hdi_server
-constexpr int COMPONENT_NAME_MAX_LEN = 128;
 
 namespace OHOS {
 namespace Codec {
 namespace Omx {
-ComponentMgr::ComponentMgr() : loadLibSuc_(false), currentComType_(NULL), currentComName_("")
+ComponentMgr::ComponentMgr()
 {
     AddVendorComponent();
     AddSoftComponent();
-}
-
-bool ComponentMgr::IsOMXHandleValid(OMX_COMPONENTTYPE *handle)
-{
-    for (size_t i = 0; i < componentTypePointAndObjectPoint_.size(); i++) {
-        if (handle == componentTypePointAndObjectPoint_[i].componentType) {
-            return true;
-        }
-    }
-    HDF_LOGE("%{public}s can not find handle [0x%{public}p]", __func__, handle);
-    return false;
 }
 
 ComponentMgr::~ComponentMgr()
@@ -51,97 +39,51 @@ ComponentMgr::~ComponentMgr()
 int32_t ComponentMgr::CreateComponentInstance(const char *componentName, const OMX_CALLBACKTYPE *callbacks,
                                               void *appData, OMX_COMPONENTTYPE **component)
 {
-    HDF_LOGI("ComponentMgr::CreateComponentInstance:%{public}s", componentName);
-    *component = NULL;
-    int32_t err = OMX_ErrorMax;
+    int32_t err = HDF_ERR_INVALID_PARAM;
+    std::lock_guard<std::mutex> lk(mutex_);
 
-    std::vector<ComponentNameAndObjectPoint>::iterator it;
-    for (it = componentNameAndObjectPoint_.begin(); it != componentNameAndObjectPoint_.end(); ++it) {
-        if (strcmp(componentName, it->componentName.c_str()) != 0) {
-            continue;
-        }
-        if (it->omxComponentMgr == nullptr) {
-            break;
-        }
-        err = it->omxComponentMgr->CreateComponentInstance(componentName, callbacks, appData, component);
-        std::vector<std::string> roles;
-        it->omxComponentMgr->GetRolesForComponent(componentName, &roles);
-        if (err != OMX_ErrorNone) {
-            HDF_LOGE("%{public}s CreateComponentInstance error %{public}x", __func__, err);
-            break;
-        }
-        ComponentTypePointAndObjectPoint point;
-        point.componentType = *component;
-        point.omxComponentMgr = it->omxComponentMgr;
-        componentTypePointAndObjectPoint_.push_back(point);
-        currentComType_ = *component;
-        currentComName_ = componentName;
+    auto iter = compoentsCore_.find(componentName);
+    if (iter == compoentsCore_.end() || iter->second == nullptr) {
+        HDF_LOGE("%{public}s: can not find component[%{public}s] in core", __func__, componentName);
+        return err;
+    }
+    auto core = iter->second;
+    OMX_HANDLETYPE handle = nullptr;
+    std::string name(componentName);
+    err = core->GetHandle(handle, name, appData, *callbacks);
+    if (err == OMX_ErrorNone && handle) {
+        OMXComponent comp;
+        comp.core = core;
+        *component = reinterpret_cast<OMX_COMPONENTTYPE *>(handle);
+        comp.handle = handle;
+        components_.push_back(comp);
     }
     return err;
 }
 
 int32_t ComponentMgr::DeleteComponentInstance(OMX_COMPONENTTYPE *component)
 {
-    std::vector<ComponentTypePointAndObjectPoint>::iterator it;
-    for (it = componentTypePointAndObjectPoint_.begin(); it != componentTypePointAndObjectPoint_.end(); ++it) {
-        if (it->componentType == component) {
-            IComponentMgr *pOMXComponentMgr = it->omxComponentMgr;
-            componentTypePointAndObjectPoint_.erase(it);
-            if (pOMXComponentMgr != nullptr) {
-                return pOMXComponentMgr->DeleteComponentInstance(component);
-            }
-            return OMX_ErrorMax;
+    int32_t err = OMX_ErrorInvalidComponent;
+    for (size_t i = 0; i < components_.size(); i++) {
+        if (components_[i].handle == component) {
+            err = components_[i].core->FreeHandle(components_[i].handle);
+            components_.erase(components_.begin() + i);
+            break;
         }
     }
-    return OMX_ErrorMax;
-}
-
-int32_t ComponentMgr::EnumerateComponentsByIndex(uint32_t index, char *componentName, size_t componentNameSize)
-{
-    size_t componentNum = componentNameAndObjectPoint_.size();
-    if (index >= componentNum) {
-        HDF_LOGE("%{public}s index [%{public}d] > componentNum [%{public}zu]", __func__, index, componentNum);
-        return OMX_ErrorInvalidComponentName;
-    }
-    std::string &compName = componentNameAndObjectPoint_[index].componentName;
-    if (componentNameSize < compName.length() + 1) {
-        HDF_LOGE("%{public}s componentNameSize [%{public}d] is too short", __func__, index);
-        return OMX_ErrorMax;
-    }
-    errno_t ret = strcpy_s(componentName, componentNameSize, compName.c_str());
-    if (ret != EOK) {
-        HDF_LOGE("%{public}s strcpy_s return error", __func__);
-        return OMX_ErrorInsufficientResources;
-    }
-
-    return OMX_ErrorNone;
+    return err;
 }
 
 int32_t ComponentMgr::GetRolesForComponent(const char *componentName, std::vector<std::string> *roles)
 {
-    if (roles == NULL) {
-        return OMX_ErrorMax;
-    }
-    roles->clear();
-    std::vector<ComponentNameAndObjectPoint>::iterator it;
-    for (it = componentNameAndObjectPoint_.begin(); it != componentNameAndObjectPoint_.end(); ++it) {
-        if (strcmp(componentName, it->componentName.c_str()) != 0) {
-            continue;
-        }
-        if (it->omxComponentMgr == nullptr) {
-            HDF_LOGE("%{public}s omxComponentMgr is null", __func__);
-            return OMX_ErrorInvalidComponentName;
-        }
-
-        int32_t err = it->omxComponentMgr->GetRolesForComponent(componentName, roles);
-        return err;
-    }
-    return OMX_ErrorInvalidComponentName;
+    (void)roles;
+    (void)componentName;
+    return OMX_ErrorNone;
 }
 
 void ComponentMgr::AddVendorComponent()
 {
-    std::string path = HDF_LIBRARY_FULL_PATH("libOMX_Pluginhw");
+    std::string path = HDF_LIBRARY_FULL_PATH("libOMX_Core");
     AddComponentByLibName(path.c_str());
 }
 
@@ -150,72 +92,32 @@ void ComponentMgr::AddSoftComponent()
 
 void ComponentMgr::AddComponentByLibName(const char *libName)
 {
-    void *libHandle = dlopen(libName, RTLD_LAZY);
-    if (libHandle == NULL) {
-        HDF_LOGE("ComponentMgr::AddComponentByLibName:libHandle is NULL, path is %{public}s", libName);
-        return;
-    }
-    typedef IComponentMgr *(*CreateOMXPluginFunc)();
-    CreateOMXPluginFunc createOMXPlugin = (CreateOMXPluginFunc)dlsym(libHandle, "createOMXPlugin");
-
-    IComponentMgr *plugin = nullptr;
-    if (createOMXPlugin != nullptr) {
-        plugin = (*createOMXPlugin)();
-    }
-    if (plugin != nullptr) {
-        ComponentInfo info;
-        info.omxComponent = plugin;
-        info.LibHandle = libHandle;
-        componentsList_.push_back(info);
-        AddComponentByInstance(plugin);
-        loadLibSuc_ = true;
-    } else {
-        dlclose(libHandle);
-    }
-}
-
-void ComponentMgr::AddComponentByInstance(IComponentMgr *pMrg)
-{
+    auto core = std::make_shared<CodecOMXCore>();
+    core->Init(libName);
+    std::lock_guard<std::mutex> lk(mutex_);
+    cores_.emplace_back(core);
+    std::string name("");
     uint32_t index = 0;
-    char name[COMPONENT_NAME_MAX_LEN];
-    bool exists = false;
-    int32_t err;
-    while ((err = pMrg->EnumerateComponentsByIndex(index++, name, sizeof(name))) == OMX_ErrorNone) {
-        std::vector<ComponentNameAndObjectPoint>::iterator it;
-        for (it = componentNameAndObjectPoint_.begin(); it != componentNameAndObjectPoint_.end(); ++it) {
-            if (strcmp(name, it->componentName.c_str()) == 0) {
-                exists = true;
-                break;
-            }
-        }
-        if (exists) {
-            exists = false;
-            continue;
-        }
-        HDF_LOGI("ComponentMgr::AddComponentByInstance:component name=%{public}s", name);
-        ComponentNameAndObjectPoint point;
-        point.componentName = name;
-        point.omxComponentMgr = pMrg;
-        componentNameAndObjectPoint_.push_back(point);
+    while (HDF_SUCCESS == core->ComponentNameEnum(name, index)) {
+        ++index;
+        compoentsCore_.emplace(std::make_pair(name, core));
     }
 }
 
 void ComponentMgr::CleanComponent()
 {
-    componentNameAndObjectPoint_.clear();
-    componentTypePointAndObjectPoint_.clear();
-
-    typedef void (*DestroyOMXPluginFunc)(IComponentMgr *);
-    for (const ComponentInfo &comInfo : componentsList_) {
-        DestroyOMXPluginFunc destroyOMXPlugin = (DestroyOMXPluginFunc)dlsym(comInfo.LibHandle, "destroyOMXPlugin");
-        if (destroyOMXPlugin != nullptr) {
-            destroyOMXPlugin(comInfo.omxComponent);
-        } else {
-            delete comInfo.omxComponent;
-        }
-        dlclose(comInfo.LibHandle);
+    std::lock_guard<std::mutex> lk(mutex_);
+    for (size_t i = 0; i < components_.size(); i++) {
+        components_[i].core->FreeHandle(components_[i].handle);
     }
-    componentsList_.clear();
+    components_.clear();
+
+    for (size_t i = 0; i < cores_.size(); i++) {
+        cores_[i]->DeInit();
+    }
+    cores_.clear();
+
+    compoentsCore_.clear();
 }
 }  // namespace Omx
 }  // namespace Codec
