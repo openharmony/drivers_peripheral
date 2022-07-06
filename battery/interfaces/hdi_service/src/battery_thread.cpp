@@ -60,7 +60,7 @@ int32_t BatteryThread::OpenUeventSocket()
         return INVALID_FD;
     }
 
-    int32_t ret = setsockopt(fd, SOL_SOCKET, SO_RCVBUFFORCE, &bufferSize, sizeof(bufferSize));
+    int32_t ret = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     if (ret < 0) {
         BATTERY_HILOGE(COMP_HDI, "set socket opt failed, ret: %{public}d", ret);
         close(fd);
