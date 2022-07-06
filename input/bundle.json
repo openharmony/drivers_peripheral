@@ -15,7 +15,7 @@
         "ipc",
         "hdf_core",
         "hiviewdfx_hilog_native",
-        "graphic_graphic_2d",
+        "graphic_standard",
         "utils_base"
       ],
       "third_part": [
