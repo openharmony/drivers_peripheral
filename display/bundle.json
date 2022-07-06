@@ -12,7 +12,7 @@
     "ram": "7700KB",
     "deps": {
       "components": [
-        "graphic_graphic_2d",
+        "graphic_standard",
         "hdf_core",
         "hiviewdfx_hilog_native",
         "utils_base"
