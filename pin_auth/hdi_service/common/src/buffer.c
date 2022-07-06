@@ -122,7 +122,7 @@ void DestoryBuffer(Buffer *buffer)
 {
     if (buffer != NULL) {
         if (buffer->buf != NULL) {
-            if (memset_s(buffer->buf, buffer->contentSize, 0, buffer->contentSize) != EOK) {
+            if (memset_s(buffer->buf, buffer->maxSize, 0, buffer->maxSize) != EOK) {
                 LOG_ERROR("DestoryBuffer memset fail!");
             }
             Free(buffer->buf);
